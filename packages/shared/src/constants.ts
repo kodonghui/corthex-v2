@@ -27,6 +27,9 @@ export const ERROR_CODES = {
   // 메신저
   MSG_001: '채널을 찾을 수 없습니다',
   MSG_002: '채널 멤버가 아닙니다',
+  // NEXUS
+  NEXUS_001: '레이아웃을 찾을 수 없습니다',
+  NEXUS_002: '조직도 데이터 조회 실패',
 } as const
 
 export type ErrorCode = keyof typeof ERROR_CODES

@@ -12,6 +12,7 @@ import { SnsPage } from './pages/sns'
 import { MessengerPage } from './pages/messenger'
 import { DashboardPage } from './pages/dashboard'
 import { OpsLogPage } from './pages/ops-log'
+import { NexusPage } from './pages/nexus'
 import { useEffect } from 'react'
 
 const queryClient = new QueryClient()
@@ -49,6 +50,7 @@ export function App() {
             <Route path="messenger" element={<MessengerPage />} />
             <Route path="dashboard" element={<DashboardPage />} />
             <Route path="ops-log" element={<OpsLogPage />} />
+            <Route path="nexus" element={<NexusPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
         </Routes>

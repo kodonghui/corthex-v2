@@ -10,6 +10,7 @@ const navItems = [
   { to: '/messenger', label: '메신저', icon: '💭' },
   { to: '/dashboard', label: '대시보드', icon: '📊' },
   { to: '/ops-log', label: '작전일지', icon: '📋' },
+  { to: '/nexus', label: 'NEXUS', icon: '🔗' },
   { to: '/settings', label: '설정', icon: '⚙️' },
 ]
 

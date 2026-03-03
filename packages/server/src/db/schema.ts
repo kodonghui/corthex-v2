@@ -329,6 +329,17 @@ export const messengerMessages = pgTable('messenger_messages', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 
+// === 26. canvas_layouts — NEXUS 캔버스 레이아웃 ===
+export const canvasLayouts = pgTable('canvas_layouts', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  name: varchar('name', { length: 100 }).notNull().default('default'),
+  layoutData: jsonb('layout_data').notNull().default('{}'),
+  isDefault: boolean('is_default').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
 // === Relations ===
 export const companiesRelations = relations(companies, ({ many }) => ({
   users: many(users),
@@ -446,4 +457,8 @@ export const messengerMessagesRelations = relations(messengerMessages, ({ one })
   company: one(companies, { fields: [messengerMessages.companyId], references: [companies.id] }),
   channel: one(messengerChannels, { fields: [messengerMessages.channelId], references: [messengerChannels.id] }),
   user: one(users, { fields: [messengerMessages.userId], references: [users.id] }),
+}))
+
+export const canvasLayoutsRelations = relations(canvasLayouts, ({ one }) => ({
+  company: one(companies, { fields: [canvasLayouts.companyId], references: [companies.id] }),
 }))

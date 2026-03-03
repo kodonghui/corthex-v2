@@ -20,6 +20,7 @@ import { activityLogRoute } from './routes/workspace/activity-log'
 import { dashboardRoute } from './routes/workspace/dashboard'
 import { telegramRoute } from './routes/workspace/telegram'
 import { messengerRoute } from './routes/workspace/messenger'
+import { nexusRoute } from './routes/workspace/nexus'
 import { startJobWorker } from './lib/job-queue'
 
 const app = new Hono()
@@ -60,6 +61,7 @@ app.route('/api/workspace', activityLogRoute)
 app.route('/api/workspace', dashboardRoute)
 app.route('/api/workspace', telegramRoute)
 app.route('/api/workspace/messenger', messengerRoute)
+app.route('/api/workspace', nexusRoute)
 
 // 서버 시작
 const port = Number(process.env.PORT) || 3000

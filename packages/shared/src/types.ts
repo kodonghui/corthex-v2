@@ -101,3 +101,37 @@ export type MessengerChannel = {
   createdBy: string
   createdAt: Date
 }
+
+// === NEXUS 캔버스 ===
+export type NexusNodePosition = {
+  x: number
+  y: number
+}
+
+export type NexusLayoutData = {
+  nodes: Record<string, NexusNodePosition>
+  viewport?: { x: number; y: number; zoom: number }
+}
+
+export type NexusOrgData = {
+  company: { id: string; name: string; slug: string }
+  departments: {
+    id: string
+    name: string
+    description: string | null
+    agents: {
+      id: string
+      name: string
+      role: string
+      status: string
+      isSecretary: boolean
+    }[]
+  }[]
+  unassignedAgents: {
+    id: string
+    name: string
+    role: string
+    status: string
+    isSecretary: boolean
+  }[]
+}
