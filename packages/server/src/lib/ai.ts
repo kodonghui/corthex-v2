@@ -1,13 +1,33 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { db } from '../db'
-import { chatMessages, agents, agentMemory } from '../db/schema'
-import { eq } from 'drizzle-orm'
+import { chatMessages, agents, agentMemory, cliCredentials } from '../db/schema'
+import { eq, and } from 'drizzle-orm'
 import { loadAgentTools, toClaudeTools, executeTool } from './tool-executor'
 import { recordCost } from './cost-tracker'
+import { decrypt } from './crypto'
 
-const getClient = () => {
-  const apiKey = process.env.ANTHROPIC_API_KEY
-  if (!apiKey) throw new Error('ANTHROPIC_API_KEY가 설정되지 않았습니다')
+/**
+ * 유저의 CLI 토큰으로 Anthropic 클라이언트 생성
+ * 설계: 각 유저(H)마다 자기 CLI 토큰 → 비용/데이터 격리
+ */
+export async function getClientForUser(userId: string, companyId: string): Promise<Anthropic> {
+  const [cred] = await db
+    .select({ encryptedToken: cliCredentials.encryptedToken })
+    .from(cliCredentials)
+    .where(
+      and(
+        eq(cliCredentials.userId, userId),
+        eq(cliCredentials.companyId, companyId),
+        eq(cliCredentials.isActive, true),
+      ),
+    )
+    .limit(1)
+
+  if (!cred) {
+    throw new Error('CLI 토큰이 등록되지 않았습니다. 관리자에게 CLI 크레덴셜 등록을 요청하세요.')
+  }
+
+  const apiKey = await decrypt(cred.encryptedToken)
   return new Anthropic({ apiKey })
 }
 
@@ -16,13 +36,13 @@ type ChatContext = {
   sessionId: string
   companyId: string
   userMessage: string
-  userId?: string
+  userId: string
 }
 
 const MAX_TOOL_ROUNDS = 5  // 도구 루프 최대 반복 횟수
 
 export async function generateAgentResponse(ctx: ChatContext): Promise<string> {
-  const client = getClient()
+  const client = await getClientForUser(ctx.userId, ctx.companyId)
 
   // 1. 에이전트 정보 로드
   const [agent] = await db
@@ -87,7 +107,7 @@ export async function generateAgentResponse(ctx: ChatContext): Promise<string> {
     agentId: ctx.agentId,
     sessionId: ctx.sessionId,
     departmentId: agent.departmentId,
-    userId: ctx.userId || '',
+    userId: ctx.userId,
   }
 
   let toolCallSummaries: string[] = []

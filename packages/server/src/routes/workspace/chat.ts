@@ -145,6 +145,7 @@ chatRoute.post(
           sessionId,
           companyId: tenant.companyId,
           userMessage: content,
+          userId: tenant.userId,
         })
       } else {
         // 일반 에이전트: 직접 대화
@@ -153,10 +154,11 @@ chatRoute.post(
           sessionId,
           companyId: tenant.companyId,
           userMessage: content,
+          userId: tenant.userId,
         })
       }
     } catch (err) {
-      aiContent = `[AI 연결 오류] ${err instanceof Error ? err.message : '알 수 없는 오류'}. 관리자에게 ANTHROPIC_API_KEY 설정을 확인해주세요.`
+      aiContent = `[AI 연결 오류] ${err instanceof Error ? err.message : '알 수 없는 오류'}`
     }
 
     const [agentMsg] = await db

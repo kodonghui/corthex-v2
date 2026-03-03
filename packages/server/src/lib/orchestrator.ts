@@ -8,18 +8,14 @@ import Anthropic from '@anthropic-ai/sdk'
 import { db } from '../db'
 import { agents, departments, delegations, chatMessages } from '../db/schema'
 import { eq, and } from 'drizzle-orm'
-
-const getClient = () => {
-  const apiKey = process.env.ANTHROPIC_API_KEY
-  if (!apiKey) throw new Error('ANTHROPIC_API_KEY가 설정되지 않았습니다')
-  return new Anthropic({ apiKey })
-}
+import { getClientForUser } from './ai'
 
 type OrchestrateContext = {
   secretaryAgentId: string
   sessionId: string
   companyId: string
   userMessage: string
+  userId: string
 }
 
 type DelegationTarget = {
@@ -145,7 +141,7 @@ ${resultsText}
  * 메인 오케스트레이션: 비서 위임 전체 플로우
  */
 export async function orchestrateSecretary(ctx: OrchestrateContext): Promise<string> {
-  const client = getClient()
+  const client = await getClientForUser(ctx.userId, ctx.companyId)
 
   // 1. 회사 내 부서 + 부서 에이전트 조회
   const deptAgents = await db
@@ -174,6 +170,7 @@ export async function orchestrateSecretary(ctx: OrchestrateContext): Promise<str
       sessionId: ctx.sessionId,
       companyId: ctx.companyId,
       userMessage: ctx.userMessage,
+      userId: ctx.userId,
     })
   }
 

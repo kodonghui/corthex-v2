@@ -110,6 +110,7 @@ async function processJob(job: typeof nightJobs.$inferSelect) {
         sessionId,
         companyId: job.companyId,
         userMessage: job.instruction,
+        userId: job.userId,
       })
     } else {
       result = await generateAgentResponse({
