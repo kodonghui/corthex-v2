@@ -14,6 +14,8 @@ import { workspaceAgentsRoute } from './routes/workspace/agents'
 import { chatRoute } from './routes/workspace/chat'
 import { profileRoute } from './routes/workspace/profile'
 import { reportsRoute } from './routes/workspace/reports'
+import { jobsRoute } from './routes/workspace/jobs'
+import { startJobWorker } from './lib/job-queue'
 
 const app = new Hono()
 
@@ -47,11 +49,15 @@ app.route('/api/workspace', workspaceAgentsRoute)
 app.route('/api/workspace/chat', chatRoute)
 app.route('/api/workspace', profileRoute)
 app.route('/api/workspace', reportsRoute)
+app.route('/api/workspace/jobs', jobsRoute)
 
 // 서버 시작
 const port = Number(process.env.PORT) || 3000
 
 console.log(`🚀 CORTHEX v2 서버 시작 — http://localhost:${port}`)
+
+// 야간 작업 워커 시작 (백그라운드 폴링)
+startJobWorker()
 
 export default {
   port,

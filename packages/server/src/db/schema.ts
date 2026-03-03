@@ -8,6 +8,7 @@ export const messageSenderEnum = pgEnum('message_sender', ['user', 'agent'])
 export const toolScopeEnum = pgEnum('tool_scope', ['platform', 'company', 'department'])
 export const delegationStatusEnum = pgEnum('delegation_status', ['pending', 'processing', 'completed', 'failed'])
 export const reportStatusEnum = pgEnum('report_status', ['draft', 'submitted', 'reviewed'])
+export const jobStatusEnum = pgEnum('job_status', ['queued', 'processing', 'completed', 'failed'])
 
 // === 1. companies — 회사 (테넌트 최상위 단위) ===
 export const companies = pgTable('companies', {
@@ -212,6 +213,26 @@ export const toolCalls = pgTable('tool_calls', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 
+// === 18. night_jobs — 야간 작업 큐 ===
+export const nightJobs = pgTable('night_jobs', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  agentId: uuid('agent_id').notNull().references(() => agents.id),
+  sessionId: uuid('session_id').references(() => chatSessions.id),
+  instruction: text('instruction').notNull(),
+  status: jobStatusEnum('status').notNull().default('queued'),
+  result: text('result'),
+  error: text('error'),
+  retryCount: integer('retry_count').notNull().default(0),
+  maxRetries: integer('max_retries').notNull().default(3),
+  scheduledFor: timestamp('scheduled_for').notNull().defaultNow(),
+  startedAt: timestamp('started_at'),
+  completedAt: timestamp('completed_at'),
+  isRead: boolean('is_read').notNull().default(false),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
 // === Relations ===
 export const companiesRelations = relations(companies, ({ many }) => ({
   users: many(users),
@@ -283,4 +304,11 @@ export const toolCallsRelations = relations(toolCalls, ({ one }) => ({
   session: one(chatSessions, { fields: [toolCalls.sessionId], references: [chatSessions.id] }),
   agent: one(agents, { fields: [toolCalls.agentId], references: [agents.id] }),
   tool: one(tools, { fields: [toolCalls.toolId], references: [tools.id] }),
+}))
+
+export const nightJobsRelations = relations(nightJobs, ({ one }) => ({
+  company: one(companies, { fields: [nightJobs.companyId], references: [companies.id] }),
+  user: one(users, { fields: [nightJobs.userId], references: [users.id] }),
+  agent: one(agents, { fields: [nightJobs.agentId], references: [agents.id] }),
+  session: one(chatSessions, { fields: [nightJobs.sessionId], references: [chatSessions.id] }),
 }))

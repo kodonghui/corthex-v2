@@ -4,6 +4,7 @@ import { useAuthStore } from '../stores/auth-store'
 const navItems = [
   { to: '/', label: '홈', icon: '🏠' },
   { to: '/chat', label: '채팅', icon: '💬' },
+  { to: '/jobs', label: '야간작업', icon: '🌙' },
   { to: '/reports', label: '보고서', icon: '📄' },
   { to: '/settings', label: '설정', icon: '⚙️' },
 ]
