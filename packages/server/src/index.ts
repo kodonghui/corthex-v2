@@ -67,18 +67,16 @@ app.route('/api/workspace', nexusRoute)
 
 // 프로덕션: 정적 파일 서빙 (SPA 폴백 포함)
 if (isProd) {
-  const root = process.env.STATIC_ROOT || './public'
-
   // Admin SPA — /admin/*
   app.use('/admin/*', serveStatic({
-    root: `${root}/admin`,
+    root: '/app/public/admin',
     rewriteRequestPath: (p) => p.replace(/^\/admin/, '') || '/',
   }))
-  app.get('/admin/*', serveStatic({ root: `${root}/admin`, path: '/index.html' }))
+  app.get('/admin/*', serveStatic({ root: '/app/public/admin', path: '/index.html' }))
 
   // App SPA — /*
-  app.use('*', serveStatic({ root: `${root}/app` }))
-  app.get('*', serveStatic({ root: `${root}/app`, path: '/index.html' }))
+  app.use('*', serveStatic({ root: '/app/public/app' }))
+  app.get('*', serveStatic({ root: '/app/public/app', path: '/index.html' }))
 }
 
 // 서버 시작
