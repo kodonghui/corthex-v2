@@ -1,9 +1,9 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { eq } from 'drizzle-orm'
+import { eq, and, desc } from 'drizzle-orm'
 import { db } from '../../db'
-import { users, apiKeys } from '../../db/schema'
+import { users, apiKeys, toolCalls, tools } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { encrypt } from '../../lib/crypto'
@@ -110,4 +110,39 @@ profileRoute.post('/profile/api-keys', zValidator('json', registerApiKeySchema),
     })
 
   return c.json({ data: apiKey }, 201)
+})
+
+// DELETE /api/workspace/profile/api-keys/:id — 내 API key 삭제
+profileRoute.delete('/profile/api-keys/:id', async (c) => {
+  const tenant = c.get('tenant') as TenantContext
+  const id = c.req.param('id')
+
+  const [key] = await db
+    .delete(apiKeys)
+    .where(and(eq(apiKeys.id, id), eq(apiKeys.userId, tenant.userId)))
+    .returning()
+
+  if (!key) throw new HTTPError(404, 'API key를 찾을 수 없습니다', 'PROFILE_002')
+  return c.json({ data: { deleted: true } })
+})
+
+// GET /api/workspace/profile/tool-calls — 내 도구 호출 내역 (최근 50건)
+profileRoute.get('/profile/tool-calls', async (c) => {
+  const tenant = c.get('tenant') as TenantContext
+
+  const result = await db
+    .select({
+      id: toolCalls.id,
+      toolName: toolCalls.toolName,
+      input: toolCalls.input,
+      output: toolCalls.output,
+      status: toolCalls.status,
+      createdAt: toolCalls.createdAt,
+    })
+    .from(toolCalls)
+    .where(eq(toolCalls.companyId, tenant.companyId))
+    .orderBy(desc(toolCalls.createdAt))
+    .limit(50)
+
+  return c.json({ data: result })
 })

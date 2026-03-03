@@ -266,32 +266,49 @@ export function ChatPage() {
                     </div>
                   )}
 
-                  {messages.map((msg) => (
-                    <div
-                      key={msg.id}
-                      className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
+                  {messages.map((msg) => {
+                    // 도구 호출 내역 분리
+                    const toolSplit = msg.content.split('\n\n---\n🔧 **도구 호출 내역:**\n')
+                    const mainContent = toolSplit[0]
+                    const toolContent = toolSplit[1] || null
+
+                    return (
                       <div
-                        className={`max-w-[70%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                          msg.sender === 'user'
-                            ? 'bg-indigo-600 text-white'
-                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
-                        }`}
+                        key={msg.id}
+                        className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
-                        <p className="whitespace-pre-wrap">{msg.content}</p>
-                        <p
-                          className={`text-[10px] mt-1 ${
-                            msg.sender === 'user' ? 'text-indigo-200' : 'text-zinc-400'
+                        <div
+                          className={`max-w-[70%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+                            msg.sender === 'user'
+                              ? 'bg-indigo-600 text-white'
+                              : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
                           }`}
                         >
-                          {new Date(msg.createdAt).toLocaleTimeString('ko-KR', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </p>
+                          <p className="whitespace-pre-wrap">{mainContent}</p>
+                          {toolContent && (
+                            <div className="mt-2 pt-2 border-t border-zinc-200 dark:border-zinc-700">
+                              <p className="text-[10px] font-medium text-indigo-500 dark:text-indigo-400 mb-1">
+                                🔧 도구 호출
+                              </p>
+                              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 whitespace-pre-wrap">
+                                {toolContent}
+                              </p>
+                            </div>
+                          )}
+                          <p
+                            className={`text-[10px] mt-1 ${
+                              msg.sender === 'user' ? 'text-indigo-200' : 'text-zinc-400'
+                            }`}
+                          >
+                            {new Date(msg.createdAt).toLocaleTimeString('ko-KR', {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
 
                   {isTyping && (
                     <div className="flex justify-start">

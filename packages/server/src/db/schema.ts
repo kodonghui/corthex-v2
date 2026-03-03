@@ -120,6 +120,8 @@ export const tools = pgTable('tools', {
   name: varchar('name', { length: 100 }).notNull(),
   description: text('description'),
   scope: toolScopeEnum('scope').notNull().default('platform'),
+  inputSchema: jsonb('input_schema'),  // Claude tool_use JSON Schema
+  handler: varchar('handler', { length: 100 }),  // 서버 핸들러 함수명
   config: jsonb('config'),  // 도구별 설정
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
@@ -183,6 +185,33 @@ export const reportComments = pgTable('report_comments', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 
+// === 16. department_knowledge — 본부별 지식 베이스 ===
+export const departmentKnowledge = pgTable('department_knowledge', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  departmentId: uuid('department_id').notNull().references(() => departments.id),
+  title: varchar('title', { length: 200 }).notNull(),
+  content: text('content').notNull(),
+  category: varchar('category', { length: 100 }),
+  createdBy: uuid('created_by').references(() => users.id),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+// === 17. tool_calls — 도구 호출 기록 ===
+export const toolCalls = pgTable('tool_calls', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  sessionId: uuid('session_id').notNull().references(() => chatSessions.id),
+  agentId: uuid('agent_id').notNull().references(() => agents.id),
+  toolId: uuid('tool_id').notNull().references(() => tools.id),
+  toolName: varchar('tool_name', { length: 100 }).notNull(),
+  input: jsonb('input'),
+  output: text('output'),
+  status: varchar('status', { length: 20 }).notNull().default('success'),  // success, error
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
 // === Relations ===
 export const companiesRelations = relations(companies, ({ many }) => ({
   users: many(users),
@@ -210,6 +239,7 @@ export const agentsRelations = relations(agents, ({ one, many }) => ({
 export const departmentsRelations = relations(departments, ({ one, many }) => ({
   company: one(companies, { fields: [departments.companyId], references: [companies.id] }),
   agents: many(agents),
+  knowledge: many(departmentKnowledge),
 }))
 
 export const chatSessionsRelations = relations(chatSessions, ({ one, many }) => ({
@@ -241,4 +271,16 @@ export const reportCommentsRelations = relations(reportComments, ({ one }) => ({
   company: one(companies, { fields: [reportComments.companyId], references: [companies.id] }),
   report: one(reports, { fields: [reportComments.reportId], references: [reports.id] }),
   author: one(users, { fields: [reportComments.authorId], references: [users.id] }),
+}))
+
+export const departmentKnowledgeRelations = relations(departmentKnowledge, ({ one }) => ({
+  company: one(companies, { fields: [departmentKnowledge.companyId], references: [companies.id] }),
+  department: one(departments, { fields: [departmentKnowledge.departmentId], references: [departments.id] }),
+}))
+
+export const toolCallsRelations = relations(toolCalls, ({ one }) => ({
+  company: one(companies, { fields: [toolCalls.companyId], references: [companies.id] }),
+  session: one(chatSessions, { fields: [toolCalls.sessionId], references: [chatSessions.id] }),
+  agent: one(agents, { fields: [toolCalls.agentId], references: [agents.id] }),
+  tool: one(tools, { fields: [toolCalls.toolId], references: [tools.id] }),
 }))
