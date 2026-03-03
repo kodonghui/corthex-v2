@@ -1,11 +1,12 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { eq } from 'drizzle-orm'
+import { eq, and } from 'drizzle-orm'
 import { db } from '../../db'
 import { agents } from '../../db/schema'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
+import type { TenantContext } from '@corthex/shared'
 
 export const agentsRoute = new Hono()
 
@@ -41,8 +42,9 @@ agentsRoute.get('/agents', async (c) => {
 
 // GET /api/admin/agents/:id
 agentsRoute.get('/agents/:id', async (c) => {
+  const tenant = c.get('tenant') as TenantContext
   const id = c.req.param('id')
-  const [agent] = await db.select().from(agents).where(eq(agents.id, id)).limit(1)
+  const [agent] = await db.select().from(agents).where(and(eq(agents.id, id), eq(agents.companyId, tenant.companyId))).limit(1)
   if (!agent) throw new HTTPError(404, '에이전트를 찾을 수 없습니다', 'AGENT_001')
   return c.json({ data: agent })
 })
@@ -61,10 +63,11 @@ agentsRoute.post('/agents', zValidator('json', createAgentSchema), async (c) => 
 agentsRoute.patch('/agents/:id', zValidator('json', updateAgentSchema), async (c) => {
   const id = c.req.param('id')
   const body = c.req.valid('json')
+  const tenant = c.get('tenant') as TenantContext
   const [agent] = await db
     .update(agents)
     .set({ ...body, updatedAt: new Date() })
-    .where(eq(agents.id, id))
+    .where(and(eq(agents.id, id), eq(agents.companyId, tenant.companyId)))
     .returning()
   if (!agent) throw new HTTPError(404, '에이전트를 찾을 수 없습니다', 'AGENT_001')
   return c.json({ data: agent })
@@ -72,11 +75,12 @@ agentsRoute.patch('/agents/:id', zValidator('json', updateAgentSchema), async (c
 
 // DELETE /api/admin/agents/:id — 비활성화
 agentsRoute.delete('/agents/:id', async (c) => {
+  const tenant = c.get('tenant') as TenantContext
   const id = c.req.param('id')
   const [agent] = await db
     .update(agents)
     .set({ isActive: false, status: 'offline', updatedAt: new Date() })
-    .where(eq(agents.id, id))
+    .where(and(eq(agents.id, id), eq(agents.companyId, tenant.companyId)))
     .returning()
   if (!agent) throw new HTTPError(404, '에이전트를 찾을 수 없습니다', 'AGENT_001')
   return c.json({ data: { message: '비활성화되었습니다' } })

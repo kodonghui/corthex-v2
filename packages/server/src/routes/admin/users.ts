@@ -6,6 +6,7 @@ import { db } from '../../db'
 import { users } from '../../db/schema'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
+import type { TenantContext } from '@corthex/shared'
 
 export const usersRoute = new Hono()
 
@@ -53,6 +54,7 @@ usersRoute.get('/users', async (c) => {
 
 // GET /api/admin/users/:id — 직원 상세
 usersRoute.get('/users/:id', async (c) => {
+  const tenant = c.get('tenant') as TenantContext
   const id = c.req.param('id')
   const [user] = await db
     .select({
@@ -66,7 +68,7 @@ usersRoute.get('/users/:id', async (c) => {
       createdAt: users.createdAt,
     })
     .from(users)
-    .where(eq(users.id, id))
+    .where(and(eq(users.id, id), eq(users.companyId, tenant.companyId)))
     .limit(1)
 
   if (!user) throw new HTTPError(404, '직원을 찾을 수 없습니다', 'USER_001')
@@ -106,6 +108,7 @@ usersRoute.post('/users', zValidator('json', createUserSchema), async (c) => {
 
 // PATCH /api/admin/users/:id — 직원 수정
 usersRoute.patch('/users/:id', zValidator('json', updateUserSchema), async (c) => {
+  const tenant = c.get('tenant') as TenantContext
   const id = c.req.param('id')
   const { password, ...rest } = c.req.valid('json')
 
@@ -117,7 +120,7 @@ usersRoute.patch('/users/:id', zValidator('json', updateUserSchema), async (c) =
   const [user] = await db
     .update(users)
     .set(updateData)
-    .where(eq(users.id, id))
+    .where(and(eq(users.id, id), eq(users.companyId, tenant.companyId)))
     .returning({
       id: users.id,
       companyId: users.companyId,
@@ -135,11 +138,12 @@ usersRoute.patch('/users/:id', zValidator('json', updateUserSchema), async (c) =
 
 // DELETE /api/admin/users/:id — 직원 비활성화
 usersRoute.delete('/users/:id', async (c) => {
+  const tenant = c.get('tenant') as TenantContext
   const id = c.req.param('id')
   const [user] = await db
     .update(users)
     .set({ isActive: false, updatedAt: new Date() })
-    .where(eq(users.id, id))
+    .where(and(eq(users.id, id), eq(users.companyId, tenant.companyId)))
     .returning()
 
   if (!user) throw new HTTPError(404, '직원을 찾을 수 없습니다', 'USER_001')

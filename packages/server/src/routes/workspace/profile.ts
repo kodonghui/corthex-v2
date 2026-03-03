@@ -3,7 +3,7 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { eq, and, desc } from 'drizzle-orm'
 import { db } from '../../db'
-import { users, apiKeys, toolCalls, tools } from '../../db/schema'
+import { users, apiKeys, toolCalls, chatSessions } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { encrypt } from '../../lib/crypto'
@@ -140,7 +140,8 @@ profileRoute.get('/profile/tool-calls', async (c) => {
       createdAt: toolCalls.createdAt,
     })
     .from(toolCalls)
-    .where(eq(toolCalls.companyId, tenant.companyId))
+    .innerJoin(chatSessions, eq(toolCalls.sessionId, chatSessions.id))
+    .where(and(eq(toolCalls.companyId, tenant.companyId), eq(chatSessions.userId, tenant.userId)))
     .orderBy(desc(toolCalls.createdAt))
     .limit(50)
 

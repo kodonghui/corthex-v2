@@ -199,7 +199,7 @@ chatRoute.get('/sessions/:sessionId/delegations', async (c) => {
     })
     .from(delegations)
     .innerJoin(agents, eq(delegations.targetAgentId, agents.id))
-    .where(eq(delegations.sessionId, sessionId))
+    .where(and(eq(delegations.sessionId, sessionId), eq(delegations.companyId, tenant.companyId)))
     .orderBy(delegations.createdAt)
 
   return c.json({ data: result })
