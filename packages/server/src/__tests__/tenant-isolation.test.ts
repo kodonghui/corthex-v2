@@ -10,37 +10,10 @@
  * 사용법: 서버 실행 후 `bun test src/__tests__/tenant-isolation.test.ts`
  */
 import { describe, test, expect, beforeAll } from 'bun:test'
-import { sign } from 'hono/jwt'
-
-const BASE = 'http://localhost:3000/api'
-const JWT_SECRET = process.env.JWT_SECRET || 'corthex-v2-dev-secret-change-in-production'
-
-// --- 실제 데이터 (Neon DB seed 기준) ---
-const REAL_COMPANY_ID = '6ee92cb0-5065-4e48-8149-38f30ad8913e'
-const REAL_CEO_ID = '36137766-d4c2-4d30-ae87-313341d735a1'
-const REAL_ADMIN_ID = '25235750-3dfe-472a-aadd-1d0310929467'
-const REAL_AGENT_ID = 'c3f0e96d-e227-4b44-a723-91f06527e982' // H-비서
-
-// --- 가짜 회사 (존재하지 않는 companyId) ---
-const FAKE_COMPANY_ID = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'
-const FAKE_USER_ID = '11111111-2222-3333-4444-555555555555'
-
-// JWT 토큰 생성 헬퍼
-async function makeToken(sub: string, companyId: string, role: 'admin' | 'user' = 'user') {
-  return sign({ sub, companyId, role, exp: Math.floor(Date.now() / 1000) + 3600 }, JWT_SECRET)
-}
-
-// fetch 헬퍼
-function api(path: string, token: string, options: RequestInit = {}) {
-  return fetch(`${BASE}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-      ...options.headers,
-    },
-  })
-}
+import {
+  api, BASE, REAL_COMPANY_ID, REAL_CEO_ID, REAL_ADMIN_ID, REAL_AGENT_ID,
+  FAKE_COMPANY_ID, FAKE_USER_ID, makeToken,
+} from './helpers/test-utils'
 
 let realCeoToken: string
 let realAdminToken: string

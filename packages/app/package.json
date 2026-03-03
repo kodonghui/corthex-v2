@@ -7,7 +7,8 @@
     "dev": "vite --port 5173",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "bun test src/__tests__/"
   },
   "dependencies": {
     "@corthex/shared": "workspace:*",

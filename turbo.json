@@ -14,6 +14,15 @@
     },
     "type-check": {
       "dependsOn": ["^build"]
+    },
+    "test": {
+      "cache": false
+    },
+    "test:unit": {
+      "cache": false
+    },
+    "test:api": {
+      "cache": false
     }
   }
 }

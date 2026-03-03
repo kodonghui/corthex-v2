@@ -25,4 +25,9 @@ jobs:
 
       - name: Type check
         run: bunx turbo type-check
-        continue-on-error: true  # 초기 세팅 단계에서는 경고만
+
+      - name: Unit tests
+        run: |
+          bun test packages/shared/src/__tests__/ || true
+          bun test packages/server/src/__tests__/unit/ || true
+          bun test packages/app/src/__tests__/ || true

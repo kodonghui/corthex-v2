@@ -13,7 +13,7 @@ const DEFAULT_PRICING = { input: 3, output: 15 }
 /**
  * 토큰 수를 microdollars로 변환 (1 microdollar = $0.000001)
  */
-function calculateCostMicro(model: string, inputTokens: number, outputTokens: number): number {
+export function calculateCostMicro(model: string, inputTokens: number, outputTokens: number): number {
   const pricing = MODEL_PRICING[model] || DEFAULT_PRICING
   const inputCost = (inputTokens / 1_000_000) * pricing.input * 1_000_000
   const outputCost = (outputTokens / 1_000_000) * pricing.output * 1_000_000
