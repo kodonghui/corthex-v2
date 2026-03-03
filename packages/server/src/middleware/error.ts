@@ -1,23 +1,5 @@
-import type { MiddlewareHandler } from 'hono'
+import type { ErrorHandler } from 'hono'
 import type { ApiError } from '@corthex/shared'
-
-export const errorHandler: MiddlewareHandler = async (c, next) => {
-  try {
-    await next()
-  } catch (err) {
-    console.error('❌ Unhandled error:', err)
-
-    const status = err instanceof HTTPError ? err.status : 500
-    const response: ApiError = {
-      error: {
-        code: 'INTERNAL_ERROR',
-        message: err instanceof Error ? err.message : 'Unknown error',
-      },
-    }
-
-    return c.json(response, status as any)
-  }
-}
 
 export class HTTPError extends Error {
   constructor(
@@ -27,4 +9,18 @@ export class HTTPError extends Error {
   ) {
     super(message)
   }
+}
+
+export const errorHandler: ErrorHandler = (err, c) => {
+  console.error('❌ Error:', err.message)
+
+  const status = err instanceof HTTPError ? err.status : 500
+  const response: ApiError = {
+    error: {
+      code: err instanceof HTTPError ? (err.code ?? 'ERROR') : 'INTERNAL_ERROR',
+      message: err instanceof Error ? err.message : 'Unknown error',
+    },
+  }
+
+  return c.json(response, status as any)
 }

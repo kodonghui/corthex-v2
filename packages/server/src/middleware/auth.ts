@@ -29,7 +29,7 @@ export const authMiddleware: MiddlewareHandler = async (c, next) => {
 
   const token = authHeader.slice(7)
   try {
-    const payload = await verify(token, JWT_SECRET) as JwtPayload
+    const payload = await verify(token, JWT_SECRET, 'HS256') as JwtPayload
     // TenantContext를 요청에 주입
     const tenant: TenantContext = {
       companyId: payload.companyId,
