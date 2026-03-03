@@ -99,3 +99,12 @@ jobs:
             # 헬스 체크
             sleep 5
             curl -f http://localhost:80/api/health || exit 1
+
+      - name: Purge Cloudflare Cache
+        if: ${{ secrets.CLOUDFLARE_ZONE_ID != '' }}
+        run: |
+          curl -s -X POST \
+            "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/purge_cache" \
+            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"purge_everything":true}'

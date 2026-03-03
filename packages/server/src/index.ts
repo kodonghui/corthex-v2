@@ -79,22 +79,28 @@ if (isProd) {
     return 'application/octet-stream'
   }
 
+  // 캐시 헤더: HTML은 no-cache, 해시된 에셋은 1년 캐시
+  const cacheHeaders = (mime: string) =>
+    mime === 'text/html'
+      ? { 'content-type': mime, 'cache-control': 'no-cache, no-store, must-revalidate' }
+      : { 'content-type': mime, 'cache-control': 'public, max-age=31536000, immutable' }
+
   // Admin SPA — /admin/*
   app.get('/admin/*', async (c) => {
     const sub = c.req.path.replace(/^\/admin/, '') || '/index.html'
     const file = Bun.file(`${STATIC_DIR}/admin${sub}`)
-    if (await file.exists()) return new Response(file, { headers: { 'content-type': getMime(sub) } })
+    if (await file.exists()) return new Response(file, { headers: cacheHeaders(getMime(sub)) })
     const fallback = Bun.file(`${STATIC_DIR}/admin/index.html`)
-    return new Response(fallback, { headers: { 'content-type': 'text/html' } })
+    return new Response(fallback, { headers: cacheHeaders('text/html') })
   })
 
   // App SPA — /*
   app.get('*', async (c) => {
     const sub = c.req.path
     const file = Bun.file(`${STATIC_DIR}/app${sub}`)
-    if (await file.exists()) return new Response(file, { headers: { 'content-type': getMime(sub) } })
+    if (await file.exists()) return new Response(file, { headers: cacheHeaders(getMime(sub)) })
     const fallback = Bun.file(`${STATIC_DIR}/app/index.html`)
-    return new Response(fallback, { headers: { 'content-type': 'text/html' } })
+    return new Response(fallback, { headers: cacheHeaders('text/html') })
   })
 }
 
