@@ -6,6 +6,7 @@ import { LoginPage } from './pages/login'
 import { HomePage } from './pages/home'
 import { ChatPage } from './pages/chat'
 import { SettingsPage } from './pages/settings'
+import { ReportsPage } from './pages/reports'
 import { useEffect } from 'react'
 
 const queryClient = new QueryClient()
@@ -37,6 +38,7 @@ export function App() {
           >
             <Route index element={<HomePage />} />
             <Route path="chat" element={<ChatPage />} />
+            <Route path="reports" element={<ReportsPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
         </Routes>

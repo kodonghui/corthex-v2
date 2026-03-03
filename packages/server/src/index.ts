@@ -13,6 +13,7 @@ import { toolsRoute } from './routes/admin/tools'
 import { workspaceAgentsRoute } from './routes/workspace/agents'
 import { chatRoute } from './routes/workspace/chat'
 import { profileRoute } from './routes/workspace/profile'
+import { reportsRoute } from './routes/workspace/reports'
 
 const app = new Hono()
 
@@ -45,6 +46,7 @@ app.route('/api/admin', toolsRoute)
 app.route('/api/workspace', workspaceAgentsRoute)
 app.route('/api/workspace/chat', chatRoute)
 app.route('/api/workspace', profileRoute)
+app.route('/api/workspace', reportsRoute)
 
 // 서버 시작
 const port = Number(process.env.PORT) || 3000

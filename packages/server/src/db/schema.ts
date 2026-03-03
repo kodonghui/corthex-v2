@@ -7,6 +7,7 @@ export const agentStatusEnum = pgEnum('agent_status', ['online', 'working', 'err
 export const messageSenderEnum = pgEnum('message_sender', ['user', 'agent'])
 export const toolScopeEnum = pgEnum('tool_scope', ['platform', 'company', 'department'])
 export const delegationStatusEnum = pgEnum('delegation_status', ['pending', 'processing', 'completed', 'failed'])
+export const reportStatusEnum = pgEnum('report_status', ['draft', 'submitted', 'reviewed'])
 
 // === 1. companies — 회사 (테넌트 최상위 단위) ===
 export const companies = pgTable('companies', {
@@ -158,6 +159,30 @@ export const delegations = pgTable('delegations', {
   completedAt: timestamp('completed_at'),
 })
 
+// === 14. reports — 보고서 ===
+export const reports = pgTable('reports', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  authorId: uuid('author_id').notNull().references(() => users.id),
+  title: varchar('title', { length: 200 }).notNull(),
+  content: text('content').notNull().default(''),
+  status: reportStatusEnum('status').notNull().default('draft'),
+  submittedTo: uuid('submitted_to').references(() => users.id),
+  submittedAt: timestamp('submitted_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+// === 15. report_comments — 보고서 코멘트 (CEO ↔ H 피드백) ===
+export const reportComments = pgTable('report_comments', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  reportId: uuid('report_id').notNull().references(() => reports.id),
+  authorId: uuid('author_id').notNull().references(() => users.id),
+  content: text('content').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
 // === Relations ===
 export const companiesRelations = relations(companies, ({ many }) => ({
   users: many(users),
@@ -204,4 +229,16 @@ export const delegationsRelations = relations(delegations, ({ one }) => ({
   session: one(chatSessions, { fields: [delegations.sessionId], references: [chatSessions.id] }),
   secretaryAgent: one(agents, { fields: [delegations.secretaryAgentId], references: [agents.id] }),
   targetAgent: one(agents, { fields: [delegations.targetAgentId], references: [agents.id] }),
+}))
+
+export const reportsRelations = relations(reports, ({ one, many }) => ({
+  company: one(companies, { fields: [reports.companyId], references: [companies.id] }),
+  author: one(users, { fields: [reports.authorId], references: [users.id] }),
+  comments: many(reportComments),
+}))
+
+export const reportCommentsRelations = relations(reportComments, ({ one }) => ({
+  company: one(companies, { fields: [reportComments.companyId], references: [companies.id] }),
+  report: one(reports, { fields: [reportComments.reportId], references: [reports.id] }),
+  author: one(users, { fields: [reportComments.authorId], references: [users.id] }),
 }))
