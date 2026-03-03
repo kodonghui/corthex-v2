@@ -1,7 +1,6 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
-import { serveStatic } from 'hono/bun'
 import { errorHandler } from './middleware/error'
 import { healthRoute } from './routes/health'
 import { authRoute } from './routes/auth'
@@ -65,18 +64,38 @@ app.route('/api/workspace', telegramRoute)
 app.route('/api/workspace/messenger', messengerRoute)
 app.route('/api/workspace', nexusRoute)
 
-// 프로덕션: 정적 파일 서빙 (SPA 폴백 포함)
+// 프로덕션: Bun 네이티브 정적 파일 서빙 (SPA 폴백 포함)
 if (isProd) {
+  const STATIC_DIR = '/app/public'
+
+  const getMime = (p: string) => {
+    if (p.endsWith('.html')) return 'text/html'
+    if (p.endsWith('.js')) return 'application/javascript'
+    if (p.endsWith('.css')) return 'text/css'
+    if (p.endsWith('.json')) return 'application/json'
+    if (p.endsWith('.png')) return 'image/png'
+    if (p.endsWith('.svg')) return 'image/svg+xml'
+    if (p.endsWith('.ico')) return 'image/x-icon'
+    return 'application/octet-stream'
+  }
+
   // Admin SPA — /admin/*
-  app.use('/admin/*', serveStatic({
-    root: '/app/public/admin',
-    rewriteRequestPath: (p) => p.replace(/^\/admin/, '') || '/',
-  }))
-  app.get('/admin/*', serveStatic({ root: '/app/public/admin', path: '/index.html' }))
+  app.get('/admin/*', async (c) => {
+    const sub = c.req.path.replace(/^\/admin/, '') || '/index.html'
+    const file = Bun.file(`${STATIC_DIR}/admin${sub}`)
+    if (await file.exists()) return new Response(file, { headers: { 'content-type': getMime(sub) } })
+    const fallback = Bun.file(`${STATIC_DIR}/admin/index.html`)
+    return new Response(fallback, { headers: { 'content-type': 'text/html' } })
+  })
 
   // App SPA — /*
-  app.use('*', serveStatic({ root: '/app/public/app' }))
-  app.get('*', serveStatic({ root: '/app/public/app', path: '/index.html' }))
+  app.get('*', async (c) => {
+    const sub = c.req.path
+    const file = Bun.file(`${STATIC_DIR}/app${sub}`)
+    if (await file.exists()) return new Response(file, { headers: { 'content-type': getMime(sub) } })
+    const fallback = Bun.file(`${STATIC_DIR}/app/index.html`)
+    return new Response(fallback, { headers: { 'content-type': 'text/html' } })
+  })
 }
 
 // 서버 시작
