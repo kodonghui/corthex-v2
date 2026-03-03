@@ -74,6 +74,10 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
+            # Nginx 비활성화 (Docker가 직접 80 포트 서빙)
+            sudo systemctl stop nginx || true
+            sudo systemctl disable nginx || true
+
             # 최신 이미지 풀
             docker pull ghcr.io/${{ github.repository }}:latest
 
@@ -81,11 +85,11 @@ jobs:
             docker stop corthex-v2 || true
             docker rm corthex-v2 || true
 
-            # 새 컨테이너 실행
+            # 새 컨테이너 실행 (포트 80 직접 노출)
             docker run -d \
               --name corthex-v2 \
               --restart unless-stopped \
-              -p 3000:3000 \
+              -p 80:3000 \
               --env-file ~/corthex/.env.production \
               ghcr.io/${{ github.repository }}:latest
 
@@ -94,4 +98,4 @@ jobs:
 
             # 헬스 체크
             sleep 5
-            curl -f http://localhost:3000/api/health || exit 1
+            curl -f http://localhost:80/api/health || exit 1
