@@ -6,6 +6,7 @@ import { db } from '../db'
 import { users } from '../db/schema'
 import { createToken, authMiddleware } from '../middleware/auth'
 import { HTTPError } from '../middleware/error'
+import { logActivity } from '../lib/activity-logger'
 
 export const authRoute = new Hono()
 
@@ -38,6 +39,15 @@ authRoute.post('/auth/login', zValidator('json', loginSchema), async (c) => {
     sub: user.id,
     companyId: user.companyId,
     role: user.role,
+  })
+
+  logActivity({
+    companyId: user.companyId,
+    type: 'login',
+    actorType: 'user',
+    actorId: user.id,
+    actorName: user.name,
+    action: '로그인',
   })
 
   return c.json({

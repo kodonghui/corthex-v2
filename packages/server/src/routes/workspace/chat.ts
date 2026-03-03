@@ -8,6 +8,7 @@ import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { generateAgentResponse } from '../../lib/ai'
 import { orchestrateSecretary } from '../../lib/orchestrator'
+import { logActivity } from '../../lib/activity-logger'
 import type { TenantContext } from '@corthex/shared'
 
 export const chatRoute = new Hono()
@@ -167,6 +168,15 @@ chatRoute.post(
         content: aiContent,
       })
       .returning()
+
+    logActivity({
+      companyId: tenant.companyId,
+      type: 'chat',
+      actorType: 'user',
+      actorId: tenant.userId,
+      action: '채팅 메시지 전송',
+      detail: content.slice(0, 100),
+    })
 
     return c.json({ data: { userMessage: userMsg, agentMessage: agentMsg } }, 201)
   },

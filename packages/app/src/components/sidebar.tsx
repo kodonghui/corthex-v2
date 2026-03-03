@@ -6,6 +6,10 @@ const navItems = [
   { to: '/chat', label: '채팅', icon: '💬' },
   { to: '/jobs', label: '야간작업', icon: '🌙' },
   { to: '/reports', label: '보고서', icon: '📄' },
+  { to: '/sns', label: 'SNS', icon: '📱' },
+  { to: '/messenger', label: '메신저', icon: '💭' },
+  { to: '/dashboard', label: '대시보드', icon: '📊' },
+  { to: '/ops-log', label: '작전일지', icon: '📋' },
   { to: '/settings', label: '설정', icon: '⚙️' },
 ]
 

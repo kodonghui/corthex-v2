@@ -3,6 +3,7 @@ import { db } from '../db'
 import { chatMessages, agents, agentMemory } from '../db/schema'
 import { eq } from 'drizzle-orm'
 import { loadAgentTools, toClaudeTools, executeTool } from './tool-executor'
+import { recordCost } from './cost-tracker'
 
 const getClient = () => {
   const apiKey = process.env.ANTHROPIC_API_KEY
@@ -98,6 +99,17 @@ export async function generateAgentResponse(ctx: ChatContext): Promise<string> {
       system: systemPrompt,
       messages,
       ...(claudeTools.length > 0 ? { tools: claudeTools } : {}),
+    })
+
+    // 비용 기록
+    recordCost({
+      companyId: ctx.companyId,
+      agentId: ctx.agentId,
+      sessionId: ctx.sessionId || undefined,
+      model: response.model,
+      inputTokens: response.usage.input_tokens,
+      outputTokens: response.usage.output_tokens,
+      source: 'chat',
     })
 
     // 텍스트 + tool_use 블록 분리

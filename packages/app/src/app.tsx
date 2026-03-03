@@ -8,6 +8,10 @@ import { ChatPage } from './pages/chat'
 import { SettingsPage } from './pages/settings'
 import { ReportsPage } from './pages/reports'
 import { JobsPage } from './pages/jobs'
+import { SnsPage } from './pages/sns'
+import { MessengerPage } from './pages/messenger'
+import { DashboardPage } from './pages/dashboard'
+import { OpsLogPage } from './pages/ops-log'
 import { useEffect } from 'react'
 
 const queryClient = new QueryClient()
@@ -41,6 +45,10 @@ export function App() {
             <Route path="chat" element={<ChatPage />} />
             <Route path="jobs" element={<JobsPage />} />
             <Route path="reports" element={<ReportsPage />} />
+            <Route path="sns" element={<SnsPage />} />
+            <Route path="messenger" element={<MessengerPage />} />
+            <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="ops-log" element={<OpsLogPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
         </Routes>

@@ -63,3 +63,41 @@ export type ChatSession = {
   lastMessageAt: Date
   createdAt: Date
 }
+
+// === SNS ===
+export type SnsStatus = 'draft' | 'pending' | 'approved' | 'rejected' | 'published' | 'failed'
+export type SnsPlatform = 'instagram' | 'tistory' | 'daum_cafe'
+
+export type SnsContent = {
+  id: string
+  companyId: string
+  platform: SnsPlatform
+  title: string
+  body: string
+  hashtags: string | null
+  imageUrl: string | null
+  status: SnsStatus
+  createdBy: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+// === 활동 로그 ===
+export type ActivityLogType = 'chat' | 'delegation' | 'tool_call' | 'job' | 'sns' | 'error' | 'system' | 'login'
+
+// === 비용 추적 ===
+export type CostSummary = {
+  totalCostUsd: number
+  byModel: { model: string; costUsd: number; count: number }[]
+  byAgent: { agentId: string; agentName: string; costUsd: number }[]
+}
+
+// === 메신저 ===
+export type MessengerChannel = {
+  id: string
+  companyId: string
+  name: string
+  description: string | null
+  createdBy: string
+  createdAt: Date
+}

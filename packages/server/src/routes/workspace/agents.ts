@@ -1,8 +1,12 @@
 import { Hono } from 'hono'
+import { zValidator } from '@hono/zod-validator'
+import { z } from 'zod'
 import { eq, and } from 'drizzle-orm'
 import { db } from '../../db'
 import { agents } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
+import { HTTPError } from '../../middleware/error'
+import { logActivity } from '../../lib/activity-logger'
 import type { TenantContext } from '@corthex/shared'
 
 export const workspaceAgentsRoute = new Hono()
@@ -46,10 +50,46 @@ workspaceAgentsRoute.get('/agents/:id', async (c) => {
     .where(and(eq(agents.id, id), eq(agents.companyId, tenant.companyId)))
     .limit(1)
 
-  if (!agent) {
-    const { HTTPError } = await import('../../middleware/error')
-    throw new HTTPError(404, '에이전트를 찾을 수 없습니다', 'AGENT_001')
-  }
+  if (!agent) throw new HTTPError(404, '에이전트를 찾을 수 없습니다', 'AGENT_001')
 
   return c.json({ data: agent })
+})
+
+// PATCH /api/workspace/agents/:id/soul — 에이전트 소울 수정 (자기 에이전트만)
+const updateSoulSchema = z.object({
+  soul: z.string().min(1),
+})
+
+workspaceAgentsRoute.patch('/agents/:id/soul', zValidator('json', updateSoulSchema), async (c) => {
+  const tenant = c.get('tenant') as TenantContext
+  const id = c.req.param('id')
+  const { soul } = c.req.valid('json')
+
+  // 자기 에이전트만 수정 가능
+  const [agent] = await db
+    .select({ id: agents.id, userId: agents.userId, name: agents.name })
+    .from(agents)
+    .where(and(eq(agents.id, id), eq(agents.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!agent) throw new HTTPError(404, '에이전트를 찾을 수 없습니다', 'AGENT_001')
+  if (agent.userId !== tenant.userId && tenant.role !== 'admin') {
+    throw new HTTPError(403, '본인 에이전트만 수정할 수 있습니다', 'AUTH_003')
+  }
+
+  const [updated] = await db
+    .update(agents)
+    .set({ soul, updatedAt: new Date() })
+    .where(eq(agents.id, id))
+    .returning()
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'system',
+    actorType: 'user',
+    actorId: tenant.userId,
+    action: `에이전트 소울 수정: ${agent.name}`,
+  })
+
+  return c.json({ data: updated })
 })

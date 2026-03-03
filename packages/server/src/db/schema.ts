@@ -9,6 +9,9 @@ export const toolScopeEnum = pgEnum('tool_scope', ['platform', 'company', 'depar
 export const delegationStatusEnum = pgEnum('delegation_status', ['pending', 'processing', 'completed', 'failed'])
 export const reportStatusEnum = pgEnum('report_status', ['draft', 'submitted', 'reviewed'])
 export const jobStatusEnum = pgEnum('job_status', ['queued', 'processing', 'completed', 'failed'])
+export const snsStatusEnum = pgEnum('sns_status', ['draft', 'pending', 'approved', 'rejected', 'published', 'failed'])
+export const snsPlatformEnum = pgEnum('sns_platform', ['instagram', 'tistory', 'daum_cafe'])
+export const activityLogTypeEnum = pgEnum('activity_log_type', ['chat', 'delegation', 'tool_call', 'job', 'sns', 'error', 'system', 'login'])
 
 // === 1. companies — 회사 (테넌트 최상위 단위) ===
 export const companies = pgTable('companies', {
@@ -233,6 +236,99 @@ export const nightJobs = pgTable('night_jobs', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 
+// === 19. sns_contents — SNS 콘텐츠 ===
+export const snsContents = pgTable('sns_contents', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  agentId: uuid('agent_id').references(() => agents.id),
+  createdBy: uuid('created_by').notNull().references(() => users.id),
+  platform: snsPlatformEnum('platform').notNull(),
+  title: varchar('title', { length: 200 }).notNull(),
+  body: text('body').notNull(),
+  hashtags: text('hashtags'),
+  imageUrl: text('image_url'),
+  status: snsStatusEnum('status').notNull().default('draft'),
+  reviewedBy: uuid('reviewed_by').references(() => users.id),
+  reviewedAt: timestamp('reviewed_at'),
+  rejectReason: text('reject_reason'),
+  publishedUrl: text('published_url'),
+  publishedAt: timestamp('published_at'),
+  publishError: text('publish_error'),
+  metadata: jsonb('metadata'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+// === 20. activity_logs — 작전일지 (활동 로그) ===
+export const activityLogs = pgTable('activity_logs', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  type: activityLogTypeEnum('type').notNull(),
+  actorType: varchar('actor_type', { length: 20 }).notNull(),  // 'user' | 'agent' | 'system'
+  actorId: uuid('actor_id'),
+  actorName: varchar('actor_name', { length: 100 }),
+  action: varchar('action', { length: 200 }).notNull(),
+  detail: text('detail'),
+  metadata: jsonb('metadata'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
+// === 21. cost_records — AI 비용 기록 ===
+export const costRecords = pgTable('cost_records', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  agentId: uuid('agent_id').references(() => agents.id),
+  sessionId: uuid('session_id').references(() => chatSessions.id),
+  provider: varchar('provider', { length: 50 }).notNull().default('anthropic'),
+  model: varchar('model', { length: 100 }).notNull(),
+  inputTokens: integer('input_tokens').notNull().default(0),
+  outputTokens: integer('output_tokens').notNull().default(0),
+  costUsdMicro: integer('cost_usd_micro').notNull().default(0),  // 1 = $0.000001
+  source: varchar('source', { length: 50 }),  // chat, delegation, job, sns
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
+// === 22. telegram_configs — 텔레그램 설정 ===
+export const telegramConfigs = pgTable('telegram_configs', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id).unique(),
+  botToken: text('bot_token').notNull(),  // encrypted
+  ceoChatId: varchar('ceo_chat_id', { length: 50 }),
+  isActive: boolean('is_active').notNull().default(false),
+  lastPollAt: timestamp('last_poll_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+// === 23. messenger_channels — 사내 메신저 채널 ===
+export const messengerChannels = pgTable('messenger_channels', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  name: varchar('name', { length: 100 }).notNull(),
+  description: text('description'),
+  createdBy: uuid('created_by').notNull().references(() => users.id),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
+// === 24. messenger_members — 메신저 채널 멤버 ===
+export const messengerMembers = pgTable('messenger_members', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  channelId: uuid('channel_id').notNull().references(() => messengerChannels.id),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  joinedAt: timestamp('joined_at').notNull().defaultNow(),
+})
+
+// === 25. messenger_messages — 사내 메신저 메시지 ===
+export const messengerMessages = pgTable('messenger_messages', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  channelId: uuid('channel_id').notNull().references(() => messengerChannels.id),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  content: text('content').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
 // === Relations ===
 export const companiesRelations = relations(companies, ({ many }) => ({
   users: many(users),
@@ -311,4 +407,43 @@ export const nightJobsRelations = relations(nightJobs, ({ one }) => ({
   user: one(users, { fields: [nightJobs.userId], references: [users.id] }),
   agent: one(agents, { fields: [nightJobs.agentId], references: [agents.id] }),
   session: one(chatSessions, { fields: [nightJobs.sessionId], references: [chatSessions.id] }),
+}))
+
+export const snsContentsRelations = relations(snsContents, ({ one }) => ({
+  company: one(companies, { fields: [snsContents.companyId], references: [companies.id] }),
+  agent: one(agents, { fields: [snsContents.agentId], references: [agents.id] }),
+  creator: one(users, { fields: [snsContents.createdBy], references: [users.id] }),
+}))
+
+export const activityLogsRelations = relations(activityLogs, ({ one }) => ({
+  company: one(companies, { fields: [activityLogs.companyId], references: [companies.id] }),
+}))
+
+export const costRecordsRelations = relations(costRecords, ({ one }) => ({
+  company: one(companies, { fields: [costRecords.companyId], references: [companies.id] }),
+  agent: one(agents, { fields: [costRecords.agentId], references: [agents.id] }),
+  session: one(chatSessions, { fields: [costRecords.sessionId], references: [chatSessions.id] }),
+}))
+
+export const telegramConfigsRelations = relations(telegramConfigs, ({ one }) => ({
+  company: one(companies, { fields: [telegramConfigs.companyId], references: [companies.id] }),
+}))
+
+export const messengerChannelsRelations = relations(messengerChannels, ({ one, many }) => ({
+  company: one(companies, { fields: [messengerChannels.companyId], references: [companies.id] }),
+  creator: one(users, { fields: [messengerChannels.createdBy], references: [users.id] }),
+  members: many(messengerMembers),
+  messages: many(messengerMessages),
+}))
+
+export const messengerMembersRelations = relations(messengerMembers, ({ one }) => ({
+  company: one(companies, { fields: [messengerMembers.companyId], references: [companies.id] }),
+  channel: one(messengerChannels, { fields: [messengerMembers.channelId], references: [messengerChannels.id] }),
+  user: one(users, { fields: [messengerMembers.userId], references: [users.id] }),
+}))
+
+export const messengerMessagesRelations = relations(messengerMessages, ({ one }) => ({
+  company: one(companies, { fields: [messengerMessages.companyId], references: [companies.id] }),
+  channel: one(messengerChannels, { fields: [messengerMessages.channelId], references: [messengerChannels.id] }),
+  user: one(users, { fields: [messengerMessages.userId], references: [users.id] }),
 }))

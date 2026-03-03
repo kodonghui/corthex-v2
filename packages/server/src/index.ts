@@ -15,6 +15,11 @@ import { chatRoute } from './routes/workspace/chat'
 import { profileRoute } from './routes/workspace/profile'
 import { reportsRoute } from './routes/workspace/reports'
 import { jobsRoute } from './routes/workspace/jobs'
+import { snsRoute } from './routes/workspace/sns'
+import { activityLogRoute } from './routes/workspace/activity-log'
+import { dashboardRoute } from './routes/workspace/dashboard'
+import { telegramRoute } from './routes/workspace/telegram'
+import { messengerRoute } from './routes/workspace/messenger'
 import { startJobWorker } from './lib/job-queue'
 
 const app = new Hono()
@@ -50,6 +55,11 @@ app.route('/api/workspace/chat', chatRoute)
 app.route('/api/workspace', profileRoute)
 app.route('/api/workspace', reportsRoute)
 app.route('/api/workspace/jobs', jobsRoute)
+app.route('/api/workspace', snsRoute)
+app.route('/api/workspace', activityLogRoute)
+app.route('/api/workspace', dashboardRoute)
+app.route('/api/workspace', telegramRoute)
+app.route('/api/workspace/messenger', messengerRoute)
 
 // 서버 시작
 const port = Number(process.env.PORT) || 3000

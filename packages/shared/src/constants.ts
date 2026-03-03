@@ -14,6 +14,19 @@ export const ERROR_CODES = {
   // 작업 큐
   QUEUE_001: '야간 작업 실패',
   QUEUE_002: '재시도 한도 초과',
+  // SNS
+  SNS_001: 'SNS 콘텐츠를 찾을 수 없습니다',
+  SNS_002: '초안/반려 상태에서만 수정할 수 있습니다',
+  SNS_003: '승인 요청 상태에서만 승인/반려할 수 있습니다',
+  SNS_004: '승인된 콘텐츠만 발행할 수 있습니다',
+  // 대시보드
+  DASH_001: '비용 데이터 조회 실패',
+  // 텔레그램
+  TELEGRAM_001: '텔레그램 설정을 찾을 수 없습니다',
+  TELEGRAM_002: '봇 토큰이 유효하지 않습니다',
+  // 메신저
+  MSG_001: '채널을 찾을 수 없습니다',
+  MSG_002: '채널 멤버가 아닙니다',
 } as const
 
 export type ErrorCode = keyof typeof ERROR_CODES

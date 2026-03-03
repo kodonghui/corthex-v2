@@ -2,6 +2,21 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 
+type TelegramConfig = {
+  id: string
+  isActive: boolean
+  ceoChatId: string | null
+  hasToken: boolean
+} | null
+
+type AgentDetail = {
+  id: string
+  name: string
+  role: string
+  soul: string | null
+  status: string
+}
+
 type ApiKey = {
   id: string
   provider: string
@@ -162,6 +177,12 @@ export function SettingsPage() {
           </div>
         </section>
 
+        {/* 텔레그램 연동 */}
+        <TelegramSection />
+
+        {/* 에이전트 소울 편집 */}
+        <AgentSoulSection />
+
         {/* 연동 상태 안내 */}
         <section>
           <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-3">서비스 연동 안내</h3>
@@ -176,5 +197,131 @@ export function SettingsPage() {
         </section>
       </div>
     </div>
+  )
+}
+
+function TelegramSection() {
+  const queryClient = useQueryClient()
+  const [botToken, setBotToken] = useState('')
+  const [ceoChatId, setCeoChatId] = useState('')
+
+  const { data: configData } = useQuery({
+    queryKey: ['telegram-config'],
+    queryFn: () => api.get<{ data: TelegramConfig }>('/workspace/telegram/config'),
+  })
+
+  const saveConfig = useMutation({
+    mutationFn: () => api.post('/workspace/telegram/config', { botToken, ceoChatId: ceoChatId || undefined }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['telegram-config'] })
+      setBotToken('')
+    },
+  })
+
+  const testMessage = useMutation({
+    mutationFn: () => api.post('/workspace/telegram/test', {}),
+  })
+
+  const disconnect = useMutation({
+    mutationFn: () => api.delete('/workspace/telegram/config'),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['telegram-config'] }),
+  })
+
+  const config = configData?.data
+
+  return (
+    <section>
+      <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-3">텔레그램 연동</h3>
+      {config?.isActive ? (
+        <div className="p-4 rounded-lg border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950 space-y-3">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-1.5 py-0.5 rounded-full">연동됨</span>
+            <span className="text-xs text-zinc-500">Chat ID: {config.ceoChatId || '미설정'}</span>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => testMessage.mutate()} disabled={testMessage.isPending}
+              className="px-3 py-1 text-xs bg-indigo-600 text-white rounded hover:bg-indigo-700 disabled:opacity-50">
+              {testMessage.isPending ? '전송 중...' : '테스트 메시지'}
+            </button>
+            <button onClick={() => disconnect.mutate()}
+              className="px-3 py-1 text-xs border border-red-300 text-red-600 rounded hover:bg-red-50 dark:hover:bg-red-900/30">
+              연결 해제
+            </button>
+          </div>
+          {testMessage.isSuccess && <p className="text-xs text-green-600">테스트 메시지 전송 성공!</p>}
+          {testMessage.isError && <p className="text-xs text-red-600">전송 실패: {(testMessage.error as Error).message}</p>}
+        </div>
+      ) : (
+        <div className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 space-y-3">
+          <input type="password" value={botToken} onChange={(e) => setBotToken(e.target.value)}
+            placeholder="봇 토큰 (@BotFather에서 발급)" className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm" />
+          <input value={ceoChatId} onChange={(e) => setCeoChatId(e.target.value)}
+            placeholder="CEO 채팅 ID (선택)" className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm" />
+          <button onClick={() => saveConfig.mutate()} disabled={!botToken || saveConfig.isPending}
+            className="w-full py-2 bg-indigo-600 text-white rounded-md text-sm hover:bg-indigo-700 disabled:opacity-50">
+            {saveConfig.isPending ? '검증 중...' : '연동하기'}
+          </button>
+          {saveConfig.isError && <p className="text-xs text-red-600">{(saveConfig.error as Error).message}</p>}
+        </div>
+      )}
+    </section>
+  )
+}
+
+function AgentSoulSection() {
+  const queryClient = useQueryClient()
+  const [selectedAgent, setSelectedAgent] = useState<string>('')
+  const [soulText, setSoulText] = useState('')
+
+  const { data: agentsData } = useQuery({
+    queryKey: ['agents'],
+    queryFn: () => api.get<{ data: { id: string; name: string }[] }>('/workspace/agents'),
+  })
+
+  const { data: agentDetail } = useQuery({
+    queryKey: ['agent-detail', selectedAgent],
+    queryFn: () => api.get<{ data: AgentDetail }>(`/workspace/agents/${selectedAgent}`),
+    enabled: !!selectedAgent,
+  })
+
+  const updateSoul = useMutation({
+    mutationFn: () => api.patch(`/workspace/agents/${selectedAgent}/soul`, { soul: soulText }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['agent-detail', selectedAgent] })
+    },
+  })
+
+  const agents = agentsData?.data || []
+
+  // 에이전트 선택 시 소울 로드
+  const detail = agentDetail?.data
+  if (detail && soulText === '' && detail.soul) {
+    setSoulText(detail.soul)
+  }
+
+  return (
+    <section>
+      <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-3">에이전트 소울 편집</h3>
+      <div className="space-y-3">
+        <select value={selectedAgent} onChange={(e) => { setSelectedAgent(e.target.value); setSoulText('') }}
+          className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm">
+          <option value="">에이전트 선택</option>
+          {agents.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+        </select>
+
+        {selectedAgent && detail && (
+          <>
+            <textarea value={soulText} onChange={(e) => setSoulText(e.target.value)}
+              rows={8} placeholder="에이전트의 성격, 역할, 말투를 마크다운으로 정의..."
+              className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm resize-none font-mono" />
+            <button onClick={() => updateSoul.mutate()} disabled={!soulText.trim() || updateSoul.isPending}
+              className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 disabled:opacity-50">
+              {updateSoul.isPending ? '저장 중...' : '소울 저장'}
+            </button>
+            {updateSoul.isSuccess && <p className="text-xs text-green-600">저장 완료!</p>}
+          </>
+        )}
+      </div>
+    </section>
   )
 }
