@@ -6,6 +6,7 @@ import { db } from '../../db'
 import { chatSessions, chatMessages, agents } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
+import { generateAgentResponse } from '../../lib/ai'
 import type { TenantContext } from '@corthex/shared'
 
 export const chatRoute = new Hono()
@@ -125,15 +126,27 @@ chatRoute.post(
       .set({ lastMessageAt: new Date() })
       .where(eq(chatSessions.id, sessionId))
 
-    // TODO: E4에서 Claude CLI 연동 후 실제 AI 응답 생성
-    // 지금은 placeholder 응답
+    // Claude AI 응답 생성
+    let aiContent: string
+    try {
+      aiContent = await generateAgentResponse({
+        agentId: session.agentId,
+        sessionId,
+        companyId: tenant.companyId,
+        userMessage: content,
+      })
+    } catch (err) {
+      // API key 미설정 등 에러 시 fallback
+      aiContent = `[AI 연결 오류] ${err instanceof Error ? err.message : '알 수 없는 오류'}. 관리자에게 ANTHROPIC_API_KEY 설정을 확인해주세요.`
+    }
+
     const [agentMsg] = await db
       .insert(chatMessages)
       .values({
         companyId: tenant.companyId,
         sessionId,
         sender: 'agent',
-        content: `[AI 응답 준비 중] "${content}"에 대한 답변을 준비하고 있습니다. E4 에픽에서 Claude CLI 연동 후 실제 AI 응답이 제공됩니다.`,
+        content: aiContent,
       })
       .returning()
 
