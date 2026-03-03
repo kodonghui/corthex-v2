@@ -1,6 +1,7 @@
 import { sign, verify } from 'hono/jwt'
 import type { MiddlewareHandler } from 'hono'
 import type { TenantContext } from '@corthex/shared'
+import type { AppEnv } from '../types'
 import { HTTPError } from './error'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'corthex-v2-dev-secret-change-in-production'
@@ -21,7 +22,7 @@ export async function createToken(payload: Omit<JwtPayload, 'exp'>): Promise<str
 }
 
 // JWT 인증 미들웨어
-export const authMiddleware: MiddlewareHandler = async (c, next) => {
+export const authMiddleware: MiddlewareHandler<AppEnv> = async (c, next) => {
   const authHeader = c.req.header('Authorization')
   if (!authHeader?.startsWith('Bearer ')) {
     throw new HTTPError(401, '인증 토큰이 필요합니다', 'AUTH_001')
@@ -44,8 +45,8 @@ export const authMiddleware: MiddlewareHandler = async (c, next) => {
 }
 
 // 관리자 전용 미들웨어
-export const adminOnly: MiddlewareHandler = async (c, next) => {
-  const tenant = c.get('tenant') as TenantContext
+export const adminOnly: MiddlewareHandler<AppEnv> = async (c, next) => {
+  const tenant = c.get('tenant')
   if (tenant.role !== 'admin') {
     throw new HTTPError(403, '관리자 권한이 필요합니다', 'AUTH_003')
   }

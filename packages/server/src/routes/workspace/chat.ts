@@ -9,9 +9,9 @@ import { HTTPError } from '../../middleware/error'
 import { generateAgentResponse } from '../../lib/ai'
 import { orchestrateSecretary } from '../../lib/orchestrator'
 import { logActivity } from '../../lib/activity-logger'
-import type { TenantContext } from '@corthex/shared'
+import type { AppEnv } from '../../types'
 
-export const chatRoute = new Hono()
+export const chatRoute = new Hono<AppEnv>()
 
 chatRoute.use('*', authMiddleware)
 
@@ -26,7 +26,7 @@ const sendMessageSchema = z.object({
 
 // GET /api/workspace/chat/sessions — 내 채팅 세션 목록
 chatRoute.get('/sessions', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
 
   const result = await db
     .select({
@@ -45,7 +45,7 @@ chatRoute.get('/sessions', async (c) => {
 
 // POST /api/workspace/chat/sessions — 새 채팅 세션 생성
 chatRoute.post('/sessions', zValidator('json', createSessionSchema), async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const { agentId, title } = c.req.valid('json')
 
   // 에이전트가 내 회사 소속인지 확인
@@ -72,7 +72,7 @@ chatRoute.post('/sessions', zValidator('json', createSessionSchema), async (c) =
 
 // GET /api/workspace/chat/sessions/:sessionId/messages — 세션 메시지 조회
 chatRoute.get('/sessions/:sessionId/messages', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const sessionId = c.req.param('sessionId')
 
   // 세션이 내 것인지 확인
@@ -98,7 +98,7 @@ chatRoute.post(
   '/sessions/:sessionId/messages',
   zValidator('json', sendMessageSchema),
   async (c) => {
-    const tenant = c.get('tenant') as TenantContext
+    const tenant = c.get('tenant')
     const sessionId = c.req.param('sessionId')
     const { content } = c.req.valid('json')
 
@@ -184,7 +184,7 @@ chatRoute.post(
 
 // GET /api/workspace/chat/sessions/:sessionId/delegations — 세션 위임 내역 조회
 chatRoute.get('/sessions/:sessionId/delegations', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const sessionId = c.req.param('sessionId')
 
   // 세션 소유권 확인

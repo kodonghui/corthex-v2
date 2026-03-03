@@ -8,9 +8,9 @@ import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { encrypt, decrypt } from '../../lib/crypto'
 import { logActivity } from '../../lib/activity-logger'
-import type { TenantContext } from '@corthex/shared'
+import type { AppEnv } from '../../types'
 
-export const telegramRoute = new Hono()
+export const telegramRoute = new Hono<AppEnv>()
 
 telegramRoute.use('*', authMiddleware)
 
@@ -21,7 +21,7 @@ const configSchema = z.object({
 
 // GET /api/workspace/telegram/config — 설정 조회
 telegramRoute.get('/telegram/config', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
 
   const [config] = await db
     .select({
@@ -44,7 +44,7 @@ telegramRoute.get('/telegram/config', async (c) => {
 
 // POST /api/workspace/telegram/config — 봇 토큰 등록/업데이트
 telegramRoute.post('/telegram/config', zValidator('json', configSchema), async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const { botToken, ceoChatId } = c.req.valid('json')
 
   // 봇 토큰 유효성 검증 (getMe)
@@ -56,7 +56,7 @@ telegramRoute.post('/telegram/config', zValidator('json', configSchema), async (
     throw new HTTPError(400, '봇 토큰이 유효하지 않습니다', 'TELEGRAM_002')
   }
 
-  const encryptedToken = encrypt(botToken)
+  const encryptedToken = await encrypt(botToken)
 
   // upsert
   const [existing] = await db
@@ -99,7 +99,7 @@ telegramRoute.post('/telegram/config', zValidator('json', configSchema), async (
 
 // POST /api/workspace/telegram/test — 테스트 메시지 전송
 telegramRoute.post('/telegram/test', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
 
   const [config] = await db
     .select()
@@ -110,7 +110,7 @@ telegramRoute.post('/telegram/test', async (c) => {
   if (!config) throw new HTTPError(404, '텔레그램 설정을 찾을 수 없습니다', 'TELEGRAM_001')
   if (!config.ceoChatId) throw new HTTPError(400, 'CEO 채팅 ID가 설정되지 않았습니다', 'TELEGRAM_001')
 
-  const botToken = decrypt(config.botToken)
+  const botToken = await decrypt(config.botToken)
 
   try {
     const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
@@ -132,7 +132,7 @@ telegramRoute.post('/telegram/test', async (c) => {
 
 // DELETE /api/workspace/telegram/config — 연결 해제
 telegramRoute.delete('/telegram/config', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
 
   await db
     .update(telegramConfigs)

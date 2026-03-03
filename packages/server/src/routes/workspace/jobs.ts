@@ -7,9 +7,9 @@ import { nightJobs, agents } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { queueNightJob } from '../../lib/job-queue'
-import type { TenantContext } from '@corthex/shared'
+import type { AppEnv } from '../../types'
 
-export const jobsRoute = new Hono()
+export const jobsRoute = new Hono<AppEnv>()
 
 jobsRoute.use('*', authMiddleware)
 
@@ -21,7 +21,7 @@ const queueJobSchema = z.object({
 
 // POST /api/workspace/jobs — 야간 작업 등록
 jobsRoute.post('/', zValidator('json', queueJobSchema), async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const { agentId, instruction, scheduledFor } = c.req.valid('json')
 
   // 에이전트 소속 확인
@@ -46,7 +46,7 @@ jobsRoute.post('/', zValidator('json', queueJobSchema), async (c) => {
 
 // GET /api/workspace/jobs — 내 야간 작업 목록
 jobsRoute.get('/', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
 
   const result = await db
     .select({
@@ -76,7 +76,7 @@ jobsRoute.get('/', async (c) => {
 
 // GET /api/workspace/jobs/notifications — 아침 알림 (읽지 않은 완료/실패 작업)
 jobsRoute.get('/notifications', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
 
   const completed = await db
     .select({
@@ -112,7 +112,7 @@ jobsRoute.get('/notifications', async (c) => {
 
 // PUT /api/workspace/jobs/:id/read — 알림 읽음 처리
 jobsRoute.put('/:id/read', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
 
   const [job] = await db
@@ -127,7 +127,7 @@ jobsRoute.put('/:id/read', async (c) => {
 
 // PUT /api/workspace/jobs/read-all — 모든 알림 읽음 처리
 jobsRoute.put('/read-all', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
 
   await db
     .update(nightJobs)
@@ -145,7 +145,7 @@ jobsRoute.put('/read-all', async (c) => {
 
 // DELETE /api/workspace/jobs/:id — 대기 중 작업 취소
 jobsRoute.delete('/:id', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
 
   // queued 상태인 것만 삭제 가능

@@ -22,8 +22,9 @@ import { telegramRoute } from './routes/workspace/telegram'
 import { messengerRoute } from './routes/workspace/messenger'
 import { nexusRoute } from './routes/workspace/nexus'
 import { startJobWorker } from './lib/job-queue'
+import type { AppEnv } from './types'
 
-const app = new Hono()
+const app = new Hono<AppEnv>()
 
 // 글로벌 미들웨어
 app.use('*', logger())

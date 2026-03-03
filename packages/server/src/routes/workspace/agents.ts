@@ -7,15 +7,15 @@ import { agents } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { logActivity } from '../../lib/activity-logger'
-import type { TenantContext } from '@corthex/shared'
+import type { AppEnv } from '../../types'
 
-export const workspaceAgentsRoute = new Hono()
+export const workspaceAgentsRoute = new Hono<AppEnv>()
 
 workspaceAgentsRoute.use('*', authMiddleware)
 
 // GET /api/workspace/agents — 내 회사의 활성 에이전트 목록
 workspaceAgentsRoute.get('/agents', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
 
   const result = await db
     .select({
@@ -34,7 +34,7 @@ workspaceAgentsRoute.get('/agents', async (c) => {
 
 // GET /api/workspace/agents/:id — 에이전트 상세 (내 회사만)
 workspaceAgentsRoute.get('/agents/:id', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
 
   const [agent] = await db
@@ -61,7 +61,7 @@ const updateSoulSchema = z.object({
 })
 
 workspaceAgentsRoute.patch('/agents/:id/soul', zValidator('json', updateSoulSchema), async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
   const { soul } = c.req.valid('json')
 

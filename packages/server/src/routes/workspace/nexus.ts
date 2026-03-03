@@ -7,15 +7,15 @@ import { companies, departments, agents, canvasLayouts } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { logActivity } from '../../lib/activity-logger'
-import type { TenantContext } from '@corthex/shared'
+import type { AppEnv } from '../../types'
 
-export const nexusRoute = new Hono()
+export const nexusRoute = new Hono<AppEnv>()
 
 nexusRoute.use('*', authMiddleware)
 
 // GET /api/workspace/nexus/org-data — 전체 조직 트리
 nexusRoute.get('/nexus/org-data', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
 
   const [company] = await db
     .select({ id: companies.id, name: companies.name, slug: companies.slug })
@@ -56,7 +56,7 @@ nexusRoute.get('/nexus/org-data', async (c) => {
 
 // GET /api/workspace/nexus/layout — 저장된 레이아웃 로드
 nexusRoute.get('/nexus/layout', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
 
   const [layout] = await db
     .select()
@@ -81,7 +81,7 @@ nexusRoute.put(
   '/nexus/layout',
   zValidator('json', saveLayoutSchema),
   async (c) => {
-    const tenant = c.get('tenant') as TenantContext
+    const tenant = c.get('tenant')
     if (tenant.role !== 'admin') {
       throw new HTTPError(403, '관리자 권한이 필요합니다', 'AUTH_003')
     }
@@ -120,7 +120,7 @@ nexusRoute.patch(
   '/nexus/agent/:id/department',
   zValidator('json', reassignSchema),
   async (c) => {
-    const tenant = c.get('tenant') as TenantContext
+    const tenant = c.get('tenant')
     if (tenant.role !== 'admin') {
       throw new HTTPError(403, '관리자 권한이 필요합니다', 'AUTH_003')
     }

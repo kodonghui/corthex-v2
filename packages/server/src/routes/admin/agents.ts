@@ -6,9 +6,9 @@ import { db } from '../../db'
 import { agents } from '../../db/schema'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
-import type { TenantContext } from '@corthex/shared'
+import type { AppEnv } from '../../types'
 
-export const agentsRoute = new Hono()
+export const agentsRoute = new Hono<AppEnv>()
 
 agentsRoute.use('*', authMiddleware, adminOnly)
 
@@ -42,7 +42,7 @@ agentsRoute.get('/agents', async (c) => {
 
 // GET /api/admin/agents/:id
 agentsRoute.get('/agents/:id', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
   const [agent] = await db.select().from(agents).where(and(eq(agents.id, id), eq(agents.companyId, tenant.companyId))).limit(1)
   if (!agent) throw new HTTPError(404, '에이전트를 찾을 수 없습니다', 'AGENT_001')
@@ -63,7 +63,7 @@ agentsRoute.post('/agents', zValidator('json', createAgentSchema), async (c) => 
 agentsRoute.patch('/agents/:id', zValidator('json', updateAgentSchema), async (c) => {
   const id = c.req.param('id')
   const body = c.req.valid('json')
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const [agent] = await db
     .update(agents)
     .set({ ...body, updatedAt: new Date() })
@@ -75,7 +75,7 @@ agentsRoute.patch('/agents/:id', zValidator('json', updateAgentSchema), async (c
 
 // DELETE /api/admin/agents/:id — 비활성화
 agentsRoute.delete('/agents/:id', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
   const [agent] = await db
     .update(agents)

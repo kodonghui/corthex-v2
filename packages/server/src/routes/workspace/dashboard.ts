@@ -3,15 +3,15 @@ import { eq, and, gte, desc, sql, count, sum } from 'drizzle-orm'
 import { db } from '../../db'
 import { costRecords, agents, chatMessages, delegations, toolCalls, nightJobs } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
-import type { TenantContext } from '@corthex/shared'
+import type { AppEnv } from '../../types'
 
-export const dashboardRoute = new Hono()
+export const dashboardRoute = new Hono<AppEnv>()
 
 dashboardRoute.use('*', authMiddleware)
 
 // GET /api/workspace/dashboard/costs — 비용 요약
 dashboardRoute.get('/dashboard/costs', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const days = Number(c.req.query('days')) || 30
   const since = new Date()
   since.setDate(since.getDate() - days)
@@ -101,7 +101,7 @@ dashboardRoute.get('/dashboard/costs', async (c) => {
 
 // GET /api/workspace/dashboard/agents — 에이전트 상태 overview
 dashboardRoute.get('/dashboard/agents', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
 
   const result = await db
     .select({
@@ -127,7 +127,7 @@ dashboardRoute.get('/dashboard/agents', async (c) => {
 
 // GET /api/workspace/dashboard/stats — 종합 통계
 dashboardRoute.get('/dashboard/stats', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const days = Number(c.req.query('days')) || 7
   const since = new Date()
   since.setDate(since.getDate() - days)

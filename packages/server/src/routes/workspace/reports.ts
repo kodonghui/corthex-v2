@@ -6,9 +6,9 @@ import { db } from '../../db'
 import { reports, reportComments, users } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
-import type { TenantContext } from '@corthex/shared'
+import type { AppEnv } from '../../types'
 
-export const reportsRoute = new Hono()
+export const reportsRoute = new Hono<AppEnv>()
 
 reportsRoute.use('*', authMiddleware)
 
@@ -28,7 +28,7 @@ const createCommentSchema = z.object({
 
 // GET /api/workspace/reports — 내 보고서 + 나에게 온 보고서 목록
 reportsRoute.get('/reports', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
 
   const result = await db
     .select({
@@ -60,7 +60,7 @@ reportsRoute.get('/reports', async (c) => {
 
 // POST /api/workspace/reports — 새 보고서 작성 (초안)
 reportsRoute.post('/reports', zValidator('json', createReportSchema), async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const { title, content } = c.req.valid('json')
 
   const [report] = await db
@@ -79,7 +79,7 @@ reportsRoute.post('/reports', zValidator('json', createReportSchema), async (c) 
 
 // GET /api/workspace/reports/:id — 보고서 상세 (본인 작성 또는 수신)
 reportsRoute.get('/reports/:id', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
 
   const [report] = await db
@@ -116,7 +116,7 @@ reportsRoute.get('/reports/:id', async (c) => {
 
 // PUT /api/workspace/reports/:id — 보고서 수정 (초안 상태만)
 reportsRoute.put('/reports/:id', zValidator('json', updateReportSchema), async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
   const body = c.req.valid('json')
 
@@ -141,7 +141,7 @@ reportsRoute.put('/reports/:id', zValidator('json', updateReportSchema), async (
 
 // POST /api/workspace/reports/:id/submit — "CEO에게 보고" (제출)
 reportsRoute.post('/reports/:id/submit', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
 
   // 본인 작성 + 초안 상태만 제출 가능
@@ -179,7 +179,7 @@ reportsRoute.post('/reports/:id/submit', async (c) => {
 
 // POST /api/workspace/reports/:id/review — 보고서 검토 완료 마킹 (CEO만)
 reportsRoute.post('/reports/:id/review', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
 
   const [existing] = await db
@@ -203,7 +203,7 @@ reportsRoute.post('/reports/:id/review', async (c) => {
 
 // DELETE /api/workspace/reports/:id — 보고서 삭제 (초안만, 본인만)
 reportsRoute.delete('/reports/:id', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
 
   const [existing] = await db
@@ -223,7 +223,7 @@ reportsRoute.delete('/reports/:id', async (c) => {
 
 // GET /api/workspace/reports/:id/comments — 코멘트 목록
 reportsRoute.get('/reports/:id/comments', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const reportId = c.req.param('id')
 
   // 보고서 접근 권한 확인
@@ -265,7 +265,7 @@ reportsRoute.post(
   '/reports/:id/comments',
   zValidator('json', createCommentSchema),
   async (c) => {
-    const tenant = c.get('tenant') as TenantContext
+    const tenant = c.get('tenant')
     const reportId = c.req.param('id')
     const { content } = c.req.valid('json')
 

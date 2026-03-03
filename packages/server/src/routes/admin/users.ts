@@ -6,9 +6,9 @@ import { db } from '../../db'
 import { users } from '../../db/schema'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
-import type { TenantContext } from '@corthex/shared'
+import type { AppEnv } from '../../types'
 
-export const usersRoute = new Hono()
+export const usersRoute = new Hono<AppEnv>()
 
 usersRoute.use('*', authMiddleware, adminOnly)
 
@@ -54,7 +54,7 @@ usersRoute.get('/users', async (c) => {
 
 // GET /api/admin/users/:id — 직원 상세
 usersRoute.get('/users/:id', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
   const [user] = await db
     .select({
@@ -108,7 +108,7 @@ usersRoute.post('/users', zValidator('json', createUserSchema), async (c) => {
 
 // PATCH /api/admin/users/:id — 직원 수정
 usersRoute.patch('/users/:id', zValidator('json', updateUserSchema), async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
   const { password, ...rest } = c.req.valid('json')
 
@@ -138,7 +138,7 @@ usersRoute.patch('/users/:id', zValidator('json', updateUserSchema), async (c) =
 
 // DELETE /api/admin/users/:id — 직원 비활성화
 usersRoute.delete('/users/:id', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
   const [user] = await db
     .update(users)

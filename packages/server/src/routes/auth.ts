@@ -7,8 +7,9 @@ import { users } from '../db/schema'
 import { createToken, authMiddleware } from '../middleware/auth'
 import { HTTPError } from '../middleware/error'
 import { logActivity } from '../lib/activity-logger'
+import type { AppEnv } from '../types'
 
-export const authRoute = new Hono()
+export const authRoute = new Hono<AppEnv>()
 
 const loginSchema = z.object({
   username: z.string().min(1),

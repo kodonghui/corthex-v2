@@ -3,15 +3,15 @@ import { eq, and, desc, gte, sql, count } from 'drizzle-orm'
 import { db } from '../../db'
 import { activityLogs } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
-import type { TenantContext } from '@corthex/shared'
+import type { AppEnv } from '../../types'
 
-export const activityLogRoute = new Hono()
+export const activityLogRoute = new Hono<AppEnv>()
 
 activityLogRoute.use('*', authMiddleware)
 
 // GET /api/workspace/activity-log — 활동 로그 목록
 activityLogRoute.get('/activity-log', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const type = c.req.query('type')
   const limit = Math.min(Number(c.req.query('limit')) || 50, 100)
   const offset = Number(c.req.query('offset')) || 0
@@ -50,7 +50,7 @@ activityLogRoute.get('/activity-log', async (c) => {
 
 // GET /api/workspace/activity-log/summary — 오늘/이번주 요약 통계
 activityLogRoute.get('/activity-log/summary', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
 
   const today = new Date()
   today.setHours(0, 0, 0, 0)

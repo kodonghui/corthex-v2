@@ -7,9 +7,9 @@ import { messengerChannels, messengerMembers, messengerMessages, users } from '.
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { logActivity } from '../../lib/activity-logger'
-import type { TenantContext } from '@corthex/shared'
+import type { AppEnv } from '../../types'
 
-export const messengerRoute = new Hono()
+export const messengerRoute = new Hono<AppEnv>()
 
 messengerRoute.use('*', authMiddleware)
 
@@ -44,7 +44,7 @@ async function assertMember(channelId: string, userId: string, companyId: string
 
 // GET /messenger/channels — 내가 참여한 채널 목록
 messengerRoute.get('/channels', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
 
   // 내가 멤버인 채널 ID 찾기
   const myMemberships = await db
@@ -79,7 +79,7 @@ messengerRoute.get('/channels', async (c) => {
 
 // POST /messenger/channels — 채널 생성
 messengerRoute.post('/channels', zValidator('json', createChannelSchema), async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const { name, description, memberIds } = c.req.valid('json')
 
   const [channel] = await db
@@ -116,7 +116,7 @@ messengerRoute.post('/channels', zValidator('json', createChannelSchema), async 
 
 // GET /messenger/channels/:id/messages — 메시지 조회
 messengerRoute.get('/channels/:id/messages', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const channelId = c.req.param('id')
   const limit = Math.min(Number(c.req.query('limit')) || 50, 100)
   const before = c.req.query('before')
@@ -148,7 +148,7 @@ messengerRoute.get('/channels/:id/messages', async (c) => {
 
 // POST /messenger/channels/:id/messages — 메시지 전송
 messengerRoute.post('/channels/:id/messages', zValidator('json', sendMessageSchema), async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const channelId = c.req.param('id')
   const { content } = c.req.valid('json')
 
@@ -169,7 +169,7 @@ messengerRoute.post('/channels/:id/messages', zValidator('json', sendMessageSche
 
 // POST /messenger/channels/:id/members — 멤버 추가
 messengerRoute.post('/channels/:id/members', zValidator('json', addMemberSchema), async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const channelId = c.req.param('id')
   const { userId } = c.req.valid('json')
 
@@ -201,7 +201,7 @@ messengerRoute.post('/channels/:id/members', zValidator('json', addMemberSchema)
 
 // DELETE /messenger/channels/:id/members/:uid — 멤버 제거
 messengerRoute.delete('/channels/:id/members/:uid', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const channelId = c.req.param('id')
   const targetUserId = c.req.param('uid')
 
@@ -220,7 +220,7 @@ messengerRoute.delete('/channels/:id/members/:uid', async (c) => {
 
 // GET /messenger/users — 같은 회사 유저 목록 (멤버 추가용)
 messengerRoute.get('/users', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
 
   const result = await db
     .select({

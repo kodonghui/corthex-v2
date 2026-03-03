@@ -9,9 +9,9 @@ import { HTTPError } from '../../middleware/error'
 import { generateAgentResponse } from '../../lib/ai'
 import { publishContent } from '../../lib/sns-publisher'
 import { logActivity } from '../../lib/activity-logger'
-import type { TenantContext } from '@corthex/shared'
+import type { AppEnv } from '../../types'
 
-export const snsRoute = new Hono()
+export const snsRoute = new Hono<AppEnv>()
 
 snsRoute.use('*', authMiddleware)
 
@@ -42,7 +42,7 @@ const rejectSchema = z.object({
 
 // GET /api/workspace/sns — 내 SNS 콘텐츠 목록
 snsRoute.get('/sns', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const platform = c.req.query('platform')
   const status = c.req.query('status')
 
@@ -78,7 +78,7 @@ snsRoute.get('/sns', async (c) => {
 
 // POST /api/workspace/sns — 수동 콘텐츠 생성
 snsRoute.post('/sns', zValidator('json', createSnsSchema), async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const body = c.req.valid('json')
 
   const [content] = await db
@@ -109,7 +109,7 @@ snsRoute.post('/sns', zValidator('json', createSnsSchema), async (c) => {
 
 // POST /api/workspace/sns/generate — AI 에이전트에게 콘텐츠 생성 요청
 snsRoute.post('/sns/generate', zValidator('json', generateSnsSchema), async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const { platform, agentId, topic } = c.req.valid('json')
 
   // 에이전트 소유권 확인
@@ -178,7 +178,7 @@ snsRoute.post('/sns/generate', zValidator('json', generateSnsSchema), async (c) 
 
 // GET /api/workspace/sns/:id — 콘텐츠 상세
 snsRoute.get('/sns/:id', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
 
   const [content] = await db
@@ -215,7 +215,7 @@ snsRoute.get('/sns/:id', async (c) => {
 
 // PUT /api/workspace/sns/:id — 수정 (draft/rejected만)
 snsRoute.put('/sns/:id', zValidator('json', updateSnsSchema), async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
   const body = c.req.valid('json')
 
@@ -242,7 +242,7 @@ snsRoute.put('/sns/:id', zValidator('json', updateSnsSchema), async (c) => {
 
 // POST /api/workspace/sns/:id/submit — 승인 요청 (draft → pending)
 snsRoute.post('/sns/:id/submit', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
 
   const [existing] = await db
@@ -276,7 +276,7 @@ snsRoute.post('/sns/:id/submit', async (c) => {
 
 // POST /api/workspace/sns/:id/approve — 승인 (admin, pending → approved)
 snsRoute.post('/sns/:id/approve', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   if (tenant.role !== 'admin') throw new HTTPError(403, '관리자만 승인할 수 있습니다', 'AUTH_003')
 
   const id = c.req.param('id')
@@ -315,7 +315,7 @@ snsRoute.post('/sns/:id/approve', async (c) => {
 
 // POST /api/workspace/sns/:id/reject — 반려 (admin, pending → rejected)
 snsRoute.post('/sns/:id/reject', zValidator('json', rejectSchema), async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   if (tenant.role !== 'admin') throw new HTTPError(403, '관리자만 반려할 수 있습니다', 'AUTH_003')
 
   const id = c.req.param('id')
@@ -356,7 +356,7 @@ snsRoute.post('/sns/:id/reject', zValidator('json', rejectSchema), async (c) => 
 
 // POST /api/workspace/sns/:id/publish — 발행 (approved → published/failed, STUB)
 snsRoute.post('/sns/:id/publish', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
 
   const [existing] = await db
@@ -412,7 +412,7 @@ snsRoute.post('/sns/:id/publish', async (c) => {
 
 // DELETE /api/workspace/sns/:id — 삭제 (draft만)
 snsRoute.delete('/sns/:id', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
 
   const [existing] = await db

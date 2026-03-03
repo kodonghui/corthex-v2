@@ -7,9 +7,9 @@ import { users, apiKeys, toolCalls, chatSessions } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { encrypt } from '../../lib/crypto'
-import type { TenantContext } from '@corthex/shared'
+import type { AppEnv } from '../../types'
 
-export const profileRoute = new Hono()
+export const profileRoute = new Hono<AppEnv>()
 
 profileRoute.use('*', authMiddleware)
 
@@ -27,7 +27,7 @@ const registerApiKeySchema = z.object({
 
 // GET /api/workspace/profile — 내 프로필
 profileRoute.get('/profile', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
 
   const [user] = await db
     .select({
@@ -49,7 +49,7 @@ profileRoute.get('/profile', async (c) => {
 
 // PATCH /api/workspace/profile — 내 프로필 수정
 profileRoute.patch('/profile', zValidator('json', updateProfileSchema), async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const { password, ...rest } = c.req.valid('json')
 
   const updateData: Record<string, unknown> = { ...rest, updatedAt: new Date() }
@@ -73,7 +73,7 @@ profileRoute.patch('/profile', zValidator('json', updateProfileSchema), async (c
 
 // GET /api/workspace/profile/api-keys — 내 API key 목록 (값은 숨김)
 profileRoute.get('/profile/api-keys', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
 
   const result = await db
     .select({
@@ -90,7 +90,7 @@ profileRoute.get('/profile/api-keys', async (c) => {
 
 // POST /api/workspace/profile/api-keys — 내 API key 등록
 profileRoute.post('/profile/api-keys', zValidator('json', registerApiKeySchema), async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const { key, ...rest } = c.req.valid('json')
   const encryptedKey = await encrypt(key)
 
@@ -114,7 +114,7 @@ profileRoute.post('/profile/api-keys', zValidator('json', registerApiKeySchema),
 
 // DELETE /api/workspace/profile/api-keys/:id — 내 API key 삭제
 profileRoute.delete('/profile/api-keys/:id', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
 
   const [key] = await db
@@ -128,7 +128,7 @@ profileRoute.delete('/profile/api-keys/:id', async (c) => {
 
 // GET /api/workspace/profile/tool-calls — 내 도구 호출 내역 (최근 50건)
 profileRoute.get('/profile/tool-calls', async (c) => {
-  const tenant = c.get('tenant') as TenantContext
+  const tenant = c.get('tenant')
 
   const result = await db
     .select({
