@@ -1,4 +1,28 @@
 import { useState, useEffect } from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { useAuthStore } from './stores/auth-store'
+import { Layout } from './components/layout'
+import { LoginPage } from './pages/login'
+import { DashboardPage } from './pages/dashboard'
+import { UsersPage } from './pages/users'
+import { DepartmentsPage } from './pages/departments'
+import { AgentsPage } from './pages/agents'
+import { CredentialsPage } from './pages/credentials'
+import { CompaniesPage } from './pages/companies'
+import { ToolsPage } from './pages/tools'
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { staleTime: 30_000, retry: 1 },
+  },
+})
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
+  if (!isAuthenticated) return <Navigate to="/login" replace />
+  return <>{children}</>
+}
 
 export function App() {
   const [dark, setDark] = useState(() =>
@@ -9,20 +33,32 @@ export function App() {
     document.documentElement.classList.toggle('dark', dark)
   }, [dark])
 
+  // expose for potential future use
+  ;(window as unknown as Record<string, unknown>).__toggleDark = () => setDark((d) => !d)
+
   return (
-    <div className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center space-y-6">
-          <h1 className="text-4xl font-bold">CORTHEX ADMIN</h1>
-          <p className="text-zinc-500 dark:text-zinc-400">관리자 콘솔 — 세팅 완료</p>
-          <button
-            onClick={() => setDark(!dark)}
-            className="px-3 py-1 rounded-md border border-zinc-200 dark:border-zinc-800 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter basename="/admin">
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }
           >
-            {dark ? '☀️ 라이트' : '🌙 다크'}
-          </button>
-        </div>
-      </div>
-    </div>
+            <Route index element={<DashboardPage />} />
+            <Route path="users" element={<UsersPage />} />
+            <Route path="departments" element={<DepartmentsPage />} />
+            <Route path="agents" element={<AgentsPage />} />
+            <Route path="credentials" element={<CredentialsPage />} />
+            <Route path="companies" element={<CompaniesPage />} />
+            <Route path="tools" element={<ToolsPage />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </QueryClientProvider>
   )
 }
