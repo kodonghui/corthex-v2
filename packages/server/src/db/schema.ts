@@ -6,6 +6,7 @@ export const userRoleEnum = pgEnum('user_role', ['admin', 'user'])
 export const agentStatusEnum = pgEnum('agent_status', ['online', 'working', 'error', 'offline'])
 export const messageSenderEnum = pgEnum('message_sender', ['user', 'agent'])
 export const toolScopeEnum = pgEnum('tool_scope', ['platform', 'company', 'department'])
+export const delegationStatusEnum = pgEnum('delegation_status', ['pending', 'processing', 'completed', 'failed'])
 
 // === 1. companies — 회사 (테넌트 최상위 단위) ===
 export const companies = pgTable('companies', {
@@ -50,6 +51,7 @@ export const agents = pgTable('agents', {
   role: varchar('role', { length: 200 }),
   soul: text('soul'),  // 마크다운 성격 정의
   status: agentStatusEnum('status').notNull().default('offline'),
+  isSecretary: boolean('is_secretary').notNull().default(false),
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
@@ -141,6 +143,21 @@ export const reportLines = pgTable('report_lines', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 
+// === 13. delegations — 비서 위임 (secretary → department agent) ===
+export const delegations = pgTable('delegations', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  sessionId: uuid('session_id').notNull().references(() => chatSessions.id),
+  secretaryAgentId: uuid('secretary_agent_id').notNull().references(() => agents.id),
+  targetAgentId: uuid('target_agent_id').notNull().references(() => agents.id),
+  userMessage: text('user_message').notNull(),
+  delegationPrompt: text('delegation_prompt').notNull(),
+  agentResponse: text('agent_response'),
+  status: delegationStatusEnum('status').notNull().default('pending'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  completedAt: timestamp('completed_at'),
+})
+
 // === Relations ===
 export const companiesRelations = relations(companies, ({ many }) => ({
   users: many(users),
@@ -180,4 +197,11 @@ export const chatSessionsRelations = relations(chatSessions, ({ one, many }) => 
 export const chatMessagesRelations = relations(chatMessages, ({ one }) => ({
   company: one(companies, { fields: [chatMessages.companyId], references: [companies.id] }),
   session: one(chatSessions, { fields: [chatMessages.sessionId], references: [chatSessions.id] }),
+}))
+
+export const delegationsRelations = relations(delegations, ({ one }) => ({
+  company: one(companies, { fields: [delegations.companyId], references: [companies.id] }),
+  session: one(chatSessions, { fields: [delegations.sessionId], references: [chatSessions.id] }),
+  secretaryAgent: one(agents, { fields: [delegations.secretaryAgentId], references: [agents.id] }),
+  targetAgent: one(agents, { fields: [delegations.targetAgentId], references: [agents.id] }),
 }))

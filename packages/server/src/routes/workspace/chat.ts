@@ -3,10 +3,11 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { eq, and, desc } from 'drizzle-orm'
 import { db } from '../../db'
-import { chatSessions, chatMessages, agents } from '../../db/schema'
+import { chatSessions, chatMessages, agents, delegations } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { generateAgentResponse } from '../../lib/ai'
+import { orchestrateSecretary } from '../../lib/orchestrator'
 import type { TenantContext } from '@corthex/shared'
 
 export const chatRoute = new Hono()
@@ -100,7 +101,7 @@ chatRoute.post(
     const sessionId = c.req.param('sessionId')
     const { content } = c.req.valid('json')
 
-    // 세션 소유권 확인
+    // 세션 소유권 + 에이전트 정보 확인
     const [session] = await db
       .select({ id: chatSessions.id, agentId: chatSessions.agentId })
       .from(chatSessions)
@@ -108,6 +109,13 @@ chatRoute.post(
       .limit(1)
 
     if (!session) throw new HTTPError(404, '세션을 찾을 수 없습니다', 'CHAT_002')
+
+    // 에이전트가 비서인지 확인
+    const [agent] = await db
+      .select({ isSecretary: agents.isSecretary })
+      .from(agents)
+      .where(eq(agents.id, session.agentId))
+      .limit(1)
 
     // 유저 메시지 저장
     const [userMsg] = await db
@@ -126,17 +134,27 @@ chatRoute.post(
       .set({ lastMessageAt: new Date() })
       .where(eq(chatSessions.id, sessionId))
 
-    // Claude AI 응답 생성
+    // AI 응답 생성 — 비서면 오케스트레이션, 아니면 직접 대화
     let aiContent: string
     try {
-      aiContent = await generateAgentResponse({
-        agentId: session.agentId,
-        sessionId,
-        companyId: tenant.companyId,
-        userMessage: content,
-      })
+      if (agent?.isSecretary) {
+        // 비서 오케스트레이션: 분석 → 부서 위임 → 종합 보고서
+        aiContent = await orchestrateSecretary({
+          secretaryAgentId: session.agentId,
+          sessionId,
+          companyId: tenant.companyId,
+          userMessage: content,
+        })
+      } else {
+        // 일반 에이전트: 직접 대화
+        aiContent = await generateAgentResponse({
+          agentId: session.agentId,
+          sessionId,
+          companyId: tenant.companyId,
+          userMessage: content,
+        })
+      }
     } catch (err) {
-      // API key 미설정 등 에러 시 fallback
       aiContent = `[AI 연결 오류] ${err instanceof Error ? err.message : '알 수 없는 오류'}. 관리자에게 ANTHROPIC_API_KEY 설정을 확인해주세요.`
     }
 
@@ -153,3 +171,36 @@ chatRoute.post(
     return c.json({ data: { userMessage: userMsg, agentMessage: agentMsg } }, 201)
   },
 )
+
+// GET /api/workspace/chat/sessions/:sessionId/delegations — 세션 위임 내역 조회
+chatRoute.get('/sessions/:sessionId/delegations', async (c) => {
+  const tenant = c.get('tenant') as TenantContext
+  const sessionId = c.req.param('sessionId')
+
+  // 세션 소유권 확인
+  const [session] = await db
+    .select({ id: chatSessions.id })
+    .from(chatSessions)
+    .where(and(eq(chatSessions.id, sessionId), eq(chatSessions.userId, tenant.userId)))
+    .limit(1)
+
+  if (!session) throw new HTTPError(404, '세션을 찾을 수 없습니다', 'CHAT_002')
+
+  const result = await db
+    .select({
+      id: delegations.id,
+      targetAgentId: delegations.targetAgentId,
+      targetAgentName: agents.name,
+      delegationPrompt: delegations.delegationPrompt,
+      agentResponse: delegations.agentResponse,
+      status: delegations.status,
+      createdAt: delegations.createdAt,
+      completedAt: delegations.completedAt,
+    })
+    .from(delegations)
+    .innerJoin(agents, eq(delegations.targetAgentId, agents.id))
+    .where(eq(delegations.sessionId, sessionId))
+    .orderBy(delegations.createdAt)
+
+  return c.json({ data: result })
+})

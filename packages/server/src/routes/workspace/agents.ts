@@ -19,6 +19,7 @@ workspaceAgentsRoute.get('/agents', async (c) => {
       name: agents.name,
       role: agents.role,
       status: agents.status,
+      isSecretary: agents.isSecretary,
       departmentId: agents.departmentId,
     })
     .from(agents)
