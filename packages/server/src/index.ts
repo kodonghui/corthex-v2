@@ -10,6 +10,9 @@ import { departmentsRoute } from './routes/admin/departments'
 import { agentsRoute } from './routes/admin/agents'
 import { credentialsRoute } from './routes/admin/credentials'
 import { toolsRoute } from './routes/admin/tools'
+import { workspaceAgentsRoute } from './routes/workspace/agents'
+import { chatRoute } from './routes/workspace/chat'
+import { profileRoute } from './routes/workspace/profile'
 
 const app = new Hono()
 
@@ -37,6 +40,11 @@ app.route('/api/admin', departmentsRoute)
 app.route('/api/admin', agentsRoute)
 app.route('/api/admin', credentialsRoute)
 app.route('/api/admin', toolsRoute)
+
+// 유저 워크스페이스 라우트 (각 파일 내부에서 authMiddleware 적용, 테넌트 격리)
+app.route('/api/workspace', workspaceAgentsRoute)
+app.route('/api/workspace/chat', chatRoute)
+app.route('/api/workspace', profileRoute)
 
 // 서버 시작
 const port = Number(process.env.PORT) || 3000
