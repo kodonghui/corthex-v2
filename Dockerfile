@@ -15,10 +15,9 @@ RUN bun install --frozen-lockfile
 FROM oven/bun:1.3.10-alpine AS builder
 WORKDIR /app
 
-COPY --from=deps /app/node_modules ./node_modules
+# 소스 전체 복사 후 의존성 설치 + 빌드
 COPY . .
-
-# Turborepo가 의존성 그래프에 따라 shared → app+admin → server 순서로 빌드
+RUN bun install --frozen-lockfile
 RUN bunx turbo build
 
 # === Stage 3: 프로덕션 ===
