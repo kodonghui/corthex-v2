@@ -1,0 +1,19 @@
+services:
+  corthex:
+    build: .
+    container_name: corthex-v2
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      STATIC_ROOT: ./public
+    env_file:
+      - .env.production
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

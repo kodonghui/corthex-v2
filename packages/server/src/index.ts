@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
+import { serveStatic } from 'hono/bun'
 import { errorHandler } from './middleware/error'
 import { healthRoute } from './routes/health'
 import { authRoute } from './routes/auth'
@@ -25,14 +26,14 @@ import { startJobWorker } from './lib/job-queue'
 import type { AppEnv } from './types'
 
 const app = new Hono<AppEnv>()
+const isProd = process.env.NODE_ENV === 'production'
 
 // 글로벌 미들웨어
 app.use('*', logger())
 app.use('*', cors({
-  origin: [
-    'http://localhost:5173',  // app dev
-    'http://localhost:5174',  // admin dev
-  ],
+  origin: isProd
+    ? ['https://corthex-hq.com']
+    : ['http://localhost:5173', 'http://localhost:5174'],
   credentials: true,
 }))
 
@@ -63,6 +64,22 @@ app.route('/api/workspace', dashboardRoute)
 app.route('/api/workspace', telegramRoute)
 app.route('/api/workspace/messenger', messengerRoute)
 app.route('/api/workspace', nexusRoute)
+
+// 프로덕션: 정적 파일 서빙 (SPA 폴백 포함)
+if (isProd) {
+  const root = process.env.STATIC_ROOT || './public'
+
+  // Admin SPA — /admin/*
+  app.use('/admin/*', serveStatic({
+    root: `${root}/admin`,
+    rewriteRequestPath: (p) => p.replace(/^\/admin/, '') || '/',
+  }))
+  app.get('/admin/*', serveStatic({ root: `${root}/admin`, path: '/index.html' }))
+
+  // App SPA — /*
+  app.use('*', serveStatic({ root: `${root}/app` }))
+  app.get('*', serveStatic({ root: `${root}/app`, path: '/index.html' }))
+}
 
 // 서버 시작
 const port = Number(process.env.PORT) || 3000

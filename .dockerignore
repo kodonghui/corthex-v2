@@ -1,0 +1,15 @@
+node_modules
+.git
+.github
+.turbo
+.env
+.env.local
+.env.*.local
+.env.production
+dist
+*.tsbuildinfo
+*.log
+.vscode
+.idea
+.DS_Store
+Thumbs.db
