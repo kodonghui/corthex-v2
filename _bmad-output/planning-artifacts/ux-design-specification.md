@@ -4,16 +4,16 @@ inputDocuments:
   - _bmad-output/planning-artifacts/prd.md
   - _bmad-output/planning-artifacts/architecture.md
   - _bmad-output/planning-artifacts/product-brief-CORTHEX_HQ-2026-03-02.md
-revision: 8
+revision: 9
 revisionDate: 2026-03-04
-revisionReason: "P3 완전 스펙 — SNS/메신저/대시보드/작전일지P3/소울편집/PWA 88개 결정 + Phase F 신설(LineChart/StatCard/DateRangePicker/SoulEditor) + WebSocket P3 이벤트 4종 + 다크모드 수동토글 + 이메일 알림 설정 + P3 화면간 플로우 + 엣지케이스"
+revisionReason: "P4 완전 스펙 — NEXUS 스케치바이브/MCP 연동/메신저 파일첨부 79개 결정 + Phase G 신설(AgentNode/DepartmentNode/NexusCanvas/NexusEditPanel/NexusInfoPanel) + WebSocket P4 이벤트(nexus-updated) + Admin 조직도 관리 + P4 화면간 플로우 + 엣지케이스"
 ---
 
-# UX Design Specification — CORTHEX v2 (Revision 8)
+# UX Design Specification — CORTHEX v2 (Revision 9)
 
 **Author:** Elddl
 **Date:** 2026-03-04
-**Revision:** 8 — P3 완전 스펙 (SNS/메신저/대시보드/소울편집/PWA 88개 결정 + Phase F 신설 + WebSocket P3 이벤트 + 다크모드 수동토글 + 이메일 알림 설정)
+**Revision:** 9 — P4 완전 스펙 (NEXUS 스케치바이브/MCP 연동/메신저 파일첨부 79개 결정 + Phase G 신설 + WebSocket P4 이벤트 + Admin 조직도 관리)
 
 ---
 
@@ -184,6 +184,15 @@ Phase F — 데이터 시각화 + 편집기 (P3 신설)
   DateRangePicker  (작전일지 P3 날짜 범위 필터 — react-day-picker, max 90일)
   SoulEditor       (소울 편집 CodeMirror — 마크다운 구문 강조, /settings 소울 탭 lazy import)
   → Phase C 완료 후 가능 (Phase D/E 독립)
+
+Phase G — NEXUS 캔버스 컴포넌트 (P4 신설, packages/app)
+  AgentNode        (에이전트 노드 — 이니셜 아바타 + 이름 + 온라인 dot. 160×80px)
+  DepartmentNode   (부서 노드 — 컬러바 + 부서명. 200×60px)
+  NexusCanvas      (React Flow 캔버스 래퍼 — BackgroundVariant.Dots + Controls + MiniMap)
+  NexusEditPanel   (편집 모드 좌측 패널 — 부서/에이전트 추가 버튼 + 선택 노드 정보)
+  NexusInfoPanel   (유저 모드 우측 슬라이드오버 — 에이전트 정보 + [채팅하기] 버튼)
+  → @xyflow/react 이미 packages/app에 설치됨. Phase D/E 독립
+  → 파일명 모두 PascalCase (아키텍처 결정 #예외)
 ```
 
 **화면별 개발 가능 시점:**
@@ -425,6 +434,9 @@ bg-base 전체화면, 중앙 정렬
 | `/dashboard?period=7d` | 기간 파라미터 유지 (공유/북마크/새로고침 복원) |
 | `/settings?tab=soul` | 소울 편집 탭 자동 활성화 |
 | `/settings?tab=notifications` | 알림 설정 탭 자동 활성화 |
+| `/settings?tab=mcp` | MCP 연동 탭 자동 활성화 |
+| `/nexus` | NEXUS 조직도 보기 (읽기 전용) |
+| `/nexus?mode=edit` | NEXUS 편집 모드 — 비관리자 접근 시 mode=edit 무시, 보기로 강제 |
 
 ### 설정 복귀
 
@@ -453,6 +465,7 @@ bg-base 전체화면, 중앙 정렬
 | 7 | CLI / API 키 | `/credentials` | FR-1.4, FR-1.5 |
 | 8 | **보고 라인** | `/report-lines` | **FR-1.9** |
 | 9 | **소울 템플릿** | `/soul-templates` | **FR-1.12** | P3 |
+| 10 | **조직도 관리** | `/nexus` | **FR-11.1, 11.2** | P4 |
 
 ### 9.2 대시보드
 
@@ -520,6 +533,64 @@ bg-base 전체화면, 중앙 정렬
 | 레이아웃 | 카드 목록. 각 카드: 템플릿명 + 첫 3줄 미리보기 + `[내용 보기]` + `[수정][삭제]`(커스텀만) |
 
 **API:** `GET /soul-templates`, `POST /soul-templates`, `PATCH /soul-templates/:id`, `DELETE /soul-templates/:id`
+
+### 9.11 조직도 관리 (Admin NEXUS 편집) — FR-11.1, 11.2 (P4)
+
+**관리자 전용 조직도 편집 화면. 항상 편집 모드. 별도 보기 모드 없음 (보기는 User 앱 `/nexus`).**
+
+**결정 사항:**
+
+| 항목 | 결정 |
+|------|------|
+| **모드** | 항상 편집 모드. 보기/편집 전환 없음 |
+| **레이아웃** | 전체 화면 React Flow 캔버스. 상단 툴바 + 좌측 편집 패널(220px) + 캔버스 |
+| **부서 노드** | `200×60px`. `bg-zinc-800 border border-zinc-600 rounded-lg`. 상단 `h-2` 컬러바 (부서별 색상). 부서명 `font-semibold text-sm`. 좌측 🏢 아이콘. 더블클릭 → 인라인 이름 편집 input |
+| **에이전트 노드** | `160×80px`. `bg-zinc-900 border border-zinc-700 rounded-lg`. 이니셜 `rounded-full w-8 h-8 bg-zinc-700`. 이름 `text-xs text-zinc-300`. 우하단 온라인 dot (agent-status WebSocket) |
+| **Orphan 노드** | agentId DB에 없을 경우 `border-dashed border-red-500/50`. 노드 내 "삭제된 에이전트" 텍스트. 상단 배너: "N개 유효하지 않은 노드가 있습니다. [제거]" |
+| **연결선** | 소속(부서↔에이전트) = `SmoothStepEdge` 실선 `stroke-zinc-500`. 위임(에이전트↔에이전트) = `BezierEdge` 점선 `stroke-blue-400/60 strokeDasharray=5`. 위임 엣지에만 `MarkerType.ArrowClosed fill-blue-400/60` |
+| **레이아웃 엔진** | Dagre `rankdir: 'LR'`. 저장 시 자동 재레이아웃. 노드 수동 드래그 위치 조정 허용 (x/y 좌표 DB 저장) |
+| **노드 추가** | 좌측 패널 `[+ 부서 추가]` / `[+ 에이전트 추가]` 버튼. 클릭 → 모달 폼 |
+| **부서 추가 폼** | 부서명 (input, required) + 색상 선택 6가지 프리셋 (blue/emerald/violet/amber/red/zinc, 500계열). 추가 → 캔버스 상단 노드 + Dagre 재레이아웃 |
+| **에이전트 추가** | 미배정 에이전트 드롭다운 (이니셜+이름+역할). 선택 → 캔버스 추가. 새 에이전트 생성은 `/agents` 에서 ("새 에이전트는 AI 에이전트 메뉴에서 추가하세요" 안내) |
+| **전체 불러오기** | 편집 패널 하단 `[전체 에이전트 가져오기]` 버튼. DB 전체 에이전트 → 미배정 노드 일괄 추가 + Dagre 재레이아웃 |
+| **연결선 그리기** | 노드 hover → Handle 점 표시. Handle 드래그 → 타 노드 Handle 드롭. 부서↔에이전트=소속, 에이전트↔에이전트=위임, 부서↔부서=**불가** (거부) |
+| **노드/엣지 삭제** | 선택(클릭) 후 `Delete`/`Backspace` 키. 또는 좌측 패널 `[🗑 삭제]` 버튼 (선택 시만 활성). ConfirmDialog 없음 (취소 롤백 가능) |
+| **노드 이름 편집** | 더블클릭 → 인라인 input. Enter=저장(로컬), Esc=취소. 최종 반영은 `[저장]` |
+| **저장 방식** | 명시적 `[저장]` 버튼. 자동저장 없음. 미저장 변경 후 이탈 시 `useBlocker` |
+| **저장 확인** | ConfirmDialog: "조직도 변경사항을 적용하시겠습니까? 에이전트 배정이 즉시 반영됩니다." |
+| **Dirty state** | `[저장]` 버튼 우측 `● 저장되지 않은 변경사항` `text-xs text-amber-400` |
+| **취소** | `[취소]` 버튼 → 모든 변경 롤백 + `fitView({ padding: 0.2 })` 재호출 |
+| **버전 충돌** | `PUT /nexus/graph` 요청에 `updatedAt` 포함. 서버 현재값과 다르면 409 → "다른 관리자가 편집 중입니다. 새로고침하시겠습니까?" |
+| **미니맵** | 우하단 `width=150 height=100` |
+| **배경** | `BackgroundVariant.Dots gap=16 size=1 color='#3f3f46'` |
+| **컨트롤** | 좌하단 `<Controls>` (ReactFlow 내장). +/-/핏 버튼 |
+| **초기 로드** | 데이터 로드 완료 후 `fitView({ padding: 0.2 })` 자동 호출 |
+| **로딩 상태** | 전체 화면 중앙 Spinner + "조직도를 불러오는 중..." `text-zinc-500` |
+| **빈 상태** | "아직 조직도가 없습니다." + `[전체 에이전트 가져오기]` 버튼 |
+| **부서 컬러** | 500계열 고정 (예: `bg-blue-500/20 border-blue-500/40 text-blue-400`). 다크/라이트 동일 |
+| **Admin WebSocket** | `agent-status` 채널 구독 (에이전트 노드 온라인 dot). `nexus-updated` 이벤트 발행 (저장 시 User 앱 실시간 반영) |
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  CORTHEX Admin │  조직도 관리     ● 저장되지 않은 변경  [저장][취소]│
+│                │┌──────────────┐┌────────────────────────────┐│
+│                ││ [+ 부서 추가] ││                            ││
+│                ││ [+ 에이전트]  ││  ┌──────────────┐          ││
+│                ││               ││  │ 🏢 A본부     │──▶ [AI]A-1🟢││
+│                ││ 선택: A-1    ││  │  (blue bar)  │    - - ▶[AI]A-2││
+│                ││ [🗑 삭제]    ││  └──────────────┘          ││
+│                ││               ││                            ││
+│                ││[전체 가져오기]││  [Controls]   [MiniMap]   ││
+│                │└──────────────┘└────────────────────────────┘│
+└──────────────────────────────────────────────────────────────┘
+```
+
+**API:**
+- `GET /nexus/graph` → 노드/엣지 + 좌표 + updatedAt 전체
+- `PUT /nexus/graph` → 전체 그래프 저장 (관리자). body: `{ nodes: [{id, type, label, color?, x, y, agentId?}], edges: [{id, source, target, type}], updatedAt }`
+- `GET /nexus/agents/unassigned` → 미배정 에이전트 목록 (편집 모달용)
+
+파일: `packages/admin/src/pages/nexus-editor.tsx` (Admin 전용 페이지). 컴포넌트는 Phase G (`AgentNode`, `DepartmentNode`, `NexusCanvas`, `NexusEditPanel`) — `packages/app` 소스에서 import
 
 ---
 
@@ -846,8 +917,15 @@ bg-base 전체화면, 중앙 정렬
   senderId: string,
   senderName: string,
   content: string,
-  contentType: "text" | "image",
+  contentType: "text" | "image" | "file",    // P4: "file" 타입 추가
   imageUrl?: string,
+  attachments?: [{                            // P4: 파일 첨부 배열
+    fileId: string,
+    type: "image" | "file",
+    mimeType: string,
+    filename: string,
+    size: number                              // bytes
+  }],
   sentAt: string
 }
 
@@ -874,6 +952,19 @@ bg-base 전체화면, 중앙 정렬
   channelId: string,
   userId: string,
   userName: string
+}
+```
+
+#### P4 WebSocket 이벤트 페이로드 구조
+
+```ts
+// 채널: "nexus"
+// nexus-updated: 관리자가 조직도 저장 → 모든 /nexus 접속자 캔버스 실시간 갱신
+{
+  type: "nexus-updated",
+  updatedBy: string,       // 관리자 이름
+  updatedAt: string        // ISO 8601
+  // 수신 시 클라이언트에서 GET /nexus/graph 재호출 + fitView() 재실행
 }
 ```
 
@@ -1214,8 +1305,11 @@ ChatPage → SessionPanel (NewChatButton → AgentListModal, SessionGroup/Sessio
 |------|------|
 | 채널 구조 | DM(1:1) + 그룹 채널 모두 지원 |
 | 채널 생성 권한 | 모든 유저(H/CEO). 같은 회사 멤버만 초대 가능 |
-| 메시지 타입 | 텍스트 + 이미지 첨부 (drag & drop + paste 지원). 파일 첨부 P4 |
+| 메시지 타입 | 텍스트 + 이미지(P3) + 문서 파일(P4). drag & drop + paste 지원 |
 | 이미지 저장 | 로컬 볼륨 `uploads/messenger/{companyId}/{channelId}/`. 최대 10MB. 유저당 1GB 쿼터 포함 |
+| **파일 첨부 P4** | 지원 형식: 이미지(jpg/png/gif/webp) + 문서(pdf/doc/docx/xls/xlsx/ppt/pptx/txt/csv/zip). 이미지 10MB / 문서 50MB. 메시지당 최대 5개(합산). 업로드 API: `POST /files/upload` (P2 재사용). 파일은 `/files` 파일관리 화면에 표시 **안 함** (메신저 내에서만 접근). 다운로드: signed URL 방식 (24시간 만료. 채널 멤버만 발급 가능 — 탈퇴 멤버 토큰 무효화) |
+| **파일 첨부 UI P4** | 이미지 아이콘(📷) → 클립 아이콘(📎)으로 교체. accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip". drag & drop 채팅 영역 전체. 업로드 진행: 버블 자리에 진행률 바 `[파일명] ▓▓▓░ 60%`. 완료 시 파일 버블로 교체 |
+| **문서 버블 P4** | `border border-zinc-700 rounded-lg p-3`. 파일 타입 아이콘(pdf=빨/xls=녹/doc=파/zip=회/기타=📎) + 파일명 `text-sm truncate max-w-[200px]` + 크기 `text-xs text-zinc-500` + `[↓]` 다운로드 버튼 |
 | 읽음 표시 | 채널별 언리드 카운트 뱃지. 1:1 DM에만 "읽음✓" 표시 추가 |
 | 히스토리 로드 | 초기 50건. 위로 스크롤 시 50건 추가. 진입 시 최신 메시지로 스크롤 |
 | 온라인 상태 | `●`(emerald, 온라인) / `○`(오프라인). WebSocket 연결 기반. 끊기면 30초 후 오프라인 전환 |
@@ -1434,7 +1528,55 @@ ChatPage → SessionPanel (NewChatButton → AgentListModal, SessionGroup/Sessio
 └──────────────────────────────────────────────────────────────┘
 ```
 
-### 10.11 NEXUS: React Flow + Dagre 캔버스 조직도. 관리자 전용 편집
+### 10.11 NEXUS (`/nexus`) — FR-11.1, 11.2 (P4)
+
+**전 직원 읽기 전용 조직도 캔버스. 편집은 Admin 콘솔에서만.**
+
+**결정 사항:**
+
+| 항목 | 결정 |
+|------|------|
+| **접근 권한** | 모든 로그인 유저 읽기 가능. 편집 버튼/기능 없음 |
+| **레이아웃** | 전체 화면 React Flow 캔버스 (사이드바 포함) |
+| **부서 노드** | `200×60px`. 상단 컬러바 + 부서명 (Admin 설정 색상 그대로 표시) |
+| **에이전트 노드** | `160×80px`. 이니셜 아바타 + 이름 + 온라인 dot (agent-status WebSocket) |
+| **연결선** | 소속=실선 `stroke-zinc-500`. 위임=점선 `stroke-blue-400/60`. 위임 엣지 화살표 |
+| **노드 클릭 — 에이전트** | 우측 슬라이드오버 (NexusInfoPanel): 에이전트 이름/역할/소울 한 줄 + `[채팅하기]` 버튼 → `/chat?agentId=`. 닫기: `×` 버튼 + 외부 클릭 + `Esc` |
+| **노드 클릭 — 부서** | 소속 에이전트 노드+엣지 하이라이트 (나머지 `opacity-30`) |
+| **실시간 갱신** | `nexus-updated` WebSocket 수신 시 `GET /nexus/graph` 재호출 + `fitView()` 재실행 |
+| **로딩** | 전체 화면 중앙 Spinner + "조직도를 불러오는 중..." |
+| **빈 상태** | "아직 조직도가 구성되지 않았습니다." (버튼 없음) |
+| **초기 핏** | 데이터 로드 완료 후 `fitView({ padding: 0.2 })` 자동 호출 |
+| **미니맵** | 우하단 `width=150 height=100` |
+| **배경** | `BackgroundVariant.Dots gap=16 size=1 color='#3f3f46'` |
+| **컨트롤** | 좌하단 `<Controls>` (+/-/핏) |
+| **모바일** | 읽기 전용만. 터치 팬/줌 허용. 노드 탭 → 슬라이드오버 |
+| **URL** | `/nexus` (보기). `/nexus?mode=edit` URL 진입 시 mode=edit 무시 → 보기 강제 |
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│ Sidebar │  NEXUS — 조직도                                    │
+│         │ ┌────────────────────────────────────────────────┐  │
+│         │ │                                      [MiniMap] │  │
+│         │ │  ┌──────────────┐    ┌──────────────┐          │  │
+│         │ │  │ 🏢 A본부     │───▶│  [AI] A-1   │ 🟢       │  │
+│         │ │  │  (blue bar)  │    │  에이전트1   │          │  │
+│         │ │  └──────────────┘    └──────────────┘          │  │
+│         │ │           · · · (dot grid) · · ·               │  │
+│         │ │ [Controls]                                      │  │
+│         │ └────────────────────────────────────────────────┘  │
+│         │                           ┌── NexusInfoPanel ────┐  │
+│         │                           │ A-1 에이전트         │  │
+│         │                           │ 역할: 분석가          │  │
+│         │                           │ "당신은 데이터..."     │  │
+│         │                           │ [채팅하기]        [×] │  │
+│         │                           └──────────────────────┘  │
+└──────────────────────────────────────────────────────────────┘
+```
+
+**API:** `GET /nexus/graph` → 노드/엣지 + 좌표 + updatedAt
+
+파일: `NexusCanvas.tsx`, `AgentNode.tsx`, `DepartmentNode.tsx`, `NexusInfoPanel.tsx` (모두 PascalCase), `nexus.tsx` (라우트 페이지 kebab-case)
 
 ### 10.12 전략실 (`/trading`) — FR-8
 
@@ -1918,6 +2060,53 @@ TradingPage → ModeBadge + RealTradingBanner (실투자 시만)
 
 파일: `file-management-tab.tsx`, `upload-zone.tsx`, `file-row.tsx`
 
+#### MCP 연동 탭 (P4) — FR-11.3
+
+**계정별 Claude Desktop MCP 서버 연결 설정. User 앱 설정에만 있음 (Admin 없음).**
+
+설정 탭 순서: API / 파일 / 매매 / 소울 / 알림 / **MCP** (6번째 추가). 모바일 레이블 "MCP" 그대로. overflow-x-auto 기존 적용됨.
+
+**결정 사항:**
+
+| 항목 | 결정 |
+|------|------|
+| MCP 서버 URL | Streamable HTTP `http://host:port/mcp` 또는 SSE `http://host:port/sse`. http/https만 허용 |
+| 등록 최대 수 | 계정당 10개. 10개 도달 시 `[+ 서버 추가]` 버튼 `disabled` + "최대 10개까지 등록 가능합니다" `text-xs` |
+| 서버 이름 자동 제안 | URL blur 시 이름 필드 자동 채움 (예: `http://localhost:3000/sse` → `localhost-3000`). 수동 수정 가능 |
+| localhost 경고 | URL에 `localhost` 감지 시 `⚠️ 프로덕션 환경에서는 외부 접근 가능한 URL을 사용하세요` Toast |
+| 연결 테스트 | 서버 등록 폼 `[연결 테스트]` 버튼 → `POST /settings/mcp/test {url}`. 성공: `✓ 연결 성공 (도구 N개 발견)` `text-emerald-500`. 실패: `✗ 연결 실패: {오류}` `text-red-500`. 로딩 중 `disabled + spinner` |
+| 연결 상태 | 각 서버 카드: `connected` (녹 dot) / `disconnected` (회색 dot) / `error` (빨 dot). 페이지 진입 시 자동 ping |
+| 도구 목록 | 서버 카드 클릭 → 아코디언 펼침. lazy 호출 (처음 열 때만 `GET /settings/mcp/:id/tools`). 도구명 `font-mono text-sm` + 설명 `text-xs text-zinc-500`. 로딩 중 skeleton 2줄 |
+| 삭제 | 카드 우측 `🗑`. ConfirmDialog("이 MCP 서버 연결을 삭제하시겠습니까?") |
+| 자동 재연결 | 없음. 페이지 진입 시 1회 ping만 |
+| 에이전트 도구 연동 | 등록 즉시 해당 계정의 모든 에이전트가 MCP 도구 사용 가능. 도구 호출 시 채팅 버블: `⚙ {도구명} [MCP] 실행 중...` |
+| 빈 상태 | "연결된 MCP 서버가 없습니다. 서버를 추가하면 에이전트가 외부 도구를 사용할 수 있습니다." + `[+ 서버 추가]` |
+
+```
+┌─────────────────────────────────────────────────────┐
+│  [API] [파일] [매매] [소울] [알림] [MCP]             │
+├─────────────────────────────────────────────────────┤
+│  MCP 서버 연결                      [+ 서버 추가]    │
+│  ┌──────────────────────────────────────────────┐   │
+│  │ 📡 localhost-3000          🟢 connected      │   │
+│  │    http://localhost:3000/sse    도구 5개  🗑  │   │
+│  │ ▼ 아코디언 열림                               │   │
+│  │   get_stock_price  주가 조회                  │   │
+│  │   analyze_chart    차트 분석                  │   │
+│  └──────────────────────────────────────────────┘   │
+│  + 서버 추가:                                         │
+│  │ 서버 이름  [localhost-8080          ]             │
+│  │ URL       [http://localhost:8080/sse]             │
+│  │                         [연결 테스트]              │
+│  │              ✓ 연결 성공 (도구 3개 발견)           │
+│  │                              [추가] [취소]        │
+└─────────────────────────────────────────────────────┘
+```
+
+**API:** `GET /settings/mcp` → 목록. `POST /settings/mcp` → 등록 (name, url). `DELETE /settings/mcp/:id` → 삭제. `POST /settings/mcp/test` → 연결 테스트 (url). `GET /settings/mcp/:id/tools` → 도구 목록 (lazy)
+
+파일: `settings-mcp.tsx`
+
 ### 10.16 P2 기존 화면 확장
 
 #### 홈 P2 확장 (FR-2.2)
@@ -1995,6 +2184,32 @@ bg-background 전체화면 중앙
 
 파일: `offline-page.tsx`, `install-banner.tsx`
 
+### 10.18 P4 화면간 플로우 + 엣지케이스
+
+#### P4 화면간 플로우
+
+| 출발 | 도착 | 트리거 |
+|------|------|--------|
+| NEXUS 에이전트 노드 클릭 | NexusInfoPanel → `[채팅하기]` → `/chat?agentId=` | 노드 클릭 → 슬라이드오버 |
+| Admin NEXUS 저장 | User 앱 `/nexus` 실시간 캔버스 갱신 | `nexus-updated` WebSocket broadcast |
+| Admin NEXUS 에이전트 없음 안내 | `/agents` (Admin) | "새 에이전트는 AI 에이전트 메뉴에서 추가하세요" 링크 |
+| 설정 MCP 탭 등록 완료 | 자동 적용 (에이전트 채팅에서 즉시 사용 가능) | 별도 화면 이동 없음 |
+
+#### P4 엣지케이스
+
+| 화면 | 상황 | 처리 |
+|------|------|------|
+| **NEXUS** | 두 관리자 동시 편집 후 저장 | `PUT /nexus/graph` 시 서버가 `updatedAt` 불일치 감지 → 409 → "다른 관리자가 편집 중입니다. 새로고침하시겠습니까?" ConfirmDialog |
+| **NEXUS** | DB에서 에이전트 삭제 후 캔버스에 남은 orphan 노드 | `GET /nexus/graph` 응답에 `isOrphan: true` 플래그 → 클라이언트: `border-dashed border-red-500/50` + "삭제된 에이전트" 텍스트. Admin 화면 상단 배너: "N개 유효하지 않은 노드가 있습니다. [제거]" |
+| **NEXUS** | 편집 취소 | 전체 변경 롤백 (서버 요청 없음) + `fitView()` 재호출 |
+| **NEXUS** | 부서↔부서 연결 시도 | 연결 시도 거부. 드래그 드롭 시 Handle 하이라이트 안 됨 (연결 타입 불가) |
+| **MCP** | 10개 초과 서버 추가 시도 | `[+ 서버 추가]` 버튼 `disabled`. "최대 10개까지 등록 가능합니다" `text-xs text-zinc-500` |
+| **MCP** | localhost URL 등록 | 등록은 허용. Toast: "프로덕션 환경에서는 외부 접근 가능한 URL을 사용하세요" `text-amber-400` |
+| **MCP** | 연결 끊긴 상태에서 에이전트 도구 호출 | 서버 레이어에서 처리 (에러 반환). 채팅 버블: `⚙ {도구명} [MCP] 실패 — MCP 서버 응답 없음` |
+| **메신저 파일** | 50MB 초과 파일 선택 | 파일 선택기 직후 즉시 Toast: "파일 크기 초과 (최대 50MB)" |
+| **메신저 파일** | 탈퇴 멤버가 파일 URL 접근 | Signed URL 무효화 (서버에서 채널 멤버 여부 검증). `403 Forbidden` |
+| **메신저 파일** | 오프라인 상태 파일 전송 | P3 오프라인 정책 동일 — 오류 Toast, 큐 없음 |
+
 ---
 
 ## 11. Interaction Rules
@@ -2065,5 +2280,9 @@ bg-background 전체화면 중앙
 
 ### P4
 
-- [ ] NEXUS 스케치바이브 (캔버스→코드 반영)
-- [ ] MCP 연동 설정
+- [ ] **NEXUS 스케치바이브** (`/nexus`) — 읽기: React Flow 캔버스. 에이전트 클릭→NexusInfoPanel→채팅. nexus-updated WebSocket. Phase G (AgentNode/DepartmentNode/NexusCanvas/NexusInfoPanel)
+- [ ] **Admin 조직도 관리** (`/admin/nexus`) — 항상 편집 모드. Dagre 자동레이아웃 + 수동 드래그. 부서/에이전트 추가 모달. orphan 노드 감지. updatedAt 충돌 감지(409). 저장 시 nexus-updated broadcast. Phase G (NexusEditPanel)
+- [ ] **MCP 연동 설정** (설정 MCP 탭 신설, 6번째 탭) — 서버 등록(max 10)/테스트/도구 목록/삭제. Signed URL. 에이전트 자동 도구 접근. 채팅 `[MCP]` 배지
+- [ ] **메신저 파일 첨부 P4** — 문서(pdf/docx/xlsx/pptx/txt/csv/zip) + 50MB. 메시지당 5개. 📎 아이콘. 진행률 바. 문서 버블(타입아이콘+파일명+크기+다운로드). Signed URL 24h. 탈퇴멤버 403
+- [ ] **P4 WebSocket 이벤트** — nexus-updated 구조 확정
+- [ ] **P4 화면간 플로우** — NEXUS→채팅, Admin NEXUS→User 앱 실시간 반영
