@@ -7,7 +7,8 @@ export default defineConfig({
   base: '/admin/',
   plugins: [react(), tailwindcss()],
   define: {
-    __BUILD_HASH__: JSON.stringify(process.env.GITHUB_SHA?.slice(0, 7) || 'dev'),
+    __BUILD_NUMBER__: JSON.stringify(process.env.BUILD_NUMBER || 'dev'),
+    __BUILD_HASH__: JSON.stringify(process.env.GITHUB_SHA?.slice(0, 7) || ''),
     __BUILD_TIME__: JSON.stringify(new Date().toISOString().slice(0, 16)),
   },
   resolve: {

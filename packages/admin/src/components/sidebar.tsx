@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { useAuthStore } from '../stores/auth-store'
 
+declare const __BUILD_NUMBER__: string
 declare const __BUILD_HASH__: string
 declare const __BUILD_TIME__: string
 
@@ -67,7 +68,7 @@ export function Sidebar() {
           </button>
         </div>
         <div className="px-3 text-[10px] text-zinc-400 dark:text-zinc-600 font-mono">
-          {__BUILD_HASH__} · {__BUILD_TIME__}
+          #{__BUILD_NUMBER__}{__BUILD_HASH__ ? ` · ${__BUILD_HASH__}` : ''}
         </div>
       </div>
     </aside>

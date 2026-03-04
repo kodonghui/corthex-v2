@@ -58,6 +58,9 @@ jobs:
           context: .
           push: true
           platforms: linux/arm64
+          build-args: |
+            BUILD_NUMBER=${{ github.run_number }}
+            GITHUB_SHA=${{ github.sha }}
           tags: |
             ghcr.io/${{ github.repository }}:latest
             ghcr.io/${{ github.repository }}:${{ github.sha }}

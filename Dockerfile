@@ -15,6 +15,12 @@ RUN bun install --frozen-lockfile
 FROM oven/bun:1.3.10-alpine AS builder
 WORKDIR /app
 
+ARG BUILD_NUMBER=dev
+ARG GITHUB_SHA=
+
+ENV BUILD_NUMBER=$BUILD_NUMBER
+ENV GITHUB_SHA=$GITHUB_SHA
+
 # 소스 전체 복사 후 의존성 설치 + 빌드
 COPY . .
 RUN bun install --frozen-lockfile
