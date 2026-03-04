@@ -55,9 +55,9 @@ jobs:
         run: bunx turbo build type-check
       - name: Unit tests
         run: |
-          bun test packages/shared/src/__tests__/ || true
-          bun test packages/server/src/__tests__/unit/ || true
-          bun test packages/app/src/__tests__/ || true
+          bun test packages/shared/src/__tests__/
+          bun test packages/server/src/__tests__/unit/
+          bun test packages/app/src/__tests__/
 
       # Docker 빌드 (캐싱 적용)
       - name: Set up QEMU
