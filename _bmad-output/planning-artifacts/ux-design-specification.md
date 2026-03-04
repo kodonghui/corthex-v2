@@ -4,16 +4,16 @@ inputDocuments:
   - _bmad-output/planning-artifacts/prd.md
   - _bmad-output/planning-artifacts/architecture.md
   - _bmad-output/planning-artifacts/product-brief-CORTHEX_HQ-2026-03-02.md
-revision: 7
+revision: 8
 revisionDate: 2026-03-04
-revisionReason: "P2 완전 스펙 — 전략실/야간작업/보고서/파일관리 56개 결정 + 19개 검토 수정 + WebSocket P2 이벤트 구조 + KIS 미연동 정책 + Phase E 신설 + 자동매매 모바일 Accordion + 실투자 경고 3곳 + P2 화면간 플로우 + 엣지케이스"
+revisionReason: "P3 완전 스펙 — SNS/메신저/대시보드/작전일지P3/소울편집/PWA 88개 결정 + Phase F 신설(LineChart/StatCard/DateRangePicker/SoulEditor) + WebSocket P3 이벤트 4종 + 다크모드 수동토글 + 이메일 알림 설정 + P3 화면간 플로우 + 엣지케이스"
 ---
 
-# UX Design Specification — CORTHEX v2 (Revision 7)
+# UX Design Specification — CORTHEX v2 (Revision 8)
 
 **Author:** Elddl
 **Date:** 2026-03-04
-**Revision:** 7 — P2 완전 스펙 (전략실/야간작업/보고서/파일관리 56개 결정 + 19개 검토 수정 + WebSocket P2 이벤트 + KIS 정책 + Phase E + 실투자 경고)
+**Revision:** 8 — P3 완전 스펙 (SNS/메신저/대시보드/소울편집/PWA 88개 결정 + Phase F 신설 + WebSocket P3 이벤트 + 다크모드 수동토글 + 이메일 알림 설정)
 
 ---
 
@@ -147,6 +147,10 @@ revisionReason: "P2 완전 스펙 — 전략실/야간작업/보고서/파일관
 | `UploadZone` | P2 | 드래그&드롭 파일 업로드 영역 |
 | `MarkdownRenderer` | P2 | 보고서 마크다운 렌더링 (`prose`) |
 | `RadioGroup` | P2 | 작업 유형 라디오 |
+| `LineChart` | P3 | Recharts 래퍼, 대시보드 일별 비용 선 그래프 |
+| `StatCard` | P3 | 대시보드 요약 카드 (아이콘 + 숫자 + 추이) |
+| `DateRangePicker` | P3 | 작전일지 날짜 범위 필터 (react-day-picker) |
+| `SoulEditor` | P3 | CodeMirror 마크다운 래퍼 (소울 편집, lazy import) |
 
 ### 컴포넌트 구현 순서 (Phase 의존성)
 
@@ -173,6 +177,13 @@ Phase E — P2 전용 특수 컴포넌트 (신설)
   UploadZone   (파일 관리 — 드래그&드롭, 다중 업로드)
   RadioGroup   (야간작업 등록 모달 작업 유형 선택)
   → Phase D 완료 후 가능
+
+Phase F — 데이터 시각화 + 편집기 (P3 신설)
+  LineChart        (대시보드 일별 비용 선 그래프 — Recharts, packages/app 설치, React.lazy())
+  StatCard         (대시보드 요약 카드 — 아이콘 + 숫자 + 기간별 수치)
+  DateRangePicker  (작전일지 P3 날짜 범위 필터 — react-day-picker, max 90일)
+  SoulEditor       (소울 편집 CodeMirror — 마크다운 구문 강조, /settings 소울 탭 lazy import)
+  → Phase C 완료 후 가능 (Phase D/E 독립)
 ```
 
 **화면별 개발 가능 시점:**
@@ -190,6 +201,12 @@ Phase E — P2 전용 특수 컴포넌트 (신설)
 | 파일 관리 | D + E |
 | 전략실 | D + E |
 | Admin 보고 라인 | A + B + C |
+| SNS | A + B + C |
+| 메신저 | A + B + C |
+| 대시보드 | A + F |
+| 작전일지 P3 보강 | A + D + F |
+| 소울 편집 (설정 탭) | B + F |
+| Admin 소울 템플릿 | A + B + C |
 
 ---
 
@@ -314,9 +331,13 @@ h-14, bg-surface, border-b, sticky top-0
 ### 다크모드 폴리시
 
 ```
-- 시스템 설정 자동 감지 (prefers-color-scheme)
+- P1: 시스템 설정 자동 감지만 (prefers-color-scheme)
+- P3: 수동 토글 추가 — light / dark / system 3가지 옵션
 - 전환 시 깜빡임 방지: <html> 태그에 theme class 즉시 적용 (초기화 script)
-- 수동 토글: P3 (P1에서는 시스템 따라감)
+- localStorage 저장. 초기값: system
+- 토글 위치: 사이드바 하단 User 영역 위 (☀️/🌙/💻 아이콘 3단계 순환)
+- Collapsed 사이드바: 현재 모드 아이콘만 표시, 클릭 시 순환 (system→light→dark→system)
+  tooltip으로 현재 모드명 표시
 ```
 
 ### 에이전트 아바타 Fallback
@@ -396,6 +417,14 @@ bg-base 전체화면, 중앙 정렬
 | `/reports` | 보고서 목록 (전체 탭 기본) |
 | `/reports/:id` | 해당 보고서 읽기 뷰 직접 진입 |
 | `/jobs` | 야간작업 목록 (일회성 탭 기본) |
+| `/sns` | SNS 목록 (전체 탭 기본) |
+| `/sns?contentId={id}` | 해당 콘텐츠 카드 하이라이트 (알림 클릭 진입) |
+| `/messenger` | 메신저 (마지막 채널 또는 EmptyState) |
+| `/messenger?channelId={id}` | 해당 채널 자동 선택 (알림 클릭 진입) |
+| `/dashboard` | 대시보드 (7일 기본) |
+| `/dashboard?period=7d` | 기간 파라미터 유지 (공유/북마크/새로고침 복원) |
+| `/settings?tab=soul` | 소울 편집 탭 자동 활성화 |
+| `/settings?tab=notifications` | 알림 설정 탭 자동 활성화 |
 
 ### 설정 복귀
 
@@ -423,6 +452,7 @@ bg-base 전체화면, 중앙 정렬
 | 6 | 도구 관리 | `/tools` | FR-1.8 |
 | 7 | CLI / API 키 | `/credentials` | FR-1.4, FR-1.5 |
 | 8 | **보고 라인** | `/report-lines` | **FR-1.9** |
+| 9 | **소울 템플릿** | `/soul-templates` | **FR-1.12** | P3 |
 
 ### 9.2 대시보드
 
@@ -432,7 +462,7 @@ bg-base 전체화면, 중앙 정렬
 
 회사/직원/부서/에이전트/도구/CLI 관리 — 기존 구현 유지.
 
-> **스타일 통일 기준:** 신규 개발(보고 라인)에만 아래 기준 적용. 기존 7개 페이지는 현행 유지 (P3 리팩터링).
+> **스타일 통일 기준:** 신규 개발(보고 라인)에만 아래 기준 적용. 기존 7개 페이지는 현행 유지 (P3 리팩터링 예정).
 
 **Admin 신규 페이지 스타일 기준:**
 - 테이블: `border rounded-lg overflow-hidden`. thead `bg-muted text-xs font-medium text-secondary`. tbody `divide-y`
@@ -475,6 +505,21 @@ bg-base 전체화면, 중앙 정렬
 | **페이지 이탈** | 미저장 변경 있을 때 이탈 시 ConfirmDialog: "저장하지 않은 변경사항이 있습니다. 나가시겠어요?" |
 
 **API:** `GET /report-lines`, `PUT /report-lines` (배열로 일괄 업데이트)
+
+### 9.10 소울 템플릿 (`/soul-templates`) — FR-1.12 (P3)
+
+**에이전트 소울 기본 템플릿 라이브러리. 관리자가 관리.**
+
+**결정 사항:**
+
+| 항목 | 결정 |
+|------|------|
+| 내장 템플릿 | 5개 기본 제공 (마케터, 분석가, 개발자, 비서, 연구원). `isBuiltin: true`. 수정/삭제 불가(`🔒` 아이콘) |
+| 커스텀 템플릿 | 같은 회사 내 공유. `isBuiltin: false`. 관리자 수정/삭제 가능. 삭제 시 ConfirmDialog |
+| 에이전트에 적용 | 에이전트 편집 모달 → 소울 편집기 상단 `[템플릿 불러오기 ▼]` 드롭다운. 선택 시 ConfirmDialog("현재 소울이 대체됩니다"). 확인 시 덮어쓰기 |
+| 레이아웃 | 카드 목록. 각 카드: 템플릿명 + 첫 3줄 미리보기 + `[내용 보기]` + `[수정][삭제]`(커스텀만) |
+
+**API:** `GET /soul-templates`, `POST /soul-templates`, `PATCH /soul-templates/:id`, `DELETE /soul-templates/:id`
 
 ---
 
@@ -762,6 +807,76 @@ bg-base 전체화면, 중앙 정렬
 }
 ```
 
+#### P3 WebSocket 이벤트 페이로드 구조
+
+```ts
+// 채널: "sns"
+// sns-content-created: 에이전트가 SNS 콘텐츠 제작 완료 → SNS 페이지 자동 업데이트 + 통합 알림
+{
+  type: "sns-content-created",
+  contentId: string,
+  agentId: string,
+  agentName: string,
+  contentType: "image" | "video" | "card" | "text",
+  platform: string[],          // ["instagram", "tistory"] 등
+  previewUrl?: string,         // 썸네일 URL (이미지/영상)
+  createdAt: string            // ISO 8601
+}
+
+// sns-published: 발행 완료(성공/실패) → SNS 카드 상태 업데이트 + 통합 알림
+{
+  type: "sns-published",
+  contentId: string,
+  platform: string,            // 플랫폼별 개별 이벤트
+  status: "success" | "failed",
+  errorMessage?: string,
+  publishedAt: string
+}
+
+// 채널: "messenger"
+// 메신저 동적 구독 제어 (클라이언트→서버)
+{ type: "messenger-subscribe",   channelIds: string[] }   // 메신저 페이지 진입 시
+{ type: "messenger-unsubscribe", channelIds: string[] }   // 채널 나가기/삭제/페이지 unmount 시
+
+// message-sent: 새 메시지 수신 → 메시지 영역 업데이트 + 사이드바 뱃지
+{
+  type: "message-sent",
+  channelId: string,
+  messageId: string,
+  senderId: string,
+  senderName: string,
+  content: string,
+  contentType: "text" | "image",
+  imageUrl?: string,
+  sentAt: string
+}
+
+// message-read: 읽음 처리 → 1:1 DM 읽음 표시 업데이트
+{
+  type: "message-read",
+  channelId: string,
+  readerId: string,
+  lastReadAt: string
+}
+
+// channel-created: 새 채널 생성 → 채널 목록 업데이트
+{
+  type: "channel-created",
+  channelId: string,
+  channelName: string,
+  createdBy: string,
+  members: string[]
+}
+
+// member-joined: 멤버 추가 → 채널 멤버 목록 업데이트
+{
+  type: "member-joined",
+  channelId: string,
+  userId: string,
+  userName: string
+}
+```
+
 #### 에이전트 대화 중 오프라인
 
 ```
@@ -1002,11 +1117,198 @@ ChatPage → SessionPanel (NewChatButton → AgentListModal, SessionGroup/Sessio
 
 파일: `reports-page.tsx`, `report-card.tsx`, `report-reader.tsx`, `markdown-renderer.tsx`, `comment-section.tsx`
 
-### 10.7 SNS: 멀티플랫폼. draft→pending→approved→published
+### 10.7 SNS (`/sns`) — FR-9
 
-### 10.8 메신저: 채널 기반 인간↔인간 채팅
+**에이전트 주도 콘텐츠 제작 + 승인 + 자동 발행. P3.**
 
-### 10.9 대시보드: 비용 모니터링 + 에이전트 상태 종합
+**결정 사항:**
+
+| 항목 | 결정 |
+|------|------|
+| 레이아웃 | 카드 그리드(2열) + 상단 탭 필터 `[전체][승인대기][발행됨][실패]` |
+| 콘텐츠 생성 트리거 | **채팅에서만** — H가 에이전트에게 "만들어줘" 지시 → 에이전트 제작 완료 시 `/sns`에 카드 자동 생성 |
+| SNS 페이지 신규 버튼 | 없음. 빈 상태엔 "에이전트에게 SNS 콘텐츠 제작을 요청해보세요" + 채팅 바로가기 |
+| 미리보기 진입 | 카드 클릭 → `max-w-2xl` 전체화면 모달 |
+| 승인 플로우 | 승인 = **즉시 발행 시작**. 예약 발행 없음. `ConfirmDialog("정말 발행하시겠습니까? 취소할 수 없습니다.")` |
+| 플랫폼 선택 | 모달 하단 체크박스. 에이전트 기본 추천, H가 변경 가능. 미연동 플랫폼 = `disabled + tooltip` |
+| 발행 실패 처리 | `failed` 카드에 `[재시도]` 버튼 + 실패 메시지. 통합 알림 발송 |
+| 반려 플로우 | 반려 버튼 → Textarea 모달(반려 사유, optional) → `rejected` 상태. 에이전트에게 사유 전달 |
+| 카드뉴스 슬라이드 | 최대 10장. `← 3/10 →` 하단 네비게이션. 키보드 화살표 지원 |
+| 영상 미리보기 | `<video controls>` 인라인. `max-h-80`. autoplay 없음 |
+| 모바일 | 카드 1열. 탭 필터 가로 스크롤. 모달 = `fixed inset-0` 풀스크린 |
+| 플랫폼 미연동 EmptyState | "아직 연동된 SNS 플랫폼이 없습니다. 관리자에게 연동 요청하세요." 콘텐츠 목록은 표시, 발행만 불가 |
+| SNS 완성 알림 | `sns-content-created` WebSocket → 통합 알림 + 사이드바 SNS 뱃지 카운트 |
+| contentId 진입 | `/sns?contentId={id}` — 해당 카드 하이라이트 (5초 ring, 알림 클릭 진입) |
+
+**상태 뱃지:**
+
+| 상태 | 라벨 | 색상 |
+|------|------|------|
+| `draft` | 초안 | `bg-muted text-muted-foreground` |
+| `pending` | 승인대기 | `bg-amber-500/20 text-amber-400` |
+| `approved` | 승인됨 | `bg-emerald-500/20 text-emerald-400` |
+| `published` | 발행됨 | `bg-blue-500/20 text-blue-400` |
+| `failed` | 발행실패 | `bg-red-500/20 text-red-400` |
+| `rejected` | 반려됨 | `bg-orange-500/20 text-orange-400` |
+
+**레이아웃:**
+
+```
+┌────────────────────────────────────────────────────┐
+│  SNS 콘텐츠                                         │
+│  [전체 12] [승인대기 3] [발행됨 8] [실패 1]         │
+│                                                    │
+│  ┌──────────────┐  ┌──────────────┐               │
+│  │ [썸네일]     │  │ [썸네일]     │               │
+│  │ 인스타 게시물│  │ 티스토리 포스│               │
+│  │ 📸 이미지    │  │ 📝 텍스트    │               │
+│  │ [승인대기]   │  │ [발행됨]     │               │
+│  │ 비서실장     │  │ 마케팅팀장   │               │
+│  │ 3분 전       │  │ 어제 14:23   │               │
+│  └──────────────┘  └──────────────┘               │
+└────────────────────────────────────────────────────┘
+```
+
+**미리보기 모달 구조:**
+
+```
+┌──────────────────────────────────────────────┐
+│ 📸 인스타그램  [승인대기]              [✕]    │
+│ ──────────────────────────────────────────── │
+│                                              │
+│  [이미지/영상/<video>/슬라이드 미리보기]      │
+│                                              │
+│ ──────────────────────────────────────────── │
+│ 캡션 텍스트 (마크다운 렌더링)                │
+│ ──────────────────────────────────────────── │
+│ 발행 플랫폼:  ☑ 인스타그램  ☑ 티스토리       │
+│              ☐ 서로연 (미연동)               │
+│ ──────────────────────────────────────────── │
+│ [반려]                  [승인 → 즉시 발행]   │
+└──────────────────────────────────────────────┘
+```
+
+**발행 완료 모달 추가 섹션:**
+
+```
+── 발행 이력 ──────────────────────────────────
+✅ 인스타그램     2026-03-04 14:23
+✅ 티스토리       2026-03-04 14:24
+❌ 서로연         실패 (Playwright 오류)  [재시도]
+```
+
+**엣지케이스:**
+- 동시 승인(두 유저): 서버에서 첫 번째만 처리, 두 번째 `409` → Toast "이미 발행된 콘텐츠입니다"
+
+**API:** `GET /sns?tab=&page=&limit=20`, `GET /sns/:id`, `POST /sns/:id/approve`, `POST /sns/:id/reject`, `POST /sns/:id/retry`
+
+파일: `sns-page.tsx`, `content-card.tsx`, `content-preview-modal.tsx`, `platform-badge.tsx`, `publish-history.tsx`
+
+### 10.8 메신저 (`/messenger`) — FR-10.5
+
+**같은 회사 인간 직원끼리 채팅. WebSocket 실시간. 회사별 격리. P3.**
+
+**결정 사항:**
+
+| 항목 | 결정 |
+|------|------|
+| 채널 구조 | DM(1:1) + 그룹 채널 모두 지원 |
+| 채널 생성 권한 | 모든 유저(H/CEO). 같은 회사 멤버만 초대 가능 |
+| 메시지 타입 | 텍스트 + 이미지 첨부 (drag & drop + paste 지원). 파일 첨부 P4 |
+| 이미지 저장 | 로컬 볼륨 `uploads/messenger/{companyId}/{channelId}/`. 최대 10MB. 유저당 1GB 쿼터 포함 |
+| 읽음 표시 | 채널별 언리드 카운트 뱃지. 1:1 DM에만 "읽음✓" 표시 추가 |
+| 히스토리 로드 | 초기 50건. 위로 스크롤 시 50건 추가. 진입 시 최신 메시지로 스크롤 |
+| 온라인 상태 | `●`(emerald, 온라인) / `○`(오프라인). WebSocket 연결 기반. 끊기면 30초 후 오프라인 전환 |
+| 알림 연동 | 채널 메시지 → 통합 알림 + 사이드바 뱃지. 채널별 뮤트 설정 가능(뱃지만, 알림 없음) |
+| 멤버 초대 | 채널 헤더 `⚙️` → "멤버 관리" 모달. 같은 회사 유저 검색 + 체크박스로 추가/제거 |
+| 채널 나가기 | 채널 설정 모달 하단 destructive 버튼. 1:1 DM은 나가기 불가(숨기기만) |
+| 채널 삭제 | 생성자만 가능. ConfirmDialog. 삭제 시 메시지 히스토리 모두 삭제 |
+| 메시지 삭제 | 자기 메시지 hover → `🗑️` 버튼. 즉시 soft delete. "삭제된 메시지입니다" 텍스트로 대체 |
+| 메시지 편집 | P5 |
+| 모바일 | 채널 목록 풀스크린 → 채널 선택 시 메시지 영역 슬라이드. 상단 `← 채널 목록` 뒤로가기 버튼 |
+| 오프라인 메시지 전송 | 입력창 `disabled` + Toast "오프라인 상태입니다. 메시지를 보내려면 연결이 필요합니다" |
+
+**레이아웃:**
+
+```
+┌──────────────────────────────────────────────────┐
+│ Sidebar │ 채널 목록 (w-64) │     메시지 영역      │
+│         │ [+ 새 DM]        │                     │
+│         │ ─ DMs ─────────  │  #마케팅팀 ⚙️  👥   │
+│         │  ● 민지      2   │  ─────────────────  │
+│         │  ○ 철수          │  민지  10:23        │
+│         │ ─ 채널 ────────  │  안녕하세요!         │
+│         │  #마케팅팀    5  │                     │
+│         │  #전략회의       │  나   10:24         │
+│         │ ─────────────── ─│  네, 확인했습니다  ✓│
+│         │                  │                     │
+│         │                  │  [이미지첨부 📎]     │
+│         │                  │  [입력창....  전송>] │
+└──────────────────────────────────────────────────┘
+```
+
+**메시지 버블:**
+- **내 메시지:** 우측 정렬. `bg-corthex-accent text-white rounded-2xl rounded-br-md`. 하단 시간 + 1:1 DM에서 읽음✓
+- **상대 메시지:** 좌측 정렬. `bg-surface border rounded-2xl rounded-bl-md`. 상단 이름 + 이니셜 아바타
+
+**엣지케이스:**
+- 채널 멤버 0명(마지막 멤버 퇴장): 채널 유지(히스토리 보존). 메시지 전송 불가. 관리자 콘솔에서만 삭제 가능
+
+**API:** `GET /messenger/channels`, `GET /messenger/channels/:id/messages?before=&limit=50`, `POST /messenger/channels`, `POST /messenger/channels/:id/messages`, `PUT /messenger/channels/:id/members`, `DELETE /messenger/messages/:id`
+
+파일: `messenger-page.tsx`, `channel-list.tsx`, `channel-item.tsx`, `message-area.tsx`, `message-bubble.tsx`, `member-invite-modal.tsx`
+
+### 10.9 대시보드 (`/dashboard`) — FR-10.2
+
+**개인 비용 모니터링 + 내 에이전트 상태 종합. P3.**
+
+> Admin 콘솔 `/`는 전사 통계(직원/에이전트 수). 유저 앱 `/dashboard`는 개인 뷰(내 비용 + 내 에이전트).
+
+**결정 사항:**
+
+| 항목 | 결정 |
+|------|------|
+| 기간 기본값 | 7일. `[오늘][7일][30일]` 토글. URL: `/dashboard?period=7d` (새로고침/공유 복원) |
+| 비용 표시 | **달러($)로 표시.** 소수점 2자리. `$0.XX (추정치)` — 실제 청구액과 다를 수 있음 안내 문구 |
+| 비용 계산 기준 | `claude-sonnet-4-5` 단가 기준. 환경변수로 관리(`CLAUDE_INPUT_PRICE_PER_1K`, `CLAUDE_OUTPUT_PRICE_PER_1K`). 추후 모델 변경 시 단가 변수만 수정 |
+| 오케스트레이션 비용 | 에이전트 현황 테이블에 비서실장 행 `font-semibold` 강조 |
+| 에이전트 상태 집계 | `활성 M / 전체 N명`. 🟢활성=WebSocket 연결 중, 🟡작업중=응답 생성 중, 🔴오프라인 |
+| 차트 | **선 그래프 (Recharts LineChart).** X축: 날짜. Y축: $. hover tooltip(날짜 + $금액). 데이터 없으면 빈 차트 + "데이터 없음" 오버레이 |
+| 새로고침 | 수동 새로고침 버튼 + 5분 자동 폴링. 새로고침 중 버튼 스피너 |
+| 빠른 이동 | 에이전트 행 클릭 → `/chat?agentId={id}` |
+| 홈 → 대시보드 | 홈 상단 "비용 요약 카드" 클릭 → `/dashboard` |
+| 모바일 | 요약 카드 1열. 차트 `h-40` 축소. 테이블 가로 스크롤 |
+| 빈 상태 | 차트: 빈 라인 + "아직 활동 데이터가 없습니다" 오버레이. StatCard: `-` 표시 |
+| Recharts 설치 | `packages/app`에만 설치. 대시보드 페이지 `React.lazy()` + `Suspense`로 lazy load |
+
+**레이아웃:**
+
+```
+┌──────────────────────────────────────────────────┐
+│  [오늘] [7일 ●] [30일]              [새로고침 🔄] │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────┐ │
+│  │ 총 비용  │ │ 총 토큰  │ │ 활성 에이│ │완료  │ │
+│  │  $12.34  │ │  1,234k  │ │  전트 3명│ │작업  │ │
+│  │ (추정치) │ │          │ │ / 전체 5 │ │ 47건 │ │
+│  └──────────┘ └──────────┘ └──────────┘ └──────┘ │
+│  ┌─ 일별 비용 ($) ────────────────────────────┐   │
+│  │  $5 ─────────────────────────────── ●      │   │
+│  │  $3 ──────────────────────────────/        │   │
+│  │  $1 ──────────────────────────── /         │   │
+│  │     3/01  3/02  3/03  3/04  3/05  3/06     │   │
+│  └────────────────────────────────────────────┘   │
+│  ┌─ 에이전트 현황 ────────────────────────────┐   │
+│  │  이름        상태    오늘 비용  오늘 작업   │   │
+│  │  비서실장 ⭐  🟡작업중  $3.12    12회       │   │
+│  │  금융분석팀장  🟢활성    $2.45     8회       │   │
+│  │  마케팅팀장    🔴오프라인  $0.00     0회       │   │
+│  └────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────┘
+```
+
+**API:** `GET /dashboard?period=today|7d|30d`, `GET /dashboard/agents`
+
+파일: `dashboard-page.tsx`, `stat-card.tsx`, `cost-chart.tsx`, `agent-status-table.tsx`
 
 ### 10.10 작전일지 (`/ops-log`) — FR-13, FR-10.1
 
@@ -1094,6 +1396,43 @@ ChatPage → SessionPanel (NewChatButton → AgentListModal, SessionGroup/Sessio
 **모바일:** 시간 → 카드 위로 이동, 필터 칩 가로 스크롤, 카드 100%
 
 파일: `ops-log-page.tsx`, `timeline-list.tsx`, `timeline-item.tsx`, `filter-bar.tsx`
+
+#### P3 보강 추가 사항
+
+**날짜 범위 피커 (P3):**
+
+| 항목 | 결정 |
+|------|------|
+| UI | DateRangePicker (react-day-picker). 시작일~종료일 범위 선택. 최대 90일 |
+| 위치 | 필터 바 우측 끝. `[🗓 2026-02-01 ~ 2026-03-01 ✕]` 칩 형태. 클릭 시 드롭다운 달력 |
+| 초기화 | `✕` 클릭으로 날짜 필터 초기화. 선택 완료 시 API 자동 재요청 |
+
+**검색 기능 (P3):**
+
+| 항목 | 결정 |
+|------|------|
+| 위치 | 필터 바에 `🔍 검색` 입력창 추가 |
+| 대상 | 에이전트명/도구명/키워드 |
+| 방식 | 300ms 디바운스. 서버 측 LIKE 쿼리 |
+
+**로그 내보내기 (P3):**
+
+| 항목 | 결정 |
+|------|------|
+| 위치 | 우상단 `[내보내기 ↓]` 버튼 |
+| 형식 | 현재 필터 기준 JSON 다운로드. CSV는 P5 |
+| 파일명 | `corthex-ops-log-{YYYY-MM-DD}_{YYYY-MM-DD}.json` (날짜 범위 기준). 날짜 필터 없으면 `corthex-ops-log-all-{YYYY-MM-DD}.json` |
+
+**로그 삭제 정책:**
+유저 직접 삭제 없음. 서버 자동 **90일** 삭제. 관리자 콘솔에서만 수동 삭제 가능.
+
+**P3 업데이트 필터 바:**
+```
+┌──────────────────────────────────────────────────────────────┐
+│ [전체] [채팅] [도구] [위임] [에러] [시스템]   🔴 실시간 ON  │
+│ 🔍 검색...                   [🗓 2026-02-01~03-01 ✕] [↓내보내기] │
+└──────────────────────────────────────────────────────────────┘
+```
 
 ### 10.11 NEXUS: React Flow + Dagre 캔버스 조직도. 관리자 전용 편집
 
@@ -1394,7 +1733,9 @@ TradingPage → ModeBadge + RealTradingBanner (실투자 시만)
 
 ### 10.14 설정 (`/settings`) — FR-2.4
 
-**탭 구조:** [API 연동 (P1)] [파일 관리 (P2)] [매매 설정 (P2)] [소울 편집 (P3)]
+**탭 구조:** [API 연동 (P1)] [파일 관리 (P2)] [매매 설정 (P2)] [소울 편집 (P3)] [알림 설정 (P3)]
+
+**탭 모바일 처리 (P3 — 탭 5개):** 가로 스크롤 탭 (`overflow-x-auto`, 스냅 스크롤). 탭 최소 너비 `min-w-[100px]`. 모바일 탭 라벨 단축: `"API"/"파일"/"매매"/"소울"/"알림"`
 
 **결정 사항:**
 
@@ -1459,6 +1800,79 @@ TradingPage → ModeBadge + RealTradingBanner (실투자 시만)
 
 **API:** `GET /credentials`, `POST /credentials`, `PATCH /credentials/:id`, `DELETE /credentials/:id`, `POST /credentials/:id/test`
 
+#### 소울 편집 탭 (P3) — FR-10.4
+
+**결정 사항:**
+
+| 항목 | 결정 |
+|------|------|
+| 에이전트 범위 | 내게 배정된 에이전트만. 드롭다운에 "내 에이전트 N개" 표시 |
+| 편집기 | CodeMirror 마크다운 (구문 강조 + 자동 들여쓰기). `SoulEditor` Phase F 컴포넌트 |
+| lazy import | `/settings?tab=soul` 진입 시 CodeMirror 동적 import (`React.lazy()`) |
+| 레이아웃 | 좌: 편집기 / 우: 마크다운 프리뷰 (md 이상 50/50 분할). 모바일: `[편집][미리보기]` 탭 전환 |
+| 글자 수 카운터 | 편집기 우하단 `XXX / 2000자` 실시간 카운터. 2000자 초과 시 amber 색상 (저장 제한 없음) |
+| 저장 방식 | **명시적 저장 버튼.** 변경 시 상단 배너("저장하지 않은 변경사항이 있습니다. [저장]") |
+| 이탈 방지 | `useBlocker` — 미저장 변경 상태에서 이탈 시 ConfirmDialog |
+| 반영 시점 | 저장 즉시 DB 업데이트. **다음 채팅 세션부터** 적용. Toast: "소울이 업데이트되었습니다. 다음 대화부터 반영됩니다." |
+| 소울 초기화 | 편집기 우상단 `[초기화 ↺]` 버튼. ConfirmDialog("관리자가 설정한 원래 소울로 되돌립니다. 현재 내용이 사라집니다."). 확인 시 `admin_soul` 필드(원본)로 복원 |
+| 관리자 강제 업데이트 | 서버에서 소울 변경 감지 → Toast "관리자가 이 에이전트의 소울을 업데이트했습니다. [새로고침]". 자동 새로고침 없음 |
+
+```
+┌────────────────────────────────────────────────────┐
+│  소울 편집                                          │
+│  에이전트 선택:  [비서실장          ▾]  [초기화 ↺]  │
+│  ─────────────────────────────────────────────────  │
+│  ┌─ 편집기 ─────────┐  ┌─ 미리보기 ──────────────┐  │
+│  │# 비서실장         │  │ 비서실장                 │  │
+│  │당신은 CEO의 비서...│  │ 당신은 CEO의 비서...     │  │
+│  │                  │  │                         │  │
+│  │             247자 │  └─────────────────────────┘  │
+│  └──────────────────┘                               │
+│  ┌─ 저장하지 않은 변경사항이 있습니다.  [저장] ────┐  │
+└────────────────────────────────────────────────────┘
+```
+
+**API:** `GET /agents/mine`, `GET /agents/:id/soul`, `PUT /agents/:id/soul`, `POST /agents/:id/soul/reset`
+
+#### 알림 설정 탭 (P3) — FR-10.6
+
+**결정 사항:**
+
+| 항목 | 결정 |
+|------|------|
+| SMTP 미등록 | 탭 상단 배너: "이메일 알림을 사용하려면 관리자에게 SMTP 설정을 요청하세요." 이메일 토글 전체 `disabled` |
+| SMTP 등록 확인 | `GET /settings/email-configured` API |
+| H 이메일 주소 | 알림 설정 탭 최상단 이메일 입력 필드. 미입력 시 이메일 토글 `disabled + tooltip`. 입력 후 인증 메일 발송 → 인증 완료 후 활성화 |
+| 이벤트별 토글 | 앱 알림 / 이메일 2개 토글씩 |
+
+**이메일 기본값:**
+
+| 이벤트 | 앱 알림 기본값 | 이메일 기본값 |
+|--------|--------------|--------------|
+| 야간작업 완료 | ON | ON |
+| 야간작업 실패 | ON | ON |
+| CEO 보고서 코멘트 | ON | ON |
+| 채팅 응답 완료 | ON | OFF |
+| 매매 체결 | ON | OFF |
+| 메신저 메시지 | ON | OFF |
+
+```
+┌────────────────────────────────────────────────────┐
+│  알림 설정                                          │
+│  이메일 주소: [user@example.com       ] [인증 발송] │
+│  ─────────────────────────────────────────────────  │
+│  이벤트                  앱 알림    이메일           │
+│  야간작업 완료             ●           ●            │
+│  야간작업 실패             ●           ●            │
+│  CEO 보고서 코멘트         ●           ●            │
+│  채팅 응답 완료            ●           ○            │
+│  매매 체결                ●           ○            │
+│  메신저 메시지             ●           ○            │
+└────────────────────────────────────────────────────┘
+```
+
+**API:** `GET /settings/notification-prefs`, `PUT /settings/notification-prefs`, `GET /settings/email-configured`, `POST /settings/email/verify`
+
 ### 10.15 파일 관리 (설정 P2 탭) — FR-11b
 
 ```
@@ -1521,6 +1935,66 @@ TradingPage → ModeBadge + RealTradingBanner (실투자 시만)
 
 헤더 위임 체인 상세 (섹션 10.4 참조). 단체 세션: 아바타 그룹 `flex -space-x-2`
 
+### 10.17 P3 화면간 플로우 + 추가 기능
+
+#### P3 화면간 플로우
+
+| 출발 | 도착 | 트리거 |
+|------|------|--------|
+| 알림 클릭 (SNS 콘텐츠 완성) | `/sns?contentId={id}` → 카드 5초 ring 하이라이트 | `sns-content-created` WebSocket → 통합 알림 |
+| 알림 클릭 (메신저 새 메시지) | `/messenger?channelId={id}` → 해당 채널 자동 선택 | `message-sent` WebSocket → 통합 알림 |
+| 메신저 메시지 내 보고서 링크 | `/reports/:id` | 마크다운 링크 렌더링 (`[보고서 제목](/reports/:id)`) |
+| 홈 비용 요약 카드 클릭 | `/dashboard?period=7d` | 홈 하단 P3 추가 카드 |
+| 대시보드 에이전트 행 클릭 | `/chat?agentId={id}` | 에이전트 현황 테이블 행 |
+
+#### 홈 P3 확장 — 비용 요약 카드
+
+```
+┌─ 이번 주 사용 비용 ──────────────────────────────┐
+│  $12.34  추정치 · 7일 기준    [대시보드 →]        │
+└──────────────────────────────────────────────────┘
+```
+KIS 미연동과 무관하게 항상 표시 (비용 데이터는 에이전트 사용 기준).
+
+#### 알림 P3 확장 — 개별/전체 삭제 (FR-10.6)
+
+| 항목 | 결정 |
+|------|------|
+| 개별 삭제 | 알림 카드 우측 `✕` 버튼 (hover 시 표시). 클릭 즉시 제거. ConfirmDialog 없음 |
+| 전체 삭제 | 알림 페이지 헤더 우측 `[전체 삭제]` 버튼. ConfirmDialog("모든 알림을 삭제할까요?") |
+| 모바일 개별 삭제 | 스와이프 왼쪽 → 빨간 삭제 액션 표시 |
+
+#### PWA (P3 — FR-10.3 대체)
+
+**결정 사항:**
+
+| 항목 | 결정 |
+|------|------|
+| 캐시 전략 | 앱 셸(HTML/CSS/JS)=Cache First. 인증 필요 API=**캐시 없음**(Network Only, 보안). 공개 정적 이미지=Cache First 7일. 채팅 스트리밍/WebSocket=캐시 없음 |
+| 설치 배너 | 첫 방문 후 3일 뒤 `beforeinstallprompt`. 하단 슬라이드업 배너. `localStorage`로 노출 제어(나중에 → 7일 재노출 없음) |
+| 푸시 알림 권한 | **PWA 설치 후에만** 권한 요청. `window.matchMedia('(display-mode: standalone)')` 확인. 미설치 = 인앱 알림만. 권한 거부 시 1회 안내 후 종료 |
+| 권한 요청 타이밍 | PWA 설치 확인 후 첫 알림 발생 시 `Notification.requestPermission()` |
+| 로그아웃 시 캐시 | `auth-store.ts` logout 액션에 `navigator.serviceWorker.controller?.postMessage({ type: 'LOGOUT' })`. SW에서 `caches.keys() → caches.delete()` |
+| SW 업데이트 | `skipWaiting` 즉시 적용 |
+| 앱 아이콘 | `manifest.json` — 192×192, 512×512, maskable. 다크 기본, `media: "(prefers-color-scheme: light)"` 조건부 라이트 아이콘 |
+
+**오프라인 페이지:**
+
+```
+┌────────────────────────────────────┐
+│                                    │
+│           📡                       │
+│   인터넷 연결이 끊겼습니다          │
+│   연결 복구 시 자동으로 재개됩니다  │
+│                                    │
+│         [다시 시도]                 │
+│                                    │
+└────────────────────────────────────┘
+bg-background 전체화면 중앙
+```
+
+파일: `offline-page.tsx`, `install-banner.tsx`
+
 ---
 
 ## 11. Interaction Rules
@@ -1573,15 +2047,21 @@ TradingPage → ModeBadge + RealTradingBanner (실투자 시만)
 
 ### P3
 
-- [ ] SNS 멀티플랫폼 + 승인
-- [ ] 메신저 채널 기반
-- [ ] 대시보드 비용 모니터링
-- [ ] 작전일지 상세 UI + 날짜 범위 필터
-- [ ] 에이전트 소울 편집
-- [ ] Admin 소울 템플릿
-- [ ] 이메일 알림 설정
-- [ ] Admin 7개 페이지 스타일 통일 리팩터링
-- [ ] 다크모드 수동 토글
+- [x] **SNS** (`/sns`) — 카드 그리드 2열 + 탭 필터 + 승인→즉시발행 + 반려 + 미리보기 모달(이미지/영상/카드뉴스). `sns-content-created`/`sns-published` WebSocket. 발행 이력. Phase A+B+C
+- [x] **메신저** (`/messenger`) — DM+그룹 채널. 이미지 첨부. 읽음 표시. 멤버 초대/나가기. 메시지 삭제. `messenger` WebSocket 채널. 동적 구독/해제. 모바일 슬라이드. Phase A+B+C
+- [x] **대시보드** (`/dashboard`) — StatCard 4개 + LineChart + 에이전트 현황 테이블. `?period=7d` URL 파라미터. 5분 폴링. Recharts lazy load. Phase A+F
+- [x] **작전일지 P3 보강** — DateRangePicker(max 90일) + 검색(300ms 디바운스) + JSON 내보내기. 로그 90일 자동 삭제. Phase A+D+F
+- [x] **소울 편집** (설정 소울 탭) — CodeMirror SoulEditor(lazy). 50/50 프리뷰. 명시적 저장. useBlocker. 소울 초기화 버튼. Phase B+F
+- [x] **알림 설정 탭 신설** (설정) — 이메일 주소 인증. 이벤트별 앱/이메일 토글. SMTP 미등록 정책. Phase A+C
+- [x] **Admin 소울 템플릿** (`/soul-templates`) — 내장 5개(수정불가) + 커스텀. 에이전트 편집 시 불러오기. Phase A+B+C
+- [x] **알림 P3 확장** — 개별/전체 삭제. 모바일 스와이프 삭제
+- [x] **홈 P3 확장** — 비용 요약 카드 → `/dashboard`
+- [x] **다크모드 수동 토글** — 사이드바 하단 `☀️/🌙/💻` 3단계 순환. `localStorage` 저장
+- [x] **PWA** — Service Worker. 캐시 전략(인증 API 캐시 제외). 설치 배너(3일 후). 푸시 알림(PWA 설치 후만). 로그아웃 캐시 삭제. 오프라인 페이지
+- [x] **설정 탭 5개 모바일** — 가로 스크롤 탭. 단축 라벨
+- [x] **P3 WebSocket 이벤트** — sns-content-created/sns-published/message-sent/message-read/channel-created/member-joined 구조 확정
+- [x] **P3 화면간 플로우** — 알림→SNS, 알림→메신저, 홈→대시보드, 대시보드→채팅
+- [ ] Admin 7개 페이지 스타일 통일 리팩터링 (P3 후반)
 
 ### P4
 
