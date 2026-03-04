@@ -11,6 +11,7 @@ import { AgentsPage } from './pages/agents'
 import { CredentialsPage } from './pages/credentials'
 import { CompaniesPage } from './pages/companies'
 import { ToolsPage } from './pages/tools'
+import { ReportLinesPage } from './pages/report-lines'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -56,6 +57,7 @@ export function App() {
             <Route path="credentials" element={<CredentialsPage />} />
             <Route path="companies" element={<CompaniesPage />} />
             <Route path="tools" element={<ToolsPage />} />
+            <Route path="report-lines" element={<ReportLinesPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

@@ -1,3 +1,9 @@
 // @corthex/ui — 공유 UI 컴포넌트
 export { cn } from './utils'
 export { Button } from './button'
+export { Card, CardHeader, CardContent, CardFooter } from './card'
+export { Badge } from './badge'
+export { Input } from './input'
+export { Skeleton, SkeletonCard, SkeletonTable } from './skeleton'
+export { StatusDot } from './status-dot'
+export { EmptyState } from './empty-state'

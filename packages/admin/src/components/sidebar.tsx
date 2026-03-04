@@ -1,6 +1,9 @@
 import { NavLink } from 'react-router-dom'
 import { useAuthStore } from '../stores/auth-store'
 
+declare const __BUILD_HASH__: string
+declare const __BUILD_TIME__: string
+
 const nav = [
   { to: '/', label: '대시보드', icon: '📊' },
   { to: '/companies', label: '회사 관리', icon: '🏛️' },
@@ -8,7 +11,8 @@ const nav = [
   { to: '/departments', label: '부서 관리', icon: '🏢' },
   { to: '/agents', label: 'AI 에이전트', icon: '🤖' },
   { to: '/tools', label: '도구 관리', icon: '🔧' },
-  { to: '/credentials', label: 'CLI 토큰', icon: '🔑' },
+  { to: '/credentials', label: 'CLI / API 키', icon: '🔑' },
+  { to: '/report-lines', label: '보고 라인', icon: '📋' },
 ]
 
 export function Sidebar() {
@@ -49,7 +53,7 @@ export function Sidebar() {
         ))}
       </nav>
 
-      <div className="p-3 border-t border-zinc-200 dark:border-zinc-800">
+      <div className="p-3 border-t border-zinc-200 dark:border-zinc-800 space-y-2">
         <div className="flex items-center justify-between px-3 py-2">
           <div>
             <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{user?.name}</p>
@@ -61,6 +65,9 @@ export function Sidebar() {
           >
             로그아웃
           </button>
+        </div>
+        <div className="px-3 text-[10px] text-zinc-400 dark:text-zinc-600 font-mono">
+          {__BUILD_HASH__} · {__BUILD_TIME__}
         </div>
       </div>
     </aside>

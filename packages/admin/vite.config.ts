@@ -6,6 +6,10 @@ import path from 'path'
 export default defineConfig({
   base: '/admin/',
   plugins: [react(), tailwindcss()],
+  define: {
+    __BUILD_HASH__: JSON.stringify(process.env.GITHUB_SHA?.slice(0, 7) || 'dev'),
+    __BUILD_TIME__: JSON.stringify(new Date().toISOString().slice(0, 16)),
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
