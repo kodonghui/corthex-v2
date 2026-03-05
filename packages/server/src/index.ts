@@ -40,12 +40,13 @@ app.use('*', cors({
 // 글로벌 에러 핸들러 (서브라우터 에러도 캐치)
 app.onError(errorHandler)
 
-// Rate Limiting
+// 공개 라우트 (인증 불필요) — health는 rate limit 이전에 등록
+app.route('/api', healthRoute)
+
+// Rate Limiting (health 제외)
 app.use('/api/*', apiRateLimit)          // 일반 API: 100/min
 app.use('/api/auth/login', loginRateLimit) // 로그인: 5/min
 
-// 공개 라우트 (인증 불필요)
-app.route('/api', healthRoute)
 app.route('/api', authRoute)
 
 // 관리자 라우트 (각 파일 내부에서 authMiddleware + adminOnly 적용)

@@ -1,6 +1,6 @@
 # Story 1.3: Hono API 서버 + 표준 응답 + Rate Limiting
 
-Status: review
+Status: done
 
 ## Story
 
