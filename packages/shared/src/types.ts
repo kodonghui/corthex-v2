@@ -102,6 +102,27 @@ export type MessengerChannel = {
   createdAt: Date
 }
 
+// === WebSocket ===
+export type WsChannel =
+  | 'chat-stream'
+  | 'agent-status'
+  | 'notifications'
+  | 'messenger'
+  | 'activity-log'
+
+export type WsInboundMessage = {
+  type: 'subscribe' | 'unsubscribe'
+  channel: WsChannel
+  params?: Record<string, string>
+}
+
+export type WsOutboundMessage = {
+  type: 'connected' | 'subscribed' | 'unsubscribed' | 'data' | 'error' | 'server-restart'
+  channel?: WsChannel
+  data?: unknown
+  code?: string
+}
+
 // === NEXUS 캔버스 ===
 export type NexusNodePosition = {
   x: number

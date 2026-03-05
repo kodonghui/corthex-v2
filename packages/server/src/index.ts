@@ -23,6 +23,9 @@ import { messengerRoute } from './routes/workspace/messenger'
 import { nexusRoute } from './routes/workspace/nexus'
 import { startJobWorker } from './lib/job-queue'
 import { loginRateLimit, apiRateLimit } from './middleware/rate-limit'
+import { wsRoute, websocket, broadcastServerRestart } from './ws/server'
+import { eventBus } from './lib/event-bus'
+import { broadcastToCompany } from './ws/channels'
 import type { AppEnv } from './types'
 
 const app = new Hono<AppEnv>()
@@ -69,6 +72,20 @@ app.route('/api/workspace', dashboardRoute)
 app.route('/api/workspace', telegramRoute)
 app.route('/api/workspace/messenger', messengerRoute)
 app.route('/api/workspace', nexusRoute)
+
+// WebSocket 라우트
+app.get('/ws', wsRoute)
+
+// EventBus → WS 브리지
+eventBus.on('activity', (data: { companyId: string; payload: unknown }) => {
+  broadcastToCompany(data.companyId, 'activity-log', data.payload)
+})
+eventBus.on('agent-status', (data: { companyId: string; payload: unknown }) => {
+  broadcastToCompany(data.companyId, 'agent-status', data.payload)
+})
+eventBus.on('notification', (data: { userId: string; payload: unknown }) => {
+  broadcastToCompany(data.userId, 'notifications', data.payload)
+})
 
 // 프로덕션: Bun 네이티브 정적 파일 서빙 (SPA 폴백 포함)
 if (isProd) {
@@ -118,9 +135,10 @@ console.log(`🚀 CORTHEX v2 서버 시작 — http://localhost:${port}`)
 // 야간 작업 워커 시작 (백그라운드 폴링)
 startJobWorker()
 
-// Graceful Shutdown — SIGTERM 시 진행 중 요청 최대 10초 대기 후 종료
+// Graceful Shutdown — SIGTERM 시 WS 클라이언트 알림 후 종료
 process.on('SIGTERM', () => {
-  console.log('🛑 SIGTERM 수신 — 서버 종료 중...')
+  console.log('🛑 SIGTERM 수신 — 클라이언트 연결 종료 중...')
+  broadcastServerRestart()
   setTimeout(() => {
     console.log('✅ 서버 종료')
     process.exit(0)
@@ -130,4 +148,5 @@ process.on('SIGTERM', () => {
 export default {
   port,
   fetch: app.fetch,
+  websocket,
 }
