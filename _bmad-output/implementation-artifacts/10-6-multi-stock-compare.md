@@ -1,6 +1,6 @@
 # Story 10.6: 다중 종목 비교 — 관심종목 멀티셀렉트 + 시세 비교표
 
-Status: review
+Status: done
 
 ## Story
 

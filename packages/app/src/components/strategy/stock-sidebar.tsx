@@ -17,8 +17,7 @@ export function StockSidebar({ className }: StockSidebarProps) {
     const raw = searchParams.get('compare')
     return raw ? raw.split(',').filter(Boolean) : []
   }, [searchParams])
-  const isCompareMode = compareCodes.length > 0 || searchParams.has('compare')
-  const [compareActive, setCompareActive] = useState(isCompareMode)
+  const compareActive = searchParams.has('compare')
   const [search, setSearch] = useState('')
 
   const { data } = useQuery({
@@ -51,28 +50,19 @@ export function StockSidebar({ className }: StockSidebarProps) {
       next.delete('compare')
       return next
     })
-    setCompareActive(false)
   }
 
   const toggleCompare = () => {
-    if (compareActive) {
-      // 비교 모드 해제
-      setSearchParams((prev) => {
-        const next = new URLSearchParams(prev)
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev)
+      if (compareActive) {
         next.delete('compare')
-        return next
-      })
-      setCompareActive(false)
-    } else {
-      // 비교 모드 진입
-      setSearchParams((prev) => {
-        const next = new URLSearchParams(prev)
+      } else {
         next.set('compare', '')
         next.delete('stock')
-        return next
-      })
-      setCompareActive(true)
-    }
+      }
+      return next
+    })
   }
 
   const toggleStockCompare = (code: string) => {

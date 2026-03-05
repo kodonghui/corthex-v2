@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Tabs } from '@corthex/ui'
 import { StockSidebar } from '../components/strategy/stock-sidebar'
@@ -15,11 +15,7 @@ export function TradingPage() {
   const [mobileTab, setMobileTab] = useState('chart')
   const [searchParams] = useSearchParams()
 
-  const isCompareMode = useMemo(() => {
-    const raw = searchParams.get('compare')
-    if (!raw) return false
-    return raw.split(',').filter(Boolean).length >= 2
-  }, [searchParams])
+  const isCompareMode = searchParams.has('compare')
 
   const CenterPanel = isCompareMode ? ComparisonPanel : ChartPanel
 
