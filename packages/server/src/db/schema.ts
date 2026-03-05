@@ -21,6 +21,7 @@ export const companies = pgTable('companies', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 100 }).notNull(),
   slug: varchar('slug', { length: 50 }).notNull().unique(),
+  smtpConfig: jsonb('smtp_config'),  // { host, port, secure, user, pass }
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),

@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { eq, and, desc, count } from 'drizzle-orm'
 import { db } from '../../db'
-import { notifications } from '../../db/schema'
+import { notifications, companies } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import type { AppEnv } from '../../types'
 
@@ -79,6 +79,19 @@ notificationsRoute.patch('/notifications/:id/read', async (c) => {
     )
 
   return c.json({ data: { success: true } })
+})
+
+// GET /api/workspace/notifications/email-configured — SMTP 설정 여부
+notificationsRoute.get('/notifications/email-configured', async (c) => {
+  const tenant = c.get('tenant')
+
+  const [company] = await db
+    .select({ smtpConfig: companies.smtpConfig })
+    .from(companies)
+    .where(eq(companies.id, tenant.companyId))
+    .limit(1)
+
+  return c.json({ data: { configured: !!company?.smtpConfig } })
 })
 
 // POST /api/workspace/notifications/read-all — 전체 읽음 처리

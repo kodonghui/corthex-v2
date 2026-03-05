@@ -1,6 +1,6 @@
 # Story 6.3: 이메일 알림 — SMTP 연동 + 이벤트별 발송
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -19,22 +19,22 @@ so that 앱에 접속하지 않아도 긴급한 알림을 확인할 수 있다.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: SMTP 설정 저장 (AC: #3)
-  - [ ] companies 테이블에 smtp_config jsonb 컬럼 추가 (또는 api_keys 활용)
-  - [ ] 관리자 API: PUT /admin/companies/:id/smtp
-  - [ ] GET /settings/email-configured API (AC: #4)
+- [x] Task 1: SMTP 설정 저장 (AC: #3)
+  - [x] companies 테이블에 smtp_config jsonb 컬럼 추가
+  - [x] 관리자 API: PUT /admin/companies/:id/smtp + DELETE
+  - [x] GET /workspace/notifications/email-configured API (AC: #4)
 
-- [ ] Task 2: 이메일 발송 유틸 (AC: #1, #2)
-  - [ ] `packages/server/src/lib/email-sender.ts` — nodemailer 기반
-  - [ ] SMTP 설정 조회 → 없으면 silent skip
-  - [ ] HTML 템플릿 (간단한 인라인 스타일)
+- [x] Task 2: 이메일 발송 유틸 (AC: #1, #2)
+  - [x] `packages/server/src/lib/email-sender.ts` — nodemailer 동적 임포트
+  - [x] SMTP 설정 조회 → 없으면 silent skip
+  - [x] HTML 템플릿 (간단한 인라인 스타일)
 
-- [ ] Task 3: notifier.ts 이메일 통합 (AC: #5)
-  - [ ] createNotification에서 notification_preferences 조회
-  - [ ] email=true + SMTP 존재 → sendEmail 호출
-  - [ ] fire-and-forget 패턴 유지
+- [x] Task 3: notifier.ts 이메일 통합 (AC: #5)
+  - [x] createNotification에서 notification_preferences 조회
+  - [x] email=true + SMTP 존재 → sendEmail 호출
+  - [x] fire-and-forget 패턴 유지
 
-- [ ] Task 4: 빌드 검증 (AC: #6)
+- [x] Task 4: 빌드 검증 (AC: #6) — 3/3 성공
 
 ## Dev Notes
 
@@ -63,6 +63,19 @@ so that 앱에 접속하지 않아도 긴급한 알림을 확인할 수 있다.
 ## Dev Agent Record
 
 ### Agent Model Used
+Claude Opus 4.6
+
 ### Debug Log References
+N/A
+
 ### Completion Notes List
+- email-sender.ts: nodemailer 동적 임포트로 미설치 시 graceful fail
+- notifier.ts: notification_preferences 조회 후 inApp/email 각각 처리
+- SMTP 관리: PUT/DELETE admin API + email-configured workspace API
+
 ### File List
+- packages/server/src/lib/email-sender.ts (NEW)
+- packages/server/src/lib/notifier.ts (MODIFIED)
+- packages/server/src/db/schema.ts (MODIFIED — smtpConfig column)
+- packages/server/src/routes/admin/companies.ts (MODIFIED — SMTP endpoints)
+- packages/server/src/routes/workspace/notifications.ts (MODIFIED — email-configured)

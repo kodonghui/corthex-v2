@@ -22,6 +22,14 @@ const updateCompanySchema = z.object({
   isActive: z.boolean().optional(),
 })
 
+const smtpConfigSchema = z.object({
+  host: z.string().min(1),
+  port: z.number().int().min(1).max(65535),
+  secure: z.boolean(),
+  user: z.string().min(1),
+  pass: z.string().min(1),
+})
+
 // GET /api/admin/companies — 전체 회사 목록
 companiesRoute.get('/companies', async (c) => {
   const result = await db.select().from(companies).orderBy(companies.createdAt)
@@ -77,4 +85,29 @@ companiesRoute.delete('/companies/:id', async (c) => {
     .returning()
   if (!company) throw new HTTPError(404, '회사를 찾을 수 없습니다', 'COMPANY_001')
   return c.json({ data: { message: '비활성화되었습니다' } })
+})
+
+// PUT /api/admin/companies/:id/smtp — SMTP 설정 저장
+companiesRoute.put('/companies/:id/smtp', zValidator('json', smtpConfigSchema), async (c) => {
+  const id = c.req.param('id')
+  const body = c.req.valid('json')
+  const [company] = await db
+    .update(companies)
+    .set({ smtpConfig: body, updatedAt: new Date() })
+    .where(eq(companies.id, id))
+    .returning()
+  if (!company) throw new HTTPError(404, '회사를 찾을 수 없습니다', 'COMPANY_001')
+  return c.json({ data: { success: true } })
+})
+
+// DELETE /api/admin/companies/:id/smtp — SMTP 설정 삭제
+companiesRoute.delete('/companies/:id/smtp', async (c) => {
+  const id = c.req.param('id')
+  const [company] = await db
+    .update(companies)
+    .set({ smtpConfig: null, updatedAt: new Date() })
+    .where(eq(companies.id, id))
+    .returning()
+  if (!company) throw new HTTPError(404, '회사를 찾을 수 없습니다', 'COMPANY_001')
+  return c.json({ data: { success: true } })
 })

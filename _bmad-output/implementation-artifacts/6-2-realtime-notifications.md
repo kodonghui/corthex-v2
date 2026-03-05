@@ -1,6 +1,6 @@
 # Story 6.2: 실시간 알림 UI — 알림 페이지 + 사이드바 뱃지 + Toast
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
