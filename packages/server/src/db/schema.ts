@@ -155,6 +155,7 @@ export const chatSessions = pgTable('chat_sessions', {
   userId: uuid('user_id').notNull().references(() => users.id),
   agentId: uuid('agent_id').notNull().references(() => agents.id),
   title: varchar('title', { length: 200 }).notNull().default('새 대화'),
+  metadata: jsonb('metadata'),  // { stockCode?, stockName? } — 전략실 등 컨텍스트
   lastMessageAt: timestamp('last_message_at'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 }, (table) => ({
