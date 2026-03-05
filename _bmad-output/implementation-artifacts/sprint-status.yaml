@@ -118,11 +118,11 @@ development_status:
   # Epic 7: 보고서 & 문서함 (P2)
   # NOTE: Party mode 12개 이슈 발견, 유저 스킵 선택 — 수정 미적용
   # ============================================================
-  epic-7: backlog
-  7-1-report-write-submit: backlog
-  7-2-report-approve-archive: backlog
-  7-3-agent-auto-report: backlog
-  7-4-ui-phase-e: backlog
+  epic-7: in-progress
+  7-1-report-write-submit: review
+  7-2-report-approve-archive: review
+  7-3-agent-auto-report: review
+  7-4-ui-phase-e: review
   epic-7-retrospective: optional
 
   # ============================================================

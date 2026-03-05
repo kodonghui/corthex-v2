@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useBlocker } from 'react-router-dom'
-import Markdown from 'react-markdown'
 import { ConfirmDialog, Select, Textarea } from '@corthex/ui'
 import { api } from '../../lib/api'
+import { MarkdownRenderer } from '../markdown-renderer'
 import { toast } from '@corthex/ui'
 
 type AgentDetail = {
@@ -197,9 +197,7 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
             <div className={`flex-1 ${mobileTab !== 'preview' ? 'hidden md:block' : ''}`}>
               <div className="border border-zinc-200 dark:border-zinc-700 rounded-md p-3 min-h-[288px] max-h-[288px] overflow-y-auto">
                 {soulText ? (
-                  <div className="prose prose-sm dark:prose-invert max-w-none text-sm">
-                    <Markdown>{soulText}</Markdown>
-                  </div>
+                  <MarkdownRenderer content={soulText} />
                 ) : (
                   <p className="text-sm text-zinc-400 italic">미리보기가 여기에 표시됩니다</p>
                 )}

@@ -8,7 +8,7 @@
 
 import type Anthropic from '@anthropic-ai/sdk'
 import { db } from '../db'
-import { toolDefinitions, agentTools, departmentKnowledge, toolCalls } from '../db/schema'
+import { toolDefinitions, agentTools, departmentKnowledge, toolCalls, reports, activityLogs } from '../db/schema'
 import { eq, and, ilike } from 'drizzle-orm'
 import { decrypt } from './crypto'
 
@@ -156,6 +156,9 @@ async function runHandler(
     case 'search_web':
       return handleSearchWeb(input)
 
+    case 'create_report':
+      return handleCreateReport(input, ctx)
+
     default:
       return `도구 '${handler}' 의 핸들러가 아직 구현되지 않았습니다.`
   }
@@ -299,5 +302,49 @@ function handleSearchWeb(input: Record<string, unknown>): string {
     query,
     results: [],
     message: '웹 검색은 현재 개발 중입니다. 추후 외부 API 연동 예정.',
+  })
+}
+
+async function handleCreateReport(
+  input: Record<string, unknown>,
+  ctx: ToolExecContext,
+): Promise<string> {
+  const title = String(input.title || '').trim()
+  const content = String(input.content || '').trim()
+
+  if (!title) return JSON.stringify({ error: '보고서 제목이 필요합니다.' })
+  if (title.length > 200) return JSON.stringify({ error: '보고서 제목은 200자 이내여야 합니다.' })
+
+  const [report] = await db
+    .insert(reports)
+    .values({
+      companyId: ctx.companyId,
+      authorId: ctx.userId,
+      title,
+      content,
+      status: 'draft',
+    })
+    .returning()
+
+  // 활동 로그 (fire-and-forget)
+  db.insert(activityLogs)
+    .values({
+      companyId: ctx.companyId,
+      eventId: crypto.randomUUID(),
+      type: 'system',
+      phase: 'end',
+      actorType: 'agent',
+      actorId: ctx.agentId,
+      actorName: '',
+      action: '보고서 자동 생성',
+      detail: title,
+    })
+    .catch(() => {})
+
+  return JSON.stringify({
+    reportId: report.id,
+    title: report.title,
+    url: `/reports/${report.id}`,
+    message: `보고서 "${title}"이(가) 생성되었습니다. [보고서 보기](/reports/${report.id})`,
   })
 }

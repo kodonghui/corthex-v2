@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
 import { Input } from '@corthex/ui'
 import { api } from '../../lib/api'
 import { useWsStore } from '../../stores/ws-store'
@@ -7,6 +8,48 @@ import { useChatStream } from '../../hooks/use-chat-stream'
 import { ToolCallCard } from './tool-call-card'
 import type { Agent, Message, Delegation, SavedToolCall } from './types'
 import type { ToolCall } from '../../hooks/use-chat-stream'
+
+/** 텍스트 내 마크다운 링크 [text](url)를 클릭 가능한 요소로 변환 */
+function renderTextWithLinks(
+  text: string,
+  onNavigate: (path: string) => void,
+): React.ReactNode {
+  const linkPattern = /\[([^\]]+)\]\(([^)]+)\)/g
+  const parts: React.ReactNode[] = []
+  let lastIndex = 0
+  let match: RegExpExecArray | null
+  let key = 0
+
+  while ((match = linkPattern.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index))
+    }
+    const linkText = match[1]
+    const href = match[2]
+    parts.push(
+      href.startsWith('/') ? (
+        <button
+          key={key++}
+          onClick={() => onNavigate(href)}
+          className="text-indigo-600 dark:text-indigo-400 underline hover:text-indigo-700 dark:hover:text-indigo-300"
+        >
+          {linkText}
+        </button>
+      ) : (
+        <a key={key++} href={href} target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 underline">
+          {linkText}
+        </a>
+      ),
+    )
+    lastIndex = match.index + match[0].length
+  }
+
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex))
+  }
+
+  return parts.length > 0 ? parts : text
+}
 
 const statusColors: Record<string, string> = {
   online: 'bg-green-400',
@@ -25,6 +68,7 @@ export function ChatArea({
   onBack?: () => void
 }) {
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const [input, setInput] = useState('')
   const [showDelegations, setShowDelegations] = useState(false)
   const [reconnectBanner, setReconnectBanner] = useState(false)
@@ -376,7 +420,7 @@ export function ChatArea({
                     {msgToolCalls.length > 0 && msgToolCalls.map((tc) => (
                       <ToolCallCard key={tc.toolId} tool={tc} />
                     ))}
-                    <p className="whitespace-pre-wrap">{mainContent}</p>
+                    <p className="whitespace-pre-wrap">{renderTextWithLinks(mainContent, navigate)}</p>
                     {toolContent && (
                       <div className="mt-2 pt-2 border-t border-zinc-200 dark:border-zinc-700">
                         <p className="text-[10px] font-medium text-indigo-500 dark:text-indigo-400 mb-1">
@@ -414,7 +458,7 @@ export function ChatArea({
                   ))}
                   {streamingText && (
                     <p className="whitespace-pre-wrap">
-                      {streamingText}
+                      {renderTextWithLinks(streamingText, navigate)}
                       <span className="animate-pulse text-indigo-400">▌</span>
                     </p>
                   )}

@@ -77,6 +77,7 @@ export function App() {
             <Route path="chat" element={<Suspense fallback={<PageSkeleton />}><ChatPage /></Suspense>} />
             <Route path="jobs" element={<Suspense fallback={<PageSkeleton />}><JobsPage /></Suspense>} />
             <Route path="reports" element={<Suspense fallback={<PageSkeleton />}><ReportsPage /></Suspense>} />
+            <Route path="reports/:id" element={<Suspense fallback={<PageSkeleton />}><ReportsPage /></Suspense>} />
             <Route path="sns" element={<Suspense fallback={<PageSkeleton />}><SnsPage /></Suspense>} />
             <Route path="messenger" element={<Suspense fallback={<PageSkeleton />}><MessengerPage /></Suspense>} />
             <Route path="dashboard" element={<Suspense fallback={<PageSkeleton />}><DashboardPage /></Suspense>} />
