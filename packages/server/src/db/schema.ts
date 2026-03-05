@@ -115,6 +115,7 @@ export const notificationPreferences = pgTable('notification_preferences', {
   inApp: boolean('in_app').notNull().default(true),
   email: boolean('email').notNull().default(false),
   push: boolean('push').notNull().default(false),
+  settings: jsonb('settings'),  // 이벤트별 세부 설정 { [eventType]: { inApp, email } }
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 }, (table) => ({

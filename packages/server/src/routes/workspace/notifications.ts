@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { eq, and, desc, count } from 'drizzle-orm'
 import { db } from '../../db'
-import { notifications, companies } from '../../db/schema'
+import { notifications, companies, notificationPreferences } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import type { AppEnv } from '../../types'
 
@@ -92,6 +92,64 @@ notificationsRoute.get('/notifications/email-configured', async (c) => {
     .limit(1)
 
   return c.json({ data: { configured: !!company?.smtpConfig } })
+})
+
+// GET /api/workspace/notification-prefs — 알림 설정 조회
+notificationsRoute.get('/notification-prefs', async (c) => {
+  const tenant = c.get('tenant')
+
+  const [prefs] = await db
+    .select()
+    .from(notificationPreferences)
+    .where(and(
+      eq(notificationPreferences.userId, tenant.userId),
+      eq(notificationPreferences.companyId, tenant.companyId),
+    ))
+    .limit(1)
+
+  // 기본값 반환
+  return c.json({
+    data: prefs ?? {
+      inApp: true,
+      email: false,
+      push: false,
+      settings: null,
+    },
+  })
+})
+
+// PUT /api/workspace/notification-prefs — 알림 설정 업데이트 (upsert)
+notificationsRoute.put('/notification-prefs', async (c) => {
+  const tenant = c.get('tenant')
+  const body = await c.req.json() as { inApp?: boolean; email?: boolean; settings?: Record<string, unknown> }
+
+  const [existing] = await db
+    .select({ id: notificationPreferences.id })
+    .from(notificationPreferences)
+    .where(and(
+      eq(notificationPreferences.userId, tenant.userId),
+      eq(notificationPreferences.companyId, tenant.companyId),
+    ))
+    .limit(1)
+
+  const values: Record<string, unknown> = { updatedAt: new Date() }
+  if (body.inApp !== undefined) values.inApp = body.inApp
+  if (body.email !== undefined) values.email = body.email
+  if (body.settings !== undefined) values.settings = body.settings
+
+  if (existing) {
+    await db.update(notificationPreferences).set(values).where(eq(notificationPreferences.id, existing.id))
+  } else {
+    await db.insert(notificationPreferences).values({
+      userId: tenant.userId,
+      companyId: tenant.companyId,
+      inApp: body.inApp ?? true,
+      email: body.email ?? false,
+      settings: body.settings ?? null,
+    })
+  }
+
+  return c.json({ data: { success: true } })
 })
 
 // POST /api/workspace/notifications/read-all — 전체 읽음 처리

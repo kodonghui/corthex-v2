@@ -5,6 +5,7 @@ import { api } from '../lib/api'
 import { useWsStore } from '../stores/ws-store'
 import { Card, Tabs, Skeleton } from '@corthex/ui'
 import type { TabItem } from '@corthex/ui'
+import { NotificationSettings } from '../components/notification-settings'
 
 type Notification = {
   id: string
@@ -232,13 +233,7 @@ export function NotificationsPage() {
         </div>
       )}
 
-      {activeTab === 'settings' && (
-        <Card>
-          <div className="p-8 text-center text-sm text-zinc-500">
-            알림 설정은 준비 중입니다.
-          </div>
-        </Card>
-      )}
+      {activeTab === 'settings' && <NotificationSettings />}
     </div>
   )
 }

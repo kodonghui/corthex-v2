@@ -194,6 +194,9 @@ export function HomePage() {
         )}
       </div>
 
+      {/* 최근 알림 */}
+      <RecentNotifications />
+
       {/* 빠른 시작 */}
       <div>
         <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-3">빠른 시작</h2>
@@ -215,6 +218,66 @@ export function HomePage() {
           ))}
         </div>
       </div>
+    </div>
+  )
+}
+
+type RecentNotif = {
+  id: string
+  type: string
+  title: string
+  isRead: boolean
+  createdAt: string
+}
+
+const NOTIF_ICON: Record<string, string> = {
+  chat_complete: '🔔',
+  delegation_complete: '🤖',
+  tool_error: '⚠️',
+  job_complete: '✅',
+  job_error: '❌',
+  system: '⚙️',
+}
+
+function RecentNotifications() {
+  const navigate = useNavigate()
+
+  const { data } = useQuery({
+    queryKey: ['recent-notifications'],
+    queryFn: () => api.get<{ data: RecentNotif[] }>('/workspace/notifications?limit=5'),
+    refetchInterval: 300_000, // 5분
+  })
+
+  const items = data?.data ?? []
+  if (items.length === 0) return null
+
+  return (
+    <div className="mb-6">
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">최근 알림</h2>
+        <button
+          onClick={() => navigate('/notifications')}
+          className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline"
+        >
+          모두 보기 →
+        </button>
+      </div>
+      <Card>
+        <CardContent className="divide-y divide-zinc-100 dark:divide-zinc-800">
+          {items.map((n) => (
+            <div key={n.id} className="flex items-center gap-2 py-2 first:pt-0 last:pb-0">
+              {!n.isRead && <div className="w-1.5 h-1.5 rounded-full bg-indigo-600 shrink-0" />}
+              <span className="text-sm">{NOTIF_ICON[n.type] || '🔔'}</span>
+              <span className={`text-sm flex-1 truncate ${n.isRead ? 'text-zinc-500' : 'text-zinc-800 dark:text-zinc-200 font-medium'}`}>
+                {n.title}
+              </span>
+              <span className="text-[11px] text-zinc-400 shrink-0">
+                {new Date(n.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
     </div>
   )
 }
