@@ -2,7 +2,7 @@
 // 실행: bun run src/db/seed.ts
 
 import { db } from './index'
-import { companies, users, departments, agents, tools } from './schema'
+import { companies, users, departments, agents, toolDefinitions } from './schema'
 
 async function seed() {
   console.log('🌱 시드 데이터 삽입 시작...')
@@ -152,7 +152,7 @@ async function seed() {
 
   for (const def of toolDefs) {
     const [tool] = await db
-      .insert(tools)
+      .insert(toolDefinitions)
       .values({ companyId: def.companyId ?? null, name: def.name, description: def.description, scope: def.scope })
       .returning()
     console.log(`  ✓ 도구: ${tool.name}`)

@@ -98,6 +98,7 @@ snsRoute.post('/sns', zValidator('json', createSnsSchema), async (c) => {
   logActivity({
     companyId: tenant.companyId,
     type: 'sns',
+    phase: 'end',
     actorType: 'user',
     actorId: tenant.userId,
     action: `SNS 콘텐츠 생성 (${body.platform})`,
@@ -166,6 +167,7 @@ snsRoute.post('/sns/generate', zValidator('json', generateSnsSchema), async (c) 
   logActivity({
     companyId: tenant.companyId,
     type: 'sns',
+    phase: 'end',
     actorType: 'agent',
     actorId: agentId,
     actorName: agent.name,
@@ -265,6 +267,7 @@ snsRoute.post('/sns/:id/submit', async (c) => {
   logActivity({
     companyId: tenant.companyId,
     type: 'sns',
+    phase: 'end',
     actorType: 'user',
     actorId: tenant.userId,
     action: 'SNS 승인 요청',
@@ -304,6 +307,7 @@ snsRoute.post('/sns/:id/approve', async (c) => {
   logActivity({
     companyId: tenant.companyId,
     type: 'sns',
+    phase: 'end',
     actorType: 'user',
     actorId: tenant.userId,
     action: 'SNS 콘텐츠 승인',
@@ -345,6 +349,7 @@ snsRoute.post('/sns/:id/reject', zValidator('json', rejectSchema), async (c) => 
   logActivity({
     companyId: tenant.companyId,
     type: 'sns',
+    phase: 'end',
     actorType: 'user',
     actorId: tenant.userId,
     action: 'SNS 콘텐츠 반려',
@@ -392,6 +397,7 @@ snsRoute.post('/sns/:id/publish', async (c) => {
     logActivity({
       companyId: tenant.companyId,
       type: 'sns',
+      phase: 'end',
       actorType: 'system',
       action: `SNS 발행 완료 (${existing.platform})`,
       detail: `${existing.title} → ${result.url}`,

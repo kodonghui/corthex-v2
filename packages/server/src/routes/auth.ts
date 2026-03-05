@@ -45,6 +45,7 @@ authRoute.post('/auth/login', zValidator('json', loginSchema), async (c) => {
   logActivity({
     companyId: user.companyId,
     type: 'login',
+    phase: 'end',
     actorType: 'user',
     actorId: user.id,
     actorName: user.name,

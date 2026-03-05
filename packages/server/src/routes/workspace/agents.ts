@@ -86,6 +86,7 @@ workspaceAgentsRoute.patch('/agents/:id/soul', zValidator('json', updateSoulSche
   logActivity({
     companyId: tenant.companyId,
     type: 'system',
+    phase: 'end',
     actorType: 'user',
     actorId: tenant.userId,
     action: `에이전트 소울 수정: ${agent.name}`,

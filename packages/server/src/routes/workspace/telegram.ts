@@ -89,6 +89,7 @@ telegramRoute.post('/telegram/config', zValidator('json', configSchema), async (
   logActivity({
     companyId: tenant.companyId,
     type: 'system',
+    phase: 'end',
     actorType: 'user',
     actorId: tenant.userId,
     action: '텔레그램 봇 설정 등록',
@@ -142,6 +143,7 @@ telegramRoute.delete('/telegram/config', async (c) => {
   logActivity({
     companyId: tenant.companyId,
     type: 'system',
+    phase: 'end',
     actorType: 'user',
     actorId: tenant.userId,
     action: '텔레그램 봇 연결 해제',

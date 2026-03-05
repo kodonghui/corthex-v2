@@ -8,7 +8,7 @@
 
 import type Anthropic from '@anthropic-ai/sdk'
 import { db } from '../db'
-import { tools, agentTools, departmentKnowledge, toolCalls } from '../db/schema'
+import { toolDefinitions, agentTools, departmentKnowledge, toolCalls } from '../db/schema'
 import { eq, and, ilike } from 'drizzle-orm'
 import { decrypt } from './crypto'
 
@@ -37,20 +37,20 @@ type ToolRecord = {
 export async function loadAgentTools(agentId: string, companyId: string): Promise<ToolRecord[]> {
   const result = await db
     .select({
-      id: tools.id,
-      name: tools.name,
-      description: tools.description,
-      inputSchema: tools.inputSchema,
-      handler: tools.handler,
+      id: toolDefinitions.id,
+      name: toolDefinitions.name,
+      description: toolDefinitions.description,
+      inputSchema: toolDefinitions.inputSchema,
+      handler: toolDefinitions.handler,
     })
     .from(agentTools)
-    .innerJoin(tools, eq(agentTools.toolId, tools.id))
+    .innerJoin(toolDefinitions, eq(agentTools.toolId, toolDefinitions.id))
     .where(
       and(
         eq(agentTools.agentId, agentId),
         eq(agentTools.companyId, companyId),
         eq(agentTools.isEnabled, true),
-        eq(tools.isActive, true),
+        eq(toolDefinitions.isActive, true),
       ),
     )
 

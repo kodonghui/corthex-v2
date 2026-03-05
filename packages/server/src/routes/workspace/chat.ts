@@ -174,6 +174,7 @@ chatRoute.post(
     logActivity({
       companyId: tenant.companyId,
       type: 'chat',
+      phase: 'end',
       actorType: 'user',
       actorId: tenant.userId,
       action: '채팅 메시지 전송',

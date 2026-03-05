@@ -1,0 +1,251 @@
+# generated: 2026-03-04
+# project: CORTHEX_HQ
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: _bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - SM typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: "2026-03-04"
+project: CORTHEX_HQ
+project_key: NOKEY
+tracking_system: file-system
+story_location: _bmad-output/implementation-artifacts
+
+development_status:
+  # ============================================================
+  # Epic 1: 프로젝트 초기화 & 인프라 (P1)
+  # ============================================================
+  epic-1: in-progress
+  1-1-monorepo-init: done
+  1-2-db-schema-p1: review
+  1-3-api-server-rate-limiting: ready-for-dev
+  1-4-admin-app-setup: ready-for-dev
+  1-5-ui-phase-a: ready-for-dev
+  1-6-credential-vault: ready-for-dev
+  1-7-tenant-isolation-tests: ready-for-dev
+  1-8-docker-pipeline-pwa: ready-for-dev
+  1-9-websocket-base: ready-for-dev
+  epic-1-retrospective: optional
+
+  # ============================================================
+  # Epic 2: 관리자 콘솔 (P1)
+  # ============================================================
+  epic-2: backlog
+  2-1-admin-login-auth: backlog
+  2-2-company-user-crud: backlog
+  2-3-cli-token-api-key: backlog
+  2-4-dept-agent-crud: backlog
+  2-5-tool-assignment: backlog
+  2-6-report-line-config: backlog
+  2-7-secretary-session-mgmt: backlog
+  2-8-admin-console-ui: backlog
+  epic-2-retrospective: optional
+
+  # ============================================================
+  # Epic 3: 인증 & 워크스페이스 (P1)
+  # ============================================================
+  epic-3: backlog
+  3-1-user-login-jwt: backlog
+  3-2-workspace-sidebar: backlog
+  3-3-home-briefing: backlog
+  3-4-personal-api-key: backlog
+  3-5-settings-ui: backlog
+  epic-3-retrospective: optional
+
+  # ============================================================
+  # Epic 4: AI 에이전트 채팅 (P1)
+  # ============================================================
+  epic-4: backlog
+  4-1-agent-list-select: backlog
+  4-2-streaming-chat-ui: backlog
+  4-3-tool-use-loop: backlog
+  4-4-chat-session-history: backlog
+  4-5-soul-persona: backlog
+  4-6-ui-phase-b: backlog
+  4-7-chat-mobile-optimize: backlog
+  epic-4-retrospective: optional
+
+  # ============================================================
+  # Epic 5: 비서 오케스트레이션 (P1)
+  # ============================================================
+  epic-5: backlog
+  5-1-secretary-chat-ui: backlog
+  5-2-battle-log-p1: backlog
+  5-3-ui-phase-c: backlog
+  epic-5-retrospective: optional
+
+  # ============================================================
+  # Epic 6: 활동 로그 & 알림 시스템 (P1~P3)
+  # ============================================================
+  epic-6: backlog
+  6-1-activity-log-api: backlog
+  6-2-realtime-notifications: backlog
+  6-3-email-notifications: backlog
+  6-4-notification-history-ui: backlog
+  6-5-ui-phase-d: backlog
+  6-6-battle-log-p2: backlog
+  epic-6-retrospective: optional
+
+  # ============================================================
+  # Epic 7: 보고서 & 문서함 (P2)
+  # NOTE: Party mode 12개 이슈 발견, 유저 스킵 선택 — 수정 미적용
+  # ============================================================
+  epic-7: backlog
+  7-1-report-write-submit: backlog
+  7-2-report-approve-archive: backlog
+  7-3-agent-auto-report: backlog
+  7-4-ui-phase-e: backlog
+  epic-7-retrospective: optional
+
+  # ============================================================
+  # Epic 8: 도구 시스템 인프라 (P2)
+  # ============================================================
+  epic-8: backlog
+  8-1-tool-engine-handler: backlog
+  8-2-tool-definitions-api: backlog
+  8-3-credential-vault-integration: backlog
+  8-4-p2-db-schema: backlog
+  8-5-isolation-test-p2: backlog
+  epic-8-retrospective: optional
+
+  # ============================================================
+  # Epic 9: 도구 카탈로그 20종+ (P2)
+  # ============================================================
+  epic-9: backlog
+  9-1-search-tools: backlog
+  9-2-email-calendar-tools: backlog
+  9-3-file-screenshot-tools: backlog
+  9-4-kis-trading-tools: backlog
+  9-5-tts-voice-tools: backlog
+  9-6-image-gen-tools: backlog
+  9-7-sns-tools: backlog
+  epic-9-retrospective: optional
+
+  # ============================================================
+  # Epic 10: 전략실 (P2) — 파티모드 후 9개 스토리로 확장
+  # ============================================================
+  epic-10: backlog
+  10-1-strategy-room-layout: backlog
+  10-2-strategy-chat-agent: backlog
+  10-3-realtime-stock-chart: backlog
+  10-4-strategy-notes: backlog
+  10-5-strategy-export: backlog
+  10-6-multi-stock-compare: backlog
+  10-7-backtest-results: backlog
+  10-8-strategy-share-url: backlog
+  10-9-collab-editor: backlog
+  epic-10-retrospective: optional
+
+  # ============================================================
+  # Epic 11: 야간작업 & 자동실행 (P2)
+  # ============================================================
+  epic-11: backlog
+  11-1-night-task-scheduler: backlog
+  11-2-night-task-crud-ui: backlog
+  11-3-trigger-auto-exec: backlog
+  11-4-auto-report-gen: backlog
+  11-5-p2-websocket-events: backlog
+  11-6-advanced-task-chain: backlog
+  epic-11-retrospective: optional
+
+  # ============================================================
+  # Epic 12: 에이전트 계층 위임 (P2)
+  # ============================================================
+  epic-12: backlog
+  12-1-agent-hierarchy-api: backlog
+  12-2-parallel-delegation: backlog
+  12-3-delegation-realtime-ui: backlog
+  12-4-delegation-security: backlog
+  epic-12-retrospective: optional
+
+  # ============================================================
+  # Epic 13: 파일 관리 (P2)
+  # ============================================================
+  epic-13: backlog
+  13-1-file-upload-storage: backlog
+  13-2-file-chat-attach: backlog
+  13-3-file-management-ui: backlog
+  epic-13-retrospective: optional
+
+  # ============================================================
+  # Epic 14: SNS 콘텐츠 파이프라인 (P3) — 파티모드 후 5개 스토리
+  # ============================================================
+  epic-14: backlog
+  14-1-sns-content-planning: backlog
+  14-2-ai-image-gen-post: backlog
+  14-3-sns-analytics: backlog
+  14-4-sns-multi-account: backlog
+  14-5-ab-test-optimize: backlog
+  epic-14-retrospective: optional
+
+  # ============================================================
+  # Epic 15: 운영 도구 (P3) — 스토리 순서 재배치 완료
+  # ============================================================
+  epic-15: backlog
+  15-1-p3-db-schema-ws: backlog
+  15-2-soul-template-mgmt: backlog
+  15-3-soul-editor: backlog
+  15-4-system-monitoring: backlog
+  15-5-org-tree-viewer: backlog
+  epic-15-retrospective: optional
+
+  # ============================================================
+  # Epic 16: 사내 메신저 (P3~P4)
+  # ============================================================
+  epic-16: backlog
+  16-1-messenger-channel-mgmt: backlog
+  16-2-realtime-message-agent: backlog
+  16-3-message-reaction-thread: backlog
+  16-4-messenger-search-notify: backlog
+  16-5-messenger-mobile-pwa: backlog
+  16-6-p4-file-attach: backlog
+  epic-16-retrospective: optional
+
+  # ============================================================
+  # Epic 17: NEXUS 스케치바이브 (P4) — 스토리 순서 재배치 완료
+  # ============================================================
+  epic-17: backlog
+  17-1-p4-db-schema-ws: backlog
+  17-2-nexus-canvas-base: backlog
+  17-3-workflow-edit-exec: backlog
+  17-4-nexus-template-share: backlog
+  17-5-nexus-mobile-access: backlog
+  epic-17-retrospective: optional
+
+  # ============================================================
+  # Epic 18: MCP 연동 (P4)
+  # ============================================================
+  epic-18: backlog
+  18-1-mcp-server-mgmt: backlog
+  18-2-mcp-tool-exec: backlog
+  18-3-mcp-streaming: backlog
+  18-4-mcp-security: backlog
+  epic-18-retrospective: optional

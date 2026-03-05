@@ -106,6 +106,7 @@ messengerRoute.post('/channels', zValidator('json', createChannelSchema), async 
   logActivity({
     companyId: tenant.companyId,
     type: 'system',
+    phase: 'end',
     actorType: 'user',
     actorId: tenant.userId,
     action: `메신저 채널 생성: ${name}`,

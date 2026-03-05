@@ -146,6 +146,7 @@ nexusRoute.patch(
     logActivity({
       companyId: tenant.companyId,
       type: 'system',
+      phase: 'end',
       actorType: 'user',
       actorId: tenant.userId,
       action: `NEXUS: 에이전트 부서 이동 — ${agent.name}`,

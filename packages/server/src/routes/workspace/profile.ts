@@ -20,9 +20,10 @@ const updateProfileSchema = z.object({
 })
 
 const registerApiKeySchema = z.object({
-  provider: z.enum(['kis', 'notion', 'email', 'telegram']),
+  provider: z.enum(['kis', 'notion', 'email', 'telegram', 'serper', 'instagram']),
   label: z.string().max(100).optional(),
-  key: z.string().min(1),
+  credentials: z.record(z.string()),  // { field: value } — 각 value는 서버에서 암호화
+  scope: z.enum(['company', 'user']).default('user'),
 })
 
 // GET /api/workspace/profile — 내 프로필
@@ -91,8 +92,13 @@ profileRoute.get('/profile/api-keys', async (c) => {
 // POST /api/workspace/profile/api-keys — 내 API key 등록
 profileRoute.post('/profile/api-keys', zValidator('json', registerApiKeySchema), async (c) => {
   const tenant = c.get('tenant')
-  const { key, ...rest } = c.req.valid('json')
-  const encryptedKey = await encrypt(key)
+  const { credentials: rawCredentials, ...rest } = c.req.valid('json')
+
+  // 각 credential 필드를 개별 AES-256-GCM 암호화
+  const encryptedCredentials: Record<string, string> = {}
+  for (const [field, value] of Object.entries(rawCredentials)) {
+    encryptedCredentials[field] = await encrypt(value)
+  }
 
   const [apiKey] = await db
     .insert(apiKeys)
@@ -100,12 +106,13 @@ profileRoute.post('/profile/api-keys', zValidator('json', registerApiKeySchema),
       companyId: tenant.companyId,
       userId: tenant.userId,
       ...rest,
-      encryptedKey,
+      credentials: encryptedCredentials,
     })
     .returning({
       id: apiKeys.id,
       provider: apiKeys.provider,
       label: apiKeys.label,
+      scope: apiKeys.scope,
       createdAt: apiKeys.createdAt,
     })
 

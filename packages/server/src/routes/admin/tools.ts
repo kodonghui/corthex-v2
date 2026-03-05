@@ -3,7 +3,7 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { eq, and } from 'drizzle-orm'
 import { db } from '../../db'
-import { tools, agentTools, reportLines } from '../../db/schema'
+import { toolDefinitions, agentTools, reportLines } from '../../db/schema'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 
@@ -25,15 +25,15 @@ const createToolSchema = z.object({
 toolsRoute.get('/tools', async (c) => {
   const companyId = c.req.query('companyId')
   const result = companyId
-    ? await db.select().from(tools).where(eq(tools.companyId, companyId))
-    : await db.select().from(tools)
+    ? await db.select().from(toolDefinitions).where(eq(toolDefinitions.companyId, companyId))
+    : await db.select().from(toolDefinitions)
   return c.json({ data: result })
 })
 
 // POST /api/admin/tools
 toolsRoute.post('/tools', zValidator('json', createToolSchema), async (c) => {
   const body = c.req.valid('json')
-  const [tool] = await db.insert(tools).values(body).returning()
+  const [tool] = await db.insert(toolDefinitions).values(body).returning()
   return c.json({ data: tool }, 201)
 })
 

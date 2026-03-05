@@ -81,14 +81,14 @@ async function seedE7() {
 
   for (const t of platformTools) {
     // 이미 존재하면 스킵
-    const existing = await sql`SELECT id FROM tools WHERE name = ${t.name} AND scope = 'platform'`
+    const existing = await sql`SELECT id FROM tool_definitions WHERE name = ${t.name} AND scope = 'platform'`
     if (existing.length > 0) {
       toolIds[t.name] = existing[0].id
       console.log(`  ⏭ 도구 존재: ${t.name}`)
       continue
     }
 
-    const [tool] = await sql`INSERT INTO tools
+    const [tool] = await sql`INSERT INTO tool_definitions
       (name, description, scope, handler, input_schema, is_active)
       VALUES (${t.name}, ${t.description}, 'platform', ${t.handler}, ${JSON.stringify(t.inputSchema)}, true)
       RETURNING id, name`
@@ -172,7 +172,7 @@ async function seedE7() {
   }
 
   // 확인
-  const toolCount = await sql`SELECT COUNT(*) as cnt FROM tools WHERE is_active = true`
+  const toolCount = await sql`SELECT COUNT(*) as cnt FROM tool_definitions WHERE is_active = true`
   const mappingCount = await sql`SELECT COUNT(*) as cnt FROM agent_tools WHERE is_enabled = true`
   const knowledgeCount = await sql`SELECT COUNT(*) as cnt FROM department_knowledge`
 

@@ -1,8 +1,9 @@
-import { pgTable, text, timestamp, uuid, varchar, boolean, jsonb, integer, pgEnum } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, uuid, varchar, boolean, jsonb, integer, pgEnum, index, uniqueIndex } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 
 // === Enums ===
 export const userRoleEnum = pgEnum('user_role', ['admin', 'user'])
+export const adminRoleEnum = pgEnum('admin_role', ['superadmin', 'admin'])
 export const agentStatusEnum = pgEnum('agent_status', ['online', 'working', 'error', 'offline'])
 export const messageSenderEnum = pgEnum('message_sender', ['user', 'agent'])
 export const toolScopeEnum = pgEnum('tool_scope', ['platform', 'company', 'department'])
@@ -12,6 +13,8 @@ export const jobStatusEnum = pgEnum('job_status', ['queued', 'processing', 'comp
 export const snsStatusEnum = pgEnum('sns_status', ['draft', 'pending', 'approved', 'rejected', 'published', 'failed'])
 export const snsPlatformEnum = pgEnum('sns_platform', ['instagram', 'tistory', 'daum_cafe'])
 export const activityLogTypeEnum = pgEnum('activity_log_type', ['chat', 'delegation', 'tool_call', 'job', 'sns', 'error', 'system', 'login'])
+export const activityPhaseEnum = pgEnum('activity_phase', ['start', 'end', 'error'])
+export const apiKeyScopeEnum = pgEnum('api_key_scope', ['company', 'user'])
 
 // === 1. companies — 회사 (테넌트 최상위 단위) ===
 export const companies = pgTable('companies', {
@@ -35,6 +38,38 @@ export const users = pgTable('users', {
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+// === 2a. admin_users — 관리자 계정 (별도 인증) ===
+export const adminUsers = pgTable('admin_users', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  username: varchar('username', { length: 50 }).notNull().unique(),
+  passwordHash: text('password_hash').notNull(),
+  name: varchar('name', { length: 100 }).notNull(),
+  role: adminRoleEnum('role').notNull().default('admin'),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
+// === 2b. sessions — 유저 JWT 세션 ===
+export const sessions = pgTable('sessions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  token: text('token').notNull().unique(),
+  expiresAt: timestamp('expires_at').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('sessions_company_idx').on(table.companyId),
+}))
+
+// === 2c. admin_sessions — 관리자 JWT 세션 ===
+export const adminSessions = pgTable('admin_sessions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  adminUserId: uuid('admin_user_id').notNull().references(() => adminUsers.id),
+  token: text('token').notNull().unique(),
+  expiresAt: timestamp('expires_at').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 
 // === 3. departments — 부서 ===
@@ -62,6 +97,20 @@ export const agents = pgTable('agents', {
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })
 
+// === 4a. notification_preferences — 유저별 알림 설정 ===
+export const notificationPreferences = pgTable('notification_preferences', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  inApp: boolean('in_app').notNull().default(true),
+  email: boolean('email').notNull().default(false),
+  push: boolean('push').notNull().default(false),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('notification_prefs_company_idx').on(table.companyId),
+}))
+
 // === 5. cli_credentials — CLI 토큰 (AES-256 암호화) ===
 export const cliCredentials = pgTable('cli_credentials', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -73,16 +122,19 @@ export const cliCredentials = pgTable('cli_credentials', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 
-// === 6. api_keys — 개인 API key (암호화) ===
+// === 6. api_keys — API 키/자격증명 (JSONB 암호화) ===
 export const apiKeys = pgTable('api_keys', {
   id: uuid('id').primaryKey().defaultRandom(),
   companyId: uuid('company_id').notNull().references(() => companies.id),
-  userId: uuid('user_id').notNull().references(() => users.id),
+  userId: uuid('user_id').references(() => users.id),  // null = 회사 공용
   provider: varchar('provider', { length: 50 }).notNull(),  // kis, notion, email, telegram
   label: varchar('label', { length: 100 }),
-  encryptedKey: text('encrypted_key').notNull(),  // AES-256
+  credentials: jsonb('credentials').notNull(),  // JSONB — 각 필드 AES-256-GCM 개별 암호화
+  scope: apiKeyScopeEnum('scope').notNull(),  // 'company' | 'user'
   createdAt: timestamp('created_at').notNull().defaultNow(),
-})
+}, (table) => ({
+  companyIdx: index('api_keys_company_idx').on(table.companyId),
+}))
 
 // === 7. chat_sessions — 채팅 세션 ===
 export const chatSessions = pgTable('chat_sessions', {
@@ -103,7 +155,10 @@ export const chatMessages = pgTable('chat_messages', {
   sender: messageSenderEnum('sender').notNull(),
   content: text('content').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-})
+}, (table) => ({
+  sessionCreatedIdx: index('chat_messages_session_created_idx').on(table.sessionId, table.createdAt),
+  companyIdx: index('chat_messages_company_idx').on(table.companyId),
+}))
 
 // === 9. agent_memory — 에이전트 장기 기억 ===
 export const agentMemory = pgTable('agent_memory', {
@@ -117,8 +172,8 @@ export const agentMemory = pgTable('agent_memory', {
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })
 
-// === 10. tools — 도구 정의 ===
-export const tools = pgTable('tools', {
+// === 10. tool_definitions — 도구 정의 ===
+export const toolDefinitions = pgTable('tool_definitions', {
   id: uuid('id').primaryKey().defaultRandom(),
   companyId: uuid('company_id').references(() => companies.id),  // null = 플랫폼 공통
   name: varchar('name', { length: 100 }).notNull(),
@@ -136,10 +191,12 @@ export const agentTools = pgTable('agent_tools', {
   id: uuid('id').primaryKey().defaultRandom(),
   companyId: uuid('company_id').notNull().references(() => companies.id),
   agentId: uuid('agent_id').notNull().references(() => agents.id),
-  toolId: uuid('tool_id').notNull().references(() => tools.id),
+  toolId: uuid('tool_id').notNull().references(() => toolDefinitions.id),
   isEnabled: boolean('is_enabled').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-})
+}, (table) => ({
+  companyIdx: index('agent_tools_company_idx').on(table.companyId),
+}))
 
 // === 12. report_lines — 보고 라인 (H → 상위자) ===
 export const reportLines = pgTable('report_lines', {
@@ -208,7 +265,7 @@ export const toolCalls = pgTable('tool_calls', {
   companyId: uuid('company_id').notNull().references(() => companies.id),
   sessionId: uuid('session_id').notNull().references(() => chatSessions.id),
   agentId: uuid('agent_id').notNull().references(() => agents.id),
-  toolId: uuid('tool_id').notNull().references(() => tools.id),
+  toolId: uuid('tool_id').notNull().references(() => toolDefinitions.id),
   toolName: varchar('tool_name', { length: 100 }).notNull(),
   input: jsonb('input'),
   output: text('output'),
@@ -262,8 +319,12 @@ export const snsContents = pgTable('sns_contents', {
 // === 20. activity_logs — 작전일지 (활동 로그) ===
 export const activityLogs = pgTable('activity_logs', {
   id: uuid('id').primaryKey().defaultRandom(),
+  eventId: uuid('event_id').notNull().unique(),  // idempotent INSERT용
   companyId: uuid('company_id').notNull().references(() => companies.id),
+  userId: uuid('user_id').references(() => users.id),
+  agentId: uuid('agent_id').references(() => agents.id),
   type: activityLogTypeEnum('type').notNull(),
+  phase: activityPhaseEnum('phase').notNull(),  // 'start' | 'end' | 'error'
   actorType: varchar('actor_type', { length: 20 }).notNull(),  // 'user' | 'agent' | 'system'
   actorId: uuid('actor_id'),
   actorName: varchar('actor_name', { length: 100 }),
@@ -271,7 +332,11 @@ export const activityLogs = pgTable('activity_logs', {
   detail: text('detail'),
   metadata: jsonb('metadata'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-})
+}, (table) => ({
+  companyCreatedIdx: index('activity_company_created_idx').on(table.companyId, table.createdAt),
+  typeIdx: index('activity_type_idx').on(table.type),
+  metadataGinIdx: index('activity_metadata_gin_idx').using('gin', table.metadata),
+}))
 
 // === 21. cost_records — AI 비용 기록 ===
 export const costRecords = pgTable('cost_records', {
@@ -410,7 +475,7 @@ export const toolCallsRelations = relations(toolCalls, ({ one }) => ({
   company: one(companies, { fields: [toolCalls.companyId], references: [companies.id] }),
   session: one(chatSessions, { fields: [toolCalls.sessionId], references: [chatSessions.id] }),
   agent: one(agents, { fields: [toolCalls.agentId], references: [agents.id] }),
-  tool: one(tools, { fields: [toolCalls.toolId], references: [tools.id] }),
+  tool: one(toolDefinitions, { fields: [toolCalls.toolId], references: [toolDefinitions.id] }),
 }))
 
 export const nightJobsRelations = relations(nightJobs, ({ one }) => ({
@@ -428,6 +493,8 @@ export const snsContentsRelations = relations(snsContents, ({ one }) => ({
 
 export const activityLogsRelations = relations(activityLogs, ({ one }) => ({
   company: one(companies, { fields: [activityLogs.companyId], references: [companies.id] }),
+  user: one(users, { fields: [activityLogs.userId], references: [users.id] }),
+  agent: one(agents, { fields: [activityLogs.agentId], references: [agents.id] }),
 }))
 
 export const costRecordsRelations = relations(costRecords, ({ one }) => ({
@@ -461,4 +528,22 @@ export const messengerMessagesRelations = relations(messengerMessages, ({ one })
 
 export const canvasLayoutsRelations = relations(canvasLayouts, ({ one }) => ({
   company: one(companies, { fields: [canvasLayouts.companyId], references: [companies.id] }),
+}))
+
+export const adminUsersRelations = relations(adminUsers, ({ many }) => ({
+  sessions: many(adminSessions),
+}))
+
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+  user: one(users, { fields: [sessions.userId], references: [users.id] }),
+  company: one(companies, { fields: [sessions.companyId], references: [companies.id] }),
+}))
+
+export const adminSessionsRelations = relations(adminSessions, ({ one }) => ({
+  adminUser: one(adminUsers, { fields: [adminSessions.adminUserId], references: [adminUsers.id] }),
+}))
+
+export const notificationPreferencesRelations = relations(notificationPreferences, ({ one }) => ({
+  user: one(users, { fields: [notificationPreferences.userId], references: [users.id] }),
+  company: one(companies, { fields: [notificationPreferences.companyId], references: [companies.id] }),
 }))
