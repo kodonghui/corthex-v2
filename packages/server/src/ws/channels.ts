@@ -103,7 +103,7 @@ export async function handleSubscription(
 
 // 특정 채널 구독자에게 브로드캐스트
 export function broadcastToChannel(channelKey: string, data: unknown) {
-  const message = JSON.stringify({ type: 'data', channel: channelKey.split('::')[0], data })
+  const message = JSON.stringify({ type: 'data', channel: channelKey.split('::')[0], channelKey, data })
   for (const clients of clientMap.values()) {
     for (const client of clients) {
       if (client.subscriptions.has(channelKey)) {

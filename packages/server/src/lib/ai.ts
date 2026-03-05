@@ -188,3 +188,149 @@ export async function generateAgentResponse(ctx: ChatContext): Promise<string> {
   // 루프 초과 시
   return '도구 호출이 너무 많아 중단되었습니다. 질문을 더 구체적으로 해주세요.'
 }
+
+// === 스트리밍 버전 ===
+
+export type StreamEvent =
+  | { type: 'token'; content: string }
+  | { type: 'tool-start'; toolName: string; toolId: string }
+  | { type: 'tool-end'; toolName: string; toolId: string; result: string }
+  | { type: 'done'; sessionId: string }
+  | { type: 'error'; code: string; message: string }
+
+/**
+ * 스트리밍 AI 응답 생성 — 이벤트 콜백으로 실시간 전달
+ * 최종 전체 텍스트를 반환하여 DB 저장에 사용
+ */
+export async function generateAgentResponseStream(
+  ctx: ChatContext,
+  onEvent: (event: StreamEvent) => void,
+): Promise<string> {
+  const client = await getClientForUser(ctx.userId, ctx.companyId)
+
+  const [agent] = await db
+    .select({
+      name: agents.name,
+      role: agents.role,
+      soul: agents.soul,
+      departmentId: agents.departmentId,
+    })
+    .from(agents)
+    .where(eq(agents.id, ctx.agentId))
+    .limit(1)
+
+  if (!agent) throw new Error('에이전트를 찾을 수 없습니다')
+
+  const history = await db
+    .select({ sender: chatMessages.sender, content: chatMessages.content })
+    .from(chatMessages)
+    .where(eq(chatMessages.sessionId, ctx.sessionId))
+    .orderBy(chatMessages.createdAt)
+    .limit(20)
+
+  const memories = await db
+    .select({ key: agentMemory.key, value: agentMemory.value })
+    .from(agentMemory)
+    .where(eq(agentMemory.agentId, ctx.agentId))
+    .limit(10)
+
+  const toolRecords = await loadAgentTools(ctx.agentId, ctx.companyId)
+  const claudeTools = toClaudeTools(toolRecords)
+
+  const memoryBlock = memories.length > 0
+    ? `\n\n## 장기 기억\n${memories.map(m => `- ${m.key}: ${m.value}`).join('\n')}`
+    : ''
+  const toolBlock = toolRecords.length > 0
+    ? `\n\n## 사용 가능한 도구\n${toolRecords.map(t => `- ${t.name}: ${t.description || ''}`).join('\n')}\n\n도구가 필요한 질문을 받으면 적극적으로 도구를 사용하세요.`
+    : ''
+
+  const systemPrompt = `${agent.soul || '당신은 도움이 되는 AI 비서입니다.'}
+
+## 기본 정보
+- 이름: ${agent.name}
+- 역할: ${agent.role || '비서'}
+- 항상 한국어로 답변합니다
+- 간결하고 실용적으로 답변합니다${memoryBlock}${toolBlock}`
+
+  const messages: Anthropic.MessageParam[] = history.map((msg) => ({
+    role: msg.sender === 'user' ? 'user' as const : 'assistant' as const,
+    content: msg.content,
+  }))
+  messages.push({ role: 'user', content: ctx.userMessage })
+
+  const toolExecCtx = {
+    companyId: ctx.companyId,
+    agentId: ctx.agentId,
+    sessionId: ctx.sessionId,
+    departmentId: agent.departmentId,
+    userId: ctx.userId,
+  }
+
+  let fullText = ''
+
+  for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
+    const stream = client.messages.stream({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 2048,
+      system: systemPrompt,
+      messages,
+      ...(claudeTools.length > 0 ? { tools: claudeTools } : {}),
+    })
+
+    // 텍스트 토큰 스트리밍
+    stream.on('text', (text) => {
+      fullText += text
+      onEvent({ type: 'token', content: text })
+    })
+
+    const finalMessage = await stream.finalMessage()
+
+    // 비용 기록
+    recordCost({
+      companyId: ctx.companyId,
+      agentId: ctx.agentId,
+      sessionId: ctx.sessionId || undefined,
+      model: finalMessage.model,
+      inputTokens: finalMessage.usage.input_tokens,
+      outputTokens: finalMessage.usage.output_tokens,
+      source: 'chat',
+    })
+
+    // tool_use 블록 확인
+    const toolUseBlocks = finalMessage.content.filter(b => b.type === 'tool_use')
+
+    if (toolUseBlocks.length === 0) {
+      // 도구 호출 없음 — 스트리밍 완료
+      onEvent({ type: 'done', sessionId: ctx.sessionId })
+      return fullText || '응답을 생성할 수 없습니다.'
+    }
+
+    // 도구 실행
+    const toolResults: Anthropic.Messages.ToolResultBlockParam[] = []
+
+    for (const block of toolUseBlocks) {
+      if (block.type !== 'tool_use') continue
+
+      onEvent({ type: 'tool-start', toolName: block.name, toolId: block.id })
+
+      const toolRecord = toolRecords.find(t => t.name === block.name)
+      if (!toolRecord) {
+        const errResult = `도구 '${block.name}'을(를) 찾을 수 없습니다.`
+        onEvent({ type: 'tool-end', toolName: block.name, toolId: block.id, result: errResult })
+        toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: errResult, is_error: true })
+        continue
+      }
+
+      const result = await executeTool(block.name, block.input as Record<string, unknown>, toolExecCtx, toolRecord)
+      onEvent({ type: 'tool-end', toolName: block.name, toolId: block.id, result })
+      toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: result })
+    }
+
+    // 다음 라운드를 위해 히스토리 업데이트
+    messages.push({ role: 'assistant', content: finalMessage.content })
+    messages.push({ role: 'user', content: toolResults })
+  }
+
+  onEvent({ type: 'done', sessionId: ctx.sessionId })
+  return fullText || '도구 호출이 너무 많아 중단되었습니다.'
+}

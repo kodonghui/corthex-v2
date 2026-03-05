@@ -6,9 +6,11 @@ import { db } from '../../db'
 import { chatSessions, chatMessages, agents, delegations } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
-import { generateAgentResponse } from '../../lib/ai'
+import { generateAgentResponse, generateAgentResponseStream } from '../../lib/ai'
+import type { StreamEvent } from '../../lib/ai'
 import { orchestrateSecretary } from '../../lib/orchestrator'
 import { logActivity } from '../../lib/activity-logger'
+import { broadcastToChannel } from '../../ws/channels'
 import type { AppEnv } from '../../types'
 
 export const chatRoute = new Hono<AppEnv>()
@@ -135,53 +137,84 @@ chatRoute.post(
       .set({ lastMessageAt: new Date() })
       .where(eq(chatSessions.id, sessionId))
 
-    // AI 응답 생성 — 비서면 오케스트레이션, 아니면 직접 대화
-    let aiContent: string
-    try {
-      if (agent?.isSecretary) {
-        // 비서 오케스트레이션: 분석 → 부서 위임 → 종합 보고서
-        aiContent = await orchestrateSecretary({
-          secretaryAgentId: session.agentId,
-          sessionId,
-          companyId: tenant.companyId,
-          userMessage: content,
-          userId: tenant.userId,
-        })
-      } else {
-        // 일반 에이전트: 직접 대화
-        aiContent = await generateAgentResponse({
-          agentId: session.agentId,
-          sessionId,
-          companyId: tenant.companyId,
-          userMessage: content,
-          userId: tenant.userId,
-        })
-      }
-    } catch (err) {
-      aiContent = `[AI 연결 오류] ${err instanceof Error ? err.message : '알 수 없는 오류'}`
-    }
-
-    const [agentMsg] = await db
-      .insert(chatMessages)
-      .values({
-        companyId: tenant.companyId,
-        sessionId,
-        sender: 'agent',
-        content: aiContent,
-      })
-      .returning()
-
     logActivity({
       companyId: tenant.companyId,
       type: 'chat',
-      phase: 'end',
+      phase: 'start',
       actorType: 'user',
       actorId: tenant.userId,
       action: '채팅 메시지 전송',
       detail: content.slice(0, 100),
     })
 
-    return c.json({ data: { userMessage: userMsg, agentMessage: agentMsg } }, 201)
+    // AI 응답을 백그라운드에서 스트리밍 생성
+    const chatCtx = {
+      agentId: session.agentId,
+      sessionId,
+      companyId: tenant.companyId,
+      userMessage: content,
+      userId: tenant.userId,
+    }
+
+    const channelKey = `chat-stream::${sessionId}`
+
+    const streamTask = async () => {
+      try {
+        let aiContent: string
+
+        if (agent?.isSecretary) {
+          // 비서: 기존 동기 방식 유지 (오케스트레이션은 스트리밍 불가)
+          aiContent = await orchestrateSecretary({
+            secretaryAgentId: session.agentId,
+            ...chatCtx,
+          })
+          broadcastToChannel(channelKey, { type: 'token', content: aiContent })
+          broadcastToChannel(channelKey, { type: 'done', sessionId })
+        } else {
+          // 일반 에이전트: 스트리밍
+          aiContent = await generateAgentResponseStream(chatCtx, (event: StreamEvent) => {
+            broadcastToChannel(channelKey, event)
+          })
+        }
+
+        // 에이전트 메시지 DB 저장
+        await db.insert(chatMessages).values({
+          companyId: tenant.companyId,
+          sessionId,
+          sender: 'agent',
+          content: aiContent,
+        })
+
+        // 첫 응답이면 세션 제목 업데이트
+        const msgCount = await db
+          .select({ id: chatMessages.id })
+          .from(chatMessages)
+          .where(eq(chatMessages.sessionId, sessionId))
+          .limit(3)
+        if (msgCount.length <= 3) {
+          const keywords = aiContent.match(/[가-힣a-zA-Z0-9]+/g)?.slice(0, 3).join(' ')
+          if (keywords) {
+            await db.update(chatSessions).set({ title: keywords.slice(0, 20) }).where(eq(chatSessions.id, sessionId))
+          }
+        }
+      } catch (err) {
+        const errMsg = err instanceof Error ? err.message : '알 수 없는 오류'
+        broadcastToChannel(channelKey, { type: 'error', code: 'AI_ERROR', message: errMsg })
+
+        // 에러 메시지도 DB에 저장
+        await db.insert(chatMessages).values({
+          companyId: tenant.companyId,
+          sessionId,
+          sender: 'agent',
+          content: `[AI 연결 오류] ${errMsg}`,
+        })
+      }
+    }
+
+    // 백그라운드 실행 — 응답을 기다리지 않음
+    streamTask()
+
+    return c.json({ data: { userMessage: userMsg } }, 201)
   },
 )
 

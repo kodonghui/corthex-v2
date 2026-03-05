@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../../lib/api'
+import { useWsStore } from '../../stores/ws-store'
+import { useChatStream } from '../../hooks/use-chat-stream'
+import { ToolCallCard } from './tool-call-card'
 import type { Agent, Message, Delegation } from './types'
 
 const statusColors: Record<string, string> = {
@@ -21,9 +24,12 @@ export function ChatArea({
 }) {
   const queryClient = useQueryClient()
   const [input, setInput] = useState('')
-  const [isTyping, setIsTyping] = useState(false)
   const [showDelegations, setShowDelegations] = useState(false)
+  const [reconnectBanner, setReconnectBanner] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const prevConnected = useRef(true)
+  const { isConnected } = useWsStore()
+  const { streamingText, isStreaming, toolCalls, error, startStream, stopStream, clearError } = useChatStream(sessionId)
 
   const { data: messagesData } = useQuery({
     queryKey: ['messages', sessionId],
@@ -41,33 +47,50 @@ export function ChatArea({
 
   const sendMessage = useMutation({
     mutationFn: (content: string) =>
-      api.post<{ data: { userMessage: Message; agentMessage: Message } }>(
+      api.post<{ data: { userMessage: Message } }>(
         `/workspace/chat/sessions/${sessionId}/messages`,
         { content },
       ),
-    onMutate: () => setIsTyping(true),
-    onSettled: () => {
-      setIsTyping(false)
+    onSuccess: () => {
+      startStream()
       queryClient.invalidateQueries({ queryKey: ['messages', sessionId] })
-      queryClient.invalidateQueries({ queryKey: ['sessions'] })
-      queryClient.invalidateQueries({ queryKey: ['delegations', sessionId] })
     },
   })
 
   const handleSend = () => {
-    if (!input.trim() || !sessionId || sendMessage.isPending) return
+    if (!input.trim() || !sessionId || sendMessage.isPending || isStreaming) return
     sendMessage.mutate(input.trim())
     setInput('')
   }
 
+  const handleRetry = () => {
+    clearError()
+    // 마지막 유저 메시지 재전송
+    const lastUserMsg = messages.filter((m) => m.sender === 'user').pop()
+    if (lastUserMsg) {
+      sendMessage.mutate(lastUserMsg.content)
+    }
+  }
+
+  // 자동 스크롤
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messagesData?.data, isTyping])
+  }, [messagesData?.data, streamingText, isStreaming])
+
+  // 연결 상태 배너
+  useEffect(() => {
+    if (!prevConnected.current && isConnected) {
+      setReconnectBanner(true)
+      const timer = setTimeout(() => setReconnectBanner(false), 2000)
+      return () => clearTimeout(timer)
+    }
+    prevConnected.current = isConnected
+  }, [isConnected])
 
   const messages = messagesData?.data || []
   const delegationList = delegationsData?.data || []
 
-  // EmptyState: 에이전트 미선택
+  // EmptyState
   if (!agent || !sessionId) {
     return (
       <div className="flex-1 flex items-center justify-center">
@@ -90,6 +113,18 @@ export function ChatArea({
 
   return (
     <div className="flex-1 flex flex-col min-w-0">
+      {/* 연결 상태 배너 */}
+      {!isConnected && (
+        <div className="px-4 py-2 bg-yellow-50 dark:bg-yellow-900/20 border-b border-yellow-200 dark:border-yellow-800 text-xs text-yellow-700 dark:text-yellow-300 text-center">
+          ⚠️ 연결이 끊겼습니다. 재연결 중...
+        </div>
+      )}
+      {reconnectBanner && (
+        <div className="px-4 py-2 bg-green-50 dark:bg-green-900/20 border-b border-green-200 dark:border-green-800 text-xs text-green-700 dark:text-green-300 text-center">
+          ⚡ 연결 복구됨
+        </div>
+      )}
+
       {/* 헤더 */}
       <div className="px-4 md:px-6 py-3 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -171,7 +206,7 @@ export function ChatArea({
         <>
           {/* 메시지 목록 */}
           <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 space-y-4">
-            {messages.length === 0 && !isTyping && (
+            {messages.length === 0 && !isStreaming && (
               <div className="text-center text-zinc-400 text-sm mt-8">
                 {agent.isSecretary ? (
                   <>
@@ -232,7 +267,35 @@ export function ChatArea({
               )
             })}
 
-            {isTyping && (
+            {/* 스트리밍 메시지 */}
+            {isStreaming && (streamingText || toolCalls.length > 0) && (
+              <div className="flex justify-start">
+                <div className="max-w-[80%] md:max-w-[70%] bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-2xl rounded-bl-md px-4 py-2.5 text-sm leading-relaxed">
+                  <p className="text-[10px] font-medium text-indigo-500 dark:text-indigo-400 mb-1">
+                    {agent.name}
+                  </p>
+                  {toolCalls.map((tool) => (
+                    <ToolCallCard key={tool.toolId} tool={tool} />
+                  ))}
+                  {streamingText && (
+                    <p className="whitespace-pre-wrap">
+                      {streamingText}
+                      <span className="animate-pulse text-indigo-400">▌</span>
+                    </p>
+                  )}
+                  {!streamingText && toolCalls.length > 0 && toolCalls.every(t => t.status === 'done') && (
+                    <div className="flex gap-1 mt-1">
+                      <span className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* 스트리밍 시작 대기 (아직 토큰 없음) */}
+            {isStreaming && !streamingText && toolCalls.length === 0 && (
               <div className="flex justify-start">
                 <div className="bg-zinc-100 dark:bg-zinc-800 rounded-2xl px-4 py-3">
                   <div className="flex items-center gap-2">
@@ -245,6 +308,23 @@ export function ChatArea({
                       <span className="text-xs text-zinc-400">부서 위임 중...</span>
                     )}
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* 에러 표시 */}
+            {error && (
+              <div className="flex justify-start">
+                <div className="max-w-[80%] bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+                  <p className="text-sm text-red-600 dark:text-red-400">
+                    ❌ {error}
+                  </p>
+                  <button
+                    onClick={handleRetry}
+                    className="mt-2 text-xs text-indigo-600 dark:text-indigo-400 hover:underline"
+                  >
+                    다시 시도
+                  </button>
                 </div>
               </div>
             )}
@@ -265,20 +345,29 @@ export function ChatArea({
                     ? `${agent.name}에게 업무 지시...`
                     : `${agent.name}에게 메시지...`
                 }
-                disabled={sendMessage.isPending}
+                disabled={sendMessage.isPending || isStreaming}
                 className="flex-1 px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
               />
-              <button
-                onClick={handleSend}
-                disabled={!input.trim() || sendMessage.isPending}
-                className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                  input.trim() && !sendMessage.isPending
-                    ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                    : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-400 cursor-not-allowed'
-                }`}
-              >
-                전송
-              </button>
+              {isStreaming ? (
+                <button
+                  onClick={stopStream}
+                  className="px-5 py-2.5 rounded-xl text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors"
+                >
+                  ■ 중지
+                </button>
+              ) : (
+                <button
+                  onClick={handleSend}
+                  disabled={!input.trim() || sendMessage.isPending}
+                  className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                    input.trim() && !sendMessage.isPending
+                      ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                      : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-400 cursor-not-allowed'
+                  }`}
+                >
+                  전송
+                </button>
+              )}
             </div>
           </div>
         </>

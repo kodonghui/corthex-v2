@@ -1,6 +1,10 @@
 import { create } from 'zustand'
 import type { WsChannel, WsOutboundMessage } from '@corthex/shared'
 
+type WsEventListener = (data: unknown) => void
+
+const channelListeners = new Map<string, Set<WsEventListener>>()
+
 type WsState = {
   socket: WebSocket | null
   isConnected: boolean
@@ -8,6 +12,8 @@ type WsState = {
   disconnect: () => void
   subscribe: (channel: WsChannel, params?: Record<string, string>) => void
   send: (channel: string, data: unknown) => void
+  addListener: (channelKey: string, fn: WsEventListener) => void
+  removeListener: (channelKey: string, fn: WsEventListener) => void
 }
 
 export const useWsStore = create<WsState>((set, get) => ({
@@ -15,7 +21,6 @@ export const useWsStore = create<WsState>((set, get) => ({
   isConnected: false,
 
   connect: (token: string) => {
-    // 기존 연결 정리
     const prev = get().socket
     if (prev) {
       prev.onclose = null
@@ -31,7 +36,6 @@ export const useWsStore = create<WsState>((set, get) => ({
 
     ws.onclose = (event) => {
       set({ isConnected: false, socket: null })
-      // 재연결하면 안 되는 코드: 정상 종료, 인증 실패, 연결 제한
       const noReconnect = [1000, 4001, 4002]
       if (!noReconnect.includes(event.code) && !serverRestarting) {
         setTimeout(() => get().connect(token), 3000)
@@ -42,9 +46,21 @@ export const useWsStore = create<WsState>((set, get) => ({
       try {
         const msg = JSON.parse(event.data) as WsOutboundMessage
         if (msg.type === 'server-restart') {
-          // onclose에서 중복 재연결 방지
           serverRestarting = true
           setTimeout(() => get().connect(token), 3000)
+          return
+        }
+
+        // 채널 데이터 → 리스너에 디스패치 (full channelKey 우선, base channel 폴백)
+        if (msg.type === 'data' && msg.channel) {
+          const fullKey = msg.channelKey
+          if (fullKey) {
+            const keyListeners = channelListeners.get(fullKey)
+            if (keyListeners) keyListeners.forEach((fn) => fn(msg.data))
+          }
+          // base channel 리스너도 호출 (하위호환)
+          const baseListeners = channelListeners.get(msg.channel)
+          if (baseListeners) baseListeners.forEach((fn) => fn(msg.data))
         }
       } catch {
         // 잘못된 JSON 무시
@@ -75,5 +91,16 @@ export const useWsStore = create<WsState>((set, get) => ({
     if (socket && isConnected) {
       socket.send(JSON.stringify({ channel, data }))
     }
+  },
+
+  addListener: (channelKey: string, fn: WsEventListener) => {
+    if (!channelListeners.has(channelKey)) {
+      channelListeners.set(channelKey, new Set())
+    }
+    channelListeners.get(channelKey)!.add(fn)
+  },
+
+  removeListener: (channelKey: string, fn: WsEventListener) => {
+    channelListeners.get(channelKey)?.delete(fn)
   },
 }))

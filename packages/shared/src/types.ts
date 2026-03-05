@@ -120,6 +120,7 @@ export type WsInboundMessage = {
 export type WsOutboundMessage = {
   type: 'connected' | 'subscribed' | 'unsubscribed' | 'data' | 'error' | 'server-restart'
   channel?: WsChannel
+  channelKey?: string
   data?: unknown
   code?: string
 }
