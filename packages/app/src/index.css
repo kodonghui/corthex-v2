@@ -7,4 +7,10 @@
   --color-corthex-success: oklch(0.55 0.16 160);      /* emerald-600 */
   --color-corthex-warning: oklch(0.65 0.16 75);       /* amber-600 */
   --color-corthex-error: oklch(0.55 0.2 25);          /* red-600 */
+  --animate-slide-in: slide-in 200ms ease-out;
+}
+
+@keyframes slide-in {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
 }

@@ -74,7 +74,7 @@ development_status:
   # ============================================================
   epic-3: in-progress
   3-1-user-login-jwt: done
-  3-2-workspace-sidebar: backlog
+  3-2-workspace-sidebar: done
   3-3-home-briefing: backlog
   3-4-personal-api-key: backlog
   3-5-settings-ui: backlog

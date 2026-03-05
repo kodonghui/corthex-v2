@@ -18,6 +18,7 @@ const navSections: NavSection[] = [
     label: '업무',
     items: [
       { to: '/chat', label: '채팅', icon: '💬' },
+      { to: '/trading', label: '전략실', icon: '📈' },
       { to: '/jobs', label: '야간작업', icon: '🌙' },
       { to: '/reports', label: '보고서', icon: '📄' },
     ],
@@ -33,17 +34,19 @@ const navSections: NavSection[] = [
     ],
   },
   {
+    label: '시스템',
     items: [
+      { to: '/notifications', label: '알림', icon: '🔔' },
       { to: '/settings', label: '설정', icon: '⚙️' },
     ],
   },
 ]
 
-export function Sidebar() {
+export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
   const { user, logout } = useAuthStore()
 
   return (
-    <aside className="w-60 h-screen border-r border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 flex flex-col">
+    <aside className="w-60 h-full flex flex-col bg-zinc-50 dark:bg-zinc-900">
       {/* 로고 */}
       <div className="px-4 h-14 flex items-center border-b border-zinc-200 dark:border-zinc-800">
         <div className="flex items-center gap-2">
@@ -69,6 +72,7 @@ export function Sidebar() {
                   key={item.to}
                   to={item.to}
                   end={item.to === '/'}
+                  onClick={onNavClick}
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                       isActive
