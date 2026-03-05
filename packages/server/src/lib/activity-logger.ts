@@ -1,5 +1,6 @@
 import { db } from '../db'
 import { activityLogs } from '../db/schema'
+import { broadcastToChannel } from '../ws/channels'
 
 type LogParams = {
   companyId: string
@@ -22,8 +23,9 @@ type LogParams = {
  */
 export async function logActivity(params: LogParams): Promise<void> {
   try {
-    await db.insert(activityLogs).values({
-      eventId: params.eventId ?? crypto.randomUUID(),
+    const eventId = params.eventId ?? crypto.randomUUID()
+    const [inserted] = await db.insert(activityLogs).values({
+      eventId,
       companyId: params.companyId,
       type: params.type,
       phase: params.phase,
@@ -35,7 +37,15 @@ export async function logActivity(params: LogParams): Promise<void> {
       action: params.action,
       detail: params.detail,
       metadata: params.metadata,
-    })
+    }).returning()
+
+    // 실시간 브로드캐스트
+    if (inserted) {
+      broadcastToChannel(`activity-log::${params.companyId}`, {
+        type: 'new-log',
+        log: inserted,
+      })
+    }
   } catch (err) {
     console.error('[ActivityLogger] 로그 기록 실패:', err)
   }

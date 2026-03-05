@@ -30,7 +30,9 @@ activityLogRoute.get('/activity-log', async (c) => {
   const result = await db
     .select({
       id: activityLogs.id,
+      eventId: activityLogs.eventId,
       type: activityLogs.type,
+      phase: activityLogs.phase,
       actorType: activityLogs.actorType,
       actorId: activityLogs.actorId,
       actorName: activityLogs.actorName,
