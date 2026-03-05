@@ -100,32 +100,34 @@ export function NotesPanel() {
       </div>
 
       {isEditing && (
-        <div className="border border-zinc-200 dark:border-zinc-700 rounded-lg p-3 space-y-2">
-          <input
-            type="text"
-            placeholder="제목 (선택)"
-            value={editTitle}
-            onChange={(e) => setEditTitle(e.target.value)}
-            className="w-full text-sm bg-transparent border-b border-zinc-200 dark:border-zinc-700 pb-1 outline-none placeholder:text-zinc-400"
-          />
-          <textarea
-            value={editContent}
-            onChange={(e) => setEditContent(e.target.value)}
-            placeholder="마크다운으로 메모를 작성하세요..."
-            rows={4}
-            className="w-full text-sm bg-transparent resize-none outline-none placeholder:text-zinc-400"
-          />
-          <div className="flex gap-2 justify-end">
-            <Button size="sm" variant="ghost" onClick={() => { setIsCreating(false); setEditingId(null) }}>
-              취소
-            </Button>
-            <Button
-              size="sm"
-              onClick={handleSave}
-              disabled={!editContent.trim() || createNote.isPending || updateNote.isPending}
-            >
-              저장
-            </Button>
+        <div className="fixed inset-0 z-50 bg-white dark:bg-zinc-900 flex flex-col p-4 sm:static sm:inset-auto sm:z-auto sm:bg-transparent sm:dark:bg-transparent sm:p-0">
+          <div className="border border-zinc-200 dark:border-zinc-700 rounded-lg p-3 space-y-2 flex-1 flex flex-col sm:flex-none">
+            <input
+              type="text"
+              placeholder="제목 (선택)"
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              className="w-full text-sm bg-transparent border-b border-zinc-200 dark:border-zinc-700 pb-1 outline-none placeholder:text-zinc-400"
+            />
+            <textarea
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              placeholder="마크다운으로 메모를 작성하세요..."
+              rows={4}
+              className="w-full text-sm bg-transparent resize-none outline-none placeholder:text-zinc-400 flex-1 sm:flex-none"
+            />
+            <div className="flex gap-2 justify-end shrink-0">
+              <Button size="sm" variant="ghost" onClick={() => { setIsCreating(false); setEditingId(null) }}>
+                취소
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleSave}
+                disabled={!editContent.trim() || createNote.isPending || updateNote.isPending}
+              >
+                저장
+              </Button>
+            </div>
           </div>
         </div>
       )}
@@ -150,7 +152,7 @@ export function NotesPanel() {
                 {new Date(note.updatedAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
               </p>
             </div>
-            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+            <div className="flex gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shrink-0">
               <Button size="sm" variant="ghost" onClick={() => startEdit(note)}>편집</Button>
               <Button size="sm" variant="ghost" onClick={() => setDeleteTarget(note.id)}>삭제</Button>
             </div>

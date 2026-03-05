@@ -310,6 +310,7 @@ strategyRoute.get(
         eq(strategyNotes.stockCode, stockCode),
       ))
       .orderBy(desc(strategyNotes.updatedAt))
+      .limit(50)
 
     return c.json({ data: result })
   },
@@ -343,6 +344,8 @@ strategyRoute.post('/notes', zValidator('json', createNoteSchema), async (c) => 
 const updateNoteSchema = z.object({
   title: z.string().max(200).optional(),
   content: z.string().max(10_000).optional(),
+}).refine((d) => d.title !== undefined || d.content !== undefined, {
+  message: '수정할 내용이 없습니다',
 })
 
 // PATCH /api/workspace/strategy/notes/:id — 노트 수정

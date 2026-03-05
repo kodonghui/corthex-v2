@@ -1,6 +1,6 @@
 # Story 10.4: 전략 노트 — 종목별 투자 메모 CRUD + 마크다운 편집
 
-Status: review
+Status: done
 
 ## Story
 
