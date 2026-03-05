@@ -1,5 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { useAuthStore } from '../stores/auth-store'
+import { useQuery } from '@tanstack/react-query'
+import { api } from '../lib/api'
 
 declare const __BUILD_NUMBER__: string
 declare const __BUILD_HASH__: string
@@ -44,6 +46,13 @@ const navSections: NavSection[] = [
 
 export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
   const { user, logout } = useAuthStore()
+  const { data: countData } = useQuery({
+    queryKey: ['notifications-count'],
+    queryFn: () => api.get<{ data: { unread: number } }>('/workspace/notifications/count'),
+    refetchInterval: 30000,
+    enabled: !!user,
+  })
+  const unreadCount = countData?.data?.unread ?? 0
 
   return (
     <aside className="w-60 h-full flex flex-col bg-zinc-50 dark:bg-zinc-900">
@@ -82,7 +91,12 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
                   }
                 >
                   <span className="text-base leading-none">{item.icon}</span>
-                  <span>{item.label}</span>
+                  <span className="flex-1">{item.label}</span>
+                  {item.to === '/notifications' && unreadCount > 0 && (
+                    <span className="ml-auto px-1.5 py-0.5 rounded-full bg-indigo-600 text-white text-[10px] font-bold leading-none">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
                 </NavLink>
               ))}
             </div>
