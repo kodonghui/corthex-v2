@@ -314,6 +314,7 @@ async function handleCreateReport(
 
   if (!title) return JSON.stringify({ error: '보고서 제목이 필요합니다.' })
   if (title.length > 200) return JSON.stringify({ error: '보고서 제목은 200자 이내여야 합니다.' })
+  if (content.length > 50_000) return JSON.stringify({ error: '보고서 내용은 50,000자 이내여야 합니다.' })
 
   const [report] = await db
     .insert(reports)

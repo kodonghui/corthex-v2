@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
 import { api } from '../lib/api'
@@ -82,10 +82,12 @@ export function ReportsPage() {
 
   // 초기 로드 시 코멘트 설정
   const commentsLoaded = commentsData?.data
-  if (commentsLoaded && allComments.length === 0 && commentsLoaded.length > 0) {
-    setAllComments(commentsLoaded)
-    setCommentTotal(commentsData.total)
-  }
+  useEffect(() => {
+    if (commentsLoaded && commentsLoaded.length > 0 && allComments.length === 0) {
+      setAllComments(commentsLoaded)
+      setCommentTotal(commentsData!.total)
+    }
+  }, [commentsLoaded]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadMoreComments = async () => {
     if (!selectedReport || allComments.length === 0) return

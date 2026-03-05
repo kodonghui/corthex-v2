@@ -378,10 +378,12 @@ reportsRoute.post(
       })
       .returning()
 
+    // 작성자 이름 조회 (응답 + 알림 공용)
+    const [commenter] = await db.select({ name: users.name }).from(users).where(eq(users.id, tenant.userId)).limit(1)
+
     // 알림: 코멘트 상대방에게 알림 (fire-and-forget)
     const notifyTarget = report.authorId === tenant.userId ? report.submittedTo : report.authorId
     if (notifyTarget) {
-      const [commenter] = await db.select({ name: users.name }).from(users).where(eq(users.id, tenant.userId)).limit(1)
       createNotification({
         userId: notifyTarget,
         companyId: tenant.companyId,
@@ -392,7 +394,7 @@ reportsRoute.post(
       }).catch(() => {})
     }
 
-    return c.json({ data: comment }, 201)
+    return c.json({ data: { ...comment, authorName: commenter?.name || '' } }, 201)
   },
 )
 
