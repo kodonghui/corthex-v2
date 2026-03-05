@@ -9,7 +9,9 @@ import { HTTPError } from '../../middleware/error'
 import { encrypt } from '../../lib/crypto'
 import { validateCredentials, encryptCredentials } from '../../services/credential-vault'
 
-export const credentialsRoute = new Hono()
+import type { AppEnv } from '../../types'
+
+export const credentialsRoute = new Hono<AppEnv>()
 
 credentialsRoute.use('*', authMiddleware, adminOnly)
 
@@ -62,11 +64,12 @@ credentialsRoute.post('/cli-credentials', zValidator('json', createCliSchema), a
 
 // DELETE /api/admin/cli-credentials/:id — 비활성화
 credentialsRoute.delete('/cli-credentials/:id', async (c) => {
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
   const [cred] = await db
     .update(cliCredentials)
     .set({ isActive: false })
-    .where(eq(cliCredentials.id, id))
+    .where(and(eq(cliCredentials.id, id), eq(cliCredentials.companyId, tenant.companyId)))
     .returning()
   if (!cred) throw new HTTPError(404, 'CLI 토큰을 찾을 수 없습니다', 'CRED_002')
   return c.json({ data: { message: '비활성화되었습니다' } })
@@ -127,8 +130,9 @@ credentialsRoute.post('/api-keys', zValidator('json', createApiKeySchema), async
 
 // DELETE /api/admin/api-keys/:id
 credentialsRoute.delete('/api-keys/:id', async (c) => {
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
-  const [key] = await db.delete(apiKeys).where(eq(apiKeys.id, id)).returning()
+  const [key] = await db.delete(apiKeys).where(and(eq(apiKeys.id, id), eq(apiKeys.companyId, tenant.companyId))).returning()
   if (!key) throw new HTTPError(404, 'API key를 찾을 수 없습니다', 'CRED_003')
   return c.json({ data: { message: '삭제되었습니다' } })
 })

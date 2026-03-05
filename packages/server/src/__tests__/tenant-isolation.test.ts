@@ -260,3 +260,48 @@ describe('CLI 격리: 타사 에이전트로 실행 불가', () => {
     expect(res.status).toBe(404)
   })
 })
+
+// =============================================
+// 9. 도구 시스템: 타사 도구 접근 불가 (P2)
+// =============================================
+describe('도구 시스템: 타사 도구 접근 불가', () => {
+  test('가짜 회사 admin으로 도구 목록 조회 → platform 도구만 반환', async () => {
+    const res = await api('/admin/tools', fakeAdminToken)
+    expect(res.status).toBe(200)
+    const body = await res.json() as { data: { companyId: string | null }[] }
+    // platform 도구(companyId=null)는 보이고, 타사 도구는 보이지 않아야 함
+    for (const tool of body.data) {
+      expect(tool.companyId === null || tool.companyId === FAKE_COMPANY_ID).toBe(true)
+    }
+  })
+
+  test('가짜 회사 admin으로 존재하지 않는 도구 수정 시도 → 404', async () => {
+    const fakeToolId = '99999999-0000-0000-0000-000000000001'
+    const res = await api(`/admin/tools/${fakeToolId}`, fakeAdminToken, {
+      method: 'PUT',
+      body: JSON.stringify({ name: 'HACKED' }),
+    })
+    expect(res.status).toBe(404)
+  })
+})
+
+// =============================================
+// 10. 자격증명: 타사 자격증명 접근 불가 (P2)
+// =============================================
+describe('자격증명: 타사 자격증명 접근 불가', () => {
+  test('가짜 회사 admin으로 타사 API 키 삭제 시도 → 404', async () => {
+    const fakeKeyId = '99999999-0000-0000-0000-000000000002'
+    const res = await api(`/admin/api-keys/${fakeKeyId}`, fakeAdminToken, {
+      method: 'DELETE',
+    })
+    expect(res.status).toBe(404)
+  })
+
+  test('가짜 회사 admin으로 타사 CLI 토큰 삭제 시도 → 404', async () => {
+    const fakeCredId = '99999999-0000-0000-0000-000000000003'
+    const res = await api(`/admin/cli-credentials/${fakeCredId}`, fakeAdminToken, {
+      method: 'DELETE',
+    })
+    expect(res.status).toBe(404)
+  })
+})

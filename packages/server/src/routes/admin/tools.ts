@@ -1,14 +1,16 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { eq, and } from 'drizzle-orm'
+import { eq, and, or, isNull } from 'drizzle-orm'
 import { db } from '../../db'
 import { toolDefinitions, agentTools } from '../../db/schema'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { registry } from '../../lib/tool-handlers'
 
-export const toolsRoute = new Hono()
+import type { AppEnv } from '../../types'
+
+export const toolsRoute = new Hono<AppEnv>()
 
 toolsRoute.use('*', authMiddleware, adminOnly)
 
@@ -49,8 +51,12 @@ toolsRoute.get('/tools', async (c) => {
 
 // GET /api/admin/tools/:id
 toolsRoute.get('/tools/:id', async (c) => {
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
-  const [tool] = await db.select().from(toolDefinitions).where(eq(toolDefinitions.id, id)).limit(1)
+  const [tool] = await db.select().from(toolDefinitions).where(and(
+    eq(toolDefinitions.id, id),
+    or(isNull(toolDefinitions.companyId), eq(toolDefinitions.companyId, tenant.companyId)),
+  )).limit(1)
   if (!tool) throw new HTTPError(404, '도구를 찾을 수 없습니다', 'TOOL_003')
 
   return c.json({
@@ -76,13 +82,18 @@ toolsRoute.post('/tools', zValidator('json', createToolSchema), async (c) => {
 
 // PUT /api/admin/tools/:id
 toolsRoute.put('/tools/:id', zValidator('json', updateToolSchema), async (c) => {
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
   const body = c.req.valid('json')
 
-  const [existing] = await db.select({ id: toolDefinitions.id }).from(toolDefinitions).where(eq(toolDefinitions.id, id)).limit(1)
+  const companyFilter = and(
+    eq(toolDefinitions.id, id),
+    or(isNull(toolDefinitions.companyId), eq(toolDefinitions.companyId, tenant.companyId)),
+  )
+  const [existing] = await db.select({ id: toolDefinitions.id }).from(toolDefinitions).where(companyFilter).limit(1)
   if (!existing) throw new HTTPError(404, '도구를 찾을 수 없습니다', 'TOOL_003')
 
-  const [updated] = await db.update(toolDefinitions).set(body).where(eq(toolDefinitions.id, id)).returning()
+  const [updated] = await db.update(toolDefinitions).set(body).where(companyFilter).returning()
 
   return c.json({
     data: {

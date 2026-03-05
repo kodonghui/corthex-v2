@@ -133,7 +133,7 @@ development_status:
   8-2-tool-definitions-api: review
   8-3-credential-vault-integration: review
   8-4-p2-db-schema: review
-  8-5-isolation-test-p2: backlog
+  8-5-isolation-test-p2: review
   epic-8-retrospective: optional
 
   # ============================================================
