@@ -110,6 +110,7 @@ export type WsChannel =
   | 'notifications'
   | 'messenger'
   | 'activity-log'
+  | 'strategy-notes'
 
 export type WsInboundMessage = {
   type: 'subscribe' | 'unsubscribe'

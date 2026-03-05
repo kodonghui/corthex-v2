@@ -1,9 +1,10 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { eq, and, desc } from 'drizzle-orm'
+import { eq, and, desc, or, inArray, sql } from 'drizzle-orm'
 import { db } from '../../db'
-import { strategyWatchlists, chatSessions, agents, strategyNotes, strategyBacktestResults } from '../../db/schema'
+import { strategyWatchlists, chatSessions, agents, strategyNotes, strategyBacktestResults, strategyNoteShares, users } from '../../db/schema'
+import { broadcastToChannel } from '../../ws/channels'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { getCredentials } from '../../services/credential-vault'
@@ -293,7 +294,7 @@ strategyRoute.get(
 
 // === 전략 노트 ===
 
-// GET /api/workspace/strategy/notes?stockCode=005930 — 종목별 노트 목록
+// GET /api/workspace/strategy/notes?stockCode=005930 — 종목별 노트 목록 (내 메모 + 공유받은 메모)
 strategyRoute.get(
   '/notes',
   zValidator('query', z.object({ stockCode: z.string().min(1).max(20) })),
@@ -301,18 +302,51 @@ strategyRoute.get(
     const tenant = c.get('tenant')
     const { stockCode } = c.req.valid('query')
 
+    // 공유받은 노트 ID 서브쿼리
+    const sharedNoteIds = db
+      .select({ noteId: strategyNoteShares.noteId })
+      .from(strategyNoteShares)
+      .where(and(
+        eq(strategyNoteShares.companyId, tenant.companyId),
+        eq(strategyNoteShares.sharedWithUserId, tenant.userId),
+      ))
+
     const result = await db
-      .select()
+      .select({
+        id: strategyNotes.id,
+        stockCode: strategyNotes.stockCode,
+        title: strategyNotes.title,
+        content: strategyNotes.content,
+        createdAt: strategyNotes.createdAt,
+        updatedAt: strategyNotes.updatedAt,
+        userId: strategyNotes.userId,
+        ownerName: users.name,
+      })
       .from(strategyNotes)
+      .leftJoin(users, eq(strategyNotes.userId, users.id))
       .where(and(
         eq(strategyNotes.companyId, tenant.companyId),
-        eq(strategyNotes.userId, tenant.userId),
         eq(strategyNotes.stockCode, stockCode),
+        or(
+          eq(strategyNotes.userId, tenant.userId),
+          inArray(strategyNotes.id, sharedNoteIds),
+        ),
       ))
       .orderBy(desc(strategyNotes.updatedAt))
       .limit(50)
 
-    return c.json({ data: result })
+    const data = result.map((r) => ({
+      id: r.id,
+      stockCode: r.stockCode,
+      title: r.title,
+      content: r.content,
+      createdAt: r.createdAt,
+      updatedAt: r.updatedAt,
+      isOwner: r.userId === tenant.userId,
+      owner: r.userId !== tenant.userId ? { id: r.userId, name: r.ownerName } : undefined,
+    }))
+
+    return c.json({ data })
   },
 )
 
@@ -348,7 +382,7 @@ const updateNoteSchema = z.object({
   message: '수정할 내용이 없습니다',
 })
 
-// PATCH /api/workspace/strategy/notes/:id — 노트 수정
+// PATCH /api/workspace/strategy/notes/:id — 노트 수정 (작성자 또는 공유 대상)
 strategyRoute.patch(
   '/notes/:id',
   zValidator('param', z.object({ id: z.string().uuid() })),
@@ -358,29 +392,52 @@ strategyRoute.patch(
     const { id } = c.req.valid('param')
     const body = c.req.valid('json')
 
+    // 작성자인지 확인
+    const [note] = await db
+      .select({ userId: strategyNotes.userId })
+      .from(strategyNotes)
+      .where(and(eq(strategyNotes.id, id), eq(strategyNotes.companyId, tenant.companyId)))
+      .limit(1)
+
+    if (!note) throw new HTTPError(404, '노트를 찾을 수 없습니다', 'STRATEGY_020')
+
+    const isOwner = note.userId === tenant.userId
+    if (!isOwner) {
+      // 공유 대상인지 확인
+      const [share] = await db
+        .select()
+        .from(strategyNoteShares)
+        .where(and(
+          eq(strategyNoteShares.noteId, id),
+          eq(strategyNoteShares.sharedWithUserId, tenant.userId),
+        ))
+        .limit(1)
+      if (!share) throw new HTTPError(404, '노트를 찾을 수 없습니다', 'STRATEGY_020')
+    }
+
     const [updated] = await db
       .update(strategyNotes)
       .set({ ...body, updatedAt: new Date() })
-      .where(and(
-        eq(strategyNotes.id, id),
-        eq(strategyNotes.companyId, tenant.companyId),
-        eq(strategyNotes.userId, tenant.userId),
-      ))
+      .where(and(eq(strategyNotes.id, id), eq(strategyNotes.companyId, tenant.companyId)))
       .returning()
 
-    if (!updated) throw new HTTPError(404, '노트를 찾을 수 없습니다', 'STRATEGY_020')
+    // WebSocket 브로드캐스트
+    broadcastToChannel(`strategy-notes::${id}`, { type: 'note-updated', noteId: id })
 
     return c.json({ data: updated })
   },
 )
 
-// DELETE /api/workspace/strategy/notes/:id — 노트 삭제
+// DELETE /api/workspace/strategy/notes/:id — 노트 삭제 (작성자만)
 strategyRoute.delete(
   '/notes/:id',
   zValidator('param', z.object({ id: z.string().uuid() })),
   async (c) => {
     const tenant = c.get('tenant')
     const { id } = c.req.valid('param')
+
+    // 삭제 전 브로드캐스트 (cascade로 shares도 삭제되므로 먼저 전송)
+    broadcastToChannel(`strategy-notes::${id}`, { type: 'note-deleted', noteId: id })
 
     const [deleted] = await db
       .delete(strategyNotes)
@@ -394,6 +451,115 @@ strategyRoute.delete(
     if (!deleted) throw new HTTPError(404, '노트를 찾을 수 없습니다', 'STRATEGY_021')
 
     return c.json({ data: { deleted: true } })
+  },
+)
+
+// === 노트 공유 ===
+
+const shareNoteSchema = z.object({
+  userIds: z.array(z.string().uuid()).min(1).max(20),
+})
+
+// POST /api/workspace/strategy/notes/:id/share — 노트 공유
+strategyRoute.post(
+  '/notes/:id/share',
+  zValidator('param', z.object({ id: z.string().uuid() })),
+  zValidator('json', shareNoteSchema),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const { id } = c.req.valid('param')
+    const { userIds } = c.req.valid('json')
+
+    // 작성자 확인
+    const [note] = await db
+      .select({ userId: strategyNotes.userId })
+      .from(strategyNotes)
+      .where(and(eq(strategyNotes.id, id), eq(strategyNotes.companyId, tenant.companyId)))
+      .limit(1)
+
+    if (!note) throw new HTTPError(404, '노트를 찾을 수 없습니다', 'STRATEGY_051')
+    if (note.userId !== tenant.userId) throw new HTTPError(403, '작성자만 공유할 수 있습니다', 'STRATEGY_050')
+
+    // 자기 자신 제외
+    const targets = userIds.filter((uid) => uid !== tenant.userId)
+    if (targets.length === 0) return c.json({ data: { shared: 0 } })
+
+    // ON CONFLICT DO NOTHING 패턴 (이미 공유된 사용자 무시)
+    await db
+      .insert(strategyNoteShares)
+      .values(targets.map((uid) => ({
+        noteId: id,
+        sharedWithUserId: uid,
+        companyId: tenant.companyId,
+      })))
+      .onConflictDoNothing({ target: [strategyNoteShares.noteId, strategyNoteShares.sharedWithUserId] })
+
+    // 공유 대상에게 notifications 채널로 알림
+    for (const uid of targets) {
+      broadcastToChannel(`notifications::${uid}`, { type: 'note-shared', noteId: id })
+    }
+
+    return c.json({ data: { shared: targets.length } }, 201)
+  },
+)
+
+// DELETE /api/workspace/strategy/notes/:id/share/:userId — 공유 해제
+strategyRoute.delete(
+  '/notes/:id/share/:userId',
+  zValidator('param', z.object({ id: z.string().uuid(), userId: z.string().uuid() })),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const { id, userId } = c.req.valid('param')
+
+    // 작성자 확인
+    const [note] = await db
+      .select({ userId: strategyNotes.userId })
+      .from(strategyNotes)
+      .where(and(eq(strategyNotes.id, id), eq(strategyNotes.companyId, tenant.companyId)))
+      .limit(1)
+
+    if (!note) throw new HTTPError(404, '노트를 찾을 수 없습니다', 'STRATEGY_052')
+    if (note.userId !== tenant.userId) throw new HTTPError(403, '작성자만 공유를 해제할 수 있습니다', 'STRATEGY_050')
+
+    const [removed] = await db
+      .delete(strategyNoteShares)
+      .where(and(
+        eq(strategyNoteShares.noteId, id),
+        eq(strategyNoteShares.sharedWithUserId, userId),
+      ))
+      .returning()
+
+    if (!removed) throw new HTTPError(404, '공유 대상을 찾을 수 없습니다', 'STRATEGY_052')
+
+    // 해제된 사용자에게 알림
+    broadcastToChannel(`notifications::${userId}`, { type: 'note-unshared', noteId: id })
+
+    return c.json({ data: { deleted: true } })
+  },
+)
+
+// GET /api/workspace/strategy/notes/:id/shares — 공유 대상 목록
+strategyRoute.get(
+  '/notes/:id/shares',
+  zValidator('param', z.object({ id: z.string().uuid() })),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const { id } = c.req.valid('param')
+
+    const result = await db
+      .select({
+        userId: strategyNoteShares.sharedWithUserId,
+        userName: users.name,
+        createdAt: strategyNoteShares.createdAt,
+      })
+      .from(strategyNoteShares)
+      .innerJoin(users, eq(strategyNoteShares.sharedWithUserId, users.id))
+      .where(and(
+        eq(strategyNoteShares.noteId, id),
+        eq(strategyNoteShares.companyId, tenant.companyId),
+      ))
+
+    return c.json({ data: result })
   },
 )
 

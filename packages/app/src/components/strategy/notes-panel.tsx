@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../../lib/api'
 import { Button, ConfirmDialog, toast } from '@corthex/ui'
 import { MarkdownRenderer } from '../markdown-renderer'
+import { useWsStore } from '../../stores/ws-store'
 
 type Note = {
   id: string
@@ -12,6 +13,20 @@ type Note = {
   content: string
   createdAt: string
   updatedAt: string
+  isOwner: boolean
+  owner?: { id: string; name: string | null }
+}
+
+type ShareTarget = {
+  userId: string
+  userName: string | null
+  createdAt: string
+}
+
+type CompanyUser = {
+  id: string
+  name: string | null
+  email: string
 }
 
 export function NotesPanel() {
@@ -23,6 +38,9 @@ export function NotesPanel() {
   const [editTitle, setEditTitle] = useState('')
   const [isCreating, setIsCreating] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
+  const [shareTarget, setShareTarget] = useState<string | null>(null)
+
+  const { subscribe, addListener, removeListener } = useWsStore()
 
   const { data: notesRes } = useQuery({
     queryKey: ['strategy-notes', stockCode],
@@ -30,6 +48,45 @@ export function NotesPanel() {
     enabled: !!stockCode,
   })
   const notes = notesRes?.data || []
+
+  // WebSocket: 메모 업데이트 수신 시 쿼리 무효화
+  const handleWsMessage = useCallback((data: unknown) => {
+    const msg = data as { type?: string }
+    if (msg?.type === 'note-updated' || msg?.type === 'note-deleted') {
+      queryClient.invalidateQueries({ queryKey: ['strategy-notes', stockCode] })
+    }
+  }, [queryClient, stockCode])
+
+  useEffect(() => {
+    if (!notes.length) return
+    const noteIds = notes.map((n) => n.id)
+    // 구독 + 리스너 등록
+    noteIds.forEach((id) => {
+      subscribe('strategy-notes', { id })
+      addListener(`strategy-notes::${id}`, handleWsMessage)
+    })
+    return () => {
+      noteIds.forEach((id) => {
+        removeListener(`strategy-notes::${id}`, handleWsMessage)
+      })
+    }
+  }, [notes.map((n) => n.id).join(','), subscribe, addListener, removeListener, handleWsMessage])
+
+  // 공유 대상 목록
+  const { data: sharesRes } = useQuery({
+    queryKey: ['strategy-note-shares', shareTarget],
+    queryFn: () => api.get<{ data: ShareTarget[] }>(`/workspace/strategy/notes/${shareTarget}/shares`),
+    enabled: !!shareTarget,
+  })
+  const currentShares = sharesRes?.data || []
+
+  // 회사 사용자 목록
+  const { data: usersRes } = useQuery({
+    queryKey: ['company-users'],
+    queryFn: () => api.get<{ data: CompanyUser[] }>('/workspace/users'),
+    enabled: !!shareTarget,
+  })
+  const companyUsers = usersRes?.data || []
 
   const createNote = useMutation({
     mutationFn: (body: { stockCode: string; title?: string; content: string }) =>
@@ -62,6 +119,27 @@ export function NotesPanel() {
     onError: () => toast.error('메모 삭제에 실패했습니다'),
   })
 
+  const shareMutation = useMutation({
+    mutationFn: ({ noteId, userIds }: { noteId: string; userIds: string[] }) =>
+      api.post(`/workspace/strategy/notes/${noteId}/share`, { userIds }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['strategy-note-shares', shareTarget] })
+      toast.success('공유되었습니다')
+    },
+    onError: () => toast.error('공유에 실패했습니다'),
+  })
+
+  const unshareMutation = useMutation({
+    mutationFn: ({ noteId, userId }: { noteId: string; userId: string }) =>
+      api.delete(`/workspace/strategy/notes/${noteId}/share/${userId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['strategy-note-shares', shareTarget] })
+      queryClient.invalidateQueries({ queryKey: ['strategy-notes', stockCode] })
+      toast.success('공유가 해제되었습니다')
+    },
+    onError: () => toast.error('공유 해제에 실패했습니다'),
+  })
+
   if (!stockCode) return null
 
   const startEdit = (note: Note) => {
@@ -86,6 +164,17 @@ export function NotesPanel() {
     }
   }
 
+  const sharedUserIds = new Set(currentShares.map((s) => s.userId))
+
+  const toggleShare = (userId: string) => {
+    if (!shareTarget) return
+    if (sharedUserIds.has(userId)) {
+      unshareMutation.mutate({ noteId: shareTarget, userId })
+    } else {
+      shareMutation.mutate({ noteId: shareTarget, userIds: [userId] })
+    }
+  }
+
   const isEditing = isCreating || editingId !== null
 
   return (
@@ -94,7 +183,7 @@ export function NotesPanel() {
         <h3 className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
           메모 ({notes.length})
         </h3>
-        {!isEditing && (
+        {!isEditing && !shareTarget && (
           <Button size="sm" variant="ghost" onClick={startCreate}>+ 새 메모</Button>
         )}
       </div>
@@ -132,7 +221,42 @@ export function NotesPanel() {
         </div>
       )}
 
-      {notes.length === 0 && !isEditing && (
+      {/* 공유 관리 패널 */}
+      {shareTarget && (
+        <div className="border border-zinc-200 dark:border-zinc-700 rounded-lg p-3 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">공유 대상 관리</span>
+            <button
+              onClick={() => setShareTarget(null)}
+              className="text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+            >
+              닫기
+            </button>
+          </div>
+          <div className="space-y-1 max-h-[200px] overflow-y-auto">
+            {companyUsers.length === 0 && (
+              <p className="text-xs text-zinc-400">사용자 목록을 불러오는 중...</p>
+            )}
+            {companyUsers.map((user) => (
+              <label
+                key={user.id}
+                className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-800/50 cursor-pointer text-sm min-h-[32px]"
+              >
+                <input
+                  type="checkbox"
+                  checked={sharedUserIds.has(user.id)}
+                  onChange={() => toggleShare(user.id)}
+                  disabled={shareMutation.isPending || unshareMutation.isPending}
+                  className="rounded border-zinc-300"
+                />
+                <span className="text-zinc-700 dark:text-zinc-300">{user.name || user.email}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {notes.length === 0 && !isEditing && !shareTarget && (
         <p className="text-xs text-zinc-400 py-2">아직 메모가 없습니다</p>
       )}
 
@@ -148,13 +272,25 @@ export function NotesPanel() {
                   {note.title}
                 </p>
               )}
-              <p className="text-xs text-zinc-400 mt-0.5">
-                {new Date(note.updatedAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-              </p>
+              <div className="flex items-center gap-2 mt-0.5">
+                <p className="text-xs text-zinc-400">
+                  {new Date(note.updatedAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                </p>
+                {!note.isOwner && note.owner && (
+                  <span className="text-xs text-blue-500">
+                    {note.owner.name || '알 수 없음'} 공유
+                  </span>
+                )}
+              </div>
             </div>
             <div className="flex gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shrink-0">
               <Button size="sm" variant="ghost" onClick={() => startEdit(note)}>편집</Button>
-              <Button size="sm" variant="ghost" onClick={() => setDeleteTarget(note.id)}>삭제</Button>
+              {note.isOwner && (
+                <>
+                  <Button size="sm" variant="ghost" onClick={() => setShareTarget(note.id)}>공유</Button>
+                  <Button size="sm" variant="ghost" onClick={() => setDeleteTarget(note.id)}>삭제</Button>
+                </>
+              )}
             </div>
           </div>
           <div className="mt-2 text-sm prose prose-sm dark:prose-invert max-w-none line-clamp-4">

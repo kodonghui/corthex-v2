@@ -1,5 +1,5 @@
 import { db } from '../db'
-import { chatSessions, messengerMembers } from '../db/schema'
+import { chatSessions, messengerMembers, strategyNotes, strategyNoteShares } from '../db/schema'
 import { eq, and } from 'drizzle-orm'
 import type { WsClient } from './server'
 import { clientMap } from './server'
@@ -90,6 +90,40 @@ export async function handleSubscription(
         return
       }
       client.subscriptions.add(`activity-log::${client.companyId}`)
+      break
+    }
+
+    case 'strategy-notes': {
+      if (!id) {
+        ws.send(JSON.stringify({ type: 'error', code: 'MISSING_PARAM', channel }))
+        return
+      }
+      // 메모 작성자 또는 공유 대상만 구독 가능
+      const [sNote] = await db
+        .select({ userId: strategyNotes.userId })
+        .from(strategyNotes)
+        .where(and(eq(strategyNotes.id, id), eq(strategyNotes.companyId, client.companyId)))
+        .limit(1)
+      if (!sNote) {
+        ws.send(JSON.stringify({ type: 'error', code: 'FORBIDDEN', channel }))
+        return
+      }
+      const isNoteOwner = sNote.userId === client.userId
+      if (!isNoteOwner) {
+        const [noteShare] = await db
+          .select({ noteId: strategyNoteShares.noteId })
+          .from(strategyNoteShares)
+          .where(and(
+            eq(strategyNoteShares.noteId, id),
+            eq(strategyNoteShares.sharedWithUserId, client.userId),
+          ))
+          .limit(1)
+        if (!noteShare) {
+          ws.send(JSON.stringify({ type: 'error', code: 'FORBIDDEN', channel }))
+          return
+        }
+      }
+      client.subscriptions.add(`strategy-notes::${id}`)
       break
     }
 

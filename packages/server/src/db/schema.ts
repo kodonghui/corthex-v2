@@ -513,6 +513,18 @@ export const strategyNotes = pgTable('strategy_notes', {
   userStockIdx: index('strategy_notes_user_stock_idx').on(table.companyId, table.userId, table.stockCode),
 }))
 
+// === 28a-1. strategy_note_shares — 전략 메모 공유 ===
+export const strategyNoteShares = pgTable('strategy_note_shares', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  noteId: uuid('note_id').notNull().references(() => strategyNotes.id, { onDelete: 'cascade' }),
+  sharedWithUserId: uuid('shared_with_user_id').notNull().references(() => users.id),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  uniqueShare: unique('strategy_note_shares_unique').on(table.noteId, table.sharedWithUserId),
+  userIdx: index('strategy_note_shares_user_idx').on(table.companyId, table.sharedWithUserId),
+}))
+
 // === 28b. strategy_backtest_results — 백테스트 결과 ===
 export const strategyBacktestResults = pgTable('strategy_backtest_results', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -689,9 +701,16 @@ export const strategyWatchlistsRelations = relations(strategyWatchlists, ({ one 
   user: one(users, { fields: [strategyWatchlists.userId], references: [users.id] }),
 }))
 
-export const strategyNotesRelations = relations(strategyNotes, ({ one }) => ({
+export const strategyNotesRelations = relations(strategyNotes, ({ one, many }) => ({
   company: one(companies, { fields: [strategyNotes.companyId], references: [companies.id] }),
   user: one(users, { fields: [strategyNotes.userId], references: [users.id] }),
+  shares: many(strategyNoteShares),
+}))
+
+export const strategyNoteSharesRelations = relations(strategyNoteShares, ({ one }) => ({
+  note: one(strategyNotes, { fields: [strategyNoteShares.noteId], references: [strategyNotes.id] }),
+  sharedWithUser: one(users, { fields: [strategyNoteShares.sharedWithUserId], references: [users.id] }),
+  company: one(companies, { fields: [strategyNoteShares.companyId], references: [companies.id] }),
 }))
 
 export const strategyBacktestResultsRelations = relations(strategyBacktestResults, ({ one }) => ({
