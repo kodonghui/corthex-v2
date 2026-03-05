@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
+import { useAdminStore } from '../stores/admin-store'
+import { useToastStore } from '../stores/toast-store'
 
 type User = { id: string; name: string; username: string; role: string }
 type CliCredential = { id: string; companyId: string; userId: string; label: string; isActive: boolean; createdAt: string }
@@ -8,22 +10,18 @@ type ApiKey = { id: string; companyId: string; userId: string; provider: string;
 
 export function CredentialsPage() {
   const qc = useQueryClient()
+  const selectedCompanyId = useAdminStore((s) => s.selectedCompanyId)
+  const addToast = useToastStore((s) => s.addToast)
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
   const [showAddToken, setShowAddToken] = useState(false)
   const [tokenForm, setTokenForm] = useState({ label: '', token: '' })
   const [showAddApiKey, setShowAddApiKey] = useState(false)
   const [apiKeyForm, setApiKeyForm] = useState({ provider: 'kis' as string, label: '', key: '' })
 
-  const { data: companyData } = useQuery({
-    queryKey: ['companies'],
-    queryFn: () => api.get<{ data: { id: string }[] }>('/admin/companies'),
-  })
-  const companyId = companyData?.data?.[0]?.id
-
   const { data: userData } = useQuery({
-    queryKey: ['users', companyId],
-    queryFn: () => api.get<{ data: User[] }>(`/admin/users?companyId=${companyId}`),
-    enabled: !!companyId,
+    queryKey: ['users', selectedCompanyId],
+    queryFn: () => api.get<{ data: User[] }>(`/admin/users?companyId=${selectedCompanyId}`),
+    enabled: !!selectedCompanyId,
   })
 
   const users = userData?.data || []
@@ -52,12 +50,18 @@ export function CredentialsPage() {
       qc.invalidateQueries({ queryKey: ['cli-credentials'] })
       setShowAddToken(false)
       setTokenForm({ label: '', token: '' })
+      addToast({ type: 'success', message: 'CLI 토큰이 등록되었습니다' })
     },
+    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
 
   const deactivateTokenMutation = useMutation({
     mutationFn: (id: string) => api.delete(`/admin/cli-credentials/${id}`),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['cli-credentials'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['cli-credentials'] })
+      addToast({ type: 'success', message: 'CLI 토큰이 비활성화되었습니다' })
+    },
+    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
 
   const addApiKeyMutation = useMutation({
@@ -67,15 +71,23 @@ export function CredentialsPage() {
       qc.invalidateQueries({ queryKey: ['api-keys'] })
       setShowAddApiKey(false)
       setApiKeyForm({ provider: 'kis', label: '', key: '' })
+      addToast({ type: 'success', message: 'API 키가 등록되었습니다' })
     },
+    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
 
   const deleteApiKeyMutation = useMutation({
     mutationFn: (id: string) => api.delete(`/admin/api-keys/${id}`),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['api-keys'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['api-keys'] })
+      addToast({ type: 'success', message: 'API 키가 삭제되었습니다' })
+    },
+    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
 
   const selectedUser = users.find((u) => u.id === selectedUserId)
+
+  if (!selectedCompanyId) return <div className="p-8 text-center text-zinc-500">회사를 선택하세요</div>
 
   return (
     <div className="space-y-6">
@@ -154,9 +166,9 @@ export function CredentialsPage() {
                   <form
                     onSubmit={(e) => {
                       e.preventDefault()
-                      if (!companyId || !selectedUserId) return
+                      if (!selectedCompanyId || !selectedUserId) return
                       addTokenMutation.mutate({
-                        companyId,
+                        companyId: selectedCompanyId,
                         userId: selectedUserId,
                         label: tokenForm.label,
                         token: tokenForm.token,
@@ -269,9 +281,9 @@ export function CredentialsPage() {
                   <form
                     onSubmit={(e) => {
                       e.preventDefault()
-                      if (!companyId || !selectedUserId) return
+                      if (!selectedCompanyId || !selectedUserId) return
                       addApiKeyMutation.mutate({
-                        companyId,
+                        companyId: selectedCompanyId,
                         userId: selectedUserId,
                         provider: apiKeyForm.provider,
                         ...(apiKeyForm.label ? { label: apiKeyForm.label } : {}),

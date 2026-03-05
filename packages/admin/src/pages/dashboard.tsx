@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { Card, CardContent, Badge, StatusDot, Skeleton } from '@corthex/ui'
+import { useAdminStore } from '../stores/admin-store'
 
-type Company = { id: string; name: string; slug: string; isActive: boolean }
 type User = { id: string; name: string; username: string; role: string; isActive: boolean }
 type Agent = { id: string; name: string; role: string; status: string; isActive: boolean }
 type Department = { id: string; name: string }
@@ -23,44 +23,37 @@ function StatCard({ label, value, isLoading }: { label: string; value: number; i
 }
 
 export function DashboardPage() {
-  const { data: companyData, isLoading: companyLoading } = useQuery({
-    queryKey: ['companies'],
-    queryFn: () => api.get<{ data: Company[] }>('/admin/companies'),
-  })
-
-  const companyId = companyData?.data?.[0]?.id
+  const selectedCompanyId = useAdminStore((s) => s.selectedCompanyId)
 
   const { data: userData, isLoading: userLoading } = useQuery({
-    queryKey: ['users', companyId],
-    queryFn: () => api.get<{ data: User[] }>(`/admin/users?companyId=${companyId}`),
-    enabled: !!companyId,
+    queryKey: ['users', selectedCompanyId],
+    queryFn: () => api.get<{ data: User[] }>(`/admin/users?companyId=${selectedCompanyId}`),
+    enabled: !!selectedCompanyId,
   })
 
   const { data: agentData, isLoading: agentLoading } = useQuery({
-    queryKey: ['agents', companyId],
-    queryFn: () => api.get<{ data: Agent[] }>(`/admin/agents?companyId=${companyId}`),
-    enabled: !!companyId,
+    queryKey: ['agents', selectedCompanyId],
+    queryFn: () => api.get<{ data: Agent[] }>(`/admin/agents?companyId=${selectedCompanyId}`),
+    enabled: !!selectedCompanyId,
   })
 
   const { data: deptData } = useQuery({
-    queryKey: ['departments', companyId],
-    queryFn: () => api.get<{ data: Department[] }>(`/admin/departments?companyId=${companyId}`),
-    enabled: !!companyId,
+    queryKey: ['departments', selectedCompanyId],
+    queryFn: () => api.get<{ data: Department[] }>(`/admin/departments?companyId=${selectedCompanyId}`),
+    enabled: !!selectedCompanyId,
   })
 
-  const company = companyData?.data?.[0]
   const users = userData?.data || []
   const agents = agentData?.data || []
   const depts = deptData?.data || []
-  const isLoading = companyLoading || userLoading || agentLoading
+  const isLoading = userLoading || agentLoading
+
+  if (!selectedCompanyId) return <div className="p-8 text-center text-zinc-500">회사를 선택하세요</div>
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">대시보드</h1>
-        {company && (
-          <p className="text-sm text-zinc-500 mt-0.5">{company.name} &middot; {company.slug}</p>
-        )}
       </div>
 
       {/* 통계 카드 */}

@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
+import { useAdminStore } from '../stores/admin-store'
+import { useToastStore } from '../stores/toast-store'
 
 type Agent = {
   id: string; companyId: string; name: string; role: string
@@ -11,26 +13,22 @@ type Department = { id: string; name: string }
 
 export function AgentsPage() {
   const qc = useQueryClient()
+  const selectedCompanyId = useAdminStore((s) => s.selectedCompanyId)
+  const addToast = useToastStore((s) => s.addToast)
   const [showCreate, setShowCreate] = useState(false)
   const [editAgent, setEditAgent] = useState<Agent | null>(null)
   const [form, setForm] = useState({ name: '', role: '', departmentId: '', soul: '' })
 
-  const { data: companyData } = useQuery({
-    queryKey: ['companies'],
-    queryFn: () => api.get<{ data: { id: string }[] }>('/admin/companies'),
-  })
-  const companyId = companyData?.data?.[0]?.id
-
   const { data: agentData, isLoading } = useQuery({
-    queryKey: ['agents', companyId],
-    queryFn: () => api.get<{ data: Agent[] }>(`/admin/agents?companyId=${companyId}`),
-    enabled: !!companyId,
+    queryKey: ['agents', selectedCompanyId],
+    queryFn: () => api.get<{ data: Agent[] }>(`/admin/agents?companyId=${selectedCompanyId}`),
+    enabled: !!selectedCompanyId,
   })
 
   const { data: deptData } = useQuery({
-    queryKey: ['departments', companyId],
-    queryFn: () => api.get<{ data: Department[] }>(`/admin/departments?companyId=${companyId}`),
-    enabled: !!companyId,
+    queryKey: ['departments', selectedCompanyId],
+    queryFn: () => api.get<{ data: Department[] }>(`/admin/departments?companyId=${selectedCompanyId}`),
+    enabled: !!selectedCompanyId,
   })
 
   const agents = agentData?.data || []
@@ -43,7 +41,9 @@ export function AgentsPage() {
       qc.invalidateQueries({ queryKey: ['agents'] })
       setShowCreate(false)
       setForm({ name: '', role: '', departmentId: '', soul: '' })
+      addToast({ type: 'success', message: '에이전트가 생성되었습니다' })
     },
+    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
 
   const updateMutation = useMutation({
@@ -52,12 +52,18 @@ export function AgentsPage() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['agents'] })
       setEditAgent(null)
+      addToast({ type: 'success', message: '에이전트가 수정되었습니다' })
     },
+    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
 
   const deactivateMutation = useMutation({
     mutationFn: (id: string) => api.delete(`/admin/agents/${id}`),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['agents'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['agents'] })
+      addToast({ type: 'success', message: '에이전트가 비활성화되었습니다' })
+    },
+    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
 
   const statusColors: Record<string, string> = {
@@ -66,6 +72,8 @@ export function AgentsPage() {
     error: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300',
     offline: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400',
   }
+
+  if (!selectedCompanyId) return <div className="p-8 text-center text-zinc-500">회사를 선택하세요</div>
 
   return (
     <div className="space-y-6">
@@ -88,9 +96,9 @@ export function AgentsPage() {
           <form
             onSubmit={(e) => {
               e.preventDefault()
-              if (!companyId) return
+              if (!selectedCompanyId) return
               createMutation.mutate({
-                companyId,
+                companyId: selectedCompanyId,
                 name: form.name,
                 role: form.role,
                 ...(form.departmentId ? { departmentId: form.departmentId } : {}),

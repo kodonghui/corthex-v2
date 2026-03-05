@@ -2,31 +2,29 @@ import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { Card, CardContent, Badge, Button, Skeleton } from '@corthex/ui'
+import { useAdminStore } from '../stores/admin-store'
+import { useToastStore } from '../stores/toast-store'
 
 type User = { id: string; name: string; username: string; role: string }
 type ReportLine = { id: string; userId: string; reportsToUserId: string | null }
 
 export function ReportLinesPage() {
   const qc = useQueryClient()
+  const selectedCompanyId = useAdminStore((s) => s.selectedCompanyId)
+  const addToast = useToastStore((s) => s.addToast)
   const [lines, setLines] = useState<Record<string, string>>({})
   const [hasChanges, setHasChanges] = useState(false)
 
-  const { data: companyData } = useQuery({
-    queryKey: ['companies'],
-    queryFn: () => api.get<{ data: { id: string }[] }>('/admin/companies'),
-  })
-  const companyId = companyData?.data?.[0]?.id
-
   const { data: userData, isLoading: usersLoading } = useQuery({
-    queryKey: ['users', companyId],
-    queryFn: () => api.get<{ data: User[] }>(`/admin/users?companyId=${companyId}`),
-    enabled: !!companyId,
+    queryKey: ['users', selectedCompanyId],
+    queryFn: () => api.get<{ data: User[] }>(`/admin/users?companyId=${selectedCompanyId}`),
+    enabled: !!selectedCompanyId,
   })
 
   const { data: reportLineData, isLoading: linesLoading } = useQuery({
-    queryKey: ['report-lines', companyId],
-    queryFn: () => api.get<{ data: ReportLine[] }>(`/admin/report-lines?companyId=${companyId}`),
-    enabled: !!companyId,
+    queryKey: ['report-lines', selectedCompanyId],
+    queryFn: () => api.get<{ data: ReportLine[] }>(`/admin/report-lines?companyId=${selectedCompanyId}`),
+    enabled: !!selectedCompanyId,
   })
 
   const users = userData?.data || []
@@ -52,7 +50,9 @@ export function ReportLinesPage() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['report-lines'] })
       setHasChanges(false)
+      addToast({ type: 'success', message: '보고 라인이 저장되었습니다' })
     },
+    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
 
   const handleChange = (userId: string, reportsTo: string) => {
@@ -61,13 +61,15 @@ export function ReportLinesPage() {
   }
 
   const handleSave = () => {
-    if (!companyId) return
+    if (!selectedCompanyId) return
     const payload = users.map((u) => ({
       userId: u.id,
       reportsToUserId: lines[u.id] || null,
     }))
-    saveMutation.mutate({ companyId, lines: payload })
+    saveMutation.mutate({ companyId: selectedCompanyId, lines: payload })
   }
+
+  if (!selectedCompanyId) return <div className="p-8 text-center text-zinc-500">회사를 선택하세요</div>
 
   return (
     <div className="space-y-6">

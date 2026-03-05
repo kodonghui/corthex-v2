@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
+import { useAdminStore } from '../stores/admin-store'
+import { useToastStore } from '../stores/toast-store'
 
 type Tool = {
   id: string; companyId: string; name: string; description: string | null
@@ -11,27 +13,23 @@ type AgentTool = { id: string; agentId: string; toolId: string; isEnabled: boole
 
 export function ToolsPage() {
   const qc = useQueryClient()
+  const selectedCompanyId = useAdminStore((s) => s.selectedCompanyId)
+  const addToast = useToastStore((s) => s.addToast)
   const [showCreate, setShowCreate] = useState(false)
   const [form, setForm] = useState({ name: '', description: '', scope: 'company' })
   const [selectedTool, setSelectedTool] = useState<string | null>(null)
   const [assignAgentId, setAssignAgentId] = useState('')
 
-  const { data: companyData } = useQuery({
-    queryKey: ['companies'],
-    queryFn: () => api.get<{ data: { id: string }[] }>('/admin/companies'),
-  })
-  const companyId = companyData?.data?.[0]?.id
-
   const { data: toolData, isLoading } = useQuery({
-    queryKey: ['tools', companyId],
-    queryFn: () => api.get<{ data: Tool[] }>(`/admin/tools?companyId=${companyId}`),
-    enabled: !!companyId,
+    queryKey: ['tools', selectedCompanyId],
+    queryFn: () => api.get<{ data: Tool[] }>(`/admin/tools?companyId=${selectedCompanyId}`),
+    enabled: !!selectedCompanyId,
   })
 
   const { data: agentData } = useQuery({
-    queryKey: ['agents', companyId],
-    queryFn: () => api.get<{ data: Agent[] }>(`/admin/agents?companyId=${companyId}`),
-    enabled: !!companyId,
+    queryKey: ['agents', selectedCompanyId],
+    queryFn: () => api.get<{ data: Agent[] }>(`/admin/agents?companyId=${selectedCompanyId}`),
+    enabled: !!selectedCompanyId,
   })
 
   const tools = toolData?.data || []
@@ -62,7 +60,9 @@ export function ToolsPage() {
       qc.invalidateQueries({ queryKey: ['tools'] })
       setShowCreate(false)
       setForm({ name: '', description: '', scope: 'company' })
+      addToast({ type: 'success', message: '도구가 생성되었습니다' })
     },
+    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
 
   const assignMutation = useMutation({
@@ -71,18 +71,28 @@ export function ToolsPage() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['agent-tools-by-agent'] })
       setAssignAgentId('')
+      addToast({ type: 'success', message: '에이전트에 도구가 배정되었습니다' })
     },
+    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
 
   const toggleMutation = useMutation({
     mutationFn: ({ id, isEnabled }: { id: string; isEnabled: boolean }) =>
       api.patch(`/admin/agent-tools/${id}`, { isEnabled }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['agent-tools-by-agent'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['agent-tools-by-agent'] })
+      addToast({ type: 'success', message: '도구 상태가 변경되었습니다' })
+    },
+    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
 
   const unassignMutation = useMutation({
     mutationFn: (id: string) => api.delete(`/admin/agent-tools/${id}`),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['agent-tools-by-agent'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['agent-tools-by-agent'] })
+      addToast({ type: 'success', message: '도구 배정이 해제되었습니다' })
+    },
+    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
 
   const scopeColors: Record<string, string> = {
@@ -90,6 +100,8 @@ export function ToolsPage() {
     company: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
     department: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
   }
+
+  if (!selectedCompanyId) return <div className="p-8 text-center text-zinc-500">회사를 선택하세요</div>
 
   return (
     <div className="space-y-6">
@@ -112,8 +124,8 @@ export function ToolsPage() {
           <form
             onSubmit={(e) => {
               e.preventDefault()
-              if (!companyId) return
-              createMutation.mutate({ companyId, ...form })
+              if (!selectedCompanyId) return
+              createMutation.mutate({ companyId: selectedCompanyId, ...form })
             }}
             className="space-y-4"
           >
@@ -218,8 +230,8 @@ export function ToolsPage() {
                 </select>
                 <button
                   onClick={() => {
-                    if (!companyId || !assignAgentId || !selectedTool) return
-                    assignMutation.mutate({ companyId, agentId: assignAgentId, toolId: selectedTool })
+                    if (!selectedCompanyId || !assignAgentId || !selectedTool) return
+                    assignMutation.mutate({ companyId: selectedCompanyId, agentId: assignAgentId, toolId: selectedTool })
                   }}
                   disabled={!assignAgentId || assignMutation.isPending}
                   className="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs font-medium rounded-lg transition-colors"
