@@ -1,6 +1,6 @@
 # Story 10.5: 전략 데이터 내보내기 — 관심종목·노트·차트 CSV/MD 다운로드
 
-Status: review
+Status: done
 
 ## Story
 

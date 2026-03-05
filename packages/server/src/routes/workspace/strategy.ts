@@ -411,6 +411,12 @@ const exportSchema = z.object({
 
 const BOM = '\uFEFF'
 
+function csvSafe(val: string): string {
+  let s = val.replace(/"/g, '""')
+  if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`
+  return `"${s}"`
+}
+
 // GET /api/workspace/strategy/export — 전략 데이터 내보내기
 strategyRoute.get('/export', zValidator('query', exportSchema), async (c) => {
   const tenant = c.get('tenant')
@@ -425,7 +431,7 @@ strategyRoute.get('/export', zValidator('query', exportSchema), async (c) => {
       .where(and(eq(strategyWatchlists.companyId, tenant.companyId), eq(strategyWatchlists.userId, tenant.userId)))
 
     const csv = BOM + '종목코드,종목명,시장\n' + rows.map((r) =>
-      `${r.stockCode},${r.stockName.replace(/,/g, ' ')},${r.market}`,
+      `${csvSafe(r.stockCode)},${csvSafe(r.stockName)},${csvSafe(r.market)}`,
     ).join('\n')
 
     const filename = `watchlist-${today}.csv`
@@ -461,9 +467,8 @@ strategyRoute.get('/export', zValidator('query', exportSchema), async (c) => {
 
     // notes CSV
     const csv = BOM + '종목코드,제목,내용,수정일\n' + notes.map((n) => {
-      const content = n.content.replace(/"/g, '""').replace(/\n/g, ' ')
-      const title = (n.title || '').replace(/"/g, '""')
-      return `${stockCode},"${title}","${content}",${new Date(n.updatedAt).toLocaleDateString('ko-KR')}`
+      const content = n.content.replace(/\n/g, ' ')
+      return `${csvSafe(stockCode!)},${csvSafe(n.title || '')},${csvSafe(content)},${csvSafe(new Date(n.updatedAt).toLocaleDateString('ko-KR'))}`
     }).join('\n')
 
     const filename = `notes-${stockCode}-${today}.csv`
@@ -520,8 +525,8 @@ strategyRoute.get('/export', zValidator('query', exportSchema), async (c) => {
       .reverse()
       .slice(-count)
 
-    const csv = BOM + '날짜,시가,고가,저가,종가,거래량\n' + candles.map((c) =>
-      `${c.time},${c.open},${c.high},${c.low},${c.close},${c.volume}`,
+    const csv = BOM + '날짜,시가,고가,저가,종가,거래량\n' + candles.map((row) =>
+      `${row.time},${row.open},${row.high},${row.low},${row.close},${row.volume}`,
     ).join('\n')
 
     const filename = `chart-${stockCode}-${count}d-${today}.csv`
