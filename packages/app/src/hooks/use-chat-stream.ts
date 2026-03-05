@@ -12,15 +12,17 @@ export type ToolCall = {
   error?: boolean
 }
 
-export type DelegationStatus = {
+export type DelegationItem = {
   targetAgentName: string
   targetAgentId: string
   status: 'delegating' | 'completed' | 'failed'
   durationMs?: number
-} | null
+}
+
+export type DelegationStatus = DelegationItem | null
 
 type StreamEvent = {
-  type: 'token' | 'tool-start' | 'tool-end' | 'done' | 'error' | 'delegation-start' | 'delegation-end'
+  type: 'token' | 'tool-start' | 'tool-end' | 'done' | 'error' | 'delegation-start' | 'delegation-end' | 'delegation-chain'
   content?: string
   toolName?: string
   toolId?: string
@@ -41,7 +43,7 @@ export function useChatStream(sessionId: string | null) {
   const [isStreaming, setIsStreaming] = useState(false)
   const [toolCalls, setToolCalls] = useState<ToolCall[]>([])
   const [error, setError] = useState<string | null>(null)
-  const [delegationStatus, setDelegationStatus] = useState<DelegationStatus>(null)
+  const [delegations, setDelegations] = useState<DelegationItem[]>([])
   const queryClient = useQueryClient()
   const { subscribe, addListener, removeListener, isConnected } = useWsStore()
   const subscribedRef = useRef<string | null>(null)
@@ -77,25 +79,42 @@ export function useChatStream(sessionId: string | null) {
           )
           break
         case 'delegation-start':
-          setDelegationStatus({
-            targetAgentName: event.targetAgentName || '',
-            targetAgentId: event.targetAgentId || '',
-            status: 'delegating',
+          setDelegations((prev) => {
+            const item: DelegationItem = {
+              targetAgentName: event.targetAgentName || '',
+              targetAgentId: event.targetAgentId || '',
+              status: 'delegating',
+            }
+            const idx = prev.findIndex((d) => d.targetAgentId === item.targetAgentId)
+            if (idx >= 0) {
+              const next = [...prev]
+              next[idx] = item
+              return next
+            }
+            return [...prev, item]
           })
           break
         case 'delegation-end':
-          setDelegationStatus({
-            targetAgentName: event.targetAgentName || '',
-            targetAgentId: event.targetAgentId || '',
-            status: (event.status as 'completed' | 'failed') || 'completed',
-            durationMs: event.durationMs,
-          })
+          setDelegations((prev) =>
+            prev.map((d) =>
+              d.targetAgentId === (event.targetAgentId || '')
+                ? {
+                    ...d,
+                    status: (event.status as 'completed' | 'failed') || 'completed',
+                    durationMs: event.durationMs,
+                  }
+                : d,
+            ),
+          )
           // 위임 완료 시 위임 내역 쿼리 갱신
           queryClient.invalidateQueries({ queryKey: ['delegations', sessionId] })
           break
+        case 'delegation-chain':
+          // 향후 사용 예정 (위임 체인 추적)
+          break
         case 'done':
           // refetch 완료 후 스트리밍 상태 초기화 (깜빡임 방지)
-          setDelegationStatus(null)
+          setDelegations([])
           Promise.all([
             queryClient.invalidateQueries({ queryKey: ['messages', sessionId] }),
             queryClient.invalidateQueries({ queryKey: ['sessions'] }),
@@ -109,7 +128,7 @@ export function useChatStream(sessionId: string | null) {
           break
         case 'error':
           setIsStreaming(false)
-          setDelegationStatus(null)
+          setDelegations([])
           setError(event.message || '응답 중 오류가 발생했습니다')
           break
       }
@@ -125,7 +144,7 @@ export function useChatStream(sessionId: string | null) {
     setStreamingText('')
     setToolCalls([])
     setError(null)
-    setDelegationStatus(null)
+    setDelegations([])
   }, [])
 
   const stopStream = useCallback(() => {
@@ -136,5 +155,8 @@ export function useChatStream(sessionId: string | null) {
     setError(null)
   }, [])
 
-  return { streamingText, isStreaming, toolCalls, error, delegationStatus, startStream, stopStream, clearError }
+  // 하위 호환: delegationStatus는 첫 번째 활성 위임을 반환
+  const delegationStatus: DelegationStatus = delegations.find((d) => d.status === 'delegating') || null
+
+  return { streamingText, isStreaming, toolCalls, error, delegations, delegationStatus, startStream, stopStream, clearError }
 }

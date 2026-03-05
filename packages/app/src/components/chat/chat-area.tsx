@@ -77,7 +77,7 @@ export function ChatArea({
   const prevConnected = useRef(true)
   const prevScrollHeightRef = useRef(0)
   const { isConnected } = useWsStore()
-  const { streamingText, isStreaming, toolCalls, error, delegationStatus, startStream, stopStream, clearError } = useChatStream(sessionId)
+  const { streamingText, isStreaming, toolCalls, error, delegations, startStream, stopStream, clearError } = useChatStream(sessionId)
 
   const {
     data: messagesData,
@@ -284,9 +284,9 @@ export function ChatArea({
               )}
             </div>
             <p className="text-xs text-zinc-400">
-              {delegationStatus?.status === 'delegating' ? (
+              {delegations.filter(d => d.status === 'delegating').length > 0 ? (
                 <span className="text-indigo-500 dark:text-indigo-400 animate-pulse">
-                  → {delegationStatus.targetAgentName}에게 위임 중...
+                  → {delegations.filter(d => d.status === 'delegating').map(d => d.targetAgentName).join(', ')}에게 위임 중...
                 </span>
               ) : (
                 agent.role
@@ -485,8 +485,8 @@ export function ChatArea({
                     </div>
                     {agent.isSecretary && (
                       <span className="text-xs text-zinc-400">
-                        {delegationStatus?.targetAgentName
-                          ? `${delegationStatus.targetAgentName}에게 위임 중...`
+                        {delegations.filter(d => d.status === 'delegating').length > 0
+                          ? `${delegations.filter(d => d.status === 'delegating').map(d => d.targetAgentName).join(', ')}에게 위임 중...`
                           : '부서 위임 분석 중...'}
                       </span>
                     )}
