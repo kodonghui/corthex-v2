@@ -1,6 +1,6 @@
 # Story 9.3: 파일/스크린샷 도구 — 노션 읽기/쓰기 + 텍스트 파일 생성
 
-Status: review
+Status: done
 
 ## Story
 

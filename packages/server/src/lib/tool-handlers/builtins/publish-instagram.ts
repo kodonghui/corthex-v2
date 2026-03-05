@@ -32,6 +32,7 @@ export const publishInstagram: ToolHandler = async (input, ctx) => {
         caption,
         access_token: accessToken,
       }),
+      signal: AbortSignal.timeout(30_000),
     })
 
     if (!containerRes.ok) {
@@ -52,6 +53,7 @@ export const publishInstagram: ToolHandler = async (input, ctx) => {
         creation_id: container.id,
         access_token: accessToken,
       }),
+      signal: AbortSignal.timeout(30_000),
     })
 
     if (!publishRes.ok) {

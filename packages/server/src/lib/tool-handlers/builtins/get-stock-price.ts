@@ -36,6 +36,7 @@ export const getStockPrice: ToolHandler = async (input, ctx) => {
 
     const res = await fetch(`${KIS_BASE_URL}/uapi/domestic-stock/v1/quotations/inquire-price?${params}`, {
       headers: kisHeaders(token, creds.app_key, creds.app_secret, 'FHKST01010100'),
+      signal: AbortSignal.timeout(30_000),
     })
 
     if (!res.ok) {

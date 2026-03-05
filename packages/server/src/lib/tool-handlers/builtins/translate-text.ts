@@ -28,9 +28,10 @@ export const translateText: ToolHandler = async (input, ctx) => {
     const body: Record<string, unknown> = { q: text, target: targetLang, format: 'text' }
     if (sourceLang) body.source = sourceLang
 
-    const res = await fetch(`https://translation.googleapis.com/language/translate/v2?key=${creds.api_key}`, {
+    const res = await fetch('https://translation.googleapis.com/language/translate/v2', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': creds.api_key },
+      signal: AbortSignal.timeout(30_000),
       body: JSON.stringify(body),
     })
 

@@ -1,6 +1,6 @@
 # Story 9.4: KIS 증권 도구 — 주식 시세 조회 + 잔고 조회 + 주문
 
-Status: review
+Status: done
 
 ## Story
 

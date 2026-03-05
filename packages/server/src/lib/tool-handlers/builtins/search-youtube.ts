@@ -34,6 +34,7 @@ export const searchYoutube: ToolHandler = async (input, ctx) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ q: query, num: 5 }),
+      signal: AbortSignal.timeout(30_000),
     })
 
     if (!res.ok) {

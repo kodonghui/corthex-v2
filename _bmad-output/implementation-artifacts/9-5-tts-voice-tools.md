@@ -1,6 +1,6 @@
 # Story 9.5: TTS/음성 도구 — 텍스트 음성 변환
 
-Status: review
+Status: done
 
 ## Story
 

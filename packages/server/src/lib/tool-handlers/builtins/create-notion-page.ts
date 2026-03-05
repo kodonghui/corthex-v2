@@ -35,6 +35,7 @@ export const createNotionPage: ToolHandler = async (input, ctx) => {
       title: { title: [{ text: { content: title } }] },
     },
     children: paragraphs.slice(0, 100),
+    ...(paragraphs.length > 100 && { _truncated: true }),
   }
 
   try {
@@ -46,6 +47,7 @@ export const createNotionPage: ToolHandler = async (input, ctx) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
+      signal: AbortSignal.timeout(30_000),
     })
 
     if (!res.ok) {
@@ -55,9 +57,10 @@ export const createNotionPage: ToolHandler = async (input, ctx) => {
 
     const data = (await res.json()) as NotionPageResponse
 
+    const truncMsg = paragraphs.length > 100 ? ` (내용이 100줄을 초과하여 일부가 잘렸습니다)` : ''
     return JSON.stringify({
       success: true,
-      message: `페이지가 생성되었습니다: ${title}`,
+      message: `페이지가 생성되었습니다: ${title}${truncMsg}`,
       pageId: data.id,
       url: data.url,
     })

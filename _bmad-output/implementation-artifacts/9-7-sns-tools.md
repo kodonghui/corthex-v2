@@ -1,6 +1,6 @@
 # Story 9.7: SNS 도구 — 인스타그램 게시물 발행 + 요약 통계
 
-Status: review
+Status: done
 
 ## Story
 

@@ -1,6 +1,6 @@
 # Story 9.6: 이미지 생성 도구 — AI 이미지 생성 + 번역 도구
 
-Status: review
+Status: done
 
 ## Story
 

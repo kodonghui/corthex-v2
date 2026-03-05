@@ -52,6 +52,7 @@ export const getAccountBalance: ToolHandler = async (input, ctx) => {
 
     const res = await fetch(`${KIS_BASE_URL}/uapi/domestic-stock/v1/trading/inquire-balance?${params}`, {
       headers: kisHeaders(token, creds.app_key, creds.app_secret, 'TTTC8434R'),
+      signal: AbortSignal.timeout(30_000),
     })
 
     if (!res.ok) {

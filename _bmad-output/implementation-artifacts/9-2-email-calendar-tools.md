@@ -1,6 +1,6 @@
 # Story 9.2: 이메일/캘린더 도구 — SMTP 이메일 발송 + 구글 캘린더 조회/생성
 
-Status: review
+Status: done
 
 ## Story
 

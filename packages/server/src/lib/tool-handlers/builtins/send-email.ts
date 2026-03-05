@@ -3,7 +3,7 @@ import { sendEmail } from '../../email-sender'
 
 export const sendEmailTool: ToolHandler = async (input, ctx) => {
   const to = String(input.to || '')
-  const subject = String(input.subject || '')
+  const subject = String(input.subject || '').replace(/[\r\n]/g, ' ')
   const body = String(input.body || '')
 
   if (!to || !subject) {

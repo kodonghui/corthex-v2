@@ -35,6 +35,7 @@ export const generateImage: ToolHandler = async (input, ctx) => {
         n: 1,
         size,
       }),
+      signal: AbortSignal.timeout(60_000),
     })
 
     if (!res.ok) {

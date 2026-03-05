@@ -139,15 +139,15 @@ development_status:
   # ============================================================
   # Epic 9: 도구 카탈로그 20종+ (P2)
   # ============================================================
-  epic-9: in-progress
-  9-1-search-tools: review
-  9-2-email-calendar-tools: review
-  9-3-file-screenshot-tools: review
-  9-4-kis-trading-tools: review
-  9-5-tts-voice-tools: review
-  9-6-image-gen-tools: review
-  9-7-sns-tools: review
-  epic-9-retrospective: optional
+  epic-9: done
+  9-1-search-tools: done
+  9-2-email-calendar-tools: done
+  9-3-file-screenshot-tools: done
+  9-4-kis-trading-tools: done
+  9-5-tts-voice-tools: done
+  9-6-image-gen-tools: done
+  9-7-sns-tools: done
+  epic-9-retrospective: done
 
   # ============================================================
   # Epic 10: 전략실 (P2) — 파티모드 후 9개 스토리로 확장

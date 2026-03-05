@@ -17,6 +17,7 @@ export async function getKisToken(appKey: string, appSecret: string): Promise<st
   const res = await fetch(`${KIS_BASE_URL}/oauth2/tokenP`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    signal: AbortSignal.timeout(30_000),
     body: JSON.stringify({
       grant_type: 'client_credentials',
       appkey: appKey,

@@ -1,7 +1,7 @@
 import type { ToolHandler } from '../types'
 
 export const generateTextFile: ToolHandler = (input) => {
-  const filename = String(input.filename || 'output.txt')
+  const filename = String(input.filename || 'output.txt').replace(/[/\\:*?"<>|]/g, '_')
   const content = String(input.content || '')
   const format = String(input.format || 'text')
 

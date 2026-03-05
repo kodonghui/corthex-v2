@@ -28,6 +28,10 @@ export const placeStockOrder: ToolHandler = async (input, ctx) => {
     return JSON.stringify({ success: false, message: 'side는 "buy" 또는 "sell"이어야 합니다.' })
   }
 
+  if (price < 0) {
+    return JSON.stringify({ success: false, message: '가격(price)은 0 이상이어야 합니다.' })
+  }
+
   let creds: Record<string, string>
   try {
     creds = await ctx.getCredentials('kis')
@@ -56,6 +60,7 @@ export const placeStockOrder: ToolHandler = async (input, ctx) => {
       method: 'POST',
       headers: kisHeaders(token, creds.app_key, creds.app_secret, trId),
       body: JSON.stringify(body),
+      signal: AbortSignal.timeout(30_000),
     })
 
     if (!res.ok) {

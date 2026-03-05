@@ -1,6 +1,6 @@
 # Story 9.1: 검색 도구 카탈로그 — Serper 기반 뉴스/이미지/유튜브/장소 검색 + 시드 카테고리
 
-Status: review
+Status: done
 
 ## Story
 

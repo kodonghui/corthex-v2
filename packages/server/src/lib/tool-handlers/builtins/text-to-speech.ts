@@ -23,9 +23,10 @@ export const textToSpeech: ToolHandler = async (input, ctx) => {
   const speed = Number(input.speed || 1.0)
 
   try {
-    const res = await fetch(`https://texttospeech.googleapis.com/v1/text:synthesize?key=${creds.api_key}`, {
+    const res = await fetch('https://texttospeech.googleapis.com/v1/text:synthesize', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': creds.api_key },
+      signal: AbortSignal.timeout(30_000),
       body: JSON.stringify({
         input: { text },
         voice: { languageCode: language, ssmlGender: 'FEMALE' },

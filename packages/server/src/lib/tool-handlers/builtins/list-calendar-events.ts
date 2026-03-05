@@ -32,7 +32,7 @@ export const listCalendarEvents: ToolHandler = async (input, ctx) => {
   try {
     const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events?key=${creds.api_key}&timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&orderBy=startTime&maxResults=10`
 
-    const res = await fetch(url)
+    const res = await fetch(url, { signal: AbortSignal.timeout(30_000) })
 
     if (!res.ok) {
       const errText = await res.text()

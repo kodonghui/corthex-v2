@@ -45,6 +45,7 @@ export const readNotionPage: ToolHandler = async (input, ctx) => {
         'Authorization': `Bearer ${creds.api_key}`,
         'Notion-Version': '2022-06-28',
       },
+      signal: AbortSignal.timeout(30_000),
     })
 
     if (!res.ok) {

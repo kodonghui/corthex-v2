@@ -28,7 +28,8 @@ export const getInstagramInsights: ToolHandler = async (input, ctx) => {
   try {
     // Account basic info
     const accountRes = await fetch(
-      `${GRAPH_API}/${pageId}?fields=followers_count,media_count&access_token=${accessToken}`,
+      `${GRAPH_API}/${pageId}?fields=followers_count,media_count`,
+      { headers: { 'Authorization': `Bearer ${accessToken}` }, signal: AbortSignal.timeout(30_000) },
     )
 
     if (!accountRes.ok) {
@@ -40,7 +41,8 @@ export const getInstagramInsights: ToolHandler = async (input, ctx) => {
 
     // Insights (impressions, reach)
     const insightsRes = await fetch(
-      `${GRAPH_API}/${pageId}/insights?metric=impressions,reach&period=day&access_token=${accessToken}`,
+      `${GRAPH_API}/${pageId}/insights?metric=impressions,reach&period=day`,
+      { headers: { 'Authorization': `Bearer ${accessToken}` }, signal: AbortSignal.timeout(30_000) },
     )
 
     let impressions = 0

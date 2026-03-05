@@ -46,6 +46,7 @@ export const createCalendarEvent: ToolHandler = async (input, ctx) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(event),
+      signal: AbortSignal.timeout(30_000),
     })
 
     if (!res.ok) {
