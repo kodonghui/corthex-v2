@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../../lib/api'
 import { useWsStore } from '../../stores/ws-store'
 import { useChatStream } from '../../hooks/use-chat-stream'
@@ -28,14 +28,26 @@ export function ChatArea({
   const [showDelegations, setShowDelegations] = useState(false)
   const [reconnectBanner, setReconnectBanner] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
   const prevConnected = useRef(true)
+  const prevScrollHeightRef = useRef(0)
   const { isConnected } = useWsStore()
   const { streamingText, isStreaming, toolCalls, error, startStream, stopStream, clearError } = useChatStream(sessionId)
 
-  const { data: messagesData } = useQuery({
+  const {
+    data: messagesData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
     queryKey: ['messages', sessionId],
-    queryFn: () =>
-      api.get<{ data: Message[] }>(`/workspace/chat/sessions/${sessionId}/messages`),
+    queryFn: ({ pageParam }: { pageParam: string | undefined }) =>
+      api.get<{ data: Message[]; hasMore: boolean }>(
+        `/workspace/chat/sessions/${sessionId}/messages${pageParam ? `?before=${pageParam}` : ''}`,
+      ),
+    getNextPageParam: (lastPage) =>
+      lastPage.hasMore ? lastPage.data[0]?.id : undefined,
+    initialPageParam: undefined as string | undefined,
     enabled: !!sessionId,
   })
 
@@ -80,22 +92,55 @@ export function ChatArea({
     }
   }
 
-  // 자동 스크롤
+  // 자동 스크롤 (새 메시지/스트리밍 시 하단으로)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messagesData?.data, streamingText, isStreaming])
+    if (!isFetchingNextPage) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [messagesData, streamingText, isStreaming, isFetchingNextPage])
 
-  // 연결 상태 배너
+  // 이전 메시지 로드 시 스크롤 위치 유지
+  useEffect(() => {
+    if (!isFetchingNextPage && prevScrollHeightRef.current > 0) {
+      const el = scrollContainerRef.current
+      if (el) {
+        const newScrollHeight = el.scrollHeight
+        el.scrollTop = newScrollHeight - prevScrollHeightRef.current
+      }
+      prevScrollHeightRef.current = 0
+    }
+  }, [isFetchingNextPage])
+
+  // 위로 스크롤 시 이전 메시지 로드
+  const handleScroll = useCallback(() => {
+    const el = scrollContainerRef.current
+    if (!el || !hasNextPage || isFetchingNextPage) return
+    if (el.scrollTop < 100) {
+      prevScrollHeightRef.current = el.scrollHeight
+      fetchNextPage()
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
+
+  // 연결 상태 배너 + 재연결 시 누락 메시지 보충
   useEffect(() => {
     if (!prevConnected.current && isConnected) {
       setReconnectBanner(true)
       const timer = setTimeout(() => setReconnectBanner(false), 2000)
+      // 재연결 시 활성 세션 데이터 새로고침
+      if (sessionId) {
+        queryClient.invalidateQueries({ queryKey: ['messages', sessionId] })
+        queryClient.invalidateQueries({ queryKey: ['tool-calls', sessionId] })
+      }
+      prevConnected.current = isConnected
       return () => clearTimeout(timer)
     }
     prevConnected.current = isConnected
-  }, [isConnected])
+  }, [isConnected, sessionId, queryClient])
 
-  const messages = messagesData?.data || []
+  const messages = useMemo(
+    () => messagesData?.pages.flatMap((p) => p.data) || [],
+    [messagesData],
+  )
   const delegationList = delegationsData?.data || []
   const savedToolCalls = toolCallsData?.data || []
 
@@ -252,7 +297,31 @@ export function ChatArea({
       ) : (
         <>
           {/* 메시지 목록 */}
-          <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 space-y-4">
+          <div
+            ref={scrollContainerRef}
+            onScroll={handleScroll}
+            className="flex-1 overflow-y-auto px-4 md:px-6 py-4 space-y-4"
+          >
+            {/* 이전 메시지 로딩 스피너 */}
+            {isFetchingNextPage && (
+              <div className="flex justify-center py-2">
+                <div className="w-5 h-5 border-2 border-zinc-300 border-t-indigo-500 rounded-full animate-spin" />
+              </div>
+            )}
+            {hasNextPage && !isFetchingNextPage && (
+              <div className="text-center py-1">
+                <button
+                  onClick={() => {
+                    const el = scrollContainerRef.current
+                    if (el) prevScrollHeightRef.current = el.scrollHeight
+                    fetchNextPage()
+                  }}
+                  className="text-xs text-indigo-500 hover:underline"
+                >
+                  이전 메시지 더 보기
+                </button>
+              </div>
+            )}
             {messages.length === 0 && !isStreaming && (
               <div className="text-center text-zinc-400 text-sm mt-8">
                 {agent.isSecretary ? (

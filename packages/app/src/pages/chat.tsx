@@ -1,4 +1,5 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { SessionPanel } from '../components/chat/session-panel'
@@ -9,9 +10,13 @@ import type { Agent, Session } from '../components/chat/types'
 
 export function ChatPage() {
   const queryClient = useQueryClient()
-  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(
+    searchParams.get('session'),
+  )
   const [showAgentModal, setShowAgentModal] = useState(false)
-  const [showChat, setShowChat] = useState(false) // 모바일 전환
+  const [showChat, setShowChat] = useState(!!searchParams.get('session'))
+  const [autoSelectDone, setAutoSelectDone] = useState(false)
 
   const { data: agentsData } = useQuery({
     queryKey: ['agents'],
@@ -27,8 +32,7 @@ export function ChatPage() {
     mutationFn: (agentId: string) =>
       api.post<{ data: Session }>('/workspace/chat/sessions', { agentId }),
     onSuccess: (res) => {
-      setSelectedSessionId(res.data.id)
-      setShowChat(true)
+      selectSession(res.data.id)
       queryClient.invalidateQueries({ queryKey: ['sessions'] })
     },
   })
@@ -50,6 +54,7 @@ export function ChatPage() {
       if (selectedSessionId === deletedId) {
         setSelectedSessionId(null)
         setShowChat(false)
+        setSearchParams({}, { replace: true })
       }
       queryClient.invalidateQueries({ queryKey: ['sessions'] })
       toast.success('대화가 삭제되었습니다')
@@ -59,6 +64,27 @@ export function ChatPage() {
 
   const agents = agentsData?.data || []
   const sessions = sessionsData?.data || []
+
+  // 세션 선택 공통 함수 (URL 동기화 포함)
+  const selectSession = useCallback(
+    (id: string) => {
+      setSelectedSessionId(id)
+      setShowChat(true)
+      setSearchParams({ session: id }, { replace: true })
+    },
+    [setSearchParams],
+  )
+
+  // 자동 세션 선택: URL에 session 없고 세션이 존재하면 가장 최근 세션 선택
+  useEffect(() => {
+    if (autoSelectDone || sessions.length === 0) return
+    setAutoSelectDone(true)
+
+    if (!selectedSessionId && sessions.length > 0) {
+      // sessions는 lastMessageAt DESC 정렬됨 (서버에서)
+      selectSession(sessions[0].id)
+    }
+  }, [sessions, selectedSessionId, autoSelectDone, selectSession])
 
   const selectedSession = useMemo(
     () => sessions.find((s) => s.id === selectedSessionId) || null,
@@ -73,22 +99,22 @@ export function ChatPage() {
   const handleAgentSelect = useCallback(
     (agent: Agent) => {
       setShowAgentModal(false)
-      // 기존 세션 찾기
       const existing = sessions.find((s) => s.agentId === agent.id)
       if (existing) {
-        setSelectedSessionId(existing.id)
-        setShowChat(true)
+        selectSession(existing.id)
       } else {
         createSession.mutate(agent.id)
       }
     },
-    [sessions, createSession],
+    [sessions, createSession, selectSession],
   )
 
-  const handleSessionSelect = useCallback((sessionId: string) => {
-    setSelectedSessionId(sessionId)
-    setShowChat(true)
-  }, [])
+  const handleSessionSelect = useCallback(
+    (sessionId: string) => {
+      selectSession(sessionId)
+    },
+    [selectSession],
+  )
 
   const handleRename = useCallback(
     (sessionId: string, title: string) => {
@@ -124,7 +150,10 @@ export function ChatPage() {
         <ChatArea
           agent={selectedAgent}
           sessionId={selectedSessionId}
-          onBack={() => setShowChat(false)}
+          onBack={() => {
+            setShowChat(false)
+            setSearchParams({}, { replace: true })
+          }}
         />
       </div>
 

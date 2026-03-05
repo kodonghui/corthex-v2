@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { eq, and, desc } from 'drizzle-orm'
+import { eq, and, desc, lt } from 'drizzle-orm'
 import { db } from '../../db'
 import { chatSessions, chatMessages, agents, delegations, toolCalls } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
@@ -72,10 +72,13 @@ chatRoute.post('/sessions', zValidator('json', createSessionSchema), async (c) =
   return c.json({ data: session }, 201)
 })
 
-// GET /api/workspace/chat/sessions/:sessionId/messages — 세션 메시지 조회
+// GET /api/workspace/chat/sessions/:sessionId/messages — 세션 메시지 조회 (cursor 페이지네이션)
 chatRoute.get('/sessions/:sessionId/messages', async (c) => {
   const tenant = c.get('tenant')
   const sessionId = c.req.param('sessionId')
+  const before = c.req.query('before') // cursor: 이 메시지 ID보다 이전
+  const rawLimit = Number(c.req.query('limit')) || 50
+  const limit = Math.min(Math.max(rawLimit, 1), 100)
 
   // 세션이 내 것인지 확인
   const [session] = await db
@@ -86,13 +89,31 @@ chatRoute.get('/sessions/:sessionId/messages', async (c) => {
 
   if (!session) throw new HTTPError(404, '세션을 찾을 수 없습니다', 'CHAT_002')
 
+  // cursor가 있으면 해당 메시지의 createdAt보다 이전 것 조회
+  const conditions = [eq(chatMessages.sessionId, sessionId)]
+  if (before) {
+    const [cursorMsg] = await db
+      .select({ createdAt: chatMessages.createdAt })
+      .from(chatMessages)
+      .where(and(eq(chatMessages.id, before), eq(chatMessages.sessionId, sessionId)))
+      .limit(1)
+    if (cursorMsg) {
+      conditions.push(lt(chatMessages.createdAt, cursorMsg.createdAt))
+    }
+  }
+
   const messages = await db
     .select()
     .from(chatMessages)
-    .where(eq(chatMessages.sessionId, sessionId))
-    .orderBy(chatMessages.createdAt)
+    .where(and(...conditions))
+    .orderBy(desc(chatMessages.createdAt))
+    .limit(limit + 1) // +1로 hasMore 판별
 
-  return c.json({ data: messages })
+  const hasMore = messages.length > limit
+  if (hasMore) messages.pop()
+  messages.reverse() // createdAt ASC로 반환
+
+  return c.json({ data: messages, hasMore })
 })
 
 // POST /api/workspace/chat/sessions/:sessionId/messages — 메시지 전송
