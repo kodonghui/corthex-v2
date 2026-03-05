@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useBlocker } from 'react-router-dom'
 import Markdown from 'react-markdown'
-import { ConfirmDialog } from '@corthex/ui'
+import { ConfirmDialog, Select, Textarea } from '@corthex/ui'
 import { api } from '../../lib/api'
 import { toast } from '@corthex/ui'
 
@@ -121,16 +121,12 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
       </div>
 
       {/* 에이전트 드롭다운 */}
-      <select
+      <Select
         value={selectedAgent}
         onChange={(e) => handleAgentChange(e.target.value)}
-        className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm"
-      >
-        <option value="">에이전트 선택 (내 에이전트 {agents.length}개)</option>
-        {agents.map((a) => (
-          <option key={a.id} value={a.id}>{a.name}</option>
-        ))}
-      </select>
+        placeholder={`에이전트 선택 (내 에이전트 ${agents.length}개)`}
+        options={agents.map((a) => ({ value: a.id, label: a.name }))}
+      />
 
       {selectedAgent && detail && (
         <>
@@ -177,12 +173,12 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
             {/* 편집기 */}
             <div className={`flex-1 ${mobileTab !== 'edit' ? 'hidden md:block' : ''}`}>
               <div className="relative">
-                <textarea
+                <Textarea
                   value={soulText}
                   onChange={(e) => setSoulText(e.target.value)}
                   rows={12}
                   placeholder="에이전트의 성격, 역할, 말투를 마크다운으로 정의..."
-                  className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm resize-none font-mono leading-relaxed"
+                  className="font-mono leading-relaxed"
                 />
                 {/* 글자 수 카운터 */}
                 <span

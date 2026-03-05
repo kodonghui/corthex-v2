@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAuthStore } from '../stores/auth-store'
+import { Select, Textarea } from '@corthex/ui'
 
 type SnsContent = {
   id: string
@@ -205,17 +206,12 @@ export function SnsPage() {
 
           {createMode === 'manual' && (
             <>
-              <select value={form.platform} onChange={(e) => setForm({ ...form, platform: e.target.value })}
-                className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm">
-                <option value="instagram">인스타그램</option>
-                <option value="tistory">티스토리</option>
-                <option value="daum_cafe">다음 카페</option>
-              </select>
+              <Select value={form.platform} onChange={(e) => setForm({ ...form, platform: e.target.value })}
+                options={[{ value: 'instagram', label: '인스타그램' }, { value: 'tistory', label: '티스토리' }, { value: 'daum_cafe', label: '다음 카페' }]} />
               <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })}
                 placeholder="제목" className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm" />
-              <textarea value={form.body} onChange={(e) => setForm({ ...form, body: e.target.value })}
-                placeholder="본문 내용" rows={6}
-                className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm resize-none" />
+              <Textarea value={form.body} onChange={(e) => setForm({ ...form, body: e.target.value })}
+                placeholder="본문 내용" rows={6} />
               <input value={form.hashtags} onChange={(e) => setForm({ ...form, hashtags: e.target.value })}
                 placeholder="해시태그 (#태그1 #태그2)" className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm" />
               <button onClick={() => createManual.mutate(form)} disabled={!form.title || !form.body || createManual.isPending}
@@ -227,17 +223,11 @@ export function SnsPage() {
 
           {createMode === 'ai' && (
             <>
-              <select value={aiForm.platform} onChange={(e) => setAiForm({ ...aiForm, platform: e.target.value })}
-                className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm">
-                <option value="instagram">인스타그램</option>
-                <option value="tistory">티스토리</option>
-                <option value="daum_cafe">다음 카페</option>
-              </select>
-              <select value={aiForm.agentId} onChange={(e) => setAiForm({ ...aiForm, agentId: e.target.value })}
-                className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm">
-                <option value="">에이전트 선택</option>
-                {agents.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
-              </select>
+              <Select value={aiForm.platform} onChange={(e) => setAiForm({ ...aiForm, platform: e.target.value })}
+                options={[{ value: 'instagram', label: '인스타그램' }, { value: 'tistory', label: '티스토리' }, { value: 'daum_cafe', label: '다음 카페' }]} />
+              <Select value={aiForm.agentId} onChange={(e) => setAiForm({ ...aiForm, agentId: e.target.value })}
+                placeholder="에이전트 선택"
+                options={agents.map((a) => ({ value: a.id, label: a.name }))} />
               <input value={aiForm.topic} onChange={(e) => setAiForm({ ...aiForm, topic: e.target.value })}
                 placeholder="주제 (예: AI 자동화 마케팅 트렌드)" className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm" />
               <button onClick={() => generateAi.mutate(aiForm)} disabled={!aiForm.agentId || !aiForm.topic || generateAi.isPending}

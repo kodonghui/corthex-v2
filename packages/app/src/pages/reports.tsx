@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAuthStore } from '../stores/auth-store'
+import { Textarea } from '@corthex/ui'
 
 type Report = {
   id: string
@@ -279,12 +280,11 @@ export function ReportsPage() {
               placeholder="보고서 제목"
               className="w-full px-4 py-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
-            <textarea
+            <Textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="보고서 내용을 작성하세요..."
               rows={16}
-              className="w-full px-4 py-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm leading-relaxed resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <div className="flex gap-3">
               <button
@@ -337,11 +337,10 @@ export function ReportsPage() {
                     onChange={(e) => setTitle(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
-                  <textarea
+                  <Textarea
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     rows={14}
-                    className="w-full px-4 py-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm leading-relaxed resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                   <div className="flex gap-3">
                     <button

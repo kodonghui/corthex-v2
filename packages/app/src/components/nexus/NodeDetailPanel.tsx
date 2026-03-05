@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../../lib/api'
 import { useState, useEffect } from 'react'
 import type { Node } from '@xyflow/react'
+import { Select } from '@corthex/ui'
 
 type Props = {
   selectedNode: Node | null
@@ -89,18 +90,11 @@ export function NodeDetailPanel({ selectedNode, onClose }: Props) {
 
             <div>
               <label className="block text-xs text-zinc-500 mb-1">부서 이동</label>
-              <select
+              <Select
                 value={deptId}
                 onChange={(e) => setDeptId(e.target.value)}
-                className="w-full px-2 py-1.5 border border-zinc-300 dark:border-zinc-600 rounded text-sm bg-white dark:bg-zinc-800"
-              >
-                <option value="">미배정</option>
-                {departments.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.name}
-                  </option>
-                ))}
-              </select>
+                options={[{ value: '', label: '미배정' }, ...departments.map((d) => ({ value: d.id, label: d.name }))]}
+              />
               <button
                 onClick={handleReassign}
                 disabled={reassign.isPending}

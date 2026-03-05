@@ -2,7 +2,8 @@ import { useState, useRef, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
 import { api } from '../lib/api'
-import { Badge, toast } from '@corthex/ui'
+import { Badge, toast, Tabs, Select } from '@corthex/ui'
+import type { TabItem } from '@corthex/ui'
 import { SoulEditor } from '../components/settings/soul-editor'
 
 type TelegramConfig = {
@@ -48,19 +49,19 @@ const PROVIDER_FIELDS: Record<string, { key: string; label: string; type: string
 
 const PROVIDER_OPTIONS = Object.keys(PROVIDER_FIELDS) as (keyof typeof PROVIDER_FIELDS)[]
 
-const TABS = [
-  { key: 'api', label: 'API 연동', shortLabel: 'API', enabled: true },
-  { key: 'telegram', label: '텔레그램', shortLabel: '텔레', enabled: true },
-  { key: 'soul', label: '소울 편집', shortLabel: '소울', enabled: true },
-  { key: 'files', label: '파일 관리', shortLabel: '파일', enabled: false },
-  { key: 'trading', label: '매매 설정', shortLabel: '매매', enabled: false },
-  { key: 'notifications', label: '알림 설정', shortLabel: '알림', enabled: false },
+const TABS: TabItem[] = [
+  { value: 'api', label: 'API 연동', shortLabel: 'API' },
+  { value: 'telegram', label: '텔레그램', shortLabel: '텔레' },
+  { value: 'soul', label: '소울 편집', shortLabel: '소울' },
+  { value: 'files', label: '파일 관리', shortLabel: '파일', disabled: true },
+  { value: 'trading', label: '매매 설정', shortLabel: '매매', disabled: true },
+  { value: 'notifications', label: '알림 설정', shortLabel: '알림', disabled: true },
 ]
 
 export function SettingsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const rawTab = searchParams.get('tab') || 'api'
-  const validTab = TABS.find((t) => t.key === rawTab && t.enabled)
+  const validTab = TABS.find((t) => t.value === rawTab && !t.disabled)
   const activeTab = validTab ? rawTab : 'api'
 
   const soulDirtyRef = useRef(false)
@@ -81,32 +82,7 @@ export function SettingsPage() {
       <h2 className="text-2xl font-bold mb-4">설정</h2>
 
       {/* 탭 네비게이션 */}
-      <div className="overflow-x-auto snap-x snap-mandatory mb-6 -mx-4 px-4 md:mx-0 md:px-0">
-        <div className="flex border-b border-zinc-200 dark:border-zinc-800 min-w-max">
-          {TABS.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => tab.enabled && setTab(tab.key)}
-              className={`relative px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors min-w-[100px] text-center snap-start ${
-                activeTab === tab.key
-                  ? 'text-indigo-600 dark:text-indigo-400'
-                  : tab.enabled
-                    ? 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
-                    : 'text-zinc-300 dark:text-zinc-600 cursor-default'
-              }`}
-            >
-              <span className="hidden md:inline">{tab.label}</span>
-              <span className="md:hidden">{tab.shortLabel}</span>
-              {!tab.enabled && (
-                <span className="ml-1 text-[10px] text-zinc-400 dark:text-zinc-600">준비 중</span>
-              )}
-              {activeTab === tab.key && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600 dark:bg-indigo-400" />
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
+      <Tabs items={TABS} value={activeTab} onChange={setTab} className="mb-6" />
 
       {/* 탭 컨텐츠 */}
       <div className={activeTab === 'soul' ? 'max-w-3xl' : 'max-w-lg'}>
@@ -212,15 +188,11 @@ function ApiKeyTab() {
           <div className="mb-4 p-4 rounded-lg border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950 space-y-3">
             <div>
               <label className="block text-xs font-medium text-zinc-500 mb-1">서비스</label>
-              <select
+              <Select
                 value={formProvider}
                 onChange={(e) => handleProviderChange(e.target.value)}
-                className="w-full px-3 py-2 rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm"
-              >
-                {PROVIDER_OPTIONS.map((p) => (
-                  <option key={p} value={p}>{PROVIDER_LABELS[p] || p}</option>
-                ))}
-              </select>
+                options={PROVIDER_OPTIONS.map((p) => ({ value: p, label: PROVIDER_LABELS[p] || p }))}
+              />
             </div>
             <div>
               <label className="block text-xs font-medium text-zinc-500 mb-1">라벨 (선택)</label>

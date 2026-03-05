@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
+import { Select, Textarea } from '@corthex/ui'
 
 type Agent = {
   id: string
@@ -108,27 +109,23 @@ export function JobsPage() {
           <div className="p-5 rounded-lg border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950 space-y-4">
             <div>
               <label className="block text-xs font-medium text-zinc-500 mb-1">담당 에이전트</label>
-              <select
+              <Select
                 value={selectedAgent}
                 onChange={(e) => setSelectedAgent(e.target.value)}
-                className="w-full px-3 py-2 rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm"
-              >
-                <option value="">에이전트 선택...</option>
-                {agentList.map((agent) => (
-                  <option key={agent.id} value={agent.id}>
-                    {agent.name} {agent.isSecretary ? '(비서)' : ''} — {agent.role}
-                  </option>
-                ))}
-              </select>
+                placeholder="에이전트 선택..."
+                options={agentList.map((agent) => ({
+                  value: agent.id,
+                  label: `${agent.name} ${agent.isSecretary ? '(비서)' : ''} — ${agent.role}`,
+                }))}
+              />
             </div>
             <div>
               <label className="block text-xs font-medium text-zinc-500 mb-1">작업 지시</label>
-              <textarea
+              <Textarea
                 value={instruction}
                 onChange={(e) => setInstruction(e.target.value)}
                 placeholder="예: 이번 달 마케팅 채널별 성과를 분석해서 보고서로 정리해줘"
                 rows={3}
-                className="w-full px-3 py-2 rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm resize-none"
               />
             </div>
             <button
