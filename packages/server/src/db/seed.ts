@@ -141,8 +141,88 @@ async function seed() {
     console.log(`  ✓ 에이전트: ${agent.name} → ${ceo.name}`)
   }
 
-  // 6. 플랫폼 공통 도구
-  const toolDefs = [
+  // 6. 내장 도구 (핸들러 등록됨)
+  const builtinTools = [
+    {
+      name: 'get_current_time',
+      description: '현재 시각(KST)을 반환합니다',
+      handler: 'get_current_time',
+      scope: 'platform' as const,
+      inputSchema: { type: 'object', properties: {} },
+    },
+    {
+      name: 'calculate',
+      description: '수학 수식을 계산합니다',
+      handler: 'calculate',
+      scope: 'platform' as const,
+      inputSchema: {
+        type: 'object',
+        properties: { expression: { type: 'string', description: '계산할 수식 (예: 2+3*4)' } },
+        required: ['expression'],
+      },
+    },
+    {
+      name: 'search_department_knowledge',
+      description: '부서 지식 베이스에서 정보를 검색합니다',
+      handler: 'search_department_knowledge',
+      scope: 'platform' as const,
+      inputSchema: {
+        type: 'object',
+        properties: { query: { type: 'string', description: '검색어' } },
+        required: ['query'],
+      },
+    },
+    {
+      name: 'get_company_info',
+      description: '회사 기본 정보를 조회합니다',
+      handler: 'get_company_info',
+      scope: 'platform' as const,
+      inputSchema: { type: 'object', properties: {} },
+    },
+    {
+      name: 'search_web',
+      description: '웹에서 정보를 검색합니다 (개발 중)',
+      handler: 'search_web',
+      scope: 'platform' as const,
+      inputSchema: {
+        type: 'object',
+        properties: { query: { type: 'string', description: '검색어' } },
+        required: ['query'],
+      },
+    },
+    {
+      name: 'create_report',
+      description: '보고서를 자동 생성합니다',
+      handler: 'create_report',
+      scope: 'platform' as const,
+      inputSchema: {
+        type: 'object',
+        properties: {
+          title: { type: 'string', description: '보고서 제목 (200자 이내)' },
+          content: { type: 'string', description: '보고서 본문 (마크다운, 50000자 이내)' },
+        },
+        required: ['title'],
+      },
+    },
+  ]
+
+  for (const def of builtinTools) {
+    const [tool] = await db
+      .insert(toolDefinitions)
+      .values({
+        companyId: null,
+        name: def.name,
+        description: def.description,
+        handler: def.handler,
+        scope: def.scope,
+        inputSchema: def.inputSchema,
+      })
+      .returning()
+    console.log(`  ✓ 내장 도구: ${tool.name} (handler: ${def.handler})`)
+  }
+
+  // 7. 외부 서비스 도구 (핸들러 미구현 — Epic 9에서 추가)
+  const externalTools = [
     { name: '일정 관리', description: '구글 캘린더 연동', scope: 'platform' as const },
     { name: '이메일', description: '이메일 발송/수신 요약', scope: 'platform' as const },
     { name: 'KIS 증권', description: 'KIS 증권 API 연동', scope: 'company' as const, companyId: company.id },
@@ -150,12 +230,12 @@ async function seed() {
     { name: '텔레그램', description: '텔레그램 봇 메시지', scope: 'platform' as const },
   ]
 
-  for (const def of toolDefs) {
+  for (const def of externalTools) {
     const [tool] = await db
       .insert(toolDefinitions)
       .values({ companyId: def.companyId ?? null, name: def.name, description: def.description, scope: def.scope })
       .returning()
-    console.log(`  ✓ 도구: ${tool.name}`)
+    console.log(`  ✓ 외부 도구: ${tool.name}`)
   }
 
   console.log('\n✅ 시드 완료!')
