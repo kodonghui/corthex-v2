@@ -339,8 +339,56 @@ async function seed() {
         required: ['title', 'startTime', 'endTime'],
       },
     },
+    {
+      name: 'read_notion_page',
+      description: '노션 페이지 내용을 읽어옵니다',
+      handler: 'read_notion_page',
+      scope: 'platform' as const,
+      category: 'content',
+      tags: ['notion', 'api', 'document'],
+      inputSchema: {
+        type: 'object',
+        properties: {
+          pageId: { type: 'string', description: '노션 페이지 ID' },
+        },
+        required: ['pageId'],
+      },
+    },
+    {
+      name: 'create_notion_page',
+      description: '노션에 새 페이지를 생성합니다',
+      handler: 'create_notion_page',
+      scope: 'platform' as const,
+      category: 'content',
+      tags: ['notion', 'api', 'document'],
+      inputSchema: {
+        type: 'object',
+        properties: {
+          parentId: { type: 'string', description: '부모 페이지 ID' },
+          title: { type: 'string', description: '페이지 제목' },
+          content: { type: 'string', description: '페이지 내용 (텍스트)' },
+        },
+        required: ['parentId', 'title'],
+      },
+    },
+    {
+      name: 'generate_text_file',
+      description: '텍스트/마크다운/CSV 파일 내용을 생성합니다',
+      handler: 'generate_text_file',
+      scope: 'platform' as const,
+      category: 'content',
+      tags: ['file', 'text', 'builtin'],
+      inputSchema: {
+        type: 'object',
+        properties: {
+          filename: { type: 'string', description: '파일명 (예: report.md)' },
+          content: { type: 'string', description: '파일 내용' },
+          format: { type: 'string', description: '형식: text, markdown, csv (기본 text)' },
+        },
+        required: ['content'],
+      },
+    },
     { name: 'KIS 증권', description: 'KIS 증권 API 연동', scope: 'company' as const, companyId: company.id },
-    { name: '노션 연동', description: '노션 페이지 읽기/쓰기', scope: 'platform' as const },
     { name: '텔레그램', description: '텔레그램 봇 메시지', scope: 'platform' as const },
   ]
 

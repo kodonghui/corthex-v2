@@ -11,6 +11,9 @@ import { searchPlaces } from './builtins/search-places'
 import { sendEmailTool } from './builtins/send-email'
 import { listCalendarEvents } from './builtins/list-calendar-events'
 import { createCalendarEvent } from './builtins/create-calendar-event'
+import { readNotionPage } from './builtins/read-notion-page'
+import { createNotionPage } from './builtins/create-notion-page'
+import { generateTextFile } from './builtins/generate-text-file'
 import { createReport } from './builtins/create-report'
 
 // 내장 핸들러 등록
@@ -26,6 +29,9 @@ registry.register('search_places', searchPlaces)
 registry.register('send_email', sendEmailTool)
 registry.register('list_calendar_events', listCalendarEvents)
 registry.register('create_calendar_event', createCalendarEvent)
+registry.register('read_notion_page', readNotionPage)
+registry.register('create_notion_page', createNotionPage)
+registry.register('generate_text_file', generateTextFile)
 registry.register('create_report', createReport)
 
 export { registry } from './registry'
