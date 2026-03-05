@@ -17,7 +17,7 @@ export function AgentsPage() {
   const addToast = useToastStore((s) => s.addToast)
   const [showCreate, setShowCreate] = useState(false)
   const [editAgent, setEditAgent] = useState<Agent | null>(null)
-  const [form, setForm] = useState({ name: '', role: '', departmentId: '', soul: '' })
+  const [form, setForm] = useState({ name: '', role: '', departmentId: '', soul: '', isSecretary: false })
 
   const { data: agentData, isLoading } = useQuery({
     queryKey: ['agents', selectedCompanyId],
@@ -40,7 +40,7 @@ export function AgentsPage() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['agents'] })
       setShowCreate(false)
-      setForm({ name: '', role: '', departmentId: '', soul: '' })
+      setForm({ name: '', role: '', departmentId: '', soul: '', isSecretary: false })
       addToast({ type: 'success', message: '에이전트가 생성되었습니다' })
     },
     onError: (err: Error) => addToast({ type: 'error', message: err.message }),
@@ -101,6 +101,7 @@ export function AgentsPage() {
                 companyId: selectedCompanyId,
                 name: form.name,
                 role: form.role,
+                isSecretary: form.isSecretary,
                 ...(form.departmentId ? { departmentId: form.departmentId } : {}),
                 ...(form.soul ? { soul: form.soul } : {}),
               })
@@ -140,6 +141,16 @@ export function AgentsPage() {
                   ))}
                 </select>
               </div>
+            </div>
+            <div className="flex items-center gap-2 col-span-2">
+              <input
+                type="checkbox"
+                id="isSecretary"
+                checked={form.isSecretary}
+                onChange={(e) => setForm({ ...form, isSecretary: e.target.checked })}
+                className="w-4 h-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500"
+              />
+              <label htmlFor="isSecretary" className="text-sm text-zinc-600 dark:text-zinc-400">비서 역할</label>
             </div>
             <div>
               <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">Soul (성격/페르소나)</label>
@@ -192,6 +203,16 @@ export function AgentsPage() {
                     className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100"
                     placeholder="역할"
                   />
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id={`secretary-${a.id}`}
+                      checked={editAgent.isSecretary}
+                      onChange={(e) => setEditAgent({ ...editAgent, isSecretary: e.target.checked })}
+                      className="w-4 h-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500"
+                    />
+                    <label htmlFor={`secretary-${a.id}`} className="text-sm text-zinc-600 dark:text-zinc-400">비서 역할</label>
+                  </div>
                   <textarea
                     value={editAgent.soul || ''}
                     onChange={(e) => setEditAgent({ ...editAgent, soul: e.target.value })}
@@ -207,6 +228,7 @@ export function AgentsPage() {
                           name: editAgent.name,
                           role: editAgent.role,
                           soul: editAgent.soul,
+                          isSecretary: editAgent.isSecretary,
                         })
                       }
                       className="text-xs text-indigo-600 hover:text-indigo-700"

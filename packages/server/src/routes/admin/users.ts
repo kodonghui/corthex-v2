@@ -6,6 +6,7 @@ import { db } from '../../db'
 import { users, sessions } from '../../db/schema'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
+import { logActivity } from '../../lib/activity-logger'
 import type { AppEnv } from '../../types'
 
 export const usersRoute = new Hono<AppEnv>()
@@ -162,13 +163,17 @@ usersRoute.delete('/users/:id', async (c) => {
 
 // POST /api/admin/users/:id/reset-password — 비밀번호 초기화
 usersRoute.post('/users/:id/reset-password', async (c) => {
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
 
-  // admin이므로 companyId 체크 없이 id만으로 조회
+  const whereClause = tenant.isAdminUser
+    ? eq(users.id, id)
+    : and(eq(users.id, id), eq(users.companyId, tenant.companyId))
+
   const [user] = await db
     .select({ id: users.id })
     .from(users)
-    .where(eq(users.id, id))
+    .where(whereClause)
     .limit(1)
 
   if (!user) throw new HTTPError(404, '직원을 찾을 수 없습니다', 'USER_001')
@@ -191,18 +196,31 @@ usersRoute.post('/users/:id/reset-password', async (c) => {
 
 // POST /api/admin/users/:id/terminate-session — 세션 종료
 usersRoute.post('/users/:id/terminate-session', async (c) => {
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
 
-  // 해당 유저가 존재하는지 확인
+  const whereClause = tenant.isAdminUser
+    ? eq(users.id, id)
+    : and(eq(users.id, id), eq(users.companyId, tenant.companyId))
+
   const [user] = await db
-    .select({ id: users.id })
+    .select({ id: users.id, companyId: users.companyId })
     .from(users)
-    .where(eq(users.id, id))
+    .where(whereClause)
     .limit(1)
 
   if (!user) throw new HTTPError(404, '직원을 찾을 수 없습니다', 'USER_001')
 
   await db.delete(sessions).where(eq(sessions.userId, id))
+
+  logActivity({
+    companyId: user.companyId,
+    type: 'system',
+    phase: 'end',
+    actorType: 'admin',
+    actorId: tenant.userId,
+    action: `세션 강제 종료: ${id}`,
+  })
 
   return c.json({ data: { message: '세션이 종료되었습니다' } })
 })

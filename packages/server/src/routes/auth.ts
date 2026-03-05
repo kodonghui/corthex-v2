@@ -27,12 +27,28 @@ authRoute.post('/auth/login', zValidator('json', loginSchema), async (c) => {
     .limit(1)
 
   if (!user || !user.isActive) {
+    logActivity({
+      companyId: 'system',
+      type: 'login',
+      phase: 'error',
+      actorType: 'system',
+      action: `로그인 실패 (존재하지 않는 계정): ${username}`,
+    })
     throw new HTTPError(401, '아이디 또는 비밀번호가 올바르지 않습니다', 'AUTH_001')
   }
 
   // 비밀번호 검증 (bcrypt 대신 Bun.password 사용)
   const valid = await Bun.password.verify(password, user.passwordHash)
   if (!valid) {
+    logActivity({
+      companyId: user.companyId,
+      type: 'login',
+      phase: 'error',
+      actorType: 'user',
+      actorId: user.id,
+      actorName: user.name,
+      action: '로그인 실패 (비밀번호 불일치)',
+    })
     throw new HTTPError(401, '아이디 또는 비밀번호가 올바르지 않습니다', 'AUTH_001')
   }
 
@@ -75,11 +91,27 @@ authRoute.post('/auth/admin/login', zValidator('json', loginSchema), async (c) =
     .limit(1)
 
   if (!admin || !admin.isActive) {
+    logActivity({
+      companyId: 'system',
+      type: 'login',
+      phase: 'error',
+      actorType: 'system',
+      action: `관리자 로그인 실패 (존재하지 않는 계정): ${username}`,
+    })
     throw new HTTPError(401, '아이디 또는 비밀번호가 올바르지 않습니다', 'AUTH_001')
   }
 
   const valid = await Bun.password.verify(password, admin.passwordHash)
   if (!valid) {
+    logActivity({
+      companyId: 'system',
+      type: 'login',
+      phase: 'error',
+      actorType: 'system',
+      actorId: admin.id,
+      actorName: admin.name,
+      action: '관리자 로그인 실패 (비밀번호 불일치)',
+    })
     throw new HTTPError(401, '아이디 또는 비밀번호가 올바르지 않습니다', 'AUTH_001')
   }
 

@@ -37,6 +37,30 @@ reportLinesRoute.get('/report-lines', async (c) => {
 reportLinesRoute.put('/report-lines', zValidator('json', bulkUpsertSchema), async (c) => {
   const { companyId, lines } = c.req.valid('json')
 
+  // 자기 자신을 상위자로 설정 방지
+  for (const line of lines) {
+    if (line.userId === line.reportsToUserId) {
+      throw new HTTPError(400, '자신을 보고 대상으로 설정할 수 없습니다', 'REPORT_LINE_002')
+    }
+  }
+
+  // 순환 참조 감지 (A→B→C→A)
+  const graph = new Map<string, string>()
+  for (const line of lines) {
+    graph.set(line.userId, line.reportsToUserId)
+  }
+  for (const startId of graph.keys()) {
+    const visited = new Set<string>()
+    let current: string | undefined = startId
+    while (current && graph.has(current)) {
+      if (visited.has(current)) {
+        throw new HTTPError(400, '순환 보고 구조가 감지되었습니다', 'REPORT_LINE_003')
+      }
+      visited.add(current)
+      current = graph.get(current)
+    }
+  }
+
   // 기존 보고 라인 삭제 후 새로 삽입
   await db.delete(reportLines).where(eq(reportLines.companyId, companyId))
 

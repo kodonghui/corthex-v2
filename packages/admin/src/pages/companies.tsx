@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
+import { useToastStore } from '../stores/toast-store'
 
 type Company = {
   id: string; name: string; slug: string; isActive: boolean; createdAt: string
@@ -8,6 +9,7 @@ type Company = {
 
 export function CompaniesPage() {
   const qc = useQueryClient()
+  const addToast = useToastStore((s) => s.addToast)
   const [showCreate, setShowCreate] = useState(false)
   const [form, setForm] = useState({ name: '', slug: '' })
   const [editId, setEditId] = useState<string | null>(null)
@@ -26,7 +28,9 @@ export function CompaniesPage() {
       qc.invalidateQueries({ queryKey: ['companies'] })
       setShowCreate(false)
       setForm({ name: '', slug: '' })
+      addToast({ type: 'success', message: '회사가 생성되었습니다' })
     },
+    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
 
   const updateMutation = useMutation({
@@ -35,7 +39,9 @@ export function CompaniesPage() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['companies'] })
       setEditId(null)
+      addToast({ type: 'success', message: '회사가 수정되었습니다' })
     },
+    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
 
   return (
