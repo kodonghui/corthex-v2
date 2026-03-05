@@ -367,6 +367,8 @@ export const snsContents = pgTable('sns_contents', {
   body: text('body').notNull(),
   hashtags: text('hashtags'),
   imageUrl: text('image_url'),
+  snsAccountId: uuid('sns_account_id'),  // references snsAccounts (defined below)
+  variantOf: uuid('variant_of'),  // self-reference for A/B variants
   status: snsStatusEnum('status').notNull().default('draft'),
   reviewedBy: uuid('reviewed_by').references(() => users.id),
   reviewedAt: timestamp('reviewed_at'),
@@ -374,9 +376,21 @@ export const snsContents = pgTable('sns_contents', {
   publishedUrl: text('published_url'),
   publishedAt: timestamp('published_at'),
   publishError: text('publish_error'),
+  scheduledAt: timestamp('scheduled_at'),
   metadata: jsonb('metadata'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+// === 19b. sns_accounts — SNS 계정 ===
+export const snsAccounts = pgTable('sns_accounts', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  platform: snsPlatformEnum('platform').notNull(),
+  accountName: varchar('account_name', { length: 100 }).notNull(),
+  credentials: jsonb('credentials'), // encrypted in practice
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 
 // === 20. activity_logs — 작전일지 (활동 로그) ===
@@ -654,10 +668,18 @@ export const nightJobTriggersRelations = relations(nightJobTriggers, ({ one, man
   jobs: many(nightJobs),
 }))
 
-export const snsContentsRelations = relations(snsContents, ({ one }) => ({
+export const snsContentsRelations = relations(snsContents, ({ one, many }) => ({
   company: one(companies, { fields: [snsContents.companyId], references: [companies.id] }),
   agent: one(agents, { fields: [snsContents.agentId], references: [agents.id] }),
   creator: one(users, { fields: [snsContents.createdBy], references: [users.id] }),
+  account: one(snsAccounts, { fields: [snsContents.snsAccountId], references: [snsAccounts.id] }),
+  parent: one(snsContents, { fields: [snsContents.variantOf], references: [snsContents.id], relationName: 'variants' }),
+  variants: many(snsContents, { relationName: 'variants' }),
+}))
+
+export const snsAccountsRelations = relations(snsAccounts, ({ one, many }) => ({
+  company: one(companies, { fields: [snsAccounts.companyId], references: [companies.id] }),
+  contents: many(snsContents),
 }))
 
 export const activityLogsRelations = relations(activityLogs, ({ one }) => ({

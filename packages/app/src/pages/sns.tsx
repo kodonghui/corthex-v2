@@ -21,6 +21,7 @@ type SnsContent = {
   publishedUrl?: string
   publishedAt?: string
   publishError?: string
+  scheduledAt?: string
   createdAt: string
   updatedAt: string
 }
@@ -59,7 +60,7 @@ export function SnsPage() {
   const [rejectReason, setRejectReason] = useState('')
 
   // 생성 폼 상태
-  const [form, setForm] = useState({ platform: 'instagram', title: '', body: '', hashtags: '' })
+  const [form, setForm] = useState({ platform: 'instagram', title: '', body: '', hashtags: '', scheduledAt: '' })
   const [aiForm, setAiForm] = useState({ platform: 'instagram', agentId: '', topic: '' })
   const [createMode, setCreateMode] = useState<'manual' | 'ai'>('manual')
 
@@ -150,7 +151,7 @@ export function SnsPage() {
         <h2 className="text-lg font-semibold">SNS 콘텐츠</h2>
         {view === 'list' && (
           <button
-            onClick={() => { setView('create'); setForm({ platform: 'instagram', title: '', body: '', hashtags: '' }) }}
+            onClick={() => { setView('create'); setForm({ platform: 'instagram', title: '', body: '', hashtags: '', scheduledAt: '' }) }}
             className="px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700"
           >
             + 새 콘텐츠
@@ -214,7 +215,16 @@ export function SnsPage() {
                 placeholder="본문 내용" rows={6} />
               <input value={form.hashtags} onChange={(e) => setForm({ ...form, hashtags: e.target.value })}
                 placeholder="해시태그 (#태그1 #태그2)" className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm" />
-              <button onClick={() => createManual.mutate(form)} disabled={!form.title || !form.body || createManual.isPending}
+              <div>
+                <label className="block text-xs text-zinc-500 mb-1">예약 발행 시간 (선택)</label>
+                <input type="datetime-local" value={form.scheduledAt || ''}
+                  onChange={(e) => setForm({ ...form, scheduledAt: e.target.value })}
+                  className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm" />
+              </div>
+              <button onClick={() => {
+                const payload = { ...form, scheduledAt: form.scheduledAt ? new Date(form.scheduledAt).toISOString() : undefined }
+                createManual.mutate(payload as typeof form)
+              }} disabled={!form.title || !form.body || createManual.isPending}
                 className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 disabled:opacity-50">
                 {createManual.isPending ? '생성 중...' : '콘텐츠 저장'}
               </button>
@@ -273,6 +283,12 @@ export function SnsPage() {
 
           {detail.publishError && (
             <p className="text-sm text-red-600">발행 오류: {detail.publishError}</p>
+          )}
+
+          {detail.scheduledAt && (
+            <p className="text-sm text-indigo-600">
+              예약 발행: {new Date(detail.scheduledAt).toLocaleString('ko')}
+            </p>
           )}
 
           <p className="text-xs text-zinc-500">
