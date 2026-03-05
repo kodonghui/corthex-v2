@@ -209,7 +209,9 @@ export async function orchestrateSecretary(
   const delegationResults: { departmentName: string; agentName: string; response: string }[] = []
 
   for (const del of analysis.delegations) {
-    const targetInfo = deptAgents.find(d => d.deptName === del.departmentName)
+    const needle = del.departmentName.trim().toLowerCase()
+    const targetInfo = deptAgents.find(d => d.deptName.trim().toLowerCase() === needle)
+      || deptAgents.find(d => d.deptName.trim().toLowerCase().includes(needle) || needle.includes(d.deptName.trim().toLowerCase()))
     if (!targetInfo) continue
 
     // delegations 테이블에 기록

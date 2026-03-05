@@ -28,7 +28,7 @@ export function Select({ className, options, placeholder, error, ...props }: Sel
       {...props}
     >
       {placeholder && (
-        <option value="" disabled>
+        <option value="" disabled hidden>
           {placeholder}
         </option>
       )}

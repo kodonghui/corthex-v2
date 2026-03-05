@@ -84,7 +84,12 @@ export function useChatStream(sessionId: string | null) {
           })
           break
         case 'delegation-end':
-          setDelegationStatus(null)
+          setDelegationStatus({
+            targetAgentName: event.targetAgentName || '',
+            targetAgentId: event.targetAgentId || '',
+            status: (event.status as 'completed' | 'failed') || 'completed',
+            durationMs: event.durationMs,
+          })
           // 위임 완료 시 위임 내역 쿼리 갱신
           queryClient.invalidateQueries({ queryKey: ['delegations', sessionId] })
           break
