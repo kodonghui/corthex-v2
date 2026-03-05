@@ -118,7 +118,7 @@ jobsRoute.put('/:id/read', async (c) => {
   const [job] = await db
     .update(nightJobs)
     .set({ isRead: true })
-    .where(and(eq(nightJobs.id, id), eq(nightJobs.userId, tenant.userId)))
+    .where(and(eq(nightJobs.id, id), eq(nightJobs.companyId, tenant.companyId), eq(nightJobs.userId, tenant.userId)))
     .returning()
 
   if (!job) throw new HTTPError(404, '작업을 찾을 수 없습니다', 'QUEUE_002')
@@ -152,7 +152,7 @@ jobsRoute.delete('/:id', async (c) => {
   const [job] = await db
     .select({ id: nightJobs.id, status: nightJobs.status })
     .from(nightJobs)
-    .where(and(eq(nightJobs.id, id), eq(nightJobs.userId, tenant.userId)))
+    .where(and(eq(nightJobs.id, id), eq(nightJobs.companyId, tenant.companyId), eq(nightJobs.userId, tenant.userId)))
     .limit(1)
 
   if (!job) throw new HTTPError(404, '작업을 찾을 수 없습니다', 'QUEUE_002')

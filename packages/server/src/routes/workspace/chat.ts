@@ -79,7 +79,7 @@ chatRoute.get('/sessions/:sessionId/messages', async (c) => {
   const [session] = await db
     .select({ id: chatSessions.id })
     .from(chatSessions)
-    .where(and(eq(chatSessions.id, sessionId), eq(chatSessions.userId, tenant.userId)))
+    .where(and(eq(chatSessions.id, sessionId), eq(chatSessions.companyId, tenant.companyId), eq(chatSessions.userId, tenant.userId)))
     .limit(1)
 
   if (!session) throw new HTTPError(404, '세션을 찾을 수 없습니다', 'CHAT_002')
@@ -106,7 +106,7 @@ chatRoute.post(
     const [session] = await db
       .select({ id: chatSessions.id, agentId: chatSessions.agentId })
       .from(chatSessions)
-      .where(and(eq(chatSessions.id, sessionId), eq(chatSessions.userId, tenant.userId)))
+      .where(and(eq(chatSessions.id, sessionId), eq(chatSessions.companyId, tenant.companyId), eq(chatSessions.userId, tenant.userId)))
       .limit(1)
 
     if (!session) throw new HTTPError(404, '세션을 찾을 수 없습니다', 'CHAT_002')
@@ -194,7 +194,7 @@ chatRoute.get('/sessions/:sessionId/delegations', async (c) => {
   const [session] = await db
     .select({ id: chatSessions.id })
     .from(chatSessions)
-    .where(and(eq(chatSessions.id, sessionId), eq(chatSessions.userId, tenant.userId)))
+    .where(and(eq(chatSessions.id, sessionId), eq(chatSessions.companyId, tenant.companyId), eq(chatSessions.userId, tenant.userId)))
     .limit(1)
 
   if (!session) throw new HTTPError(404, '세션을 찾을 수 없습니다', 'CHAT_002')

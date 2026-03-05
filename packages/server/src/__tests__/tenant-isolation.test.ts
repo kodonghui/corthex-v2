@@ -12,7 +12,7 @@
 import { describe, test, expect, beforeAll } from 'bun:test'
 import {
   api, BASE, REAL_COMPANY_ID, REAL_CEO_ID, REAL_ADMIN_ID, REAL_AGENT_ID,
-  FAKE_COMPANY_ID, FAKE_USER_ID, makeToken,
+  FAKE_COMPANY_ID, FAKE_USER_ID, makeToken, makeExpiredToken,
 } from './helpers/test-utils'
 
 let realCeoToken: string
@@ -212,5 +212,51 @@ describe('정상 접근: 올바른 토큰으로 데이터 조회', () => {
     expect(res.status).toBe(200)
     const body = await res.json() as { data: { id: string } }
     expect(body.data.id).toBe(REAL_CEO_ID)
+  })
+})
+
+// =============================================
+// 7. WebSocket: 채널 격리 (Story 1.9 완료 후 활성화)
+// =============================================
+describe('WebSocket: 채널 격리', () => {
+  test.skip('유저A가 유저B 채팅 채널 구독 시도 → 메시지 미수신 (TODO: Story 1.9 완료 후 활성화)', async () => {
+    // WS 연결 후 타 회사 채널 구독 시도
+    // /ws?token=<A사토큰> 연결 후 { type: 'subscribe', channel: 'chat::<B사세션ID>' } 전송
+    // 서버가 메시지를 브로드캐스트하지 않거나 에러 응답 확인
+  })
+
+  test.skip('만료된 토큰으로 WS 연결 시도 → 거부 (TODO: Story 1.9 완료 후 활성화)', async () => {
+    // 만료된 토큰으로 /ws 연결 시도
+    // 연결 즉시 끊김 또는 에러 메시지
+    const _expiredToken = await makeExpiredToken(REAL_CEO_ID, REAL_COMPANY_ID)
+    // WebSocket 서버 구현 후 테스트 활성화
+  })
+})
+
+// =============================================
+// 8. CLI 격리: 타사 에이전트로 실행 불가
+// =============================================
+describe('CLI 격리: 타사 에이전트로 실행 불가', () => {
+  test('B사 유저가 A사 에이전트로 채팅 세션 생성 시도 → 404', async () => {
+    const res = await api('/workspace/chat/sessions', fakeUserToken, {
+      method: 'POST',
+      body: JSON.stringify({ agentId: REAL_AGENT_ID }),
+    })
+    expect(res.status).toBe(404)
+  })
+
+  test('B사 유저가 A사 보고서 조회 시도 → 빈 배열', async () => {
+    const res = await api('/workspace/reports', fakeUserToken)
+    expect(res.status).toBe(200)
+    const body = await res.json() as { data: unknown[] }
+    expect(body.data).toEqual([])
+  })
+
+  test('B사 유저가 A사 에이전트로 작업 등록 시도 → 404', async () => {
+    const res = await api('/workspace/jobs', fakeUserToken, {
+      method: 'POST',
+      body: JSON.stringify({ agentId: REAL_AGENT_ID, instruction: '테스트' }),
+    })
+    expect(res.status).toBe(404)
   })
 })

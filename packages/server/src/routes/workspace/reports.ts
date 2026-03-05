@@ -124,7 +124,7 @@ reportsRoute.put('/reports/:id', zValidator('json', updateReportSchema), async (
   const [existing] = await db
     .select({ id: reports.id, status: reports.status })
     .from(reports)
-    .where(and(eq(reports.id, id), eq(reports.authorId, tenant.userId)))
+    .where(and(eq(reports.id, id), eq(reports.companyId, tenant.companyId), eq(reports.authorId, tenant.userId)))
     .limit(1)
 
   if (!existing) throw new HTTPError(404, '보고서를 찾을 수 없습니다', 'REPORT_001')
@@ -148,7 +148,7 @@ reportsRoute.post('/reports/:id/submit', async (c) => {
   const [existing] = await db
     .select({ id: reports.id, status: reports.status })
     .from(reports)
-    .where(and(eq(reports.id, id), eq(reports.authorId, tenant.userId)))
+    .where(and(eq(reports.id, id), eq(reports.companyId, tenant.companyId), eq(reports.authorId, tenant.userId)))
     .limit(1)
 
   if (!existing) throw new HTTPError(404, '보고서를 찾을 수 없습니다', 'REPORT_001')
@@ -209,7 +209,7 @@ reportsRoute.delete('/reports/:id', async (c) => {
   const [existing] = await db
     .select({ id: reports.id, status: reports.status })
     .from(reports)
-    .where(and(eq(reports.id, id), eq(reports.authorId, tenant.userId)))
+    .where(and(eq(reports.id, id), eq(reports.companyId, tenant.companyId), eq(reports.authorId, tenant.userId)))
     .limit(1)
 
   if (!existing) throw new HTTPError(404, '보고서를 찾을 수 없습니다', 'REPORT_001')
