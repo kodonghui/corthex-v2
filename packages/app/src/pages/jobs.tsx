@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../lib/api'
 import { Select, Textarea, Input, Tabs, ConfirmDialog, Badge, toast } from '@corthex/ui'
+import { useWsStore } from '../stores/ws-store'
 
 type Agent = {
   id: string
@@ -76,6 +77,35 @@ const TABS = [
 
 export function JobsPage() {
   const [activeTab, setActiveTab] = useState('jobs')
+  const queryClient = useQueryClient()
+  const { subscribe, addListener, removeListener, isConnected } = useWsStore()
+  const subscribedRef = useRef(false)
+
+  useEffect(() => {
+    if (!isConnected) {
+      subscribedRef.current = false
+      return
+    }
+
+    if (!subscribedRef.current) {
+      subscribe('night-jobs', {})
+      subscribedRef.current = true
+    }
+
+    const handler = (data: unknown) => {
+      const event = data as { type: string; jobId?: string }
+      queryClient.invalidateQueries({ queryKey: ['night-jobs'] })
+
+      if (event.type === 'job-completed') {
+        toast.success('야간 작업이 완료되었습니다')
+      } else if (event.type === 'job-failed') {
+        toast.error('야간 작업이 실패했습니다')
+      }
+    }
+
+    addListener('night-jobs', handler)
+    return () => removeListener('night-jobs', handler)
+  }, [isConnected, subscribe, addListener, removeListener, queryClient])
 
   return (
     <div className="p-8">

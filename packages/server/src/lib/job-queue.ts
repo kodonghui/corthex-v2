@@ -6,6 +6,7 @@ import { nightJobs, agents, chatSessions, chatMessages, agentMemory, reports } f
 import { eq, and, lte, asc } from 'drizzle-orm'
 import { generateAgentResponse } from './ai'
 import { orchestrateSecretary } from './orchestrator'
+import { broadcastToCompany } from '../ws/channels'
 
 const POLL_INTERVAL_MS = 30_000  // 30초마다 큐 확인
 const MAX_RETRIES = 3
@@ -72,6 +73,11 @@ async function pickNextJob() {
 // 단일 작업 처리
 async function processJob(job: typeof nightJobs.$inferSelect) {
   console.log(`🔄 야간 작업 처리 시작: ${job.id}`)
+
+  // WS: 작업 시작 알림
+  broadcastToCompany(job.companyId, 'night-jobs', {
+    type: 'job-progress', jobId: job.id, statusMessage: '작업 처리 중...',
+  })
 
   try {
     // 에이전트 정보 확인
@@ -172,6 +178,14 @@ async function processJob(job: typeof nightJobs.$inferSelect) {
       })
       .where(eq(nightJobs.id, job.id))
 
+    // WS: 작업 완료 알림
+    broadcastToCompany(job.companyId, 'night-jobs', {
+      type: 'job-completed',
+      jobId: job.id,
+      durationMs: job.startedAt ? Date.now() - new Date(job.startedAt).getTime() : 0,
+      reportId: reportId || null,
+    })
+
     console.log(`✅ 야간 작업 완료: ${job.id}`)
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : '알 수 없는 오류'
@@ -206,6 +220,14 @@ async function processJob(job: typeof nightJobs.$inferSelect) {
           completedAt: new Date(),
         })
         .where(eq(nightJobs.id, job.id))
+
+      // WS: 최종 실패 알림
+      broadcastToCompany(job.companyId, 'night-jobs', {
+        type: 'job-failed',
+        jobId: job.id,
+        errorMessage: errorMsg,
+        retryCount: newRetryCount,
+      })
 
       console.log(`💀 야간 작업 최종 실패: ${job.id} (재시도 ${job.maxRetries}회 초과)`)
     }
