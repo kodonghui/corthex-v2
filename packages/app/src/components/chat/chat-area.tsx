@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { Input } from '@corthex/ui'
 import { api } from '../../lib/api'
 import { useWsStore } from '../../stores/ws-store'
 import { useChatStream } from '../../hooks/use-chat-stream'
@@ -457,7 +458,7 @@ export function ChatArea({
           {/* 입력 영역 */}
           <div className="px-4 md:px-6 py-4 border-t border-zinc-200 dark:border-zinc-800">
             <div className="flex gap-3">
-              <input
+              <Input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -468,7 +469,7 @@ export function ChatArea({
                     : `${agent.name}에게 메시지...`
                 }
                 disabled={sendMessage.isPending || isStreaming}
-                className="flex-1 px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
+                className="flex-1 px-4 py-2.5 rounded-xl"
               />
               {isStreaming ? (
                 <button

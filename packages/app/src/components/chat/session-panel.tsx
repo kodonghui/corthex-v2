@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
+import { ConfirmDialog } from '@corthex/ui'
 import type { Agent, Session } from './types'
 
 type DateGroup = {
@@ -68,42 +69,6 @@ function SessionMenu({
       >
         삭제
       </button>
-    </div>
-  )
-}
-
-function DeleteConfirmDialog({
-  onConfirm,
-  onCancel,
-}: {
-  onConfirm: () => void
-  onCancel: () => void
-}) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onCancel}>
-      <div
-        className="bg-white dark:bg-zinc-900 rounded-xl shadow-xl w-full max-w-sm mx-4 p-5"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h3 className="text-sm font-semibold mb-2">대화 삭제</h3>
-        <p className="text-xs text-zinc-500 mb-4 leading-relaxed">
-          이 대화를 삭제하시겠어요? 삭제된 대화는 복구할 수 없습니다. 에이전트의 기억은 유지됩니다.
-        </p>
-        <div className="flex gap-2 justify-end">
-          <button
-            onClick={onCancel}
-            className="px-3 py-1.5 text-xs rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800"
-          >
-            취소
-          </button>
-          <button
-            onClick={onConfirm}
-            className="px-3 py-1.5 text-xs rounded-lg bg-red-500 text-white hover:bg-red-600"
-          >
-            삭제
-          </button>
-        </div>
-      </div>
     </div>
   )
 }
@@ -268,15 +233,18 @@ export function SessionPanel({
       </div>
 
       {/* 삭제 확인 다이얼로그 */}
-      {deleteTargetId && (
-        <DeleteConfirmDialog
-          onConfirm={() => {
-            onDeleteSession(deleteTargetId)
-            setDeleteTargetId(null)
-          }}
-          onCancel={() => setDeleteTargetId(null)}
-        />
-      )}
+      <ConfirmDialog
+        isOpen={!!deleteTargetId}
+        onConfirm={() => {
+          if (deleteTargetId) onDeleteSession(deleteTargetId)
+          setDeleteTargetId(null)
+        }}
+        onCancel={() => setDeleteTargetId(null)}
+        title="대화 삭제"
+        description="이 대화를 삭제하시겠어요? 삭제된 대화는 복구할 수 없습니다. 에이전트의 기억은 유지됩니다."
+        confirmText="삭제"
+        variant="danger"
+      />
     </div>
   )
 }

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useBlocker } from 'react-router-dom'
 import Markdown from 'react-markdown'
+import { ConfirmDialog } from '@corthex/ui'
 import { api } from '../../lib/api'
 import { toast } from '@corthex/ui'
 
@@ -224,30 +225,16 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
       )}
 
       {/* 이탈 방지 다이얼로그 */}
-      {blocker.state === 'blocked' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-zinc-900 rounded-xl p-6 max-w-sm mx-4 shadow-xl">
-            <h4 className="text-sm font-medium mb-2">저장하지 않은 변경사항</h4>
-            <p className="text-xs text-zinc-500 mb-4">
-              저장하지 않은 변경사항이 있습니다. 나가시겠어요?
-            </p>
-            <div className="flex gap-2 justify-end">
-              <button
-                onClick={() => blocker.reset?.()}
-                className="px-3 py-1.5 text-xs border border-zinc-300 dark:border-zinc-600 rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-800"
-              >
-                계속 편집
-              </button>
-              <button
-                onClick={() => blocker.proceed?.()}
-                className="px-3 py-1.5 text-xs bg-red-500 text-white rounded-md hover:bg-red-600"
-              >
-                나가기
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDialog
+        isOpen={blocker.state === 'blocked'}
+        onConfirm={() => blocker.proceed?.()}
+        onCancel={() => blocker.reset?.()}
+        title="저장하지 않은 변경사항"
+        description="저장하지 않은 변경사항이 있습니다. 나가시겠어요?"
+        confirmText="나가기"
+        cancelText="계속 편집"
+        variant="danger"
+      />
     </section>
   )
 }
