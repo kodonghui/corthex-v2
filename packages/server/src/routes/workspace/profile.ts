@@ -6,7 +6,7 @@ import { db } from '../../db'
 import { users, apiKeys, toolCalls, chatSessions } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
-import { encrypt } from '../../lib/crypto'
+import { validateCredentials, encryptCredentials } from '../../services/credential-vault'
 import type { AppEnv } from '../../types'
 
 export const profileRoute = new Hono<AppEnv>()
@@ -94,11 +94,8 @@ profileRoute.post('/profile/api-keys', zValidator('json', registerApiKeySchema),
   const tenant = c.get('tenant')
   const { credentials: rawCredentials, ...rest } = c.req.valid('json')
 
-  // 각 credential 필드를 개별 AES-256-GCM 암호화
-  const encryptedCredentials: Record<string, string> = {}
-  for (const [field, value] of Object.entries(rawCredentials)) {
-    encryptedCredentials[field] = await encrypt(value)
-  }
+  validateCredentials(rest.provider, rawCredentials)
+  const encryptedCredentials = await encryptCredentials(rawCredentials)
 
   const [apiKey] = await db
     .insert(apiKeys)
