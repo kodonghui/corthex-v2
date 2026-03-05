@@ -179,12 +179,12 @@ development_status:
   # ============================================================
   # Epic 12: 에이전트 계층 위임 (P2)
   # ============================================================
-  epic-12: backlog
-  12-1-agent-hierarchy-api: backlog
-  12-2-parallel-delegation: backlog
-  12-3-delegation-realtime-ui: backlog
-  12-4-delegation-security: backlog
-  epic-12-retrospective: optional
+  epic-12: done
+  12-1-agent-hierarchy-api: done
+  12-2-parallel-delegation: done
+  12-3-delegation-realtime-ui: done
+  12-4-delegation-security: done
+  epic-12-retrospective: done
 
   # ============================================================
   # Epic 13: 파일 관리 (P2)
