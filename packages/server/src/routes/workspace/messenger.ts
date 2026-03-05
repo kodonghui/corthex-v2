@@ -1,9 +1,9 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { eq, and, desc, inArray } from 'drizzle-orm'
+import { eq, and, desc, inArray, sql } from 'drizzle-orm'
 import { db } from '../../db'
-import { messengerChannels, messengerMembers, messengerMessages, users } from '../../db/schema'
+import { messengerChannels, messengerMembers, messengerMessages, messengerReactions, users } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { logActivity } from '../../lib/activity-logger'
@@ -21,6 +21,13 @@ const createChannelSchema = z.object({
 
 const sendMessageSchema = z.object({
   content: z.string().min(1),
+  parentMessageId: z.string().uuid().optional(),
+  fileId: z.string().uuid().optional(),
+})
+
+const updateChannelSchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  description: z.string().nullable().optional(),
 })
 
 const addMemberSchema = z.object({
@@ -71,6 +78,7 @@ messengerRoute.get('/channels', async (c) => {
     .where(and(
       inArray(messengerChannels.id, channelIds),
       eq(messengerChannels.companyId, tenant.companyId),
+      eq(messengerChannels.isActive, true),
     ))
     .orderBy(messengerChannels.createdAt)
 
@@ -151,7 +159,7 @@ messengerRoute.get('/channels/:id/messages', async (c) => {
 messengerRoute.post('/channels/:id/messages', zValidator('json', sendMessageSchema), async (c) => {
   const tenant = c.get('tenant')
   const channelId = c.req.param('id')
-  const { content } = c.req.valid('json')
+  const { content, parentMessageId, fileId } = c.req.valid('json')
 
   await assertMember(channelId, tenant.userId, tenant.companyId)
 
@@ -162,6 +170,8 @@ messengerRoute.post('/channels/:id/messages', zValidator('json', sendMessageSche
       channelId,
       userId: tenant.userId,
       content,
+      parentMessageId,
+      fileId,
     })
     .returning()
 
@@ -234,4 +244,173 @@ messengerRoute.get('/users', async (c) => {
     .orderBy(users.name)
 
   return c.json({ data: result })
+})
+
+// ========== Story 16-1: Channel Management ==========
+
+// PATCH /messenger/channels/:id — 채널 수정
+messengerRoute.patch('/channels/:id', zValidator('json', updateChannelSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const channelId = c.req.param('id')
+  const body = c.req.valid('json')
+
+  const [channel] = await db.select({ id: messengerChannels.id, createdBy: messengerChannels.createdBy })
+    .from(messengerChannels)
+    .where(and(eq(messengerChannels.id, channelId), eq(messengerChannels.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!channel) throw new HTTPError(404, '채널을 찾을 수 없습니다', 'MSG_001')
+  if (channel.createdBy !== tenant.userId && tenant.role !== 'admin') {
+    throw new HTTPError(403, '채널 생성자 또는 관리자만 수정할 수 있습니다', 'AUTH_003')
+  }
+
+  const [updated] = await db.update(messengerChannels)
+    .set({ ...body, updatedAt: new Date() })
+    .where(eq(messengerChannels.id, channelId))
+    .returning()
+
+  return c.json({ data: updated })
+})
+
+// DELETE /messenger/channels/:id — 채널 삭제 (soft)
+messengerRoute.delete('/channels/:id', async (c) => {
+  const tenant = c.get('tenant')
+  const channelId = c.req.param('id')
+
+  const [channel] = await db.select({ id: messengerChannels.id, createdBy: messengerChannels.createdBy })
+    .from(messengerChannels)
+    .where(and(eq(messengerChannels.id, channelId), eq(messengerChannels.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!channel) throw new HTTPError(404, '채널을 찾을 수 없습니다', 'MSG_001')
+  if (channel.createdBy !== tenant.userId && tenant.role !== 'admin') {
+    throw new HTTPError(403, '채널 생성자 또는 관리자만 삭제할 수 있습니다', 'AUTH_003')
+  }
+
+  await db.update(messengerChannels)
+    .set({ isActive: false, updatedAt: new Date() })
+    .where(eq(messengerChannels.id, channelId))
+
+  return c.json({ data: { message: '삭제되었습니다' } })
+})
+
+// ========== Story 16-2: Agent Integration ==========
+
+// POST /messenger/channels/:id/agent — 에이전트 멘션/호출
+const agentMentionSchema = z.object({
+  agentId: z.string().uuid(),
+  message: z.string().min(1),
+})
+
+messengerRoute.post('/channels/:id/agent', zValidator('json', agentMentionSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const channelId = c.req.param('id')
+  const { agentId, message } = c.req.valid('json')
+
+  await assertMember(channelId, tenant.userId, tenant.companyId)
+
+  const { generateAgentResponse } = await import('../../lib/ai')
+  const response = await generateAgentResponse({
+    agentId,
+    sessionId: '',
+    companyId: tenant.companyId,
+    userMessage: message,
+    userId: tenant.userId,
+  })
+
+  const [agentMsg] = await db.insert(messengerMessages).values({
+    companyId: tenant.companyId,
+    channelId,
+    userId: tenant.userId,
+    content: `[AI] ${response}`,
+  }).returning()
+
+  return c.json({ data: agentMsg }, 201)
+})
+
+// ========== Story 16-3: Reactions + Threads ==========
+
+// POST /messenger/messages/:id/react — 반응 추가
+messengerRoute.post('/messages/:id/react', zValidator('json', z.object({ emoji: z.string().min(1).max(10) })), async (c) => {
+  const tenant = c.get('tenant')
+  const messageId = c.req.param('id')
+  const { emoji } = c.req.valid('json')
+
+  const [reaction] = await db.insert(messengerReactions).values({
+    companyId: tenant.companyId,
+    messageId,
+    userId: tenant.userId,
+    emoji,
+  }).returning()
+
+  return c.json({ data: reaction }, 201)
+})
+
+// DELETE /messenger/messages/:id/react — 반응 제거
+messengerRoute.delete('/messages/:id/react', async (c) => {
+  const tenant = c.get('tenant')
+  const messageId = c.req.param('id')
+
+  await db.delete(messengerReactions)
+    .where(and(
+      eq(messengerReactions.messageId, messageId),
+      eq(messengerReactions.userId, tenant.userId),
+      eq(messengerReactions.companyId, tenant.companyId),
+    ))
+
+  return c.json({ data: { removed: true } })
+})
+
+// GET /messenger/messages/:id/thread — 스레드 조회
+messengerRoute.get('/messages/:id/thread', async (c) => {
+  const tenant = c.get('tenant')
+  const parentId = c.req.param('id')
+
+  const replies = await db
+    .select({
+      id: messengerMessages.id,
+      userId: messengerMessages.userId,
+      userName: users.name,
+      content: messengerMessages.content,
+      createdAt: messengerMessages.createdAt,
+    })
+    .from(messengerMessages)
+    .innerJoin(users, eq(messengerMessages.userId, users.id))
+    .where(and(
+      eq(messengerMessages.parentMessageId, parentId),
+      eq(messengerMessages.companyId, tenant.companyId),
+    ))
+    .orderBy(messengerMessages.createdAt)
+
+  return c.json({ data: replies })
+})
+
+// ========== Story 16-4: Search ==========
+
+// GET /messenger/search?q=keyword — 메시지 검색
+messengerRoute.get('/search', async (c) => {
+  const tenant = c.get('tenant')
+  const q = c.req.query('q')
+  if (!q) return c.json({ data: [] })
+
+  const results = await db
+    .select({
+      id: messengerMessages.id,
+      content: messengerMessages.content,
+      channelId: messengerMessages.channelId,
+      channelName: messengerChannels.name,
+      userName: users.name,
+      createdAt: messengerMessages.createdAt,
+    })
+    .from(messengerMessages)
+    .innerJoin(users, eq(messengerMessages.userId, users.id))
+    .innerJoin(messengerChannels, eq(messengerMessages.channelId, messengerChannels.id))
+    .where(and(
+      eq(messengerMessages.companyId, tenant.companyId),
+      sql`${messengerMessages.content} ILIKE ${'%' + q + '%'}`,
+    ))
+    .orderBy(desc(messengerMessages.createdAt))
+    .limit(50)
+
+  return c.json({ data: results })
 })
