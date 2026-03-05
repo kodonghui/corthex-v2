@@ -24,6 +24,7 @@ import { dashboardRoute } from './routes/workspace/dashboard'
 import { telegramRoute } from './routes/workspace/telegram'
 import { messengerRoute } from './routes/workspace/messenger'
 import { nexusRoute } from './routes/workspace/nexus'
+import { mcpRoute } from './routes/workspace/mcp'
 import { strategyRoute } from './routes/workspace/strategy'
 import { schedulesRoute } from './routes/workspace/schedules'
 import { triggersRoute } from './routes/workspace/triggers'
@@ -86,6 +87,7 @@ app.route('/api/workspace', dashboardRoute)
 app.route('/api/workspace', telegramRoute)
 app.route('/api/workspace/messenger', messengerRoute)
 app.route('/api/workspace', nexusRoute)
+app.route('/api/workspace/mcp', mcpRoute)
 app.route('/api/workspace/strategy', strategyRoute)
 app.route('/api/workspace/schedules', schedulesRoute)
 app.route('/api/workspace/triggers', triggersRoute)

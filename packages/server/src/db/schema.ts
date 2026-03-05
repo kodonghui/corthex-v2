@@ -585,6 +585,45 @@ export const soulTemplates = pgTable('soul_templates', {
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })
 
+// === 30. nexus_workflows — NEXUS 워크플로우 ===
+export const nexusWorkflows = pgTable('nexus_workflows', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  name: varchar('name', { length: 200 }).notNull(),
+  description: text('description'),
+  nodes: jsonb('nodes').notNull().default('[]'), // [{id, type, position, data}]
+  edges: jsonb('edges').notNull().default('[]'), // [{id, source, target}]
+  isTemplate: boolean('is_template').notNull().default(false),
+  isActive: boolean('is_active').notNull().default(true),
+  createdBy: uuid('created_by').notNull().references(() => users.id),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+// === 31. nexus_executions — 워크플로우 실행 기록 ===
+export const nexusExecutions = pgTable('nexus_executions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  workflowId: uuid('workflow_id').notNull().references(() => nexusWorkflows.id),
+  status: varchar('status', { length: 20 }).notNull().default('running'), // running, completed, failed
+  result: jsonb('result'),
+  startedAt: timestamp('started_at').notNull().defaultNow(),
+  completedAt: timestamp('completed_at'),
+})
+
+// === 32. mcp_servers — MCP 서버 등록 ===
+export const mcpServers = pgTable('mcp_servers', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  name: varchar('name', { length: 100 }).notNull(),
+  url: text('url').notNull(),
+  transport: varchar('transport', { length: 20 }).notNull().default('stdio'), // stdio, sse
+  config: jsonb('config'),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
 // === 28. canvas_layouts — NEXUS 캔버스 레이아웃 ===
 export const canvasLayouts = pgTable('canvas_layouts', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -807,4 +846,19 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
 export const notificationPreferencesRelations = relations(notificationPreferences, ({ one }) => ({
   user: one(users, { fields: [notificationPreferences.userId], references: [users.id] }),
   company: one(companies, { fields: [notificationPreferences.companyId], references: [companies.id] }),
+}))
+
+export const nexusWorkflowsRelations = relations(nexusWorkflows, ({ one, many }) => ({
+  company: one(companies, { fields: [nexusWorkflows.companyId], references: [companies.id] }),
+  creator: one(users, { fields: [nexusWorkflows.createdBy], references: [users.id] }),
+  executions: many(nexusExecutions),
+}))
+
+export const nexusExecutionsRelations = relations(nexusExecutions, ({ one }) => ({
+  company: one(companies, { fields: [nexusExecutions.companyId], references: [companies.id] }),
+  workflow: one(nexusWorkflows, { fields: [nexusExecutions.workflowId], references: [nexusWorkflows.id] }),
+}))
+
+export const mcpServersRelations = relations(mcpServers, ({ one }) => ({
+  company: one(companies, { fields: [mcpServers.companyId], references: [companies.id] }),
 }))
