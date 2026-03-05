@@ -10,11 +10,12 @@ export type JwtPayload = {
   sub: string       // userId
   companyId: string
   role: 'admin' | 'user'
+  type?: 'admin'    // admin_users 로그인 시에만 추가
   exp: number
 }
 
 // JWT 토큰 생성
-export async function createToken(payload: Omit<JwtPayload, 'exp'>): Promise<string> {
+export async function createToken(payload: Omit<JwtPayload, 'exp' | 'type'> & { type?: 'admin' }): Promise<string> {
   return sign(
     { ...payload, exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 }, // 24시간
     JWT_SECRET,
@@ -36,6 +37,7 @@ export const authMiddleware: MiddlewareHandler<AppEnv> = async (c, next) => {
       companyId: payload.companyId,
       userId: payload.sub,
       role: payload.role,
+      isAdminUser: payload.type === 'admin',
     }
     c.set('tenant', tenant)
     await next()
@@ -44,10 +46,10 @@ export const authMiddleware: MiddlewareHandler<AppEnv> = async (c, next) => {
   }
 }
 
-// 관리자 전용 미들웨어
+// 관리자 전용 미들웨어 — admin_users JWT만 허용 (type: 'admin')
 export const adminOnly: MiddlewareHandler<AppEnv> = async (c, next) => {
   const tenant = c.get('tenant')
-  if (tenant.role !== 'admin') {
+  if (tenant.role !== 'admin' || !tenant.isAdminUser) {
     throw new HTTPError(403, '관리자 권한이 필요합니다', 'AUTH_003')
   }
   await next()

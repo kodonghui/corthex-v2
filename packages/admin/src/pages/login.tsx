@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuthStore } from '../stores/auth-store'
 import { api } from '../lib/api'
 
@@ -8,28 +8,38 @@ export function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [countdown, setCountdown] = useState(0)
   const login = useAuthStore((s) => s.login)
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+
+  useEffect(() => {
+    if (countdown <= 0) return
+    const timer = setInterval(() => setCountdown((c) => c - 1), 1000)
+    return () => clearInterval(timer)
+  }, [countdown])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (countdown > 0) return
     setError('')
     setLoading(true)
 
     try {
       const res = await api.post<{
-        data: { token: string; user: { id: string; name: string; role: 'admin' | 'user' } }
-      }>('/auth/login', { username, password })
+        data: { token: string; user: { id: string; name: string; role: string } }
+      }>('/auth/admin/login', { username, password })
 
-      if (res.data.user.role !== 'admin') {
-        setError('관리자 계정만 접근할 수 있습니다')
-        return
+      login(res.data.token, { ...res.data.user, role: res.data.user.role as 'admin' | 'user' })
+      const redirect = searchParams.get('redirect') || '/'
+      navigate(redirect)
+    } catch (err: unknown) {
+      if (err && typeof err === 'object' && 'retryAfter' in err) {
+        setCountdown((err as { retryAfter: number }).retryAfter)
+        setError('')
+      } else {
+        setError(err instanceof Error ? err.message : '로그인 실패')
       }
-
-      login(res.data.token, res.data.user)
-      navigate('/')
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '로그인 실패')
     } finally {
       setLoading(false)
     }
@@ -80,12 +90,20 @@ export function LoginPage() {
               </div>
             )}
 
+            {countdown > 0 && (
+              <div className="px-3 py-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                <p className="text-sm text-amber-600 dark:text-amber-400">
+                  잠시 후 다시 시도하세요 ({countdown}초 후 잠금 해제)
+                </p>
+              </div>
+            )}
+
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || countdown > 0}
               className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer"
             >
-              {loading ? '로그인 중...' : '로그인'}
+              {loading ? '로그인 중...' : countdown > 0 ? `${countdown}초 후 재시도` : '로그인'}
             </button>
           </form>
         </div>

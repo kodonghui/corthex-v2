@@ -1,9 +1,15 @@
+import { useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import { useAuthStore } from '../stores/auth-store'
+import { useAdminStore } from '../stores/admin-store'
+import { api } from '../lib/api'
 
 declare const __BUILD_NUMBER__: string
 declare const __BUILD_HASH__: string
 declare const __BUILD_TIME__: string
+
+type Company = { id: string; name: string; slug: string }
 
 const nav = [
   { to: '/', label: '대시보드', icon: '📊' },
@@ -19,11 +25,27 @@ const nav = [
 export function Sidebar() {
   const user = useAuthStore((s) => s.user)
   const logout = useAuthStore((s) => s.logout)
+  const selectedCompanyId = useAdminStore((s) => s.selectedCompanyId)
+  const setSelectedCompanyId = useAdminStore((s) => s.setSelectedCompanyId)
+
+  const { data: companyData } = useQuery({
+    queryKey: ['companies'],
+    queryFn: () => api.get<{ data: Company[] }>('/admin/companies'),
+  })
+
+  const companies = companyData?.data || []
+
+  // 회사 미선택 시 첫 번째 회사 자동 선택
+  useEffect(() => {
+    if (!selectedCompanyId && companies.length > 0) {
+      setSelectedCompanyId(companies[0].id)
+    }
+  }, [selectedCompanyId, companies, setSelectedCompanyId])
 
   return (
     <aside className="w-60 h-screen flex flex-col bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800">
       <div className="p-4 border-b border-zinc-200 dark:border-zinc-800">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mb-3">
           <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-sm font-bold">
             C
           </div>
@@ -32,6 +54,21 @@ export function Sidebar() {
             <p className="text-xs text-zinc-500">Admin Console</p>
           </div>
         </div>
+
+        {/* 회사 선택 드롭다운 */}
+        {companies.length > 0 && (
+          <select
+            value={selectedCompanyId || ''}
+            onChange={(e) => setSelectedCompanyId(e.target.value)}
+            className="w-full px-2 py-1.5 text-xs border border-zinc-200 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500/40 focus:outline-none"
+          >
+            {companies.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">

@@ -23,8 +23,9 @@ const createRateLimiter = (limit: number, windowMs: number, errorCode: string, e
     }
 
     if (entry.count >= limit) {
+      const retryAfter = Math.ceil((entry.resetAt - now) / 1000)
       return c.json(
-        { error: { code: errorCode, message: errorMessage } },
+        { error: { code: errorCode, message: errorMessage, retryAfter } },
         429,
       )
     }

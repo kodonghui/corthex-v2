@@ -3,6 +3,7 @@ export type TenantContext = {
   companyId: string
   userId: string
   role: 'admin' | 'user'
+  isAdminUser?: boolean  // admin_users 테이블에서 로그인한 경우 true
 }
 
 // === API 응답 패턴 ===

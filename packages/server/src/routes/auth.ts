@@ -3,7 +3,7 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { eq } from 'drizzle-orm'
 import { db } from '../db'
-import { users } from '../db/schema'
+import { users, adminUsers } from '../db/schema'
 import { createToken, authMiddleware } from '../middleware/auth'
 import { HTTPError } from '../middleware/error'
 import { logActivity } from '../lib/activity-logger'
@@ -59,6 +59,44 @@ authRoute.post('/auth/login', zValidator('json', loginSchema), async (c) => {
         id: user.id,
         name: user.name,
         role: user.role,
+      },
+    },
+  })
+})
+
+// POST /api/auth/admin/login — 관리자 전용 로그인 (admin_users 테이블)
+authRoute.post('/auth/admin/login', zValidator('json', loginSchema), async (c) => {
+  const { username, password } = c.req.valid('json')
+
+  const [admin] = await db
+    .select()
+    .from(adminUsers)
+    .where(eq(adminUsers.username, username))
+    .limit(1)
+
+  if (!admin || !admin.isActive) {
+    throw new HTTPError(401, '아이디 또는 비밀번호가 올바르지 않습니다', 'AUTH_001')
+  }
+
+  const valid = await Bun.password.verify(password, admin.passwordHash)
+  if (!valid) {
+    throw new HTTPError(401, '아이디 또는 비밀번호가 올바르지 않습니다', 'AUTH_001')
+  }
+
+  const token = await createToken({
+    sub: admin.id,
+    companyId: 'system',
+    role: 'admin',
+    type: 'admin',
+  })
+
+  return c.json({
+    data: {
+      token,
+      user: {
+        id: admin.id,
+        name: admin.name,
+        role: admin.role,
       },
     },
   })
