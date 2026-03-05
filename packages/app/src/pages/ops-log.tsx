@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
 import { api } from '../lib/api'
 import { useWsStore } from '../stores/ws-store'
-import { FilterChip, TimelineGroup } from '@corthex/ui'
+import { FilterChip, TimelineGroup, Input } from '@corthex/ui'
 import type { TimelineItem } from '@corthex/ui'
 
 type ActivityLog = {
@@ -24,6 +24,8 @@ type Summary = {
   today: { type: string; count: number }[]
   week: { type: string; count: number }[]
 }
+
+type LogPage = { data: ActivityLog[]; nextCursor: string | null }
 
 const TYPE_LABELS: Record<string, string> = {
   chat: '채팅',
@@ -68,15 +70,28 @@ function getDateGroup(dateStr: string): string {
   return d.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })
 }
 
+function useDebounce(value: string, delay: number) {
+  const [debounced, setDebounced] = useState(value)
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(value), delay)
+    return () => clearTimeout(t)
+  }, [value, delay])
+  return debounced
+}
+
 export function OpsLogPage() {
   const queryClient = useQueryClient()
   const [searchParams, setSearchParams] = useSearchParams()
   const { subscribe, addListener, removeListener, isConnected } = useWsStore()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const sentinelRef = useRef<HTMLDivElement>(null)
   const [realtimeLogs, setRealtimeLogs] = useState<ActivityLog[]>([])
   const [newLogCount, setNewLogCount] = useState(0)
   const isAtTopRef = useRef(true)
   const subscribedRef = useRef(false)
+  const [searchInput, setSearchInput] = useState('')
+  const debouncedSearch = useDebounce(searchInput, 300)
+  const [expandedId, setExpandedId] = useState<string | null>(null)
 
   // URL 기반 필터 (복수 선택)
   const activeFilters = useMemo(() => {
@@ -95,16 +110,44 @@ export function OpsLogPage() {
     }
   }, [activeFilters, setSearchParams])
 
-  // REST 로그 조회
-  const { data: logsData } = useQuery({
-    queryKey: ['activity-log'],
-    queryFn: () => api.get<{ data: ActivityLog[] }>('/workspace/activity-log?limit=100'),
+  // Infinite query
+  const {
+    data: logsData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['activity-log', debouncedSearch],
+    queryFn: ({ pageParam }) => {
+      const params = new URLSearchParams({ limit: '50' })
+      if (pageParam) params.set('cursor', pageParam)
+      if (debouncedSearch) params.set('search', debouncedSearch)
+      return api.get<LogPage>(`/workspace/activity-log?${params}`)
+    },
+    getNextPageParam: (lastPage) => lastPage?.nextCursor ?? undefined,
+    initialPageParam: undefined as string | undefined,
   })
 
   const { data: summaryData } = useQuery({
     queryKey: ['activity-log-summary'],
     queryFn: () => api.get<{ data: Summary }>('/workspace/activity-log/summary'),
   })
+
+  // IntersectionObserver for infinite scroll
+  useEffect(() => {
+    const el = sentinelRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage()
+        }
+      },
+      { rootMargin: '200px' },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
   // WebSocket 실시간 구독
   useEffect(() => {
@@ -119,11 +162,9 @@ export function OpsLogPage() {
       const event = data as { type: string; log: ActivityLog }
       if (event.type === 'new-log' && event.log) {
         setRealtimeLogs((prev) => [event.log, ...prev])
-        // 스크롤이 위에 있으면 자동 추가, 아래면 배너
         if (!isAtTopRef.current) {
           setNewLogCount((n) => n + 1)
         }
-        // 요약 갱신
         queryClient.invalidateQueries({ queryKey: ['activity-log-summary'] })
       }
     }
@@ -147,9 +188,9 @@ export function OpsLogPage() {
     setNewLogCount(0)
   }, [])
 
-  // 로그 합치기: REST + 실시간 (중복 제거)
+  // 로그 합치기: REST pages + 실시간 (중복 제거)
   const allLogs = useMemo(() => {
-    const restLogs = logsData?.data || []
+    const restLogs = logsData?.pages?.flatMap((p) => p?.data ?? []) ?? []
     const seenIds = new Set(restLogs.map((l) => l.id))
     const unique = [...realtimeLogs.filter((l) => !seenIds.has(l.id)), ...restLogs]
     return unique.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
@@ -160,7 +201,6 @@ export function OpsLogPage() {
     const endByEvent = new Map<string, ActivityLog>()
     const merged = new Set<string>()
 
-    // end 이벤트를 eventId로 인덱싱
     for (const log of allLogs) {
       if ((log.phase === 'end' || log.phase === 'error') && log.eventId) {
         endByEvent.set(log.eventId, log)
@@ -177,7 +217,6 @@ export function OpsLogPage() {
         if (endLog) {
           const diff = new Date(endLog.createdAt).getTime() - new Date(log.createdAt).getTime()
           if (diff < 3000) {
-            // 합침: start + end → 1개 카드
             merged.add(endLog.id)
             result.push({ ...log, endLog, durationMs: diff })
             continue
@@ -214,6 +253,13 @@ export function OpsLogPage() {
 
   const summary = summaryData?.data
 
+  // 바 차트용 최대값 계산
+  const maxCount = useMemo(() => {
+    if (!summary) return 1
+    const all = [...(summary.today || []), ...(summary.week || [])]
+    return Math.max(1, ...all.map((s) => Number(s.count)))
+  }, [summary])
+
   return (
     <div className="h-full flex flex-col">
       {/* 헤더 */}
@@ -227,48 +273,40 @@ export function OpsLogPage() {
         </div>
       </div>
 
-      {/* 요약 */}
+      {/* 요약 바 차트 */}
       {summary && (
         <div className="px-4 md:px-6 py-3 border-b border-zinc-100 dark:border-zinc-800">
-          <div className="flex gap-6">
-            <div>
-              <span className="text-xs text-zinc-500 mr-2">오늘</span>
-              {summary.today.length === 0 && <span className="text-xs text-zinc-400">-</span>}
-              {summary.today.map((s) => (
-                <span key={s.type} className="text-xs text-zinc-600 dark:text-zinc-400 mr-2">
-                  {TYPE_ICONS[s.type]} {s.count}
-                </span>
-              ))}
-            </div>
-            <div>
-              <span className="text-xs text-zinc-500 mr-2">이번주</span>
-              {summary.week.length === 0 && <span className="text-xs text-zinc-400">-</span>}
-              {summary.week.map((s) => (
-                <span key={s.type} className="text-xs text-zinc-600 dark:text-zinc-400 mr-2">
-                  {TYPE_ICONS[s.type]} {s.count}
-                </span>
-              ))}
-            </div>
+          <div className="flex gap-8">
+            <SummaryChart label="오늘" data={summary.today} maxCount={maxCount} />
+            <SummaryChart label="이번주" data={summary.week} maxCount={maxCount} />
           </div>
         </div>
       )}
 
-      {/* 필터 칩 */}
-      <div className="px-4 md:px-6 py-3 border-b border-zinc-100 dark:border-zinc-800 flex gap-2 flex-wrap overflow-x-auto [-webkit-overflow-scrolling:touch]">
-        <FilterChip
-          label="전체"
-          active={activeFilters.size === 0}
-          onClick={() => setSearchParams({}, { replace: true })}
+      {/* 검색 + 필터 칩 */}
+      <div className="px-4 md:px-6 py-3 border-b border-zinc-100 dark:border-zinc-800 space-y-2">
+        <Input
+          placeholder="로그 검색 (action, detail)..."
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          className="text-xs h-8"
         />
-        {Object.entries(TYPE_LABELS).map(([key, label]) => (
+        <div className="flex gap-2 flex-wrap overflow-x-auto [-webkit-overflow-scrolling:touch]">
           <FilterChip
-            key={key}
-            label={label}
-            icon={TYPE_ICONS[key]}
-            active={activeFilters.has(key)}
-            onClick={() => toggleFilter(key)}
+            label="전체"
+            active={activeFilters.size === 0}
+            onClick={() => setSearchParams({}, { replace: true })}
           />
-        ))}
+          {Object.entries(TYPE_LABELS).map(([key, label]) => (
+            <FilterChip
+              key={key}
+              label={label}
+              icon={TYPE_ICONS[key]}
+              active={activeFilters.has(key)}
+              onClick={() => toggleFilter(key)}
+            />
+          ))}
+        </div>
       </div>
 
       {/* 새 로그 배너 */}
@@ -288,7 +326,9 @@ export function OpsLogPage() {
         className="flex-1 overflow-y-auto px-4 md:px-6 py-4 [-webkit-overflow-scrolling:touch]"
       >
         {filteredLogs.length === 0 && (
-          <p className="text-sm text-zinc-400 text-center mt-8">활동 로그가 없습니다.</p>
+          <p className="text-sm text-zinc-400 text-center mt-8">
+            {debouncedSearch ? `"${debouncedSearch}" 검색 결과가 없습니다` : '활동 로그가 없습니다.'}
+          </p>
         )}
 
         {groupedLogs.map((group) => (
@@ -301,7 +341,10 @@ export function OpsLogPage() {
                 ? PHASE_DOT[log.endLog.phase] || PHASE_DOT.end
                 : PHASE_DOT[log.phase] || 'bg-zinc-400',
               content: (
-                <div className="border border-zinc-100 dark:border-zinc-800 rounded-lg p-3">
+                <div
+                  className="border border-zinc-100 dark:border-zinc-800 rounded-lg p-3 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+                  onClick={() => setExpandedId(expandedId === log.id ? null : log.id)}
+                >
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-sm">{TYPE_ICONS[log.type] || '📌'}</span>
                     <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
@@ -338,10 +381,62 @@ export function OpsLogPage() {
                     {formatTime(log.createdAt)}
                     {log.endLog && ` → ${formatTime(log.endLog.createdAt)}`}
                   </div>
+
+                  {/* 확장 상세 */}
+                  {expandedId === log.id && (
+                    <div className="mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                      {log.detail && (
+                        <p className="text-[11px] text-zinc-600 dark:text-zinc-400 mb-1 whitespace-pre-wrap">{log.detail}</p>
+                      )}
+                      {log.metadata != null && (
+                        <pre className="text-[10px] text-zinc-500 bg-zinc-50 dark:bg-zinc-800/60 rounded p-2 overflow-x-auto max-h-40">
+                          {JSON.stringify(log.metadata as Record<string, unknown>, null, 2)}
+                        </pre>
+                      )}
+                    </div>
+                  )}
                 </div>
               ),
             }))}
           />
+        ))}
+
+        {/* 무한스크롤 센티널 */}
+        <div ref={sentinelRef} className="h-4" />
+        {isFetchingNextPage && (
+          <p className="text-xs text-zinc-400 text-center py-4">더 불러오는 중...</p>
+        )}
+      </div>
+    </div>
+  )
+}
+
+/** 간단한 바 차트 — CSS 기반 */
+function SummaryChart({ label, data, maxCount }: { label: string; data: { type: string; count: number }[]; maxCount: number }) {
+  if (data.length === 0) {
+    return (
+      <div>
+        <span className="text-xs text-zinc-500 block mb-1">{label}</span>
+        <span className="text-xs text-zinc-400">-</span>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex-1 min-w-0">
+      <span className="text-xs text-zinc-500 block mb-1.5">{label}</span>
+      <div className="space-y-1">
+        {data.map((s) => (
+          <div key={s.type} className="flex items-center gap-2">
+            <span className="text-[10px] w-5 shrink-0">{TYPE_ICONS[s.type]}</span>
+            <div className="flex-1 h-3 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-indigo-500 rounded-full transition-all"
+                style={{ width: `${Math.max(4, (Number(s.count) / maxCount) * 100)}%` }}
+              />
+            </div>
+            <span className="text-[10px] text-zinc-500 w-6 text-right">{s.count}</span>
+          </div>
         ))}
       </div>
     </div>

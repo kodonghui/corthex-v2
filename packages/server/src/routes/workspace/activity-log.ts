@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { eq, and, desc, gte, sql, count } from 'drizzle-orm'
+import { eq, and, desc, gte, lt, sql, count, or, ilike } from 'drizzle-orm'
 import { db } from '../../db'
 import { activityLogs } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
@@ -9,12 +9,13 @@ export const activityLogRoute = new Hono<AppEnv>()
 
 activityLogRoute.use('*', authMiddleware)
 
-// GET /api/workspace/activity-log — 활동 로그 목록
+// GET /api/workspace/activity-log — 활동 로그 목록 (cursor 페이지네이션 + 검색)
 activityLogRoute.get('/activity-log', async (c) => {
   const tenant = c.get('tenant')
   const type = c.req.query('type')
   const limit = Math.min(Number(c.req.query('limit')) || 50, 100)
-  const offset = Number(c.req.query('offset')) || 0
+  const cursor = c.req.query('cursor') // ISO date string
+  const search = c.req.query('search')?.trim()
 
   const conditions = [eq(activityLogs.companyId, tenant.companyId)]
 
@@ -22,9 +23,22 @@ activityLogRoute.get('/activity-log', async (c) => {
     conditions.push(eq(activityLogs.type, type as any))
   }
 
+  if (cursor) {
+    conditions.push(lt(activityLogs.createdAt, new Date(cursor)))
+  }
+
   const dateFrom = c.req.query('from')
   if (dateFrom) {
     conditions.push(gte(activityLogs.createdAt, new Date(dateFrom)))
+  }
+
+  if (search) {
+    conditions.push(
+      or(
+        ilike(activityLogs.action, `%${search}%`),
+        ilike(activityLogs.detail, `%${search}%`),
+      )!,
+    )
   }
 
   const result = await db
@@ -44,10 +58,15 @@ activityLogRoute.get('/activity-log', async (c) => {
     .from(activityLogs)
     .where(and(...conditions))
     .orderBy(desc(activityLogs.createdAt))
-    .limit(limit)
-    .offset(offset)
+    .limit(limit + 1) // +1 for hasMore check
 
-  return c.json({ data: result })
+  const hasMore = result.length > limit
+  const data = hasMore ? result.slice(0, limit) : result
+  const nextCursor = hasMore && data.length > 0
+    ? data[data.length - 1].createdAt.toISOString()
+    : null
+
+  return c.json({ data, nextCursor })
 })
 
 // GET /api/workspace/activity-log/summary — 오늘/이번주 요약 통계
