@@ -1,6 +1,6 @@
 # Story 3.1: User Login JWT
 
-Status: review
+Status: done
 
 ## Story
 
