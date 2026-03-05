@@ -14,6 +14,7 @@ export const PROVIDER_SCHEMAS: Record<string, string[]> = {
   serper: ['api_key'],
   notion: ['api_key'],
   google_calendar: ['api_key'],
+  tts: ['api_key'],
 }
 
 // 필수 필드 유효성 검사

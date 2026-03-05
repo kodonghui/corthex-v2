@@ -430,7 +430,23 @@ async function seed() {
         required: ['stockCode', 'side', 'quantity'],
       },
     },
-    { name: '텔레그램', description: '텔레그램 봇 메시지', scope: 'platform' as const },
+    {
+      name: 'text_to_speech',
+      description: '텍스트를 음성(MP3)으로 변환합니다',
+      handler: 'text_to_speech',
+      scope: 'platform' as const,
+      category: 'utility',
+      tags: ['tts', 'voice', 'api'],
+      inputSchema: {
+        type: 'object',
+        properties: {
+          text: { type: 'string', description: '변환할 텍스트 (5000자 이내)' },
+          language: { type: 'string', description: '언어 코드 (기본 ko-KR)' },
+          speed: { type: 'number', description: '속도 (기본 1.0)' },
+        },
+        required: ['text'],
+      },
+    },
   ]
 
   for (const def of externalTools) {
