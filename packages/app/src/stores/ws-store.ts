@@ -27,10 +27,13 @@ export const useWsStore = create<WsState>((set, get) => ({
 
     ws.onopen = () => set({ isConnected: true })
 
+    let serverRestarting = false
+
     ws.onclose = (event) => {
       set({ isConnected: false, socket: null })
-      // 비정상 종료 또는 서버 재시작 → 3초 후 재연결
-      if (event.code !== 1000) {
+      // 재연결하면 안 되는 코드: 정상 종료, 인증 실패, 연결 제한
+      const noReconnect = [1000, 4001, 4002]
+      if (!noReconnect.includes(event.code) && !serverRestarting) {
         setTimeout(() => get().connect(token), 3000)
       }
     }
@@ -39,6 +42,8 @@ export const useWsStore = create<WsState>((set, get) => ({
       try {
         const msg = JSON.parse(event.data) as WsOutboundMessage
         if (msg.type === 'server-restart') {
+          // onclose에서 중복 재연결 방지
+          serverRestarting = true
           setTimeout(() => get().connect(token), 3000)
         }
       } catch {

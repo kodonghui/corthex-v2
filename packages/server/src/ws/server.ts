@@ -62,7 +62,7 @@ export const wsRoute = upgradeWebSocket(async (c) => {
       ws.send(JSON.stringify({ type: 'connected', userId: tenant.sub, companyId: tenant.companyId }))
     },
 
-    onMessage(event, ws) {
+    async onMessage(event, ws) {
       if (!tenant) return
       try {
         const msg = JSON.parse(String(event.data)) as WsInboundMessage
@@ -71,14 +71,14 @@ export const wsRoute = upgradeWebSocket(async (c) => {
         if (!client) return
 
         if (msg.type === 'subscribe') {
-          handleSubscription(client, msg.channel, msg.params, ws)
+          await handleSubscription(client, msg.channel, msg.params, ws)
         } else if (msg.type === 'unsubscribe') {
           const key = msg.params?.id ? `${msg.channel}::${msg.params.id}` : msg.channel
           client.subscriptions.delete(key)
           ws.send(JSON.stringify({ type: 'unsubscribed', channel: msg.channel }))
         }
       } catch {
-        // 잘못된 JSON — 무시
+        // 잘못된 JSON 또는 DB 에러 — 무시
       }
     },
 
