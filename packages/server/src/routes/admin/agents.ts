@@ -54,7 +54,7 @@ agentsRoute.post('/agents', zValidator('json', createAgentSchema), async (c) => 
   const body = c.req.valid('json')
   const [agent] = await db
     .insert(agents)
-    .values({ ...body, status: 'offline' })
+    .values({ ...body, adminSoul: body.soul || null, status: 'offline' })
     .returning()
   return c.json({ data: agent }, 201)
 })
@@ -64,9 +64,14 @@ agentsRoute.patch('/agents/:id', zValidator('json', updateAgentSchema), async (c
   const id = c.req.param('id')
   const body = c.req.valid('json')
   const tenant = c.get('tenant')
+  // 관리자가 soul을 변경하면 admin_soul도 동시 업데이트
   const [agent] = await db
     .update(agents)
-    .set({ ...body, updatedAt: new Date() })
+    .set({
+      ...body,
+      ...(body.soul !== undefined ? { adminSoul: body.soul } : {}),
+      updatedAt: new Date(),
+    })
     .where(and(eq(agents.id, id), eq(agents.companyId, tenant.companyId)))
     .returning()
   if (!agent) throw new HTTPError(404, '에이전트를 찾을 수 없습니다', 'AGENT_001')

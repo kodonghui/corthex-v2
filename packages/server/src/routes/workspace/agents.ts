@@ -43,6 +43,7 @@ workspaceAgentsRoute.get('/agents/:id', async (c) => {
       name: agents.name,
       role: agents.role,
       soul: agents.soul,
+      adminSoul: agents.adminSoul,
       status: agents.status,
       departmentId: agents.departmentId,
     })
@@ -90,6 +91,44 @@ workspaceAgentsRoute.patch('/agents/:id/soul', zValidator('json', updateSoulSche
     actorType: 'user',
     actorId: tenant.userId,
     action: `에이전트 소울 수정: ${agent.name}`,
+  })
+
+  return c.json({ data: updated })
+})
+
+// POST /api/workspace/agents/:id/soul/reset — 에이전트 소울 초기화 (admin_soul로 복원)
+workspaceAgentsRoute.post('/agents/:id/soul/reset', async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+
+  const [agent] = await db
+    .select({ id: agents.id, userId: agents.userId, name: agents.name, adminSoul: agents.adminSoul })
+    .from(agents)
+    .where(and(eq(agents.id, id), eq(agents.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!agent) throw new HTTPError(404, '에이전트를 찾을 수 없습니다', 'AGENT_001')
+  if (agent.userId !== tenant.userId && tenant.role !== 'admin') {
+    throw new HTTPError(403, '본인 에이전트만 수정할 수 있습니다', 'AUTH_003')
+  }
+
+  if (!agent.adminSoul) {
+    throw new HTTPError(400, '초기화할 원본 소울이 없습니다', 'AGENT_002')
+  }
+
+  const [updated] = await db
+    .update(agents)
+    .set({ soul: agent.adminSoul, updatedAt: new Date() })
+    .where(eq(agents.id, id))
+    .returning()
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'system',
+    phase: 'end',
+    actorType: 'user',
+    actorId: tenant.userId,
+    action: `에이전트 소울 초기화: ${agent.name}`,
   })
 
   return c.json({ data: updated })

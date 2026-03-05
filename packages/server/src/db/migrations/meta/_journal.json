@@ -57,6 +57,13 @@
       "when": 1772696123301,
       "tag": "0007_gifted_xorn",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1772697134269,
+      "tag": "0008_flaky_black_tarantula",
+      "breakpoints": true
     }
   ]
 }

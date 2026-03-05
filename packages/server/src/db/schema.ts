@@ -96,6 +96,7 @@ export const agents = pgTable('agents', {
   name: varchar('name', { length: 100 }).notNull(),
   role: varchar('role', { length: 200 }),
   soul: text('soul'),  // 마크다운 성격 정의
+  adminSoul: text('admin_soul'),  // 관리자가 설정한 원본 소울 (초기화용)
   status: agentStatusEnum('status').notNull().default('offline'),
   isSecretary: boolean('is_secretary').notNull().default(false),
   isActive: boolean('is_active').notNull().default(true),
