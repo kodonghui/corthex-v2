@@ -11,6 +11,7 @@ import { db } from '../db'
 import { toolDefinitions, agentTools, toolCalls } from '../db/schema'
 import { eq, and } from 'drizzle-orm'
 import { registry } from './tool-handlers'
+import { getCredentials as vaultGetCredentials } from '../services/credential-vault'
 import type { ToolExecContext } from './tool-handlers'
 
 // === Claude API tool 타입 ===
@@ -23,6 +24,7 @@ type ToolRecord = {
   description: string | null
   inputSchema: unknown
   handler: string | null
+  config: unknown
 }
 
 /**
@@ -36,6 +38,7 @@ export async function loadAgentTools(agentId: string, companyId: string): Promis
       description: toolDefinitions.description,
       inputSchema: toolDefinitions.inputSchema,
       handler: toolDefinitions.handler,
+      config: toolDefinitions.config,
     })
     .from(agentTools)
     .innerJoin(toolDefinitions, eq(agentTools.toolId, toolDefinitions.id))
@@ -109,10 +112,23 @@ const TOOL_TIMEOUT_MS = 30_000
 export async function executeTool(
   toolName: string,
   input: Record<string, unknown>,
-  ctx: ToolExecContext,
+  ctx: Omit<ToolExecContext, 'getCredentials' | 'config'>,
   toolRecord: ToolRecord,
 ): Promise<string> {
   const startTime = Date.now()
+
+  // ctx에 getCredentials + config 바인딩
+  const enrichedCtx: ToolExecContext = {
+    ...ctx,
+    config: (toolRecord.config as Record<string, unknown>) || undefined,
+    getCredentials: async (provider: string) => {
+      try {
+        return await vaultGetCredentials(ctx.companyId, provider, ctx.userId)
+      } catch {
+        throw new Error(`'${provider}' API 키가 등록되지 않았습니다. 설정에서 API 키를 등록하세요.`)
+      }
+    },
+  }
 
   // 입력 스키마 검증
   if (toolRecord.inputSchema) {
@@ -146,7 +162,7 @@ export async function executeTool(
     }
 
     const result = await Promise.race([
-      Promise.resolve(fn(input, ctx)),
+      Promise.resolve(fn(input, enrichedCtx)),
       new Promise<never>((_, reject) => {
         timeoutId = setTimeout(() => reject(new Error('TOOL_TIMEOUT')), TOOL_TIMEOUT_MS)
       }),

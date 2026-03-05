@@ -4,6 +4,8 @@ export type ToolExecContext = {
   sessionId: string
   departmentId: string | null
   userId: string
+  config?: Record<string, unknown>
+  getCredentials: (provider: string) => Promise<Record<string, string>>
 }
 
 export type ToolHandler = (
