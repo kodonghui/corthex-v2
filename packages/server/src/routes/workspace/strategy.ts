@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { eq, and, desc, or, inArray, sql } from 'drizzle-orm'
+import { eq, and, desc, or, inArray } from 'drizzle-orm'
 import { db } from '../../db'
 import { strategyWatchlists, chatSessions, agents, strategyNotes, strategyBacktestResults, strategyNoteShares, users } from '../../db/schema'
 import { broadcastToChannel } from '../../ws/channels'
@@ -436,9 +436,6 @@ strategyRoute.delete(
     const tenant = c.get('tenant')
     const { id } = c.req.valid('param')
 
-    // 삭제 전 브로드캐스트 (cascade로 shares도 삭제되므로 먼저 전송)
-    broadcastToChannel(`strategy-notes::${id}`, { type: 'note-deleted', noteId: id })
-
     const [deleted] = await db
       .delete(strategyNotes)
       .where(and(
@@ -449,6 +446,9 @@ strategyRoute.delete(
       .returning()
 
     if (!deleted) throw new HTTPError(404, '노트를 찾을 수 없습니다', 'STRATEGY_021')
+
+    // 삭제 성공 후 브로드캐스트
+    broadcastToChannel(`strategy-notes::${id}`, { type: 'note-deleted', noteId: id })
 
     return c.json({ data: { deleted: true } })
   },

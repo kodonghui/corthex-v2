@@ -1,6 +1,6 @@
 # Story 10.9: 전략 메모 협업 편집기 — 실시간 공유 + WebSocket 동기화
 
-Status: review
+Status: done
 
 ## Story
 

@@ -152,7 +152,7 @@ development_status:
   # ============================================================
   # Epic 10: 전략실 (P2) — 파티모드 후 9개 스토리로 확장
   # ============================================================
-  epic-10: in-progress
+  epic-10: done
   10-1-strategy-room-layout: done
   10-2-strategy-chat-agent: done
   10-3-realtime-stock-chart: done
@@ -161,7 +161,7 @@ development_status:
   10-6-multi-stock-compare: done
   10-7-backtest-results: done
   10-8-strategy-share-url: done
-  10-9-collab-editor: review
+  10-9-collab-editor: done
   epic-10-retrospective: optional
 
   # ============================================================

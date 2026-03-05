@@ -5,6 +5,7 @@ import { api } from '../../lib/api'
 import { Button, ConfirmDialog, toast } from '@corthex/ui'
 import { MarkdownRenderer } from '../markdown-renderer'
 import { useWsStore } from '../../stores/ws-store'
+import { useAuthStore } from '../../stores/auth-store'
 
 type Note = {
   id: string
@@ -41,6 +42,7 @@ export function NotesPanel() {
   const [shareTarget, setShareTarget] = useState<string | null>(null)
 
   const { subscribe, addListener, removeListener } = useWsStore()
+  const currentUserId = useAuthStore((s) => s.user?.id)
 
   const { data: notesRes } = useQuery({
     queryKey: ['strategy-notes', stockCode],
@@ -237,7 +239,7 @@ export function NotesPanel() {
             {companyUsers.length === 0 && (
               <p className="text-xs text-zinc-400">사용자 목록을 불러오는 중...</p>
             )}
-            {companyUsers.map((user) => (
+            {companyUsers.filter((u) => u.id !== currentUserId).map((user) => (
               <label
                 key={user.id}
                 className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-800/50 cursor-pointer text-sm min-h-[32px]"
