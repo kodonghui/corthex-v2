@@ -1,6 +1,6 @@
 # Story 1.6: Credential Vault 구현 (AES-256-GCM)
 
-Status: review
+Status: done
 
 ## Story
 

@@ -49,7 +49,7 @@ development_status:
   1-3-api-server-rate-limiting: done
   1-4-admin-app-setup: done
   1-5-ui-phase-a: done
-  1-6-credential-vault: review
+  1-6-credential-vault: done
   1-7-tenant-isolation-tests: ready-for-dev
   1-8-docker-pipeline-pwa: ready-for-dev
   1-9-websocket-base: ready-for-dev
