@@ -1,23 +1,36 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useAuthStore } from './stores/auth-store'
 import { Layout } from './components/layout'
-import { LoginPage } from './pages/login'
-import { DashboardPage } from './pages/dashboard'
-import { UsersPage } from './pages/users'
-import { DepartmentsPage } from './pages/departments'
-import { AgentsPage } from './pages/agents'
-import { CredentialsPage } from './pages/credentials'
-import { CompaniesPage } from './pages/companies'
-import { ToolsPage } from './pages/tools'
-import { ReportLinesPage } from './pages/report-lines'
+import { Skeleton } from '@corthex/ui'
+
+const LoginPage = lazy(() => import('./pages/login').then((m) => ({ default: m.LoginPage })))
+const DashboardPage = lazy(() => import('./pages/dashboard').then((m) => ({ default: m.DashboardPage })))
+const UsersPage = lazy(() => import('./pages/users').then((m) => ({ default: m.UsersPage })))
+const DepartmentsPage = lazy(() => import('./pages/departments').then((m) => ({ default: m.DepartmentsPage })))
+const AgentsPage = lazy(() => import('./pages/agents').then((m) => ({ default: m.AgentsPage })))
+const CredentialsPage = lazy(() => import('./pages/credentials').then((m) => ({ default: m.CredentialsPage })))
+const CompaniesPage = lazy(() => import('./pages/companies').then((m) => ({ default: m.CompaniesPage })))
+const ToolsPage = lazy(() => import('./pages/tools').then((m) => ({ default: m.ToolsPage })))
+const ReportLinesPage = lazy(() => import('./pages/report-lines').then((m) => ({ default: m.ReportLinesPage })))
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: { staleTime: 30_000, retry: 1 },
   },
 })
+
+function PageSkeleton() {
+  return (
+    <div className="p-6 space-y-4">
+      <Skeleton className="h-8 w-48" />
+      <Skeleton className="h-4 w-full" />
+      <Skeleton className="h-4 w-3/4" />
+      <Skeleton className="h-32 w-full" />
+    </div>
+  )
+}
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
@@ -34,14 +47,20 @@ export function App() {
     document.documentElement.classList.toggle('dark', dark)
   }, [dark])
 
-  // expose for potential future use
   ;(window as unknown as Record<string, unknown>).__toggleDark = () => setDark((d) => !d)
 
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter basename="/admin">
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/login"
+            element={
+              <Suspense fallback={<PageSkeleton />}>
+                <LoginPage />
+              </Suspense>
+            }
+          />
           <Route
             path="/"
             element={
@@ -50,14 +69,14 @@ export function App() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<DashboardPage />} />
-            <Route path="users" element={<UsersPage />} />
-            <Route path="departments" element={<DepartmentsPage />} />
-            <Route path="agents" element={<AgentsPage />} />
-            <Route path="credentials" element={<CredentialsPage />} />
-            <Route path="companies" element={<CompaniesPage />} />
-            <Route path="tools" element={<ToolsPage />} />
-            <Route path="report-lines" element={<ReportLinesPage />} />
+            <Route index element={<Suspense fallback={<PageSkeleton />}><DashboardPage /></Suspense>} />
+            <Route path="users" element={<Suspense fallback={<PageSkeleton />}><UsersPage /></Suspense>} />
+            <Route path="departments" element={<Suspense fallback={<PageSkeleton />}><DepartmentsPage /></Suspense>} />
+            <Route path="agents" element={<Suspense fallback={<PageSkeleton />}><AgentsPage /></Suspense>} />
+            <Route path="credentials" element={<Suspense fallback={<PageSkeleton />}><CredentialsPage /></Suspense>} />
+            <Route path="companies" element={<Suspense fallback={<PageSkeleton />}><CompaniesPage /></Suspense>} />
+            <Route path="tools" element={<Suspense fallback={<PageSkeleton />}><ToolsPage /></Suspense>} />
+            <Route path="report-lines" element={<Suspense fallback={<PageSkeleton />}><ReportLinesPage /></Suspense>} />
           </Route>
         </Routes>
       </BrowserRouter>
