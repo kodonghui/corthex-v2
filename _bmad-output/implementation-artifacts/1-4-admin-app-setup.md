@@ -1,6 +1,6 @@
 # Story 1.4: Admin & App 앱 세팅 (Vite + 라우팅 + 상태 관리)
 
-Status: review
+Status: done
 
 ## Story
 
