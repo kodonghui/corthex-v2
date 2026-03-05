@@ -17,8 +17,8 @@ export const FAKE_COMPANY_ID = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'
 export const FAKE_USER_ID = '11111111-2222-3333-4444-555555555555'
 
 /** JWT 토큰 생성 헬퍼 */
-export async function makeToken(sub: string, companyId: string, role: 'admin' | 'user' = 'user') {
-  return sign({ sub, companyId, role, exp: Math.floor(Date.now() / 1000) + 3600 }, JWT_SECRET)
+export async function makeToken(sub: string, companyId: string, role: 'admin' | 'user' = 'user', type?: 'admin') {
+  return sign({ sub, companyId, role, ...(type ? { type } : {}), exp: Math.floor(Date.now() / 1000) + 3600 }, JWT_SECRET)
 }
 
 /** 만료된 JWT 토큰 생성 */
@@ -53,7 +53,7 @@ export function apiNoAuth(path: string, options: RequestInit = {}) {
 export async function createTestTokens() {
   return {
     realCeoToken: await makeToken(REAL_CEO_ID, REAL_COMPANY_ID, 'user'),
-    realAdminToken: await makeToken(REAL_ADMIN_ID, REAL_COMPANY_ID, 'admin'),
+    realAdminToken: await makeToken(REAL_ADMIN_ID, REAL_COMPANY_ID, 'admin', 'admin'),
     fakeUserToken: await makeToken(FAKE_USER_ID, FAKE_COMPANY_ID, 'user'),
     fakeAdminToken: await makeToken(FAKE_USER_ID, FAKE_COMPANY_ID, 'admin'),
   }

@@ -58,15 +58,15 @@ development_status:
   # ============================================================
   # Epic 2: 관리자 콘솔 (P1)
   # ============================================================
-  epic-2: backlog
-  2-1-admin-login-auth: backlog
-  2-2-company-user-crud: backlog
-  2-3-cli-token-api-key: backlog
-  2-4-dept-agent-crud: backlog
-  2-5-tool-assignment: backlog
-  2-6-report-line-config: backlog
-  2-7-secretary-session-mgmt: backlog
-  2-8-admin-console-ui: backlog
+  epic-2: done
+  2-1-admin-login-auth: done
+  2-2-company-user-crud: done
+  2-3-cli-token-api-key: done
+  2-4-dept-agent-crud: done
+  2-5-tool-assignment: done
+  2-6-report-line-config: done
+  2-7-secretary-session-mgmt: done
+  2-8-admin-console-ui: done
   epic-2-retrospective: optional
 
   # ============================================================
