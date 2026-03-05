@@ -58,7 +58,10 @@ export function Layout() {
       </div>
 
       {/* 모바일 상단바 (lg 미만) */}
-      <header className="lg:hidden h-14 flex items-center justify-between px-4 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 sticky top-0 z-30 shrink-0">
+      <header className="lg:hidden flex flex-col sticky top-0 z-30 shrink-0 bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
+        {/* safe area 스페이서 (노치/Dynamic Island) */}
+        <div className="h-[env(safe-area-inset-top)]" />
+        <div className="h-14 flex items-center justify-between px-4">
         <div className="flex items-center gap-3">
           <button
             onClick={openSidebar}
@@ -78,6 +81,7 @@ export function Layout() {
         </div>
         <div className="w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xs font-medium">
           {user?.name?.charAt(0) || '?'}
+        </div>
         </div>
       </header>
 

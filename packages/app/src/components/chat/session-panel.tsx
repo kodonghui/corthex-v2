@@ -139,7 +139,7 @@ export function SessionPanel({
       </div>
 
       {/* 세션 목록 */}
-      <div className="flex-1 overflow-y-auto p-2">
+      <div className="flex-1 overflow-y-auto p-2 [-webkit-overflow-scrolling:touch]">
         {groups.length === 0 ? (
           <p className="text-xs text-zinc-400 text-center py-6">대화 내역이 없습니다</p>
         ) : (
@@ -197,7 +197,7 @@ export function SessionPanel({
                               className="w-full text-xs px-1 py-0.5 rounded border border-indigo-400 bg-white dark:bg-zinc-800 focus:outline-none"
                             />
                           ) : (
-                            <p className="text-xs truncate max-w-[160px]">{session.title}</p>
+                            <p className="text-xs truncate">{session.title}</p>
                           )}
                           <p className="text-[10px] text-zinc-400">{time}</p>
                         </div>
@@ -209,7 +209,7 @@ export function SessionPanel({
                           e.stopPropagation()
                           setMenuSessionId(menuSessionId === session.id ? null : session.id)
                         }}
-                        className="absolute right-1 top-2 opacity-0 group-hover:opacity-100 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 text-xs px-1"
+                        className="absolute right-0.5 top-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 text-xs p-2"
                       >
                         ···
                       </button>

@@ -116,7 +116,7 @@ export function ChatArea({
   const handleScroll = useCallback(() => {
     const el = scrollContainerRef.current
     if (!el || !hasNextPage || isFetchingNextPage) return
-    if (el.scrollTop < 100) {
+    if (el.scrollTop < Math.max(100, el.clientHeight * 0.15)) {
       prevScrollHeightRef.current = el.scrollHeight
       fetchNextPage()
     }
@@ -224,9 +224,9 @@ export function ChatArea({
           {onBack && (
             <button
               onClick={onBack}
-              className="md:hidden text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 mr-1"
+              className="md:hidden text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 -ml-2 p-2 rounded-lg active:bg-zinc-100 dark:active:bg-zinc-800"
             >
-              ←
+              ← 대화 목록
             </button>
           )}
           <span className={`w-2.5 h-2.5 rounded-full ${statusColors[agent.status]}`} />
@@ -301,7 +301,7 @@ export function ChatArea({
           <div
             ref={scrollContainerRef}
             onScroll={handleScroll}
-            className="flex-1 overflow-y-auto px-4 md:px-6 py-4 space-y-4"
+            className="flex-1 overflow-y-auto px-4 md:px-6 py-4 space-y-4 [-webkit-overflow-scrolling:touch]"
           >
             {/* 이전 메시지 로딩 스피너 */}
             {isFetchingNextPage && (
@@ -456,7 +456,7 @@ export function ChatArea({
           </div>
 
           {/* 입력 영역 */}
-          <div className="px-4 md:px-6 py-4 border-t border-zinc-200 dark:border-zinc-800">
+          <div className="px-4 md:px-6 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] border-t border-zinc-200 dark:border-zinc-800">
             <div className="flex gap-3">
               <Input
                 type="text"
@@ -474,7 +474,7 @@ export function ChatArea({
               {isStreaming ? (
                 <button
                   onClick={stopStream}
-                  className="px-5 py-2.5 rounded-xl text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors"
+                  className="px-5 py-3 rounded-xl text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors"
                 >
                   ■ 중지
                 </button>
@@ -482,7 +482,7 @@ export function ChatArea({
                 <button
                   onClick={handleSend}
                   disabled={!input.trim() || sendMessage.isPending}
-                  className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                  className={`px-5 py-3 rounded-xl text-sm font-medium transition-colors ${
                     input.trim() && !sendMessage.isPending
                       ? 'bg-indigo-600 text-white hover:bg-indigo-700'
                       : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-400 cursor-not-allowed'

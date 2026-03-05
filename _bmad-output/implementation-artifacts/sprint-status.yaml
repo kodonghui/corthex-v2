@@ -83,14 +83,14 @@ development_status:
   # ============================================================
   # Epic 4: AI 에이전트 채팅 (P1)
   # ============================================================
-  epic-4: in-progress
+  epic-4: done
   4-1-agent-list-select: done
   4-2-streaming-chat-ui: done
   4-3-tool-use-loop: done
   4-4-chat-session-history: done
   4-5-soul-persona: done
   4-6-ui-phase-b: done
-  4-7-chat-mobile-optimize: backlog
+  4-7-chat-mobile-optimize: done
   epic-4-retrospective: optional
 
   # ============================================================
