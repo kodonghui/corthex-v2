@@ -2,7 +2,7 @@
 // 실행: bun run src/db/seed.ts
 
 import { db } from './index'
-import { companies, users, departments, agents, toolDefinitions } from './schema'
+import { companies, users, departments, agents, toolDefinitions, strategyWatchlists } from './schema'
 
 async function seed() {
   console.log('🌱 시드 데이터 삽입 시작...')
@@ -525,6 +525,29 @@ async function seed() {
       .returning()
     console.log(`  ✓ 외부 도구: ${tool.name}${('handler' in def) ? ` (handler: ${def.handler})` : ''}`)
   }
+
+  // 8. 전략실 관심 종목 (CEO 기본 워치리스트)
+  const watchlistStocks = [
+    { stockCode: '005930', stockName: '삼성전자', market: 'KOSPI' },
+    { stockCode: '000660', stockName: 'SK하이닉스', market: 'KOSPI' },
+    { stockCode: '035420', stockName: 'NAVER', market: 'KOSPI' },
+    { stockCode: '035720', stockName: '카카오', market: 'KOSPI' },
+    { stockCode: '373220', stockName: 'LG에너지솔루션', market: 'KOSPI' },
+    { stockCode: '006400', stockName: '삼성SDI', market: 'KOSPI' },
+    { stockCode: '051910', stockName: 'LG화학', market: 'KOSPI' },
+    { stockCode: '068270', stockName: '셀트리온', market: 'KOSPI' },
+    { stockCode: '207940', stockName: '삼성바이오로직스', market: 'KOSPI' },
+    { stockCode: '005380', stockName: '현대자동차', market: 'KOSPI' },
+  ]
+
+  for (const stock of watchlistStocks) {
+    await db.insert(strategyWatchlists).values({
+      companyId: company.id,
+      userId: ceo.id,
+      ...stock,
+    })
+  }
+  console.log(`  ✓ 전략실 관심 종목: ${watchlistStocks.length}개`)
 
   console.log('\n✅ 시드 완료!')
   console.log(`\n📋 로그인 정보:`)

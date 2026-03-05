@@ -23,6 +23,7 @@ import { dashboardRoute } from './routes/workspace/dashboard'
 import { telegramRoute } from './routes/workspace/telegram'
 import { messengerRoute } from './routes/workspace/messenger'
 import { nexusRoute } from './routes/workspace/nexus'
+import { strategyRoute } from './routes/workspace/strategy'
 import { runMigrations } from './db'
 import { startJobWorker } from './lib/job-queue'
 import { loginRateLimit, apiRateLimit } from './middleware/rate-limit'
@@ -78,6 +79,7 @@ app.route('/api/workspace', dashboardRoute)
 app.route('/api/workspace', telegramRoute)
 app.route('/api/workspace/messenger', messengerRoute)
 app.route('/api/workspace', nexusRoute)
+app.route('/api/workspace/strategy', strategyRoute)
 
 // WebSocket 라우트
 app.get('/ws', wsRoute)

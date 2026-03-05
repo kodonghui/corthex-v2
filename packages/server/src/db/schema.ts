@@ -484,7 +484,21 @@ export const files = pgTable('files', {
   companyIdx: index('files_company_idx').on(table.companyId),
 }))
 
-// === 27. canvas_layouts — NEXUS 캔버스 레이아웃 ===
+// === 27. strategy_watchlists — 전략실 관심 종목 ===
+export const strategyWatchlists = pgTable('strategy_watchlists', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  stockCode: varchar('stock_code', { length: 20 }).notNull(),
+  stockName: varchar('stock_name', { length: 100 }).notNull(),
+  market: varchar('market', { length: 10 }).notNull().default('KOSPI'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('strategy_watchlists_company_idx').on(table.companyId),
+  userStockUniq: unique('strategy_watchlists_user_stock_uniq').on(table.companyId, table.userId, table.stockCode),
+}))
+
+// === 28. canvas_layouts — NEXUS 캔버스 레이아웃 ===
 export const canvasLayouts = pgTable('canvas_layouts', {
   id: uuid('id').primaryKey().defaultRandom(),
   companyId: uuid('company_id').notNull().references(() => companies.id),
@@ -636,6 +650,11 @@ export const messengerMessagesRelations = relations(messengerMessages, ({ one })
 export const filesRelations = relations(files, ({ one }) => ({
   company: one(companies, { fields: [files.companyId], references: [companies.id] }),
   user: one(users, { fields: [files.userId], references: [users.id] }),
+}))
+
+export const strategyWatchlistsRelations = relations(strategyWatchlists, ({ one }) => ({
+  company: one(companies, { fields: [strategyWatchlists.companyId], references: [companies.id] }),
+  user: one(users, { fields: [strategyWatchlists.userId], references: [users.id] }),
 }))
 
 export const canvasLayoutsRelations = relations(canvasLayouts, ({ one }) => ({

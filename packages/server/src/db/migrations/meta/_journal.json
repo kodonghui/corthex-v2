@@ -78,6 +78,13 @@
       "when": 1772718215706,
       "tag": "0010_strong_mephistopheles",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1772723309330,
+      "tag": "0011_strategy-watchlists",
+      "breakpoints": true
     }
   ]
 }
