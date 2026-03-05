@@ -26,6 +26,7 @@ import { nexusRoute } from './routes/workspace/nexus'
 import { strategyRoute } from './routes/workspace/strategy'
 import { schedulesRoute } from './routes/workspace/schedules'
 import { triggersRoute } from './routes/workspace/triggers'
+import { filesRoute } from './routes/workspace/files'
 import { runMigrations } from './db'
 import { startJobWorker } from './lib/job-queue'
 import { startScheduleWorker } from './lib/schedule-worker'
@@ -86,6 +87,7 @@ app.route('/api/workspace', nexusRoute)
 app.route('/api/workspace/strategy', strategyRoute)
 app.route('/api/workspace/schedules', schedulesRoute)
 app.route('/api/workspace/triggers', triggersRoute)
+app.route('/api/workspace', filesRoute)
 
 // WebSocket 라우트
 app.get('/ws', wsRoute)
