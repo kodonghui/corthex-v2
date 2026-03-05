@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { api } from '../../lib/api'
 import { Card, EmptyState } from '@corthex/ui'
 import { StockChart } from './stock-chart'
+import { NotesPanel } from './notes-panel'
 import type { WatchlistItem } from './types'
 
 type PriceData = {
@@ -124,7 +125,7 @@ export function ChartPanel() {
   const changeSign = price && !price.error && price.changeRate > 0 ? '+' : ''
 
   return (
-    <div className="p-4 h-full flex flex-col gap-3">
+    <div className="p-4 h-full flex flex-col gap-3 overflow-y-auto">
       <Card variant="bordered" className="shrink-0">
         <div className="px-5 py-4">
           <div className="flex items-baseline gap-2 flex-wrap">
@@ -169,7 +170,7 @@ export function ChartPanel() {
         </div>
       </Card>
 
-      <Card variant="bordered" className="flex-1 min-h-0">
+      <Card variant="bordered" className="min-h-[240px] h-[40vh]">
         {chartLoading && (
           <div className="flex items-center justify-center h-full">
             <p className="text-sm text-zinc-400">차트 로딩 중...</p>
@@ -184,6 +185,8 @@ export function ChartPanel() {
           <StockChart candles={candles} className="w-full h-full" />
         )}
       </Card>
+
+      <NotesPanel />
     </div>
   )
 }

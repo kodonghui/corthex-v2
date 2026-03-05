@@ -3,7 +3,7 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { eq, and, desc } from 'drizzle-orm'
 import { db } from '../../db'
-import { strategyWatchlists, chatSessions, agents } from '../../db/schema'
+import { strategyWatchlists, chatSessions, agents, strategyNotes } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { getCredentials } from '../../services/credential-vault'
@@ -288,5 +288,108 @@ strategyRoute.get(
       .slice(-count)
 
     return c.json({ data: { candles } })
+  },
+)
+
+// === 전략 노트 ===
+
+// GET /api/workspace/strategy/notes?stockCode=005930 — 종목별 노트 목록
+strategyRoute.get(
+  '/notes',
+  zValidator('query', z.object({ stockCode: z.string().min(1).max(20) })),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const { stockCode } = c.req.valid('query')
+
+    const result = await db
+      .select()
+      .from(strategyNotes)
+      .where(and(
+        eq(strategyNotes.companyId, tenant.companyId),
+        eq(strategyNotes.userId, tenant.userId),
+        eq(strategyNotes.stockCode, stockCode),
+      ))
+      .orderBy(desc(strategyNotes.updatedAt))
+
+    return c.json({ data: result })
+  },
+)
+
+const createNoteSchema = z.object({
+  stockCode: z.string().min(1).max(20),
+  title: z.string().max(200).optional(),
+  content: z.string().max(10_000).default(''),
+})
+
+// POST /api/workspace/strategy/notes — 노트 생성
+strategyRoute.post('/notes', zValidator('json', createNoteSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const { stockCode, title, content } = c.req.valid('json')
+
+  const [note] = await db
+    .insert(strategyNotes)
+    .values({
+      companyId: tenant.companyId,
+      userId: tenant.userId,
+      stockCode,
+      title: title || null,
+      content,
+    })
+    .returning()
+
+  return c.json({ data: note }, 201)
+})
+
+const updateNoteSchema = z.object({
+  title: z.string().max(200).optional(),
+  content: z.string().max(10_000).optional(),
+})
+
+// PATCH /api/workspace/strategy/notes/:id — 노트 수정
+strategyRoute.patch(
+  '/notes/:id',
+  zValidator('param', z.object({ id: z.string().uuid() })),
+  zValidator('json', updateNoteSchema),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const { id } = c.req.valid('param')
+    const body = c.req.valid('json')
+
+    const [updated] = await db
+      .update(strategyNotes)
+      .set({ ...body, updatedAt: new Date() })
+      .where(and(
+        eq(strategyNotes.id, id),
+        eq(strategyNotes.companyId, tenant.companyId),
+        eq(strategyNotes.userId, tenant.userId),
+      ))
+      .returning()
+
+    if (!updated) throw new HTTPError(404, '노트를 찾을 수 없습니다', 'STRATEGY_020')
+
+    return c.json({ data: updated })
+  },
+)
+
+// DELETE /api/workspace/strategy/notes/:id — 노트 삭제
+strategyRoute.delete(
+  '/notes/:id',
+  zValidator('param', z.object({ id: z.string().uuid() })),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const { id } = c.req.valid('param')
+
+    const [deleted] = await db
+      .delete(strategyNotes)
+      .where(and(
+        eq(strategyNotes.id, id),
+        eq(strategyNotes.companyId, tenant.companyId),
+        eq(strategyNotes.userId, tenant.userId),
+      ))
+      .returning()
+
+    if (!deleted) throw new HTTPError(404, '노트를 찾을 수 없습니다', 'STRATEGY_021')
+
+    return c.json({ data: { deleted: true } })
   },
 )

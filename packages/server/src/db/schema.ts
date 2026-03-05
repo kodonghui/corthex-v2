@@ -499,6 +499,20 @@ export const strategyWatchlists = pgTable('strategy_watchlists', {
   userStockUniq: unique('strategy_watchlists_user_stock_uniq').on(table.companyId, table.userId, table.stockCode),
 }))
 
+// === 28a. strategy_notes — 전략 메모 ===
+export const strategyNotes = pgTable('strategy_notes', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  stockCode: varchar('stock_code', { length: 20 }).notNull(),
+  title: varchar('title', { length: 200 }),
+  content: text('content').notNull().default(''),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  userStockIdx: index('strategy_notes_user_stock_idx').on(table.companyId, table.userId, table.stockCode),
+}))
+
 // === 28. canvas_layouts — NEXUS 캔버스 레이아웃 ===
 export const canvasLayouts = pgTable('canvas_layouts', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -656,6 +670,11 @@ export const filesRelations = relations(files, ({ one }) => ({
 export const strategyWatchlistsRelations = relations(strategyWatchlists, ({ one }) => ({
   company: one(companies, { fields: [strategyWatchlists.companyId], references: [companies.id] }),
   user: one(users, { fields: [strategyWatchlists.userId], references: [users.id] }),
+}))
+
+export const strategyNotesRelations = relations(strategyNotes, ({ one }) => ({
+  company: one(companies, { fields: [strategyNotes.companyId], references: [companies.id] }),
+  user: one(users, { fields: [strategyNotes.userId], references: [users.id] }),
 }))
 
 export const canvasLayoutsRelations = relations(canvasLayouts, ({ one }) => ({
