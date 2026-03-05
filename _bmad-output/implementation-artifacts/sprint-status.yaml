@@ -76,7 +76,7 @@ development_status:
   3-1-user-login-jwt: done
   3-2-workspace-sidebar: done
   3-3-home-briefing: done
-  3-4-personal-api-key: backlog
+  3-4-personal-api-key: done
   3-5-settings-ui: backlog
   epic-3-retrospective: optional
 

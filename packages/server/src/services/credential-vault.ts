@@ -9,6 +9,7 @@ import { ERROR_CODES } from '@corthex/shared'
 export const PROVIDER_SCHEMAS: Record<string, string[]> = {
   kis: ['app_key', 'app_secret', 'account_no'],
   smtp: ['host', 'port', 'user', 'password', 'from'],
+  email: ['host', 'port', 'user', 'password', 'from'],
   instagram: ['access_token', 'page_id'],
   serper: ['api_key'],
   notion: ['api_key'],

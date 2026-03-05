@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
+import { Badge, toast } from '@corthex/ui'
 
 type TelegramConfig = {
   id: string
@@ -24,54 +25,101 @@ type ApiKey = {
   createdAt: string
 }
 
-const providerLabels: Record<string, string> = {
+const PROVIDER_LABELS: Record<string, string> = {
   kis: 'KIS 증권',
   notion: '노션',
   email: '이메일',
+  serper: 'Serper 검색',
+  instagram: '인스타그램',
   telegram: '텔레그램',
 }
+
+const PROVIDER_FIELDS: Record<string, { key: string; label: string; type: string }[]> = {
+  kis: [
+    { key: 'app_key', label: 'App Key', type: 'password' },
+    { key: 'app_secret', label: 'App Secret', type: 'password' },
+    { key: 'account_no', label: '계좌번호', type: 'text' },
+  ],
+  notion: [
+    { key: 'api_key', label: 'API Key', type: 'password' },
+  ],
+  email: [
+    { key: 'host', label: 'SMTP 호스트', type: 'text' },
+    { key: 'port', label: '포트', type: 'text' },
+    { key: 'user', label: '사용자명', type: 'text' },
+    { key: 'password', label: '비밀번호', type: 'password' },
+    { key: 'from', label: '발신 주소', type: 'email' },
+  ],
+}
+
+const PROVIDER_OPTIONS = Object.keys(PROVIDER_FIELDS) as (keyof typeof PROVIDER_FIELDS)[]
 
 export function SettingsPage() {
   const queryClient = useQueryClient()
   const [showForm, setShowForm] = useState(false)
-  const [formProvider, setFormProvider] = useState('kis')
+  const [formProvider, setFormProvider] = useState<string>('kis')
   const [formLabel, setFormLabel] = useState('')
-  const [formKey, setFormKey] = useState('')
+  const [formCredentials, setFormCredentials] = useState<Record<string, string>>({})
 
-  const { data: keysData } = useQuery({
+  const { data: keysData, isLoading: keysLoading } = useQuery({
     queryKey: ['api-keys'],
     queryFn: () => api.get<{ data: ApiKey[] }>('/workspace/profile/api-keys'),
   })
 
   const registerKey = useMutation({
-    mutationFn: (body: { provider: string; label?: string; key: string }) =>
+    mutationFn: (body: { provider: string; label?: string; credentials: Record<string, string> }) =>
       api.post('/workspace/profile/api-keys', body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['api-keys'] })
       setShowForm(false)
       setFormLabel('')
-      setFormKey('')
+      setFormCredentials({})
+      toast.success('API 키가 등록되었습니다')
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'API 키 등록에 실패했습니다')
     },
   })
 
   const deleteKey = useMutation({
     mutationFn: (id: string) => api.delete(`/workspace/profile/api-keys/${id}`),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['api-keys'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['api-keys'] })
+      toast.success('API 키가 삭제되었습니다')
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'API 키 삭제에 실패했습니다')
+    },
   })
 
   const keys = keysData?.data || []
+  const fields = PROVIDER_FIELDS[formProvider] || []
+  const allFieldsFilled = fields.every((f) => formCredentials[f.key]?.trim())
+
+  const handleProviderChange = (provider: string) => {
+    setFormProvider(provider)
+    setFormCredentials({})
+  }
+
+  const handleFieldChange = (fieldKey: string, value: string) => {
+    setFormCredentials((prev) => ({ ...prev, [fieldKey]: value }))
+  }
 
   const handleRegister = () => {
-    if (!formKey.trim()) return
+    if (!allFieldsFilled) return
+    const credentials: Record<string, string> = {}
+    for (const f of fields) {
+      credentials[f.key] = formCredentials[f.key].trim()
+    }
     registerKey.mutate({
       provider: formProvider,
       ...(formLabel.trim() ? { label: formLabel.trim() } : {}),
-      key: formKey.trim(),
+      credentials,
     })
   }
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       <h2 className="text-2xl font-bold mb-6">설정</h2>
 
       <div className="max-w-lg space-y-6">
@@ -80,7 +128,7 @@ export function SettingsPage() {
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400">개인 API Key</h3>
             <button
-              onClick={() => setShowForm(!showForm)}
+              onClick={() => { setShowForm(!showForm); setFormCredentials({}) }}
               className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline"
             >
               {showForm ? '취소' : '+ 새 키 등록'}
@@ -94,13 +142,12 @@ export function SettingsPage() {
                 <label className="block text-xs font-medium text-zinc-500 mb-1">서비스</label>
                 <select
                   value={formProvider}
-                  onChange={(e) => setFormProvider(e.target.value)}
+                  onChange={(e) => handleProviderChange(e.target.value)}
                   className="w-full px-3 py-2 rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm"
                 >
-                  <option value="kis">KIS 증권</option>
-                  <option value="notion">노션</option>
-                  <option value="email">이메일</option>
-                  <option value="telegram">텔레그램</option>
+                  {PROVIDER_OPTIONS.map((p) => (
+                    <option key={p} value={p}>{PROVIDER_LABELS[p] || p}</option>
+                  ))}
                 </select>
               </div>
               <div>
@@ -113,29 +160,36 @@ export function SettingsPage() {
                   className="w-full px-3 py-2 rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm"
                 />
               </div>
-              <div>
-                <label className="block text-xs font-medium text-zinc-500 mb-1">API Key</label>
-                <input
-                  type="password"
-                  value={formKey}
-                  onChange={(e) => setFormKey(e.target.value)}
-                  placeholder="API key 입력"
-                  className="w-full px-3 py-2 rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm"
-                />
-              </div>
+              {fields.map((f) => (
+                <div key={f.key}>
+                  <label className="block text-xs font-medium text-zinc-500 mb-1">{f.label}</label>
+                  <input
+                    type={f.type}
+                    value={formCredentials[f.key] || ''}
+                    onChange={(e) => handleFieldChange(f.key, e.target.value)}
+                    placeholder={`${f.label} 입력`}
+                    className="w-full px-3 py-2 rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm"
+                  />
+                </div>
+              ))}
+              <p className="text-[10px] text-zinc-400 flex items-center gap-1">
+                <span>🔒</span> 모든 키는 서버에서 암호화되어 저장됩니다
+              </p>
               <button
                 onClick={handleRegister}
-                disabled={!formKey.trim() || registerKey.isPending}
+                disabled={!allFieldsFilled || registerKey.isPending}
                 className="w-full py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700 disabled:opacity-50"
               >
-                {registerKey.isPending ? '등록 중...' : '등록 (AES-256 암호화 저장)'}
+                {registerKey.isPending ? '등록 중...' : '등록'}
               </button>
             </div>
           )}
 
           {/* 등록된 키 목록 */}
           <div className="space-y-2">
-            {keys.length === 0 ? (
+            {keysLoading ? (
+              <div className="text-center py-6 text-sm text-zinc-400">불러오는 중...</div>
+            ) : keys.length === 0 ? (
               <div className="text-center py-6 text-sm text-zinc-400">
                 등록된 API key가 없습니다
               </div>
@@ -148,11 +202,9 @@ export function SettingsPage() {
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium">
-                        {providerLabels[key.provider] || key.provider}
+                        {PROVIDER_LABELS[key.provider] || key.provider}
                       </span>
-                      <span className="text-[10px] bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-1.5 py-0.5 rounded-full">
-                        연동됨
-                      </span>
+                      <Badge variant="success">연동됨</Badge>
                     </div>
                     {key.label && (
                       <p className="text-xs text-zinc-400 mt-0.5">{key.label}</p>
