@@ -1,6 +1,6 @@
 # Story 8.4: P2 데이터베이스 스키마 — 도구 카탈로그 + 야간작업 스케줄 + 파일 관리 + 위임 계층
 
-Status: review
+Status: done
 
 ## Story
 

@@ -1,6 +1,6 @@
 # Story 8.3: 자격증명 봉투 통합 — 도구 핸들러에서 Credential Vault 접근
 
-Status: review
+Status: done
 
 ## Story
 

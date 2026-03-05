@@ -150,14 +150,14 @@ export async function executeTool(
     })
     .returning()
 
+  let timeoutId: ReturnType<typeof setTimeout> | undefined
   try {
-    let timeoutId: ReturnType<typeof setTimeout>
     const handlerName = toolRecord.handler || toolName
     const fn = registry.get(handlerName)
     if (!fn) {
       const durationMs = Date.now() - startTime
       const msg = `도구 '${handlerName}' 의 핸들러가 아직 구현되지 않았습니다.`
-      await db.update(toolCalls).set({ output: msg, durationMs }).where(eq(toolCalls.id, callLog.id))
+      await db.update(toolCalls).set({ output: msg, status: 'error', durationMs }).where(eq(toolCalls.id, callLog.id))
       return msg
     }
 
@@ -167,7 +167,7 @@ export async function executeTool(
         timeoutId = setTimeout(() => reject(new Error('TOOL_TIMEOUT')), TOOL_TIMEOUT_MS)
       }),
     ])
-    clearTimeout(timeoutId!)
+    if (timeoutId) clearTimeout(timeoutId)
 
     const durationMs = Date.now() - startTime
     await db
@@ -177,7 +177,7 @@ export async function executeTool(
 
     return result
   } catch (err) {
-    clearTimeout(timeoutId!)
+    if (timeoutId) clearTimeout(timeoutId)
     const durationMs = Date.now() - startTime
     const isTimeout = err instanceof Error && err.message === 'TOOL_TIMEOUT'
     const errMsg = isTimeout

@@ -1,6 +1,6 @@
 # Story 8.5: P2 테넌트 격리 테스트 — 도구/자격증명 API 격리 검증 + 보안 갭 수정
 
-Status: review
+Status: done
 
 ## Story
 

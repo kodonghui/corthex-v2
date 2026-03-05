@@ -128,13 +128,13 @@ development_status:
   # ============================================================
   # Epic 8: 도구 시스템 인프라 (P2)
   # ============================================================
-  epic-8: in-progress
-  8-1-tool-engine-handler: review
-  8-2-tool-definitions-api: review
-  8-3-credential-vault-integration: review
-  8-4-p2-db-schema: review
-  8-5-isolation-test-p2: review
-  epic-8-retrospective: optional
+  epic-8: done
+  8-1-tool-engine-handler: done
+  8-2-tool-definitions-api: done
+  8-3-credential-vault-integration: done
+  8-4-p2-db-schema: done
+  8-5-isolation-test-p2: done
+  epic-8-retrospective: done
 
   # ============================================================
   # Epic 9: 도구 카탈로그 20종+ (P2)

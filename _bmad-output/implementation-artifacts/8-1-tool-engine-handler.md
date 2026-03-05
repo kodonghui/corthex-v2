@@ -1,6 +1,6 @@
 # Story 8.1: 도구 엔진 핸들러 레지스트리 — switch/case → 플러그인 방식 전환
 
-Status: review
+Status: done
 
 ## Story
 

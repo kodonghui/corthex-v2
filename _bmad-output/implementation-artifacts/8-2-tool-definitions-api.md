@@ -1,6 +1,6 @@
 # Story 8.2: 도구 정의 API 고도화 — handler/inputSchema CRUD + 관리 UI 확장
 
-Status: review
+Status: done
 
 ## Story
 

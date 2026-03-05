@@ -37,10 +37,10 @@ const updateToolSchema = z.object({
 
 // GET /api/admin/tools
 toolsRoute.get('/tools', async (c) => {
-  const companyId = c.req.query('companyId')
-  const result = companyId
-    ? await db.select().from(toolDefinitions).where(eq(toolDefinitions.companyId, companyId))
-    : await db.select().from(toolDefinitions)
+  const tenant = c.get('tenant')
+  const result = await db.select().from(toolDefinitions).where(
+    or(isNull(toolDefinitions.companyId), eq(toolDefinitions.companyId, tenant.companyId)),
+  )
 
   const data = result.map((t) => ({
     ...t,
@@ -114,27 +114,33 @@ const assignToolSchema = z.object({
 
 // GET /api/admin/agent-tools?agentId=xxx
 toolsRoute.get('/agent-tools', async (c) => {
+  const tenant = c.get('tenant')
   const agentId = c.req.query('agentId')
   if (!agentId) throw new HTTPError(400, 'agentId 파라미터가 필요합니다', 'TOOL_001')
-  const result = await db.select().from(agentTools).where(eq(agentTools.agentId, agentId))
+  const result = await db.select().from(agentTools).where(
+    and(eq(agentTools.agentId, agentId), eq(agentTools.companyId, tenant.companyId)),
+  )
   return c.json({ data: result })
 })
 
 // POST /api/admin/agent-tools — 도구 할당
 toolsRoute.post('/agent-tools', zValidator('json', assignToolSchema), async (c) => {
+  const tenant = c.get('tenant')
   const body = c.req.valid('json')
+  if (body.companyId !== tenant.companyId) throw new HTTPError(403, '다른 회사의 도구를 할당할 수 없습니다', 'TOOL_004')
   const [mapping] = await db.insert(agentTools).values(body).returning()
   return c.json({ data: mapping }, 201)
 })
 
 // PATCH /api/admin/agent-tools/:id — 토글 on/off
 toolsRoute.patch('/agent-tools/:id', async (c) => {
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
   const { isEnabled } = await c.req.json<{ isEnabled: boolean }>()
   const [mapping] = await db
     .update(agentTools)
     .set({ isEnabled })
-    .where(eq(agentTools.id, id))
+    .where(and(eq(agentTools.id, id), eq(agentTools.companyId, tenant.companyId)))
     .returning()
   if (!mapping) throw new HTTPError(404, '매핑을 찾을 수 없습니다', 'TOOL_002')
   return c.json({ data: mapping })
@@ -142,8 +148,11 @@ toolsRoute.patch('/agent-tools/:id', async (c) => {
 
 // DELETE /api/admin/agent-tools/:id
 toolsRoute.delete('/agent-tools/:id', async (c) => {
+  const tenant = c.get('tenant')
   const id = c.req.param('id')
-  const [mapping] = await db.delete(agentTools).where(eq(agentTools.id, id)).returning()
+  const [mapping] = await db.delete(agentTools).where(
+    and(eq(agentTools.id, id), eq(agentTools.companyId, tenant.companyId)),
+  ).returning()
   if (!mapping) throw new HTTPError(404, '매핑을 찾을 수 없습니다', 'TOOL_002')
   return c.json({ data: { message: '삭제되었습니다' } })
 })
