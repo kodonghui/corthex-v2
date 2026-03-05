@@ -132,7 +132,7 @@ development_status:
   8-1-tool-engine-handler: review
   8-2-tool-definitions-api: review
   8-3-credential-vault-integration: review
-  8-4-p2-db-schema: backlog
+  8-4-p2-db-schema: review
   8-5-isolation-test-p2: backlog
   epic-8-retrospective: optional
 

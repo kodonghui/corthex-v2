@@ -196,8 +196,11 @@ export const toolDefinitions = pgTable('tool_definitions', {
   inputSchema: jsonb('input_schema'),  // Claude tool_use JSON Schema
   handler: varchar('handler', { length: 100 }),  // 서버 핸들러 함수명
   config: jsonb('config'),  // 도구별 설정
+  category: varchar('category', { length: 50 }),  // 'search', 'finance', 'content', 'utility', 'communication'
+  tags: jsonb('tags'),  // string[] — ['web', 'api', 'free', 'premium']
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
 }, (table) => ({
   companyIdx: index('tool_definitions_company_idx').on(table.companyId),
 }))
@@ -232,10 +235,12 @@ export const delegations = pgTable('delegations', {
   sessionId: uuid('session_id').notNull().references(() => chatSessions.id),
   secretaryAgentId: uuid('secretary_agent_id').notNull().references(() => agents.id),
   targetAgentId: uuid('target_agent_id').notNull().references(() => agents.id),
+  parentDelegationId: uuid('parent_delegation_id'),  // 자기참조 — 연쇄 위임 추적
   userMessage: text('user_message').notNull(),
   delegationPrompt: text('delegation_prompt').notNull(),
   agentResponse: text('agent_response'),
   status: delegationStatusEnum('status').notNull().default('pending'),
+  depth: integer('depth').notNull().default(0),  // 위임 깊이 (0 = 직접, 1+ = 연쇄)
   createdAt: timestamp('created_at').notNull().defaultNow(),
   completedAt: timestamp('completed_at'),
 })
@@ -299,9 +304,12 @@ export const nightJobs = pgTable('night_jobs', {
   userId: uuid('user_id').notNull().references(() => users.id),
   agentId: uuid('agent_id').notNull().references(() => agents.id),
   sessionId: uuid('session_id').references(() => chatSessions.id),
+  scheduleId: uuid('schedule_id'),  // FK added after nightJobSchedules defined
+  triggerId: uuid('trigger_id'),  // FK added after nightJobTriggers defined
   instruction: text('instruction').notNull(),
   status: jobStatusEnum('status').notNull().default('queued'),
   result: text('result'),
+  resultData: jsonb('result_data'),  // 구조화된 실행 결과
   error: text('error'),
   retryCount: integer('retry_count').notNull().default(0),
   maxRetries: integer('max_retries').notNull().default(3),
@@ -311,6 +319,38 @@ export const nightJobs = pgTable('night_jobs', {
   isRead: boolean('is_read').notNull().default(false),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
+
+// === 18b. night_job_schedules — 반복 야간작업 스케줄 ===
+export const nightJobSchedules = pgTable('night_job_schedules', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  agentId: uuid('agent_id').notNull().references(() => agents.id),
+  instruction: text('instruction').notNull(),
+  cronExpression: varchar('cron_expression', { length: 100 }).notNull(),
+  nextRunAt: timestamp('next_run_at'),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('night_schedules_company_idx').on(table.companyId),
+}))
+
+// === 18c. night_job_triggers — 이벤트 기반 트리거 ===
+export const nightJobTriggers = pgTable('night_job_triggers', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  agentId: uuid('agent_id').notNull().references(() => agents.id),
+  instruction: text('instruction').notNull(),
+  triggerType: varchar('trigger_type', { length: 50 }).notNull(),
+  condition: jsonb('condition').notNull(),
+  isActive: boolean('is_active').notNull().default(true),
+  lastTriggeredAt: timestamp('last_triggered_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('night_triggers_company_idx').on(table.companyId),
+}))
 
 // === 19. sns_contents — SNS 콘텐츠 ===
 export const snsContents = pgTable('sns_contents', {
@@ -429,7 +469,22 @@ export const messengerMessages = pgTable('messenger_messages', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 
-// === 26. canvas_layouts — NEXUS 캔버스 레이아웃 ===
+// === 26. files — 파일 메타데이터 ===
+export const files = pgTable('files', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  filename: varchar('filename', { length: 255 }).notNull(),
+  mimeType: varchar('mime_type', { length: 100 }).notNull(),
+  sizeBytes: integer('size_bytes').notNull(),
+  storagePath: text('storage_path').notNull(),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('files_company_idx').on(table.companyId),
+}))
+
+// === 27. canvas_layouts — NEXUS 캔버스 레이아웃 ===
 export const canvasLayouts = pgTable('canvas_layouts', {
   id: uuid('id').primaryKey().defaultRandom(),
   companyId: uuid('company_id').notNull().references(() => companies.id),
@@ -487,6 +542,7 @@ export const delegationsRelations = relations(delegations, ({ one }) => ({
   session: one(chatSessions, { fields: [delegations.sessionId], references: [chatSessions.id] }),
   secretaryAgent: one(agents, { fields: [delegations.secretaryAgentId], references: [agents.id] }),
   targetAgent: one(agents, { fields: [delegations.targetAgentId], references: [agents.id] }),
+  parentDelegation: one(delegations, { fields: [delegations.parentDelegationId], references: [delegations.id] }),
 }))
 
 export const reportsRelations = relations(reports, ({ one, many }) => ({
@@ -518,6 +574,22 @@ export const nightJobsRelations = relations(nightJobs, ({ one }) => ({
   user: one(users, { fields: [nightJobs.userId], references: [users.id] }),
   agent: one(agents, { fields: [nightJobs.agentId], references: [agents.id] }),
   session: one(chatSessions, { fields: [nightJobs.sessionId], references: [chatSessions.id] }),
+  schedule: one(nightJobSchedules, { fields: [nightJobs.scheduleId], references: [nightJobSchedules.id] }),
+  trigger: one(nightJobTriggers, { fields: [nightJobs.triggerId], references: [nightJobTriggers.id] }),
+}))
+
+export const nightJobSchedulesRelations = relations(nightJobSchedules, ({ one, many }) => ({
+  company: one(companies, { fields: [nightJobSchedules.companyId], references: [companies.id] }),
+  user: one(users, { fields: [nightJobSchedules.userId], references: [users.id] }),
+  agent: one(agents, { fields: [nightJobSchedules.agentId], references: [agents.id] }),
+  jobs: many(nightJobs),
+}))
+
+export const nightJobTriggersRelations = relations(nightJobTriggers, ({ one, many }) => ({
+  company: one(companies, { fields: [nightJobTriggers.companyId], references: [companies.id] }),
+  user: one(users, { fields: [nightJobTriggers.userId], references: [users.id] }),
+  agent: one(agents, { fields: [nightJobTriggers.agentId], references: [agents.id] }),
+  jobs: many(nightJobs),
 }))
 
 export const snsContentsRelations = relations(snsContents, ({ one }) => ({
@@ -559,6 +631,11 @@ export const messengerMessagesRelations = relations(messengerMessages, ({ one })
   company: one(companies, { fields: [messengerMessages.companyId], references: [companies.id] }),
   channel: one(messengerChannels, { fields: [messengerMessages.channelId], references: [messengerChannels.id] }),
   user: one(users, { fields: [messengerMessages.userId], references: [users.id] }),
+}))
+
+export const filesRelations = relations(files, ({ one }) => ({
+  company: one(companies, { fields: [files.companyId], references: [companies.id] }),
+  user: one(users, { fields: [files.userId], references: [users.id] }),
 }))
 
 export const canvasLayoutsRelations = relations(canvasLayouts, ({ one }) => ({

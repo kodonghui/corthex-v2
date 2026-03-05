@@ -64,6 +64,20 @@
       "when": 1772697134269,
       "tag": "0008_flaky_black_tarantula",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1772714533450,
+      "tag": "0009_add-notification-prefs-unique",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1772718215706,
+      "tag": "0010_strong_mephistopheles",
+      "breakpoints": true
     }
   ]
 }
