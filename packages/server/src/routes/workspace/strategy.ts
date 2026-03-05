@@ -53,9 +53,9 @@ strategyRoute.post('/watchlist', zValidator('json', addWatchlistSchema), async (
 })
 
 // DELETE /api/workspace/strategy/watchlist/:id — 종목 삭제
-strategyRoute.delete('/watchlist/:id', async (c) => {
+strategyRoute.delete('/watchlist/:id', zValidator('param', z.object({ id: z.string().uuid() })), async (c) => {
   const tenant = c.get('tenant')
-  const id = c.req.param('id')
+  const { id } = c.req.valid('param')
 
   const [deleted] = await db
     .delete(strategyWatchlists)

@@ -1,6 +1,6 @@
 # Story 10.1: 전략실 레이아웃 — 3패널 반응형 레이아웃 + 종목 검색
 
-Status: review
+Status: done
 
 ## Story
 

@@ -2,13 +2,7 @@ import { useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../../lib/api'
 import { Card, EmptyState } from '@corthex/ui'
-
-type WatchlistItem = {
-  id: string
-  stockCode: string
-  stockName: string
-  market: string
-}
+import type { WatchlistItem } from './types'
 
 export function ChartPanel() {
   const [searchParams] = useSearchParams()

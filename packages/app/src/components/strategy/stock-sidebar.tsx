@@ -3,13 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
 import { api } from '../../lib/api'
 import { Input, toast } from '@corthex/ui'
-
-type WatchlistItem = {
-  id: string
-  stockCode: string
-  stockName: string
-  market: string
-}
+import type { WatchlistItem } from './types'
 
 interface StockSidebarProps {
   className?: string
@@ -32,6 +26,7 @@ export function StockSidebar({ className }: StockSidebarProps) {
       queryClient.invalidateQueries({ queryKey: ['strategy-watchlist'] })
       toast.success('종목이 삭제되었습니다')
     },
+    onError: () => toast.error('종목 삭제에 실패했습니다'),
   })
 
   const items = data?.data ?? []
@@ -63,10 +58,13 @@ export function StockSidebar({ className }: StockSidebarProps) {
       </div>
       <div className="flex-1 overflow-y-auto">
         {filtered.map((stock) => (
-          <button
+          <div
             key={stock.id}
+            role="button"
+            tabIndex={0}
             onClick={() => selectStock(stock.stockCode)}
-            className={`w-full flex items-center justify-between px-3 py-2.5 text-left text-sm transition-colors min-h-[44px] ${
+            onKeyDown={(e) => e.key === 'Enter' && selectStock(stock.stockCode)}
+            className={`w-full flex items-center justify-between px-3 py-2.5 text-left text-sm transition-colors min-h-[44px] cursor-pointer ${
               selectedStock === stock.stockCode
                 ? 'bg-zinc-100 dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400'
                 : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
@@ -86,7 +84,7 @@ export function StockSidebar({ className }: StockSidebarProps) {
             >
               x
             </button>
-          </button>
+          </div>
         ))}
         {filtered.length === 0 && (
           <p className="px-3 py-6 text-xs text-zinc-400 text-center">
