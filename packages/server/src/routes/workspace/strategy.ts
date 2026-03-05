@@ -6,6 +6,8 @@ import { db } from '../../db'
 import { strategyWatchlists, chatSessions, agents } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
+import { getCredentials } from '../../services/credential-vault'
+import { getKisToken, kisHeaders, KIS_BASE_URL } from '../../lib/tool-handlers/builtins/kis-auth'
 import type { AppEnv } from '../../types'
 
 export const strategyRoute = new Hono<AppEnv>()
@@ -171,5 +173,117 @@ strategyRoute.patch(
     if (!updated) throw new HTTPError(404, '세션을 찾을 수 없습니다', 'STRATEGY_004')
 
     return c.json({ data: updated })
+  },
+)
+
+// === 시세 조회 ===
+
+// GET /api/workspace/strategy/prices?codes=005930,035420 — 실시간 시세
+strategyRoute.get('/prices', zValidator('query', z.object({ codes: z.string().min(1) })), async (c) => {
+  const tenant = c.get('tenant')
+  const { codes } = c.req.valid('query')
+  const codeList = codes.split(',').map((s) => s.trim()).filter(Boolean).slice(0, 20)
+
+  let creds: Record<string, string>
+  try {
+    creds = await getCredentials(tenant.companyId, 'kis', tenant.userId)
+  } catch {
+    throw new HTTPError(400, 'KIS API 키가 등록되지 않았습니다', 'STRATEGY_010')
+  }
+
+  const token = await getKisToken(creds.app_key, creds.app_secret)
+  const results: Record<string, unknown> = {}
+
+  for (const code of codeList) {
+    try {
+      const params = new URLSearchParams({
+        FID_COND_MRKT_DIV_CODE: 'J',
+        FID_INPUT_ISCD: code,
+      })
+      const res = await fetch(`${KIS_BASE_URL}/uapi/domestic-stock/v1/quotations/inquire-price?${params}`, {
+        headers: kisHeaders(token, creds.app_key, creds.app_secret, 'FHKST01010100'),
+        signal: AbortSignal.timeout(10_000),
+      })
+      if (!res.ok) { results[code] = { error: true }; continue }
+      const data = await res.json() as { output?: Record<string, string>; rt_cd?: string }
+      if (data.rt_cd !== '0') { results[code] = { error: true }; continue }
+      const o = data.output || {}
+      results[code] = {
+        name: o.hts_kor_isnm || code,
+        price: Number(o.stck_prpr || 0),
+        change: Number(o.prdy_vrss || 0),
+        changeRate: Number(o.prdy_ctrt || 0),
+        open: Number(o.stck_oprc || 0),
+        high: Number(o.stck_hgpr || 0),
+        low: Number(o.stck_lwpr || 0),
+        volume: Number(o.acml_vol || 0),
+      }
+    } catch {
+      results[code] = { error: true }
+    }
+  }
+
+  return c.json({ data: results })
+})
+
+// GET /api/workspace/strategy/chart-data?code=005930&count=60 — 일봉 차트 데이터
+strategyRoute.get(
+  '/chart-data',
+  zValidator('query', z.object({
+    code: z.string().min(1).max(20),
+    count: z.coerce.number().int().min(1).max(200).default(60),
+  })),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const { code, count } = c.req.valid('query')
+
+    let creds: Record<string, string>
+    try {
+      creds = await getCredentials(tenant.companyId, 'kis', tenant.userId)
+    } catch {
+      throw new HTTPError(400, 'KIS API 키가 등록되지 않았습니다', 'STRATEGY_011')
+    }
+
+    const token = await getKisToken(creds.app_key, creds.app_secret)
+
+    const endDate = new Date()
+    const startDate = new Date()
+    startDate.setDate(startDate.getDate() - Math.ceil(count * 1.6))
+
+    const fmt = (d: Date) => d.toISOString().slice(0, 10).replace(/-/g, '')
+
+    const params = new URLSearchParams({
+      FID_COND_MRKT_DIV_CODE: 'J',
+      FID_INPUT_ISCD: code,
+      FID_INPUT_DATE_1: fmt(startDate),
+      FID_INPUT_DATE_2: fmt(endDate),
+      FID_PERIOD_DIV_CODE: 'D',
+      FID_ORG_ADJ_PRC: '0',
+    })
+
+    const res = await fetch(`${KIS_BASE_URL}/uapi/domestic-stock/v1/quotations/inquire-daily-price?${params}`, {
+      headers: kisHeaders(token, creds.app_key, creds.app_secret, 'FHKST03010100'),
+      signal: AbortSignal.timeout(15_000),
+    })
+
+    if (!res.ok) throw new HTTPError(502, 'KIS 일봉 API 호출 실패', 'STRATEGY_012')
+
+    const data = await res.json() as { output2?: Array<Record<string, string>>; rt_cd?: string }
+    if (data.rt_cd !== '0') throw new HTTPError(502, 'KIS 일봉 데이터 오류', 'STRATEGY_013')
+
+    const candles = (data.output2 || [])
+      .filter((r) => r.stck_bsop_date && r.stck_oprc !== '0')
+      .map((r) => ({
+        time: `${r.stck_bsop_date.slice(0, 4)}-${r.stck_bsop_date.slice(4, 6)}-${r.stck_bsop_date.slice(6, 8)}`,
+        open: Number(r.stck_oprc),
+        high: Number(r.stck_hgpr),
+        low: Number(r.stck_lwpr),
+        close: Number(r.stck_clpr),
+        volume: Number(r.acml_vol || 0),
+      }))
+      .reverse()
+      .slice(-count)
+
+    return c.json({ data: { candles } })
   },
 )
