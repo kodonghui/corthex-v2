@@ -1,6 +1,6 @@
 # Story 1.5: @corthex/ui Phase A 컴포넌트 라이브러리
 
-Status: review
+Status: done
 
 ## Story
 
