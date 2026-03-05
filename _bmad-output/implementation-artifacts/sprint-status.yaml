@@ -189,11 +189,11 @@ development_status:
   # ============================================================
   # Epic 13: 파일 관리 (P2)
   # ============================================================
-  epic-13: backlog
-  13-1-file-upload-storage: backlog
-  13-2-file-chat-attach: backlog
-  13-3-file-management-ui: backlog
-  epic-13-retrospective: optional
+  epic-13: done
+  13-1-file-upload-storage: done
+  13-2-file-chat-attach: done
+  13-3-file-management-ui: done
+  epic-13-retrospective: done
 
   # ============================================================
   # Epic 14: SNS 콘텐츠 파이프라인 (P3) — 파티모드 후 5개 스토리
