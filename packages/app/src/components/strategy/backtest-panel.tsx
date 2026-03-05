@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../../lib/api'
 import { Button, Card, ConfirmDialog, toast } from '@corthex/ui'
@@ -29,14 +29,29 @@ interface BacktestPanelProps {
   stockCode: string
   candles: Candle[]
   onMarkers: (markers: MarkerData[]) => void
+  onParamsChange?: (params: { shortPeriod: number; longPeriod: number } | null) => void
+  initialShort?: number
+  initialLong?: number
+  autoRun?: boolean
 }
 
-export function BacktestPanel({ stockCode, candles, onMarkers }: BacktestPanelProps) {
+export function BacktestPanel({ stockCode, candles, onMarkers, onParamsChange, initialShort, initialLong, autoRun }: BacktestPanelProps) {
   const queryClient = useQueryClient()
-  const [shortPeriod, setShortPeriod] = useState(5)
-  const [longPeriod, setLongPeriod] = useState(20)
+  const [shortPeriod, setShortPeriod] = useState(initialShort ?? 5)
+  const [longPeriod, setLongPeriod] = useState(initialLong ?? 20)
   const [result, setResult] = useState<BacktestResult | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
+
+  // Auto-run backtest when opened from shared URL
+  useEffect(() => {
+    if (autoRun && initialShort && initialLong && candles.length > 0) {
+      const res = runMaCrossover(candles, initialShort, initialLong)
+      setResult(res)
+      onMarkers(res.signals.map((s) => ({ time: s.date, type: s.type })))
+      onParamsChange?.({ shortPeriod: initialShort, longPeriod: initialLong })
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoRun, candles.length])
 
   const { data: savedRes } = useQuery({
     queryKey: ['strategy-backtest', stockCode],
@@ -72,6 +87,7 @@ export function BacktestPanel({ stockCode, candles, onMarkers }: BacktestPanelPr
     const res = runMaCrossover(candles, shortPeriod, longPeriod)
     setResult(res)
     onMarkers(res.signals.map((s) => ({ time: s.date, type: s.type })))
+    onParamsChange?.({ shortPeriod, longPeriod })
   }
 
   const saveResult = () => {
@@ -94,11 +110,13 @@ export function BacktestPanel({ stockCode, candles, onMarkers }: BacktestPanelPr
     setShortPeriod(item.strategyParams.shortPeriod)
     setLongPeriod(item.strategyParams.longPeriod)
     onMarkers(item.signals.map((s) => ({ time: s.date, type: s.type })))
+    onParamsChange?.({ shortPeriod: item.strategyParams.shortPeriod, longPeriod: item.strategyParams.longPeriod })
   }
 
   const clearResult = () => {
     setResult(null)
     onMarkers([])
+    onParamsChange?.(null)
   }
 
   const returnColor = (v: number) => v > 0 ? 'text-emerald-500' : v < 0 ? 'text-red-500' : 'text-zinc-400'

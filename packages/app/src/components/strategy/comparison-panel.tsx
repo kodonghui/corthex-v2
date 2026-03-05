@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../../lib/api'
-import { Card, EmptyState } from '@corthex/ui'
+import { Button, Card, EmptyState, toast } from '@corthex/ui'
 
 type PriceData = {
   name: string
@@ -88,8 +88,20 @@ export function ComparisonPanel() {
             <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
               종목 비교 ({codes.length}개)
             </h2>
-            <div className="text-xs text-zinc-400">
-              {!marketOpen && <span className="text-zinc-500">장 마감</span>}
+            <div className="flex items-center gap-2">
+              {!marketOpen && <span className="text-xs text-zinc-500">장 마감</span>}
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href).then(
+                    () => toast.success('공유 링크가 복사되었습니다'),
+                    () => toast.error('클립보드 복사에 실패했습니다'),
+                  )
+                }}
+              >
+                공유
+              </Button>
             </div>
           </div>
         </div>

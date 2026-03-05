@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../../lib/api'
-import { Button, Card, EmptyState } from '@corthex/ui'
+import { Button, Card, EmptyState, toast } from '@corthex/ui'
 import { StockChart, type MarkerData } from './stock-chart'
 import { NotesPanel } from './notes-panel'
 import { ExportDialog } from './export-dialog'
@@ -58,6 +58,13 @@ export function ChartPanel() {
   const [exportOpen, setExportOpen] = useState(false)
   const [backtestOpen, setBacktestOpen] = useState(false)
   const [markers, setMarkers] = useState<MarkerData[]>([])
+  const [backtestParams, setBacktestParams] = useState<{ shortPeriod: number; longPeriod: number } | null>(null)
+
+  // Parse backtest URL params for auto-run
+  const btType = searchParams.get('bt')
+  const spRaw = Number(searchParams.get('sp'))
+  const lpRaw = Number(searchParams.get('lp'))
+  const autoBacktest = btType === 'ma' && !isNaN(spRaw) && !isNaN(lpRaw) && spRaw > 0 && lpRaw > 0 && spRaw < lpRaw
 
   useEffect(() => {
     const id = setInterval(() => setMarketOpen(isMarketOpen()), 60_000)
@@ -108,7 +115,28 @@ export function ChartPanel() {
     setLastUpdated(null)
     setMarkers([])
     setBacktestOpen(false)
+    setBacktestParams(null)
   }, [stockCode])
+
+  // Auto-open backtest panel when URL has backtest params
+  useEffect(() => {
+    if (autoBacktest && stockCode) {
+      setBacktestOpen(true)
+    }
+  }, [autoBacktest, stockCode])
+
+  const shareUrl = () => {
+    const url = new URL(window.location.href)
+    if (backtestOpen && backtestParams) {
+      url.searchParams.set('bt', 'ma')
+      url.searchParams.set('sp', String(backtestParams.shortPeriod))
+      url.searchParams.set('lp', String(backtestParams.longPeriod))
+    }
+    navigator.clipboard.writeText(url.toString()).then(
+      () => toast.success('공유 링크가 복사되었습니다'),
+      () => toast.error('클립보드 복사에 실패했습니다'),
+    )
+  }
 
   if (!stockCode || !stock) {
     return (
@@ -149,6 +177,7 @@ export function ChartPanel() {
               <Button size="sm" variant="ghost" onClick={() => setBacktestOpen(!backtestOpen)}>
                 {backtestOpen ? '백테스트 닫기' : '백테스트'}
               </Button>
+              <Button size="sm" variant="ghost" onClick={shareUrl}>공유</Button>
               <Button size="sm" variant="ghost" onClick={() => setExportOpen(true)}>내보내기</Button>
             </div>
           </div>
@@ -206,6 +235,10 @@ export function ChartPanel() {
           stockCode={stockCode}
           candles={candles}
           onMarkers={setMarkers}
+          onParamsChange={setBacktestParams}
+          initialShort={autoBacktest ? spRaw : undefined}
+          initialLong={autoBacktest ? lpRaw : undefined}
+          autoRun={autoBacktest}
         />
       )}
 
