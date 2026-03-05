@@ -171,7 +171,7 @@ development_status:
   11-1-night-task-scheduler: review
   11-2-night-task-crud-ui: review
   11-3-trigger-auto-exec: review
-  11-4-auto-report-gen: backlog
+  11-4-auto-report-gen: review
   11-5-p2-websocket-events: backlog
   11-6-advanced-task-chain: backlog
   epic-11-retrospective: optional

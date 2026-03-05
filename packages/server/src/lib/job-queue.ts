@@ -2,7 +2,7 @@
 // Neon 서버리스 호환 (pg-boss 대신 자체 구현)
 
 import { db } from '../db'
-import { nightJobs, agents, chatSessions, chatMessages, agentMemory } from '../db/schema'
+import { nightJobs, agents, chatSessions, chatMessages, agentMemory, reports } from '../db/schema'
 import { eq, and, lte, asc } from 'drizzle-orm'
 import { generateAgentResponse } from './ai'
 import { orchestrateSecretary } from './orchestrator'
@@ -143,12 +143,30 @@ async function processJob(job: typeof nightJobs.$inferSelect) {
       metadata: { jobId: job.id },
     })
 
+    // 자동 보고서 생성
+    let reportId: string | null = null
+    try {
+      const now = new Date()
+      const [report] = await db.insert(reports).values({
+        companyId: job.companyId,
+        authorId: job.userId,
+        title: `[야간] ${agent.name} — ${job.instruction.slice(0, 50)}`,
+        content: `## 야간 작업 결과\n\n**에이전트:** ${agent.name}\n**실행 시간:** ${now.toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}\n**지시:** ${job.instruction}\n\n---\n\n${result}`,
+        status: 'draft',
+      }).returning()
+      reportId = report.id
+      console.log(`📝 자동 보고서 생성: ${report.id}`)
+    } catch (reportErr) {
+      console.error(`⚠️ 자동 보고서 생성 실패 (작업은 완료):`, reportErr)
+    }
+
     // 작업 완료
     await db
       .update(nightJobs)
       .set({
         status: 'completed',
         result,
+        resultData: reportId ? { reportId } : null,
         completedAt: new Date(),
         sessionId,
       })

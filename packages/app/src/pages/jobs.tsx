@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
 import { api } from '../lib/api'
 import { Select, Textarea, Input, Tabs, ConfirmDialog, Badge, toast } from '@corthex/ui'
 
@@ -24,6 +25,7 @@ type NightJob = {
   scheduledFor: string
   startedAt: string | null
   completedAt: string | null
+  resultData: { reportId?: string } | null
   isRead: boolean
   createdAt: string
 }
@@ -95,6 +97,7 @@ export function JobsPage() {
 
 /* ─── 작업 탭 (기존) ─── */
 function JobsTab() {
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [showForm, setShowForm] = useState(false)
   const [selectedAgent, setSelectedAgent] = useState('')
@@ -279,6 +282,14 @@ function JobsTab() {
                           {job.error}
                         </p>
                       </div>
+                    )}
+                    {job.resultData?.reportId && (
+                      <button
+                        onClick={() => navigate('/reports')}
+                        className="mb-3 px-3 py-1.5 bg-indigo-600 text-white rounded-md text-xs font-medium hover:bg-indigo-700"
+                      >
+                        보고서 보기
+                      </button>
                     )}
                     {job.retryCount > 0 && (
                       <p className="text-[10px] text-zinc-400">

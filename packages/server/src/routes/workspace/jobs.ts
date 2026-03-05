@@ -62,6 +62,7 @@ jobsRoute.get('/', async (c) => {
       scheduledFor: nightJobs.scheduledFor,
       startedAt: nightJobs.startedAt,
       completedAt: nightJobs.completedAt,
+      resultData: nightJobs.resultData,
       isRead: nightJobs.isRead,
       createdAt: nightJobs.createdAt,
     })
