@@ -198,13 +198,13 @@ development_status:
   # ============================================================
   # Epic 14: SNS 콘텐츠 파이프라인 (P3) — 파티모드 후 5개 스토리
   # ============================================================
-  epic-14: backlog
-  14-1-sns-content-planning: backlog
-  14-2-ai-image-gen-post: backlog
-  14-3-sns-analytics: backlog
-  14-4-sns-multi-account: backlog
-  14-5-ab-test-optimize: backlog
-  epic-14-retrospective: optional
+  epic-14: done
+  14-1-sns-content-planning: done
+  14-2-ai-image-gen-post: done
+  14-3-sns-analytics: done
+  14-4-sns-multi-account: done
+  14-5-ab-test-optimize: done
+  epic-14-retrospective: done
 
   # ============================================================
   # Epic 15: 운영 도구 (P3) — 스토리 순서 재배치 완료
