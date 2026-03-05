@@ -22,6 +22,7 @@ import { telegramRoute } from './routes/workspace/telegram'
 import { messengerRoute } from './routes/workspace/messenger'
 import { nexusRoute } from './routes/workspace/nexus'
 import { startJobWorker } from './lib/job-queue'
+import { loginRateLimit, apiRateLimit } from './middleware/rate-limit'
 import type { AppEnv } from './types'
 
 const app = new Hono<AppEnv>()
@@ -38,6 +39,10 @@ app.use('*', cors({
 
 // 글로벌 에러 핸들러 (서브라우터 에러도 캐치)
 app.onError(errorHandler)
+
+// Rate Limiting
+app.use('/api/*', apiRateLimit)          // 일반 API: 100/min
+app.use('/api/auth/login', loginRateLimit) // 로그인: 5/min
 
 // 공개 라우트 (인증 불필요)
 app.route('/api', healthRoute)
@@ -111,6 +116,15 @@ console.log(`🚀 CORTHEX v2 서버 시작 — http://localhost:${port}`)
 
 // 야간 작업 워커 시작 (백그라운드 폴링)
 startJobWorker()
+
+// Graceful Shutdown — SIGTERM 시 진행 중 요청 최대 10초 대기 후 종료
+process.on('SIGTERM', () => {
+  console.log('🛑 SIGTERM 수신 — 서버 종료 중...')
+  setTimeout(() => {
+    console.log('✅ 서버 종료')
+    process.exit(0)
+  }, 10_000)
+})
 
 export default {
   port,

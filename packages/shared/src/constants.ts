@@ -30,6 +30,15 @@ export const ERROR_CODES = {
   // NEXUS
   NEXUS_001: '레이아웃을 찾을 수 없습니다',
   NEXUS_002: '조직도 데이터 조회 실패',
+  // 자동매매
+  TRADE_001: '자동매매 한도 초과',
+  TRADE_002: '모의/실투자 모드 불일치',
+  // 도구
+  TOOL_001: 'API key 없음 또는 조회 실패',
+  TOOL_002: '도구 실행 타임아웃',
+  // Rate Limiting
+  AUTH_004: '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.',
+  RATE_001: 'API 요청 한도 초과',
 } as const
 
 export type ErrorCode = keyof typeof ERROR_CODES
