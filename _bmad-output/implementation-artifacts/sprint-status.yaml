@@ -162,7 +162,7 @@ development_status:
   10-7-backtest-results: done
   10-8-strategy-share-url: done
   10-9-collab-editor: done
-  epic-10-retrospective: optional
+  epic-10-retrospective: done
 
   # ============================================================
   # Epic 11: 야간작업 & 자동실행 (P2)
