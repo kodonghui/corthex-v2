@@ -4,7 +4,7 @@ import { api } from '../lib/api'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, Badge, StatusDot, Skeleton } from '@corthex/ui'
 
-type Agent = { id: string; name: string; role: string; status: string }
+type Agent = { id: string; name: string; role: string; status: string; isSecretary: boolean }
 type JobNotification = {
   id: string
   agentName: string
@@ -19,6 +19,27 @@ type NotificationsResponse = {
   completedCount: number
   failedCount: number
   jobs: JobNotification[]
+}
+
+const STATUS_ORDER: Record<string, number> = { online: 0, working: 1, error: 2, offline: 3 }
+const MAX_AGENTS = 8
+
+function sortAgents(agents: Agent[]): Agent[] {
+  return [...agents].sort((a, b) => {
+    if (a.isSecretary !== b.isSecretary) return a.isSecretary ? -1 : 1
+    const statusDiff = (STATUS_ORDER[a.status] ?? 9) - (STATUS_ORDER[b.status] ?? 9)
+    if (statusDiff !== 0) return statusDiff
+    return a.name.localeCompare(b.name, 'ko')
+  })
+}
+
+function formatDate(): string {
+  return new Date().toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    weekday: 'long',
+  })
 }
 
 export function HomePage() {
@@ -45,17 +66,20 @@ export function HomePage() {
     },
   })
 
-  const agents = agentsData?.data || []
+  const allAgents = agentsData?.data || []
+  const sorted = sortAgents(allAgents)
+  const visibleAgents = sorted.slice(0, MAX_AGENTS)
+  const overflowCount = sorted.length - MAX_AGENTS
   const notifications = notifData?.data
 
   return (
-    <div className="p-6 max-w-4xl">
-      {/* 인사말 */}
+    <div className="p-4 md:p-6 max-w-4xl">
+      {/* 인사 헤더 */}
       <div className="mb-8">
         <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-          안녕하세요 {user?.name}님
+          안녕하세요, {user?.name}님 👋
         </h1>
-        <p className="text-sm text-zinc-500 mt-0.5">오늘도 좋은 하루 되세요.</p>
+        <p className="text-sm text-zinc-500 mt-0.5">{formatDate()}</p>
       </div>
 
       {/* 야간 작업 알림 */}
@@ -113,8 +137,8 @@ export function HomePage() {
       <div className="mb-6">
         <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-3">내 팀</h2>
         {agentsLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {[1, 2, 3].map((i) => (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map((i) => (
               <Card key={i}>
                 <CardContent className="space-y-2">
                   <Skeleton className="h-4 w-20" />
@@ -124,27 +148,42 @@ export function HomePage() {
               </Card>
             ))}
           </div>
-        ) : agents.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {agents.map((a) => (
-              <Card
-                key={a.id}
-                className="cursor-pointer hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors"
-                onClick={() => navigate('/chat')}
-              >
-                <CardContent>
-                  <div className="flex items-center gap-2 mb-1">
-                    <StatusDot status={a.status} />
-                    <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{a.name}</span>
-                  </div>
-                  <p className="text-xs text-zinc-500 mb-2">{a.role}</p>
-                  {a.status === 'online' && (
-                    <span className="text-[10px] text-indigo-600 dark:text-indigo-400">채팅 →</span>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+        ) : visibleAgents.length > 0 ? (
+          <>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {visibleAgents.map((a) => {
+                const isOffline = a.status === 'offline'
+                return (
+                  <Card
+                    key={a.id}
+                    className={`transition-colors ${
+                      isOffline
+                        ? 'opacity-60'
+                        : 'cursor-pointer hover:border-indigo-300 dark:hover:border-indigo-700'
+                    }`}
+                    onClick={isOffline ? undefined : () => navigate('/chat')}
+                  >
+                    <CardContent>
+                      <div className="flex items-center gap-2 mb-1">
+                        <StatusDot status={a.status} />
+                        <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{a.name}</span>
+                        {a.isSecretary && <span className="text-xs" title="비서">⭐</span>}
+                      </div>
+                      <p className="text-xs text-zinc-500 mb-2">{a.role}</p>
+                      {!isOffline && (
+                        <span className="text-[10px] text-indigo-600 dark:text-indigo-400">채팅 →</span>
+                      )}
+                    </CardContent>
+                  </Card>
+                )
+              })}
+            </div>
+            {overflowCount > 0 && (
+              <p className="text-xs text-zinc-400 mt-2 text-center">
+                +{overflowCount}명 더 보기
+              </p>
+            )}
+          </>
         ) : (
           <Card>
             <CardContent className="py-8 text-center">
@@ -155,7 +194,7 @@ export function HomePage() {
         )}
       </div>
 
-      {/* 빠른 액션 */}
+      {/* 빠른 시작 */}
       <div>
         <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-3">빠른 시작</h2>
         <div className="grid grid-cols-3 gap-3">
