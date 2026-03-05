@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, varchar, boolean, jsonb, integer, pgEnum, index, uniqueIndex } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, uuid, varchar, boolean, jsonb, integer, pgEnum, index } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 
 // === Enums ===
@@ -38,7 +38,9 @@ export const users = pgTable('users', {
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
-})
+}, (table) => ({
+  companyIdx: index('users_company_idx').on(table.companyId),
+}))
 
 // === 2a. admin_users — 관리자 계정 (별도 인증) ===
 export const adminUsers = pgTable('admin_users', {
@@ -79,7 +81,9 @@ export const departments = pgTable('departments', {
   name: varchar('name', { length: 100 }).notNull(),
   description: text('description'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-})
+}, (table) => ({
+  companyIdx: index('departments_company_idx').on(table.companyId),
+}))
 
 // === 4. agents — AI 에이전트 ===
 export const agents = pgTable('agents', {
@@ -95,7 +99,9 @@ export const agents = pgTable('agents', {
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
-})
+}, (table) => ({
+  companyIdx: index('agents_company_idx').on(table.companyId),
+}))
 
 // === 4a. notification_preferences — 유저별 알림 설정 ===
 export const notificationPreferences = pgTable('notification_preferences', {
@@ -145,7 +151,9 @@ export const chatSessions = pgTable('chat_sessions', {
   title: varchar('title', { length: 200 }).notNull().default('새 대화'),
   lastMessageAt: timestamp('last_message_at'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-})
+}, (table) => ({
+  companyIdx: index('chat_sessions_company_idx').on(table.companyId),
+}))
 
 // === 8. chat_messages — 채팅 메시지 히스토리 ===
 export const chatMessages = pgTable('chat_messages', {
@@ -184,7 +192,9 @@ export const toolDefinitions = pgTable('tool_definitions', {
   config: jsonb('config'),  // 도구별 설정
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-})
+}, (table) => ({
+  companyIdx: index('tool_definitions_company_idx').on(table.companyId),
+}))
 
 // === 11. agent_tools — 에이전트-도구 매핑 ===
 export const agentTools = pgTable('agent_tools', {
@@ -205,7 +215,9 @@ export const reportLines = pgTable('report_lines', {
   reporterId: uuid('reporter_id').notNull().references(() => users.id),  // 보고하는 사람
   supervisorId: uuid('supervisor_id').notNull().references(() => users.id),  // 보고받는 사람
   createdAt: timestamp('created_at').notNull().defaultNow(),
-})
+}, (table) => ({
+  companyIdx: index('report_lines_company_idx').on(table.companyId),
+}))
 
 // === 13. delegations — 비서 위임 (secretary → department agent) ===
 export const delegations = pgTable('delegations', {

@@ -1,6 +1,6 @@
 # Story 1.2: PostgreSQL + Drizzle ORM + P1 DB 스키마
 
-Status: review
+Status: done
 
 ## Story
 
@@ -251,6 +251,7 @@ claude-opus-4-6
 ### Change Log
 
 - 2026-03-05: Story 1.2 구현 완료 — P1 DB 스키마 완성 (6개 태스크)
+- 2026-03-05: Code Review — H1(6개 테이블 company_id 인덱스 누락) + M1(dead import) 수정 완료 → done
 
 ### File List
 
