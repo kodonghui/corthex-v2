@@ -209,43 +209,43 @@ development_status:
   # ============================================================
   # Epic 15: 운영 도구 (P3) — 스토리 순서 재배치 완료
   # ============================================================
-  epic-15: backlog
-  15-1-p3-db-schema-ws: backlog
-  15-2-soul-template-mgmt: backlog
-  15-3-soul-editor: backlog
-  15-4-system-monitoring: backlog
-  15-5-org-tree-viewer: backlog
-  epic-15-retrospective: optional
+  epic-15: done
+  15-1-p3-db-schema-ws: done
+  15-2-soul-template-mgmt: done
+  15-3-soul-editor: done
+  15-4-system-monitoring: done
+  15-5-org-tree-viewer: done
+  epic-15-retrospective: done
 
   # ============================================================
   # Epic 16: 사내 메신저 (P3~P4)
   # ============================================================
-  epic-16: backlog
-  16-1-messenger-channel-mgmt: backlog
-  16-2-realtime-message-agent: backlog
-  16-3-message-reaction-thread: backlog
-  16-4-messenger-search-notify: backlog
-  16-5-messenger-mobile-pwa: backlog
-  16-6-p4-file-attach: backlog
-  epic-16-retrospective: optional
+  epic-16: done
+  16-1-messenger-channel-mgmt: done
+  16-2-realtime-message-agent: done
+  16-3-message-reaction-thread: done
+  16-4-messenger-search-notify: done
+  16-5-messenger-mobile-pwa: done
+  16-6-p4-file-attach: done
+  epic-16-retrospective: done
 
   # ============================================================
   # Epic 17: NEXUS 스케치바이브 (P4) — 스토리 순서 재배치 완료
   # ============================================================
-  epic-17: backlog
-  17-1-p4-db-schema-ws: backlog
-  17-2-nexus-canvas-base: backlog
-  17-3-workflow-edit-exec: backlog
-  17-4-nexus-template-share: backlog
-  17-5-nexus-mobile-access: backlog
-  epic-17-retrospective: optional
+  epic-17: done
+  17-1-p4-db-schema-ws: done
+  17-2-nexus-canvas-base: done
+  17-3-workflow-edit-exec: done
+  17-4-nexus-template-share: done
+  17-5-nexus-mobile-access: done
+  epic-17-retrospective: done
 
   # ============================================================
   # Epic 18: MCP 연동 (P4)
   # ============================================================
-  epic-18: backlog
-  18-1-mcp-server-mgmt: backlog
-  18-2-mcp-tool-exec: backlog
-  18-3-mcp-streaming: backlog
-  18-4-mcp-security: backlog
-  epic-18-retrospective: optional
+  epic-18: done
+  18-1-mcp-server-mgmt: done
+  18-2-mcp-tool-exec: done
+  18-3-mcp-streaming: done
+  18-4-mcp-security: done
+  epic-18-retrospective: done
