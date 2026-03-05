@@ -160,6 +160,21 @@ export async function orchestrateSecretary(
 ): Promise<string> {
   const client = await getClientForUser(ctx.userId, ctx.companyId)
 
+  // 위임 깊이 제한 (최대 3단계)
+  const MAX_DELEGATION_DEPTH = 3
+
+  const existingDelegations = await db
+    .select({ id: delegations.id })
+    .from(delegations)
+    .where(and(
+      eq(delegations.sessionId, ctx.sessionId),
+      eq(delegations.status, 'processing'),
+    ))
+
+  if (existingDelegations.length >= MAX_DELEGATION_DEPTH) {
+    return '위임 깊이 제한에 도달했습니다. 현재 처리 중인 위임이 완료된 후 다시 시도해주세요.'
+  }
+
   // 1. 회사 내 부서 + 부서 에이전트 조회
   const deptAgents = await db
     .select({
@@ -206,15 +221,29 @@ export async function orchestrateSecretary(
     return analysis.directResponse
   }
 
-  // 4. 위임 실행
-  const delegationResults: { departmentName: string; agentName: string; response: string }[] = []
-
-  for (const del of analysis.delegations) {
+  // 4. 위임 실행 (병렬)
+  const delegationTargets = analysis.delegations.map(del => {
     const needle = del.departmentName.trim().toLowerCase()
     const targetInfo = deptAgents.find(d => d.deptName.trim().toLowerCase() === needle)
       || deptAgents.find(d => d.deptName.trim().toLowerCase().includes(needle) || needle.includes(d.deptName.trim().toLowerCase()))
-    if (!targetInfo) continue
+    return targetInfo ? { del, targetInfo } : null
+  }).filter(Boolean) as { del: { departmentName: string; prompt: string }; targetInfo: typeof deptAgents[0] }[]
 
+  // 중복 위임 방지 (같은 에이전트에게 2번 위임 방지)
+  const seen = new Set<string>()
+  const uniqueTargets = delegationTargets.filter(({ targetInfo }) => {
+    if (seen.has(targetInfo.agentId)) return false
+    seen.add(targetInfo.agentId)
+    return true
+  })
+
+  // 위임 체인 이벤트 (3개 이상 동시 위임 시)
+  if (uniqueTargets.length >= 3) {
+    onEvent?.({ type: 'delegation-chain' as any, chain: uniqueTargets.map(t => t.targetInfo.agentName) })
+  }
+
+  // 병렬 위임 실행
+  const delegationPromises = uniqueTargets.map(async ({ del, targetInfo }) => {
     // delegations 테이블에 기록
     const [delegation] = await db
       .insert(delegations)
@@ -234,7 +263,6 @@ export async function orchestrateSecretary(
     const delegationStart = Date.now()
 
     try {
-      // 부서 에이전트 호출
       const response = await executeDelegation(
         client,
         {
@@ -246,42 +274,41 @@ export async function orchestrateSecretary(
         targetInfo.agentSoul,
       )
 
-      // 결과 저장
       await db
         .update(delegations)
         .set({ agentResponse: response, status: 'completed', completedAt: new Date() })
         .where(eq(delegations.id, delegation.id))
 
-      // 위임 완료 이벤트
       onEvent?.({ type: 'delegation-end', targetAgentName: targetInfo.agentName, targetAgentId: targetInfo.agentId, status: 'completed', durationMs: Date.now() - delegationStart })
-
-      // 알림 생성 (fire-and-forget)
       notifyDelegationComplete(ctx.userId, ctx.companyId, targetInfo.agentName, ctx.sessionId)
 
-      delegationResults.push({
-        departmentName: targetInfo.deptName,
-        agentName: targetInfo.agentName,
-        response,
-      })
+      return { departmentName: targetInfo.deptName, agentName: targetInfo.agentName, response }
     } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : '알 수 없는 오류'
       await db
         .update(delegations)
-        .set({
-          agentResponse: `오류: ${err instanceof Error ? err.message : '알 수 없는 오류'}`,
-          status: 'failed',
-          completedAt: new Date(),
-        })
+        .set({ agentResponse: `오류: ${errorMsg}`, status: 'failed', completedAt: new Date() })
         .where(eq(delegations.id, delegation.id))
 
-      // 위임 실패 이벤트
       onEvent?.({ type: 'delegation-end', targetAgentName: targetInfo.agentName, targetAgentId: targetInfo.agentId, status: 'failed', durationMs: Date.now() - delegationStart })
 
-      delegationResults.push({
-        departmentName: targetInfo.deptName,
-        agentName: targetInfo.agentName,
-        response: `[오류] ${err instanceof Error ? err.message : '알 수 없는 오류'}`,
-      })
+      return { departmentName: targetInfo.deptName, agentName: targetInfo.agentName, response: `[오류] ${errorMsg}` }
     }
+  })
+
+  const delegationResults = await Promise.all(delegationPromises)
+
+  // 감사 로그
+  const { logActivity } = await import('./activity-logger')
+  for (const result of delegationResults) {
+    logActivity({
+      companyId: ctx.companyId,
+      type: 'system',
+      phase: 'end',
+      actorType: 'agent',
+      actorId: ctx.secretaryAgentId,
+      action: `비서 위임 완료: ${result.departmentName} (${result.agentName}) — ${result.response.startsWith('[오류]') ? '실패' : '성공'}`,
+    })
   }
 
   // 5. 종합 보고서 생성
