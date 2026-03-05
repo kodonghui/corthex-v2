@@ -388,7 +388,48 @@ async function seed() {
         required: ['content'],
       },
     },
-    { name: 'KIS 증권', description: 'KIS 증권 API 연동', scope: 'company' as const, companyId: company.id },
+    {
+      name: 'get_stock_price',
+      description: '주식 종목 현재가/등락률/거래량을 조회합니다',
+      handler: 'get_stock_price',
+      scope: 'platform' as const,
+      category: 'finance',
+      tags: ['kis', 'stock', 'api', 'market'],
+      inputSchema: {
+        type: 'object',
+        properties: {
+          stockCode: { type: 'string', description: '종목코드 (예: 005930)' },
+        },
+        required: ['stockCode'],
+      },
+    },
+    {
+      name: 'get_account_balance',
+      description: '증권 계좌 잔고(보유종목, 평가금액)를 조회합니다',
+      handler: 'get_account_balance',
+      scope: 'platform' as const,
+      category: 'finance',
+      tags: ['kis', 'stock', 'api', 'account'],
+      inputSchema: { type: 'object', properties: {} },
+    },
+    {
+      name: 'place_stock_order',
+      description: '주식 매수/매도 주문을 실행합니다',
+      handler: 'place_stock_order',
+      scope: 'platform' as const,
+      category: 'finance',
+      tags: ['kis', 'stock', 'api', 'trading'],
+      inputSchema: {
+        type: 'object',
+        properties: {
+          stockCode: { type: 'string', description: '종목코드 (예: 005930)' },
+          side: { type: 'string', description: '매수/매도 (buy 또는 sell)' },
+          quantity: { type: 'number', description: '주문 수량' },
+          price: { type: 'number', description: '주문 가격 (0이면 시장가)' },
+        },
+        required: ['stockCode', 'side', 'quantity'],
+      },
+    },
     { name: '텔레그램', description: '텔레그램 봇 메시지', scope: 'platform' as const },
   ]
 

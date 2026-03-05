@@ -14,6 +14,9 @@ import { createCalendarEvent } from './builtins/create-calendar-event'
 import { readNotionPage } from './builtins/read-notion-page'
 import { createNotionPage } from './builtins/create-notion-page'
 import { generateTextFile } from './builtins/generate-text-file'
+import { getStockPrice } from './builtins/get-stock-price'
+import { getAccountBalance } from './builtins/get-account-balance'
+import { placeStockOrder } from './builtins/place-stock-order'
 import { createReport } from './builtins/create-report'
 
 // 내장 핸들러 등록
@@ -32,6 +35,9 @@ registry.register('create_calendar_event', createCalendarEvent)
 registry.register('read_notion_page', readNotionPage)
 registry.register('create_notion_page', createNotionPage)
 registry.register('generate_text_file', generateTextFile)
+registry.register('get_stock_price', getStockPrice)
+registry.register('get_account_balance', getAccountBalance)
+registry.register('place_stock_order', placeStockOrder)
 registry.register('create_report', createReport)
 
 export { registry } from './registry'
