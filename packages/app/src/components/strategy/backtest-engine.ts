@@ -54,7 +54,6 @@ export function runMaCrossover(
 
   const signals: Signal[] = []
   let position: 'long' | null = null
-  let entryPrice = 0
 
   for (let i = 1; i < candles.length; i++) {
     const prevShort = shortMa[i - 1]
@@ -67,8 +66,7 @@ export function runMaCrossover(
     // Golden cross: short crosses above long → buy
     if (prevShort <= prevLong && curShort > curLong && position === null) {
       position = 'long'
-      entryPrice = candles[i].close
-      signals.push({ date: candles[i].time, type: 'buy', price: entryPrice })
+      signals.push({ date: candles[i].time, type: 'buy', price: candles[i].close })
     }
     // Dead cross: short crosses below long → sell
     else if (prevShort >= prevLong && curShort < curLong && position === 'long') {
@@ -77,8 +75,7 @@ export function runMaCrossover(
     }
   }
 
-  // Calculate metrics
-  let totalReturn = 0
+  // Calculate metrics using compound returns
   let wins = 0
   let tradeCount = 0
   let peak = 1
@@ -91,7 +88,6 @@ export function runMaCrossover(
     if (!sell) break
 
     const ret = (sell.price - buy.price) / buy.price
-    totalReturn += ret
     tradeCount++
     if (ret > 0) wins++
 
@@ -101,10 +97,12 @@ export function runMaCrossover(
     if (drawdown > maxDrawdown) maxDrawdown = drawdown
   }
 
+  const totalReturn = (cumulative - 1) * 100
+
   return {
     signals,
     metrics: {
-      totalReturn: Math.round(totalReturn * 10000) / 100,
+      totalReturn: Math.round(totalReturn * 100) / 100,
       tradeCount,
       winRate: tradeCount > 0 ? Math.round((wins / tradeCount) * 10000) / 100 : 0,
       maxDrawdown: Math.round(maxDrawdown * 10000) / 100,

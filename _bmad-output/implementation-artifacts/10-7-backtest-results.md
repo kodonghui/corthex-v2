@@ -1,6 +1,6 @@
 # Story 10.7: 백테스트 결과 — 간단 전략 시뮬레이션 + 차트 마커 표시
 
-Status: review
+Status: done
 
 ## Story
 

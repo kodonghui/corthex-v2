@@ -1,5 +1,4 @@
-import { useState, useMemo } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../../lib/api'
 import { Button, Card, ConfirmDialog, toast } from '@corthex/ui'
@@ -66,8 +65,8 @@ export function BacktestPanel({ stockCode, candles, onMarkers }: BacktestPanelPr
   })
 
   const runBacktest = () => {
-    if (shortPeriod >= longPeriod) {
-      toast.error('단기 MA는 장기 MA보다 작아야 합니다')
+    if (shortPeriod < 2 || longPeriod < 3 || shortPeriod >= longPeriod) {
+      toast.error('단기 MA(2 이상)는 장기 MA(3 이상)보다 작아야 합니다')
       return
     }
     const res = runMaCrossover(candles, shortPeriod, longPeriod)
