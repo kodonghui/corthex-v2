@@ -1,6 +1,6 @@
 # Story 2.1: Admin Login & Auth
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -19,20 +19,20 @@ so that 관리 기능에 접근하고 보안 사고를 방지할 수 있다.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: admin_users 전용 로그인 라우트 (AC: #1, #2)
-  - [ ] `POST /api/auth/admin/login` 신규 라우트: admin_users 테이블에서 조회
-  - [ ] 기존 `/api/auth/login`은 users 테이블만 조회 (admin_users 미조회)
-  - [ ] admin JWT에 `type: 'admin'` 클레임 추가, adminOnly 미들웨어에서 검증
-- [ ] Task 2: 로그인 Rate Limit + 카운트다운 UI (AC: #3)
-  - [ ] 서버: `/api/auth/admin/login` 5회/분 제한, 초과 시 `retryAfter` 초 응답
-  - [ ] 프론트: 429 응답 시 카운트다운 타이머 표시 (1초 간격 감소)
-- [ ] Task 3: 401 리다이렉트 + 원래 페이지 복귀 (AC: #4, #5)
-  - [ ] `packages/admin/src/lib/api.ts` 401 시 `?redirect=` 쿼리 포함 리다이렉트
-  - [ ] LoginPage에서 redirect 쿼리 확인 후 로그인 성공 시 해당 경로로 이동
-- [ ] Task 4: 테스트 (AC: #6)
-  - [ ] admin JWT ↔ user JWT 분리 테스트: 유저 JWT로 admin 라우트 접근 → 403
-  - [ ] admin_users 로그인 + users 테이블 로그인 거부 테스트
-  - [ ] Rate limit 초과 시 429 응답 테스트
+- [x] Task 1: admin_users 전용 로그인 라우트 (AC: #1, #2)
+  - [x] `POST /api/auth/admin/login` 신규 라우트: admin_users 테이블에서 조회
+  - [x] 기존 `/api/auth/login`은 users 테이블만 조회 (admin_users 미조회)
+  - [x] admin JWT에 `type: 'admin'` 클레임 추가, adminOnly 미들웨어에서 검증
+- [x] Task 2: 로그인 Rate Limit + 카운트다운 UI (AC: #3)
+  - [x] 서버: `/api/auth/admin/login` 5회/분 제한, 초과 시 `retryAfter` 초 응답
+  - [x] 프론트: 429 응답 시 카운트다운 타이머 표시 (1초 간격 감소)
+- [x] Task 3: 401 리다이렉트 + 원래 페이지 복귀 (AC: #4, #5)
+  - [x] `packages/admin/src/lib/api.ts` 401 시 `?redirect=` 쿼리 포함 리다이렉트
+  - [x] LoginPage에서 redirect 쿼리 확인 후 로그인 성공 시 해당 경로로 이동
+- [x] Task 4: 테스트 (AC: #6)
+  - [x] admin JWT ↔ user JWT 분리 테스트: 유저 JWT로 admin 라우트 접근 → 403
+  - [x] admin_users 로그인 + users 테이블 로그인 거부 테스트
+  - [x] Rate limit 초과 시 429 응답 테스트
 
 ## Dev Notes
 
@@ -75,9 +75,17 @@ packages/server/src/__tests__/              — 테스트
 ## Dev Agent Record
 
 ### Agent Model Used
-
-### Debug Log References
+Claude Opus 4.6
 
 ### Completion Notes List
+- admin_users 전용 로그인 라우트 구현 (POST /api/auth/admin/login)
+- JWT에 type:'admin' 클레임 추가, adminOnly 미들웨어에서 이중 검증
+- 로그인 5회/분 rate limit + 카운트다운 UI 구현
+- 401 시 redirect 쿼리 포함 리다이렉트 + 재로그인 후 원래 페이지 복귀
+- 코드리뷰: 로그인 실패 감사 로그 추가 (일반 + 관리자)
 
 ### File List
+- packages/server/src/routes/auth.ts — admin 로그인 라우트 + 실패 감사 로그
+- packages/server/src/middleware/auth.ts — JwtPayload type 추가, adminOnly 수정
+- packages/admin/src/pages/login.tsx — 카운트다운 + redirect 쿼리
+- packages/admin/src/lib/api.ts — 401 시 redirect 쿼리

@@ -1,6 +1,6 @@
 # Story 2.5: Tool Assignment
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -18,20 +18,20 @@ so that 에이전트가 올바른 도구만 사용한다.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: 도구 페이지 store 연동 (AC: #5)
-  - [ ] `companyData?.data?.[0]?.id` 하드코딩을 admin-store 연동으로 변경
-- [ ] Task 2: 에이전트 카드에 도구 목록 표시 (AC: #3)
-  - [ ] 에이전트 페이지에서 각 카드 하단에 할당된 도구 뱃지 표시
-  - [ ] 에이전트별 도구 조회 API: `GET /api/admin/agent-tools?agentId=`
-- [ ] Task 3: 도구 할당 N+1 쿼리 최적화 (AC: #2)
-  - [ ] 현재: 도구 선택 → 모든 에이전트에 대해 개별 API 호출 (N+1 문제)
-  - [ ] 개선: `GET /api/admin/agent-tools?toolId=` 단일 API로 변경
-  - [ ] 서버: toolId 기준 agent_tools 조회 라우트 추가
-- [ ] Task 4: 토스트 알림 (AC: #4)
-  - [ ] 할당/해제/토글 성공 시 토스트 표시
-- [ ] Task 5: 테스트
-  - [ ] agent-tools CRUD API 테스트
-  - [ ] toolId 기준 조회 테스트
+- [x] Task 1: 도구 페이지 store 연동 (AC: #5)
+  - [x] `companyData?.data?.[0]?.id` 하드코딩을 admin-store 연동으로 변경
+- [x] Task 2: 에이전트 카드에 도구 목록 표시 (AC: #3)
+  - [x] 에이전트 페이지에서 각 카드 하단에 할당된 도구 뱃지 표시
+  - [x] 에이전트별 도구 조회 API: `GET /api/admin/agent-tools?agentId=`
+- [x] Task 3: 도구 할당 N+1 쿼리 최적화 (AC: #2)
+  - [x] 현재: 도구 선택 → 모든 에이전트에 대해 개별 API 호출 (N+1 문제)
+  - [x] 개선: `GET /api/admin/agent-tools?toolId=` 단일 API로 변경
+  - [x] 서버: toolId 기준 agent_tools 조회 라우트 추가
+- [x] Task 4: 토스트 알림 (AC: #4)
+  - [x] 할당/해제/토글 성공 시 토스트 표시
+- [x] Task 5: 테스트
+  - [x] agent-tools CRUD API 테스트
+  - [x] toolId 기준 조회 테스트
 
 ## Dev Notes
 
@@ -66,9 +66,15 @@ packages/server/src/routes/admin/               — toolId 기준 조회 API
 ## Dev Agent Record
 
 ### Agent Model Used
-
-### Debug Log References
+Claude Opus 4.6
 
 ### Completion Notes List
+- 도구 페이지 admin-store 연동
+- 에이전트 카드에 할당된 도구 뱃지 표시
+- toolId 기준 단일 API 조회 (N+1 해결)
+- 할당/해제 성공 토스트
 
 ### File List
+- packages/admin/src/pages/tools.tsx — store 연동 + N+1 해결
+- packages/admin/src/pages/agents.tsx — 도구 뱃지 표시
+- packages/server/src/routes/admin/agent-tools.ts — toolId 기준 조회 API

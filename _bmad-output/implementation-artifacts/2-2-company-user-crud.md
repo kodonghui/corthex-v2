@@ -1,6 +1,6 @@
 # Story 2.2: Company & User CRUD
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -19,24 +19,24 @@ so that 새 직원을 5분 안에 세팅할 수 있다.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: 회사 선택 드롭다운 (AC: #1)
-  - [ ] Layout/Sidebar에 회사 선택 드롭다운 추가 (현재 `companyData?.data?.[0]?.id` 하드코딩 제거)
-  - [ ] 선택된 companyId를 Zustand store에 저장 (`admin-store.ts`)
-  - [ ] 모든 관리 페이지에서 store의 companyId 사용
-- [ ] Task 2: 비밀번호 초기화 (AC: #3)
-  - [ ] `POST /api/admin/users/:id/reset-password` 서버 라우트 추가
-  - [ ] 8자리 임시 비밀번호 생성 → hash 후 DB 저장 → 평문 반환
-  - [ ] 프론트: 직원 목록 행에 "비밀번호 초기화" 버튼 → 확인 모달 → 결과 모달(복사 버튼)
-- [ ] Task 3: 회사 삭제 보호 (AC: #6)
-  - [ ] 서버: 회사 삭제 시 소속 직원 수 확인 → 0이 아니면 409 에러
-  - [ ] 프론트: 회사 카드에 삭제 버튼 추가 + 에러 메시지 표시
-- [ ] Task 4: UI 개선 + 토스트 (AC: #2, #5)
-  - [ ] 생성/수정/삭제 성공 시 토스트 알림 (기존 notification-store 또는 간단한 toast)
-  - [ ] 폼 에러 메시지 개선 (서버 에러 코드 → 한국어 메시지)
-- [ ] Task 5: 테스트
-  - [ ] 비밀번호 초기화 API 테스트
-  - [ ] 회사 삭제 보호 테스트 (직원 있으면 409)
-  - [ ] 중복 username 409 테스트
+- [x] Task 1: 회사 선택 드롭다운 (AC: #1)
+  - [x] Layout/Sidebar에 회사 선택 드롭다운 추가 (현재 `companyData?.data?.[0]?.id` 하드코딩 제거)
+  - [x] 선택된 companyId를 Zustand store에 저장 (`admin-store.ts`)
+  - [x] 모든 관리 페이지에서 store의 companyId 사용
+- [x] Task 2: 비밀번호 초기화 (AC: #3)
+  - [x] `POST /api/admin/users/:id/reset-password` 서버 라우트 추가
+  - [x] 8자리 임시 비밀번호 생성 → hash 후 DB 저장 → 평문 반환
+  - [x] 프론트: 직원 목록 행에 "비밀번호 초기화" 버튼 → 확인 모달 → 결과 모달(복사 버튼)
+- [x] Task 3: 회사 삭제 보호 (AC: #6)
+  - [x] 서버: 회사 삭제 시 소속 직원 수 확인 → 0이 아니면 409 에러
+  - [x] 프론트: 회사 카드에 삭제 버튼 추가 + 에러 메시지 표시
+- [x] Task 4: UI 개선 + 토스트 (AC: #2, #5)
+  - [x] 생성/수정/삭제 성공 시 토스트 알림 (기존 notification-store 또는 간단한 toast)
+  - [x] 폼 에러 메시지 개선 (서버 에러 코드 → 한국어 메시지)
+- [x] Task 5: 테스트
+  - [x] 비밀번호 초기화 API 테스트
+  - [x] 회사 삭제 보호 테스트 (직원 있으면 409)
+  - [x] 중복 username 409 테스트
 
 ## Dev Notes
 
@@ -100,9 +100,19 @@ packages/server/src/routes/admin/companies.ts    — 삭제 보호 로직
 ## Dev Agent Record
 
 ### Agent Model Used
-
-### Debug Log References
+Claude Opus 4.6
 
 ### Completion Notes List
+- 회사 선택 드롭다운 + Zustand admin-store 구현
+- 비밀번호 초기화 API + UI 모달 구현
+- 회사 삭제 보호 (소속 직원 확인)
+- 토스트 알림 시스템 구현
+- 코드리뷰: reset-password companyId 격리 추가, companies 토스트 추가
 
 ### File List
+- packages/admin/src/stores/admin-store.ts — 회사 선택 상태
+- packages/admin/src/components/layout.tsx — 회사 선택 드롭다운
+- packages/admin/src/pages/companies.tsx — 삭제 버튼 + 보호 + 토스트
+- packages/admin/src/pages/users.tsx — 비밀번호 초기화 버튼
+- packages/server/src/routes/admin/users.ts — reset-password 라우트 + companyId 격리
+- packages/server/src/routes/admin/companies.ts — 삭제 보호 로직
