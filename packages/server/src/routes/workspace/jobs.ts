@@ -17,12 +17,13 @@ const queueJobSchema = z.object({
   agentId: z.string().uuid(),
   instruction: z.string().min(1),
   scheduledFor: z.string().datetime().optional(),
+  dependsOnJobId: z.string().uuid().optional(),
 })
 
 // POST /api/workspace/jobs — 야간 작업 등록
 jobsRoute.post('/', zValidator('json', queueJobSchema), async (c) => {
   const tenant = c.get('tenant')
-  const { agentId, instruction, scheduledFor } = c.req.valid('json')
+  const { agentId, instruction, scheduledFor, dependsOnJobId } = c.req.valid('json')
 
   // 에이전트 소속 확인
   const [agent] = await db
@@ -33,12 +34,16 @@ jobsRoute.post('/', zValidator('json', queueJobSchema), async (c) => {
 
   if (!agent) throw new HTTPError(404, '에이전트를 찾을 수 없습니다', 'QUEUE_001')
 
+  // 체인 작업: 선행 작업이 있으면 먼 미래로 스케줄 (선행 완료 시 갱신됨)
+  const chainSchedule = dependsOnJobId ? new Date('2099-01-01') : undefined
+
   const job = await queueNightJob({
     companyId: tenant.companyId,
     userId: tenant.userId,
     agentId,
     instruction,
-    scheduledFor: scheduledFor ? new Date(scheduledFor) : undefined,
+    scheduledFor: chainSchedule || (scheduledFor ? new Date(scheduledFor) : undefined),
+    dependsOnJobId,
   })
 
   return c.json({ data: job }, 201)
@@ -159,6 +164,19 @@ jobsRoute.delete('/:id', async (c) => {
   if (!job) throw new HTTPError(404, '작업을 찾을 수 없습니다', 'QUEUE_002')
   if (job.status !== 'queued') {
     throw new HTTPError(400, '대기 중인 작업만 취소할 수 있습니다', 'QUEUE_003')
+  }
+
+  // cascade: 후행 체인 작업도 삭제
+  const allJobs = await db
+    .select({ id: nightJobs.id, resultData: nightJobs.resultData, status: nightJobs.status })
+    .from(nightJobs)
+    .where(and(eq(nightJobs.companyId, tenant.companyId), eq(nightJobs.status, 'queued')))
+
+  for (const chainJob of allJobs) {
+    const rd = chainJob.resultData as Record<string, unknown> | null
+    if (rd?.dependsOnJobId === id) {
+      await db.delete(nightJobs).where(eq(nightJobs.id, chainJob.id))
+    }
   }
 
   await db.delete(nightJobs).where(eq(nightJobs.id, id))

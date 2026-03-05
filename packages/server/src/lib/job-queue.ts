@@ -21,6 +21,7 @@ export async function queueNightJob(params: {
   sessionId?: string
   scheduleId?: string
   triggerId?: string
+  dependsOnJobId?: string
   instruction: string
   scheduledFor?: Date
 }) {
@@ -34,6 +35,7 @@ export async function queueNightJob(params: {
       scheduleId: params.scheduleId || null,
       triggerId: params.triggerId || null,
       instruction: params.instruction,
+      resultData: params.dependsOnJobId ? { dependsOnJobId: params.dependsOnJobId } : null,
       scheduledFor: params.scheduledFor || new Date(),
       maxRetries: MAX_RETRIES,
     })
@@ -172,11 +174,36 @@ async function processJob(job: typeof nightJobs.$inferSelect) {
       .set({
         status: 'completed',
         result,
-        resultData: reportId ? { reportId } : null,
+        resultData: {
+          ...(job.resultData as Record<string, unknown> || {}),
+          ...(reportId ? { reportId } : {}),
+        },
         completedAt: new Date(),
         sessionId,
       })
       .where(eq(nightJobs.id, job.id))
+
+    // 체인 작업: 후행 작업 활성화 (선행 result 주입)
+    try {
+      const chainJobs = await db
+        .select()
+        .from(nightJobs)
+        .where(eq(nightJobs.status, 'queued'))
+
+      for (const chainJob of chainJobs) {
+        const rd = chainJob.resultData as Record<string, unknown> | null
+        if (rd?.dependsOnJobId === job.id) {
+          const chainInstruction = `[선행 작업 결과]\n${result.slice(0, 2000)}\n\n[추가 지시]\n${chainJob.instruction}`
+          await db
+            .update(nightJobs)
+            .set({ instruction: chainInstruction, scheduledFor: new Date() })
+            .where(eq(nightJobs.id, chainJob.id))
+          console.log(`🔗 체인 작업 활성화: ${chainJob.id} (선행: ${job.id})`)
+        }
+      }
+    } catch (chainErr) {
+      console.error('체인 작업 활성화 실패:', chainErr)
+    }
 
     // WS: 작업 완료 알림
     broadcastToCompany(job.companyId, 'night-jobs', {
@@ -228,6 +255,31 @@ async function processJob(job: typeof nightJobs.$inferSelect) {
         errorMessage: errorMsg,
         retryCount: newRetryCount,
       })
+
+      // 체인 작업: 후행 작업도 cascade 실패
+      try {
+        const chainJobs = await db
+          .select()
+          .from(nightJobs)
+          .where(eq(nightJobs.status, 'queued'))
+
+        for (const chainJob of chainJobs) {
+          const rd = chainJob.resultData as Record<string, unknown> | null
+          if (rd?.dependsOnJobId === job.id) {
+            await db
+              .update(nightJobs)
+              .set({
+                status: 'failed',
+                error: `[선행 작업 실패] 선행 작업(${job.id})이 실패하여 자동 취소됨`,
+                completedAt: new Date(),
+              })
+              .where(eq(nightJobs.id, chainJob.id))
+            console.log(`🔗 체인 작업 cascade 실패: ${chainJob.id}`)
+          }
+        }
+      } catch (chainErr) {
+        console.error('체인 cascade 실패 처리 오류:', chainErr)
+      }
 
       console.log(`💀 야간 작업 최종 실패: ${job.id} (재시도 ${job.maxRetries}회 초과)`)
     }

@@ -130,8 +130,10 @@ function JobsTab() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [showForm, setShowForm] = useState(false)
+  const [showChainForm, setShowChainForm] = useState(false)
   const [selectedAgent, setSelectedAgent] = useState('')
   const [instruction, setInstruction] = useState('')
+  const [chainTarget, setChainTarget] = useState('')
   const [expandedJob, setExpandedJob] = useState<string | null>(null)
 
   const { data: agentsData } = useQuery({
@@ -146,14 +148,16 @@ function JobsTab() {
   })
 
   const queueJob = useMutation({
-    mutationFn: (body: { agentId: string; instruction: string }) =>
+    mutationFn: (body: Record<string, unknown>) =>
       api.post('/workspace/jobs', body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['night-jobs'] })
       queryClient.invalidateQueries({ queryKey: ['job-notifications'] })
       setShowForm(false)
+      setShowChainForm(false)
       setInstruction('')
       setSelectedAgent('')
+      setChainTarget('')
     },
   })
 
@@ -175,7 +179,9 @@ function JobsTab() {
 
   const handleSubmit = () => {
     if (!selectedAgent || !instruction.trim()) return
-    queueJob.mutate({ agentId: selectedAgent, instruction: instruction.trim() })
+    const body: Record<string, unknown> = { agentId: selectedAgent, instruction: instruction.trim() }
+    if (showChainForm && chainTarget) body.dependsOnJobId = chainTarget
+    queueJob.mutate(body as { agentId: string; instruction: string })
   }
 
   return (
@@ -212,12 +218,38 @@ function JobsTab() {
               rows={3}
             />
           </div>
+          {/* 체인 옵션 */}
+          <div>
+            <button
+              type="button"
+              onClick={() => setShowChainForm(!showChainForm)}
+              className="text-xs text-indigo-600 hover:text-indigo-700 font-medium"
+            >
+              {showChainForm ? '체인 해제' : '🔗 선행 작업에 체인 연결'}
+            </button>
+            {showChainForm && (
+              <div className="mt-2">
+                <Select
+                  value={chainTarget}
+                  onChange={(e) => setChainTarget(e.target.value)}
+                  placeholder="선행 작업 선택..."
+                  options={jobs.filter(j => j.status === 'queued' || j.status === 'processing').map(j => ({
+                    value: j.id,
+                    label: `${j.agentName} — ${j.instruction.slice(0, 40)}...`,
+                  }))}
+                />
+                <p className="text-[10px] text-zinc-400 mt-1">
+                  선행 작업이 완료되면 그 결과를 포함하여 이 작업이 자동 실행됩니다
+                </p>
+              </div>
+            )}
+          </div>
           <button
             onClick={handleSubmit}
             disabled={!selectedAgent || !instruction.trim() || queueJob.isPending}
             className="w-full py-2.5 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700 disabled:opacity-50"
           >
-            {queueJob.isPending ? '등록 중...' : '야간 작업 등록'}
+            {queueJob.isPending ? '등록 중...' : showChainForm && chainTarget ? '체인 작업 등록' : '야간 작업 등록'}
           </button>
         </div>
       )}
@@ -233,11 +265,13 @@ function JobsTab() {
           jobs.map((job) => {
             const cfg = statusConfig[job.status]
             const isExpanded = expandedJob === job.id
+            const rd = job.resultData as Record<string, unknown> | null
+            const isChain = !!rd?.dependsOnJobId
 
             return (
               <div
                 key={job.id}
-                className={`border rounded-lg overflow-hidden ${
+                className={`border rounded-lg overflow-hidden ${isChain ? 'ml-6 ' : ''}${
                   !job.isRead && (job.status === 'completed' || job.status === 'failed')
                     ? 'border-indigo-300 dark:border-indigo-700'
                     : 'border-zinc-200 dark:border-zinc-800'
@@ -254,6 +288,7 @@ function JobsTab() {
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
+                      {isChain && <span className="text-[10px] text-zinc-400">↳</span>}
                       <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${cfg.color}`}>
                         {cfg.label}
                       </span>
