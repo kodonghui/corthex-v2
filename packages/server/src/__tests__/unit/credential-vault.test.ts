@@ -86,13 +86,16 @@ describe('validateCredentials', () => {
 })
 
 describe('PROVIDER_SCHEMAS', () => {
-  test('6개 provider 스키마 정의됨', () => {
-    expect(Object.keys(PROVIDER_SCHEMAS)).toHaveLength(6)
+  test('9개 provider 스키마 정의됨', () => {
+    expect(Object.keys(PROVIDER_SCHEMAS)).toHaveLength(9)
     expect(PROVIDER_SCHEMAS.kis).toEqual(['app_key', 'app_secret', 'account_no'])
     expect(PROVIDER_SCHEMAS.smtp).toEqual(['host', 'port', 'user', 'password', 'from'])
     expect(PROVIDER_SCHEMAS.email).toEqual(['host', 'port', 'user', 'password', 'from'])
     expect(PROVIDER_SCHEMAS.instagram).toEqual(['access_token', 'page_id'])
     expect(PROVIDER_SCHEMAS.serper).toEqual(['api_key'])
     expect(PROVIDER_SCHEMAS.notion).toEqual(['api_key'])
+    expect(PROVIDER_SCHEMAS.google_calendar).toEqual(['api_key'])
+    expect(PROVIDER_SCHEMAS.tts).toEqual(['api_key'])
+    expect(PROVIDER_SCHEMAS.openai).toEqual(['api_key'])
   })
 })
