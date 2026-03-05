@@ -2,7 +2,8 @@
 # 작업 완료 시 커밋+푸시까지 자동으로. 배포 완료될 때까지 모니터링 후 결과 보고.
 # 배포 실패 시 즉시 원인 파악+수정+재푸시. 배포 성공 후: 빌드 #N + 변경 내용 + 확인 위치 보고.
 # 파일명 kebab-case 소문자. import는 git ls-files 기준 케이싱 일치 (Linux CI 대소문자 구분).
-# secrets는 if 조건에서 직접 참조 금지 → env 바인딩 후 env.VAR로 체크.
+# secrets는 if 조건에서 직접 참조 금지 -> env 바인딩 후 env.VAR로 체크.
+# self-hosted runner: Oracle VPS (ARM64)에서 직접 빌드+배포. GitHub Actions 무료 분 소진 없음.
 # ======
 
 name: Deploy
@@ -11,14 +12,10 @@ on:
   push:
     branches: [main]
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
-
 jobs:
   # 1. 코드 변경 감지
   changes:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     outputs:
       code: ${{ steps.filter.outputs.code }}
     steps:
@@ -38,10 +35,7 @@ jobs:
   build-and-deploy:
     needs: changes
     if: needs.changes.outputs.code == 'true'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
 
@@ -59,65 +53,30 @@ jobs:
           bun test packages/server/src/__tests__/unit/
           bun test packages/app/src/__tests__/
 
-      # Docker 빌드 (캐싱 적용)
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Log in to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          platforms: linux/arm64
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          build-args: |
-            BUILD_NUMBER=${{ github.run_number }}
-            GITHUB_SHA=${{ github.sha }}
-          tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ github.sha }}
+      # Docker 빌드 (VPS에서 직접, ARM64 네이티브 — QEMU 불필요)
+      - name: Build Docker image
+        run: |
+          docker build \
+            --build-arg BUILD_NUMBER=${{ github.run_number }} \
+            --build-arg GITHUB_SHA=${{ github.sha }} \
+            -t corthex-v2:latest \
+            -t corthex-v2:${{ github.sha }} \
+            .
 
-      # VPS 배포
-      - name: Deploy to Oracle VPS
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            # Nginx 비활성화 (Docker가 직접 80 포트 서빙)
-            sudo systemctl stop nginx || true
-            sudo systemctl disable nginx || true
-
-            # 최신 이미지 풀
-            docker pull ghcr.io/${{ github.repository }}:latest
-
-            # 기존 컨테이너 중지 및 제거
-            docker stop corthex-v2 || true
-            docker rm corthex-v2 || true
-
-            # 새 컨테이너 실행 (포트 80 직접 노출)
-            docker run -d \
-              --name corthex-v2 \
-              --restart unless-stopped \
-              -p 80:3000 \
-              --env-file ~/corthex/.env.production \
-              ghcr.io/${{ github.repository }}:latest
-
-            # 오래된 이미지 정리
-            docker image prune -f
-
-            # 헬스 체크
-            sleep 5
-            curl -f http://localhost:80/api/health || exit 1
+      # 컨테이너 교체 배포
+      - name: Deploy container
+        run: |
+          docker stop corthex-v2 || true
+          docker rm corthex-v2 || true
+          docker run -d \
+            --name corthex-v2 \
+            --restart unless-stopped \
+            -p 80:3000 \
+            --env-file ~/corthex/.env.production \
+            corthex-v2:latest
+          docker image prune -f
+          sleep 5
+          curl -f http://localhost:80/api/health || exit 1
 
       - name: Purge Cloudflare Cache
         env:
@@ -135,6 +94,6 @@ jobs:
   skip-notice:
     needs: changes
     if: needs.changes.outputs.code != 'true'
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - run: echo "코드 변경 없음 — 빌드/배포 스킵"
