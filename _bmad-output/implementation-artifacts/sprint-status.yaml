@@ -100,7 +100,7 @@ development_status:
   5-1-secretary-chat-ui: review
   5-2-battle-log-p1: review
   5-3-ui-phase-c: review
-  epic-5-retrospective: optional
+  epic-5-retrospective: done
 
   # ============================================================
   # Epic 6: 활동 로그 & 알림 시스템 (P1~P3)
