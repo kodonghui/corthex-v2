@@ -22,6 +22,7 @@ import { dashboardRoute } from './routes/workspace/dashboard'
 import { telegramRoute } from './routes/workspace/telegram'
 import { messengerRoute } from './routes/workspace/messenger'
 import { nexusRoute } from './routes/workspace/nexus'
+import { runMigrations } from './db'
 import { startJobWorker } from './lib/job-queue'
 import { loginRateLimit, apiRateLimit } from './middleware/rate-limit'
 import { wsRoute, websocket, broadcastServerRestart } from './ws/server'
@@ -135,8 +136,10 @@ const port = Number(process.env.PORT) || 3000
 
 console.log(`🚀 CORTHEX v2 서버 시작 — http://localhost:${port}`)
 
-// 야간 작업 워커 시작 (백그라운드 폴링)
-startJobWorker()
+// DB 마이그레이션 자동 적용 후 워커 시작
+runMigrations().then(() => {
+  startJobWorker()
+})
 
 // Graceful Shutdown — SIGTERM 시 WS 클라이언트 알림 후 종료
 process.on('SIGTERM', () => {

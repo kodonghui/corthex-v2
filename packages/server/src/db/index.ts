@@ -1,4 +1,5 @@
 import { drizzle } from 'drizzle-orm/postgres-js'
+import { migrate } from 'drizzle-orm/postgres-js/migrator'
 import postgres from 'postgres'
 import * as schema from './schema'
 import { resolve } from 'path'
@@ -28,5 +29,20 @@ const connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/
 
 const client = postgres(connectionString)
 export const db = drizzle(client, { schema })
+
+/** 서버 시작 시 마이그레이션 자동 적용 */
+export async function runMigrations() {
+  const migrationsFolder = resolve(import.meta.dir, './migrations')
+  if (!existsSync(migrationsFolder)) {
+    console.log('[DB] 마이그레이션 폴더 없음 — 건너뜀')
+    return
+  }
+  try {
+    await migrate(db, { migrationsFolder })
+    console.log('[DB] 마이그레이션 적용 완료')
+  } catch (err) {
+    console.error('[DB] 마이그레이션 실패:', err)
+  }
+}
 
 export { schema }
