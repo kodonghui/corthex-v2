@@ -51,7 +51,7 @@ development_status:
   1-5-ui-phase-a: done
   1-6-credential-vault: done
   1-7-tenant-isolation-tests: done
-  1-8-docker-pipeline-pwa: ready-for-dev
+  1-8-docker-pipeline-pwa: done
   1-9-websocket-base: ready-for-dev
   epic-1-retrospective: optional
 
