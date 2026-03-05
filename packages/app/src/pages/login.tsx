@@ -1,30 +1,51 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuthStore } from '../stores/auth-store'
 import { api } from '../lib/api'
+import { RateLimitError } from '../lib/api'
 
 export function LoginPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [countdown, setCountdown] = useState(0)
   const login = useAuthStore((s) => s.login)
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const redirectTo = searchParams.get('redirect') || '/'
+
+  useEffect(() => {
+    if (isAuthenticated) navigate(redirectTo, { replace: true })
+  }, [isAuthenticated, navigate, redirectTo])
+
+  useEffect(() => {
+    if (countdown <= 0) return
+    const timer = setInterval(() => setCountdown((c) => c - 1), 1000)
+    return () => clearInterval(timer)
+  }, [countdown])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (countdown > 0) return
     setError('')
     setLoading(true)
 
     try {
-      const res = await api.post<{ data: { token: string; user: { id: string; name: string; role: 'admin' | 'user' } } }>(
+      const res = await api.post<{ data: { token: string; user: { id: string; name: string; role: 'admin' | 'user'; companyId: string } } }>(
         '/auth/login',
         { username, password },
       )
       login(res.data.token, res.data.user)
-      navigate('/')
+      navigate(redirectTo, { replace: true })
     } catch (err) {
-      setError(err instanceof Error ? err.message : '로그인 실패')
+      if (err instanceof RateLimitError) {
+        setCountdown(err.retryAfter)
+        setError(`로그인 시도가 너무 많습니다. ${err.retryAfter}초 후 다시 시도해주세요`)
+      } else {
+        setError(err instanceof Error ? err.message : '로그인 실패')
+      }
     } finally {
       setLoading(false)
     }
@@ -49,6 +70,7 @@ export function LoginPage() {
               onChange={(e) => setUsername(e.target.value)}
               className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               required
+              autoComplete="username"
             />
           </div>
           <div>
@@ -61,6 +83,7 @@ export function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               required
+              autoComplete="current-password"
             />
           </div>
 
@@ -70,10 +93,14 @@ export function LoginPage() {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || countdown > 0}
             className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-md text-sm font-medium transition-colors"
           >
-            {loading ? '로그인 중...' : '로그인'}
+            {countdown > 0
+              ? `${countdown}초 후 재시도`
+              : loading
+                ? '로그인 중...'
+                : '로그인'}
           </button>
         </form>
       </div>

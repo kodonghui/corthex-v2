@@ -32,15 +32,25 @@ function PageSkeleton() {
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
-  if (!isAuthenticated) return <Navigate to="/login" replace />
+  const location = window.location.pathname
+  if (!isAuthenticated) {
+    const redirect = location !== '/' ? `?redirect=${encodeURIComponent(location)}` : ''
+    return <Navigate to={`/login${redirect}`} replace />
+  }
   return <>{children}</>
 }
 
 export function App() {
+  const checkAuth = useAuthStore((s) => s.checkAuth)
+
   useEffect(() => {
     const dark = window.matchMedia('(prefers-color-scheme: dark)').matches
     document.documentElement.classList.toggle('dark', dark)
   }, [])
+
+  useEffect(() => {
+    checkAuth()
+  }, [checkAuth])
 
   return (
     <QueryClientProvider client={queryClient}>
