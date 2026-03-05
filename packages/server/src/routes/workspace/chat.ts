@@ -274,7 +274,8 @@ chatRoute.delete('/sessions/:sessionId', async (c) => {
 
   if (!session) throw new HTTPError(404, '세션을 찾을 수 없습니다', 'CHAT_002')
 
-  // 종속 레코드 삭제: delegations → messages → session 순서
+  // 종속 레코드 삭제: toolCalls → delegations → messages → session 순서
+  await db.delete(toolCalls).where(eq(toolCalls.sessionId, sessionId))
   await db.delete(delegations).where(eq(delegations.sessionId, sessionId))
   await db.delete(chatMessages).where(eq(chatMessages.sessionId, sessionId))
   await db.delete(chatSessions).where(eq(chatSessions.id, sessionId))

@@ -16,7 +16,7 @@ export function CredentialsPage() {
   const [showAddToken, setShowAddToken] = useState(false)
   const [tokenForm, setTokenForm] = useState({ label: '', token: '' })
   const [showAddApiKey, setShowAddApiKey] = useState(false)
-  const [apiKeyForm, setApiKeyForm] = useState({ provider: 'kis' as string, label: '', key: '' })
+  const [apiKeyForm, setApiKeyForm] = useState({ provider: 'kis' as string, label: '', key: '', scope: 'user' as 'company' | 'user' })
 
   const { data: userData } = useQuery({
     queryKey: ['users', selectedCompanyId],
@@ -65,12 +65,12 @@ export function CredentialsPage() {
   })
 
   const addApiKeyMutation = useMutation({
-    mutationFn: (body: { companyId: string; userId: string; provider: string; label?: string; key: string }) =>
+    mutationFn: (body: { companyId: string; userId: string; provider: string; label?: string; credentials: Record<string, string>; scope: 'company' | 'user' }) =>
       api.post('/admin/api-keys', body),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['api-keys'] })
       setShowAddApiKey(false)
-      setApiKeyForm({ provider: 'kis', label: '', key: '' })
+      setApiKeyForm({ provider: 'kis', label: '', key: '', scope: 'user' })
       addToast({ type: 'success', message: 'API 키가 등록되었습니다' })
     },
     onError: (err: Error) => addToast({ type: 'error', message: err.message }),
@@ -287,12 +287,13 @@ export function CredentialsPage() {
                         userId: selectedUserId,
                         provider: apiKeyForm.provider,
                         ...(apiKeyForm.label ? { label: apiKeyForm.label } : {}),
-                        key: apiKeyForm.key,
+                        credentials: { key: apiKeyForm.key },
+                        scope: apiKeyForm.scope,
                       })
                     }}
                     className="mb-4 p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg space-y-3"
                   >
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-3 gap-3">
                       <div>
                         <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">제공자</label>
                         <select
@@ -304,6 +305,17 @@ export function CredentialsPage() {
                           <option value="notion">Notion</option>
                           <option value="email">Email</option>
                           <option value="telegram">Telegram</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">범위</label>
+                        <select
+                          value={apiKeyForm.scope}
+                          onChange={(e) => setApiKeyForm({ ...apiKeyForm, scope: e.target.value as 'company' | 'user' })}
+                          className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100"
+                        >
+                          <option value="user">개인용</option>
+                          <option value="company">회사 공용</option>
                         </select>
                       </div>
                       <div>

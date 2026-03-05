@@ -3,7 +3,7 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { eq, and } from 'drizzle-orm'
 import { db } from '../../db'
-import { toolDefinitions, agentTools, reportLines } from '../../db/schema'
+import { toolDefinitions, agentTools } from '../../db/schema'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 
@@ -82,33 +82,3 @@ toolsRoute.delete('/agent-tools/:id', async (c) => {
   return c.json({ data: { message: '삭제되었습니다' } })
 })
 
-// === Report Lines (보고 라인) ===
-
-const createReportLineSchema = z.object({
-  companyId: z.string().uuid(),
-  reporterId: z.string().uuid(),
-  supervisorId: z.string().uuid(),
-})
-
-// GET /api/admin/report-lines?companyId=xxx
-toolsRoute.get('/report-lines', async (c) => {
-  const companyId = c.req.query('companyId')
-  if (!companyId) throw new HTTPError(400, 'companyId 파라미터가 필요합니다', 'RPT_001')
-  const result = await db.select().from(reportLines).where(eq(reportLines.companyId, companyId))
-  return c.json({ data: result })
-})
-
-// POST /api/admin/report-lines
-toolsRoute.post('/report-lines', zValidator('json', createReportLineSchema), async (c) => {
-  const body = c.req.valid('json')
-  const [line] = await db.insert(reportLines).values(body).returning()
-  return c.json({ data: line }, 201)
-})
-
-// DELETE /api/admin/report-lines/:id
-toolsRoute.delete('/report-lines/:id', async (c) => {
-  const id = c.req.param('id')
-  const [line] = await db.delete(reportLines).where(eq(reportLines.id, id)).returning()
-  if (!line) throw new HTTPError(404, '보고 라인을 찾을 수 없습니다', 'RPT_002')
-  return c.json({ data: { message: '삭제되었습니다' } })
-})

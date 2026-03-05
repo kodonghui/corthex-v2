@@ -217,7 +217,7 @@ usersRoute.post('/users/:id/terminate-session', async (c) => {
     companyId: user.companyId,
     type: 'system',
     phase: 'end',
-    actorType: 'admin',
+    actorType: 'system',
     actorId: tenant.userId,
     action: `세션 강제 종료: ${id}`,
   })
