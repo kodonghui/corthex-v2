@@ -80,7 +80,9 @@ export const departments = pgTable('departments', {
   companyId: uuid('company_id').notNull().references(() => companies.id),
   name: varchar('name', { length: 100 }).notNull(),
   description: text('description'),
+  isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
 }, (table) => ({
   companyIdx: index('departments_company_idx').on(table.companyId),
 }))

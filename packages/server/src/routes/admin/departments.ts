@@ -75,7 +75,11 @@ departmentsRoute.delete('/departments/:id', async (c) => {
     throw new HTTPError(409, `소속 에이전트가 ${agentCount}명 있어 삭제할 수 없습니다`, 'DEPT_003')
   }
 
-  const [dept] = await db.delete(departments).where(eq(departments.id, id)).returning()
+  const [dept] = await db
+    .update(departments)
+    .set({ isActive: false, updatedAt: new Date() })
+    .where(eq(departments.id, id))
+    .returning()
   if (!dept) throw new HTTPError(404, '부서를 찾을 수 없습니다', 'DEPT_001')
-  return c.json({ data: { message: '삭제되었습니다' } })
+  return c.json({ data: { message: '비활성화되었습니다' } })
 })
