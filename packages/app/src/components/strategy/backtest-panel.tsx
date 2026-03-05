@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../../lib/api'
 import { Button, Card, ConfirmDialog, toast } from '@corthex/ui'
@@ -42,16 +42,17 @@ export function BacktestPanel({ stockCode, candles, onMarkers, onParamsChange, i
   const [result, setResult] = useState<BacktestResult | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
 
-  // Auto-run backtest when opened from shared URL
+  // Auto-run backtest when opened from shared URL (once only)
+  const autoRanRef = useRef(false)
   useEffect(() => {
-    if (autoRun && initialShort && initialLong && candles.length > 0) {
+    if (autoRun && initialShort && initialLong && candles.length > 0 && !autoRanRef.current) {
+      autoRanRef.current = true
       const res = runMaCrossover(candles, initialShort, initialLong)
       setResult(res)
       onMarkers(res.signals.map((s) => ({ time: s.date, type: s.type })))
       onParamsChange?.({ shortPeriod: initialShort, longPeriod: initialLong })
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoRun, candles.length])
+  }, [autoRun, initialShort, initialLong, candles, onMarkers, onParamsChange])
 
   const { data: savedRes } = useQuery({
     queryKey: ['strategy-backtest', stockCode],

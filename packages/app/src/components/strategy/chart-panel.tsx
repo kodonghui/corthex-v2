@@ -131,6 +131,10 @@ export function ChartPanel() {
       url.searchParams.set('bt', 'ma')
       url.searchParams.set('sp', String(backtestParams.shortPeriod))
       url.searchParams.set('lp', String(backtestParams.longPeriod))
+    } else {
+      url.searchParams.delete('bt')
+      url.searchParams.delete('sp')
+      url.searchParams.delete('lp')
     }
     navigator.clipboard.writeText(url.toString()).then(
       () => toast.success('공유 링크가 복사되었습니다'),

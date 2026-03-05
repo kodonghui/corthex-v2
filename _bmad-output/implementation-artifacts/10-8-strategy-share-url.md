@@ -1,6 +1,6 @@
 # Story 10.8: 전략 공유 URL — 종목 뷰 + 백테스트 설정 공유 링크
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -19,29 +19,29 @@ so that 동료에게 동일한 분석 화면을 빠르게 공유할 수 있다.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: URL 파라미터 스키마 확장 (AC: #2, #3)
-  - [ ] `packages/app/src/components/strategy/chart-panel.tsx` 수정
+- [x] Task 1: URL 파라미터 스키마 확장 (AC: #2, #3)
+  - [x] `packages/app/src/components/strategy/chart-panel.tsx` 수정
     - URL에서 `bt` (backtest type), `sp` (short period), `lp` (long period) 파라미터 읽기
     - 페이지 로드 시 해당 파라미터가 있으면 백테스트 자동 실행
-  - [ ] `packages/app/src/components/strategy/backtest-panel.tsx` 수정
+  - [x] `packages/app/src/components/strategy/backtest-panel.tsx` 수정
     - props로 `initialShort`, `initialLong`, `autoRun` 전달받기
     - `autoRun` 시 마운트 후 자동 백테스트 실행
 
-- [ ] Task 2: 공유 버튼 + 클립보드 복사 (AC: #1, #2, #4)
-  - [ ] `packages/app/src/components/strategy/chart-panel.tsx` 수정
+- [x] Task 2: 공유 버튼 + 클립보드 복사 (AC: #1, #2, #4)
+  - [x] `packages/app/src/components/strategy/chart-panel.tsx` 수정
     - 헤더 버튼 영역에 "공유" 버튼 추가
     - 클릭 시 현재 URL(`window.location.href`)에 백테스트 파라미터 포함하여 복사
     - `navigator.clipboard.writeText()` + `toast.success('공유 링크가 복사되었습니다')`
-  - [ ] `packages/app/src/components/strategy/comparison-panel.tsx` 수정
+  - [x] `packages/app/src/components/strategy/comparison-panel.tsx` 수정
     - 비교 모드에서도 "공유" 버튼 추가 (비교 종목 URL 그대로 복사)
 
-- [ ] Task 3: 잘못된 파라미터 방어 (AC: #5)
-  - [ ] 숫자 아닌 `sp`/`lp` 값 → 무시 (NaN 체크)
-  - [ ] `bt` 값이 지원 전략이 아니면 → 무시
-  - [ ] `compare` 에 유효하지 않은 코드 → 기존 필터링 로직으로 처리 (이미 구현됨)
+- [x] Task 3: 잘못된 파라미터 방어 (AC: #5)
+  - [x] 숫자 아닌 `sp`/`lp` 값 → 무시 (NaN 체크)
+  - [x] `bt` 값이 지원 전략이 아니면 → 무시
+  - [x] `compare` 에 유효하지 않은 코드 → 기존 필터링 로직으로 처리 (이미 구현됨)
 
-- [ ] Task 4: 빌드 확인 (AC: #6)
-  - [ ] `npx turbo build --force` 3/3 성공
+- [x] Task 4: 빌드 확인 (AC: #6)
+  - [x] `npx turbo build --force` 3/3 성공
 
 ## Dev Notes
 
@@ -170,7 +170,17 @@ const shareUrl = () => {
 ## Dev Agent Record
 
 ### Agent Model Used
+Claude Opus 4.6
 
 ### Completion Notes List
+- URL 파라미터: bt(전략)/sp(단기MA)/lp(장기MA) 파싱 + NaN/범위 방어
+- 공유 버튼: ChartPanel 헤더 + ComparisonPanel 헤더에 "공유" 추가
+- 백테스트 자동 실행: autoRun prop + useRef로 1회 실행 보장
+- 클립보드: navigator.clipboard.writeText + toast 성공/실패 처리
+- 코드 리뷰 수정: 백테스트 비활성 시 bt/sp/lp URL 잔류 버그 수정, eslint-disable 제거 + useRef 패턴
+- 빌드 3/3 성공
 
 ### File List
+- packages/app/src/components/strategy/chart-panel.tsx (공유 버튼 + URL 파싱 + bt/sp/lp 정리)
+- packages/app/src/components/strategy/backtest-panel.tsx (initialShort/Long + autoRun + useRef)
+- packages/app/src/components/strategy/comparison-panel.tsx (공유 버튼)
