@@ -1,0 +1,288 @@
+import { useState, useEffect, useRef } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { api } from '../../lib/api'
+import type { Agent, Message, Delegation } from './types'
+
+const statusColors: Record<string, string> = {
+  online: 'bg-green-400',
+  working: 'bg-yellow-400 animate-pulse',
+  error: 'bg-red-400',
+  offline: 'bg-zinc-400',
+}
+
+export function ChatArea({
+  agent,
+  sessionId,
+  onBack,
+}: {
+  agent: Agent | null
+  sessionId: string | null
+  onBack?: () => void
+}) {
+  const queryClient = useQueryClient()
+  const [input, setInput] = useState('')
+  const [isTyping, setIsTyping] = useState(false)
+  const [showDelegations, setShowDelegations] = useState(false)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  const { data: messagesData } = useQuery({
+    queryKey: ['messages', sessionId],
+    queryFn: () =>
+      api.get<{ data: Message[] }>(`/workspace/chat/sessions/${sessionId}/messages`),
+    enabled: !!sessionId,
+  })
+
+  const { data: delegationsData } = useQuery({
+    queryKey: ['delegations', sessionId],
+    queryFn: () =>
+      api.get<{ data: Delegation[] }>(`/workspace/chat/sessions/${sessionId}/delegations`),
+    enabled: !!sessionId && !!agent?.isSecretary,
+  })
+
+  const sendMessage = useMutation({
+    mutationFn: (content: string) =>
+      api.post<{ data: { userMessage: Message; agentMessage: Message } }>(
+        `/workspace/chat/sessions/${sessionId}/messages`,
+        { content },
+      ),
+    onMutate: () => setIsTyping(true),
+    onSettled: () => {
+      setIsTyping(false)
+      queryClient.invalidateQueries({ queryKey: ['messages', sessionId] })
+      queryClient.invalidateQueries({ queryKey: ['sessions'] })
+      queryClient.invalidateQueries({ queryKey: ['delegations', sessionId] })
+    },
+  })
+
+  const handleSend = () => {
+    if (!input.trim() || !sessionId || sendMessage.isPending) return
+    sendMessage.mutate(input.trim())
+    setInput('')
+  }
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messagesData?.data, isTyping])
+
+  const messages = messagesData?.data || []
+  const delegationList = delegationsData?.data || []
+
+  // EmptyState: 에이전트 미선택
+  if (!agent || !sessionId) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <div className="text-center text-zinc-400">
+          <p className="text-4xl mb-3">💬</p>
+          <p className="text-lg mb-1">에이전트와 첫 대화를 시작해보세요!</p>
+          <p className="text-sm mb-4">좌측에서 &apos;새 대화&apos; 버튼을 눌러 에이전트를 선택하세요</p>
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            >
+              새 대화 시작
+            </button>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex-1 flex flex-col min-w-0">
+      {/* 헤더 */}
+      <div className="px-4 md:px-6 py-3 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="md:hidden text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 mr-1"
+            >
+              ←
+            </button>
+          )}
+          <span className={`w-2.5 h-2.5 rounded-full ${statusColors[agent.status]}`} />
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="font-medium text-sm">{agent.name}</h3>
+              {agent.isSecretary && (
+                <span className="text-[10px] bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded-full">
+                  비서 오케스트레이터
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-zinc-400">{agent.role}</p>
+          </div>
+        </div>
+        {agent.isSecretary && delegationList.length > 0 && (
+          <button
+            onClick={() => setShowDelegations(!showDelegations)}
+            className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline"
+          >
+            {showDelegations ? '채팅 보기' : `위임 내역 (${delegationList.length})`}
+          </button>
+        )}
+      </div>
+
+      {/* 위임 내역 패널 */}
+      {showDelegations ? (
+        <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 space-y-3">
+          <h4 className="text-sm font-medium text-zinc-500 mb-2">부서 위임 내역</h4>
+          {delegationList.map((del) => (
+            <div
+              key={del.id}
+              className="border border-zinc-200 dark:border-zinc-700 rounded-lg p-4"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium">{del.targetAgentName}</span>
+                <span
+                  className={`text-[10px] px-2 py-0.5 rounded-full ${
+                    del.status === 'completed'
+                      ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
+                      : del.status === 'failed'
+                        ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
+                        : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300'
+                  }`}
+                >
+                  {del.status === 'completed' ? '완료' : del.status === 'failed' ? '실패' : '처리중'}
+                </span>
+              </div>
+              <p className="text-xs text-zinc-500 mb-2">지시: {del.delegationPrompt}</p>
+              {del.agentResponse && (
+                <div className="bg-zinc-50 dark:bg-zinc-800 rounded-md p-3 text-xs text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap">
+                  {del.agentResponse}
+                </div>
+              )}
+              <p className="text-[10px] text-zinc-400 mt-2">
+                {new Date(del.createdAt).toLocaleTimeString('ko-KR', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+                {del.completedAt &&
+                  ` → ${new Date(del.completedAt).toLocaleTimeString('ko-KR', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}`}
+              </p>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <>
+          {/* 메시지 목록 */}
+          <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 space-y-4">
+            {messages.length === 0 && !isTyping && (
+              <div className="text-center text-zinc-400 text-sm mt-8">
+                {agent.isSecretary ? (
+                  <>
+                    <p className="mb-1">{agent.name}에게 업무를 지시하세요</p>
+                    <p className="text-xs">비서가 적절한 부서에 자동으로 위임합니다</p>
+                  </>
+                ) : (
+                  <p>{agent.name}에게 메시지를 보내보세요</p>
+                )}
+              </div>
+            )}
+
+            {messages.map((msg) => {
+              const toolSplit = msg.content.split('\n\n---\n🔧 **도구 호출 내역:**\n')
+              const mainContent = toolSplit[0]
+              const toolContent = toolSplit[1] || null
+
+              return (
+                <div
+                  key={msg.id}
+                  className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`max-w-[80%] md:max-w-[70%] px-4 py-2.5 text-sm leading-relaxed ${
+                      msg.sender === 'user'
+                        ? 'bg-indigo-600 text-white rounded-2xl rounded-br-md'
+                        : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-2xl rounded-bl-md'
+                    }`}
+                  >
+                    {msg.sender === 'agent' && (
+                      <p className="text-[10px] font-medium text-indigo-500 dark:text-indigo-400 mb-1">
+                        {agent.name}
+                      </p>
+                    )}
+                    <p className="whitespace-pre-wrap">{mainContent}</p>
+                    {toolContent && (
+                      <div className="mt-2 pt-2 border-t border-zinc-200 dark:border-zinc-700">
+                        <p className="text-[10px] font-medium text-indigo-500 dark:text-indigo-400 mb-1">
+                          🔧 도구 호출
+                        </p>
+                        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 whitespace-pre-wrap">
+                          {toolContent}
+                        </p>
+                      </div>
+                    )}
+                    <p
+                      className={`text-[10px] mt-1 ${
+                        msg.sender === 'user' ? 'text-indigo-200' : 'text-zinc-400'
+                      }`}
+                    >
+                      {new Date(msg.createdAt).toLocaleTimeString('ko-KR', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </p>
+                  </div>
+                </div>
+              )
+            })}
+
+            {isTyping && (
+              <div className="flex justify-start">
+                <div className="bg-zinc-100 dark:bg-zinc-800 rounded-2xl px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <div className="flex gap-1">
+                      <span className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </div>
+                    {agent.isSecretary && (
+                      <span className="text-xs text-zinc-400">부서 위임 중...</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* 입력 영역 */}
+          <div className="px-4 md:px-6 py-4 border-t border-zinc-200 dark:border-zinc-800">
+            <div className="flex gap-3">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
+                placeholder={
+                  agent.isSecretary
+                    ? `${agent.name}에게 업무 지시...`
+                    : `${agent.name}에게 메시지...`
+                }
+                disabled={sendMessage.isPending}
+                className="flex-1 px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
+              />
+              <button
+                onClick={handleSend}
+                disabled={!input.trim() || sendMessage.isPending}
+                className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                  input.trim() && !sendMessage.isPending
+                    ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                    : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-400 cursor-not-allowed'
+                }`}
+              >
+                전송
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}

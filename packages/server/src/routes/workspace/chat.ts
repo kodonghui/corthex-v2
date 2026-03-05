@@ -185,6 +185,49 @@ chatRoute.post(
   },
 )
 
+const updateSessionSchema = z.object({
+  title: z.string().min(1).max(200),
+})
+
+// PATCH /api/workspace/chat/sessions/:sessionId — 세션 제목 수정
+chatRoute.patch('/sessions/:sessionId', zValidator('json', updateSessionSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const sessionId = c.req.param('sessionId')
+  const { title } = c.req.valid('json')
+
+  const [session] = await db
+    .update(chatSessions)
+    .set({ title })
+    .where(and(eq(chatSessions.id, sessionId), eq(chatSessions.companyId, tenant.companyId), eq(chatSessions.userId, tenant.userId)))
+    .returning()
+
+  if (!session) throw new HTTPError(404, '세션을 찾을 수 없습니다', 'CHAT_002')
+
+  return c.json({ data: session })
+})
+
+// DELETE /api/workspace/chat/sessions/:sessionId — 세션 삭제
+chatRoute.delete('/sessions/:sessionId', async (c) => {
+  const tenant = c.get('tenant')
+  const sessionId = c.req.param('sessionId')
+
+  // 세션 소유권 확인
+  const [session] = await db
+    .select({ id: chatSessions.id })
+    .from(chatSessions)
+    .where(and(eq(chatSessions.id, sessionId), eq(chatSessions.companyId, tenant.companyId), eq(chatSessions.userId, tenant.userId)))
+    .limit(1)
+
+  if (!session) throw new HTTPError(404, '세션을 찾을 수 없습니다', 'CHAT_002')
+
+  // 종속 레코드 삭제: delegations → messages → session 순서
+  await db.delete(delegations).where(eq(delegations.sessionId, sessionId))
+  await db.delete(chatMessages).where(eq(chatMessages.sessionId, sessionId))
+  await db.delete(chatSessions).where(eq(chatSessions.id, sessionId))
+
+  return c.json({ data: { deleted: true } })
+})
+
 // GET /api/workspace/chat/sessions/:sessionId/delegations — 세션 위임 내역 조회
 chatRoute.get('/sessions/:sessionId/delegations', async (c) => {
   const tenant = c.get('tenant')
