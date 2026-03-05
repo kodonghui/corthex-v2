@@ -2,9 +2,10 @@ import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../../lib/api'
-import { Card, EmptyState } from '@corthex/ui'
+import { Button, Card, EmptyState } from '@corthex/ui'
 import { StockChart } from './stock-chart'
 import { NotesPanel } from './notes-panel'
+import { ExportDialog } from './export-dialog'
 import type { WatchlistItem } from './types'
 
 type PriceData = {
@@ -53,6 +54,7 @@ export function ChartPanel() {
   const [failCount, setFailCount] = useState(0)
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [marketOpen, setMarketOpen] = useState(isMarketOpen)
+  const [exportOpen, setExportOpen] = useState(false)
 
   useEffect(() => {
     const id = setInterval(() => setMarketOpen(isMarketOpen()), 60_000)
@@ -128,14 +130,17 @@ export function ChartPanel() {
     <div className="p-4 h-full flex flex-col gap-3 overflow-y-auto">
       <Card variant="bordered" className="shrink-0">
         <div className="px-5 py-4">
-          <div className="flex items-baseline gap-2 flex-wrap">
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-              {stock.stockName}
-            </h2>
-            <span className="text-sm text-zinc-400">{stock.stockCode}</span>
-            <span className="text-xs px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500">
-              {stock.market}
-            </span>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                {stock.stockName}
+              </h2>
+              <span className="text-sm text-zinc-400">{stock.stockCode}</span>
+              <span className="text-xs px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500">
+                {stock.market}
+              </span>
+            </div>
+            <Button size="sm" variant="ghost" onClick={() => setExportOpen(true)}>내보내기</Button>
           </div>
 
           {price && !price.error && (
@@ -187,6 +192,12 @@ export function ChartPanel() {
       </Card>
 
       <NotesPanel />
+
+      <ExportDialog
+        isOpen={exportOpen}
+        onClose={() => setExportOpen(false)}
+        stockCode={stockCode}
+      />
     </div>
   )
 }

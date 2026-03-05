@@ -396,3 +396,139 @@ strategyRoute.delete(
     return c.json({ data: { deleted: true } })
   },
 )
+
+// === 데이터 내보내기 ===
+
+const exportSchema = z.object({
+  type: z.enum(['watchlist', 'notes', 'chart']),
+  format: z.enum(['csv', 'md']),
+  stockCode: z.string().max(20).optional(),
+  count: z.coerce.number().int().min(1).max(200).default(60),
+}).refine(
+  (d) => d.type === 'watchlist' || (d.stockCode && /^[A-Za-z0-9]{1,20}$/.test(d.stockCode)),
+  { message: '종목코드가 필요합니다', path: ['stockCode'] },
+)
+
+const BOM = '\uFEFF'
+
+// GET /api/workspace/strategy/export — 전략 데이터 내보내기
+strategyRoute.get('/export', zValidator('query', exportSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const { type, format, stockCode, count } = c.req.valid('query')
+  const today = new Date().toISOString().slice(0, 10)
+
+  // --- 관심종목 CSV ---
+  if (type === 'watchlist') {
+    const rows = await db
+      .select()
+      .from(strategyWatchlists)
+      .where(and(eq(strategyWatchlists.companyId, tenant.companyId), eq(strategyWatchlists.userId, tenant.userId)))
+
+    const csv = BOM + '종목코드,종목명,시장\n' + rows.map((r) =>
+      `${r.stockCode},${r.stockName.replace(/,/g, ' ')},${r.market}`,
+    ).join('\n')
+
+    const filename = `watchlist-${today}.csv`
+    c.header('Content-Type', 'text/csv; charset=utf-8')
+    c.header('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`)
+    return c.body(csv)
+  }
+
+  // --- 메모 내보내기 ---
+  if (type === 'notes') {
+    const notes = await db
+      .select()
+      .from(strategyNotes)
+      .where(and(
+        eq(strategyNotes.companyId, tenant.companyId),
+        eq(strategyNotes.userId, tenant.userId),
+        eq(strategyNotes.stockCode, stockCode!),
+      ))
+      .orderBy(desc(strategyNotes.updatedAt))
+      .limit(50)
+
+    if (format === 'md') {
+      const md = `# ${stockCode} 전략 메모\n\n` + notes.map((n) => {
+        const date = new Date(n.updatedAt).toLocaleDateString('ko-KR')
+        return `## ${n.title || '무제'}\n\n> ${date}\n\n${n.content}`
+      }).join('\n\n---\n\n')
+
+      const filename = `notes-${stockCode}-${today}.md`
+      c.header('Content-Type', 'text/markdown; charset=utf-8')
+      c.header('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`)
+      return c.body(md)
+    }
+
+    // notes CSV
+    const csv = BOM + '종목코드,제목,내용,수정일\n' + notes.map((n) => {
+      const content = n.content.replace(/"/g, '""').replace(/\n/g, ' ')
+      const title = (n.title || '').replace(/"/g, '""')
+      return `${stockCode},"${title}","${content}",${new Date(n.updatedAt).toLocaleDateString('ko-KR')}`
+    }).join('\n')
+
+    const filename = `notes-${stockCode}-${today}.csv`
+    c.header('Content-Type', 'text/csv; charset=utf-8')
+    c.header('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`)
+    return c.body(csv)
+  }
+
+  // --- 차트 데이터 CSV ---
+  if (type === 'chart') {
+    let creds: Record<string, string>
+    try {
+      creds = await getCredentials(tenant.companyId, 'kis', tenant.userId)
+    } catch {
+      throw new HTTPError(400, 'KIS API 키가 등록되지 않았습니다', 'STRATEGY_030')
+    }
+
+    const token = await getKisToken(creds.app_key, creds.app_secret)
+
+    const endDate = new Date()
+    const startDate = new Date()
+    startDate.setDate(startDate.getDate() - Math.ceil(count * 1.6))
+    const fmt = (d: Date) => d.toISOString().slice(0, 10).replace(/-/g, '')
+
+    const params = new URLSearchParams({
+      FID_COND_MRKT_DIV_CODE: 'J',
+      FID_INPUT_ISCD: stockCode!,
+      FID_INPUT_DATE_1: fmt(startDate),
+      FID_INPUT_DATE_2: fmt(endDate),
+      FID_PERIOD_DIV_CODE: 'D',
+      FID_ORG_ADJ_PRC: '0',
+    })
+
+    const res = await fetch(`${KIS_BASE_URL}/uapi/domestic-stock/v1/quotations/inquire-daily-price?${params}`, {
+      headers: kisHeaders(token, creds.app_key, creds.app_secret, 'FHKST03010100'),
+      signal: AbortSignal.timeout(15_000),
+    })
+
+    if (!res.ok) throw new HTTPError(502, 'KIS 일봉 API 호출 실패', 'STRATEGY_031')
+
+    const data = await res.json() as { output2?: Array<Record<string, string>>; rt_cd?: string }
+    if (data.rt_cd !== '0') throw new HTTPError(502, 'KIS 일봉 데이터 오류', 'STRATEGY_032')
+
+    const candles = (data.output2 || [])
+      .filter((r) => r.stck_bsop_date && r.stck_oprc !== '0')
+      .map((r) => ({
+        time: `${r.stck_bsop_date.slice(0, 4)}-${r.stck_bsop_date.slice(4, 6)}-${r.stck_bsop_date.slice(6, 8)}`,
+        open: r.stck_oprc,
+        high: r.stck_hgpr,
+        low: r.stck_lwpr,
+        close: r.stck_clpr,
+        volume: r.acml_vol || '0',
+      }))
+      .reverse()
+      .slice(-count)
+
+    const csv = BOM + '날짜,시가,고가,저가,종가,거래량\n' + candles.map((c) =>
+      `${c.time},${c.open},${c.high},${c.low},${c.close},${c.volume}`,
+    ).join('\n')
+
+    const filename = `chart-${stockCode}-${count}d-${today}.csv`
+    c.header('Content-Type', 'text/csv; charset=utf-8')
+    c.header('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`)
+    return c.body(csv)
+  }
+
+  throw new HTTPError(400, '지원하지 않는 내보내기 유형입니다', 'STRATEGY_033')
+})
