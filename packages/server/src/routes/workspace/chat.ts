@@ -184,12 +184,19 @@ chatRoute.post(
         let aiContent: string
 
         if (agent?.isSecretary) {
-          // 비서: 기존 동기 방식 유지 (오케스트레이션은 스트리밍 불가)
-          aiContent = await orchestrateSecretary({
-            secretaryAgentId: session.agentId,
-            ...chatCtx,
-          })
-          broadcastToChannel(channelKey, { type: 'token', content: aiContent })
+          // 비서: 위임 이벤트 + 토큰을 실시간 브로드캐스트
+          let hasStreamedTokens = false
+          aiContent = await orchestrateSecretary(
+            { secretaryAgentId: session.agentId, ...chatCtx },
+            (event) => {
+              if (event.type === 'token') hasStreamedTokens = true
+              broadcastToChannel(channelKey, event)
+            },
+          )
+          // 스트리밍으로 토큰이 전송되지 않은 경우에만 한번에 전송 (직접응답, 단일위임)
+          if (!hasStreamedTokens) {
+            broadcastToChannel(channelKey, { type: 'token', content: aiContent })
+          }
           broadcastToChannel(channelKey, { type: 'done', sessionId })
         } else {
           // 일반 에이전트: 스트리밍

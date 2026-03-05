@@ -18,6 +18,11 @@ type OrchestrateContext = {
   userId: string
 }
 
+export type OrchestrateEvent =
+  | { type: 'delegation-start'; targetAgentName: string; targetAgentId: string }
+  | { type: 'delegation-end'; targetAgentName: string; targetAgentId: string; status: 'completed' | 'failed'; durationMs: number }
+  | { type: 'token'; content: string }
+
 type DelegationTarget = {
   departmentName: string
   agentId: string
@@ -101,18 +106,19 @@ CEO 비서가 전달한 업무를 처리하세요. 결과를 명확하게 보고
 }
 
 /**
- * Step 3: 비서가 모든 위임 결과를 종합하여 최종 보고서 작성
+ * Step 3: 비서가 모든 위임 결과를 종합하여 최종 보고서 작성 (스트리밍)
  */
 async function compileReport(
   client: Anthropic,
   userMessage: string,
   results: { departmentName: string; agentName: string; response: string }[],
+  onToken?: (text: string) => void,
 ): Promise<string> {
   const resultsText = results
     .map(r => `### ${r.departmentName} (${r.agentName})\n${r.response}`)
     .join('\n\n---\n\n')
 
-  const response = await client.messages.create({
+  const stream = client.messages.stream({
     model: 'claude-sonnet-4-20250514',
     max_tokens: 2048,
     system: `당신은 CEO 비서입니다. 각 부서 에이전트의 응답을 종합하여 CEO에게 보고할 최종 보고서를 작성합니다.
@@ -134,13 +140,23 @@ ${resultsText}
     }],
   })
 
-  return response.content.find(b => b.type === 'text')?.text || '보고서를 생성할 수 없습니다.'
+  let fullText = ''
+  stream.on('text', (text) => {
+    fullText += text
+    onToken?.(text)
+  })
+
+  await stream.finalMessage()
+  return fullText || '보고서를 생성할 수 없습니다.'
 }
 
 /**
  * 메인 오케스트레이션: 비서 위임 전체 플로우
  */
-export async function orchestrateSecretary(ctx: OrchestrateContext): Promise<string> {
+export async function orchestrateSecretary(
+  ctx: OrchestrateContext,
+  onEvent?: (event: OrchestrateEvent) => void,
+): Promise<string> {
   const client = await getClientForUser(ctx.userId, ctx.companyId)
 
   // 1. 회사 내 부서 + 부서 에이전트 조회
@@ -210,6 +226,10 @@ export async function orchestrateSecretary(ctx: OrchestrateContext): Promise<str
       })
       .returning()
 
+    // 위임 시작 이벤트
+    onEvent?.({ type: 'delegation-start', targetAgentName: targetInfo.agentName, targetAgentId: targetInfo.agentId })
+    const delegationStart = Date.now()
+
     try {
       // 부서 에이전트 호출
       const response = await executeDelegation(
@@ -229,6 +249,9 @@ export async function orchestrateSecretary(ctx: OrchestrateContext): Promise<str
         .set({ agentResponse: response, status: 'completed', completedAt: new Date() })
         .where(eq(delegations.id, delegation.id))
 
+      // 위임 완료 이벤트
+      onEvent?.({ type: 'delegation-end', targetAgentName: targetInfo.agentName, targetAgentId: targetInfo.agentId, status: 'completed', durationMs: Date.now() - delegationStart })
+
       delegationResults.push({
         departmentName: targetInfo.deptName,
         agentName: targetInfo.agentName,
@@ -243,6 +266,9 @@ export async function orchestrateSecretary(ctx: OrchestrateContext): Promise<str
           completedAt: new Date(),
         })
         .where(eq(delegations.id, delegation.id))
+
+      // 위임 실패 이벤트
+      onEvent?.({ type: 'delegation-end', targetAgentName: targetInfo.agentName, targetAgentId: targetInfo.agentId, status: 'failed', durationMs: Date.now() - delegationStart })
 
       delegationResults.push({
         departmentName: targetInfo.deptName,
@@ -263,6 +289,8 @@ export async function orchestrateSecretary(ctx: OrchestrateContext): Promise<str
     return `📋 **${r.departmentName} (${r.agentName}) 보고:**\n\n${r.response}`
   }
 
-  // 복수 부서 → 종합 보고서
-  return compileReport(client, ctx.userMessage, delegationResults)
+  // 복수 부서 → 종합 보고서 (스트리밍)
+  return compileReport(client, ctx.userMessage, delegationResults, (text) => {
+    onEvent?.({ type: 'token', content: text })
+  })
 }

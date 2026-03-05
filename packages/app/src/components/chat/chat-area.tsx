@@ -33,7 +33,7 @@ export function ChatArea({
   const prevConnected = useRef(true)
   const prevScrollHeightRef = useRef(0)
   const { isConnected } = useWsStore()
-  const { streamingText, isStreaming, toolCalls, error, startStream, stopStream, clearError } = useChatStream(sessionId)
+  const { streamingText, isStreaming, toolCalls, error, delegationStatus, startStream, stopStream, clearError } = useChatStream(sessionId)
 
   const {
     data: messagesData,
@@ -239,7 +239,15 @@ export function ChatArea({
                 </span>
               )}
             </div>
-            <p className="text-xs text-zinc-400">{agent.role}</p>
+            <p className="text-xs text-zinc-400">
+              {delegationStatus?.status === 'delegating' ? (
+                <span className="text-indigo-500 dark:text-indigo-400 animate-pulse">
+                  → {delegationStatus.targetAgentName}에게 위임 중...
+                </span>
+              ) : (
+                agent.role
+              )}
+            </p>
           </div>
         </div>
         {agent.isSecretary && delegationList.length > 0 && (
@@ -286,11 +294,15 @@ export function ChatArea({
                   hour: '2-digit',
                   minute: '2-digit',
                 })}
-                {del.completedAt &&
-                  ` → ${new Date(del.completedAt).toLocaleTimeString('ko-KR', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}`}
+                {del.completedAt && (
+                  <>
+                    {` → ${new Date(del.completedAt).toLocaleTimeString('ko-KR', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}`}
+                    {` (${Math.round((new Date(del.completedAt).getTime() - new Date(del.createdAt).getTime()) / 1000)}초)`}
+                  </>
+                )}
               </p>
             </div>
           ))}
@@ -428,7 +440,11 @@ export function ChatArea({
                       <span className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                     </div>
                     {agent.isSecretary && (
-                      <span className="text-xs text-zinc-400">부서 위임 중...</span>
+                      <span className="text-xs text-zinc-400">
+                        {delegationStatus?.targetAgentName
+                          ? `${delegationStatus.targetAgentName}에게 위임 중...`
+                          : '부서 위임 분석 중...'}
+                      </span>
                     )}
                   </div>
                 </div>

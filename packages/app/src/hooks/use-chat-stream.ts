@@ -12,8 +12,15 @@ export type ToolCall = {
   error?: boolean
 }
 
+export type DelegationStatus = {
+  targetAgentName: string
+  targetAgentId: string
+  status: 'delegating' | 'completed' | 'failed'
+  durationMs?: number
+} | null
+
 type StreamEvent = {
-  type: 'token' | 'tool-start' | 'tool-end' | 'done' | 'error'
+  type: 'token' | 'tool-start' | 'tool-end' | 'done' | 'error' | 'delegation-start' | 'delegation-end'
   content?: string
   toolName?: string
   toolId?: string
@@ -24,6 +31,9 @@ type StreamEvent = {
   sessionId?: string
   code?: string
   message?: string
+  targetAgentName?: string
+  targetAgentId?: string
+  status?: string
 }
 
 export function useChatStream(sessionId: string | null) {
@@ -31,6 +41,7 @@ export function useChatStream(sessionId: string | null) {
   const [isStreaming, setIsStreaming] = useState(false)
   const [toolCalls, setToolCalls] = useState<ToolCall[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [delegationStatus, setDelegationStatus] = useState<DelegationStatus>(null)
   const queryClient = useQueryClient()
   const { subscribe, addListener, removeListener, isConnected } = useWsStore()
   const subscribedRef = useRef<string | null>(null)
@@ -65,12 +76,26 @@ export function useChatStream(sessionId: string | null) {
             ),
           )
           break
+        case 'delegation-start':
+          setDelegationStatus({
+            targetAgentName: event.targetAgentName || '',
+            targetAgentId: event.targetAgentId || '',
+            status: 'delegating',
+          })
+          break
+        case 'delegation-end':
+          setDelegationStatus(null)
+          // 위임 완료 시 위임 내역 쿼리 갱신
+          queryClient.invalidateQueries({ queryKey: ['delegations', sessionId] })
+          break
         case 'done':
           // refetch 완료 후 스트리밍 상태 초기화 (깜빡임 방지)
+          setDelegationStatus(null)
           Promise.all([
             queryClient.invalidateQueries({ queryKey: ['messages', sessionId] }),
             queryClient.invalidateQueries({ queryKey: ['sessions'] }),
             queryClient.invalidateQueries({ queryKey: ['tool-calls', sessionId] }),
+            queryClient.invalidateQueries({ queryKey: ['delegations', sessionId] }),
           ]).then(() => {
             setIsStreaming(false)
             setStreamingText('')
@@ -79,6 +104,7 @@ export function useChatStream(sessionId: string | null) {
           break
         case 'error':
           setIsStreaming(false)
+          setDelegationStatus(null)
           setError(event.message || '응답 중 오류가 발생했습니다')
           break
       }
@@ -94,6 +120,7 @@ export function useChatStream(sessionId: string | null) {
     setStreamingText('')
     setToolCalls([])
     setError(null)
+    setDelegationStatus(null)
   }, [])
 
   const stopStream = useCallback(() => {
@@ -104,5 +131,5 @@ export function useChatStream(sessionId: string | null) {
     setError(null)
   }, [])
 
-  return { streamingText, isStreaming, toolCalls, error, startStream, stopStream, clearError }
+  return { streamingText, isStreaming, toolCalls, error, delegationStatus, startStream, stopStream, clearError }
 }

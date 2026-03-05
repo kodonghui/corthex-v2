@@ -96,8 +96,8 @@ development_status:
   # ============================================================
   # Epic 5: 비서 오케스트레이션 (P1)
   # ============================================================
-  epic-5: backlog
-  5-1-secretary-chat-ui: backlog
+  epic-5: in-progress
+  5-1-secretary-chat-ui: review
   5-2-battle-log-p1: backlog
   5-3-ui-phase-c: backlog
   epic-5-retrospective: optional
