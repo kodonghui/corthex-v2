@@ -18,6 +18,8 @@ import { getStockPrice } from './builtins/get-stock-price'
 import { getAccountBalance } from './builtins/get-account-balance'
 import { placeStockOrder } from './builtins/place-stock-order'
 import { textToSpeech } from './builtins/text-to-speech'
+import { generateImage } from './builtins/generate-image'
+import { translateText } from './builtins/translate-text'
 import { createReport } from './builtins/create-report'
 
 // 내장 핸들러 등록
@@ -40,6 +42,8 @@ registry.register('get_stock_price', getStockPrice)
 registry.register('get_account_balance', getAccountBalance)
 registry.register('place_stock_order', placeStockOrder)
 registry.register('text_to_speech', textToSpeech)
+registry.register('generate_image', generateImage)
+registry.register('translate_text', translateText)
 registry.register('create_report', createReport)
 
 export { registry } from './registry'

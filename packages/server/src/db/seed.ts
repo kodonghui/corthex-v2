@@ -447,6 +447,39 @@ async function seed() {
         required: ['text'],
       },
     },
+    {
+      name: 'generate_image',
+      description: 'AI로 이미지를 생성합니다 (DALL-E)',
+      handler: 'generate_image',
+      scope: 'platform' as const,
+      category: 'content',
+      tags: ['openai', 'image', 'ai', 'api'],
+      inputSchema: {
+        type: 'object',
+        properties: {
+          prompt: { type: 'string', description: '이미지 설명 (영어 권장)' },
+          size: { type: 'string', description: '크기: 1024x1024, 1024x1792, 1792x1024 (기본 1024x1024)' },
+        },
+        required: ['prompt'],
+      },
+    },
+    {
+      name: 'translate_text',
+      description: '텍스트를 다른 언어로 번역합니다',
+      handler: 'translate_text',
+      scope: 'platform' as const,
+      category: 'utility',
+      tags: ['translate', 'google', 'api'],
+      inputSchema: {
+        type: 'object',
+        properties: {
+          text: { type: 'string', description: '번역할 텍스트' },
+          target: { type: 'string', description: '대상 언어 코드 (예: en, ja, zh, ko)' },
+          source: { type: 'string', description: '원본 언어 코드 (미입력 시 자동 감지)' },
+        },
+        required: ['text'],
+      },
+    },
   ]
 
   for (const def of externalTools) {
