@@ -233,7 +233,7 @@ chatRoute.post(
     }
 
     // 백그라운드 실행 — 응답을 기다리지 않음
-    streamTask()
+    streamTask().catch((err) => console.error('[streamTask] fatal error:', err))
 
     return c.json({ data: { userMessage: userMsg } }, 201)
   },
@@ -274,11 +274,13 @@ chatRoute.delete('/sessions/:sessionId', async (c) => {
 
   if (!session) throw new HTTPError(404, '세션을 찾을 수 없습니다', 'CHAT_002')
 
-  // 종속 레코드 삭제: toolCalls → delegations → messages → session 순서
-  await db.delete(toolCalls).where(eq(toolCalls.sessionId, sessionId))
-  await db.delete(delegations).where(eq(delegations.sessionId, sessionId))
-  await db.delete(chatMessages).where(eq(chatMessages.sessionId, sessionId))
-  await db.delete(chatSessions).where(eq(chatSessions.id, sessionId))
+  // 종속 레코드 삭제: toolCalls → delegations → messages → session 순서 (트랜잭션)
+  await db.transaction(async (tx) => {
+    await tx.delete(toolCalls).where(eq(toolCalls.sessionId, sessionId))
+    await tx.delete(delegations).where(eq(delegations.sessionId, sessionId))
+    await tx.delete(chatMessages).where(eq(chatMessages.sessionId, sessionId))
+    await tx.delete(chatSessions).where(eq(chatSessions.id, sessionId))
+  })
 
   return c.json({ data: { deleted: true } })
 })

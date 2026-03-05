@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { db } from '../db'
 import { chatMessages, agents, agentMemory, cliCredentials } from '../db/schema'
-import { eq, and } from 'drizzle-orm'
+import { eq, and, desc } from 'drizzle-orm'
 import { loadAgentTools, toClaudeTools, executeTool } from './tool-executor'
 import { recordCost } from './cost-tracker'
 import { decrypt } from './crypto'
@@ -63,8 +63,9 @@ export async function generateAgentResponse(ctx: ChatContext): Promise<string> {
     .select({ sender: chatMessages.sender, content: chatMessages.content })
     .from(chatMessages)
     .where(eq(chatMessages.sessionId, ctx.sessionId))
-    .orderBy(chatMessages.createdAt)
+    .orderBy(desc(chatMessages.createdAt))
     .limit(20)
+  history.reverse()
 
   // 3. 에이전트 장기 기억 로드
   const memories = await db
@@ -225,8 +226,9 @@ export async function generateAgentResponseStream(
     .select({ sender: chatMessages.sender, content: chatMessages.content })
     .from(chatMessages)
     .where(eq(chatMessages.sessionId, ctx.sessionId))
-    .orderBy(chatMessages.createdAt)
+    .orderBy(desc(chatMessages.createdAt))
     .limit(20)
+  history.reverse()
 
   const memories = await db
     .select({ key: agentMemory.key, value: agentMemory.value })

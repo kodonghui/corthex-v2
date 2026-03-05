@@ -58,7 +58,7 @@ workspaceAgentsRoute.get('/agents/:id', async (c) => {
 
 // PATCH /api/workspace/agents/:id/soul — 에이전트 소울 수정 (자기 에이전트만)
 const updateSoulSchema = z.object({
-  soul: z.string().min(1),
+  soul: z.string().min(1).max(2000),
 })
 
 workspaceAgentsRoute.patch('/agents/:id/soul', zValidator('json', updateSoulSchema), async (c) => {

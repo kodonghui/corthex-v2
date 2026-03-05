@@ -80,10 +80,19 @@ bun test src/__tests__/
 | 유형 | 파일 수 | 테스트 수 |
 |------|--------|----------|
 | Unit (기존) | 9 | 69 |
+| Unit (신규 — Epic 3-4) | 3 | 70 |
 | API (기존) | 9 | ~90 |
 | API (신규) | 6 | ~56 |
 | Tenant Isolation | 1 | ~27 |
-| **합계** | **25** | **~242** |
+| **합계** | **28** | **~312** |
+
+### Epic 3-4 신규 유닛 테스트 (2026-03-05)
+
+| 테스트 파일 | 테스트 수 | 커버 영역 |
+|------------|----------|----------|
+| `unit/chat-session.test.ts` | 26 | limit 클램핑(1-100), rawLimit 파싱, 세션 제목 자동생성, 기본 제목, cursor 페이지네이션 hasMore |
+| `unit/tool-executor.test.ts` | 28 | TOOL_TIMEOUT_MS(30s), 타임아웃 판별, 에러 메시지 생성, 상태값(success/error/timeout), duration 추적, MAX_TOOL_ROUNDS(5), Promise.race 패턴, calculate/get_current_time 핸들러, 핸들러 라우팅 |
+| `unit/session-delete.test.ts` | 13+3=16 | 캐스케이드 삭제 순서(toolCalls->delegations->messages->session), FK 의존성 검증, await 순차 실행 보장 |
 
 ## 미테스트 영역
 

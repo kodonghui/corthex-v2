@@ -116,6 +116,7 @@ export async function executeTool(
 
     return result
   } catch (err) {
+    clearTimeout(timeoutId!)
     const durationMs = Date.now() - startTime
     const isTimeout = err instanceof Error && err.message === 'TOOL_TIMEOUT'
     const errMsg = isTimeout
@@ -173,20 +174,78 @@ function handleGetCurrentTime(): string {
   })
 }
 
+// 안전한 수학 평가기 (new Function/eval 대신 재귀 파서)
+function safeEvalMath(expr: string): number {
+  const tokens = expr.replace(/\s+/g, '').replace(/\^/g, '**')
+  let pos = 0
+
+  function parseExpr(): number {
+    let left = parseTerm()
+    while (pos < tokens.length && (tokens[pos] === '+' || tokens[pos] === '-')) {
+      const op = tokens[pos++]
+      const right = parseTerm()
+      left = op === '+' ? left + right : left - right
+    }
+    return left
+  }
+
+  function parseTerm(): number {
+    let left = parsePower()
+    while (pos < tokens.length && (tokens[pos] === '*' || tokens[pos] === '/')) {
+      const op = tokens[pos++]
+      const right = parsePower()
+      left = op === '*' ? left * right : left / right
+    }
+    return left
+  }
+
+  function parsePower(): number {
+    let base = parseUnary()
+    if (pos < tokens.length - 1 && tokens[pos] === '*' && tokens[pos + 1] === '*') {
+      pos += 2
+      const exp = parsePower()
+      base = Math.pow(base, exp)
+    }
+    return base
+  }
+
+  function parseUnary(): number {
+    if (tokens[pos] === '-') { pos++; return -parseAtom() }
+    if (tokens[pos] === '+') { pos++ }
+    return parseAtom()
+  }
+
+  function parseAtom(): number {
+    if (tokens[pos] === '(') {
+      pos++
+      const val = parseExpr()
+      if (tokens[pos] === ')') pos++
+      return val
+    }
+    const start = pos
+    while (pos < tokens.length && /[\d.]/.test(tokens[pos])) pos++
+    if (pos === start) throw new Error('unexpected token')
+    return parseFloat(tokens.slice(start, pos))
+  }
+
+  const result = parseExpr()
+  if (!isFinite(result)) throw new Error('invalid result')
+  return result
+}
+
 function handleCalculate(input: Record<string, unknown>): string {
   const expression = String(input.expression || '')
   if (!expression) return '수식이 비어있습니다.'
 
   // 안전한 수학 연산만 허용 (숫자, 연산자, 괄호, 공백, 소수점)
-  if (!/^[\d\s+\-*/().,%^]+$/.test(expression)) {
+  if (!/^[\d\s+\-*/().^]+$/.test(expression)) {
     return '허용되지 않는 문자가 포함되어 있습니다.'
   }
 
   try {
-    // ^ → ** (거듭제곱)
-    const sanitized = expression.replace(/\^/g, '**')
-    const result = new Function(`return (${sanitized})`)()
-    return JSON.stringify({ expression, result: Number(result) })
+    // 간단한 재귀 파서로 안전하게 평가
+    const result = safeEvalMath(expression)
+    return JSON.stringify({ expression, result })
   } catch {
     return `계산 오류: '${expression}'을(를) 처리할 수 없습니다.`
   }
@@ -215,7 +274,7 @@ async function handleSearchKnowledge(
       and(
         eq(departmentKnowledge.companyId, ctx.companyId),
         eq(departmentKnowledge.departmentId, ctx.departmentId),
-        ilike(departmentKnowledge.content, `%${query}%`),
+        ilike(departmentKnowledge.content, `%${query.replace(/%/g, '\\%').replace(/_/g, '\\_')}%`),
       ),
     )
     .limit(5)
