@@ -6,6 +6,7 @@ import { db } from '../../db'
 import { toolDefinitions, agentTools } from '../../db/schema'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
+import { registry } from '../../lib/tool-handlers'
 
 export const toolsRoute = new Hono()
 
@@ -18,7 +19,18 @@ const createToolSchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().optional(),
   scope: z.enum(['platform', 'company', 'department']).default('platform'),
+  handler: z.string().max(100).optional(),
+  inputSchema: z.record(z.unknown()).optional(),
   config: z.record(z.unknown()).optional(),
+})
+
+const updateToolSchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  description: z.string().optional(),
+  handler: z.string().max(100).nullable().optional(),
+  inputSchema: z.record(z.unknown()).nullable().optional(),
+  config: z.record(z.unknown()).nullable().optional(),
+  isActive: z.boolean().optional(),
 })
 
 // GET /api/admin/tools
@@ -27,14 +39,57 @@ toolsRoute.get('/tools', async (c) => {
   const result = companyId
     ? await db.select().from(toolDefinitions).where(eq(toolDefinitions.companyId, companyId))
     : await db.select().from(toolDefinitions)
-  return c.json({ data: result })
+
+  const data = result.map((t) => ({
+    ...t,
+    handlerRegistered: t.handler ? !!registry.get(t.handler) : false,
+  }))
+  return c.json({ data })
+})
+
+// GET /api/admin/tools/:id
+toolsRoute.get('/tools/:id', async (c) => {
+  const id = c.req.param('id')
+  const [tool] = await db.select().from(toolDefinitions).where(eq(toolDefinitions.id, id)).limit(1)
+  if (!tool) throw new HTTPError(404, '도구를 찾을 수 없습니다', 'TOOL_003')
+
+  return c.json({
+    data: {
+      ...tool,
+      handlerRegistered: tool.handler ? !!registry.get(tool.handler) : false,
+    },
+  })
 })
 
 // POST /api/admin/tools
 toolsRoute.post('/tools', zValidator('json', createToolSchema), async (c) => {
   const body = c.req.valid('json')
   const [tool] = await db.insert(toolDefinitions).values(body).returning()
-  return c.json({ data: tool }, 201)
+
+  return c.json({
+    data: {
+      ...tool,
+      handlerRegistered: tool.handler ? !!registry.get(tool.handler) : false,
+    },
+  }, 201)
+})
+
+// PUT /api/admin/tools/:id
+toolsRoute.put('/tools/:id', zValidator('json', updateToolSchema), async (c) => {
+  const id = c.req.param('id')
+  const body = c.req.valid('json')
+
+  const [existing] = await db.select({ id: toolDefinitions.id }).from(toolDefinitions).where(eq(toolDefinitions.id, id)).limit(1)
+  if (!existing) throw new HTTPError(404, '도구를 찾을 수 없습니다', 'TOOL_003')
+
+  const [updated] = await db.update(toolDefinitions).set(body).where(eq(toolDefinitions.id, id)).returning()
+
+  return c.json({
+    data: {
+      ...updated,
+      handlerRegistered: updated.handler ? !!registry.get(updated.handler) : false,
+    },
+  })
 })
 
 // === Agent-Tool Mapping ===
@@ -81,4 +136,3 @@ toolsRoute.delete('/agent-tools/:id', async (c) => {
   if (!mapping) throw new HTTPError(404, '매핑을 찾을 수 없습니다', 'TOOL_002')
   return c.json({ data: { message: '삭제되었습니다' } })
 })
-

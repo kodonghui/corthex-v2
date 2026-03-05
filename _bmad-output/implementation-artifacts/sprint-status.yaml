@@ -130,7 +130,7 @@ development_status:
   # ============================================================
   epic-8: in-progress
   8-1-tool-engine-handler: review
-  8-2-tool-definitions-api: backlog
+  8-2-tool-definitions-api: review
   8-3-credential-vault-integration: backlog
   8-4-p2-db-schema: backlog
   8-5-isolation-test-p2: backlog
