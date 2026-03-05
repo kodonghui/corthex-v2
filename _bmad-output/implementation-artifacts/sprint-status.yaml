@@ -110,7 +110,7 @@ development_status:
   6-2-realtime-notifications: review
   6-3-email-notifications: review
   6-4-notification-history-ui: review
-  6-5-ui-phase-d: ready-for-dev
+  6-5-ui-phase-d: review
   6-6-battle-log-p2: ready-for-dev
   epic-6-retrospective: optional
 

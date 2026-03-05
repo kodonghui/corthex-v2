@@ -3,6 +3,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
 import { api } from '../lib/api'
 import { useWsStore } from '../stores/ws-store'
+import { FilterChip, TimelineGroup } from '@corthex/ui'
+import type { TimelineItem } from '@corthex/ui'
 
 type ActivityLog = {
   id: string
@@ -253,28 +255,19 @@ export function OpsLogPage() {
 
       {/* 필터 칩 */}
       <div className="px-4 md:px-6 py-3 border-b border-zinc-100 dark:border-zinc-800 flex gap-2 flex-wrap overflow-x-auto [-webkit-overflow-scrolling:touch]">
-        <button
+        <FilterChip
+          label="전체"
+          active={activeFilters.size === 0}
           onClick={() => setSearchParams({}, { replace: true })}
-          className={`text-xs px-3 py-1.5 rounded-full whitespace-nowrap transition-colors ${
-            activeFilters.size === 0
-              ? 'bg-indigo-600 text-white'
-              : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:bg-zinc-200 dark:hover:bg-zinc-700'
-          }`}
-        >
-          전체
-        </button>
+        />
         {Object.entries(TYPE_LABELS).map(([key, label]) => (
-          <button
+          <FilterChip
             key={key}
+            label={label}
+            icon={TYPE_ICONS[key]}
+            active={activeFilters.has(key)}
             onClick={() => toggleFilter(key)}
-            className={`text-xs px-3 py-1.5 rounded-full whitespace-nowrap transition-colors ${
-              activeFilters.has(key)
-                ? 'bg-indigo-600 text-white'
-                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:bg-zinc-200 dark:hover:bg-zinc-700'
-            }`}
-          >
-            {TYPE_ICONS[key]} {label}
-          </button>
+          />
         ))}
       </div>
 
@@ -299,66 +292,56 @@ export function OpsLogPage() {
         )}
 
         {groupedLogs.map((group) => (
-          <div key={group.label} className="mb-6">
-            <div className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-3 pl-8">
-              {group.label}
-            </div>
-            <div className="relative">
-              {/* 세로선 */}
-              <div className="absolute left-[9px] top-2 bottom-2 w-px bg-zinc-200 dark:bg-zinc-700" />
-
-              {group.logs.map((log) => (
-                <div key={log.id} className="relative flex gap-3 py-1.5 group">
-                  {/* 도트 */}
-                  <div className={`w-[18px] h-[18px] rounded-full mt-1 z-10 border-2 border-white dark:border-zinc-900 flex-shrink-0 ${
-                    log.endLog
-                      ? PHASE_DOT[log.endLog.phase] || PHASE_DOT.end
-                      : PHASE_DOT[log.phase] || 'bg-zinc-400'
-                  }`} />
-
-                  {/* 카드 */}
-                  <div className="flex-1 border border-zinc-100 dark:border-zinc-800 rounded-lg p-3 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm">{TYPE_ICONS[log.type] || '📌'}</span>
-                      <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
-                        {log.action}
+          <TimelineGroup
+            key={group.label}
+            label={group.label}
+            items={group.logs.map((log): TimelineItem => ({
+              id: log.id,
+              dotColor: log.endLog
+                ? PHASE_DOT[log.endLog.phase] || PHASE_DOT.end
+                : PHASE_DOT[log.phase] || 'bg-zinc-400',
+              content: (
+                <div className="border border-zinc-100 dark:border-zinc-800 rounded-lg p-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-sm">{TYPE_ICONS[log.type] || '📌'}</span>
+                    <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                      {log.action}
+                    </span>
+                    {log.endLog && log.durationMs != null && (
+                      <span className="text-[10px] text-green-600 dark:text-green-400">
+                        ✅ {log.durationMs < 1000 ? `${log.durationMs}ms` : `${(log.durationMs / 1000).toFixed(1)}초`}
                       </span>
-                      {log.endLog && log.durationMs != null && (
-                        <span className="text-[10px] text-green-600 dark:text-green-400">
-                          ✅ {log.durationMs < 1000 ? `${log.durationMs}ms` : `${(log.durationMs / 1000).toFixed(1)}초`}
-                        </span>
-                      )}
-                      {!log.endLog && log.phase === 'start' && (
-                        <span className="text-[10px] text-yellow-600 dark:text-yellow-400 animate-pulse">
-                          ⏳ 진행 중...
-                        </span>
-                      )}
-                      {log.phase === 'error' && !log.endLog && (
-                        <span className="text-[10px] text-red-600 dark:text-red-400">
-                          ❌ 실패
-                        </span>
-                      )}
-                    </div>
+                    )}
+                    {!log.endLog && log.phase === 'start' && (
+                      <span className="text-[10px] text-yellow-600 dark:text-yellow-400 animate-pulse">
+                        ⏳ 진행 중...
+                      </span>
+                    )}
+                    {log.phase === 'error' && !log.endLog && (
+                      <span className="text-[10px] text-red-600 dark:text-red-400">
+                        ❌ 실패
+                      </span>
+                    )}
+                  </div>
 
-                    <div className="flex items-center gap-2 text-[11px] text-zinc-500 dark:text-zinc-400">
-                      <span>{log.actorName || (log.actorType === 'system' ? '시스템' : '')}</span>
-                      {log.detail && (
-                        <>
-                          <span>·</span>
-                          <span className="truncate">{log.detail}</span>
-                        </>
-                      )}
-                    </div>
+                  <div className="flex items-center gap-2 text-[11px] text-zinc-500 dark:text-zinc-400">
+                    <span>{log.actorName || (log.actorType === 'system' ? '시스템' : '')}</span>
+                    {log.detail && (
+                      <>
+                        <span>·</span>
+                        <span className="truncate">{log.detail}</span>
+                      </>
+                    )}
+                  </div>
 
-                    <div className="text-[10px] text-zinc-400 mt-1">
-                      {formatTime(log.createdAt)}
-                      {log.endLog && ` → ${formatTime(log.endLog.createdAt)}`}
-                    </div>
+                  <div className="text-[10px] text-zinc-400 mt-1">
+                    {formatTime(log.createdAt)}
+                    {log.endLog && ` → ${formatTime(log.endLog.createdAt)}`}
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
+              ),
+            }))}
+          />
         ))}
       </div>
     </div>

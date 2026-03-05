@@ -11,6 +11,8 @@ const variantStyles: Record<ToastVariant, string> = {
   warning: 'bg-amber-500 text-white',
 }
 
+const MAX_TOASTS = 3
+
 let _addToast: ((message: string, variant: ToastVariant) => void) | null = null
 
 export const toast = {
@@ -25,8 +27,12 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
   const addToast = useCallback((message: string, variant: ToastVariant) => {
     const id = crypto.randomUUID()
-    setToasts((prev) => [...prev, { id, message, variant }])
-    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 4000)
+    setToasts((prev) => {
+      const next = [...prev, { id, message, variant }]
+      // FIFO: keep max 3
+      return next.length > MAX_TOASTS ? next.slice(-MAX_TOASTS) : next
+    })
+    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 5000)
   }, [])
 
   _addToast = addToast
@@ -34,13 +40,13 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <>
       {children}
-      <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
+      <div className="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none">
         {toasts.map((t) => (
           <div
             key={t.id}
             className={cn(
-              'flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg text-sm font-medium',
-              'transition-all duration-200',
+              'flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg text-sm font-medium pointer-events-auto',
+              'animate-[slideInRight_0.2s_ease-out]',
               variantStyles[t.variant],
             )}
           >

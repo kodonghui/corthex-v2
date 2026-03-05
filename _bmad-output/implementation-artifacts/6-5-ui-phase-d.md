@@ -1,6 +1,6 @@
 # Story 6.5: UI Phase D — Toast + Timeline + FilterChip 공유 컴포넌트
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -20,35 +20,24 @@ so that 코드 중복을 제거하고 알림/작전일지 UI 일관성을 높인
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: @corthex/ui Toast 컴포넌트 (AC: #1, #2)
-  - [ ] packages/ui/src/toast.tsx
-  - [ ] ToastProvider + useToast hook (context 기반)
-  - [ ] variant: success(초록)/error(빨강)/info(파랑)/warning(노랑)
-  - [ ] 우상단 fixed, 수직 스택, 애니메이션 (slide-in/fade-out)
-  - [ ] 5초 자동 닫힘 + X 수동 닫힘
-  - [ ] index.ts export
+- [x] Task 1: @corthex/ui Toast 개선 (AC: #1, #2)
+  - [x] 우상단(top-4 right-4)으로 이동, 5초 자동 닫힘, max 3 FIFO
+  - [x] slideInRight 애니메이션 추가
 
-- [ ] Task 2: @corthex/ui FilterChip 컴포넌트 (AC: #4)
-  - [ ] packages/ui/src/filter-chip.tsx
-  - [ ] Props: label, active, onClick, icon?, count?
-  - [ ] 활성=bg-corthex-accent text-white, 비활성=bg-muted
-  - [ ] index.ts export
+- [x] Task 2: @corthex/ui FilterChip 컴포넌트 (AC: #4)
+  - [x] packages/ui/src/filter-chip.tsx — label, active, onClick, icon?, count?
 
-- [ ] Task 3: @corthex/ui Timeline 컴포넌트 (AC: #3)
-  - [ ] packages/ui/src/timeline.tsx
-  - [ ] Props: items (dotColor, content, time)
-  - [ ] 세로선 + 도트 + 카드 슬롯
-  - [ ] index.ts export
+- [x] Task 3: @corthex/ui TimelineGroup 컴포넌트 (AC: #3)
+  - [x] packages/ui/src/timeline.tsx — 세로선 + 도트 + 카드 슬롯
 
-- [ ] Task 4: ops-log.tsx 리팩토링 (AC: #5)
-  - [ ] 인라인 FilterChip → @corthex/ui FilterChip
-  - [ ] 인라인 타임라인 → @corthex/ui Timeline
+- [x] Task 4: ops-log.tsx 리팩토링 (AC: #5)
+  - [x] 인라인 FilterChip → @corthex/ui FilterChip
+  - [x] 인라인 타임라인 → @corthex/ui TimelineGroup
 
-- [ ] Task 5: Toast 적용 (AC: #6)
-  - [ ] App.tsx에 ToastProvider 래핑
-  - [ ] 6-2 알림 Toast를 @corthex/ui Toast로 교체
+- [x] Task 5: Toast 적용 (AC: #6)
+  - [x] 이미 ToastProvider + notification-listener에서 @corthex/ui toast 사용 중
 
-- [ ] Task 6: 빌드 검증 (AC: #7)
+- [x] Task 6: 빌드 검증 (AC: #7) — 3/3 성공
 
 ## Dev Notes
 
@@ -72,6 +61,18 @@ so that 코드 중복을 제거하고 알림/작전일지 UI 일관성을 높인
 ## Dev Agent Record
 
 ### Agent Model Used
-### Debug Log References
+Claude Opus 4.6
+
 ### Completion Notes List
+- Toast 기존 구현 개선: bottom→top, 4s→5s, max 3 FIFO, slideInRight 애니메이션
+- FilterChip: icon/count 지원, 활성=인디고/비활성=muted
+- TimelineGroup: dotColor + ReactNode content 슬롯
+- @corthex/ui 컴포넌트 수: 18 → 20 (FilterChip, TimelineGroup)
+
 ### File List
+- packages/ui/src/toast.tsx (MODIFIED)
+- packages/ui/src/filter-chip.tsx (NEW)
+- packages/ui/src/timeline.tsx (NEW)
+- packages/ui/src/index.ts (MODIFIED)
+- packages/app/src/pages/ops-log.tsx (MODIFIED — 리팩토링)
+- packages/app/src/index.css (MODIFIED — slideInRight keyframe)
