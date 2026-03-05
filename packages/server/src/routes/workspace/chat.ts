@@ -3,7 +3,7 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { eq, and, desc, lt } from 'drizzle-orm'
 import { db } from '../../db'
-import { chatSessions, chatMessages, agents, delegations, toolCalls } from '../../db/schema'
+import { chatSessions, chatMessages, agents, delegations, toolCalls, files } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { generateAgentResponse, generateAgentResponseStream } from '../../lib/ai'
@@ -25,6 +25,7 @@ const createSessionSchema = z.object({
 
 const sendMessageSchema = z.object({
   content: z.string().min(1),
+  fileId: z.string().uuid().optional(),
 })
 
 // GET /api/workspace/chat/sessions — 내 채팅 세션 목록
@@ -104,8 +105,22 @@ chatRoute.get('/sessions/:sessionId/messages', async (c) => {
   }
 
   const messages = await db
-    .select()
+    .select({
+      id: chatMessages.id,
+      companyId: chatMessages.companyId,
+      sessionId: chatMessages.sessionId,
+      sender: chatMessages.sender,
+      content: chatMessages.content,
+      fileId: chatMessages.fileId,
+      createdAt: chatMessages.createdAt,
+      file: {
+        filename: files.filename,
+        mimeType: files.mimeType,
+        sizeBytes: files.sizeBytes,
+      },
+    })
     .from(chatMessages)
+    .leftJoin(files, eq(chatMessages.fileId, files.id))
     .where(and(...conditions))
     .orderBy(desc(chatMessages.createdAt))
     .limit(limit + 1) // +1로 hasMore 판별
@@ -124,7 +139,7 @@ chatRoute.post(
   async (c) => {
     const tenant = c.get('tenant')
     const sessionId = c.req.param('sessionId')
-    const { content } = c.req.valid('json')
+    const { content, fileId } = c.req.valid('json')
 
     // 세션 소유권 + 에이전트 정보 확인
     const [session] = await db
@@ -150,6 +165,7 @@ chatRoute.post(
         sessionId,
         sender: 'user',
         content,
+        fileId: fileId ?? null,
       })
       .returning()
 

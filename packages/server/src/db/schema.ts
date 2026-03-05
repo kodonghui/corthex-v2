@@ -79,6 +79,7 @@ export const adminSessions = pgTable('admin_sessions', {
 export const departments = pgTable('departments', {
   id: uuid('id').primaryKey().defaultRandom(),
   companyId: uuid('company_id').notNull().references(() => companies.id),
+  parentDepartmentId: uuid('parent_department_id'),  // 자기참조 — 부서 계층
   name: varchar('name', { length: 100 }).notNull(),
   description: text('description'),
   isActive: boolean('is_active').notNull().default(true),
@@ -99,6 +100,7 @@ export const agents = pgTable('agents', {
   soul: text('soul'),  // 마크다운 성격 정의
   adminSoul: text('admin_soul'),  // 관리자가 설정한 원본 소울 (초기화용)
   status: agentStatusEnum('status').notNull().default('offline'),
+  level: varchar('level', { length: 20 }).notNull().default('member'),  // member/lead/director
   isSecretary: boolean('is_secretary').notNull().default(false),
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
@@ -169,6 +171,7 @@ export const chatMessages = pgTable('chat_messages', {
   sessionId: uuid('session_id').notNull().references(() => chatSessions.id),
   sender: messageSenderEnum('sender').notNull(),
   content: text('content').notNull(),
+  fileId: uuid('file_id').references(() => files.id),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 }, (table) => ({
   sessionCreatedIdx: index('chat_messages_session_created_idx').on(table.sessionId, table.createdAt),
@@ -593,6 +596,7 @@ export const chatSessionsRelations = relations(chatSessions, ({ one, many }) => 
 export const chatMessagesRelations = relations(chatMessages, ({ one }) => ({
   company: one(companies, { fields: [chatMessages.companyId], references: [companies.id] }),
   session: one(chatSessions, { fields: [chatMessages.sessionId], references: [chatSessions.id] }),
+  file: one(files, { fields: [chatMessages.fileId], references: [files.id] }),
 }))
 
 export const delegationsRelations = relations(delegations, ({ one }) => ({
