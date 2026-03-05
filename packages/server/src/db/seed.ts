@@ -480,6 +480,31 @@ async function seed() {
         required: ['text'],
       },
     },
+    {
+      name: 'publish_instagram',
+      description: '인스타그램에 이미지 게시물을 발행합니다',
+      handler: 'publish_instagram',
+      scope: 'platform' as const,
+      category: 'content',
+      tags: ['instagram', 'sns', 'api'],
+      inputSchema: {
+        type: 'object',
+        properties: {
+          imageUrl: { type: 'string', description: '게시할 이미지 URL' },
+          caption: { type: 'string', description: '게시물 캡션' },
+        },
+        required: ['imageUrl'],
+      },
+    },
+    {
+      name: 'get_instagram_insights',
+      description: '인스타그램 계정 통계(팔로워, 노출, 도달)를 조회합니다',
+      handler: 'get_instagram_insights',
+      scope: 'platform' as const,
+      category: 'utility',
+      tags: ['instagram', 'sns', 'api', 'analytics'],
+      inputSchema: { type: 'object', properties: {} },
+    },
   ]
 
   for (const def of externalTools) {

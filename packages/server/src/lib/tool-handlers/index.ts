@@ -20,6 +20,8 @@ import { placeStockOrder } from './builtins/place-stock-order'
 import { textToSpeech } from './builtins/text-to-speech'
 import { generateImage } from './builtins/generate-image'
 import { translateText } from './builtins/translate-text'
+import { publishInstagram } from './builtins/publish-instagram'
+import { getInstagramInsights } from './builtins/get-instagram-insights'
 import { createReport } from './builtins/create-report'
 
 // 내장 핸들러 등록
@@ -44,6 +46,8 @@ registry.register('place_stock_order', placeStockOrder)
 registry.register('text_to_speech', textToSpeech)
 registry.register('generate_image', generateImage)
 registry.register('translate_text', translateText)
+registry.register('publish_instagram', publishInstagram)
+registry.register('get_instagram_insights', getInstagramInsights)
 registry.register('create_report', createReport)
 
 export { registry } from './registry'
