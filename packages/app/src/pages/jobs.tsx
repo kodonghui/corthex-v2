@@ -47,9 +47,29 @@ const statusConfig: Record<string, { label: string; color: string }> = {
   failed: { label: '실패', color: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' },
 }
 
+type Trigger = {
+  id: string
+  agentId: string
+  agentName: string
+  instruction: string
+  triggerType: 'price-above' | 'price-below' | 'market-open' | 'market-close'
+  condition: { symbol?: string; targetPrice?: number }
+  isActive: boolean
+  lastTriggeredAt: string | null
+  createdAt: string
+}
+
+const triggerTypeLabels: Record<string, string> = {
+  'price-above': '주가 이상',
+  'price-below': '주가 이하',
+  'market-open': '장 시작',
+  'market-close': '장 마감',
+}
+
 const TABS = [
   { value: 'jobs', label: '작업' },
   { value: 'schedules', label: '스케줄' },
+  { value: 'triggers', label: '트리거' },
 ]
 
 export function JobsPage() {
@@ -68,6 +88,7 @@ export function JobsPage() {
 
       {activeTab === 'jobs' && <JobsTab />}
       {activeTab === 'schedules' && <SchedulesTab />}
+      {activeTab === 'triggers' && <TriggersTab />}
     </div>
   )
 }
@@ -533,6 +554,329 @@ function SchedulesTab() {
         onCancel={() => setDeleteTarget(null)}
         title="스케줄 삭제"
         description="이 스케줄을 삭제하시겠습니까? 연결된 대기 중 작업도 함께 삭제됩니다."
+        variant="danger"
+      />
+    </div>
+  )
+}
+
+/* ─── 트리거 탭 (신규) ─── */
+function TriggersTab() {
+  const queryClient = useQueryClient()
+  const [showForm, setShowForm] = useState(false)
+  const [selectedAgent, setSelectedAgent] = useState('')
+  const [instruction, setInstruction] = useState('')
+  const [triggerType, setTriggerType] = useState<string>('market-open')
+  const [symbol, setSymbol] = useState('')
+  const [targetPrice, setTargetPrice] = useState('')
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editInstruction, setEditInstruction] = useState('')
+  const [editTriggerType, setEditTriggerType] = useState('')
+  const [editSymbol, setEditSymbol] = useState('')
+  const [editTargetPrice, setEditTargetPrice] = useState('')
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
+
+  const { data: agentsData } = useQuery({
+    queryKey: ['agents'],
+    queryFn: () => api.get<{ data: Agent[] }>('/workspace/agents'),
+  })
+
+  const { data: triggersData } = useQuery({
+    queryKey: ['triggers'],
+    queryFn: () => api.get<{ data: Trigger[] }>('/workspace/triggers'),
+  })
+
+  const createTrigger = useMutation({
+    mutationFn: (body: { agentId: string; instruction: string; triggerType: string; condition: Record<string, unknown> }) =>
+      api.post('/workspace/triggers', body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['triggers'] })
+      setShowForm(false)
+      setSelectedAgent('')
+      setInstruction('')
+      setTriggerType('market-open')
+      setSymbol('')
+      setTargetPrice('')
+      toast.success('트리거 등록 완료')
+    },
+    onError: () => toast.error('트리거 등록 실패'),
+  })
+
+  const updateTrigger = useMutation({
+    mutationFn: ({ id, ...body }: { id: string; instruction?: string; triggerType?: string; condition?: Record<string, unknown>; isActive?: boolean }) =>
+      api.patch(`/workspace/triggers/${id}`, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['triggers'] })
+      setEditingId(null)
+      toast.success('트리거 수정 완료')
+    },
+    onError: () => toast.error('트리거 수정 실패'),
+  })
+
+  const deleteTrigger = useMutation({
+    mutationFn: (id: string) => api.delete(`/workspace/triggers/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['triggers'] })
+      setDeleteTarget(null)
+      toast.success('트리거 삭제 완료')
+    },
+  })
+
+  const agentList = agentsData?.data || []
+  const triggers = triggersData?.data || []
+  const isPriceTrigger = triggerType === 'price-above' || triggerType === 'price-below'
+  const isEditPriceTrigger = editTriggerType === 'price-above' || editTriggerType === 'price-below'
+
+  const handleCreate = () => {
+    if (!selectedAgent || !instruction.trim()) return
+    const condition: Record<string, unknown> = {}
+    if (isPriceTrigger) {
+      if (!symbol.trim() || !targetPrice) return
+      condition.symbol = symbol.trim()
+      condition.targetPrice = Number(targetPrice)
+    }
+    createTrigger.mutate({
+      agentId: selectedAgent,
+      instruction: instruction.trim(),
+      triggerType,
+      condition,
+    })
+  }
+
+  const handleRewatch = (trigger: Trigger) => {
+    updateTrigger.mutate({ id: trigger.id, isActive: true })
+  }
+
+  const startEdit = (trigger: Trigger) => {
+    setEditingId(trigger.id)
+    setEditInstruction(trigger.instruction)
+    setEditTriggerType(trigger.triggerType)
+    setEditSymbol(trigger.condition?.symbol || '')
+    setEditTargetPrice(String(trigger.condition?.targetPrice || ''))
+  }
+
+  const handleSaveEdit = (id: string) => {
+    const condition: Record<string, unknown> = {}
+    if (isEditPriceTrigger) {
+      condition.symbol = editSymbol.trim()
+      condition.targetPrice = Number(editTargetPrice)
+    }
+    updateTrigger.mutate({
+      id,
+      instruction: editInstruction.trim(),
+      triggerType: editTriggerType,
+      condition,
+    })
+  }
+
+  const triggerTypeOptions = [
+    { value: 'price-above', label: '주가 이상 도달' },
+    { value: 'price-below', label: '주가 이하 하락' },
+    { value: 'market-open', label: '장 시작 (09:00)' },
+    { value: 'market-close', label: '장 마감 (15:30)' },
+  ]
+
+  return (
+    <div className="max-w-2xl space-y-6">
+      <div className="flex justify-end">
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700"
+        >
+          {showForm ? '취소' : '+ 새 트리거'}
+        </button>
+      </div>
+
+      {/* 생성 폼 */}
+      {showForm && (
+        <div className="p-5 rounded-lg border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950 space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-zinc-500 mb-1">담당 에이전트</label>
+            <Select
+              value={selectedAgent}
+              onChange={(e) => setSelectedAgent(e.target.value)}
+              placeholder="에이전트 선택..."
+              options={agentList.map((agent) => ({
+                value: agent.id,
+                label: `${agent.name} ${agent.isSecretary ? '(비서)' : ''} — ${agent.role}`,
+              }))}
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-zinc-500 mb-1">작업 지시</label>
+            <Textarea
+              value={instruction}
+              onChange={(e) => setInstruction(e.target.value)}
+              placeholder="예: 삼성전자 목표가 도달 시 매도 분석 보고서 작성"
+              rows={3}
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-zinc-500 mb-1">트리거 유형</label>
+            <Select
+              value={triggerType}
+              onChange={(e) => setTriggerType(e.target.value)}
+              options={triggerTypeOptions}
+            />
+          </div>
+          {isPriceTrigger && (
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-zinc-500 mb-1">종목코드</label>
+                <Input
+                  value={symbol}
+                  onChange={(e) => setSymbol(e.target.value)}
+                  placeholder="005930"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-zinc-500 mb-1">목표가 (원)</label>
+                <Input
+                  type="number"
+                  value={targetPrice}
+                  onChange={(e) => setTargetPrice(e.target.value)}
+                  placeholder="70000"
+                />
+              </div>
+            </div>
+          )}
+          <button
+            onClick={handleCreate}
+            disabled={!selectedAgent || !instruction.trim() || (isPriceTrigger && (!symbol.trim() || !targetPrice)) || createTrigger.isPending}
+            className="w-full py-2.5 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700 disabled:opacity-50"
+          >
+            {createTrigger.isPending ? '등록 중...' : '트리거 등록'}
+          </button>
+        </div>
+      )}
+
+      {/* 트리거 목록 */}
+      <div className="space-y-3">
+        {triggers.length === 0 ? (
+          <div className="text-center py-12 text-sm text-zinc-400">
+            <p className="text-3xl mb-3">🎯</p>
+            <p>등록된 트리거가 없습니다</p>
+            <p className="text-xs mt-1">조건을 설정하면 충족 시 자동으로 작업이 실행됩니다</p>
+          </div>
+        ) : (
+          triggers.map((trigger) => {
+            const isEditing = editingId === trigger.id
+
+            return (
+              <div
+                key={trigger.id}
+                className="border rounded-lg overflow-hidden border-zinc-200 dark:border-zinc-800"
+              >
+                <div className="px-4 py-3">
+                  {isEditing ? (
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-[10px] font-medium text-zinc-500 mb-1">작업 지시</label>
+                        <Textarea
+                          value={editInstruction}
+                          onChange={(e) => setEditInstruction(e.target.value)}
+                          rows={2}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-medium text-zinc-500 mb-1">트리거 유형</label>
+                        <Select
+                          value={editTriggerType}
+                          onChange={(e) => setEditTriggerType(e.target.value)}
+                          options={triggerTypeOptions}
+                        />
+                      </div>
+                      {isEditPriceTrigger && (
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-[10px] font-medium text-zinc-500 mb-1">종목코드</label>
+                            <Input value={editSymbol} onChange={(e) => setEditSymbol(e.target.value)} />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-medium text-zinc-500 mb-1">목표가</label>
+                            <Input type="number" value={editTargetPrice} onChange={(e) => setEditTargetPrice(e.target.value)} />
+                          </div>
+                        </div>
+                      )}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleSaveEdit(trigger.id)}
+                          disabled={updateTrigger.isPending}
+                          className="px-3 py-1.5 bg-indigo-600 text-white rounded-md text-xs font-medium hover:bg-indigo-700 disabled:opacity-50"
+                        >
+                          저장
+                        </button>
+                        <button
+                          onClick={() => setEditingId(null)}
+                          className="px-3 py-1.5 text-zinc-500 hover:text-zinc-700 text-xs"
+                        >
+                          취소
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Badge variant={trigger.isActive ? 'success' : 'default'}>
+                            {trigger.isActive ? '감시 중' : '중지'}
+                          </Badge>
+                          <span className="text-xs text-zinc-400">{trigger.agentName}</span>
+                          <span className="text-[10px] font-mono text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">
+                            {triggerTypeLabels[trigger.triggerType] || trigger.triggerType}
+                          </span>
+                        </div>
+                        <p className="text-sm font-medium">{trigger.instruction}</p>
+                        {(trigger.triggerType === 'price-above' || trigger.triggerType === 'price-below') && trigger.condition && (
+                          <p className="text-[10px] text-zinc-400 mt-0.5">
+                            {trigger.condition.symbol} {trigger.triggerType === 'price-above' ? '≥' : '≤'} {trigger.condition.targetPrice?.toLocaleString()}원
+                          </p>
+                        )}
+                        {trigger.lastTriggeredAt && (
+                          <p className="text-[10px] text-zinc-400 mt-0.5">
+                            마지막 발동: {new Date(trigger.lastTriggeredAt).toLocaleString('ko-KR', {
+                              month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
+                            })}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 ml-3 shrink-0">
+                        {!trigger.isActive && (
+                          <button
+                            onClick={() => handleRewatch(trigger)}
+                            className="text-xs text-indigo-600 hover:text-indigo-700 font-medium"
+                          >
+                            다시 감시
+                          </button>
+                        )}
+                        <button
+                          onClick={() => startEdit(trigger)}
+                          className="text-xs text-zinc-400 hover:text-indigo-600"
+                        >
+                          수정
+                        </button>
+                        <button
+                          onClick={() => setDeleteTarget(trigger.id)}
+                          className="text-xs text-zinc-400 hover:text-red-600"
+                        >
+                          삭제
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )
+          })
+        )}
+      </div>
+
+      <ConfirmDialog
+        isOpen={!!deleteTarget}
+        onConfirm={() => deleteTarget && deleteTrigger.mutate(deleteTarget)}
+        onCancel={() => setDeleteTarget(null)}
+        title="트리거 삭제"
+        description="이 트리거를 삭제하시겠습니까? 연결된 대기 중 작업도 함께 삭제됩니다."
         variant="danger"
       />
     </div>

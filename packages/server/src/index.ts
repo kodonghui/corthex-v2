@@ -25,9 +25,11 @@ import { messengerRoute } from './routes/workspace/messenger'
 import { nexusRoute } from './routes/workspace/nexus'
 import { strategyRoute } from './routes/workspace/strategy'
 import { schedulesRoute } from './routes/workspace/schedules'
+import { triggersRoute } from './routes/workspace/triggers'
 import { runMigrations } from './db'
 import { startJobWorker } from './lib/job-queue'
 import { startScheduleWorker } from './lib/schedule-worker'
+import { startTriggerWorker } from './lib/trigger-worker'
 import { loginRateLimit, apiRateLimit } from './middleware/rate-limit'
 import { wsRoute, websocket, broadcastServerRestart } from './ws/server'
 import { eventBus } from './lib/event-bus'
@@ -83,6 +85,7 @@ app.route('/api/workspace/messenger', messengerRoute)
 app.route('/api/workspace', nexusRoute)
 app.route('/api/workspace/strategy', strategyRoute)
 app.route('/api/workspace/schedules', schedulesRoute)
+app.route('/api/workspace/triggers', triggersRoute)
 
 // WebSocket 라우트
 app.get('/ws', wsRoute)
@@ -147,6 +150,7 @@ console.log(`🚀 CORTHEX v2 서버 시작 — http://localhost:${port}`)
 runMigrations().then(() => {
   startJobWorker()
   startScheduleWorker()
+  startTriggerWorker()
 })
 
 // Graceful Shutdown — SIGTERM 시 WS 클라이언트 알림 후 종료

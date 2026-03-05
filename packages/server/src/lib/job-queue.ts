@@ -19,6 +19,7 @@ export async function queueNightJob(params: {
   agentId: string
   sessionId?: string
   scheduleId?: string
+  triggerId?: string
   instruction: string
   scheduledFor?: Date
 }) {
@@ -30,6 +31,7 @@ export async function queueNightJob(params: {
       agentId: params.agentId,
       sessionId: params.sessionId || null,
       scheduleId: params.scheduleId || null,
+      triggerId: params.triggerId || null,
       instruction: params.instruction,
       scheduledFor: params.scheduledFor || new Date(),
       maxRetries: MAX_RETRIES,
