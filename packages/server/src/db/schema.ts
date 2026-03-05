@@ -513,6 +513,23 @@ export const strategyNotes = pgTable('strategy_notes', {
   userStockIdx: index('strategy_notes_user_stock_idx').on(table.companyId, table.userId, table.stockCode),
 }))
 
+// === 28b. strategy_backtest_results — 백테스트 결과 ===
+export const strategyBacktestResults = pgTable('strategy_backtest_results', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  stockCode: varchar('stock_code', { length: 20 }).notNull(),
+  strategyType: varchar('strategy_type', { length: 50 }).notNull(),
+  strategyParams: jsonb('strategy_params').notNull().default({}),
+  signals: jsonb('signals').notNull().default([]),
+  metrics: jsonb('metrics').notNull().default({}),
+  dataRange: varchar('data_range', { length: 50 }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('strategy_backtest_company_idx').on(table.companyId),
+  userStockIdx: index('strategy_backtest_user_stock_idx').on(table.companyId, table.userId, table.stockCode),
+}))
+
 // === 28. canvas_layouts — NEXUS 캔버스 레이아웃 ===
 export const canvasLayouts = pgTable('canvas_layouts', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -675,6 +692,11 @@ export const strategyWatchlistsRelations = relations(strategyWatchlists, ({ one 
 export const strategyNotesRelations = relations(strategyNotes, ({ one }) => ({
   company: one(companies, { fields: [strategyNotes.companyId], references: [companies.id] }),
   user: one(users, { fields: [strategyNotes.userId], references: [users.id] }),
+}))
+
+export const strategyBacktestResultsRelations = relations(strategyBacktestResults, ({ one }) => ({
+  company: one(companies, { fields: [strategyBacktestResults.companyId], references: [companies.id] }),
+  user: one(users, { fields: [strategyBacktestResults.userId], references: [users.id] }),
 }))
 
 export const canvasLayoutsRelations = relations(canvasLayouts, ({ one }) => ({

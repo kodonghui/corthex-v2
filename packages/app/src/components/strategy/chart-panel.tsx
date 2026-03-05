@@ -3,9 +3,10 @@ import { useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../../lib/api'
 import { Button, Card, EmptyState } from '@corthex/ui'
-import { StockChart } from './stock-chart'
+import { StockChart, type MarkerData } from './stock-chart'
 import { NotesPanel } from './notes-panel'
 import { ExportDialog } from './export-dialog'
+import { BacktestPanel } from './backtest-panel'
 import type { WatchlistItem } from './types'
 
 type PriceData = {
@@ -55,6 +56,8 @@ export function ChartPanel() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [marketOpen, setMarketOpen] = useState(isMarketOpen)
   const [exportOpen, setExportOpen] = useState(false)
+  const [backtestOpen, setBacktestOpen] = useState(false)
+  const [markers, setMarkers] = useState<MarkerData[]>([])
 
   useEffect(() => {
     const id = setInterval(() => setMarketOpen(isMarketOpen()), 60_000)
@@ -103,6 +106,8 @@ export function ChartPanel() {
   useEffect(() => {
     setFailCount(0)
     setLastUpdated(null)
+    setMarkers([])
+    setBacktestOpen(false)
   }, [stockCode])
 
   if (!stockCode || !stock) {
@@ -140,7 +145,12 @@ export function ChartPanel() {
                 {stock.market}
               </span>
             </div>
-            <Button size="sm" variant="ghost" onClick={() => setExportOpen(true)}>내보내기</Button>
+            <div className="flex gap-1">
+              <Button size="sm" variant="ghost" onClick={() => setBacktestOpen(!backtestOpen)}>
+                {backtestOpen ? '백테스트 닫기' : '백테스트'}
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => setExportOpen(true)}>내보내기</Button>
+            </div>
           </div>
 
           {price && !price.error && (
@@ -187,9 +197,17 @@ export function ChartPanel() {
           </div>
         )}
         {!chartLoading && candles.length > 0 && (
-          <StockChart candles={candles} className="w-full h-full" />
+          <StockChart candles={candles} markers={markers} className="w-full h-full" />
         )}
       </Card>
+
+      {backtestOpen && (
+        <BacktestPanel
+          stockCode={stockCode}
+          candles={candles}
+          onMarkers={setMarkers}
+        />
+      )}
 
       <NotesPanel />
 

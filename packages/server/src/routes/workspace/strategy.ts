@@ -3,7 +3,7 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { eq, and, desc } from 'drizzle-orm'
 import { db } from '../../db'
-import { strategyWatchlists, chatSessions, agents, strategyNotes } from '../../db/schema'
+import { strategyWatchlists, chatSessions, agents, strategyNotes, strategyBacktestResults } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { getCredentials } from '../../services/credential-vault'
@@ -537,3 +537,91 @@ strategyRoute.get('/export', zValidator('query', exportSchema), async (c) => {
 
   throw new HTTPError(400, '지원하지 않는 내보내기 유형입니다', 'STRATEGY_033')
 })
+
+// === 백테스트 결과 ===
+
+const backtestCreateSchema = z.object({
+  stockCode: z.string().min(1).max(20).regex(/^[A-Za-z0-9]{1,20}$/),
+  strategyType: z.string().min(1).max(50),
+  strategyParams: z.record(z.unknown()),
+  signals: z.array(z.object({
+    date: z.string(),
+    type: z.enum(['buy', 'sell']),
+    price: z.number(),
+  })),
+  metrics: z.object({
+    totalReturn: z.number(),
+    tradeCount: z.number(),
+    winRate: z.number(),
+    maxDrawdown: z.number(),
+  }),
+  dataRange: z.string().max(50).optional(),
+})
+
+// GET /api/workspace/strategy/backtest-results?stockCode=005930
+strategyRoute.get(
+  '/backtest-results',
+  zValidator('query', z.object({ stockCode: z.string().min(1).max(20) })),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const { stockCode } = c.req.valid('query')
+
+    const results = await db
+      .select()
+      .from(strategyBacktestResults)
+      .where(and(
+        eq(strategyBacktestResults.companyId, tenant.companyId),
+        eq(strategyBacktestResults.userId, tenant.userId),
+        eq(strategyBacktestResults.stockCode, stockCode),
+      ))
+      .orderBy(desc(strategyBacktestResults.createdAt))
+      .limit(20)
+
+    return c.json({ data: results })
+  },
+)
+
+// POST /api/workspace/strategy/backtest-results
+strategyRoute.post('/backtest-results', zValidator('json', backtestCreateSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const body = c.req.valid('json')
+
+  const [result] = await db
+    .insert(strategyBacktestResults)
+    .values({
+      companyId: tenant.companyId,
+      userId: tenant.userId,
+      stockCode: body.stockCode,
+      strategyType: body.strategyType,
+      strategyParams: body.strategyParams,
+      signals: body.signals,
+      metrics: body.metrics,
+      dataRange: body.dataRange || null,
+    })
+    .returning()
+
+  return c.json({ data: result }, 201)
+})
+
+// DELETE /api/workspace/strategy/backtest-results/:id
+strategyRoute.delete(
+  '/backtest-results/:id',
+  zValidator('param', z.object({ id: z.string().uuid() })),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const { id } = c.req.valid('param')
+
+    const [deleted] = await db
+      .delete(strategyBacktestResults)
+      .where(and(
+        eq(strategyBacktestResults.id, id),
+        eq(strategyBacktestResults.companyId, tenant.companyId),
+        eq(strategyBacktestResults.userId, tenant.userId),
+      ))
+      .returning()
+
+    if (!deleted) throw new HTTPError(404, '백테스트 결과를 찾을 수 없습니다', 'STRATEGY_041')
+
+    return c.json({ data: { deleted: true } })
+  },
+)

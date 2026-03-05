@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { createChart, type IChartApi, type CandlestickData, ColorType, CandlestickSeries } from 'lightweight-charts'
+import { createChart, createSeriesMarkers, type IChartApi, type CandlestickData, ColorType, CandlestickSeries } from 'lightweight-charts'
 
 type Candle = {
   time: string
@@ -10,12 +10,18 @@ type Candle = {
   volume: number
 }
 
+export type MarkerData = {
+  time: string
+  type: 'buy' | 'sell'
+}
+
 type Props = {
   candles: Candle[]
+  markers?: MarkerData[]
   className?: string
 }
 
-export function StockChart({ candles, className }: Props) {
+export function StockChart({ candles, markers, className }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const chartRef = useRef<IChartApi | null>(null)
 
@@ -54,6 +60,19 @@ export function StockChart({ candles, className }: Props) {
     })
 
     series.setData(candles as CandlestickData[])
+
+    if (markers && markers.length > 0) {
+      createSeriesMarkers(series,
+        markers.map((m) => ({
+          time: m.time,
+          position: m.type === 'buy' ? 'belowBar' as const : 'aboveBar' as const,
+          color: m.type === 'buy' ? '#10b981' : '#ef4444',
+          shape: m.type === 'buy' ? 'arrowUp' as const : 'arrowDown' as const,
+          text: m.type === 'buy' ? 'B' : 'S',
+        })),
+      )
+    }
+
     chart.timeScale().fitContent()
     chartRef.current = chart
 
@@ -68,7 +87,7 @@ export function StockChart({ candles, className }: Props) {
       chart.remove()
       chartRef.current = null
     }
-  }, [candles])
+  }, [candles, markers])
 
   return <div ref={containerRef} className={className} />
 }
