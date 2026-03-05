@@ -1,6 +1,6 @@
 # Story 10.2: 전략실 채팅 에이전트 — 종목 컨텍스트 채팅 + 스트리밍
 
-Status: review
+Status: done
 
 ## Story
 

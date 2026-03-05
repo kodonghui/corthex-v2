@@ -95,10 +95,10 @@ strategyRoute.get('/chat/session', async (c) => {
     .orderBy(desc(chatSessions.lastMessageAt))
     .limit(20)
 
-  // 전략실 세션 찾기 (metadata.stockCode가 있는 세션)
+  // 전략실 세션 찾기 (metadata.strategy === true 마커)
   const strategySession = result.find((s) => {
-    const meta = s.metadata as { stockCode?: string } | null
-    return meta?.stockCode
+    const meta = s.metadata as { strategy?: boolean } | null
+    return meta?.strategy === true
   })
 
   return c.json({ data: strategySession || null })
@@ -127,7 +127,7 @@ strategyRoute.post('/chat/sessions', zValidator('json', createChatSchema), async
 
   if (!agent) throw new HTTPError(404, '에이전트를 찾을 수 없습니다', 'STRATEGY_003')
 
-  const metadata = stockCode ? { stockCode, stockName } : null
+  const metadata = { strategy: true as const, stockCode: stockCode || null, stockName: stockName || null }
 
   const [session] = await db
     .insert(chatSessions)
@@ -160,7 +160,7 @@ strategyRoute.patch(
 
     const [updated] = await db
       .update(chatSessions)
-      .set({ metadata: { stockCode, stockName } })
+      .set({ metadata: { strategy: true, stockCode, stockName } })
       .where(and(
         eq(chatSessions.id, id),
         eq(chatSessions.companyId, tenant.companyId),

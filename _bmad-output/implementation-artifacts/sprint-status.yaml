@@ -154,7 +154,7 @@ development_status:
   # ============================================================
   epic-10: in-progress
   10-1-strategy-room-layout: done
-  10-2-strategy-chat-agent: review
+  10-2-strategy-chat-agent: done
   10-3-realtime-stock-chart: backlog
   10-4-strategy-notes: backlog
   10-5-strategy-export: backlog

@@ -87,13 +87,24 @@ export async function generateAgentResponse(ctx: ChatContext): Promise<string> {
     ? `\n\n## 사용 가능한 도구\n${toolRecords.map(t => `- ${t.name}: ${t.description || ''}`).join('\n')}\n\n도구가 필요한 질문을 받으면 적극적으로 도구를 사용하세요.`
     : ''
 
+  // 5.5 세션 metadata에서 종목 컨텍스트 추출
+  const [sessionRow] = await db
+    .select({ metadata: chatSessions.metadata })
+    .from(chatSessions)
+    .where(eq(chatSessions.id, ctx.sessionId))
+    .limit(1)
+  const meta = sessionRow?.metadata as { stockCode?: string; stockName?: string } | null
+  const stockContext = meta?.stockCode
+    ? `\n\n## 현재 종목 컨텍스트\n사용자가 보고 있는 종목: ${meta.stockName || ''} (${meta.stockCode})\n이 종목에 대한 질문에 우선적으로 답변해주세요.`
+    : ''
+
   const systemPrompt = `${agent.soul || '당신은 도움이 되는 AI 비서입니다.'}
 
 ## 기본 정보
 - 이름: ${agent.name}
 - 역할: ${agent.role || '비서'}
 - 항상 한국어로 답변합니다
-- 간결하고 실용적으로 답변합니다${memoryBlock}${toolBlock}`
+- 간결하고 실용적으로 답변합니다${stockContext}${memoryBlock}${toolBlock}`
 
   // 6. 메시지 배열 구성
   const messages: Anthropic.MessageParam[] = history.map((msg) => ({

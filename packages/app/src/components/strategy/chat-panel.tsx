@@ -53,7 +53,7 @@ export function ChatPanel() {
     if (!isLoading && !session && !createSession.isPending) {
       createSession.mutate({ stockCode: stockCode || undefined, stockName: stockName || undefined })
     }
-  }, [isLoading, session, createSession.isPending])
+  }, [isLoading, session, createSession.isPending, stockCode, stockName])
 
   // 종목 변경 시 세션 컨텍스트 업데이트
   useEffect(() => {
