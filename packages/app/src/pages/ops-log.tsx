@@ -151,7 +151,10 @@ export function OpsLogPage() {
 
   // WebSocket 실시간 구독
   useEffect(() => {
-    if (!isConnected) return
+    if (!isConnected) {
+      subscribedRef.current = false
+      return
+    }
 
     if (!subscribedRef.current) {
       subscribe('activity-log', {})
@@ -161,7 +164,7 @@ export function OpsLogPage() {
     const handler = (data: unknown) => {
       const event = data as { type: string; log: ActivityLog }
       if (event.type === 'new-log' && event.log) {
-        setRealtimeLogs((prev) => [event.log, ...prev])
+        setRealtimeLogs((prev) => [event.log, ...prev].slice(0, 200))
         if (!isAtTopRef.current) {
           setNewLogCount((n) => n + 1)
         }

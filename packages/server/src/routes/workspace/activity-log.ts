@@ -33,10 +33,11 @@ activityLogRoute.get('/activity-log', async (c) => {
   }
 
   if (search) {
+    const escaped = search.replace(/[%_\\]/g, '\\$&')
     conditions.push(
       or(
-        ilike(activityLogs.action, `%${search}%`),
-        ilike(activityLogs.detail, `%${search}%`),
+        ilike(activityLogs.action, `%${escaped}%`),
+        ilike(activityLogs.detail, `%${escaped}%`),
       )!,
     )
   }

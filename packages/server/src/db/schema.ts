@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, varchar, boolean, jsonb, integer, pgEnum, index } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, uuid, varchar, boolean, jsonb, integer, pgEnum, index, unique } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 
 // === Enums ===
@@ -120,6 +120,7 @@ export const notificationPreferences = pgTable('notification_preferences', {
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 }, (table) => ({
   companyIdx: index('notification_prefs_company_idx').on(table.companyId),
+  userCompanyUniq: unique('notification_prefs_user_company_uniq').on(table.userId, table.companyId),
 }))
 
 // === 5. cli_credentials — CLI 토큰 (AES-256 암호화) ===

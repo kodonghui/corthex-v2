@@ -68,6 +68,7 @@ export async function createNotification(params: NotifyParams): Promise<void> {
         const smtp = company.smtpConfig as { host: string; port: number; secure: boolean; user: string; pass: string }
         const html = buildNotificationEmail(params.title, params.body, params.actionUrl)
         sendEmail(smtp, { to: user.email, subject: `[CORTHEX] ${params.title}`, html })
+          .catch((err) => console.error('[Notifier] 이메일 발송 에러:', err))
       }
     }
   } catch (err) {

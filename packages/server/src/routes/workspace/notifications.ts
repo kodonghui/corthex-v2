@@ -1,9 +1,16 @@
 import { Hono } from 'hono'
 import { eq, and, desc, count } from 'drizzle-orm'
+import { z } from 'zod'
 import { db } from '../../db'
 import { notifications, companies, notificationPreferences } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import type { AppEnv } from '../../types'
+
+const notificationPrefsSchema = z.object({
+  inApp: z.boolean().optional(),
+  email: z.boolean().optional(),
+  settings: z.record(z.unknown()).nullable().optional(),
+})
 
 export const notificationsRoute = new Hono<AppEnv>()
 
@@ -121,33 +128,32 @@ notificationsRoute.get('/notification-prefs', async (c) => {
 // PUT /api/workspace/notification-prefs — 알림 설정 업데이트 (upsert)
 notificationsRoute.put('/notification-prefs', async (c) => {
   const tenant = c.get('tenant')
-  const body = await c.req.json() as { inApp?: boolean; email?: boolean; settings?: Record<string, unknown> }
-
-  const [existing] = await db
-    .select({ id: notificationPreferences.id })
-    .from(notificationPreferences)
-    .where(and(
-      eq(notificationPreferences.userId, tenant.userId),
-      eq(notificationPreferences.companyId, tenant.companyId),
-    ))
-    .limit(1)
+  const raw = await c.req.json()
+  const parsed = notificationPrefsSchema.safeParse(raw)
+  if (!parsed.success) {
+    return c.json({ error: 'Invalid request body' }, 400)
+  }
+  const body = parsed.data
 
   const values: Record<string, unknown> = { updatedAt: new Date() }
   if (body.inApp !== undefined) values.inApp = body.inApp
   if (body.email !== undefined) values.email = body.email
   if (body.settings !== undefined) values.settings = body.settings
 
-  if (existing) {
-    await db.update(notificationPreferences).set(values).where(eq(notificationPreferences.id, existing.id))
-  } else {
-    await db.insert(notificationPreferences).values({
+  // Atomic upsert: INSERT ON CONFLICT UPDATE
+  await db
+    .insert(notificationPreferences)
+    .values({
       userId: tenant.userId,
       companyId: tenant.companyId,
       inApp: body.inApp ?? true,
       email: body.email ?? false,
       settings: body.settings ?? null,
     })
-  }
+    .onConflictDoUpdate({
+      target: [notificationPreferences.userId, notificationPreferences.companyId],
+      set: values,
+    })
 
   return c.json({ data: { success: true } })
 })

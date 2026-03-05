@@ -18,9 +18,11 @@ export function NotificationListener() {
 
     subscribe('notifications', {})
 
-    const userId = localStorage.getItem('corthex_user')
-      ? JSON.parse(localStorage.getItem('corthex_user')!).id
-      : null
+    let userId: string | null = null
+    try {
+      const raw = localStorage.getItem('corthex_user')
+      if (raw) userId = JSON.parse(raw).id
+    } catch { /* corrupted localStorage */ }
     if (!userId) return
 
     const channelKey = `notifications::${userId}`
@@ -28,9 +30,10 @@ export function NotificationListener() {
     const handler = (data: unknown) => {
       const event = data as { type: string; notification?: { title: string } }
       if (event.type === 'new-notification') {
-        // React Query 갱신 (사이드바 뱃지 + 알림 목록)
+        // React Query 갱신 (사이드바 뱃지 + 알림 목록 + 홈 최근 알림)
         queryClient.invalidateQueries({ queryKey: ['notifications'] })
         queryClient.invalidateQueries({ queryKey: ['notifications-count'] })
+        queryClient.invalidateQueries({ queryKey: ['recent-notifications'] })
 
         // /notifications 이외 페이지에서만 Toast
         if (!location.pathname.startsWith('/notifications')) {

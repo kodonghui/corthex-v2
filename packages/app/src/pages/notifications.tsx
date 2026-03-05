@@ -78,6 +78,7 @@ export function NotificationsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] })
       queryClient.invalidateQueries({ queryKey: ['notifications-count'] })
+      queryClient.invalidateQueries({ queryKey: ['recent-notifications'] })
     },
   })
 
@@ -86,6 +87,7 @@ export function NotificationsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] })
       queryClient.invalidateQueries({ queryKey: ['notifications-count'] })
+      queryClient.invalidateQueries({ queryKey: ['recent-notifications'] })
     },
   })
 
@@ -99,9 +101,11 @@ export function NotificationsPage() {
       queryClient.invalidateQueries({ queryKey: ['notifications-count'] })
     }
 
-    const userId = localStorage.getItem('corthex_user')
-      ? JSON.parse(localStorage.getItem('corthex_user')!).id
-      : null
+    let userId: string | null = null
+    try {
+      const raw = localStorage.getItem('corthex_user')
+      if (raw) userId = JSON.parse(raw).id
+    } catch { /* corrupted localStorage */ }
     if (!userId) return
 
     const channelKey = `notifications::${userId}`
