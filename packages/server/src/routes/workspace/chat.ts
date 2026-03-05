@@ -3,7 +3,7 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { eq, and, desc } from 'drizzle-orm'
 import { db } from '../../db'
-import { chatSessions, chatMessages, agents, delegations } from '../../db/schema'
+import { chatSessions, chatMessages, agents, delegations, toolCalls } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { generateAgentResponse, generateAgentResponseStream } from '../../lib/ai'
@@ -290,6 +290,37 @@ chatRoute.get('/sessions/:sessionId/delegations', async (c) => {
     .innerJoin(agents, eq(delegations.targetAgentId, agents.id))
     .where(and(eq(delegations.sessionId, sessionId), eq(delegations.companyId, tenant.companyId)))
     .orderBy(delegations.createdAt)
+
+  return c.json({ data: result })
+})
+
+// GET /api/workspace/chat/sessions/:sessionId/tool-calls — 세션 도구 호출 이력
+chatRoute.get('/sessions/:sessionId/tool-calls', async (c) => {
+  const tenant = c.get('tenant')
+  const sessionId = c.req.param('sessionId')
+
+  // 세션 소유권 확인
+  const [session] = await db
+    .select({ id: chatSessions.id })
+    .from(chatSessions)
+    .where(and(eq(chatSessions.id, sessionId), eq(chatSessions.companyId, tenant.companyId), eq(chatSessions.userId, tenant.userId)))
+    .limit(1)
+
+  if (!session) throw new HTTPError(404, '세션을 찾을 수 없습니다', 'CHAT_002')
+
+  const result = await db
+    .select({
+      id: toolCalls.id,
+      toolName: toolCalls.toolName,
+      input: toolCalls.input,
+      output: toolCalls.output,
+      status: toolCalls.status,
+      durationMs: toolCalls.durationMs,
+      createdAt: toolCalls.createdAt,
+    })
+    .from(toolCalls)
+    .where(and(eq(toolCalls.sessionId, sessionId), eq(toolCalls.companyId, tenant.companyId)))
+    .orderBy(toolCalls.createdAt)
 
   return c.json({ data: result })
 })

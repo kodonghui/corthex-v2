@@ -86,7 +86,7 @@ development_status:
   epic-4: in-progress
   4-1-agent-list-select: done
   4-2-streaming-chat-ui: done
-  4-3-tool-use-loop: backlog
+  4-3-tool-use-loop: done
   4-4-chat-session-history: backlog
   4-5-soul-persona: backlog
   4-6-ui-phase-b: backlog

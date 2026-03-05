@@ -1,0 +1,1 @@
+ALTER TABLE "tool_calls" ADD COLUMN "duration_ms" integer;

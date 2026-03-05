@@ -21,6 +21,16 @@ export type Message = {
   createdAt: string
 }
 
+export type SavedToolCall = {
+  id: string
+  toolName: string
+  input: unknown
+  output: string | null
+  status: string
+  durationMs: number | null
+  createdAt: string
+}
+
 export type Delegation = {
   id: string
   targetAgentName: string

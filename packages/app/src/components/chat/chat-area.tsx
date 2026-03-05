@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../../lib/api'
 import { useWsStore } from '../../stores/ws-store'
 import { useChatStream } from '../../hooks/use-chat-stream'
 import { ToolCallCard } from './tool-call-card'
-import type { Agent, Message, Delegation } from './types'
+import type { Agent, Message, Delegation, SavedToolCall } from './types'
+import type { ToolCall } from '../../hooks/use-chat-stream'
 
 const statusColors: Record<string, string> = {
   online: 'bg-green-400',
@@ -43,6 +44,13 @@ export function ChatArea({
     queryFn: () =>
       api.get<{ data: Delegation[] }>(`/workspace/chat/sessions/${sessionId}/delegations`),
     enabled: !!sessionId && !!agent?.isSecretary,
+  })
+
+  const { data: toolCallsData } = useQuery({
+    queryKey: ['tool-calls', sessionId],
+    queryFn: () =>
+      api.get<{ data: SavedToolCall[] }>(`/workspace/chat/sessions/${sessionId}/tool-calls`),
+    enabled: !!sessionId,
   })
 
   const sendMessage = useMutation({
@@ -89,6 +97,45 @@ export function ChatArea({
 
   const messages = messagesData?.data || []
   const delegationList = delegationsData?.data || []
+  const savedToolCalls = toolCallsData?.data || []
+
+  // 에이전트 메시지별 도구 호출 매칭: 미리 계산된 맵 (O(n+m) 한 번)
+  const toolCallsByMessage = useMemo(() => {
+    const map = new Map<string, ToolCall[]>()
+    if (savedToolCalls.length === 0 || messages.length === 0) return map
+
+    for (let i = 0; i < messages.length; i++) {
+      const msg = messages[i]
+      if (msg.sender !== 'agent') continue
+
+      const msgTime = new Date(msg.createdAt).getTime()
+      let prevTime = 0
+      for (let j = i - 1; j >= 0; j--) {
+        if (messages[j].sender === 'user') {
+          prevTime = new Date(messages[j].createdAt).getTime()
+          break
+        }
+      }
+
+      const matched = savedToolCalls
+        .filter((tc) => {
+          const tcTime = new Date(tc.createdAt).getTime()
+          return tcTime >= prevTime && tcTime <= msgTime
+        })
+        .map((tc) => ({
+          toolId: tc.id,
+          toolName: tc.toolName,
+          status: 'done' as const,
+          input: tc.input ? JSON.stringify(tc.input).slice(0, 200) : undefined,
+          result: tc.output || undefined,
+          durationMs: tc.durationMs != null ? tc.durationMs : undefined,
+          error: (tc.status === 'error' || tc.status === 'timeout') ? true : undefined,
+        }))
+
+      if (matched.length > 0) map.set(msg.id, matched)
+    }
+    return map
+  }, [messages, savedToolCalls])
 
   // EmptyState
   if (!agent || !sessionId) {
@@ -220,9 +267,12 @@ export function ChatArea({
             )}
 
             {messages.map((msg) => {
+              // 에이전트 메시지의 도구 호출 카드 (API 기반)
+              const msgToolCalls = toolCallsByMessage.get(msg.id) || []
+              // fallback: 구버전 메시지의 텍스트 기반 도구 요약
               const toolSplit = msg.content.split('\n\n---\n🔧 **도구 호출 내역:**\n')
               const mainContent = toolSplit[0]
-              const toolContent = toolSplit[1] || null
+              const toolContent = msgToolCalls.length === 0 ? (toolSplit[1] || null) : null
 
               return (
                 <div
@@ -241,6 +291,9 @@ export function ChatArea({
                         {agent.name}
                       </p>
                     )}
+                    {msgToolCalls.length > 0 && msgToolCalls.map((tc) => (
+                      <ToolCallCard key={tc.toolId} tool={tc} />
+                    ))}
                     <p className="whitespace-pre-wrap">{mainContent}</p>
                     {toolContent && (
                       <div className="mt-2 pt-2 border-t border-zinc-200 dark:border-zinc-700">

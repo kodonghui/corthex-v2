@@ -6,7 +6,10 @@ export type ToolCall = {
   toolId: string
   toolName: string
   status: 'running' | 'done'
+  input?: string
   result?: string
+  durationMs?: number
+  error?: boolean
 }
 
 type StreamEvent = {
@@ -14,7 +17,10 @@ type StreamEvent = {
   content?: string
   toolName?: string
   toolId?: string
+  input?: string
   result?: string
+  durationMs?: number
+  error?: boolean
   sessionId?: string
   code?: string
   message?: string
@@ -47,14 +53,14 @@ export function useChatStream(sessionId: string | null) {
         case 'tool-start':
           setToolCalls((prev) => [
             ...prev,
-            { toolId: event.toolId || '', toolName: event.toolName || '', status: 'running' },
+            { toolId: event.toolId || '', toolName: event.toolName || '', status: 'running', input: event.input },
           ])
           break
         case 'tool-end':
           setToolCalls((prev) =>
             prev.map((t) =>
               t.toolId === event.toolId
-                ? { ...t, status: 'done' as const, result: event.result }
+                ? { ...t, status: 'done' as const, result: event.result, durationMs: event.durationMs, error: event.error }
                 : t,
             ),
           )
@@ -64,6 +70,7 @@ export function useChatStream(sessionId: string | null) {
           Promise.all([
             queryClient.invalidateQueries({ queryKey: ['messages', sessionId] }),
             queryClient.invalidateQueries({ queryKey: ['sessions'] }),
+            queryClient.invalidateQueries({ queryKey: ['tool-calls', sessionId] }),
           ]).then(() => {
             setIsStreaming(false)
             setStreamingText('')

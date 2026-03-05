@@ -283,7 +283,8 @@ export const toolCalls = pgTable('tool_calls', {
   toolName: varchar('tool_name', { length: 100 }).notNull(),
   input: jsonb('input'),
   output: text('output'),
-  status: varchar('status', { length: 20 }).notNull().default('success'),  // success, error
+  status: varchar('status', { length: 20 }).notNull().default('success'),  // success, error, timeout
+  durationMs: integer('duration_ms'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 

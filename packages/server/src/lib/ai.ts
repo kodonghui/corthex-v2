@@ -193,8 +193,8 @@ export async function generateAgentResponse(ctx: ChatContext): Promise<string> {
 
 export type StreamEvent =
   | { type: 'token'; content: string }
-  | { type: 'tool-start'; toolName: string; toolId: string }
-  | { type: 'tool-end'; toolName: string; toolId: string; result: string }
+  | { type: 'tool-start'; toolName: string; toolId: string; input?: string }
+  | { type: 'tool-end'; toolName: string; toolId: string; result: string; durationMs?: number; error?: boolean }
   | { type: 'done'; sessionId: string }
   | { type: 'error'; code: string; message: string }
 
@@ -311,19 +311,23 @@ export async function generateAgentResponseStream(
     for (const block of toolUseBlocks) {
       if (block.type !== 'tool_use') continue
 
-      onEvent({ type: 'tool-start', toolName: block.name, toolId: block.id })
+      const inputStr = JSON.stringify(block.input).slice(0, 200)
+      onEvent({ type: 'tool-start', toolName: block.name, toolId: block.id, input: inputStr })
 
       const toolRecord = toolRecords.find(t => t.name === block.name)
       if (!toolRecord) {
         const errResult = `도구 '${block.name}'을(를) 찾을 수 없습니다.`
-        onEvent({ type: 'tool-end', toolName: block.name, toolId: block.id, result: errResult })
+        onEvent({ type: 'tool-end', toolName: block.name, toolId: block.id, result: errResult, durationMs: 0, error: true })
         toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: errResult, is_error: true })
         continue
       }
 
+      const toolStart = Date.now()
       const result = await executeTool(block.name, block.input as Record<string, unknown>, toolExecCtx, toolRecord)
-      onEvent({ type: 'tool-end', toolName: block.name, toolId: block.id, result })
-      toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: result })
+      const durationMs = Date.now() - toolStart
+      const isError = result.startsWith('[오류]')
+      onEvent({ type: 'tool-end', toolName: block.name, toolId: block.id, result, durationMs, error: isError || undefined })
+      toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: result, ...(isError ? { is_error: true } : {}) })
     }
 
     // 다음 라운드를 위해 히스토리 업데이트
@@ -331,6 +335,10 @@ export async function generateAgentResponseStream(
     messages.push({ role: 'user', content: toolResults })
   }
 
+  // MAX_TOOL_ROUNDS 초과 안내
+  const limitMsg = '\n\n도구 호출 횟수 제한(5회)에 도달했습니다. 질문을 더 구체적으로 해주세요.'
+  fullText += limitMsg
+  onEvent({ type: 'token', content: limitMsg })
   onEvent({ type: 'done', sessionId: ctx.sessionId })
-  return fullText || '도구 호출이 너무 많아 중단되었습니다.'
+  return fullText
 }

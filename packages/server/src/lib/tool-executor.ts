@@ -74,12 +74,16 @@ export function toClaudeTools(toolRecords: ToolRecord[]): ClaudeTool[] {
 /**
  * 도구 실행 — handler 이름에 따라 분기
  */
+const TOOL_TIMEOUT_MS = 30_000
+
 export async function executeTool(
   toolName: string,
   input: Record<string, unknown>,
   ctx: ToolExecContext,
   toolRecord: ToolRecord,
 ): Promise<string> {
+  const startTime = Date.now()
+
   // 도구 호출 기록 생성
   const [callLog] = await db
     .insert(toolCalls)
@@ -95,20 +99,32 @@ export async function executeTool(
     .returning()
 
   try {
-    const result = await runHandler(toolRecord.handler || toolName, input, ctx)
+    let timeoutId: ReturnType<typeof setTimeout>
+    const result = await Promise.race([
+      runHandler(toolRecord.handler || toolName, input, ctx),
+      new Promise<never>((_, reject) => {
+        timeoutId = setTimeout(() => reject(new Error('TOOL_TIMEOUT')), TOOL_TIMEOUT_MS)
+      }),
+    ])
+    clearTimeout(timeoutId!)
 
+    const durationMs = Date.now() - startTime
     await db
       .update(toolCalls)
-      .set({ output: result })
+      .set({ output: result, durationMs })
       .where(eq(toolCalls.id, callLog.id))
 
     return result
   } catch (err) {
-    const errMsg = err instanceof Error ? err.message : '도구 실행 실패'
+    const durationMs = Date.now() - startTime
+    const isTimeout = err instanceof Error && err.message === 'TOOL_TIMEOUT'
+    const errMsg = isTimeout
+      ? '도구 응답 시간이 초과되었습니다 (30초)'
+      : err instanceof Error ? err.message : '도구 실행 실패'
 
     await db
       .update(toolCalls)
-      .set({ output: errMsg, status: 'error' })
+      .set({ output: errMsg, status: isTimeout ? 'timeout' : 'error', durationMs })
       .where(eq(toolCalls.id, callLog.id))
 
     return `[오류] ${errMsg}`
