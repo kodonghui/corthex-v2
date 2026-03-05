@@ -96,22 +96,22 @@ development_status:
   # ============================================================
   # Epic 5: 비서 오케스트레이션 (P1)
   # ============================================================
-  epic-5: in-progress
-  5-1-secretary-chat-ui: review
-  5-2-battle-log-p1: review
-  5-3-ui-phase-c: review
+  epic-5: done
+  5-1-secretary-chat-ui: done
+  5-2-battle-log-p1: done
+  5-3-ui-phase-c: done
   epic-5-retrospective: done
 
   # ============================================================
   # Epic 6: 활동 로그 & 알림 시스템 (P1~P3)
   # ============================================================
-  epic-6: backlog
-  6-1-activity-log-api: backlog
-  6-2-realtime-notifications: backlog
-  6-3-email-notifications: backlog
-  6-4-notification-history-ui: backlog
-  6-5-ui-phase-d: backlog
-  6-6-battle-log-p2: backlog
+  epic-6: in-progress
+  6-1-activity-log-api: review
+  6-2-realtime-notifications: ready-for-dev
+  6-3-email-notifications: ready-for-dev
+  6-4-notification-history-ui: ready-for-dev
+  6-5-ui-phase-d: ready-for-dev
+  6-6-battle-log-p2: ready-for-dev
   epic-6-retrospective: optional
 
   # ============================================================

@@ -10,6 +10,7 @@ import { generateAgentResponse, generateAgentResponseStream } from '../../lib/ai
 import type { StreamEvent } from '../../lib/ai'
 import { orchestrateSecretary } from '../../lib/orchestrator'
 import { logActivity } from '../../lib/activity-logger'
+import { notifyChatComplete, notifyToolError } from '../../lib/notifier'
 import { broadcastToChannel } from '../../ws/channels'
 import type { AppEnv } from '../../types'
 
@@ -136,7 +137,7 @@ chatRoute.post(
 
     // 에이전트가 비서인지 확인
     const [agent] = await db
-      .select({ isSecretary: agents.isSecretary })
+      .select({ isSecretary: agents.isSecretary, name: agents.name })
       .from(agents)
       .where(eq(agents.id, session.agentId))
       .limit(1)
@@ -202,6 +203,9 @@ chatRoute.post(
           // 일반 에이전트: 스트리밍
           aiContent = await generateAgentResponseStream(chatCtx, (event: StreamEvent) => {
             broadcastToChannel(channelKey, event)
+            if (event.type === 'tool-end' && event.error) {
+              notifyToolError(tenant.userId, tenant.companyId, event.toolName)
+            }
           })
         }
 
@@ -212,6 +216,9 @@ chatRoute.post(
           sender: 'agent',
           content: aiContent,
         })
+
+        // 알림 생성 (fire-and-forget)
+        notifyChatComplete(tenant.userId, tenant.companyId, agent?.name || '에이전트', sessionId)
 
         // 첫 응답이면 세션 제목 업데이트
         const msgCount = await db

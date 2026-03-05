@@ -18,6 +18,7 @@ import { reportsRoute } from './routes/workspace/reports'
 import { jobsRoute } from './routes/workspace/jobs'
 import { snsRoute } from './routes/workspace/sns'
 import { activityLogRoute } from './routes/workspace/activity-log'
+import { notificationsRoute } from './routes/workspace/notifications'
 import { dashboardRoute } from './routes/workspace/dashboard'
 import { telegramRoute } from './routes/workspace/telegram'
 import { messengerRoute } from './routes/workspace/messenger'
@@ -72,6 +73,7 @@ app.route('/api/workspace', reportsRoute)
 app.route('/api/workspace/jobs', jobsRoute)
 app.route('/api/workspace', snsRoute)
 app.route('/api/workspace', activityLogRoute)
+app.route('/api/workspace', notificationsRoute)
 app.route('/api/workspace', dashboardRoute)
 app.route('/api/workspace', telegramRoute)
 app.route('/api/workspace/messenger', messengerRoute)

@@ -9,6 +9,7 @@ import { db } from '../db'
 import { agents, departments, delegations, chatMessages } from '../db/schema'
 import { eq, and } from 'drizzle-orm'
 import { getClientForUser } from './ai'
+import { notifyDelegationComplete } from './notifier'
 
 type OrchestrateContext = {
   secretaryAgentId: string
@@ -253,6 +254,9 @@ export async function orchestrateSecretary(
 
       // 위임 완료 이벤트
       onEvent?.({ type: 'delegation-end', targetAgentName: targetInfo.agentName, targetAgentId: targetInfo.agentId, status: 'completed', durationMs: Date.now() - delegationStart })
+
+      // 알림 생성 (fire-and-forget)
+      notifyDelegationComplete(ctx.userId, ctx.companyId, targetInfo.agentName, ctx.sessionId)
 
       delegationResults.push({
         departmentName: targetInfo.deptName,

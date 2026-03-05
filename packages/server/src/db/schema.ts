@@ -354,6 +354,22 @@ export const activityLogs = pgTable('activity_logs', {
   metadataGinIdx: index('activity_metadata_gin_idx').using('gin', table.metadata),
 }))
 
+// === 20b. notifications — 사용자 알림 ===
+export const notifications = pgTable('notifications', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  type: varchar('type', { length: 30 }).notNull(),  // chat_complete, delegation_complete, tool_error, job_complete, job_error, system
+  title: varchar('title', { length: 200 }).notNull(),
+  body: text('body'),
+  actionUrl: varchar('action_url', { length: 500 }),
+  isRead: boolean('is_read').notNull().default(false),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  userCreatedIdx: index('notif_user_created_idx').on(table.companyId, table.userId, table.createdAt),
+  userUnreadIdx: index('notif_user_unread_idx').on(table.userId, table.isRead),
+}))
+
 // === 21. cost_records — AI 비용 기록 ===
 export const costRecords = pgTable('cost_records', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -557,6 +573,11 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
 
 export const adminSessionsRelations = relations(adminSessions, ({ one }) => ({
   adminUser: one(adminUsers, { fields: [adminSessions.adminUserId], references: [adminUsers.id] }),
+}))
+
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+  user: one(users, { fields: [notifications.userId], references: [users.id] }),
+  company: one(companies, { fields: [notifications.companyId], references: [companies.id] }),
 }))
 
 export const notificationPreferencesRelations = relations(notificationPreferences, ({ one }) => ({
