@@ -8,6 +8,9 @@ import { searchNews } from './builtins/search-news'
 import { searchImages } from './builtins/search-images'
 import { searchYoutube } from './builtins/search-youtube'
 import { searchPlaces } from './builtins/search-places'
+import { sendEmailTool } from './builtins/send-email'
+import { listCalendarEvents } from './builtins/list-calendar-events'
+import { createCalendarEvent } from './builtins/create-calendar-event'
 import { createReport } from './builtins/create-report'
 
 // 내장 핸들러 등록
@@ -20,6 +23,9 @@ registry.register('search_news', searchNews)
 registry.register('search_images', searchImages)
 registry.register('search_youtube', searchYoutube)
 registry.register('search_places', searchPlaces)
+registry.register('send_email', sendEmailTool)
+registry.register('list_calendar_events', listCalendarEvents)
+registry.register('create_calendar_event', createCalendarEvent)
 registry.register('create_report', createReport)
 
 export { registry } from './registry'

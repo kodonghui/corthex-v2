@@ -287,21 +287,80 @@ async function seed() {
     console.log(`  ✓ 내장 도구: ${tool.name} (handler: ${def.handler})`)
   }
 
-  // 7. 외부 서비스 도구 (핸들러 미구현 — Epic 9에서 추가)
+  // 7. 외부 서비스 도구 (Epic 9에서 순차 구현)
   const externalTools = [
-    { name: '일정 관리', description: '구글 캘린더 연동', scope: 'platform' as const },
-    { name: '이메일', description: '이메일 발송/수신 요약', scope: 'platform' as const },
+    {
+      name: 'send_email',
+      description: 'SMTP를 통해 이메일을 발송합니다',
+      handler: 'send_email',
+      scope: 'platform' as const,
+      category: 'communication',
+      tags: ['email', 'smtp', 'api'],
+      inputSchema: {
+        type: 'object',
+        properties: {
+          to: { type: 'string', description: '받는 사람 이메일 주소' },
+          subject: { type: 'string', description: '이메일 제목' },
+          body: { type: 'string', description: '이메일 본문 (텍스트)' },
+        },
+        required: ['to', 'subject'],
+      },
+    },
+    {
+      name: 'list_calendar_events',
+      description: '구글 캘린더 일정을 조회합니다',
+      handler: 'list_calendar_events',
+      scope: 'platform' as const,
+      category: 'utility',
+      tags: ['calendar', 'google', 'api'],
+      inputSchema: {
+        type: 'object',
+        properties: {
+          days: { type: 'number', description: '조회할 일수 (기본 7일)' },
+        },
+      },
+    },
+    {
+      name: 'create_calendar_event',
+      description: '구글 캘린더에 새 일정을 생성합니다',
+      handler: 'create_calendar_event',
+      scope: 'platform' as const,
+      category: 'utility',
+      tags: ['calendar', 'google', 'api'],
+      inputSchema: {
+        type: 'object',
+        properties: {
+          title: { type: 'string', description: '일정 제목' },
+          startTime: { type: 'string', description: '시작 시간 (ISO 8601, 예: 2026-03-05T10:00:00+09:00)' },
+          endTime: { type: 'string', description: '종료 시간 (ISO 8601)' },
+          description: { type: 'string', description: '일정 설명 (선택)' },
+          location: { type: 'string', description: '장소 (선택)' },
+        },
+        required: ['title', 'startTime', 'endTime'],
+      },
+    },
     { name: 'KIS 증권', description: 'KIS 증권 API 연동', scope: 'company' as const, companyId: company.id },
     { name: '노션 연동', description: '노션 페이지 읽기/쓰기', scope: 'platform' as const },
     { name: '텔레그램', description: '텔레그램 봇 메시지', scope: 'platform' as const },
   ]
 
   for (const def of externalTools) {
+    const values: Record<string, unknown> = {
+      companyId: ('companyId' in def ? def.companyId : null) ?? null,
+      name: def.name,
+      description: def.description,
+      scope: def.scope,
+    }
+    if ('handler' in def) values.handler = def.handler
+    if ('inputSchema' in def) values.inputSchema = def.inputSchema
+    if ('category' in def) values.category = def.category
+    if ('tags' in def) values.tags = def.tags
+
     const [tool] = await db
       .insert(toolDefinitions)
-      .values({ companyId: def.companyId ?? null, name: def.name, description: def.description, scope: def.scope })
+      .values(values)
       .returning()
-    console.log(`  ✓ 외부 도구: ${tool.name}`)
+    console.log(`  ✓ 외부 도구: ${tool.name}${('handler' in def) ? ` (handler: ${def.handler})` : ''}`)
   }
 
   console.log('\n✅ 시드 완료!')

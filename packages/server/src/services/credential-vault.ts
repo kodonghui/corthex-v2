@@ -13,6 +13,7 @@ export const PROVIDER_SCHEMAS: Record<string, string[]> = {
   instagram: ['access_token', 'page_id'],
   serper: ['api_key'],
   notion: ['api_key'],
+  google_calendar: ['api_key'],
 }
 
 // 필수 필드 유효성 검사
