@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { eq, and, gte, desc, sql, count, sum } from 'drizzle-orm'
 import { db } from '../../db'
-import { costRecords, agents, chatMessages, delegations, toolCalls, nightJobs } from '../../db/schema'
+import { costRecords, agents, chatMessages, delegations, toolCalls, nightJobs, activityLogs } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import type { AppEnv } from '../../types'
 
@@ -164,6 +164,36 @@ dashboardRoute.get('/dashboard/stats', async (c) => {
       toolCalls: Number(toolCallsCount?.count || 0),
       nightJobs: Number(jobsCount?.count || 0),
       days,
+    },
+  })
+})
+
+// GET /api/workspace/dashboard/system — 시스템 모니터링
+dashboardRoute.get('/dashboard/system', async (c) => {
+  const tenant = c.get('tenant')
+
+  const uptime = process.uptime()
+  const memory = process.memoryUsage()
+
+  // 최근 24시간 에러 카운트
+  const recentErrors = await db
+    .select({ count: count() })
+    .from(activityLogs)
+    .where(and(
+      eq(activityLogs.companyId, tenant.companyId),
+      eq(activityLogs.phase, 'error'),
+      gte(activityLogs.createdAt, new Date(Date.now() - 24 * 60 * 60 * 1000)),
+    ))
+
+  return c.json({
+    data: {
+      uptime: Math.floor(uptime),
+      memory: {
+        heapUsed: Math.round(memory.heapUsed / 1024 / 1024),
+        heapTotal: Math.round(memory.heapTotal / 1024 / 1024),
+        rss: Math.round(memory.rss / 1024 / 1024),
+      },
+      recentErrors: Number(recentErrors[0]?.count || 0),
     },
   })
 })

@@ -465,7 +465,9 @@ export const messengerChannels = pgTable('messenger_channels', {
   name: varchar('name', { length: 100 }).notNull(),
   description: text('description'),
   createdBy: uuid('created_by').notNull().references(() => users.id),
+  isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })
 
 // === 24. messenger_members — 메신저 채널 멤버 ===
@@ -484,6 +486,18 @@ export const messengerMessages = pgTable('messenger_messages', {
   channelId: uuid('channel_id').notNull().references(() => messengerChannels.id),
   userId: uuid('user_id').notNull().references(() => users.id),
   content: text('content').notNull(),
+  parentMessageId: uuid('parent_message_id'),
+  fileId: uuid('file_id').references(() => files.id),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
+// === 25b. messenger_reactions — 메시지 반응 ===
+export const messengerReactions = pgTable('messenger_reactions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  messageId: uuid('message_id').notNull().references(() => messengerMessages.id),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  emoji: varchar('emoji', { length: 10 }).notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 
@@ -558,6 +572,18 @@ export const strategyBacktestResults = pgTable('strategy_backtest_results', {
   companyIdx: index('strategy_backtest_company_idx').on(table.companyId),
   userStockIdx: index('strategy_backtest_user_stock_idx').on(table.companyId, table.userId, table.stockCode),
 }))
+
+// === 29. soul_templates — 소울 템플릿 ===
+export const soulTemplates = pgTable('soul_templates', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  name: varchar('name', { length: 100 }).notNull(),
+  category: varchar('category', { length: 50 }).notNull().default('general'),
+  content: text('content').notNull(),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
 
 // === 28. canvas_layouts — NEXUS 캔버스 레이아웃 ===
 export const canvasLayouts = pgTable('canvas_layouts', {
@@ -711,10 +737,18 @@ export const messengerMembersRelations = relations(messengerMembers, ({ one }) =
   user: one(users, { fields: [messengerMembers.userId], references: [users.id] }),
 }))
 
-export const messengerMessagesRelations = relations(messengerMessages, ({ one }) => ({
+export const messengerMessagesRelations = relations(messengerMessages, ({ one, many }) => ({
   company: one(companies, { fields: [messengerMessages.companyId], references: [companies.id] }),
   channel: one(messengerChannels, { fields: [messengerMessages.channelId], references: [messengerChannels.id] }),
   user: one(users, { fields: [messengerMessages.userId], references: [users.id] }),
+  file: one(files, { fields: [messengerMessages.fileId], references: [files.id] }),
+  reactions: many(messengerReactions),
+}))
+
+export const messengerReactionsRelations = relations(messengerReactions, ({ one }) => ({
+  company: one(companies, { fields: [messengerReactions.companyId], references: [companies.id] }),
+  message: one(messengerMessages, { fields: [messengerReactions.messageId], references: [messengerMessages.id] }),
+  user: one(users, { fields: [messengerReactions.userId], references: [users.id] }),
 }))
 
 export const filesRelations = relations(files, ({ one }) => ({
@@ -746,6 +780,10 @@ export const strategyBacktestResultsRelations = relations(strategyBacktestResult
 
 export const canvasLayoutsRelations = relations(canvasLayouts, ({ one }) => ({
   company: one(companies, { fields: [canvasLayouts.companyId], references: [companies.id] }),
+}))
+
+export const soulTemplatesRelations = relations(soulTemplates, ({ one }) => ({
+  company: one(companies, { fields: [soulTemplates.companyId], references: [companies.id] }),
 }))
 
 export const adminUsersRelations = relations(adminUsers, ({ many }) => ({
