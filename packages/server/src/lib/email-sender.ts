@@ -26,6 +26,7 @@ export async function sendEmail(smtpConfig: SmtpConfig | null, params: EmailPara
 
   try {
     // nodemailer는 런타임에 동적 임포트 (미설치 시 graceful fail)
+    // @ts-ignore nodemailer는 optional dependency
     const nodemailer = await import('nodemailer').catch(() => null)
     if (!nodemailer) {
       console.warn('[EmailSender] nodemailer 미설치 — 이메일 발송 스킵')

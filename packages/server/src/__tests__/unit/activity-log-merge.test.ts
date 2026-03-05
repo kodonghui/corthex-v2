@@ -179,7 +179,7 @@ describe('날짜 그룹 함수', () => {
 
 describe('필터 URL 동기화 로직', () => {
   test('빈 필터 → 빈 Set', () => {
-    const param: string | null = null
+    const param = null as string | null
     const filters = param ? new Set(param.split(',')) : new Set<string>()
     expect(filters.size).toBe(0)
   })

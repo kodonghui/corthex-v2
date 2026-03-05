@@ -521,7 +521,7 @@ async function seed() {
 
     const [tool] = await db
       .insert(toolDefinitions)
-      .values(values)
+      .values(values as any)
       .returning()
     console.log(`  ✓ 외부 도구: ${tool.name}${('handler' in def) ? ` (handler: ${def.handler})` : ''}`)
   }
