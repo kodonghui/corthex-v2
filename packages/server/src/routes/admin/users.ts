@@ -3,7 +3,7 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { eq, and } from 'drizzle-orm'
 import { db } from '../../db'
-import { users } from '../../db/schema'
+import { users, sessions } from '../../db/schema'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import type { AppEnv } from '../../types'
@@ -56,6 +56,9 @@ usersRoute.get('/users', async (c) => {
 usersRoute.get('/users/:id', async (c) => {
   const tenant = c.get('tenant')
   const id = c.req.param('id')
+  const whereClause = tenant.isAdminUser
+    ? eq(users.id, id)
+    : and(eq(users.id, id), eq(users.companyId, tenant.companyId))
   const [user] = await db
     .select({
       id: users.id,
@@ -68,7 +71,7 @@ usersRoute.get('/users/:id', async (c) => {
       createdAt: users.createdAt,
     })
     .from(users)
-    .where(and(eq(users.id, id), eq(users.companyId, tenant.companyId)))
+    .where(whereClause)
     .limit(1)
 
   if (!user) throw new HTTPError(404, '직원을 찾을 수 없습니다', 'USER_001')
@@ -117,10 +120,14 @@ usersRoute.patch('/users/:id', zValidator('json', updateUserSchema), async (c) =
     updateData.passwordHash = await Bun.password.hash(password)
   }
 
+  const whereClause = tenant.isAdminUser
+    ? eq(users.id, id)
+    : and(eq(users.id, id), eq(users.companyId, tenant.companyId))
+
   const [user] = await db
     .update(users)
     .set(updateData)
-    .where(and(eq(users.id, id), eq(users.companyId, tenant.companyId)))
+    .where(whereClause)
     .returning({
       id: users.id,
       companyId: users.companyId,
@@ -140,12 +147,62 @@ usersRoute.patch('/users/:id', zValidator('json', updateUserSchema), async (c) =
 usersRoute.delete('/users/:id', async (c) => {
   const tenant = c.get('tenant')
   const id = c.req.param('id')
+  const whereClause = tenant.isAdminUser
+    ? eq(users.id, id)
+    : and(eq(users.id, id), eq(users.companyId, tenant.companyId))
   const [user] = await db
     .update(users)
     .set({ isActive: false, updatedAt: new Date() })
-    .where(and(eq(users.id, id), eq(users.companyId, tenant.companyId)))
+    .where(whereClause)
     .returning()
 
   if (!user) throw new HTTPError(404, '직원을 찾을 수 없습니다', 'USER_001')
   return c.json({ data: { message: '비활성화되었습니다' } })
+})
+
+// POST /api/admin/users/:id/reset-password — 비밀번호 초기화
+usersRoute.post('/users/:id/reset-password', async (c) => {
+  const id = c.req.param('id')
+
+  // admin이므로 companyId 체크 없이 id만으로 조회
+  const [user] = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.id, id))
+    .limit(1)
+
+  if (!user) throw new HTTPError(404, '직원을 찾을 수 없습니다', 'USER_001')
+
+  // 8자리 랜덤 영숫자 임시 비밀번호 생성
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789'
+  let tempPassword = ''
+  for (let i = 0; i < 8; i++) {
+    tempPassword += chars[Math.floor(Math.random() * chars.length)]
+  }
+
+  const passwordHash = await Bun.password.hash(tempPassword)
+  await db
+    .update(users)
+    .set({ passwordHash, updatedAt: new Date() })
+    .where(eq(users.id, id))
+
+  return c.json({ data: { tempPassword } })
+})
+
+// POST /api/admin/users/:id/terminate-session — 세션 종료
+usersRoute.post('/users/:id/terminate-session', async (c) => {
+  const id = c.req.param('id')
+
+  // 해당 유저가 존재하는지 확인
+  const [user] = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.id, id))
+    .limit(1)
+
+  if (!user) throw new HTTPError(404, '직원을 찾을 수 없습니다', 'USER_001')
+
+  await db.delete(sessions).where(eq(sessions.userId, id))
+
+  return c.json({ data: { message: '세션이 종료되었습니다' } })
 })

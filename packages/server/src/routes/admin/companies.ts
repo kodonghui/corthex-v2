@@ -1,9 +1,9 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { eq } from 'drizzle-orm'
+import { eq, and, count } from 'drizzle-orm'
 import { db } from '../../db'
-import { companies } from '../../db/schema'
+import { companies, users } from '../../db/schema'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 
@@ -59,6 +59,17 @@ companiesRoute.patch('/companies/:id', zValidator('json', updateCompanySchema), 
 // DELETE /api/admin/companies/:id — 회사 비활성화 (soft delete)
 companiesRoute.delete('/companies/:id', async (c) => {
   const id = c.req.param('id')
+
+  // 활성 직원 수 체크
+  const [{ activeCount }] = await db
+    .select({ activeCount: count() })
+    .from(users)
+    .where(and(eq(users.companyId, id), eq(users.isActive, true)))
+
+  if (Number(activeCount) > 0) {
+    throw new HTTPError(409, `활성 직원이 ${activeCount}명 있어 비활성화할 수 없습니다. 먼저 직원을 이동하거나 비활성화하세요`, 'COMPANY_002')
+  }
+
   const [company] = await db
     .update(companies)
     .set({ isActive: false, updatedAt: new Date() })
