@@ -149,6 +149,8 @@ async function seed() {
       handler: 'get_current_time',
       scope: 'platform' as const,
       inputSchema: { type: 'object', properties: {} },
+      category: 'utility',
+      tags: ['builtin'],
     },
     {
       name: 'calculate',
@@ -160,6 +162,8 @@ async function seed() {
         properties: { expression: { type: 'string', description: '계산할 수식 (예: 2+3*4)' } },
         required: ['expression'],
       },
+      category: 'utility',
+      tags: ['builtin', 'math'],
     },
     {
       name: 'search_department_knowledge',
@@ -171,6 +175,8 @@ async function seed() {
         properties: { query: { type: 'string', description: '검색어' } },
         required: ['query'],
       },
+      category: 'search',
+      tags: ['builtin', 'internal'],
     },
     {
       name: 'get_company_info',
@@ -178,10 +184,12 @@ async function seed() {
       handler: 'get_company_info',
       scope: 'platform' as const,
       inputSchema: { type: 'object', properties: {} },
+      category: 'utility',
+      tags: ['builtin', 'internal'],
     },
     {
       name: 'search_web',
-      description: '웹에서 정보를 검색합니다 (개발 중)',
+      description: '웹에서 정보를 검색합니다',
       handler: 'search_web',
       scope: 'platform' as const,
       inputSchema: {
@@ -189,6 +197,60 @@ async function seed() {
         properties: { query: { type: 'string', description: '검색어' } },
         required: ['query'],
       },
+      category: 'search',
+      tags: ['web', 'api', 'serper'],
+    },
+    {
+      name: 'search_news',
+      description: '최신 뉴스를 검색합니다',
+      handler: 'search_news',
+      scope: 'platform' as const,
+      inputSchema: {
+        type: 'object',
+        properties: { query: { type: 'string', description: '검색어' } },
+        required: ['query'],
+      },
+      category: 'search',
+      tags: ['web', 'api', 'serper', 'news'],
+    },
+    {
+      name: 'search_images',
+      description: '이미지를 검색합니다',
+      handler: 'search_images',
+      scope: 'platform' as const,
+      inputSchema: {
+        type: 'object',
+        properties: { query: { type: 'string', description: '검색어' } },
+        required: ['query'],
+      },
+      category: 'search',
+      tags: ['web', 'api', 'serper', 'image'],
+    },
+    {
+      name: 'search_youtube',
+      description: '유튜브 영상을 검색합니다',
+      handler: 'search_youtube',
+      scope: 'platform' as const,
+      inputSchema: {
+        type: 'object',
+        properties: { query: { type: 'string', description: '검색어' } },
+        required: ['query'],
+      },
+      category: 'search',
+      tags: ['web', 'api', 'serper', 'video'],
+    },
+    {
+      name: 'search_places',
+      description: '장소(가게, 식당 등)를 검색합니다',
+      handler: 'search_places',
+      scope: 'platform' as const,
+      inputSchema: {
+        type: 'object',
+        properties: { query: { type: 'string', description: '검색어' } },
+        required: ['query'],
+      },
+      category: 'search',
+      tags: ['web', 'api', 'serper', 'local'],
     },
     {
       name: 'create_report',
@@ -203,6 +265,8 @@ async function seed() {
         },
         required: ['title'],
       },
+      category: 'content',
+      tags: ['builtin', 'report'],
     },
   ]
 
@@ -216,6 +280,8 @@ async function seed() {
         handler: def.handler,
         scope: def.scope,
         inputSchema: def.inputSchema,
+        category: def.category,
+        tags: def.tags,
       })
       .returning()
     console.log(`  ✓ 내장 도구: ${tool.name} (handler: ${def.handler})`)
