@@ -182,7 +182,8 @@ strategyRoute.patch(
 strategyRoute.get('/prices', zValidator('query', z.object({ codes: z.string().min(1) })), async (c) => {
   const tenant = c.get('tenant')
   const { codes } = c.req.valid('query')
-  const codeList = codes.split(',').map((s) => s.trim()).filter(Boolean).slice(0, 20)
+  const codeList = codes.split(',').map((s) => s.trim()).filter((s) => /^[A-Za-z0-9]{1,20}$/.test(s)).slice(0, 20)
+  if (codeList.length === 0) throw new HTTPError(400, '유효한 종목코드가 없습니다', 'STRATEGY_014')
 
   let creds: Record<string, string>
   try {
@@ -192,36 +193,38 @@ strategyRoute.get('/prices', zValidator('query', z.object({ codes: z.string().mi
   }
 
   const token = await getKisToken(creds.app_key, creds.app_secret)
-  const results: Record<string, unknown> = {}
 
-  for (const code of codeList) {
-    try {
-      const params = new URLSearchParams({
-        FID_COND_MRKT_DIV_CODE: 'J',
-        FID_INPUT_ISCD: code,
-      })
-      const res = await fetch(`${KIS_BASE_URL}/uapi/domestic-stock/v1/quotations/inquire-price?${params}`, {
-        headers: kisHeaders(token, creds.app_key, creds.app_secret, 'FHKST01010100'),
-        signal: AbortSignal.timeout(10_000),
-      })
-      if (!res.ok) { results[code] = { error: true }; continue }
-      const data = await res.json() as { output?: Record<string, string>; rt_cd?: string }
-      if (data.rt_cd !== '0') { results[code] = { error: true }; continue }
-      const o = data.output || {}
-      results[code] = {
-        name: o.hts_kor_isnm || code,
-        price: Number(o.stck_prpr || 0),
-        change: Number(o.prdy_vrss || 0),
-        changeRate: Number(o.prdy_ctrt || 0),
-        open: Number(o.stck_oprc || 0),
-        high: Number(o.stck_hgpr || 0),
-        low: Number(o.stck_lwpr || 0),
-        volume: Number(o.acml_vol || 0),
-      }
-    } catch {
-      results[code] = { error: true }
+  const fetchOne = async (code: string) => {
+    const params = new URLSearchParams({
+      FID_COND_MRKT_DIV_CODE: 'J',
+      FID_INPUT_ISCD: code,
+    })
+    const res = await fetch(`${KIS_BASE_URL}/uapi/domestic-stock/v1/quotations/inquire-price?${params}`, {
+      headers: kisHeaders(token, creds.app_key, creds.app_secret, 'FHKST01010100'),
+      signal: AbortSignal.timeout(10_000),
+    })
+    if (!res.ok) return { error: true }
+    const data = await res.json() as { output?: Record<string, string>; rt_cd?: string }
+    if (data.rt_cd !== '0') return { error: true }
+    const o = data.output || {}
+    return {
+      name: o.hts_kor_isnm || code,
+      price: Number(o.stck_prpr || 0),
+      change: Number(o.prdy_vrss || 0),
+      changeRate: Number(o.prdy_ctrt || 0),
+      open: Number(o.stck_oprc || 0),
+      high: Number(o.stck_hgpr || 0),
+      low: Number(o.stck_lwpr || 0),
+      volume: Number(o.acml_vol || 0),
     }
   }
+
+  const settled = await Promise.allSettled(codeList.map((code) => fetchOne(code)))
+  const results: Record<string, unknown> = {}
+  codeList.forEach((code, i) => {
+    const r = settled[i]
+    results[code] = r.status === 'fulfilled' ? r.value : { error: true }
+  })
 
   return c.json({ data: results })
 })

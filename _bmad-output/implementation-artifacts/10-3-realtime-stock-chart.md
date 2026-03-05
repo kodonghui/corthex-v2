@@ -1,6 +1,6 @@
 # Story 10.3: 실시간 종목 차트 — KIS 시세 폴링 + 캔들스틱 차트
 
-Status: review
+Status: done
 
 ## Story
 

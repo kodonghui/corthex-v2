@@ -51,7 +51,12 @@ export function ChartPanel() {
   const stockCode = searchParams.get('stock')
   const [failCount, setFailCount] = useState(0)
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
-  const marketOpen = isMarketOpen()
+  const [marketOpen, setMarketOpen] = useState(isMarketOpen)
+
+  useEffect(() => {
+    const id = setInterval(() => setMarketOpen(isMarketOpen()), 60_000)
+    return () => clearInterval(id)
+  }, [])
 
   const { data: watchlist } = useQuery({
     queryKey: ['strategy-watchlist'],
@@ -61,7 +66,7 @@ export function ChartPanel() {
 
   const { data: priceRes, error: priceError } = useQuery({
     queryKey: ['strategy-prices', stockCode],
-    queryFn: () => api.get<{ data: Record<string, PriceData> }>(`/workspace/strategy/prices?codes=${stockCode}`),
+    queryFn: () => api.get<{ data: Record<string, PriceData> }>(`/workspace/strategy/prices?codes=${encodeURIComponent(stockCode!)}`),
     enabled: !!stockCode,
     refetchInterval: marketOpen ? 30_000 : false,
     refetchOnWindowFocus: true,
@@ -70,7 +75,7 @@ export function ChartPanel() {
 
   const { data: chartRes, isLoading: chartLoading } = useQuery({
     queryKey: ['strategy-chart-data', stockCode],
-    queryFn: () => api.get<{ data: { candles: Candle[] } }>(`/workspace/strategy/chart-data?code=${stockCode}&count=60`),
+    queryFn: () => api.get<{ data: { candles: Candle[] } }>(`/workspace/strategy/chart-data?code=${encodeURIComponent(stockCode!)}&count=60`),
     enabled: !!stockCode,
     staleTime: 5 * 60 * 1000,
   })
