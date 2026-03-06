@@ -3,7 +3,7 @@ import { db } from '../db'
 import { chatMessages, chatSessions, agents, agentMemory, cliCredentials, mcpServers } from '../db/schema'
 import { eq, and, desc } from 'drizzle-orm'
 import { loadAgentTools, toClaudeTools, executeTool } from './tool-executor'
-import { mcpListTools, mcpCallTool } from './mcp-client'
+import { mcpListTools, mcpCallTool, mcpCallToolStream } from './mcp-client'
 import { recordCost } from './cost-tracker'
 import { decrypt } from './crypto'
 
@@ -297,6 +297,7 @@ export async function generateAgentResponse(ctx: ChatContext): Promise<string> {
 export type StreamEvent =
   | { type: 'token'; content: string }
   | { type: 'tool-start'; toolName: string; toolId: string; input?: string }
+  | { type: 'tool-progress'; toolName: string; toolId: string; content: string }
   | { type: 'tool-end'; toolName: string; toolId: string; result: string; durationMs?: number; error?: boolean }
   | { type: 'done'; sessionId: string }
   | { type: 'error'; code: string; message: string }
@@ -442,7 +443,14 @@ export async function generateAgentResponseStream(
         onEvent({ type: 'tool-start', toolName: `${block.name} [MCP]`, toolId: block.id, input: inputStr })
         const toolStart = Date.now()
         try {
-          const result = await mcpCallTool(mcpTool.serverUrl, block.name, block.input as Record<string, unknown>)
+          const result = await mcpCallToolStream(
+            mcpTool.serverUrl,
+            block.name,
+            block.input as Record<string, unknown>,
+            (progressText) => {
+              onEvent({ type: 'tool-progress', toolName: `${block.name} [MCP]`, toolId: block.id, content: progressText })
+            },
+          )
           const durationMs = Date.now() - toolStart
           onEvent({ type: 'tool-end', toolName: `${block.name} [MCP]`, toolId: block.id, result: result || '(빈 결과)', durationMs })
           toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: result || '(빈 결과)' })

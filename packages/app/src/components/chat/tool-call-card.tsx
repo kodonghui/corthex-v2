@@ -50,6 +50,11 @@ export function ToolCallCard({ tool }: { tool: ToolCall }) {
           )}
         </span>
       </button>
+      {isRunning && tool.progressText && (
+        <div className="mt-2 pt-2 border-t border-zinc-200 dark:border-zinc-700">
+          <pre className="text-[11px] text-zinc-400 dark:text-zinc-500 whitespace-pre-wrap break-all animate-pulse">{tool.progressText.length > 500 ? tool.progressText.slice(-500) : tool.progressText}</pre>
+        </div>
+      )}
       {expanded && (
         <div className="mt-2 pt-2 border-t border-zinc-200 dark:border-zinc-700 space-y-1">
           {tool.input && (

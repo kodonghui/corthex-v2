@@ -8,6 +8,7 @@ export type ToolCall = {
   status: 'running' | 'done'
   input?: string
   result?: string
+  progressText?: string
   durationMs?: number
   error?: boolean
 }
@@ -25,7 +26,7 @@ export type DelegationStatus = DelegationStatusEntry | null
 export type DelegationStatuses = Record<string, DelegationStatusEntry>
 
 type StreamEvent = {
-  type: 'token' | 'tool-start' | 'tool-end' | 'done' | 'error' | 'delegation-start' | 'delegation-end' | 'delegation-chain'
+  type: 'token' | 'tool-start' | 'tool-progress' | 'tool-end' | 'done' | 'error' | 'delegation-start' | 'delegation-end' | 'delegation-chain'
   content?: string
   toolName?: string
   toolId?: string
@@ -75,11 +76,20 @@ export function useChatStream(sessionId: string | null) {
             { toolId: event.toolId || '', toolName: event.toolName || '', status: 'running', input: event.input },
           ])
           break
+        case 'tool-progress':
+          setToolCalls((prev) =>
+            prev.map((t) =>
+              t.toolId === event.toolId
+                ? { ...t, progressText: event.content }
+                : t,
+            ),
+          )
+          break
         case 'tool-end':
           setToolCalls((prev) =>
             prev.map((t) =>
               t.toolId === event.toolId
-                ? { ...t, status: 'done' as const, result: event.result, durationMs: event.durationMs, error: event.error }
+                ? { ...t, status: 'done' as const, result: event.result, progressText: undefined, durationMs: event.durationMs, error: event.error }
                 : t,
             ),
           )
