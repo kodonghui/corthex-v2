@@ -112,6 +112,21 @@ export type SnsAbResult = {
   scores: { id: string; title: string; metrics: SnsMetrics | null; score: number }[]
 }
 
+// === 소울 템플릿 ===
+export type SoulTemplate = {
+  id: string
+  companyId: string | null
+  name: string
+  description: string | null
+  content: string
+  category: string | null
+  isBuiltin: boolean
+  isActive: boolean
+  createdBy: string | null
+  createdAt: Date
+  updatedAt: Date
+}
+
 // === 활동 로그 ===
 export type ActivityLogType = 'chat' | 'delegation' | 'tool_call' | 'job' | 'sns' | 'error' | 'system' | 'login'
 

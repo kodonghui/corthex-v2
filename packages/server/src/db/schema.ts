@@ -590,6 +590,23 @@ export const canvasLayouts = pgTable('canvas_layouts', {
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })
 
+// === 30. soul_templates — 소울 템플릿 라이브러리 ===
+export const soulTemplates = pgTable('soul_templates', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').references(() => companies.id),  // null = 플랫폼 내장
+  name: varchar('name', { length: 100 }).notNull(),
+  description: text('description'),
+  content: text('content').notNull(),
+  category: varchar('category', { length: 50 }),
+  isBuiltin: boolean('is_builtin').notNull().default(false),
+  isActive: boolean('is_active').notNull().default(true),
+  createdBy: uuid('created_by').references(() => users.id),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('soul_templates_company_idx').on(table.companyId),
+}))
+
 // === Relations ===
 export const companiesRelations = relations(companies, ({ many }) => ({
   users: many(users),
@@ -789,4 +806,9 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
 export const notificationPreferencesRelations = relations(notificationPreferences, ({ one }) => ({
   user: one(users, { fields: [notificationPreferences.userId], references: [users.id] }),
   company: one(companies, { fields: [notificationPreferences.companyId], references: [companies.id] }),
+}))
+
+export const soulTemplatesRelations = relations(soulTemplates, ({ one }) => ({
+  company: one(companies, { fields: [soulTemplates.companyId], references: [companies.id] }),
+  creator: one(users, { fields: [soulTemplates.createdBy], references: [users.id] }),
 }))
