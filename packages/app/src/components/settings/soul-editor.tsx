@@ -1,10 +1,12 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useBlocker } from 'react-router-dom'
-import { ConfirmDialog, Select, Textarea } from '@corthex/ui'
+import { ConfirmDialog, Select } from '@corthex/ui'
 import { api } from '../../lib/api'
 import { MarkdownRenderer } from '../markdown-renderer'
 import { toast } from '@corthex/ui'
+
+const CodeMirrorEditor = lazy(() => import('../codemirror-editor'))
 
 type AgentDetail = {
   id: string
@@ -210,16 +212,20 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
             {/* 편집기 */}
             <div className={`flex-1 ${mobileTab !== 'edit' ? 'hidden md:block' : ''}`}>
               <div className="relative">
-                <Textarea
-                  value={soulText}
-                  onChange={(e) => setSoulText(e.target.value)}
-                  rows={12}
-                  placeholder="에이전트의 성격, 역할, 말투를 마크다운으로 정의..."
-                  className="font-mono leading-relaxed"
-                />
+                <Suspense
+                  fallback={
+                    <div className="border border-zinc-200 dark:border-zinc-700 rounded-md p-3 min-h-[288px] animate-pulse bg-zinc-100 dark:bg-zinc-800" />
+                  }
+                >
+                  <CodeMirrorEditor
+                    value={soulText}
+                    onChange={setSoulText}
+                    placeholder="에이전트의 성격, 역할, 말투를 마크다운으로 정의..."
+                  />
+                </Suspense>
                 {/* 글자 수 카운터 */}
                 <span
-                  className={`absolute bottom-2 right-3 text-[10px] ${
+                  className={`absolute bottom-2 right-3 text-[10px] z-10 ${
                     isOverLimit
                       ? 'text-amber-500 font-medium'
                       : 'text-zinc-400'

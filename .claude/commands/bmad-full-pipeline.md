@@ -36,9 +36,9 @@ Skill 도구 호출: skill="bmad-bmm-create-story", args="[스토리 ID]"
 Skill 도구 호출: skill="bmad-bmm-dev-story", args="[스토리 파일 경로]"
 - 구현 완료까지 진행
 
-### 3단계: TEA (자동 테스트 생성)
-Skill 도구 호출: skill="bmad-bmm-qa-generate-e2e-tests"
-- 이 스토리에서 변경/추가된 코드에 대한 테스트 생성
+### 3단계: TEA (Test Architect 자동 테스트 생성)
+Skill 도구 호출: skill="bmad-tea-automate"
+- 이 스토리에서 변경/추가된 코드에 대한 리스크 기반 테스트 생성
 
 ### 4단계: QA 검증
 Skill 도구 호출: skill="bmad-agent-bmm-qa"

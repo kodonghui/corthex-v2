@@ -212,7 +212,7 @@ development_status:
   epic-15: in-progress
   15-1-p3-db-schema-ws: done
   15-2-soul-template-mgmt: done
-  15-3-soul-editor: backlog
+  15-3-soul-editor: done
   15-4-system-monitoring: backlog
   15-5-org-tree-viewer: backlog
   epic-15-retrospective: optional
