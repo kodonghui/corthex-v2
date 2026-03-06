@@ -220,14 +220,14 @@ development_status:
   # ============================================================
   # Epic 16: 사내 메신저 (P3~P4)
   # ============================================================
-  epic-16: in-progress
+  epic-16: done
   16-1-messenger-channel-mgmt: done
   16-2-realtime-message-agent: done
   16-3-message-reaction-thread: done
   16-4-messenger-search-notify: done
   16-5-messenger-mobile-pwa: done
   16-6-p4-file-attach: done
-  epic-16-retrospective: optional
+  epic-16-retrospective: done
 
   # ============================================================
   # Epic 17: NEXUS 스케치바이브 (P4) — 스토리 순서 재배치 완료
