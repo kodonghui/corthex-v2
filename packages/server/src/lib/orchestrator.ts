@@ -182,10 +182,9 @@ export async function detectCycleInDelegationRules(
     graph.set(r.sourceAgentId, targets)
   }
 
-  // 새 규칙 추가
-  const newTargets = graph.get(newSourceId) || []
-  newTargets.push(newTargetId)
-  graph.set(newSourceId, newTargets)
+  // 새 규칙 추가 (기존 배열 변형 방지)
+  const existing = graph.get(newSourceId) || []
+  graph.set(newSourceId, [...existing, newTargetId])
 
   // newTargetId에서 DFS → newSourceId 도달 가능하면 순환
   const visited = new Set<string>()
@@ -228,10 +227,10 @@ async function matchDelegationRules(
   const matched: { targetAgentId: string; prompt: string; priority: number }[] = []
 
   for (const rule of rules) {
-    const cond = rule.condition as { keywords: string[]; departmentId?: string }
-    if (!cond?.keywords?.length) continue
+    const cond = rule.condition as { keywords?: unknown[]; departmentId?: string } | null
+    if (!cond || !Array.isArray(cond.keywords) || cond.keywords.length === 0) continue
 
-    const hit = cond.keywords.some(kw => msgLower.includes(kw.toLowerCase()))
+    const hit = cond.keywords.some(kw => typeof kw === 'string' && msgLower.includes(kw.toLowerCase()))
     if (hit) {
       matched.push({
         targetAgentId: rule.targetAgentId,
