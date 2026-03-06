@@ -12,7 +12,7 @@ export const filesRoute = new Hono<AppEnv>()
 
 filesRoute.use('*', authMiddleware)
 
-const MAX_FILE_SIZE = 10_485_760 // 10MB
+const MAX_FILE_SIZE = 52_428_800 // 50MB
 
 const ALLOWED_MIME_PREFIXES = ['image/', 'text/']
 const ALLOWED_MIME_TYPES = [
@@ -44,7 +44,7 @@ filesRoute.post('/', async (c) => {
   }
 
   if (file.size > MAX_FILE_SIZE) {
-    throw new HTTPError(400, '파일 크기는 10MB 이하만 허용됩니다', 'FILE_002')
+    throw new HTTPError(400, '파일 크기는 50MB 이하만 허용됩니다', 'FILE_002')
   }
 
   if (!isAllowedMimeType(file.type)) {

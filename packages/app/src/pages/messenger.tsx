@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom'
 import { api } from '../lib/api'
 import { useAuthStore } from '../stores/auth-store'
 import { useWsStore } from '../stores/ws-store'
+import { toast } from '@corthex/ui'
 
 type Channel = {
   id: string
@@ -20,6 +21,13 @@ type ReactionGroup = {
   userIds: string[]
 }
 
+type FileAttachment = {
+  id: string
+  filename: string
+  mimeType: string
+  sizeBytes: number
+}
+
 type Message = {
   id: string
   userId: string
@@ -29,6 +37,7 @@ type Message = {
   createdAt: string
   replyCount?: number
   reactions?: ReactionGroup[]
+  attachments?: FileAttachment[]
 }
 
 type CompanyUser = {
@@ -70,6 +79,63 @@ type SearchResult = {
 }
 
 const EMOJI_LIST = ['👍', '❤️', '😂', '😮', '👏', '🔥']
+
+const MAX_UPLOAD_SIZE = 52_428_800 // 50MB
+const FILE_ACCEPT = 'image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip'
+
+function formatFileSize(bytes: number) {
+  if (bytes < 1024) return `${bytes}B`
+  if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)}KB`
+  return `${(bytes / 1048576).toFixed(1)}MB`
+}
+
+function getFileIcon(mimeType: string) {
+  if (mimeType === 'application/pdf') return { icon: '📄', color: 'text-red-500' }
+  if (mimeType.includes('spreadsheet') || mimeType.includes('excel')) return { icon: '📊', color: 'text-green-500' }
+  if (mimeType.includes('word') || mimeType === 'application/msword') return { icon: '📝', color: 'text-blue-500' }
+  if (mimeType === 'application/zip') return { icon: '📦', color: 'text-zinc-500' }
+  return { icon: '📎', color: 'text-zinc-400' }
+}
+
+function AttachmentRenderer({ attachments }: { attachments: FileAttachment[] }) {
+  if (!attachments || attachments.length === 0) return null
+  return (
+    <div className="mt-1.5 space-y-1.5">
+      {attachments.map((file) => {
+        const isImage = file.mimeType.startsWith('image/')
+        if (isImage) {
+          return (
+            <a key={file.id} href={`/api/workspace/files/${file.id}/download`} target="_blank" rel="noopener noreferrer">
+              <img
+                src={`/api/workspace/files/${file.id}/download`}
+                alt={file.filename}
+                className="max-w-64 rounded-lg cursor-pointer hover:opacity-90"
+                loading="lazy"
+              />
+            </a>
+          )
+        }
+        const { icon, color } = getFileIcon(file.mimeType)
+        return (
+          <a
+            key={file.id}
+            href={`/api/workspace/files/${file.id}/download`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 border border-zinc-700 rounded-lg p-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 max-w-64"
+          >
+            <span className={`text-xl ${color}`}>{icon}</span>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm truncate">{file.filename}</p>
+              <p className="text-xs text-zinc-400">{formatFileSize(file.sizeBytes)}</p>
+            </div>
+            <span className="text-zinc-400 text-sm shrink-0">↓</span>
+          </a>
+        )
+      })}
+    </div>
+  )
+}
 
 function formatTime(dateStr: string) {
   const d = new Date(dateStr)
@@ -311,6 +377,9 @@ function ThreadPanel({
 }) {
   const queryClient = useQueryClient()
   const [replyText, setReplyText] = useState('')
+  const [threadPendingFiles, setThreadPendingFiles] = useState<FileAttachment[]>([])
+  const [threadUploading, setThreadUploading] = useState(false)
+  const threadFileInputRef = useRef<HTMLInputElement>(null)
   const repliesEndRef = useRef<HTMLDivElement>(null)
   const { addListener, removeListener, isConnected } = useWsStore()
 
@@ -365,10 +434,49 @@ function ThreadPanel({
   }, [replies.length])
 
   const sendReply = useMutation({
-    mutationFn: (content: string) =>
-      api.post(`/workspace/messenger/channels/${channelId}/messages`, { content, parentMessageId: parentMessage.id }),
-    onSuccess: () => setReplyText(''),
+    mutationFn: ({ content, attachmentIds }: { content: string; attachmentIds?: string[] }) =>
+      api.post(`/workspace/messenger/channels/${channelId}/messages`, {
+        content,
+        parentMessageId: parentMessage.id,
+        ...(attachmentIds?.length ? { attachmentIds } : {}),
+      }),
+    onSuccess: () => {
+      setReplyText('')
+      setThreadPendingFiles([])
+    },
   })
+
+  const handleThreadFileSelect = async (fileList: FileList | null) => {
+    if (!fileList) return
+    const remaining = 5 - threadPendingFiles.length
+    const filesToUpload = Array.from(fileList).slice(0, remaining)
+    setThreadUploading(true)
+    try {
+      for (const file of filesToUpload) {
+        if (file.size > MAX_UPLOAD_SIZE) {
+          toast.error('파일 크기 초과 (최대 50MB)')
+          continue
+        }
+        try {
+          const formData = new FormData()
+          formData.append('file', file)
+          const res = await api.upload<{ data: FileAttachment }>('/workspace/files', formData)
+          setThreadPendingFiles((prev) => [...prev, res.data])
+        } catch {
+          toast.error('파일 업로드 실패')
+        }
+      }
+    } finally {
+      setThreadUploading(false)
+    }
+  }
+
+  const handleThreadSend = () => {
+    if (!replyText.trim() && threadPendingFiles.length === 0) return
+    const content = replyText.trim() || '(파일 첨부)'
+    const attachmentIds = threadPendingFiles.map((f) => f.id)
+    sendReply.mutate({ content, attachmentIds: attachmentIds.length ? attachmentIds : undefined })
+  }
 
   const addReaction = useMutation({
     mutationFn: ({ msgId, emoji }: { msgId: string; emoji: string }) =>
@@ -396,6 +504,7 @@ function ThreadPanel({
       <div className="px-3 py-2 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900">
         <p className="text-xs text-zinc-500 mb-0.5">{parentMessage.userName}</p>
         <p className="text-sm">{parentMessage.content}</p>
+        {parentMessage.attachments && <AttachmentRenderer attachments={parentMessage.attachments} />}
         <p className="text-xs text-zinc-400 mt-0.5">{formatTime(parentMessage.createdAt)}</p>
       </div>
 
@@ -415,6 +524,7 @@ function ThreadPanel({
                     isMe ? 'bg-indigo-600 text-white' : 'bg-zinc-100 dark:bg-zinc-800'
                   }`}>
                     {reply.content}
+                    {reply.attachments && <AttachmentRenderer attachments={reply.attachments} />}
                   </div>
                   {/* 리액션 배지 */}
                   {reply.reactions && reply.reactions.length > 0 && (
@@ -457,21 +567,41 @@ function ThreadPanel({
 
       {/* 답글 입력 */}
       <div className="px-3 py-2 border-t border-zinc-200 dark:border-zinc-800">
+        {threadPendingFiles.length > 0 && (
+          <div className="mb-1.5 flex flex-wrap gap-1">
+            {threadPendingFiles.map((f) => (
+              <div key={f.id} className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 rounded px-2 py-0.5 text-xs">
+                <span className="truncate max-w-[100px]">{f.filename}</span>
+                <span className="text-zinc-400">{formatFileSize(f.sizeBytes)}</span>
+                <button onClick={() => setThreadPendingFiles((prev) => prev.filter((p) => p.id !== f.id))} className="text-zinc-400 hover:text-red-500">✕</button>
+              </div>
+            ))}
+          </div>
+        )}
         <div className="flex gap-1.5">
+          <input type="file" ref={threadFileInputRef} hidden multiple accept={FILE_ACCEPT} onChange={(e) => handleThreadFileSelect(e.target.files)} />
+          <button
+            onClick={() => threadFileInputRef.current?.click()}
+            disabled={threadUploading || threadPendingFiles.length >= 5}
+            className="px-2 py-1.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 disabled:opacity-50"
+            title="파일 첨부"
+          >
+            📎
+          </button>
           <input
             value={replyText}
             onChange={(e) => setReplyText(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey && replyText.trim()) {
-                sendReply.mutate(replyText.trim())
+              if (e.key === 'Enter' && !e.shiftKey && (replyText.trim() || threadPendingFiles.length > 0)) {
+                handleThreadSend()
               }
             }}
             placeholder="답글..."
             className="flex-1 px-2.5 py-1.5 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm"
           />
           <button
-            onClick={() => replyText.trim() && sendReply.mutate(replyText.trim())}
-            disabled={!replyText.trim() || sendReply.isPending}
+            onClick={handleThreadSend}
+            disabled={(!replyText.trim() && threadPendingFiles.length === 0) || sendReply.isPending || threadUploading}
             className="px-3 py-1.5 bg-indigo-600 text-white text-xs rounded-md hover:bg-indigo-700 disabled:opacity-50"
           >
             전송
@@ -504,10 +634,14 @@ export function MessengerPage() {
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({})
   const [mentionToast, setMentionToast] = useState<{ title: string; actionUrl: string } | null>(null)
   const [showChat, setShowChat] = useState(false)
+  const [pendingFiles, setPendingFiles] = useState<FileAttachment[]>([])
+  const [uploading, setUploading] = useState(false)
+  const [dragOver, setDragOver] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const searchRef = useRef<HTMLDivElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // URL에서 channelId 파라미터 (알림 클릭 시)
   useEffect(() => {
@@ -702,10 +836,14 @@ export function MessengerPage() {
   }, [isConnected, channelsData?.data, selectedChannel, subscribe, addListener, removeListener, queryClient])
 
   const sendMessage = useMutation({
-    mutationFn: (content: string) =>
-      api.post(`/workspace/messenger/channels/${selectedChannel}/messages`, { content }),
+    mutationFn: ({ content, attachmentIds }: { content: string; attachmentIds?: string[] }) =>
+      api.post(`/workspace/messenger/channels/${selectedChannel}/messages`, {
+        content,
+        ...(attachmentIds?.length ? { attachmentIds } : {}),
+      }),
     onSuccess: () => {
       setNewMessage('')
+      setPendingFiles([])
     },
   })
 
@@ -765,9 +903,42 @@ export function MessengerPage() {
     }
   }
 
+  const handleFileSelect = async (fileList: FileList | null) => {
+    if (!fileList) return
+    const remaining = 5 - pendingFiles.length
+    const filesToUpload = Array.from(fileList).slice(0, remaining)
+    setUploading(true)
+    try {
+      for (const file of filesToUpload) {
+        if (file.size > MAX_UPLOAD_SIZE) {
+          toast.error('파일 크기 초과 (최대 50MB)')
+          continue
+        }
+        try {
+          const formData = new FormData()
+          formData.append('file', file)
+          const res = await api.upload<{ data: FileAttachment }>('/workspace/files', formData)
+          setPendingFiles((prev) => [...prev, res.data])
+        } catch {
+          toast.error('파일 업로드 실패')
+        }
+      }
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setDragOver(false)
+    handleFileSelect(e.dataTransfer.files)
+  }
+
   const handleSend = () => {
-    if (!newMessage.trim()) return
-    sendMessage.mutate(newMessage.trim())
+    if (!newMessage.trim() && pendingFiles.length === 0) return
+    const content = newMessage.trim() || '(파일 첨부)'
+    const attachmentIds = pendingFiles.map((f) => f.id)
+    sendMessage.mutate({ content, attachmentIds: attachmentIds.length ? attachmentIds : undefined })
     setShowMention(false)
   }
 
@@ -960,6 +1131,7 @@ export function MessengerPage() {
                                   : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
                               }`}>
                                 {msg.content}
+                                {msg.attachments && <AttachmentRenderer attachments={msg.attachments} />}
                               </div>
                               {/* 호버 시 액션 바 */}
                               {isHovered && (
@@ -1039,7 +1211,13 @@ export function MessengerPage() {
                 </div>
 
                 {/* 입력 */}
-                <div className="px-4 py-3 border-t border-zinc-200 dark:border-zinc-800 relative" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
+                <div
+                  className={`px-4 py-3 border-t border-zinc-200 dark:border-zinc-800 relative ${dragOver ? 'bg-indigo-50 dark:bg-indigo-950 border-indigo-400' : ''}`}
+                  style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
+                  onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={handleDrop}
+                >
                   {showMention && filteredAgents.length > 0 && (
                     <div className="absolute bottom-full left-4 right-4 mb-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-md shadow-lg max-h-32 overflow-y-auto z-10">
                       {filteredAgents.map((a) => (
@@ -1054,7 +1232,27 @@ export function MessengerPage() {
                       ))}
                     </div>
                   )}
+                  {pendingFiles.length > 0 && (
+                    <div className="mb-2 flex flex-wrap gap-1.5">
+                      {pendingFiles.map((f) => (
+                        <div key={f.id} className="flex items-center gap-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-md px-2.5 py-1 text-xs">
+                          <span className="truncate max-w-[120px]">{f.filename}</span>
+                          <span className="text-zinc-400">{formatFileSize(f.sizeBytes)}</span>
+                          <button onClick={() => setPendingFiles((prev) => prev.filter((p) => p.id !== f.id))} className="text-zinc-400 hover:text-red-500 ml-0.5">✕</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <input type="file" ref={fileInputRef} hidden multiple accept={FILE_ACCEPT} onChange={(e) => { handleFileSelect(e.target.files); e.target.value = '' }} />
                   <div className="flex gap-2">
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading || pendingFiles.length >= 5}
+                      className="px-2 py-2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 disabled:opacity-50"
+                      title="파일 첨부 (최대 5개)"
+                    >
+                      📎
+                    </button>
                     <input
                       ref={inputRef}
                       value={newMessage}
@@ -1068,7 +1266,7 @@ export function MessengerPage() {
                     />
                     <button
                       onClick={handleSend}
-                      disabled={!newMessage.trim() || sendMessage.isPending}
+                      disabled={(!newMessage.trim() && pendingFiles.length === 0) || sendMessage.isPending || uploading}
                       className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 disabled:opacity-50"
                     >
                       전송

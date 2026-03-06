@@ -491,6 +491,7 @@ export const messengerMessages = pgTable('messenger_messages', {
   userId: uuid('user_id').notNull().references(() => users.id),
   parentMessageId: uuid('parent_message_id'),
   content: text('content').notNull(),
+  attachmentIds: text('attachment_ids'),  // JSON string array of file UUIDs
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 

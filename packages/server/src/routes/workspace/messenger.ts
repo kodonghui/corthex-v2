@@ -3,7 +3,7 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { eq, and, desc, inArray, sql, isNull, ilike, gt } from 'drizzle-orm'
 import { db } from '../../db'
-import { messengerChannels, messengerMembers, messengerMessages, messengerReactions, users, agents } from '../../db/schema'
+import { messengerChannels, messengerMembers, messengerMessages, messengerReactions, users, agents, files } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { logActivity } from '../../lib/activity-logger'
@@ -32,6 +32,7 @@ const updateChannelSchema = z.object({
 const sendMessageSchema = z.object({
   content: z.string().min(1).max(4000),
   parentMessageId: z.string().uuid().optional(),
+  attachmentIds: z.array(z.string().uuid()).max(5).optional(),
 })
 
 const reactionSchema = z.object({
@@ -421,6 +422,7 @@ messengerRoute.get('/channels/:id/messages', async (c) => {
       userName: users.name,
       content: messengerMessages.content,
       parentMessageId: messengerMessages.parentMessageId,
+      attachmentIds: messengerMessages.attachmentIds,
       createdAt: messengerMessages.createdAt,
       replyCount: sql<number>`(SELECT count(*)::int FROM messenger_messages r WHERE r.parent_message_id = ${messengerMessages.id})`,
     })
@@ -434,12 +436,28 @@ messengerRoute.get('/channels/:id/messages', async (c) => {
     .orderBy(desc(messengerMessages.createdAt))
     .limit(limitNum)
 
+  // 첨부파일 메타데이터 일괄 조회
+  const parsedMessages = messages.map(m => ({
+    ...m,
+    parsedAttachmentIds: m.attachmentIds ? JSON.parse(m.attachmentIds) as string[] : [],
+  }))
+  const allFileIds = [...new Set(parsedMessages.flatMap(m => m.parsedAttachmentIds))]
+  const filesMap = new Map<string, { id: string; filename: string; mimeType: string; sizeBytes: number }>()
+  if (allFileIds.length > 0) {
+    const fileRows = await db
+      .select({ id: files.id, filename: files.filename, mimeType: files.mimeType, sizeBytes: files.sizeBytes })
+      .from(files)
+      .where(inArray(files.id, allFileIds))
+    for (const f of fileRows) filesMap.set(f.id, f)
+  }
+
   // 각 메시지의 리액션 집계
   const messageIds = messages.map((m) => m.id)
   const reactionsMap = await getReactionsMap(messageIds, tenant.companyId)
 
-  const result = messages.reverse().map((m) => ({
+  const result = parsedMessages.reverse().map(({ parsedAttachmentIds, attachmentIds: _raw, ...m }) => ({
     ...m,
+    attachments: parsedAttachmentIds.map(id => filesMap.get(id)).filter(Boolean),
     reactions: reactionsMap[m.id] || [],
   }))
 
@@ -450,9 +468,24 @@ messengerRoute.get('/channels/:id/messages', async (c) => {
 messengerRoute.post('/channels/:id/messages', zValidator('json', sendMessageSchema), async (c) => {
   const tenant = c.get('tenant')
   const channelId = c.req.param('id')
-  const { content, parentMessageId } = c.req.valid('json')
+  const { content, parentMessageId, attachmentIds } = c.req.valid('json')
 
   await assertMember(channelId, tenant.userId, tenant.companyId)
+
+  // 첨부파일 검증: 존재 + 같은 회사 소속 + 활성 확인
+  if (attachmentIds?.length) {
+    const validFiles = await db
+      .select({ id: files.id })
+      .from(files)
+      .where(and(
+        inArray(files.id, attachmentIds),
+        eq(files.companyId, tenant.companyId),
+        eq(files.isActive, true),
+      ))
+    if (validFiles.length !== attachmentIds.length) {
+      throw new HTTPError(400, '유효하지 않은 파일이 포함되어 있습니다', 'FILE_007')
+    }
+  }
 
   // parentMessageId 제공 시 해당 메시지가 같은 채널에 존재하는지 검증
   if (parentMessageId) {
@@ -476,6 +509,7 @@ messengerRoute.post('/channels/:id/messages', zValidator('json', sendMessageSche
       userId: tenant.userId,
       content,
       parentMessageId: parentMessageId || null,
+      attachmentIds: attachmentIds?.length ? JSON.stringify(attachmentIds) : null,
     })
     .returning()
 
@@ -486,6 +520,16 @@ messengerRoute.post('/channels/:id/messages', zValidator('json', sendMessageSche
     .where(eq(users.id, tenant.userId))
     .limit(1)
 
+  // 첨부파일 메타데이터 조회 (WS 브로드캐스트용)
+  let attachments: { id: string; filename: string; mimeType: string; sizeBytes: number }[] = []
+  if (attachmentIds?.length) {
+    const fileRows = await db
+      .select({ id: files.id, filename: files.filename, mimeType: files.mimeType, sizeBytes: files.sizeBytes })
+      .from(files)
+      .where(inArray(files.id, attachmentIds))
+    attachments = fileRows
+  }
+
   broadcastToChannel(`messenger::${channelId}`, {
     type: 'new-message',
     message: {
@@ -495,6 +539,7 @@ messengerRoute.post('/channels/:id/messages', zValidator('json', sendMessageSche
       content: message.content,
       parentMessageId: message.parentMessageId,
       createdAt: message.createdAt,
+      attachments,
     },
   })
 
@@ -656,6 +701,7 @@ messengerRoute.get('/channels/:id/messages/:msgId/thread', async (c) => {
       userName: users.name,
       content: messengerMessages.content,
       parentMessageId: messengerMessages.parentMessageId,
+      attachmentIds: messengerMessages.attachmentIds,
       createdAt: messengerMessages.createdAt,
     })
     .from(messengerMessages)
@@ -667,12 +713,28 @@ messengerRoute.get('/channels/:id/messages/:msgId/thread', async (c) => {
     ))
     .orderBy(messengerMessages.createdAt)
 
+  // 첨부파일 메타데이터 일괄 조회
+  const parsedReplies = replies.map(r => ({
+    ...r,
+    parsedAttachmentIds: r.attachmentIds ? JSON.parse(r.attachmentIds) as string[] : [],
+  }))
+  const replyFileIds = parsedReplies.flatMap(r => r.parsedAttachmentIds)
+  const replyFilesMap = new Map<string, { id: string; filename: string; mimeType: string; sizeBytes: number }>()
+  if (replyFileIds.length > 0) {
+    const fileRows = await db
+      .select({ id: files.id, filename: files.filename, mimeType: files.mimeType, sizeBytes: files.sizeBytes })
+      .from(files)
+      .where(inArray(files.id, replyFileIds))
+    for (const f of fileRows) replyFilesMap.set(f.id, f)
+  }
+
   // 각 답글의 리액션도 포함
   const replyIds = replies.map((r) => r.id)
   const reactionsMap = await getReactionsMap(replyIds, tenant.companyId)
 
-  const result = replies.map((r) => ({
+  const result = parsedReplies.map(({ parsedAttachmentIds, attachmentIds: _raw, ...r }) => ({
     ...r,
+    attachments: parsedAttachmentIds.map(id => replyFilesMap.get(id)).filter(Boolean),
     reactions: reactionsMap[r.id] || [],
   }))
 
