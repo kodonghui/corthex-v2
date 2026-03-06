@@ -187,9 +187,9 @@ workspaceAgentsRoute.post('/agents/delegation-rules', zValidator('json', createR
   const tenant = c.get('tenant')
   const body = c.req.valid('json')
 
-  // 역할 기반 권한 체크: admin/manager만 허용
-  if (tenant.role !== 'admin' && tenant.role !== 'manager') {
-    throw new HTTPError(403, '위임 규칙은 관리자 또는 매니저만 생성할 수 있습니다', 'AUTH_003')
+  // 역할 기반 권한 체크: admin만 허용
+  if (tenant.role !== 'admin') {
+    throw new HTTPError(403, '위임 규칙은 관리자만 생성할 수 있습니다', 'AUTH_003')
   }
 
   // 자기 자신에게 위임 금지
@@ -255,9 +255,9 @@ workspaceAgentsRoute.delete('/agents/delegation-rules/:id', async (c) => {
   const tenant = c.get('tenant')
   const id = c.req.param('id')
 
-  // 역할 기반 권한 체크: admin/manager만 허용
-  if (tenant.role !== 'admin' && tenant.role !== 'manager') {
-    throw new HTTPError(403, '위임 규칙은 관리자 또는 매니저만 삭제할 수 있습니다', 'AUTH_003')
+  // 역할 기반 권한 체크: admin만 허용
+  if (tenant.role !== 'admin') {
+    throw new HTTPError(403, '위임 규칙은 관리자만 삭제할 수 있습니다', 'AUTH_003')
   }
 
   const deleted = await db

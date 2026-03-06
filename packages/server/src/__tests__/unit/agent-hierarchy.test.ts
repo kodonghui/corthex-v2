@@ -338,8 +338,8 @@ describe('자기 위임 방지', () => {
   })
 
   test('다른 에이전트 간 위임 허용', () => {
-    const sourceId = 'agent-123'
-    const targetId = 'agent-456'
+    const sourceId: string = 'agent-123'
+    const targetId: string = 'agent-456'
     expect(sourceId === targetId).toBe(false)
   })
 })

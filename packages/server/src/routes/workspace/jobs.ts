@@ -214,7 +214,7 @@ jobsRoute.post('/chain', zValidator('json', chainJobSchema), async (c) => {
 
     for (let i = 0; i < steps.length; i++) {
       const step = steps[i]
-      const [job] = await tx
+      const [job]: any[] = await tx
         .insert(nightJobs)
         .values({
           companyId: tenant.companyId,

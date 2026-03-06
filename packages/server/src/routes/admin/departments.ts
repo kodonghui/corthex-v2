@@ -99,32 +99,18 @@ departmentsRoute.get('/departments/tree', async (c) => {
       id: agents.id,
       name: agents.name,
       role: agents.role,
-      level: agents.level,
       departmentId: agents.departmentId,
       isSecretary: agents.isSecretary,
     })
     .from(agents)
     .where(and(eq(agents.companyId, companyId), eq(agents.isActive, true)))
 
-  type TreeNode = {
-    id: string
-    name: string
-    description: string | null
-    children: TreeNode[]
-    agents: typeof allAgents
-  }
+  const tree = allDepts.map(d => ({
+    id: d.id,
+    name: d.name,
+    description: d.description,
+    agents: allAgents.filter(a => a.departmentId === d.id),
+  }))
 
-  function buildTree(parentId: string | null): TreeNode[] {
-    return allDepts
-      .filter(d => (d.parentDepartmentId || null) === parentId)
-      .map(d => ({
-        id: d.id,
-        name: d.name,
-        description: d.description,
-        children: buildTree(d.id),
-        agents: allAgents.filter(a => a.departmentId === d.id),
-      }))
-  }
-
-  return c.json({ data: buildTree(null) })
+  return c.json({ data: tree })
 })
