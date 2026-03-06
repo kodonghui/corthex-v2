@@ -232,8 +232,8 @@ development_status:
   # ============================================================
   # Epic 17: NEXUS 스케치바이브 (P4) — 스토리 순서 재배치 완료
   # ============================================================
-  epic-17: backlog
-  17-1-p4-db-schema-ws: backlog
+  epic-17: in-progress
+  17-1-p4-db-schema-ws: done
   17-2-nexus-canvas-base: backlog
   17-3-workflow-edit-exec: backlog
   17-4-nexus-template-share: backlog

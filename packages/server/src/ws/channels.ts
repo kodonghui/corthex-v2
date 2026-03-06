@@ -138,6 +138,17 @@ export async function handleSubscription(
       break
     }
 
+    case 'nexus': {
+      // 같은 companyId만 구독 가능
+      const nexusCompanyId = id || client.companyId
+      if (nexusCompanyId !== client.companyId) {
+        ws.send(JSON.stringify({ type: 'error', code: 'FORBIDDEN', channel }))
+        return
+      }
+      client.subscriptions.add(`nexus::${client.companyId}`)
+      break
+    }
+
     default:
       ws.send(JSON.stringify({ type: 'error', code: 'UNKNOWN_CHANNEL', channel }))
       return

@@ -156,6 +156,7 @@ export type WsChannel =
   | 'activity-log'
   | 'strategy-notes'
   | 'night-job'
+  | 'nexus'
 
 export type WsInboundMessage = {
   type: 'subscribe' | 'unsubscribe'

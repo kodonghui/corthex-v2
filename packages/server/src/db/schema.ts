@@ -636,6 +636,45 @@ export const pushSubscriptions = pgTable('push_subscriptions', {
   endpointUniq: unique('push_subscriptions_endpoint_uniq').on(table.endpoint),
 }))
 
+// === 32. nexus_workflows — NEXUS 워크플로우 ===
+export const nexusWorkflows = pgTable('nexus_workflows', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  name: varchar('name', { length: 200 }).notNull(),
+  description: text('description'),
+  nodes: jsonb('nodes').notNull().default([]),
+  edges: jsonb('edges').notNull().default([]),
+  isTemplate: boolean('is_template').notNull().default(false),
+  isActive: boolean('is_active').notNull().default(true),
+  createdBy: uuid('created_by').notNull().references(() => users.id),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+// === 33. nexus_executions — NEXUS 워크플로우 실행 기록 ===
+export const nexusExecutions = pgTable('nexus_executions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  workflowId: uuid('workflow_id').notNull().references(() => nexusWorkflows.id),
+  status: varchar('status', { length: 20 }).notNull().default('running'),
+  result: jsonb('result'),
+  startedAt: timestamp('started_at').notNull().defaultNow(),
+  completedAt: timestamp('completed_at'),
+})
+
+// === 34. mcp_servers — MCP 서버 연동 ===
+export const mcpServers = pgTable('mcp_servers', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  name: varchar('name', { length: 100 }).notNull(),
+  url: text('url').notNull(),
+  transport: varchar('transport', { length: 20 }).notNull().default('stdio'),
+  config: jsonb('config'),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
 // === Relations ===
 export const companiesRelations = relations(companies, ({ many }) => ({
   users: many(users),
@@ -852,4 +891,19 @@ export const soulTemplatesRelations = relations(soulTemplates, ({ one }) => ({
 export const pushSubscriptionsRelations = relations(pushSubscriptions, ({ one }) => ({
   company: one(companies, { fields: [pushSubscriptions.companyId], references: [companies.id] }),
   user: one(users, { fields: [pushSubscriptions.userId], references: [users.id] }),
+}))
+
+export const nexusWorkflowsRelations = relations(nexusWorkflows, ({ one, many }) => ({
+  company: one(companies, { fields: [nexusWorkflows.companyId], references: [companies.id] }),
+  createdByUser: one(users, { fields: [nexusWorkflows.createdBy], references: [users.id] }),
+  executions: many(nexusExecutions),
+}))
+
+export const nexusExecutionsRelations = relations(nexusExecutions, ({ one }) => ({
+  company: one(companies, { fields: [nexusExecutions.companyId], references: [companies.id] }),
+  workflow: one(nexusWorkflows, { fields: [nexusExecutions.workflowId], references: [nexusWorkflows.id] }),
+}))
+
+export const mcpServersRelations = relations(mcpServers, ({ one }) => ({
+  company: one(companies, { fields: [mcpServers.companyId], references: [companies.id] }),
 }))
