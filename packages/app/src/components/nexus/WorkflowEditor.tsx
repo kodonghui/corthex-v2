@@ -34,8 +34,10 @@ export function WorkflowEditor({ workflowId, onBack }: Props) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [isDirty, setIsDirty] = useState(false)
   const [showBackConfirm, setShowBackConfirm] = useState(false)
+  const [showMoreMenu, setShowMoreMenu] = useState(false)
   const initialLoadRef = useRef(false)
   const loadedRef = useRef(false)
+  const moreMenuRef = useRef<HTMLDivElement>(null)
 
   const { data: workflowsRes } = useQuery({
     queryKey: ['nexus-workflows'],
@@ -79,6 +81,25 @@ export function WorkflowEditor({ workflowId, onBack }: Props) {
     setIsDirty(true)
   }, [nodes, edges])
 
+  // Close more menu on outside click or Escape
+  useEffect(() => {
+    if (!showMoreMenu) return
+    const handleClick = (e: MouseEvent) => {
+      if (moreMenuRef.current && !moreMenuRef.current.contains(e.target as HTMLElement)) {
+        setShowMoreMenu(false)
+      }
+    }
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowMoreMenu(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('mousedown', handleClick)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [showMoreMenu])
+
   const onConnect = useCallback(
     (connection: Connection) => {
       setEdges((eds) => addEdge({ ...connection, id: `e-${Date.now()}` }, eds))
@@ -100,6 +121,7 @@ export function WorkflowEditor({ workflowId, onBack }: Props) {
         data: { label },
       },
     ])
+    setShowMoreMenu(false)
   }, [setNodes])
 
   const saveMutation = useMutation({
@@ -177,22 +199,18 @@ export function WorkflowEditor({ workflowId, onBack }: Props) {
   return (
     <div className="flex flex-col h-full">
       {/* 툴바 */}
-      <div className="px-4 py-2 border-b border-zinc-700 flex items-center gap-2 flex-wrap">
-        <button onClick={handleBack} className="text-sm text-zinc-400 hover:text-zinc-200">
+      <div className="px-3 sm:px-4 py-2 border-b border-zinc-700 flex items-center gap-1.5 sm:gap-2">
+        <button onClick={handleBack} className="text-sm text-zinc-400 hover:text-zinc-200 shrink-0">
           ← 목록
         </button>
-        <span className="text-zinc-600">|</span>
-        <span className="text-sm font-semibold truncate">{workflow.name}</span>
+        <span className="text-zinc-600 hidden sm:inline">|</span>
+        <span className="text-sm font-semibold truncate max-w-[120px] sm:max-w-none">{workflow.name}</span>
         {isDirty && (
-          <span className="text-xs text-amber-400">● 저장되지 않은 변경</span>
+          <span className="text-xs text-amber-400 hidden sm:inline">● 저장되지 않은 변경</span>
         )}
         <div className="flex-1" />
-        <button
-          onClick={handleAddNode}
-          className="px-2 py-1 text-xs bg-zinc-700 hover:bg-zinc-600 rounded transition-colors"
-        >
-          + 노드
-        </button>
+
+        {/* 핵심 버튼 — 항상 표시 */}
         <button
           onClick={() => saveMutation.mutate()}
           disabled={saveMutation.isPending}
@@ -207,29 +225,81 @@ export function WorkflowEditor({ workflowId, onBack }: Props) {
         >
           {executeMutation.isPending ? '실행 중...' : '실행'}
         </button>
-        <button
-          onClick={() => setShowHistory(!showHistory)}
-          className={`px-2 py-1 text-xs rounded transition-colors ${showHistory ? 'bg-zinc-600 text-white' : 'bg-zinc-700 hover:bg-zinc-600'}`}
-        >
-          실행 기록
-        </button>
-        <button
-          onClick={() => templateMutation.mutate(!workflow.isTemplate)}
-          disabled={templateMutation.isPending}
-          className={`px-2 py-1 text-xs rounded transition-colors ${
-            workflow.isTemplate
-              ? 'text-purple-400 hover:text-purple-300 hover:bg-purple-500/10'
-              : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-700'
-          }`}
-        >
-          {workflow.isTemplate ? '공유 해제' : '템플릿으로 공유'}
-        </button>
-        <button
-          onClick={() => setShowDeleteConfirm(true)}
-          className="px-2 py-1 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded transition-colors"
-        >
-          삭제
-        </button>
+
+        {/* 보조 버튼 — 데스크톱: 인라인, 모바일: 더보기 드롭다운 */}
+        <div className="hidden md:flex items-center gap-2">
+          <button
+            onClick={handleAddNode}
+            className="px-2 py-1 text-xs bg-zinc-700 hover:bg-zinc-600 rounded transition-colors"
+          >
+            + 노드
+          </button>
+          <button
+            onClick={() => setShowHistory(!showHistory)}
+            className={`px-2 py-1 text-xs rounded transition-colors ${showHistory ? 'bg-zinc-600 text-white' : 'bg-zinc-700 hover:bg-zinc-600'}`}
+          >
+            실행 기록
+          </button>
+          <button
+            onClick={() => templateMutation.mutate(!workflow.isTemplate)}
+            disabled={templateMutation.isPending}
+            className={`px-2 py-1 text-xs rounded transition-colors ${
+              workflow.isTemplate
+                ? 'text-purple-400 hover:text-purple-300 hover:bg-purple-500/10'
+                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-700'
+            }`}
+          >
+            {workflow.isTemplate ? '공유 해제' : '템플릿으로 공유'}
+          </button>
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            className="px-2 py-1 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded transition-colors"
+          >
+            삭제
+          </button>
+        </div>
+
+        {/* 모바일 더보기 메뉴 */}
+        <div className="relative md:hidden" ref={moreMenuRef}>
+          <button
+            onClick={() => setShowMoreMenu(!showMoreMenu)}
+            className="px-2 py-1 text-xs bg-zinc-700 hover:bg-zinc-600 rounded transition-colors"
+          >
+            ···
+          </button>
+          {showMoreMenu && (
+            <div className="absolute right-0 top-full mt-1 w-44 bg-zinc-800 border border-zinc-700 rounded-lg shadow-lg z-50 py-1">
+              <button
+                onClick={handleAddNode}
+                className="w-full text-left px-3 py-2 text-xs hover:bg-zinc-700 transition-colors"
+              >
+                + 노드 추가
+              </button>
+              <button
+                onClick={() => { setShowHistory(!showHistory); setShowMoreMenu(false) }}
+                className="w-full text-left px-3 py-2 text-xs hover:bg-zinc-700 transition-colors"
+              >
+                {showHistory ? '실행 기록 닫기' : '실행 기록'}
+              </button>
+              <button
+                onClick={() => { templateMutation.mutate(!workflow.isTemplate); setShowMoreMenu(false) }}
+                disabled={templateMutation.isPending}
+                className={`w-full text-left px-3 py-2 text-xs hover:bg-zinc-700 transition-colors ${
+                  workflow.isTemplate ? 'text-purple-400' : ''
+                }`}
+              >
+                {workflow.isTemplate ? '공유 해제' : '템플릿으로 공유'}
+              </button>
+              <hr className="border-zinc-700 my-1" />
+              <button
+                onClick={() => { setShowDeleteConfirm(true); setShowMoreMenu(false) }}
+                className="w-full text-left px-3 py-2 text-xs text-red-400 hover:bg-zinc-700 transition-colors"
+              >
+                삭제
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* 캔버스 */}
@@ -254,7 +324,7 @@ export function WorkflowEditor({ workflowId, onBack }: Props) {
           <MiniMap
             nodeStrokeWidth={3}
             style={{ width: 150, height: 100 }}
-            className="!bg-zinc-100 dark:!bg-zinc-800"
+            className="!bg-zinc-100 dark:!bg-zinc-800 hidden md:block"
           />
         </ReactFlow>
       </div>

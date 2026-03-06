@@ -68,7 +68,7 @@ export function WorkflowListPanel({ onSelect }: Props) {
 
   return (
     <div className="p-4">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
         <div className="flex items-center gap-3">
           <h3 className="text-base font-semibold">워크플로우</h3>
           <div className="flex gap-1">
@@ -107,7 +107,7 @@ export function WorkflowListPanel({ onSelect }: Props) {
       {/* 생성 모달 */}
       {showCreate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 w-96">
+          <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 w-[90vw] max-w-96">
             <h4 className="text-sm font-semibold mb-3">새 워크플로우</h4>
             <input
               type="text"

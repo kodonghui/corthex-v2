@@ -186,12 +186,12 @@ export function NexusPage() {
   return (
     <div className="h-full flex flex-col">
       {/* 헤더 + 탭 */}
-      <div className="px-4 py-2 border-b border-zinc-200 dark:border-zinc-800 flex items-center gap-4">
-        <h2 className="text-lg font-semibold">NEXUS</h2>
-        <div className="flex gap-1">
+      <div className="px-4 py-2 border-b border-zinc-200 dark:border-zinc-800 flex items-center gap-2 sm:gap-4">
+        <h2 className="text-base sm:text-lg font-semibold shrink-0">NEXUS</h2>
+        <div className="flex gap-1 flex-1 sm:flex-none">
           <button
             onClick={() => setTab('org')}
-            className={`px-3 py-1 text-sm rounded-lg transition-colors ${
+            className={`flex-1 sm:flex-none px-3 py-1 text-sm text-center rounded-lg transition-colors ${
               currentTab === 'org'
                 ? 'bg-zinc-700 text-white'
                 : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800'
@@ -201,7 +201,7 @@ export function NexusPage() {
           </button>
           <button
             onClick={() => setTab('workflows')}
-            className={`px-3 py-1 text-sm rounded-lg transition-colors ${
+            className={`flex-1 sm:flex-none px-3 py-1 text-sm text-center rounded-lg transition-colors ${
               currentTab === 'workflows'
                 ? 'bg-zinc-700 text-white'
                 : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800'
@@ -254,7 +254,7 @@ export function NexusPage() {
                   <MiniMap
                     nodeStrokeWidth={3}
                     style={{ width: 150, height: 100 }}
-                    className="!bg-zinc-100 dark:!bg-zinc-800"
+                    className="!bg-zinc-100 dark:!bg-zinc-800 hidden md:block"
                   />
                 </ReactFlow>
               </div>

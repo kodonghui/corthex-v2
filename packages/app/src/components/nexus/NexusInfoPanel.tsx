@@ -27,66 +27,103 @@ export function NexusInfoPanel({ node, onClose }: Props) {
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      document.body.style.overflow = ''
+    }
   }, [handleKeyDown])
 
-  return (
-    <div className="w-72 border-l border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 p-4 overflow-y-auto transition-all">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">에이전트 정보</h3>
-        <button
-          onClick={onClose}
-          className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 text-lg leading-none"
-          aria-label="닫기"
-        >
-          &times;
-        </button>
+  const panelContent = (
+    <div className="space-y-3">
+      {/* 이름 + 상태 */}
+      <div className="flex items-center gap-2">
+        <span className={`w-2.5 h-2.5 rounded-full ${statusInfo.color}`} />
+        <span className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{node.label}</span>
       </div>
 
-      <div className="space-y-3">
-        {/* 이름 + 상태 */}
-        <div className="flex items-center gap-2">
-          <span className={`w-2.5 h-2.5 rounded-full ${statusInfo.color}`} />
-          <span className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{node.label}</span>
-        </div>
-
-        {/* 역할 */}
-        {node.role && (
-          <div>
-            <span className="text-xs text-zinc-500">역할</span>
-            <p className="text-sm text-zinc-700 dark:text-zinc-300">{node.role}</p>
-          </div>
-        )}
-
-        {/* 소울 한 줄 */}
-        {node.soul && (
-          <div>
-            <p className="text-xs text-zinc-500 italic">"{node.soul}"</p>
-          </div>
-        )}
-
-        {/* 상태 */}
+      {/* 역할 */}
+      {node.role && (
         <div>
-          <span className="text-xs text-zinc-500">상태</span>
-          <p className="text-sm text-zinc-700 dark:text-zinc-300">{statusInfo.label}</p>
+          <span className="text-xs text-zinc-500">역할</span>
+          <p className="text-sm text-zinc-700 dark:text-zinc-300">{node.role}</p>
         </div>
+      )}
 
-        {node.isSecretary && (
-          <span className="inline-block text-[10px] bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300 px-2 py-0.5 rounded">
-            비서실장
-          </span>
-        )}
+      {/* 소울 한 줄 */}
+      {node.soul && (
+        <div>
+          <p className="text-xs text-zinc-500 italic">"{node.soul}"</p>
+        </div>
+      )}
 
-        <hr className="border-zinc-200 dark:border-zinc-700" />
+      {/* 상태 */}
+      <div>
+        <span className="text-xs text-zinc-500">상태</span>
+        <p className="text-sm text-zinc-700 dark:text-zinc-300">{statusInfo.label}</p>
+      </div>
 
-        {/* 채팅하기 */}
+      {node.isSecretary && (
+        <span className="inline-block text-[10px] bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300 px-2 py-0.5 rounded">
+          비서실장
+        </span>
+      )}
+
+      <hr className="border-zinc-200 dark:border-zinc-700" />
+
+      {/* 채팅하기 */}
+      {node.agentId && (
         <button
           onClick={() => navigate(`/chat?agentId=${node.agentId}`)}
           className="w-full py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors"
         >
           채팅하기
         </button>
-      </div>
+      )}
     </div>
+  )
+
+  return (
+    <>
+      {/* 모바일: 하단 슬라이드업 시트 */}
+      <div className="md:hidden fixed inset-0 z-40" onClick={onClose}>
+        <div className="absolute inset-0 bg-black/40" />
+        <div
+          className="absolute bottom-0 inset-x-0 bg-zinc-50 dark:bg-zinc-900 rounded-t-2xl p-4 max-h-[60vh] overflow-y-auto [-webkit-overflow-scrolling:touch] animate-slide-up"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* 드래그 핸들 */}
+          <div className="flex justify-center mb-3">
+            <div className="w-10 h-1 bg-zinc-300 dark:bg-zinc-600 rounded-full" />
+          </div>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">에이전트 정보</h3>
+            <button
+              onClick={onClose}
+              className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 text-lg leading-none"
+              aria-label="닫기"
+            >
+              &times;
+            </button>
+          </div>
+          {panelContent}
+        </div>
+      </div>
+
+      {/* 데스크톱: 기존 우측 사이드바 */}
+      <div className="hidden md:block w-72 border-l border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 p-4 overflow-y-auto transition-all">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">에이전트 정보</h3>
+          <button
+            onClick={onClose}
+            className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 text-lg leading-none"
+            aria-label="닫기"
+          >
+            &times;
+          </button>
+        </div>
+        {panelContent}
+      </div>
+    </>
   )
 }

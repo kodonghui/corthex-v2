@@ -8,6 +8,7 @@
   --color-corthex-warning: oklch(0.65 0.16 75);       /* amber-600 */
   --color-corthex-error: oklch(0.55 0.2 25);          /* red-600 */
   --animate-slide-in: slide-in 200ms ease-out;
+  --animate-slide-up: slide-up 200ms ease-out;
 }
 
 @keyframes slide-in {
@@ -18,4 +19,9 @@
 @keyframes slideInRight {
   from { transform: translateX(100%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
 }
