@@ -99,6 +99,7 @@ export function JobsPage() {
   const [modalDays, setModalDays] = useState<number[]>([])
   const [modalScheduledFor, setModalScheduledFor] = useState('')
   const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null)
+  const [editingTrigger, setEditingTrigger] = useState<Trigger | null>(null)
 
   const { data: agentsData } = useQuery({
     queryKey: ['agents'],
@@ -166,6 +167,15 @@ export function JobsPage() {
   const createTrigger = useMutation({
     mutationFn: (body: { agentId: string; instruction: string; triggerType: string; condition: Record<string, unknown> }) =>
       api.post('/workspace/jobs/triggers', body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['night-triggers'] })
+      closeModal()
+    },
+  })
+
+  const updateTrigger = useMutation({
+    mutationFn: ({ id, ...body }: { id: string; instruction?: string; triggerType?: string; condition?: Record<string, unknown> }) =>
+      api.patch(`/workspace/jobs/triggers/${id}`, body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['night-triggers'] })
       closeModal()
@@ -254,6 +264,7 @@ export function JobsPage() {
     setModalStockCode('')
     setModalTargetPrice('')
     setEditingSchedule(null)
+    setEditingTrigger(null)
     setChainSteps([])
   }
 
@@ -272,6 +283,19 @@ export function JobsPage() {
     else {
       setModalFrequency('custom')
       setModalDays(dow.split(',').map(Number))
+    }
+    setShowModal(true)
+  }
+
+  function openEditTrigger(t: Trigger) {
+    setEditingTrigger(t)
+    setModalType('trigger')
+    setModalAgent(t.agentId)
+    setModalInstruction(t.instruction)
+    setModalTriggerType(t.triggerType)
+    if (t.triggerType === 'price-above' || t.triggerType === 'price-below') {
+      setModalStockCode(String(t.condition.stockCode || ''))
+      setModalTargetPrice(String(t.condition.targetPrice || ''))
     }
     setShowModal(true)
   }
@@ -299,12 +323,21 @@ export function JobsPage() {
       const condition: Record<string, unknown> = isPriceTrigger
         ? { stockCode: modalStockCode.trim(), targetPrice: Number(modalTargetPrice) }
         : {}
-      createTrigger.mutate({
-        agentId: modalAgent,
-        instruction: modalInstruction.trim(),
-        triggerType: modalTriggerType,
-        condition,
-      })
+      if (editingTrigger) {
+        updateTrigger.mutate({
+          id: editingTrigger.id,
+          instruction: modalInstruction.trim(),
+          triggerType: modalTriggerType,
+          condition,
+        })
+      } else {
+        createTrigger.mutate({
+          agentId: modalAgent,
+          instruction: modalInstruction.trim(),
+          triggerType: modalTriggerType,
+          condition,
+        })
+      }
     } else {
       if (modalFrequency === 'custom' && modalDays.length === 0) return
       const body = {
@@ -341,7 +374,7 @@ export function JobsPage() {
     { key: 'trigger', label: '트리거', count: triggers.length },
   ]
 
-  const isPending = queueJob.isPending || createSchedule.isPending || updateSchedule.isPending || createTrigger.isPending || createChain.isPending
+  const isPending = queueJob.isPending || createSchedule.isPending || updateSchedule.isPending || createTrigger.isPending || updateTrigger.isPending || createChain.isPending
 
   return (
     <div className="p-8">
@@ -536,6 +569,12 @@ export function JobsPage() {
                   </div>
                   <div className="flex items-center gap-2 ml-3">
                     <button
+                      onClick={() => openEditTrigger(t)}
+                      className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+                    >
+                      편집
+                    </button>
+                    <button
                       onClick={() => toggleTrigger.mutate(t.id)}
                       className={`text-xs ${t.isActive ? 'text-amber-500 hover:text-amber-600' : 'text-green-500 hover:text-green-600'}`}
                     >
@@ -559,10 +598,10 @@ export function JobsPage() {
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => closeModal()}>
           <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-xl max-w-lg w-full mx-4 p-6 space-y-4" onClick={e => e.stopPropagation()}>
-            <h3 className="text-lg font-bold">{editingSchedule ? '스케줄 수정' : '작업 등록'}</h3>
+            <h3 className="text-lg font-bold">{editingSchedule ? '스케줄 수정' : editingTrigger ? '트리거 수정' : '작업 등록'}</h3>
 
             {/* 유형 선택 (신규만) */}
-            {!editingSchedule && (
+            {!editingSchedule && !editingTrigger && (
               <div className="flex gap-3 flex-wrap">
                 {([['oneTime', '일회성'], ['schedule', '반복 스케줄'], ['trigger', '이벤트 트리거']] as const).map(([val, label]) => (
                   <label key={val} className="flex items-center gap-2 cursor-pointer">
@@ -769,7 +808,7 @@ export function JobsPage() {
                 disabled={!modalAgent || !modalInstruction.trim() || (modalType === 'schedule' && modalFrequency === 'custom' && modalDays.length === 0) || (modalType === 'trigger' && (modalTriggerType === 'price-above' || modalTriggerType === 'price-below') && (!modalStockCode.trim() || !modalTargetPrice)) || isPending}
                 className="flex-1 py-2.5 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700 disabled:opacity-50"
               >
-                {isPending ? '처리 중...' : editingSchedule ? '수정' : '등록'}
+                {isPending ? '처리 중...' : (editingSchedule || editingTrigger) ? '수정' : '등록'}
               </button>
             </div>
           </div>

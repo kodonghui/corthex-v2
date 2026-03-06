@@ -35,7 +35,14 @@ const updateTriggerSchema = z.object({
   instruction: z.string().min(1).max(2000).optional(),
   triggerType: triggerTypeEnum.optional(),
   condition: z.record(z.unknown()).optional(),
-})
+}).refine((data) => {
+  // triggerType이 price 계열로 변경되면 condition도 함께 보내야 함
+  if (data.triggerType === 'price-above' || data.triggerType === 'price-below') {
+    if (!data.condition) return false
+    return priceConditionSchema.safeParse(data.condition).success
+  }
+  return true
+}, { message: '가격 트리거에는 stockCode와 targetPrice가 필요합니다' })
 
 // GET /triggers — 내 트리거 목록
 triggersRoute.get('/', async (c) => {
@@ -105,9 +112,9 @@ triggersRoute.patch('/:id', zValidator('json', updateTriggerSchema), async (c) =
   if (!existing) throw new HTTPError(404, '트리거를 찾을 수 없습니다', 'TRIGGER_002')
 
   const updates: Record<string, unknown> = {}
-  if (body.instruction) updates.instruction = body.instruction
-  if (body.triggerType) updates.triggerType = body.triggerType
-  if (body.condition) updates.condition = body.condition
+  if (body.instruction !== undefined) updates.instruction = body.instruction
+  if (body.triggerType !== undefined) updates.triggerType = body.triggerType
+  if (body.condition !== undefined) updates.condition = body.condition
 
   const [updated] = await db
     .update(nightJobTriggers)

@@ -34,7 +34,10 @@ async function fetchCurrentPrice(stockCode: string, companyId: string): Promise<
     const data = (await res.json()) as { rt_cd?: string; output?: { stck_prpr?: string } }
     if (data.rt_cd !== '0') return null
 
-    return Number(data.output?.stck_prpr || 0)
+    const priceStr = data.output?.stck_prpr
+    if (!priceStr) return null
+    const price = Number(priceStr)
+    return price > 0 ? price : null
   } catch {
     return null
   }
@@ -87,8 +90,8 @@ async function evaluateTrigger(trigger: TriggerRow): Promise<boolean> {
     case 'market-open': {
       const hour = getKstHour()
       const minute = getKstMinute()
-      // 장 시작: 09:00 KST — 09:00~09:01 사이에만 발동 (30초 폴링이므로 1분 범위)
-      if (hour === 9 && minute === 0) {
+      // 장 시작: 09:00 KST — 09:00~09:01 범위 (30초 폴링 drift 허용)
+      if (hour === 9 && minute <= 1) {
         // 오늘 이미 발동했으면 건너뛰기
         const today = getTodayKst()
         if (trigger.lastTriggeredAt) {
@@ -103,8 +106,8 @@ async function evaluateTrigger(trigger: TriggerRow): Promise<boolean> {
     case 'market-close': {
       const hour = getKstHour()
       const minute = getKstMinute()
-      // 장 마감: 15:30 KST
-      if (hour === 15 && minute === 30) {
+      // 장 마감: 15:30 KST — 15:30~15:31 범위 (30초 폴링 drift 허용)
+      if (hour === 15 && (minute === 30 || minute === 31)) {
         const today = getTodayKst()
         if (trigger.lastTriggeredAt) {
           const lastDate = new Date(trigger.lastTriggeredAt.getTime() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10)
