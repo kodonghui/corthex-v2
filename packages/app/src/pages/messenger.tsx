@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAuthStore } from '../stores/auth-store'
+import { useWsStore } from '../stores/ws-store'
 
 type Channel = {
   id: string
@@ -42,6 +43,12 @@ type ChannelDetail = {
   memberCount: number
 }
 
+type AgentInfo = {
+  id: string
+  name: string
+  role: string | null
+}
+
 function formatTime(dateStr: string) {
   const d = new Date(dateStr)
   const now = new Date()
@@ -53,10 +60,12 @@ function formatTime(dateStr: string) {
 function ChannelSettingsModal({
   channelId,
   userId,
+  onlineUserIds,
   onClose,
 }: {
   channelId: string
   userId: string
+  onlineUserIds: Set<string>
   onClose: () => void
 }) {
   const queryClient = useQueryClient()
@@ -206,7 +215,10 @@ function ChannelSettingsModal({
             <div className="space-y-1 max-h-32 overflow-y-auto">
               {members.map((m) => (
                 <div key={m.id} className="flex items-center justify-between py-1 px-2 rounded hover:bg-zinc-50 dark:hover:bg-zinc-800">
-                  <span className="text-sm">{m.name} <span className="text-xs text-zinc-500">({m.role})</span></span>
+                  <span className="text-sm">
+                    <span className={onlineUserIds.has(m.id) ? 'text-emerald-500' : 'text-zinc-400'}>{onlineUserIds.has(m.id) ? '●' : '○'}</span>
+                    {' '}{m.name} <span className="text-xs text-zinc-500">({m.role})</span>
+                  </span>
                   {m.id !== userId && (
                     <button
                       onClick={() => removeMember.mutate(m.id)}
@@ -271,12 +283,18 @@ function ChannelSettingsModal({
 export function MessengerPage() {
   const queryClient = useQueryClient()
   const user = useAuthStore((s) => s.user)
+  const { subscribe, addListener, removeListener, isConnected } = useWsStore()
   const [selectedChannel, setSelectedChannel] = useState<string | null>(null)
   const [newMessage, setNewMessage] = useState('')
   const [showCreate, setShowCreate] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [createForm, setCreateForm] = useState({ name: '', description: '' })
+  const [typingAgent, setTypingAgent] = useState<string | null>(null)
+  const [showMention, setShowMention] = useState(false)
+  const [mentionSearch, setMentionSearch] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   // 채널 목록
   const { data: channelsData } = useQuery({
@@ -284,20 +302,54 @@ export function MessengerPage() {
     queryFn: () => api.get<{ data: Channel[] }>('/workspace/messenger/channels'),
   })
 
-  // 메시지 (선택된 채널, 5초 폴링)
+  // 메시지 (선택된 채널, WebSocket 미연결 시 30초 폴링 fallback)
   const { data: messagesData } = useQuery({
     queryKey: ['messenger-messages', selectedChannel],
     queryFn: () => api.get<{ data: Message[] }>(`/workspace/messenger/channels/${selectedChannel}/messages`),
     enabled: !!selectedChannel,
-    refetchInterval: 5000,
+    refetchInterval: isConnected ? false : 30000,
   })
+
+  // WebSocket 실시간 메시지 수신
+  useEffect(() => {
+    if (!selectedChannel || !isConnected) return
+
+    subscribe('messenger', { id: selectedChannel })
+
+    const handler = (data: unknown) => {
+      const event = data as { type: string; message?: Message; agentName?: string }
+      if (event.type === 'new-message' && event.message) {
+        // React Query 캐시에 optimistic append (중복 방지)
+        queryClient.setQueryData(
+          ['messenger-messages', selectedChannel],
+          (old: { data: Message[] } | undefined) => {
+            const existing = old?.data || []
+            if (existing.some((m) => m.id === event.message!.id)) return old
+            return { data: [...existing, event.message!] }
+          },
+        )
+        // 채널 목록 lastMessage 갱신
+        queryClient.invalidateQueries({ queryKey: ['messenger-channels'] })
+      }
+      if (event.type === 'typing' && event.agentName) {
+        setTypingAgent(event.agentName)
+        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
+        typingTimeoutRef.current = setTimeout(() => setTypingAgent(null), 3000)
+      }
+    }
+
+    const channelKey = `messenger::${selectedChannel}`
+    addListener(channelKey, handler)
+    return () => {
+      removeListener(channelKey, handler)
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
+    }
+  }, [selectedChannel, isConnected, subscribe, addListener, removeListener, queryClient])
 
   const sendMessage = useMutation({
     mutationFn: (content: string) =>
       api.post(`/workspace/messenger/channels/${selectedChannel}/messages`, { content }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['messenger-messages', selectedChannel] })
-      queryClient.invalidateQueries({ queryKey: ['messenger-channels'] })
       setNewMessage('')
     },
   })
@@ -312,6 +364,24 @@ export function MessengerPage() {
       setCreateForm({ name: '', description: '' })
     },
   })
+
+  // 에이전트 목록 (멘션 자동완성용)
+  const { data: agentsData } = useQuery({
+    queryKey: ['agents'],
+    queryFn: () => api.get<{ data: AgentInfo[] }>('/workspace/agents'),
+  })
+
+  // 온라인 상태 (30초 폴링)
+  const { data: onlineData } = useQuery({
+    queryKey: ['messenger-online-status'],
+    queryFn: () => api.get<{ data: string[] }>('/workspace/messenger/online-status'),
+    refetchInterval: 30000,
+  })
+  const onlineUserIds = useMemo(() => new Set(onlineData?.data || []), [onlineData])
+  const allAgents = agentsData?.data || []
+  const filteredAgents = showMention
+    ? allAgents.filter((a) => a.name.toLowerCase().includes(mentionSearch.toLowerCase()))
+    : []
 
   const channels = channelsData?.data || []
   const messages = messagesData?.data || []
@@ -333,6 +403,30 @@ export function MessengerPage() {
   const handleSend = () => {
     if (!newMessage.trim()) return
     sendMessage.mutate(newMessage.trim())
+    setShowMention(false)
+  }
+
+  const handleInputChange = (value: string) => {
+    setNewMessage(value)
+    // @ 멘션 감지
+    const atIdx = value.lastIndexOf('@')
+    if (atIdx !== -1 && (atIdx === 0 || value[atIdx - 1] === ' ')) {
+      const query = value.slice(atIdx + 1)
+      if (!query.includes(' ')) {
+        setShowMention(true)
+        setMentionSearch(query)
+        return
+      }
+    }
+    setShowMention(false)
+  }
+
+  const handleMentionSelect = (agentName: string) => {
+    const atIdx = newMessage.lastIndexOf('@')
+    const before = newMessage.slice(0, atIdx)
+    setNewMessage(`${before}@${agentName} `)
+    setShowMention(false)
+    inputRef.current?.focus()
   }
 
   return (
@@ -434,17 +528,41 @@ export function MessengerPage() {
                     </div>
                   )
                 })}
+                {typingAgent && (
+                  <div className="flex items-center gap-2 px-2 py-1 text-xs text-zinc-500">
+                    <span className="animate-pulse">🤖 {typingAgent}이(가) 입력 중...</span>
+                  </div>
+                )}
                 <div ref={messagesEndRef} />
               </div>
 
               {/* 입력 */}
-              <div className="px-4 py-3 border-t border-zinc-200 dark:border-zinc-800">
+              <div className="px-4 py-3 border-t border-zinc-200 dark:border-zinc-800 relative">
+                {/* 멘션 자동완성 드롭다운 */}
+                {showMention && filteredAgents.length > 0 && (
+                  <div className="absolute bottom-full left-4 right-4 mb-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-md shadow-lg max-h-32 overflow-y-auto z-10">
+                    {filteredAgents.map((a) => (
+                      <button
+                        key={a.id}
+                        onClick={() => handleMentionSelect(a.name)}
+                        className="w-full text-left px-3 py-2 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 flex items-center gap-2"
+                      >
+                        <span className="text-indigo-500">@{a.name}</span>
+                        {a.role && <span className="text-xs text-zinc-500">({a.role})</span>}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 <div className="flex gap-2">
                   <input
+                    ref={inputRef}
                     value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
-                    placeholder="메시지를 입력하세요..."
+                    onChange={(e) => handleInputChange(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey && !showMention) handleSend()
+                      if (e.key === 'Escape') setShowMention(false)
+                    }}
+                    placeholder="메시지를 입력하세요... (@로 에이전트 호출)"
                     className="flex-1 px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm"
                   />
                   <button
@@ -466,6 +584,7 @@ export function MessengerPage() {
         <ChannelSettingsModal
           channelId={selectedChannel}
           userId={user.id}
+          onlineUserIds={onlineUserIds}
           onClose={handleSettingsClose}
         />
       )}

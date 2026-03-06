@@ -3,10 +3,13 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { eq, and, desc, inArray, sql } from 'drizzle-orm'
 import { db } from '../../db'
-import { messengerChannels, messengerMembers, messengerMessages, users } from '../../db/schema'
+import { messengerChannels, messengerMembers, messengerMessages, users, agents } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { logActivity } from '../../lib/activity-logger'
+import { broadcastToChannel } from '../../ws/channels'
+import { clientMap } from '../../ws/server'
+import { getClientForUser } from '../../lib/ai'
 import type { AppEnv } from '../../types'
 
 export const messengerRoute = new Hono<AppEnv>()
@@ -25,7 +28,7 @@ const updateChannelSchema = z.object({
 })
 
 const sendMessageSchema = z.object({
-  content: z.string().min(1),
+  content: z.string().min(1).max(4000),
 })
 
 const addMemberSchema = z.object({
@@ -46,6 +49,106 @@ async function assertMember(channelId: string, userId: string, companyId: string
 
   if (!member) throw new HTTPError(403, '채널 멤버가 아닙니다', 'MSG_002')
 }
+
+// AI 에이전트 멘션 → 비동기 응답 생성
+async function handleAgentMention(
+  agent: { id: string; name: string; soul: string | null; userId: string },
+  channelId: string,
+  userMessage: string,
+  userId: string,
+  companyId: string,
+) {
+  // typing 인디케이터 브로드캐스트
+  broadcastToChannel(`messenger::${channelId}`, { type: 'typing', agentName: agent.name })
+
+  try {
+    const client = await getClientForUser(userId, companyId)
+
+    // 최근 채널 메시지 10건을 컨텍스트로 사용
+    const recentMsgs = await db
+      .select({ userName: users.name, content: messengerMessages.content })
+      .from(messengerMessages)
+      .innerJoin(users, eq(messengerMessages.userId, users.id))
+      .where(and(eq(messengerMessages.channelId, channelId), eq(messengerMessages.companyId, companyId)))
+      .orderBy(desc(messengerMessages.createdAt))
+      .limit(10)
+    recentMsgs.reverse()
+
+    const contextMessages = recentMsgs.map((m) => `${m.userName}: ${m.content}`).join('\n')
+
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-5-20241022',
+      max_tokens: 1024,
+      system: `${agent.soul || '당신은 도움이 되는 AI 비서입니다.'}\n\n이름: ${agent.name}\n한국어로 답변. 간결하게.`,
+      messages: [
+        {
+          role: 'user',
+          content: `다음은 메신저 채널의 최근 대화입니다:\n\n${contextMessages}\n\n위 대화에서 당신(@${agent.name})에게 질문했습니다. 답변해주세요.`,
+        },
+      ],
+    })
+
+    const responseText = response.content
+      .filter((b) => b.type === 'text')
+      .map((b) => (b as { type: 'text'; text: string }).text)
+      .join('')
+
+    // 에이전트 응답을 메시지로 저장 (에이전트의 userId 사용)
+    const [agentMessage] = await db
+      .insert(messengerMessages)
+      .values({
+        companyId,
+        channelId,
+        userId: agent.userId,
+        content: responseText,
+      })
+      .returning()
+
+    // WebSocket 브로드캐스트
+    broadcastToChannel(`messenger::${channelId}`, {
+      type: 'new-message',
+      message: {
+        id: agentMessage.id,
+        userId: agentMessage.userId,
+        userName: agent.name,
+        content: responseText,
+        createdAt: agentMessage.createdAt,
+      },
+    })
+  } catch {
+    // AI 호출 실패 시 에러 메시지를 DB에 저장 후 브로드캐스트
+    const errorContent = '죄송합니다, 응답을 생성하지 못했습니다. 잠시 후 다시 시도해주세요.'
+    const [errorMsg] = await db
+      .insert(messengerMessages)
+      .values({ companyId, channelId, userId: agent.userId, content: errorContent })
+      .returning()
+
+    broadcastToChannel(`messenger::${channelId}`, {
+      type: 'new-message',
+      message: {
+        id: errorMsg.id,
+        userId: errorMsg.userId,
+        userName: agent.name,
+        content: errorContent,
+        createdAt: errorMsg.createdAt,
+      },
+    })
+  }
+}
+
+// GET /messenger/online-status — 같은 회사의 온라인 유저 ID 목록
+messengerRoute.get('/online-status', async (c) => {
+  const tenant = c.get('tenant')
+
+  const onlineUserIds: string[] = []
+  for (const [userId, clients] of clientMap.entries()) {
+    if (clients.some((cl) => cl.companyId === tenant.companyId)) {
+      onlineUserIds.push(userId)
+    }
+  }
+
+  return c.json({ data: onlineUserIds })
+})
 
 // GET /messenger/channels — 내가 참여한 채널 목록 (lastMessage 포함)
 messengerRoute.get('/channels', async (c) => {
@@ -334,6 +437,40 @@ messengerRoute.post('/channels/:id/messages', zValidator('json', sendMessageSche
       content,
     })
     .returning()
+
+  // 유저 이름 조회 후 WebSocket 실시간 브로드캐스트
+  const [sender] = await db
+    .select({ name: users.name })
+    .from(users)
+    .where(eq(users.id, tenant.userId))
+    .limit(1)
+
+  broadcastToChannel(`messenger::${channelId}`, {
+    type: 'new-message',
+    message: {
+      id: message.id,
+      userId: message.userId,
+      userName: sender?.name || 'Unknown',
+      content: message.content,
+      createdAt: message.createdAt,
+    },
+  })
+
+  // @에이전트 멘션 파싱 → 비동기 AI 응답 (fire-and-forget, DB 조회 포함)
+  const mentionMatch = content.match(/@(\S+)/)
+  if (mentionMatch) {
+    const agentName = mentionMatch[1]
+    const cId = tenant.companyId
+    const uId = tenant.userId
+    ;(async () => {
+      const [agent] = await db
+        .select({ id: agents.id, name: agents.name, soul: agents.soul, userId: agents.userId })
+        .from(agents)
+        .where(and(eq(agents.name, agentName), eq(agents.companyId, cId)))
+        .limit(1)
+      if (agent) await handleAgentMention(agent, channelId, content, uId, cId)
+    })().catch(() => {})
+  }
 
   return c.json({ data: message }, 201)
 })
