@@ -29,6 +29,7 @@ import { runMigrations } from './db'
 import { startJobWorker, stopJobWorker } from './lib/job-queue'
 import { startScheduleWorker, stopScheduleWorker } from './lib/schedule-worker'
 import { startTriggerWorker, stopTriggerWorker } from './lib/trigger-worker'
+import { startSnsScheduleChecker, stopSnsScheduleChecker } from './lib/sns-schedule-checker'
 import { loginRateLimit, apiRateLimit } from './middleware/rate-limit'
 import { wsRoute, websocket, broadcastServerRestart } from './ws/server'
 import { eventBus } from './lib/event-bus'
@@ -152,6 +153,7 @@ runMigrations().then(() => {
   startJobWorker()
   startScheduleWorker()
   startTriggerWorker()
+  startSnsScheduleChecker()
 })
 
 // Graceful Shutdown — SIGTERM 시 WS 클라이언트 알림 후 종료
@@ -160,6 +162,7 @@ process.on('SIGTERM', () => {
   stopJobWorker()
   stopScheduleWorker()
   stopTriggerWorker()
+  stopSnsScheduleChecker()
   broadcastServerRestart()
   setTimeout(() => {
     console.log('✅ 서버 종료')

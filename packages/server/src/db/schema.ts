@@ -10,7 +10,7 @@ export const toolScopeEnum = pgEnum('tool_scope', ['platform', 'company', 'depar
 export const delegationStatusEnum = pgEnum('delegation_status', ['pending', 'processing', 'completed', 'failed'])
 export const reportStatusEnum = pgEnum('report_status', ['draft', 'submitted', 'reviewed'])
 export const jobStatusEnum = pgEnum('job_status', ['queued', 'processing', 'completed', 'failed', 'blocked'])
-export const snsStatusEnum = pgEnum('sns_status', ['draft', 'pending', 'approved', 'rejected', 'published', 'failed'])
+export const snsStatusEnum = pgEnum('sns_status', ['draft', 'pending', 'approved', 'scheduled', 'rejected', 'published', 'failed'])
 export const snsPlatformEnum = pgEnum('sns_platform', ['instagram', 'tistory', 'daum_cafe'])
 export const activityLogTypeEnum = pgEnum('activity_log_type', ['chat', 'delegation', 'tool_call', 'job', 'sns', 'error', 'system', 'login'])
 export const activityPhaseEnum = pgEnum('activity_phase', ['start', 'end', 'error'])
@@ -374,6 +374,7 @@ export const snsContents = pgTable('sns_contents', {
   publishedUrl: text('published_url'),
   publishedAt: timestamp('published_at'),
   publishError: text('publish_error'),
+  scheduledAt: timestamp('scheduled_at'),
   metadata: jsonb('metadata'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),

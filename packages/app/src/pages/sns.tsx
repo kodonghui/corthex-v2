@@ -21,6 +21,7 @@ type SnsContent = {
   publishedUrl?: string
   publishedAt?: string
   publishError?: string
+  scheduledAt?: string | null
   createdAt: string
   updatedAt: string
 }
@@ -31,6 +32,7 @@ const STATUS_LABELS: Record<string, string> = {
   draft: '초안',
   pending: '승인 대기',
   approved: '승인됨',
+  scheduled: '예약됨',
   rejected: '반려됨',
   published: '발행 완료',
   failed: '발행 실패',
@@ -40,6 +42,7 @@ const STATUS_COLORS: Record<string, string> = {
   draft: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300',
   pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
   approved: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+  scheduled: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
   rejected: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
   published: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200',
   failed: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
@@ -59,7 +62,7 @@ export function SnsPage() {
   const [rejectReason, setRejectReason] = useState('')
 
   // 생성 폼 상태
-  const [form, setForm] = useState({ platform: 'instagram', title: '', body: '', hashtags: '' })
+  const [form, setForm] = useState({ platform: 'instagram', title: '', body: '', hashtags: '', scheduledAt: '' })
   const [aiForm, setAiForm] = useState({ platform: 'instagram', agentId: '', topic: '' })
   const [createMode, setCreateMode] = useState<'manual' | 'ai'>('manual')
 
@@ -80,7 +83,10 @@ export function SnsPage() {
   })
 
   const createManual = useMutation({
-    mutationFn: (data: typeof form) => api.post<{ data: SnsContent }>('/workspace/sns', data),
+    mutationFn: (data: typeof form) => {
+      const payload = { ...data, scheduledAt: data.scheduledAt ? new Date(data.scheduledAt).toISOString() : undefined }
+      return api.post<{ data: SnsContent }>('/workspace/sns', payload)
+    },
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ['sns'] })
       setSelectedId(res.data.id)
@@ -131,6 +137,14 @@ export function SnsPage() {
     },
   })
 
+  const cancelSchedule = useMutation({
+    mutationFn: (id: string) => api.post(`/workspace/sns/${id}/cancel-schedule`, {}),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sns'] })
+      queryClient.invalidateQueries({ queryKey: ['sns', selectedId] })
+    },
+  })
+
   const deleteSns = useMutation({
     mutationFn: (id: string) => api.delete(`/workspace/sns/${id}`),
     onSuccess: () => {
@@ -150,7 +164,7 @@ export function SnsPage() {
         <h2 className="text-lg font-semibold">SNS 콘텐츠</h2>
         {view === 'list' && (
           <button
-            onClick={() => { setView('create'); setForm({ platform: 'instagram', title: '', body: '', hashtags: '' }) }}
+            onClick={() => { setView('create'); setForm({ platform: 'instagram', title: '', body: '', hashtags: '', scheduledAt: '' }) }}
             className="px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700"
           >
             + 새 콘텐츠
@@ -214,6 +228,11 @@ export function SnsPage() {
                 placeholder="본문 내용" rows={6} />
               <input value={form.hashtags} onChange={(e) => setForm({ ...form, hashtags: e.target.value })}
                 placeholder="해시태그 (#태그1 #태그2)" className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm" />
+              <div>
+                <label className="block text-xs text-zinc-500 mb-1">예약 발행 (선택)</label>
+                <input type="datetime-local" value={form.scheduledAt} onChange={(e) => setForm({ ...form, scheduledAt: e.target.value })}
+                  className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm" />
+              </div>
               <button onClick={() => createManual.mutate(form)} disabled={!form.title || !form.body || createManual.isPending}
                 className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 disabled:opacity-50">
                 {createManual.isPending ? '생성 중...' : '콘텐츠 저장'}
@@ -275,6 +294,12 @@ export function SnsPage() {
             <p className="text-sm text-red-600">발행 오류: {detail.publishError}</p>
           )}
 
+          {detail.scheduledAt && (
+            <p className="text-sm text-blue-600 dark:text-blue-400">
+              예약 시간: {new Date(detail.scheduledAt).toLocaleString('ko')}
+            </p>
+          )}
+
           <p className="text-xs text-zinc-500">
             작성: {detail.creatorName} · {new Date(detail.createdAt).toLocaleString('ko')}
           </p>
@@ -310,6 +335,13 @@ export function SnsPage() {
               <button onClick={() => publish.mutate(detail.id)} disabled={publish.isPending}
                 className="px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 disabled:opacity-50">
                 {publish.isPending ? '발행 중...' : '발행하기'}
+              </button>
+            )}
+
+            {detail.status === 'scheduled' && (
+              <button onClick={() => cancelSchedule.mutate(detail.id)} disabled={cancelSchedule.isPending}
+                className="px-3 py-1.5 border border-blue-300 text-blue-600 text-sm rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/30 disabled:opacity-50">
+                {cancelSchedule.isPending ? '취소 중...' : '예약 취소'}
               </button>
             )}
 

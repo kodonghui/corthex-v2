@@ -21,6 +21,7 @@ const createSnsSchema = z.object({
   body: z.string().min(1),
   hashtags: z.string().optional(),
   imageUrl: z.string().optional(),
+  scheduledAt: z.string().datetime().optional(),
 })
 
 const generateSnsSchema = z.object({
@@ -34,6 +35,7 @@ const updateSnsSchema = z.object({
   body: z.string().optional(),
   hashtags: z.string().optional(),
   imageUrl: z.string().optional(),
+  scheduledAt: z.string().datetime().nullable().optional(),
 })
 
 const rejectSchema = z.object({
@@ -55,6 +57,7 @@ snsRoute.get('/sns', async (c) => {
       createdBy: snsContents.createdBy,
       creatorName: users.name,
       publishedUrl: snsContents.publishedUrl,
+      scheduledAt: snsContents.scheduledAt,
       createdAt: snsContents.createdAt,
       updatedAt: snsContents.updatedAt,
     })
@@ -81,6 +84,10 @@ snsRoute.post('/sns', zValidator('json', createSnsSchema), async (c) => {
   const tenant = c.get('tenant')
   const body = c.req.valid('json')
 
+  if (body.scheduledAt && new Date(body.scheduledAt) <= new Date()) {
+    throw new HTTPError(400, '예약 시간은 현재보다 미래여야 합니다', 'SNS_005')
+  }
+
   const [content] = await db
     .insert(snsContents)
     .values({
@@ -91,6 +98,7 @@ snsRoute.post('/sns', zValidator('json', createSnsSchema), async (c) => {
       body: body.body,
       hashtags: body.hashtags,
       imageUrl: body.imageUrl,
+      scheduledAt: body.scheduledAt ? new Date(body.scheduledAt) : null,
       status: 'draft',
     })
     .returning()
@@ -201,6 +209,7 @@ snsRoute.get('/sns/:id', async (c) => {
       publishedUrl: snsContents.publishedUrl,
       publishedAt: snsContents.publishedAt,
       publishError: snsContents.publishError,
+      scheduledAt: snsContents.scheduledAt,
       metadata: snsContents.metadata,
       createdAt: snsContents.createdAt,
       updatedAt: snsContents.updatedAt,
@@ -233,9 +242,21 @@ snsRoute.put('/sns/:id', zValidator('json', updateSnsSchema), async (c) => {
     throw new HTTPError(400, '초안/반려 상태에서만 수정할 수 있습니다', 'SNS_002')
   }
 
+  if (body.scheduledAt && new Date(body.scheduledAt) <= new Date()) {
+    throw new HTTPError(400, '예약 시간은 현재보다 미래여야 합니다', 'SNS_005')
+  }
+
   const [updated] = await db
     .update(snsContents)
-    .set({ ...body, status: 'draft', updatedAt: new Date() })
+    .set({
+      title: body.title,
+      body: body.body,
+      hashtags: body.hashtags,
+      imageUrl: body.imageUrl,
+      ...(body.scheduledAt !== undefined ? { scheduledAt: body.scheduledAt ? new Date(body.scheduledAt) : null } : {}),
+      status: 'draft',
+      updatedAt: new Date(),
+    })
     .where(eq(snsContents.id, id))
     .returning()
 
@@ -285,7 +306,7 @@ snsRoute.post('/sns/:id/approve', async (c) => {
   const id = c.req.param('id')
 
   const [existing] = await db
-    .select({ id: snsContents.id, status: snsContents.status, title: snsContents.title })
+    .select({ id: snsContents.id, status: snsContents.status, title: snsContents.title, scheduledAt: snsContents.scheduledAt })
     .from(snsContents)
     .where(and(eq(snsContents.id, id), eq(snsContents.companyId, tenant.companyId)))
     .limit(1)
@@ -293,10 +314,12 @@ snsRoute.post('/sns/:id/approve', async (c) => {
   if (!existing) throw new HTTPError(404, 'SNS 콘텐츠를 찾을 수 없습니다', 'SNS_001')
   if (existing.status !== 'pending') throw new HTTPError(400, '승인 요청 상태에서만 승인할 수 있습니다', 'SNS_003')
 
+  const newStatus = existing.scheduledAt && existing.scheduledAt > new Date() ? 'scheduled' : 'approved'
+
   const [updated] = await db
     .update(snsContents)
     .set({
-      status: 'approved',
+      status: newStatus,
       reviewedBy: tenant.userId,
       reviewedAt: new Date(),
       updatedAt: new Date(),
@@ -310,7 +333,7 @@ snsRoute.post('/sns/:id/approve', async (c) => {
     phase: 'end',
     actorType: 'user',
     actorId: tenant.userId,
-    action: 'SNS 콘텐츠 승인',
+    action: newStatus === 'scheduled' ? 'SNS 콘텐츠 예약 승인' : 'SNS 콘텐츠 승인',
     detail: existing.title,
   })
 
@@ -414,6 +437,45 @@ snsRoute.post('/sns/:id/publish', async (c) => {
 
     throw new HTTPError(500, errorMsg, 'SNS_004')
   }
+})
+
+// POST /api/workspace/sns/:id/cancel-schedule — 예약 취소 (scheduled → approved, admin만)
+snsRoute.post('/sns/:id/cancel-schedule', async (c) => {
+  const tenant = c.get('tenant')
+  if (tenant.role !== 'admin') throw new HTTPError(403, '관리자만 예약을 취소할 수 있습니다', 'AUTH_003')
+
+  const id = c.req.param('id')
+
+  const [existing] = await db
+    .select({ id: snsContents.id, status: snsContents.status, title: snsContents.title })
+    .from(snsContents)
+    .where(and(eq(snsContents.id, id), eq(snsContents.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!existing) throw new HTTPError(404, 'SNS 콘텐츠를 찾을 수 없습니다', 'SNS_001')
+  if (existing.status !== 'scheduled') throw new HTTPError(400, '예약 상태에서만 취소할 수 있습니다', 'SNS_006')
+
+  const [updated] = await db
+    .update(snsContents)
+    .set({
+      status: 'approved',
+      scheduledAt: null,
+      updatedAt: new Date(),
+    })
+    .where(eq(snsContents.id, id))
+    .returning()
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'sns',
+    phase: 'end',
+    actorType: 'user',
+    actorId: tenant.userId,
+    action: 'SNS 예약 취소',
+    detail: existing.title,
+  })
+
+  return c.json({ data: updated })
 })
 
 // DELETE /api/workspace/sns/:id — 삭제 (draft만)
