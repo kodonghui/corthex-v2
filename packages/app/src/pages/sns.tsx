@@ -63,7 +63,7 @@ export function SnsPage() {
 
   // 생성 폼 상태
   const [form, setForm] = useState({ platform: 'instagram', title: '', body: '', hashtags: '', scheduledAt: '' })
-  const [aiForm, setAiForm] = useState({ platform: 'instagram', agentId: '', topic: '' })
+  const [aiForm, setAiForm] = useState({ platform: 'instagram', agentId: '', topic: '', imagePrompt: '' })
   const [createMode, setCreateMode] = useState<'manual' | 'ai'>('manual')
 
   const { data: listData } = useQuery({
@@ -95,7 +95,10 @@ export function SnsPage() {
   })
 
   const generateAi = useMutation({
-    mutationFn: (data: typeof aiForm) => api.post<{ data: SnsContent }>('/workspace/sns/generate', data),
+    mutationFn: (data: typeof aiForm) => {
+      const payload = { ...data, imagePrompt: data.imagePrompt || undefined }
+      return api.post<{ data: SnsContent; imageGenerationError?: string }>('/workspace/sns/generate-with-image', payload)
+    },
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ['sns'] })
       setSelectedId(res.data.id)
@@ -142,6 +145,20 @@ export function SnsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sns'] })
       queryClient.invalidateQueries({ queryKey: ['sns', selectedId] })
+    },
+  })
+
+  const [imagePromptInput, setImagePromptInput] = useState('')
+  const [showImagePrompt, setShowImagePrompt] = useState(false)
+
+  const generateImage = useMutation({
+    mutationFn: ({ id, imagePrompt }: { id: string; imagePrompt: string }) =>
+      api.post<{ data: SnsContent }>(`/workspace/sns/${id}/generate-image`, { imagePrompt }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sns'] })
+      queryClient.invalidateQueries({ queryKey: ['sns', selectedId] })
+      setShowImagePrompt(false)
+      setImagePromptInput('')
     },
   })
 
@@ -249,6 +266,11 @@ export function SnsPage() {
                 options={agents.map((a) => ({ value: a.id, label: a.name }))} />
               <input value={aiForm.topic} onChange={(e) => setAiForm({ ...aiForm, topic: e.target.value })}
                 placeholder="주제 (예: AI 자동화 마케팅 트렌드)" className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm" />
+              <div>
+                <label className="block text-xs text-zinc-500 mb-1">이미지 설명 (선택)</label>
+                <input value={aiForm.imagePrompt} onChange={(e) => setAiForm({ ...aiForm, imagePrompt: e.target.value })}
+                  placeholder="AI가 생성할 이미지 설명 (예: 미래적인 AI 로봇이 마케팅 회의하는 장면)" className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm" />
+              </div>
               <button onClick={() => generateAi.mutate(aiForm)} disabled={!aiForm.agentId || !aiForm.topic || generateAi.isPending}
                 className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 disabled:opacity-50">
                 {generateAi.isPending ? 'AI 생성 중...' : 'AI로 콘텐츠 생성'}
@@ -272,6 +294,12 @@ export function SnsPage() {
           <div className="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap bg-zinc-50 dark:bg-zinc-800 p-4 rounded-lg">
             {detail.body}
           </div>
+
+          {detail.imageUrl && (
+            <div className="rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-700">
+              <img src={detail.imageUrl} alt={detail.title} className="w-full max-h-96 object-cover" />
+            </div>
+          )}
 
           {detail.hashtags && (
             <p className="text-sm text-indigo-600 dark:text-indigo-400">{detail.hashtags}</p>
@@ -345,6 +373,13 @@ export function SnsPage() {
               </button>
             )}
 
+            {(detail.status === 'draft' || detail.status === 'rejected') && !showImagePrompt && (
+              <button onClick={() => setShowImagePrompt(true)}
+                className="px-3 py-1.5 border border-purple-300 text-purple-600 text-sm rounded-md hover:bg-purple-50 dark:hover:bg-purple-900/30">
+                이미지 생성
+              </button>
+            )}
+
             {detail.status === 'draft' && (
               <button onClick={() => deleteSns.mutate(detail.id)}
                 className="px-3 py-1.5 border border-red-300 text-red-600 text-sm rounded-md hover:bg-red-50 dark:hover:bg-red-900/30">
@@ -352,6 +387,27 @@ export function SnsPage() {
               </button>
             )}
           </div>
+
+          {showImagePrompt && (
+            <div className="flex gap-2 items-end">
+              <div className="flex-1">
+                <label className="block text-xs text-zinc-500 mb-1">이미지 설명</label>
+                <input value={imagePromptInput} onChange={(e) => setImagePromptInput(e.target.value)}
+                  placeholder="AI가 생성할 이미지를 설명하세요"
+                  className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm" />
+              </div>
+              <button
+                onClick={() => generateImage.mutate({ id: detail.id, imagePrompt: imagePromptInput })}
+                disabled={!imagePromptInput || generateImage.isPending}
+                className="px-3 py-2 bg-purple-600 text-white text-sm rounded-md hover:bg-purple-700 disabled:opacity-50">
+                {generateImage.isPending ? '생성 중...' : '생성'}
+              </button>
+              <button onClick={() => { setShowImagePrompt(false); setImagePromptInput('') }}
+                className="px-3 py-2 text-zinc-500 text-sm hover:text-zinc-700">
+                취소
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

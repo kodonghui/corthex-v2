@@ -200,7 +200,7 @@ development_status:
   # ============================================================
   epic-14: in-progress
   14-1-sns-content-planning: done
-  14-2-ai-image-gen-post: backlog
+  14-2-ai-image-gen-post: done
   14-3-sns-analytics: backlog
   14-4-sns-multi-account: backlog
   14-5-ab-test-optimize: backlog

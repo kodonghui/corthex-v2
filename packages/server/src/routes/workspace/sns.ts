@@ -8,6 +8,7 @@ import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { generateAgentResponse } from '../../lib/ai'
 import { publishContent } from '../../lib/sns-publisher'
+import { generateSnsImage } from '../../lib/sns-image-generator'
 import { logActivity } from '../../lib/activity-logger'
 import type { AppEnv } from '../../types'
 
@@ -38,9 +39,26 @@ const updateSnsSchema = z.object({
   scheduledAt: z.string().datetime().nullable().optional(),
 })
 
+const generateWithImageSchema = z.object({
+  platform: z.enum(['instagram', 'tistory', 'daum_cafe']),
+  agentId: z.string().uuid(),
+  topic: z.string().min(1),
+  imagePrompt: z.string().max(4000).optional(),
+})
+
+const generateImageSchema = z.object({
+  imagePrompt: z.string().min(1).max(4000),
+})
+
 const rejectSchema = z.object({
   reason: z.string().min(1),
 })
+
+const PLATFORM_NAMES: Record<string, string> = {
+  instagram: '인스타그램',
+  tistory: '티스토리 블로그',
+  daum_cafe: '다음 카페',
+}
 
 // GET /api/workspace/sns — 내 SNS 콘텐츠 목록
 snsRoute.get('/sns', async (c) => {
@@ -130,13 +148,7 @@ snsRoute.post('/sns/generate', zValidator('json', generateSnsSchema), async (c) 
 
   if (!agent) throw new HTTPError(404, '에이전트를 찾을 수 없습니다', 'AGENT_001')
 
-  const platformNames: Record<string, string> = {
-    instagram: '인스타그램',
-    tistory: '티스토리 블로그',
-    daum_cafe: '다음 카페',
-  }
-
-  const prompt = `${platformNames[platform]}에 게시할 SNS 콘텐츠를 작성해주세요.
+  const prompt = `${PLATFORM_NAMES[platform]}에 게시할 SNS 콘텐츠를 작성해주세요.
 
 주제: ${topic}
 
@@ -184,6 +196,121 @@ snsRoute.post('/sns/generate', zValidator('json', generateSnsSchema), async (c) 
   })
 
   return c.json({ data: content }, 201)
+})
+
+// POST /api/workspace/sns/generate-with-image — AI 텍스트 + 이미지 생성
+snsRoute.post('/sns/generate-with-image', zValidator('json', generateWithImageSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const { platform, agentId, topic, imagePrompt } = c.req.valid('json')
+
+  const [agent] = await db
+    .select({ id: agents.id, name: agents.name })
+    .from(agents)
+    .where(and(eq(agents.id, agentId), eq(agents.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!agent) throw new HTTPError(404, '에이전트를 찾을 수 없습니다', 'AGENT_001')
+
+  const prompt = `${PLATFORM_NAMES[platform]}에 게시할 SNS 콘텐츠를 작성해주세요.
+
+주제: ${topic}
+
+다음 형식으로 작성해주세요:
+제목: [제목]
+본문: [본문 내용]
+해시태그: [#태그1 #태그2 ...]`
+
+  const aiResponse = await generateAgentResponse({
+    agentId,
+    sessionId: '',
+    companyId: tenant.companyId,
+    userMessage: prompt,
+    userId: tenant.userId,
+  })
+
+  const titleMatch = aiResponse.match(/제목:\s*(.+)/)?.[1]?.trim() || topic
+  const bodyMatch = aiResponse.match(/본문:\s*([\s\S]*?)(?=해시태그:|$)/)?.[1]?.trim() || aiResponse
+  const hashtagMatch = aiResponse.match(/해시태그:\s*(.+)/)?.[1]?.trim()
+
+  // 이미지 생성 (부분 실패 허용)
+  let imageUrl: string | null = null
+  let imageGenerationError: string | undefined
+  if (imagePrompt) {
+    const imageResult = await generateSnsImage(imagePrompt, tenant.companyId)
+    imageUrl = imageResult.imageUrl
+    imageGenerationError = imageResult.error
+  }
+
+  const [content] = await db
+    .insert(snsContents)
+    .values({
+      companyId: tenant.companyId,
+      agentId,
+      createdBy: tenant.userId,
+      platform,
+      title: titleMatch,
+      body: bodyMatch,
+      hashtags: hashtagMatch,
+      imageUrl,
+      status: 'draft',
+    })
+    .returning()
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'sns',
+    phase: 'end',
+    actorType: 'agent',
+    actorId: agentId,
+    actorName: agent.name,
+    action: `AI SNS 콘텐츠 생성${imageUrl ? '+이미지' : ''} (${platform})`,
+    detail: titleMatch,
+  })
+
+  return c.json({ data: content, imageGenerationError }, 201)
+})
+
+// POST /api/workspace/sns/:id/generate-image — 기존 콘텐츠에 AI 이미지 생성
+snsRoute.post('/sns/:id/generate-image', zValidator('json', generateImageSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+  const { imagePrompt } = c.req.valid('json')
+
+  const [existing] = await db
+    .select({ id: snsContents.id, status: snsContents.status, createdBy: snsContents.createdBy, title: snsContents.title })
+    .from(snsContents)
+    .where(and(eq(snsContents.id, id), eq(snsContents.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!existing) throw new HTTPError(404, 'SNS 콘텐츠를 찾을 수 없습니다', 'SNS_001')
+  if (existing.createdBy !== tenant.userId) throw new HTTPError(403, '본인만 이미지를 생성할 수 있습니다', 'AUTH_003')
+  if (existing.status !== 'draft' && existing.status !== 'rejected') {
+    throw new HTTPError(400, '초안/반려 상태에서만 이미지를 생성할 수 있습니다', 'SNS_002')
+  }
+
+  const imageResult = await generateSnsImage(imagePrompt, tenant.companyId)
+
+  if (!imageResult.imageUrl) {
+    throw new HTTPError(500, imageResult.error || '이미지 생성에 실패했습니다', 'SNS_007')
+  }
+
+  const [updated] = await db
+    .update(snsContents)
+    .set({ imageUrl: imageResult.imageUrl, updatedAt: new Date() })
+    .where(eq(snsContents.id, id))
+    .returning()
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'sns',
+    phase: 'end',
+    actorType: 'user',
+    actorId: tenant.userId,
+    action: 'SNS AI 이미지 생성',
+    detail: existing.title,
+  })
+
+  return c.json({ data: updated })
 })
 
 // GET /api/workspace/sns/:id — 콘텐츠 상세
