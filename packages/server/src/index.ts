@@ -17,6 +17,7 @@ import { profileRoute } from './routes/workspace/profile'
 import { reportsRoute } from './routes/workspace/reports'
 import { jobsRoute } from './routes/workspace/jobs'
 import { snsRoute } from './routes/workspace/sns'
+import { snsAccountsRoute } from './routes/workspace/sns-accounts'
 import { activityLogRoute } from './routes/workspace/activity-log'
 import { notificationsRoute } from './routes/workspace/notifications'
 import { dashboardRoute } from './routes/workspace/dashboard'
@@ -77,6 +78,7 @@ app.route('/api/workspace', profileRoute)
 app.route('/api/workspace', reportsRoute)
 app.route('/api/workspace/jobs', jobsRoute)
 app.route('/api/workspace', snsRoute)
+app.route('/api/workspace/sns-accounts', snsAccountsRoute)
 app.route('/api/workspace', activityLogRoute)
 app.route('/api/workspace', notificationsRoute)
 app.route('/api/workspace', dashboardRoute)

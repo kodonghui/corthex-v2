@@ -13,6 +13,12 @@ type PublishResult = {
   platformId?: string
 }
 
+type SnsAccountInfo = {
+  accountId: string
+  accountName: string
+  credentials: Record<string, string> | null
+}
+
 type SnsContentInput = {
   id: string
   platform: string
@@ -20,6 +26,7 @@ type SnsContentInput = {
   body: string
   hashtags: string | null
   imageUrl: string | null
+  account?: SnsAccountInfo | null
 }
 
 export async function publishToInstagram(content: SnsContentInput): Promise<PublishResult> {

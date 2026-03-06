@@ -4,6 +4,15 @@ import { api } from '../lib/api'
 import { useAuthStore } from '../stores/auth-store'
 import { Select, Textarea } from '@corthex/ui'
 
+type SnsAccount = {
+  id: string
+  platform: string
+  accountName: string
+  accountId: string
+  isActive: boolean
+  createdAt: string
+}
+
 type SnsContent = {
   id: string
   platform: string
@@ -12,6 +21,8 @@ type SnsContent = {
   hashtags?: string
   imageUrl?: string
   status: string
+  snsAccountId?: string | null
+  accountName?: string | null
   createdBy: string
   creatorName: string
   agentId?: string
@@ -24,6 +35,14 @@ type SnsContent = {
   scheduledAt?: string | null
   createdAt: string
   updatedAt: string
+}
+
+type SnsStats = {
+  total: number
+  byStatus: { status: string; count: number }[]
+  byPlatform: { platform: string; total: number; published: number }[]
+  dailyTrend: { date: string; count: number }[]
+  days: number
 }
 
 type Agent = { id: string; name: string }
@@ -57,14 +76,21 @@ const PLATFORM_LABELS: Record<string, string> = {
 export function SnsPage() {
   const queryClient = useQueryClient()
   const user = useAuthStore((s) => s.user)
-  const [view, setView] = useState<'list' | 'create' | 'detail'>('list')
+  const [view, setView] = useState<'list' | 'create' | 'detail' | 'stats' | 'accounts'>('list')
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [rejectReason, setRejectReason] = useState('')
+  const [accountFilter, setAccountFilter] = useState('')
 
   // 생성 폼 상태
-  const [form, setForm] = useState({ platform: 'instagram', title: '', body: '', hashtags: '', scheduledAt: '' })
+  const [form, setForm] = useState({ platform: 'instagram', title: '', body: '', hashtags: '', scheduledAt: '', snsAccountId: '' })
   const [aiForm, setAiForm] = useState({ platform: 'instagram', agentId: '', topic: '', imagePrompt: '' })
+
+  // 계정 관리 상태
+  const [showAccountModal, setShowAccountModal] = useState(false)
+  const [editingAccount, setEditingAccount] = useState<SnsAccount | null>(null)
+  const [accountForm, setAccountForm] = useState({ platform: 'instagram', accountName: '', accountId: '', credentials: '' })
   const [createMode, setCreateMode] = useState<'manual' | 'ai'>('manual')
+  const [statsDays, setStatsDays] = useState(30)
 
   const { data: listData } = useQuery({
     queryKey: ['sns'],
@@ -82,13 +108,29 @@ export function SnsPage() {
     queryFn: () => api.get<{ data: Agent[] }>('/workspace/agents'),
   })
 
+  const { data: statsData } = useQuery({
+    queryKey: ['sns-stats', statsDays],
+    queryFn: () => api.get<{ data: SnsStats }>(`/workspace/sns/stats?days=${statsDays}`),
+    enabled: view === 'stats',
+  })
+
+  const { data: accountsData } = useQuery({
+    queryKey: ['sns-accounts'],
+    queryFn: () => api.get<{ data: SnsAccount[] }>('/workspace/sns-accounts'),
+  })
+
   const createManual = useMutation({
     mutationFn: (data: typeof form) => {
-      const payload = { ...data, scheduledAt: data.scheduledAt ? new Date(data.scheduledAt).toISOString() : undefined }
+      const payload = {
+        ...data,
+        scheduledAt: data.scheduledAt ? new Date(data.scheduledAt).toISOString() : undefined,
+        snsAccountId: data.snsAccountId || undefined,
+      }
       return api.post<{ data: SnsContent }>('/workspace/sns', payload)
     },
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ['sns'] })
+      queryClient.invalidateQueries({ queryKey: ['sns-stats'] })
       setSelectedId(res.data.id)
       setView('detail')
     },
@@ -101,6 +143,7 @@ export function SnsPage() {
     },
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ['sns'] })
+      queryClient.invalidateQueries({ queryKey: ['sns-stats'] })
       setSelectedId(res.data.id)
       setView('detail')
     },
@@ -111,6 +154,7 @@ export function SnsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sns'] })
       queryClient.invalidateQueries({ queryKey: ['sns', selectedId] })
+      queryClient.invalidateQueries({ queryKey: ['sns-stats'] })
     },
   })
 
@@ -119,6 +163,7 @@ export function SnsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sns'] })
       queryClient.invalidateQueries({ queryKey: ['sns', selectedId] })
+      queryClient.invalidateQueries({ queryKey: ['sns-stats'] })
     },
   })
 
@@ -128,6 +173,7 @@ export function SnsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sns'] })
       queryClient.invalidateQueries({ queryKey: ['sns', selectedId] })
+      queryClient.invalidateQueries({ queryKey: ['sns-stats'] })
       setRejectReason('')
     },
   })
@@ -137,6 +183,7 @@ export function SnsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sns'] })
       queryClient.invalidateQueries({ queryKey: ['sns', selectedId] })
+      queryClient.invalidateQueries({ queryKey: ['sns-stats'] })
     },
   })
 
@@ -145,6 +192,7 @@ export function SnsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sns'] })
       queryClient.invalidateQueries({ queryKey: ['sns', selectedId] })
+      queryClient.invalidateQueries({ queryKey: ['sns-stats'] })
     },
   })
 
@@ -157,6 +205,7 @@ export function SnsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sns'] })
       queryClient.invalidateQueries({ queryKey: ['sns', selectedId] })
+      queryClient.invalidateQueries({ queryKey: ['sns-stats'] })
       setShowImagePrompt(false)
       setImagePromptInput('')
     },
@@ -166,13 +215,42 @@ export function SnsPage() {
     mutationFn: (id: string) => api.delete(`/workspace/sns/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sns'] })
+      queryClient.invalidateQueries({ queryKey: ['sns-stats'] })
       setView('list')
     },
+  })
+
+  const createAccount = useMutation({
+    mutationFn: (data: { platform: string; accountName: string; accountId: string; credentials?: Record<string, string> }) =>
+      api.post('/workspace/sns-accounts', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sns-accounts'] })
+      setShowAccountModal(false)
+      setAccountForm({ platform: 'instagram', accountName: '', accountId: '', credentials: '' })
+    },
+  })
+
+  const updateAccount = useMutation({
+    mutationFn: ({ id, ...data }: { id: string; accountName?: string; accountId?: string; credentials?: Record<string, string> }) =>
+      api.put(`/workspace/sns-accounts/${id}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sns-accounts'] })
+      setShowAccountModal(false)
+      setEditingAccount(null)
+      setAccountForm({ platform: 'instagram', accountName: '', accountId: '', credentials: '' })
+    },
+  })
+
+  const deleteAccount = useMutation({
+    mutationFn: (id: string) => api.delete(`/workspace/sns-accounts/${id}`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['sns-accounts'] }),
   })
 
   const list = listData?.data || []
   const detail = detailData?.data
   const agents = agentsData?.data || []
+  const accounts = accountsData?.data || []
+  const filteredList = accountFilter ? list.filter((i) => i.snsAccountId === accountFilter) : list
 
   return (
     <div className="h-full flex flex-col">
@@ -180,12 +258,22 @@ export function SnsPage() {
       <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
         <h2 className="text-lg font-semibold">SNS 콘텐츠</h2>
         {view === 'list' && (
-          <button
-            onClick={() => { setView('create'); setForm({ platform: 'instagram', title: '', body: '', hashtags: '', scheduledAt: '' }) }}
-            className="px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700"
-          >
-            + 새 콘텐츠
-          </button>
+          <div className="flex gap-2">
+            <button onClick={() => setView('accounts')}
+              className="px-3 py-1.5 border border-zinc-300 dark:border-zinc-600 text-sm rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-800">
+              계정 관리
+            </button>
+            <button onClick={() => setView('stats')}
+              className="px-3 py-1.5 border border-zinc-300 dark:border-zinc-600 text-sm rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-800">
+              통계
+            </button>
+            <button
+              onClick={() => { setView('create'); setForm({ platform: 'instagram', title: '', body: '', hashtags: '', scheduledAt: '', snsAccountId: '' }) }}
+              className="px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700"
+            >
+              + 새 콘텐츠
+            </button>
+          </div>
         )}
         {view !== 'list' && (
           <button onClick={() => setView('list')} className="text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">
@@ -197,15 +285,28 @@ export function SnsPage() {
       {/* 리스트 */}
       {view === 'list' && (
         <div className="px-6 py-4 space-y-3 overflow-y-auto flex-1">
-          {list.length === 0 && <p className="text-sm text-zinc-500">아직 SNS 콘텐츠가 없습니다.</p>}
-          {list.map((item) => (
+          {accounts.length > 0 && (
+            <div className="flex gap-2 items-center mb-2">
+              <span className="text-xs text-zinc-500">계정:</span>
+              <select value={accountFilter} onChange={(e) => setAccountFilter(e.target.value)}
+                className="px-2 py-1 text-xs border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800">
+                <option value="">전체</option>
+                {accounts.map((a) => <option key={a.id} value={a.id}>{a.accountName} ({PLATFORM_LABELS[a.platform]})</option>)}
+              </select>
+            </div>
+          )}
+          {filteredList.length === 0 && <p className="text-sm text-zinc-500">아직 SNS 콘텐츠가 없습니다.</p>}
+          {filteredList.map((item) => (
             <div
               key={item.id}
               onClick={() => { setSelectedId(item.id); setView('detail') }}
               className="p-4 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer"
             >
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-zinc-500">{PLATFORM_LABELS[item.platform] || item.platform}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-zinc-500">{PLATFORM_LABELS[item.platform] || item.platform}</span>
+                  {item.accountName && <span className="text-xs text-indigo-500">@{item.accountName}</span>}
+                </div>
                 <span className={`text-xs px-2 py-0.5 rounded-full ${STATUS_COLORS[item.status]}`}>
                   {STATUS_LABELS[item.status]}
                 </span>
@@ -250,6 +351,18 @@ export function SnsPage() {
                 <input type="datetime-local" value={form.scheduledAt} onChange={(e) => setForm({ ...form, scheduledAt: e.target.value })}
                   className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm" />
               </div>
+              {accounts.length > 0 && (
+                <div>
+                  <label className="block text-xs text-zinc-500 mb-1">발행 계정 (선택)</label>
+                  <select value={form.snsAccountId} onChange={(e) => setForm({ ...form, snsAccountId: e.target.value })}
+                    className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm">
+                    <option value="">계정 미선택</option>
+                    {accounts.filter((a) => a.platform === form.platform).map((a) => (
+                      <option key={a.id} value={a.id}>{a.accountName} ({a.accountId})</option>
+                    ))}
+                  </select>
+                </div>
+              )}
               <button onClick={() => createManual.mutate(form)} disabled={!form.title || !form.body || createManual.isPending}
                 className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 disabled:opacity-50">
                 {createManual.isPending ? '생성 중...' : '콘텐츠 저장'}
@@ -330,6 +443,7 @@ export function SnsPage() {
 
           <p className="text-xs text-zinc-500">
             작성: {detail.creatorName} · {new Date(detail.createdAt).toLocaleString('ko')}
+            {detail.accountName && <> · 계정: <span className="text-indigo-500">@{detail.accountName}</span></>}
           </p>
 
           {/* 액션 버튼 */}
@@ -410,6 +524,189 @@ export function SnsPage() {
           )}
         </div>
       )}
+
+      {/* 계정 관리 */}
+      {view === 'accounts' && (
+        <div className="px-6 py-4 max-w-2xl space-y-4 overflow-y-auto flex-1">
+          <div className="flex justify-between items-center">
+            <h3 className="text-base font-semibold">SNS 계정 관리</h3>
+            <button onClick={() => { setShowAccountModal(true); setEditingAccount(null); setAccountForm({ platform: 'instagram', accountName: '', accountId: '', credentials: '' }) }}
+              className="px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700">
+              + 계정 추가
+            </button>
+          </div>
+
+          {accounts.length === 0 && <p className="text-sm text-zinc-500">등록된 SNS 계정이 없습니다.</p>}
+          {accounts.map((acct) => (
+            <div key={acct.id} className="p-4 border border-zinc-200 dark:border-zinc-700 rounded-lg flex justify-between items-center">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-zinc-500">{PLATFORM_LABELS[acct.platform]}</span>
+                  <span className={`text-xs px-1.5 py-0.5 rounded ${acct.isActive ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : 'bg-zinc-100 text-zinc-500'}`}>
+                    {acct.isActive ? '활성' : '비활성'}
+                  </span>
+                </div>
+                <p className="font-medium text-sm mt-1">{acct.accountName}</p>
+                <p className="text-xs text-zinc-500">{acct.accountId}</p>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => {
+                  setEditingAccount(acct)
+                  setAccountForm({ platform: acct.platform, accountName: acct.accountName, accountId: acct.accountId, credentials: '' })
+                  setShowAccountModal(true)
+                }} className="px-2 py-1 text-xs border border-zinc-300 dark:border-zinc-600 rounded hover:bg-zinc-50 dark:hover:bg-zinc-800">
+                  수정
+                </button>
+                <button onClick={() => { if (confirm('이 계정을 삭제하시겠습니까?')) deleteAccount.mutate(acct.id) }}
+                  className="px-2 py-1 text-xs border border-red-300 text-red-600 rounded hover:bg-red-50 dark:hover:bg-red-900/30">
+                  삭제
+                </button>
+              </div>
+            </div>
+          ))}
+
+          {/* 계정 추가/수정 모달 */}
+          {showAccountModal && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowAccountModal(false)}>
+              <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl max-w-md w-full space-y-4" onClick={(e) => e.stopPropagation()}>
+                <h4 className="text-base font-semibold">{editingAccount ? '계정 수정' : '계정 추가'}</h4>
+                {!editingAccount && (
+                  <Select value={accountForm.platform} onChange={(e) => setAccountForm({ ...accountForm, platform: e.target.value })}
+                    options={[{ value: 'instagram', label: '인스타그램' }, { value: 'tistory', label: '티스토리' }, { value: 'daum_cafe', label: '다음 카페' }]} />
+                )}
+                <input value={accountForm.accountName} onChange={(e) => setAccountForm({ ...accountForm, accountName: e.target.value })}
+                  placeholder="계정 이름 (예: 회사 공식)" className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm" />
+                <input value={accountForm.accountId} onChange={(e) => setAccountForm({ ...accountForm, accountId: e.target.value })}
+                  placeholder="계정 ID (예: @company_official)" className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm" />
+                <div>
+                  <label className="block text-xs text-zinc-500 mb-1">인증 정보 (JSON, 선택)</label>
+                  <input type="password" value={accountForm.credentials}
+                    onChange={(e) => setAccountForm({ ...accountForm, credentials: e.target.value })}
+                    placeholder='{"apiKey": "...", "accessToken": "..."}'
+                    className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm font-mono" />
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <button onClick={() => setShowAccountModal(false)}
+                    className="px-3 py-1.5 text-sm text-zinc-500 hover:text-zinc-700">취소</button>
+                  <button
+                    onClick={() => {
+                      let creds: Record<string, string> | undefined
+                      if (accountForm.credentials) {
+                        try { creds = JSON.parse(accountForm.credentials) } catch { alert('인증 정보 JSON 형식이 올바르지 않습니다'); return }
+                      }
+                      if (editingAccount) {
+                        updateAccount.mutate({ id: editingAccount.id, accountName: accountForm.accountName, accountId: accountForm.accountId, ...(creds ? { credentials: creds } : {}) })
+                      } else {
+                        createAccount.mutate({ platform: accountForm.platform, accountName: accountForm.accountName, accountId: accountForm.accountId, ...(creds ? { credentials: creds } : {}) })
+                      }
+                    }}
+                    disabled={!accountForm.accountName || !accountForm.accountId || createAccount.isPending || updateAccount.isPending}
+                    className="px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 disabled:opacity-50">
+                    {createAccount.isPending || updateAccount.isPending ? '저장 중...' : '저장'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 통계 */}
+      {view === 'stats' && (() => {
+        const stats = statsData?.data
+        if (!stats) return <div className="px-6 py-4 text-sm text-zinc-500">로딩 중...</div>
+        if (stats.total === 0) return <div className="px-6 py-4 text-sm text-zinc-500">아직 SNS 콘텐츠가 없습니다.</div>
+
+        const publishedCount = stats.byStatus.find((s) => s.status === 'published')?.count ?? 0
+        const failedCount = stats.byStatus.find((s) => s.status === 'failed')?.count ?? 0
+        const pendingCount = stats.byStatus
+          .filter((s) => ['pending', 'approved', 'scheduled'].includes(s.status))
+          .reduce((sum, s) => sum + s.count, 0)
+        const successRate = publishedCount + failedCount > 0
+          ? Math.round((publishedCount / (publishedCount + failedCount)) * 100)
+          : 0
+
+        const maxDaily = Math.max(...stats.dailyTrend.map((d) => d.count), 1)
+
+        return (
+          <div className="px-6 py-4 space-y-6 overflow-y-auto flex-1 max-w-4xl">
+            {/* 기간 선택 */}
+            <div className="flex gap-2">
+              {[7, 30, 90].map((d) => (
+                <button key={d} onClick={() => setStatsDays(d)}
+                  className={`px-3 py-1 text-sm rounded ${statsDays === d ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300' : 'text-zinc-500 hover:text-zinc-700'}`}>
+                  {d}일
+                </button>
+              ))}
+            </div>
+
+            {/* 요약 카드 */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { label: '총 콘텐츠', value: stats.total },
+                { label: '발행 완료', value: publishedCount },
+                { label: '성공률', value: `${successRate}%` },
+                { label: '대기 중', value: pendingCount },
+              ].map(({ label, value }) => (
+                <div key={label} className="p-3 bg-zinc-50 dark:bg-zinc-800 rounded-lg text-center">
+                  <p className="text-2xl font-bold">{value}</p>
+                  <p className="text-xs text-zinc-500">{label}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* 상태별 분포 */}
+            <section>
+              <h3 className="text-sm font-semibold text-zinc-500 dark:text-zinc-400 mb-3">상태별 분포</h3>
+              <div className="space-y-2">
+                {stats.byStatus.map((s) => (
+                  <div key={s.status} className="flex items-center gap-3">
+                    <span className={`text-xs px-2 py-0.5 rounded-full w-20 text-center ${STATUS_COLORS[s.status] || ''}`}>
+                      {STATUS_LABELS[s.status] || s.status}
+                    </span>
+                    <div className="flex-1 bg-zinc-100 dark:bg-zinc-800 rounded-full h-4">
+                      <div className="bg-indigo-500 h-4 rounded-full" style={{ width: `${(s.count / stats.total) * 100}%` }} />
+                    </div>
+                    <span className="text-sm font-medium w-8 text-right">{s.count}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* 플랫폼별 분포 */}
+            <section>
+              <h3 className="text-sm font-semibold text-zinc-500 dark:text-zinc-400 mb-3">플랫폼별 분포</h3>
+              <div className="grid grid-cols-3 gap-3">
+                {stats.byPlatform.map((p) => (
+                  <div key={p.platform} className="p-3 border border-zinc-200 dark:border-zinc-700 rounded-lg text-center">
+                    <p className="text-xs text-zinc-500">{PLATFORM_LABELS[p.platform] || p.platform}</p>
+                    <p className="text-xl font-bold mt-1">{p.total}</p>
+                    <p className="text-xs text-green-600 dark:text-green-400">발행 {p.published}건</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* 일별 추이 */}
+            {stats.dailyTrend.length > 0 && (
+              <section>
+                <h3 className="text-sm font-semibold text-zinc-500 dark:text-zinc-400 mb-3">일별 생성 추이</h3>
+                <div className="space-y-1">
+                  {stats.dailyTrend.map((d) => (
+                    <div key={d.date} className="flex items-center gap-2">
+                      <span className="text-xs text-zinc-500 w-24">{d.date}</span>
+                      <div className="flex-1 bg-zinc-100 dark:bg-zinc-800 rounded h-3">
+                        <div className="bg-indigo-500 h-3 rounded" style={{ width: `${(d.count / maxDaily) * 100}%` }} />
+                      </div>
+                      <span className="text-xs font-medium w-6 text-right">{d.count}</span>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+          </div>
+        )
+      })()}
     </div>
   )
 }

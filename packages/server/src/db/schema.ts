@@ -356,11 +356,28 @@ export const nightJobTriggers = pgTable('night_job_triggers', {
   companyIdx: index('night_triggers_company_idx').on(table.companyId),
 }))
 
+// === 19a. sns_accounts — SNS 계정 (멀티 계정 관리) ===
+export const snsAccounts = pgTable('sns_accounts', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  platform: snsPlatformEnum('platform').notNull(),
+  accountName: varchar('account_name', { length: 100 }).notNull(),
+  accountId: varchar('account_id', { length: 200 }).notNull(),
+  credentials: text('credentials'),  // AES-256-GCM 암호화 JSON
+  isActive: boolean('is_active').notNull().default(true),
+  createdBy: uuid('created_by').notNull().references(() => users.id),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('sns_accounts_company_idx').on(table.companyId),
+}))
+
 // === 19. sns_contents — SNS 콘텐츠 ===
 export const snsContents = pgTable('sns_contents', {
   id: uuid('id').primaryKey().defaultRandom(),
   companyId: uuid('company_id').notNull().references(() => companies.id),
   agentId: uuid('agent_id').references(() => agents.id),
+  snsAccountId: uuid('sns_account_id').references(() => snsAccounts.id),
   createdBy: uuid('created_by').notNull().references(() => users.id),
   platform: snsPlatformEnum('platform').notNull(),
   title: varchar('title', { length: 200 }).notNull(),
@@ -669,9 +686,16 @@ export const nightJobTriggersRelations = relations(nightJobTriggers, ({ one, man
   jobs: many(nightJobs),
 }))
 
+export const snsAccountsRelations = relations(snsAccounts, ({ one, many }) => ({
+  company: one(companies, { fields: [snsAccounts.companyId], references: [companies.id] }),
+  creator: one(users, { fields: [snsAccounts.createdBy], references: [users.id] }),
+  contents: many(snsContents),
+}))
+
 export const snsContentsRelations = relations(snsContents, ({ one }) => ({
   company: one(companies, { fields: [snsContents.companyId], references: [companies.id] }),
   agent: one(agents, { fields: [snsContents.agentId], references: [agents.id] }),
+  snsAccount: one(snsAccounts, { fields: [snsContents.snsAccountId], references: [snsAccounts.id] }),
   creator: one(users, { fields: [snsContents.createdBy], references: [users.id] }),
 }))
 

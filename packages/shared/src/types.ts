@@ -66,8 +66,20 @@ export type ChatSession = {
 }
 
 // === SNS ===
-export type SnsStatus = 'draft' | 'pending' | 'approved' | 'rejected' | 'published' | 'failed'
+export type SnsStatus = 'draft' | 'pending' | 'approved' | 'scheduled' | 'rejected' | 'published' | 'failed'
 export type SnsPlatform = 'instagram' | 'tistory' | 'daum_cafe'
+
+export type SnsAccount = {
+  id: string
+  companyId: string
+  platform: SnsPlatform
+  accountName: string
+  accountId: string
+  isActive: boolean
+  createdBy: string
+  createdAt: Date
+  updatedAt: Date
+}
 
 export type SnsContent = {
   id: string
@@ -78,6 +90,7 @@ export type SnsContent = {
   hashtags: string | null
   imageUrl: string | null
   status: SnsStatus
+  snsAccountId?: string | null
   createdBy: string
   createdAt: Date
   updatedAt: Date

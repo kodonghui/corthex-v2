@@ -3,10 +3,11 @@
  */
 
 import { db } from '../db'
-import { snsContents } from '../db/schema'
+import { snsContents, snsAccounts } from '../db/schema'
 import { eq, and, lte } from 'drizzle-orm'
 import { publishContent } from './sns-publisher'
 import { logActivity } from './activity-logger'
+import { decrypt } from './crypto'
 
 const SNS_POLL_INTERVAL_MS = 60_000 // 60초마다 폴링
 
@@ -26,8 +27,13 @@ export async function checkScheduledSns() {
         hashtags: snsContents.hashtags,
         imageUrl: snsContents.imageUrl,
         status: snsContents.status,
+        snsAccountId: snsContents.snsAccountId,
+        accountName: snsAccounts.accountName,
+        accountIdStr: snsAccounts.accountId,
+        accountCredentials: snsAccounts.credentials,
       })
       .from(snsContents)
+      .leftJoin(snsAccounts, eq(snsContents.snsAccountId, snsAccounts.id))
       .where(
         and(
           eq(snsContents.status, 'scheduled'),
@@ -47,6 +53,16 @@ export async function checkScheduledSns() {
 
         if (!locked) continue // 이미 다른 폴링에서 처리됨
 
+        // 계정 정보 준비
+        let accountInfo = null
+        if (post.snsAccountId && post.accountName) {
+          let creds = null
+          if (post.accountCredentials) {
+            try { creds = JSON.parse(await decrypt(post.accountCredentials)) } catch { /* ignore */ }
+          }
+          accountInfo = { accountId: post.accountIdStr || '', accountName: post.accountName, credentials: creds }
+        }
+
         const result = await publishContent({
           id: post.id,
           platform: post.platform,
@@ -54,6 +70,7 @@ export async function checkScheduledSns() {
           body: post.body,
           hashtags: post.hashtags,
           imageUrl: post.imageUrl,
+          account: accountInfo,
         })
 
         await db

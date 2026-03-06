@@ -1,9 +1,9 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { eq, and, desc } from 'drizzle-orm'
+import { eq, and, desc, gte, sql, count } from 'drizzle-orm'
 import { db } from '../../db'
-import { snsContents, users, agents } from '../../db/schema'
+import { snsContents, snsAccounts, users, agents } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { generateAgentResponse } from '../../lib/ai'
@@ -23,6 +23,7 @@ const createSnsSchema = z.object({
   hashtags: z.string().optional(),
   imageUrl: z.string().optional(),
   scheduledAt: z.string().datetime().optional(),
+  snsAccountId: z.string().uuid().optional(),
 })
 
 const generateSnsSchema = z.object({
@@ -65,13 +66,21 @@ snsRoute.get('/sns', async (c) => {
   const tenant = c.get('tenant')
   const platform = c.req.query('platform')
   const status = c.req.query('status')
+  const accountId = c.req.query('accountId')
 
-  let query = db
+  const conditions = [eq(snsContents.companyId, tenant.companyId)]
+  if (platform) conditions.push(eq(snsContents.platform, platform as 'instagram' | 'tistory' | 'daum_cafe'))
+  if (status) conditions.push(eq(snsContents.status, status as 'draft' | 'pending' | 'approved' | 'scheduled' | 'rejected' | 'published' | 'failed'))
+  if (accountId) conditions.push(eq(snsContents.snsAccountId, accountId))
+
+  const result = await db
     .select({
       id: snsContents.id,
       platform: snsContents.platform,
       title: snsContents.title,
       status: snsContents.status,
+      snsAccountId: snsContents.snsAccountId,
+      accountName: snsAccounts.accountName,
       createdBy: snsContents.createdBy,
       creatorName: users.name,
       publishedUrl: snsContents.publishedUrl,
@@ -81,20 +90,65 @@ snsRoute.get('/sns', async (c) => {
     })
     .from(snsContents)
     .innerJoin(users, eq(snsContents.createdBy, users.id))
-    .where(eq(snsContents.companyId, tenant.companyId))
+    .leftJoin(snsAccounts, eq(snsContents.snsAccountId, snsAccounts.id))
+    .where(and(...conditions))
     .orderBy(desc(snsContents.updatedAt))
-    .$dynamic()
 
-  const result = await query
+  return c.json({ data: result })
+})
 
-  // 클라이언트 필터링 (간단하게)
-  const filtered = result.filter((r) => {
-    if (platform && r.platform !== platform) return false
-    if (status && r.status !== status) return false
-    return true
+// GET /api/workspace/sns/stats — SNS 통계
+snsRoute.get('/sns/stats', async (c) => {
+  const tenant = c.get('tenant')
+  const rawDays = Number(c.req.query('days')) || 30
+  const days = Math.min(Math.max(rawDays, 1), 365)
+  const since = new Date(Date.now() - days * 86400000)
+
+  const baseWhere = and(
+    eq(snsContents.companyId, tenant.companyId),
+    gte(snsContents.createdAt, since),
+  )
+
+  const [totalResult, byStatusResult, byPlatformResult, dailyTrendResult] = await Promise.all([
+    // 총 건수
+    db.select({ count: count() }).from(snsContents).where(baseWhere),
+
+    // 상태별 분포
+    db.select({ status: snsContents.status, count: count() })
+      .from(snsContents)
+      .where(baseWhere)
+      .groupBy(snsContents.status),
+
+    // 플랫폼별 분포 (전체 + published)
+    db.select({
+      platform: snsContents.platform,
+      total: count(),
+      published: sql<number>`count(*) filter (where ${snsContents.status} = 'published')`,
+    })
+      .from(snsContents)
+      .where(baseWhere)
+      .groupBy(snsContents.platform),
+
+    // 일별 생성 추이
+    db.select({
+      date: sql<string>`to_char(${snsContents.createdAt}, 'YYYY-MM-DD')`,
+      count: count(),
+    })
+      .from(snsContents)
+      .where(baseWhere)
+      .groupBy(sql`to_char(${snsContents.createdAt}, 'YYYY-MM-DD')`)
+      .orderBy(sql`to_char(${snsContents.createdAt}, 'YYYY-MM-DD')`),
+  ])
+
+  return c.json({
+    data: {
+      total: totalResult[0]?.count ?? 0,
+      byStatus: byStatusResult.map((r) => ({ status: r.status, count: r.count })),
+      byPlatform: byPlatformResult.map((r) => ({ platform: r.platform, total: r.total, published: Number(r.published) })),
+      dailyTrend: dailyTrendResult.map((r) => ({ date: r.date, count: r.count })),
+      days,
+    },
   })
-
-  return c.json({ data: filtered })
 })
 
 // POST /api/workspace/sns — 수동 콘텐츠 생성
@@ -104,6 +158,14 @@ snsRoute.post('/sns', zValidator('json', createSnsSchema), async (c) => {
 
   if (body.scheduledAt && new Date(body.scheduledAt) <= new Date()) {
     throw new HTTPError(400, '예약 시간은 현재보다 미래여야 합니다', 'SNS_005')
+  }
+
+  // snsAccountId 유효성 검증
+  if (body.snsAccountId) {
+    const [acct] = await db.select({ id: snsAccounts.id }).from(snsAccounts)
+      .where(and(eq(snsAccounts.id, body.snsAccountId), eq(snsAccounts.companyId, tenant.companyId)))
+      .limit(1)
+    if (!acct) throw new HTTPError(400, 'SNS 계정을 찾을 수 없습니다', 'SNS_ACCOUNT_001')
   }
 
   const [content] = await db
@@ -116,6 +178,7 @@ snsRoute.post('/sns', zValidator('json', createSnsSchema), async (c) => {
       body: body.body,
       hashtags: body.hashtags,
       imageUrl: body.imageUrl,
+      snsAccountId: body.snsAccountId || null,
       scheduledAt: body.scheduledAt ? new Date(body.scheduledAt) : null,
       status: 'draft',
     })
@@ -327,6 +390,8 @@ snsRoute.get('/sns/:id', async (c) => {
       hashtags: snsContents.hashtags,
       imageUrl: snsContents.imageUrl,
       status: snsContents.status,
+      snsAccountId: snsContents.snsAccountId,
+      accountName: snsAccounts.accountName,
       createdBy: snsContents.createdBy,
       creatorName: users.name,
       agentId: snsContents.agentId,
@@ -343,6 +408,7 @@ snsRoute.get('/sns/:id', async (c) => {
     })
     .from(snsContents)
     .innerJoin(users, eq(snsContents.createdBy, users.id))
+    .leftJoin(snsAccounts, eq(snsContents.snsAccountId, snsAccounts.id))
     .where(and(eq(snsContents.id, id), eq(snsContents.companyId, tenant.companyId)))
     .limit(1)
 
