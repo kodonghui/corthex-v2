@@ -15,6 +15,7 @@ const CompaniesPage = lazy(() => import('./pages/companies').then((m) => ({ defa
 const ToolsPage = lazy(() => import('./pages/tools').then((m) => ({ default: m.ToolsPage })))
 const ReportLinesPage = lazy(() => import('./pages/report-lines').then((m) => ({ default: m.ReportLinesPage })))
 const SoulTemplatesPage = lazy(() => import('./pages/soul-templates').then((m) => ({ default: m.SoulTemplatesPage })))
+const MonitoringPage = lazy(() => import('./pages/monitoring').then((m) => ({ default: m.MonitoringPage })))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -79,6 +80,7 @@ export function App() {
             <Route path="tools" element={<Suspense fallback={<PageSkeleton />}><ToolsPage /></Suspense>} />
             <Route path="report-lines" element={<Suspense fallback={<PageSkeleton />}><ReportLinesPage /></Suspense>} />
             <Route path="soul-templates" element={<Suspense fallback={<PageSkeleton />}><SoulTemplatesPage /></Suspense>} />
+            <Route path="monitoring" element={<Suspense fallback={<PageSkeleton />}><MonitoringPage /></Suspense>} />
           </Route>
         </Routes>
       </BrowserRouter>

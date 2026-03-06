@@ -12,6 +12,7 @@ import { credentialsRoute } from './routes/admin/credentials'
 import { toolsRoute } from './routes/admin/tools'
 import { reportLinesRoute } from './routes/admin/report-lines'
 import { soulTemplatesRoute } from './routes/admin/soul-templates'
+import { monitoringRoute } from './routes/admin/monitoring'
 import { workspaceAgentsRoute } from './routes/workspace/agents'
 import { chatRoute } from './routes/workspace/chat'
 import { profileRoute } from './routes/workspace/profile'
@@ -73,6 +74,7 @@ app.route('/api/admin', credentialsRoute)
 app.route('/api/admin', toolsRoute)
 app.route('/api/admin', reportLinesRoute)
 app.route('/api/admin', soulTemplatesRoute)
+app.route('/api/admin', monitoringRoute)
 
 // 유저 워크스페이스 라우트 (각 파일 내부에서 authMiddleware 적용, 테넌트 격리)
 app.route('/api/workspace', workspaceAgentsRoute)
