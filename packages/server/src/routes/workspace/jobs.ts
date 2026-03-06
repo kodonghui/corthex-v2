@@ -207,29 +207,33 @@ jobsRoute.post('/chain', zValidator('json', chainJobSchema), async (c) => {
   }
 
   const chainId = randomUUID()
-  const createdJobs = []
-  let previousJobId: string | null = null
 
-  for (let i = 0; i < steps.length; i++) {
-    const step = steps[i]
-    const [job] = await db
-      .insert(nightJobs)
-      .values({
-        companyId: tenant.companyId,
-        userId: tenant.userId,
-        agentId: step.agentId,
-        instruction: step.instruction,
-        status: i === 0 ? 'queued' : 'blocked',
-        scheduledFor: new Date(),
-        maxRetries: 3,
-        chainId,
-        parentJobId: previousJobId,
-      })
-      .returning()
+  const createdJobs = await db.transaction(async (tx) => {
+    const jobs = []
+    let previousJobId: string | null = null
 
-    createdJobs.push(job)
-    previousJobId = job.id
-  }
+    for (let i = 0; i < steps.length; i++) {
+      const step = steps[i]
+      const [job] = await tx
+        .insert(nightJobs)
+        .values({
+          companyId: tenant.companyId,
+          userId: tenant.userId,
+          agentId: step.agentId,
+          instruction: step.instruction,
+          status: i === 0 ? 'queued' : 'blocked',
+          scheduledFor: new Date(),
+          maxRetries: 3,
+          chainId,
+          parentJobId: previousJobId,
+        })
+        .returning()
+
+      jobs.push(job)
+      previousJobId = job.id
+    }
+    return jobs
+  })
 
   console.log(`🔗 체인 작업 등록: ${chainId} (${steps.length}단계)`)
   return c.json({ data: createdJobs }, 201)

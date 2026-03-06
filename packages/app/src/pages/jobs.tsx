@@ -210,17 +210,18 @@ export function JobsPage() {
 
   const wsHandler = useCallback((data: unknown) => {
     const event = data as { type: string; jobId?: string; progress?: number; statusMessage?: string }
-    if (event.type === 'job-progress' && event.jobId) {
+    const jobId = event.jobId
+    if (event.type === 'job-progress' && jobId) {
       setJobProgress(prev => {
         // 첫 progress 이벤트 시 query 갱신 (processing 상태 반영)
-        if (!prev[event.jobId!]) queryClient.invalidateQueries({ queryKey: ['night-jobs'] })
+        if (!prev[jobId]) queryClient.invalidateQueries({ queryKey: ['night-jobs'] })
         return {
           ...prev,
-          [event.jobId!]: { progress: event.progress || 0, statusMessage: event.statusMessage || '' },
+          [jobId]: { progress: event.progress || 0, statusMessage: event.statusMessage || '' },
         }
       })
     } else if (event.type === 'job-completed' || event.type === 'job-failed') {
-      if (event.jobId) setJobProgress(prev => { const next = { ...prev }; delete next[event.jobId!]; return next })
+      if (jobId) setJobProgress(prev => { const next = { ...prev }; delete next[jobId]; return next })
       queryClient.invalidateQueries({ queryKey: ['night-jobs'] })
       queryClient.invalidateQueries({ queryKey: ['job-notifications'] })
     } else if (event.type === 'job-retrying' || event.type === 'job-queued' || event.type === 'chain-failed') {

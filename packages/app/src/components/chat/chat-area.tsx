@@ -77,7 +77,8 @@ export function ChatArea({
   const prevConnected = useRef(true)
   const prevScrollHeightRef = useRef(0)
   const { isConnected } = useWsStore()
-  const { streamingText, isStreaming, toolCalls, error, delegationStatus, startStream, stopStream, clearError } = useChatStream(sessionId)
+  const { streamingText, isStreaming, toolCalls, error, delegationStatus, delegationStatuses, delegationChain, startStream, stopStream, clearError } = useChatStream(sessionId)
+  const [chainExpanded, setChainExpanded] = useState(false)
 
   const {
     data: messagesData,
@@ -136,6 +137,11 @@ export function ChatArea({
       sendMessage.mutate(lastUserMsg.content)
     }
   }
+
+  // 체인 해제 시 펼침 상태 초기화
+  useEffect(() => {
+    if (!delegationChain) setChainExpanded(false)
+  }, [delegationChain])
 
   // 자동 스크롤 (새 메시지/스트리밍 시 하단으로)
   useEffect(() => {
@@ -284,13 +290,65 @@ export function ChatArea({
               )}
             </div>
             <p className="text-xs text-zinc-400">
-              {delegationStatus?.status === 'delegating' ? (
-                <span className="text-indigo-500 dark:text-indigo-400 animate-pulse">
-                  → {delegationStatus.targetAgentName}에게 위임 중...
-                </span>
-              ) : (
-                agent.role
-              )}
+              {(() => {
+                // 우선순위 1: delegation-chain (연쇄 위임)
+                if (delegationChain && delegationChain.length >= 3) {
+                  if (chainExpanded) {
+                    return (
+                      <span className="text-indigo-500 dark:text-indigo-400">
+                        <button onClick={() => setChainExpanded(false)} className="hover:underline">
+                          🔀 {delegationChain.join(' → ')}
+                        </button>
+                        <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 ml-4">
+                          현재 활성: {delegationChain[delegationChain.length - 1]}
+                        </span>
+                      </span>
+                    )
+                  }
+                  return (
+                    <button
+                      onClick={() => setChainExpanded(true)}
+                      className="text-indigo-500 dark:text-indigo-400 animate-pulse hover:underline"
+                    >
+                      🔀 {delegationChain.length - 1}단계 위임 중 ▾
+                    </button>
+                  )
+                }
+                if (delegationChain && delegationChain.length === 2) {
+                  return (
+                    <span className="text-indigo-500 dark:text-indigo-400 animate-pulse">
+                      {delegationChain[1]}에게 위임 중...
+                    </span>
+                  )
+                }
+                // 우선순위 2: delegationStatuses (병렬 위임)
+                const entries = Object.values(delegationStatuses)
+                const total = entries.length
+                const completed = entries.filter(s => s.status !== 'delegating').length
+                const delegating = entries.filter(s => s.status === 'delegating')
+                if (total > 1 && completed < total) {
+                  return (
+                    <span className="text-indigo-500 dark:text-indigo-400 animate-pulse">
+                      → {total}개 부서 위임 중 ({completed}/{total} 완료)
+                    </span>
+                  )
+                }
+                if (total > 1 && completed === total) {
+                  return (
+                    <span className="text-green-500 dark:text-green-400">
+                      ✓ {total}개 부서 위임 완료
+                    </span>
+                  )
+                }
+                if (delegating.length === 1) {
+                  return (
+                    <span className="text-indigo-500 dark:text-indigo-400 animate-pulse">
+                      → {delegating[0].targetAgentName}에게 위임 중...
+                    </span>
+                  )
+                }
+                return agent.role
+              })()}
             </p>
           </div>
         </div>
@@ -485,9 +543,17 @@ export function ChatArea({
                     </div>
                     {agent.isSecretary && (
                       <span className="text-xs text-zinc-400">
-                        {delegationStatus?.targetAgentName
-                          ? `${delegationStatus.targetAgentName}에게 위임 중...`
-                          : '부서 위임 분석 중...'}
+                        {(() => {
+                          if (delegationChain && delegationChain.length >= 2) {
+                            return `🔀 ${delegationChain.join(' → ')}`
+                          }
+                          const entries = Object.values(delegationStatuses)
+                          const total = entries.length
+                          const completed = entries.filter(s => s.status !== 'delegating').length
+                          if (total > 1) return `${total}개 부서 위임 중 (${completed}/${total} 완료)`
+                          if (delegationStatus?.targetAgentName) return `${delegationStatus.targetAgentName}에게 위임 중...`
+                          return '부서 위임 분석 중...'
+                        })()}
                       </span>
                     )}
                   </div>

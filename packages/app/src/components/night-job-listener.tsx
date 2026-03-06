@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useWsStore } from '../stores/ws-store'
 import { useAuthStore } from '../stores/auth-store'
@@ -12,6 +12,8 @@ export function NightJobListener() {
   const { subscribe, addListener, removeListener, isConnected } = useWsStore()
   const user = useAuthStore((s) => s.user)
   const location = useLocation()
+  const pathnameRef = useRef(location.pathname)
+  pathnameRef.current = location.pathname
 
   useEffect(() => {
     if (!isConnected || !user) return
@@ -23,7 +25,7 @@ export function NightJobListener() {
       const event = data as { type: string; jobId?: string; instruction?: string }
 
       // /jobs 페이지에서는 토스트 비활성화 (카드에서 직접 확인 가능)
-      if (location.pathname.startsWith('/jobs')) return
+      if (pathnameRef.current.startsWith('/jobs')) return
 
       const label = event.instruction ? event.instruction.slice(0, 30) : ''
 
@@ -36,7 +38,7 @@ export function NightJobListener() {
 
     addListener(channelKey, handler)
     return () => removeListener(channelKey, handler)
-  }, [isConnected, user, subscribe, addListener, removeListener, location.pathname])
+  }, [isConnected, user, subscribe, addListener, removeListener])
 
   return null
 }
