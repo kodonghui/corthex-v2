@@ -488,9 +488,22 @@ export const messengerMessages = pgTable('messenger_messages', {
   companyId: uuid('company_id').notNull().references(() => companies.id),
   channelId: uuid('channel_id').notNull().references(() => messengerChannels.id),
   userId: uuid('user_id').notNull().references(() => users.id),
+  parentMessageId: uuid('parent_message_id'),
   content: text('content').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
+
+// === 25a. messenger_reactions — 메시지 리액션 ===
+export const messengerReactions = pgTable('messenger_reactions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  messageId: uuid('message_id').notNull().references(() => messengerMessages.id),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  emoji: varchar('emoji', { length: 20 }).notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  uniqueReaction: unique('messenger_reactions_unique').on(table.messageId, table.userId, table.emoji),
+}))
 
 // === 26. files — 파일 메타데이터 ===
 export const files = pgTable('files', {
@@ -748,10 +761,17 @@ export const messengerMembersRelations = relations(messengerMembers, ({ one }) =
   user: one(users, { fields: [messengerMembers.userId], references: [users.id] }),
 }))
 
-export const messengerMessagesRelations = relations(messengerMessages, ({ one }) => ({
+export const messengerMessagesRelations = relations(messengerMessages, ({ one, many }) => ({
   company: one(companies, { fields: [messengerMessages.companyId], references: [companies.id] }),
   channel: one(messengerChannels, { fields: [messengerMessages.channelId], references: [messengerChannels.id] }),
   user: one(users, { fields: [messengerMessages.userId], references: [users.id] }),
+  reactions: many(messengerReactions),
+}))
+
+export const messengerReactionsRelations = relations(messengerReactions, ({ one }) => ({
+  company: one(companies, { fields: [messengerReactions.companyId], references: [companies.id] }),
+  message: one(messengerMessages, { fields: [messengerReactions.messageId], references: [messengerMessages.id] }),
+  user: one(users, { fields: [messengerReactions.userId], references: [users.id] }),
 }))
 
 export const filesRelations = relations(files, ({ one }) => ({

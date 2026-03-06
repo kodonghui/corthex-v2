@@ -13,12 +13,21 @@ type Channel = {
   lastMessage: { content: string; userName: string; createdAt: string } | null
 }
 
+type ReactionGroup = {
+  emoji: string
+  count: number
+  userIds: string[]
+}
+
 type Message = {
   id: string
   userId: string
   userName: string
   content: string
+  parentMessageId?: string | null
   createdAt: string
+  replyCount?: number
+  reactions?: ReactionGroup[]
 }
 
 type CompanyUser = {
@@ -48,6 +57,8 @@ type AgentInfo = {
   name: string
   role: string | null
 }
+
+const EMOJI_LIST = ['👍', '❤️', '😂', '😮', '👏', '🔥']
 
 function formatTime(dateStr: string) {
   const d = new Date(dateStr)
@@ -181,7 +192,6 @@ function ChannelSettingsModal({
         </div>
 
         <div className="p-4 space-y-4">
-          {/* 채널 정보 수정 */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-zinc-600 dark:text-zinc-400">채널 이름</label>
             <input
@@ -207,7 +217,6 @@ function ChannelSettingsModal({
             {updateChannel.isPending ? '저장 중...' : '저장'}
           </button>
 
-          {/* 멤버 관리 */}
           <div className="border-t border-zinc-200 dark:border-zinc-700 pt-4">
             <h4 className="text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-2">
               멤버 ({members.length}명)
@@ -231,7 +240,6 @@ function ChannelSettingsModal({
               ))}
             </div>
 
-            {/* 멤버 추가 */}
             <div className="mt-2">
               <input
                 value={memberSearch}
@@ -255,7 +263,6 @@ function ChannelSettingsModal({
             </div>
           </div>
 
-          {/* 나가기 + 삭제 */}
           <div className="border-t border-zinc-200 dark:border-zinc-700 pt-4 space-y-2">
             <button
               onClick={handleLeave}
@@ -280,6 +287,190 @@ function ChannelSettingsModal({
   )
 }
 
+function ThreadPanel({
+  channelId,
+  parentMessage,
+  userId,
+  onClose,
+}: {
+  channelId: string
+  parentMessage: Message
+  userId: string
+  onClose: () => void
+}) {
+  const queryClient = useQueryClient()
+  const [replyText, setReplyText] = useState('')
+  const repliesEndRef = useRef<HTMLDivElement>(null)
+  const { addListener, removeListener, isConnected } = useWsStore()
+
+  const { data: threadData } = useQuery({
+    queryKey: ['messenger-thread', channelId, parentMessage.id],
+    queryFn: () => api.get<{ data: Message[] }>(`/workspace/messenger/channels/${channelId}/messages/${parentMessage.id}/thread`),
+    refetchInterval: isConnected ? false : 30000,
+  })
+
+  const replies = threadData?.data || []
+
+  // WebSocket으로 스레드 답글 실시간 수신
+  useEffect(() => {
+    if (!isConnected) return
+
+    const handler = (data: unknown) => {
+      const event = data as { type: string; message?: Message; messageId?: string; reactions?: ReactionGroup[] }
+      if (event.type === 'new-message' && event.message?.parentMessageId === parentMessage.id) {
+        queryClient.setQueryData(
+          ['messenger-thread', channelId, parentMessage.id],
+          (old: { data: Message[] } | undefined) => {
+            const existing = old?.data || []
+            if (existing.some((m) => m.id === event.message!.id)) return old
+            return { data: [...existing, { ...event.message!, reactions: [] }] }
+          },
+        )
+        // 메인 채널의 replyCount도 갱신
+        queryClient.invalidateQueries({ queryKey: ['messenger-messages', channelId] })
+      }
+      if (event.type === 'reaction-update' && event.messageId) {
+        queryClient.setQueryData(
+          ['messenger-thread', channelId, parentMessage.id],
+          (old: { data: Message[] } | undefined) => {
+            if (!old) return old
+            return {
+              data: old.data.map((m) =>
+                m.id === event.messageId ? { ...m, reactions: event.reactions || [] } : m,
+              ),
+            }
+          },
+        )
+      }
+    }
+
+    const channelKey = `messenger::${channelId}`
+    addListener(channelKey, handler)
+    return () => removeListener(channelKey, handler)
+  }, [isConnected, channelId, parentMessage.id, addListener, removeListener, queryClient])
+
+  useEffect(() => {
+    repliesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [replies.length])
+
+  const sendReply = useMutation({
+    mutationFn: (content: string) =>
+      api.post(`/workspace/messenger/channels/${channelId}/messages`, { content, parentMessageId: parentMessage.id }),
+    onSuccess: () => setReplyText(''),
+  })
+
+  const addReaction = useMutation({
+    mutationFn: ({ msgId, emoji }: { msgId: string; emoji: string }) =>
+      api.post(`/workspace/messenger/channels/${channelId}/messages/${msgId}/reactions`, { emoji }),
+  })
+
+  const removeReaction = useMutation({
+    mutationFn: ({ msgId, emoji }: { msgId: string; emoji: string }) =>
+      api.delete(`/workspace/messenger/channels/${channelId}/messages/${msgId}/reactions/${encodeURIComponent(emoji)}`),
+  })
+
+  const toggleReaction = (msgId: string, emoji: string, myReaction: boolean) => {
+    if (myReaction) removeReaction.mutate({ msgId, emoji })
+    else addReaction.mutate({ msgId, emoji })
+  }
+
+  return (
+    <div className="w-80 border-l border-zinc-200 dark:border-zinc-800 flex flex-col bg-white dark:bg-zinc-950">
+      <div className="px-3 py-2 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+        <span className="text-sm font-medium">스레드</span>
+        <button onClick={onClose} className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 text-sm">✕</button>
+      </div>
+
+      {/* 원본 메시지 */}
+      <div className="px-3 py-2 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900">
+        <p className="text-xs text-zinc-500 mb-0.5">{parentMessage.userName}</p>
+        <p className="text-sm">{parentMessage.content}</p>
+        <p className="text-xs text-zinc-400 mt-0.5">{formatTime(parentMessage.createdAt)}</p>
+      </div>
+
+      {/* 답글 목록 */}
+      <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2">
+        {replies.length === 0 && (
+          <p className="text-xs text-zinc-400 text-center mt-4">아직 답글이 없습니다.</p>
+        )}
+        {replies.map((reply) => {
+          const isMe = reply.userId === userId
+          return (
+            <div key={reply.id} className="group">
+              <div className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                <div className="max-w-[85%]">
+                  {!isMe && <p className="text-xs text-zinc-500 mb-0.5">{reply.userName}</p>}
+                  <div className={`px-2.5 py-1.5 rounded-lg text-sm ${
+                    isMe ? 'bg-indigo-600 text-white' : 'bg-zinc-100 dark:bg-zinc-800'
+                  }`}>
+                    {reply.content}
+                  </div>
+                  {/* 리액션 배지 */}
+                  {reply.reactions && reply.reactions.length > 0 && (
+                    <div className="flex gap-1 mt-0.5 flex-wrap">
+                      {reply.reactions.map((r) => (
+                        <button
+                          key={r.emoji}
+                          onClick={() => toggleReaction(reply.id, r.emoji, r.userIds.includes(userId))}
+                          className={`text-xs px-1.5 py-0.5 rounded-full border ${
+                            r.userIds.includes(userId)
+                              ? 'border-indigo-400 bg-indigo-50 dark:bg-indigo-950'
+                              : 'border-zinc-200 dark:border-zinc-700'
+                          }`}
+                        >
+                          {r.emoji} {r.count}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-xs text-zinc-400 mt-0.5">{formatTime(reply.createdAt)}</p>
+                </div>
+              </div>
+              {/* 호버 시 이모지 추가 */}
+              <div className="hidden group-hover:flex gap-0.5 mt-0.5">
+                {EMOJI_LIST.map((e) => (
+                  <button
+                    key={e}
+                    onClick={() => toggleReaction(reply.id, e, reply.reactions?.some((r) => r.emoji === e && r.userIds.includes(userId)) || false)}
+                    className="text-xs hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded px-0.5"
+                  >
+                    {e}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )
+        })}
+        <div ref={repliesEndRef} />
+      </div>
+
+      {/* 답글 입력 */}
+      <div className="px-3 py-2 border-t border-zinc-200 dark:border-zinc-800">
+        <div className="flex gap-1.5">
+          <input
+            value={replyText}
+            onChange={(e) => setReplyText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey && replyText.trim()) {
+                sendReply.mutate(replyText.trim())
+              }
+            }}
+            placeholder="답글..."
+            className="flex-1 px-2.5 py-1.5 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm"
+          />
+          <button
+            onClick={() => replyText.trim() && sendReply.mutate(replyText.trim())}
+            disabled={!replyText.trim() || sendReply.isPending}
+            className="px-3 py-1.5 bg-indigo-600 text-white text-xs rounded-md hover:bg-indigo-700 disabled:opacity-50"
+          >
+            전송
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function MessengerPage() {
   const queryClient = useQueryClient()
   const user = useAuthStore((s) => s.user)
@@ -292,6 +483,9 @@ export function MessengerPage() {
   const [typingAgent, setTypingAgent] = useState<string | null>(null)
   const [showMention, setShowMention] = useState(false)
   const [mentionSearch, setMentionSearch] = useState('')
+  const [threadMessage, setThreadMessage] = useState<Message | null>(null)
+  const [hoveredMsgId, setHoveredMsgId] = useState<string | null>(null)
+  const [showEmojiPicker, setShowEmojiPicker] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -317,24 +511,53 @@ export function MessengerPage() {
     subscribe('messenger', { id: selectedChannel })
 
     const handler = (data: unknown) => {
-      const event = data as { type: string; message?: Message; agentName?: string }
+      const event = data as { type: string; message?: Message; agentName?: string; messageId?: string; reactions?: ReactionGroup[] }
       if (event.type === 'new-message' && event.message) {
-        // React Query 캐시에 optimistic append (중복 방지)
-        queryClient.setQueryData(
-          ['messenger-messages', selectedChannel],
-          (old: { data: Message[] } | undefined) => {
-            const existing = old?.data || []
-            if (existing.some((m) => m.id === event.message!.id)) return old
-            return { data: [...existing, event.message!] }
-          },
-        )
-        // 채널 목록 lastMessage 갱신
+        // 스레드 답글은 메인 목록에 추가하지 않음 (ThreadPanel에서 처리)
+        if (!event.message.parentMessageId) {
+          queryClient.setQueryData(
+            ['messenger-messages', selectedChannel],
+            (old: { data: Message[] } | undefined) => {
+              const existing = old?.data || []
+              if (existing.some((m) => m.id === event.message!.id)) return old
+              return { data: [...existing, { ...event.message!, replyCount: 0, reactions: [] }] }
+            },
+          )
+        } else {
+          // 스레드 답글이면 메인 메시지의 replyCount 갱신
+          queryClient.setQueryData(
+            ['messenger-messages', selectedChannel],
+            (old: { data: Message[] } | undefined) => {
+              if (!old) return old
+              return {
+                data: old.data.map((m) =>
+                  m.id === event.message!.parentMessageId
+                    ? { ...m, replyCount: (m.replyCount || 0) + 1 }
+                    : m,
+                ),
+              }
+            },
+          )
+        }
         queryClient.invalidateQueries({ queryKey: ['messenger-channels'] })
       }
       if (event.type === 'typing' && event.agentName) {
         setTypingAgent(event.agentName)
         if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
         typingTimeoutRef.current = setTimeout(() => setTypingAgent(null), 3000)
+      }
+      if (event.type === 'reaction-update' && event.messageId) {
+        queryClient.setQueryData(
+          ['messenger-messages', selectedChannel],
+          (old: { data: Message[] } | undefined) => {
+            if (!old) return old
+            return {
+              data: old.data.map((m) =>
+                m.id === event.messageId ? { ...m, reactions: event.reactions || [] } : m,
+              ),
+            }
+          },
+        )
       }
     }
 
@@ -363,6 +586,16 @@ export function MessengerPage() {
       setShowCreate(false)
       setCreateForm({ name: '', description: '' })
     },
+  })
+
+  const addReaction = useMutation({
+    mutationFn: ({ msgId, emoji }: { msgId: string; emoji: string }) =>
+      api.post(`/workspace/messenger/channels/${selectedChannel}/messages/${msgId}/reactions`, { emoji }),
+  })
+
+  const removeReaction = useMutation({
+    mutationFn: ({ msgId, emoji }: { msgId: string; emoji: string }) =>
+      api.delete(`/workspace/messenger/channels/${selectedChannel}/messages/${msgId}/reactions/${encodeURIComponent(emoji)}`),
   })
 
   // 에이전트 목록 (멘션 자동완성용)
@@ -408,7 +641,6 @@ export function MessengerPage() {
 
   const handleInputChange = (value: string) => {
     setNewMessage(value)
-    // @ 멘션 감지
     const atIdx = value.lastIndexOf('@')
     if (atIdx !== -1 && (atIdx === 0 || value[atIdx - 1] === ' ')) {
       const query = value.slice(atIdx + 1)
@@ -427,6 +659,12 @@ export function MessengerPage() {
     setNewMessage(`${before}@${agentName} `)
     setShowMention(false)
     inputRef.current?.focus()
+  }
+
+  const toggleReaction = (msgId: string, emoji: string, myReaction: boolean) => {
+    if (myReaction) removeReaction.mutate({ msgId, emoji })
+    else addReaction.mutate({ msgId, emoji })
+    setShowEmojiPicker(null)
   }
 
   return (
@@ -459,7 +697,7 @@ export function MessengerPage() {
           {channels.map((ch) => (
             <button
               key={ch.id}
-              onClick={() => setSelectedChannel(ch.id)}
+              onClick={() => { setSelectedChannel(ch.id); setThreadMessage(null) }}
               className={`w-full text-left px-3 py-2.5 text-sm border-b border-zinc-100 dark:border-zinc-800 transition-colors ${
                 selectedChannel === ch.id
                   ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300'
@@ -484,97 +722,178 @@ export function MessengerPage() {
         </div>
 
         {/* 메시지 영역 (우) */}
-        <div className="flex-1 flex flex-col min-w-0">
-          {!selectedChannel ? (
-            <div className="flex-1 flex items-center justify-center text-zinc-400 text-sm">
-              채널을 선택하세요
-            </div>
-          ) : (
-            <>
-              {/* 채널 헤더 */}
-              <div className="px-4 py-2 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
-                <span className="font-medium text-sm">{selectedChannelData?.name}</span>
-                <button
-                  onClick={() => setShowSettings(true)}
-                  className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 text-lg"
-                  title="채널 설정"
-                >
-                  ⚙️
-                </button>
+        <div className="flex-1 flex min-w-0">
+          <div className="flex-1 flex flex-col min-w-0">
+            {!selectedChannel ? (
+              <div className="flex-1 flex items-center justify-center text-zinc-400 text-sm">
+                채널을 선택하세요
               </div>
-
-              {/* 메시지 목록 */}
-              <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
-                {messages.length === 0 && (
-                  <p className="text-sm text-zinc-400 text-center mt-8">아직 메시지가 없습니다.</p>
-                )}
-                {messages.map((msg) => {
-                  const isMe = msg.userId === user?.id
-                  return (
-                    <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-[70%] ${isMe ? 'order-2' : ''}`}>
-                        {!isMe && <p className="text-xs text-zinc-500 mb-0.5">{msg.userName}</p>}
-                        <div className={`px-3 py-2 rounded-lg text-sm ${
-                          isMe
-                            ? 'bg-indigo-600 text-white'
-                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
-                        }`}>
-                          {msg.content}
-                        </div>
-                        <p className="text-xs text-zinc-400 mt-0.5">
-                          {new Date(msg.createdAt).toLocaleTimeString('ko', { hour: '2-digit', minute: '2-digit' })}
-                        </p>
-                      </div>
-                    </div>
-                  )
-                })}
-                {typingAgent && (
-                  <div className="flex items-center gap-2 px-2 py-1 text-xs text-zinc-500">
-                    <span className="animate-pulse">🤖 {typingAgent}이(가) 입력 중...</span>
-                  </div>
-                )}
-                <div ref={messagesEndRef} />
-              </div>
-
-              {/* 입력 */}
-              <div className="px-4 py-3 border-t border-zinc-200 dark:border-zinc-800 relative">
-                {/* 멘션 자동완성 드롭다운 */}
-                {showMention && filteredAgents.length > 0 && (
-                  <div className="absolute bottom-full left-4 right-4 mb-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-md shadow-lg max-h-32 overflow-y-auto z-10">
-                    {filteredAgents.map((a) => (
-                      <button
-                        key={a.id}
-                        onClick={() => handleMentionSelect(a.name)}
-                        className="w-full text-left px-3 py-2 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 flex items-center gap-2"
-                      >
-                        <span className="text-indigo-500">@{a.name}</span>
-                        {a.role && <span className="text-xs text-zinc-500">({a.role})</span>}
-                      </button>
-                    ))}
-                  </div>
-                )}
-                <div className="flex gap-2">
-                  <input
-                    ref={inputRef}
-                    value={newMessage}
-                    onChange={(e) => handleInputChange(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey && !showMention) handleSend()
-                      if (e.key === 'Escape') setShowMention(false)
-                    }}
-                    placeholder="메시지를 입력하세요... (@로 에이전트 호출)"
-                    className="flex-1 px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm"
-                  />
+            ) : (
+              <>
+                {/* 채널 헤더 */}
+                <div className="px-4 py-2 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+                  <span className="font-medium text-sm">{selectedChannelData?.name}</span>
                   <button
-                    onClick={handleSend}
-                    disabled={!newMessage.trim() || sendMessage.isPending}
-                    className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                    onClick={() => setShowSettings(true)}
+                    className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 text-lg"
+                    title="채널 설정"
                   >
-                    전송
+                    ⚙️
                   </button>
                 </div>
-              </div>
-            </>
+
+                {/* 메시지 목록 */}
+                <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+                  {messages.length === 0 && (
+                    <p className="text-sm text-zinc-400 text-center mt-8">아직 메시지가 없습니다.</p>
+                  )}
+                  {messages.map((msg) => {
+                    const isMe = msg.userId === user?.id
+                    const isHovered = hoveredMsgId === msg.id
+                    return (
+                      <div
+                        key={msg.id}
+                        className="group relative"
+                        onMouseEnter={() => setHoveredMsgId(msg.id)}
+                        onMouseLeave={() => { setHoveredMsgId(null); if (showEmojiPicker === msg.id) setShowEmojiPicker(null) }}
+                      >
+                        <div className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                          <div className={`max-w-[70%] ${isMe ? 'order-2' : ''}`}>
+                            {!isMe && <p className="text-xs text-zinc-500 mb-0.5">{msg.userName}</p>}
+                            <div className="relative">
+                              <div className={`px-3 py-2 rounded-lg text-sm ${
+                                isMe
+                                  ? 'bg-indigo-600 text-white'
+                                  : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
+                              }`}>
+                                {msg.content}
+                              </div>
+                              {/* 호버 시 액션 바 */}
+                              {isHovered && (
+                                <div className={`absolute -top-7 ${isMe ? 'right-0' : 'left-0'} flex gap-0.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-md shadow-sm px-1 py-0.5 z-10`}>
+                                  <button
+                                    onClick={() => setShowEmojiPicker(showEmojiPicker === msg.id ? null : msg.id)}
+                                    className="text-xs hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded px-1 py-0.5"
+                                    title="리액션"
+                                  >
+                                    😀
+                                  </button>
+                                  <button
+                                    onClick={() => setThreadMessage(msg)}
+                                    className="text-xs hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded px-1 py-0.5"
+                                    title="답글"
+                                  >
+                                    💬
+                                  </button>
+                                </div>
+                              )}
+                              {/* 이모지 피커 */}
+                              {showEmojiPicker === msg.id && (
+                                <div className={`absolute -top-14 ${isMe ? 'right-0' : 'left-0'} flex gap-0.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-md shadow-lg px-1.5 py-1 z-20`}>
+                                  {EMOJI_LIST.map((e) => (
+                                    <button
+                                      key={e}
+                                      onClick={() => toggleReaction(msg.id, e, msg.reactions?.some((r) => r.emoji === e && r.userIds.includes(user?.id || '')) || false)}
+                                      className="text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded px-1 py-0.5"
+                                    >
+                                      {e}
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                            {/* 리액션 배지 */}
+                            {msg.reactions && msg.reactions.length > 0 && (
+                              <div className="flex gap-1 mt-0.5 flex-wrap">
+                                {msg.reactions.map((r) => (
+                                  <button
+                                    key={r.emoji}
+                                    onClick={() => toggleReaction(msg.id, r.emoji, r.userIds.includes(user?.id || ''))}
+                                    className={`text-xs px-1.5 py-0.5 rounded-full border ${
+                                      r.userIds.includes(user?.id || '')
+                                        ? 'border-indigo-400 bg-indigo-50 dark:bg-indigo-950'
+                                        : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300'
+                                    }`}
+                                  >
+                                    {r.emoji} {r.count}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                            {/* 답글 카운트 */}
+                            {(msg.replyCount || 0) > 0 && (
+                              <button
+                                onClick={() => setThreadMessage(msg)}
+                                className="text-xs text-indigo-500 hover:text-indigo-700 mt-0.5"
+                              >
+                                {msg.replyCount}개 답글
+                              </button>
+                            )}
+                            <p className="text-xs text-zinc-400 mt-0.5">
+                              {new Date(msg.createdAt).toLocaleTimeString('ko', { hour: '2-digit', minute: '2-digit' })}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                  {typingAgent && (
+                    <div className="flex items-center gap-2 px-2 py-1 text-xs text-zinc-500">
+                      <span className="animate-pulse">🤖 {typingAgent}이(가) 입력 중...</span>
+                    </div>
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
+
+                {/* 입력 */}
+                <div className="px-4 py-3 border-t border-zinc-200 dark:border-zinc-800 relative">
+                  {showMention && filteredAgents.length > 0 && (
+                    <div className="absolute bottom-full left-4 right-4 mb-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-md shadow-lg max-h-32 overflow-y-auto z-10">
+                      {filteredAgents.map((a) => (
+                        <button
+                          key={a.id}
+                          onClick={() => handleMentionSelect(a.name)}
+                          className="w-full text-left px-3 py-2 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 flex items-center gap-2"
+                        >
+                          <span className="text-indigo-500">@{a.name}</span>
+                          {a.role && <span className="text-xs text-zinc-500">({a.role})</span>}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <div className="flex gap-2">
+                    <input
+                      ref={inputRef}
+                      value={newMessage}
+                      onChange={(e) => handleInputChange(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey && !showMention) handleSend()
+                        if (e.key === 'Escape') setShowMention(false)
+                      }}
+                      placeholder="메시지를 입력하세요... (@로 에이전트 호출)"
+                      className="flex-1 px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm"
+                    />
+                    <button
+                      onClick={handleSend}
+                      disabled={!newMessage.trim() || sendMessage.isPending}
+                      className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                    >
+                      전송
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* 스레드 패널 */}
+          {threadMessage && selectedChannel && user && (
+            <ThreadPanel
+              channelId={selectedChannel}
+              parentMessage={threadMessage}
+              userId={user.id}
+              onClose={() => setThreadMessage(null)}
+            />
           )}
         </div>
       </div>

@@ -134,6 +134,13 @@
       "when": 1772899200000,
       "tag": "0020_chat-message-attachments",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1772985600000,
+      "tag": "0025_messenger-reactions-threads",
+      "breakpoints": true
     }
   ]
 }

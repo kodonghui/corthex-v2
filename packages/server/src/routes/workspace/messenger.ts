@@ -1,9 +1,9 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { eq, and, desc, inArray, sql } from 'drizzle-orm'
+import { eq, and, desc, inArray, sql, isNull } from 'drizzle-orm'
 import { db } from '../../db'
-import { messengerChannels, messengerMembers, messengerMessages, users, agents } from '../../db/schema'
+import { messengerChannels, messengerMembers, messengerMessages, messengerReactions, users, agents } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { logActivity } from '../../lib/activity-logger'
@@ -29,6 +29,11 @@ const updateChannelSchema = z.object({
 
 const sendMessageSchema = z.object({
   content: z.string().min(1).max(4000),
+  parentMessageId: z.string().uuid().optional(),
+})
+
+const reactionSchema = z.object({
+  emoji: z.string().min(1).max(20),
 })
 
 const addMemberSchema = z.object({
@@ -324,7 +329,18 @@ messengerRoute.delete('/channels/:id', async (c) => {
     throw new HTTPError(403, '채널 생성자만 삭제할 수 있습니다', 'MSG_006')
   }
 
-  // FK 순서: messages → members → channel
+  // FK 순서: reactions → messages → members → channel
+  // reactions가 messages에 FK 참조하므로 먼저 삭제해야 함
+  const channelMsgIds = await db
+    .select({ id: messengerMessages.id })
+    .from(messengerMessages)
+    .where(and(eq(messengerMessages.channelId, channelId), eq(messengerMessages.companyId, tenant.companyId)))
+  if (channelMsgIds.length > 0) {
+    await db.delete(messengerReactions).where(and(
+      inArray(messengerReactions.messageId, channelMsgIds.map((m) => m.id)),
+      eq(messengerReactions.companyId, tenant.companyId),
+    ))
+  }
   await db.delete(messengerMessages).where(and(
     eq(messengerMessages.channelId, channelId),
     eq(messengerMessages.companyId, tenant.companyId),
@@ -388,45 +404,67 @@ messengerRoute.post('/channels', zValidator('json', createChannelSchema), async 
   return c.json({ data: channel }, 201)
 })
 
-// GET /messenger/channels/:id/messages — 메시지 조회
+// GET /messenger/channels/:id/messages — 메시지 조회 (메인 메시지만, replyCount 포함)
 messengerRoute.get('/channels/:id/messages', async (c) => {
   const tenant = c.get('tenant')
   const channelId = c.req.param('id')
-  const limit = Math.min(Number(c.req.query('limit')) || 50, 100)
-  const before = c.req.query('before')
+  const limitNum = Math.min(Number(c.req.query('limit')) || 50, 100)
 
   await assertMember(channelId, tenant.userId, tenant.companyId)
 
-  let query = db
+  const messages = await db
     .select({
       id: messengerMessages.id,
       userId: messengerMessages.userId,
       userName: users.name,
       content: messengerMessages.content,
+      parentMessageId: messengerMessages.parentMessageId,
       createdAt: messengerMessages.createdAt,
+      replyCount: sql<number>`(SELECT count(*)::int FROM messenger_messages r WHERE r.parent_message_id = ${messengerMessages.id})`,
     })
     .from(messengerMessages)
     .innerJoin(users, eq(messengerMessages.userId, users.id))
     .where(and(
       eq(messengerMessages.channelId, channelId),
       eq(messengerMessages.companyId, tenant.companyId),
+      isNull(messengerMessages.parentMessageId),
     ))
     .orderBy(desc(messengerMessages.createdAt))
-    .limit(limit)
+    .limit(limitNum)
 
-  const messages = await query
+  // 각 메시지의 리액션 집계
+  const messageIds = messages.map((m) => m.id)
+  const reactionsMap = await getReactionsMap(messageIds, tenant.companyId)
 
-  // 최신순으로 가져왔으므로 뒤집어서 반환 (오래된 것 먼저)
-  return c.json({ data: messages.reverse() })
+  const result = messages.reverse().map((m) => ({
+    ...m,
+    reactions: reactionsMap[m.id] || [],
+  }))
+
+  return c.json({ data: result })
 })
 
 // POST /messenger/channels/:id/messages — 메시지 전송
 messengerRoute.post('/channels/:id/messages', zValidator('json', sendMessageSchema), async (c) => {
   const tenant = c.get('tenant')
   const channelId = c.req.param('id')
-  const { content } = c.req.valid('json')
+  const { content, parentMessageId } = c.req.valid('json')
 
   await assertMember(channelId, tenant.userId, tenant.companyId)
+
+  // parentMessageId 제공 시 해당 메시지가 같은 채널에 존재하는지 검증
+  if (parentMessageId) {
+    const [parentMsg] = await db
+      .select({ id: messengerMessages.id })
+      .from(messengerMessages)
+      .where(and(
+        eq(messengerMessages.id, parentMessageId),
+        eq(messengerMessages.channelId, channelId),
+        eq(messengerMessages.companyId, tenant.companyId),
+      ))
+      .limit(1)
+    if (!parentMsg) throw new HTTPError(404, '원본 메시지를 찾을 수 없습니다', 'MSG_011')
+  }
 
   const [message] = await db
     .insert(messengerMessages)
@@ -435,6 +473,7 @@ messengerRoute.post('/channels/:id/messages', zValidator('json', sendMessageSche
       channelId,
       userId: tenant.userId,
       content,
+      parentMessageId: parentMessageId || null,
     })
     .returning()
 
@@ -452,6 +491,7 @@ messengerRoute.post('/channels/:id/messages', zValidator('json', sendMessageSche
       userId: message.userId,
       userName: sender?.name || 'Unknown',
       content: message.content,
+      parentMessageId: message.parentMessageId,
       createdAt: message.createdAt,
     },
   })
@@ -543,6 +583,167 @@ messengerRoute.delete('/channels/:id/members/:uid', async (c) => {
 
   return c.json({ data: { removed: true } })
 })
+
+// GET /messenger/channels/:id/messages/:msgId/thread — 스레드 답글 조회
+messengerRoute.get('/channels/:id/messages/:msgId/thread', async (c) => {
+  const tenant = c.get('tenant')
+  const channelId = c.req.param('id')
+  const msgId = c.req.param('msgId')
+
+  await assertMember(channelId, tenant.userId, tenant.companyId)
+
+  const replies = await db
+    .select({
+      id: messengerMessages.id,
+      userId: messengerMessages.userId,
+      userName: users.name,
+      content: messengerMessages.content,
+      parentMessageId: messengerMessages.parentMessageId,
+      createdAt: messengerMessages.createdAt,
+    })
+    .from(messengerMessages)
+    .innerJoin(users, eq(messengerMessages.userId, users.id))
+    .where(and(
+      eq(messengerMessages.channelId, channelId),
+      eq(messengerMessages.companyId, tenant.companyId),
+      eq(messengerMessages.parentMessageId, msgId),
+    ))
+    .orderBy(messengerMessages.createdAt)
+
+  // 각 답글의 리액션도 포함
+  const replyIds = replies.map((r) => r.id)
+  const reactionsMap = await getReactionsMap(replyIds, tenant.companyId)
+
+  const result = replies.map((r) => ({
+    ...r,
+    reactions: reactionsMap[r.id] || [],
+  }))
+
+  return c.json({ data: result })
+})
+
+// POST /messenger/channels/:id/messages/:msgId/reactions — 리액션 추가
+messengerRoute.post('/channels/:id/messages/:msgId/reactions', zValidator('json', reactionSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const channelId = c.req.param('id')
+  const msgId = c.req.param('msgId')
+  const { emoji } = c.req.valid('json')
+
+  await assertMember(channelId, tenant.userId, tenant.companyId)
+
+  try {
+    await db
+      .insert(messengerReactions)
+      .values({
+        companyId: tenant.companyId,
+        messageId: msgId,
+        userId: tenant.userId,
+        emoji,
+      })
+  } catch (err: unknown) {
+    // unique constraint violation (duplicate reaction)
+    const message = err instanceof Error ? err.message : String(err)
+    if (message.includes('unique') || message.includes('duplicate') || message.includes('23505')) {
+      throw new HTTPError(409, '이미 같은 리액션을 추가했습니다', 'MSG_010')
+    }
+    throw err
+  }
+
+  // 해당 메시지의 전체 리액션 상태를 브로드캐스트
+  const reactions = await getMessageReactions(msgId, tenant.companyId)
+  broadcastToChannel(`messenger::${channelId}`, {
+    type: 'reaction-update',
+    messageId: msgId,
+    reactions,
+  })
+
+  return c.json({ data: { added: true } }, 201)
+})
+
+// DELETE /messenger/channels/:id/messages/:msgId/reactions/:emoji — 리액션 제거
+messengerRoute.delete('/channels/:id/messages/:msgId/reactions/:emoji', async (c) => {
+  const tenant = c.get('tenant')
+  const channelId = c.req.param('id')
+  const msgId = c.req.param('msgId')
+  const emoji = decodeURIComponent(c.req.param('emoji'))
+
+  await assertMember(channelId, tenant.userId, tenant.companyId)
+
+  await db
+    .delete(messengerReactions)
+    .where(and(
+      eq(messengerReactions.messageId, msgId),
+      eq(messengerReactions.userId, tenant.userId),
+      eq(messengerReactions.emoji, emoji),
+      eq(messengerReactions.companyId, tenant.companyId),
+    ))
+
+  const reactions = await getMessageReactions(msgId, tenant.companyId)
+  broadcastToChannel(`messenger::${channelId}`, {
+    type: 'reaction-update',
+    messageId: msgId,
+    reactions,
+  })
+
+  return c.json({ data: { removed: true } })
+})
+
+// 리액션 집계 헬퍼
+async function getMessageReactions(messageId: string, companyId: string) {
+  const allReactions = await db
+    .select({
+      emoji: messengerReactions.emoji,
+      userId: messengerReactions.userId,
+    })
+    .from(messengerReactions)
+    .where(and(
+      eq(messengerReactions.messageId, messageId),
+      eq(messengerReactions.companyId, companyId),
+    ))
+
+  const groups: { emoji: string; count: number; userIds: string[] }[] = []
+  for (const r of allReactions) {
+    const existing = groups.find((g) => g.emoji === r.emoji)
+    if (existing) {
+      existing.count++
+      existing.userIds.push(r.userId)
+    } else {
+      groups.push({ emoji: r.emoji, count: 1, userIds: [r.userId] })
+    }
+  }
+  return groups
+}
+
+// 여러 메시지의 리액션을 한번에 집계하는 헬퍼
+async function getReactionsMap(messageIds: string[], companyId: string) {
+  const map: Record<string, { emoji: string; count: number; userIds: string[] }[]> = {}
+  if (messageIds.length === 0) return map
+
+  const allReactions = await db
+    .select({
+      messageId: messengerReactions.messageId,
+      emoji: messengerReactions.emoji,
+      userId: messengerReactions.userId,
+    })
+    .from(messengerReactions)
+    .where(and(
+      inArray(messengerReactions.messageId, messageIds),
+      eq(messengerReactions.companyId, companyId),
+    ))
+
+  for (const r of allReactions) {
+    if (!map[r.messageId]) map[r.messageId] = []
+    const group = map[r.messageId]
+    const existing = group.find((g) => g.emoji === r.emoji)
+    if (existing) {
+      existing.count++
+      existing.userIds.push(r.userId)
+    } else {
+      group.push({ emoji: r.emoji, count: 1, userIds: [r.userId] })
+    }
+  }
+  return map
+}
 
 // GET /messenger/users — 같은 회사 유저 목록 (멤버 추가용)
 messengerRoute.get('/users', async (c) => {
