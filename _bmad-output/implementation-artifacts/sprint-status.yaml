@@ -1,8 +1,8 @@
-# generated: 2026-03-04
-# project: CORTHEX_HQ
-# project_key: NOKEY
+# generated: 2026-03-06
+# project: corthex-v2
+# project_key: CORTHEX
 # tracking_system: file-system
-# story_location: _bmad-output/implementation-artifacts
+# story_location: _bmad-output/implementation-artifacts/stories
 
 # STATUS DEFINITIONS:
 # ==================
@@ -12,8 +12,8 @@
 #   - done: All stories in epic completed
 #
 # Epic Status Transitions:
-#   - backlog → in-progress: Automatically when first story is created (via create-story)
-#   - in-progress → done: Manually when all stories reach 'done' status
+#   - backlog -> in-progress: Automatically when first story is created (via create-story)
+#   - in-progress -> done: Manually when all stories reach 'done' status
 #
 # Story Status:
 #   - backlog: Story only exists in epic file
@@ -32,220 +32,197 @@
 # - Stories can be worked in parallel if team capacity allows
 # - SM typically creates next story after previous one is 'done' to incorporate learnings
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+#
+# RECOMMENDED IMPLEMENTATION ORDER:
+# 1. Epic 0 (Foundation) -> Epic 3 (Agents) -> Epic 5 (LLM) -> Epic 4 (Tools)
+# 2. Epic 2 (Orchestration) -> Epic 1 (Command Center) -> Epic 6 (Quality Gate)
+# 3. Epics 7-18 (independent, any order)
 
-generated: "2026-03-04"
-project: CORTHEX_HQ
-project_key: NOKEY
+generated: "2026-03-06"
+project: corthex-v2
+project_key: CORTHEX
 tracking_system: file-system
-story_location: _bmad-output/implementation-artifacts
+story_location: _bmad-output/implementation-artifacts/stories
 
 development_status:
   # ============================================================
-  # Epic 1: 프로젝트 초기화 & 인프라 (P1)
+  # Epic 0: Foundation - Multi-tenancy & Auth
+  # FRs: FR84-FR88 | NFRs: NFR6, NFR7, NFR8, NFR11, NFR12
   # ============================================================
-  epic-1: done
-  1-1-monorepo-init: done
-  1-2-db-schema-p1: done
-  1-3-api-server-rate-limiting: done
-  1-4-admin-app-setup: done
-  1-5-ui-phase-a: done
-  1-6-credential-vault: done
-  1-7-tenant-isolation-tests: done
-  1-8-docker-pipeline-pwa: done
-  1-9-websocket-base: done
-  epic-1-retrospective: done
+  epic-0: backlog
+  0-1-company-and-admin-user-setup: backlog
+  0-2-user-authentication-and-invitation: backlog
+  0-3-credential-vault: backlog
+  0-4-admin-console-company-and-user-management-ui: backlog
+  epic-0-retrospective: optional
 
   # ============================================================
-  # Epic 2: 관리자 콘솔 (P1)
+  # Epic 1: Command Center
+  # FRs: FR1-FR6 | NFRs: NFR3, NFR17
   # ============================================================
-  epic-2: done
-  2-1-admin-login-auth: done
-  2-2-company-user-crud: done
-  2-3-cli-token-api-key: done
-  2-4-dept-agent-crud: done
-  2-5-tool-assignment: done
-  2-6-report-line-config: done
-  2-7-secretary-session-mgmt: done
-  2-8-admin-console-ui: done
-  epic-2-retrospective: done
+  epic-1: backlog
+  1-1-command-input-and-natural-language: backlog
+  1-2-at-mention-direct-assignment: backlog
+  1-3-slash-commands-8-types: backlog
+  1-4-command-presets: backlog
+  1-5-real-time-delegation-chain-display: backlog
+  epic-1-retrospective: optional
 
   # ============================================================
-  # Epic 3: 인증 & 워크스페이스 (P1)
+  # Epic 2: Orchestration Engine
+  # FRs: FR7-FR13 | NFRs: NFR1, NFR2, NFR15, NFR18
   # ============================================================
-  epic-3: done
-  3-1-user-login-jwt: done
-  3-2-workspace-sidebar: done
-  3-3-home-briefing: done
-  3-4-personal-api-key: done
-  3-5-settings-ui: done
-  epic-3-retrospective: done
+  epic-2: backlog
+  2-1-chief-of-staff-command-classification: backlog
+  2-2-manager-task-decomposition-and-parallel-delegation: backlog
+  2-3-specialist-autonomous-deep-work-5-stage: backlog
+  2-4-manager-as-5th-analyst: backlog
+  2-5-quality-gate-and-rework-loop: backlog
+  2-6-sequential-relay-mode: backlog
+  epic-2-retrospective: optional
 
   # ============================================================
-  # Epic 4: AI 에이전트 채팅 (P1)
+  # Epic 3: Agent Organization & Soul System
+  # FRs: FR14-FR18
   # ============================================================
-  epic-4: done
-  4-1-agent-list-select: done
-  4-2-streaming-chat-ui: done
-  4-3-tool-use-loop: done
-  4-4-chat-session-history: done
-  4-5-soul-persona: done
-  4-6-ui-phase-b: done
-  4-7-chat-mobile-optimize: done
-  epic-4-retrospective: done
+  epic-3: backlog
+  3-1-29-agent-organization-deployment: backlog
+  3-2-soul-editor-web-ui-markdown: backlog
+  3-3-department-knowledge-injection: backlog
+  epic-3-retrospective: optional
 
   # ============================================================
-  # Epic 5: 비서 오케스트레이션 (P1)
+  # Epic 4: Tool System
+  # FRs: FR19-FR24 | NFRs: NFR9, NFR14
   # ============================================================
-  epic-5: done
-  5-1-secretary-chat-ui: done
-  5-2-battle-log-p1: done
-  5-3-ui-phase-c: done
-  epic-5-retrospective: done
+  epic-4: backlog
+  4-1-toolpool-registry-and-execution: backlog
+  4-2-core-tool-implementations-finance-and-common: backlog
+  4-3-tool-permission-management-and-health-check: backlog
+  epic-4-retrospective: optional
 
   # ============================================================
-  # Epic 6: 활동 로그 & 알림 시스템 (P1~P3)
+  # Epic 5: LLM Multi-Provider Router
+  # FRs: FR25-FR29 | NFRs: NFR16, NFR19
   # ============================================================
-  epic-6: done
-  6-1-activity-log-api: done
-  6-2-realtime-notifications: done
-  6-3-email-notifications: done
-  6-4-notification-history-ui: done
-  6-5-ui-phase-d: done
-  6-6-battle-log-p2: done
-  epic-6-retrospective: done
+  epic-5: backlog
+  5-1-multi-provider-llm-routing: backlog
+  5-2-cost-tracking-and-budget-enforcement: backlog
+  5-3-batch-api-queue: backlog
+  5-4-llm-provider-failover: backlog
+  epic-5-retrospective: optional
 
   # ============================================================
-  # Epic 7: 보고서 & 문서함 (P2)
-  # NOTE: Party mode 12개 이슈 발견, 유저 스킵 선택 — 수정 미적용
+  # Epic 6: Quality Gate
+  # FRs: FR30-FR33
   # ============================================================
-  epic-7: done
-  7-1-report-write-submit: done
-  7-2-report-approve-archive: done
-  7-3-agent-auto-report: done
-  7-4-ui-phase-e: done
-  epic-7-retrospective: done
+  epic-6: backlog
+  6-1-5-item-quality-rubric-evaluation: backlog
+  6-2-auto-rework-and-ceo-feedback: backlog
+  epic-6-retrospective: optional
 
   # ============================================================
-  # Epic 8: 도구 시스템 인프라 (P2)
+  # Epic 7: Dashboard & Monitoring
+  # FRs: FR54-FR58 | NFRs: NFR4
   # ============================================================
-  epic-8: done
-  8-1-tool-engine-handler: done
-  8-2-tool-definitions-api: done
-  8-3-credential-vault-integration: done
-  8-4-p2-db-schema: done
-  8-5-isolation-test-p2: done
-  epic-8-retrospective: done
+  epic-7: backlog
+  7-1-summary-cards-and-quick-actions: backlog
+  7-2-ai-usage-charts-and-budget-management: backlog
+  epic-7-retrospective: optional
 
   # ============================================================
-  # Epic 9: 도구 카탈로그 20종+ (P2)
+  # Epic 8: Activity Logging & History
+  # FRs: FR59-FR63 | NFRs: NFR10
   # ============================================================
-  epic-9: done
-  9-1-search-tools: done
-  9-2-email-calendar-tools: done
-  9-3-file-screenshot-tools: done
-  9-4-kis-trading-tools: done
-  9-5-tts-voice-tools: done
-  9-6-image-gen-tools: done
-  9-7-sns-tools: done
-  epic-9-retrospective: done
+  epic-8: backlog
+  8-1-4-tab-activity-log: backlog
+  8-2-command-history-with-search-and-replay: backlog
+  epic-8-retrospective: optional
 
   # ============================================================
-  # Epic 10: 전략실 (P2) — 파티모드 후 9개 스토리로 확장
+  # Epic 9: Knowledge Base & Agent Memory
+  # FRs: FR64-FR67
   # ============================================================
-  epic-10: done
-  10-1-strategy-room-layout: done
-  10-2-strategy-chat-agent: done
-  10-3-realtime-stock-chart: done
-  10-4-strategy-notes: done
-  10-5-strategy-export: done
-  10-6-multi-stock-compare: done
-  10-7-backtest-results: done
-  10-8-strategy-share-url: done
-  10-9-collab-editor: done
-  epic-10-retrospective: done
+  epic-9: backlog
+  9-1-knowledge-base-crud-and-department-injection: backlog
+  9-2-auto-learning-from-tasks: backlog
+  epic-9-retrospective: optional
 
   # ============================================================
-  # Epic 11: 야간작업 & 자동실행 (P2)
+  # Epic 10: Cron Scheduler
+  # FRs: FR68-FR70
   # ============================================================
-  epic-11: done
-  11-1-night-task-scheduler: done
-  11-2-night-task-crud-ui: done
-  11-3-trigger-auto-exec: done
-  11-4-auto-report-gen: done
-  11-5-p2-websocket-events: done
-  11-6-advanced-task-chain: done
-  epic-11-retrospective: done
+  epic-10: backlog
+  10-1-cron-job-management: backlog
+  epic-10-retrospective: optional
 
   # ============================================================
-  # Epic 12: 에이전트 계층 위임 (P2)
+  # Epic 11: AGORA Debate Engine
+  # FRs: FR34-FR37
   # ============================================================
-  epic-12: done
-  12-1-agent-hierarchy-api: done
-  12-2-parallel-delegation: done
-  12-3-delegation-realtime-ui: done
-  12-4-delegation-security: done
-  epic-12-retrospective: done
+  epic-11: backlog
+  11-1-round-based-debate-orchestration: backlog
+  11-2-debate-results-diff-view-and-synthesis: backlog
+  epic-11-retrospective: optional
 
   # ============================================================
-  # Epic 13: 파일 관리 (P2)
+  # Epic 12: Strategy Room (Trading)
+  # FRs: FR38-FR43 | NFRs: NFR5, NFR20
   # ============================================================
-  epic-13: done
-  13-1-file-upload-storage: done
-  13-2-file-chat-attach: done
-  13-3-file-management-ui: done
-  epic-13-retrospective: done
+  epic-12: backlog
+  12-1-portfolio-dashboard-and-watchlist: backlog
+  12-2-kis-auto-trading: backlog
+  12-3-paper-trading: backlog
+  epic-12-retrospective: optional
 
   # ============================================================
-  # Epic 14: SNS 콘텐츠 파이프라인 (P3) — 파티모드 후 5개 스토리
+  # Epic 13: SNS Publishing
+  # FRs: FR44-FR48 | NFRs: NFR22
   # ============================================================
-  epic-14: done
-  14-1-sns-content-planning: done
-  14-2-ai-image-gen-post: done
-  14-3-sns-analytics: done
-  14-4-sns-multi-account: done
-  14-5-ab-test-optimize: done
-  epic-14-retrospective: done
+  epic-13: backlog
+  13-1-content-generation-and-approval-flow: backlog
+  13-2-selenium-auto-publishing: backlog
+  epic-13-retrospective: optional
 
   # ============================================================
-  # Epic 15: 운영 도구 (P3) — 스토리 순서 재배치 완료
+  # Epic 14: SketchVibe (Visual Collaboration)
+  # FRs: FR49-FR53 | NFRs: NFR23
   # ============================================================
-  epic-15: done
-  15-1-p3-db-schema-ws: done
-  15-2-soul-template-mgmt: done
-  15-3-soul-editor: done
-  15-4-system-monitoring: done
-  15-5-org-tree-viewer: done
-  epic-15-retrospective: done
+  epic-14: backlog
+  14-1-cytoscape-canvas-and-node-types: backlog
+  14-2-mermaid-bidirectional-and-ai-collaboration: backlog
+  epic-14-retrospective: optional
 
   # ============================================================
-  # Epic 16: 사내 메신저 (P3~P4)
+  # Epic 15: ARGOS Intelligence Collection
+  # FRs: FR71-FR73
   # ============================================================
-  epic-16: done
-  16-1-messenger-channel-mgmt: done
-  16-2-realtime-message-agent: done
-  16-3-message-reaction-thread: done
-  16-4-messenger-search-notify: done
-  16-5-messenger-mobile-pwa: done
-  16-6-p4-file-attach: done
-  epic-16-retrospective: done
+  epic-15: backlog
+  15-1-trigger-based-intelligence-collection: backlog
+  epic-15-retrospective: optional
 
   # ============================================================
-  # Epic 17: NEXUS 스케치바이브 (P4) — 스토리 순서 재배치 완료
+  # Epic 16: Telegram & Messenger
+  # FRs: FR74-FR76 | NFRs: NFR21
   # ============================================================
-  epic-17: done
-  17-1-p4-db-schema-ws: done
-  17-2-nexus-canvas-base: done
-  17-3-workflow-edit-exec: done
-  17-4-nexus-template-share: done
-  17-5-nexus-mobile-access: done
-  epic-17-retrospective: done
+  epic-16: backlog
+  16-1-telegram-bot-integration: backlog
+  16-2-in-company-messenger: backlog
+  epic-16-retrospective: optional
 
   # ============================================================
-  # Epic 18: MCP 연동 (P4)
+  # Epic 17: Performance Analysis & Archive
+  # FRs: FR77-FR81
   # ============================================================
-  epic-18: done
-  18-1-mcp-server-mgmt: done
-  18-2-mcp-tool-exec: done
-  18-3-mcp-streaming: done
-  18-4-mcp-security: done
-  epic-18-retrospective: done
+  epic-17: backlog
+  17-1-performance-dashboard-and-soul-gym: backlog
+  17-2-classified-archive-and-similar-reports: backlog
+  epic-17-retrospective: optional
+
+  # ============================================================
+  # Epic 18: Workflow Automation
+  # FRs: FR82-FR83
+  # ============================================================
+  epic-18: backlog
+  18-1-multi-step-workflow-creation-and-execution: backlog
+  epic-18-retrospective: optional

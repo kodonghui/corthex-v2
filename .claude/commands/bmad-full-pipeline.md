@@ -1,81 +1,236 @@
 ---
 name: 'full-pipeline'
-description: 'BMAD 5단계 풀 파이프라인 실행. 스토리 하나를 create-story → dev-story → TEA → QA → code-review 까지 한 번에 처리. 사용법: /bmad-full-pipeline [스토리 ID, 예: 15-3]'
+description: 'BMAD full pipeline. planning(brief->PRD->arch->UX->epics, step-by-step party mode) or story dev(create->dev->TEA->QA->CR). Usage: /bmad-full-pipeline [planning|story-ID]'
 ---
 
-# BMAD Full Pipeline — 스토리 풀 파이프라인
+# BMAD Full Pipeline
 
-사용자가 지정한 스토리(또는 스프린트 플랜에서 다음 스토리)에 대해 BMAD 5단계를 **한 번에** 실행하는 오케스트레이터 명령입니다.
+planning mode or story dev mode.
 
-## 실행 대상
-- 인자가 있으면: 해당 스토리 ID (예: `15-3`)
-- 인자가 없으면: sprint-status.yaml에서 `backlog` 상태인 첫 번째 스토리
+## Mode
 
-## 오케스트레이터 프로토콜
+- `planning` or no args: planning pipeline (brief -> PRD -> architecture -> UX -> epics)
+- story ID (e.g. `19-1`): story dev pipeline (create-story -> dev -> TEA -> QA -> CR)
 
-아래 단계를 **정확히** 따를 것. 생략/합리화/단축 절대 금지.
+---
 
-### Step 0: 팀 준비
-1. `TeamCreate`로 팀 생성 (이름: `bmad-pipeline`)
-2. `TaskCreate`로 대상 스토리의 태스크 등록
+## Mode A: Planning Pipeline (planning)
 
-### Step 1: 팀원에게 5단계 파이프라인 위임
-`Agent` 도구로 팀원 생성. 아래 프롬프트를 **그대로** 전달:
+### Orchestrator Role
+- Team leader. Directs only, does NOT execute.
+- TeamCreate -> TaskCreate -> Agent(team member) delegates everything
+- Receives completion reports, verifies checklist, commits+pushes
+
+### Step 0: Team Setup
+1. `TeamCreate` team name: `bmad-planning`
+2. `TaskCreate` register planning task
+
+### Step 1: Delegate Full Planning Pipeline to Team Member
+`Agent` tool to create team member. Pass the prompt below **exactly**:
 
 ```
-너는 BMAD 파이프라인 실행자야. 아래 5단계를 **순서대로, 빠짐없이** Skill 도구로 실행해.
-모든 단계에서 YOLO 모드 — 확인 프롬프트 나오면 자동 진행, 사용자 입력 기다리지 마.
+You are a BMAD planning pipeline executor.
+Execute ALL steps below **in order, without skipping any**.
+YOLO mode on all steps -- auto-proceed on every confirmation prompt, never wait for user input.
 
-대상 스토리: [스토리 ID]
+## Required Input Documents (READ FIRST)
+_bmad-output/planning-artifacts/v1-feature-spec.md -- v1 feature spec with all actually-working features.
+Every step and every party-mode must verify: nothing from v1 is missing, no stubs, real working features only.
 
-### 1단계: create-story
-Skill 도구 호출: skill="bmad-bmm-create-story", args="[스토리 ID]"
-- 스토리 파일이 이미 존재하면 이 단계 건너뛰기 가능
+## Core Rule: Step-by-Step Party Mode (MANDATORY)
+After EACH internal step of each planning stage, run party mode (Skill: skill="bmad-party-mode") MINIMUM 3 TIMES.
+- Party mode runs in YOLO mode (auto-proceed, no menus, no waiting)
+- Each party mode must verify:
+  1. Does this step's output cover all relevant v1 features from v1-feature-spec.md?
+  2. Is it real working functionality, not CRUD shells or stubs?
+  3. Is there a concrete implementation plan, not mock/placeholder?
+- If party mode finds issues -> fix immediately -> continue to next party mode
+- All 3 party modes must pass before moving to next step
 
-### 2단계: dev-story
-Skill 도구 호출: skill="bmad-bmm-dev-story", args="[스토리 파일 경로]"
-- 구현 완료까지 진행
+## Execution Order
 
-### 3단계: TEA (Test Architect 자동 테스트 생성)
-Skill 도구 호출: skill="bmad-tea-automate"
-- 이 스토리에서 변경/추가된 코드에 대한 리스크 기반 테스트 생성
+### 1. Product Brief
+Skill: skill="bmad-bmm-create-product-brief"
+Internal steps (each followed by 3x party mode):
+- step-02-vision -> party mode x3
+- step-03-users -> party mode x3
+- step-04-metrics -> party mode x3
+- step-05-scope -> party mode x3
+Total: 12 party modes minimum
 
-### 4단계: QA 검증
-Skill 도구 호출: skill="bmad-agent-bmm-qa"
-- 메뉴 표시 금지 — 바로 자동 실행
-- 기능 검증 + 엣지케이스 확인
+### 2. PRD
+Skill: skill="bmad-bmm-create-prd"
+Internal steps (each followed by 3x party mode):
+- step-02-discovery -> party mode x3
+- step-02b-vision -> party mode x3
+- step-02c-executive-summary -> party mode x3
+- step-03-success -> party mode x3
+- step-04-journeys -> party mode x3
+- step-05-domain -> party mode x3
+- step-06-innovation -> party mode x3
+- step-07-project-type -> party mode x3
+- step-08-scoping -> party mode x3
+- step-09-functional -> party mode x3
+- step-10-nonfunctional -> party mode x3
+Total: 33 party modes minimum
+Verify: ALL v1 features are in functional requirements
 
-### 5단계: code-review
-Skill 도구 호출: skill="bmad-bmm-code-review"
-- 이슈 발견 시 자동 수정
-- 수정 후 재리뷰 불필요 (자동 수정 1회로 충분)
+### 3. Architecture
+Skill: skill="bmad-bmm-create-architecture"
+Internal steps (each followed by 3x party mode):
+- step-02-context -> party mode x3
+- step-03-starter -> party mode x3
+- step-04-decisions -> party mode x3
+- step-05-patterns -> party mode x3
+- step-06-structure -> party mode x3
+- step-07-validation -> party mode x3
+Total: 18 party modes minimum
+Verify: orchestration, tool system, LLM router, memory architecture present
 
-### 완료 후
-SendMessage로 오케스트레이터에게 아래 형식으로 보고:
+### 4. UX Design
+Skill: skill="bmad-bmm-create-ux-design"
+Internal steps (each followed by 3x party mode):
+- step-02-discovery -> party mode x3
+- step-03-core-experience -> party mode x3
+- step-04-emotional-response -> party mode x3
+- step-05-inspiration -> party mode x3
+- step-06-design-system -> party mode x3
+- step-07-defining-experience -> party mode x3
+- step-08-visual-foundation -> party mode x3
+- step-09-design-directions -> party mode x3
+- step-10-user-journeys -> party mode x3
+- step-11-component-strategy -> party mode x3
+- step-12-ux-patterns -> party mode x3
+- step-13-responsive-accessibility -> party mode x3
+Total: 36 party modes minimum
 
-[BMAD 체크리스트 — Story [스토리 ID]]
-[x] 1. create-story 완료
-[x] 2. dev-story 완료
-[x] 3. TEA 완료
-[x] 4. QA 완료
-[x] 5. code-review 완료
+### 5. Epics & Stories
+Skill: skill="bmad-bmm-create-epics-and-stories"
+Internal steps (each followed by 3x party mode):
+- step-02-design-epics -> party mode x3
+- step-03-create-stories -> party mode x3
+- step-04-final-validation -> party mode x3
+Total: 9 party modes minimum
+Verify: epics organized by core features, not CRUD lists
 
-요약: (무엇을 구현했는지 1-2줄)
-테스트: (생성된 테스트 수)
-이슈: (code-review에서 발견/수정된 이슈 수)
+### 6. Implementation Readiness Check
+Skill: skill="bmad-bmm-check-implementation-readiness"
+Internal steps (each followed by 3x party mode):
+- step-01-document-discovery -> party mode x3
+- step-02-prd-analysis -> party mode x3
+- step-03-epic-coverage-validation -> party mode x3
+- step-04-ux-alignment -> party mode x3
+- step-05-epic-quality-review -> party mode x3
+- step-06-final-assessment -> party mode x3
+Total: 18 party modes minimum
+
+### 7. Sprint Planning
+Skill: skill="bmad-bmm-sprint-planning"
+-> sprint-status.yaml generated
+
+### Completion Report
+SendMessage to orchestrator:
+
+[Planning Pipeline Complete]
+[x] 1. Product Brief done + party mode per step (12+)
+[x] 2. PRD done + party mode per step (33+)
+[x] 3. Architecture done + party mode per step (18+)
+[x] 4. UX Design done + party mode per step (36+)
+[x] 5. Epics & Stories done + party mode per step (9+)
+[x] 6. Readiness Check done + party mode per step (18+)
+[x] 7. Sprint Planning done
+
+v1 feature coverage: (N/N items from v1 checklist covered)
+Epic count: N
+Story count: N
+Total party modes executed: ~126+
+Key findings from party modes: (1-3 line summary)
 ```
 
-### Step 2: 대기 및 결과 확인
-- 팀원 작업 완료 대기
-- SendMessage로 체크리스트 보고 수신
-- 5/5 체크 확인
+### Step 2: Wait and Verify
+- Wait for team member completion
+- Receive final report
+- Verify checklist 7/7
+- Verify v1 feature coverage
 
-### Step 3: 커밋 + 푸시
-- 체크리스트 5/5 확인 후 커밋 + 푸시
-- 커밋 메시지: `feat: Story [ID] [스토리 제목] — [구현 요약] + TEA [N]건`
-- sprint-status.yaml 해당 스토리를 `done`으로 업데이트
-- 배포 보고 테이블 출력
+### Step 3: Commit + Push
+- Commit all planning artifacts
+- Message: `docs: BMAD planning pipeline complete -- brief+PRD+arch+UX+epics + ~126 party modes`
 
-### Step 4: 다음 스토리 확인
-- 같은 에픽에 남은 스토리가 있으면 사용자에게 알림
-- 에픽의 마지막 스토리였으면: "에픽 완료! `/bmad-bmm-retrospective` 실행하시겠어요?" 안내
+### Step 4: Dev Guidance
+- "Planning complete! Start dev with `/bmad-full-pipeline [first story ID]`"
+
+---
+
+## Mode B: Story Dev Pipeline (story ID)
+
+### Step 0: Team Setup
+1. `TeamCreate` team name: `bmad-pipeline`
+2. `TaskCreate` register story task
+
+### Step 1: Delegate 5-Step Pipeline to Team Member
+`Agent` tool to create team member. Pass the prompt below **exactly**:
+
+```
+You are a BMAD pipeline executor. Execute ALL 5 steps below **in order, without skipping any**.
+YOLO mode on all steps -- auto-proceed on every confirmation prompt, never wait for user input.
+
+IMPORTANT: This story must produce REAL WORKING functionality, not CRUD pages or stubs.
+Reference v1 feature spec (_bmad-output/planning-artifacts/v1-feature-spec.md) to verify
+how the feature worked in v1, and implement at the same level in v2.
+
+Target story: [story ID]
+
+### Step 1: create-story
+Skill: skill="bmad-bmm-create-story", args="[story ID]"
+- Skip if story file already exists
+
+### Step 2: dev-story
+Skill: skill="bmad-bmm-dev-story", args="[story file path]"
+- Complete implementation
+- NO stubs/mocks -- real working code only
+
+### Step 3: TEA (Test Architect)
+Skill: skill="bmad-tea-automate"
+- Risk-based test generation for changed/added code
+
+### Step 4: QA
+Skill: skill="bmad-agent-bmm-qa"
+- NO menu display -- execute immediately
+- Feature verification + edge case check
+- Verify "actually works" (stub APIs = fail)
+
+### Step 5: code-review
+Skill: skill="bmad-bmm-code-review"
+- Auto-fix any issues found
+- One round of auto-fix is sufficient
+
+### Completion Report
+SendMessage to orchestrator:
+
+[BMAD Checklist -- Story [story ID]]
+[x] 1. create-story done
+[x] 2. dev-story done
+[x] 3. TEA done
+[x] 4. QA done
+[x] 5. code-review done
+
+Summary: (what was implemented, 1-2 lines)
+Tests: (number of tests generated)
+Issues: (issues found/fixed in code-review)
+Real functionality: (confirm not stub)
+```
+
+### Step 2: Wait and Verify
+- Wait for team member completion
+- Receive checklist report
+- Verify 5/5 checked + real functionality confirmed
+
+### Step 3: Commit + Push
+- Message: `feat: Story [ID] [title] -- [summary] + TEA [N] tests`
+- Update sprint-status.yaml
+- Output deploy report table
+
+### Step 4: Next Story
+- If more stories in same epic -> notify user
+- If last story in epic -> "Epic complete! Run `/bmad-bmm-retrospective`?"
