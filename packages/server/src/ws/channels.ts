@@ -127,6 +127,17 @@ export async function handleSubscription(
       break
     }
 
+    case 'night-job': {
+      // 같은 companyId만 구독 가능
+      const jobCompanyId = id || client.companyId
+      if (jobCompanyId !== client.companyId) {
+        ws.send(JSON.stringify({ type: 'error', code: 'FORBIDDEN', channel }))
+        return
+      }
+      client.subscriptions.add(`night-job::${client.companyId}`)
+      break
+    }
+
     default:
       ws.send(JSON.stringify({ type: 'error', code: 'UNKNOWN_CHANNEL', channel }))
       return

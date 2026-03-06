@@ -167,14 +167,14 @@ development_status:
   # ============================================================
   # Epic 11: 야간작업 & 자동실행 (P2)
   # ============================================================
-  epic-11: backlog
-  11-1-night-task-scheduler: backlog
-  11-2-night-task-crud-ui: backlog
-  11-3-trigger-auto-exec: backlog
-  11-4-auto-report-gen: backlog
-  11-5-p2-websocket-events: backlog
-  11-6-advanced-task-chain: backlog
-  epic-11-retrospective: optional
+  epic-11: done
+  11-1-night-task-scheduler: done
+  11-2-night-task-crud-ui: done
+  11-3-trigger-auto-exec: done
+  11-4-auto-report-gen: done
+  11-5-p2-websocket-events: done
+  11-6-advanced-task-chain: done
+  epic-11-retrospective: done
 
   # ============================================================
   # Epic 12: 에이전트 계층 위임 (P2)

@@ -1,15 +1,22 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { eq, and, desc, sql } from 'drizzle-orm'
+import { eq, and, desc, sql, isNull, inArray } from 'drizzle-orm'
+import { randomUUID } from 'crypto'
 import { db } from '../../db'
 import { nightJobs, agents } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { queueNightJob } from '../../lib/job-queue'
+import { schedulesRoute } from './schedules'
+import { triggersRoute } from './triggers'
 import type { AppEnv } from '../../types'
 
 export const jobsRoute = new Hono<AppEnv>()
+
+// 스케줄 서브라우트 마운트
+jobsRoute.route('/schedules', schedulesRoute)
+jobsRoute.route('/triggers', triggersRoute)
 
 jobsRoute.use('*', authMiddleware)
 
@@ -63,11 +70,19 @@ jobsRoute.get('/', async (c) => {
       startedAt: nightJobs.startedAt,
       completedAt: nightJobs.completedAt,
       isRead: nightJobs.isRead,
+      resultData: nightJobs.resultData,
+      parentJobId: nightJobs.parentJobId,
+      chainId: nightJobs.chainId,
       createdAt: nightJobs.createdAt,
     })
     .from(nightJobs)
     .innerJoin(agents, eq(nightJobs.agentId, agents.id))
-    .where(and(eq(nightJobs.userId, tenant.userId), eq(nightJobs.companyId, tenant.companyId)))
+    .where(and(
+      eq(nightJobs.userId, tenant.userId),
+      eq(nightJobs.companyId, tenant.companyId),
+      isNull(nightJobs.scheduleId),
+      isNull(nightJobs.triggerId),
+    ))
     .orderBy(desc(nightJobs.createdAt))
     .limit(50)
 
@@ -86,6 +101,7 @@ jobsRoute.get('/notifications', async (c) => {
       status: nightJobs.status,
       result: nightJobs.result,
       error: nightJobs.error,
+      resultData: nightJobs.resultData,
       completedAt: nightJobs.completedAt,
     })
     .from(nightJobs)
@@ -162,4 +178,94 @@ jobsRoute.delete('/:id', async (c) => {
 
   await db.delete(nightJobs).where(eq(nightJobs.id, id))
   return c.json({ data: { deleted: true } })
+})
+
+// POST /api/workspace/jobs/chain — 체인 작업 일괄 등록 (2~5단계)
+const chainJobSchema = z.object({
+  steps: z.array(z.object({
+    agentId: z.string().uuid(),
+    instruction: z.string().min(1),
+  })).min(2).max(5),
+})
+
+jobsRoute.post('/chain', zValidator('json', chainJobSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const { steps } = c.req.valid('json')
+
+  // 모든 에이전트 소속 확인
+  const agentIds = [...new Set(steps.map(s => s.agentId))]
+  const validAgents = await db
+    .select({ id: agents.id })
+    .from(agents)
+    .where(and(
+      inArray(agents.id, agentIds),
+      eq(agents.companyId, tenant.companyId),
+    ))
+
+  if (validAgents.length !== agentIds.length) {
+    throw new HTTPError(404, '유효하지 않은 에이전트가 포함되어 있습니다', 'CHAIN_001')
+  }
+
+  const chainId = randomUUID()
+  const createdJobs = []
+  let previousJobId: string | null = null
+
+  for (let i = 0; i < steps.length; i++) {
+    const step = steps[i]
+    const [job] = await db
+      .insert(nightJobs)
+      .values({
+        companyId: tenant.companyId,
+        userId: tenant.userId,
+        agentId: step.agentId,
+        instruction: step.instruction,
+        status: i === 0 ? 'queued' : 'blocked',
+        scheduledFor: new Date(),
+        maxRetries: 3,
+        chainId,
+        parentJobId: previousJobId,
+      })
+      .returning()
+
+    createdJobs.push(job)
+    previousJobId = job.id
+  }
+
+  console.log(`🔗 체인 작업 등록: ${chainId} (${steps.length}단계)`)
+  return c.json({ data: createdJobs }, 201)
+})
+
+// DELETE /api/workspace/jobs/chain/:chainId — 체인 전체 취소
+jobsRoute.delete('/chain/:chainId', async (c) => {
+  const tenant = c.get('tenant')
+  const chainId = c.req.param('chainId')
+
+  // 체인 내 processing 작업 확인
+  const [processing] = await db
+    .select({ id: nightJobs.id })
+    .from(nightJobs)
+    .where(and(
+      eq(nightJobs.chainId, chainId),
+      eq(nightJobs.companyId, tenant.companyId),
+      eq(nightJobs.userId, tenant.userId),
+      eq(nightJobs.status, 'processing'),
+    ))
+    .limit(1)
+
+  if (processing) {
+    throw new HTTPError(400, '처리 중인 작업이 포함된 체인은 취소할 수 없습니다', 'CHAIN_002')
+  }
+
+  // queued/blocked 작업 삭제
+  const deleted = await db
+    .delete(nightJobs)
+    .where(and(
+      eq(nightJobs.chainId, chainId),
+      eq(nightJobs.companyId, tenant.companyId),
+      eq(nightJobs.userId, tenant.userId),
+      sql`${nightJobs.status} IN ('queued', 'blocked')`,
+    ))
+    .returning({ id: nightJobs.id })
+
+  return c.json({ data: { deleted: deleted.length } })
 })

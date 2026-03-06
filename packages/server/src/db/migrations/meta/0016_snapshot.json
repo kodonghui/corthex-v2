@@ -1,6 +1,6 @@
 {
-  "id": "9a311d6e-a9d8-49b9-b4b7-a6a4304bf547",
-  "prevId": "bf13529d-4bb8-4b8a-8f69-09609e938f6b",
+  "id": "924ddbcb-0cb8-435e-9df6-7c5e92f461fe",
+  "prevId": "5b756b0a-d95e-40fe-bc5c-38b3f78815be",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -600,13 +600,6 @@
           "notNull": true,
           "default": "'offline'"
         },
-        "level": {
-          "name": "level",
-          "type": "varchar(20)",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'member'"
-        },
         "is_secretary": {
           "name": "is_secretary",
           "type": "boolean",
@@ -918,12 +911,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "file_id": {
-          "name": "file_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -990,19 +977,6 @@
           "tableTo": "chat_sessions",
           "columnsFrom": [
             "session_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "chat_messages_file_id_files_id_fk": {
-          "name": "chat_messages_file_id_files_id_fk",
-          "tableFrom": "chat_messages",
-          "tableTo": "files",
-          "columnsFrom": [
-            "file_id"
           ],
           "columnsTo": [
             "id"
@@ -1689,12 +1663,6 @@
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
-        },
-        "parent_department_id": {
-          "name": "parent_department_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
         },
         "name": {
           "name": "name",
@@ -2518,6 +2486,18 @@
           "primaryKey": false,
           "notNull": true,
           "default": false
+        },
+        "parent_job_id": {
+          "name": "parent_job_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "chain_id": {
+          "name": "chain_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -4487,7 +4467,8 @@
         "queued",
         "processing",
         "completed",
-        "failed"
+        "failed",
+        "blocked"
       ]
     },
     "public.message_sender": {

@@ -15,7 +15,11 @@
 - 사용자가 'BMAD 써서 작업 다 해놓으라'고 하면 **반드시** BMAD 스킬로 할 것
 - 절대로 BMAD 스킬을 건너뛰고 직접 구현하지 말 것
 - 안 지키면 전부 지워버림
-- 스토리 하나당 반드시: create-story → dev-story → code-review 순서로 BMAD 스킬 실행
+- 스토리 하나당 반드시: create-story → dev-story → QA(TEA+일반QA) → code-review 순서로 BMAD 스킬 실행
+- QA 단계 (dev-story 완료 후, code-review 전):
+  1. TEA (Test Architect): `/bmad:tea:automate` 스킬로 자동 테스트 설계+생성 (testarch 모듈)
+  2. 일반 QA: `bmad-agent-bmm-qa` 에이전트로 기능 검증 + 엣지케이스 확인
+- 코드 리뷰에서 이슈 발견 시 항상 자동 수정 (물어보지 말고 바로 [1] 선택)
 - 에픽 하나 끝나면 반드시: retrospective 스킬 실행
 - 어떤 상황에서도 (YOLO 모드, 자러간다, 빨리 해 등) 이 순서를 생략하지 말 것
 

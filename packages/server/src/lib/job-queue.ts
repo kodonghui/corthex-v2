@@ -2,10 +2,11 @@
 // Neon 서버리스 호환 (pg-boss 대신 자체 구현)
 
 import { db } from '../db'
-import { nightJobs, agents, chatSessions, chatMessages, agentMemory } from '../db/schema'
+import { nightJobs, agents, chatSessions, chatMessages, agentMemory, reports } from '../db/schema'
 import { eq, and, lte, asc } from 'drizzle-orm'
 import { generateAgentResponse } from './ai'
 import { orchestrateSecretary } from './orchestrator'
+import { eventBus } from './event-bus'
 
 const POLL_INTERVAL_MS = 30_000  // 30초마다 큐 확인
 const MAX_RETRIES = 3
@@ -20,6 +21,8 @@ export async function queueNightJob(params: {
   sessionId?: string
   instruction: string
   scheduledFor?: Date
+  scheduleId?: string
+  triggerId?: string
 }) {
   const [job] = await db
     .insert(nightJobs)
@@ -31,6 +34,8 @@ export async function queueNightJob(params: {
       instruction: params.instruction,
       scheduledFor: params.scheduledFor || new Date(),
       maxRetries: MAX_RETRIES,
+      scheduleId: params.scheduleId || null,
+      triggerId: params.triggerId || null,
     })
     .returning()
 
@@ -65,11 +70,22 @@ async function pickNextJob() {
   return job
 }
 
+// 진행률 이벤트 헬퍼
+function emitProgress(companyId: string, jobId: string, progress: number, statusMessage: string) {
+  eventBus.emit('night-job', {
+    companyId,
+    payload: { type: 'job-progress', jobId, progress, statusMessage },
+  })
+}
+
 // 단일 작업 처리
 async function processJob(job: typeof nightJobs.$inferSelect) {
   console.log(`🔄 야간 작업 처리 시작: ${job.id}`)
+  const processStartedAt = Date.now()
 
   try {
+    emitProgress(job.companyId, job.id, 0, '작업 준비 중...')
+
     // 에이전트 정보 확인
     const [agent] = await db
       .select({ id: agents.id, isSecretary: agents.isSecretary, name: agents.name })
@@ -102,6 +118,8 @@ async function processJob(job: typeof nightJobs.$inferSelect) {
       content: `[야간 작업] ${job.instruction}`,
     })
 
+    emitProgress(job.companyId, job.id, 20, 'AI 분석 중...')
+
     // AI 응답 생성
     let result: string
     if (agent.isSecretary) {
@@ -122,6 +140,8 @@ async function processJob(job: typeof nightJobs.$inferSelect) {
       })
     }
 
+    emitProgress(job.companyId, job.id, 60, '응답 처리 중...')
+
     // 에이전트 응답 메시지 저장
     await db.insert(chatMessages).values({
       companyId: job.companyId,
@@ -139,16 +159,51 @@ async function processJob(job: typeof nightJobs.$inferSelect) {
       metadata: { jobId: job.id },
     })
 
+    emitProgress(job.companyId, job.id, 80, '보고서 생성 중...')
+
+    // 자동 보고서 생성
+    let reportId: string | null = null
+    try {
+      const [report] = await db
+        .insert(reports)
+        .values({
+          companyId: job.companyId,
+          authorId: job.userId,
+          title: `[야간] ${job.instruction.replace(/\n/g, ' ').slice(0, 50)}`,
+          content: result,
+          status: 'draft',
+        })
+        .returning()
+      reportId = report.id
+      console.log(`📝 야간 작업 보고서 생성: ${reportId}`)
+    } catch (reportErr) {
+      console.error(`⚠️ 야간 작업 보고서 생성 실패: ${job.id}`, reportErr)
+    }
+
     // 작업 완료
+    const resultData = { sessionId, reportId }
     await db
       .update(nightJobs)
       .set({
         status: 'completed',
         result,
+        resultData,
         completedAt: new Date(),
         sessionId,
       })
       .where(eq(nightJobs.id, job.id))
+
+    // 체인: 다음 작업 활성화 (이벤트 발행 전에 실행해야 UI가 즉시 반영됨)
+    if (job.chainId) {
+      await activateNextChainJob(job.id, job.chainId, job.companyId, result)
+    }
+
+    // WebSocket 이벤트 브로드캐스트
+    const durationMs = Date.now() - processStartedAt
+    eventBus.emit('night-job', {
+      companyId: job.companyId,
+      payload: { type: 'job-completed', jobId: job.id, resultData, durationMs, instruction: job.instruction },
+    })
 
     console.log(`✅ 야간 작업 완료: ${job.id}`)
   } catch (err) {
@@ -172,6 +227,12 @@ async function processJob(job: typeof nightJobs.$inferSelect) {
         })
         .where(eq(nightJobs.id, job.id))
 
+      // 재시도 상태 변경 WebSocket 이벤트
+      eventBus.emit('night-job', {
+        companyId: job.companyId,
+        payload: { type: 'job-retrying', jobId: job.id, retryCount: newRetryCount, maxRetries: job.maxRetries },
+      })
+
       console.log(`🔁 재시도 예약 (${newRetryCount}/${job.maxRetries}): ${retryAt.toISOString()}`)
     } else {
       // 최대 재시도 초과 → 실패 확정
@@ -186,8 +247,73 @@ async function processJob(job: typeof nightJobs.$inferSelect) {
         .where(eq(nightJobs.id, job.id))
 
       console.log(`💀 야간 작업 최종 실패: ${job.id} (재시도 ${job.maxRetries}회 초과)`)
+
+      // WebSocket 이벤트 브로드캐스트
+      eventBus.emit('night-job', {
+        companyId: job.companyId,
+        payload: { type: 'job-failed', jobId: job.id, errorCode: 'MAX_RETRIES_EXCEEDED', errorMessage: errorMsg, retryCount: newRetryCount, instruction: job.instruction },
+      })
+
+      // 체인: 후속 작업 전체 실패 처리
+      if (job.chainId) {
+        await failRemainingChainJobs(job.chainId, job.companyId)
+      }
     }
   }
+}
+
+// 체인: 다음 blocked 작업을 queued로 활성화 + 이전 결과 주입
+async function activateNextChainJob(parentJobId: string, chainId: string, companyId: string, previousResult: string) {
+  const [nextJob] = await db
+    .select()
+    .from(nightJobs)
+    .where(
+      and(
+        eq(nightJobs.parentJobId, parentJobId),
+        eq(nightJobs.chainId, chainId),
+        eq(nightJobs.status, 'blocked'),
+      ),
+    )
+    .limit(1)
+
+  if (!nextJob) return
+
+  const enrichedInstruction = `[이전 작업 결과]\n${previousResult.slice(0, 500)}\n\n[현재 지시]\n${nextJob.instruction}`
+
+  await db
+    .update(nightJobs)
+    .set({ status: 'queued', instruction: enrichedInstruction, scheduledFor: new Date() })
+    .where(eq(nightJobs.id, nextJob.id))
+
+  eventBus.emit('night-job', {
+    companyId,
+    payload: { type: 'job-queued', jobId: nextJob.id },
+  })
+
+  console.log(`🔗 체인 다음 작업 활성화: ${nextJob.id}`)
+}
+
+// 체인: 실패 시 남은 blocked 작업 전체 실패 처리
+async function failRemainingChainJobs(chainId: string, companyId: string) {
+  const updated = await db
+    .update(nightJobs)
+    .set({ status: 'failed', error: '이전 작업 실패로 취소됨', completedAt: new Date() })
+    .where(
+      and(
+        eq(nightJobs.chainId, chainId),
+        eq(nightJobs.status, 'blocked'),
+      ),
+    )
+    .returning({ id: nightJobs.id })
+
+  if (updated.length === 0) return
+
+  eventBus.emit('night-job', {
+    companyId,
+    payload: { type: 'chain-failed', chainId, cancelledCount: updated.length },
+  })
+
+  console.log(`🔗 체인 실패: ${updated.length}개 후속 작업 취소됨`)
 }
 
 // 폴링 워커 1회 실행

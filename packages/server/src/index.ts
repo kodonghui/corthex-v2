@@ -25,7 +25,9 @@ import { messengerRoute } from './routes/workspace/messenger'
 import { nexusRoute } from './routes/workspace/nexus'
 import { strategyRoute } from './routes/workspace/strategy'
 import { runMigrations } from './db'
-import { startJobWorker } from './lib/job-queue'
+import { startJobWorker, stopJobWorker } from './lib/job-queue'
+import { startScheduleWorker, stopScheduleWorker } from './lib/schedule-worker'
+import { startTriggerWorker, stopTriggerWorker } from './lib/trigger-worker'
 import { loginRateLimit, apiRateLimit } from './middleware/rate-limit'
 import { wsRoute, websocket, broadcastServerRestart } from './ws/server'
 import { eventBus } from './lib/event-bus'
@@ -94,6 +96,9 @@ eventBus.on('agent-status', (data: { companyId: string; payload: unknown }) => {
 eventBus.on('notification', (data: { userId: string; payload: unknown }) => {
   broadcastToCompany(data.userId, 'notifications', data.payload)
 })
+eventBus.on('night-job', (data: { companyId: string; payload: unknown }) => {
+  broadcastToCompany(data.companyId, 'night-job', data.payload)
+})
 
 // 프로덕션: Bun 네이티브 정적 파일 서빙 (SPA 폴백 포함)
 if (isProd) {
@@ -143,11 +148,16 @@ console.log(`🚀 CORTHEX v2 서버 시작 — http://localhost:${port}`)
 // DB 마이그레이션 자동 적용 후 워커 시작
 runMigrations().then(() => {
   startJobWorker()
+  startScheduleWorker()
+  startTriggerWorker()
 })
 
 // Graceful Shutdown — SIGTERM 시 WS 클라이언트 알림 후 종료
 process.on('SIGTERM', () => {
   console.log('🛑 SIGTERM 수신 — 클라이언트 연결 종료 중...')
+  stopJobWorker()
+  stopScheduleWorker()
+  stopTriggerWorker()
   broadcastServerRestart()
   setTimeout(() => {
     console.log('✅ 서버 종료')

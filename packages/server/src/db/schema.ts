@@ -9,7 +9,7 @@ export const messageSenderEnum = pgEnum('message_sender', ['user', 'agent'])
 export const toolScopeEnum = pgEnum('tool_scope', ['platform', 'company', 'department'])
 export const delegationStatusEnum = pgEnum('delegation_status', ['pending', 'processing', 'completed', 'failed'])
 export const reportStatusEnum = pgEnum('report_status', ['draft', 'submitted', 'reviewed'])
-export const jobStatusEnum = pgEnum('job_status', ['queued', 'processing', 'completed', 'failed'])
+export const jobStatusEnum = pgEnum('job_status', ['queued', 'processing', 'completed', 'failed', 'blocked'])
 export const snsStatusEnum = pgEnum('sns_status', ['draft', 'pending', 'approved', 'rejected', 'published', 'failed'])
 export const snsPlatformEnum = pgEnum('sns_platform', ['instagram', 'tistory', 'daum_cafe'])
 export const activityLogTypeEnum = pgEnum('activity_log_type', ['chat', 'delegation', 'tool_call', 'job', 'sns', 'error', 'system', 'login'])
@@ -318,6 +318,8 @@ export const nightJobs = pgTable('night_jobs', {
   startedAt: timestamp('started_at'),
   completedAt: timestamp('completed_at'),
   isRead: boolean('is_read').notNull().default(false),
+  parentJobId: uuid('parent_job_id'),  // 체인: 이전 작업 참조 (self-reference)
+  chainId: uuid('chain_id'),          // 체인: 같은 그룹 식별자
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 
