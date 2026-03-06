@@ -1,25 +1,25 @@
-import { useCallback, useState, useEffect, useRef } from 'react'
+import { useCallback, useState, useEffect, useRef, useMemo } from 'react'
 import {
   ReactFlow,
   Background,
+  BackgroundVariant,
   Controls,
   MiniMap,
   useNodesState,
   useEdgesState,
   type Node,
   type Edge,
-  type OnNodesChange,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
-import { useAuthStore } from '../stores/auth-store'
+import { useWsStore } from '../stores/ws-store'
 import { CompanyNode } from '../components/nexus/CompanyNode'
 import { DepartmentNode } from '../components/nexus/DepartmentNode'
 import { AgentNode } from '../components/nexus/AgentNode'
-import { NodeDetailPanel } from '../components/nexus/NodeDetailPanel'
+import { NexusInfoPanel } from '../components/nexus/NexusInfoPanel'
 import { getAutoLayout } from '../lib/dagre-layout'
-import type { NexusOrgData, NexusLayoutData } from '@corthex/shared'
+import type { NexusGraphData, NexusGraphNode } from '@corthex/shared'
 
 const nodeTypes = {
   company: CompanyNode,
@@ -28,210 +28,210 @@ const nodeTypes = {
 }
 
 export function NexusPage() {
-  const user = useAuthStore((s) => s.user)
+  const queryClient = useQueryClient()
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
-  const [selectedNode, setSelectedNode] = useState<Node | null>(null)
-  const initialized = useRef(false)
+  const [edges, setEdges] = useEdgesState<Edge>([])
+  const [selectedAgent, setSelectedAgent] = useState<NexusGraphNode | null>(null)
+  const [highlightedDeptId, setHighlightedDeptId] = useState<string | null>(null)
+  const reactFlowRef = useRef<{ fitView: (opts?: { padding?: number }) => void } | null>(null)
 
-  // Admin check
-  if (user?.role !== 'admin') {
+  // WS store
+  const wsSubscribe = useWsStore((s) => s.subscribe)
+  const addListener = useWsStore((s) => s.addListener)
+  const removeListener = useWsStore((s) => s.removeListener)
+  const isConnected = useWsStore((s) => s.isConnected)
+
+  // Fetch graph data
+  const { data: graphRes, isLoading } = useQuery({
+    queryKey: ['nexus-graph'],
+    queryFn: () => api.get<{ data: NexusGraphData }>('/workspace/nexus/graph'),
+  })
+
+  // WebSocket nexus-updated subscription
+  useEffect(() => {
+    if (!isConnected) return
+    wsSubscribe('nexus')
+    const handler = () => {
+      queryClient.invalidateQueries({ queryKey: ['nexus-graph'] }).then(() => {
+        setTimeout(() => reactFlowRef.current?.fitView({ padding: 0.2 }), 100)
+      })
+    }
+    addListener('nexus', handler)
+    return () => {
+      removeListener('nexus', handler)
+    }
+  }, [isConnected, wsSubscribe, addListener, removeListener, queryClient])
+
+  // Graph data -> React Flow nodes/edges
+  useEffect(() => {
+    if (!graphRes?.data) return
+    const graph = graphRes.data
+
+    const hasSavedPositions = graph.nodes.some((n) => n.x !== 0 || n.y !== 0)
+
+    const newNodes: Node[] = graph.nodes.map((n) => ({
+      id: n.id,
+      type: n.type,
+      position: { x: n.x, y: n.y },
+      data: {
+        label: n.label,
+        slug: n.slug,
+        description: n.description,
+        agentCount: n.agentCount,
+        role: n.role,
+        status: n.status,
+        isSecretary: n.isSecretary,
+      },
+      draggable: false,
+    }))
+
+    const newEdges: Edge[] = graph.edges.map((e) => ({
+      id: e.id,
+      source: e.source,
+      target: e.target,
+      type: e.type || 'smoothstep',
+      animated: e.animated,
+      style: e.style as Record<string, string | number> | undefined,
+    }))
+
+    const finalNodes = hasSavedPositions ? newNodes : getAutoLayout(newNodes, newEdges)
+
+    setNodes(finalNodes)
+    setEdges(newEdges)
+  }, [graphRes, setNodes, setEdges])
+
+  // Highlighted edges/nodes for department click
+  const highlightedNodeIds = useMemo(() => {
+    if (!highlightedDeptId) return null
+    const ids = new Set<string>([highlightedDeptId])
+    edges.forEach((e) => {
+      if (e.source === highlightedDeptId) ids.add(e.target)
+    })
+    // Also highlight company parent
+    edges.forEach((e) => {
+      if (e.target === highlightedDeptId) ids.add(e.source)
+    })
+    return ids
+  }, [highlightedDeptId, edges])
+
+  // Apply opacity styles
+  const styledNodes = useMemo(() => {
+    if (!highlightedNodeIds) return nodes
+    return nodes.map((n) => ({
+      ...n,
+      style: {
+        ...n.style,
+        opacity: highlightedNodeIds.has(n.id) ? 1 : 0.3,
+        transition: 'opacity 0.2s ease',
+      },
+    }))
+  }, [nodes, highlightedNodeIds])
+
+  const styledEdges = useMemo(() => {
+    if (!highlightedNodeIds) return edges
+    return edges.map((e) => ({
+      ...e,
+      style: {
+        ...e.style,
+        opacity: highlightedNodeIds.has(e.source) && highlightedNodeIds.has(e.target) ? 1 : 0.15,
+        transition: 'opacity 0.2s ease',
+      },
+    }))
+  }, [edges, highlightedNodeIds])
+
+  const handleNodeClick = useCallback(
+    (_: React.MouseEvent, node: Node) => {
+      if (node.type === 'agent') {
+        // Find the graph node data to pass to info panel
+        const graphNode = graphRes?.data?.nodes.find((n) => n.id === node.id)
+        if (graphNode) {
+          setSelectedAgent(graphNode)
+          setHighlightedDeptId(null)
+        }
+      } else if (node.type === 'department') {
+        setSelectedAgent(null)
+        setHighlightedDeptId((prev) => (prev === node.id ? null : node.id))
+      } else {
+        setSelectedAgent(null)
+        setHighlightedDeptId(null)
+      }
+    },
+    [graphRes],
+  )
+
+  const handlePaneClick = useCallback(() => {
+    setSelectedAgent(null)
+    setHighlightedDeptId(null)
+  }, [])
+
+  // Loading state
+  if (isLoading) {
     return (
-      <div className="h-full flex items-center justify-center">
-        <p className="text-zinc-500">관리자 권한이 필요합니다</p>
+      <div className="h-full flex flex-col items-center justify-center gap-3">
+        <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+        <p className="text-sm text-zinc-500">조직도를 불러오는 중...</p>
       </div>
     )
   }
 
-  const { data: orgData } = useQuery({
-    queryKey: ['nexus-org-data'],
-    queryFn: () => api.get<{ data: NexusOrgData }>('/workspace/nexus/org-data'),
-  })
-
-  const { data: layoutRes } = useQuery({
-    queryKey: ['nexus-layout'],
-    queryFn: () => api.get<{ data: { layoutData: NexusLayoutData } | null }>('/workspace/nexus/layout'),
-  })
-
-  const saveLayout = useMutation({
-    mutationFn: (data: NexusLayoutData) => api.put('/workspace/nexus/layout', data),
-  })
-
-  // org 데이터 → React Flow 노드/엣지 변환
-  useEffect(() => {
-    if (!orgData?.data) return
-    // 이미 초기화된 경우 중복 실행 방지 (org-data가 바뀌면 리셋)
-    const org = orgData.data
-    const saved = layoutRes?.data?.layoutData
-
-    const newNodes: Node[] = []
-    const newEdges: Edge[] = []
-
-    // Company 노드
-    const companyNodeId = `company-${org.company.id}`
-    newNodes.push({
-      id: companyNodeId,
-      type: 'company',
-      position: saved?.nodes?.[companyNodeId] || { x: 0, y: 0 },
-      data: { label: org.company.name, slug: org.company.slug },
-      draggable: true,
-    })
-
-    // Department 노드 + 엣지
-    org.departments.forEach((dept) => {
-      const deptNodeId = `dept-${dept.id}`
-      newNodes.push({
-        id: deptNodeId,
-        type: 'department',
-        position: saved?.nodes?.[deptNodeId] || { x: 0, y: 0 },
-        data: { label: dept.name, description: dept.description, agentCount: dept.agents.length },
-        draggable: true,
-      })
-      newEdges.push({
-        id: `e-company-${dept.id}`,
-        source: companyNodeId,
-        target: deptNodeId,
-        type: 'smoothstep',
-        animated: false,
-      })
-
-      // Agent 노드 in department
-      dept.agents.forEach((agent) => {
-        const agentNodeId = `agent-${agent.id}`
-        newNodes.push({
-          id: agentNodeId,
-          type: 'agent',
-          position: saved?.nodes?.[agentNodeId] || { x: 0, y: 0 },
-          data: {
-            label: agent.name,
-            role: agent.role,
-            status: agent.status,
-            isSecretary: agent.isSecretary,
-          },
-          draggable: true,
-        })
-        newEdges.push({
-          id: `e-dept-${agent.id}`,
-          source: deptNodeId,
-          target: agentNodeId,
-          type: 'smoothstep',
-        })
-      })
-    })
-
-    // 미배정 에이전트
-    org.unassignedAgents.forEach((agent) => {
-      const agentNodeId = `agent-${agent.id}`
-      newNodes.push({
-        id: agentNodeId,
-        type: 'agent',
-        position: saved?.nodes?.[agentNodeId] || { x: 0, y: 0 },
-        data: {
-          label: agent.name,
-          role: agent.role,
-          status: agent.status,
-          isSecretary: agent.isSecretary,
-        },
-        draggable: true,
-      })
-      newEdges.push({
-        id: `e-unassigned-${agent.id}`,
-        source: companyNodeId,
-        target: agentNodeId,
-        type: 'smoothstep',
-        style: { strokeDasharray: '5 5' },
-      })
-    })
-
-    // 저장된 레이아웃 없으면 dagre 자동 정렬
-    const finalNodes = saved?.nodes && Object.keys(saved.nodes).length > 0
-      ? newNodes
-      : getAutoLayout(newNodes, newEdges)
-
-    setNodes(finalNodes)
-    setEdges(newEdges)
-    initialized.current = true
-  }, [orgData, layoutRes])
-
-  const handleNodesChange: OnNodesChange<Node> = useCallback(
-    (changes) => {
-      onNodesChange(changes)
-    },
-    [onNodesChange],
-  )
-
-  const handleSaveLayout = useCallback(() => {
-    const nodePositions: Record<string, { x: number; y: number }> = {}
-    nodes.forEach((n) => {
-      nodePositions[n.id] = { x: n.position.x, y: n.position.y }
-    })
-    saveLayout.mutate({ nodes: nodePositions })
-  }, [nodes, saveLayout])
-
-  const handleAutoLayout = useCallback(() => {
-    const layouted = getAutoLayout(nodes, edges)
-    setNodes(layouted)
-  }, [nodes, edges, setNodes])
+  // Empty state
+  if (!graphRes?.data?.nodes.length) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <p className="text-zinc-500">아직 조직도가 구성되지 않았습니다.</p>
+      </div>
+    )
+  }
 
   return (
     <div className="h-full flex">
       <div className="flex-1 flex flex-col">
-        {/* 툴바 */}
-        <div className="px-4 py-2 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <h2 className="text-lg font-semibold">NEXUS</h2>
-            <span className="text-xs text-zinc-400">조직도 캔버스</span>
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={handleAutoLayout}
-              className="px-3 py-1.5 text-xs border border-zinc-300 dark:border-zinc-600 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800"
-            >
-              자동 정렬
-            </button>
-            <button
-              onClick={handleSaveLayout}
-              disabled={saveLayout.isPending}
-              className="px-3 py-1.5 text-xs bg-indigo-600 text-white rounded hover:bg-indigo-700 disabled:opacity-50"
-            >
-              {saveLayout.isPending ? '저장 중...' : '레이아웃 저장'}
-            </button>
-            {saveLayout.isSuccess && (
-              <span className="text-xs text-green-600 self-center">저장됨</span>
-            )}
-          </div>
+        {/* 헤더 */}
+        <div className="px-4 py-2 border-b border-zinc-200 dark:border-zinc-800 flex items-center gap-3">
+          <h2 className="text-lg font-semibold">NEXUS</h2>
+          <span className="text-xs text-zinc-400">조직도</span>
         </div>
 
         {/* 캔버스 */}
         <div className="flex-1">
           <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={handleNodesChange}
-            onEdgesChange={onEdgesChange}
+            nodes={styledNodes}
+            edges={styledEdges}
+            onNodesChange={onNodesChange}
             nodeTypes={nodeTypes}
-            onNodeClick={(_, node) => setSelectedNode(node)}
-            onPaneClick={() => setSelectedNode(null)}
+            onNodeClick={handleNodeClick}
+            onPaneClick={handlePaneClick}
+            onInit={(instance) => {
+              reactFlowRef.current = instance
+              instance.fitView({ padding: 0.2 })
+            }}
             fitView
+            fitViewOptions={{ padding: 0.2 }}
             minZoom={0.2}
             maxZoom={2}
+            panOnScroll
+            zoomOnPinch
+            nodesDraggable={false}
+            nodesConnectable={false}
+            elementsSelectable={true}
             proOptions={{ hideAttribution: true }}
           >
-            <Background />
+            <Background variant={BackgroundVariant.Dots} gap={16} size={1} color="#3f3f46" />
             <Controls />
             <MiniMap
               nodeStrokeWidth={3}
+              style={{ width: 150, height: 100 }}
               className="!bg-zinc-100 dark:!bg-zinc-800"
             />
           </ReactFlow>
         </div>
       </div>
 
-      {/* 상세 패널 */}
-      {selectedNode && (
-        <NodeDetailPanel
-          selectedNode={selectedNode}
-          onClose={() => setSelectedNode(null)}
+      {/* 에이전트 정보 패널 */}
+      {selectedAgent && (
+        <NexusInfoPanel
+          node={selectedAgent}
+          onClose={() => setSelectedAgent(null)}
         />
       )}
     </div>

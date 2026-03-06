@@ -111,6 +111,146 @@ nexusRoute.put(
   },
 )
 
+// GET /api/workspace/nexus/graph — 통합 그래프 데이터 (노드+엣지+좌표)
+nexusRoute.get('/nexus/graph', async (c) => {
+  const tenant = c.get('tenant')
+
+  const [company] = await db
+    .select({ id: companies.id, name: companies.name, slug: companies.slug })
+    .from(companies)
+    .where(eq(companies.id, tenant.companyId))
+    .limit(1)
+
+  const depts = await db
+    .select({ id: departments.id, name: departments.name, description: departments.description })
+    .from(departments)
+    .where(eq(departments.companyId, tenant.companyId))
+
+  const allAgents = await db
+    .select({
+      id: agents.id,
+      name: agents.name,
+      role: agents.role,
+      status: agents.status,
+      isSecretary: agents.isSecretary,
+      departmentId: agents.departmentId,
+      soul: agents.soul,
+    })
+    .from(agents)
+    .where(and(eq(agents.companyId, tenant.companyId), eq(agents.isActive, true)))
+
+  const [layout] = await db
+    .select()
+    .from(canvasLayouts)
+    .where(and(eq(canvasLayouts.companyId, tenant.companyId), eq(canvasLayouts.isDefault, true)))
+    .limit(1)
+
+  const saved = (layout?.layoutData as { nodes?: Record<string, { x: number; y: number }> } | null)?.nodes || {}
+
+  // Pre-group agents by departmentId (O(n) instead of O(n*m))
+  const agentsByDept = new Map<string, typeof allAgents>()
+  const unassignedAgents: typeof allAgents = []
+  for (const agent of allAgents) {
+    if (agent.departmentId) {
+      const list = agentsByDept.get(agent.departmentId) || []
+      list.push(agent)
+      agentsByDept.set(agent.departmentId, list)
+    } else {
+      unassignedAgents.push(agent)
+    }
+  }
+
+  const nodes: Array<Record<string, unknown>> = []
+  const edges: Array<Record<string, unknown>> = []
+
+  // Company node
+  const companyNodeId = `company-${company.id}`
+  nodes.push({
+    id: companyNodeId,
+    type: 'company',
+    label: company.name,
+    x: saved[companyNodeId]?.x ?? 0,
+    y: saved[companyNodeId]?.y ?? 0,
+    slug: company.slug,
+  })
+
+  // Department nodes + edges
+  for (const dept of depts) {
+    const deptNodeId = `dept-${dept.id}`
+    const deptAgents = agentsByDept.get(dept.id) || []
+    nodes.push({
+      id: deptNodeId,
+      type: 'department',
+      label: dept.name,
+      description: dept.description,
+      agentCount: deptAgents.length,
+      x: saved[deptNodeId]?.x ?? 0,
+      y: saved[deptNodeId]?.y ?? 0,
+    })
+    edges.push({
+      id: `e-company-${dept.id}`,
+      source: companyNodeId,
+      target: deptNodeId,
+      type: 'smoothstep',
+    })
+
+    // Agent nodes in department
+    for (const agent of deptAgents) {
+      const agentNodeId = `agent-${agent.id}`
+      nodes.push({
+        id: agentNodeId,
+        type: 'agent',
+        label: agent.name,
+        agentId: agent.id,
+        role: agent.role,
+        status: agent.status,
+        isSecretary: agent.isSecretary,
+        soul: agent.soul ? agent.soul.split('\n')[0].slice(0, 100) : null,
+        x: saved[agentNodeId]?.x ?? 0,
+        y: saved[agentNodeId]?.y ?? 0,
+      })
+      edges.push({
+        id: `e-dept-${agent.id}`,
+        source: deptNodeId,
+        target: agentNodeId,
+        type: 'smoothstep',
+      })
+    }
+  }
+
+  // Unassigned agents
+  for (const agent of unassignedAgents) {
+    const agentNodeId = `agent-${agent.id}`
+    nodes.push({
+      id: agentNodeId,
+      type: 'agent',
+      label: agent.name,
+      agentId: agent.id,
+      role: agent.role,
+      status: agent.status,
+      isSecretary: agent.isSecretary,
+      soul: agent.soul ? agent.soul.split('\n')[0].slice(0, 100) : null,
+      x: saved[agentNodeId]?.x ?? 0,
+      y: saved[agentNodeId]?.y ?? 0,
+    })
+    edges.push({
+      id: `e-unassigned-${agent.id}`,
+      source: companyNodeId,
+      target: agentNodeId,
+      type: 'smoothstep',
+      style: { strokeDasharray: '5 5' },
+    })
+  }
+
+  return c.json({
+    data: {
+      nodes,
+      edges,
+      updatedAt: layout?.updatedAt?.toISOString() ?? null,
+    },
+  })
+})
+
 // PATCH /api/workspace/nexus/agent/:id/department — 에이전트 부서 이동
 const reassignSchema = z.object({
   departmentId: z.string().uuid().nullable(),

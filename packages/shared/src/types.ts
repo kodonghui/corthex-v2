@@ -205,3 +205,35 @@ export type NexusOrgData = {
     isSecretary: boolean
   }[]
 }
+
+export type NexusGraphNode = {
+  id: string
+  type: 'company' | 'department' | 'agent'
+  label: string
+  x: number
+  y: number
+  color?: string
+  agentId?: string
+  role?: string
+  status?: string
+  isSecretary?: boolean
+  description?: string | null
+  agentCount?: number
+  slug?: string
+  soul?: string | null
+}
+
+export type NexusGraphEdge = {
+  id: string
+  source: string
+  target: string
+  type: 'smoothstep' | 'bezier'
+  animated?: boolean
+  style?: Record<string, string | number>
+}
+
+export type NexusGraphData = {
+  nodes: NexusGraphNode[]
+  edges: NexusGraphEdge[]
+  updatedAt: string | null
+}
