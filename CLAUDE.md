@@ -16,7 +16,7 @@
 
 1. **create-story**: `bmad-bmm-create-story` 스킬 → 스토리 파일 생성
 2. **dev-story**: `bmad-bmm-dev-story` 스킬 → 구현
-3. **TEA automate**: `bmad-bmm-qa-generate-e2e-tests` 스킬 → 자동 테스트 설계+생성
+3. **TEA automate**: `bmad-tea-automate` 스킬 → Test Architect 리스크 기반 테스트 생성
 4. **QA 검증**: `bmad-agent-bmm-qa` 에이전트 → 기능 검증 + 엣지케이스 확인
 5. **code-review**: `bmad-bmm-code-review` 스킬 → 코드 리뷰 (이슈 발견 시 자동 수정)
 

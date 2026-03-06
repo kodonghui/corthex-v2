@@ -22,6 +22,7 @@ const nav = [
   { to: '/report-lines', label: '보고 라인', icon: '📋' },
   { to: '/soul-templates', label: '소울 템플릿', icon: '✨' },
   { to: '/monitoring', label: '시스템 모니터링', icon: '🖥️' },
+  { to: '/org-chart', label: '조직도', icon: '🏗️' },
 ]
 
 export function Sidebar() {

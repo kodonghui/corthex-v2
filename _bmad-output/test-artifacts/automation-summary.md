@@ -1,11 +1,11 @@
 ---
-stepsCompleted: ['step-01-preflight-and-context', 'step-02-identify-targets', 'step-03-generate-tests']
-lastStep: 'step-03-generate-tests'
+stepsCompleted: ['step-01-preflight-and-context', 'step-02-identify-targets', 'step-03-generate-tests', 'step-04-validate-and-summarize']
+lastStep: 'step-04-validate-and-summarize'
 lastSaved: '2026-03-06'
-story: '15-4-system-monitoring'
+story: '15-5-org-tree-viewer'
 ---
 
-# TEA Automation Summary — Story 15-4
+# TEA Automation Summary — Story 15-5 (Org Tree Viewer)
 
 ## Stack & Framework
 - **Stack**: fullstack (monorepo: server + app + admin)
@@ -14,23 +14,38 @@ story: '15-4-system-monitoring'
 
 ## Coverage Plan
 
-| Target | Level | Priority | Tests |
-|--------|-------|----------|-------|
-| error-counter.ts (core) | Unit | P0 | 10 |
-| error-counter.ts (edge cases) | Unit | P1 | 13 |
-| error-counter.ts (rapid fire) | Unit | P2 | 2 |
-| monitoring.ts route module | Unit | P0 | 2 |
-| error.ts integration | Unit | P1 | 4 |
-| API response shape | Unit | P0 | 9 |
-| Uptime formatting | Unit | P1 | 11 |
-| MemoryBar color thresholds | Unit | P1 | 10 |
-| Admin sidebar nav | Unit | P2 | 5 |
+| Priority | Category | Tests |
+|----------|----------|-------|
+| P0 | API Input Validation | 3 |
+| P0 | Response Shape Consistency | 5 |
+| P1 | Data Structure Core | 9 |
+| P1 | Status Color/Label Mapping | 10 |
+| P1 | Department Ordering | 3 |
+| P1 | Status Distribution | 2 |
+| P1 | Tooltip Data | 2 |
+| P1 | Company Node | 3 |
+| P2 | Edge Cases | 5 |
+| P2 | Multi-Department Stress | 2 |
+| P2 | Secretary Distribution | 2 |
 
 ## Results
-- **Total tests**: 66
-- **Pass**: 66
+- **Total tests**: 46
+- **Pass**: 46
 - **Fail**: 0
-- **Full regression**: 1251 tests pass (0 regressions)
+
+## Test Suites (12)
+1. Org Chart — Data Structure (9 tests)
+2. Org Chart — Status Color Mapping (5 tests)
+3. Org Chart — Edge Cases (5 tests)
+4. Org Chart — API Input Validation (3 tests)
+5. Org Chart — Department Ordering (3 tests)
+6. Org Chart — Status Distribution (2 tests)
+7. Org Chart — Status Label Mapping (5 tests)
+8. Org Chart — Tooltip Data (2 tests)
+9. Org Chart — Company Node (3 tests)
+10. Org Chart — Multi-Department Stress (2 tests)
+11. Org Chart — Secretary Distribution (2 tests)
+12. Org Chart — Response Shape (5 tests)
 
 ## Test File
-- `packages/server/src/__tests__/unit/system-monitoring.test.ts` (66 tests)
+- `packages/server/src/__tests__/unit/org-chart.test.ts` (46 tests)
