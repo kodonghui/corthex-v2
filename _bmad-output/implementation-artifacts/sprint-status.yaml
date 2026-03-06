@@ -232,13 +232,13 @@ development_status:
   # ============================================================
   # Epic 17: NEXUS 스케치바이브 (P4) — 스토리 순서 재배치 완료
   # ============================================================
-  epic-17: in-progress
+  epic-17: done
   17-1-p4-db-schema-ws: done
   17-2-nexus-canvas-base: done
   17-3-workflow-edit-exec: done
   17-4-nexus-template-share: done
   17-5-nexus-mobile-access: done
-  epic-17-retrospective: optional
+  epic-17-retrospective: done
 
   # ============================================================
   # Epic 18: MCP 연동 (P4)
