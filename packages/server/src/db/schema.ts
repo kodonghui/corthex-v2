@@ -169,6 +169,7 @@ export const chatMessages = pgTable('chat_messages', {
   sessionId: uuid('session_id').notNull().references(() => chatSessions.id),
   sender: messageSenderEnum('sender').notNull(),
   content: text('content').notNull(),
+  attachmentIds: text('attachment_ids'),  // JSON string array of file UUIDs
   createdAt: timestamp('created_at').notNull().defaultNow(),
 }, (table) => ({
   sessionCreatedIdx: index('chat_messages_session_created_idx').on(table.sessionId, table.createdAt),
@@ -542,6 +543,21 @@ export const strategyBacktestResults = pgTable('strategy_backtest_results', {
 }, (table) => ({
   companyIdx: index('strategy_backtest_company_idx').on(table.companyId),
   userStockIdx: index('strategy_backtest_user_stock_idx').on(table.companyId, table.userId, table.stockCode),
+}))
+
+// === 29. agent_delegation_rules — 에이전트 위임 규칙 ===
+export const agentDelegationRules = pgTable('agent_delegation_rules', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  sourceAgentId: uuid('source_agent_id').notNull().references(() => agents.id),
+  targetAgentId: uuid('target_agent_id').notNull().references(() => agents.id),
+  condition: jsonb('condition').notNull(),  // { keywords: string[], departmentId?: string }
+  priority: integer('priority').notNull().default(0),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('delegation_rules_company_idx').on(table.companyId),
+  sourceIdx: index('delegation_rules_source_idx').on(table.companyId, table.sourceAgentId),
 }))
 
 // === 28. canvas_layouts — NEXUS 캔버스 레이아웃 ===

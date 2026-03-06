@@ -6,7 +6,7 @@ import { api } from '../../lib/api'
 import { useWsStore } from '../../stores/ws-store'
 import { useChatStream } from '../../hooks/use-chat-stream'
 import { ToolCallCard } from './tool-call-card'
-import type { Agent, Message, Delegation, SavedToolCall } from './types'
+import type { Agent, Message, Delegation, SavedToolCall, FileAttachment } from './types'
 import type { ToolCall } from '../../hooks/use-chat-stream'
 
 /** 텍스트 내 마크다운 링크 [text](url)를 클릭 가능한 요소로 변환 */
@@ -51,6 +51,12 @@ function renderTextWithLinks(
   return parts.length > 0 ? parts : text
 }
 
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes}B`
+  if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)}KB`
+  return `${(bytes / 1048576).toFixed(1)}MB`
+}
+
 const statusColors: Record<string, string> = {
   online: 'bg-green-400',
   working: 'bg-yellow-400 animate-pulse',
@@ -72,6 +78,9 @@ export function ChatArea({
   const [input, setInput] = useState('')
   const [showDelegations, setShowDelegations] = useState(false)
   const [reconnectBanner, setReconnectBanner] = useState(false)
+  const [pendingAttachments, setPendingAttachments] = useState<FileAttachment[]>([])
+  const [isUploading, setIsUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const prevConnected = useRef(true)
@@ -112,20 +121,44 @@ export function ChatArea({
   })
 
   const sendMessage = useMutation({
-    mutationFn: (content: string) =>
+    mutationFn: (payload: { content: string; attachmentIds?: string[] }) =>
       api.post<{ data: { userMessage: Message } }>(
         `/workspace/chat/sessions/${sessionId}/messages`,
-        { content },
+        payload,
       ),
     onSuccess: () => {
       startStream()
+      setPendingAttachments([])
       queryClient.invalidateQueries({ queryKey: ['messages', sessionId] })
     },
   })
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = '' // reset input
+    if (pendingAttachments.length >= 5) return
+
+    setIsUploading(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      const res = await api.upload<{ data: FileAttachment }>('/workspace/files', formData)
+      setPendingAttachments(prev => [...prev, res.data])
+    } catch (err) {
+      console.error('[파일 업로드 실패]', err)
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
   const handleSend = () => {
     if (!input.trim() || !sessionId || sendMessage.isPending || isStreaming) return
-    sendMessage.mutate(input.trim())
+    const payload: { content: string; attachmentIds?: string[] } = { content: input.trim() }
+    if (pendingAttachments.length > 0) {
+      payload.attachmentIds = pendingAttachments.map(f => f.id)
+    }
+    sendMessage.mutate(payload)
     setInput('')
   }
 
@@ -134,7 +167,10 @@ export function ChatArea({
     // 마지막 유저 메시지 재전송
     const lastUserMsg = messages.filter((m) => m.sender === 'user').pop()
     if (lastUserMsg) {
-      sendMessage.mutate(lastUserMsg.content)
+      sendMessage.mutate({
+        content: lastUserMsg.content,
+        attachmentIds: lastUserMsg.attachmentIds?.length ? lastUserMsg.attachmentIds : undefined,
+      })
     }
   }
 
@@ -479,6 +515,36 @@ export function ChatArea({
                       <ToolCallCard key={tc.toolId} tool={tc} />
                     ))}
                     <p className="whitespace-pre-wrap">{renderTextWithLinks(mainContent, navigate)}</p>
+                    {msg.attachments && msg.attachments.length > 0 && (
+                      <div className="mt-2 space-y-1.5">
+                        {msg.attachments.map(att => (
+                          <a
+                            key={att.id}
+                            href={`/api/workspace/files/${att.id}/download`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-xs transition-colors ${
+                              msg.sender === 'user'
+                                ? 'bg-indigo-500/30 hover:bg-indigo-500/40'
+                                : 'bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600'
+                            }`}
+                          >
+                            {att.mimeType.startsWith('image/') ? (
+                              <img
+                                src={`/api/workspace/files/${att.id}/download`}
+                                alt={att.filename}
+                                className="w-16 h-16 object-cover rounded"
+                                loading="lazy"
+                              />
+                            ) : (
+                              <span>📄</span>
+                            )}
+                            <span className="truncate max-w-[150px]">{att.filename}</span>
+                            <span className="text-zinc-400 ml-auto">{formatBytes(att.sizeBytes)}</span>
+                          </a>
+                        ))}
+                      </div>
+                    )}
                     {toolContent && (
                       <div className="mt-2 pt-2 border-t border-zinc-200 dark:border-zinc-700">
                         <p className="text-[10px] font-medium text-indigo-500 dark:text-indigo-400 mb-1">
@@ -583,7 +649,39 @@ export function ChatArea({
 
           {/* 입력 영역 */}
           <div className="px-4 md:px-6 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] border-t border-zinc-200 dark:border-zinc-800">
+            {/* 첨부 파일 미리보기 */}
+            {pendingAttachments.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-2">
+                {pendingAttachments.map(f => (
+                  <div key={f.id} className="flex items-center gap-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-lg px-2.5 py-1.5 text-xs">
+                    <span className="text-zinc-500">{f.mimeType.startsWith('image/') ? '🖼️' : '📄'}</span>
+                    <span className="max-w-[120px] truncate">{f.filename}</span>
+                    <span className="text-zinc-400">{formatBytes(f.sizeBytes)}</span>
+                    <button
+                      onClick={() => setPendingAttachments(prev => prev.filter(a => a.id !== f.id))}
+                      className="text-zinc-400 hover:text-red-500 ml-0.5"
+                    >✕</button>
+                  </div>
+                ))}
+              </div>
+            )}
             <div className="flex gap-3">
+              <input
+                ref={fileInputRef}
+                type="file"
+                hidden
+                onChange={handleFileUpload}
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isStreaming || isUploading || pendingAttachments.length >= 5}
+                className="px-3 py-2.5 rounded-xl text-sm text-zinc-500 hover:text-indigo-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                title="파일 첨부 (최대 5개)"
+              >
+                {isUploading ? (
+                  <span className="w-4 h-4 border-2 border-zinc-300 border-t-indigo-500 rounded-full animate-spin inline-block" />
+                ) : '📎'}
+              </button>
               <Input
                 type="text"
                 value={input}

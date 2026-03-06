@@ -1,9 +1,9 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { eq, and, desc, lt } from 'drizzle-orm'
+import { eq, and, desc, lt, inArray } from 'drizzle-orm'
 import { db } from '../../db'
-import { chatSessions, chatMessages, agents, delegations, toolCalls } from '../../db/schema'
+import { chatSessions, chatMessages, agents, delegations, toolCalls, files } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { generateAgentResponse, generateAgentResponseStream } from '../../lib/ai'
@@ -25,6 +25,7 @@ const createSessionSchema = z.object({
 
 const sendMessageSchema = z.object({
   content: z.string().min(1),
+  attachmentIds: z.array(z.string().uuid()).max(5).optional(),
 })
 
 // GET /api/workspace/chat/sessions — 내 채팅 세션 목록
@@ -114,7 +115,31 @@ chatRoute.get('/sessions/:sessionId/messages', async (c) => {
   if (hasMore) messages.pop()
   messages.reverse() // createdAt ASC로 반환
 
-  return c.json({ data: messages, hasMore })
+  // 첨부파일 메타데이터 조인 (JSON.parse 1회만)
+  const parsedMessages = messages.map(m => ({
+    ...m,
+    parsedAttachmentIds: m.attachmentIds ? JSON.parse(m.attachmentIds) as string[] : [],
+  }))
+
+  const allFileIds = parsedMessages.flatMap(m => m.parsedAttachmentIds)
+
+  const filesMap = allFileIds.length > 0
+    ? new Map(
+        (await db
+          .select({ id: files.id, filename: files.filename, mimeType: files.mimeType, sizeBytes: files.sizeBytes })
+          .from(files)
+          .where(inArray(files.id, allFileIds))
+        ).map(f => [f.id, f]),
+      )
+    : new Map<string, { id: string; filename: string; mimeType: string; sizeBytes: number }>()
+
+  const data = parsedMessages.map(({ parsedAttachmentIds, ...m }) => ({
+    ...m,
+    attachmentIds: parsedAttachmentIds,
+    attachments: parsedAttachmentIds.map(id => filesMap.get(id)).filter(Boolean),
+  }))
+
+  return c.json({ data, hasMore })
 })
 
 // POST /api/workspace/chat/sessions/:sessionId/messages — 메시지 전송
@@ -124,7 +149,22 @@ chatRoute.post(
   async (c) => {
     const tenant = c.get('tenant')
     const sessionId = c.req.param('sessionId')
-    const { content } = c.req.valid('json')
+    const { content, attachmentIds } = c.req.valid('json')
+
+    // 첨부파일 검증: 존재 + 같은 회사 소속 확인
+    if (attachmentIds?.length) {
+      const validFiles = await db
+        .select({ id: files.id })
+        .from(files)
+        .where(and(
+          inArray(files.id, attachmentIds),
+          eq(files.companyId, tenant.companyId),
+          eq(files.isActive, true),
+        ))
+      if (validFiles.length !== attachmentIds.length) {
+        throw new HTTPError(400, '유효하지 않은 파일이 포함되어 있습니다', 'FILE_007')
+      }
+    }
 
     // 세션 소유권 + 에이전트 정보 확인
     const [session] = await db
@@ -150,6 +190,7 @@ chatRoute.post(
         sessionId,
         sender: 'user',
         content,
+        attachmentIds: attachmentIds?.length ? JSON.stringify(attachmentIds) : null,
       })
       .returning()
 

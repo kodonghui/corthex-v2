@@ -120,6 +120,20 @@
       "when": 1772767525327,
       "tag": "0016_unusual_northstar",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1772853600000,
+      "tag": "0017_agent_delegation_rules",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1772899200000,
+      "tag": "0020_chat-message-attachments",
+      "breakpoints": true
     }
   ]
 }

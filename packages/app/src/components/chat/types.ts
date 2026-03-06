@@ -14,10 +14,19 @@ export type Session = {
   createdAt: string
 }
 
+export type FileAttachment = {
+  id: string
+  filename: string
+  mimeType: string
+  sizeBytes: number
+}
+
 export type Message = {
   id: string
   sender: 'user' | 'agent'
   content: string
+  attachmentIds?: string[]
+  attachments?: FileAttachment[]
   createdAt: string
 }
 
