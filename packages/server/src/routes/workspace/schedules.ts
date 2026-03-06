@@ -47,14 +47,20 @@ const createScheduleSchema = z.object({
   agentId: z.string().uuid(),
   instruction: z.string().min(1).max(2000),
   frequency: z.enum(['daily', 'weekdays', 'custom']),
-  time: z.string().regex(/^\d{2}:\d{2}$/),
+  time: z.string().regex(/^\d{2}:\d{2}$/).refine((t) => {
+    const [h, m] = t.split(':').map(Number)
+    return h >= 0 && h <= 23 && m >= 0 && m <= 59
+  }, '유효한 시간(00:00~23:59)을 입력하세요'),
   days: z.array(z.number().min(0).max(6)).optional(),
 })
 
 const updateScheduleSchema = z.object({
   instruction: z.string().min(1).max(2000).optional(),
   frequency: z.enum(['daily', 'weekdays', 'custom']).optional(),
-  time: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+  time: z.string().regex(/^\d{2}:\d{2}$/).refine((t) => {
+    const [h, m] = t.split(':').map(Number)
+    return h >= 0 && h <= 23 && m >= 0 && m <= 59
+  }, '유효한 시간(00:00~23:59)을 입력하세요').optional(),
   days: z.array(z.number().min(0).max(6)).optional(),
 })
 
@@ -134,7 +140,7 @@ schedulesRoute.patch('/:id', zValidator('json', updateScheduleSchema), async (c)
   if (!existing) throw new HTTPError(404, '스케줄을 찾을 수 없습니다', 'SCHEDULE_002')
 
   const updates: Record<string, unknown> = { updatedAt: new Date() }
-  if (body.instruction) updates.instruction = body.instruction
+  if (body.instruction !== undefined) updates.instruction = body.instruction
 
   if (body.frequency || body.time || body.days) {
     // 기존 cron에서 frequency 추론
@@ -162,7 +168,7 @@ schedulesRoute.patch('/:id', zValidator('json', updateScheduleSchema), async (c)
   const [updated] = await db
     .update(nightJobSchedules)
     .set(updates)
-    .where(eq(nightJobSchedules.id, id))
+    .where(and(eq(nightJobSchedules.id, id), eq(nightJobSchedules.companyId, tenant.companyId), eq(nightJobSchedules.userId, tenant.userId)))
     .returning()
 
   return c.json({ data: { ...updated, description: describeCron(updated.cronExpression) } })
@@ -191,7 +197,7 @@ schedulesRoute.patch('/:id/toggle', async (c) => {
   const [updated] = await db
     .update(nightJobSchedules)
     .set(updates)
-    .where(eq(nightJobSchedules.id, id))
+    .where(and(eq(nightJobSchedules.id, id), eq(nightJobSchedules.companyId, tenant.companyId), eq(nightJobSchedules.userId, tenant.userId)))
     .returning()
 
   return c.json({ data: updated })
@@ -210,6 +216,6 @@ schedulesRoute.delete('/:id', async (c) => {
 
   if (!existing) throw new HTTPError(404, '스케줄을 찾을 수 없습니다', 'SCHEDULE_002')
 
-  await db.delete(nightJobSchedules).where(eq(nightJobSchedules.id, id))
+  await db.delete(nightJobSchedules).where(and(eq(nightJobSchedules.id, id), eq(nightJobSchedules.companyId, tenant.companyId), eq(nightJobSchedules.userId, tenant.userId)))
   return c.json({ data: { deleted: true } })
 })
