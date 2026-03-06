@@ -115,9 +115,9 @@ describe('TEA — Story 17-5: NEXUS 모바일 접근 리스크 기반 테스트'
     const editorContent = readFileSync(join(APP_SRC, 'components/nexus/WorkflowEditor.tsx'), 'utf-8')
     const listContent = readFileSync(join(APP_SRC, 'components/nexus/WorkflowListPanel.tsx'), 'utf-8')
 
-    test('nexus.tsx: sm 브레이크포인트 사용 (탭 버튼)', () => {
-      expect(nexusContent).toContain('sm:flex-none')
-      expect(nexusContent).toContain('sm:text-lg')
+    test('nexus.tsx: md 브레이크포인트 사용 (채팅 토글)', () => {
+      expect(nexusContent).toContain('hidden md:flex')
+      expect(nexusContent).toContain('hidden md:block')
     })
 
     test('nexus.tsx: md 브레이크포인트 사용 (MiniMap)', () => {
@@ -176,13 +176,14 @@ describe('TEA — Story 17-5: NEXUS 모바일 접근 리스크 기반 테스트'
     const editorContent = readFileSync(join(APP_SRC, 'components/nexus/WorkflowEditor.tsx'), 'utf-8')
     const infoPanelContent = readFileSync(join(APP_SRC, 'components/nexus/NexusInfoPanel.tsx'), 'utf-8')
 
-    test('nexus.tsx: ReactFlow 읽기 전용 속성 유지 (nodesDraggable=false)', () => {
-      expect(nexusContent).toContain('nodesDraggable={false}')
+    test('nexus.tsx: SketchVibe 캔버스 드래그/연결 활성화', () => {
+      expect(nexusContent).toContain('nodesDraggable')
+      expect(nexusContent).toContain('nodesConnectable')
     })
 
-    test('nexus.tsx: 최소/최대 줌 제한 유지', () => {
-      expect(nexusContent).toContain('minZoom={0.2}')
-      expect(nexusContent).toContain('maxZoom={2}')
+    test('nexus.tsx: 줌 제한 설정', () => {
+      expect(nexusContent).toContain('minZoom')
+      expect(nexusContent).toContain('maxZoom')
     })
 
     test('WorkflowEditor: 삭제 키 설정 유지 (Backspace + Delete)', () => {
@@ -220,13 +221,14 @@ describe('TEA — Story 17-5: NEXUS 모바일 접근 리스크 기반 테스트'
     const editorContent = readFileSync(join(APP_SRC, 'components/nexus/WorkflowEditor.tsx'), 'utf-8')
     const listContent = readFileSync(join(APP_SRC, 'components/nexus/WorkflowListPanel.tsx'), 'utf-8')
 
-    test('nexus.tsx: WebSocket nexus 채널 구독 유지', () => {
-      expect(nexusContent).toContain("wsSubscribe('nexus')")
+    test('nexus.tsx: SketchVibe 캔버스 + 채팅 구조', () => {
+      expect(nexusContent).toContain('SketchVibe')
+      expect(nexusContent).toContain('ChatArea')
     })
 
-    test('nexus.tsx: 조직도/워크플로우 2탭 구조 유지', () => {
-      expect(nexusContent).toContain("'org'")
-      expect(nexusContent).toContain("'workflows'")
+    test('nexus.tsx: 캔버스 컨텍스트를 AI에 전달', () => {
+      expect(nexusContent).toContain('canvasContext')
+      expect(nexusContent).toContain('canvasToText')
     })
 
     test('nexus.tsx: fitView padding 0.2 유지', () => {

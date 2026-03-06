@@ -73,22 +73,20 @@ describe('QA — Story 17-5: NEXUS 모바일 접근 기능 검증', () => {
     })
   })
 
-  // ========== AC #3: 부서 노드 하이라이트 (터치 탭 토글) ==========
-  describe('AC #3: 부서 노드 하이라이트', () => {
+  // ========== AC #3: SketchVibe 캔버스 인터랙션 ==========
+  describe('AC #3: SketchVibe 캔버스 인터랙션', () => {
     const content = readFileSync(join(APP_SRC, 'pages/nexus.tsx'), 'utf-8')
 
-    test('부서 클릭 시 하이라이트 토글', () => {
-      expect(content).toContain('highlightedDeptId')
-      // 토글 로직: prev === node.id ? null : node.id
-      expect(content).toContain('prev === node.id ? null : node.id')
+    test('노드 드래그 활성화 (nodesDraggable)', () => {
+      expect(content).toContain('nodesDraggable')
     })
 
-    test('하이라이트 시 opacity 0.3 적용', () => {
-      expect(content).toContain('? 1 : 0.3')
+    test('노드 연결 활성화 (nodesConnectable)', () => {
+      expect(content).toContain('nodesConnectable')
     })
 
-    test('하이라이트 전환 애니메이션', () => {
-      expect(content).toContain("transition: 'opacity 0.2s ease'")
+    test('Delete 키로 삭제 가능', () => {
+      expect(content).toContain('deleteKeyCode')
     })
   })
 
@@ -145,20 +143,20 @@ describe('QA — Story 17-5: NEXUS 모바일 접근 기능 검증', () => {
     })
   })
 
-  // ========== AC #7: 모바일 헤더 탭 ==========
-  describe('AC #7: 모바일 NEXUS 헤더 탭', () => {
+  // ========== AC #7: 모바일 캔버스/채팅 전환 ==========
+  describe('AC #7: 모바일 SketchVibe 뷰 전환', () => {
     const content = readFileSync(join(APP_SRC, 'pages/nexus.tsx'), 'utf-8')
 
-    test('탭 버튼 flex-1 (모바일 균등 배분)', () => {
-      expect(content).toContain('flex-1 sm:flex-none')
+    test('모바일 캔버스/채팅 전환 버튼', () => {
+      expect(content).toContain('mobileView')
     })
 
-    test('탭 버튼 text-center', () => {
-      expect(content).toContain('text-center')
+    test('SketchVibe 헤더', () => {
+      expect(content).toContain('SketchVibe')
     })
 
-    test('탭 컨테이너 flex-1 sm:flex-none', () => {
-      expect(content).toContain('flex-1 sm:flex-none')
+    test('에이전트 선택 드롭다운', () => {
+      expect(content).toContain('selectedAgentId')
     })
   })
 
@@ -226,9 +224,9 @@ describe('QA — Story 17-5: NEXUS 모바일 접근 기능 검증', () => {
       expect(content).toContain("if (!label) return")
     })
 
-    test('nexus.tsx: 조직도 빈 상태 처리', () => {
+    test('nexus.tsx: 캔버스 빈 상태 안내', () => {
       const content = readFileSync(join(APP_SRC, 'pages/nexus.tsx'), 'utf-8')
-      expect(content).toContain('아직 조직도가 구성되지 않았습니다')
+      expect(content).toContain('여기에 그림을 그려보세요')
     })
   })
 })
