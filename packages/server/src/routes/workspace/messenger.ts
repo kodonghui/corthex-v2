@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { eq, and, desc, inArray } from 'drizzle-orm'
+import { eq, and, desc, inArray, sql } from 'drizzle-orm'
 import { db } from '../../db'
 import { messengerChannels, messengerMembers, messengerMessages, users } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
@@ -17,6 +17,11 @@ const createChannelSchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().optional(),
   memberIds: z.array(z.string().uuid()).optional(),
+})
+
+const updateChannelSchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  description: z.string().optional(),
 })
 
 const sendMessageSchema = z.object({
@@ -42,7 +47,7 @@ async function assertMember(channelId: string, userId: string, companyId: string
   if (!member) throw new HTTPError(403, '채널 멤버가 아닙니다', 'MSG_002')
 }
 
-// GET /messenger/channels — 내가 참여한 채널 목록
+// GET /messenger/channels — 내가 참여한 채널 목록 (lastMessage 포함)
 messengerRoute.get('/channels', async (c) => {
   const tenant = c.get('tenant')
 
@@ -74,7 +79,172 @@ messengerRoute.get('/channels', async (c) => {
     ))
     .orderBy(messengerChannels.createdAt)
 
-  return c.json({ data: channels })
+  // 각 채널의 마지막 메시지 가져오기
+  const channelsWithLastMsg = await Promise.all(
+    channels.map(async (ch) => {
+      const [lastMsg] = await db
+        .select({
+          content: messengerMessages.content,
+          userName: users.name,
+          createdAt: messengerMessages.createdAt,
+        })
+        .from(messengerMessages)
+        .innerJoin(users, eq(messengerMessages.userId, users.id))
+        .where(and(
+          eq(messengerMessages.channelId, ch.id),
+          eq(messengerMessages.companyId, tenant.companyId),
+        ))
+        .orderBy(desc(messengerMessages.createdAt))
+        .limit(1)
+
+      return { ...ch, lastMessage: lastMsg || null }
+    }),
+  )
+
+  return c.json({ data: channelsWithLastMsg })
+})
+
+// GET /messenger/channels/:id — 채널 상세
+messengerRoute.get('/channels/:id', async (c) => {
+  const tenant = c.get('tenant')
+  const channelId = c.req.param('id')
+
+  await assertMember(channelId, tenant.userId, tenant.companyId)
+
+  const [channel] = await db
+    .select({
+      id: messengerChannels.id,
+      name: messengerChannels.name,
+      description: messengerChannels.description,
+      createdBy: messengerChannels.createdBy,
+      createdAt: messengerChannels.createdAt,
+    })
+    .from(messengerChannels)
+    .where(and(
+      eq(messengerChannels.id, channelId),
+      eq(messengerChannels.companyId, tenant.companyId),
+    ))
+    .limit(1)
+
+  if (!channel) throw new HTTPError(404, '채널을 찾을 수 없습니다', 'MSG_004')
+
+  const memberCount = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(messengerMembers)
+    .where(and(
+      eq(messengerMembers.channelId, channelId),
+      eq(messengerMembers.companyId, tenant.companyId),
+    ))
+
+  return c.json({ data: { ...channel, memberCount: memberCount[0].count } })
+})
+
+// GET /messenger/channels/:id/members — 채널 멤버 목록
+messengerRoute.get('/channels/:id/members', async (c) => {
+  const tenant = c.get('tenant')
+  const channelId = c.req.param('id')
+
+  await assertMember(channelId, tenant.userId, tenant.companyId)
+
+  const members = await db
+    .select({
+      id: users.id,
+      name: users.name,
+      role: users.role,
+      joinedAt: messengerMembers.joinedAt,
+    })
+    .from(messengerMembers)
+    .innerJoin(users, eq(messengerMembers.userId, users.id))
+    .where(and(
+      eq(messengerMembers.channelId, channelId),
+      eq(messengerMembers.companyId, tenant.companyId),
+    ))
+    .orderBy(messengerMembers.joinedAt)
+
+  return c.json({ data: members })
+})
+
+// PUT /messenger/channels/:id — 채널 수정
+messengerRoute.put('/channels/:id', zValidator('json', updateChannelSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const channelId = c.req.param('id')
+  const updates = c.req.valid('json')
+
+  await assertMember(channelId, tenant.userId, tenant.companyId)
+
+  const setValues: Record<string, unknown> = {}
+  if (updates.name !== undefined) setValues.name = updates.name
+  if (updates.description !== undefined) setValues.description = updates.description
+
+  if (Object.keys(setValues).length === 0) {
+    throw new HTTPError(400, '수정할 내용이 없습니다', 'MSG_005')
+  }
+
+  const [updated] = await db
+    .update(messengerChannels)
+    .set(setValues)
+    .where(and(
+      eq(messengerChannels.id, channelId),
+      eq(messengerChannels.companyId, tenant.companyId),
+    ))
+    .returning()
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'system',
+    phase: 'end',
+    actorType: 'user',
+    actorId: tenant.userId,
+    action: `메신저 채널 수정: ${updated.name}`,
+  })
+
+  return c.json({ data: updated })
+})
+
+// DELETE /messenger/channels/:id — 채널 삭제 (생성자만)
+messengerRoute.delete('/channels/:id', async (c) => {
+  const tenant = c.get('tenant')
+  const channelId = c.req.param('id')
+
+  // 채널 정보 가져오기
+  const [channel] = await db
+    .select({ id: messengerChannels.id, name: messengerChannels.name, createdBy: messengerChannels.createdBy })
+    .from(messengerChannels)
+    .where(and(
+      eq(messengerChannels.id, channelId),
+      eq(messengerChannels.companyId, tenant.companyId),
+    ))
+    .limit(1)
+
+  if (!channel) throw new HTTPError(404, '채널을 찾을 수 없습니다', 'MSG_004')
+  if (channel.createdBy !== tenant.userId) {
+    throw new HTTPError(403, '채널 생성자만 삭제할 수 있습니다', 'MSG_006')
+  }
+
+  // FK 순서: messages → members → channel
+  await db.delete(messengerMessages).where(and(
+    eq(messengerMessages.channelId, channelId),
+    eq(messengerMessages.companyId, tenant.companyId),
+  ))
+  await db.delete(messengerMembers).where(and(
+    eq(messengerMembers.channelId, channelId),
+    eq(messengerMembers.companyId, tenant.companyId),
+  ))
+  await db.delete(messengerChannels).where(and(
+    eq(messengerChannels.id, channelId),
+    eq(messengerChannels.companyId, tenant.companyId),
+  ))
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'system',
+    phase: 'end',
+    actorType: 'user',
+    actorId: tenant.userId,
+    action: `메신저 채널 삭제: ${channel.name}`,
+  })
+
+  return c.json({ data: { deleted: true } })
 })
 
 // POST /messenger/channels — 채널 생성
@@ -198,6 +368,24 @@ messengerRoute.post('/channels/:id/members', zValidator('json', addMemberSchema)
     .returning()
 
   return c.json({ data: member }, 201)
+})
+
+// DELETE /messenger/channels/:id/members/me — 채널 나가기
+messengerRoute.delete('/channels/:id/members/me', async (c) => {
+  const tenant = c.get('tenant')
+  const channelId = c.req.param('id')
+
+  await assertMember(channelId, tenant.userId, tenant.companyId)
+
+  await db
+    .delete(messengerMembers)
+    .where(and(
+      eq(messengerMembers.channelId, channelId),
+      eq(messengerMembers.userId, tenant.userId),
+      eq(messengerMembers.companyId, tenant.companyId),
+    ))
+
+  return c.json({ data: { left: true } })
 })
 
 // DELETE /messenger/channels/:id/members/:uid — 멤버 제거
