@@ -1,12 +1,13 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { eq, and } from 'drizzle-orm'
+import { eq, and, sql } from 'drizzle-orm'
 import { db } from '../../db'
-import { agents } from '../../db/schema'
+import { agents, agentDelegationRules } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { logActivity } from '../../lib/activity-logger'
+import { detectCycleInDelegationRules } from '../../lib/orchestrator'
 import type { AppEnv } from '../../types'
 
 export const workspaceAgentsRoute = new Hono<AppEnv>()
@@ -30,6 +31,41 @@ workspaceAgentsRoute.get('/agents', async (c) => {
     .where(and(eq(agents.companyId, tenant.companyId), eq(agents.isActive, true)))
 
   return c.json({ data: result })
+})
+
+// GET /api/workspace/agents/delegation-rules — 회사 전체 위임 규칙 조회
+// NOTE: :id 라우트보다 위에 등록해야 'delegation-rules'가 :id로 캡처되지 않음
+workspaceAgentsRoute.get('/agents/delegation-rules', async (c) => {
+  const tenant = c.get('tenant')
+
+  const rules = await db
+    .select({
+      id: agentDelegationRules.id,
+      sourceAgentId: agentDelegationRules.sourceAgentId,
+      targetAgentId: agentDelegationRules.targetAgentId,
+      condition: agentDelegationRules.condition,
+      priority: agentDelegationRules.priority,
+      isActive: agentDelegationRules.isActive,
+      createdAt: agentDelegationRules.createdAt,
+    })
+    .from(agentDelegationRules)
+    .where(eq(agentDelegationRules.companyId, tenant.companyId))
+
+  // 에이전트 이름 조인
+  const agentList = await db
+    .select({ id: agents.id, name: agents.name })
+    .from(agents)
+    .where(eq(agents.companyId, tenant.companyId))
+  const agentNames: Record<string, string> = {}
+  for (const a of agentList) agentNames[a.id] = a.name
+
+  const data = rules.map(r => ({
+    ...r,
+    sourceAgentName: agentNames[r.sourceAgentId] || '알 수 없음',
+    targetAgentName: agentNames[r.targetAgentId] || '알 수 없음',
+  }))
+
+  return c.json({ data })
 })
 
 // GET /api/workspace/agents/:id — 에이전트 상세 (내 회사만)
@@ -132,4 +168,113 @@ workspaceAgentsRoute.post('/agents/:id/soul/reset', async (c) => {
   })
 
   return c.json({ data: updated })
+})
+
+// === 위임 규칙 CRUD (POST/DELETE) ===
+
+// POST /api/workspace/agents/delegation-rules — 위임 규칙 생성
+const createRuleSchema = z.object({
+  sourceAgentId: z.string().uuid(),
+  targetAgentId: z.string().uuid(),
+  condition: z.object({
+    keywords: z.array(z.string()).min(1),
+    departmentId: z.string().uuid().optional(),
+  }),
+  priority: z.number().int().min(0).max(100).default(0),
+})
+
+workspaceAgentsRoute.post('/agents/delegation-rules', zValidator('json', createRuleSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const body = c.req.valid('json')
+
+  // 역할 기반 권한 체크: admin/manager만 허용
+  if (tenant.role !== 'admin' && tenant.role !== 'manager') {
+    throw new HTTPError(403, '위임 규칙은 관리자 또는 매니저만 생성할 수 있습니다', 'AUTH_003')
+  }
+
+  // 자기 자신에게 위임 금지
+  if (body.sourceAgentId === body.targetAgentId) {
+    throw new HTTPError(400, '같은 에이전트에게 위임할 수 없습니다', 'RULE_002')
+  }
+
+  // 회사별 규칙 개수 제한 (50개)
+  const [countResult] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(agentDelegationRules)
+    .where(eq(agentDelegationRules.companyId, tenant.companyId))
+  if (countResult.count >= 50) {
+    throw new HTTPError(400, '위임 규칙 최대 개수(50)를 초과했습니다', 'RULE_004')
+  }
+
+  // sourceAgentId, targetAgentId가 같은 회사 소속인지 확인
+  const [source] = await db
+    .select({ id: agents.id })
+    .from(agents)
+    .where(and(eq(agents.id, body.sourceAgentId), eq(agents.companyId, tenant.companyId)))
+    .limit(1)
+  if (!source) throw new HTTPError(404, '소스 에이전트를 찾을 수 없습니다', 'AGENT_001')
+
+  const [target] = await db
+    .select({ id: agents.id })
+    .from(agents)
+    .where(and(eq(agents.id, body.targetAgentId), eq(agents.companyId, tenant.companyId)))
+    .limit(1)
+  if (!target) throw new HTTPError(404, '대상 에이전트를 찾을 수 없습니다', 'AGENT_001')
+
+  // 순환 위임 경로 감지
+  const hasCycle = await detectCycleInDelegationRules(tenant.companyId, body.sourceAgentId, body.targetAgentId)
+  if (hasCycle) {
+    throw new HTTPError(400, '순환 위임 경로가 감지되었습니다', 'RULE_003')
+  }
+
+  const [rule] = await db
+    .insert(agentDelegationRules)
+    .values({
+      companyId: tenant.companyId,
+      sourceAgentId: body.sourceAgentId,
+      targetAgentId: body.targetAgentId,
+      condition: body.condition,
+      priority: body.priority,
+    })
+    .returning()
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'system',
+    phase: 'end',
+    actorType: 'user',
+    actorId: tenant.userId,
+    action: `위임 규칙 생성`,
+  })
+
+  return c.json({ data: rule }, 201)
+})
+
+// DELETE /api/workspace/agents/delegation-rules/:id — 위임 규칙 삭제
+workspaceAgentsRoute.delete('/agents/delegation-rules/:id', async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+
+  // 역할 기반 권한 체크: admin/manager만 허용
+  if (tenant.role !== 'admin' && tenant.role !== 'manager') {
+    throw new HTTPError(403, '위임 규칙은 관리자 또는 매니저만 삭제할 수 있습니다', 'AUTH_003')
+  }
+
+  const deleted = await db
+    .delete(agentDelegationRules)
+    .where(and(eq(agentDelegationRules.id, id), eq(agentDelegationRules.companyId, tenant.companyId)))
+    .returning({ id: agentDelegationRules.id })
+
+  if (deleted.length === 0) throw new HTTPError(404, '위임 규칙을 찾을 수 없습니다', 'RULE_001')
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'system',
+    phase: 'end',
+    actorType: 'user',
+    actorId: tenant.userId,
+    action: `위임 규칙 삭제`,
+  })
+
+  return c.json({ data: { id: deleted[0].id } })
 })
