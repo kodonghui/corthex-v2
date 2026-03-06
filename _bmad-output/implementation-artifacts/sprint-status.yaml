@@ -184,7 +184,7 @@ development_status:
   12-2-parallel-delegation: done
   12-3-delegation-realtime-ui: done
   12-4-delegation-security: done
-  epic-12-retrospective: optional
+  epic-12-retrospective: done
 
   # ============================================================
   # Epic 13: 파일 관리 (P2)
