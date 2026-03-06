@@ -12,12 +12,15 @@ import {
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useSearchParams } from 'react-router-dom'
 import { api } from '../lib/api'
 import { useWsStore } from '../stores/ws-store'
 import { CompanyNode } from '../components/nexus/CompanyNode'
 import { DepartmentNode } from '../components/nexus/DepartmentNode'
 import { AgentNode } from '../components/nexus/AgentNode'
 import { NexusInfoPanel } from '../components/nexus/NexusInfoPanel'
+import { WorkflowListPanel } from '../components/nexus/WorkflowListPanel'
+import { WorkflowEditor } from '../components/nexus/WorkflowEditor'
 import { getAutoLayout } from '../lib/dagre-layout'
 import type { NexusGraphData, NexusGraphNode } from '@corthex/shared'
 
@@ -27,8 +30,14 @@ const nodeTypes = {
   agent: AgentNode,
 }
 
+type NexusTab = 'org' | 'workflows'
+
 export function NexusPage() {
   const queryClient = useQueryClient()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const currentTab = (searchParams.get('tab') === 'workflows' ? 'workflows' : 'org') as NexusTab
+  const [selectedWorkflowId, setSelectedWorkflowId] = useState<string | null>(null)
+
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   const [edges, setEdges] = useEdgesState<Edge>([])
   const [selectedAgent, setSelectedAgent] = useState<NexusGraphNode | null>(null)
@@ -45,6 +54,7 @@ export function NexusPage() {
   const { data: graphRes, isLoading } = useQuery({
     queryKey: ['nexus-graph'],
     queryFn: () => api.get<{ data: NexusGraphData }>('/workspace/nexus/graph'),
+    enabled: currentTab === 'org',
   })
 
   // WebSocket nexus-updated subscription
@@ -164,75 +174,112 @@ export function NexusPage() {
     setHighlightedDeptId(null)
   }, [])
 
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className="h-full flex flex-col items-center justify-center gap-3">
-        <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-        <p className="text-sm text-zinc-500">조직도를 불러오는 중...</p>
-      </div>
-    )
-  }
-
-  // Empty state
-  if (!graphRes?.data?.nodes.length) {
-    return (
-      <div className="h-full flex items-center justify-center">
-        <p className="text-zinc-500">아직 조직도가 구성되지 않았습니다.</p>
-      </div>
-    )
+  const setTab = (tab: NexusTab) => {
+    if (tab === 'org') {
+      setSearchParams({})
+    } else {
+      setSearchParams({ tab })
+    }
+    setSelectedWorkflowId(null)
   }
 
   return (
-    <div className="h-full flex">
-      <div className="flex-1 flex flex-col">
-        {/* 헤더 */}
-        <div className="px-4 py-2 border-b border-zinc-200 dark:border-zinc-800 flex items-center gap-3">
-          <h2 className="text-lg font-semibold">NEXUS</h2>
-          <span className="text-xs text-zinc-400">조직도</span>
-        </div>
-
-        {/* 캔버스 */}
-        <div className="flex-1">
-          <ReactFlow
-            nodes={styledNodes}
-            edges={styledEdges}
-            onNodesChange={onNodesChange}
-            nodeTypes={nodeTypes}
-            onNodeClick={handleNodeClick}
-            onPaneClick={handlePaneClick}
-            onInit={(instance) => {
-              reactFlowRef.current = instance
-              instance.fitView({ padding: 0.2 })
-            }}
-            fitView
-            fitViewOptions={{ padding: 0.2 }}
-            minZoom={0.2}
-            maxZoom={2}
-            panOnScroll
-            zoomOnPinch
-            nodesDraggable={false}
-            nodesConnectable={false}
-            elementsSelectable={true}
-            proOptions={{ hideAttribution: true }}
+    <div className="h-full flex flex-col">
+      {/* 헤더 + 탭 */}
+      <div className="px-4 py-2 border-b border-zinc-200 dark:border-zinc-800 flex items-center gap-4">
+        <h2 className="text-lg font-semibold">NEXUS</h2>
+        <div className="flex gap-1">
+          <button
+            onClick={() => setTab('org')}
+            className={`px-3 py-1 text-sm rounded-lg transition-colors ${
+              currentTab === 'org'
+                ? 'bg-zinc-700 text-white'
+                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800'
+            }`}
           >
-            <Background variant={BackgroundVariant.Dots} gap={16} size={1} color="#3f3f46" />
-            <Controls />
-            <MiniMap
-              nodeStrokeWidth={3}
-              style={{ width: 150, height: 100 }}
-              className="!bg-zinc-100 dark:!bg-zinc-800"
-            />
-          </ReactFlow>
+            조직도
+          </button>
+          <button
+            onClick={() => setTab('workflows')}
+            className={`px-3 py-1 text-sm rounded-lg transition-colors ${
+              currentTab === 'workflows'
+                ? 'bg-zinc-700 text-white'
+                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800'
+            }`}
+          >
+            워크플로우
+          </button>
         </div>
       </div>
 
-      {/* 에이전트 정보 패널 */}
-      {selectedAgent && (
-        <NexusInfoPanel
-          node={selectedAgent}
-          onClose={() => setSelectedAgent(null)}
-        />
+      {/* 탭 콘텐츠 */}
+      {currentTab === 'org' ? (
+        <div className="flex-1 flex">
+          <div className="flex-1 flex flex-col">
+            {isLoading ? (
+              <div className="flex-1 flex flex-col items-center justify-center gap-3">
+                <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                <p className="text-sm text-zinc-500">조직도를 불러오는 중...</p>
+              </div>
+            ) : !graphRes?.data?.nodes.length ? (
+              <div className="flex-1 flex items-center justify-center">
+                <p className="text-zinc-500">아직 조직도가 구성되지 않았습니다.</p>
+              </div>
+            ) : (
+              <div className="flex-1">
+                <ReactFlow
+                  nodes={styledNodes}
+                  edges={styledEdges}
+                  onNodesChange={onNodesChange}
+                  nodeTypes={nodeTypes}
+                  onNodeClick={handleNodeClick}
+                  onPaneClick={handlePaneClick}
+                  onInit={(instance) => {
+                    reactFlowRef.current = instance
+                    instance.fitView({ padding: 0.2 })
+                  }}
+                  fitView
+                  fitViewOptions={{ padding: 0.2 }}
+                  minZoom={0.2}
+                  maxZoom={2}
+                  panOnScroll
+                  zoomOnPinch
+                  nodesDraggable={false}
+                  nodesConnectable={false}
+                  elementsSelectable={true}
+                  proOptions={{ hideAttribution: true }}
+                >
+                  <Background variant={BackgroundVariant.Dots} gap={16} size={1} color="#3f3f46" />
+                  <Controls />
+                  <MiniMap
+                    nodeStrokeWidth={3}
+                    style={{ width: 150, height: 100 }}
+                    className="!bg-zinc-100 dark:!bg-zinc-800"
+                  />
+                </ReactFlow>
+              </div>
+            )}
+          </div>
+
+          {/* 에이전트 정보 패널 */}
+          {selectedAgent && (
+            <NexusInfoPanel
+              node={selectedAgent}
+              onClose={() => setSelectedAgent(null)}
+            />
+          )}
+        </div>
+      ) : (
+        <div className="flex-1 overflow-auto">
+          {selectedWorkflowId ? (
+            <WorkflowEditor
+              workflowId={selectedWorkflowId}
+              onBack={() => setSelectedWorkflowId(null)}
+            />
+          ) : (
+            <WorkflowListPanel onSelect={setSelectedWorkflowId} />
+          )}
+        </div>
       )}
     </div>
   )

@@ -235,7 +235,7 @@ development_status:
   epic-17: in-progress
   17-1-p4-db-schema-ws: done
   17-2-nexus-canvas-base: done
-  17-3-workflow-edit-exec: backlog
+  17-3-workflow-edit-exec: done
   17-4-nexus-template-share: backlog
   17-5-nexus-mobile-access: backlog
   epic-17-retrospective: optional

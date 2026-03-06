@@ -237,3 +237,28 @@ export type NexusGraphData = {
   edges: NexusGraphEdge[]
   updatedAt: string | null
 }
+
+// === NEXUS 워크플로우 ===
+export type NexusWorkflow = {
+  id: string
+  companyId: string
+  name: string
+  description: string | null
+  nodes: unknown[]
+  edges: unknown[]
+  isTemplate: boolean
+  isActive: boolean
+  createdBy: string
+  createdAt: string
+  updatedAt: string
+}
+
+export type NexusExecution = {
+  id: string
+  companyId: string
+  workflowId: string
+  status: string
+  result: unknown | null
+  startedAt: string
+  completedAt: string | null
+}

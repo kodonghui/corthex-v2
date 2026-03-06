@@ -1,9 +1,9 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { eq, and } from 'drizzle-orm'
+import { eq, and, desc } from 'drizzle-orm'
 import { db } from '../../db'
-import { companies, departments, agents, canvasLayouts } from '../../db/schema'
+import { companies, departments, agents, canvasLayouts, nexusWorkflows, nexusExecutions } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { logActivity } from '../../lib/activity-logger'
@@ -296,3 +296,208 @@ nexusRoute.patch(
     return c.json({ data: updated })
   },
 )
+
+// ========================================
+// 워크플로우 CRUD + 실행 API
+// ========================================
+
+// GET /api/workspace/nexus/workflows — 워크플로우 목록
+nexusRoute.get('/nexus/workflows', async (c) => {
+  const tenant = c.get('tenant')
+
+  const workflows = await db
+    .select()
+    .from(nexusWorkflows)
+    .where(eq(nexusWorkflows.companyId, tenant.companyId))
+    .orderBy(desc(nexusWorkflows.updatedAt))
+
+  return c.json({ data: workflows })
+})
+
+// POST /api/workspace/nexus/workflows — 워크플로우 생성
+const createWorkflowSchema = z.object({
+  name: z.string().min(1).max(200),
+  description: z.string().optional(),
+  nodes: z.array(z.any()).default([]),
+  edges: z.array(z.any()).default([]),
+})
+
+nexusRoute.post(
+  '/nexus/workflows',
+  zValidator('json', createWorkflowSchema),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const body = c.req.valid('json')
+
+    const [created] = await db
+      .insert(nexusWorkflows)
+      .values({
+        companyId: tenant.companyId,
+        name: body.name,
+        description: body.description ?? null,
+        nodes: body.nodes,
+        edges: body.edges,
+        createdBy: tenant.userId,
+      })
+      .returning()
+
+    logActivity({
+      companyId: tenant.companyId,
+      type: 'system',
+      phase: 'end',
+      actorType: 'user',
+      actorId: tenant.userId,
+      action: `NEXUS: 워크플로우 생성 — ${body.name}`,
+    })
+
+    return c.json({ data: created }, 201)
+  },
+)
+
+// PUT /api/workspace/nexus/workflows/:id — 워크플로우 수정
+const updateWorkflowSchema = z.object({
+  name: z.string().min(1).max(200).optional(),
+  description: z.string().nullable().optional(),
+  nodes: z.array(z.any()).optional(),
+  edges: z.array(z.any()).optional(),
+  isActive: z.boolean().optional(),
+})
+
+nexusRoute.put(
+  '/nexus/workflows/:id',
+  zValidator('json', updateWorkflowSchema),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const id = c.req.param('id')
+    const body = c.req.valid('json')
+
+    const [existing] = await db
+      .select({ id: nexusWorkflows.id })
+      .from(nexusWorkflows)
+      .where(and(eq(nexusWorkflows.id, id), eq(nexusWorkflows.companyId, tenant.companyId)))
+      .limit(1)
+
+    if (!existing) throw new HTTPError(404, '워크플로우를 찾을 수 없습니다', 'WORKFLOW_001')
+
+    const [updated] = await db
+      .update(nexusWorkflows)
+      .set({ ...body, updatedAt: new Date() })
+      .where(eq(nexusWorkflows.id, id))
+      .returning()
+
+    return c.json({ data: updated })
+  },
+)
+
+// DELETE /api/workspace/nexus/workflows/:id — 워크플로우 삭제
+nexusRoute.delete('/nexus/workflows/:id', async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+
+  const [existing] = await db
+    .select({ id: nexusWorkflows.id, name: nexusWorkflows.name })
+    .from(nexusWorkflows)
+    .where(and(eq(nexusWorkflows.id, id), eq(nexusWorkflows.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!existing) throw new HTTPError(404, '워크플로우를 찾을 수 없습니다', 'WORKFLOW_001')
+
+  // 실행 기록 + 워크플로우를 트랜잭션으로 삭제
+  await db.transaction(async (tx) => {
+    await tx
+      .delete(nexusExecutions)
+      .where(eq(nexusExecutions.workflowId, id))
+    await tx
+      .delete(nexusWorkflows)
+      .where(eq(nexusWorkflows.id, id))
+  })
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'system',
+    phase: 'end',
+    actorType: 'user',
+    actorId: tenant.userId,
+    action: `NEXUS: 워크플로우 삭제 — ${existing.name}`,
+  })
+
+  return c.json({ data: { deleted: true } })
+})
+
+// POST /api/workspace/nexus/workflows/:id/execute — 워크플로우 실행 (stub)
+nexusRoute.post('/nexus/workflows/:id/execute', async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+
+  const [workflow] = await db
+    .select()
+    .from(nexusWorkflows)
+    .where(and(eq(nexusWorkflows.id, id), eq(nexusWorkflows.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!workflow) throw new HTTPError(404, '워크플로우를 찾을 수 없습니다', 'WORKFLOW_001')
+  if (!workflow.isActive) throw new HTTPError(400, '비활성 워크플로우는 실행할 수 없습니다', 'WORKFLOW_002')
+
+  // 실행 레코드 생성
+  const [execution] = await db
+    .insert(nexusExecutions)
+    .values({
+      companyId: tenant.companyId,
+      workflowId: id,
+      status: 'running',
+    })
+    .returning()
+
+  // Stub: 즉시 완료 처리
+  const nodes = workflow.nodes as unknown[]
+  const edges = workflow.edges as unknown[]
+  const [completed] = await db
+    .update(nexusExecutions)
+    .set({
+      status: 'completed',
+      result: {
+        message: '워크플로우 실행 완료 (stub)',
+        nodeCount: Array.isArray(nodes) ? nodes.length : 0,
+        edgeCount: Array.isArray(edges) ? edges.length : 0,
+        executedAt: new Date().toISOString(),
+      },
+      completedAt: new Date(),
+    })
+    .where(eq(nexusExecutions.id, execution.id))
+    .returning()
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'system',
+    phase: 'end',
+    actorType: 'user',
+    actorId: tenant.userId,
+    action: `NEXUS: 워크플로우 실행 — ${workflow.name}`,
+  })
+
+  return c.json({ data: completed })
+})
+
+// GET /api/workspace/nexus/workflows/:id/executions — 실행 기록 조회
+nexusRoute.get('/nexus/workflows/:id/executions', async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+
+  // 워크플로우 존재 확인
+  const [workflow] = await db
+    .select({ id: nexusWorkflows.id })
+    .from(nexusWorkflows)
+    .where(and(eq(nexusWorkflows.id, id), eq(nexusWorkflows.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!workflow) throw new HTTPError(404, '워크플로우를 찾을 수 없습니다', 'WORKFLOW_001')
+
+  const executions = await db
+    .select()
+    .from(nexusExecutions)
+    .where(and(eq(nexusExecutions.workflowId, id), eq(nexusExecutions.companyId, tenant.companyId)))
+    .orderBy(desc(nexusExecutions.startedAt))
+    .limit(20)
+
+  return c.json({ data: executions })
+})
