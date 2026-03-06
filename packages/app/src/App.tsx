@@ -18,6 +18,7 @@ const OpsLogPage = lazy(() => import('./pages/ops-log').then((m) => ({ default: 
 const NexusPage = lazy(() => import('./pages/nexus').then((m) => ({ default: m.NexusPage })))
 const NotificationsPage = lazy(() => import('./pages/notifications').then((m) => ({ default: m.NotificationsPage })))
 const TradingPage = lazy(() => import('./pages/trading').then((m) => ({ default: m.TradingPage })))
+const FilesPage = lazy(() => import('./pages/files').then((m) => ({ default: m.FilesPage })))
 
 const queryClient = new QueryClient()
 
@@ -84,6 +85,7 @@ export function App() {
             <Route path="ops-log" element={<Suspense fallback={<PageSkeleton />}><OpsLogPage /></Suspense>} />
             <Route path="nexus" element={<Suspense fallback={<PageSkeleton />}><NexusPage /></Suspense>} />
             <Route path="trading" element={<Suspense fallback={<PageSkeleton />}><TradingPage /></Suspense>} />
+            <Route path="files" element={<Suspense fallback={<PageSkeleton />}><FilesPage /></Suspense>} />
             <Route path="notifications" element={<Suspense fallback={<PageSkeleton />}><NotificationsPage /></Suspense>} />
             <Route path="settings" element={<Suspense fallback={<PageSkeleton />}><SettingsPage /></Suspense>} />
           </Route>

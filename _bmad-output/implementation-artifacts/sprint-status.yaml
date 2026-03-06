@@ -192,7 +192,7 @@ development_status:
   epic-13: in-progress
   13-1-file-upload-storage: done
   13-2-file-chat-attach: done
-  13-3-file-management-ui: backlog
+  13-3-file-management-ui: done
   epic-13-retrospective: optional
 
   # ============================================================

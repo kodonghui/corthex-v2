@@ -23,6 +23,7 @@ const navSections: NavSection[] = [
       { to: '/trading', label: '전략실', icon: '📈' },
       { to: '/jobs', label: '야간작업', icon: '🌙' },
       { to: '/reports', label: '보고서', icon: '📄' },
+      { to: '/files', label: '파일', icon: '📁' },
     ],
   },
   {
