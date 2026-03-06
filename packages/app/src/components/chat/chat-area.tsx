@@ -68,10 +68,12 @@ export function ChatArea({
   agent,
   sessionId,
   onBack,
+  canvasContext,
 }: {
   agent: Agent | null
   sessionId: string | null
   onBack?: () => void
+  canvasContext?: string
 }) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
@@ -154,7 +156,10 @@ export function ChatArea({
 
   const handleSend = () => {
     if (!input.trim() || !sessionId || sendMessage.isPending || isStreaming) return
-    const payload: { content: string; attachmentIds?: string[] } = { content: input.trim() }
+    const content = canvasContext
+      ? `${canvasContext}\n\n---\n${input.trim()}`
+      : input.trim()
+    const payload: { content: string; attachmentIds?: string[] } = { content }
     if (pendingAttachments.length > 0) {
       payload.attachmentIds = pendingAttachments.map(f => f.id)
     }
