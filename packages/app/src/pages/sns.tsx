@@ -23,6 +23,9 @@ type SnsContent = {
   status: string
   snsAccountId?: string | null
   accountName?: string | null
+  variantOf?: string | null
+  variants?: { id: string; title: string; status: string; metadata?: unknown; createdAt: string }[]
+  metadata?: Record<string, unknown> | null
   createdBy: string
   creatorName: string
   agentId?: string
@@ -35,6 +38,15 @@ type SnsContent = {
   scheduledAt?: string | null
   createdAt: string
   updatedAt: string
+}
+
+type SnsMetrics = { views: number; likes: number; shares: number; clicks: number; updatedAt?: string }
+type SnsAbScore = { id: string; title: string; metrics: SnsMetrics | null; score: number; status: string }
+type SnsAbResult = {
+  original: SnsContent
+  variants: SnsContent[]
+  winner: { id: string; score: number } | null
+  scores: SnsAbScore[]
 }
 
 type SnsStats = {
@@ -91,10 +103,17 @@ export function SnsPage() {
   const [accountForm, setAccountForm] = useState({ platform: 'instagram', accountName: '', accountId: '', credentials: '' })
   const [createMode, setCreateMode] = useState<'manual' | 'ai'>('manual')
   const [statsDays, setStatsDays] = useState(30)
+  const [showOnlyOriginals, setShowOnlyOriginals] = useState(false)
+  const [showVariantModal, setShowVariantModal] = useState(false)
+  const [variantStrategy, setVariantStrategy] = useState<string>('mixed')
+  const [variantCount, setVariantCount] = useState(3)
+  const [metricsForm, setMetricsForm] = useState({ views: 0, likes: 0, shares: 0, clicks: 0 })
+  const [showMetricsForm, setShowMetricsForm] = useState(false)
+  const [showAbResults, setShowAbResults] = useState(false)
 
   const { data: listData } = useQuery({
-    queryKey: ['sns'],
-    queryFn: () => api.get<{ data: SnsContent[] }>('/workspace/sns'),
+    queryKey: ['sns', showOnlyOriginals ? 'root' : 'all'],
+    queryFn: () => api.get<{ data: SnsContent[] }>(`/workspace/sns${showOnlyOriginals ? '?variantOf=root' : ''}`),
   })
 
   const { data: detailData } = useQuery({
@@ -220,6 +239,42 @@ export function SnsPage() {
     },
   })
 
+  const createVariant = useMutation({
+    mutationFn: ({ id, ...data }: { id: string; title?: string; body?: string; hashtags?: string }) =>
+      api.post<{ data: SnsContent }>(`/workspace/sns/${id}/create-variant`, data),
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ['sns'] })
+      queryClient.invalidateQueries({ queryKey: ['sns', selectedId] })
+      setSelectedId(res.data.id)
+    },
+  })
+
+  const generateVariants = useMutation({
+    mutationFn: ({ id, ...data }: { id: string; count: number; strategy: string; agentId: string }) =>
+      api.post(`/workspace/sns/${id}/generate-variants`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sns'] })
+      queryClient.invalidateQueries({ queryKey: ['sns', selectedId] })
+      setShowVariantModal(false)
+    },
+  })
+
+  const updateMetrics = useMutation({
+    mutationFn: ({ id, ...data }: { id: string; views: number; likes: number; shares: number; clicks: number }) =>
+      api.put(`/workspace/sns/${id}/metrics`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sns', selectedId] })
+      queryClient.invalidateQueries({ queryKey: ['ab-results', selectedId] })
+      setShowMetricsForm(false)
+    },
+  })
+
+  const { data: abResultsData } = useQuery({
+    queryKey: ['ab-results', selectedId],
+    queryFn: () => api.get<{ data: SnsAbResult }>(`/workspace/sns/${selectedId}/ab-results`),
+    enabled: !!selectedId && showAbResults,
+  })
+
   const createAccount = useMutation({
     mutationFn: (data: { platform: string; accountName: string; accountId: string; credentials?: Record<string, string> }) =>
       api.post('/workspace/sns-accounts', data),
@@ -285,16 +340,23 @@ export function SnsPage() {
       {/* 리스트 */}
       {view === 'list' && (
         <div className="px-6 py-4 space-y-3 overflow-y-auto flex-1">
-          {accounts.length > 0 && (
-            <div className="flex gap-2 items-center mb-2">
-              <span className="text-xs text-zinc-500">계정:</span>
-              <select value={accountFilter} onChange={(e) => setAccountFilter(e.target.value)}
-                className="px-2 py-1 text-xs border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800">
-                <option value="">전체</option>
-                {accounts.map((a) => <option key={a.id} value={a.id}>{a.accountName} ({PLATFORM_LABELS[a.platform]})</option>)}
-              </select>
-            </div>
-          )}
+          <div className="flex gap-3 items-center mb-2 flex-wrap">
+            {accounts.length > 0 && (
+              <div className="flex gap-2 items-center">
+                <span className="text-xs text-zinc-500">계정:</span>
+                <select value={accountFilter} onChange={(e) => setAccountFilter(e.target.value)}
+                  className="px-2 py-1 text-xs border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800">
+                  <option value="">전체</option>
+                  {accounts.map((a) => <option key={a.id} value={a.id}>{a.accountName} ({PLATFORM_LABELS[a.platform]})</option>)}
+                </select>
+              </div>
+            )}
+            <label className="flex items-center gap-1 text-xs text-zinc-500 cursor-pointer">
+              <input type="checkbox" checked={showOnlyOriginals} onChange={(e) => setShowOnlyOriginals(e.target.checked)}
+                className="rounded border-zinc-300" />
+              원본만 보기
+            </label>
+          </div>
           {filteredList.length === 0 && <p className="text-sm text-zinc-500">아직 SNS 콘텐츠가 없습니다.</p>}
           {filteredList.map((item) => (
             <div
@@ -306,6 +368,7 @@ export function SnsPage() {
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-zinc-500">{PLATFORM_LABELS[item.platform] || item.platform}</span>
                   {item.accountName && <span className="text-xs text-indigo-500">@{item.accountName}</span>}
+                  {item.variantOf && <span className="text-xs px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300">변형</span>}
                 </div>
                 <span className={`text-xs px-2 py-0.5 rounded-full ${STATUS_COLORS[item.status]}`}>
                   {STATUS_LABELS[item.status]}
@@ -520,6 +583,141 @@ export function SnsPage() {
                 className="px-3 py-2 text-zinc-500 text-sm hover:text-zinc-700">
                 취소
               </button>
+            </div>
+          )}
+
+          {/* A/B 테스트 섹션 */}
+          <div className="border-t border-zinc-200 dark:border-zinc-700 pt-4 mt-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-semibold">A/B 테스트</h4>
+              <div className="flex gap-2">
+                <button onClick={() => createVariant.mutate({ id: detail.id })}
+                  disabled={createVariant.isPending}
+                  className="px-2 py-1 text-xs border border-purple-300 text-purple-600 rounded hover:bg-purple-50 dark:hover:bg-purple-900/30 disabled:opacity-50">
+                  {createVariant.isPending ? '생성 중...' : '변형 복제'}
+                </button>
+                <button onClick={() => setShowVariantModal(true)}
+                  className="px-2 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700">
+                  AI 변형 생성
+                </button>
+                <button onClick={() => { setShowMetricsForm(!showMetricsForm); const m = (detail.metadata as Record<string, unknown>)?.metrics as SnsMetrics | undefined; if (m) setMetricsForm({ views: m.views, likes: m.likes, shares: m.shares, clicks: m.clicks }) }}
+                  className="px-2 py-1 text-xs border border-zinc-300 dark:border-zinc-600 rounded hover:bg-zinc-50 dark:hover:bg-zinc-800">
+                  성과 입력
+                </button>
+                {(detail.variants?.length ?? 0) > 0 && (
+                  <button onClick={() => setShowAbResults(!showAbResults)}
+                    className="px-2 py-1 text-xs border border-green-300 text-green-600 rounded hover:bg-green-50 dark:hover:bg-green-900/30">
+                    {showAbResults ? '결과 닫기' : '결과 비교'}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* 성과 입력 폼 */}
+            {showMetricsForm && (
+              <div className="p-3 bg-zinc-50 dark:bg-zinc-800 rounded-lg space-y-2">
+                <div className="grid grid-cols-4 gap-2">
+                  {(['views', 'likes', 'shares', 'clicks'] as const).map((key) => (
+                    <div key={key}>
+                      <label className="block text-xs text-zinc-500 mb-1">{{ views: '조회', likes: '좋아요', shares: '공유', clicks: '클릭' }[key]}</label>
+                      <input type="number" min={0} value={metricsForm[key]}
+                        onChange={(e) => setMetricsForm({ ...metricsForm, [key]: Number(e.target.value) || 0 })}
+                        className="w-full px-2 py-1 border border-zinc-300 dark:border-zinc-600 rounded text-sm bg-white dark:bg-zinc-900" />
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <button onClick={() => setShowMetricsForm(false)} className="px-2 py-1 text-xs text-zinc-500">취소</button>
+                  <button onClick={() => updateMetrics.mutate({ id: detail.id, ...metricsForm })}
+                    disabled={updateMetrics.isPending}
+                    className="px-2 py-1 text-xs bg-indigo-600 text-white rounded hover:bg-indigo-700 disabled:opacity-50">
+                    {updateMetrics.isPending ? '저장 중...' : '저장'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* 변형 목록 */}
+            {detail.variants && detail.variants.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs text-zinc-500">변형 {detail.variants.length}개</p>
+                {detail.variants.map((v) => (
+                  <div key={v.id}
+                    onClick={() => { setSelectedId(v.id); setShowAbResults(false); setShowMetricsForm(false) }}
+                    className="p-2 border border-zinc-200 dark:border-zinc-700 rounded cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 flex justify-between items-center">
+                    <div>
+                      <span className="text-xs px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300 mr-2">변형</span>
+                      <span className="text-sm">{v.title}</span>
+                    </div>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${STATUS_COLORS[v.status]}`}>{STATUS_LABELS[v.status]}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* A/B 결과 비교 */}
+            {showAbResults && abResultsData?.data && (() => {
+              const ab = abResultsData.data
+              return (
+                <div className="p-3 bg-zinc-50 dark:bg-zinc-800 rounded-lg space-y-2">
+                  <h5 className="text-xs font-semibold text-zinc-500">A/B 테스트 결과</h5>
+                  <div className="space-y-1">
+                    {ab.scores.map((s) => (
+                      <div key={s.id} className={`flex items-center justify-between p-2 rounded text-sm ${ab.winner?.id === s.id ? 'bg-green-50 dark:bg-green-900/30 border border-green-300 dark:border-green-700' : ''}`}>
+                        <div className="flex items-center gap-2">
+                          {ab.winner?.id === s.id && <span className="text-xs text-green-600 font-bold">WINNER</span>}
+                          <span className="truncate max-w-[200px]">{s.title}</span>
+                        </div>
+                        <div className="flex gap-3 text-xs text-zinc-500">
+                          {s.metrics ? (
+                            <>
+                              <span>조회 {s.metrics.views}</span>
+                              <span>좋아요 {s.metrics.likes}</span>
+                              <span>공유 {s.metrics.shares}</span>
+                              <span>클릭 {s.metrics.clicks}</span>
+                              <span className="font-bold text-indigo-600">점수 {s.score}</span>
+                            </>
+                          ) : <span className="text-zinc-400">성과 미입력</span>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            })()}
+          </div>
+
+          {/* AI 변형 생성 모달 */}
+          {showVariantModal && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowVariantModal(false)}>
+              <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl max-w-md w-full space-y-4" onClick={(e) => e.stopPropagation()}>
+                <h4 className="text-base font-semibold">AI A/B 변형 생성</h4>
+                <div>
+                  <label className="block text-xs text-zinc-500 mb-1">변형 수 ({variantCount}개)</label>
+                  <input type="range" min={2} max={5} value={variantCount} onChange={(e) => setVariantCount(Number(e.target.value))}
+                    className="w-full" />
+                </div>
+                <Select value={variantStrategy} onChange={(e) => setVariantStrategy(e.target.value)}
+                  options={[
+                    { value: 'tone', label: '어조 변경' },
+                    { value: 'length', label: '길이 변경' },
+                    { value: 'hashtag', label: '해시태그 최적화' },
+                    { value: 'headline', label: '제목 변경' },
+                    { value: 'mixed', label: '전체 변경' },
+                  ]} />
+                <Select value={aiForm.agentId} onChange={(e) => setAiForm({ ...aiForm, agentId: e.target.value })}
+                  placeholder="에이전트 선택"
+                  options={agents.map((a) => ({ value: a.id, label: a.name }))} />
+                <div className="flex gap-2 justify-end">
+                  <button onClick={() => setShowVariantModal(false)} className="px-3 py-1.5 text-sm text-zinc-500">취소</button>
+                  <button
+                    onClick={() => generateVariants.mutate({ id: detail.id, count: variantCount, strategy: variantStrategy, agentId: aiForm.agentId })}
+                    disabled={!aiForm.agentId || generateVariants.isPending}
+                    className="px-3 py-1.5 bg-purple-600 text-white text-sm rounded-md hover:bg-purple-700 disabled:opacity-50">
+                    {generateVariants.isPending ? `생성 중...` : `${variantCount}개 변형 생성`}
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>

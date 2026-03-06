@@ -203,7 +203,7 @@ development_status:
   14-2-ai-image-gen-post: done
   14-3-sns-analytics: done
   14-4-sns-multi-account: done
-  14-5-ab-test-optimize: backlog
+  14-5-ab-test-optimize: done
   epic-14-retrospective: optional
 
   # ============================================================

@@ -91,9 +91,25 @@ export type SnsContent = {
   imageUrl: string | null
   status: SnsStatus
   snsAccountId?: string | null
+  variantOf?: string | null
   createdBy: string
   createdAt: Date
   updatedAt: Date
+}
+
+export type SnsMetrics = {
+  views: number
+  likes: number
+  shares: number
+  clicks: number
+  updatedAt?: string
+}
+
+export type SnsAbResult = {
+  original: SnsContent
+  variants: SnsContent[]
+  winner: { id: string; score: number } | null
+  scores: { id: string; title: string; metrics: SnsMetrics | null; score: number }[]
 }
 
 // === 활동 로그 ===

@@ -392,6 +392,7 @@ export const snsContents = pgTable('sns_contents', {
   publishedAt: timestamp('published_at'),
   publishError: text('publish_error'),
   scheduledAt: timestamp('scheduled_at'),
+  variantOf: uuid('variant_of'),  // self-ref FK — A/B 테스트 원본 연결
   metadata: jsonb('metadata'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
@@ -692,11 +693,13 @@ export const snsAccountsRelations = relations(snsAccounts, ({ one, many }) => ({
   contents: many(snsContents),
 }))
 
-export const snsContentsRelations = relations(snsContents, ({ one }) => ({
+export const snsContentsRelations = relations(snsContents, ({ one, many }) => ({
   company: one(companies, { fields: [snsContents.companyId], references: [companies.id] }),
   agent: one(agents, { fields: [snsContents.agentId], references: [agents.id] }),
   snsAccount: one(snsAccounts, { fields: [snsContents.snsAccountId], references: [snsAccounts.id] }),
   creator: one(users, { fields: [snsContents.createdBy], references: [users.id] }),
+  original: one(snsContents, { fields: [snsContents.variantOf], references: [snsContents.id], relationName: 'variants' }),
+  variants: many(snsContents, { relationName: 'variants' }),
 }))
 
 export const activityLogsRelations = relations(activityLogs, ({ one }) => ({

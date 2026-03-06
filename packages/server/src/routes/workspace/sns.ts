@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { eq, and, desc, gte, sql, count } from 'drizzle-orm'
+import { eq, and, desc, gte, sql, count, isNull } from 'drizzle-orm'
 import { db } from '../../db'
 import { snsContents, snsAccounts, users, agents } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
@@ -55,6 +55,26 @@ const rejectSchema = z.object({
   reason: z.string().min(1),
 })
 
+const createVariantSchema = z.object({
+  title: z.string().min(1).max(200).optional(),
+  body: z.string().min(1).optional(),
+  hashtags: z.string().optional(),
+  imageUrl: z.string().optional(),
+})
+
+const generateVariantsSchema = z.object({
+  count: z.number().int().min(2).max(5),
+  strategy: z.enum(['tone', 'length', 'hashtag', 'headline', 'mixed']),
+  agentId: z.string().uuid(),
+})
+
+const metricsSchema = z.object({
+  views: z.number().int().min(0),
+  likes: z.number().int().min(0),
+  shares: z.number().int().min(0),
+  clicks: z.number().int().min(0),
+})
+
 const PLATFORM_NAMES: Record<string, string> = {
   instagram: '인스타그램',
   tistory: '티스토리 블로그',
@@ -67,11 +87,17 @@ snsRoute.get('/sns', async (c) => {
   const platform = c.req.query('platform')
   const status = c.req.query('status')
   const accountId = c.req.query('accountId')
+  const variantOfParam = c.req.query('variantOf')
 
   const conditions = [eq(snsContents.companyId, tenant.companyId)]
   if (platform) conditions.push(eq(snsContents.platform, platform as 'instagram' | 'tistory' | 'daum_cafe'))
   if (status) conditions.push(eq(snsContents.status, status as 'draft' | 'pending' | 'approved' | 'scheduled' | 'rejected' | 'published' | 'failed'))
   if (accountId) conditions.push(eq(snsContents.snsAccountId, accountId))
+  if (variantOfParam === 'root') {
+    conditions.push(isNull(snsContents.variantOf))
+  } else if (variantOfParam) {
+    conditions.push(eq(snsContents.variantOf, variantOfParam))
+  }
 
   const result = await db
     .select({
@@ -85,6 +111,7 @@ snsRoute.get('/sns', async (c) => {
       creatorName: users.name,
       publishedUrl: snsContents.publishedUrl,
       scheduledAt: snsContents.scheduledAt,
+      variantOf: snsContents.variantOf,
       createdAt: snsContents.createdAt,
       updatedAt: snsContents.updatedAt,
     })
@@ -402,6 +429,7 @@ snsRoute.get('/sns/:id', async (c) => {
       publishedAt: snsContents.publishedAt,
       publishError: snsContents.publishError,
       scheduledAt: snsContents.scheduledAt,
+      variantOf: snsContents.variantOf,
       metadata: snsContents.metadata,
       createdAt: snsContents.createdAt,
       updatedAt: snsContents.updatedAt,
@@ -414,7 +442,20 @@ snsRoute.get('/sns/:id', async (c) => {
 
   if (!content) throw new HTTPError(404, 'SNS 콘텐츠를 찾을 수 없습니다', 'SNS_001')
 
-  return c.json({ data: content })
+  // 변형 목록 조회
+  const variants = await db
+    .select({
+      id: snsContents.id,
+      title: snsContents.title,
+      status: snsContents.status,
+      metadata: snsContents.metadata,
+      createdAt: snsContents.createdAt,
+    })
+    .from(snsContents)
+    .where(and(eq(snsContents.variantOf, id), eq(snsContents.companyId, tenant.companyId)))
+    .orderBy(desc(snsContents.createdAt))
+
+  return c.json({ data: { ...content, variants } })
 })
 
 // PUT /api/workspace/sns/:id — 수정 (draft/rejected만)
@@ -689,4 +730,243 @@ snsRoute.delete('/sns/:id', async (c) => {
   await db.delete(snsContents).where(eq(snsContents.id, id))
 
   return c.json({ data: { deleted: true } })
+})
+
+// ==================== A/B 테스트 최적화 ====================
+
+// POST /api/workspace/sns/:id/create-variant — 수동 변형 생성
+snsRoute.post('/sns/:id/create-variant', zValidator('json', createVariantSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+  const body = c.req.valid('json')
+
+  const [original] = await db
+    .select()
+    .from(snsContents)
+    .where(and(eq(snsContents.id, id), eq(snsContents.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!original) throw new HTTPError(404, 'SNS 콘텐츠를 찾을 수 없습니다', 'SNS_001')
+
+  const [variant] = await db
+    .insert(snsContents)
+    .values({
+      companyId: tenant.companyId,
+      createdBy: tenant.userId,
+      agentId: original.agentId,
+      snsAccountId: original.snsAccountId,
+      platform: original.platform,
+      title: body.title || original.title,
+      body: body.body || original.body,
+      hashtags: body.hashtags ?? original.hashtags,
+      imageUrl: body.imageUrl ?? original.imageUrl,
+      variantOf: id,
+      status: 'draft',
+    })
+    .returning()
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'sns',
+    phase: 'end',
+    actorType: 'user',
+    actorId: tenant.userId,
+    action: 'SNS A/B 변형 생성',
+    detail: `${original.title} → ${variant.title}`,
+  })
+
+  return c.json({ data: variant }, 201)
+})
+
+const STRATEGY_PROMPTS: Record<string, string> = {
+  tone: '같은 내용을 다른 어조(공식적/친근한/유머러스 등)로 변형해주세요.',
+  length: '같은 메시지를 더 짧게 또는 길게 변형해주세요.',
+  hashtag: '같은 내용에 다른 해시태그 전략을 적용해주세요.',
+  headline: '같은 본문에 다른 제목/헤드라인을 적용해주세요.',
+  mixed: '어조, 길이, 해시태그, 제목을 모두 다르게 변형해주세요.',
+}
+
+// POST /api/workspace/sns/:id/generate-variants — AI 변형 자동 생성
+snsRoute.post('/sns/:id/generate-variants', zValidator('json', generateVariantsSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+  const { count: variantCount, strategy, agentId } = c.req.valid('json')
+
+  const [original] = await db
+    .select()
+    .from(snsContents)
+    .where(and(eq(snsContents.id, id), eq(snsContents.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!original) throw new HTTPError(404, 'SNS 콘텐츠를 찾을 수 없습니다', 'SNS_001')
+
+  const [agent] = await db
+    .select({ id: agents.id, name: agents.name })
+    .from(agents)
+    .where(and(eq(agents.id, agentId), eq(agents.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!agent) throw new HTTPError(404, '에이전트를 찾을 수 없습니다', 'AGENT_001')
+
+  const createdVariants = []
+
+  for (let i = 0; i < variantCount; i++) {
+    try {
+      const prompt = `아래 SNS 콘텐츠의 A/B 테스트 변형 ${i + 1}/${variantCount}을 만들어주세요.
+
+전략: ${STRATEGY_PROMPTS[strategy]}
+
+원본 콘텐츠:
+플랫폼: ${PLATFORM_NAMES[original.platform]}
+제목: ${original.title}
+본문: ${original.body}
+해시태그: ${original.hashtags || '없음'}
+
+다음 형식으로 작성해주세요:
+제목: [변형된 제목]
+본문: [변형된 본문]
+해시태그: [변형된 해시태그]`
+
+      const aiResponse = await generateAgentResponse({
+        agentId,
+        sessionId: '',
+        companyId: tenant.companyId,
+        userMessage: prompt,
+        userId: tenant.userId,
+      })
+
+      const titleMatch = aiResponse.match(/제목:\s*(.+)/)?.[1]?.trim() || `${original.title} (변형 ${i + 1})`
+      const bodyMatch = aiResponse.match(/본문:\s*([\s\S]*?)(?=해시태그:|$)/)?.[1]?.trim() || original.body
+      const hashtagMatch = aiResponse.match(/해시태그:\s*(.+)/)?.[1]?.trim() || original.hashtags
+
+      const [variant] = await db
+        .insert(snsContents)
+        .values({
+          companyId: tenant.companyId,
+          agentId,
+          createdBy: tenant.userId,
+          snsAccountId: original.snsAccountId,
+          platform: original.platform,
+          title: titleMatch,
+          body: bodyMatch,
+          hashtags: hashtagMatch,
+          imageUrl: original.imageUrl,
+          variantOf: id,
+          status: 'draft',
+        })
+        .returning()
+
+      createdVariants.push(variant)
+    } catch {
+      // 부분 실패 허용 — 이미 생성된 변형은 유지, 나머지 계속 시도
+      continue
+    }
+  }
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'sns',
+    phase: 'end',
+    actorType: 'agent',
+    actorId: agentId,
+    actorName: agent.name,
+    action: `AI A/B 변형 ${variantCount}개 생성 (${strategy})`,
+    detail: original.title,
+  })
+
+  return c.json({ data: createdVariants }, 201)
+})
+
+// PUT /api/workspace/sns/:id/metrics — 성과 데이터 입력
+snsRoute.put('/sns/:id/metrics', zValidator('json', metricsSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+  const metrics = c.req.valid('json')
+
+  const [existing] = await db
+    .select({ id: snsContents.id, metadata: snsContents.metadata })
+    .from(snsContents)
+    .where(and(eq(snsContents.id, id), eq(snsContents.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!existing) throw new HTTPError(404, 'SNS 콘텐츠를 찾을 수 없습니다', 'SNS_001')
+
+  const existingMetadata = (existing.metadata as Record<string, unknown>) || {}
+
+  const [updated] = await db
+    .update(snsContents)
+    .set({
+      metadata: { ...existingMetadata, metrics: { ...metrics, updatedAt: new Date().toISOString() } },
+      updatedAt: new Date(),
+    })
+    .where(eq(snsContents.id, id))
+    .returning()
+
+  return c.json({ data: updated })
+})
+
+function calcEngagement(m: { views: number; likes: number; shares: number; clicks: number }): number {
+  return m.views + m.likes * 2 + m.shares * 3 + m.clicks * 2
+}
+
+// GET /api/workspace/sns/:id/ab-results — A/B 테스트 결과 비교
+snsRoute.get('/sns/:id/ab-results', async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+
+  const [original] = await db
+    .select({
+      id: snsContents.id,
+      title: snsContents.title,
+      status: snsContents.status,
+      metadata: snsContents.metadata,
+      platform: snsContents.platform,
+      createdAt: snsContents.createdAt,
+    })
+    .from(snsContents)
+    .where(and(eq(snsContents.id, id), eq(snsContents.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!original) throw new HTTPError(404, 'SNS 콘텐츠를 찾을 수 없습니다', 'SNS_001')
+
+  const variants = await db
+    .select({
+      id: snsContents.id,
+      title: snsContents.title,
+      status: snsContents.status,
+      metadata: snsContents.metadata,
+      createdAt: snsContents.createdAt,
+    })
+    .from(snsContents)
+    .where(and(eq(snsContents.variantOf, id), eq(snsContents.companyId, tenant.companyId)))
+    .orderBy(snsContents.createdAt)
+
+  const allContents = [original, ...variants]
+
+  const scores = allContents.map((item) => {
+    const meta = item.metadata as Record<string, unknown> | null
+    const metrics = (meta?.metrics as { views: number; likes: number; shares: number; clicks: number }) || null
+    const score = metrics ? calcEngagement(metrics) : 0
+    return {
+      id: item.id,
+      title: item.title,
+      status: item.status,
+      metrics,
+      score,
+    }
+  })
+
+  const scoredEntries = scores.filter((s) => s.metrics !== null)
+  const winner = scoredEntries.length > 0
+    ? scoredEntries.reduce((best, curr) => (curr.score > best.score ? curr : best))
+    : null
+
+  return c.json({
+    data: {
+      original,
+      variants,
+      winner: winner ? { id: winner.id, score: winner.score } : null,
+      scores,
+    },
+  })
 })
