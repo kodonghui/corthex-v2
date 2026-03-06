@@ -3,7 +3,7 @@
 
 import { db } from '../db'
 import { nightJobs, agents, chatSessions, chatMessages, agentMemory, reports } from '../db/schema'
-import { eq, and, lte, asc } from 'drizzle-orm'
+import { eq, and, lte, asc, sql } from 'drizzle-orm'
 import { generateAgentResponse } from './ai'
 import { orchestrateSecretary } from './orchestrator'
 import { eventBus } from './event-bus'
@@ -44,30 +44,27 @@ export async function queueNightJob(params: {
 }
 
 // 다음 처리할 작업 선택 (FIFO, 스케줄 시간 도달한 것만)
+// 원자적 UPDATE ... RETURNING으로 동시 워커 간 중복 방지
 async function pickNextJob() {
   const now = new Date()
 
   const [job] = await db
-    .select()
-    .from(nightJobs)
-    .where(
-      and(
-        eq(nightJobs.status, 'queued'),
-        lte(nightJobs.scheduledFor, now),
-      ),
-    )
-    .orderBy(asc(nightJobs.createdAt))
-    .limit(1)
-
-  if (!job) return null
-
-  // 상태를 processing으로 변경 (락 역할)
-  await db
     .update(nightJobs)
     .set({ status: 'processing', startedAt: new Date() })
-    .where(eq(nightJobs.id, job.id))
+    .where(
+      and(
+        eq(nightJobs.id, sql`(
+          SELECT id FROM night_jobs
+          WHERE status = 'queued' AND scheduled_for <= ${now}
+          ORDER BY created_at ASC
+          LIMIT 1
+          FOR UPDATE SKIP LOCKED
+        )`),
+      ),
+    )
+    .returning()
 
-  return job
+  return job || null
 }
 
 // 진행률 이벤트 헬퍼
@@ -161,7 +158,8 @@ async function processJob(job: typeof nightJobs.$inferSelect) {
 
     emitProgress(job.companyId, job.id, 80, '보고서 생성 중...')
 
-    // 자동 보고서 생성
+    // 자동 보고서 생성 (content는 50,000자 제한 — 과도한 AI 응답 방어)
+    const MAX_REPORT_CONTENT = 50_000
     let reportId: string | null = null
     try {
       const [report] = await db
@@ -170,7 +168,7 @@ async function processJob(job: typeof nightJobs.$inferSelect) {
           companyId: job.companyId,
           authorId: job.userId,
           title: `[야간] ${job.instruction.replace(/\n/g, ' ').slice(0, 50)}`,
-          content: result,
+          content: result.length > MAX_REPORT_CONTENT ? result.slice(0, MAX_REPORT_CONTENT) + '\n\n...(내용이 너무 길어 잘렸습니다)' : result,
           status: 'draft',
         })
         .returning()
@@ -198,11 +196,11 @@ async function processJob(job: typeof nightJobs.$inferSelect) {
       await activateNextChainJob(job.id, job.chainId, job.companyId, result)
     }
 
-    // WebSocket 이벤트 브로드캐스트
+    // WebSocket 이벤트 브로드캐스트 (instruction 제외 — 타 사용자에게 노출 방지)
     const durationMs = Date.now() - processStartedAt
     eventBus.emit('night-job', {
       companyId: job.companyId,
-      payload: { type: 'job-completed', jobId: job.id, resultData, durationMs, instruction: job.instruction },
+      payload: { type: 'job-completed', jobId: job.id, resultData, durationMs },
     })
 
     console.log(`✅ 야간 작업 완료: ${job.id}`)
@@ -248,10 +246,10 @@ async function processJob(job: typeof nightJobs.$inferSelect) {
 
       console.log(`💀 야간 작업 최종 실패: ${job.id} (재시도 ${job.maxRetries}회 초과)`)
 
-      // WebSocket 이벤트 브로드캐스트
+      // WebSocket 이벤트 브로드캐스트 (errorMessage/instruction 제외 — 타 사용자에게 노출 방지)
       eventBus.emit('night-job', {
         companyId: job.companyId,
-        payload: { type: 'job-failed', jobId: job.id, errorCode: 'MAX_RETRIES_EXCEEDED', errorMessage: errorMsg, retryCount: newRetryCount, instruction: job.instruction },
+        payload: { type: 'job-failed', jobId: job.id, errorCode: 'MAX_RETRIES_EXCEEDED', retryCount: newRetryCount },
       })
 
       // 체인: 후속 작업 전체 실패 처리
