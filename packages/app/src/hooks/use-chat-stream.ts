@@ -12,17 +12,15 @@ export type ToolCall = {
   error?: boolean
 }
 
-export type DelegationItem = {
+export type DelegationStatus = {
   targetAgentName: string
   targetAgentId: string
   status: 'delegating' | 'completed' | 'failed'
   durationMs?: number
-}
-
-export type DelegationStatus = DelegationItem | null
+} | null
 
 type StreamEvent = {
-  type: 'token' | 'tool-start' | 'tool-end' | 'done' | 'error' | 'delegation-start' | 'delegation-end' | 'delegation-chain'
+  type: 'token' | 'tool-start' | 'tool-end' | 'done' | 'error' | 'delegation-start' | 'delegation-end'
   content?: string
   toolName?: string
   toolId?: string
@@ -43,7 +41,7 @@ export function useChatStream(sessionId: string | null) {
   const [isStreaming, setIsStreaming] = useState(false)
   const [toolCalls, setToolCalls] = useState<ToolCall[]>([])
   const [error, setError] = useState<string | null>(null)
-  const [delegations, setDelegations] = useState<DelegationItem[]>([])
+  const [delegationStatus, setDelegationStatus] = useState<DelegationStatus>(null)
   const queryClient = useQueryClient()
   const { subscribe, addListener, removeListener, isConnected } = useWsStore()
   const subscribedRef = useRef<string | null>(null)
@@ -79,42 +77,25 @@ export function useChatStream(sessionId: string | null) {
           )
           break
         case 'delegation-start':
-          setDelegations((prev) => {
-            const item: DelegationItem = {
-              targetAgentName: event.targetAgentName || '',
-              targetAgentId: event.targetAgentId || '',
-              status: 'delegating',
-            }
-            const idx = prev.findIndex((d) => d.targetAgentId === item.targetAgentId)
-            if (idx >= 0) {
-              const next = [...prev]
-              next[idx] = item
-              return next
-            }
-            return [...prev, item]
+          setDelegationStatus({
+            targetAgentName: event.targetAgentName || '',
+            targetAgentId: event.targetAgentId || '',
+            status: 'delegating',
           })
           break
         case 'delegation-end':
-          setDelegations((prev) =>
-            prev.map((d) =>
-              d.targetAgentId === (event.targetAgentId || '')
-                ? {
-                    ...d,
-                    status: (event.status as 'completed' | 'failed') || 'completed',
-                    durationMs: event.durationMs,
-                  }
-                : d,
-            ),
-          )
+          setDelegationStatus({
+            targetAgentName: event.targetAgentName || '',
+            targetAgentId: event.targetAgentId || '',
+            status: (event.status as 'completed' | 'failed') || 'completed',
+            durationMs: event.durationMs,
+          })
           // 위임 완료 시 위임 내역 쿼리 갱신
           queryClient.invalidateQueries({ queryKey: ['delegations', sessionId] })
           break
-        case 'delegation-chain':
-          // 향후 사용 예정 (위임 체인 추적)
-          break
         case 'done':
           // refetch 완료 후 스트리밍 상태 초기화 (깜빡임 방지)
-          setDelegations([])
+          setDelegationStatus(null)
           Promise.all([
             queryClient.invalidateQueries({ queryKey: ['messages', sessionId] }),
             queryClient.invalidateQueries({ queryKey: ['sessions'] }),
@@ -128,7 +109,7 @@ export function useChatStream(sessionId: string | null) {
           break
         case 'error':
           setIsStreaming(false)
-          setDelegations([])
+          setDelegationStatus(null)
           setError(event.message || '응답 중 오류가 발생했습니다')
           break
       }
@@ -144,7 +125,7 @@ export function useChatStream(sessionId: string | null) {
     setStreamingText('')
     setToolCalls([])
     setError(null)
-    setDelegations([])
+    setDelegationStatus(null)
   }, [])
 
   const stopStream = useCallback(() => {
@@ -155,8 +136,5 @@ export function useChatStream(sessionId: string | null) {
     setError(null)
   }, [])
 
-  // 하위 호환: delegationStatus는 첫 번째 활성 위임을 반환
-  const delegationStatus: DelegationStatus = delegations.find((d) => d.status === 'delegating') || null
-
-  return { streamingText, isStreaming, toolCalls, error, delegations, delegationStatus, startStream, stopStream, clearError }
+  return { streamingText, isStreaming, toolCalls, error, delegationStatus, startStream, stopStream, clearError }
 }

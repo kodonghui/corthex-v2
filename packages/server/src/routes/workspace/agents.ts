@@ -1,9 +1,9 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { eq, and, asc } from 'drizzle-orm'
+import { eq, and } from 'drizzle-orm'
 import { db } from '../../db'
-import { agents, departments, soulTemplates } from '../../db/schema'
+import { agents } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { logActivity } from '../../lib/activity-logger'
@@ -23,59 +23,12 @@ workspaceAgentsRoute.get('/agents', async (c) => {
       name: agents.name,
       role: agents.role,
       status: agents.status,
-      level: agents.level,
       isSecretary: agents.isSecretary,
       departmentId: agents.departmentId,
     })
     .from(agents)
     .where(and(eq(agents.companyId, tenant.companyId), eq(agents.isActive, true)))
 
-  return c.json({ data: result })
-})
-
-// GET /api/workspace/agents/hierarchy — 부서별 에이전트 계층
-workspaceAgentsRoute.get('/agents/hierarchy', async (c) => {
-  const tenant = c.get('tenant')
-
-  const allDepts = await db
-    .select({ id: departments.id, name: departments.name, parentDepartmentId: departments.parentDepartmentId })
-    .from(departments)
-    .where(and(eq(departments.companyId, tenant.companyId), eq(departments.isActive, true)))
-
-  const allAgents = await db
-    .select({
-      id: agents.id,
-      name: agents.name,
-      role: agents.role,
-      level: agents.level,
-      status: agents.status,
-      isSecretary: agents.isSecretary,
-      departmentId: agents.departmentId,
-    })
-    .from(agents)
-    .where(and(eq(agents.companyId, tenant.companyId), eq(agents.isActive, true)))
-
-  // 레벨 우선순위: director > lead > member
-  const levelOrder: Record<string, number> = { director: 0, lead: 1, member: 2 }
-
-  const hierarchy = allDepts.map(dept => ({
-    department: dept,
-    agents: allAgents
-      .filter(a => a.departmentId === dept.id)
-      .sort((a, b) => (levelOrder[a.level] ?? 9) - (levelOrder[b.level] ?? 9)),
-  }))
-
-  // 부서 없는 에이전트
-  const unassigned = allAgents.filter(a => !a.departmentId)
-
-  return c.json({ data: { departments: hierarchy, unassigned } })
-})
-
-// GET /api/workspace/agents/soul-templates — 소울 템플릿 목록
-workspaceAgentsRoute.get('/agents/soul-templates', async (c) => {
-  const tenant = c.get('tenant')
-  const result = await db.select().from(soulTemplates)
-    .where(and(eq(soulTemplates.companyId, tenant.companyId), eq(soulTemplates.isActive, true)))
   return c.json({ data: result })
 })
 

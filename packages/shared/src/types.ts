@@ -110,7 +110,6 @@ export type WsChannel =
   | 'notifications'
   | 'messenger'
   | 'activity-log'
-  | 'night-jobs'
   | 'strategy-notes'
 
 export type WsInboundMessage = {

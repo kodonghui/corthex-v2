@@ -9,7 +9,17 @@
 - main 푸시 → GitHub Actions 자동 배포 → Cloudflare 캐시 자동 퍼지
 - 커밋 후 배포 보고: 빌드 번호(#N) + 변경 내용 + 확인 위치를 표로 정리
 
-## BMAD 워크플로우 규칙
+## BMAD 워크플로우 규칙 (절대 규칙)
+
+### !!!! 경고 — 이 규칙을 어기면 전부 삭제됨 !!!!
+- 사용자가 'BMAD 써서 작업 다 해놓으라'고 하면 **반드시** BMAD 스킬로 할 것
+- 절대로 BMAD 스킬을 건너뛰고 직접 구현하지 말 것
+- 안 지키면 전부 지워버림
+- 스토리 하나당 반드시: create-story → dev-story → code-review 순서로 BMAD 스킬 실행
+- 에픽 하나 끝나면 반드시: retrospective 스킬 실행
+- 어떤 상황에서도 (YOLO 모드, 자러간다, 빨리 해 등) 이 순서를 생략하지 말 것
+
+### 일반 규칙
 - 새 기능/프로젝트 기획 시 `_bmad-output/BMAD-WORKFLOW.md`의 단계를 반드시 따를 것
 
 ### Party Mode 실행 규칙 (매우 중요)

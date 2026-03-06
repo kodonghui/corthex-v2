@@ -79,7 +79,6 @@ export const adminSessions = pgTable('admin_sessions', {
 export const departments = pgTable('departments', {
   id: uuid('id').primaryKey().defaultRandom(),
   companyId: uuid('company_id').notNull().references(() => companies.id),
-  parentDepartmentId: uuid('parent_department_id'),  // 자기참조 — 부서 계층
   name: varchar('name', { length: 100 }).notNull(),
   description: text('description'),
   isActive: boolean('is_active').notNull().default(true),
@@ -100,7 +99,6 @@ export const agents = pgTable('agents', {
   soul: text('soul'),  // 마크다운 성격 정의
   adminSoul: text('admin_soul'),  // 관리자가 설정한 원본 소울 (초기화용)
   status: agentStatusEnum('status').notNull().default('offline'),
-  level: varchar('level', { length: 20 }).notNull().default('member'),  // member/lead/director
   isSecretary: boolean('is_secretary').notNull().default(false),
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
@@ -171,7 +169,6 @@ export const chatMessages = pgTable('chat_messages', {
   sessionId: uuid('session_id').notNull().references(() => chatSessions.id),
   sender: messageSenderEnum('sender').notNull(),
   content: text('content').notNull(),
-  fileId: uuid('file_id').references(() => files.id),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 }, (table) => ({
   sessionCreatedIdx: index('chat_messages_session_created_idx').on(table.sessionId, table.createdAt),
@@ -367,8 +364,6 @@ export const snsContents = pgTable('sns_contents', {
   body: text('body').notNull(),
   hashtags: text('hashtags'),
   imageUrl: text('image_url'),
-  snsAccountId: uuid('sns_account_id'),  // references snsAccounts (defined below)
-  variantOf: uuid('variant_of'),  // self-reference for A/B variants
   status: snsStatusEnum('status').notNull().default('draft'),
   reviewedBy: uuid('reviewed_by').references(() => users.id),
   reviewedAt: timestamp('reviewed_at'),
@@ -376,21 +371,9 @@ export const snsContents = pgTable('sns_contents', {
   publishedUrl: text('published_url'),
   publishedAt: timestamp('published_at'),
   publishError: text('publish_error'),
-  scheduledAt: timestamp('scheduled_at'),
   metadata: jsonb('metadata'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
-})
-
-// === 19b. sns_accounts — SNS 계정 ===
-export const snsAccounts = pgTable('sns_accounts', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  companyId: uuid('company_id').notNull().references(() => companies.id),
-  platform: snsPlatformEnum('platform').notNull(),
-  accountName: varchar('account_name', { length: 100 }).notNull(),
-  credentials: jsonb('credentials'), // encrypted in practice
-  isActive: boolean('is_active').notNull().default(true),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 
 // === 20. activity_logs — 작전일지 (활동 로그) ===
@@ -465,9 +448,7 @@ export const messengerChannels = pgTable('messenger_channels', {
   name: varchar('name', { length: 100 }).notNull(),
   description: text('description'),
   createdBy: uuid('created_by').notNull().references(() => users.id),
-  isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })
 
 // === 24. messenger_members — 메신저 채널 멤버 ===
@@ -486,18 +467,6 @@ export const messengerMessages = pgTable('messenger_messages', {
   channelId: uuid('channel_id').notNull().references(() => messengerChannels.id),
   userId: uuid('user_id').notNull().references(() => users.id),
   content: text('content').notNull(),
-  parentMessageId: uuid('parent_message_id'),
-  fileId: uuid('file_id').references(() => files.id),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-})
-
-// === 25b. messenger_reactions — 메시지 반응 ===
-export const messengerReactions = pgTable('messenger_reactions', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  companyId: uuid('company_id').notNull().references(() => companies.id),
-  messageId: uuid('message_id').notNull().references(() => messengerMessages.id),
-  userId: uuid('user_id').notNull().references(() => users.id),
-  emoji: varchar('emoji', { length: 10 }).notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 
@@ -573,57 +542,6 @@ export const strategyBacktestResults = pgTable('strategy_backtest_results', {
   userStockIdx: index('strategy_backtest_user_stock_idx').on(table.companyId, table.userId, table.stockCode),
 }))
 
-// === 29. soul_templates — 소울 템플릿 ===
-export const soulTemplates = pgTable('soul_templates', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  companyId: uuid('company_id').notNull().references(() => companies.id),
-  name: varchar('name', { length: 100 }).notNull(),
-  category: varchar('category', { length: 50 }).notNull().default('general'),
-  content: text('content').notNull(),
-  isActive: boolean('is_active').notNull().default(true),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow(),
-})
-
-// === 30. nexus_workflows — NEXUS 워크플로우 ===
-export const nexusWorkflows = pgTable('nexus_workflows', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  companyId: uuid('company_id').notNull().references(() => companies.id),
-  name: varchar('name', { length: 200 }).notNull(),
-  description: text('description'),
-  nodes: jsonb('nodes').notNull().default('[]'), // [{id, type, position, data}]
-  edges: jsonb('edges').notNull().default('[]'), // [{id, source, target}]
-  isTemplate: boolean('is_template').notNull().default(false),
-  isActive: boolean('is_active').notNull().default(true),
-  createdBy: uuid('created_by').notNull().references(() => users.id),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow(),
-})
-
-// === 31. nexus_executions — 워크플로우 실행 기록 ===
-export const nexusExecutions = pgTable('nexus_executions', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  companyId: uuid('company_id').notNull().references(() => companies.id),
-  workflowId: uuid('workflow_id').notNull().references(() => nexusWorkflows.id),
-  status: varchar('status', { length: 20 }).notNull().default('running'), // running, completed, failed
-  result: jsonb('result'),
-  startedAt: timestamp('started_at').notNull().defaultNow(),
-  completedAt: timestamp('completed_at'),
-})
-
-// === 32. mcp_servers — MCP 서버 등록 ===
-export const mcpServers = pgTable('mcp_servers', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  companyId: uuid('company_id').notNull().references(() => companies.id),
-  name: varchar('name', { length: 100 }).notNull(),
-  url: text('url').notNull(),
-  transport: varchar('transport', { length: 20 }).notNull().default('stdio'), // stdio, sse
-  config: jsonb('config'),
-  isActive: boolean('is_active').notNull().default(true),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow(),
-})
-
 // === 28. canvas_layouts — NEXUS 캔버스 레이아웃 ===
 export const canvasLayouts = pgTable('canvas_layouts', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -675,7 +593,6 @@ export const chatSessionsRelations = relations(chatSessions, ({ one, many }) => 
 export const chatMessagesRelations = relations(chatMessages, ({ one }) => ({
   company: one(companies, { fields: [chatMessages.companyId], references: [companies.id] }),
   session: one(chatSessions, { fields: [chatMessages.sessionId], references: [chatSessions.id] }),
-  file: one(files, { fields: [chatMessages.fileId], references: [files.id] }),
 }))
 
 export const delegationsRelations = relations(delegations, ({ one }) => ({
@@ -733,18 +650,10 @@ export const nightJobTriggersRelations = relations(nightJobTriggers, ({ one, man
   jobs: many(nightJobs),
 }))
 
-export const snsContentsRelations = relations(snsContents, ({ one, many }) => ({
+export const snsContentsRelations = relations(snsContents, ({ one }) => ({
   company: one(companies, { fields: [snsContents.companyId], references: [companies.id] }),
   agent: one(agents, { fields: [snsContents.agentId], references: [agents.id] }),
   creator: one(users, { fields: [snsContents.createdBy], references: [users.id] }),
-  account: one(snsAccounts, { fields: [snsContents.snsAccountId], references: [snsAccounts.id] }),
-  parent: one(snsContents, { fields: [snsContents.variantOf], references: [snsContents.id], relationName: 'variants' }),
-  variants: many(snsContents, { relationName: 'variants' }),
-}))
-
-export const snsAccountsRelations = relations(snsAccounts, ({ one, many }) => ({
-  company: one(companies, { fields: [snsAccounts.companyId], references: [companies.id] }),
-  contents: many(snsContents),
 }))
 
 export const activityLogsRelations = relations(activityLogs, ({ one }) => ({
@@ -776,18 +685,10 @@ export const messengerMembersRelations = relations(messengerMembers, ({ one }) =
   user: one(users, { fields: [messengerMembers.userId], references: [users.id] }),
 }))
 
-export const messengerMessagesRelations = relations(messengerMessages, ({ one, many }) => ({
+export const messengerMessagesRelations = relations(messengerMessages, ({ one }) => ({
   company: one(companies, { fields: [messengerMessages.companyId], references: [companies.id] }),
   channel: one(messengerChannels, { fields: [messengerMessages.channelId], references: [messengerChannels.id] }),
   user: one(users, { fields: [messengerMessages.userId], references: [users.id] }),
-  file: one(files, { fields: [messengerMessages.fileId], references: [files.id] }),
-  reactions: many(messengerReactions),
-}))
-
-export const messengerReactionsRelations = relations(messengerReactions, ({ one }) => ({
-  company: one(companies, { fields: [messengerReactions.companyId], references: [companies.id] }),
-  message: one(messengerMessages, { fields: [messengerReactions.messageId], references: [messengerMessages.id] }),
-  user: one(users, { fields: [messengerReactions.userId], references: [users.id] }),
 }))
 
 export const filesRelations = relations(files, ({ one }) => ({
@@ -821,10 +722,6 @@ export const canvasLayoutsRelations = relations(canvasLayouts, ({ one }) => ({
   company: one(companies, { fields: [canvasLayouts.companyId], references: [companies.id] }),
 }))
 
-export const soulTemplatesRelations = relations(soulTemplates, ({ one }) => ({
-  company: one(companies, { fields: [soulTemplates.companyId], references: [companies.id] }),
-}))
-
 export const adminUsersRelations = relations(adminUsers, ({ many }) => ({
   sessions: many(adminSessions),
 }))
@@ -846,19 +743,4 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
 export const notificationPreferencesRelations = relations(notificationPreferences, ({ one }) => ({
   user: one(users, { fields: [notificationPreferences.userId], references: [users.id] }),
   company: one(companies, { fields: [notificationPreferences.companyId], references: [companies.id] }),
-}))
-
-export const nexusWorkflowsRelations = relations(nexusWorkflows, ({ one, many }) => ({
-  company: one(companies, { fields: [nexusWorkflows.companyId], references: [companies.id] }),
-  creator: one(users, { fields: [nexusWorkflows.createdBy], references: [users.id] }),
-  executions: many(nexusExecutions),
-}))
-
-export const nexusExecutionsRelations = relations(nexusExecutions, ({ one }) => ({
-  company: one(companies, { fields: [nexusExecutions.companyId], references: [companies.id] }),
-  workflow: one(nexusWorkflows, { fields: [nexusExecutions.workflowId], references: [nexusWorkflows.id] }),
-}))
-
-export const mcpServersRelations = relations(mcpServers, ({ one }) => ({
-  company: one(companies, { fields: [mcpServers.companyId], references: [companies.id] }),
 }))

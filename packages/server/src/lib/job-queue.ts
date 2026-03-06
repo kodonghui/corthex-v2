@@ -2,11 +2,10 @@
 // Neon 서버리스 호환 (pg-boss 대신 자체 구현)
 
 import { db } from '../db'
-import { nightJobs, agents, chatSessions, chatMessages, agentMemory, reports } from '../db/schema'
+import { nightJobs, agents, chatSessions, chatMessages, agentMemory } from '../db/schema'
 import { eq, and, lte, asc } from 'drizzle-orm'
 import { generateAgentResponse } from './ai'
 import { orchestrateSecretary } from './orchestrator'
-import { broadcastToCompany } from '../ws/channels'
 
 const POLL_INTERVAL_MS = 30_000  // 30초마다 큐 확인
 const MAX_RETRIES = 3
@@ -19,9 +18,6 @@ export async function queueNightJob(params: {
   userId: string
   agentId: string
   sessionId?: string
-  scheduleId?: string
-  triggerId?: string
-  dependsOnJobId?: string
   instruction: string
   scheduledFor?: Date
 }) {
@@ -32,10 +28,7 @@ export async function queueNightJob(params: {
       userId: params.userId,
       agentId: params.agentId,
       sessionId: params.sessionId || null,
-      scheduleId: params.scheduleId || null,
-      triggerId: params.triggerId || null,
       instruction: params.instruction,
-      resultData: params.dependsOnJobId ? { dependsOnJobId: params.dependsOnJobId } : null,
       scheduledFor: params.scheduledFor || new Date(),
       maxRetries: MAX_RETRIES,
     })
@@ -75,11 +68,6 @@ async function pickNextJob() {
 // 단일 작업 처리
 async function processJob(job: typeof nightJobs.$inferSelect) {
   console.log(`🔄 야간 작업 처리 시작: ${job.id}`)
-
-  // WS: 작업 시작 알림
-  broadcastToCompany(job.companyId, 'night-jobs', {
-    type: 'job-progress', jobId: job.id, statusMessage: '작업 처리 중...',
-  })
 
   try {
     // 에이전트 정보 확인
@@ -151,67 +139,16 @@ async function processJob(job: typeof nightJobs.$inferSelect) {
       metadata: { jobId: job.id },
     })
 
-    // 자동 보고서 생성
-    let reportId: string | null = null
-    try {
-      const now = new Date()
-      const [report] = await db.insert(reports).values({
-        companyId: job.companyId,
-        authorId: job.userId,
-        title: `[야간] ${agent.name} — ${job.instruction.slice(0, 50)}`,
-        content: `## 야간 작업 결과\n\n**에이전트:** ${agent.name}\n**실행 시간:** ${now.toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}\n**지시:** ${job.instruction}\n\n---\n\n${result}`,
-        status: 'draft',
-      }).returning()
-      reportId = report.id
-      console.log(`📝 자동 보고서 생성: ${report.id}`)
-    } catch (reportErr) {
-      console.error(`⚠️ 자동 보고서 생성 실패 (작업은 완료):`, reportErr)
-    }
-
     // 작업 완료
     await db
       .update(nightJobs)
       .set({
         status: 'completed',
         result,
-        resultData: {
-          ...(job.resultData as Record<string, unknown> || {}),
-          ...(reportId ? { reportId } : {}),
-        },
         completedAt: new Date(),
         sessionId,
       })
       .where(eq(nightJobs.id, job.id))
-
-    // 체인 작업: 후행 작업 활성화 (선행 result 주입)
-    try {
-      const chainJobs = await db
-        .select()
-        .from(nightJobs)
-        .where(eq(nightJobs.status, 'queued'))
-
-      for (const chainJob of chainJobs) {
-        const rd = chainJob.resultData as Record<string, unknown> | null
-        if (rd?.dependsOnJobId === job.id) {
-          const chainInstruction = `[선행 작업 결과]\n${result.slice(0, 2000)}\n\n[추가 지시]\n${chainJob.instruction}`
-          await db
-            .update(nightJobs)
-            .set({ instruction: chainInstruction, scheduledFor: new Date() })
-            .where(eq(nightJobs.id, chainJob.id))
-          console.log(`🔗 체인 작업 활성화: ${chainJob.id} (선행: ${job.id})`)
-        }
-      }
-    } catch (chainErr) {
-      console.error('체인 작업 활성화 실패:', chainErr)
-    }
-
-    // WS: 작업 완료 알림
-    broadcastToCompany(job.companyId, 'night-jobs', {
-      type: 'job-completed',
-      jobId: job.id,
-      durationMs: job.startedAt ? Date.now() - new Date(job.startedAt).getTime() : 0,
-      reportId: reportId || null,
-    })
 
     console.log(`✅ 야간 작업 완료: ${job.id}`)
   } catch (err) {
@@ -247,39 +184,6 @@ async function processJob(job: typeof nightJobs.$inferSelect) {
           completedAt: new Date(),
         })
         .where(eq(nightJobs.id, job.id))
-
-      // WS: 최종 실패 알림
-      broadcastToCompany(job.companyId, 'night-jobs', {
-        type: 'job-failed',
-        jobId: job.id,
-        errorMessage: errorMsg,
-        retryCount: newRetryCount,
-      })
-
-      // 체인 작업: 후행 작업도 cascade 실패
-      try {
-        const chainJobs = await db
-          .select()
-          .from(nightJobs)
-          .where(eq(nightJobs.status, 'queued'))
-
-        for (const chainJob of chainJobs) {
-          const rd = chainJob.resultData as Record<string, unknown> | null
-          if (rd?.dependsOnJobId === job.id) {
-            await db
-              .update(nightJobs)
-              .set({
-                status: 'failed',
-                error: `[선행 작업 실패] 선행 작업(${job.id})이 실패하여 자동 취소됨`,
-                completedAt: new Date(),
-              })
-              .where(eq(nightJobs.id, chainJob.id))
-            console.log(`🔗 체인 작업 cascade 실패: ${chainJob.id}`)
-          }
-        }
-      } catch (chainErr) {
-        console.error('체인 cascade 실패 처리 오류:', chainErr)
-      }
 
       console.log(`💀 야간 작업 최종 실패: ${job.id} (재시도 ${job.maxRetries}회 초과)`)
     }

@@ -11,7 +11,6 @@ import { agentsRoute } from './routes/admin/agents'
 import { credentialsRoute } from './routes/admin/credentials'
 import { toolsRoute } from './routes/admin/tools'
 import { reportLinesRoute } from './routes/admin/report-lines'
-import { soulTemplatesRoute } from './routes/admin/soul-templates'
 import { workspaceAgentsRoute } from './routes/workspace/agents'
 import { chatRoute } from './routes/workspace/chat'
 import { profileRoute } from './routes/workspace/profile'
@@ -24,15 +23,9 @@ import { dashboardRoute } from './routes/workspace/dashboard'
 import { telegramRoute } from './routes/workspace/telegram'
 import { messengerRoute } from './routes/workspace/messenger'
 import { nexusRoute } from './routes/workspace/nexus'
-import { mcpRoute } from './routes/workspace/mcp'
 import { strategyRoute } from './routes/workspace/strategy'
-import { schedulesRoute } from './routes/workspace/schedules'
-import { triggersRoute } from './routes/workspace/triggers'
-import { filesRoute } from './routes/workspace/files'
 import { runMigrations } from './db'
 import { startJobWorker } from './lib/job-queue'
-import { startScheduleWorker } from './lib/schedule-worker'
-import { startTriggerWorker } from './lib/trigger-worker'
 import { loginRateLimit, apiRateLimit } from './middleware/rate-limit'
 import { wsRoute, websocket, broadcastServerRestart } from './ws/server'
 import { eventBus } from './lib/event-bus'
@@ -72,7 +65,6 @@ app.route('/api/admin', agentsRoute)
 app.route('/api/admin', credentialsRoute)
 app.route('/api/admin', toolsRoute)
 app.route('/api/admin', reportLinesRoute)
-app.route('/api/admin', soulTemplatesRoute)
 
 // 유저 워크스페이스 라우트 (각 파일 내부에서 authMiddleware 적용, 테넌트 격리)
 app.route('/api/workspace', workspaceAgentsRoute)
@@ -87,11 +79,7 @@ app.route('/api/workspace', dashboardRoute)
 app.route('/api/workspace', telegramRoute)
 app.route('/api/workspace/messenger', messengerRoute)
 app.route('/api/workspace', nexusRoute)
-app.route('/api/workspace/mcp', mcpRoute)
 app.route('/api/workspace/strategy', strategyRoute)
-app.route('/api/workspace/schedules', schedulesRoute)
-app.route('/api/workspace/triggers', triggersRoute)
-app.route('/api/workspace', filesRoute)
 
 // WebSocket 라우트
 app.get('/ws', wsRoute)
@@ -155,8 +143,6 @@ console.log(`🚀 CORTHEX v2 서버 시작 — http://localhost:${port}`)
 // DB 마이그레이션 자동 적용 후 워커 시작
 runMigrations().then(() => {
   startJobWorker()
-  startScheduleWorker()
-  startTriggerWorker()
 })
 
 // Graceful Shutdown — SIGTERM 시 WS 클라이언트 알림 후 종료

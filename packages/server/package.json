@@ -18,6 +18,7 @@
     "@corthex/shared": "workspace:*",
     "@hono/zod-validator": "^0.5",
     "@neondatabase/serverless": "^1.0.2",
+    "croner": "^10.0.1",
     "drizzle-orm": "^0.39",
     "hono": "^4",
     "postgres": "^3.4",

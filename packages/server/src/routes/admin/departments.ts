@@ -83,3 +83,48 @@ departmentsRoute.delete('/departments/:id', async (c) => {
   if (!dept) throw new HTTPError(404, '부서를 찾을 수 없습니다', 'DEPT_001')
   return c.json({ data: { message: '비활성화되었습니다' } })
 })
+
+// GET /api/admin/departments/tree?companyId=xxx — 부서 계층 트리
+departmentsRoute.get('/departments/tree', async (c) => {
+  const companyId = c.req.query('companyId')
+  if (!companyId) throw new HTTPError(400, 'companyId가 필요합니다', 'DEPT_004')
+
+  const allDepts = await db
+    .select()
+    .from(departments)
+    .where(and(eq(departments.companyId, companyId), eq(departments.isActive, true)))
+
+  const allAgents = await db
+    .select({
+      id: agents.id,
+      name: agents.name,
+      role: agents.role,
+      level: agents.level,
+      departmentId: agents.departmentId,
+      isSecretary: agents.isSecretary,
+    })
+    .from(agents)
+    .where(and(eq(agents.companyId, companyId), eq(agents.isActive, true)))
+
+  type TreeNode = {
+    id: string
+    name: string
+    description: string | null
+    children: TreeNode[]
+    agents: typeof allAgents
+  }
+
+  function buildTree(parentId: string | null): TreeNode[] {
+    return allDepts
+      .filter(d => (d.parentDepartmentId || null) === parentId)
+      .map(d => ({
+        id: d.id,
+        name: d.name,
+        description: d.description,
+        children: buildTree(d.id),
+        agents: allAgents.filter(a => a.departmentId === d.id),
+      }))
+  }
+
+  return c.json({ data: buildTree(null) })
+})
