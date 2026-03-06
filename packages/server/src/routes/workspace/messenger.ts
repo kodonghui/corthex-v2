@@ -1,13 +1,14 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { eq, and, desc, inArray, sql, isNull } from 'drizzle-orm'
+import { eq, and, desc, inArray, sql, isNull, ilike, gt } from 'drizzle-orm'
 import { db } from '../../db'
 import { messengerChannels, messengerMembers, messengerMessages, messengerReactions, users, agents } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { logActivity } from '../../lib/activity-logger'
 import { broadcastToChannel } from '../../ws/channels'
+import { createNotification } from '../../lib/notifier'
 import { clientMap } from '../../ws/server'
 import { getClientForUser } from '../../lib/ai'
 import type { AppEnv } from '../../types'
@@ -496,19 +497,48 @@ messengerRoute.post('/channels/:id/messages', zValidator('json', sendMessageSche
     },
   })
 
-  // @에이전트 멘션 파싱 → 비동기 AI 응답 (fire-and-forget, DB 조회 포함)
-  const mentionMatch = content.match(/@(\S+)/)
-  if (mentionMatch) {
-    const agentName = mentionMatch[1]
-    const cId = tenant.companyId
-    const uId = tenant.userId
+  // @멘션 파싱 → 에이전트 AI 응답 + 유저 알림 (fire-and-forget)
+  const mentionMatches = content.matchAll(/@(\S+)/g)
+  const cId = tenant.companyId
+  const uId = tenant.userId
+  for (const match of mentionMatches) {
+    const mentionName = match[1]
     ;(async () => {
+      // 에이전트 멘션 확인
       const [agent] = await db
         .select({ id: agents.id, name: agents.name, soul: agents.soul, userId: agents.userId })
         .from(agents)
-        .where(and(eq(agents.name, agentName), eq(agents.companyId, cId)))
+        .where(and(eq(agents.name, mentionName), eq(agents.companyId, cId)))
         .limit(1)
-      if (agent) await handleAgentMention(agent, channelId, content, uId, cId)
+      if (agent) {
+        await handleAgentMention(agent, channelId, content, uId, cId)
+        return
+      }
+
+      // 유저 멘션 → 알림 생성
+      const [mentionedUser] = await db
+        .select({ id: users.id, name: users.name })
+        .from(users)
+        .where(and(eq(users.name, mentionName), eq(users.companyId, cId)))
+        .limit(1)
+      if (mentionedUser && mentionedUser.id !== uId) {
+        // 채널명 조회
+        const [ch] = await db
+          .select({ name: messengerChannels.name })
+          .from(messengerChannels)
+          .where(eq(messengerChannels.id, channelId))
+          .limit(1)
+        const chName = ch?.name || '채널'
+
+        await createNotification({
+          userId: mentionedUser.id,
+          companyId: cId,
+          type: 'messenger_mention',
+          title: `#${chName}에서 @멘션`,
+          body: content.length > 100 ? content.slice(0, 100) + '...' : content,
+          actionUrl: `/messenger?channelId=${channelId}`,
+        })
+      }
     })().catch(() => {})
   }
 
@@ -744,6 +774,117 @@ async function getReactionsMap(messageIds: string[], companyId: string) {
   }
   return map
 }
+
+// GET /messenger/search — 메시지 검색 (내가 멤버인 채널만)
+messengerRoute.get('/search', async (c) => {
+  const tenant = c.get('tenant')
+  const q = (c.req.query('q') || '').trim()
+  const limitNum = Math.min(Number(c.req.query('limit')) || 30, 100)
+
+  if (q.length < 2) {
+    return c.json({ data: [] })
+  }
+
+  // ILIKE 와일드카드 이스케이프 (%와 _ 문자를 리터럴로)
+  const escapedQ = q.replace(/%/g, '\\%').replace(/_/g, '\\_')
+
+  // 내가 멤버인 채널 ID
+  const myMemberships = await db
+    .select({ channelId: messengerMembers.channelId })
+    .from(messengerMembers)
+    .where(and(
+      eq(messengerMembers.userId, tenant.userId),
+      eq(messengerMembers.companyId, tenant.companyId),
+    ))
+
+  if (myMemberships.length === 0) return c.json({ data: [] })
+
+  const channelIds = myMemberships.map((m) => m.channelId)
+
+  const results = await db
+    .select({
+      id: messengerMessages.id,
+      channelId: messengerMessages.channelId,
+      channelName: messengerChannels.name,
+      userId: messengerMessages.userId,
+      userName: users.name,
+      content: messengerMessages.content,
+      createdAt: messengerMessages.createdAt,
+    })
+    .from(messengerMessages)
+    .innerJoin(users, eq(messengerMessages.userId, users.id))
+    .innerJoin(messengerChannels, eq(messengerMessages.channelId, messengerChannels.id))
+    .where(and(
+      eq(messengerMessages.companyId, tenant.companyId),
+      inArray(messengerMessages.channelId, channelIds),
+      ilike(messengerMessages.content, `%${escapedQ}%`),
+    ))
+    .orderBy(desc(messengerMessages.createdAt))
+    .limit(limitNum)
+
+  return c.json({ data: results })
+})
+
+// GET /messenger/channels/unread — 채널별 미읽음 카운트
+messengerRoute.get('/channels/unread', async (c) => {
+  const tenant = c.get('tenant')
+
+  const myMemberships = await db
+    .select({
+      channelId: messengerMembers.channelId,
+      lastReadAt: messengerMembers.lastReadAt,
+      joinedAt: messengerMembers.joinedAt,
+    })
+    .from(messengerMembers)
+    .where(and(
+      eq(messengerMembers.userId, tenant.userId),
+      eq(messengerMembers.companyId, tenant.companyId),
+    ))
+
+  if (myMemberships.length === 0) return c.json({ data: {} })
+
+  const unreadCounts: Record<string, number> = {}
+
+  await Promise.all(
+    myMemberships.map(async (m) => {
+      const since = m.lastReadAt || m.joinedAt
+      const [result] = await db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(messengerMessages)
+        .where(and(
+          eq(messengerMessages.channelId, m.channelId),
+          eq(messengerMessages.companyId, tenant.companyId),
+          isNull(messengerMessages.parentMessageId),
+          gt(messengerMessages.createdAt, since),
+        ))
+
+      if (result.count > 0) {
+        unreadCounts[m.channelId] = result.count
+      }
+    }),
+  )
+
+  return c.json({ data: unreadCounts })
+})
+
+// POST /messenger/channels/:id/read — 채널 읽음 처리
+messengerRoute.post('/channels/:id/read', async (c) => {
+  const tenant = c.get('tenant')
+  const channelId = c.req.param('id')
+
+  await assertMember(channelId, tenant.userId, tenant.companyId)
+
+  await db
+    .update(messengerMembers)
+    .set({ lastReadAt: new Date() })
+    .where(and(
+      eq(messengerMembers.channelId, channelId),
+      eq(messengerMembers.userId, tenant.userId),
+      eq(messengerMembers.companyId, tenant.companyId),
+    ))
+
+  return c.json({ data: { success: true } })
+})
 
 // GET /messenger/users — 같은 회사 유저 목록 (멤버 추가용)
 messengerRoute.get('/users', async (c) => {

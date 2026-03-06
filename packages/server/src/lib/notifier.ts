@@ -7,7 +7,7 @@ import { sendEmail, buildNotificationEmail } from './email-sender'
 type NotifyParams = {
   userId: string
   companyId: string
-  type: 'chat_complete' | 'delegation_complete' | 'tool_error' | 'job_complete' | 'job_error' | 'system'
+  type: 'chat_complete' | 'delegation_complete' | 'tool_error' | 'job_complete' | 'job_error' | 'system' | 'messenger_mention'
   title: string
   body?: string
   actionUrl?: string

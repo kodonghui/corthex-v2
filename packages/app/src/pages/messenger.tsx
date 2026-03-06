@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useSearchParams } from 'react-router-dom'
 import { api } from '../lib/api'
 import { useAuthStore } from '../stores/auth-store'
 import { useWsStore } from '../stores/ws-store'
@@ -56,6 +57,16 @@ type AgentInfo = {
   id: string
   name: string
   role: string | null
+}
+
+type SearchResult = {
+  id: string
+  channelId: string
+  channelName: string
+  userId: string
+  userName: string
+  content: string
+  createdAt: string
 }
 
 const EMOJI_LIST = ['👍', '❤️', '😂', '😮', '👏', '🔥']
@@ -475,6 +486,7 @@ export function MessengerPage() {
   const queryClient = useQueryClient()
   const user = useAuthStore((s) => s.user)
   const { subscribe, addListener, removeListener, isConnected } = useWsStore()
+  const [searchParams] = useSearchParams()
   const [selectedChannel, setSelectedChannel] = useState<string | null>(null)
   const [newMessage, setNewMessage] = useState('')
   const [showCreate, setShowCreate] = useState(false)
@@ -486,15 +498,89 @@ export function MessengerPage() {
   const [threadMessage, setThreadMessage] = useState<Message | null>(null)
   const [hoveredMsgId, setHoveredMsgId] = useState<string | null>(null)
   const [showEmojiPicker, setShowEmojiPicker] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const [showSearchResults, setShowSearchResults] = useState(false)
+  const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({})
+  const [mentionToast, setMentionToast] = useState<{ title: string; actionUrl: string } | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const searchRef = useRef<HTMLDivElement>(null)
+
+  // URL에서 channelId 파라미터 (알림 클릭 시)
+  useEffect(() => {
+    const chId = searchParams.get('channelId')
+    if (chId) setSelectedChannel(chId)
+  }, [searchParams])
+
+  // 검색 디바운스
+  useEffect(() => {
+    if (searchQuery.length < 2) { setDebouncedSearch(''); return }
+    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 300)
+    return () => clearTimeout(timer)
+  }, [searchQuery])
+
+  // 검색 외부 클릭 닫기
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowSearchResults(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
 
   // 채널 목록
   const { data: channelsData } = useQuery({
     queryKey: ['messenger-channels'],
     queryFn: () => api.get<{ data: Channel[] }>('/workspace/messenger/channels'),
   })
+
+  // 메시지 검색
+  const { data: searchData } = useQuery({
+    queryKey: ['messenger-search', debouncedSearch],
+    queryFn: () => api.get<{ data: SearchResult[] }>(`/workspace/messenger/search?q=${encodeURIComponent(debouncedSearch)}`),
+    enabled: debouncedSearch.length >= 2,
+  })
+  const searchResults = searchData?.data || []
+
+  // 채널별 미읽음 카운트
+  const { data: unreadData } = useQuery({
+    queryKey: ['messenger-unread'],
+    queryFn: () => api.get<{ data: Record<string, number> }>('/workspace/messenger/channels/unread'),
+    refetchInterval: 60000,
+  })
+
+  // 서버 unread를 로컬 상태에 동기화
+  useEffect(() => {
+    if (unreadData?.data) {
+      setUnreadCounts((prev) => {
+        const merged = { ...prev }
+        for (const [chId, count] of Object.entries(unreadData.data)) {
+          if (merged[chId] === undefined || merged[chId] < count) {
+            merged[chId] = count
+          }
+        }
+        return merged
+      })
+    }
+  }, [unreadData])
+
+  // 채널 읽음 처리
+  const markRead = useMutation({
+    mutationFn: (channelId: string) =>
+      api.post(`/workspace/messenger/channels/${channelId}/read`, {}),
+  })
+
+  // 채널 선택 핸들러
+  const handleSelectChannel = useCallback((channelId: string) => {
+    setSelectedChannel(channelId)
+    setThreadMessage(null)
+    setUnreadCounts((prev) => ({ ...prev, [channelId]: 0 }))
+    markRead.mutate(channelId)
+  }, [markRead])
 
   // 메시지 (선택된 채널, WebSocket 미연결 시 30초 폴링 fallback)
   const { data: messagesData } = useQuery({
@@ -568,6 +654,50 @@ export function MessengerPage() {
       if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
     }
   }, [selectedChannel, isConnected, subscribe, addListener, removeListener, queryClient])
+
+  // 알림 WS: messenger_mention 토스트
+  useEffect(() => {
+    if (!isConnected || !user) return
+    const notifKey = `notifications::${user.id}`
+    const handler = (data: unknown) => {
+      const event = data as { type: string; notification?: { type: string; title: string; actionUrl?: string } }
+      if (event.type === 'new-notification' && event.notification?.type === 'messenger_mention') {
+        setMentionToast({ title: event.notification.title, actionUrl: event.notification.actionUrl || '/messenger' })
+        setTimeout(() => setMentionToast(null), 5000)
+      }
+    }
+    addListener(notifKey, handler)
+    return () => removeListener(notifKey, handler)
+  }, [isConnected, user, addListener, removeListener])
+
+  // 모든 내 채널의 WS 구독 → unread 추적
+  useEffect(() => {
+    if (!isConnected || !channelsData?.data) return
+    const channelIds = channelsData.data.map((ch) => ch.id)
+    for (const chId of channelIds) {
+      if (chId !== selectedChannel) {
+        subscribe('messenger', { id: chId })
+      }
+    }
+
+    const handlers: { key: string; fn: (data: unknown) => void }[] = []
+    for (const chId of channelIds) {
+      if (chId === selectedChannel) continue
+      const channelKey = `messenger::${chId}`
+      const fn = (data: unknown) => {
+        const event = data as { type: string; message?: Message }
+        if (event.type === 'new-message' && event.message && !event.message.parentMessageId) {
+          setUnreadCounts((prev) => ({ ...prev, [chId]: (prev[chId] || 0) + 1 }))
+          queryClient.invalidateQueries({ queryKey: ['messenger-channels'] })
+        }
+      }
+      addListener(channelKey, fn)
+      handlers.push({ key: channelKey, fn })
+    }
+    return () => {
+      for (const h of handlers) removeListener(h.key, h.fn)
+    }
+  }, [isConnected, channelsData?.data, selectedChannel, subscribe, addListener, removeListener, queryClient])
 
   const sendMessage = useMutation({
     mutationFn: (content: string) =>
@@ -680,6 +810,49 @@ export function MessengerPage() {
       <div className="flex flex-1 min-h-0">
         {/* 채널 목록 (좌) */}
         <div className="w-64 border-r border-zinc-200 dark:border-zinc-800 overflow-y-auto">
+          {/* 검색 */}
+          <div ref={searchRef} className="relative p-2 border-b border-zinc-200 dark:border-zinc-700">
+            <div className="flex items-center gap-1.5 px-2 py-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-md">
+              <span className="text-zinc-400 text-sm">🔍</span>
+              <input
+                value={searchQuery}
+                onChange={(e) => { setSearchQuery(e.target.value); setShowSearchResults(true) }}
+                onFocus={() => debouncedSearch.length >= 2 && setShowSearchResults(true)}
+                onKeyDown={(e) => e.key === 'Escape' && setShowSearchResults(false)}
+                placeholder="메시지 검색..."
+                className="flex-1 bg-transparent text-sm outline-none placeholder-zinc-400"
+              />
+              {searchQuery && (
+                <button onClick={() => { setSearchQuery(''); setShowSearchResults(false) }}
+                  className="text-zinc-400 hover:text-zinc-600 text-xs">✕</button>
+              )}
+            </div>
+            {showSearchResults && searchResults.length > 0 && (
+              <div className="absolute left-2 right-2 top-full mt-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-md shadow-lg max-h-64 overflow-y-auto z-30">
+                {searchResults.map((r) => (
+                  <button
+                    key={r.id}
+                    onClick={() => { handleSelectChannel(r.channelId); setShowSearchResults(false); setSearchQuery('') }}
+                    className="w-full text-left px-3 py-2 hover:bg-zinc-50 dark:hover:bg-zinc-800 border-b border-zinc-100 dark:border-zinc-800 last:border-0"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium text-indigo-500">#{r.channelName}</span>
+                      <span className="text-[10px] text-zinc-400">{formatTime(r.createdAt)}</span>
+                    </div>
+                    <p className="text-xs text-zinc-500 mt-0.5">{r.userName}</p>
+                    <p className="text-sm truncate mt-0.5">
+                      {r.content.length > 80 ? r.content.slice(0, 80) + '...' : r.content}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            )}
+            {showSearchResults && debouncedSearch.length >= 2 && searchResults.length === 0 && (
+              <div className="absolute left-2 right-2 top-full mt-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-md shadow-lg p-3 z-30">
+                <p className="text-xs text-zinc-400 text-center">검색 결과가 없습니다</p>
+              </div>
+            )}
+          </div>
           {showCreate && (
             <div className="p-3 border-b border-zinc-200 dark:border-zinc-700 space-y-2">
               <input value={createForm.name} onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
@@ -694,31 +867,41 @@ export function MessengerPage() {
           {channels.length === 0 && !showCreate && (
             <p className="p-3 text-xs text-zinc-500">채널이 없습니다. 새 채널을 만드세요.</p>
           )}
-          {channels.map((ch) => (
-            <button
-              key={ch.id}
-              onClick={() => { setSelectedChannel(ch.id); setThreadMessage(null) }}
-              className={`w-full text-left px-3 py-2.5 text-sm border-b border-zinc-100 dark:border-zinc-800 transition-colors ${
-                selectedChannel === ch.id
-                  ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300'
-                  : 'hover:bg-zinc-50 dark:hover:bg-zinc-800'
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <p className="font-medium truncate">{ch.name}</p>
-                {ch.lastMessage && (
-                  <span className="text-xs text-zinc-400 ml-1 shrink-0">{formatTime(ch.lastMessage.createdAt)}</span>
-                )}
-              </div>
-              {ch.lastMessage ? (
-                <p className="text-xs text-zinc-500 truncate mt-0.5">
-                  {ch.lastMessage.userName}: {ch.lastMessage.content}
-                </p>
-              ) : ch.description ? (
-                <p className="text-xs text-zinc-500 truncate mt-0.5">{ch.description}</p>
-              ) : null}
-            </button>
-          ))}
+          {channels.map((ch) => {
+            const unread = unreadCounts[ch.id] || 0
+            return (
+              <button
+                key={ch.id}
+                onClick={() => handleSelectChannel(ch.id)}
+                className={`w-full text-left px-3 py-2.5 text-sm border-b border-zinc-100 dark:border-zinc-800 transition-colors ${
+                  selectedChannel === ch.id
+                    ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300'
+                    : 'hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <p className={`font-medium truncate ${unread > 0 ? 'font-bold' : ''}`}>{ch.name}</p>
+                  <div className="flex items-center gap-1.5 ml-1 shrink-0">
+                    {unread > 0 && (
+                      <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold text-white bg-red-500 rounded-full">
+                        {unread > 99 ? '99+' : unread}
+                      </span>
+                    )}
+                    {ch.lastMessage && (
+                      <span className="text-xs text-zinc-400">{formatTime(ch.lastMessage.createdAt)}</span>
+                    )}
+                  </div>
+                </div>
+                {ch.lastMessage ? (
+                  <p className="text-xs text-zinc-500 truncate mt-0.5">
+                    {ch.lastMessage.userName}: {ch.lastMessage.content}
+                  </p>
+                ) : ch.description ? (
+                  <p className="text-xs text-zinc-500 truncate mt-0.5">{ch.description}</p>
+                ) : null}
+              </button>
+            )
+          })}
         </div>
 
         {/* 메시지 영역 (우) */}
@@ -906,6 +1089,21 @@ export function MessengerPage() {
           onlineUserIds={onlineUserIds}
           onClose={handleSettingsClose}
         />
+      )}
+
+      {/* 멘션 알림 토스트 */}
+      {mentionToast && (
+        <div
+          className="fixed bottom-4 right-4 bg-indigo-600 text-white px-4 py-3 rounded-lg shadow-lg cursor-pointer z-50 max-w-xs animate-in fade-in slide-in-from-bottom-2"
+          onClick={() => {
+            const chMatch = mentionToast.actionUrl.match(/channelId=([^&]+)/)
+            if (chMatch) handleSelectChannel(chMatch[1])
+            setMentionToast(null)
+          }}
+        >
+          <p className="text-sm font-medium">@멘션 알림</p>
+          <p className="text-xs opacity-90 mt-0.5">{mentionToast.title}</p>
+        </div>
       )}
     </div>
   )

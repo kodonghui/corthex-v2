@@ -141,6 +141,13 @@
       "when": 1772985600000,
       "tag": "0025_messenger-reactions-threads",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1773072000000,
+      "tag": "0026_messenger-search-unread",
+      "breakpoints": true
     }
   ]
 }

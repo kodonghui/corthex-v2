@@ -480,6 +480,7 @@ export const messengerMembers = pgTable('messenger_members', {
   channelId: uuid('channel_id').notNull().references(() => messengerChannels.id),
   userId: uuid('user_id').notNull().references(() => users.id),
   joinedAt: timestamp('joined_at').notNull().defaultNow(),
+  lastReadAt: timestamp('last_read_at'),
 })
 
 // === 25. messenger_messages — 사내 메신저 메시지 ===
