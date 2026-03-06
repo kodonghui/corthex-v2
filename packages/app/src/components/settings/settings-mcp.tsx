@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../../lib/api'
 import { toast } from '@corthex/ui'
+import { useAuthStore } from '../../stores/auth-store'
 
 type McpServer = {
   id: string
@@ -35,6 +36,8 @@ function suggestName(url: string): string {
 
 export function SettingsMcp() {
   const queryClient = useQueryClient()
+  const user = useAuthStore((s) => s.user)
+  const isAdmin = user?.role === 'admin'
   const [showForm, setShowForm] = useState(false)
   const [formUrl, setFormUrl] = useState('')
   const [formName, setFormName] = useState('')
@@ -118,20 +121,22 @@ export function SettingsMcp() {
       <section>
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400">MCP 서버 연결</h3>
-          <button
-            onClick={() => { setShowForm(!showForm); setTestResult(null) }}
-            disabled={isMaxReached && !showForm}
-            className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {showForm ? '취소' : '+ 서버 추가'}
-          </button>
+          {isAdmin && (
+            <button
+              onClick={() => { setShowForm(!showForm); setTestResult(null) }}
+              disabled={isMaxReached && !showForm}
+              className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {showForm ? '취소' : '+ 서버 추가'}
+            </button>
+          )}
         </div>
 
-        {isMaxReached && !showForm && (
+        {isAdmin && isMaxReached && !showForm && (
           <p className="text-xs text-zinc-500 mb-3">최대 {MAX_SERVERS}개까지 등록 가능합니다</p>
         )}
 
-        {showForm && (
+        {isAdmin && showForm && (
           <div className="mb-4 p-4 rounded-lg border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950 space-y-3">
             <div>
               <label className="block text-xs font-medium text-zinc-500 mb-1">서버 URL</label>
@@ -206,6 +211,7 @@ export function SettingsMcp() {
                     deleteServer.mutate(server.id)
                   }
                 }}
+                isAdmin={isAdmin}
               />
             ))
           )}
@@ -221,12 +227,14 @@ function ServerCard({
   expanded,
   onToggle,
   onDelete,
+  isAdmin,
 }: {
   server: McpServer
   status: ConnectionStatus
   expanded: boolean
   onToggle: () => void
   onDelete: () => void
+  isAdmin: boolean
 }) {
   const { data: toolsData, isLoading: toolsLoading } = useQuery({
     queryKey: ['mcp-tools', server.id],
@@ -263,14 +271,19 @@ function ServerCard({
             <span className="text-[10px] text-zinc-400">{statusLabel}</span>
           </div>
           <p className="text-xs text-zinc-400 truncate mt-0.5">{server.url}</p>
+          {server.url.startsWith('http://') && (
+            <p className="text-[10px] text-yellow-600 dark:text-yellow-500 mt-0.5">HTTPS 사용을 권장합니다</p>
+          )}
         </div>
-        <button
-          onClick={(e) => { e.stopPropagation(); onDelete() }}
-          className="text-zinc-400 hover:text-red-500 ml-2 flex-shrink-0"
-          title="삭제"
-        >
-          🗑
-        </button>
+        {isAdmin && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onDelete() }}
+            className="text-zinc-400 hover:text-red-500 ml-2 flex-shrink-0"
+            title="삭제"
+          >
+            🗑
+          </button>
+        )}
       </div>
 
       {expanded && (

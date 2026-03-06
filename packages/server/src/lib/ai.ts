@@ -6,6 +6,8 @@ import { loadAgentTools, toClaudeTools, executeTool } from './tool-executor'
 import { mcpListTools, mcpCallTool, mcpCallToolStream } from './mcp-client'
 import { recordCost } from './cost-tracker'
 import { decrypt } from './crypto'
+import { checkMcpRateLimit } from './mcp-rate-limit'
+import { logActivity } from './activity-logger'
 
 /**
  * 유저의 CLI 토큰으로 Anthropic 클라이언트 생성
@@ -235,6 +237,18 @@ export async function generateAgentResponse(ctx: ChatContext): Promise<string> {
       // MCP 도구인지 확인
       const mcpTool = mcpToolRecords.find(t => t.name === block.name)
       if (mcpTool) {
+        // MCP 속도 제한
+        const rateCheck = checkMcpRateLimit(ctx.userId)
+        if (!rateCheck.allowed) {
+          toolResults.push({
+            type: 'tool_result' as const,
+            tool_use_id: block.id,
+            content: '[오류] MCP 도구 실행 속도 제한 (분당 20회)',
+            is_error: true,
+          } as Anthropic.Messages.ToolResultBlockParam)
+          continue
+        }
+
         try {
           const result = await mcpCallTool(mcpTool.serverUrl, block.name, block.input as Record<string, unknown>)
           toolCallSummaries.push(`- **${block.name}** [MCP]: ${JSON.stringify(block.input).slice(0, 80)}`)
@@ -243,6 +257,13 @@ export async function generateAgentResponse(ctx: ChatContext): Promise<string> {
             tool_use_id: block.id,
             content: result || '(빈 결과)',
           } as Anthropic.Messages.ToolResultBlockParam)
+
+          logActivity({
+            companyId: ctx.companyId, userId: ctx.userId, type: 'tool_call', phase: 'end',
+            actorType: 'user', actorId: ctx.userId, action: 'mcp-tool-execute',
+            detail: `MCP 도구 실행: ${block.name}`,
+            metadata: { toolName: block.name, serverUrl: mcpTool.serverUrl },
+          })
         } catch (err) {
           const errMsg = err instanceof Error ? err.message : 'MCP 도구 실행 실패'
           toolCallSummaries.push(`- **${block.name}** [MCP] 실패: ${errMsg}`)
@@ -252,6 +273,13 @@ export async function generateAgentResponse(ctx: ChatContext): Promise<string> {
             content: `[오류] ${errMsg}`,
             is_error: true,
           } as Anthropic.Messages.ToolResultBlockParam)
+
+          logActivity({
+            companyId: ctx.companyId, userId: ctx.userId, type: 'tool_call', phase: 'error',
+            actorType: 'user', actorId: ctx.userId, action: 'mcp-tool-execute',
+            detail: `MCP 도구 실행 실패: ${block.name} — ${errMsg}`,
+            metadata: { toolName: block.name, serverUrl: mcpTool.serverUrl, error: errMsg },
+          })
         }
         continue
       }
@@ -440,6 +468,15 @@ export async function generateAgentResponseStream(
       // MCP 도구인지 확인
       const mcpTool = mcpToolRecords.find(t => t.name === block.name)
       if (mcpTool) {
+        // MCP 속도 제한
+        const rateCheck = checkMcpRateLimit(ctx.userId)
+        if (!rateCheck.allowed) {
+          onEvent({ type: 'tool-start', toolName: `${block.name} [MCP]`, toolId: block.id, input: inputStr })
+          onEvent({ type: 'tool-end', toolName: `${block.name} [MCP]`, toolId: block.id, result: 'MCP 도구 실행 속도 제한 (분당 20회)', durationMs: 0, error: true })
+          toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: '[오류] MCP 도구 실행 속도 제한 (분당 20회)', is_error: true })
+          continue
+        }
+
         onEvent({ type: 'tool-start', toolName: `${block.name} [MCP]`, toolId: block.id, input: inputStr })
         const toolStart = Date.now()
         try {
@@ -454,11 +491,25 @@ export async function generateAgentResponseStream(
           const durationMs = Date.now() - toolStart
           onEvent({ type: 'tool-end', toolName: `${block.name} [MCP]`, toolId: block.id, result: result || '(빈 결과)', durationMs })
           toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: result || '(빈 결과)' })
+
+          logActivity({
+            companyId: ctx.companyId, userId: ctx.userId, type: 'tool_call', phase: 'end',
+            actorType: 'user', actorId: ctx.userId, action: 'mcp-tool-execute',
+            detail: `MCP 도구 실행: ${block.name}`,
+            metadata: { toolName: block.name, serverUrl: mcpTool.serverUrl, durationMs },
+          })
         } catch (err) {
           const durationMs = Date.now() - toolStart
           const errMsg = err instanceof Error ? err.message : 'MCP 도구 실행 실패'
           onEvent({ type: 'tool-end', toolName: `${block.name} [MCP]`, toolId: block.id, result: errMsg, durationMs, error: true })
           toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: `[오류] ${errMsg}`, is_error: true })
+
+          logActivity({
+            companyId: ctx.companyId, userId: ctx.userId, type: 'tool_call', phase: 'error',
+            actorType: 'user', actorId: ctx.userId, action: 'mcp-tool-execute',
+            detail: `MCP 도구 실행 실패: ${block.name} — ${errMsg}`,
+            metadata: { toolName: block.name, serverUrl: mcpTool.serverUrl, error: errMsg },
+          })
         }
         continue
       }

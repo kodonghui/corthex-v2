@@ -4,9 +4,11 @@ import { z } from 'zod'
 import { eq, and, asc } from 'drizzle-orm'
 import { db } from '../../db'
 import { mcpServers } from '../../db/schema'
-import { authMiddleware } from '../../middleware/auth'
+import { authMiddleware, adminOnly } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { mcpListTools, mcpCallTool, isPrivateUrl } from '../../lib/mcp-client'
+import { checkMcpRateLimit } from '../../lib/mcp-rate-limit'
+import { logActivity } from '../../lib/activity-logger'
 import type { AppEnv } from '../../types'
 
 export const settingsMcpRoute = new Hono<AppEnv>()
@@ -43,9 +45,9 @@ settingsMcpRoute.get('/mcp', async (c) => {
   return c.json({ data: servers })
 })
 
-// POST /settings/mcp — 서버 등록
-settingsMcpRoute.post('/mcp', zValidator('json', createSchema), async (c) => {
-  const { companyId } = c.get('tenant')
+// POST /settings/mcp — 서버 등록 (관리자 전용)
+settingsMcpRoute.post('/mcp', adminOnly, zValidator('json', createSchema), async (c) => {
+  const { companyId, userId } = c.get('tenant')
   const body = c.req.valid('json')
 
   // 10개 제한 체크
@@ -64,16 +66,29 @@ settingsMcpRoute.post('/mcp', zValidator('json', createSchema), async (c) => {
       companyId,
       name: body.name,
       url: body.url,
-      transport: 'stdio',
+      transport: 'http',
     })
     .returning()
+
+  // 감사 로그
+  logActivity({
+    companyId,
+    userId,
+    type: 'system',
+    phase: 'end',
+    actorType: 'user',
+    actorId: userId,
+    action: 'mcp-server-register',
+    detail: `MCP 서버 등록: ${body.name} (${body.url})`,
+    metadata: { serverName: body.name, url: body.url, serverId: server.id },
+  })
 
   return c.json({ data: server }, 201)
 })
 
-// DELETE /settings/mcp/:id — 서버 삭제 (soft delete)
-settingsMcpRoute.delete('/mcp/:id', async (c) => {
-  const { companyId } = c.get('tenant')
+// DELETE /settings/mcp/:id — 서버 삭제 (관리자 전용, soft delete)
+settingsMcpRoute.delete('/mcp/:id', adminOnly, async (c) => {
+  const { companyId, userId } = c.get('tenant')
   const id = c.req.param('id')
 
   const [existing] = await db
@@ -90,11 +105,24 @@ settingsMcpRoute.delete('/mcp/:id', async (c) => {
     .where(eq(mcpServers.id, id))
     .returning()
 
+  // 감사 로그
+  logActivity({
+    companyId,
+    userId,
+    type: 'system',
+    phase: 'end',
+    actorType: 'user',
+    actorId: userId,
+    action: 'mcp-server-delete',
+    detail: `MCP 서버 삭제: ${existing.name} (${existing.url})`,
+    metadata: { serverName: existing.name, url: existing.url, serverId: id },
+  })
+
   return c.json({ data: deleted })
 })
 
-// POST /settings/mcp/test — 연결 테스트 (실제 MCP tools/list 호출)
-settingsMcpRoute.post('/mcp/test', zValidator('json', testSchema), async (c) => {
+// POST /settings/mcp/test — 연결 테스트 (관리자 전용, 실제 MCP tools/list 호출)
+settingsMcpRoute.post('/mcp/test', adminOnly, zValidator('json', testSchema), async (c) => {
   const { url } = c.req.valid('json')
 
   if (isPrivateUrl(url)) {
@@ -147,8 +175,15 @@ const executeSchema = z.object({
 
 // POST /settings/mcp/execute — MCP 도구 실행
 settingsMcpRoute.post('/mcp/execute', zValidator('json', executeSchema), async (c) => {
-  const { companyId } = c.get('tenant')
+  const { companyId, userId } = c.get('tenant')
   const { serverId, toolName, arguments: args } = c.req.valid('json')
+
+  // 속도 제한 체크
+  const rateCheck = checkMcpRateLimit(userId)
+  if (!rateCheck.allowed) {
+    c.header('Retry-After', String(rateCheck.retryAfterSec || 60))
+    throw new HTTPError(429, 'MCP 도구 실행 속도 제한 (분당 20회)', 'MCP_003')
+  }
 
   const [server] = await db
     .select()
@@ -160,9 +195,36 @@ settingsMcpRoute.post('/mcp/execute', zValidator('json', executeSchema), async (
 
   try {
     const result = await mcpCallTool(server.url, toolName, args)
+
+    // 감사 로그
+    logActivity({
+      companyId,
+      userId,
+      type: 'tool_call',
+      phase: 'end',
+      actorType: 'user',
+      actorId: userId,
+      action: 'mcp-tool-execute',
+      detail: `MCP 도구 실행: ${toolName} (${server.name})`,
+      metadata: { serverName: server.name, toolName, serverId },
+    })
+
     return c.json({ result })
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'MCP 도구 실행 실패'
+
+    logActivity({
+      companyId,
+      userId,
+      type: 'tool_call',
+      phase: 'error',
+      actorType: 'user',
+      actorId: userId,
+      action: 'mcp-tool-execute',
+      detail: `MCP 도구 실행 실패: ${toolName} (${server.name}) — ${msg}`,
+      metadata: { serverName: server.name, toolName, serverId, error: msg },
+    })
+
     return c.json({ result: null, error: msg }, 500)
   }
 })
@@ -179,6 +241,11 @@ settingsMcpRoute.get('/mcp/:id/ping', async (c) => {
     .limit(1)
 
   if (!server) throw new HTTPError(404, 'MCP 서버를 찾을 수 없습니다', 'MCP_002')
+
+  // SSRF 방지: 등록 후 isPrivateUrl 정책이 강화될 수 있으므로 실행 시점에도 체크
+  if (isPrivateUrl(server.url)) {
+    return c.json({ status: 'error' })
+  }
 
   try {
     // 가벼운 연결 확인: tools/list 대신 간단 HTTP POST로 MCP 서버 응답 여부만 확인

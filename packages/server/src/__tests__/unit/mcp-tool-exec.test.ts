@@ -33,9 +33,9 @@ describe('MCP Client — mcp-client.ts', () => {
       expect(isPrivateUrl('http://api.service.io:3000/mcp')).toBe(false)
     })
 
-    it('should return false for invalid URLs', async () => {
+    it('should return true for invalid URLs (안전한 기본값)', async () => {
       const { isPrivateUrl } = await import('../../lib/mcp-client')
-      expect(isPrivateUrl('not-a-url')).toBe(false)
+      expect(isPrivateUrl('not-a-url')).toBe(true) // 파싱 실패 시 차단
     })
   })
 

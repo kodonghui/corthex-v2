@@ -27,12 +27,53 @@ export function isPrivateUrl(url: string): boolean {
   try {
     const parsed = new URL(url)
     const host = parsed.hostname
-    if (host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0' || host === '[::]') return false // localhost는 개발용 허용
-    if (host === '169.254.169.254') return true // AWS metadata
-    if (/^(10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.)/.test(host)) return true
+
+    // 프로토콜 검증: http/https만 허용
+    if (!['http:', 'https:'].includes(parsed.protocol)) return true
+
+    // IPv6 bracket 제거 (URL 파서가 [::1] 형태로 반환)
+    const bareHost = host.startsWith('[') && host.endsWith(']') ? host.slice(1, -1) : host
+
+    // 빈 호스트 차단
+    if (!bareHost || bareHost.length === 0) return true
+
+    // 개발/테스트 환경에서만 localhost 허용
+    const isDev = process.env.NODE_ENV !== 'production'
+    const localhostPatterns = ['localhost', '127.0.0.1', '0.0.0.0', '::1']
+    if (localhostPatterns.includes(bareHost)) return !isDev
+
+    // 클라우드 메타데이터 엔드포인트
+    if (bareHost === '169.254.169.254') return true
+    if (bareHost === 'metadata.google.internal') return true
+
+    // RFC1918 사설 IP
+    if (/^(10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.)/.test(bareHost)) return true
+
+    // IPv4-mapped IPv6 (::ffff:10.0.0.1 → ::ffff:a00:1 등)
+    if (/^::ffff:/i.test(bareHost)) {
+      const mappedPart = bareHost.slice(7) // ::ffff: 제거
+      // dotted decimal 형태
+      if (/^(10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.|127\.|0\.)/.test(mappedPart)) return true
+      if (mappedPart === '169.254.169.254') return true
+      // hex 형태 (7f00:1 = 127.0.0.1, a00:1 = 10.0.0.1 등)
+      // 127.x.x.x → 7f00:0 ~ 7fff:ffff
+      if (/^7f/i.test(mappedPart)) return true
+      // 10.x.x.x → a00:0 ~ aff:ffff
+      if (/^a[0-9a-f]{1,2}:/i.test(mappedPart)) return true
+      // 192.168.x.x → c0a8:0 ~ c0a8:ffff
+      if (/^c0a8:/i.test(mappedPart)) return true
+      // 172.16-31.x.x → ac1[0-f]:0 ~ ac1f:ffff
+      if (/^ac1[0-9a-f]:/i.test(mappedPart)) return true
+      // 169.254.169.254 → a9fe:a9fe
+      if (mappedPart === 'a9fe:a9fe') return true
+    }
+
+    // IPv6 내부 주소 (fd00::/8 ULA, fe80::/10 link-local)
+    if (/^(fd|fe80)/i.test(bareHost) || bareHost === '::') return true
+
     return false
   } catch {
-    return false
+    return true // 파싱 실패 시 안전하게 차단
   }
 }
 
@@ -108,13 +149,19 @@ export async function mcpCallTool(
   return extractTextFromResult(response.result)
 }
 
+const MCP_MAX_RESULT_SIZE = 102_400 // 100KB
+
 function extractTextFromResult(result: unknown): string {
   const r = result as { content?: Array<{ type: string; text?: string }> } | undefined
   if (!r?.content?.length) return ''
-  return r.content
+  let text = r.content
     .filter((c) => c.type === 'text' && c.text)
     .map((c) => c.text!)
     .join('\n')
+  if (text.length > MCP_MAX_RESULT_SIZE) {
+    text = text.slice(0, MCP_MAX_RESULT_SIZE) + '\n\n(결과가 100KB를 초과하여 잘렸습니다)'
+  }
+  return text
 }
 
 /**
