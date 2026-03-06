@@ -19,6 +19,7 @@ async function pollSchedules() {
     const now = new Date()
 
     // isActive + (nextRunAt <= now OR nextRunAt IS NULL) 조건
+    // 한 폴링당 최대 50건 처리 — 대량 스케줄 시 워커 블로킹 방지
     const dueSchedules = await db
       .select()
       .from(nightJobSchedules)
@@ -31,9 +32,17 @@ async function pollSchedules() {
           ),
         ),
       )
+      .limit(50)
 
     for (const schedule of dueSchedules) {
       try {
+        // nextRunAt을 먼저 갱신하여 중복 생성 방지 (race condition 대책)
+        const nextRun = getNextCronDate(schedule.cronExpression, now)
+        await db
+          .update(nightJobSchedules)
+          .set({ nextRunAt: nextRun, updatedAt: new Date() })
+          .where(eq(nightJobSchedules.id, schedule.id))
+
         // nightJobs에 새 작업 생성 (scheduleId 연결)
         const newJob = await queueNightJob({
           companyId: schedule.companyId,
@@ -48,13 +57,6 @@ async function pollSchedules() {
           companyId: schedule.companyId,
           payload: { type: 'job-queued', jobId: newJob.id },
         })
-
-        // nextRunAt 갱신
-        const nextRun = getNextCronDate(schedule.cronExpression, now)
-        await db
-          .update(nightJobSchedules)
-          .set({ nextRunAt: nextRun, updatedAt: new Date() })
-          .where(eq(nightJobSchedules.id, schedule.id))
 
         console.log(`📅 스케줄 작업 생성: ${schedule.id} — 다음 실행: ${nextRun.toISOString()}`)
       } catch (err) {

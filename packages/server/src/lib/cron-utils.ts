@@ -19,6 +19,7 @@ function parseField(field: string, min: number, max: number): number[] {
       const start = parseInt(startStr, 10)
       const end = parseInt(endStr, 10)
       if (isNaN(start) || isNaN(end)) throw new Error(`Invalid cron field value: ${part}`)
+      if (start > end) throw new Error(`Invalid cron range (start > end): ${part}`)
       for (let i = Math.max(start, min); i <= Math.min(end, max); i++) values.add(i)
     } else {
       const val = parseInt(part, 10)
@@ -27,7 +28,9 @@ function parseField(field: string, min: number, max: number): number[] {
     }
   }
 
-  return Array.from(values).sort((a, b) => a - b)
+  const result = Array.from(values).sort((a, b) => a - b)
+  if (result.length === 0) throw new Error(`Cron field produced no valid values: ${field}`)
+  return result
 }
 
 /**
