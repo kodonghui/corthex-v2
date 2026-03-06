@@ -31,9 +31,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   logout: () => {
+    // 서버 push 구독 해제 (토큰 제거 전에 호출)
+    api.delete('/workspace/push/subscribe').catch(() => {})
     localStorage.removeItem('corthex_token')
     localStorage.removeItem('corthex_user')
     set({ token: null, user: null, isAuthenticated: false })
+    // SW 캐시 삭제
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({ type: 'LOGOUT' })
+    }
   },
 
   checkAuth: async () => {

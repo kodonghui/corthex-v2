@@ -621,6 +621,20 @@ export const soulTemplates = pgTable('soul_templates', {
   companyIdx: index('soul_templates_company_idx').on(table.companyId),
 }))
 
+// === 31. push_subscriptions — Web Push 구독 ===
+export const pushSubscriptions = pgTable('push_subscriptions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  endpoint: text('endpoint').notNull(),
+  p256dh: text('p256dh').notNull(),
+  auth: text('auth').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  userIdx: index('push_subscriptions_user_idx').on(table.companyId, table.userId),
+  endpointUniq: unique('push_subscriptions_endpoint_uniq').on(table.endpoint),
+}))
+
 // === Relations ===
 export const companiesRelations = relations(companies, ({ many }) => ({
   users: many(users),
@@ -832,4 +846,9 @@ export const notificationPreferencesRelations = relations(notificationPreference
 export const soulTemplatesRelations = relations(soulTemplates, ({ one }) => ({
   company: one(companies, { fields: [soulTemplates.companyId], references: [companies.id] }),
   creator: one(users, { fields: [soulTemplates.createdBy], references: [users.id] }),
+}))
+
+export const pushSubscriptionsRelations = relations(pushSubscriptions, ({ one }) => ({
+  company: one(companies, { fields: [pushSubscriptions.companyId], references: [companies.id] }),
+  user: one(users, { fields: [pushSubscriptions.userId], references: [users.id] }),
 }))

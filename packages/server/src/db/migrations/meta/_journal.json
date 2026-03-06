@@ -148,6 +148,13 @@
       "when": 1773072000000,
       "tag": "0026_messenger-search-unread",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1773158400000,
+      "tag": "0027_push-subscriptions",
+      "breakpoints": true
     }
   ]
 }

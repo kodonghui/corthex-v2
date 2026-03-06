@@ -10,6 +10,7 @@ import { logActivity } from '../../lib/activity-logger'
 import { broadcastToChannel } from '../../ws/channels'
 import { createNotification } from '../../lib/notifier'
 import { clientMap } from '../../ws/server'
+import { sendPushToUser } from './push'
 import { getClientForUser } from '../../lib/ai'
 import type { AppEnv } from '../../types'
 
@@ -496,6 +497,32 @@ messengerRoute.post('/channels/:id/messages', zValidator('json', sendMessageSche
       createdAt: message.createdAt,
     },
   })
+
+  // Web Push: 오프라인 채널 멤버에게 푸시 알림 (fire-and-forget)
+  ;(async () => {
+    try {
+      const [membersResult, chResult] = await Promise.all([
+        db.select({ userId: messengerMembers.userId }).from(messengerMembers)
+          .where(and(eq(messengerMembers.channelId, channelId), eq(messengerMembers.companyId, tenant.companyId))),
+        db.select({ name: messengerChannels.name }).from(messengerChannels)
+          .where(eq(messengerChannels.id, channelId)).limit(1),
+      ])
+      const members = membersResult
+      const chName = chResult[0]?.name || '채널'
+      for (const m of members) {
+        if (m.userId === tenant.userId) continue
+        // Check if user has active WS connection
+        const hasWs = clientMap.has(m.userId)
+        if (!hasWs) {
+          sendPushToUser(m.userId, tenant.companyId, {
+            title: `#${chName}`,
+            body: `${sender?.name || 'Unknown'}: ${content.length > 80 ? content.slice(0, 80) + '...' : content}`,
+            url: `/messenger?channelId=${channelId}`,
+          }).catch(() => {})
+        }
+      }
+    } catch { /* ignore push errors */ }
+  })()
 
   // @멘션 파싱 → 에이전트 AI 응답 + 유저 알림 (fire-and-forget)
   const mentionMatches = content.matchAll(/@(\S+)/g)

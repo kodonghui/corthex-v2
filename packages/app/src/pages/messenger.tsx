@@ -192,7 +192,7 @@ function ChannelSettingsModal({
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
       <div
-        className="bg-white dark:bg-zinc-900 rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto shadow-xl"
+        className="bg-white dark:bg-zinc-900 rounded-lg w-full max-w-md max-h-[80vh] md:max-h-[80vh] h-full md:h-auto overflow-y-auto shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="px-4 py-3 border-b border-zinc-200 dark:border-zinc-700 flex items-center justify-between">
@@ -386,10 +386,10 @@ function ThreadPanel({
   }
 
   return (
-    <div className="w-80 border-l border-zinc-200 dark:border-zinc-800 flex flex-col bg-white dark:bg-zinc-950">
+    <div className="fixed inset-0 md:static md:w-80 border-l border-zinc-200 dark:border-zinc-800 flex flex-col bg-white dark:bg-zinc-950 z-40">
       <div className="px-3 py-2 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
         <span className="text-sm font-medium">스레드</span>
-        <button onClick={onClose} className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 text-sm">✕</button>
+        <button onClick={onClose} className="p-2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 text-sm">✕</button>
       </div>
 
       {/* 원본 메시지 */}
@@ -503,6 +503,7 @@ export function MessengerPage() {
   const [showSearchResults, setShowSearchResults] = useState(false)
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({})
   const [mentionToast, setMentionToast] = useState<{ title: string; actionUrl: string } | null>(null)
+  const [showChat, setShowChat] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -578,6 +579,7 @@ export function MessengerPage() {
   const handleSelectChannel = useCallback((channelId: string) => {
     setSelectedChannel(channelId)
     setThreadMessage(null)
+    setShowChat(true)
     setUnreadCounts((prev) => ({ ...prev, [channelId]: 0 }))
     markRead.mutate(channelId)
   }, [markRead])
@@ -808,8 +810,8 @@ export function MessengerPage() {
       </div>
 
       <div className="flex flex-1 min-h-0">
-        {/* 채널 목록 (좌) */}
-        <div className="w-64 border-r border-zinc-200 dark:border-zinc-800 overflow-y-auto">
+        {/* 채널 목록 (좌) — 모바일: showChat false일 때만 표시 */}
+        <div className={`w-full md:w-64 border-r border-zinc-200 dark:border-zinc-800 overflow-y-auto [-webkit-overflow-scrolling:touch] ${showChat ? 'hidden md:block' : ''}`}>
           {/* 검색 */}
           <div ref={searchRef} className="relative p-2 border-b border-zinc-200 dark:border-zinc-700">
             <div className="flex items-center gap-1.5 px-2 py-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-md">
@@ -904,8 +906,8 @@ export function MessengerPage() {
           })}
         </div>
 
-        {/* 메시지 영역 (우) */}
-        <div className="flex-1 flex min-w-0">
+        {/* 메시지 영역 (우) — 모바일: showChat true일 때만 표시 */}
+        <div className={`flex-1 flex min-w-0 ${showChat ? '' : 'hidden md:flex'}`}>
           <div className="flex-1 flex flex-col min-w-0">
             {!selectedChannel ? (
               <div className="flex-1 flex items-center justify-center text-zinc-400 text-sm">
@@ -915,7 +917,15 @@ export function MessengerPage() {
               <>
                 {/* 채널 헤더 */}
                 <div className="px-4 py-2 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
-                  <span className="font-medium text-sm">{selectedChannelData?.name}</span>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <button
+                      onClick={() => setShowChat(false)}
+                      className="md:hidden p-2 -ml-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 active:bg-zinc-200 dark:active:bg-zinc-700 text-sm text-zinc-600 dark:text-zinc-400 shrink-0"
+                    >
+                      ← 채널
+                    </button>
+                    <span className="font-medium text-sm truncate">{selectedChannelData?.name}</span>
+                  </div>
                   <button
                     onClick={() => setShowSettings(true)}
                     className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 text-lg"
@@ -926,7 +936,7 @@ export function MessengerPage() {
                 </div>
 
                 {/* 메시지 목록 */}
-                <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+                <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 [-webkit-overflow-scrolling:touch]">
                   {messages.length === 0 && (
                     <p className="text-sm text-zinc-400 text-center mt-8">아직 메시지가 없습니다.</p>
                   )}
@@ -1029,7 +1039,7 @@ export function MessengerPage() {
                 </div>
 
                 {/* 입력 */}
-                <div className="px-4 py-3 border-t border-zinc-200 dark:border-zinc-800 relative">
+                <div className="px-4 py-3 border-t border-zinc-200 dark:border-zinc-800 relative" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
                   {showMention && filteredAgents.length > 0 && (
                     <div className="absolute bottom-full left-4 right-4 mb-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-md shadow-lg max-h-32 overflow-y-auto z-10">
                       {filteredAgents.map((a) => (

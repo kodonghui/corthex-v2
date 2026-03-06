@@ -5,6 +5,8 @@ import { useAuthStore } from '../stores/auth-store'
 import { ToastProvider } from '@corthex/ui'
 import { NotificationListener } from './notification-listener'
 import { NightJobListener } from './night-job-listener'
+import { InstallBanner } from './install-banner'
+import { PushPermission } from './push-permission'
 
 export function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -109,6 +111,8 @@ export function Layout() {
         </div>
       )}
     </div>
+    <InstallBanner />
+    <PushPermission />
     </ToastProvider>
   )
 }
