@@ -24,6 +24,7 @@ import { telegramRoute } from './routes/workspace/telegram'
 import { messengerRoute } from './routes/workspace/messenger'
 import { nexusRoute } from './routes/workspace/nexus'
 import { strategyRoute } from './routes/workspace/strategy'
+import { filesRoute } from './routes/workspace/files'
 import { runMigrations } from './db'
 import { startJobWorker, stopJobWorker } from './lib/job-queue'
 import { startScheduleWorker, stopScheduleWorker } from './lib/schedule-worker'
@@ -82,6 +83,7 @@ app.route('/api/workspace', telegramRoute)
 app.route('/api/workspace/messenger', messengerRoute)
 app.route('/api/workspace', nexusRoute)
 app.route('/api/workspace/strategy', strategyRoute)
+app.route('/api/workspace/files', filesRoute)
 
 // WebSocket 라우트
 app.get('/ws', wsRoute)
