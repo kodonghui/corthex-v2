@@ -5,6 +5,7 @@ import { api } from '../lib/api'
 import { Badge, toast, Tabs, Select } from '@corthex/ui'
 import type { TabItem } from '@corthex/ui'
 import { SoulEditor } from '../components/settings/soul-editor'
+import { SettingsMcp } from '../components/settings/settings-mcp'
 
 type TelegramConfig = {
   id: string
@@ -56,6 +57,7 @@ const TABS: TabItem[] = [
   { value: 'files', label: '파일 관리', shortLabel: '파일', disabled: true },
   { value: 'trading', label: '매매 설정', shortLabel: '매매', disabled: true },
   { value: 'notifications', label: '알림 설정', shortLabel: '알림', disabled: true },
+  { value: 'mcp', label: 'MCP 연동', shortLabel: 'MCP' },
 ]
 
 export function SettingsPage() {
@@ -85,10 +87,11 @@ export function SettingsPage() {
       <Tabs items={TABS} value={activeTab} onChange={setTab} className="mb-6" />
 
       {/* 탭 컨텐츠 */}
-      <div className={activeTab === 'soul' ? 'max-w-3xl' : 'max-w-lg'}>
+      <div className={activeTab === 'soul' || activeTab === 'mcp' ? 'max-w-3xl' : 'max-w-lg'}>
         {activeTab === 'api' && <ApiKeyTab />}
         {activeTab === 'telegram' && <TelegramSection />}
         {activeTab === 'soul' && <SoulEditor onDirtyChange={handleSoulDirtyChange} />}
+        {activeTab === 'mcp' && <SettingsMcp />}
         {(activeTab === 'files' || activeTab === 'trading' || activeTab === 'notifications') && (
           <PlaceholderTab />
         )}

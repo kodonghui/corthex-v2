@@ -243,8 +243,8 @@ development_status:
   # ============================================================
   # Epic 18: MCP 연동 (P4)
   # ============================================================
-  epic-18: backlog
-  18-1-mcp-server-mgmt: backlog
+  epic-18: in-progress
+  18-1-mcp-server-mgmt: done
   18-2-mcp-tool-exec: backlog
   18-3-mcp-streaming: backlog
   18-4-mcp-security: backlog

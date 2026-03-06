@@ -31,6 +31,7 @@ import { strategyRoute } from './routes/workspace/strategy'
 import { filesRoute } from './routes/workspace/files'
 import { workspaceSoulTemplatesRoute } from './routes/workspace/soul-templates'
 import { pushRoute } from './routes/workspace/push'
+import { settingsMcpRoute } from './routes/workspace/settings-mcp'
 import { runMigrations } from './db'
 import { startJobWorker, stopJobWorker } from './lib/job-queue'
 import { startScheduleWorker, stopScheduleWorker } from './lib/schedule-worker'
@@ -97,6 +98,7 @@ app.route('/api/workspace/strategy', strategyRoute)
 app.route('/api/workspace/files', filesRoute)
 app.route('/api/workspace', workspaceSoulTemplatesRoute)
 app.route('/api/workspace/push', pushRoute)
+app.route('/api/workspace/settings', settingsMcpRoute)
 
 // WebSocket 라우트
 app.get('/ws', wsRoute)
