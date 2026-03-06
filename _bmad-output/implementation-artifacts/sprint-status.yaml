@@ -209,13 +209,13 @@ development_status:
   # ============================================================
   # Epic 15: 운영 도구 (P3) — 스토리 순서 재배치 완료
   # ============================================================
-  epic-15: in-progress
+  epic-15: done
   15-1-p3-db-schema-ws: done
   15-2-soul-template-mgmt: done
   15-3-soul-editor: done
   15-4-system-monitoring: done
   15-5-org-tree-viewer: done
-  epic-15-retrospective: optional
+  epic-15-retrospective: done
 
   # ============================================================
   # Epic 16: 사내 메신저 (P3~P4)
