@@ -10,6 +10,7 @@ type Agent = {
   isSecretary: boolean; isActive: boolean; createdAt: string
 }
 type Department = { id: string; name: string }
+type SoulTemplate = { id: string; name: string; content: string; isBuiltin: boolean }
 
 export function AgentsPage() {
   const qc = useQueryClient()
@@ -31,8 +32,15 @@ export function AgentsPage() {
     enabled: !!selectedCompanyId,
   })
 
+  const { data: templateData } = useQuery({
+    queryKey: ['soul-templates', selectedCompanyId],
+    queryFn: () => api.get<{ data: SoulTemplate[] }>(`/admin/soul-templates?companyId=${selectedCompanyId}`),
+    enabled: !!selectedCompanyId,
+  })
+
   const agents = agentData?.data || []
   const depts = deptData?.data || []
+  const soulTemplates = templateData?.data || []
   const deptMap = new Map(depts.map((d) => [d.id, d.name]))
 
   const createMutation = useMutation({
@@ -154,6 +162,25 @@ export function AgentsPage() {
             </div>
             <div>
               <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">Soul (성격/페르소나)</label>
+              {soulTemplates.length > 0 && (
+                <select
+                  value=""
+                  onChange={(e) => {
+                    const tpl = soulTemplates.find((t) => t.id === e.target.value)
+                    if (tpl) {
+                      if (!form.soul || confirm('현재 소울이 템플릿 내용으로 대체됩니다. 계속하시겠습니까?')) {
+                        setForm({ ...form, soul: tpl.content })
+                      }
+                    }
+                  }}
+                  className="w-full px-3 py-1.5 mb-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                >
+                  <option value="">템플릿 불러오기...</option>
+                  {soulTemplates.map((t) => (
+                    <option key={t.id} value={t.id}>{t.isBuiltin ? '🔒 ' : ''}{t.name}</option>
+                  ))}
+                </select>
+              )}
               <textarea
                 value={form.soul}
                 onChange={(e) => setForm({ ...form, soul: e.target.value })}

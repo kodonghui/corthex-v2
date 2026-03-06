@@ -15,6 +15,13 @@ type AgentDetail = {
   status: string
 }
 
+type SoulTemplate = {
+  id: string
+  name: string
+  content: string
+  isBuiltin: boolean
+}
+
 const MAX_CHARS = 2000
 
 export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean) => void }) {
@@ -54,6 +61,16 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
     },
     onError: () => toast.error('소울 저장에 실패했습니다'),
   })
+
+  // 소울 템플릿 목록
+  const { data: templateData } = useQuery({
+    queryKey: ['soul-templates'],
+    queryFn: () => api.get<{ data: SoulTemplate[] }>('/workspace/soul-templates'),
+  })
+  const soulTemplates = templateData?.data || []
+
+  const [showTemplateConfirm, setShowTemplateConfirm] = useState(false)
+  const [pendingTemplate, setPendingTemplate] = useState<SoulTemplate | null>(null)
 
   // 소울 초기화
   const resetSoul = useMutation({
@@ -130,6 +147,26 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
 
       {selectedAgent && detail && (
         <>
+          {/* 템플릿 불러오기 */}
+          {soulTemplates.length > 0 && (
+            <select
+              value=""
+              onChange={(e) => {
+                const tpl = soulTemplates.find((t) => t.id === e.target.value)
+                if (tpl) {
+                  setPendingTemplate(tpl)
+                  setShowTemplateConfirm(true)
+                }
+              }}
+              className="w-full px-3 py-1.5 border border-zinc-200 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500/40 focus:outline-none"
+            >
+              <option value="">템플릿 불러오기...</option>
+              {soulTemplates.map((t) => (
+                <option key={t.id} value={t.id}>{t.isBuiltin ? '🔒 ' : ''}{t.name}</option>
+              ))}
+            </select>
+          )}
+
           {/* 미저장 변경사항 배너 */}
           {isDirty && (
             <div className="flex items-center justify-between px-3 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md text-xs text-amber-700 dark:text-amber-300">
@@ -217,6 +254,27 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
           </div>
         </>
       )}
+
+      {/* 템플릿 적용 확인 다이얼로그 */}
+      <ConfirmDialog
+        isOpen={showTemplateConfirm}
+        onConfirm={() => {
+          if (pendingTemplate) {
+            setSoulText(pendingTemplate.content)
+          }
+          setShowTemplateConfirm(false)
+          setPendingTemplate(null)
+        }}
+        onCancel={() => {
+          setShowTemplateConfirm(false)
+          setPendingTemplate(null)
+        }}
+        title="템플릿 적용"
+        description="현재 소울이 템플릿 내용으로 대체됩니다. 계속하시겠습니까?"
+        confirmText="적용"
+        cancelText="취소"
+        variant="danger"
+      />
 
       {/* 이탈 방지 다이얼로그 */}
       <ConfirmDialog

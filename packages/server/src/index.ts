@@ -11,6 +11,7 @@ import { agentsRoute } from './routes/admin/agents'
 import { credentialsRoute } from './routes/admin/credentials'
 import { toolsRoute } from './routes/admin/tools'
 import { reportLinesRoute } from './routes/admin/report-lines'
+import { soulTemplatesRoute } from './routes/admin/soul-templates'
 import { workspaceAgentsRoute } from './routes/workspace/agents'
 import { chatRoute } from './routes/workspace/chat'
 import { profileRoute } from './routes/workspace/profile'
@@ -26,6 +27,7 @@ import { messengerRoute } from './routes/workspace/messenger'
 import { nexusRoute } from './routes/workspace/nexus'
 import { strategyRoute } from './routes/workspace/strategy'
 import { filesRoute } from './routes/workspace/files'
+import { workspaceSoulTemplatesRoute } from './routes/workspace/soul-templates'
 import { runMigrations } from './db'
 import { startJobWorker, stopJobWorker } from './lib/job-queue'
 import { startScheduleWorker, stopScheduleWorker } from './lib/schedule-worker'
@@ -70,6 +72,7 @@ app.route('/api/admin', agentsRoute)
 app.route('/api/admin', credentialsRoute)
 app.route('/api/admin', toolsRoute)
 app.route('/api/admin', reportLinesRoute)
+app.route('/api/admin', soulTemplatesRoute)
 
 // 유저 워크스페이스 라우트 (각 파일 내부에서 authMiddleware 적용, 테넌트 격리)
 app.route('/api/workspace', workspaceAgentsRoute)
@@ -87,6 +90,7 @@ app.route('/api/workspace/messenger', messengerRoute)
 app.route('/api/workspace', nexusRoute)
 app.route('/api/workspace/strategy', strategyRoute)
 app.route('/api/workspace/files', filesRoute)
+app.route('/api/workspace', workspaceSoulTemplatesRoute)
 
 // WebSocket 라우트
 app.get('/ws', wsRoute)

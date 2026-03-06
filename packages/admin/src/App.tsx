@@ -14,6 +14,7 @@ const CredentialsPage = lazy(() => import('./pages/credentials').then((m) => ({ 
 const CompaniesPage = lazy(() => import('./pages/companies').then((m) => ({ default: m.CompaniesPage })))
 const ToolsPage = lazy(() => import('./pages/tools').then((m) => ({ default: m.ToolsPage })))
 const ReportLinesPage = lazy(() => import('./pages/report-lines').then((m) => ({ default: m.ReportLinesPage })))
+const SoulTemplatesPage = lazy(() => import('./pages/soul-templates').then((m) => ({ default: m.SoulTemplatesPage })))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -77,6 +78,7 @@ export function App() {
             <Route path="companies" element={<Suspense fallback={<PageSkeleton />}><CompaniesPage /></Suspense>} />
             <Route path="tools" element={<Suspense fallback={<PageSkeleton />}><ToolsPage /></Suspense>} />
             <Route path="report-lines" element={<Suspense fallback={<PageSkeleton />}><ReportLinesPage /></Suspense>} />
+            <Route path="soul-templates" element={<Suspense fallback={<PageSkeleton />}><SoulTemplatesPage /></Suspense>} />
           </Route>
         </Routes>
       </BrowserRouter>
