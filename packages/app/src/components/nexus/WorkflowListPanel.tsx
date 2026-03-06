@@ -8,14 +8,17 @@ type Props = {
   onSelect: (id: string) => void
 }
 
+type ListFilter = 'mine' | 'templates'
+
 export function WorkflowListPanel({ onSelect }: Props) {
   const queryClient = useQueryClient()
   const [showCreate, setShowCreate] = useState(false)
   const [newName, setNewName] = useState('')
+  const [listFilter, setListFilter] = useState<ListFilter>('mine')
 
   const { data, isLoading } = useQuery({
-    queryKey: ['nexus-workflows'],
-    queryFn: () => api.get<{ data: NexusWorkflow[] }>('/workspace/nexus/workflows'),
+    queryKey: ['nexus-workflows', listFilter],
+    queryFn: () => api.get<{ data: NexusWorkflow[] }>(`/workspace/nexus/workflows?filter=${listFilter}`),
   })
 
   const createMutation = useMutation({
@@ -31,10 +34,26 @@ export function WorkflowListPanel({ onSelect }: Props) {
     onError: () => toast.error('워크플로우 생성에 실패했습니다'),
   })
 
+  const cloneMutation = useMutation({
+    mutationFn: (id: string) =>
+      api.post<{ data: NexusWorkflow }>(`/workspace/nexus/workflows/${id}/clone`, {}),
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ['nexus-workflows'] })
+      toast.success('워크플로우를 복제했습니다')
+      onSelect(res.data.id)
+    },
+    onError: () => toast.error('복제에 실패했습니다'),
+  })
+
   const handleCreate = () => {
     const trimmed = newName.trim()
     if (!trimmed) return
     createMutation.mutate(trimmed)
+  }
+
+  const handleClone = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation()
+    cloneMutation.mutate(id)
   }
 
   if (isLoading) {
@@ -50,13 +69,39 @@ export function WorkflowListPanel({ onSelect }: Props) {
   return (
     <div className="p-4">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-base font-semibold">워크플로우</h3>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="px-3 py-1.5 text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
-        >
-          + 새 워크플로우
-        </button>
+        <div className="flex items-center gap-3">
+          <h3 className="text-base font-semibold">워크플로우</h3>
+          <div className="flex gap-1">
+            <button
+              onClick={() => setListFilter('mine')}
+              className={`px-2.5 py-1 text-xs rounded-lg transition-colors ${
+                listFilter === 'mine'
+                  ? 'bg-zinc-700 text-white'
+                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800'
+              }`}
+            >
+              내 워크플로우
+            </button>
+            <button
+              onClick={() => setListFilter('templates')}
+              className={`px-2.5 py-1 text-xs rounded-lg transition-colors ${
+                listFilter === 'templates'
+                  ? 'bg-zinc-700 text-white'
+                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800'
+              }`}
+            >
+              템플릿
+            </button>
+          </div>
+        </div>
+        {listFilter === 'mine' && (
+          <button
+            onClick={() => setShowCreate(true)}
+            className="px-3 py-1.5 text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
+          >
+            + 새 워크플로우
+          </button>
+        )}
       </div>
 
       {/* 생성 모달 */}
@@ -96,8 +141,12 @@ export function WorkflowListPanel({ onSelect }: Props) {
       {/* 워크플로우 목록 */}
       {workflows.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-48 text-zinc-500">
-          <p className="text-sm">아직 워크플로우가 없습니다.</p>
-          <p className="text-xs mt-1">새로 만들어보세요.</p>
+          <p className="text-sm">
+            {listFilter === 'mine' ? '아직 워크플로우가 없습니다.' : '공유된 템플릿이 없습니다.'}
+          </p>
+          <p className="text-xs mt-1">
+            {listFilter === 'mine' ? '새로 만들어보세요.' : '워크플로우를 만들고 템플릿으로 공유해보세요.'}
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -109,16 +158,30 @@ export function WorkflowListPanel({ onSelect }: Props) {
             >
               <div className="flex items-start justify-between mb-2">
                 <h4 className="font-semibold text-sm truncate flex-1">{wf.name}</h4>
-                <Badge variant={wf.isActive ? 'success' : 'default'} className="ml-2 text-xs">
-                  {wf.isActive ? '활성' : '비활성'}
-                </Badge>
+                <div className="flex items-center gap-1.5 ml-2">
+                  {wf.isTemplate && (
+                    <Badge variant="purple" className="text-xs">템플릿</Badge>
+                  )}
+                  <Badge variant={wf.isActive ? 'success' : 'default'} className="text-xs">
+                    {wf.isActive ? '활성' : '비활성'}
+                  </Badge>
+                </div>
               </div>
               {wf.description && (
                 <p className="text-sm text-zinc-400 line-clamp-2 mb-3">{wf.description}</p>
               )}
-              <p className="text-xs text-zinc-500">
-                {new Date(wf.createdAt).toLocaleDateString('ko-KR')}
-              </p>
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-zinc-500">
+                  {new Date(wf.createdAt).toLocaleDateString('ko-KR')}
+                </p>
+                <button
+                  onClick={(e) => handleClone(e, wf.id)}
+                  disabled={cloneMutation.isPending}
+                  className="px-2 py-0.5 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-zinc-700 rounded transition-colors"
+                >
+                  복제
+                </button>
+              </div>
             </div>
           ))}
         </div>

@@ -301,14 +301,23 @@ nexusRoute.patch(
 // 워크플로우 CRUD + 실행 API
 // ========================================
 
-// GET /api/workspace/nexus/workflows — 워크플로우 목록
+// GET /api/workspace/nexus/workflows — 워크플로우 목록 (filter: mine/templates)
 nexusRoute.get('/nexus/workflows', async (c) => {
   const tenant = c.get('tenant')
+  const filter = c.req.query('filter')
+
+  const conditions = [eq(nexusWorkflows.companyId, tenant.companyId)]
+
+  if (filter === 'mine') {
+    conditions.push(eq(nexusWorkflows.createdBy, tenant.userId))
+  } else if (filter === 'templates') {
+    conditions.push(eq(nexusWorkflows.isTemplate, true))
+  }
 
   const workflows = await db
     .select()
     .from(nexusWorkflows)
-    .where(eq(nexusWorkflows.companyId, tenant.companyId))
+    .where(and(...conditions))
     .orderBy(desc(nexusWorkflows.updatedAt))
 
   return c.json({ data: workflows })
@@ -361,6 +370,7 @@ const updateWorkflowSchema = z.object({
   nodes: z.array(z.any()).optional(),
   edges: z.array(z.any()).optional(),
   isActive: z.boolean().optional(),
+  isTemplate: z.boolean().optional(),
 })
 
 nexusRoute.put(
@@ -500,4 +510,42 @@ nexusRoute.get('/nexus/workflows/:id/executions', async (c) => {
     .limit(20)
 
   return c.json({ data: executions })
+})
+
+// POST /api/workspace/nexus/workflows/:id/clone — 워크플로우 복제
+nexusRoute.post('/nexus/workflows/:id/clone', async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+
+  const [source] = await db
+    .select()
+    .from(nexusWorkflows)
+    .where(and(eq(nexusWorkflows.id, id), eq(nexusWorkflows.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!source) throw new HTTPError(404, '워크플로우를 찾을 수 없습니다', 'WORKFLOW_001')
+
+  const [cloned] = await db
+    .insert(nexusWorkflows)
+    .values({
+      companyId: tenant.companyId,
+      name: `${source.name} (복사)`.slice(0, 200),
+      description: source.description,
+      nodes: source.nodes,
+      edges: source.edges,
+      isTemplate: false,
+      createdBy: tenant.userId,
+    })
+    .returning()
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'system',
+    phase: 'end',
+    actorType: 'user',
+    actorId: tenant.userId,
+    action: `NEXUS: 워크플로우 복제 — ${source.name}`,
+  })
+
+  return c.json({ data: cloned }, 201)
 })

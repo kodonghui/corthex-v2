@@ -138,6 +138,16 @@ export function WorkflowEditor({ workflowId, onBack }: Props) {
     onError: () => toast.error('실행에 실패했습니다'),
   })
 
+  const templateMutation = useMutation({
+    mutationFn: (isTemplate: boolean) =>
+      api.put(`/workspace/nexus/workflows/${workflowId}`, { isTemplate }),
+    onSuccess: (_res, isTemplate) => {
+      queryClient.invalidateQueries({ queryKey: ['nexus-workflows'] })
+      toast.success(isTemplate ? '템플릿으로 공유되었습니다' : '템플릿 공유가 해제되었습니다')
+    },
+    onError: () => toast.error('변경에 실패했습니다'),
+  })
+
   const deleteMutation = useMutation({
     mutationFn: () => api.delete(`/workspace/nexus/workflows/${workflowId}`),
     onSuccess: () => {
@@ -202,6 +212,17 @@ export function WorkflowEditor({ workflowId, onBack }: Props) {
           className={`px-2 py-1 text-xs rounded transition-colors ${showHistory ? 'bg-zinc-600 text-white' : 'bg-zinc-700 hover:bg-zinc-600'}`}
         >
           실행 기록
+        </button>
+        <button
+          onClick={() => templateMutation.mutate(!workflow.isTemplate)}
+          disabled={templateMutation.isPending}
+          className={`px-2 py-1 text-xs rounded transition-colors ${
+            workflow.isTemplate
+              ? 'text-purple-400 hover:text-purple-300 hover:bg-purple-500/10'
+              : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-700'
+          }`}
+        >
+          {workflow.isTemplate ? '공유 해제' : '템플릿으로 공유'}
         </button>
         <button
           onClick={() => setShowDeleteConfirm(true)}
