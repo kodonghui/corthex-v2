@@ -1,8 +1,9 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { db } from '../db'
-import { chatMessages, chatSessions, agents, agentMemory, cliCredentials } from '../db/schema'
+import { chatMessages, chatSessions, agents, agentMemory, cliCredentials, mcpServers } from '../db/schema'
 import { eq, and, desc } from 'drizzle-orm'
 import { loadAgentTools, toClaudeTools, executeTool } from './tool-executor'
+import { mcpListTools, mcpCallTool } from './mcp-client'
 import { recordCost } from './cost-tracker'
 import { decrypt } from './crypto'
 
@@ -29,6 +30,65 @@ export async function getClientForUser(userId: string, companyId: string): Promi
 
   const apiKey = await decrypt(cred.encryptedToken)
   return new Anthropic({ apiKey })
+}
+
+// MCP 도구 레코드 — handler가 'mcp::serverId' 형식
+type McpToolRecord = {
+  name: string
+  description: string
+  inputSchema: Record<string, unknown>
+  serverUrl: string
+  serverId: string
+}
+
+/**
+ * 회사에 등록된 활성 MCP 서버들에서 도구 목록 수집
+ */
+async function loadMcpToolsForCompany(companyId: string, existingToolNames: Set<string>): Promise<{
+  mcpToolRecords: McpToolRecord[]
+  claudeMcpTools: Anthropic.Messages.Tool[]
+}> {
+  const servers = await db
+    .select({ id: mcpServers.id, name: mcpServers.name, url: mcpServers.url })
+    .from(mcpServers)
+    .where(and(eq(mcpServers.companyId, companyId), eq(mcpServers.isActive, true)))
+
+  if (servers.length === 0) return { mcpToolRecords: [], claudeMcpTools: [] }
+
+  const mcpToolRecords: McpToolRecord[] = []
+  const claudeMcpTools: Anthropic.Messages.Tool[] = []
+
+  for (const server of servers) {
+    try {
+      const tools = await mcpListTools(server.url)
+      for (const tool of tools) {
+        // 내장 도구와 이름 충돌 시 건너뛰기
+        if (existingToolNames.has(tool.name)) continue
+        // 이미 다른 MCP 서버에서 추가된 같은 이름 도구도 건너뛰기
+        if (mcpToolRecords.some(t => t.name === tool.name)) continue
+
+        mcpToolRecords.push({
+          name: tool.name,
+          description: tool.description || '',
+          inputSchema: tool.inputSchema || {},
+          serverUrl: server.url,
+          serverId: server.id,
+        })
+        claudeMcpTools.push({
+          name: tool.name,
+          description: `[MCP] ${tool.description || ''}`,
+          input_schema: (tool.inputSchema as Anthropic.Messages.Tool['input_schema']) || {
+            type: 'object' as const,
+            properties: {},
+          },
+        })
+      }
+    } catch {
+      // MCP 서버 연결 실패 시 건너뛰기 (서비스 가용성 우선)
+    }
+  }
+
+  return { mcpToolRecords, claudeMcpTools }
 }
 
 type ChatContext = {
@@ -74,17 +134,24 @@ export async function generateAgentResponse(ctx: ChatContext): Promise<string> {
     .where(eq(agentMemory.agentId, ctx.agentId))
     .limit(10)
 
-  // 4. 에이전트에 할당된 도구 로드
+  // 4. 에이전트에 할당된 도구 로드 + MCP 도구 추가
   const toolRecords = await loadAgentTools(ctx.agentId, ctx.companyId)
   const claudeTools = toClaudeTools(toolRecords)
+  const existingToolNames = new Set(toolRecords.map(t => t.name))
+  const { mcpToolRecords, claudeMcpTools } = await loadMcpToolsForCompany(ctx.companyId, existingToolNames)
+  const allClaudeTools = [...claudeTools, ...claudeMcpTools]
 
   // 5. 시스템 프롬프트 구성
   const memoryBlock = memories.length > 0
     ? `\n\n## 장기 기억\n${memories.map(m => `- ${m.key}: ${m.value}`).join('\n')}`
     : ''
 
-  const toolBlock = toolRecords.length > 0
-    ? `\n\n## 사용 가능한 도구\n${toolRecords.map(t => `- ${t.name}: ${t.description || ''}`).join('\n')}\n\n도구가 필요한 질문을 받으면 적극적으로 도구를 사용하세요.`
+  const allToolDescriptions = [
+    ...toolRecords.map(t => `- ${t.name}: ${t.description || ''}`),
+    ...mcpToolRecords.map(t => `- ${t.name} [MCP]: ${t.description}`),
+  ]
+  const toolBlock = allToolDescriptions.length > 0
+    ? `\n\n## 사용 가능한 도구\n${allToolDescriptions.join('\n')}\n\n도구가 필요한 질문을 받으면 적극적으로 도구를 사용하세요.`
     : ''
 
   // 5.5 세션 metadata에서 종목 컨텍스트 추출
@@ -130,7 +197,7 @@ export async function generateAgentResponse(ctx: ChatContext): Promise<string> {
       max_tokens: 2048,
       system: systemPrompt,
       messages,
-      ...(claudeTools.length > 0 ? { tools: claudeTools } : {}),
+      ...(allClaudeTools.length > 0 ? { tools: allClaudeTools } : {}),
     })
 
     // 비용 기록
@@ -164,6 +231,30 @@ export async function generateAgentResponse(ctx: ChatContext): Promise<string> {
 
     for (const block of toolUseBlocks) {
       if (block.type !== 'tool_use') continue
+
+      // MCP 도구인지 확인
+      const mcpTool = mcpToolRecords.find(t => t.name === block.name)
+      if (mcpTool) {
+        try {
+          const result = await mcpCallTool(mcpTool.serverUrl, block.name, block.input as Record<string, unknown>)
+          toolCallSummaries.push(`- **${block.name}** [MCP]: ${JSON.stringify(block.input).slice(0, 80)}`)
+          toolResults.push({
+            type: 'tool_result' as const,
+            tool_use_id: block.id,
+            content: result || '(빈 결과)',
+          } as Anthropic.Messages.ToolResultBlockParam)
+        } catch (err) {
+          const errMsg = err instanceof Error ? err.message : 'MCP 도구 실행 실패'
+          toolCallSummaries.push(`- **${block.name}** [MCP] 실패: ${errMsg}`)
+          toolResults.push({
+            type: 'tool_result' as const,
+            tool_use_id: block.id,
+            content: `[오류] ${errMsg}`,
+            is_error: true,
+          } as Anthropic.Messages.ToolResultBlockParam)
+        }
+        continue
+      }
 
       const toolRecord = toolRecords.find(t => t.name === block.name)
       if (!toolRecord) {
@@ -247,14 +338,22 @@ export async function generateAgentResponseStream(
     .where(eq(agentMemory.agentId, ctx.agentId))
     .limit(10)
 
+  // 에이전트 도구 + MCP 도구 로드
   const toolRecords = await loadAgentTools(ctx.agentId, ctx.companyId)
   const claudeTools = toClaudeTools(toolRecords)
+  const existingToolNames = new Set(toolRecords.map(t => t.name))
+  const { mcpToolRecords, claudeMcpTools } = await loadMcpToolsForCompany(ctx.companyId, existingToolNames)
+  const allClaudeTools = [...claudeTools, ...claudeMcpTools]
 
   const memoryBlock = memories.length > 0
     ? `\n\n## 장기 기억\n${memories.map(m => `- ${m.key}: ${m.value}`).join('\n')}`
     : ''
-  const toolBlock = toolRecords.length > 0
-    ? `\n\n## 사용 가능한 도구\n${toolRecords.map(t => `- ${t.name}: ${t.description || ''}`).join('\n')}\n\n도구가 필요한 질문을 받으면 적극적으로 도구를 사용하세요.`
+  const allToolDescriptions = [
+    ...toolRecords.map(t => `- ${t.name}: ${t.description || ''}`),
+    ...mcpToolRecords.map(t => `- ${t.name} [MCP]: ${t.description}`),
+  ]
+  const toolBlock = allToolDescriptions.length > 0
+    ? `\n\n## 사용 가능한 도구\n${allToolDescriptions.join('\n')}\n\n도구가 필요한 질문을 받으면 적극적으로 도구를 사용하세요.`
     : ''
 
   // 세션 metadata에서 종목 컨텍스트 추출
@@ -298,7 +397,7 @@ export async function generateAgentResponseStream(
       max_tokens: 2048,
       system: systemPrompt,
       messages,
-      ...(claudeTools.length > 0 ? { tools: claudeTools } : {}),
+      ...(allClaudeTools.length > 0 ? { tools: allClaudeTools } : {}),
     })
 
     // 텍스트 토큰 스트리밍
@@ -336,6 +435,26 @@ export async function generateAgentResponseStream(
       if (block.type !== 'tool_use') continue
 
       const inputStr = JSON.stringify(block.input).slice(0, 200)
+
+      // MCP 도구인지 확인
+      const mcpTool = mcpToolRecords.find(t => t.name === block.name)
+      if (mcpTool) {
+        onEvent({ type: 'tool-start', toolName: `${block.name} [MCP]`, toolId: block.id, input: inputStr })
+        const toolStart = Date.now()
+        try {
+          const result = await mcpCallTool(mcpTool.serverUrl, block.name, block.input as Record<string, unknown>)
+          const durationMs = Date.now() - toolStart
+          onEvent({ type: 'tool-end', toolName: `${block.name} [MCP]`, toolId: block.id, result: result || '(빈 결과)', durationMs })
+          toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: result || '(빈 결과)' })
+        } catch (err) {
+          const durationMs = Date.now() - toolStart
+          const errMsg = err instanceof Error ? err.message : 'MCP 도구 실행 실패'
+          onEvent({ type: 'tool-end', toolName: `${block.name} [MCP]`, toolId: block.id, result: errMsg, durationMs, error: true })
+          toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: `[오류] ${errMsg}`, is_error: true })
+        }
+        continue
+      }
+
       onEvent({ type: 'tool-start', toolName: block.name, toolId: block.id, input: inputStr })
 
       const toolRecord = toolRecords.find(t => t.name === block.name)

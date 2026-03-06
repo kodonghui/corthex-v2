@@ -6,6 +6,7 @@ import { db } from '../../db'
 import { mcpServers } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
+import { mcpListTools, mcpCallTool, isPrivateUrl } from '../../lib/mcp-client'
 import type { AppEnv } from '../../types'
 
 export const settingsMcpRoute = new Hono<AppEnv>()
@@ -92,41 +93,7 @@ settingsMcpRoute.delete('/mcp/:id', async (c) => {
   return c.json({ data: deleted })
 })
 
-// SSRF 방지: 내부 네트워크 IP 차단
-function isPrivateUrl(url: string): boolean {
-  try {
-    const parsed = new URL(url)
-    const host = parsed.hostname
-    if (host === '0.0.0.0' || host === '[::]') return true
-    if (/^(10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.)/.test(host)) return true
-    if (host === '169.254.169.254') return true // AWS metadata
-    return false
-  } catch {
-    return false
-  }
-}
-
-async function safeFetch(url: string, timeoutMs: number): Promise<Response> {
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), timeoutMs)
-  try {
-    const res = await fetch(url, { method: 'HEAD', signal: controller.signal })
-    return res
-  } catch {
-    const controller2 = new AbortController()
-    const timeout2 = setTimeout(() => controller2.abort(), timeoutMs)
-    try {
-      const res = await fetch(url, { method: 'GET', signal: controller2.signal })
-      return res
-    } finally {
-      clearTimeout(timeout2)
-    }
-  } finally {
-    clearTimeout(timeout)
-  }
-}
-
-// POST /settings/mcp/test — 연결 테스트 (stub)
+// POST /settings/mcp/test — 연결 테스트 (실제 MCP tools/list 호출)
 settingsMcpRoute.post('/mcp/test', zValidator('json', testSchema), async (c) => {
   const { url } = c.req.valid('json')
 
@@ -135,22 +102,23 @@ settingsMcpRoute.post('/mcp/test', zValidator('json', testSchema), async (c) => 
   }
 
   try {
-    const res = await safeFetch(url, 5000)
+    const tools = await mcpListTools(url)
     return c.json({
-      success: res.ok || res.status < 500,
-      toolCount: 0,
-      message: '연결 성공',
+      success: true,
+      toolCount: tools.length,
+      message: `연결 성공 (도구 ${tools.length}개 발견)`,
     })
-  } catch {
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : '서버에 접근할 수 없습니다'
     return c.json({
       success: false,
       toolCount: 0,
-      message: '연결 실패: 서버에 접근할 수 없습니다',
+      message: `연결 실패: ${msg}`,
     })
   }
 })
 
-// GET /settings/mcp/:id/tools — 도구 목록 (stub)
+// GET /settings/mcp/:id/tools — 도구 목록 (MCP tools/list 호출)
 settingsMcpRoute.get('/mcp/:id/tools', async (c) => {
   const { companyId } = c.get('tenant')
   const id = c.req.param('id')
@@ -163,8 +131,40 @@ settingsMcpRoute.get('/mcp/:id/tools', async (c) => {
 
   if (!server) throw new HTTPError(404, 'MCP 서버를 찾을 수 없습니다', 'MCP_002')
 
-  // Stub: 실제 MCP 프로토콜 연동은 Story 18-2에서 구현
-  return c.json({ tools: [] })
+  try {
+    const tools = await mcpListTools(server.url)
+    return c.json({ tools })
+  } catch {
+    return c.json({ tools: [], error: 'MCP 서버에서 도구 목록을 가져올 수 없습니다' })
+  }
+})
+
+const executeSchema = z.object({
+  serverId: z.string().uuid(),
+  toolName: z.string().min(1),
+  arguments: z.record(z.unknown()).default({}),
+})
+
+// POST /settings/mcp/execute — MCP 도구 실행
+settingsMcpRoute.post('/mcp/execute', zValidator('json', executeSchema), async (c) => {
+  const { companyId } = c.get('tenant')
+  const { serverId, toolName, arguments: args } = c.req.valid('json')
+
+  const [server] = await db
+    .select()
+    .from(mcpServers)
+    .where(and(eq(mcpServers.id, serverId), eq(mcpServers.companyId, companyId), eq(mcpServers.isActive, true)))
+    .limit(1)
+
+  if (!server) throw new HTTPError(404, 'MCP 서버를 찾을 수 없습니다', 'MCP_002')
+
+  try {
+    const result = await mcpCallTool(server.url, toolName, args)
+    return c.json({ result })
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'MCP 도구 실행 실패'
+    return c.json({ result: null, error: msg }, 500)
+  }
 })
 
 // GET /settings/mcp/:id/ping — 연결 상태 확인
@@ -181,8 +181,20 @@ settingsMcpRoute.get('/mcp/:id/ping', async (c) => {
   if (!server) throw new HTTPError(404, 'MCP 서버를 찾을 수 없습니다', 'MCP_002')
 
   try {
-    const res = await safeFetch(server.url, 3000)
-    return c.json({ status: res.ok || res.status < 500 ? 'connected' : 'error' })
+    // 가벼운 연결 확인: tools/list 대신 간단 HTTP POST로 MCP 서버 응답 여부만 확인
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 3000)
+    try {
+      const res = await fetch(server.url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', id: 0, method: 'ping', params: {} }),
+        signal: controller.signal,
+      })
+      return c.json({ status: res.ok || res.status < 500 ? 'connected' : 'error' })
+    } finally {
+      clearTimeout(timeout)
+    }
   } catch {
     return c.json({ status: 'disconnected' })
   }

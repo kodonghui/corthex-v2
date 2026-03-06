@@ -245,7 +245,7 @@ development_status:
   # ============================================================
   epic-18: in-progress
   18-1-mcp-server-mgmt: done
-  18-2-mcp-tool-exec: backlog
+  18-2-mcp-tool-exec: done
   18-3-mcp-streaming: backlog
   18-4-mcp-security: backlog
   epic-18-retrospective: optional
