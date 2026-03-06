@@ -33,12 +33,12 @@ function filterFiles(files: FileRecord[], filter: FileFilter, search: string): F
   if (filter === 'images') filtered = filtered.filter(f => f.mimeType.startsWith('image/'))
   else if (filter === 'documents') filtered = filtered.filter(f =>
     f.mimeType.includes('pdf') || f.mimeType.includes('word') ||
-    f.mimeType.includes('sheet') || f.mimeType.includes('presentation'),
+    f.mimeType.includes('sheet') || f.mimeType.includes('excel') || f.mimeType.includes('presentation'),
   )
   else if (filter === 'others') filtered = filtered.filter(f =>
     !f.mimeType.startsWith('image/') && !f.mimeType.includes('pdf') &&
     !f.mimeType.includes('word') && !f.mimeType.includes('sheet') &&
-    !f.mimeType.includes('presentation'),
+    !f.mimeType.includes('excel') && !f.mimeType.includes('presentation'),
   )
   if (search) {
     const q = search.toLowerCase()
