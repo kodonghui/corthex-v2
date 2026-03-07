@@ -92,8 +92,8 @@ development_status:
   # FRs: FR1-FR12 | UX: Admin A1, A2, A3, A7, CEO org view
   # Dependencies: Epic 1
   # ============================================================
-  epic-2: backlog
-  2-1-department-crud-api: backlog
+  epic-2: in-progress
+  2-1-department-crud-api: done
   2-2-agent-crud-api: backlog
   2-3-cascade-analysis-engine: backlog
   2-4-org-template-apply-api: backlog
@@ -109,8 +109,8 @@ development_status:
   # FRs: FR26-FR34 (LLM) | NFRs: NFR3, NFR11, NFR22, NFR26
   # Dependencies: Epic 1
   # ============================================================
-  epic-3: backlog
-  3-1-llm-provider-adapters-claude-gpt-gemini: backlog
+  epic-3: in-progress
+  3-1-llm-provider-adapters-claude-gpt-gemini: review
   3-2-llm-router-3tier-model-assignment: backlog
   3-3-provider-fallback-strategy: backlog
   3-4-agent-runner-stateless-executor: backlog
