@@ -1,8 +1,9 @@
-// 시드 스크립트 — 초기 회사 + admin 유저 생성
+// 시드 스크립트 — 초기 회사 + admin 유저 + 시스템 에이전트 + 조직 템플릿
 // 실행: bun run src/db/seed.ts
 
 import { db } from './index'
 import { companies, users, departments, agents, toolDefinitions, strategyWatchlists } from './schema'
+import { seedSystemAgent, seedOrgTemplates } from '../services/seed.service'
 
 async function seed() {
   console.log('🌱 시드 데이터 삽입 시작...')
@@ -76,26 +77,9 @@ async function seed() {
 
   console.log(`  ✓ 부서: ${mktDept.name}, ${finDept.name}`)
 
-  // 5. AI 에이전트 — 비서 (오케스트레이터)
-  const [secretary] = await db
-    .insert(agents)
-    .values({
-      companyId: company.id,
-      userId: ceo.id,
-      departmentId: execDept.id,
-      name: 'H-비서',
-      role: 'CEO 비서',
-      isSecretary: true,
-      soul: `당신은 CORTHEX HQ의 CEO 비서 에이전트입니다.
-- 항상 공손하고 명확하게 답변합니다
-- 유저의 요청을 분석하여 적절한 부서에 위임합니다
-- 위임 결과를 종합하여 최종 보고서를 작성합니다
-- 한국어로 대화합니다`,
-      status: 'offline',
-    })
-    .returning()
-
-  console.log(`  ✓ 에이전트: ${secretary.name} (비서) → ${ceo.name}`)
+  // 5. AI 에이전트 — 비서실장 (시스템 에이전트, isSystem=true)
+  const chief = await seedSystemAgent(company.id, ceo.id)
+  console.log(`  ✓ 비서실장 (시스템 에이전트) → ${ceo.name}`)
 
   // 5-2. 부서별 에이전트
   const deptAgents = [
@@ -548,6 +532,10 @@ async function seed() {
     })
   }
   console.log(`  ✓ 전략실 관심 종목: ${watchlistStocks.length}개`)
+
+  // 9. 빌트인 조직 템플릿 시드 (플랫폼 공통, companyId=null)
+  const templates = await seedOrgTemplates()
+  console.log(`  ✓ 조직 템플릿: ${templates.length}개 (${templates.map(t => t.name).join(', ')})`)
 
   console.log('\n✅ 시드 완료!')
   console.log(`\n📋 로그인 정보:`)
