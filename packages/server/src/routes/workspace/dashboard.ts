@@ -5,7 +5,7 @@ import { eq, and, gte, sql, count, sum } from 'drizzle-orm'
 import { db } from '../../db'
 import { costRecords, agents, chatMessages, delegations, toolCalls, nightJobs } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
-import { getSummary, getUsage, getBudget } from '../../services/dashboard'
+import { getSummary, getUsage, getBudget, getQuickActions, updateQuickActions, getSatisfaction } from '../../services/dashboard'
 import type { AppEnv } from '../../types'
 
 export const dashboardRoute = new Hono<AppEnv>()
@@ -195,4 +195,44 @@ dashboardRoute.get('/dashboard/stats', async (c) => {
       days,
     },
   })
+})
+
+// GET /api/workspace/dashboard/quick-actions — 퀵 액션 목록 (Story 6-6)
+dashboardRoute.get('/dashboard/quick-actions', async (c) => {
+  const tenant = c.get('tenant')
+  const data = await getQuickActions(tenant.companyId)
+  return c.json({ success: true, data })
+})
+
+// PUT /api/workspace/dashboard/quick-actions — 퀵 액션 수정 (Story 6-6)
+const quickActionSchema = z.object({
+  id: z.string().min(1).max(50),
+  label: z.string().min(1).max(100),
+  icon: z.string().min(1).max(10),
+  command: z.string().min(1).max(1000),
+  presetId: z.string().uuid().nullish(),
+  sortOrder: z.number().int().min(0),
+})
+
+const updateQuickActionsSchema = z.object({
+  actions: z.array(quickActionSchema).min(1).max(10),
+})
+
+dashboardRoute.put('/dashboard/quick-actions', zValidator('json', updateQuickActionsSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const { actions } = c.req.valid('json')
+  const data = await updateQuickActions(tenant.companyId, actions)
+  return c.json({ success: true, data })
+})
+
+// GET /api/workspace/dashboard/satisfaction — 만족도 차트 데이터 (Story 6-6)
+const satisfactionQuerySchema = z.object({
+  period: z.enum(['7d', '30d', 'all']).default('7d'),
+})
+
+dashboardRoute.get('/dashboard/satisfaction', zValidator('query', satisfactionQuerySchema), async (c) => {
+  const tenant = c.get('tenant')
+  const { period } = c.req.valid('query')
+  const data = await getSatisfaction(tenant.companyId, period)
+  return c.json({ success: true, data })
 })

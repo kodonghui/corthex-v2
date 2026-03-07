@@ -183,6 +183,13 @@
       "when": 1773504000000,
       "tag": "0031_phase1-schema-extension",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1773590400000,
+      "tag": "0032_company-settings",
+      "breakpoints": true
     }
   ]
 }

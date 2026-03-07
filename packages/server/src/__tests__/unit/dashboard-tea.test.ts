@@ -46,10 +46,11 @@ const mockMicroToUsd = mock((micro: number) => micro / 1_000_000)
 
 mock.module('../../db', () => ({ db: mockDb }))
 mock.module('../../db/schema', () => ({
-  commands: { companyId: 'companyId', status: 'status', createdAt: 'createdAt' },
+  commands: { companyId: 'companyId', status: 'status', createdAt: 'createdAt', metadata: 'metadata' },
   costRecords: { companyId: 'companyId', provider: 'provider', costUsdMicro: 'costUsdMicro', createdAt: 'createdAt', inputTokens: 'inputTokens', outputTokens: 'outputTokens' },
   agents: { companyId: 'companyId', status: 'status', isActive: 'isActive' },
   departments: { id: 'id', name: 'name' },
+  companies: { id: 'id', settings: 'settings', updatedAt: 'updatedAt' },
 }))
 mock.module('../../lib/cost-tracker', () => ({
   getCostSummary: mockGetCostSummary,

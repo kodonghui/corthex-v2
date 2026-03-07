@@ -1,8 +1,8 @@
 import { db } from '../db'
-import { commands, costRecords, agents, departments } from '../db/schema'
+import { commands, costRecords, agents, departments, companies } from '../db/schema'
 import { and, eq, gte, lte, sql, count, sum } from 'drizzle-orm'
 import { getCostSummary, getDepartmentCostBreakdown, microToUsd } from '../lib/cost-tracker'
-import type { DashboardSummary, DashboardUsage, DashboardUsageDay, DashboardBudget, LLMProviderName } from '@corthex/shared'
+import type { DashboardSummary, DashboardUsage, DashboardUsageDay, DashboardBudget, DashboardSatisfaction, QuickAction, LLMProviderName } from '@corthex/shared'
 
 // === Simple TTL Cache ===
 
@@ -255,5 +255,112 @@ export async function getBudget(companyId: string): Promise<DashboardBudget> {
   }
 
   setCache(cacheKey, result, 300_000) // 5min TTL
+  return result
+}
+
+// === Quick Actions ===
+
+const DEFAULT_QUICK_ACTIONS: QuickAction[] = [
+  { id: 'daily-briefing', label: '일일 브리핑', icon: '📋', command: '/일일브리핑', presetId: null, sortOrder: 0 },
+  { id: 'system-check', label: '시스템 점검', icon: '🔍', command: '/시스템점검', presetId: null, sortOrder: 1 },
+  { id: 'cost-report', label: '비용 리포트', icon: '📊', command: '/비용리포트', presetId: null, sortOrder: 2 },
+  { id: 'routine', label: '루틴 실행', icon: '▶️', command: '/루틴', presetId: null, sortOrder: 3 },
+]
+
+export async function getQuickActions(companyId: string): Promise<QuickAction[]> {
+  const cacheKey = `${companyId}:quick-actions`
+  const cached = getCached<QuickAction[]>(cacheKey)
+  if (cached) return cached
+
+  const [company] = await db
+    .select({ settings: companies.settings })
+    .from(companies)
+    .where(eq(companies.id, companyId))
+    .limit(1)
+
+  const settings = company?.settings as Record<string, unknown> | null
+  const actions = (settings?.dashboardQuickActions as QuickAction[] | undefined) ?? DEFAULT_QUICK_ACTIONS
+
+  setCache(cacheKey, actions, 60_000) // 1min TTL
+  return actions
+}
+
+export async function updateQuickActions(companyId: string, actions: QuickAction[]): Promise<QuickAction[]> {
+  const rows = await db
+    .select({ settings: companies.settings })
+    .from(companies)
+    .where(eq(companies.id, companyId))
+    .limit(1)
+
+  if (rows.length === 0) return actions // company not found — return input as-is
+
+  const existingSettings = (rows[0]?.settings ?? {}) as Record<string, unknown>
+  const updatedSettings = { ...existingSettings, dashboardQuickActions: actions }
+
+  await db
+    .update(companies)
+    .set({ settings: updatedSettings, updatedAt: new Date() })
+    .where(eq(companies.id, companyId))
+
+  // Invalidate cache
+  cache.delete(`${companyId}:quick-actions`)
+
+  return actions
+}
+
+// === Satisfaction ===
+
+export async function getSatisfaction(companyId: string, period: '7d' | '30d' | 'all'): Promise<DashboardSatisfaction> {
+  const cacheKey = `${companyId}:satisfaction:${period}`
+  const cached = getCached<DashboardSatisfaction>(cacheKey)
+  if (cached) return cached
+
+  const conditions = [
+    eq(commands.companyId, companyId),
+    eq(commands.status, 'completed'),
+  ]
+
+  if (period !== 'all') {
+    const days = period === '7d' ? 7 : 30
+    const since = new Date()
+    since.setDate(since.getDate() - days)
+    since.setUTCHours(0, 0, 0, 0)
+    conditions.push(gte(commands.createdAt, since))
+  }
+
+  // Total completed commands
+  const [totalRow] = await db
+    .select({ cnt: count() })
+    .from(commands)
+    .where(and(...conditions))
+
+  // Positive (thumbs up)
+  const [positiveRow] = await db
+    .select({ cnt: count() })
+    .from(commands)
+    .where(and(
+      ...conditions,
+      sql`${commands.metadata}->'feedback'->>'rating' = 'up'`,
+    ))
+
+  // Negative (thumbs down)
+  const [negativeRow] = await db
+    .select({ cnt: count() })
+    .from(commands)
+    .where(and(
+      ...conditions,
+      sql`${commands.metadata}->'feedback'->>'rating' = 'down'`,
+    ))
+
+  const total = totalRow?.cnt ?? 0
+  const positive = positiveRow?.cnt ?? 0
+  const negative = negativeRow?.cnt ?? 0
+  const neutral = total - positive - negative
+  const feedbackTotal = positive + negative
+  const rate = feedbackTotal > 0 ? Math.round((positive / feedbackTotal) * 100) : 0
+
+  const result: DashboardSatisfaction = { total, positive, negative, neutral, rate, period }
+
+  setCache(cacheKey, result, 30_000) // 30s TTL
   return result
 }
