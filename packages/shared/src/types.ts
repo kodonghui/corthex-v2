@@ -290,6 +290,53 @@ export type CostSummary = {
   byAgent: { agentId: string; agentName: string; costUsd: number }[]
 }
 
+// === 대시보드 집계 ===
+export type DashboardSummary = {
+  tasks: {
+    total: number
+    completed: number
+    failed: number
+    inProgress: number
+  }
+  cost: {
+    todayUsd: number
+    byProvider: { provider: LLMProviderName; costUsd: number }[]
+    budgetUsagePercent: number
+  }
+  agents: {
+    total: number
+    active: number
+    idle: number
+    error: number
+  }
+  integrations: {
+    providers: { name: LLMProviderName; status: 'up' | 'down' }[]
+    toolSystemOk: boolean
+  }
+}
+
+export type DashboardUsageDay = {
+  date: string
+  provider: LLMProviderName
+  inputTokens: number
+  outputTokens: number
+  costUsd: number
+}
+
+export type DashboardUsage = {
+  days: number
+  usage: DashboardUsageDay[]
+}
+
+export type DashboardBudget = {
+  currentMonthSpendUsd: number
+  monthlyBudgetUsd: number
+  usagePercent: number
+  projectedMonthEndUsd: number
+  isDefaultBudget: boolean
+  byDepartment: { departmentId: string; name: string; costUsd: number }[]
+}
+
 // === 메신저 ===
 export type MessengerChannel = {
   id: string

@@ -1,13 +1,42 @@
 import { Hono } from 'hono'
-import { eq, and, gte, desc, sql, count, sum } from 'drizzle-orm'
+import { zValidator } from '@hono/zod-validator'
+import { z } from 'zod'
+import { eq, and, gte, sql, count, sum } from 'drizzle-orm'
 import { db } from '../../db'
 import { costRecords, agents, chatMessages, delegations, toolCalls, nightJobs } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
+import { getSummary, getUsage, getBudget } from '../../services/dashboard'
 import type { AppEnv } from '../../types'
 
 export const dashboardRoute = new Hono<AppEnv>()
 
 dashboardRoute.use('*', authMiddleware)
+
+// GET /api/workspace/dashboard/summary — 4개 요약 카드 (Story 6-1)
+dashboardRoute.get('/dashboard/summary', async (c) => {
+  const tenant = c.get('tenant')
+  const data = await getSummary(tenant.companyId)
+  return c.json({ success: true, data })
+})
+
+// GET /api/workspace/dashboard/usage — AI 사용량 차트 (Story 6-1)
+const usageQuerySchema = z.object({
+  days: z.coerce.number().int().min(1).max(90).default(7),
+})
+
+dashboardRoute.get('/dashboard/usage', zValidator('query', usageQuerySchema), async (c) => {
+  const tenant = c.get('tenant')
+  const { days } = c.req.valid('query')
+  const data = await getUsage(tenant.companyId, days)
+  return c.json({ success: true, data })
+})
+
+// GET /api/workspace/dashboard/budget — 예산 진행률 (Story 6-1)
+dashboardRoute.get('/dashboard/budget', async (c) => {
+  const tenant = c.get('tenant')
+  const data = await getBudget(tenant.companyId)
+  return c.json({ success: true, data })
+})
 
 // GET /api/workspace/dashboard/costs — 비용 요약
 dashboardRoute.get('/dashboard/costs', async (c) => {
