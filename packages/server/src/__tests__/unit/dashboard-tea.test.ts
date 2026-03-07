@@ -57,6 +57,14 @@ mock.module('../../lib/cost-tracker', () => ({
   getDepartmentCostBreakdown: mockGetDepartmentCostBreakdown,
   microToUsd: mockMicroToUsd,
 }))
+mock.module('../../services/budget-guard', () => ({
+  loadBudgetConfig: async () => ({
+    monthlyBudget: 0,
+    dailyBudget: 0,
+    warningThreshold: 80,
+    autoBlock: true,
+  }),
+}))
 
 const { getSummary, getUsage, getBudget } = await import('../../services/dashboard')
 

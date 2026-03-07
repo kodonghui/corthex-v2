@@ -1,9 +1,10 @@
 import { getModelConfig, getTierDefaultModel, getFallbackModels } from '../config/models'
 import { createProvider } from '../lib/llm/index'
 import { getCredentials } from './credential-vault'
-import { recordCost } from '../lib/cost-tracker'
+import { recordCost, microToUsd } from '../lib/cost-tracker'
 import { createAuditLog, AUDIT_ACTIONS } from './audit-log'
 import { CircuitBreaker } from '../lib/llm/circuit-breaker'
+import { checkBudget } from './budget-guard'
 import type { LLMProvider } from '../lib/llm/types'
 import type { LLMRequest, LLMResponse, LLMStreamChunk, LLMProviderName, LLMError } from '@corthex/shared'
 import type { CircuitBreakerStatus } from '../lib/llm/circuit-breaker'
@@ -143,6 +144,9 @@ export class LLMRouter {
    * Tries the primary provider first, then falls back through equivalent-tier models.
    */
   async call(request: LLMRequest, context: LLMRouterContext): Promise<LLMResponse> {
+    // Budget check — before any LLM call
+    await this.enforceBudget(context)
+
     const startTime = Date.now()
     const primaryProvider = resolveProvider(request.model)
     const errors: FallbackAttemptError[] = []
@@ -218,6 +222,9 @@ export class LLMRouter {
    * If stream fails mid-stream, falls back to non-streaming call on next provider.
    */
   async *stream(request: LLMRequest, context: LLMRouterContext): AsyncGenerator<LLMStreamChunk> {
+    // Budget check — before any LLM call
+    await this.enforceBudget(context)
+
     const startTime = Date.now()
     const primaryProvider = resolveProvider(request.model)
     const errors: FallbackAttemptError[] = []
@@ -349,6 +356,44 @@ export class LLMRouter {
    */
   getCircuitBreakerStatus(): Record<LLMProviderName, CircuitBreakerStatus> {
     return this.circuitBreaker.getStatus()
+  }
+
+  /**
+   * Check budget before LLM call. Throws BUDGET_EXCEEDED if blocked.
+   * Swallows guard failures to avoid breaking LLM calls.
+   */
+  private async enforceBudget(context: LLMRouterContext): Promise<void> {
+    try {
+      const result = await checkBudget(context.companyId)
+      if (!result.allowed) {
+        const resetDate = result.resetDate
+        const level = result.reason === 'daily_exceeded' ? '일일' : '월간'
+        const budgetMicro = result.reason === 'daily_exceeded' ? result.dailyBudgetMicro : result.monthlyBudgetMicro
+        const spendMicro = result.reason === 'daily_exceeded' ? result.currentDaySpendMicro : result.currentMonthSpendMicro
+
+        const err = new Error(`${level} 예산 한도를 초과했습니다`) as Error & {
+          code: string
+          provider: string
+          retryable: boolean
+          currentSpend: number
+          budget: number
+          resetDate: string
+        }
+        err.code = 'BUDGET_EXCEEDED'
+        err.provider = 'system'
+        err.retryable = false
+        err.currentSpend = microToUsd(spendMicro)
+        err.budget = microToUsd(budgetMicro)
+        err.resetDate = resetDate
+        throw err
+      }
+    } catch (err) {
+      // Re-throw budget exceeded errors, swallow everything else
+      if (err && typeof err === 'object' && 'code' in err && (err as { code: string }).code === 'BUDGET_EXCEEDED') {
+        throw err
+      }
+      console.error('[LLMRouter] Budget check failed, proceeding:', err)
+    }
   }
 
   /**

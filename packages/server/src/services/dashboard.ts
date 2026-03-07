@@ -2,6 +2,7 @@ import { db } from '../db'
 import { commands, costRecords, agents, departments, companies } from '../db/schema'
 import { and, eq, gte, lte, sql, count, sum } from 'drizzle-orm'
 import { getCostSummary, getDepartmentCostBreakdown, microToUsd } from '../lib/cost-tracker'
+import { loadBudgetConfig } from './budget-guard'
 import type { DashboardSummary, DashboardUsage, DashboardUsageDay, DashboardBudget, DashboardSatisfaction, QuickAction, LLMProviderName } from '@corthex/shared'
 
 // === Simple TTL Cache ===
@@ -104,11 +105,13 @@ export async function getSummary(companyId: string): Promise<DashboardSummary> {
     costUsd: microToUsd(r.costMicro ?? 0),
   }))
 
-  // Budget usage: month-to-date / monthly budget
+  // Budget usage: month-to-date / monthly budget (real settings from budget-guard)
   const mStart = monthStart()
   const monthCost = await getCostSummary(companyId, { from: mStart, to: now })
-  const budgetUsagePercent = DEFAULT_MONTHLY_BUDGET_MICRO > 0
-    ? Math.round((monthCost.totalCostMicro / DEFAULT_MONTHLY_BUDGET_MICRO) * 100)
+  const budgetConfig = await loadBudgetConfig(companyId)
+  const effectiveBudget = budgetConfig.monthlyBudget > 0 ? budgetConfig.monthlyBudget : DEFAULT_MONTHLY_BUDGET_MICRO
+  const budgetUsagePercent = effectiveBudget > 0
+    ? Math.round((monthCost.totalCostMicro / effectiveBudget) * 100)
     : 0
 
   const cost = {
@@ -232,21 +235,26 @@ export async function getBudget(companyId: string): Promise<DashboardBudget> {
   // Department breakdown
   const deptBreakdown = await getDepartmentCostBreakdown(companyId, { from: mStart, to: now })
 
+  // Load real budget settings
+  const budgetConfig = await loadBudgetConfig(companyId)
+  const effectiveBudgetMicro = budgetConfig.monthlyBudget > 0 ? budgetConfig.monthlyBudget : DEFAULT_MONTHLY_BUDGET_MICRO
+  const isDefault = budgetConfig.monthlyBudget <= 0
+
   // Linear extrapolation
   const projectedMicro = daysElapsed > 0
     ? Math.round((currentMonthSpendMicro / daysElapsed) * totalDaysInMonth)
     : 0
 
-  const usagePercent = DEFAULT_MONTHLY_BUDGET_MICRO > 0
-    ? Math.round((currentMonthSpendMicro / DEFAULT_MONTHLY_BUDGET_MICRO) * 100)
+  const usagePercent = effectiveBudgetMicro > 0
+    ? Math.round((currentMonthSpendMicro / effectiveBudgetMicro) * 100)
     : 0
 
   const result: DashboardBudget = {
     currentMonthSpendUsd: microToUsd(currentMonthSpendMicro),
-    monthlyBudgetUsd: microToUsd(DEFAULT_MONTHLY_BUDGET_MICRO),
+    monthlyBudgetUsd: microToUsd(effectiveBudgetMicro),
     usagePercent,
     projectedMonthEndUsd: microToUsd(projectedMicro),
-    isDefaultBudget: true,
+    isDefaultBudget: isDefault,
     byDepartment: deptBreakdown.items.map(item => ({
       departmentId: item.key,
       name: item.label,
