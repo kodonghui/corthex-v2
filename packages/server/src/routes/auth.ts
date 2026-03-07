@@ -3,7 +3,7 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { eq } from 'drizzle-orm'
 import { db } from '../db'
-import { users, adminUsers } from '../db/schema'
+import { users, companies, adminUsers } from '../db/schema'
 import { createToken, authMiddleware } from '../middleware/auth'
 import { HTTPError } from '../middleware/error'
 import { logActivity } from '../lib/activity-logger'
@@ -14,6 +14,100 @@ export const authRoute = new Hono<AppEnv>()
 const loginSchema = z.object({
   username: z.string().min(1),
   password: z.string().min(1),
+})
+
+const registerSchema = z.object({
+  companyName: z.string().min(1).max(100),
+  slug: z.string().min(1).max(50).regex(/^[a-z0-9-]+$/, 'slug는 소문자, 숫자, 하이픈만 가능'),
+  username: z.string().min(2).max(50),
+  password: z.string().min(6),
+  name: z.string().min(1).max(100),
+  email: z.string().email(),
+})
+
+// POST /api/auth/register — 회사 + 관리자 계정 동시 생성 (셀프 등록)
+authRoute.post('/auth/register', zValidator('json', registerSchema), async (c) => {
+  const { companyName, slug, username, password, name, email } = c.req.valid('json')
+
+  // slug 중복 체크
+  const [existingCompany] = await db
+    .select({ id: companies.id })
+    .from(companies)
+    .where(eq(companies.slug, slug))
+    .limit(1)
+  if (existingCompany) {
+    throw new HTTPError(409, '이미 사용 중인 slug입니다', 'REG_001')
+  }
+
+  // username 중복 체크
+  const [existingUser] = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.username, username))
+    .limit(1)
+  if (existingUser) {
+    throw new HTTPError(409, '이미 존재하는 아이디입니다', 'REG_002')
+  }
+
+  // 회사 생성
+  const [company] = await db
+    .insert(companies)
+    .values({ name: companyName, slug })
+    .returning()
+
+  // 관리자 유저 생성 (회사 소속)
+  const passwordHash = await Bun.password.hash(password)
+  const [user] = await db
+    .insert(users)
+    .values({
+      companyId: company.id,
+      username,
+      passwordHash,
+      name,
+      email,
+      role: 'admin',
+    })
+    .returning({
+      id: users.id,
+      companyId: users.companyId,
+      username: users.username,
+      name: users.name,
+      email: users.email,
+      role: users.role,
+    })
+
+  // JWT 발급
+  const token = await createToken({
+    sub: user.id,
+    companyId: company.id,
+    role: 'admin',
+  })
+
+  logActivity({
+    companyId: company.id,
+    type: 'system',
+    phase: 'end',
+    actorType: 'user',
+    actorId: user.id,
+    actorName: user.name,
+    action: `회사 등록: ${companyName} (${slug})`,
+  })
+
+  return c.json({
+    data: {
+      token,
+      company: {
+        id: company.id,
+        name: company.name,
+        slug: company.slug,
+      },
+      user: {
+        id: user.id,
+        name: user.name,
+        role: user.role,
+      },
+    },
+  }, 201)
 })
 
 // POST /api/auth/login

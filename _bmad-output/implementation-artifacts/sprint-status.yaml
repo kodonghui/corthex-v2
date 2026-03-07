@@ -49,8 +49,8 @@ development_status:
   # Epic 0: Foundation - Multi-tenancy & Auth
   # FRs: FR84-FR88 | NFRs: NFR6, NFR7, NFR8, NFR11, NFR12
   # ============================================================
-  epic-0: backlog
-  0-1-company-and-admin-user-setup: backlog
+  epic-0: in-progress
+  0-1-company-and-admin-user-setup: done
   0-2-user-authentication-and-invitation: backlog
   0-3-credential-vault: backlog
   0-4-admin-console-company-and-user-management-ui: backlog

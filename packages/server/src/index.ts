@@ -65,6 +65,7 @@ app.route('/api', healthRoute)
 app.use('/api/*', apiRateLimit)          // 일반 API: 100/min
 app.use('/api/auth/login', loginRateLimit)       // 로그인: 5/min
 app.use('/api/auth/admin/login', loginRateLimit) // 관리자 로그인: 5/min
+app.use('/api/auth/register', loginRateLimit)    // 회원가입: 5/min
 
 app.route('/api', authRoute)
 
