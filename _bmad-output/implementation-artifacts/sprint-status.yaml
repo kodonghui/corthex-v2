@@ -102,7 +102,7 @@ development_status:
   2-7-agent-management-soul-editor-ui-admin: done
   2-8-org-template-ui-agent-move: done
   2-9-ceo-app-org-readonly-view: done
-  epic-2-retrospective: optional
+  epic-2-retrospective: done
 
   # ============================================================
   # Epic 3: LLM Multi-Provider & Agent Execution (7 stories, 17 SP)
