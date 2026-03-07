@@ -32,6 +32,40 @@ Run with `/bmad-full-pipeline planning`. Party mode required at every internal s
 - If any answer is "no" -> fix document -> party mode continues
 - Expected total: ~126 party modes across full planning pipeline
 
+### Party Mode Evidence Rules (MANDATORY -- no evidence = not done)
+Party mode execution MUST leave verifiable evidence. Without evidence, it is treated as NOT executed.
+
+**1. Log files per party mode round:**
+- Path: `_bmad-output/party-logs/{stage}-step{N}-round{M}.md`
+- Example: `_bmad-output/party-logs/brief-step02-round1.md`
+- Required content in each log:
+  - Timestamp
+  - Step name and document section being reviewed
+  - **Actual quotes from the document** (minimum 3 lines quoted)
+  - Each agent's specific feedback (what they said, not "approved")
+  - v1-feature-spec.md checklist items verified
+  - Changes made (before/after diff, or "no changes needed" with justification)
+  - Consensus result (pass/fail + remaining objections)
+
+**2. Incremental commits (timestamp evidence):**
+- After completing each planning STAGE (not step): commit document + party logs
+- Commit message format: `docs(planning): {stage} complete -- {N} party modes, {summary}`
+- Example: `docs(planning): Brief complete -- 12 party modes, v1 coverage 16/16`
+- This creates git timestamp gaps that prove real execution time
+- **FORBIDDEN**: committing all stages in a single commit
+
+**3. Document-embedded summary:**
+- At the end of each major section in the planning document, append:
+  ```
+  <!-- Party Mode: {N} rounds, consensus reached, key feedback: {1-line summary} -->
+  ```
+
+### Planning Pipeline: Always Recreate (MANDATORY)
+- Planning pipeline MUST create ALL documents fresh, even if files already exist
+- Existing planning artifacts are OVERWRITTEN, never reused or skipped
+- "File already exists" is NOT a reason to skip -- the whole point is to redo them
+- This prevents reusing stale documents from previous pipelines
+
 ### Story Dev Required Order (ALL steps via BMAD skills, no exceptions)
 Every story must execute these 5 steps **via BMAD skills only**. No direct implementation/review/testing.
 
@@ -98,6 +132,9 @@ Before EVERY story commit, print these 6 items. ALL must be checked to commit:
 - Deciding "I already know the content so I don't need the skill"
 - Showing BMAD agent menus and asking user to choose
 - **Treating stub/mock as "implementation complete"** -- only real working code counts
+- **Skipping planning stages because "file already exists"** -- always recreate
+- **Committing all planning stages in a single commit** -- one commit per stage minimum
+- **Claiming party mode was done without log files in `_bmad-output/party-logs/`**
 
 ### General Rules
 - For new features/projects: follow `_bmad-output/BMAD-WORKFLOW.md` stages
@@ -110,6 +147,7 @@ Before EVERY story commit, print these 6 items. ALL must be checked to commit:
   - Consensus = 0 major objections, remaining items classified as "minor"
 - Attempting to skip party mode -> warning + run party mode first
 - **v1-feature-spec.md checklist verification mandatory in every party mode**
+- **No log file in `_bmad-output/party-logs/` = party mode not executed = violation**
 
 ## Work Efficiency
 - BMAD pipeline MUST be delegated to **TeamCreate team members** (visible in tmux)

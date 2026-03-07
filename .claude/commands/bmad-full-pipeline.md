@@ -47,103 +47,143 @@ After EACH internal step of each planning stage, run party mode (Skill: skill="b
 - If party mode finds issues -> fix immediately -> continue to next party mode
 - All 3 party modes must pass before moving to next step
 
+## Core Rule: Party Mode Evidence (MANDATORY -- no log = violation)
+Each party mode round MUST produce a log file:
+- Path: `_bmad-output/party-logs/{stage}-step{N}-round{M}.md`
+- Example: `_bmad-output/party-logs/prd-step09-round2.md`
+- Log MUST contain:
+  1. Timestamp
+  2. Step name + document section being reviewed
+  3. **Actual quotes from the document** (minimum 3 lines)
+  4. Each agent's specific feedback (name + what they said)
+  5. v1-feature-spec.md items checked in this round
+  6. Changes made (before/after diff, or "none needed" with reason)
+  7. Consensus result (pass/fail)
+- Without this log file, the party mode is treated as NOT executed.
+
+## Core Rule: Always Recreate Documents (MANDATORY)
+- ALL planning documents MUST be created fresh. NEVER skip because "file already exists".
+- Existing files are OVERWRITTEN. The purpose of this pipeline is to redo everything.
+- "Skip if already exists" only applies to story files in Mode B, NEVER to planning docs.
+
+## Core Rule: Incremental Commits (MANDATORY)
+- After each planning STAGE completes (with all its party mode logs), commit immediately.
+- Do NOT wait until the end to commit everything at once.
+- Commit format: `docs(planning): {stage} complete -- {N} party modes`
+- This creates verifiable git timestamp evidence of real execution.
+
 ## Execution Order
 
 ### 1. Product Brief
 Skill: skill="bmad-bmm-create-product-brief"
-Internal steps (each followed by 3x party mode):
-- step-02-vision -> party mode x3
-- step-03-users -> party mode x3
-- step-04-metrics -> party mode x3
-- step-05-scope -> party mode x3
-Total: 12 party modes minimum
+IMPORTANT: Create fresh even if file exists. Overwrite previous version.
+Internal steps (each followed by 3x party mode + log file each):
+- step-02-vision -> party mode x3 -> logs: brief-step02-round{1,2,3}.md
+- step-03-users -> party mode x3 -> logs: brief-step03-round{1,2,3}.md
+- step-04-metrics -> party mode x3 -> logs: brief-step04-round{1,2,3}.md
+- step-05-scope -> party mode x3 -> logs: brief-step05-round{1,2,3}.md
+Total: 12 party modes minimum, 12 log files
+After completion: git commit (Brief + 12 log files)
 
 ### 2. PRD
 Skill: skill="bmad-bmm-create-prd"
-Internal steps (each followed by 3x party mode):
-- step-02-discovery -> party mode x3
-- step-02b-vision -> party mode x3
-- step-02c-executive-summary -> party mode x3
-- step-03-success -> party mode x3
-- step-04-journeys -> party mode x3
-- step-05-domain -> party mode x3
-- step-06-innovation -> party mode x3
-- step-07-project-type -> party mode x3
-- step-08-scoping -> party mode x3
-- step-09-functional -> party mode x3
-- step-10-nonfunctional -> party mode x3
-Total: 33 party modes minimum
+IMPORTANT: Create fresh even if file exists. Overwrite previous version.
+Internal steps (each followed by 3x party mode + log file each):
+- step-02-discovery -> party mode x3 -> logs: prd-step02-round{1,2,3}.md
+- step-02b-vision -> party mode x3 -> logs: prd-step02b-round{1,2,3}.md
+- step-02c-executive-summary -> party mode x3 -> logs: prd-step02c-round{1,2,3}.md
+- step-03-success -> party mode x3 -> logs: prd-step03-round{1,2,3}.md
+- step-04-journeys -> party mode x3 -> logs: prd-step04-round{1,2,3}.md
+- step-05-domain -> party mode x3 -> logs: prd-step05-round{1,2,3}.md
+- step-06-innovation -> party mode x3 -> logs: prd-step06-round{1,2,3}.md
+- step-07-project-type -> party mode x3 -> logs: prd-step07-round{1,2,3}.md
+- step-08-scoping -> party mode x3 -> logs: prd-step08-round{1,2,3}.md
+- step-09-functional -> party mode x3 -> logs: prd-step09-round{1,2,3}.md
+- step-10-nonfunctional -> party mode x3 -> logs: prd-step10-round{1,2,3}.md
+Total: 33 party modes minimum, 33 log files
 Verify: ALL v1 features are in functional requirements
+After completion: git commit (PRD + 33 log files)
 
 ### 3. Architecture
 Skill: skill="bmad-bmm-create-architecture"
-Internal steps (each followed by 3x party mode):
-- step-02-context -> party mode x3
-- step-03-starter -> party mode x3
-- step-04-decisions -> party mode x3
-- step-05-patterns -> party mode x3
-- step-06-structure -> party mode x3
-- step-07-validation -> party mode x3
-Total: 18 party modes minimum
+IMPORTANT: Create fresh even if file exists. Overwrite previous version.
+Internal steps (each followed by 3x party mode + log file each):
+- step-02-context -> party mode x3 -> logs: arch-step02-round{1,2,3}.md
+- step-03-starter -> party mode x3 -> logs: arch-step03-round{1,2,3}.md
+- step-04-decisions -> party mode x3 -> logs: arch-step04-round{1,2,3}.md
+- step-05-patterns -> party mode x3 -> logs: arch-step05-round{1,2,3}.md
+- step-06-structure -> party mode x3 -> logs: arch-step06-round{1,2,3}.md
+- step-07-validation -> party mode x3 -> logs: arch-step07-round{1,2,3}.md
+Total: 18 party modes minimum, 18 log files
 Verify: orchestration, tool system, LLM router, memory architecture present
+After completion: git commit (Architecture + 18 log files)
 
 ### 4. UX Design
 Skill: skill="bmad-bmm-create-ux-design"
-Internal steps (each followed by 3x party mode):
-- step-02-discovery -> party mode x3
-- step-03-core-experience -> party mode x3
-- step-04-emotional-response -> party mode x3
-- step-05-inspiration -> party mode x3
-- step-06-design-system -> party mode x3
-- step-07-defining-experience -> party mode x3
-- step-08-visual-foundation -> party mode x3
-- step-09-design-directions -> party mode x3
-- step-10-user-journeys -> party mode x3
-- step-11-component-strategy -> party mode x3
-- step-12-ux-patterns -> party mode x3
-- step-13-responsive-accessibility -> party mode x3
-Total: 36 party modes minimum
+IMPORTANT: Create fresh even if file exists. Overwrite previous version. NEVER skip this step.
+Internal steps (each followed by 3x party mode + log file each):
+- step-02-discovery -> party mode x3 -> logs: ux-step02-round{1,2,3}.md
+- step-03-core-experience -> party mode x3 -> logs: ux-step03-round{1,2,3}.md
+- step-04-emotional-response -> party mode x3 -> logs: ux-step04-round{1,2,3}.md
+- step-05-inspiration -> party mode x3 -> logs: ux-step05-round{1,2,3}.md
+- step-06-design-system -> party mode x3 -> logs: ux-step06-round{1,2,3}.md
+- step-07-defining-experience -> party mode x3 -> logs: ux-step07-round{1,2,3}.md
+- step-08-visual-foundation -> party mode x3 -> logs: ux-step08-round{1,2,3}.md
+- step-09-design-directions -> party mode x3 -> logs: ux-step09-round{1,2,3}.md
+- step-10-user-journeys -> party mode x3 -> logs: ux-step10-round{1,2,3}.md
+- step-11-component-strategy -> party mode x3 -> logs: ux-step11-round{1,2,3}.md
+- step-12-ux-patterns -> party mode x3 -> logs: ux-step12-round{1,2,3}.md
+- step-13-responsive-accessibility -> party mode x3 -> logs: ux-step13-round{1,2,3}.md
+Total: 36 party modes minimum, 36 log files
+After completion: git commit (UX + 36 log files)
 
 ### 5. Epics & Stories
 Skill: skill="bmad-bmm-create-epics-and-stories"
-Internal steps (each followed by 3x party mode):
-- step-02-design-epics -> party mode x3
-- step-03-create-stories -> party mode x3
-- step-04-final-validation -> party mode x3
-Total: 9 party modes minimum
+IMPORTANT: Create fresh even if file exists. Overwrite previous version.
+Internal steps (each followed by 3x party mode + log file each):
+- step-02-design-epics -> party mode x3 -> logs: epics-step02-round{1,2,3}.md
+- step-03-create-stories -> party mode x3 -> logs: epics-step03-round{1,2,3}.md
+- step-04-final-validation -> party mode x3 -> logs: epics-step04-round{1,2,3}.md
+Total: 9 party modes minimum, 9 log files
 Verify: epics organized by core features, not CRUD lists
+After completion: git commit (Epics + 9 log files)
 
 ### 6. Implementation Readiness Check
 Skill: skill="bmad-bmm-check-implementation-readiness"
-Internal steps (each followed by 3x party mode):
-- step-01-document-discovery -> party mode x3
-- step-02-prd-analysis -> party mode x3
-- step-03-epic-coverage-validation -> party mode x3
-- step-04-ux-alignment -> party mode x3
-- step-05-epic-quality-review -> party mode x3
-- step-06-final-assessment -> party mode x3
-Total: 18 party modes minimum
+IMPORTANT: Create fresh even if file exists. Overwrite previous version.
+Internal steps (each followed by 3x party mode + log file each):
+- step-01-document-discovery -> party mode x3 -> logs: readiness-step01-round{1,2,3}.md
+- step-02-prd-analysis -> party mode x3 -> logs: readiness-step02-round{1,2,3}.md
+- step-03-epic-coverage-validation -> party mode x3 -> logs: readiness-step03-round{1,2,3}.md
+- step-04-ux-alignment -> party mode x3 -> logs: readiness-step04-round{1,2,3}.md
+- step-05-epic-quality-review -> party mode x3 -> logs: readiness-step05-round{1,2,3}.md
+- step-06-final-assessment -> party mode x3 -> logs: readiness-step06-round{1,2,3}.md
+Total: 18 party modes minimum, 18 log files
+After completion: git commit (Readiness + 18 log files)
 
 ### 7. Sprint Planning
 Skill: skill="bmad-bmm-sprint-planning"
 -> sprint-status.yaml generated
+After completion: git commit (sprint-status.yaml)
 
 ### Completion Report
 SendMessage to orchestrator:
 
 [Planning Pipeline Complete]
-[x] 1. Product Brief done + party mode per step (12+)
-[x] 2. PRD done + party mode per step (33+)
-[x] 3. Architecture done + party mode per step (18+)
-[x] 4. UX Design done + party mode per step (36+)
-[x] 5. Epics & Stories done + party mode per step (9+)
-[x] 6. Readiness Check done + party mode per step (18+)
-[x] 7. Sprint Planning done
+[x] 1. Product Brief done + party mode per step (12+) + committed
+[x] 2. PRD done + party mode per step (33+) + committed
+[x] 3. Architecture done + party mode per step (18+) + committed
+[x] 4. UX Design done + party mode per step (36+) + committed
+[x] 5. Epics & Stories done + party mode per step (9+) + committed
+[x] 6. Readiness Check done + party mode per step (18+) + committed
+[x] 7. Sprint Planning done + committed
 
 v1 feature coverage: (N/N items from v1 checklist covered)
 Epic count: N
 Story count: N
 Total party modes executed: ~126+
+Party log files created: ~126 files in _bmad-output/party-logs/
+Commits created: 7 (one per stage)
 Key findings from party modes: (1-3 line summary)
 ```
 
@@ -152,10 +192,8 @@ Key findings from party modes: (1-3 line summary)
 - Receive final report
 - Verify checklist 7/7
 - Verify v1 feature coverage
-
-### Step 3: Commit + Push
-- Commit all planning artifacts
-- Message: `docs: BMAD planning pipeline complete -- brief+PRD+arch+UX+epics + ~126 party modes`
+- **Verify party log files exist**: `ls _bmad-output/party-logs/ | wc -l` should be ~126
+- **Verify separate commits**: `git log --oneline` should show 7 planning commits
 
 ### Step 4: Dev Guidance
 - "Planning complete! Start dev with `/bmad-full-pipeline [first story ID]`"
