@@ -7,7 +7,7 @@ import { cliCredentials, apiKeys } from '../../db/schema'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { encrypt } from '../../lib/crypto'
-import { validateCredentials, encryptCredentials } from '../../services/credential-vault'
+import { validateCredentials, encryptCredentials, SUPPORTED_PROVIDERS } from '../../services/credential-vault'
 
 import type { AppEnv } from '../../types'
 
@@ -80,7 +80,7 @@ credentialsRoute.delete('/cli-credentials/:id', async (c) => {
 const createApiKeySchema = z.object({
   companyId: z.string().uuid(),
   userId: z.string().uuid().nullable().optional(),
-  provider: z.enum(['kis', 'notion', 'email', 'telegram', 'serper', 'instagram']),
+  provider: z.enum(SUPPORTED_PROVIDERS),
   label: z.string().max(100).optional(),
   credentials: z.record(z.string()),  // { field: value } — 각 value는 서버에서 AES-256-GCM 암호화
   scope: z.enum(['company', 'user']),

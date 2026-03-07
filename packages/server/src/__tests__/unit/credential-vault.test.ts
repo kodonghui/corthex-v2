@@ -4,6 +4,7 @@ import {
   encryptCredentials,
   decryptCredentials,
   PROVIDER_SCHEMAS,
+  SUPPORTED_PROVIDERS,
 } from '../../services/credential-vault'
 
 beforeAll(() => {
@@ -86,16 +87,68 @@ describe('validateCredentials', () => {
 })
 
 describe('PROVIDER_SCHEMAS', () => {
-  test('9개 provider 스키마 정의됨', () => {
-    expect(Object.keys(PROVIDER_SCHEMAS)).toHaveLength(9)
+  test('12개 provider 스키마 정의됨', () => {
+    expect(Object.keys(PROVIDER_SCHEMAS)).toHaveLength(12)
+    expect(PROVIDER_SCHEMAS.anthropic).toEqual(['api_key'])
+    expect(PROVIDER_SCHEMAS.openai).toEqual(['api_key'])
+    expect(PROVIDER_SCHEMAS.google_ai).toEqual(['api_key'])
     expect(PROVIDER_SCHEMAS.kis).toEqual(['app_key', 'app_secret', 'account_no'])
     expect(PROVIDER_SCHEMAS.smtp).toEqual(['host', 'port', 'user', 'password', 'from'])
     expect(PROVIDER_SCHEMAS.email).toEqual(['host', 'port', 'user', 'password', 'from'])
+    expect(PROVIDER_SCHEMAS.telegram).toEqual(['bot_token', 'chat_id'])
     expect(PROVIDER_SCHEMAS.instagram).toEqual(['access_token', 'page_id'])
     expect(PROVIDER_SCHEMAS.serper).toEqual(['api_key'])
     expect(PROVIDER_SCHEMAS.notion).toEqual(['api_key'])
     expect(PROVIDER_SCHEMAS.google_calendar).toEqual(['api_key'])
     expect(PROVIDER_SCHEMAS.tts).toEqual(['api_key'])
-    expect(PROVIDER_SCHEMAS.openai).toEqual(['api_key'])
+  })
+})
+
+describe('SUPPORTED_PROVIDERS', () => {
+  test('PROVIDER_SCHEMAS의 모든 키와 일치', () => {
+    expect(SUPPORTED_PROVIDERS).toEqual(Object.keys(PROVIDER_SCHEMAS))
+  })
+
+  test('LLM 프로바이더 포함 확인', () => {
+    expect(SUPPORTED_PROVIDERS).toContain('anthropic')
+    expect(SUPPORTED_PROVIDERS).toContain('openai')
+    expect(SUPPORTED_PROVIDERS).toContain('google_ai')
+  })
+})
+
+describe('새 프로바이더 검증', () => {
+  test('Anthropic api_key 검증 통과', () => {
+    expect(() => validateCredentials('anthropic', { api_key: 'sk-ant-xxx' })).not.toThrow()
+  })
+
+  test('Anthropic api_key 누락 시 에러', () => {
+    expect(() => validateCredentials('anthropic', {} as Record<string, string>)).toThrow('필수 필드 누락')
+  })
+
+  test('Google AI api_key 검증 통과', () => {
+    expect(() => validateCredentials('google_ai', { api_key: 'AIzaSy-xxx' })).not.toThrow()
+  })
+
+  test('Telegram 2필드 검증 통과', () => {
+    expect(() => validateCredentials('telegram', { bot_token: '123:ABC', chat_id: '-100123' })).not.toThrow()
+  })
+
+  test('Telegram bot_token 누락 시 에러', () => {
+    expect(() => validateCredentials('telegram', { chat_id: '-100123' } as Record<string, string>)).toThrow('필수 필드 누락')
+  })
+
+  test('Anthropic api_key 왕복 암호화', async () => {
+    const original = { api_key: 'sk-ant-api03-test-key-12345' }
+    const encrypted = await encryptCredentials(original)
+    expect(encrypted.api_key).not.toBe(original.api_key)
+    const decrypted = await decryptCredentials(encrypted)
+    expect(decrypted).toEqual(original)
+  })
+
+  test('Telegram 2필드 왕복 암호화', async () => {
+    const original = { bot_token: '123456:ABC-DEF', chat_id: '-1001234567890' }
+    const encrypted = await encryptCredentials(original)
+    const decrypted = await decryptCredentials(encrypted)
+    expect(decrypted).toEqual(original)
   })
 })

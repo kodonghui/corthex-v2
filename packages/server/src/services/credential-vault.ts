@@ -7,16 +7,22 @@ import { ERROR_CODES } from '@corthex/shared'
 
 // Provider별 필수 필드 정의
 export const PROVIDER_SCHEMAS: Record<string, string[]> = {
+  anthropic: ['api_key'],
+  openai: ['api_key'],
+  google_ai: ['api_key'],
   kis: ['app_key', 'app_secret', 'account_no'],
   smtp: ['host', 'port', 'user', 'password', 'from'],
   email: ['host', 'port', 'user', 'password', 'from'],
+  telegram: ['bot_token', 'chat_id'],
   instagram: ['access_token', 'page_id'],
   serper: ['api_key'],
   notion: ['api_key'],
   google_calendar: ['api_key'],
   tts: ['api_key'],
-  openai: ['api_key'],
 }
+
+// All supported provider names (used for Zod enum validation)
+export const SUPPORTED_PROVIDERS = Object.keys(PROVIDER_SCHEMAS) as [string, ...string[]]
 
 // 필수 필드 유효성 검사
 export function validateCredentials(
