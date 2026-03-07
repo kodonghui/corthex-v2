@@ -45,6 +45,7 @@ import { startSnsScheduleChecker, stopSnsScheduleChecker } from './lib/sns-sched
 import { loginRateLimit, apiRateLimit } from './middleware/rate-limit'
 import { wsRoute, websocket, broadcastServerRestart } from './ws/server'
 import { eventBus } from './lib/event-bus'
+import { initToolPool } from './services/tool-pool-init'
 import { broadcastToCompany } from './ws/channels'
 import type { AppEnv } from './types'
 
@@ -173,6 +174,9 @@ if (isProd) {
 const port = Number(process.env.PORT) || 3000
 
 console.log(`🚀 CORTHEX v2 서버 시작 — http://localhost:${port}`)
+
+// ToolPool -> AgentRunner 연결
+initToolPool()
 
 // DB 마이그레이션 자동 적용 후 워커 시작
 runMigrations().then(() => {

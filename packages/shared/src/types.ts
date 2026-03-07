@@ -232,6 +232,19 @@ export type ToolExecutor = (
   args: Record<string, unknown>,
 ) => Promise<{ result: string } | { error: string }>
 
+// === Tool System (Epic 4) ===
+export type ToolCategory = 'finance' | 'legal' | 'marketing' | 'tech' | 'common'
+
+export type ToolContext = {
+  companyId: string
+  agentId: string
+  agentName: string
+}
+
+export type ToolResult =
+  | { success: true; result: string }
+  | { success: false; error: string }
+
 // === Batch Collector ===
 export type BatchItemStatus = 'pending' | 'processing' | 'completed' | 'failed'
 
