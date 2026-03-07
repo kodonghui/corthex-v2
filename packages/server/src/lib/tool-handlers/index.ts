@@ -23,6 +23,17 @@ import { translateText } from './builtins/translate-text'
 import { publishInstagram } from './builtins/publish-instagram'
 import { getInstagramInsights } from './builtins/get-instagram-insights'
 import { createReport } from './builtins/create-report'
+import { spreadsheetTool } from './builtins/spreadsheet-tool'
+import { chartGenerator } from './builtins/chart-generator'
+import { fileManager } from './builtins/file-manager'
+import { dateUtils } from './builtins/date-utils'
+import { jsonParser } from './builtins/json-parser'
+import { textSummarizer } from './builtins/text-summarizer'
+import { urlFetcher } from './builtins/url-fetcher'
+import { markdownConverter } from './builtins/markdown-converter'
+import { regexMatcher } from './builtins/regex-matcher'
+import { unitConverter } from './builtins/unit-converter'
+import { randomGenerator } from './builtins/random-generator'
 
 // 내장 핸들러 등록
 registry.register('get_current_time', getCurrentTime)
@@ -49,6 +60,17 @@ registry.register('translate_text', translateText)
 registry.register('publish_instagram', publishInstagram)
 registry.register('get_instagram_insights', getInstagramInsights)
 registry.register('create_report', createReport)
+registry.register('spreadsheet_tool', spreadsheetTool)
+registry.register('chart_generator', chartGenerator)
+registry.register('file_manager', fileManager)
+registry.register('date_utils', dateUtils)
+registry.register('json_parser', jsonParser)
+registry.register('text_summarizer', textSummarizer)
+registry.register('url_fetcher', urlFetcher)
+registry.register('markdown_converter', markdownConverter)
+registry.register('regex_matcher', regexMatcher)
+registry.register('unit_converter', unitConverter)
+registry.register('random_generator', randomGenerator)
 
 export { registry } from './registry'
 export type { ToolHandler, ToolExecContext } from './types'
