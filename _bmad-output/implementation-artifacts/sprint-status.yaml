@@ -94,7 +94,7 @@ development_status:
   # ============================================================
   epic-2: in-progress
   2-1-department-crud-api: done
-  2-2-agent-crud-api: backlog
+  2-2-agent-crud-api: done
   2-3-cascade-analysis-engine: backlog
   2-4-org-template-apply-api: backlog
   2-5-org-tree-view-ui-admin: backlog
@@ -111,7 +111,7 @@ development_status:
   # ============================================================
   epic-3: in-progress
   3-1-llm-provider-adapters-claude-gpt-gemini: done
-  3-2-llm-router-3tier-model-assignment: backlog
+  3-2-llm-router-3tier-model-assignment: done
   3-3-provider-fallback-strategy: backlog
   3-4-agent-runner-stateless-executor: backlog
   3-5-cost-recording-system-models-yaml: backlog
