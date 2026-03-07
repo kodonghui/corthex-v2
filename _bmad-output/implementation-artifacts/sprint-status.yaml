@@ -54,7 +54,7 @@ development_status:
   0-2-user-authentication-and-invitation: done
   0-3-credential-vault: done
   0-4-admin-console-company-and-user-management-ui: done
-  epic-0-retrospective: optional
+  epic-0-retrospective: done
 
   # ============================================================
   # Epic 1: Command Center
