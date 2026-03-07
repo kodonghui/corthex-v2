@@ -6,6 +6,7 @@ import { db } from '../../db'
 import { costRecords, agents, chatMessages, delegations, toolCalls, nightJobs } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { getSummary, getUsage, getBudget, getQuickActions, updateQuickActions, getSatisfaction } from '../../services/dashboard'
+import * as costAggregation from '../../services/cost-aggregation'
 import type { AppEnv } from '../../types'
 
 export const dashboardRoute = new Hono<AppEnv>()
@@ -124,6 +125,41 @@ dashboardRoute.get('/dashboard/costs', async (c) => {
         count: Number(r.count),
       })),
       days,
+    },
+  })
+})
+
+// GET /api/workspace/dashboard/costs/by-agent — 에이전트별 비용 (Story 7-4)
+const costDateRangeSchema = z.object({
+  startDate: z.string().date().optional(),
+  endDate: z.string().date().optional(),
+})
+
+dashboardRoute.get('/dashboard/costs/by-agent', zValidator('query', costDateRangeSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const query = c.req.valid('query')
+  const endDate = query.endDate ? new Date(query.endDate + 'T23:59:59.999Z') : new Date()
+  const startDate = query.startDate
+    ? new Date(query.startDate + 'T00:00:00.000Z')
+    : new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000)
+  const items = await costAggregation.getByAgent(tenant.companyId, { startDate, endDate })
+  return c.json({ success: true, data: { items } })
+})
+
+// GET /api/workspace/dashboard/costs/daily — 일일 비용 추이 (Story 7-4)
+dashboardRoute.get('/dashboard/costs/daily', zValidator('query', costDateRangeSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const query = c.req.valid('query')
+  const endDate = query.endDate ? new Date(query.endDate + 'T23:59:59.999Z') : new Date()
+  const startDate = query.startDate
+    ? new Date(query.startDate + 'T00:00:00.000Z')
+    : new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000)
+  const items = await costAggregation.getDaily(tenant.companyId, { startDate, endDate })
+  return c.json({
+    success: true,
+    data: {
+      items,
+      meta: { startDate: startDate.toISOString(), endDate: endDate.toISOString() },
     },
   })
 })

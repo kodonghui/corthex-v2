@@ -178,12 +178,12 @@ development_status:
   # UX: Admin A6, CEO cost card
   # Dependencies: Epic 3 (CostTracker)
   # ============================================================
-  epic-7: in-progress
+  epic-7: done
   7-1-3axis-cost-aggregation-api: done
   7-2-budget-limit-auto-block: done
   7-3-cost-dashboard-ui-admin-a6: done
-  7-4-ceo-app-cost-card-drilldown: in-progress
-  7-5-budget-exceeded-websocket-alert: in-progress
+  7-4-ceo-app-cost-card-drilldown: done
+  7-5-budget-exceeded-websocket-alert: done
   epic-7-retrospective: optional
 
   # ============================================================

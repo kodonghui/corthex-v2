@@ -21,6 +21,8 @@ const TradingPage = lazy(() => import('./pages/trading').then((m) => ({ default:
 const FilesPage = lazy(() => import('./pages/files').then((m) => ({ default: m.FilesPage })))
 const OrgPage = lazy(() => import('./pages/org').then((m) => ({ default: m.OrgPage })))
 const CommandCenterPage = lazy(() => import('./pages/command-center').then((m) => ({ default: m.CommandCenterPage })))
+const ActivityLogPage = lazy(() => import('./pages/activity-log').then((m) => ({ default: m.ActivityLogPage })))
+const CostsPage = lazy(() => import('./pages/costs').then((m) => ({ default: m.CostsPage })))
 
 const queryClient = new QueryClient()
 
@@ -91,6 +93,8 @@ export function App() {
             <Route path="files" element={<Suspense fallback={<PageSkeleton />}><FilesPage /></Suspense>} />
             <Route path="org" element={<Suspense fallback={<PageSkeleton />}><OrgPage /></Suspense>} />
             <Route path="notifications" element={<Suspense fallback={<PageSkeleton />}><NotificationsPage /></Suspense>} />
+            <Route path="activity-log" element={<Suspense fallback={<PageSkeleton />}><ActivityLogPage /></Suspense>} />
+            <Route path="costs" element={<Suspense fallback={<PageSkeleton />}><CostsPage /></Suspense>} />
             <Route path="settings" element={<Suspense fallback={<PageSkeleton />}><SettingsPage /></Suspense>} />
           </Route>
         </Routes>

@@ -34,6 +34,7 @@ const navSections: NavSection[] = [
       { to: '/sns', label: 'SNS', icon: '📱' },
       { to: '/messenger', label: '메신저', icon: '💭' },
       { to: '/dashboard', label: '작전현황', icon: '📊' },
+      { to: '/costs', label: '비용 분석', icon: '💰' },
       { to: '/activity-log', label: '통신로그', icon: '📞' },
       { to: '/ops-log', label: '작전일지', icon: '📋' },
       { to: '/nexus', label: 'NEXUS', icon: '🔗' },

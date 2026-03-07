@@ -32,6 +32,7 @@ const PROVIDER_LABELS: Record<LLMProviderName, string> = {
 // === Summary Cards ===
 
 function SummaryCards({ data }: { data: DashboardSummary }) {
+  const navigate = useNavigate()
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
       {/* Task Card */}
@@ -57,14 +58,21 @@ function SummaryCards({ data }: { data: DashboardSummary }) {
         </div>
       </Card>
 
-      {/* Cost Card */}
+      {/* Cost Card — clickable → /costs drilldown */}
       <Card>
-        <div className="px-4 py-3">
+        <div
+          className="px-4 py-3 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors rounded-xl"
+          onClick={() => navigate('/costs')}
+          role="link"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter') navigate('/costs') }}
+        >
           <div className="flex items-center gap-2 mb-2">
             <span className="text-base">💰</span>
             <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
               비용 현황
             </span>
+            <span className="ml-auto text-[10px] text-zinc-400">상세 &rarr;</span>
           </div>
           <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
             ${data.cost.todayUsd.toFixed(2)}
