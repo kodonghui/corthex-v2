@@ -79,8 +79,8 @@ development_status:
   # ============================================================
   epic-1: in-progress
   1-1-phase1-drizzle-schema-extension: done
-  1-2-tenant-isolation-middleware: review
-  1-3-rbac-middleware: in-progress
+  1-2-tenant-isolation-middleware: done
+  1-3-rbac-middleware: review
   1-4-audit-log-system: done
   1-5-credential-vault-extension: backlog
   1-6-seed-data-org-templates: backlog
