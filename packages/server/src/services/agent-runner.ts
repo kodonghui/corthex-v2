@@ -1,5 +1,6 @@
 import { llmRouter, resolveModel, resolveProvider } from './llm-router'
 import { calculateCostMicro } from '../lib/cost-tracker'
+import { checkToolPermission, hasWildcard } from './tool-permission-guard'
 import type { LLMRouterContext } from './llm-router'
 import type {
   LLMRequest,
@@ -31,6 +32,7 @@ export type AgentConfig = {
 }
 
 export type ToolDefinitionProvider = (allowedTools: string[]) => LLMToolDefinition[]
+export type ToolNameProvider = () => string[]
 
 // === Constants ===
 
@@ -98,12 +100,29 @@ let toolDefinitionProvider: ToolDefinitionProvider = (allowedTools: string[]) =>
   }))
 }
 
+// Returns all registered tool names -- used for wildcard "*" resolution
+let toolNameProvider: ToolNameProvider = () => []
+
 export function setToolDefinitionProvider(provider: ToolDefinitionProvider): void {
   toolDefinitionProvider = provider
 }
 
+export function setToolNameProvider(provider: ToolNameProvider): void {
+  toolNameProvider = provider
+}
+
+export function getAllToolNames(): string[] {
+  return toolNameProvider()
+}
+
 export function getToolDefinitions(allowedTools: string[]): LLMToolDefinition[] {
   if (!allowedTools || allowedTools.length === 0) return []
+  // Wildcard: resolve to all registered tools
+  if (hasWildcard(allowedTools)) {
+    const allNames = toolNameProvider()
+    if (allNames.length === 0) return []
+    return toolDefinitionProvider(allNames)
+  }
   return toolDefinitionProvider(allowedTools)
 }
 
@@ -160,7 +179,7 @@ export class AgentRunner {
         break
       }
 
-      const toolResults = await this.executeToolCalls(response.toolCalls, toolExecutor, allToolRecords)
+      const toolResults = await this.executeToolCalls(response.toolCalls, toolExecutor, allToolRecords, agent.allowedTools)
 
       // Append assistant message with tool calls
       messages.push({
@@ -276,7 +295,7 @@ export class AgentRunner {
       }
 
       // Execute tool calls
-      const toolResults = await this.executeToolCalls(bufferedToolCalls, toolExecutor, allToolRecords)
+      const toolResults = await this.executeToolCalls(bufferedToolCalls, toolExecutor, allToolRecords, agent.allowedTools)
 
       // Append messages for next iteration
       messages.push({
@@ -307,10 +326,20 @@ export class AgentRunner {
     toolCalls: LLMToolCall[],
     toolExecutor: ToolExecutor,
     allToolRecords: ToolCallRecord[],
+    allowedTools?: string[],
   ): Promise<Array<{ toolCallId: string; content: string }>> {
     const results: Array<{ toolCallId: string; content: string }> = []
 
     for (const tc of toolCalls) {
+      // NFR14: Server-side permission check before execution
+      const permission = checkToolPermission(allowedTools, tc.name)
+      if (!permission.allowed) {
+        const reason = permission.reason || `TOOL_NOT_PERMITTED: ${tc.name}`
+        allToolRecords.push({ name: tc.name, arguments: tc.arguments, error: reason, durationMs: 0 })
+        results.push({ toolCallId: tc.id, content: `Error: ${reason}` })
+        continue
+      }
+
       const start = Date.now()
       try {
         const result = await toolExecutor(tc.name, tc.arguments)
