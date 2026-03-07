@@ -1,274 +1,243 @@
 ---
 name: 'full-pipeline'
-description: 'BMAD full pipeline. planning(brief->PRD->arch->UX->epics, step-by-step party mode) or story dev(create->dev->TEA->QA->CR). Usage: /bmad-full-pipeline [planning|story-ID]'
+description: 'BMAD 풀 파이프라인. planning(brief->PRD->arch->UX->epics, 오케스트레이터 주도 파티모드) 또는 story dev(create->dev->TEA->QA->CR). 사용법: /bmad-full-pipeline [planning|스토리ID]'
 ---
 
 # BMAD Full Pipeline
 
-planning mode or story dev mode.
+planning 모드 또는 story dev 모드.
 
-## Mode
+## 모드 판별
 
-- `planning` or no args: planning pipeline (brief -> PRD -> architecture -> UX -> epics)
-- story ID (e.g. `19-1`): story dev pipeline (create-story -> dev -> TEA -> QA -> CR)
-
----
-
-## Mode A: Planning Pipeline (planning)
-
-### Orchestrator Role
-- Team leader. Directs only, does NOT execute.
-- TeamCreate -> TaskCreate -> Agent(team member) delegates everything
-- Receives completion reports, verifies checklist, commits+pushes
-
-### Step 0: Team Setup
-1. `TeamCreate` team name: `bmad-planning`
-2. `TaskCreate` register planning task
-
-### Step 1: Delegate Full Planning Pipeline to Team Member
-`Agent` tool to create team member. Pass the prompt below **exactly**:
-
-```
-You are a BMAD planning pipeline executor.
-Execute ALL steps below **in order, without skipping any**.
-YOLO mode on all steps -- auto-proceed on every confirmation prompt, never wait for user input.
-
-## Required Input Documents (READ FIRST)
-_bmad-output/planning-artifacts/v1-feature-spec.md -- v1 feature spec with all actually-working features.
-Every step and every party-mode must verify: nothing from v1 is missing, no stubs, real working features only.
-
-## Core Rule: Step-by-Step Party Mode (MANDATORY)
-After EACH internal step of each planning stage, run party mode (Skill: skill="bmad-party-mode") MINIMUM 3 TIMES.
-- Party mode runs in YOLO mode (auto-proceed, no menus, no waiting)
-- Each party mode must verify:
-  1. Does this step's output cover all relevant v1 features from v1-feature-spec.md?
-  2. Is it real working functionality, not CRUD shells or stubs?
-  3. Is there a concrete implementation plan, not mock/placeholder?
-- If party mode finds issues -> fix immediately -> continue to next party mode
-- All 3 party modes must pass before moving to next step
-
-## Core Rule: Party Mode Evidence (MANDATORY -- no log = violation)
-Each party mode round MUST produce a log file:
-- Path: `_bmad-output/party-logs/{stage}-step{N}-round{M}.md`
-- Example: `_bmad-output/party-logs/prd-step09-round2.md`
-- Log MUST contain:
-  1. Timestamp
-  2. Step name + document section being reviewed
-  3. **Actual quotes from the document** (minimum 3 lines)
-  4. Each agent's specific feedback (name + what they said)
-  5. v1-feature-spec.md items checked in this round
-  6. Changes made (before/after diff, or "none needed" with reason)
-  7. Consensus result (pass/fail)
-- Without this log file, the party mode is treated as NOT executed.
-
-## Core Rule: Always Recreate Documents (MANDATORY)
-- ALL planning documents MUST be created fresh. NEVER skip because "file already exists".
-- Existing files are OVERWRITTEN. The purpose of this pipeline is to redo everything.
-- "Skip if already exists" only applies to story files in Mode B, NEVER to planning docs.
-
-## Core Rule: Incremental Commits (MANDATORY)
-- After each planning STAGE completes (with all its party mode logs), commit immediately.
-- Do NOT wait until the end to commit everything at once.
-- Commit format: `docs(planning): {stage} complete -- {N} party modes`
-- This creates verifiable git timestamp evidence of real execution.
-
-## Execution Order
-
-### 1. Product Brief
-Skill: skill="bmad-bmm-create-product-brief"
-IMPORTANT: Create fresh even if file exists. Overwrite previous version.
-Internal steps (each followed by 3x party mode + log file each):
-- step-02-vision -> party mode x3 -> logs: brief-step02-round{1,2,3}.md
-- step-03-users -> party mode x3 -> logs: brief-step03-round{1,2,3}.md
-- step-04-metrics -> party mode x3 -> logs: brief-step04-round{1,2,3}.md
-- step-05-scope -> party mode x3 -> logs: brief-step05-round{1,2,3}.md
-Total: 12 party modes minimum, 12 log files
-After completion: git commit (Brief + 12 log files)
-
-### 2. PRD
-Skill: skill="bmad-bmm-create-prd"
-IMPORTANT: Create fresh even if file exists. Overwrite previous version.
-Internal steps (each followed by 3x party mode + log file each):
-- step-02-discovery -> party mode x3 -> logs: prd-step02-round{1,2,3}.md
-- step-02b-vision -> party mode x3 -> logs: prd-step02b-round{1,2,3}.md
-- step-02c-executive-summary -> party mode x3 -> logs: prd-step02c-round{1,2,3}.md
-- step-03-success -> party mode x3 -> logs: prd-step03-round{1,2,3}.md
-- step-04-journeys -> party mode x3 -> logs: prd-step04-round{1,2,3}.md
-- step-05-domain -> party mode x3 -> logs: prd-step05-round{1,2,3}.md
-- step-06-innovation -> party mode x3 -> logs: prd-step06-round{1,2,3}.md
-- step-07-project-type -> party mode x3 -> logs: prd-step07-round{1,2,3}.md
-- step-08-scoping -> party mode x3 -> logs: prd-step08-round{1,2,3}.md
-- step-09-functional -> party mode x3 -> logs: prd-step09-round{1,2,3}.md
-- step-10-nonfunctional -> party mode x3 -> logs: prd-step10-round{1,2,3}.md
-Total: 33 party modes minimum, 33 log files
-Verify: ALL v1 features are in functional requirements
-After completion: git commit (PRD + 33 log files)
-
-### 3. Architecture
-Skill: skill="bmad-bmm-create-architecture"
-IMPORTANT: Create fresh even if file exists. Overwrite previous version.
-Internal steps (each followed by 3x party mode + log file each):
-- step-02-context -> party mode x3 -> logs: arch-step02-round{1,2,3}.md
-- step-03-starter -> party mode x3 -> logs: arch-step03-round{1,2,3}.md
-- step-04-decisions -> party mode x3 -> logs: arch-step04-round{1,2,3}.md
-- step-05-patterns -> party mode x3 -> logs: arch-step05-round{1,2,3}.md
-- step-06-structure -> party mode x3 -> logs: arch-step06-round{1,2,3}.md
-- step-07-validation -> party mode x3 -> logs: arch-step07-round{1,2,3}.md
-Total: 18 party modes minimum, 18 log files
-Verify: orchestration, tool system, LLM router, memory architecture present
-After completion: git commit (Architecture + 18 log files)
-
-### 4. UX Design
-Skill: skill="bmad-bmm-create-ux-design"
-IMPORTANT: Create fresh even if file exists. Overwrite previous version. NEVER skip this step.
-Internal steps (each followed by 3x party mode + log file each):
-- step-02-discovery -> party mode x3 -> logs: ux-step02-round{1,2,3}.md
-- step-03-core-experience -> party mode x3 -> logs: ux-step03-round{1,2,3}.md
-- step-04-emotional-response -> party mode x3 -> logs: ux-step04-round{1,2,3}.md
-- step-05-inspiration -> party mode x3 -> logs: ux-step05-round{1,2,3}.md
-- step-06-design-system -> party mode x3 -> logs: ux-step06-round{1,2,3}.md
-- step-07-defining-experience -> party mode x3 -> logs: ux-step07-round{1,2,3}.md
-- step-08-visual-foundation -> party mode x3 -> logs: ux-step08-round{1,2,3}.md
-- step-09-design-directions -> party mode x3 -> logs: ux-step09-round{1,2,3}.md
-- step-10-user-journeys -> party mode x3 -> logs: ux-step10-round{1,2,3}.md
-- step-11-component-strategy -> party mode x3 -> logs: ux-step11-round{1,2,3}.md
-- step-12-ux-patterns -> party mode x3 -> logs: ux-step12-round{1,2,3}.md
-- step-13-responsive-accessibility -> party mode x3 -> logs: ux-step13-round{1,2,3}.md
-Total: 36 party modes minimum, 36 log files
-After completion: git commit (UX + 36 log files)
-
-### 5. Epics & Stories
-Skill: skill="bmad-bmm-create-epics-and-stories"
-IMPORTANT: Create fresh even if file exists. Overwrite previous version.
-Internal steps (each followed by 3x party mode + log file each):
-- step-02-design-epics -> party mode x3 -> logs: epics-step02-round{1,2,3}.md
-- step-03-create-stories -> party mode x3 -> logs: epics-step03-round{1,2,3}.md
-- step-04-final-validation -> party mode x3 -> logs: epics-step04-round{1,2,3}.md
-Total: 9 party modes minimum, 9 log files
-Verify: epics organized by core features, not CRUD lists
-After completion: git commit (Epics + 9 log files)
-
-### 6. Implementation Readiness Check
-Skill: skill="bmad-bmm-check-implementation-readiness"
-IMPORTANT: Create fresh even if file exists. Overwrite previous version.
-Internal steps (each followed by 3x party mode + log file each):
-- step-01-document-discovery -> party mode x3 -> logs: readiness-step01-round{1,2,3}.md
-- step-02-prd-analysis -> party mode x3 -> logs: readiness-step02-round{1,2,3}.md
-- step-03-epic-coverage-validation -> party mode x3 -> logs: readiness-step03-round{1,2,3}.md
-- step-04-ux-alignment -> party mode x3 -> logs: readiness-step04-round{1,2,3}.md
-- step-05-epic-quality-review -> party mode x3 -> logs: readiness-step05-round{1,2,3}.md
-- step-06-final-assessment -> party mode x3 -> logs: readiness-step06-round{1,2,3}.md
-Total: 18 party modes minimum, 18 log files
-After completion: git commit (Readiness + 18 log files)
-
-### 7. Sprint Planning
-Skill: skill="bmad-bmm-sprint-planning"
--> sprint-status.yaml generated
-After completion: git commit (sprint-status.yaml)
-
-### Completion Report
-SendMessage to orchestrator:
-
-[Planning Pipeline Complete]
-[x] 1. Product Brief done + party mode per step (12+) + committed
-[x] 2. PRD done + party mode per step (33+) + committed
-[x] 3. Architecture done + party mode per step (18+) + committed
-[x] 4. UX Design done + party mode per step (36+) + committed
-[x] 5. Epics & Stories done + party mode per step (9+) + committed
-[x] 6. Readiness Check done + party mode per step (18+) + committed
-[x] 7. Sprint Planning done + committed
-
-v1 feature coverage: (N/N items from v1 checklist covered)
-Epic count: N
-Story count: N
-Total party modes executed: ~126+
-Party log files created: ~126 files in _bmad-output/party-logs/
-Commits created: 7 (one per stage)
-Key findings from party modes: (1-3 line summary)
-```
-
-### Step 2: Wait and Verify
-- Wait for team member completion
-- Receive final report
-- Verify checklist 7/7
-- Verify v1 feature coverage
-- **Verify party log files exist**: `ls _bmad-output/party-logs/ | wc -l` should be ~126
-- **Verify separate commits**: `git log --oneline` should show 7 planning commits
-
-### Step 4: Dev Guidance
-- "Planning complete! Start dev with `/bmad-full-pipeline [first story ID]`"
+- `planning` 또는 인자 없음: 기획 파이프라인 (brief -> PRD -> architecture -> UX -> epics)
+- 스토리 ID (예: `3-1`): 스토리 개발 파이프라인 (create-story -> dev -> TEA -> QA -> CR)
 
 ---
 
-## Mode B: Story Dev Pipeline (story ID)
+## 모드 A: 기획 파이프라인 (planning)
 
-### Step 0: Team Setup
-1. `TeamCreate` team name: `bmad-pipeline`
-2. `TaskCreate` register story task
+### 핵심 원칙: 오케스트레이터 주도 파티모드
+- **팀원은 문서만 작성**. 파티모드는 절대 팀원이 실행하지 않음.
+- **오케스트레이터(메인 대화)가 직접** `Skill("bmad-party-mode")`를 호출.
+- 이렇게 하면 파티모드 할루시네이션(가짜 실행) 방지.
 
-### Step 1: Delegate 5-Step Pipeline to Team Member
-`Agent` tool to create team member. Pass the prompt below **exactly**:
+### 전체 흐름 (스텝 단위 반복)
 
 ```
-You are a BMAD pipeline executor. Execute ALL 5 steps below **in order, without skipping any**.
-YOLO mode on all steps -- auto-proceed on every confirmation prompt, never wait for user input.
-
-IMPORTANT: This story must produce REAL WORKING functionality, not CRUD pages or stubs.
-Reference v1 feature spec (_bmad-output/planning-artifacts/v1-feature-spec.md) to verify
-how the feature worked in v1, and implement at the same level in v2.
-
-Target story: [story ID]
-
-### Step 1: create-story
-Skill: skill="bmad-bmm-create-story", args="[story ID]"
-- Skip if story file already exists
-
-### Step 2: dev-story
-Skill: skill="bmad-bmm-dev-story", args="[story file path]"
-- Complete implementation
-- NO stubs/mocks -- real working code only
-
-### Step 3: TEA (Test Architect)
-Skill: skill="bmad-tea-automate"
-- Risk-based test generation for changed/added code
-
-### Step 4: QA
-Skill: skill="bmad-agent-bmm-qa"
-- NO menu display -- execute immediately
-- Feature verification + edge case check
-- Verify "actually works" (stub APIs = fail)
-
-### Step 5: code-review
-Skill: skill="bmad-bmm-code-review"
-- Auto-fix any issues found
-- One round of auto-fix is sufficient
-
-### Completion Report
-SendMessage to orchestrator:
-
-[BMAD Checklist -- Story [story ID]]
-[x] 1. create-story done
-[x] 2. dev-story done
-[x] 3. TEA done
-[x] 4. QA done
-[x] 5. code-review done
-
-Summary: (what was implemented, 1-2 lines)
-Tests: (number of tests generated)
-Issues: (issues found/fixed in code-review)
-Real functionality: (confirm not stub)
+1. 오케스트레이터 -> 팀원: "Brief의 step-02-vision 완성해"
+2. 팀원: 해당 스텝 작성 완료 -> SendMessage로 보고
+3. 오케스트레이터: Skill("bmad-party-mode") 호출 #1 (YOLO)
+4. 오케스트레이터: Skill("bmad-party-mode") 호출 #2 (YOLO)
+5. 오케스트레이터: Skill("bmad-party-mode") 호출 #3 (YOLO)
+6. 이슈 발견 -> 팀원에게 수정 지시 -> 수정 후 파티모드 재실행
+7. 3회 통과 -> 팀원에게 다음 스텝 지시
+8. 해당 단계 전체 스텝 완료 -> 커밋 -> 다음 단계로
 ```
 
-### Step 2: Wait and Verify
-- Wait for team member completion
-- Receive checklist report
-- Verify 5/5 checked + real functionality confirmed
+### Step 0: 팀 준비
+1. `TeamCreate` 팀 이름: `bmad-planning`
+2. `TaskCreate` 기획 태스크 등록
 
-### Step 3: Commit + Push
-- Message: `feat: Story [ID] [title] -- [summary] + TEA [N] tests`
-- Update sprint-status.yaml
-- Output deploy report table
+### Step 1: 팀원 생성
+`Agent` 도구로 팀원 생성. 아래 프롬프트 전달:
 
-### Step 4: Next Story
-- If more stories in same epic -> notify user
-- If last story in epic -> "Epic complete! Run `/bmad-bmm-retrospective`?"
+```
+너는 BMAD 기획 문서 작성자야.
+오케스트레이터가 지시하는 스텝을 하나씩 완성해.
+YOLO 모드 -- 확인 프롬프트 자동 진행, 사용자 입력 기다리지 마.
+
+## 규칙
+1. 오케스트레이터가 지시한 스텝만 작성. 파티모드는 네가 실행하지 마.
+2. 스텝 완성 후 SendMessage로 오케스트레이터에게 보고.
+3. 문서는 항상 새로 생성 -- "파일이 이미 있으니 건너뛰기" 금지.
+4. v1-feature-spec.md (_bmad-output/planning-artifacts/v1-feature-spec.md) 반드시 참조.
+5. stub/mock/placeholder 금지 -- 구체적이고 실제적인 내용만.
+
+## 보고 형식
+[스텝 완료] {단계명} - {스텝명}
+작성한 내용 요약: (1-2줄)
+변경된 파일: (경로)
+```
+
+### Step 2: 단계별 실행 (오케스트레이터가 직접 루프)
+
+각 기획 단계에 대해 아래를 반복:
+
+#### 단계 진행 방법:
+1. 팀원에게 해당 Skill 실행 + 특정 스텝 작성 지시
+2. 팀원 완료 보고 대기
+3. **오케스트레이터가 직접** `Skill("bmad-party-mode")` 3회 호출
+   - YOLO 모드 (자동 진행, 메뉴 없음)
+   - 매번 확인: 실제 동작 기능인가? 구체적 구현 계획인가? v1 기능 커버하는가?
+4. 이슈 발견 시: 팀원에게 수정 지시 -> 수정 완료 후 파티모드 재실행
+5. 3회 모두 통과 -> 다음 스텝으로
+
+#### 1. Product Brief
+팀원에게 Skill: `bmad-bmm-create-product-brief` 실행 지시.
+스텝별 파티모드 (오케스트레이터 실행):
+- step-02-vision: 파티모드 x3
+- step-03-users: 파티모드 x3
+- step-04-metrics: 파티모드 x3
+- step-05-scope: 파티모드 x3
+합계: 파티모드 12회
+완료 후: git commit `docs(planning): Brief complete -- 12 party modes`
+
+#### 2. PRD
+팀원에게 Skill: `bmad-bmm-create-prd` 실행 지시.
+스텝별 파티모드 (오케스트레이터 실행):
+- step-02-discovery: 파티모드 x3
+- step-02b-vision: 파티모드 x3
+- step-02c-executive-summary: 파티모드 x3
+- step-03-success: 파티모드 x3
+- step-04-journeys: 파티모드 x3
+- step-05-domain: 파티모드 x3
+- step-06-innovation: 파티모드 x3
+- step-07-project-type: 파티모드 x3
+- step-08-scoping: 파티모드 x3
+- step-09-functional: 파티모드 x3
+- step-10-nonfunctional: 파티모드 x3
+합계: 파티모드 33회
+완료 후: git commit `docs(planning): PRD complete -- 33 party modes`
+
+#### 3. Architecture
+팀원에게 Skill: `bmad-bmm-create-architecture` 실행 지시.
+스텝별 파티모드 (오케스트레이터 실행):
+- step-02-context: 파티모드 x3
+- step-03-starter: 파티모드 x3
+- step-04-decisions: 파티모드 x3
+- step-05-patterns: 파티모드 x3
+- step-06-structure: 파티모드 x3
+- step-07-validation: 파티모드 x3
+합계: 파티모드 18회
+완료 후: git commit `docs(planning): Architecture complete -- 18 party modes`
+
+#### 4. UX Design
+팀원에게 Skill: `bmad-bmm-create-ux-design` 실행 지시.
+스텝별 파티모드 (오케스트레이터 실행):
+- step-02-discovery: 파티모드 x3
+- step-03-core-experience: 파티모드 x3
+- step-04-emotional-response: 파티모드 x3
+- step-05-inspiration: 파티모드 x3
+- step-06-design-system: 파티모드 x3
+- step-07-defining-experience: 파티모드 x3
+- step-08-visual-foundation: 파티모드 x3
+- step-09-design-directions: 파티모드 x3
+- step-10-user-journeys: 파티모드 x3
+- step-11-component-strategy: 파티모드 x3
+- step-12-ux-patterns: 파티모드 x3
+- step-13-responsive-accessibility: 파티모드 x3
+합계: 파티모드 36회
+완료 후: git commit `docs(planning): UX Design complete -- 36 party modes`
+
+#### 5. Epics & Stories
+팀원에게 Skill: `bmad-bmm-create-epics-and-stories` 실행 지시.
+스텝별 파티모드 (오케스트레이터 실행):
+- step-02-design-epics: 파티모드 x3
+- step-03-create-stories: 파티모드 x3
+- step-04-final-validation: 파티모드 x3
+합계: 파티모드 9회
+완료 후: git commit `docs(planning): Epics complete -- 9 party modes`
+
+#### 6. 구현 준비 점검
+팀원에게 Skill: `bmad-bmm-check-implementation-readiness` 실행 지시.
+스텝별 파티모드 (오케스트레이터 실행):
+- step-01-document-discovery: 파티모드 x3
+- step-02-prd-analysis: 파티모드 x3
+- step-03-epic-coverage-validation: 파티모드 x3
+- step-04-ux-alignment: 파티모드 x3
+- step-05-epic-quality-review: 파티모드 x3
+- step-06-final-assessment: 파티모드 x3
+합계: 파티모드 18회
+완료 후: git commit `docs(planning): Readiness complete -- 18 party modes`
+
+#### 7. 스프린트 플래닝
+팀원에게 Skill: `bmad-bmm-sprint-planning` 실행 지시.
+-> sprint-status.yaml 생성
+완료 후: git commit `docs(planning): Sprint planning complete`
+
+### Step 3: 최종 검증
+- 총 파티모드 횟수 확인 (~126회)
+- 개별 커밋 7개 확인: `git log --oneline`
+- 팀원 종료
+
+### Step 4: 개발 안내
+- "기획 완료! `/bmad-full-pipeline [첫 스토리 ID]`로 개발을 시작하세요"
+
+---
+
+## 모드 B: 스토리 개발 파이프라인 (스토리 ID)
+
+### 실행 대상
+- 인자가 있으면: 해당 스토리 ID (예: `3-1`)
+- 인자가 없으면: sprint-status.yaml에서 `backlog` 상태인 첫 번째 스토리
+
+### Step 0: 팀 준비
+1. `TeamCreate`로 팀 생성 (이름: `bmad-pipeline`)
+2. `TaskCreate`로 대상 스토리의 태스크 등록
+
+### Step 1: 팀원에게 5단계 파이프라인 위임
+`Agent` 도구로 팀원 생성. 아래 프롬프트를 **그대로** 전달:
+
+```
+너는 BMAD 파이프라인 실행자야. 아래 5단계를 **순서대로, 빠짐없이** Skill 도구로 실행해.
+모든 단계에서 YOLO 모드 -- 확인 프롬프트 나오면 자동 진행, 사용자 입력 기다리지 마.
+
+중요: 이 스토리는 **진짜 동작하는 기능**을 만들어야 해. stub/mock/placeholder 페이지 금지.
+
+대상 스토리: [스토리 ID]
+
+### 1단계: create-story
+Skill 도구 호출: skill="bmad-bmm-create-story", args="[스토리 ID]"
+- 스토리 파일이 이미 존재하면 이 단계 건너뛰기 가능
+
+### 2단계: dev-story
+Skill 도구 호출: skill="bmad-bmm-dev-story", args="[스토리 파일 경로]"
+- 구현 완료까지 진행
+- stub/mock 금지 -- 진짜 동작하는 코드만
+
+### 3단계: TEA (Test Architect 자동 테스트 생성)
+Skill 도구 호출: skill="bmad-tea-automate"
+- 이 스토리에서 변경/추가된 코드에 대한 리스크 기반 테스트 생성
+
+### 4단계: QA 검증
+Skill 도구 호출: skill="bmad-agent-bmm-qa"
+- 메뉴 표시 금지 -- 바로 자동 실행
+- 기능 검증 + 엣지케이스 확인
+- "실제로 동작하는지" 확인 (stub API = 실패)
+
+### 5단계: code-review
+Skill 도구 호출: skill="bmad-bmm-code-review"
+- 이슈 발견 시 자동 수정
+- 수정 후 재리뷰 불필요 (자동 수정 1회로 충분)
+
+### 완료 후
+SendMessage로 오케스트레이터에게 아래 형식으로 보고:
+
+[BMAD 체크리스트 -- Story [스토리 ID]]
+[x] 1. create-story 완료
+[x] 2. dev-story 완료
+[x] 3. TEA 완료
+[x] 4. QA 완료
+[x] 5. code-review 완료
+[x] 6. 실제 동작 확인 완료 (stub/mock 아님)
+
+요약: (무엇을 구현했는지 1-2줄)
+테스트: (생성된 테스트 수)
+이슈: (code-review에서 발견/수정된 이슈 수)
+실제 동작: (stub이 아닌 진짜 기능임을 확인)
+```
+
+### Step 2: 대기 및 결과 확인
+- 팀원 작업 완료 대기
+- SendMessage로 체크리스트 보고 수신
+- 6/6 체크 확인 (실제 동작 확인 포함)
+
+### Step 3: 커밋 + 푸시
+- 체크리스트 6/6 확인 후 커밋 + 푸시
+- 커밋 메시지: `feat: Story [ID] [스토리 제목] -- [구현 요약] + TEA [N]건`
+- sprint-status.yaml 해당 스토리를 `done`으로 업데이트
+- 배포 보고 테이블 출력
+
+### Step 4: 다음 스토리 확인
+- 같은 에픽에 남은 스토리가 있으면 사용자에게 알림
+- 에픽의 마지막 스토리였으면: "에픽 완료! `/bmad-bmm-retrospective` 실행하시겠어요?" 안내

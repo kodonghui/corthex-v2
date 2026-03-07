@@ -1,159 +1,145 @@
 # CLAUDE.md -- CORTHEX v2
 
-## User Info
-- Non-developer. No dev jargon. Explain simply and in detail.
-- Always use formal Korean (jondenmal)
+## 사용자 정보
+- 비개발자. 개발 용어 사용 금지. 쉽고 자세하게 설명할 것
+- 항상 존댓말 사용
 
-## Deploy Rules
-- Auto commit + push on completion (never ask)
-- main push -> GitHub Actions auto deploy -> Cloudflare cache purge
-- Post-commit deploy report: build number(#N) + changes + where to verify, in table format
+## 배포 규칙
+- 완료 시 자동 커밋 + 푸시 (묻지 말 것)
+- main push -> GitHub Actions 자동 배포 -> Cloudflare 캐시 퍼지
+- 커밋 후 배포 보고: 빌드 번호(#N) + 변경 내용 + 확인 위치, 테이블 형식
 
-## v1 Feature Spec (Top Priority Reference)
-- Path: `_bmad-output/planning-artifacts/v1-feature-spec.md`
-- Contains ALL features that **actually worked** in v1
-- **Reference this document at every planning/design/implementation stage**
-- Core principle: "If it worked in v1, it MUST work in v2"
-- Build REAL working features, not CRUD pages or stubs
+## v1 기능 스펙 (최우선 참조)
+- 경로: `_bmad-output/planning-artifacts/v1-feature-spec.md`
+- v1에서 **실제로 동작했던** 모든 기능 포함
+- **기획/설계/구현 모든 단계에서 이 문서를 참조할 것**
+- 핵심 원칙: "v1에서 동작했으면 v2에서도 반드시 동작해야 한다"
+- stub/mock/CRUD 페이지가 아닌 진짜 동작하는 기능을 만들 것
 
-## BMAD Workflow Rules (Absolute Rules -- violation = entire work deleted)
+## v2 핵심 방향 (v1과 다른 점)
+- 29명 고정이 아님 -- 관리자가 **부서/인간직원/AI직원을 자유롭게 생성-수정-삭제** 가능
+- 동적 조직 관리가 핵심. 에이전트 수는 관리자가 결정
 
-### Planning Pipeline (brief -> PRD -> architecture -> UX -> epics)
-Run with `/bmad-full-pipeline planning`. Party mode required at every internal step.
+## BMAD 워크플로우 규칙 (절대 규칙 -- 위반 시 전체 작업 삭제)
 
-### Party Mode Rule: Step-by-Step (MANDATORY)
-- Each planning stage has internal steps (e.g., Brief has vision, users, metrics, scope)
-- **After EACH internal step**: run party mode **minimum 3 times**
-- Party mode runs in YOLO mode (auto-proceed, no menus, no waiting)
-- Party mode MUST verify:
-  1. Does this step cover relevant v1 features from v1-feature-spec.md?
-  2. Is it real working functionality, not CRUD shells or stubs?
-  3. Is there a concrete implementation plan, not mock/placeholder?
-- If any answer is "no" -> fix document -> party mode continues
-- Expected total: ~126 party modes across full planning pipeline
+### 기획 파이프라인 (brief -> PRD -> architecture -> UX -> epics)
+`/bmad-full-pipeline planning`으로 실행. 모든 내부 스텝마다 파티모드 필수.
 
-### Party Mode Evidence Rules (MANDATORY -- no evidence = not done)
-Party mode execution MUST leave verifiable evidence. Without evidence, it is treated as NOT executed.
+### 파티모드 규칙: 오케스트레이터 주도 (필수)
+- **파티모드는 오케스트레이터(메인 대화)가 직접 실행**. 팀원이 파티모드를 실행하는 것 금지.
+- 팀원은 문서/스텝만 작성하고 보고 -> 오케스트레이터가 `Skill("bmad-party-mode")` 직접 호출.
+- 각 기획 단계의 내부 스텝마다 파티모드를 **최소 3회** 실행 (총 ~126회)
+- 파티모드는 YOLO 모드 (자동 진행, 메뉴 없음, 대기 없음)
+- 파티모드에서 확인할 것:
+  1. 실제 동작하는 기능인가? (stub/mock이 아닌가?)
+  2. 구체적인 구현 계획이 있는가? (placeholder가 아닌가?)
+  3. v1-feature-spec.md의 해당 기능을 커버하는가?
+- 문제 발견 시 -> 팀원에게 수정 지시 -> 수정 후 파티모드 재실행
+- 합의 기준: 주요 반대 의견 0개, 남은 의견이 모두 "사소한 것"일 때
 
-**1. Log files per party mode round:**
-- Path: `_bmad-output/party-logs/{stage}-step{N}-round{M}.md`
-- Example: `_bmad-output/party-logs/brief-step02-round1.md`
-- Required content in each log:
-  - Timestamp
-  - Step name and document section being reviewed
-  - **Actual quotes from the document** (minimum 3 lines quoted)
-  - Each agent's specific feedback (what they said, not "approved")
-  - v1-feature-spec.md checklist items verified
-  - Changes made (before/after diff, or "no changes needed" with justification)
-  - Consensus result (pass/fail + remaining objections)
+### 기획 파이프라인: 항상 새로 생성 (필수)
+- 기획 파이프라인은 모든 문서를 **처음부터 새로** 만들 것
+- 기존 기획 문서가 있어도 덮어쓰기 -- 건너뛰기 금지
+- "파일이 이미 있다"는 건너뛸 이유가 아님
 
-**2. Incremental commits (timestamp evidence):**
-- After completing each planning STAGE (not step): commit document + party logs
-- Commit message format: `docs(planning): {stage} complete -- {N} party modes, {summary}`
-- Example: `docs(planning): Brief complete -- 12 party modes, v1 coverage 16/16`
-- This creates git timestamp gaps that prove real execution time
-- **FORBIDDEN**: committing all stages in a single commit
+### 단계별 개별 커밋 (필수)
+- 각 기획 단계 완료 후 즉시 커밋
+- 커밋 메시지 형식: `docs(planning): {stage} complete -- {N} party modes`
+- 마지막에 한꺼번에 커밋하는 것 **금지**
 
-**3. Document-embedded summary:**
-- At the end of each major section in the planning document, append:
-  ```
-  <!-- Party Mode: {N} rounds, consensus reached, key feedback: {1-line summary} -->
-  ```
+### 스토리 개발 필수 순서 (하나도 빠짐없이 BMAD 스킬 호출)
+매 스토리마다 아래 5단계를 **반드시 BMAD 스킬로** 실행할 것.
 
-### Planning Pipeline: Always Recreate (MANDATORY)
-- Planning pipeline MUST create ALL documents fresh, even if files already exist
-- Existing planning artifacts are OVERWRITTEN, never reused or skipped
-- "File already exists" is NOT a reason to skip -- the whole point is to redo them
-- This prevents reusing stale documents from previous pipelines
+1. **create-story**: `bmad-bmm-create-story` 스킬 -> 스토리 파일 생성
+2. **dev-story**: `bmad-bmm-dev-story` 스킬 -> 구현 (**stub/mock 금지, 진짜 동작하는 코드만**)
+3. **TEA automate**: `bmad-tea-automate` 스킬 -> 리스크 기반 자동 테스트 생성
+4. **QA 검증**: `bmad-agent-bmm-qa` 에이전트 -> 기능 검증 + 엣지케이스 확인
+5. **code-review**: `bmad-bmm-code-review` 스킬 -> 코드 리뷰 (이슈 발견 시 자동 수정)
 
-### Story Dev Required Order (ALL steps via BMAD skills, no exceptions)
-Every story must execute these 5 steps **via BMAD skills only**. No direct implementation/review/testing.
+### 에픽 완료 시
+- `bmad-bmm-retrospective` 스킬 실행 필수
 
-1. **create-story**: `bmad-bmm-create-story` skill -> story file
-2. **dev-story**: `bmad-bmm-dev-story` skill -> implementation (**no stubs, real working code**)
-3. **TEA automate**: `bmad-tea-automate` skill -> risk-based test generation
-4. **QA verification**: `bmad-agent-bmm-qa` agent -> feature + edge case verification
-5. **code-review**: `bmad-bmm-code-review` skill -> code review (auto-fix issues)
+### BMAD 에이전트 자동 실행 규칙
+- BMAD 에이전트(QA 등) 실행 시 **메뉴 표시하지 말고 바로 작업 실행**할 것
+- QA 에이전트 -> 메뉴 안 보여주고 바로 [QA] Automate 실행
+- 에이전트에서 사용자 입력 기다리지 말 것 -- 알아서 자동 진행
+- BMAD 워크플로우 내 확인/선택 프롬프트도 자동 진행 (YOLO 모드)
 
-### On Epic Completion
-- Run `bmad-bmm-retrospective` skill (mandatory)
+### 오케스트레이터 프로토콜 (TeamCreate 팀 위임)
+메인 대화는 **오케스트레이터**. 실제 작업은 **TeamCreate로 생성한 팀원**이 한다.
+팀원은 tmux 분할 창에서 실행되어 사용자가 실시간으로 관찰 가능.
 
-### BMAD Agent Auto-Execution Rules
-- BMAD agents (QA etc.): **NO menu display, execute immediately**
-- QA agent -> skip menu, run [QA] Automate directly
-- Never wait for user input in agents -- auto-proceed
-- All confirmation/selection prompts in BMAD workflow: auto-proceed (YOLO mode)
+**기획 파이프라인 실행:**
+1. `TeamCreate`로 팀 생성
+2. 팀원에게 스텝 하나씩 지시 -> 팀원 완료 보고
+3. **오케스트레이터가 직접** `Skill("bmad-party-mode")` 3회 호출
+4. 이슈 발견 시 팀원에게 수정 지시 -> 파티모드 재실행
+5. 통과 -> 다음 스텝 지시 -> 반복
+6. 단계 완료 -> 커밋 -> 다음 단계
 
-### Orchestrator Protocol (TeamCreate Delegation)
-Main conversation = **orchestrator (team leader)**. Actual work = **team members via TeamCreate**.
-Team members run in tmux split panes so user can observe in real-time.
+**스토리 개발 실행:**
+1. `TeamCreate`로 팀 생성
+2. `TaskCreate`로 스토리별 할 일 등록
+3. `Agent`(team_name 지정)로 팀원 생성 -> BMAD 5단계 전체를 지시
+4. 팀원이 직렬로 create-story -> dev -> TEA -> QA -> CR 실행 (tmux에서 보임)
+5. 오케스트레이터는 대기 -- 완료 보고 오면 체크리스트 확인 -> 커밋+푸시
+6. 다음 스토리 반복
 
-**Execution:**
-1. `TeamCreate` to create team
-2. `TaskCreate` to register story tasks
-3. `Agent`(team_name) to create member -> instruct full BMAD 5-step pipeline
-4. Member executes serially: create-story -> dev -> TEA -> QA -> CR (visible in tmux)
-5. Orchestrator waits -- on completion report, verify checklist -> commit+push
-6. Next story
+**팀원 프롬프트에 반드시 포함:**
+- BMAD 5단계 스킬명 + 인자 + 실행 순서
+- YOLO 모드 (확인 프롬프트 자동 진행)
+- QA 에이전트 메뉴 표시 금지 -- 바로 실행
+- code-review 이슈 발견 시 자동 수정
+- **stub/mock 금지 -- 진짜 동작하는 코드만**
+- 완료 후 SendMessage로 오케스트레이터에게 결과 보고
 
-**Team member prompt MUST include:**
-- BMAD 5-step skill names + args + execution order
-- YOLO mode (auto-proceed all prompts)
-- QA agent: no menu, execute immediately
-- code-review: auto-fix on issues
-- **v1-feature-spec.md reference** (check how feature worked in v1)
-- **No stubs -- real working code only**
-- On completion: SendMessage report to orchestrator
+**에픽 단위 운영:**
+- 에픽 내 스토리를 순차 처리 (의존성)
+- 에픽 완료 후 retrospective도 팀원에게 위임
+- 컨텍스트가 길어지면 새 대화로 이어갈 것
 
-**Epic-level operation:**
-- Process stories sequentially within epic (dependencies)
-- Delegate retrospective to team member after epic completion
-- Start new conversation if context gets long
-
-### Pre-Commit Hard Checklist
-Before EVERY story commit, print these 6 items. ALL must be checked to commit:
+### 커밋 전 하드 체크리스트
+매 스토리 커밋 직전, 아래 6개 항목을 출력. 전부 체크되어야만 커밋 가능:
 ```
-[BMAD Checklist -- Story X-Y]
-[ ] 1. create-story done (team agent or skill)
-[ ] 2. dev-story done (team agent or skill)
-[ ] 3. TEA done (team agent or skill)
-[ ] 4. QA done (team agent or skill)
-[ ] 5. code-review done (team agent or skill)
-[ ] 6. Real functionality confirmed (not stub/mock)
+[BMAD 체크리스트 -- Story X-Y]
+[ ] 1. create-story 완료 (팀 에이전트 또는 스킬)
+[ ] 2. dev-story 완료 (팀 에이전트 또는 스킬)
+[ ] 3. TEA 완료 (팀 에이전트 또는 스킬)
+[ ] 4. QA 완료 (팀 에이전트 또는 스킬)
+[ ] 5. code-review 완료 (팀 에이전트 또는 스킬)
+[ ] 6. 실제 동작 확인 (stub/mock 아님)
 ```
-- Any unchecked = no commit. Run missing step first.
-- No rationalizing: "good enough", "TEA caught bugs so skip QA", etc.
+- 하나라도 미완료이면 커밋 금지. 빠진 단계를 먼저 실행할 것
+- "이미 충분하다", "TEA에서 버그 잡았으니 QA 생략" 등의 합리화 금지
 
-### Absolutely Forbidden
-- Implementing code without BMAD skills
-- Code reviewing without BMAD skills
-- Skipping QA/TEA steps
-- Skipping this order under ANY circumstance (YOLO, context compression, "hurry", "going to sleep")
-- Deciding "I already know the content so I don't need the skill"
-- Showing BMAD agent menus and asking user to choose
-- **Treating stub/mock as "implementation complete"** -- only real working code counts
-- **Skipping planning stages because "file already exists"** -- always recreate
-- **Committing all planning stages in a single commit** -- one commit per stage minimum
-- **Claiming party mode was done without log files in `_bmad-output/party-logs/`**
+### 절대 금지 사항
+- BMAD 스킬 없이 직접 코드 구현하는 것
+- BMAD 스킬 없이 직접 코드 리뷰하는 것
+- QA/TEA 단계를 건너뛰는 것
+- 어떤 상황에서도 이 순서를 생략하지 말 것
+- "이미 내용을 알고 있으니 스킬 안 써도 된다"는 판단 금지
+- BMAD 에이전트 메뉴 보여주면서 사용자한테 선택하라고 하는 것
+- **stub/mock/placeholder를 "구현 완료"로 처리하는 것**
+- **기획 단계를 "파일이 이미 있으니" 건너뛰는 것**
+- **기획 단계를 한 커밋에 몰아서 커밋하는 것**
+- **팀원이 파티모드를 실행하는 것** -- 파티모드는 오케스트레이터만 실행
 
-### General Rules
-- For new features/projects: follow `_bmad-output/BMAD-WORKFLOW.md` stages
+### Party Mode 실행 규칙 (매우 중요)
+- **기획 파이프라인**: 오케스트레이터가 각 내부 스텝마다 파티모드 3회 직접 실행 (총 ~126회)
+- Party Mode는 **합의가 날 때까지 반복 실행**할 것:
+  - 에이전트들이 문제/우려사항을 제기하면 -> 문서 수정 -> Party Mode 재실행
+  - 모든 에이전트가 진행 동의 또는 이견 없음 상태가 될 때까지 반복
+  - 합의 기준: 주요 반대 의견 0개, 남은 의견이 모두 "사소한 것"일 때
+- Party Mode 없이 다음 단계로 넘어가려 하면 반드시 경고하고 Party Mode를 먼저 실행할 것
 
-### Party Mode Execution Rules (Critical)
-- ALL planning steps require party mode (per-step, minimum 3 times each)
-- Party mode repeats **until consensus**:
-  - Agents raise concerns -> fix document -> next party mode
-  - Continue until all agents agree to proceed or no major objections remain
-  - Consensus = 0 major objections, remaining items classified as "minor"
-- Attempting to skip party mode -> warning + run party mode first
-- **v1-feature-spec.md checklist verification mandatory in every party mode**
-- **No log file in `_bmad-output/party-logs/` = party mode not executed = violation**
+## 작업 효율
+- BMAD 파이프라인은 반드시 **TeamCreate 팀원**에게 위임 (tmux에서 사용자가 볼 수 있게)
+- 독립적 조사/탐색은 Agent 도구(서브에이전트)도 가능하지만, 개발 작업은 팀원 우선
+- 오케스트레이터는 팀원 대기 중 sleep하며, 완료 보고 시 깨어나서 처리
 
-## Work Efficiency
-- BMAD pipeline MUST be delegated to **TeamCreate team members** (visible in tmux)
-- Independent research/exploration can use Agent tool (subagents), but dev work = team members first
-- Orchestrator sleeps while waiting for team member, wakes on completion report
-
-## Coding Conventions
-- Filenames: kebab-case lowercase
-- Import paths must match actual casing from `git ls-files` (Linux CI is case-sensitive)
+## 코딩 컨벤션
+- 파일명: kebab-case 소문자
+- import 경로는 `git ls-files` 기준 실제 케이싱과 반드시 일치 (Linux CI 대소문자 구분)
+- 컴포넌트명: PascalCase
+- API 응답: `{ success: true, data }` / `{ success: false, error: { code, message } }`
+- 테스트: bun:test (서버)
