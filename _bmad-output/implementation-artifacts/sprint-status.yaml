@@ -96,7 +96,7 @@ development_status:
   2-1-department-crud-api: done
   2-2-agent-crud-api: done
   2-3-cascade-analysis-engine: done
-  2-4-org-template-apply-api: backlog
+  2-4-org-template-apply-api: done
   2-5-org-tree-view-ui-admin: backlog
   2-6-department-management-ui-admin: backlog
   2-7-agent-management-soul-editor-ui-admin: backlog
@@ -113,9 +113,9 @@ development_status:
   3-1-llm-provider-adapters-claude-gpt-gemini: done
   3-2-llm-router-3tier-model-assignment: done
   3-3-provider-fallback-strategy: done
-  3-4-agent-runner-stateless-executor: backlog
-  3-5-cost-recording-system-models-yaml: backlog
-  3-6-batch-collector-batch-execute: backlog
+  3-4-agent-runner-stateless-executor: done
+  3-5-cost-recording-system-models-yaml: in-progress
+  3-6-batch-collector-batch-execute: in-progress
   3-7-llm-integration-fallback-test: backlog
   epic-3-retrospective: optional
 

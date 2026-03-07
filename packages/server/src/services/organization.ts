@@ -1,9 +1,10 @@
 import { db } from '../db'
-import { departments, agents, orchestrationTasks, costRecords, departmentKnowledge } from '../db/schema'
-import { eq, and, count, ne, isNull, inArray, sum } from 'drizzle-orm'
+import { departments, agents, orchestrationTasks, costRecords, departmentKnowledge, orgTemplates } from '../db/schema'
+import { eq, and, count, ne, isNull, inArray, sum, or } from 'drizzle-orm'
 import { withTenant, scopedWhere, scopedInsert } from '../db/tenant-helpers'
 import { createAuditLog, AUDIT_ACTIONS } from './audit-log'
 import type { ActorType } from './audit-log'
+import type { TemplateData } from './seed.service'
 
 export interface DepartmentInput {
   name: string
@@ -675,4 +676,192 @@ export async function executeCascade(
       analysis,
     },
   }
+}
+
+// ============================================================
+// Org Template Functions
+// ============================================================
+
+export interface TemplateApplySummary {
+  templateId: string
+  templateName: string
+  departmentsCreated: number
+  departmentsSkipped: number
+  agentsCreated: number
+  agentsSkipped: number
+  details: Array<{
+    departmentName: string
+    action: 'created' | 'skipped'
+    departmentId: string
+    agentsCreated: string[]
+    agentsSkipped: string[]
+  }>
+}
+
+/**
+ * Get all org templates visible to a company.
+ * Returns builtin templates (companyId=null) + company-specific templates.
+ */
+export async function getOrgTemplates(companyId: string) {
+  return db
+    .select()
+    .from(orgTemplates)
+    .where(
+      and(
+        eq(orgTemplates.isActive, true),
+        or(
+          isNull(orgTemplates.companyId),
+          eq(orgTemplates.companyId, companyId),
+        ),
+      ),
+    )
+}
+
+/**
+ * Get a single org template by ID, visible to the given company.
+ */
+export async function getOrgTemplateById(companyId: string, templateId: string) {
+  const [tmpl] = await db
+    .select()
+    .from(orgTemplates)
+    .where(
+      and(
+        eq(orgTemplates.id, templateId),
+        or(
+          isNull(orgTemplates.companyId),
+          eq(orgTemplates.companyId, companyId),
+        ),
+      ),
+    )
+    .limit(1)
+  return tmpl ?? null
+}
+
+/**
+ * Apply an org template: bulk-create departments + agents.
+ * Merge strategy: skip existing departments/agents by name within the company.
+ */
+export async function applyTemplate(
+  tenant: TenantActor,
+  templateId: string,
+): Promise<{ data: TemplateApplySummary } | { error: { status: number; message: string; code: string } }> {
+  // Load template
+  const tmpl = await getOrgTemplateById(tenant.companyId, templateId)
+  if (!tmpl) {
+    return { error: { status: 404, message: '조직 템플릿을 찾을 수 없습니다', code: 'TMPL_001' } }
+  }
+  if (!tmpl.isActive) {
+    return { error: { status: 409, message: '비활성화된 조직 템플릿입니다', code: 'TMPL_002' } }
+  }
+
+  const templateData = tmpl.templateData as TemplateData
+
+  // Pre-load existing departments and agents for merge check
+  const existingDepts = await db
+    .select({ id: departments.id, name: departments.name })
+    .from(departments)
+    .where(
+      and(
+        withTenant(departments.companyId, tenant.companyId),
+        eq(departments.isActive, true),
+      ),
+    )
+  const existingDeptMap = new Map(existingDepts.map((d) => [d.name, d.id]))
+
+  const existingAgentList = await db
+    .select({ id: agents.id, name: agents.name })
+    .from(agents)
+    .where(withTenant(agents.companyId, tenant.companyId))
+  const existingAgentNames = new Set(existingAgentList.map((a) => a.name))
+
+  const summary: TemplateApplySummary = {
+    templateId,
+    templateName: tmpl.name,
+    departmentsCreated: 0,
+    departmentsSkipped: 0,
+    agentsCreated: 0,
+    agentsSkipped: 0,
+    details: [],
+  }
+
+  for (const dept of templateData.departments) {
+    let departmentId: string
+    let deptAction: 'created' | 'skipped'
+
+    const existingId = existingDeptMap.get(dept.name)
+    if (existingId) {
+      departmentId = existingId
+      deptAction = 'skipped'
+      summary.departmentsSkipped++
+    } else {
+      const [newDept] = await db
+        .insert(departments)
+        .values(scopedInsert(tenant.companyId, {
+          name: dept.name,
+          description: dept.description,
+        }))
+        .returning()
+      departmentId = newDept.id
+      deptAction = 'created'
+      summary.departmentsCreated++
+      existingDeptMap.set(dept.name, departmentId)
+    }
+
+    const detail: (typeof summary.details)[number] = {
+      departmentName: dept.name,
+      action: deptAction,
+      departmentId,
+      agentsCreated: [],
+      agentsSkipped: [],
+    }
+
+    for (const agentDef of dept.agents) {
+      if (existingAgentNames.has(agentDef.name)) {
+        detail.agentsSkipped.push(agentDef.name)
+        summary.agentsSkipped++
+        continue
+      }
+
+      await db
+        .insert(agents)
+        .values(scopedInsert(tenant.companyId, {
+          userId: tenant.userId,
+          departmentId,
+          name: agentDef.name,
+          nameEn: agentDef.nameEn ?? null,
+          role: agentDef.role,
+          tier: agentDef.tier,
+          modelName: agentDef.modelName,
+          soul: agentDef.soul,
+          adminSoul: agentDef.soul,
+          allowedTools: agentDef.allowedTools,
+          status: 'offline',
+        }))
+
+      detail.agentsCreated.push(agentDef.name)
+      summary.agentsCreated++
+      existingAgentNames.add(agentDef.name)
+    }
+
+    summary.details.push(detail)
+  }
+
+  // Audit log
+  await createAuditLog({
+    companyId: tenant.companyId,
+    actorType: actorType(tenant),
+    actorId: tenant.userId,
+    action: AUDIT_ACTIONS.ORG_TEMPLATE_APPLY,
+    targetType: 'org_template',
+    targetId: templateId,
+    metadata: {
+      templateName: tmpl.name,
+      departmentsCreated: summary.departmentsCreated,
+      departmentsSkipped: summary.departmentsSkipped,
+      agentsCreated: summary.agentsCreated,
+      agentsSkipped: summary.agentsSkipped,
+    },
+  })
+
+  return { data: summary }
 }
