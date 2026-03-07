@@ -141,11 +141,11 @@ development_status:
   # ============================================================
   epic-5: in-progress
   5-1-command-router-type-classification: done
-  5-2-chief-of-staff-auto-classify-delegate: backlog
+  5-2-chief-of-staff-auto-classify-delegate: in-progress
   5-3-manager-delegate-parallel-specialist: backlog
   5-4-manager-synthesis-quality-gate: backlog
   5-5-all-sequential-command-processing: backlog
-  5-6-deepwork-autonomous-multistep: backlog
+  5-6-deepwork-autonomous-multistep: done
   5-7-command-center-ui-chat-mention-slash: backlog
   5-8-delegation-chain-realtime-websocket: backlog
   5-9-report-view-feedback: backlog
