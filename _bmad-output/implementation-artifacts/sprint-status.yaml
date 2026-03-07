@@ -139,7 +139,7 @@ development_status:
   # UX: CEO #2 (Command Center)
   # Dependencies: Epic 2 (org data), Epic 4 (tools)
   # ============================================================
-  epic-5: in-progress
+  epic-5: done
   5-1-command-router-type-classification: done
   5-2-chief-of-staff-auto-classify-delegate: done
   5-3-manager-delegate-parallel-specialist: done
@@ -151,7 +151,7 @@ development_status:
   5-9-report-view-feedback: done
   5-10-preset-crud-slash-popup: done
   5-11-orchestration-integration-test: done
-  epic-5-retrospective: optional
+  epic-5-retrospective: done
 
   # ============================================================
   # Phase 1 MVP -- P1 (Should Have)
@@ -163,10 +163,10 @@ development_status:
   # UX: CEO #1 (Dashboard), CEO #7 (Activity Log)
   # Dependencies: Epic 5
   # ============================================================
-  epic-6: backlog
-  6-1-dashboard-aggregation-api: backlog
+  epic-6: in-progress
+  6-1-dashboard-aggregation-api: in-progress
   6-2-operations-dashboard-ui: backlog
-  6-3-activity-log-4tab-api: backlog
+  6-3-activity-log-4tab-api: in-progress
   6-4-activity-log-4tab-ui: backlog
   6-5-websocket-realtime-dashboard-refresh: backlog
   6-6-quick-actions-satisfaction-chart: backlog
