@@ -146,10 +146,10 @@ development_status:
   5-4-manager-synthesis-quality-gate: done
   5-5-all-sequential-command-processing: done
   5-6-deepwork-autonomous-multistep: done
-  5-7-command-center-ui-chat-mention-slash: review
+  5-7-command-center-ui-chat-mention-slash: done
   5-8-delegation-chain-realtime-websocket: done
   5-9-report-view-feedback: done
-  5-10-preset-crud-slash-popup: backlog
+  5-10-preset-crud-slash-popup: in-progress
   5-11-orchestration-integration-test: backlog
   epic-5-retrospective: optional
 

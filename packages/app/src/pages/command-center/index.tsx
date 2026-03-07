@@ -112,6 +112,7 @@ export function CommandCenterPage() {
             messages={messages}
             isLoading={historyLoading}
             onReportClick={handleReportClick}
+            onExampleClick={submitCommand}
           />
           <DelegationChain />
           <CommandInput
@@ -154,6 +155,7 @@ export function CommandCenterPage() {
                   messages={messages}
                   isLoading={historyLoading}
                   onReportClick={handleReportClick}
+                  onExampleClick={submitCommand}
                 />
                 <DelegationChain />
                 <CommandInput

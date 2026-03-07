@@ -14,6 +14,7 @@ const navSections: NavSection[] = [
   {
     items: [
       { to: '/', label: '홈', icon: '🏠' },
+      { to: '/command-center', label: '사령관실', icon: '🎖️' },
     ],
   },
   {

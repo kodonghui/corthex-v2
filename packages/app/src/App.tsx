@@ -20,6 +20,7 @@ const NotificationsPage = lazy(() => import('./pages/notifications').then((m) =>
 const TradingPage = lazy(() => import('./pages/trading').then((m) => ({ default: m.TradingPage })))
 const FilesPage = lazy(() => import('./pages/files').then((m) => ({ default: m.FilesPage })))
 const OrgPage = lazy(() => import('./pages/org').then((m) => ({ default: m.OrgPage })))
+const CommandCenterPage = lazy(() => import('./pages/command-center').then((m) => ({ default: m.CommandCenterPage })))
 
 const queryClient = new QueryClient()
 
@@ -76,6 +77,7 @@ export function App() {
             }
           >
             <Route index element={<Suspense fallback={<PageSkeleton />}><HomePage /></Suspense>} />
+            <Route path="command-center" element={<Suspense fallback={<PageSkeleton />}><CommandCenterPage /></Suspense>} />
             <Route path="chat" element={<Suspense fallback={<PageSkeleton />}><ChatPage /></Suspense>} />
             <Route path="jobs" element={<Suspense fallback={<PageSkeleton />}><JobsPage /></Suspense>} />
             <Route path="reports" element={<Suspense fallback={<PageSkeleton />}><ReportsPage /></Suspense>} />
