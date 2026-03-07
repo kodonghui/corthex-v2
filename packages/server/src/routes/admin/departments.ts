@@ -14,8 +14,16 @@ import {
   getDepartmentById,
   createDepartment,
   updateDepartment,
-  deleteDepartment,
+  analyzeCascade,
+  executeCascade,
 } from '../../services/organization'
+import type { CascadeMode } from '../../services/organization'
+
+function throwIfError(result: { error?: { status: number; message: string; code: string } }): void {
+  if (result.error) {
+    throw new HTTPError(result.error.status, result.error.message, result.error.code)
+  }
+}
 
 export const departmentsRoute = new Hono<AppEnv>()
 
@@ -68,6 +76,15 @@ departmentsRoute.get('/departments/tree', async (c) => {
   return c.json({ data: tree })
 })
 
+// GET /api/admin/departments/:id/cascade-analysis -- cascade impact report (must be before :id)
+departmentsRoute.get('/departments/:id/cascade-analysis', async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+  const result = await analyzeCascade(tenant.companyId, id)
+  throwIfError(result as any)
+  return c.json({ data: (result as any).data })
+})
+
 // GET /api/admin/departments/:id -- single department by ID
 departmentsRoute.get('/departments/:id', async (c) => {
   const tenant = c.get('tenant')
@@ -96,11 +113,18 @@ departmentsRoute.patch('/departments/:id', zValidator('json', updateDepartmentSc
   return c.json({ data: result.data })
 })
 
-// DELETE /api/admin/departments/:id
+// DELETE /api/admin/departments/:id?mode=force|wait_completion
 departmentsRoute.delete('/departments/:id', async (c) => {
   const tenant = c.get('tenant')
   const id = c.req.param('id')
-  const result = await deleteDepartment(tenant, id)
-  if ('error' in result) throw new HTTPError(result.error.status, result.error.message, result.error.code)
-  return c.json({ data: result.data })
+  const modeParam = c.req.query('mode') as CascadeMode | undefined
+
+  // Validate mode if provided
+  if (modeParam && !['force', 'wait_completion'].includes(modeParam)) {
+    throw new HTTPError(400, 'mode는 force 또는 wait_completion만 가능합니다', 'CASCADE_003')
+  }
+
+  const result = await executeCascade(tenant, id, modeParam)
+  throwIfError(result as any)
+  return c.json({ data: (result as any).data })
 })

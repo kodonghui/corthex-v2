@@ -1,6 +1,6 @@
 import { db } from '../db'
-import { departments, agents } from '../db/schema'
-import { eq, and, count, ne, isNull } from 'drizzle-orm'
+import { departments, agents, orchestrationTasks, costRecords, departmentKnowledge } from '../db/schema'
+import { eq, and, count, ne, isNull, inArray, sum } from 'drizzle-orm'
 import { withTenant, scopedWhere, scopedInsert } from '../db/tenant-helpers'
 import { createAuditLog, AUDIT_ACTIONS } from './audit-log'
 import type { ActorType } from './audit-log'
@@ -422,4 +422,257 @@ export async function deactivateAgent(tenant: TenantActor, agentId: string) {
   })
 
   return { data: { message: '에이전트가 비활성화되었습니다' } }
+}
+
+// ============================================================
+// Cascade Analysis & Execution
+// ============================================================
+
+export interface AgentCascadeBreakdown {
+  id: string
+  name: string
+  tier: string
+  isSystem: boolean
+  activeTaskCount: number
+  totalCostUsdMicro: number
+}
+
+export interface CascadeAnalysis {
+  departmentId: string
+  departmentName: string
+  agentCount: number
+  activeTaskCount: number
+  totalCostUsdMicro: number
+  knowledgeCount: number
+  agentBreakdown: AgentCascadeBreakdown[]
+}
+
+/**
+ * Analyze cascade impact of deleting a department.
+ * Returns agent count, active tasks, accumulated costs, knowledge count, and per-agent breakdown.
+ */
+export async function analyzeCascade(
+  companyId: string,
+  departmentId: string,
+): Promise<{ data: CascadeAnalysis } | { error: { status: number; message: string; code: string } }> {
+  // Verify department exists and belongs to tenant
+  const [dept] = await db
+    .select()
+    .from(departments)
+    .where(scopedWhere(departments.companyId, companyId, eq(departments.id, departmentId)))
+    .limit(1)
+
+  if (!dept) {
+    return { error: { status: 404, message: '부서를 찾을 수 없습니다', code: 'DEPT_001' } }
+  }
+
+  if (!dept.isActive) {
+    return { error: { status: 409, message: '이미 비활성화된 부서입니다', code: 'CASCADE_002' } }
+  }
+
+  // Get all agents in this department
+  const deptAgents = await db
+    .select()
+    .from(agents)
+    .where(
+      and(
+        withTenant(agents.companyId, companyId),
+        eq(agents.departmentId, departmentId),
+      ),
+    )
+
+  // Build per-agent breakdown
+  const agentBreakdown: AgentCascadeBreakdown[] = []
+  let totalActiveTaskCount = 0
+  let totalCostUsdMicro = 0
+
+  for (const agent of deptAgents) {
+    // Count active tasks for this agent
+    const [taskResult] = await db
+      .select({ cnt: count() })
+      .from(orchestrationTasks)
+      .where(
+        and(
+          withTenant(orchestrationTasks.companyId, companyId),
+          eq(orchestrationTasks.agentId, agent.id),
+          inArray(orchestrationTasks.status, ['pending', 'running']),
+        ),
+      )
+    const activeTaskCount = Number(taskResult?.cnt ?? 0)
+
+    // Sum costs for this agent
+    const [costResult] = await db
+      .select({ total: sum(costRecords.costUsdMicro) })
+      .from(costRecords)
+      .where(
+        and(
+          withTenant(costRecords.companyId, companyId),
+          eq(costRecords.agentId, agent.id),
+        ),
+      )
+    const agentCost = Number(costResult?.total ?? 0)
+
+    agentBreakdown.push({
+      id: agent.id,
+      name: agent.name,
+      tier: agent.tier,
+      isSystem: agent.isSystem,
+      activeTaskCount,
+      totalCostUsdMicro: agentCost,
+    })
+
+    totalActiveTaskCount += activeTaskCount
+    totalCostUsdMicro += agentCost
+  }
+
+  // Count department knowledge entries
+  const [knowledgeResult] = await db
+    .select({ cnt: count() })
+    .from(departmentKnowledge)
+    .where(
+      and(
+        withTenant(departmentKnowledge.companyId, companyId),
+        eq(departmentKnowledge.departmentId, departmentId),
+      ),
+    )
+  const knowledgeCount = Number(knowledgeResult?.cnt ?? 0)
+
+  return {
+    data: {
+      departmentId,
+      departmentName: dept.name,
+      agentCount: deptAgents.length,
+      activeTaskCount: totalActiveTaskCount,
+      totalCostUsdMicro,
+      knowledgeCount,
+      agentBreakdown,
+    },
+  }
+}
+
+export type CascadeMode = 'wait_completion' | 'force'
+
+/**
+ * Execute cascade deletion of a department.
+ * - mode='force': immediately stops active tasks, unassigns agents, soft-deletes dept
+ * - mode='wait_completion': if active tasks exist, returns pending status; otherwise proceeds
+ * - no mode: proceeds only if no active tasks, otherwise returns 409
+ */
+export async function executeCascade(
+  tenant: TenantActor,
+  departmentId: string,
+  mode?: CascadeMode,
+) {
+  // Run impact analysis first
+  const analysisResult = await analyzeCascade(tenant.companyId, departmentId)
+  if ('error' in analysisResult) {
+    return analysisResult
+  }
+  const analysis = analysisResult.data
+
+  // If no mode specified and active tasks exist, require mode selection
+  if (!mode && analysis.activeTaskCount > 0) {
+    return {
+      error: {
+        status: 409,
+        message: `진행 중인 작업이 ${analysis.activeTaskCount}개 있습니다. mode=force 또는 mode=wait_completion을 지정하세요`,
+        code: 'CASCADE_001',
+        analysis,
+      },
+    }
+  }
+
+  // mode=wait_completion with active tasks: return pending status
+  if (mode === 'wait_completion' && analysis.activeTaskCount > 0) {
+    return {
+      data: {
+        status: 'pending',
+        message: `진행 중인 작업 ${analysis.activeTaskCount}개가 완료될 때까지 대기합니다. 작업 완료 후 다시 삭제를 시도하세요.`,
+        analysis,
+      },
+    }
+  }
+
+  // mode=force: stop active tasks
+  if (mode === 'force' && analysis.activeTaskCount > 0) {
+    const agentIds = analysis.agentBreakdown.map((a) => a.id)
+    if (agentIds.length > 0) {
+      await db
+        .update(orchestrationTasks)
+        .set({
+          status: 'failed',
+          completedAt: new Date(),
+          metadata: { reason: 'cascade_force_stop' },
+        })
+        .where(
+          and(
+            withTenant(orchestrationTasks.companyId, tenant.companyId),
+            inArray(orchestrationTasks.agentId, agentIds),
+            inArray(orchestrationTasks.status, ['pending', 'running']),
+          ),
+        )
+    }
+  }
+
+  // Unassign all agents in department (batch update)
+  if (analysis.agentCount > 0) {
+    const agentIds = analysis.agentBreakdown.map((a) => a.id)
+    await db
+      .update(agents)
+      .set({
+        departmentId: null,
+        isActive: false,
+        status: 'offline',
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          withTenant(agents.companyId, tenant.companyId),
+          inArray(agents.id, agentIds),
+        ),
+      )
+  }
+
+  // Soft-delete department
+  await db
+    .update(departments)
+    .set({ isActive: false, updatedAt: new Date() })
+    .where(scopedWhere(departments.companyId, tenant.companyId, eq(departments.id, departmentId)))
+
+  // Audit log with cascade analysis
+  await createAuditLog({
+    companyId: tenant.companyId,
+    actorType: actorType(tenant),
+    actorId: tenant.userId,
+    action: AUDIT_ACTIONS.ORG_CASCADE_EXECUTE,
+    targetType: 'department',
+    targetId: departmentId,
+    before: {
+      name: analysis.departmentName,
+      agentCount: analysis.agentCount,
+      isActive: true,
+    },
+    after: { isActive: false },
+    metadata: {
+      mode: mode ?? 'immediate',
+      analysis: {
+        activeTaskCount: analysis.activeTaskCount,
+        totalCostUsdMicro: analysis.totalCostUsdMicro,
+        knowledgeCount: analysis.knowledgeCount,
+        agentBreakdown: analysis.agentBreakdown.map((a) => ({
+          id: a.id,
+          name: a.name,
+          activeTaskCount: a.activeTaskCount,
+        })),
+      },
+    },
+  })
+
+  return {
+    data: {
+      status: 'completed',
+      message: `부서 "${analysis.departmentName}"이(가) 삭제되었습니다. 에이전트 ${analysis.agentCount}명 미배속 전환.`,
+      analysis,
+    },
+  }
 }
