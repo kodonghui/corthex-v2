@@ -477,8 +477,12 @@ export const costRecords = pgTable('cost_records', {
   outputTokens: integer('output_tokens').notNull().default(0),
   costUsdMicro: integer('cost_usd_micro').notNull().default(0),  // 1 = $0.000001
   source: varchar('source', { length: 50 }),  // chat, delegation, job, sns
+  isBatch: boolean('is_batch').notNull().default(false),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-})
+}, (table) => ({
+  companyCreatedIdx: index('cost_records_company_created_idx').on(table.companyId, table.createdAt),
+  agentIdx: index('cost_records_agent_idx').on(table.agentId),
+}))
 
 // === 22. telegram_configs — 텔레그램 설정 ===
 export const telegramConfigs = pgTable('telegram_configs', {
