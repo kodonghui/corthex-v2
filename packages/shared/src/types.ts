@@ -310,6 +310,9 @@ export type WsChannel =
   | 'strategy-notes'
   | 'night-job'
   | 'nexus'
+  | 'command'
+  | 'delegation'
+  | 'tool'
 
 export type WsInboundMessage = {
   type: 'subscribe' | 'unsubscribe'

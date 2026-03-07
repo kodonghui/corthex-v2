@@ -133,6 +133,15 @@ eventBus.on('notification', (data: { userId: string; payload: unknown }) => {
 eventBus.on('night-job', (data: { companyId: string; payload: unknown }) => {
   broadcastToCompany(data.companyId, 'night-job', data.payload)
 })
+eventBus.on('command', (data: { companyId: string; payload: unknown }) => {
+  broadcastToCompany(data.companyId, 'command', data.payload)
+})
+eventBus.on('delegation', (data: { companyId: string; payload: unknown }) => {
+  broadcastToCompany(data.companyId, 'delegation', data.payload)
+})
+eventBus.on('tool', (data: { companyId: string; payload: unknown }) => {
+  broadcastToCompany(data.companyId, 'tool', data.payload)
+})
 
 // 프로덕션: Bun 네이티브 정적 파일 서빙 (SPA 폴백 포함)
 if (isProd) {

@@ -149,6 +149,19 @@ export async function handleSubscription(
       break
     }
 
+    case 'command':
+    case 'delegation':
+    case 'tool': {
+      // 같은 companyId만 구독 가능
+      const orchCompanyId = id || client.companyId
+      if (orchCompanyId !== client.companyId) {
+        ws.send(JSON.stringify({ type: 'error', code: 'FORBIDDEN', channel }))
+        return
+      }
+      client.subscriptions.add(`${channel}::${client.companyId}`)
+      break
+    }
+
     default:
       ws.send(JSON.stringify({ type: 'error', code: 'UNKNOWN_CHANNEL', channel }))
       return
