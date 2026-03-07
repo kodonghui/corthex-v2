@@ -7,6 +7,7 @@ import { users, companies, adminUsers, invitations } from '../db/schema'
 import { createToken, authMiddleware } from '../middleware/auth'
 import { HTTPError } from '../middleware/error'
 import { logActivity } from '../lib/activity-logger'
+import { deployOrganization } from '../services/agent-org-deployer'
 import type { AppEnv } from '../types'
 
 export const authRoute = new Hono<AppEnv>()
@@ -76,6 +77,9 @@ authRoute.post('/auth/register', zValidator('json', registerSchema), async (c) =
       role: users.role,
     })
 
+  // 29-Agent Organization 자동 배치
+  const orgResult = await deployOrganization(company.id, user.id)
+
   // JWT 발급
   const token = await createToken({
     sub: user.id,
@@ -90,7 +94,7 @@ authRoute.post('/auth/register', zValidator('json', registerSchema), async (c) =
     actorType: 'user',
     actorId: user.id,
     actorName: user.name,
-    action: `회사 등록: ${companyName} (${slug})`,
+    action: `회사 등록: ${companyName} (${slug}) — ${orgResult.agentCount}명 에이전트 배치`,
   })
 
   return c.json({

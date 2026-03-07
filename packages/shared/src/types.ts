@@ -34,13 +34,19 @@ export type User = {
 }
 
 // === 에이전트 ===
+export type AgentTier = 'manager' | 'specialist' | 'worker'
+
 export type Agent = {
   id: string
   companyId: string
   userId: string
   name: string
+  nameEn: string | null
   role: string
+  tier: AgentTier
+  modelName: string
   departmentId: string | null
+  reportTo: string | null
   soul: string
   status: AgentStatus
   createdAt: Date

@@ -85,8 +85,8 @@ development_status:
   # Epic 3: Agent Organization & Soul System
   # FRs: FR14-FR18
   # ============================================================
-  epic-3: backlog
-  3-1-29-agent-organization-deployment: backlog
+  epic-3: in-progress
+  3-1-29-agent-organization-deployment: done
   3-2-soul-editor-web-ui-markdown: backlog
   3-3-department-knowledge-injection: backlog
   epic-3-retrospective: optional

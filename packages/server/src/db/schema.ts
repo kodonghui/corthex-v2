@@ -16,6 +16,7 @@ export const activityLogTypeEnum = pgEnum('activity_log_type', ['chat', 'delegat
 export const activityPhaseEnum = pgEnum('activity_phase', ['start', 'end', 'error'])
 export const apiKeyScopeEnum = pgEnum('api_key_scope', ['company', 'user'])
 export const invitationStatusEnum = pgEnum('invitation_status', ['pending', 'accepted', 'expired', 'revoked'])
+export const agentTierEnum = pgEnum('agent_tier', ['manager', 'specialist', 'worker'])
 
 // === 1. companies — 회사 (테넌트 최상위 단위) ===
 export const companies = pgTable('companies', {
@@ -113,6 +114,10 @@ export const agents = pgTable('agents', {
   departmentId: uuid('department_id').references(() => departments.id),
   name: varchar('name', { length: 100 }).notNull(),
   role: varchar('role', { length: 200 }),
+  tier: agentTierEnum('tier').notNull().default('specialist'),
+  nameEn: varchar('name_en', { length: 100 }),
+  modelName: varchar('model_name', { length: 100 }).notNull().default('claude-haiku-4-5'),
+  reportTo: uuid('report_to'),  // self-reference to parent agent
   soul: text('soul'),  // 마크다운 성격 정의
   adminSoul: text('admin_soul'),  // 관리자가 설정한 원본 소울 (초기화용)
   status: agentStatusEnum('status').notNull().default('offline'),

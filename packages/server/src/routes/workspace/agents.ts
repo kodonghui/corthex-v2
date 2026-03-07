@@ -22,15 +22,59 @@ workspaceAgentsRoute.get('/agents', async (c) => {
     .select({
       id: agents.id,
       name: agents.name,
+      nameEn: agents.nameEn,
       role: agents.role,
+      tier: agents.tier,
+      modelName: agents.modelName,
       status: agents.status,
       isSecretary: agents.isSecretary,
       departmentId: agents.departmentId,
+      reportTo: agents.reportTo,
     })
     .from(agents)
     .where(and(eq(agents.companyId, tenant.companyId), eq(agents.isActive, true)))
 
   return c.json({ data: result })
+})
+
+// GET /api/workspace/agents/hierarchy — 전체 에이전트 조직도 (트리 구조)
+workspaceAgentsRoute.get('/agents/hierarchy', async (c) => {
+  const tenant = c.get('tenant')
+
+  const allAgents = await db
+    .select({
+      id: agents.id,
+      name: agents.name,
+      nameEn: agents.nameEn,
+      role: agents.role,
+      tier: agents.tier,
+      modelName: agents.modelName,
+      status: agents.status,
+      isSecretary: agents.isSecretary,
+      departmentId: agents.departmentId,
+      reportTo: agents.reportTo,
+    })
+    .from(agents)
+    .where(and(eq(agents.companyId, tenant.companyId), eq(agents.isActive, true)))
+
+  // Build tree: find roots (reportTo === null), then recursively attach children
+  type AgentNode = typeof allAgents[number] & { children: AgentNode[] }
+
+  const agentById = new Map<string, AgentNode>()
+  for (const a of allAgents) {
+    agentById.set(a.id, { ...a, children: [] })
+  }
+
+  const roots: AgentNode[] = []
+  for (const node of agentById.values()) {
+    if (node.reportTo && agentById.has(node.reportTo)) {
+      agentById.get(node.reportTo)!.children.push(node)
+    } else {
+      roots.push(node)
+    }
+  }
+
+  return c.json({ data: roots })
 })
 
 // GET /api/workspace/agents/delegation-rules — 회사 전체 위임 규칙 조회
@@ -77,11 +121,15 @@ workspaceAgentsRoute.get('/agents/:id', async (c) => {
     .select({
       id: agents.id,
       name: agents.name,
+      nameEn: agents.nameEn,
       role: agents.role,
+      tier: agents.tier,
+      modelName: agents.modelName,
       soul: agents.soul,
       adminSoul: agents.adminSoul,
       status: agents.status,
       departmentId: agents.departmentId,
+      reportTo: agents.reportTo,
     })
     .from(agents)
     .where(and(eq(agents.id, id), eq(agents.companyId, tenant.companyId)))
@@ -94,7 +142,7 @@ workspaceAgentsRoute.get('/agents/:id', async (c) => {
 
 // PATCH /api/workspace/agents/:id/soul — 에이전트 소울 수정 (자기 에이전트만)
 const updateSoulSchema = z.object({
-  soul: z.string().min(1).max(2000),
+  soul: z.string().min(1).max(50000),
 })
 
 workspaceAgentsRoute.patch('/agents/:id/soul', zValidator('json', updateSoulSchema), async (c) => {
