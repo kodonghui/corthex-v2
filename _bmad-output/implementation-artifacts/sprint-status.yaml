@@ -165,7 +165,7 @@ development_status:
   # ============================================================
   epic-6: in-progress
   6-1-dashboard-aggregation-api: done
-  6-2-operations-dashboard-ui: backlog
+  6-2-operations-dashboard-ui: in-progress
   6-3-activity-log-4tab-api: review
   6-4-activity-log-4tab-ui: backlog
   6-5-websocket-realtime-dashboard-refresh: backlog

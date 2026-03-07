@@ -25,6 +25,7 @@ import { jobsRoute } from './routes/workspace/jobs'
 import { snsRoute } from './routes/workspace/sns'
 import { snsAccountsRoute } from './routes/workspace/sns-accounts'
 import { activityLogRoute } from './routes/workspace/activity-log'
+import { activityTabsRoute } from './routes/workspace/activity-tabs'
 import { notificationsRoute } from './routes/workspace/notifications'
 import { dashboardRoute } from './routes/workspace/dashboard'
 import { telegramRoute } from './routes/workspace/telegram'
@@ -103,6 +104,7 @@ app.route('/api/workspace/jobs', jobsRoute)
 app.route('/api/workspace', snsRoute)
 app.route('/api/workspace/sns-accounts', snsAccountsRoute)
 app.route('/api/workspace', activityLogRoute)
+app.route('/api/workspace', activityTabsRoute)
 app.route('/api/workspace', notificationsRoute)
 app.route('/api/workspace', dashboardRoute)
 app.route('/api/workspace', telegramRoute)

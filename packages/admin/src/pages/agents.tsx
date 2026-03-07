@@ -174,8 +174,8 @@ export function AgentsPage() {
   })
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, ...body }: { id: string } & Record<string, unknown>) =>
-      api.patch(`/admin/agents/${id}`, body),
+    mutationFn: async ({ id, ...body }: { id: string } & Record<string, unknown>): Promise<{ data: Agent } | undefined> =>
+      api.patch(`/admin/agents/${id}`, body) as Promise<{ data: Agent } | undefined>,
     onSuccess: (result: { data: Agent } | undefined, variables) => {
       qc.invalidateQueries({ queryKey: ['agents'] })
       // Refresh selected agent with server response (includes server-side effects like adminSoul sync)
