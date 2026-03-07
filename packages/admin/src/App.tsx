@@ -17,6 +17,7 @@ const ReportLinesPage = lazy(() => import('./pages/report-lines').then((m) => ({
 const SoulTemplatesPage = lazy(() => import('./pages/soul-templates').then((m) => ({ default: m.SoulTemplatesPage })))
 const MonitoringPage = lazy(() => import('./pages/monitoring').then((m) => ({ default: m.MonitoringPage })))
 const OrgChartPage = lazy(() => import('./pages/org-chart').then((m) => ({ default: m.OrgChartPage })))
+const OrgTemplatesPage = lazy(() => import('./pages/org-templates').then((m) => ({ default: m.OrgTemplatesPage })))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -83,6 +84,7 @@ export function App() {
             <Route path="soul-templates" element={<Suspense fallback={<PageSkeleton />}><SoulTemplatesPage /></Suspense>} />
             <Route path="monitoring" element={<Suspense fallback={<PageSkeleton />}><MonitoringPage /></Suspense>} />
             <Route path="org-chart" element={<Suspense fallback={<PageSkeleton />}><OrgChartPage /></Suspense>} />
+            <Route path="org-templates" element={<Suspense fallback={<PageSkeleton />}><OrgTemplatesPage /></Suspense>} />
           </Route>
         </Routes>
       </BrowserRouter>

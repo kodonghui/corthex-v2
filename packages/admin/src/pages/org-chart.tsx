@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
+import { useToastStore } from '../stores/toast-store'
 import { Card, CardContent, Skeleton } from '@corthex/ui'
 
 // ============================================================
@@ -53,13 +55,45 @@ const TIER_CONFIG: Record<string, { bg: string; label: string }> = {
 }
 
 // ============================================================
-// AgentDetailPanel -- slide-in from right
+// AgentDetailPanel -- slide-in from right with department move
 // ============================================================
-function AgentDetailPanel({ agent, onClose }: { agent: OrgAgent; onClose: () => void }) {
+function AgentDetailPanel({
+  agent,
+  departments,
+  onClose,
+}: {
+  agent: OrgAgent
+  departments: OrgDept[]
+  onClose: () => void
+}) {
+  const qc = useQueryClient()
+  const addToast = useToastStore((s) => s.addToast)
   const status = STATUS_CONFIG[agent.status] || STATUS_CONFIG.offline
   const tier = TIER_CONFIG[agent.tier] || TIER_CONFIG.specialist
   const tools = agent.allowedTools || []
   const soulSummary = agent.soul ? (agent.soul.length > 200 ? agent.soul.slice(0, 200) + '...' : agent.soul) : null
+
+  const [moveDeptId, setMoveDeptId] = useState(agent.departmentId || '')
+
+  const moveMutation = useMutation({
+    mutationFn: (newDeptId: string | null) =>
+      api.patch(`/admin/agents/${agent.id}`, { departmentId: newDeptId }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['org-chart'] })
+      qc.invalidateQueries({ queryKey: ['agents'] })
+      addToast({ type: 'success', message: `${agent.name}의 부서가 변경되었습니다` })
+      onClose()
+    },
+    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
+  })
+
+  function handleMove() {
+    const newDeptId = moveDeptId || null
+    if (newDeptId === agent.departmentId) return
+    moveMutation.mutate(newDeptId)
+  }
+
+  const deptChanged = (moveDeptId || null) !== (agent.departmentId || null)
 
   return (
     <>
@@ -96,6 +130,30 @@ function AgentDetailPanel({ agent, onClose }: { agent: OrgAgent; onClose: () => 
               <p className="text-sm text-zinc-700 dark:text-zinc-300">{agent.role}</p>
             </div>
           )}
+
+          {/* Department Move */}
+          <div>
+            <p className="text-xs text-zinc-400 dark:text-zinc-500 mb-1">부서 이동</p>
+            <div className="flex gap-2">
+              <select
+                value={moveDeptId}
+                onChange={(e) => setMoveDeptId(e.target.value)}
+                className="flex-1 px-2 py-1.5 text-sm border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              >
+                <option value="">미배속</option>
+                {departments.map((d) => (
+                  <option key={d.id} value={d.id}>{d.name}</option>
+                ))}
+              </select>
+              <button
+                onClick={handleMove}
+                disabled={!deptChanged || moveMutation.isPending}
+                className="px-3 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+              >
+                {moveMutation.isPending ? '...' : '이동'}
+              </button>
+            </div>
+          </div>
 
           {/* System badge */}
           {agent.isSystem && (
@@ -222,6 +280,7 @@ function OrgChartSkeleton() {
 // ============================================================
 export function OrgChartPage() {
   const selectedCompanyId = useAdminStore((s) => s.selectedCompanyId)
+  const navigate = useNavigate()
   const [selectedAgent, setSelectedAgent] = useState<OrgAgent | null>(null)
 
   const { data, isLoading, isError, refetch } = useQuery({
@@ -293,11 +352,16 @@ export function OrgChartPage() {
             </span>
           </div>
 
-          {/* Empty state */}
+          {/* Empty state with template CTA */}
           {isEmpty && (
             <div className="text-center py-12 space-y-3">
               <p className="text-sm text-zinc-500">아직 조직이 구성되지 않았습니다.</p>
-              <p className="text-xs text-zinc-400">템플릿으로 시작해 보세요!</p>
+              <button
+                onClick={() => navigate('/org-templates')}
+                className="px-4 py-2 text-sm rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
+              >
+                템플릿으로 시작하세요
+              </button>
             </div>
           )}
 
@@ -331,7 +395,14 @@ export function OrgChartPage() {
       </Card>
 
       {/* Agent detail side panel */}
-      {selectedAgent && <AgentDetailPanel agent={selectedAgent} onClose={() => setSelectedAgent(null)} />}
+      {selectedAgent && (
+        <AgentDetailPanel
+          key={selectedAgent.id}
+          agent={selectedAgent}
+          departments={org.departments}
+          onClose={() => setSelectedAgent(null)}
+        />
+      )}
     </div>
   )
 }

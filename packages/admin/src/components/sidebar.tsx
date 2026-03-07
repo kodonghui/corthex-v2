@@ -23,6 +23,7 @@ const nav = [
   { to: '/soul-templates', label: '소울 템플릿', icon: '✨' },
   { to: '/monitoring', label: '시스템 모니터링', icon: '🖥️' },
   { to: '/org-chart', label: '조직도', icon: '🏗️' },
+  { to: '/org-templates', label: '조직 템플릿', icon: '📋' },
 ]
 
 export function Sidebar() {
