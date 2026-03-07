@@ -131,7 +131,7 @@ development_status:
   4-4-domain-tools-15-implementation: done
   4-5-tool-invocation-log-system: done
   4-6-admin-tool-management-ui-a5: done
-  epic-4-retrospective: optional
+  epic-4-retrospective: done
 
   # ============================================================
   # Epic 5: Orchestration Engine & Command Center (11 stories, 27 SP)
