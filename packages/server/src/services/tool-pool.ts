@@ -7,6 +7,7 @@ import type {
   ToolExecutor,
   LLMToolDefinition,
 } from '@corthex/shared'
+import { recordToolInvocation } from './tool-invocation-log'
 
 // === Types ===
 
@@ -66,15 +67,51 @@ export class ToolPool {
       return { success: false, error: `Invalid parameters: ${issues}` }
     }
 
-    // Execute tool
+    // Execute tool with timing
+    const startTime = Date.now()
     try {
       const result = await tool.execute(parsed.data, context)
+      const durationMs = Date.now() - startTime
+
       if (result.success) {
-        return { success: true, result: truncateResult(result.result, MAX_RESULT_LENGTH) }
+        const truncated = truncateResult(result.result, MAX_RESULT_LENGTH)
+        // Fire-and-forget logging (no await)
+        recordToolInvocation({
+          companyId: context.companyId,
+          agentId: context.agentId,
+          toolName: name,
+          input: parsed.data,
+          output: truncated,
+          status: 'success',
+          durationMs,
+        })
+        return { success: true, result: truncated }
       }
+
+      // Error result from tool
+      recordToolInvocation({
+        companyId: context.companyId,
+        agentId: context.agentId,
+        toolName: name,
+        input: parsed.data,
+        output: result.error,
+        status: 'error',
+        durationMs,
+      })
       return result
     } catch (err) {
+      const durationMs = Date.now() - startTime
       const message = err instanceof Error ? err.message : String(err)
+      // Fire-and-forget logging (no await)
+      recordToolInvocation({
+        companyId: context.companyId,
+        agentId: context.agentId,
+        toolName: name,
+        input: parsed.data,
+        output: message,
+        status: 'error',
+        durationMs,
+      })
       return { success: false, error: message }
     }
   }

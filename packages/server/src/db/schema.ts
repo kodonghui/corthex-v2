@@ -317,16 +317,20 @@ export const departmentKnowledge = pgTable('department_knowledge', {
 export const toolCalls = pgTable('tool_calls', {
   id: uuid('id').primaryKey().defaultRandom(),
   companyId: uuid('company_id').notNull().references(() => companies.id),
-  sessionId: uuid('session_id').notNull().references(() => chatSessions.id),
-  agentId: uuid('agent_id').notNull().references(() => agents.id),
-  toolId: uuid('tool_id').notNull().references(() => toolDefinitions.id),
+  sessionId: uuid('session_id').references(() => chatSessions.id),
+  agentId: uuid('agent_id').references(() => agents.id),
+  toolId: uuid('tool_id').references(() => toolDefinitions.id),
   toolName: varchar('tool_name', { length: 100 }).notNull(),
   input: jsonb('input'),
   output: text('output'),
   status: varchar('status', { length: 20 }).notNull().default('success'),  // success, error, timeout
   durationMs: integer('duration_ms'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-})
+}, (table) => ({
+  companyCreatedIdx: index('tool_calls_company_created_idx').on(table.companyId, table.createdAt),
+  agentIdx: index('tool_calls_agent_idx').on(table.agentId),
+  toolNameIdx: index('tool_calls_tool_name_idx').on(table.toolName),
+}))
 
 // === 18. night_jobs — 야간 작업 큐 ===
 export const nightJobs = pgTable('night_jobs', {
@@ -901,7 +905,7 @@ export const toolCallsRelations = relations(toolCalls, ({ one }) => ({
   company: one(companies, { fields: [toolCalls.companyId], references: [companies.id] }),
   session: one(chatSessions, { fields: [toolCalls.sessionId], references: [chatSessions.id] }),
   agent: one(agents, { fields: [toolCalls.agentId], references: [agents.id] }),
-  tool: one(toolDefinitions, { fields: [toolCalls.toolId], references: [toolDefinitions.id] }),
+  toolDefinition: one(toolDefinitions, { fields: [toolCalls.toolId], references: [toolDefinitions.id] }),
 }))
 
 export const nightJobsRelations = relations(nightJobs, ({ one }) => ({

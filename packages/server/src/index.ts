@@ -16,6 +16,7 @@ import { monitoringRoute } from './routes/admin/monitoring'
 import { orgChartRoute } from './routes/admin/org-chart'
 import { auditLogsRoute } from './routes/admin/audit-logs'
 import { orgTemplatesRoute } from './routes/admin/org-templates'
+import { toolInvocationsRoute } from './routes/admin/tool-invocations'
 import { workspaceAgentsRoute } from './routes/workspace/agents'
 import { chatRoute } from './routes/workspace/chat'
 import { profileRoute } from './routes/workspace/profile'
@@ -89,6 +90,7 @@ app.route('/api/admin', monitoringRoute)
 app.route('/api/admin', orgChartRoute)
 app.route('/api/admin', auditLogsRoute)
 app.route('/api/admin', orgTemplatesRoute)
+app.route('/api/admin', toolInvocationsRoute)
 
 // 유저 워크스페이스 라우트 (각 파일 내부에서 authMiddleware 적용, 테넌트 격리)
 app.route('/api/workspace', workspaceAgentsRoute)

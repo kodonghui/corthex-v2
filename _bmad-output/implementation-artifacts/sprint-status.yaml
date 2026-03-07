@@ -128,9 +128,9 @@ development_status:
   4-1-toolpool-registry-zod-framework: done
   4-2-server-side-allowed-tools-enforcement: done
   4-3-common-tools-15-implementation: done
-  4-4-domain-tools-15-implementation: in-progress
-  4-5-tool-invocation-log-system: in-progress
-  4-6-admin-tool-management-ui-a5: backlog
+  4-4-domain-tools-15-implementation: review
+  4-5-tool-invocation-log-system: done
+  4-6-admin-tool-management-ui-a5: in-progress
   epic-4-retrospective: optional
 
   # ============================================================
