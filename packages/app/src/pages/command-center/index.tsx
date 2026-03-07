@@ -4,12 +4,14 @@ import { Tabs } from '@corthex/ui'
 import type { TabItem } from '@corthex/ui'
 import { useCommandCenter } from '../../hooks/use-command-center'
 import { useCommandStore } from '../../stores/command-store'
+import { usePresets } from '../../hooks/use-presets'
 import { api } from '../../lib/api'
 import { ReportView } from '../../components/chat/report-view'
 import { ReportDetailModal } from '../../components/chat/report-detail-modal'
 import { MessageList } from './components/message-list'
 import { CommandInput } from './components/command-input'
 import { DelegationChain } from './components/delegation-chain'
+import { PresetManager } from './components/preset-manager'
 
 type CommandDetail = {
   id: string
@@ -72,7 +74,9 @@ function ReportPanel({ commandId, onDetailClick }: { commandId: string; onDetail
 export function CommandCenterPage() {
   const { messages, historyLoading, submitCommand, isSubmitting, managers, deptMap } = useCommandCenter()
   const { selectedReportId, viewMode, setSelectedReport, setViewMode, activeCommandId } = useCommandStore()
+  const { presets, createPreset, updatePreset, deletePreset, executePreset, isCreating, isExecuting } = usePresets()
   const [detailModalId, setDetailModalId] = useState<string | null>(null)
+  const [showPresetManager, setShowPresetManager] = useState(false)
 
   const handleReportClick = useCallback(
     (commandId: string) => {
@@ -81,6 +85,26 @@ export function CommandCenterPage() {
     },
     [setSelectedReport, setViewMode],
   )
+
+  const handleExecutePreset = useCallback(
+    async (presetId: string) => {
+      try {
+        await executePreset(presetId)
+      } catch {
+        // error shown by toast
+      }
+    },
+    [executePreset],
+  )
+
+  // Map presets to SlashPopup format
+  const presetItems = presets.map((p) => ({
+    id: p.id,
+    name: p.name,
+    command: p.command,
+    description: p.description,
+    category: p.category,
+  }))
 
   // Mobile tab items
   const tabItems: TabItem[] = [
@@ -93,15 +117,24 @@ export function CommandCenterPage() {
       {/* Header */}
       <div className="flex items-center justify-between px-4 h-12 border-b border-zinc-200 dark:border-zinc-700 flex-shrink-0">
         <h1 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">🎖️ 사령관실</h1>
-        {activeCommandId && (
-          <div className="flex items-center gap-1.5">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500" />
-            </span>
-            <span className="text-xs text-blue-600 dark:text-blue-400">처리 중</span>
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          {activeCommandId && (
+            <div className="flex items-center gap-1.5">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500" />
+              </span>
+              <span className="text-xs text-blue-600 dark:text-blue-400">처리 중</span>
+            </div>
+          )}
+          <button
+            onClick={() => setShowPresetManager(true)}
+            className="px-2 py-1 text-xs rounded-md border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors"
+            title="프리셋 관리"
+          >
+            ⭐ 프리셋
+          </button>
+        </div>
       </div>
 
       {/* Desktop: split view / Mobile: tabs */}
@@ -120,6 +153,7 @@ export function CommandCenterPage() {
             isSubmitting={isSubmitting}
             managers={managers}
             deptMap={deptMap}
+            presets={presetItems}
           />
         </div>
 
@@ -163,6 +197,7 @@ export function CommandCenterPage() {
                   isSubmitting={isSubmitting}
                   managers={managers}
                   deptMap={deptMap}
+                  presets={presetItems}
                 />
               </div>
             ) : (
@@ -178,6 +213,20 @@ export function CommandCenterPage() {
           isOpen={!!detailModalId}
           onClose={() => setDetailModalId(null)}
           commandId={detailModalId}
+        />
+      )}
+
+      {/* Preset Manager Modal */}
+      {showPresetManager && (
+        <PresetManager
+          presets={presets}
+          onClose={() => setShowPresetManager(false)}
+          onCreate={createPreset}
+          onUpdate={updatePreset}
+          onDelete={deletePreset}
+          onExecute={handleExecutePreset}
+          isCreating={isCreating}
+          isExecuting={isExecuting}
         />
       )}
     </div>

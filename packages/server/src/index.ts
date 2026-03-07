@@ -38,6 +38,7 @@ import { settingsMcpRoute } from './routes/workspace/settings-mcp'
 import { invitationsRoute } from './routes/workspace/invitations'
 import { workspaceCredentialsRoute } from './routes/workspace/credentials'
 import { workspaceOrgChartRoute } from './routes/workspace/org-chart'
+import { presetsRoute } from './routes/workspace/presets'
 import { commandsRoute } from './routes/commands'
 import { runMigrations } from './db'
 import { startJobWorker, stopJobWorker } from './lib/job-queue'
@@ -116,6 +117,7 @@ app.route('/api/workspace', invitationsRoute)
 app.route('/api/workspace', workspaceCredentialsRoute)
 app.route('/api/workspace', workspaceOrgChartRoute)
 app.route('/api/workspace/commands', commandsRoute)
+app.route('/api/workspace/presets', presetsRoute)
 
 // WebSocket 라우트
 app.get('/ws', wsRoute)

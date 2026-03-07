@@ -149,7 +149,7 @@ development_status:
   5-7-command-center-ui-chat-mention-slash: done
   5-8-delegation-chain-realtime-websocket: done
   5-9-report-view-feedback: done
-  5-10-preset-crud-slash-popup: in-progress
+  5-10-preset-crud-slash-popup: done
   5-11-orchestration-integration-test: backlog
   epic-5-retrospective: optional
 

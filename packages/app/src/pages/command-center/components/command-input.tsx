@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { Button } from '@corthex/ui'
-import { SlashPopup, SLASH_COMMANDS } from './slash-popup'
+import { SlashPopup, SLASH_COMMANDS, getFilteredCount } from './slash-popup'
+import type { PresetItem } from './slash-popup'
 import { MentionPopup } from './mention-popup'
 
 type Agent = {
@@ -16,9 +17,10 @@ type Props = {
   isSubmitting: boolean
   managers: Agent[]
   deptMap: Map<string, string>
+  presets?: PresetItem[]
 }
 
-export function CommandInput({ onSubmit, isSubmitting, managers, deptMap }: Props) {
+export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, presets = [] }: Props) {
   const [text, setText] = useState('')
   const [showSlash, setShowSlash] = useState(false)
   const [showMention, setShowMention] = useState(false)
@@ -93,12 +95,10 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap }: Prop
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       // Handle popups
       if (showSlash) {
-        const filtered = SLASH_COMMANDS.filter((c) =>
-          c.cmd.toLowerCase().includes(slashQuery.toLowerCase()),
-        )
+        const totalFiltered = getFilteredCount(slashQuery, presets)
         if (e.key === 'ArrowDown') {
           e.preventDefault()
-          setSlashIdx((i) => Math.min(i + 1, filtered.length - 1))
+          setSlashIdx((i) => Math.min(i + 1, totalFiltered - 1))
           return
         }
         if (e.key === 'ArrowUp') {
@@ -108,8 +108,23 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap }: Prop
         }
         if (e.key === 'Enter' || e.key === 'Tab') {
           e.preventDefault()
-          if (filtered[slashIdx]) {
-            handleSlashSelect(filtered[slashIdx].cmd)
+          // Determine if selected item is a command or preset
+          const filteredCmds = SLASH_COMMANDS.filter((c) =>
+            c.cmd.toLowerCase().includes(slashQuery.toLowerCase()),
+          )
+          if (slashIdx < filteredCmds.length) {
+            handleSlashSelect(filteredCmds[slashIdx].cmd)
+          } else {
+            const q = slashQuery.toLowerCase()
+            const filteredPresets = presets.filter((p) =>
+              p.name.toLowerCase().includes(q) ||
+              p.command.toLowerCase().includes(q) ||
+              (p.category && p.category.toLowerCase().includes(q)),
+            )
+            const presetIdx = slashIdx - filteredCmds.length
+            if (filteredPresets[presetIdx]) {
+              handlePresetSelect(filteredPresets[presetIdx])
+            }
           }
           return
         }
@@ -156,7 +171,7 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap }: Prop
         handleSubmit()
       }
     },
-    [showSlash, showMention, slashQuery, slashIdx, mentionQuery, mentionIdx, managers, handleSubmit],
+    [showSlash, showMention, slashQuery, slashIdx, mentionQuery, mentionIdx, managers, presets, handleSubmit],
   )
 
   const handleSlashSelect = useCallback(
@@ -165,6 +180,20 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap }: Prop
       const newText = text.replace(/(?:^|\s)\/\S*$/, (match) => {
         const prefix = match.startsWith(' ') ? ' ' : ''
         return `${prefix}${cmd} `
+      })
+      setText(newText)
+      setShowSlash(false)
+      textareaRef.current?.focus()
+    },
+    [text],
+  )
+
+  const handlePresetSelect = useCallback(
+    (preset: PresetItem) => {
+      // Insert preset command text, replacing the /query
+      const newText = text.replace(/(?:^|\s)\/\S*$/, (match) => {
+        const prefix = match.startsWith(' ') ? ' ' : ''
+        return `${prefix}${preset.command}`
       })
       setText(newText)
       setShowSlash(false)
@@ -195,7 +224,9 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap }: Prop
           query={slashQuery}
           selectedIndex={slashIdx}
           onSelect={handleSlashSelect}
+          onSelectPreset={handlePresetSelect}
           onClose={() => setShowSlash(false)}
+          presets={presets}
         />
       )}
       {showMention && (
