@@ -150,7 +150,7 @@ development_status:
   5-8-delegation-chain-realtime-websocket: done
   5-9-report-view-feedback: done
   5-10-preset-crud-slash-popup: done
-  5-11-orchestration-integration-test: backlog
+  5-11-orchestration-integration-test: done
   epic-5-retrospective: optional
 
   # ============================================================
