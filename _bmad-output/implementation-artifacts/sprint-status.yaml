@@ -124,13 +124,13 @@ development_status:
   # FRs: FR26-FR29 | NFRs: NFR14 | UX: Admin A5
   # Dependencies: Epic 3 (AgentRunner), Epic 2 (agents table)
   # ============================================================
-  epic-4: in-progress
+  epic-4: done
   4-1-toolpool-registry-zod-framework: done
   4-2-server-side-allowed-tools-enforcement: done
   4-3-common-tools-15-implementation: done
-  4-4-domain-tools-15-implementation: review
+  4-4-domain-tools-15-implementation: done
   4-5-tool-invocation-log-system: done
-  4-6-admin-tool-management-ui-a5: in-progress
+  4-6-admin-tool-management-ui-a5: done
   epic-4-retrospective: optional
 
   # ============================================================
@@ -139,8 +139,8 @@ development_status:
   # UX: CEO #2 (Command Center)
   # Dependencies: Epic 2 (org data), Epic 4 (tools)
   # ============================================================
-  epic-5: backlog
-  5-1-command-router-type-classification: backlog
+  epic-5: in-progress
+  5-1-command-router-type-classification: in-progress
   5-2-chief-of-staff-auto-classify-delegate: backlog
   5-3-manager-delegate-parallel-specialist: backlog
   5-4-manager-synthesis-quality-gate: backlog
