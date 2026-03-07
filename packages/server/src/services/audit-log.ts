@@ -12,6 +12,8 @@ export const AUDIT_ACTIONS = {
   ORG_AGENT_UPDATE: 'org.agent.update',
   ORG_AGENT_DELETE: 'org.agent.delete',
   ORG_AGENT_DEACTIVATE: 'org.agent.deactivate',
+  ORG_CASCADE_ANALYZE: 'org.cascade.analyze',
+  ORG_CASCADE_EXECUTE: 'org.cascade.execute',
   ORG_TEMPLATE_APPLY: 'org.template.apply',
   // Credentials
   CREDENTIAL_STORE: 'credential.store',
@@ -24,6 +26,8 @@ export const AUDIT_ACTIONS = {
   TRADE_ORDER_CREATE: 'trade.order.create',
   TRADE_ORDER_EXECUTE: 'trade.order.execute',
   TRADE_ORDER_CANCEL: 'trade.order.cancel',
+  // LLM
+  LLM_FALLBACK: 'llm.fallback',
   // System
   SYSTEM_CONFIG_CHANGE: 'system.config.change',
 } as const

@@ -94,6 +94,37 @@ export function getFallbackOrder(): LLMProviderName[] {
   return config.fallbackOrder
 }
 
+/**
+ * Get equivalent-tier fallback models from other providers, in fallbackOrder sequence.
+ * Groups models by pricing tier: manager-tier (high) vs specialist/worker-tier (low).
+ * Returns models from other providers only (excludes same-provider models).
+ */
+export function getFallbackModels(originalModelId: string): string[] {
+  const config = loadModelsConfig()
+  const originalModel = config.models.find(m => m.id === originalModelId)
+  if (!originalModel) return []
+
+  // Determine tier group: manager-tier if input price >= $1/1M, else worker-tier
+  const isManagerTier = originalModel.inputPricePer1M >= 1
+
+  // Get fallback order, skip the original model's provider
+  const fallbackProviders = config.fallbackOrder.filter(
+    p => p !== originalModel.provider,
+  )
+
+  const result: string[] = []
+  for (const provider of fallbackProviders) {
+    const providerModels = config.models.filter(m => m.provider === provider)
+    // Pick the model matching the same tier
+    const match = isManagerTier
+      ? providerModels.find(m => m.inputPricePer1M >= 1)
+      : providerModels.find(m => m.inputPricePer1M < 1)
+    if (match) result.push(match.id)
+  }
+
+  return result
+}
+
 // Reset cache (for testing)
 export function resetModelsCache(): void {
   cachedConfig = null
