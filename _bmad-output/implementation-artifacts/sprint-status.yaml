@@ -1,8 +1,8 @@
-# generated: 2026-03-06
+# generated: 2026-03-07
 # project: corthex-v2
-# project_key: CORTHEX
+# project_key: NOKEY
 # tracking_system: file-system
-# story_location: _bmad-output/implementation-artifacts/stories
+# story_location: _bmad-output/implementation-artifacts
 
 # STATUS DEFINITIONS:
 # ==================
@@ -33,196 +33,348 @@
 # - SM typically creates next story after previous one is 'done' to incorporate learnings
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 #
+# PHASE STRUCTURE:
+# ================
+# P0 (MVP Core): Epic 1-5 (40 stories, 99 SP)
+# P1 (MVP Complete): Epic 6-9 (24 stories, 53 SP)
+# Phase 2 (Domain Features): Epic 10-18 (50 stories, 120 SP)
+# Phase 3 (Extensions): Epic 19-20 (10 stories, 26 SP)
+#
+# CRITICAL PATH (P0):
+# Epic 0 [done] -> Epic 1 -> Epic 2 + Epic 3 (parallel) -> Epic 4 -> Epic 5
+#
 # RECOMMENDED IMPLEMENTATION ORDER:
-# 1. Epic 0 (Foundation) -> Epic 3 (Agents) -> Epic 5 (LLM) -> Epic 4 (Tools)
-# 2. Epic 2 (Orchestration) -> Epic 1 (Command Center) -> Epic 6 (Quality Gate)
-# 3. Epics 7-18 (independent, any order)
+# 1. Epic 1 (Data Layer) - foundation for everything
+# 2. Epic 2 (Dynamic Org) + Epic 3 (LLM) - parallel after Epic 1
+# 3. Epic 4 (Tools) - needs Epic 3
+# 4. Epic 5 (Orchestration) - convergence point, needs Epic 2 + Epic 4
+# 5. Epic 6-9 (P1) - parallel after Epic 5
+# 6. Epic 10-18 (Phase 2) - domain features
+# 7. Epic 19-20 (Phase 3) - extensions
 
-generated: "2026-03-06"
+generated: "2026-03-07"
 project: corthex-v2
-project_key: CORTHEX
+project_key: NOKEY
 tracking_system: file-system
-story_location: _bmad-output/implementation-artifacts/stories
+story_location: _bmad-output/implementation-artifacts
 
 development_status:
   # ============================================================
-  # Epic 0: Foundation - Multi-tenancy & Auth
-  # FRs: FR84-FR88 | NFRs: NFR6, NFR7, NFR8, NFR11, NFR12
+  # Epic 0: Foundation (COMPLETED)
+  # Turborepo monorepo, Hono+Bun server, React+Vite SPA x2,
+  # PostgreSQL+Drizzle, WebSocket EventBus, AES-256-GCM vault,
+  # JWT auth, bun:test 201 tests passing
   # ============================================================
-  epic-0: in-progress
-  0-1-company-and-admin-user-setup: done
-  0-2-user-authentication-and-invitation: done
-  0-3-credential-vault: done
-  0-4-admin-console-company-and-user-management-ui: done
+  epic-0: done
   epic-0-retrospective: done
 
   # ============================================================
-  # Epic 1: Command Center
-  # FRs: FR1-FR6 | NFRs: NFR3, NFR17
+  # Phase 1 MVP -- P0 (Must Have)
+  # ============================================================
+
+  # ============================================================
+  # Epic 1: Data Layer & Security Foundation (7 stories, 16 SP)
+  # FRs: FR42, FR46, FR48, FR49 | NFRs: NFR10, NFR12, NFR13
+  # Dependencies: Epic 0 (done)
   # ============================================================
   epic-1: backlog
-  1-1-command-input-and-natural-language: backlog
-  1-2-at-mention-direct-assignment: backlog
-  1-3-slash-commands-8-types: backlog
-  1-4-command-presets: backlog
-  1-5-real-time-delegation-chain-display: backlog
+  1-1-phase1-drizzle-schema-extension: backlog
+  1-2-tenant-isolation-middleware: backlog
+  1-3-rbac-middleware: backlog
+  1-4-audit-log-system: backlog
+  1-5-credential-vault-extension: backlog
+  1-6-seed-data-org-templates: backlog
+  1-7-tenant-isolation-integration-test: backlog
   epic-1-retrospective: optional
 
   # ============================================================
-  # Epic 2: Orchestration Engine
-  # FRs: FR7-FR13 | NFRs: NFR1, NFR2, NFR15, NFR18
+  # Epic 2: Dynamic Organization Management (9 stories, 23 SP)
+  # FRs: FR1-FR12 | UX: Admin A1, A2, A3, A7, CEO org view
+  # Dependencies: Epic 1
   # ============================================================
   epic-2: backlog
-  2-1-chief-of-staff-command-classification: backlog
-  2-2-manager-task-decomposition-and-parallel-delegation: backlog
-  2-3-specialist-autonomous-deep-work-5-stage: backlog
-  2-4-manager-as-5th-analyst: backlog
-  2-5-quality-gate-and-rework-loop: backlog
-  2-6-sequential-relay-mode: backlog
+  2-1-department-crud-api: backlog
+  2-2-agent-crud-api: backlog
+  2-3-cascade-analysis-engine: backlog
+  2-4-org-template-apply-api: backlog
+  2-5-org-tree-view-ui-admin: backlog
+  2-6-department-management-ui-admin: backlog
+  2-7-agent-management-soul-editor-ui-admin: backlog
+  2-8-org-template-ui-agent-move: backlog
+  2-9-ceo-app-org-readonly-view: backlog
   epic-2-retrospective: optional
 
   # ============================================================
-  # Epic 3: Agent Organization & Soul System
-  # FRs: FR14-FR18
+  # Epic 3: LLM Multi-Provider & Agent Execution (7 stories, 17 SP)
+  # FRs: FR26-FR34 (LLM) | NFRs: NFR3, NFR11, NFR22, NFR26
+  # Dependencies: Epic 1
   # ============================================================
-  epic-3: in-progress
-  3-1-29-agent-organization-deployment: done
-  3-2-soul-editor-web-ui-markdown: backlog
-  3-3-department-knowledge-injection: backlog
+  epic-3: backlog
+  3-1-llm-provider-adapters-claude-gpt-gemini: backlog
+  3-2-llm-router-3tier-model-assignment: backlog
+  3-3-provider-fallback-strategy: backlog
+  3-4-agent-runner-stateless-executor: backlog
+  3-5-cost-recording-system-models-yaml: backlog
+  3-6-batch-collector-batch-execute: backlog
+  3-7-llm-integration-fallback-test: backlog
   epic-3-retrospective: optional
 
   # ============================================================
-  # Epic 4: Tool System
-  # FRs: FR19-FR24 | NFRs: NFR9, NFR14
+  # Epic 4: Tool System (6 stories, 16 SP)
+  # FRs: FR26-FR29 | NFRs: NFR14 | UX: Admin A5
+  # Dependencies: Epic 3 (AgentRunner), Epic 2 (agents table)
   # ============================================================
   epic-4: backlog
-  4-1-toolpool-registry-and-execution: backlog
-  4-2-core-tool-implementations-finance-and-common: backlog
-  4-3-tool-permission-management-and-health-check: backlog
+  4-1-toolpool-registry-zod-framework: backlog
+  4-2-server-side-allowed-tools-enforcement: backlog
+  4-3-common-tools-15-implementation: backlog
+  4-4-domain-tools-15-implementation: backlog
+  4-5-tool-invocation-log-system: backlog
+  4-6-admin-tool-management-ui-a5: backlog
   epic-4-retrospective: optional
 
   # ============================================================
-  # Epic 5: LLM Multi-Provider Router
-  # FRs: FR25-FR29 | NFRs: NFR16, NFR19
+  # Epic 5: Orchestration Engine & Command Center (11 stories, 27 SP)
+  # FRs: FR13-FR25, FR50-FR51 | NFRs: NFR1, NFR2, NFR4, NFR20
+  # UX: CEO #2 (Command Center)
+  # Dependencies: Epic 2 (org data), Epic 4 (tools)
   # ============================================================
   epic-5: backlog
-  5-1-multi-provider-llm-routing: backlog
-  5-2-cost-tracking-and-budget-enforcement: backlog
-  5-3-batch-api-queue: backlog
-  5-4-llm-provider-failover: backlog
+  5-1-command-router-type-classification: backlog
+  5-2-chief-of-staff-auto-classify-delegate: backlog
+  5-3-manager-delegate-parallel-specialist: backlog
+  5-4-manager-synthesis-quality-gate: backlog
+  5-5-all-sequential-command-processing: backlog
+  5-6-deepwork-autonomous-multistep: backlog
+  5-7-command-center-ui-chat-mention-slash: backlog
+  5-8-delegation-chain-realtime-websocket: backlog
+  5-9-report-view-feedback: backlog
+  5-10-preset-crud-slash-popup: backlog
+  5-11-orchestration-integration-test: backlog
   epic-5-retrospective: optional
 
   # ============================================================
-  # Epic 6: Quality Gate
-  # FRs: FR30-FR33
+  # Phase 1 MVP -- P1 (Should Have)
+  # ============================================================
+
+  # ============================================================
+  # Epic 6: Dashboard & Activity Monitoring (6 stories, 14 SP)
+  # FRs: FR35-FR37, FR41 | NFRs: NFR4, NFR5
+  # UX: CEO #1 (Dashboard), CEO #7 (Activity Log)
+  # Dependencies: Epic 5
   # ============================================================
   epic-6: backlog
-  6-1-5-item-quality-rubric-evaluation: backlog
-  6-2-auto-rework-and-ceo-feedback: backlog
+  6-1-dashboard-aggregation-api: backlog
+  6-2-operations-dashboard-ui: backlog
+  6-3-activity-log-4tab-api: backlog
+  6-4-activity-log-4tab-ui: backlog
+  6-5-websocket-realtime-dashboard-refresh: backlog
+  6-6-quick-actions-satisfaction-chart: backlog
   epic-6-retrospective: optional
 
   # ============================================================
-  # Epic 7: Dashboard & Monitoring
-  # FRs: FR54-FR58 | NFRs: NFR4
+  # Epic 7: Cost Management System (5 stories, 11 SP)
+  # FRs: FR38-FR40 | NFRs: NFR30, NFR33
+  # UX: Admin A6, CEO cost card
+  # Dependencies: Epic 3 (CostTracker)
   # ============================================================
   epic-7: backlog
-  7-1-summary-cards-and-quick-actions: backlog
-  7-2-ai-usage-charts-and-budget-management: backlog
+  7-1-3axis-cost-aggregation-api: backlog
+  7-2-budget-limit-auto-block: backlog
+  7-3-cost-dashboard-ui-admin-a6: backlog
+  7-4-ceo-app-cost-card-drilldown: backlog
+  7-5-budget-exceeded-websocket-alert: backlog
   epic-7-retrospective: optional
 
   # ============================================================
-  # Epic 8: Activity Logging & History
-  # FRs: FR59-FR63 | NFRs: NFR10
+  # Epic 8: Quality Gate Enhancement (5 stories, 11 SP)
+  # FRs: FR52-FR55
+  # Dependencies: Epic 5 (P0 quality gate)
   # ============================================================
   epic-8: backlog
-  8-1-4-tab-activity-log: backlog
-  8-2-command-history-with-search-and-replay: backlog
+  8-1-quality-rules-yaml-parser: backlog
+  8-2-auto-rule-inspection-engine: backlog
+  8-3-hallucination-detection: backlog
+  8-4-prompt-injection-defense: backlog
+  8-5-qa-tab-enhanced-ui: backlog
   epic-8-retrospective: optional
 
   # ============================================================
-  # Epic 9: Knowledge Base & Agent Memory
-  # FRs: FR64-FR67
+  # Epic 9: Multi-tenancy & Admin Console (8 stories, 17 SP)
+  # FRs: FR43-FR45, FR47 | NFRs: NFR34
+  # UX: Admin A4, A8, Onboarding, CEO #14
+  # Dependencies: Epic 1 (tenant), Epic 2 (org)
   # ============================================================
   epic-9: backlog
-  9-1-knowledge-base-crud-and-department-injection: backlog
-  9-2-auto-learning-from-tasks: backlog
+  9-1-company-crud-api: backlog
+  9-2-human-employee-management-api: backlog
+  9-3-employee-command-center-restriction: backlog
+  9-4-employee-management-ui-admin-a4: backlog
+  9-5-company-settings-ui-admin-a8: backlog
+  9-6-admin-ceo-app-switching: backlog
+  9-7-onboarding-wizard: backlog
+  9-8-ceo-app-settings-screen: backlog
   epic-9-retrospective: optional
 
   # ============================================================
-  # Epic 10: Cron Scheduler
-  # FRs: FR68-FR70
+  # Phase 2 -- v1 Feature Migration (Domain Features)
+  # ============================================================
+
+  # ============================================================
+  # Epic 10: Strategy Room & Trading (8 stories, 20 SP)
+  # FRs: FR56-FR62 | NFRs: NFR27
+  # UX: CEO #3 (Strategy Room)
+  # Dependencies: Epic 5, Epic 4
   # ============================================================
   epic-10: backlog
-  10-1-cron-job-management: backlog
+  10-1-strategy-schema-watchlist-portfolio-orders: backlog
+  10-2-kis-securities-api-adapter: backlog
+  10-3-finance-tools-5-implementation: backlog
+  10-4-cio-vector-separation-orchestration: backlog
+  10-5-autonomous-approval-execution-risk-control: backlog
+  10-6-real-paper-trading-separation: backlog
+  10-7-strategy-room-ui-portfolio-watchlist: backlog
+  10-8-trading-approval-history-ui: backlog
   epic-10-retrospective: optional
 
   # ============================================================
-  # Epic 11: AGORA Debate Engine
-  # FRs: FR34-FR37
+  # Epic 11: AGORA Debate Engine (5 stories, 12 SP)
+  # FRs: FR63
+  # UX: CEO #5 (AGORA)
+  # Dependencies: Epic 5, Epic 3
   # ============================================================
   epic-11: backlog
-  11-1-round-based-debate-orchestration: backlog
-  11-2-debate-results-diff-view-and-synthesis: backlog
+  11-1-agora-engine-round-management-consensus: backlog
+  11-2-debate-deep-debate-command-integration: backlog
+  11-3-websocket-debate-channel-streaming: backlog
+  11-4-agora-ui-round-timeline-speech-cards: backlog
+  11-5-diff-view-debate-result-insertion: backlog
   epic-11-retrospective: optional
 
   # ============================================================
-  # Epic 12: Strategy Room (Trading)
-  # FRs: FR38-FR43 | NFRs: NFR5, NFR20
+  # Epic 12: SNS Publishing (5 stories, 14 SP)
+  # FRs: FR65 | NFRs: NFR29
+  # UX: CEO #6 (SNS)
+  # Dependencies: Epic 4, Epic 5
   # ============================================================
   epic-12: backlog
-  12-1-portfolio-dashboard-and-watchlist: backlog
-  12-2-kis-auto-trading: backlog
-  12-3-paper-trading: backlog
+  12-1-sns-content-management-api: backlog
+  12-2-marketing-tools-3-implementation: backlog
+  12-3-selenium-auto-publish-engine-5-platforms: backlog
+  12-4-scheduled-publish-queue-card-news: backlog
+  12-5-sns-publishing-ui: backlog
   epic-12-retrospective: optional
 
   # ============================================================
-  # Epic 13: SNS Publishing
-  # FRs: FR44-FR48 | NFRs: NFR22
+  # Epic 13: SketchVibe Canvas (5 stories, 13 SP)
+  # FRs: FR64
+  # UX: CEO #4 (SketchVibe)
+  # Dependencies: Epic 5, Epic 3
   # ============================================================
   epic-13: backlog
-  13-1-content-generation-and-approval-flow: backlog
-  13-2-selenium-auto-publishing: backlog
+  13-1-cytoscape-canvas-8-node-types-connection: backlog
+  13-2-mermaid-cytoscape-bidirectional-conversion: backlog
+  13-3-mcp-sse-ai-realtime-canvas-manipulation: backlog
+  13-4-save-load-knowledge-base-integration: backlog
+  13-5-sketchvibe-ui-integration-command-center: backlog
   epic-13-retrospective: optional
 
   # ============================================================
-  # Epic 14: SketchVibe (Visual Collaboration)
-  # FRs: FR49-FR53 | NFRs: NFR23
+  # Epic 14: Cron Scheduler & ARGOS (6 stories, 13 SP)
+  # FRs: FR66-FR67
+  # UX: CEO #11 (Cron), CEO #12 (ARGOS)
+  # Dependencies: Epic 5, Epic 4
   # ============================================================
   epic-14: backlog
-  14-1-cytoscape-canvas-and-node-types: backlog
-  14-2-mermaid-bidirectional-and-ai-collaboration: backlog
+  14-1-cron-scheduler-service-crud-api: backlog
+  14-2-cron-execution-engine-auto-run: backlog
+  14-3-argos-trigger-condition-auto-collect: backlog
+  14-4-cron-base-ui: backlog
+  14-5-argos-ui: backlog
+  14-6-status-bar-data-ai-ok-ng-cost: backlog
   epic-14-retrospective: optional
 
   # ============================================================
-  # Epic 15: ARGOS Intelligence Collection
-  # FRs: FR71-FR73
+  # Epic 15: Telegram Integration (3 stories, 6 SP)
+  # FRs: FR68
+  # Dependencies: Epic 5, Epic 14
   # ============================================================
   epic-15: backlog
-  15-1-trigger-based-intelligence-collection: backlog
+  15-1-telegram-bot-api-webhook: backlog
+  15-2-telegram-command-parsing-mention-text: backlog
+  15-3-result-send-cron-result-auto-send: backlog
   epic-15-retrospective: optional
 
   # ============================================================
-  # Epic 16: Telegram & Messenger
-  # FRs: FR74-FR76 | NFRs: NFR21
+  # Epic 16: Knowledge Base & Agent Memory (6 stories, 13 SP)
+  # FRs: FR69-FR70
+  # UX: CEO #13 (Knowledge)
+  # Dependencies: Epic 3, Epic 5
   # ============================================================
   epic-16: backlog
-  16-1-telegram-bot-integration: backlog
-  16-2-in-company-messenger: backlog
+  16-1-knowledge-schema-docs-memories: backlog
+  16-2-document-store-crud-api-folder-management: backlog
+  16-3-department-knowledge-auto-injection: backlog
+  16-4-agent-memory-auto-learning-extraction: backlog
+  16-5-knowledge-ui-drag-drop-upload: backlog
+  16-6-similar-task-previous-learning-auto-reference: backlog
   epic-16-retrospective: optional
 
   # ============================================================
-  # Epic 17: Performance Analysis & Archive
-  # FRs: FR77-FR81
+  # Epic 17: History, Archive & Performance (7 stories, 16 SP)
+  # FRs: FR71-FR73
+  # UX: CEO #8 (History), CEO #9 (Archive), CEO #10 (Performance)
+  # Dependencies: Epic 5, Epic 7, Epic 8
   # ============================================================
   epic-17: backlog
-  17-1-performance-dashboard-and-soul-gym: backlog
-  17-2-classified-archive-and-similar-reports: backlog
+  17-1-operation-log-api-search-filter-bookmark: backlog
+  17-2-operation-log-ui-ab-compare-replay: backlog
+  17-3-classified-docs-api-archive-filter-similar: backlog
+  17-4-classified-docs-ui: backlog
+  17-5-performance-analysis-api-soul-gym: backlog
+  17-6-performance-analysis-ui-soul-gym-suggestions: backlog
+  17-7-quality-dashboard-pass-rate-avg-score: backlog
   epic-17-retrospective: optional
 
   # ============================================================
-  # Epic 18: Workflow Automation
-  # FRs: FR82-FR83
+  # Epic 18: Workflow Automation (5 stories, 13 SP)
+  # FRs: FR74-FR75
+  # Dependencies: Epic 14, Epic 5
   # ============================================================
   epic-18: backlog
-  18-1-multi-step-workflow-creation-and-execution: backlog
+  18-1-workflow-crud-api-multistep-definition: backlog
+  18-2-workflow-execution-engine-sequential-parallel: backlog
+  18-3-predictive-workflow-pattern-analysis: backlog
+  18-4-workflow-builder-ui: backlog
+  18-5-execution-status-realtime-monitoring-ui: backlog
   epic-18-retrospective: optional
+
+  # ============================================================
+  # Phase 3 -- Extensions (12+ months)
+  # ============================================================
+
+  # ============================================================
+  # Epic 19: Internal Messenger (5 stories, 10 SP)
+  # FRs: FR76
+  # Dependencies: Epic 9
+  # ============================================================
+  epic-19: backlog
+  19-1-messenger-schema-conversations-messages: backlog
+  19-2-realtime-chat-api-websocket-channel: backlog
+  19-3-one-on-one-group-message-ui: backlog
+  19-4-ai-analysis-result-sharing: backlog
+  19-5-company-id-based-chat-isolation: backlog
+  epic-19-retrospective: optional
+
+  # ============================================================
+  # Epic 20: Platform Extensions (5 stories, 16 SP)
+  # PRD: Vision (Phase 3)
+  # Dependencies: Epic 2, Epic 18
+  # ============================================================
+  epic-20: backlog
+  20-1-org-template-market-api-ui: backlog
+  20-2-agent-marketplace-soul-tool-exchange: backlog
+  20-3-public-api-key-issuance: backlog
+  20-4-workflow-builder-nocode-visual: backlog
+  20-5-platform-integration-test: backlog
+  epic-20-retrospective: optional
