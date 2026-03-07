@@ -18,6 +18,11 @@ export const apiKeyScopeEnum = pgEnum('api_key_scope', ['company', 'user'])
 export const invitationStatusEnum = pgEnum('invitation_status', ['pending', 'accepted', 'expired', 'revoked'])
 export const agentTierEnum = pgEnum('agent_tier', ['manager', 'specialist', 'worker'])
 
+// === Phase 1 New Enums (Epic 1 Story 1) ===
+export const commandTypeEnum = pgEnum('command_type', ['direct', 'mention', 'slash', 'preset', 'batch', 'all', 'sequential', 'deepwork'])
+export const orchestrationTaskStatusEnum = pgEnum('orchestration_task_status', ['pending', 'running', 'completed', 'failed', 'timeout'])
+export const qualityResultEnum = pgEnum('quality_result', ['pass', 'fail'])
+
 // === 1. companies — 회사 (테넌트 최상위 단위) ===
 export const companies = pgTable('companies', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -122,6 +127,8 @@ export const agents = pgTable('agents', {
   adminSoul: text('admin_soul'),  // 관리자가 설정한 원본 소울 (초기화용)
   status: agentStatusEnum('status').notNull().default('offline'),
   isSecretary: boolean('is_secretary').notNull().default(false),
+  isSystem: boolean('is_system').notNull().default(false),  // 시스템 에이전트 삭제 보호
+  allowedTools: jsonb('allowed_tools').default([]),  // string[] — 허용 도구 이름 목록
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
@@ -697,11 +704,133 @@ export const mcpServers = pgTable('mcp_servers', {
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })
 
+// === Phase 1 New Tables (Epic 1 Story 1) ===
+
+// === P1-1. commands — CEO 명령 이력 ===
+export const commands = pgTable('commands', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  type: commandTypeEnum('type').notNull().default('direct'),
+  text: text('text').notNull(),
+  targetAgentId: uuid('target_agent_id').references(() => agents.id),
+  status: varchar('status', { length: 20 }).notNull().default('pending'),  // pending|processing|completed|failed|cancelled
+  result: text('result'),
+  metadata: jsonb('metadata'),  // 슬래시 종류, 프리셋ID 등
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  completedAt: timestamp('completed_at'),
+}, (table) => ({
+  companyIdx: index('commands_company_idx').on(table.companyId),
+  companyUserIdx: index('commands_company_user_idx').on(table.companyId, table.userId),
+  companyCreatedIdx: index('commands_company_created_idx').on(table.companyId, table.createdAt),
+}))
+
+// === P1-2. orchestration_tasks — 오케스트레이션 작업 추적 ===
+export const orchestrationTasks = pgTable('orchestration_tasks', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  commandId: uuid('command_id').notNull().references(() => commands.id),
+  agentId: uuid('agent_id').notNull().references(() => agents.id),
+  parentTaskId: uuid('parent_task_id'),  // self-ref — 위임 체인 추적
+  type: varchar('type', { length: 30 }).notNull(),  // classify|delegate|execute|synthesize|review
+  input: text('input'),
+  output: text('output'),
+  status: orchestrationTaskStatusEnum('status').notNull().default('pending'),
+  startedAt: timestamp('started_at'),
+  completedAt: timestamp('completed_at'),
+  durationMs: integer('duration_ms'),
+  metadata: jsonb('metadata'),  // 도구 호출 수, 토큰 수 등
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('orch_tasks_company_idx').on(table.companyId),
+  companyCommandIdx: index('orch_tasks_company_command_idx').on(table.companyId, table.commandId),
+  companyAgentIdx: index('orch_tasks_company_agent_idx').on(table.companyId, table.agentId),
+}))
+
+// === P1-3. quality_reviews — QA 게이트 결과 ===
+export const qualityReviews = pgTable('quality_reviews', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  commandId: uuid('command_id').notNull().references(() => commands.id),
+  taskId: uuid('task_id').references(() => orchestrationTasks.id),
+  reviewerAgentId: uuid('reviewer_agent_id').notNull().references(() => agents.id),
+  conclusion: qualityResultEnum('conclusion').notNull(),
+  scores: jsonb('scores').notNull(),  // {conclusionQuality, evidenceSources, riskAssessment, formatCompliance, logicalCoherence}
+  feedback: text('feedback'),  // fail 시 재작업 지시
+  attemptNumber: integer('attempt_number').notNull().default(1),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('quality_reviews_company_idx').on(table.companyId),
+  companyCommandIdx: index('quality_reviews_company_command_idx').on(table.companyId, table.commandId),
+}))
+
+// === P1-4. presets — 명령 프리셋 ===
+export const presets = pgTable('presets', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  name: varchar('name', { length: 100 }).notNull(),
+  description: text('description'),
+  command: text('command').notNull(),
+  category: varchar('category', { length: 50 }),
+  isGlobal: boolean('is_global').notNull().default(false),
+  sortOrder: integer('sort_order').notNull().default(0),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('presets_company_idx').on(table.companyId),
+  companyUserIdx: index('presets_company_user_idx').on(table.companyId, table.userId),
+}))
+
+// === P1-5. org_templates — 조직 템플릿 ===
+export const orgTemplates = pgTable('org_templates', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').references(() => companies.id),  // null = 플랫폼 내장 템플릿
+  name: varchar('name', { length: 100 }).notNull(),
+  description: text('description'),
+  templateData: jsonb('template_data').notNull(),  // {departments: [{name, agents: [{name, tier, modelName, soul, allowedTools}]}]}
+  isBuiltin: boolean('is_builtin').notNull().default(false),
+  isActive: boolean('is_active').notNull().default(true),
+  createdBy: uuid('created_by').references(() => users.id),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('org_templates_company_idx').on(table.companyId),
+}))
+
+// === P1-6. audit_logs — 삭제 불가 감사 로그 (INSERT ONLY) ===
+export const auditLogs = pgTable('audit_logs', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  actorType: varchar('actor_type', { length: 20 }).notNull(),  // admin_user|user|agent|system
+  actorId: uuid('actor_id').notNull(),
+  action: varchar('action', { length: 100 }).notNull(),  // org.department.create|credential.access|trade.order...
+  targetType: varchar('target_type', { length: 50 }),  // department|agent|credential|company...
+  targetId: uuid('target_id'),
+  before: jsonb('before'),  // 변경 전 상태
+  after: jsonb('after'),  // 변경 후 상태
+  metadata: jsonb('metadata'),  // IP, userAgent 등
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  // NO updatedAt — INSERT-ONLY 테이블
+}, (table) => ({
+  companyIdx: index('audit_logs_company_idx').on(table.companyId),
+  companyActionIdx: index('audit_logs_company_action_idx').on(table.companyId, table.action),
+  companyCreatedIdx: index('audit_logs_company_created_idx').on(table.companyId, table.createdAt),
+  companyTargetIdx: index('audit_logs_company_target_idx').on(table.companyId, table.targetType, table.targetId),
+}))
+
 // === Relations ===
 export const companiesRelations = relations(companies, ({ many }) => ({
   users: many(users),
   departments: many(departments),
   agents: many(agents),
+  commands: many(commands),
+  orchestrationTasks: many(orchestrationTasks),
+  qualityReviews: many(qualityReviews),
+  presets: many(presets),
+  orgTemplates: many(orgTemplates),
+  auditLogs: many(auditLogs),
 }))
 
 export const usersRelations = relations(users, ({ one, many }) => ({
@@ -928,4 +1057,42 @@ export const nexusExecutionsRelations = relations(nexusExecutions, ({ one }) => 
 
 export const mcpServersRelations = relations(mcpServers, ({ one }) => ({
   company: one(companies, { fields: [mcpServers.companyId], references: [companies.id] }),
+}))
+
+// === Phase 1 New Relations (Epic 1 Story 1) ===
+
+export const commandsRelations = relations(commands, ({ one, many }) => ({
+  company: one(companies, { fields: [commands.companyId], references: [companies.id] }),
+  user: one(users, { fields: [commands.userId], references: [users.id] }),
+  targetAgent: one(agents, { fields: [commands.targetAgentId], references: [agents.id] }),
+  tasks: many(orchestrationTasks),
+  qualityReviews: many(qualityReviews),
+}))
+
+export const orchestrationTasksRelations = relations(orchestrationTasks, ({ one }) => ({
+  company: one(companies, { fields: [orchestrationTasks.companyId], references: [companies.id] }),
+  command: one(commands, { fields: [orchestrationTasks.commandId], references: [commands.id] }),
+  agent: one(agents, { fields: [orchestrationTasks.agentId], references: [agents.id] }),
+  parentTask: one(orchestrationTasks, { fields: [orchestrationTasks.parentTaskId], references: [orchestrationTasks.id] }),
+}))
+
+export const qualityReviewsRelations = relations(qualityReviews, ({ one }) => ({
+  company: one(companies, { fields: [qualityReviews.companyId], references: [companies.id] }),
+  command: one(commands, { fields: [qualityReviews.commandId], references: [commands.id] }),
+  task: one(orchestrationTasks, { fields: [qualityReviews.taskId], references: [orchestrationTasks.id] }),
+  reviewerAgent: one(agents, { fields: [qualityReviews.reviewerAgentId], references: [agents.id] }),
+}))
+
+export const presetsRelations = relations(presets, ({ one }) => ({
+  company: one(companies, { fields: [presets.companyId], references: [companies.id] }),
+  user: one(users, { fields: [presets.userId], references: [users.id] }),
+}))
+
+export const orgTemplatesRelations = relations(orgTemplates, ({ one }) => ({
+  company: one(companies, { fields: [orgTemplates.companyId], references: [companies.id] }),
+  creator: one(users, { fields: [orgTemplates.createdBy], references: [users.id] }),
+}))
+
+export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
+  company: one(companies, { fields: [auditLogs.companyId], references: [companies.id] }),
 }))

@@ -176,6 +176,13 @@
       "when": 1773417600000,
       "tag": "0030_agent-organization",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1773504000000,
+      "tag": "0031_phase1-schema-extension",
+      "breakpoints": true
     }
   ]
 }
