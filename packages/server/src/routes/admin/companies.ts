@@ -3,7 +3,7 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { eq, and, count } from 'drizzle-orm'
 import { db } from '../../db'
-import { companies, users } from '../../db/schema'
+import { companies, users, agents } from '../../db/schema'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 
@@ -34,6 +34,32 @@ const smtpConfigSchema = z.object({
 companiesRoute.get('/companies', async (c) => {
   const result = await db.select().from(companies).orderBy(companies.createdAt)
   return c.json({ data: result })
+})
+
+// GET /api/admin/companies/stats — 회사별 유저/에이전트 수 통계
+companiesRoute.get('/companies/stats', async (c) => {
+  const userCounts = await db
+    .select({ companyId: users.companyId, userCount: count() })
+    .from(users)
+    .where(eq(users.isActive, true))
+    .groupBy(users.companyId)
+
+  const agentCounts = await db
+    .select({ companyId: agents.companyId, agentCount: count() })
+    .from(agents)
+    .where(eq(agents.isActive, true))
+    .groupBy(agents.companyId)
+
+  const stats: Record<string, { userCount: number; agentCount: number }> = {}
+  for (const row of userCounts) {
+    stats[row.companyId] = { userCount: Number(row.userCount), agentCount: 0 }
+  }
+  for (const row of agentCounts) {
+    if (!stats[row.companyId]) stats[row.companyId] = { userCount: 0, agentCount: 0 }
+    stats[row.companyId].agentCount = Number(row.agentCount)
+  }
+
+  return c.json({ data: stats })
 })
 
 // GET /api/admin/companies/:id — 회사 상세

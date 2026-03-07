@@ -1,15 +1,16 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
 import { useToastStore } from '../stores/toast-store'
+import { ConfirmDialog, EmptyState, SkeletonTable } from '@corthex/ui'
 
 type User = {
   id: string; companyId: string; name: string; username: string
   email: string | null; role: string; isActive: boolean; createdAt: string
 }
 type Department = { id: string; name: string }
-type Agent = { id: string; name: string; departmentId: string | null }
+type Agent = { id: string; name: string; departmentId: string | null; userId: string }
 
 export function UsersPage() {
   const qc = useQueryClient()
@@ -18,7 +19,10 @@ export function UsersPage() {
   const [deptFilter, setDeptFilter] = useState<string>('all')
   const [showCreate, setShowCreate] = useState(false)
   const [editUser, setEditUser] = useState<User | null>(null)
+  const [editForm, setEditForm] = useState({ name: '', email: '', role: '' })
   const [form, setForm] = useState({ username: '', password: '', name: '', email: '', role: 'user' as string })
+  const [deactivateTarget, setDeactivateTarget] = useState<User | null>(null)
+  const [resetPasswordTarget, setResetPasswordTarget] = useState<User | null>(null)
 
   const { data: userData, isLoading } = useQuery({
     queryKey: ['users', selectedCompanyId],
@@ -42,19 +46,20 @@ export function UsersPage() {
   const depts = deptData?.data || []
   const agents = agentData?.data || []
 
-  // 부서별 유저 매핑: 에이전트의 userId → departmentId
-  const userDeptMap = new Map<string, string>()
-  for (const agent of agents) {
-    if (agent.departmentId) {
-      userDeptMap.set(agent.id, agent.departmentId)
+  // Build user->department mapping via agents table
+  const userDeptMap = useMemo(() => {
+    const map = new Map<string, string>()
+    for (const agent of agents) {
+      if (agent.departmentId && agent.userId) {
+        map.set(agent.userId, agent.departmentId)
+      }
     }
-  }
+    return map
+  }, [agents])
 
   const filteredUsers = deptFilter === 'all'
     ? users
-    : deptFilter === 'none'
-      ? users // 부서 없는 직원 필터는 추후
-      : users
+    : users.filter((u) => userDeptMap.get(u.id) === deptFilter)
 
   const createMutation = useMutation({
     mutationFn: (body: typeof form & { companyId: string }) =>
@@ -83,9 +88,25 @@ export function UsersPage() {
     mutationFn: (id: string) => api.delete(`/admin/users/${id}`),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['users'] })
+      setDeactivateTarget(null)
       addToast({ type: 'success', message: '직원이 비활성화되었습니다' })
     },
-    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
+    onError: (err: Error) => {
+      setDeactivateTarget(null)
+      addToast({ type: 'error', message: err.message })
+    },
+  })
+
+  const resetPasswordMutation = useMutation({
+    mutationFn: (id: string) => api.post(`/admin/users/${id}/reset-password`, {}),
+    onSuccess: () => {
+      setResetPasswordTarget(null)
+      addToast({ type: 'success', message: '비밀번호가 초기화되었습니다' })
+    },
+    onError: (err: Error) => {
+      setResetPasswordTarget(null)
+      addToast({ type: 'error', message: err.message })
+    },
   })
 
   if (!selectedCompanyId) return <div className="p-8 text-center text-zinc-500">회사를 선택하세요</div>
@@ -218,7 +239,14 @@ export function UsersPage() {
       {/* 직원 목록 테이블 */}
       <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
         {isLoading ? (
-          <div className="p-8 text-center text-zinc-500">로딩 중...</div>
+          <div className="p-5">
+            <SkeletonTable rows={5} />
+          </div>
+        ) : filteredUsers.length === 0 ? (
+          <EmptyState
+            title="직원이 없습니다"
+            description={deptFilter !== 'all' ? '선택한 부서에 배정된 직원이 없습니다' : '직원을 추가해보세요'}
+          />
         ) : (
           <table className="w-full">
             <thead>
@@ -237,24 +265,47 @@ export function UsersPage() {
                   <td className="px-5 py-3">
                     {editUser?.id === u.id ? (
                       <input
-                        value={editUser.name}
-                        onChange={(e) => setEditUser({ ...editUser, name: e.target.value })}
-                        className="px-2 py-1 border border-zinc-300 dark:border-zinc-700 rounded text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
+                        value={editForm.name}
+                        onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                        className="px-2 py-1 border border-zinc-300 dark:border-zinc-700 rounded text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 w-full"
                       />
                     ) : (
                       <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{u.name}</span>
                     )}
                   </td>
                   <td className="px-5 py-3 text-sm text-zinc-600 dark:text-zinc-400">@{u.username}</td>
-                  <td className="px-5 py-3 text-sm text-zinc-600 dark:text-zinc-400">{u.email || '-'}</td>
                   <td className="px-5 py-3">
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${
-                      u.role === 'admin'
-                        ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
-                        : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
-                    }`}>
-                      {u.role === 'admin' ? '관리자' : '직원'}
-                    </span>
+                    {editUser?.id === u.id ? (
+                      <input
+                        type="email"
+                        value={editForm.email}
+                        onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                        className="px-2 py-1 border border-zinc-300 dark:border-zinc-700 rounded text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 w-full"
+                        placeholder="이메일"
+                      />
+                    ) : (
+                      <span className="text-sm text-zinc-600 dark:text-zinc-400">{u.email || '-'}</span>
+                    )}
+                  </td>
+                  <td className="px-5 py-3">
+                    {editUser?.id === u.id ? (
+                      <select
+                        value={editForm.role}
+                        onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
+                        className="px-2 py-1 border border-zinc-300 dark:border-zinc-700 rounded text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
+                      >
+                        <option value="user">직원</option>
+                        <option value="admin">관리자</option>
+                      </select>
+                    ) : (
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${
+                        u.role === 'admin'
+                          ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
+                          : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
+                      }`}>
+                        {u.role === 'admin' ? '관리자' : '직원'}
+                      </span>
+                    )}
                   </td>
                   <td className="px-5 py-3">
                     <span className={`text-xs px-2 py-0.5 rounded-full ${
@@ -269,7 +320,12 @@ export function UsersPage() {
                     {editUser?.id === u.id ? (
                       <div className="flex gap-2 justify-end">
                         <button
-                          onClick={() => updateMutation.mutate({ id: u.id, name: editUser.name })}
+                          onClick={() => updateMutation.mutate({
+                            id: u.id,
+                            name: editForm.name,
+                            email: editForm.email || undefined,
+                            role: editForm.role,
+                          })}
                           className="text-xs text-indigo-600 hover:text-indigo-700"
                         >
                           저장
@@ -281,18 +337,23 @@ export function UsersPage() {
                     ) : (
                       <div className="flex gap-2 justify-end">
                         <button
-                          onClick={() => setEditUser(u)}
+                          onClick={() => {
+                            setEditUser(u)
+                            setEditForm({ name: u.name, email: u.email || '', role: u.role })
+                          }}
                           className="text-xs text-indigo-600 hover:text-indigo-700"
                         >
                           수정
                         </button>
+                        <button
+                          onClick={() => setResetPasswordTarget(u)}
+                          className="text-xs text-amber-600 hover:text-amber-700"
+                        >
+                          비밀번호 초기화
+                        </button>
                         {u.isActive && (
                           <button
-                            onClick={() => {
-                              if (confirm(`${u.name}을(를) 비활성화하시겠습니까?`)) {
-                                deactivateMutation.mutate(u.id)
-                              }
-                            }}
+                            onClick={() => setDeactivateTarget(u)}
                             className="text-xs text-red-600 hover:text-red-700"
                           >
                             비활성화
@@ -307,6 +368,26 @@ export function UsersPage() {
           </table>
         )}
       </div>
+
+      <ConfirmDialog
+        isOpen={!!deactivateTarget}
+        onConfirm={() => deactivateTarget && deactivateMutation.mutate(deactivateTarget.id)}
+        onCancel={() => setDeactivateTarget(null)}
+        title={`${deactivateTarget?.name} 비활성화`}
+        description="이 직원을 비활성화하면 더 이상 로그인할 수 없습니다. 나중에 다시 활성화할 수 있습니다."
+        confirmText="비활성화"
+        variant="danger"
+      />
+
+      <ConfirmDialog
+        isOpen={!!resetPasswordTarget}
+        onConfirm={() => resetPasswordTarget && resetPasswordMutation.mutate(resetPasswordTarget.id)}
+        onCancel={() => setResetPasswordTarget(null)}
+        title={`${resetPasswordTarget?.name} 비밀번호 초기화`}
+        description="비밀번호가 기본값으로 초기화됩니다. 직원에게 새 비밀번호를 안내해주세요."
+        confirmText="초기화"
+        variant="default"
+      />
     </div>
   )
 }
