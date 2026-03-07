@@ -92,7 +92,7 @@ development_status:
   # FRs: FR1-FR12 | UX: Admin A1, A2, A3, A7, CEO org view
   # Dependencies: Epic 1
   # ============================================================
-  epic-2: in-progress
+  epic-2: done
   2-1-department-crud-api: done
   2-2-agent-crud-api: done
   2-3-cascade-analysis-engine: done
@@ -101,7 +101,7 @@ development_status:
   2-6-department-management-ui-admin: done
   2-7-agent-management-soul-editor-ui-admin: done
   2-8-org-template-ui-agent-move: done
-  2-9-ceo-app-org-readonly-view: review
+  2-9-ceo-app-org-readonly-view: done
   epic-2-retrospective: optional
 
   # ============================================================
