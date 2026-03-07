@@ -18,6 +18,7 @@ const nav = [
   { to: '/departments', label: '부서 관리', icon: '🏢' },
   { to: '/agents', label: 'AI 에이전트', icon: '🤖' },
   { to: '/tools', label: '도구 관리', icon: '🔧' },
+  { to: '/costs', label: '비용 관리', icon: '💰' },
   { to: '/credentials', label: 'CLI / API 키', icon: '🔑' },
   { to: '/report-lines', label: '보고 라인', icon: '📋' },
   { to: '/soul-templates', label: '소울 템플릿', icon: '✨' },

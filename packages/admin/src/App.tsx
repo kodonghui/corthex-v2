@@ -13,6 +13,7 @@ const AgentsPage = lazy(() => import('./pages/agents').then((m) => ({ default: m
 const CredentialsPage = lazy(() => import('./pages/credentials').then((m) => ({ default: m.CredentialsPage })))
 const CompaniesPage = lazy(() => import('./pages/companies').then((m) => ({ default: m.CompaniesPage })))
 const ToolsPage = lazy(() => import('./pages/tools').then((m) => ({ default: m.ToolsPage })))
+const CostsPage = lazy(() => import('./pages/costs').then((m) => ({ default: m.CostsPage })))
 const ReportLinesPage = lazy(() => import('./pages/report-lines').then((m) => ({ default: m.ReportLinesPage })))
 const SoulTemplatesPage = lazy(() => import('./pages/soul-templates').then((m) => ({ default: m.SoulTemplatesPage })))
 const MonitoringPage = lazy(() => import('./pages/monitoring').then((m) => ({ default: m.MonitoringPage })))
@@ -80,6 +81,7 @@ export function App() {
             <Route path="credentials" element={<Suspense fallback={<PageSkeleton />}><CredentialsPage /></Suspense>} />
             <Route path="companies" element={<Suspense fallback={<PageSkeleton />}><CompaniesPage /></Suspense>} />
             <Route path="tools" element={<Suspense fallback={<PageSkeleton />}><ToolsPage /></Suspense>} />
+            <Route path="costs" element={<Suspense fallback={<PageSkeleton />}><CostsPage /></Suspense>} />
             <Route path="report-lines" element={<Suspense fallback={<PageSkeleton />}><ReportLinesPage /></Suspense>} />
             <Route path="soul-templates" element={<Suspense fallback={<PageSkeleton />}><SoulTemplatesPage /></Suspense>} />
             <Route path="monitoring" element={<Suspense fallback={<PageSkeleton />}><MonitoringPage /></Suspense>} />
