@@ -97,9 +97,9 @@ development_status:
   2-2-agent-crud-api: done
   2-3-cascade-analysis-engine: done
   2-4-org-template-apply-api: done
-  2-5-org-tree-view-ui-admin: in-progress
-  2-6-department-management-ui-admin: in-progress
-  2-7-agent-management-soul-editor-ui-admin: backlog
+  2-5-org-tree-view-ui-admin: review
+  2-6-department-management-ui-admin: done
+  2-7-agent-management-soul-editor-ui-admin: in-progress
   2-8-org-template-ui-agent-move: backlog
   2-9-ceo-app-org-readonly-view: backlog
   epic-2-retrospective: optional
@@ -115,7 +115,7 @@ development_status:
   3-3-provider-fallback-strategy: done
   3-4-agent-runner-stateless-executor: done
   3-5-cost-recording-system-models-yaml: done
-  3-6-batch-collector-batch-execute: review
+  3-6-batch-collector-batch-execute: done
   3-7-llm-integration-fallback-test: backlog
   epic-3-retrospective: optional
 
