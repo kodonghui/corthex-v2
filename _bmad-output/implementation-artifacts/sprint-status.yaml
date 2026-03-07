@@ -84,7 +84,7 @@ development_status:
   1-4-audit-log-system: done
   1-5-credential-vault-extension: done
   1-6-seed-data-org-templates: done
-  1-7-tenant-isolation-integration-test: backlog
+  1-7-tenant-isolation-integration-test: done
   epic-1-retrospective: optional
 
   # ============================================================
