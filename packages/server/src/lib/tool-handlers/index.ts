@@ -34,6 +34,18 @@ import { markdownConverter } from './builtins/markdown-converter'
 import { regexMatcher } from './builtins/regex-matcher'
 import { unitConverter } from './builtins/unit-converter'
 import { randomGenerator } from './builtins/random-generator'
+import { sentimentAnalyzer } from './builtins/sentiment-analyzer'
+import { companyAnalyzer } from './builtins/company-analyzer'
+import { marketOverview } from './builtins/market-overview'
+import { lawSearch } from './builtins/law-search'
+import { contractReviewer } from './builtins/contract-reviewer'
+import { trademarkSimilarity } from './builtins/trademark-similarity'
+import { patentSearch } from './builtins/patent-search'
+import { uptimeMonitor } from './builtins/uptime-monitor'
+import { securityScanner } from './builtins/security-scanner'
+import { codeQualityTool } from './builtins/code-quality-tool'
+import { dnsLookup } from './builtins/dns-lookup'
+import { sslChecker } from './builtins/ssl-checker'
 
 // 내장 핸들러 등록
 registry.register('get_current_time', getCurrentTime)
@@ -71,6 +83,18 @@ registry.register('markdown_converter', markdownConverter)
 registry.register('regex_matcher', regexMatcher)
 registry.register('unit_converter', unitConverter)
 registry.register('random_generator', randomGenerator)
+registry.register('sentiment_analyzer', sentimentAnalyzer)
+registry.register('company_analyzer', companyAnalyzer)
+registry.register('market_overview', marketOverview)
+registry.register('law_search', lawSearch)
+registry.register('contract_reviewer', contractReviewer)
+registry.register('trademark_similarity', trademarkSimilarity)
+registry.register('patent_search', patentSearch)
+registry.register('uptime_monitor', uptimeMonitor)
+registry.register('security_scanner', securityScanner)
+registry.register('code_quality', codeQualityTool)
+registry.register('dns_lookup', dnsLookup)
+registry.register('ssl_checker', sslChecker)
 
 export { registry } from './registry'
 export type { ToolHandler, ToolExecContext } from './types'

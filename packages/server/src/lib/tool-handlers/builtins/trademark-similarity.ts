@@ -17,6 +17,17 @@ const KO_TO_EN: Record<string, string> = {
   'ㅟ': 'wi', 'ㅠ': 'yu', 'ㅡ': 'eu', 'ㅢ': 'ui', 'ㅣ': 'i',
 }
 
+// Jongsung (final consonant) romanization differs from chosung
+const JONG_TO_EN: Record<string, string> = {
+  'ㄱ': 'k', 'ㄲ': 'k', 'ㄴ': 'n', 'ㄷ': 't', 'ㄹ': 'l',
+  'ㅁ': 'm', 'ㅂ': 'p', 'ㅅ': 't', 'ㅆ': 't', 'ㅇ': 'ng',
+  'ㅈ': 't', 'ㅊ': 't', 'ㅋ': 'k', 'ㅌ': 't', 'ㅍ': 'p', 'ㅎ': 'h',
+  'ㄳ': 'k', 'ㄵ': 'n', 'ㄶ': 'n', 'ㄺ': 'k', 'ㄻ': 'm',
+  'ㄼ': 'l', 'ㄽ': 'l', 'ㄾ': 'l', 'ㄿ': 'l', 'ㅀ': 'l', 'ㅄ': 'p',
+}
+
+type JamoEntry = { jamo: string; position: 'cho' | 'jung' | 'jong' | 'other' }
+
 function decomposeHangul(text: string): string[] {
   const jamos: string[] = []
   for (const char of text) {
@@ -35,9 +46,31 @@ function decomposeHangul(text: string): string[] {
   return jamos
 }
 
+function decomposeWithPosition(text: string): JamoEntry[] {
+  const entries: JamoEntry[] = []
+  for (const char of text) {
+    const code = char.charCodeAt(0)
+    if (code >= 0xAC00 && code <= 0xD7A3) {
+      const offset = code - 0xAC00
+      const cho = Math.floor(offset / (21 * 28))
+      const jung = Math.floor((offset % (21 * 28)) / 28)
+      const jong = offset % 28
+      entries.push({ jamo: CHOSUNG[cho], position: 'cho' })
+      entries.push({ jamo: JUNGSUNG[jung], position: 'jung' })
+      if (jong > 0) entries.push({ jamo: JONGSUNG[jong], position: 'jong' })
+    } else {
+      entries.push({ jamo: char.toLowerCase(), position: 'other' })
+    }
+  }
+  return entries
+}
+
 function romanize(text: string): string {
-  const jamos = decomposeHangul(text)
-  return jamos.map((j) => KO_TO_EN[j] || j).join('')
+  const entries = decomposeWithPosition(text)
+  return entries.map((e) => {
+    if (e.position === 'jong') return JONG_TO_EN[e.jamo] || e.jamo
+    return KO_TO_EN[e.jamo] || e.jamo
+  }).join('')
 }
 
 function jamoSimilarity(a: string, b: string): number {
