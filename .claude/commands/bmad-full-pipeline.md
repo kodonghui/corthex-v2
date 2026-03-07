@@ -106,8 +106,15 @@ YOLO mode -- never wait for user input, never show menus.
 ---
 ## [Party Mode Round 1] {step_name}
 
-### Debate Summary
-(2-3 lines of key agent disagreements)
+### Expert Opinions (ALL 7 MUST appear -- this is visible in tmux to user)
+
+**John (PM):** (2-3 lines of specific feedback from PM perspective)
+**Winston (Architect):** (2-3 lines of specific feedback from Architect perspective)
+**Sally (UX Designer):** (2-3 lines of specific feedback from UX perspective)
+**Amelia (Developer):** (2-3 lines of specific feedback from Dev perspective)
+**Quinn (QA):** (2-3 lines of specific feedback from QA perspective)
+**Mary (Business Analyst):** (2-3 lines of specific feedback from Analyst perspective)
+**Bob (Scrum Master):** (2-3 lines of specific feedback from SM perspective)
 
 ### Issues Found
 | # | Severity | Raised By | Issue | Suggestion |
@@ -129,7 +136,7 @@ YOLO mode -- never wait for user input, never show menus.
 4. Propose better solutions if Round 1 fixes are weak
 5. Deep-dive into any inter-agent disagreements
 6. Save log to _bmad-output/party-logs/{stage}-{step}-round2.md
-7. Send feedback in same format but titled "Round 2"
+7. Send feedback in same format (including all 7 expert opinions) but titled "Round 2"
 
 ### When you receive a FIXED document (Round 3 -- Final):
 1. Read the updated document
@@ -141,6 +148,16 @@ YOLO mode -- never wait for user input, never show menus.
 
 ---
 ## [Party Mode Round 3 - FINAL] {step_name}
+
+### Expert Opinions (ALL 7 MUST appear -- this is visible in tmux to user)
+
+**John (PM):** (final assessment)
+**Winston (Architect):** (final assessment)
+**Sally (UX Designer):** (final assessment)
+**Amelia (Developer):** (final assessment)
+**Quinn (QA):** (final assessment)
+**Mary (Business Analyst):** (final assessment)
+**Bob (Scrum Master):** (final assessment)
 
 ### Final Confirmed Issues
 | # | Severity | Issue | Fix Method |
@@ -229,6 +246,7 @@ Reviewer는 피드백을 Writer에게 보내기 **전에** 로그 파일을 먼�
 ```
 Step 0: 팀 준비
   -> TeamCreate (팀: bmad-planning)
+  -> tmux 설정: tmux bind f resize-pane -Z (Ctrl+B -> f 로 창 전체화면 토글)
   -> _bmad/_config/agent-manifest.csv 읽기 (또는 기본 7명 사용)
   -> 프로젝트 컨텍스트 파악 (CLAUDE.md, feature specs 등)
 
