@@ -33,18 +33,27 @@ orgChartRoute.get('/org-chart', async (c) => {
       id: agents.id,
       name: agents.name,
       role: agents.role,
+      tier: agents.tier,
+      modelName: agents.modelName,
       departmentId: agents.departmentId,
       status: agents.status,
       isSecretary: agents.isSecretary,
+      isSystem: agents.isSystem,
+      soul: agents.soul,
+      allowedTools: agents.allowedTools,
     })
     .from(agents)
     .where(and(eq(agents.companyId, companyId), eq(agents.isActive, true)))
+
+  const tierOrder: Record<string, number> = { manager: 0, specialist: 1, worker: 2 }
+  const sortByTier = <T extends { tier: string }>(list: T[]) =>
+    [...list].sort((a, b) => (tierOrder[a.tier] ?? 9) - (tierOrder[b.tier] ?? 9))
 
   const deptTree = allDepts.map((d) => ({
     id: d.id,
     name: d.name,
     description: d.description,
-    agents: allAgents.filter((a) => a.departmentId === d.id),
+    agents: sortByTier(allAgents.filter((a) => a.departmentId === d.id)),
   }))
 
   const unassignedAgents = allAgents.filter((a) => !a.departmentId)

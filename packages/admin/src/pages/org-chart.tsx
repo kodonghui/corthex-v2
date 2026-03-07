@@ -1,16 +1,24 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
 import { Card, CardContent, Skeleton } from '@corthex/ui'
 
+// ============================================================
+// Types matching server API response (Story 2-5 enhanced)
+// ============================================================
 type OrgAgent = {
   id: string
   name: string
-  role: string
+  role: string | null
+  tier: 'manager' | 'specialist' | 'worker'
+  modelName: string
   departmentId: string | null
   status: string
   isSecretary: boolean
+  isSystem: boolean
+  soul: string | null
+  allowedTools: string[] | null
 }
 
 type OrgDept = {
@@ -28,52 +36,130 @@ type OrgChartData = {
   }
 }
 
-const statusColor: Record<string, string> = {
-  online: 'bg-green-500',
-  working: 'bg-blue-500',
-  error: 'bg-red-500',
-  offline: 'bg-gray-400',
+// ============================================================
+// Constants
+// ============================================================
+const STATUS_CONFIG: Record<string, { color: string; pulse?: boolean; label: string }> = {
+  online: { color: 'bg-green-500', label: '온라인' },
+  working: { color: 'bg-blue-500', pulse: true, label: '작업 중' },
+  error: { color: 'bg-red-500', label: '오류' },
+  offline: { color: 'bg-gray-400', label: '오프라인' },
 }
 
-const statusLabel: Record<string, string> = {
-  online: '온라인',
-  working: '작업 중',
-  error: '오류',
-  offline: '오프라인',
+const TIER_CONFIG: Record<string, { bg: string; label: string }> = {
+  manager: { bg: 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300', label: 'Manager' },
+  specialist: { bg: 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300', label: 'Specialist' },
+  worker: { bg: 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400', label: 'Worker' },
 }
 
-function AgentNode({ agent }: { agent: OrgAgent }) {
-  const [showTooltip, setShowTooltip] = useState(false)
+// ============================================================
+// AgentDetailPanel -- slide-in from right
+// ============================================================
+function AgentDetailPanel({ agent, onClose }: { agent: OrgAgent; onClose: () => void }) {
+  const status = STATUS_CONFIG[agent.status] || STATUS_CONFIG.offline
+  const tier = TIER_CONFIG[agent.tier] || TIER_CONFIG.specialist
+  const tools = agent.allowedTools || []
+  const soulSummary = agent.soul ? (agent.soul.length > 200 ? agent.soul.slice(0, 200) + '...' : agent.soul) : null
 
   return (
-    <div
-      className="relative flex items-center gap-2 px-3 py-2 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-sm hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors cursor-default"
-      onMouseEnter={() => setShowTooltip(true)}
-      onMouseLeave={() => setShowTooltip(false)}
-    >
-      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${statusColor[agent.status] || 'bg-gray-400'}`} />
-      <span className="text-zinc-900 dark:text-zinc-100 truncate">{agent.name}</span>
-      {agent.isSecretary && (
-        <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300 flex-shrink-0">
-          비서
-        </span>
-      )}
-      {showTooltip && (
-        <div className="absolute left-full ml-2 top-0 z-50 w-48 p-3 rounded-lg shadow-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
-          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{agent.name}</p>
-          <p className="text-xs text-zinc-500 mt-1">{agent.role || '역할 미지정'}</p>
-          <div className="flex items-center gap-1.5 mt-2">
-            <span className={`w-2 h-2 rounded-full ${statusColor[agent.status] || 'bg-gray-400'}`} />
-            <span className="text-xs text-zinc-600 dark:text-zinc-400">{statusLabel[agent.status] || agent.status}</span>
+    <>
+      {/* Backdrop */}
+      <div className="fixed inset-0 z-40 bg-black/20" onClick={onClose} />
+      {/* Panel */}
+      <div className="fixed right-0 top-0 z-50 h-full w-80 bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-xl animate-slide-left overflow-y-auto">
+        <div className="p-5 space-y-5">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">{agent.name}</h2>
+            <button onClick={onClose} className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 text-xl leading-none">&times;</button>
           </div>
-          {agent.isSecretary && <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">비서 에이전트</p>}
+
+          {/* Status + Tier */}
+          <div className="flex items-center gap-2">
+            <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium ${tier.bg}`}>{tier.label}</span>
+            <span className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+              <span className={`w-2 h-2 rounded-full ${status.color} ${status.pulse ? 'animate-pulse' : ''}`} />
+              {status.label}
+            </span>
+          </div>
+
+          {/* Model */}
+          <div>
+            <p className="text-xs text-zinc-400 dark:text-zinc-500 mb-1">모델</p>
+            <p className="text-sm text-zinc-700 dark:text-zinc-300 font-mono">{agent.modelName}</p>
+          </div>
+
+          {/* Role */}
+          {agent.role && (
+            <div>
+              <p className="text-xs text-zinc-400 dark:text-zinc-500 mb-1">역할</p>
+              <p className="text-sm text-zinc-700 dark:text-zinc-300">{agent.role}</p>
+            </div>
+          )}
+
+          {/* System badge */}
+          {agent.isSystem && (
+            <div className="flex items-center gap-1.5 px-2 py-1.5 rounded bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800">
+              <span className="text-xs">🔒</span>
+              <span className="text-xs text-amber-700 dark:text-amber-300">시스템 필수 에이전트</span>
+            </div>
+          )}
+
+          {/* Soul summary */}
+          {soulSummary && (
+            <div>
+              <p className="text-xs text-zinc-400 dark:text-zinc-500 mb-1">Soul</p>
+              <p className="text-xs text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap bg-zinc-50 dark:bg-zinc-800 rounded p-2">{soulSummary}</p>
+            </div>
+          )}
+
+          {/* Tools */}
+          {tools.length > 0 && (
+            <div>
+              <p className="text-xs text-zinc-400 dark:text-zinc-500 mb-1">허용 도구 ({tools.length})</p>
+              <div className="flex flex-wrap gap-1">
+                {tools.map((tool) => (
+                  <span key={tool} className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
+                    {tool}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </div>
+    </>
   )
 }
 
-function DepartmentNode({ dept }: { dept: OrgDept }) {
+// ============================================================
+// AgentNode -- individual agent in the tree
+// ============================================================
+function AgentNode({ agent, onSelect }: { agent: OrgAgent; onSelect: (a: OrgAgent) => void }) {
+  const status = STATUS_CONFIG[agent.status] || STATUS_CONFIG.offline
+  const tier = TIER_CONFIG[agent.tier] || TIER_CONFIG.specialist
+
+  return (
+    <button
+      onClick={() => onSelect(agent)}
+      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-sm hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors cursor-pointer w-full text-left"
+    >
+      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${status.color} ${status.pulse ? 'animate-pulse' : ''}`} />
+      <span className="text-zinc-900 dark:text-zinc-100 truncate">{agent.name}</span>
+      <span className={`text-[10px] px-1.5 py-0.5 rounded flex-shrink-0 ${tier.bg}`}>{tier.label}</span>
+      {agent.isSystem && (
+        <span className="text-[10px] px-1 py-0.5 rounded bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300 flex-shrink-0">
+          🔒 시스템
+        </span>
+      )}
+    </button>
+  )
+}
+
+// ============================================================
+// DepartmentSection -- collapsible department with agents
+// ============================================================
+function DepartmentSection({ dept, onSelectAgent }: { dept: OrgDept; onSelectAgent: (a: OrgAgent) => void }) {
   const [expanded, setExpanded] = useState(true)
 
   return (
@@ -84,14 +170,15 @@ function DepartmentNode({ dept }: { dept: OrgDept }) {
       >
         <span className="text-xs text-indigo-400">{expanded ? '▼' : '▶'}</span>
         <span className="text-sm font-medium text-indigo-700 dark:text-indigo-300">{dept.name}</span>
-        <span className="text-xs px-1.5 py-0.5 rounded-full bg-indigo-200 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 ml-auto">
+        {dept.description && <span className="text-xs text-indigo-400 dark:text-indigo-500 truncate hidden sm:inline">— {dept.description}</span>}
+        <span className="text-xs px-1.5 py-0.5 rounded-full bg-indigo-200 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 ml-auto flex-shrink-0">
           {dept.agents.length}
         </span>
       </button>
       {expanded && dept.agents.length > 0 && (
         <div className="ml-6 md:ml-10 mt-2 space-y-1.5 border-l-2 border-indigo-200 dark:border-indigo-800 pl-4">
           {dept.agents.map((agent) => (
-            <AgentNode key={agent.id} agent={agent} />
+            <AgentNode key={agent.id} agent={agent} onSelect={onSelectAgent} />
           ))}
         </div>
       )}
@@ -104,14 +191,54 @@ function DepartmentNode({ dept }: { dept: OrgDept }) {
   )
 }
 
+// ============================================================
+// Loading Skeleton
+// ============================================================
+function OrgChartSkeleton() {
+  return (
+    <div className="space-y-6">
+      <Skeleton className="h-8 w-32" />
+      <Card>
+        <CardContent>
+          <Skeleton className="h-12 w-full mb-4" />
+          {[0, 1].map((d) => (
+            <div key={d} className="ml-10 mb-4">
+              <Skeleton className="h-10 w-full mb-2" />
+              <div className="ml-10 space-y-1.5 border-l-2 border-zinc-200 dark:border-zinc-700 pl-4">
+                {[0, 1, 2].map((a) => (
+                  <Skeleton key={a} className="h-9 w-full" />
+                ))}
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+// ============================================================
+// Main Page
+// ============================================================
 export function OrgChartPage() {
   const selectedCompanyId = useAdminStore((s) => s.selectedCompanyId)
+  const [selectedAgent, setSelectedAgent] = useState<OrgAgent | null>(null)
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['org-chart', selectedCompanyId],
-    queryFn: () => api.get<OrgChartData>(`/admin/org-chart?companyId=${selectedCompanyId}`),
+    queryFn: () => api.get<OrgChartData>(`/admin/org-chart?companyId=${encodeURIComponent(selectedCompanyId!)}`),
     enabled: !!selectedCompanyId,
   })
+
+  // Close panel on Escape (global listener so it works regardless of focus)
+  useEffect(() => {
+    if (!selectedAgent) return
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelectedAgent(null)
+    }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [selectedAgent])
 
   if (!selectedCompanyId) {
     return (
@@ -124,27 +251,30 @@ export function OrgChartPage() {
     )
   }
 
+  if (isLoading || !data) return <OrgChartSkeleton />
+
   if (isError) {
     return (
       <div className="space-y-6">
         <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">조직도</h1>
         <Card><CardContent>
-          <p className="text-sm text-red-500 text-center py-8">데이터를 불러오는데 실패했습니다.</p>
+          <div className="text-center py-8 space-y-3">
+            <p className="text-sm text-red-500">조직도를 불러올 수 없습니다.</p>
+            <button
+              onClick={() => refetch()}
+              className="px-4 py-2 text-sm rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
+            >
+              다시 시도
+            </button>
+          </div>
         </CardContent></Card>
       </div>
     )
   }
 
-  if (isLoading || !data) {
-    return (
-      <div className="space-y-6">
-        <Skeleton className="h-8 w-32" />
-        <Card><CardContent><Skeleton className="h-64 w-full" /></CardContent></Card>
-      </div>
-    )
-  }
-
   const org = data.data
+  const totalAgents = org.departments.reduce((s, d) => s + d.agents.length, 0) + org.unassignedAgents.length
+  const isEmpty = org.departments.length === 0 && org.unassignedAgents.length === 0
 
   return (
     <div className="space-y-6">
@@ -152,44 +282,56 @@ export function OrgChartPage() {
 
       <Card>
         <CardContent>
-          {/* 회사 루트 노드 */}
+          {/* Company root node */}
           <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 mb-4">
-            <span className="text-lg">🏛️</span>
+            <span className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
+              {org.company.name.charAt(0)}
+            </span>
             <span className="text-sm font-semibold">{org.company.name}</span>
             <span className="text-xs opacity-60 ml-auto">
-              {org.departments.length}개 부서 · {org.departments.reduce((s, d) => s + d.agents.length, 0) + org.unassignedAgents.length}명 에이전트
+              {org.departments.length}개 부서 · {totalAgents}명 에이전트
             </span>
           </div>
 
-          {/* 부서 노드들 */}
-          <div className="space-y-3">
-            {org.departments.map((dept) => (
-              <DepartmentNode key={dept.id} dept={dept} />
-            ))}
-          </div>
+          {/* Empty state */}
+          {isEmpty && (
+            <div className="text-center py-12 space-y-3">
+              <p className="text-sm text-zinc-500">아직 조직이 구성되지 않았습니다.</p>
+              <p className="text-xs text-zinc-400">템플릿으로 시작해 보세요!</p>
+            </div>
+          )}
 
-          {/* 미배정 에이전트 */}
+          {/* Department tree */}
+          {!isEmpty && (
+            <div className="space-y-3">
+              {org.departments.map((dept) => (
+                <DepartmentSection key={dept.id} dept={dept} onSelectAgent={setSelectedAgent} />
+              ))}
+            </div>
+          )}
+
+          {/* Unassigned agents */}
           {org.unassignedAgents.length > 0 && (
             <div className="ml-6 md:ml-10 mt-3">
               <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800">
-                <span className="text-sm font-medium text-amber-700 dark:text-amber-300">미배정</span>
+                <span className="text-sm font-medium text-amber-700 dark:text-amber-300">미배속</span>
+                <span className="text-xs text-amber-500 dark:text-amber-400">부서를 지정하세요</span>
                 <span className="text-xs px-1.5 py-0.5 rounded-full bg-amber-200 dark:bg-amber-800 text-amber-600 dark:text-amber-400 ml-auto">
                   {org.unassignedAgents.length}
                 </span>
               </div>
               <div className="ml-6 md:ml-10 mt-2 space-y-1.5 border-l-2 border-amber-200 dark:border-amber-800 pl-4">
                 {org.unassignedAgents.map((agent) => (
-                  <AgentNode key={agent.id} agent={agent} />
+                  <AgentNode key={agent.id} agent={agent} onSelect={setSelectedAgent} />
                 ))}
               </div>
             </div>
           )}
-
-          {org.departments.length === 0 && org.unassignedAgents.length === 0 && (
-            <p className="text-sm text-zinc-400 text-center py-8">부서와 에이전트가 아직 없습니다.</p>
-          )}
         </CardContent>
       </Card>
+
+      {/* Agent detail side panel */}
+      {selectedAgent && <AgentDetailPanel agent={selectedAgent} onClose={() => setSelectedAgent(null)} />}
     </div>
   )
 }
