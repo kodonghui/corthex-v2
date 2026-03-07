@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import { Sidebar } from './sidebar'
 import { ToastContainer } from './toast-container'
+import { AdminBudgetAlertListener } from './budget-alert-listener'
 
 export function Layout() {
   return (
@@ -11,6 +12,7 @@ export function Layout() {
           <Outlet />
         </div>
       </main>
+      <AdminBudgetAlertListener />
       <ToastContainer />
     </div>
   )

@@ -5,6 +5,7 @@ import { useAuthStore } from '../stores/auth-store'
 import { ToastProvider } from '@corthex/ui'
 import { NotificationListener } from './notification-listener'
 import { NightJobListener } from './night-job-listener'
+import { BudgetAlertListener } from './budget-alert-listener'
 import { InstallBanner } from './install-banner'
 import { PushPermission } from './push-permission'
 
@@ -59,6 +60,7 @@ export function Layout() {
     <ToastProvider>
     <NotificationListener />
     <NightJobListener />
+    <BudgetAlertListener />
     <div className="h-screen flex flex-col lg:flex-row bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
       {/* 데스크톱 사이드바 (lg 이상) */}
       <div className="hidden lg:block border-r border-zinc-200 dark:border-zinc-800">
