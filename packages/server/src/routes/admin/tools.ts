@@ -3,10 +3,11 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { eq, and, or, isNull } from 'drizzle-orm'
 import { db } from '../../db'
-import { toolDefinitions, agentTools } from '../../db/schema'
+import { toolDefinitions, agentTools, agents } from '../../db/schema'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { registry } from '../../lib/tool-handlers'
+import { createAuditLog } from '../../services/audit-log'
 
 import type { AppEnv } from '../../types'
 
@@ -46,6 +47,57 @@ toolsRoute.get('/tools', async (c) => {
     ...t,
     handlerRegistered: t.handler ? !!registry.get(t.handler) : false,
   }))
+  return c.json({ data })
+})
+
+// GET /api/admin/tools/catalog -- grouped by category (MUST be before /tools/:id)
+toolsRoute.get('/tools/catalog', async (c) => {
+  const tenant = c.get('tenant')
+
+  // Get tools from DB (with category metadata)
+  const dbTools = await db.select().from(toolDefinitions).where(
+    or(isNull(toolDefinitions.companyId), eq(toolDefinitions.companyId, tenant.companyId)),
+  )
+
+  // Get handler names from registry
+  const registeredHandlers = new Set(registry.list())
+
+  // Build catalog grouped by category
+  const categoryMap = new Map<string, Array<{
+    name: string
+    description: string | null
+    category: string
+    registered: boolean
+  }>>()
+
+  for (const tool of dbTools) {
+    if (!tool.isActive) continue
+    const cat = tool.category || 'common'
+    if (!categoryMap.has(cat)) categoryMap.set(cat, [])
+    categoryMap.get(cat)!.push({
+      name: tool.handler || tool.name,
+      description: tool.description,
+      category: cat,
+      registered: tool.handler ? registeredHandlers.has(tool.handler) : false,
+    })
+  }
+
+  // Sort categories and tools
+  const categories = ['common', 'finance', 'legal', 'marketing', 'tech']
+  const data = categories
+    .filter((cat) => categoryMap.has(cat))
+    .map((cat) => ({
+      category: cat,
+      tools: categoryMap.get(cat)!.sort((a, b) => a.name.localeCompare(b.name)),
+    }))
+
+  // Add any unknown categories at the end
+  for (const [cat, tools] of categoryMap) {
+    if (!categories.includes(cat)) {
+      data.push({ category: cat, tools: tools.sort((a, b) => a.name.localeCompare(b.name)) })
+    }
+  }
+
   return c.json({ data })
 })
 
@@ -101,6 +153,129 @@ toolsRoute.put('/tools/:id', zValidator('json', updateToolSchema), async (c) => 
       handlerRegistered: updated.handler ? !!registry.get(updated.handler) : false,
     },
   })
+})
+
+// === Agent Allowed Tools Management ===
+
+const updateAllowedToolsSchema = z.object({
+  allowedTools: z.array(z.string()),
+})
+
+const batchAllowedToolsSchema = z.object({
+  category: z.string().min(1),
+  action: z.enum(['add', 'remove']),
+})
+
+// PATCH /api/admin/agents/:id/allowed-tools -- replace allowedTools
+toolsRoute.patch('/agents/:id/allowed-tools', zValidator('json', updateAllowedToolsSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const agentId = c.req.param('id')
+  const { allowedTools } = c.req.valid('json')
+
+  // Get current agent
+  const [current] = await db.select()
+    .from(agents)
+    .where(and(eq(agents.id, agentId), eq(agents.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!current) throw new HTTPError(404, '에이전트를 찾을 수 없습니다', 'AGENT_001')
+
+  const before = (current.allowedTools as string[]) || []
+  const added = allowedTools.filter((t) => !before.includes(t))
+  const removed = before.filter((t) => !allowedTools.includes(t))
+
+  // Update
+  const [updated] = await db.update(agents)
+    .set({ allowedTools, updatedAt: new Date() })
+    .where(and(eq(agents.id, agentId), eq(agents.companyId, tenant.companyId)))
+    .returning()
+
+  // Audit log
+  if (added.length > 0 || removed.length > 0) {
+    createAuditLog({
+      companyId: tenant.companyId,
+      actorType: tenant.isAdminUser ? 'admin_user' : 'user',
+      actorId: tenant.userId,
+      action: 'agent.allowedTools.update',
+      targetType: 'agent',
+      targetId: agentId,
+      before: { allowedTools: before },
+      after: { allowedTools },
+      metadata: { added, removed },
+    }).catch(() => {})
+  }
+
+  return c.json({ data: { id: updated.id, name: updated.name, allowedTools: updated.allowedTools } })
+})
+
+// PATCH /api/admin/agents/:id/allowed-tools/batch -- category bulk add/remove
+toolsRoute.patch('/agents/:id/allowed-tools/batch', zValidator('json', batchAllowedToolsSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const agentId = c.req.param('id')
+  const { category, action } = c.req.valid('json')
+
+  // Get tools in this category from DB
+  const categoryTools = await db.select({ handler: toolDefinitions.handler })
+    .from(toolDefinitions)
+    .where(
+      and(
+        eq(toolDefinitions.category, category),
+        eq(toolDefinitions.isActive, true),
+        or(isNull(toolDefinitions.companyId), eq(toolDefinitions.companyId, tenant.companyId)),
+      ),
+    )
+
+  const categoryToolNames = categoryTools
+    .map((t) => t.handler)
+    .filter((h): h is string => !!h)
+
+  if (categoryToolNames.length === 0) {
+    throw new HTTPError(404, `카테고리 "${category}"에 도구가 없습니다`, 'TOOL_005')
+  }
+
+  // Get current agent
+  const [current] = await db.select()
+    .from(agents)
+    .where(and(eq(agents.id, agentId), eq(agents.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!current) throw new HTTPError(404, '에이전트를 찾을 수 없습니다', 'AGENT_001')
+
+  const before = (current.allowedTools as string[]) || []
+  let newAllowed: string[]
+
+  if (action === 'add') {
+    newAllowed = [...new Set([...before, ...categoryToolNames])]
+  } else {
+    const removeSet = new Set(categoryToolNames)
+    newAllowed = before.filter((t) => !removeSet.has(t))
+  }
+
+  const added = newAllowed.filter((t) => !before.includes(t))
+  const removed = before.filter((t) => !newAllowed.includes(t))
+
+  // Update
+  const [updated] = await db.update(agents)
+    .set({ allowedTools: newAllowed, updatedAt: new Date() })
+    .where(and(eq(agents.id, agentId), eq(agents.companyId, tenant.companyId)))
+    .returning()
+
+  // Audit log
+  if (added.length > 0 || removed.length > 0) {
+    createAuditLog({
+      companyId: tenant.companyId,
+      actorType: tenant.isAdminUser ? 'admin_user' : 'user',
+      actorId: tenant.userId,
+      action: 'agent.allowedTools.batch',
+      targetType: 'agent',
+      targetId: agentId,
+      before: { allowedTools: before },
+      after: { allowedTools: newAllowed },
+      metadata: { category, batchAction: action, added, removed },
+    }).catch(() => {})
+  }
+
+  return c.json({ data: { id: updated.id, name: updated.name, allowedTools: updated.allowedTools } })
 })
 
 // === Agent-Tool Mapping ===
