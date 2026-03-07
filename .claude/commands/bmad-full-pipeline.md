@@ -1,6 +1,6 @@
 ---
 name: 'full-pipeline'
-description: 'BMAD Full Pipeline. planning(brief->PRD->arch->UX->epics, 서브에이전트 파티모드) 또는 story dev(create->dev->TEA->QA->CR). 사용법: /bmad-full-pipeline [planning|스토리ID]'
+description: 'BMAD Full Pipeline. planning(brief->PRD->arch->UX->epics, 팀원 핑퐁 파티모드) 또는 story dev(create->dev->TEA->QA->CR). 사용법: /bmad-full-pipeline [planning|스토리ID]'
 ---
 
 # BMAD Full Pipeline
@@ -14,43 +14,48 @@ planning 모드 또는 story dev 모드.
 
 ---
 
-## 서브에이전트 파티모드 (핵심 메커니즘)
+## 팀원 파티모드 (핵심 메커니즘)
 
-BMAD의 대화형 파티모드(`bmad-party-mode` 스킬) 대신, **서브에이전트 방식**으로 완전 자동화.
-매 스텝마다 **3 라운드 직렬 실행**. 사용자 입력 불필요 -- 완전 YOLO.
+**팀원 2명(Writer + Reviewer)이 직접 핑퐁**하면서 파티모드를 수행.
+둘 다 tmux에서 실행 -- 사용자가 실시간으로 관찰 가능.
+매 스텝마다 **3 라운드 핑퐁**. 사용자 입력 불필요 -- 완전 YOLO.
 
-### 왜 서브에이전트를 쓰는가
+### 왜 팀원 핑퐁인가 (서브에이전트 대신)
 
-- `bmad-party-mode` 스킬은 대화형 -> 매번 "Y" 눌러야 다음 진행
-- 42 스텝 × 3 라운드 = 126번 "Y"는 비현실적
-- 서브에이전트는 결과만 반환하고 종료 -> 입력 불필요
-- 3개의 독립된 서브에이전트가 교차 검증 -> 할루시네이션 방지
-- 오케스트레이터가 라운드 간 요약 정리 -> 방향 제어 + 중복 제거
+- 서브에이전트(Agent 도구 foreground)는 **보이지 않음** -- 사용자가 토론 과정 관찰 불가
+- 팀원은 **tmux 창**에서 실행 -- 7명 전문가 토론이 실시간으로 보임
+- Reviewer는 파이프라인 내내 **상주** -- 라운드 간 컨텍스트 유지, 콜드스타트 없음
+- Writer-Reviewer가 SendMessage로 직접 소통 -- 오케스트레이터 개입 불필요
+- 오케스트레이터 역할 최소화 -- 스텝 지시 + 커밋만
 
 ### 흐름
 
 ```
-Writer: 스텝 작성 완료 -> SendMessage로 보고
+[스텝 시작]
+오케스트레이터 -> Writer: "{step_name} 작성해"
 
-오케스트레이터: Agent 도구로 라운드1 실행 (foreground)
-  -> 서브에이전트가 7명 역할극 토론 -> 이슈 테이블 반환
+Writer: 스텝 작성 완료 -> Reviewer에게: "Review this: {file_path}"
 
-오케스트레이터: 라운드1 결과 정리 (중복 제거, 핵심 파악)
+Reviewer: 문서 읽고 7명 역할극 토론
+  -> Writer에게: 라운드1 피드백 (이슈 테이블)
 
-오케스트레이터: Agent 도구로 라운드2 실행
-  입력: 문서 + 라운드1 요약
-  -> 7명이 라운드1 결과를 보고 더 깊이 검토
+Writer: 라운드1 이슈 수정 -> Reviewer에게: "Fixed, review again"
 
-오케스트레이터: 라운드1+2 결과 통합
+Reviewer: 수정된 문서 + 라운드1 컨텍스트로 심화 검토
+  -> Writer에게: 라운드2 피드백 (심화 발견)
 
-오케스트레이터: Agent 도구로 라운드3 실행
-  입력: 문서 + 라운드1+2 통합 요약
-  -> 7명이 최종 검토 -> PASS/FAIL 판정
+Writer: 라운드2 이슈 수정 -> Reviewer에게: "Fixed, final review"
 
-오케스트레이터: 판정에 따라 처리
-  PASS + 이슈 있음 -> Writer에게 수정 지시 -> 다음 스텝으로
-  PASS + 이슈 없음 -> 그대로 다음 스텝으로
-  FAIL -> Writer에게 재작성 지시 -> 라운드1부터 재실행
+Reviewer: 수정된 문서 + 라운드1+2 컨텍스트로 최종 검토
+  -> Writer에게: 라운드3 최종 판정 (PASS/FAIL)
+
+PASS + 이슈 -> Writer가 남은 이슈 수정 -> 오케스트레이터에게 완료 보고
+PASS + 이슈 없음 -> Writer가 바로 오케스트레이터에게 완료 보고
+FAIL -> Writer가 재작성 -> Reviewer에게 다시 전달 -> 라운드1부터 재실행
+
+[스텝 완료]
+오케스트레이터: 완료 보고 수신 -> 다음 스텝 지시
+단계 전체 스텝 완료 -> 오케스트레이터가 git commit
 ```
 
 ### 에이전트 매니페스트
@@ -68,33 +73,39 @@ Writer: 스텝 작성 완료 -> SendMessage로 보고
 | Business Analyst | Mary | 비즈니스 가치, 시장 적합성, ROI |
 | Scrum Master | Bob | 범위, 의존성, 일정 위험 |
 
-### 서브에이전트 프롬프트 템플릿
+### Reviewer 프롬프트 템플릿
 
-#### 라운드 1
+Reviewer 팀원 생성 시 아래 프롬프트를 전달:
 
 ```
-You are a BMAD multi-agent reviewer.
-Play all 7 expert roles from the agent manifest below and debate.
-Faithfully reflect each agent's communicationStyle, principles, and role.
+You are a BMAD party mode reviewer. You stay alive throughout the entire planning pipeline.
+When Writer sends you a document to review, perform a 7-expert debate and return feedback.
+YOLO mode -- never wait for user input, never show menus.
+
+## Your Role
+- Receive documents from Writer via SendMessage
+- Play all 7 expert roles from the agent manifest and debate
+- Return structured feedback to Writer via SendMessage
+- Track round number (1, 2, or 3) based on conversation context
 
 ## Agent Manifest
 {agent_manifest}
 
-## Review Target
-File: {document_path}
-Step: {step_name}
+## How Each Round Works
 
-## Reference Documents (must cross-check)
-- v1-feature-spec.md (if exists): does it cover the feature?
-- Previous stage documents: is it consistent?
+### When you receive a NEW document (Round 1):
+1. Read the document file
+2. Play all 7 expert roles -- each raises issues from their perspective
+3. Agents rebut, agree, or supplement each other
+4. Confirm: "Is this a real working feature? Not a stub/mock?"
+5. Confirm: "Is there a concrete implementation plan? Not a placeholder?"
+6. Cross-check against v1-feature-spec.md (if exists) and previous stage documents
+7. Save log to _bmad-output/party-logs/{stage}-{step}-round1.md
+8. Send feedback to Writer in this format:
 
-## Debate Rules
-1. Each agent raises issues/concerns/improvements from their perspective
-2. Agents may rebut, agree, or supplement each other
-3. Confirm: "Is this a real working feature? Not a stub/mock?"
-4. Confirm: "Is there a concrete implementation plan? Not a placeholder?"
+---
+## [Party Mode Round 1] {step_name}
 
-## Output Format
 ### Debate Summary
 (2-3 lines of key agent disagreements)
 
@@ -106,94 +117,108 @@ Step: {step_name}
 ### Consensus Status
 - Major objections: N
 - Minor opinions: N
-```
 
-#### 라운드 2
+### Action Required
+- FIX: (list of issues Writer must fix before Round 2)
+---
 
-```
-You are a BMAD multi-agent reviewer (Round 2).
-Play all 7 expert roles from the agent manifest below and debate.
+### When you receive a FIXED document (Round 2):
+1. Read the updated document
+2. Re-evaluate Round 1 issues -- are they actually fixed?
+3. Find perspectives or issues Round 1 missed
+4. Propose better solutions if Round 1 fixes are weak
+5. Deep-dive into any inter-agent disagreements
+6. Save log to _bmad-output/party-logs/{stage}-{step}-round2.md
+7. Send feedback in same format but titled "Round 2"
 
-## Agent Manifest
-{agent_manifest}
+### When you receive a FIXED document (Round 3 -- Final):
+1. Read the updated document
+2. Final review of all remaining issues
+3. Downgrade exaggerated issues, upgrade underestimated ones
+4. Create final confirmed fix list
+5. Save log to _bmad-output/party-logs/{stage}-{step}-round3.md
+6. Make final judgment and send to Writer:
 
-## Review Target
-File: {document_path}
-Step: {step_name}
+---
+## [Party Mode Round 3 - FINAL] {step_name}
 
-## Round 1 Results (Orchestrator Summary)
-{round1_summary}
-
-## This Round's Mission
-1. Re-evaluate whether Round 1 issues are real problems
-2. Find perspectives or issues Round 1 missed
-3. Propose better solutions for Round 1 issues
-4. Deep-dive into any inter-agent disagreements
-
-## Output Format
-(Same table format as Round 1)
-```
-
-#### 라운드 3
-
-```
-You are a BMAD multi-agent reviewer (Final Round).
-Play all 7 expert roles from the agent manifest below and debate.
-
-## Agent Manifest
-{agent_manifest}
-
-## Review Target
-File: {document_path}
-Step: {step_name}
-
-## Round 1+2 Merged Results
-{round1_2_summary}
-
-## This Round's Mission (Final)
-1. Final review of all issues so far
-2. Downgrade exaggerated issues, upgrade underestimated ones
-3. Create final confirmed fix list
-4. Final judgment: "Can we proceed to the next stage as-is?"
-
-## Output Format
 ### Final Confirmed Issues
 | # | Severity | Issue | Fix Method |
 |---|----------|-------|------------|
+(only issues that still need fixing)
 
 ### Final Verdict
-- PASS: can proceed after fixes / FAIL: rewrite needed
+- **PASS** or **FAIL**
 - Reason: (1-2 lines)
+
+### If PASS with issues:
+- FIX: (final fix list for Writer -- fix these then proceed to next step)
+
+### If FAIL:
+- REWRITE: (what needs to be fundamentally redone)
+---
+
+## Important Rules
+- Always read the actual document file before reviewing -- never review from memory
+- Be specific: cite exact sections, line references, missing details
+- Each of the 7 agents must contribute at least one point per round
+- Don't be a rubber stamp -- find real issues, not just nitpicks
+- But also don't manufacture fake problems -- if it's good, say it's good
+- After sending Round 3 verdict, WAIT for the next document from Writer
 ```
 
-### 오케스트레이터가 각 라운드를 실행하는 구체적 절차
+### Writer 프롬프트 템플릿
 
-1. **문서 읽기**: Writer가 작성 완료한 문서를 Read 도구로 읽음
-2. **agent-manifest.csv 읽기** (또는 기본 7명 사용)
-3. **Agent 도구로 라운드1 호출** (foreground, background 아님)
-   - `{agent_manifest}`, `{document_path}`, `{step_name}` 채워서 프롬프트 전달
-   - 서브에이전트가 문서 읽고, 7명 역할극 수행, 이슈 테이블 반환
-4. **라운드1 결과 요약** (중복 제거, 핵심 테마 정리)
-5. **Agent 도구로 라운드2 호출**
-   - `{round1_summary}`에 4번의 요약을 넣음
-   - 서브에이전트가 심화 검토 반환
-6. **라운드1+2 통합 요약** 작성
-7. **Agent 도구로 라운드3 호출**
-   - `{round1_2_summary}`에 6번의 통합 요약을 넣음
-   - 서브에이전트가 최종 PASS/FAIL 판정 반환
-8. **판정에 따라 처리**:
-   - PASS + 이슈 -> Writer에게 SendMessage로 수정 지시 -> Writer 수정 후 다음 스텝
-   - PASS + 이슈 없음 -> 바로 다음 스텝
-   - FAIL -> Writer에게 SendMessage로 재작성 지시 -> 라운드1부터 재실행
+Writer 팀원 생성 시 아래 프롬프트를 전달:
+
+```
+You are a BMAD planning document writer.
+You work with a Reviewer teammate who validates your work through 3-round party mode.
+YOLO mode -- auto-proceed through all confirmation prompts, never wait for user input.
+
+## Your Workflow (per step)
+1. Receive step instruction from Orchestrator
+2. Write the step using the appropriate BMAD skill
+3. Send the completed document path to Reviewer: "Review this: {file_path}, Step: {step_name}"
+4. Receive Round 1 feedback from Reviewer -> fix issues -> send back: "Fixed. Step: {step_name}"
+5. Receive Round 2 feedback from Reviewer -> fix issues -> send back: "Fixed. Step: {step_name}"
+6. Receive Round 3 final verdict from Reviewer:
+   - PASS with issues -> fix remaining issues -> SendMessage to Orchestrator: step complete report
+   - PASS no issues -> SendMessage to Orchestrator: step complete report
+   - FAIL -> rewrite from scratch -> send to Reviewer: "Rewritten. Step: {step_name}" -> restart rounds
+
+## Rules
+1. Only write the step the Orchestrator instructed. Do NOT skip ahead.
+2. Always create documents fresh -- never skip because "file already exists".
+3. Reference v1-feature-spec.md if it exists in the project.
+4. No stubs/mocks/placeholders -- concrete, real content only.
+5. When running a BMAD skill, provide all needed project context yourself.
+   Do not wait for user input. Auto-answer any skill prompts.
+6. When fixing Reviewer feedback, actually fix the document file -- don't just acknowledge.
+7. After ALL 3 rounds pass for a step, report to Orchestrator (not Reviewer).
+
+## Report Format (to Orchestrator, after step passes all 3 rounds)
+[Step Complete] {stage_name} - {step_name}
+Content summary: (1-2 lines)
+Party mode: 3 rounds passed (issues fixed: N)
+Changed files: (paths)
+
+## Report Format (to Reviewer, for review)
+Review this: {file_path}
+Step: {step_name}
+Stage: {stage_name}
+```
 
 ### 파티모드 로그 저장
 
-각 라운드 결과를 `_bmad-output/party-logs/`에 저장:
+Reviewer가 각 라운드의 토론을 `_bmad-output/party-logs/`에 저장:
 - `{stage}-{step}-round1.md`
 - `{stage}-{step}-round2.md`
 - `{stage}-{step}-round3.md`
 
 예시: `brief-step02-round1.md`, `prd-step05-round2.md`
+
+Reviewer는 피드백을 Writer에게 보내기 **전에** 로그 파일을 먼저 저장.
 
 ---
 
@@ -204,60 +229,51 @@ Step: {step_name}
 ```
 Step 0: 팀 준비
   -> TeamCreate (팀: bmad-planning)
-  -> TaskCreate (기획 단계별 태스크 등록)
-
-Step 1: 준비
-  -> _bmad/_config/agent-manifest.csv 읽기
-  -> 기존 기획 문서 확인
+  -> _bmad/_config/agent-manifest.csv 읽기 (또는 기본 7명 사용)
   -> 프로젝트 컨텍스트 파악 (CLAUDE.md, feature specs 등)
 
-Step 2: Writer 팀원 생성
-  -> Agent 도구로 Writer 생성 (프롬프트는 아래 참조)
+Step 1: 팀원 2명 생성
+  -> Writer 생성 (Agent 도구, team_name: bmad-planning, name: writer)
+     - mode: bypassPermissions
+     - Writer 프롬프트 템플릿 사용
+     - 단계 목록, 스텝 목록, BMAD 스킬명 포함
+  -> Reviewer 생성 (Agent 도구, team_name: bmad-planning, name: reviewer)
+     - mode: bypassPermissions
+     - Reviewer 프롬프트 템플릿 사용
+     - agent-manifest.csv 전체 내용을 {agent_manifest}에 포함
 
-Step 3: 단계별 루프 (7개 단계 반복)
-  -> 각 단계의 각 스텝에 대해:
-     1. SendMessage로 Writer에게 지시: "{step_name} 작성해"
-     2. Writer 완료 보고 대기
-     3. 서브에이전트 파티모드 3라운드 실행
-     4. PASS/FAIL 처리
-     5. 다음 스텝으로
+Step 2: 단계별 루프 (7개 단계 반복)
+  -> Writer에게 SendMessage: "Start {stage_name}. Write {step_name}. Use skill: {skill_name}"
+  -> Writer가 작성 -> Reviewer와 3라운드 핑퐁 (오케스트레이터 개입 없음)
+  -> Writer가 "[Step Complete]" 보고 -> 다음 스텝 지시
   -> 단계 전체 스텝 완료 후: git commit
 
-Step 4: 최종 검증
-  -> 총 파티 라운드 수 확인
+Step 3: 최종 검증
+  -> party-logs에서 총 파티 라운드 수 확인
   -> 개별 커밋 확인: git log --oneline
-  -> Writer 종료
+  -> Writer + Reviewer 종료
 
-Step 5: 완료
+Step 4: 완료
   -> "기획 완료! /bmad-full-pipeline [첫 스토리 ID]로 개발 시작하세요"
 ```
 
-### Writer 팀원 프롬프트
+### 오케스트레이터가 실제로 하는 일 (최소)
 
-`Agent` 도구로 생성. `team_name` 지정, `mode: "bypassPermissions"`:
+1. **팀 생성 + Writer & Reviewer 생성** (시작 시 1회)
+2. **Writer에게 스텝 지시** (SendMessage로 하나씩)
+3. **Writer 완료 보고 대기** (Writer-Reviewer가 3라운드 자율 처리)
+4. **단계 완료 시 커밋** (단계 내 모든 스텝 PASS 후)
+5. **다음 스텝 지시** (반복)
+6. **팀원 종료** (완료 시)
 
-```
-너는 BMAD 기획 문서 작성자야.
-오케스트레이터가 지시하는 스텝을 하나씩 완성해.
-YOLO 모드 -- 확인 프롬프트 자동 진행, 사용자 입력 기다리지 마.
-
-## 규칙
-1. 오케스트레이터가 지시한 스텝만 작성. 파티모드는 네가 실행하지 마.
-2. 스텝 완성 후 SendMessage로 오케스트레이터에게 보고.
-3. 문서는 항상 새로 생성 -- "파일이 이미 있으니 건너뛰기" 금지.
-4. v1-feature-spec.md (_bmad-output/planning-artifacts/v1-feature-spec.md) 반드시 참조.
-5. stub/mock/placeholder 금지 -- 구체적이고 실제적인 내용만.
-6. BMAD 스킬 실행 시 필요한 컨텍스트를 직접 제공. 사용자 입력 기다리지 마.
-
-## 보고 형식
-[스텝 완료] {단계명} - {스텝명}
-작성한 내용 요약: (1-2줄)
-변경된 파일: (경로)
-```
+오케스트레이터가 하지 **않는** 것:
+- 파티모드 직접 실행 (Reviewer가 함)
+- 라운드 결과 요약 (Reviewer가 컨텍스트 유지)
+- PASS/FAIL 판정 (Reviewer가 판정, Writer가 처리)
 
 ### 기획 단계 & 스텝 목록
 
-각 스텝마다 서브에이전트 파티모드 3라운드 실행.
+각 스텝마다 Writer-Reviewer 핑퐁 3라운드.
 
 #### 1단계: Product Brief
 Writer에게 Skill: `bmad-bmm-create-product-brief` 실행 지시.
@@ -452,7 +468,9 @@ SendMessage로 오케스트레이터에게 아래 형식으로 보고:
 4. stub/mock/placeholder를 "완료"로 처리 금지
 5. 기획 단계를 "파일이 이미 있으니" 건너뛰기 금지 -- 항상 새로 생성
 6. 기획 단계를 한 커밋에 몰아서 커밋 금지 -- 단계별 개별 커밋
-7. Writer(팀원)가 파티모드 실행 금지 -- 오케스트레이터만 서브에이전트로 실행
+7. Writer가 파티모드 실행 금지 -- Reviewer가 함
 8. BMAD 에이전트: 메뉴 표시 금지, 즉시 실행 (YOLO)
 9. 기획 문서: 항상 새로 생성 (기존 파일 덮어쓰기)
-10. 파티모드 서브에이전트는 foreground 실행 (background 아님)
+10. Writer와 Reviewer 모두 tmux에서 실행 (사용자 관찰 가능)
+11. Reviewer는 파이프라인 끝까지 상주 -- 스텝 사이에 종료하지 말 것
+12. 오케스트레이터가 파티모드 직접 실행 금지 -- Writer-Reviewer가 자율 처리
