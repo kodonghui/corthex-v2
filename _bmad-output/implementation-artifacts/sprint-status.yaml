@@ -110,7 +110,7 @@ development_status:
   # Dependencies: Epic 1
   # ============================================================
   epic-3: in-progress
-  3-1-llm-provider-adapters-claude-gpt-gemini: review
+  3-1-llm-provider-adapters-claude-gpt-gemini: done
   3-2-llm-router-3tier-model-assignment: backlog
   3-3-provider-fallback-strategy: backlog
   3-4-agent-runner-stateless-executor: backlog

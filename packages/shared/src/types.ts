@@ -148,6 +148,61 @@ export type SoulTemplate = {
 // === 활동 로그 ===
 export type ActivityLogType = 'chat' | 'delegation' | 'tool_call' | 'job' | 'sns' | 'error' | 'system' | 'login'
 
+// === LLM Provider ===
+export type LLMProviderName = 'anthropic' | 'openai' | 'google'
+
+export type LLMRequest = {
+  model: string
+  messages: LLMMessage[]
+  systemPrompt?: string
+  tools?: LLMToolDefinition[]
+  maxTokens?: number
+  temperature?: number
+  stream?: boolean
+}
+
+export type LLMMessage = {
+  role: 'user' | 'assistant' | 'tool'
+  content: string
+  toolCallId?: string
+  toolCalls?: LLMToolCall[]
+}
+
+export type LLMToolDefinition = {
+  name: string
+  description: string
+  parameters: Record<string, unknown>
+}
+
+export type LLMToolCall = {
+  id: string
+  name: string
+  arguments: Record<string, unknown>
+}
+
+export type LLMResponse = {
+  content: string
+  toolCalls: LLMToolCall[]
+  usage: { inputTokens: number; outputTokens: number }
+  model: string
+  provider: LLMProviderName
+  finishReason: 'stop' | 'tool_use' | 'max_tokens' | 'error'
+}
+
+export type LLMStreamChunk = {
+  type: 'text' | 'tool_call_start' | 'tool_call_delta' | 'done'
+  content?: string
+  toolCall?: Partial<LLMToolCall>
+  usage?: { inputTokens: number; outputTokens: number }
+}
+
+export type LLMError = {
+  provider: LLMProviderName
+  code: 'auth_error' | 'rate_limit' | 'timeout' | 'server_error' | 'invalid_request' | 'unknown'
+  message: string
+  retryable: boolean
+}
+
 // === 비용 추적 ===
 export type CostSummary = {
   totalCostUsd: number
