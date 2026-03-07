@@ -7,6 +7,7 @@ import { commands } from '../db/schema'
 import { authMiddleware } from '../middleware/auth'
 import { HTTPError } from '../middleware/error'
 import { classify, createCommand } from '../services/command-router'
+import { process as chiefOfStaffProcess } from '../services/chief-of-staff'
 import type { AppEnv } from '../types'
 
 export const commandsRoute = new Hono<AppEnv>()
@@ -41,6 +42,32 @@ commandsRoute.post('/', zValidator('json', submitCommandSchema), async (c) => {
     targetAgentId: result.targetAgentId,
     metadata: result.parsedMeta,
   })
+
+  // For direct commands (natural text, no slash/mention), trigger ChiefOfStaff processing asynchronously
+  if (result.type === 'direct') {
+    // Fire-and-forget: process in background, results via WebSocket
+    chiefOfStaffProcess({
+      commandId: command.id,
+      commandText: body.text,
+      companyId: tenant.companyId,
+      userId: tenant.userId,
+    }).catch((err) => {
+      console.error(`[ChiefOfStaff] process failed for command ${command.id}:`, err)
+    })
+  }
+
+  // For mention commands with targetAgentId, also trigger ChiefOfStaff (skip classification)
+  if (result.type === 'mention' && result.targetAgentId) {
+    chiefOfStaffProcess({
+      commandId: command.id,
+      commandText: body.text,
+      companyId: tenant.companyId,
+      userId: tenant.userId,
+      targetAgentId: result.targetAgentId,
+    }).catch((err) => {
+      console.error(`[ChiefOfStaff] process failed for mention command ${command.id}:`, err)
+    })
+  }
 
   return c.json({
     success: true,
