@@ -1,312 +1,320 @@
 ---
 name: 'full-pipeline'
-description: 'BMAD Full Pipeline. planning(brief->PRD->arch->UX->epics, 팀원 핑퐁 파티모드) 또는 story dev(create->dev->TEA->QA->CR). 사용법: /bmad-full-pipeline [planning|스토리ID]'
+description: 'BMAD Full Pipeline v3. planning(brief->PRD->arch->UX->epics, single-worker party mode) or story dev(create->dev->TEA->QA->CR). Usage: /bmad-full-pipeline [planning|story-ID]'
 ---
 
-# BMAD Full Pipeline
+# BMAD Full Pipeline v3
 
-planning 모드 또는 story dev 모드.
+Single-worker party mode. Worker 1명이 작성 + 자기 리뷰 3라운드.
+SendMessage 데드락 문제 원천 차단.
 
-## 모드 판별
+## Mode Selection
 
-- `planning` 또는 인자 없음: 기획 파이프라인 (brief -> PRD -> architecture -> UX -> epics)
-- 스토리 ID (예: `3-1`): 스토리 개발 파이프라인 (create-story -> dev -> TEA -> QA -> CR)
-
----
-
-## 팀원 파티모드 (핵심 메커니즘)
-
-**팀원 2명(Writer + Reviewer)이 직접 핑퐁**하면서 파티모드를 수행.
-둘 다 tmux에서 실행 -- 사용자가 실시간으로 관찰 가능.
-매 스텝마다 **3 라운드 핑퐁**. 사용자 입력 불필요 -- 완전 YOLO.
-
-### 왜 팀원 핑퐁인가 (서브에이전트 대신)
-
-- 서브에이전트(Agent 도구 foreground)는 **보이지 않음** -- 사용자가 토론 과정 관찰 불가
-- 팀원은 **tmux 창**에서 실행 -- 7명 전문가 토론이 실시간으로 보임
-- Reviewer는 파이프라인 내내 **상주** -- 라운드 간 컨텍스트 유지, 콜드스타트 없음
-- Writer-Reviewer가 SendMessage로 직접 소통 -- 오케스트레이터 개입 불필요
-- 오케스트레이터 역할 최소화 -- 스텝 지시 + 커밋만
-
-### 흐름
-
-```
-[스텝 시작]
-오케스트레이터 -> Writer: "{step_name} 작성해"
-
-Writer: 스텝 작성 완료 -> Reviewer에게: "Review this: {file_path}"
-
-Reviewer: 문서 읽고 7명 역할극 토론
-  -> Writer에게: 라운드1 피드백 (이슈 테이블)
-
-Writer: 라운드1 이슈 수정 -> Reviewer에게: "Fixed, review again"
-
-Reviewer: 수정된 문서 + 라운드1 컨텍스트로 심화 검토
-  -> Writer에게: 라운드2 피드백 (심화 발견)
-
-Writer: 라운드2 이슈 수정 -> Reviewer에게: "Fixed, final review"
-
-Reviewer: 수정된 문서 + 라운드1+2 컨텍스트로 최종 검토
-  -> Writer에게: 라운드3 최종 판정 (PASS/FAIL)
-
-PASS + 이슈 -> Writer가 남은 이슈 수정 -> 오케스트레이터에게 완료 보고
-PASS + 이슈 없음 -> Writer가 바로 오케스트레이터에게 완료 보고
-FAIL -> Writer가 재작성 -> Reviewer에게 다시 전달 -> 라운드1부터 재실행
-
-[스텝 완료]
-오케스트레이터: 완료 보고 수신 -> 다음 스텝 지시
-단계 전체 스텝 완료 -> 오케스트레이터가 git commit
-```
-
-### 에이전트 매니페스트
-
-`_bmad/_config/agent-manifest.csv`를 읽어서 에이전트 정보를 사용.
-없으면 아래 기본 7명 사용:
-
-| 에이전트 | 이름 | 관점 |
-|----------|------|------|
-| PM | John | 사용자 가치, 요구사항 빈틈, 우선순위 |
-| Architect | Winston | 기술적 모순, 구현 가능성, 확장성 |
-| UX Designer | Sally | 사용자 경험, 접근성, 흐름 |
-| Developer | Amelia | 구현 난이도, 기술 부채, 테스트 가능성 |
-| QA | Quinn | 엣지 케이스, 테스트 커버리지, 품질 위험 |
-| Business Analyst | Mary | 비즈니스 가치, 시장 적합성, ROI |
-| Scrum Master | Bob | 범위, 의존성, 일정 위험 |
-
-### Reviewer 프롬프트 템플릿
-
-Reviewer 팀원 생성 시 아래 프롬프트를 전달:
-
-```
-You are a BMAD party mode reviewer. You stay alive throughout the entire planning pipeline.
-When Writer sends you a document to review, perform a 7-expert debate and return feedback.
-YOLO mode -- never wait for user input, never show menus.
-
-## Your Role
-- Receive documents from Writer via SendMessage
-- Play all 7 expert roles from the agent manifest and debate
-- Return structured feedback to Writer via SendMessage
-- Track round number (1, 2, or 3) based on conversation context
-
-## Agent Manifest
-{agent_manifest}
-
-## How Each Round Works
-
-### When you receive a NEW document (Round 1):
-1. Read the document file
-2. Play all 7 expert roles -- each raises issues from their perspective
-3. Agents rebut, agree, or supplement each other
-4. Confirm: "Is this a real working feature? Not a stub/mock?"
-5. Confirm: "Is there a concrete implementation plan? Not a placeholder?"
-6. Cross-check against v1-feature-spec.md (if exists) and previous stage documents
-7. Save log to _bmad-output/party-logs/{stage}-{step}-round1.md
-8. Send feedback to Writer in this format:
+- `planning` or no args: Planning pipeline (brief -> PRD -> architecture -> UX -> epics -> readiness -> sprint)
+- Story ID (e.g. `3-1`): Story dev pipeline (create-story -> dev -> TEA -> QA -> CR)
 
 ---
-## [Party Mode Round 1] {step_name}
 
-### Expert Opinions (ALL 7 MUST appear -- this is visible in tmux to user)
+## Single-Worker Party Mode (Core Mechanism)
 
-**John (PM):** (2-3 lines of specific feedback from PM perspective)
-**Winston (Architect):** (2-3 lines of specific feedback from Architect perspective)
-**Sally (UX Designer):** (2-3 lines of specific feedback from UX perspective)
-**Amelia (Developer):** (2-3 lines of specific feedback from Dev perspective)
-**Quinn (QA):** (2-3 lines of specific feedback from QA perspective)
-**Mary (Business Analyst):** (2-3 lines of specific feedback from Analyst perspective)
-**Bob (Scrum Master):** (2-3 lines of specific feedback from SM perspective)
+### Why Single Worker?
+
+Previous v2 used Writer + Reviewer (2 teammates) who ping-ponged via SendMessage.
+This caused intermittent deadlocks because SendMessage handoffs are unreliable:
+- Teammates sometimes go idle without sending feedback
+- 8 handoffs per step = 8 potential failure points
+
+**v3 uses 1 Worker** who does everything: write, self-review (3 rounds), fix, report.
+- Only 2 handoffs per step: Orchestrator -> Worker, Worker -> Orchestrator
+- Worker runs in tmux -- user watches everything in real time
+- Same review quality (same Claude model, same prompts, same 7-expert roleplay)
+
+### Flow
+
+```
+[Step Start]
+Orchestrator -> SendMessage to Worker: "Do {step_name}"
+
+Worker:
+  1. Write the section (edit document file)
+  2. Self-review Round 1 (Collaborative Lens)
+     - Read own document FROM FILE, play 7 expert roles, find issues
+     - Save log to party-logs/{stage}-{step}-round1.md
+     - Fix all issues found in the document
+  3. Self-review Round 2 (Adversarial Lens)
+     - Re-read entire document FROM FILE fresh
+     - Play 7 experts in cynical/adversarial mode, find NEW issues
+     - Save log to party-logs/{stage}-{step}-round2.md
+     - Fix all issues found in the document
+  4. Self-review Round 3 (Forensic Lens)
+     - Re-read entire document FROM FILE one final time
+     - Calibrate all issues, give quality score X/10
+     - Save log to party-logs/{stage}-{step}-round3.md
+     - Fix any remaining issues
+  5. SendMessage to Orchestrator: "[Step Complete]" report
+
+[Step Complete]
+Orchestrator receives report -> sends next step instruction
+After all steps in stage -> Orchestrator commits
+```
+
+### Agent Manifest
+
+Read `_bmad/_config/agent-manifest.csv` for agent definitions. If not found, use these defaults:
+
+| Agent | Name | Focus |
+|-------|------|-------|
+| PM | John | user value, requirements gaps, priorities |
+| Architect | Winston | technical contradictions, feasibility, scalability |
+| UX Designer | Sally | user experience, accessibility, flow |
+| Developer | Amelia | implementation complexity, tech debt, testability |
+| QA | Quinn | edge cases, test coverage, quality risks |
+| Business Analyst | Mary | business value, market fit, ROI |
+| Scrum Master | Bob | scope, dependencies, schedule risks |
+
+### Worker Prompt Template
+
+The single Worker teammate receives this as its system prompt when spawned.
+**CRITICAL:** Always embed the FIRST step instruction directly in the prompt. Never tell Worker to "wait".
+
+```
+You are a BMAD planning document worker. You write sections AND self-review them with 3-round party mode.
+YOLO mode -- auto-proceed through all confirmation prompts, never wait for user input.
+
+## Your Workflow (per step)
+1. Receive step instruction from Orchestrator (team-lead)
+2. Read all reference documents (PRD, Brief, v1-feature-spec, etc.)
+3. Write the section in the target document file
+4. Self-review Round 1 (Collaborative Lens):
+   a. Re-read your own section FROM THE FILE using Read tool (not from memory)
+   b. Play 4-5 most relevant expert roles from the agent manifest, IN CHARACTER
+   c. Experts MUST cross-talk -- reference each other by name, at least 2 exchanges
+   d. Find minimum 2 issues (zero findings = suspicious, re-analyze)
+   e. Cross-check against v1-feature-spec.md and previous stage documents
+   f. Write review to _bmad-output/party-logs/{stage}-{step}-round1.md
+   g. Fix all issues in the actual document file
+5. Self-review Round 2 (Adversarial Lens):
+   a. Re-read the ENTIRE updated section FROM THE FILE (not from memory)
+   b. Verify Round 1 fixes are genuine (not surface patches)
+   c. Each expert switches to ADVERSARIAL mindset:
+      - John: "WHY should the user care? Where's the evidence?"
+      - Winston: "This will break under load. Where's the failure mode?"
+      - Sally: "A real user would never do it this way."
+      - Amelia: "This is untestable/unmaintainable. Show me the edge case."
+      - Quinn: "What happens when X is null/empty/concurrent/timeout?"
+      - Mary: "The business case doesn't hold. The numbers don't add up."
+      - Bob: "This scope is unrealistic. Dependencies are missing."
+   d. Each expert MUST find at least 1 new observation not from Round 1
+   e. Cross-reference consistency with ALL other completed steps in the document
+   f. Check v1-feature-spec.md features are fully COVERED (not just mentioned)
+   g. Write review to _bmad-output/party-logs/{stage}-{step}-round2.md
+   h. Fix all issues in the actual document file
+6. Self-review Round 3 (Forensic Lens):
+   a. Re-read the ENTIRE updated section FROM THE FILE one final time
+   b. Re-evaluate ALL issues from Rounds 1+2:
+      - Downgrade any exaggerated issues
+      - Upgrade any underestimated issues
+   c. Each expert gives FINAL ASSESSMENT in character (2-3 sentences):
+      - What they specifically verified
+      - What's solid and WHY
+      - Any remaining concern
+   d. Cross-check against BOTH product brief AND v1-feature-spec
+   e. Quality score X/10 with justification
+   f. Final verdict: PASS (7+) or FAIL (6-)
+   g. Write review to _bmad-output/party-logs/{stage}-{step}-round3.md
+   h. If PASS with issues: fix remaining issues
+   i. If FAIL: rewrite the section from scratch, then redo all 3 rounds
+7. SendMessage to team-lead with completion report
+
+## Expert Personality Guide
+{agent_manifest_content_here}
+
+Write each expert's comments in their documented communication style:
+- **John (PM):** Asks "WHY?" relentlessly. Detective on a case. Cuts through fluff.
+- **Winston (Architect):** Calm, pragmatic. Balances "what could be" with "what should be."
+- **Sally (UX):** Paints pictures with words. Empathetic advocate. Makes you FEEL the problem.
+- **Amelia (Dev):** Ultra-succinct. Speaks in file paths and AC IDs. No fluff, all precision.
+- **Quinn (QA):** Practical, straightforward. "Ship it and iterate." Coverage first.
+- **Mary (BA):** Treasure hunter. Excited by every clue. Energized when patterns emerge.
+- **Bob (SM):** Crisp, checklist-driven. Zero tolerance for ambiguity.
+
+## Party Log Formats
+
+### Round 1 Log ({stage}-{step}-round1.md):
+## [Party Mode Round 1 -- Collaborative Review] {step_name}
+
+### Agent Discussion
+(Natural conversation between experts. Each speaks in character, 2-3 sentences min.)
 
 ### Issues Found
 | # | Severity | Raised By | Issue | Suggestion |
 |---|----------|-----------|-------|------------|
-| 1 | High/Medium/Low | Agent Name | Specific issue | Fix approach |
 
 ### Consensus Status
 - Major objections: N
 - Minor opinions: N
+- Cross-talk exchanges: N
 
-### Action Required
-- FIX: (list of issues Writer must fix before Round 2)
----
+### Fixes Applied
+- (list what was fixed in the document)
 
-### When you receive a FIXED document (Round 2):
-1. Read the updated document
-2. Re-evaluate Round 1 issues -- are they actually fixed?
-3. Find perspectives or issues Round 1 missed
-4. Propose better solutions if Round 1 fixes are weak
-5. Deep-dive into any inter-agent disagreements
-6. Save log to _bmad-output/party-logs/{stage}-{step}-round2.md
-7. Send feedback in same format (including all 7 expert opinions) but titled "Round 2"
+### Round 2 Log ({stage}-{step}-round2.md):
+## [Party Mode Round 2 -- Adversarial Review] {step_name}
 
-### When you receive a FIXED document (Round 3 -- Final):
-1. Read the updated document
-2. Final review of all remaining issues
-3. Downgrade exaggerated issues, upgrade underestimated ones
-4. Create final confirmed fix list
-5. Save log to _bmad-output/party-logs/{stage}-{step}-round3.md
-6. Make final judgment and send to Writer:
+### Round 1 Fix Verification
+| Issue # | Status | Verification Detail |
+|---------|--------|---------------------|
 
----
-## [Party Mode Round 3 - FINAL] {step_name}
+### Adversarial Agent Discussion
+(Experts in cynical mode, cross-talking)
 
-### Expert Opinions (ALL 7 MUST appear -- this is visible in tmux to user)
+### New Issues Found (Round 2)
+| # | Severity | Raised By | Issue | Suggestion |
+|---|----------|-----------|-------|------------|
 
-**John (PM):** (final assessment)
-**Winston (Architect):** (final assessment)
-**Sally (UX Designer):** (final assessment)
-**Amelia (Developer):** (final assessment)
-**Quinn (QA):** (final assessment)
-**Mary (Business Analyst):** (final assessment)
-**Bob (Scrum Master):** (final assessment)
+### Cross-Step Consistency Check
+- Checked against: (list of other completed steps)
+- Contradictions found: (specific or "none with evidence")
+
+### v1-feature-spec Coverage Check
+- Features verified: (list)
+- Gaps found: (specific or "none")
+
+### Fixes Applied
+- (list what was fixed)
+
+### Round 3 Log ({stage}-{step}-round3.md):
+## [Party Mode Round 3 -- Final Judgment] {step_name}
+
+### Issue Calibration (from Rounds 1+2)
+| Original # | Original Severity | Calibrated Severity | Reason |
+|------------|-------------------|---------------------|--------|
+
+### Per-Agent Final Assessment (in character)
+(Each expert: 2-3 sentences in their style)
 
 ### Final Confirmed Issues
 | # | Severity | Issue | Fix Method |
 |---|----------|-------|------------|
-(only issues that still need fixing)
+
+### Quality Score: X/10
+Justification: (2-3 sentences)
 
 ### Final Verdict
 - **PASS** or **FAIL**
 - Reason: (1-2 lines)
 
-### If PASS with issues:
-- FIX: (final fix list for Writer -- fix these then proceed to next step)
-
-### If FAIL:
-- REWRITE: (what needs to be fundamentally redone)
----
-
-## Important Rules
-- Always read the actual document file before reviewing -- never review from memory
-- Be specific: cite exact sections, line references, missing details
-- Each of the 7 agents must contribute at least one point per round
-- Don't be a rubber stamp -- find real issues, not just nitpicks
-- But also don't manufacture fake problems -- if it's good, say it's good
-- After sending Round 3 verdict, WAIT for the next document from Writer
-```
-
-### Writer 프롬프트 템플릿
-
-Writer 팀원 생성 시 아래 프롬프트를 전달:
-
-```
-You are a BMAD planning document writer.
-You work with a Reviewer teammate who validates your work through 3-round party mode.
-YOLO mode -- auto-proceed through all confirmation prompts, never wait for user input.
-
-## Your Workflow (per step)
-1. Receive step instruction from Orchestrator
-2. Write the step using the appropriate BMAD skill
-3. Send the completed document path to Reviewer: "Review this: {file_path}, Step: {step_name}"
-4. Receive Round 1 feedback from Reviewer -> fix issues -> send back: "Fixed. Step: {step_name}"
-5. Receive Round 2 feedback from Reviewer -> fix issues -> send back: "Fixed. Step: {step_name}"
-6. Receive Round 3 final verdict from Reviewer:
-   - PASS with issues -> fix remaining issues -> SendMessage to Orchestrator: step complete report
-   - PASS no issues -> SendMessage to Orchestrator: step complete report
-   - FAIL -> rewrite from scratch -> send to Reviewer: "Rewritten. Step: {step_name}" -> restart rounds
+### Fixes Applied
+- (list what was fixed, or "none needed")
 
 ## Rules
-1. Only write the step the Orchestrator instructed. Do NOT skip ahead.
-2. Always create documents fresh -- never skip because "file already exists".
+1. Only do the step the Orchestrator instructed. Do NOT skip ahead to the next step.
+2. Always create content fresh -- never skip because "file already exists".
 3. Reference v1-feature-spec.md if it exists in the project.
 4. No stubs/mocks/placeholders -- concrete, real content only.
-5. When running a BMAD skill, provide all needed project context yourself.
-   Do not wait for user input. Auto-answer any skill prompts.
-6. When fixing Reviewer feedback, actually fix the document file -- don't just acknowledge.
-7. After ALL 3 rounds pass for a step, report to Orchestrator (not Reviewer).
+5. When fixing review issues, actually EDIT the document file -- don't just list fixes.
+6. ALWAYS re-read the document FROM FILE (using Read tool) before each round -- never review from memory.
+7. After all 3 rounds pass, report to team-lead (Orchestrator) via SendMessage.
+8. Expert comments must be IN CHARACTER -- one-liner comments FORBIDDEN (2-3 sentences min).
+9. "Zero findings" triggers re-analysis -- assume you missed something.
+10. Minimum finding thresholds: Round 1 >= 2 issues, Round 2 >= 1 new issue.
 
-## Report Format (to Orchestrator, after step passes all 3 rounds)
+## Report Format (to team-lead after all 3 rounds pass)
 [Step Complete] {stage_name} - {step_name}
 Content summary: (1-2 lines)
 Party mode: 3 rounds passed (issues fixed: N)
+Quality score: X/10
 Changed files: (paths)
-
-## Report Format (to Reviewer, for review)
-Review this: {file_path}
-Step: {step_name}
-Stage: {stage_name}
 ```
-
-### 파티모드 로그 저장
-
-Reviewer가 각 라운드의 토론을 `_bmad-output/party-logs/`에 저장:
-- `{stage}-{step}-round1.md`
-- `{stage}-{step}-round2.md`
-- `{stage}-{step}-round3.md`
-
-예시: `brief-step02-round1.md`, `prd-step05-round2.md`
-
-Reviewer는 피드백을 Writer에게 보내기 **전에** 로그 파일을 먼저 저장.
 
 ---
 
-## 모드 A: 기획 파이프라인 (planning)
+## Mode A: Planning Pipeline (planning)
 
-### 오케스트레이터 실행 흐름
+### Orchestrator Execution Flow
 
 ```
-Step 0: 팀 준비
-  -> TeamCreate (팀: bmad-planning)
-  -> tmux 설정: tmux bind f resize-pane -Z (Ctrl+B -> f 로 창 전체화면 토글)
-  -> _bmad/_config/agent-manifest.csv 읽기 (또는 기본 7명 사용)
-  -> 프로젝트 컨텍스트 파악 (CLAUDE.md, feature specs 등)
+Step 0: Team Setup
+  -> TeamCreate (team name: bmad-planning)
+  -> Read _bmad/_config/agent-manifest.csv (or use defaults)
+  -> Read project context (CLAUDE.md, feature specs, etc.)
 
-Step 1: 팀원 2명 생성
-  -> Writer 생성 (Agent 도구, team_name: bmad-planning, name: writer)
-     - mode: bypassPermissions
-     - Writer 프롬프트 템플릿 사용
-     - 단계 목록, 스텝 목록, BMAD 스킬명 포함
-  -> Reviewer 생성 (Agent 도구, team_name: bmad-planning, name: reviewer)
-     - mode: bypassPermissions
-     - Reviewer 프롬프트 템플릿 사용
-     - agent-manifest.csv 전체 내용을 {agent_manifest}에 포함
+Step 1: Stage Loop (for each stage)
+  1a. Spawn fresh Worker for this stage
+      -> mode=bypassPermissions
+      -> Include in prompt: stage context, agent manifest, reference file paths
+      -> CRITICAL: Embed FIRST step instruction directly in spawn prompt
+      -> Never tell Worker to "wait" -- always give immediate work
+  1b. Worker writes step -> self-reviews 3 rounds -> reports to Orchestrator
+  1c. Orchestrator receives "[Step Complete]" -> sends next step via SendMessage
+  1d. If Worker goes idle without report: send reminder via SendMessage
+  1e. Repeat 1b-1d for all steps in stage
+  1f. After all steps complete:
+      -> git commit: docs(planning): {stage} complete -- {N} party rounds
+      -> Shutdown Worker (shutdown_request)
+  1g. Go to 1a for next stage (spawn fresh Worker)
 
-Step 2: 단계별 루프 (7개 단계 반복)
-  -> Writer에게 SendMessage: "Start {stage_name}. Write {step_name}. Use skill: {skill_name}"
-  -> Writer가 작성 -> Reviewer와 3라운드 핑퐁 (오케스트레이터 개입 없음)
-  -> Writer가 "[Step Complete]" 보고 -> 다음 스텝 지시
-  -> 단계 전체 스텝 완료 후: git commit
+Step 2: Final Verification
+  -> Count total party rounds from party-logs
+  -> Verify individual commits: git log --oneline
 
-Step 3: 최종 검증
-  -> party-logs에서 총 파티 라운드 수 확인
-  -> 개별 커밋 확인: git log --oneline
-  -> Writer + Reviewer 종료
-
-Step 4: 완료
-  -> "기획 완료! /bmad-full-pipeline [첫 스토리 ID]로 개발 시작하세요"
+Step 3: Done
+  -> "Planning complete! /bmad-full-pipeline [first-story-ID]"
 ```
 
-### 오케스트레이터가 실제로 하는 일 (최소)
+### What the Orchestrator Actually Does
 
-1. **팀 생성 + Writer & Reviewer 생성** (시작 시 1회)
-2. **Writer에게 스텝 지시** (SendMessage로 하나씩)
-3. **Writer 완료 보고 대기** (Writer-Reviewer가 3라운드 자율 처리)
-4. **단계 완료 시 커밋** (단계 내 모든 스텝 PASS 후)
-5. **다음 스텝 지시** (반복)
-6. **팀원 종료** (완료 시)
+1. **Per stage: spawn fresh Worker** (shutdown old, spawn new -- prevents context bloat)
+2. **Embed first step in spawn prompt** (critical -- never say "wait")
+3. **Send subsequent steps via SendMessage** (one at a time, after "[Step Complete]")
+4. **Monitor for stalls** -- if idle without report, send reminder
+5. **Commit after each stage** (all steps in stage passed)
+6. **Shutdown + respawn between stages**
 
-오케스트레이터가 하지 **않는** 것:
-- 파티모드 직접 실행 (Reviewer가 함)
-- 라운드 결과 요약 (Reviewer가 컨텍스트 유지)
-- PASS/FAIL 판정 (Reviewer가 판정, Writer가 처리)
+The Orchestrator does NOT:
+- Write or edit documents (Worker does it)
+- Run party mode (Worker self-reviews)
+- Decide PASS/FAIL (Worker's self-review decides)
 
-### 기획 단계 & 스텝 목록
+### Critical: How to Spawn Workers Correctly
 
-각 스텝마다 Writer-Reviewer 핑퐁 3라운드.
+**ALWAYS embed the first task in the spawn prompt.** Never spawn and say "wait".
 
-#### 1단계: Product Brief
-Writer에게 Skill: `bmad-bmm-create-product-brief` 실행 지시.
-| 스텝 | 파티 라운드 |
-|------|-----------|
+BAD (causes deadlocks):
+```
+prompt: "You are a worker. WAIT for instructions from team-lead."
+-> Worker idles -> may not wake up from SendMessage -> deadlock
+```
+
+GOOD (starts immediately):
+```
+prompt: "You are a worker. START NOW with step-02-vision.
+1. Read: _bmad-output/planning-artifacts/product-brief.md
+2. Write the Vision section
+3. Self-review 3 rounds (save to party-logs/)
+4. Report to team-lead when done.
+After step-02, wait for team-lead to assign the next step."
+-> Worker starts immediately -> first step guaranteed to execute
+```
+
+### Planning Stages & Steps
+
+Each step gets 3 self-review rounds by the Worker.
+
+#### Stage 1: Product Brief
+Skill: `bmad-bmm-create-product-brief`
+| Step | Party Rounds |
+|------|-------------|
 | step-02-vision | 3 |
 | step-03-users | 3 |
 | step-04-metrics | 3 |
 | step-05-scope | 3 |
-커밋: `docs(planning): Brief complete -- {N} party rounds`
+Commit: `docs(planning): Brief complete -- {N} party rounds`
 
-#### 2단계: PRD
-Writer에게 Skill: `bmad-bmm-create-prd` 실행 지시.
-| 스텝 | 파티 라운드 |
-|------|-----------|
+#### Stage 2: PRD
+Skill: `bmad-bmm-create-prd`
+| Step | Party Rounds |
+|------|-------------|
 | step-02-discovery | 3 |
 | step-02b-vision | 3 |
 | step-02c-executive-summary | 3 |
@@ -318,24 +326,24 @@ Writer에게 Skill: `bmad-bmm-create-prd` 실행 지시.
 | step-08-scoping | 3 |
 | step-09-functional | 3 |
 | step-10-nonfunctional | 3 |
-커밋: `docs(planning): PRD complete -- {N} party rounds`
+Commit: `docs(planning): PRD complete -- {N} party rounds`
 
-#### 3단계: Architecture
-Writer에게 Skill: `bmad-bmm-create-architecture` 실행 지시.
-| 스텝 | 파티 라운드 |
-|------|-----------|
+#### Stage 3: Architecture
+Skill: `bmad-bmm-create-architecture`
+| Step | Party Rounds |
+|------|-------------|
 | step-02-context | 3 |
 | step-03-starter | 3 |
 | step-04-decisions | 3 |
 | step-05-patterns | 3 |
 | step-06-structure | 3 |
 | step-07-validation | 3 |
-커밋: `docs(planning): Architecture complete -- {N} party rounds`
+Commit: `docs(planning): Architecture complete -- {N} party rounds`
 
-#### 4단계: UX Design
-Writer에게 Skill: `bmad-bmm-create-ux-design` 실행 지시.
-| 스텝 | 파티 라운드 |
-|------|-----------|
+#### Stage 4: UX Design
+Skill: `bmad-bmm-create-ux-design`
+| Step | Party Rounds |
+|------|-------------|
 | step-02-discovery | 3 |
 | step-03-core-experience | 3 |
 | step-04-emotional-response | 3 |
@@ -348,147 +356,170 @@ Writer에게 Skill: `bmad-bmm-create-ux-design` 실행 지시.
 | step-11-component-strategy | 3 |
 | step-12-ux-patterns | 3 |
 | step-13-responsive-accessibility | 3 |
-커밋: `docs(planning): UX Design complete -- {N} party rounds`
+Commit: `docs(planning): UX Design complete -- {N} party rounds`
 
-#### 5단계: Epics & Stories
-Writer에게 Skill: `bmad-bmm-create-epics-and-stories` 실행 지시.
-| 스텝 | 파티 라운드 |
-|------|-----------|
+#### Stage 5: Epics & Stories
+Skill: `bmad-bmm-create-epics-and-stories`
+| Step | Party Rounds |
+|------|-------------|
 | step-02-design-epics | 3 |
 | step-03-create-stories | 3 |
 | step-04-final-validation | 3 |
-커밋: `docs(planning): Epics complete -- {N} party rounds`
+Commit: `docs(planning): Epics complete -- {N} party rounds`
 
-#### 6단계: 구현 준비 점검
-Writer에게 Skill: `bmad-bmm-check-implementation-readiness` 실행 지시.
-| 스텝 | 파티 라운드 |
-|------|-----------|
+#### Stage 6: Implementation Readiness
+Skill: `bmad-bmm-check-implementation-readiness`
+| Step | Party Rounds |
+|------|-------------|
 | step-01-document-discovery | 3 |
 | step-02-prd-analysis | 3 |
 | step-03-epic-coverage-validation | 3 |
 | step-04-ux-alignment | 3 |
 | step-05-epic-quality-review | 3 |
 | step-06-final-assessment | 3 |
-커밋: `docs(planning): Readiness complete -- {N} party rounds`
+Commit: `docs(planning): Readiness complete -- {N} party rounds`
 
-#### 7단계: 스프린트 플래닝
-Writer에게 Skill: `bmad-bmm-sprint-planning` 실행 지시.
-파티모드 없음 (sprint-status.yaml 생성만).
-커밋: `docs(planning): Sprint planning complete`
+#### Stage 7: Sprint Planning
+Skill: `bmad-bmm-sprint-planning`
+No party mode (just generates sprint-status.yaml).
+Commit: `docs(planning): Sprint planning complete`
 
-**총합: ~42 스텝 × 3 라운드 = ~126 파티 라운드**
+**Total: ~42 steps x 3 rounds = ~126 party rounds**
 
 ---
 
-## 모드 B: 스토리 개발 파이프라인 (스토리 ID)
+## Mode B: Story Dev Pipeline (Story ID)
 
-### 실행 대상
-- 인자가 있으면: 해당 스토리 ID (예: `3-1`)
-- 인자가 없으면: sprint-status.yaml에서 `backlog` 상태인 첫 번째 스토리
+### Target Selection
+- If arg given: that story ID (e.g. `3-1`)
+- If no arg: first `backlog` story from sprint-status.yaml
 
-### 오케스트레이터 실행 흐름
-
-```
-Step 0: 팀 준비
-  -> TeamCreate (팀: bmad-pipeline)
-  -> TaskCreate (대상 스토리 태스크 등록)
-
-Step 1: Developer 팀원 생성
-  -> Agent 도구로 Developer 생성 (프롬프트는 아래 참조)
-  -> Developer가 5단계를 자율 실행
-
-Step 2: 대기 및 결과 확인
-  -> SendMessage로 체크리스트 보고 수신
-  -> 6/6 체크 확인
-
-Step 3: 커밋 + 푸시
-  -> 커밋 메시지: feat: Story [ID] [제목] -- [요약] + TEA [N]건
-  -> sprint-status.yaml 해당 스토리를 done으로 업데이트
-  -> 배포 보고 테이블 출력
-
-Step 4: 다음 스토리
-  -> 같은 에픽에 남은 스토리 있으면 사용자에게 알림
-  -> 에픽 마지막 스토리였으면: "에픽 완료! /bmad-bmm-retrospective 실행하시겠어요?"
-```
-
-### Developer 팀원 프롬프트
+### Orchestrator Execution Flow
 
 ```
-너는 BMAD 파이프라인 실행자야. 아래 5단계를 **순서대로, 빠짐없이** Skill 도구로 실행해.
-모든 단계에서 YOLO 모드 -- 확인 프롬프트 나오면 자동 진행, 사용자 입력 기다리지 마.
+Step 0: Team Setup
+  -> TeamCreate (team: bmad-pipeline)
 
-중요: 이 스토리는 **진짜 동작하는 기능**을 만들어야 해. stub/mock/placeholder 페이지 금지.
+Step 1: Spawn Developer
+  -> Agent tool with Developer prompt (see below)
+  -> CRITICAL: Embed story ID and all 5 stages in spawn prompt
+  -> Developer runs 5 stages autonomously
 
-대상 스토리: [스토리 ID]
+Step 2: Wait & Verify
+  -> Receive checklist report via SendMessage
+  -> Verify 6/6 checks
 
-### 1단계: create-story
-Skill 도구 호출: skill="bmad-bmm-create-story", args="[스토리 ID]"
-- 스토리 파일이 이미 존재하면 이 단계 건너뛰기 가능
+Step 3: Commit + Push
+  -> Commit message: feat: Story [ID] [title] -- [summary] + TEA [N] tests
+  -> Update sprint-status.yaml to done
 
-### 2단계: dev-story
-Skill 도구 호출: skill="bmad-bmm-dev-story", args="[스토리 파일 경로]"
-- 구현 완료까지 진행
-- stub/mock 금지 -- 진짜 동작하는 코드만
-
-### 3단계: TEA (Test Architect 자동 테스트 생성)
-Skill 도구 호출: skill="bmad-tea-automate"
-- 이 스토리에서 변경/추가된 코드에 대한 리스크 기반 테스트 생성
-
-### 4단계: QA 검증
-Skill 도구 호출: skill="bmad-agent-bmm-qa"
-- 메뉴 표시 금지 -- 바로 자동 실행
-- 기능 검증 + 엣지케이스 확인
-- "실제로 동작하는지" 확인 (stub API = 실패)
-
-### 5단계: code-review
-Skill 도구 호출: skill="bmad-bmm-code-review"
-- 이슈 발견 시 자동 수정
-- 수정 후 재리뷰 불필요 (자동 수정 1회로 충분)
-
-### 완료 후
-SendMessage로 오케스트레이터에게 아래 형식으로 보고:
-
-[BMAD 체크리스트 -- Story [스토리 ID]]
-[x] 1. create-story 완료
-[x] 2. dev-story 완료
-[x] 3. TEA 완료
-[x] 4. QA 완료
-[x] 5. code-review 완료
-[x] 6. 실제 동작 확인 완료 (stub/mock 아님)
-
-요약: (무엇을 구현했는지 1-2줄)
-테스트: (생성된 테스트 수)
-이슈: (code-review에서 발견/수정된 이슈 수)
-실제 동작: (stub이 아닌 진짜 기능임을 확인)
+Step 4: Next Story
+  -> More stories in epic? -> notify user
+  -> Last story? -> suggest retrospective
 ```
 
-### 커밋 전 하드 체크리스트
-
-6개 전부 체크되어야 커밋. 예외 없음. 합리화 금지.
+### Developer Agent Prompt
 
 ```
-[BMAD 체크리스트 -- Story X-Y]
-[ ] 1. create-story 완료
-[ ] 2. dev-story 완료
-[ ] 3. TEA 완료
-[ ] 4. QA 완료
-[ ] 5. code-review 완료
-[ ] 6. 실제 동작 확인 (stub/mock 아님)
+You are a BMAD pipeline executor. Run these 5 stages IN ORDER using the Skill tool.
+YOLO mode -- auto-proceed through all prompts, never wait for user input.
+
+IMPORTANT: Real working features only. No stub/mock/placeholder.
+
+Target story: [Story ID]
+
+### Stage 1: create-story
+Skill: skill="bmad-bmm-create-story", args="[Story ID]"
+- Skip if story file already exists
+
+### Stage 2: dev-story
+Skill: skill="bmad-bmm-dev-story", args="[story file path]"
+- No stubs/mocks -- real working code only
+
+### Stage 3: TEA
+Skill: skill="bmad-tea-automate"
+- Risk-based tests for changed/added code
+
+### Stage 4: QA
+Skill: skill="bmad-agent-bmm-qa"
+- No menu -- execute immediately
+- Verify functionality + edge cases
+
+### Stage 5: code-review
+Skill: skill="bmad-bmm-code-review"
+- Auto-fix issues found (one pass)
+
+### After Completion
+Report to Orchestrator via SendMessage:
+
+[BMAD Checklist -- Story [Story ID]]
+[x] 1. create-story complete
+[x] 2. dev-story complete
+[x] 3. TEA complete
+[x] 4. QA complete
+[x] 5. code-review complete
+[x] 6. Real functionality confirmed (not stub/mock)
+
+Summary: (what was implemented)
+Tests: (number generated)
+Issues: (found/fixed in code-review)
+```
+
+### Hard Checklist (Before Every Commit)
+
+ALL 6 must be checked. No exceptions. No rationalizations.
+
+```
+[BMAD Checklist -- Story X-Y]
+[ ] 1. create-story complete
+[ ] 2. dev-story complete
+[ ] 3. TEA complete
+[ ] 4. QA complete
+[ ] 5. code-review complete
+[ ] 6. Real functionality confirmed (not stub/mock)
 ```
 
 ---
 
-## 절대 규칙
+## Troubleshooting
 
-1. BMAD 스킬 없이 직접 코드 구현 금지
-2. BMAD 스킬 없이 직접 코드 리뷰 금지
-3. QA/TEA 단계 생략 금지
-4. stub/mock/placeholder를 "완료"로 처리 금지
-5. 기획 단계를 "파일이 이미 있으니" 건너뛰기 금지 -- 항상 새로 생성
-6. 기획 단계를 한 커밋에 몰아서 커밋 금지 -- 단계별 개별 커밋
-7. Writer가 파티모드 실행 금지 -- Reviewer가 함
-8. BMAD 에이전트: 메뉴 표시 금지, 즉시 실행 (YOLO)
-9. 기획 문서: 항상 새로 생성 (기존 파일 덮어쓰기)
-10. Writer와 Reviewer 모두 tmux에서 실행 (사용자 관찰 가능)
-11. Reviewer는 파이프라인 끝까지 상주 -- 스텝 사이에 종료하지 말 것
-12. 오케스트레이터가 파티모드 직접 실행 금지 -- Writer-Reviewer가 자율 처리
+### Worker goes idle without completing a step
+**Cause:** Worker finished a tool call but didn't continue to the next action.
+**Fix:** Send a reminder via SendMessage: "Continue working on {step_name}. Complete the 3-round self-review and report back."
+If still stuck after 2 reminders, shutdown Worker and respawn with the task re-embedded in the spawn prompt.
+
+### Worker skips self-review rounds
+**Cause:** Worker reports "[Step Complete]" without creating party-logs.
+**Fix:** Reject the report: "Party logs missing for {step_name}. Redo the 3-round self-review and save logs to _bmad-output/party-logs/."
+
+### Worker context gets too long (quality degrades)
+**Cause:** Document is very large (3000+ lines) or many steps in one stage.
+**Fix:** Tell Worker to focus on specific line ranges. Shutdown and respawn between stages (not steps).
+
+### Orchestrator runs out of context
+**Cause:** Too many stages in one conversation.
+**Fix:** Each stage has its own lifecycle (spawn -> work -> commit -> shutdown). Start a new conversation if context gets compressed too much. Check git log to see what's already committed.
+
+### Worker reports FAIL on self-review Round 3
+**Cause:** Fundamental quality issue in the section.
+**Fix:** Worker should automatically rewrite and redo all 3 rounds. If it fails twice, Orchestrator should review the section manually.
+
+---
+
+## Absolute Rules
+
+1. Never implement code without BMAD skills
+2. Never review code without BMAD skills
+3. Never skip QA/TEA stages
+4. Never treat stub/mock/placeholder as "complete"
+5. Never skip planning stages because "file already exists" -- always fresh
+6. Never batch planning stages into one commit -- individual commits per stage
+7. BMAD agents: no menus, execute immediately (YOLO)
+8. Planning stages: create fresh every time (overwrite existing)
+9. Worker runs in tmux (visible to user)
+10. Worker stays alive for all steps within a single STAGE -- shutdown and respawn between stages
+11. Orchestrator does NOT write documents or run party mode -- Worker does everything
+12. Orchestrator MUST embed first task in Worker's spawn prompt -- never say "wait"
+13. Worker must self-review by re-reading FROM FILE (Read tool) -- never from memory
+14. Expert comments must be in character with 2-3 sentence minimum -- no one-liners
+15. "Zero findings" triggers re-analysis (BMAD adversarial protocol)
