@@ -337,6 +337,52 @@ export type DashboardBudget = {
   byDepartment: { departmentId: string; name: string; costUsd: number }[]
 }
 
+// === 3축 비용 집계 (Admin) ===
+
+export type AdminCostByAgent = {
+  agentId: string
+  agentName: string
+  totalCostMicro: number
+  inputTokens: number
+  outputTokens: number
+  callCount: number
+}
+
+export type AdminCostByModel = {
+  model: string
+  provider: string
+  displayName: string
+  totalCostMicro: number
+  inputTokens: number
+  outputTokens: number
+  callCount: number
+}
+
+export type AdminCostByDepartment = {
+  departmentId: string
+  departmentName: string
+  totalCostMicro: number
+  agentCount: number
+  callCount: number
+}
+
+export type AdminCostSummary = {
+  totalCostMicro: number
+  totalInputTokens: number
+  totalOutputTokens: number
+  totalCalls: number
+  byProvider: { provider: string; costMicro: number; callCount: number }[]
+  trendPercent: number  // vs previous same-length period
+}
+
+export type AdminCostDaily = {
+  date: string
+  costMicro: number
+  inputTokens: number
+  outputTokens: number
+  callCount: number
+}
+
 // === 퀵 액션 + 만족도 ===
 
 export type QuickAction = {

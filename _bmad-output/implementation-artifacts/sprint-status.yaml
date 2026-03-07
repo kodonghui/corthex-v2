@@ -179,8 +179,8 @@ development_status:
   # Dependencies: Epic 3 (CostTracker)
   # ============================================================
   epic-7: in-progress
-  7-1-3axis-cost-aggregation-api: in-progress
-  7-2-budget-limit-auto-block: in-progress
+  7-1-3axis-cost-aggregation-api: done
+  7-2-budget-limit-auto-block: review
   7-3-cost-dashboard-ui-admin-a6: backlog
   7-4-ceo-app-cost-card-drilldown: backlog
   7-5-budget-exceeded-websocket-alert: backlog
