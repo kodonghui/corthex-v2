@@ -32,6 +32,7 @@ import { filesRoute } from './routes/workspace/files'
 import { workspaceSoulTemplatesRoute } from './routes/workspace/soul-templates'
 import { pushRoute } from './routes/workspace/push'
 import { settingsMcpRoute } from './routes/workspace/settings-mcp'
+import { invitationsRoute } from './routes/workspace/invitations'
 import { runMigrations } from './db'
 import { startJobWorker, stopJobWorker } from './lib/job-queue'
 import { startScheduleWorker, stopScheduleWorker } from './lib/schedule-worker'
@@ -66,6 +67,7 @@ app.use('/api/*', apiRateLimit)          // 일반 API: 100/min
 app.use('/api/auth/login', loginRateLimit)       // 로그인: 5/min
 app.use('/api/auth/admin/login', loginRateLimit) // 관리자 로그인: 5/min
 app.use('/api/auth/register', loginRateLimit)    // 회원가입: 5/min
+app.use('/api/auth/accept-invite', loginRateLimit) // 초대 수락: 5/min
 
 app.route('/api', authRoute)
 
@@ -100,6 +102,7 @@ app.route('/api/workspace/files', filesRoute)
 app.route('/api/workspace', workspaceSoulTemplatesRoute)
 app.route('/api/workspace/push', pushRoute)
 app.route('/api/workspace/settings', settingsMcpRoute)
+app.route('/api/workspace', invitationsRoute)
 
 // WebSocket 라우트
 app.get('/ws', wsRoute)

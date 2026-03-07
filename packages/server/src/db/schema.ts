@@ -15,6 +15,7 @@ export const snsPlatformEnum = pgEnum('sns_platform', ['instagram', 'tistory', '
 export const activityLogTypeEnum = pgEnum('activity_log_type', ['chat', 'delegation', 'tool_call', 'job', 'sns', 'error', 'system', 'login'])
 export const activityPhaseEnum = pgEnum('activity_phase', ['start', 'end', 'error'])
 export const apiKeyScopeEnum = pgEnum('api_key_scope', ['company', 'user'])
+export const invitationStatusEnum = pgEnum('invitation_status', ['pending', 'accepted', 'expired', 'revoked'])
 
 // === 1. companies — 회사 (테넌트 최상위 단위) ===
 export const companies = pgTable('companies', {
@@ -74,6 +75,22 @@ export const adminSessions = pgTable('admin_sessions', {
   expiresAt: timestamp('expires_at').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
+
+// === 2d. invitations — 직원 초대 ===
+export const invitations = pgTable('invitations', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  email: varchar('email', { length: 255 }).notNull(),
+  role: userRoleEnum('role').notNull().default('user'),
+  token: varchar('token', { length: 64 }).notNull().unique(),
+  status: invitationStatusEnum('status').notNull().default('pending'),
+  invitedBy: uuid('invited_by').notNull().references(() => users.id),
+  expiresAt: timestamp('expires_at').notNull(),
+  acceptedAt: timestamp('accepted_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('invitations_company_idx').on(table.companyId),
+}))
 
 // === 3. departments — 부서 ===
 export const departments = pgTable('departments', {
