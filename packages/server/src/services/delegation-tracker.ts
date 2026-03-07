@@ -11,6 +11,8 @@ export type DelegationEventType =
   | 'SPECIALIST_COMPLETED'
   | 'SPECIALIST_FAILED'
   | 'SYNTHESIZING'
+  | 'SYNTHESIS_COMPLETED'
+  | 'SYNTHESIS_FAILED'
   | 'QUALITY_CHECKING'
   | 'QUALITY_PASSED'
   | 'QUALITY_FAILED'
@@ -123,6 +125,14 @@ export class DelegationTracker {
 
   synthesizing(companyId: string, commandId: string, agentId: string, agentName: string): void {
     this.emitDelegation(companyId, commandId, 'SYNTHESIZING', 'synthesizing', { agentId, agentName })
+  }
+
+  synthesisCompleted(companyId: string, commandId: string, agentId: string, agentName: string, durationMs: number): void {
+    this.emitDelegation(companyId, commandId, 'SYNTHESIS_COMPLETED', 'synthesis-completed', { agentId, agentName, data: { durationMs } })
+  }
+
+  synthesisFailed(companyId: string, commandId: string, agentId: string, agentName: string, error: string): void {
+    this.emitDelegation(companyId, commandId, 'SYNTHESIS_FAILED', 'synthesis-failed', { agentId, agentName, data: { error } })
   }
 
   // --- Quality gate ---

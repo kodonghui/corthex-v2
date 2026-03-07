@@ -1,6 +1,7 @@
 import { agentRunner, type AgentConfig } from './agent-runner'
 import { delegationTracker } from './delegation-tracker'
-import { delegate as managerDelegate, formatDelegationResult } from './manager-delegate'
+import { delegate as managerDelegate } from './manager-delegate'
+import { synthesize as managerSynthesize } from './manager-synthesis'
 import { db } from '../db'
 import { commands, agents, departments, orchestrationTasks, qualityReviews } from '../db/schema'
 import { eq, and } from 'drizzle-orm'
@@ -219,7 +220,7 @@ export async function findSecretaryAgent(companyId: string): Promise<AgentConfig
 
 // === Get Active Managers ===
 
-async function getActiveManagers(companyId: string) {
+export async function getActiveManagers(companyId: string) {
   return db
     .select({
       id: agents.id,
@@ -539,7 +540,18 @@ export async function process(options: ProcessOptions): Promise<ChiefOfStaffResu
       parentTaskId: null,
       toolExecutor,
     })
-    managerResult = formatDelegationResult(delegationResult, managerAgent.name)
+
+    // === Phase 2b: Synthesize (LLM combines results into structured report) ===
+    phases.push('synthesize')
+    managerResult = await managerSynthesize({
+      manager: managerAgent,
+      delegationResult,
+      commandText,
+      companyId,
+      commandId,
+      parentTaskId: null,
+      toolExecutor,
+    })
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : String(err)
     await updateCommandFailed(commandId, companyId, `Manager 실행 실패: ${errorMsg}`)
