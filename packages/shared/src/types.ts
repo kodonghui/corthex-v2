@@ -203,6 +203,73 @@ export type LLMError = {
   retryable: boolean
 }
 
+// === Agent Execution ===
+export type TaskRequest = {
+  messages: LLMMessage[]
+  context?: string
+  maxToolIterations?: number
+}
+
+export type ToolCallRecord = {
+  name: string
+  arguments: Record<string, unknown>
+  result?: string
+  error?: string
+  durationMs: number
+}
+
+export type TaskResponse = {
+  content: string
+  toolCalls: ToolCallRecord[]
+  usage: { inputTokens: number; outputTokens: number }
+  cost: { model: string; provider: LLMProviderName; estimatedCostMicro: number }
+  finishReason: string
+  iterations: number
+}
+
+export type ToolExecutor = (
+  toolName: string,
+  args: Record<string, unknown>,
+) => Promise<{ result: string } | { error: string }>
+
+// === Batch Collector ===
+export type BatchItemStatus = 'pending' | 'processing' | 'completed' | 'failed'
+
+export type BatchItem = {
+  id: string
+  companyId: string
+  request: LLMRequest
+  context: {
+    companyId: string
+    agentId?: string
+    agentName?: string
+    sessionId?: string
+    source: 'chat' | 'delegation' | 'job' | 'sns'
+  }
+  status: BatchItemStatus
+  result?: LLMResponse
+  error?: string
+  enqueuedAt: string
+  completedAt?: string
+}
+
+export type BatchStatus = {
+  pending: number
+  processing: number
+  completed: number
+  failed: number
+  totalItems: number
+  estimatedSavingsMicro: number
+}
+
+export type BatchFlushResult = {
+  batchId: string
+  provider: LLMProviderName
+  itemCount: number
+  status: 'submitted' | 'failed'
+  error?: string
+}
+
 // === 비용 추적 ===
 export type CostSummary = {
   totalCostUsd: number
