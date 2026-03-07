@@ -109,7 +109,7 @@ development_status:
   # FRs: FR26-FR34 (LLM) | NFRs: NFR3, NFR11, NFR22, NFR26
   # Dependencies: Epic 1
   # ============================================================
-  epic-3: in-progress
+  epic-3: done
   3-1-llm-provider-adapters-claude-gpt-gemini: done
   3-2-llm-router-3tier-model-assignment: done
   3-3-provider-fallback-strategy: done
@@ -117,7 +117,7 @@ development_status:
   3-5-cost-recording-system-models-yaml: done
   3-6-batch-collector-batch-execute: done
   3-7-llm-integration-fallback-test: done
-  epic-3-retrospective: optional
+  epic-3-retrospective: done
 
   # ============================================================
   # Epic 4: Tool System (6 stories, 16 SP)
