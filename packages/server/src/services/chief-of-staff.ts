@@ -1,16 +1,17 @@
 import { agentRunner, type AgentConfig } from './agent-runner'
-import { eventBus } from '../lib/event-bus'
+import { delegationTracker } from './delegation-tracker'
+import { delegate as managerDelegate, formatDelegationResult } from './manager-delegate'
 import { db } from '../db'
 import { commands, agents, departments, orchestrationTasks, qualityReviews } from '../db/schema'
 import { eq, and } from 'drizzle-orm'
 import type { LLMRouterContext } from './llm-router'
 import type { ToolExecutor } from '@corthex/shared'
 
-function makeContext(companyId: string, agent: AgentConfig): LLMRouterContext {
+export function makeContext(companyId: string, agent: AgentConfig): LLMRouterContext {
   return { companyId, agentId: agent.id, agentName: agent.name, source: 'delegation' }
 }
 
-function toAgentConfig(row: {
+export function toAgentConfig(row: {
   id: string
   companyId: string
   name: string
@@ -157,27 +158,9 @@ export function parseLLMJson<T>(raw: string): T | null {
   }
 }
 
-// === Emit WebSocket Events ===
-
-function emitCommandStatus(
-  companyId: string,
-  commandId: string,
-  phase: string,
-  detail?: string,
-) {
-  eventBus.emit('command', {
-    type: 'command:status',
-    companyId,
-    commandId,
-    phase,
-    detail,
-    timestamp: new Date().toISOString(),
-  })
-}
-
 // === Orchestration Task Recording ===
 
-async function createOrchTask(params: {
+export async function createOrchTask(params: {
   companyId: string
   commandId: string
   agentId: string
@@ -201,7 +184,7 @@ async function createOrchTask(params: {
   return task
 }
 
-async function completeOrchTask(taskId: string, output: string, status: 'completed' | 'failed', startedAt: Date | null) {
+export async function completeOrchTask(taskId: string, output: string, status: 'completed' | 'failed', startedAt: Date | null) {
   await db
     .update(orchestrationTasks)
     .set({
@@ -428,7 +411,8 @@ export async function process(options: ProcessOptions): Promise<ChiefOfStaffResu
 
   const phases: string[] = []
 
-  // Update command status to processing
+  // Start tracking + update command status
+  delegationTracker.startCommand(companyId, commandId)
   await db.update(commands)
     .set({ status: 'processing' })
     .where(and(eq(commands.id, commandId), eq(commands.companyId, companyId)))
@@ -437,7 +421,7 @@ export async function process(options: ProcessOptions): Promise<ChiefOfStaffResu
   const secretaryAgent = await findSecretaryAgent(companyId)
   if (!secretaryAgent) {
     await updateCommandFailed(commandId, companyId, '비서실장 에이전트를 찾을 수 없습니다')
-    emitCommandStatus(companyId, commandId, 'failed', '비서실장 에이전트 없음')
+    delegationTracker.failed(companyId, commandId, '비서실장 에이전트 없음')
     return {
       commandId,
       content: '비서실장 에이전트를 찾을 수 없습니다',
@@ -455,7 +439,7 @@ export async function process(options: ProcessOptions): Promise<ChiefOfStaffResu
 
   if (targetAgentId) {
     // Skip classification for @mention commands — delegate directly
-    emitCommandStatus(companyId, commandId, 'delegating', '직접 지정된 에이전트에게 위임 중...')
+    delegationTracker.classified(companyId, commandId, { departmentId: '', managerId: targetAgentId!, confidence: 1, reasoning: '직접 지정' })
     phases.push('direct-delegate')
 
     const [target] = await db
@@ -469,7 +453,7 @@ export async function process(options: ProcessOptions): Promise<ChiefOfStaffResu
     }
   } else {
     // Auto-classify
-    emitCommandStatus(companyId, commandId, 'classifying', '명령 분류 중...')
+    delegationTracker.classify(companyId, commandId)
     phases.push('classify')
 
     const classifyTask = await createOrchTask({
@@ -486,7 +470,7 @@ export async function process(options: ProcessOptions): Promise<ChiefOfStaffResu
       if (!classification || classification.confidence < 0.5) {
         // Low confidence — secretary handles directly
         await completeOrchTask(classifyTask.id, JSON.stringify(classification), 'completed', classifyTask.startedAt)
-        emitCommandStatus(companyId, commandId, 'executing', '비서실장이 직접 처리 중...')
+        delegationTracker.classified(companyId, commandId, classification ?? { departmentId: '', managerId: secretaryAgent.id, confidence: 0, reasoning: '분류 불가' })
         phases.push('secretary-direct')
 
         managerAgent = secretaryAgent
@@ -498,6 +482,7 @@ export async function process(options: ProcessOptions): Promise<ChiefOfStaffResu
         }
       } else {
         await completeOrchTask(classifyTask.id, JSON.stringify(classification), 'completed', classifyTask.startedAt)
+        delegationTracker.classified(companyId, commandId, classification)
 
         // Load the target manager
         const [targetManager] = await db
@@ -528,7 +513,7 @@ export async function process(options: ProcessOptions): Promise<ChiefOfStaffResu
 
   if (!managerAgent) {
     await updateCommandFailed(commandId, companyId, '위임할 에이전트를 찾을 수 없습니다')
-    emitCommandStatus(companyId, commandId, 'failed', '위임 대상 없음')
+    delegationTracker.failed(companyId, commandId, '위임 대상 없음')
     return {
       commandId,
       content: '위임할 에이전트를 찾을 수 없습니다',
@@ -540,27 +525,25 @@ export async function process(options: ProcessOptions): Promise<ChiefOfStaffResu
     }
   }
 
-  // === Phase 2: Delegate ===
-  emitCommandStatus(companyId, commandId, 'delegating', `${managerAgent.name}에게 위임 중...`)
+  // === Phase 2: Delegate (Manager self-analysis + parallel specialist execution) ===
+  // Note: managerDelegate() internally calls delegationTracker.managerStarted()
   phases.push('delegate')
-
-  const delegateTask = await createOrchTask({
-    companyId,
-    commandId,
-    agentId: managerAgent.id,
-    type: 'delegate',
-    input: commandText,
-  })
 
   let managerResult: string
   try {
-    managerResult = await delegate(managerAgent, commandText, companyId, undefined, toolExecutor)
-    await completeOrchTask(delegateTask.id, managerResult, 'completed', delegateTask.startedAt)
+    const delegationResult = await managerDelegate({
+      manager: managerAgent,
+      commandText,
+      companyId,
+      commandId,
+      parentTaskId: null,
+      toolExecutor,
+    })
+    managerResult = formatDelegationResult(delegationResult, managerAgent.name)
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : String(err)
-    await completeOrchTask(delegateTask.id, errorMsg, 'failed', delegateTask.startedAt)
     await updateCommandFailed(commandId, companyId, `Manager 실행 실패: ${errorMsg}`)
-    emitCommandStatus(companyId, commandId, 'failed', 'Manager 실행 실패')
+    delegationTracker.failed(companyId, commandId, `Manager 실행 실패: ${errorMsg}`)
     return {
       commandId,
       content: `Manager 실행 실패: ${errorMsg}`,
@@ -573,7 +556,7 @@ export async function process(options: ProcessOptions): Promise<ChiefOfStaffResu
   }
 
   // === Phase 3: Quality Gate + Rework Loop ===
-  emitCommandStatus(companyId, commandId, 'reviewing', '품질 검수 중...')
+  delegationTracker.qualityChecking(companyId, commandId)
   phases.push('review')
 
   let currentResult = managerResult
@@ -607,10 +590,14 @@ export async function process(options: ProcessOptions): Promise<ChiefOfStaffResu
     }
 
     if (lastQualityResult.passed) {
+      delegationTracker.qualityPassed(companyId, commandId, lastQualityResult.scores as unknown as Record<string, number>, lastQualityResult.totalScore)
       break
     }
 
-    // FAIL — check if we can rework
+    // FAIL
+    delegationTracker.qualityFailed(companyId, commandId, lastQualityResult.scores as unknown as Record<string, number>, lastQualityResult.totalScore, lastQualityResult.feedback ?? '')
+
+    // Check if we can rework
     if (attempt > MAX_REWORK_ATTEMPTS) {
       // Max reworks exceeded — pass with warning
       warningFlag = true
@@ -619,7 +606,7 @@ export async function process(options: ProcessOptions): Promise<ChiefOfStaffResu
     }
 
     // Rework
-    emitCommandStatus(companyId, commandId, 'reworking', `재작업 중 (${attempt}/${MAX_REWORK_ATTEMPTS})...`)
+    delegationTracker.reworking(companyId, commandId, attempt, MAX_REWORK_ATTEMPTS)
     phases.push(`rework-${attempt}`)
 
     const reworkContext = `## 재작업 지시 (시도 ${attempt + 1}/${MAX_REWORK_ATTEMPTS + 1})
@@ -643,7 +630,7 @@ ${currentResult}`
   }
 
   // === Phase 4: Complete ===
-  emitCommandStatus(companyId, commandId, 'completed')
+  delegationTracker.completed(companyId, commandId)
   phases.push('completed')
 
   const qualityGateSummary = lastQualityResult ? {
