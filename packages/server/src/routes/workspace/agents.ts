@@ -6,6 +6,7 @@ import { db } from '../../db'
 import { agents, agentDelegationRules } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
+import { isCeoOrAbove } from '@corthex/shared'
 import { logActivity } from '../../lib/activity-logger'
 import { detectCycleInDelegationRules } from '../../lib/orchestrator'
 import type { AppEnv } from '../../types'
@@ -158,7 +159,7 @@ workspaceAgentsRoute.patch('/agents/:id/soul', zValidator('json', updateSoulSche
     .limit(1)
 
   if (!agent) throw new HTTPError(404, '에이전트를 찾을 수 없습니다', 'AGENT_001')
-  if (agent.userId !== tenant.userId && tenant.role !== 'admin') {
+  if (agent.userId !== tenant.userId && !isCeoOrAbove(tenant.role)) {
     throw new HTTPError(403, '본인 에이전트만 수정할 수 있습니다', 'AUTH_003')
   }
 
@@ -192,7 +193,7 @@ workspaceAgentsRoute.post('/agents/:id/soul/reset', async (c) => {
     .limit(1)
 
   if (!agent) throw new HTTPError(404, '에이전트를 찾을 수 없습니다', 'AGENT_001')
-  if (agent.userId !== tenant.userId && tenant.role !== 'admin') {
+  if (agent.userId !== tenant.userId && !isCeoOrAbove(tenant.role)) {
     throw new HTTPError(403, '본인 에이전트만 수정할 수 있습니다', 'AUTH_003')
   }
 
@@ -236,7 +237,7 @@ workspaceAgentsRoute.post('/agents/delegation-rules', zValidator('json', createR
   const body = c.req.valid('json')
 
   // 역할 기반 권한 체크: admin만 허용
-  if (tenant.role !== 'admin') {
+  if (!isCeoOrAbove(tenant.role)) {
     throw new HTTPError(403, '위임 규칙은 관리자만 생성할 수 있습니다', 'AUTH_003')
   }
 
@@ -304,7 +305,7 @@ workspaceAgentsRoute.delete('/agents/delegation-rules/:id', async (c) => {
   const id = c.req.param('id')
 
   // 역할 기반 권한 체크: admin만 허용
-  if (tenant.role !== 'admin') {
+  if (!isCeoOrAbove(tenant.role)) {
     throw new HTTPError(403, '위임 규칙은 관리자만 삭제할 수 있습니다', 'AUTH_003')
   }
 

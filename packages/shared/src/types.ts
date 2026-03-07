@@ -1,9 +1,21 @@
+// === RBAC 역할 (4가지) ===
+export type UserRole = 'super_admin' | 'company_admin' | 'ceo' | 'employee'
+
 // === 테넌트 컨텍스트 (모든 핸들러에 자동 주입) ===
 export type TenantContext = {
   companyId: string
   userId: string
-  role: 'admin' | 'user'
+  role: UserRole
   isAdminUser?: boolean  // admin_users 테이블에서 로그인한 경우 true
+}
+
+// RBAC 역할 헬퍼
+export function isAdminLevel(role: UserRole): boolean {
+  return role === 'super_admin' || role === 'company_admin'
+}
+
+export function isCeoOrAbove(role: UserRole): boolean {
+  return role === 'super_admin' || role === 'company_admin' || role === 'ceo'
 }
 
 // === API 응답 패턴 ===

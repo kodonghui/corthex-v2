@@ -1,6 +1,7 @@
 import { sign, verify } from 'hono/jwt'
 import type { MiddlewareHandler } from 'hono'
-import type { TenantContext } from '@corthex/shared'
+import type { TenantContext, UserRole } from '@corthex/shared'
+import { isAdminLevel } from '@corthex/shared'
 import type { AppEnv } from '../types'
 import { HTTPError } from './error'
 
@@ -9,7 +10,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'corthex-v2-dev-secret-change-in-pr
 export type JwtPayload = {
   sub: string       // userId
   companyId: string
-  role: 'admin' | 'user'
+  role: UserRole
   type?: 'admin'    // admin_users 로그인 시에만 추가
   exp: number
 }
@@ -32,7 +33,6 @@ export const authMiddleware: MiddlewareHandler<AppEnv> = async (c, next) => {
   const token = authHeader.slice(7)
   try {
     const payload = await verify(token, JWT_SECRET, 'HS256') as JwtPayload
-    // TenantContext를 요청에 주입
     const tenant: TenantContext = {
       companyId: payload.companyId,
       userId: payload.sub,
@@ -46,10 +46,10 @@ export const authMiddleware: MiddlewareHandler<AppEnv> = async (c, next) => {
   }
 }
 
-// 관리자 전용 미들웨어 — admin_users JWT만 허용 (type: 'admin')
+// 관리자 전용 미들웨어 — admin_users JWT만 허용 (super_admin, company_admin)
 export const adminOnly: MiddlewareHandler<AppEnv> = async (c, next) => {
   const tenant = c.get('tenant')
-  if (tenant.role !== 'admin' || !tenant.isAdminUser) {
+  if (!isAdminLevel(tenant.role) || !tenant.isAdminUser) {
     throw new HTTPError(403, '관리자 권한이 필요합니다', 'AUTH_003')
   }
   await next()

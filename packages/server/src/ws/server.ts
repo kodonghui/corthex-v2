@@ -2,17 +2,17 @@ import { createBunWebSocket } from 'hono/bun'
 import { verify } from 'hono/jwt'
 import type { ServerWebSocket } from 'bun'
 import { handleSubscription } from './channels'
-import type { WsInboundMessage } from '@corthex/shared'
+import type { WsInboundMessage, UserRole } from '@corthex/shared'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'corthex-v2-dev-secret-change-in-production'
 
-type JwtPayload = { sub: string; companyId: string; role: 'admin' | 'user' }
+type JwtPayload = { sub: string; companyId: string; role: UserRole }
 
 export type WsClient = {
   ws: ServerWebSocket<unknown>
   userId: string
   companyId: string
-  role: 'admin' | 'user'
+  role: UserRole
   subscriptions: Set<string>
   connectedAt: Date
 }

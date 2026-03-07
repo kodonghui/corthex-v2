@@ -2,6 +2,7 @@
  * 테스트 공통 유틸 — makeToken, api, 시드 데이터 ID
  */
 import { sign } from 'hono/jwt'
+import type { UserRole } from '@corthex/shared'
 
 export const BASE = 'http://localhost:3000/api'
 export const JWT_SECRET = process.env.JWT_SECRET || 'corthex-v2-dev-secret-change-in-production'
@@ -17,12 +18,12 @@ export const FAKE_COMPANY_ID = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'
 export const FAKE_USER_ID = '11111111-2222-3333-4444-555555555555'
 
 /** JWT 토큰 생성 헬퍼 */
-export async function makeToken(sub: string, companyId: string, role: 'admin' | 'user' = 'user', type?: 'admin') {
+export async function makeToken(sub: string, companyId: string, role: UserRole = 'employee', type?: 'admin') {
   return sign({ sub, companyId, role, ...(type ? { type } : {}), exp: Math.floor(Date.now() / 1000) + 3600 }, JWT_SECRET)
 }
 
 /** 만료된 JWT 토큰 생성 */
-export async function makeExpiredToken(sub: string, companyId: string, role: 'admin' | 'user' = 'user') {
+export async function makeExpiredToken(sub: string, companyId: string, role: UserRole = 'employee') {
   return sign({ sub, companyId, role, exp: Math.floor(Date.now() / 1000) - 3600 }, JWT_SECRET)
 }
 
@@ -49,12 +50,12 @@ export function apiNoAuth(path: string, options: RequestInit = {}) {
   })
 }
 
-/** 자주 쓰는 4종 토큰 미리 생성 */
+/** 자주 쓰는 4종 RBAC 토큰 미리 생성 */
 export async function createTestTokens() {
   return {
-    realCeoToken: await makeToken(REAL_CEO_ID, REAL_COMPANY_ID, 'user'),
-    realAdminToken: await makeToken(REAL_ADMIN_ID, REAL_COMPANY_ID, 'admin', 'admin'),
-    fakeUserToken: await makeToken(FAKE_USER_ID, FAKE_COMPANY_ID, 'user'),
-    fakeAdminToken: await makeToken(FAKE_USER_ID, FAKE_COMPANY_ID, 'admin'),
+    realCeoToken: await makeToken(REAL_CEO_ID, REAL_COMPANY_ID, 'ceo'),
+    realAdminToken: await makeToken(REAL_ADMIN_ID, REAL_COMPANY_ID, 'super_admin', 'admin'),
+    fakeUserToken: await makeToken(FAKE_USER_ID, FAKE_COMPANY_ID, 'employee'),
+    fakeAdminToken: await makeToken(FAKE_USER_ID, FAKE_COMPANY_ID, 'ceo'),
   }
 }

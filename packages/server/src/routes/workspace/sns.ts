@@ -6,6 +6,7 @@ import { db } from '../../db'
 import { snsContents, snsAccounts, users, agents } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
+import { isCeoOrAbove } from '@corthex/shared'
 import { generateAgentResponse } from '../../lib/ai'
 import { publishContent } from '../../lib/sns-publisher'
 import { generateSnsImage } from '../../lib/sns-image-generator'
@@ -535,7 +536,7 @@ snsRoute.post('/sns/:id/submit', async (c) => {
 // POST /api/workspace/sns/:id/approve — 승인 (admin, pending → approved)
 snsRoute.post('/sns/:id/approve', async (c) => {
   const tenant = c.get('tenant')
-  if (tenant.role !== 'admin') throw new HTTPError(403, '관리자만 승인할 수 있습니다', 'AUTH_003')
+  if (!isCeoOrAbove(tenant.role)) throw new HTTPError(403, '관리자만 승인할 수 있습니다', 'AUTH_003')
 
   const id = c.req.param('id')
 
@@ -577,7 +578,7 @@ snsRoute.post('/sns/:id/approve', async (c) => {
 // POST /api/workspace/sns/:id/reject — 반려 (admin, pending → rejected)
 snsRoute.post('/sns/:id/reject', zValidator('json', rejectSchema), async (c) => {
   const tenant = c.get('tenant')
-  if (tenant.role !== 'admin') throw new HTTPError(403, '관리자만 반려할 수 있습니다', 'AUTH_003')
+  if (!isCeoOrAbove(tenant.role)) throw new HTTPError(403, '관리자만 반려할 수 있습니다', 'AUTH_003')
 
   const id = c.req.param('id')
   const { reason } = c.req.valid('json')
@@ -676,7 +677,7 @@ snsRoute.post('/sns/:id/publish', async (c) => {
 // POST /api/workspace/sns/:id/cancel-schedule — 예약 취소 (scheduled → approved, admin만)
 snsRoute.post('/sns/:id/cancel-schedule', async (c) => {
   const tenant = c.get('tenant')
-  if (tenant.role !== 'admin') throw new HTTPError(403, '관리자만 예약을 취소할 수 있습니다', 'AUTH_003')
+  if (!isCeoOrAbove(tenant.role)) throw new HTTPError(403, '관리자만 예약을 취소할 수 있습니다', 'AUTH_003')
 
   const id = c.req.param('id')
 

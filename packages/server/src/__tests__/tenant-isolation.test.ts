@@ -21,10 +21,10 @@ let fakeUserToken: string
 let fakeAdminToken: string
 
 beforeAll(async () => {
-  realCeoToken = await makeToken(REAL_CEO_ID, REAL_COMPANY_ID, 'user')
-  realAdminToken = await makeToken(REAL_ADMIN_ID, REAL_COMPANY_ID, 'admin', 'admin')
-  fakeUserToken = await makeToken(FAKE_USER_ID, FAKE_COMPANY_ID, 'user')
-  fakeAdminToken = await makeToken(FAKE_USER_ID, FAKE_COMPANY_ID, 'admin')
+  realCeoToken = await makeToken(REAL_CEO_ID, REAL_COMPANY_ID, 'ceo')
+  realAdminToken = await makeToken(REAL_ADMIN_ID, REAL_COMPANY_ID, 'super_admin', 'admin')
+  fakeUserToken = await makeToken(FAKE_USER_ID, FAKE_COMPANY_ID, 'employee')
+  fakeAdminToken = await makeToken(FAKE_USER_ID, FAKE_COMPANY_ID, 'ceo')
 })
 
 // =============================================

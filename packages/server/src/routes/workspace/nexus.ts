@@ -6,6 +6,7 @@ import { db } from '../../db'
 import { companies, departments, agents, canvasLayouts, nexusWorkflows, nexusExecutions } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
+import { isCeoOrAbove } from '@corthex/shared'
 import { logActivity } from '../../lib/activity-logger'
 import type { AppEnv } from '../../types'
 
@@ -82,7 +83,7 @@ nexusRoute.put(
   zValidator('json', saveLayoutSchema),
   async (c) => {
     const tenant = c.get('tenant')
-    if (tenant.role !== 'admin') {
+    if (!isCeoOrAbove(tenant.role)) {
       throw new HTTPError(403, '관리자 권한이 필요합니다', 'AUTH_003')
     }
 
@@ -261,7 +262,7 @@ nexusRoute.patch(
   zValidator('json', reassignSchema),
   async (c) => {
     const tenant = c.get('tenant')
-    if (tenant.role !== 'admin') {
+    if (!isCeoOrAbove(tenant.role)) {
       throw new HTTPError(403, '관리자 권한이 필요합니다', 'AUTH_003')
     }
 

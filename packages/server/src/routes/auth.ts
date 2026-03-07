@@ -80,11 +80,11 @@ authRoute.post('/auth/register', zValidator('json', registerSchema), async (c) =
   // 29-Agent Organization 자동 배치
   const orgResult = await deployOrganization(company.id, user.id)
 
-  // JWT 발급
+  // JWT 발급 — 회사 등록자는 CEO 역할
   const token = await createToken({
     sub: user.id,
     companyId: company.id,
-    role: 'admin',
+    role: 'ceo',
   })
 
   logActivity({
@@ -150,10 +150,13 @@ authRoute.post('/auth/login', zValidator('json', loginSchema), async (c) => {
     throw new HTTPError(401, '아이디 또는 비밀번호가 올바르지 않습니다', 'AUTH_001')
   }
 
+  // users 테이블 역할을 RBAC 역할로 매핑
+  const rbacRole = user.role === 'admin' ? 'ceo' as const : 'employee' as const
+
   const token = await createToken({
     sub: user.id,
     companyId: user.companyId,
-    role: user.role,
+    role: rbacRole,
   })
 
   logActivity({
@@ -213,10 +216,13 @@ authRoute.post('/auth/admin/login', zValidator('json', loginSchema), async (c) =
     throw new HTTPError(401, '아이디 또는 비밀번호가 올바르지 않습니다', 'AUTH_001')
   }
 
+  // admin_users 역할을 RBAC 역할로 매핑
+  const adminRbacRole = admin.role === 'superadmin' ? 'super_admin' as const : 'company_admin' as const
+
   const token = await createToken({
     sub: admin.id,
     companyId: 'system',
-    role: 'admin',
+    role: adminRbacRole,
     type: 'admin',
   })
 
@@ -368,11 +374,12 @@ authRoute.post('/auth/accept-invite', zValidator('json', acceptInviteSchema), as
     .set({ status: 'accepted', acceptedAt: new Date() })
     .where(eq(invitations.id, invitation.id))
 
-  // JWT 발급
+  // JWT 발급 — users 역할을 RBAC 역할로 매핑
+  const inviteRbacRole = user.role === 'admin' ? 'ceo' as const : 'employee' as const
   const jwtToken = await createToken({
     sub: user.id,
     companyId: invitation.companyId,
-    role: user.role,
+    role: inviteRbacRole,
   })
 
   logActivity({
