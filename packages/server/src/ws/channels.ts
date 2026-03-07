@@ -149,6 +149,7 @@ export async function handleSubscription(
       break
     }
 
+    case 'cost':
     case 'command':
     case 'delegation':
     case 'tool': {

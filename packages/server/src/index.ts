@@ -146,6 +146,9 @@ eventBus.on('delegation', (data: { companyId: string; payload: unknown }) => {
 eventBus.on('tool', (data: { companyId: string; payload: unknown }) => {
   broadcastToCompany(data.companyId, 'tool', data.payload)
 })
+eventBus.on('cost', (data: { companyId: string; payload: unknown }) => {
+  broadcastToCompany(data.companyId, 'cost', data.payload)
+})
 
 // 프로덕션: Bun 네이티브 정적 파일 서빙 (SPA 폴백 포함)
 if (isProd) {

@@ -337,6 +337,26 @@ export type DashboardBudget = {
   byDepartment: { departmentId: string; name: string; costUsd: number }[]
 }
 
+// === 퀵 액션 + 만족도 ===
+
+export type QuickAction = {
+  id: string
+  label: string
+  icon: string
+  command: string
+  presetId?: string | null
+  sortOrder: number
+}
+
+export type DashboardSatisfaction = {
+  total: number
+  positive: number
+  negative: number
+  neutral: number
+  rate: number  // 0-100, percentage of positive among those with feedback
+  period: '7d' | '30d' | 'all'
+}
+
 // === 메신저 ===
 export type MessengerChannel = {
   id: string
@@ -360,6 +380,7 @@ export type WsChannel =
   | 'command'
   | 'delegation'
   | 'tool'
+  | 'cost'
 
 export type WsInboundMessage = {
   type: 'subscribe' | 'unsubscribe'

@@ -3,6 +3,7 @@ import { costRecords, agents, departments } from '../db/schema'
 import { getModelConfig } from '../config/models'
 import { sql, and, eq, gte, lte, sum, count } from 'drizzle-orm'
 import type { LLMProviderName } from '@corthex/shared'
+import { eventBus } from './event-bus'
 
 // Fallback pricing for unknown models (Claude Sonnet level)
 const DEFAULT_PRICING = { input: 3, output: 15 }
@@ -64,6 +65,18 @@ export async function recordCost(params: RecordParams): Promise<void> {
       costUsdMicro: costMicro,
       source: params.source,
       isBatch: params.isBatch ?? false,
+    })
+
+    // Broadcast cost event for real-time dashboard updates
+    eventBus.emit('cost', {
+      companyId: params.companyId,
+      payload: {
+        type: 'cost-recorded',
+        provider,
+        model: params.model,
+        costUsdMicro: costMicro,
+        source: params.source,
+      },
     })
   } catch (err) {
     console.error('[CostTracker] 비용 기록 실패:', err)

@@ -1,14 +1,18 @@
 import { useState, useMemo, useEffect } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { Card, Skeleton, Toggle } from '@corthex/ui'
 import { api } from '../lib/api'
+import { useDashboardWs } from '../hooks/use-dashboard-ws'
+import { WsStatusIndicator } from '../components/ws-status-indicator'
 import type {
   LLMProviderName,
   DashboardSummary,
   DashboardUsageDay,
   DashboardUsage,
   DashboardBudget,
+  QuickAction,
+  DashboardSatisfaction,
 } from '@corthex/shared'
 
 // === Constants ===
@@ -24,8 +28,6 @@ const PROVIDER_LABELS: Record<LLMProviderName, string> = {
   openai: 'OpenAI',
   google: 'Google',
 }
-
-const REFETCH_INTERVAL = 30_000
 
 // === Summary Cards ===
 
@@ -355,40 +357,157 @@ function BudgetBar({ data }: { data: DashboardBudget }) {
   )
 }
 
-// === Quick Actions ===
+// === Quick Actions (API-based) ===
 
-function QuickActions() {
+function QuickActionsPanel() {
   const navigate = useNavigate()
+  const [executingId, setExecutingId] = useState<string | null>(null)
 
-  const actions = [
-    { label: '루틴 실행', command: '/루틴', icon: '▶️', desc: '일상 루틴 자동 실행' },
-    { label: '시스템 점검', command: '/시스템점검', icon: '🔍', desc: '전체 시스템 상태 점검' },
-    { label: '비용 리포트', command: '/비용리포트', icon: '📊', desc: '상세 비용 분석 보고서' },
-  ]
+  const { data: actionsRes } = useQuery({
+    queryKey: ['dashboard-quick-actions'],
+    queryFn: () => api.get<{ data: QuickAction[] }>('/workspace/dashboard/quick-actions'),
+  })
+
+  const executePreset = useMutation({
+    mutationFn: (presetId: string) =>
+      api.post(`/workspace/presets/${presetId}/execute`, {}),
+    onSettled: () => setExecutingId(null),
+  })
+
+  const actions = actionsRes?.data ?? []
+
+  const handleClick = (action: QuickAction) => {
+    if (action.presetId) {
+      setExecutingId(action.id)
+      executePreset.mutate(action.presetId)
+    } else {
+      navigate(`/command-center?preset=${encodeURIComponent(action.command)}`)
+    }
+  }
+
+  if (actions.length === 0) return null
 
   return (
     <div>
       <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-3">퀵 액션</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {actions.map((action) => (
           <button
-            key={action.command}
-            onClick={() =>
-              navigate(`/command-center?preset=${encodeURIComponent(action.command)}`)
-            }
-            className="flex items-center gap-3 px-4 py-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors text-left"
+            key={action.id}
+            onClick={() => handleClick(action)}
+            disabled={executingId === action.id}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors text-left disabled:opacity-50"
           >
-            <span className="text-xl">{action.icon}</span>
-            <div>
-              <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-                {action.label}
-              </p>
-              <p className="text-xs text-zinc-500">{action.desc}</p>
-            </div>
+            <span className="text-xl">{executingId === action.id ? '...' : action.icon}</span>
+            <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+              {action.label}
+            </p>
           </button>
         ))}
       </div>
     </div>
+  )
+}
+
+// === Satisfaction Chart (CSS donut) ===
+
+const SATISFACTION_PERIODS = [
+  { value: '7d' as const, label: '7일' },
+  { value: '30d' as const, label: '30일' },
+  { value: 'all' as const, label: '전체' },
+]
+
+function SatisfactionChart() {
+  const [period, setPeriod] = useState<'7d' | '30d' | 'all'>('7d')
+
+  const { data: satRes } = useQuery({
+    queryKey: ['dashboard-satisfaction', period],
+    queryFn: () =>
+      api.get<{ data: DashboardSatisfaction }>(`/workspace/dashboard/satisfaction?period=${period}`),
+  })
+
+  const sat = satRes?.data
+
+  if (!sat) return null
+
+  const total = sat.positive + sat.negative + sat.neutral
+  const posPercent = total > 0 ? (sat.positive / total) * 100 : 0
+  const negPercent = total > 0 ? (sat.negative / total) * 100 : 0
+
+  const gradient = total > 0
+    ? `conic-gradient(#22C55E 0deg ${posPercent * 3.6}deg, #EF4444 ${posPercent * 3.6}deg ${(posPercent + negPercent) * 3.6}deg, #D4D4D8 ${(posPercent + negPercent) * 3.6}deg 360deg)`
+    : 'conic-gradient(#D4D4D8 0deg 360deg)'
+
+  return (
+    <Card>
+      <div className="px-5 py-4">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">명령 만족도</h3>
+          <div className="flex gap-1">
+            {SATISFACTION_PERIODS.map((p) => (
+              <button
+                key={p.value}
+                onClick={() => setPeriod(p.value)}
+                className={`px-2 py-0.5 text-xs rounded ${
+                  period === p.value
+                    ? 'bg-zinc-800 text-white dark:bg-zinc-200 dark:text-zinc-900'
+                    : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-6">
+          {/* Donut chart */}
+          <div className="relative w-28 h-28 flex-shrink-0">
+            <div
+              className="w-full h-full rounded-full"
+              style={{ background: gradient }}
+              role="img"
+              aria-label={`만족도 ${sat.rate}%`}
+            />
+            {/* Inner circle for donut effect */}
+            <div className="absolute inset-3 rounded-full bg-white dark:bg-zinc-900 flex flex-col items-center justify-center">
+              <span className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+                {sat.rate}%
+              </span>
+              <span className="text-[9px] text-zinc-400">만족도</span>
+            </div>
+          </div>
+
+          {/* Legend + counts */}
+          <div className="flex-1 space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-sm bg-green-500 inline-block" />
+                <span className="text-zinc-600 dark:text-zinc-400">긍정</span>
+              </span>
+              <span className="font-medium text-zinc-900 dark:text-zinc-100">{sat.positive}건</span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <span className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-sm bg-red-500 inline-block" />
+                <span className="text-zinc-600 dark:text-zinc-400">부정</span>
+              </span>
+              <span className="font-medium text-zinc-900 dark:text-zinc-100">{sat.negative}건</span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <span className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-sm bg-zinc-300 dark:bg-zinc-600 inline-block" />
+                <span className="text-zinc-600 dark:text-zinc-400">무응답</span>
+              </span>
+              <span className="font-medium text-zinc-900 dark:text-zinc-100">{sat.neutral}건</span>
+            </div>
+            <div className="pt-1 border-t border-zinc-100 dark:border-zinc-800">
+              <span className="text-xs text-zinc-400">총 {sat.total}건</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Card>
   )
 }
 
@@ -429,23 +548,23 @@ function DashboardSkeleton() {
 export function DashboardPage() {
   const [usageDays, setUsageDays] = useState(7)
 
+  // WebSocket real-time updates (replaces 30s polling)
+  useDashboardWs()
+
   const { data: summaryRes, isLoading: summaryLoading, error: summaryError } = useQuery({
     queryKey: ['dashboard-summary'],
     queryFn: () => api.get<{ data: DashboardSummary }>('/workspace/dashboard/summary'),
-    refetchInterval: REFETCH_INTERVAL,
   })
 
   const { data: usageRes, isLoading: usageLoading } = useQuery({
     queryKey: ['dashboard-usage', usageDays],
     queryFn: () =>
       api.get<{ data: DashboardUsage }>(`/workspace/dashboard/usage?days=${usageDays}`),
-    refetchInterval: REFETCH_INTERVAL,
   })
 
   const { data: budgetRes, isLoading: budgetLoading } = useQuery({
     queryKey: ['dashboard-budget'],
     queryFn: () => api.get<{ data: DashboardBudget }>('/workspace/dashboard/budget'),
-    refetchInterval: REFETCH_INTERVAL,
   })
 
   const summary = summaryRes?.data
@@ -461,9 +580,12 @@ export function DashboardPage() {
 
   return (
     <div className="h-full overflow-y-auto">
-      <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">
-        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">작전현황</h2>
-        <p className="text-xs text-zinc-500 mt-0.5">조직 전체 현황을 한눈에 파악합니다</p>
+      <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">작전현황</h2>
+          <p className="text-xs text-zinc-500 mt-0.5">조직 전체 현황을 한눈에 파악합니다</p>
+        </div>
+        <WsStatusIndicator />
       </div>
 
       <div className="px-6 py-4 space-y-6 max-w-6xl">
@@ -488,7 +610,9 @@ export function DashboardPage() {
 
             {budget && <BudgetBar data={budget} />}
 
-            <QuickActions />
+            <SatisfactionChart />
+
+            <QuickActionsPanel />
           </>
         )}
       </div>

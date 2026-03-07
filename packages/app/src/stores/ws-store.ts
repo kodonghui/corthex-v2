@@ -5,9 +5,17 @@ type WsEventListener = (data: unknown) => void
 
 const channelListeners = new Map<string, Set<WsEventListener>>()
 
+const BACKOFF_BASE = 3000
+const BACKOFF_MAX = 30000
+
+function getBackoffDelay(attempt: number): number {
+  return Math.min(BACKOFF_BASE * Math.pow(2, attempt), BACKOFF_MAX)
+}
+
 type WsState = {
   socket: WebSocket | null
   isConnected: boolean
+  reconnectAttempt: number
   connect: (token: string) => void
   disconnect: () => void
   subscribe: (channel: WsChannel, params?: Record<string, string>) => void
@@ -19,6 +27,7 @@ type WsState = {
 export const useWsStore = create<WsState>((set, get) => ({
   socket: null,
   isConnected: false,
+  reconnectAttempt: 0,
 
   connect: (token: string) => {
     const prev = get().socket
@@ -30,7 +39,7 @@ export const useWsStore = create<WsState>((set, get) => ({
     const protocol = location.protocol === 'https:' ? 'wss' : 'ws'
     const ws = new WebSocket(`${protocol}://${location.host}/ws?token=${token}`)
 
-    ws.onopen = () => set({ isConnected: true })
+    ws.onopen = () => set({ isConnected: true, reconnectAttempt: 0 })
 
     let serverRestarting = false
 
@@ -38,7 +47,10 @@ export const useWsStore = create<WsState>((set, get) => ({
       set({ isConnected: false, socket: null })
       const noReconnect = [1000, 4001, 4002]
       if (!noReconnect.includes(event.code) && !serverRestarting) {
-        setTimeout(() => get().connect(token), 3000)
+        const attempt = get().reconnectAttempt
+        const delay = getBackoffDelay(attempt)
+        set({ reconnectAttempt: attempt + 1 })
+        setTimeout(() => get().connect(token), delay)
       }
     }
 
@@ -47,7 +59,8 @@ export const useWsStore = create<WsState>((set, get) => ({
         const msg = JSON.parse(event.data) as WsOutboundMessage
         if (msg.type === 'server-restart') {
           serverRestarting = true
-          setTimeout(() => get().connect(token), 3000)
+          set({ reconnectAttempt: 0 })
+          setTimeout(() => get().connect(token), BACKOFF_BASE)
           return
         }
 
@@ -76,7 +89,7 @@ export const useWsStore = create<WsState>((set, get) => ({
       ws.onclose = null
       ws.close()
     }
-    set({ socket: null, isConnected: false })
+    set({ socket: null, isConnected: false, reconnectAttempt: 0 })
   },
 
   subscribe: (channel: WsChannel, params?: Record<string, string>) => {

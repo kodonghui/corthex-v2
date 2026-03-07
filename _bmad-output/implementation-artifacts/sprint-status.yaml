@@ -168,8 +168,8 @@ development_status:
   6-2-operations-dashboard-ui: done
   6-3-activity-log-4tab-api: done
   6-4-activity-log-4tab-ui: done
-  6-5-websocket-realtime-dashboard-refresh: in-progress
-  6-6-quick-actions-satisfaction-chart: in-progress
+  6-5-websocket-realtime-dashboard-refresh: done
+  6-6-quick-actions-satisfaction-chart: review
   epic-6-retrospective: optional
 
   # ============================================================

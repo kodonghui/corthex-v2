@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
 import { api } from '../lib/api'
+import { useActivityWs } from '../hooks/use-activity-ws'
+import { WsStatusIndicator } from '../components/ws-status-indicator'
 import { Tabs, Badge, Input, SkeletonTable, EmptyState } from '@corthex/ui'
 import type { TabItem } from '@corthex/ui'
 
@@ -150,6 +152,9 @@ export function ActivityLogPage() {
   const [expandedQaId, setExpandedQaId] = useState<string | null>(null)
 
   // Reset page when filters change
+  // WebSocket real-time updates
+  useActivityWs(tab)
+
   const debouncedSearch = useDebounce(searchInput, 300)
 
   const setTab = useCallback((t: string) => {
@@ -214,8 +219,9 @@ export function ActivityLogPage() {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="px-4 md:px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">
+      <div className="px-4 md:px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
         <h2 className="text-lg font-semibold">통신로그</h2>
+        <WsStatusIndicator />
       </div>
 
       {/* Tabs */}
