@@ -24,6 +24,7 @@ export type ParsedMeta = {
   mentionAgentId?: string
   presetId?: string
   timeoutMs: number
+  source?: string
 }
 
 export type ClassifyOptions = {

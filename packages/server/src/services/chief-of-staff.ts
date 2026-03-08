@@ -463,7 +463,7 @@ ${result}`
     }
   }
 
-  const conclusion = passed ? 'pass' : (inspectionResult?.conclusion === 'warning' && legacyPassed ? 'warning' : 'fail')
+  const conclusion: 'pass' | 'fail' = passed ? 'pass' : 'fail'
 
   await db.insert(qualityReviews).values({
     companyId,
@@ -719,7 +719,7 @@ export async function process(options: ProcessOptions): Promise<ChiefOfStaffResu
     let deptNameEn: string | undefined
     if (classification?.departmentId) {
       try {
-        const [dept] = await db.select({ nameEn: departments.nameEn }).from(departments)
+        const [dept] = await db.select({ nameEn: departments.name }).from(departments)
           .where(and(eq(departments.id, classification.departmentId), eq(departments.companyId, companyId)))
           .limit(1)
         deptNameEn = dept?.nameEn ?? undefined

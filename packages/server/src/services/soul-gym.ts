@@ -68,13 +68,11 @@ export async function analyzeSoul(companyId: string, agentId: string) {
   const currentSoul = agent.soul || '(소울 미설정)'
 
   // Call LLM to generate 3 variants
-  const credentials = await scanForCredentials(companyId)
   const llmContext: LLMRouterContext = {
     companyId,
     agentId,
     agentName: 'soul-gym',
     source: 'delegation',
-    credentials,
   }
 
   const analysisPrompt = `당신은 AI 에이전트 성능 최적화 전문가입니다.
@@ -121,7 +119,7 @@ JSON만 반환하세요. 설명 없이 순수 JSON만.`
 
   try {
     const response = await llmRouter.call({
-      model: resolveModel(ANALYSIS_MODEL),
+      model: ANALYSIS_MODEL,
       messages: [{ role: 'user', content: analysisPrompt }],
       maxTokens: 2000,
       temperature: 0.7,
@@ -182,13 +180,11 @@ export async function runBenchmark(companyId: string, agentId: string, variants:
   if (agentRow.length === 0) return { error: 'AGENT_NOT_FOUND' as const }
   const agent = agentRow[0]
 
-  const credentials = await scanForCredentials(companyId)
   const llmContext: LLMRouterContext = {
     companyId,
     agentId,
     agentName: 'soul-gym-benchmark',
     source: 'delegation',
-    credentials,
   }
 
   // Generate benchmark questions based on agent's role
@@ -201,7 +197,7 @@ JSON 형식:
 JSON만 반환.`
 
   const qResponse = await llmRouter.call({
-    model: resolveModel(ANALYSIS_MODEL),
+    model: ANALYSIS_MODEL,
     messages: [{ role: 'user', content: questionPrompt }],
     maxTokens: 500,
     temperature: 0.5,
@@ -248,7 +244,7 @@ JSON만 반환.`
     for (const sv of soulVersions) {
       try {
         const resp = await llmRouter.call({
-          model: resolveModel(agent.modelName),
+          model: agent.modelName ?? ANALYSIS_MODEL,
           systemPrompt: sv.soul || '당신은 유능한 AI 에이전트입니다.',
           messages: [{ role: 'user', content: q.question }],
           maxTokens: 800,
@@ -276,7 +272,7 @@ JSON만 반환: { "bluf": N, "expertise": N, "specificity": N, "structure": N, "
 
       try {
         const judgeResp = await llmRouter.call({
-          model: resolveModel(JUDGE_MODEL),
+          model: JUDGE_MODEL,
           messages: [{ role: 'user', content: judgePrompt }],
           maxTokens: 200,
           temperature: 0,
@@ -494,13 +490,11 @@ export async function runSoulEvolution(companyId: string, agentId: string) {
     return { data: { noIssues: true, message: '최근 30일 내 경고/실패 기록이 없습니다.' } }
   }
 
-  const credentials = await scanForCredentials(companyId)
   const llmContext: LLMRouterContext = {
     companyId,
     agentId,
     agentName: 'soul-evolution',
     source: 'delegation',
-    credentials,
   }
 
   const evolutionPrompt = `당신은 AI 에이전트 Soul(성격 문서) 진화 전문가입니다.
@@ -522,7 +516,7 @@ ${warnings.slice(0, 5).map((w, i) => `${i + 1}. ${w.slice(0, 200)}`).join('\n')}
 
   try {
     const response = await llmRouter.call({
-      model: resolveModel(ANALYSIS_MODEL),
+      model: ANALYSIS_MODEL,
       messages: [{ role: 'user', content: evolutionPrompt }],
       maxTokens: 1000,
       temperature: 0.5,

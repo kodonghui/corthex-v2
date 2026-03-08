@@ -64,7 +64,7 @@ superAdminCompaniesRoute.post('/companies', zValidator('json', createCompanySche
   const result = await createCompanyWithAdmin(input, tenant.userId)
 
   if ('error' in result) {
-    throw new HTTPError(409, result.error.message, result.error.code)
+    throw new HTTPError(409, result.error!.message, result.error!.code)
   }
 
   return c.json({ data: result.data }, 201)
@@ -111,7 +111,7 @@ superAdminCompaniesRoute.put('/companies/:id', zValidator('json', updateCompanyS
   }
 
   if ('error' in result) {
-    throw new HTTPError(409, result.error.message, result.error.code)
+    throw new HTTPError(409, result.error!.message, result.error!.code)
   }
 
   return c.json({ data: result.data })
@@ -126,8 +126,8 @@ superAdminCompaniesRoute.delete('/companies/:id', async (c) => {
   const result = await softDeleteCompany(id, tenant.userId)
 
   if ('error' in result) {
-    const status = result.error.code === 'COMPANY_NOT_FOUND' ? 404 : 409
-    throw new HTTPError(status, result.error.message, result.error.code)
+    const status = result.error!.code === 'COMPANY_NOT_FOUND' ? 404 : 409
+    throw new HTTPError(status, result.error!.message, result.error!.code)
   }
 
   return c.json({ data: result.data })

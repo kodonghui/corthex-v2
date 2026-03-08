@@ -21,7 +21,7 @@ import type { CascadeMode } from '../../services/organization'
 
 function throwIfError(result: { error?: { status: number; message: string; code: string } }): void {
   if (result.error) {
-    throw new HTTPError(result.error.status, result.error.message, result.error.code)
+    throw new HTTPError(result.error!.status, result.error!.message, result.error!.code)
   }
 }
 
@@ -99,7 +99,7 @@ departmentsRoute.post('/departments', zValidator('json', createDepartmentSchema)
   const tenant = c.get('tenant')
   const body = c.req.valid('json')
   const result = await createDepartment(tenant, body)
-  if ('error' in result) throw new HTTPError(result.error.status, result.error.message, result.error.code)
+  if ('error' in result) throw new HTTPError(result.error!.status, result.error!.message, result.error!.code)
   return c.json({ data: result.data }, 201)
 })
 
@@ -109,7 +109,7 @@ departmentsRoute.patch('/departments/:id', zValidator('json', updateDepartmentSc
   const id = c.req.param('id')
   const body = c.req.valid('json')
   const result = await updateDepartment(tenant, id, body)
-  if ('error' in result) throw new HTTPError(result.error.status, result.error.message, result.error.code)
+  if ('error' in result) throw new HTTPError(result.error!.status, result.error!.message, result.error!.code)
   return c.json({ data: result.data })
 })
 

@@ -13,6 +13,7 @@ import { telegramConfigs, agents, commands, orchestrationTasks, costRecords, dep
 import { eq, and, desc, sum, sql } from 'drizzle-orm'
 import { decrypt } from '../lib/crypto'
 import { classify, createCommand, parseSlash, parseMention, resolveMentionAgent } from './command-router'
+import type { SlashType } from './command-router'
 import { process as chiefOfStaffProcess } from './chief-of-staff'
 import { processAll } from './all-command-processor'
 import { processSequential } from './sequential-command-processor'
@@ -458,7 +459,7 @@ async function cmdCancel(ctx: CommandContext): Promise<string> {
 
   await db
     .update(orchestrationTasks)
-    .set({ status: 'failed', updatedAt: new Date() })
+    .set({ status: 'failed' })
     .where(eq(orchestrationTasks.id, task.id))
 
   return `✅ 작업 \`${taskId}\` 취소 완료.`
@@ -617,7 +618,7 @@ export async function handleCallbackQuery(
 
       logActivity({
         companyId: config.companyId,
-        type: 'tool',
+        type: 'tool_call',
         phase: 'end',
         actorType: 'user',
         actorId: ceoChatId,
@@ -657,7 +658,7 @@ export async function handleCallbackQuery(
 
       logActivity({
         companyId: config.companyId,
-        type: 'tool',
+        type: 'tool_call',
         phase: 'end',
         actorType: 'user',
         actorId: ceoChatId,
@@ -701,7 +702,7 @@ async function handleKoreanSlash(
     text: originalText,
     type: commandType as any,
     targetAgentId: null,
-    metadata: { slashType, slashArgs: slashArgs || undefined, timeoutMs: 300000, source: 'telegram' },
+    metadata: { slashType: slashType as SlashType | undefined, slashArgs: slashArgs || undefined, timeoutMs: 300000, source: 'telegram' },
   })
 
   logActivity({

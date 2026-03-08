@@ -16,7 +16,9 @@ let Options: any
 async function loadSelenium(): Promise<boolean> {
   if (seleniumLoaded) return true
   try {
+    // @ts-ignore -- selenium-webdriver types not installed (runtime-only)
     const selenium = await import('selenium-webdriver')
+    // @ts-ignore
     const chrome = await import('selenium-webdriver/chrome.js')
     Builder = selenium.Builder
     By = selenium.By

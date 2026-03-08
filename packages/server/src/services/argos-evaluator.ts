@@ -366,6 +366,7 @@ async function executeTriggeredAction(trigger: TriggerRow, eventData: Record<str
     // Insert user message
     await db.insert(chatMessages).values({
       sessionId: session.id,
+      companyId: trigger.companyId,
       sender: 'user',
       content: trigger.instruction,
     })
@@ -398,6 +399,7 @@ async function executeTriggeredAction(trigger: TriggerRow, eventData: Record<str
     // Save agent message
     await db.insert(chatMessages).values({
       sessionId: session.id,
+      companyId: trigger.companyId,
       sender: 'agent',
       content: result,
     })
@@ -407,9 +409,8 @@ async function executeTriggeredAction(trigger: TriggerRow, eventData: Record<str
       await db.insert(agentMemory).values({
         companyId: trigger.companyId,
         agentId: trigger.agentId,
-        memoryType: 'fact',
-        content: `[ARGOS 자동 실행] ${trigger.name || trigger.triggerType}: ${result.slice(0, 500)}`,
-        source: 'argos-trigger',
+        key: `argos-${trigger.triggerType}-${Date.now()}`,
+        value: `[ARGOS 자동 실행] ${trigger.name || trigger.triggerType}: ${result.slice(0, 500)}`,
       })
     } catch { /* memory save is optional */ }
 
@@ -418,8 +419,7 @@ async function executeTriggeredAction(trigger: TriggerRow, eventData: Record<str
       const reportContent = result.slice(0, 50_000)
       await db.insert(reports).values({
         companyId: trigger.companyId,
-        sessionId: session.id,
-        agentId: trigger.agentId,
+        authorId: trigger.userId,
         title: `[ARGOS] ${trigger.name || trigger.triggerType} 결과`,
         content: reportContent,
         status: 'submitted',

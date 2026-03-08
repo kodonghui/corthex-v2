@@ -70,7 +70,7 @@ agentsRoute.post('/agents', zValidator('json', createAgentSchema), async (c) => 
   const tenant = c.get('tenant')
   const body = c.req.valid('json')
   const result = await createAgent(tenant, body)
-  if ('error' in result) throw new HTTPError(result.error.status, result.error.message, result.error.code)
+  if ('error' in result) throw new HTTPError(result.error!.status, result.error!.message, result.error!.code)
   return c.json({ data: result.data }, 201)
 })
 
@@ -80,7 +80,7 @@ agentsRoute.patch('/agents/:id', zValidator('json', updateAgentSchema), async (c
   const id = c.req.param('id')
   const body = c.req.valid('json')
   const result = await updateAgent(tenant, id, body)
-  if ('error' in result) throw new HTTPError(result.error.status, result.error.message, result.error.code)
+  if ('error' in result) throw new HTTPError(result.error!.status, result.error!.message, result.error!.code)
   return c.json({ data: result.data })
 })
 
@@ -89,6 +89,6 @@ agentsRoute.delete('/agents/:id', async (c) => {
   const tenant = c.get('tenant')
   const id = c.req.param('id')
   const result = await deactivateAgent(tenant, id)
-  if ('error' in result) throw new HTTPError(result.error.status, result.error.message, result.error.code)
+  if ('error' in result) throw new HTTPError(result.error!.status, result.error!.message, result.error!.code)
   return c.json({ data: result.data })
 })

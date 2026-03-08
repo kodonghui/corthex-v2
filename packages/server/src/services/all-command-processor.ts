@@ -105,7 +105,7 @@ export async function processAll(options: AllCommandOptions): Promise<AllCommand
     return { commandId, content: '활성 Manager가 없습니다', managerCount: 0, successCount: 0, failedCount: 0 }
   }
 
-  const managers = managerRows.map(toAgentConfig)
+  const managers = managerRows.map((r) => toAgentConfig(r as unknown as Parameters<typeof toAgentConfig>[0]))
 
   // Dispatch to ALL managers in parallel (reusing managerDelegate from 5-3)
   const managerTasks = managers.map(async (manager) => {

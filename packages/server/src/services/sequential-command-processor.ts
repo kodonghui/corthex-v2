@@ -176,7 +176,7 @@ export async function processSequential(options: SequentialCommandOptions): Prom
     return { commandId, content: '활성 Manager가 없습니다', managerOrder: [], stepCount: 0 }
   }
 
-  const allManagers = managerRows.map(toAgentConfig)
+  const allManagers = managerRows.map((r) => toAgentConfig(r as unknown as Parameters<typeof toAgentConfig>[0]))
 
   // Step 1: Plan order (secretary LLM decides)
   const orderedIds = await planOrder(commandText, companyId, secretaryAgent, allManagers)
