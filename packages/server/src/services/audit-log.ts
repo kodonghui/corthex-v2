@@ -28,6 +28,10 @@ export const AUDIT_ACTIONS = {
   TRADE_ORDER_CANCEL: 'trade.order.cancel',
   // LLM
   LLM_FALLBACK: 'llm.fallback',
+  // Company Management
+  COMPANY_CREATE: 'company.create',
+  COMPANY_UPDATE: 'company.update',
+  COMPANY_DELETE: 'company.delete',
   // System
   SYSTEM_CONFIG_CHANGE: 'system.config.change',
 } as const

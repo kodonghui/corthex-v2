@@ -192,7 +192,7 @@ development_status:
   # Dependencies: Epic 5 (P0 quality gate)
   # ============================================================
   epic-8: in-progress
-  8-1-quality-rules-yaml-parser: in-progress
+  8-1-quality-rules-yaml-parser: review
   8-2-auto-rule-inspection-engine: backlog
   8-3-hallucination-detection: backlog
   8-4-prompt-injection-defense: backlog
@@ -206,7 +206,7 @@ development_status:
   # Dependencies: Epic 1 (tenant), Epic 2 (org)
   # ============================================================
   epic-9: in-progress
-  9-1-company-crud-api: in-progress
+  9-1-company-crud-api: done
   9-2-human-employee-management-api: backlog
   9-3-employee-command-center-restriction: backlog
   9-4-employee-management-ui-admin-a4: backlog

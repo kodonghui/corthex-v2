@@ -19,6 +19,7 @@ import { orgTemplatesRoute } from './routes/admin/org-templates'
 import { toolInvocationsRoute } from './routes/admin/tool-invocations'
 import { costsRoute } from './routes/admin/costs'
 import { budgetRoute } from './routes/admin/budget'
+import { qualityRulesRoute } from './routes/admin/quality-rules'
 import { workspaceAgentsRoute } from './routes/workspace/agents'
 import { chatRoute } from './routes/workspace/chat'
 import { profileRoute } from './routes/workspace/profile'
@@ -42,6 +43,7 @@ import { invitationsRoute } from './routes/workspace/invitations'
 import { workspaceCredentialsRoute } from './routes/workspace/credentials'
 import { workspaceOrgChartRoute } from './routes/workspace/org-chart'
 import { presetsRoute } from './routes/workspace/presets'
+import { superAdminCompaniesRoute } from './routes/super-admin/companies'
 import { commandsRoute } from './routes/commands'
 import { runMigrations } from './db'
 import { startJobWorker, stopJobWorker } from './lib/job-queue'
@@ -82,6 +84,9 @@ app.use('/api/auth/accept-invite', loginRateLimit) // 초대 수락: 5/min
 
 app.route('/api', authRoute)
 
+// Super Admin 라우트 (super_admin 역할만 접근)
+app.route('/api/super-admin', superAdminCompaniesRoute)
+
 // 관리자 라우트 (각 파일 내부에서 authMiddleware + adminOnly 적용)
 app.route('/api/admin', companiesRoute)
 app.route('/api/admin', usersRoute)
@@ -98,6 +103,7 @@ app.route('/api/admin', orgTemplatesRoute)
 app.route('/api/admin', toolInvocationsRoute)
 app.route('/api/admin', costsRoute)
 app.route('/api/admin', budgetRoute)
+app.route('/api/admin', qualityRulesRoute)
 
 // 유저 워크스페이스 라우트 (각 파일 내부에서 authMiddleware 적용, 테넌트 격리)
 app.route('/api/workspace', workspaceAgentsRoute)
