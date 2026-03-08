@@ -8,6 +8,7 @@ import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { encrypt, decrypt } from '../../lib/crypto'
 import { logActivity } from '../../lib/activity-logger'
+import { setWebhook, deleteWebhook } from '../../services/telegram-bot'
 import type { AppEnv } from '../../types'
 
 export const telegramRoute = new Hono<AppEnv>()
@@ -28,6 +29,7 @@ telegramRoute.get('/telegram/config', async (c) => {
       id: telegramConfigs.id,
       isActive: telegramConfigs.isActive,
       ceoChatId: telegramConfigs.ceoChatId,
+      webhookUrl: telegramConfigs.webhookUrl,
       lastPollAt: telegramConfigs.lastPollAt,
       createdAt: telegramConfigs.createdAt,
     })
@@ -39,7 +41,7 @@ telegramRoute.get('/telegram/config', async (c) => {
     return c.json({ data: null })
   }
 
-  return c.json({ data: { ...config, hasToken: true } })
+  return c.json({ data: { ...config, hasToken: true, hasWebhook: !!config.webhookUrl } })
 })
 
 // POST /api/workspace/telegram/config — 봇 토큰 등록/업데이트
@@ -147,6 +149,98 @@ telegramRoute.delete('/telegram/config', async (c) => {
     actorType: 'user',
     actorId: tenant.userId,
     action: '텔레그램 봇 연결 해제',
+  })
+
+  return c.json({ data: { success: true } })
+})
+
+// PUT /api/workspace/telegram/webhook — Webhook 등록
+const webhookSchema = z.object({
+  baseUrl: z.string().url(), // e.g. "https://corthex-hq.com"
+})
+
+telegramRoute.put('/telegram/webhook', zValidator('json', webhookSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const { baseUrl } = c.req.valid('json')
+
+  const [config] = await db
+    .select()
+    .from(telegramConfigs)
+    .where(and(eq(telegramConfigs.companyId, tenant.companyId), eq(telegramConfigs.isActive, true)))
+    .limit(1)
+
+  if (!config) throw new HTTPError(404, '텔레그램 설정을 찾을 수 없습니다', 'TELEGRAM_001')
+
+  const botToken = await decrypt(config.botToken)
+
+  // Generate a random secret token for webhook verification
+  const secret = crypto.randomUUID().replace(/-/g, '')
+  const webhookUrl = `${baseUrl.replace(/\/$/, '')}/api/telegram/webhook/${tenant.companyId}`
+
+  try {
+    await setWebhook(botToken, webhookUrl, secret)
+  } catch (err) {
+    throw new HTTPError(500, `Webhook 등록 실패: ${err instanceof Error ? err.message : ''}`, 'TELEGRAM_003')
+  }
+
+  await db
+    .update(telegramConfigs)
+    .set({
+      webhookSecret: secret,
+      webhookUrl,
+      updatedAt: new Date(),
+    })
+    .where(eq(telegramConfigs.id, config.id))
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'system',
+    phase: 'end',
+    actorType: 'user',
+    actorId: tenant.userId,
+    action: '텔레그램 Webhook 등록',
+    metadata: { webhookUrl },
+  })
+
+  return c.json({ data: { success: true, webhookUrl } })
+})
+
+// DELETE /api/workspace/telegram/webhook — Webhook 해제
+telegramRoute.delete('/telegram/webhook', async (c) => {
+  const tenant = c.get('tenant')
+
+  const [config] = await db
+    .select()
+    .from(telegramConfigs)
+    .where(and(eq(telegramConfigs.companyId, tenant.companyId), eq(telegramConfigs.isActive, true)))
+    .limit(1)
+
+  if (!config) throw new HTTPError(404, '텔레그램 설정을 찾을 수 없습니다', 'TELEGRAM_001')
+
+  const botToken = await decrypt(config.botToken)
+
+  try {
+    await deleteWebhook(botToken)
+  } catch (err) {
+    throw new HTTPError(500, `Webhook 해제 실패: ${err instanceof Error ? err.message : ''}`, 'TELEGRAM_003')
+  }
+
+  await db
+    .update(telegramConfigs)
+    .set({
+      webhookSecret: null,
+      webhookUrl: null,
+      updatedAt: new Date(),
+    })
+    .where(eq(telegramConfigs.id, config.id))
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'system',
+    phase: 'end',
+    actorType: 'user',
+    actorId: tenant.userId,
+    action: '텔레그램 Webhook 해제',
   })
 
   return c.json({ data: { success: true } })

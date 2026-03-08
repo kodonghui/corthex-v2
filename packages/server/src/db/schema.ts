@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, varchar, boolean, jsonb, integer, pgEnum, index, unique } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, uuid, varchar, boolean, jsonb, integer, pgEnum, index, unique, uniqueIndex, real } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 
 // === Enums ===
@@ -500,6 +500,10 @@ export const snsContents = pgTable('sns_contents', {
   publishError: text('publish_error'),
   scheduledAt: timestamp('scheduled_at'),
   variantOf: uuid('variant_of'),  // self-ref FK — A/B 테스트 원본 연결
+  priority: integer('priority').notNull().default(0),  // 높을수록 먼저 발행
+  isCardNews: boolean('is_card_news').notNull().default(false),  // 카드뉴스 시리즈 여부
+  cardSeriesId: uuid('card_series_id'),  // 카드뉴스 시리즈 루트 ID (self-ref)
+  cardIndex: integer('card_index'),  // 시리즈 내 순서 (0-based)
   metadata: jsonb('metadata'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
@@ -568,6 +572,8 @@ export const telegramConfigs = pgTable('telegram_configs', {
   companyId: uuid('company_id').notNull().references(() => companies.id).unique(),
   botToken: text('bot_token').notNull(),  // encrypted
   ceoChatId: varchar('ceo_chat_id', { length: 50 }),
+  webhookSecret: varchar('webhook_secret', { length: 100 }),  // secret_token for webhook verification
+  webhookUrl: text('webhook_url'),  // registered webhook URL
   isActive: boolean('is_active').notNull().default(false),
   lastPollAt: timestamp('last_poll_at'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
@@ -845,6 +851,18 @@ export const sketches = pgTable('sketches', {
   createdByIdx: index('sketches_created_by_idx').on(table.createdBy),
 }))
 
+// === 35b. sketch_versions — SketchVibe 캔버스 버전 히스토리 ===
+export const sketchVersions = pgTable('sketch_versions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  sketchId: uuid('sketch_id').notNull().references(() => sketches.id, { onDelete: 'cascade' }),
+  version: integer('version').notNull(),
+  graphData: jsonb('graph_data').notNull().default('{"nodes":[],"edges":[]}'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  sketchIdx: index('sketch_versions_sketch_idx').on(table.sketchId),
+  sketchVersionUniq: unique('sketch_versions_sketch_version_uniq').on(table.sketchId, table.version),
+}))
+
 // === Phase 1 New Tables (Epic 1 Story 1) ===
 
 // === P1-1. commands — CEO 명령 이력 ===
@@ -1097,6 +1115,8 @@ export const snsContentsRelations = relations(snsContents, ({ one, many }) => ({
   creator: one(users, { fields: [snsContents.createdBy], references: [users.id] }),
   original: one(snsContents, { fields: [snsContents.variantOf], references: [snsContents.id], relationName: 'variants' }),
   variants: many(snsContents, { relationName: 'variants' }),
+  cardSeriesRoot: one(snsContents, { fields: [snsContents.cardSeriesId], references: [snsContents.id], relationName: 'cardSeriesItems' }),
+  cardSeriesItems: many(snsContents, { relationName: 'cardSeriesItems' }),
 }))
 
 export const activityLogsRelations = relations(activityLogs, ({ one }) => ({
@@ -1234,9 +1254,14 @@ export const mcpServersRelations = relations(mcpServers, ({ one }) => ({
   company: one(companies, { fields: [mcpServers.companyId], references: [companies.id] }),
 }))
 
-export const sketchesRelations = relations(sketches, ({ one }) => ({
+export const sketchesRelations = relations(sketches, ({ one, many }) => ({
   company: one(companies, { fields: [sketches.companyId], references: [companies.id] }),
   createdByUser: one(users, { fields: [sketches.createdBy], references: [users.id] }),
+  versions: many(sketchVersions),
+}))
+
+export const sketchVersionsRelations = relations(sketchVersions, ({ one }) => ({
+  sketch: one(sketches, { fields: [sketchVersions.sketchId], references: [sketches.id] }),
 }))
 
 // === Phase 1 New Relations (Epic 1 Story 1) ===
@@ -1455,4 +1480,67 @@ export const bookmarksRelations = relations(bookmarks, ({ one }) => ({
   company: one(companies, { fields: [bookmarks.companyId], references: [companies.id] }),
   user: one(users, { fields: [bookmarks.userId], references: [users.id] }),
   command: one(commands, { fields: [bookmarks.commandId], references: [commands.id] }),
+}))
+
+// === Phase 2: Archive / Classified Docs (Epic 17 Story 3) ===
+
+export const classificationEnum = pgEnum('classification', ['public', 'internal', 'confidential', 'secret'])
+
+// === A-1. archive_folders — 기밀문서 폴더 (중첩 구조) ===
+export const archiveFolders = pgTable('archive_folders', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  name: varchar('name', { length: 200 }).notNull(),
+  parentId: uuid('parent_id'),  // self-reference for nested folders
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('archive_folders_company_idx').on(table.companyId),
+  parentIdx: index('archive_folders_parent_idx').on(table.parentId),
+}))
+
+// === A-2. archive_items — 기밀문서 아카이브 항목 ===
+export const archiveItems = pgTable('archive_items', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  commandId: uuid('command_id').notNull().references(() => commands.id),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  title: varchar('title', { length: 500 }).notNull(),
+  classification: classificationEnum('classification').notNull().default('internal'),
+  content: text('content'),  // 원본 result 마크다운
+  summary: text('summary'),  // 사용자 작성 요약
+  tags: jsonb('tags').$type<string[]>().default([]),
+  folderId: uuid('folder_id').references(() => archiveFolders.id),
+  qualityScore: real('quality_score'),  // 아카이브 시점 품질 점수 스냅샷
+  agentId: uuid('agent_id').references(() => agents.id),
+  departmentId: uuid('department_id').references(() => departments.id),
+  commandType: varchar('command_type', { length: 50 }),  // 원본 명령 유형
+  commandText: text('command_text'),  // 원본 명령 텍스트 (유사 문서 검색용)
+  metadata: jsonb('metadata').$type<Record<string, unknown>>().default({}),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  deletedAt: timestamp('deleted_at'),  // soft delete
+}, (table) => ({
+  companyIdx: index('archive_items_company_idx').on(table.companyId),
+  commandUniq: uniqueIndex('archive_items_command_uniq').on(table.companyId, table.commandId),
+  classificationIdx: index('archive_items_classification_idx').on(table.companyId, table.classification),
+  folderIdx: index('archive_items_folder_idx').on(table.companyId, table.folderId),
+  departmentIdx: index('archive_items_department_idx').on(table.companyId, table.departmentId),
+}))
+
+// === Archive Relations ===
+export const archiveFoldersRelations = relations(archiveFolders, ({ one, many }) => ({
+  company: one(companies, { fields: [archiveFolders.companyId], references: [companies.id] }),
+  parent: one(archiveFolders, { fields: [archiveFolders.parentId], references: [archiveFolders.id], relationName: 'archiveFolderChildren' }),
+  children: many(archiveFolders, { relationName: 'archiveFolderChildren' }),
+  items: many(archiveItems),
+}))
+
+export const archiveItemsRelations = relations(archiveItems, ({ one }) => ({
+  company: one(companies, { fields: [archiveItems.companyId], references: [companies.id] }),
+  command: one(commands, { fields: [archiveItems.commandId], references: [commands.id] }),
+  user: one(users, { fields: [archiveItems.userId], references: [users.id] }),
+  agent: one(agents, { fields: [archiveItems.agentId], references: [agents.id] }),
+  department: one(departments, { fields: [archiveItems.departmentId], references: [departments.id] }),
+  folder: one(archiveFolders, { fields: [archiveItems.folderId], references: [archiveFolders.id] }),
 }))

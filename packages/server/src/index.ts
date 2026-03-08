@@ -52,6 +52,7 @@ import { knowledgeRoute } from './routes/workspace/knowledge'
 import { argosRoute } from './routes/workspace/argos'
 import { superAdminCompaniesRoute } from './routes/super-admin/companies'
 import { commandsRoute } from './routes/commands'
+import { telegramWebhookRoute } from './routes/telegram-webhook'
 import { runMigrations } from './db'
 import { startJobWorker, stopJobWorker } from './lib/job-queue'
 import { startArgosEngine, stopArgosEngine } from './services/argos-evaluator'
@@ -82,6 +83,7 @@ app.onError(errorHandler)
 
 // 공개 라우트 (인증 불필요) — health는 rate limit 이전에 등록
 app.route('/api', healthRoute)
+app.route('/api/telegram', telegramWebhookRoute)  // Telegram Webhook (공개, rate limit 적용)
 
 // Rate Limiting (health 제외)
 app.use('/api/*', apiRateLimit)          // 일반 API: 100/min
