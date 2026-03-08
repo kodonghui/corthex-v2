@@ -228,7 +228,7 @@ development_status:
   # ============================================================
   epic-10: in-progress
   10-1-strategy-schema-watchlist-portfolio-orders: done
-  10-2-kis-securities-api-adapter: backlog
+  10-2-kis-securities-api-adapter: in-progress
   10-3-finance-tools-5-implementation: backlog
   10-4-cio-vector-separation-orchestration: backlog
   10-5-autonomous-approval-execution-risk-control: backlog
@@ -245,7 +245,7 @@ development_status:
   # ============================================================
   epic-11: in-progress
   11-1-agora-engine-round-management-consensus: done
-  11-2-debate-deep-debate-command-integration: ready-for-dev
+  11-2-debate-deep-debate-command-integration: review
   11-3-websocket-debate-channel-streaming: backlog
   11-4-agora-ui-round-timeline-speech-cards: backlog
   11-5-diff-view-debate-result-insertion: backlog
@@ -259,7 +259,7 @@ development_status:
   # ============================================================
   epic-12: in-progress
   12-1-sns-content-management-api: done
-  12-2-marketing-tools-3-implementation: in-progress
+  12-2-marketing-tools-3-implementation: review
   12-3-selenium-auto-publish-engine-5-platforms: backlog
   12-4-scheduled-publish-queue-card-news: backlog
   12-5-sns-publishing-ui: backlog
@@ -273,7 +273,7 @@ development_status:
   # ============================================================
   epic-13: in-progress
   13-1-cytoscape-canvas-8-node-types-connection: done
-  13-2-mermaid-cytoscape-bidirectional-conversion: ready-for-dev
+  13-2-mermaid-cytoscape-bidirectional-conversion: in-progress
   13-3-mcp-sse-ai-realtime-canvas-manipulation: backlog
   13-4-save-load-knowledge-base-integration: backlog
   13-5-sketchvibe-ui-integration-command-center: backlog
@@ -287,7 +287,7 @@ development_status:
   # ============================================================
   epic-14: in-progress
   14-1-cron-scheduler-service-crud-api: done
-  14-2-cron-execution-engine-auto-run: in-progress
+  14-2-cron-execution-engine-auto-run: done
   14-3-argos-trigger-condition-auto-collect: backlog
   14-4-cron-base-ui: backlog
   14-5-argos-ui: backlog

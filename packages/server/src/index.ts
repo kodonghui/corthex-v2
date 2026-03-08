@@ -47,11 +47,13 @@ import { workspaceCredentialsRoute } from './routes/workspace/credentials'
 import { workspaceOrgChartRoute } from './routes/workspace/org-chart'
 import { presetsRoute } from './routes/workspace/presets'
 import { sketchesRoute } from './routes/workspace/sketches'
+import { operationLogRoute } from './routes/workspace/operation-log'
+import { knowledgeRoute } from './routes/workspace/knowledge'
 import { superAdminCompaniesRoute } from './routes/super-admin/companies'
 import { commandsRoute } from './routes/commands'
 import { runMigrations } from './db'
 import { startJobWorker, stopJobWorker } from './lib/job-queue'
-import { startScheduleWorker, stopScheduleWorker } from './lib/schedule-worker'
+import { startCronEngine, stopCronEngine } from './services/cron-execution-engine'
 import { startTriggerWorker, stopTriggerWorker } from './lib/trigger-worker'
 import { startSnsScheduleChecker, stopSnsScheduleChecker } from './lib/sns-schedule-checker'
 import { loginRateLimit, apiRateLimit } from './middleware/rate-limit'
@@ -138,6 +140,8 @@ app.route('/api/workspace', workspaceOrgChartRoute)
 app.route('/api/workspace/commands', commandsRoute)
 app.route('/api/workspace/presets', presetsRoute)
 app.route('/api/workspace/sketches', sketchesRoute)
+app.route('/api/workspace', operationLogRoute)
+app.route('/api/workspace/knowledge', knowledgeRoute)
 
 // WebSocket 라우트
 app.get('/ws', wsRoute)
@@ -219,16 +223,16 @@ initToolPool()
 // DB 마이그레이션 자동 적용 후 워커 시작
 runMigrations().then(() => {
   startJobWorker()
-  startScheduleWorker()
+  startCronEngine()
   startTriggerWorker()
   startSnsScheduleChecker()
 })
 
 // Graceful Shutdown — SIGTERM 시 WS 클라이언트 알림 후 종료
-process.on('SIGTERM', () => {
+process.on('SIGTERM', async () => {
   console.log('🛑 SIGTERM 수신 — 클라이언트 연결 종료 중...')
   stopJobWorker()
-  stopScheduleWorker()
+  await stopCronEngine()
   stopTriggerWorker()
   stopSnsScheduleChecker()
   broadcastServerRestart()
