@@ -101,6 +101,18 @@ export const invitations = pgTable('invitations', {
   companyIdx: index('invitations_company_idx').on(table.companyId),
 }))
 
+// === 2e. employee_departments — 직원-부서 매핑 ===
+export const employeeDepartments = pgTable('employee_departments', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  departmentId: uuid('department_id').notNull().references(() => departments.id),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('employee_departments_company_idx').on(table.companyId),
+  uniqueAssignment: unique('employee_departments_unique').on(table.userId, table.departmentId),
+}))
+
 // === 3. departments — 부서 ===
 export const departments = pgTable('departments', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -850,6 +862,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   cliCredentials: many(cliCredentials),
   apiKeys: many(apiKeys),
   chatSessions: many(chatSessions),
+  employeeDepartments: many(employeeDepartments),
 }))
 
 export const agentsRelations = relations(agents, ({ one, many }) => ({
@@ -865,6 +878,13 @@ export const departmentsRelations = relations(departments, ({ one, many }) => ({
   company: one(companies, { fields: [departments.companyId], references: [companies.id] }),
   agents: many(agents),
   knowledge: many(departmentKnowledge),
+  employeeDepartments: many(employeeDepartments),
+}))
+
+export const employeeDepartmentsRelations = relations(employeeDepartments, ({ one }) => ({
+  user: one(users, { fields: [employeeDepartments.userId], references: [users.id] }),
+  department: one(departments, { fields: [employeeDepartments.departmentId], references: [departments.id] }),
+  company: one(companies, { fields: [employeeDepartments.companyId], references: [companies.id] }),
 }))
 
 export const chatSessionsRelations = relations(chatSessions, ({ one, many }) => ({

@@ -20,6 +20,8 @@ import { toolInvocationsRoute } from './routes/admin/tool-invocations'
 import { costsRoute } from './routes/admin/costs'
 import { budgetRoute } from './routes/admin/budget'
 import { qualityRulesRoute } from './routes/admin/quality-rules'
+import { securityRoute } from './routes/admin/security'
+import { employeesRoute } from './routes/admin/employees'
 import { workspaceAgentsRoute } from './routes/workspace/agents'
 import { chatRoute } from './routes/workspace/chat'
 import { profileRoute } from './routes/workspace/profile'
@@ -104,6 +106,8 @@ app.route('/api/admin', toolInvocationsRoute)
 app.route('/api/admin', costsRoute)
 app.route('/api/admin', budgetRoute)
 app.route('/api/admin', qualityRulesRoute)
+app.route('/api/admin', securityRoute)
+app.route('/api/admin', employeesRoute)
 
 // 유저 워크스페이스 라우트 (각 파일 내부에서 authMiddleware 적용, 테넌트 격리)
 app.route('/api/workspace', workspaceAgentsRoute)

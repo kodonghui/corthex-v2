@@ -32,8 +32,18 @@ export const AUDIT_ACTIONS = {
   COMPANY_CREATE: 'company.create',
   COMPANY_UPDATE: 'company.update',
   COMPANY_DELETE: 'company.delete',
+  // Employee Management
+  EMPLOYEE_CREATE: 'employee.create',
+  EMPLOYEE_UPDATE: 'employee.update',
+  EMPLOYEE_DEACTIVATE: 'employee.deactivate',
+  EMPLOYEE_REACTIVATE: 'employee.reactivate',
+  EMPLOYEE_PASSWORD_RESET: 'employee.password_reset',
   // System
   SYSTEM_CONFIG_CHANGE: 'system.config.change',
+  // Security (Prompt Guard)
+  SECURITY_INPUT_BLOCKED: 'security.input.blocked',
+  SECURITY_OUTPUT_REDACTED: 'security.output.redacted',
+  SECURITY_INJECTION_ATTEMPT: 'security.injection.attempt',
 } as const
 
 export type AuditAction = (typeof AUDIT_ACTIONS)[keyof typeof AUDIT_ACTIONS]
