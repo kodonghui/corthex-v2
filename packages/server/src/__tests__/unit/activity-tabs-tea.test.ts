@@ -161,11 +161,11 @@ describe('TEA: Route module structure', () => {
     expect(typeof mod.activityTabsRoute.use).toBe('function')
   })
 
-  it('route file has exactly 4 GET handlers registered', async () => {
+  it('route file has exactly 5 GET handlers registered', async () => {
     const mod = await import('../../routes/workspace/activity-tabs')
     const routes = mod.activityTabsRoute.routes
     const getRoutes = routes.filter((r: any) => r.method === 'GET')
-    expect(getRoutes.length).toBe(4)
+    expect(getRoutes.length).toBe(5)
   })
 
   it('route paths match expected patterns', async () => {

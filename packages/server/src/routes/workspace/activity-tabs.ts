@@ -7,6 +7,8 @@ import {
   getDelegations,
   getQualityReviews,
   getToolInvocations,
+  getSecurityAlerts,
+  getSecurityAlertCount24h,
 } from '../../services/activity-log-service'
 import type { AppEnv } from '../../types'
 
@@ -86,4 +88,21 @@ activityTabsRoute.get('/activity/tools', async (c) => {
   }, pagination)
 
   return c.json({ success: true, data: result })
+})
+
+// GET /activity/security-alerts — 보안 알림 (프롬프트 인젝션 차단 이력)
+activityTabsRoute.get('/activity/security-alerts', async (c) => {
+  const tenant = c.get('tenant')
+  const query = c.req.query()
+  const pagination = parsePaginationParams(query)
+
+  const [result, count24h] = await Promise.all([
+    getSecurityAlerts(tenant.companyId, {
+      startDate: query.startDate,
+      endDate: query.endDate,
+    }, pagination),
+    getSecurityAlertCount24h(tenant.companyId),
+  ])
+
+  return c.json({ success: true, data: { ...result, count24h } })
 })

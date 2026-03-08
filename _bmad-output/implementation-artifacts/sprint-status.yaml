@@ -196,7 +196,7 @@ development_status:
   8-2-auto-rule-inspection-engine: review
   8-3-hallucination-detection: done
   8-4-prompt-injection-defense: done
-  8-5-qa-tab-enhanced-ui: review
+  8-5-qa-tab-enhanced-ui: done
   epic-8-retrospective: optional
 
   # ============================================================
@@ -212,7 +212,7 @@ development_status:
   9-4-employee-management-ui-admin-a4: done
   9-5-company-settings-ui-admin-a8: done
   9-6-admin-ceo-app-switching: done
-  9-7-onboarding-wizard: review
+  9-7-onboarding-wizard: done
   9-8-ceo-app-settings-screen: done
   epic-9-retrospective: optional
 

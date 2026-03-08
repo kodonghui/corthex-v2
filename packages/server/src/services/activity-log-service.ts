@@ -1,6 +1,7 @@
-import { eq, and, desc, gte, lte, count, ilike, or, inArray } from 'drizzle-orm'
+import { eq, and, desc, gte, lte, count, ilike, or, inArray, sql } from 'drizzle-orm'
 import { db } from '../db'
-import { activityLogs, orchestrationTasks, qualityReviews, toolCalls, agents, commands } from '../db/schema'
+import { activityLogs, orchestrationTasks, qualityReviews, toolCalls, agents, commands, auditLogs } from '../db/schema'
+import { AUDIT_ACTIONS } from './audit-log'
 
 // === Common pagination helpers ===
 
@@ -372,4 +373,83 @@ export async function getToolInvocations(
     limit: pagination.limit,
     total: Number(totalResult?.count || 0),
   }
+}
+
+// === 5. Security Alerts (보안 알림) ===
+
+const SECURITY_ACTIONS = [
+  AUDIT_ACTIONS.SECURITY_INPUT_BLOCKED,
+  AUDIT_ACTIONS.SECURITY_OUTPUT_REDACTED,
+  AUDIT_ACTIONS.SECURITY_INJECTION_ATTEMPT,
+]
+
+type SecurityAlertFilters = {
+  startDate?: string
+  endDate?: string
+}
+
+type SecurityAlertItem = {
+  id: string
+  action: string
+  actorType: string
+  actorId: string
+  targetType: string | null
+  metadata: unknown
+  createdAt: Date
+}
+
+export async function getSecurityAlerts(
+  companyId: string,
+  filters: SecurityAlertFilters,
+  pagination: PaginationParams,
+): Promise<PaginatedResult<SecurityAlertItem>> {
+  const conditions = [
+    eq(auditLogs.companyId, companyId),
+    inArray(auditLogs.action, SECURITY_ACTIONS),
+  ]
+  const dateConditions = applyDateConditions(auditLogs, parseDateFilter(filters.startDate, filters.endDate))
+  conditions.push(...dateConditions)
+
+  const whereClause = and(...conditions)
+
+  const [totalResult] = await db
+    .select({ count: count() })
+    .from(auditLogs)
+    .where(whereClause)
+
+  const items = await db
+    .select({
+      id: auditLogs.id,
+      action: auditLogs.action,
+      actorType: auditLogs.actorType,
+      actorId: auditLogs.actorId,
+      targetType: auditLogs.targetType,
+      metadata: auditLogs.metadata,
+      createdAt: auditLogs.createdAt,
+    })
+    .from(auditLogs)
+    .where(whereClause)
+    .orderBy(desc(auditLogs.createdAt))
+    .limit(pagination.limit)
+    .offset(pagination.offset)
+
+  return {
+    items,
+    page: pagination.page,
+    limit: pagination.limit,
+    total: Number(totalResult?.count || 0),
+  }
+}
+
+export async function getSecurityAlertCount24h(companyId: string): Promise<number> {
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000)
+  const [result] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(auditLogs)
+    .where(and(
+      eq(auditLogs.companyId, companyId),
+      inArray(auditLogs.action, SECURITY_ACTIONS),
+      gte(auditLogs.createdAt, since),
+    ))
+  return Number(result?.count || 0)
 }
