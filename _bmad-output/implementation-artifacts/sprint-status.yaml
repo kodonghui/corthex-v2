@@ -191,13 +191,13 @@ development_status:
   # FRs: FR52-FR55
   # Dependencies: Epic 5 (P0 quality gate)
   # ============================================================
-  epic-8: in-progress
+  epic-8: done
   8-1-quality-rules-yaml-parser: done
-  8-2-auto-rule-inspection-engine: review
+  8-2-auto-rule-inspection-engine: done
   8-3-hallucination-detection: done
   8-4-prompt-injection-defense: done
   8-5-qa-tab-enhanced-ui: done
-  epic-8-retrospective: optional
+  epic-8-retrospective: done
 
   # ============================================================
   # Epic 9: Multi-tenancy & Admin Console (8 stories, 17 SP)
