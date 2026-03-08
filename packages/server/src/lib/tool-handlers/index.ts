@@ -49,6 +49,11 @@ import { sslChecker } from './builtins/ssl-checker'
 import { hashtagGenerator } from './builtins/hashtag-generator'
 import { contentCalendar } from './builtins/content-calendar'
 import { engagementAnalyzer } from './builtins/engagement-analyzer'
+import { krStock } from './builtins/kr-stock'
+import { dartApi } from './builtins/dart-api'
+import { secEdgar } from './builtins/sec-edgar'
+import { backtestEngine } from './builtins/backtest-engine'
+import { kisTrading } from './builtins/kis-trading'
 
 // 내장 핸들러 등록
 registry.register('get_current_time', getCurrentTime)
@@ -101,6 +106,11 @@ registry.register('ssl_checker', sslChecker)
 registry.register('hashtag_generator', hashtagGenerator)
 registry.register('content_calendar', contentCalendar)
 registry.register('engagement_analyzer', engagementAnalyzer)
+registry.register('kr_stock', krStock)
+registry.register('dart_api', dartApi)
+registry.register('sec_edgar', secEdgar)
+registry.register('backtest_engine', backtestEngine)
+registry.register('kis_trading', kisTrading)
 
 export { registry } from './registry'
 export type { ToolHandler, ToolExecContext } from './types'
