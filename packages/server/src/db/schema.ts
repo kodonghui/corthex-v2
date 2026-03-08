@@ -1291,3 +1291,110 @@ export const debatesRelations = relations(debates, ({ one }) => ({
   company: one(companies, { fields: [debates.companyId], references: [companies.id] }),
   creator: one(users, { fields: [debates.createdBy], references: [users.id] }),
 }))
+
+// === Phase 2: Knowledge Base & Agent Memory (Epic 16 Story 1) ===
+
+// === K-1. knowledge_folders — 지식 폴더 (중첩 구조) ===
+export const knowledgeFolders = pgTable('knowledge_folders', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  name: varchar('name', { length: 200 }).notNull(),
+  description: text('description'),
+  parentId: uuid('parent_id'),  // self-reference for nested folders
+  departmentId: uuid('department_id').references(() => departments.id),
+  createdBy: uuid('created_by').notNull().references(() => users.id),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('knowledge_folders_company_idx').on(table.companyId),
+  parentIdx: index('knowledge_folders_parent_idx').on(table.parentId),
+  departmentIdx: index('knowledge_folders_department_idx').on(table.departmentId),
+  uniqueNamePerLevel: unique('knowledge_folders_name_level_uniq').on(table.companyId, table.name, table.parentId),
+}))
+
+// === K-2. knowledge_docs — 지식 문서 ===
+export const knowledgeDocs = pgTable('knowledge_docs', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  folderId: uuid('folder_id').references(() => knowledgeFolders.id),
+  title: varchar('title', { length: 500 }).notNull(),
+  content: text('content'),  // markdown body
+  contentType: varchar('content_type', { length: 50 }).notNull().default('markdown'),
+  fileUrl: text('file_url'),  // uploaded file reference
+  tags: jsonb('tags').$type<string[]>().default([]),
+  createdBy: uuid('created_by').notNull().references(() => users.id),
+  updatedBy: uuid('updated_by').references(() => users.id),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('knowledge_docs_company_idx').on(table.companyId),
+  folderIdx: index('knowledge_docs_folder_idx').on(table.folderId),
+  createdByIdx: index('knowledge_docs_created_by_idx').on(table.createdBy),
+}))
+
+// === K-3. agent_memories — 에이전트 학습 기억 (enhanced) ===
+export const agentMemories = pgTable('agent_memories', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  agentId: uuid('agent_id').notNull().references(() => agents.id),
+  memoryType: memoryTypeEnum('memory_type').notNull().default('learning'),
+  key: varchar('key', { length: 200 }).notNull(),
+  content: text('content').notNull(),
+  context: text('context'),  // what task/situation produced this memory
+  source: varchar('source', { length: 50 }).notNull().default('manual'),
+  confidence: integer('confidence').notNull().default(50),  // 0-100
+  usageCount: integer('usage_count').notNull().default(0),
+  lastUsedAt: timestamp('last_used_at'),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('agent_memories_company_idx').on(table.companyId),
+  agentIdx: index('agent_memories_agent_idx').on(table.agentId),
+  memoryTypeIdx: index('agent_memories_type_idx').on(table.memoryType),
+}))
+
+// === Knowledge Base Relations ===
+export const knowledgeFoldersRelations = relations(knowledgeFolders, ({ one, many }) => ({
+  company: one(companies, { fields: [knowledgeFolders.companyId], references: [companies.id] }),
+  parent: one(knowledgeFolders, { fields: [knowledgeFolders.parentId], references: [knowledgeFolders.id], relationName: 'children' }),
+  children: many(knowledgeFolders, { relationName: 'children' }),
+  department: one(departments, { fields: [knowledgeFolders.departmentId], references: [departments.id] }),
+  creator: one(users, { fields: [knowledgeFolders.createdBy], references: [users.id] }),
+  docs: many(knowledgeDocs),
+}))
+
+export const knowledgeDocsRelations = relations(knowledgeDocs, ({ one }) => ({
+  company: one(companies, { fields: [knowledgeDocs.companyId], references: [companies.id] }),
+  folder: one(knowledgeFolders, { fields: [knowledgeDocs.folderId], references: [knowledgeFolders.id] }),
+  creator: one(users, { fields: [knowledgeDocs.createdBy], references: [users.id] }),
+  updater: one(users, { fields: [knowledgeDocs.updatedBy], references: [users.id] }),
+}))
+
+export const agentMemoriesRelations = relations(agentMemories, ({ one }) => ({
+  company: one(companies, { fields: [agentMemories.companyId], references: [companies.id] }),
+  agent: one(agents, { fields: [agentMemories.agentId], references: [agents.id] }),
+}))
+
+// === Phase 2: Operation Log Bookmarks (Epic 17 Story 1) ===
+
+export const bookmarks = pgTable('bookmarks', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  commandId: uuid('command_id').notNull().references(() => commands.id),
+  note: text('note'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  companyUserIdx: index('bookmarks_company_user_idx').on(table.companyId, table.userId),
+  companyUserCommandUniq: unique('bookmarks_company_user_command_uniq').on(table.companyId, table.userId, table.commandId),
+}))
+
+export const bookmarksRelations = relations(bookmarks, ({ one }) => ({
+  company: one(companies, { fields: [bookmarks.companyId], references: [companies.id] }),
+  user: one(users, { fields: [bookmarks.userId], references: [users.id] }),
+  command: one(commands, { fields: [bookmarks.commandId], references: [commands.id] }),
+}))

@@ -1,9 +1,9 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { eq, and, desc, or, inArray } from 'drizzle-orm'
+import { eq, and, desc, or, inArray, gte, lte, lt, sql } from 'drizzle-orm'
 import { db } from '../../db'
-import { strategyWatchlists, chatSessions, agents, strategyNotes, strategyBacktestResults, strategyNoteShares, users } from '../../db/schema'
+import { strategyWatchlists, chatSessions, agents, strategyNotes, strategyBacktestResults, strategyNoteShares, users, strategyPortfolios, strategyOrders } from '../../db/schema'
 import { broadcastToChannel } from '../../ws/channels'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
@@ -791,3 +791,330 @@ strategyRoute.delete(
     return c.json({ data: { deleted: true } })
   },
 )
+
+// ======================================
+// === 포트폴리오 CRUD (E10-S1 Task 4) ===
+// ======================================
+
+const createPortfolioSchema = z.object({
+  name: z.string().min(1).max(100),
+  tradingMode: z.enum(['real', 'paper']).default('paper'),
+  initialCash: z.number().int().min(0).default(50_000_000),
+  memo: z.string().max(500).optional(),
+})
+
+// GET /api/workspace/strategy/portfolios — 포트폴리오 목록
+strategyRoute.get(
+  '/portfolios',
+  zValidator('query', z.object({ tradingMode: z.enum(['real', 'paper']).optional() })),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const { tradingMode } = c.req.valid('query')
+
+    const conditions = [
+      eq(strategyPortfolios.companyId, tenant.companyId),
+      eq(strategyPortfolios.userId, tenant.userId),
+    ]
+    if (tradingMode) conditions.push(eq(strategyPortfolios.tradingMode, tradingMode))
+
+    const result = await db
+      .select()
+      .from(strategyPortfolios)
+      .where(and(...conditions))
+      .orderBy(desc(strategyPortfolios.updatedAt))
+
+    return c.json({ data: result })
+  },
+)
+
+// POST /api/workspace/strategy/portfolios — 포트폴리오 생성
+strategyRoute.post('/portfolios', zValidator('json', createPortfolioSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const { name, tradingMode, initialCash, memo } = c.req.valid('json')
+
+  const [portfolio] = await db
+    .insert(strategyPortfolios)
+    .values({
+      companyId: tenant.companyId,
+      userId: tenant.userId,
+      name,
+      tradingMode,
+      initialCash,
+      cashBalance: initialCash,
+      totalValue: initialCash,
+      memo: memo || null,
+    })
+    .returning()
+
+  return c.json({ data: portfolio }, 201)
+})
+
+// GET /api/workspace/strategy/portfolios/:id — 포트폴리오 단건 조회
+strategyRoute.get(
+  '/portfolios/:id',
+  zValidator('param', z.object({ id: z.string().uuid() })),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const { id } = c.req.valid('param')
+
+    const [portfolio] = await db
+      .select()
+      .from(strategyPortfolios)
+      .where(and(
+        eq(strategyPortfolios.id, id),
+        eq(strategyPortfolios.companyId, tenant.companyId),
+        eq(strategyPortfolios.userId, tenant.userId),
+      ))
+      .limit(1)
+
+    if (!portfolio) throw new HTTPError(404, '포트폴리오를 찾을 수 없습니다', 'STRATEGY_100')
+
+    return c.json({ data: portfolio })
+  },
+)
+
+const updatePortfolioSchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  cashBalance: z.number().int().min(0).optional(),
+  holdings: z.array(z.object({
+    ticker: z.string().min(1).max(20),
+    name: z.string().min(1).max(100),
+    market: z.string().max(10).default('KR'),
+    quantity: z.number().int().min(0),
+    avgPrice: z.number().min(0),
+    currentPrice: z.number().min(0).optional(),
+  })).optional(),
+  totalValue: z.number().int().min(0).optional(),
+  memo: z.string().max(500).optional(),
+}).refine((d) => Object.keys(d).length > 0, { message: '수정할 내용이 없습니다' })
+
+// PATCH /api/workspace/strategy/portfolios/:id — 포트폴리오 수정
+strategyRoute.patch(
+  '/portfolios/:id',
+  zValidator('param', z.object({ id: z.string().uuid() })),
+  zValidator('json', updatePortfolioSchema),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const { id } = c.req.valid('param')
+    const body = c.req.valid('json')
+
+    const updateData: Record<string, unknown> = { updatedAt: new Date() }
+    if (body.name !== undefined) updateData.name = body.name
+    if (body.cashBalance !== undefined) updateData.cashBalance = body.cashBalance
+    if (body.holdings !== undefined) updateData.holdings = body.holdings
+    if (body.totalValue !== undefined) updateData.totalValue = body.totalValue
+    if (body.memo !== undefined) updateData.memo = body.memo
+
+    const [updated] = await db
+      .update(strategyPortfolios)
+      .set(updateData)
+      .where(and(
+        eq(strategyPortfolios.id, id),
+        eq(strategyPortfolios.companyId, tenant.companyId),
+        eq(strategyPortfolios.userId, tenant.userId),
+      ))
+      .returning()
+
+    if (!updated) throw new HTTPError(404, '포트폴리오를 찾을 수 없습니다', 'STRATEGY_101')
+
+    return c.json({ data: updated })
+  },
+)
+
+// ===============================================
+// === 매매 주문 이력 API (E10-S1 Task 5, FR62) ===
+// ===============================================
+
+const createOrderSchema = z.object({
+  portfolioId: z.string().uuid().optional(),
+  agentId: z.string().uuid().optional(),
+  ticker: z.string().min(1).max(20),
+  tickerName: z.string().min(1).max(100),
+  side: z.enum(['buy', 'sell']),
+  quantity: z.number().int().min(1),
+  price: z.number().int().min(0),
+  orderType: z.enum(['market', 'limit']).default('market'),
+  tradingMode: z.enum(['real', 'paper']).default('paper'),
+  status: z.enum(['pending', 'submitted', 'executed', 'cancelled', 'rejected', 'failed']).default('pending'),
+  reason: z.string().max(500).optional(),
+  kisOrderNo: z.string().max(50).optional(),
+  executedAt: z.string().datetime().optional(),
+})
+
+// GET /api/workspace/strategy/orders — 주문 이력 (cursor 페이지네이션 + 필터)
+strategyRoute.get(
+  '/orders',
+  zValidator('query', z.object({
+    cursor: z.string().uuid().optional(),
+    limit: z.coerce.number().int().min(1).max(200).default(50),
+    dateFrom: z.string().optional(),
+    dateTo: z.string().optional(),
+    ticker: z.string().max(20).optional(),
+    side: z.enum(['buy', 'sell']).optional(),
+    status: z.enum(['pending', 'submitted', 'executed', 'cancelled', 'rejected', 'failed']).optional(),
+    tradingMode: z.enum(['real', 'paper']).optional(),
+  })),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const { cursor, limit, dateFrom, dateTo, ticker, side, status, tradingMode } = c.req.valid('query')
+
+    const conditions = [
+      eq(strategyOrders.companyId, tenant.companyId),
+      eq(strategyOrders.userId, tenant.userId),
+    ]
+
+    if (ticker) conditions.push(eq(strategyOrders.ticker, ticker))
+    if (side) conditions.push(eq(strategyOrders.side, side))
+    if (status) conditions.push(eq(strategyOrders.status, status))
+    if (tradingMode) conditions.push(eq(strategyOrders.tradingMode, tradingMode))
+    if (dateFrom) conditions.push(gte(strategyOrders.createdAt, new Date(dateFrom)))
+    if (dateTo) conditions.push(lte(strategyOrders.createdAt, new Date(dateTo)))
+
+    // Cursor-based pagination: fetch items created before the cursor item
+    if (cursor) {
+      const [cursorOrder] = await db
+        .select({ createdAt: strategyOrders.createdAt })
+        .from(strategyOrders)
+        .where(eq(strategyOrders.id, cursor))
+        .limit(1)
+
+      if (cursorOrder) {
+        conditions.push(lt(strategyOrders.createdAt, cursorOrder.createdAt))
+      }
+    }
+
+    const result = await db
+      .select()
+      .from(strategyOrders)
+      .where(and(...conditions))
+      .orderBy(desc(strategyOrders.createdAt))
+      .limit(limit + 1) // fetch one extra to detect hasMore
+
+    const hasMore = result.length > limit
+    const items = hasMore ? result.slice(0, limit) : result
+    const nextCursor = hasMore ? items[items.length - 1].id : null
+
+    return c.json({ data: items, pagination: { hasMore, nextCursor, limit } })
+  },
+)
+
+// POST /api/workspace/strategy/orders — 주문 기록 생성
+strategyRoute.post('/orders', zValidator('json', createOrderSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const body = c.req.valid('json')
+
+  // Validate portfolioId belongs to same tenant (tenant isolation)
+  if (body.portfolioId) {
+    const [portfolio] = await db
+      .select({ id: strategyPortfolios.id })
+      .from(strategyPortfolios)
+      .where(and(
+        eq(strategyPortfolios.id, body.portfolioId),
+        eq(strategyPortfolios.companyId, tenant.companyId),
+        eq(strategyPortfolios.userId, tenant.userId),
+      ))
+      .limit(1)
+    if (!portfolio) throw new HTTPError(404, '포트폴리오를 찾을 수 없습니다', 'STRATEGY_111')
+  }
+
+  // Validate agentId belongs to same company (tenant isolation)
+  if (body.agentId) {
+    const [agent] = await db
+      .select({ id: agents.id })
+      .from(agents)
+      .where(and(
+        eq(agents.id, body.agentId),
+        eq(agents.companyId, tenant.companyId),
+      ))
+      .limit(1)
+    if (!agent) throw new HTTPError(404, '에이전트를 찾을 수 없습니다', 'STRATEGY_112')
+  }
+
+  const totalAmount = body.quantity * body.price
+
+  const [order] = await db
+    .insert(strategyOrders)
+    .values({
+      companyId: tenant.companyId,
+      userId: tenant.userId,
+      portfolioId: body.portfolioId || null,
+      agentId: body.agentId || null,
+      ticker: body.ticker,
+      tickerName: body.tickerName,
+      side: body.side,
+      quantity: body.quantity,
+      price: body.price,
+      totalAmount,
+      orderType: body.orderType,
+      tradingMode: body.tradingMode,
+      status: body.status,
+      reason: body.reason || null,
+      kisOrderNo: body.kisOrderNo || null,
+      executedAt: body.executedAt ? new Date(body.executedAt) : null,
+    })
+    .returning()
+
+  return c.json({ data: order }, 201)
+})
+
+// GET /api/workspace/strategy/orders/summary — 주문 요약 통계 (must be before :id route)
+strategyRoute.get(
+  '/orders/summary',
+  zValidator('query', z.object({
+    tradingMode: z.enum(['real', 'paper']).optional(),
+    dateFrom: z.string().optional(),
+    dateTo: z.string().optional(),
+  })),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const { tradingMode, dateFrom, dateTo } = c.req.valid('query')
+
+    const conditions = [
+      eq(strategyOrders.companyId, tenant.companyId),
+      eq(strategyOrders.userId, tenant.userId),
+    ]
+    if (tradingMode) conditions.push(eq(strategyOrders.tradingMode, tradingMode))
+    if (dateFrom) conditions.push(gte(strategyOrders.createdAt, new Date(dateFrom)))
+    if (dateTo) conditions.push(lte(strategyOrders.createdAt, new Date(dateTo)))
+
+    const result = await db
+      .select({
+        totalOrders: sql<number>`count(*)::int`,
+        executedOrders: sql<number>`count(*) filter (where ${strategyOrders.status} = 'executed')::int`,
+        totalBuyAmount: sql<number>`coalesce(sum(case when ${strategyOrders.side} = 'buy' and ${strategyOrders.status} = 'executed' then ${strategyOrders.totalAmount} else 0 end), 0)::int`,
+        totalSellAmount: sql<number>`coalesce(sum(case when ${strategyOrders.side} = 'sell' and ${strategyOrders.status} = 'executed' then ${strategyOrders.totalAmount} else 0 end), 0)::int`,
+        buyCount: sql<number>`count(*) filter (where ${strategyOrders.side} = 'buy' and ${strategyOrders.status} = 'executed')::int`,
+        sellCount: sql<number>`count(*) filter (where ${strategyOrders.side} = 'sell' and ${strategyOrders.status} = 'executed')::int`,
+      })
+      .from(strategyOrders)
+      .where(and(...conditions))
+
+    return c.json({ data: result[0] || { totalOrders: 0, executedOrders: 0, totalBuyAmount: 0, totalSellAmount: 0, buyCount: 0, sellCount: 0 } })
+  },
+)
+
+// GET /api/workspace/strategy/orders/:id — 주문 단건 조회
+strategyRoute.get(
+  '/orders/:id',
+  zValidator('param', z.object({ id: z.string().uuid() })),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const { id } = c.req.valid('param')
+
+    const [order] = await db
+      .select()
+      .from(strategyOrders)
+      .where(and(
+        eq(strategyOrders.id, id),
+        eq(strategyOrders.companyId, tenant.companyId),
+        eq(strategyOrders.userId, tenant.userId),
+      ))
+      .limit(1)
+
+    if (!order) throw new HTTPError(404, '주문을 찾을 수 없습니다', 'STRATEGY_110')
+
+    return c.json({ data: order })
+  },
+)
+
+// NOTE: DELETE endpoint intentionally omitted — FR62 requires permanent order preservation

@@ -227,7 +227,7 @@ development_status:
   # Dependencies: Epic 5, Epic 4
   # ============================================================
   epic-10: in-progress
-  10-1-strategy-schema-watchlist-portfolio-orders: review
+  10-1-strategy-schema-watchlist-portfolio-orders: done
   10-2-kis-securities-api-adapter: backlog
   10-3-finance-tools-5-implementation: backlog
   10-4-cio-vector-separation-orchestration: backlog
@@ -245,7 +245,7 @@ development_status:
   # ============================================================
   epic-11: in-progress
   11-1-agora-engine-round-management-consensus: done
-  11-2-debate-deep-debate-command-integration: backlog
+  11-2-debate-deep-debate-command-integration: ready-for-dev
   11-3-websocket-debate-channel-streaming: backlog
   11-4-agora-ui-round-timeline-speech-cards: backlog
   11-5-diff-view-debate-result-insertion: backlog
@@ -273,7 +273,7 @@ development_status:
   # ============================================================
   epic-13: in-progress
   13-1-cytoscape-canvas-8-node-types-connection: done
-  13-2-mermaid-cytoscape-bidirectional-conversion: backlog
+  13-2-mermaid-cytoscape-bidirectional-conversion: ready-for-dev
   13-3-mcp-sse-ai-realtime-canvas-manipulation: backlog
   13-4-save-load-knowledge-base-integration: backlog
   13-5-sketchvibe-ui-integration-command-center: backlog
