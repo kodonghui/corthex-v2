@@ -49,10 +49,12 @@ import { presetsRoute } from './routes/workspace/presets'
 import { sketchesRoute } from './routes/workspace/sketches'
 import { operationLogRoute } from './routes/workspace/operation-log'
 import { knowledgeRoute } from './routes/workspace/knowledge'
+import { argosRoute } from './routes/workspace/argos'
 import { superAdminCompaniesRoute } from './routes/super-admin/companies'
 import { commandsRoute } from './routes/commands'
 import { runMigrations } from './db'
 import { startJobWorker, stopJobWorker } from './lib/job-queue'
+import { startArgosEngine, stopArgosEngine } from './services/argos-evaluator'
 import { startCronEngine, stopCronEngine } from './services/cron-execution-engine'
 import { startTriggerWorker, stopTriggerWorker } from './lib/trigger-worker'
 import { startSnsScheduleChecker, stopSnsScheduleChecker } from './lib/sns-schedule-checker'
@@ -60,7 +62,7 @@ import { loginRateLimit, apiRateLimit } from './middleware/rate-limit'
 import { wsRoute, websocket, broadcastServerRestart } from './ws/server'
 import { eventBus } from './lib/event-bus'
 import { initToolPool } from './services/tool-pool-init'
-import { broadcastToCompany } from './ws/channels'
+import { broadcastToCompany, broadcastToChannel } from './ws/channels'
 import type { AppEnv } from './types'
 
 const app = new Hono<AppEnv>()
@@ -142,6 +144,7 @@ app.route('/api/workspace/presets', presetsRoute)
 app.route('/api/workspace/sketches', sketchesRoute)
 app.route('/api/workspace', operationLogRoute)
 app.route('/api/workspace/knowledge', knowledgeRoute)
+app.route('/api/workspace/argos', argosRoute)
 
 // WebSocket 라우트
 app.get('/ws', wsRoute)
@@ -170,6 +173,15 @@ eventBus.on('tool', (data: { companyId: string; payload: unknown }) => {
 })
 eventBus.on('cost', (data: { companyId: string; payload: unknown }) => {
   broadcastToCompany(data.companyId, 'cost', data.payload)
+})
+eventBus.on('argos', (data: { companyId: string; payload: unknown }) => {
+  broadcastToCompany(data.companyId, 'argos', data.payload)
+})
+eventBus.on('debate', (data: { companyId: string; payload: unknown }) => {
+  const payload = data.payload as { debateId?: string }
+  if (payload?.debateId) {
+    broadcastToChannel(`debate::${payload.debateId}`, data.payload)
+  }
 })
 
 // 프로덕션: Bun 네이티브 정적 파일 서빙 (SPA 폴백 포함)
@@ -225,6 +237,7 @@ runMigrations().then(() => {
   startJobWorker()
   startCronEngine()
   startTriggerWorker()
+  startArgosEngine()
   startSnsScheduleChecker()
 })
 
@@ -234,6 +247,7 @@ process.on('SIGTERM', async () => {
   stopJobWorker()
   await stopCronEngine()
   stopTriggerWorker()
+  await stopArgosEngine()
   stopSnsScheduleChecker()
   broadcastServerRestart()
   setTimeout(() => {

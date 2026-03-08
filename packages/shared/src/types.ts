@@ -612,3 +612,139 @@ export type DebateCommandResult = {
   report: string
   participants: { agentId: string; agentName: string; role: string }[]
 }
+
+// === Debate WebSocket Events (E11-S3) ===
+
+export type DebateWsEventBase = {
+  debateId: string
+  timestamp: string
+}
+
+export type DebateRoundStartedEvent = DebateWsEventBase & {
+  event: 'round-started'
+  roundNum: number
+  totalRounds: number
+}
+
+export type DebateSpeechDeliveredEvent = DebateWsEventBase & {
+  event: 'speech-delivered'
+  roundNum: number
+  speech: {
+    agentId: string
+    agentName: string
+    content: string
+    position: string
+  }
+}
+
+export type DebateRoundEndedEvent = DebateWsEventBase & {
+  event: 'round-ended'
+  roundNum: number
+  speechCount: number
+}
+
+export type DebateCompletedEvent = DebateWsEventBase & {
+  event: 'debate-completed'
+  result: DebateResult
+}
+
+export type DebateFailedEvent = DebateWsEventBase & {
+  event: 'debate-failed'
+  error: string
+}
+
+export type DebateStartedEvent = DebateWsEventBase & {
+  event: 'debate-started'
+  topic: string
+  totalRounds: number
+}
+
+export type DebateWsEvent =
+  | DebateStartedEvent
+  | DebateRoundStartedEvent
+  | DebateSpeechDeliveredEvent
+  | DebateRoundEndedEvent
+  | DebateCompletedEvent
+  | DebateFailedEvent
+
+export type DebateTimelineEntry = DebateWsEvent
+
+// === ARGOS Trigger System ===
+
+export type ArgosTriggerType = 'price' | 'news' | 'schedule' | 'custom' | 'price-above' | 'price-below' | 'market-open' | 'market-close'
+export type ArgosEventStatus = 'detected' | 'executing' | 'completed' | 'failed'
+
+export type ArgosPriceCondition = {
+  ticker: string
+  market?: 'KR' | 'US'
+  operator: 'above' | 'below' | 'change_pct_above' | 'change_pct_below'
+  value: number
+  dataSource?: 'cached' | 'realtime'
+}
+
+export type ArgosNewsCondition = {
+  keywords: string[]
+  matchMode?: 'any' | 'all'
+  sources?: string[]
+  excludeKeywords?: string[]
+}
+
+export type ArgosScheduleCondition = {
+  intervalMinutes: number
+  activeHours?: { start: number; end: number }
+  activeDays?: number[]
+}
+
+export type ArgosCustomCondition = {
+  field: string
+  operator: string
+  value: number | string
+  dataSource?: string
+}
+
+export type ArgosTrigger = {
+  id: string
+  companyId: string
+  userId: string
+  agentId: string
+  name: string | null
+  instruction: string
+  triggerType: ArgosTriggerType
+  condition: ArgosPriceCondition | ArgosNewsCondition | ArgosScheduleCondition | ArgosCustomCondition | Record<string, unknown>
+  cooldownMinutes: number
+  isActive: boolean
+  lastTriggeredAt: string | null
+  createdAt: string
+}
+
+export type ArgosEvent = {
+  id: string
+  companyId: string
+  triggerId: string
+  eventType: string
+  eventData: Record<string, unknown> | null
+  status: ArgosEventStatus
+  commandId: string | null
+  result: string | null
+  error: string | null
+  durationMs: number | null
+  processedAt: string | null
+  createdAt: string
+}
+
+export type ArgosStatus = {
+  dataOk: boolean
+  aiOk: boolean
+  activeTriggersCount: number
+  todayCost: number
+  lastCheckAt: string | null
+}
+
+export type CreateArgosTriggerRequest = {
+  name?: string
+  agentId: string
+  instruction: string
+  triggerType: ArgosTriggerType
+  condition: Record<string, unknown>
+  cooldownMinutes?: number
+}

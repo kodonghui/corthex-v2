@@ -1,6 +1,6 @@
 # Story 7.4: CEO App Cost Card Drilldown
 
-Status: review
+Status: done
 
 ## Story
 

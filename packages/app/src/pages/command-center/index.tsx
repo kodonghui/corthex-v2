@@ -1,5 +1,6 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { useSearchParams } from 'react-router-dom'
 import { Tabs } from '@corthex/ui'
 import type { TabItem } from '@corthex/ui'
 import { useCommandCenter } from '../../hooks/use-command-center'
@@ -77,6 +78,16 @@ export function CommandCenterPage() {
   const { presets, createPreset, updatePreset, deletePreset, executePreset, isCreating, isExecuting } = usePresets()
   const [detailModalId, setDetailModalId] = useState<string | null>(null)
   const [showPresetManager, setShowPresetManager] = useState(false)
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  // Replay: auto-submit from ops-log redirect
+  useEffect(() => {
+    const replayText = searchParams.get('replay')
+    if (replayText && !isSubmitting && !historyLoading) {
+      submitCommand(decodeURIComponent(replayText))
+      setSearchParams({}, { replace: true })
+    }
+  }, [searchParams, submitCommand, isSubmitting, historyLoading, setSearchParams])
 
   const handleReportClick = useCallback(
     (commandId: string) => {

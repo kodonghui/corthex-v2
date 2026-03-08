@@ -1305,6 +1305,12 @@ export const debates = pgTable('debates', {
     keyArguments: string[]
     roundCount: number
   } | null>(),
+  timeline: jsonb('timeline').$type<{
+    event: string
+    debateId: string
+    timestamp: string
+    [key: string]: unknown
+  }[]>().notNull().default([]),
   createdBy: uuid('created_by').notNull().references(() => users.id),
   error: text('error'),
   startedAt: timestamp('started_at'),
@@ -1363,6 +1369,23 @@ export const knowledgeDocs = pgTable('knowledge_docs', {
   createdByIdx: index('knowledge_docs_created_by_idx').on(table.createdBy),
 }))
 
+// === K-2a. doc_versions — 문서 버전 이력 ===
+export const docVersions = pgTable('doc_versions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  docId: uuid('doc_id').notNull().references(() => knowledgeDocs.id),
+  version: integer('version').notNull(),
+  title: varchar('title', { length: 500 }).notNull(),
+  content: text('content'),
+  contentType: varchar('content_type', { length: 50 }).notNull().default('markdown'),
+  tags: jsonb('tags').$type<string[]>().default([]),
+  editedBy: uuid('edited_by').notNull().references(() => users.id),
+  changeNote: varchar('change_note', { length: 500 }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  docIdx: index('doc_versions_doc_idx').on(table.docId),
+  docVersionUniq: unique('doc_versions_doc_version_uniq').on(table.docId, table.version),
+}))
+
 // === K-3. agent_memories — 에이전트 학습 기억 (enhanced) ===
 export const agentMemories = pgTable('agent_memories', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -1395,11 +1418,17 @@ export const knowledgeFoldersRelations = relations(knowledgeFolders, ({ one, man
   docs: many(knowledgeDocs),
 }))
 
-export const knowledgeDocsRelations = relations(knowledgeDocs, ({ one }) => ({
+export const knowledgeDocsRelations = relations(knowledgeDocs, ({ one, many }) => ({
   company: one(companies, { fields: [knowledgeDocs.companyId], references: [companies.id] }),
   folder: one(knowledgeFolders, { fields: [knowledgeDocs.folderId], references: [knowledgeFolders.id] }),
   creator: one(users, { fields: [knowledgeDocs.createdBy], references: [users.id] }),
   updater: one(users, { fields: [knowledgeDocs.updatedBy], references: [users.id] }),
+  versions: many(docVersions),
+}))
+
+export const docVersionsRelations = relations(docVersions, ({ one }) => ({
+  doc: one(knowledgeDocs, { fields: [docVersions.docId], references: [knowledgeDocs.id] }),
+  editor: one(users, { fields: [docVersions.editedBy], references: [users.id] }),
 }))
 
 export const agentMemoriesRelations = relations(agentMemories, ({ one }) => ({
