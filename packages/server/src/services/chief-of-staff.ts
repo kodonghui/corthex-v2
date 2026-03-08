@@ -645,7 +645,7 @@ export async function process(options: ProcessOptions): Promise<ChiefOfStaffResu
             companyId,
             userId: options.userId,
             commandId,
-            tradingMode: 'paper', // Default to paper for pending
+            tradingMode: tradingSettings.tradingMode || 'paper',
             agentId: managerAgent.id,
           })
           pendingApproval = true
@@ -658,7 +658,7 @@ export async function process(options: ProcessOptions): Promise<ChiefOfStaffResu
             companyId,
             userId: options.userId,
             commandId,
-            tradingMode: 'paper',
+            tradingMode: tradingSettings.tradingMode || 'paper',
             vectorAgentId: managerAgent.id,
           })
         }

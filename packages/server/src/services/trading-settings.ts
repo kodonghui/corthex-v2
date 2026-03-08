@@ -5,7 +5,7 @@
 import { db } from '../db'
 import { companies } from '../db/schema'
 import { eq } from 'drizzle-orm'
-import type { RiskProfile, ExecutionMode, TradingSettings, RiskProfileConfig, RiskRange } from '@corthex/shared'
+import type { RiskProfile, ExecutionMode, TradingMode, TradingSettings, RiskProfileConfig, RiskRange } from '@corthex/shared'
 
 // === Risk Profile Definitions (ported from v1 trading_engine.py) ===
 
@@ -50,6 +50,8 @@ export const RISK_PROFILES: Record<RiskProfile, RiskProfileConfig> = {
 export const DEFAULT_TRADING_SETTINGS: TradingSettings = {
   executionMode: 'approval',
   riskProfile: 'balanced',
+  tradingMode: 'paper',
+  initialCapital: 100_000_000,
   customSettings: {},
   settingsHistory: [],
 }
@@ -99,6 +101,8 @@ export async function getTradingSettings(companyId: string): Promise<TradingSett
   return {
     executionMode: (tradingSettings.executionMode as ExecutionMode) || 'approval',
     riskProfile: (tradingSettings.riskProfile as RiskProfile) || 'balanced',
+    tradingMode: (tradingSettings.tradingMode as TradingMode) || 'paper',
+    initialCapital: tradingSettings.initialCapital ?? 100_000_000,
     customSettings: tradingSettings.customSettings || {},
     settingsHistory: tradingSettings.settingsHistory || [],
   }
@@ -107,6 +111,8 @@ export async function getTradingSettings(companyId: string): Promise<TradingSett
 export type UpdateTradingSettingsInput = {
   executionMode?: ExecutionMode
   riskProfile?: RiskProfile
+  tradingMode?: TradingMode
+  initialCapital?: number
   customSettings?: Partial<TradingSettings['customSettings']>
 }
 
@@ -124,6 +130,18 @@ export async function updateTradingSettings(
   if (updates.executionMode && ['autonomous', 'approval'].includes(updates.executionMode)) {
     current.executionMode = updates.executionMode
     applied.executionMode = updates.executionMode
+  }
+
+  // Update trading mode
+  if (updates.tradingMode && ['real', 'paper'].includes(updates.tradingMode)) {
+    current.tradingMode = updates.tradingMode
+    applied.tradingMode = updates.tradingMode
+  }
+
+  // Update initial capital
+  if (updates.initialCapital !== undefined && updates.initialCapital > 0) {
+    current.initialCapital = updates.initialCapital
+    applied.initialCapital = updates.initialCapital
   }
 
   // Update risk profile

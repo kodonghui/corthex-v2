@@ -763,6 +763,9 @@ export type ArgosStatus = {
   activeTriggersCount: number
   todayCost: number
   lastCheckAt: string | null
+  dataOkReason?: string
+  aiOkReason?: string
+  costBreakdown?: { cronCost: number; llmCost: number }
 }
 
 export type CreateArgosTriggerRequest = {
@@ -821,6 +824,7 @@ export type VectorExecutionResult = {
 
 export type RiskProfile = 'conservative' | 'balanced' | 'aggressive'
 export type ExecutionMode = 'autonomous' | 'approval'
+export type TradingMode = 'real' | 'paper'
 
 export type RiskRange = { min: number; max: number; default: number }
 
@@ -837,9 +841,17 @@ export type RiskProfileConfig = {
   orderSize: RiskRange
 }
 
+export type TradingModeChangeRequest = {
+  mode: TradingMode
+  password: string
+  confirmationCode?: string
+}
+
 export type TradingSettings = {
   executionMode: ExecutionMode
   riskProfile: RiskProfile
+  tradingMode: TradingMode
+  initialCapital: number
   customSettings: {
     maxPositionPct?: number
     minConfidence?: number

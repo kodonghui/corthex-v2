@@ -1363,3 +1363,185 @@ strategyRoute.post('/orders/bulk-reject', zValidator('json', bulkActionSchema), 
   const results = await bulkReject(orderIds, tenant.companyId, reason)
   return c.json({ data: results })
 })
+
+// ===============================================
+// === Trading Mode Separation API (E10-S6, FR61) ===
+// ===============================================
+
+const tradingModeChangeSchema = z.object({
+  mode: z.enum(['real', 'paper']),
+  password: z.string().min(1),
+  confirmationCode: z.string().optional(),
+})
+
+// PUT /api/workspace/strategy/settings/trading-mode — 거래 모드 전환 (2단계 확인)
+strategyRoute.put('/settings/trading-mode', zValidator('json', tradingModeChangeSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const { mode, password, confirmationCode } = c.req.valid('json')
+
+  // Get current settings
+  const currentSettings = await getTradingSettings(tenant.companyId)
+
+  // If already in requested mode, return success
+  if (currentSettings.tradingMode === mode) {
+    return c.json({ data: { tradingMode: mode, message: '이미 해당 거래 모드입니다' } })
+  }
+
+  // Step 1: Password verification
+  const [user] = await db
+    .select({ passwordHash: users.passwordHash })
+    .from(users)
+    .where(eq(users.id, tenant.userId))
+    .limit(1)
+
+  if (!user) {
+    return c.json({ success: false, error: { code: 'USER_NOT_FOUND', message: '사용자를 찾을 수 없습니다' } }, 404)
+  }
+
+  const passwordValid = await Bun.password.verify(password, user.passwordHash)
+  if (!passwordValid) {
+    return c.json({ success: false, error: { code: 'INVALID_PASSWORD', message: '비밀번호가 올바르지 않습니다' } }, 401)
+  }
+
+  // Step 2: For paper→real transition, require confirmation code
+  if (mode === 'real') {
+    if (confirmationCode !== 'REAL_TRADING') {
+      return c.json({
+        success: false,
+        error: { code: 'CONFIRMATION_REQUIRED', message: '실거래 전환을 위해 확인 코드 "REAL_TRADING"이 필요합니다' },
+      }, 400)
+    }
+  }
+
+  // Apply trading mode change
+  const result = await updateTradingSettings(
+    tenant.companyId,
+    { tradingMode: mode },
+    tenant.userId,
+    `거래 모드 전환: ${currentSettings.tradingMode} → ${mode}`,
+  )
+
+  // Broadcast mode change via WebSocket
+  broadcastToChannel(`strategy::${tenant.companyId}`, {
+    type: 'mode:changed',
+    previousMode: currentSettings.tradingMode,
+    newMode: mode,
+    changedBy: tenant.userId,
+    changedAt: new Date().toISOString(),
+  })
+
+  return c.json({
+    data: {
+      tradingMode: result.settings.tradingMode,
+      previousMode: currentSettings.tradingMode,
+      message: mode === 'real' ? '실거래 모드로 전환되었습니다' : '모의거래 모드로 전환되었습니다',
+    },
+  })
+})
+
+// GET /api/workspace/strategy/trading-status — KIS 연결 상태 + 현재 거래 모드
+strategyRoute.get('/trading-status', async (c) => {
+  const tenant = c.get('tenant')
+
+  const settings = await getTradingSettings(tenant.companyId)
+
+  // Check KIS credentials availability
+  let kisAvailable = false
+  let accountDisplay = '미설정'
+  try {
+    const creds = await getCredentials(tenant.companyId, 'kis')
+    if (creds) {
+      kisAvailable = true
+      const accountNo = (creds as Record<string, string>).account_no || ''
+      accountDisplay = accountNo.length >= 4 ? `****${accountNo.slice(-4)}` : '설정됨'
+    }
+  } catch {
+    // No KIS credentials
+  }
+
+  const activeMode = settings.tradingMode === 'real' && kisAvailable ? '실거래' : '모의거래'
+
+  return c.json({
+    data: {
+      tradingMode: settings.tradingMode,
+      kisAvailable,
+      account: accountDisplay,
+      activeMode,
+    },
+  })
+})
+
+const portfolioResetSchema = z.object({
+  confirm: z.literal(true),
+})
+
+// POST /api/workspace/strategy/portfolio/reset — 모의거래 포트폴리오 리셋
+strategyRoute.post('/portfolio/reset', zValidator('json', portfolioResetSchema), async (c) => {
+  const tenant = c.get('tenant')
+
+  const settings = await getTradingSettings(tenant.companyId)
+  const initialCapital = settings.initialCapital || 100_000_000
+
+  // Only reset paper trading portfolios
+  const paperPortfolios = await db
+    .select()
+    .from(strategyPortfolios)
+    .where(and(
+      eq(strategyPortfolios.companyId, tenant.companyId),
+      eq(strategyPortfolios.userId, tenant.userId),
+      eq(strategyPortfolios.tradingMode, 'paper'),
+    ))
+
+  if (paperPortfolios.length === 0) {
+    return c.json({ success: false, error: { code: 'NO_PAPER_PORTFOLIO', message: '모의거래 포트폴리오가 없습니다' } }, 404)
+  }
+
+  // Reset each paper portfolio
+  const resetIds: string[] = []
+  for (const portfolio of paperPortfolios) {
+    await db
+      .update(strategyPortfolios)
+      .set({
+        cashBalance: initialCapital,
+        holdings: [],
+        totalValue: initialCapital,
+        updatedAt: new Date(),
+      })
+      .where(eq(strategyPortfolios.id, portfolio.id))
+    resetIds.push(portfolio.id)
+  }
+
+  // Note: strategy_orders are preserved for audit trail
+
+  return c.json({
+    data: {
+      resetCount: resetIds.length,
+      initialCapital,
+      message: `모의거래 포트폴리오 ${resetIds.length}개가 초기화되었습니다 (초기자금: ${initialCapital.toLocaleString()}원)`,
+    },
+  })
+})
+
+const initialCapitalSchema = z.object({
+  amount: z.number().min(1_000_000).max(2_000_000_000), // PostgreSQL integer max ~2.1B
+})
+
+// PUT /api/workspace/strategy/portfolio/initial-capital — 모의거래 초기 자금 설정
+strategyRoute.put('/portfolio/initial-capital', zValidator('json', initialCapitalSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const { amount } = c.req.valid('json')
+
+  const result = await updateTradingSettings(
+    tenant.companyId,
+    { initialCapital: amount },
+    tenant.userId,
+    `모의거래 초기 자금 변경: ${amount.toLocaleString()}원`,
+  )
+
+  return c.json({
+    data: {
+      initialCapital: result.settings.initialCapital,
+      message: `초기 자금이 ${amount.toLocaleString()}원으로 설정되었습니다. 다음 리셋 시 적용됩니다.`,
+    },
+  })
+})
