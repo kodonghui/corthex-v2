@@ -19,6 +19,7 @@ const SoulTemplatesPage = lazy(() => import('./pages/soul-templates').then((m) =
 const MonitoringPage = lazy(() => import('./pages/monitoring').then((m) => ({ default: m.MonitoringPage })))
 const OrgChartPage = lazy(() => import('./pages/org-chart').then((m) => ({ default: m.OrgChartPage })))
 const OrgTemplatesPage = lazy(() => import('./pages/org-templates').then((m) => ({ default: m.OrgTemplatesPage })))
+const EmployeesPage = lazy(() => import('./pages/employees').then((m) => ({ default: m.EmployeesPage })))
 const SettingsPage = lazy(() => import('./pages/settings').then((m) => ({ default: m.SettingsPage })))
 
 const queryClient = new QueryClient({
@@ -77,6 +78,7 @@ export function App() {
           >
             <Route index element={<Suspense fallback={<PageSkeleton />}><DashboardPage /></Suspense>} />
             <Route path="users" element={<Suspense fallback={<PageSkeleton />}><UsersPage /></Suspense>} />
+            <Route path="employees" element={<Suspense fallback={<PageSkeleton />}><EmployeesPage /></Suspense>} />
             <Route path="departments" element={<Suspense fallback={<PageSkeleton />}><DepartmentsPage /></Suspense>} />
             <Route path="agents" element={<Suspense fallback={<PageSkeleton />}><AgentsPage /></Suspense>} />
             <Route path="credentials" element={<Suspense fallback={<PageSkeleton />}><CredentialsPage /></Suspense>} />

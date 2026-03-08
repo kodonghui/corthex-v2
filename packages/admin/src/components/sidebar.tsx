@@ -14,7 +14,7 @@ type Company = { id: string; name: string; slug: string }
 const nav = [
   { to: '/', label: '대시보드', icon: '📊' },
   { to: '/companies', label: '회사 관리', icon: '🏛️' },
-  { to: '/users', label: '직원 관리', icon: '👥' },
+  { to: '/employees', label: '직원 관리', icon: '👥' },
   { to: '/departments', label: '부서 관리', icon: '🏢' },
   { to: '/agents', label: 'AI 에이전트', icon: '🤖' },
   { to: '/tools', label: '도구 관리', icon: '🔧' },

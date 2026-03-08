@@ -194,7 +194,7 @@ development_status:
   epic-8: in-progress
   8-1-quality-rules-yaml-parser: done
   8-2-auto-rule-inspection-engine: review
-  8-3-hallucination-detection: backlog
+  8-3-hallucination-detection: review
   8-4-prompt-injection-defense: done
   8-5-qa-tab-enhanced-ui: backlog
   epic-8-retrospective: optional
@@ -208,8 +208,8 @@ development_status:
   epic-9: in-progress
   9-1-company-crud-api: done
   9-2-human-employee-management-api: done
-  9-3-employee-command-center-restriction: in-progress
-  9-4-employee-management-ui-admin-a4: backlog
+  9-3-employee-command-center-restriction: review
+  9-4-employee-management-ui-admin-a4: done
   9-5-company-settings-ui-admin-a8: done
   9-6-admin-ceo-app-switching: done
   9-7-onboarding-wizard: backlog
