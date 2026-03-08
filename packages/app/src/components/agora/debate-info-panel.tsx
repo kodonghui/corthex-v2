@@ -1,0 +1,104 @@
+import { Badge, cn } from '@corthex/ui'
+import type { Debate } from '@corthex/shared'
+
+const STATUS_LABELS: Record<string, string> = {
+  pending: '대기',
+  'in-progress': '진행중',
+  completed: '완료',
+  failed: '실패',
+}
+
+const AVATAR_COLORS = [
+  'bg-blue-500/20 text-blue-400',
+  'bg-red-500/20 text-red-400',
+  'bg-purple-500/20 text-purple-400',
+  'bg-emerald-500/20 text-emerald-400',
+  'bg-amber-500/20 text-amber-400',
+  'bg-cyan-500/20 text-cyan-400',
+  'bg-pink-500/20 text-pink-400',
+  'bg-orange-500/20 text-orange-400',
+]
+
+function getColor(id: string): string {
+  let hash = 0
+  for (let i = 0; i < id.length; i++) hash = ((hash << 5) - hash + id.charCodeAt(i)) | 0
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length]
+}
+
+function formatDate(dateStr: string | null): string {
+  if (!dateStr) return '-'
+  return new Date(dateStr).toLocaleString('ko-KR', {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+export function DebateInfoPanel({ debate }: { debate: Debate }) {
+  return (
+    <div className="h-full overflow-y-auto">
+      {/* Header */}
+      <div className="px-4 py-3 border-b border-zinc-200 dark:border-zinc-800">
+        <h3 className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-2">
+          토론 정보
+        </h3>
+        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{debate.topic}</p>
+      </div>
+
+      <div className="px-4 py-3 space-y-4">
+        {/* Meta */}
+        <div className="space-y-2">
+          <InfoRow label="유형" value={debate.debateType === 'deep-debate' ? '심층토론 (3라운드)' : '토론 (2라운드)'} />
+          <InfoRow label="상태" value={STATUS_LABELS[debate.status] ?? debate.status} />
+          <InfoRow label="최대 라운드" value={String(debate.maxRounds)} />
+          <InfoRow label="진행 라운드" value={String(debate.rounds.length)} />
+          <InfoRow label="시작" value={formatDate(debate.startedAt)} />
+          <InfoRow label="완료" value={formatDate(debate.completedAt)} />
+        </div>
+
+        {/* Participants */}
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-2">
+            참여자 ({debate.participants.length})
+          </p>
+          <div className="space-y-1.5">
+            {debate.participants.map((p) => (
+              <div key={p.agentId} className="flex items-center gap-2">
+                <div
+                  className={cn(
+                    'w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold',
+                    getColor(p.agentId),
+                  )}
+                >
+                  {p.agentName[0]}
+                </div>
+                <div>
+                  <p className="text-xs text-zinc-900 dark:text-zinc-100">{p.agentName}</p>
+                  <p className="text-[10px] text-zinc-400">{p.role}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Error */}
+        {debate.error && (
+          <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-2">
+            <p className="text-[10px] font-semibold text-red-500 mb-1">오류</p>
+            <p className="text-xs text-red-400">{debate.error}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-[10px] text-zinc-400">{label}</span>
+      <span className="text-xs text-zinc-700 dark:text-zinc-300">{value}</span>
+    </div>
+  )
+}

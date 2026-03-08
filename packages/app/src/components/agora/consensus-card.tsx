@@ -1,0 +1,68 @@
+import { cn } from '@corthex/ui'
+import type { DebateResult, ConsensusResult } from '@corthex/shared'
+
+const CONSENSUS_STYLES: Record<ConsensusResult, { bg: string; border: string; icon: string; label: string }> = {
+  consensus: {
+    bg: 'bg-emerald-500/10',
+    border: 'border-emerald-500/30',
+    icon: '✅',
+    label: '합의 도달',
+  },
+  dissent: {
+    bg: 'bg-red-500/10',
+    border: 'border-red-500/30',
+    icon: '❌',
+    label: '합의 실패 (이견)',
+  },
+  partial: {
+    bg: 'bg-amber-500/10',
+    border: 'border-amber-500/30',
+    icon: '⚠️',
+    label: '부분 합의',
+  },
+}
+
+export function ConsensusCard({ result }: { result: DebateResult }) {
+  const style = CONSENSUS_STYLES[result.consensus]
+
+  return (
+    <div className={cn('rounded-xl border p-4 space-y-3', style.bg, style.border)}>
+      {/* Header */}
+      <div className="flex items-center gap-2">
+        <span className="text-lg">{style.icon}</span>
+        <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">{style.label}</h3>
+        <span className="text-[10px] text-zinc-400 font-mono ml-auto">{result.roundCount}R</span>
+      </div>
+
+      {/* Summary */}
+      <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed">{result.summary}</p>
+
+      {/* Positions */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-1">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">다수 의견</p>
+          <p className="text-xs text-zinc-600 dark:text-zinc-400">{result.majorityPosition}</p>
+        </div>
+        <div className="space-y-1">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">소수 의견</p>
+          <p className="text-xs text-zinc-600 dark:text-zinc-400">{result.minorityPosition}</p>
+        </div>
+      </div>
+
+      {/* Key arguments */}
+      {result.keyArguments.length > 0 && (
+        <div className="space-y-1">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">핵심 논점</p>
+          <ul className="space-y-1">
+            {result.keyArguments.map((arg, i) => (
+              <li key={i} className="text-xs text-zinc-600 dark:text-zinc-400 flex gap-1.5">
+                <span className="text-zinc-400 shrink-0">•</span>
+                <span>{arg}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  )
+}

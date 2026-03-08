@@ -1,0 +1,133 @@
+import { useState, useEffect, useCallback } from 'react'
+import { useLocation } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { api } from '../lib/api'
+import { DebateListPanel } from '../components/agora/debate-list-panel'
+import { DebateTimeline } from '../components/agora/debate-timeline'
+import { DebateInfoPanel } from '../components/agora/debate-info-panel'
+import { CreateDebateModal } from '../components/agora/create-debate-modal'
+import type { Debate, DebateTimelineEntry } from '@corthex/shared'
+
+export function AgoraPage() {
+  const location = useLocation()
+  const [selectedDebate, setSelectedDebate] = useState<Debate | null>(null)
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [mobileView, setMobileView] = useState<'list' | 'detail'>('list')
+
+  // Auto-select debate from navigation state or URL params
+  const stateDebateId = (location.state as { debateId?: string } | null)?.debateId
+  const urlDebateId = new URLSearchParams(location.search).get('debateId')
+  const autoDebateId = stateDebateId || urlDebateId
+
+  // Fetch detailed debate when selected
+  const { data: debateDetail } = useQuery({
+    queryKey: ['debate', selectedDebate?.id],
+    queryFn: () => api.get<{ data: Debate }>(`/workspace/debates/${selectedDebate!.id}`),
+    enabled: !!selectedDebate?.id,
+    refetchInterval: selectedDebate?.status === 'in-progress' ? 5000 : false,
+  })
+
+  // Fetch timeline for completed debates
+  const { data: timelineData } = useQuery({
+    queryKey: ['debate-timeline', selectedDebate?.id],
+    queryFn: () => api.get<{ data: DebateTimelineEntry[] }>(`/workspace/debates/${selectedDebate!.id}/timeline`),
+    enabled: !!selectedDebate?.id && selectedDebate?.status === 'completed',
+  })
+
+  const debate = debateDetail?.data ?? selectedDebate
+  const timeline = timelineData?.data
+
+  // Auto-select from navigation state
+  useEffect(() => {
+    if (autoDebateId && !selectedDebate) {
+      api.get<{ data: Debate }>(`/workspace/debates/${autoDebateId}`).then((res) => {
+        setSelectedDebate(res.data)
+        setMobileView('detail')
+      }).catch(() => {
+        // Debate not found; ignore
+      })
+    }
+  }, [autoDebateId, selectedDebate])
+
+  const handleSelectDebate = useCallback((d: Debate) => {
+    setSelectedDebate(d)
+    setMobileView('detail')
+  }, [])
+
+  const handleCreated = useCallback((d: Debate) => {
+    setSelectedDebate(d)
+    setShowCreateModal(false)
+    setMobileView('detail')
+  }, [])
+
+  const handleBackToList = useCallback(() => {
+    setMobileView('list')
+  }, [])
+
+  return (
+    <div className="flex h-full">
+      {/* Left panel: debate list (hidden on mobile when viewing detail) */}
+      <div className={`w-72 shrink-0 border-r border-zinc-200 dark:border-zinc-800 ${mobileView === 'detail' ? 'hidden md:block' : ''}`}>
+        <DebateListPanel
+          selectedId={selectedDebate?.id ?? null}
+          onSelect={handleSelectDebate}
+          onCreateNew={() => setShowCreateModal(true)}
+        />
+      </div>
+
+      {/* Center panel: timeline */}
+      <div className={`flex-1 flex flex-col min-w-0 ${mobileView === 'list' ? 'hidden md:flex' : 'flex'}`}>
+        {debate ? (
+          <>
+            {/* Mobile back button */}
+            <div className="md:hidden shrink-0 px-4 py-2 border-b border-zinc-200 dark:border-zinc-800">
+              <button onClick={handleBackToList} className="text-xs text-indigo-500 hover:text-indigo-400">
+                ← 목록으로
+              </button>
+            </div>
+
+            {/* Topic header */}
+            <div className="shrink-0 px-4 py-3 border-b border-zinc-200 dark:border-zinc-800">
+              <div className="flex items-center gap-2">
+                <h2 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">{debate.topic}</h2>
+                {debate.status === 'in-progress' && (
+                  <span className="flex items-center gap-1 text-[10px] text-emerald-500 shrink-0">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    진행중
+                  </span>
+                )}
+              </div>
+              <p className="text-[10px] text-zinc-400 mt-0.5">
+                {debate.debateType === 'deep-debate' ? '심층토론' : '토론'} · {debate.participants.length}명 · Round {debate.rounds.length}/{debate.maxRounds}
+              </p>
+            </div>
+
+            {/* Timeline */}
+            <DebateTimeline debate={debate} timeline={timeline} />
+          </>
+        ) : (
+          <div className="flex-1 flex items-center justify-center text-zinc-400 dark:text-zinc-500">
+            <div className="text-center space-y-2">
+              <p className="text-3xl opacity-30">🗣️</p>
+              <p className="text-sm">토론을 선택하거나 새 토론을 시작하세요</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Right panel: debate info (desktop only) */}
+      {debate && (
+        <div className="hidden lg:block w-72 shrink-0 border-l border-zinc-200 dark:border-zinc-800">
+          <DebateInfoPanel debate={debate} />
+        </div>
+      )}
+
+      {/* Create modal */}
+      <CreateDebateModal
+        open={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreated={handleCreated}
+      />
+    </div>
+  )
+}
