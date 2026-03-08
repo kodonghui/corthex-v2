@@ -603,3 +603,12 @@ export type CreateDebateRequest = {
 }
 
 export type DebateResponse = Debate
+
+export type DebateCommandResult = {
+  debateId: string
+  topic: string
+  debateType: DebateType
+  consensus: ConsensusResult | null
+  report: string
+  participants: { agentId: string; agentName: string; role: string }[]
+}

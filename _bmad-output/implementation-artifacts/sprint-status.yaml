@@ -245,7 +245,7 @@ development_status:
   # ============================================================
   epic-11: in-progress
   11-1-agora-engine-round-management-consensus: done
-  11-2-debate-deep-debate-command-integration: review
+  11-2-debate-deep-debate-command-integration: done
   11-3-websocket-debate-channel-streaming: backlog
   11-4-agora-ui-round-timeline-speech-cards: backlog
   11-5-diff-view-debate-result-insertion: backlog
@@ -288,7 +288,7 @@ development_status:
   epic-14: in-progress
   14-1-cron-scheduler-service-crud-api: done
   14-2-cron-execution-engine-auto-run: done
-  14-3-argos-trigger-condition-auto-collect: backlog
+  14-3-argos-trigger-condition-auto-collect: ready-for-dev
   14-4-cron-base-ui: backlog
   14-5-argos-ui: backlog
   14-6-status-bar-data-ai-ok-ng-cost: backlog
@@ -327,7 +327,7 @@ development_status:
   # Dependencies: Epic 5, Epic 7, Epic 8
   # ============================================================
   epic-17: in-progress
-  17-1-operation-log-api-search-filter-bookmark: in-progress
+  17-1-operation-log-api-search-filter-bookmark: review
   17-2-operation-log-ui-ab-compare-replay: backlog
   17-3-classified-docs-api-archive-filter-similar: backlog
   17-4-classified-docs-ui: backlog

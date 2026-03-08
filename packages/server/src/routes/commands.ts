@@ -13,6 +13,7 @@ import { classify, createCommand } from '../services/command-router'
 import { process as chiefOfStaffProcess } from '../services/chief-of-staff'
 import { processAll } from '../services/all-command-processor'
 import { processSequential } from '../services/sequential-command-processor'
+import { processDebateCommand } from '../services/debate-command-handler'
 import type { AppEnv } from '../types'
 
 export const commandsRoute = new Hono<AppEnv>()
@@ -112,6 +113,20 @@ commandsRoute.post('/', zValidator('json', submitCommandSchema), promptGuardMidd
       userId: tenant.userId,
     }).catch((err) => {
       console.error(`[SequentialCommand] process failed for command ${command.id}:`, err)
+    })
+  }
+
+  // For /토론 or /심층토론 commands, trigger DebateCommandHandler
+  if (result.parsedMeta.slashType === 'debate' || result.parsedMeta.slashType === 'deep_debate') {
+    const debateTopic = result.parsedMeta.slashArgs || ''
+    processDebateCommand({
+      commandId: command.id,
+      topic: debateTopic,
+      debateType: result.parsedMeta.slashType === 'deep_debate' ? 'deep-debate' : 'debate',
+      companyId: tenant.companyId,
+      userId: tenant.userId,
+    }).catch((err) => {
+      console.error(`[DebateCommand] process failed for command ${command.id}:`, err)
     })
   }
 

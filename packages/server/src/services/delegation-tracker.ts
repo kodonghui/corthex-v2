@@ -19,6 +19,9 @@ export type DelegationEventType =
   | 'REWORKING'
   | 'COMPLETED'
   | 'FAILED'
+  | 'DEBATE_STARTED'
+  | 'DEBATE_ROUND_PROGRESS'
+  | 'DEBATE_COMPLETED'
 
 export type DelegationEvent = {
   commandId: string
@@ -151,6 +154,20 @@ export class DelegationTracker {
 
   reworking(companyId: string, commandId: string, attempt: number, maxAttempts: number): void {
     this.emitCommand(companyId, commandId, 'REWORKING', 'reworking', { data: { attempt, maxAttempts } })
+  }
+
+  // --- Debate tracking ---
+
+  debateStarted(companyId: string, commandId: string, data: { debateId: string; topic: string; participants: string[] }): void {
+    this.emitCommand(companyId, commandId, 'DEBATE_STARTED', 'debate-started', { data: data as unknown as Record<string, unknown> })
+  }
+
+  debateRoundProgress(companyId: string, commandId: string, data: { debateId: string; roundNum: number; totalRounds: number }): void {
+    this.emitCommand(companyId, commandId, 'DEBATE_ROUND_PROGRESS', 'debate-round-progress', { data: data as unknown as Record<string, unknown> })
+  }
+
+  debateCompleted(companyId: string, commandId: string, data: { debateId: string; consensus: string; summary: string }): void {
+    this.emitCommand(companyId, commandId, 'DEBATE_COMPLETED', 'debate-completed', { data: data as unknown as Record<string, unknown> })
   }
 
   // --- Tool tracking ---
