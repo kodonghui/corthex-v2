@@ -29,7 +29,7 @@ export const memoryTypeEnum = pgEnum('memory_type', ['learning', 'insight', 'pre
 // === Phase 2 New Enums (Epic 10 Story 1) ===
 export const tradingModeEnum = pgEnum('trading_mode', ['real', 'paper'])
 export const orderSideEnum = pgEnum('order_side', ['buy', 'sell'])
-export const orderStatusEnum = pgEnum('order_status', ['pending', 'submitted', 'executed', 'cancelled', 'rejected', 'failed'])
+export const orderStatusEnum = pgEnum('order_status', ['pending_approval', 'pending', 'submitted', 'executed', 'cancelled', 'rejected', 'failed'])
 export const orderTypeEnum = pgEnum('order_type', ['market', 'limit'])
 export const cronRunStatusEnum = pgEnum('cron_run_status', ['running', 'success', 'failed'])
 export const debateStatusEnum = pgEnum('debate_status', ['pending', 'in-progress', 'completed', 'failed'])
@@ -158,6 +158,7 @@ export const agents = pgTable('agents', {
   isSecretary: boolean('is_secretary').notNull().default(false),
   isSystem: boolean('is_system').notNull().default(false),  // 시스템 에이전트 삭제 보호
   allowedTools: jsonb('allowed_tools').default([]),  // string[] — 허용 도구 이름 목록
+  autoLearn: boolean('auto_learn').notNull().default(true),  // 자동 학습 메모리 추출 on/off
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
