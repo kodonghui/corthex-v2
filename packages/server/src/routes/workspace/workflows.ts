@@ -8,6 +8,7 @@ import { HTTPError } from '../../middleware/error'
 import { authMiddleware } from '../../middleware/auth'
 import { isCeoOrAbove } from '@corthex/shared'
 import type { AppEnv } from '../../types'
+import { WorkflowEngine } from '../../services/workflow/engine'
 
 export const workflowsRoute = new Hono<AppEnv>()
 
@@ -184,7 +185,7 @@ workflowsRoute.post(
 
     try {
       // WorkflowEngine.startExecution handles db check and throws if not found
-      const execution = await WorkflowEngine.startExecution(id, tenant.companyId, tenant.sub)
+      const execution = await WorkflowEngine.startExecution(id, tenant.companyId, tenant.userId)
       return c.json({ success: true, data: execution })
     } catch (err: any) {
       if (err.message.includes('not found')) {
