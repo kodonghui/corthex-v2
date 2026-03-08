@@ -14,6 +14,105 @@ async function getUserId(accessToken: string): Promise<string> {
   return data.id
 }
 
+/**
+ * Instagram 캐러셀(카드뉴스) 발행
+ * v1 포트: 각 이미지당 carousel_item 컨테이너 → carousel 컨테이너 → 발행
+ * 최대 10장
+ */
+async function publishCarousel(input: PublishInput, credentials: Record<string, string>): Promise<PublishResult> {
+  const accessToken = credentials.access_token
+  if (!accessToken) return { success: false, error: 'Instagram access_token이 없습니다' }
+
+  const mediaUrls = input.mediaUrls!
+  if (mediaUrls.length < 2) return { success: false, error: '캐러셀에는 최소 2개의 이미지가 필요합니다' }
+  if (mediaUrls.length > 10) return { success: false, error: '캐러셀 최대 이미지 수는 10개입니다' }
+
+  try {
+    const userId = credentials.user_id || await getUserId(accessToken)
+    const caption = input.hashtags ? `${input.body}\n\n${input.hashtags}` : input.body
+
+    // 1. 각 이미지의 carousel_item 컨테이너 생성
+    const containerIds: string[] = []
+    for (const imgUrl of mediaUrls) {
+      const res = await fetch(`${API_BASE}/${userId}/media`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          image_url: imgUrl,
+          is_carousel_item: 'true',
+          access_token: accessToken,
+        }),
+      })
+      if (!res.ok) {
+        const err = await res.json() as { error?: { message?: string } }
+        return { success: false, error: `캐러셀 아이템 생성 실패: ${err.error?.message || res.status}` }
+      }
+      const data = await res.json() as { id: string }
+      containerIds.push(data.id)
+    }
+
+    // 2. 캐러셀 컨테이너 생성
+    const carouselRes = await fetch(`${API_BASE}/${userId}/media`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        media_type: 'CAROUSEL',
+        children: containerIds.join(','),
+        caption,
+        access_token: accessToken,
+      }),
+    })
+
+    if (!carouselRes.ok) {
+      const err = await carouselRes.json() as { error?: { message?: string } }
+      return { success: false, error: `캐러셀 컨테이너 생성 실패: ${err.error?.message || carouselRes.status}` }
+    }
+
+    const carousel = await carouselRes.json() as { id: string }
+
+    // 3. 발행 (최대 3회 재시도, 비동기 처리 대기)
+    let publishData: { id: string } | null = null
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const publishRes = await fetch(`${API_BASE}/${userId}/media_publish`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          creation_id: carousel.id,
+          access_token: accessToken,
+        }),
+      })
+
+      if (publishRes.ok) {
+        publishData = await publishRes.json() as { id: string }
+        break
+      }
+
+      const pubErr = await publishRes.json() as { error?: { code?: number; message?: string } }
+      if (pubErr.error?.code === 9007 && attempt < 2) {
+        await new Promise((r) => setTimeout(r, 3000)) // 캐러셀은 처리 시간 더 걸림
+        continue
+      }
+      return { success: false, error: `캐러셀 발행 실패: ${pubErr.error?.message || publishRes.status}` }
+    }
+
+    if (!publishData) return { success: false, error: '캐러셀 미디어 처리 시간 초과' }
+
+    // 4. permalink 조회
+    const permalinkRes = await fetch(
+      `${API_BASE}/${publishData.id}?fields=permalink&access_token=${accessToken}`,
+    )
+    let permalink = `https://instagram.com/p/${publishData.id}`
+    if (permalinkRes.ok) {
+      const plData = await permalinkRes.json() as { permalink?: string }
+      if (plData.permalink) permalink = plData.permalink
+    }
+
+    return { success: true, url: permalink, platformId: publishData.id }
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : 'Instagram 캐러셀 발행 오류' }
+  }
+}
+
 export const instagramPublisher: PlatformPublisher = {
   platform: 'instagram',
 
@@ -21,6 +120,11 @@ export const instagramPublisher: PlatformPublisher = {
     const accessToken = credentials.access_token
     if (!accessToken) {
       return { success: false, error: 'Instagram access_token이 없습니다' }
+    }
+
+    // 카드뉴스(캐러셀) 분기: mediaUrls가 2개 이상이면 캐러셀
+    if (input.mediaUrls && input.mediaUrls.length > 1) {
+      return publishCarousel(input, credentials)
     }
 
     if (!input.imageUrl) {

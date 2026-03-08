@@ -86,7 +86,18 @@ export async function publishContentById(contentId: string, companyId: string): 
     }
   }
 
-  // 5. 발행 실행
+  // 5. 카드뉴스 시리즈 이미지 수집
+  let mediaUrls: string[] | undefined
+  if (content.isCardNews) {
+    const meta = (content.metadata as Record<string, unknown>) || {}
+    const cards = (meta.cards as Array<{ imageUrl?: string }>) || []
+    const urls = cards.map((c) => c.imageUrl).filter((u): u is string => !!u)
+    if (urls.length > 0) {
+      mediaUrls = urls
+    }
+  }
+
+  // 6. 발행 실행
   const publishInput: PublishInput = {
     id: content.id,
     platform,
@@ -94,16 +105,17 @@ export async function publishContentById(contentId: string, companyId: string): 
     body: content.body,
     hashtags: content.hashtags,
     imageUrl: content.imageUrl,
+    mediaUrls,
   }
 
   const result = await publisher.publish(publishInput, credentials)
 
-  // 6. Rate limit 기록
+  // 7. Rate limit 기록
   if (result.success) {
     recordPublish(platform)
   }
 
-  // 7. 메타데이터 업데이트 (재시도 횟수 등)
+  // 8. 메타데이터 업데이트 (재시도 횟수 등)
   const existingMeta = (content.metadata as Record<string, unknown>) || {}
   const retryCount = (existingMeta.retryCount as number) || 0
 

@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { eq, and, desc, gte, sql, count, isNull } from 'drizzle-orm'
+import { eq, and, desc, asc, gte, lte, sql, count, isNull, inArray } from 'drizzle-orm'
 import { db } from '../../db'
 import { snsContents, snsAccounts, users, agents } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
@@ -1044,4 +1044,688 @@ snsRoute.get('/sns/:id/publish-result', async (c) => {
   if (!result) throw new HTTPError(404, 'SNS 콘텐츠를 찾을 수 없습니다', 'SNS_001')
 
   return c.json({ data: result })
+})
+
+// ==================== 예약 발행 큐 대시보드 ====================
+
+// GET /api/workspace/sns/queue — 예약 큐 조회 (scheduled 상태, priority+scheduledAt 정렬)
+snsRoute.get('/sns/queue', async (c) => {
+  const tenant = c.get('tenant')
+  const platform = c.req.query('platform')
+  const rawStatus = c.req.query('status') || 'scheduled'
+  const validStatuses = ['scheduled', 'published', 'failed', 'all']
+  const statusFilter = validStatuses.includes(rawStatus) ? rawStatus : 'scheduled'
+
+  const conditions = [
+    eq(snsContents.companyId, tenant.companyId),
+    isNull(snsContents.cardSeriesId), // 개별 카드 제외 (시리즈 루트만)
+  ]
+
+  if (statusFilter === 'all') {
+    // scheduled + published + failed
+    conditions.push(
+      sql`${snsContents.status} IN ('scheduled', 'published', 'failed')`,
+    )
+  } else {
+    conditions.push(eq(snsContents.status, statusFilter as 'scheduled' | 'published' | 'failed'))
+  }
+  if (platform) conditions.push(eq(snsContents.platform, platform as 'instagram' | 'tistory' | 'daum_cafe'))
+
+  const result = await db
+    .select({
+      id: snsContents.id,
+      platform: snsContents.platform,
+      title: snsContents.title,
+      status: snsContents.status,
+      priority: snsContents.priority,
+      isCardNews: snsContents.isCardNews,
+      scheduledAt: snsContents.scheduledAt,
+      publishedAt: snsContents.publishedAt,
+      publishError: snsContents.publishError,
+      createdAt: snsContents.createdAt,
+    })
+    .from(snsContents)
+    .where(and(...conditions))
+    .orderBy(asc(snsContents.scheduledAt), desc(snsContents.priority))
+
+  return c.json({ data: result })
+})
+
+// GET /api/workspace/sns/queue/stats — 큐 통계
+snsRoute.get('/sns/queue/stats', async (c) => {
+  const tenant = c.get('tenant')
+  const baseWhere = eq(snsContents.companyId, tenant.companyId)
+
+  const [scheduledCount, publishedCount, failedCount, byPlatformResult, nextPublish] = await Promise.all([
+    db.select({ count: count() }).from(snsContents)
+      .where(and(baseWhere, eq(snsContents.status, 'scheduled'))),
+    db.select({ count: count() }).from(snsContents)
+      .where(and(baseWhere, eq(snsContents.status, 'published'))),
+    db.select({ count: count() }).from(snsContents)
+      .where(and(baseWhere, eq(snsContents.status, 'failed'))),
+    db.select({ platform: snsContents.platform, count: count() })
+      .from(snsContents)
+      .where(and(baseWhere, eq(snsContents.status, 'scheduled')))
+      .groupBy(snsContents.platform),
+    db.select({ scheduledAt: snsContents.scheduledAt })
+      .from(snsContents)
+      .where(and(baseWhere, eq(snsContents.status, 'scheduled')))
+      .orderBy(asc(snsContents.scheduledAt))
+      .limit(1),
+  ])
+
+  return c.json({
+    data: {
+      scheduled: scheduledCount[0]?.count ?? 0,
+      published: publishedCount[0]?.count ?? 0,
+      failed: failedCount[0]?.count ?? 0,
+      byPlatform: byPlatformResult.map((r) => ({ platform: r.platform, count: r.count })),
+      nextPublishAt: nextPublish[0]?.scheduledAt?.toISOString() || null,
+    },
+  })
+})
+
+const batchScheduleSchema = z.object({
+  ids: z.array(z.string().uuid()).min(1).max(50),
+  scheduledAt: z.string().datetime(),
+  priority: z.number().int().min(0).max(100).optional(),
+})
+
+// POST /api/workspace/sns/batch-schedule — 여러 콘텐츠 일괄 예약
+snsRoute.post('/sns/batch-schedule', zValidator('json', batchScheduleSchema), async (c) => {
+  const tenant = c.get('tenant')
+  if (!isCeoOrAbove(tenant.role)) throw new HTTPError(403, '관리자만 일괄 예약할 수 있습니다', 'AUTH_003')
+
+  const { ids, scheduledAt, priority } = c.req.valid('json')
+
+  if (new Date(scheduledAt) <= new Date()) {
+    throw new HTTPError(400, '예약 시간은 현재보다 미래여야 합니다', 'SNS_005')
+  }
+
+  // 승인된(approved) 콘텐츠만 예약 가능
+  const eligible = await db
+    .select({ id: snsContents.id })
+    .from(snsContents)
+    .where(and(
+      eq(snsContents.companyId, tenant.companyId),
+      eq(snsContents.status, 'approved'),
+      inArray(snsContents.id, ids),
+    ))
+
+  if (eligible.length === 0) {
+    throw new HTTPError(400, '예약 가능한 콘텐츠가 없습니다 (승인됨 상태만 가능)', 'SNS_008')
+  }
+
+  const eligibleIds = eligible.map((e) => e.id)
+
+  const updated = await db
+    .update(snsContents)
+    .set({
+      status: 'scheduled',
+      scheduledAt: new Date(scheduledAt),
+      ...(priority !== undefined ? { priority } : {}),
+      updatedAt: new Date(),
+    })
+    .where(and(
+      eq(snsContents.companyId, tenant.companyId),
+      inArray(snsContents.id, eligibleIds),
+    ))
+    .returning({ id: snsContents.id })
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'sns',
+    phase: 'end',
+    actorType: 'user',
+    actorId: tenant.userId,
+    action: `SNS 일괄 예약 (${updated.length}건)`,
+    detail: `예약: ${scheduledAt}`,
+  })
+
+  const skippedIds = ids.filter((id) => !eligibleIds.includes(id))
+  return c.json({ data: { scheduled: updated.length, ids: updated.map((u) => u.id), skippedIds } })
+})
+
+const batchCancelSchema = z.object({
+  ids: z.array(z.string().uuid()).min(1).max(50),
+})
+
+// POST /api/workspace/sns/batch-cancel — 여러 콘텐츠 일괄 예약 취소
+snsRoute.post('/sns/batch-cancel', zValidator('json', batchCancelSchema), async (c) => {
+  const tenant = c.get('tenant')
+  if (!isCeoOrAbove(tenant.role)) throw new HTTPError(403, '관리자만 일괄 취소할 수 있습니다', 'AUTH_003')
+
+  const { ids } = c.req.valid('json')
+
+  const updated = await db
+    .update(snsContents)
+    .set({
+      status: 'approved',
+      scheduledAt: null,
+      updatedAt: new Date(),
+    })
+    .where(and(
+      eq(snsContents.companyId, tenant.companyId),
+      eq(snsContents.status, 'scheduled'),
+      inArray(snsContents.id, ids),
+    ))
+    .returning({ id: snsContents.id })
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'sns',
+    phase: 'end',
+    actorType: 'user',
+    actorId: tenant.userId,
+    action: `SNS 일괄 예약 취소 (${updated.length}건)`,
+  })
+
+  return c.json({ data: { cancelled: updated.length, ids: updated.map((u) => u.id) } })
+})
+
+// ==================== 카드뉴스 시리즈 ====================
+
+const cardSchema = z.object({
+  imageUrl: z.string().min(1),
+  caption: z.string().min(1),
+  layout: z.enum(['cover', 'content', 'closing']).default('content'),
+})
+
+const createCardSeriesSchema = z.object({
+  platform: z.enum(SNS_PLATFORMS),
+  title: z.string().min(1).max(200),
+  description: z.string().optional(),
+  cards: z.array(cardSchema).min(2).max(10),
+  hashtags: z.string().optional(),
+  scheduledAt: z.string().datetime().optional(),
+  snsAccountId: z.string().uuid().optional(),
+  priority: z.number().int().min(0).max(100).optional(),
+})
+
+// POST /api/workspace/sns/card-series — 카드뉴스 시리즈 생성
+snsRoute.post('/sns/card-series', zValidator('json', createCardSeriesSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const body = c.req.valid('json')
+
+  if (body.scheduledAt && new Date(body.scheduledAt) <= new Date()) {
+    throw new HTTPError(400, '예약 시간은 현재보다 미래여야 합니다', 'SNS_005')
+  }
+
+  if (body.snsAccountId) {
+    const [acct] = await db.select({ id: snsAccounts.id }).from(snsAccounts)
+      .where(and(eq(snsAccounts.id, body.snsAccountId), eq(snsAccounts.companyId, tenant.companyId)))
+      .limit(1)
+    if (!acct) throw new HTTPError(400, 'SNS 계정을 찾을 수 없습니다', 'SNS_ACCOUNT_001')
+  }
+
+  // 카드 배열에 인덱스 부여
+  const cardsWithIndex = body.cards.map((card, i) => ({
+    index: i,
+    imageUrl: card.imageUrl,
+    caption: card.caption,
+    layout: card.layout,
+  }))
+
+  // 시리즈 루트 콘텐츠 생성 (body = description 또는 첫 카드 캡션)
+  const seriesBody = body.description || body.cards.map((c) => c.caption).join('\n\n')
+
+  const [root] = await db
+    .insert(snsContents)
+    .values({
+      companyId: tenant.companyId,
+      createdBy: tenant.userId,
+      platform: body.platform,
+      title: body.title,
+      body: seriesBody,
+      hashtags: body.hashtags || null,
+      imageUrl: body.cards[0]?.imageUrl || null, // 첫 카드 이미지가 대표 이미지
+      snsAccountId: body.snsAccountId || null,
+      scheduledAt: body.scheduledAt ? new Date(body.scheduledAt) : null,
+      priority: body.priority ?? 0,
+      isCardNews: true,
+      cardIndex: null, // 루트는 cardIndex 없음
+      status: 'draft',
+      metadata: {
+        cards: cardsWithIndex,
+        totalCards: cardsWithIndex.length,
+        seriesTitle: body.title,
+      },
+    })
+    .returning()
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'sns',
+    phase: 'end',
+    actorType: 'user',
+    actorId: tenant.userId,
+    action: `카드뉴스 시리즈 생성 (${body.platform}, ${cardsWithIndex.length}장)`,
+    detail: body.title,
+  })
+
+  return c.json({ data: { ...root, cards: cardsWithIndex } }, 201)
+})
+
+// GET /api/workspace/sns/card-series/:id — 카드뉴스 시리즈 상세
+snsRoute.get('/sns/card-series/:id', async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+
+  const [series] = await db
+    .select()
+    .from(snsContents)
+    .where(and(
+      eq(snsContents.id, id),
+      eq(snsContents.companyId, tenant.companyId),
+      eq(snsContents.isCardNews, true),
+    ))
+    .limit(1)
+
+  if (!series) throw new HTTPError(404, '카드뉴스 시리즈를 찾을 수 없습니다', 'SNS_CARD_001')
+
+  const meta = (series.metadata as Record<string, unknown>) || {}
+  const cards = (meta.cards as Array<{ index: number; imageUrl: string; caption: string; layout: string }>) || []
+
+  return c.json({
+    data: {
+      ...series,
+      cards: cards.sort((a, b) => a.index - b.index),
+    },
+  })
+})
+
+const updateCardSchema = z.object({
+  imageUrl: z.string().min(1).optional(),
+  caption: z.string().min(1).optional(),
+  layout: z.enum(['cover', 'content', 'closing']).optional(),
+})
+
+// PUT /api/workspace/sns/card-series/:id/cards/:index — 개별 카드 수정
+snsRoute.put('/sns/card-series/:id/cards/:index', zValidator('json', updateCardSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+  const cardIdx = parseInt(c.req.param('index'), 10)
+  if (Number.isNaN(cardIdx) || cardIdx < 0) {
+    throw new HTTPError(400, '유효하지 않은 카드 인덱스입니다', 'SNS_CARD_002')
+  }
+  const body = c.req.valid('json')
+
+  const [series] = await db
+    .select()
+    .from(snsContents)
+    .where(and(
+      eq(snsContents.id, id),
+      eq(snsContents.companyId, tenant.companyId),
+      eq(snsContents.isCardNews, true),
+    ))
+    .limit(1)
+
+  if (!series) throw new HTTPError(404, '카드뉴스 시리즈를 찾을 수 없습니다', 'SNS_CARD_001')
+  if (series.createdBy !== tenant.userId) throw new HTTPError(403, '본인만 수정할 수 있습니다', 'AUTH_003')
+  if (series.status !== 'draft' && series.status !== 'rejected') {
+    throw new HTTPError(400, '초안/반려 상태에서만 수정할 수 있습니다', 'SNS_002')
+  }
+
+  const meta = (series.metadata as Record<string, unknown>) || {}
+  const cards = [...((meta.cards as Array<Record<string, unknown>>) || [])]
+
+  const targetCard = cards.find((c) => (c.index as number) === cardIdx)
+  if (!targetCard) throw new HTTPError(404, `카드 ${cardIdx}을 찾을 수 없습니다`, 'SNS_CARD_002')
+
+  if (body.imageUrl) targetCard.imageUrl = body.imageUrl
+  if (body.caption) targetCard.caption = body.caption
+  if (body.layout) targetCard.layout = body.layout
+
+  const [updated] = await db
+    .update(snsContents)
+    .set({
+      metadata: { ...meta, cards },
+      // 첫 카드 이미지 변경 시 대표 이미지도 갱신
+      ...(cardIdx === 0 && body.imageUrl ? { imageUrl: body.imageUrl } : {}),
+      updatedAt: new Date(),
+    })
+    .where(eq(snsContents.id, id))
+    .returning()
+
+  return c.json({ data: { ...updated, cards } })
+})
+
+// DELETE /api/workspace/sns/card-series/:id — 시리즈 삭제 (draft만)
+snsRoute.delete('/sns/card-series/:id', async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+
+  const [series] = await db
+    .select({ id: snsContents.id, status: snsContents.status, createdBy: snsContents.createdBy })
+    .from(snsContents)
+    .where(and(
+      eq(snsContents.id, id),
+      eq(snsContents.companyId, tenant.companyId),
+      eq(snsContents.isCardNews, true),
+    ))
+    .limit(1)
+
+  if (!series) throw new HTTPError(404, '카드뉴스 시리즈를 찾을 수 없습니다', 'SNS_CARD_001')
+  if (series.createdBy !== tenant.userId) throw new HTTPError(403, '본인만 삭제할 수 있습니다', 'AUTH_003')
+  if (series.status !== 'draft') throw new HTTPError(400, '초안 상태에서만 삭제할 수 있습니다', 'SNS_002')
+
+  await db.delete(snsContents).where(eq(snsContents.id, id))
+
+  return c.json({ data: { deleted: true } })
+})
+
+const reorderCardsSchema = z.object({
+  order: z.array(z.number().int().min(0)).min(2).max(10),
+})
+
+// POST /api/workspace/sns/card-series/:id/reorder — 카드 순서 변경
+snsRoute.post('/sns/card-series/:id/reorder', zValidator('json', reorderCardsSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+  const { order } = c.req.valid('json')
+
+  const [series] = await db
+    .select()
+    .from(snsContents)
+    .where(and(
+      eq(snsContents.id, id),
+      eq(snsContents.companyId, tenant.companyId),
+      eq(snsContents.isCardNews, true),
+    ))
+    .limit(1)
+
+  if (!series) throw new HTTPError(404, '카드뉴스 시리즈를 찾을 수 없습니다', 'SNS_CARD_001')
+  if (series.status !== 'draft' && series.status !== 'rejected') {
+    throw new HTTPError(400, '초안/반려 상태에서만 순서를 변경할 수 있습니다', 'SNS_002')
+  }
+
+  const meta = (series.metadata as Record<string, unknown>) || {}
+  const cards = (meta.cards as Array<Record<string, unknown>>) || []
+
+  if (order.length !== cards.length) {
+    throw new HTTPError(400, `순서 배열 길이(${order.length})가 카드 수(${cards.length})와 다릅니다`, 'SNS_CARD_003')
+  }
+
+  // order 배열의 각 값은 기존 카드의 인덱스 → 새 순서대로 재배치
+  const reordered = order.map((oldIdx, newIdx) => {
+    const card = cards.find((c) => (c.index as number) === oldIdx)
+    if (!card) throw new HTTPError(400, `인덱스 ${oldIdx}의 카드를 찾을 수 없습니다`, 'SNS_CARD_002')
+    return { ...card, index: newIdx }
+  })
+
+  const firstCardImg = (reordered[0] as Record<string, unknown>)?.imageUrl as string | undefined
+
+  const [updated] = await db
+    .update(snsContents)
+    .set({
+      metadata: { ...meta, cards: reordered },
+      imageUrl: firstCardImg || series.imageUrl, // 첫 카드 이미지가 대표
+      updatedAt: new Date(),
+    })
+    .where(eq(snsContents.id, id))
+    .returning()
+
+  return c.json({ data: { ...updated, cards: reordered } })
+})
+
+// ==================== AI 카드뉴스 자동 생성 ====================
+
+const generateCardSeriesSchema = z.object({
+  platform: z.enum(SNS_PLATFORMS),
+  agentId: z.string().uuid(),
+  topic: z.string().min(1),
+  cardCount: z.number().int().min(3).max(10).default(5),
+  includeImages: z.boolean().default(true),
+})
+
+// POST /api/workspace/sns/card-series/generate — AI 카드뉴스 시리즈 자동 생성
+snsRoute.post('/sns/card-series/generate', zValidator('json', generateCardSeriesSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const { platform, agentId, topic, cardCount, includeImages } = c.req.valid('json')
+
+  // 에이전트 확인
+  const [agent] = await db
+    .select({ id: agents.id, name: agents.name })
+    .from(agents)
+    .where(and(eq(agents.id, agentId), eq(agents.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!agent) throw new HTTPError(404, '에이전트를 찾을 수 없습니다', 'AGENT_001')
+
+  // AI에게 카드뉴스 시리즈 구조 생성 요청
+  const prompt = `${PLATFORM_NAMES[platform]}용 카드뉴스 시리즈를 만들어주세요.
+
+주제: ${topic}
+총 카드 수: ${cardCount}장
+
+구조:
+- 1장: 커버 (볼드 제목 + 주요 메시지)
+- 2~${cardCount - 1}장: 내용 (핵심 포인트별)
+- ${cardCount}장: 클로징 (CTA + 요약)
+
+다음 JSON 형식으로 응답해주세요:
+{
+  "title": "시리즈 전체 제목",
+  "hashtags": "#태그1 #태그2",
+  "cards": [
+    { "caption": "카드 1 설명", "layout": "cover", "imagePrompt": "이미지 생성 프롬프트" },
+    { "caption": "카드 2 설명", "layout": "content", "imagePrompt": "이미지 생성 프롬프트" },
+    ...
+  ]
+}`
+
+  const aiResponse = await generateAgentResponse({
+    agentId,
+    sessionId: '',
+    companyId: tenant.companyId,
+    userMessage: prompt,
+    userId: tenant.userId,
+  })
+
+  // JSON 파싱 시도
+  let parsed: { title: string; hashtags?: string; cards: Array<{ caption: string; layout: string; imagePrompt?: string }> }
+  try {
+    const jsonMatch = aiResponse.match(/\{[\s\S]*\}/)
+    if (!jsonMatch) throw new Error('JSON not found')
+    parsed = JSON.parse(jsonMatch[0])
+  } catch {
+    // JSON 파싱 실패 시 기본 구조 생성
+    parsed = {
+      title: topic,
+      cards: Array.from({ length: cardCount }, (_, i) => ({
+        caption: i === 0 ? `${topic} - 커버` : i === cardCount - 1 ? `${topic} - 마무리` : `${topic} - 핵심 포인트 ${i}`,
+        layout: i === 0 ? 'cover' : i === cardCount - 1 ? 'closing' : 'content',
+        imagePrompt: `Card news slide ${i + 1} of ${cardCount} about "${topic}". Maintain consistent visual identity.`,
+      })),
+    }
+  }
+
+  // 이미지 생성 (선택적)
+  const cardsWithImages = await Promise.all(
+    parsed.cards.map(async (card, i) => {
+      let imageUrl = ''
+      if (includeImages && card.imagePrompt) {
+        const consistencyPrompt = `Slide ${i + 1} of ${parsed.cards.length}. IMPORTANT: Maintain consistent visual identity — same color palette, typography style, layout structure across ALL slides. ${card.imagePrompt}`
+        const imgResult = await generateSnsImage(consistencyPrompt, tenant.companyId)
+        imageUrl = imgResult.imageUrl || ''
+      }
+      return {
+        index: i,
+        imageUrl,
+        caption: card.caption,
+        layout: (card.layout as 'cover' | 'content' | 'closing') || 'content',
+      }
+    }),
+  )
+
+  // DB에 시리즈 루트 저장
+  const seriesBody = cardsWithImages.map((c) => c.caption).join('\n\n')
+
+  const [root] = await db
+    .insert(snsContents)
+    .values({
+      companyId: tenant.companyId,
+      agentId,
+      createdBy: tenant.userId,
+      platform,
+      title: parsed.title || topic,
+      body: seriesBody,
+      hashtags: parsed.hashtags || null,
+      imageUrl: cardsWithImages[0]?.imageUrl || null,
+      isCardNews: true,
+      cardIndex: null,
+      status: 'draft',
+      metadata: {
+        cards: cardsWithImages,
+        totalCards: cardsWithImages.length,
+        seriesTitle: parsed.title || topic,
+      },
+    })
+    .returning()
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'sns',
+    phase: 'end',
+    actorType: 'agent',
+    actorId: agentId,
+    actorName: agent.name,
+    action: `AI 카드뉴스 시리즈 생성 (${platform}, ${cardsWithImages.length}장)`,
+    detail: parsed.title || topic,
+  })
+
+  return c.json({ data: { ...root, cards: cardsWithImages } }, 201)
+})
+
+// ==================== 카드뉴스 시리즈 승인 플로우 ====================
+
+// POST /api/workspace/sns/card-series/:id/submit — 시리즈 전체 승인 요청
+snsRoute.post('/sns/card-series/:id/submit', async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+
+  const [series] = await db
+    .select({ id: snsContents.id, status: snsContents.status, title: snsContents.title })
+    .from(snsContents)
+    .where(and(
+      eq(snsContents.id, id),
+      eq(snsContents.companyId, tenant.companyId),
+      eq(snsContents.isCardNews, true),
+    ))
+    .limit(1)
+
+  if (!series) throw new HTTPError(404, '카드뉴스 시리즈를 찾을 수 없습니다', 'SNS_CARD_001')
+  if (series.status !== 'draft' && series.status !== 'rejected') {
+    throw new HTTPError(400, '초안/반려 상태에서만 승인 요청할 수 있습니다', 'SNS_002')
+  }
+
+  const [updated] = await db
+    .update(snsContents)
+    .set({ status: 'pending', updatedAt: new Date() })
+    .where(eq(snsContents.id, id))
+    .returning()
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'sns',
+    phase: 'end',
+    actorType: 'user',
+    actorId: tenant.userId,
+    action: '카드뉴스 시리즈 승인 요청',
+    detail: series.title,
+  })
+
+  return c.json({ data: updated })
+})
+
+// POST /api/workspace/sns/card-series/:id/approve — 시리즈 전체 승인
+snsRoute.post('/sns/card-series/:id/approve', async (c) => {
+  const tenant = c.get('tenant')
+  if (!isCeoOrAbove(tenant.role)) throw new HTTPError(403, '관리자만 승인할 수 있습니다', 'AUTH_003')
+
+  const id = c.req.param('id')
+
+  const [series] = await db
+    .select({ id: snsContents.id, status: snsContents.status, title: snsContents.title, scheduledAt: snsContents.scheduledAt })
+    .from(snsContents)
+    .where(and(
+      eq(snsContents.id, id),
+      eq(snsContents.companyId, tenant.companyId),
+      eq(snsContents.isCardNews, true),
+    ))
+    .limit(1)
+
+  if (!series) throw new HTTPError(404, '카드뉴스 시리즈를 찾을 수 없습니다', 'SNS_CARD_001')
+  if (series.status !== 'pending') throw new HTTPError(400, '승인 요청 상태에서만 승인할 수 있습니다', 'SNS_003')
+
+  const newStatus = series.scheduledAt && series.scheduledAt > new Date() ? 'scheduled' : 'approved'
+
+  const [updated] = await db
+    .update(snsContents)
+    .set({
+      status: newStatus,
+      reviewedBy: tenant.userId,
+      reviewedAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(eq(snsContents.id, id))
+    .returning()
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'sns',
+    phase: 'end',
+    actorType: 'user',
+    actorId: tenant.userId,
+    action: newStatus === 'scheduled' ? '카드뉴스 시리즈 예약 승인' : '카드뉴스 시리즈 승인',
+    detail: series.title,
+  })
+
+  return c.json({ data: updated })
+})
+
+// POST /api/workspace/sns/card-series/:id/reject — 시리즈 전체 반려
+snsRoute.post('/sns/card-series/:id/reject', zValidator('json', rejectSchema), async (c) => {
+  const tenant = c.get('tenant')
+  if (!isCeoOrAbove(tenant.role)) throw new HTTPError(403, '관리자만 반려할 수 있습니다', 'AUTH_003')
+
+  const id = c.req.param('id')
+  const { reason } = c.req.valid('json')
+
+  const [series] = await db
+    .select({ id: snsContents.id, status: snsContents.status, title: snsContents.title })
+    .from(snsContents)
+    .where(and(
+      eq(snsContents.id, id),
+      eq(snsContents.companyId, tenant.companyId),
+      eq(snsContents.isCardNews, true),
+    ))
+    .limit(1)
+
+  if (!series) throw new HTTPError(404, '카드뉴스 시리즈를 찾을 수 없습니다', 'SNS_CARD_001')
+  if (series.status !== 'pending') throw new HTTPError(400, '승인 요청 상태에서만 반려할 수 있습니다', 'SNS_003')
+
+  const [updated] = await db
+    .update(snsContents)
+    .set({
+      status: 'rejected',
+      reviewedBy: tenant.userId,
+      reviewedAt: new Date(),
+      rejectReason: reason,
+      updatedAt: new Date(),
+    })
+    .where(eq(snsContents.id, id))
+    .returning()
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'sns',
+    phase: 'end',
+    actorType: 'user',
+    actorId: tenant.userId,
+    action: '카드뉴스 시리즈 반려',
+    detail: `${series.title} — 사유: ${reason}`,
+  })
+
+  return c.json({ data: updated })
 })

@@ -816,3 +816,122 @@ export type VectorExecutionResult = {
   orders: VectorOrderResult[]
   totalDurationMs: number
 }
+
+// === Trading Settings & Risk Control (Epic 10 Story 5) ===
+
+export type RiskProfile = 'conservative' | 'balanced' | 'aggressive'
+export type ExecutionMode = 'autonomous' | 'approval'
+
+export type RiskRange = { min: number; max: number; default: number }
+
+export type RiskProfileConfig = {
+  label: string
+  emoji: string
+  cashReserve: RiskRange
+  maxPositionPct: RiskRange
+  minConfidence: RiskRange
+  defaultStopLoss: RiskRange
+  defaultTakeProfit: RiskRange
+  maxDailyTrades: RiskRange
+  maxDailyLossPct: RiskRange
+  orderSize: RiskRange
+}
+
+export type TradingSettings = {
+  executionMode: ExecutionMode
+  riskProfile: RiskProfile
+  customSettings: {
+    maxPositionPct?: number
+    minConfidence?: number
+    defaultStopLoss?: number
+    defaultTakeProfit?: number
+    maxDailyTrades?: number
+    maxDailyLossPct?: number
+    orderSize?: number
+  }
+  settingsHistory: Array<{
+    changedAt: string
+    changedBy: string
+    action: string
+    detail: string
+    applied: Record<string, unknown>
+    rejected: Record<string, unknown>
+  }>
+}
+
+export type TradeApprovalAction = 'approve' | 'reject'
+
+export type TradeApprovalResult = {
+  orderId: string
+  action: TradeApprovalAction
+  success: boolean
+  message?: string
+  kisOrderNo?: string
+}
+
+// === Archive / Classified Docs (Epic 17 Story 3) ===
+
+export type Classification = 'public' | 'internal' | 'confidential' | 'secret'
+
+export type ArchiveItem = {
+  id: string
+  title: string
+  classification: Classification
+  summary: string | null
+  tags: string[]
+  folderId: string | null
+  folderName: string | null
+  agentName: string | null
+  departmentName: string | null
+  qualityScore: number | null
+  commandType: string | null
+  createdAt: string
+}
+
+export type ArchiveDetail = ArchiveItem & {
+  content: string | null
+  commandId: string
+  commandText: string | null
+  delegationChain: {
+    id: string
+    agentId: string
+    agentName: string | null
+    type: string
+    status: string
+    durationMs: number | null
+  }[]
+  qualityReview: {
+    id: string
+    conclusion: string
+    scores: Record<string, number>
+    feedback: string | null
+    attemptNumber: number
+  } | null
+  similarDocuments: SimilarDocument[]
+}
+
+export type SimilarDocument = {
+  id: string
+  title: string
+  classification: Classification
+  summary: string | null
+  agentName: string | null
+  qualityScore: number | null
+  similarityScore: number
+  createdAt: string | Date
+}
+
+export type ArchiveFolder = {
+  id: string
+  name: string
+  parentId: string | null
+  children: ArchiveFolder[]
+  documentCount: number
+}
+
+export type ArchiveStats = {
+  totalDocuments: number
+  byClassification: Record<Classification, number>
+  byDepartment: { departmentId: string; departmentName: string; count: number }[]
+  recentWeekCount: number
+}

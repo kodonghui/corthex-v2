@@ -12,6 +12,8 @@ export interface PublishInput {
   body: string
   hashtags: string | null
   imageUrl: string | null
+  /** 카드뉴스 이미지 URL 배열 (캐러셀용) */
+  mediaUrls?: string[]
 }
 
 export interface PublishResult {

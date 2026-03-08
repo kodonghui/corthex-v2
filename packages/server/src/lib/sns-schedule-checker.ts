@@ -4,7 +4,7 @@
 
 import { db } from '../db'
 import { snsContents, snsAccounts } from '../db/schema'
-import { eq, and, lte } from 'drizzle-orm'
+import { eq, and, lte, isNull, asc, desc } from 'drizzle-orm'
 import { publishContent } from './sns-publisher'
 import { logActivity } from './activity-logger'
 import { decrypt } from './crypto'
@@ -17,6 +17,7 @@ export async function checkScheduledSns() {
   try {
     const now = new Date()
 
+    // 카드뉴스 개별 카드는 제외 (시리즈 루트만 발행 대상)
     const duePosts = await db
       .select({
         id: snsContents.id,
@@ -28,6 +29,8 @@ export async function checkScheduledSns() {
         imageUrl: snsContents.imageUrl,
         status: snsContents.status,
         snsAccountId: snsContents.snsAccountId,
+        isCardNews: snsContents.isCardNews,
+        metadata: snsContents.metadata,
         accountName: snsAccounts.accountName,
         accountIdStr: snsAccounts.accountId,
         accountCredentials: snsAccounts.credentials,
@@ -38,8 +41,10 @@ export async function checkScheduledSns() {
         and(
           eq(snsContents.status, 'scheduled'),
           lte(snsContents.scheduledAt, now),
+          isNull(snsContents.cardSeriesId), // 개별 카드는 제외, 루트만 대상
         ),
       )
+      .orderBy(asc(snsContents.scheduledAt), desc(snsContents.priority))
       .limit(20)
 
     for (const post of duePosts) {
@@ -63,6 +68,15 @@ export async function checkScheduledSns() {
           accountInfo = { accountId: post.accountIdStr || '', accountName: post.accountName, credentials: creds }
         }
 
+        // 카드뉴스 시리즈인 경우 이미지 URL 배열 수집
+        let mediaUrls: string[] | undefined
+        if (post.isCardNews) {
+          const meta = (post.metadata as Record<string, unknown>) || {}
+          const cards = (meta.cards as Array<{ imageUrl?: string }>) || []
+          const urls = cards.map((c) => c.imageUrl).filter((u): u is string => !!u)
+          if (urls.length > 0) mediaUrls = urls
+        }
+
         const result = await publishContent({
           id: post.id,
           platform: post.platform,
@@ -71,6 +85,7 @@ export async function checkScheduledSns() {
           hashtags: post.hashtags,
           imageUrl: post.imageUrl,
           account: accountInfo,
+          mediaUrls,
         })
 
         await db

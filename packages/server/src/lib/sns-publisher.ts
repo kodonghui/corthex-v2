@@ -18,6 +18,8 @@ type SnsContentInput = {
   body: string
   hashtags: string | null
   imageUrl: string | null
+  account?: { accountId: string; accountName: string; credentials: Record<string, string> | null } | null
+  mediaUrls?: string[]
 }
 
 type PublishResultLegacy = {
@@ -52,9 +54,11 @@ export async function publishContent(content: SnsContentInput): Promise<PublishR
     body: content.body,
     hashtags: content.hashtags,
     imageUrl: content.imageUrl,
+    mediaUrls: content.mediaUrls,
   }
 
-  const result = await publisher.publish(input, {})
+  const credentials = content.account?.credentials || {}
+  const result = await publisher.publish(input, credentials)
 
   if (!result.success) {
     throw new Error(result.error || '발행 실패')
