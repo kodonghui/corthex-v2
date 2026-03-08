@@ -3,6 +3,7 @@ import { calculateCostMicro } from '../lib/cost-tracker'
 import { checkToolPermission, hasWildcard } from './tool-permission-guard'
 import { filterOutput } from './output-filter'
 import { createAuditLog, AUDIT_ACTIONS } from './audit-log'
+import { collectKnowledgeContext, collectAgentMemoryContext } from './knowledge-injector'
 import type { LLMRouterContext } from './llm-router'
 import type {
   LLMRequest,
@@ -31,6 +32,7 @@ export type AgentConfig = {
   soul: string | null
   allowedTools: string[]
   isActive: boolean
+  departmentId?: string | null
 }
 
 export type ToolDefinitionProvider = (allowedTools: string[]) => LLMToolDefinition[]
@@ -147,6 +149,20 @@ export class AgentRunner {
     if (task.context) {
       finalSystemPrompt += `\n\n## Additional Context\n\n${task.context}`
       scanForCredentials(task.context)
+    }
+
+    // Auto-inject department knowledge and agent memories
+    if (agent.departmentId) {
+      const knowledgeCtx = await collectKnowledgeContext(agent.companyId, agent.id, agent.departmentId)
+      if (knowledgeCtx) {
+        finalSystemPrompt += `\n\n## Department Knowledge\n\n${knowledgeCtx}`
+        scanForCredentials(knowledgeCtx)
+      }
+    }
+    const memoryCtx = await collectAgentMemoryContext(agent.companyId, agent.id)
+    if (memoryCtx) {
+      finalSystemPrompt += `\n\n## Agent Memories\n\n${memoryCtx}`
+      scanForCredentials(memoryCtx)
     }
 
     const messages: LLMMessage[] = [...task.messages]
@@ -269,6 +285,20 @@ export class AgentRunner {
     if (task.context) {
       finalSystemPrompt += `\n\n## Additional Context\n\n${task.context}`
       scanForCredentials(task.context)
+    }
+
+    // Auto-inject department knowledge and agent memories
+    if (agent.departmentId) {
+      const knowledgeCtx = await collectKnowledgeContext(agent.companyId, agent.id, agent.departmentId)
+      if (knowledgeCtx) {
+        finalSystemPrompt += `\n\n## Department Knowledge\n\n${knowledgeCtx}`
+        scanForCredentials(knowledgeCtx)
+      }
+    }
+    const memoryCtx = await collectAgentMemoryContext(agent.companyId, agent.id)
+    if (memoryCtx) {
+      finalSystemPrompt += `\n\n## Agent Memories\n\n${memoryCtx}`
+      scanForCredentials(memoryCtx)
     }
 
     const messages: LLMMessage[] = [...task.messages]

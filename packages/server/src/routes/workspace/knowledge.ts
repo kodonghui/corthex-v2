@@ -7,6 +7,7 @@ import { knowledgeFolders, knowledgeDocs, docVersions, agentMemories, agents } f
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { KNOWLEDGE_TEMPLATES } from '../../lib/knowledge-templates'
+import { clearKnowledgeCache, getInjectionPreview } from '../../services/knowledge-injector'
 import type { AppEnv } from '../../types'
 import { join } from 'path'
 import { existsSync, mkdirSync } from 'fs'
@@ -14,6 +15,18 @@ import { existsSync, mkdirSync } from 'fs'
 export const knowledgeRoute = new Hono<AppEnv>()
 
 knowledgeRoute.use('*', authMiddleware)
+
+// Invalidate knowledge injection cache on any mutation
+knowledgeRoute.use('*', async (c, next) => {
+  await next()
+  const method = c.req.method
+  if (method === 'POST' || method === 'PATCH' || method === 'DELETE') {
+    const tenant = c.get('tenant')
+    if (tenant?.companyId) {
+      clearKnowledgeCache(tenant.companyId)
+    }
+  }
+})
 
 // ── Zod Schemas ──
 
@@ -35,7 +48,7 @@ const createDocSchema = z.object({
   folderId: z.string().uuid().nullable().optional(),
   title: z.string().min(1).max(500),
   content: z.string().optional(),
-  contentType: z.enum(['markdown', 'text', 'html']).default('markdown'),
+  contentType: z.enum(['markdown', 'text', 'html', 'mermaid']).default('markdown'),
   fileUrl: z.string().max(2000).optional(),
   tags: z.array(z.string().max(100)).max(20).default([]),
 })
@@ -43,7 +56,7 @@ const createDocSchema = z.object({
 const updateDocSchema = z.object({
   title: z.string().min(1).max(500).optional(),
   content: z.string().optional(),
-  contentType: z.enum(['markdown', 'text', 'html']).optional(),
+  contentType: z.enum(['markdown', 'text', 'html', 'mermaid']).optional(),
   fileUrl: z.string().max(2000).nullable().optional(),
   tags: z.array(z.string().max(100)).max(20).optional(),
   folderId: z.string().uuid().nullable().optional(),
@@ -320,6 +333,7 @@ knowledgeRoute.post('/docs', zValidator('json', createDocSchema), async (c) => {
 knowledgeRoute.get('/docs', async (c) => {
   const tenant = c.get('tenant')
   const folderId = c.req.query('folderId')
+  const contentTypeFilter = c.req.query('contentType')
   const q = c.req.query('q')
   const tagsParam = c.req.query('tags')
   const page = Math.max(1, Number(c.req.query('page')) || 1)
@@ -330,6 +344,10 @@ knowledgeRoute.get('/docs', async (c) => {
     eq(knowledgeDocs.companyId, tenant.companyId),
     eq(knowledgeDocs.isActive, true),
   ]
+
+  if (contentTypeFilter) {
+    conditions.push(eq(knowledgeDocs.contentType, contentTypeFilter))
+  }
 
   if (folderId === 'null' || folderId === 'root') {
     conditions.push(isNull(knowledgeDocs.folderId))
@@ -1349,4 +1367,25 @@ knowledgeRoute.post('/memories/:id/used', async (c) => {
     .returning()
 
   return c.json({ data: updated })
+})
+
+// ── Injection Preview ──
+
+knowledgeRoute.get('/injection-preview/:agentId', async (c) => {
+  const tenant = c.get('tenant')
+  const agentId = c.req.param('agentId')
+
+  // Fetch agent to get departmentId
+  const [agent] = await db
+    .select({ id: agents.id, departmentId: agents.departmentId })
+    .from(agents)
+    .where(and(eq(agents.id, agentId), eq(agents.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!agent) {
+    throw new HTTPError(404, '에이전트를 찾을 수 없습니다')
+  }
+
+  const preview = await getInjectionPreview(tenant.companyId, agentId, agent.departmentId)
+  return c.json({ data: preview })
 })

@@ -40,6 +40,13 @@ mock.module('../../db/schema', () => ({
   commands: { id: 'id', companyId: 'company_id' },
 }))
 
+mock.module('../../services/knowledge-injector', () => ({
+  collectKnowledgeContext: mock(() => Promise.resolve(null)),
+  collectAgentMemoryContext: mock(() => Promise.resolve(null)),
+  clearKnowledgeCache: mock(() => {}),
+  clearAllCache: mock(() => {}),
+}))
+
 // === Test Helpers ===
 
 const testAgent: AgentConfig = {

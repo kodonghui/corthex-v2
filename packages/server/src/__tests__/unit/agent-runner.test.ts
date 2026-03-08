@@ -32,6 +32,17 @@ mock.module('../../lib/cost-tracker', () => ({
   recordCost: mock(() => Promise.resolve()),
 }))
 
+// Mock knowledge-injector (auto-injection returns null by default in tests)
+const mockCollectKnowledge = mock(() => Promise.resolve(null))
+const mockCollectMemory = mock(() => Promise.resolve(null))
+
+mock.module('../../services/knowledge-injector', () => ({
+  collectKnowledgeContext: mockCollectKnowledge,
+  collectAgentMemoryContext: mockCollectMemory,
+  clearKnowledgeCache: mock(() => {}),
+  clearAllCache: mock(() => {}),
+}))
+
 import {
   AgentRunner,
   buildSystemPrompt,
