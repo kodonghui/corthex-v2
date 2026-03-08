@@ -23,6 +23,7 @@ const navSections: NavSection[] = [
     items: [
       { to: '/chat', label: '채팅', icon: '💬' },
       { to: '/trading', label: '전략실', icon: '📈' },
+      { to: '/agora', label: 'AGORA 토론', icon: '🗣️' },
       { to: '/jobs', label: '야간작업', icon: '🌙' },
       { to: '/reports', label: '보고서', icon: '📄' },
       { to: '/files', label: '파일', icon: '📁' },
@@ -38,6 +39,7 @@ const navSections: NavSection[] = [
       { to: '/costs', label: '비용 분석', icon: '💰' },
       { to: '/activity-log', label: '통신로그', icon: '📞' },
       { to: '/ops-log', label: '작전일지', icon: '📋' },
+      { to: '/cron', label: '크론기지', icon: '⏰' },
       { to: '/nexus', label: 'NEXUS', icon: '🔗' },
     ],
   },
