@@ -8,7 +8,8 @@ import { broadcastToChannel } from '../../ws/channels'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { getCredentials } from '../../services/credential-vault'
-import { getKisToken, kisHeaders, KIS_BASE_URL } from '../../lib/tool-handlers/builtins/kis-auth'
+import { getKisToken, kisHeaders, KIS_BASE_URL, getKisBaseUrl } from '../../lib/tool-handlers/builtins/kis-auth'
+import { executeOrder, getBalance, syncOrderStatus, getOverseasPrice } from '../../services/kis-adapter'
 import type { AppEnv } from '../../types'
 
 export const strategyRoute = new Hono<AppEnv>()
@@ -1118,3 +1119,117 @@ strategyRoute.get(
 )
 
 // NOTE: DELETE endpoint intentionally omitted — FR62 requires permanent order preservation
+
+// ===============================================
+// === KIS API 어댑터 라우트 (E10-S2) ===
+// ===============================================
+
+const executeOrderSchema = z.object({
+  portfolioId: z.string().uuid().optional(),
+  ticker: z.string().min(1).max(20),
+  tickerName: z.string().min(1).max(100),
+  side: z.enum(['buy', 'sell']),
+  quantity: z.number().int().min(1),
+  price: z.number().min(0).default(0),
+  orderType: z.enum(['market', 'limit']).default('market'),
+  tradingMode: z.enum(['real', 'paper']).default('paper'),
+  market: z.enum(['KR', 'US']).default('KR'),
+  exchange: z.enum(['NASD', 'NASDAQ', 'NYSE', 'AMEX']).optional(),
+  reason: z.string().max(500).optional(),
+})
+
+// POST /api/workspace/strategy/execute-order — KIS 주문 실행
+strategyRoute.post('/execute-order', zValidator('json', executeOrderSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const body = c.req.valid('json')
+
+  // Validate portfolioId belongs to tenant
+  if (body.portfolioId) {
+    const [portfolio] = await db
+      .select({ id: strategyPortfolios.id })
+      .from(strategyPortfolios)
+      .where(and(
+        eq(strategyPortfolios.id, body.portfolioId),
+        eq(strategyPortfolios.companyId, tenant.companyId),
+        eq(strategyPortfolios.userId, tenant.userId),
+      ))
+      .limit(1)
+    if (!portfolio) throw new HTTPError(404, '포트폴리오를 찾을 수 없습니다', 'STRATEGY_200')
+  }
+
+  const result = await executeOrder({
+    companyId: tenant.companyId,
+    userId: tenant.userId,
+    portfolioId: body.portfolioId,
+    ticker: body.ticker,
+    tickerName: body.tickerName,
+    side: body.side,
+    quantity: body.quantity,
+    price: body.price,
+    orderType: body.orderType,
+    tradingMode: body.tradingMode,
+    market: body.market,
+    exchange: body.exchange,
+    reason: body.reason,
+  })
+
+  const statusCode = result.success ? 201 : 400
+  return c.json({ data: result }, statusCode)
+})
+
+// GET /api/workspace/strategy/balance — KIS 계좌 잔고 조회
+strategyRoute.get(
+  '/balance',
+  zValidator('query', z.object({ tradingMode: z.enum(['real', 'paper']).default('paper') })),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const { tradingMode } = c.req.valid('query')
+
+    const result = await getBalance(tenant.companyId, tenant.userId, tradingMode)
+
+    if (!result.success) {
+      throw new HTTPError(502, result.error || 'KIS 잔고 조회 실패', 'STRATEGY_201')
+    }
+
+    return c.json({ data: result })
+  },
+)
+
+// GET /api/workspace/strategy/order-status/:id — 주문 상태 동기화
+strategyRoute.get(
+  '/order-status/:id',
+  zValidator('param', z.object({ id: z.string().uuid() })),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const { id } = c.req.valid('param')
+
+    const result = await syncOrderStatus(tenant.companyId, tenant.userId, id)
+
+    if (!result.success) {
+      throw new HTTPError(502, result.message, 'STRATEGY_202')
+    }
+
+    return c.json({ data: result })
+  },
+)
+
+// GET /api/workspace/strategy/overseas-price — 해외 주식 시세 조회
+strategyRoute.get(
+  '/overseas-price',
+  zValidator('query', z.object({
+    symbol: z.string().min(1).max(20),
+    exchange: z.string().max(10).default('NASD'),
+  })),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const { symbol, exchange } = c.req.valid('query')
+
+    const result = await getOverseasPrice(tenant.companyId, tenant.userId, symbol, exchange)
+
+    if (!result.success) {
+      throw new HTTPError(502, result.error || '해외 시세 조회 실패', 'STRATEGY_203')
+    }
+
+    return c.json({ data: result.data })
+  },
+)

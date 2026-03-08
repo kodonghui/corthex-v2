@@ -160,6 +160,25 @@ mock.module('../../lib/tool-handlers/builtins/kis-auth', () => ({
   getKisToken: mock(async () => 'test_token'),
   kisHeaders: mock(() => ({})),
   KIS_BASE_URL: 'https://openapi.koreainvestment.com:9443',
+  KIS_BASE_REAL: 'https://openapi.koreainvestment.com:9443',
+  KIS_BASE_PAPER: 'https://openapivts.koreainvestment.com:29443',
+  getKisBaseUrl: mock((mode: string) => mode === 'paper' ? 'https://openapivts.koreainvestment.com:29443' : 'https://openapi.koreainvestment.com:9443'),
+  invalidateKisToken: mock(() => {}),
+  KIS_TR_IDS: {
+    domestic: { real: { buy: 'TTTC0012U', sell: 'TTTC0011U', balance: 'TTTC8434R' }, paper: { buy: 'VTTC0012U', sell: 'VTTC0011U', balance: 'VTTC8434R' } },
+    overseas: { real: { buy: 'TTTT1002U', sell: 'TTTT1006U', balance: 'TTTS3012R', price: 'HHDFS00000300' }, paper: { buy: 'VTTT1002U', sell: 'VTTT1006U', balance: 'VTTS3012R', price: 'HHDFS00000300' } },
+    price: { domestic: 'FHKST01010100', domesticDaily: 'FHKST03010100', overseas: 'HHDFS00000300' },
+  },
+  EXCHANGE_CODES: { order: { NASDAQ: 'NASD', NYSE: 'NYSE', AMEX: 'AMEX', NASD: 'NASD' }, price: { NASD: 'NAS', NYSE: 'NYS', AMEX: 'AMS' } },
+}))
+
+mock.module('../../services/kis-adapter', () => ({
+  executeOrder: mock(async () => ({ success: true, orderId: 'test', message: 'ok', side: 'buy', ticker: '005930', quantity: 10, price: 50000, status: 'submitted' })),
+  getBalance: mock(async () => ({ success: true, cash: 10000000, holdings: [], totalEval: 10000000, mode: 'paper' })),
+  syncOrderStatus: mock(async () => ({ success: true, status: 'executed', message: '체결 완료' })),
+  getOverseasPrice: mock(async () => ({ success: true, data: { symbol: 'AAPL', price: 150 } })),
+  isKoreanMarketOpen: mock(() => true),
+  isUSMarketOpen: mock(() => true),
 }))
 
 // ============================================================

@@ -228,7 +228,7 @@ development_status:
   # ============================================================
   epic-10: in-progress
   10-1-strategy-schema-watchlist-portfolio-orders: done
-  10-2-kis-securities-api-adapter: review
+  10-2-kis-securities-api-adapter: done
   10-3-finance-tools-5-implementation: backlog
   10-4-cio-vector-separation-orchestration: backlog
   10-5-autonomous-approval-execution-risk-control: backlog
@@ -246,7 +246,7 @@ development_status:
   epic-11: in-progress
   11-1-agora-engine-round-management-consensus: done
   11-2-debate-deep-debate-command-integration: done
-  11-3-websocket-debate-channel-streaming: backlog
+  11-3-websocket-debate-channel-streaming: in-progress
   11-4-agora-ui-round-timeline-speech-cards: backlog
   11-5-diff-view-debate-result-insertion: backlog
   epic-11-retrospective: optional
@@ -274,7 +274,7 @@ development_status:
   epic-13: in-progress
   13-1-cytoscape-canvas-8-node-types-connection: done
   13-2-mermaid-cytoscape-bidirectional-conversion: done
-  13-3-mcp-sse-ai-realtime-canvas-manipulation: backlog
+  13-3-mcp-sse-ai-realtime-canvas-manipulation: in-progress
   13-4-save-load-knowledge-base-integration: backlog
   13-5-sketchvibe-ui-integration-command-center: backlog
   epic-13-retrospective: optional
@@ -313,7 +313,7 @@ development_status:
   # ============================================================
   epic-16: in-progress
   16-1-knowledge-schema-docs-memories: done
-  16-2-document-store-crud-api-folder-management: backlog
+  16-2-document-store-crud-api-folder-management: in-progress
   16-3-department-knowledge-auto-injection: backlog
   16-4-agent-memory-auto-learning-extraction: backlog
   16-5-knowledge-ui-drag-drop-upload: backlog
@@ -328,7 +328,7 @@ development_status:
   # ============================================================
   epic-17: in-progress
   17-1-operation-log-api-search-filter-bookmark: review
-  17-2-operation-log-ui-ab-compare-replay: backlog
+  17-2-operation-log-ui-ab-compare-replay: in-progress
   17-3-classified-docs-api-archive-filter-similar: backlog
   17-4-classified-docs-ui: backlog
   17-5-performance-analysis-api-soul-gym: backlog
