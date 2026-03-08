@@ -23,6 +23,16 @@ export const commandTypeEnum = pgEnum('command_type', ['direct', 'mention', 'sla
 export const orchestrationTaskStatusEnum = pgEnum('orchestration_task_status', ['pending', 'running', 'completed', 'failed', 'timeout'])
 export const qualityResultEnum = pgEnum('quality_result', ['pass', 'fail'])
 
+// === Phase 2 New Enums (Epic 10 Story 1) ===
+export const tradingModeEnum = pgEnum('trading_mode', ['real', 'paper'])
+export const orderSideEnum = pgEnum('order_side', ['buy', 'sell'])
+export const orderStatusEnum = pgEnum('order_status', ['pending', 'submitted', 'executed', 'cancelled', 'rejected', 'failed'])
+export const orderTypeEnum = pgEnum('order_type', ['market', 'limit'])
+export const cronRunStatusEnum = pgEnum('cron_run_status', ['running', 'success', 'failed'])
+export const debateStatusEnum = pgEnum('debate_status', ['pending', 'in-progress', 'completed', 'failed'])
+export const debateTypeEnum = pgEnum('debate_type', ['debate', 'deep-debate'])
+export const consensusResultEnum = pgEnum('consensus_result', ['consensus', 'dissent', 'partial'])
+
 // === 1. companies — 회사 (테넌트 최상위 단위) ===
 export const companies = pgTable('companies', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -378,9 +388,11 @@ export const nightJobSchedules = pgTable('night_job_schedules', {
   companyId: uuid('company_id').notNull().references(() => companies.id),
   userId: uuid('user_id').notNull().references(() => users.id),
   agentId: uuid('agent_id').notNull().references(() => agents.id),
+  name: varchar('name', { length: 200 }).notNull(),
   instruction: text('instruction').notNull(),
   cronExpression: varchar('cron_expression', { length: 100 }).notNull(),
   nextRunAt: timestamp('next_run_at'),
+  lastRunAt: timestamp('last_run_at'),
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
@@ -402,6 +414,27 @@ export const nightJobTriggers = pgTable('night_job_triggers', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 }, (table) => ({
   companyIdx: index('night_triggers_company_idx').on(table.companyId),
+}))
+
+// === 18d. cron_runs — 크론 작업 실행 기록 ===
+export const cronRuns = pgTable('cron_runs', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  cronJobId: uuid('cron_job_id').notNull().references(() => nightJobSchedules.id, { onDelete: 'cascade' }),
+  status: cronRunStatusEnum('status').notNull().default('running'),
+  commandText: text('command_text').notNull(),
+  startedAt: timestamp('started_at').notNull().defaultNow(),
+  completedAt: timestamp('completed_at'),
+  result: text('result'),
+  error: text('error'),
+  durationMs: integer('duration_ms'),
+  tokensUsed: integer('tokens_used'),
+  costMicro: integer('cost_micro'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('cron_runs_company_idx').on(table.companyId),
+  cronJobIdx: index('cron_runs_cron_job_idx').on(table.cronJobId),
+  statusIdx: index('cron_runs_status_idx').on(table.status),
 }))
 
 // === 19a. sns_accounts — SNS 계정 (멀티 계정 관리) ===
@@ -631,6 +664,51 @@ export const strategyBacktestResults = pgTable('strategy_backtest_results', {
   userStockIdx: index('strategy_backtest_user_stock_idx').on(table.companyId, table.userId, table.stockCode),
 }))
 
+// === 28c. strategy_portfolios — 투자 포트폴리오 ===
+export const strategyPortfolios = pgTable('strategy_portfolios', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  name: varchar('name', { length: 100 }).notNull(),
+  tradingMode: tradingModeEnum('trading_mode').notNull().default('paper'),
+  initialCash: integer('initial_cash').notNull().default(50_000_000),
+  cashBalance: integer('cash_balance').notNull().default(50_000_000),
+  holdings: jsonb('holdings').$type<Array<{ ticker: string; name: string; market: string; quantity: number; avgPrice: number; currentPrice?: number }>>().notNull().default([]),
+  totalValue: integer('total_value').notNull().default(50_000_000),
+  memo: text('memo'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  companyUserIdx: index('strategy_portfolios_company_user_idx').on(table.companyId, table.userId),
+  companyModeIdx: index('strategy_portfolios_company_mode_idx').on(table.companyId, table.userId, table.tradingMode),
+}))
+
+// === 28d. strategy_orders — 매매 주문 (영구 보존, DELETE 금지 FR62) ===
+export const strategyOrders = pgTable('strategy_orders', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  portfolioId: uuid('portfolio_id').references(() => strategyPortfolios.id),
+  agentId: uuid('agent_id').references(() => agents.id),
+  ticker: varchar('ticker', { length: 20 }).notNull(),
+  tickerName: varchar('ticker_name', { length: 100 }).notNull(),
+  side: orderSideEnum('side').notNull(),
+  quantity: integer('quantity').notNull(),
+  price: integer('price').notNull(),
+  totalAmount: integer('total_amount').notNull(),
+  orderType: orderTypeEnum('order_type').notNull().default('market'),
+  tradingMode: tradingModeEnum('trading_mode').notNull().default('paper'),
+  status: orderStatusEnum('status').notNull().default('pending'),
+  reason: text('reason'),
+  kisOrderNo: varchar('kis_order_no', { length: 50 }),
+  executedAt: timestamp('executed_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  companyCreatedIdx: index('strategy_orders_company_created_idx').on(table.companyId, table.createdAt),
+  companyTickerIdx: index('strategy_orders_company_ticker_idx').on(table.companyId, table.ticker),
+  companyModeStatusIdx: index('strategy_orders_company_mode_status_idx').on(table.companyId, table.tradingMode, table.status),
+}))
+
 // === 29. agent_delegation_rules — 에이전트 위임 규칙 ===
 export const agentDelegationRules = pgTable('agent_delegation_rules', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -726,6 +804,20 @@ export const mcpServers = pgTable('mcp_servers', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })
+
+// === 35. sketches — SketchVibe 캔버스 다이어그램 ===
+export const sketches = pgTable('sketches', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  name: varchar('name', { length: 200 }).notNull(),
+  graphData: jsonb('graph_data').notNull().default('{"nodes":[],"edges":[]}'),
+  createdBy: uuid('created_by').notNull().references(() => users.id),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('sketches_company_idx').on(table.companyId),
+  createdByIdx: index('sketches_created_by_idx').on(table.createdBy),
+}))
 
 // === Phase 1 New Tables (Epic 1 Story 1) ===
 
@@ -945,6 +1037,12 @@ export const nightJobSchedulesRelations = relations(nightJobSchedules, ({ one, m
   user: one(users, { fields: [nightJobSchedules.userId], references: [users.id] }),
   agent: one(agents, { fields: [nightJobSchedules.agentId], references: [agents.id] }),
   jobs: many(nightJobs),
+  runs: many(cronRuns),
+}))
+
+export const cronRunsRelations = relations(cronRuns, ({ one }) => ({
+  company: one(companies, { fields: [cronRuns.companyId], references: [companies.id] }),
+  cronJob: one(nightJobSchedules, { fields: [cronRuns.cronJobId], references: [nightJobSchedules.id] }),
 }))
 
 export const nightJobTriggersRelations = relations(nightJobTriggers, ({ one, many }) => ({
@@ -1038,6 +1136,19 @@ export const strategyBacktestResultsRelations = relations(strategyBacktestResult
   user: one(users, { fields: [strategyBacktestResults.userId], references: [users.id] }),
 }))
 
+export const strategyPortfoliosRelations = relations(strategyPortfolios, ({ one, many }) => ({
+  company: one(companies, { fields: [strategyPortfolios.companyId], references: [companies.id] }),
+  user: one(users, { fields: [strategyPortfolios.userId], references: [users.id] }),
+  orders: many(strategyOrders),
+}))
+
+export const strategyOrdersRelations = relations(strategyOrders, ({ one }) => ({
+  company: one(companies, { fields: [strategyOrders.companyId], references: [companies.id] }),
+  user: one(users, { fields: [strategyOrders.userId], references: [users.id] }),
+  portfolio: one(strategyPortfolios, { fields: [strategyOrders.portfolioId], references: [strategyPortfolios.id] }),
+  agent: one(agents, { fields: [strategyOrders.agentId], references: [agents.id] }),
+}))
+
 export const canvasLayoutsRelations = relations(canvasLayouts, ({ one }) => ({
   company: one(companies, { fields: [canvasLayouts.companyId], references: [companies.id] }),
 }))
@@ -1091,6 +1202,11 @@ export const mcpServersRelations = relations(mcpServers, ({ one }) => ({
   company: one(companies, { fields: [mcpServers.companyId], references: [companies.id] }),
 }))
 
+export const sketchesRelations = relations(sketches, ({ one }) => ({
+  company: one(companies, { fields: [sketches.companyId], references: [companies.id] }),
+  createdByUser: one(users, { fields: [sketches.createdBy], references: [users.id] }),
+}))
+
 // === Phase 1 New Relations (Epic 1 Story 1) ===
 
 export const commandsRelations = relations(commands, ({ one, many }) => ({
@@ -1127,4 +1243,48 @@ export const orgTemplatesRelations = relations(orgTemplates, ({ one }) => ({
 
 export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
   company: one(companies, { fields: [auditLogs.companyId], references: [companies.id] }),
+}))
+
+// === Phase 2: AGORA Debate Engine (Epic 11 Story 1) ===
+
+export const debates = pgTable('debates', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  topic: text('topic').notNull(),
+  debateType: debateTypeEnum('debate_type').notNull().default('debate'),
+  status: debateStatusEnum('status').notNull().default('pending'),
+  maxRounds: integer('max_rounds').notNull().default(2),
+  participants: jsonb('participants').$type<{ agentId: string; agentName: string; role: string }[]>().notNull().default([]),
+  rounds: jsonb('rounds').$type<{
+    roundNum: number
+    speeches: {
+      agentId: string
+      agentName: string
+      content: string
+      position: string
+      createdAt: string
+    }[]
+  }[]>().notNull().default([]),
+  result: jsonb('result').$type<{
+    consensus: 'consensus' | 'dissent' | 'partial'
+    summary: string
+    majorityPosition: string
+    minorityPosition: string
+    keyArguments: string[]
+    roundCount: number
+  } | null>(),
+  createdBy: uuid('created_by').notNull().references(() => users.id),
+  error: text('error'),
+  startedAt: timestamp('started_at'),
+  completedAt: timestamp('completed_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('debates_company_idx').on(table.companyId),
+  statusIdx: index('debates_status_idx').on(table.status),
+}))
+
+export const debatesRelations = relations(debates, ({ one }) => ({
+  company: one(companies, { fields: [debates.companyId], references: [companies.id] }),
+  creator: one(users, { fields: [debates.createdBy], references: [users.id] }),
 }))

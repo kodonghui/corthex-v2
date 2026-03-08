@@ -190,6 +190,20 @@
       "when": 1773590400000,
       "tag": "0032_company-settings",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1773849600000,
+      "tag": "0035_sketches-table",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1773936000000,
+      "tag": "0036_cron-scheduler-enhancements",
+      "breakpoints": true
     }
   ]
 }

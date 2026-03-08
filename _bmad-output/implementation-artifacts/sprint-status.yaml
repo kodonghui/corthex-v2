@@ -286,7 +286,7 @@ development_status:
   # Dependencies: Epic 5, Epic 4
   # ============================================================
   epic-14: in-progress
-  14-1-cron-scheduler-service-crud-api: review
+  14-1-cron-scheduler-service-crud-api: done
   14-2-cron-execution-engine-auto-run: backlog
   14-3-argos-trigger-condition-auto-collect: backlog
   14-4-cron-base-ui: backlog
