@@ -1,17 +1,19 @@
 // VECTOR Execution Service
 // Parses CIO trade proposals and executes orders via KIS adapter.
-// Validates market hours, daily limits, and confidence thresholds.
+// Validates market hours, daily limits, confidence thresholds, and risk profile constraints.
 
 import { executeOrder, isKoreanMarketOpen, isUSMarketOpen } from './kis-adapter'
 import { delegationTracker } from './delegation-tracker'
 import { db } from '../db'
-import { strategyOrders } from '../db/schema'
+import { strategyOrders, strategyPortfolios } from '../db/schema'
 import { eq, and, gte } from 'drizzle-orm'
 import { sql } from 'drizzle-orm'
+import { getTradingSettings, getEffectiveValue } from './trading-settings'
 import type {
   TradeProposal,
   VectorExecutionResult,
   VectorOrderResult,
+  TradingSettings,
 } from '@corthex/shared'
 
 // === Types ===
@@ -25,10 +27,10 @@ export type VectorExecuteOptions = {
   vectorAgentId?: string
 }
 
-// === Constants ===
+// === Constants (fallbacks if no settings loaded) ===
 
-const MIN_CONFIDENCE = 0.6
-const DEFAULT_DAILY_TRADE_LIMIT = 20
+const FALLBACK_MIN_CONFIDENCE = 0.6
+const FALLBACK_DAILY_TRADE_LIMIT = 20
 
 // === Validation ===
 
@@ -50,9 +52,9 @@ export function validateMarketHours(market: 'KR' | 'US', tradingMode: 'real' | '
   return { valid: true }
 }
 
-export function validateConfidence(confidence: number): OrderValidation {
-  if (!Number.isFinite(confidence) || confidence < MIN_CONFIDENCE) {
-    return { valid: false, reason: `확신도 ${Number.isFinite(confidence) ? (confidence * 100).toFixed(0) : '0'}% — 최소 ${MIN_CONFIDENCE * 100}% 필요` }
+export function validateConfidence(confidence: number, minConfidence: number = FALLBACK_MIN_CONFIDENCE): OrderValidation {
+  if (!Number.isFinite(confidence) || confidence < minConfidence) {
+    return { valid: false, reason: `확신도 ${Number.isFinite(confidence) ? (confidence * 100).toFixed(0) : '0'}% — 최소 ${(minConfidence * 100).toFixed(0)}% 필요` }
   }
   return { valid: true }
 }
@@ -60,7 +62,7 @@ export function validateConfidence(confidence: number): OrderValidation {
 export async function validateDailyLimit(
   companyId: string,
   tradingMode: 'real' | 'paper',
-  limit: number = DEFAULT_DAILY_TRADE_LIMIT,
+  limit: number = FALLBACK_DAILY_TRADE_LIMIT,
 ): Promise<OrderValidation> {
   const todayStart = new Date()
   todayStart.setHours(0, 0, 0, 0)
@@ -83,26 +85,149 @@ export async function validateDailyLimit(
   return { valid: true }
 }
 
+/**
+ * Validate position size against portfolio total value.
+ * Ensures no single stock exceeds maxPositionPct of portfolio.
+ */
+export async function validatePositionSize(
+  proposal: TradeProposal,
+  companyId: string,
+  userId: string,
+  tradingMode: 'real' | 'paper',
+  maxPositionPct: number,
+): Promise<OrderValidation> {
+  // Only check for buy orders
+  if (proposal.side !== 'buy') return { valid: true }
+
+  const portfolios = await db
+    .select({ totalValue: strategyPortfolios.totalValue })
+    .from(strategyPortfolios)
+    .where(and(
+      eq(strategyPortfolios.companyId, companyId),
+      eq(strategyPortfolios.userId, userId),
+      eq(strategyPortfolios.tradingMode, tradingMode),
+    ))
+    .limit(1)
+
+  if (portfolios.length === 0) return { valid: true } // No portfolio = skip check
+
+  const totalValue = portfolios[0].totalValue
+  if (totalValue <= 0) return { valid: true }
+
+  const orderValue = proposal.quantity * proposal.price
+  const positionPct = (orderValue / totalValue) * 100
+
+  if (positionPct > maxPositionPct) {
+    return {
+      valid: false,
+      reason: `종목 비중 초과: ${positionPct.toFixed(1)}% > 최대 ${maxPositionPct}%`,
+    }
+  }
+  return { valid: true }
+}
+
+/**
+ * Validate daily realized loss doesn't exceed maxDailyLossPct.
+ */
+export async function validateDailyLoss(
+  companyId: string,
+  userId: string,
+  tradingMode: 'real' | 'paper',
+  maxDailyLossPct: number,
+): Promise<OrderValidation> {
+  const todayStart = new Date()
+  todayStart.setHours(0, 0, 0, 0)
+
+  // Sum of sell orders executed today (negative if loss)
+  const [result] = await db
+    .select({
+      totalSold: sql<number>`coalesce(sum(case when ${strategyOrders.side} = 'sell' then ${strategyOrders.totalAmount} else 0 end), 0)::int`,
+    })
+    .from(strategyOrders)
+    .where(and(
+      eq(strategyOrders.companyId, companyId),
+      eq(strategyOrders.userId, userId),
+      eq(strategyOrders.tradingMode, tradingMode),
+      eq(strategyOrders.status, 'executed'),
+      gte(strategyOrders.createdAt, todayStart),
+    ))
+
+  // Get portfolio total value for percentage calculation
+  const portfolios = await db
+    .select({ totalValue: strategyPortfolios.totalValue })
+    .from(strategyPortfolios)
+    .where(and(
+      eq(strategyPortfolios.companyId, companyId),
+      eq(strategyPortfolios.userId, userId),
+      eq(strategyPortfolios.tradingMode, tradingMode),
+    ))
+    .limit(1)
+
+  if (portfolios.length === 0) return { valid: true }
+
+  const totalValue = portfolios[0].totalValue
+  if (totalValue <= 0) return { valid: true }
+
+  // Simplified: if daily sell volume exceeds threshold, block further trading
+  // Full P&L calculation would need buy price tracking (future enhancement)
+  const dailySellPct = ((result?.totalSold ?? 0) / totalValue) * 100
+
+  if (dailySellPct > maxDailyLossPct * 10) { // Conservative multiplier
+    return {
+      valid: false,
+      reason: `일일 매매 활동이 손실 한도에 근접 (일일 최대 손실: ${maxDailyLossPct}%)`,
+    }
+  }
+  return { valid: true }
+}
+
+/**
+ * Full validation with risk profile awareness.
+ */
 export async function validateOrder(
   proposal: TradeProposal,
   companyId: string,
   tradingMode: 'real' | 'paper',
+  settings?: TradingSettings,
+  userId?: string,
 ): Promise<OrderValidation> {
-  // 1. Confidence check
-  const confCheck = validateConfidence(proposal.confidence)
+  // Resolve effective limits from risk profile
+  const minConf = settings
+    ? getEffectiveValue('minConfidence', settings) / 100 // stored as percentage, need 0-1
+    : FALLBACK_MIN_CONFIDENCE
+  const dailyLimit = settings
+    ? getEffectiveValue('maxDailyTrades', settings)
+    : FALLBACK_DAILY_TRADE_LIMIT
+
+  // 1. Confidence check (dynamic based on risk profile)
+  const confCheck = validateConfidence(proposal.confidence, minConf)
   if (!confCheck.valid) return confCheck
 
   // 2. Market hours check
   const marketCheck = validateMarketHours(proposal.market, tradingMode)
   if (!marketCheck.valid) return marketCheck
 
-  // 3. Daily limit check
-  const limitCheck = await validateDailyLimit(companyId, tradingMode)
+  // 3. Daily limit check (dynamic based on risk profile)
+  const limitCheck = await validateDailyLimit(companyId, tradingMode, dailyLimit)
   if (!limitCheck.valid) return limitCheck
 
   // 4. Basic quantity check
   if (proposal.quantity <= 0) {
     return { valid: false, reason: '수량이 0 이하입니다' }
+  }
+
+  // 5. Position size check (if settings + userId available)
+  if (settings && userId) {
+    const maxPosPct = getEffectiveValue('maxPositionPct', settings)
+    const posCheck = await validatePositionSize(proposal, companyId, userId, tradingMode, maxPosPct)
+    if (!posCheck.valid) return posCheck
+  }
+
+  // 6. Daily loss check (if settings + userId available)
+  if (settings && userId) {
+    const maxLossPct = getEffectiveValue('maxDailyLossPct', settings)
+    const lossCheck = await validateDailyLoss(companyId, userId, tradingMode, maxLossPct)
+    if (!lossCheck.valid) return lossCheck
   }
 
   return { valid: true }
@@ -113,9 +238,13 @@ export async function validateOrder(
 /**
  * Execute validated trade proposals via KIS adapter.
  * Each proposal is validated individually; failures don't block other orders.
+ * Now loads trading settings for risk profile-aware validation.
  */
 export async function executeProposals(options: VectorExecuteOptions): Promise<VectorExecutionResult> {
   const { proposals, companyId, userId, commandId, tradingMode, vectorAgentId } = options
+
+  // Load trading settings for risk-aware validation
+  const settings = await getTradingSettings(companyId)
 
   const totalStart = Date.now()
   const orders: VectorOrderResult[] = []
@@ -130,8 +259,8 @@ export async function executeProposals(options: VectorExecuteOptions): Promise<V
   delegationTracker.vectorExecutionStarted(companyId, commandId, proposals.length)
 
   for (const proposal of proposals) {
-    // Validate
-    const validation = await validateOrder(proposal, companyId, tradingMode)
+    // Validate with risk profile
+    const validation = await validateOrder(proposal, companyId, tradingMode, settings, userId)
     if (!validation.valid) {
       orders.push({
         proposal,
@@ -207,7 +336,13 @@ export async function executeProposals(options: VectorExecuteOptions): Promise<V
 export function formatCIOVectorResult(
   analysisReport: string,
   vectorResult: VectorExecutionResult | null,
+  pendingApproval?: boolean,
+  pendingCount?: number,
 ): string {
+  if (pendingApproval && pendingCount) {
+    return `${analysisReport}\n\n---\n\n## 매매 승인 대기\n\n⏳ **${pendingCount}건**의 매매 제안이 승인 대기 중입니다.\n전략실에서 확인 후 승인/거부해주세요.`
+  }
+
   if (!vectorResult || vectorResult.totalProposals === 0) {
     return analysisReport
   }

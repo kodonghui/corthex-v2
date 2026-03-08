@@ -10,6 +10,8 @@ import { HTTPError } from '../../middleware/error'
 import { getCredentials } from '../../services/credential-vault'
 import { getKisToken, kisHeaders, KIS_BASE_URL, getKisBaseUrl } from '../../lib/tool-handlers/builtins/kis-auth'
 import { executeOrder, getBalance, syncOrderStatus, getOverseasPrice } from '../../services/kis-adapter'
+import { getTradingSettings, updateTradingSettings, RISK_PROFILES } from '../../services/trading-settings'
+import { approveOrder, rejectOrder, bulkApprove, bulkReject, getPendingOrders } from '../../services/trade-approval'
 import type { AppEnv } from '../../types'
 
 export const strategyRoute = new Hono<AppEnv>()
@@ -936,7 +938,7 @@ const createOrderSchema = z.object({
   price: z.number().int().min(0),
   orderType: z.enum(['market', 'limit']).default('market'),
   tradingMode: z.enum(['real', 'paper']).default('paper'),
-  status: z.enum(['pending', 'submitted', 'executed', 'cancelled', 'rejected', 'failed']).default('pending'),
+  status: z.enum(['pending_approval', 'pending', 'submitted', 'executed', 'cancelled', 'rejected', 'failed']).default('pending'),
   reason: z.string().max(500).optional(),
   kisOrderNo: z.string().max(50).optional(),
   executedAt: z.string().datetime().optional(),
@@ -952,7 +954,7 @@ strategyRoute.get(
     dateTo: z.string().optional(),
     ticker: z.string().max(20).optional(),
     side: z.enum(['buy', 'sell']).optional(),
-    status: z.enum(['pending', 'submitted', 'executed', 'cancelled', 'rejected', 'failed']).optional(),
+    status: z.enum(['pending_approval', 'pending', 'submitted', 'executed', 'cancelled', 'rejected', 'failed']).optional(),
     tradingMode: z.enum(['real', 'paper']).optional(),
   })),
   async (c) => {
@@ -1233,3 +1235,131 @@ strategyRoute.get(
     return c.json({ data: result.data })
   },
 )
+
+// ===============================================
+// === Trading Settings API (E10-S5, FR59/FR60) ===
+// ===============================================
+
+// GET /api/workspace/strategy/settings — 트레이딩 설정 조회
+strategyRoute.get('/settings', async (c) => {
+  const tenant = c.get('tenant')
+
+  const settings = await getTradingSettings(tenant.companyId)
+  const profileConfig = RISK_PROFILES[settings.riskProfile]
+
+  return c.json({
+    data: {
+      ...settings,
+      profileConfig,
+      settingsHistory: undefined, // Don't send full history in GET
+    },
+  })
+})
+
+// GET /api/workspace/strategy/settings/history — 설정 변경 이력
+strategyRoute.get('/settings/history', async (c) => {
+  const tenant = c.get('tenant')
+  const settings = await getTradingSettings(tenant.companyId)
+  return c.json({ data: settings.settingsHistory.slice(-50) })
+})
+
+// GET /api/workspace/strategy/settings/profiles — 투자 성향 프로필 목록
+strategyRoute.get('/settings/profiles', async (c) => {
+  return c.json({ data: RISK_PROFILES })
+})
+
+const updateSettingsSchema = z.object({
+  executionMode: z.enum(['autonomous', 'approval']).optional(),
+  riskProfile: z.enum(['conservative', 'balanced', 'aggressive']).optional(),
+  customSettings: z.object({
+    maxPositionPct: z.number().optional(),
+    minConfidence: z.number().optional(),
+    defaultStopLoss: z.number().optional(),
+    defaultTakeProfit: z.number().optional(),
+    maxDailyTrades: z.number().optional(),
+    maxDailyLossPct: z.number().optional(),
+    orderSize: z.number().optional(),
+  }).optional(),
+  reason: z.string().min(1).max(500),
+})
+
+// PUT /api/workspace/strategy/settings — 트레이딩 설정 변경
+strategyRoute.put('/settings', zValidator('json', updateSettingsSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const { reason, ...updates } = c.req.valid('json')
+
+  const result = await updateTradingSettings(
+    tenant.companyId,
+    updates,
+    tenant.userId,
+    reason,
+  )
+
+  return c.json({
+    data: {
+      settings: { ...result.settings, settingsHistory: undefined },
+      applied: result.applied,
+      rejected: result.rejected,
+    },
+  })
+})
+
+// ===============================================
+// === Trade Approval API (E10-S5, FR59) ===
+// ===============================================
+
+// GET /api/workspace/strategy/orders/pending — 승인 대기 주문 목록
+strategyRoute.get('/orders/pending', async (c) => {
+  const tenant = c.get('tenant')
+  const orders = await getPendingOrders(tenant.companyId, tenant.userId)
+  return c.json({ data: orders })
+})
+
+// POST /api/workspace/strategy/orders/:id/approve — 단건 승인
+strategyRoute.post(
+  '/orders/:id/approve',
+  zValidator('param', z.object({ id: z.string().uuid() })),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const { id } = c.req.valid('param')
+    const result = await approveOrder(id, tenant.companyId, tenant.userId)
+    const statusCode = result.success ? 200 : 400
+    return c.json({ data: result }, statusCode)
+  },
+)
+
+// POST /api/workspace/strategy/orders/:id/reject — 단건 거부
+strategyRoute.post(
+  '/orders/:id/reject',
+  zValidator('param', z.object({ id: z.string().uuid() })),
+  zValidator('json', z.object({ reason: z.string().max(500).optional() })),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const { id } = c.req.valid('param')
+    const { reason } = c.req.valid('json')
+    const result = await rejectOrder(id, tenant.companyId, reason)
+    const statusCode = result.success ? 200 : 400
+    return c.json({ data: result }, statusCode)
+  },
+)
+
+const bulkActionSchema = z.object({
+  orderIds: z.array(z.string().uuid()).min(1).max(50),
+  reason: z.string().max(500).optional(),
+})
+
+// POST /api/workspace/strategy/orders/bulk-approve — 일괄 승인
+strategyRoute.post('/orders/bulk-approve', zValidator('json', bulkActionSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const { orderIds } = c.req.valid('json')
+  const results = await bulkApprove(orderIds, tenant.companyId, tenant.userId)
+  return c.json({ data: results })
+})
+
+// POST /api/workspace/strategy/orders/bulk-reject — 일괄 거부
+strategyRoute.post('/orders/bulk-reject', zValidator('json', bulkActionSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const { orderIds, reason } = c.req.valid('json')
+  const results = await bulkReject(orderIds, tenant.companyId, reason)
+  return c.json({ data: results })
+})
