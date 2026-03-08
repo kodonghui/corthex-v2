@@ -6,6 +6,7 @@ import { db } from '../db'
 import { commands, orchestrationTasks, agents, qualityReviews, costRecords } from '../db/schema'
 import { microToUsd } from '../lib/cost-tracker'
 import { authMiddleware } from '../middleware/auth'
+import { promptGuardMiddleware } from '../middleware/prompt-guard'
 import { HTTPError } from '../middleware/error'
 import { classify, createCommand } from '../services/command-router'
 import { process as chiefOfStaffProcess } from '../services/chief-of-staff'
@@ -25,7 +26,8 @@ const submitCommandSchema = z.object({
 })
 
 // POST /api/workspace/commands — 명령 제출 + 자동 분류
-commandsRoute.post('/', zValidator('json', submitCommandSchema), async (c) => {
+// promptGuardMiddleware: 프롬프트 인젝션 방어 (FR55)
+commandsRoute.post('/', zValidator('json', submitCommandSchema), promptGuardMiddleware, async (c) => {
   const tenant = c.get('tenant')
   const body = c.req.valid('json')
 

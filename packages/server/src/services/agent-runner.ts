@@ -1,6 +1,8 @@
 import { llmRouter, resolveModel, resolveProvider } from './llm-router'
 import { calculateCostMicro } from '../lib/cost-tracker'
 import { checkToolPermission, hasWildcard } from './tool-permission-guard'
+import { filterOutput } from './output-filter'
+import { createAuditLog, AUDIT_ACTIONS } from './audit-log'
 import type { LLMRouterContext } from './llm-router'
 import type {
   LLMRequest,
@@ -221,8 +223,29 @@ export class AgentRunner {
     const provider = resolveProvider(model)
     const costMicro = calculateCostMicro(model, totalInput, totalOutput)
 
+    // FR55: Output filter — redact credentials in agent response
+    const content = lastResponse.content
+    const filterResult = content ? filterOutput(content) : null
+    const finalContent = filterResult ? filterResult.filtered : content
+
+    // Audit log if credentials were redacted (fire-and-forget)
+    if (filterResult && filterResult.redactedCount > 0) {
+      createAuditLog({
+        companyId: agent.companyId,
+        actorType: 'agent',
+        actorId: agent.id,
+        action: AUDIT_ACTIONS.SECURITY_OUTPUT_REDACTED,
+        targetType: 'agent_response',
+        metadata: {
+          redactedCount: filterResult.redactedCount,
+          redactedTypes: filterResult.redactedTypes,
+          agentName: agent.name,
+        },
+      }).catch(() => {})
+    }
+
     return {
-      content: lastResponse.content,
+      content: finalContent,
       toolCalls: allToolRecords,
       usage: { inputTokens: totalInput, outputTokens: totalOutput },
       cost: { model, provider, estimatedCostMicro: costMicro },
