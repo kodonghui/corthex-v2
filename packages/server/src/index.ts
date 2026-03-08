@@ -37,6 +37,7 @@ import { telegramRoute } from './routes/workspace/telegram'
 import { messengerRoute } from './routes/workspace/messenger'
 import { nexusRoute } from './routes/workspace/nexus'
 import { strategyRoute } from './routes/workspace/strategy'
+import { debatesRoute } from './routes/workspace/debates'
 import { filesRoute } from './routes/workspace/files'
 import { workspaceSoulTemplatesRoute } from './routes/workspace/soul-templates'
 import { pushRoute } from './routes/workspace/push'
@@ -45,6 +46,7 @@ import { invitationsRoute } from './routes/workspace/invitations'
 import { workspaceCredentialsRoute } from './routes/workspace/credentials'
 import { workspaceOrgChartRoute } from './routes/workspace/org-chart'
 import { presetsRoute } from './routes/workspace/presets'
+import { sketchesRoute } from './routes/workspace/sketches'
 import { superAdminCompaniesRoute } from './routes/super-admin/companies'
 import { commandsRoute } from './routes/commands'
 import { runMigrations } from './db'
@@ -125,6 +127,7 @@ app.route('/api/workspace', telegramRoute)
 app.route('/api/workspace/messenger', messengerRoute)
 app.route('/api/workspace', nexusRoute)
 app.route('/api/workspace/strategy', strategyRoute)
+app.route('/api/workspace/debates', debatesRoute)
 app.route('/api/workspace/files', filesRoute)
 app.route('/api/workspace', workspaceSoulTemplatesRoute)
 app.route('/api/workspace/push', pushRoute)
@@ -134,6 +137,7 @@ app.route('/api/workspace', workspaceCredentialsRoute)
 app.route('/api/workspace', workspaceOrgChartRoute)
 app.route('/api/workspace/commands', commandsRoute)
 app.route('/api/workspace/presets', presetsRoute)
+app.route('/api/workspace/sketches', sketchesRoute)
 
 // WebSocket 라우트
 app.get('/ws', wsRoute)
