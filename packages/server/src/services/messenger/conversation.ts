@@ -1,5 +1,5 @@
 import { db } from '../../db'
-import { conversations, conversationParticipants, messages } from '../../db/schema'
+import { conversations, conversationParticipants, messages, users } from '../../db/schema'
 import { eq, and, desc, sql, inArray } from 'drizzle-orm'
 import type { Conversation, ConversationListItem } from '@corthex/shared'
 
@@ -26,6 +26,9 @@ export class ConversationService {
     if (type === 'group' && participantIds.length < 2) {
       throw new Error('Group conversations require at least 2 participants')
     }
+
+    // Verify all participants belong to the same company
+    await this.verifyUsersInCompany(participantIds, companyId)
 
     const [conv] = await db
       .insert(conversations)
@@ -223,6 +226,9 @@ export class ConversationService {
     const existing = conv.participants.find((p) => p.userId === userId)
     if (existing) throw new Error('User is already a participant')
 
+    // Verify user belongs to the same company
+    await this.verifyUsersInCompany([userId], companyId)
+
     await db.insert(conversationParticipants).values({
       conversationId,
       userId,
@@ -302,5 +308,26 @@ export class ConversationService {
     }
 
     return null
+  }
+
+  /**
+   * Verify that all userIds belong to the specified company.
+   * Throws if any user is not found or belongs to a different company.
+   */
+  private async verifyUsersInCompany(userIds: string[], companyId: string): Promise<void> {
+    if (userIds.length === 0) return
+
+    const foundUsers = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(and(
+        inArray(users.id, userIds),
+        eq(users.companyId, companyId),
+        eq(users.isActive, true),
+      ))
+
+    if (foundUsers.length !== userIds.length) {
+      throw new Error('One or more participants do not belong to this company')
+    }
   }
 }

@@ -115,6 +115,7 @@ conversationsRoute.get('/unread', async (c) => {
         .from(messages)
         .where(and(
           eq(messages.conversationId, row.conversationId),
+          eq(messages.companyId, tenant.companyId),
           eq(messages.isDeleted, false),
           sql`${messages.createdAt} > ${row.lastReadAt}`,
         ))
@@ -125,6 +126,7 @@ conversationsRoute.get('/unread', async (c) => {
         .from(messages)
         .where(and(
           eq(messages.conversationId, row.conversationId),
+          eq(messages.companyId, tenant.companyId),
           eq(messages.isDeleted, false),
         ))
       unreadCount = result?.count ?? 0
