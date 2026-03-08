@@ -76,3 +76,17 @@ debatesRoute.get('/:id', zValidator('param', z.object({ id: z.string().uuid() })
 
   return c.json({ success: true, data: debate })
 })
+
+// GET /api/workspace/debates/:id/timeline — 토론 이벤트 타임라인 (재생용)
+debatesRoute.get('/:id/timeline', zValidator('param', z.object({ id: z.string().uuid() })), async (c) => {
+  const tenant = c.get('tenant')
+  const { id } = c.req.valid('param')
+
+  const debate = await getDebate(id, tenant.companyId)
+  if (!debate) {
+    return c.json({ success: false, error: { code: 'DEBATE_NOT_FOUND', message: '토론을 찾을 수 없습니다' } }, 404)
+  }
+
+  const timeline = (debate.timeline ?? []) as { event: string; debateId: string; timestamp: string; [k: string]: unknown }[]
+  return c.json({ success: true, data: timeline })
+})

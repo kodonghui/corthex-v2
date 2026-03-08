@@ -46,10 +46,23 @@ type DebateParticipant = {
   role: string
 }
 
-// === Debate Event Hook (for future WebSocket integration in E11-S3) ===
+// === Debate Event Hook (WebSocket streaming E11-S3) ===
 
-function emitDebateEvent(companyId: string, eventType: string, payload: unknown): void {
-  eventBus.emit('debate', { companyId, payload: { type: eventType, ...payload as Record<string, unknown> } })
+async function emitDebateEvent(debateId: string, companyId: string, eventType: string, payload: Record<string, unknown>): Promise<void> {
+  const event = { event: eventType, debateId, ...payload, timestamp: new Date().toISOString() }
+  eventBus.emit('debate', { companyId, payload: event })
+  // Append to timeline for replay
+  try {
+    const [row] = await db
+      .select({ timeline: debates.timeline })
+      .from(debates)
+      .where(eq(debates.id, debateId))
+    const existing = (row?.timeline ?? []) as { event: string; debateId: string; timestamp: string; [k: string]: unknown }[]
+    existing.push(event)
+    await db.update(debates).set({ timeline: existing }).where(eq(debates.id, debateId))
+  } catch {
+    // Timeline append failure should not block debate execution
+  }
 }
 
 // === AGORA Engine ===
@@ -123,11 +136,11 @@ export async function startDebate(debateId: string, companyId: string) {
     .set({ status: 'in-progress' as DebateStatus, startedAt: new Date(), updatedAt: new Date() })
     .where(and(eq(debates.id, debateId), eq(debates.companyId, companyId)))
 
-  emitDebateEvent(companyId, 'debate-started', { debateId, topic: debate.topic })
+  emitDebateEvent(debateId, companyId, 'debate-started', { topic: debate.topic, totalRounds: debate.maxRounds })
 
   // Run rounds asynchronously
   executeDebateRounds(debateId, companyId, debate).catch(async (err) => {
-    await handleDebateError(debateId, err)
+    await handleDebateError(debateId, companyId, err)
   })
 
   return { ...debate, status: 'in-progress' as DebateStatus }
@@ -157,7 +170,7 @@ async function executeDebateRounds(
   }
 
   for (let roundNum = 1; roundNum <= debate.maxRounds; roundNum++) {
-    emitDebateEvent(companyId, 'round-started', { debateId, roundNum })
+    emitDebateEvent(debateId, companyId, 'round-started', { roundNum, totalRounds: debate.maxRounds })
 
     const speeches: DebateSpeech[] = []
 
@@ -197,7 +210,7 @@ async function executeDebateRounds(
         }
 
         speeches.push(speech)
-        emitDebateEvent(companyId, 'agent-spoke', { debateId, roundNum, speech })
+        emitDebateEvent(debateId, companyId, 'speech-delivered', { roundNum, speech })
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : String(err)
         speeches.push({
@@ -219,7 +232,7 @@ async function executeDebateRounds(
       .set({ rounds: allRounds, updatedAt: new Date() })
       .where(eq(debates.id, debateId))
 
-    emitDebateEvent(companyId, 'round-ended', { debateId, roundNum })
+    emitDebateEvent(debateId, companyId, 'round-ended', { roundNum, speechCount: speeches.length })
   }
 
   // Detect consensus
@@ -237,7 +250,7 @@ async function executeDebateRounds(
     })
     .where(eq(debates.id, debateId))
 
-  emitDebateEvent(companyId, 'debate-done', { debateId, result })
+  emitDebateEvent(debateId, companyId, 'debate-completed', { result })
 }
 
 export function buildSpeechPrompt(
@@ -403,7 +416,7 @@ function extractPosition(content: string): string {
   return firstSentence.slice(0, 100) || content.slice(0, 100)
 }
 
-async function handleDebateError(debateId: string, err: unknown): Promise<void> {
+async function handleDebateError(debateId: string, companyId: string, err: unknown): Promise<void> {
   const errorMsg = err instanceof Error ? err.message : String(err)
   await db
     .update(debates)
@@ -414,6 +427,7 @@ async function handleDebateError(debateId: string, err: unknown): Promise<void> 
       updatedAt: new Date(),
     })
     .where(eq(debates.id, debateId))
+  emitDebateEvent(debateId, companyId, 'debate-failed', { error: errorMsg })
 }
 
 // === Query Functions ===

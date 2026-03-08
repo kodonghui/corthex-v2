@@ -1,5 +1,5 @@
 import { db } from '../db'
-import { chatSessions, messengerMembers, strategyNotes, strategyNoteShares } from '../db/schema'
+import { chatSessions, messengerMembers, strategyNotes, strategyNoteShares, debates } from '../db/schema'
 import { eq, and } from 'drizzle-orm'
 import type { WsClient } from './server'
 import { clientMap } from './server'
@@ -146,6 +146,25 @@ export async function handleSubscription(
         return
       }
       client.subscriptions.add(`nexus::${client.companyId}`)
+      break
+    }
+
+    case 'debate': {
+      if (!id) {
+        ws.send(JSON.stringify({ type: 'error', code: 'MISSING_PARAM', channel }))
+        return
+      }
+      // DB에서 debate 존재 + companyId 확인
+      const [debate] = await db
+        .select({ companyId: debates.companyId })
+        .from(debates)
+        .where(eq(debates.id, id))
+        .limit(1)
+      if (!debate || debate.companyId !== client.companyId) {
+        ws.send(JSON.stringify({ type: 'error', code: 'FORBIDDEN', channel }))
+        return
+      }
+      client.subscriptions.add(`debate::${id}`)
       break
     }
 
