@@ -1685,3 +1685,27 @@ export const workflowExecutions = pgTable('workflow_executions', {
   workflowIdx: index('workflow_executions_workflow_idx').on(table.workflowId),
   createdIdx: index('workflow_executions_created_idx').on(table.workflowId, table.createdAt),
 }))
+
+export const workflowExecutionsRelations = relations(workflowExecutions, ({ one }) => ({
+  company: one(companies, { fields: [workflowExecutions.companyId], references: [companies.id] }),
+  workflow: one(workflows, { fields: [workflowExecutions.workflowId], references: [workflows.id] })
+}))
+
+export const workflowSuggestions = pgTable('workflow_suggestions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  reason: text('reason').notNull(),
+  suggestedSteps: jsonb('suggested_steps').notNull().default([]),
+  status: varchar('status', { length: 20 }).notNull().default('pending'), // 'pending', 'accepted', 'rejected'
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  companyUserIdx: index('workflow_suggestions_company_user_idx').on(table.companyId, table.userId),
+  statusIdx: index('workflow_suggestions_status_idx').on(table.companyId, table.status),
+}))
+
+export const workflowSuggestionsRelations = relations(workflowSuggestions, ({ one }) => ({
+  company: one(companies, { fields: [workflowSuggestions.companyId], references: [companies.id] }),
+  user: one(users, { fields: [workflowSuggestions.userId], references: [users.id] }),
+}))
