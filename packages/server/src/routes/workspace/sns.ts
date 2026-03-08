@@ -670,7 +670,16 @@ snsRoute.post('/sns/:id/publish', async (c) => {
       .set({ status: 'failed', publishError: errorMsg, updatedAt: new Date() })
       .where(eq(snsContents.id, id))
 
-    throw new HTTPError(500, errorMsg, 'SNS_004')
+    logActivity({
+      companyId: tenant.companyId,
+      type: 'sns',
+      phase: 'error',
+      actorType: 'system',
+      action: `SNS 발행 실패 (${existing.platform})`,
+      detail: `${existing.title} — ${errorMsg}`,
+    })
+
+    throw new HTTPError(500, errorMsg, 'SNS_006')
   }
 })
 

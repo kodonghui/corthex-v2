@@ -226,8 +226,8 @@ development_status:
   # UX: CEO #3 (Strategy Room)
   # Dependencies: Epic 5, Epic 4
   # ============================================================
-  epic-10: backlog
-  10-1-strategy-schema-watchlist-portfolio-orders: backlog
+  epic-10: in-progress
+  10-1-strategy-schema-watchlist-portfolio-orders: in-progress
   10-2-kis-securities-api-adapter: backlog
   10-3-finance-tools-5-implementation: backlog
   10-4-cio-vector-separation-orchestration: backlog
@@ -243,8 +243,8 @@ development_status:
   # UX: CEO #5 (AGORA)
   # Dependencies: Epic 5, Epic 3
   # ============================================================
-  epic-11: backlog
-  11-1-agora-engine-round-management-consensus: backlog
+  epic-11: in-progress
+  11-1-agora-engine-round-management-consensus: review
   11-2-debate-deep-debate-command-integration: backlog
   11-3-websocket-debate-channel-streaming: backlog
   11-4-agora-ui-round-timeline-speech-cards: backlog
@@ -257,8 +257,8 @@ development_status:
   # UX: CEO #6 (SNS)
   # Dependencies: Epic 4, Epic 5
   # ============================================================
-  epic-12: backlog
-  12-1-sns-content-management-api: backlog
+  epic-12: in-progress
+  12-1-sns-content-management-api: done
   12-2-marketing-tools-3-implementation: backlog
   12-3-selenium-auto-publish-engine-5-platforms: backlog
   12-4-scheduled-publish-queue-card-news: backlog
@@ -271,8 +271,8 @@ development_status:
   # UX: CEO #4 (SketchVibe)
   # Dependencies: Epic 5, Epic 3
   # ============================================================
-  epic-13: backlog
-  13-1-cytoscape-canvas-8-node-types-connection: backlog
+  epic-13: in-progress
+  13-1-cytoscape-canvas-8-node-types-connection: in-progress
   13-2-mermaid-cytoscape-bidirectional-conversion: backlog
   13-3-mcp-sse-ai-realtime-canvas-manipulation: backlog
   13-4-save-load-knowledge-base-integration: backlog
@@ -285,8 +285,8 @@ development_status:
   # UX: CEO #11 (Cron), CEO #12 (ARGOS)
   # Dependencies: Epic 5, Epic 4
   # ============================================================
-  epic-14: backlog
-  14-1-cron-scheduler-service-crud-api: backlog
+  epic-14: in-progress
+  14-1-cron-scheduler-service-crud-api: review
   14-2-cron-execution-engine-auto-run: backlog
   14-3-argos-trigger-condition-auto-collect: backlog
   14-4-cron-base-ui: backlog
