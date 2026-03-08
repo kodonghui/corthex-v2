@@ -25,6 +25,7 @@ const nav = [
   { to: '/monitoring', label: '시스템 모니터링', icon: '🖥️' },
   { to: '/org-chart', label: '조직도', icon: '🏗️' },
   { to: '/org-templates', label: '조직 템플릿', icon: '📋' },
+  { to: '/workflows', label: '워크플로우', icon: '⚡' },
 ]
 
 function SwitchToCeoButton({ companyId }: { companyId: string | null }) {
