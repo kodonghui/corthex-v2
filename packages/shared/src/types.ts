@@ -442,6 +442,7 @@ export type WsChannel =
   | 'delegation'
   | 'tool'
   | 'cost'
+  | 'debate'
 
 export type WsInboundMessage = {
   type: 'subscribe' | 'unsubscribe'
@@ -547,3 +548,58 @@ export type NexusExecution = {
   startedAt: string
   completedAt: string | null
 }
+
+// === AGORA Debate Engine ===
+
+export type DebateStatus = 'pending' | 'in-progress' | 'completed' | 'failed'
+export type DebateType = 'debate' | 'deep-debate'
+export type ConsensusResult = 'consensus' | 'dissent' | 'partial'
+
+export type DebateSpeech = {
+  agentId: string
+  agentName: string
+  content: string
+  position: string
+  createdAt: string
+}
+
+export type DebateRound = {
+  roundNum: number
+  speeches: DebateSpeech[]
+}
+
+export type DebateResult = {
+  consensus: ConsensusResult
+  summary: string
+  majorityPosition: string
+  minorityPosition: string
+  keyArguments: string[]
+  roundCount: number
+}
+
+export type Debate = {
+  id: string
+  companyId: string
+  topic: string
+  debateType: DebateType
+  status: DebateStatus
+  maxRounds: number
+  participants: { agentId: string; agentName: string; role: string }[]
+  rounds: DebateRound[]
+  result: DebateResult | null
+  createdBy: string
+  error: string | null
+  startedAt: string | null
+  completedAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export type CreateDebateRequest = {
+  topic: string
+  debateType?: DebateType
+  participantAgentIds: string[]
+  maxRounds?: number
+}
+
+export type DebateResponse = Debate

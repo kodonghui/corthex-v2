@@ -244,7 +244,7 @@ development_status:
   # Dependencies: Epic 5, Epic 3
   # ============================================================
   epic-11: in-progress
-  11-1-agora-engine-round-management-consensus: review
+  11-1-agora-engine-round-management-consensus: done
   11-2-debate-deep-debate-command-integration: backlog
   11-3-websocket-debate-channel-streaming: backlog
   11-4-agora-ui-round-timeline-speech-cards: backlog
@@ -287,7 +287,7 @@ development_status:
   # ============================================================
   epic-14: in-progress
   14-1-cron-scheduler-service-crud-api: done
-  14-2-cron-execution-engine-auto-run: backlog
+  14-2-cron-execution-engine-auto-run: in-progress
   14-3-argos-trigger-condition-auto-collect: backlog
   14-4-cron-base-ui: backlog
   14-5-argos-ui: backlog
@@ -312,7 +312,7 @@ development_status:
   # Dependencies: Epic 3, Epic 5
   # ============================================================
   epic-16: in-progress
-  16-1-knowledge-schema-docs-memories: ready-for-dev
+  16-1-knowledge-schema-docs-memories: in-progress
   16-2-document-store-crud-api-folder-management: backlog
   16-3-department-knowledge-auto-injection: backlog
   16-4-agent-memory-auto-learning-extraction: backlog
@@ -326,8 +326,8 @@ development_status:
   # UX: CEO #8 (History), CEO #9 (Archive), CEO #10 (Performance)
   # Dependencies: Epic 5, Epic 7, Epic 8
   # ============================================================
-  epic-17: backlog
-  17-1-operation-log-api-search-filter-bookmark: backlog
+  epic-17: in-progress
+  17-1-operation-log-api-search-filter-bookmark: in-progress
   17-2-operation-log-ui-ab-compare-replay: backlog
   17-3-classified-docs-api-archive-filter-similar: backlog
   17-4-classified-docs-ui: backlog

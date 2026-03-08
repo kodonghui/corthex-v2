@@ -23,6 +23,9 @@ export const commandTypeEnum = pgEnum('command_type', ['direct', 'mention', 'sla
 export const orchestrationTaskStatusEnum = pgEnum('orchestration_task_status', ['pending', 'running', 'completed', 'failed', 'timeout'])
 export const qualityResultEnum = pgEnum('quality_result', ['pass', 'fail'])
 
+// === Phase 2 New Enums (Epic 16 Story 1) ===
+export const memoryTypeEnum = pgEnum('memory_type', ['learning', 'insight', 'preference', 'fact'])
+
 // === Phase 2 New Enums (Epic 10 Story 1) ===
 export const tradingModeEnum = pgEnum('trading_mode', ['real', 'paper'])
 export const orderSideEnum = pgEnum('order_side', ['buy', 'sell'])
