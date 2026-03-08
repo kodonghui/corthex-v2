@@ -1,3 +1,4 @@
+import { useState, useCallback } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useAuthStore } from '../stores/auth-store'
 import { useQuery } from '@tanstack/react-query'
@@ -48,6 +49,47 @@ const navSections: NavSection[] = [
     ],
   },
 ]
+
+function SwitchToAdminButton() {
+  const [switching, setSwitching] = useState(false)
+  const { data: canSwitchData } = useQuery({
+    queryKey: ['can-switch-admin'],
+    queryFn: () => api.get<{ data: { canSwitch: boolean } }>('/auth/can-switch-admin'),
+    staleTime: 5 * 60 * 1000,
+  })
+
+  const canSwitch = canSwitchData?.data?.canSwitch ?? false
+
+  const handleSwitch = useCallback(async () => {
+    if (!canSwitch || switching) return
+    setSwitching(true)
+    try {
+      const res = await api.post<{ data: { token: string; user: { id: string; name: string; role: string }; targetUrl: string } }>('/auth/switch-app', {
+        targetApp: 'admin',
+      })
+      // Admin 앱 localStorage에 토큰 저장
+      localStorage.setItem('corthex_admin_token', res.data.token)
+      localStorage.setItem('corthex_admin_user', JSON.stringify(res.data.user))
+      window.location.href = res.data.targetUrl
+    } catch (err) {
+      setSwitching(false)
+      alert(err instanceof Error ? err.message : '앱 전환에 실패했습니다')
+    }
+  }, [canSwitch, switching])
+
+  if (!canSwitch) return null
+
+  return (
+    <button
+      onClick={handleSwitch}
+      disabled={switching}
+      className="flex items-center gap-2 w-full px-2 py-2 text-xs font-medium rounded-lg transition-colors text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950 hover:bg-indigo-100 dark:hover:bg-indigo-900"
+    >
+      <span>⇄</span>
+      <span>{switching ? '전환 중...' : '관리자 콘솔'}</span>
+    </button>
+  )
+}
 
 export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
   const { user, logout } = useAuthStore()
@@ -111,6 +153,7 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
 
       {/* 유저 정보 */}
       <div className="px-3 py-3 border-t border-zinc-200 dark:border-zinc-800 space-y-2">
+        <SwitchToAdminButton />
         <div className="flex items-center justify-between px-2">
           <div>
             <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{user?.name}</p>

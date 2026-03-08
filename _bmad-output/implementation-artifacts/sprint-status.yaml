@@ -207,11 +207,11 @@ development_status:
   # ============================================================
   epic-9: in-progress
   9-1-company-crud-api: done
-  9-2-human-employee-management-api: review
+  9-2-human-employee-management-api: done
   9-3-employee-command-center-restriction: backlog
   9-4-employee-management-ui-admin-a4: backlog
   9-5-company-settings-ui-admin-a8: done
-  9-6-admin-ceo-app-switching: review
+  9-6-admin-ceo-app-switching: done
   9-7-onboarding-wizard: backlog
   9-8-ceo-app-settings-screen: backlog
   epic-9-retrospective: optional

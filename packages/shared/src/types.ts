@@ -32,6 +32,20 @@ export type ApiError = {
   }
 }
 
+// === 앱 전환 ===
+export type SwitchAppTarget = 'admin' | 'ceo'
+
+export type SwitchAppRequest = {
+  targetApp: SwitchAppTarget
+  companyId?: string  // super_admin이 CEO 앱으로 전환 시 필수
+}
+
+export type SwitchAppResponse = {
+  token: string
+  user: { id: string; name: string; role: string; companyId?: string }
+  targetUrl: string
+}
+
 // === 에이전트 상태 ===
 export type AgentStatus = 'online' | 'working' | 'error' | 'offline'
 

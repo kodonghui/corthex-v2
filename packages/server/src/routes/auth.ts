@@ -404,6 +404,178 @@ authRoute.post('/auth/accept-invite', zValidator('json', acceptInviteSchema), as
   }, 201)
 })
 
+// POST /api/auth/switch-app — Admin ↔ CEO 앱 전환 (재로그인 없이)
+const switchAppSchema = z.object({
+  targetApp: z.enum(['admin', 'ceo']),
+  companyId: z.string().uuid().optional(),
+})
+
+authRoute.post('/auth/switch-app', authMiddleware, zValidator('json', switchAppSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const { targetApp, companyId } = c.req.valid('json')
+
+  // admin_users 테이블에서 현재 사용자 확인
+  // Admin JWT(type='admin')이면 sub가 admin_users.id
+  // User JWT이면 email로 admin_users 매칭 필요
+  let adminUser: { id: string; companyId: string | null; name: string; role: string; email: string | null; isActive: boolean } | undefined
+
+  if (tenant.isAdminUser) {
+    // Admin -> CEO 전환: admin_users에서 직접 조회
+    const [found] = await db
+      .select({
+        id: adminUsers.id,
+        companyId: adminUsers.companyId,
+        name: adminUsers.name,
+        role: adminUsers.role,
+        email: adminUsers.email,
+        isActive: adminUsers.isActive,
+      })
+      .from(adminUsers)
+      .where(eq(adminUsers.id, tenant.userId))
+      .limit(1)
+    adminUser = found
+  } else {
+    // CEO -> Admin 전환: users 테이블에서 email 조회 -> admin_users 매칭
+    const [user] = await db
+      .select({ email: users.email })
+      .from(users)
+      .where(eq(users.id, tenant.userId))
+      .limit(1)
+    if (user?.email) {
+      const [found] = await db
+        .select({
+          id: adminUsers.id,
+          companyId: adminUsers.companyId,
+          name: adminUsers.name,
+          role: adminUsers.role,
+          email: adminUsers.email,
+          isActive: adminUsers.isActive,
+        })
+        .from(adminUsers)
+        .where(eq(adminUsers.email, user.email))
+        .limit(1)
+      adminUser = found
+    }
+  }
+
+  if (!adminUser || !adminUser.isActive) {
+    throw new HTTPError(403, '앱 전환 권한이 없습니다. 관리자 계정이 필요합니다.', 'SWITCH_001')
+  }
+
+  if (targetApp === 'ceo') {
+    // Admin -> CEO 전환
+    // companyId 결정: company_admin은 자기 회사 고정, super_admin은 요청에서 받음
+    const targetCompanyId = adminUser.companyId ? adminUser.companyId : companyId
+    if (!targetCompanyId) {
+      throw new HTTPError(400, '전환할 회사를 선택해주세요', 'SWITCH_002')
+    }
+
+    // 회사 활성 상태 확인
+    const [company] = await db
+      .select({ id: companies.id, isActive: companies.isActive, name: companies.name })
+      .from(companies)
+      .where(eq(companies.id, targetCompanyId))
+      .limit(1)
+    if (!company || !company.isActive) {
+      throw new HTTPError(403, '비활성화된 회사입니다', 'SWITCH_003')
+    }
+
+    // 해당 회사에서 같은 이메일의 user 찾기
+    let targetUser: { id: string; name: string; role: string } | undefined
+    if (adminUser.email) {
+      const [found] = await db
+        .select({ id: users.id, name: users.name, role: users.role })
+        .from(users)
+        .where(and(eq(users.companyId, targetCompanyId), eq(users.email, adminUser.email), eq(users.isActive, true)))
+        .limit(1)
+      targetUser = found
+    }
+
+    if (!targetUser) {
+      throw new HTTPError(404, '해당 회사에 CEO 계정이 없습니다', 'SWITCH_004')
+    }
+
+    const rbacRole = targetUser.role === 'admin' ? 'ceo' as const : 'employee' as const
+    const token = await createToken({
+      sub: targetUser.id,
+      companyId: targetCompanyId,
+      role: rbacRole,
+    })
+
+    logActivity({
+      companyId: targetCompanyId,
+      type: 'login',
+      phase: 'end',
+      actorType: 'user',
+      actorId: adminUser.id,
+      action: `앱 전환: Admin → CEO (대상 유저: ${targetUser.name})`,
+    })
+
+    return c.json({
+      data: {
+        token,
+        user: { id: targetUser.id, name: targetUser.name, role: targetUser.role, companyId: targetCompanyId },
+        targetUrl: '/',
+      },
+    })
+  } else {
+    // CEO -> Admin 전환
+    const adminRbacRole = adminUser.role === 'superadmin' ? 'super_admin' as const : 'company_admin' as const
+    const token = await createToken({
+      sub: adminUser.id,
+      companyId: 'system',
+      role: adminRbacRole,
+      type: 'admin',
+    })
+
+    logActivity({
+      companyId: tenant.companyId,
+      type: 'login',
+      phase: 'end',
+      actorType: 'user',
+      actorId: adminUser.id,
+      action: `앱 전환: CEO → Admin (관리자: ${adminUser.name})`,
+    })
+
+    return c.json({
+      data: {
+        token,
+        user: { id: adminUser.id, name: adminUser.name, role: adminUser.role },
+        targetUrl: '/admin',
+      },
+    })
+  }
+})
+
+// GET /api/auth/can-switch-admin — CEO 앱에서 Admin 전환 가능 여부 확인
+authRoute.get('/auth/can-switch-admin', authMiddleware, async (c) => {
+  const tenant = c.get('tenant')
+
+  // 이미 admin JWT면 당연히 가능
+  if (tenant.isAdminUser) {
+    return c.json({ data: { canSwitch: true } })
+  }
+
+  // users 테이블에서 email 조회 -> admin_users 매칭
+  const [user] = await db
+    .select({ email: users.email })
+    .from(users)
+    .where(eq(users.id, tenant.userId))
+    .limit(1)
+
+  if (!user?.email) {
+    return c.json({ data: { canSwitch: false } })
+  }
+
+  const [adminUser] = await db
+    .select({ id: adminUsers.id, isActive: adminUsers.isActive })
+    .from(adminUsers)
+    .where(eq(adminUsers.email, user.email))
+    .limit(1)
+
+  return c.json({ data: { canSwitch: !!adminUser && adminUser.isActive } })
+})
+
 // GET /api/auth/me — 현재 유저 정보 (인증 필요)
 authRoute.get('/auth/me', authMiddleware, async (c) => {
   const tenant = c.get('tenant')
