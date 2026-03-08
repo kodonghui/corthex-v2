@@ -459,6 +459,7 @@ export type WsChannel =
   | 'agent-status'
   | 'notifications'
   | 'messenger'
+  | 'conversation'
   | 'activity-log'
   | 'strategy-notes'
   | 'night-job'
@@ -1084,4 +1085,20 @@ export type CreateConversationRequest = {
   type: ConversationType
   participantIds: string[]
   name?: string
+}
+
+export type SendMessageRequest = {
+  content: string
+  type?: MessageType
+}
+
+export type ConversationMessagesResponse = {
+  items: Message[]
+  nextCursor: string | null
+  hasMore: boolean
+}
+
+export type ConversationUnreadItem = {
+  conversationId: string
+  unreadCount: number
 }

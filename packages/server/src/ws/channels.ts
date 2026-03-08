@@ -1,5 +1,5 @@
 import { db } from '../db'
-import { chatSessions, messengerMembers, strategyNotes, strategyNoteShares, debates } from '../db/schema'
+import { chatSessions, messengerMembers, conversationParticipants, strategyNotes, strategyNoteShares, debates } from '../db/schema'
 import { eq, and } from 'drizzle-orm'
 import type { WsClient } from './server'
 import { clientMap } from './server'
@@ -79,6 +79,31 @@ export async function handleSubscription(
         return
       }
       client.subscriptions.add(`messenger::${id}`)
+      break
+    }
+
+    case 'conversation': {
+      if (!id) {
+        ws.send(JSON.stringify({ type: 'error', code: 'MISSING_PARAM', channel }))
+        return
+      }
+      // DB에서 대화방 참여자 확인
+      const [convParticipant] = await db
+        .select({ visitorId: conversationParticipants.userId })
+        .from(conversationParticipants)
+        .where(
+          and(
+            eq(conversationParticipants.conversationId, id),
+            eq(conversationParticipants.userId, client.userId),
+            eq(conversationParticipants.companyId, client.companyId),
+          ),
+        )
+        .limit(1)
+      if (!convParticipant) {
+        ws.send(JSON.stringify({ type: 'error', code: 'FORBIDDEN', channel }))
+        return
+      }
+      client.subscriptions.add(`conversation::${id}`)
       break
     }
 
