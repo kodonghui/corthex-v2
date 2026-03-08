@@ -46,6 +46,9 @@ import { securityScanner } from './builtins/security-scanner'
 import { codeQualityTool } from './builtins/code-quality-tool'
 import { dnsLookup } from './builtins/dns-lookup'
 import { sslChecker } from './builtins/ssl-checker'
+import { hashtagGenerator } from './builtins/hashtag-generator'
+import { contentCalendar } from './builtins/content-calendar'
+import { engagementAnalyzer } from './builtins/engagement-analyzer'
 
 // 내장 핸들러 등록
 registry.register('get_current_time', getCurrentTime)
@@ -95,6 +98,9 @@ registry.register('security_scanner', securityScanner)
 registry.register('code_quality', codeQualityTool)
 registry.register('dns_lookup', dnsLookup)
 registry.register('ssl_checker', sslChecker)
+registry.register('hashtag_generator', hashtagGenerator)
+registry.register('content_calendar', contentCalendar)
+registry.register('engagement_analyzer', engagementAnalyzer)
 
 export { registry } from './registry'
 export type { ToolHandler, ToolExecContext } from './types'

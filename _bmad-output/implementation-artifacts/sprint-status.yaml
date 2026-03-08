@@ -259,7 +259,7 @@ development_status:
   # ============================================================
   epic-12: in-progress
   12-1-sns-content-management-api: done
-  12-2-marketing-tools-3-implementation: review
+  12-2-marketing-tools-3-implementation: done
   12-3-selenium-auto-publish-engine-5-platforms: backlog
   12-4-scheduled-publish-queue-card-news: backlog
   12-5-sns-publishing-ui: backlog
@@ -273,7 +273,7 @@ development_status:
   # ============================================================
   epic-13: in-progress
   13-1-cytoscape-canvas-8-node-types-connection: done
-  13-2-mermaid-cytoscape-bidirectional-conversion: in-progress
+  13-2-mermaid-cytoscape-bidirectional-conversion: review
   13-3-mcp-sse-ai-realtime-canvas-manipulation: backlog
   13-4-save-load-knowledge-base-integration: backlog
   13-5-sketchvibe-ui-integration-command-center: backlog
