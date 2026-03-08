@@ -41,6 +41,26 @@ type Suggestion = {
   createdAt: string
 }
 
+type StepSummary = {
+  stepId: string
+  stepName: string
+  status: string
+  output: unknown | null
+  durationMs: number
+  error: string | null
+}
+
+type Execution = {
+  id: string
+  companyId: string
+  workflowId: string
+  status: 'success' | 'failed'
+  totalDurationMs: number
+  stepSummaries: StepSummary[]
+  triggeredBy: string | null
+  createdAt: string
+}
+
 type Tab = 'list' | 'suggestions'
 
 // === Helpers ===
@@ -110,6 +130,7 @@ export function WorkflowsPage() {
   const [tab, setTab] = useState<Tab>('list')
   const [editingWorkflow, setEditingWorkflow] = useState<Workflow | null>(null)
   const [creating, setCreating] = useState(false)
+  const [viewingExecutions, setViewingExecutions] = useState<Workflow | null>(null)
 
   // Fetch workflows
   const { data: wfData, isLoading } = useQuery({
@@ -166,11 +187,31 @@ export function WorkflowsPage() {
     onError: (e: Error) => addToast({ type: 'error', message: e.message }),
   })
 
+  // Execute workflow (from list view)
+  const executeMut = useMutation({
+    mutationFn: (id: string) => api.post<{ data: { executionId: string; status: string; totalDurationMs: number; stepSummaries: StepSummary[] } }>(`/workspace/workflows/${id}/execute`, {}),
+    onSuccess: (res, id) => {
+      const d = res.data
+      addToast({ type: d.status === 'success' ? 'success' : 'error', message: `실행 ${d.status === 'success' ? '성공' : '실패'} (${(d.totalDurationMs / 1000).toFixed(1)}초)` })
+      qc.invalidateQueries({ queryKey: ['workflow-executions', id] })
+    },
+    onError: (e: Error) => addToast({ type: 'error', message: e.message }),
+  })
+
   const workflows = wfData?.data || []
   const suggestions = sugData?.data || []
 
   if (!selectedCompanyId) {
     return <div className="text-zinc-500 dark:text-zinc-400">회사를 선택해주세요</div>
+  }
+
+  if (viewingExecutions) {
+    return (
+      <ExecutionHistory
+        workflow={viewingExecutions}
+        onClose={() => setViewingExecutions(null)}
+      />
+    )
   }
 
   if (editingWorkflow || creating) {
@@ -274,21 +315,38 @@ export function WorkflowsPage() {
                     ))}
                   </div>
                 </div>
-                <div className="flex gap-2 ml-4">
-                  <button
-                    onClick={() => setEditingWorkflow(wf)}
-                    className="px-3 py-1.5 text-xs rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                  >
-                    편집
-                  </button>
-                  <button
-                    onClick={() => {
-                      if (confirm('정말 삭제하시겠습니까?')) deleteMut.mutate(wf.id)
-                    }}
-                    className="px-3 py-1.5 text-xs rounded-lg border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950"
-                  >
-                    삭제
-                  </button>
+                <div className="flex gap-2 ml-4 flex-col">
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => executeMut.mutate(wf.id)}
+                      disabled={executeMut.isPending}
+                      className="px-3 py-1.5 text-xs font-medium rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
+                    >
+                      {executeMut.isPending ? '실행 중...' : '실행'}
+                    </button>
+                    <button
+                      onClick={() => setViewingExecutions(wf)}
+                      className="px-3 py-1.5 text-xs rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                    >
+                      이력
+                    </button>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setEditingWorkflow(wf)}
+                      className="px-3 py-1.5 text-xs rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                    >
+                      편집
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (confirm('정말 삭제하시겠습니까?')) deleteMut.mutate(wf.id)
+                      }}
+                      className="px-3 py-1.5 text-xs rounded-lg border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950"
+                    >
+                      삭제
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -688,6 +746,220 @@ function StepForm({
             max={3}
           />
         </div>
+      </div>
+    </div>
+  )
+}
+
+// === Execution History ===
+
+function ExecutionHistory({
+  workflow,
+  onClose,
+}: {
+  workflow: Workflow
+  onClose: () => void
+}) {
+  const addToast = useToastStore((s) => s.addToast)
+  const qc = useQueryClient()
+  const [selectedExecution, setSelectedExecution] = useState<Execution | null>(null)
+
+  const { data: execData, isLoading } = useQuery({
+    queryKey: ['workflow-executions', workflow.id],
+    queryFn: () => api.get<{ data: Execution[]; meta: { total: number } }>(`/workspace/workflows/${workflow.id}/executions?limit=50`),
+  })
+
+  const executeMut = useMutation({
+    mutationFn: () => api.post<{ data: { executionId: string; status: string; totalDurationMs: number; stepSummaries: StepSummary[] } }>(`/workspace/workflows/${workflow.id}/execute`, {}),
+    onSuccess: (res) => {
+      const d = res.data
+      addToast({ type: d.status === 'success' ? 'success' : 'error', message: `실행 ${d.status === 'success' ? '성공' : '실패'} (${(d.totalDurationMs / 1000).toFixed(1)}초)` })
+      qc.invalidateQueries({ queryKey: ['workflow-executions', workflow.id] })
+    },
+    onError: (e: Error) => addToast({ type: 'error', message: e.message }),
+  })
+
+  const executions = execData?.data || []
+
+  if (selectedExecution) {
+    return (
+      <ExecutionDetail
+        execution={selectedExecution}
+        workflowName={workflow.name}
+        onBack={() => setSelectedExecution(null)}
+      />
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">실행 이력</h1>
+          <p className="text-sm text-zinc-500 mt-1">{workflow.name}</p>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => executeMut.mutate()}
+            disabled={executeMut.isPending}
+            className="px-4 py-2 text-sm font-medium rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
+          >
+            {executeMut.isPending ? '실행 중...' : '지금 실행'}
+          </button>
+          <button onClick={onClose} className="text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">
+            ← 목록으로
+          </button>
+        </div>
+      </div>
+
+      {isLoading && <p className="text-zinc-500">로딩 중...</p>}
+      {!isLoading && executions.length === 0 && (
+        <div className="text-center py-12 text-zinc-500 dark:text-zinc-400">
+          <p className="text-lg mb-2">실행 이력이 없습니다</p>
+          <p className="text-sm">"지금 실행" 버튼을 눌러 워크플로우를 실행해보세요.</p>
+        </div>
+      )}
+
+      <div className="space-y-2">
+        {executions.map((exec) => (
+          <button
+            key={exec.id}
+            onClick={() => setSelectedExecution(exec)}
+            className="w-full text-left p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  exec.status === 'success'
+                    ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                    : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
+                }`}>
+                  {exec.status === 'success' ? '성공' : '실패'}
+                </span>
+                <span className="text-sm text-zinc-700 dark:text-zinc-300">
+                  {exec.stepSummaries.length}개 스텝
+                </span>
+                <span className="text-sm text-zinc-500">
+                  {(exec.totalDurationMs / 1000).toFixed(1)}초
+                </span>
+              </div>
+              <span className="text-xs text-zinc-400">
+                {new Date(exec.createdAt).toLocaleString('ko-KR')}
+              </span>
+            </div>
+            {/* Step status mini-bar */}
+            <div className="flex gap-1 mt-2">
+              {exec.stepSummaries.map((step) => (
+                <div
+                  key={step.stepId}
+                  title={`${step.stepName}: ${step.status}`}
+                  className={`h-2 flex-1 rounded-full ${
+                    step.status === 'completed' ? 'bg-green-400 dark:bg-green-600'
+                    : step.status === 'failed' ? 'bg-red-400 dark:bg-red-600'
+                    : 'bg-zinc-300 dark:bg-zinc-600'
+                  }`}
+                />
+              ))}
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// === Execution Detail ===
+
+function ExecutionDetail({
+  execution,
+  workflowName,
+  onBack,
+}: {
+  execution: Execution
+  workflowName: string
+  onBack: () => void
+}) {
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">실행 상세</h1>
+          <p className="text-sm text-zinc-500 mt-1">{workflowName}</p>
+        </div>
+        <button onClick={onBack} className="text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">
+          ← 이력으로
+        </button>
+      </div>
+
+      {/* Summary */}
+      <div className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900">
+        <div className="flex items-center gap-4">
+          <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+            execution.status === 'success'
+              ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+              : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
+          }`}>
+            {execution.status === 'success' ? '성공' : '실패'}
+          </span>
+          <span className="text-sm text-zinc-600 dark:text-zinc-400">
+            총 소요시간: {(execution.totalDurationMs / 1000).toFixed(2)}초
+          </span>
+          <span className="text-sm text-zinc-500">
+            {new Date(execution.createdAt).toLocaleString('ko-KR')}
+          </span>
+        </div>
+      </div>
+
+      {/* Step Results */}
+      <div className="space-y-3">
+        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+          스텝 결과 ({execution.stepSummaries.length})
+        </h2>
+        {execution.stepSummaries.map((step, idx) => (
+          <div
+            key={step.stepId}
+            className={`p-4 rounded-lg border bg-white dark:bg-zinc-900 ${
+              step.status === 'completed'
+                ? 'border-green-200 dark:border-green-800'
+                : step.status === 'failed'
+                ? 'border-red-200 dark:border-red-800'
+                : 'border-zinc-200 dark:border-zinc-700'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-mono text-zinc-400">#{idx + 1}</span>
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                  step.status === 'completed'
+                    ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                    : step.status === 'failed'
+                    ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
+                    : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
+                }`}>
+                  {step.status === 'completed' ? '완료' : step.status === 'failed' ? '실패' : step.status}
+                </span>
+                <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                  {step.stepName}
+                </span>
+              </div>
+              <span className="text-xs text-zinc-500">
+                {step.durationMs >= 1000
+                  ? `${(step.durationMs / 1000).toFixed(1)}초`
+                  : `${step.durationMs}ms`}
+              </span>
+            </div>
+            {step.error && (
+              <div className="mt-2 p-2 rounded bg-red-50 dark:bg-red-950/30 text-xs text-red-600 dark:text-red-400 font-mono">
+                {step.error}
+              </div>
+            )}
+            {step.output != null && (
+              <div className="mt-2 p-2 rounded bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-600 dark:text-zinc-400 font-mono max-h-32 overflow-y-auto">
+                {typeof step.output === 'string' ? step.output : JSON.stringify(step.output, null, 2)}
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   )

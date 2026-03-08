@@ -346,7 +346,7 @@ development_status:
   18-2-workflow-execution-engine-sequential-parallel: done
   18-3-predictive-workflow-pattern-analysis: done
   18-4-workflow-builder-ui: done
-  18-5-execution-status-realtime-monitoring-ui: backlog
+  18-5-execution-status-realtime-monitoring-ui: done
   epic-18-retrospective: optional
 
   # ============================================================
