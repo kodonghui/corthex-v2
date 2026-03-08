@@ -10,6 +10,7 @@ import { getNextCronDate } from '../lib/cron-utils'
 import { generateAgentResponse } from '../lib/ai'
 import { orchestrateSecretary } from '../lib/orchestrator'
 import { eventBus } from '../lib/event-bus'
+import { sendCronResult } from './telegram-bot'
 
 // === Configuration ===
 
@@ -263,6 +264,10 @@ async function executeCronJob(schedule: ScheduleRow, retryCount = 0): Promise<vo
       },
     })
 
+    // 텔레그램 결과 전송 (fire-and-forget)
+    sendCronResult(schedule.companyId, schedule.name, result, true)
+      .catch(err => console.warn('[CronEngine] Telegram result send failed:', err))
+
     console.log(`✅ 크론 실행 완료: "${schedule.name}" (${durationMs}ms)`)
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : '알 수 없는 오류'
@@ -330,6 +335,10 @@ async function executeCronJob(schedule: ScheduleRow, retryCount = 0): Promise<vo
           willRetry: false,
         },
       })
+
+      // 텔레그램 최종 실패 전송 (fire-and-forget, 재시도 중에는 전송하지 않음)
+      sendCronResult(schedule.companyId, schedule.name, errorMsg, false)
+        .catch(err => console.warn('[CronEngine] Telegram failure send failed:', err))
     }
   }
 }

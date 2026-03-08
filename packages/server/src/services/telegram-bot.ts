@@ -1016,6 +1016,49 @@ export async function handleUpdate(
   }
 }
 
+// === Notification Functions (15-3) ===
+
+const CRON_RESULT_MAX_LENGTH = 3900
+
+/**
+ * 범용 텔레그램 알림 전송 — companyId로 설정 조회 → 토큰 복호화 → sendMessage.
+ * 설정 없거나 비활성이면 조용히 return. 전송 실패 시 throw 안 함.
+ */
+export async function sendTelegramNotification(companyId: string, message: string): Promise<void> {
+  try {
+    const config = await getConfigByCompanyId(companyId)
+    if (!config || !config.isActive || !config.ceoChatId) return
+
+    const token = await decrypt(config.botToken)
+    await sendMessage(token, config.ceoChatId, message)
+  } catch (err) {
+    console.warn('[TelegramBot] Notification send failed:', err instanceof Error ? err.message : err)
+  }
+}
+
+/**
+ * 크론 결과 전용 전송 — 성공/실패에 따라 포맷팅 후 sendTelegramNotification 호출.
+ * fire-and-forget: 내부에서 에러 처리, throw 안 함.
+ */
+export async function sendCronResult(
+  companyId: string,
+  scheduleName: string,
+  resultOrError: string,
+  isSuccess: boolean,
+): Promise<void> {
+  let message: string
+  if (isSuccess) {
+    message = `⏰ [${scheduleName}]\n\n${resultOrError}`
+    if (message.length > CRON_RESULT_MAX_LENGTH) {
+      message = message.slice(0, CRON_RESULT_MAX_LENGTH) + '\n\n... (전체는 웹에서 확인)'
+    }
+  } else {
+    message = `❌ 크론 실패: ${scheduleName}\n오류: ${resultOrError}`
+  }
+
+  await sendTelegramNotification(companyId, message)
+}
+
 // === Config Loader ===
 
 export async function getConfigByCompanyId(companyId: string): Promise<TelegramConfig | null> {
