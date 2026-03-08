@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
 import { api } from '../../lib/api'
 import { useWsStore } from '../../stores/ws-store'
 import { toast } from '@corthex/ui'
@@ -34,6 +35,20 @@ type ConversationDetail = {
 
 type ApiResponse<T> = { success: boolean; data: T }
 
+// ai_report content JSON 파싱 헬퍼
+export function parseAiReportContent(content: string): { reportId: string | null; title: string; summary: string } {
+  try {
+    const parsed = JSON.parse(content)
+    return {
+      reportId: parsed.reportId || null,
+      title: parsed.title || '보고서',
+      summary: parsed.summary || '',
+    }
+  } catch {
+    return { reportId: null, title: '보고서', summary: content.slice(0, 200) }
+  }
+}
+
 type Props = {
   conversationId: string
   conversationDetail: ConversationDetail | null
@@ -44,6 +59,7 @@ type Props = {
 
 export function ConversationChat({ conversationId, conversationDetail, currentUserId, onBack, onLeave }: Props) {
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const { addListener, removeListener } = useWsStore()
   const [inputText, setInputText] = useState('')
   const [typingUsers, setTypingUsers] = useState<Set<string>>(new Set())
@@ -232,6 +248,41 @@ export function ConversationChat({ conversationId, conversationDetail, currentUs
           }
 
           const isMine = msg.senderId === currentUserId
+
+          // ai_report 카드 렌더링
+          if (msg.type === 'ai_report') {
+            const reportData = parseAiReportContent(msg.content)
+            return (
+              <div
+                key={msg.id}
+                className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className="max-w-[75%] border border-indigo-200 dark:border-indigo-800 rounded-lg overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
+                  onClick={() => reportData.reportId && navigate(`/reports/${reportData.reportId}`)}
+                >
+                  <div className="bg-indigo-50 dark:bg-indigo-950 px-3 py-2 border-b border-indigo-200 dark:border-indigo-800">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-sm">📄</span>
+                      <span className="text-xs font-medium text-indigo-700 dark:text-indigo-300">AI 보고서</span>
+                    </div>
+                  </div>
+                  <div className="px-3 py-2 bg-white dark:bg-zinc-900">
+                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">{reportData.title}</p>
+                    {reportData.summary && (
+                      <p className="text-xs text-zinc-500 mt-1 line-clamp-2">{reportData.summary}</p>
+                    )}
+                    <p className="text-[10px] text-indigo-500 mt-1.5">전체 보기 →</p>
+                  </div>
+                  <div className={`px-3 py-1 ${isMine ? 'text-right' : 'text-left'}`}>
+                    <span className="text-[10px] text-zinc-400">
+                      {new Date(msg.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )
+          }
 
           return (
             <div

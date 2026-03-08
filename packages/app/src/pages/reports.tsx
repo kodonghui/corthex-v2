@@ -6,6 +6,7 @@ import { MarkdownRenderer } from '../components/markdown-renderer'
 import { useAuthStore } from '../stores/auth-store'
 import { Card, Tabs, Textarea, Badge, Skeleton, ConfirmDialog, EmptyState, toast } from '@corthex/ui'
 import type { TabItem } from '@corthex/ui'
+import { ShareToConversationModal } from '../components/messenger/share-to-conversation-modal'
 
 type Report = {
   id: string
@@ -56,6 +57,7 @@ export function ReportsPage() {
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [downloading, setDownloading] = useState(false)
+  const [showShareModal, setShowShareModal] = useState(false)
 
   // 보고서 목록
   const { data: reportsData, isLoading } = useQuery({
@@ -472,13 +474,21 @@ export function ReportsPage() {
                   </button>
                 )}
                 {report.status !== 'draft' && (
-                  <button
-                    onClick={handleDownload}
-                    disabled={downloading}
-                    className="px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-lg text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
-                  >
-                    {downloading ? '다운로드 중...' : '📥 다운로드'}
-                  </button>
+                  <>
+                    <button
+                      onClick={handleDownload}
+                      disabled={downloading}
+                      className="px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-lg text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+                    >
+                      {downloading ? '다운로드 중...' : '📥 다운로드'}
+                    </button>
+                    <button
+                      onClick={() => setShowShareModal(true)}
+                      className="px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-lg text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+                    >
+                      💬 메신저로 공유
+                    </button>
+                  </>
                 )}
               </div>
             )}
@@ -602,6 +612,14 @@ export function ReportsPage() {
         }}
         onCancel={() => setDeleteConfirmOpen(false)}
       />
+
+      {showShareModal && report && (
+        <ShareToConversationModal
+          reportId={report.id}
+          reportTitle={report.title}
+          onClose={() => setShowShareModal(false)}
+        />
+      )}
     </div>
   )
 }

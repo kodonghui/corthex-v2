@@ -3,7 +3,7 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { eq, and, desc, sql, lt } from 'drizzle-orm'
 import { db } from '../../db'
-import { conversations, conversationParticipants, messages, users } from '../../db/schema'
+import { conversations, conversationParticipants, messages, users, reports } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { broadcastToChannel } from '../../ws/channels'
@@ -31,6 +31,10 @@ const sendMessageSchema = z.object({
 
 const addParticipantSchema = z.object({
   userId: z.string().uuid(),
+})
+
+const shareReportSchema = z.object({
+  reportId: z.string().uuid(),
 })
 
 // === Helper: 참여자 검증 ===
@@ -439,3 +443,87 @@ conversationsRoute.post('/:id/typing', async (c) => {
 
   return c.json({ success: true })
 })
+
+// === 보고서 공유 API ===
+
+// POST /conversations/:id/share-report — 보고서를 대화방에 공유
+conversationsRoute.post(
+  '/:id/share-report',
+  zValidator('json', shareReportSchema),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const conversationId = c.req.param('id')
+    const { reportId } = c.req.valid('json')
+
+    // 참여자 검증
+    await assertParticipant(conversationId, tenant.userId, tenant.companyId)
+
+    // 보고서 존재 + 접근 권한 확인
+    const [report] = await db
+      .select({
+        id: reports.id,
+        title: reports.title,
+        content: reports.content,
+      })
+      .from(reports)
+      .where(and(
+        eq(reports.id, reportId),
+        eq(reports.companyId, tenant.companyId),
+      ))
+      .limit(1)
+
+    if (!report) throw new HTTPError(404, '보고서를 찾을 수 없습니다', 'CONV_008')
+
+    // 보고서 요약 생성 (최대 200자)
+    const summary = report.content
+      ? report.content.replace(/[#*`\n]/g, ' ').trim().slice(0, 200)
+      : ''
+
+    const contentJson = JSON.stringify({
+      reportId: report.id,
+      title: report.title,
+      summary,
+    })
+
+    // ai_report 메시지 INSERT
+    const [msg] = await db
+      .insert(messages)
+      .values({
+        conversationId,
+        senderId: tenant.userId,
+        companyId: tenant.companyId,
+        content: contentJson,
+        type: 'ai_report',
+      })
+      .returning()
+
+    // 대화방 updatedAt 갱신
+    await db
+      .update(conversations)
+      .set({ updatedAt: new Date() })
+      .where(eq(conversations.id, conversationId))
+
+    // 본인 lastReadAt 자동 갱신
+    await conversationService.markAsRead(conversationId, tenant.userId, tenant.companyId)
+
+    const messageData = {
+      id: msg.id,
+      conversationId: msg.conversationId,
+      senderId: msg.senderId,
+      companyId: msg.companyId,
+      content: msg.content,
+      type: msg.type,
+      isDeleted: msg.isDeleted,
+      createdAt: msg.createdAt.toISOString(),
+      updatedAt: msg.updatedAt.toISOString(),
+    }
+
+    // WebSocket 브로드캐스트
+    broadcastToChannel(`conversation::${conversationId}`, {
+      type: 'new-message',
+      message: messageData,
+    })
+
+    return c.json({ success: true, data: messageData }, 201)
+  },
+)
