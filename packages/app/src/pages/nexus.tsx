@@ -204,6 +204,31 @@ function NexusPageInner() {
     }, []),
   })
 
+  // Canvas context for AI (serialized as text)
+  const canvasContext = useMemo(() => canvasToText(nodes, edges), [nodes, edges])
+
+  // Node label change handler (for double-click editing)
+  const handleLabelChange = useCallback(
+    (nodeId: string, label: string) => {
+      setNodes((nds) =>
+        nds.map((n) => (n.id === nodeId ? { ...n, data: { ...n.data, label } } : n)),
+      )
+      setDirty(true)
+    },
+    [setNodes],
+  )
+
+  // Edge label change handler
+  const handleEdgeLabelChange = useCallback(
+    (edgeId: string, label: string) => {
+      setEdges((eds) =>
+        eds.map((e) => (e.id === edgeId ? { ...e, data: { ...e.data, label } } : e)),
+      )
+      setDirty(true)
+    },
+    [setEdges],
+  )
+
   // Load Mermaid from knowledge base
   const handleLoadFromKnowledge = useCallback(
     (mermaidCode: string, title: string) => {
@@ -228,31 +253,6 @@ function NexusPageInner() {
       }
     },
     [dirty, setNodes, setEdges, handleLabelChange, handleEdgeLabelChange, reactFlowInstance],
-  )
-
-  // Canvas context for AI (serialized as text)
-  const canvasContext = useMemo(() => canvasToText(nodes, edges), [nodes, edges])
-
-  // Node label change handler (for double-click editing)
-  const handleLabelChange = useCallback(
-    (nodeId: string, label: string) => {
-      setNodes((nds) =>
-        nds.map((n) => (n.id === nodeId ? { ...n, data: { ...n.data, label } } : n)),
-      )
-      setDirty(true)
-    },
-    [setNodes],
-  )
-
-  // Edge label change handler
-  const handleEdgeLabelChange = useCallback(
-    (edgeId: string, label: string) => {
-      setEdges((eds) =>
-        eds.map((e) => (e.id === edgeId ? { ...e, data: { ...e.data, label } } : e)),
-      )
-      setDirty(true)
-    },
-    [setEdges],
   )
 
   // === Load pending graph data from command center ===

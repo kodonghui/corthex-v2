@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import React, { useState, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../../lib/api'
 import { Card, Button, EmptyState, Input, Modal, toast, Badge, Select } from '@corthex/ui'
@@ -200,7 +200,7 @@ function PortfolioCard({ portfolio, prices }: { portfolio: Portfolio; prices: Re
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{portfolio.name}</h3>
-            <Badge variant={portfolio.tradingMode === 'real' ? 'danger' : 'info'}>
+            <Badge variant={portfolio.tradingMode === 'real' ? 'error' : 'info'}>
               {portfolio.tradingMode === 'real' ? '실거래' : '모의거래'}
             </Badge>
           </div>
@@ -320,7 +320,7 @@ function CreateModal({
           <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1 block">거래 모드</label>
           <Select
             value={mode}
-            onChange={(v) => setMode(v as 'paper' | 'real')}
+            onChange={(e) => setMode((e as React.ChangeEvent<HTMLSelectElement>).target.value as 'paper' | 'real')}
             options={[
               { value: 'paper', label: '모의거래' },
               { value: 'real', label: '실거래' },

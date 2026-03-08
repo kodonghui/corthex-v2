@@ -50,7 +50,7 @@ export function CanvasSidebar({ currentSketchId, onLoad, onNew, onLoadFromKnowle
   })
 
   const duplicateMutation = useMutation({
-    mutationFn: (id: string) => api.post(`/workspace/sketches/${id}/duplicate`),
+    mutationFn: (id: string) => api.post(`/workspace/sketches/${id}/duplicate`, {}),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sketches'] })
     },

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { Card, Badge, Input, Skeleton, SkeletonTable, EmptyState, Modal, ConfirmDialog, toast, Tabs, Select } from '@corthex/ui'
@@ -622,15 +622,15 @@ function SoulGymPanel() {
         {/* Confirm dialog */}
         <ConfirmDialog
           isOpen={!!confirmTarget}
-          onClose={() => setConfirmTarget(null)}
+          onCancel={() => setConfirmTarget(null)}
           onConfirm={() => confirmTarget && applyMutation.mutate(confirmTarget.id)}
           title="개선 제안 적용"
-          message={
+          description={
             confirmTarget
-              ? `"${confirmTarget.agentName}"에게 "${SUGGESTION_TYPE_LABEL[confirmTarget.suggestionType]}" 제안을 적용하시겠습니까?\n\n예상 개선: +${confirmTarget.expectedImprovement}% (신뢰도 ${confirmTarget.confidence}%)`
+              ? `"${confirmTarget.agentName}"에게 "${SUGGESTION_TYPE_LABEL[confirmTarget.suggestionType]}" 제안을 적용하시겠습니까? 예상 개선: +${confirmTarget.expectedImprovement}% (신뢰도 ${confirmTarget.confidence}%)`
               : ''
           }
-          confirmLabel="적용"
+          confirmText="적용"
           variant="default"
         />
       </div>
@@ -1067,7 +1067,7 @@ function QualityDashboardTab() {
         {departmentOptions.length > 0 && (
           <Select
             value={departmentId}
-            onChange={setDepartmentId}
+            onChange={(e) => setDepartmentId((e as React.ChangeEvent<HTMLSelectElement>).target.value)}
             options={[{ value: '', label: '전체 부서' }, ...departmentOptions]}
           />
         )}

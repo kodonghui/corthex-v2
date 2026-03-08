@@ -165,7 +165,7 @@ export function PendingOrders() {
               )}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <Badge variant={order.side === 'buy' ? 'success' : 'danger'}>
+                  <Badge variant={order.side === 'buy' ? 'success' : 'error'}>
                     {order.side === 'buy' ? '매수' : '매도'}
                   </Badge>
                   <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">{order.tickerName}</span>

@@ -468,6 +468,8 @@ export type WsChannel =
   | 'tool'
   | 'cost'
   | 'debate'
+  | 'strategy'
+  | 'argos'
 
 export type WsInboundMessage = {
   type: 'subscribe' | 'unsubscribe'
