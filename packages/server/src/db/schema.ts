@@ -34,6 +34,7 @@ export const orderTypeEnum = pgEnum('order_type', ['market', 'limit'])
 export const cronRunStatusEnum = pgEnum('cron_run_status', ['running', 'success', 'failed'])
 export const debateStatusEnum = pgEnum('debate_status', ['pending', 'in-progress', 'completed', 'failed'])
 export const debateTypeEnum = pgEnum('debate_type', ['debate', 'deep-debate'])
+export const argosEventStatusEnum = pgEnum('argos_event_status', ['detected', 'executing', 'completed', 'failed'])
 export const consensusResultEnum = pgEnum('consensus_result', ['consensus', 'dissent', 'partial'])
 
 // === 1. companies — 회사 (테넌트 최상위 단위) ===
@@ -403,15 +404,17 @@ export const nightJobSchedules = pgTable('night_job_schedules', {
   companyIdx: index('night_schedules_company_idx').on(table.companyId),
 }))
 
-// === 18c. night_job_triggers — 이벤트 기반 트리거 ===
+// === 18c. night_job_triggers — 이벤트 기반 트리거 (ARGOS) ===
 export const nightJobTriggers = pgTable('night_job_triggers', {
   id: uuid('id').primaryKey().defaultRandom(),
   companyId: uuid('company_id').notNull().references(() => companies.id),
   userId: uuid('user_id').notNull().references(() => users.id),
   agentId: uuid('agent_id').notNull().references(() => agents.id),
+  name: varchar('name', { length: 200 }),
   instruction: text('instruction').notNull(),
   triggerType: varchar('trigger_type', { length: 50 }).notNull(),
   condition: jsonb('condition').notNull(),
+  cooldownMinutes: integer('cooldown_minutes').notNull().default(30),
   isActive: boolean('is_active').notNull().default(true),
   lastTriggeredAt: timestamp('last_triggered_at'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
@@ -438,6 +441,26 @@ export const cronRuns = pgTable('cron_runs', {
   companyIdx: index('cron_runs_company_idx').on(table.companyId),
   cronJobIdx: index('cron_runs_cron_job_idx').on(table.cronJobId),
   statusIdx: index('cron_runs_status_idx').on(table.status),
+}))
+
+// === 18e. argos_events — ARGOS 트리거 이벤트 기록 ===
+export const argosEvents = pgTable('argos_events', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  triggerId: uuid('trigger_id').notNull().references(() => nightJobTriggers.id, { onDelete: 'cascade' }),
+  eventType: varchar('event_type', { length: 50 }).notNull(),
+  eventData: jsonb('event_data'),
+  status: argosEventStatusEnum('status').notNull().default('detected'),
+  commandId: uuid('command_id'),
+  result: text('result'),
+  error: text('error'),
+  durationMs: integer('duration_ms'),
+  processedAt: timestamp('processed_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('argos_events_company_idx').on(table.companyId),
+  triggerIdx: index('argos_events_trigger_idx').on(table.triggerId),
+  statusIdx: index('argos_events_status_idx').on(table.status),
 }))
 
 // === 19a. sns_accounts — SNS 계정 (멀티 계정 관리) ===
@@ -1053,6 +1076,12 @@ export const nightJobTriggersRelations = relations(nightJobTriggers, ({ one, man
   user: one(users, { fields: [nightJobTriggers.userId], references: [users.id] }),
   agent: one(agents, { fields: [nightJobTriggers.agentId], references: [agents.id] }),
   jobs: many(nightJobs),
+  events: many(argosEvents),
+}))
+
+export const argosEventsRelations = relations(argosEvents, ({ one }) => ({
+  company: one(companies, { fields: [argosEvents.companyId], references: [companies.id] }),
+  trigger: one(nightJobTriggers, { fields: [argosEvents.triggerId], references: [nightJobTriggers.id] }),
 }))
 
 export const snsAccountsRelations = relations(snsAccounts, ({ one, many }) => ({
