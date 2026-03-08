@@ -226,7 +226,7 @@ development_status:
   # UX: CEO #3 (Strategy Room)
   # Dependencies: Epic 5, Epic 4
   # ============================================================
-  epic-10: in-progress
+  epic-10: done
   10-1-strategy-schema-watchlist-portfolio-orders: done
   10-2-kis-securities-api-adapter: done
   10-3-finance-tools-5-implementation: done
@@ -243,7 +243,7 @@ development_status:
   # UX: CEO #5 (AGORA)
   # Dependencies: Epic 5, Epic 3
   # ============================================================
-  epic-11: in-progress
+  epic-11: done
   11-1-agora-engine-round-management-consensus: done
   11-2-debate-deep-debate-command-integration: done
   11-3-websocket-debate-channel-streaming: done
@@ -257,7 +257,7 @@ development_status:
   # UX: CEO #6 (SNS)
   # Dependencies: Epic 4, Epic 5
   # ============================================================
-  epic-12: in-progress
+  epic-12: done
   12-1-sns-content-management-api: done
   12-2-marketing-tools-3-implementation: done
   12-3-selenium-auto-publish-engine-5-platforms: done
@@ -271,7 +271,7 @@ development_status:
   # UX: CEO #4 (SketchVibe)
   # Dependencies: Epic 5, Epic 3
   # ============================================================
-  epic-13: in-progress
+  epic-13: done
   13-1-cytoscape-canvas-8-node-types-connection: done
   13-2-mermaid-cytoscape-bidirectional-conversion: done
   13-3-mcp-sse-ai-realtime-canvas-manipulation: done
@@ -299,7 +299,7 @@ development_status:
   # FRs: FR68
   # Dependencies: Epic 5, Epic 14
   # ============================================================
-  epic-15: in-progress
+  epic-15: done
   15-1-telegram-bot-api-webhook: done
   15-2-telegram-command-parsing-mention-text: done
   15-3-result-send-cron-result-auto-send: done
@@ -311,7 +311,7 @@ development_status:
   # UX: CEO #13 (Knowledge)
   # Dependencies: Epic 3, Epic 5
   # ============================================================
-  epic-16: in-progress
+  epic-16: done
   16-1-knowledge-schema-docs-memories: done
   16-2-document-store-crud-api-folder-management: done
   16-3-department-knowledge-auto-injection: done
@@ -326,7 +326,7 @@ development_status:
   # UX: CEO #8 (History), CEO #9 (Archive), CEO #10 (Performance)
   # Dependencies: Epic 5, Epic 7, Epic 8
   # ============================================================
-  epic-17: in-progress
+  epic-17: done
   17-1-operation-log-api-search-filter-bookmark: done
   17-2-operation-log-ui-ab-compare-replay: done
   17-3-classified-docs-api-archive-filter-similar: done
