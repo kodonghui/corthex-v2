@@ -23,6 +23,7 @@ const EmployeesPage = lazy(() => import('./pages/employees').then((m) => ({ defa
 const SettingsPage = lazy(() => import('./pages/settings').then((m) => ({ default: m.SettingsPage })))
 const OnboardingWizardPage = lazy(() => import('./pages/onboarding').then((m) => ({ default: m.OnboardingWizardPage })))
 const WorkflowsPage = lazy(() => import('./pages/workflows').then((m) => ({ default: m.WorkflowsPage })))
+const TemplateMarketPage = lazy(() => import('./pages/template-market').then((m) => ({ default: m.TemplateMarketPage })))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -93,6 +94,7 @@ export function App() {
             <Route path="org-chart" element={<Suspense fallback={<PageSkeleton />}><OrgChartPage /></Suspense>} />
             <Route path="org-templates" element={<Suspense fallback={<PageSkeleton />}><OrgTemplatesPage /></Suspense>} />
             <Route path="workflows" element={<Suspense fallback={<PageSkeleton />}><WorkflowsPage /></Suspense>} />
+            <Route path="template-market" element={<Suspense fallback={<PageSkeleton />}><TemplateMarketPage /></Suspense>} />
             <Route path="settings" element={<Suspense fallback={<PageSkeleton />}><SettingsPage /></Suspense>} />
             <Route path="onboarding" element={<Suspense fallback={<PageSkeleton />}><OnboardingWizardPage /></Suspense>} />
           </Route>

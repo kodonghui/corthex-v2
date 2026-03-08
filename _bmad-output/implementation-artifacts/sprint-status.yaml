@@ -358,21 +358,21 @@ development_status:
   # FRs: FR76
   # Dependencies: Epic 9
   # ============================================================
-  epic-19: in-progress
+  epic-19: done
   19-1-messenger-schema-conversations-messages: done
   19-2-realtime-chat-api-websocket-channel: done
   19-3-one-on-one-group-message-ui: done
   19-4-ai-analysis-result-sharing: done
   19-5-company-id-based-chat-isolation: done
-  epic-19-retrospective: optional
+  epic-19-retrospective: done
 
   # ============================================================
   # Epic 20: Platform Extensions (5 stories, 16 SP)
   # PRD: Vision (Phase 3)
   # Dependencies: Epic 2, Epic 18
   # ============================================================
-  epic-20: backlog
-  20-1-org-template-market-api-ui: backlog
+  epic-20: in-progress
+  20-1-org-template-market-api-ui: done
   20-2-agent-marketplace-soul-tool-exchange: backlog
   20-3-public-api-key-issuance: backlog
   20-4-workflow-builder-nocode-visual: backlog

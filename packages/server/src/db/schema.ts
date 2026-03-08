@@ -996,11 +996,16 @@ export const orgTemplates = pgTable('org_templates', {
   templateData: jsonb('template_data').notNull(),  // {departments: [{name, agents: [{name, tier, modelName, soul, allowedTools}]}]}
   isBuiltin: boolean('is_builtin').notNull().default(false),
   isActive: boolean('is_active').notNull().default(true),
+  isPublished: boolean('is_published').notNull().default(false),
+  publishedAt: timestamp('published_at'),
+  downloadCount: integer('download_count').notNull().default(0),
+  tags: jsonb('tags'),  // string[]
   createdBy: uuid('created_by').references(() => users.id),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 }, (table) => ({
   companyIdx: index('org_templates_company_idx').on(table.companyId),
+  publishedIdx: index('org_templates_published_idx').on(table.isPublished),
 }))
 
 // === P1-6. audit_logs — 삭제 불가 감사 로그 (INSERT ONLY) ===
