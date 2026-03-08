@@ -21,6 +21,7 @@ const OrgChartPage = lazy(() => import('./pages/org-chart').then((m) => ({ defau
 const OrgTemplatesPage = lazy(() => import('./pages/org-templates').then((m) => ({ default: m.OrgTemplatesPage })))
 const EmployeesPage = lazy(() => import('./pages/employees').then((m) => ({ default: m.EmployeesPage })))
 const SettingsPage = lazy(() => import('./pages/settings').then((m) => ({ default: m.SettingsPage })))
+const OnboardingWizardPage = lazy(() => import('./pages/onboarding').then((m) => ({ default: m.OnboardingWizardPage })))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -91,6 +92,7 @@ export function App() {
             <Route path="org-chart" element={<Suspense fallback={<PageSkeleton />}><OrgChartPage /></Suspense>} />
             <Route path="org-templates" element={<Suspense fallback={<PageSkeleton />}><OrgTemplatesPage /></Suspense>} />
             <Route path="settings" element={<Suspense fallback={<PageSkeleton />}><SettingsPage /></Suspense>} />
+            <Route path="onboarding" element={<Suspense fallback={<PageSkeleton />}><OnboardingWizardPage /></Suspense>} />
           </Route>
         </Routes>
       </BrowserRouter>
