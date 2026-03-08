@@ -38,6 +38,10 @@ export const AUDIT_ACTIONS = {
   EMPLOYEE_DEACTIVATE: 'employee.deactivate',
   EMPLOYEE_REACTIVATE: 'employee.reactivate',
   EMPLOYEE_PASSWORD_RESET: 'employee.password_reset',
+  // Public API Keys
+  API_KEY_CREATE: 'api_key.create',
+  API_KEY_DELETE: 'api_key.delete',
+  API_KEY_ROTATE: 'api_key.rotate',
   // System
   SYSTEM_CONFIG_CHANGE: 'system.config.change',
   // Security (Prompt Guard)

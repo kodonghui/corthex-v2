@@ -1082,6 +1082,25 @@ export const soulBackups = pgTable('soul_backups', {
   agentIdx: index('soul_backups_agent_idx').on(table.companyId, table.agentId),
 }))
 
+// === P3-20. company_api_keys — 공개 API 키 (SHA-256 해시 저장) ===
+export const companyApiKeys = pgTable('company_api_keys', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  name: varchar('name', { length: 100 }).notNull(),
+  keyPrefix: varchar('key_prefix', { length: 20 }).notNull(),
+  keyHash: varchar('key_hash', { length: 64 }).notNull(),  // SHA-256 hex
+  lastUsedAt: timestamp('last_used_at'),
+  expiresAt: timestamp('expires_at'),
+  isActive: boolean('is_active').notNull().default(true),
+  scopes: jsonb('scopes').notNull().default(['read']),  // ['read'] | ['read','write'] | ['read','write','execute']
+  rateLimitPerMin: integer('rate_limit_per_min').notNull().default(60),
+  createdBy: uuid('created_by').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('company_api_keys_company_idx').on(table.companyId),
+  keyHashIdx: uniqueIndex('company_api_keys_key_hash_idx').on(table.keyHash),
+}))
+
 // === Relations ===
 export const companiesRelations = relations(companies, ({ many }) => ({
   users: many(users),

@@ -374,7 +374,7 @@ development_status:
   epic-20: in-progress
   20-1-org-template-market-api-ui: done
   20-2-agent-marketplace-soul-tool-exchange: done
-  20-3-public-api-key-issuance: backlog
+  20-3-public-api-key-issuance: done
   20-4-workflow-builder-nocode-visual: backlog
   20-5-platform-integration-test: backlog
   epic-20-retrospective: optional

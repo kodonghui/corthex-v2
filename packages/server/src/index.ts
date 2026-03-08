@@ -57,6 +57,8 @@ import { workflowsRoute } from './routes/workspace/workflows'
 import { conversationsRoute } from './routes/workspace/conversations'
 import { workspaceTemplateMarketRoute } from './routes/workspace/template-market'
 import { workspaceAgentMarketplaceRoute } from './routes/workspace/agent-marketplace'
+import { publicApiKeysRoute } from './routes/admin/public-api-keys'
+import { publicApiV1Route } from './routes/public-api/v1'
 import { superAdminCompaniesRoute } from './routes/super-admin/companies'
 
 import { commandsRoute } from './routes/commands'
@@ -124,6 +126,7 @@ app.route('/api/admin', budgetRoute)
 app.route('/api/admin', qualityRulesRoute)
 app.route('/api/admin', securityRoute)
 app.route('/api/admin', employeesRoute)
+app.route('/api/admin', publicApiKeysRoute)
 
 // 유저 워크스페이스 라우트 (각 파일 내부에서 authMiddleware 적용, 테넌트 격리)
 app.route('/api/workspace', workspaceAgentsRoute)
@@ -162,6 +165,9 @@ app.route('/api/workspace', workflowsRoute)
 app.route('/api/workspace/conversations', conversationsRoute)
 app.route('/api/workspace', workspaceTemplateMarketRoute)
 app.route('/api/workspace', workspaceAgentMarketplaceRoute)
+
+// 공개 API (API 키 인증)
+app.route('/api/v1', publicApiV1Route)
 
 // WebSocket 라우트
 app.get('/ws', wsRoute)
