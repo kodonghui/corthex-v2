@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useAuthStore } from '../stores/auth-store'
@@ -26,6 +26,39 @@ const nav = [
   { to: '/org-chart', label: '조직도', icon: '🏗️' },
   { to: '/org-templates', label: '조직 템플릿', icon: '📋' },
 ]
+
+function SwitchToCeoButton({ companyId }: { companyId: string | null }) {
+  const [switching, setSwitching] = useState(false)
+
+  const handleSwitch = useCallback(async () => {
+    if (!companyId || switching) return
+    setSwitching(true)
+    try {
+      const res = await api.post<{ data: { token: string; user: { id: string; name: string; role: string; companyId: string }; targetUrl: string } }>('/auth/switch-app', {
+        targetApp: 'ceo',
+        companyId,
+      })
+      // CEO 앱 localStorage에 토큰 저장
+      localStorage.setItem('corthex_token', res.data.token)
+      localStorage.setItem('corthex_user', JSON.stringify(res.data.user))
+      window.location.href = res.data.targetUrl
+    } catch (err) {
+      setSwitching(false)
+      alert(err instanceof Error ? err.message : '앱 전환에 실패했습니다')
+    }
+  }, [companyId, switching])
+
+  return (
+    <button
+      onClick={handleSwitch}
+      disabled={!companyId || switching}
+      className="flex items-center gap-2 w-full px-3 py-2 text-xs font-medium rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950 hover:bg-indigo-100 dark:hover:bg-indigo-900"
+    >
+      <span>⇄</span>
+      <span>{switching ? '전환 중...' : 'CEO 앱으로 전환'}</span>
+    </button>
+  )
+}
 
 export function Sidebar() {
   const user = useAuthStore((s) => s.user)
@@ -97,6 +130,20 @@ export function Sidebar() {
       </nav>
 
       <div className="p-3 border-t border-zinc-200 dark:border-zinc-800 space-y-2">
+        <NavLink
+          to="/settings"
+          className={({ isActive }) =>
+            `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+              isActive
+                ? 'bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-medium'
+                : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+            }`
+          }
+        >
+          <span>{'⚙️'}</span>
+          <span>회사 설정</span>
+        </NavLink>
+        <SwitchToCeoButton companyId={selectedCompanyId} />
         <div className="flex items-center justify-between px-3 py-2">
           <div>
             <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{user?.name}</p>

@@ -20,6 +20,7 @@ const createCompanySchema = z.object({
 const updateCompanySchema = z.object({
   name: z.string().min(1).max(100).optional(),
   isActive: z.boolean().optional(),
+  settings: z.record(z.unknown()).optional(),
 })
 
 const smtpConfigSchema = z.object({
