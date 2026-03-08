@@ -18,7 +18,8 @@ import '@xyflow/react/dist/style.css'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { ChatArea } from '../components/chat/chat-area'
-import { canvasToText } from '../lib/canvas-to-mermaid'
+import { canvasToText, canvasToMermaid } from '../lib/canvas-to-mermaid'
+import { mermaidToCanvas } from '../lib/mermaid-to-canvas'
 import { sketchVibeNodeTypes, NODE_PALETTE, type SvNodeType } from '../components/nexus/sketchvibe-nodes'
 import { sketchVibeEdgeTypes } from '../components/nexus/editable-edge'
 import { ContextMenu } from '../components/nexus/context-menu'
@@ -61,6 +62,12 @@ function NexusPageInner() {
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const [saveNameInput, setSaveNameInput] = useState('')
   const [showSidebar, setShowSidebar] = useState(false)
+
+  // Mermaid import/export state
+  const [showMermaidModal, setShowMermaidModal] = useState(false)
+  const [mermaidInput, setMermaidInput] = useState('')
+  const [mermaidError, setMermaidError] = useState('')
+  const [exportCopied, setExportCopied] = useState(false)
 
   // Chat state
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null)
@@ -387,6 +394,46 @@ function NexusPageInner() {
     [],
   )
 
+  // Mermaid import handler
+  const handleMermaidImport = useCallback(() => {
+    if (!mermaidInput.trim()) return
+    const result = mermaidToCanvas(mermaidInput)
+    if (result.error) {
+      setMermaidError(result.error)
+      return
+    }
+    // Inject callbacks into nodes and edges
+    const importedNodes = result.nodes.map((n) => ({
+      ...n,
+      data: { ...n.data, onLabelChange: handleLabelChange },
+    }))
+    const importedEdges = result.edges.map((e) => ({
+      ...e,
+      data: { ...e.data, onEdgeLabelChange: handleEdgeLabelChange },
+    }))
+    setNodes(importedNodes)
+    setEdges(importedEdges)
+    setDirty(true)
+    setShowMermaidModal(false)
+    setMermaidInput('')
+    setMermaidError('')
+    setTimeout(() => reactFlowInstance?.fitView({ padding: 0.2 }), 100)
+  }, [mermaidInput, handleLabelChange, handleEdgeLabelChange, setNodes, setEdges, reactFlowInstance])
+
+  // Mermaid export handler
+  const handleMermaidExport = useCallback(async () => {
+    const code = canvasToMermaid(nodes, edges)
+    try {
+      await navigator.clipboard.writeText(code)
+      setExportCopied(true)
+      setTimeout(() => setExportCopied(false), 2000)
+    } catch {
+      // Fallback: show in modal
+      setMermaidInput(code)
+      setShowMermaidModal(true)
+    }
+  }, [nodes, edges])
+
   // Context menu action handler
   const handleContextAction = useCallback(
     (action: { type: string; nodeId?: string; nodeType?: SvNodeType; position?: { x: number; y: number } }) => {
@@ -479,6 +526,25 @@ function NexusPageInner() {
           }`}
         >
           목록
+        </button>
+
+        {/* Mermaid Import */}
+        <button
+          onClick={() => { setMermaidInput(''); setMermaidError(''); setShowMermaidModal(true) }}
+          className="px-2 py-1 text-xs bg-zinc-700 hover:bg-zinc-600 text-zinc-300 rounded transition-colors"
+          title="Mermaid 코드 가져오기"
+        >
+          Mermaid
+        </button>
+
+        {/* Mermaid Export */}
+        <button
+          onClick={handleMermaidExport}
+          disabled={nodes.length === 0}
+          className="px-2 py-1 text-xs bg-zinc-700 hover:bg-zinc-600 disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-300 rounded transition-colors"
+          title="Mermaid 코드 내보내기"
+        >
+          {exportCopied ? '복사됨!' : '내보내기'}
         </button>
 
         {/* 에이전트 선택 */}
@@ -711,6 +777,40 @@ function NexusPageInner() {
                 className="px-3 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 disabled:bg-zinc-700 disabled:text-zinc-500 text-white rounded-lg"
               >
                 저장
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Mermaid Import 모달 */}
+      {showMermaidModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-zinc-900 border border-zinc-700 rounded-xl p-6 w-[480px] max-w-[90vw] shadow-2xl">
+            <h3 className="text-sm font-semibold text-zinc-200 mb-3">Mermaid 코드 가져오기</h3>
+            <textarea
+              autoFocus
+              value={mermaidInput}
+              onChange={(e) => { setMermaidInput(e.target.value); setMermaidError('') }}
+              placeholder={`flowchart TD\n  A([시작])\n  B[에이전트]\n  A --> B`}
+              rows={10}
+              className="w-full bg-zinc-800 border border-zinc-600 rounded-lg px-3 py-2 text-sm text-zinc-200 font-mono outline-none focus:border-indigo-500 resize-y"
+            />
+            {mermaidError && (
+              <p className="mt-2 text-xs text-red-400">{mermaidError}</p>
+            )}
+            <div className="flex gap-2 mt-4 justify-end">
+              <button
+                onClick={() => setShowMermaidModal(false)}
+                className="px-3 py-1.5 text-xs bg-zinc-700 hover:bg-zinc-600 text-zinc-300 rounded-lg"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleMermaidImport}
+                disabled={!mermaidInput.trim()}
+                className="px-3 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 disabled:bg-zinc-700 disabled:text-zinc-500 text-white rounded-lg"
+              >
+                적용
               </button>
             </div>
           </div>

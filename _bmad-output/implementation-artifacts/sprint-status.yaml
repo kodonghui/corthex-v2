@@ -228,7 +228,7 @@ development_status:
   # ============================================================
   epic-10: in-progress
   10-1-strategy-schema-watchlist-portfolio-orders: done
-  10-2-kis-securities-api-adapter: in-progress
+  10-2-kis-securities-api-adapter: review
   10-3-finance-tools-5-implementation: backlog
   10-4-cio-vector-separation-orchestration: backlog
   10-5-autonomous-approval-execution-risk-control: backlog
@@ -260,7 +260,7 @@ development_status:
   epic-12: in-progress
   12-1-sns-content-management-api: done
   12-2-marketing-tools-3-implementation: done
-  12-3-selenium-auto-publish-engine-5-platforms: backlog
+  12-3-selenium-auto-publish-engine-5-platforms: ready-for-dev
   12-4-scheduled-publish-queue-card-news: backlog
   12-5-sns-publishing-ui: backlog
   epic-12-retrospective: optional
@@ -273,7 +273,7 @@ development_status:
   # ============================================================
   epic-13: in-progress
   13-1-cytoscape-canvas-8-node-types-connection: done
-  13-2-mermaid-cytoscape-bidirectional-conversion: review
+  13-2-mermaid-cytoscape-bidirectional-conversion: done
   13-3-mcp-sse-ai-realtime-canvas-manipulation: backlog
   13-4-save-load-knowledge-base-integration: backlog
   13-5-sketchvibe-ui-integration-command-center: backlog
@@ -288,7 +288,7 @@ development_status:
   epic-14: in-progress
   14-1-cron-scheduler-service-crud-api: done
   14-2-cron-execution-engine-auto-run: done
-  14-3-argos-trigger-condition-auto-collect: ready-for-dev
+  14-3-argos-trigger-condition-auto-collect: in-progress
   14-4-cron-base-ui: backlog
   14-5-argos-ui: backlog
   14-6-status-bar-data-ai-ok-ng-cost: backlog
@@ -312,7 +312,7 @@ development_status:
   # Dependencies: Epic 3, Epic 5
   # ============================================================
   epic-16: in-progress
-  16-1-knowledge-schema-docs-memories: in-progress
+  16-1-knowledge-schema-docs-memories: done
   16-2-document-store-crud-api-folder-management: backlog
   16-3-department-knowledge-auto-injection: backlog
   16-4-agent-memory-auto-learning-extraction: backlog

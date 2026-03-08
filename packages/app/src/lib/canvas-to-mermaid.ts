@@ -4,7 +4,7 @@ type SvNodeType = 'start' | 'end' | 'agent' | 'system' | 'api' | 'decide' | 'db'
 
 const MERMAID_SHAPES: Record<SvNodeType, [string, string]> = {
   start: ['([', '])'],
-  end: ['([', '])'],
+  end: ['((', '))'],
   agent: ['[', ']'],
   system: ['[[', ']]'],
   api: ['{{', '}}'],
@@ -40,14 +40,19 @@ export function canvasToMermaid(nodes: Node[], edges: Edge[]): string {
     const label = (node.data as { label?: string })?.label || 'untitled'
     const [open, close] = MERMAID_SHAPES[type] || ['[', ']']
     const sid = shortId(node.id)
-    lines.push(`  ${sid}${open}"${label} (${TYPE_LABELS[type]})"${close}`)
+    lines.push(`  ${sid}${open}"${label}"${close}`)
   }
 
-  // 엣지 정의
+  // 엣지 정의 (라벨 포함)
   for (const edge of edges) {
     const src = shortId(edge.source)
     const tgt = shortId(edge.target)
-    lines.push(`  ${src} --> ${tgt}`)
+    const label = (edge.data as { label?: string } | undefined)?.label || ''
+    if (label) {
+      lines.push(`  ${src} -->|${label}| ${tgt}`)
+    } else {
+      lines.push(`  ${src} --> ${tgt}`)
+    }
   }
 
   return lines.join('\n')

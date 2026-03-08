@@ -7,6 +7,7 @@ import { sketches } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { logActivity } from '../../lib/activity-logger'
+import { parseMermaid } from '@corthex/shared'
 import type { AppEnv } from '../../types'
 
 export const sketchesRoute = new Hono<AppEnv>()
@@ -152,3 +153,71 @@ sketchesRoute.delete('/:id', async (c) => {
 
   return c.json({ data: { deleted: true } })
 })
+
+// POST /api/workspace/sketches/import-mermaid — Mermaid 코드로 캔버스 생성
+const importMermaidSchema = z.object({
+  mermaid: z.string().min(1, 'Mermaid 코드를 입력하세요').max(50000, 'Mermaid 코드가 너무 깁니다 (최대 50,000자)'),
+  name: z.string().min(1).max(200).optional(),
+})
+
+sketchesRoute.post(
+  '/import-mermaid',
+  zValidator('json', importMermaidSchema),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const body = c.req.valid('json')
+
+    const result = parseMermaid(body.mermaid)
+
+    if (result.error) {
+      throw new HTTPError(400, result.error, 'MERMAID_001')
+    }
+
+    // Convert ParsedNode/ParsedEdge to graphData format
+    const graphNodes = result.nodes.map((n, i) => ({
+      id: n.id,
+      type: n.nodeType,
+      position: { x: 100 + (i % 4) * 250, y: 100 + Math.floor(i / 4) * 150 },
+      data: { label: n.label },
+    }))
+
+    const graphEdges = result.edges.map((e) => ({
+      id: e.id,
+      source: e.source,
+      target: e.target,
+      type: 'editable',
+      data: { label: e.label },
+    }))
+
+    const graphData = { nodes: graphNodes, edges: graphEdges }
+    const sketchName = body.name || `Mermaid Import ${new Date().toLocaleString('ko-KR')}`
+
+    const [created] = await db
+      .insert(sketches)
+      .values({
+        companyId: tenant.companyId,
+        name: sketchName,
+        graphData,
+        createdBy: tenant.userId,
+      })
+      .returning()
+
+    logActivity({
+      companyId: tenant.companyId,
+      type: 'system',
+      phase: 'end',
+      actorType: 'user',
+      actorId: tenant.userId,
+      action: `SketchVibe: Mermaid 가져오기 — ${sketchName} (노드 ${result.nodes.length}개)`,
+    })
+
+    return c.json({
+      data: created,
+      meta: {
+        nodesCount: result.nodes.length,
+        edgesCount: result.edges.length,
+        warnings: result.warnings,
+      },
+    }, 201)
+  },
+)
