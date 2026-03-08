@@ -341,12 +341,12 @@ development_status:
   # FRs: FR74-FR75
   # Dependencies: Epic 14, Epic 5
   # ============================================================
-  epic-18: backlog
-  18-1-workflow-crud-api-multistep-definition: backlog
-  18-2-workflow-execution-engine-sequential-parallel: backlog
-  18-3-predictive-workflow-pattern-analysis: backlog
-  18-4-workflow-builder-ui: backlog
-  18-5-execution-status-realtime-monitoring-ui: backlog
+  epic-18: in-progress
+  18-1-workflow-crud-api-multistep-definition: done
+  18-2-workflow-execution-engine-sequential-parallel: done
+  18-3-predictive-workflow-pattern-analysis: done
+  18-4-workflow-builder-ui: done
+  18-5-execution-status-realtime-monitoring-ui: done
   epic-18-retrospective: optional
 
   # ============================================================

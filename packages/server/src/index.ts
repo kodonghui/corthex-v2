@@ -52,8 +52,10 @@ import { knowledgeRoute } from './routes/workspace/knowledge'
 import { argosRoute } from './routes/workspace/argos'
 import { archiveRoute } from './routes/workspace/archive'
 import { qualityDashboardRoute } from './routes/workspace/quality-dashboard'
+import { workflowsRoute } from './routes/workspace/workflows'
 import { performanceRoute } from './routes/workspace/performance'
 import { superAdminCompaniesRoute } from './routes/super-admin/companies'
+
 import { commandsRoute } from './routes/commands'
 import { telegramWebhookRoute } from './routes/telegram-webhook'
 import { runMigrations } from './db'
@@ -151,8 +153,9 @@ app.route('/api/workspace', operationLogRoute)
 app.route('/api/workspace/knowledge', knowledgeRoute)
 app.route('/api/workspace/argos', argosRoute)
 app.route('/api/workspace/archive', archiveRoute)
-app.route('/api/workspace/quality-dashboard', qualityDashboardRoute)
+app.route('/api/workspace', qualityDashboardRoute)
 app.route('/api/workspace', performanceRoute)
+app.route('/api/workspace', workflowsRoute)
 
 // WebSocket 라우트
 app.get('/ws', wsRoute)

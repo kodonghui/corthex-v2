@@ -45,6 +45,7 @@ const navSections: NavSection[] = [
       { to: '/cron', label: '크론기지', icon: '⏰' },
       { to: '/argos', label: 'ARGOS', icon: '🔍' },
       { to: '/nexus', label: 'NEXUS', icon: '🔗' },
+      { to: '/workflows', label: '워크플로우', icon: '⚡' },
     ],
   },
   {

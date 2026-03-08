@@ -995,3 +995,37 @@ export type SoulGymSuggestion = {
   expectedImprovement: number
   estimatedTokens: number
 }
+
+// === Phase 2: Workflow Automation (Epic 18 Story 1) ===
+
+export type WorkflowStepType = 'tool' | 'llm' | 'condition'
+
+export type WorkflowStep = {
+  id: string
+  type: WorkflowStepType
+  action: string
+  params?: Record<string, unknown>
+  dependsOn?: string[]
+}
+
+export type Workflow = {
+  id: string
+  companyId: string
+  name: string
+  description: string | null
+  steps: WorkflowStep[]
+  isActive: boolean
+  createdBy: string
+  createdAt: string
+  updatedAt: string
+}
+
+export type CreateWorkflowRequest = {
+  name: string
+  description?: string
+  steps: WorkflowStep[]
+}
+
+export type UpdateWorkflowRequest = Partial<CreateWorkflowRequest> & {
+  isActive?: boolean
+}

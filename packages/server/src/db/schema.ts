@@ -1593,3 +1593,41 @@ export const archiveItemsRelations = relations(archiveItems, ({ one }) => ({
   department: one(departments, { fields: [archiveItems.departmentId], references: [departments.id] }),
   folder: one(archiveFolders, { fields: [archiveItems.folderId], references: [archiveFolders.id] }),
 }))
+
+// === Phase 2: Workflow Automation (Epic 18 Story 1) ===
+
+export const workflows = pgTable('workflows', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  name: varchar('name', { length: 200 }).notNull(),
+  description: text('description'),
+  steps: jsonb('steps').notNull().default([]),
+  isActive: boolean('is_active').notNull().default(true),
+  createdBy: uuid('created_by').notNull().references(() => users.id),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('workflows_company_idx').on(table.companyId),
+  isActiveIdx: index('workflows_is_active_idx').on(table.companyId, table.isActive),
+}))
+
+export const workflowsRelations = relations(workflows, ({ one, many }) => ({
+  company: one(companies, { fields: [workflows.companyId], references: [companies.id] }),
+  creator: one(users, { fields: [workflows.createdBy], references: [users.id] }),
+  executions: many(workflowExecutions),
+}))
+
+export const workflowExecutions = pgTable('workflow_executions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  workflowId: uuid('workflow_id').notNull().references(() => workflows.id, { onDelete: 'cascade' }),
+  status: varchar('status', { length: 20 }).notNull(), // 'success', 'failed'
+  totalDurationMs: integer('total_duration_ms').notNull(),
+  stepSummaries: jsonb('step_summaries').notNull().default([]), // array of StepSummary
+  triggeredBy: uuid('triggered_by').references(() => users.id),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('workflow_executions_company_idx').on(table.companyId),
+  workflowIdx: index('workflow_executions_workflow_idx').on(table.workflowId),
+  createdIdx: index('workflow_executions_created_idx').on(table.workflowId, table.createdAt),
+}))
