@@ -22,6 +22,11 @@ export type DelegationEventType =
   | 'DEBATE_STARTED'
   | 'DEBATE_ROUND_PROGRESS'
   | 'DEBATE_COMPLETED'
+  | 'CIO_PHASE_STARTED'
+  | 'CIO_PHASE_COMPLETED'
+  | 'VECTOR_VALIDATION_STARTED'
+  | 'VECTOR_EXECUTION_STARTED'
+  | 'VECTOR_EXECUTION_COMPLETED'
 
 export type DelegationEvent = {
   commandId: string
@@ -168,6 +173,28 @@ export class DelegationTracker {
 
   debateCompleted(companyId: string, commandId: string, data: { debateId: string; consensus: string; summary: string }): void {
     this.emitCommand(companyId, commandId, 'DEBATE_COMPLETED', 'debate-completed', { data: data as unknown as Record<string, unknown> })
+  }
+
+  // --- CIO+VECTOR tracking ---
+
+  cioPhaseStarted(companyId: string, commandId: string, phase: number, agentId: string, agentName: string): void {
+    this.emitDelegation(companyId, commandId, 'CIO_PHASE_STARTED', `cio-phase-${phase}-start`, { agentId, agentName, data: { phase } })
+  }
+
+  cioPhaseCompleted(companyId: string, commandId: string, phase: number, agentId: string, agentName: string, durationMs: number): void {
+    this.emitDelegation(companyId, commandId, 'CIO_PHASE_COMPLETED', `cio-phase-${phase}-complete`, { agentId, agentName, data: { phase, durationMs } })
+  }
+
+  vectorValidationStarted(companyId: string, commandId: string): void {
+    this.emitDelegation(companyId, commandId, 'VECTOR_VALIDATION_STARTED', 'vector-validation-start')
+  }
+
+  vectorExecutionStarted(companyId: string, commandId: string, proposalCount: number): void {
+    this.emitDelegation(companyId, commandId, 'VECTOR_EXECUTION_STARTED', 'vector-execution-start', { data: { proposalCount } })
+  }
+
+  vectorExecutionCompleted(companyId: string, commandId: string, results: { executed: number; skipped: number; failed: number }): void {
+    this.emitDelegation(companyId, commandId, 'VECTOR_EXECUTION_COMPLETED', 'vector-execution-complete', { data: results as unknown as Record<string, unknown> })
   }
 
   // --- Tool tracking ---

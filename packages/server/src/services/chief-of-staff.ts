@@ -2,6 +2,8 @@ import { agentRunner, type AgentConfig } from './agent-runner'
 import { delegationTracker } from './delegation-tracker'
 import { delegate as managerDelegate } from './manager-delegate'
 import { synthesize as managerSynthesize } from './manager-synthesis'
+import { orchestrateCIO } from './cio-orchestrator'
+import { executeProposals, formatCIOVectorResult } from './vector-executor'
 import { inspect, type InspectionResult, type RuleResult, type RubricScore } from './inspection-engine'
 import { db } from '../db'
 import { commands, agents, departments, orchestrationTasks, qualityReviews } from '../db/schema'
@@ -35,6 +37,7 @@ export function toAgentConfig(row: {
     soul: row.soul,
     allowedTools: (row.allowedTools as string[]) ?? [],
     isActive: row.isActive,
+    departmentId: (row.departmentId as string | null) ?? null,
   }
 }
 
@@ -263,6 +266,23 @@ async function getActiveDepartments(companyId: string) {
         eq(departments.isActive, true),
       ),
     )
+}
+
+// === Investment Department Detection ===
+
+const INVESTMENT_KEYWORDS = ['투자', '금융', '전략', 'investment', 'finance', 'strategy', 'trading', 'cio']
+
+export async function isInvestmentDepartment(departmentId: string, companyId: string): Promise<boolean> {
+  const [dept] = await db
+    .select({ name: departments.name, description: departments.description })
+    .from(departments)
+    .where(and(eq(departments.id, departmentId), eq(departments.companyId, companyId)))
+    .limit(1)
+
+  if (!dept) return false
+
+  const searchText = [dept.name, dept.description].filter(Boolean).join(' ').toLowerCase()
+  return INVESTMENT_KEYWORDS.some(kw => searchText.includes(kw))
 }
 
 // === Core Functions ===
@@ -581,32 +601,67 @@ export async function process(options: ProcessOptions): Promise<ChiefOfStaffResu
     }
   }
 
-  // === Phase 2: Delegate (Manager self-analysis + parallel specialist execution) ===
-  // Note: managerDelegate() internally calls delegationTracker.managerStarted()
+  // === Phase 2: Delegate ===
+  // Detect investment department for CIO+VECTOR pipeline
+  const isInvestment = classification?.departmentId
+    ? await isInvestmentDepartment(classification.departmentId, companyId)
+    : false
+
   phases.push('delegate')
 
   let managerResult: string
   try {
-    const delegationResult = await managerDelegate({
-      manager: managerAgent,
-      commandText,
-      companyId,
-      commandId,
-      parentTaskId: null,
-      toolExecutor,
-    })
+    if (isInvestment) {
+      // CIO+VECTOR 3-phase orchestration pipeline
+      phases.push('cio-orchestrate')
 
-    // === Phase 2b: Synthesize (LLM combines results into structured report) ===
-    phases.push('synthesize')
-    managerResult = await managerSynthesize({
-      manager: managerAgent,
-      delegationResult,
-      commandText,
-      companyId,
-      commandId,
-      parentTaskId: null,
-      toolExecutor,
-    })
+      const cioResult = await orchestrateCIO({
+        manager: managerAgent,
+        commandText,
+        companyId,
+        commandId,
+        parentTaskId: null,
+        toolExecutor,
+      })
+
+      // Execute trade proposals via VECTOR (if any)
+      let vectorResult = null
+      if (cioResult.tradeProposals.length > 0) {
+        phases.push('vector-execute')
+        vectorResult = await executeProposals({
+          proposals: cioResult.tradeProposals,
+          companyId,
+          userId: options.userId,
+          commandId,
+          tradingMode: 'paper', // Default to paper; Story 10-5 will add approval/auto mode
+          vectorAgentId: managerAgent.id,
+        })
+      }
+
+      managerResult = formatCIOVectorResult(cioResult.analysisReport, vectorResult)
+    } else {
+      // Standard manager delegation pipeline
+      const delegationResult = await managerDelegate({
+        manager: managerAgent,
+        commandText,
+        companyId,
+        commandId,
+        parentTaskId: null,
+        toolExecutor,
+      })
+
+      // Synthesize results into structured report
+      phases.push('synthesize')
+      managerResult = await managerSynthesize({
+        manager: managerAgent,
+        delegationResult,
+        commandText,
+        companyId,
+        commandId,
+        parentTaskId: null,
+        toolExecutor,
+      })
+    }
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : String(err)
     await updateCommandFailed(commandId, companyId, `Manager 실행 실패: ${errorMsg}`)

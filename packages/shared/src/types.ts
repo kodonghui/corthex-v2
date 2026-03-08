@@ -100,7 +100,7 @@ export type ChatSession = {
 
 // === SNS ===
 export type SnsStatus = 'draft' | 'pending' | 'approved' | 'scheduled' | 'rejected' | 'published' | 'failed'
-export type SnsPlatform = 'instagram' | 'tistory' | 'daum_cafe'
+export type SnsPlatform = 'instagram' | 'tistory' | 'daum_cafe' | 'twitter' | 'facebook' | 'naver_blog'
 
 export type SnsAccount = {
   id: string
@@ -125,9 +125,34 @@ export type SnsContent = {
   status: SnsStatus
   snsAccountId?: string | null
   variantOf?: string | null
+  priority: number
+  isCardNews: boolean
+  cardSeriesId?: string | null
+  cardIndex?: number | null
   createdBy: string
   createdAt: Date
   updatedAt: Date
+}
+
+export type CardNewsCard = {
+  index: number
+  imageUrl: string
+  caption: string
+  layout: 'cover' | 'content' | 'closing'
+}
+
+export type CardSeriesMetadata = {
+  cards: CardNewsCard[]
+  totalCards: number
+  seriesTitle: string
+}
+
+export type QueueStats = {
+  scheduled: number
+  published: number
+  failed: number
+  byPlatform: { platform: SnsPlatform; count: number }[]
+  nextPublishAt: string | null
 }
 
 export type SnsMetrics = {
@@ -747,4 +772,47 @@ export type CreateArgosTriggerRequest = {
   triggerType: ArgosTriggerType
   condition: Record<string, unknown>
   cooldownMinutes?: number
+}
+
+// === CIO+VECTOR Orchestration Types ===
+
+export type TradeProposal = {
+  ticker: string
+  tickerName: string
+  side: 'buy' | 'sell'
+  quantity: number
+  price: number // 0 = market order
+  reason: string
+  confidence: number // 0~1
+  market: 'KR' | 'US'
+}
+
+export type CIOPhase = 1 | 2 | 3
+
+export type CIOOrchestrationResult = {
+  analysisReport: string
+  tradeProposals: TradeProposal[]
+  phases: Array<{
+    phase: CIOPhase
+    durationMs: number
+    agentCount: number
+  }>
+  totalDurationMs: number
+}
+
+export type VectorOrderResult = {
+  proposal: TradeProposal
+  status: 'executed' | 'skipped' | 'failed'
+  orderId?: string
+  kisOrderNo?: string
+  reason?: string
+}
+
+export type VectorExecutionResult = {
+  totalProposals: number
+  executed: number
+  skipped: number
+  failed: number
+  orders: VectorOrderResult[]
+  totalDurationMs: number
 }
