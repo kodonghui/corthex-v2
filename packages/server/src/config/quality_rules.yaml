@@ -1,0 +1,723 @@
+# CORTHEX v2 Quality Gate Rules
+# P1 Enhancement: YAML-based automatic quality inspection
+# Categories: completeness, accuracy, safety
+# Severity: critical, major, minor
+# Condition types: regex, keyword, threshold, llm-check
+# Actions: pass, warn, fail
+
+rules:
+  # ─────────────────────────────────────────────
+  # Completeness: 응답 완전성 검사
+  # ─────────────────────────────────────────────
+  - id: comp-min-length
+    category: completeness
+    name: "최소 응답 길이"
+    description: "에이전트 응답이 최소 길이 이상인지 확인"
+    severity: major
+    enabled: true
+    condition:
+      type: threshold
+      params:
+        field: responseLength
+        operator: ">="
+        value: 50
+    action:
+      onPass: pass
+      onFail: fail
+      failMessage: "응답이 너무 짧습니다 (최소 50자 필요)"
+
+  - id: comp-has-sources
+    category: completeness
+    name: "출처 포함 여부"
+    description: "분석 결과에 근거 출처가 포함되어 있는지 확인"
+    severity: minor
+    enabled: true
+    condition:
+      type: keyword
+      params:
+        keywords:
+          - "에 따르면"
+          - "출처:"
+          - "참고:"
+          - "Source:"
+          - "Reference:"
+          - "에 의하면"
+          - "보고서에서"
+          - "데이터에 따르면"
+        minMatches: 1
+    action:
+      onPass: pass
+      onFail: warn
+      failMessage: "출처나 근거가 명시되지 않았습니다"
+
+  - id: comp-has-structure
+    category: completeness
+    name: "구조화된 응답"
+    description: "소제목, 목록, 번호 등 구조적 요소 포함 확인"
+    severity: minor
+    enabled: true
+    condition:
+      type: regex
+      params:
+        patterns:
+          - "^#{1,3}\\s"
+          - "^[-*]\\s"
+          - "^\\d+[.):]\\s"
+        minMatches: 2
+        multiline: true
+    action:
+      onPass: pass
+      onFail: warn
+      failMessage: "구조화 요소(제목, 목록 등)가 부족합니다"
+
+  - id: comp-conclusion-present
+    category: completeness
+    name: "결론 포함"
+    description: "응답에 결론이나 요약이 포함되어 있는지 확인"
+    severity: major
+    enabled: true
+    condition:
+      type: keyword
+      params:
+        keywords:
+          - "결론"
+          - "요약"
+          - "종합"
+          - "결과적으로"
+          - "따라서"
+          - "정리하면"
+          - "Summary"
+          - "Conclusion"
+        minMatches: 1
+    action:
+      onPass: pass
+      onFail: warn
+      failMessage: "결론이나 요약이 없습니다"
+
+  # ─────────────────────────────────────────────
+  # Accuracy: 정확성 검사
+  # ─────────────────────────────────────────────
+  - id: acc-fact-check
+    category: accuracy
+    name: "사실 확인 (LLM)"
+    description: "도구 조회 데이터와 에이전트 응답을 비교하여 사실 여부 확인"
+    severity: critical
+    enabled: true
+    condition:
+      type: llm-check
+      params:
+        prompt: "다음 에이전트 응답에서 도구 데이터와 다른 사실이 있는지 검사하세요. 수치, 날짜, 이름 등을 비교하세요."
+        requireToolData: true
+    action:
+      onPass: pass
+      onFail: fail
+      failMessage: "도구 데이터와 일치하지 않는 사실이 포함되어 있습니다"
+
+  - id: acc-hallucination-detect
+    category: accuracy
+    name: "환각 탐지"
+    description: "존재하지 않는 사실, 가짜 출처 등 환각 패턴 탐지"
+    severity: critical
+    enabled: true
+    condition:
+      type: llm-check
+      params:
+        prompt: "다음 텍스트에서 환각(hallucination) 징후를 탐지하세요: 존재하지 않는 기관, 가짜 통계, 허위 인용, 불가능한 날짜/수치 등"
+        checkPatterns:
+          - "존재하지 않는 기관명"
+          - "가짜 통계 수치"
+          - "허위 인용/출처"
+          - "불가능한 날짜"
+    action:
+      onPass: pass
+      onFail: fail
+      failMessage: "환각(사실과 다른 내용)이 감지되었습니다"
+
+  - id: acc-no-absolute-claims
+    category: accuracy
+    name: "절대적 확언 방지"
+    description: "무조건, 반드시, 확실히 등 과도한 확언 탐지"
+    severity: minor
+    enabled: true
+    condition:
+      type: keyword
+      params:
+        keywords:
+          - "무조건"
+          - "반드시 상승"
+          - "확실히"
+          - "100%"
+          - "절대적으로"
+          - "틀림없이"
+        minMatches: 1
+        mode: absence
+    action:
+      onPass: pass
+      onFail: warn
+      failMessage: "과도하게 확언적인 표현이 포함되어 있습니다"
+
+  # ─────────────────────────────────────────────
+  # Safety: 보안 검사
+  # ─────────────────────────────────────────────
+  - id: safe-credential-leak
+    category: safety
+    name: "크리덴셜 유출 탐지"
+    description: "API 키, 비밀번호, 토큰 등 크리덴셜 패턴 탐지"
+    severity: critical
+    enabled: true
+    condition:
+      type: regex
+      params:
+        patterns:
+          - "sk-[a-zA-Z0-9]{20,}"
+          - "AKIA[A-Z0-9]{16}"
+          - "ghp_[a-zA-Z0-9]{36}"
+          - "password\\s*[:=]\\s*[\"']?[^\\s\"']{8,}"
+          - "api[_-]?key\\s*[:=]\\s*[\"']?[a-zA-Z0-9]{16,}"
+          - "Bearer\\s+[a-zA-Z0-9._-]{20,}"
+          - "-----BEGIN\\s+(RSA\\s+)?PRIVATE\\s+KEY-----"
+        minMatches: 1
+    action:
+      onPass: pass
+      onFail: fail
+      failMessage: "크리덴셜(API 키, 비밀번호 등) 유출이 감지되었습니다"
+
+  - id: safe-prompt-injection
+    category: safety
+    name: "프롬프트 인젝션 방어"
+    description: "시스템 프롬프트 노출, 인젝션 시도 패턴 탐지"
+    severity: critical
+    enabled: true
+    condition:
+      type: regex
+      params:
+        patterns:
+          - "시스템\\s*프롬프트"
+          - "system\\s*prompt"
+          - "ignore\\s+(previous|above|all)\\s+instructions"
+          - "이전\\s*지시를?\\s*무시"
+          - "You are an? AI"
+          - "As an? AI language model"
+          - "DAN\\s*mode"
+        minMatches: 1
+    action:
+      onPass: pass
+      onFail: fail
+      failMessage: "프롬프트 인젝션 시도 또는 시스템 프롬프트 노출이 감지되었습니다"
+
+  - id: safe-pii-exposure
+    category: safety
+    name: "개인정보 노출 방지"
+    description: "주민등록번호, 전화번호, 이메일 등 개인정보 패턴 탐지"
+    severity: major
+    enabled: true
+    condition:
+      type: regex
+      params:
+        patterns:
+          - "\\d{6}[-]\\d{7}"
+          - "01[016789][-]?\\d{3,4}[-]?\\d{4}"
+        minMatches: 1
+    action:
+      onPass: pass
+      onFail: warn
+      failMessage: "개인정보(주민번호, 전화번호 등) 노출이 감지되었습니다"
+
+# ─────────────────────────────────────────────
+# Pass Criteria: 합격 기준
+# ─────────────────────────────────────────────
+passCriteria:
+  allCriticalMustPass: true
+  maxFailCount: 0
+  maxWarnCount: 3
+  criticalCap: 2.0
+
+# ─────────────────────────────────────────────
+# Department Rubrics: 부서별 루브릭 (v1에서 이식)
+# 매니저가 결과물을 검수할 때 사용하는 평가 기준
+# ─────────────────────────────────────────────
+rubrics:
+  default:
+    name: "기본 검수 기준"
+    commonChecklist:
+      required:
+        - id: C1
+          label: "업무 지시에 실제로 답하고 있는가?"
+        - id: C2
+          label: "빈 응답/에러가 아닌가?"
+      optional:
+        - id: C3
+          label: "비개발자가 이해 가능한 수준인가?"
+        - id: C4
+          label: "결론이 먼저 제시되어 있는가? (BLUF)"
+    scoring:
+      - id: Q1
+        label: "관련성"
+        weight: 25
+        critical: true
+        criteria:
+          1: "업무 지시의 핵심 질문을 다루지 않음"
+          3: "핵심은 다루나 요청 항목 1-2개 누락"
+          5: "모든 항목에 직접 답하고 결론이 범위 내"
+      - id: Q2
+        label: "구체성"
+        weight: 25
+        critical: false
+        criteria:
+          1: "막연한 일반론만 나열, 수치/사례 전무"
+          3: "일부 구체적 내용 있으나 핵심 뒷받침 부족"
+          5: "주요 주장마다 수치/사례/출처 뒷받침"
+      - id: Q3
+        label: "신뢰성"
+        weight: 20
+        critical: true
+        criteria:
+          1: "출처 없는 수치, 존재하지 않는 기관 인용"
+          3: "대체로 신뢰하나 1-2건 출처 불명"
+          5: "모든 수치에 출처 명시, 확인 가능"
+      - id: Q4
+        label: "완결성"
+        weight: 15
+        critical: false
+        criteria:
+          1: "요청 범위 절반 이하만 다룸"
+          3: "대부분 다루나 일부 피상적"
+          5: "빠짐없이 다루고 깊이 일관"
+      - id: Q5
+        label: "가독성"
+        weight: 15
+        critical: false
+        criteria:
+          1: "문장 과밀, 반복, 핵심 찾기 어려움"
+          3: "읽히지만 일부 장황"
+          5: "구조 명확, 한 번 읽어 이해 가능"
+
+  secretary:
+    name: "비서실 검수 기준"
+    departmentChecklist:
+      required:
+        - id: D1
+          label: "CEO 지시사항을 빠짐없이 반영했는가?"
+      optional:
+        - id: D2
+          label: "일정/마감 등 시간 정보가 포함되어 있는가?"
+    scoring:
+      - id: Q1
+        label: "지시 충실도"
+        weight: 25
+        critical: true
+        criteria:
+          1: "CEO 지시의 핵심 요구를 파악하지 못함"
+          3: "핵심은 반영했으나 세부 요구 1-2개 누락"
+          5: "모든 항목 반영 + 맥락상 필요한 사항 선제 포함"
+      - id: Q2
+        label: "완결성"
+        weight: 20
+        critical: false
+        criteria:
+          1: "지시 3개 중 1개만 처리, 결론 없음"
+          3: "대부분 다루나 1-2개 항목 내용 부족"
+          5: "모든 지시에 구체적 조치 내용 기술"
+      - id: Q3
+        label: "실행 가능성"
+        weight: 20
+        critical: false
+        criteria:
+          1: "추상적 결론만, 누가/언제/무엇 불명확"
+          3: "액션 아이템 있으나 담당자/기한 부족"
+          5: "담당자/기한/구체적 방법 명시"
+      - id: Q4
+        label: "명확성"
+        weight: 20
+        critical: false
+        criteria:
+          1: "전문 용어 남발, 주어 생략"
+          3: "대체로 이해 가능하나 1-2곳 불명확"
+          5: "비전문가 한 번 읽고 즉시 이해"
+      - id: Q5
+        label: "시의성"
+        weight: 15
+        critical: false
+        criteria:
+          1: "마감/일정 없음, 긴급성 표시 없음"
+          3: "일정 언급했으나 구체적 날짜 부족"
+          5: "마감일/점검일 명시, 우선순위 구분"
+
+  finance:
+    name: "금융분석팀 검수 기준"
+    departmentChecklist:
+      required:
+        - id: D1
+          label: "분석 결론과 데이터 사이 논리적 연결이 있는가?"
+      optional:
+        - id: D2
+          label: "매수/매도/관망 방향성과 근거가 있는가?"
+        - id: D3
+          label: "분석 대상 종목이 티커와 함께 특정되어 있는가?"
+      excludeCommon:
+        - C1
+    scoring:
+      - id: Q1
+        label: "시의성 (도구 데이터 활용)"
+        weight: 25
+        critical: true
+        criteria:
+          1: "도구 데이터 미활용, 일반론만 나열"
+          3: "도구 데이터 일부 인용, 시장 이벤트 연결 부족"
+          5: "도구 데이터 적극 활용, 시장 이벤트와 논리적 연결"
+      - id: Q2
+        label: "매수/매도 균형"
+        weight: 20
+        critical: false
+        criteria:
+          1: "일방적 논거만, 확언 남발"
+          3: "양면 다루나 한쪽 형식적"
+          5: "매수/리스크 근거 각 2개+, 균형적"
+      - id: Q3
+        label: "리스크 수치화"
+        weight: 20
+        critical: false
+        criteria:
+          1: "리스크 언급 없음"
+          3: "리스크 언급하나 수치 없음"
+          5: "손절가/하방 시나리오/변동성 수치 2개+ 제시"
+      - id: Q4
+        label: "실행 전략"
+        weight: 20
+        critical: false
+        criteria:
+          1: "방향만, 진입가/목표가 없음"
+          3: "방향 있으나 진입가/목표가/손절가 1-2개 누락"
+          5: "진입가/목표가/손절가 + 분할 전략"
+      - id: Q5
+        label: "출처 투명성"
+        weight: 15
+        critical: false
+        criteria:
+          1: "수치 출처 전혀 없음"
+          3: "일부 출처 있으나 구체적 기관명/날짜 부족"
+          5: "핵심 데이터마다 출처 명시, 원본 확인 가능"
+
+  strategy:
+    name: "전략기획팀 검수 기준"
+    departmentChecklist:
+      required:
+        - id: D1
+          label: "시장 데이터/수치가 포함되어 있는가?"
+        - id: D2
+          label: "분석에서 결론까지 논리가 일관되는가?"
+      optional:
+        - id: D3
+          label: "경쟁사 비교 분석이 있는가?"
+    scoring:
+      - id: Q1
+        label: "데이터 근거"
+        weight: 25
+        critical: true
+        criteria:
+          1: "숫자 없이 의견만 나열"
+          3: "핵심 수치 1-2개 있으나 출처 불분명"
+          5: "TAM/SAM 등 수치 + 출처 명시"
+      - id: Q2
+        label: "논리 일관성"
+        weight: 20
+        critical: false
+        criteria:
+          1: "전제와 결론 모순"
+          3: "흐름은 있으나 1-2곳 비약"
+          5: "현황→기회→전략→실행 단계별 연결"
+      - id: Q3
+        label: "시장 현실성"
+        weight: 20
+        critical: false
+        criteria:
+          1: "경쟁사 무시, 블루오션 단정"
+          3: "경쟁사 피상적 언급"
+          5: "경쟁사 2개+ 구체적 비교, 진입장벽 평가"
+      - id: Q4
+        label: "실행 로드맵"
+        weight: 20
+        critical: false
+        criteria:
+          1: "방향만 제시, 일정/예산 없음"
+          3: "분기별 방향 있으나 마일스톤/예산 부족"
+          5: "마일스톤/비용/인력/KPI 명시"
+      - id: Q5
+        label: "리스크 인식"
+        weight: 15
+        critical: false
+        criteria:
+          1: "장밋빛 전망만, 위험 없음"
+          3: "리스크 1-2개 언급, 대응 방안 없음"
+          5: "주요 리스크 3개+ 식별, 대응 방안 + 플랜 B"
+
+  legal:
+    name: "법무팀 검수 기준"
+    departmentChecklist:
+      required:
+        - id: D1
+          label: "관련 법률/판례 인용이 있는가?"
+        - id: D2
+          label: "법적 리스크가 식별되어 있는가?"
+      optional:
+        - id: D3
+          label: "각 리스크에 대한 대응 방안이 있는가?"
+    scoring:
+      - id: Q1
+        label: "법적 정확성"
+        weight: 25
+        critical: true
+        criteria:
+          1: "조문 번호 없이 인용, 존재하지 않는 판례"
+          3: "조문 맞으나 적용 요건 1-2개 생략"
+          5: "법률명+조항+호 정확 인용, 판례 사건번호 명시"
+      - id: Q2
+        label: "근거 출처"
+        weight: 20
+        critical: false
+        criteria:
+          1: "법령 밖 상식을 판정 근거로 사용"
+          3: "주된 근거는 법령이나 일부 비공식 근거"
+          5: "모든 핵심 판단이 법령/판례에 매핑"
+      - id: Q3
+        label: "언어 정밀성"
+        weight: 20
+        critical: false
+        criteria:
+          1: "법률 용어 오용 다수"
+          3: "한두 번 부정확"
+          5: "주어/시점/양태 체계적 구분"
+      - id: Q4
+        label: "리스크 식별"
+        weight: 20
+        critical: false
+        criteria:
+          1: "적법/위법만 결론, 분쟁 가능성 미고려"
+          3: "주요 리스크 1-2개 식별, 심각도 평가 없음"
+          5: "현재+잠재 리스크 구분, 발생 가능성/결과 평가"
+      - id: Q5
+        label: "대응 방안"
+        weight: 15
+        critical: false
+        criteria:
+          1: "주의가 필요합니다로 끝"
+          3: "일부 리스크에만 대응 방안"
+          5: "각 리스크별 구체적 대응 + 필요 조치"
+
+  marketing:
+    name: "마케팅팀 검수 기준"
+    departmentChecklist:
+      required:
+        - id: D1
+          label: "타겟 고객이 명확히 정의되어 있는가?"
+      optional:
+        - id: D2
+          label: "KPI/성과 지표가 포함되어 있는가?"
+        - id: D3
+          label: "경쟁 콘텐츠와의 차별점이 있는가?"
+    scoring:
+      - id: Q1
+        label: "타겟 명확성"
+        weight: 25
+        critical: true
+        criteria:
+          1: "전체 집단을 타겟으로, 구분 없음"
+          3: "타겟 좁혔으나 페르소나 부족"
+          5: "구체적 페르소나 정의"
+      - id: Q2
+        label: "차별화"
+        weight: 20
+        critical: false
+        criteria:
+          1: "경쟁사 차이점 없음"
+          3: "차별점 언급하나 경쟁사 비교 없음"
+          5: "경쟁 제품 2개+ 비교 후 차별화 논리"
+      - id: Q3
+        label: "실행 구체성"
+        weight: 20
+        critical: false
+        criteria:
+          1: "방향만 제시"
+          3: "채널 선정했으나 빈도/예산/KPI 부족"
+          5: "채널별 포맷/빈도/예산/KPI 명시"
+      - id: Q4
+        label: "데이터 활용"
+        weight: 20
+        critical: false
+        criteria:
+          1: "직감/일반론만"
+          3: "데이터 일부 인용, 인사이트 부족"
+          5: "데이터→인사이트→전략 도출 명확"
+      - id: Q5
+        label: "톤/가독성"
+        weight: 15
+        critical: false
+        criteria:
+          1: "목적에 맞지 않는 톤"
+          3: "톤 적절하나 일부 장황"
+          5: "목적에 맞는 톤, 핵심 메시지 명확"
+
+  tech:
+    name: "기술개발팀 검수 기준"
+    departmentChecklist:
+      required:
+        - id: D1
+          label: "기술 용어와 개념이 정확한가?"
+      optional:
+        - id: D2
+          label: "코드 예시 또는 아키텍처 설계가 포함되어 있는가?"
+    scoring:
+      - id: Q1
+        label: "기술 정확성"
+        weight: 25
+        critical: true
+        criteria:
+          1: "존재하지 않는 API/라이브러리 사용"
+          3: "대체로 맞으나 deprecated 기능 사용"
+          5: "모든 기술 용어/코드 정확, 최신 버전"
+      - id: Q2
+        label: "실현 가능성"
+        weight: 20
+        critical: false
+        criteria:
+          1: "현재 기술/인프라로 불가능"
+          3: "가능하나 제약 미고려"
+          5: "현실적 제약 고려한 제안"
+      - id: Q3
+        label: "코드/설계 구체성"
+        weight: 20
+        critical: false
+        criteria:
+          1: "추상적 설명만, 코드 없음"
+          3: "부분적 코드, 핵심 로직 부족"
+          5: "실행 가능 코드 또는 상세 아키텍처 포함"
+      - id: Q4
+        label: "보안/안정성"
+        weight: 20
+        critical: false
+        criteria:
+          1: "명백한 보안 취약점"
+          3: "기본 보안 고려, edge case 부족"
+          5: "OWASP Top 10 수준 보안 고려"
+      - id: Q5
+        label: "유지보수성"
+        weight: 15
+        critical: false
+        criteria:
+          1: "하드코딩, 매직 넘버"
+          3: "구조 있으나 설정 미분리"
+          5: "설정 분리, 모듈화, 테스트 가능"
+
+  publishing:
+    name: "콘텐츠팀 검수 기준"
+    departmentChecklist:
+      required:
+        - id: D1
+          label: "사실관계(날짜, 수치, 이름 등)가 정확한가?"
+      optional:
+        - id: D2
+          label: "시각적 요소(표, 목록 등)가 적절히 사용되었는가?"
+    scoring:
+      - id: Q1
+        label: "사실 정확성"
+        weight: 25
+        critical: true
+        criteria:
+          1: "날짜/이름/수치 오류 2건+"
+          3: "대체로 정확, 1건 사소한 오류"
+          5: "모든 사실 정확, 한정어 적절 사용"
+      - id: Q2
+        label: "범위 완결성"
+        weight: 20
+        critical: false
+        criteria:
+          1: "요청 범위 절반 이하"
+          3: "대부분 다루나 일부 피상적"
+          5: "빠짐없이 다루고 깊이 일관"
+      - id: Q3
+        label: "가독성"
+        weight: 20
+        critical: false
+        criteria:
+          1: "문장 과밀/중복"
+          3: "읽히지만 일부 장황"
+          5: "정보 밀도 높고 반복 최소"
+      - id: Q4
+        label: "구조/형식"
+        weight: 20
+        critical: false
+        criteria:
+          1: "소제목 없이 나열"
+          3: "소제목 있으나 순서 비논리적"
+          5: "계층 구조 명확, 일관된 배열"
+      - id: Q5
+        label: "시각화 활용"
+        weight: 15
+        critical: false
+        criteria:
+          1: "시각 요소 전혀 없음"
+          3: "일부 사용, 일관성 부족"
+          5: "내용 유형에 맞는 시각 요소 활용"
+
+# ─────────────────────────────────────────────
+# Investment Analysis Rules: 투자 분석 전용 규칙 (v1 이식)
+# ─────────────────────────────────────────────
+investmentAnalysis:
+  balanceRequired:
+    enabled: true
+    description: "매수 근거와 매도/리스크 근거가 모두 있어야 함"
+    minRiskMentions: 2
+    keywordsRisk:
+      - "하락 리스크"
+      - "손절"
+      - "위험"
+      - "리스크"
+      - "주의"
+      - "매도"
+      - "단점"
+      - "우려"
+    keywordsBullish:
+      - "매수"
+      - "상승"
+      - "호재"
+      - "강세"
+      - "기회"
+    biasThreshold: 3.0
+
+  riskDisclosure:
+    enabled: true
+    description: "투자 리스크를 반드시 수치로 명시해야 함"
+    requiredFields:
+      - "목표주가 하단"
+      - "손절 기준"
+    allowPartial: true
+
+  optimismBiasCheck:
+    enabled: true
+    description: "지나치게 낙관적인 표현을 감지"
+    penaltyPhrases:
+      - "무조건 오른다"
+      - "확실히"
+      - "반드시 상승"
+      - "100%"
+      - "절대적으로"
+    warningPhrases:
+      - "강력 매수"
+      - "폭발적 상승"
+      - "대박"
+    maxPenaltyCount: 0
+    maxWarningCount: 2
+
+  evidenceQuality:
+    enabled: true
+    description: "의견이 아닌 데이터 기반 근거가 있어야 함"
+    minDataPoints: 1
+    evidenceKeywords:
+      - "PER"
+      - "PBR"
+      - "ROE"
+      - "영업이익"
+      - "매출"
+      - "%"
+      - "억"
+      - "조"
