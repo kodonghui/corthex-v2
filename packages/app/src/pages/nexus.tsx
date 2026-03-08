@@ -24,6 +24,8 @@ import { sketchVibeNodeTypes, NODE_PALETTE, type SvNodeType } from '../component
 import { sketchVibeEdgeTypes } from '../components/nexus/editable-edge'
 import { ContextMenu } from '../components/nexus/context-menu'
 import { CanvasSidebar } from '../components/nexus/canvas-sidebar'
+import { ExportKnowledgeDialog } from '../components/nexus/export-knowledge-dialog'
+import { useAutoSave } from '../hooks/use-auto-save'
 import { useWsStore } from '../stores/ws-store'
 import type { Agent, Session } from '../components/chat/types'
 
@@ -85,6 +87,12 @@ function NexusPageInner() {
     target: 'node' | 'pane'
     nodeId?: string
   } | null>(null)
+
+  // Export knowledge dialog
+  const [showExportKnowledge, setShowExportKnowledge] = useState(false)
+
+  // Auto-save toast
+  const [autoSaveToast, setAutoSaveToast] = useState(false)
 
   // Mobile: canvas or chat view
   const [mobileView, setMobileView] = useState<'canvas' | 'chat'>('canvas')
@@ -171,6 +179,56 @@ function NexusPageInner() {
       handleAgentSelect(agents[0].id)
     }
   }, [agents, selectedAgentId, handleAgentSelect])
+
+  // Auto-save hook
+  useAutoSave({
+    sketchId: currentSketchId,
+    dirty,
+    getGraphData: useCallback(() => {
+      const cleanNodes = nodes.map(({ data, ...rest }) => {
+        if (!data) return rest
+        const { onLabelChange: _, ...cleanData } = data as Record<string, unknown>
+        return { ...rest, data: cleanData }
+      })
+      const cleanEdges = edges.map(({ data, ...rest }) => {
+        if (!data) return rest
+        const { onEdgeLabelChange: _, ...cleanData } = data as Record<string, unknown>
+        return { ...rest, data: cleanData }
+      })
+      return { nodes: cleanNodes, edges: cleanEdges }
+    }, [nodes, edges]),
+    onSaved: useCallback(() => {
+      setDirty(false)
+      setAutoSaveToast(true)
+      setTimeout(() => setAutoSaveToast(false), 2000)
+    }, []),
+  })
+
+  // Load Mermaid from knowledge base
+  const handleLoadFromKnowledge = useCallback(
+    (mermaidCode: string, title: string) => {
+      if (dirty && !confirm(`현재 캔버스에 저장하지 않은 변경사항이 있어요. "${title}"을(를) 불러올까요?`)) return
+      const result = mermaidToCanvas(mermaidCode)
+      if (result.nodes.length > 0) {
+        const restoredNodes = result.nodes.map((n: Node) => ({
+          ...n,
+          data: { ...n.data, onLabelChange: handleLabelChange },
+        }))
+        const restoredEdges = result.edges.map((e: Edge) => ({
+          ...e,
+          type: e.type || 'editable',
+          data: { ...e.data, onEdgeLabelChange: handleEdgeLabelChange },
+        }))
+        setNodes(restoredNodes)
+        setEdges(restoredEdges)
+        setCurrentSketchId(null)
+        setCurrentSketchName(`${title} (지식 베이스)`)
+        setDirty(false)
+        setTimeout(() => reactFlowInstance?.fitView({ padding: 0.2 }), 100)
+      }
+    },
+    [dirty, setNodes, setEdges, handleLabelChange, handleEdgeLabelChange, reactFlowInstance],
+  )
 
   // Canvas context for AI (serialized as text)
   const canvasContext = useMemo(() => canvasToText(nodes, edges), [nodes, edges])
@@ -696,6 +754,16 @@ function NexusPageInner() {
           {exportCopied ? '복사됨!' : '내보내기'}
         </button>
 
+        {/* 지식 베이스에 저장 */}
+        <button
+          onClick={() => setShowExportKnowledge(true)}
+          disabled={nodes.length === 0 || !currentSketchId}
+          className="px-2 py-1 text-xs bg-zinc-700 hover:bg-zinc-600 disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-300 rounded transition-colors"
+          title="지식 베이스에 다이어그램 저장"
+        >
+          지식 저장
+        </button>
+
         {/* Undo / Redo */}
         <button
           onClick={handleUndo}
@@ -767,6 +835,7 @@ function NexusPageInner() {
               currentSketchId={currentSketchId}
               onLoad={handleLoadSketch}
               onNew={handleNewCanvas}
+              onLoadFromKnowledge={handleLoadFromKnowledge}
             />
           </div>
         )}
@@ -932,6 +1001,7 @@ function NexusPageInner() {
             <span>노드 {nodes.length}개</span>
             <span>연결 {edges.length}개</span>
             {dirty && <span className="text-amber-500">미저장</span>}
+            {autoSaveToast && <span className="text-emerald-400">자동 저장됨</span>}
             {undoStack.length > 0 && <span className="text-zinc-600">Undo {undoStack.length}</span>}
             <span className="hidden sm:inline">| 더블클릭: 이름 편집 | Delete: 삭제 | 핸들 드래그: 연결 | 우클릭: 메뉴</span>
           </div>
@@ -1031,6 +1101,22 @@ function NexusPageInner() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* 지식 베이스 내보내기 다이얼로그 */}
+      {showExportKnowledge && currentSketchId && (
+        <ExportKnowledgeDialog
+          sketchId={currentSketchId}
+          sketchName={currentSketchName || '새 다이어그램'}
+          onClose={() => setShowExportKnowledge(false)}
+        />
+      )}
+
+      {/* 자동 저장 토스트 */}
+      {autoSaveToast && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 bg-emerald-800/90 text-emerald-200 text-xs rounded-lg shadow-lg animate-pulse">
+          자동 저장됨
         </div>
       )}
     </div>

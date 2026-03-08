@@ -1,9 +1,10 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { eq, and, desc } from 'drizzle-orm'
+import { eq, and, desc, max, asc, sql, inArray } from 'drizzle-orm'
 import { db } from '../../db'
-import { sketches } from '../../db/schema'
+import { sketches, sketchVersions, knowledgeDocs } from '../../db/schema'
+import { canvasToMermaidCode } from '@corthex/shared'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { logActivity } from '../../lib/activity-logger'
@@ -105,14 +106,52 @@ sketchesRoute.put(
     const tenant = c.get('tenant')
     const id = c.req.param('id')
     const body = c.req.valid('json')
+    const autoSave = c.req.query('autoSave') === 'true'
 
     const [existing] = await db
-      .select({ id: sketches.id })
+      .select({ id: sketches.id, graphData: sketches.graphData })
       .from(sketches)
       .where(and(eq(sketches.id, id), eq(sketches.companyId, tenant.companyId)))
       .limit(1)
 
     if (!existing) throw new HTTPError(404, '캔버스를 찾을 수 없습니다', 'SKETCH_001')
+
+    // Manual save: record previous version (skip for auto-save)
+    if (!autoSave && body.graphData) {
+      const prev = existing.graphData as { nodes?: unknown[]; edges?: unknown[] }
+      if (prev?.nodes && Array.isArray(prev.nodes) && prev.nodes.length > 0) {
+        // Get max version number
+        const [maxRow] = await db
+          .select({ maxVer: max(sketchVersions.version) })
+          .from(sketchVersions)
+          .where(eq(sketchVersions.sketchId, id))
+        const nextVersion = ((maxRow?.maxVer as number | null) ?? 0) + 1
+
+        await db.insert(sketchVersions).values({
+          sketchId: id,
+          version: nextVersion,
+          graphData: existing.graphData,
+        })
+
+        // Prune: keep max 20 versions
+        const [countRow] = await db
+          .select({ cnt: sql<number>`count(*)::int` })
+          .from(sketchVersions)
+          .where(eq(sketchVersions.sketchId, id))
+        if ((countRow?.cnt ?? 0) > 20) {
+          const excess = (countRow?.cnt ?? 0) - 20
+          const oldest = await db
+            .select({ id: sketchVersions.id })
+            .from(sketchVersions)
+            .where(eq(sketchVersions.sketchId, id))
+            .orderBy(asc(sketchVersions.version))
+            .limit(excess)
+          if (oldest.length > 0) {
+            await db.delete(sketchVersions).where(inArray(sketchVersions.id, oldest.map(r => r.id)))
+          }
+        }
+      }
+    }
 
     const updateData: Record<string, unknown> = { updatedAt: new Date() }
     if (body.name !== undefined) updateData.name = body.name
@@ -222,6 +261,200 @@ sketchesRoute.post(
     }, 201)
   },
 )
+
+// POST /api/workspace/sketches/:id/duplicate — 캔버스 복제
+sketchesRoute.post('/:id/duplicate', async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+
+  const [original] = await db
+    .select()
+    .from(sketches)
+    .where(and(eq(sketches.id, id), eq(sketches.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!original) throw new HTTPError(404, '캔버스를 찾을 수 없습니다', 'SKETCH_001')
+
+  const [duplicated] = await db
+    .insert(sketches)
+    .values({
+      companyId: tenant.companyId,
+      name: `${original.name} (복사본)`.slice(0, 200),
+      graphData: original.graphData,
+      createdBy: tenant.userId,
+    })
+    .returning()
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'system',
+    phase: 'end',
+    actorType: 'user',
+    actorId: tenant.userId,
+    action: `SketchVibe: 캔버스 복제 — ${original.name}`,
+  })
+
+  return c.json({ data: duplicated }, 201)
+})
+
+// POST /api/workspace/sketches/:id/export-knowledge — 지식 베이스에 다이어그램 내보내기
+const exportKnowledgeSchema = z.object({
+  title: z.string().min(1, '제목을 입력하세요').max(500),
+  folderId: z.string().uuid().optional(),
+})
+
+sketchesRoute.post(
+  '/:id/export-knowledge',
+  zValidator('json', exportKnowledgeSchema),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const id = c.req.param('id')
+    const body = c.req.valid('json')
+
+    const [sketch] = await db
+      .select()
+      .from(sketches)
+      .where(and(eq(sketches.id, id), eq(sketches.companyId, tenant.companyId)))
+      .limit(1)
+
+    if (!sketch) throw new HTTPError(404, '캔버스를 찾을 수 없습니다', 'SKETCH_001')
+
+    const graphData = sketch.graphData as { nodes?: Array<{ id: string; type?: string; data?: { label?: string } }>; edges?: Array<{ source: string; target: string; data?: { label?: string } }> }
+    const nodes = graphData?.nodes || []
+    const edges = graphData?.edges || []
+
+    if (nodes.length === 0) {
+      throw new HTTPError(400, '빈 캔버스는 내보낼 수 없습니다', 'SKETCH_EXPORT_001')
+    }
+
+    const mermaidCode = canvasToMermaidCode(nodes, edges)
+
+    const content = `\`\`\`mermaid\n${mermaidCode}\n\`\`\`\n\n> SketchVibe에서 내보냄 — ${sketch.name} (${new Date().toLocaleString('ko-KR')})`
+
+    const [doc] = await db
+      .insert(knowledgeDocs)
+      .values({
+        companyId: tenant.companyId,
+        title: body.title,
+        content,
+        contentType: 'mermaid',
+        folderId: body.folderId || null,
+        tags: ['sketchvibe', 'diagram'],
+        createdBy: tenant.userId,
+        updatedBy: tenant.userId,
+      })
+      .returning()
+
+    logActivity({
+      companyId: tenant.companyId,
+      type: 'system',
+      phase: 'end',
+      actorType: 'user',
+      actorId: tenant.userId,
+      action: `SketchVibe: 지식 베이스 내보내기 — ${body.title}`,
+    })
+
+    return c.json({ data: { docId: doc.id, title: doc.title, folderId: doc.folderId } }, 201)
+  },
+)
+
+// GET /api/workspace/sketches/:id/versions — 스케치 버전 히스토리
+sketchesRoute.get('/:id/versions', async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+
+  // Verify sketch belongs to this tenant
+  const [sketch] = await db
+    .select({ id: sketches.id })
+    .from(sketches)
+    .where(and(eq(sketches.id, id), eq(sketches.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!sketch) throw new HTTPError(404, '캔버스를 찾을 수 없습니다', 'SKETCH_001')
+
+  const versions = await db
+    .select({
+      id: sketchVersions.id,
+      version: sketchVersions.version,
+      graphData: sketchVersions.graphData,
+      createdAt: sketchVersions.createdAt,
+    })
+    .from(sketchVersions)
+    .where(eq(sketchVersions.sketchId, id))
+    .orderBy(desc(sketchVersions.version))
+
+  const data = versions.map((v) => {
+    const gd = v.graphData as { nodes?: unknown[]; edges?: unknown[] }
+    return {
+      id: v.id,
+      version: v.version,
+      createdAt: v.createdAt,
+      nodeCount: Array.isArray(gd?.nodes) ? gd.nodes.length : 0,
+      edgeCount: Array.isArray(gd?.edges) ? gd.edges.length : 0,
+    }
+  })
+
+  return c.json({ data })
+})
+
+// POST /api/workspace/sketches/:id/versions/:versionId/restore — 특정 버전으로 복원
+sketchesRoute.post('/:id/versions/:versionId/restore', async (c) => {
+  const tenant = c.get('tenant')
+  const sketchId = c.req.param('id')
+  const versionId = c.req.param('versionId')
+
+  // Verify sketch belongs to this tenant
+  const [sketch] = await db
+    .select()
+    .from(sketches)
+    .where(and(eq(sketches.id, sketchId), eq(sketches.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!sketch) throw new HTTPError(404, '캔버스를 찾을 수 없습니다', 'SKETCH_001')
+
+  // Find the target version
+  const [targetVersion] = await db
+    .select()
+    .from(sketchVersions)
+    .where(and(eq(sketchVersions.id, versionId), eq(sketchVersions.sketchId, sketchId)))
+    .limit(1)
+
+  if (!targetVersion) throw new HTTPError(404, '버전을 찾을 수 없습니다', 'SKETCH_VER_001')
+
+  // Backup current state as new version before restoring
+  const currentGraphData = sketch.graphData as { nodes?: unknown[]; edges?: unknown[] }
+  if (currentGraphData?.nodes && Array.isArray(currentGraphData.nodes) && currentGraphData.nodes.length > 0) {
+    const [maxRow] = await db
+      .select({ maxVer: max(sketchVersions.version) })
+      .from(sketchVersions)
+      .where(eq(sketchVersions.sketchId, sketchId))
+    const nextVersion = ((maxRow?.maxVer as number | null) ?? 0) + 1
+
+    await db.insert(sketchVersions).values({
+      sketchId,
+      version: nextVersion,
+      graphData: sketch.graphData,
+    })
+  }
+
+  // Restore target version's graphData
+  const [updated] = await db
+    .update(sketches)
+    .set({ graphData: targetVersion.graphData, updatedAt: new Date() })
+    .where(eq(sketches.id, sketchId))
+    .returning()
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'system',
+    phase: 'end',
+    actorType: 'user',
+    actorId: tenant.userId,
+    action: `SketchVibe: 버전 복원 — v${targetVersion.version}`,
+  })
+
+  return c.json({ data: updated })
+})
 
 // POST /api/workspace/sketches/ai-command — AI 캔버스 명령
 const aiCommandSchema = z.object({
