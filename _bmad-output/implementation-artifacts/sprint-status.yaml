@@ -358,7 +358,7 @@ development_status:
   # FRs: FR76
   # Dependencies: Epic 9
   # ============================================================
-  epic-19: backlog
+  epic-19: in-progress
   19-1-messenger-schema-conversations-messages: done
   19-2-realtime-chat-api-websocket-channel: backlog
   19-3-one-on-one-group-message-ui: backlog

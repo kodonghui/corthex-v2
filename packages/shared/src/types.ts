@@ -1029,3 +1029,59 @@ export type CreateWorkflowRequest = {
 export type UpdateWorkflowRequest = Partial<CreateWorkflowRequest> & {
   isActive?: boolean
 }
+
+// === Messenger (Epic 19) ===
+export type ConversationType = 'direct' | 'group'
+export type MessageType = 'text' | 'system' | 'ai_report'
+
+export type Conversation = {
+  id: string
+  companyId: string
+  type: ConversationType
+  name: string | null
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export type ConversationParticipant = {
+  conversationId: string
+  userId: string
+  companyId: string
+  joinedAt: string
+  lastReadAt: string | null
+}
+
+export type Message = {
+  id: string
+  conversationId: string
+  senderId: string
+  companyId: string
+  content: string
+  type: MessageType
+  isDeleted: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export type ConversationListItem = {
+  id: string
+  type: ConversationType
+  name: string | null
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+  lastMessage: {
+    content: string
+    senderId: string
+    createdAt: string
+  } | null
+  unreadCount: number
+  participantCount: number
+}
+
+export type CreateConversationRequest = {
+  type: ConversationType
+  participantIds: string[]
+  name?: string
+}

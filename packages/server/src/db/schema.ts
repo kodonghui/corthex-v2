@@ -634,17 +634,22 @@ export const conversations = pgTable('conversations', {
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
-});
+}, (table) => ({
+  companyIdx: index('conversations_company_idx').on(table.companyId),
+  companyActiveIdx: index('conversations_company_active_idx').on(table.companyId, table.isActive),
+}));
 
 // === 25c. conversation_participants — 대화방 참여자 (Story 19-1) ===
 export const conversationParticipants = pgTable('conversation_participants', {
   conversationId: uuid('conversation_id').notNull().references(() => conversations.id),
   userId: uuid('user_id').notNull().references(() => users.id),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
   joinedAt: timestamp('joined_at').notNull().defaultNow(),
   lastReadAt: timestamp('last_read_at'),
 }, (table) => ({
   pk: primaryKey({ columns: [table.conversationId, table.userId] }),
   userConvIdx: index('conv_participants_user_conv_idx').on(table.userId, table.conversationId),
+  companyUserIdx: index('conv_participants_company_user_idx').on(table.companyId, table.userId),
 }));
 
 // === 25d. messages — 1:1/그룹 대화 메시지 (Story 19-1) ===
@@ -652,6 +657,7 @@ export const messages = pgTable('messages', {
   id: uuid('id').primaryKey().defaultRandom(),
   conversationId: uuid('conversation_id').notNull().references(() => conversations.id),
   senderId: uuid('sender_id').notNull().references(() => users.id),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
   content: text('content').notNull(),
   type: varchar('type', { length: 20 }).notNull().default('text'), // 'text' | 'system' | 'ai_report'
   isDeleted: boolean('is_deleted').notNull().default(false),
@@ -659,6 +665,7 @@ export const messages = pgTable('messages', {
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 }, (table) => ({
   convCreatedIdx: index('messages_conv_created_idx').on(table.conversationId, table.createdAt),
+  companyIdx: index('messages_company_idx').on(table.companyId),
 }));
 
 // === 26. files — 파일 메타데이터 ===
@@ -1257,11 +1264,13 @@ export const conversationsRelations = relations(conversations, ({ one, many }) =
 export const conversationParticipantsRelations = relations(conversationParticipants, ({ one }) => ({
   conversation: one(conversations, { fields: [conversationParticipants.conversationId], references: [conversations.id] }),
   user: one(users, { fields: [conversationParticipants.userId], references: [users.id] }),
+  company: one(companies, { fields: [conversationParticipants.companyId], references: [companies.id] }),
 }))
 
 export const messagesRelations = relations(messages, ({ one }) => ({
   conversation: one(conversations, { fields: [messages.conversationId], references: [conversations.id] }),
   sender: one(users, { fields: [messages.senderId], references: [users.id] }),
+  company: one(companies, { fields: [messages.companyId], references: [companies.id] }),
 }))
 
 export const filesRelations = relations(files, ({ one }) => ({
