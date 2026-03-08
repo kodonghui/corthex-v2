@@ -161,7 +161,8 @@ export class AgentRunner {
         scanForCredentials(knowledgeCtx)
       }
     }
-    const memoryCtx = await collectAgentMemoryContext(agent.companyId, agent.id)
+    const taskDesc = typeof task.messages[0]?.content === 'string' ? task.messages[0].content : undefined
+    const memoryCtx = await collectAgentMemoryContext(agent.companyId, agent.id, taskDesc)
     if (memoryCtx) {
       finalSystemPrompt += `\n\n## Agent Memories\n\n${memoryCtx}`
       scanForCredentials(memoryCtx)
@@ -311,7 +312,8 @@ export class AgentRunner {
         scanForCredentials(knowledgeCtx)
       }
     }
-    const memoryCtx = await collectAgentMemoryContext(agent.companyId, agent.id)
+    const streamTaskDesc = typeof task.messages[0]?.content === 'string' ? task.messages[0].content : undefined
+    const memoryCtx = await collectAgentMemoryContext(agent.companyId, agent.id, streamTaskDesc)
     if (memoryCtx) {
       finalSystemPrompt += `\n\n## Agent Memories\n\n${memoryCtx}`
       scanForCredentials(memoryCtx)

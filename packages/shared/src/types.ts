@@ -947,3 +947,49 @@ export type ArchiveStats = {
   byDepartment: { departmentId: string; departmentName: string; count: number }[]
   recentWeekCount: number
 }
+
+// === 전력분석 (Performance Analysis) ===
+
+export type PerformanceSummary = {
+  totalAgents: number
+  avgSuccessRate: number
+  totalCostThisMonth: number
+  avgResponseTimeMs: number
+  changes: {
+    agents: number
+    successRate: number
+    cost: number
+    responseTime: number
+  }
+}
+
+export type AgentPerformance = {
+  id: string
+  name: string
+  departmentName: string
+  role: string
+  totalCalls: number
+  successRate: number
+  avgCostUsd: number
+  avgResponseTimeMs: number
+  soulGymStatus: 'optimal' | 'has-suggestions' | 'needs-attention'
+}
+
+export type AgentPerformanceDetail = AgentPerformance & {
+  dailyMetrics: { date: string; successRate: number; costUsd: number }[]
+  recentTasks: { commandText: string; status: string; costUsd: number; durationMs: number; createdAt: string }[]
+  qualityDistribution: { score: number; count: number; label: string }[]
+  soulInfo: { systemPromptSummary: string; allowedToolsCount: number; modelName: string }
+}
+
+export type SoulGymSuggestion = {
+  id: string
+  agentId: string
+  agentName: string
+  currentSuccessRate: number
+  suggestionType: 'prompt-improve' | 'add-tool' | 'change-model'
+  description: string
+  confidence: number
+  expectedImprovement: number
+  estimatedTokens: number
+}

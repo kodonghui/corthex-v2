@@ -32,6 +32,20 @@ mock.module('../../lib/cost-tracker', () => ({
   recordCost: mock(() => Promise.resolve()),
 }))
 
+mock.module('../../services/knowledge-injector', () => ({
+  collectKnowledgeContext: mock(() => Promise.resolve(null)),
+  collectAgentMemoryContext: mock(() => Promise.resolve(null)),
+  clearKnowledgeCache: mock(() => {}),
+  clearAllCache: mock(() => {}),
+}))
+
+mock.module('../../services/memory-extractor', () => ({
+  extractAndSaveMemories: mock(() => Promise.resolve({ saved: 0, memories: [] })),
+  consolidateMemories: mock(() => Promise.resolve({ merged: 0, remaining: 0 })),
+  clearRateLimiter: mock(() => {}),
+  isRateLimited: mock(() => false),
+}))
+
 import { AgentRunner, buildSystemPrompt, getToolDefinitions } from '../../services/agent-runner'
 import type { AgentConfig } from '../../services/agent-runner'
 

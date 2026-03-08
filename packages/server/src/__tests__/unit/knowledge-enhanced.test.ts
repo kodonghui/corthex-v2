@@ -86,12 +86,36 @@ mock.module('../../db/schema', () => ({
     usageCount: 'usage_count', lastUsedAt: 'last_used_at',
     isActive: 'is_active', createdAt: 'created_at', updatedAt: 'updated_at',
   },
-  agents: { id: 'id', companyId: 'company_id' },
+  agents: { id: 'id', companyId: 'company_id', departmentId: 'department_id' },
+  departmentKnowledge: {
+    companyId: 'company_id', departmentId: 'department_id',
+    title: 'title', content: 'content', category: 'category',
+    updatedAt: 'updated_at',
+  },
   memoryTypeEnum: {},
   docVersionsRelations: {},
   knowledgeFoldersRelations: {},
   knowledgeDocsRelations: {},
   agentMemoriesRelations: {},
+}))
+
+// Mock knowledge-injector (used by knowledge route for cache invalidation)
+mock.module('../../services/knowledge-injector', () => ({
+  clearKnowledgeCache: mock(() => {}),
+  getInjectionPreview: mock(() => Promise.resolve({
+    departmentKnowledge: [], knowledgeDocs: [], agentMemories: [],
+    totalChars: 0, truncated: false,
+  })),
+  collectKnowledgeContext: mock(() => Promise.resolve(null)),
+  collectAgentMemoryContext: mock(() => Promise.resolve(null)),
+  clearAllCache: mock(() => {}),
+}))
+
+mock.module('../../services/memory-extractor', () => ({
+  extractAndSaveMemories: mock(() => Promise.resolve({ saved: 0, memories: [] })),
+  consolidateMemories: mock(() => Promise.resolve({ merged: 0, remaining: 0 })),
+  clearRateLimiter: mock(() => {}),
+  isRateLimited: mock(() => false),
 }))
 
 mock.module('../../middleware/auth', () => ({

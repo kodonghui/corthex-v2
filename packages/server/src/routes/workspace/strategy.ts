@@ -32,6 +32,7 @@ strategyRoute.get('/watchlist', async (c) => {
     .select()
     .from(strategyWatchlists)
     .where(and(eq(strategyWatchlists.companyId, tenant.companyId), eq(strategyWatchlists.userId, tenant.userId)))
+    .orderBy(strategyWatchlists.sortOrder)
 
   return c.json({ data: result })
 })
@@ -75,6 +76,29 @@ strategyRoute.delete('/watchlist/:id', zValidator('param', z.object({ id: z.stri
   if (!deleted) throw new HTTPError(404, '종목을 찾을 수 없습니다', 'STRATEGY_002')
 
   return c.json({ data: { deleted: true } })
+})
+
+// PATCH /api/workspace/strategy/watchlist/reorder — 관심종목 순서 변경
+const reorderSchema = z.object({
+  items: z.array(z.object({ id: z.string().uuid(), sortOrder: z.number().int().min(0) })).min(1).max(200),
+})
+
+strategyRoute.patch('/watchlist/reorder', zValidator('json', reorderSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const { items } = c.req.valid('json')
+
+  for (const item of items) {
+    await db
+      .update(strategyWatchlists)
+      .set({ sortOrder: item.sortOrder })
+      .where(and(
+        eq(strategyWatchlists.id, item.id),
+        eq(strategyWatchlists.companyId, tenant.companyId),
+        eq(strategyWatchlists.userId, tenant.userId),
+      ))
+  }
+
+  return c.json({ data: { reordered: items.length } })
 })
 
 // === 전략 채팅 ===

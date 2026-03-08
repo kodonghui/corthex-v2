@@ -648,6 +648,7 @@ export const strategyWatchlists = pgTable('strategy_watchlists', {
   stockCode: varchar('stock_code', { length: 20 }).notNull(),
   stockName: varchar('stock_name', { length: 100 }).notNull(),
   market: varchar('market', { length: 10 }).notNull().default('KOSPI'),
+  sortOrder: integer('sort_order').notNull().default(0),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 }, (table) => ({
   companyIdx: index('strategy_watchlists_company_idx').on(table.companyId),
@@ -978,6 +979,53 @@ export const auditLogs = pgTable('audit_logs', {
   companyActionIdx: index('audit_logs_company_action_idx').on(table.companyId, table.action),
   companyCreatedIdx: index('audit_logs_company_created_idx').on(table.companyId, table.createdAt),
   companyTargetIdx: index('audit_logs_company_target_idx').on(table.companyId, table.targetType, table.targetId),
+}))
+
+// === P2-17. soul_gym_rounds — Soul Gym 진화 이력 ===
+export const soulGymRounds = pgTable('soul_gym_rounds', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  agentId: uuid('agent_id').notNull().references(() => agents.id),
+  roundNum: integer('round_num').notNull().default(1),
+  scoreBefore: real('score_before').notNull().default(0),
+  scoreAfter: real('score_after').notNull().default(0),
+  improvement: real('improvement').notNull().default(0),
+  winner: varchar('winner', { length: 30 }).notNull(),  // original | variantA | variantB | variantC
+  costUsd: real('cost_usd').notNull().default(0),
+  variantsJson: jsonb('variants_json'),  // { scores, proposals, elapsed }
+  benchmarkJson: jsonb('benchmark_json'),  // { questions, responses, judgeScores }
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('soul_gym_rounds_company_idx').on(table.companyId),
+  agentIdx: index('soul_gym_rounds_agent_idx').on(table.companyId, table.agentId),
+}))
+
+// === P2-18. soul_evolution_proposals — Soul Evolution 제안 ===
+export const soulEvolutionProposals = pgTable('soul_evolution_proposals', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  agentId: uuid('agent_id').notNull().references(() => agents.id),
+  status: varchar('status', { length: 20 }).notNull().default('pending'),  // pending | approved | rejected
+  proposalText: text('proposal_text').notNull(),
+  analysisJson: jsonb('analysis_json'),  // { warningsAnalyzed, patterns, reasoning }
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  resolvedAt: timestamp('resolved_at'),
+}, (table) => ({
+  companyIdx: index('soul_evolution_proposals_company_idx').on(table.companyId),
+  agentStatusIdx: index('soul_evolution_proposals_agent_status_idx').on(table.companyId, table.agentId, table.status),
+}))
+
+// === P2-19. soul_backups — Soul 백업 (롤백용) ===
+export const soulBackups = pgTable('soul_backups', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  agentId: uuid('agent_id').notNull().references(() => agents.id),
+  soulMarkdown: text('soul_markdown').notNull(),
+  version: integer('version').notNull().default(1),
+  source: varchar('source', { length: 30 }).notNull().default('soul-gym'),  // soul-gym | soul-evolution | manual
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  agentIdx: index('soul_backups_agent_idx').on(table.companyId, table.agentId),
 }))
 
 // === Relations ===

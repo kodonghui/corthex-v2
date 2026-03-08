@@ -27,6 +27,8 @@ const CronBasePage = lazy(() => import('./pages/cron-base').then((m) => ({ defau
 const ArgosPage = lazy(() => import('./pages/argos').then((m) => ({ default: m.ArgosPage })))
 const AgoraPage = lazy(() => import('./pages/agora').then((m) => ({ default: m.AgoraPage })))
 const ClassifiedPage = lazy(() => import('./pages/classified').then((m) => ({ default: m.ClassifiedPage })))
+const KnowledgePage = lazy(() => import('./pages/knowledge').then((m) => ({ default: m.KnowledgePage })))
+const PerformancePage = lazy(() => import('./pages/performance').then((m) => ({ default: m.PerformancePage })))
 
 const queryClient = new QueryClient()
 
@@ -111,6 +113,8 @@ export function App() {
             <Route path="argos" element={<Suspense fallback={<PageSkeleton />}><ArgosPage /></Suspense>} />
             <Route path="agora" element={<Suspense fallback={<PageSkeleton />}><AgoraPage /></Suspense>} />
             <Route path="classified" element={<Suspense fallback={<PageSkeleton />}><ClassifiedPage /></Suspense>} />
+            <Route path="knowledge" element={<Suspense fallback={<PageSkeleton />}><KnowledgePage /></Suspense>} />
+            <Route path="performance" element={<Suspense fallback={<PageSkeleton />}><PerformancePage /></Suspense>} />
             <Route path="settings" element={<Suspense fallback={<PageSkeleton />}><SettingsPage /></Suspense>} />
           </Route>
         </Routes>

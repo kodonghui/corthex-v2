@@ -3,4 +3,5 @@ export type WatchlistItem = {
   stockCode: string
   stockName: string
   market: string
+  sortOrder?: number
 }

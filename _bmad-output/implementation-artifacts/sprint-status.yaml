@@ -230,11 +230,11 @@ development_status:
   10-1-strategy-schema-watchlist-portfolio-orders: done
   10-2-kis-securities-api-adapter: done
   10-3-finance-tools-5-implementation: done
-  10-4-cio-vector-separation-orchestration: backlog
-  10-5-autonomous-approval-execution-risk-control: backlog
-  10-6-real-paper-trading-separation: backlog
-  10-7-strategy-room-ui-portfolio-watchlist: backlog
-  10-8-trading-approval-history-ui: backlog
+  10-4-cio-vector-separation-orchestration: done
+  10-5-autonomous-approval-execution-risk-control: done
+  10-6-real-paper-trading-separation: done
+  10-7-strategy-room-ui-portfolio-watchlist: done
+  10-8-trading-approval-history-ui: done
   epic-10-retrospective: optional
 
   # ============================================================
@@ -247,8 +247,8 @@ development_status:
   11-1-agora-engine-round-management-consensus: done
   11-2-debate-deep-debate-command-integration: done
   11-3-websocket-debate-channel-streaming: done
-  11-4-agora-ui-round-timeline-speech-cards: backlog
-  11-5-diff-view-debate-result-insertion: backlog
+  11-4-agora-ui-round-timeline-speech-cards: done
+  11-5-diff-view-debate-result-insertion: done
   epic-11-retrospective: optional
 
   # ============================================================
@@ -261,8 +261,8 @@ development_status:
   12-1-sns-content-management-api: done
   12-2-marketing-tools-3-implementation: done
   12-3-selenium-auto-publish-engine-5-platforms: done
-  12-4-scheduled-publish-queue-card-news: backlog
-  12-5-sns-publishing-ui: backlog
+  12-4-scheduled-publish-queue-card-news: done
+  12-5-sns-publishing-ui: done
   epic-12-retrospective: optional
 
   # ============================================================
@@ -275,8 +275,8 @@ development_status:
   13-1-cytoscape-canvas-8-node-types-connection: done
   13-2-mermaid-cytoscape-bidirectional-conversion: done
   13-3-mcp-sse-ai-realtime-canvas-manipulation: done
-  13-4-save-load-knowledge-base-integration: backlog
-  13-5-sketchvibe-ui-integration-command-center: backlog
+  13-4-save-load-knowledge-base-integration: done
+  13-5-sketchvibe-ui-integration-command-center: done
   epic-13-retrospective: optional
 
   # ============================================================
@@ -285,13 +285,13 @@ development_status:
   # UX: CEO #11 (Cron), CEO #12 (ARGOS)
   # Dependencies: Epic 5, Epic 4
   # ============================================================
-  epic-14: in-progress
+  epic-14: done
   14-1-cron-scheduler-service-crud-api: done
   14-2-cron-execution-engine-auto-run: done
   14-3-argos-trigger-condition-auto-collect: done
-  14-4-cron-base-ui: backlog
-  14-5-argos-ui: backlog
-  14-6-status-bar-data-ai-ok-ng-cost: backlog
+  14-4-cron-base-ui: done
+  14-5-argos-ui: done
+  14-6-status-bar-data-ai-ok-ng-cost: done
   epic-14-retrospective: optional
 
   # ============================================================
@@ -299,10 +299,10 @@ development_status:
   # FRs: FR68
   # Dependencies: Epic 5, Epic 14
   # ============================================================
-  epic-15: backlog
-  15-1-telegram-bot-api-webhook: backlog
-  15-2-telegram-command-parsing-mention-text: backlog
-  15-3-result-send-cron-result-auto-send: backlog
+  epic-15: in-progress
+  15-1-telegram-bot-api-webhook: done
+  15-2-telegram-command-parsing-mention-text: done
+  15-3-result-send-cron-result-auto-send: done
   epic-15-retrospective: optional
 
   # ============================================================
@@ -314,10 +314,10 @@ development_status:
   epic-16: in-progress
   16-1-knowledge-schema-docs-memories: done
   16-2-document-store-crud-api-folder-management: done
-  16-3-department-knowledge-auto-injection: backlog
-  16-4-agent-memory-auto-learning-extraction: backlog
-  16-5-knowledge-ui-drag-drop-upload: backlog
-  16-6-similar-task-previous-learning-auto-reference: backlog
+  16-3-department-knowledge-auto-injection: done
+  16-4-agent-memory-auto-learning-extraction: done
+  16-5-knowledge-ui-drag-drop-upload: done
+  16-6-similar-task-previous-learning-auto-reference: done
   epic-16-retrospective: optional
 
   # ============================================================
@@ -329,11 +329,11 @@ development_status:
   epic-17: in-progress
   17-1-operation-log-api-search-filter-bookmark: done
   17-2-operation-log-ui-ab-compare-replay: done
-  17-3-classified-docs-api-archive-filter-similar: backlog
-  17-4-classified-docs-ui: backlog
-  17-5-performance-analysis-api-soul-gym: backlog
-  17-6-performance-analysis-ui-soul-gym-suggestions: backlog
-  17-7-quality-dashboard-pass-rate-avg-score: backlog
+  17-3-classified-docs-api-archive-filter-similar: done
+  17-4-classified-docs-ui: done
+  17-5-performance-analysis-api-soul-gym: done
+  17-6-performance-analysis-ui-soul-gym-suggestions: done
+  17-7-quality-dashboard-pass-rate-avg-score: done
   epic-17-retrospective: optional
 
   # ============================================================

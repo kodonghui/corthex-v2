@@ -40,6 +40,8 @@ const navSections: NavSection[] = [
       { to: '/activity-log', label: '통신로그', icon: '📞' },
       { to: '/ops-log', label: '작전일지', icon: '📋' },
       { to: '/classified', label: '기밀문서', icon: '🔒' },
+      { to: '/performance', label: '전력분석', icon: '💪' },
+      { to: '/knowledge', label: '정보국', icon: '📚' },
       { to: '/cron', label: '크론기지', icon: '⏰' },
       { to: '/argos', label: 'ARGOS', icon: '🔍' },
       { to: '/nexus', label: 'NEXUS', icon: '🔗' },

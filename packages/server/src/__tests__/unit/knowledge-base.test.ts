@@ -92,9 +92,32 @@ mock.module('../../db/schema', () => ({
     editedBy: 'edited_by', changeNote: 'change_note', createdAt: 'created_at',
   },
   agents: {
-    id: 'id', companyId: 'company_id',
+    id: 'id', companyId: 'company_id', departmentId: 'department_id',
+  },
+  departmentKnowledge: {
+    companyId: 'company_id', departmentId: 'department_id',
+    title: 'title', content: 'content', category: 'category',
+    updatedAt: 'updated_at',
   },
   memoryTypeEnum: {},
+}))
+
+mock.module('../../services/knowledge-injector', () => ({
+  clearKnowledgeCache: mock(() => {}),
+  getInjectionPreview: mock(() => Promise.resolve({
+    departmentKnowledge: [], knowledgeDocs: [], agentMemories: [],
+    totalChars: 0, truncated: false,
+  })),
+  collectKnowledgeContext: mock(() => Promise.resolve(null)),
+  collectAgentMemoryContext: mock(() => Promise.resolve(null)),
+  clearAllCache: mock(() => {}),
+}))
+
+mock.module('../../services/memory-extractor', () => ({
+  extractAndSaveMemories: mock(() => Promise.resolve({ saved: 0, memories: [] })),
+  consolidateMemories: mock(() => Promise.resolve({ merged: 0, remaining: 0 })),
+  clearRateLimiter: mock(() => {}),
+  isRateLimited: mock(() => false),
 }))
 
 mock.module('../../lib/knowledge-templates', () => ({

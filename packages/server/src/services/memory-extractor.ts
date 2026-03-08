@@ -10,6 +10,50 @@ import type { LLMRouterContext } from './llm-router'
 
 const MAX_LEARNINGS = 3
 const RATE_LIMIT_MS = 60_000 // 1 minute per agent
+const MAX_KEYWORDS = 10
+
+// === Korean / English Stopwords ===
+
+const KOREAN_STOPWORDS = new Set([
+  '은', '는', '이', '가', '을', '를', '에', '의', '로', '와', '과',
+  '도', '만', '에서', '까지', '부터', '하다', '있다', '되다', '것',
+  '수', '등', '그', '이것', '저것', '그것', '하는', '된', '할', '한',
+  '더', '또', '및', '위해', '대한', '통해', '있는', '하고', '대해',
+])
+
+const ENGLISH_STOPWORDS = new Set([
+  'the', 'is', 'a', 'an', 'to', 'for', 'of', 'in', 'on', 'at', 'by',
+  'with', 'and', 'or', 'not', 'it', 'its', 'this', 'that', 'be', 'are',
+  'was', 'were', 'been', 'has', 'have', 'had', 'do', 'does', 'did',
+  'will', 'would', 'can', 'could', 'should', 'may', 'might', 'from',
+  'as', 'but', 'if', 'so', 'no', 'yes', 'all', 'any', 'each', 'some',
+])
+
+// === Task Keyword Extraction ===
+
+export function extractTaskKeywords(taskDescription: string): string[] {
+  if (!taskDescription || !taskDescription.trim()) return []
+
+  // Split on whitespace and punctuation
+  const tokens = taskDescription
+    .toLowerCase()
+    .replace(/[.,;:!?'"()\[\]{}<>@#$%^&*+=|\\\/~`]/g, ' ')
+    .split(/\s+/)
+    .filter(t => t.length >= 2)
+
+  // Filter stopwords
+  const filtered = tokens.filter(
+    t => !KOREAN_STOPWORDS.has(t) && !ENGLISH_STOPWORDS.has(t),
+  )
+
+  // Deduplicate
+  const unique = [...new Set(filtered)]
+
+  // Sort by length DESC (longer = more specific/meaningful)
+  unique.sort((a, b) => b.length - a.length)
+
+  return unique.slice(0, MAX_KEYWORDS)
+}
 
 // === Rate Limiter ===
 
@@ -130,6 +174,7 @@ async function saveMemory(
   agentId: string,
   item: { key: string; content: string; memoryType: 'learning' | 'insight' | 'preference' | 'fact' },
   source: string,
+  taskContext?: string,
 ): Promise<boolean> {
   // Credential scrubbing
   try {
@@ -161,6 +206,7 @@ async function saveMemory(
       memoryType: item.memoryType,
       key: item.key.slice(0, 200), // varchar(200) limit
       content: item.content,
+      context: taskContext || null,
       source,
       confidence: 70, // auto-extracted default confidence
     })
@@ -212,12 +258,16 @@ export async function extractAndSaveMemories(params: {
     return { saved: 0, memories: [] }
   }
 
+  // Extract task keywords for context field
+  const taskKeywords = extractTaskKeywords(taskDescription)
+  const taskContext = taskKeywords.length > 0 ? taskKeywords.join('\n') : undefined
+
   // Save each extracted memory
   const savedMemories: { key: string; content: string }[] = []
   const sourceLabel = source ? `auto:${source}` : 'auto'
 
   for (const item of items) {
-    const saved = await saveMemory(companyId, agentId, item, sourceLabel)
+    const saved = await saveMemory(companyId, agentId, item, sourceLabel, taskContext)
     if (saved) {
       savedMemories.push({ key: item.key, content: item.content })
     }

@@ -47,6 +47,13 @@ mock.module('../../services/knowledge-injector', () => ({
   clearAllCache: mock(() => {}),
 }))
 
+mock.module('../../services/memory-extractor', () => ({
+  extractAndSaveMemories: mock(() => Promise.resolve({ saved: 0, memories: [] })),
+  consolidateMemories: mock(() => Promise.resolve({ merged: 0, remaining: 0 })),
+  clearRateLimiter: mock(() => {}),
+  isRateLimited: mock(() => false),
+}))
+
 // === Test Helpers ===
 
 const testAgent: AgentConfig = {
