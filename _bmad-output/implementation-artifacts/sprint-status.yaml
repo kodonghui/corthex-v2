@@ -184,15 +184,15 @@ development_status:
   7-3-cost-dashboard-ui-admin-a6: done
   7-4-ceo-app-cost-card-drilldown: done
   7-5-budget-exceeded-websocket-alert: done
-  epic-7-retrospective: optional
+  epic-7-retrospective: done
 
   # ============================================================
   # Epic 8: Quality Gate Enhancement (5 stories, 11 SP)
   # FRs: FR52-FR55
   # Dependencies: Epic 5 (P0 quality gate)
   # ============================================================
-  epic-8: backlog
-  8-1-quality-rules-yaml-parser: backlog
+  epic-8: in-progress
+  8-1-quality-rules-yaml-parser: in-progress
   8-2-auto-rule-inspection-engine: backlog
   8-3-hallucination-detection: backlog
   8-4-prompt-injection-defense: backlog
@@ -205,8 +205,8 @@ development_status:
   # UX: Admin A4, A8, Onboarding, CEO #14
   # Dependencies: Epic 1 (tenant), Epic 2 (org)
   # ============================================================
-  epic-9: backlog
-  9-1-company-crud-api: backlog
+  epic-9: in-progress
+  9-1-company-crud-api: in-progress
   9-2-human-employee-management-api: backlog
   9-3-employee-command-center-restriction: backlog
   9-4-employee-management-ui-admin-a4: backlog
