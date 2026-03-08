@@ -1,6 +1,6 @@
 import { db } from '../db'
 import { commands, costRecords, agents, departments, companies } from '../db/schema'
-import { and, eq, gte, lte, sql, count, sum } from 'drizzle-orm'
+import { and, eq, gte, lte, sql, count, sum, inArray } from 'drizzle-orm'
 import { getCostSummary, getDepartmentCostBreakdown, microToUsd } from '../lib/cost-tracker'
 import { loadBudgetConfig } from './budget-guard'
 import type { DashboardSummary, DashboardUsage, DashboardUsageDay, DashboardBudget, DashboardSatisfaction, QuickAction, LLMProviderName } from '@corthex/shared'
@@ -50,8 +50,10 @@ const DEFAULT_MONTHLY_BUDGET_MICRO = 500_000_000 // $500
  * Get summary data for 4 dashboard cards
  * Cached for 30 seconds
  */
-export async function getSummary(companyId: string): Promise<DashboardSummary> {
-  const cacheKey = `${companyId}:summary`
+export async function getSummary(companyId: string, departmentIds?: string[]): Promise<DashboardSummary> {
+  // For employee-scoped requests, use departmentIds in cache key
+  const scopeKey = departmentIds ? `:dept:${[...departmentIds].sort().join(',')}` : ''
+  const cacheKey = `${companyId}:summary${scopeKey}`
   const cached = getCached<DashboardSummary>(cacheKey)
   if (cached) return cached
 
@@ -87,17 +89,36 @@ export async function getSummary(companyId: string): Promise<DashboardSummary> {
   const costSummary = await getCostSummary(companyId, { from: today, to: now })
 
   // Provider breakdown for today
-  const providerRows = await db
+  const providerCostConditions = [
+    eq(costRecords.companyId, companyId),
+    gte(costRecords.createdAt, today),
+    lte(costRecords.createdAt, now),
+  ]
+
+  // Employee department scoping for cost data
+  let scopedAgentIds: string[] | undefined
+  if (departmentIds) {
+    if (departmentIds.length === 0) {
+      scopedAgentIds = []
+    } else {
+      const scopedAgents = await db
+        .select({ id: agents.id })
+        .from(agents)
+        .where(and(eq(agents.companyId, companyId), inArray(agents.departmentId, departmentIds)))
+      scopedAgentIds = scopedAgents.map(a => a.id)
+    }
+    if (scopedAgentIds.length > 0) {
+      providerCostConditions.push(inArray(costRecords.agentId, scopedAgentIds))
+    }
+  }
+
+  const providerRows = (scopedAgentIds && scopedAgentIds.length === 0) ? [] : await db
     .select({
       provider: costRecords.provider,
       costMicro: sum(costRecords.costUsdMicro).mapWith(Number),
     })
     .from(costRecords)
-    .where(and(
-      eq(costRecords.companyId, companyId),
-      gte(costRecords.createdAt, today),
-      lte(costRecords.createdAt, now),
-    ))
+    .where(and(...providerCostConditions))
     .groupBy(costRecords.provider)
 
   const byProvider = providerRows.map(r => ({
@@ -121,13 +142,18 @@ export async function getSummary(companyId: string): Promise<DashboardSummary> {
   }
 
   // 3. Agent card
-  const agentRows = await db
+  const agentConditions = [eq(agents.companyId, companyId), eq(agents.isActive, true)]
+  if (departmentIds && departmentIds.length > 0) {
+    agentConditions.push(inArray(agents.departmentId, departmentIds))
+  }
+
+  const agentRows = (departmentIds && departmentIds.length === 0) ? [] : await db
     .select({
       status: agents.status,
       cnt: count(),
     })
     .from(agents)
-    .where(and(eq(agents.companyId, companyId), eq(agents.isActive, true)))
+    .where(and(...agentConditions))
     .groupBy(agents.status)
 
   const agentMap: Record<string, number> = {}
@@ -218,8 +244,9 @@ export async function getUsage(companyId: string, days: number): Promise<Dashboa
  * Get budget progress for current month
  * Cached for 5 minutes
  */
-export async function getBudget(companyId: string): Promise<DashboardBudget> {
-  const cacheKey = `${companyId}:budget`
+export async function getBudget(companyId: string, departmentIds?: string[]): Promise<DashboardBudget> {
+  const scopeKey = departmentIds ? `:dept:${[...departmentIds].sort().join(',')}` : ''
+  const cacheKey = `${companyId}:budget${scopeKey}`
   const cached = getCached<DashboardBudget>(cacheKey)
   if (cached) return cached
 
@@ -249,17 +276,24 @@ export async function getBudget(companyId: string): Promise<DashboardBudget> {
     ? Math.round((currentMonthSpendMicro / effectiveBudgetMicro) * 100)
     : 0
 
+  // Filter byDepartment for employee scope
+  const allDepartments = deptBreakdown.items.map(item => ({
+    departmentId: item.key,
+    name: item.label,
+    costUsd: microToUsd(item.costMicro),
+  }))
+
+  const filteredDepartments = departmentIds
+    ? allDepartments.filter(d => departmentIds.includes(d.departmentId))
+    : allDepartments
+
   const result: DashboardBudget = {
     currentMonthSpendUsd: microToUsd(currentMonthSpendMicro),
     monthlyBudgetUsd: microToUsd(effectiveBudgetMicro),
     usagePercent,
     projectedMonthEndUsd: microToUsd(projectedMicro),
     isDefaultBudget: isDefault,
-    byDepartment: deptBreakdown.items.map(item => ({
-      departmentId: item.key,
-      name: item.label,
-      costUsd: microToUsd(item.costMicro),
-    })),
+    byDepartment: filteredDepartments,
   }
 
   setCache(cacheKey, result, 300_000) // 5min TTL

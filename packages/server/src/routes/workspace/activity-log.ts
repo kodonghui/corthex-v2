@@ -1,13 +1,15 @@
 import { Hono } from 'hono'
-import { eq, and, desc, gte, lt, sql, count, or, ilike } from 'drizzle-orm'
+import { eq, and, desc, gte, lt, sql, count, or, ilike, inArray } from 'drizzle-orm'
 import { db } from '../../db'
-import { activityLogs } from '../../db/schema'
+import { activityLogs, agents } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
+import { departmentScopeMiddleware } from '../../middleware/department-scope'
 import type { AppEnv } from '../../types'
 
 export const activityLogRoute = new Hono<AppEnv>()
 
 activityLogRoute.use('*', authMiddleware)
+activityLogRoute.use('*', departmentScopeMiddleware)
 
 // GET /api/workspace/activity-log — 활동 로그 목록 (cursor 페이지네이션 + 검색)
 activityLogRoute.get('/activity-log', async (c) => {
@@ -17,7 +19,25 @@ activityLogRoute.get('/activity-log', async (c) => {
   const cursor = c.req.query('cursor') // ISO date string
   const search = c.req.query('search')?.trim()
 
+  // Employee department scoping: get scoped agent IDs
+  if (tenant.departmentIds && tenant.departmentIds.length === 0) {
+    return c.json({ data: [], nextCursor: null })
+  }
+
+  let scopedActorIds: string[] | undefined
+  if (tenant.departmentIds) {
+    const scopedAgents = await db
+      .select({ id: agents.id })
+      .from(agents)
+      .where(and(eq(agents.companyId, tenant.companyId), inArray(agents.departmentId, tenant.departmentIds)))
+    scopedActorIds = [...scopedAgents.map(a => a.id), tenant.userId]
+  }
+
   const conditions = [eq(activityLogs.companyId, tenant.companyId)]
+
+  if (scopedActorIds) {
+    conditions.push(inArray(activityLogs.actorId, scopedActorIds))
+  }
 
   if (type) {
     conditions.push(eq(activityLogs.type, type as any))
@@ -81,6 +101,34 @@ activityLogRoute.get('/activity-log/summary', async (c) => {
   weekAgo.setDate(weekAgo.getDate() - 7)
   weekAgo.setHours(0, 0, 0, 0)
 
+  // Employee department scoping
+  if (tenant.departmentIds && tenant.departmentIds.length === 0) {
+    return c.json({ data: { today: [], week: [] } })
+  }
+
+  let scopedActorIds: string[] | undefined
+  if (tenant.departmentIds) {
+    const scopedAgents = await db
+      .select({ id: agents.id })
+      .from(agents)
+      .where(and(eq(agents.companyId, tenant.companyId), inArray(agents.departmentId, tenant.departmentIds)))
+    scopedActorIds = [...scopedAgents.map(a => a.id), tenant.userId]
+  }
+
+  const todayConditions = [
+    eq(activityLogs.companyId, tenant.companyId),
+    gte(activityLogs.createdAt, today),
+  ]
+  const weekConditions = [
+    eq(activityLogs.companyId, tenant.companyId),
+    gte(activityLogs.createdAt, weekAgo),
+  ]
+
+  if (scopedActorIds) {
+    todayConditions.push(inArray(activityLogs.actorId, scopedActorIds))
+    weekConditions.push(inArray(activityLogs.actorId, scopedActorIds))
+  }
+
   // 오늘 타입별 카운트
   const todayCounts = await db
     .select({
@@ -88,10 +136,7 @@ activityLogRoute.get('/activity-log/summary', async (c) => {
       count: count(),
     })
     .from(activityLogs)
-    .where(and(
-      eq(activityLogs.companyId, tenant.companyId),
-      gte(activityLogs.createdAt, today),
-    ))
+    .where(and(...todayConditions))
     .groupBy(activityLogs.type)
 
   // 이번주 타입별 카운트
@@ -101,10 +146,7 @@ activityLogRoute.get('/activity-log/summary', async (c) => {
       count: count(),
     })
     .from(activityLogs)
-    .where(and(
-      eq(activityLogs.companyId, tenant.companyId),
-      gte(activityLogs.createdAt, weekAgo),
-    ))
+    .where(and(...weekConditions))
     .groupBy(activityLogs.type)
 
   return c.json({

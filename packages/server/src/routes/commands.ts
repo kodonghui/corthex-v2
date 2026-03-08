@@ -6,6 +6,7 @@ import { db } from '../db'
 import { commands, orchestrationTasks, agents, qualityReviews, costRecords } from '../db/schema'
 import { microToUsd } from '../lib/cost-tracker'
 import { authMiddleware } from '../middleware/auth'
+import { departmentScopeMiddleware } from '../middleware/department-scope'
 import { promptGuardMiddleware } from '../middleware/prompt-guard'
 import { HTTPError } from '../middleware/error'
 import { classify, createCommand } from '../services/command-router'
@@ -17,6 +18,7 @@ import type { AppEnv } from '../types'
 export const commandsRoute = new Hono<AppEnv>()
 
 commandsRoute.use('*', authMiddleware)
+commandsRoute.use('*', departmentScopeMiddleware)
 
 const submitCommandSchema = z.object({
   text: z.string().min(1).max(10_000),
@@ -30,6 +32,19 @@ const submitCommandSchema = z.object({
 commandsRoute.post('/', zValidator('json', submitCommandSchema), promptGuardMiddleware, async (c) => {
   const tenant = c.get('tenant')
   const body = c.req.valid('json')
+
+  // Employee: validate targetAgentId belongs to assigned department
+  if (tenant.departmentIds && body.targetAgentId) {
+    const [targetAgent] = await db
+      .select({ departmentId: agents.departmentId })
+      .from(agents)
+      .where(and(eq(agents.id, body.targetAgentId), eq(agents.companyId, tenant.companyId)))
+      .limit(1)
+
+    if (!targetAgent || !targetAgent.departmentId || !tenant.departmentIds.includes(targetAgent.departmentId)) {
+      throw new HTTPError(403, '해당 부서의 에이전트에게만 명령할 수 있습니다', 'SCOPE_002')
+    }
+  }
 
   const result = await classify(body.text, {
     companyId: tenant.companyId,

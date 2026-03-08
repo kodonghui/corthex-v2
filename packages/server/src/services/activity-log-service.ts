@@ -1,4 +1,4 @@
-import { eq, and, desc, gte, lte, count, ilike, or } from 'drizzle-orm'
+import { eq, and, desc, gte, lte, count, ilike, or, inArray } from 'drizzle-orm'
 import { db } from '../db'
 import { activityLogs, orchestrationTasks, qualityReviews, toolCalls, agents, commands } from '../db/schema'
 
@@ -40,6 +40,7 @@ type PaginatedResult<T> = { items: T[]; page: number; limit: number; total: numb
 type AgentActivityFilters = {
   agentId?: string
   departmentId?: string
+  departmentIds?: string[]  // employee scope
   status?: string  // phase value
   startDate?: string
   endDate?: string
@@ -71,6 +72,14 @@ export async function getAgentActivity(
   // departmentId filter via agents join
   if (filters.departmentId) {
     conditions.push(eq(agents.departmentId, filters.departmentId))
+  }
+
+  // Employee department scope
+  if (filters.departmentIds) {
+    if (filters.departmentIds.length === 0) {
+      return { items: [], page: pagination.page, limit: pagination.limit, total: 0 }
+    }
+    conditions.push(inArray(agents.departmentId, filters.departmentIds))
   }
 
   const whereClause = and(...conditions)
@@ -117,6 +126,7 @@ export async function getAgentActivity(
 
 type DelegationFilters = {
   departmentId?: string
+  departmentIds?: string[]  // employee scope
   startDate?: string
   endDate?: string
   search?: string
@@ -133,6 +143,14 @@ export async function getDelegations(
 
   if (filters.departmentId) {
     conditions.push(eq(agents.departmentId, filters.departmentId))
+  }
+
+  // Employee department scope
+  if (filters.departmentIds) {
+    if (filters.departmentIds.length === 0) {
+      return { items: [], page: pagination.page, limit: pagination.limit, total: 0 }
+    }
+    conditions.push(inArray(agents.departmentId, filters.departmentIds))
   }
 
   if (filters.search) {
@@ -192,6 +210,7 @@ export async function getDelegations(
 type QualityFilters = {
   conclusion?: 'pass' | 'fail'
   reviewerAgentId?: string
+  departmentIds?: string[]  // employee scope
   startDate?: string
   endDate?: string
   search?: string
@@ -208,6 +227,14 @@ export async function getQualityReviews(
 
   if (filters.conclusion) conditions.push(eq(qualityReviews.conclusion, filters.conclusion))
   if (filters.reviewerAgentId) conditions.push(eq(qualityReviews.reviewerAgentId, filters.reviewerAgentId))
+
+  // Employee department scope
+  if (filters.departmentIds) {
+    if (filters.departmentIds.length === 0) {
+      return { items: [], page: pagination.page, limit: pagination.limit, total: 0 }
+    }
+    conditions.push(inArray(agents.departmentId, filters.departmentIds))
+  }
 
   if (filters.search) {
     const escaped = filters.search.replace(/[%_\\]/g, '\\$&')
@@ -264,6 +291,7 @@ export async function getQualityReviews(
 type ToolFilters = {
   toolName?: string
   agentId?: string
+  departmentIds?: string[]  // employee scope
   status?: string
   startDate?: string
   endDate?: string
@@ -282,6 +310,14 @@ export async function getToolInvocations(
   if (filters.toolName) conditions.push(eq(toolCalls.toolName, filters.toolName))
   if (filters.agentId) conditions.push(eq(toolCalls.agentId, filters.agentId))
   if (filters.status) conditions.push(eq(toolCalls.status, filters.status))
+
+  // Employee department scope
+  if (filters.departmentIds) {
+    if (filters.departmentIds.length === 0) {
+      return { items: [], page: pagination.page, limit: pagination.limit, total: 0 }
+    }
+    conditions.push(inArray(agents.departmentId, filters.departmentIds))
+  }
 
   if (filters.search) {
     const escaped = filters.search.replace(/[%_\\]/g, '\\$&')

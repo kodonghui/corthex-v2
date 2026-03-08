@@ -7,6 +7,7 @@ export type TenantContext = {
   userId: string
   role: UserRole
   isAdminUser?: boolean  // admin_users 테이블에서 로그인한 경우 true
+  departmentIds?: string[]  // employee의 할당 부서 ID 목록 (undefined = 전체 접근)
 }
 
 // RBAC 역할 헬퍼

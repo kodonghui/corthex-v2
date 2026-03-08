@@ -1,10 +1,11 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { eq, and, gte, sql, count, sum } from 'drizzle-orm'
+import { eq, and, gte, sql, count, sum, inArray } from 'drizzle-orm'
 import { db } from '../../db'
 import { costRecords, agents, chatMessages, delegations, toolCalls, nightJobs } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
+import { departmentScopeMiddleware } from '../../middleware/department-scope'
 import { getSummary, getUsage, getBudget, getQuickActions, updateQuickActions, getSatisfaction } from '../../services/dashboard'
 import * as costAggregation from '../../services/cost-aggregation'
 import type { AppEnv } from '../../types'
@@ -12,11 +13,12 @@ import type { AppEnv } from '../../types'
 export const dashboardRoute = new Hono<AppEnv>()
 
 dashboardRoute.use('*', authMiddleware)
+dashboardRoute.use('*', departmentScopeMiddleware)
 
 // GET /api/workspace/dashboard/summary — 4개 요약 카드 (Story 6-1)
 dashboardRoute.get('/dashboard/summary', async (c) => {
   const tenant = c.get('tenant')
-  const data = await getSummary(tenant.companyId)
+  const data = await getSummary(tenant.companyId, tenant.departmentIds)
   return c.json({ success: true, data })
 })
 
@@ -35,7 +37,7 @@ dashboardRoute.get('/dashboard/usage', zValidator('query', usageQuerySchema), as
 // GET /api/workspace/dashboard/budget — 예산 진행률 (Story 6-1)
 dashboardRoute.get('/dashboard/budget', async (c) => {
   const tenant = c.get('tenant')
-  const data = await getBudget(tenant.companyId)
+  const data = await getBudget(tenant.companyId, tenant.departmentIds)
   return c.json({ success: true, data })
 })
 
@@ -45,6 +47,32 @@ dashboardRoute.get('/dashboard/costs', async (c) => {
   const days = Number(c.req.query('days')) || 30
   const since = new Date()
   since.setDate(since.getDate() - days)
+
+  // Employee with no departments: empty result
+  if (tenant.departmentIds && tenant.departmentIds.length === 0) {
+    return c.json({ data: { totalCostUsd: 0, byModel: [], byAgent: [], bySource: [], days } })
+  }
+
+  // Get scoped agent IDs for employee department filtering
+  let scopedAgentIds: string[] | undefined
+  if (tenant.departmentIds) {
+    const scopedAgents = await db
+      .select({ id: agents.id })
+      .from(agents)
+      .where(and(eq(agents.companyId, tenant.companyId), inArray(agents.departmentId, tenant.departmentIds)))
+    scopedAgentIds = scopedAgents.map(a => a.id)
+    if (scopedAgentIds.length === 0) {
+      return c.json({ data: { totalCostUsd: 0, byModel: [], byAgent: [], bySource: [], days } })
+    }
+  }
+
+  const baseCostConditions = [
+    eq(costRecords.companyId, tenant.companyId),
+    gte(costRecords.createdAt, since),
+  ]
+  if (scopedAgentIds) {
+    baseCostConditions.push(inArray(costRecords.agentId, scopedAgentIds))
+  }
 
   // 모델별 비용
   const byModel = await db
@@ -56,10 +84,7 @@ dashboardRoute.get('/dashboard/costs', async (c) => {
       count: count(),
     })
     .from(costRecords)
-    .where(and(
-      eq(costRecords.companyId, tenant.companyId),
-      gte(costRecords.createdAt, since),
-    ))
+    .where(and(...baseCostConditions))
     .groupBy(costRecords.model)
 
   // 에이전트별 비용
@@ -72,10 +97,7 @@ dashboardRoute.get('/dashboard/costs', async (c) => {
     })
     .from(costRecords)
     .leftJoin(agents, eq(costRecords.agentId, agents.id))
-    .where(and(
-      eq(costRecords.companyId, tenant.companyId),
-      gte(costRecords.createdAt, since),
-    ))
+    .where(and(...baseCostConditions))
     .groupBy(costRecords.agentId, agents.name)
 
   // 소스별 비용
@@ -86,10 +108,7 @@ dashboardRoute.get('/dashboard/costs', async (c) => {
       count: count(),
     })
     .from(costRecords)
-    .where(and(
-      eq(costRecords.companyId, tenant.companyId),
-      gte(costRecords.createdAt, since),
-    ))
+    .where(and(...baseCostConditions))
     .groupBy(costRecords.source)
 
   // 총 비용
@@ -98,10 +117,7 @@ dashboardRoute.get('/dashboard/costs', async (c) => {
       totalCostMicro: sum(costRecords.costUsdMicro),
     })
     .from(costRecords)
-    .where(and(
-      eq(costRecords.companyId, tenant.companyId),
-      gte(costRecords.createdAt, since),
-    ))
+    .where(and(...baseCostConditions))
 
   return c.json({
     data: {
@@ -142,7 +158,7 @@ dashboardRoute.get('/dashboard/costs/by-agent', zValidator('query', costDateRang
   const startDate = query.startDate
     ? new Date(query.startDate + 'T00:00:00.000Z')
     : new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000)
-  const items = await costAggregation.getByAgent(tenant.companyId, { startDate, endDate })
+  const items = await costAggregation.getByAgent(tenant.companyId, { startDate, endDate }, tenant.departmentIds)
   return c.json({ success: true, data: { items } })
 })
 
@@ -168,6 +184,14 @@ dashboardRoute.get('/dashboard/costs/daily', zValidator('query', costDateRangeSc
 dashboardRoute.get('/dashboard/agents', async (c) => {
   const tenant = c.get('tenant')
 
+  const conditions = [eq(agents.companyId, tenant.companyId), eq(agents.isActive, true)]
+  if (tenant.departmentIds) {
+    if (tenant.departmentIds.length === 0) {
+      return c.json({ data: { agents: [], statusCounts: { online: 0, working: 0, error: 0, offline: 0 } } })
+    }
+    conditions.push(inArray(agents.departmentId, tenant.departmentIds))
+  }
+
   const result = await db
     .select({
       id: agents.id,
@@ -177,7 +201,7 @@ dashboardRoute.get('/dashboard/agents', async (c) => {
       isSecretary: agents.isSecretary,
     })
     .from(agents)
-    .where(and(eq(agents.companyId, tenant.companyId), eq(agents.isActive, true)))
+    .where(and(...conditions))
     .orderBy(agents.name)
 
   const statusCounts = {

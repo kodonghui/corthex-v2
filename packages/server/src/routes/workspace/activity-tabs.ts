@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { authMiddleware } from '../../middleware/auth'
+import { departmentScopeMiddleware } from '../../middleware/department-scope'
 import {
   parsePaginationParams,
   getAgentActivity,
@@ -12,6 +13,7 @@ import type { AppEnv } from '../../types'
 export const activityTabsRoute = new Hono<AppEnv>()
 
 activityTabsRoute.use('*', authMiddleware)
+activityTabsRoute.use('*', departmentScopeMiddleware)
 
 // GET /activity/agents — 활동 탭 (에이전트 활동 로그)
 activityTabsRoute.get('/activity/agents', async (c) => {
@@ -22,6 +24,7 @@ activityTabsRoute.get('/activity/agents', async (c) => {
   const result = await getAgentActivity(tenant.companyId, {
     agentId: query.agentId,
     departmentId: query.departmentId,
+    departmentIds: tenant.departmentIds,
     status: query.status,
     startDate: query.startDate,
     endDate: query.endDate,
@@ -39,6 +42,7 @@ activityTabsRoute.get('/activity/delegations', async (c) => {
 
   const result = await getDelegations(tenant.companyId, {
     departmentId: query.departmentId,
+    departmentIds: tenant.departmentIds,
     startDate: query.startDate,
     endDate: query.endDate,
     search: query.search?.trim(),
@@ -56,6 +60,7 @@ activityTabsRoute.get('/activity/quality', async (c) => {
   const result = await getQualityReviews(tenant.companyId, {
     conclusion: query.conclusion as 'pass' | 'fail' | undefined,
     reviewerAgentId: query.reviewerAgentId,
+    departmentIds: tenant.departmentIds,
     startDate: query.startDate,
     endDate: query.endDate,
     search: query.search?.trim(),
@@ -73,6 +78,7 @@ activityTabsRoute.get('/activity/tools', async (c) => {
   const result = await getToolInvocations(tenant.companyId, {
     toolName: query.toolName,
     agentId: query.agentId,
+    departmentIds: tenant.departmentIds,
     status: query.status,
     startDate: query.startDate,
     endDate: query.endDate,

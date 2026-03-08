@@ -1,10 +1,11 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { eq, and, sql } from 'drizzle-orm'
+import { eq, and, sql, inArray } from 'drizzle-orm'
 import { db } from '../../db'
 import { agents, agentDelegationRules } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
+import { departmentScopeMiddleware } from '../../middleware/department-scope'
 import { HTTPError } from '../../middleware/error'
 import { isCeoOrAbove } from '@corthex/shared'
 import { logActivity } from '../../lib/activity-logger'
@@ -14,10 +15,21 @@ import type { AppEnv } from '../../types'
 export const workspaceAgentsRoute = new Hono<AppEnv>()
 
 workspaceAgentsRoute.use('*', authMiddleware)
+workspaceAgentsRoute.use('*', departmentScopeMiddleware)
 
 // GET /api/workspace/agents — 내 회사의 활성 에이전트 목록
 workspaceAgentsRoute.get('/agents', async (c) => {
   const tenant = c.get('tenant')
+
+  const conditions = [eq(agents.companyId, tenant.companyId), eq(agents.isActive, true)]
+
+  // Employee: only show agents from assigned departments
+  if (tenant.departmentIds) {
+    if (tenant.departmentIds.length === 0) {
+      return c.json({ data: [] })
+    }
+    conditions.push(inArray(agents.departmentId, tenant.departmentIds))
+  }
 
   const result = await db
     .select({
@@ -33,7 +45,7 @@ workspaceAgentsRoute.get('/agents', async (c) => {
       reportTo: agents.reportTo,
     })
     .from(agents)
-    .where(and(eq(agents.companyId, tenant.companyId), eq(agents.isActive, true)))
+    .where(and(...conditions))
 
   return c.json({ data: result })
 })
@@ -41,6 +53,15 @@ workspaceAgentsRoute.get('/agents', async (c) => {
 // GET /api/workspace/agents/hierarchy — 전체 에이전트 조직도 (트리 구조)
 workspaceAgentsRoute.get('/agents/hierarchy', async (c) => {
   const tenant = c.get('tenant')
+
+  const conditions = [eq(agents.companyId, tenant.companyId), eq(agents.isActive, true)]
+
+  if (tenant.departmentIds) {
+    if (tenant.departmentIds.length === 0) {
+      return c.json({ data: [] })
+    }
+    conditions.push(inArray(agents.departmentId, tenant.departmentIds))
+  }
 
   const allAgents = await db
     .select({
@@ -56,7 +77,7 @@ workspaceAgentsRoute.get('/agents/hierarchy', async (c) => {
       reportTo: agents.reportTo,
     })
     .from(agents)
-    .where(and(eq(agents.companyId, tenant.companyId), eq(agents.isActive, true)))
+    .where(and(...conditions))
 
   // Build tree: find roots (reportTo === null), then recursively attach children
   type AgentNode = typeof allAgents[number] & { children: AgentNode[] }
@@ -97,14 +118,29 @@ workspaceAgentsRoute.get('/agents/delegation-rules', async (c) => {
     .where(eq(agentDelegationRules.companyId, tenant.companyId))
 
   // 에이전트 이름 조인
+  const agentConditions = [eq(agents.companyId, tenant.companyId)]
+  if (tenant.departmentIds) {
+    if (tenant.departmentIds.length === 0) {
+      return c.json({ data: [] })
+    }
+    agentConditions.push(inArray(agents.departmentId, tenant.departmentIds))
+  }
+
   const agentList = await db
     .select({ id: agents.id, name: agents.name })
     .from(agents)
-    .where(eq(agents.companyId, tenant.companyId))
+    .where(and(...agentConditions))
   const agentNames: Record<string, string> = {}
   for (const a of agentList) agentNames[a.id] = a.name
 
-  const data = rules.map(r => ({
+  // Employee: only show rules where both source and target are in their departments
+  let filteredRules = rules
+  if (tenant.departmentIds) {
+    const scopedIds = new Set(agentList.map(a => a.id))
+    filteredRules = rules.filter(r => scopedIds.has(r.sourceAgentId) && scopedIds.has(r.targetAgentId))
+  }
+
+  const data = filteredRules.map(r => ({
     ...r,
     sourceAgentName: agentNames[r.sourceAgentId] || '알 수 없음',
     targetAgentName: agentNames[r.targetAgentId] || '알 수 없음',
@@ -137,6 +173,11 @@ workspaceAgentsRoute.get('/agents/:id', async (c) => {
     .limit(1)
 
   if (!agent) throw new HTTPError(404, '에이전트를 찾을 수 없습니다', 'AGENT_001')
+
+  // Employee: verify agent belongs to assigned department
+  if (tenant.departmentIds && (!agent.departmentId || !tenant.departmentIds.includes(agent.departmentId))) {
+    throw new HTTPError(403, '해당 부서의 에이전트에만 접근할 수 있습니다', 'SCOPE_001')
+  }
 
   return c.json({ data: agent })
 })

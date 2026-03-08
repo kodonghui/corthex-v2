@@ -1,6 +1,6 @@
 import { db } from '../db'
 import { costRecords, agents, departments } from '../db/schema'
-import { sql, and, eq, gte, lte, sum, count, desc } from 'drizzle-orm'
+import { sql, and, eq, gte, lte, sum, count, desc, inArray } from 'drizzle-orm'
 import { getModelConfig } from '../config/models'
 import type {
   AdminCostByAgent,
@@ -23,7 +23,15 @@ function dateConditions(companyId: string, range: DateRange) {
 /**
  * Cost per agent (GROUP BY agentId, JOIN agents for name)
  */
-export async function getByAgent(companyId: string, range: DateRange): Promise<AdminCostByAgent[]> {
+export async function getByAgent(companyId: string, range: DateRange, departmentIds?: string[]): Promise<AdminCostByAgent[]> {
+  const conditions = dateConditions(companyId, range)
+
+  // Employee department scope: only include agents from assigned departments
+  if (departmentIds) {
+    if (departmentIds.length === 0) return []
+    conditions.push(inArray(agents.departmentId, departmentIds))
+  }
+
   const rows = await db
     .select({
       agentId: costRecords.agentId,
@@ -35,7 +43,7 @@ export async function getByAgent(companyId: string, range: DateRange): Promise<A
     })
     .from(costRecords)
     .leftJoin(agents, eq(costRecords.agentId, agents.id))
-    .where(and(...dateConditions(companyId, range)))
+    .where(and(...conditions))
     .groupBy(costRecords.agentId, agents.name)
     .orderBy(desc(sum(costRecords.costUsdMicro)))
 
