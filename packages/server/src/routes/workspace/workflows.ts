@@ -6,6 +6,7 @@ import type { AppEnv } from '../../types'
 import { HTTPError } from '../../middleware/error'
 import { authMiddleware } from '../../middleware/auth'
 import { WorkflowService } from '../../services/workflow/engine'
+import { WorkflowExecutionService } from '../../services/workflow/execution'
 
 // === Zod Schemas ===
 
@@ -134,6 +135,39 @@ workflowsRoute.put(
     }
 
     return c.json({ success: true, data: (result as any).data })
+  }
+)
+
+// POST /workflows/:id/execute -- 워크플로우 실행
+workflowsRoute.post('/workflows/:id/execute', async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+
+  const workflow = await WorkflowService.getById(id, tenant.companyId)
+  if (!workflow) {
+    throw new HTTPError(404, '워크플로우를 찾을 수 없습니다', 'NOT_FOUND')
+  }
+
+  const result = await WorkflowExecutionService.execute({
+    workflow,
+    companyId: tenant.companyId,
+    triggeredBy: tenant.userId,
+  })
+
+  return c.json({ success: true, data: result })
+})
+
+// GET /workflows/:workflowId/executions -- 워크플로우 실행 이력 조회
+workflowsRoute.get(
+  '/workflows/:workflowId/executions',
+  zValidator('query', ListQuerySchema),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const workflowId = c.req.param('workflowId')
+    const { page, limit } = c.req.valid('query')
+
+    const result = await WorkflowExecutionService.list(workflowId, tenant.companyId, { page, limit })
+    return c.json({ success: true, data: result.data, meta: result.meta })
   }
 )
 
