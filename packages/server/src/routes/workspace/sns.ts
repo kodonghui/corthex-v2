@@ -9,6 +9,7 @@ import { HTTPError } from '../../middleware/error'
 import { isCeoOrAbove } from '@corthex/shared'
 import { generateAgentResponse } from '../../lib/ai'
 import { publishContent } from '../../lib/sns-publisher'
+import { publishContentById, retryPublish, getPublishResult } from '../../lib/sns-publishers/publish-engine'
 import { generateSnsImage } from '../../lib/sns-image-generator'
 import { logActivity } from '../../lib/activity-logger'
 import type { AppEnv } from '../../types'
@@ -17,8 +18,10 @@ export const snsRoute = new Hono<AppEnv>()
 
 snsRoute.use('*', authMiddleware)
 
+const SNS_PLATFORMS = ['instagram', 'tistory', 'daum_cafe', 'twitter', 'facebook', 'naver_blog'] as const
+
 const createSnsSchema = z.object({
-  platform: z.enum(['instagram', 'tistory', 'daum_cafe']),
+  platform: z.enum(SNS_PLATFORMS),
   title: z.string().min(1).max(200),
   body: z.string().min(1),
   hashtags: z.string().optional(),
@@ -28,7 +31,7 @@ const createSnsSchema = z.object({
 })
 
 const generateSnsSchema = z.object({
-  platform: z.enum(['instagram', 'tistory', 'daum_cafe']),
+  platform: z.enum(SNS_PLATFORMS),
   agentId: z.string().uuid(),
   topic: z.string().min(1),
 })
@@ -42,7 +45,7 @@ const updateSnsSchema = z.object({
 })
 
 const generateWithImageSchema = z.object({
-  platform: z.enum(['instagram', 'tistory', 'daum_cafe']),
+  platform: z.enum(SNS_PLATFORMS),
   agentId: z.string().uuid(),
   topic: z.string().min(1),
   imagePrompt: z.string().max(4000).optional(),
@@ -80,6 +83,9 @@ const PLATFORM_NAMES: Record<string, string> = {
   instagram: '인스타그램',
   tistory: '티스토리 블로그',
   daum_cafe: '다음 카페',
+  twitter: '트위터/X',
+  facebook: '페이스북',
+  naver_blog: '네이버 블로그',
 }
 
 // GET /api/workspace/sns — 내 SNS 콘텐츠 목록
@@ -617,7 +623,7 @@ snsRoute.post('/sns/:id/reject', zValidator('json', rejectSchema), async (c) => 
   return c.json({ data: updated })
 })
 
-// POST /api/workspace/sns/:id/publish — 발행 (approved → published/failed, STUB)
+// POST /api/workspace/sns/:id/publish — 발행 (approved → published/failed, PublishEngine)
 snsRoute.post('/sns/:id/publish', async (c) => {
   const tenant = c.get('tenant')
   const id = c.req.param('id')
@@ -979,4 +985,63 @@ snsRoute.get('/sns/:id/ab-results', async (c) => {
       scores,
     },
   })
+})
+
+// ==================== 발행 엔진 API ====================
+
+// POST /api/workspace/sns/:id/engine-publish — PublishEngine을 통한 발행 (credential 복호화 포함)
+snsRoute.post('/sns/:id/engine-publish', async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+
+  const result = await publishContentById(id, tenant.companyId)
+
+  if (!result.success) {
+    throw new HTTPError(500, result.error || '발행 실패', 'SNS_PUBLISH_001')
+  }
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'sns',
+    phase: 'end',
+    actorType: 'system',
+    action: `SNS 엔진 발행 완료`,
+    detail: result.url || '',
+  })
+
+  return c.json({ data: result })
+})
+
+// POST /api/workspace/sns/:id/retry-publish — 실패한 콘텐츠 재발행
+snsRoute.post('/sns/:id/retry-publish', async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+
+  const result = await retryPublish(id, tenant.companyId)
+
+  if (!result.success) {
+    throw new HTTPError(500, result.error || '재발행 실패', 'SNS_PUBLISH_002')
+  }
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'sns',
+    phase: 'end',
+    actorType: 'system',
+    action: `SNS 재발행 완료`,
+    detail: result.url || '',
+  })
+
+  return c.json({ data: result })
+})
+
+// GET /api/workspace/sns/:id/publish-result — 발행 결과 조회
+snsRoute.get('/sns/:id/publish-result', async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+
+  const result = await getPublishResult(id, tenant.companyId)
+  if (!result) throw new HTTPError(404, 'SNS 콘텐츠를 찾을 수 없습니다', 'SNS_001')
+
+  return c.json({ data: result })
 })
