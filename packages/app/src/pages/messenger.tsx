@@ -5,6 +5,7 @@ import { api } from '../lib/api'
 import { useAuthStore } from '../stores/auth-store'
 import { useWsStore } from '../stores/ws-store'
 import { toast } from '@corthex/ui'
+import { ConversationsView } from '../components/messenger/conversations-view'
 
 type Channel = {
   id: string
@@ -613,6 +614,51 @@ function ThreadPanel({
 }
 
 export function MessengerPage() {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const activeTab = searchParams.get('tab') === 'conversations' ? 'conversations' : 'channels'
+
+  const handleTabChange = (tab: 'channels' | 'conversations') => {
+    setSearchParams(tab === 'channels' ? {} : { tab: 'conversations' })
+  }
+
+  return (
+    <div className="h-full flex flex-col">
+      <div className="px-6 py-3 border-b border-zinc-200 dark:border-zinc-800 flex items-center gap-4">
+        <h2 className="text-lg font-semibold">메신저</h2>
+        <div className="flex gap-1 bg-zinc-100 dark:bg-zinc-800 rounded-lg p-0.5">
+          <button
+            onClick={() => handleTabChange('channels')}
+            className={`px-3 py-1 text-xs rounded-md transition-colors ${
+              activeTab === 'channels'
+                ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-sm font-medium'
+                : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+            }`}
+          >
+            채널
+          </button>
+          <button
+            onClick={() => handleTabChange('conversations')}
+            className={`px-3 py-1 text-xs rounded-md transition-colors ${
+              activeTab === 'conversations'
+                ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-sm font-medium'
+                : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+            }`}
+          >
+            대화
+          </button>
+        </div>
+      </div>
+
+      {activeTab === 'conversations' ? (
+        <ConversationsView />
+      ) : (
+        <ChannelsView />
+      )}
+    </div>
+  )
+}
+
+function ChannelsView() {
   const queryClient = useQueryClient()
   const user = useAuthStore((s) => s.user)
   const { subscribe, addListener, removeListener, isConnected } = useWsStore()
@@ -971,9 +1017,9 @@ export function MessengerPage() {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
-        <h2 className="text-lg font-semibold">메신저</h2>
+    <>
+      <div className="px-4 py-2 border-b border-zinc-200 dark:border-zinc-700 flex items-center justify-between">
+        <span className="text-xs text-zinc-500">채널 기반 메신저</span>
         <button onClick={() => setShowCreate(!showCreate)}
           className="px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700">
           + 채널
@@ -1313,6 +1359,6 @@ export function MessengerPage() {
           <p className="text-xs opacity-90 mt-0.5">{mentionToast.title}</p>
         </div>
       )}
-    </div>
+    </>
   )
 }

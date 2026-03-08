@@ -361,7 +361,7 @@ development_status:
   epic-19: in-progress
   19-1-messenger-schema-conversations-messages: done
   19-2-realtime-chat-api-websocket-channel: done
-  19-3-one-on-one-group-message-ui: backlog
+  19-3-one-on-one-group-message-ui: done
   19-4-ai-analysis-result-sharing: backlog
   19-5-company-id-based-chat-isolation: backlog
   epic-19-retrospective: optional

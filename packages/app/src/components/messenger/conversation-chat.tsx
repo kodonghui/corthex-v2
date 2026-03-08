@@ -1,0 +1,344 @@
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
+import { api } from '../../lib/api'
+import { useWsStore } from '../../stores/ws-store'
+import { toast } from '@corthex/ui'
+
+type MessageItem = {
+  id: string
+  conversationId: string
+  senderId: string
+  companyId: string
+  content: string
+  type: 'text' | 'system' | 'ai_report'
+  isDeleted: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+type MessagesResponse = {
+  items: MessageItem[]
+  nextCursor: string | null
+  hasMore: boolean
+}
+
+type ConversationDetail = {
+  id: string
+  type: 'direct' | 'group'
+  name: string | null
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+  participants: Array<{ userId: string; companyId: string; joinedAt: string; lastReadAt: string | null; userName?: string }>
+}
+
+type ApiResponse<T> = { success: boolean; data: T }
+
+type Props = {
+  conversationId: string
+  conversationDetail: ConversationDetail | null
+  currentUserId: string
+  onBack: () => void
+  onLeave: () => void
+}
+
+export function ConversationChat({ conversationId, conversationDetail, currentUserId, onBack, onLeave }: Props) {
+  const queryClient = useQueryClient()
+  const { addListener, removeListener } = useWsStore()
+  const [inputText, setInputText] = useState('')
+  const [typingUsers, setTypingUsers] = useState<Set<string>>(new Set())
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false)
+  const [hoveredMsgId, setHoveredMsgId] = useState<string | null>(null)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLTextAreaElement>(null)
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const lastTypingSentRef = useRef(0)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+
+  // 메시지 목록 (infinite query)
+  const {
+    data: messagesData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['conversation-messages', conversationId],
+    queryFn: async ({ pageParam }) => {
+      const params = new URLSearchParams({ limit: '50' })
+      if (pageParam) params.set('cursor', pageParam)
+      const res = await api.get<ApiResponse<MessagesResponse>>(`/workspace/conversations/${conversationId}/messages?${params}`)
+      return res.data
+    },
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+    initialPageParam: undefined as string | undefined,
+  })
+
+  // 모든 메시지를 역순으로 합치기 (서버는 DESC, UI는 ASC 필요)
+  const allMessages = (messagesData?.pages ?? []).flatMap((page) => page.items).reverse()
+
+  // 메시지 전송
+  const sendMessage = useMutation({
+    mutationFn: (content: string) =>
+      api.post<ApiResponse<MessageItem>>(`/workspace/conversations/${conversationId}/messages`, { content, type: 'text' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['conversation-messages', conversationId] })
+      queryClient.invalidateQueries({ queryKey: ['conversations'] })
+    },
+    onError: () => toast.error('메시지 전송 실패'),
+  })
+
+  // 메시지 삭제
+  const deleteMessage = useMutation({
+    mutationFn: (msgId: string) =>
+      api.delete<ApiResponse<{ id: string }>>(`/workspace/conversations/${conversationId}/messages/${msgId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['conversation-messages', conversationId] })
+    },
+    onError: () => toast.error('메시지 삭제 실패'),
+  })
+
+  // 나가기
+  const leaveConversation = useMutation({
+    mutationFn: () =>
+      api.delete<ApiResponse<{ userId: string }>>(`/workspace/conversations/${conversationId}/participants/me`),
+    onSuccess: () => {
+      toast.success('대화방에서 나왔습니다')
+      onLeave()
+    },
+    onError: () => toast.error('나가기 실패'),
+  })
+
+  // 자동 스크롤
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [allMessages.length])
+
+  // 타이핑 이벤트 수신
+  useEffect(() => {
+    const channelKey = `conversation::${conversationId}`
+
+    const handler = (data: unknown) => {
+      const event = data as { type: string; userId?: string }
+      if (event.type === 'typing' && event.userId && event.userId !== currentUserId) {
+        setTypingUsers((prev) => new Set(prev).add(event.userId!))
+
+        // 3초 후 자동 해제
+        setTimeout(() => {
+          setTypingUsers((prev) => {
+            const next = new Set(prev)
+            next.delete(event.userId!)
+            return next
+          })
+        }, 3000)
+      }
+    }
+
+    addListener(channelKey, handler)
+    return () => removeListener(channelKey, handler)
+  }, [conversationId, currentUserId, addListener, removeListener])
+
+  // 전송 핸들러
+  const handleSend = useCallback(() => {
+    const text = inputText.trim()
+    if (!text) return
+    sendMessage.mutate(text)
+    setInputText('')
+    inputRef.current?.focus()
+  }, [inputText, sendMessage])
+
+  // 타이핑 이벤트 전송 (debounce 2초)
+  const sendTypingEvent = useCallback(() => {
+    const now = Date.now()
+    if (now - lastTypingSentRef.current < 2000) return
+    lastTypingSentRef.current = now
+    api.post(`/workspace/conversations/${conversationId}/typing`, {}).catch(() => {})
+  }, [conversationId])
+
+  // 입력 변경
+  const handleInputChange = useCallback((value: string) => {
+    setInputText(value)
+    if (value.trim()) sendTypingEvent()
+  }, [sendTypingEvent])
+
+  // 위로 스크롤 시 이전 메시지 로드
+  const handleScroll = useCallback(() => {
+    const el = scrollContainerRef.current
+    if (!el) return
+    if (el.scrollTop < 50 && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage()
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
+
+  // 대화방 이름
+  const displayName = conversationDetail?.type === 'group'
+    ? (conversationDetail.name || '그룹 대화')
+    : (conversationDetail?.name || '1:1 대화')
+
+  const participantCount = conversationDetail?.participants.length ?? 0
+
+  return (
+    <div className="flex-1 flex flex-col min-h-0">
+      {/* 헤더 */}
+      <div className="px-4 py-2 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-2 min-w-0">
+          <button
+            onClick={onBack}
+            className="md:hidden p-2 -ml-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-sm text-zinc-600 dark:text-zinc-400 shrink-0"
+          >
+            ←
+          </button>
+          <span className="font-medium text-sm truncate">{displayName}</span>
+          <span className="text-xs text-zinc-400 shrink-0">{participantCount}명</span>
+        </div>
+        {conversationDetail?.type === 'group' && (
+          <button
+            onClick={() => setShowLeaveConfirm(true)}
+            className="text-xs text-red-500 hover:text-red-600 px-2 py-1 rounded hover:bg-red-50 dark:hover:bg-red-950"
+          >
+            나가기
+          </button>
+        )}
+      </div>
+
+      {/* 메시지 영역 */}
+      <div
+        ref={scrollContainerRef}
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto px-4 py-2 space-y-1"
+      >
+        {isFetchingNextPage && (
+          <div className="text-center py-2">
+            <span className="text-xs text-zinc-400">이전 메시지 로딩...</span>
+          </div>
+        )}
+        {hasNextPage && !isFetchingNextPage && (
+          <button
+            onClick={() => fetchNextPage()}
+            className="w-full text-center py-1 text-xs text-indigo-500 hover:text-indigo-600"
+          >
+            이전 메시지 더 보기
+          </button>
+        )}
+
+        {allMessages.map((msg) => {
+          if (msg.type === 'system') {
+            return (
+              <div key={msg.id} className="text-center py-1">
+                <span className="text-xs text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-3 py-1 rounded-full">
+                  {msg.content}
+                </span>
+              </div>
+            )
+          }
+
+          const isMine = msg.senderId === currentUserId
+
+          return (
+            <div
+              key={msg.id}
+              className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}
+              onMouseEnter={() => setHoveredMsgId(msg.id)}
+              onMouseLeave={() => setHoveredMsgId(null)}
+            >
+              <div className={`relative max-w-[75%] group`}>
+                <div
+                  className={`px-3 py-2 rounded-lg text-sm ${
+                    isMine
+                      ? 'bg-indigo-600 text-white rounded-br-sm'
+                      : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-bl-sm'
+                  }`}
+                >
+                  {msg.content}
+                </div>
+                <div className={`flex items-center gap-1 mt-0.5 ${isMine ? 'justify-end' : 'justify-start'}`}>
+                  <span className="text-[10px] text-zinc-400">
+                    {new Date(msg.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
+
+                {/* 삭제 버튼 (본인 메시지만) */}
+                {isMine && hoveredMsgId === msg.id && (
+                  <button
+                    onClick={() => {
+                      if (confirm('이 메시지를 삭제하시겠습니까?')) {
+                        deleteMessage.mutate(msg.id)
+                      }
+                    }}
+                    className="absolute -top-2 -left-2 w-5 h-5 bg-red-500 text-white rounded-full text-[10px] flex items-center justify-center hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                    title="삭제"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            </div>
+          )
+        })}
+
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* 타이핑 표시 */}
+      {typingUsers.size > 0 && (
+        <div className="px-4 py-1 text-xs text-zinc-400">
+          입력 중...
+        </div>
+      )}
+
+      {/* 입력 영역 */}
+      <div className="px-4 py-3 border-t border-zinc-200 dark:border-zinc-800 shrink-0">
+        <div className="flex items-end gap-2">
+          <textarea
+            ref={inputRef}
+            value={inputText}
+            onChange={(e) => handleInputChange(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault()
+                handleSend()
+              }
+            }}
+            placeholder="메시지를 입력하세요..."
+            rows={1}
+            className="flex-1 px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 text-sm resize-none max-h-32 overflow-y-auto"
+          />
+          <button
+            onClick={handleSend}
+            disabled={!inputText.trim() || sendMessage.isPending}
+            className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 disabled:opacity-50 shrink-0"
+          >
+            전송
+          </button>
+        </div>
+      </div>
+
+      {/* 나가기 확인 모달 */}
+      {showLeaveConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white dark:bg-zinc-900 rounded-lg p-5 w-80 shadow-xl">
+            <h3 className="font-medium text-sm mb-3">대화방 나가기</h3>
+            <p className="text-xs text-zinc-500 mb-4">이 그룹 대화방에서 나가시겠습니까?</p>
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={() => setShowLeaveConfirm(false)}
+                className="px-3 py-1.5 text-xs rounded-md border border-zinc-300 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+              >
+                취소
+              </button>
+              <button
+                onClick={() => {
+                  leaveConversation.mutate()
+                  setShowLeaveConfirm(false)
+                }}
+                disabled={leaveConversation.isPending}
+                className="px-3 py-1.5 text-xs rounded-md bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
+              >
+                나가기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
