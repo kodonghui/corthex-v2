@@ -4,6 +4,7 @@ import { checkToolPermission, hasWildcard } from './tool-permission-guard'
 import { filterOutput } from './output-filter'
 import { createAuditLog, AUDIT_ACTIONS } from './audit-log'
 import { collectKnowledgeContext, collectAgentMemoryContext } from './knowledge-injector'
+import { extractAndSaveMemories } from './memory-extractor'
 import type { LLMRouterContext } from './llm-router'
 import type {
   LLMRequest,
@@ -33,6 +34,7 @@ export type AgentConfig = {
   allowedTools: string[]
   isActive: boolean
   departmentId?: string | null
+  autoLearn?: boolean
 }
 
 export type ToolDefinitionProvider = (allowedTools: string[]) => LLMToolDefinition[]
@@ -260,7 +262,7 @@ export class AgentRunner {
       }).catch(() => {})
     }
 
-    return {
+    const taskResponse = {
       content: finalContent,
       toolCalls: allToolRecords,
       usage: { inputTokens: totalInput, outputTokens: totalOutput },
@@ -268,6 +270,20 @@ export class AgentRunner {
       finishReason: lastResponse.finishReason,
       iterations: actualIterations,
     }
+
+    // Auto-learning: extract memories from successful task (fire-and-forget)
+    if (agent.autoLearn !== false && finalContent && lastResponse.finishReason !== 'error') {
+      const taskDesc = task.messages[0]?.content || ''
+      extractAndSaveMemories({
+        companyId: agent.companyId,
+        agentId: agent.id,
+        taskDescription: taskDesc,
+        taskResult: finalContent,
+        source: agent.name,
+      }).catch(() => {})
+    }
+
+    return taskResponse
   }
 
   async *executeStream(
@@ -343,6 +359,17 @@ export class AgentRunner {
 
       // No tool calls -- stream is done
       if (!hasToolCalls || bufferedToolCalls.length === 0 || !toolExecutor) {
+        // Auto-learning: extract memories from stream result (fire-and-forget)
+        if (agent.autoLearn !== false && bufferedContent) {
+          const taskDesc = task.messages[0]?.content || ''
+          extractAndSaveMemories({
+            companyId: agent.companyId,
+            agentId: agent.id,
+            taskDescription: taskDesc,
+            taskResult: bufferedContent,
+            source: agent.name,
+          }).catch(() => {})
+        }
         yield { type: 'done', usage: { inputTokens: totalInput, outputTokens: totalOutput } }
         return
       }

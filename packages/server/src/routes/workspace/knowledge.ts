@@ -8,6 +8,7 @@ import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { KNOWLEDGE_TEMPLATES } from '../../lib/knowledge-templates'
 import { clearKnowledgeCache, getInjectionPreview } from '../../services/knowledge-injector'
+import { consolidateMemories } from '../../services/memory-extractor'
 import type { AppEnv } from '../../types'
 import { join } from 'path'
 import { existsSync, mkdirSync } from 'fs'
@@ -1388,4 +1389,21 @@ knowledgeRoute.get('/injection-preview/:agentId', async (c) => {
 
   const preview = await getInjectionPreview(tenant.companyId, agentId, agent.departmentId)
   return c.json({ data: preview })
+})
+
+// POST /memories/consolidate/:agentId — 유사 기억 병합
+knowledgeRoute.post('/memories/consolidate/:agentId', async (c) => {
+  const tenant = c.get('tenant')
+  const agentId = c.req.param('agentId')
+
+  // Validate agent exists
+  const [agent] = await db.select({ id: agents.id })
+    .from(agents)
+    .where(and(eq(agents.id, agentId), eq(agents.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!agent) throw new HTTPError(404, '에이전트를 찾을 수 없습니다')
+
+  const result = await consolidateMemories(tenant.companyId, agentId)
+  return c.json({ data: result })
 })

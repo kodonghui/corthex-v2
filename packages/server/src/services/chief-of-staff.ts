@@ -1,9 +1,12 @@
 import { agentRunner, type AgentConfig } from './agent-runner'
+import { extractAndSaveMemories } from './memory-extractor'
 import { delegationTracker } from './delegation-tracker'
 import { delegate as managerDelegate } from './manager-delegate'
 import { synthesize as managerSynthesize } from './manager-synthesis'
 import { orchestrateCIO } from './cio-orchestrator'
 import { executeProposals, formatCIOVectorResult } from './vector-executor'
+import { getTradingSettings } from './trading-settings'
+import { savePendingOrders } from './trade-approval'
 import { inspect, type InspectionResult, type RuleResult, type RubricScore } from './inspection-engine'
 import { db } from '../db'
 import { commands, agents, departments, orchestrationTasks, qualityReviews } from '../db/schema'
@@ -38,6 +41,7 @@ export function toAgentConfig(row: {
     allowedTools: (row.allowedTools as string[]) ?? [],
     isActive: row.isActive,
     departmentId: (row.departmentId as string | null) ?? null,
+    autoLearn: (row.autoLearn as boolean | undefined) ?? true,
   }
 }
 
@@ -624,21 +628,43 @@ export async function process(options: ProcessOptions): Promise<ChiefOfStaffResu
         toolExecutor,
       })
 
-      // Execute trade proposals via VECTOR (if any)
+      // Load trading settings to determine execution mode
+      const tradingSettings = await getTradingSettings(companyId)
+
+      // Execute trade proposals via VECTOR or save for approval
       let vectorResult = null
+      let pendingApproval = false
+      let pendingCount = 0
+
       if (cioResult.tradeProposals.length > 0) {
-        phases.push('vector-execute')
-        vectorResult = await executeProposals({
-          proposals: cioResult.tradeProposals,
-          companyId,
-          userId: options.userId,
-          commandId,
-          tradingMode: 'paper', // Default to paper; Story 10-5 will add approval/auto mode
-          vectorAgentId: managerAgent.id,
-        })
+        if (tradingSettings.executionMode === 'approval') {
+          // Approval mode: save as pending and notify CEO
+          phases.push('pending-approval')
+          const orderIds = await savePendingOrders({
+            proposals: cioResult.tradeProposals,
+            companyId,
+            userId: options.userId,
+            commandId,
+            tradingMode: 'paper', // Default to paper for pending
+            agentId: managerAgent.id,
+          })
+          pendingApproval = true
+          pendingCount = orderIds.length
+        } else {
+          // Autonomous mode: execute immediately with risk controls
+          phases.push('vector-execute')
+          vectorResult = await executeProposals({
+            proposals: cioResult.tradeProposals,
+            companyId,
+            userId: options.userId,
+            commandId,
+            tradingMode: 'paper',
+            vectorAgentId: managerAgent.id,
+          })
+        }
       }
 
-      managerResult = formatCIOVectorResult(cioResult.analysisReport, vectorResult)
+      managerResult = formatCIOVectorResult(cioResult.analysisReport, vectorResult, pendingApproval, pendingCount)
     } else {
       // Standard manager delegation pipeline
       const delegationResult = await managerDelegate({
@@ -766,6 +792,17 @@ ${currentResult}`
   // === Phase 4: Complete ===
   delegationTracker.completed(companyId, commandId)
   phases.push('completed')
+
+  // Auto-learning: extract memories from completed command (fire-and-forget)
+  if (managerAgent.autoLearn !== false && currentResult) {
+    extractAndSaveMemories({
+      companyId,
+      agentId: managerAgent.id,
+      taskDescription: commandText,
+      taskResult: currentResult.slice(0, 2000),
+      source: managerAgent.name,
+    }).catch(() => {})
+  }
 
   const qualityGateSummary = lastQualityResult ? {
     passed: lastQualityResult.passed,

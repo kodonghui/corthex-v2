@@ -1,0 +1,1 @@
+ALTER TABLE agents ADD COLUMN auto_learn BOOLEAN NOT NULL DEFAULT true;
