@@ -10,12 +10,12 @@
 As a Developer, I want to create the foundational database schema for the Internal Messenger (FR76) so that Human employees can eventually use real-time 1:1 and group chat with strict tenant isolation.
 
 ### Acceptance Criteria
-- [ ] `conversations` 테이블 정의 (`id`, `company_id`, `type`, `name`, `is_active`, `createdAt`, `updatedAt`).
-- [ ] `conversation_participants` 연결 테이블 정의 (`conversation_id`, `user_id`, `joined_at`, `last_read_at`).
-- [ ] `messages` 테이블 정의 (`id`, `conversation_id`, `sender_id`, `content`, `type`, `is_deleted`, `createdAt`, `updatedAt`).
-- [ ] 모든 테이블 간의 Foreign Key 관계(Relations) 명확하게 정의.
-- [ ] `company_id` 기반 테넌트 격리를 위한 참조키 및 인덱스 설정.
-- [ ] Drizzle Kit 마이그레이션 파일(`db:generate`) 생성 확인.
+- [x] `conversations` 테이블 정의 (`id`, `company_id`, `type`, `name`, `is_active`, `createdAt`, `updatedAt`).
+- [x] `conversation_participants` 연결 테이블 정의 (`conversation_id`, `user_id`, `joined_at`, `last_read_at`).
+- [x] `messages` 테이블 정의 (`id`, `conversation_id`, `sender_id`, `content`, `type`, `is_deleted`, `createdAt`, `updatedAt`).
+- [x] 모든 테이블 간의 Foreign Key 관계(Relations) 명확하게 정의.
+- [x] `company_id` 기반 테넌트 격리를 위한 참조키 및 인덱스 설정.
+- [x] Drizzle Kit 마이그레이션 파일(`db:generate`) 생성 확인.
 
 ### Business Context
 이 스토리는 Phase 3 확장의 핵심인 "사내 메신저" 기능의 데이터 기반을 마련합니다 (FR76). 올바른 스키마 설계와 테넌트 격리(`company_id`)가 되어 있어야 이후 WebSocket 기반 실시간 채팅(19-2) 및 UI(19-3) 구현이 가능합니다. 성능과 확장성을 고려하여 인덱스와 관계를 정확히 수립해야 합니다.

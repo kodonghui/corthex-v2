@@ -359,7 +359,7 @@ development_status:
   # Dependencies: Epic 9
   # ============================================================
   epic-19: backlog
-  19-1-messenger-schema-conversations-messages: ready-for-dev
+  19-1-messenger-schema-conversations-messages: done
   19-2-realtime-chat-api-websocket-channel: backlog
   19-3-one-on-one-group-message-ui: backlog
   19-4-ai-analysis-result-sharing: backlog

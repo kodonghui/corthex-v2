@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, varchar, boolean, jsonb, integer, pgEnum, index, unique, uniqueIndex, real } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, uuid, varchar, boolean, jsonb, integer, pgEnum, index, unique, uniqueIndex, real, primaryKey } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 
 // === Enums ===
@@ -625,6 +625,42 @@ export const messengerReactions = pgTable('messenger_reactions', {
   uniqueReaction: unique('messenger_reactions_unique').on(table.messageId, table.userId, table.emoji),
 }))
 
+// === 25b. conversations — 1:1 및 그룹 대화방 (Story 19-1) ===
+export const conversations = pgTable('conversations', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  type: varchar('type', { length: 20 }).notNull(), // 'direct' | 'group'
+  name: varchar('name', { length: 255 }), // 그룹 채팅방 이름
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+// === 25c. conversation_participants — 대화방 참여자 (Story 19-1) ===
+export const conversationParticipants = pgTable('conversation_participants', {
+  conversationId: uuid('conversation_id').notNull().references(() => conversations.id),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  joinedAt: timestamp('joined_at').notNull().defaultNow(),
+  lastReadAt: timestamp('last_read_at'),
+}, (table) => ({
+  pk: primaryKey({ columns: [table.conversationId, table.userId] }),
+  userConvIdx: index('conv_participants_user_conv_idx').on(table.userId, table.conversationId),
+}));
+
+// === 25d. messages — 1:1/그룹 대화 메시지 (Story 19-1) ===
+export const messages = pgTable('messages', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  conversationId: uuid('conversation_id').notNull().references(() => conversations.id),
+  senderId: uuid('sender_id').notNull().references(() => users.id),
+  content: text('content').notNull(),
+  type: varchar('type', { length: 20 }).notNull().default('text'), // 'text' | 'system' | 'ai_report'
+  isDeleted: boolean('is_deleted').notNull().default(false),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  convCreatedIdx: index('messages_conv_created_idx').on(table.conversationId, table.createdAt),
+}));
+
 // === 26. files — 파일 메타데이터 ===
 export const files = pgTable('files', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -1048,6 +1084,8 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   apiKeys: many(apiKeys),
   chatSessions: many(chatSessions),
   employeeDepartments: many(employeeDepartments),
+  conversationParticipants: many(conversationParticipants),
+  messages: many(messages),
 }))
 
 export const agentsRelations = relations(agents, ({ one, many }) => ({
@@ -1208,6 +1246,22 @@ export const messengerReactionsRelations = relations(messengerReactions, ({ one 
   company: one(companies, { fields: [messengerReactions.companyId], references: [companies.id] }),
   message: one(messengerMessages, { fields: [messengerReactions.messageId], references: [messengerMessages.id] }),
   user: one(users, { fields: [messengerReactions.userId], references: [users.id] }),
+}))
+
+export const conversationsRelations = relations(conversations, ({ one, many }) => ({
+  company: one(companies, { fields: [conversations.companyId], references: [companies.id] }),
+  participants: many(conversationParticipants),
+  messages: many(messages),
+}))
+
+export const conversationParticipantsRelations = relations(conversationParticipants, ({ one }) => ({
+  conversation: one(conversations, { fields: [conversationParticipants.conversationId], references: [conversations.id] }),
+  user: one(users, { fields: [conversationParticipants.userId], references: [users.id] }),
+}))
+
+export const messagesRelations = relations(messages, ({ one }) => ({
+  conversation: one(conversations, { fields: [messages.conversationId], references: [conversations.id] }),
+  sender: one(users, { fields: [messages.senderId], references: [users.id] }),
 }))
 
 export const filesRelations = relations(files, ({ one }) => ({
