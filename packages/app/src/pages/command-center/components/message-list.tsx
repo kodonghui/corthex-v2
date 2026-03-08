@@ -1,6 +1,8 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
+import { ReactFlowProvider } from '@xyflow/react'
 import { Badge } from '@corthex/ui'
 import { MarkdownRenderer } from '../../../components/markdown-renderer'
+import { SketchPreviewCard, SketchLoadingCard } from './sketch-preview-card'
 import type { CommandMessage } from '../../../stores/command-store'
 
 type Props = {
@@ -147,23 +149,41 @@ export function MessageList({ messages, isLoading, onReportClick, onExampleClick
                       </Badge>
                     )}
                   </div>
-                  <div className="bg-zinc-100 dark:bg-zinc-800 px-4 py-2.5 rounded-2xl rounded-bl-md">
-                    {msg.result ? (
-                      <button
-                        onClick={() => msg.commandId && onReportClick(msg.commandId)}
-                        className="text-left w-full"
-                      >
-                        <div className="line-clamp-4">
-                          <MarkdownRenderer content={msg.result.slice(0, 500)} />
-                        </div>
-                        {msg.result.length > 500 && (
-                          <p className="text-xs text-indigo-600 dark:text-indigo-400 mt-1">전체 보고서 보기 →</p>
-                        )}
-                      </button>
-                    ) : (
-                      <p className="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap">{msg.text}</p>
-                    )}
-                  </div>
+
+                  {/* Sketch loading card */}
+                  {msg.sketchLoading && <SketchLoadingCard />}
+
+                  {/* Sketch preview card */}
+                  {msg.sketchResult && !msg.sketchLoading && (
+                    <ReactFlowProvider>
+                      <SketchPreviewCard
+                        mermaid={msg.sketchResult.mermaid}
+                        description={msg.sketchResult.description}
+                        commandId={msg.commandId || ''}
+                      />
+                    </ReactFlowProvider>
+                  )}
+
+                  {/* Regular message (non-sketch) */}
+                  {!msg.sketchResult && !msg.sketchLoading && (
+                    <div className="bg-zinc-100 dark:bg-zinc-800 px-4 py-2.5 rounded-2xl rounded-bl-md">
+                      {msg.result ? (
+                        <button
+                          onClick={() => msg.commandId && onReportClick(msg.commandId)}
+                          className="text-left w-full"
+                        >
+                          <div className="line-clamp-4">
+                            <MarkdownRenderer content={msg.result.slice(0, 500)} />
+                          </div>
+                          {msg.result.length > 500 && (
+                            <p className="text-xs text-indigo-600 dark:text-indigo-400 mt-1">전체 보고서 보기 →</p>
+                          )}
+                        </button>
+                      ) : (
+                        <p className="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap">{msg.text}</p>
+                      )}
+                    </div>
+                  )}
                   <p className="text-[10px] text-zinc-400 mt-1">{formatTime(msg.createdAt)}</p>
                 </div>
               </div>

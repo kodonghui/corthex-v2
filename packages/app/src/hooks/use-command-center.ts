@@ -86,6 +86,8 @@ export function useCommandCenter() {
           },
         ]
         if (cmd.status === 'completed' && cmd.result) {
+          const meta = cmd.metadata as Record<string, unknown> | null
+          const sketchRes = meta?.sketchResult as { mermaid: string; description: string } | undefined
           items.push({
             id: `agent-${cmd.id}`,
             role: 'agent',
@@ -93,6 +95,7 @@ export function useCommandCenter() {
             commandId: cmd.id,
             status: 'completed',
             result: cmd.result,
+            sketchResult: sketchRes ? { mermaid: sketchRes.mermaid, description: sketchRes.description } : undefined,
             createdAt: cmd.completedAt || cmd.createdAt,
           })
         } else if (cmd.status === 'failed') {
@@ -140,6 +143,7 @@ export function useCommandCenter() {
     ws.subscribe('command')
     ws.subscribe('delegation')
     ws.subscribe('tool')
+    ws.subscribe('nexus')
   }, [])
 
   // Command channel listener
@@ -147,24 +151,46 @@ export function useCommandCenter() {
     const { addListener, removeListener } = useWsStore.getState()
 
     const handleCommand = (data: unknown) => {
-      const evt = data as { commandId?: string; event?: string; result?: string; quality?: { passed: boolean; score?: number } }
+      const evt = data as { commandId?: string; event?: string; result?: string; quality?: { passed: boolean; score?: number }; sketchResult?: { mermaid: string; description: string } }
       if (!evt.commandId) return
 
       if (evt.event === 'COMPLETED' && evt.result) {
-        addMessage({
-          id: `agent-${evt.commandId}`,
-          role: 'agent',
-          text: evt.result,
-          commandId: evt.commandId,
-          status: 'completed',
-          result: evt.result,
-          quality: evt.quality,
-          createdAt: new Date().toISOString(),
-        })
-        setActiveCommand(null)
-        setSelectedReport(evt.commandId)
-        setViewMode('report')
-        queryClient.invalidateQueries({ queryKey: ['commands'] })
+        // For sketch commands, the nexus channel already handles the preview card
+        // Only add a standard agent message if there's no sketch result being shown via nexus
+        if (evt.sketchResult) {
+          // Sketch command completed — update any existing loading card or add result
+          const current = useCommandStore.getState().messages
+          const hasSketchCard = current.some((m) => m.commandId === evt.commandId && (m.sketchResult || m.sketchLoading))
+          if (!hasSketchCard) {
+            addMessage({
+              id: `agent-${evt.commandId}`,
+              role: 'agent',
+              text: evt.result,
+              commandId: evt.commandId,
+              status: 'completed',
+              result: evt.result,
+              sketchResult: evt.sketchResult,
+              createdAt: new Date().toISOString(),
+            })
+          }
+          setActiveCommand(null)
+          queryClient.invalidateQueries({ queryKey: ['commands'] })
+        } else {
+          addMessage({
+            id: `agent-${evt.commandId}`,
+            role: 'agent',
+            text: evt.result,
+            commandId: evt.commandId,
+            status: 'completed',
+            result: evt.result,
+            quality: evt.quality,
+            createdAt: new Date().toISOString(),
+          })
+          setActiveCommand(null)
+          setSelectedReport(evt.commandId)
+          setViewMode('report')
+          queryClient.invalidateQueries({ queryKey: ['commands'] })
+        }
       } else if (evt.event === 'FAILED') {
         addMessage({
           id: `err-${evt.commandId}`,
@@ -223,14 +249,73 @@ export function useCommandCenter() {
       })
     }
 
+    // Nexus channel listener for sketch commands
+    const handleNexus = (data: unknown) => {
+      const evt = data as {
+        type: string
+        commandId?: string
+        mermaid?: string
+        description?: string
+        error?: string
+      }
+
+      if (evt.type === 'canvas_ai_start' && evt.commandId) {
+        // Show loading card in message list
+        addMessage({
+          id: `sketch-loading-${evt.commandId}`,
+          role: 'agent',
+          text: '다이어그램 생성 중...',
+          agentName: 'SketchVibe AI',
+          commandId: evt.commandId,
+          sketchLoading: true,
+          createdAt: new Date().toISOString(),
+        })
+      } else if (evt.type === 'canvas_update' && evt.commandId && evt.mermaid) {
+        // Replace loading card with preview card
+        const { setMessages: setMsgs } = useCommandStore.getState()
+        const current = useCommandStore.getState().messages
+        const updatedMsgs = current.map((m) =>
+          m.commandId === evt.commandId && m.sketchLoading
+            ? {
+                ...m,
+                text: evt.description || '다이어그램이 생성되었습니다',
+                sketchLoading: false,
+                sketchResult: {
+                  mermaid: evt.mermaid!,
+                  description: evt.description || '',
+                },
+              }
+            : m,
+        )
+        setMsgs(updatedMsgs)
+      } else if (evt.type === 'canvas_ai_error' && evt.commandId) {
+        // Replace loading card with error card
+        const { setMessages: setMsgs } = useCommandStore.getState()
+        const current = useCommandStore.getState().messages
+        const updatedMsgs = current.map((m) =>
+          m.commandId === evt.commandId && m.sketchLoading
+            ? {
+                ...m,
+                role: 'system' as const,
+                text: evt.error || '다이어그램 생성에 실패했습니다',
+                sketchLoading: false,
+              }
+            : m,
+        )
+        setMsgs(updatedMsgs)
+      }
+    }
+
     addListener('command', handleCommand)
     addListener('delegation', handleDelegation)
     addListener('tool', handleTool)
+    addListener('nexus', handleNexus)
 
     return () => {
       removeListener('command', handleCommand)
       removeListener('delegation', handleDelegation)
       removeListener('tool', handleTool)
+      removeListener('nexus', handleNexus)
     }
   }, [addDelegationStep, addMessage, clearDelegation, queryClient, setActiveCommand, setSelectedReport, setViewMode, updateMessageResult])
 

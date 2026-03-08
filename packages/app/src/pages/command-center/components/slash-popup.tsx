@@ -9,6 +9,7 @@ const SLASH_COMMANDS = [
   { cmd: '/명령어', args: '', desc: '사용 가능한 모든 명령어 보기', icon: '📋' },
   { cmd: '/토론', args: '[주제]', desc: '팀장 2라운드 토론 시작', icon: '💬' },
   { cmd: '/심층토론', args: '[주제]', desc: '팀장 3라운드 심층 토론 시작', icon: '🧠' },
+  { cmd: '/스케치', args: '[설명]', desc: 'AI로 다이어그램 생성', icon: '🎨' },
 ]
 
 export type PresetItem = {

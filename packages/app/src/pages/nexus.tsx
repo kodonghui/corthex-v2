@@ -255,6 +255,33 @@ function NexusPageInner() {
     [setEdges],
   )
 
+  // === Load pending graph data from command center ===
+  useEffect(() => {
+    const pending = sessionStorage.getItem('pendingGraphData')
+    if (pending) {
+      try {
+        const data = JSON.parse(pending) as { nodes: Node[]; edges: Edge[] }
+        if (data.nodes && data.edges) {
+          const nodesWithHandlers = data.nodes.map((n: Node) => ({
+            ...n,
+            data: { ...n.data, onLabelChange: handleLabelChange },
+          }))
+          const edgesWithHandlers = data.edges.map((e: Edge) => ({
+            ...e,
+            data: { ...e.data, onEdgeLabelChange: handleEdgeLabelChange },
+          }))
+          setNodes(nodesWithHandlers)
+          setEdges(edgesWithHandlers)
+          setCurrentSketchId(null)
+          setCurrentSketchName('')
+          setDirty(true)
+          setTimeout(() => reactFlowInstance?.fitView(), 100)
+        }
+      } catch { /* ignore parse errors */ }
+      sessionStorage.removeItem('pendingGraphData')
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Connect nodes with editable edge type
   const onConnect = useCallback(
     (connection: Connection) => {

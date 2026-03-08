@@ -13,6 +13,11 @@ export type DelegationStep = {
   children: DelegationStep[]
 }
 
+export type SketchResult = {
+  mermaid: string
+  description: string
+}
+
 export type CommandMessage = {
   id: string
   role: 'user' | 'agent' | 'system'
@@ -22,6 +27,8 @@ export type CommandMessage = {
   status?: string
   result?: string
   quality?: { passed: boolean; score?: number }
+  sketchResult?: SketchResult
+  sketchLoading?: boolean
   createdAt: string
 }
 

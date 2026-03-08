@@ -14,6 +14,7 @@ import { process as chiefOfStaffProcess } from '../services/chief-of-staff'
 import { processAll } from '../services/all-command-processor'
 import { processSequential } from '../services/sequential-command-processor'
 import { processDebateCommand } from '../services/debate-command-handler'
+import { processSketchCommand } from '../services/sketch-command-handler'
 import type { AppEnv } from '../types'
 
 export const commandsRoute = new Hono<AppEnv>()
@@ -127,6 +128,19 @@ commandsRoute.post('/', zValidator('json', submitCommandSchema), promptGuardMidd
       userId: tenant.userId,
     }).catch((err) => {
       console.error(`[DebateCommand] process failed for command ${command.id}:`, err)
+    })
+  }
+
+  // For /스케치 commands, trigger SketchCommandHandler
+  if (result.parsedMeta.slashType === 'sketch') {
+    const sketchPrompt = result.parsedMeta.slashArgs || ''
+    processSketchCommand({
+      commandId: command.id,
+      prompt: sketchPrompt,
+      companyId: tenant.companyId,
+      userId: tenant.userId,
+    }).catch((err) => {
+      console.error(`[SketchCommand] process failed for command ${command.id}:`, err)
     })
   }
 

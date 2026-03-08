@@ -15,6 +15,7 @@ export type SlashType =
   | 'commands_list' // /명령어
   | 'debate'        // /토론
   | 'deep_debate'   // /심층토론
+  | 'sketch'        // /스케치
 
 export type ParsedMeta = {
   slashType?: SlashType
@@ -51,6 +52,7 @@ const SLASH_COMMANDS: Record<string, { slashType: SlashType; commandType: Comman
   '/명령어':   { slashType: 'commands_list', commandType: 'slash' },
   '/토론':     { slashType: 'debate',        commandType: 'slash' },
   '/심층토론': { slashType: 'deep_debate',   commandType: 'slash' },
+  '/스케치':   { slashType: 'sketch',        commandType: 'slash' },
 }
 
 // === Timeout Defaults (ms) ===
@@ -72,6 +74,7 @@ const SLASH_TIMEOUT_OVERRIDES: Partial<Record<SlashType, number>> = {
   deep_debate: 300_000,
   all:         300_000,
   sequential:  300_000,
+  sketch:      60_000,
 }
 
 // === Parsing Functions ===
