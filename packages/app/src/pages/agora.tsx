@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { DebateListPanel } from '../components/agora/debate-list-panel'
@@ -10,9 +10,13 @@ import type { Debate, DebateTimelineEntry } from '@corthex/shared'
 
 export function AgoraPage() {
   const location = useLocation()
+  const navigate = useNavigate()
   const [selectedDebate, setSelectedDebate] = useState<Debate | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [mobileView, setMobileView] = useState<'list' | 'detail'>('list')
+
+  // Track if user came from chat (for "back to chat" button)
+  const fromChat = (location.state as { fromChat?: boolean } | null)?.fromChat ?? false
 
   // Auto-select debate from navigation state or URL params
   const stateDebateId = (location.state as { debateId?: string } | null)?.debateId
@@ -104,6 +108,18 @@ export function AgoraPage() {
 
             {/* Timeline */}
             <DebateTimeline debate={debate} timeline={timeline} />
+
+            {/* Back to chat button (when debate completed and came from chat) */}
+            {fromChat && debate.status === 'completed' && (
+              <div className="shrink-0 px-4 py-3 border-t border-zinc-200 dark:border-zinc-800">
+                <button
+                  onClick={() => navigate('/chat')}
+                  className="w-full py-2 text-xs font-medium text-indigo-500 hover:text-indigo-400 bg-indigo-500/10 hover:bg-indigo-500/20 rounded-lg transition-colors"
+                >
+                  ← 사령관실로 돌아가기
+                </button>
+              </div>
+            )}
           </>
         ) : (
           <div className="flex-1 flex items-center justify-center text-zinc-400 dark:text-zinc-500">

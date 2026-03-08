@@ -1,5 +1,7 @@
-import { Badge, cn } from '@corthex/ui'
+import { useState, useEffect } from 'react'
+import { cn, Tabs } from '@corthex/ui'
 import type { Debate } from '@corthex/shared'
+import { DiffView } from './diff-view'
 
 const STATUS_LABELS: Record<string, string> = {
   pending: '대기',
@@ -35,9 +37,52 @@ function formatDate(dateStr: string | null): string {
   })
 }
 
+const TAB_ITEMS = [
+  { value: 'info', label: '정보' },
+  { value: 'diff', label: 'Diff' },
+]
+
 export function DebateInfoPanel({ debate }: { debate: Debate }) {
+  const [activeTab, setActiveTab] = useState('info')
+  const isDiffEnabled = debate.status === 'completed' && debate.rounds.length > 0
+
+  // Auto-switch to diff tab when debate is completed
+  useEffect(() => {
+    if (debate.status === 'completed') {
+      setActiveTab('diff')
+    } else {
+      setActiveTab('info')
+    }
+  }, [debate.id, debate.status])
+
+  const tabItems = TAB_ITEMS.map((item) =>
+    item.value === 'diff' ? { ...item, disabled: !isDiffEnabled } : item,
+  )
+
   return (
-    <div className="h-full overflow-y-auto">
+    <div className="h-full flex flex-col overflow-hidden">
+      {/* Tabs */}
+      <div className="shrink-0">
+        <Tabs items={tabItems} value={activeTab} onChange={setActiveTab} />
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto">
+        {activeTab === 'info' ? (
+          <InfoContent debate={debate} />
+        ) : (
+          <div className="px-4 py-3">
+            <DiffView debate={debate} />
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function InfoContent({ debate }: { debate: Debate }) {
+  return (
+    <>
       {/* Header */}
       <div className="px-4 py-3 border-b border-zinc-200 dark:border-zinc-800">
         <h3 className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-2">
@@ -90,7 +135,7 @@ export function DebateInfoPanel({ debate }: { debate: Debate }) {
           </div>
         )}
       </div>
-    </div>
+    </>
   )
 }
 

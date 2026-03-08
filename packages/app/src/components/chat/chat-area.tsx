@@ -1,13 +1,34 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { Input } from '@corthex/ui'
+import { Input, toast } from '@corthex/ui'
 import { api } from '../../lib/api'
 import { useWsStore } from '../../stores/ws-store'
 import { useChatStream } from '../../hooks/use-chat-stream'
 import { ToolCallCard } from './tool-call-card'
+import { DebateResultCard } from '../agora/debate-result-card'
 import type { Agent, Message, Delegation, SavedToolCall, FileAttachment } from './types'
 import type { ToolCall } from '../../hooks/use-chat-stream'
+import type { Debate, DebateResult, DebateWsEvent, CreateDebateRequest } from '@corthex/shared'
+
+/** Detect debate slash commands: /토론 [topic] or /심층토론 [topic] */
+function parseDebateCommand(text: string): { debateType: 'debate' | 'deep-debate'; topic: string } | null {
+  const trimmed = text.trim()
+  if (trimmed.startsWith('/심층토론 ') || trimmed.startsWith('/심층토론\n')) {
+    return { debateType: 'deep-debate', topic: trimmed.replace(/^\/심층토론\s*/, '').trim() }
+  }
+  if (trimmed.startsWith('/토론 ') || trimmed.startsWith('/토론\n')) {
+    return { debateType: 'debate', topic: trimmed.replace(/^\/토론\s*/, '').trim() }
+  }
+  return null
+}
+
+type DebateResultEntry = {
+  debateId: string
+  topic: string
+  result: DebateResult
+  insertedAt: string
+}
 
 /** 텍스트 내 마크다운 링크 [text](url)를 클릭 가능한 요소로 변환 */
 function renderTextWithLinks(
@@ -90,6 +111,8 @@ export function ChatArea({
   const { isConnected } = useWsStore()
   const { streamingText, isStreaming, toolCalls, error, delegationStatus, delegationStatuses, delegationChain, startStream, stopStream, clearError } = useChatStream(sessionId)
   const [chainExpanded, setChainExpanded] = useState(false)
+  const [debateResults, setDebateResults] = useState<DebateResultEntry[]>([])
+  const [debateNotice, setDebateNotice] = useState<string | null>(null)
 
   const {
     data: messagesData,
@@ -154,8 +177,42 @@ export function ChatArea({
     }
   }
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim() || !sessionId || sendMessage.isPending || isStreaming) return
+
+    // Check for debate commands
+    const debateCmd = parseDebateCommand(input.trim())
+    if (debateCmd && debateCmd.topic) {
+      setInput('')
+      setDebateNotice(`토론이 시작됩니다. AGORA로 이동합니다...`)
+      try {
+        // Create debate with available agents
+        const agentsRes = await api.get<{ data: { id: string }[] }>('/workspace/agents')
+        const agentIds = agentsRes.data.slice(0, 5).map((a) => a.id)
+        if (agentIds.length < 2) {
+          toast.error('토론에 참여할 에이전트가 부족합니다 (최소 2명)')
+          setDebateNotice(null)
+          return
+        }
+        const createRes = await api.post<{ data: Debate }>('/workspace/debates', {
+          topic: debateCmd.topic,
+          debateType: debateCmd.debateType,
+          participantAgentIds: agentIds,
+        } satisfies CreateDebateRequest)
+        const debateId = createRes.data.id
+        await api.post(`/workspace/debates/${debateId}/start`, {})
+        // Navigate to AGORA
+        setTimeout(() => {
+          setDebateNotice(null)
+          navigate('/agora', { state: { debateId, fromChat: true } })
+        }, 1000)
+      } catch {
+        toast.error('토론 시작에 실패했습니다')
+        setDebateNotice(null)
+      }
+      return
+    }
+
     const content = canvasContext
       ? `${canvasContext}\n\n---\n${input.trim()}`
       : input.trim()
@@ -228,6 +285,37 @@ export function ChatArea({
     }
     prevConnected.current = isConnected
   }, [isConnected, sessionId, queryClient])
+
+  // Listen for debate-completed events on the global debate channel
+  useEffect(() => {
+    if (!isConnected) return
+    const channelKey = 'debate::global'
+    const handler = (data: unknown) => {
+      const event = data as DebateWsEvent
+      if (event.event === 'debate-completed') {
+        // Fetch debate details to get topic
+        api.get<{ data: Debate }>(`/workspace/debates/${event.debateId}`).then((res) => {
+          const debate = res.data
+          if (debate.result) {
+            setDebateResults((prev) => [
+              ...prev,
+              {
+                debateId: debate.id,
+                topic: debate.topic,
+                result: debate.result!,
+                insertedAt: new Date().toISOString(),
+              },
+            ])
+          }
+        }).catch(() => {
+          // Ignore fetch errors
+        })
+      }
+    }
+    const { addListener, removeListener } = useWsStore.getState()
+    addListener(channelKey, handler)
+    return () => removeListener(channelKey, handler)
+  }, [isConnected])
 
   const messages = useMemo(
     () => messagesData?.pages.flatMap((p) => p.data) || [],
@@ -648,6 +736,28 @@ export function ChatArea({
                 </div>
               </div>
             )}
+
+            {/* Debate notice */}
+            {debateNotice && (
+              <div className="flex justify-center">
+                <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg px-4 py-2 text-xs text-indigo-600 dark:text-indigo-400 animate-pulse">
+                  🗣️ {debateNotice}
+                </div>
+              </div>
+            )}
+
+            {/* Debate result cards */}
+            {debateResults.map((dr) => (
+              <div key={dr.debateId} className="flex justify-start">
+                <div className="max-w-[80%] md:max-w-[70%]">
+                  <DebateResultCard
+                    debateId={dr.debateId}
+                    topic={dr.topic}
+                    result={dr.result}
+                  />
+                </div>
+              </div>
+            ))}
 
             <div ref={messagesEndRef} />
           </div>
