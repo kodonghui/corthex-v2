@@ -13,6 +13,7 @@ import {
 } from './quality-rules'
 import { llmRouter } from './llm-router'
 import type { LLMRouterContext } from './llm-router'
+import { detect as detectHallucinations, type HallucinationReport } from './hallucination-detector'
 
 // Local JSON parser to avoid circular dependency with chief-of-staff.ts
 function parseLLMJson<T>(raw: string): T | null {
@@ -70,6 +71,7 @@ export type InspectionResult = {
   maxScore: number
   feedback: string | null
   rubricScores?: RubricScore[]
+  hallucinationReport?: HallucinationReport
 }
 
 // === Rule-based evaluators (deterministic) ===
@@ -469,6 +471,30 @@ export async function inspect(input: InspectionInput): Promise<InspectionResult>
     llmResults.push(result)
   }
 
+  // Phase 2.5: Hallucination detection (rule-based, complements LLM accuracy checks)
+  let hallucinationReport: HallucinationReport | undefined
+  if (toolData && Object.keys(toolData).length > 0) {
+    try {
+      hallucinationReport = detectHallucinations(content, toolData, commandText)
+
+      // Add hallucination results as a synthetic RuleResult
+      if (hallucinationReport.verdict !== 'clean') {
+        ruleBasedResults.push({
+          ruleId: 'hallucination-detector',
+          ruleName: '환각 탐지 (규칙 기반)',
+          category: 'accuracy',
+          severity: hallucinationReport.verdict === 'critical' ? 'critical' : 'major',
+          result: hallucinationReport.verdict === 'critical' ? 'fail' : 'warn',
+          score: hallucinationReport.score,
+          message: hallucinationReport.details,
+        })
+      }
+    } catch (err) {
+      // Hallucination detection failure — don't block inspection
+      console.error('[inspection-engine] Hallucination detection error:', err instanceof Error ? err.message : err)
+    }
+  }
+
   // Phase 3: Rubric evaluation (if department specified)
   let rubricScores: RubricScore[] | undefined
   if (departmentNameEn) {
@@ -497,5 +523,6 @@ export async function inspect(input: InspectionInput): Promise<InspectionResult>
     maxScore,
     feedback,
     rubricScores,
+    hallucinationReport,
   }
 }

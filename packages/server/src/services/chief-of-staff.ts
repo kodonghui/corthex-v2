@@ -2,6 +2,7 @@ import { agentRunner, type AgentConfig } from './agent-runner'
 import { delegationTracker } from './delegation-tracker'
 import { delegate as managerDelegate } from './manager-delegate'
 import { synthesize as managerSynthesize } from './manager-synthesis'
+import { inspect, type InspectionResult, type RuleResult, type RubricScore } from './inspection-engine'
 import { db } from '../db'
 import { commands, agents, departments, orchestrationTasks, qualityReviews } from '../db/schema'
 import { eq, and } from 'drizzle-orm'
@@ -59,6 +60,7 @@ export type QualityGateResult = {
   totalScore: number
   passed: boolean
   feedback: string | null
+  inspection?: InspectionResult | null
 }
 
 export type ChiefOfStaffResult = {
@@ -347,7 +349,10 @@ export async function qualityGate(
   commandId: string,
   secretaryAgent: AgentConfig,
   attemptNumber: number,
+  departmentNameEn?: string,
+  toolData?: Record<string, unknown>,
 ): Promise<QualityGateResult> {
+  // === Phase A: Legacy LLM 5-item inspection ===
   const reviewInput = `## 원본 명령
 ${commandText}
 
@@ -382,21 +387,71 @@ ${result}`
   const scores = parsed?.scores ?? defaultScores
   const totalScore = scores.conclusionClarity + scores.evidenceSufficiency +
     scores.riskMention + scores.formatAdequacy + scores.logicalConsistency
-  const passed = totalScore >= QUALITY_PASS_THRESHOLD
-  const feedback = passed ? null : (parsed?.feedback ?? '품질 기준 미달. 결론을 명확히 하고, 근거를 보강하세요.')
+  const legacyPassed = totalScore >= QUALITY_PASS_THRESHOLD
+  const legacyFeedback = legacyPassed ? null : (parsed?.feedback ?? '품질 기준 미달. 결론을 명확히 하고, 근거를 보강하세요.')
 
-  // Save to quality_reviews
+  // === Phase B: YAML rule-based + LLM hybrid inspection (P1) ===
+  let inspectionResult: InspectionResult | null = null
+  try {
+    inspectionResult = await inspect({
+      content: result,
+      commandText,
+      companyId,
+      commandId,
+      agentId: secretaryAgent.id,
+      departmentNameEn,
+      toolData,
+      attemptNumber,
+    })
+  } catch (err) {
+    // InspectionEngine failure — don't block the quality gate
+    console.error('[quality-gate] InspectionEngine error, proceeding with legacy only:', err instanceof Error ? err.message : err)
+  }
+
+  // === Phase C: Hybrid judgment ===
+  // Both legacy AND inspection must pass for overall pass
+  const inspectionPassed = !inspectionResult || inspectionResult.conclusion === 'pass'
+  const passed = legacyPassed && inspectionPassed
+
+  // Merge feedback
+  let feedback: string | null = null
+  const feedbacks: string[] = []
+  if (legacyFeedback) feedbacks.push(legacyFeedback)
+  if (inspectionResult?.feedback) feedbacks.push(inspectionResult.feedback)
+  if (feedbacks.length > 0) feedback = feedbacks.join('\n\n---\n\n')
+
+  // Save to quality_reviews with merged scores
+  const mergedScores: Record<string, unknown> = {
+    legacyScores: scores,
+    legacyTotalScore: totalScore,
+    legacyPassed,
+  }
+  if (inspectionResult) {
+    mergedScores.ruleResults = inspectionResult.ruleResults
+    mergedScores.inspectionConclusion = inspectionResult.conclusion
+    mergedScores.inspectionScore = inspectionResult.totalScore
+    mergedScores.inspectionMaxScore = inspectionResult.maxScore
+    if (inspectionResult.rubricScores) {
+      mergedScores.rubricScores = inspectionResult.rubricScores
+    }
+    if (inspectionResult.hallucinationReport) {
+      mergedScores.hallucinationReport = inspectionResult.hallucinationReport
+    }
+  }
+
+  const conclusion = passed ? 'pass' : (inspectionResult?.conclusion === 'warning' && legacyPassed ? 'warning' : 'fail')
+
   await db.insert(qualityReviews).values({
     companyId,
     commandId,
     reviewerAgentId: secretaryAgent.id,
-    conclusion: passed ? 'pass' : 'fail',
-    scores: scores as unknown as Record<string, unknown>,
+    conclusion,
+    scores: mergedScores,
     feedback,
     attemptNumber,
   })
 
-  return { scores, totalScore, passed, feedback }
+  return { scores, totalScore, passed, feedback, inspection: inspectionResult }
 }
 
 // === Main Process Pipeline ===
@@ -579,6 +634,17 @@ export async function process(options: ProcessOptions): Promise<ChiefOfStaffResu
   for (let attempt = 1; attempt <= MAX_REWORK_ATTEMPTS + 1; attempt++) {
     attemptNumber = attempt
 
+    // Resolve department name for rubric evaluation
+    let deptNameEn: string | undefined
+    if (classification?.departmentId) {
+      try {
+        const [dept] = await db.select({ nameEn: departments.nameEn }).from(departments)
+          .where(and(eq(departments.id, classification.departmentId), eq(departments.companyId, companyId)))
+          .limit(1)
+        deptNameEn = dept?.nameEn ?? undefined
+      } catch { /* ignore — rubric will use default */ }
+    }
+
     try {
       lastQualityResult = await qualityGate(
         currentResult,
@@ -587,6 +653,7 @@ export async function process(options: ProcessOptions): Promise<ChiefOfStaffResu
         commandId,
         secretaryAgent,
         attempt,
+        deptNameEn,
       )
     } catch (err) {
       // Quality gate LLM failure — pass with warning
