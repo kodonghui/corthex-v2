@@ -86,10 +86,19 @@ mock.module('../../db/schema', () => ({
     usageCount: 'usage_count', lastUsedAt: 'last_used_at',
     isActive: 'is_active', createdAt: 'created_at', updatedAt: 'updated_at',
   },
+  docVersions: {
+    id: 'id', docId: 'doc_id', version: 'version', title: 'title',
+    content: 'content', contentType: 'content_type', tags: 'tags',
+    editedBy: 'edited_by', changeNote: 'change_note', createdAt: 'created_at',
+  },
   agents: {
     id: 'id', companyId: 'company_id',
   },
   memoryTypeEnum: {},
+}))
+
+mock.module('../../lib/knowledge-templates', () => ({
+  KNOWLEDGE_TEMPLATES: [],
 }))
 
 mock.module('../../middleware/auth', () => ({
