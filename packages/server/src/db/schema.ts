@@ -822,11 +822,17 @@ export const soulTemplates = pgTable('soul_templates', {
   category: varchar('category', { length: 50 }),
   isBuiltin: boolean('is_builtin').notNull().default(false),
   isActive: boolean('is_active').notNull().default(true),
+  isPublished: boolean('is_published').notNull().default(false),
+  publishedAt: timestamp('published_at'),
+  downloadCount: integer('download_count').notNull().default(0),
+  tier: varchar('tier', { length: 20 }),
+  allowedTools: jsonb('allowed_tools'),
   createdBy: uuid('created_by').references(() => users.id),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 }, (table) => ({
   companyIdx: index('soul_templates_company_idx').on(table.companyId),
+  publishedIdx: index('soul_templates_published_idx').on(table.isPublished),
 }))
 
 // === 31. push_subscriptions — Web Push 구독 ===

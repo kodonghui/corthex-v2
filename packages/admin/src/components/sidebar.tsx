@@ -26,6 +26,7 @@ const nav = [
   { to: '/org-chart', label: '조직도', icon: '🏗️' },
   { to: '/org-templates', label: '조직 템플릿', icon: '📋' },
   { to: '/template-market', label: '템플릿 마켓', icon: '🛒' },
+  { to: '/agent-marketplace', label: '에이전트 마켓', icon: '🧠' },
   { to: '/workflows', label: '워크플로우', icon: '⚡' },
 ]
 

@@ -5,6 +5,7 @@ import { eq, and, or, isNull, asc, desc } from 'drizzle-orm'
 import { db } from '../../db'
 import { soulTemplates } from '../../db/schema'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
+import { tenantMiddleware } from '../../middleware/tenant'
 import { HTTPError } from '../../middleware/error'
 import type { AppEnv } from '../../types'
 
@@ -104,4 +105,50 @@ soulTemplatesRoute.delete('/soul-templates/:id', async (c) => {
     .returning()
 
   return c.json({ data: deleted })
+})
+
+// POST /api/admin/soul-templates/:id/publish -- publish to agent marketplace
+soulTemplatesRoute.post('/soul-templates/:id/publish', tenantMiddleware, async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+
+  const [tmpl] = await db
+    .select()
+    .from(soulTemplates)
+    .where(and(eq(soulTemplates.id, id), eq(soulTemplates.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!tmpl) throw new HTTPError(404, '소울 템플릿을 찾을 수 없습니다', 'ST_005')
+  if (tmpl.isPublished) throw new HTTPError(409, '이미 공개된 템플릿입니다', 'ST_006')
+
+  const [updated] = await db
+    .update(soulTemplates)
+    .set({ isPublished: true, publishedAt: new Date(), updatedAt: new Date() })
+    .where(eq(soulTemplates.id, id))
+    .returning()
+
+  return c.json({ data: updated })
+})
+
+// POST /api/admin/soul-templates/:id/unpublish -- remove from agent marketplace
+soulTemplatesRoute.post('/soul-templates/:id/unpublish', tenantMiddleware, async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+
+  const [tmpl] = await db
+    .select()
+    .from(soulTemplates)
+    .where(and(eq(soulTemplates.id, id), eq(soulTemplates.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!tmpl) throw new HTTPError(404, '소울 템플릿을 찾을 수 없습니다', 'ST_005')
+  if (!tmpl.isPublished) throw new HTTPError(409, '이미 비공개 상태입니다', 'ST_007')
+
+  const [updated] = await db
+    .update(soulTemplates)
+    .set({ isPublished: false, updatedAt: new Date() })
+    .where(eq(soulTemplates.id, id))
+    .returning()
+
+  return c.json({ data: updated })
 })

@@ -56,6 +56,7 @@ import { performanceRoute } from './routes/workspace/performance'
 import { workflowsRoute } from './routes/workspace/workflows'
 import { conversationsRoute } from './routes/workspace/conversations'
 import { workspaceTemplateMarketRoute } from './routes/workspace/template-market'
+import { workspaceAgentMarketplaceRoute } from './routes/workspace/agent-marketplace'
 import { superAdminCompaniesRoute } from './routes/super-admin/companies'
 
 import { commandsRoute } from './routes/commands'
@@ -160,6 +161,7 @@ app.route('/api/workspace', performanceRoute)
 app.route('/api/workspace', workflowsRoute)
 app.route('/api/workspace/conversations', conversationsRoute)
 app.route('/api/workspace', workspaceTemplateMarketRoute)
+app.route('/api/workspace', workspaceAgentMarketplaceRoute)
 
 // WebSocket 라우트
 app.get('/ws', wsRoute)

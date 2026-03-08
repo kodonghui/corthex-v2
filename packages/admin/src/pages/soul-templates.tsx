@@ -13,6 +13,9 @@ type SoulTemplate = {
   category: string | null
   isBuiltin: boolean
   isActive: boolean
+  isPublished?: boolean
+  publishedAt?: string | null
+  downloadCount?: number
   createdAt: string
   updatedAt: string
 }
@@ -25,6 +28,7 @@ export function SoulTemplatesPage() {
   const [editTemplate, setEditTemplate] = useState<SoulTemplate | null>(null)
   const [viewContent, setViewContent] = useState<SoulTemplate | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<SoulTemplate | null>(null)
+  const [publishConfirmId, setPublishConfirmId] = useState<string | null>(null)
   const [form, setForm] = useState({ name: '', description: '', content: '', category: '' })
 
   const { data, isLoading } = useQuery({
@@ -34,6 +38,7 @@ export function SoulTemplatesPage() {
   })
 
   const templates = data?.data || []
+  const companyTemplates = templates.filter((t) => t.companyId === selectedCompanyId)
 
   const createMutation = useMutation({
     mutationFn: (body: Record<string, unknown>) => api.post('/admin/soul-templates', body),
@@ -63,6 +68,25 @@ export function SoulTemplatesPage() {
       qc.invalidateQueries({ queryKey: ['soul-templates'] })
       setDeleteTarget(null)
       addToast({ type: 'success', message: '소울 템플릿이 삭제되었습니다' })
+    },
+    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
+  })
+
+  const publishMutation = useMutation({
+    mutationFn: (id: string) => api.post(`/admin/soul-templates/${id}/publish`, {}),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['soul-templates'] })
+      setPublishConfirmId(null)
+      addToast({ type: 'success', message: '에이전트 마켓에 공개되었습니다' })
+    },
+    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
+  })
+
+  const unpublishMutation = useMutation({
+    mutationFn: (id: string) => api.post(`/admin/soul-templates/${id}/unpublish`, {}),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['soul-templates'] })
+      addToast({ type: 'success', message: '마켓에서 비공개 처리되었습니다' })
     },
     onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
@@ -222,6 +246,11 @@ export function SoulTemplatesPage() {
                             🔒
                           </span>
                         )}
+                        {t.isPublished && (
+                          <span className="text-xs px-1.5 py-0.5 rounded bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">
+                            공개
+                          </span>
+                        )}
                       </div>
                       {t.description && (
                         <p className="text-sm text-zinc-500 mt-0.5">{t.description}</p>
@@ -262,6 +291,52 @@ export function SoulTemplatesPage() {
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Marketplace publish management section */}
+      {companyTemplates.length > 0 && (
+        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5">
+          <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4">마켓 공개 관리</h3>
+          <p className="text-sm text-zinc-500 mb-4">회사 소울 템플릿을 에이전트 마켓에 공개하거나 비공개 처리할 수 있습니다.</p>
+          <div className="space-y-2">
+            {companyTemplates.map((t) => (
+              <div
+                key={t.id}
+                className="flex items-center justify-between px-4 py-3 rounded-lg bg-zinc-50 dark:bg-zinc-800"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{t.name}</span>
+                  {t.category && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400">
+                      {t.category}
+                    </span>
+                  )}
+                  {t.isPublished && (
+                    <span className="text-xs text-zinc-400">
+                      다운로드 {t.downloadCount || 0}회
+                    </span>
+                  )}
+                </div>
+                {t.isPublished ? (
+                  <button
+                    onClick={() => unpublishMutation.mutate(t.id)}
+                    disabled={unpublishMutation.isPending}
+                    className="px-3 py-1.5 text-xs font-medium rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 disabled:opacity-50 transition-colors"
+                  >
+                    비공개
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setPublishConfirmId(t.id)}
+                    className="px-3 py-1.5 text-xs font-medium rounded-lg bg-green-600 hover:bg-green-700 text-white transition-colors"
+                  >
+                    마켓 공개
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -314,6 +389,36 @@ export function SoulTemplatesPage() {
                 className="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
               >
                 {deleteMutation.isPending ? '삭제 중...' : '삭제'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Publish confirmation modal */}
+      {publishConfirmId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setPublishConfirmId(null)}>
+          <div
+            className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 max-w-md w-full mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-2">마켓 공개 확인</h3>
+            <p className="text-sm text-zinc-500 mb-4">
+              이 소울 템플릿을 에이전트 마켓에 공개하시겠습니까? 공개 후 다른 회사에서 이 템플릿을 검색하고 가져갈 수 있습니다.
+            </p>
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={() => setPublishConfirmId(null)}
+                className="px-4 py-2 text-sm text-zinc-600"
+              >
+                취소
+              </button>
+              <button
+                onClick={() => publishMutation.mutate(publishConfirmId)}
+                disabled={publishMutation.isPending}
+                className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+              >
+                {publishMutation.isPending ? '공개 중...' : '공개'}
               </button>
             </div>
           </div>
