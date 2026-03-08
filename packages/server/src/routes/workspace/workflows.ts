@@ -7,6 +7,8 @@ import { HTTPError } from '../../middleware/error'
 import { authMiddleware } from '../../middleware/auth'
 import { WorkflowService } from '../../services/workflow/engine'
 import { WorkflowExecutionService } from '../../services/workflow/execution'
+import { WorkflowSuggestionService } from '../../services/workflow/suggestion'
+import { PatternAnalyzer } from '../../services/workflow/pattern-analyzer'
 
 // === Zod Schemas ===
 
@@ -95,6 +97,67 @@ workflowsRoute.get(
     return c.json({ success: true, data: result.data, meta: result.meta })
   }
 )
+
+// === Workflow Suggestions (must be before :id routes) ===
+
+// GET /workflows/suggestions -- 사용자별 pending 제안 목록
+workflowsRoute.get(
+  '/workflows/suggestions',
+  zValidator('query', ListQuerySchema),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const { page, limit } = c.req.valid('query')
+
+    const result = await WorkflowSuggestionService.list(
+      tenant.companyId, tenant.userId, { page, limit }
+    )
+    return c.json({ success: true, data: result.data, meta: result.meta })
+  }
+)
+
+// POST /workflows/suggestions/:id/accept -- 제안 수락 → 워크플로우 생성
+workflowsRoute.post('/workflows/suggestions/:id/accept', async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+
+  const result = await WorkflowSuggestionService.accept(id, tenant.companyId, tenant.userId)
+  if (!result.success) {
+    if (result.error === 'NOT_FOUND') {
+      throw new HTTPError(404, '제안을 찾을 수 없습니다', 'NOT_FOUND')
+    }
+    if (result.error === 'ALREADY_PROCESSED') {
+      throw new HTTPError(400, '이미 처리된 제안입니다', 'ALREADY_PROCESSED')
+    }
+    throw new HTTPError(400, '워크플로우 생성 실패', 'INVALID_WORKFLOW')
+  }
+
+  return c.json({ success: true, data: { workflowId: result.workflowId } }, 201)
+})
+
+// POST /workflows/suggestions/:id/reject -- 제안 거절
+workflowsRoute.post('/workflows/suggestions/:id/reject', async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+
+  const result = await WorkflowSuggestionService.reject(id, tenant.companyId, tenant.userId)
+  if (!result.success) {
+    if (result.error === 'NOT_FOUND') {
+      throw new HTTPError(404, '제안을 찾을 수 없습니다', 'NOT_FOUND')
+    }
+    throw new HTTPError(400, '이미 처리된 제안입니다', 'ALREADY_PROCESSED')
+  }
+
+  return c.json({ success: true, message: '제안이 거절되었습니다' })
+})
+
+// POST /workflows/analyze -- 온디맨드 패턴 분석 트리거
+workflowsRoute.post('/workflows/analyze', async (c) => {
+  const tenant = c.get('tenant')
+  requireCeoOrAdmin(tenant)
+
+  const result = await PatternAnalyzer.analyze(tenant.companyId, tenant.userId)
+  return c.json({ success: true, data: result })
+})
 
 // GET /workflows/:id -- 워크플로우 단건 조회
 workflowsRoute.get('/workflows/:id', async (c) => {
