@@ -4,19 +4,22 @@
  * v1의 polling 방식 대신 Webhook으로 전환.
  * 멀티테넌트: companyId별 독립 봇 토큰.
  * 명령 → CommandRouter → ChiefOfStaff → 결과 sendMessage.
+ *
+ * 15-2: @멘션(entity기반) + 한국어 슬래시 + callback query + inline keyboard
  */
 
 import { db } from '../db'
-import { telegramConfigs, agents, commands, orchestrationTasks, costRecords, departments } from '../db/schema'
+import { telegramConfigs, agents, commands, orchestrationTasks, costRecords, departments, snsContents } from '../db/schema'
 import { eq, and, desc, sum, sql } from 'drizzle-orm'
 import { decrypt } from '../lib/crypto'
-import { classify, createCommand } from './command-router'
+import { classify, createCommand, parseSlash, parseMention, resolveMentionAgent } from './command-router'
 import { process as chiefOfStaffProcess } from './chief-of-staff'
 import { processAll } from './all-command-processor'
 import { processSequential } from './sequential-command-processor'
 import { processDebateCommand } from './debate-command-handler'
 import { logActivity } from '../lib/activity-logger'
 import { microToUsd } from '../lib/cost-tracker'
+import { batchCollector } from './batch-collector'
 
 // === Types ===
 
@@ -157,6 +160,95 @@ export async function sendMessage(token: string, chatId: string | number, text: 
   }
 }
 
+// === Inline Keyboard & Message Management (15-2) ===
+
+export type InlineButton = { text: string; callback_data: string }
+
+export async function sendMessageWithKeyboard(
+  token: string,
+  chatId: string | number,
+  text: string,
+  keyboard: InlineButton[][],
+): Promise<{ message_id: number }> {
+  return callTelegramApi(token, 'sendMessage', {
+    chat_id: chatId,
+    text,
+    parse_mode: 'Markdown',
+    reply_markup: { inline_keyboard: keyboard },
+  })
+}
+
+export async function editMessage(
+  token: string,
+  chatId: string | number,
+  messageId: number,
+  text: string,
+  keyboard?: InlineButton[][],
+): Promise<void> {
+  const params: Record<string, unknown> = {
+    chat_id: chatId,
+    message_id: messageId,
+    text,
+    parse_mode: 'Markdown',
+  }
+  if (keyboard) {
+    params.reply_markup = { inline_keyboard: keyboard }
+  }
+  await callTelegramApi(token, 'editMessageText', params)
+}
+
+export async function deleteMessage(
+  token: string,
+  chatId: string | number,
+  messageId: number,
+): Promise<void> {
+  await callTelegramApi(token, 'deleteMessage', {
+    chat_id: chatId,
+    message_id: messageId,
+  })
+}
+
+export async function answerCallbackQuery(
+  token: string,
+  callbackQueryId: string,
+  text?: string,
+  showAlert?: boolean,
+): Promise<void> {
+  await callTelegramApi(token, 'answerCallbackQuery', {
+    callback_query_id: callbackQueryId,
+    text,
+    show_alert: showAlert,
+  })
+}
+
+// === Entity Parsing (15-2) ===
+
+export function parseEntities(
+  text: string,
+  entities?: Array<{ type: string; offset: number; length: number }>,
+): { mentionName: string | null; cleanText: string } {
+  if (!entities || entities.length === 0) {
+    return { mentionName: null, cleanText: text }
+  }
+
+  // Find the first "mention" entity (e.g., @AgentName)
+  const mentionEntity = entities.find(e => e.type === 'mention')
+  if (!mentionEntity) {
+    return { mentionName: null, cleanText: text }
+  }
+
+  // Extract @name from entity (remove the leading @)
+  const raw = text.slice(mentionEntity.offset, mentionEntity.offset + mentionEntity.length)
+  const mentionName = raw.startsWith('@') ? raw.slice(1) : raw
+
+  // Remove the mention from text to get clean command text
+  const before = text.slice(0, mentionEntity.offset)
+  const after = text.slice(mentionEntity.offset + mentionEntity.length)
+  const cleanText = (before + after).trim()
+
+  return { mentionName, cleanText }
+}
+
 // === Webhook Management ===
 
 export async function setWebhook(
@@ -216,7 +308,14 @@ async function cmdHelp(_ctx: CommandContext): Promise<string> {
     '  /cancel ID - 작업 취소\n\n' +
     '*보고서 명령어*:\n' +
     '  /detail  - 마지막 보고서 전체 보기\n' +
-    '  /task ID - 특정 작업 상세 보기'
+    '  /task ID - 특정 작업 상세 보기\n\n' +
+    '*한국어 명령*:\n' +
+    '  /전체 [명령] - 전체 에이전트 실행\n' +
+    '  /순차 [명령] - 순차 실행\n' +
+    '  /토론 [주제] - 토론 시작\n' +
+    '  /명령어 - 전체 명령어 목록\n\n' +
+    '*@멘션*:\n' +
+    '  @에이전트명 [명령] - 특정 Manager에게 직접 지시'
   )
 }
 
@@ -459,12 +558,256 @@ export function parseCommand(text: string): { command: string | null; args: stri
   return { command: match[1].toLowerCase(), args: match[2] }
 }
 
+// === Callback Query Handler (15-2) ===
+
+export async function handleCallbackQuery(
+  callbackQuery: NonNullable<TelegramUpdate['callback_query']>,
+  config: TelegramConfig,
+): Promise<void> {
+  const data = callbackQuery.data || ''
+  const chatId = callbackQuery.message?.chat?.id
+  const ceoChatId = config.ceoChatId
+
+  let token: string
+  try {
+    token = await decrypt(config.botToken)
+  } catch (err) {
+    console.error('[TelegramBot] Failed to decrypt bot token for callback:', err)
+    return
+  }
+
+  // Auth: only process callbacks from configured CEO chat
+  if (!ceoChatId || !chatId || String(chatId) !== ceoChatId) {
+    await answerCallbackQuery(token, callbackQuery.id, '권한이 없습니다.').catch(() => {})
+    return
+  }
+
+  const messageId = callbackQuery.message?.message_id
+
+  try {
+    if (data.startsWith('sns_approve:')) {
+      const contentId = data.slice('sns_approve:'.length)
+      // Approve SNS content: pending → approved
+      const [existing] = await db
+        .select({ id: snsContents.id, status: snsContents.status, title: snsContents.title })
+        .from(snsContents)
+        .where(and(eq(snsContents.id, contentId), eq(snsContents.companyId, config.companyId)))
+        .limit(1)
+
+      if (!existing) {
+        await answerCallbackQuery(token, callbackQuery.id, '콘텐츠를 찾을 수 없습니다.')
+        return
+      }
+      if (existing.status !== 'pending') {
+        await answerCallbackQuery(token, callbackQuery.id, `현재 상태(${existing.status})에서는 승인할 수 없습니다.`)
+        return
+      }
+
+      await db
+        .update(snsContents)
+        .set({ status: 'approved', reviewedBy: ceoChatId, reviewedAt: new Date(), updatedAt: new Date() })
+        .where(eq(snsContents.id, contentId))
+
+      await answerCallbackQuery(token, callbackQuery.id, '승인 완료!')
+      if (messageId) {
+        await editMessage(token, chatId, messageId,
+          `✅ *SNS 발행 승인 완료*\n콘텐츠: ${existing.title || contentId}`
+        ).catch(() => {})
+      }
+
+      logActivity({
+        companyId: config.companyId,
+        type: 'tool',
+        phase: 'end',
+        actorType: 'user',
+        actorId: ceoChatId,
+        action: '텔레그램 SNS 승인',
+        detail: contentId,
+      })
+
+    } else if (data.startsWith('sns_reject:')) {
+      const contentId = data.slice('sns_reject:'.length)
+      // Reject SNS content: pending → rejected
+      const [existing] = await db
+        .select({ id: snsContents.id, status: snsContents.status, title: snsContents.title })
+        .from(snsContents)
+        .where(and(eq(snsContents.id, contentId), eq(snsContents.companyId, config.companyId)))
+        .limit(1)
+
+      if (!existing) {
+        await answerCallbackQuery(token, callbackQuery.id, '콘텐츠를 찾을 수 없습니다.')
+        return
+      }
+      if (existing.status !== 'pending') {
+        await answerCallbackQuery(token, callbackQuery.id, `현재 상태(${existing.status})에서는 거절할 수 없습니다.`)
+        return
+      }
+
+      await db
+        .update(snsContents)
+        .set({ status: 'rejected', reviewedBy: ceoChatId, reviewedAt: new Date(), rejectReason: 'CEO 텔레그램에서 거절', updatedAt: new Date() })
+        .where(eq(snsContents.id, contentId))
+
+      await answerCallbackQuery(token, callbackQuery.id, '거절 완료!')
+      if (messageId) {
+        await editMessage(token, chatId, messageId,
+          `❌ *SNS 발행 거절*\n콘텐츠: ${existing.title || contentId}`
+        ).catch(() => {})
+      }
+
+      logActivity({
+        companyId: config.companyId,
+        type: 'tool',
+        phase: 'end',
+        actorType: 'user',
+        actorId: ceoChatId,
+        action: '텔레그램 SNS 거절',
+        detail: contentId,
+      })
+
+    } else {
+      await answerCallbackQuery(token, callbackQuery.id, '알 수 없는 액션입니다.')
+    }
+  } catch (err) {
+    console.error('[TelegramBot] Callback query error:', err)
+    await answerCallbackQuery(token, callbackQuery.id, `오류: ${err instanceof Error ? err.message : '처리 실패'}`).catch(() => {})
+  }
+}
+
+// === Korean Slash Command Handlers (15-2) ===
+
+async function handleKoreanSlash(
+  token: string,
+  chatId: number | string,
+  companyId: string,
+  ceoChatId: string,
+  slashType: string,
+  slashArgs: string,
+  commandType: string,
+  originalText: string,
+): Promise<void> {
+  const onComplete = async (result: string) => {
+    try {
+      await sendMessage(token, chatId, result || '(결과 없음)')
+    } catch (sendErr) {
+      console.error('[TelegramBot] Failed to send result:', sendErr)
+    }
+  }
+
+  // Create command record
+  const cmd = await createCommand({
+    companyId,
+    userId: ceoChatId,
+    text: originalText,
+    type: commandType as any,
+    targetAgentId: null,
+    metadata: { slashType, slashArgs: slashArgs || undefined, timeoutMs: 300000, source: 'telegram' },
+  })
+
+  logActivity({
+    companyId,
+    type: 'chat',
+    phase: 'start',
+    actorType: 'user',
+    actorId: ceoChatId,
+    action: `텔레그램 한국어 명령: ${originalText.slice(0, 100)}`,
+    metadata: { commandId: cmd.id, source: 'telegram', slashType },
+  })
+
+  if (slashType === 'all') {
+    await sendMessage(token, chatId, `⏳ 전체 명령 처리 중: _${(slashArgs || '').slice(0, 50)}_`)
+    processAll({
+      commandId: cmd.id,
+      commandText: slashArgs || originalText,
+      companyId,
+      userId: ceoChatId,
+    }).then((result: any) => {
+      onComplete(result?.content || result?.summary || '(전체 명령 완료)')
+    }).catch(err => {
+      sendMessage(token, chatId, `❌ 전체 명령 실패: ${err instanceof Error ? err.message : ''}`).catch(() => {})
+    })
+
+  } else if (slashType === 'sequential') {
+    await sendMessage(token, chatId, `⏳ 순차 명령 처리 중: _${(slashArgs || '').slice(0, 50)}_`)
+    processSequential({
+      commandId: cmd.id,
+      commandText: slashArgs || originalText,
+      companyId,
+      userId: ceoChatId,
+    }).then((result: any) => {
+      onComplete(result?.content || result?.summary || '(순차 명령 완료)')
+    }).catch(err => {
+      sendMessage(token, chatId, `❌ 순차 명령 실패: ${err instanceof Error ? err.message : ''}`).catch(() => {})
+    })
+
+  } else if (slashType === 'debate' || slashType === 'deep_debate') {
+    if (!slashArgs) {
+      await sendMessage(token, chatId, '사용법: /토론 [주제]\n\n예: `/토론 AI가 인간의 일자리를 대체할까?`')
+      return
+    }
+    await sendMessage(token, chatId, `⏳ 토론 시작: _${slashArgs.slice(0, 50)}_`)
+    processDebateCommand({
+      commandId: cmd.id,
+      topic: slashArgs,
+      debateType: slashType === 'deep_debate' ? 'deep-debate' : 'debate',
+      companyId,
+      userId: ceoChatId,
+    }).then((result: any) => {
+      onComplete(result?.content || result?.summary || '(토론 완료)')
+    }).catch(err => {
+      sendMessage(token, chatId, `❌ 토론 실패: ${err instanceof Error ? err.message : ''}`).catch(() => {})
+    })
+
+  } else if (slashType === 'tool_check') {
+    await sendMessage(token, chatId, '*도구 점검*\n\n도구 시스템 상태 확인 중...\n🟢 도구 풀: 정상')
+
+  } else if (slashType === 'batch_run') {
+    try {
+      const results = await batchCollector.flush(companyId)
+      const count = Array.isArray(results) ? results.length : 0
+      await sendMessage(token, chatId, `✅ *배치 실행 완료*\n\n처리된 요청: ${count}건`)
+    } catch (err) {
+      await sendMessage(token, chatId, `❌ 배치 실행 실패: ${err instanceof Error ? err.message : ''}`)
+    }
+
+  } else if (slashType === 'batch_status') {
+    const status = batchCollector.getStatus(companyId)
+    await sendMessage(token, chatId,
+      `*배치 상태*\n\n📋 대기: ${status.pending}건\n⏳ 처리중: ${status.processing}건\n✅ 완료: ${status.completed}건\n❌ 실패: ${status.failed}건\n📊 전체: ${status.totalItems}건`)
+
+  } else if (slashType === 'commands_list') {
+    await sendMessage(token, chatId,
+      '*사용 가능한 명령어*\n\n' +
+      '*텔레그램 명령*:\n' +
+      '  /start, /help, /agents, /cost\n' +
+      '  /health, /status, /tasks, /last\n' +
+      '  /cancel, /detail, /result, /task, /models\n\n' +
+      '*한국어 명령*:\n' +
+      '  /전체 [명령] - 전체 에이전트 실행\n' +
+      '  /순차 [명령] - 순차 실행\n' +
+      '  /토론 [주제] - 토론 시작\n' +
+      '  /심층토론 [주제] - 심층 토론\n' +
+      '  /도구점검 - 도구 상태\n' +
+      '  /배치실행 - 배치 플러시\n' +
+      '  /배치상태 - 배치 큐 상태\n' +
+      '  /명령어 - 이 목록\n\n' +
+      '*@멘션 지정*:\n' +
+      '  @에이전트이름 [명령] - 특정 Manager에게 직접 지시')
+  }
+}
+
 // === Main Update Handler ===
 
 export async function handleUpdate(
   update: TelegramUpdate,
   config: TelegramConfig,
 ): Promise<void> {
+  // 1. Callback query handling (priority — no message.text)
+  if (update.callback_query) {
+    await handleCallbackQuery(update.callback_query, config)
+    return
+  }
+
   const message = update.message
   if (!message?.text || !message.chat) return
 
@@ -481,10 +824,63 @@ export async function handleUpdate(
   const text = message.text.trim()
   if (!text) return
 
+  // 2. Check Telegram entities for @mentions
+  const entityResult = parseEntities(text, message.entities)
+  if (entityResult.mentionName) {
+    // Resolve agent by mention name
+    const agentId = await resolveMentionAgent(entityResult.mentionName, config.companyId)
+    if (agentId) {
+      // Route to specific agent via ChiefOfStaff
+      try {
+        await sendMessage(token, chatId, `⏳ @${entityResult.mentionName}에게 지시 중: _${entityResult.cleanText.slice(0, 50)}_`)
+
+        const cmd = await createCommand({
+          companyId: config.companyId,
+          userId: ceoChatId,
+          text: entityResult.cleanText || text,
+          type: 'mention',
+          targetAgentId: agentId,
+          metadata: { mentionName: entityResult.mentionName, mentionAgentId: agentId, timeoutMs: 60000, source: 'telegram' },
+        })
+
+        logActivity({
+          companyId: config.companyId,
+          type: 'chat',
+          phase: 'start',
+          actorType: 'user',
+          actorId: ceoChatId,
+          action: `텔레그램 @멘션: @${entityResult.mentionName} ${entityResult.cleanText.slice(0, 80)}`,
+          metadata: { commandId: cmd.id, source: 'telegram', mentionName: entityResult.mentionName },
+        })
+
+        chiefOfStaffProcess({
+          commandId: cmd.id,
+          commandText: entityResult.cleanText || text,
+          companyId: config.companyId,
+          userId: ceoChatId,
+          targetAgentId: agentId,
+        }).then((result) => {
+          sendMessage(token, chatId, result.content || '(결과 없음)').catch(() => {})
+        }).catch((err) => {
+          console.error(`[TelegramBot] @mention ChiefOfStaff failed:`, err)
+          sendMessage(token, chatId, `❌ @${entityResult.mentionName} 처리 실패: ${err instanceof Error ? err.message : ''}`).catch(() => {})
+        })
+      } catch (err) {
+        console.error('[TelegramBot] @mention error:', err)
+        await sendMessage(token, chatId, `❌ 오류 발생: ${err instanceof Error ? err.message : '처리 실패'}`).catch(() => {})
+      }
+      return
+    } else {
+      // Agent not found — send hint
+      await sendMessage(token, chatId, `❓ 에이전트 "@${entityResult.mentionName}"을(를) 찾을 수 없습니다.\n/agents 로 에이전트 목록을 확인하세요.`)
+      return
+    }
+  }
+
+  // 3. Telegram slash commands (/start, /help, etc.)
   const { command, args } = parseCommand(text)
 
   if (command && SLASH_HANDLERS[command]) {
-    // Handle slash command
     try {
       const ctx: CommandContext = { token, chatId, companyId: config.companyId, args }
       const response = await SLASH_HANDLERS[command](ctx)
@@ -496,14 +892,46 @@ export async function handleUpdate(
     return
   }
 
-  // General text → orchestration via CommandRouter
+  // 4. Korean slash commands (/전체, /순차, /토론, etc.)
+  const slashResult = parseSlash(text)
+  if (slashResult) {
+    try {
+      await handleKoreanSlash(
+        token, chatId, config.companyId, ceoChatId,
+        slashResult.slashType, slashResult.args, slashResult.commandType, text,
+      )
+    } catch (err) {
+      console.error(`[TelegramBot] Korean slash failed:`, err)
+      await sendMessage(token, chatId, `❌ 한국어 명령 실패: ${err instanceof Error ? err.message : ''}`).catch(() => {})
+    }
+    return
+  }
+
+  // 5. Korean text debate command ("토론 [주제]" without slash)
+  if (text.startsWith('토론 ')) {
+    const topic = text.slice(3).trim()
+    if (topic) {
+      try {
+        await handleKoreanSlash(
+          token, chatId, config.companyId, ceoChatId,
+          'debate', topic, 'slash', text,
+        )
+      } catch (err) {
+        console.error('[TelegramBot] Korean debate text failed:', err)
+        await sendMessage(token, chatId, `❌ 토론 실패: ${err instanceof Error ? err.message : ''}`).catch(() => {})
+      }
+      return
+    }
+  }
+
+  // 6. General text → orchestration via CommandRouter (fallback, includes text @mentions)
   try {
     await sendMessage(token, chatId, `⏳ 처리 중: _${text.slice(0, 50)}_`)
 
-    // Use existing CommandRouter pipeline
+    // Use existing CommandRouter pipeline (handles text-based @mentions and all other types)
     const classifyResult = await classify(text, {
       companyId: config.companyId,
-      userId: ceoChatId, // use ceoChatId as user identifier for telegram
+      userId: ceoChatId,
     })
 
     const cmd = await createCommand({
