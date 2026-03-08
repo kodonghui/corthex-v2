@@ -40,6 +40,7 @@ mock.module('../../db/schema', () => ({
   argosEvents: { id: 'id', companyId: 'company_id', triggerId: 'trigger_id', eventType: 'event_type', eventData: 'event_data', status: 'status', commandId: 'command_id', result: 'result', error: 'error', durationMs: 'duration_ms', processedAt: 'processed_at', createdAt: 'created_at' },
   agents: { id: 'id', name: 'name', companyId: 'company_id', isSecretary: 'is_secretary' },
   cronRuns: { companyId: 'company_id', createdAt: 'created_at' },
+  costRecords: { companyId: 'company_id', source: 'source', createdAt: 'created_at' },
   chatSessions: {},
   chatMessages: {},
   agentMemory: {},

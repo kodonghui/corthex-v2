@@ -2,7 +2,7 @@
 // Story 14-3: ARGOS Trigger Condition Auto-Collect
 
 import { db } from '../db'
-import { nightJobTriggers, argosEvents, agents, cronRuns } from '../db/schema'
+import { nightJobTriggers, argosEvents, agents, cronRuns, costRecords } from '../db/schema'
 import { eq, and, desc, sql, count } from 'drizzle-orm'
 import { z } from 'zod'
 
@@ -350,6 +350,9 @@ export async function getArgosStatus(companyId: string): Promise<{
   activeTriggersCount: number
   todayCost: number
   lastCheckAt: string | null
+  dataOkReason: string
+  aiOkReason: string
+  costBreakdown: { cronCost: number; llmCost: number }
 }> {
   // Active triggers count
   const [triggerCount] = await db
@@ -357,17 +360,34 @@ export async function getArgosStatus(companyId: string): Promise<{
     .from(nightJobTriggers)
     .where(and(eq(nightJobTriggers.companyId, companyId), eq(nightJobTriggers.isActive, true)))
 
-  // Today's cost from ARGOS-triggered executions
+  const activeTriggersCount = triggerCount?.count || 0
+
+  // Today's cost from cron runs
   const todayStart = new Date()
   todayStart.setHours(0, 0, 0, 0)
 
-  const [costResult] = await db
+  const [cronCostResult] = await db
     .select({ total: sql<number>`COALESCE(SUM(cost_micro), 0)::int` })
     .from(cronRuns)
     .where(and(
       eq(cronRuns.companyId, companyId),
       sql`${cronRuns.createdAt} >= ${todayStart}`,
     ))
+
+  // Today's LLM cost from cost_records (source = 'job')
+  const [llmCostResult] = await db
+    .select({ total: sql<number>`COALESCE(SUM(cost_usd_micro), 0)::int` })
+    .from(costRecords)
+    .where(and(
+      eq(costRecords.companyId, companyId),
+      eq(costRecords.source, 'job'),
+      sql`${costRecords.createdAt} >= ${todayStart}`,
+    ))
+
+  const cronCostMicro = cronCostResult?.total || 0
+  const llmCostMicro = llmCostResult?.total || 0
+  const cronCost = cronCostMicro / 1_000_000
+  const llmCost = llmCostMicro / 1_000_000
 
   // Last event check
   const [lastEvent] = await db
@@ -377,8 +397,16 @@ export async function getArgosStatus(companyId: string): Promise<{
     .orderBy(desc(argosEvents.createdAt))
     .limit(1)
 
-  // Check recent failures for AI OK/NG
-  const [failureCount] = await db
+  // Recent events stats (last 1 hour) for data OK/NG and AI OK/NG
+  const [recentTotal] = await db
+    .select({ count: count() })
+    .from(argosEvents)
+    .where(and(
+      eq(argosEvents.companyId, companyId),
+      sql`${argosEvents.createdAt} >= NOW() - INTERVAL '1 hour'`,
+    ))
+
+  const [recentFailed] = await db
     .select({ count: count() })
     .from(argosEvents)
     .where(and(
@@ -387,11 +415,71 @@ export async function getArgosStatus(companyId: string): Promise<{
       sql`${argosEvents.createdAt} >= NOW() - INTERVAL '1 hour'`,
     ))
 
+  const totalCount = recentTotal?.count || 0
+  const failedCount = recentFailed?.count || 0
+
+  // === Data OK/NG ===
+  let dataOk: boolean
+  let dataOkReason: string
+
+  if (activeTriggersCount === 0) {
+    dataOk = true
+    dataOkReason = '활성 트리거 없음'
+  } else if (totalCount === 0) {
+    dataOk = false
+    dataOkReason = '활성 트리거 있으나 최근 1시간 이벤트 없음'
+  } else if (totalCount > 0 && failedCount / totalCount >= 0.5) {
+    dataOk = false
+    dataOkReason = `최근 1시간 실패율 ${Math.round(failedCount / totalCount * 100)}% (${failedCount}/${totalCount}건)`
+  } else {
+    dataOk = true
+    dataOkReason = `최근 1시간 이벤트 ${totalCount}건, 실패 ${failedCount}건`
+  }
+
+  // === AI OK/NG ===
+  let aiOk: boolean
+  let aiOkReason: string
+
+  if (failedCount >= 3) {
+    aiOk = false
+    aiOkReason = `최근 1시간 실패 ${failedCount}건 (임계값: 3건)`
+  } else if (totalCount > 0 && failedCount / totalCount >= 0.5) {
+    aiOk = false
+    aiOkReason = `최근 1시간 실패율 ${Math.round(failedCount / totalCount * 100)}% (${failedCount}/${totalCount}건)`
+  } else {
+    aiOk = true
+    aiOkReason = totalCount > 0
+      ? `최근 1시간 실패 ${failedCount}/${totalCount}건`
+      : '최근 1시간 이벤트 없음'
+  }
+
+  // === Last Check At (evaluator vs event, whichever is newer) ===
+  let evaluatorLastCheck: Date | null = null
+  try {
+    const { getLastCheckAt } = await import('./argos-evaluator')
+    evaluatorLastCheck = getLastCheckAt()
+  } catch { /* evaluator may not be started */ }
+  const eventLastCheck = lastEvent?.createdAt || null
+
+  let lastCheckAt: string | null = null
+  if (evaluatorLastCheck && eventLastCheck) {
+    lastCheckAt = evaluatorLastCheck > eventLastCheck
+      ? evaluatorLastCheck.toISOString()
+      : eventLastCheck.toISOString()
+  } else if (evaluatorLastCheck) {
+    lastCheckAt = evaluatorLastCheck.toISOString()
+  } else if (eventLastCheck) {
+    lastCheckAt = eventLastCheck.toISOString()
+  }
+
   return {
-    dataOk: true, // Data sources availability (simplified: always OK if server running)
-    aiOk: (failureCount?.count || 0) < 3, // NG if 3+ failures in last hour
-    activeTriggersCount: triggerCount?.count || 0,
-    todayCost: (costResult?.total || 0) / 1_000_000, // micro to dollars
-    lastCheckAt: lastEvent?.createdAt?.toISOString() || null,
+    dataOk,
+    aiOk,
+    activeTriggersCount,
+    todayCost: cronCost + llmCost,
+    lastCheckAt,
+    dataOkReason,
+    aiOkReason,
+    costBreakdown: { cronCost, llmCost },
   }
 }
