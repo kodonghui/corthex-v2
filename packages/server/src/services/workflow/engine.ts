@@ -1,213 +1,266 @@
 import { db } from '../../db'
 import { workflows, workflowExecutions } from '../../db/schema'
-import { eq, and } from 'drizzle-orm'
-import { toolPool } from '../tool-pool'
+import { eq, and, desc, sql } from 'drizzle-orm'
+
+// === Step Type Definitions ===
 
 export interface WorkflowStep {
   id: string
-  type: string
+  name: string
+  type: 'tool' | 'llm' | 'condition'
   action: string
   params?: Record<string, any>
+  agentId?: string
   dependsOn?: string[]
+  // condition 전용
+  trueBranch?: string
+  falseBranch?: string
+  // llm 전용
+  systemPrompt?: string
+  // 공통
+  timeout?: number
+  retryCount?: number
 }
 
-export interface WorkflowContext {
-  executionId: string
-  workflowId: string
-  companyId: string
-  state: Record<string, any>
+// === DAG Validation ===
+
+export interface DagValidationResult {
+  valid: boolean
+  errors: string[]
+  layers?: WorkflowStep[][] // topologically sorted layers (for parallel execution)
 }
 
-// 간단한 DAG (Directed Acyclic Graph) 실행 엔진
-export class WorkflowEngine {
-  
-  static async startExecution(workflowId: string, companyId: string, triggeredBy: string) {
-    const workflow = await db.query.workflows.findFirst({
-      where: and(
-        eq(workflows.id, workflowId),
-        eq(workflows.companyId, companyId),
-        eq(workflows.isActive, true)
-      )
-    })
+/**
+ * DAG 유효성 검증: 순환 참조 탐지 + stepId 참조 검증 + condition 분기 검증
+ */
+export function validateDag(steps: WorkflowStep[]): DagValidationResult {
+  const errors: string[] = []
+  const stepIds = new Set(steps.map(s => s.id))
 
-    if (!workflow) {
-      throw new Error(`Workflow ${workflowId} not found or inactive`)
+  // 1. stepId 중복 검사
+  if (stepIds.size !== steps.length) {
+    const seen = new Set<string>()
+    for (const s of steps) {
+      if (seen.has(s.id)) errors.push(`중복된 스텝 ID: ${s.id}`)
+      seen.add(s.id)
+    }
+  }
+
+  // 2. dependsOn 참조 검증
+  for (const step of steps) {
+    if (step.dependsOn) {
+      for (const dep of step.dependsOn) {
+        if (!stepIds.has(dep)) {
+          errors.push(`스텝 "${step.name}"(${step.id})의 dependsOn이 존재하지 않는 스텝을 참조: ${dep}`)
+        }
+        if (dep === step.id) {
+          errors.push(`스텝 "${step.name}"(${step.id})이 자기 자신을 참조`)
+        }
+      }
+    }
+  }
+
+  // 3. condition 분기 검증
+  for (const step of steps) {
+    if (step.type === 'condition') {
+      if (step.trueBranch && !stepIds.has(step.trueBranch)) {
+        errors.push(`스텝 "${step.name}"의 trueBranch가 존재하지 않는 스텝을 참조: ${step.trueBranch}`)
+      }
+      if (step.falseBranch && !stepIds.has(step.falseBranch)) {
+        errors.push(`스텝 "${step.name}"의 falseBranch가 존재하지 않는 스텝을 참조: ${step.falseBranch}`)
+      }
+    }
+  }
+
+  if (errors.length > 0) {
+    return { valid: false, errors }
+  }
+
+  // 4. Kahn's algorithm으로 순환 참조 탐지 + 레이어 분류
+  const inDegree: Record<string, number> = {}
+  const graph: Record<string, string[]> = {}
+  const stepMap = new Map<string, WorkflowStep>()
+
+  for (const s of steps) {
+    stepMap.set(s.id, s)
+    inDegree[s.id] = 0
+    graph[s.id] = []
+  }
+
+  for (const s of steps) {
+    if (s.dependsOn) {
+      for (const dep of s.dependsOn) {
+        graph[dep].push(s.id)
+        inDegree[s.id]++
+      }
+    }
+  }
+
+  const layers: WorkflowStep[][] = []
+  let queue = Object.keys(inDegree).filter(id => inDegree[id] === 0)
+
+  while (queue.length > 0) {
+    layers.push(queue.map(id => stepMap.get(id)!))
+    const nextQueue: string[] = []
+    for (const id of queue) {
+      for (const neighbor of graph[id]) {
+        inDegree[neighbor]--
+        if (inDegree[neighbor] === 0) {
+          nextQueue.push(neighbor)
+        }
+      }
+    }
+    queue = nextQueue
+  }
+
+  const visitedCount = layers.reduce((acc, l) => acc + l.length, 0)
+  if (visitedCount !== steps.length) {
+    return { valid: false, errors: ['워크플로우에 순환 의존성이 있습니다'] }
+  }
+
+  return { valid: true, errors: [], layers }
+}
+
+// === Workflow Service (CRUD) ===
+
+export class WorkflowService {
+
+  /** 워크플로우 생성 */
+  static async create(params: {
+    companyId: string
+    name: string
+    description?: string
+    steps: WorkflowStep[]
+    createdBy: string
+  }) {
+    // DAG 유효성 검증
+    const validation = validateDag(params.steps)
+    if (!validation.valid) {
+      return { success: false as const, errors: validation.errors }
     }
 
-    const [execution] = await db.insert(workflowExecutions)
+    const [workflow] = await db.insert(workflows)
       .values({
-        workflowId,
-        companyId,
-        status: 'running',
-        stepSummaries: [],
-        totalDurationMs: 0,
-        triggeredBy
+        companyId: params.companyId,
+        name: params.name,
+        description: params.description ?? null,
+        steps: params.steps,
+        createdBy: params.createdBy,
       })
       .returning()
 
-    this.runDag(workflow, execution.id, companyId).catch(async (err) => {
-      console.error(`Workflow ${execution.id} failed:`, err)
-      await this.markFailed(execution.id, companyId, err.message, 0)
+    return { success: true as const, data: workflow }
+  }
+
+  /** 워크플로우 목록 조회 (활성만, 최신순) */
+  static async list(companyId: string, opts?: { page?: number; limit?: number }) {
+    const page = opts?.page ?? 1
+    const limit = opts?.limit ?? 20
+    const offset = (page - 1) * limit
+
+    const [results, countResult] = await Promise.all([
+      db.query.workflows.findMany({
+        where: and(
+          eq(workflows.companyId, companyId),
+          eq(workflows.isActive, true),
+        ),
+        orderBy: [desc(workflows.createdAt)],
+        limit,
+        offset,
+      }),
+      db.select({ count: sql<number>`count(*)::int` })
+        .from(workflows)
+        .where(and(
+          eq(workflows.companyId, companyId),
+          eq(workflows.isActive, true),
+        )),
+    ])
+
+    return {
+      data: results,
+      meta: { page, total: countResult[0]?.count ?? 0 },
+    }
+  }
+
+  /** 워크플로우 단건 조회 (최근 실행 이력 5건 포함) */
+  static async getById(id: string, companyId: string) {
+    const workflow = await db.query.workflows.findFirst({
+      where: and(
+        eq(workflows.id, id),
+        eq(workflows.companyId, companyId),
+        eq(workflows.isActive, true),
+      ),
     })
 
-    return execution
-  }
+    if (!workflow) return null
 
-  private static async runDag(workflow: typeof workflows.$inferSelect, executionId: string, companyId: string) {
-    const steps = workflow.steps as WorkflowStep[]
-    if (!steps || steps.length === 0) {
-      return this.markCompleted(executionId, companyId, [], 0)
-    }
-
-    const layers = this.topologicalSort(steps)
-
-    let currentState: Record<string, any> = {}
-    let currentSummaries: any[] = []
-    const startTime = Date.now()
-
-    try {
-      for (const layer of layers) {
-        
-        const stepPromises = layer.map(async (step) => {
-          const result = await this.executeStep(step, currentState, companyId)
-          return { stepId: step.id, action: step.action, status: 'success', result }
-        })
-
-        const layerResults = await Promise.all(stepPromises)
-
-        for (const res of layerResults) {
-          currentState[res.stepId] = res.result
-          currentSummaries.push(res)
-        }
-
-        await db.update(workflowExecutions)
-          .set({ stepSummaries: currentSummaries })
-          .where(eq(workflowExecutions.id, executionId))
-      }
-
-      await this.markCompleted(executionId, companyId, currentSummaries, Date.now() - startTime)
-
-    } catch (error: any) {
-      currentSummaries.push({ error: error.message, status: 'failed' })
-      await this.markFailed(executionId, companyId, currentSummaries, Date.now() - startTime)
-      throw error
-    }
-  }
-
-  private static async executeStep(step: WorkflowStep, currentState: Record<string, any>, companyId: string) {
-    const injectedParams = this.injectContext(step.params || {}, currentState)
-
-    if (step.type === 'tool') {
-      return await toolPool.execute(step.action, injectedParams, {
-        companyId,
-        agentId: 'system-workflow',
-        agentName: 'Workflow Engine'
-      })
-    } else if (step.type === 'llm') {
-      return { msg: 'LLM step placeholder', input: injectedParams }
-    } else {
-      return { msg: 'Unknown step type' }
-    }
-  }
-
-  private static injectContext(params: Record<string, any>, state: Record<string, any>): Record<string, any> {
-    const injected: Record<string, any> = {}
-    
-    for (const [key, val] of Object.entries(params)) {
-      if (typeof val === 'string') {
-        const match = val.match(/^\{\{(.+)\}\}$/)
-        if (match) {
-          const path = match[1].split('.')
-          let current: any = state
-          for (const p of path) {
-            current = current ? current[p] : undefined
-          }
-          injected[key] = current
-        } else {
-          injected[key] = val
-        }
-      } else if (typeof val === 'object' && val !== null) {
-        injected[key] = this.injectContext(val, state)
-      } else {
-        injected[key] = val
-      }
-    }
-
-    return injected
-  }
-
-  static topologicalSort(steps: WorkflowStep[]): WorkflowStep[][] {
-    const inDegree: Record<string, number> = {}
-    const graph: Record<string, string[]> = {}
-    const stepMap = new Map<string, WorkflowStep>()
-
-    steps.forEach(s => {
-      stepMap.set(s.id, s)
-      inDegree[s.id] = 0
-      graph[s.id] = []
+    // 최근 실행 이력 5건
+    const recentExecutions = await db.query.workflowExecutions.findMany({
+      where: and(
+        eq(workflowExecutions.workflowId, id),
+        eq(workflowExecutions.companyId, companyId),
+      ),
+      orderBy: [desc(workflowExecutions.createdAt)],
+      limit: 5,
     })
 
-    steps.forEach(s => {
-      if (s.dependsOn) {
-        s.dependsOn.forEach((dep: string) => {
-          if (!graph[dep]) graph[dep] = []
-          graph[dep].push(s.id)
-          inDegree[s.id] = (inDegree[s.id] || 0) + 1
-        })
-      }
-    })
-
-    const layers: WorkflowStep[][] = []
-    let queue: string[] = Object.keys(inDegree).filter(id => inDegree[id] === 0)
-
-    while (queue.length > 0) {
-      const currentLayerSteps = queue.map(id => stepMap.get(id)!)
-      layers.push(currentLayerSteps)
-      
-      const nextQueue: string[] = []
-      
-      for (const currentId of queue) {
-        if (graph[currentId]) {
-          for (const neighbor of graph[currentId]) {
-            inDegree[neighbor]--
-            if (inDegree[neighbor] === 0) {
-              nextQueue.push(neighbor)
-            }
-          }
-        }
-      }
-      queue = nextQueue
-    }
-
-    const visitedCount = layers.reduce((acc, layer) => acc + layer.length, 0)
-    if (visitedCount !== steps.length) {
-      throw new Error('Cyclic dependency detected in workflow steps')
-    }
-
-    return layers
+    return { ...workflow, recentExecutions }
   }
 
-  private static async markCompleted(executionId: string, companyId: string, summaries: any[], durationMs: number) {
-    await db.update(workflowExecutions)
+  /** 워크플로우 수정 */
+  static async update(id: string, companyId: string, updates: {
+    name?: string
+    description?: string
+    steps?: WorkflowStep[]
+  }) {
+    // 존재 여부 + 활성 상태 확인
+    const existing = await db.query.workflows.findFirst({
+      where: and(
+        eq(workflows.id, id),
+        eq(workflows.companyId, companyId),
+      ),
+    })
+
+    if (!existing) return { success: false as const, error: 'NOT_FOUND' as const }
+    if (!existing.isActive) return { success: false as const, error: 'INACTIVE' as const }
+
+    // steps 변경 시 DAG 유효성 검증
+    if (updates.steps) {
+      const validation = validateDag(updates.steps)
+      if (!validation.valid) {
+        return { success: false as const, error: 'INVALID_DAG' as const, errors: validation.errors }
+      }
+    }
+
+    const [updated] = await db.update(workflows)
       .set({
-        status: 'success',
-        stepSummaries: summaries,
-        totalDurationMs: durationMs
+        ...(updates.name !== undefined && { name: updates.name }),
+        ...(updates.description !== undefined && { description: updates.description }),
+        ...(updates.steps !== undefined && { steps: updates.steps }),
+        updatedAt: new Date(),
       })
-      .where(and(eq(workflowExecutions.id, executionId), eq(workflowExecutions.companyId, companyId)))
+      .where(and(eq(workflows.id, id), eq(workflows.companyId, companyId)))
+      .returning()
+
+    return { success: true as const, data: updated }
   }
 
-  private static async markFailed(executionId: string, companyId: string, summariesOrError: any, durationMs: number) {
-    const errorDetails = typeof summariesOrError === 'string' 
-      ? [{ error: summariesOrError, status: 'failed' }] 
-      : summariesOrError
+  /** 워크플로우 소프트 삭제 */
+  static async softDelete(id: string, companyId: string) {
+    const existing = await db.query.workflows.findFirst({
+      where: and(
+        eq(workflows.id, id),
+        eq(workflows.companyId, companyId),
+        eq(workflows.isActive, true),
+      ),
+    })
 
-    await db.update(workflowExecutions)
-      .set({
-        status: 'failed',
-        stepSummaries: errorDetails,
-        totalDurationMs: durationMs
-      })
-      .where(and(eq(workflowExecutions.id, executionId), eq(workflowExecutions.companyId, companyId)))
+    if (!existing) return { success: false as const, error: 'NOT_FOUND' as const }
+
+    await db.update(workflows)
+      .set({ isActive: false, updatedAt: new Date() })
+      .where(and(eq(workflows.id, id), eq(workflows.companyId, companyId)))
+
+    return { success: true as const }
   }
 }

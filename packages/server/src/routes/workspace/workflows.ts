@@ -1,197 +1,153 @@
 import { Hono } from 'hono'
 import { z } from 'zod'
 import { zValidator } from '@hono/zod-validator'
-import { db } from '../../db'
-import { workflows } from '../../db/schema'
-import { eq, and } from 'drizzle-orm'
-import { HTTPError } from '../../middleware/error'
-import { authMiddleware } from '../../middleware/auth'
 import { isCeoOrAbove } from '@corthex/shared'
 import type { AppEnv } from '../../types'
-import { WorkflowEngine } from '../../services/workflow/engine'
+import { HTTPError } from '../../middleware/error'
+import { authMiddleware } from '../../middleware/auth'
+import { WorkflowService } from '../../services/workflow/engine'
+
+// === Zod Schemas ===
+
+export const StepSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().min(1).max(100),
+  type: z.enum(['tool', 'llm', 'condition']),
+  action: z.string().min(1),
+  params: z.record(z.any()).optional(),
+  agentId: z.string().uuid().optional(),
+  dependsOn: z.array(z.string().uuid()).optional(),
+  trueBranch: z.string().uuid().optional(),
+  falseBranch: z.string().uuid().optional(),
+  systemPrompt: z.string().optional(),
+  timeout: z.number().int().min(1000).max(300000).optional(),
+  retryCount: z.number().int().min(0).max(3).optional(),
+})
+
+const CreateWorkflowSchema = z.object({
+  name: z.string().min(1).max(200),
+  description: z.string().max(2000).optional(),
+  steps: z.array(StepSchema).min(1).max(20),
+})
+
+const UpdateWorkflowSchema = z.object({
+  name: z.string().min(1).max(200).optional(),
+  description: z.string().max(2000).optional(),
+  steps: z.array(StepSchema).min(1).max(20).optional(),
+}).refine(
+  (data) => data.name !== undefined || data.description !== undefined || data.steps !== undefined,
+  { message: '최소 하나의 필드(name, description, steps)가 필요합니다' }
+)
+
+const ListQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+})
+
+// === Routes ===
 
 export const workflowsRoute = new Hono<AppEnv>()
 
 workflowsRoute.use('*', authMiddleware)
 
-// StepSchema Definition
-export const StepSchema = z.object({
-  id: z.string().uuid(),
-  type: z.enum(['tool', 'llm', 'condition']),
-  action: z.string(),
-  params: z.record(z.any()).optional(),
-  dependsOn: z.array(z.string().uuid()).optional()
-})
+/** CEO/Admin 권한 확인 헬퍼 */
+function requireCeoOrAdmin(tenant: { role: string; isAdminUser?: boolean }) {
+  if (!isCeoOrAbove(tenant.role as any) && !tenant.isAdminUser) {
+    throw new HTTPError(403, 'CEO 또는 관리자 권한이 필요합니다', 'FORBIDDEN')
+  }
+}
 
-export type WorkflowStep = z.infer<typeof StepSchema>
-
-// Create Workflow
+// POST /workflows -- 워크플로우 생성
 workflowsRoute.post(
   '/workflows',
-  zValidator(
-    'json',
-    z.object({
-      name: z.string().min(1).max(255),
-      description: z.string().optional(),
-      steps: z.array(StepSchema).max(20)
-    })
-  ),
+  zValidator('json', CreateWorkflowSchema),
   async (c) => {
     const tenant = c.get('tenant')
-    
-    if (!isCeoOrAbove(tenant.role) && !tenant.isAdminUser) {
-      throw new HTTPError(403, '관리자/CEO 권한이 필요합니다.', 'FORBIDDEN')
+    requireCeoOrAdmin(tenant)
+
+    const body = c.req.valid('json')
+    const result = await WorkflowService.create({
+      companyId: tenant.companyId,
+      name: body.name,
+      description: body.description,
+      steps: body.steps,
+      createdBy: tenant.userId,
+    })
+
+    if (!result.success) {
+      throw new HTTPError(400, `DAG 유효성 검증 실패: ${result.errors.join('; ')}`, 'INVALID_DAG')
     }
 
-    const { name, description, steps } = c.req.valid('json')
-
-    const [workflow] = await db.insert(workflows)
-      .values({
-        companyId: tenant.companyId,
-        name,
-        description,
-        steps,
-        createdBy: tenant.userId
-      })
-      .returning()
-
-    return c.json({ data: workflow }, 201)
+    return c.json({ success: true, data: result.data }, 201)
   }
 )
 
-// List Workflows
-workflowsRoute.get('/workflows', async (c) => {
-  const tenant = c.get('tenant')
+// GET /workflows -- 워크플로우 목록 조회
+workflowsRoute.get(
+  '/workflows',
+  zValidator('query', ListQuerySchema),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const { page, limit } = c.req.valid('query')
 
-  const results = await db.query.workflows.findMany({
-    where: and(
-      eq(workflows.companyId, tenant.companyId),
-      eq(workflows.isActive, true)
-    ),
-    orderBy: (workflows, { desc }) => [desc(workflows.createdAt)]
-  })
+    const result = await WorkflowService.list(tenant.companyId, { page, limit })
+    return c.json({ success: true, data: result.data, meta: result.meta })
+  }
+)
 
-  return c.json({ data: results })
-})
-
-// Get Single Workflow
+// GET /workflows/:id -- 워크플로우 단건 조회
 workflowsRoute.get('/workflows/:id', async (c) => {
   const tenant = c.get('tenant')
   const id = c.req.param('id')
 
-  const workflow = await db.query.workflows.findFirst({
-    where: and(
-      eq(workflows.id, id),
-      eq(workflows.companyId, tenant.companyId),
-      eq(workflows.isActive, true)
-    )
-  })
-
+  const workflow = await WorkflowService.getById(id, tenant.companyId)
   if (!workflow) {
-    throw new HTTPError(404, '워크플로우를 찾을 수 없습니다.', 'NOT_FOUND')
+    throw new HTTPError(404, '워크플로우를 찾을 수 없습니다', 'NOT_FOUND')
   }
 
-  return c.json({ data: workflow })
+  return c.json({ success: true, data: workflow })
 })
 
-// Update Workflow
+// PUT /workflows/:id -- 워크플로우 수정
 workflowsRoute.put(
   '/workflows/:id',
-  zValidator(
-    'json',
-    z.object({
-      name: z.string().min(1).max(255).optional(),
-      description: z.string().optional(),
-      steps: z.array(StepSchema).max(20).optional()
-    })
-  ),
+  zValidator('json', UpdateWorkflowSchema),
   async (c) => {
     const tenant = c.get('tenant')
-
-    if (!isCeoOrAbove(tenant.role) && !tenant.isAdminUser) {
-      throw new HTTPError(403, '관리자/CEO 권한이 필요합니다.', 'FORBIDDEN')
-    }
+    requireCeoOrAdmin(tenant)
 
     const id = c.req.param('id')
     const updates = c.req.valid('json')
 
-    // 존재 여부 및 권한 확인
-    const existing = await db.query.workflows.findFirst({
-      where: and(
-        eq(workflows.id, id),
-        eq(workflows.companyId, tenant.companyId),
-        eq(workflows.isActive, true)
-      )
-    })
+    const result = await WorkflowService.update(id, tenant.companyId, updates)
 
-    if (!existing) {
-      throw new HTTPError(404, '워크플로우를 찾을 수 없습니다.', 'NOT_FOUND')
-    }
-
-    const [updated] = await db.update(workflows)
-      .set({
-        ...updates,
-        updatedAt: new Date()
-      })
-      .where(and(eq(workflows.id, id), eq(workflows.companyId, tenant.companyId)))
-      .returning()
-
-    return c.json({ data: updated })
-  }
-)
-
-// Soft Delete Workflow
-workflowsRoute.delete(
-  '/workflows/:id',
-  async (c) => {
-    const tenant = c.get('tenant')
-
-    if (!isCeoOrAbove(tenant.role) && !tenant.isAdminUser) {
-      throw new HTTPError(403, '관리자/CEO 권한이 필요합니다.', 'FORBIDDEN')
-    }
-
-    const id = c.req.param('id')
-
-    const existing = await db.query.workflows.findFirst({
-      where: and(
-        eq(workflows.id, id),
-        eq(workflows.companyId, tenant.companyId),
-        eq(workflows.isActive, true)
-      )
-    })
-
-    if (!existing) {
-      throw new HTTPError(404, '워크플로우를 찾을 수 없습니다.', 'NOT_FOUND')
-    }
-
-    await db.update(workflows)
-      .set({
-        isActive: false,
-        updatedAt: new Date()
-      })
-      .where(and(eq(workflows.id, id), eq(workflows.companyId, tenant.companyId)))
-
-    return c.json({ success: true, message: '워크플로우가 삭제되었습니다.' })
-  }
-)
-
-// Execute Workflow
-workflowsRoute.post(
-  '/workflows/:id/execute',
-  async (c) => {
-    const tenant = c.get('tenant')
-
-    const id = c.req.param('id')
-
-    try {
-      // WorkflowEngine.startExecution handles db check and throws if not found
-      const execution = await WorkflowEngine.startExecution(id, tenant.companyId, tenant.userId)
-      return c.json({ success: true, data: execution })
-    } catch (err: any) {
-      if (err.message.includes('not found')) {
-        throw new HTTPError(404, '워크플로우를 찾을 수 없거나 비활성화 상태입니다.', 'NOT_FOUND')
+    if (!result.success) {
+      if (result.error === 'NOT_FOUND') {
+        throw new HTTPError(404, '워크플로우를 찾을 수 없습니다', 'NOT_FOUND')
       }
-      throw new HTTPError(500, `실행 시작 실패: ${err.message}`, 'INTERNAL_ERROR')
+      if (result.error === 'INACTIVE') {
+        throw new HTTPError(400, '비활성 워크플로우는 수정할 수 없습니다', 'WORKFLOW_INACTIVE')
+      }
+      if (result.error === 'INVALID_DAG') {
+        throw new HTTPError(400, `DAG 유효성 검증 실패: ${(result as any).errors.join('; ')}`, 'INVALID_DAG')
+      }
     }
+
+    return c.json({ success: true, data: (result as any).data })
   }
 )
+
+// DELETE /workflows/:id -- 워크플로우 소프트 삭제
+workflowsRoute.delete('/workflows/:id', async (c) => {
+  const tenant = c.get('tenant')
+  requireCeoOrAdmin(tenant)
+
+  const id = c.req.param('id')
+  const result = await WorkflowService.softDelete(id, tenant.companyId)
+
+  if (!result.success) {
+    throw new HTTPError(404, '워크플로우를 찾을 수 없습니다', 'NOT_FOUND')
+  }
+
+  return c.json({ success: true, message: '워크플로우가 삭제되었습니다' })
+})
