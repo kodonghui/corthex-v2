@@ -24,6 +24,7 @@ import { sketchVibeNodeTypes, NODE_PALETTE, type SvNodeType } from '../component
 import { sketchVibeEdgeTypes } from '../components/nexus/editable-edge'
 import { ContextMenu } from '../components/nexus/context-menu'
 import { CanvasSidebar } from '../components/nexus/canvas-sidebar'
+import { useWsStore } from '../stores/ws-store'
 import type { Agent, Session } from '../components/chat/types'
 
 let nodeCounter = 0
@@ -46,6 +47,8 @@ interface SketchDetail {
   createdAt: string
   updatedAt: string
 }
+
+type CanvasSnapshot = { nodes: Node[]; edges: Edge[] }
 
 function NexusPageInner() {
   const queryClient = useQueryClient()
@@ -85,6 +88,14 @@ function NexusPageInner() {
 
   // Mobile: canvas or chat view
   const [mobileView, setMobileView] = useState<'canvas' | 'chat'>('canvas')
+
+  // === AI Canvas Command State ===
+  const [aiCommand, setAiCommand] = useState('')
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiError, setAiError] = useState('')
+  const [aiPreview, setAiPreview] = useState<{ nodes: Node[]; edges: Edge[]; description: string } | null>(null)
+  const [undoStack, setUndoStack] = useState<CanvasSnapshot[]>([])
+  const [redoStack, setRedoStack] = useState<CanvasSnapshot[]>([])
 
   // Agents & sessions
   const { data: agentsRes } = useQuery({
@@ -434,14 +445,152 @@ function NexusPageInner() {
     }
   }, [nodes, edges])
 
+  // === AI Canvas Command ===
+
+  const aiCommandMutation = useMutation({
+    mutationFn: (params: { command: string; graphData: { nodes: Node[]; edges: Edge[] } }) =>
+      api.post<{ data: { commandId: string; mermaid: string; description: string } }>(
+        '/workspace/sketches/ai-command',
+        params,
+      ),
+  })
+
+  const handleAiCommand = useCallback(async () => {
+    if (!aiCommand.trim() || aiLoading) return
+    setAiLoading(true)
+    setAiError('')
+    setAiPreview(null)
+
+    try {
+      const result = await aiCommandMutation.mutateAsync({
+        command: aiCommand.trim(),
+        graphData: getCleanGraphData(),
+      })
+
+      // Parse Mermaid response into preview nodes/edges
+      const parsed = mermaidToCanvas(result.data.mermaid)
+      if (parsed.error) {
+        setAiError(`Mermaid 파싱 오류: ${parsed.error}`)
+        return
+      }
+
+      // Inject callbacks into preview nodes/edges
+      const previewNodes = parsed.nodes.map((n) => ({
+        ...n,
+        data: { ...n.data, onLabelChange: handleLabelChange },
+      }))
+      const previewEdges = parsed.edges.map((e) => ({
+        ...e,
+        data: { ...e.data, onEdgeLabelChange: handleEdgeLabelChange },
+      }))
+
+      setAiPreview({
+        nodes: previewNodes,
+        edges: previewEdges,
+        description: result.data.description,
+      })
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'AI 명령 처리에 실패했습니다'
+      setAiError(message)
+    } finally {
+      setAiLoading(false)
+    }
+  }, [aiCommand, aiLoading, aiCommandMutation, getCleanGraphData, handleLabelChange, handleEdgeLabelChange])
+
+  // Apply AI preview
+  const handleApplyAiPreview = useCallback(() => {
+    if (!aiPreview) return
+    // Save current state to undo stack
+    setUndoStack((prev) => [...prev.slice(-19), { nodes: [...nodes], edges: [...edges] }])
+    setRedoStack([])
+    // Apply preview
+    setNodes(aiPreview.nodes)
+    setEdges(aiPreview.edges)
+    setDirty(true)
+    setAiPreview(null)
+    setAiCommand('')
+    setTimeout(() => reactFlowInstance?.fitView({ padding: 0.2 }), 100)
+  }, [aiPreview, nodes, edges, setNodes, setEdges, reactFlowInstance])
+
+  // Cancel AI preview
+  const handleCancelAiPreview = useCallback(() => {
+    setAiPreview(null)
+  }, [])
+
+  // Undo
+  const handleUndo = useCallback(() => {
+    if (undoStack.length === 0) return
+    const prev = undoStack[undoStack.length - 1]
+    setRedoStack((r) => [...r, { nodes: [...nodes], edges: [...edges] }])
+    setUndoStack((u) => u.slice(0, -1))
+    // Restore with callbacks
+    setNodes(prev.nodes.map((n) => ({ ...n, data: { ...n.data, onLabelChange: handleLabelChange } })))
+    setEdges(prev.edges.map((e) => ({ ...e, data: { ...e.data, onEdgeLabelChange: handleEdgeLabelChange } })))
+    setDirty(true)
+  }, [undoStack, nodes, edges, setNodes, setEdges, handleLabelChange, handleEdgeLabelChange])
+
+  // Redo
+  const handleRedo = useCallback(() => {
+    if (redoStack.length === 0) return
+    const next = redoStack[redoStack.length - 1]
+    setUndoStack((u) => [...u, { nodes: [...nodes], edges: [...edges] }])
+    setRedoStack((r) => r.slice(0, -1))
+    setNodes(next.nodes.map((n) => ({ ...n, data: { ...n.data, onLabelChange: handleLabelChange } })))
+    setEdges(next.edges.map((e) => ({ ...e, data: { ...e.data, onEdgeLabelChange: handleEdgeLabelChange } })))
+    setDirty(true)
+  }, [redoStack, nodes, edges, setNodes, setEdges, handleLabelChange, handleEdgeLabelChange])
+
+  // === WebSocket nexus channel listener ===
+  const { subscribe, addListener, removeListener, isConnected } = useWsStore()
+
+  useEffect(() => {
+    if (!isConnected) return
+    subscribe('nexus')
+  }, [isConnected, subscribe])
+
+  useEffect(() => {
+    const handleNexusMessage = (data: unknown) => {
+      const msg = data as { type?: string; mermaid?: string; description?: string; error?: string; command?: string }
+      if (!msg?.type) return
+
+      switch (msg.type) {
+        case 'canvas_ai_start':
+          setAiLoading(true)
+          setAiError('')
+          break
+        case 'canvas_update': {
+          if (!msg.mermaid) break
+          const parsed = mermaidToCanvas(msg.mermaid)
+          if (parsed.error) break
+          const pNodes = parsed.nodes.map((n) => ({
+            ...n,
+            data: { ...n.data, onLabelChange: handleLabelChange },
+          }))
+          const pEdges = parsed.edges.map((e) => ({
+            ...e,
+            data: { ...e.data, onEdgeLabelChange: handleEdgeLabelChange },
+          }))
+          setAiPreview({ nodes: pNodes, edges: pEdges, description: msg.description || '' })
+          setAiLoading(false)
+          break
+        }
+        case 'canvas_ai_error':
+          setAiError(msg.error || 'AI 오류')
+          setAiLoading(false)
+          break
+      }
+    }
+
+    addListener('nexus', handleNexusMessage)
+    return () => removeListener('nexus', handleNexusMessage)
+  }, [addListener, removeListener, handleLabelChange, handleEdgeLabelChange])
+
   // Context menu action handler
   const handleContextAction = useCallback(
     (action: { type: string; nodeId?: string; nodeType?: SvNodeType; position?: { x: number; y: number } }) => {
       setContextMenu(null)
       switch (action.type) {
         case 'edit-label': {
-          // Trigger edit by simulating double-click behavior
-          // Find the node and programmatically start editing
           if (action.nodeId) {
             setNodes((nds) =>
               nds.map((n) =>
@@ -545,6 +694,24 @@ function NexusPageInner() {
           title="Mermaid 코드 내보내기"
         >
           {exportCopied ? '복사됨!' : '내보내기'}
+        </button>
+
+        {/* Undo / Redo */}
+        <button
+          onClick={handleUndo}
+          disabled={undoStack.length === 0}
+          className="px-2 py-1 text-xs bg-zinc-700 hover:bg-zinc-600 disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-300 rounded transition-colors"
+          title="실행 취소"
+        >
+          ↩
+        </button>
+        <button
+          onClick={handleRedo}
+          disabled={redoStack.length === 0}
+          className="px-2 py-1 text-xs bg-zinc-700 hover:bg-zinc-600 disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-300 rounded transition-colors"
+          title="다시 실행"
+        >
+          ↪
         </button>
 
         {/* 에이전트 선택 */}
@@ -661,14 +828,36 @@ function NexusPageInner() {
             </button>
           </div>
 
+          {/* AI 프리뷰 오버레이 */}
+          {aiPreview && (
+            <div className="absolute top-2 right-2 z-20 bg-zinc-900/95 border border-indigo-500 rounded-lg shadow-xl p-3 w-72">
+              <p className="text-xs text-indigo-400 font-semibold mb-1">AI 제안</p>
+              <p className="text-xs text-zinc-300 mb-3">{aiPreview.description}</p>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleApplyAiPreview}
+                  className="flex-1 px-3 py-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors"
+                >
+                  적용
+                </button>
+                <button
+                  onClick={handleCancelAiPreview}
+                  className="flex-1 px-3 py-1.5 text-xs bg-zinc-700 hover:bg-zinc-600 text-zinc-300 rounded-lg transition-colors"
+                >
+                  취소
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* 캔버스 안내 (비어있을 때) */}
-          {nodes.length === 0 && (
+          {nodes.length === 0 && !aiPreview && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
               <div className="text-center text-zinc-500">
                 <p className="text-lg mb-2">여기에 그림을 그려보세요</p>
                 <p className="text-sm">왼쪽 위 "+ 노드" 버튼으로 노드를 추가하고,</p>
                 <p className="text-sm">드래그해서 연결하세요.</p>
-                <p className="text-sm mt-2">오른쪽 채팅에서 AI와 함께 토론할 수 있어요.</p>
+                <p className="text-sm mt-2">하단 AI 명령으로 자동 생성할 수도 있어요.</p>
               </div>
             </div>
           )}
@@ -676,11 +865,11 @@ function NexusPageInner() {
           {/* ReactFlow 캔버스 */}
           <div className="flex-1">
             <ReactFlow
-              nodes={nodes}
-              edges={edges}
-              onNodesChange={handleNodesChange}
-              onEdgesChange={handleEdgesChange}
-              onConnect={onConnect}
+              nodes={aiPreview ? aiPreview.nodes : nodes}
+              edges={aiPreview ? aiPreview.edges : edges}
+              onNodesChange={aiPreview ? undefined : handleNodesChange}
+              onEdgesChange={aiPreview ? undefined : handleEdgesChange}
+              onConnect={aiPreview ? undefined : onConnect}
               nodeTypes={sketchVibeNodeTypes}
               edgeTypes={sketchVibeEdgeTypes}
               defaultEdgeOptions={{ type: 'editable' }}
@@ -688,9 +877,9 @@ function NexusPageInner() {
               fitViewOptions={{ padding: 0.3 }}
               minZoom={0.1}
               maxZoom={3}
-              nodesDraggable
-              nodesConnectable
-              deleteKeyCode={['Backspace', 'Delete']}
+              nodesDraggable={!aiPreview}
+              nodesConnectable={!aiPreview}
+              deleteKeyCode={aiPreview ? [] : ['Backspace', 'Delete']}
               panOnScroll
               zoomOnPinch
               proOptions={{ hideAttribution: true }}
@@ -698,8 +887,8 @@ function NexusPageInner() {
                 setShowToolbar(false)
                 setContextMenu(null)
               }}
-              onNodeContextMenu={(event, node) => handleContextMenu(event, node.id)}
-              onPaneContextMenu={(event) => handleContextMenu(event as unknown as React.MouseEvent)}
+              onNodeContextMenu={aiPreview ? undefined : (event, node) => handleContextMenu(event, node.id)}
+              onPaneContextMenu={aiPreview ? undefined : (event) => handleContextMenu(event as unknown as React.MouseEvent)}
             >
               <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#3f3f46" />
               <Controls />
@@ -711,11 +900,39 @@ function NexusPageInner() {
             </ReactFlow>
           </div>
 
+          {/* AI 명령 입력란 */}
+          <div className="px-3 py-2 border-t border-zinc-800 bg-zinc-900/90 flex items-center gap-2">
+            <span className="text-[10px] text-indigo-400 font-semibold shrink-0">AI</span>
+            <input
+              value={aiCommand}
+              onChange={(e) => setAiCommand(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleAiCommand() } }}
+              placeholder="예: DB 노드를 추가하고 API 서버에 연결해줘"
+              disabled={aiLoading}
+              className="flex-1 bg-zinc-800 border border-zinc-700 rounded px-2 py-1 text-xs text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-indigo-500 disabled:opacity-50"
+            />
+            <button
+              onClick={handleAiCommand}
+              disabled={!aiCommand.trim() || aiLoading}
+              className="px-3 py-1 text-xs bg-indigo-600 hover:bg-indigo-700 disabled:bg-zinc-700 disabled:text-zinc-500 text-white rounded transition-colors shrink-0"
+            >
+              {aiLoading ? '처리중...' : '전송'}
+            </button>
+          </div>
+
+          {/* AI 오류 표시 */}
+          {aiError && (
+            <div className="px-3 py-1 bg-red-900/30 border-t border-red-800">
+              <p className="text-[10px] text-red-400">{aiError}</p>
+            </div>
+          )}
+
           {/* 하단 상태바 */}
           <div className="px-3 py-1 border-t border-zinc-800 bg-zinc-900/80 flex items-center gap-3 text-[10px] text-zinc-500">
             <span>노드 {nodes.length}개</span>
             <span>연결 {edges.length}개</span>
             {dirty && <span className="text-amber-500">미저장</span>}
+            {undoStack.length > 0 && <span className="text-zinc-600">Undo {undoStack.length}</span>}
             <span className="hidden sm:inline">| 더블클릭: 이름 편집 | Delete: 삭제 | 핸들 드래그: 연결 | 우클릭: 메뉴</span>
           </div>
         </div>

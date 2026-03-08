@@ -8,6 +8,7 @@ import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { logActivity } from '../../lib/activity-logger'
 import { parseMermaid } from '@corthex/shared'
+import { interpretCanvasCommand } from '../../services/canvas-ai'
 import type { AppEnv } from '../../types'
 
 export const sketchesRoute = new Hono<AppEnv>()
@@ -219,5 +220,54 @@ sketchesRoute.post(
         warnings: result.warnings,
       },
     }, 201)
+  },
+)
+
+// POST /api/workspace/sketches/ai-command — AI 캔버스 명령
+const aiCommandSchema = z.object({
+  sketchId: z.string().optional(),
+  command: z.string().min(1, '명령을 입력하세요').max(2000, '명령이 너무 깁니다 (최대 2,000자)'),
+  graphData: z.object({
+    nodes: z.array(z.any()).default([]),
+    edges: z.array(z.any()).default([]),
+  }),
+})
+
+sketchesRoute.post(
+  '/ai-command',
+  zValidator('json', aiCommandSchema),
+  async (c) => {
+    const tenant = c.get('tenant')
+    const body = c.req.valid('json')
+
+    try {
+      const result = await interpretCanvasCommand({
+        command: body.command,
+        graphData: body.graphData,
+        companyId: tenant.companyId,
+        userId: tenant.userId,
+        sketchId: body.sketchId,
+      })
+
+      logActivity({
+        companyId: tenant.companyId,
+        type: 'system',
+        phase: 'end',
+        actorType: 'user',
+        actorId: tenant.userId,
+        action: `SketchVibe AI: ${body.command.slice(0, 60)}`,
+      })
+
+      return c.json({
+        data: {
+          commandId: result.commandId,
+          mermaid: result.mermaid,
+          description: result.description,
+        },
+      })
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'AI 명령 처리에 실패했습니다'
+      throw new HTTPError(500, message, 'SKETCH_AI_001')
+    }
   },
 )
