@@ -51,8 +51,16 @@ export function App() {
   const checkAuth = useAuthStore((s) => s.checkAuth)
 
   useEffect(() => {
-    const dark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    document.documentElement.classList.toggle('dark', dark)
+    const stored = localStorage.getItem('corthex_theme') as 'system' | 'light' | 'dark' | null
+    const theme = stored || 'system'
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark')
+    } else if (theme === 'light') {
+      document.documentElement.classList.remove('dark')
+    } else {
+      const dark = window.matchMedia('(prefers-color-scheme: dark)').matches
+      document.documentElement.classList.toggle('dark', dark)
+    }
   }, [])
 
   useEffect(() => {
