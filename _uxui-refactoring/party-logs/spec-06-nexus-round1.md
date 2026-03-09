@@ -1,54 +1,73 @@
-# Party Mode Log: spec-06-nexus — Round 1 (Collaborative)
-> 날짜: 2026-03-09
-> 문서: _uxui-refactoring/specs/06-nexus.md
-> 리뷰어: 7-expert panel
+# [Party Mode Round 1 -- Collaborative Review] Nexus / SketchVibe
 
----
+### Agent Discussion
 
-## Expert Debate
+**John (PM):** "WHY does this spec not mention keyboard shortcuts at all? v1 had Space bar for connection mode toggle and Ctrl+Click for multi-select. If a power user opens this tool and can't use keyboard shortcuts, they'll bounce immediately. The discoverability story is zero -- there's no shortcut overlay, no tooltip hints, nothing. WHY should the user care about a 'design tool' that doesn't respect design tool conventions? Every competitor -- Figma, Miro, Excalidraw -- has a `?` key for shortcut help. We need this."
 
-### 📋 John (PM)
-v1-feature-spec 7번 항목에 대한 체크리스트가 13개 항목으로 빠짐없이 정리되어 있어서 좋습니다. "UI 변경 시 절대 건드리면 안 되는 것" 목록도 명확해요. 다만 **에이전트 선택 드롭다운**이 문제점(#10)에는 언급되었지만, 개선 방향(섹션 4)이나 컴포넌트 목록(섹션 5)에 반영되지 않았습니다. 에이전트 선택 UI 개선이 빠지면 기존 기능 커버리지에 구멍이 생깁니다.
+**Winston (Architect):** "I see a practical scaling concern. The spec defines no performance boundaries. ReactFlow can handle ~200 nodes comfortably, but the current spec has zero guidance on what happens at 50, 100, or 500 nodes. Under load, the canvas will stutter, the AI preview overlay will block interaction, and the status bar node count becomes meaningless because the user can't see most nodes anyway. We need at minimum a soft warning at 50+ nodes and a documented expectation that the canvas targets up to 200 nodes. Also, the WebSocket reconnection section says 'warning text (red)' but provides no user action -- no reconnect button, no retry mechanism."
 
-### 🏗️ Winston (Architect)
-컴포넌트 목록이 6개로 비교적 간결하지만, **MermaidModal, AI 명령 입력, AI 프리뷰 오버레이, 상태바** 등이 별도 컴포넌트로 존재할 텐데 목록에 빠져 있습니다. 이들이 NexusPage 안에 인라인인지, 별도 컴포넌트인지 명확히 해야 구현 시 혼란이 없어요. 또한 ChatArea(채팅 패널)도 개선 대상인데 컴포넌트 목록에 없습니다.
+**Sally (UX):** "A real user working on a complex diagram would absolutely need multi-select and subgraph grouping. v1 had compound parent support and Ctrl+Click multi-select, but Section 9 (existing features checklist) doesn't mention either of these. If we lose these during UXUI refactoring, a user who built a complex 30-node diagram with subgroups in v1 will be stranded. Also, the AI command failure state just says 'red error text' -- but what error? 'Something went wrong' is useless. The user needs to know if it was a network issue, a parsing failure, or an AI timeout so they can decide whether to retry or rephrase."
 
-### 🎨 Sally (UX)
-노드 추가 → 배치 → 연결이라는 핵심 워크플로우가 2~3클릭으로 잘 설계되어 있어요. 빈 캔버스 안내 개선 방향도 좋습니다. 다만 **로딩 상태와 에러 상태의 UI 정의가 완전히 누락**되었습니다. 캔버스 목록을 불러오는 동안, AI 명령 처리 중, 저장 실패 시 등 각각의 상태에 대한 비주얼 가이드가 필요해요.
+**Amelia (Dev):** "`pages/nexus.tsx` has 7 inline components (items 7-12 in the component table). That's a massive single file. During UXUI refactoring, touching one inline component risks breaking others. The spec should at minimum note which inline components are candidates for extraction. Also, the `nexus-node-item` testid uses a `data-node-type` attribute but the spec doesn't define the 8 expected values for that attribute -- test authors will guess."
 
-### 💻 Amelia (Dev)
-data-testid 25개로 인터랙션 요소가 잘 커버되어 있습니다. 하지만 몇 가지 빠진 것이 있어요: (1) `nexus-autolayout-btn` — 자동 정렬(dagre) 버튼, (2) `nexus-new-btn` — 새 캔버스 버튼, (3) `nexus-clear-btn` — 캔버스 초기화 버튼, (4) `nexus-knowledge-btn` — 지식 베이스 저장 버튼, (5) `nexus-agent-select` — 에이전트 선택 드롭다운. 이 5개는 기존 기능에 포함된 인터랙티브 요소인데 testid가 없습니다.
+**Quinn (QA):** "What happens when WebSocket disconnects mid-AI-command? The spec defines WebSocket disconnection and AI command failure as separate states but never addresses the intersection. If I'm testing: user sends AI command -> WebSocket drops -> AI result arrives via HTTP fallback? Or does it just fail silently? Also, test item #15 (Undo/Redo) says 'add node then Undo' but doesn't specify whether keyboard shortcut Ctrl+Z or the button should be tested. We need both paths."
 
-### 🧪 Quinn (QA)
-테스트 항목 10개는 happy path 위주입니다. **엣지케이스 테스트가 부족해요**: (1) AI 명령 빈 텍스트 전송 시 비활성화 확인, (2) 캔버스 저장 실패 시 에러 표시, (3) Mermaid 코드 파싱 에러 시 피드백, (4) 노드 최대 개수 초과 시 처리. 또한 로딩 상태 테스트(캔버스 로딩 중 skeleton)도 추가되어야 합니다.
+**Mary (BA):** "The business case for the Mermaid import/export is interesting but the spec undersells it. In v1, Mermaid was the bridge between AI-generated diagrams and human-editable canvases. The spec mentions Mermaid modal has 'basic textarea, no code highlighting' as a problem (#6) but the fix in Section 4 doesn't explicitly address it -- it just says 'modal style improvement.' We need to be specific: syntax highlighting, line numbers, error gutter. This is a core differentiator, not a nice-to-have."
 
-### 🏃 Bob (SM)
-6개 컴포넌트 수정, API 변경 없음 — 범위 자체는 적절합니다. 하지만 **섹션 4.3 "인터랙션 개선"의 "AI 명령 자동완성", "키보드 단축키 힌트 표시"는 새로운 기능 추가**에 해당합니다. UI-only 범위를 명확히 하려면, 이 항목들은 "향후 개선" 또는 "범위 외"로 분리해야 합니다. 자동완성은 특히 백엔드 연동이 필요할 수 있어요.
+**Bob (SM):** "The scope of this spec is ambitious. 12 components, 8 node types, WebSocket, AI commands, Mermaid integration, chat panel, undo/redo -- and we're supposed to do 'UXUI only' without touching any logic. But the checklist in Section 9 mixes logic items (ReactFlow config, mutation handlers) with style items. The boundary is unclear. I need an explicit 'UXUI scope boundary' section that says: 'We change CSS/layout/markup only. We do NOT change: [list].' Without that, every developer will interpret the scope differently."
 
-### 📊 Mary (BA)
-SketchVibe는 "AI + 시각 도구" 조합으로 경쟁 제품 대비 독특한 가치를 제공합니다. Banana2 프롬프트가 Figma/Excalidraw/Miro를 참고하면서 CORTHEX의 AI 차별점을 잘 녹여냈어요. 비즈니스 가치가 명확하고, 기존 기능을 보존하면서 비주얼만 개선하는 방향이 안전합니다.
-
----
-
-## Cross-talk
-
-**Winston → Amelia:** 컴포넌트 목록에 빠진 요소들과 data-testid에 빠진 요소들이 겹치네요. MermaidModal, AI 입력, 상태바 등이 컴포넌트 목록에도, testid에도 보충이 필요합니다. 함께 정리하면 좋겠어요.
-
-**Amelia → Winston:** 맞아요. 특히 `nexus-mermaid-modal`은 testid에는 있는데 컴포넌트 목록에는 없어서 불일치가 생겼네요. 컴포넌트 목록을 보강하면 testid도 자연스럽게 정리될 거예요.
-
-**Bob → Sally:** 로딩/에러 상태 정의가 빠진 건 동의하는데, 로딩 skeleton 디자인을 새로 만드는 것도 범위 확장 아닌가요?
-
-**Sally → Bob:** 기존 앱에서 이미 skeleton 패턴을 쓰고 있다면 그걸 재사용하면 UI-only 범위 안이에요. 새 컴포넌트를 만드는 게 아니라 기존 skeleton을 적용하는 거니까요.
-
----
-
-## Issues Found
+### Issues Found
 
 | # | Severity | Raised By | Issue | Suggestion |
-|---|----------|-----------|-------|-----------|
-| 1 | High | Sally, Quinn | 로딩 상태, 에러 상태 UI 정의 완전 누락 | 섹션 3에 로딩/에러 상태 추가, 관련 testid 추가 |
-| 2 | Medium | Amelia | data-testid 5개 누락 (autolayout, new, clear, knowledge, agent-select) | 섹션 11 testid 목록에 추가 |
-| 3 | Medium | Winston, Amelia | 컴포넌트 목록 불완전 — MermaidModal, AI입력, 상태바, ChatArea, 에이전트 선택 누락 | 섹션 5 컴포넌트 테이블 보강 |
-| 4 | Medium | Bob | 섹션 4.3 "AI 자동완성", "키보드 단축키 힌트"는 UI-only 범위 초과 | 범위 외로 분리하거나 "향후 개선"으로 명시 |
-| 5 | Low | John | 에이전트 선택 드롭다운 개선이 문제점에만 있고 해결책 없음 | 개선 방향 및 컴포넌트 목록에 반영 |
-| 6 | Low | Quinn | 테스트 항목에 에러/엣지케이스 부족 | 에러 핸들링 테스트 3~4개 추가 |
+|---|----------|-----------|-------|------------|
+| 1 | High | John, Sally | 키보드 단축키 및 멀티선택/서브그래프 기능이 Section 9 체크리스트에 누락됨. v1에서 Space바 연결 모드, Ctrl+Click 멀티선택, compound parent가 있었으나 명시되지 않음. | Section 9에 멀티선택, 서브그래프 추가. 단축키 오버레이(`?` 키) 컴포넌트 추가. |
+| 2 | High | Winston | 대용량 캔버스 성능 경계 미정의. WebSocket 끊김 시 사용자 복구 액션(재연결 버튼) 없음. | 노드 50개+ 경고 상태 추가. WebSocket 끊김 상태에 재연결 버튼 추가. |
+| 3 | Medium | Sally | AI 명령 실패 시 에러 메시지가 "빨간 에러 텍스트"로만 정의 -- 원인 구분 없음. | 에러 유형별 메시지 가이드 추가 (네트워크/파싱/타임아웃). |
+| 4 | Medium | Mary | Mermaid 모달 개선이 Section 4에서 구체적이지 않음 (syntax highlighting, line numbers 등 미언급). | Section 4.2 또는 별도 항목으로 Mermaid 모달 구체 개선안 명시. (단, 현재 UXUI 범위에서는 스타일 수준으로 제한 가능) |
+
+### Consensus Status
+
+4개 이슈 중 #1, #2는 즉시 수정 합의. #3은 에러 텍스트에 "원인 요약" 추가로 합의. #4는 Mermaid 모달 개선은 스타일 범위 내에서 다루되, syntax highlighting은 향후 enhancement로 분리하기로 합의.
+
+주요 반대 의견 0개. 모든 전문가가 수정 방향에 동의.
+
+### Cross-talk
+
+**Winston -> Sally:** "WebSocket 끊김 + AI 명령 실패의 교차 상태를 네가 제기한 에러 메시지 구분과 연결하면, 에러 메시지에 '실시간 연결 끊김 -- 재연결 후 다시 시도하세요' 같은 구체적 안내를 넣을 수 있겠어."
+
+**Sally -> Winston:** "동의해요. 에러 원인별로 CTA(Call-to-Action)를 다르게 하면 사용자가 즉시 다음 행동을 알 수 있어요. 네트워크 에러면 '재연결 버튼', AI 타임아웃이면 '다시 시도' 버튼."
+
+**John -> Bob:** "Bob이 말한 'UXUI 범위 경계' 문제는 진짜 중요한데, Section 9에 이미 '절대 건드리면 안 되는 것' 목록이 있으니 그걸 'UXUI 범위 외'로 리라벨링하면 되지 않을까?"
+
+**Bob -> John:** "그 목록은 '건드리면 안 되는 로직'이지, '무엇을 변경하는가'는 아니에요. 양쪽 다 명시해야 범위가 선명해집니다."
+
+### v1-feature-spec Coverage Check
+
+| v1 기능 (Section 7) | 스펙 커버 여부 | 비고 |
+|---------------------|--------------|------|
+| 8종 노드 | O | Section 9 체크리스트 |
+| 드래그/편집/삭제 | O | |
+| 엣지 생성 | O | |
+| Mermaid 양방향 변환 | O | |
+| 저장/불러오기 | O | |
+| AI 자연어 명령 | O | |
+| AI 프리뷰 | O | |
+| Undo/Redo | O | |
+| 자동 정렬 (dagre) | O | |
+| 지식 베이스 저장 | O | |
+| 채팅+캔버스 컨텍스트 | O | |
+| WebSocket 실시간 | O | |
+| Command Center -> sessionStorage | O | |
+| 멀티선택 (Ctrl+Click) | **X -> 수정 완료** | Section 9에 추가 |
+| 서브그래프 그룹핑 | **X -> 수정 완료** | Section 9에 추가 |
+| Space바 연결 모드 | 해당 없음 (v2는 ReactFlow 드래그 핸들 방식) | v1 Cytoscape 전용 기능 |
+
+### Fixes Applied
+
+1. **Section 9**: 멀티선택(Ctrl+클릭/Shift+클릭), 서브그래프 그룹핑(compound parent) 체크리스트 항목 추가
+2. **상태별 UI 정의**: 대용량 캔버스 경고 (노드 50개+) 행 추가
+3. **상태별 UI 정의**: WebSocket 끊김 상태에 재연결 버튼 추가
+4. **상태별 UI 정의**: AI 명령 실패에 "원인 요약" 추가
+5. **Section 4.4**: 키보드 단축키 표시 섹션 신규 추가 (`?` 키 오버레이, Tab 포커스 이동)
+6. **Section 5**: KeyboardShortcutOverlay 컴포넌트 추가 (#13)
+7. **Section 11**: `nexus-keyboard-shortcuts`, `nexus-performance-warning` testid 추가

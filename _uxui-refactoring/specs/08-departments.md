@@ -50,8 +50,8 @@
 │ (●) 완료 대기 (권장)                               │
 │ ( ) 강제 종료                                     │
 │                                                  │
-│ * 학습 기록 아카이브 보존                            │
-│ * 비용 기록 영구 보존                              │
+│ * 학습 기록 → 아카이브에 보존됩니다                   │
+│ * 비용 기록 → 영구 보존됩니다 (삭제되지 않음)         │
 │                               [취소] [삭제 실행]   │
 └──────────────────────────────────────────────────┘
 ```
@@ -86,15 +86,16 @@
 - 부서 카드에서 바로 소속 에이전트 목록 프리뷰
 - 삭제 방식 선택 시 결과 미리보기 강화
 - **인라인 편집 전환 규칙**: 편집 중 다른 행의 편집 클릭 시, 현재 편집을 자동 취소하고 새 행으로 전환 (저장 확인 다이얼로그 없음 -- 경량 인라인 편집이므로)
+- **생성 모달 + 인라인 편집 충돌 규칙**: 생성 모달 열기 시 진행 중인 인라인 편집을 자동 취소 (두 편집 상태가 동시에 존재하지 않도록)
 
 ### 4.4 상태 UI 정의
 - **로딩 상태**: 테이블 영역에 skeleton 행 3~5개 표시 (shimmer 애니메이션)
 - **에러 상태**: 테이블 영역에 에러 메시지 + 재시도 버튼 표시
-- **생성 폼**: Banana2가 모달 또는 인라인 중 결정 (현재 인라인의 레이아웃 밀림 문제 해결 필요)
+- **생성 폼**: 모달로 확정 (인라인 레이아웃 밀림 문제 해결 + Playwright 테스트 일관성 확보). CreateDepartmentModal 컴포넌트 사용
 
 ### 4.5 부서 색상/아이콘
 - UI-only 시각 장식 (DB에 저장하지 않음)
-- 부서 인덱스 순서대로 사전 정의된 색상 팔레트에서 할당
+- **부서 ID 기반 해시로 색상 결정** (`colors[departmentId % palette.length]`) — 삭제/재생성 시 색상 안정성 보장
 - API 변경 없음
 
 ---
@@ -105,6 +106,7 @@
 |---|---------|---------|------|
 | 1 | DepartmentsPage | 전체 레이아웃 + 테이블 스타일 | pages/departments.tsx |
 | 2 | CascadeAnalysisModal | 영향 분석 모달 추출 + 스타일 개선 | components/cascade-analysis-modal.tsx |
+| 3 | CreateDepartmentModal | 부서 생성 모달 (인라인 폼 → 모달 전환) | components/create-department-modal.tsx |
 
 ---
 
@@ -113,8 +115,8 @@
 | 데이터 | 소스 | 용도 |
 |--------|------|------|
 | depts | useQuery → /admin/departments?companyId=X | 부서 목록 |
-| allAgents | useQuery → /admin/agents?companyId=X | 에이전트 수 계산 |
-| cascadeData | api.get → /admin/departments/:id/cascade-analysis | 삭제 영향 분석 |
+| allAgents | useQuery → /admin/agents?companyId=X | 에이전트 수 계산 (프론트에서 departmentId로 그룹핑 — API 변경 없음 원칙 유지. 서버에 agentCount가 있으면 우선 사용) |
+| cascadeData | api.get → /admin/departments/:id/cascade-analysis | 삭제 영향 분석. API 에러 시 모달 내부에 에러 메시지 + 재시도 버튼 표시 (모달은 닫지 않음) |
 | showCreate | useState | 생성 폼 토글 |
 | editId | useState | 인라인 편집 중인 부서 |
 | cascadeTarget | useState | 삭제 대상 부서 |
@@ -148,13 +150,17 @@
 |------------|---------|
 | **1440px+** (Desktop) | 전체 테이블 |
 | **768px~1439px** (Tablet) | 테이블 (설명 컬럼 숨김) |
-| **~375px** (Mobile) | 카드 리스트 |
+| **~375px** (Mobile) | 카드 리스트 — 카드 내용: 부서명 + 에이전트 수 뱃지 + 상태 뱃지, 편집/삭제는 kebab(⋮) 메뉴. 생성 폼은 풀스크린 모달. cascade 모달도 풀스크린 |
 
 ---
 
 ## 9. 기존 기능 참고사항
 
 v2 핵심 방향: "관리자가 부서를 자유롭게 생성-수정-삭제"
+
+**부서 상태 비즈니스 정의:**
+- **활성(active)**: 정상 운영 — 에이전트가 작업을 받을 수 있음
+- **비활성(inactive)**: 운영 중단 — 소속 에이전트에게 새 작업 배정 불가, 기존 진행 중 작업은 완료까지 허용. 비활성 부서는 삭제 시 cascade 분석에서 "진행 중 작업 0건"으로 표시될 수 있음. **비활성 부서도 이름/설명 편집 가능** (편집 버튼 숨기거나 비활성화하지 않음)
 
 - [x] 부서 CRUD
 - [x] 부서별 에이전트 수 표시
@@ -196,12 +202,12 @@ Required functional elements:
 1. Page header — "Department Management", department count, "+ New Department" button.
 2. Department table — columns: Name, Description, Agent Count (as badge), Status (active/inactive badge), Actions (edit, delete).
 3. Inline editing — when editing, the row transforms to show input fields with save/cancel buttons. Highlighted background to indicate edit mode.
-4. Create form — expandable form above table, or modal. Fields: name (required), description (optional).
+4. Create form — modal dialog. Fields: name (required), description (optional). Modal avoids layout shift.
 5. Cascade analysis modal — opened when deleting. Shows: 4 impact summary cards (agents, active tasks, knowledge records, cost). Agent breakdown list. Deletion mode selector (radio buttons with descriptions). Confirmation info. Cancel/Delete buttons.
 6. Empty state — when no departments exist (icon + message + "Create your first department" CTA button).
 7. Loading state — skeleton placeholder rows (3-5 shimmer rows) while data loads.
 8. Error state — centered error message with retry button when API call fails.
-9. Department color indicators — each department row has a small colored dot or left border stripe, cycling through a fixed palette by index (purely decorative, no data stored).
+9. Department color indicators — each department row has a small colored dot or left border stripe, color determined by department ID hash (colors[id % paletteLength]), purely decorative, no data stored. Colors remain stable when departments are deleted or reordered.
 
 Design tone — YOU DECIDE:
 - Admin management panel, clean and professional.
@@ -223,10 +229,10 @@ Mobile version (375x812) of the same department management page.
 IMPORTANT — Mobile context: BOTTOM TAB BAR and TOP HEADER already exist. Content area only.
 
 Mobile-specific:
-- Departments as cards instead of table
+- Departments as cards instead of table. Each card shows: department name, agent count badge, status badge. Edit/delete actions behind a kebab (⋮) menu.
 - Create form as full-screen modal
 - Cascade modal: full-screen with scrollable content
-- Inline editing: expand card into edit mode
+- Editing: prefer edit modal over inline card expansion (more consistent with create modal UX). Kebab menu opens a dropdown or action sheet with edit/delete options.
 
 Design tone: Same as desktop. YOU DECIDE.
 Resolution: 375x812, pixel-perfect mobile UI screenshot style.
@@ -267,6 +273,7 @@ Resolution: 375x812, pixel-perfect mobile UI screenshot style.
 | `departments-edit-name` | 이름 입력 필드 (편집) | 인라인 편집 이름 입력 |
 | `departments-edit-desc` | 설명 입력 필드 (편집) | 인라인 편집 설명 입력 |
 | `departments-retry-btn` | 재시도 버튼 | 에러 상태에서 재로드 |
+| `departments-status-badge` | 상태 뱃지 (활성/비활성) | 부서 상태 시각적 확인 |
 
 ---
 
@@ -286,5 +293,5 @@ Resolution: 375x812, pixel-perfect mobile UI screenshot style.
 | 10 | 편집 취소 | 수정 클릭 -> 이름 변경 -> 취소 | 원래 값 복원 |
 | 11 | 로딩 상태 | 느린 네트워크 시뮬레이션 | `departments-loading` skeleton 표시 |
 | 12 | 에러 상태 | API 에러 시뮬레이션 | `departments-error` 에러 메시지 표시 |
-| 13 | 중복 부서명 | 기존 부서명과 동일한 이름으로 생성 | 에러 토스트 또는 validation 메시지 |
+| 13 | 중복 부서명 | 기존 부서명과 동일한 이름으로 생성 | 서버 400 에러 → 에러 토스트 표시 (서버 unique 제약) |
 | 14 | cascade 모달 닫기 | cascade 모달에서 취소 클릭 | 모달 닫힘, 부서 유지 |

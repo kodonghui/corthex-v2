@@ -1,86 +1,117 @@
-# Party Mode Round 2 (Adversarial) -- Credentials (CLI 토큰 / API 키 관리)
+# [Party Mode Round 2 -- Adversarial Review] credentials
 
-> 날짜: 2026-03-09
-> 문서: _uxui-refactoring/specs/09-credentials.md
-> 리뷰어: 7-expert panel (Adversarial Lens)
-
----
-
-## Round 1 이슈 반영 확인
-
-| # | Round 1 이슈 | 반영 여부 |
-|---|-------------|----------|
-| 1 | 컴포넌트 목록에 모달/확인 다이얼로그 누락 (Major) | [x] 반영됨 -- AddTokenModal, AddApiKeyModal, ConfirmDialog 추가 (총 4개) |
-| 2 | data-testid 6개+ 누락 (Major) | [x] 반영됨 -- submit/cancel/label/key 버튼, confirm-dialog, loading/error/empty 추가 (총 36개) |
-| 3 | 로딩/에러 상태 UI 정의 없음 (Major) | [x] 반영됨 -- 섹션 4.4 신설, 스켈레톤/에러/빈 상태 구체화 |
-| 4 | API 키 목록에 scope 표시 누락 (Medium) | [x] 반영됨 -- apikey-scope-badge testid + Banana2 프롬프트에 scope badge 추가 |
-| 5 | 가이드 박스 접기 기능 미정의 (Minor) | [x] 반영됨 -- 섹션 4.3에 추가, guide-collapse-btn testid 추가 |
-| 6 | 로딩/에러 상태 data-testid 누락 (Medium) | [x] 반영됨 -- credentials-loading, credentials-error, credentials-empty 추가 |
-
-**Round 1 이슈 전부 정상 반영 확인.**
+> 대상: `_uxui-refactoring/specs/09-credentials.md`
+> 일시: 2026-03-09
+> 렌즈: Adversarial (적대적 검토)
 
 ---
 
-## 전문가 리뷰
+### Round 1 Fix Verification
 
-### Sally (UX)
-모바일 뒤로 가기(직원 목록 복귀) 동선이 섹션 8에 반영되고 `mobile-back-btn` testid도 추가되어 이전 Round 2 이슈가 해결되었습니다. **새 발견: 직원 목록이 많을 때(10명 이상) 스크롤이 필요한데, 현재 직원 목록에 검색/필터 기능이 없습니다.** `employee-search` testid가 이번에 추가되었는데, 섹션 4.2나 Banana2 프롬프트에는 직원 검색 기능이 명시되어 있지 않아요. testid만 있고 기능 정의가 없으면 구현 시 혼란스럽습니다. Banana2 프롬프트에 "Employee list with optional search/filter input"을 추가하거나, testid를 제거해야 합니다.
+| # | Round 1 Issue | Fixed? | Verification |
+|---|--------------|--------|-------------|
+| 1 | Banana2 프롬프트 "inline or modal" 모순 | YES | Section 10 항목 #5를 "modal dialogs (not inline)" 으로 수정 확인 |
+| 2 | 토큰 마스킹 프리뷰 데이터 소스 미정의 | YES | Section 6 creds 행에 "서버 maskedToken 필드 있으면 표시, 없으면 라벨만" 명시 확인 |
+| 3 | `credentials-no-selection` testid 누락 | YES | Section 11에 추가 + Section 4.4에 "직원 미선택 상태" 정의 확인 |
+| 4 | 가이드 접기 상태 지속성 미정의 | YES | Section 4.3에 "localStorage에 저장" 명시 확인 |
+| 5 | 토큰 비활성화 시 에이전트 경고 없음 | PARTIAL | Section 9에 "비활성화 = soft delete, 재활성화 불가" 추가됨. 에이전트 경고는 mutation 로직 영역이라 UI 범위 밖 -- 수용 |
+| 6 | `apikey-provider-badge` testid 누락 | YES | Section 11에 추가 확인 |
+| 7 | 토큰 비활성화 vs 삭제 의미 차이 미명시 | YES | Section 9에 "비활성화 = soft delete, 재활성화 없음, 목록에 남음" 명시 확인 |
 
-### Winston (Architect)
-컴포넌트 4개 구조가 합리적입니다. ConfirmDialog를 "공유 UI 컴포넌트 활용"이라고 한 것은 올바른 판단입니다 -- 다른 페이지(departments cascade 삭제 등)에서도 필요하므로. **AddTokenModal과 AddApiKeyModal의 파일 위치가 "pages/credentials.tsx 내부 또는 별도"로 미결정**인데, 이건 구현 시 판단해도 되므로 Minor입니다. 모달 크기가 작으면 같은 파일에, 복잡하면 분리하면 됩니다.
-
-### Amelia (Dev)
-data-testid 36개 -- 매우 충분합니다. 토큰 마스킹 프리뷰(`token-masked-preview`)가 추가된 것이 좋아요. 다만 **이 마스킹 프리뷰가 서버에서 내려오는 건지 프론트에서 처리하는 건지** 데이터 바인딩 섹션에서 명확하지 않습니다. 현재 `creds` 쿼리 응답에 마스킹된 토큰 프리뷰가 포함되는지, 아니면 등록 시 프론트에서 앞 몇 글자만 저장하는지 결정이 필요해요. 이건 "UI 변경 시 절대 건드리면 안 되는 것"에 해당할 수 있으므로 주의가 필요합니다. 기존 API 응답 구조에 마스킹 필드가 있다면 그대로 사용하면 되고, 없다면 프론트에서 표시만 생략하는 것이 안전합니다.
-
-### Quinn (QA)
-테스트 17개 -- 빈 라벨 토큰 등록(#16)과 토큰 마스킹 표시(#17)가 추가되어 edge case 커버리지가 우수합니다. **새 발견: 동일 직원에게 동일 라벨로 토큰을 중복 등록할 때의 동작이 정의되지 않았습니다.** 서버가 막아주는지, 프론트에서 validation을 해야 하는지 명시가 없어요. 다만 이는 서버 로직 관련이므로 "절대 건드리면 안 되는" 영역일 수 있고, UI-only 리팩토링 범위에서는 기존 동작을 유지하면 됩니다. Minor입니다.
-
-### John (PM)
-기능 커버리지가 완전합니다. CLI OAuth 토큰 CRUD, API 키 CRUD, scope 관리, 가이드 박스, 토큰 활성/비활성 상태 전부 포함되어 있습니다. "API 과금 표현 금지" 규칙도 준수하고 있고, "CLI 토큰"이라는 용어를 일관되게 사용하고 있어요. PM 관점에서 추가 이슈 없습니다.
-
-### Bob (SM)
-범위: 4개 컴포넌트 (1개 수정 + 2개 모달 신규 + 1개 공유 컴포넌트). 모달 2개는 기존 인라인 폼을 감싸는 수준이라 작업량이 크지 않습니다. `employee-search` testid가 추가되었는데 기능 정의 없이 testid만 있으면 스코프 모호성이 생깁니다. 검색 기능을 넣을 거면 명시하고, 아니면 testid를 제거해야 합니다.
-
-### Mary (BA)
-보안 관리 페이지의 비즈니스 가치는 명확합니다. 토큰 마스킹 프리뷰 추가는 보안 인식을 높이면서도 관리자가 어떤 토큰인지 구분할 수 있게 해주는 좋은 개선입니다. ConfirmDialog로 native confirm()을 대체하는 것도 전문적인 인상을 줍니다.
+**Round 1 이슈 7건 중 6건 완전 반영, 1건 부분 반영 (UI 범위 밖이라 수용).**
 
 ---
 
-## 크로스톡
+### Adversarial Agent Discussion
 
-**Sally -> Bob:** `employee-search` testid 건에 동의합니다. 검색 기능은 직원이 10명 이상일 때 유용하지만, 구현 범위를 고려하면 "직원 수가 많을 경우를 위한 선택적 기능"으로 Banana2 프롬프트에만 힌트를 주고, 없어도 동작하는 구조가 맞습니다. testid는 유지하되 "optional" 표기를 추가하면 됩니다.
+**John (PM):**
+"Round 1 수정이 잘 적용되었습니다. 그런데 WHY doesn't the spec address the scenario where ALL tokens for an employee are deactivated? If employee A has 3 tokens and all are deactivated, their AI agents can't function at all. The admin should see some kind of warning state on the employee list item -- maybe a red dot or 'No active tokens' indicator next to the employee name. Currently the employee list (Section 4.2) shows avatar + role but says nothing about token health. An admin managing 20 employees needs to quickly scan which ones have functioning tokens and which don't. This is a visibility gap that goes beyond individual token status."
 
-**Amelia -> Quinn:** 토큰 마스킹 프리뷰와 중복 라벨 validation 둘 다 기존 서버 API 동작에 의존하는 부분입니다. UI-only 리팩토링에서는 서버 응답을 그대로 표시하면 되므로, 새 API 호출이나 프론트 로직 추가 없이 기존 데이터만 활용하는 것이 안전합니다. 마스킹 프리뷰는 서버 응답에 마스킹 필드가 있으면 표시하고, 없으면 라벨만 표시하는 방식이 현실적입니다.
+**Winston (Architect):**
+"The masking clarification is good -- 'server maskedToken field or label-only fallback.' **New observation: the `employee-search` in Section 4.2 says 'displayed when 10+ employees, frontend filtering.' But the data binding (Section 6) shows `users` query fetches all users. What if there are 100 employees? The search input does frontend filtering on an already-loaded list, which is fine. But the conditional rendering ('10+') means the search input isn't always present. This creates a testability issue: test for `employee-search` can only run when there are 10+ employees in the test data. Consider always showing the search input (hidden when < 10 is a UX optimization that complicates testing) or noting this condition in the test spec.**"
 
-**Winston -> Sally:** ConfirmDialog를 공유 컴포넌트로 만들면 departments의 cascade 삭제에서도 활용 가능합니다. 두 스펙 간 일관성 측면에서도 공유 컴포넌트 접근이 맞습니다.
+**Sally (UX):**
+"**New observation: the mobile flow has a UX gap at the 'back' transition.** Section 8 says '1-column: employee selection -> token/key list transition' with a back button. But what happens to the right panel content when the user navigates back? If the user was viewing Employee A's tokens, navigates back, then selects Employee B -- does the token section immediately load B's data? Or is there a flash of A's stale data? The spec should clarify: on mobile, navigating back should clear the selected employee state (`selectedUserId = null`), and selecting a new employee starts fresh. This prevents stale data confusion. Also, the mobile Banana2 prompt says 'employee selection as a dropdown or full-width list' -- dropdown is wrong for mobile; a full-width list (master view) is what the spec describes. Remove the dropdown option from the prompt."
+
+**Amelia (Dev):**
+"The testid count is now 39 items -- very thorough. **New observation: the `token-add-form` testid is on the form element, but since the form is now inside a modal (AddTokenModal), should there be a `token-add-modal` testid for the modal backdrop/container separate from the form content? Playwright tests often need to verify the modal opened (backdrop visible) before interacting with form elements inside it. Same for `apikey-add-form` -> should have `apikey-add-modal`.** This is a Low issue since tests can assert on `token-add-form` visibility as a proxy for modal open state, but explicit modal container testids are cleaner."
+
+**Quinn (QA):**
+"19 tests cover a good range. **New observation: there's no test for the guide box collapse state persistence.** Section 4.3 now says 'localStorage 저장', so we need a test: 'collapse guide -> reload page -> guide stays collapsed.' This is important because it validates the localStorage integration, which is a new behavior. Also, test #17 (token masking) has a conditional dependency: 'when server has maskedToken field.' This means the test might need to be skipped or adapted based on the actual API response structure. The test spec should note: 'if server does not return maskedToken, verify label-only display instead.'"
+
+**Mary (BA):**
+"**New observation: the API key scope business rule needs more context.** Section 9 says 'API 키 범위 (company/user)' but doesn't explain the business impact. A 'company' scope API key is shared across all AI agents in the company; a 'user' scope key is tied to one employee's agents. This matters for the ConfirmDialog when deleting a company-scope key -- the warning should be more severe because it affects all agents, not just one employee's. Currently the ConfirmDialog is generic for all delete/deactivate actions. Consider different warning text based on scope: company = 'This key is used by all AI agents in the company' vs user = 'This key is used by this employee's AI agents only.'"
+
+**Bob (SM):**
+"Scope review: 4 components, 39 testids, 19 tests, 7 API endpoints. This is well-contained. **New observation: the mobile Banana2 prompt lists 4 mobile-specific items but doesn't mention the 'no selection' placeholder state.** On mobile, when the user first loads the page, they see the employee list. But on desktop, the right panel shows 'select an employee' placeholder. On mobile, since it's a single-column master view, the placeholder isn't visible -- the user just sees the employee list. The prompt should clarify this mobile flow difference so Banana2 doesn't try to show a placeholder on the mobile employee list screen."
 
 ---
 
-## 신규 발견 이슈
+### New Issues Found (Round 2)
 
-| # | 심각도 | 내용 | 제기자 |
-|---|--------|------|--------|
-| 1 | Minor | `employee-search` testid가 있지만 기능 정의(섹션 4.2, Banana2 프롬프트)에 검색 기능 미명시 | Sally, Bob |
-| 2 | Minor | 토큰 마스킹 프리뷰가 서버 응답 기반인지 프론트 처리인지 데이터 바인딩에 미정의 | Amelia |
-| 3 | Minor | 동일 라벨 토큰 중복 등록 시 동작 미정의 (서버 영역이라 UI-only 범위 밖) | Quinn |
+| # | Severity | Raised By | Issue | Suggestion |
+|---|----------|-----------|-------|------------|
+| 1 | Medium | Sally | 모바일 Banana2 프롬프트에 "dropdown" 옵션 부적절 -- 스펙은 full-width 리스트인데 프롬프트에 dropdown 포함 | 모바일 프롬프트에서 "dropdown" 제거, "full-width employee list as master view" 로 변경 |
+| 2 | Low | John | 직원 목록에 토큰 건강 상태(active token 유무) 표시 없음 -- 20명 관리 시 스캔 어려움 | Section 4.2에 "직원 항목에 활성 토큰 수 뱃지 표시" 힌트 추가 (선택적 기능) |
+| 3 | Low | Winston | `employee-search` 조건부 렌더링(10+)이 테스트 복잡도 높임 | 테스트 스펙에 "10명 이상 테스트 데이터 필요" 조건 명시 |
+| 4 | Low | Quinn | 가이드 접기 상태 지속성(localStorage) 테스트 누락 | Test #20 추가: "가이드 접기 -> 페이지 새로고침 -> 접힌 상태 유지" |
+| 5 | Low | Mary | API 키 삭제 시 scope에 따른 차별 경고 없음 | ConfirmDialog 경고 문구에 scope 정보 포함 권장 (선택적) |
+| 6 | Low | Sally | 모바일 뒤로가기 시 selectedUserId 초기화 필요 -- stale data 방지 | Section 8 모바일 설명에 "뒤로가기 시 selectedUserId 초기화" 추가 |
 
 ---
 
-## UXUI 체크포인트
+### Cross-talk
 
-- [x] 핵심 동작 3클릭 이내 (직원 선택 1클릭 + 등록 버튼 1클릭 + 폼 제출 1클릭 = 3클릭)
-- [x] 빈 상태/에러 상태/로딩 상태 정의됨 (섹션 4.4 + Banana2 프롬프트 항목 6~10)
-- [x] data-testid가 모든 인터랙션 요소에 할당됨 (36개)
-- [x] 기존 기능 전부 커버 (섹션 9 체크리스트 5항목 전체 체크)
+**Winston -> Quinn:** "localStorage 테스트는 Playwright에서 `page.evaluate(() => localStorage.getItem('guide-collapsed'))` 로 검증 가능합니다. 테스트 #20 추가에 동의합니다. 이건 UI 동작이 아니라 상태 지속성 검증이라 별도 테스트가 필요해요."
+
+**Sally -> Bob:** "모바일 placeholder 건 동의합니다. 모바일에서는 employee list가 곧 initial screen이므로 별도 placeholder가 필요 없어요. Banana2 프롬프트에 'On mobile, the employee list IS the initial screen -- no placeholder needed' 한 줄 추가하면 혼란을 방지할 수 있습니다."
+
+**Mary -> John:** "John의 '토큰 건강 상태 뱃지' 아이디어는 좋지만, 현재 users 쿼리(`/admin/users?companyId=X`)에 토큰 정보가 포함되는지 확인이 필요합니다. 포함되지 않으면 추가 API 호출이 필요한데, 이는 'API 변경 없음' 원칙을 위반할 수 있어요. 프론트에서 각 직원의 creds를 prefetch하는 방식은 N+1 문제를 일으킵니다. 선택적 기능으로 남기는 게 현실적입니다."
+
+---
+
+### v1-feature-spec Coverage Check
+
+| v1 기능 | 커버 여부 | 비고 |
+|---------|----------|------|
+| CLI 격리 (사람 1명 = CLI 1개) -- Section 23 | O | 직원별 토큰 관리로 구현 |
+| 에이전트 두뇌 (CLI 토큰으로 AI 실행) | O | Section 9에 명시 |
+| 도구 시스템 API 키 (KIS, Notion 등) -- Section 3.1 | O | 외부 API 키 CRUD |
+| 멀티테넌시 (companyId 격리) -- Section 23 | O | selectedCompanyId 기반 |
+| "API 과금" 표현 금지 규칙 | O | "CLI 토큰" 용어 일관 사용 |
+| 도구 권한 제어 -- Section 3.2 | 간접 | API 키 scope(company/user)가 권한 범위 역할 |
+
+v1-feature-spec에 credentials 직접 대응 항목은 없지만, AI 에이전트 운영의 핵심 인프라 페이지로서 도구 시스템, CLI 격리, 멀티테넌시를 모두 지원. 커버리지 충분.
+
+---
+
+### UXUI Checklist
+
+- [x] 핵심 동작 3클릭 이내 (직원 선택 1 + 등록 버튼 1 + 폼 제출 1 = 3클릭)
+- [x] 빈 상태 / 에러 상태 / 로딩 상태 / 미선택 상태 정의됨 (Section 4.4)
+- [x] data-testid가 모든 인터랙션 요소에 할당됨 (39개)
+- [x] 기존 기능 전부 커버 (Section 9 체크리스트 5항목 전체 체크)
 - [x] Banana2 프롬프트가 영문으로 구체적으로 작성됨 (데스크톱 + 모바일)
-- [x] 반응형 breakpoint (375px, 768px, 1440px) 명시 (섹션 8)
-- [x] 기능 로직은 안 건드리고 UI만 변경하는 범위 (섹션 9 "절대 건드리면 안 되는 것" 4항목)
+- [x] 반응형 breakpoint (375px, 768px, 1440px) 명시 (Section 8)
+- [x] 기능 로직은 안 건드리고 UI만 변경하는 범위 (Section 9 "절대 건드리면 안 되는 것" 4항목)
+- [x] 보안 관련 시각적 단서 정의됨 (Section 4.1 + Banana2 프롬프트 항목 #7)
+- [x] 토큰 비활성화 비즈니스 의미 정의됨 (Section 9 soft delete)
+- [x] 가이드 접기 상태 지속성 정의됨 (Section 4.3 localStorage)
 
 ---
 
-## 품질 점수: 9/10
+### Fixes Applied
+
+1. **모바일 Banana2 프롬프트 수정** -- "dropdown or full-width list" -> "full-width employee list (master view). On mobile, employee list IS the initial screen." 변경
+2. **가이드 접기 지속성 테스트 추가** -- Test #20 추가
+3. **모바일 뒤로가기 시 selectedUserId 초기화** -- Section 8 모바일 설명에 추가
+4. **직원 검색 테스트 조건 주석** -- employee-search testid 설명에 "(선택적: 직원 10명+ 시)" 이미 있으므로 충분
+
+---
+
+### Quality Score: 9/10
 
 감점 사유:
-- -1: `employee-search` testid와 기능 정의 불일치 (Minor, 구현 시 해결 가능)
+- -1: Round 1에서 Banana2 프롬프트 모순 High 이슈 1건 (수정 완료)
 
-## 판정: PASS
+### Final Verdict: PASS

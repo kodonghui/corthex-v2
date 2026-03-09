@@ -1,94 +1,97 @@
-# Party Mode Round 2 (Adversarial) — Nexus / SketchVibe
+# [Party Mode Round 2 -- Adversarial Review] Nexus / SketchVibe
 
-> 날짜: 2026-03-09
-> 문서: _uxui-refactoring/specs/06-nexus.md
-> 리뷰어: 7-expert panel (Adversarial Lens)
+### Round 1 Fix Verification
 
----
+| # | Round 1 Issue | Fixed? | Verification |
+|---|---------------|--------|--------------|
+| 1 | 키보드 단축키/멀티선택/서브그래프 누락 | O | Section 9에 멀티선택, 서브그래프 추가. Section 4.4에 단축키 오버레이 추가. 컴포넌트 #13 KeyboardShortcutOverlay 추가. |
+| 2 | 대용량 캔버스 성능 경계/WebSocket 재연결 버튼 | O | 상태별 UI에 "대용량 캔버스 경고" 행 추가. WebSocket 끊김에 재연결 버튼 추가. |
+| 3 | AI 명령 실패 에러 원인 구분 없음 | O | "빨간 에러 텍스트 + 원인 요약" 으로 수정됨. |
+| 4 | Mermaid 모달 개선 비구체적 | Partial | 문제점 #6에 "코드 하이라이팅 없음"이 기술되어 있고, 개선은 스타일 범위 내로 제한. syntax highlighting은 향후 enhancement로 합의. |
 
-## Round 1 이슈 반영 확인
+### Adversarial Agent Discussion
 
-- [x] 이슈 1 (High): 로딩/에러 상태 UI 정의 누락 → 섹션 3 "상태별 UI 정의" 테이블로 9개 상태 정의됨
-- [x] 이슈 2 (Medium): data-testid 5개 누락 → `nexus-autolayout-btn`, `nexus-new-btn`, `nexus-clear-btn`, `nexus-knowledge-btn`, `nexus-agent-select` 모두 추가됨
-- [x] 이슈 3 (Medium): 컴포넌트 목록 불완전 → 6개에서 12개로 보강 (MermaidModal, AI 명령 입력, AI 프리뷰, StatusBar, ChatArea, AgentSelect)
-- [x] 이슈 4 (Medium): AI 자동완성/키보드 단축키 범위 초과 → 섹션 4.4 "향후 개선 (현재 범위 외)"로 분리
-- [x] 이슈 5 (Low): 에이전트 선택 드롭다운 개선 반영 없음 → 섹션 4.3 + 컴포넌트 #12에 반영
-- [x] 이슈 6 (Low): 에러/엣지케이스 테스트 부족 → 테스트 #11~#14 추가
+**John (PM):** "Round 1 수정은 납득됩니다. 그런데 적대적으로 보면, Section 8 반응형에서 768px~1439px 태블릿 구간이 '캔버스 + 채팅 2패널 (채팅 축소)'로 되어 있는데, 1024px 태블릿에서 채팅 패널(380px) + 캔버스를 동시에 보여주면 캔버스가 640px밖에 안 됩니다. 이건 '캔버스가 주인공'이라는 4.1 디자인 원칙과 모순이에요. 태블릿에서는 채팅을 오버레이나 드로어로 바꿔야 합니다."
 
----
+**Winston (Architect):** "Round 1에서 추가된 대용량 캔버스 경고(50개+)는 좋은데, 그 경고를 toast로 표시한다고 되어 있습니다. toast는 몇 초 후 사라지죠. 50개 노드를 추가하는 사용자는 이미 복잡한 캔버스에 집중하고 있어서 toast를 놓칠 수 있어요. 다만 이건 Low severity입니다 -- 지속적 배너보다 toast가 덜 방해가 되니까요. 현재 정의로 충분합니다."
 
-## 전문가 리뷰
+**Sally (UX):** "Section 4.4에 키보드 단축키 오버레이가 추가되었지만, `?` 키로 열린다고만 되어 있어요. 그런데 AI 명령 입력란에 포커스가 있을 때 `?`를 누르면 입력에 들어가버리지 단축키 오버레이가 열리지 않습니다. 이건 키보드 이벤트 충돌이에요. 해결책: 입력란에 포커스가 없을 때만 `?` 키가 동작하거나, 별도 버튼으로도 열 수 있어야 합니다. 또한 Tab 키 포커스 이동을 언급했지만 포커스 가시성(focus ring)에 대한 정의가 없어요."
 
-### Sally (UX)
-핵심 워크플로우를 적대적으로 따져보겠습니다. 노드 추가는 "팔레트 열기 → 타입 클릭"으로 2클릭, AI 명령은 "입력 → 전송"으로 2클릭, 저장은 1클릭 — 3클릭 이내 기준을 충족합니다. 하지만 **모바일 레이아웃에서 AI 명령 입력란이 캔버스 뷰와 채팅 뷰 중 어디에 속하는지 불명확했습니다**. 캔버스를 보면서 AI 명령을 내리는 것이 자연스러우므로 캔버스 뷰에서만 표시해야 하는데, 이 구분이 원본에 없었어요. 이번 리뷰 과정에서 모바일 뷰 규칙으로 "AI 명령 입력란은 캔버스 뷰에서만 표시"가 스펙에 추가되어 해결되었습니다.
+**Amelia (Dev):** "Section 12의 Playwright 테스트 #15 'Undo/Redo'가 '노드 추가 -> Undo 클릭 -> 노드 제거됨'으로 되어 있는데, 이건 UI 버튼 Undo만 테스트합니다. Ctrl+Z 키보드 단축키 Undo도 별도 테스트가 필요해요. 이 두 경로는 구현이 다를 수 있습니다 -- 버튼은 onClick 핸들러, 키보드는 onKeyDown 글로벌 리스너. 둘 다 같은 결과를 보장하는 테스트가 있어야 합니다."
 
-### Winston (Architect)
-컴포넌트 #7~#12가 전부 "pages/nexus.tsx (인라인)"으로 되어 있는데, 이것이 실제 코드 구조와 일치하는지는 구현 시 확인이 필요합니다. 만약 인라인 컴포넌트 6개가 한 파일에 있으면 1000줄 이상의 파일이 되어 스타일 수정 시 찾기 어려울 수 있습니다. 다만 "UI만 변경, 구조 유지" 원칙을 따르면 컴포넌트 분리는 별도 작업이므로, 현재로서는 각 인라인 컴포넌트의 함수명만이라도 주석으로 표기하면 충분합니다. 구조적으로는 합리적인 설계입니다.
+**Quinn (QA):** "Round 1에서 testid `nexus-keyboard-shortcuts`와 `nexus-performance-warning`이 추가되었는데, Section 12 Playwright 테스트에는 이 두 testid를 검증하는 테스트가 없습니다. testid만 정의하고 테스트가 없으면 CI에서 깨져도 모릅니다. 단축키 오버레이 표시 테스트를 추가해야 합니다."
 
-### Amelia (Dev)
-기존 Round 2에서 지적했던 ContextMenu testid 3개(`nexus-context-menu`, `nexus-ctx-duplicate`, `nexus-ctx-delete`)가 이미 스펙에 반영되어 있어 좋습니다. 이번에 추가로 발견한 것: **캔버스 내 개별 노드에 대한 testid가 없었습니다**. ReactFlow 노드가 DOM에 렌더링될 때 `nexus-node-item`이라는 testid를 부여하고 `data-node-type` attribute로 8종 노드를 구분하는 방식을 제안했고, 이번 리뷰 과정에서 스펙에 반영되었습니다. 또한 WebSocket 상태 표시를 위한 `nexus-ws-status` testid도 추가되었습니다. 현재 총 37개 testid로 충분한 커버리지입니다.
+**Mary (BA):** "Banana2 프롬프트의 Required functional elements #9 'Canvas list sidebar (optional, togglable)'가 있는데, 실제 스펙 Section 4.2에서는 '캔버스 사이드바: 필요시만 표시, 기본 숨김'으로 되어 있어요. 프롬프트와 스펙 간 정합성은 OK인데, 한 가지 질문: 캔버스 목록이 비어있을 때(첫 사용) 사이드바를 여는 게 의미가 있나요? 빈 캔버스 상태와 빈 캔버스 목록 상태가 동시에 발생하는 시나리오의 UX가 미정의입니다. 다만 이건 엣지케이스이고 빈 캔버스 안내 카드가 이를 커버하므로 Low severity."
 
-### Quinn (QA)
-기존 Round 2에서 빠져 있던 Undo/Redo 테스트가 #15로 추가된 것을 확인했습니다. 적대적 관점에서 한 가지 더: **WebSocket 관련 테스트가 완전히 빠져 있었습니다**. 기존 기능 목록에 "WebSocket 실시간 AI 캔버스 업데이트"가 핵심 기능으로 있는데, WebSocket 연결 실패/재연결 상태의 UI 정의와 테스트가 없었어요. 이번 리뷰에서 상태별 UI 정의에 "WebSocket 연결 끊김"과 "WebSocket 재연결 중" 2개 상태가 추가되었고, `nexus-ws-status` testid도 추가되었습니다. 다만 WebSocket 테스트 시나리오 자체는 Playwright에서 WebSocket 모킹의 복잡도를 고려해 선택적으로 남겨둡니다.
+**Bob (SM):** "Section 5 컴포넌트가 13개로 늘어났습니다. 이 중 #7~#13이 전부 nexus.tsx 인라인이에요. 한 파일에 7개 인라인 컴포넌트의 스타일을 동시에 수정하면 diff가 거대해지고 리뷰가 어렵습니다. UXUI 작업을 컴포넌트별 PR로 쪼개야 하는지 결정이 필요합니다. 다만 이건 실행 계획 문제이지 스펙 문제는 아닙니다."
 
-### John (PM)
-기존 기능 13개 항목 체크리스트가 완전합니다. 이전 Round 2에서 지적한 "sessionStorage를 통한 Command Center 데이터 전달 테스트"는 cross-page 인터랙션이라 Playwright에서 테스트하기 까다롭고, 기능 자체는 "건드리면 안 되는 것" 목록에 있으니 UI 변경으로 깨질 가능성이 낮습니다. 추가로 **캔버스 이름 편집 인터랙션**(헤더의 캔버스명 더블클릭 편집)이 기존 기능 #2 "더블클릭 이름 편집"에 포함되지만, 이것이 노드 이름 편집과 캔버스 제목 편집 두 가지인지 구분이 모호합니다. 다만 이것은 Low severity 수준입니다.
-
-### Bob (SM)
-컴포넌트 12개 + Playwright 테스트 15개 — 단일 페이지치고 상당한 볼륨입니다. ReactFlow 캔버스, AI 채팅, Mermaid 모달, 8종 노드 스타일을 모두 건드려야 하므로 **예상 작업 시간이 다른 페이지의 2배 이상**입니다. 다만 섹션 4.4에서 범위 외 항목을 이미 분리했고, "건드리면 안 되는 것" 7개 항목이 명확하므로 스코프 크립 위험은 낮습니다. 볼륨은 크지만 관리 가능한 수준이에요.
-
-### Mary (BA)
-Banana2 프롬프트가 "YOU DECIDE" 톤으로 디자인 자유도를 준 것은 올바른 접근입니다. "Canvas must dominate the screen"이라는 우선순위가 비즈니스 가치(AI + 시각 도구 차별화)와 잘 정렬되어 있어요. SketchVibe가 CORTHEX의 독특한 가치 제안이므로, 이 페이지의 비주얼 품질이 전체 제품 인상에 큰 영향을 미칩니다.
-
----
-
-## 크로스톡
-
-**Amelia <-> Quinn:** 노드 testid 문제를 함께 정리했습니다. `nexus-node-item` + `data-node-type` attribute 방식으로 ReactFlow 커스텀 노드 내부에 testid를 부여하면, 테스트 #2의 기대 결과를 "캔버스 내 `nexus-node-item` 요소 개수가 1 증가"로 구체화할 수 있어요. WebSocket testid도 `nexus-ws-status`로 추가되어 향후 WebSocket 모킹 테스트가 가능해졌습니다.
-
-**Sally <-> Bob:** 모바일 뷰에서 AI 입력란 소속 문제를 논의했습니다. Sally가 "캔버스 뷰에서만 표시"를 제안했고, Bob이 "이것은 기존 동작을 명시하는 것이지 새 기능이 아니다"라고 확인하여 범위 내로 판단했습니다. 스펙에 모바일 뷰 규칙이 추가되었습니다.
-
-**John <-> Winston:** sessionStorage 데이터 전달과 인라인 컴포넌트 구조에 대해 논의했습니다. 둘 다 현재 UI 리팩토링 범위에서는 "있는 그대로 유지"가 원칙이므로, 문서에 주의사항으로 남겨두되 구조 변경은 하지 않기로 합의했습니다.
-
----
-
-## 신규 발견 이슈
+### New Issues Found (Round 2)
 
 | # | Severity | Raised By | Issue | Suggestion |
-|---|----------|-----------|-------|-----------|
-| 1 | Medium | Amelia, Quinn | 캔버스 내 개별 노드 testid 미정의 | `nexus-node-item` + `data-node-type` attribute 추가 → **스펙 반영 완료** |
-| 2 | Medium | Quinn | WebSocket 상태 UI 정의 및 testid 누락 | 상태별 UI에 WebSocket 2개 상태 + `nexus-ws-status` testid 추가 → **스펙 반영 완료** |
-| 3 | Low | Sally | 모바일 뷰에서 AI 입력란 소속 뷰 미명시 | 모바일 뷰 규칙 추가 → **스펙 반영 완료** |
-| 4 | Low | John | 캔버스 이름 편집 vs 노드 이름 편집 구분 모호 | 기존 기능 #2에 포함, 추가 명시 권장 (선택적) |
-| 5 | Low | Bob | 작업 볼륨 과다 (12 컴포넌트 + 15 테스트) | 관리 가능 수준, Phase 분리는 선택적 |
+|---|----------|-----------|-------|------------|
+| 1 | Medium | John | 태블릿(768~1439px)에서 채팅 2패널이 캔버스 공간을 과도하게 압축. "캔버스가 주인공" 원칙과 모순. | 태블릿: 채팅을 오버레이/드로어로 변경 |
+| 2 | Medium | Amelia, Quinn | Undo/Redo 테스트가 UI 버튼만 검증. 키보드 단축키(Ctrl+Z/Y) 경로 미테스트. 단축키 오버레이/성능경고 testid에 대한 테스트도 없음. | 테스트 #16 키보드 Undo/Redo, #17 단축키 오버레이 추가 |
+| 3 | Low | Sally | `?` 키 단축키 오버레이가 AI 입력란 포커스 시 충돌 가능. 포커스 가시성(focus ring) 미정의. | 입력란 미포커스 시만 동작 + 포커스 링 스타일 추가 |
 
----
+### Cross-talk
 
-## UXUI 체크포인트
+**John -> Sally:** "태블릿에서 채팅 오버레이로 바꾸면 네가 걱정하는 포커스 문제도 일부 해소돼. 채팅이 캔버스 위에 뜨니까 사용자 시선이 분산되지 않고, AI 입력란과 채팅 입력란의 포커스 충돌도 줄어들지."
 
-- [x] 핵심 동작 3클릭 이내 — 노드 추가 2클릭, AI 명령 2클릭, 저장 1클릭
-- [x] 빈 상태/에러 상태/로딩 상태 정의됨 — 섹션 3 상태별 UI 정의 (11개 상태, WebSocket 포함)
-- [x] data-testid가 모든 인터랙션 요소에 할당됨 — 37개 (노드, WebSocket, 컨텍스트 메뉴 포함)
-- [x] 기존 기능 전부 커버 — 13개 체크리스트 모두 체크
-- [x] Banana2 프롬프트가 영문으로 구체적으로 작성됨 — 데스크톱/모바일 각각 상세 프롬프트
-- [x] 반응형 breakpoint (375px, 768px, 1440px) 명시 — 섹션 8에 3단계 명시
-- [x] 기능 로직은 안 건드리고 UI만 변경하는 범위 — "건드리면 안 되는 것" 7개 항목 명시, 범위 외 항목 분리됨
+**Sally -> John:** "맞아요. 오버레이 방식이면 채팅 열림/닫힘이 명확하니까 키보드 이벤트 라우팅도 단순해져요. 캔버스 뷰일 때만 `?` 키가 동작하면 되니까."
 
----
+**Quinn -> Amelia:** "키보드 단축키 테스트를 추가하면 기존 #15를 '버튼 Undo/Redo'로 남기고, #16을 '키보드 Ctrl+Z/Y'로 분리하는 게 깔끔해요. 그리고 #17로 단축키 오버레이 표시 테스트도 넣죠."
 
-## 품질 점수: 8/10
+**Amelia -> Quinn:** "동의합니다. testid가 있는데 테스트가 없으면 의미가 없으니까요."
+
+### v1-feature-spec Coverage Check
+
+| v1 기능 (Section 7) | 스펙 커버 | 비고 |
+|---------------------|----------|------|
+| 8종 노드 | O | |
+| 드래그/편집/삭제 | O | |
+| 엣지 생성 (드래그 핸들) | O | |
+| 멀티선택 | O | Round 1에서 추가 |
+| 서브그래프 그룹핑 | O | Round 1에서 추가 |
+| Mermaid 양방향 변환 | O | |
+| 저장/불러오기 | O | |
+| AI 자연어 명령 | O | |
+| AI 프리뷰 (적용/취소) | O | |
+| Undo/Redo | O | |
+| 자동 정렬 (dagre) | O | |
+| 지식 베이스 저장 | O | |
+| 채팅+캔버스 컨텍스트 | O | |
+| WebSocket 실시간 | O | |
+| Command Center -> sessionStorage | O | |
+
+v1 기능 15/15 커버. 누락 없음.
+
+### UXUI Checklist
+
+- [x] 핵심 동작 3클릭 이내 (노드 추가 2, AI 명령 2, 저장 1)
+- [x] 빈/에러/로딩 상태 정의 (12개 상태)
+- [x] data-testid 전체 인터랙션 요소 커버 (37개)
+- [x] 기존 기능 15개 전부 커버
+- [x] Banana2 프롬프트 영문 상세 (데스크톱/모바일)
+- [x] 반응형 3단계 명시
+- [x] UI 변경 범위 명확 (보호 목록 7개)
+
+### Fixes Applied
+
+1. **Section 8**: 태블릿(768~1439px) 채팅을 "2패널 (채팅 축소)" -> "캔버스 전체, 채팅은 오버레이/드로어" 로 수정
+2. **Section 12**: 테스트 #15를 "Undo/Redo (버튼)"으로 명확화, #16 "Undo/Redo (키보드)", #17 "단축키 오버레이" 추가
+3. **Section 4.4**: 포커스 가시성 `focus-visible:ring-2` 정의 추가
+
+### Quality Score: 8/10
 
 **감점 사유:**
-- -1: 인라인 컴포넌트 6개의 함수명/위치가 구현자에게 불친절 (구조 문서화 부족)
-- -1: WebSocket 테스트 시나리오가 testid는 있으나 Playwright 테스트 목록에 미포함 (복잡도 고려 선택적)
+- -1: 인라인 컴포넌트 7개가 단일 파일(nexus.tsx)에 집중 -- 리팩토링 시 diff 관리 어려움 (실행 계획 문제)
+- -1: Mermaid 모달 개선이 구체적이지 않음 (syntax highlighting은 향후 enhancement로 분리, 현재는 스타일만)
 
 **강점:**
-- Round 1 이슈 6개 + Round 2 이슈 3개 모두 스펙에 반영 완료
-- 상태별 UI 정의가 11개로 매우 상세 (WebSocket 포함)
-- 37개 testid로 모든 인터랙션 요소 커버
-- Banana2 프롬프트 품질 높음
-- 기존 기능 보호 목록 7개 항목 명확
+- v1 기능 15/15 완전 커버
+- 상태별 UI 12개 상세 정의 (대용량 경고, WebSocket 포함)
+- 37개 testid + 17개 Playwright 테스트
+- 키보드 접근성 정의 (단축키 오버레이, 포커스 링)
+- 보호 목록 7개로 로직 변경 방지 명확
 
----
-
-## 판정: PASS
+### Final Verdict: PASS

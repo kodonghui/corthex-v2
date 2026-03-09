@@ -71,12 +71,13 @@
 - 토큰/키 등록: 모달로 변경 (레이아웃 밀림 방지) -- AddTokenModal, AddApiKeyModal 컴포넌트
 - 비활성화/삭제: 커스텀 확인 다이얼로그 (ConfirmDialog) -- native confirm() 대체
 - 토큰 복사 방지 표시
-- 가이드 박스: 접기(collapse) 기능 추가 (익숙한 관리자용)
+- 가이드 박스: 접기(collapse) 기능 추가 (익숙한 관리자용). **접기 상태는 localStorage에 저장** — 세션 간 유지
 
 ### 4.4 상태 UI 정의
 - **로딩 상태**: 직원 목록, 토큰 목록, API 키 목록 각각 스켈레톤 UI 표시
 - **에러 상태**: API 호출 실패 시 에러 메시지 + 재시도 버튼 표시
 - **빈 상태**: 아이콘 + 안내 텍스트 + 등록 유도 버튼 (단순 텍스트가 아닌 시각적 빈 상태)
+- **직원 미선택 상태**: 우측 2/3 영역에 "직원을 선택하세요" placeholder 표시 (아이콘 + 안내 텍스트). 토큰/키 등록 버튼 비활성화
 
 ---
 
@@ -98,7 +99,7 @@
 | 데이터 | 소스 | 용도 |
 |--------|------|------|
 | users | useQuery → /admin/users?companyId=X | 직원 목록 |
-| creds | useQuery → /admin/cli-credentials?userId=X | CLI 토큰 목록 |
+| creds | useQuery → /admin/cli-credentials?userId=X | CLI 토큰 목록. 마스킹 프리뷰: 서버 응답에 maskedToken 필드가 있으면 표시, 없으면 라벨만 표시 (프론트에서 토큰 원문 접근 불가) |
 | apiKeys | useQuery → /admin/api-keys?userId=X | API 키 목록 |
 | selectedUserId | useState | 선택된 직원 |
 | showAddToken | useState | 토큰 등록 폼 토글 |
@@ -134,7 +135,7 @@
 |------------|---------|
 | **1440px+** (Desktop) | 3컬럼 그리드 (직원 1/3 + 토큰/키 2/3) |
 | **768px~1439px** (Tablet) | 2컬럼 (직원 1/3 + 토큰/키 2/3) |
-| **~375px** (Mobile) | 1컬럼: 직원 선택 → 토큰/키 목록 전환 (상단에 "< 직원 목록" 뒤로가기 버튼 표시) |
+| **~375px** (Mobile) | 1컬럼: 직원 선택 → 토큰/키 목록 전환 (상단에 "< 직원 목록" 뒤로가기 버튼 표시). 뒤로가기 시 `selectedUserId` 초기화 (stale data 방지) |
 
 ---
 
@@ -146,7 +147,7 @@ v1-feature-spec.md에 직접 대응하는 항목은 없지만, CLI 토큰은 AI 
 
 - [x] 직원별 CLI OAuth 토큰 CRUD
 - [x] 외부 API 키 CRUD (KIS, Notion, Email, Telegram)
-- [x] 토큰 활성/비활성 상태 관리
+- [x] 토큰 활성/비활성 상태 관리 (**비활성화 = soft delete, 현재 API에서 재활성화 기능 없음**. 비활성 토큰은 목록에 남아있지만 에이전트가 사용 불가)
 - [x] API 키 범위 (company/user)
 - [x] 가이드: OAuth 토큰 찾는 법
 
@@ -187,7 +188,7 @@ Required functional elements:
 4. Token section (right, ~2/3 width) — for the selected employee:
    a. CLI OAuth Tokens — header with employee name, "+ Register Token" button. List of tokens showing: label, registration date, active/inactive badge, deactivate button.
    b. External API Keys — header, "+ Register API Key" button. List of keys showing: provider badge (KIS/Notion/etc.), scope badge (personal/company), label, registration date, delete button.
-5. Registration forms — for adding new tokens or API keys. Could be inline expandable or modal. Token form: label + textarea for token. API key form: provider selector, scope (personal/company), label, key input (password field).
+5. Registration forms — modal dialogs (not inline). Token form: label + textarea for token value. API key form: provider selector, scope (personal/company radio), label, key input (password field). Modals prevent layout shift.
 6. Empty state — "No registered tokens" / "No registered API keys" with icon and CTA button.
 7. Security indicators — visual cues that this is sensitive data (lock icons, masked token preview like "sk-ant-oat01-***", etc.).
 8. Loading state — skeleton placeholders while data loads (employee list, token list, API key list each independently).
@@ -214,8 +215,9 @@ Mobile version (375x812) of the same credentials management page.
 IMPORTANT — Mobile context: BOTTOM TAB BAR and TOP HEADER already exist. Content area only.
 
 Mobile-specific:
-- Employee selection as a dropdown or full-width list
-- Token/key sections stacked vertically
+- Employee list as a full-width master view (NOT dropdown). Employee list IS the initial screen on mobile -- no placeholder needed.
+- After selecting an employee, navigate to detail view showing token/key sections stacked vertically
+- Back button ("< Employee List") in content area to return to master view. Navigating back clears selectedUserId (prevents stale data).
 - Registration forms as full-screen modals
 - Guide box collapsible
 
@@ -267,6 +269,8 @@ Resolution: 375x812, pixel-perfect mobile UI screenshot style.
 | `token-masked-preview` | 마스킹된 토큰 프리뷰 | sk-ant-oat01-*** 형태 표시 |
 | `credentials-retry-btn` | 재시도 버튼 | 에러 상태에서 재로드 |
 | `employee-search` | 직원 검색 입력 (선택적) | 직원 10명+ 시 프론트 필터링 |
+| `credentials-no-selection` | 직원 미선택 placeholder | "직원을 선택하세요" 안내 |
+| `apikey-provider-badge` | 제공자 뱃지 (KIS/Notion 등) | API 키 목록에서 제공자 시각 구분 |
 
 ---
 
@@ -290,4 +294,7 @@ Resolution: 375x812, pixel-perfect mobile UI screenshot style.
 | 14 | 확인 다이얼로그 | 비활성화/삭제 클릭 | `confirm-dialog` 표시, native confirm 아님 |
 | 15 | 모바일 뒤로가기 | 375px 뷰포트에서 직원 선택 후 뒤로가기 클릭 | 직원 목록으로 복귀 |
 | 16 | 빈 라벨 토큰 등록 | 라벨 비우고 등록 시도 | validation 에러 또는 버튼 비활성화 |
-| 17 | 토큰 마스킹 표시 | 토큰 등록 후 목록 확인 | 마스킹된 프리뷰 (sk-ant-***) 표시 |
+| 17 | 토큰 마스킹 표시 | 토큰 등록 후 목록 확인 | 마스킹된 프리뷰 (sk-ant-***) 표시 (서버에 maskedToken 필드가 있을 때) |
+| 18 | 직원 미선택 placeholder | 페이지 최초 로드, 직원 미선택 | `credentials-no-selection` 표시, 등록 버튼 비활성화 |
+| 19 | 토큰 등록 모달 | + 토큰 등록 클릭 | `token-add-form` 모달 열림 (인라인 폼 아님) |
+| 20 | 가이드 접기 지속성 | 접기 버튼 클릭 → 페이지 새로고침 | 가이드 박스 접힌 상태 유지 (localStorage) |

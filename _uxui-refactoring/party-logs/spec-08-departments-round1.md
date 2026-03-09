@@ -1,54 +1,89 @@
-# Party Mode Log: spec-08-departments -- Round 1 (Collaborative)
-> 날짜: 2026-03-09
-> 문서: _uxui-refactoring/specs/08-departments.md
-> 리뷰어: 7-expert panel
+# [Party Mode Round 1 -- Collaborative Review] departments
+
+> 대상: `_uxui-refactoring/specs/08-departments.md`
+> 일시: 2026-03-09
+> 렌즈: Collaborative (협력적 검토)
 
 ---
 
-## Expert Debate
+### Agent Discussion
 
-### Sally (UX)
-부서 관리 흐름은 간결합니다. "목록 확인 -> 생성/편집/삭제" 모두 2~3클릭 이내로 완료 가능하고, 삭제 시 영향 분석 모달을 거치는 것도 실수 방지에 좋아요. 다만 **로딩 상태와 에러 상태에 대한 비주얼 정의가 없습니다.** 섹션 3에서 "빈 상태: 기본 텍스트 + 버튼"은 문제로 지적했지만, 로딩 skeleton이나 API 에러 시 UI가 어떻게 보여야 하는지 정의가 빠져 있어요. 또한 생성 폼이 테이블 위에 인라인으로 나타나는 방식은 문제점으로 지적했는데, 개선 방향에서 이걸 모달로 바꿀지 인라인을 유지할지 구체적 결정이 없습니다.
+**John (PM):**
+"WHY does the cascade analysis modal show 'cost' (비용) as one of the four impact cards? From the admin's perspective, what decision does cost information actually help them make? If a department has $500 accumulated cost, does that change whether I delete it? I suspect not -- it's a sunk cost. The admin cares about *ongoing* impact: active tasks that will be interrupted, agents that need reassignment. The cost card is noise that dilutes the signal of the truly actionable metrics. WHY should the admin care about historical cost at deletion time? I'd argue the card should at minimum explain that the cost record is *preserved* after deletion, so the admin knows nothing is lost -- otherwise the number just creates anxiety without a clear action."
 
-### Winston (Architect)
-컴포넌트 목록이 **DepartmentsPage 1개만** 기재되어 있는데, Cascade 분석 모달은 별도 컴포넌트로 분리할 만큼 복잡합니다. 영향 분석 카드 4개 + 에이전트 목록 + 삭제 방식 선택기까지 포함하면 200줄 이상의 모달인데, 이걸 DepartmentsPage 안에 전부 넣으면 유지보수가 어렵습니다. 최소한 CascadeAnalysisModal을 별도 행으로 분리하는 게 바람직해요. 데이터 바인딩 섹션은 깔끔하게 정리되어 있고, API 엔드포인트 5개가 명확합니다.
+**Winston (Architect):**
+"The spec says 'department color/icon is UI-only, not stored in DB, assigned by index order.' This is practical for now, but it will break when departments are reordered, deleted, or created in non-sequential order. If department A (index 0, blue) is deleted, department B (formerly index 1, green) becomes index 0 and turns blue. Users will see colors shifting randomly after any deletion. A deterministic hash of the department ID would be more stable -- `colors[departmentId % palette.length]` ensures colors never change regardless of list mutations. Also, the inline edit rule says 'auto-cancel current edit when clicking another row' -- fine, but the spec doesn't address what happens when the cascade-analysis API returns an error while the modal is already open. Does the modal show a spinner-then-error inside, or does it close? This needs to be specified."
 
-### Amelia (Dev)
-data-testid 17개 -- 기본 인터랙션은 커버됩니다. 하지만 **누락이 있습니다:** (1) `departments-cascade-knowledge` -- 학습 기록 카드용 testid가 없어요. agents, tasks는 있는데 knowledge와 cost 카드는 빠짐. (2) `departments-cascade-cost` -- 비용 카드도 마찬가지. (3) `departments-loading` -- 로딩 상태 testid. (4) `departments-error` -- 에러 상태 testid. (5) 생성 폼의 **개별 입력 필드** testid가 없어요: `departments-create-name`, `departments-create-desc`, `departments-create-submit` 등이 필요합니다.
+**Sally (UX):**
+"Looking at the mobile breakpoint (375px), the spec just says 'card list' -- but it doesn't describe what the card contains or how edit/delete are accessed. A card with name, description, agent count, status, AND edit/delete buttons is going to be extremely cramped at 375px. Real users on mobile are more likely scanning than editing. The mobile card should show name + agent count badge + status badge, with edit/delete behind a kebab menu (three dots). Also, the 'create form' -- on desktop we're told 'Banana2 decides modal or inline,' but this non-decision makes Playwright tests impossible to write reliably. We need to commit to one. Given the identified layout-shift problem with inline forms, modal is the clear winner."
 
-### Quinn (QA)
-Playwright 테스트 8개 -- happy path는 커버되지만 **edge case가 부족합니다.** 추가 필요: (1) 빈 이름으로 생성 시도 시 validation 에러 확인, (2) 중복 부서명 생성 시도 시 에러 처리, (3) 에이전트가 0명인 부서 삭제 시 cascade 모달이 "영향 없음" 표시, (4) 네트워크 에러 시 에러 메시지 표시, (5) 인라인 편집 중 취소 시 원래 값 복원. 현재 테스트만으로는 QA 검증이 불완전합니다.
+**Amelia (Dev):**
+"`allAgents` query in Section 6 fetches ALL agents via `/admin/agents?companyId=X` just to count per-department. With 200 agents across 10 departments, that's 200 records pulled client-side for 10 badge numbers. The server should ideally return `agentCount` per department, but since 'API 변경 없음' is a constraint, at minimum the spec should acknowledge this pattern and note that if the server response already includes agentCount, it should be preferred. Also: `departments-row` as a shared testid means `getByTestId` returns multiple elements. For cascade test #6, we need to target a specific row's delete button -- the spec should clarify that `departments-delete-btn` inside a specific `departments-row` is the targeting pattern."
 
-### John (PM)
-v2의 핵심 방향인 "관리자가 부서를 자유롭게 CRUD"가 잘 반영되어 있고, 섹션 9의 기능 체크리스트 6개 항목이 빠짐없이 커버됩니다. 다만 **부서 색상/아이콘 기능**이 섹션 3에서 문제로 지적되고 4.2에서 개선 방향으로 언급되지만, 실제 데이터 바인딩이나 API에 색상/아이콘 필드가 없어요. 이게 Banana2 디자인에만 맡기는 시각적 장식인지, 실제 데이터를 저장하는 기능인지 명확히 해야 합니다.
+**Quinn (QA):**
+"Test #13 says 'duplicate department name -> error toast or validation message' but the spec never defines whether duplicate names are even validated. Is this a frontend-only check, a server 400, or a DB unique constraint? If the server doesn't enforce uniqueness, this test will always pass (no error ever fires). The spec needs to explicitly state the validation source. Additionally, there's no test for what happens when cascade-analysis API fails -- the modal opens, the API call fires, and then what? This is a real user scenario (network timeout) with no defined behavior."
 
-### Bob (SM)
-범위: 1개 컴포넌트 파일 수정, API 변경 없음 -- 가볍고 적절합니다. "절대 건드리면 안 되는 것" 리스트 4개 항목이 명확해서 좋아요. 다만 Winston 지적처럼 **cascade 모달을 별도 컴포넌트로 분리하면 "새 파일 생성"이 되어 범위가 확장됩니다.** 이 경우 기존 파일에서 JSX를 추출하는 것이므로 기능 변경 없이 구조만 바뀌는 것이라 수용 가능하다고 봅니다. 스코프 표에 반영만 해주면 됩니다.
+**Mary (BA):**
+"The business case for 'department status (active/inactive)' is poorly defined. v1 had a fixed 29-agent structure with no concept of deactivating a department. v2 adds dynamic management, but the spec doesn't define what 'inactive' actually means operationally. Can an inactive department still receive tasks? Do its agents stop working? If inactive means 'soft delete,' then cascade analysis should behave differently -- an inactive department with 0 active tasks needs different messaging than an active one. This is a pattern I see across admin pages: status badges without defined business semantics. The admin sees a grey 'inactive' badge but has no idea what it implies for operations."
 
-### Mary (BA)
-부서 관리는 v2에서 "동적 조직 관리"의 기반이 되는 페이지입니다. 비즈니스 가치가 명확하고, 특히 cascade 삭제 분석은 관리자의 실수를 방지하는 핵심 안전장치예요. 영향 분석 모달에서 비용, 학습 기록 보존 안내를 보여주는 것은 관리자 신뢰도를 높이는 좋은 UX입니다. 전체적으로 비즈니스 요구사항 커버리지가 충분합니다.
-
----
-
-## Cross-talk
-
-**Winston -> Bob:** Cascade 모달 분리 건, 동의합니다. 기존 departments.tsx에서 모달 부분만 추출하면 기능 변경 없이 구조 개선이 가능하고, 컴포넌트 목록에 행 하나 추가하면 됩니다. 범위 확장이라기보다 리팩토링의 일부로 볼 수 있어요.
-
-**Amelia -> Quinn:** testid 누락 건과 테스트 항목 추가 건이 연동됩니다. cascade-knowledge, cascade-cost testid를 추가해야 Quinn이 제안한 "에이전트 0명 부서" 테스트에서 각 카드 값을 검증할 수 있어요.
-
-**Sally -> John:** 부서 색상/아이콘 건, UI-only 변경이면 하드코딩된 색상 팔레트에서 부서 순서대로 색을 할당하는 방식이 현실적입니다. 새 API 필드를 추가하면 범위를 넘으니까요.
+**Bob (SM):**
+"Section 4.4 says 'create form: Banana2 decides modal or inline.' That's a scope gap -- we can't write Playwright tests for the create flow if we don't know whether it's a modal or inline form. The testid list includes `departments-create-form` and `departments-create-name`, implying a form exists, but its container type (modal vs inline) affects how Playwright locates and interacts with it. This needs a decision NOW, not deferred to a design tool. Also, the component list has only 2 entries but after adding a create modal that becomes 3 -- update the table."
 
 ---
 
-## Issues Found (Round 1)
+### Cross-talk
 
-| # | 심각도 | 내용 | 제기자 |
-|---|--------|------|--------|
-| 1 | Major | data-testid 누락: cascade-knowledge, cascade-cost, loading, error, 생성 폼 필드별 testid | Amelia |
-| 2 | Major | 로딩/에러 상태 UI 정의 누락 | Sally, Quinn |
-| 3 | Minor | 컴포넌트 목록이 1개만 -- cascade 모달 분리 필요 | Winston, Bob |
-| 4 | Minor | Playwright 테스트 edge case 부족 (validation, 중복명, 0명 삭제, 에러) | Quinn |
-| 5 | Minor | 부서 색상/아이콘이 시각 장식인지 데이터 저장인지 불명확 | John |
-| 6 | Minor | 생성 폼을 모달로 변경할지 인라인 유지할지 미결정 | Sally |
+**Winston -> Sally:** "Sally's point about mobile cards connects to my color concern. If departments have color indicators on desktop (left border stripe), the mobile card needs to carry that color ID as well, or users lose the color-association they built on desktop. The kebab menu suggestion is solid -- it keeps the card compact while preserving all actions."
 
-**판정: 수정 필요 (Major 2건)**
+**Quinn -> Mary:** "Mary raises the active/inactive business rule question -- and this directly impacts my test coverage. If 'inactive' has no defined behavior, I can't write meaningful tests for it. Does an inactive department show a different cascade modal? Can you still edit an inactive department? The spec needs at minimum a 2-line definition of what each status means operationally."
+
+**John -> Amelia:** "Amelia's concern about fetching all agents is also a PM concern. If the agent count badge is wrong due to a client-side counting bug, the cascade analysis loses trust. The 'API 변경 없음' constraint is understood, but the spec should at least note the preference for server-side counts when available."
+
+---
+
+### Issues Found
+
+| # | Severity | Raised By | Issue | Suggestion |
+|---|----------|-----------|-------|------------|
+| 1 | High | Sally, Bob | 모바일 카드 레이아웃 미정의 -- 375px에서 카드 내용, 편집/삭제 접근 방식, 생성 폼 형태 미명시 | 모바일 카드: 이름+에이전트수+상태, 편집/삭제는 kebab 메뉴, 생성 폼은 풀스크린 모달 |
+| 2 | High | Mary, Quinn | 부서 '비활성' 상태의 비즈니스 의미 미정의 -- inactive가 운영에 미치는 영향 불명 | 비활성 = 새 작업 배정 불가, 기존 작업은 완료 허용으로 정의 |
+| 3 | Medium | Winston | 부서 색상 인덱스 기반 할당 -- 삭제/재정렬 시 색상 변동 | `colors[departmentId % palette.length]` ID 기반 해시로 변경 |
+| 4 | Medium | Amelia | allAgents 전체 fetch로 에이전트 수 계산 -- 비효율 + 정확성 리스크 | 서버에 agentCount 있으면 우선 사용 명시, 프론트 계산은 폴백 |
+| 5 | Medium | Bob, Sally | 생성 폼 컨테이너 타입 미결정 -- Banana2 위임으로 테스트 작성 불가 | 모달로 확정 + 컴포넌트 목록에 CreateDepartmentModal 추가 |
+| 6 | Medium | Quinn, Winston | cascade-analysis API 에러 시 모달 내 동작 미정의 | 모달 내부에 에러 메시지 + 재시도 표시 (모달은 닫지 않음) |
+| 7 | Low | John | cascade 모달 '비용' 카드가 삭제 결정에 실질적 도움 안됨 | 비용 카드에 "아카이브에 보존됩니다" 안심 문구 추가 |
+| 8 | Low | Quinn | 중복 부서명 validation 소스 불명 | 서버 unique 제약 기반 400 에러 -> 에러 토스트로 명시 |
+
+---
+
+### Consensus Status
+
+- 주요 반대 의견: 0개 (8개 이슈 전원 동의)
+- 합의: **수정 필요** -- High 2건 + Medium 4건 수정 후 Round 2 진행
+
+---
+
+### v1-feature-spec Coverage Check
+
+| v1 기능 | 스펙 커버 여부 | 비고 |
+|---------|-------------|------|
+| 조직 구조 (부서 단위) -- Section 2.1 | O | 부서 CRUD 완비 |
+| 에이전트 3계급 배정 -- Section 2.2 | 해당없음 | 계급은 에이전트 페이지(07) 관할 |
+| 부서별 지식 자동 주입 -- Section 16 | 해당없음 | 정보국(knowledge) 페이지 관할 |
+| 부서별 비용 추적 -- Section 21 | 부분 | cascade에서 비용 표시, 별도 비용 대시보드는 performance 페이지 |
+| v2 동적 조직 관리 -- Section 23 | O | 생성-수정-삭제 자유롭게 가능 |
+| 에이전트 메모리/학습 -- Section 20 | 해당없음 | cascade의 '학습 기록' 카드로 간접 참조만 |
+
+---
+
+### Fixes Applied
+
+1. **모바일 카드 레이아웃 상세화** -- Section 8 모바일 행에 카드 구성(이름+뱃지+상태), kebab 메뉴, 풀스크린 모달 명시
+2. **비활성 상태 비즈니스 정의** -- Section 9에 active/inactive 운영 의미 추가 (비활성 = 새 작업 배정 불가, 기존 작업 완료 허용)
+3. **부서 색상 할당 방식 변경** -- Section 4.5에서 인덱스 -> `departmentId % palette.length` 해시로 변경
+4. **에이전트 수 계산 방식 명시** -- Section 6 allAgents 행에 서버 agentCount 우선 사용 + 프론트 계산 폴백 주석
+5. **생성 폼 모달 확정** -- Section 4.4에서 "Banana2 결정" -> "모달로 확정" + CreateDepartmentModal 컴포넌트 추가 (목록 3개로)
+6. **cascade API 에러 처리** -- Section 6 cascadeData 행에 에러 시 모달 내부 에러+재시도 명시
+7. **cascade 비용 카드 안심 문구** -- Section 2 모달 다이어그램에 "아카이브에 보존됩니다" 추가
+8. **중복 부서명 validation 명확화** -- Test #13에 "서버 400 에러 -> 에러 토스트" 명시
+9. **Banana2 프롬프트 업데이트** -- 데스크톱: create form = modal 확정, 색상 = ID hash. 모바일: kebab 메뉴, card 내용 명시

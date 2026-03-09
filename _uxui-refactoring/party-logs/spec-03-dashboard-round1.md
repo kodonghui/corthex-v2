@@ -1,55 +1,53 @@
-# Party Mode Round 1 — Spec 03 Dashboard (Collaborative Lens)
+# [Party Mode Round 1 -- Collaborative Review] Dashboard (작전현황)
 
-**날짜:** 2026-03-09
-**대상:** `_uxui-refactoring/specs/03-dashboard.md`
-**모드:** Collaborative (건설적 개선)
+### Agent Discussion
 
----
+**John (PM):** "Section 1에서 '아침에 접속해서 오늘 AI가 처리한 작업 수, 비용, 에이전트 상태 확인'이라고 했는데, WHY is this the first page the CEO sees? 이 페이지가 로그인 후 랜딩 페이지인지, 별도로 /dashboard로 이동해야 하는 건지 명시가 없다. 또한 v1-feature-spec #9에서 '일일 한도 / 월 한도'가 있는데, 스펙에는 '월 예산 진행률'만 있고 일일 한도 표시가 없다. v1에서 되던 게 v2에서 빠진 건지 확인이 필요하다."
 
-## Expert Reviews
+**Winston (Architect):** "section 6에서 API 엔드포인트가 5개인데, 페이지 로드 시 5개 API를 동시에 호출하면 waterfall이 발생한다. 또한 WebSocket으로 실시간 업데이트를 한다고 했는데, 어떤 데이터가 WebSocket으로 오고 어떤 데이터가 polling인지 구분이 없다. 5개 API 전부 WebSocket으로 실시간 갱신되는 건지? 이 구분이 없으면 프론트엔드 캐시 무효화 전략을 세울 수 없다."
 
-### Sally (UX)
-대시보드 핵심 동선은 잘 설계되어 있습니다. 요약 카드 → 차트 → 퀵 액션까지 자연스러운 스캔 흐름이에요. 다만 **비용 카드 클릭 → /costs 드릴다운이 유일한 카드 인터랙션인데, 다른 카드(작업, 에이전트)도 클릭하면 해당 페이지로 이동할 것으로 기대하는 사용자가 있을 수 있습니다.** 카드별 클릭 동작을 명시하면 좋겠습니다. 퀵 액션 상단 이동은 좋은 방향이에요.
+**Sally (UX):** "section 3에서 '퀵 액션 노출도 -- 페이지 하단에 위치해 스크롤 필요'를 문제로 지적하고, section 4.2에서 '퀵 액션 상단 이동'을 개선 방향으로 제시했다. 하지만 퀵 액션을 상단으로 올리면 차트/예산 영역이 아래로 밀려서, CEO가 가장 먼저 봐야 하는 '비용/예산 상태'를 확인하려면 오히려 스크롤해야 한다. Banana2에게 최적 배치를 맡기겠다면 '퀵 액션 상단 이동'이라는 구체적인 지시를 제거해야 한다."
 
-### Winston (Architect)
-컴포넌트 7개 모두 dashboard.tsx 인라인이라 단일 파일 크기가 커질 수 있지만, UI-only 리팩토링 범위에서는 합리적입니다. **다만 SummaryCards 컴포넌트가 4개 카드를 하나로 묶고 있는데, 개별 카드 단위로 재사용할 수 있도록 `SummaryCard` (단수형) 단위 분리를 고려할 필요가 있습니다.** 데이터 바인딩은 기존 API 그대로 유지하므로 안전합니다.
+**Amelia (Dev):** "section 5에서 모든 컴포넌트가 pages/dashboard.tsx (인라인)이라고 되어있다. dashboard.tsx 하나에 SummaryCards, UsageChart, BudgetBar, SatisfactionChart, QuickActionsPanel, DashboardSkeleton이 전부 인라인으로 들어있다는 뜻인데, 이 파일이 이미 수백 줄일 것이다. 또한 data-testid에 quick-action-btn-{id}라는 동적 testid가 있는데, Playwright에서 이걸 어떻게 select하는지 전략이 없다."
 
-### Amelia (Dev)
-data-testid 목록이 잘 정의되어 있습니다. **하지만 `quick-action-btn`이 여러 개인데 개별 구분이 안 됩니다 — `quick-action-btn-{id}` 같은 동적 testid 패턴이 필요합니다.** 또한 예산 프로그레스 바의 퍼센트 텍스트(`budget-percentage`)와 projected spend 마커에 대한 testid가 누락되어 있습니다. Playwright 테스트 시 이 값들을 검증해야 합니다.
+**Quinn (QA):** "Playwright 테스트 14개 항목 중, 12번 '에러 상태 -- API 실패 시뮬레이션'은 실제 배포 URL에서 어떻게 테스트하는가? chat 스펙에는 테스트 유형 컬럼이 추가됐는데, dashboard 스펙에는 이 컬럼이 없다. 또한 11번 '로딩 스켈레톤'도 네트워크 속도가 빠르면 스켈레톤이 순식간에 사라져서 테스트가 flaky할 수 있다."
 
-### Quinn (QA)
-에러 상태(`dashboard-error`)와 로딩 스켈레톤(`dashboard-skeleton`)이 정의되어 있어 좋습니다. **하지만 Empty 상태가 정의되어 있지 않습니다 — 조직에 에이전트가 0명이거나 오늘 작업이 0건일 때 각 카드/차트가 어떻게 표시되는지 명시해야 합니다.** 또한 WebSocket 연결 끊김 후 재연결 시 데이터 refresh 동작도 명시하면 좋겠습니다.
+**Mary (BA):** "v1-feature-spec #9.2에서 'AI 사용량 -- 프로바이더별 호출 횟수'라고 되어있는데, 현재 스펙의 사용량 차트는 '일별 비용(spend)'을 보여준다. 호출 횟수와 비용은 다른 지표인데, v1에서 호출 횟수를 보여줬다면 v2에서도 호출 횟수를 보여야 하는 게 아닌가? 또한 v1 #9.3에서 '일일 한도'가 있었는데 현재 스펙에는 월 예산만 있다."
 
-### John (PM)
-v1 기능 대부분 커버되어 있습니다. **하지만 v1 spec 9.4에 있는 "최근 사용 명령어" 기능이 퀵 액션 섹션에서 언급되지 않았습니다.** 퀵 액션이 프리셋 실행 + 네비게이션만 다루고, 최근 사용 히스토리 기반 명령어 표시가 빠져 있어요. 이 기능이 현재 구현에 없는 건지, 있는데 spec에서 누락된 건지 확인이 필요합니다.
+**Bob (SM):** "section 8에 상태별 UI 정의가 잘 되어있는 건 좋지만, Empty 상태에서 '에이전트 0명: AI 에이전트를 추가해보세요'라고 안내한다고 했다. 이건 관리자 콘솔(admin)에서 에이전트를 추가하는 건데, 일반 사용자(app)에게 '추가해보세요'라고 안내하는 건 잘못된 유도다. app 사용자는 에이전트를 추가할 권한이 없을 수 있다."
 
-### Bob (SM)
-범위가 UI-only로 잘 한정되어 있고, "절대 건드리면 안 되는 것" 리스트가 명확합니다. 7개 컴포넌트 스타일 개선은 현실적인 범위입니다. 예상 작업량도 적절합니다.
+### Cross-talk
 
-### Mary (BA)
-CEO가 아침에 한눈에 상태를 파악한다는 시나리오가 명확하고, 비즈니스 가치가 잘 드러납니다. 예산 위험도 색상 체계(초록/노랑/빨강)가 즉각적인 의사결정을 지원합니다. 만족도 트렌드도 CEO의 핵심 관심사를 잘 반영합니다.
+**Mary -> John:** "John, 일일 한도와 호출 횟수 문제는 v1 기능 회귀에 해당한다. v1-feature-spec이 '최우선 참조'인데, 이 스펙이 v1의 일일 한도를 빼먹은 건 심각한 누락이다. Banana2 프롬프트에도 '일일 한도' 관련 UI가 전혀 없다."
 
----
+**Quinn -> Amelia:** "Amelia가 지적한 quick-action-btn-{id} 동적 testid 문제에 동의한다. Playwright에서 [data-testid^='quick-action-btn-']로 prefix match를 쓸 수 있지만, 이런 전략이 스펙에 명시되어 있지 않으면 테스트 작성자가 혼란스러울 것이다."
 
-## Cross-talk
+**Sally -> Bob:** "Bob이 지적한 '에이전트 추가해보세요' 안내 문제에 동의한다. app 사용자에게 admin 액션을 유도하는 건 UX 안티패턴이다. '관리자에게 에이전트 등록을 요청하세요' 같은 안내가 더 적절하다."
 
-**Sally → Amelia:** "비용 카드 외에 다른 카드도 클릭 가능하다면 각 카드에 `summary-card-tasks-link`, `summary-card-agents-link` 같은 testid도 필요하지 않을까요?"
+### Issues Found
 
-**Amelia → Sally:** "맞습니다. 다만 현재 코드를 보면 비용 카드만 navigate('/costs')가 있고 다른 카드는 클릭 동작이 없어요. UI-only 범위를 벗어나지 않으려면 기존 동작 그대로 유지하고, 비용 카드의 클릭 가능 힌트만 강화하는 게 맞을 것 같습니다."
+| # | Severity | Raised By | Issue | Suggestion |
+|---|----------|-----------|-------|------------|
+| 1 | Major | Mary, John | v1의 일일 예산 한도가 스펙에서 누락됨. v1 #9.3에 '일일 한도'가 있었으나 현재 월 예산만 표시 | 월 예산으로 통합된 근거 명시, 일일 비용은 요약 카드에서 표시 |
+| 2 | Medium | Mary | v1의 사용량 차트가 '호출 횟수'인데 v2에서 '비용(spend)'으로 변경됨 | tooltip에 호출 횟수도 함께 표시하도록 Banana2 프롬프트 수정 |
+| 3 | Medium | Quinn | Playwright 테스트에 테스트 유형(E2E/Mock필요) 컬럼 없음 | chat 스펙과 동일하게 테스트 유형 컬럼 추가 |
+| 4 | Medium | Sally | '퀵 액션 상단 이동'이 Banana2 재량과 모순 | 레이아웃 지시를 제거하고 Banana2에게 최적 배치 위임 |
+| 5 | Minor | Bob, Sally | Empty 상태에서 '에이전트를 추가해보세요'는 app 사용자에게 잘못된 유도 | '관리자에게 문의하세요' 등으로 변경 |
+| 6 | Minor | Amelia | quick-action-btn-{id} 동적 testid의 Playwright select 전략 미명시 | prefix match 전략 명시 |
 
-**Quinn → John:** "최근 사용 명령어 기능이 v1에 있다면 Empty 상태도 정의해야 해요 — 첫 사용 시 최근 명령어가 0개일 때 어떻게 보이는지."
+### Consensus Status
+- Major objections: 1
+- Minor opinions: 5
+- Cross-talk exchanges: 3
 
-**John → Quinn:** "확인해보니 현재 코드의 퀵 액션은 서버에서 고정 리스트를 내려주는 방식이라 '최근 사용'은 별도 UI가 아닌 서버 정렬로 처리됩니다. spec에 이 점을 명시하면 혼동이 줄겠네요."
+### v1-feature-spec Coverage Check
+- Features verified: v1 #9.1 요약 카드 (4개), v1 #9.4 퀵 액션, v1 #9.5 CEO 만족도
+- Gaps found: v1 #9.3 일일 예산 한도 누락 (월 예산으로 통합 근거 추가), v1 #9.2 호출 횟수 지표 불명확 (tooltip 표시로 보완)
 
----
-
-## Issues Found
-
-| # | 심각도 | 내용 | 조치 |
-|---|--------|------|------|
-| 1 | **Medium** | Empty 상태 미정의 (작업 0건, 에이전트 0명 등) | spec에 Empty 상태 섹션 추가 |
-| 2 | **Medium** | `quick-action-btn` testid가 개별 구분 불가 | `quick-action-btn-{id}` 패턴으로 변경 |
-| 3 | **Low** | 예산 퍼센트 텍스트, projected marker testid 누락 | `budget-percentage`, `budget-projected` 추가 |
-| 4 | **Low** | v1의 "최근 사용 명령어" 기능 언급 없음 | 퀵 액션 설명에 서버 정렬 방식 명시 |
-
-**Round 1 결과:** 4개 이슈 발견, 수정 적용 필요
+### Fixes Applied
+1. section 10: '퀵 액션 상단 이동' -> 'Banana2가 최적 위치 결정' 으로 수정
+2. section 8.3: '에이전트를 추가해보세요' -> '관리자에게 AI 에이전트 등록을 요청하세요' 수정
+3. section 10: v1 일일 한도가 월 예산으로 통합된 근거 명시
+4. section 13: Playwright 테스트에 테스트 유형 컬럼 추가, 퀵 액션을 네비게이션/프리셋으로 분리, 예산 색상 전환 테스트 추가 (14개 -> 16개)
+5. section 13: 동적 testid prefix match 전략 안내 추가
+6. Banana2 프롬프트: 사용량 차트 tooltip에 호출 횟수도 표시하도록 수정

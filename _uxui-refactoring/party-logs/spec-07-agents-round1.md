@@ -1,53 +1,66 @@
-# Party Mode Log: spec-07-agents — Round 1 (Collaborative)
-> 날짜: 2026-03-09
-> 문서: _uxui-refactoring/specs/07-agents.md
-> 리뷰어: 7-expert panel
+# [Party Mode Round 1 -- Collaborative Review] Agents (에이전트 관리)
 
----
+### Agent Discussion
 
-## Expert Debate
+**John (PM):** "WHY is there no 'unsaved changes' warning for the Soul editor? The Soul is a 16KB+ markdown document -- v1's CIO Soul had MPT, Kelly Criterion, and complex investment principles. If an admin spends 20 minutes editing a Soul and then accidentally clicks the backdrop to close the slide panel, all changes vanish. No warning, no confirmation, no autosave. This is a data loss risk that directly undermines WHY an admin would use this tool. Every serious text editor has this -- VS Code, Google Docs, even WordPress. We need a 'You have unsaved changes' confirmation dialog when closing the panel with dirty state."
 
-### John (PM)
-v1-feature-spec.md 2번 항목(에이전트 조직 시스템)의 핵심 기능 8개가 모두 섹션 9 체크리스트에 포함되어 있어 안심됩니다. 다만 **isSecretary(비서 에이전트) 속성**이 실제 코드에 존재하는데 설명서에 언급이 없어요. 비서 에이전트가 v1에서 특별한 역할을 했다면 이 속성의 UI 표시 방식도 정의가 필요합니다. 또한 Soul 템플릿 "불러오기" 플로우가 시나리오에는 있지만 Playwright 테스트 항목에 빠져 있어요.
+**Winston (Architect):** "The component table has exactly one row: 'AgentsPage -- pages/agents.tsx'. This file contains the table, the filter bar, the create form, the detail slide panel with 3 tabs, the Soul editor with preview, the deactivation modal -- all inline. During UXUI refactoring, any CSS change to the Soul editor preview styling could accidentally break the deactivation modal's layout because they share the same scope. The spec should at minimum enumerate the logical sub-components within this file, even if they stay inline. Also, the deactivation modal says 'basic modal, impact info missing' in problems but the fix in Section 4 doesn't specify what impact information should be shown."
 
-### Winston (Architect)
-컴포넌트 목록이 1행뿐입니다. "단일 파일에 모든 컴포넌트가 인라인"이라고 되어 있는데, UXUI 리팩토링 이후에도 단일 파일을 유지할지 결정이 필요해요. 에이전트 테이블, 디테일 패널, 생성 폼, Soul 에디터 등 최소 4~5개 서브 컴포넌트로 분리하는 게 유지보수와 재사용성 면에서 훨씬 낫습니다. 다만 이번 범위가 "UI만 변경"이라면, 컴포넌트 분리는 별도 작업으로 남겨두고 현재 구조 내에서 스타일만 개선하는 방향을 명시해야 합니다.
+**Sally (UX):** "A real admin managing 50+ AI agents would use the search and filter constantly. But Section 3 problem #6 says 'filter bar uses basic select styling' and Section 4 says 'filter bar style unification' -- that's too vague. What does unification mean? Matching the search input's border radius? Using the same dropdown component as the tier selector in the detail panel? Also, when all filters return zero results, there's no defined 'empty search results' state. That's different from the 'empty state' (no agents at all) -- one needs a 'Clear filters' CTA, the other needs a '+ New Agent' CTA."
 
-### Sally (UX)
-섹션 4.3에서 "에이전트 카드 뷰 옵션 (테이블 <-> 카드)" 토글을 제안하는데, 이 토글 UI가 레이아웃 분석(섹션 2)이나 data-testid 목록에 반영되지 않았습니다. 사용자가 뷰를 전환하는 인터랙션이 정의되지 않으면 구현 시 혼란이 생겨요. 또한 **로딩 상태(skeleton)와 에러 상태 UI 정의가 없습니다** — Banana2 프롬프트에 "Loading state, error state" 요청은 있지만 설명서 본문에 구체적 설명이 빠져 있어요.
+**Amelia (Dev):** "The detail panel has 3 tabs: info, soul, tools. The Soul tab has 'split view with markdown editor (left) and rendered preview (right).' But Section 3 says the height is only 400px min, which is a problem for long Souls. The fix in Section 4 says 'Soul editor height expanded.' To what? 600px? Full panel height minus header/tabs? Without a concrete value or rule (like `calc(100vh - 200px)`), every developer will interpret it differently. Also, `agents-soul-template-select` testid was missing from the original list."
 
-### Amelia (Dev)
-data-testid 22개로 주요 요소는 커버되지만, 누락이 보입니다: (1) `agents-loading` — 목록 로딩 중 skeleton/spinner, (2) `agents-error` — API 에러 상태, (3) `agents-view-toggle` — 카드/테이블 뷰 전환 (4.3에서 제안), (4) `agents-soul-template-select` — Soul 템플릿 선택 드롭다운. 생성 폼 내부 필드별 testid(name, role, tier 등)도 테스트 자동화 시 필요할 수 있지만, 폼 전체를 `agents-create-form`으로 묶는 것도 실용적이니 우선순위는 낮습니다.
+**Quinn (QA):** "The Playwright tests have 16 items but no test for the 'search results empty' state or the filter reset interaction. If I apply 3 filters simultaneously and get zero results, how does the user recover? Also, there's no test for the unsaved changes scenario -- if Soul editing doesn't have a save confirmation, we can't test it, but if we add one (per John's request), we need a test for it. Test #16 'tier auto-matching' is good but doesn't verify that the model dropdown actually updates -- it just says 'model automatically changes.' Changes to what value?"
 
-### Quinn (QA)
-Playwright 테스트 10개 중 **에러 핸들링 테스트가 전혀 없습니다**. 최소한: (1) 에이전트 생성 시 필수 필드 누락 → 에러 메시지, (2) API 실패 시 에러 UI 표시, (3) 중복 이름 생성 시도 처리. 또한 Soul 템플릿 불러오기 테스트와 카드/테이블 뷰 전환 테스트도 빠져 있어요. 현재 테스트는 happy path에 치우쳐 있어 edge case 커버리지가 부족합니다.
+**Mary (BA):** "The business case for this page is strong -- v2's core differentiator is dynamic org management. But the spec undersells the 'secretary agent' concept. v1 had a Chief of Staff (비서실장) who orchestrated all commands. If this page lets admins create/edit secretary agents but doesn't visually distinguish them from regular agents, admins might accidentally deactivate the secretary and break the entire command routing. The isSecretary attribute exists in the code (Section 3 problem #11), but the spec only mentions it as a problem without a solution in Section 4."
 
-### Bob (SM)
-범위가 적절합니다 — 단일 파일 수정, API 변경 없음. "절대 건드리면 안 되는 것" 5개 항목도 명확해서 좋아요. 다만 **섹션 4.3의 "카드 뷰 옵션"은 새로운 기능 추가**에 해당하며, 순수 UI 리팩토링 범위를 넘을 수 있습니다. 테이블 뷰를 유지하면서 스타일만 개선하고, 카드 뷰 전환은 별도 Enhancement로 분리하는 게 스코프 관리에 안전합니다.
+**Bob (SM):** "The scope note in Section 4 says 'card view option separated as Enhancement.' Good scope control. But Section 8 says mobile layout uses 'card list' -- so cards ARE in scope for mobile but NOT for desktop? That's confusing. Either cards are out of scope entirely (mobile uses a simplified table/list), or cards are the mobile default (which means card component must be built anyway). This ambiguity needs resolution. Also, the Banana2 mobile prompt says 'Agent list as cards instead of table' which contradicts removing cards from scope."
 
-### Mary (BA)
-에이전트 관리는 CORTHEX v2의 "동적 조직 관리" 핵심 가치와 직결되는 페이지예요. 관리자가 AI 직원을 자유롭게 생성/편집할 수 있는 경험이 v1과 차별화되는 포인트인데, 설명서가 그 가치를 잘 보존하면서 비주얼만 개선하는 방향이라 비즈니스 관점에서 적절합니다. Banana2 프롬프트에 "scannable agent list"를 강조한 것도 관리 효율을 높이는 데 핵심이에요.
-
----
-
-## Cross-talk
-
-**Bob -> Winston:** 카드 뷰 옵션 건에 동의합니다. 현재 범위에서는 테이블 스타일 개선에 집중하고, 카드 뷰 토글은 Enhancement로 빼는 게 맞겠어요. Winston이 말씀하신 컴포넌트 분리도 마찬가지로 별도 작업으로.
-
-**Winston -> Bob:** 네, 이번 작업에서는 "UI만 변경, 구조 유지"를 명확히 하고, 컴포넌트 분리와 카드 뷰는 후속 작업으로 명시하는 게 좋겠습니다.
-
-**Sally -> Quinn:** 로딩/에러 상태 정의가 빠진 건 UX와 QA 모두에게 영향이 커요. 로딩 중 skeleton UI와 에러 시 재시도 버튼이 정의되어야 테스트도 작성할 수 있죠.
-
-**Quinn -> Amelia:** 로딩/에러 testid 추가 동의합니다. `agents-loading`과 `agents-error`는 필수이고, 에러 상태에서 재시도 버튼 `agents-retry-btn`도 있으면 좋겠어요.
-
----
-
-## Issues Found
+### Issues Found
 
 | # | Severity | Raised By | Issue | Suggestion |
-|---|----------|-----------|-------|-----------|
-| 1 | Medium | Sally, Amelia, Quinn | 로딩 상태(skeleton) / 에러 상태 UI 정의 누락 | 섹션 3에 로딩/에러 상태 추가, data-testid 2개 추가 (`agents-loading`, `agents-error`) |
-| 2 | Medium | Bob, Winston | 섹션 4.3의 "카드 뷰 옵션"이 UI 리팩토링 범위를 넘는 새 기능 | 카드 뷰 토글을 별도 Enhancement로 분리, 현재 범위에서 제거 |
-| 3 | Low | John | isSecretary(비서 에이전트) 속성이 코드에 존재하나 설명서에 미언급 | 비서 에이전트 표시 방식 추가 (시스템 뱃지와 유사한 비서 뱃지) |
-| 4 | Low | Amelia | `agents-soul-template-select` data-testid 누락 | Soul 템플릿 선택 testid 추가 |
-| 5 | Low | Quinn | Soul 템플릿 불러오기 / 에러 핸들링 테스트 항목 누락 | Playwright 테스트 3개 추가 |
+|---|----------|-----------|-------|------------|
+| 1 | High | John | Soul 편집 중 패널 닫기 시 미저장 경고 없음. 데이터 유실 위험. | 패널 닫기 시 dirty 상태면 "저장하지 않은 변경" 확인 다이얼로그 표시 |
+| 2 | High | Sally, Quinn | 상태별 UI 정의 누락 -- 로딩 skeleton, 에러+재시도, 검색결과 없음 등. | Section 3에 상태별 UI 정의 테이블 추가 |
+| 3 | Medium | Winston | 비활성화 모달의 "영향 범위 정보"가 무엇인지 미구체화. | 비활성화 시 해당 에이전트가 연결된 워크플로우/스케줄 수를 표시하는 것을 명시 |
+| 4 | Medium | Mary | isSecretary(비서 에이전트) 시각 표시 미정의. 실수로 비활성화 위험. | Section 9 체크리스트에 비서 에이전트 표시 추가. 비서 뱃지 정의. |
+
+### Consensus Status
+
+4개 이슈 모두 즉시 수정 합의. 주요 반대 의견 0개.
+- #1: 모든 전문가 동의 (데이터 유실 방지는 필수)
+- #2: Sally + Quinn + Amelia 합의 (상태 정의 없으면 테스트 불가)
+- #3: Winston + Mary 합의 (비활성화 영향 범위 표시)
+- #4: Mary + John 합의 (비서 에이전트 보호 필수)
+
+### Cross-talk
+
+**John -> Mary:** "비서 에이전트 보호 문제에 동감합니다. 시스템 에이전트는 이미 isSystem 보호 로직이 있는데, 비서 에이전트도 비활성화 시 추가 경고가 필요해요. '이 에이전트는 명령 라우팅의 핵심입니다. 비활성화하면 자동 라우팅이 중단됩니다' 같은 경고요."
+
+**Mary -> John:** "맞아요. 비서 뱃지를 보라색으로 시스템 뱃지(앰버)와 구분하면 시각적으로도 명확해지겠죠."
+
+**Quinn -> Sally:** "검색 결과 없음 상태와 빈 목록 상태를 구분해서 정의하면, 테스트에서도 두 시나리오를 명확히 분리할 수 있어요. '필터 초기화' 링크의 testid도 필요하겠네요."
+
+**Sally -> Quinn:** "동의합니다. `agents-search-empty`와 `agents-filter-reset` testid를 추가하면 되겠어요."
+
+### v1-feature-spec Coverage Check
+
+| v1 기능 (Section 2) | 스펙 커버 여부 | 비고 |
+|---------------------|--------------|------|
+| 에이전트 CRUD (생성/수정/비활성화) | O | Section 9 |
+| 3계급 (Manager/Specialist/Worker) + 모델 배정 | O | |
+| 부서 배정 | O | |
+| Soul(성격) 편집 + 미리보기 | O | |
+| Soul 템플릿 불러오기 | O | |
+| 시스템 에이전트 보호 (삭제 불가) | O | |
+| 도구 허용 목록 확인 | O | |
+| 필터 (부서/계급/상태/검색) | O | |
+| 비서 에이전트(isSecretary) 표시 | **X -> 수정 완료** | Section 9에 추가 |
+
+### Fixes Applied
+
+1. **Section 3**: 문제점 #12 "미저장 경고 없음" 추가. "상태별 UI 정의" 테이블 신규 추가 (11개 상태: 로딩, 저장, 에러, 빈 목록, 검색 결과 없음, Soul 미저장 경고 등)
+2. **Section 3**: 문제점 #7에 "이 에이전트가 어떤 워크플로우/스케줄에 연결되어 있는지 미표시" 구체화
+3. **Section 9**: 비서 에이전트(isSecretary) 시각적 구분 체크리스트 항목 추가
+4. **Section 11**: `agents-unsaved-dialog`, `agents-search-empty`, `agents-filter-reset` testid 3개 추가
+5. **Section 12**: 테스트 #17 미저장 경고, #18 검색 결과 없음, #19 비서 에이전트 뱃지 추가
