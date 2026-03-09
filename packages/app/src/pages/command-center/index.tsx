@@ -30,15 +30,14 @@ export function CommandCenterPage() {
   const [detailModalId, setDetailModalId] = useState<string | null>(null)
   const [showPresetManager, setShowPresetManager] = useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
+  const [mobileTab, setMobileTab] = useState<'chat' | 'report'>('chat')
 
-  // Fetch selected command details
   const { data: selectedCommandData } = useQuery({
     queryKey: ['command', selectedReportId],
     queryFn: () => api.get<{ data: CommandDetail }>(`/workspace/commands/${selectedReportId}`),
     enabled: !!selectedReportId,
   })
 
-  // Replay: auto-submit from ops-log redirect
   useEffect(() => {
     const replayText = searchParams.get('replay')
     if (replayText && !isSubmitting && !historyLoading) {
@@ -51,6 +50,7 @@ export function CommandCenterPage() {
     (commandId: string) => {
       setSelectedReport(commandId)
       setViewMode('report')
+      setMobileTab('report')
     },
     [setSelectedReport, setViewMode],
   )
@@ -66,7 +66,6 @@ export function CommandCenterPage() {
     [executePreset],
   )
 
-  // Map presets to SlashPopup format
   const presetItems = presets.map((p) => ({
     id: p.id,
     name: p.name,
@@ -76,24 +75,27 @@ export function CommandCenterPage() {
   }))
 
   const selectedCommand = selectedCommandData?.data
+  const activeSteps = delegationSteps.filter((s) => s.commandId === activeCommandId)
 
   return (
-    <div data-testid="command-center-page" className="h-full flex flex-col bg-white dark:bg-zinc-950">
-      {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 flex-shrink-0">
-        <h1 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Task delegation pipeline</h1>
-      </div>
-
-      {/* Pipeline Visualization */}
+    <div
+      data-testid="command-center-page"
+      className="h-full flex flex-col bg-zinc-950 overflow-hidden"
+    >
+      {/* Pipeline bar — always visible at top */}
       <PipelineVisualization
         activeCommandId={activeCommandId}
-        delegationSteps={delegationSteps.filter((s) => s.commandId === activeCommandId)}
+        delegationSteps={activeSteps}
       />
 
-      {/* Main Content - Two Column Layout */}
+      {/* Main body: left thread + right report, fills remaining height */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Left Column - Message Thread */}
-        <div className="w-1/2 flex flex-col border-r border-zinc-200 dark:border-zinc-800 min-w-0">
+        {/* ── Left column: message thread ── */}
+        <div
+          className={`flex flex-col border-r border-zinc-800 min-w-0
+            ${mobileTab === 'chat' ? 'flex' : 'hidden'}
+            md:flex md:w-[420px] lg:w-[480px] xl:w-[520px]`}
+        >
           <MessageThread
             messages={messages}
             isLoading={historyLoading}
@@ -103,8 +105,12 @@ export function CommandCenterPage() {
           />
         </div>
 
-        {/* Right Column - Deliverable Viewer */}
-        <div className="w-1/2 flex flex-col min-w-0 bg-zinc-50/50 dark:bg-zinc-900/30">
+        {/* ── Right column: deliverable viewer ── */}
+        <div
+          className={`flex-1 flex flex-col min-w-0
+            ${mobileTab === 'report' ? 'flex' : 'hidden'}
+            md:flex`}
+        >
           <DeliverableViewer
             commandId={selectedReportId}
             command={selectedCommand}
@@ -112,12 +118,13 @@ export function CommandCenterPage() {
             onClose={() => {
               setSelectedReport(null)
               setViewMode('chat')
+              setMobileTab('chat')
             }}
           />
         </div>
       </div>
 
-      {/* Command Input - Full Width at Bottom */}
+      {/* Command input — pinned to bottom */}
       <CommandInput
         onSubmit={submitCommand}
         isSubmitting={isSubmitting}
@@ -127,7 +134,33 @@ export function CommandCenterPage() {
         onOpenPresets={() => setShowPresetManager(true)}
       />
 
-      {/* Report Detail Modal */}
+      {/* Mobile tab switcher — only shown on small screens */}
+      <div className="md:hidden flex border-t border-zinc-800 bg-zinc-950">
+        <button
+          data-testid="view-tab-chat"
+          onClick={() => setMobileTab('chat')}
+          className={`flex-1 py-3 text-xs font-medium transition-colors ${
+            mobileTab === 'chat'
+              ? 'text-zinc-100 border-t-2 border-corthex-accent -mt-px'
+              : 'text-zinc-500 hover:text-zinc-300'
+          }`}
+        >
+          Thread
+        </button>
+        <button
+          data-testid="view-tab-report"
+          onClick={() => setMobileTab('report')}
+          className={`flex-1 py-3 text-xs font-medium transition-colors ${
+            mobileTab === 'report'
+              ? 'text-zinc-100 border-t-2 border-corthex-accent -mt-px'
+              : 'text-zinc-500 hover:text-zinc-300'
+          }`}
+        >
+          Deliverable
+        </button>
+      </div>
+
+      {/* Modals */}
       {detailModalId && (
         <ReportDetailModal
           isOpen={!!detailModalId}
@@ -136,7 +169,6 @@ export function CommandCenterPage() {
         />
       )}
 
-      {/* Preset Manager Modal */}
       {showPresetManager && (
         <PresetManager
           presets={presets}

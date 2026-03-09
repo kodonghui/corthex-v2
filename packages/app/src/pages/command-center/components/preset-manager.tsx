@@ -15,7 +15,9 @@ type Props = {
 
 const CATEGORIES = ['일반', '분석', '보고', '전략', '마케팅', '기술']
 
-export function PresetManager({ presets, onClose, onCreate, onUpdate, onDelete, onExecute, isCreating, isExecuting }: Props) {
+export function PresetManager({
+  presets, onClose, onCreate, onUpdate, onDelete, onExecute, isCreating, isExecuting,
+}: Props) {
   const [mode, setMode] = useState<'list' | 'create' | 'edit'>('list')
   const [editId, setEditId] = useState<string | null>(null)
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
@@ -25,98 +27,93 @@ export function PresetManager({ presets, onClose, onCreate, onUpdate, onDelete, 
   const [category, setCategory] = useState('')
 
   const resetForm = useCallback(() => {
-    setName('')
-    setCommand('')
-    setDescription('')
-    setCategory('')
-    setEditId(null)
-    setMode('list')
+    setName(''); setCommand(''); setDescription(''); setCategory(''); setEditId(null); setMode('list')
   }, [])
 
   const handleCreate = useCallback(async () => {
     if (!name.trim() || !command.trim()) return
     try {
-      await onCreate({
-        name: name.trim(),
-        command: command.trim(),
-        description: description.trim() || null,
-        category: category || null,
-      })
+      await onCreate({ name: name.trim(), command: command.trim(), description: description.trim() || null, category: category || null })
       resetForm()
-    } catch {
-      // error is shown by toast in parent
-    }
+    } catch { /* toast handles errors */ }
   }, [name, command, description, category, onCreate, resetForm])
 
   const handleUpdate = useCallback(async () => {
     if (!editId || !name.trim() || !command.trim()) return
     try {
-      await onUpdate({
-        id: editId,
-        name: name.trim(),
-        command: command.trim(),
-        description: description.trim() || null,
-        category: category || null,
-      })
+      await onUpdate({ id: editId, name: name.trim(), command: command.trim(), description: description.trim() || null, category: category || null })
       resetForm()
-    } catch {
-      // error shown by toast
-    }
+    } catch { /* toast handles errors */ }
   }, [editId, name, command, description, category, onUpdate, resetForm])
 
   const startEdit = useCallback((preset: Preset) => {
-    setEditId(preset.id)
-    setName(preset.name)
-    setCommand(preset.command)
-    setDescription(preset.description || '')
-    setCategory(preset.category || '')
-    setMode('edit')
+    setEditId(preset.id); setName(preset.name); setCommand(preset.command)
+    setDescription(preset.description || ''); setCategory(preset.category || ''); setMode('edit')
   }, [])
 
   const handleDelete = useCallback(async (id: string) => {
-    try {
-      await onDelete(id)
-      setDeleteConfirmId(null)
-    } catch {
-      // error shown by toast
-    }
+    try { await onDelete(id); setDeleteConfirmId(null) } catch { /* toast */ }
   }, [onDelete])
 
+  const inputCls = "w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500/30 transition-colors"
+
   return (
-    <div data-testid="preset-manager-modal" className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col">
+    <div
+      data-testid="preset-manager-modal"
+      className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      onClick={(e) => e.target === e.currentTarget && mode === 'list' && onClose()}
+    >
+      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-zinc-200 dark:border-zinc-700">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-            {mode === 'create' ? '새 프리셋' : mode === 'edit' ? '프리셋 수정' : '프리셋 관리'}
-          </h2>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800 flex-shrink-0">
+          <div className="flex items-center gap-3">
+            {mode !== 'list' && (
+              <button
+                onClick={resetForm}
+                className="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+              >
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <path d="M10 6H2M5 3L2 6l3 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            )}
+            <h2 className="text-sm font-semibold text-zinc-100">
+              {mode === 'create' ? 'New Template' : mode === 'edit' ? 'Edit Template' : 'Saved Templates'}
+            </h2>
+          </div>
           <button
             onClick={mode === 'list' ? onClose : resetForm}
-            className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 text-xl"
+            className="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
           >
-            {mode === 'list' ? '✕' : '←'}
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+              <path d="M2 2l7 7M9 2l-7 7" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+            </svg>
           </button>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4">
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto p-5">
           {mode === 'list' && (
             <>
-              {/* Create button */}
+              {/* Create new */}
               <button
                 data-testid="preset-create-btn"
                 onClick={() => setMode('create')}
-                className="w-full flex items-center gap-2 p-3 rounded-lg border-2 border-dashed border-zinc-300 dark:border-zinc-600 text-zinc-500 dark:text-zinc-400 hover:border-indigo-400 hover:text-indigo-500 transition-colors mb-3"
+                className="w-full flex items-center gap-3 p-3 rounded-xl border border-dashed border-zinc-700 text-zinc-500 hover:border-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50 transition-all mb-4"
               >
-                <span className="text-lg">+</span>
-                <span className="text-sm">새 프리셋 만들기</span>
+                <div className="w-7 h-7 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center flex-shrink-0">
+                  <svg width="11" height="11" viewBox="0 0 11 11" fill="none" className="text-zinc-400">
+                    <path d="M5.5 2v7M2 5.5h7" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                  </svg>
+                </div>
+                <span className="text-sm">New template</span>
               </button>
 
-              {/* Preset list */}
+              {/* List */}
               {presets.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-sm text-zinc-400">저장된 프리셋이 없습니다.</p>
-                  <p className="text-xs text-zinc-400 mt-1">자주 쓰는 명령을 프리셋으로 저장해보세요.</p>
+                <div className="text-center py-10">
+                  <p className="text-sm text-zinc-600">No templates saved yet</p>
+                  <p className="text-xs text-zinc-700 mt-1">Save frequently used commands as templates for quick access</p>
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -124,75 +121,79 @@ export function PresetManager({ presets, onClose, onCreate, onUpdate, onDelete, 
                     <div
                       key={preset.id}
                       data-testid="preset-item"
-                      className="rounded-lg border border-zinc-200 dark:border-zinc-700 p-3 hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors"
+                      className="group rounded-xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800/50 hover:border-zinc-700 transition-all"
                     >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
-                              {preset.name}
-                            </span>
+                      <div className="flex items-start gap-3 p-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-sm font-medium text-zinc-200 truncate">{preset.name}</span>
                             {preset.category && (
-                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-700 text-zinc-500 dark:text-zinc-400 flex-shrink-0">
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-zinc-500 flex-shrink-0">
                                 {preset.category}
                               </span>
                             )}
                             {preset.isGlobal && (
-                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex-shrink-0">
-                                공용
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-corthex-accent/10 border border-corthex-accent/20 text-corthex-accent-dark flex-shrink-0">
+                                Global
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 truncate">
-                            {preset.command}
-                          </p>
+                          <p className="text-xs text-zinc-600 mt-0.5 truncate">{preset.command}</p>
                           {preset.description && (
-                            <p className="text-xs text-zinc-400 mt-0.5 truncate">
-                              {preset.description}
-                            </p>
+                            <p className="text-xs text-zinc-700 mt-0.5 truncate">{preset.description}</p>
                           )}
                         </div>
-                        <div className="flex items-center gap-1 flex-shrink-0">
-                          <Button
+                        <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {/* Run */}
+                          <button
                             data-testid="preset-execute-btn"
                             onClick={() => onExecute(preset.id)}
                             disabled={isExecuting}
-                            className="h-7 px-2 text-xs"
-                            title="실행"
+                            title="Run"
+                            className="w-7 h-7 flex items-center justify-center rounded-lg bg-corthex-accent/10 border border-corthex-accent/30 text-corthex-accent-dark hover:bg-corthex-accent/20 transition-colors disabled:opacity-40"
                           >
-                            ▶
-                          </Button>
+                            <svg width="9" height="10" viewBox="0 0 9 10" fill="none">
+                              <path d="M2 1.5l5.5 3L2 7.5V1.5z" fill="currentColor" />
+                            </svg>
+                          </button>
                           {!preset.isGlobal && (
                             <>
+                              {/* Edit */}
                               <button
                                 onClick={() => startEdit(preset)}
-                                className="h-7 w-7 flex items-center justify-center text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 text-xs rounded hover:bg-zinc-100 dark:hover:bg-zinc-700"
-                                title="수정"
+                                title="Edit"
+                                className="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-600 hover:text-zinc-300 hover:bg-zinc-700 transition-colors"
                               >
-                                ✏️
+                                <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                                  <path d="M2 8.5l1-1 4-4 1 1-4 4-1 1z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+                                  <path d="M7 3.5l1-1" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                                </svg>
                               </button>
+                              {/* Delete */}
                               {deleteConfirmId === preset.id ? (
                                 <div className="flex items-center gap-1">
                                   <button
                                     onClick={() => handleDelete(preset.id)}
-                                    className="h-7 px-2 text-xs bg-red-500 text-white rounded hover:bg-red-600"
+                                    className="h-7 px-2 text-xs rounded-lg bg-red-950/60 border border-red-800/60 text-red-400 hover:bg-red-900/60 transition-colors"
                                   >
-                                    삭제
+                                    Delete
                                   </button>
                                   <button
                                     onClick={() => setDeleteConfirmId(null)}
-                                    className="h-7 px-2 text-xs text-zinc-500 rounded hover:bg-zinc-100 dark:hover:bg-zinc-700"
+                                    className="h-7 px-2 text-xs rounded-lg text-zinc-500 hover:text-zinc-300 hover:bg-zinc-700 transition-colors"
                                   >
-                                    취소
+                                    Cancel
                                   </button>
                                 </div>
                               ) : (
                                 <button
                                   onClick={() => setDeleteConfirmId(preset.id)}
-                                  className="h-7 w-7 flex items-center justify-center text-zinc-400 hover:text-red-500 text-xs rounded hover:bg-zinc-100 dark:hover:bg-zinc-700"
-                                  title="삭제"
+                                  title="Delete"
+                                  className="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-600 hover:text-red-400 hover:bg-zinc-700 transition-colors"
                                 >
-                                  🗑
+                                  <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                                    <path d="M2 3h7M4 3V2h3v1M4.5 5.5V8M6.5 5.5V8M3 3l.5 6h4l.5-6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                                  </svg>
                                 </button>
                               )}
                             </>
@@ -209,57 +210,57 @@ export function PresetManager({ presets, onClose, onCreate, onUpdate, onDelete, 
           {(mode === 'create' || mode === 'edit') && (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                  이름 <span className="text-red-500">*</span>
+                <label className="block text-xs font-medium text-zinc-400 mb-1.5">
+                  Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="예: 삼성전자 주간 보고서"
-                  className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="e.g. Weekly Sales Report"
+                  className={inputCls}
                   maxLength={100}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                  명령어 <span className="text-red-500">*</span>
+                <label className="block text-xs font-medium text-zinc-400 mb-1.5">
+                  Command <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   value={command}
                   onChange={(e) => setCommand(e.target.value)}
-                  placeholder="예: 삼성전자 최근 실적 분석하고 투자 의견 작성해줘"
+                  placeholder="e.g. Analyze Q3 sales data and create a presentation"
                   rows={3}
-                  className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                  className={`${inputCls} resize-none`}
                   maxLength={10000}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                  설명 (선택)
+                <label className="block text-xs font-medium text-zinc-400 mb-1.5">
+                  Description <span className="text-zinc-600">(optional)</span>
                 </label>
                 <input
                   type="text"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="이 프리셋에 대한 설명"
-                  className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="A short description of what this template does"
+                  className={inputCls}
                   maxLength={500}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                  카테고리 (선택)
+                <label className="block text-xs font-medium text-zinc-400 mb-1.5">
+                  Category <span className="text-zinc-600">(optional)</span>
                 </label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className={`${inputCls} appearance-none`}
                 >
-                  <option value="">카테고리 없음</option>
+                  <option value="">No category</option>
                   {CATEGORIES.map((cat) => (
                     <option key={cat} value={cat}>{cat}</option>
                   ))}
@@ -269,22 +270,22 @@ export function PresetManager({ presets, onClose, onCreate, onUpdate, onDelete, 
           )}
         </div>
 
-        {/* Footer */}
+        {/* Footer for create/edit forms */}
         {(mode === 'create' || mode === 'edit') && (
-          <div className="p-4 border-t border-zinc-200 dark:border-zinc-700 flex justify-end gap-2">
-            <Button
+          <div className="px-5 py-4 border-t border-zinc-800 flex justify-end gap-2 flex-shrink-0">
+            <button
               onClick={resetForm}
-              className="px-4 py-2 text-sm bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-600"
+              className="h-8 px-4 text-xs font-medium rounded-lg border border-zinc-700 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
             >
-              취소
-            </Button>
-            <Button
+              Cancel
+            </button>
+            <button
               onClick={mode === 'create' ? handleCreate : handleUpdate}
               disabled={!name.trim() || !command.trim() || isCreating}
-              className="px-4 py-2 text-sm"
+              className="h-8 px-4 text-xs font-semibold rounded-lg bg-corthex-accent text-white hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              {isCreating ? '저장 중...' : mode === 'create' ? '생성' : '저장'}
-            </Button>
+              {isCreating ? 'Saving...' : mode === 'create' ? 'Create' : 'Save'}
+            </button>
           </div>
         )}
       </div>

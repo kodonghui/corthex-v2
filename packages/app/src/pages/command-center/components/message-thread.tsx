@@ -17,78 +17,148 @@ function formatTime(iso: string): string {
 }
 
 const EXAMPLE_COMMANDS = [
-  { text: 'Give instructions to your AI team (e.g., "Analyze our Q3 sales data and create a presentation")...', desc: '' },
+  {
+    text: 'Analyze our Q3 sales data and create a presentation',
+    label: 'Data analysis',
+  },
+  {
+    text: 'Write a competitive landscape report for the AI agent market',
+    label: 'Research report',
+  },
+  {
+    text: 'Summarize the board meeting notes and extract action items',
+    label: 'Summarize',
+  },
 ]
 
+const ROLE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
+  MANAGER: {
+    bg: 'bg-violet-950/50',
+    text: 'text-violet-300',
+    border: 'border-violet-800/60',
+  },
+  CONTENT: {
+    bg: 'bg-amber-950/40',
+    text: 'text-amber-300',
+    border: 'border-amber-800/60',
+  },
+  ANALYST: {
+    bg: 'bg-blue-950/50',
+    text: 'text-blue-300',
+    border: 'border-blue-800/60',
+  },
+  DESIGNER: {
+    bg: 'bg-emerald-950/40',
+    text: 'text-emerald-300',
+    border: 'border-emerald-800/60',
+  },
+}
+
 function RoleBadge({ role }: { role: string }) {
-  const styles: Record<string, string> = {
-    MANAGER: 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400',
-    CONTENT: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-    ANALYST: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-    DESIGNER: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+  const c = ROLE_COLORS[role]
+  if (!c) {
+    return (
+      <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-sm uppercase tracking-wide bg-zinc-800 text-zinc-400">
+        {role}
+      </span>
+    )
   }
   return (
-    <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded uppercase ${styles[role] || 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'}`}>
+    <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-sm uppercase tracking-wide border ${c.bg} ${c.text} ${c.border}`}>
       {role}
     </span>
   )
 }
 
-function QualityBadge({ passed }: { passed: boolean }) {
+function QualityBadge({ passed, testId }: { passed: boolean; testId?: string }) {
   return (
     <span
-      className={`text-[10px] font-medium px-1.5 py-0.5 rounded flex items-center gap-1 ${
+      data-testid={testId}
+      className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-sm flex items-center gap-1 border ${
         passed
-          ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
-          : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+          ? 'bg-emerald-950/60 text-emerald-400 border-emerald-800/60'
+          : 'bg-red-950/60 text-red-400 border-red-800/60'
       }`}
     >
-      <span className={`w-1.5 h-1.5 rounded-full ${passed ? 'bg-emerald-500' : 'bg-red-500'}`} />
+      <span className={`w-1.5 h-1.5 rounded-full ${passed ? 'bg-emerald-400' : 'bg-red-400'}`} />
       {passed ? 'PASS' : 'FAIL'}
     </span>
   )
 }
 
+function AgentAvatar({ name, role }: { name?: string; role?: string }) {
+  const initial = name?.charAt(0)?.toUpperCase() || 'A'
+  const c = role ? ROLE_COLORS[role] : undefined
+  return (
+    <div
+      className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-semibold border
+        ${c ? `${c.bg} ${c.text} ${c.border}` : 'bg-zinc-800 text-zinc-400 border-zinc-700'}`}
+    >
+      {initial}
+    </div>
+  )
+}
+
+function UserAvatar() {
+  return (
+    <div className="w-7 h-7 rounded-full bg-corthex-accent/20 border border-corthex-accent/40 flex items-center justify-center flex-shrink-0">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-corthex-accent-dark">
+        <circle cx="6" cy="4" r="2.5" stroke="currentColor" strokeWidth="1.3" />
+        <path d="M1.5 11c0-2.5 2-4 4.5-4s4.5 1.5 4.5 4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+      </svg>
+    </div>
+  )
+}
+
 function EmptyState({ onExampleClick }: { onExampleClick: (text: string) => void }) {
   return (
-    <div data-testid="message-empty-state" className="flex-1 flex flex-col items-center justify-center p-6">
-      <div className="w-full max-w-md">
-        <button
-          onClick={() => onExampleClick(EXAMPLE_COMMANDS[0].text)}
-          className="w-full text-left p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
-        >
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">{EXAMPLE_COMMANDS[0].text}</p>
-        </button>
+    <div
+      data-testid="message-empty-state"
+      className="flex-1 flex flex-col items-center justify-center p-6 gap-6"
+    >
+      {/* Wordmark */}
+      <div className="text-center">
+        <p className="text-zinc-600 text-xs font-medium uppercase tracking-widest mb-2">Command Center</p>
+        <h2 className="text-zinc-200 text-lg font-semibold">What shall we tackle today?</h2>
+        <p className="text-zinc-500 text-sm mt-1">Use {'/'} for commands, {'@'} to address a specific agent</p>
+      </div>
+
+      {/* Example tiles */}
+      <div className="w-full max-w-sm flex flex-col gap-2">
+        {EXAMPLE_COMMANDS.map((cmd) => (
+          <button
+            key={cmd.text}
+            data-testid="example-command"
+            onClick={() => onExampleClick(cmd.text)}
+            className="group flex items-start gap-3 p-3 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-600 hover:bg-zinc-800/80 transition-all text-left"
+          >
+            <span className="mt-0.5 flex-shrink-0 w-5 h-5 rounded bg-zinc-800 border border-zinc-700 flex items-center justify-center group-hover:border-zinc-500 transition-colors">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className="text-zinc-500 group-hover:text-zinc-300">
+                <path d="M2 5h6M5 2l3 3-3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+            <div>
+              <p className="text-xs font-medium text-zinc-500 mb-0.5">{cmd.label}</p>
+              <p className="text-sm text-zinc-400 group-hover:text-zinc-200 leading-snug transition-colors">{cmd.text}</p>
+            </div>
+          </button>
+        ))}
       </div>
     </div>
   )
 }
 
-function AgentAvatar({ name, role }: { name?: string; role?: string }) {
-  // Generate avatar based on role or name
-  const avatarColors: Record<string, string> = {
-    MANAGER: 'bg-violet-100 dark:bg-violet-900/30',
-    CONTENT: 'bg-amber-100 dark:bg-amber-900/30',
-    ANALYST: 'bg-blue-100 dark:bg-blue-900/30',
-    DESIGNER: 'bg-emerald-100 dark:bg-emerald-900/30',
-  }
-  
-  const initial = name?.charAt(0) || 'A'
-  const bgColor = role ? avatarColors[role] || 'bg-zinc-100 dark:bg-zinc-800' : 'bg-zinc-100 dark:bg-zinc-800'
-  
-  return (
-    <div className={`w-8 h-8 rounded-full ${bgColor} flex items-center justify-center flex-shrink-0`}>
-      <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">{initial}</span>
-    </div>
-  )
-}
-
-export function MessageThread({ messages, isLoading, onReportClick, onExampleClick, selectedCommandId }: Props) {
+export function MessageThread({
+  messages,
+  isLoading,
+  onReportClick,
+  onExampleClick,
+  selectedCommandId,
+}: Props) {
   const bottomRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [showScrollBtn, setShowScrollBtn] = useState(false)
 
-  // Auto-scroll to bottom on new messages
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages.length])
@@ -107,13 +177,16 @@ export function MessageThread({ messages, isLoading, onReportClick, onExampleCli
   // Loading skeleton
   if (isLoading) {
     return (
-      <div data-testid="message-loading-skeleton" className="flex-1 p-4 space-y-4">
+      <div
+        data-testid="message-loading-skeleton"
+        className="flex-1 p-4 space-y-4 overflow-hidden"
+      >
         {[1, 2, 3].map((i) => (
           <div key={i} className="flex gap-3 animate-pulse">
-            <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-700" />
-            <div className="flex-1">
-              <div className="h-4 w-24 bg-zinc-200 dark:bg-zinc-700 rounded mb-2" />
-              <div className="h-12 bg-zinc-100 dark:bg-zinc-800 rounded-lg" />
+            <div className="w-7 h-7 rounded-full bg-zinc-800 flex-shrink-0" />
+            <div className="flex-1 space-y-2">
+              <div className="h-3 w-20 bg-zinc-800 rounded" />
+              <div className="h-10 bg-zinc-900 rounded-lg" />
             </div>
           </div>
         ))}
@@ -121,75 +194,87 @@ export function MessageThread({ messages, isLoading, onReportClick, onExampleCli
     )
   }
 
-  // Empty state
   if (messages.length === 0) {
     return <EmptyState onExampleClick={onExampleClick || (() => {})} />
   }
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-200 dark:border-zinc-800">
-        <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Message thread</h2>
-        <button className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <circle cx="3" cy="8" r="1.5" fill="currentColor" />
-            <circle cx="8" cy="8" r="1.5" fill="currentColor" />
-            <circle cx="13" cy="8" r="1.5" fill="currentColor" />
-          </svg>
-        </button>
-      </div>
-
-      {/* Messages */}
+    <div className="flex flex-col h-full relative">
+      {/* Scroll area */}
       <div
         data-testid="message-list"
         ref={containerRef}
-        className="flex-1 overflow-y-auto p-4 space-y-4"
+        className="flex-1 overflow-y-auto px-3 py-3 space-y-1"
         onScroll={handleScroll}
       >
-        {messages.map((msg) => (
-          <div key={msg.id}>
-            {msg.role === 'user' && (
+        {messages.map((msg) => {
+          if (msg.role === 'user') {
+            const isSelected = selectedCommandId === msg.commandId
+            return (
               <div
+                key={msg.id}
                 data-testid="message-item-user"
-                className={`flex gap-3 p-3 rounded-lg border transition-colors cursor-pointer ${
-                  selectedCommandId === msg.commandId
-                    ? 'border-blue-300 bg-blue-50/50 dark:border-blue-700 dark:bg-blue-900/20'
-                    : 'border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
-                }`}
                 onClick={() => msg.commandId && onReportClick(msg.commandId)}
+                className={`group flex gap-2.5 px-3 py-2.5 rounded-lg cursor-pointer transition-all ${
+                  isSelected
+                    ? 'bg-corthex-accent/10 border border-corthex-accent/30'
+                    : 'hover:bg-zinc-900 border border-transparent hover:border-zinc-800'
+                }`}
               >
-                <AgentAvatar name="User" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-zinc-700 dark:text-zinc-300">{msg.text}</p>
+                <UserAvatar />
+                <div className="flex-1 min-w-0 pt-0.5">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="text-xs font-semibold text-zinc-300">You</span>
+                    {msg.createdAt && (
+                      <span className="text-[10px] text-zinc-600">{formatTime(msg.createdAt)}</span>
+                    )}
+                  </div>
+                  <p className="text-sm text-zinc-200 leading-relaxed">{msg.text}</p>
                 </div>
+                {isSelected && (
+                  <div className="flex-shrink-0 mt-0.5">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-corthex-accent-dark">
+                      <path d="M3 7h8M8 4l3 3-3 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                )}
               </div>
-            )}
+            )
+          }
 
-            {msg.role === 'agent' && (
+          if (msg.role === 'agent') {
+            const isSelected = selectedCommandId === msg.commandId
+            return (
               <div
+                key={msg.id}
                 data-testid="message-item-agent"
-                className={`flex gap-3 p-3 rounded-lg border transition-colors cursor-pointer ${
-                  selectedCommandId === msg.commandId
-                    ? 'border-blue-300 bg-blue-50/50 dark:border-blue-700 dark:bg-blue-900/20'
-                    : 'border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
-                }`}
                 onClick={() => msg.commandId && onReportClick(msg.commandId)}
+                className={`group flex gap-2.5 px-3 py-2.5 rounded-lg cursor-pointer transition-all ${
+                  isSelected
+                    ? 'bg-corthex-accent/10 border border-corthex-accent/30'
+                    : 'hover:bg-zinc-900 border border-transparent hover:border-zinc-800'
+                }`}
               >
                 <AgentAvatar name={msg.agentName} role={msg.agentRole} />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                <div className="flex-1 min-w-0 pt-0.5">
+                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <span className="text-xs font-semibold text-zinc-200">
                       @{msg.agentName || 'Agent'}
                     </span>
                     {msg.agentRole && <RoleBadge role={msg.agentRole} />}
-                    {msg.quality && <QualityBadge passed={msg.quality.passed} />}
+                    {msg.quality && (
+                      <QualityBadge
+                        passed={msg.quality.passed}
+                        testId="quality-badge"
+                      />
+                    )}
+                    {msg.createdAt && (
+                      <span className="text-[10px] text-zinc-600">{formatTime(msg.createdAt)}</span>
+                    )}
                   </div>
 
-                  {/* Sketch loading card */}
                   {msg.sketchLoading && <SketchLoadingCard />}
 
-                  {/* Sketch preview card */}
                   {msg.sketchResult && !msg.sketchLoading && (
                     <ReactFlowProvider>
                       <SketchPreviewCard
@@ -200,35 +285,49 @@ export function MessageThread({ messages, isLoading, onReportClick, onExampleCli
                     </ReactFlowProvider>
                   )}
 
-                  {/* Regular message */}
                   {!msg.sketchResult && !msg.sketchLoading && (
-                    <p className="text-sm text-zinc-600 dark:text-zinc-400">{msg.text || msg.result?.slice(0, 150) + '...'}</p>
+                    <p className="text-sm text-zinc-400 leading-relaxed">
+                      {msg.text || (msg.result ? msg.result.slice(0, 150) + '…' : '')}
+                    </p>
                   )}
                 </div>
               </div>
-            )}
+            )
+          }
 
-            {msg.role === 'system' && (
-              <div className="flex justify-center">
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-4 py-2 rounded-lg">
-                  <p className="text-sm text-red-600 dark:text-red-400">{msg.text}</p>
+          if (msg.role === 'system') {
+            return (
+              <div key={msg.id} className="flex justify-center py-1">
+                <div
+                  data-testid="command-error"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-950/40 border border-red-800/60"
+                >
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-red-400 flex-shrink-0">
+                    <circle cx="6" cy="6" r="5" stroke="currentColor" strokeWidth="1.3" />
+                    <path d="M6 4v3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                    <circle cx="6" cy="8.5" r="0.5" fill="currentColor" />
+                  </svg>
+                  <p className="text-xs text-red-400">{msg.text}</p>
                 </div>
               </div>
-            )}
-          </div>
-        ))}
+            )
+          }
+
+          return null
+        })}
 
         <div ref={bottomRef} />
       </div>
 
+      {/* Scroll to bottom button */}
       {showScrollBtn && (
         <button
           onClick={scrollToBottom}
-          className="absolute bottom-20 right-4 z-40 w-8 h-8 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md flex items-center justify-center hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
           aria-label="Scroll to bottom"
+          className="absolute bottom-3 right-3 w-7 h-7 rounded-full bg-zinc-800 border border-zinc-700 shadow-lg flex items-center justify-center hover:bg-zinc-700 transition-colors"
         >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M7 2v10M7 12l-4-4M7 12l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-zinc-400">
+            <path d="M6 2v8M6 10l-3-3M6 10l3-3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
       )}
