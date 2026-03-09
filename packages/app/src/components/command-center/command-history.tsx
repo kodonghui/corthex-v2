@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { cn, Badge } from '@corthex/ui'
+import { cn } from '@corthex/ui'
 import type { Command, CommandStatus, QualityGrade } from './types'
 
 const statusConfig: Record<CommandStatus, { label: string; color: string }> = {

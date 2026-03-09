@@ -7,6 +7,7 @@ import { useWsStore } from '../../stores/ws-store'
 import { useChatStream } from '../../hooks/use-chat-stream'
 import { ToolCallCard } from './tool-call-card'
 import { DebateResultCard } from '../agora/debate-result-card'
+import { ScrollToBottom } from './scroll-to-bottom'
 import type { Agent, Message, Delegation, SavedToolCall, FileAttachment } from './types'
 import type { ToolCall } from '../../hooks/use-chat-stream'
 import type { Debate, DebateResult, DebateWsEvent, CreateDebateRequest } from '@corthex/shared'
@@ -113,6 +114,7 @@ export function ChatArea({
   const [chainExpanded, setChainExpanded] = useState(false)
   const [debateResults, setDebateResults] = useState<DebateResultEntry[]>([])
   const [debateNotice, setDebateNotice] = useState<string | null>(null)
+  const [showScrollButton, setShowScrollButton] = useState(false)
 
   const {
     data: messagesData,
@@ -260,10 +262,15 @@ export function ChatArea({
     }
   }, [isFetchingNextPage])
 
-  // 위로 스크롤 시 이전 메시지 로드
+  // 위로 스크롤 시 이전 메시지 로드 + 스크롤 다운 버튼 표시 여부 결정
   const handleScroll = useCallback(() => {
     const el = scrollContainerRef.current
-    if (!el || !hasNextPage || isFetchingNextPage) return
+    if (!el) return
+    // 스크롤 다운 버튼: 하단에서 200px 이상 위에 있을 때 표시
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight
+    setShowScrollButton(distanceFromBottom > 200)
+    // 위로 스크롤 시 이전 메시지 로드
+    if (!hasNextPage || isFetchingNextPage) return
     if (el.scrollTop < Math.max(100, el.clientHeight * 0.15)) {
       prevScrollHeightRef.current = el.scrollHeight
       fetchNextPage()
@@ -761,6 +768,12 @@ export function ChatArea({
 
             <div ref={messagesEndRef} />
           </div>
+
+          {/* 맨 아래로 스크롤 버튼 */}
+          <ScrollToBottom
+            visible={showScrollButton}
+            onClick={() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })}
+          />
 
           {/* 입력 영역 */}
           <div className="px-4 md:px-6 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] border-t border-zinc-200 dark:border-zinc-800">
