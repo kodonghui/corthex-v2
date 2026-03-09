@@ -96,18 +96,18 @@ export function SoulTemplatesPage() {
     return lines.length < content.length ? lines + '...' : lines
   }
 
-  if (!selectedCompanyId) return <div className="p-8 text-center text-zinc-500">회사를 선택하세요</div>
+  if (!selectedCompanyId) return <div className="p-8 text-center text-slate-500">회사를 선택하세요</div>
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between" data-testid="soul-templates-header">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">소울 템플릿</h1>
-          <p className="text-sm text-zinc-500 mt-1">{templates.length}개 템플릿</p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-50">소울 템플릿</h1>
+          <p className="text-sm text-slate-400 mt-1">{templates.length}개 템플릿</p>
         </div>
         <button
           onClick={() => setShowCreate(true)}
-          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors"
+          className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors"
         >
           + 새 템플릿
         </button>
@@ -115,8 +115,8 @@ export function SoulTemplatesPage() {
 
       {/* Create form */}
       {showCreate && (
-        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5">
-          <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4">새 소울 템플릿</h3>
+        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-5" data-testid="soul-create-form">
+          <h3 className="text-lg font-semibold text-slate-50 mb-4">새 소울 템플릿</h3>
           <form
             onSubmit={(e) => {
               e.preventDefault()
@@ -130,55 +130,55 @@ export function SoulTemplatesPage() {
             }}
             className="space-y-4"
           >
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">템플릿 이름</label>
+                <label className="block text-sm font-medium text-slate-300 mb-1">템플릿 이름</label>
                 <input
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 outline-none"
                   placeholder="예: 친절한 상담원"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">카테고리</label>
+                <label className="block text-sm font-medium text-slate-300 mb-1">카테고리</label>
                 <input
                   value={form.category}
                   onChange={(e) => setForm({ ...form, category: e.target.value })}
-                  className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 outline-none"
                   placeholder="예: 고객 응대"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">설명</label>
+              <label className="block text-sm font-medium text-slate-300 mb-1">설명</label>
               <input
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
-                className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 outline-none"
                 placeholder="이 템플릿의 용도"
               />
             </div>
             <div>
-              <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">소울 내용</label>
+              <label className="block text-sm font-medium text-slate-300 mb-1">소울 내용</label>
               <textarea
                 value={form.content}
                 onChange={(e) => setForm({ ...form, content: e.target.value })}
                 rows={6}
-                className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none resize-none font-mono"
+                className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 outline-none resize-none font-mono"
                 placeholder="에이전트의 성격과 행동 방식을 마크다운으로 정의..."
                 required
               />
             </div>
             <div className="flex gap-2 justify-end">
-              <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2 text-sm text-zinc-600">
+              <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200 transition-colors">
                 취소
               </button>
               <button
                 type="submit"
                 disabled={createMutation.isPending}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+                className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors"
               >
                 {createMutation.isPending ? '생성 중...' : '생성'}
               </button>
@@ -188,34 +188,35 @@ export function SoulTemplatesPage() {
       )}
 
       {isLoading ? (
-        <div className="text-center text-zinc-500 py-8">로딩 중...</div>
+        <div className="text-center text-slate-500 py-12">로딩 중...</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {templates.map((t) => (
             <div
               key={t.id}
-              className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5"
+              data-testid={`soul-card-${t.id}`}
+              className={`bg-slate-800/50 rounded-xl p-5 ${editTemplate?.id === t.id ? 'border border-blue-500/30' : 'border border-slate-700'}`}
             >
               {editTemplate?.id === t.id ? (
                 <div className="space-y-3">
                   <input
                     value={editTemplate.name}
                     onChange={(e) => setEditTemplate({ ...editTemplate, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100"
+                    className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm text-white outline-none"
                   />
                   <input
                     value={editTemplate.description || ''}
                     onChange={(e) => setEditTemplate({ ...editTemplate, description: e.target.value })}
-                    className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100"
+                    className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm text-white outline-none"
                     placeholder="설명"
                   />
                   <textarea
                     value={editTemplate.content}
                     onChange={(e) => setEditTemplate({ ...editTemplate, content: e.target.value })}
                     rows={6}
-                    className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 resize-none font-mono"
+                    className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm text-white outline-none resize-none font-mono"
                   />
-                  <div className="flex gap-2">
+                  <div className="flex gap-3 pt-3 border-t border-slate-700/50">
                     <button
                       onClick={() =>
                         updateMutation.mutate({
@@ -226,11 +227,11 @@ export function SoulTemplatesPage() {
                           category: editTemplate.category,
                         })
                       }
-                      className="text-xs text-indigo-600 hover:text-indigo-700"
+                      className="text-xs text-blue-400 hover:text-blue-300 font-medium transition-colors"
                     >
                       저장
                     </button>
-                    <button onClick={() => setEditTemplate(null)} className="text-xs text-zinc-500">
+                    <button onClick={() => setEditTemplate(null)} className="text-xs text-slate-400 hover:text-slate-300 transition-colors">
                       취소
                     </button>
                   </div>
@@ -240,33 +241,35 @@ export function SoulTemplatesPage() {
                   <div className="flex items-start justify-between mb-3">
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{t.name}</h3>
+                        <h3 className="text-base font-semibold text-slate-50">{t.name}</h3>
                         {t.isBuiltin && (
-                          <span className="text-xs text-zinc-400" title="Built-in template">
-                            🔒
+                          <span className="text-slate-500" title="Built-in template">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
                           </span>
                         )}
                         {t.isPublished && (
-                          <span className="text-xs px-1.5 py-0.5 rounded bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                             공개
                           </span>
                         )}
                       </div>
                       {t.description && (
-                        <p className="text-sm text-zinc-500 mt-0.5">{t.description}</p>
+                        <p className="text-sm text-slate-400 mt-0.5">{t.description}</p>
                       )}
                     </div>
                     {t.category && (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-700 text-slate-300">
                         {t.category}
                       </span>
                     )}
                   </div>
-                  <pre className="text-xs text-zinc-500 whitespace-pre-wrap line-clamp-3 mb-3 font-mono">{preview(t.content)}</pre>
-                  <div className="flex gap-2 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                  <pre className="text-xs text-slate-500 whitespace-pre-wrap line-clamp-3 mb-3 font-mono leading-relaxed">{preview(t.content)}</pre>
+                  <div className="flex gap-3 pt-3 border-t border-slate-700/50">
                     <button
                       onClick={() => setViewContent(t)}
-                      className="text-xs text-indigo-600 hover:text-indigo-700"
+                      className="text-xs text-blue-400 hover:text-blue-300 transition-colors font-medium"
                     >
                       내용 보기
                     </button>
@@ -274,13 +277,13 @@ export function SoulTemplatesPage() {
                       <>
                         <button
                           onClick={() => setEditTemplate(t)}
-                          className="text-xs text-indigo-600 hover:text-indigo-700"
+                          className="text-xs text-blue-400 hover:text-blue-300 transition-colors font-medium"
                         >
                           수정
                         </button>
                         <button
                           onClick={() => setDeleteTarget(t)}
-                          className="text-xs text-red-600 hover:text-red-700"
+                          className="text-xs text-red-400 hover:text-red-300 transition-colors font-medium"
                         >
                           삭제
                         </button>
@@ -296,24 +299,24 @@ export function SoulTemplatesPage() {
 
       {/* Marketplace publish management section */}
       {companyTemplates.length > 0 && (
-        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5">
-          <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4">마켓 공개 관리</h3>
-          <p className="text-sm text-zinc-500 mb-4">회사 소울 템플릿을 에이전트 마켓에 공개하거나 비공개 처리할 수 있습니다.</p>
+        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
+          <h3 className="text-lg font-semibold text-slate-50 mb-2">마켓 공개 관리</h3>
+          <p className="text-sm text-slate-400 mb-4">회사 소울 템플릿을 에이전트 마켓에 공개하거나 비공개 처리할 수 있습니다.</p>
           <div className="space-y-2">
             {companyTemplates.map((t) => (
               <div
                 key={t.id}
-                className="flex items-center justify-between px-4 py-3 rounded-lg bg-zinc-50 dark:bg-zinc-800"
+                className="flex items-center justify-between px-4 py-3 rounded-lg bg-slate-900/50 border border-slate-700/50"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{t.name}</span>
+                  <span className="text-sm font-medium text-slate-50">{t.name}</span>
                   {t.category && (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400">
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-slate-700 text-slate-400">
                       {t.category}
                     </span>
                   )}
                   {t.isPublished && (
-                    <span className="text-xs text-zinc-400">
+                    <span className="text-xs text-slate-500">
                       다운로드 {t.downloadCount || 0}회
                     </span>
                   )}
@@ -322,14 +325,14 @@ export function SoulTemplatesPage() {
                   <button
                     onClick={() => unpublishMutation.mutate(t.id)}
                     disabled={unpublishMutation.isPending}
-                    className="px-3 py-1.5 text-xs font-medium rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 disabled:opacity-50 transition-colors"
+                    className="px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-700 disabled:opacity-50 transition-colors"
                   >
                     비공개
                   </button>
                 ) : (
                   <button
                     onClick={() => setPublishConfirmId(t.id)}
-                    className="px-3 py-1.5 text-xs font-medium rounded-lg bg-green-600 hover:bg-green-700 text-white transition-colors"
+                    className="px-3 py-1.5 text-xs font-medium rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition-colors"
                   >
                     마켓 공개
                   </button>
@@ -342,23 +345,30 @@ export function SoulTemplatesPage() {
 
       {/* View content modal */}
       {viewContent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setViewContent(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setViewContent(null)}>
           <div
-            className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto"
+            className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                {viewContent.name} {viewContent.isBuiltin && '🔒'}
+              <h3 className="text-lg font-semibold text-slate-50">
+                {viewContent.name}
+                {viewContent.isBuiltin && (
+                  <svg className="w-4 h-4 inline-block ml-2 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                )}
               </h3>
-              <button onClick={() => setViewContent(null)} className="text-zinc-500 hover:text-zinc-700 text-lg">
-                ✕
+              <button onClick={() => setViewContent(null)} className="text-slate-500 hover:text-slate-300 p-1 rounded-lg hover:bg-slate-700 transition-colors">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
             {viewContent.description && (
-              <p className="text-sm text-zinc-500 mb-3">{viewContent.description}</p>
+              <p className="text-sm text-slate-400 mb-3">{viewContent.description}</p>
             )}
-            <pre className="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap font-mono bg-zinc-50 dark:bg-zinc-800 rounded-lg p-4">
+            <pre className="text-sm text-slate-300 whitespace-pre-wrap font-mono bg-slate-900 rounded-lg p-4 border border-slate-700">
               {viewContent.content}
             </pre>
           </div>
@@ -367,26 +377,27 @@ export function SoulTemplatesPage() {
 
       {/* Delete confirmation */}
       {deleteTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setDeleteTarget(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setDeleteTarget(null)}>
           <div
-            className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 max-w-md w-full mx-4"
+            data-testid="soul-delete-modal"
+            className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-6 max-w-md w-full mx-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-2">템플릿 삭제</h3>
-            <p className="text-sm text-zinc-500 mb-4">
+            <h3 className="text-lg font-semibold text-slate-50 mb-2">템플릿 삭제</h3>
+            <p className="text-sm text-slate-400 mb-4">
               "{deleteTarget.name}" 템플릿을 삭제하시겠습니까? 이미 적용된 에이전트 소울에는 영향이 없습니다.
             </p>
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setDeleteTarget(null)}
-                className="px-4 py-2 text-sm text-zinc-600"
+                className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200 transition-colors"
               >
                 취소
               </button>
               <button
                 onClick={() => deleteMutation.mutate(deleteTarget.id)}
                 disabled={deleteMutation.isPending}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+                className="px-4 py-2 bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
               >
                 {deleteMutation.isPending ? '삭제 중...' : '삭제'}
               </button>
@@ -397,26 +408,27 @@ export function SoulTemplatesPage() {
 
       {/* Publish confirmation modal */}
       {publishConfirmId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setPublishConfirmId(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setPublishConfirmId(null)}>
           <div
-            className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 max-w-md w-full mx-4"
+            data-testid="soul-publish-modal"
+            className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-6 max-w-md w-full mx-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-2">마켓 공개 확인</h3>
-            <p className="text-sm text-zinc-500 mb-4">
+            <h3 className="text-lg font-semibold text-slate-50 mb-2">마켓 공개 확인</h3>
+            <p className="text-sm text-slate-400 mb-4">
               이 소울 템플릿을 에이전트 마켓에 공개하시겠습니까? 공개 후 다른 회사에서 이 템플릿을 검색하고 가져갈 수 있습니다.
             </p>
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setPublishConfirmId(null)}
-                className="px-4 py-2 text-sm text-zinc-600"
+                className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200 transition-colors"
               >
                 취소
               </button>
               <button
                 onClick={() => publishMutation.mutate(publishConfirmId)}
                 disabled={publishMutation.isPending}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
               >
                 {publishMutation.isPending ? '공개 중...' : '공개'}
               </button>

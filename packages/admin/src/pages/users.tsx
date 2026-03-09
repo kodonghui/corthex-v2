@@ -109,31 +109,39 @@ export function UsersPage() {
     },
   })
 
-  if (!selectedCompanyId) return <div className="p-8 text-center text-zinc-500">회사를 선택하세요</div>
+  if (!selectedCompanyId) {
+    return (
+      <div className="flex items-center justify-center h-64" data-testid="no-company">
+        <p className="text-sm text-slate-400">회사를 선택하세요</p>
+      </div>
+    )
+  }
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-5xl mx-auto px-6 py-6 space-y-6" data-testid="users-page">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">직원 관리</h1>
-          <p className="text-sm text-zinc-500 mt-1">{users.length}명의 직원</p>
+          <h1 className="text-2xl font-bold tracking-tight text-white">직원 관리</h1>
+          <p className="text-sm text-slate-400 mt-1">{users.length}명의 직원</p>
         </div>
         <button
-          onClick={() => setShowCreate(true)}
-          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors"
+          onClick={() => setShowCreate(!showCreate)}
+          className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors flex items-center gap-2"
+          data-testid="add-user-btn"
         >
-          + 직원 추가
+          <span>+</span> 직원 추가
         </button>
       </div>
 
-      {/* 부서 필터 */}
-      <div className="flex gap-2 flex-wrap">
+      {/* Department Filter Tabs */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1" data-testid="dept-filter">
         <button
           onClick={() => setDeptFilter('all')}
-          className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
+          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer whitespace-nowrap ${
             deptFilter === 'all'
-              ? 'bg-indigo-600 text-white'
-              : 'bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+              ? 'text-white bg-blue-600'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800'
           }`}
         >
           전체
@@ -142,10 +150,10 @@ export function UsersPage() {
           <button
             key={d.id}
             onClick={() => setDeptFilter(d.id)}
-            className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer whitespace-nowrap ${
               deptFilter === d.id
-                ? 'bg-indigo-600 text-white'
-                : 'bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                ? 'text-white bg-blue-600'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800'
             }`}
           >
             {d.name}
@@ -153,172 +161,176 @@ export function UsersPage() {
         ))}
       </div>
 
-      {/* 직원 생성 폼 */}
+      {/* Create User Form */}
       {showCreate && (
-        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5">
-          <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4">새 직원 등록</h3>
+        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-5 space-y-4" data-testid="create-form">
+          <h3 className="text-lg font-semibold text-white">새 직원 추가</h3>
           <form
             onSubmit={(e) => {
               e.preventDefault()
               if (!selectedCompanyId) return
               createMutation.mutate({ ...form, companyId: selectedCompanyId })
             }}
-            className="grid grid-cols-2 gap-4"
+            className="grid grid-cols-1 md:grid-cols-2 gap-4"
           >
             <div>
-              <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">아이디</label>
+              <label className="block text-xs font-medium text-slate-400 mb-1.5">아이디</label>
               <input
                 value={form.username}
                 onChange={(e) => setForm({ ...form, username: e.target.value })}
-                className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 transition-colors"
+                placeholder="사용자 아이디"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">비밀번호</label>
+              <label className="block text-xs font-medium text-slate-400 mb-1.5">비밀번호</label>
               <input
                 type="password"
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
-                className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 transition-colors"
+                placeholder="비밀번호"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">이름</label>
+              <label className="block text-xs font-medium text-slate-400 mb-1.5">이름</label>
               <input
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 transition-colors"
+                placeholder="직원 이름"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">이메일</label>
+              <label className="block text-xs font-medium text-slate-400 mb-1.5">이메일</label>
               <input
                 type="email"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 transition-colors"
+                placeholder="email@example.com"
               />
             </div>
             <div>
-              <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">역할</label>
+              <label className="block text-xs font-medium text-slate-400 mb-1.5">역할</label>
               <select
                 value={form.role}
                 onChange={(e) => setForm({ ...form, role: e.target.value })}
-                className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-white"
               >
                 <option value="user">일반 직원</option>
                 <option value="admin">관리자</option>
               </select>
             </div>
-            <div className="col-span-2 flex gap-2 justify-end">
+            <div className="md:col-span-2 flex items-center justify-end gap-3 pt-2">
               <button
                 type="button"
                 onClick={() => setShowCreate(false)}
-                className="px-4 py-2 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+                className="bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
               >
                 취소
               </button>
               <button
                 type="submit"
                 disabled={createMutation.isPending}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+                className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50"
               >
                 {createMutation.isPending ? '생성 중...' : '생성'}
               </button>
             </div>
             {createMutation.isError && (
-              <p className="col-span-2 text-sm text-red-600">{(createMutation.error as Error).message}</p>
+              <p className="md:col-span-2 text-sm text-red-400">{(createMutation.error as Error).message}</p>
             )}
           </form>
         </div>
       )}
 
-      {/* 직원 목록 테이블 */}
-      <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+      {/* User List Table */}
+      <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden" data-testid="user-table">
         {isLoading ? (
           <div className="p-5">
             <SkeletonTable rows={5} />
           </div>
         ) : filteredUsers.length === 0 ? (
           <EmptyState
-            title="직원이 없습니다"
-            description={deptFilter !== 'all' ? '선택한 부서에 배정된 직원이 없습니다' : '직원을 추가해보세요'}
+            title={deptFilter !== 'all' ? '해당 부서에 직원이 없습니다' : '직원이 없습니다'}
+            description={deptFilter !== 'all' ? '다른 부서를 선택하거나 전체를 확인하세요.' : '직원 추가 버튼을 눌러 새 직원을 등록하세요.'}
           />
         ) : (
           <table className="w-full">
             <thead>
-              <tr className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50">
-                <th className="text-left text-xs font-medium text-zinc-500 uppercase px-5 py-3">이름</th>
-                <th className="text-left text-xs font-medium text-zinc-500 uppercase px-5 py-3">아이디</th>
-                <th className="text-left text-xs font-medium text-zinc-500 uppercase px-5 py-3">이메일</th>
-                <th className="text-left text-xs font-medium text-zinc-500 uppercase px-5 py-3">역할</th>
-                <th className="text-left text-xs font-medium text-zinc-500 uppercase px-5 py-3">상태</th>
-                <th className="text-right text-xs font-medium text-zinc-500 uppercase px-5 py-3">관리</th>
+              <tr className="border-b border-slate-700">
+                <th className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 px-4 py-3">이름</th>
+                <th className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 px-4 py-3">아이디</th>
+                <th className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 px-4 py-3">이메일</th>
+                <th className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 px-4 py-3">역할</th>
+                <th className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 px-4 py-3">상태</th>
+                <th className="text-right text-xs font-medium uppercase tracking-wider text-slate-400 px-4 py-3">관리</th>
               </tr>
             </thead>
             <tbody>
               {filteredUsers.map((u) => (
-                <tr key={u.id} className="border-b border-zinc-100 dark:border-zinc-800 last:border-0 hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
-                  <td className="px-5 py-3">
+                <tr key={u.id} className="border-b border-slate-700/50 hover:bg-slate-800/50 transition-colors">
+                  <td className="px-4 py-3">
                     {editUser?.id === u.id ? (
                       <input
                         value={editForm.name}
                         onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                        className="px-2 py-1 border border-zinc-300 dark:border-zinc-700 rounded text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 w-full"
+                        className="bg-slate-700 border border-slate-600 focus:border-blue-500 rounded px-2 py-1 text-sm text-white w-full"
                       />
                     ) : (
-                      <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{u.name}</span>
+                      <span className="text-sm font-medium text-white">{u.name}</span>
                     )}
                   </td>
-                  <td className="px-5 py-3 text-sm text-zinc-600 dark:text-zinc-400">@{u.username}</td>
-                  <td className="px-5 py-3">
+                  <td className="px-4 py-3 text-sm text-slate-400 font-mono">@{u.username}</td>
+                  <td className="px-4 py-3">
                     {editUser?.id === u.id ? (
                       <input
                         type="email"
                         value={editForm.email}
                         onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                        className="px-2 py-1 border border-zinc-300 dark:border-zinc-700 rounded text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 w-full"
+                        className="bg-slate-700 border border-slate-600 focus:border-blue-500 rounded px-2 py-1 text-sm text-white w-full"
                         placeholder="이메일"
                       />
                     ) : (
-                      <span className="text-sm text-zinc-600 dark:text-zinc-400">{u.email || '-'}</span>
+                      <span className="text-sm text-slate-400">{u.email || '—'}</span>
                     )}
                   </td>
-                  <td className="px-5 py-3">
+                  <td className="px-4 py-3">
                     {editUser?.id === u.id ? (
                       <select
                         value={editForm.role}
                         onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
-                        className="px-2 py-1 border border-zinc-300 dark:border-zinc-700 rounded text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
+                        className="bg-slate-700 border border-slate-600 rounded px-2 py-1 text-sm text-white"
                       >
                         <option value="user">직원</option>
                         <option value="admin">관리자</option>
                       </select>
                     ) : (
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                         u.role === 'admin'
-                          ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
-                          : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
+                          ? 'bg-purple-500/20 text-purple-400'
+                          : 'bg-slate-600/50 text-slate-300'
                       }`}>
                         {u.role === 'admin' ? '관리자' : '직원'}
                       </span>
                     )}
                   </td>
-                  <td className="px-5 py-3">
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${
+                  <td className="px-4 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                       u.isActive
-                        ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
-                        : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
+                        ? 'bg-emerald-500/20 text-emerald-400'
+                        : 'bg-red-500/20 text-red-400'
                     }`}>
                       {u.isActive ? '활성' : '비활성'}
                     </span>
                   </td>
-                  <td className="px-5 py-3 text-right">
+                  <td className="px-4 py-3 text-right">
                     {editUser?.id === u.id ? (
-                      <div className="flex gap-2 justify-end">
+                      <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => updateMutation.mutate({
                             id: u.id,
@@ -326,35 +338,38 @@ export function UsersPage() {
                             email: editForm.email || undefined,
                             role: editForm.role,
                           })}
-                          className="text-xs text-indigo-600 hover:text-indigo-700"
+                          className="text-xs text-blue-400 hover:text-blue-300 px-2 py-1 rounded hover:bg-slate-700 transition-colors"
                         >
                           저장
                         </button>
-                        <button onClick={() => setEditUser(null)} className="text-xs text-zinc-500">
+                        <button
+                          onClick={() => setEditUser(null)}
+                          className="text-xs text-slate-400 hover:text-white px-2 py-1 rounded hover:bg-slate-700 transition-colors"
+                        >
                           취소
                         </button>
                       </div>
                     ) : (
-                      <div className="flex gap-2 justify-end">
+                      <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => {
                             setEditUser(u)
                             setEditForm({ name: u.name, email: u.email || '', role: u.role })
                           }}
-                          className="text-xs text-indigo-600 hover:text-indigo-700"
+                          className="text-xs text-slate-400 hover:text-white px-2 py-1 rounded hover:bg-slate-700 transition-colors"
                         >
                           수정
                         </button>
                         <button
                           onClick={() => setResetPasswordTarget(u)}
-                          className="text-xs text-amber-600 hover:text-amber-700"
+                          className="text-xs text-slate-400 hover:text-white px-2 py-1 rounded hover:bg-slate-700 transition-colors"
                         >
                           비밀번호 초기화
                         </button>
                         {u.isActive && (
                           <button
                             onClick={() => setDeactivateTarget(u)}
-                            className="text-xs text-red-600 hover:text-red-700"
+                            className="text-xs text-red-400 hover:text-red-300 px-2 py-1 rounded hover:bg-red-500/10 transition-colors"
                           >
                             비활성화
                           </button>
@@ -374,7 +389,7 @@ export function UsersPage() {
         onConfirm={() => deactivateTarget && deactivateMutation.mutate(deactivateTarget.id)}
         onCancel={() => setDeactivateTarget(null)}
         title={`${deactivateTarget?.name} 비활성화`}
-        description="이 직원을 비활성화하면 더 이상 로그인할 수 없습니다. 나중에 다시 활성화할 수 있습니다."
+        description="이 직원은 더 이상 로그인할 수 없습니다. 나중에 다시 활성화할 수 있습니다."
         confirmText="비활성화"
         variant="danger"
       />
@@ -384,7 +399,7 @@ export function UsersPage() {
         onConfirm={() => resetPasswordTarget && resetPasswordMutation.mutate(resetPasswordTarget.id)}
         onCancel={() => setResetPasswordTarget(null)}
         title={`${resetPasswordTarget?.name} 비밀번호 초기화`}
-        description="비밀번호가 기본값으로 초기화됩니다. 직원에게 새 비밀번호를 안내해주세요."
+        description="비밀번호가 초기값으로 재설정됩니다. 새 비밀번호를 직원에게 전달해주세요."
         confirmText="초기화"
         variant="default"
       />
