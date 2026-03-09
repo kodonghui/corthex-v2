@@ -17,6 +17,12 @@ type Props = {
   onClose: () => void
 }
 
+const STATUS_DOT: Record<string, string> = {
+  ACTIVE: 'bg-emerald-400',
+  IDLE: 'bg-zinc-600',
+  BUSY: 'bg-amber-400',
+}
+
 export function MentionPopup({ query, selectedIndex, agents, deptMap, onSelect, onClose }: Props) {
   const listRef = useRef<HTMLDivElement>(null)
 
@@ -30,7 +36,6 @@ export function MentionPopup({ query, selectedIndex, agents, deptMap, onSelect, 
     )
   }, [agents, deptMap, query])
 
-  // Group by department
   const grouped = useMemo(() => {
     const groups = new Map<string, Agent[]>()
     for (const agent of filtered) {
@@ -41,12 +46,9 @@ export function MentionPopup({ query, selectedIndex, agents, deptMap, onSelect, 
     return groups
   }, [filtered, deptMap])
 
-  // Flat list for keyboard navigation
   const flatList = useMemo(() => {
     const result: Agent[] = []
-    for (const agents of grouped.values()) {
-      result.push(...agents)
-    }
+    for (const agentsInGroup of grouped.values()) result.push(...agentsInGroup)
     return result
   }, [grouped])
 
@@ -63,45 +65,65 @@ export function MentionPopup({ query, selectedIndex, agents, deptMap, onSelect, 
     <div
       data-testid="mention-popup"
       ref={listRef}
-      className="w-80 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-xl overflow-hidden"
       role="listbox"
       aria-label="Agent mention"
+      className="w-72 bg-zinc-900 border border-zinc-700/80 rounded-xl shadow-2xl overflow-hidden"
     >
-      <div className="max-h-72 overflow-y-auto">
+      <div className="max-h-64 overflow-y-auto">
         {/* Header */}
-        <div className="px-3 py-2 border-b border-zinc-100 dark:border-zinc-700">
-          <p className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Agents</p>
+        <div className="px-3 py-2 border-b border-zinc-800">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-600">Agents</p>
         </div>
 
-        {/* Grouped agents by department */}
-        {[...grouped.entries()].map(([deptName, agentsInDept]) => (
-          <div key={deptName} className="py-1">
-            {/* Department header with inline agent names */}
-            <div className="px-3 py-1.5">
-              <span className="text-xs font-medium text-zinc-900 dark:text-zinc-100">{deptName}:</span>
-              <span className="text-xs text-zinc-500 dark:text-zinc-400 ml-1">
-                {agentsInDept.map((a, i) => (
-                  <span key={a.id}>
-                    <button
-                      role="option"
-                      aria-selected={flatIdx + i === selectedIndex}
-                      className={`inline-flex items-center hover:text-blue-600 dark:hover:text-blue-400 transition-colors ${
-                        flatIdx + i === selectedIndex ? 'text-blue-600 dark:text-blue-400' : ''
-                      }`}
-                      onClick={() => onSelect(a)}
-                      onMouseDown={(e) => e.preventDefault()}
-                    >
-                      @{a.name}
-                    </button>
-                    {i < agentsInDept.length - 1 && ', '}
-                  </span>
-                ))}
-              </span>
+        {[...grouped.entries()].map(([deptName, agentsInDept]) => {
+          const groupStartIdx = flatIdx
+          flatIdx += agentsInDept.length
+
+          return (
+            <div key={deptName} className="py-1">
+              {/* Dept label */}
+              <div className="px-3 py-1">
+                <span className="text-[10px] font-medium text-zinc-600 uppercase tracking-wide">{deptName}</span>
+              </div>
+              {/* Agent rows */}
+              {agentsInDept.map((agent, i) => {
+                const idx = groupStartIdx + i
+                const isSelected = idx === selectedIndex
+                const dot = STATUS_DOT[agent.status] || 'bg-zinc-700'
+                return (
+                  <button
+                    key={agent.id}
+                    data-testid="mention-agent-item"
+                    role="option"
+                    aria-selected={isSelected}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors ${
+                      isSelected ? 'bg-zinc-800' : 'hover:bg-zinc-800/60'
+                    }`}
+                    onClick={() => onSelect(agent)}
+                    onMouseDown={(e) => e.preventDefault()}
+                  >
+                    {/* Avatar */}
+                    <div className="w-6 h-6 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-[10px] font-semibold text-zinc-400 flex-shrink-0">
+                      {agent.name.charAt(0).toUpperCase()}
+                    </div>
+                    {/* Name */}
+                    <span className={`text-sm flex-1 ${isSelected ? 'text-zinc-100' : 'text-zinc-300'}`}>
+                      @{agent.name}
+                    </span>
+                    {/* Tier badge */}
+                    {agent.tier && (
+                      <span className="text-[10px] px-1 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-zinc-500 flex-shrink-0">
+                        {agent.tier}
+                      </span>
+                    )}
+                    {/* Status dot */}
+                    <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${dot}`} />
+                  </button>
+                )
+              })}
             </div>
-            {/* Update flatIdx after processing this group */}
-            {(() => { flatIdx += agentsInDept.length; return null })()}
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )
