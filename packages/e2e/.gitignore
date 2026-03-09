@@ -1,0 +1,17 @@
+# 환경 변수 (비밀번호 포함)
+.env.test
+
+# Playwright 결과물
+reports/
+test-results/
+playwright-report/
+
+# 인증 상태 (로그인 토큰)
+src/fixtures/.auth/
+
+# 스크린샷/비디오
+screenshots/
+videos/
+
+# Node
+node_modules/
