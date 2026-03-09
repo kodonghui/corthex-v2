@@ -7,10 +7,11 @@ BMAD 프레임워크 기반 자동화 파이프라인 패키지.
 
 ## 이게 뭔가요?
 
-소프트웨어 프로젝트를 만들 때 **기획 -> 개발** 전 과정을 자동으로 진행해주는 도구입니다.
+소프트웨어 프로젝트를 만들 때 **기획 -> 개발 -> UXUI 리팩토링** 전 과정을 자동으로 진행해주는 도구입니다.
 
 - **기획 파이프라인**: 아이디어를 Product Brief -> PRD -> Architecture -> UX -> Epics 순서로 구체화
 - **개발 파이프라인**: 각 스토리를 create -> dev -> test -> QA -> code-review 순서로 구현
+- **UXUI 파이프라인** (NEW): 페이지별 UX 설명서 -> Banana2 디자인 이미지 -> 코딩 -> Playwright 테스트
 - **파티모드**: 7명의 AI 전문가가 매 단계마다 토론하면서 품질 검증 (tmux에서 실시간 관찰 가능!)
 
 ---
@@ -49,8 +50,11 @@ v3에서는 **Worker 1명이 작성 + 리뷰를 모두 처리**합니다.
 ### 방법 1: 프로젝트에 직접 복사 (권장)
 
 ```bash
-# 이 폴더의 파이프라인 파일을 프로젝트의 .claude/commands/ 안에 복사
+# 기획+개발 파이프라인
 cp kodonghui_full_pipeline/kdh-full-auto-pipeline.md [프로젝트]/.claude/commands/
+
+# UXUI 리팩토링 파이프라인 (선택)
+cp kodonghui_full_pipeline/kdh-uxui-pipeline.md [프로젝트]/.claude/commands/
 ```
 
 ### 방법 2: 글로벌 설치 (모든 프로젝트에서 사용)
@@ -58,6 +62,7 @@ cp kodonghui_full_pipeline/kdh-full-auto-pipeline.md [프로젝트]/.claude/comm
 ```bash
 # 홈 디렉토리의 .claude/commands/에 복사
 cp kodonghui_full_pipeline/kdh-full-auto-pipeline.md ~/.claude/commands/
+cp kodonghui_full_pipeline/kdh-uxui-pipeline.md ~/.claude/commands/
 ```
 
 ### 주의: 중복 방지
@@ -82,6 +87,35 @@ Claude Code에서 아래 명령어를 입력하면 됩니다:
 /kdh-full-auto-pipeline 3-1
 ```
 -> 스토리 3-1의 개발 파이프라인 실행 (create -> dev -> TEA -> QA -> CR)
+
+### UXUI 리팩토링 (개발 완료 후)
+```
+/kdh-uxui-pipeline              <- 진행 상황 확인 + 다음 할 일 안내
+/kdh-uxui-pipeline phase0       <- Playwright 환경 세팅 (최초 1회)
+/kdh-uxui-pipeline phase1       <- 현재 기능 상태 스모크 테스트
+/kdh-uxui-pipeline spec chat    <- "chat" 페이지 UX 설명서 작성 + 파티모드
+/kdh-uxui-pipeline code chat    <- Banana2 이미지 보고 코딩 + 파티모드 + Playwright
+/kdh-uxui-pipeline phase3       <- 시각 회귀 테스트 기준 등록
+/kdh-uxui-pipeline final        <- 최종 전체 검증
+```
+
+**UXUI 파이프라인 워크플로우:**
+```
+1. phase0 — Playwright 설치 + 테스트 골격 생성
+2. phase1 — 전 페이지 스모크 테스트 (현재 상태 파악)
+3. 페이지별 반복:
+   a. spec {페이지명} — 설명서 작성 + 파티모드 2라운드
+   b. 사용자가 Banana2로 디자인 이미지 생성
+   c. code {페이지명} — 이미지 보고 코딩 + 파티모드 2라운드 + Playwright 테스트
+4. phase3 — 시각 회귀 테스트 기준 스크린샷 등록
+5. final — 전체 검증
+```
+
+**UXUI 파이프라인 처음 쓸 때:**
+- 프로젝트 루트에 `_uxui-refactoring/CONFIG.md`를 만들어야 합니다
+- CONFIG.md에 배포 URL, 페이지 목록, 프론트엔드 구조를 적으면 됩니다
+- CONFIG.md 없이 실행하면 Claude가 프로젝트 구조를 분석해서 자동 제안합니다
+- 자세한 CONFIG.md 템플릿은 `kdh-uxui-pipeline.md` 상단에 있습니다
 
 ---
 
@@ -269,7 +303,8 @@ FAIL -> 처음부터 재작성 -> 3라운드 재실행
 ```
 kodonghui_full_pipeline/
   README.md                         <- 지금 보고 있는 파일
-  kdh-full-auto-pipeline.md          <- Claude Code 커맨드 파일 (이것만 복사하면 됨)
+  kdh-full-auto-pipeline.md          <- 기획+개발 파이프라인 커맨드
+  kdh-uxui-pipeline.md               <- UXUI 리팩토링 파이프라인 커맨드 (NEW)
   example_CLAUDE.md.md               <- CLAUDE.md 예시 (프로젝트에 맞게 수정)
 ```
 

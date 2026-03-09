@@ -1,7 +1,10 @@
 import { defineConfig, devices } from '@playwright/test'
 import * as dotenv from 'dotenv'
+import * as path from 'path'
 
-dotenv.config({ path: '.env.test' })
+dotenv.config({ path: path.resolve(__dirname, '.env.test') })
+
+const e2eRoot = __dirname
 
 export default defineConfig({
   testDir: './src/tests',
@@ -27,26 +30,32 @@ export default defineConfig({
     },
     {
       name: 'app',
+      testDir: './src/tests',
+      testMatch: /smoke\/app\/|interaction\/app\//,
       use: {
         ...devices['Desktop Chrome'],
-        storageState: 'src/fixtures/.auth/user.json',
+        storageState: path.resolve(e2eRoot, 'src/fixtures/.auth/user.json'),
       },
       dependencies: ['auth-setup'],
     },
     {
       name: 'admin',
+      testDir: './src/tests',
+      testMatch: /smoke\/admin\/|interaction\/admin\//,
       use: {
         ...devices['Desktop Chrome'],
         baseURL: process.env.ADMIN_URL || 'https://corthex-hq.com/admin',
-        storageState: 'src/fixtures/.auth/admin.json',
+        storageState: path.resolve(e2eRoot, 'src/fixtures/.auth/admin.json'),
       },
       dependencies: ['auth-setup'],
     },
     {
       name: 'mobile',
+      testDir: './src/tests',
+      testMatch: /smoke\/app\/|interaction\/app\//,
       use: {
         ...devices['iPhone 14'],
-        storageState: 'src/fixtures/.auth/user.json',
+        storageState: path.resolve(e2eRoot, 'src/fixtures/.auth/user.json'),
       },
       dependencies: ['auth-setup'],
     },
