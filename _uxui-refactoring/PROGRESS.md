@@ -14,14 +14,14 @@
 | # | 페이지 | spec | image | code | test | 상태 |
 |---|--------|------|-------|------|------|------|
 | 01 | command-center | ✅ | 대기 | - | - | spec 완료, 이미지 대기 |
-| 02 | chat | - | - | - | - | 미시작 |
-| 03 | dashboard | - | - | - | - | 미시작 |
-| 04 | trading | - | - | - | - | 미시작 |
-| 05 | agora | - | - | - | - | 미시작 |
-| 06 | nexus | - | - | - | - | 미시작 |
-| 07 | agents (admin) | - | - | - | - | 미시작 |
-| 08 | departments (admin) | - | - | - | - | 미시작 |
-| 09 | credentials (admin) | - | - | - | - | 미시작 |
+| 02 | chat | ✅ 8/10 | 대기 | - | - | spec 완료, 이미지 대기 |
+| 03 | dashboard | ✅ 8/10 | 대기 | - | - | spec 완료, 이미지 대기 |
+| 04 | trading | ✅ 8/10 | 대기 | - | - | spec 완료, 이미지 대기 |
+| 05 | agora | ✅ 8/10 | 대기 | - | - | spec 완료, 이미지 대기 |
+| 06 | nexus | ✅ 8/10 | 대기 | - | - | spec 완료, 이미지 대기 |
+| 07 | agents (admin) | ✅ 9/10 | 대기 | - | - | spec 완료, 이미지 대기 |
+| 08 | departments (admin) | ✅ 8/10 | 대기 | - | - | spec 완료, 이미지 대기 |
+| 09 | credentials (admin) | ✅ 9/10 | 대기 | - | - | spec 완료, 이미지 대기 |
 
 ### 2순위
 | # | 페이지 | spec | image | code | test | 상태 |
