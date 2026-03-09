@@ -1,4 +1,4 @@
-# Party Mode Round 2 — Spec 03 Dashboard (Adversarial Lens)
+# Party Mode Round 2 (Adversarial) — Dashboard (작전현황)
 
 **날짜:** 2026-03-09
 **대상:** `_uxui-refactoring/specs/03-dashboard.md` (Round 1 수정 후)
@@ -6,77 +6,85 @@
 
 ---
 
-## Round 1 수정 검증
+## Round 1 이슈 반영 확인
 
-| Round 1 이슈 | 수정 여부 | 검증 |
-|--------------|----------|------|
-| Empty 상태 미정의 | OK | 섹션 8.3에 5개 Empty 케이스 추가됨 |
-| quick-action-btn 개별 구분 | OK | `quick-action-btn-{id}` 패턴으로 변경됨 |
-| budget-percentage/projected testid | OK | data-testid 목록에 추가됨 |
-| 최근 사용 명령어 미언급 | OK | 퀵 액션 설명에 "최근 사용 순 서버 정렬" 추가됨 |
+| # | Round 1 이슈 | 반영 여부 |
+|---|-------------|----------|
+| 1 | Empty 상태 미정의 (작업 0건, 에이전트 0명 등) | [x] 반영됨 — 섹션 8.3에 5개 Empty 케이스 추가 |
+| 2 | `quick-action-btn` testid 개별 구분 불가 | [x] 반영됨 — `quick-action-btn-{id}` 동적 패턴으로 변경 |
+| 3 | 예산 퍼센트/projected marker testid 누락 | [x] 반영됨 — `budget-percentage`, `budget-projected` 추가 |
+| 4 | v1 "최근 사용 명령어" 미언급 | [x] 반영됨 — 섹션 10에 "최근 사용 순 서버 정렬" 명시 |
+
+**Round 1 이슈 전체 반영 완료.**
 
 ---
 
-## Expert Reviews (Adversarial)
+## 전문가 리뷰
 
 ### Sally (UX)
-Banana2 프롬프트에서 "Error state — clear message when data cannot be loaded"만 있고 **Empty 상태 시각 디자인이 프롬프트에 포함되지 않았습니다.** Banana2가 Empty 상태 UI를 생성하지 않으면 개발자가 임의로 만들게 됩니다. 프롬프트에 empty state 시각 요소를 추가해야 합니다.
+핵심 동작이 모두 0~1클릭 이내로 완수됩니다 — 요약 카드 스캔(0클릭), 기간 토글(1클릭), 퀵 액션(1클릭), 비용 드릴다운(1클릭). 대시보드로서 매우 효율적인 UX입니다. **하지만 Banana2 프롬프트에 Empty 상태의 시각적 디자인 요청이 원래 빠져 있었습니다.** "Error state"만 프롬프트 항목 8에 있었고, Empty 상태(차트에 데이터 없을 때, 카드에 0건일 때)의 시각적 표현을 Banana2에게 요청하지 않으면, 개발자가 임의로 placeholder를 만들어야 합니다. 수정 후 항목 9에 Empty 상태가 추가되었습니다.
 
 ### Winston (Architect)
-컴포넌트 목록과 data-testid 목록이 정합합니다. UI-only 범위도 잘 유지되어 있습니다. "건드리면 안 되는 것" 리스트도 적절합니다. 구조적 문제 없음.
+컴포넌트 7개가 모두 `dashboard.tsx` 인라인이라 단일 파일 크기가 커질 수 있지만, UI-only 리팩토링 범위에서는 합리적입니다. "건드리면 안 되는 것" 6개 항목이 잘 정의되어 있고, 데이터 바인딩(섹션 6)과 API 엔드포인트가 "변경 없음"으로 명확합니다. **SummaryCards 컴포넌트가 4개 카드를 하나로 묶고 있는데, 개별 SummaryCard 단위로 분리하면 재사용성이 높아지지만**, 이것은 코드 구조 변경이라 현재 범위 밖입니다. 구조적 이슈 없음.
 
 ### Amelia (Dev)
-Round 1 수정으로 testid가 보완되었습니다. `satisfaction-period` testid가 3개 버튼(7d/30d/all)인데 하나의 testid만 있어요 — 하지만 이건 버튼 그룹의 컨테이너 testid로 사용하면 되니 괜찮습니다. Playwright 테스트에서 에러 상태(#12)와 예산 퍼센트(#13)가 추가되어 커버리지가 좋아졌습니다.
+data-testid 19개로 커버리지가 좋습니다. `quick-action-btn-{id}` 동적 패턴이 적용되어 Playwright에서 개별 버튼을 정확히 타겟팅할 수 있습니다. `satisfaction-period` testid가 3개 버튼(7d/30d/all)의 컨테이너 역할을 하는데, 이는 컨테이너 내 `button` 셀렉터로 개별 버튼을 잡을 수 있으므로 문제 없습니다. **Playwright 테스트에 `ws-status` 인디케이터 렌더링 확인이 원래 빠져 있었습니다.** 수정 후 테스트 #14에 WS 상태 표시 테스트가 추가되었습니다.
 
 ### Quinn (QA)
-Empty/Error/Loading 3종 상태가 모두 정의되어 좋습니다. 한 가지 — **Playwright 테스트 항목에 WebSocket 연결 상태 표시 테스트가 없습니다.** `ws-status` testid가 있지만 테스트 항목 12개 중 WS 상태 확인이 빠져 있어요. 연결됨/끊김 표시 확인 테스트를 추가해야 합니다.
+Empty/Error/Loading 3종 상태가 모두 정의되어 있어 edge case 커버리지가 좋습니다. 섹션 8.3의 5개 Empty 케이스(작업 0건, 에이전트 0명, 사용량 데이터 없음, 만족도 0건, 퀵 액션 0개)가 구체적이에요. **WebSocket 연결 끊김 후 재연결 시 데이터 자동 refresh 동작이 명시되면 더 좋겠지만**, 이것은 `useDashboardWs` 훅의 기존 동작이므로 UI-only 범위에서 별도 정의 불필요합니다. Playwright 테스트 14개로 주요 인터랙션이 모두 커버됩니다.
 
 ### John (PM)
-v1 기능이 모두 커버되어 있습니다. "최근 사용 순 서버 정렬" 명시도 좋습니다. 기능 누락 없음.
+v1 기능이 모두 커버되어 있습니다. 섹션 10의 체크리스트 7개 항목이 v1 spec 9번과 정확히 대응합니다. "최근 사용 순 서버 정렬"이 추가되어 퀵 액션의 동작 방식이 명확해졌습니다. **비용 카드 외 다른 카드(작업, 에이전트)의 클릭 동작이 없다는 것이 Sally의 Round 1 지적이었는데**, 현재 코드에서 비용 카드만 navigate가 있으므로 기존 동작 유지가 맞습니다. 기능 누락 없음.
 
 ### Bob (SM)
-범위 적절합니다. Empty 상태 추가로 약간 작업량이 늘었지만 UI-only 범위 내입니다. 리스크 없음.
+7개 컴포넌트 스타일 개선이라는 범위가 매우 현실적입니다. Empty 상태 5개가 추가되어 약간 작업량이 늘었지만, 각각 간단한 placeholder 텍스트 수준이라 부담 없습니다. "건드리면 안 되는 것" 6항목과 "API 변경 없음" 선언이 명확하여, 구현자가 범위를 벗어날 위험이 매우 낮습니다. 리스크 없음.
 
 ### Mary (BA)
-비즈니스 가치 명확합니다. CEO가 아침에 빠르게 상태를 파악하는 시나리오가 잘 지원됩니다. Empty 상태가 추가되어 첫 사용자 경험도 고려되었습니다.
+비즈니스 가치가 매우 명확합니다. CEO가 아침에 30초 안에 AI 조직 전체 상태를 파악하는 시나리오가 완벽히 지원됩니다. 예산 위험도 3단계 색상(초록/노랑/빨강)이 즉각적 의사결정을 지원하고, 만족도 트렌드로 서비스 품질 추이를 확인할 수 있습니다. Empty 상태가 추가되면서 첫 사용자(에이전트 0명, 작업 0건)도 당황하지 않는 경험이 보장됩니다.
 
 ---
 
-## Cross-talk
+## 크로스톡
 
-**Quinn → Amelia:** "ws-status testid는 있는데 Playwright 테스트에 WS 연결 상태 확인이 없어요. 추가해야 하지 않을까요?"
+**Quinn → Amelia:** "`ws-status` testid는 있는데 Playwright 테스트에 WS 연결 상태 확인이 없었어요. 실제 WS 연결/끊김 시뮬레이션은 e2e에서 어려울 수 있지만, 최소한 인디케이터가 렌더링되는지는 확인해야 하지 않을까요?"
 
-**Amelia → Quinn:** "맞습니다. 간단히 `ws-status` 요소 존재 확인 테스트를 추가하면 됩니다. 실제 WS 연결/끊김 시뮬레이션은 e2e에서 어려울 수 있지만, 최소한 인디케이터가 렌더링되는지는 확인해야 합니다."
+**Amelia → Quinn:** "맞습니다. `ws-status` 요소 존재 확인 테스트를 추가했습니다. 실제 연결 상태 변경은 mock이 필요하므로 단위 테스트에서 다루고, Playwright에서는 인디케이터 렌더링만 확인하면 됩니다."
 
----
+**Sally → Winston:** "Empty 상태 디자인을 Banana2에게 별도로 요청해야 하는데, 프롬프트에 넣을 때 각 카드/차트마다 empty state를 보여달라고 해야 할까요, 아니면 별도 스크린으로?"
 
-## New Issues (Round 2)
-
-| # | 심각도 | 내용 | 조치 |
-|---|--------|------|------|
-| 1 | **Low** | Banana2 프롬프트에 Empty 상태 디자인 요청 누락 | 프롬프트에 empty state 항목 추가 |
-| 2 | **Low** | Playwright 테스트에 ws-status 확인 항목 누락 | 테스트 항목 #14로 추가 |
+**Winston → Sally:** "프롬프트 항목 9에 'each card/chart should have its own empty state message'로 명시했으니, Banana2가 각 영역별로 empty placeholder를 생성할 겁니다. 별도 스크린보다 인라인이 대시보드에 적합합니다."
 
 ---
 
-## UXUI Checklist
+## 신규 발견 이슈
 
-- [x] Core actions within 3 clicks? — 요약 카드 스캔(0클릭), 기간 토글(1클릭), 퀵 액션(1클릭), 드릴다운(1클릭)
-- [x] Empty/error/loading states defined? — 섹션 8에 3종 상태 모두 정의
-- [x] data-testid for all interactive elements? — 18개 testid 정의, 동적 패턴 포함
-- [x] All existing features covered? — v1 spec 9번 항목 전체 체크됨
-- [x] Banana2 prompt context+function centered (no layout forcing)? — "YOU DECIDE" 명시, 레이아웃 강제 없음
-- [x] Responsive breakpoints (375px, 768px, 1440px) specified? — 섹션 9에 3단계 정의
-- [x] UI-only scope (no feature logic changes)? — "건드리면 안 되는 것" 6개 항목 명시
+| # | 심각도 | 이슈 | 발견자 |
+|---|--------|------|--------|
+| 1 | **Low** | Banana2 프롬프트에 Empty 상태 시각 디자인 요청 누락 → 항목 9로 추가 완료 | Sally |
+| 2 | **Low** | Playwright 테스트에 ws-status 확인 항목 누락 → 테스트 #14로 추가 완료 | Quinn, Amelia |
+
+**모든 이슈 스펙에 수정 적용 완료.**
 
 ---
 
-## Final Score
+## UXUI 체크포인트
 
-**8 / 10 — PASS**
+- [x] 핵심 동작 3클릭 이내 — 요약 카드 스캔(0클릭), 기간 토글(1클릭), 퀵 액션(1클릭), 드릴다운(1클릭)
+- [x] 빈 상태/에러 상태/로딩 상태 정의됨 — 섹션 8에 Loading/Error/Empty 3종 상태 모두 정의, Empty 5개 케이스 구체적
+- [x] data-testid가 모든 인터랙션 요소에 할당됨 — 19개 testid, 동적 패턴(`quick-action-btn-{id}`) 포함
+- [x] 기존 기능 전부 커버 — v1 spec 9번 항목 전체 체크, "최근 사용 순 서버 정렬" 명시
+- [x] Banana2 프롬프트가 영문으로 구체적으로 작성됨 — 9개 기능 요소, Empty 상태 포함, "YOU DECIDE" 톤 명시
+- [x] 반응형 breakpoint (375px, 768px, 1440px) 명시 — 섹션 9에 3단계 정의
+- [x] 기능 로직은 안 건드리고 UI만 변경하는 범위 — "건드리면 안 되는 것" 6개 항목 명시
+
+---
+
+## 품질 점수: 8/10
 
 **감점 사유:**
-- -1: Banana2 프롬프트에 Empty 상태 시각 요소 미포함 (수정 적용)
-- -1: WS 상태 테스트 항목 누락 (수정 적용)
+- -1: Banana2 프롬프트에 Empty 상태 시각 요소가 원래 미포함 (수정 적용됨)
+- -1: WS 상태 테스트 항목이 원래 누락 (수정 적용됨)
 
-**종합 평가:** 대시보드 spec이 전반적으로 잘 작성되어 있습니다. 데이터 바인딩, 색상 체계, 반응형 breakpoint 모두 명확하고, v1 기능 커버리지도 완전합니다. Round 1~2에서 발견된 이슈들(Empty 상태, testid 개선, Banana2 프롬프트 보완)이 모두 수정 적용되어 구현 준비가 완료된 상태입니다.
+## 판정: PASS
+
+**종합 평가:** 대시보드 스펙이 전반적으로 매우 잘 작성되어 있습니다. 데이터 바인딩, 색상 체계(예산 3단계, 프로바이더별), 반응형 breakpoint 모두 명확하고, v1 기능 커버리지가 완전합니다. Round 1에서 발견된 4개 이슈(Empty 상태, testid 개선, 예산 관련 testid, 최근 사용 명령어)가 모두 수정 반영되었고, Round 2에서 발견된 2개 Low 이슈(Banana2 Empty 상태, WS 테스트)도 스펙에 수정 적용되었습니다. Banana2 이미지 생성 및 구현 준비가 완료된 상태입니다.
