@@ -148,36 +148,50 @@ Read `_bmad/_config/agent-manifest.csv` for agent definitions. If not found, use
 
 ---
 
-## Party Mode: 3라운드 (kdh-full-auto-pipeline과 동일 구조)
+## Party Mode: 비대화형 3라운드 자기 리뷰 (kdh-full-auto-pipeline 방식)
 
-Worker가 혼자 7명 역할극 수행. 매 라운드 **파일에서 다시 읽기** 필수.
-YOLO 모드 — 사용자 입력/확인/메뉴 표시 금지. 전부 자동.
+**Worker가 혼자서** 7명 전문가 역할극 수행. **완전 자동 — 사용자 입력/확인/메뉴 표시 일체 금지.**
+`bmad-party-mode` 스킬 호출 금지 (대화형이라 멈춤). Worker가 직접 역할극 + 로그 작성 + 수정까지 전부 처리.
+
+### 비대화형 실행 방법 (중요)
+
+```
+Worker는 bmad-party-mode 스킬을 호출하지 않는다.
+Worker가 직접:
+  1. 작성한 파일을 Read tool로 다시 읽는다 (기억 X, 반드시 파일에서)
+  2. 7명 전문가 역할을 순서대로 연기하면서 이슈를 찾는다
+  3. 이슈 테이블을 작성한다
+  4. party-logs/{파일명}.md에 Write tool로 저장한다
+  5. 발견된 이슈를 Edit tool로 원본 파일에서 즉시 수정한다
+  6. 다음 라운드로 넘어간다 (사용자 확인 없이)
+이 전체 과정에 사용자 개입 제로. YOLO 모드.
+```
 
 ### Round 구조
 
 **Round 1 (Collaborative Lens):**
-- 파일에서 다시 읽기 (Read tool — 기억으로 리뷰 금지)
-- 전문가 4~5명이 우호적 관점에서 리뷰
-- 크로스톡 2회 이상
-- 최소 2개 이슈 발견 (0개 = 재분석)
-- 발견된 이슈 즉시 수정
-- party-logs에 저장
+- 작성한 파일을 Read tool로 다시 읽기 (기억으로 리뷰 절대 금지)
+- 전문가 4~5명이 우호적 관점에서 리뷰 (인격 반영, 2~3문장 이상)
+- 크로스톡 2회 이상 (전문가끼리 이름 부르며 대화)
+- 최소 2개 이슈 발견 (0개 = 의심하고 재분석)
+- 발견된 이슈를 Edit tool로 원본 파일에서 즉시 수정
+- party-logs에 Write tool로 저장
 
 **Round 2 (Adversarial Lens):**
-- 수정된 파일에서 다시 읽기 (Read tool)
+- 수정된 파일을 Read tool로 다시 읽기
 - 전문가 전원(7명)이 적대적 관점으로 전환
 - Round 1 수정이 진짜 고쳐졌는지 검증
 - 각 전문가 최소 1개 새 관찰 (Round 1에 없던 것)
 - 현재 백엔드 코드 기준으로 기능 커버리지 확인 (v1-feature-spec 직접 참조 금지)
-- 발견된 이슈 즉시 수정
-- party-logs에 저장
+- 발견된 이슈를 Edit tool로 원본 파일에서 즉시 수정
+- party-logs에 Write tool로 저장
 
 **Round 3 (Forensic Lens):**
-- 최종 파일에서 다시 읽기 (Read tool)
+- 최종 파일을 Read tool로 다시 읽기
 - Round 1+2의 모든 이슈를 재평가 (과장 → 하향, 과소평가 → 상향)
 - 각 전문가 최종 평가 (2~3문장, 인격 반영)
 - 품질 점수 X/10 + PASS (7+) 또는 FAIL (6-)
-- party-logs에 저장
+- party-logs에 Write tool로 저장
 - FAIL → 수정 후 3라운드 전체 재실행
 
 ### Party Log 형식
@@ -196,15 +210,90 @@ _uxui-refactoring/party-logs/
 ...
 ```
 
+### Party Log 라운드별 형식 (Worker가 이 형식으로 저장)
+
+**Round 1 ({type}-{번호}-{페이지명}-round1.md):**
+```
+## [Party Mode Round 1 -- Collaborative Review] {step_name}
+
+### Agent Discussion
+(전문가들이 인격 반영해서 자연스럽게 대화. 이름 부르며 크로스톡. 각 2~3문장 이상)
+
+### Issues Found
+| # | Severity | Raised By | Issue | Suggestion |
+|---|----------|-----------|-------|------------|
+
+### Consensus Status
+- Major objections: N
+- Minor opinions: N
+- Cross-talk exchanges: N
+
+### Fixes Applied
+- (원본 파일에서 실제로 수정한 내용)
+```
+
+**Round 2 ({type}-{번호}-{페이지명}-round2.md):**
+```
+## [Party Mode Round 2 -- Adversarial Review] {step_name}
+
+### Round 1 Fix Verification
+| Issue # | Status | Verification Detail |
+|---------|--------|---------------------|
+
+### Adversarial Agent Discussion
+(전문가들이 적대적 모드로 전환. 각자 최소 1개 새 관찰.)
+
+### New Issues Found (Round 2)
+| # | Severity | Raised By | Issue | Suggestion |
+|---|----------|-----------|-------|------------|
+
+### Cross-Step Consistency Check
+- Checked against: (다른 완료된 페이지 프롬프트들)
+- Contradictions found: (구체적 내용 또는 "none with evidence")
+
+### Fixes Applied
+- (원본 파일에서 실제로 수정한 내용)
+```
+
+**Round 3 ({type}-{번호}-{페이지명}-round3.md):**
+```
+## [Party Mode Round 3 -- Final Judgment] {step_name}
+
+### Issue Calibration (from Rounds 1+2)
+| Original # | Original Severity | Calibrated Severity | Reason |
+|------------|-------------------|---------------------|--------|
+
+### Per-Agent Final Assessment (in character)
+(각 전문가 2~3문장, 자기 스타일로)
+
+### Quality Score: X/10
+Justification: (2~3문장)
+
+### Final Verdict
+- **PASS** or **FAIL**
+- Reason: (1~2줄)
+
+### Fixes Applied
+- (수정 내용 또는 "none needed")
+```
+
 ---
 
-## Mode: prompt PAGENAME (Lovable 프롬프트 생성 + 3라운드 파티모드)
+## Mode: prompt PAGENAME (Lovable 프롬프트 생성 + 비대화형 3라운드 자기 리뷰)
 
 ### Worker 스폰 프롬프트
 
 ```
 You are a UXUI wireframe prompt writer for CORTHEX v2. You generate design prompts for Lovable AND self-review them with 3-round party mode.
 YOLO mode -- auto-proceed through all prompts, never wait for user input.
+
+## CRITICAL: 비대화형 파티모드 (bmad-party-mode 스킬 호출 금지)
+파티모드는 Skill tool로 호출하지 않는다. Worker인 네가 직접 수행한다:
+1. 작성한 프롬프트 파일을 Read tool로 다시 읽는다 (기억으로 리뷰 절대 금지)
+2. 7명 전문가(John/Winston/Sally/Amelia/Quinn/Mary/Bob) 역할을 직접 연기한다
+3. 이슈 테이블을 작성하고, party-logs 파일에 Write tool로 저장한다
+4. 발견된 이슈를 Edit tool로 프롬프트 원본 파일에서 즉시 수정한다
+5. 다음 라운드로 자동 진행한다 (사용자 확인 없이, 메뉴 없이)
 
 ## CRITICAL RULE: Lovable has COMPLETE creative freedom on everything visual
 Your prompt must NEVER contain:
@@ -253,19 +342,35 @@ Structure:
 ### UX Considerations
 ### What NOT to Include on This Page
 
-### Step 3: Self-Review 3 Rounds (Party Mode)
-Round 1 (Collaborative): party-logs/prompt-{번호}-{페이지명}-round1.md
-Round 2 (Adversarial): party-logs/prompt-{번호}-{페이지명}-round2.md
-Round 3 (Forensic): party-logs/prompt-{번호}-{페이지명}-round3.md
+### Step 3: 비대화형 자기 리뷰 3라운드 (직접 수행 — Skill 호출 금지)
 
-ADVERSARIAL CHECKLIST (Round 2+3):
-- [ ] Zero color/font/size/layout mentions? (ANY visual spec = instant FAIL)
-- [ ] Only describes currently existing v2 features? (deleted features included = FAIL)
-- [ ] Data descriptions match actual schema.ts fields?
-- [ ] Actions match actual frontend event handlers?
-- [ ] Edge cases defined (empty state, error, loading, mobile)?
-- [ ] Lovable has enough context to understand what to design?
-- [ ] Description is specific and detailed (not vague)?
+**Round 1 (Collaborative Lens):**
+1. 프롬프트 파일을 Read tool로 다시 읽기
+2. 전문가 4~5명이 우호적 관점으로 리뷰 (인격 반영, 2~3문장 이상, 크로스톡 2회+)
+3. 최소 2개 이슈 (0개 = 재분석)
+4. Write tool로 party-logs/prompt-{번호}-{페이지명}-round1.md 저장
+5. Edit tool로 프롬프트 파일에서 이슈 수정
+
+**Round 2 (Adversarial Lens):**
+1. 수정된 프롬프트 파일을 Read tool로 다시 읽기
+2. 전문가 전원(7명) 적대적 모드, 각자 최소 1개 새 관찰
+3. ADVERSARIAL CHECKLIST 검증:
+   - [ ] Zero color/font/size/layout mentions? (ANY visual spec = instant FAIL)
+   - [ ] Only describes currently existing v2 features? (deleted features included = FAIL)
+   - [ ] Data descriptions match actual schema.ts fields?
+   - [ ] Actions match actual frontend event handlers?
+   - [ ] Edge cases defined (empty state, error, loading, mobile)?
+   - [ ] Lovable has enough context to understand what to design?
+   - [ ] Description is specific and detailed (not vague)?
+4. Write tool로 party-logs/prompt-{번호}-{페이지명}-round2.md 저장
+5. Edit tool로 프롬프트 파일에서 이슈 수정
+
+**Round 3 (Forensic Lens):**
+1. 최종 프롬프트 파일을 Read tool로 다시 읽기
+2. Round 1+2 이슈 재평가 + 각 전문가 최종 평가
+3. 품질 점수 X/10 + PASS(7+) / FAIL(6-)
+4. Write tool로 party-logs/prompt-{번호}-{페이지명}-round3.md 저장
+5. FAIL → 프롬프트 재작성 후 3라운드 전체 재실행
 
 ### Step 4: Report to Orchestrator
 [Step Complete] prompt-{번호}-{페이지명}
@@ -277,18 +382,49 @@ Changed files: (경로들)
 
 ---
 
-## Mode: prompt-batch PRIORITY (일괄 프롬프트 생성)
+## Mode: prompt-batch PRIORITY (일괄 프롬프트 생성 → 사용자 호출)
+
+### 전체 흐름
 
 ```
-1. 해당 우선순위의 모든 페이지에 대해 순차 실행
-2. 페이지당: 현재 코드 읽기 → 프롬프트 생성 → 파티모드 3라운드
-3. 5페이지마다 Worker shutdown + 새 Worker 스폰 (컨텍스트 관리)
-4. 전체 완료 후 오케스트레이터가 일괄 커밋
+오케스트레이터:
+  1. 해당 우선순위의 전체 페이지 목록 추출
+  2. Worker 스폰 (첫 페이지 작업을 spawn 프롬프트에 포함)
+  3. Worker가 페이지 1개 완료 보고 → 오케스트레이터가 다음 페이지 SendMessage
+  4. 5페이지마다 Worker shutdown + 새 Worker 스폰 (컨텍스트 관리)
+  5. 해당 우선순위의 모든 페이지 프롬프트 완료
+  6. 오케스트레이터가 일괄 커밋 + 푸시
+  7. ★ 사용자에게 알림: "A단계 전체 완료! 프롬프트 {N}개 생성됨. 확인해주세요."
+     → 사용자가 Lovable에서 B단계(와이어프레임) 수동 진행
+     → 사용자가 다시 부르면 C단계(code-batch) 실행
+
+Worker 페이지당 작업:
+  1. 현재 코드 읽기 (페이지 파일 + 관련 백엔드 라우트 + 스키마)
+  2. Lovable 프롬프트 생성 → _uxui-refactoring/lovable-prompts/{번호}-{페이지명}.md
+  3. 비대화형 파티모드 3라운드 자기 리뷰 (bmad-party-mode 스킬 호출 금지)
+     - Round 1 (Collaborative) → 이슈 수정 → 로그 저장
+     - Round 2 (Adversarial) → 이슈 수정 → 로그 저장
+     - Round 3 (Forensic) → PASS/FAIL 판정 → 로그 저장
+     - FAIL → 재작성 후 3라운드 재실행
+  4. 오케스트레이터에게 완료 보고 (SendMessage)
+```
+
+### 사용자 호출 시점 (중요)
+
+```
+prompt-batch 실행 → 모든 페이지 프롬프트 완료 → 커밋+푸시 → "A단계 완료" 알림
+                                                                    ↓
+                                                          사용자가 B단계 수동 진행
+                                                          (Lovable에 프롬프트 복붙)
+                                                                    ↓
+                                                          사용자가 다시 부름
+                                                                    ↓
+                                                          code-batch 실행 (C단계)
 ```
 
 ---
 
-## Mode: code PAGENAME (리팩토링 + 3라운드 파티모드 + Playwright)
+## Mode: code PAGENAME (리팩토링 + 비대화형 3라운드 자기 리뷰 + Playwright)
 
 ### 전제 조건
 - `prompt PAGENAME` 완료 (프롬프트 파일 존재)
@@ -299,6 +435,14 @@ Changed files: (경로들)
 ```
 You are a UXUI refactoring developer for CORTHEX v2. You implement UI changes based on Lovable wireframes AND self-review with 3-round party mode.
 YOLO mode -- auto-proceed through all prompts, never wait for user input.
+
+## CRITICAL: 비대화형 파티모드 (bmad-party-mode 스킬 호출 금지)
+파티모드는 Skill tool로 호출하지 않는다. Worker인 네가 직접 수행한다:
+1. 수정한 코드 파일을 Read tool로 다시 읽는다 (기억으로 리뷰 절대 금지)
+2. 7명 전문가(John/Winston/Sally/Amelia/Quinn/Mary/Bob) 역할을 직접 연기한다
+3. 이슈 테이블을 작성하고, party-logs 파일에 Write tool로 저장한다
+4. 발견된 이슈를 Edit tool로 코드 파일에서 즉시 수정한다
+5. 다음 라운드로 자동 진행한다 (사용자 확인 없이, 메뉴 없이)
 
 ## Your References (MUST read before coding)
 1. **Wireframe** (DESIGN GUIDE): _uxui-refactoring/wireframes/{번호}-{페이지명}.png
@@ -331,20 +475,36 @@ For each file in the page:
 5. Add data-testid to every interactive element
 6. Preserve all existing functionality
 
-### Step 3: Self-Review 3 Rounds (Party Mode)
-Round 1 (Collaborative): party-logs/code-{번호}-{페이지명}-round1.md
-Round 2 (Adversarial): party-logs/code-{번호}-{페이지명}-round2.md
-Round 3 (Forensic): party-logs/code-{번호}-{페이지명}-round3.md
+### Step 3: 비대화형 자기 리뷰 3라운드 (직접 수행 — Skill 호출 금지)
 
-ADVERSARIAL CHECKLIST (Round 2+3):
-- [ ] Wireframe layout matched?
-- [ ] 기능 로직이 100% 동일? (API 호출, 상태관리, 이벤트 핸들러)
-- [ ] data-testid 전부 추가됨?
-- [ ] 기존 data-testid 삭제 안 됨?
-- [ ] 반응형 (mobile에서 깨지지 않는가)?
-- [ ] 로딩/에러/빈 상태 UI 처리됨?
-- [ ] 다른 페이지에 영향 없음?
-- [ ] import 경로 대소문자 일치?
+**Round 1 (Collaborative Lens):**
+1. 수정한 코드 파일 전부를 Read tool로 다시 읽기
+2. 전문가 4~5명이 우호적 관점으로 리뷰 (인격 반영, 2~3문장 이상, 크로스톡 2회+)
+3. 최소 2개 이슈 (0개 = 재분석)
+4. Write tool로 party-logs/code-{번호}-{페이지명}-round1.md 저장
+5. Edit tool로 코드 파일에서 이슈 수정
+
+**Round 2 (Adversarial Lens):**
+1. 수정된 코드 파일 전부를 Read tool로 다시 읽기
+2. 전문가 전원(7명) 적대적 모드, 각자 최소 1개 새 관찰
+3. ADVERSARIAL CHECKLIST 검증:
+   - [ ] Wireframe layout matched?
+   - [ ] 기능 로직이 100% 동일? (API 호출, 상태관리, 이벤트 핸들러)
+   - [ ] data-testid 전부 추가됨?
+   - [ ] 기존 data-testid 삭제 안 됨?
+   - [ ] 반응형 (mobile에서 깨지지 않는가)?
+   - [ ] 로딩/에러/빈 상태 UI 처리됨?
+   - [ ] 다른 페이지에 영향 없음?
+   - [ ] import 경로 대소문자 일치?
+4. Write tool로 party-logs/code-{번호}-{페이지명}-round2.md 저장
+5. Edit tool로 코드 파일에서 이슈 수정
+
+**Round 3 (Forensic Lens):**
+1. 최종 코드 파일 전부를 Read tool로 다시 읽기
+2. Round 1+2 이슈 재평가 + 각 전문가 최종 평가
+3. 품질 점수 X/10 + PASS(7+) / FAIL(6-)
+4. Write tool로 party-logs/code-{번호}-{페이지명}-round3.md 저장
+5. FAIL → 코드 재수정 후 3라운드 전체 재실행
 
 ### Step 4: Write Playwright Tests
 Save to: packages/e2e/src/tests/interaction/{app|admin}/{페이지명}.spec.ts
