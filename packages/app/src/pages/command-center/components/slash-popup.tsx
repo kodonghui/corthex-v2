@@ -29,7 +29,7 @@ type Props = {
 }
 
 function CommandIcon({ type }: { type: string }) {
-  const icons: Record<string, JSX.Element> = {
+  const icons: Record<string, React.ReactNode> = {
     chart: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="text-blue-500">
         <path d="M2 12l3-4 3 2 4-6 2 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
