@@ -3,23 +3,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
 import { useToastStore } from '../stores/toast-store'
+import { WorkflowCanvas, type WorkflowStep } from '../components/workflow-canvas'
 
 // === Types ===
 
-type WorkflowStep = {
-  id: string
-  name: string
-  type: 'tool' | 'llm' | 'condition'
-  action: string
-  params?: Record<string, unknown>
-  agentId?: string
-  dependsOn?: string[]
-  trueBranch?: string
-  falseBranch?: string
-  systemPrompt?: string
-  timeout?: number
-  retryCount?: number
-}
+export type { WorkflowStep }
 
 type Workflow = {
   id: string
@@ -424,6 +412,7 @@ function WorkflowEditor({
     workflow?.steps.length ? workflow.steps : [emptyStep()]
   )
   const [saving, setSaving] = useState(false)
+  const [editorMode, setEditorMode] = useState<'canvas' | 'form'>('canvas')
 
   const isEditing = !!workflow
 
@@ -492,9 +481,34 @@ function WorkflowEditor({
         <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
           {isEditing ? '워크플로우 편집' : '새 워크플로우'}
         </h1>
-        <button onClick={onClose} className="text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">
-          ← 목록으로
-        </button>
+        <div className="flex items-center gap-3">
+          {/* Canvas/Form mode toggle */}
+          <div className="flex rounded-lg border border-zinc-300 dark:border-zinc-600 overflow-hidden">
+            <button
+              onClick={() => setEditorMode('canvas')}
+              className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+                editorMode === 'canvas'
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700'
+              }`}
+            >
+              캔버스
+            </button>
+            <button
+              onClick={() => setEditorMode('form')}
+              className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+                editorMode === 'form'
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700'
+              }`}
+            >
+              폼
+            </button>
+          </div>
+          <button onClick={onClose} className="text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">
+            ← 목록으로
+          </button>
+        </div>
       </div>
 
       {/* Name & Description */}
@@ -520,52 +534,62 @@ function WorkflowEditor({
         </div>
       </div>
 
-      {/* DAG Visualization */}
-      <DagPreview steps={steps} />
+      {/* Canvas Mode */}
+      {editorMode === 'canvas' && (
+        <WorkflowCanvas steps={steps} onChange={setSteps} onSave={handleSave} />
+      )}
 
-      {/* Step Builder */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">스텝 ({steps.length})</h2>
-          <button
-            onClick={addStep}
-            className="px-3 py-1.5 text-xs font-medium rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
-          >
-            + 스텝 추가
-          </button>
-        </div>
+      {/* Form Mode (original) */}
+      {editorMode === 'form' && (
+        <>
+          {/* DAG Visualization */}
+          <DagPreview steps={steps} />
 
-        {steps.map((step, idx) => (
-          <StepForm
-            key={step.id}
-            step={step}
-            index={idx}
-            allSteps={steps}
-            onUpdate={(partial) => updateStep(idx, partial)}
-            onRemove={() => removeStep(idx)}
-            onMove={(dir) => moveStep(idx, dir)}
-            isFirst={idx === 0}
-            isLast={idx === steps.length - 1}
-          />
-        ))}
-      </div>
+          {/* Step Builder */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">스텝 ({steps.length})</h2>
+              <button
+                onClick={addStep}
+                className="px-3 py-1.5 text-xs font-medium rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
+              >
+                + 스텝 추가
+              </button>
+            </div>
 
-      {/* Save */}
-      <div className="flex gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-700">
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="px-6 py-2 text-sm font-medium rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50"
-        >
-          {saving ? '저장 중...' : isEditing ? '수정' : '생성'}
-        </button>
-        <button
-          onClick={onClose}
-          className="px-6 py-2 text-sm rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-        >
-          취소
-        </button>
-      </div>
+            {steps.map((step, idx) => (
+              <StepForm
+                key={step.id}
+                step={step}
+                index={idx}
+                allSteps={steps}
+                onUpdate={(partial) => updateStep(idx, partial)}
+                onRemove={() => removeStep(idx)}
+                onMove={(dir) => moveStep(idx, dir)}
+                isFirst={idx === 0}
+                isLast={idx === steps.length - 1}
+              />
+            ))}
+          </div>
+
+          {/* Save */}
+          <div className="flex gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-700">
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="px-6 py-2 text-sm font-medium rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50"
+            >
+              {saving ? '저장 중...' : isEditing ? '수정' : '생성'}
+            </button>
+            <button
+              onClick={onClose}
+              className="px-6 py-2 text-sm rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            >
+              취소
+            </button>
+          </div>
+        </>
+      )}
     </div>
   )
 }
