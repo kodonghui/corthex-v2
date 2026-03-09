@@ -1,33 +1,20 @@
-# Party Mode Round 2 — Adversarial Review
-## Page: 19-workflows (워크플로우 관리)
+# Round 2 Review: 19-workflows
+## Lens: Adversarial
+## Issues Found:
 
-### Lens: Actively looking for flaws, omissions, contradictions, and ways the prompt could mislead Lovable.
+1. **No error state for failed API fetches**: The spec defines Loading, Empty (3 variants), and Company Not Selected states, but has NO error state for when API calls fail (network error, 403 forbidden, server error). The source code relies on toast notifications for mutation errors, but an inline error state is needed for the initial list data fetch failure -- otherwise users see an empty list with no indication of failure.
 
-### Score: 8/10 — PASS
+2. **Execute button race condition on list view**: The source code uses a single shared `executeMut` mutation, so `executeMut.isPending` disables ALL execute buttons when any single workflow is being executed. The spec shows individual "실행" buttons per card but doesn't address this UX limitation. This should be noted for implementers.
 
-### Issues Found
+3. **Missing "pending/skipped" step status in execution mini-bar**: The spec's execution card shows green (completed) and red (failed) step bars, but there's no explicit definition for pending, running, or skipped steps. The source code has a fallback gray bar (`bg-zinc-300 dark:bg-zinc-600`) for unknown statuses, but the spec should define this third state explicitly.
 
-**Issue 1 (New, Medium): Prompt mentions colors for step types**
-- "Tool=blue, LLM=purple, Condition=amber" and "True (green) and False (red)" — these are color prescriptions! The CRITICAL rule says the prompt must NEVER contain colors. While these describe functional distinctions (types need to be visually distinct), specifying blue/purple/amber/green/red violates the creative freedom mandate.
-- **Fix Applied**: Removed color references. Changed to "each type should be visually distinct" and "True/False branches should be visually distinguishable."
+4. **Dark theme contrast on suggestion card actions**: The "거절" button uses `text-slate-400` on `bg-slate-800/50` card background. At 4.2:1 contrast ratio this barely passes WCAG AA for normal text but fails for small text (text-xs = ~10px effective). Consider using `text-slate-300` for better readability.
 
-**Issue 2 (New, Minor): "SVG-based" is an implementation prescription**
-- The prompt says "Interactive SVG-based visual DAG editor" — this prescribes implementation technology. Lovable should choose the rendering approach (SVG, Canvas, HTML+CSS, etc.).
-- **Fix Applied**: Changed to "Interactive visual DAG editor."
+## Resolution:
+- Issue 1: Critical -- added Error State section to the spec.
+- Issue 2: Minor UX note -- documented but not a spec defect.
+- Issue 3: Added "pending/skipped" step status color definition to the spec.
+- Issue 4: Updated suggestion reject button from `text-slate-400` to `text-slate-300`.
 
-**Issue 3 (Carried from R1): Active/inactive toggle still missing from User Actions**
-- Round 1 identified that there's no user action to toggle workflow active/inactive status. This was noted but not fixed in the prompt.
-- **Fix Applied**: Added to User Actions list.
-
-**Issue 4 (New, Minor): "JSON editor" may be too technical**
-- The prompt mentions "JSON editor" which is a developer-facing feature. The context doc says "The CEO is not a developer." However, this is the Admin app, used by admins who may be more technical. And the current code has this feature.
-- **Resolution**: Keep as-is. Admin app users are expected to handle some technical features.
-
-### Fixes Applied to Prompt
-
-1. Removed "Tool=blue, LLM=purple, Condition=amber" → "each step type (Tool, LLM, Condition) should be visually distinguishable"
-2. Removed "True (green) and False (red)" → "True and False branches should be visually distinct from each other and from regular dependency edges"
-3. Removed "SVG-based" → "Interactive visual DAG editor"
-4. Added "Toggle a workflow's active/inactive status" to User Actions
-
-**Verdict: PASS (8/10) — after fixes applied**
+## Score: 7/10
+## Verdict: PASS

@@ -1,21 +1,16 @@
-# Party Mode Round 1 (Collaborative) — 16-files
+# Round 1 Review: 16-files
+## Lens: Collaborative
+## Issues Found:
+1. **Missing upload error/validation state documentation**: The spec describes the upload button spinner state but does not document what happens when upload fails (file too large, disallowed MIME type, network error). The backend returns specific error codes (FILE_001, FILE_002, FILE_003). The source code handles this with `toast.error()`, but the spec should document expected toast messages for each failure mode. This is an API coverage gap.
+2. **Active filter chip sizing inconsistency**: The active chip uses `bg-blue-600 text-white` without a border, while inactive chips have `border border-slate-600`. This creates a ~2px size difference between active and inactive states due to border presence. Should add `border border-blue-600` to the active chip or `border border-transparent` for consistent element sizing across states.
+3. **Drag & drop section lacks event handling description**: The drag-drop overlay is specified visually but missing the actual event model -- `onDragEnter`, `onDragOver`, `onDragLeave`, `onDrop` handlers aren't described. Also no mention of what happens with multi-file drops (spec only shows single file upload via the button handler).
+4. **No mobile-specific action button visibility rule**: The spec mentions "always visible on mobile (remove `opacity-0 group-hover:opacity-100`)" but doesn't specify the breakpoint. Should use `sm:opacity-0 sm:group-hover:opacity-100` to make actions always visible below `sm` breakpoint and hover-reveal on desktop.
 
-## Experts: Mary (Analyst), Sally (UX), John (PM), Quinn (QA), Winston (Architect)
+## Resolution:
+- Issue 1: Will add upload error states section to the spec.
+- Issue 2: Will add `border border-blue-600` to active chip class.
+- Issue 3: Accepted as minor -- drag-drop is labeled "Enhancement" and event handling is implementation detail.
+- Issue 4: Will update action button classes with responsive opacity.
 
-### Discussion
-
-- **Mary** (📊): "Data model is straightforward and fully covered. Schema fields: id, companyId, userId, filename, mimeType, sizeBytes, storagePath, isActive, createdAt. All relevant display fields represented. The storagePath is internal and correctly omitted from the prompt."
-- **Sally** (🎨): "Good that the prompt explicitly states this page is 'intentionally simple'. Clear differentiation from Knowledge Base. The 'image preview' suggestion is nice but says 'consider' — leaves creative freedom. Clean."
-- **John** (📋): "4 user actions — appropriately scoped for a simple page. The prompt distinguishes this from Knowledge Base well. Good mention of the 50-file backend limit."
-- **Quinn** (🧪): "Backend check: POST / (upload), GET / (list), GET /:id/download, DELETE /:id. All four endpoints covered in the prompt. The delete endpoint checks `file.userId !== tenant.userId` — prompt correctly notes only uploader can delete. The isAllowedMimeType function checks prefixes ('image/', 'text/') and specific types — prompt lists these accurately. ✅"
-- **Winston** (🏗️): "No visual prescriptions detected. No colors, sizes, or layout specifics. The 'file type icons' mention describes function not visual implementation. Clean."
-
-### Issues Found (2)
-1. **'Image preview' and 'thumbnail' could be seen as visual prescriptions** — "small thumbnail inline" suggests layout
-2. **userId resolution not mentioned** — same issue as knowledge page, uploader shows as ID
-
-### Fixes Applied
-1. Softened thumbnail language to "For image files, showing a preview can help users identify them quickly"
-2. Added "(resolved from userId)" note to Uploader field
-
-### Verdict: PASS (9/10, minor fixes applied, moving to Round 2)
+## Score: 8/10
+## Verdict: PASS

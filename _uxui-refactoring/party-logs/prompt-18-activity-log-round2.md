@@ -1,19 +1,16 @@
-# Party Mode Round 2 (Adversarial) — 18-activity-log
+# Round 2 Review: 18-activity-log
+## Lens: Adversarial
+## Issues Found:
+1. **No error/retry state for failed API calls**: The spec documents Loading (SkeletonTable) and Empty states but has no guidance for network error or API failure states. The source code also lacks explicit error handling UI — if `activeQuery.isError` is true, the page would show the empty state instead of an error message. The spec should prescribe an error state with a retry button, e.g., "로그를 불러올 수 없습니다. 다시 시도해주세요."
+2. **Security alert banner lacks ShieldAlertIcon import/specification**: The spec references `<ShieldAlertIcon>` in the collapsed banner HTML but doesn't note which icon library it comes from or provide a fallback. The source code omits the icon entirely and just uses text. The spec should clarify the icon source (lucide-react) or remove it to avoid confusion.
+3. **Hallucination panel "showAll" toggle missing from spec**: The source code has a "전체 보기 / 일부만 보기" toggle for claims with >5 items. The spec shows the claims list but doesn't document this pagination/toggle behavior, which is important for UX when there are many claims.
+4. **Dark theme contrast: date inputs on dark background**: The spec uses `bg-slate-800 text-slate-300` for date inputs, but native HTML date inputs have browser-default calendar icons that don't adapt to dark backgrounds. On Chrome/Firefox dark mode, the calendar picker dropdown may render in light theme, creating a jarring contrast. No mitigation documented.
 
-## Experts: Mary (Analyst), Sally (UX), John (PM), Quinn (QA), Winston (Architect)
+## Resolution:
+1. **Fix required**: Add an Error state section to the spec with retry guidance.
+2. **Accepted as-is**: Minor icon detail. The spec names lucide icons consistently across pages. No change needed.
+3. **Fix required**: Add "showAll" toggle documentation to the Hallucination Report Panel section.
+4. **Accepted as-is**: Browser date input dark mode is a known platform limitation. Noting as a future enhancement (custom date picker component).
 
-### Discussion
-
-- **Winston** (🏗️): "Adversarial: The prompt says 'real-time updates via WebSocket.' Let me verify the WebSocket implementation actually pushes activity-log events... The WsChannel type includes 'activity-log'. The context doc (00-context.md) lists 'activity-log: Live activity feed'. This feature exists in the type system and is referenced as a channel. Prompt is accurate."
-- **Quinn** (🧪): "Adversarial: The prompt says 'Text search: Free text search across action and detail fields.' The backend uses `ilike` on both `action` and `detail` with an OR condition. Confirmed — prompt matches exactly."
-- **Mary** (📊): "Adversarial: Summary stats — the backend groups by type and returns count for today and this week. It does NOT return actor-level summaries or department-level breakdowns in the summary endpoint. The prompt correctly describes it as 'count of events by type' only. No overstatement."
-- **John** (📋): "Adversarial question: The prompt mentions 'login' as an activity type. Does the login event actually get logged? Checking auth routes... yes, the auth route calls `logActivity` with type 'login' on successful authentication. Verified."
-- **Sally** (🎨): "One potential issue: The prompt says 'Metadata: JSON object with extra structured data (shown expandable if present).' The metadata is stored as JSONB and could contain arbitrary data. Saying 'shown expandable' suggests an accordion/expand pattern which is somewhat prescriptive. Should soften to 'viewable when the user wants to see it' or 'accessible on demand.'"
-
-### Issues Found (1)
-1. **'Shown expandable' is mildly prescriptive** — implies accordion UI pattern
-
-### Fixes Applied
-1. Changed "shown expandable if present" to "accessible on demand if present"
-
-### Verdict: PASS (9/10, minor wording fix, moving to Round 3)
+## Score: 7/10
+## Verdict: PASS

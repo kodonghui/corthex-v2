@@ -1,21 +1,41 @@
-# Party Mode Round 1 (Collaborative) — 15-knowledge
+# Round 1 Review: 15-knowledge
+## Lens: Collaborative
+## Issues Found:
 
-## Experts: Mary (Analyst), Sally (UX), John (PM), Quinn (QA), Winston (Architect)
+1. **API endpoint path mismatch: Version restore**
+   - Spec says: `POST /workspace/knowledge/docs/:id/restore/:versionId`
+   - Backend actual: `POST /workspace/knowledge/docs/:id/versions/:versionId/restore`
+   - Source code correctly uses the backend path. Spec is wrong.
 
-### Discussion
+2. **API endpoint path mismatch: Memory consolidate**
+   - Spec says: `POST /workspace/knowledge/memories/:agentId/consolidate`
+   - Backend actual: `POST /workspace/knowledge/memories/consolidate/:agentId`
+   - Segment order is reversed in spec.
 
-- **Mary** (📊): "Comprehensive data model coverage. All knowledge_folders, knowledge_docs, doc_versions, and agent_memories fields from schema are represented. Templates and injection preview endpoints also covered. The `departmentId` on folders is mentioned as secondary text — good."
-- **Sally** (🎨): "The document detail view is well structured. Split editor/preview for markdown is great UX. However, the prompt mentions 'drag and drop' which might be prescriptive of visual behavior — should be softened or removed."
-- **John** (📋): "21 user actions is thorough. One concern: Knowledge Injection Preview is an admin-level feature from the knowledge-injector service. Is it available in the CEO app route? Checking... yes, `/knowledge/injection-preview` exists in workspace routes. Valid."
-- **Quinn** (🧪): "Edge case: What happens when folderId filtering uses 'null' or 'root' string to show root-level documents? The prompt mentions root level but should clarify this is for documents without a folder. Also, pagination state should be mentioned — does changing folders reset pagination?"
-- **Sally** (🎨): "Good catch Quinn. Also, I notice the prompt says 'Content type dropdown filter (markdown / text / html / mermaid)' — but are these the correct labels? The schema uses exactly these values. Fine as data, but Lovable should decide how to display them."
+3. **API endpoint path mismatch: Injection preview**
+   - Spec says: `GET /workspace/knowledge/injection-preview`
+   - Backend actual: `GET /workspace/knowledge/injection-preview/:agentId` (requires agentId param)
+   - Spec omits the required `:agentId` path parameter.
 
-### Issues Found (2)
-1. **Drag-and-drop is prescriptive of visual interaction** — violates "complete creative freedom" rule
-2. **Folder change should reset pagination** — not mentioned in UX considerations
+4. **13 backend endpoints missing from spec API table**
+   - `GET /folders/:id`, `GET /docs/:id/download`, `POST /folders/:id/move`, `POST /folders/bulk-delete`, `GET /folders/:id/stats`, `POST /docs/from-template`, `GET /tags`, `POST /docs/:id/tags`, `DELETE /docs/:id/tags`, `GET /search`, `GET /memories/context/:agentId`, `GET /memories/:id`, `POST /memories/:id/used`
+   - Source code actively uses `/tags` endpoint and `/docs/:id/download`.
 
-### Fixes Applied
-1. Changed drag-and-drop bullet to softer language: "Moving documents between folders should be easy and intuitive" (removed drag-and-drop mention)
-2. Added UX consideration about pagination reset when switching folders
+5. **Knowledge Templates and Injection Preview sections have no source code implementation**
+   - Spec sections 5 and 6 describe template and injection-preview UI components.
+   - Source code (knowledge.tsx) does not implement either feature at all.
+   - Backend routes exist for both. Spec-to-code gap.
 
-### Verdict: PASS (8/10, fixes applied, moving to Round 2)
+6. **Badge variant mapping inconsistency**
+   - Spec defines custom Tailwind classes per content/memory type (e.g., `bg-blue-500/20 text-blue-400` for markdown).
+   - Source code uses generic Badge component variants (`info`, `success`, `warning`, `error`) which map differently.
+   - Memory type mapping also differs: spec has learning=emerald, source has learning=info(blue).
+
+## Resolution:
+- Issues 1-3: Fix API endpoint paths in spec to match backend.
+- Issue 4: Add missing endpoints to spec API table.
+- Issue 5: Accept as known gap -- spec describes target state; source code will catch up.
+- Issue 6: Accept -- spec prescribes ideal; Badge component abstracts the actual colors.
+
+## Score: 5/10
+## Verdict: FAIL

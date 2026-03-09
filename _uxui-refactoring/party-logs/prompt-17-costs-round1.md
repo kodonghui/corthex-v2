@@ -1,21 +1,12 @@
-# Party Mode Round 1 (Collaborative) — 17-costs
-
-## Experts: Mary (Analyst), Sally (UX), John (PM), Quinn (QA), Winston (Architect)
-
-### Discussion
-
-- **Mary** (📊): "Data coverage is thorough. The prompt covers dashboard/costs (summary with byModel, byAgent, bySource), dashboard/budget (monthly budget + projections + by department), dashboard/costs/by-agent (detailed with date range), and dashboard/costs/daily (time series). All four workspace endpoints are represented."
-- **Sally** (🎨): "Budget warning states and projected spending callouts are excellent UX considerations. The CEO-focused framing ('quick answers') is spot on. One concern: 'visual emphasis — not just numbers' for budget warnings is borderline prescriptive. Should soften to 'communicate urgency clearly.'"
-- **John** (📋): "8 user actions — appropriate scope. The period selector (7/14/30 days) matches the backend `days` parameter. The custom date range for detailed agent costs matches the `startDate/endDate` params on `/dashboard/costs/by-agent`."
-- **Quinn** (🧪): "Edge case: Employee department scoping. The backend has `departmentScopeMiddleware` that filters costs to employee's departments. Prompt correctly notes this behavior. Also, when `departmentIds` is empty array, backend returns zero data — prompt says 'hide data that's not available.' Good."
-- **Winston** (🏗️): "Checking for visual prescriptions: 'sorting by cost descending by default' is behavioral, not visual — acceptable. 'Summary cards should stack vertically' — this is a layout instruction! Should remove."
-
-### Issues Found (2)
-1. **'Summary cards should stack vertically' on mobile** — prescriptive layout instruction
-2. **'Visual emphasis' for budget warnings** — borderline prescriptive
-
-### Fixes Applied
-1. Changed mobile layout to "Summary and breakdowns should remain readable on narrow screens"
-2. Changed budget warning to "communicate urgency clearly"
-
-### Verdict: PASS (8/10, fixes applied, moving to Round 2)
+# Round 1 Review: 17-costs
+## Lens: Collaborative
+## Issues Found:
+1. **Spec uses slate-* color palette but source code uses zinc-* palette.** The design spec consistently references `bg-slate-900`, `bg-slate-800`, `text-slate-50`, `text-slate-400`, `border-slate-700`, etc., but the actual source code (`costs.tsx`) uses `zinc-*` variants throughout (e.g., `text-zinc-900 dark:text-zinc-100`, `border-zinc-200 dark:border-zinc-800`, `bg-zinc-100 dark:bg-zinc-800`). The spec and source code are misaligned. The spec should either match the source or the source should be updated. Since other pages likely use zinc-*, the spec should be updated to use zinc-* for consistency.
+2. **Spec uses blue-500 for bar charts; source uses indigo-500/indigo-400.** The spec defines `bg-blue-500` for agent cost bars and daily chart bars, but the actual implementation uses `bg-indigo-500 dark:bg-indigo-400` for agent bars and `bg-indigo-500 dark:bg-indigo-400` for daily chart bars. The active period pill also uses indigo in the source (`bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300`) but blue in the spec (`bg-blue-600/20 text-blue-400`).
+3. **Spec donut center uses `bg-slate-800` but source uses `bg-white dark:bg-zinc-900`.** The donut chart's inner circle in the spec is `bg-slate-800` (hardcoded dark), while the source supports both light/dark modes with `bg-white dark:bg-zinc-900`.
+4. **Spec lacks error state for API failure.** The source code has a distinct error state (`데이터를 불러올 수 없습니다`) when costData is null after loading completes, but the spec only covers loading skeleton and empty state -- no API error state is documented.
+5. **Spec budget banner colors differ from source.** Spec uses `bg-amber-500/10 text-amber-400 border-amber-500/30` (amber for warning) and `bg-red-500/10 text-red-400 border-red-500/30` (red for exceeded). Source uses light/dark responsive classes: `bg-yellow-50 dark:bg-yellow-950/30 text-yellow-700 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800` (yellow, not amber).
+## Resolution:
+All 5 issues are valid discrepancies between the spec and source code. The spec should be updated to match the actual zinc-based, indigo-accented, light/dark responsive design system used in the source. Issues will be fixed after Round 3.
+## Score: 6/10
+## Verdict: FAIL

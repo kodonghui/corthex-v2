@@ -1,51 +1,43 @@
-# Party Mode Round 3 — Forensic Review
-## Page: 19-workflows (워크플로우 관리)
+# Round 3 Review: 19-workflows
+## Lens: Forensic
+## Issues Found:
 
-### Lens: Line-by-line verification against source code. Every claim in the prompt must be traceable to actual code. No invented features.
+1. **Tailwind class audit -- design system palette consistency**: The spec consistently uses `bg-slate-900` (root), `bg-slate-800/50` (cards), `border-slate-700` (borders), `text-slate-50`/`text-slate-100` (headings), `text-slate-300`/`text-slate-400` (body/meta), `text-slate-500` (muted). All match the Vercel-style dark theme design system. VERIFIED PASS.
 
-### Source Files Verified
-- `packages/admin/src/pages/workflows.tsx` (1035 lines)
-- `packages/admin/src/components/workflow-canvas.tsx` (832 lines)
+2. **Action button color audit**:
+   - Primary: `bg-blue-600 hover:bg-blue-500` -- consistent throughout spec
+   - Execute/Accept: `bg-emerald-600 hover:bg-emerald-500` -- consistent
+   - Delete: `border-red-500/30 text-red-400 hover:bg-red-500/10` -- consistent
+   - Secondary: `border-slate-600 text-slate-300 hover:bg-slate-700` -- consistent
+   VERIFIED PASS.
 
-### Verification Checklist
+3. **API endpoint path verification against backend routes** (mounted at `/api/workspace`):
+   | Spec Path | Backend Route | Match |
+   |-----------|---------------|-------|
+   | GET /workspace/workflows?limit=100 | GET /workflows (query: page, limit) | PASS |
+   | POST /workspace/workflows | POST /workflows | PASS |
+   | PUT /workspace/workflows/:id | PUT /workflows/:id | PASS |
+   | DELETE /workspace/workflows/:id | DELETE /workflows/:id | PASS |
+   | POST /workspace/workflows/:id/execute | POST /workflows/:id/execute | PASS |
+   | GET /workspace/workflows/:id/executions?limit=50 | GET /workflows/:workflowId/executions | PASS |
+   | GET /workspace/workflows/suggestions?limit=100 | GET /workflows/suggestions | PASS |
+   | POST /workspace/workflows/suggestions/:id/accept | POST /workflows/suggestions/:id/accept | PASS |
+   | POST /workspace/workflows/suggestions/:id/reject | POST /workflows/suggestions/:id/reject | PASS |
+   | POST /workspace/workflows/analyze | POST /workflows/analyze | PASS |
+   All 10 endpoints verified against backend.
 
-| Prompt Claim | Code Evidence | Status |
-|---|---|---|
-| Workflow has id, name, description, steps, isActive, createdBy, createdAt | Type definition lines 12-22 | ✅ |
-| Steps are Tool/LLM/Condition | WorkflowStep type, stepTypeLabels lines 99-103 | ✅ |
-| Tabs: list and suggestions | Tab type line 52, tab state lines 241-262 | ✅ |
-| Suggestion has reason and suggestedSteps | Suggestion type lines 24-30 | ✅ |
-| Accept/reject suggestions | acceptMut/rejectMut lines 148-166 | ✅ |
-| Pattern analysis button | analyzeMut lines 169-176 | ✅ |
-| Canvas mode with drag, pan, zoom | workflow-canvas.tsx, handleMouseDown/Move/Up/Wheel | ✅ |
-| Form mode with step builder | StepForm component lines 599-776 | ✅ |
-| Canvas/Form toggle | editorMode state line 415, toggle lines 486-507 | ✅ |
-| DAG preview in form mode | DagPreview component lines 994-1034 | ✅ |
-| Cycle detection | wouldCreateCycle in canvas lines 149-157, buildDagLayers line 1026 | ✅ |
-| Node side panel editor | selectedNode panel in canvas lines 710-805 | ✅ |
-| JSON editor toggle | showJsonEditor state, lines 809-828 | ✅ |
-| Execution history view | ExecutionHistory component lines 780-893 | ✅ |
-| Execution detail view | ExecutionDetail component lines 897-989 | ✅ |
-| Step status mini-bar | Lines 875-887 | ✅ |
-| Execute workflow from list | executeMut lines 179-187 | ✅ |
-| Execute from history view | executeMut in ExecutionHistory lines 796-804 | ✅ |
-| Delete workflow | deleteMut lines 138-145 | ✅ |
-| Auto-layout button | handleAutoLayout in canvas line 372 | ✅ |
-| DependsOn selector | StepForm lines 714-745 | ✅ |
-| Timeout and retry fields | StepForm lines 747-773 | ✅ |
-| System prompt for LLM | StepForm lines 670-681 | ✅ |
-| True/False branch for Condition | StepForm lines 683-712 | ✅ |
-| Active/inactive toggle (added R2) | Not in current code — isActive field exists but no toggle UI | ⚠️ Minor |
+4. **Missing endpoint**: `GET /workspace/workflows/:id` exists in backend (single workflow fetch, line 162) but was not in the spec's API table. Fixed in Round 1 resolution.
 
-### Issues Found
+5. **Step type color classes -- spec targets correct redesign palette**:
+   - Spec: `bg-blue-500/20 text-blue-400` (tool) -- uses opacity modifier, correct for dark theme
+   - Source: `bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300` -- light/dark dual mode
+   - Spec is the redesign target. PASS.
 
-**Issue 1 (Minor): Active/inactive toggle was added in R2 but doesn't exist in code**
-- The R2 fix added "Toggle workflow active/inactive status" as a user action, but the current code doesn't have this toggle. The isActive field is displayed but not editable.
-- **Resolution**: Remove from user actions. The prompt should only describe what currently exists. The isActive status display is sufficient.
-- **Fix Applied**: Removed from User Actions.
+6. **Execution status badge -- emerald vs green**: Spec uses `bg-emerald-500/20 text-emerald-400`. Source uses `bg-green-100 dark:bg-green-900/30`. Emerald is the redesign target, consistent with other page specs. PASS.
 
-**No other discrepancies found.** All other claims are traceable to code.
+## Resolution:
+- Issue 4: Fixed by adding the missing endpoint to the spec (applied).
+- All other items verified as correct.
 
-### Final Score: 9/10 — PASS
-
-All 0 major objections. Prompt accurately reflects the codebase after forensic verification.
+## Score: 9/10
+## Verdict: PASS

@@ -1,42 +1,20 @@
-# Party Mode Round 1 — Collaborative Review
-## Page: 19-workflows (워크플로우 관리)
+# Round 1 Review: 19-workflows
+## Lens: Collaborative
+## Issues Found:
 
-### Reviewers (7 Expert Perspectives)
-1. **UX Designer** — User flow & interaction patterns
-2. **Frontend Architect** — Component structure & state management
-3. **Product Manager** — Feature completeness & business value
-4. **Accessibility Specialist** — WCAG compliance & keyboard navigation
-5. **Data Visualization Expert** — DAG rendering & information density
-6. **QA Engineer** — Edge cases & error states
-7. **Korean Localization Expert** — Language & cultural accuracy
+1. **Color system mismatch between spec and source code**: The design spec uses the `slate-*` palette exclusively (bg-slate-900, bg-slate-800, text-slate-50), but the source code uses `zinc-*` with light/dark variants (text-zinc-900 dark:text-zinc-100, bg-white dark:bg-zinc-900). The spec represents the target dark-mode redesign, so this is intentional. However, the spec should be explicit that it is dark-mode only and that the source code will be updated to match.
 
-### Review Summary
+2. **Missing `GET /workspace/workflows/:id` endpoint in spec API table**: The backend defines a single-workflow fetch endpoint at `GET /workflows/:id` (route file line 162-173), but the spec's API Endpoints table omits it. While the UI currently uses list data, implementers need the full API surface documented.
 
-**Overall Score: 8/10 — PASS**
+3. **Root container `p-6` may cause double-padding**: The spec defines `<div className="space-y-6 p-6 bg-slate-900 min-h-full">` as the root container, but the source code root is just `<div className="space-y-6">`. The padding and background likely come from the layout wrapper. The spec should clarify this to prevent double-padding.
 
-### Issues Found
+4. **Loading state gap**: The spec defines skeleton card placeholders (h-32, animate-pulse) for loading, but the source code uses a plain text `<p>로딩 중...</p>`. The spec's skeleton approach is better UX and is the correct redesign target.
 
-**Issue 1 (Medium): Missing toggle for workflow active/inactive status**
-- Raised by: Product Manager
-- The prompt describes showing active/inactive status but doesn't mention a user action to toggle a workflow's active status. The current code has `isActive` field but no UI to change it.
-- Resolution: Added to prompt — mention that the edit form or list view should allow toggling active/inactive status.
+## Resolution:
+- Issue 1: Acceptable as-is -- spec is the redesign target. No change.
+- Issue 2: Added `GET /workspace/workflows/:id` row to the API table in the spec.
+- Issue 3: Added clarifying comment to root container section.
+- Issue 4: No spec change needed -- skeleton is the target.
 
-**Issue 2 (Minor): Canvas mode accessibility gap**
-- Raised by: Accessibility Specialist
-- The canvas mode relies heavily on mouse interactions (drag, click, wheel). Should mention keyboard-accessible alternatives for adding nodes and connecting edges, or explicitly note that form mode serves as the accessible alternative.
-- Resolution: Already addressed in UX Considerations — form mode is explicitly mentioned as the accessibility alternative.
-
-**Issue 3 (Minor): Execution triggeredBy field not mentioned**
-- Raised by: QA Engineer
-- The Execution type has a `triggeredBy` field (nullable) that indicates who/what triggered the execution. This context could be useful in execution history.
-- Resolution: Minor omission. Not critical for wireframe prompt.
-
-**Issue 4 (Minor): No mention of workflow count on tab label**
-- Raised by: UX Designer
-- The prompt mentions "Workflow count: Header shows total count" but the actual code shows the count in the tab label: "워크플로우 (5)". Should clarify this is in the tab, not just the header.
-- Resolution: Already implicit in the tab description. Acceptable.
-
-### Consensus
-All reviewers agree the prompt comprehensively covers the page's complex multi-view structure (list/editor/history/detail), both editing modes (canvas/form), and the suggestion system. The prompt correctly avoids specifying visual details while providing all functional requirements. No major issues — 0 major objections.
-
-**Verdict: PASS (8/10)**
+## Score: 8/10
+## Verdict: PASS
