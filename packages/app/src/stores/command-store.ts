@@ -23,6 +23,7 @@ export type CommandMessage = {
   role: 'user' | 'agent' | 'system'
   text: string
   agentName?: string
+  agentRole?: string
   commandId?: string
   status?: string
   result?: string
