@@ -98,7 +98,7 @@
 ## 4. 개선 방향
 
 ### 4.1 디자인 톤
-- **톤은 Banana2가 결정** -- 현재의 light/dark zinc 베이스 톤에 얽매이지 않음
+- **톤은 v0.dev가 결정** -- 현재의 light/dark zinc 베이스 톤에 얽매이지 않음
 - 상태별 색상 구분 유지: 성공(green), 실패(red), 진행중(amber), 비활성(zinc)
 - 스텝 타입별 색상 코드 유지: Tool(blue), LLM(purple), Condition(amber)
 
@@ -202,9 +202,11 @@ v1-feature-spec.md 14번 항목에 따라, 아래 기능이 **반드시** 동작
 
 ---
 
-## 10. Banana2 이미지 생성 프롬프트
+## 10. v0.dev 디자인+코딩 지시사항
 
-### 데스크톱 버전
+> v0.dev가 디자인과 코딩을 동시에 수행합니다. 아래 내용을 v0 프롬프트에 포함하세요. 레이아웃은 v0에게 자유도를 부여합니다.
+
+### v0 프롬프트 (디자인+코딩 통합)
 ```
 Design the CONTENT AREA of a single page inside a web application. This is NOT a standalone app — it lives inside an existing app shell that already provides a left navigation sidebar and a top header. You are designing ONLY the main content region.
 
@@ -250,7 +252,7 @@ Design priorities:
 Resolution: 1440x900, pixel-perfect UI screenshot style. Should look like a real production web application, not a wireframe or mockup.
 ```
 
-### 모바일 버전
+### 모바일 참고사항
 ```
 Mobile version (375x812) of the same page described above.
 

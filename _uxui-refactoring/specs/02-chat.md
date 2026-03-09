@@ -109,7 +109,7 @@
 ## 4. 개선 방향
 
 ### 4.1 디자인 톤
-- **톤은 Banana2(디자인 AI)가 결정** — 특정 테마 강제 없음
+- **톤은 v0.dev가 결정** — 특정 테마 강제 없음
 - 메신저 앱 느낌 (Slack, Discord, iMessage 같은 친숙한 채팅 UX)
 - 에이전트 아바타/뱃지로 대화 상대를 시각적으로 구분
 
@@ -254,9 +254,11 @@
 
 ---
 
-## 10. Banana2 이미지 생성 프롬프트
+## 10. v0.dev 디자인+코딩 지시사항
 
-### 데스크톱 버전
+> v0.dev가 디자인과 코딩을 동시에 수행합니다. 아래 내용을 v0 프롬프트에 포함하세요. 레이아웃은 v0에게 자유도를 부여합니다.
+
+### v0 프롬프트 (디자인+코딩 통합)
 ```
 Design the CONTENT AREA of a single page inside a web application. This is NOT a standalone app — it lives inside an existing app shell that already provides a left navigation sidebar and a top header. You are designing ONLY the main content region.
 
@@ -305,7 +307,7 @@ Design priorities (in order):
 Resolution: 1440x900, pixel-perfect UI screenshot style. Should look like a real production web application, not a wireframe or mockup.
 ```
 
-### 모바일 버전
+### 모바일 참고사항
 ```
 Mobile version (375x812) of the same page described above.
 

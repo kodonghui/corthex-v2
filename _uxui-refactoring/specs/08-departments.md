@@ -74,7 +74,7 @@
 ## 4. 개선 방향
 
 ### 4.1 디자인 톤
-- **톤은 Banana2(디자인 AI)가 결정** — 특정 테마 강제 없음
+- **톤은 v0.dev가 결정** — 특정 테마 강제 없음
 - 깔끔한 관리자 패널 (조직 관리 도구 느낌)
 
 ### 4.2 레이아웃 개선
@@ -177,9 +177,11 @@ v2 핵심 방향: "관리자가 부서를 자유롭게 생성-수정-삭제"
 
 ---
 
-## 10. Banana2 이미지 생성 프롬프트
+## 10. v0.dev 디자인+코딩 지시사항
 
-### 데스크톱 버전
+> v0.dev가 디자인과 코딩을 동시에 수행합니다. 아래 내용을 v0 프롬프트에 포함하세요. 레이아웃은 v0에게 자유도를 부여합니다.
+
+### v0 프롬프트 (디자인+코딩 통합)
 ```
 Design the CONTENT AREA of a single page inside a web application. This is NOT a standalone app — it lives inside an existing app shell that already provides a left navigation sidebar and a top header. You are designing ONLY the main content region.
 
@@ -222,7 +224,7 @@ Design priorities:
 Resolution: 1440x900, pixel-perfect UI screenshot style.
 ```
 
-### 모바일 버전
+### 모바일 참고사항
 ```
 Mobile version (375x812) of the same department management page.
 
