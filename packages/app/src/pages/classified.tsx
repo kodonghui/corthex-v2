@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../lib/api'
-import { Badge, Input, SkeletonTable, EmptyState, ConfirmDialog, toast } from '@corthex/ui'
+import { toast } from '@corthex/ui'
 import { MarkdownRenderer } from '../components/markdown-renderer'
 
 // === Types ===
@@ -68,11 +68,11 @@ type PaginatedResponse = {
 
 const PAGE_SIZE = 20
 
-const CLASSIFICATION_BADGE: Record<Classification, { label: string; variant: 'success' | 'info' | 'warning' | 'error' }> = {
-  public: { label: '공개', variant: 'success' },
-  internal: { label: '내부', variant: 'info' },
-  confidential: { label: '기밀', variant: 'warning' },
-  secret: { label: '극비', variant: 'error' },
+const CLASSIFICATION_CONFIG: Record<Classification, { label: string; classes: string }> = {
+  public: { label: '공개', classes: 'bg-emerald-500/15 text-emerald-400' },
+  internal: { label: '내부', classes: 'bg-blue-500/15 text-blue-400' },
+  confidential: { label: '기밀', classes: 'bg-amber-500/15 text-amber-400' },
+  secret: { label: '극비', classes: 'bg-red-500/15 text-red-400' },
 }
 
 const CLASSIFICATION_COLORS: Record<Classification, string> = {
@@ -87,6 +87,8 @@ const SORT_OPTIONS: { value: string; label: string }[] = [
   { value: 'classification', label: '등급순' },
   { value: 'qualityScore', label: '품질순' },
 ]
+
+const inputClasses = 'bg-slate-900/50 border border-slate-600 focus:border-blue-500 text-slate-50 rounded-lg outline-none'
 
 // === Helpers ===
 
@@ -187,7 +189,7 @@ export function ClassifiedPage() {
     if (debouncedSearch) chips.push({ key: 'search', label: `검색: ${debouncedSearch}`, onRemove: () => { setSearchInput(''); setPage(1) } })
     if (classificationFilter) chips.push({
       key: 'classification',
-      label: `등급: ${CLASSIFICATION_BADGE[classificationFilter as Classification]?.label || classificationFilter}`,
+      label: `등급: ${CLASSIFICATION_CONFIG[classificationFilter as Classification]?.label || classificationFilter}`,
       onRemove: () => { setClassificationFilter(''); setPage(1) },
     })
     if (startDate) chips.push({ key: 'startDate', label: `시작: ${startDate}`, onRemove: () => { setStartDate(''); setPage(1) } })
@@ -215,22 +217,23 @@ export function ClassifiedPage() {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
 
   return (
-    <div className="h-full flex flex-col">
+    <div data-testid="classified-page" className="h-full flex flex-col">
       {/* Header */}
-      <div className="px-4 md:px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+      <div className="px-4 md:px-6 py-4 border-b border-slate-700 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowFolderTree(!showFolderTree)}
-            className="md:hidden px-2 py-1 text-xs border border-zinc-200 dark:border-zinc-700 rounded hover:bg-zinc-50 dark:hover:bg-zinc-800"
+            className="md:hidden px-2 py-1 text-xs border border-slate-700 rounded hover:bg-slate-800 text-slate-300"
           >
             {showFolderTree ? '폴더 숨기기' : '폴더 보기'}
           </button>
-          <h2 className="text-lg font-semibold">기밀문서</h2>
+          <h2 className="text-lg font-semibold text-slate-50">기밀문서</h2>
         </div>
         {detailId && (
           <button
+            data-testid="back-to-list-btn"
             onClick={() => setDetailId(null)}
-            className="px-3 py-1.5 text-xs border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300"
+            className="px-3 py-1.5 text-xs border border-slate-700 rounded-lg hover:bg-slate-800 text-slate-300"
           >
             목록으로
           </button>
@@ -241,7 +244,7 @@ export function ClassifiedPage() {
       <div className="flex-1 flex overflow-hidden">
         {/* Left panel: Folder tree + Stats */}
         {showFolderTree && (
-          <div className="w-56 lg:w-64 border-r border-zinc-200 dark:border-zinc-800 flex flex-col overflow-y-auto bg-zinc-50/50 dark:bg-zinc-900/50">
+          <div data-testid="folder-sidebar" className="w-56 lg:w-64 border-r border-slate-700 bg-slate-900/80 flex flex-col overflow-y-auto flex-shrink-0">
             {/* Stats */}
             {stats && <StatsCard stats={stats} />}
 
@@ -270,40 +273,42 @@ export function ClassifiedPage() {
           ) : (
             <>
               {/* Filters */}
-              <div className="px-4 md:px-6 py-3 border-b border-zinc-100 dark:border-zinc-800 flex flex-wrap gap-2 items-center">
-                <Input
+              <div data-testid="filter-bar" className="px-4 py-3 border-b border-slate-700 flex flex-wrap items-center gap-2">
+                <input
                   placeholder="검색..."
                   value={searchInput}
                   onChange={(e) => { setSearchInput(e.target.value); setPage(1) }}
-                  className="text-xs h-8 w-40 md:w-48"
+                  className={`text-xs px-3 py-1.5 w-40 md:w-48 ${inputClasses}`}
                 />
                 <select
                   value={classificationFilter}
                   onChange={(e) => { setClassificationFilter(e.target.value); setPage(1) }}
-                  className="text-xs h-8 px-2 border border-zinc-200 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300"
+                  className="bg-slate-800 border border-slate-700 text-xs text-slate-300 rounded-lg px-2 py-1.5"
                 >
                   <option value="">전체 등급</option>
-                  {(Object.entries(CLASSIFICATION_BADGE) as [Classification, { label: string }][]).map(([k, v]) => (
+                  {(Object.entries(CLASSIFICATION_CONFIG) as [Classification, { label: string }][]).map(([k, v]) => (
                     <option key={k} value={k}>{v.label}</option>
                   ))}
                 </select>
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => { setStartDate(e.target.value); setPage(1) }}
-                  className="text-xs h-8 px-2 border border-zinc-200 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300"
-                />
-                <span className="text-xs text-zinc-400">~</span>
-                <input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => { setEndDate(e.target.value); setPage(1) }}
-                  className="text-xs h-8 px-2 border border-zinc-200 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300"
-                />
+                <div className="flex items-center gap-1">
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => { setStartDate(e.target.value); setPage(1) }}
+                    className="bg-slate-800 border border-slate-700 text-xs text-slate-300 rounded-lg px-2 py-1.5"
+                  />
+                  <span className="text-xs text-slate-500">~</span>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => { setEndDate(e.target.value); setPage(1) }}
+                    className="bg-slate-800 border border-slate-700 text-xs text-slate-300 rounded-lg px-2 py-1.5"
+                  />
+                </div>
                 <select
                   value={sortBy}
                   onChange={(e) => { setSortBy(e.target.value); setPage(1) }}
-                  className="text-xs h-8 px-2 border border-zinc-200 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300"
+                  className="bg-slate-800 border border-slate-700 text-xs text-slate-300 rounded-lg px-2 py-1.5"
                 >
                   {SORT_OPTIONS.map(opt => (
                     <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -313,16 +318,16 @@ export function ClassifiedPage() {
 
               {/* Filter chips */}
               {filterChips.length > 0 && (
-                <div className="px-4 md:px-6 py-2 border-b border-zinc-100 dark:border-zinc-800 flex flex-wrap gap-1.5">
+                <div data-testid="filter-chips" className="px-4 py-2 flex flex-wrap items-center gap-1.5">
                   {filterChips.map(chip => (
                     <span
                       key={chip.key}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full"
+                      className="flex items-center gap-1 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[11px] px-2.5 py-1 rounded-full"
                     >
                       {chip.label}
                       <button
                         onClick={chip.onRemove}
-                        className="text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-200 ml-0.5"
+                        className="hover:text-blue-200 ml-0.5"
                       >
                         ×
                       </button>
@@ -333,7 +338,7 @@ export function ClassifiedPage() {
                       setSearchInput(''); setClassificationFilter(''); setStartDate(''); setEndDate('')
                       setSortBy('date'); setSelectedFolderId(null); setPage(1)
                     }}
-                    className="text-[11px] text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 px-2 py-1"
+                    className="text-[11px] text-slate-500 hover:text-slate-300 ml-2"
                   >
                     전체 초기화
                   </button>
@@ -341,57 +346,60 @@ export function ClassifiedPage() {
               )}
 
               {/* Document list */}
-              <div className="flex-1 overflow-auto px-4 md:px-6 py-3">
+              <div className="flex-1 overflow-auto">
                 {listQuery.isLoading ? (
-                  <SkeletonTable rows={8} />
+                  <div className="px-4 py-3 space-y-2">
+                    {Array.from({ length: 8 }).map((_, i) => (
+                      <div key={i} className="h-10 bg-slate-800/30 rounded animate-pulse" />
+                    ))}
+                  </div>
                 ) : items.length === 0 ? (
-                  <EmptyState
-                    icon={<span className="text-3xl">🔒</span>}
-                    title="아카이브된 문서가 없습니다"
-                    description="사령관실에서 완료된 명령의 결과를 아카이브하면 기밀문서에 보관됩니다."
-                    action={
-                      <button
-                        onClick={() => navigate('/command-center')}
-                        className="mt-2 px-4 py-2 text-xs bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-                      >
-                        사령관실로 이동
-                      </button>
-                    }
-                  />
+                  <div data-testid="classified-empty-state" className="flex-1 flex flex-col items-center justify-center py-16">
+                    <p className="text-3xl mb-3">🔒</p>
+                    <p className="text-sm font-medium text-slate-300">아카이브된 문서가 없습니다</p>
+                    <p className="text-xs text-slate-500 mt-1">사령관실에서 완료된 명령의 결과를 아카이브하면 기밀문서에 보관됩니다.</p>
+                    <button
+                      onClick={() => navigate('/command-center')}
+                      className="mt-3 px-4 py-2 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-500"
+                    >
+                      사령관실로 이동
+                    </button>
+                  </div>
                 ) : (
                   <div className="overflow-x-auto">
-                    <table className="w-full text-sm min-w-[700px]">
+                    <table data-testid="document-table" className="w-full text-sm min-w-[700px]">
                       <thead>
-                        <tr className="text-xs text-zinc-500 border-b dark:border-zinc-700">
-                          <th className="text-left py-2 pr-3 font-medium">제목</th>
-                          <th className="text-left py-2 pr-3 font-medium">등급</th>
-                          <th className="text-left py-2 pr-3 font-medium">부서</th>
-                          <th className="text-left py-2 pr-3 font-medium">에이전트</th>
-                          <th className="text-left py-2 pr-3 font-medium">품질</th>
-                          <th className="text-left py-2 pr-3 font-medium">태그</th>
-                          <th className="text-left py-2 font-medium">날짜</th>
+                        <tr className="border-b border-slate-700">
+                          <th className="text-[11px] font-medium text-slate-500 uppercase tracking-wider px-3 py-2.5 text-left">제목</th>
+                          <th className="text-[11px] font-medium text-slate-500 uppercase tracking-wider px-3 py-2.5 text-left">등급</th>
+                          <th className="text-[11px] font-medium text-slate-500 uppercase tracking-wider px-3 py-2.5 text-left">부서</th>
+                          <th className="text-[11px] font-medium text-slate-500 uppercase tracking-wider px-3 py-2.5 text-left">에이전트</th>
+                          <th className="text-[11px] font-medium text-slate-500 uppercase tracking-wider px-3 py-2.5 text-left">품질</th>
+                          <th className="text-[11px] font-medium text-slate-500 uppercase tracking-wider px-3 py-2.5 text-left">태그</th>
+                          <th className="text-[11px] font-medium text-slate-500 uppercase tracking-wider px-3 py-2.5 text-left">날짜</th>
                         </tr>
                       </thead>
                       <tbody>
                         {items.map(item => (
                           <tr
                             key={item.id}
-                            className="border-b border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 cursor-pointer"
+                            data-testid={`doc-row-${item.id}`}
+                            className="border-b border-slate-700/50 hover:bg-slate-800/50 cursor-pointer transition-colors"
                             onClick={() => setDetailId(item.id)}
                           >
-                            <td className="py-2.5 pr-3 text-xs truncate max-w-[200px]" title={item.title}>{item.title}</td>
-                            <td className="py-2.5 pr-3">
+                            <td className="px-3 py-2.5 text-xs font-medium text-slate-200 truncate max-w-[200px]" title={item.title}>{item.title}</td>
+                            <td className="px-3 py-2.5">
                               <ClassificationBadge classification={item.classification} />
                             </td>
-                            <td className="py-2.5 pr-3 text-xs text-zinc-600 dark:text-zinc-400">{item.departmentName || '-'}</td>
-                            <td className="py-2.5 pr-3 text-xs text-zinc-600 dark:text-zinc-400">{item.agentName || '-'}</td>
-                            <td className="py-2.5 pr-3">
+                            <td className="px-3 py-2.5 text-xs text-slate-400">{item.departmentName || '-'}</td>
+                            <td className="px-3 py-2.5 text-xs text-slate-400">{item.agentName || '-'}</td>
+                            <td className="px-3 py-2.5">
                               <QualityBar score={item.qualityScore} />
                             </td>
-                            <td className="py-2.5 pr-3">
+                            <td className="px-3 py-2.5">
                               <TagList tags={item.tags} max={2} />
                             </td>
-                            <td className="py-2.5 text-xs text-zinc-500 whitespace-nowrap">{formatDate(item.createdAt)}</td>
+                            <td className="px-3 py-2.5 text-[10px] text-slate-500 font-mono whitespace-nowrap">{formatDate(item.createdAt)}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -402,27 +410,24 @@ export function ClassifiedPage() {
 
               {/* Pagination */}
               {total > 0 && (
-                <div className="px-4 md:px-6 py-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
-                  <span className="text-xs text-zinc-500">{total.toLocaleString()}건</span>
-                  <div className="flex items-center gap-2">
-                    <button
-                      disabled={page <= 1}
-                      onClick={() => setPage(p => p - 1)}
-                      className="px-3 py-1.5 text-xs border border-zinc-200 dark:border-zinc-700 rounded disabled:opacity-30 hover:bg-zinc-50 dark:hover:bg-zinc-800"
-                    >
-                      이전
-                    </button>
-                    <span className="text-xs text-zinc-600 dark:text-zinc-400">
-                      {page} / {totalPages}
-                    </span>
-                    <button
-                      disabled={page >= totalPages}
-                      onClick={() => setPage(p => p + 1)}
-                      className="px-3 py-1.5 text-xs border border-zinc-200 dark:border-zinc-700 rounded disabled:opacity-30 hover:bg-zinc-50 dark:hover:bg-zinc-800"
-                    >
-                      다음
-                    </button>
-                  </div>
+                <div data-testid="pagination" className="px-4 py-3 border-t border-slate-700 flex items-center justify-center gap-3">
+                  <button
+                    disabled={page <= 1}
+                    onClick={() => setPage(p => p - 1)}
+                    className="text-xs text-slate-400 hover:text-slate-200 disabled:opacity-30 px-2 py-1"
+                  >
+                    ← 이전
+                  </button>
+                  <span className="text-xs text-slate-500">
+                    {page} / {totalPages}
+                  </span>
+                  <button
+                    disabled={page >= totalPages}
+                    onClick={() => setPage(p => p + 1)}
+                    className="text-xs text-slate-400 hover:text-slate-200 disabled:opacity-30 px-2 py-1"
+                  >
+                    다음 →
+                  </button>
                 </div>
               )}
             </>
@@ -430,19 +435,33 @@ export function ClassifiedPage() {
         </div>
       </div>
 
-      {/* Delete confirm */}
-      <ConfirmDialog
-        isOpen={!!deleteConfirmId}
-        onConfirm={() => {
-          if (deleteConfirmId) deleteMutation.mutate(deleteConfirmId)
-          setDeleteConfirmId(null)
-        }}
-        onCancel={() => setDeleteConfirmId(null)}
-        title="문서 삭제"
-        description="이 기밀문서를 삭제하시겠습니까? 삭제된 문서는 복원할 수 있습니다."
-        confirmText="삭제"
-        cancelText="취소"
-      />
+      {/* Delete confirm dialog */}
+      {deleteConfirmId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setDeleteConfirmId(null)} />
+          <div className="relative bg-slate-800 border border-slate-700 rounded-2xl p-6 w-80 shadow-2xl">
+            <h3 className="text-sm font-semibold text-slate-50 mb-2">문서 삭제</h3>
+            <p className="text-xs text-slate-400 mb-4">이 기밀문서를 삭제하시겠습니까? 삭제된 문서는 복원할 수 있습니다.</p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setDeleteConfirmId(null)}
+                className="px-3 py-1.5 text-xs text-slate-400 hover:text-slate-200 rounded-lg border border-slate-600 hover:bg-slate-700"
+              >
+                취소
+              </button>
+              <button
+                onClick={() => {
+                  if (deleteConfirmId) deleteMutation.mutate(deleteConfirmId)
+                  setDeleteConfirmId(null)
+                }}
+                className="px-3 py-1.5 text-xs bg-red-600 hover:bg-red-500 text-white rounded-lg"
+              >
+                삭제
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -452,39 +471,37 @@ export function ClassifiedPage() {
 function StatsCard({ stats }: { stats: ArchiveStats }) {
   const total = stats.totalDocuments
   return (
-    <div className="px-3 py-3 border-b border-zinc-200 dark:border-zinc-800">
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">전체 문서</span>
-        <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100">{total}</span>
+    <div className="px-3 py-3 border-b border-slate-700">
+      <div className="flex items-center justify-between">
+        <span className="text-xs text-slate-400">전체 문서</span>
+        <span className="text-sm font-semibold text-slate-50">{total}</span>
       </div>
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-[10px] text-zinc-500">최근 7일</span>
-        <span className="text-xs font-medium text-indigo-600 dark:text-indigo-400">+{stats.recentWeekCount}</span>
-      </div>
+      <p className="text-[10px] text-slate-500 mt-0.5">최근 7일: {stats.recentWeekCount}건</p>
+
       {/* Classification distribution bar */}
       {total > 0 && (
-        <div className="space-y-1">
-          <div className="flex h-2 rounded-full overflow-hidden bg-zinc-200 dark:bg-zinc-700">
+        <>
+          <div className="flex w-full h-2 rounded-full overflow-hidden mt-2 bg-slate-700">
             {(Object.entries(CLASSIFICATION_COLORS) as [Classification, string][]).map(([cls, color]) => {
               const count = stats.byClassification[cls] || 0
               const pct = (count / total) * 100
               return pct > 0 ? (
-                <div key={cls} className={`${color}`} style={{ width: `${pct}%` }} title={`${CLASSIFICATION_BADGE[cls].label}: ${count}`} />
+                <div key={cls} className={color} style={{ width: `${pct}%` }} title={`${CLASSIFICATION_CONFIG[cls].label}: ${count}`} />
               ) : null
             })}
           </div>
-          <div className="flex flex-wrap gap-x-2 gap-y-0.5">
-            {(Object.entries(CLASSIFICATION_BADGE) as [Classification, { label: string }][]).map(([cls, info]) => {
+          <div className="mt-1.5 grid grid-cols-2 gap-1">
+            {(Object.entries(CLASSIFICATION_CONFIG) as [Classification, { label: string }][]).map(([cls, info]) => {
               const count = stats.byClassification[cls] || 0
               return count > 0 ? (
-                <span key={cls} className="text-[9px] text-zinc-500 flex items-center gap-0.5">
+                <span key={cls} className="flex items-center gap-1 text-[10px] text-slate-500">
                   <span className={`w-1.5 h-1.5 rounded-full ${CLASSIFICATION_COLORS[cls]}`} />
                   {info.label} {count}
                 </span>
               ) : null
             })}
           </div>
-        </div>
+        </>
       )}
     </div>
   )
@@ -543,12 +560,13 @@ function FolderTree({
   }
 
   return (
-    <div className="flex-1 px-2 py-2">
-      <div className="flex items-center justify-between px-1 mb-1">
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">폴더</span>
+    <div className="flex-1">
+      {/* Header */}
+      <div className="px-3 py-2 flex items-center justify-between border-b border-slate-700">
+        <span className="text-xs font-medium text-slate-400">폴더</span>
         <button
           onClick={() => setCreating(true)}
-          className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 text-sm leading-none"
+          className="text-slate-500 hover:text-slate-300 text-xs"
           title="새 폴더"
         >
           +
@@ -558,10 +576,10 @@ function FolderTree({
       {/* "All" option */}
       <button
         onClick={() => onSelectFolder(null)}
-        className={`w-full text-left px-2 py-1.5 text-xs rounded transition-colors mb-0.5 ${
+        className={`w-full text-left px-3 py-2 text-xs cursor-pointer transition-colors ${
           selectedFolderId === null
-            ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 font-medium'
-            : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+            ? 'bg-blue-500/10 text-blue-400 border-l-2 border-blue-500'
+            : 'text-slate-400 hover:text-slate-300 hover:bg-slate-800/50'
         }`}
       >
         전체
@@ -582,7 +600,7 @@ function FolderTree({
 
       {/* New folder input */}
       {creating && (
-        <div className="px-1 py-1">
+        <div className="px-3 py-1.5">
           <input
             ref={createInputRef}
             value={newFolderName}
@@ -592,25 +610,39 @@ function FolderTree({
               if (e.key === 'Escape') { setCreating(false); setNewFolderName('') }
             }}
             onBlur={handleCreateSubmit}
-            className="w-full text-xs px-2 py-1 border border-indigo-300 dark:border-indigo-700 rounded bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-indigo-400"
-            placeholder="폴더 이름"
+            className={`w-full text-xs px-2 py-1 ${inputClasses}`}
+            placeholder="새 폴더"
           />
         </div>
       )}
 
       {/* Folder delete confirm */}
-      <ConfirmDialog
-        isOpen={!!deleteFolderId}
-        onConfirm={() => {
-          if (deleteFolderId) deleteFolderMutation.mutate(deleteFolderId)
-          setDeleteFolderId(null)
-        }}
-        onCancel={() => setDeleteFolderId(null)}
-        title="폴더 삭제"
-        description="이 폴더를 삭제하시겠습니까?"
-        confirmText="삭제"
-        cancelText="취소"
-      />
+      {deleteFolderId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setDeleteFolderId(null)} />
+          <div className="relative bg-slate-800 border border-slate-700 rounded-2xl p-6 w-80 shadow-2xl">
+            <h3 className="text-sm font-semibold text-slate-50 mb-2">폴더 삭제</h3>
+            <p className="text-xs text-slate-400 mb-4">이 폴더를 삭제하시겠습니까?</p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setDeleteFolderId(null)}
+                className="px-3 py-1.5 text-xs text-slate-400 hover:text-slate-200 rounded-lg border border-slate-600 hover:bg-slate-700"
+              >
+                취소
+              </button>
+              <button
+                onClick={() => {
+                  if (deleteFolderId) deleteFolderMutation.mutate(deleteFolderId)
+                  setDeleteFolderId(null)
+                }}
+                className="px-3 py-1.5 text-xs bg-red-600 hover:bg-red-500 text-white rounded-lg"
+              >
+                삭제
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -663,7 +695,7 @@ function FolderNode({
   return (
     <div>
       {editing ? (
-        <div style={{ paddingLeft: `${depth * 12 + 4}px` }} className="py-0.5">
+        <div style={{ paddingLeft: `${depth * 12 + 12}px` }} className="py-0.5 pr-3">
           <input
             ref={editInputRef}
             value={editName}
@@ -673,47 +705,49 @@ function FolderNode({
               if (e.key === 'Escape') { setEditing(false); setEditName(folder.name) }
             }}
             onBlur={handleRenameSubmit}
-            className="w-full text-xs px-2 py-1 border border-indigo-300 dark:border-indigo-700 rounded bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-indigo-400"
+            className="bg-slate-800 border border-slate-600 text-xs px-1.5 py-0.5 rounded w-full outline-none text-slate-50"
           />
         </div>
       ) : (
         <div className="relative group">
-          <button
+          <div
             onClick={() => onSelectFolder(folder.id)}
-            onDoubleClick={() => { setEditing(true); setEditName(folder.name) }}
-            style={{ paddingLeft: `${depth * 12 + 8}px` }}
-            className={`w-full text-left pr-8 py-1.5 text-xs rounded transition-colors flex items-center gap-1.5 ${
+            style={{ paddingLeft: `${depth * 12 + 12}px` }}
+            className={`flex items-center justify-between px-3 py-1.5 text-xs cursor-pointer transition-colors ${
               isSelected
-                ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 font-medium'
-                : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                ? 'bg-blue-500/10 text-blue-400'
+                : 'text-slate-400 hover:bg-slate-800/50'
             }`}
           >
-            <span className="text-[10px]">📁</span>
-            <span className="truncate flex-1">{folder.name}</span>
-            {folder.documentCount > 0 && (
-              <span className="text-[9px] text-zinc-400 dark:text-zinc-500 font-mono">{folder.documentCount}</span>
-            )}
-          </button>
-          {/* Context menu trigger */}
-          <button
-            onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu) }}
-            className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 px-1 text-xs"
-          >
-            ⋮
-          </button>
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span className="text-slate-500">📁</span>
+              <span className="truncate max-w-[120px]">{folder.name}</span>
+            </div>
+            <div className="opacity-0 group-hover:opacity-100 flex items-center gap-0.5">
+              {folder.documentCount > 0 && (
+                <span className="text-[10px] text-slate-600">{folder.documentCount}</span>
+              )}
+              <button
+                onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu) }}
+                className="text-slate-600 hover:text-slate-400 px-1"
+              >
+                ⋮
+              </button>
+            </div>
+          </div>
           {showMenu && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="absolute right-0 top-full z-20 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg py-1 min-w-[100px]">
+              <div className="absolute right-0 top-full z-20 bg-slate-800 border border-slate-700 rounded-lg shadow-xl py-1 min-w-[100px]">
                 <button
                   onClick={() => { setEditing(true); setEditName(folder.name); setShowMenu(false) }}
-                  className="w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300"
+                  className="w-full text-left text-xs px-3 py-1.5 hover:bg-slate-700/50 text-slate-300"
                 >
                   이름 변경
                 </button>
                 <button
                   onClick={() => { onRequestDelete(folder.id); setShowMenu(false) }}
-                  className="w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-50 dark:hover:bg-zinc-700 text-red-600 dark:text-red-400"
+                  className="w-full text-left text-xs px-3 py-1.5 hover:bg-slate-700/50 text-red-400"
                 >
                   삭제
                 </button>
@@ -804,56 +838,60 @@ function DocumentDetailView({
   }, [editForm, updateMutation])
 
   if (isLoading || !detail) {
-    return <div className="flex-1 flex items-center justify-center text-sm text-zinc-400">로딩 중...</div>
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-slate-600 border-t-blue-500 rounded-full animate-spin" />
+      </div>
+    )
   }
 
   const totalCost = detail.costRecords.reduce((sum, r) => sum + r.costMicro, 0)
 
   return (
-    <div className="flex-1 flex overflow-hidden">
+    <div data-testid="document-detail" className="flex-1 flex overflow-hidden">
       {/* Detail main */}
-      <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4">
+      <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 space-y-4">
         {/* Header */}
-        <div className="flex items-start justify-between mb-4">
+        <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
             {editing ? (
               <input
                 value={editForm.title}
                 onChange={(e) => setEditForm(f => ({ ...f, title: e.target.value }))}
-                className="text-sm font-semibold w-full px-2 py-1 border border-indigo-300 dark:border-indigo-700 rounded bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
+                className={`text-sm font-semibold w-full px-3 py-1.5 ${inputClasses}`}
               />
             ) : (
-              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-1">{detail.title}</h3>
+              <h3 className="text-sm font-semibold text-slate-50">{detail.title}</h3>
             )}
             <div className="flex items-center gap-2 mt-1">
               {editing ? (
                 <select
                   value={editForm.classification}
                   onChange={(e) => setEditForm(f => ({ ...f, classification: e.target.value as Classification }))}
-                  className="text-xs h-7 px-2 border border-zinc-200 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300"
+                  className="bg-slate-800 border border-slate-700 text-xs text-slate-300 rounded-lg px-2 py-1.5"
                 >
-                  {(Object.entries(CLASSIFICATION_BADGE) as [Classification, { label: string }][]).map(([k, v]) => (
+                  {(Object.entries(CLASSIFICATION_CONFIG) as [Classification, { label: string }][]).map(([k, v]) => (
                     <option key={k} value={k}>{v.label}</option>
                   ))}
                 </select>
               ) : (
                 <ClassificationBadge classification={detail.classification} />
               )}
-              <span className="text-[11px] text-zinc-500">{formatDate(detail.createdAt)}</span>
-              {detail.agentName && <span className="text-[11px] text-zinc-500">· {detail.agentName}</span>}
-              {detail.departmentName && <span className="text-[11px] text-zinc-500">· {detail.departmentName}</span>}
+              <span className="text-[10px] text-slate-500 font-mono">{formatDate(detail.createdAt)}</span>
+              {detail.agentName && <span className="text-[10px] text-slate-400">· {detail.agentName}</span>}
+              {detail.departmentName && <span className="text-[10px] text-slate-400">· {detail.departmentName}</span>}
             </div>
           </div>
-          <div className="flex items-center gap-2 ml-3">
+          <div className="flex items-center gap-1 ml-3">
             {editing ? (
               <>
-                <button onClick={() => setEditing(false)} className="px-2.5 py-1 text-[11px] border border-zinc-200 dark:border-zinc-700 rounded hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400">취소</button>
-                <button onClick={handleSave} className="px-2.5 py-1 text-[11px] bg-indigo-600 text-white rounded hover:bg-indigo-700">저장</button>
+                <button onClick={() => setEditing(false)} className="text-xs text-slate-400 px-2 py-1 rounded hover:bg-slate-700/50">취소</button>
+                <button onClick={handleSave} className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1.5 rounded-lg">저장</button>
               </>
             ) : (
               <>
-                <button onClick={startEditing} className="px-2.5 py-1 text-[11px] border border-zinc-200 dark:border-zinc-700 rounded hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400">편집</button>
-                <button onClick={() => onDelete(detail.id)} className="px-2.5 py-1 text-[11px] border border-red-200 dark:border-red-800 rounded hover:bg-red-50 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400">삭제</button>
+                <button onClick={startEditing} className="text-xs text-slate-400 hover:text-slate-200 px-2 py-1 rounded hover:bg-slate-700/50">편집</button>
+                <button onClick={() => onDelete(detail.id)} className="text-xs text-red-400 hover:bg-red-500/10 px-2 py-1 rounded">삭제</button>
               </>
             )}
           </div>
@@ -861,37 +899,36 @@ function DocumentDetailView({
 
         {/* Summary (editable) */}
         {editing ? (
-          <div className="mb-4">
-            <label className="text-xs font-medium text-zinc-500 mb-1 block">요약</label>
+          <div>
+            <label className="text-[10px] text-slate-500 font-medium uppercase tracking-wider mb-1 block">요약</label>
             <textarea
               value={editForm.summary}
               onChange={(e) => setEditForm(f => ({ ...f, summary: e.target.value }))}
-              className="w-full text-xs px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 h-20 resize-none"
+              className={`w-full text-xs p-3 h-20 resize-none ${inputClasses}`}
               placeholder="요약 입력..."
             />
           </div>
         ) : detail.summary ? (
-          <div className="mb-4 p-3 bg-zinc-50 dark:bg-zinc-800/60 rounded-lg">
-            <p className="text-xs font-medium text-zinc-500 mb-1">요약</p>
-            <p className="text-sm text-zinc-700 dark:text-zinc-300">{detail.summary}</p>
+          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-3">
+            <p className="text-xs text-slate-300">{detail.summary}</p>
           </div>
         ) : null}
 
         {/* Tags (editable) */}
         {editing ? (
-          <div className="mb-4">
-            <label className="text-xs font-medium text-zinc-500 mb-1 block">태그 (쉼표 구분)</label>
+          <div>
+            <label className="text-[10px] text-slate-500 font-medium uppercase tracking-wider mb-1 block">태그 (쉼표 구분)</label>
             <input
               value={editForm.tags}
               onChange={(e) => setEditForm(f => ({ ...f, tags: e.target.value }))}
-              className="w-full text-xs px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200"
+              className={`w-full text-xs px-3 py-2 ${inputClasses}`}
               placeholder="태그1, 태그2, ..."
             />
           </div>
         ) : detail.tags.length > 0 ? (
-          <div className="mb-4 flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-1">
             {detail.tags.map(tag => (
-              <span key={tag} className="px-2 py-0.5 text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded-full">
+              <span key={tag} className="bg-slate-700/50 text-slate-300 text-[10px] px-2 py-0.5 rounded-full">
                 {tag}
               </span>
             ))}
@@ -900,12 +937,12 @@ function DocumentDetailView({
 
         {/* Folder (editable) */}
         {editing && (
-          <div className="mb-4">
-            <label className="text-xs font-medium text-zinc-500 mb-1 block">폴더</label>
+          <div>
+            <label className="text-[10px] text-slate-500 font-medium uppercase tracking-wider mb-1 block">폴더</label>
             <select
               value={editForm.folderId}
               onChange={(e) => setEditForm(f => ({ ...f, folderId: e.target.value }))}
-              className="text-xs h-8 px-2 border border-zinc-200 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300"
+              className="bg-slate-800 border border-slate-700 text-xs text-slate-300 rounded-lg px-2 py-1.5"
             >
               <option value="">폴더 없음</option>
               {flattenFolders(folders).map(f => (
@@ -916,7 +953,7 @@ function DocumentDetailView({
         )}
 
         {/* Meta cards */}
-        <div className="grid grid-cols-3 gap-3 mb-4">
+        <div className="grid grid-cols-3 gap-3">
           <MetaCard label="품질 점수" value={detail.qualityScore != null ? detail.qualityScore.toFixed(1) : '-'} />
           <MetaCard label="비용" value={formatCost(totalCost)} />
           <MetaCard label="명령 유형" value={detail.commandType || '-'} />
@@ -924,29 +961,33 @@ function DocumentDetailView({
 
         {/* Quality review */}
         {detail.qualityReview && (
-          <div className="mb-4 p-3 border border-zinc-100 dark:border-zinc-800 rounded-lg">
-            <p className="text-xs font-medium text-zinc-500 mb-2">품질 평가</p>
-            <div className="flex items-center gap-3 mb-2">
-              <QualityBar score={detail.qualityReview.score} />
-              <Badge variant={detail.qualityReview.conclusion === 'pass' ? 'success' : 'error'}>
+          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-slate-300">품질 리뷰</span>
+              <span className={`text-[10px] px-2 py-0.5 rounded-full ${
+                detail.qualityReview.conclusion === 'pass'
+                  ? 'bg-emerald-500/15 text-emerald-400'
+                  : 'bg-red-500/15 text-red-400'
+              }`}>
                 {detail.qualityReview.conclusion === 'pass' ? 'PASS' : 'FAIL'}
-              </Badge>
+              </span>
             </div>
+            <p className="text-xs text-slate-400 mt-1">점수: {detail.qualityReview.score}/5</p>
             {detail.qualityReview.feedback && (
-              <p className="text-xs text-zinc-600 dark:text-zinc-400">{detail.qualityReview.feedback}</p>
+              <p className="text-xs text-slate-300 mt-2">{detail.qualityReview.feedback}</p>
             )}
           </div>
         )}
 
         {/* Delegation chain */}
         {detail.delegationChain.length > 0 && (
-          <div className="mb-4">
-            <p className="text-xs font-medium text-zinc-500 mb-2">위임 체인</p>
-            <div className="flex items-center gap-1 flex-wrap">
+          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-3">
+            <p className="text-xs font-medium text-slate-300 mb-2">위임 체인</p>
+            <div className="flex items-center flex-wrap gap-1">
               {detail.delegationChain.map((step, i) => (
                 <span key={i} className="flex items-center gap-1">
-                  {i > 0 && <span className="text-zinc-300 dark:text-zinc-600">→</span>}
-                  <span className="text-[11px] px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded text-zinc-700 dark:text-zinc-300">
+                  {i > 0 && <span className="text-slate-600">→</span>}
+                  <span className="text-[10px] bg-slate-700/50 px-2 py-1 rounded text-slate-300">
                     {step.agentName}
                   </span>
                 </span>
@@ -957,46 +998,40 @@ function DocumentDetailView({
 
         {/* Content */}
         {detail.content && (
-          <div className="mb-4">
-            <p className="text-xs font-medium text-zinc-500 mb-2">보고서 내용</p>
-            <div className="border border-zinc-100 dark:border-zinc-800 rounded-lg p-4 max-h-[500px] overflow-y-auto">
-              <MarkdownRenderer content={detail.content} />
-            </div>
+          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4 max-h-[500px] overflow-y-auto">
+            <MarkdownRenderer content={detail.content} />
           </div>
         )}
 
         {/* Original command */}
         {detail.commandText && (
-          <div className="mb-4 p-3 bg-zinc-50 dark:bg-zinc-800/60 rounded-lg">
-            <p className="text-xs font-medium text-zinc-500 mb-1">원본 명령</p>
-            <p className="text-sm text-zinc-700 dark:text-zinc-300">{detail.commandText}</p>
+          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-3">
+            <p className="text-[10px] text-slate-500 font-medium mb-1">원본 명령</p>
+            <p className="text-xs text-slate-300 font-mono">{detail.commandText}</p>
           </div>
         )}
       </div>
 
       {/* Similar documents sidebar */}
       {detail.similarDocuments.length > 0 && (
-        <div className="w-56 lg:w-64 border-l border-zinc-200 dark:border-zinc-800 overflow-y-auto bg-zinc-50/50 dark:bg-zinc-900/50 px-3 py-3">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-2">유사 문서</p>
-          <div className="space-y-2">
-            {detail.similarDocuments.map(doc => (
-              <button
-                key={doc.id}
-                onClick={() => onNavigate(doc.id)}
-                className="w-full text-left p-2 rounded-lg border border-zinc-100 dark:border-zinc-800 hover:bg-white dark:hover:bg-zinc-800 transition-colors"
-              >
-                <p className="text-xs font-medium text-zinc-800 dark:text-zinc-200 truncate mb-1">{doc.title}</p>
-                <div className="flex items-center gap-1.5 mb-1">
-                  <ClassificationBadge classification={doc.classification} small />
-                  <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-mono">{doc.similarityScore}%</span>
-                </div>
-                <p className="text-[10px] text-zinc-500">{formatDate(doc.createdAt)}</p>
-                {doc.summary && (
-                  <p className="text-[10px] text-zinc-400 truncate mt-0.5">{doc.summary}</p>
-                )}
-              </button>
-            ))}
+        <div data-testid="similar-docs-sidebar" className="w-56 lg:w-64 border-l border-slate-700 bg-slate-900/80 overflow-y-auto flex-shrink-0">
+          <div className="px-3 py-3 border-b border-slate-700">
+            <span className="text-xs font-medium text-slate-400">유사 문서</span>
           </div>
+          {detail.similarDocuments.map(doc => (
+            <div
+              key={doc.id}
+              onClick={() => onNavigate(doc.id)}
+              className="px-3 py-2.5 border-b border-slate-700/50 cursor-pointer hover:bg-slate-800/50 transition-colors"
+            >
+              <p className="text-xs font-medium text-slate-200 truncate">{doc.title}</p>
+              <div className="flex items-center gap-2 mt-1">
+                <ClassificationBadge classification={doc.classification} small />
+                <span className="text-[10px] font-mono text-cyan-400">{doc.similarityScore}%</span>
+              </div>
+              <p className="text-[10px] text-slate-500 mt-0.5">{formatDate(doc.createdAt)}</p>
+            </div>
+          ))}
         </div>
       )}
     </div>
@@ -1006,44 +1041,48 @@ function DocumentDetailView({
 // === Sub-components ===
 
 function ClassificationBadge({ classification, small }: { classification: Classification; small?: boolean }) {
-  const info = CLASSIFICATION_BADGE[classification] || { label: classification, variant: 'default' as const }
-  return <Badge variant={info.variant}>{small ? info.label[0] : info.label}</Badge>
+  const info = CLASSIFICATION_CONFIG[classification] || { label: classification, classes: 'bg-slate-500/15 text-slate-400' }
+  return (
+    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${info.classes}`}>
+      {small ? info.label[0] : info.label}
+    </span>
+  )
 }
 
 function QualityBar({ score }: { score: number | null }) {
-  if (score == null) return <span className="text-xs text-zinc-400">-</span>
+  if (score == null) return <span className="text-[10px] text-slate-500">-</span>
   const pct = Math.round(score * 20)
   return (
-    <div className="flex items-center gap-1.5 min-w-[80px]">
-      <div className="flex-1 h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+    <div className="flex items-center gap-1.5">
+      <div className="w-16 h-1.5 bg-slate-700 rounded-full overflow-hidden">
         <div className={`h-full rounded-full ${scoreColor(score)}`} style={{ width: `${pct}%` }} />
       </div>
-      <span className="text-[10px] text-zinc-500 w-6 text-right">{score.toFixed(1)}</span>
+      <span className="text-[10px] font-mono text-slate-400">{score.toFixed(1)}/5</span>
     </div>
   )
 }
 
 function TagList({ tags, max }: { tags: string[]; max: number }) {
-  if (tags.length === 0) return <span className="text-xs text-zinc-400">-</span>
+  if (tags.length === 0) return <span className="text-[10px] text-slate-500">-</span>
   const shown = tags.slice(0, max)
   const rest = tags.length - max
   return (
     <div className="flex items-center gap-1">
       {shown.map(tag => (
-        <span key={tag} className="px-1.5 py-0.5 text-[9px] bg-zinc-100 dark:bg-zinc-800 text-zinc-500 rounded">
+        <span key={tag} className="text-[10px] bg-slate-700/50 text-slate-400 px-1.5 py-0.5 rounded">
           {tag}
         </span>
       ))}
-      {rest > 0 && <span className="text-[9px] text-zinc-400">+{rest}</span>}
+      {rest > 0 && <span className="text-[10px] text-slate-500">+{rest}</span>}
     </div>
   )
 }
 
 function MetaCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="p-2 bg-zinc-50 dark:bg-zinc-800/60 rounded">
-      <p className="text-[10px] text-zinc-400 mb-0.5">{label}</p>
-      <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">{value}</p>
+    <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-3">
+      <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">{label}</p>
+      <p className="text-sm font-semibold text-slate-50 mt-1">{value}</p>
     </div>
   )
 }

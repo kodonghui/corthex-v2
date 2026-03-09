@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Link } from 'react-router-dom'
 import { api } from '../lib/api'
-import { Select, Textarea, Badge, StatusDot, ConfirmDialog, ProgressBar } from '@corthex/ui'
 import { useWsStore } from '../stores/ws-store'
 import { useAuthStore } from '../stores/auth-store'
 
@@ -46,7 +44,7 @@ type CronRun = {
   createdAt: string
 }
 
-// ── Cron Presets ──
+// ── Constants ──
 
 const CRON_PRESETS = [
   { label: '매일 오전 9시', value: '0 9 * * *', icon: '☀️' },
@@ -59,38 +57,30 @@ const CRON_PRESETS = [
 
 const DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토']
 
-const runStatusConfig: Record<string, { label: string; variant: 'default' | 'info' | 'error' | 'success' | 'warning' }> = {
-  running: { label: '실행중', variant: 'warning' },
-  success: { label: '성공', variant: 'success' },
-  failed: { label: '실패', variant: 'error' },
+const RUN_STATUS_CONFIG: Record<string, { label: string; classes: string }> = {
+  running: { label: '실행중', classes: 'bg-blue-500/15 text-blue-400 animate-pulse' },
+  success: { label: '성공', classes: 'bg-emerald-500/15 text-emerald-400' },
+  failed: { label: '실패', classes: 'bg-red-500/15 text-red-400' },
 }
 
-// ── Client-side cron description (lightweight, matches server describeCronExpression) ──
+// ── Cron Description ──
 
 function describeCron(expr: string): string {
   const parts = expr.trim().split(/\s+/)
   if (parts.length !== 5) return expr
 
   const [minute, hour, , , dow] = parts
-
-  // Handle step/range expressions -- fall back to raw display
   const isSimpleNum = (v: string) => /^\d+$/.test(v)
 
   if (hour === '*' && minute === '0') return '매시 정각'
   if (hour === '*' && isSimpleNum(minute)) return `매시 ${minute.padStart(2, '0')}분`
-  if (hour === '*') return `매시 (${minute})` // e.g. */5
+  if (hour === '*') return `매시 (${minute})`
+  if (!isSimpleNum(hour) || !isSimpleNum(minute)) return expr
 
-  if (!isSimpleNum(hour) || !isSimpleNum(minute)) return expr // complex expression
-
-  const minuteStr = minute.padStart(2, '0')
-  const hourStr = hour.padStart(2, '0')
-  const timeStr = `${hourStr}:${minuteStr}`
-
-  if (dow === '*') return `매일 ${timeStr}`
+  const timeStr = `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}`
+  if (dow === '*' || dow === '0-6') return `매일 ${timeStr}`
   if (dow === '1-5') return `평일 ${timeStr}`
-  if (dow === '0-6') return `매일 ${timeStr}`
 
-  // Specific days
   const dayLabels = dow.split(',').map(d => DAY_NAMES[parseInt(d)] || d).join(', ')
   return `${dayLabels} ${timeStr}`
 }
@@ -105,7 +95,7 @@ export function CronBasePage() {
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
   const [jobProgress, setJobProgress] = useState<Record<string, { progress: number; statusMessage: string }>>({})
 
-  // ── Data Queries ──
+  // ── Data ──
 
   const { data: agentsData } = useQuery({
     queryKey: ['agents'],
@@ -115,7 +105,7 @@ export function CronBasePage() {
   const { data: schedulesData, isLoading: schedulesLoading } = useQuery({
     queryKey: ['night-schedules'],
     queryFn: () => api.get<{ data: Schedule[] }>('/workspace/jobs/schedules'),
-    refetchInterval: 30_000, // 30s polling for nextRunAt
+    refetchInterval: 30_000,
   })
 
   const agentList = agentsData?.data || []
@@ -146,7 +136,7 @@ export function CronBasePage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['night-schedules'] }),
   })
 
-  const deleteSchedule = useMutation({
+  const deleteScheduleMutation = useMutation({
     mutationFn: (id: string) => api.delete(`/workspace/jobs/schedules/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['night-schedules'] })
@@ -169,7 +159,6 @@ export function CronBasePage() {
     } else if (event.type === 'job-completed' || event.type === 'job-failed') {
       if (event.jobId) setJobProgress(prev => { const next = { ...prev }; delete next[event.jobId!]; return next })
       queryClient.invalidateQueries({ queryKey: ['night-schedules'] })
-      // Also refresh runs if expanded
       if (expandedSchedule) {
         queryClient.invalidateQueries({ queryKey: ['cron-runs', expandedSchedule] })
       }
@@ -204,18 +193,16 @@ export function CronBasePage() {
   // ── Render ──
 
   return (
-    <div className="p-6 sm:p-8 max-w-4xl">
+    <div data-testid="cron-page" className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-2">
         <div>
-          <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">⏰ 크론기지</h2>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-            반복 작업을 자동화하는 기지 — 시스템이 나 대신 깨어 있습니다
-          </p>
+          <h1 className="text-2xl font-bold text-slate-50">크론기지 <span className="ml-2">⏰</span></h1>
         </div>
         <button
+          data-testid="add-cron-btn"
           onClick={openCreate}
-          className="px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700 transition-colors"
+          className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors"
         >
           + 크론 추가
         </button>
@@ -225,14 +212,16 @@ export function CronBasePage() {
       {schedulesLoading ? (
         <div className="space-y-3">
           {[1, 2, 3].map(i => (
-            <div key={i} className="border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 animate-pulse">
-              <div className="h-4 bg-zinc-200 dark:bg-zinc-700 rounded w-1/3 mb-2" />
-              <div className="h-3 bg-zinc-200 dark:bg-zinc-700 rounded w-2/3" />
-            </div>
+            <div key={i} className="bg-slate-800/30 border border-slate-700/50 rounded-xl animate-pulse h-28" />
           ))}
         </div>
       ) : schedules.length === 0 ? (
-        <EmptyState onAdd={openCreate} />
+        <div data-testid="cron-empty-state" className="bg-slate-800/30 border border-dashed border-slate-700 rounded-xl p-12 text-center">
+          <p className="text-4xl mb-3">⏰</p>
+          <p className="text-sm font-medium text-slate-300">설정된 크론 작업이 없습니다</p>
+          <p className="text-xs text-slate-500 mt-1">정기적으로 에이전트가 수행할 작업을 추가해보세요</p>
+          <button onClick={openCreate} className="bg-blue-600 hover:bg-blue-500 text-white text-sm rounded-lg px-4 py-2 mt-4 transition-colors">크론 추가</button>
+        </div>
       ) : (
         <div className="space-y-3">
           {schedules.map(s => (
@@ -268,35 +257,19 @@ export function CronBasePage() {
       )}
 
       {/* Delete Confirm */}
-      <ConfirmDialog
-        isOpen={!!deleteTarget}
-        title="스케줄 삭제"
-        description="이 반복 스케줄을 삭제하시겠습니까? 실행 기록도 함께 삭제됩니다."
-        onConfirm={() => deleteTarget && deleteSchedule.mutate(deleteTarget)}
-        onCancel={() => setDeleteTarget(null)}
-      />
-    </div>
-  )
-}
-
-// ── Empty State ──
-
-function EmptyState({ onAdd }: { onAdd: () => void }) {
-  return (
-    <div className="text-center py-16">
-      <p className="text-5xl mb-4">⏰</p>
-      <h3 className="text-lg font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
-        예약된 작전이 없습니다
-      </h3>
-      <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6">
-        반복 작업을 크론으로 자동화하세요
-      </p>
-      <button
-        onClick={onAdd}
-        className="px-5 py-2.5 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700 transition-colors"
-      >
-        + 크론 추가
-      </button>
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/60" onClick={() => setDeleteTarget(null)} />
+          <div className="relative bg-slate-800 border border-slate-700 rounded-xl p-5 max-w-sm mx-4 shadow-2xl">
+            <h3 className="text-sm font-semibold text-slate-50">크론 삭제</h3>
+            <p className="text-xs text-slate-400 mt-2">이 스케줄과 실행 기록이 모두 삭제됩니다. 계속하시겠습니까?</p>
+            <div className="flex justify-end gap-2 mt-4">
+              <button onClick={() => setDeleteTarget(null)} className="text-xs text-slate-400 hover:text-slate-200 px-3 py-1.5 rounded-lg">취소</button>
+              <button onClick={() => deleteTarget && deleteScheduleMutation.mutate(deleteTarget)} className="bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1.5 rounded-lg">삭제</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -323,73 +296,51 @@ function ScheduleCard({
   const cronDesc = s.description || describeCron(s.cronExpression)
 
   return (
-    <div className={`border rounded-lg overflow-hidden transition-colors ${
-      s.isActive
-        ? 'border-zinc-200 dark:border-zinc-800'
-        : 'border-zinc-100 dark:border-zinc-900 opacity-60'
-    }`}>
-      {/* Main row */}
-      <div
-        className="px-4 py-3 flex items-center gap-3 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
-        onClick={onToggleExpand}
-      >
-        <StatusDot status={s.isActive ? 'online' : 'offline'} />
-
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-0.5">
-            <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">
-              {s.name || s.instruction.slice(0, 40)}
-            </span>
-            <span className="text-xs text-zinc-400 dark:text-zinc-500 shrink-0">{s.agentName}</span>
+    <div data-testid={`schedule-card-${s.id}`} className={`bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden transition-all ${!s.isActive ? 'opacity-50' : ''}`}>
+      <div className="px-4 py-4">
+        {/* Row 1: Name + Agent */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className={`w-2.5 h-2.5 rounded-full ${s.isActive ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]' : 'bg-slate-500'}`} />
+            <span className="text-sm font-semibold text-slate-50 truncate max-w-[250px]">{s.name || s.instruction.slice(0, 40)}</span>
           </div>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">{s.instruction}</p>
-          <div className="flex gap-3 mt-1 text-[10px] font-mono text-zinc-400">
-            <span className="text-amber-600 dark:text-amber-400 font-medium">{cronDesc}</span>
-            {s.nextRunAt && s.isActive && (
-              <span>다음: {formatRelativeTime(s.nextRunAt)}</span>
-            )}
-            {s.lastRunAt && (
-              <span>마지막: {formatShortDate(s.lastRunAt)}</span>
-            )}
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-slate-400">Agent: {s.agentName}</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0" onClick={e => e.stopPropagation()}>
-          <button
-            onClick={onEdit}
-            className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors px-2 py-1"
-          >
-            편집
-          </button>
-          <button
-            onClick={onToggle}
-            className={`text-xs px-2 py-1 rounded transition-colors ${
-              s.isActive
-                ? 'text-amber-600 hover:text-amber-700 dark:text-amber-400'
-                : 'text-green-600 hover:text-green-700 dark:text-green-400'
-            }`}
-          >
-            {s.isActive ? '중지' : '시작'}
-          </button>
-          <button
-            onClick={onDelete}
-            className="text-xs text-red-500 hover:text-red-600 transition-colors px-2 py-1"
-          >
-            삭제
-          </button>
-          <span className="text-zinc-400 text-xs ml-1">{isExpanded ? '▲' : '▼'}</span>
+        {/* Row 2: Instruction */}
+        <p className="text-xs text-slate-400 line-clamp-2 mt-2">{s.instruction}</p>
+
+        {/* Row 3: Schedule info + Actions */}
+        <div className="flex items-center justify-between mt-3">
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-medium text-cyan-400">{cronDesc}</span>
+            <span className="text-[10px] text-slate-500">
+              다음: {s.nextRunAt && s.isActive ? formatRelativeTime(s.nextRunAt) : '—'}
+            </span>
+            <span className="text-[10px] text-slate-500">
+              마지막: {s.lastRunAt ? formatShortDate(s.lastRunAt) : '—'}
+            </span>
+          </div>
+          <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
+            <button onClick={onEdit} className="text-xs text-slate-400 hover:text-slate-200 px-2 py-1 rounded hover:bg-slate-700/50 transition-colors">편집</button>
+            <button onClick={onToggle} className={`text-xs px-2 py-1 rounded transition-colors ${s.isActive ? 'text-amber-400 hover:bg-amber-500/10' : 'text-emerald-400 hover:bg-emerald-500/10'}`}>
+              {s.isActive ? '중지' : '시작'}
+            </button>
+            <button onClick={onDelete} className="text-xs text-red-400 hover:bg-red-500/10 px-2 py-1 rounded transition-colors">삭제</button>
+            <button onClick={onToggleExpand} className="text-xs text-slate-500 hover:text-slate-300 px-2 py-1">{isExpanded ? '▲' : '▼'}</button>
+          </div>
         </div>
       </div>
 
-      {/* Expanded: Execution History */}
-      {isExpanded && (
-        <RunHistory scheduleId={s.id} jobProgress={jobProgress} />
-      )}
+      {/* Run History */}
+      {isExpanded && <RunHistory scheduleId={s.id} jobProgress={jobProgress} />}
     </div>
   )
 }
 
-// ── Run History (expanded panel) ──
+// ── Run History ──
 
 function RunHistory({ scheduleId, jobProgress }: { scheduleId: string; jobProgress: Record<string, { progress: number; statusMessage: string }> }) {
   const [page, setPage] = useState(1)
@@ -405,88 +356,80 @@ function RunHistory({ scheduleId, jobProgress }: { scheduleId: string; jobProgre
   const pagination = runsData?.pagination
 
   return (
-    <div className="border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50">
-      <div className="px-4 py-2">
-        <p className="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">
-          실행 기록 {pagination ? `(${pagination.total}건)` : ''}
-        </p>
-
-        {isLoading ? (
-          <div className="py-4 text-center text-xs text-zinc-400">로딩 중...</div>
-        ) : runs.length === 0 ? (
-          <div className="py-4 text-center text-xs text-zinc-400">아직 실행 기록이 없습니다</div>
-        ) : (
-          <div className="space-y-1.5">
-            {runs.map(run => {
-              const cfg = runStatusConfig[run.status] || { label: run.status, variant: 'default' as const }
-              const progress = jobProgress[run.id]
-              return (
-                <div key={run.id} className="flex items-center gap-3 py-1.5 px-2 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
-                  <Badge variant={cfg.variant} className="shrink-0 text-[10px]">{cfg.label}</Badge>
-                  <span className="text-[10px] text-zinc-500 dark:text-zinc-400 shrink-0">
-                    {run.startedAt ? formatShortDate(run.startedAt) : '-'}
-                  </span>
+    <div className="border-t border-slate-700 bg-slate-900/30">
+      {isLoading ? (
+        <div className="py-6 text-center text-xs text-slate-500">로딩 중...</div>
+      ) : runs.length === 0 ? (
+        <div className="py-6 text-center text-xs text-slate-500">실행 기록이 없습니다</div>
+      ) : (
+        <>
+          {runs.map(run => {
+            const cfg = RUN_STATUS_CONFIG[run.status] || { label: run.status, classes: 'bg-slate-500/15 text-slate-400' }
+            const progress = jobProgress[run.id]
+            return (
+              <div key={run.id} className="px-4 py-2.5 border-b border-slate-700/30 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${cfg.classes}`}>{cfg.label}</span>
+                  <span className="text-[10px] text-slate-400 font-mono">{run.startedAt ? formatShortDate(run.startedAt) : '—'}</span>
+                </div>
+                <div className="flex items-center gap-3">
                   {run.durationMs !== null && run.status !== 'running' && (
-                    <span className="text-[10px] text-zinc-400">{(run.durationMs / 1000).toFixed(1)}초</span>
+                    <span className="text-[10px] text-slate-500 font-mono">{(run.durationMs / 1000).toFixed(1)}초</span>
                   )}
                   {run.tokensUsed !== null && (
-                    <span className="text-[10px] text-zinc-400">{run.tokensUsed.toLocaleString()}tk</span>
+                    <span className="text-[10px] text-slate-500 font-mono">{run.tokensUsed.toLocaleString()}토큰</span>
                   )}
                   {run.costMicro !== null && run.costMicro > 0 && (
-                    <span className="text-[10px] text-zinc-400">${(run.costMicro / 1_000_000).toFixed(4)}</span>
-                  )}
-                  {run.status === 'running' && progress && (
-                    <div className="flex-1 max-w-32">
-                      <ProgressBar value={progress.progress} />
-                    </div>
-                  )}
-                  {run.status === 'running' && !progress && (
-                    <span className="text-[10px] text-amber-500 animate-pulse">실행중...</span>
-                  )}
-                  {run.status === 'failed' && run.error && (
-                    <span className="text-[10px] text-red-500 truncate flex-1" title={run.error}>
-                      {run.error.slice(0, 60)}
-                    </span>
-                  )}
-                  {run.status === 'success' && run.result && (
-                    <span className="text-[10px] text-green-600 dark:text-green-400 truncate flex-1">
-                      {run.result.slice(0, 60)}
-                    </span>
+                    <span className="text-[10px] text-slate-500 font-mono">${(run.costMicro / 1_000_000).toFixed(3)}</span>
                   )}
                 </div>
-              )
-            })}
-          </div>
-        )}
+                {run.status === 'running' && progress && (
+                  <div className="w-full h-1 bg-slate-700 rounded-full mt-2">
+                    <div className="h-full bg-blue-500 rounded-full animate-pulse" style={{ width: `${Math.max(progress.progress, 33)}%` }} />
+                  </div>
+                )}
+                {run.status === 'running' && !progress && (
+                  <div className="w-full h-1 bg-slate-700 rounded-full mt-2">
+                    <div className="h-full bg-blue-500 rounded-full animate-pulse w-1/3" />
+                  </div>
+                )}
+                {run.status === 'failed' && run.error && (
+                  <span className="text-[10px] text-red-400 truncate max-w-full mt-1">{run.error.slice(0, 60)}</span>
+                )}
+                {run.status === 'success' && run.result && (
+                  <span className="text-[10px] text-slate-500 truncate max-w-full mt-1">{run.result.slice(0, 60)}</span>
+                )}
+              </div>
+            )
+          })}
 
-        {/* Pagination */}
-        {pagination && pagination.totalPages > 1 && (
-          <div className="flex items-center justify-center gap-2 mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
-            <button
-              onClick={() => setPage(p => Math.max(1, p - 1))}
-              disabled={page <= 1}
-              className="text-[10px] text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 disabled:opacity-30 px-2 py-1"
-            >
-              ← 이전
-            </button>
-            <span className="text-[10px] text-zinc-400">
-              {pagination.page} / {pagination.totalPages}
-            </span>
-            <button
-              onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
-              disabled={page >= pagination.totalPages}
-              className="text-[10px] text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 disabled:opacity-30 px-2 py-1"
-            >
-              다음 →
-            </button>
-          </div>
-        )}
-      </div>
+          {/* Pagination */}
+          {pagination && pagination.totalPages > 1 && (
+            <div className="px-4 py-2 flex items-center justify-center gap-3">
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page <= 1}
+                className="text-[10px] text-slate-400 hover:text-slate-200 disabled:opacity-30 px-2 py-1"
+              >
+                ← 이전
+              </button>
+              <span className="text-[10px] text-slate-500">{pagination.page} / {pagination.totalPages}</span>
+              <button
+                onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
+                disabled={page >= pagination.totalPages}
+                className="text-[10px] text-slate-400 hover:text-slate-200 disabled:opacity-30 px-2 py-1"
+              >
+                다음 →
+              </button>
+            </div>
+          )}
+        </>
+      )}
     </div>
   )
 }
 
-// ── Schedule Modal (Create/Edit) ──
+// ── Schedule Modal ──
 
 function ScheduleModal({
   editing,
@@ -514,15 +457,12 @@ function ScheduleModal({
   const [cronExpression, setCronExpression] = useState(editing?.cronExpression || '')
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null)
 
-  // Legacy mode state
   const [time, setTime] = useState('09:00')
   const [frequency, setFrequency] = useState<'daily' | 'weekdays' | 'custom'>('daily')
   const [days, setDays] = useState<number[]>([])
 
-  // Initialize from editing schedule
   useEffect(() => {
     if (editing) {
-      // Check if it matches a preset
       const preset = CRON_PRESETS.find(p => p.value === editing.cronExpression)
       if (preset) {
         setMode('preset')
@@ -532,8 +472,6 @@ function ScheduleModal({
         setMode('custom')
         setCronExpression(editing.cronExpression)
       }
-
-      // Also parse for legacy mode fields
       const parts = editing.cronExpression.split(' ')
       if (parts.length === 5) {
         setTime(`${parts[1].padStart(2, '0')}:${parts[0].padStart(2, '0')}`)
@@ -555,224 +493,184 @@ function ScheduleModal({
 
   function handleSubmit() {
     if (!agent || !instruction.trim() || !name.trim()) return
-
-    let finalCron = cronExpression
     if (mode === 'legacy') {
-      // Build from frequency/time/days
-      onSubmit({
-        name: name.trim(),
-        agentId: agent,
-        instruction: instruction.trim(),
-        frequency,
-        time,
-        days: frequency === 'custom' ? days : undefined,
-      })
+      onSubmit({ name: name.trim(), agentId: agent, instruction: instruction.trim(), frequency, time, days: frequency === 'custom' ? days : undefined })
       return
     }
-
-    if (!finalCron) return
-    onSubmit({
-      name: name.trim(),
-      agentId: agent,
-      instruction: instruction.trim(),
-      cronExpression: finalCron,
-    })
+    if (!cronExpression) return
+    onSubmit({ name: name.trim(), agentId: agent, instruction: instruction.trim(), cronExpression })
   }
 
   const cronDescription = cronExpression ? describeCron(cronExpression) : ''
   const isValid = name.trim() && agent && instruction.trim() && (
-    mode === 'legacy'
-      ? (frequency !== 'custom' || days.length > 0)
-      : !!cronExpression
+    mode === 'legacy' ? (frequency !== 'custom' || days.length > 0) : !!cronExpression
   )
 
+  const inputClasses = 'w-full bg-slate-900/50 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 text-sm text-slate-50 rounded-lg px-3 py-2 outline-none transition-colors placeholder:text-slate-600'
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center" data-testid="cron-modal">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       <div
-        className="bg-white dark:bg-zinc-900 rounded-xl shadow-xl max-w-lg w-full mx-4 p-6 space-y-4 max-h-[90vh] overflow-y-auto"
+        className="relative bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-lg mx-4 max-h-[85vh] overflow-y-auto shadow-2xl"
         onClick={e => e.stopPropagation()}
       >
-        <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
-          {editing ? '스케줄 수정' : '크론 스케줄 추가'}
-        </h3>
-
-        {/* Name */}
-        <div>
-          <label className="block text-xs font-medium text-zinc-500 mb-1">스케줄 이름</label>
-          <input
-            type="text"
-            value={name}
-            onChange={e => setName(e.target.value)}
-            placeholder="예: 매일 아침 시황 브리핑"
-            className="w-full px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100"
-          />
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-700">
+          <h3 className="text-lg font-semibold text-slate-50">{editing ? '크론 수정' : '크론 추가'}</h3>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-200 transition-colors">✕</button>
         </div>
 
-        {/* Agent */}
-        <div>
-          <label className="block text-xs font-medium text-zinc-500 mb-1">담당 에이전트</label>
-          <Select
-            value={agent}
-            onChange={e => setAgent(e.target.value)}
-            placeholder="에이전트 선택..."
-            options={agents.map(a => ({
-              value: a.id,
-              label: `${a.name} ${a.isSecretary ? '(비서실장)' : ''} — ${a.role}`,
-            }))}
-          />
-        </div>
-
-        {/* Instruction */}
-        <div>
-          <label className="block text-xs font-medium text-zinc-500 mb-1">작업 지시</label>
-          <Textarea
-            value={instruction}
-            onChange={e => setInstruction(e.target.value)}
-            placeholder="예: 오늘 시황 브리핑을 작성해서 보고해줘"
-            rows={3}
-          />
-        </div>
-
-        {/* Mode Tabs */}
-        <div>
-          <label className="block text-xs font-medium text-zinc-500 mb-2">실행 주기</label>
-          <div className="flex gap-1 mb-3">
-            {([['preset', '프리셋'], ['custom', '직접 입력'], ['legacy', '간편 설정']] as const).map(([val, label]) => (
-              <button
-                key={val}
-                type="button"
-                onClick={() => setMode(val)}
-                className={`px-3 py-1.5 text-xs rounded-md transition-colors ${
-                  mode === val
-                    ? 'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300 font-medium'
-                    : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
+        {/* Body */}
+        <div className="px-5 py-4 space-y-4">
+          {/* Name */}
+          <div>
+            <label className="text-xs font-medium text-slate-300 mb-1.5 block">스케줄 이름</label>
+            <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder='예: 일일 시장 브리핑' className={inputClasses} />
           </div>
 
-          {/* Preset Mode */}
-          {mode === 'preset' && (
-            <div className="grid grid-cols-2 gap-2">
-              {CRON_PRESETS.map(preset => (
+          {/* Agent */}
+          <div>
+            <label className="text-xs font-medium text-slate-300 mb-1.5 block">에이전트</label>
+            <select value={agent} onChange={e => setAgent(e.target.value)} className={inputClasses}>
+              <option value="">에이전트 선택...</option>
+              {agents.map(a => (
+                <option key={a.id} value={a.id}>{a.name} {a.isSecretary ? '(비서실장)' : ''} — {a.role}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Instruction */}
+          <div>
+            <label className="text-xs font-medium text-slate-300 mb-1.5 block">작업 지시</label>
+            <textarea
+              value={instruction}
+              onChange={e => setInstruction(e.target.value)}
+              placeholder="에이전트에게 시킬 작업을 입력하세요"
+              rows={3}
+              className={`${inputClasses} resize-none`}
+            />
+          </div>
+
+          {/* Frequency */}
+          <div>
+            <label className="text-xs font-medium text-slate-300 mb-1.5 block">실행 주기</label>
+
+            {/* Tabs */}
+            <div className="flex bg-slate-900/50 rounded-lg p-0.5 mb-3">
+              {([['preset', '프리셋'], ['custom', '커스텀'], ['legacy', '시간 지정']] as const).map(([val, label]) => (
                 <button
-                  key={preset.value}
+                  key={val}
                   type="button"
-                  onClick={() => handlePresetSelect(preset.value)}
-                  className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm transition-colors text-left ${
-                    selectedPreset === preset.value
-                      ? 'bg-amber-100 border-2 border-amber-500 text-amber-800 dark:bg-amber-900 dark:border-amber-400 dark:text-amber-200'
-                      : 'bg-zinc-50 border border-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-300 hover:border-amber-300 dark:hover:border-amber-600'
+                  onClick={() => setMode(val)}
+                  className={`text-xs px-3 py-1.5 rounded-md transition-colors flex-1 text-center ${
+                    mode === val ? 'bg-slate-700 text-slate-50' : 'text-slate-400 hover:text-slate-300'
                   }`}
                 >
-                  <span className="text-lg">{preset.icon}</span>
-                  <span className="text-xs font-medium">{preset.label}</span>
+                  {label}
                 </button>
               ))}
             </div>
-          )}
 
-          {/* Custom Mode */}
-          {mode === 'custom' && (
-            <div className="space-y-2">
-              <input
-                type="text"
-                value={cronExpression}
-                onChange={e => { setCronExpression(e.target.value); setSelectedPreset(null) }}
-                placeholder="분 시 일 월 요일  (예: 0 9 * * 1-5)"
-                className="w-full px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm font-mono text-zinc-900 dark:text-zinc-100"
-              />
-              {cronExpression && (
-                <p className="text-xs text-amber-600 dark:text-amber-400">
-                  → {describeCron(cronExpression)}
-                </p>
-              )}
-              <p className="text-[10px] text-zinc-400">
-                형식: 분(0-59) 시(0-23) 일(1-31) 월(1-12) 요일(0-6, 0=일)
-              </p>
-            </div>
-          )}
+            {/* Preset */}
+            {mode === 'preset' && (
+              <div className="grid grid-cols-3 gap-2">
+                {CRON_PRESETS.map(preset => (
+                  <button
+                    key={preset.value}
+                    type="button"
+                    onClick={() => handlePresetSelect(preset.value)}
+                    className={`text-xs px-3 py-2.5 rounded-lg border text-center transition-all ${
+                      selectedPreset === preset.value
+                        ? 'bg-blue-500/15 border-blue-500/40 text-blue-400'
+                        : 'bg-slate-800/50 border-slate-700 text-slate-400 hover:border-slate-600'
+                    }`}
+                  >
+                    <span className="text-lg block mb-1">{preset.icon}</span>
+                    <span className="text-[11px] font-medium">{preset.label}</span>
+                  </button>
+                ))}
+              </div>
+            )}
 
-          {/* Legacy Mode (simple frequency/time picker) */}
-          {mode === 'legacy' && (
-            <div className="space-y-3">
-              <div>
-                <label className="block text-xs font-medium text-zinc-500 mb-1">실행 시간</label>
+            {/* Custom */}
+            {mode === 'custom' && (
+              <div className="space-y-2">
                 <input
-                  type="time"
-                  value={time}
-                  onChange={e => setTime(e.target.value)}
-                  className="w-full px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm"
+                  type="text"
+                  value={cronExpression}
+                  onChange={e => { setCronExpression(e.target.value); setSelectedPreset(null) }}
+                  placeholder="분 시 일 월 요일 (예: 0 9 * * 1-5)"
+                  className={inputClasses}
                 />
+                {cronExpression && cronDescription !== cronExpression ? (
+                  <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-2">
+                    <p className="text-xs text-emerald-400">✓ {cronDescription}</p>
+                  </div>
+                ) : cronExpression ? (
+                  <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-2">
+                    <p className="text-xs text-red-400">✗ 유효하지 않은 표현식</p>
+                  </div>
+                ) : null}
               </div>
-              <div>
-                <label className="block text-xs font-medium text-zinc-500 mb-2">주기</label>
-                <div className="flex gap-3">
-                  {([['daily', '매일'], ['weekdays', '평일'], ['custom', '특정 요일']] as const).map(([val, label]) => (
-                    <label key={val} className="flex items-center gap-1.5 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="frequency"
-                        checked={frequency === val}
-                        onChange={() => setFrequency(val)}
-                        className="accent-amber-600"
-                      />
-                      <span className="text-sm">{label}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-              {frequency === 'custom' && (
+            )}
+
+            {/* Legacy */}
+            {mode === 'legacy' && (
+              <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-medium text-zinc-500 mb-2">요일 선택</label>
-                  <div className="flex gap-2">
-                    {DAY_NAMES.map((dayName, i) => (
-                      <button
-                        key={i}
-                        type="button"
-                        onClick={() => setDays(prev => prev.includes(i) ? prev.filter(d => d !== i) : [...prev, i])}
-                        className={`w-9 h-9 rounded-full text-xs font-medium transition-colors ${
-                          days.includes(i)
-                            ? 'bg-amber-600 text-white'
-                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
-                        }`}
-                      >
-                        {dayName}
-                      </button>
+                  <label className="text-xs font-medium text-slate-300 mb-1.5 block">실행 시간</label>
+                  <input type="time" value={time} onChange={e => setTime(e.target.value)} className={inputClasses} />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-slate-300 mb-1.5 block">주기</label>
+                  <div className="flex gap-3">
+                    {([['daily', '매일'], ['weekdays', '평일'], ['custom', '특정 요일']] as const).map(([val, label]) => (
+                      <label key={val} className="flex items-center gap-1.5 text-xs text-slate-300 cursor-pointer">
+                        <input type="radio" name="frequency" checked={frequency === val} onChange={() => setFrequency(val)} className="accent-blue-500" />
+                        {label}
+                      </label>
                     ))}
                   </div>
-                  {frequency === 'custom' && days.length === 0 && (
-                    <p className="text-xs text-red-500 mt-1">실행할 요일을 1개 이상 선택하세요</p>
-                  )}
                 </div>
-              )}
+                {frequency === 'custom' && (
+                  <div>
+                    <div className="flex gap-2">
+                      {DAY_NAMES.map((dayName, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => setDays(prev => prev.includes(i) ? prev.filter(d => d !== i) : [...prev, i])}
+                          className={`w-8 h-8 text-xs rounded-lg border transition-all ${
+                            days.includes(i) ? 'bg-blue-500/20 border-blue-500/40 text-blue-400' : 'border-slate-700 text-slate-500'
+                          }`}
+                        >
+                          {dayName}
+                        </button>
+                      ))}
+                    </div>
+                    {days.length === 0 && <p className="text-xs text-red-400 mt-1">실행할 요일을 1개 이상 선택하세요</p>}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Description Preview */}
+          {mode !== 'legacy' && cronDescription && cronDescription !== cronExpression && (
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-2.5">
+              <p className="text-xs text-amber-400">📋 {cronDescription}</p>
             </div>
           )}
         </div>
 
-        {/* Cron description summary */}
-        {mode !== 'legacy' && cronDescription && (
-          <div className="bg-amber-50 dark:bg-amber-950 rounded-lg px-3 py-2">
-            <p className="text-xs text-amber-700 dark:text-amber-300">
-              <span className="font-medium">실행 주기:</span> {cronDescription}
-            </p>
-          </div>
-        )}
-
-        {/* Buttons */}
-        <div className="flex gap-3 pt-2">
-          <button
-            onClick={onClose}
-            className="flex-1 py-2.5 text-sm font-medium text-zinc-600 dark:text-zinc-400 border border-zinc-300 dark:border-zinc-700 rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
-          >
-            취소
-          </button>
+        {/* Footer */}
+        <div className="flex justify-end gap-2 px-5 py-4 border-t border-slate-700">
+          <button onClick={onClose} className="text-sm text-slate-400 hover:text-slate-200 px-4 py-2 rounded-lg hover:bg-slate-700/50 transition-colors">취소</button>
           <button
             onClick={handleSubmit}
             disabled={!isValid || isPending}
-            className="flex-1 py-2.5 bg-amber-600 text-white rounded-md text-sm font-medium hover:bg-amber-700 disabled:opacity-50 transition-colors"
+            className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
           >
             {isPending ? '처리 중...' : editing ? '수정' : '등록'}
           </button>
