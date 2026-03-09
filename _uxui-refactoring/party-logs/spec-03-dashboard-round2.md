@@ -1,90 +1,70 @@
-# Party Mode Round 2 (Adversarial) — Dashboard (작전현황)
+# [Party Mode Round 2 -- Adversarial Review] Dashboard (작전현황)
 
-**날짜:** 2026-03-09
-**대상:** `_uxui-refactoring/specs/03-dashboard.md` (Round 1 수정 후)
-**모드:** Adversarial (의도적 결함 탐색)
+### Round 1 Fix Verification
 
----
+| Issue # | Status | Verification Detail |
+|---------|--------|---------------------|
+| 1 | Fixed | v1 일일 한도 -> 월 예산 통합 근거가 section 10에 명시됨 |
+| 2 | Fixed | Banana2 프롬프트에 tooltip에 cost + call count 모두 표시 |
+| 3 | Fixed | Playwright 테스트에 테스트 유형 컬럼 추가됨 |
+| 4 | Fixed | '퀵 액션 상단 이동' -> 'Banana2가 최적 위치 결정' |
+| 5 | Fixed | '에이전트를 추가해보세요' -> '관리자에게 등록을 요청하세요' |
+| 6 | Fixed | 동적 testid prefix match 전략 명시됨 |
 
-## Round 1 이슈 반영 확인
+### Adversarial Agent Discussion
 
-| # | Round 1 이슈 | 반영 여부 |
-|---|-------------|----------|
-| 1 | Empty 상태 미정의 (작업 0건, 에이전트 0명 등) | [x] 반영됨 — 섹션 8.3에 5개 Empty 케이스 추가 |
-| 2 | `quick-action-btn` testid 개별 구분 불가 | [x] 반영됨 — `quick-action-btn-{id}` 동적 패턴으로 변경 |
-| 3 | 예산 퍼센트/projected marker testid 누락 | [x] 반영됨 — `budget-percentage`, `budget-projected` 추가 |
-| 4 | v1 "최근 사용 명령어" 미언급 | [x] 반영됨 — 섹션 10에 "최근 사용 순 서버 정렬" 명시 |
+**John (PM):** "WHY should the user care about 'integrations' status on a daily dashboard? 연동 상태 카드는 Anthropic/OpenAI/Google의 up/down 상태를 보여주는데, 프로바이더가 down이면 작업 실패 수에 이미 반영될 텐데, 별도 카드의 비즈니스 가치가 의문이다. 하지만 이건 기존 구현된 기능이고 UI-only 범위이므로 현재 스펙에서 변경할 사항은 아니다."
 
-**Round 1 이슈 전체 반영 완료.**
+**Winston (Architect):** "This will break under load. section 9 반응형에서 모바일 breakpoint가 ~375px로 되어있다. Chat 스펙에서는 이미 ~767px로 수정됐는데, Dashboard는 여전히 ~375px이다. 376px~767px 사이 디바이스에서 요약 카드 4컬럼 레이아웃이 깨질 수 있다. 또한 WebSocket dashboard 채널이 어떤 데이터를 push하는지 명시가 없어서 Banana2가 실시간 업데이트 인디케이터를 어디에 넣어야 하는지 모른다."
 
----
+**Sally (UX):** "A real user would get confused by inconsistent period selectors. 사용량 차트의 7/30일 토글과 만족도 차트의 7d/30d/all 선택기가 서로 다른 UI 패턴이면 사용자가 일관성 부족으로 혼란을 느낀다. 두 기간 선택기가 같은 segmented button 패턴이어야 한다. Banana2 프롬프트에 이 일관성을 명시해야 한다."
 
-## 전문가 리뷰
+**Amelia (Dev):** "dashboard-empty testid가 하나인데, Empty 상태가 카드별로 5가지(작업/에이전트/사용량/만족도/퀵 액션)다. Playwright에서 '어떤 empty 상태가 표시되었는지' 구분할 수 없다. 최소한 dashboard-empty-tasks, dashboard-empty-usage 같은 개별 testid가 필요하다. 또한 section 5에서 모든 컴포넌트가 인라인인데, 컴포넌트 분리는 후속 작업이라는 점을 명시해야 한다."
 
-### Sally (UX)
-핵심 동작이 모두 0~1클릭 이내로 완수됩니다 — 요약 카드 스캔(0클릭), 기간 토글(1클릭), 퀵 액션(1클릭), 비용 드릴다운(1클릭). 대시보드로서 매우 효율적인 UX입니다. **하지만 Banana2 프롬프트에 Empty 상태의 시각적 디자인 요청이 원래 빠져 있었습니다.** "Error state"만 프롬프트 항목 8에 있었고, Empty 상태(차트에 데이터 없을 때, 카드에 0건일 때)의 시각적 표현을 Banana2에게 요청하지 않으면, 개발자가 임의로 placeholder를 만들어야 합니다. 수정 후 항목 9에 Empty 상태가 추가되었습니다.
+**Quinn (QA):** "What happens when budget API returns 0 or null for budget? 예산이 설정되지 않은 상태에서 프로그레스 바가 division by zero로 뻗을 수 있다. '예산 미설정' Empty 상태가 section 8.3에 없다. 또한 Playwright 테스트 16번 '예산 색상 전환'이 데이터 의존이라 실제 환경에서 항상 skip될 위험이 있다."
 
-### Winston (Architect)
-컴포넌트 7개가 모두 `dashboard.tsx` 인라인이라 단일 파일 크기가 커질 수 있지만, UI-only 리팩토링 범위에서는 합리적입니다. "건드리면 안 되는 것" 6개 항목이 잘 정의되어 있고, 데이터 바인딩(섹션 6)과 API 엔드포인트가 "변경 없음"으로 명확합니다. **SummaryCards 컴포넌트가 4개 카드를 하나로 묶고 있는데, 개별 SummaryCard 단위로 분리하면 재사용성이 높아지지만**, 이것은 코드 구조 변경이라 현재 범위 밖입니다. 구조적 이슈 없음.
+**Mary (BA):** "The business case for projected month-end spend doesn't hold without explaining how it's calculated. Banana2 프롬프트에 'projected month-end spend as a dashed marker'가 있는데, 사용자가 이 마커를 보고 '이게 뭐지?'라고 생각할 수 있다. tooltip이나 라벨로 '현재 사용 추세 기반 예상'임을 표시해야 한다."
 
-### Amelia (Dev)
-data-testid 19개로 커버리지가 좋습니다. `quick-action-btn-{id}` 동적 패턴이 적용되어 Playwright에서 개별 버튼을 정확히 타겟팅할 수 있습니다. `satisfaction-period` testid가 3개 버튼(7d/30d/all)의 컨테이너 역할을 하는데, 이는 컨테이너 내 `button` 셀렉터로 개별 버튼을 잡을 수 있으므로 문제 없습니다. **Playwright 테스트에 `ws-status` 인디케이터 렌더링 확인이 원래 빠져 있었습니다.** 수정 후 테스트 #14에 WS 상태 표시 테스트가 추가되었습니다.
+**Bob (SM):** "section 10에서 '건드리면 안 되는 것'에 getBudgetColor가 있는데, 이 함수의 threshold(0-59%/60-79%/80%+)가 section 7의 색상 정의와 일치하는지 검증이 필요하다. 코드와 스펙 불일치 시 Banana2 디자인과 실제 동작이 다를 수 있다. 또한 'WS 실시간 업데이트 확인' 테스트가 빠져있지만, 이건 WS 로직 자체를 테스트하는 것이라 UI-only 범위 밖이므로 현재 생략이 합리적이다."
 
-### Quinn (QA)
-Empty/Error/Loading 3종 상태가 모두 정의되어 있어 edge case 커버리지가 좋습니다. 섹션 8.3의 5개 Empty 케이스(작업 0건, 에이전트 0명, 사용량 데이터 없음, 만족도 0건, 퀵 액션 0개)가 구체적이에요. **WebSocket 연결 끊김 후 재연결 시 데이터 자동 refresh 동작이 명시되면 더 좋겠지만**, 이것은 `useDashboardWs` 훅의 기존 동작이므로 UI-only 범위에서 별도 정의 불필요합니다. Playwright 테스트 14개로 주요 인터랙션이 모두 커버됩니다.
+### New Issues Found (Round 2)
 
-### John (PM)
-v1 기능이 모두 커버되어 있습니다. 섹션 10의 체크리스트 7개 항목이 v1 spec 9번과 정확히 대응합니다. "최근 사용 순 서버 정렬"이 추가되어 퀵 액션의 동작 방식이 명확해졌습니다. **비용 카드 외 다른 카드(작업, 에이전트)의 클릭 동작이 없다는 것이 Sally의 Round 1 지적이었는데**, 현재 코드에서 비용 카드만 navigate가 있으므로 기존 동작 유지가 맞습니다. 기능 누락 없음.
+| # | Severity | Raised By | Issue | Suggestion |
+|---|----------|-----------|-------|------------|
+| 7 | Major | Winston | 모바일 breakpoint ~375px로 chat 스펙(~767px)과 불일치 | ~767px로 통일 |
+| 8 | Medium | Quinn | 예산 미설정(budget=0/null) 시 Empty 상태 미정의 | section 8.3에 예산 미설정 empty 추가 |
+| 9 | Medium | Amelia, Quinn | dashboard-empty testid 1개로 5가지 empty 구분 불가 | 카드별 개별 empty testid 추가 |
+| 10 | Minor | Sally, Winston | 사용량 토글과 만족도 기간 선택기 UI 패턴 불일치 가능성 | Banana2 프롬프트에 동일 패턴 지시 |
+| 11 | Minor | Mary | projected month-end spend 마커에 설명 없음 | tooltip으로 '현재 추세 기반 예상' 명시 |
 
-### Bob (SM)
-7개 컴포넌트 스타일 개선이라는 범위가 매우 현실적입니다. Empty 상태 5개가 추가되어 약간 작업량이 늘었지만, 각각 간단한 placeholder 텍스트 수준이라 부담 없습니다. "건드리면 안 되는 것" 6항목과 "API 변경 없음" 선언이 명확하여, 구현자가 범위를 벗어날 위험이 매우 낮습니다. 리스크 없음.
+### Cross-talk
 
-### Mary (BA)
-비즈니스 가치가 매우 명확합니다. CEO가 아침에 30초 안에 AI 조직 전체 상태를 파악하는 시나리오가 완벽히 지원됩니다. 예산 위험도 3단계 색상(초록/노랑/빨강)이 즉각적 의사결정을 지원하고, 만족도 트렌드로 서비스 품질 추이를 확인할 수 있습니다. Empty 상태가 추가되면서 첫 사용자(에이전트 0명, 작업 0건)도 당황하지 않는 경험이 보장됩니다.
+**Winston -> Sally:** "Sally가 지적한 기간 선택기 UI 일관성 문제에 동의한다. 사용량 토글은 usage-toggle이고 만족도는 satisfaction-period인데, 이 둘이 같은 UI 패턴(segmented button)이어야 사용자 학습 비용이 줄어든다. Banana2 프롬프트에서 두 기간 선택기를 동일한 UI 패턴으로 처리하라고 명시해야 한다."
 
----
+**Quinn -> Amelia:** "Amelia가 지적한 dashboard-empty 단일 testid 문제에 동의한다. Empty 상태가 5가지인데 testid가 1개면, Playwright에서 어떤 empty 상태가 표시되었는지 구분할 수 없다. 최소한 dashboard-empty-tasks, dashboard-empty-usage 같은 개별 testid가 필요하다."
 
-## 크로스톡
+### v1-feature-spec Coverage Check
+- Features verified: v1 #9.1 요약 카드 4개, v1 #9.2 AI 사용량 (비용+호출 횟수 tooltip), v1 #9.3 예산 관리 (월 예산 통합 근거 명시), v1 #9.4 퀵 액션 (서버 정렬), v1 #9.5 CEO 만족도
+- Gaps found: none -- Round 1에서 추가된 보완으로 모든 v1 기능 커버됨
 
-**Quinn → Amelia:** "`ws-status` testid는 있는데 Playwright 테스트에 WS 연결 상태 확인이 없었어요. 실제 WS 연결/끊김 시뮬레이션은 e2e에서 어려울 수 있지만, 최소한 인디케이터가 렌더링되는지는 확인해야 하지 않을까요?"
+### UXUI Checklist
+- [x] 핵심 동작 3클릭 이내 -- 요약 카드 스캔(0클릭) -> 기간 토글(1클릭) -> 퀵 액션(1클릭)
+- [x] 빈/에러/로딩 상태 정의됨 -- 로딩 스켈레톤, 에러+재시도, 6가지 Empty 상태 (작업/에이전트/사용량/만족도/퀵액션/예산)
+- [x] data-testid 모든 인터랙션 요소에 할당 -- 23개 testid (기존 19 - dashboard-empty + 5개 개별 empty)
+- [x] 기존 기능 전부 커버 -- v1 spec 9번 전체 체크 + 일일 한도 통합 근거
+- [x] Banana2 프롬프트 영문+구체적 -- 9개 기능 요소, 기간 선택기 패턴 통일 지시, projected spend tooltip, empty 상태
+- [x] 반응형 breakpoint 명시 -- ~767px(Mobile), 768~1439px(Tablet), 1440px+(Desktop)
+- [x] UI-only 범위 (기능 로직 변경 없음) -- "건드리면 안 되는 것" 6항목 명시
 
-**Amelia → Quinn:** "맞습니다. `ws-status` 요소 존재 확인 테스트를 추가했습니다. 실제 연결 상태 변경은 mock이 필요하므로 단위 테스트에서 다루고, Playwright에서는 인디케이터 렌더링만 확인하면 됩니다."
+### Fixes Applied
+1. 모바일 breakpoint ~375px -> ~767px로 수정 (chat 스펙과 통일)
+2. section 8.3에 예산 미설정 Empty 상태 추가
+3. dashboard-empty testid -> 5개 개별 testid로 분리
+4. Banana2 프롬프트에 만족도 기간 선택기 = 사용량 토글과 동일 패턴 지시
+5. Banana2 프롬프트에 projected month-end spend tooltip 설명 추가
+6. Banana2 프롬프트에 예산 미설정 시 placeholder 표시 지시 추가
 
-**Sally → Winston:** "Empty 상태 디자인을 Banana2에게 별도로 요청해야 하는데, 프롬프트에 넣을 때 각 카드/차트마다 empty state를 보여달라고 해야 할까요, 아니면 별도 스크린으로?"
+### Quality Score: 8/10
+Justification: Round 1의 6개 이슈가 모두 수정되었고, Round 2에서 발견된 5개 신규 이슈도 스펙에 반영 완료. v1 기능 회귀 없이 모든 기능이 커버되며, 예산 edge case(미설정), Empty 상태 세분화, breakpoint 통일, 기간 선택기 패턴 일관성 등 실질적인 품질 개선. -1점은 WebSocket이 어떤 데이터를 push하는지 명시 없는 점(기존 로직 불변이므로 UI 스펙 범위 밖), -1점은 컴포넌트가 모두 인라인이라 코드 구조가 복잡한 점(후속 리팩토링 필요).
 
-**Winston → Sally:** "프롬프트 항목 9에 'each card/chart should have its own empty state message'로 명시했으니, Banana2가 각 영역별로 empty placeholder를 생성할 겁니다. 별도 스크린보다 인라인이 대시보드에 적합합니다."
-
----
-
-## 신규 발견 이슈
-
-| # | 심각도 | 이슈 | 발견자 |
-|---|--------|------|--------|
-| 1 | **Low** | Banana2 프롬프트에 Empty 상태 시각 디자인 요청 누락 → 항목 9로 추가 완료 | Sally |
-| 2 | **Low** | Playwright 테스트에 ws-status 확인 항목 누락 → 테스트 #14로 추가 완료 | Quinn, Amelia |
-
-**모든 이슈 스펙에 수정 적용 완료.**
-
----
-
-## UXUI 체크포인트
-
-- [x] 핵심 동작 3클릭 이내 — 요약 카드 스캔(0클릭), 기간 토글(1클릭), 퀵 액션(1클릭), 드릴다운(1클릭)
-- [x] 빈 상태/에러 상태/로딩 상태 정의됨 — 섹션 8에 Loading/Error/Empty 3종 상태 모두 정의, Empty 5개 케이스 구체적
-- [x] data-testid가 모든 인터랙션 요소에 할당됨 — 19개 testid, 동적 패턴(`quick-action-btn-{id}`) 포함
-- [x] 기존 기능 전부 커버 — v1 spec 9번 항목 전체 체크, "최근 사용 순 서버 정렬" 명시
-- [x] Banana2 프롬프트가 영문으로 구체적으로 작성됨 — 9개 기능 요소, Empty 상태 포함, "YOU DECIDE" 톤 명시
-- [x] 반응형 breakpoint (375px, 768px, 1440px) 명시 — 섹션 9에 3단계 정의
-- [x] 기능 로직은 안 건드리고 UI만 변경하는 범위 — "건드리면 안 되는 것" 6개 항목 명시
-
----
-
-## 품질 점수: 8/10
-
-**감점 사유:**
-- -1: Banana2 프롬프트에 Empty 상태 시각 요소가 원래 미포함 (수정 적용됨)
-- -1: WS 상태 테스트 항목이 원래 누락 (수정 적용됨)
-
-## 판정: PASS
-
-**종합 평가:** 대시보드 스펙이 전반적으로 매우 잘 작성되어 있습니다. 데이터 바인딩, 색상 체계(예산 3단계, 프로바이더별), 반응형 breakpoint 모두 명확하고, v1 기능 커버리지가 완전합니다. Round 1에서 발견된 4개 이슈(Empty 상태, testid 개선, 예산 관련 testid, 최근 사용 명령어)가 모두 수정 반영되었고, Round 2에서 발견된 2개 Low 이슈(Banana2 Empty 상태, WS 테스트)도 스펙에 수정 적용되었습니다. Banana2 이미지 생성 및 구현 준비가 완료된 상태입니다.
+### Final Verdict: PASS
