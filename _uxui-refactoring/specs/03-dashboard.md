@@ -219,8 +219,8 @@ Required functional elements (you decide the optimal arrangement):
 1. Page header — title and a small real-time connection status indicator.
 2. Summary cards (4) — Tasks (total/completed/failed/in-progress), Costs (today's spend + budget %), Agents (total/active/idle/error), Integrations (provider status: up/down for Anthropic/OpenAI/Google + tool system).
 3. AI usage chart — stacked bar chart showing daily spend (cost in dollars) by provider (Anthropic=blue, OpenAI=green, Google=orange). Toggleable between 7-day and 30-day views. Hoverable bars with tooltip showing date, cost, and call count. Note: the primary metric is cost, but tooltip should also show call count for reference.
-4. Monthly budget progress bar — horizontal bar showing current spend vs budget. Color changes: green (0-59%), yellow (60-79%), red (80%+). Shows projected month-end spend as a dashed marker. Department-level cost breakdown below.
-5. Satisfaction donut chart — shows positive/negative/neutral feedback ratio. Period selector (7d / 30d / all). Shows satisfaction rate percentage in center.
+4. Monthly budget progress bar — horizontal bar showing current spend vs budget. Color changes: green (0-59%), yellow (60-79%), red (80%+). Shows projected month-end spend as a dashed marker with tooltip "Projected based on current spending trend". Department-level cost breakdown below. If budget is not set, show a placeholder message instead of the bar.
+5. Satisfaction donut chart — shows positive/negative/neutral feedback ratio. Period selector (7d / 30d / all). Shows satisfaction rate percentage in center. IMPORTANT: The period selector UI pattern must match the usage chart's 7/30-day toggle (use the same component style for consistency).
 6. Quick action buttons — grid of action buttons with icons and labels. Some trigger preset commands, others navigate to other pages.
 7. Loading skeleton — skeleton UI matching the layout of all cards and charts.
 8. Error state — clear message when data cannot be loaded.
