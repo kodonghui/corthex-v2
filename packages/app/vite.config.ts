@@ -13,8 +13,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@corthex/ui': path.resolve(__dirname, '../ui/src/index.ts'),
-      '@corthex/shared': path.resolve(__dirname, '../shared/src/index.ts'),
+      '@corthex/ui': path.resolve(__dirname, './src/lib/ui/index.ts'),
+      '@corthex/shared': path.resolve(__dirname, './src/lib/shared/index.ts'),
     },
   },
   server: {
