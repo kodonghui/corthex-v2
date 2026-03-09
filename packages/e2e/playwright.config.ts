@@ -55,6 +55,7 @@ export default defineConfig({
       testMatch: /smoke\/app\/|interaction\/app\//,
       use: {
         ...devices['iPhone 14'],
+        defaultBrowserType: 'chromium',
         storageState: path.resolve(e2eRoot, 'src/fixtures/.auth/user.json'),
       },
       dependencies: ['auth-setup'],
