@@ -63,9 +63,9 @@
 - 민감 데이터임을 시각적으로 전달 (자물쇠 아이콘, 보안 뱃지 등)
 
 ### 4.2 레이아웃 개선
-- **직원 목록**: 아바타 + 역할 표시
+- **직원 목록**: 아바타 + 역할 표시, 직원 수 10명 이상 시 검색 입력 표시 (프론트 필터링, API 변경 없음)
 - **가이드**: 더 친근한 정보 박스 스타일
-- **토큰 카드**: 보안 레벨 표시, 마스킹된 프리뷰
+- **토큰 카드**: 보안 레벨 표시, 마스킹된 프리뷰 (서버 응답에 마스킹 필드가 있으면 사용, 없으면 라벨만 표시)
 
 ### 4.3 인터랙션 개선
 - 토큰/키 등록: 모달로 변경 (레이아웃 밀림 방지) -- AddTokenModal, AddApiKeyModal 컴포넌트
@@ -183,7 +183,7 @@ IMPORTANT — App shell context:
 Required functional elements:
 1. Page header — "CLI Token / API Key Management" with subtitle.
 2. Guide box — informational callout explaining how to find the Claude OAuth token (step-by-step instructions). Should feel helpful, not alarming.
-3. Employee list (left, ~1/3 width) — list of employees with name and username. Selected employee is highlighted.
+3. Employee list (left, ~1/3 width) — list of employees with name and username. Selected employee is highlighted. Optional: search/filter input at the top if the list is long.
 4. Token section (right, ~2/3 width) — for the selected employee:
    a. CLI OAuth Tokens — header with employee name, "+ Register Token" button. List of tokens showing: label, registration date, active/inactive badge, deactivate button.
    b. External API Keys — header, "+ Register API Key" button. List of keys showing: provider badge (KIS/Notion/etc.), scope badge (personal/company), label, registration date, delete button.
@@ -266,7 +266,7 @@ Resolution: 375x812, pixel-perfect mobile UI screenshot style.
 | `mobile-back-btn` | 모바일 뒤로가기 | 직원 목록으로 복귀 (모바일만) |
 | `token-masked-preview` | 마스킹된 토큰 프리뷰 | sk-ant-oat01-*** 형태 표시 |
 | `credentials-retry-btn` | 재시도 버튼 | 에러 상태에서 재로드 |
-| `employee-search` | 직원 검색 입력 | 직원 목록 필터링 (직원 수 많을 때) |
+| `employee-search` | 직원 검색 입력 (선택적) | 직원 10명+ 시 프론트 필터링 |
 
 ---
 

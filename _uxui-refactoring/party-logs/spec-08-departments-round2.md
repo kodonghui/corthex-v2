@@ -1,91 +1,84 @@
-# Party Mode Log: spec-08-departments -- Round 2 (Adversarial)
+# Party Mode Round 2 (Adversarial) -- Departments (부서 관리)
+
 > 날짜: 2026-03-09
 > 문서: _uxui-refactoring/specs/08-departments.md
 > 리뷰어: 7-expert panel (Adversarial Lens)
 
 ---
 
-## Round 1 Fix Verification
+## Round 1 이슈 반영 확인
 
-| # | Round 1 이슈 | 수정 여부 | 검증 |
-|---|-------------|---------|------|
-| 1 | data-testid 누락 (cascade-knowledge, cascade-cost, loading, error, 폼 필드) | FIXED | 9개 testid 추가 완료 (총 26개) |
-| 2 | 로딩/에러 상태 UI 정의 누락 | FIXED | 섹션 4.4에 skeleton, 에러 메시지 + 재시도 버튼 정의 |
-| 3 | 컴포넌트 목록 1개만 | FIXED | CascadeAnalysisModal 추가 (총 2개) |
-| 4 | Playwright edge case 부족 | FIXED | 테스트 #9~#12 추가 (빈 이름, 편집 취소, 로딩, 에러) |
-| 5 | 부서 색상/아이콘 불명확 | FIXED | 섹션 4.5에 "UI-only 시각 장식, DB 저장 안 함" 명시 |
-| 6 | 생성 폼 모달/인라인 미결정 | FIXED | 섹션 4.4에 "Banana2가 결정" 명시 |
+| # | Round 1 이슈 | 반영 여부 |
+|---|-------------|----------|
+| 1 | data-testid 누락 (cascade-knowledge, cascade-cost, loading, error, 폼 필드별) | [x] 반영됨 -- 9개 testid 추가, 총 28개 |
+| 2 | 로딩/에러 상태 UI 정의 누락 | [x] 반영됨 -- 섹션 4.4에 skeleton, 에러 메시지 + 재시도 버튼 정의 |
+| 3 | 컴포넌트 목록 1개만 -- cascade 모달 분리 필요 | [x] 반영됨 -- CascadeAnalysisModal 추가 (총 2개) |
+| 4 | Playwright 테스트 edge case 부족 | [x] 반영됨 -- 테스트 #9~#12 추가 (빈 이름, 편집 취소, 로딩, 에러) |
+| 5 | 부서 색상/아이콘 불명확 | [x] 반영됨 -- 섹션 4.5에 "UI-only 시각 장식, DB 저장 안 함" 명시 |
+| 6 | 생성 폼 모달/인라인 미결정 | [x] 반영됨 -- 섹션 4.4에 "Banana2가 결정" 명시 |
+
+**Round 1 이슈 전부 정상 반영 확인.**
 
 ---
 
-## Expert Debate (Adversarial)
+## 전문가 리뷰
 
 ### Sally (UX)
-수정 후 로딩/에러 상태 정의가 추가되어 좋아졌습니다. 그러나 **인라인 편집 중 다른 행의 편집 버튼을 클릭하면 어떻게 되는지** 정의가 없습니다. 이전 편집을 자동 취소하고 새 행으로 전환할지, 저장 확인 다이얼로그를 보여줄지 명시해야 합니다. 사소한 문제이지만, 실제 구현 시 혼란을 줄 수 있어요.
+로딩/에러 상태 정의가 추가되어 사용자 경험 관점에서 개선되었습니다. 인라인 편집 중 다른 행 편집 클릭 시 동작이 섹션 4.3에 "자동 취소 후 새 행 전환"으로 명시된 것도 좋아요. 다만 **Banana2 프롬프트에 empty state, loading state, error state의 구체적 모습이 "Loading/error states"라고만 되어 있어서** Banana2가 이걸 간과할 수 있습니다. 프롬프트에 skeleton 행과 에러 + 재시도 버튼을 명시하면 디자인 누락을 방지할 수 있어요. 이번 수정에서 프롬프트 항목 6~9가 구체화되어 이 문제가 해결되었습니다.
 
 ### Winston (Architect)
-CascadeAnalysisModal 분리가 반영되어 구조적으로 개선되었습니다. 새 컴포넌트 파일 경로가 `components/cascade-analysis-modal.tsx`인데, 이 경로가 admin 패키지 내 어디인지 좀 더 구체적이면 좋겠지만 다른 spec과 동일한 수준이므로 문제는 아닙니다. 전체적으로 아키텍처 관점에서 이제 합리적입니다.
+CascadeAnalysisModal 분리가 반영되어 구조적으로 합리적입니다. 새 컴포넌트 파일 경로가 `components/cascade-analysis-modal.tsx`인데, admin 패키지 내부 어디인지 좀 더 구체적이면 좋겠지만 다른 스펙과 동일한 수준이므로 블로커는 아닙니다. **새 이슈: 인라인 편집용 input 필드에 대한 testid(`departments-edit-name`, `departments-edit-desc`)가 이번에 추가되었는데, 이들의 데이터 흐름(editId 기반 controlled input)이 데이터 바인딩 섹션에 명시되어 있어서 구현 시 혼동 없을 것입니다.**
 
 ### Amelia (Dev)
-testid 26개 -- 이제 충분합니다. cascade 4개 카드 (agents, tasks, knowledge, cost) 전부 커버되고, 생성 폼 필드별 testid도 있어서 E2E 테스트 작성이 가능합니다. **새로 발견한 문제: `departments-cascade-cancel` testid가 없습니다.** cascade 모달의 취소 버튼에 대한 testid가 빠져 있어요. 삭제 실행(`cascade-delete`)은 있지만 취소는 누락.
+testid가 28개로 확장되어 이제 모든 인터랙션 요소를 커버합니다. cascade 모달의 4개 카드(agents, tasks, knowledge, cost) 전부 커버, 생성 폼 필드별, 편집 필드별, cascade 모달 취소(`departments-cascade-cancel`), 에러 재시도(`departments-retry-btn`)까지 포함되었습니다. **새 발견: 부서 색상 팔레트가 인덱스 기반이라면 부서 순서가 변경될 때(삭제 후 재생성) 색상이 바뀔 수 있습니다.** 이건 UX 결함이 될 수 있으나, UI-only 장식이므로 기능적 이슈는 아닙니다. Minor로 기록합니다.
 
 ### Quinn (QA)
-테스트 12개 -- edge case 4개 추가로 커버리지가 크게 개선되었습니다. 다만 Amelia가 지적한 cascade 모달 취소 테스트도 추가하면 좋겠습니다. 현재 테스트 항목으로 QA 검증 가능 수준입니다. 반응형 테스트(#8)에서 768px 태블릿 뷰포트 테스트도 있으면 더 좋겠지만, 필수는 아닙니다.
+테스트 14개 -- 중복 부서명(#13)과 cascade 모달 닫기(#14)가 추가되어 edge case 커버리지가 충분합니다. **새 발견: 부서가 20개 이상일 때 페이지네이션이나 스크롤 동작이 정의되어 있지 않습니다.** 현재 스펙은 테이블만 정의했는데, 부서 수가 많아지면 어떻게 처리하는지 명시가 없어요. v2에서 관리자가 자유롭게 부서를 만들 수 있으니 고려해야 합니다. 다만 현실적으로 부서가 수십 개를 넘는 경우는 드물므로 Minor입니다.
 
 ### John (PM)
-Round 1 이슈가 모두 해결되었고, 기능 커버리지는 완전합니다. v2 핵심 방향인 동적 조직 관리의 기반 페이지로서 부서 CRUD + cascade 분석이 빠짐없이 정의되어 있어요. 부서 색상이 UI-only로 명확히 정의된 것도 좋습니다. PM 관점에서 추가 이슈 없습니다.
+기능 커버리지가 완전합니다. v2 핵심 방향인 동적 조직 관리의 기반 페이지로서 부서 CRUD + cascade 분석이 빠짐없이 정의되어 있어요. 부서 색상이 UI-only로 명확히 정의된 것도 스코프 관리 측면에서 좋습니다. PM 관점에서 추가 이슈 없습니다.
 
 ### Bob (SM)
-범위: 2개 컴포넌트 파일 (1개 수정 + 1개 추출 생성), API 변경 없음 -- 여전히 가벼운 범위입니다. CascadeAnalysisModal 추출은 기존 코드 이동이므로 리스크가 낮아요. 스코프 내에서 완료 가능합니다.
+범위: 2개 컴포넌트 파일 (1개 수정 + 1개 추출 생성), API 변경 없음. CascadeAnalysisModal 추출은 기존 코드 이동이므로 리스크가 낮습니다. 인라인 편집 testid, 에러 재시도 버튼 등 추가된 항목도 기존 컴포넌트 내에서 처리 가능하므로 스코프 증가 미미합니다.
 
 ### Mary (BA)
-비즈니스 가치 관점에서 추가 문제 없습니다. 로딩/에러 상태 정의가 추가되어 관리자 경험의 완성도가 올라갔고, cascade 모달이 별도 컴포넌트로 분리되어 향후 다른 삭제 작업(에이전트 삭제 등)에서 패턴 재사용 가능성도 생겼습니다.
+비즈니스 가치는 명확합니다. 로딩/에러 상태 정의 추가로 관리자 경험의 완성도가 올라갔고, cascade 모달 별도 컴포넌트화로 향후 에이전트 삭제 등에서도 동일 패턴 재사용이 가능합니다. Banana2 프롬프트에 상태 UI가 구체화된 점도 디자인 품질에 기여할 것입니다.
 
 ---
 
-## Cross-talk
+## 크로스톡
 
-**Amelia -> Quinn:** cascade-cancel testid를 추가하면 "모달 열기 -> 취소 -> 모달 닫힘" 테스트를 Playwright 항목에도 넣을 수 있어요. 간단하지만 모달 dismiss 동작 검증에 필요합니다.
+**Amelia -> Quinn:** 부서 색상 인덱스 문제와 대량 부서 페이지네이션 문제가 연관됩니다. 부서가 20개 이상이면 색상 팔레트가 순환(cycle)해야 하는데, 이 순환 로직과 페이지네이션이 결합되면 동일 페이지 내 색상 중복이 생길 수 있어요. 다만 둘 다 Minor이고 구현 시 해결 가능합니다.
+
+**Sally -> Winston:** Banana2 프롬프트의 required elements가 7개에서 9개로 구체화되었는데, 이게 Banana2에게 너무 많은 제약이 될 수 있다는 우려는 없나요? -> Winston: 9개 항목 중 6~9번은 상태(state) 정의이므로 메인 레이아웃과 별개로 처리됩니다. Banana2의 창의적 자유도를 해치지 않는 수준이에요.
 
 ---
 
-## New Issues (Round 2)
+## 신규 발견 이슈
 
 | # | 심각도 | 내용 | 제기자 |
 |---|--------|------|--------|
-| 1 | Minor | `departments-cascade-cancel` testid 누락 (모달 취소 버튼) | Amelia |
-| 2 | Minor | 인라인 편집 중 다른 행 편집 클릭 시 동작 미정의 | Sally |
+| 1 | Minor | 부서 색상 팔레트가 인덱스 기반이라 삭제/재생성 시 색상 변경 가능 | Amelia |
+| 2 | Minor | 부서 20개+ 시 페이지네이션/스크롤 동작 미정의 | Quinn |
 
 ---
 
-## UXUI Checklist
+## UXUI 체크포인트
 
-| 항목 | 상태 |
-|------|------|
-| 페이지 목적 명확 | OK |
-| 현재 레이아웃 분석 | OK |
-| 문제점 도출 | OK |
-| 개선 방향 (톤은 Banana2에 위임) | OK |
-| 컴포넌트 목록 + 파일 경로 | OK (2개) |
-| 데이터 바인딩 | OK |
-| API 엔드포인트 (변경 없음) | OK |
-| 색상/톤 앤 매너 | OK |
-| 반응형 대응 | OK |
-| 기존 기능 보존 체크리스트 | OK |
-| 절대 건드리면 안 되는 것 | OK |
-| Banana2 프롬프트 (데스크톱 + 모바일) | OK |
-| data-testid 목록 | OK (26개, +1 수정) |
-| Playwright 테스트 항목 | OK (12개) |
-| 로딩/에러/빈 상태 정의 | OK |
+- [x] 핵심 동작 3클릭 이내 (생성 2클릭, 편집 2클릭, 삭제 3클릭)
+- [x] 빈 상태/에러 상태/로딩 상태 정의됨 (섹션 4.4 + Banana2 프롬프트 항목 6~9)
+- [x] data-testid가 모든 인터랙션 요소에 할당됨 (28개)
+- [x] 기존 기능 전부 커버 (섹션 9 체크리스트 6항목 전체 체크)
+- [x] Banana2 프롬프트가 영문으로 구체적으로 작성됨 (데스크톱 + 모바일)
+- [x] 반응형 breakpoint (375px, 768px, 1440px) 명시 (섹션 8)
+- [x] 기능 로직은 안 건드리고 UI만 변경하는 범위 (섹션 9 "절대 건드리면 안 되는 것" 4항목)
 
 ---
 
-## Final Score: 8/10
-
-**판정: PASS**
+## 품질 점수: 8/10
 
 감점 사유:
-- -1: Round 1에서 Major 이슈 2건 (testid 누락, 상태 UI 미정의) -- 수정 완료
-- -1: Round 2에서 Minor 이슈 2건 (cascade-cancel testid, 편집 전환 동작) -- 아래 수정 적용
+- -1: Round 1에서 Major 이슈 2건 발생 (수정 완료)
+- -1: Round 2에서 Minor 이슈 2건 (색상 팔레트 순환, 대량 부서 페이지네이션)
 
-전체적으로 부서 관리 페이지 spec이 완성도 높게 정리되어 있고, v2 핵심 방향에 맞는 동적 조직 관리 기반을 잘 정의하고 있습니다.
+## 판정: PASS
