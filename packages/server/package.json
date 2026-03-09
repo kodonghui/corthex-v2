@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
-    "@corthex/shared": "workspace:*",
     "@google/generative-ai": "^0.24.1",
     "@hono/zod-validator": "^0.5",
     "@neondatabase/serverless": "^1.0.2",

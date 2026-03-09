@@ -18,8 +18,6 @@
       "name": "@corthex/admin",
       "version": "0.0.1",
       "dependencies": {
-        "@corthex/shared": "workspace:*",
-        "@corthex/ui": "workspace:*",
         "@tanstack/react-query": "^5.90.21",
         "react": "^19",
         "react-dom": "^19",
@@ -46,8 +44,6 @@
         "@codemirror/state": "^6.5.4",
         "@codemirror/theme-one-dark": "^6.1.3",
         "@codemirror/view": "^6.39.16",
-        "@corthex/shared": "workspace:*",
-        "@corthex/ui": "workspace:*",
         "@dagrejs/dagre": "^2.0.4",
         "@dnd-kit/core": "^6.3.1",
         "@dnd-kit/sortable": "^10.0.0",
@@ -87,7 +83,6 @@
       "version": "0.0.1",
       "dependencies": {
         "@anthropic-ai/sdk": "^0.78.0",
-        "@corthex/shared": "workspace:*",
         "@google/generative-ai": "^0.24.1",
         "@hono/zod-validator": "^0.5",
         "@neondatabase/serverless": "^1.0.2",
