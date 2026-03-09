@@ -732,31 +732,33 @@ function NexusPageInner() {
   )
 
   return (
-    <div className="h-full flex flex-col">
+    <div data-testid="nexus-page" className="h-full flex flex-col">
       {/* 헤더 */}
-      <div className="px-3 py-2 border-b border-zinc-200 dark:border-zinc-800 flex items-center gap-2">
-        <h2 className="text-base font-semibold shrink-0">SketchVibe</h2>
+      <div className="px-3 py-2 border-b border-slate-700 flex items-center gap-2">
+        <h2 className="text-base font-semibold shrink-0 text-slate-50">SketchVibe</h2>
 
         {currentSketchName && (
-          <span className="text-xs text-zinc-400 truncate max-w-[120px]">
+          <span className="text-xs text-slate-400 truncate max-w-[120px]">
             — {currentSketchName}{dirty ? ' *' : ''}
           </span>
         )}
 
         {/* 저장 버튼 */}
         <button
+          data-testid="nexus-save-btn"
           onClick={handleSave}
           disabled={nodes.length === 0}
-          className="px-2 py-1 text-xs bg-emerald-600 hover:bg-emerald-700 disabled:bg-zinc-700 disabled:text-zinc-500 text-white rounded transition-colors"
+          className="px-2 py-1 text-xs bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded transition-colors"
         >
           저장
         </button>
 
         {/* 캔버스 목록 토글 */}
         <button
+          data-testid="nexus-sidebar-toggle"
           onClick={() => setShowSidebar(!showSidebar)}
           className={`px-2 py-1 text-xs rounded transition-colors ${
-            showSidebar ? 'bg-indigo-600 text-white' : 'bg-zinc-700 hover:bg-zinc-600 text-zinc-300'
+            showSidebar ? 'bg-blue-600 text-white' : 'bg-slate-700 hover:bg-slate-600 text-slate-300'
           }`}
         >
           목록
@@ -764,8 +766,9 @@ function NexusPageInner() {
 
         {/* Mermaid Import */}
         <button
+          data-testid="nexus-mermaid-import-btn"
           onClick={() => { setMermaidInput(''); setMermaidError(''); setShowMermaidModal(true) }}
-          className="px-2 py-1 text-xs bg-zinc-700 hover:bg-zinc-600 text-zinc-300 rounded transition-colors"
+          className="px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 rounded transition-colors"
           title="Mermaid 코드 가져오기"
         >
           Mermaid
@@ -773,9 +776,10 @@ function NexusPageInner() {
 
         {/* Mermaid Export */}
         <button
+          data-testid="nexus-mermaid-export-btn"
           onClick={handleMermaidExport}
           disabled={nodes.length === 0}
-          className="px-2 py-1 text-xs bg-zinc-700 hover:bg-zinc-600 disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-300 rounded transition-colors"
+          className="px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 text-slate-300 rounded transition-colors"
           title="Mermaid 코드 내보내기"
         >
           {exportCopied ? '복사됨!' : '내보내기'}
@@ -783,9 +787,10 @@ function NexusPageInner() {
 
         {/* 지식 베이스에 저장 */}
         <button
+          data-testid="nexus-kb-save-btn"
           onClick={() => setShowExportKnowledge(true)}
           disabled={nodes.length === 0 || !currentSketchId}
-          className="px-2 py-1 text-xs bg-zinc-700 hover:bg-zinc-600 disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-300 rounded transition-colors"
+          className="px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 text-slate-300 rounded transition-colors"
           title="지식 베이스에 다이어그램 저장"
         >
           지식 저장
@@ -793,17 +798,19 @@ function NexusPageInner() {
 
         {/* Undo / Redo */}
         <button
+          data-testid="nexus-undo-btn"
           onClick={handleUndo}
           disabled={undoStack.length === 0}
-          className="px-2 py-1 text-xs bg-zinc-700 hover:bg-zinc-600 disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-300 rounded transition-colors"
+          className="px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 text-slate-300 rounded transition-colors"
           title="실행 취소"
         >
           ↩
         </button>
         <button
+          data-testid="nexus-redo-btn"
           onClick={handleRedo}
           disabled={redoStack.length === 0}
-          className="px-2 py-1 text-xs bg-zinc-700 hover:bg-zinc-600 disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-300 rounded transition-colors"
+          className="px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 text-slate-300 rounded transition-colors"
           title="다시 실행"
         >
           ↪
@@ -811,9 +818,10 @@ function NexusPageInner() {
 
         {/* 에이전트 선택 */}
         <select
+          data-testid="nexus-agent-select"
           value={selectedAgentId || ''}
           onChange={(e) => handleAgentSelect(e.target.value)}
-          className="text-xs bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded px-2 py-1 max-w-[140px]"
+          className="text-xs bg-slate-800 border border-slate-700 rounded px-2 py-1 max-w-[140px] text-slate-200"
         >
           {agents.map((a) => (
             <option key={a.id} value={a.id}>
@@ -827,17 +835,19 @@ function NexusPageInner() {
         {/* 모바일 뷰 토글 */}
         <div className="flex md:hidden gap-1">
           <button
+            data-testid="nexus-mobile-canvas-tab"
             onClick={() => setMobileView('canvas')}
             className={`px-2 py-1 text-xs rounded ${
-              mobileView === 'canvas' ? 'bg-zinc-700 text-white' : 'text-zinc-400'
+              mobileView === 'canvas' ? 'bg-slate-700 text-white' : 'text-slate-400'
             }`}
           >
             캔버스
           </button>
           <button
+            data-testid="nexus-mobile-chat-tab"
             onClick={() => setMobileView('chat')}
             className={`px-2 py-1 text-xs rounded ${
-              mobileView === 'chat' ? 'bg-zinc-700 text-white' : 'text-zinc-400'
+              mobileView === 'chat' ? 'bg-slate-700 text-white' : 'text-slate-400'
             }`}
           >
             채팅
@@ -846,8 +856,9 @@ function NexusPageInner() {
 
         {/* 데스크톱 채팅 토글 */}
         <button
+          data-testid="nexus-chat-toggle"
           onClick={() => setChatOpen(!chatOpen)}
-          className="hidden md:block px-2 py-1 text-xs bg-zinc-700 hover:bg-zinc-600 text-white rounded transition-colors"
+          className="hidden md:block px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 text-white rounded transition-colors"
         >
           {chatOpen ? '채팅 닫기' : '채팅 열기'}
         </button>
@@ -857,7 +868,7 @@ function NexusPageInner() {
       <div className="flex-1 flex overflow-hidden">
         {/* 캔버스 목록 사이드바 */}
         {showSidebar && (
-          <div className="w-52 border-r border-zinc-800 shrink-0 hidden md:block">
+          <div data-testid="nexus-sidebar" className="w-52 border-r border-slate-800 shrink-0 hidden md:block">
             <CanvasSidebar
               currentSketchId={currentSketchId}
               onLoad={handleLoadSketch}
@@ -869,6 +880,7 @@ function NexusPageInner() {
 
         {/* 캔버스 */}
         <div
+          data-testid="nexus-canvas"
           className={`flex-1 flex flex-col relative ${
             mobileView === 'chat' ? 'hidden md:flex' : 'flex'
           }`}
@@ -878,27 +890,28 @@ function NexusPageInner() {
             {/* 노드 추가 버튼 */}
             <div className="relative">
               <button
+                data-testid="nexus-node-palette-btn"
                 onClick={() => setShowToolbar(!showToolbar)}
-                className="px-3 py-2 text-xs bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-lg transition-colors"
+                className="px-3 py-2 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-lg transition-colors"
               >
                 + 노드
               </button>
 
               {/* 팔레트 드롭다운 */}
               {showToolbar && (
-                <div className="absolute top-full left-0 mt-1 bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl p-2 w-44 z-50">
+                <div className="absolute top-full left-0 mt-1 bg-slate-900 border border-slate-700 rounded-lg shadow-xl p-2 w-44 z-50">
                   {NODE_PALETTE.map((item) => (
                     <button
                       key={item.type}
                       onClick={() => handleAddNode(item.type)}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-left hover:bg-zinc-800 rounded transition-colors"
+                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-left hover:bg-slate-800 rounded transition-colors"
                     >
                       <span
                         className={`w-5 h-5 rounded flex items-center justify-center text-white text-[10px] ${item.color}`}
                       >
                         {item.icon}
                       </span>
-                      <span className="text-zinc-200">{item.label}</span>
+                      <span className="text-slate-200">{item.label}</span>
                     </button>
                   ))}
                 </div>
@@ -907,8 +920,9 @@ function NexusPageInner() {
 
             {/* 자동 정렬 */}
             <button
+              data-testid="nexus-auto-layout-btn"
               onClick={handleAutoLayout}
-              className="px-3 py-2 text-xs bg-zinc-700 hover:bg-zinc-600 text-white rounded-lg shadow transition-colors"
+              className="px-3 py-2 text-xs bg-slate-700 hover:bg-slate-600 text-white rounded-lg shadow transition-colors"
               title="자동 정렬"
             >
               ⟳ 정렬
@@ -916,8 +930,9 @@ function NexusPageInner() {
 
             {/* 초기화 */}
             <button
+              data-testid="nexus-clear-btn"
               onClick={handleClear}
-              className="px-3 py-2 text-xs bg-zinc-700 hover:bg-zinc-600 text-white rounded-lg shadow transition-colors"
+              className="px-3 py-2 text-xs bg-slate-700 hover:bg-slate-600 text-white rounded-lg shadow transition-colors"
               title="초기화"
             >
               ✕ 초기화
@@ -926,19 +941,21 @@ function NexusPageInner() {
 
           {/* AI 프리뷰 오버레이 */}
           {aiPreview && (
-            <div className="absolute top-2 right-2 z-20 bg-zinc-900/95 border border-indigo-500 rounded-lg shadow-xl p-3 w-72">
-              <p className="text-xs text-indigo-400 font-semibold mb-1">AI 제안</p>
-              <p className="text-xs text-zinc-300 mb-3">{aiPreview.description}</p>
+            <div data-testid="nexus-ai-preview" className="absolute top-2 right-2 z-20 bg-slate-900/95 border border-blue-500 rounded-lg shadow-xl p-3 w-72">
+              <p className="text-xs text-blue-400 font-semibold mb-1">AI 제안</p>
+              <p className="text-xs text-slate-300 mb-3">{aiPreview.description}</p>
               <div className="flex gap-2">
                 <button
+                  data-testid="nexus-ai-apply-btn"
                   onClick={handleApplyAiPreview}
                   className="flex-1 px-3 py-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors"
                 >
                   적용
                 </button>
                 <button
+                  data-testid="nexus-ai-cancel-btn"
                   onClick={handleCancelAiPreview}
-                  className="flex-1 px-3 py-1.5 text-xs bg-zinc-700 hover:bg-zinc-600 text-zinc-300 rounded-lg transition-colors"
+                  className="flex-1 px-3 py-1.5 text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-colors"
                 >
                   취소
                 </button>
@@ -949,9 +966,9 @@ function NexusPageInner() {
           {/* 캔버스 안내 (비어있을 때) */}
           {nodes.length === 0 && !aiPreview && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-              <div className="text-center text-zinc-500">
+              <div className="text-center text-slate-500">
                 <p className="text-lg mb-2">여기에 그림을 그려보세요</p>
-                <p className="text-sm">왼쪽 위 "+ 노드" 버튼으로 노드를 추가하고,</p>
+                <p className="text-sm">왼쪽 위 &quot;+ 노드&quot; 버튼으로 노드를 추가하고,</p>
                 <p className="text-sm">드래그해서 연결하세요.</p>
                 <p className="text-sm mt-2">하단 AI 명령으로 자동 생성할 수도 있어요.</p>
               </div>
@@ -991,26 +1008,28 @@ function NexusPageInner() {
               <MiniMap
                 nodeStrokeWidth={3}
                 style={{ width: 120, height: 80 }}
-                className="!bg-zinc-100 dark:!bg-zinc-800 hidden md:block"
+                className="!bg-slate-800 hidden md:block"
               />
             </ReactFlow>
           </div>
 
           {/* AI 명령 입력란 */}
-          <div className="px-3 py-2 border-t border-zinc-800 bg-zinc-900/90 flex items-center gap-2">
-            <span className="text-[10px] text-indigo-400 font-semibold shrink-0">AI</span>
+          <div className="px-3 py-2 border-t border-slate-800 bg-slate-900/90 flex items-center gap-2">
+            <span className="text-[10px] text-blue-400 font-semibold shrink-0">AI</span>
             <input
+              data-testid="nexus-ai-input"
               value={aiCommand}
               onChange={(e) => setAiCommand(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleAiCommand() } }}
               placeholder="예: DB 노드를 추가하고 API 서버에 연결해줘"
               disabled={aiLoading}
-              className="flex-1 bg-zinc-800 border border-zinc-700 rounded px-2 py-1 text-xs text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-indigo-500 disabled:opacity-50"
+              className="flex-1 bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-slate-200 placeholder:text-slate-600 outline-none focus:border-blue-500 disabled:opacity-50"
             />
             <button
+              data-testid="nexus-ai-send-btn"
               onClick={handleAiCommand}
               disabled={!aiCommand.trim() || aiLoading}
-              className="px-3 py-1 text-xs bg-indigo-600 hover:bg-indigo-700 disabled:bg-zinc-700 disabled:text-zinc-500 text-white rounded transition-colors shrink-0"
+              className="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded transition-colors shrink-0"
             >
               {aiLoading ? '처리중...' : '전송'}
             </button>
@@ -1024,20 +1043,21 @@ function NexusPageInner() {
           )}
 
           {/* 하단 상태바 */}
-          <div className="px-3 py-1 border-t border-zinc-800 bg-zinc-900/80 flex items-center gap-3 text-[10px] text-zinc-500">
+          <div data-testid="nexus-status-bar" className="px-3 py-1 border-t border-slate-800 bg-slate-900/80 flex items-center gap-3 text-[10px] text-slate-500">
             <span>노드 {nodes.length}개</span>
             <span>연결 {edges.length}개</span>
             {dirty && <span className="text-amber-500">미저장</span>}
             {autoSaveToast && <span className="text-emerald-400">자동 저장됨</span>}
-            {undoStack.length > 0 && <span className="text-zinc-600">Undo {undoStack.length}</span>}
-            <span className="hidden sm:inline">| 더블클릭: 이름 편집 | Delete: 삭제 | 핸들 드래그: 연결 | 우클릭: 메뉴</span>
+            {undoStack.length > 0 && <span className="text-slate-600">Undo {undoStack.length}</span>}
+            <span className="hidden sm:inline text-slate-500">더블클릭: 이름 편집 | Delete: 삭제 | 핸들 드래그: 연결 | 우클릭: 메뉴</span>
           </div>
         </div>
 
         {/* 채팅 패널 */}
         {(chatOpen || mobileView === 'chat') && (
           <div
-            className={`border-l border-zinc-200 dark:border-zinc-800 flex flex-col ${
+            data-testid="nexus-chat-panel"
+            className={`border-l border-slate-800 flex flex-col ${
               mobileView === 'canvas' ? 'hidden md:flex' : 'flex'
             } w-full md:w-[380px] lg:w-[420px] shrink-0`}
           >
@@ -1064,9 +1084,9 @@ function NexusPageInner() {
 
       {/* 저장 다이얼로그 */}
       {showSaveDialog && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-zinc-900 border border-zinc-700 rounded-xl p-6 w-80 shadow-2xl">
-            <h3 className="text-sm font-semibold text-zinc-200 mb-3">캔버스 저장</h3>
+        <div data-testid="nexus-save-dialog" className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 w-80 shadow-2xl">
+            <h3 className="text-sm font-semibold text-slate-200 mb-3">캔버스 저장</h3>
             <input
               autoFocus
               value={saveNameInput}
@@ -1076,19 +1096,19 @@ function NexusPageInner() {
                 if (e.key === 'Escape') setShowSaveDialog(false)
               }}
               placeholder="캔버스 이름을 입력하세요"
-              className="w-full bg-zinc-800 border border-zinc-600 rounded-lg px-3 py-2 text-sm text-zinc-200 outline-none focus:border-indigo-500"
+              className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-200 outline-none focus:border-blue-500"
             />
             <div className="flex gap-2 mt-4 justify-end">
               <button
                 onClick={() => setShowSaveDialog(false)}
-                className="px-3 py-1.5 text-xs bg-zinc-700 hover:bg-zinc-600 text-zinc-300 rounded-lg"
+                className="px-3 py-1.5 text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg"
               >
                 취소
               </button>
               <button
                 onClick={handleSaveNew}
                 disabled={!saveNameInput.trim()}
-                className="px-3 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 disabled:bg-zinc-700 disabled:text-zinc-500 text-white rounded-lg"
+                className="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-lg"
               >
                 저장
               </button>
@@ -1098,16 +1118,16 @@ function NexusPageInner() {
       )}
       {/* Mermaid Import 모달 */}
       {showMermaidModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-zinc-900 border border-zinc-700 rounded-xl p-6 w-[480px] max-w-[90vw] shadow-2xl">
-            <h3 className="text-sm font-semibold text-zinc-200 mb-3">Mermaid 코드 가져오기</h3>
+        <div data-testid="nexus-mermaid-modal" className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 w-[480px] max-w-[90vw] shadow-2xl">
+            <h3 className="text-sm font-semibold text-slate-200 mb-3">Mermaid 코드 가져오기</h3>
             <textarea
               autoFocus
               value={mermaidInput}
               onChange={(e) => { setMermaidInput(e.target.value); setMermaidError('') }}
               placeholder={`flowchart TD\n  A([시작])\n  B[에이전트]\n  A --> B`}
               rows={10}
-              className="w-full bg-zinc-800 border border-zinc-600 rounded-lg px-3 py-2 text-sm text-zinc-200 font-mono outline-none focus:border-indigo-500 resize-y"
+              className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-200 font-mono outline-none focus:border-blue-500 resize-y"
             />
             {mermaidError && (
               <p className="mt-2 text-xs text-red-400">{mermaidError}</p>
@@ -1115,14 +1135,14 @@ function NexusPageInner() {
             <div className="flex gap-2 mt-4 justify-end">
               <button
                 onClick={() => setShowMermaidModal(false)}
-                className="px-3 py-1.5 text-xs bg-zinc-700 hover:bg-zinc-600 text-zinc-300 rounded-lg"
+                className="px-3 py-1.5 text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg"
               >
                 취소
               </button>
               <button
                 onClick={handleMermaidImport}
                 disabled={!mermaidInput.trim()}
-                className="px-3 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 disabled:bg-zinc-700 disabled:text-zinc-500 text-white rounded-lg"
+                className="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-lg"
               >
                 적용
               </button>
@@ -1142,7 +1162,7 @@ function NexusPageInner() {
 
       {/* 자동 저장 토스트 */}
       {autoSaveToast && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 bg-emerald-800/90 text-emerald-200 text-xs rounded-lg shadow-lg animate-pulse">
+        <div data-testid="nexus-autosave-toast" className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 bg-emerald-800/90 text-emerald-200 text-xs rounded-lg shadow-lg animate-pulse">
           자동 저장됨
         </div>
       )}

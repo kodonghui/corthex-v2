@@ -41,7 +41,8 @@ export function ContextMenu({ x, y, target, nodeId, onAction, onClose }: Context
   return (
     <div
       ref={ref}
-      className="fixed bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl py-1 z-[100] min-w-[160px]"
+      data-testid="nexus-context-menu"
+      className="fixed bg-slate-900 border border-slate-700 rounded-lg shadow-xl py-1 z-[100] min-w-[160px]"
       style={{ left: x, top: y }}
     >
       {target === 'node' && nodeId && (
@@ -55,7 +56,7 @@ export function ContextMenu({ x, y, target, nodeId, onAction, onClose }: Context
             label="복제"
             onClick={() => onAction({ type: 'duplicate', nodeId })}
           />
-          <div className="border-t border-zinc-800 my-1" />
+          <div className="border-t border-slate-800 my-1" />
           <MenuItem
             label="삭제"
             shortcut="Del"
@@ -67,7 +68,7 @@ export function ContextMenu({ x, y, target, nodeId, onAction, onClose }: Context
 
       {target === 'pane' && (
         <>
-          <div className="px-3 py-1 text-[10px] text-zinc-500 font-medium">노드 추가</div>
+          <div className="px-3 py-1 text-[10px] text-slate-500 font-medium">노드 추가</div>
           {NODE_PALETTE.map((item) => (
             <MenuItem
               key={item.type}
@@ -101,12 +102,12 @@ function MenuItem({
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center justify-between px-3 py-1.5 text-xs hover:bg-zinc-800 transition-colors ${
-        danger ? 'text-red-400 hover:text-red-300' : 'text-zinc-200'
+      className={`w-full flex items-center justify-between px-3 py-1.5 text-xs hover:bg-slate-800 transition-colors ${
+        danger ? 'text-red-400 hover:text-red-300' : 'text-slate-200'
       }`}
     >
       <span>{label}</span>
-      {shortcut && <span className="text-[10px] text-zinc-500 ml-4">{shortcut}</span>}
+      {shortcut && <span className="text-[10px] text-slate-500 ml-4">{shortcut}</span>}
     </button>
   )
 }

@@ -70,13 +70,13 @@ export function CanvasSidebar({ currentSketchId, onLoad, onNew, onLoadFromKnowle
   return (
     <div className="flex flex-col h-full">
       {/* Tab header */}
-      <div className="flex border-b border-zinc-800">
+      <div className="flex border-b border-slate-800">
         <button
           onClick={() => setActiveTab('sketches')}
           className={`flex-1 px-3 py-2 text-[10px] font-medium transition-colors ${
             activeTab === 'sketches'
-              ? 'text-indigo-400 border-b-2 border-indigo-500'
-              : 'text-zinc-500 hover:text-zinc-300'
+              ? 'text-blue-400 border-b-2 border-blue-500'
+              : 'text-slate-500 hover:text-slate-300'
           }`}
         >
           스케치
@@ -85,8 +85,8 @@ export function CanvasSidebar({ currentSketchId, onLoad, onNew, onLoadFromKnowle
           onClick={() => setActiveTab('knowledge')}
           className={`flex-1 px-3 py-2 text-[10px] font-medium transition-colors ${
             activeTab === 'knowledge'
-              ? 'text-indigo-400 border-b-2 border-indigo-500'
-              : 'text-zinc-500 hover:text-zinc-300'
+              ? 'text-blue-400 border-b-2 border-blue-500'
+              : 'text-slate-500 hover:text-slate-300'
           }`}
         >
           지식 베이스
@@ -96,11 +96,11 @@ export function CanvasSidebar({ currentSketchId, onLoad, onNew, onLoadFromKnowle
       {/* Sketches tab */}
       {activeTab === 'sketches' && (
         <>
-          <div className="px-3 py-2 border-b border-zinc-800 flex items-center justify-between">
-            <span className="text-xs font-medium text-zinc-400">저장된 캔버스</span>
+          <div className="px-3 py-2 border-b border-slate-800 flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-400">저장된 캔버스</span>
             <button
               onClick={onNew}
-              className="text-[10px] px-2 py-0.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded transition-colors"
+              className="text-[10px] px-2 py-0.5 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
             >
               + 새 캔버스
             </button>
@@ -108,11 +108,11 @@ export function CanvasSidebar({ currentSketchId, onLoad, onNew, onLoadFromKnowle
 
           <div className="flex-1 overflow-y-auto">
             {sketchesLoading && (
-              <div className="px-3 py-4 text-xs text-zinc-500 text-center">불러오는 중...</div>
+              <div className="px-3 py-4 text-xs text-slate-500 text-center">불러오는 중...</div>
             )}
 
             {!sketchesLoading && sketches.length === 0 && (
-              <div className="px-3 py-4 text-xs text-zinc-500 text-center">
+              <div className="px-3 py-4 text-xs text-slate-500 text-center">
                 저장된 캔버스가 없어요.
                 <br />
                 캔버스를 그리고 저장해보세요.
@@ -122,13 +122,13 @@ export function CanvasSidebar({ currentSketchId, onLoad, onNew, onLoadFromKnowle
             {sketches.map((s) => (
               <div
                 key={s.id}
-                className={`group px-3 py-2 border-b border-zinc-800/50 cursor-pointer hover:bg-zinc-800/50 transition-colors ${
-                  s.id === currentSketchId ? 'bg-indigo-900/30 border-l-2 border-l-indigo-500' : ''
+                className={`group px-3 py-2 border-b border-slate-800/50 cursor-pointer hover:bg-slate-800/50 transition-colors ${
+                  s.id === currentSketchId ? 'bg-blue-900/30 border-l-2 border-l-blue-500' : ''
                 }`}
                 onClick={() => onLoad(s.id)}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-zinc-200 truncate flex-1">{s.name}</span>
+                  <span className="text-xs text-slate-200 truncate flex-1">{s.name}</span>
                   {confirmDelete === s.id ? (
                     <div className="flex gap-1">
                       <button
@@ -145,7 +145,7 @@ export function CanvasSidebar({ currentSketchId, onLoad, onNew, onLoadFromKnowle
                           e.stopPropagation()
                           setConfirmDelete(null)
                         }}
-                        className="text-[10px] px-1.5 py-0.5 bg-zinc-700 text-zinc-300 rounded"
+                        className="text-[10px] px-1.5 py-0.5 bg-slate-700 text-slate-300 rounded"
                       >
                         취소
                       </button>
@@ -157,7 +157,7 @@ export function CanvasSidebar({ currentSketchId, onLoad, onNew, onLoadFromKnowle
                           e.stopPropagation()
                           duplicateMutation.mutate(s.id)
                         }}
-                        className="text-zinc-500 hover:text-indigo-400 text-[10px]"
+                        className="text-slate-500 hover:text-blue-400 text-[10px]"
                         title="복제"
                       >
                         복제
@@ -167,7 +167,7 @@ export function CanvasSidebar({ currentSketchId, onLoad, onNew, onLoadFromKnowle
                           e.stopPropagation()
                           setConfirmDelete(s.id)
                         }}
-                        className="text-zinc-600 hover:text-red-400 text-xs"
+                        className="text-slate-600 hover:text-red-400 text-xs"
                         title="삭제"
                       >
                         ×
@@ -175,7 +175,7 @@ export function CanvasSidebar({ currentSketchId, onLoad, onNew, onLoadFromKnowle
                     </div>
                   )}
                 </div>
-                <div className="text-[10px] text-zinc-500 mt-0.5">
+                <div className="text-[10px] text-slate-500 mt-0.5">
                   {new Date(s.updatedAt).toLocaleDateString('ko-KR', {
                     month: 'short',
                     day: 'numeric',
@@ -193,11 +193,11 @@ export function CanvasSidebar({ currentSketchId, onLoad, onNew, onLoadFromKnowle
       {activeTab === 'knowledge' && (
         <div className="flex-1 overflow-y-auto">
           {knowledgeLoading && (
-            <div className="px-3 py-4 text-xs text-zinc-500 text-center">불러오는 중...</div>
+            <div className="px-3 py-4 text-xs text-slate-500 text-center">불러오는 중...</div>
           )}
 
           {!knowledgeLoading && knowledgeDocs.length === 0 && (
-            <div className="px-3 py-4 text-xs text-zinc-500 text-center">
+            <div className="px-3 py-4 text-xs text-slate-500 text-center">
               Mermaid 다이어그램이 없어요.
               <br />
               캔버스에서 &quot;지식 베이스에 저장&quot;으로 내보내보세요.
@@ -207,16 +207,16 @@ export function CanvasSidebar({ currentSketchId, onLoad, onNew, onLoadFromKnowle
           {knowledgeDocs.map((doc) => (
             <div
               key={doc.id}
-              className="group px-3 py-2 border-b border-zinc-800/50 cursor-pointer hover:bg-zinc-800/50 transition-colors"
+              className="group px-3 py-2 border-b border-slate-800/50 cursor-pointer hover:bg-slate-800/50 transition-colors"
               onClick={() => handleKnowledgeImport(doc)}
             >
               <div className="flex items-center justify-between">
-                <span className="text-xs text-zinc-200 truncate flex-1">{doc.title}</span>
-                <span className="text-[9px] text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="text-xs text-slate-200 truncate flex-1">{doc.title}</span>
+                <span className="text-[9px] text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">
                   가져오기
                 </span>
               </div>
-              <div className="text-[10px] text-zinc-500 mt-0.5">
+              <div className="text-[10px] text-slate-500 mt-0.5">
                 {new Date(doc.updatedAt).toLocaleDateString('ko-KR', {
                   month: 'short',
                   day: 'numeric',

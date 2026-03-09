@@ -92,19 +92,19 @@ export function EditableEdge({
                   setEditing(false)
                 }
               }}
-              className="bg-zinc-800 border border-zinc-600 rounded px-2 py-0.5 text-xs text-zinc-200 outline-none min-w-[60px] text-center"
+              className="bg-slate-800 border border-slate-600 rounded px-2 py-0.5 text-xs text-slate-200 outline-none min-w-[60px] text-center"
               onClick={(e) => e.stopPropagation()}
             />
           ) : label ? (
             <span
-              className="bg-zinc-900/90 border border-zinc-700 rounded px-2 py-0.5 text-[10px] text-zinc-300 cursor-text select-none"
+              className="bg-slate-900/90 border border-slate-700 rounded px-2 py-0.5 text-[10px] text-slate-300 cursor-text select-none"
               title="더블클릭으로 편집"
             >
               {label}
             </span>
           ) : selected ? (
             <span
-              className="bg-zinc-900/70 border border-dashed border-zinc-600 rounded px-2 py-0.5 text-[10px] text-zinc-500 cursor-text"
+              className="bg-slate-900/70 border border-dashed border-slate-600 rounded px-2 py-0.5 text-[10px] text-slate-500 cursor-text"
               title="더블클릭으로 라벨 추가"
             >
               라벨 추가

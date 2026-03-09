@@ -47,10 +47,10 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  online: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
-  working: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
-  error: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300',
-  offline: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400',
+  online: 'bg-emerald-900/30 text-emerald-300',
+  working: 'bg-blue-900/30 text-blue-300',
+  error: 'bg-red-900/30 text-red-300',
+  offline: 'bg-slate-800 text-slate-400',
 }
 
 const TIER_LABELS: Record<string, string> = {
@@ -59,7 +59,7 @@ const TIER_LABELS: Record<string, string> = {
   worker: 'Worker',
 }
 
-const inputCls = 'w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none'
+const inputCls = 'w-full px-3 py-2 border border-slate-600 rounded-lg bg-slate-800 text-sm text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none'
 const selectCls = inputCls
 
 /** Lightweight markdown -> HTML for Soul preview */
@@ -69,9 +69,9 @@ function renderMarkdown(md: string): string {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     // code blocks
-    .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre class="bg-zinc-100 dark:bg-zinc-800 rounded p-2 text-xs overflow-x-auto my-2"><code>$2</code></pre>')
+    .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre class="bg-slate-800 rounded p-2 text-xs overflow-x-auto my-2"><code>$2</code></pre>')
     // inline code
-    .replace(/`([^`]+)`/g, '<code class="bg-zinc-100 dark:bg-zinc-800 px-1 rounded text-xs">$1</code>')
+    .replace(/`([^`]+)`/g, '<code class="bg-slate-800 px-1 rounded text-xs">$1</code>')
     // headings
     .replace(/^### (.+)$/gm, '<h3 class="text-sm font-semibold mt-3 mb-1">$1</h3>')
     .replace(/^## (.+)$/gm, '<h2 class="text-base font-semibold mt-3 mb-1">$1</h2>')
@@ -250,19 +250,22 @@ export function AgentsPage() {
     })
   }
 
-  if (!selectedCompanyId) return <div className="p-8 text-center text-zinc-500">회사를 선택하세요</div>
+  if (!selectedCompanyId) return <div className="p-8 text-center text-slate-500">회사를 선택하세요</div>
+
+  const filterCls = 'px-3 py-1.5 border border-slate-600 rounded-lg bg-slate-800 text-sm text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none'
 
   return (
-    <div className="space-y-6">
+    <div data-testid="agents-page" className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">에이전트 관리</h1>
-          <p className="text-sm text-zinc-500 mt-1">{agents.length}개 에이전트{filteredAgents.length !== agents.length ? ` (${filteredAgents.length}개 표시)` : ''}</p>
+          <h1 data-testid="agents-title" className="text-3xl font-bold tracking-tight text-slate-50">에이전트 관리</h1>
+          <p className="text-sm text-slate-400 mt-1">{agents.length}개 에이전트{filteredAgents.length !== agents.length ? ` (${filteredAgents.length}개 표시)` : ''}</p>
         </div>
         <button
+          data-testid="agents-create-btn"
           onClick={() => setShowCreate(true)}
-          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors"
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors"
         >
           + 새 AI 직원 추가
         </button>
@@ -271,22 +274,23 @@ export function AgentsPage() {
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
         <input
+          data-testid="agents-search-input"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="에이전트 검색..."
-          className="px-3 py-1.5 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none w-48"
+          className={`${filterCls} w-48`}
         />
-        <select value={filterDept} onChange={(e) => setFilterDept(e.target.value)} className="px-3 py-1.5 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        <select data-testid="agents-filter-dept" value={filterDept} onChange={(e) => setFilterDept(e.target.value)} className={filterCls}>
           <option value="">모든 부서</option>
           {depts.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
         </select>
-        <select value={filterTier} onChange={(e) => setFilterTier(e.target.value)} className="px-3 py-1.5 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        <select data-testid="agents-filter-tier" value={filterTier} onChange={(e) => setFilterTier(e.target.value)} className={filterCls}>
           <option value="">모든 계급</option>
           <option value="manager">Manager</option>
           <option value="specialist">Specialist</option>
           <option value="worker">Worker</option>
         </select>
-        <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="px-3 py-1.5 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        <select data-testid="agents-filter-status" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className={filterCls}>
           <option value="">모든 상태</option>
           <option value="online">유휴</option>
           <option value="working">작업중</option>
@@ -297,13 +301,14 @@ export function AgentsPage() {
 
       {/* Create Form */}
       {showCreate && (
-        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5">
-          <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4">새 AI 직원</h3>
+        <div data-testid="agents-create-form" className="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
+          <h3 className="text-xl font-semibold text-slate-50 mb-4">새 AI 직원</h3>
           <form onSubmit={handleCreate} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">이름 *</label>
+                <label className="block text-sm text-slate-400 mb-1">이름 *</label>
                 <input
+                  data-testid="agents-create-name"
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   className={inputCls}
@@ -312,8 +317,9 @@ export function AgentsPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">역할</label>
+                <label className="block text-sm text-slate-400 mb-1">역할</label>
                 <input
+                  data-testid="agents-create-role"
                   value={form.role}
                   onChange={(e) => setForm({ ...form, role: e.target.value })}
                   className={inputCls}
@@ -321,31 +327,31 @@ export function AgentsPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">계급</label>
-                <select value={form.tier} onChange={(e) => handleTierChange(e.target.value as 'manager' | 'specialist' | 'worker')} className={selectCls}>
+                <label className="block text-sm text-slate-400 mb-1">계급</label>
+                <select data-testid="agents-create-tier" value={form.tier} onChange={(e) => handleTierChange(e.target.value as 'manager' | 'specialist' | 'worker')} className={selectCls}>
                   {TIER_OPTIONS.map((t) => (
                     <option key={t.value} value={t.value}>{t.label} - {t.desc}</option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">LLM 모델</label>
-                <select value={form.modelName} onChange={(e) => setForm({ ...form, modelName: e.target.value })} className={selectCls}>
+                <label className="block text-sm text-slate-400 mb-1">LLM 모델</label>
+                <select data-testid="agents-create-model" value={form.modelName} onChange={(e) => setForm({ ...form, modelName: e.target.value })} className={selectCls}>
                   {MODEL_OPTIONS.map((m) => (
                     <option key={m.value} value={m.value}>{m.label}</option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">소속 부서</label>
-                <select value={form.departmentId} onChange={(e) => setForm({ ...form, departmentId: e.target.value })} className={selectCls}>
+                <label className="block text-sm text-slate-400 mb-1">소속 부서</label>
+                <select data-testid="agents-create-dept" value={form.departmentId} onChange={(e) => setForm({ ...form, departmentId: e.target.value })} className={selectCls}>
                   <option value="">미배정</option>
                   {depts.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
                 </select>
               </div>
             </div>
             <div>
-              <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">Soul (성격/페르소나)</label>
+              <label className="block text-sm text-slate-400 mb-1">Soul (성격/페르소나)</label>
               {soulTemplates.length > 0 && (
                 <select
                   value=""
@@ -353,7 +359,7 @@ export function AgentsPage() {
                     const tpl = soulTemplates.find((t) => t.id === e.target.value)
                     if (tpl) setForm({ ...form, soul: tpl.content })
                   }}
-                  className="w-full px-3 py-1.5 mb-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3 py-1.5 mb-2 border border-slate-600 rounded-lg bg-slate-800 text-xs text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 >
                   <option value="">템플릿 불러오기...</option>
                   {soulTemplates.map((t) => (
@@ -362,6 +368,7 @@ export function AgentsPage() {
                 </select>
               )}
               <textarea
+                data-testid="agents-create-soul"
                 value={form.soul}
                 onChange={(e) => setForm({ ...form, soul: e.target.value })}
                 rows={3}
@@ -371,16 +378,18 @@ export function AgentsPage() {
             </div>
             <div className="flex gap-2 justify-end">
               <button
+                data-testid="agents-create-cancel"
                 type="button"
                 onClick={() => { setShowCreate(false); setForm({ ...defaultCreateForm }) }}
-                className="px-4 py-2 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
+                className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200"
               >
                 취소
               </button>
               <button
+                data-testid="agents-create-submit"
                 type="submit"
                 disabled={createMutation.isPending}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
               >
                 {createMutation.isPending ? '생성 중...' : '만들기'}
               </button>
@@ -391,37 +400,38 @@ export function AgentsPage() {
 
       {/* Agent Table */}
       {isLoading ? (
-        <div className="text-center text-zinc-500 py-8">로딩 중...</div>
+        <div data-testid="agents-loading" className="text-center text-slate-500 py-8">로딩 중...</div>
       ) : filteredAgents.length === 0 ? (
-        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-12 text-center">
-          <p className="text-zinc-500 mb-4">{agents.length === 0 ? '등록된 에이전트가 없습니다' : '필터 조건에 맞는 에이전트가 없습니다'}</p>
+        <div data-testid="agents-empty-state" className="bg-slate-800/50 border border-slate-700 rounded-xl p-12 text-center">
+          <p className="text-slate-500 mb-4">{agents.length === 0 ? '등록된 에이전트가 없습니다' : '필터 조건에 맞는 에이전트가 없습니다'}</p>
           {agents.length === 0 && (
             <button
               onClick={() => setShowCreate(true)}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors"
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors"
             >
               + 새 AI 직원 추가
             </button>
           )}
         </div>
       ) : (
-        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+        <div data-testid="agents-table" className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-zinc-200 dark:border-zinc-800">
-                <th className="text-left text-xs font-medium text-zinc-500 uppercase tracking-wider px-5 py-3">이름</th>
-                <th className="text-center text-xs font-medium text-zinc-500 uppercase tracking-wider px-5 py-3">계급</th>
-                <th className="text-center text-xs font-medium text-zinc-500 uppercase tracking-wider px-5 py-3">모델</th>
-                <th className="text-center text-xs font-medium text-zinc-500 uppercase tracking-wider px-5 py-3">부서</th>
-                <th className="text-center text-xs font-medium text-zinc-500 uppercase tracking-wider px-5 py-3">상태</th>
-                <th className="text-right text-xs font-medium text-zinc-500 uppercase tracking-wider px-5 py-3">작업</th>
+              <tr className="border-b border-slate-700">
+                <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wider px-5 py-3">이름</th>
+                <th className="text-center text-xs font-medium text-slate-400 uppercase tracking-wider px-5 py-3">계급</th>
+                <th className="text-center text-xs font-medium text-slate-400 uppercase tracking-wider px-5 py-3">모델</th>
+                <th className="text-center text-xs font-medium text-slate-400 uppercase tracking-wider px-5 py-3">부서</th>
+                <th className="text-center text-xs font-medium text-slate-400 uppercase tracking-wider px-5 py-3">상태</th>
+                <th className="text-right text-xs font-medium text-slate-400 uppercase tracking-wider px-5 py-3">작업</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+            <tbody className="divide-y divide-slate-800">
               {filteredAgents.map((a) => (
                 <tr
                   key={a.id}
-                  className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors cursor-pointer"
+                  data-testid={`agents-row-${a.id}`}
+                  className="hover:bg-slate-800/50 transition-colors cursor-pointer"
                   onClick={() => openDetail(a)}
                 >
                   <td className="px-5 py-3">
@@ -431,49 +441,51 @@ export function AgentsPage() {
                           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" /></svg>
                         </span>
                       )}
-                      <div>
-                        <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{a.name}</span>
-                        {a.role && <p className="text-xs text-zinc-500">{a.role}</p>}
+                      <div data-testid={`agents-name-${a.id}`}>
+                        <span className="text-sm font-medium text-slate-50">{a.name}</span>
+                        {a.role && <p className="text-xs text-slate-400">{a.role}</p>}
                       </div>
                       {a.isSystem && (
-                        <span className="text-xs px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300">
+                        <span data-testid={`agents-system-badge-${a.id}`} className="text-xs px-1.5 py-0.5 rounded bg-amber-900/30 text-amber-300">
                           시스템
                         </span>
                       )}
                       {!a.isActive && (
-                        <span className="text-xs px-1.5 py-0.5 rounded bg-zinc-200 dark:bg-zinc-700 text-zinc-500">
+                        <span data-testid={`agents-inactive-badge-${a.id}`} className="text-xs px-1.5 py-0.5 rounded bg-slate-700 text-slate-500">
                           비활성
                         </span>
                       )}
                     </div>
                   </td>
                   <td className="px-5 py-3 text-center">
-                    <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">{TIER_LABELS[a.tier] || a.tier}</span>
+                    <span className="text-xs font-medium text-slate-300">{TIER_LABELS[a.tier] || a.tier}</span>
                   </td>
                   <td className="px-5 py-3 text-center">
-                    <span className="text-xs text-zinc-500">{a.modelName}</span>
+                    <span className="text-xs text-slate-400">{a.modelName}</span>
                   </td>
                   <td className="px-5 py-3 text-center">
-                    <span className="text-xs text-zinc-600 dark:text-zinc-400">
+                    <span className="text-xs text-slate-400">
                       {a.departmentId ? deptMap.get(a.departmentId) || '-' : '미배정'}
                     </span>
                   </td>
                   <td className="px-5 py-3 text-center">
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${STATUS_COLORS[a.status] || STATUS_COLORS.offline}`}>
+                    <span data-testid={`agents-status-${a.id}`} className={`text-xs px-2 py-0.5 rounded-full ${STATUS_COLORS[a.status] || STATUS_COLORS.offline}`}>
                       {STATUS_LABELS[a.status] || a.status}
                     </span>
                   </td>
                   <td className="px-5 py-3 text-right" onClick={(e) => e.stopPropagation()}>
                     <button
+                      data-testid={`agents-edit-${a.id}`}
                       onClick={() => openDetail(a)}
-                      className="text-xs text-indigo-600 hover:text-indigo-700 font-medium mr-3"
+                      className="text-xs text-blue-500 hover:text-blue-400 font-medium mr-3"
                     >
                       편집
                     </button>
                     {a.isActive && !a.isSystem && (
                       <button
+                        data-testid={`agents-deactivate-${a.id}`}
                         onClick={() => setDeactivateTarget(a)}
-                        className="text-xs text-red-600 hover:text-red-700 font-medium"
+                        className="text-xs text-red-500 hover:text-red-400 font-medium"
                       >
                         비활성화
                       </button>
@@ -490,20 +502,21 @@ export function AgentsPage() {
       {selectedAgent && (
         <div className="fixed inset-0 z-50 flex items-start justify-end bg-black/50" onClick={() => setSelectedAgent(null)}>
           <div
-            className="bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-700 shadow-xl h-full w-full max-w-2xl overflow-y-auto"
+            data-testid="agents-detail-panel"
+            className="bg-slate-900 border-l border-slate-700 shadow-xl h-full w-full max-w-2xl overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Panel Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 sticky top-0 bg-white dark:bg-zinc-900 z-10">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700 sticky top-0 bg-slate-900 z-10">
               <div className="flex items-center gap-3">
-                <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">{selectedAgent.name}</h2>
+                <h2 className="text-lg font-semibold text-slate-50">{selectedAgent.name}</h2>
                 {selectedAgent.isSystem && (
-                  <span className="text-xs px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300">
+                  <span className="text-xs px-2 py-0.5 rounded bg-amber-900/30 text-amber-300">
                     시스템 에이전트
                   </span>
                 )}
               </div>
-              <button onClick={() => setSelectedAgent(null)} className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300">
+              <button data-testid="agents-detail-close" onClick={() => setSelectedAgent(null)} className="text-slate-400 hover:text-slate-300">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -512,27 +525,28 @@ export function AgentsPage() {
 
             {/* System agent warning */}
             {selectedAgent.isSystem && (
-              <div className="mx-6 mt-4 px-4 py-3 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-lg">
-                <p className="text-sm text-amber-700 dark:text-amber-300">
+              <div className="mx-6 mt-4 px-4 py-3 bg-amber-900/10 border border-amber-800 rounded-lg">
+                <p className="text-sm text-amber-300">
                   이 에이전트는 오케스트레이션에 필수입니다. 삭제할 수 없습니다.
                 </p>
               </div>
             )}
 
             {/* Tabs */}
-            <div className="flex border-b border-zinc-200 dark:border-zinc-800 px-6 mt-2">
+            <div className="flex border-b border-slate-700 px-6 mt-2">
               {([
-                { key: 'info' as const, label: '기본 정보' },
-                { key: 'soul' as const, label: 'Soul 편집' },
-                { key: 'tools' as const, label: '도구 권한' },
+                { key: 'info' as const, label: '기본 정보', testId: 'agents-tab-info' },
+                { key: 'soul' as const, label: 'Soul 편집', testId: 'agents-tab-soul' },
+                { key: 'tools' as const, label: '도구 권한', testId: 'agents-tab-tools' },
               ]).map((tab) => (
                 <button
                   key={tab.key}
+                  data-testid={tab.testId}
                   onClick={() => setDetailTab(tab.key)}
                   className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                     detailTab === tab.key
-                      ? 'border-indigo-600 text-indigo-600'
-                      : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+                      ? 'border-blue-600 text-blue-500'
+                      : 'border-transparent text-slate-400 hover:text-slate-300'
                   }`}
                 >
                   {tab.label}
@@ -546,7 +560,7 @@ export function AgentsPage() {
               {detailTab === 'info' && (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">이름</label>
+                    <label className="block text-sm text-slate-400 mb-1">이름</label>
                     <input
                       value={editForm.name || ''}
                       onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
@@ -554,7 +568,7 @@ export function AgentsPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">역할</label>
+                    <label className="block text-sm text-slate-400 mb-1">역할</label>
                     <input
                       value={editForm.role || ''}
                       onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
@@ -564,7 +578,7 @@ export function AgentsPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">계급</label>
+                      <label className="block text-sm text-slate-400 mb-1">계급</label>
                       <select
                         value={editForm.tier || 'specialist'}
                         onChange={(e) => {
@@ -580,7 +594,7 @@ export function AgentsPage() {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">LLM 모델</label>
+                      <label className="block text-sm text-slate-400 mb-1">LLM 모델</label>
                       <select value={editForm.modelName || ''} onChange={(e) => setEditForm({ ...editForm, modelName: e.target.value })} className={selectCls}>
                         {MODEL_OPTIONS.map((m) => (
                           <option key={m.value} value={m.value}>{m.label}</option>
@@ -589,7 +603,7 @@ export function AgentsPage() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">소속 부서</label>
+                    <label className="block text-sm text-slate-400 mb-1">소속 부서</label>
                     <select
                       value={editForm.departmentId || ''}
                       onChange={(e) => setEditForm({ ...editForm, departmentId: e.target.value || null })}
@@ -599,11 +613,12 @@ export function AgentsPage() {
                       {depts.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
                     </select>
                   </div>
-                  <div className="flex gap-2 justify-end pt-4 border-t border-zinc-200 dark:border-zinc-800">
+                  <div className="flex gap-2 justify-end pt-4 border-t border-slate-700">
                     <button
+                      data-testid="agents-save-info"
                       onClick={handleSaveInfo}
                       disabled={updateMutation.isPending}
-                      className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
                     >
                       {updateMutation.isPending ? '저장 중...' : '저장'}
                     </button>
@@ -616,12 +631,13 @@ export function AgentsPage() {
                 <div className="space-y-4">
                   {soulTemplates.length > 0 && (
                     <select
+                      data-testid="agents-soul-template"
                       value=""
                       onChange={(e) => {
                         const tpl = soulTemplates.find((t) => t.id === e.target.value)
                         if (tpl) setEditForm({ ...editForm, soul: tpl.content })
                       }}
-                      className="w-full px-3 py-1.5 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                      className="w-full px-3 py-1.5 border border-slate-600 rounded-lg bg-slate-800 text-xs text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     >
                       <option value="">템플릿 불러오기...</option>
                       {soulTemplates.map((t) => (
@@ -632,28 +648,31 @@ export function AgentsPage() {
                   <div className="grid grid-cols-2 gap-4" style={{ minHeight: '400px' }}>
                     {/* Editor */}
                     <div className="flex flex-col">
-                      <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">에디터</label>
+                      <label className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">에디터</label>
                       <textarea
+                        data-testid="agents-soul-editor"
                         value={editForm.soul || ''}
                         onChange={(e) => setEditForm({ ...editForm, soul: e.target.value })}
-                        className="flex-1 px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none resize-none font-mono"
+                        className="flex-1 px-3 py-2 border border-slate-600 rounded-lg bg-slate-800 text-sm text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none font-mono"
                         placeholder="# 에이전트 Soul&#10;&#10;이 에이전트의 성격, 역할, 전문 분야를 정의합니다..."
                       />
                     </div>
                     {/* Preview */}
                     <div className="flex flex-col">
-                      <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">미리보기</label>
+                      <label className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">미리보기</label>
                       <div
-                        className="flex-1 px-4 py-3 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 overflow-y-auto prose-sm"
-                        dangerouslySetInnerHTML={{ __html: editForm.soul ? renderMarkdown(editForm.soul) : '<p class="text-zinc-400 text-sm">Soul 마크다운을 입력하면 미리보기가 표시됩니다...</p>' }}
+                        data-testid="agents-soul-preview"
+                        className="flex-1 px-4 py-3 border border-slate-700 rounded-lg bg-slate-800/50 overflow-y-auto prose-sm"
+                        dangerouslySetInnerHTML={{ __html: editForm.soul ? renderMarkdown(editForm.soul) : '<p class="text-slate-400 text-sm">Soul 마크다운을 입력하면 미리보기가 표시됩니다...</p>' }}
                       />
                     </div>
                   </div>
-                  <div className="flex gap-2 justify-end pt-4 border-t border-zinc-200 dark:border-zinc-800">
+                  <div className="flex gap-2 justify-end pt-4 border-t border-slate-700">
                     <button
+                      data-testid="agents-save-soul"
                       onClick={handleSaveSoul}
                       disabled={updateMutation.isPending}
-                      className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
                     >
                       {updateMutation.isPending ? '저장 중...' : 'Soul 저장'}
                     </button>
@@ -664,24 +683,24 @@ export function AgentsPage() {
               {/* Tools Tab */}
               {detailTab === 'tools' && (
                 <div className="space-y-4">
-                  <div className="px-4 py-3 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-lg">
-                    <p className="text-sm text-zinc-500">
+                  <div className="px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg">
+                    <p className="text-sm text-slate-500">
                       도구 관리 기능은 준비 중입니다. (Epic 4에서 구현 예정)
                     </p>
                   </div>
                   {selectedAgent.allowedTools && selectedAgent.allowedTools.length > 0 ? (
                     <div>
-                      <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2 block">현재 허용 도구</label>
+                      <label className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2 block">현재 허용 도구</label>
                       <div className="flex flex-wrap gap-2">
                         {selectedAgent.allowedTools.map((tool) => (
-                          <span key={tool} className="text-xs px-2 py-1 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
+                          <span key={tool} className="text-xs px-2 py-1 rounded bg-slate-800 text-slate-400">
                             {tool}
                           </span>
                         ))}
                       </div>
                     </div>
                   ) : (
-                    <p className="text-sm text-zinc-500">허용된 도구가 없습니다.</p>
+                    <p className="text-sm text-slate-500">허용된 도구가 없습니다.</p>
                   )}
                 </div>
               )}
@@ -689,10 +708,10 @@ export function AgentsPage() {
 
             {/* Panel Footer -- Deactivate */}
             {!selectedAgent.isSystem && selectedAgent.isActive && (
-              <div className="px-6 py-4 border-t border-zinc-200 dark:border-zinc-800">
+              <div className="px-6 py-4 border-t border-slate-700">
                 <button
                   onClick={() => setDeactivateTarget(selectedAgent)}
-                  className="text-xs text-red-600 hover:text-red-700 font-medium"
+                  className="text-xs text-red-500 hover:text-red-400 font-medium"
                 >
                   이 에이전트 비활성화
                 </button>
@@ -706,33 +725,36 @@ export function AgentsPage() {
       {deactivateTarget && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50" onClick={() => setDeactivateTarget(null)}>
           <div
-            className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-700 shadow-xl w-full max-w-md mx-4"
+            data-testid="agents-deactivate-modal"
+            className="bg-slate-900 rounded-xl border border-slate-700 shadow-xl w-full max-w-md mx-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">
-              <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">에이전트 비활성화</h2>
+            <div className="px-6 py-4 border-b border-slate-700">
+              <h2 className="text-lg font-semibold text-slate-50">에이전트 비활성화</h2>
             </div>
             <div className="px-6 py-5 space-y-3">
-              <p className="text-sm text-zinc-700 dark:text-zinc-300">
+              <p className="text-sm text-slate-300">
                 <strong>&quot;{deactivateTarget.name}&quot;</strong> 에이전트를 비활성화하시겠습니까?
               </p>
-              <div className="bg-zinc-50 dark:bg-zinc-800 rounded-lg p-3 text-xs text-zinc-500 space-y-1">
+              <div className="bg-slate-800 rounded-lg p-3 text-xs text-slate-400 space-y-1">
                 <p>* 에이전트가 미배속으로 전환됩니다</p>
                 <p>* 메모리/학습 기록이 아카이브됩니다</p>
                 <p>* 비용 기록은 영구 보존됩니다</p>
               </div>
             </div>
-            <div className="flex justify-end gap-3 px-6 py-4 border-t border-zinc-200 dark:border-zinc-800">
+            <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-700">
               <button
+                data-testid="agents-deactivate-cancel"
                 onClick={() => setDeactivateTarget(null)}
-                className="px-4 py-2 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
+                className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200"
               >
                 취소
               </button>
               <button
+                data-testid="agents-deactivate-confirm"
                 onClick={() => deactivateMutation.mutate(deactivateTarget.id)}
                 disabled={deactivateMutation.isPending}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+                className="px-4 py-2 bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
               >
                 {deactivateMutation.isPending ? '처리 중...' : '비활성화'}
               </button>
