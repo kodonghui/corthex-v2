@@ -9,6 +9,22 @@
 - main push -> GitHub Actions 자동 배포 -> Cloudflare 캐시 퍼지
 - 커밋 후 배포 보고: 빌드 번호(#N) + 변경 내용 + 확인 위치, 테이블 형식
 
+### 커밋 전 필수: TypeScript 타입 체크 (배포 실패 방지)
+**커밋+푸시 전에 반드시 `npx tsc --noEmit -p packages/server/tsconfig.json` 실행할 것!**
+타입 에러가 있으면 Deploy가 실패함. CI 실패와 달리 Deploy 실패는 실제로 배포가 안 됨.
+
+**과거 배포 실패 원인 분석:**
+| 원인 | 예시 | 방지법 |
+|------|------|--------|
+| UserRole 등 유니온 타입에 없는 값 사용 | `role: 'user'` (정답: `'employee'`) | shared/types.ts의 타입 정의 확인 |
+| c.set() 오버로드 불일치 | AppEnv Variables에 없는 키 사용 | server/types.ts의 AppEnv 확인 |
+| import 경로 대소문자 불일치 | Linux CI는 대소문자 구분함 | `git ls-files` 기준으로 정확히 맞출 것 |
+
+**팀 에이전트(Developer)에게도 반드시 지시할 것:**
+- dev-story/code-review 완료 후 `npx tsc --noEmit` 실행
+- 타입 에러 있으면 수정 후 보고
+- 특히 shared 패키지의 타입(UserRole, TenantContext 등)을 새 코드에서 쓸 때 정확한 값 확인
+
 ## v1 기능 스펙 (최우선 참조)
 - 경로: `_bmad-output/planning-artifacts/v1-feature-spec.md`
 - v1에서 **실제로 동작했던** 모든 기능 포함
