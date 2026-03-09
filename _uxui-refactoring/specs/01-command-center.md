@@ -83,8 +83,9 @@ CEO가 AI 에이전트 조직에 명령을 내리는 **유일한 진입점**. �
 ## 4. 개선 방향
 
 ### 4.1 디자인 톤
-- **다크 테마 기반** (현재 유지): 명령 센터 느낌의 프로페셔널한 분위기
-- 색상 강조: 처리 중(amber), 완료(emerald), 실패(red) 상태별 색상 강화
+- **톤은 Banana2(디자인 AI)가 결정** — v1의 "군사 테마"에 얽매이지 않음
+- 페이지 이름, 아이콘, 색상 등은 관리자가 커스터마이즈 가능한 플랫폼이므로 특정 테마를 강제하지 않음
+- 상태별 색상 구분은 유지 (처리 중/완료/실패가 시각적으로 명확해야 함)
 - 카드 기반 레이아웃으로 메시지 간 시각적 분리 강화
 
 ### 4.2 레이아웃 개선
@@ -194,66 +195,80 @@ v1-feature-spec.md 1번 항목에 따라, 아래 기능이 **반드시** 동작�
 
 ### 데스크톱 버전
 ```
-Product context:
-CORTHEX is an AI-powered company management platform. A human CEO controls an entire AI organization — departments, AI employees (agents), and human staff — from a single web dashboard. Think of it as "running a company where most employees are AI agents."
+Design the CONTENT AREA of a single page inside a web application. This is NOT a standalone app — it lives inside an existing app shell that already provides a left navigation sidebar and a top header. You are designing ONLY the main content region.
 
-This page — "Commander's Office" (사령관실):
-The CEO's primary workspace. This is WHERE the CEO gives orders to the AI organization and monitors execution in real-time. It's the single most important page in the product.
+Product: CORTHEX — a platform where a human user manages an organization of AI agents. Think of it like Slack or Linear, but instead of messaging coworkers, you're giving tasks to AI employees and watching them collaborate to deliver results.
 
-What the CEO does here:
-1. Types a natural language command (e.g., "Research competitor pricing and write a report")
-2. Watches the delegation chain unfold in real-time: Chief of Staff → Department Head → Specialist agent
-3. Reads the completed report/deliverable
+This page: The primary workspace where the user gives natural language instructions to AI agents and monitors their progress. It's the most-used page in the entire product.
 
-Required functional elements (arrange these however produces the BEST UX — no layout constraints):
-- Chat-style message thread: CEO's commands (user bubbles) and AI agent responses (with agent name, role badge)
-- Delegation chain visualization: real-time pipeline showing which agent is currently working (amber=processing, green=done, red=failed)
-- Report/deliverable viewer: rendered markdown reports, Mermaid diagrams, sketch previews
-- Command input area: auto-expanding textarea with send button
-- Slash command popup: categorized command list (triggered by "/" key)
-- @mention popup: agent list grouped by department with avatars (triggered by "@" key)
-- Preset commands: quick-access to saved command templates
-- Quality badges: PASS/FAIL indicators on agent outputs
-- Empty state: welcoming onboarding with example commands for first-time users
-- Loading skeleton: while history loads
-- Error state: when API fails
+User workflow:
+1. User types an instruction in natural language (e.g., "Analyze our Q3 sales data and create a presentation")
+2. The system routes the task through a chain of AI agents — each specializing in different roles. The user sees this chain progress in real-time.
+3. When agents complete their work, the user reads the deliverables (reports, diagrams, documents) right here.
 
-Tone & mood:
-- Dark theme (zinc-800/900 base)
-- Military command center meets modern SaaS — authoritative but clean
-- Color coding: indigo for user actions, amber for processing, emerald for success, red for failure
-- Professional, minimal, no decorative clutter — pure functionality
+IMPORTANT — App shell context:
+- The app already has a LEFT SIDEBAR for navigation (switching between pages). DO NOT include any navigation sidebar in your design.
+- The app already has a TOP HEADER with the app logo, user avatar, notifications. DO NOT include a top app bar.
+- Your design fills the CONTENT AREA only — the space to the right of the sidebar and below the header.
+- On desktop, this content area is approximately 1200px wide and 850px tall.
 
-Design freedom:
-You have FULL creative freedom on layout, component arrangement, and visual hierarchy. The current version uses a simple split-view, but you can reimagine this completely. Prioritize: (1) command input accessibility, (2) delegation chain visibility, (3) report readability.
+Required functional elements (you decide the optimal arrangement):
+1. Message thread — user's instructions and AI agent responses, chat-style. Agent messages show: agent name, role/department tag, and the response content.
+2. Task delegation pipeline — real-time visualization of which AI agent is currently working. Shows a chain like: "Manager → Analyst → Writer" with status per step (waiting / working / done / failed).
+3. Deliverable viewer — when an agent produces a report or diagram, the user can read it here. Supports rendered markdown, Mermaid diagrams, and sketch previews.
+4. Input area — a text input at the bottom where the user types instructions. Has a send button. Auto-expands for longer text.
+5. Quick command popup — when user types "/" in the input, a popup shows categorized commands (like Slack's slash commands).
+6. Agent mention popup — when user types "@", a popup shows available AI agents grouped by department.
+7. Saved templates — quick access to frequently-used instruction templates (the user can create/edit/delete these).
+8. Quality indicators — PASS/FAIL badges on agent outputs showing quality check results.
+9. Empty state — when there's no history yet, show a welcoming onboarding with example instructions the user can click to try.
+10. Loading state — skeleton UI while history loads.
+11. Error state — clear message when something goes wrong.
 
-Resolution: 1440x900, UI screenshot style, pixel-perfect.
+Design tone — YOU DECIDE:
+- This is NOT a military/command center app. It's a modern productivity platform for managing AI workers.
+- Choose whatever visual tone fits best for a professional tool that a CEO or team lead would use daily.
+- Light theme, dark theme, or mixed — your choice. Pick what makes the most sense.
+- Status colors should be clearly distinguishable (processing vs complete vs failed).
+- Clean and functional. This is a tool people use 8 hours a day — it should feel effortless, not flashy.
+
+Design priorities (in order):
+1. The input area must be immediately accessible — this is what the user interacts with most.
+2. The delegation pipeline must be visible at a glance — the user needs to know task progress without scrolling.
+3. Deliverables must be readable — reports can be long, diagrams can be complex.
+
+Resolution: 1440x900, pixel-perfect UI screenshot style. Should look like a real production web application, not a wireframe or mockup.
 ```
 
 ### 모바일 버전
 ```
-Mobile version (375x812) of the CORTHEX "Commander's Office" — the CEO's AI organization command center.
+Mobile version (375x812) of the same page described above.
 
-Same product context as desktop: CEO gives natural language commands to AI agents, watches delegation chain execute in real-time, reads completed reports.
+Same product context: a platform where users manage AI agents by giving natural language instructions and monitoring task delegation in real-time.
 
-Required elements (optimize arrangement for mobile touch UX):
-- Chat message thread (CEO commands + AI agent responses with badges)
-- Delegation chain status (real-time processing visualization)
-- Report/deliverable viewing area
-- Command input (bottom-fixed, with send button)
-- Slash command popup (triggered by "/")
-- @mention popup (triggered by "@")
-- Preset quick-access
-- Quality badges (PASS/FAIL)
-- Loading/empty/error states
+IMPORTANT — Mobile app shell context:
+- The mobile app has a BOTTOM TAB BAR for navigation (switching between pages). DO NOT include a bottom nav bar.
+- The app has a compact TOP HEADER. DO NOT include a top app bar.
+- Your design fills the CONTENT AREA between the header and the bottom nav bar.
 
-Tone: Dark theme (zinc-800/900), military meets SaaS, professional.
-Colors: indigo=user, amber=processing, emerald=success, red=failure.
+Required elements (same as desktop, optimized for mobile touch):
+1. Message thread (user instructions + AI agent responses)
+2. Task delegation status (compact real-time visualization)
+3. Deliverable viewing area
+4. Input area (bottom-positioned, above the app's tab bar, with send button)
+5. "/" command popup and "@" mention popup (mobile-friendly format — bottom sheets, not dropdowns)
+6. Saved templates quick-access
+7. Quality badges (PASS/FAIL)
+8. Loading / empty / error states
 
-Design freedom:
-Full creative freedom on mobile layout. Current version uses tab switching (Chat/Report), but you can try bottom sheets, swipe navigation, collapsible sections, or any mobile pattern that works best. Prioritize: easy command input with one thumb, clear delegation status at a glance.
+Design tone: Same as desktop version — consistent visual language. YOU DECIDE the tone.
 
-Resolution: 375x812, mobile UI screenshot style, pixel-perfect.
+Design priorities for mobile:
+1. Input must be reachable with one thumb at the bottom of the screen.
+2. Delegation status visible at a glance without scrolling.
+3. Reading deliverables should feel comfortable despite smaller screen.
+
+Resolution: 375x812, pixel-perfect mobile UI screenshot style. Should look like a real production mobile web app.
 ```
 
 ---
