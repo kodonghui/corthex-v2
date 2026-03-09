@@ -336,6 +336,26 @@ export default defineConfig({
 ## 12. Playwright 인터랙션 테스트 항목
 ```
 
+### Banana2 프롬프트 작성 규칙 (중요)
+
+프롬프트는 **컨텍스트 + 기능 요소 + 톤** 중심으로 작성. **레이아웃은 지정하지 않는다.**
+Banana2가 최적의 배치를 스스로 결정하도록 디자인 자유도를 부여.
+
+```
+프롬프트 필수 구성:
+1. Product context — 이 제품이 뭔지 (제품 설명)
+2. Page purpose — 이 페이지에서 사용자가 뭘 하는지
+3. User scenario — 핵심 사용 시나리오 3단계
+4. Required elements — 들어가야 하는 기능 요소 목록 (배치는 자유)
+5. Tone & mood — 분위기, 색상 체계
+6. Design freedom — "Full creative freedom on layout" 명시
+
+프롬프트에 넣지 말 것:
+- "left 60%, right 40%" 같은 구체적 레이아웃 비율
+- "Split view", "sidebar" 같은 배치 지시
+- 현재 구현을 답습하는 설명
+```
+
 ### 파티모드 UXUI 전용 체크포인트 (Round 2에서 추가 확인)
 
 ```
@@ -343,7 +363,7 @@ export default defineConfig({
 - [ ] 빈 상태/에러 상태/로딩 상태 정의됨?
 - [ ] data-testid가 모든 인터랙션 요소에 할당됨?
 - [ ] 기존 기능 전부 커버?
-- [ ] Banana2 프롬프트가 영문으로 구체적으로 작성됨?
+- [ ] Banana2 프롬프트가 컨텍스트+기능 중심으로 작성됨? (레이아웃 강제 없음)
 - [ ] 반응형 breakpoint (375px, 768px, 1440px) 명시?
 - [ ] 기능 로직은 안 건드리고 UI만 변경하는 범위?
 ```

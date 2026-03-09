@@ -194,50 +194,64 @@ v1-feature-spec.md 1번 항목에 따라, 아래 기능이 **반드시** 동작�
 
 ### 데스크톱 버전
 ```
-A professional dark-themed command center dashboard for an AI-powered company management system.
+Product context:
+CORTHEX is an AI-powered company management platform. A human CEO controls an entire AI organization — departments, AI employees (agents), and human staff — from a single web dashboard. Think of it as "running a company where most employees are AI agents."
 
-Layout: Split view with chat panel (left 60%) and report panel (right 40%).
+This page — "Commander's Office" (사령관실):
+The CEO's primary workspace. This is WHERE the CEO gives orders to the AI organization and monitors execution in real-time. It's the single most important page in the product.
 
-Left panel (Chat):
-- Dark background (zinc-900) header with military-style title "Commander's Office" and a star icon preset button
-- Message list with card-style messages:
-  - User messages: indigo-600 rounded bubbles, right-aligned
-  - AI agent messages: zinc-800 cards with subtle border, left-aligned, showing agent name with AI badge
-  - Quality badges (green PASS / red FAIL) on agent messages
-  - Date separators between message groups
-- Delegation chain section below the message list, above the input area, showing: "Chief of Staff → CMO → Content Specialist" with amber pulsing dots for active steps, green checkmarks for completed
-- Bottom command input area: dark zinc-900 background with shadow separation, auto-expanding textarea, blue send button
+What the CEO does here:
+1. Types a natural language command (e.g., "Research competitor pricing and write a report")
+2. Watches the delegation chain unfold in real-time: Chief of Staff → Department Head → Specialist agent
+3. Reads the completed report/deliverable
 
-Right panel (Report):
-- Full report view with markdown-rendered content
-- Mermaid diagram preview card with action buttons
+Required functional elements (arrange these however produces the BEST UX — no layout constraints):
+- Chat-style message thread: CEO's commands (user bubbles) and AI agent responses (with agent name, role badge)
+- Delegation chain visualization: real-time pipeline showing which agent is currently working (amber=processing, green=done, red=failed)
+- Report/deliverable viewer: rendered markdown reports, Mermaid diagrams, sketch previews
+- Command input area: auto-expanding textarea with send button
+- Slash command popup: categorized command list (triggered by "/" key)
+- @mention popup: agent list grouped by department with avatars (triggered by "@" key)
+- Preset commands: quick-access to saved command templates
+- Quality badges: PASS/FAIL indicators on agent outputs
+- Empty state: welcoming onboarding with example commands for first-time users
+- Loading skeleton: while history loads
+- Error state: when API fails
 
-Popups visible:
-- Slash command popup: dark card with categorized commands, each with icon
-- Or mention popup: agent list grouped by department with colored avatars
+Tone & mood:
+- Dark theme (zinc-800/900 base)
+- Military command center meets modern SaaS — authoritative but clean
+- Color coding: indigo for user actions, amber for processing, emerald for success, red for failure
+- Professional, minimal, no decorative clutter — pure functionality
 
-Color scheme: Dark mode with zinc-800/900 base, indigo accents for user actions, amber for processing, emerald for success, red for failure.
-
-Style: Clean, professional, minimal. Like a military command center meets modern SaaS dashboard. No decorative elements, pure functionality.
+Design freedom:
+You have FULL creative freedom on layout, component arrangement, and visual hierarchy. The current version uses a simple split-view, but you can reimagine this completely. Prioritize: (1) command input accessibility, (2) delegation chain visibility, (3) report readability.
 
 Resolution: 1440x900, UI screenshot style, pixel-perfect.
 ```
 
 ### 모바일 버전
 ```
-Mobile version (375x812) of the same AI command center dashboard, dark theme.
+Mobile version (375x812) of the CORTHEX "Commander's Office" — the CEO's AI organization command center.
 
-Single column layout with tab navigation at top: [Chat] [Report] tabs.
+Same product context as desktop: CEO gives natural language commands to AI agents, watches delegation chain execute in real-time, reads completed reports.
 
-Chat tab active:
-- Compact message cards, minimal side margins
-- User messages: indigo bubbles, right-aligned
-- AI messages: zinc-800 cards, full-width
-- Delegation chain collapsed into single progress bar with step indicators
-- Bottom-fixed command input with send button
-- When slash popup appears: bottom-sheet style, covering bottom 60% of screen
+Required elements (optimize arrangement for mobile touch UX):
+- Chat message thread (CEO commands + AI agent responses with badges)
+- Delegation chain status (real-time processing visualization)
+- Report/deliverable viewing area
+- Command input (bottom-fixed, with send button)
+- Slash command popup (triggered by "/")
+- @mention popup (triggered by "@")
+- Preset quick-access
+- Quality badges (PASS/FAIL)
+- Loading/empty/error states
 
-Style: Same dark professional theme, optimized for mobile touch. Larger touch targets (44px minimum). Bottom-sheet popups instead of dropdown.
+Tone: Dark theme (zinc-800/900), military meets SaaS, professional.
+Colors: indigo=user, amber=processing, emerald=success, red=failure.
+
+Design freedom:
+Full creative freedom on mobile layout. Current version uses tab switching (Chat/Report), but you can try bottom sheets, swipe navigation, collapsible sections, or any mobile pattern that works best. Prioritize: easy command input with one thumb, clear delegation status at a glance.
 
 Resolution: 375x812, mobile UI screenshot style, pixel-perfect.
 ```
