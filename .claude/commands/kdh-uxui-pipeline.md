@@ -1,25 +1,56 @@
 ---
 name: 'kdh-uxui-pipeline'
-description: 'UXUI 리팩토링 파이프라인. v0.dev + Claude 보완 + Playwright QA + Party Mode 리뷰. Usage: /kdh-uxui-pipeline [phase0|phase1|spec PAGENAME|v0-prompt PAGENAME|integrate PAGENAME|phase3|final]'
+description: 'UXUI 리팩토링 파이프라인. Lovable 와이어프레임 + Claude Code 리팩토링 + 3라운드 파티모드 + Playwright QA. Usage: /kdh-uxui-pipeline [phase0|phase1|prompt PAGENAME|prompt-batch PRIORITY|code PAGENAME|code-batch PRIORITY|phase3|final]'
 ---
 
-# CORTHEX UXUI Refactoring Pipeline
+# CORTHEX UXUI Refactoring Pipeline v5
 
-v0.dev(디자인+코딩) + Claude(보완+통합) + Playwright QA + BMAD Party Mode를 결합한 UXUI 리팩토링 파이프라인.
-**이 PC(VS Code) 한 곳에서 전부 진행.** VPS는 서버만 운영.
+Lovable 와이어프레임(디자인) + Claude Code(코딩) + 3라운드 파티모드 + Playwright QA.
+**tmux Worker가 실제 작업 수행. 오케스트레이터는 지시+커밋만.**
+
+---
 
 ## Mode Selection
 
 - `phase0`: Playwright 환경 세팅 (한 번만)
 - `phase1`: 현재 기능 상태 점검 (스모크 테스트)
-- `spec PAGENAME`: 해당 페이지 설명서 작성 + 파티모드 리뷰
-- `spec-batch PRIORITY`: 해당 우선순위의 모든 페이지 설명서 일괄 작성 (예: `spec-batch 1`)
-- `v0-prompt PAGENAME`: v0.dev에 보낼 프롬프트 생성 (사용자가 v0에 복붙)
-- `v0-prompt-batch PRIORITY`: 해당 우선순위 전체 v0 프롬프트 일괄 생성
-- `integrate PAGENAME`: v0 브랜치 머지 + Claude 보완 + 파티모드 + Playwright 테스트
+- `prompt PAGENAME`: Lovable한테 보낼 와이어프레임 프롬프트 생성
+- `prompt-batch PRIORITY`: 해당 우선순위 전체 Lovable 프롬프트 생성
+- `code PAGENAME`: Lovable 와이어프레임 기반 코드 리팩토링 + 파티모드 3라운드 + Playwright
+- `code-batch PRIORITY`: 해당 우선순위 전체 리팩토링 일괄 실행
 - `phase3`: 시각 회귀 테스트 기준 이미지 등록
 - `final`: 최종 전체 검증
 - 인자 없음: 진행 상황 표시 + 다음 작업 안내
+
+---
+
+## 핵심 원칙
+
+### Lovable = 디자인 전권 위임
+
+**Lovable이 결정하는 것:**
+- 레이아웃, 색상, 타이포그래피, spacing, 컴포넌트 디자인, 시각적 위계
+- 정보 밀도, 애니메이션, 아이콘, 다크/라이트 모드
+- 모든 시각적 결정 — 예외 없음
+
+**우리가 Lovable에게 주는 것 (프롬프트):**
+- 이 페이지가 뭘 하는 페이지인지 (목적)
+- 어떤 데이터가 표시되는지 (엔티티, 필드, 상태)
+- 사용자가 뭘 할 수 있는지 (모든 인터랙션)
+- UX 고려사항 (기능적 요구만 — 시각적 지시 제로)
+
+**프롬프트에 절대 넣지 않는 것:**
+- 색상 이름, hex 코드, 그라데이션
+- 폰트 이름, 크기, 굵기
+- px/rem 값, 비율, 레이아웃 구조
+- 컴포넌트 라이브러리 이름
+- "왼쪽에 X, 오른쪽에 Y" 같은 배치 지시
+
+### 기능 로직 불변
+
+- API 호출, 상태관리, 이벤트 핸들러 100% 유지
+- UI/레이아웃/스타일/Tailwind 클래스만 변경
+- v2 백엔드에 **현재 존재하는** 기능만 반영 (v1 스펙 직접 참조 금지 — 삭제된 기능 부활 방지)
 
 ---
 
@@ -28,393 +59,372 @@ v0.dev(디자인+코딩) + Claude(보완+통합) + Playwright QA + BMAD Party Mo
 ```
 이 PC (VS Code) 한 곳에서 전부 진행
 
-Claude Code         → 설명서 작성, v0 프롬프트 생성, 보완 코딩, 테스트, 파티모드
-v0.dev              → 디자인 + UI 코딩 (사용자가 브라우저에서 조작)
-Playwright 확장      → ▶ 클릭으로 테스트 실행 + 브라우저 실시간 확인
+오케스트레이터 (메인 Claude Code)
+  → 팀 생성, Worker 스폰, 스텝 지시, 커밋+푸시
+  → 문서 작성/코딩 직접 안 함
+
+Worker (tmux 안의 Claude Code)
+  → 프롬프트 작성, 코드 리팩토링, 파티모드 3라운드, 테스트 작성
+  → 사용자가 tmux에서 실시간 관찰 가능
+
+Lovable (브라우저)
+  → 사용자가 프롬프트 복붙 → 와이어프레임 생성 → 스크린샷 저장
+
+Playwright 확장
+  → ▶ 클릭으로 테스트 실행 + 브라우저 실시간 확인
 
 테스트 대상: 배포 사이트 (https://corthex-hq.com)
 ```
 
 ---
 
-## 핵심 워크플로우: v0 중심 파이프라인
+## 전체 흐름
 
 ```
-Step A: Claude가 설명서 작성 (스펙)
-Step B: Claude가 v0 프롬프트 생성
-Step C: 사용자가 v0.dev에 프롬프트 전달 → v0가 디자인+코딩 → GitHub PR
-Step D: Claude가 v0 브랜치 머지 + 보완 (data-testid, 타입, 백엔드 연결)
-Step E: 파티모드 2라운드 (코드 리뷰)
-Step F: Playwright 테스트 작성 + 실행
-Step G: 커밋 + 푸시 (자동 배포)
+[Phase 0] Playwright 환경 세팅 (1회)
+    ↓
+[Phase 1] 현재 기능 상태 점검 (스모크 테스트)
+    ↓
+[Phase 2] 페이지별 리팩토링 (반복)
+    → A. prompt: Worker가 Lovable 프롬프트 생성 (현재 코드 분석 기반)
+    → B. 사용자가 Lovable에 복붙 → 와이어프레임 스크린샷 저장
+    → C. code: Worker가 와이어프레임 보고 코드 리팩토링 + 파티모드 3라운드
+    → D. Worker가 Playwright 테스트 작성 + 실행
+    → E. 오케스트레이터가 타입 체크 + 커밋 + 푸시 (자동 배포)
+    ↓
+[Phase 3] 시각 회귀 테스트 기준 이미지 등록
+    ↓
+[Phase 4] 최종 전체 검증
 ```
 
-**사용자가 직접 하는 것: Step C (v0에 프롬프트 복붙 + PR 확인)만.**
+**사용자가 직접 하는 것: B단계 (Lovable에 프롬프트 복붙 + 스크린샷 저장)만.**
 
 ---
 
-## v0.dev 프롬프트 작성 규칙 (핵심)
+## Single-Worker 패턴 (kdh-full-auto-pipeline과 동일)
 
-### 표준 프롬프트 템플릿
+### 왜 Single Worker인가?
 
-```markdown
-## Project Context
-- Product: CORTHEX — AI agent management SaaS platform
-- Tech: React 19 + TypeScript + Tailwind CSS 4 (NOT v3)
-- Monorepo: packages/app (user app), packages/ui (shared components)
-- GitHub: kodonghui/corthex-v2 (already connected)
-- Dark mode support required (Tailwind dark: prefix)
+- 2인 핑퐁(Writer+Reviewer) → SendMessage 데드락 빈번
+- **1인 Worker가 작성 + 자기 리뷰 3라운드 + 수정 + 보고** = 데드락 0
+- Worker는 tmux에서 실행 → 사용자가 실시간 관찰
+- 오케스트레이터 ↔ Worker 핸드오프 최소 2회(지시, 완료보고)
 
-## This Page: {페이지 한글명} ({경로})
-- Purpose: {스펙에서 가져옴}
-- Current file: {파일 경로}
-- Key features: {기능 목록}
+### Agent Manifest
 
-## Design Requirements
-1. Modern, clean SaaS dashboard aesthetic
-2. Preserve ALL existing functionality (API calls, state management, event handlers)
-3. Add data-testid attributes to all interactive elements (list from spec)
-4. Responsive: desktop (1440px) + mobile (375px)
-5. Dark mode support (dark: prefix classes)
-6. Loading/error/empty states for all data sections
-7. Full creative freedom on layout — you decide the best arrangement
+Read `_bmad/_config/agent-manifest.csv` for agent definitions. If not found, use defaults:
 
-## Current Code
-{현재 코드 또는 "see file at {경로}"}
+| Agent | Name | Focus |
+|-------|------|-------|
+| PM | John | user value, requirements gaps, priorities |
+| Architect | Winston | technical contradictions, feasibility, scalability |
+| UX Designer | Sally | user experience, accessibility, flow |
+| Developer | Amelia | implementation complexity, tech debt, testability |
+| QA | Quinn | edge cases, test coverage, quality risks |
+| Business Analyst | Mary | business value, market fit, ROI |
+| Scrum Master | Bob | scope, dependencies, schedule risks |
 
-## data-testid List (MUST include all)
-{스펙 11번에서 가져옴}
+### 오케스트레이터가 하는 것
+
+```
+1. TeamCreate로 팀 생성
+2. Worker 스폰 (첫 작업을 spawn 프롬프트에 포함 — "기다려" 금지)
+3. Worker 완료 보고 수신
+4. 결과 검증 (파티 로그 존재, 품질 점수 확인)
+5. 타입 체크: npx tsc --noEmit -p packages/server/tsconfig.json
+6. 커밋 + 푸시
+7. 다음 페이지로 Worker에게 SendMessage (또는 shutdown + 새 Worker 스폰)
 ```
 
-### 프롬프트에 넣지 말 것
-- 구체적 레이아웃 비율 ("left 60%")
-- 색상 코드 지정 (v0가 알아서 정함)
-- 현재 UI를 그대로 따라 하라는 지시
+### 오케스트레이터가 하지 않는 것
 
-### 프롬프트에 반드시 넣을 것
-- data-testid 전체 목록
-- 기능 로직 변경 금지 명시
-- 현재 코드 경로 (v0가 GitHub에서 읽을 수 있게)
+```
+- 프롬프트 작성 (Worker가 함)
+- 코드 리팩토링 (Worker가 함)
+- 파티모드 실행 (Worker가 자기 리뷰)
+- PASS/FAIL 판정 (Worker가 자체 판정)
+- 테스트 작성 (Worker가 함)
+```
 
 ---
 
-## Party Mode: UXUI 전용 (핵심)
+## Party Mode: 3라운드 (kdh-full-auto-pipeline과 동일 구조)
 
-BMAD의 7명 전문가가 **UX/UI 관점에서** 리뷰. **2라운드** 구조 (Collaborative + Adversarial). UX 중심 체크포인트 추가.
+Worker가 혼자 7명 역할극 수행. 매 라운드 **파일에서 다시 읽기** 필수.
+YOLO 모드 — 사용자 입력/확인/메뉴 표시 금지. 전부 자동.
 
-### YOLO 모드 (절대 규칙)
-```
-- 파티모드는 완전 자동 실행 — 사용자 입력/확인/메뉴 표시 금지
-- 7명 전문가 역할극을 Claude가 혼자 다 수행
-- 매 라운드 시작 시 파일에서 다시 읽기 (기억으로 리뷰 금지)
-- 이슈 발견 → 즉시 수정 → 다음 라운드로 자동 진행
-- PASS/FAIL 판정도 자동 — 사용자에게 "어떻게 할까요?" 물어보지 말 것
-- FAIL이면 자동으로 수정 → 재실행
-```
+### Round 구조
 
-### 7명 전문가 프로필 (역할극용)
+**Round 1 (Collaborative Lens):**
+- 파일에서 다시 읽기 (Read tool — 기억으로 리뷰 금지)
+- 전문가 4~5명이 우호적 관점에서 리뷰
+- 크로스톡 2회 이상
+- 최소 2개 이슈 발견 (0개 = 재분석)
+- 발견된 이슈 즉시 수정
+- party-logs에 저장
 
-**John (PM — Product Manager)**
-- 성격: "WHY?"를 끊임없이 묻는 형사 같은 스타일. 직설적이고 날카로움.
-- UXUI 관점: 사용자 가치, 요구사항 갭, 우선순위. v1에서 동작했던 기능이 빠지면 즉시 지적.
+**Round 2 (Adversarial Lens):**
+- 수정된 파일에서 다시 읽기 (Read tool)
+- 전문가 전원(7명)이 적대적 관점으로 전환
+- Round 1 수정이 진짜 고쳐졌는지 검증
+- 각 전문가 최소 1개 새 관찰 (Round 1에 없던 것)
+- 현재 백엔드 코드 기준으로 기능 커버리지 확인 (v1-feature-spec 직접 참조 금지)
+- 발견된 이슈 즉시 수정
+- party-logs에 저장
 
-**Winston (Architect)**
-- 성격: 차분하고 실용적. "할 수 있는 것"과 "해야 하는 것"의 균형을 잡음.
-- UXUI 관점: 컴포넌트 구조, Tailwind 클래스 합리성, 재사용성, 하드코딩 값 감지.
+**Round 3 (Forensic Lens):**
+- 최종 파일에서 다시 읽기 (Read tool)
+- Round 1+2의 모든 이슈를 재평가 (과장 → 하향, 과소평가 → 상향)
+- 각 전문가 최종 평가 (2~3문장, 인격 반영)
+- 품질 점수 X/10 + PASS (7+) 또는 FAIL (6-)
+- party-logs에 저장
+- FAIL → 수정 후 3라운드 전체 재실행
 
-**Sally (UX Designer)**
-- 성격: 공감 능력 높은 사용자 옹호자. 문제를 "느끼게" 만듦.
-- UXUI 관점: 사용자 흐름, 접근성, 인터랙션, 반응형, 시각적 위계, 빈 상태/에러 상태.
+### Party Log 형식
 
-**Amelia (Developer)**
-- 성격: 초간결. 파일 경로와 코드로 말함. 정밀도 극대화.
-- UXUI 관점: data-testid 누락, 구현 가능성, 기능 로직 변경 여부 감시, 기술 부채.
-
-**Quinn (QA Engineer)**
-- 성격: 실용적이고 직설적. 커버리지 우선.
-- UXUI 관점: 엣지케이스(빈 상태, 에러, 로딩), 테스트 커버리지, 콘솔 에러, 회귀 리스크.
-
-**Bob (Scrum Master)**
-- 성격: 간결하고 체크리스트 중심. 모호함에 대한 관용 제로.
-- UXUI 관점: 작업 범위 현실성, UI만 변경하는지 감시, 다른 페이지 영향 없는지 확인.
-
-**Mary (Business Analyst)**
-- 성격: 보물찾기하듯 흥분하는 스타일. 패턴 발견하면 에너지 폭발.
-- UXUI 관점: 비즈니스 가치, 사용자가 핵심 작업을 쉽게 완료할 수 있는지.
-
-### Party Mode 적용 시점
-
-| 단계 | 파티모드 | 무엇을 리뷰하는가 |
-|------|---------|------------------|
-| **설명서 작성 후** | 2라운드 | 디자인 방향이 맞는지, UX가 합리적인지 |
-| **v0 코드 통합 후** | 2라운드 | v0 코드 + Claude 보완이 완전한지 |
-| 테스트 | 파티모드 없음 | Playwright가 자동 검증 |
-
-**총: 페이지당 4라운드 (설명서 2 + 코드통합 2)**
-
-### UXUI 전용 체크포인트
-
-**설명서 리뷰 시:**
-```
-- Sally(UX): 사용자 흐름이 자연스러운가? 핵심 동작이 3클릭 이내인가?
-- Winston(Architect): 컴포넌트 구조가 합리적인가? 재사용 가능한가?
-- Amelia(Dev): data-testid 목록이 빠짐없는가? 구현 가능한가?
-- Quinn(QA): 엣지케이스(빈 상태, 에러, 로딩)가 정의되어 있는가?
-- John(PM): v1에서 동작했던 기능이 모두 커버되는가?
-- Bob(SM): 작업 범위가 현실적인가? UI만 바꾸고 기능은 안 건드리는가?
-- Mary(BA): 이 페이지의 비즈니스 가치가 명확한가?
-```
-
-**코드통합 리뷰 시:**
-```
-- Sally(UX): v0 디자인이 사용성 있는가? 반응형 깨지는 곳 없는가?
-- Winston(Architect): Tailwind 클래스가 합리적인가? 하드코딩된 값 없는가?
-- Amelia(Dev): data-testid가 전부 추가됐는가? 기능 로직을 건드리지 않았는가?
-- Quinn(QA): 콘솔 에러 없는가? 로딩/에러/빈 상태 처리됐는가?
-- John(PM): v1에서 동작했던 기능이 깨지지 않았는가?
-- Bob(SM): 변경 범위가 해당 페이지에 한정되는가? 다른 페이지 영향 없는가?
-- Mary(BA): 사용자가 이 화면에서 핵심 작업을 쉽게 완료할 수 있는가?
-```
-
-### Party Log 저장 위치
+kdh-full-auto-pipeline의 Party Log 형식과 동일.
+저장 경로: `_uxui-refactoring/party-logs/`
 
 ```
 _uxui-refactoring/party-logs/
-├── spec-01-command-center-round1.md
-├── spec-01-command-center-round2.md
-├── code-01-command-center-round1.md    ← v0 통합 후 리뷰
+├── prompt-01-command-center-round1.md
+├── prompt-01-command-center-round2.md
+├── prompt-01-command-center-round3.md
+├── code-01-command-center-round1.md
 ├── code-01-command-center-round2.md
+├── code-01-command-center-round3.md
 ...
 ```
 
-### Round 구조 (2라운드 — 각 step별 2번)
+---
 
-**Round 1 (Collaborative Lens):**
-- 전문가 7명 전원이 우호적 관점에서 리뷰
-- 각 전문가가 자기 전문 분야에서 **3~5문장** 코멘트 (인격 반영 필수)
-- **최소 2개 이슈 발견** (0개 = 재분석)
-- 크로스톡 2회 이상
-- 발견된 이슈 즉시 수정 후 Round 2로
+## Mode: prompt PAGENAME (Lovable 프롬프트 생성 + 3라운드 파티모드)
 
-**Round 2 (Adversarial Lens):**
-- 전문가 전원이 **적대적 관점으로 전환**
-- Round 1에서 수정한 것이 진짜 고쳐졌는지 검증
-- v1-feature-spec.md 기능 커버리지 **최종 확인**
-- **최소 1개 새 이슈 발견**
-- 이슈 심각도 분류: Critical / Major / Medium / Low
-- 품질 점수 X/10
-- PASS (7+) 또는 FAIL (6-)
-- FAIL 시 이슈 수정 → 2라운드 재실행
-
-### 이슈 심각도 기준
+### Worker 스폰 프롬프트
 
 ```
-Critical: 기존 기능 누락, 핵심 사용 흐름 불가능, 데이터 바인딩 오류
-Major:    반응형 깨짐, 중요 testid 누락, 상태 정의 누락 (에러/로딩/빈)
-Medium:   색상 체계 불일치, 엣지케이스 미정의
-Low:      구현 시 해결 가능한 세부사항, 선택적 개선
+You are a UXUI wireframe prompt writer for CORTHEX v2. You generate design prompts for Lovable AND self-review them with 3-round party mode.
+YOLO mode -- auto-proceed through all prompts, never wait for user input.
+
+## CRITICAL RULE: Lovable has COMPLETE creative freedom on everything visual
+Your prompt must NEVER contain:
+- Colors, hex codes, gradients
+- Font names, sizes, weights
+- px/rem values, layout ratios, column widths
+- Component library names
+- Placement instructions ("left sidebar", "right panel")
+
+Your prompt must ONLY contain:
+- What the page is for (purpose, context)
+- What data is displayed (entities, fields, states, relationships)
+- What actions users can take (every interaction, button, form, modal)
+- UX considerations (functional only — information hierarchy, edge cases, mobile adaptation)
+
+## Your References (MUST read before writing)
+1. Current page code: packages/{app|admin}/src/pages/{페이지명}/ (현재 코드 — 어떤 데이터/기능이 있는지 파악)
+2. Backend routes: packages/server/src/routes/ (API 엔드포인트 — 실제 데이터 확인)
+3. Database schema: packages/server/src/db/schema.ts (엔티티 구조)
+4. Shared types: packages/shared/src/types.ts (타입 정의)
+
+IMPORTANT: Only describe features that CURRENTLY EXIST in the v2 codebase.
+Do NOT reference v1-feature-spec.md directly — some features were removed in v2.
+Read the actual code to confirm what exists.
+
+## Your Task: Generate Lovable prompt for {페이지명} (page #{번호})
+
+### Step 1: Read Current Code
+- Read all files in the page directory
+- Read relevant backend routes
+- Read relevant schema tables
+- Understand: what data exists, what API calls are made, what state is managed
+
+### Step 2: Write Lovable Prompt
+Save to: _uxui-refactoring/lovable-prompts/{번호}-{페이지명}.md
+
+Structure:
+# {번호}. {페이지명} — Wireframe Prompt
+
+## 복사할 프롬프트:
+(User copies everything below this line to Lovable)
+
+### What This Page Is For
+### Data Displayed — In Detail
+### User Actions
+### UX Considerations
+### What NOT to Include on This Page
+
+### Step 3: Self-Review 3 Rounds (Party Mode)
+Round 1 (Collaborative): party-logs/prompt-{번호}-{페이지명}-round1.md
+Round 2 (Adversarial): party-logs/prompt-{번호}-{페이지명}-round2.md
+Round 3 (Forensic): party-logs/prompt-{번호}-{페이지명}-round3.md
+
+ADVERSARIAL CHECKLIST (Round 2+3):
+- [ ] Zero color/font/size/layout mentions? (ANY visual spec = instant FAIL)
+- [ ] Only describes currently existing v2 features? (deleted features included = FAIL)
+- [ ] Data descriptions match actual schema.ts fields?
+- [ ] Actions match actual frontend event handlers?
+- [ ] Edge cases defined (empty state, error, loading, mobile)?
+- [ ] Lovable has enough context to understand what to design?
+- [ ] Description is specific and detailed (not vague)?
+
+### Step 4: Report to Orchestrator
+[Step Complete] prompt-{번호}-{페이지명}
+Content summary: (1~2줄)
+Party mode: 3 rounds passed (issues fixed: N)
+Quality score: X/10
+Changed files: (경로들)
+```
+
+---
+
+## Mode: prompt-batch PRIORITY (일괄 프롬프트 생성)
+
+```
+1. 해당 우선순위의 모든 페이지에 대해 순차 실행
+2. 페이지당: 현재 코드 읽기 → 프롬프트 생성 → 파티모드 3라운드
+3. 5페이지마다 Worker shutdown + 새 Worker 스폰 (컨텍스트 관리)
+4. 전체 완료 후 오케스트레이터가 일괄 커밋
+```
+
+---
+
+## Mode: code PAGENAME (리팩토링 + 3라운드 파티모드 + Playwright)
+
+### 전제 조건
+- `prompt PAGENAME` 완료 (프롬프트 파일 존재)
+- Lovable 와이어프레임 존재 (`_uxui-refactoring/wireframes/{번호}-{페이지명}.png`)
+
+### Worker 스폰 프롬프트
+
+```
+You are a UXUI refactoring developer for CORTHEX v2. You implement UI changes based on Lovable wireframes AND self-review with 3-round party mode.
+YOLO mode -- auto-proceed through all prompts, never wait for user input.
+
+## Your References (MUST read before coding)
+1. **Wireframe** (DESIGN GUIDE): _uxui-refactoring/wireframes/{번호}-{페이지명}.png
+   - This is the visual target. Match the wireframe's layout, visual structure, and component arrangement.
+   - Lovable designed this with full creative freedom — follow its design decisions.
+2. **Lovable Prompt**: _uxui-refactoring/lovable-prompts/{번호}-{페이지명}.md (what was requested)
+3. **Current page code**: packages/{app|admin}/src/pages/{페이지명}/ (what exists now)
+
+## ABSOLUTE RULES (break any = instant FAIL)
+1. 기능 로직 건드리지 말 것 — API 호출, 상태관리, 이벤트 핸들러 100% 유지
+2. UI/레이아웃/스타일/Tailwind 클래스만 변경
+3. data-testid 전부 추가 (모든 인터랙션 요소)
+4. 기존 data-testid 삭제 금지
+5. 새 파일 생성 최소화 (기존 파일 수정 선호)
+6. import 경로는 git ls-files 기준 대소문자 정확히 일치
+
+## Your Task: Refactor {페이지명} (page #{번호})
+
+### Step 1: Read References
+- Read wireframe image
+- Read Lovable prompt
+- Read all current page code files
+
+### Step 2: Refactor Code
+For each file in the page:
+1. Match wireframe layout (component arrangement, visual structure)
+2. Update Tailwind classes to match wireframe's visual style
+3. Implement responsive design (desktop + mobile)
+4. Add loading/error/empty state UI where missing
+5. Add data-testid to every interactive element
+6. Preserve all existing functionality
+
+### Step 3: Self-Review 3 Rounds (Party Mode)
+Round 1 (Collaborative): party-logs/code-{번호}-{페이지명}-round1.md
+Round 2 (Adversarial): party-logs/code-{번호}-{페이지명}-round2.md
+Round 3 (Forensic): party-logs/code-{번호}-{페이지명}-round3.md
+
+ADVERSARIAL CHECKLIST (Round 2+3):
+- [ ] Wireframe layout matched?
+- [ ] 기능 로직이 100% 동일? (API 호출, 상태관리, 이벤트 핸들러)
+- [ ] data-testid 전부 추가됨?
+- [ ] 기존 data-testid 삭제 안 됨?
+- [ ] 반응형 (mobile에서 깨지지 않는가)?
+- [ ] 로딩/에러/빈 상태 UI 처리됨?
+- [ ] 다른 페이지에 영향 없음?
+- [ ] import 경로 대소문자 일치?
+
+### Step 4: Write Playwright Tests
+Save to: packages/e2e/src/tests/interaction/{app|admin}/{페이지명}.spec.ts
+
+- 페이지 로드 확인
+- 주요 인터랙션 (클릭, 입력, 내비게이션)
+- data-testid 존재 확인
+- 반응형 테스트 (desktop + mobile viewport)
+
+### Step 5: Run Tests
+- npx playwright test src/tests/interaction/{app|admin}/{페이지명}.spec.ts
+- npx playwright test src/tests/smoke/ (회귀 확인)
+- 실패 시 수정 후 재실행
+
+### Step 6: Report to Orchestrator
+[Step Complete] code-{번호}-{페이지명}
+Content summary: (1~2줄)
+Party mode: 3 rounds passed (issues fixed: N)
+Quality score: X/10
+Tests: N개 작성, 전부 통과
+Changed files: (경로들)
+```
+
+---
+
+## Mode: code-batch PRIORITY (일괄 리팩토링)
+
+```
+1. 해당 우선순위에서 prompt 완료 + wireframe 존재 + code 미완료 페이지 목록 추출
+2. 페이지별로 순차 실행 (code PAGENAME과 동일)
+3. 5페이지마다 Worker shutdown + 새 Worker 스폰
+4. 전체 완료 후 스모크 테스트 전체 실행
 ```
 
 ---
 
 ## Mode: phase0 (Playwright 환경 세팅)
 
-한 번만 실행. Playwright + 테스트 파일 골격 생성.
-
-### 실행 순서
+한 번만 실행. packages/e2e/ 디렉토리에 Playwright 설정 생성.
 
 ```
-1. packages/e2e/ 디렉토리 생성
-2. package.json 생성
-3. playwright.config.ts 생성 (배포 URL 기준)
-4. auth.setup.ts 생성 (로그인 자동화)
-5. .env.test 템플릿 생성
-6. smoke 테스트 파일 생성 (app + admin)
-7. .gitignore 업데이트
-8. npx playwright install chromium
-9. 사용자에게 .env.test 비밀번호 입력 요청
+1. packages/e2e/ 디렉토리 확인 (이미 있으면 스킵)
+2. playwright.config.ts 생성 (baseURL: https://corthex-hq.com)
+3. auth.setup.ts 생성
+4. smoke 테스트 파일 생성 (42페이지)
+5. npx playwright install chromium
+6. 사용자에게 .env.test 비밀번호 입력 요청
 ```
-
-### 완료 조건
-- `npx playwright test --list` 에서 테스트 목록 표시됨
-- 사용자가 `.env.test`에 비밀번호 입력 완료
 
 ---
 
 ## Mode: phase1 (현재 기능 상태 점검)
 
-### 실행 순서
-
 ```
 1. npx playwright test src/tests/smoke/ 실행
 2. 결과 파싱 (통과/실패 페이지 분류)
-3. _uxui-refactoring/phase1-baseline.md 에 결과 기록
-4. 요약 보고 (앱 ??/23 통과, 어드민 ??/19 통과)
-```
-
----
-
-## Mode: spec PAGENAME (설명서 작성 + 파티모드)
-
-### 실행 순서
-
-```
-1. 페이지 번호 + 이름 확인 (우선순위 표 참조)
-2. 해당 페이지 코드 읽기 (pages/, components/)
-3. v1-feature-spec.md에서 해당 기능 확인
-4. 설명서 작성 → _uxui-refactoring/specs/{번호}-{페이지명}.md
-5. ★ 파티모드 2라운드 (설명서 리뷰) ★
-   - Round 1: Collaborative → party-logs/spec-{번호}-{페이지명}-round1.md
-   - Round 2: Adversarial → party-logs/spec-{번호}-{페이지명}-round2.md
-6. PASS (7+) → 커밋: docs(uxui-spec): {페이지명} 설명서 완료 -- 2 party rounds
-7. FAIL (6-) → 이슈 수정 → 2라운드 재실행
-8. 사용자에게 안내: "v0-prompt {페이지명} 으로 v0 프롬프트를 생성하세요"
-```
-
-### 설명서 템플릿
-
-```markdown
-# {페이지명} UX/UI 설명서
-
-## 1. 페이지 목적
-## 2. 현재 레이아웃 분석
-## 3. 현재 문제점
-## 4. 개선 방향
-## 5. 컴포넌트 목록 (개선 후)
-## 6. 데이터 바인딩
-## 7. 색상/톤 앤 매너
-## 8. 반응형 대응
-## 9. v1 참고사항
-## 10. v0.dev 지시사항 (v0가 참고할 핵심 정보)
-## 11. data-testid 목록
-## 12. Playwright 인터랙션 테스트 항목
-```
-
-**섹션 10 변경사항**: 기존 "Banana2 이미지 프롬프트" → "v0.dev 지시사항"
-- v0가 디자인+코딩을 동시에 하므로, 디자인 방향과 기능 요구사항을 함께 기술
-- 레이아웃은 v0에게 자유도 부여 ("Full creative freedom on layout")
-
-### UXUI 전용 체크포인트 (Round 2에서 추가 확인)
-
-```
-- [ ] 핵심 동작이 3클릭 이내?
-- [ ] 빈 상태/에러 상태/로딩 상태 정의됨?
-- [ ] data-testid가 모든 인터랙션 요소에 할당됨?
-- [ ] v1 기능 전부 커버?
-- [ ] v0 지시사항이 기능 요구사항+디자인 방향을 명확히 전달?
-- [ ] 반응형 breakpoint (375px, 768px, 1440px) 명시?
-- [ ] 기능 로직은 안 건드리고 UI만 변경하는 범위?
-```
-
----
-
-## Mode: v0-prompt PAGENAME (v0.dev 프롬프트 생성)
-
-### 전제 조건
-- `spec PAGENAME` 완료 (설명서 존재)
-
-### 실행 순서
-
-```
-1. 설명서 읽기 (specs/{번호}-{페이지명}.md)
-2. 현재 코드 읽기 (해당 페이지 파일들)
-3. v0.dev 표준 프롬프트 생성 (위 템플릿 사용)
-4. 프롬프트를 사용자에게 출력 (복붙용)
-5. 안내: "이 프롬프트를 v0.dev에 붙여넣으세요. v0가 PR을 만들면 알려주세요."
-```
-
-### Mode: v0-prompt-batch PRIORITY (v0 프롬프트 일괄 생성)
-
-```
-1. PROGRESS.md에서 spec 완료 + v0 미완료 페이지 확인
-2. 각 페이지별 v0 프롬프트 생성
-3. 통합 문서로 출력 (사용자가 하나씩 v0에 전달)
-```
-
----
-
-## Mode: integrate PAGENAME (v0 코드 통합 + 보완 + 테스트)
-
-### 전제 조건
-- `spec PAGENAME` 완료 (설명서 존재)
-- v0가 GitHub PR/브랜치 생성 완료
-
-### 실행 순서
-
-```
-1. v0 브랜치 확인 (git branch -r | grep {페이지명})
-2. v0 브랜치 머지 (git merge 또는 cherry-pick)
-3. TypeScript 타입 수정 (JSX.Element → React.ReactNode 등)
-4. data-testid 추가/확인 (설명서 11번 대조)
-5. 백엔드 연결 확인 (API 호출, 상태관리 로직 유지 확인)
-6. 빠진 기능 보완 (v0가 못 만든 부분)
-7. ★ 파티모드 2라운드 (코드 리뷰) ★
-   - Round 1: Collaborative → party-logs/code-{번호}-{페이지명}-round1.md
-   - Round 2: Adversarial → party-logs/code-{번호}-{페이지명}-round2.md
-8. PASS → 인터랙션 테스트 작성
-   - packages/e2e/src/tests/interaction/{app|admin}/{페이지명}.spec.ts
-9. Playwright 테스트 실행
-10. 스모크 테스트 실행 (회귀 확인)
-11. 전부 통과 → 커밋 + 푸시
-    - feat(uxui): {페이지명} UI 리팩토링 -- v0 + 2 party rounds, {N} tests
-12. PROGRESS.md 업데이트
-```
-
-### Claude 보완 체크리스트 (v0 머지 후 필수)
-
-```
-[ ] TypeScript 타입 에러 수정
-[ ] data-testid 전부 추가 (스펙 11번 대조)
-[ ] 기존 data-testid 삭제 안 됐는지 확인
-[ ] 기능 로직(API, 상태관리, 이벤트 핸들러) 유지 확인
-[ ] import 경로 정상 (git ls-files 기준 대소문자)
-[ ] 로딩/에러/빈 상태 UI 처리
-[ ] 반응형 (375px 깨지지 않는가)
-[ ] 다크모드 대응 (dark: 클래스)
-```
-
-### 파티모드 코드통합 리뷰 전용 체크포인트 (Round 2)
-
-```
-- [ ] v0 디자인이 사용성 있는가?
-- [ ] 기능 로직이 변경되지 않았는가? (API 호출, 상태관리 동일)
-- [ ] data-testid 전부 추가됨?
-- [ ] 콘솔 에러 없음?
-- [ ] 로딩/에러/빈 상태 UI 처리됨?
-- [ ] 반응형 (375px에서 깨지지 않는가)?
-- [ ] 다크모드 대응?
-- [ ] 다른 페이지에 영향 없음?
+3. 요약 보고
 ```
 
 ---
 
 ## Mode: phase3 (시각 회귀 기준 등록)
 
-### 전제 조건
-- 1순위 페이지들(최소 9개) UXUI 리팩토링 완료
-
-### 실행 순서
-
 ```
-1. visual regression 테스트 파일 생성 (앱 + 어드민)
-2. npx playwright test src/tests/visual/ --update-snapshots 실행
-3. 기준 스크린샷 생성됨
+1. visual regression 테스트 파일 생성
+2. npx playwright test src/tests/visual/ --update-snapshots
+3. 기준 스크린샷 생성
 4. 커밋: test(visual): baseline screenshots for new UXUI
-5. 안내: "이후 코드 수정 시 npx playwright test src/tests/visual/ 로 UI 깨짐 감지 가능"
 ```
 
 ---
 
 ## Mode: final (최종 전체 검증)
 
-### 실행 순서
-
 ```
 1. npx playwright test src/tests/smoke/ (전 페이지 접근)
 2. npx playwright test src/tests/interaction/ (기능 동작)
 3. npx playwright test src/tests/visual/ (스크린샷 비교)
-4. 결과 종합 리포트 생성
-5. 실패 항목 있으면 원인 분석 + 수정 제안
+4. 결과 종합 리포트
+5. 실패 항목 있으면 Worker 스폰해서 수정
 6. 전부 통과 → "UXUI 리팩토링 완료" 선언
 ```
 
@@ -422,17 +432,33 @@ Low:      구현 시 해결 가능한 세부사항, 선택적 개선
 
 ## Mode: 인자 없음 (진행 상황 + 다음 안내)
 
-### 실행 순서
+```
+1. _uxui-refactoring/ 폴더 구조 확인
+2. lovable-prompts/, wireframes/, party-logs/ 존재 확인
+3. 현재 진행 상황 요약 (완료/진행중/남은 페이지)
+4. 다음 할 일 안내
+```
+
+---
+
+## 저장 위치
 
 ```
-1. _uxui-refactoring/PROGRESS.md 읽기
-2. 현재 진행 상황 요약 (완료/진행중/남은 페이지)
-3. 다음 할 일 안내:
-   - Phase 0 안 했으면 → "phase0부터 시작하세요"
-   - Phase 1 안 했으면 → "phase1으로 현재 상태 점검하세요"
-   - 다음 페이지 spec 필요하면 → "spec {페이지명} 으로 설명서 작성하세요"
-   - spec 완료 + v0 미완료이면 → "v0-prompt {페이지명} 으로 프롬프트를 생성하세요"
-   - v0 PR 완료이면 → "integrate {페이지명} 으로 통합하세요"
+_uxui-refactoring/
+├── lovable-prompts/          (Worker가 생성한 Lovable 프롬프트)
+│   ├── 00-context.md         (모든 페이지 공통 제품 컨텍스트 — 처음 한 번만 Lovable에 전달)
+│   ├── 01-command-center.md
+│   ├── 02-chat.md
+│   ...
+├── wireframes/               (사용자가 Lovable에서 받아 저장한 스크린샷)
+│   ├── 01-command-center.png
+│   ├── 02-chat.png
+│   ...
+├── party-logs/               (파티모드 리뷰 로그)
+│   ├── prompt-01-command-center-round1.md
+│   ├── code-01-command-center-round1.md
+│   ...
+└── (이전 파일들은 삭제됨: design-system/, PROGRESS.md, WORKFLOW.md)
 ```
 
 ---
@@ -486,31 +512,53 @@ Low:      구현 시 해결 가능한 세부사항, 선택적 개선
 
 ---
 
-## 참조 파일 위치
+## Worker 스폰 규칙
 
-| 항목 | 경로 |
-|------|------|
-| 이 파이프라인 | `.claude/commands/kdh-uxui-pipeline.md` |
-| 워크플로우 문서 | `_uxui-refactoring/WORKFLOW.md` |
-| 설명서 | `_uxui-refactoring/specs/*.md` |
-| 파티 로그 | `_uxui-refactoring/party-logs/*.md` |
-| 진행 상황 | `_uxui-refactoring/PROGRESS.md` |
-| Phase 1 결과 | `_uxui-refactoring/phase1-baseline.md` |
-| v1 기능 스펙 | `_bmad-output/planning-artifacts/v1-feature-spec.md` |
+```
+1. 반드시 첫 작업을 spawn 프롬프트에 포함 — "기다려" 금지
+2. Worker에게 mode=bypassPermissions 부여
+3. 5개 이상 페이지 처리하면 shutdown + 새 Worker 스폰 (컨텍스트 관리)
+4. Worker가 멈추면 SendMessage로 리마인더
+5. Worker가 FAIL 보고 → 자동 재시도 1회 → 2번째 FAIL → 오케스트레이터 개입
+```
+
+---
+
+## 트러블슈팅
+
+### Worker가 스텝 완료 없이 멈춤
+**해결:** SendMessage: "Continue working. Complete 3-round self-review and report back."
+2번 리마인더 후에도 안 되면 shutdown + 새 Worker 스폰.
+
+### Worker가 파티모드 라운드를 건너뜀
+**해결:** 거부: "Party logs missing. Redo 3-round self-review."
+
+### Worker가 프롬프트에 색상/폰트/레이아웃을 넣음
+**해결:** 즉시 FAIL. "Remove ALL visual specifications. Lovable has full creative freedom."
+
+### Worker가 삭제된 v1 기능을 프롬프트에 넣음
+**해결:** FAIL. "Only describe features that exist in current v2 code. Read the actual code, not v1-feature-spec."
+
+### TypeScript 타입 체크 실패
+**해결:** Worker가 수정 또는 오케스트레이터가 직접 수정. 커밋 전 반드시 통과.
+
+### Playwright 테스트 실패
+**해결:** 커밋+푸시 후 2분 대기 → 재실행. 인증 실패면 auth.setup.ts 확인.
 
 ---
 
 ## 절대 규칙
 
-1. **기능 로직 건드리지 말 것** — UI/스타일만 변경
-2. **파티모드 없이 설명서 넘어가지 말 것** — spec 2라운드 필수
-3. **파티모드 없이 코드 커밋하지 말 것** — integrate 2라운드 필수
-4. **Playwright 테스트 실패 시 커밋 금지**
-5. **data-testid 누락 시 커밋 금지**
-6. **v1에서 동작했던 기능이 깨지면 즉시 수정**
-7. **v0 없이 직접 UI 코딩하지 말 것** — v0가 디자인+코딩, Claude는 보완만
-8. **각 파티모드는 파일에서 다시 읽어서 리뷰** (기억으로 리뷰 금지)
-9. **전문가 코멘트는 3~5문장** (한 줄짜리 금지, 인격 반영 필수)
-10. **"이슈 0개" = 재분석** (BMAD 프로토콜)
-11. **Round 1 최소 2개, Round 2 최소 1개 신규 이슈 발견** 필수
-12. **v0 모델: v0 Pro 기본 사용** (복잡한 페이지만 v0 Max)
+1. **Lovable에게 디자인 전권 위임** — 프롬프트에 시각적 지시 제로
+2. **v2 현재 코드 기준** — v1-feature-spec 직접 참조 금지 (삭제된 기능 부활 방지)
+3. **기능 로직 건드리지 말 것** — UI/스타일만 변경
+4. **파티모드 3라운드 없이 커밋하지 말 것**
+5. **Playwright 테스트 실패 시 커밋 금지**
+6. **data-testid 누락 시 커밋 금지**
+7. **각 파티모드는 파일에서 다시 읽어서 리뷰** (기억으로 리뷰 금지)
+8. **전문가 코멘트는 2~3문장 이상** (한 줄짜리 금지, 인격 반영 필수)
+9. **"이슈 0개" = 재분석** (BMAD 프로토콜)
+10. **오케스트레이터는 코딩/파티모드 직접 안 함** — Worker가 전부 처리
+11. **Worker spawn 시 첫 작업 포함 필수** — "기다려" 금지
+12. **커밋 전 npx tsc --noEmit 필수**
+13. **5페이지마다 Worker shutdown + 새 Worker 스폰** (컨텍스트 관리)
