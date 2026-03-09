@@ -140,3 +140,9 @@
 - 컴포넌트명: PascalCase
 - API 응답: `{ success: true, data }` / `{ success: false, error: { code, message } }`
 - 테스트: bun:test (서버)
+
+## 컨텍스트 메모리 규칙 (컴팩션 대비)
+- 중요한 결정/방향 전환이 있을 때마다 `.claude/memory/working-state.md`에 현재 상태 기록
+- 긴 작업 중 자연스러운 구간(기능 하나 완료, 방향 전환 등)마다 자동 업데이트
+- 기록 항목: (1) 지금 하고 있는 것 (2) 핵심 결정사항 (3) 다음 할 것 (4) 주의사항
+- 세션 종료 시 `.claude/memory/YYYY-MM-DD-주제.md`로 세션 요약 저장
