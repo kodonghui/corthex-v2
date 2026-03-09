@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
-import { Badge, Input, SkeletonTable, EmptyState, Modal, ConfirmDialog, Tabs, toast } from '@corthex/ui'
+import { Badge, SkeletonTable, EmptyState, Modal, ConfirmDialog, toast } from '@corthex/ui'
 import { MarkdownRenderer } from '../components/markdown-renderer'
 
 // === Types ===
@@ -70,24 +70,33 @@ type Agent = { id: string; name: string; departmentId: string | null }
 
 const PAGE_SIZE = 20
 
-const CONTENT_TYPE_BADGE: Record<ContentType, { label: string; variant: 'success' | 'info' | 'warning' | 'error' }> = {
-  markdown: { label: 'MD', variant: 'info' },
-  text: { label: 'TXT', variant: 'success' },
-  html: { label: 'HTML', variant: 'warning' },
-  mermaid: { label: 'Mermaid', variant: 'error' },
+const CONTENT_TYPE_COLORS: Record<ContentType, string> = {
+  markdown: 'bg-blue-500/20 text-blue-400',
+  text: 'bg-slate-600/50 text-slate-300',
+  html: 'bg-orange-500/20 text-orange-400',
+  mermaid: 'bg-purple-500/20 text-purple-400',
 }
 
-const MEMORY_TYPE_BADGE: Record<MemoryType, { label: string; variant: 'success' | 'info' | 'warning' | 'error' }> = {
-  learning: { label: '학습', variant: 'info' },
-  insight: { label: '인사이트', variant: 'success' },
-  preference: { label: '선호', variant: 'warning' },
-  fact: { label: '사실', variant: 'error' },
+const CONTENT_TYPE_LABELS: Record<ContentType, string> = {
+  markdown: 'markdown',
+  text: '텍스트',
+  html: 'HTML',
+  mermaid: 'Mermaid',
 }
 
-const TAB_ITEMS = [
-  { value: 'docs', label: '문서' },
-  { value: 'memories', label: '에이전트 기억' },
-]
+const MEMORY_TYPE_COLORS: Record<MemoryType, string> = {
+  learning: 'bg-emerald-500/20 text-emerald-400',
+  insight: 'bg-purple-500/20 text-purple-400',
+  preference: 'bg-blue-500/20 text-blue-400',
+  fact: 'bg-amber-500/20 text-amber-400',
+}
+
+const MEMORY_TYPE_LABELS: Record<MemoryType, string> = {
+  learning: '학습',
+  insight: '인사이트',
+  preference: '선호',
+  fact: '사실',
+}
 
 // === Helpers ===
 
@@ -143,26 +152,51 @@ function findFolderName(folders: KnowledgeFolder[], id: string): string | null {
 
 export function KnowledgePage() {
   const queryClient = useQueryClient()
-  const [activeTab, setActiveTab] = useState('docs')
+  const [activeTab, setActiveTab] = useState<'docs' | 'memories'>('docs')
   const [showFolderTree, setShowFolderTree] = useState(true)
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col bg-slate-900" data-testid="knowledge-page">
       {/* Header */}
-      <div className="px-4 md:px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+      <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowFolderTree(!showFolderTree)}
-            className="md:hidden px-2 py-1 text-xs border border-zinc-200 dark:border-zinc-700 rounded hover:bg-zinc-50 dark:hover:bg-zinc-800"
+            className="md:hidden p-1.5 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors"
+            aria-label={showFolderTree ? '폴더 숨기기' : '폴더 보기'}
           >
-            {showFolderTree ? '폴더 숨기기' : '폴더 보기'}
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
           </button>
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">📚 정보국</h2>
+          <h1 className="text-lg font-semibold text-slate-50">지식 베이스</h1>
+        </div>
+        {/* Tabs */}
+        <div className="flex gap-0">
+          <button
+            onClick={() => setActiveTab('docs')}
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+              activeTab === 'docs'
+                ? 'bg-blue-600/20 text-blue-400'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+            data-testid="tab-docs"
+          >
+            문서
+          </button>
+          <button
+            onClick={() => setActiveTab('memories')}
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+              activeTab === 'memories'
+                ? 'bg-blue-600/20 text-blue-400'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+            data-testid="tab-memories"
+          >
+            에이전트 기억
+          </button>
         </div>
       </div>
-
-      {/* Tabs */}
-      <Tabs items={TAB_ITEMS} value={activeTab} onChange={setActiveTab} />
 
       {/* Tab content */}
       {activeTab === 'docs' ? (
@@ -177,12 +211,11 @@ export function KnowledgePage() {
 // === Docs Tab ===
 
 function DocsTab({ showFolderTree, queryClient }: { showFolderTree: boolean; queryClient: ReturnType<typeof useQueryClient> }) {
-  // State
   const [page, setPage] = useState(1)
   const [searchInput, setSearchInput] = useState('')
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null)
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
-  const [sortBy, setSortBy] = useState<'updatedAt' | 'title'>('updatedAt')
+  const [contentTypeFilter, setContentTypeFilter] = useState<ContentType | ''>('')
   const [detailDoc, setDetailDoc] = useState<KnowledgeDoc | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [editDoc, setEditDoc] = useState<KnowledgeDoc | null>(null)
@@ -194,19 +227,17 @@ function DocsTab({ showFolderTree, queryClient }: { showFolderTree: boolean; que
 
   const debouncedSearch = useDebounce(searchInput, 300)
 
-  // Build query params
   const buildParams = useCallback(() => {
     const params = new URLSearchParams({ page: String(page), limit: String(PAGE_SIZE) })
     if (debouncedSearch) params.set('search', debouncedSearch)
     if (selectedFolderId) params.set('folderId', selectedFolderId)
     if (selectedTag) params.set('tag', selectedTag)
-    if (sortBy === 'title') params.set('sortBy', 'title')
+    if (contentTypeFilter) params.set('contentType', contentTypeFilter)
     return params.toString()
-  }, [page, debouncedSearch, selectedFolderId, selectedTag, sortBy])
+  }, [page, debouncedSearch, selectedFolderId, selectedTag, contentTypeFilter])
 
-  // Queries
   const docsQuery = useQuery({
-    queryKey: ['knowledge-docs', page, debouncedSearch, selectedFolderId, selectedTag, sortBy],
+    queryKey: ['knowledge-docs', page, debouncedSearch, selectedFolderId, selectedTag, contentTypeFilter],
     queryFn: () => api.get<{ data: { items: KnowledgeDoc[]; page: number; limit: number; total: number } }>(`/workspace/knowledge/docs?${buildParams()}`),
   })
 
@@ -224,19 +255,6 @@ function DocsTab({ showFolderTree, queryClient }: { showFolderTree: boolean; que
   const total = docsQuery.data?.data?.total ?? 0
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
   const folders = foldersQuery.data?.data ?? []
-  const tags = tagsQuery.data?.data ?? []
-
-  // Filter chips
-  const filterChips = useMemo(() => {
-    const chips: { key: string; label: string; onRemove: () => void }[] = []
-    if (debouncedSearch) chips.push({ key: 'search', label: `검색: ${debouncedSearch}`, onRemove: () => { setSearchInput(''); setPage(1) } })
-    if (selectedFolderId) {
-      const name = findFolderName(folders, selectedFolderId)
-      chips.push({ key: 'folder', label: `폴더: ${name || '선택됨'}`, onRemove: () => { setSelectedFolderId(null); setPage(1) } })
-    }
-    if (selectedTag) chips.push({ key: 'tag', label: `태그: ${selectedTag}`, onRemove: () => { setSelectedTag(null); setPage(1) } })
-    return chips
-  }, [debouncedSearch, selectedFolderId, selectedTag, folders])
 
   // Upload handler
   const handleUploadFiles = useCallback(async (files: FileList | File[]) => {
@@ -266,29 +284,13 @@ function DocsTab({ showFolderTree, queryClient }: { showFolderTree: boolean; que
     if (errorCount > 0) toast.error(`${errorCount}개 파일 업로드 실패`)
   }, [selectedFolderId, queryClient])
 
-  // Drag-and-drop handlers
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDragOver(true)
-  }, [])
-
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDragOver(false)
-  }, [])
-
+  const handleDragOver = useCallback((e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); setDragOver(true) }, [])
+  const handleDragLeave = useCallback((e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); setDragOver(false) }, [])
   const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDragOver(false)
-    if (e.dataTransfer.files.length > 0) {
-      handleUploadFiles(e.dataTransfer.files)
-    }
+    e.preventDefault(); e.stopPropagation(); setDragOver(false)
+    if (e.dataTransfer.files.length > 0) handleUploadFiles(e.dataTransfer.files)
   }, [handleUploadFiles])
 
-  // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: (id: string) => api.delete(`/workspace/knowledge/docs/${id}`),
     onSuccess: () => {
@@ -303,20 +305,20 @@ function DocsTab({ showFolderTree, queryClient }: { showFolderTree: boolean; que
 
   return (
     <div className="flex-1 flex overflow-hidden">
-      {/* Left: Folder tree */}
+      {/* Sidebar */}
       {showFolderTree && (
-        <div className="w-56 lg:w-64 border-r border-zinc-200 dark:border-zinc-800 flex flex-col overflow-y-auto bg-zinc-50/50 dark:bg-zinc-900/50">
+        <aside className="w-64 border-r border-slate-700 bg-slate-800/50 flex flex-col overflow-y-auto" data-testid="folder-sidebar">
           <FolderTree
             folders={folders}
             selectedFolderId={selectedFolderId}
             onSelectFolder={(id) => { setSelectedFolderId(id); setPage(1); setDetailDoc(null) }}
             queryClient={queryClient}
           />
-        </div>
+        </aside>
       )}
 
-      {/* Right: List or detail */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      {/* Main content */}
+      <main className="flex-1 flex flex-col overflow-hidden">
         {detailDoc ? (
           <DocDetailView
             doc={detailDoc}
@@ -329,29 +331,50 @@ function DocsTab({ showFolderTree, queryClient }: { showFolderTree: boolean; que
           />
         ) : (
           <>
-            {/* Toolbar */}
-            <div className="px-4 md:px-6 py-3 border-b border-zinc-100 dark:border-zinc-800 flex flex-wrap gap-2 items-center">
-              <Input
-                placeholder="검색..."
-                value={searchInput}
-                onChange={(e) => { setSearchInput(e.target.value); setPage(1) }}
-                className="text-xs h-8 w-40 md:w-48"
-              />
+            {/* Search + Filters Bar */}
+            <div className="px-6 py-3 border-b border-slate-700/50 flex flex-wrap items-center gap-3">
+              <div className="relative flex-1 min-w-[200px] max-w-sm">
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input
+                  placeholder="문서 검색..."
+                  value={searchInput}
+                  onChange={(e) => { setSearchInput(e.target.value); setPage(1) }}
+                  className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 outline-none transition-colors"
+                  data-testid="doc-search"
+                />
+              </div>
               <select
-                value={sortBy}
-                onChange={(e) => { setSortBy(e.target.value as 'updatedAt' | 'title'); setPage(1) }}
-                className="text-xs h-8 px-2 border border-zinc-200 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300"
+                value={contentTypeFilter}
+                onChange={(e) => { setContentTypeFilter(e.target.value as ContentType | ''); setPage(1) }}
+                className="bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-300 outline-none focus:border-blue-500"
               >
-                <option value="updatedAt">최신순</option>
-                <option value="title">이름순</option>
+                <option value="">전체 유형</option>
+                <option value="markdown">Markdown</option>
+                <option value="text">텍스트</option>
+                <option value="html">HTML</option>
+                <option value="mermaid">Mermaid</option>
               </select>
-              <div className="flex-1" />
+              <input
+                placeholder="태그 필터..."
+                value={selectedTag || ''}
+                onChange={(e) => { setSelectedTag(e.target.value || null); setPage(1) }}
+                className="bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 outline-none focus:border-blue-500 w-32"
+              />
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors flex items-center gap-2"
+                data-testid="create-doc-button"
+              >
+                <span>+</span> 문서 작성
+              </button>
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="px-3 py-1.5 text-xs border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300"
+                className="px-3 py-2 text-sm border border-slate-600 rounded-lg text-slate-300 hover:bg-slate-700 disabled:opacity-50 transition-colors"
               >
-                {uploading ? '업로드 중...' : '📎 파일 업로드'}
+                {uploading ? '업로드 중...' : '파일 업로드'}
               </button>
               <input
                 ref={fileInputRef}
@@ -360,58 +383,12 @@ function DocsTab({ showFolderTree, queryClient }: { showFolderTree: boolean; que
                 className="hidden"
                 onChange={(e) => { if (e.target.files) handleUploadFiles(e.target.files); e.target.value = '' }}
               />
-              <button
-                onClick={() => setShowCreateModal(true)}
-                className="px-3 py-1.5 text-xs bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-              >
-                + 새 문서
-              </button>
             </div>
-
-            {/* Tags bar */}
-            {tags.length > 0 && (
-              <div className="px-4 md:px-6 py-2 border-b border-zinc-100 dark:border-zinc-800 flex flex-wrap gap-1.5">
-                {tags.slice(0, 15).map(t => (
-                  <button
-                    key={t.tag}
-                    onClick={() => { setSelectedTag(selectedTag === t.tag ? null : t.tag); setPage(1) }}
-                    className={`px-2 py-0.5 text-[10px] rounded-full transition-colors ${
-                      selectedTag === t.tag
-                        ? 'bg-indigo-600 text-white'
-                        : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
-                    }`}
-                  >
-                    {t.tag} <span className="opacity-60">{t.count}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Filter chips */}
-            {filterChips.length > 0 && (
-              <div className="px-4 md:px-6 py-2 border-b border-zinc-100 dark:border-zinc-800 flex flex-wrap gap-1.5">
-                {filterChips.map(chip => (
-                  <span
-                    key={chip.key}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full"
-                  >
-                    {chip.label}
-                    <button onClick={chip.onRemove} className="text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-200 ml-0.5">×</button>
-                  </span>
-                ))}
-                <button
-                  onClick={() => { setSearchInput(''); setSelectedFolderId(null); setSelectedTag(null); setPage(1) }}
-                  className="text-[11px] text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 px-2 py-1"
-                >
-                  전체 초기화
-                </button>
-              </div>
-            )}
 
             {/* Document list with drop zone */}
             <div
-              className={`flex-1 overflow-auto px-4 md:px-6 py-3 relative transition-colors ${
-                dragOver ? 'bg-indigo-50/50 dark:bg-indigo-950/30' : ''
+              className={`flex-1 overflow-auto p-6 relative transition-colors ${
+                dragOver ? 'bg-blue-500/5' : ''
               }`}
               onDragOver={handleDragOver}
               onDragEnter={handleDragOver}
@@ -420,87 +397,104 @@ function DocsTab({ showFolderTree, queryClient }: { showFolderTree: boolean; que
             >
               {/* Drag overlay */}
               {dragOver && (
-                <div className="absolute inset-4 border-2 border-dashed border-indigo-400 dark:border-indigo-600 rounded-xl flex flex-col items-center justify-center bg-indigo-50/80 dark:bg-indigo-950/80 z-10 pointer-events-none">
+                <div className="absolute inset-4 border-2 border-dashed border-blue-500/50 rounded-xl flex flex-col items-center justify-center bg-blue-500/10 z-10 pointer-events-none">
                   <span className="text-3xl mb-2">📁</span>
-                  <span className="text-sm font-medium text-indigo-700 dark:text-indigo-300">파일을 놓으세요</span>
-                  <span className="text-xs text-indigo-500">여러 파일을 동시에 업로드할 수 있습니다</span>
+                  <span className="text-sm font-medium text-blue-300">파일을 놓으세요</span>
                 </div>
               )}
 
               {docsQuery.isLoading ? (
                 <SkeletonTable rows={8} />
               ) : items.length === 0 ? (
-                <EmptyState
-                  icon={<span className="text-3xl">📚</span>}
-                  title="문서가 없습니다"
-                  description="새 문서를 작성하거나 파일을 드래그하여 업로드하세요."
-                  action={
-                    <button
-                      onClick={() => setShowCreateModal(true)}
-                      className="mt-2 px-4 py-2 text-xs bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-                    >
-                      새 문서 작성
-                    </button>
-                  }
-                />
+                <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="docs-empty">
+                  <div className="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center mb-4">
+                    <svg className="w-8 h-8 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-base font-medium text-slate-300 mb-2">이 폴더에 문서가 없습니다</h3>
+                  <p className="text-sm text-slate-500 mb-4">문서를 만들어 지식을 정리해보세요</p>
+                  <button
+                    onClick={() => setShowCreateModal(true)}
+                    className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                  >문서 만들기</button>
+                </div>
               ) : (
-                <div className="space-y-1">
-                  {items.map(doc => (
-                    <div
-                      key={doc.id}
-                      onClick={() => setDetailDoc(doc)}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/50 border border-transparent hover:border-zinc-200 dark:hover:border-zinc-700 transition-colors"
-                    >
-                      <span className="text-base">
-                        {doc.fileUrl ? '📎' : doc.contentType === 'mermaid' ? '📊' : '📄'}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200 truncate">{doc.title}</p>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <Badge variant={CONTENT_TYPE_BADGE[doc.contentType]?.variant || 'info'}>
-                            {CONTENT_TYPE_BADGE[doc.contentType]?.label || doc.contentType}
-                          </Badge>
-                          {doc.tags.slice(0, 2).map(tag => (
-                            <span key={tag} className="text-[9px] px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 rounded">
-                              {tag}
+                <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden" data-testid="doc-table">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-slate-700">
+                        <th className="text-left py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">제목</th>
+                        <th className="text-left py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-24">유형</th>
+                        <th className="text-left py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">태그</th>
+                        <th className="text-right py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-32">수정일</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-700/50">
+                      {items.map(doc => (
+                        <tr
+                          key={doc.id}
+                          onClick={() => setDetailDoc(doc)}
+                          className="hover:bg-slate-700/30 cursor-pointer transition-colors"
+                          data-testid={`doc-row-${doc.id}`}
+                        >
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-2">
+                              <svg className="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              </svg>
+                              <span className="text-sm font-medium text-slate-100 truncate">{doc.title}</span>
+                              {doc.fileUrl && (
+                                <svg className="w-3 h-3 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                </svg>
+                              )}
+                            </div>
+                          </td>
+                          <td className="py-3 px-4">
+                            <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${CONTENT_TYPE_COLORS[doc.contentType]}`}>
+                              {CONTENT_TYPE_LABELS[doc.contentType] || doc.contentType}
                             </span>
-                          ))}
-                          {doc.tags.length > 2 && <span className="text-[9px] text-zinc-400">+{doc.tags.length - 2}</span>}
-                        </div>
-                      </div>
-                      <span className="text-[11px] text-zinc-400 whitespace-nowrap">{formatRelative(doc.updatedAt)}</span>
-                    </div>
-                  ))}
+                          </td>
+                          <td className="py-3 px-4">
+                            <div className="flex gap-1 flex-wrap">
+                              {doc.tags.slice(0, 3).map(tag => (
+                                <span key={tag} className="px-1.5 py-0.5 rounded text-[10px] bg-slate-700 text-slate-300">{tag}</span>
+                              ))}
+                              {doc.tags.length > 3 && <span className="text-[10px] text-slate-500">+{doc.tags.length - 3}</span>}
+                            </div>
+                          </td>
+                          <td className="py-3 px-4 text-right text-xs text-slate-400">{formatRelative(doc.updatedAt)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </div>
 
             {/* Pagination */}
             {total > 0 && (
-              <div className="px-4 md:px-6 py-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
-                <span className="text-xs text-zinc-500">{total.toLocaleString()}건</span>
+              <div className="px-6 py-3 border-t border-slate-700 flex items-center justify-between">
+                <span className="text-xs text-slate-500">{total}건 중 {(page - 1) * PAGE_SIZE + 1}-{Math.min(page * PAGE_SIZE, total)}</span>
                 <div className="flex items-center gap-2">
                   <button
                     disabled={page <= 1}
                     onClick={() => setPage(p => p - 1)}
-                    className="px-3 py-1.5 text-xs border border-zinc-200 dark:border-zinc-700 rounded disabled:opacity-30 hover:bg-zinc-50 dark:hover:bg-zinc-800"
-                  >
-                    이전
-                  </button>
-                  <span className="text-xs text-zinc-600 dark:text-zinc-400">{page} / {totalPages}</span>
+                    className="px-3 py-1.5 text-xs border border-slate-600 rounded-lg text-slate-400 hover:bg-slate-700 disabled:opacity-30 transition-colors"
+                  >이전</button>
+                  <span className="text-xs text-slate-400">{page} / {totalPages}</span>
                   <button
                     disabled={page >= totalPages}
                     onClick={() => setPage(p => p + 1)}
-                    className="px-3 py-1.5 text-xs border border-zinc-200 dark:border-zinc-700 rounded disabled:opacity-30 hover:bg-zinc-50 dark:hover:bg-zinc-800"
-                  >
-                    다음
-                  </button>
+                    className="px-3 py-1.5 text-xs border border-slate-600 rounded-lg text-slate-400 hover:bg-slate-700 disabled:opacity-30 transition-colors"
+                  >다음</button>
                 </div>
               </div>
             )}
           </>
         )}
-      </div>
+      </main>
 
       {/* Create/Edit Modal */}
       <DocModal
@@ -562,9 +556,7 @@ function FolderTree({
     onError: (err: Error) => toast.error(err.message),
   })
 
-  useEffect(() => {
-    if (creating) createRef.current?.focus()
-  }, [creating])
+  useEffect(() => { if (creating) createRef.current?.focus() }, [creating])
 
   const handleSubmit = () => {
     if (newName.trim()) {
@@ -575,54 +567,66 @@ function FolderTree({
   }
 
   return (
-    <div className="flex-1 px-2 py-2">
-      <div className="flex items-center justify-between px-1 mb-1">
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">폴더</span>
+    <div className="flex-1">
+      {/* Header */}
+      <div className="p-3 border-b border-slate-700 flex items-center justify-between">
+        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">폴더</span>
         <button
           onClick={() => setCreating(true)}
-          className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 text-sm leading-none"
+          className="p-1.5 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors"
           title="새 폴더"
-        >+</button>
+          data-testid="add-folder"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+        </button>
       </div>
+      {/* Tree */}
+      <div className="flex-1 overflow-y-auto p-2 space-y-0.5">
+        <button
+          onClick={() => onSelectFolder(null)}
+          className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 ${
+            selectedFolderId === null
+              ? 'bg-blue-600/20 text-blue-400 border-l-2 border-blue-500'
+              : 'text-slate-300 hover:bg-slate-700/50'
+          }`}
+          data-testid="folder-all"
+        >
+          <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+          </svg>
+          <span className="flex-1 truncate">전체 문서</span>
+        </button>
 
-      <button
-        onClick={() => onSelectFolder(null)}
-        className={`w-full text-left px-2 py-1.5 text-xs rounded transition-colors mb-0.5 ${
-          selectedFolderId === null
-            ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 font-medium'
-            : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
-        }`}
-      >
-        전체 문서
-      </button>
-
-      {folders.map(folder => (
-        <FolderNode
-          key={folder.id}
-          folder={folder}
-          depth={0}
-          selectedFolderId={selectedFolderId}
-          onSelectFolder={onSelectFolder}
-          queryClient={queryClient}
-        />
-      ))}
-
-      {creating && (
-        <div className="px-1 py-1">
-          <input
-            ref={createRef}
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleSubmit()
-              if (e.key === 'Escape') { setCreating(false); setNewName('') }
-            }}
-            onBlur={handleSubmit}
-            className="w-full text-xs px-2 py-1 border border-indigo-300 dark:border-indigo-700 rounded bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-indigo-400"
-            placeholder="폴더 이름"
+        {folders.map(folder => (
+          <FolderNode
+            key={folder.id}
+            folder={folder}
+            depth={0}
+            selectedFolderId={selectedFolderId}
+            onSelectFolder={onSelectFolder}
+            queryClient={queryClient}
           />
-        </div>
-      )}
+        ))}
+
+        {creating && (
+          <div className="px-1 py-1">
+            <input
+              ref={createRef}
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSubmit()
+                if (e.key === 'Escape') { setCreating(false); setNewName('') }
+              }}
+              onBlur={handleSubmit}
+              className="w-full text-sm px-3 py-1.5 border border-blue-500 rounded-lg bg-slate-800 text-slate-50 outline-none"
+              placeholder="폴더 이름"
+            />
+          </div>
+        )}
+      </div>
     </div>
   )
 }
@@ -700,7 +704,7 @@ function FolderNode({
   return (
     <div>
       {editing ? (
-        <div style={{ paddingLeft: `${depth * 12 + 4}px` }} className="py-0.5">
+        <div style={{ paddingLeft: `${depth * 16 + 4}px` }} className="py-0.5">
           <input
             ref={editRef}
             value={editName}
@@ -710,7 +714,7 @@ function FolderNode({
               if (e.key === 'Escape') { setEditing(false); setEditName(folder.name) }
             }}
             onBlur={handleRename}
-            className="w-full text-xs px-2 py-1 border border-indigo-300 dark:border-indigo-700 rounded bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-indigo-400"
+            className="w-full text-sm px-3 py-1.5 border border-blue-500 rounded-lg bg-slate-800 text-slate-50 outline-none"
           />
         </div>
       ) : (
@@ -718,45 +722,53 @@ function FolderNode({
           <button
             onClick={() => onSelectFolder(folder.id)}
             onDoubleClick={() => { setEditing(true); setEditName(folder.name) }}
-            style={{ paddingLeft: `${depth * 12 + 8}px` }}
-            className={`w-full text-left pr-8 py-1.5 text-xs rounded transition-colors flex items-center gap-1.5 ${
+            style={{ paddingLeft: `${depth * 16 + 12}px` }}
+            className={`w-full text-left pr-8 py-2 text-sm rounded-lg transition-colors flex items-center gap-2 ${
               isSelected
-                ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 font-medium'
-                : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                ? 'bg-blue-600/20 text-blue-400 border-l-2 border-blue-500'
+                : 'text-slate-300 hover:bg-slate-700/50'
             }`}
           >
-            <span className="text-[10px]">📁</span>
+            <svg className="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+            </svg>
             <span className="truncate flex-1">{folder.name}</span>
             {folder.documentCount > 0 && (
-              <span className="text-[9px] text-zinc-400 dark:text-zinc-500 font-mono">{folder.documentCount}</span>
+              <span className="text-xs text-slate-500">{folder.documentCount}</span>
             )}
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu) }}
-            className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 px-1 text-xs"
-          >⋮</button>
+            className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-slate-400 hover:text-slate-200 px-1.5 py-1 text-xs rounded-lg hover:bg-slate-700 transition-all"
+          >
+            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+              <circle cx="12" cy="6" r="1.5" />
+              <circle cx="12" cy="12" r="1.5" />
+              <circle cx="12" cy="18" r="1.5" />
+            </svg>
+          </button>
           {showMenu && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="absolute right-0 top-full z-20 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg py-1 min-w-[120px]">
-                <button
-                  onClick={() => { setCreatingChild(true); setShowMenu(false) }}
-                  className="w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300"
-                >하위 폴더</button>
+              <div className="absolute right-0 top-full z-50 bg-slate-800 border border-slate-600 rounded-lg shadow-xl py-1 min-w-[160px]">
                 <button
                   onClick={() => { setEditing(true); setEditName(folder.name); setShowMenu(false) }}
-                  className="w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300"
+                  className="w-full text-left px-3 py-2 text-sm text-slate-300 hover:bg-slate-700 flex items-center gap-2"
                 >이름 변경</button>
                 <button
+                  onClick={() => { setCreatingChild(true); setShowMenu(false) }}
+                  className="w-full text-left px-3 py-2 text-sm text-slate-300 hover:bg-slate-700 flex items-center gap-2"
+                >하위 폴더 추가</button>
+                <div className="border-t border-slate-700 my-1" />
+                <button
                   onClick={() => { deleteMutation.mutate(); setShowMenu(false) }}
-                  className="w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-50 dark:hover:bg-zinc-700 text-red-600 dark:text-red-400"
+                  className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2"
                 >삭제</button>
               </div>
             </>
           )}
         </div>
       )}
-      {/* Children */}
       {folder.children.map(child => (
         <FolderNode
           key={child.id}
@@ -767,9 +779,8 @@ function FolderNode({
           queryClient={queryClient}
         />
       ))}
-      {/* Create child folder input */}
       {creatingChild && (
-        <div style={{ paddingLeft: `${(depth + 1) * 12 + 4}px` }} className="py-0.5">
+        <div style={{ paddingLeft: `${(depth + 1) * 16 + 4}px` }} className="py-0.5">
           <input
             ref={childRef}
             value={childName}
@@ -779,7 +790,7 @@ function FolderNode({
               if (e.key === 'Escape') { setCreatingChild(false); setChildName('') }
             }}
             onBlur={handleCreateChild}
-            className="w-full text-xs px-2 py-1 border border-indigo-300 dark:border-indigo-700 rounded bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-indigo-400"
+            className="w-full text-sm px-3 py-1.5 border border-blue-500 rounded-lg bg-slate-800 text-slate-50 outline-none"
             placeholder="하위 폴더 이름"
           />
         </div>
@@ -801,7 +812,6 @@ function DocDetailView({
   onShowVersions: (id: string) => void
   queryClient: ReturnType<typeof useQueryClient>
 }) {
-  // Fetch full doc detail
   const detailQuery = useQuery({
     queryKey: ['knowledge-doc-detail', doc.id],
     queryFn: () => api.get<{ data: KnowledgeDoc }>(`/workspace/knowledge/docs/${doc.id}`),
@@ -810,61 +820,69 @@ function DocDetailView({
   const fullDoc = detailQuery.data?.data ?? doc
 
   return (
-    <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4">
-      {/* Header */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <button onClick={onBack} className="text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300">← 목록</button>
-          </div>
-          <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-1">{fullDoc.title}</h3>
-          <div className="flex items-center gap-2 flex-wrap">
-            <Badge variant={CONTENT_TYPE_BADGE[fullDoc.contentType]?.variant || 'info'}>
-              {CONTENT_TYPE_BADGE[fullDoc.contentType]?.label || fullDoc.contentType}
-            </Badge>
-            {fullDoc.tags.map(tag => (
-              <span key={tag} className="px-2 py-0.5 text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded-full">{tag}</span>
-            ))}
-            <span className="text-[11px] text-zinc-500">수정: {formatRelative(fullDoc.updatedAt)}</span>
-          </div>
+    <div className="flex-1 overflow-y-auto p-6 space-y-6" data-testid="doc-detail">
+      {/* Back + Title */}
+      <div className="flex items-center gap-3">
+        <button onClick={onBack} className="p-2 rounded-lg hover:bg-slate-700 text-slate-400 transition-colors">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <h3 className="flex-1 text-xl font-semibold text-slate-50 truncate">{fullDoc.title}</h3>
+        <div className="flex items-center gap-2">
+          <button onClick={() => onShowVersions(fullDoc.id)} className="px-3 py-1.5 text-xs border border-slate-600 rounded-lg text-slate-400 hover:bg-slate-700 transition-colors">버전 이력</button>
+          <button onClick={() => onEdit(fullDoc)} className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors">편집</button>
+          <button onClick={() => onDelete(fullDoc.id)} className="p-2 rounded-lg hover:bg-red-500/10 text-red-400 transition-colors">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
         </div>
-        <div className="flex items-center gap-2 ml-3">
-          <button onClick={() => onShowVersions(fullDoc.id)} className="px-2.5 py-1 text-[11px] border border-zinc-200 dark:border-zinc-700 rounded hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400">버전 이력</button>
-          <button onClick={() => onEdit(fullDoc)} className="px-2.5 py-1 text-[11px] border border-zinc-200 dark:border-zinc-700 rounded hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400">편집</button>
-          {fullDoc.fileUrl && (
-            <a
-              href={`/api/workspace/knowledge/docs/${fullDoc.id}/download`}
-              className="px-2.5 py-1 text-[11px] border border-zinc-200 dark:border-zinc-700 rounded hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
-            >다운로드</a>
-          )}
-          <button onClick={() => onDelete(fullDoc.id)} className="px-2.5 py-1 text-[11px] border border-red-200 dark:border-red-800 rounded hover:bg-red-50 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400">삭제</button>
-        </div>
+      </div>
+
+      {/* Meta bar */}
+      <div className="flex flex-wrap items-center gap-3">
+        <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${CONTENT_TYPE_COLORS[fullDoc.contentType]}`}>
+          {CONTENT_TYPE_LABELS[fullDoc.contentType]}
+        </span>
+        {fullDoc.tags.map(tag => (
+          <span key={tag} className="px-2 py-0.5 rounded-full text-[11px] bg-slate-700 text-slate-300">{tag}</span>
+        ))}
+        <span className="text-xs text-slate-500">수정: {formatRelative(fullDoc.updatedAt)}</span>
       </div>
 
       {/* Content */}
       {fullDoc.content && (
-        <div className="border border-zinc-100 dark:border-zinc-800 rounded-lg p-4 max-h-[600px] overflow-y-auto">
+        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 max-h-[600px] overflow-y-auto">
           {fullDoc.contentType === 'markdown' || fullDoc.contentType === 'mermaid' ? (
-            <MarkdownRenderer content={fullDoc.content} />
+            <div className="prose prose-invert prose-sm max-w-none">
+              <MarkdownRenderer content={fullDoc.content} />
+            </div>
           ) : fullDoc.contentType === 'html' ? (
-            <div className="prose dark:prose-invert max-w-none text-sm">
+            <div className="prose prose-invert prose-sm max-w-none">
               <MarkdownRenderer content={fullDoc.content} />
             </div>
           ) : (
-            <pre className="text-xs text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap font-mono">{fullDoc.content}</pre>
+            <pre className="text-xs text-slate-300 whitespace-pre-wrap font-mono">{fullDoc.content}</pre>
           )}
         </div>
       )}
 
-      {/* File info */}
-      {fullDoc.fileUrl && !fullDoc.content && (
-        <div className="p-6 text-center border border-zinc-100 dark:border-zinc-800 rounded-lg">
-          <span className="text-3xl">📎</span>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-2">첨부 파일</p>
-          <a
-            href={`/api/workspace/knowledge/docs/${fullDoc.id}/download`}
-            className="mt-2 inline-block px-4 py-2 text-xs bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-          >다운로드</a>
+      {/* File attachment */}
+      {fullDoc.fileUrl && (
+        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+              </svg>
+              <span className="text-sm text-slate-300">첨부 파일</span>
+            </div>
+            <a
+              href={`/api/workspace/knowledge/docs/${fullDoc.id}/download`}
+              className="text-xs text-blue-400 hover:text-blue-300"
+            >다운로드</a>
+          </div>
         </div>
       )}
     </div>
@@ -934,27 +952,12 @@ function DocModal({
   })
 
   const handleSubmit = () => {
-    if (!title.trim()) {
-      toast.error('제목을 입력하세요')
-      return
-    }
+    if (!title.trim()) { toast.error('제목을 입력하세요'); return }
     const tags = tagsInput.split(',').map(t => t.trim()).filter(Boolean)
     if (isEdit) {
-      updateMutation.mutate({
-        title: title.trim(),
-        contentType,
-        content,
-        folderId: folderId || null,
-        tags,
-      })
+      updateMutation.mutate({ title: title.trim(), contentType, content, folderId: folderId || null, tags })
     } else {
-      createMutation.mutate({
-        title: title.trim(),
-        contentType,
-        content,
-        folderId: folderId || undefined,
-        tags,
-      })
+      createMutation.mutate({ title: title.trim(), contentType, content, folderId: folderId || undefined, tags })
     }
   }
 
@@ -963,26 +966,23 @@ function DocModal({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={isEdit ? '문서 편집' : '새 문서'} className="max-w-2xl">
       <div className="space-y-4">
-        {/* Title */}
         <div>
-          <label className="text-xs font-medium text-zinc-500 mb-1 block">제목</label>
+          <label className="block text-sm font-medium text-slate-300 mb-1">제목 *</label>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full text-sm px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-slate-50 outline-none"
             placeholder="문서 제목"
             autoFocus
           />
         </div>
-
-        {/* Type + Folder row */}
         <div className="flex gap-3">
           <div className="flex-1">
-            <label className="text-xs font-medium text-zinc-500 mb-1 block">유형</label>
+            <label className="block text-sm font-medium text-slate-300 mb-1">유형</label>
             <select
               value={contentType}
               onChange={(e) => setContentType(e.target.value as ContentType)}
-              className="w-full text-xs h-9 px-2 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300"
+              className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-300 outline-none"
             >
               <option value="markdown">마크다운</option>
               <option value="text">텍스트</option>
@@ -991,11 +991,11 @@ function DocModal({
             </select>
           </div>
           <div className="flex-1">
-            <label className="text-xs font-medium text-zinc-500 mb-1 block">폴더</label>
+            <label className="block text-sm font-medium text-slate-300 mb-1">폴더</label>
             <select
               value={folderId}
               onChange={(e) => setFolderId(e.target.value)}
-              className="w-full text-xs h-9 px-2 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300"
+              className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-300 outline-none"
             >
               <option value="">폴더 없음</option>
               {flattenFolders(folders).map(f => (
@@ -1004,39 +1004,30 @@ function DocModal({
             </select>
           </div>
         </div>
-
-        {/* Tags */}
         <div>
-          <label className="text-xs font-medium text-zinc-500 mb-1 block">태그 (쉼표 구분)</label>
+          <label className="block text-sm font-medium text-slate-300 mb-1">태그 (쉼표 구분)</label>
           <input
             value={tagsInput}
             onChange={(e) => setTagsInput(e.target.value)}
-            className="w-full text-xs px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200"
+            className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-50 outline-none placeholder:text-slate-500"
             placeholder="태그1, 태그2, ..."
           />
         </div>
-
-        {/* Content */}
         <div>
-          <label className="text-xs font-medium text-zinc-500 mb-1 block">내용</label>
+          <label className="block text-sm font-medium text-slate-300 mb-1">내용</label>
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="w-full text-xs px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-mono h-64 resize-y"
+            className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-50 font-mono min-h-[256px] resize-y outline-none placeholder:text-slate-500"
             placeholder={contentType === 'markdown' ? '마크다운으로 작성...' : '내용을 입력하세요...'}
           />
         </div>
-
-        {/* Actions */}
-        <div className="flex items-center justify-end gap-2 pt-2">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-xs border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
-          >취소</button>
+        <div className="flex justify-end gap-2 pt-2">
+          <button onClick={onClose} className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200 transition-colors">취소</button>
           <button
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="px-4 py-2 text-xs bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+            className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50"
           >{isSubmitting ? '저장 중...' : isEdit ? '수정' : '생성'}</button>
         </div>
       </div>
@@ -1077,21 +1068,22 @@ function VersionHistoryModal({
   return (
     <Modal isOpen={!!docId} onClose={onClose} title="버전 이력">
       {versionsQuery.isLoading ? (
-        <div className="py-8 text-center text-sm text-zinc-400">로딩 중...</div>
+        <div className="py-8 text-center text-sm text-slate-400">로딩 중...</div>
       ) : versions.length === 0 ? (
-        <div className="py-8 text-center text-sm text-zinc-400">버전 이력이 없습니다</div>
+        <div className="py-8 text-center text-sm text-slate-400">버전 이력이 없습니다</div>
       ) : (
-        <div className="space-y-2 max-h-96 overflow-y-auto">
+        <div className="divide-y divide-slate-700/50 max-h-96 overflow-y-auto">
           {versions.map(v => (
-            <div key={v.id} className="flex items-center justify-between p-3 rounded-lg border border-zinc-100 dark:border-zinc-800">
+            <div key={v.id} className="px-4 py-3 flex items-center justify-between hover:bg-slate-700/20 transition-colors">
               <div>
-                <p className="text-xs font-medium text-zinc-800 dark:text-zinc-200">v{v.version} - {v.title}</p>
-                <p className="text-[10px] text-zinc-500 mt-0.5">{formatDate(v.createdAt)}{v.changeNote ? ` · ${v.changeNote}` : ''}</p>
+                <span className="text-sm text-slate-200">v{v.version}</span>
+                <span className="text-xs text-slate-500 ml-2">{formatDate(v.createdAt)}{v.editedBy ? ` · ${v.editedBy}` : ''}</span>
+                {v.changeNote && <p className="text-xs text-slate-400 mt-0.5">{v.changeNote}</p>}
               </div>
               <button
                 onClick={() => restoreMutation.mutate(v.id)}
                 disabled={restoreMutation.isPending}
-                className="px-2.5 py-1 text-[11px] border border-zinc-200 dark:border-zinc-700 rounded hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
+                className="text-xs text-blue-400 hover:text-blue-300 px-3 py-1 rounded-lg border border-slate-600 hover:bg-blue-500/10 transition-colors"
               >복원</button>
             </div>
           ))}
@@ -1106,11 +1098,11 @@ function VersionHistoryModal({
 function MemoriesTab({ queryClient }: { queryClient: ReturnType<typeof useQueryClient> }) {
   const [agentFilter, setAgentFilter] = useState<string>('')
   const [typeFilter, setTypeFilter] = useState<MemoryType | ''>('')
+  const [searchInput, setSearchInput] = useState('')
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [editMemory, setEditMemory] = useState<AgentMemory | null>(null)
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
 
-  // Queries
   const buildParams = useCallback(() => {
     const params = new URLSearchParams()
     if (agentFilter) params.set('agentId', agentFilter)
@@ -1132,6 +1124,12 @@ function MemoriesTab({ queryClient }: { queryClient: ReturnType<typeof useQueryC
   const memories = memoriesQuery.data?.data ?? []
   const agents = agentsQuery.data?.data ?? []
 
+  const filteredMemories = useMemo(() => {
+    if (!searchInput) return memories
+    const q = searchInput.toLowerCase()
+    return memories.filter(m => m.key.toLowerCase().includes(q) || m.content.toLowerCase().includes(q))
+  }, [memories, searchInput])
+
   const deleteMutation = useMutation({
     mutationFn: (id: string) => api.delete(`/workspace/knowledge/memories/${id}`),
     onSuccess: () => {
@@ -1142,13 +1140,13 @@ function MemoriesTab({ queryClient }: { queryClient: ReturnType<typeof useQueryC
   })
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden">
-      {/* Toolbar */}
-      <div className="px-4 md:px-6 py-3 border-b border-zinc-100 dark:border-zinc-800 flex flex-wrap gap-2 items-center">
+    <div className="flex-1 flex flex-col overflow-hidden" data-testid="memories-tab">
+      {/* Filters */}
+      <div className="px-6 py-3 border-b border-slate-700/50 flex flex-wrap gap-3 items-center">
         <select
           value={agentFilter}
           onChange={(e) => setAgentFilter(e.target.value)}
-          className="text-xs h-8 px-2 border border-zinc-200 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300"
+          className="bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-300 outline-none focus:border-blue-500"
         >
           <option value="">전체 에이전트</option>
           {agents.map(a => (
@@ -1158,85 +1156,98 @@ function MemoriesTab({ queryClient }: { queryClient: ReturnType<typeof useQueryC
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value as MemoryType | '')}
-          className="text-xs h-8 px-2 border border-zinc-200 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300"
+          className="bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-300 outline-none"
         >
           <option value="">전체 유형</option>
-          {(Object.entries(MEMORY_TYPE_BADGE) as [MemoryType, { label: string }][]).map(([k, v]) => (
-            <option key={k} value={k}>{v.label}</option>
-          ))}
+          <option value="learning">학습</option>
+          <option value="insight">인사이트</option>
+          <option value="preference">선호</option>
+          <option value="fact">사실</option>
         </select>
+        <input
+          className="bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 outline-none w-40"
+          placeholder="검색..."
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+        />
         <div className="flex-1" />
         <button
           onClick={() => setShowCreateModal(true)}
-          className="px-3 py-1.5 text-xs bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-        >+ 새 기억</button>
-      </div>
-
-      {/* Memory type chips */}
-      <div className="px-4 md:px-6 py-2 border-b border-zinc-100 dark:border-zinc-800 flex gap-1.5">
-        {(Object.entries(MEMORY_TYPE_BADGE) as [MemoryType, { label: string }][]).map(([k, v]) => (
-          <button
-            key={k}
-            onClick={() => setTypeFilter(typeFilter === k ? '' : k)}
-            className={`px-2.5 py-1 text-[10px] rounded-full transition-colors ${
-              typeFilter === k
-                ? 'bg-indigo-600 text-white'
-                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
-            }`}
-          >{v.label}</button>
-        ))}
+          className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+          data-testid="add-memory"
+        >+ 기억 추가</button>
       </div>
 
       {/* Memory list */}
-      <div className="flex-1 overflow-auto px-4 md:px-6 py-3">
+      <div className="flex-1 overflow-auto p-6 space-y-3">
         {memoriesQuery.isLoading ? (
-          <SkeletonTable rows={6} />
-        ) : memories.length === 0 ? (
-          <EmptyState
-            icon={<span className="text-3xl">🧠</span>}
-            title="에이전트 기억이 없습니다"
-            description="에이전트가 작업을 수행하면 자동으로 학습 기억이 생성됩니다."
-          />
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-32 bg-slate-700/50 rounded-xl animate-pulse" />
+            ))}
+          </div>
+        ) : filteredMemories.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="memories-empty">
+            <div className="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center mb-4">
+              <span className="text-3xl">🧠</span>
+            </div>
+            <h3 className="text-base font-medium text-slate-300 mb-2">에이전트 기억이 없습니다</h3>
+            <p className="text-sm text-slate-500">에이전트가 작업하면서 자동으로 기억을 학습합니다</p>
+          </div>
         ) : (
-          <div className="space-y-2">
-            {memories.map(mem => (
-              <div key={mem.id} className="p-3 rounded-lg border border-zinc-100 dark:border-zinc-800 hover:border-zinc-200 dark:hover:border-zinc-700 transition-colors">
-                <div className="flex items-start justify-between mb-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">{mem.key}</span>
-                    <Badge variant={MEMORY_TYPE_BADGE[mem.memoryType]?.variant || 'info'}>
-                      {MEMORY_TYPE_BADGE[mem.memoryType]?.label || mem.memoryType}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => setEditMemory(mem)}
-                      className="px-2 py-0.5 text-[10px] text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
-                    >편집</button>
-                    <button
-                      onClick={() => setDeleteConfirmId(mem.id)}
-                      className="px-2 py-0.5 text-[10px] text-red-400 hover:text-red-600"
-                    >삭제</button>
-                  </div>
+          filteredMemories.map(mem => (
+            <div
+              key={mem.id}
+              className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 space-y-3 hover:border-slate-600 transition-colors"
+              data-testid={`memory-card-${mem.id}`}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-slate-100">{mem.key}</span>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${MEMORY_TYPE_COLORS[mem.memoryType]}`}>
+                    {MEMORY_TYPE_LABELS[mem.memoryType]}
+                  </span>
                 </div>
-                <p className="text-xs text-zinc-600 dark:text-zinc-400 mb-2 line-clamp-2">{mem.content}</p>
-                <div className="flex items-center gap-3 text-[10px] text-zinc-400">
-                  {mem.agentName && <span>에이전트: {mem.agentName}</span>}
-                  <span>신뢰도: {mem.confidence}%</span>
-                  <span>사용: {mem.usageCount}회</span>
-                  {mem.source && <span>출처: {mem.source}</span>}
-                  <span>{formatRelative(mem.updatedAt)}</span>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => setEditMemory(mem)}
+                    className="p-1.5 rounded-lg hover:bg-slate-700 text-slate-400 transition-colors"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => setDeleteConfirmId(mem.id)}
+                    className="p-1.5 rounded-lg hover:bg-red-500/10 text-red-400 transition-colors"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
                 </div>
-                {/* Confidence bar */}
-                <div className="mt-2 h-1 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+              </div>
+              <p className="text-sm text-slate-300 leading-relaxed">{mem.content}</p>
+              <div className="flex items-center gap-4 text-xs text-slate-500">
+                {mem.agentName && <span>에이전트: <span className="text-cyan-400">{mem.agentName}</span></span>}
+                <span>출처: {mem.source || '자동'}</span>
+                <span>사용 {mem.usageCount}회</span>
+              </div>
+              {/* Confidence bar */}
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-slate-500 w-12">신뢰도</span>
+                <div className="flex-1 h-1.5 bg-slate-700 rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full ${mem.confidence >= 70 ? 'bg-emerald-500' : mem.confidence >= 40 ? 'bg-amber-500' : 'bg-red-500'}`}
                     style={{ width: `${mem.confidence}%` }}
                   />
                 </div>
+                <span className={`text-[10px] font-medium ${mem.confidence >= 70 ? 'text-emerald-400' : mem.confidence >= 40 ? 'text-amber-400' : 'text-red-400'}`}>
+                  {mem.confidence}%
+                </span>
               </div>
-            ))}
-          </div>
+            </div>
+          ))
         )}
       </div>
 
@@ -1323,10 +1334,7 @@ function MemoryModal({
   })
 
   const handleSubmit = () => {
-    if (!key.trim() || !content.trim()) {
-      toast.error('제목과 내용을 입력하세요')
-      return
-    }
+    if (!key.trim() || !content.trim()) { toast.error('제목과 내용을 입력하세요'); return }
     if (isEdit) {
       updateMutation.mutate({ memoryType, key: key.trim(), content: content.trim(), confidence })
     } else {
@@ -1342,11 +1350,11 @@ function MemoryModal({
       <div className="space-y-4">
         {!isEdit && (
           <div>
-            <label className="text-xs font-medium text-zinc-500 mb-1 block">에이전트</label>
+            <label className="block text-sm font-medium text-slate-300 mb-1">에이전트</label>
             <select
               value={agentId}
               onChange={(e) => setAgentId(e.target.value)}
-              className="w-full text-xs h-9 px-2 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300"
+              className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-300 outline-none"
             >
               <option value="">에이전트 선택</option>
               {agents.map(a => (
@@ -1357,53 +1365,47 @@ function MemoryModal({
         )}
         <div className="flex gap-3">
           <div className="flex-1">
-            <label className="text-xs font-medium text-zinc-500 mb-1 block">유형</label>
+            <label className="block text-sm font-medium text-slate-300 mb-1">유형</label>
             <select
               value={memoryType}
               onChange={(e) => setMemoryType(e.target.value as MemoryType)}
-              className="w-full text-xs h-9 px-2 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300"
+              className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-300 outline-none"
             >
-              {(Object.entries(MEMORY_TYPE_BADGE) as [MemoryType, { label: string }][]).map(([k, v]) => (
-                <option key={k} value={k}>{v.label}</option>
-              ))}
+              <option value="learning">학습</option>
+              <option value="insight">인사이트</option>
+              <option value="preference">선호</option>
+              <option value="fact">사실</option>
             </select>
           </div>
           <div className="flex-1">
-            <label className="text-xs font-medium text-zinc-500 mb-1 block">신뢰도: {confidence}%</label>
-            <input
-              type="range"
-              min={0}
-              max={100}
-              value={confidence}
-              onChange={(e) => setConfidence(Number(e.target.value))}
-              className="w-full h-9"
-            />
+            <label className="block text-sm font-medium text-slate-300 mb-1">신뢰도: {confidence}%</label>
+            <input type="range" min={0} max={100} value={confidence} onChange={(e) => setConfidence(Number(e.target.value))} className="w-full h-9" />
           </div>
         </div>
         <div>
-          <label className="text-xs font-medium text-zinc-500 mb-1 block">제목</label>
+          <label className="block text-sm font-medium text-slate-300 mb-1">제목</label>
           <input
             value={key}
             onChange={(e) => setKey(e.target.value)}
-            className="w-full text-sm px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200"
+            className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-50 outline-none placeholder:text-slate-500"
             placeholder="기억 제목"
           />
         </div>
         <div>
-          <label className="text-xs font-medium text-zinc-500 mb-1 block">내용</label>
+          <label className="block text-sm font-medium text-slate-300 mb-1">내용</label>
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="w-full text-xs px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 h-32 resize-y"
+            className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-50 h-32 resize-y outline-none placeholder:text-slate-500"
             placeholder="학습 내용..."
           />
         </div>
-        <div className="flex items-center justify-end gap-2 pt-2">
-          <button onClick={onClose} className="px-4 py-2 text-xs border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400">취소</button>
+        <div className="flex justify-end gap-2 pt-2">
+          <button onClick={onClose} className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200 transition-colors">취소</button>
           <button
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="px-4 py-2 text-xs bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+            className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50"
           >{isSubmitting ? '저장 중...' : isEdit ? '수정' : '생성'}</button>
         </div>
       </div>
