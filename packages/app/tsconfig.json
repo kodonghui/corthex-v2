@@ -6,7 +6,9 @@
     "rootDir": "./src",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@corthex/ui": ["../ui/src/index.ts"],
+      "@corthex/shared": ["../shared/src/index.ts"]
     }
   },
   "include": ["src"],
