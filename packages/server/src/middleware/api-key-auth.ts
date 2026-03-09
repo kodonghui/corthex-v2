@@ -69,7 +69,7 @@ export const apiKeyAuth: MiddlewareHandler<AppEnv> = async (c, next) => {
   c.set('tenant', {
     companyId: record.companyId,
     userId: record.createdBy,
-    role: 'user' as const,
+    role: 'employee' as const,
     isAdminUser: false,
   })
 
