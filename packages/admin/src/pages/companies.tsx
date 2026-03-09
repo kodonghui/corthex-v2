@@ -78,7 +78,7 @@ export function CompaniesPage() {
   })
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="companies-page">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">회사 관리</h1>
@@ -91,6 +91,7 @@ export function CompaniesPage() {
         <button
           onClick={() => setShowCreate(true)}
           className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors"
+          data-testid="company-add-btn"
         >
           + 회사 추가
         </button>
@@ -103,10 +104,11 @@ export function CompaniesPage() {
         onChange={(e) => setSearch(e.target.value)}
         placeholder="회사명 또는 슬러그로 검색..."
         className="w-full max-w-md px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+        data-testid="company-search"
       />
 
       {showCreate && (
-        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5">
+        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5" data-testid="company-create-form">
           <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4">새 회사</h3>
           <form
             onSubmit={(e) => {
@@ -158,13 +160,14 @@ export function CompaniesPage() {
           {[1, 2, 3, 4].map((i) => <SkeletonCard key={i} />)}
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-4" data-testid="company-list">
           {filteredCompanies.map((c) => {
             const s = stats[c.id] || { userCount: 0, agentCount: 0 }
             return (
               <div
                 key={c.id}
                 className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5"
+                data-testid={`company-card-${c.slug}`}
               >
                 {editId === c.id ? (
                   <div className="flex items-center gap-4">

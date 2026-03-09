@@ -68,7 +68,7 @@ function CompanyInfoSection({ company, onSave }: { company: Company; onSave: (da
   }
 
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5">
+    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5" data-testid="settings-company-info">
       <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4">회사 기본 정보</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -210,7 +210,7 @@ function ApiKeySection({ companyId }: { companyId: string }) {
   }
 
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5">
+    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5" data-testid="settings-api-keys">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">API 키 관리</h2>
@@ -219,6 +219,7 @@ function ApiKeySection({ companyId }: { companyId: string }) {
         <button
           onClick={() => setShowAdd(true)}
           className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium rounded-lg transition-colors"
+          data-testid="api-key-add-btn"
         >
           + API 키 등록
         </button>
@@ -433,7 +434,7 @@ function DefaultSettingsSection({
   }
 
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5">
+    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5" data-testid="settings-defaults">
       <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4">기본 설정</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -524,7 +525,7 @@ export function SettingsPage() {
   }
 
   if (!selectedCompanyId) {
-    return <div className="p-8 text-center text-zinc-500">회사를 선택하세요</div>
+    return <div className="p-8 text-center text-zinc-500" data-testid="settings-no-company">회사를 선택하세요</div>
   }
 
   if (isLoading) {
@@ -543,7 +544,7 @@ export function SettingsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="settings-page">
       <div>
         <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">회사 설정</h1>
         <p className="text-sm text-zinc-500 mt-1">회사 기본 정보, API 키, 기본 설정을 관리합니다</p>
