@@ -73,7 +73,7 @@ export function SketchPreviewCard({ mermaid, description, commandId }: Props) {
   }, [saveName, saveMutation])
 
   return (
-    <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden bg-white dark:bg-zinc-800">
+    <div data-testid="sketch-preview" className="rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden bg-white dark:bg-zinc-800">
       {/* Mini canvas preview */}
       <div className="h-48 bg-zinc-50 dark:bg-zinc-900 relative">
         {nodes.length > 0 ? (

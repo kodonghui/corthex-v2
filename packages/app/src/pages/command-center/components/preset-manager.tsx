@@ -83,7 +83,7 @@ export function PresetManager({ presets, onClose, onCreate, onUpdate, onDelete, 
   }, [onDelete])
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div data-testid="preset-manager-modal" className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-zinc-200 dark:border-zinc-700">
@@ -104,6 +104,7 @@ export function PresetManager({ presets, onClose, onCreate, onUpdate, onDelete, 
             <>
               {/* Create button */}
               <button
+                data-testid="preset-create-btn"
                 onClick={() => setMode('create')}
                 className="w-full flex items-center gap-2 p-3 rounded-lg border-2 border-dashed border-zinc-300 dark:border-zinc-600 text-zinc-500 dark:text-zinc-400 hover:border-indigo-400 hover:text-indigo-500 transition-colors mb-3"
               >
@@ -122,6 +123,7 @@ export function PresetManager({ presets, onClose, onCreate, onUpdate, onDelete, 
                   {presets.map((preset) => (
                     <div
                       key={preset.id}
+                      data-testid="preset-item"
                       className="rounded-lg border border-zinc-200 dark:border-zinc-700 p-3 hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors"
                     >
                       <div className="flex items-start justify-between gap-2">
@@ -152,6 +154,7 @@ export function PresetManager({ presets, onClose, onCreate, onUpdate, onDelete, 
                         </div>
                         <div className="flex items-center gap-1 flex-shrink-0">
                           <Button
+                            data-testid="preset-execute-btn"
                             onClick={() => onExecute(preset.id)}
                             disabled={isExecuting}
                             className="h-7 px-2 text-xs"

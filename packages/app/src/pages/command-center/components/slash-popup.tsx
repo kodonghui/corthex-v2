@@ -57,6 +57,7 @@ export function SlashPopup({ query, selectedIndex, onSelect, onSelectPreset, onC
 
   return (
     <div
+      data-testid="slash-popup"
       ref={listRef}
       className="absolute bottom-full mb-2 left-0 w-full max-w-md bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-lg overflow-hidden z-50"
       role="listbox"
@@ -72,6 +73,7 @@ export function SlashPopup({ query, selectedIndex, onSelect, onSelectPreset, onC
             {filteredCommands.map((cmd, idx) => (
               <button
                 key={cmd.cmd}
+                data-testid="slash-command-item"
                 role="option"
                 aria-selected={idx === selectedIndex}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors ${

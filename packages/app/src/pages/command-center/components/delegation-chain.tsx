@@ -103,7 +103,7 @@ export function DelegationChain() {
   const isComplete = lastStep?.event === 'COMPLETED' || lastStep?.event === 'FAILED'
 
   return (
-    <div className="border-t border-zinc-200 dark:border-zinc-700 bg-zinc-50/50 dark:bg-zinc-800/50">
+    <div data-testid="delegation-chain" className="border-t border-zinc-200 dark:border-zinc-700 bg-zinc-50/50 dark:bg-zinc-800/50">
       {/* Header */}
       <button
         onClick={() => setExpanded(!expanded)}
@@ -143,7 +143,9 @@ export function DelegationChain() {
           ) : (
             <div className="border-l-2 border-zinc-200 dark:border-zinc-700 pl-3 space-y-0">
               {steps.map((step) => (
-                <StepNode key={step.id} step={step} />
+                <div key={step.id} data-testid="delegation-step">
+                  <StepNode step={step} />
+                </div>
               ))}
             </div>
           )}

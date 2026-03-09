@@ -29,29 +29,33 @@ function shouldShowDateSeparator(current: string, prev: string | null): boolean 
 
 const EXAMPLE_COMMANDS = [
   { text: '삼성전자 분석해줘', desc: '투자분석처에 자동 위임' },
-  { text: '/전체 시장 전망 보고서', desc: '모든 팀장에게 동시 명령' },
-  { text: '@CIO 포트폴리오 리밸런싱', desc: '특정 팀장에게 직접 지시' },
+  { text: '/전체 시장 전망 보고서', desc: '모든 에이전트에게 동시 명령' },
+  { text: '@CIO 포트폴리오 리밸런싱', desc: '특정 에이전트에게 직접 지시' },
 ]
 
 function EmptyState({ onExampleClick }: { onExampleClick: (text: string) => void }) {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-      <div className="w-16 h-16 rounded-2xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center mb-4">
-        <span className="text-3xl">🎖️</span>
+    <div data-testid="message-empty-state" className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+      <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center mb-4">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" className="text-indigo-500">
+          <path d="M4 7C4 5.343 5.343 4 7 4H21C22.657 4 24 5.343 24 7V17C24 18.657 22.657 20 21 20H15L10 24V20H7C5.343 20 4 18.657 4 17V7Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
+          <path d="M9 10H19M9 14H15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+        </svg>
       </div>
-      <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
-        사령관실에 오신 것을 환영합니다
+      <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
+        작업을 위임해보세요
       </h2>
       <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6 max-w-sm">
         명령을 입력하면 AI 조직이 자동으로 분석하고 보고합니다.
-        @로 특정 팀장을 지정하거나 /로 특수 명령을 사용할 수 있습니다.
+        @로 특정 에이전트를 지정하거나 /로 특수 명령을 사용할 수 있습니다.
       </p>
       <div className="space-y-2 w-full max-w-sm">
         {EXAMPLE_COMMANDS.map((ex) => (
           <button
             key={ex.text}
+            data-testid="example-command"
             onClick={() => onExampleClick(ex.text)}
-            className="w-full text-left p-3 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+            className="w-full text-left p-3 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors"
           >
             <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{ex.text}</p>
             <p className="text-xs text-zinc-400 mt-0.5">{ex.desc}</p>
@@ -87,10 +91,10 @@ export function MessageList({ messages, isLoading, onReportClick, onExampleClick
   // Loading skeleton
   if (isLoading) {
     return (
-      <div className="flex-1 p-4 space-y-4">
-        {Array.from({ length: 5 }).map((_, i) => (
+      <div data-testid="message-loading-skeleton" className="flex-1 p-4 space-y-4">
+        {[70, 45, 60, 50, 65].map((width, i) => (
           <div key={i} className={`flex ${i % 2 === 0 ? 'justify-end' : 'justify-start'}`}>
-            <div className="h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-800 animate-pulse" style={{ width: `${40 + Math.random() * 30}%` }} />
+            <div className="h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-800 animate-pulse" style={{ width: `${width}%` }} />
           </div>
         ))}
       </div>
@@ -104,6 +108,7 @@ export function MessageList({ messages, isLoading, onReportClick, onExampleClick
 
   return (
     <div
+      data-testid="message-list"
       ref={containerRef}
       className="flex-1 overflow-y-auto p-4 space-y-3"
       onScroll={handleScroll}
@@ -123,7 +128,7 @@ export function MessageList({ messages, isLoading, onReportClick, onExampleClick
             )}
 
             {msg.role === 'user' && (
-              <div className="flex justify-end">
+              <div data-testid="message-item-user" className="flex justify-end">
                 <div className="max-w-[75%]">
                   <div className="bg-indigo-600 text-white px-4 py-2.5 rounded-2xl rounded-br-md">
                     <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
@@ -134,19 +139,23 @@ export function MessageList({ messages, isLoading, onReportClick, onExampleClick
             )}
 
             {msg.role === 'agent' && (
-              <div className="flex justify-start">
+              <div data-testid="message-item-agent" className="flex justify-start">
                 <div className="max-w-[85%]">
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 flex items-center justify-center text-[10px] font-bold">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-[10px] font-bold flex-shrink-0">
                       AI
                     </div>
                     {msg.agentName && (
-                      <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">{msg.agentName}</span>
+                      <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">{msg.agentName}</span>
                     )}
                     {msg.quality && (
-                      <Badge className={msg.quality.passed ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}>
-                        {msg.quality.passed ? 'PASS' : 'FAIL'}
-                      </Badge>
+                      <span data-testid="quality-badge">
+                        <Badge
+                          className={msg.quality.passed ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}
+                        >
+                          {msg.quality.passed ? 'PASS' : 'FAIL'}
+                        </Badge>
+                      </span>
                     )}
                   </div>
 
@@ -166,7 +175,7 @@ export function MessageList({ messages, isLoading, onReportClick, onExampleClick
 
                   {/* Regular message (non-sketch) */}
                   {!msg.sketchResult && !msg.sketchLoading && (
-                    <div className="bg-zinc-100 dark:bg-zinc-800 px-4 py-2.5 rounded-2xl rounded-bl-md">
+                    <div className="bg-zinc-100 dark:bg-zinc-800 px-4 py-3 rounded-2xl rounded-bl-md">
                       {msg.result ? (
                         <button
                           onClick={() => msg.commandId && onReportClick(msg.commandId)}
@@ -176,7 +185,7 @@ export function MessageList({ messages, isLoading, onReportClick, onExampleClick
                             <MarkdownRenderer content={msg.result.slice(0, 500)} />
                           </div>
                           {msg.result.length > 500 && (
-                            <p className="text-xs text-indigo-600 dark:text-indigo-400 mt-1">전체 보고서 보기 →</p>
+                            <p className="text-xs text-indigo-600 dark:text-indigo-400 mt-1.5 font-medium">전체 보고서 보기 →</p>
                           )}
                         </button>
                       ) : (

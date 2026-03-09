@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "admin",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["run", "--cwd", "packages/admin", "dev"],
+      "port": 5173
+    },
+    {
+      "name": "app",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["run", "--cwd", "packages/app", "dev"],
+      "port": 5174
+    },
+    {
+      "name": "server",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["run", "--cwd", "packages/server", "dev"],
+      "port": 3000
+    }
+  ]
+}

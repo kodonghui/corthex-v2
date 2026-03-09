@@ -61,6 +61,7 @@ export function MentionPopup({ query, selectedIndex, agents, deptMap, onSelect, 
 
   return (
     <div
+      data-testid="mention-popup"
       ref={listRef}
       className="absolute bottom-full mb-2 left-0 w-full max-w-sm bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-lg overflow-hidden z-50"
       role="listbox"
@@ -80,6 +81,7 @@ export function MentionPopup({ query, selectedIndex, agents, deptMap, onSelect, 
               return (
                 <button
                   key={agent.id}
+                  data-testid="mention-agent-item"
                   role="option"
                   aria-selected={thisIdx === selectedIndex}
                   className={`w-full flex items-center gap-3 px-3 py-2 text-left transition-colors ${

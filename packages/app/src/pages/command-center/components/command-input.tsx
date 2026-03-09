@@ -242,6 +242,7 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
 
       <div className="flex items-end gap-2">
         <textarea
+          data-testid="command-input"
           ref={textareaRef}
           value={text}
           onChange={(e) => handleChange(e.target.value)}
@@ -253,13 +254,14 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
           style={{ minHeight: '40px', maxHeight: '160px' }}
         />
         <Button
+          data-testid="command-submit"
           onClick={handleSubmit}
           disabled={!text.trim() || isSubmitting}
           className="h-10 w-10 flex-shrink-0 rounded-lg"
           aria-label="명령 전송"
         >
           {isSubmitting ? (
-            <span className="animate-spin">⏳</span>
+            <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin mx-auto" />
           ) : (
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="mx-auto">
               <path d="M3 13L13 8L3 3V7L9 8L3 9V13Z" fill="currentColor" />
