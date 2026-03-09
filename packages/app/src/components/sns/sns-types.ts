@@ -85,14 +85,14 @@ export const STATUS_LABELS: Record<string, string> = {
 }
 
 export const STATUS_COLORS: Record<string, string> = {
-  draft: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300',
-  pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-  approved: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-  scheduled: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-  rejected: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-  published: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200',
-  failed: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-  publishing: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+  draft: 'bg-slate-700 text-slate-300',
+  pending: 'bg-amber-500/20 text-amber-400',
+  approved: 'bg-emerald-500/20 text-emerald-400',
+  scheduled: 'bg-blue-500/20 text-blue-400',
+  rejected: 'bg-red-500/20 text-red-400',
+  published: 'bg-cyan-500/20 text-cyan-400',
+  failed: 'bg-red-500/20 text-red-400',
+  publishing: 'bg-purple-500/20 text-purple-400',
 }
 
 export const PLATFORM_LABELS: Record<string, string> = {

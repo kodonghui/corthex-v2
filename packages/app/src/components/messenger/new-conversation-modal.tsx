@@ -82,12 +82,12 @@ export function NewConversationModal({ onClose, onCreated }: Props) {
   const canCreate = mode === 'direct' ? selectedUsers.length === 1 : selectedUsers.length >= 1
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
-      <div className="bg-white dark:bg-zinc-900 rounded-lg w-96 max-h-[80vh] shadow-xl flex flex-col" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose} data-testid="new-conversation-modal">
+      <div className="bg-slate-800 border border-slate-700 rounded-2xl w-96 max-h-[80vh] shadow-2xl flex flex-col" onClick={(e) => e.stopPropagation()}>
         {/* 헤더 */}
-        <div className="px-4 py-3 border-b border-zinc-200 dark:border-zinc-700 flex items-center justify-between">
-          <h3 className="font-medium text-sm">새 대화</h3>
-          <button onClick={onClose} className="text-zinc-400 hover:text-zinc-600 text-sm">✕</button>
+        <div className="px-4 py-3 border-b border-slate-700 flex items-center justify-between">
+          <h3 className="font-medium text-sm text-slate-50">새 대화</h3>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-200 text-sm">✕</button>
         </div>
 
         {/* 모드 선택 */}
@@ -96,8 +96,8 @@ export function NewConversationModal({ onClose, onCreated }: Props) {
             onClick={() => { setMode('direct'); setSelectedUsers([]) }}
             className={`px-3 py-1 text-xs rounded-full border ${
               mode === 'direct'
-                ? 'bg-indigo-600 text-white border-indigo-600'
-                : 'border-zinc-300 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'border-slate-600 hover:bg-slate-700'
             }`}
           >
             1:1 대화
@@ -106,8 +106,8 @@ export function NewConversationModal({ onClose, onCreated }: Props) {
             onClick={() => { setMode('group'); setSelectedUsers([]) }}
             className={`px-3 py-1 text-xs rounded-full border ${
               mode === 'group'
-                ? 'bg-indigo-600 text-white border-indigo-600'
-                : 'border-zinc-300 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'border-slate-600 hover:bg-slate-700'
             }`}
           >
             그룹 대화
@@ -121,7 +121,7 @@ export function NewConversationModal({ onClose, onCreated }: Props) {
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
               placeholder="그룹 이름 (선택)"
-              className="w-full px-2.5 py-1.5 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm"
+              className="w-full px-3 py-2 bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg text-sm"
             />
           </div>
         )}
@@ -134,10 +134,10 @@ export function NewConversationModal({ onClose, onCreated }: Props) {
               return (
                 <span
                   key={uid}
-                  className="inline-flex items-center gap-1 px-2 py-0.5 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 text-xs rounded-full"
+                  className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-600/10 text-blue-400 text-xs rounded-full"
                 >
                   {u?.name || '...'}
-                  <button onClick={() => toggleUser(uid)} className="text-indigo-400 hover:text-indigo-600">✕</button>
+                  <button onClick={() => toggleUser(uid)} className="text-blue-400 hover:text-blue-300">✕</button>
                 </span>
               )
             })}
@@ -150,7 +150,7 @@ export function NewConversationModal({ onClose, onCreated }: Props) {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="이름으로 검색..."
-            className="w-full px-2.5 py-1.5 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm"
+            className="w-full px-3 py-2 bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg text-sm"
             autoFocus
           />
         </div>
@@ -163,40 +163,40 @@ export function NewConversationModal({ onClose, onCreated }: Props) {
               <button
                 key={u.id}
                 onClick={() => toggleUser(u.id)}
-                className={`w-full text-left px-2.5 py-2 rounded-md text-sm flex items-center gap-2 ${
+                className={`w-full text-left px-2.5 py-2 rounded-lg text-sm flex items-center gap-2 ${
                   isSelected
-                    ? 'bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300'
-                    : 'hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                    ? 'bg-blue-600/10 text-blue-400'
+                    : 'hover:bg-slate-700'
                 }`}
               >
-                <span className="w-7 h-7 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-xs font-medium">
+                <span className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-xs font-medium text-slate-300">
                   {u.name.charAt(0)}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate">{u.name}</p>
-                  <p className="text-[10px] text-zinc-400">{u.role}</p>
+                  <p className="font-medium truncate text-slate-100">{u.name}</p>
+                  <p className="text-[10px] text-slate-500">{u.role}</p>
                 </div>
-                {isSelected && <span className="text-indigo-600 text-sm">✓</span>}
+                {isSelected && <span className="text-blue-400 text-sm">✓</span>}
               </button>
             )
           })}
           {filteredUsers.length === 0 && (
-            <p className="text-xs text-zinc-400 text-center py-4">사용자를 찾을 수 없습니다</p>
+            <p className="text-xs text-slate-400 text-center py-4">사용자를 찾을 수 없습니다</p>
           )}
         </div>
 
         {/* 하단 */}
-        <div className="px-4 py-3 border-t border-zinc-200 dark:border-zinc-700 flex justify-end gap-2">
+        <div className="px-4 py-3 border-t border-slate-700 flex justify-end gap-2">
           <button
             onClick={onClose}
-            className="px-3 py-1.5 text-xs rounded-md border border-zinc-300 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+            className="px-3 py-1.5 text-xs rounded-lg border border-slate-600 hover:bg-slate-700"
           >
             취소
           </button>
           <button
             onClick={handleCreate}
             disabled={!canCreate || createConversation.isPending}
-            className="px-3 py-1.5 text-xs rounded-md bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50"
+            className="px-3 py-1.5 text-xs rounded-lg bg-blue-600 text-white hover:bg-blue-500 disabled:opacity-50"
           >
             {createConversation.isPending ? '생성 중...' : '대화 시작'}
           </button>

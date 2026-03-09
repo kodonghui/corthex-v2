@@ -23,7 +23,6 @@ function formatTime(iso: string) {
 
 function getConversationDisplayName(conv: ConversationListItem, currentUserId: string): string {
   if (conv.type === 'group') return conv.name || '그룹 대화'
-  // 1:1 대화 — 이름이 없으면 "1:1 대화" 표시 (상대방 이름은 서버에서 name 필드로 내려줌)
   return conv.name || '1:1 대화'
 }
 
@@ -41,14 +40,14 @@ type Props = {
 export function ConversationsPanel({ conversations, selectedId, currentUserId, onSelect }: Props) {
   if (conversations.length === 0) {
     return (
-      <div className="flex-1 flex items-center justify-center p-4">
-        <p className="text-xs text-zinc-400 text-center">대화가 없습니다.<br />새 대화를 시작해보세요.</p>
+      <div className="flex-1 flex items-center justify-center p-4" data-testid="conversations-empty">
+        <p className="text-xs text-slate-400 text-center">대화가 없습니다.<br />새 대화를 시작해보세요.</p>
       </div>
     )
   }
 
   return (
-    <div className="flex-1 overflow-y-auto">
+    <div className="flex-1 overflow-y-auto" data-testid="conversations-list">
       {conversations.map((conv) => {
         const displayName = getConversationDisplayName(conv, currentUserId)
         const avatar = getConversationAvatar(conv)
@@ -57,10 +56,11 @@ export function ConversationsPanel({ conversations, selectedId, currentUserId, o
           <button
             key={conv.id}
             onClick={() => onSelect(conv.id)}
-            className={`w-full text-left px-3 py-2.5 text-sm border-b border-zinc-100 dark:border-zinc-800 transition-colors ${
+            data-testid={`conversation-item-${conv.id}`}
+            className={`w-full text-left px-3 py-2.5 text-sm border-b border-slate-800 transition-colors ${
               selectedId === conv.id
-                ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300'
-                : 'hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                ? 'bg-blue-600/10 text-blue-400'
+                : 'hover:bg-slate-800'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -77,14 +77,14 @@ export function ConversationsPanel({ conversations, selectedId, currentUserId, o
                       </span>
                     )}
                     {conv.lastMessage && (
-                      <span className="text-[10px] text-zinc-400">{formatTime(conv.lastMessage.createdAt)}</span>
+                      <span className="text-[10px] text-slate-500">{formatTime(conv.lastMessage.createdAt)}</span>
                     )}
                   </div>
                 </div>
                 {conv.lastMessage ? (
-                  <p className="text-xs text-zinc-500 truncate mt-0.5">{conv.lastMessage.content}</p>
+                  <p className="text-xs text-slate-500 truncate mt-0.5">{conv.lastMessage.content}</p>
                 ) : (
-                  <p className="text-xs text-zinc-400 mt-0.5">메시지 없음</p>
+                  <p className="text-xs text-slate-400 mt-0.5">메시지 없음</p>
                 )}
               </div>
             </div>

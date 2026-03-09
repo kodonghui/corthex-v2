@@ -4,8 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { api } from '../lib/api'
 import { MarkdownRenderer } from '../components/markdown-renderer'
 import { useAuthStore } from '../stores/auth-store'
-import { Card, Tabs, Textarea, Badge, Skeleton, ConfirmDialog, EmptyState, toast } from '@corthex/ui'
-import type { TabItem } from '@corthex/ui'
+import { toast } from '@corthex/ui'
 import { ShareToConversationModal } from '../components/messenger/share-to-conversation-modal'
 
 type Report = {
@@ -29,16 +28,10 @@ type Comment = {
   createdAt: string
 }
 
-const statusLabel: Record<string, string> = {
-  draft: '초안',
-  submitted: '제출됨',
-  reviewed: '검토 완료',
-}
-
-const statusVariant: Record<string, 'default' | 'success' | 'warning' | 'error'> = {
-  draft: 'default',
-  submitted: 'warning',
-  reviewed: 'success',
+const STATUS_STYLES: Record<string, { label: string; className: string }> = {
+  draft: { label: '초안', className: 'bg-slate-700 text-slate-300' },
+  submitted: { label: '📤 CEO 보고 완료', className: 'bg-amber-500/20 text-amber-400' },
+  reviewed: { label: '검토 완료', className: 'bg-emerald-500/20 text-emerald-400' },
 }
 
 export function ReportsPage() {
@@ -180,7 +173,7 @@ export function ReportsPage() {
     (r) => r.submittedTo === user?.id && r.authorId !== user?.id,
   )
 
-  const tabItems: TabItem[] = [
+  const tabs = [
     { value: 'all', label: `전체 (${reportList.length})` },
     { value: 'mine', label: `내 보고서 (${myReports.length})` },
     { value: 'received', label: `받은 보고서 (${receivedReports.length})` },
@@ -242,20 +235,23 @@ export function ReportsPage() {
     }
   }
 
+  const inputClass = 'w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/30 focus:outline-none'
+
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col bg-slate-900" data-testid="reports-page">
       {/* 헤더 */}
-      <div className="px-4 sm:px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+      <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
         <div className="flex items-center gap-3">
           {view !== 'list' && (
             <button
               onClick={handleBack}
-              className="text-sm text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+              className="text-sm text-slate-400 hover:text-slate-200"
+              data-testid="back-btn"
             >
-              &larr; 목록
+              ← 목록
             </button>
           )}
-          <h2 className="text-lg font-semibold">
+          <h2 className="text-xl font-semibold text-slate-50">
             {view === 'list' ? '보고서' : view === 'create' ? '새 보고서' : '보고서 상세'}
           </h2>
         </div>
@@ -266,7 +262,8 @@ export function ReportsPage() {
               setContent('')
               setView('create')
             }}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"
+            className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium"
+            data-testid="new-report-btn"
           >
             + 새 보고서
           </button>
@@ -277,46 +274,70 @@ export function ReportsPage() {
       <div className="flex-1 overflow-y-auto [-webkit-overflow-scrolling:touch]">
         {/* === 목록 뷰 === */}
         {view === 'list' && (
-          <div className="px-4 sm:px-6 py-4 space-y-4 max-w-2xl">
-            <Tabs items={tabItems} value={activeTab} onChange={setActiveTab} />
+          <div className="px-6 py-4 space-y-4 max-w-2xl">
+            {/* Tab Bar */}
+            <div className="flex gap-1" data-testid="report-tabs">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.value}
+                  onClick={() => setActiveTab(tab.value)}
+                  className={`px-4 py-2 text-sm border-b-2 transition-colors ${
+                    activeTab === tab.value
+                      ? 'border-blue-500 text-blue-400 font-medium'
+                      : 'border-transparent text-slate-400 hover:text-slate-200'
+                  }`}
+                  data-testid={`report-tab-${tab.value}`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
 
             {isLoading ? (
-              <div className="space-y-3">
+              <div className="space-y-3" data-testid="reports-loading">
                 {[1, 2, 3].map((i) => (
-                  <Skeleton key={i} className="h-20 rounded-lg" />
+                  <div key={i} className="h-20 bg-slate-800 animate-pulse rounded-xl" />
                 ))}
               </div>
             ) : filteredReports.length === 0 ? (
-              <EmptyState
-                title={activeTab === 'received' ? '받은 보고서가 없습니다' : '아직 보고서가 없습니다'}
-                description={activeTab === 'mine' ? '새 보고서를 작성해보세요' : undefined}
-              />
+              <div className="text-center py-16" data-testid="reports-empty">
+                <p className="text-sm text-slate-400">
+                  {activeTab === 'received' ? '받은 보고서가 없습니다' : '아직 보고서가 없습니다'}
+                </p>
+                {activeTab === 'mine' && (
+                  <p className="text-xs text-slate-500 mt-1">새 보고서를 작성해보세요</p>
+                )}
+              </div>
             ) : (
-              <div className="space-y-2">
-                {filteredReports.map((r) => (
-                  <button
-                    key={r.id}
-                    onClick={() => handleOpenDetail(r.id)}
-                    className="w-full text-left px-4 py-3 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
-                  >
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-sm text-zinc-900 dark:text-zinc-100 truncate">
-                        {r.title}
-                      </span>
-                      <Badge variant={statusVariant[r.status]}>
-                        {r.status === 'submitted' ? '📤 CEO 보고 완료' : statusLabel[r.status]}
-                      </Badge>
-                    </div>
-                    {r.content && (
-                      <p className="text-xs text-zinc-500 line-clamp-2 mb-1">
-                        {(r.content || '').slice(0, 120)}
-                      </p>
-                    )}
-                    <div className="text-[11px] text-zinc-400">
-                      {r.authorName} · {new Date(r.submittedAt || r.updatedAt).toLocaleDateString('ko-KR')}
-                    </div>
-                  </button>
-                ))}
+              <div className="space-y-2" data-testid="reports-list">
+                {filteredReports.map((r) => {
+                  const style = STATUS_STYLES[r.status] || STATUS_STYLES.draft
+                  return (
+                    <button
+                      key={r.id}
+                      onClick={() => handleOpenDetail(r.id)}
+                      className="w-full text-left px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 hover:border-slate-600 cursor-pointer transition-all"
+                      data-testid={`report-item-${r.id}`}
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-medium text-sm text-slate-100 truncate">
+                          {r.title}
+                        </span>
+                        <span className={`text-xs px-2 py-0.5 rounded shrink-0 ${style.className}`}>
+                          {style.label}
+                        </span>
+                      </div>
+                      {r.content && (
+                        <p className="text-xs text-slate-500 line-clamp-2 mb-1">
+                          {(r.content || '').slice(0, 120)}
+                        </p>
+                      )}
+                      <div className="text-[11px] text-slate-500">
+                        {r.authorName} · {new Date(r.submittedAt || r.updatedAt).toLocaleDateString('ko-KR')}
+                      </div>
+                    </button>
+                  )
+                })}
               </div>
             )}
           </div>
@@ -324,19 +345,22 @@ export function ReportsPage() {
 
         {/* === 작성 뷰 === */}
         {view === 'create' && (
-          <div className="px-4 sm:px-6 py-4 max-w-2xl space-y-4">
+          <div className="px-6 py-4 max-w-2xl space-y-4">
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="보고서 제목"
-              className="w-full px-4 py-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className={inputClass}
+              data-testid="report-title-input"
             />
-            <Textarea
+            <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="보고서 내용을 마크다운으로 작성하세요..."
               rows={16}
+              className={inputClass}
+              data-testid="report-content-input"
             />
             <div className="flex gap-3">
               <button
@@ -345,13 +369,14 @@ export function ReportsPage() {
                   createReport.mutate({ title: title.trim(), content })
                 }}
                 disabled={!title.trim() || createReport.isPending}
-                className="px-5 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+                className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-5 py-2.5 text-sm font-medium disabled:opacity-50"
+                data-testid="save-draft-btn"
               >
                 {createReport.isPending ? '저장 중...' : '초안 저장'}
               </button>
               <button
                 onClick={handleBack}
-                className="px-5 py-2.5 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 text-sm"
+                className="text-slate-400 hover:text-slate-200 text-sm px-5 py-2.5"
               >
                 취소
               </button>
@@ -361,31 +386,31 @@ export function ReportsPage() {
 
         {/* === 상세 뷰 로딩 === */}
         {view === 'detail' && detailLoading && (
-          <div className="px-4 sm:px-6 py-4 max-w-2xl space-y-4">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-6 w-3/4" />
+          <div className="px-6 py-4 max-w-2xl space-y-4" data-testid="detail-loading">
+            <div className="h-4 w-24 bg-slate-700 animate-pulse rounded" />
+            <div className="h-6 w-3/4 bg-slate-700 animate-pulse rounded" />
             {[...Array(10)].map((_, i) => (
-              <Skeleton key={i} className="h-4 w-full" />
+              <div key={i} className="h-4 w-full bg-slate-700 animate-pulse rounded" />
             ))}
           </div>
         )}
 
         {/* === 상세 뷰 === */}
         {view === 'detail' && !detailLoading && report && (
-          <div className="px-4 sm:px-6 py-4 max-w-2xl space-y-6">
+          <div className="px-6 py-4 max-w-2xl space-y-6" data-testid="report-detail">
             {/* 상태 + 메타 정보 */}
             <div className="space-y-3">
               <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant={statusVariant[report.status]}>
+                <span className={`text-xs px-2 py-0.5 rounded ${STATUS_STYLES[report.status]?.className || ''}`}>
                   {report.status === 'submitted' || report.status === 'reviewed'
                     ? '📤 CEO 보고 완료'
-                    : statusLabel[report.status]}
-                </Badge>
-                <span className="text-xs text-zinc-400">
+                    : STATUS_STYLES[report.status]?.label || report.status}
+                </span>
+                <span className="text-xs text-slate-500">
                   작성: {report.authorName} · {new Date(report.createdAt).toLocaleDateString('ko-KR')}
                 </span>
                 {report.submittedAt && (
-                  <span className="text-xs text-zinc-400">
+                  <span className="text-xs text-slate-500">
                     · 제출: {new Date(report.submittedAt).toLocaleDateString('ko-KR')}
                   </span>
                 )}
@@ -393,7 +418,7 @@ export function ReportsPage() {
 
               {/* CEO 보고 완료 안내 */}
               {report.status !== 'draft' && (
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                <p className="text-xs text-slate-500">
                   CEO에게 보고된 보고서입니다. 본문 수정이 제한됩니다.
                 </p>
               )}
@@ -404,24 +429,25 @@ export function ReportsPage() {
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className={inputClass}
                   />
-                  <Textarea
+                  <textarea
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     rows={14}
+                    className={inputClass}
                   />
                   <div className="flex gap-3">
                     <button
                       onClick={handleSaveEdit}
                       disabled={!title.trim() || updateReport.isPending}
-                      className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+                      className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50"
                     >
                       {updateReport.isPending ? '저장 중...' : '저장'}
                     </button>
                     <button
                       onClick={() => setEditMode(false)}
-                      className="px-4 py-2 text-zinc-500 text-sm"
+                      className="text-slate-400 hover:text-slate-200 text-sm px-4 py-2"
                     >
                       취소
                     </button>
@@ -429,10 +455,10 @@ export function ReportsPage() {
                 </>
               ) : (
                 <>
-                  <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">{report.title}</h2>
+                  <h2 className="text-xl font-bold text-slate-50">{report.title}</h2>
                   <MarkdownRenderer
                     content={report.content || '(내용 없음)'}
-                    className="bg-zinc-50 dark:bg-zinc-800/50 rounded-lg p-5 min-h-[200px]"
+                    className="bg-slate-800/50 rounded-xl p-5 min-h-[200px]"
                   />
                 </>
               )}
@@ -440,25 +466,28 @@ export function ReportsPage() {
 
             {/* 액션 버튼 — 모바일 sticky */}
             {!editMode && (
-              <div className="flex gap-3 border-t border-zinc-200 dark:border-zinc-800 pt-4 sm:static sticky bottom-0 bg-white dark:bg-zinc-900 pb-4 sm:pb-0">
+              <div className="flex gap-3 border-t border-slate-700 pt-4 sm:static sticky bottom-0 bg-slate-900 pb-4 sm:pb-0">
                 {isMyReport && report.status === 'draft' && (
                   <>
                     <button
                       onClick={handleStartEdit}
-                      className="px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-lg text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+                      className="border border-slate-600 text-slate-300 hover:bg-slate-800 rounded-lg px-4 py-2 text-sm"
+                      data-testid="edit-btn"
                     >
                       수정
                     </button>
                     <button
                       onClick={() => setConfirmOpen(true)}
                       disabled={submitReport.isPending}
-                      className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+                      className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50"
+                      data-testid="submit-btn"
                     >
                       📤 CEO에게 보고
                     </button>
                     <button
                       onClick={() => setDeleteConfirmOpen(true)}
-                      className="px-4 py-2 text-red-500 hover:text-red-600 text-sm"
+                      className="text-red-400 hover:text-red-300 text-sm px-4 py-2"
+                      data-testid="delete-btn"
                     >
                       삭제
                     </button>
@@ -468,7 +497,8 @@ export function ReportsPage() {
                   <button
                     onClick={() => reviewReport.mutate()}
                     disabled={reviewReport.isPending}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 transition-colors"
+                    className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50"
+                    data-testid="review-btn"
                   >
                     {reviewReport.isPending ? '처리 중...' : '검토 완료'}
                   </button>
@@ -478,13 +508,15 @@ export function ReportsPage() {
                     <button
                       onClick={handleDownload}
                       disabled={downloading}
-                      className="px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-lg text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+                      className="border border-slate-600 text-slate-300 hover:bg-slate-800 rounded-lg px-4 py-2 text-sm"
+                      data-testid="download-btn"
                     >
                       {downloading ? '다운로드 중...' : '📥 다운로드'}
                     </button>
                     <button
                       onClick={() => setShowShareModal(true)}
-                      className="px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-lg text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+                      className="border border-slate-600 text-slate-300 hover:bg-slate-800 rounded-lg px-4 py-2 text-sm"
+                      data-testid="share-btn"
                     >
                       💬 메신저로 공유
                     </button>
@@ -495,19 +527,19 @@ export function ReportsPage() {
 
             {/* 코멘트 섹션 (제출 이후만) */}
             {report.status !== 'draft' && (
-              <div className="border-t border-zinc-200 dark:border-zinc-800 pt-4 space-y-4">
-                <h3 className="text-sm font-medium text-zinc-500">
+              <div className="border-t border-slate-700 pt-4 space-y-4" data-testid="comments-section">
+                <h3 className="text-sm font-medium text-slate-500">
                   코멘트 ({comments.length})
                 </h3>
 
                 {comments.length === 0 && (
-                  <p className="text-xs text-zinc-400">아직 코멘트가 없습니다</p>
+                  <p className="text-xs text-slate-500">아직 코멘트가 없습니다</p>
                 )}
 
                 {remainingComments > 0 && (
                   <button
                     onClick={loadMoreComments}
-                    className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline"
+                    className="text-xs text-blue-400 hover:underline"
                   >
                     이전 코멘트 {remainingComments}개 더 보기
                   </button>
@@ -518,17 +550,17 @@ export function ReportsPage() {
                   return (
                     <div
                       key={c.id}
-                      className={`max-w-[85%] rounded-lg px-4 py-3 ${
+                      className={`max-w-[85%] rounded-xl px-4 py-3 ${
                         isCeo
-                          ? 'ml-auto bg-indigo-50 dark:bg-indigo-950/20'
-                          : 'mr-auto bg-zinc-50 dark:bg-zinc-800/50'
+                          ? 'ml-auto bg-blue-600/10'
+                          : 'mr-auto bg-slate-800/50'
                       }`}
                     >
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                        <span className="text-xs font-medium text-slate-300">
                           {c.authorName}
                         </span>
-                        <span className="text-[10px] text-zinc-400">
+                        <span className="text-[10px] text-slate-500">
                           {new Date(c.createdAt).toLocaleString('ko-KR', {
                             month: 'short',
                             day: 'numeric',
@@ -537,7 +569,7 @@ export function ReportsPage() {
                           })}
                         </span>
                       </div>
-                      <p className="text-sm whitespace-pre-wrap text-zinc-700 dark:text-zinc-300">
+                      <p className="text-sm whitespace-pre-wrap text-slate-300">
                         {c.content}
                       </p>
                     </div>
@@ -555,14 +587,16 @@ export function ReportsPage() {
                       }
                     }}
                     placeholder="코멘트 작성..."
-                    className="flex-1 px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="flex-1 bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-4 py-2 text-sm focus:outline-none"
+                    data-testid="comment-input"
                   />
                   <button
                     onClick={() => {
                       if (commentInput.trim()) createComment.mutate(commentInput.trim())
                     }}
                     disabled={!commentInput.trim() || createComment.isPending}
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+                    className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50"
+                    data-testid="comment-send-btn"
                   >
                     전송
                   </button>
@@ -572,13 +606,14 @@ export function ReportsPage() {
 
             {/* 에이전트와 이어서 논의하기 */}
             {report.status !== 'draft' && (
-              <div className="border-t border-zinc-200 dark:border-zinc-700 pt-4">
+              <div className="border-t border-slate-700 pt-4">
                 <button
                   onClick={() => navigate('/chat?newSession=true')}
-                  className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-lg text-sm font-medium hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors flex items-center justify-center gap-2"
+                  className="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl px-4 py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                  data-testid="agent-discussion-btn"
                 >
                   <span>에이전트와 이어서 논의하기</span>
-                  <span className="text-xs text-zinc-400">→</span>
+                  <span className="text-xs text-slate-500">→</span>
                 </button>
               </div>
             )}
@@ -587,31 +622,32 @@ export function ReportsPage() {
       </div>
 
       {/* ConfirmDialog: CEO 보고 */}
-      <ConfirmDialog
-        isOpen={confirmOpen}
-        title="CEO에게 보고"
-        description="이 보고서를 CEO에게 보고하시겠습니까? 보고 후 본문 수정이 제한됩니다."
-        confirmText="보고하기"
-        onConfirm={() => {
-          setConfirmOpen(false)
-          submitReport.mutate()
-        }}
-        onCancel={() => setConfirmOpen(false)}
-      />
+      {confirmOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-6 w-96">
+            <h3 className="text-sm font-semibold text-slate-100 mb-2">CEO에게 보고</h3>
+            <p className="text-xs text-slate-400 mb-4">이 보고서를 CEO에게 보고하시겠습니까? 보고 후 본문 수정이 제한됩니다.</p>
+            <div className="flex justify-end gap-2">
+              <button onClick={() => setConfirmOpen(false)} className="border border-slate-600 rounded-lg px-4 py-2 text-sm text-slate-300 hover:bg-slate-700">취소</button>
+              <button onClick={() => { setConfirmOpen(false); submitReport.mutate() }} className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium">보고하기</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ConfirmDialog: 삭제 */}
-      <ConfirmDialog
-        isOpen={deleteConfirmOpen}
-        title="보고서 삭제"
-        description="이 보고서를 삭제하시겠습니까? 되돌릴 수 없습니다."
-        confirmText="삭제"
-        variant="danger"
-        onConfirm={() => {
-          setDeleteConfirmOpen(false)
-          deleteReport.mutate()
-        }}
-        onCancel={() => setDeleteConfirmOpen(false)}
-      />
+      {deleteConfirmOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-6 w-96">
+            <h3 className="text-sm font-semibold text-slate-100 mb-2">보고서 삭제</h3>
+            <p className="text-xs text-slate-400 mb-4">이 보고서를 삭제하시겠습니까? 되돌릴 수 없습니다.</p>
+            <div className="flex justify-end gap-2">
+              <button onClick={() => setDeleteConfirmOpen(false)} className="border border-slate-600 rounded-lg px-4 py-2 text-sm text-slate-300 hover:bg-slate-700">취소</button>
+              <button onClick={() => { setDeleteConfirmOpen(false); deleteReport.mutate() }} className="bg-red-600 hover:bg-red-500 text-white rounded-lg px-4 py-2 text-sm font-medium">삭제</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showShareModal && report && (
         <ShareToConversationModal
