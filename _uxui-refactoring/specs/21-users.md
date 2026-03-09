@@ -294,6 +294,8 @@ Resolution: 375x812, pixel-perfect mobile UI screenshot style. Should look like 
 | `users-status-badge` | 상태 뱃지 | 활성/비활성 표시 |
 | `users-search-input` | 검색 입력 | 이름/아이디 검색 |
 | `users-reactivate-btn` | 재활성화 버튼 | 비활성 사용자 재활성화 |
+| `users-password-modal` | 임시 비밀번호 모달 | 초기화 후 임시 PW 표시 |
+| `users-password-copy` | 비밀번호 복사 버튼 | 임시 PW 클립보드 복사 |
 | `users-empty-state` | 빈 상태 | 직원 없을 때 |
 | `users-loading` | 로딩 상태 | 데이터 로딩 중 |
 | `users-error-state` | 에러 상태 | API 실패 시 에러 메시지 + 재시도 |

@@ -358,6 +358,7 @@ Resolution: 375x812, pixel-perfect mobile UI screenshot style. Should look like 
 | 14 | 예산 경고 배너 | 사용률 80%+ | `costs-budget-banner` 표시, 경고 텍스트 |
 | 15 | 로딩 스켈레톤 | 데이터 로딩 중 | `costs-loading-skeleton` 표시 |
 | 16 | 빈 데이터 상태 | 데이터 없을 때 | 적절한 빈 상태 메시지 |
-| 17 | 뒤로가기 | ← 버튼 클릭 | /dashboard로 이동 |
+| 17 | 예산 미설정 상태 | 예산 미설정 시 | `costs-card-budget`에 안내 메시지 표시 |
 | 18 | 반응형 확인 | 375px 뷰포트 | 카드 1열, 차트 세로 나열 |
 | 19 | 프로바이더 색상 확인 | 도넛 차트 렌더 | Anthropic 파란, OpenAI 초록, Google 주황 |
+| 20 | API 에러 상태 | API 실패 시 | `costs-error-state` 에러 메시지 표시 |
