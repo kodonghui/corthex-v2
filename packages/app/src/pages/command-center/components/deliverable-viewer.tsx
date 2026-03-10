@@ -29,11 +29,12 @@ export function DeliverableViewer({ commandId, command, onDetailClick, onClose }
     return (
       <div data-testid="deliverable-viewer" className="flex-1 flex flex-col min-w-0">
         <div className="flex flex-col items-center justify-center h-full">
-          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" className="text-slate-700 mb-3">
-            <rect x="10" y="6" width="28" height="36" rx="4" stroke="currentColor" strokeWidth="2" />
-            <path d="M18 18h12M18 24h12M18 30h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-          </svg>
-          <p className="text-sm text-slate-500">산출물이 선택되지 않았습니다</p>
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600/10 via-slate-800 to-slate-800 border border-slate-700/50 flex items-center justify-center mb-4">
+            <svg className="w-8 h-8 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+            </svg>
+          </div>
+          <p className="text-sm font-medium text-slate-400">산출물이 선택되지 않았습니다</p>
           <p className="text-xs text-slate-600 mt-1">왼쪽에서 명령을 선택하세요</p>
         </div>
       </div>
@@ -44,8 +45,9 @@ export function DeliverableViewer({ commandId, command, onDetailClick, onClose }
   if (!command) {
     return (
       <div data-testid="deliverable-viewer" className="flex-1 flex flex-col min-w-0">
-        <div className="flex items-center justify-center h-full">
-          <div className="w-6 h-6 rounded-full border-2 border-slate-700 border-t-blue-500 animate-spin" />
+        <div className="flex flex-col items-center justify-center h-full gap-3">
+          <div className="w-8 h-8 rounded-full border-2 border-slate-700 border-t-blue-500 animate-spin" />
+          <p className="text-xs text-slate-600">결과를 불러오는 중...</p>
         </div>
       </div>
     )
@@ -53,56 +55,70 @@ export function DeliverableViewer({ commandId, command, onDetailClick, onClose }
 
   return (
     <div data-testid="deliverable-viewer" className="flex-1 flex flex-col min-w-0">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700 shrink-0">
-        <div className="flex items-center gap-2 min-w-0">
-          <span className="text-sm font-medium text-slate-200 truncate">
-            {command.text?.slice(0, 40)}{command.text?.length > 40 ? '…' : ''}
-          </span>
-          {qualityGate && (
-            <span
-              data-testid={`quality-badge-${command.id}`}
-              className={`text-xs px-1.5 py-0.5 rounded border ${
-                qualityGate.passed
-                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-                  : 'bg-red-500/20 text-red-400 border-red-500/30'
-              }`}
+      {/* Header — gradient accent */}
+      <div className="relative overflow-hidden border-b border-slate-700/50 shrink-0">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 via-transparent to-transparent" />
+        <div className="relative flex items-center justify-between px-5 py-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 rounded-xl bg-blue-500/15 flex items-center justify-center shrink-0">
+              <svg className="w-4.5 h-4.5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+              </svg>
+            </div>
+            <div className="min-w-0">
+              <span className="text-sm font-semibold text-white truncate block">
+                {command.text?.slice(0, 50)}{command.text?.length > 50 ? '…' : ''}
+              </span>
+              {command.createdAt && (
+                <span className="text-xs text-slate-500 font-mono">{new Date(command.createdAt).toLocaleString('ko-KR')}</span>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {qualityGate && (
+              <span
+                data-testid={`quality-badge-${command.id}`}
+                className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full border ${
+                  qualityGate.passed
+                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                    : 'bg-red-500/10 text-red-400 border-red-500/20'
+                }`}
+              >
+                <span className={`w-1.5 h-1.5 rounded-full ${qualityGate.passed ? 'bg-emerald-400' : 'bg-red-400'}`} />
+                {qualityGate.passed ? 'PASS' : 'FAIL'} {qualityGate.totalScore}
+              </span>
+            )}
+            <button
+              onClick={onDetailClick}
+              title="전체 보기"
+              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all cursor-pointer"
             >
-              {qualityGate.passed ? 'PASS' : 'FAIL'} {qualityGate.totalScore}
-            </span>
-          )}
-        </div>
-        <div className="flex items-center gap-1">
-          <button
-            onClick={onDetailClick}
-            title="전체 보기"
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700 transition-colors"
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M10 2h4v4M6 14H2v-4M14 2l-5 5M2 14l5-5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-          <button
-            onClick={onClose}
-            title="닫기"
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700 transition-colors"
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-            </svg>
-          </button>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M10 2h4v4M6 14H2v-4M14 2l-5 5M2 14l5-5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+            <button
+              onClick={onClose}
+              title="닫기"
+              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all cursor-pointer"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-700 shrink-0">
+      <div className="flex border-b border-slate-700/50 shrink-0 px-1">
         <button
           data-testid="viewer-tab-overview"
           onClick={() => setActiveTab('overview')}
-          className={`px-4 py-2 text-sm font-medium transition-colors ${
+          className={`px-4 py-3 text-sm font-medium transition-all cursor-pointer ${
             activeTab === 'overview'
               ? 'text-blue-400 border-b-2 border-blue-400'
-              : 'text-slate-500 hover:text-slate-300'
+              : 'text-slate-500 hover:text-slate-300 border-b-2 border-transparent'
           }`}
         >
           개요
@@ -110,10 +126,10 @@ export function DeliverableViewer({ commandId, command, onDetailClick, onClose }
         <button
           data-testid="viewer-tab-deliverable"
           onClick={() => setActiveTab('deliverable')}
-          className={`px-4 py-2 text-sm font-medium transition-colors ${
+          className={`px-4 py-3 text-sm font-medium transition-all cursor-pointer ${
             activeTab === 'deliverable'
               ? 'text-blue-400 border-b-2 border-blue-400'
-              : 'text-slate-500 hover:text-slate-300'
+              : 'text-slate-500 hover:text-slate-300 border-b-2 border-transparent'
           }`}
         >
           산출물
@@ -121,24 +137,21 @@ export function DeliverableViewer({ commandId, command, onDetailClick, onClose }
       </div>
 
       {/* Content area */}
-      <div className="flex-1 overflow-y-auto px-4 py-4">
+      <div className="flex-1 overflow-y-auto px-5 py-5">
         {command.result ? (
           <div
-            className="prose prose-sm prose-invert max-w-none prose-headings:text-slate-100 prose-p:text-slate-300 prose-strong:text-slate-200 prose-code:text-cyan-400 prose-code:bg-slate-800 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-a:text-blue-400 prose-blockquote:border-slate-600 prose-blockquote:text-slate-400 prose-pre:bg-slate-800 prose-pre:border prose-pre:border-slate-700 cursor-pointer"
+            className="prose prose-sm prose-invert max-w-none prose-headings:text-slate-100 prose-p:text-slate-300 prose-strong:text-slate-200 prose-code:text-cyan-400 prose-code:bg-slate-800 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-lg prose-a:text-blue-400 prose-blockquote:border-slate-600 prose-blockquote:text-slate-400 prose-pre:bg-slate-800/80 prose-pre:border prose-pre:border-slate-700/50 prose-pre:rounded-xl cursor-pointer"
             onClick={onDetailClick}
           >
             <MarkdownRenderer content={command.result} />
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-full gap-3">
-            <div className="w-6 h-6 rounded-full border-2 border-slate-700 border-t-blue-500 animate-spin" />
+            <div className="w-8 h-8 rounded-full border-2 border-slate-700 border-t-blue-500 animate-spin" />
             <p className="text-xs text-slate-600">결과 대기 중...</p>
           </div>
         )}
       </div>
-
-      {/* Footer hint */}
-      <p className="text-xs text-slate-600 text-center py-2">클릭하여 전체 보기</p>
     </div>
   )
 }

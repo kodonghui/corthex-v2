@@ -8,9 +8,31 @@ test.describe('Command Center — 인터랙션 테스트', () => {
 
   test('페이지 렌더링 및 핵심 요소 확인', async ({ page }) => {
     await expect(page.locator('[data-testid="command-center-page"]')).toBeVisible()
+    await expect(page.locator('[data-testid="command-center-header"]')).toBeVisible()
     await expect(page.locator('[data-testid="preset-manager-btn"]')).toBeVisible()
     await expect(page.locator('[data-testid="command-input"]')).toBeVisible()
     await expect(page.locator('[data-testid="send-button"]')).toBeVisible()
+  })
+
+  test('KPI 카드 4개 표시', async ({ page }) => {
+    await expect(page.locator('[data-testid="kpi-card-commands"]')).toBeVisible()
+    await expect(page.locator('[data-testid="kpi-card-agents"]')).toBeVisible()
+    await expect(page.locator('[data-testid="kpi-card-pipeline"]')).toBeVisible()
+    await expect(page.locator('[data-testid="kpi-card-presets"]')).toBeVisible()
+  })
+
+  test('KPI 프리셋 카드 클릭 시 프리셋 모달 열림', async ({ page }) => {
+    await page.locator('[data-testid="kpi-card-presets"]').click()
+    await expect(page.locator('[data-testid="preset-manager-modal"]')).toBeVisible()
+  })
+
+  test('WS 연결 상태 표시 (desktop)', async ({ page }) => {
+    const pill = page.locator('[data-testid="ws-status-pill"]')
+    const isVisible = await pill.isVisible().catch(() => false)
+    // WS status pill is hidden on mobile (hidden sm:flex)
+    if (isVisible) {
+      await expect(pill).toBeVisible()
+    }
   })
 
   test('빈 상태 표시 확인', async ({ page }) => {

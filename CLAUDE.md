@@ -1,149 +1,78 @@
 # CLAUDE.md -- CORTHEX v2
 
-## 사용자 정보
-- 비개발자. 개발 용어 사용 금지. 쉽고 자세하게 설명할 것
-- 항상 존댓말 사용
+## User
+- Non-developer. No jargon. Explain simply
+- Always use 존댓말 (formal Korean)
+- Talk to user in Korean, but code/commits/docs output can be in English
+- Auto commit + push on completion (don't ask)
 
-## 배포 규칙
-- 완료 시 자동 커밋 + 푸시 (묻지 말 것)
-- main push -> GitHub Actions 자동 배포 -> Cloudflare 캐시 퍼지
-- 커밋 후 배포 보고: 빌드 번호(#N) + 변경 내용 + 확인 위치, 테이블 형식
+## Deploy
+- main push -> GitHub Actions -> Cloudflare cache purge
+- Post-deploy report: build #N + changes + where to check (table format)
+- **Before commit+push**: `npx tsc --noEmit -p packages/server/tsconfig.json` (deploy fails on type errors)
+- Common type errors: wrong union values (check shared/types.ts), wrong c.set() keys (check server/types.ts), case-sensitive imports (use `git ls-files`)
+- Team agents must also run tsc before reporting completion
 
-### 커밋 전 필수: TypeScript 타입 체크 (배포 실패 방지)
-**커밋+푸시 전에 반드시 `npx tsc --noEmit -p packages/server/tsconfig.json` 실행할 것!**
-타입 에러가 있으면 Deploy가 실패함. CI 실패와 달리 Deploy 실패는 실제로 배포가 안 됨.
+## v1 Feature Spec (top priority reference)
+- Path: `_bmad-output/planning-artifacts/v1-feature-spec.md`
+- Rule: "if it worked in v1, it must work in v2"
+- No stub/mock/CRUD — real working features only
 
-**과거 배포 실패 원인 분석:**
-| 원인 | 예시 | 방지법 |
-|------|------|--------|
-| UserRole 등 유니온 타입에 없는 값 사용 | `role: 'user'` (정답: `'employee'`) | shared/types.ts의 타입 정의 확인 |
-| c.set() 오버로드 불일치 | AppEnv Variables에 없는 키 사용 | server/types.ts의 AppEnv 확인 |
-| import 경로 대소문자 불일치 | Linux CI는 대소문자 구분함 | `git ls-files` 기준으로 정확히 맞출 것 |
+## v2 Direction
+- Not 29 fixed agents — admin can freely create/edit/delete departments, human staff, AI agents
+- Dynamic org management is the core difference
 
-**팀 에이전트(Developer)에게도 반드시 지시할 것:**
-- dev-story/code-review 완료 후 `npx tsc --noEmit` 실행
-- 타입 에러 있으면 수정 후 보고
-- 특히 shared 패키지의 타입(UserRole, TenantContext 등)을 새 코드에서 쓸 때 정확한 값 확인
+## BMAD Workflow (absolute rules)
 
-## v1 기능 스펙 (최우선 참조)
-- 경로: `_bmad-output/planning-artifacts/v1-feature-spec.md`
-- v1에서 **실제로 동작했던** 모든 기능 포함
-- **기획/설계/구현 모든 단계에서 이 문서를 참조할 것**
-- 핵심 원칙: "v1에서 동작했으면 v2에서도 반드시 동작해야 한다"
-- stub/mock/CRUD 페이지가 아닌 진짜 동작하는 기능을 만들 것
+### Planning Pipeline
+- Run via `/bmad-full-pipeline planning`. All steps require party mode
+- Always create fresh (overwrite existing docs, never skip)
+- Commit per stage: `docs(planning): {stage} complete -- {N} party rounds`
 
-## v2 핵심 방향 (v1과 다른 점)
-- 29명 고정이 아님 -- 관리자가 **부서/인간직원/AI직원을 자유롭게 생성-수정-삭제** 가능
-- 동적 조직 관리가 핵심. 에이전트 수는 관리자가 결정
+### Party Mode: Single Worker Self-Review
+- 1 Worker writes + self-reviews 3 rounds (not 2-person ping-pong)
+- Round lenses: Collaborative → Adversarial → Forensic
+- Worker re-reads file each round (no memory-based review)
+- YOLO mode: auto-proceed, no menus, no waiting
+- Check: real features? concrete plan? covers v1 spec?
+- PASS/FAIL by Worker. Pass = 0 major objections
 
-## BMAD 워크플로우 규칙 (절대 규칙 -- 위반 시 전체 작업 삭제)
+### Story Development (5 mandatory BMAD skills per story)
+1. `bmad-bmm-create-story` → story file
+2. `bmad-bmm-dev-story` → implementation (**no stubs**)
+3. `bmad-tea-automate` → risk-based tests
+4. `bmad-agent-bmm-qa` → QA verification (auto-run, no menu)
+5. `bmad-bmm-code-review` → code review + auto-fix
+- Epic completion: run `bmad-bmm-retrospective`
 
-### 기획 파이프라인 (brief -> PRD -> architecture -> UX -> epics)
-`/bmad-full-pipeline planning`으로 실행. 모든 내부 스텝마다 파티모드 필수.
+### Orchestrator Protocol
+- Main conversation = orchestrator. Real work = TeamCreate worker in tmux
+- Worker spawn must include first task (never "wait")
+- Orchestrator only: assign steps + commit. Worker does everything else
+- Commit only when 6-point checklist passes (create/dev/TEA/QA/CR/real functionality)
 
-### 파티모드 규칙: Worker 1인 자기 리뷰 (필수)
-- **Worker 1명이 작성 + 리뷰를 모두 처리** (2인 핑퐁 방식 아님)
-- Worker가 문서 작성 -> 자기 리뷰 3라운드 (7명 전문가 역할극) -> 오케스트레이터에게 보고
-- 오케스트레이터는 파티모드 직접 안 함 -- Worker가 자율적으로 처리
-- 각 기획 단계의 내부 스텝마다 파티모드 3라운드 (총 ~126회)
-- 파티모드는 YOLO 모드 (자동 진행, 메뉴 없음, 대기 없음)
-- Worker는 매 라운드 파일에서 다시 읽음 (기억으로 리뷰 금지)
-- 파티모드에서 확인할 것:
-  1. 실제 동작하는 기능인가? (stub/mock이 아닌가?)
-  2. 구체적인 구현 계획이 있는가? (placeholder가 아닌가?)
-  3. v1-feature-spec.md의 해당 기능을 커버하는가?
-- PASS/FAIL은 Worker가 자체 판정
-- 합의 기준: 주요 반대 의견 0개, 남은 의견이 모두 "사소한 것"일 때
+### Prohibited
+- Implementing or reviewing code without BMAD skills
+- Skipping QA/TEA steps
+- Treating stub/mock as "done"
+- Orchestrator running party mode directly
+- Showing BMAD agent menus to user
 
-### 기획 파이프라인: 항상 새로 생성 (필수)
-- 기획 파이프라인은 모든 문서를 **처음부터 새로** 만들 것
-- 기존 기획 문서가 있어도 덮어쓰기 -- 건너뛰기 금지
-- "파일이 이미 있다"는 건너뛸 이유가 아님
+## Output Quality (absolute rule)
+All outputs must be **specific and detailed**. No vague/abstract expressions.
+Bad: "professional colors" → Good: `bg-slate-900 (#0f172a)`
+Bad: "add sidebar" → Good: `w-64 fixed left-0 h-screen bg-slate-900 border-r border-slate-700`
+Workers/team agents follow the same standard. "Vague" = instant FAIL in party mode.
 
-### 단계별 개별 커밋 (필수)
-- 각 기획 단계 완료 후 즉시 커밋
-- 커밋 메시지 형식: `docs(planning): {stage} complete -- {N} party rounds`
-- 마지막에 한꺼번에 커밋하는 것 **금지**
+## Coding Conventions
+- Filenames: kebab-case lowercase
+- Imports: must match `git ls-files` casing exactly (Linux CI is case-sensitive)
+- Components: PascalCase
+- API response: `{ success: true, data }` / `{ success: false, error: { code, message } }`
+- Tests: bun:test (server)
 
-### 스토리 개발 필수 순서 (하나도 빠짐없이 BMAD 스킬 호출)
-매 스토리마다 아래 5단계를 **반드시 BMAD 스킬로** 실행할 것.
-
-1. **create-story**: `bmad-bmm-create-story` 스킬 -> 스토리 파일 생성
-2. **dev-story**: `bmad-bmm-dev-story` 스킬 -> 구현 (**stub/mock 금지, 진짜 동작하는 코드만**)
-3. **TEA automate**: `bmad-tea-automate` 스킬 -> 리스크 기반 자동 테스트 생성
-4. **QA 검증**: `bmad-agent-bmm-qa` 에이전트 -> 기능 검증 + 엣지케이스 확인
-5. **code-review**: `bmad-bmm-code-review` 스킬 -> 코드 리뷰 (이슈 발견 시 자동 수정)
-
-### 에픽 완료 시
-- `bmad-bmm-retrospective` 스킬 실행 필수
-
-### BMAD 에이전트 자동 실행 규칙
-- BMAD 에이전트(QA 등) 실행 시 **메뉴 표시하지 말고 바로 작업 실행**할 것
-- 에이전트에서 사용자 입력 기다리지 말 것 -- 알아서 자동 진행
-- BMAD 워크플로우 내 확인/선택 프롬프트도 자동 진행 (YOLO 모드)
-
-### 오케스트레이터 프로토콜 (TeamCreate 팀 위임)
-메인 대화는 **오케스트레이터**. 실제 작업은 **TeamCreate로 생성한 팀원**이 한다.
-팀원은 tmux 분할 창에서 실행되어 사용자가 실시간으로 관찰 가능.
-
-**기획 파이프라인 실행:**
-1. `TeamCreate`로 팀 생성
-2. Worker(팀원 1명) 생성 -- **첫 스텝 지시를 spawn 프롬프트에 포함** ("기다려" 금지)
-3. Worker가 작성 -> 자기 리뷰 3라운드 -> 오케스트레이터에게 완료 보고
-4. 오케스트레이터 -> Worker에게 다음 스텝 지시 (SendMessage)
-5. 단계 완료 -> 커밋 -> Worker 종료 -> 새 Worker 생성 -> 다음 단계
-
-**스토리 개발 실행:**
-1. `TeamCreate`로 팀 생성
-2. Developer(팀원) 생성 -> BMAD 5단계 전체를 지시
-3. Developer가 직렬로 create-story -> dev -> TEA -> QA -> CR 실행 (tmux에서 보임)
-4. 오케스트레이터는 대기 -- 완료 보고 오면 체크리스트 확인 -> 커밋+푸시
-
-### 커밋 전 하드 체크리스트
-매 스토리 커밋 직전, 아래 6개 항목을 출력. 전부 체크되어야만 커밋 가능:
-```
-[BMAD 체크리스트 -- Story X-Y]
-[ ] 1. create-story 완료 (팀 에이전트 또는 스킬)
-[ ] 2. dev-story 완료 (팀 에이전트 또는 스킬)
-[ ] 3. TEA 완료 (팀 에이전트 또는 스킬)
-[ ] 4. QA 완료 (팀 에이전트 또는 스킬)
-[ ] 5. code-review 완료 (팀 에이전트 또는 스킬)
-[ ] 6. 실제 동작 확인 (stub/mock 아님)
-```
-- 하나라도 미완료이면 커밋 금지. 빠진 단계를 먼저 실행할 것
-
-### 절대 금지 사항
-- BMAD 스킬 없이 직접 코드 구현하는 것
-- BMAD 스킬 없이 직접 코드 리뷰하는 것
-- QA/TEA 단계를 건너뛰는 것
-- stub/mock/placeholder를 "구현 완료"로 처리하는 것
-- 기획 단계를 "파일이 이미 있으니" 건너뛰는 것
-- 기획 단계를 한 커밋에 몰아서 커밋하는 것
-- **오케스트레이터가 파티모드를 직접 실행하는 것** -- Worker가 자율 처리
-- BMAD 에이전트 메뉴 보여주면서 사용자한테 선택하라고 하는 것
-- Worker에게 "기다려"라고 spawn하는 것 (첫 작업을 반드시 프롬프트에 포함)
-
-### Party Mode 실행 규칙 (매우 중요)
-- **기획 파이프라인**: Worker가 매 스텝 자기 리뷰 3라운드 (총 ~126회)
-- Worker가 FAIL 판정 -> 재작성 -> 3라운드 재실행
-- 합의 기준: 주요 반대 의견이 0개
-- Party Mode 없이 다음 단계로 넘어가려 하면 반드시 경고
-
-## 작업 효율
-- 기획은 Worker 1인 팀, 개발은 Developer 1인 팀 (tmux에서 관찰 가능)
-- 오케스트레이터는 스텝 지시 + 커밋만 담당 (최소 역할)
-- Worker가 멈추면 SendMessage로 리마인더 전송
-
-## 코딩 컨벤션
-- 파일명: kebab-case 소문자
-- import 경로는 `git ls-files` 기준 실제 케이싱과 반드시 일치 (Linux CI 대소문자 구분)
-- 컴포넌트명: PascalCase
-- API 응답: `{ success: true, data }` / `{ success: false, error: { code, message } }`
-- 테스트: bun:test (서버)
-
-## 컨텍스트 메모리 규칙 (컴팩션 대비)
-- 중요한 결정/방향 전환이 있을 때마다 `.claude/memory/working-state.md`에 현재 상태 기록
-- 긴 작업 중 자연스러운 구간(기능 하나 완료, 방향 전환 등)마다 자동 업데이트
-- 기록 항목: (1) 지금 하고 있는 것 (2) 핵심 결정사항 (3) 다음 할 것 (4) 주의사항
-- 세션 종료 시 `.claude/memory/YYYY-MM-DD-주제.md`로 세션 요약 저장
-- 새 세션 시작 시 `.claude/memory/working-state.md`와 최근 세션 기록을 먼저 읽을 것
+## Context Memory (compaction survival)
+- Auto-save to `.claude/memory/working-state.md` on key decisions and natural breakpoints
+- Record: (1) current work (2) key decisions (3) next steps (4) warnings
+- Session end: save summary to `.claude/memory/YYYY-MM-DD-topic.md`
+- New session: read working-state.md + recent session logs first

@@ -309,10 +309,6 @@ kodonghui_full_pipeline/
   kdh-full-auto-pipeline.md          <- 기획+개발 파이프라인 커맨드
   kdh-uxui-pipeline.md               <- UXUI 리팩토링 파이프라인 커맨드
   example_CLAUDE.md.md               <- CLAUDE.md 예시 (프로젝트에 맞게 수정)
-  memory/                            <- 컨텍스트 메모리 패키지 (NEW)
-    README.md                        <- 메모리 시스템 설명
-    kdh-memory.md                    <- /kdh-memory 슬래시 커맨드
-    example_CLAUDE_memory.md         <- CLAUDE.md에 붙여넣을 메모리 규칙
 ```
 
 ---
