@@ -1,1777 +1,1567 @@
-# Epics & Stories - CORTHEX v2
+---
+stepsCompleted: [1, 2, 3]
+partyModeRounds: 9
+inputDocuments:
+  - _bmad-output/planning-artifacts/product-brief-corthex-v2-engine-refactor-2026-03-10.md
+  - _bmad-output/planning-artifacts/prd.md
+  - _bmad-output/planning-artifacts/architecture.md
+  - _bmad-output/planning-artifacts/ux-design-specification.md
+  - _bmad-output/planning-artifacts/v1-feature-spec.md
+workflowType: 'epics-and-stories'
+project_name: 'corthex-v2'
+date: '2026-03-11'
+---
 
-**Author:** ubuntu
-**Date:** 2026-03-07
+# CORTHEX v2 — Epics & User Stories
+
+_Agent Engine Refactor: SDK 기반 엔진 교체 + 동적 조직 관리 + 지능화_
+
+## Overview
+
+| 항목 | 값 |
+|------|-----|
+| Total Epics | 12 |
+| Total Stories | 64 |
+| Total Story Points | 174 SP |
+| Phases | 4 (Engine → Orchestration → Tier/Viz → Intelligence) |
+| Duration | ~9 weeks |
+| Architecture Decisions | D1~D16 |
+| Engine Patterns | E1~E10 |
+
+### Phase-Epic Mapping
+
+| Phase | Duration | Epics | Focus |
+|-------|----------|-------|-------|
+| Phase 1: Engine | 2 weeks | Epic 1~4 | SDK 엔진 교체, Hook 보안, 마이그레이션 |
+| Phase 2: Orchestration | 3 weeks | Epic 5~7 | 비서 시스템, Hub UX, 조직 관리 |
+| Phase 3: Tier & Visualization | 2 weeks | Epic 8~9 | N-Tier 계층, NEXUS React Flow |
+| Phase 4: Intelligence | 2 weeks | Epic 10~11 | 의미검색, NotebookLM, SketchVibe MCP |
+| Supporting | Ongoing | Epic 12 | 테스트 인프라, CI, 품질 게이트 |
 
 ---
 
-## Epic Design
+## Epic 1: Engine Foundation & Infrastructure
 
-### Design Approach
+**Phase:** 1 (Week 1)
+**Priority:** P0 — 모든 후속 Epic의 전제
+**Story Points:** 13 SP
+**Dependencies:** None (첫 번째)
+**Architecture:** D1 (getDB), D3 (에러 코드), D9 (로거), E3, E10
 
-에픽은 PRD의 9개 기능 영역(76 FRs), Architecture의 구현 순서(10단계 의존성 기반), UX Design의 22개 화면 인벤토리, Product Brief의 Phase 전략을 통합하여 설계한다.
+### Goal
+SDK 엔진의 기반 인프라를 구축한다: 멀티테넌시 격리(getDB), 구조화 로거, 에러 코드 체계, 세션 제한, CI 경계 검증. 이 인프라가 없으면 엔진 코어(Epic 2)와 Hook(Epic 3)을 구현할 수 없다.
 
-**에픽 분할 원칙:**
-1. 각 에픽은 독립적으로 배포 가능한 가치 단위
-2. 아키텍처 의존성 순서를 존중 (하위 레이어 먼저)
-3. PRD Phase(P0/P1/Phase 2/Phase 3)와 정렬
-4. 에픽당 5~10개 스토리 범위 유지 (관리 가능 단위)
+### Stories
 
-**기존 완료:** Epic 0 (Foundation) -- Turborepo 모노레포, Hono+Bun 서버, React+Vite SPA 2개, PostgreSQL+Drizzle, WebSocket EventBus, AES-256-GCM 볼트, JWT 인증, bun:test 201건 통과. 이미 커밋됨.
+#### Story 1.1: Phase 1 의존성 검증 및 설치
+**Points:** 3 SP | **Priority:** P0
 
----
+**As a** 개발자
+**I want** Phase 1에 필요한 모든 패키지가 설치되고 빌드가 통과하는 것을
+**So that** 이후 구현 시 의존성 문제로 차단되지 않는다
 
-## Phase 1 MVP -- P0 (Must Have)
+**Acceptance Criteria:**
+- [ ] `@anthropic-ai/claude-agent-sdk@0.2.72` exact pin 설치 (^ 없음)
+- [ ] `@zapier/secret-scrubber` 설치 + ARM64 빌드 확인
+- [ ] `hono-rate-limiter` 설치
+- [ ] `croner` 설치 (Bun 네이티브 호환)
+- [ ] `pino` 설치 + Bun 호환 테스트 → 실패 시 `consola` 폴백 설치 (D9)
+- [ ] `turbo build` 성공 (전체 패키지)
+- [ ] `bun test` 기존 테스트 전체 통과
+- [ ] Zod v4 ↔ 기존 Zod v3 충돌 여부 확인 (`grep -r "from 'zod'" packages/`)
+- [ ] Dockerfile COPY 목록 업데이트
+- [ ] ARM64 Docker 빌드 성공
+- [ ] `bun.lockb` 커밋 추적 확인 (V11)
 
-### Epic 1: Data Layer & Security Foundation
-
-**설명:** v2의 모든 기능이 의존하는 데이터 스키마 확장, 테넌트 격리 미들웨어, RBAC 미들웨어를 구축한다. Architecture 결정 #9(Tenant Isolation)와 #10(Data Architecture)을 구현하며, 모든 후속 에픽의 기반이 된다.
-
-**목표:**
-- Drizzle ORM 스키마에 Phase 1 핵심 테이블 추가 (companies, departments, agents, commands, tasks, tool_invocations, cost_records, credentials, quality_reviews, presets, org_templates, audit_logs)
-- 모든 DB 쿼리에 companyId WHERE 절을 자동 주입하는 테넌트 미들웨어
-- JWT payload에서 역할(Super Admin/Company Admin/CEO/Human 직원) 추출 + API 엔드포인트별 접근 제어
-- 시스템 에이전트 + 기본 조직 템플릿 시드 데이터
-
-**수용 기준:**
-- [ ] 모든 companyId 격리 테이블에 대해 테넌트 미들웨어가 자동으로 WHERE 절 주입
-- [ ] JWT 토큰에 userId + companyId + role 포함, 역할별 API 접근 제한 동작
-- [ ] 감사 로그 테이블에 삭제 불가(soft delete 포함) 제약 적용
-- [ ] 시드 데이터: 비서실장(시스템 에이전트) + 3종 조직 템플릿 생성
-- [ ] 기존 201건 테스트 유지 + 테넌트 격리 테스트 추가
-
-**의존성:** Epic 0 (Foundation) -- 완료됨
-**예상 스토리 수:** 6~8개
-
-**PRD 매핑:** FR42(companyId 격리), FR46(AES-256-GCM), FR48(JWT RBAC), FR49(감사 로그), NFR10(companyId WHERE 필수), NFR13(감사 로그 영구)
-**Architecture 매핑:** Decision #9(Tenant Isolation), #10(Data Architecture)
-**UX 매핑:** 해당 없음 (백엔드 인프라)
+**Technical Notes:**
+- SDK 0.x → exact pin 필수 (아키텍처 V1, V6)
+- pino Bun 호환 테스트 → 실패 시 consola 폴백 (D9)
 
 ---
 
-### Epic 2: Dynamic Organization Management
+#### Story 1.2: getDB(companyId) 멀티테넌시 래퍼
+**Points:** 3 SP | **Priority:** P0
 
-**설명:** v2의 핵심 차별점인 동적 조직 관리를 구현한다. 부서/AI 에이전트 CRUD, 시스템 에이전트 보호, cascade 처리, 조직 템플릿, 조직도 트리 뷰를 포함한다. 관리자 콘솔(admin 앱)의 핵심 화면들(A1 조직도, A2 부서 관리, A3 에이전트 관리, A7 조직 템플릿)을 구축한다.
+**As a** 서버 개발자
+**I want** 모든 DB 접근이 companyId로 자동 격리되는 것을
+**So that** 타사 데이터에 접근할 수 없다
 
-**목표:**
-- 부서 CRUD API + cascade 분석/처리 엔진 (OrganizationService)
-- AI 에이전트 CRUD API (이름, 계급, 모델, allowed_tools, Soul, isSystem)
-- 시스템 에이전트 삭제 차단 (403)
-- 조직 템플릿 적용 API (부서/에이전트 일괄 생성, < 2분 NFR35)
-- 관리자 콘솔 UI: 조직도 트리 뷰, 부서 관리 화면, 에이전트 관리 + Soul 편집
-- CEO 앱: 조직도 읽기 전용 뷰
+**Acceptance Criteria:**
+- [ ] `packages/server/src/db/scoped-query.ts` (~30줄) 생성
+- [ ] READ: agents(), departments(), tierConfigs(), knowledgeDocs() 스코프 쿼리
+- [ ] WRITE: insertAgent(), updateAgent(), deleteAgent() — companyId 자동 주입
+- [ ] UPDATE/DELETE에 companyId WHERE 자동 적용 (E3)
+- [ ] companyId 빈 문자열 시 throw Error (가드)
+- [ ] 단위 테스트: `scoped-query.test.ts` — 격리 검증 3케이스
+- [ ] 기존 `tenant-isolation.test.ts`에 getDB 케이스 추가
 
-**수용 기준:**
-- [ ] 부서 생성/수정/삭제 API 동작, cascade 시 영향 분석(작업 수, 에이전트 수, 비용) 반환
-- [ ] 부서 삭제 시 "완료 대기" / "강제 종료" 모드 선택 가능
-- [ ] 에이전트 미배속 전환 (삭제 대신), 메모리 아카이브, 비용 기록 영구 보존
-- [ ] 시스템 에이전트(isSystem=true) 삭제 시도 시 403 반환
-- [ ] 에이전트 CRUD + Soul 마크다운 편집 + 저장 동작
-- [ ] 조직 템플릿 3종("투자분석", "마케팅", "올인원") 적용 시 부서+에이전트 일괄 생성
-- [ ] 조직도 트리 뷰에서 부서-팀장-전문가 계층 표시, 에이전트 상태 뱃지(유휴/작업중/에러)
-- [ ] 드래그 앤 드롭으로 에이전트 부서 이동
-
-**의존성:** Epic 1 (스키마 + 테넌트 미들웨어)
-**예상 스토리 수:** 8~10개
-
-**PRD 매핑:** FR1-FR12 (조직 관리 12개 전체)
-**Architecture 매핑:** Decision #5(Dynamic Org + Cascade Engine)
-**UX 매핑:** Admin A1(조직도), A2(부서 관리), A3(에이전트 관리), A7(조직 템플릿), CEO 앱 에이전트 페이지
+**Technical Notes:**
+- Anti-Pattern: `db.select().from(agents)` 직접 쿼리 금지 (E3)
+- Phase 1에서는 engine이 사용하는 테이블만. 나머지 점진 추가
+- 기존 코드와 공존 (Phase 1에서는 강제 전환 안 함)
 
 ---
 
-### Epic 3: LLM Multi-Provider & Agent Execution
+#### Story 1.3: 구조화 로거 어댑터
+**Points:** 2 SP | **Priority:** P0
 
-**설명:** AI 에이전트의 두뇌를 구현한다. Claude/GPT/Gemini 3사 LLM 라우터, 3계급 자동 모델 배정, fallback 전략, Batch API 수집기, AgentRunner(무상태 실행기)를 구축한다.
+**As a** 운영자
+**I want** 모든 로그에 sessionId, companyId, agentId가 자동 포함되는 것을
+**So that** 문제 발생 시 세션 단위로 추적할 수 있다
 
-**목표:**
-- LLMRouter: 프로바이더별 어댑터(Anthropic, OpenAI, Google) + Strategy 패턴 라우팅
-- 3계급 자동 모델 배정 (Manager=Sonnet, Specialist=Haiku, Worker=Haiku)
-- 프로바이더 장애 시 자동 fallback (Claude -> GPT -> Gemini, < 5초 NFR26)
-- BatchCollector: 비긴급 요청 수집 + /배치실행 시 일괄 플러시
-- AgentRunner: Soul + 지식 + 도구 정의로 시스템 프롬프트 조립 + LLM 호출
-- 비용 기록: 모든 LLM 호출마다 토큰 수 + 비용 산출 (models.yaml 가격표)
-- models.yaml: 모델별 input/output 1M 토큰당 가격 정의
+**Acceptance Criteria:**
+- [ ] `packages/server/src/db/logger.ts` (~10줄) 생성
+- [ ] pino 우선 시도 → Bun 미호환 시 consola 폴백 (D9)
+- [ ] 어댑터 인터페이스: `{ info, warn, error, child }` — 교체 비용 0
+- [ ] child logger 패턴: `log.child({ sessionId, companyId, agentId })`
+- [ ] 구조화 출력: `{ timestamp, level, sessionId, agentId, companyId, event, data }`
+- [ ] console.log 직접 사용 금지 (Anti-Pattern 등록)
 
-**수용 기준:**
-- [ ] Claude/GPT/Gemini 3사 API 호출 성공
-- [ ] 에이전트 계급에 따라 모델 자동 배정 (Admin 수동 변경 가능)
-- [ ] 프로바이더 장애 시 5초 내 fallback 전환
-- [ ] Batch API 큐에 요청 수집 + /배치실행으로 일괄 전송
-- [ ] AgentRunner가 Soul + allowed_tools로 시스템 프롬프트 조립 후 LLM 호출
-- [ ] 모든 LLM 호출에 대해 cost_records 테이블에 비용 기록
-- [ ] 에이전트 프롬프트에 크리덴셜 노출 금지 (NFR11)
-
-**의존성:** Epic 1 (스키마 -- agents 테이블 정의 포함)
-**예상 스토리 수:** 7~9개
-
-**PRD 매핑:** FR26-FR34 (도구&LLM 9개 중 LLM 부분), FR30(3계급 자동 배정), FR31(수동 모델 변경), FR32(3사 라우팅), FR33(Batch API), FR34(fallback)
-**Architecture 매핑:** Decision #2(Agent Execution Model), #3(LLM Provider Router), #7(Cost Tracking)
-**UX 매핑:** 해당 없음 (서버 내부, UI는 Epic 5에서)
+**Technical Notes:**
+- NFR-LOG1~3 요구사항 충족
+- 30일 보관은 인프라 설정 (이 스토리 범위 외)
 
 ---
 
-### Epic 4: Tool System
+#### Story 1.4: 에러 코드 레지스트리
+**Points:** 2 SP | **Priority:** P0
 
-**설명:** 에이전트가 실제 작업을 수행하는 수단인 도구 시스템을 구현한다. ToolPool 레지스트리, 서버 사이드 권한 검증, 핵심 30+ 도구, 도구 호출 로그를 구축한다.
+**As a** 프론트엔드/백엔드 개발자
+**I want** 모든 에러가 도메인 프리픽스 코드로 통일되는 것을
+**So that** HTTP와 SSE 양쪽에서 일관된 에러 처리가 가능하다
 
-**목표:**
-- ToolPool: 도구 레지스트리 + Zod 파라미터 검증 + 실행 + 결과 반환 (4000자 초과 시 요약)
-- 서버 사이드 allowed_tools 권한 검증 (에이전트 응답이 아닌 서버에서 차단, NFR14)
-- 핵심 30+ 도구 구현 (common 카테고리 우선): real_web_search, calculator, translator, spreadsheet_tool, chart_generator, email_sender, file_manager, date_utils 등
-- 도구 호출 로그: agent, tool, input, output, duration 기록 (tool_invocations 테이블)
-- 관리자 콘솔 도구 관리 화면 (A5): 도구 카탈로그 + 에이전트별 체크박스 권한 매트릭스
+**Acceptance Criteria:**
+- [ ] `packages/server/src/lib/error-codes.ts` (~30줄) 생성
+- [ ] 프리픽스 6종: AUTH_, AGENT_, SESSION_, HANDOFF_, TOOL_, ORG_ (D3)
+- [ ] 기존 숫자 코드 → 서술 별명 매핑 (AUTH_001 → AUTH_INVALID_CREDENTIALS)
+- [ ] 신규 코드: AGENT_SPAWN_FAILED, AGENT_TIMEOUT, SESSION_LIMIT_EXCEEDED, HANDOFF_DEPTH_EXCEEDED, HANDOFF_CIRCULAR, HANDOFF_TARGET_NOT_FOUND, TOOL_PERMISSION_DENIED, HOOK_PIPELINE_ERROR
+- [ ] `as const` 타입 안전성
+- [ ] 단위 테스트: `error-codes.test.ts` — 중복 코드 없음 검증
+- [ ] 기존 에러 코드와 충돌 없음 확인
 
-**수용 기준:**
-- [ ] ToolPool에 30+ 도구 등록, 각 도구 Zod 스키마 + execute() 구현
-- [ ] 에이전트가 allowed_tools에 없는 도구 호출 시 서버에서 자동 차단 + 로그
-- [ ] 도구 결과 > 4000자 시 자동 요약 절삭
-- [ ] 모든 도구 호출이 tool_invocations 테이블에 기록
-- [ ] 관리자 콘솔에서 에이전트별 도구 권한 체크박스 매트릭스로 설정/변경
-
-**의존성:** Epic 1 (스키마), Epic 3 (AgentRunner -- 도구 호출은 AgentRunner 내부에서)
-**예상 스토리 수:** 6~8개
-
-**PRD 매핑:** FR26(도구 호출), FR27(서버 사이드 권한 강제), FR28(도구 권한 설정), FR29(도구 호출 로그)
-**Architecture 매핑:** Decision #4(Tool System)
-**UX 매핑:** Admin A5(도구 관리)
+**Technical Notes:**
+- 신규 engine 코드: 영어 메시지 (디버깅용)
+- 프론트: Phase 2에서 `error-messages.ts` 코드→한국어 변환 (S10)
+- 미등록 코드 fallback: "오류가 발생했습니다 (코드: {code})" (P11)
 
 ---
 
-### Epic 5: Orchestration Engine & Command Center
+#### Story 1.5: 세션 Rate Limiter 미들웨어
+**Points:** 2 SP | **Priority:** P1
 
-**설명:** CORTHEX의 핵심 경험을 구현한다. CEO가 사령관실에서 명령을 입력하면 비서실장이 자동 분류하고, Manager에게 위임하며, Specialist들이 병렬 작업하고, 결과를 종합하여 품질 검수 후 CEO에게 보고하는 전체 파이프라인. 사령관실 UI(명령 입력, @멘션, 슬래시 8종, 프리셋, 위임 체인 실시간 표시)를 포함한다.
+**As a** 시스템 관리자
+**I want** 동시 에이전트 세션이 20개를 초과하지 않는 것을
+**So that** 4코어 서버의 CPU가 포화되지 않는다
 
-**목표:**
-- OrchestratorService: 명령 수명주기 관리 (수신 -> 분류 -> 위임 -> 병렬 실행 -> 종합 -> 검수 -> 보고)
-- ChiefOfStaff: 명령 자동 분류 + 최종 검수 5항목(결론/근거/리스크/형식/논리) + 자동 재작업(최대 2회)
-- Manager 위임: 자체 분석(#007 5번째 분석가) + 하위 전문가 병렬 배분 + 결과 종합
-- /전체: 모든 Manager 동시 위임 + 결과 종합
-- /순차: Manager 순차 위임 + 결과 누적
-- 딥워크: 에이전트 자율 다단계 작업 (계획 -> 수집 -> 분석 -> 초안 -> 최종)
-- 사령관실 UI: 채팅형 입력 바, @멘션 자동완성, 슬래시 명령 팝업 8종, 프리셋 CRUD
-- 위임 체인 실시간 표시: WebSocket command+delegation+tool 채널 구독
-- 보고서 뷰: 마크다운 렌더링 + 품질 뱃지(PASS/FAIL) + 비용 요약 + 피드백(thumbs up/down)
-- 단계별 타임아웃 (LLM 단일 < 30초, 전체 체인 < 5분)
+**Acceptance Criteria:**
+- [ ] `packages/server/src/middleware/rate-limiter.ts` 생성
+- [ ] `hono-rate-limiter` 기반 동시 세션 제한 (NFR-SC1: 20)
+- [ ] 초과 시 HTTP 429 + `SESSION_LIMIT_EXCEEDED` 에러 코드
+- [ ] 세션 종료 시 카운트 감소 (SSE done 이벤트 연동)
+- [ ] 설정 가능: 환경변수 `MAX_CONCURRENT_SESSIONS` (기본 20)
 
-**수용 기준:**
-- [ ] "삼성전자 분석해줘" -> 비서실장 분류 -> Manager 위임 -> Specialist 병렬 실행 -> Manager 종합 -> 비서실장 검수 -> CEO 보고서 수신
-- [ ] @멘션으로 특정 Manager 직접 지정 동작 (자동완성 팝업에 현재 활성 Manager 표시)
-- [ ] 슬래시 8종(/전체, /순차, /도구점검, /배치실행, /배치상태, /명령어, /토론, /심층토론) 동작
-- [ ] 프리셋 CRUD + 프리셋에서 명령 실행
-- [ ] 위임 체인 실시간 표시: 에이전트 이름 + 현재 단계 + 경과 시간 + 도구 호출 표시
-- [ ] 품질 게이트 5항목 검수 -> FAIL 시 자동 재작업(최대 2회) -> 2회 실패 후 경고 플래그 달아 전달
-- [ ] 보고서에 thumbs up/down 피드백 기능
-- [ ] 오케스트레이션 성공률 > 95% (NFR20)
-- [ ] 단순 명령 < 60초, 복합 명령 < 5분 (NFR1, NFR2)
-
-**의존성:** Epic 2 (조직 데이터), Epic 3 (LLM Router + AgentRunner), Epic 4 (ToolPool)
-**예상 스토리 수:** 10~12개 (가장 큰 에픽 -- 내부 마일스톤으로 Backend/Frontend/QualityGate 3개 트랙 관리 권장)
-
-**PRD 매핑:** FR13-FR25 (사령관실 6 + 오케스트레이션 7), FR50-FR51 (품질 게이트 P0)
-**Architecture 매핑:** Decision #1(Orchestration Engine), #6(Quality Gate), #8(Real-time Communication)
-**UX 매핑:** CEO 앱 #2(사령관실), Core User Flow 1(명령 -> 위임 -> 결과)
+**Technical Notes:**
+- 4코어 ARM64, HT 없음 → 동시 spawn 시 CPU 스파이크 주의
+- CLI rate limit에 의해 추가 하향 가능 (Phase 1 부하 테스트로 확정)
 
 ---
 
-## Phase 1 MVP -- P1 (Should Have)
+#### Story 1.6: CI Engine 경계 검증 스크립트
+**Points:** 1 SP | **Priority:** P1
 
-### Epic 6: Dashboard & Activity Monitoring
+**As a** 개발자
+**I want** engine/ 내부 모듈이 외부에서 직접 import되면 CI가 실패하는 것을
+**So that** 아키텍처 경계(E8, E10)가 자동으로 보호된다
 
-**설명:** 작전현황(홈 대시보드)과 통신로그 4탭을 구현한다. CEO/Admin이 조직 현황, 비용, 에이전트 활동을 실시간으로 모니터링하는 화면을 제공한다.
+**Acceptance Criteria:**
+- [ ] `.github/scripts/engine-boundary-check.sh` 생성
+- [ ] `grep -rn "from.*engine/hooks/"` routes/, lib/ → 발견 시 exit 1
+- [ ] `grep -rn "from.*engine/soul-renderer"` routes/, lib/ → 발견 시 exit 1
+- [ ] `grep -rn "from.*engine/model-selector"` routes/, lib/ → 발견 시 exit 1
+- [ ] `deploy.yml`에 step 추가 (빌드 전 실행)
+- [ ] 허용: `engine/agent-loop`, `engine/types` import만
 
-**목표:**
-- 작전현황(홈) 대시보드: 요약 카드 4개(작업/비용/에이전트/연동 상태), AI 사용량 그래프(프로바이더별), 예산 진행 바, 퀵 액션(루틴+시스템 명령), 만족도 원형 차트
-- 통신로그 4탭: 활동(에이전트 활동), 통신(위임 기록 from->to, 비용, 토큰), QA(품질 검수 결과), 도구(도구 호출 기록)
-- 실시간 데이터: WebSocket cost + agent-status 채널 연동
-
-**수용 기준:**
-- [ ] 작전현황에 4개 요약 카드 실시간 갱신
-- [ ] AI 사용량 막대 그래프 (Anthropic/OpenAI/Google 프로바이더별)
-- [ ] 예산 진행 바 (초록->노랑->빨강 색상 변화)
-- [ ] 퀵 액션 버튼 클릭 시 사령관실에 해당 명령 자동 입력
-- [ ] 만족도 원형 차트 (thumbs up/down 집계)
-- [ ] 통신로그 4탭 각각 필터 + 상세 모달 동작
-- [ ] WebSocket으로 실시간 데이터 반영 (새로고침 불필요)
-
-**의존성:** Epic 5 (오케스트레이션 -- 활동/통신/QA/도구 데이터 생성원)
-**예상 스토리 수:** 6~8개
-
-**PRD 매핑:** FR35-FR37, FR41 (모니터링 4개)
-**Architecture 매핑:** Decision #8(Real-time Communication) WebSocket 채널 활용
-**UX 매핑:** CEO 앱 #1(작전현황), #7(통신로그)
+**Technical Notes:**
+- engine/ 공개 API = agent-loop.ts + types.ts 2개만 (E8)
+- barrel export(index.ts) 만들지 않음
 
 ---
 
-### Epic 7: Cost Management System
+## Epic 2: Agent Engine Core
 
-**설명:** 에이전트별/모델별/부서별 3축 비용 추적, 일일/월 예산 한도, 예산 초과 시 자동 차단을 구현한다. 비용 투명성은 3명 페르소나 모두의 핵심 관심사이다.
+**Phase:** 1 (Week 1~2)
+**Priority:** P0 — 핵심 엔진
+**Story Points:** 18 SP
+**Dependencies:** Epic 1 (getDB, logger, error-codes)
+**Architecture:** D5 (SessionContext), D6 (단일 진입점), E1, E4, E5, E6, E7, E8
 
-**목표:**
-- CostTracker: LLM 호출마다 models.yaml 기반 비용 산출 + cost_records 기록
-- 3축 집계 API: 에이전트별, 모델별, 부서별 실시간 합산
-- 예산 관리: 일일 한도 + 월 한도 설정 (회사별)
-- 한도 초과: 자동 차단 + WebSocket cost 채널로 CEO 알림
-- 비용 대시보드 UI (관리자 콘솔 A6): 도넛 차트(부서별) + 막대 차트(에이전트별) + 예산 진행 바 + 한도 설정 폼
-- CEO 앱 비용 뷰: 작전현황 내 비용 카드 + 드릴다운
+### Goal
+SDK query() 래퍼인 agent-loop.ts를 구현하고, Soul 템플릿 변수 치환, 모델 선택, SSE 어댑터, call_agent 핸드오프를 완성한다. 이 Epic이 완료되면 "에이전트에게 메시지를 보내면 응답을 받는다"가 동작한다.
 
-**수용 기준:**
-- [ ] 모든 LLM 호출에 대해 모델별 가격표 기반 비용 자동 산출
-- [ ] 에이전트별/모델별/부서별 비용 집계 API 응답
-- [ ] 일일/월 예산 한도 설정 + 한도 도달 시 LLM 호출 자동 차단
-- [ ] 예산 초과 시 WebSocket으로 CEO에게 실시간 알림
-- [ ] 비용 대시보드에 도넛/막대 차트 렌더링
-- [ ] 3계급 모델 배정으로 전체 비용 40%+ 절감 (NFR30)
+### Stories
 
-**의존성:** Epic 3 (LLM Router -- 비용 기록 삽입 지점)
-**예상 스토리 수:** 5~7개
+#### Story 2.1: engine/types.ts — SessionContext & SSE 타입 정의
+**Points:** 2 SP | **Priority:** P0
 
-**PRD 매핑:** FR38-FR40 (비용 추적/한도/차트)
-**Architecture 매핑:** Decision #7(Cost Tracking System)
-**UX 매핑:** Admin A6(비용 대시보드), CEO 앱 작전현황 비용 카드
+**As a** 엔진 개발자
+**I want** SessionContext, SSEEvent, PreToolHookResult 등 핵심 타입이 정의되는 것을
+**So that** 모든 엔진 모듈이 일관된 타입을 사용한다
 
----
+**Acceptance Criteria:**
+- [ ] `packages/server/src/engine/types.ts` 생성
+- [ ] SessionContext 인터페이스 — 9 readonly 필드 (E1): cliToken, userId, companyId, depth, sessionId, startedAt, maxDepth, visitedAgents
+- [ ] `readonly string[]` for visitedAgents (병렬 핸드오프 시 독립 복사)
+- [ ] SSEEvent 유니언 타입 — 6종: accepted, processing, handoff, message, error, done (E5)
+- [ ] PreToolHookResult: `{ allow: boolean; reason?: string }`
+- [ ] RunAgentOptions: `{ ctx: SessionContext; soul: string; message: string; tools?: Tool[] }`
+- [ ] **server 내부 전용** — shared re-export 금지 (P1, S1)
+- [ ] `ctx.depth = 1` → 컴파일 에러 확인 (readonly)
 
-### Epic 8: Quality Gate Enhancement
-
-**설명:** P0에서 구현한 비서실장 5항목 간이 검수를 고도화한다. quality_rules.yaml 기반 자동 규칙 검수, 환각 탐지 자동화, 프롬프트 인젝션 방어를 구현한다.
-
-**목표:**
-- quality_rules.yaml: 완전성(길이, 출처, 구조) + 정확성(팩트체크, 환각 방지) 규칙 정의
-- 자동 규칙 검수 엔진: yaml 규칙 기반 + LLM 기반 하이브리드 검수
-- 환각 탐지: 도구를 통한 실제 데이터 조회 결과와 에이전트 응답 비교
-- 프롬프트 인젝션 방어: 시스템 프롬프트/사용자 입력 분리, 에이전트 출력에서 크리덴셜 패턴 필터링
-- 통신로그 QA 탭 강화: 규칙별 검수 결과 상세 표시
-
-**수용 기준:**
-- [ ] quality_rules.yaml 파일 기반 자동 규칙 검수 동작
-- [ ] 환각 탐지: 사실과 다른 내용 감지 시 자동 반려 + 재작업
-- [ ] 프롬프트 인젝션: 시스템 프롬프트 유출 시도 차단 + 로그
-- [ ] 에이전트 출력에서 크리덴셜/API 키 패턴 자동 필터링
-- [ ] QA 탭에서 규칙별 검수 상세 결과 확인 가능
-
-**의존성:** Epic 5 (P0 품질 게이트 기반)
-**예상 스토리 수:** 5~6개
-
-**PRD 매핑:** FR52-FR55 (품질 관리 P1)
-**Architecture 매핑:** Decision #6(Quality Gate Pipeline) P1 확장
-**UX 매핑:** CEO 앱 통신로그 QA 탭 확장
+**Technical Notes:**
+- Anti-Pattern: engine/types.ts를 shared re-export → 프론트에 cliToken 타입 노출
+- 타입 경계 맵: shared/types.ts (공용) ↔ server/types.ts (Hono) ↔ engine/types.ts (엔진)
 
 ---
 
-### Epic 9: Multi-tenancy & Admin Console
+#### Story 2.2: agent-loop.ts — SDK query() 래퍼 + 단일 진입점
+**Points:** 5 SP | **Priority:** P0
 
-**설명:** 멀티테넌시 완성과 관리자 콘솔의 회사/직원 관리 화면을 구현한다. 회사 CRUD, Human 직원 워크스페이스, 부서별 접근 권한, 관리자 콘솔 <-> CEO 앱 전환을 포함한다.
+**As a** 시스템
+**I want** 모든 에이전트 실행이 agent-loop.ts를 통과하는 것을
+**So that** Hook 파이프라인이 우회 불가하고 보안이 보장된다
 
-**목표:**
-- 회사 CRUD API: companyId 자동 발급, 관리자 계정 생성, 초기 비밀번호 발급
-- Human 직원 관리: 워크스페이스 생성, 부서별 접근 권한 부여
-- 직원 사령관실 제한: @멘션에 자기 부서 Manager만, 비용은 자기 부서만
-- 관리자 콘솔 UI (A4 직원 관리, A8 회사 설정): 직원 테이블 + 초대 폼 + 권한 체크리스트 + 회사 정보 + API 키 관리
-- Admin <-> CEO 앱 전환: JWT 세션 공유, 재로그인 불필요
-- 온보딩 위저드: Admin 첫 접속 시 5단계 가이드
+**Acceptance Criteria:**
+- [ ] `packages/server/src/engine/agent-loop.ts` (~50줄) 생성
+- [ ] `runAgent(options: RunAgentOptions)` 단일 export (D6)
+- [ ] SessionContext 생성 (최초 호출 시) 또는 전파 (핸드오프 시)
+- [ ] Pre-spawn "accepted" SSE 이벤트 발행 (SDK spawn ~2초 흡수)
+- [ ] SDK `Agent.query()` 호출: `env: { ANTHROPIC_API_KEY: ctx.cliToken }`
+- [ ] query() 호출 후 cliToken 변수 즉시 null (NFR-S2)
+- [ ] Hook 파이프라인 연결: PreToolUse → PostToolUse → Stop (D4)
+- [ ] 세션 레지스트리: Map<sessionId, SessionContext> — graceful shutdown용 (NFR-O1)
+- [ ] 세션 완료 시 레지스트리 제거 + SSE "done" 이벤트
+- [ ] SDK query() 실패 시 AGENT_SPAWN_FAILED 에러 + SSE error 이벤트 + 세션 레지스트리 정리
+- [ ] SDK rate limit(429) 시 적절한 에러 메시지 + 재시도 안내
+- [ ] AsyncGenerator<SSEEvent> 반환 (sse-adapter 연동용)
 
-**수용 기준:**
-- [ ] 회사 생성 -> companyId 발급 -> 관리자 계정 생성 -> 접속 링크 동작
-- [ ] Human 직원 초대 + 워크스페이스 생성 + 부서별 접근 권한 설정
-- [ ] 직원이 사령관실에서 자기 부서의 Manager만 @멘션 가능
-- [ ] 직원이 자기 워크스페이스 내에서만 명령/비용/이력 확인
-- [ ] Admin 콘솔 <-> CEO 앱 전환 시 재로그인 없이 매끄럽게 이동
-- [ ] 크로스 테넌트 접근 완전 차단 (Admin도 개별 회사 명령 내용 열람 불가)
-
-**의존성:** Epic 1 (테넌트 미들웨어 + RBAC), Epic 2 (조직 관리 -- 부서/에이전트)
-**예상 스토리 수:** 7~9개
-
-**PRD 매핑:** FR43-FR45, FR47 (멀티테넌시 & 사용자 관리 4개)
-**Architecture 매핑:** Decision #9(Tenant Isolation Middleware)
-**UX 매핑:** Admin A4(직원 관리), A8(회사 설정), 온보딩 위저드, Admin<->CEO 전환
-
----
-
-## Phase 2 -- v1 기능 이식 (6개월)
-
-> **도구 확장 전략:** Epic 4에서 ToolPool 프레임워크 + 30+ 공통 도구를 구축한다. Phase 2의 도메인별 도구(Finance, Marketing, Legal, Tech)는 해당 기능 에픽의 스토리로 구현한다. 예: Finance 도구(kr_stock, kis_trading 등)는 Epic 10(Strategy Room) 스토리에 포함. 이는 도구가 해당 기능과 함께 테스트/배포되도록 보장한다.
-
-### Epic 10: Strategy Room & Trading (높음)
-
-**설명:** 투자 분석 + KIS 자동매매를 구현한다. 포트폴리오 대시보드, 관심종목 60초 시세 갱신, CIO+VECTOR 분리(#001), 자율/승인 실행, 투자 성향별 리스크 제어, 실/모의거래 분리를 포함한다. 이사장 페르소나의 핵심 Journey(J2).
-
-**목표:**
-- 전략실 UI: 포트폴리오 카드(현금/보유종목/수익률/총자산), 관심종목 리스트(드래그 정렬, KR/US 필터, 60초 갱신), 차트 모달
-- KIS 증권 API 연동: 시세 조회 + 주문 전송 + 체결 확인
-- CIO(분석) + VECTOR(실행봇) 분리: CIO 종합 분석 -> VECTOR 주문 실행
-- 자율/승인 실행 모드: CEO 설정에서 선택
-- 투자 성향(보수/균형/공격): 종목당 최대 비중%, 일일 매매 한도
-- 실거래/모의거래 분리: 서버 설정으로 완전 분리, 실거래 전환 시 2단계 확인
-- 모의거래(Paper Trading): 초기자금 설정 + 실제 시장 데이터로 가상 매매
-- 주문 이력 영구 보존 (삭제 불가)
-- Finance 도구 추가: kr_stock, dart_api, sec_edgar, backtest_engine, kis_trading
-
-**수용 기준:**
-- [ ] 포트폴리오 대시보드에 보유 종목 + 실시간 시세(60초 갱신) 표시
-- [ ] "/전체 리밸런싱 제안" -> CIO + 4명 전문가 병렬 분석 -> CIO 종합 -> 매매 제안
-- [ ] VECTOR가 KIS API로 한국/미국 시장 주문 전송 + 체결 확인
-- [ ] 자율/승인 실행 모드 선택 + 승인 모드에서 CEO 확인 후 실행
-- [ ] 실거래/모의거래 환경 완전 분리 + 실거래 전환 시 2단계 확인
-- [ ] 모든 매매 주문(실행/취소/거부/체결/미체결) 영구 보존
-
-**의존성:** Epic 5 (오케스트레이션), Epic 4 (도구 시스템 -- Finance 도구 추가)
-**예상 스토리 수:** 8~10개
-
-**PRD 매핑:** FR56-FR62 (투자 & 금융 7개 전체)
-**Architecture 매핑:** Phase 2 추가 테이블 (watchlist, portfolio, trade_orders)
-**UX 매핑:** CEO 앱 #3(전략실), Journey J2(이사장)
+**Technical Notes:**
+- 결정 2(D6): 허브/텔레그램/ARGOS/AGORA/자동매매/스케치바이브 전부 이 함수 통과
+- Phase 1: 순차 핸드오프만 (E7). 병렬은 Phase 2+ branchId 추가 후
+- Soul에 cliToken 절대 주입 안 함 (SEC-6)
 
 ---
 
-### Epic 11: AGORA Debate Engine (높음)
+#### Story 2.3: soul-renderer.ts — Soul 템플릿 변수 치환
+**Points:** 3 SP | **Priority:** P0
 
-**설명:** Manager급 에이전트들이 주제에 대해 라운드 기반 토론을 수행하는 AGORA 엔진을 구현한다. 2/3라운드 토론, SSE 스트리밍, 합의/비합의 판정, Diff 뷰를 포함한다.
+**As a** 에이전트 시스템
+**I want** Soul 마크다운에 DB 데이터가 동적 주입되는 것을
+**So that** 에이전트가 조직/도구/부하 정보를 실시간으로 인지한다
 
-**목표:**
-- 토론 오케스트레이션: /토론(2라운드) + /심층토론(3라운드) 명령 처리
-- 라운드 관리: 각 라운드에서 Manager들이 순차 발언 -> 반론/보완
-- SSE 스트리밍: 토론 과정 실시간 전송 (WebSocket debate 채널)
-- 합의/비합의 판정: 라운드 종료 후 AI가 합의 수준 평가
-- AGORA UI: 라운드 타임라인 뷰 + 에이전트 아바타 + 발언 카드 + 합의 결과
-- 사령관실 -> AGORA 자동 전환: /토론 입력 시 AGORA 화면으로 이동
+**Acceptance Criteria:**
+- [ ] `packages/server/src/engine/soul-renderer.ts` (~40줄) 생성
+- [ ] 6개 변수 치환: `{{agent_list}}`, `{{subordinate_list}}`, `{{tool_list}}`, `{{department_name}}`, `{{owner_name}}`, `{{specialty}}` (E4)
+- [ ] getDB(companyId)로 DB 데이터 조회 (E3)
+- [ ] 치환 실패 시 빈 문자열 대체 (에러 아님)
+- [ ] Soul에 사용자 입력 직접 삽입 절대 금지 (prompt injection 방지)
+- [ ] 단위 테스트: `soul-renderer.test.ts` — 6변수 치환 + 누락 변수 + 빈 DB 케이스
+- [ ] engine 내부 전용 (E8: 외부 import 금지)
 
-**수용 기준:**
-- [ ] /토론 명령 -> 모든 Manager가 2라운드 토론 + 합의 결과 반환
-- [ ] /심층토론 -> 3라운드 심층 토론
-- [ ] 토론 과정 WebSocket으로 실시간 스트리밍
-- [ ] AGORA UI에서 라운드별 발언 확인 + Diff 뷰
-- [ ] 사령관실 대화 이력에 토론 결과 요약 카드 자동 삽입
-
-**의존성:** Epic 5 (오케스트레이션 + 사령관실), Epic 3 (LLM -- 다수 에이전트 동시 호출)
-**예상 스토리 수:** 6~7개
-
-**PRD 매핑:** FR63 (AGORA 토론)
-**Architecture 매핑:** services/agora-engine.ts, WebSocket debate 채널
-**UX 매핑:** CEO 앱 #5(AGORA 토론)
+**Technical Notes:**
+- v1: agents.yaml 고정 → v2: DB 동적 조회 (조직 CRUD와 연동)
+- `{{변수명}}` 이중 중괄호만. soul-renderer.ts만 치환 수행
 
 ---
 
-### Epic 12: SNS Publishing (높음)
+#### Story 2.4: model-selector.ts — 티어→모델 매핑
+**Points:** 1 SP | **Priority:** P0
 
-**설명:** 5개 플랫폼(Instagram, YouTube, 티스토리, 다음카페, LinkedIn) 콘텐츠 자동 발행을 구현한다. AI 콘텐츠 생성, 승인 플로우, 예약 발행, Selenium 자동화를 포함한다.
+**As a** 에이전트 시스템
+**I want** 에이전트 tier에 따라 적절한 Claude 모델이 자동 선택되는 것을
+**So that** Manager는 Sonnet, Worker는 Haiku로 비용이 최적화된다
 
-**목표:**
-- SNS 콘텐츠 관리: AI 생성 + 미디어 갤러리 + 승인/반려 플로우
-- 예약 발행 큐 + 카드뉴스 시리즈(5~10장)
-- Selenium 기반 자동 발행: 로그인 -> 콘텐츠 입력 -> 발행 (60초 타임아웃 NFR29)
-- Marketing 도구 추가: sns_manager, seo_analyzer, hashtag_recommender
+**Acceptance Criteria:**
+- [ ] `packages/server/src/engine/model-selector.ts` (~20줄) 생성
+- [ ] tier_configs 테이블에서 modelPreference 조회 (getDB)
+- [ ] Phase 1~4: Claude 전용 (claude-sonnet-4-6, claude-haiku-4-5 등) (E6)
+- [ ] tier 미설정 시 기본값: claude-haiku-4-5
+- [ ] 단위 테스트: `model-selector.test.ts` — tier별 매핑 + 기본값 케이스
 
-**수용 기준:**
-- [ ] AI가 콘텐츠 생성 + CEO 승인 후 발행
-- [ ] 5개 플랫폼 각각 Selenium 자동 발행 동작
-- [ ] 예약 발행 큐에서 지정 시간에 자동 발행
-- [ ] 카드뉴스 시리즈 5~10장 일괄 생성/발행
-
-**의존성:** Epic 4 (도구 시스템 -- Marketing 도구 추가), Epic 5 (사령관실 명령)
-**예상 스토리 수:** 6~8개
-
-**PRD 매핑:** FR65 (SNS 통신국)
-**Architecture 매핑:** routes/sns.ts, tools/marketing/
-**UX 매핑:** CEO 앱 #6(SNS 통신국)
+**Technical Notes:**
+- llm-router.ts는 동결 (Phase 5+ 재설계). 라우팅 로직 추가 금지
+- 현재 v1: agents.yaml model_name → v2: tier_configs DB
 
 ---
 
-### Epic 13: SketchVibe Canvas (중간)
+#### Story 2.5: sse-adapter.ts — SDK→기존 SSE 변환
+**Points:** 2 SP | **Priority:** P0
 
-**설명:** Cytoscape.js 기반 인터랙티브 캔버스에서 AI와 함께 다이어그램을 그리며 대화하는 SketchVibe를 구현한다. Mermaid<->Cytoscape 양방향 변환, MCP SSE 실시간 AI 편집을 포함한다.
+**As a** 프론트엔드
+**I want** SDK 메시지가 기존 SSE 이벤트 형식으로 변환되는 것을
+**So that** Phase 1에서 프론트엔드 수정 0으로 엔진을 교체할 수 있다
 
-**목표:**
-- Cytoscape.js 캔버스: 8종 노드(agent, system, api, decide, db, start, end, note), 드래그 이동, 더블클릭 편집, Delete 삭제
-- 연결 모드: Space바 토글, edgehandles 드래그 화살표, compound parent subgraph
-- Mermaid <-> Cytoscape 양방향 변환: classDef/style 커스텀 색상, subgraph 변환
-- MCP SSE 연동: AI가 실시간 캔버스 조작 (WebSocket nexus 채널)
-- 저장/불러오기: 확인된 다이어그램 저장 + 지식 베이스 연동
+**Acceptance Criteria:**
+- [ ] `packages/server/src/engine/sse-adapter.ts` (~30줄) 생성
+- [ ] SDK AsyncGenerator<SDKMessage> → SSEEvent 변환
+- [ ] 매핑: SDK text → message, SDK tool_use → processing, SDK 종료 → done
+- [ ] 기존 프론트엔드 SSE 파싱 호환 확인
+- [ ] handoff 이벤트: delegation-tracker Hook에서 주입 (별도)
+- [ ] engine 내부 전용 (E8)
 
-**수용 기준:**
-- [ ] 캔버스에서 8종 노드 생성/편집/삭제/연결 동작
-- [ ] Mermaid 코드 -> Cytoscape 변환 + 역변환 동작
-- [ ] AI가 "이 플로우에서 병목은?" 질문에 캔버스 노드 실시간 추가/수정
-- [ ] 다이어그램 저장/불러오기 동작
-
-**의존성:** Epic 5 (사령관실 -- AI 대화), Epic 3 (LLM)
-**예상 스토리 수:** 6~8개
-
-**PRD 매핑:** FR64 (SketchVibe)
-**Architecture 매핑:** routes/sketches.ts, WebSocket nexus 채널
-**UX 매핑:** CEO 앱 #4(SketchVibe)
+**Technical Notes:**
+- Phase 1 핵심 전략: 프론트 수정 최소화 → SSE 어댑터가 호환 보장
+- WebSocket 이벤트는 Phase 1 기존 형식 유지 (D11)
 
 ---
 
-### Epic 14: Cron Scheduler & ARGOS (중간)
+#### Story 2.6: call-agent.ts — N단계 핸드오프 도구
+**Points:** 5 SP | **Priority:** P0
 
-**설명:** 반복 명령 자동화(크론 스케줄러)와 조건 트리거 자동 수집(ARGOS)을 구현한다. 두 기능은 "자동 실행"이라는 공통 패턴을 공유한다.
+**As a** 비서/매니저 에이전트
+**I want** call_agent 도구로 하위 에이전트에게 작업을 위임할 수 있는 것을
+**So that** 자동 분류→부서 배분→병렬 위임→종합이 동작한다
 
-**목표:**
-- 크론 스케줄러: cron 일정 CRUD, 프리셋(매일 9시 등) + 커스텀 cron 표현식, 활성/비활성 토글, last_run/next_run 추적
-- 사령관실 명령을 지정 시간에 자동 실행 + 결과 전송 (텔레그램/대시보드)
-- ARGOS: 트리거 조건 설정(키워드, 가격 변동 등) -> 조건 만족 시 자동 수집 -> 분석 연결
-- 상태 바: 데이터 OK/NG, AI OK/NG, 트리거 수, 비용
-- 크론기지 UI + ARGOS UI
+**Acceptance Criteria:**
+- [ ] `packages/server/src/tool-handlers/builtins/call-agent.ts` (~40줄) 생성
+- [ ] MCP 도구 스키마: `{ targetAgentId: string, message: string, priority?: string }`
+- [ ] SessionContext spread 복사: `{ ...ctx, depth: ctx.depth + 1, visitedAgents: [...ctx.visitedAgents, targetId] }` (E1)
+- [ ] 깊이 제한: `ctx.depth >= ctx.maxDepth` → HANDOFF_DEPTH_EXCEEDED 에러
+- [ ] 순환 감지: `ctx.visitedAgents.includes(targetId)` → HANDOFF_CIRCULAR 에러 (FR9)
+- [ ] 대상 에이전트 조회: getDB(ctx.companyId).agents() (E3)
+- [ ] 대상 미존재 → HANDOFF_TARGET_NOT_FOUND 에러
+- [ ] 재귀 runAgent() 호출 (agent-loop.ts)
+- [ ] SSE "handoff" 이벤트 발행: `{ from, to, depth }`
+- [ ] Phase 1: 순차 실행만 (for..of). Promise.all은 Phase 2+ (E7)
 
-**수용 기준:**
-- [ ] 크론 일정 CRUD + 프리셋/커스텀 cron 표현식 동작
-- [ ] 지정 시간에 사령관실 명령 자동 실행 + 결과 기록
-- [ ] ARGOS 트리거 조건 설정 + 조건 만족 시 자동 분석 실행
-- [ ] 크론기지 UI에서 활성 토글 + next_run 표시
-
-**의존성:** Epic 5 (사령관실 명령 API 재사용), Epic 4 (도구 -- 데이터 수집 도구)
-**예상 스토리 수:** 6~8개
-
-**PRD 매핑:** FR66(크론 스케줄러), FR67(ARGOS)
-**Architecture 매핑:** services/cron-scheduler.ts, services/argos-collector.ts
-**UX 매핑:** CEO 앱 #11(크론기지), #12(ARGOS)
-
----
-
-### Epic 15: Telegram Integration (중간)
-
-**설명:** 텔레그램 봇을 통해 모바일에서 AI 조직에 명령을 보내고 결과를 수신하는 기능을 구현한다.
-
-**목표:**
-- 텔레그램 Bot API 연동: Webhook 방식
-- 사령관실과 동일한 명령 체계: @멘션, 일반 텍스트
-- 부서별 보고서/비용 텔레그램 푸시 알림
-- 크론 스케줄러 결과 텔레그램 전송
-
-**수용 기준:**
-- [ ] 텔레그램에서 명령 전송 -> 오케스트레이션 실행 -> 결과 텔레그램 메시지로 수신
-- [ ] @멘션으로 특정 Manager 지정 가능
-- [ ] 크론 결과 텔레그램 자동 전송
-
-**의존성:** Epic 5 (사령관실 명령 API), Epic 14 (크론 -- 결과 전송)
-**예상 스토리 수:** 4~5개
-
-**PRD 매핑:** FR68 (텔레그램)
-**Architecture 매핑:** routes/telegram.ts
-**UX 매핑:** 해당 없음 (Bot API, UI 없음)
+**Technical Notes:**
+- v1 오케스트레이션: chief-of-staff → manager → specialist (하드코딩)
+- v2: Soul 기반 자율 위임. call_agent = 범용 핸드오프 도구
+- 병렬 핸드오프 시 visitedAgents가 분기별 독립 (글로벌 Set 아님)
 
 ---
 
-### Epic 16: Knowledge Base & Agent Memory (중간)
+## Epic 3: Hook System & Security Pipeline
 
-**설명:** 지식 관리(정보국)와 에이전트 자동 학습 메모리를 구현한다. 초기 구현은 파일 기반 지식 주입 방식(v1 접근법)을 사용하며, 벡터 DB 기반 RAG는 아키텍처 결정 #13 확정 후 선택적 강화로 추가한다.
+**Phase:** 1 (Week 2)
+**Priority:** P0 — 보안 필수
+**Story Points:** 15 SP
+**Dependencies:** Epic 2 (agent-loop.ts, types.ts)
+**Architecture:** D4 (Hook 순서), E2, SEC-1~6
 
-**목표:**
-- 정보국: 문서 저장소, 폴더 구조, 드래그&드롭 업로드, 문서 CRUD
-- 부서별 지식 자동 주입: 파일 기반 부서별 폴더에서 에이전트 시스템 프롬프트에 관련 지식 포함 (벡터 DB RAG는 선택적 강화)
-- 에이전트 메모리: 작업 완료 후 핵심 학습 포인트 자동 추출 + 저장
-- 다음 유사 작업에서 이전 학습 자동 참고 (시스템 프롬프트 주입)
-- 메모리 금지 원칙: 모든 메모리는 명시적 파일로 관리 (#005)
+### Goal
+5개 Hook을 구현하여 보안 파이프라인을 완성한다. 도구 권한 제어, 민감 정보 마스킹, 핸드오프 추적, 비용 기록. Hook 순서 위반 = 보안 사고 (마스킹 안 된 토큰이 WebSocket으로 노출).
 
-**수용 기준:**
-- [ ] 정보국에 문서 업로드/편집/삭제 + 폴더 관리
-- [ ] 에이전트 시스템 프롬프트에 부서별 지식 자동 주입
-- [ ] 작업 완료 후 학습 포인트 자동 추출 + 저장
-- [ ] 유사 작업 수행 시 이전 학습 내용 자동 참고
+### Stories
 
-**의존성:** Epic 3 (AgentRunner -- 프롬프트 주입 지점), Epic 5 (오케스트레이션)
-**예상 스토리 수:** 6~8개
+#### Story 3.1: tool-permission-guard — PreToolUse Hook
+**Points:** 3 SP | **Priority:** P0
 
-**PRD 매핑:** FR69(RAG), FR70(에이전트 메모리)
-**Architecture 매핑:** routes/knowledge.ts, Phase 2 테이블 (knowledge_docs, agent_memories)
-**UX 매핑:** CEO 앱 #13(정보국)
+**As a** 보안 시스템
+**I want** 에이전트가 허용된 도구만 호출할 수 있는 것을
+**So that** CMO가 kr_stock을 쓰거나 CIO가 sns_manager를 쓸 수 없다
 
----
+**Acceptance Criteria:**
+- [ ] `packages/server/src/engine/hooks/tool-permission-guard.ts` (~20줄) 생성
+- [ ] PreToolUse 시그니처: `(ctx, toolName, toolInput) => PreToolHookResult` (E2)
+- [ ] `agent.allowedTools.includes(toolName)` 확인 (D7: agents.allowed_tools jsonb)
+- [ ] 비허용 → `{ allow: false, reason: TOOL_PERMISSION_DENIED }`
+- [ ] 허용 → `{ allow: true }`
+- [ ] deny 시 이후 Hook 실행 안 함 (D4 순서)
+- [ ] call_agent 도구는 항상 허용 (내장 도구)
+- [ ] 단위 테스트: 허용/거부/call_agent 예외 3케이스
 
-### Epic 17: History, Archive & Performance (낮음)
-
-**설명:** 작전일지(명령 이력), 기밀문서(보고서 아카이브), 전력분석(에이전트 성능/Soul Gym)을 구현한다. 세 기능은 "과거 데이터 조회/분석"이라는 공통 패턴을 공유한다.
-
-**목표:**
-- 작전일지: CEO 명령 이력 검색/필터, 북마크, 태그, A/B 비교, 리플레이
-- 기밀문서: 보고서 아카이브, 부서별/등급별 필터, 유사 문서 찾기
-- 전력분석: Soul Gym(에이전트별 개선 제안, 신뢰도), 품질 대시보드(통과율, 평균 점수), 에이전트 성능(호출 수, 성공률, 비용, 시간)
-
-**수용 기준:**
-- [ ] 작전일지에서 과거 명령 검색 + A/B 비교 + 리플레이 동작
-- [ ] 기밀문서에 보고서 아카이브 + 필터 + 유사 문서 추천
-- [ ] 전력분석에서 에이전트별 성능 지표 + Soul Gym 개선 제안
-
-**의존성:** Epic 5 (명령/보고서 데이터), Epic 7 (비용 데이터), Epic 8 (품질 데이터)
-**예상 스토리 수:** 7~9개
-
-**PRD 매핑:** FR71(작전일지), FR72(기밀문서), FR73(전력분석)
-**Architecture 매핑:** 해당 라우트 + 기존 테이블 활용
-**UX 매핑:** CEO 앱 #8(작전일지), #9(기밀문서), #10(전력분석)
+**Technical Notes:**
+- v1: agents.yaml allowed_tools → v2: DB jsonb 배열 (D7)
+- 도구 리네임 시: `UPDATE agents SET allowed_tools = replace(...)::jsonb`
 
 ---
 
-### Epic 18: Workflow Automation (낮음)
+#### Story 3.2: credential-scrubber — PostToolUse Hook (보안 최우선)
+**Points:** 3 SP | **Priority:** P0
 
-**설명:** 다단계 자동화 파이프라인과 예측 워크플로우(#004)를 구현한다.
+**As a** 보안 시스템
+**I want** 도구 출력에서 민감 패턴(API 키, 토큰, 비밀번호)이 자동 마스킹되는 것을
+**So that** AI가 민감 정보를 학습하거나 WebSocket으로 노출하지 않는다
 
-**목표:**
-- 워크플로우 CRUD: 순차/병렬 다단계 스텝 정의 (데이터 수집 -> 분석 -> 보고서)
-- 실행 상태 추적: currentStep, done, error 실시간 모니터링
-- 예측 워크플로우 (#004): 사용자 명령 패턴 분석 -> 자주 사용하는 워크플로우 자동 제안
+**Acceptance Criteria:**
+- [ ] `packages/server/src/engine/hooks/credential-scrubber.ts` (~20줄) 생성
+- [ ] PostToolUse 시그니처: `(ctx, toolName, toolOutput) => string` (E2)
+- [ ] `@zapier/secret-scrubber` 기반 패턴 탐지
+- [ ] 추가 패턴: CLI 토큰 (`sk-ant-*`), KIS API 키, 텔레그램 봇 토큰
+- [ ] 마스킹 형식: `***REDACTED***`
+- [ ] PostToolUse 순서: **1번째** — redactor, delegation-tracker보다 먼저 (D4)
+- [ ] 단위 테스트: 5개+ 패턴 마스킹 확인
 
-**수용 기준:**
-- [ ] 워크플로우 생성/편집/삭제 + 다단계 스텝 빌더 동작
-- [ ] 워크플로우 실행 시 스텝별 진행 상태 실시간 표시
-- [ ] 자주 사용하는 명령 패턴 기반 워크플로우 자동 제안
-
-**의존성:** Epic 14 (크론 -- 자동 실행), Epic 5 (오케스트레이션)
-**예상 스토리 수:** 5~7개
-
-**PRD 매핑:** FR74(워크플로우), FR75(예측 워크플로우 #004)
-**Architecture 매핑:** CEO 앱 자동화 화면
-**UX 매핑:** CEO 앱 자동화 화면
-
----
-
-## Phase 3 -- 확장 (12개월+)
-
-### Epic 19: Internal Messenger (Phase 3)
-
-**설명:** Human 직원 간 실시간 채팅 기능을 구현한다. 멀티테넌시 안정화 후 진행.
-
-**목표:**
-- 실시간 채팅: Human 직원 간 1:1 및 그룹 메시지
-- AI 분석 결과 공유: 보고서를 메신저로 전달
-- companyId 기반 격리
-
-**의존성:** Epic 9 (멀티테넌시 안정화)
-**예상 스토리 수:** 5~7개
-
-**PRD 매핑:** FR76 (사내 메신저)
+**Technical Notes:**
+- **순서 위반 시 보안 사고**: delegation-tracker가 먼저 실행되면 마스킹 안 된 토큰이 WebSocket 노출
+- `@zapier/secret-scrubber`는 순수 함수 → 모킹 불필요, 실제 실행 (E9)
 
 ---
 
-### Epic 20: Platform Extensions (Phase 3)
+#### Story 3.3: output-redactor — PostToolUse Hook
+**Points:** 2 SP | **Priority:** P0
 
-**설명:** 플랫폼 확장 기능을 구현한다. 조직 템플릿 마켓, 에이전트 마켓플레이스, 공개 API, 노코드 워크플로우 빌더.
+**As a** 보안 시스템
+**I want** credential-scrubber가 놓친 추가 민감 패턴도 마스킹되는 것을
+**So that** 이중 방어선으로 정보 유출을 방지한다
 
-**목표:**
-- 조직 템플릿 마켓: 사용자가 만든 조직 구조 공유/복제
-- 에이전트 마켓플레이스: 공유 Soul/도구 세트 교환
-- API 공개: 외부 시스템 연동
-- 워크플로우 빌더 (노코드): 비주얼 자동화
+**Acceptance Criteria:**
+- [ ] `packages/server/src/engine/hooks/output-redactor.ts` (~15줄) 생성
+- [ ] PostToolUse 시그니처: `(ctx, toolName, toolOutput) => string` (E2)
+- [ ] 커스텀 패턴: 이메일, 전화번호, 주민번호, 계좌번호
+- [ ] 회사별 추가 패턴 설정 가능 (DB에서 로드)
+- [ ] PostToolUse 순서: **2번째** — scrubber 이후, delegation-tracker 이전 (D4)
 
-**의존성:** Epic 18 (워크플로우 기본), Epic 2 (조직 템플릿)
-**예상 스토리 수:** 8~12개
-
-**PRD 매핑:** PRD Vision (Phase 3)
-
----
-
-## Epic Prioritization Summary
-
-| Phase | Epic | 우선순위 | 스토리 수 | 핵심 PRD FRs |
-|-------|------|---------|----------|-------------|
-| **P0** | Epic 1: Data Layer & Security | 최우선 | 6~8 | FR42,46,48,49 |
-| **P0** | Epic 2: Dynamic Organization | 최우선 | 8~10 | FR1-12 |
-| **P0** | Epic 3: LLM & Agent Execution | 최우선 | 7~9 | FR26-34 (LLM) |
-| **P0** | Epic 4: Tool System | 최우선 | 6~8 | FR26-29 (도구) |
-| **P0** | Epic 5: Orchestration & Command | 최우선 | 10~12 | FR13-25, FR50-51 |
-| **P1** | Epic 6: Dashboard & Monitoring | 높음 | 6~8 | FR35-37, FR41 |
-| **P1** | Epic 7: Cost Management | 높음 | 5~7 | FR38-40 |
-| **P1** | Epic 8: Quality Gate Enhancement | 높음 | 5~6 | FR52-55 |
-| **P1** | Epic 9: Multi-tenancy & Admin | 높음 | 7~9 | FR42-49 |
-| **Phase 2** | Epic 10: Strategy & Trading | 높음 | 8~10 | FR56-62 |
-| **Phase 2** | Epic 11: AGORA Debate | 높음 | 6~7 | FR63 |
-| **Phase 2** | Epic 12: SNS Publishing | 높음 | 6~8 | FR65 |
-| **Phase 2** | Epic 13: SketchVibe Canvas | 중간 | 6~8 | FR64 |
-| **Phase 2** | Epic 14: Cron & ARGOS | 중간 | 6~8 | FR66-67 |
-| **Phase 2** | Epic 15: Telegram | 중간 | 4~5 | FR68 |
-| **Phase 2** | Epic 16: Knowledge & Memory | 중간 | 6~8 | FR69-70 |
-| **Phase 2** | Epic 17: History/Archive/Perf | 낮음 | 7~9 | FR71-73 |
-| **Phase 2** | Epic 18: Workflow Automation | 낮음 | 5~7 | FR74-75 |
-| **Phase 3** | Epic 19: Internal Messenger | 미래 | 5~7 | FR76 |
-| **Phase 3** | Epic 20: Platform Extensions | 미래 | 8~12 | Vision |
-| | **총계** | | **~120~160** | **76 FRs + Vision** |
+**Technical Notes:**
+- credential-scrubber와 분리: scrubber = 범용 라이브러리, redactor = 도메인 특화
 
 ---
 
-## Epic Dependency Graph
+#### Story 3.4: delegation-tracker — PostToolUse Hook
+**Points:** 3 SP | **Priority:** P0
+
+**As a** 사용자
+**I want** 핸드오프 과정이 실시간으로 화면에 표시되는 것을
+**So that** "비서실장 → CMO → 콘텐츠 전문가" 체인을 볼 수 있다
+
+**Acceptance Criteria:**
+- [ ] `packages/server/src/engine/hooks/delegation-tracker.ts` (~30줄) 생성
+- [ ] PostToolUse 시그니처: call_agent 도구 실행 후 트리거
+- [ ] WebSocket 이벤트 발행: `{ type: 'handoff', from, to, depth, timestamp }`
+- [ ] **마스킹된 안전한 데이터만** 발행 (scrubber + redactor 이후) (D4)
+- [ ] EventEmitter 기반 (단일 서버 충분. Phase 5+ Redis 교체 대비 인터페이스 추상화)
+- [ ] PostToolUse 순서: **3번째** — scrubber, redactor 이후 (D4)
+- [ ] v1 대응: 기존 delegation-tracker.ts 교체 (코드 처분 매트릭스)
+- [ ] 기존 프론트 WebSocket 채널 호환 (D11: Phase 1 기존 형식 유지)
+
+**Technical Notes:**
+- v1: delegation-tracker.ts → v2: engine/hooks/ 로 이동 + Hook 파이프라인 통합
+- 프론트: 허브 트래커 → 위임 체인 표시 ("비서실장 분석 중..." → "CMO에게 위임")
+
+---
+
+#### Story 3.5: cost-tracker — Stop Hook
+**Points:** 2 SP | **Priority:** P1
+
+**As a** 관리자/CEO
+**I want** 모든 에이전트 호출의 토큰 사용량과 비용이 자동 기록되는 것을
+**So that** 에이전트별/모델별/부서별 비용을 추적할 수 있다
+
+**Acceptance Criteria:**
+- [ ] `packages/server/src/engine/hooks/cost-tracker.ts` (~20줄) 생성
+- [ ] Stop 시그니처: `(ctx, usage: { inputTokens, outputTokens }) => void` (E2)
+- [ ] 비용 계산: 모델별 가격 × 토큰 수 (models config 참조)
+- [ ] DB 기록: agent_id, model, input_tokens, output_tokens, cost_usd, session_id
+- [ ] 핸드오프 체인 내 각 에이전트별 개별 기록
+- [ ] SSE "done" 이벤트에 비용 포함: `{ costUsd, tokensUsed }` (E5)
+
+**Technical Notes:**
+- v1: 비용 관리 대시보드 존재 (v1 spec #21) → v2에서도 동일 데이터 제공
+- Stop Hook이므로 세션 종료 시 1회만 호출
+
+---
+
+#### Story 3.6: Hook 파이프라인 통합 테스트
+**Points:** 2 SP | **Priority:** P0
+
+**As a** 보안 검증자
+**I want** Hook 실행 순서가 보장되고 에러 시 세션이 중단되는 것을
+**So that** 보안 파이프라인의 무결성이 검증된다
+
+**Acceptance Criteria:**
+- [ ] `packages/server/src/__tests__/integration/hook-pipeline.test.ts` 생성
+- [ ] 순서 검증: PreToolUse(permission) → PostToolUse(scrubber→redactor→delegation) → Stop(cost)
+- [ ] permission deny 시 PostToolUse 실행 안 됨 확인
+- [ ] Hook 에러 → HOOK_PIPELINE_ERROR 코드 + SSE error 이벤트 + 세션 중단 (P4)
+- [ ] scrubber 전 delegation-tracker 실행 → FAIL (순서 위반 테스트)
+- [ ] SDK 모킹 사용 (E9): Agent.query() 모킹, Hook은 실제 실행
+
+---
+
+## Epic 4: Engine Migration & Regression
+
+**Phase:** 1 (Week 2)
+**Priority:** P0 — 무중단 전환
+**Story Points:** 14 SP
+**Dependencies:** Epic 2, Epic 3
+**Architecture:** D2 (CLI 토큰 만료), D11 (WebSocket 유지), S11 (호출자 6곳), S12 (불가침)
+
+### Goal
+기존 agent-runner.ts를 engine/agent-loop.ts로 교체하고, 6개 호출자(허브, 텔레그램, ARGOS, AGORA, 자동매매, 스케치바이브)의 import를 전환한다. 기존 서비스 삭제 후 회귀 테스트.
+
+### Stories
+
+#### Story 4.1: hub.ts — SSE 스트리밍 진입점
+**Points:** 3 SP | **Priority:** P0
+
+**As a** CEO/사용자
+**I want** 허브에서 에이전트에게 메시지를 보내면 SSE로 실시간 응답을 받는 것을
+**So that** 사령관실 핵심 기능이 동작한다
+
+**Acceptance Criteria:**
+- [ ] `packages/server/src/routes/workspace/hub.ts` — SSE 엔드포인트 신규 작성 (S3, S7)
+- [ ] HTTP POST → SessionContext 생성 (JWT → userId, companyId)
+- [ ] runAgent() 호출 → AsyncGenerator<SSEEvent> → SSE 스트림 응답
+- [ ] 기존 chat.ts는 세션 REST CRUD 유지 (S3: 역할 분리)
+- [ ] Pre-spawn "accepted" 이벤트 50ms 이내 (체감 지연 0)
+- [ ] 에러 시 SSE error 이벤트 → 프론트 에러 표시
+- [ ] `@mention` 파싱: `@투자분석팀장` → 해당 에이전트 직접 지정
+- [ ] 일반 텍스트: 비서실장(is_secretary=true) 자동 라우팅
+
+**Technical Notes:**
+- v1 핵심 흐름: CEO 명령 → 비서실장 → 팀장 → 전문가 → 종합 → 보고
+- 슬래시 명령어(/전체, /순차, /토론 등) 파싱은 Phase 2 Epic 5에서
+
+---
+
+#### Story 4.2: 호출자 Import 전환 (텔레그램, ARGOS, AGORA, 자동매매)
+**Points:** 3 SP | **Priority:** P0
+
+**As a** 시스템
+**I want** 4개 호출 경로가 agent-runner 대신 agent-loop를 사용하는 것을
+**So that** 모든 에이전트 실행이 새 엔진을 통과한다
+
+**Acceptance Criteria:**
+- [ ] `services/telegram/handler.ts` — import 교체 + SessionContext 생성 코드 추가
+- [ ] `services/argos/scheduler.ts` — import 교체 + SessionContext 생성 코드 추가
+- [ ] `routes/workspace/agora.ts` — import 교체 + SessionContext 생성 코드 추가
+- [ ] `services/trading/executor.ts` — import 교체 + SessionContext 생성 코드 추가
+- [ ] 불가침 원칙: 비즈니스 로직/기능 변경 없음 (S12)
+- [ ] SessionContext 소스: 각 서비스의 설정/JWT에서 companyId 추출
+- [ ] 기존 에러 핸들링 패턴 통합 (새 에러 코드 사용)
+
+**Technical Notes:**
+- 호출자 6곳 중 4곳 (S11). hub.ts는 4.1, sketchvibe-mcp는 Phase 4
+- 불가침 = 비즈니스 로직 변경 없음. import 교체 + SessionContext 추가만
+
+---
+
+#### Story 4.3: 기존 서비스 교체/삭제
+**Points:** 2 SP | **Priority:** P0
+
+**As a** 개발자
+**I want** 교체 완료된 기존 서비스 파일이 삭제되는 것을
+**So that** 코드베이스에 중복 경로가 남지 않는다
+
+**Acceptance Criteria:**
+- [ ] `services/agent-runner.ts` 삭제 (코드 처분 매트릭스: Phase 1 교체)
+- [ ] `services/delegation-tracker.ts` 삭제 (코드 처분 매트릭스: Phase 1 교체)
+- [ ] 삭제 전: `grep -r "agent-runner\|delegation-tracker" packages/server/src/` → 0건 확인
+- [ ] `tsc --noEmit` 성공 (참조 없음 확인)
+- [ ] `bun test` 전체 통과
+
+**Technical Notes:**
+- chief-of-staff.ts, manager-delegate.ts, cio-orchestrator.ts → Phase 2 삭제 (Soul 검증 후)
+- llm-router.ts → 동결 (Phase 5+)
+
+---
+
+#### Story 4.4: Graceful Shutdown 구현
+**Points:** 2 SP | **Priority:** P1
+
+**As a** 운영자
+**I want** 서버 재시작 시 진행 중인 에이전트 세션이 완료된 후 종료되는 것을
+**So that** 사용자가 응답 중간에 연결이 끊기지 않는다
+
+**Acceptance Criteria:**
+- [ ] `packages/server/src/index.ts` — SIGTERM 핸들러 추가
+- [ ] 세션 레지스트리(agent-loop.ts)의 활성 세션 확인
+- [ ] 활성 세션 > 0: 새 요청 거부 (503) + 기존 세션 완료 대기
+- [ ] 타임아웃: 120초 후 강제 종료 (NFR-P8)
+- [ ] 로그: "Graceful shutdown initiated, N active sessions remaining"
+
+**Technical Notes:**
+- NFR-O1 요구사항
+- Docker STOPSIGNAL SIGTERM 확인
+
+---
+
+#### Story 4.5: 3단계 핸드오프 통합 테스트
+**Points:** 2 SP | **Priority:** P0
+
+**As a** QA
+**I want** 비서→매니저→전문가 3단계 핸드오프가 정상 동작하는 것을
+**So that** v1의 핵심 오케스트레이션이 v2에서도 동작한다
+
+**Acceptance Criteria:**
+- [ ] `packages/server/src/__tests__/integration/handoff-chain.test.ts` 생성
+- [ ] SDK 모킹 (E9): 3개 에이전트(비서/매니저/전문가) 모킹
+- [ ] 깊이 추적: depth 0→1→2 확인
+- [ ] visitedAgents 누적: [비서] → [비서, 매니저] → [비서, 매니저, 전문가]
+- [ ] SSE 이벤트 순서: accepted → processing → handoff × 2 → message → done
+- [ ] 순환 감지: 비서→매니저→비서 시도 → HANDOFF_CIRCULAR 에러 확인
+- [ ] 깊이 초과: maxDepth=2에서 3단계 시도 → HANDOFF_DEPTH_EXCEEDED 확인
+- [ ] 비용 합산: 3개 에이전트 각각 cost-tracker 기록 확인
+
+**Technical Notes:**
+- v1 핵심 흐름 재현: CEO → 비서실장 → 팀장 → 전문가
+
+---
+
+#### Story 4.6: Epic 1~20 회귀 테스트
+**Points:** 2 SP | **Priority:** P0
+
+**As a** QA
+**I want** 엔진 교체 후 기존 Epic 1~20의 기능이 모두 정상인 것을
+**So that** "v1에서 되던 건 v2에서도 반드시 된다"
+
+**Acceptance Criteria:**
+- [ ] `tsc --noEmit -p packages/server/tsconfig.json` 통과
+- [ ] `bun test` 전체 통과 (기존 테스트 0 실패)
+- [ ] SSE 이벤트 형식 호환 확인 (기존 프론트 파싱과 일치)
+- [ ] WebSocket 이벤트 기존 형식 유지 (D11)
+- [ ] AGORA 토론 API 동작 확인
+- [ ] 기존 도구 125개 타입 체크 + 샘플 5개 실행
+- [ ] 배포 후 수동 확인: 텔레그램 봇, ARGOS 크론잡, 자동매매
+
+**Technical Notes:**
+- Phase 1 회귀 테스트 매트릭스: CI 자동화 8개 + 수동 3개 + 반자동 1개 (S15, S18)
+
+---
+
+## Epic 5: Secretary System & Soul Orchestration
+
+**Phase:** 2 (Week 3)
+**Priority:** P0 — 핵심 오케스트레이션
+**Story Points:** 16 SP
+**Dependencies:** Epic 2 (agent-loop, soul-renderer), Epic 4 (migration complete)
+**Architecture:** FR11~20 (Secretary & Orchestration), E4 (Soul 변수)
+
+### Goal
+비서실장 Soul 기반 오케스트레이션을 구현하고, 슬래시 명령어/프리셋을 처리한다. 기존 하드코딩 오케스트레이터(chief-of-staff.ts)를 Soul + call_agent으로 대체.
+
+### Stories
+
+#### Story 5.1: 비서 에이전트 DB 필드 및 설정
+**Points:** 2 SP | **Priority:** P0
+
+**As a** 관리자
+**I want** 에이전트를 비서실장으로 지정할 수 있는 것을
+**So that** 사용자 메시지가 비서를 통해 자동 라우팅된다
+
+**Acceptance Criteria:**
+- [ ] agents 테이블에 `is_secretary boolean DEFAULT false` 컬럼 추가
+- [ ] agents 테이블에 `owner_user_id uuid REFERENCES users(id)` 컬럼 추가
+- [ ] 회사당 is_secretary=true 에이전트 최대 1명 제약 (unique partial index)
+- [ ] 비서 삭제 방지 → ORG_SECRETARY_DELETE_DENIED 에러
+- [ ] 마이그레이션 파일 생성 + 기존 데이터 무중단
+
+**Technical Notes:**
+- v1: chief-of-staff 하드코딩 → v2: DB 플래그로 동적 지정
+- owner_user_id: 인간 직원 1명 = CLI 1개 매핑의 기반
+
+---
+
+#### Story 5.2: 비서 Soul 템플릿 작성
+**Points:** 3 SP | **Priority:** P0
+
+**As a** 비서 에이전트
+**I want** 사용자 명령을 분석하여 적절한 부서/에이전트에 위임하는 Soul을
+**So that** 하드코딩 없이 자연어로 라우팅이 동작한다
+
+**Acceptance Criteria:**
+- [ ] 비서 Soul 마크다운 (~2,000자) 작성
+- [ ] 역할 정의: 명령 분류, 부서 라우팅, 결과 종합, CEO 눈높이 보고
+- [ ] `{{agent_list}}` 변수로 가용 에이전트 자동 주입
+- [ ] `{{department_name}}` 변수로 부서 정보 자동 주입
+- [ ] call_agent 도구 사용 지시: "분석이 필요하면 해당 전문가에게 call_agent으로 위임"
+- [ ] 종합 보고 지시: "여러 에이전트 결과를 CEO가 이해하기 쉽게 종합"
+- [ ] QA 검수 지시 (v1 spec #19): 결론/근거/리스크/형식/논리 5항목
+- [ ] v1 비서실장 기능 재현: 자동 분류 → 부서 배분 → 병렬 위임 → 종합
+
+**Technical Notes:**
+- v1: Orchestrator.process_command() 하드코딩 → v2: Soul 기반 자율 판단
+- call_agent = 범용 도구. Soul이 "누구에게 위임할지" 판단
+
+---
+
+#### Story 5.3: 슬래시 명령어 파서
+**Points:** 3 SP | **Priority:** P0
+
+**As a** CEO
+**I want** /전체, /순차, /토론, /심층토론 등 슬래시 명령어가 동작하는 것을
+**So that** v1에서 쓰던 명령 방식이 그대로 된다
+
+**Acceptance Criteria:**
+- [ ] 슬래시 명령어 파서 구현 (hub.ts 또는 별도 모듈)
+- [ ] `/전체` — 모든 매니저급 에이전트에게 동시 지시 (call_agent × N)
+- [ ] `/순차` — 에이전트 릴레이 모드 (순차 핸드오프)
+- [ ] `/도구점검` — 전체 도구 상태 확인
+- [ ] `/배치실행` — 대기 중인 AI 요청 일괄 전송
+- [ ] `/배치상태` — 배치 작업 진행 확인
+- [ ] `/명령어` — 전체 명령어 목록
+- [ ] `/토론` — AGORA 2라운드 토론 시작
+- [ ] `/심층토론` — AGORA 3라운드 토론 시작
+- [ ] 프리셋: 사용자 정의 단축어 (DB 저장)
+
+**Technical Notes:**
+- v1: 8종 슬래시 명령어 (v1 spec §1.1)
+- /토론, /심층토론은 AGORA 엔진 연동
+
+---
+
+#### Story 5.4: 매니저 Soul 표준 템플릿
+**Points:** 2 SP | **Priority:** P0
+
+**As a** 매니저 에이전트
+**I want** 부하 전문가들에게 작업을 배분하고 결과를 종합하는 Soul을
+**So that** v1의 팀장 역할이 동작한다
+
+**Acceptance Criteria:**
+- [ ] 매니저 Soul 표준 템플릿 작성 (~1,500자)
+- [ ] `{{subordinate_list}}` 변수로 부하 에이전트 자동 주입
+- [ ] `{{tool_list}}` 변수로 사용 가능 도구 주입
+- [ ] 작업 분해 → 배분 → 종합 지시
+- [ ] CEO 아이디어 #007: "처장 = 5번째 분석가" → 매니저도 독자 분석 후 종합
+- [ ] 부서별 표준 보고서 형식 (CEO 아이디어 #011)
+
+**Technical Notes:**
+- v1: manager-delegate.ts 하드코딩 → v2: Soul + call_agent
+- 부서별 커스텀 Soul은 관리자가 웹 UI에서 편집 (Phase 2 후반)
+
+---
+
+#### Story 5.5: 기존 오케스트레이터 삭제
+**Points:** 2 SP | **Priority:** P0
+
+**As a** 개발자
+**I want** Soul 기반 오케스트레이션이 검증된 후 하드코딩 파일을 삭제하는 것을
+**So that** 중복 코드가 없다
+
+**Acceptance Criteria:**
+- [ ] `services/chief-of-staff.ts` 삭제 (코드 처분 매트릭스)
+- [ ] `services/manager-delegate.ts` 삭제
+- [ ] `services/cio-orchestrator.ts` 삭제
+- [ ] 삭제 전: grep 0건 확인
+- [ ] `tsc --noEmit` + `bun test` 통과
+
+**Technical Notes:**
+- Phase 2에서 삭제 (Soul 검증 후). Phase 1에서 미리 삭제하지 않음
+
+---
+
+#### Story 5.6: @멘션 + 프리셋 시스템
+**Points:** 2 SP | **Priority:** P1
+
+**As a** CEO
+**I want** @팀장이름으로 직접 지시하고, 자주 쓰는 명령을 프리셋으로 저장하는 것을
+**So that** 효율적으로 AI를 지휘할 수 있다
+
+**Acceptance Criteria:**
+- [ ] @멘션 파싱: `@투자분석팀장 삼성전자 분석` → 비서 우회, 직접 해당 에이전트
+- [ ] 에이전트 이름/별칭으로 매칭 (fuzzy match 아님, 정확 일치)
+- [ ] 프리셋 CRUD: 단축어→전체 명령 매핑 (DB 저장)
+- [ ] 예: "시황" → "현재 주식시장 시황을 분석해줘"
+- [ ] 프리셋 실행: 단축어 입력 시 자동 확장 + 실행
+
+**Technical Notes:**
+- v1 spec §1.1: @멘션 + 프리셋 동작 확인
+
+---
+
+#### Story 5.7: 자율 딥워크 + 품질 게이트
+**Points:** 2 SP | **Priority:** P1
+
+**As a** 에이전트
+**I want** 1번 답하는 게 아니라 다단계 자율 작업 후 보고하는 것을
+**So that** v1의 심층 분석 품질이 유지된다
+
+**Acceptance Criteria:**
+- [ ] Soul에 자율 딥워크 패턴 주입: 계획→수집→분석→초안→최종
+- [ ] 품질 게이트: 비서실장이 편집장 역할 — 5항목 QA (v1 spec #19)
+- [ ] 결론/근거/리스크/형식/논리 점검 → 미달 시 재작업 지시
+- [ ] 재작업 = call_agent로 동일 에이전트 재호출 (message에 피드백 포함)
+
+**Technical Notes:**
+- v1 spec §2.4: 자율 딥워크 (계획→수집→분석→초안→최종)
+- v1 spec #19: quality_rules.yaml 기반 QA
+
+---
+
+## Epic 6: Hub UX — 2 Layout Variants
+
+**Phase:** 2 (Week 3~4)
+**Priority:** P0 — 핵심 사용자 인터페이스
+**Story Points:** 14 SP
+**Dependencies:** Epic 5 (비서 시스템)
+**Architecture:** UX Design (비서 유무 분기), D11→WebSocket 전환
+
+### Goal
+비서 유무에 따른 허브 레이아웃 2종을 구현한다. 비서 있음 = 채팅만 (자동 라우팅), 비서 없음 = 에이전트 선택 + 채팅.
+
+### Stories
+
+#### Story 6.1: 비서 있음 레이아웃 (풀 위드 채팅)
+**Points:** 3 SP | **Priority:** P0
+
+**As a** CEO
+**I want** 비서가 있으면 채팅 입력만으로 모든 명령을 내릴 수 있는 것을
+**So that** 에이전트를 일일이 선택하지 않아도 된다
+
+**Acceptance Criteria:**
+- [ ] `hasSecretary: boolean` 상태에 따라 레이아웃 분기
+- [ ] 비서 있음: 채팅 영역 풀 위드 (에이전트 목록 숨김)
+- [ ] assistant-ui 또는 커스텀 채팅 UI (React 19 호환성 확인 후 결정)
+- [ ] SSE 스트리밍: accepted→processing→handoff→message→error→done UI 상태 반영
+- [ ] 핸드오프 트래커: 실시간 "비서실장 → CMO → 콘텐츠전문가" 표시
+- [ ] 마크다운 렌더링 (v1 호환)
+- [ ] 파일 첨부 (v1 호환)
+
+**Technical Notes:**
+- UX Design: Direction A "Command Center" 선택
+- assistant-ui → Phase 2 시작 전 React 19 호환성 확인 (폴백: 직접 구현 ~300줄)
+
+---
+
+#### Story 6.2: 비서 없음 레이아웃 (에이전트 선택 + 채팅)
+**Points:** 3 SP | **Priority:** P0
+
+**As a** 사용자 (비서 미설정)
+**I want** 에이전트 목록에서 선택하여 직접 대화하는 것을
+**So that** 비서 없이도 AI를 사용할 수 있다
+
+**Acceptance Criteria:**
+- [ ] 좌측 패널: 에이전트 목록 (부서별 그룹핑)
+- [ ] 50+ 에이전트 시: 부서별 접힘/펼침 + lastUsedAt 정렬
+- [ ] 에이전트 선택 → 우측 채팅 영역에서 대화
+- [ ] 에이전트 아바타, 이름, 소속 부서 표시
+- [ ] 검색/필터 기능
+
+**Technical Notes:**
+- UX Design: 비서 없음 variant
+
+---
+
+#### Story 6.3: SSE 상태 머신 + 에러 투명성
+**Points:** 3 SP | **Priority:** P0
+
+**As a** 사용자
+**I want** 에이전트 작업 상태가 실시간으로 표시되고 에러가 명확히 보이는 것을
+**So that** 블랙박스 에러 0건을 달성한다
+
+**Acceptance Criteria:**
+- [ ] SSE 6개 이벤트 → UI 상태 매핑 (E5):
+  - accepted → "명령 접수됨" + 로딩 스피너
+  - processing → "비서실장 분석 중..." + 에이전트 이름
+  - handoff → 트래커 업데이트 (from → to)
+  - message → 스트리밍 텍스트 표시
+  - error → 에러 배너 (코드 + 한국어 메시지)
+  - done → 비용 표시 + 스피너 종료
+- [ ] 에러 메시지 한국어 변환: `error-messages.ts` (S10)
+- [ ] 미등록 코드 fallback: "오류가 발생했습니다 (코드: {code})" (P11)
+- [ ] 핸드오프 실패 시 사용자에게 명시적 표시
+
+**Technical Notes:**
+- "블랙박스 에러 0건" = 모든 핸드오프 실패를 사용자에게 명시적 표시
+
+---
+
+#### Story 6.4: 대화 기록 + autoLearn
+**Points:** 2 SP | **Priority:** P1
+
+**As a** CEO
+**I want** 이전 대화 기록이 보존되고 에이전트가 자동 학습하는 것을
+**So that** 같은 질문을 반복하지 않아도 된다
+
+**Acceptance Criteria:**
+- [ ] 대화 기록 무제한 보관 (NFR-DI: chat_messages 테이블)
+- [ ] 이전 대화 로드 + 스크롤 페이지네이션
+- [ ] autoLearn: 작업 완료 후 핵심 학습 포인트 자동 추출 (v1 spec #20)
+- [ ] 학습 포인트 → 다음 유사 작업 시 Soul에 자동 주입
+
+**Technical Notes:**
+- v1 spec #20: 에이전트 메모리 (자동 학습 + 지식 주입)
+- Phase 2 후반 구현 → Phase 4 pgvector와 연동 강화
+
+---
+
+#### Story 6.5: WebSocket 핸드오프 채널 전환
+**Points:** 3 SP | **Priority:** P1
+
+**As a** 프론트엔드
+**I want** WebSocket 이벤트가 Hook 기반 delegation-tracker에서 발행되는 것을
+**So that** 기존 7채널 멀티플렉싱과 통합된다
+
+**Acceptance Criteria:**
+- [ ] Phase 1 기존 형식 → Phase 2 Hook 기반 전환 (D11)
+- [ ] delegation-tracker Hook → EventBus → WebSocket 채널
+- [ ] 기존 WebSocket 구독자 호환
+- [ ] TanStack Query 캐시 자동 무효화 (핸드오프 상태 변경 시)
+
+---
+
+## Epic 7: Organization Management
+
+**Phase:** 2 (Week 4~5)
+**Priority:** P0 — v2 핵심 차별점
+**Story Points:** 16 SP
+**Dependencies:** Epic 5 (비서/Soul 시스템)
+**Architecture:** FR30~37 (Organization), UX (NEXUS 읽기전용)
+
+### Goal
+관리자가 부서/에이전트를 자유롭게 생성/수정/삭제할 수 있는 동적 조직 관리. v1의 29명 고정 구조를 탈피하여 v2의 핵심 차별점을 구현.
+
+### Stories
+
+#### Story 7.1: 부서 CRUD API + UI
+**Points:** 3 SP | **Priority:** P0
+
+**As a** 관리자
+**I want** 부서를 자유롭게 생성/수정/삭제하는 것을
+**So that** 회사 구조에 맞는 조직을 구성할 수 있다
+
+**Acceptance Criteria:**
+- [ ] REST API: POST/PUT/DELETE `/api/admin/departments`
+- [ ] 부서명, 설명, 상위 부서 ID (계층 구조)
+- [ ] 삭제 시 소속 에이전트 처리: 미할당으로 변경 (cascade 아님)
+- [ ] getDB(companyId) 격리 (E3)
+- [ ] Admin UI: 부서 목록 + 생성/편집/삭제 모달
+
+**Technical Notes:**
+- v2 핵심: 관리자가 언제든 부서 구성 변경 가능
+
+---
+
+#### Story 7.2: 에이전트 CRUD API + UI (Soul 편집 포함)
+**Points:** 5 SP | **Priority:** P0
+
+**As a** 관리자
+**I want** AI 에이전트를 자유롭게 생성/편집/삭제하고 Soul을 편집하는 것을
+**So that** v1의 29명 고정이 아닌 동적 조직을 운영할 수 있다
+
+**Acceptance Criteria:**
+- [ ] REST API: POST/PUT/DELETE `/api/admin/agents`
+- [ ] 필드: 이름, 소속 부서, tier, allowed_tools(jsonb), is_secretary, owner_user_id
+- [ ] Soul 편집: 마크다운 에디터 (웹 UI에서 CEO가 직접 편집, v1 spec §2.3)
+- [ ] Soul 변수 자동 프리뷰: `{{agent_list}}` 등이 실제 값으로 치환된 결과 표시
+- [ ] 비서 에이전트 삭제 방지: ORG_SECRETARY_DELETE_DENIED
+- [ ] 에이전트 생성 시 기본 Soul 템플릿 자동 적용
+- [ ] Admin UI: 에이전트 목록 + 상세 편집 페이지
+
+**Technical Notes:**
+- v1 spec §2.3: 웹 UI에서 Soul 직접 편집 (서버 재시작 불필요)
+- 에이전트 생성 = DB INSERT + Soul 기본 템플릿 생성
+
+---
+
+#### Story 7.3: 조직 템플릿 + 온보딩
+**Points:** 3 SP | **Priority:** P1
+
+**As a** 신규 회사 관리자
+**I want** 가입 시 기본 조직 구조가 자동 생성되는 것을
+**So that** 빈 화면에서 시작하지 않아도 된다
+
+**Acceptance Criteria:**
+- [ ] 기본 조직 템플릿: CEO + 비서 + 3개 부서 + 부서당 매니저 1명
+- [ ] 가입 완료 시 자동 생성 (FR: Onboarding)
+- [ ] 템플릿 커스터마이징: 관리자가 선택 가능 (기본/기술/마케팅/투자)
+- [ ] CLI 토큰 등록 가이드 (온보딩 위저드)
+
+**Technical Notes:**
+- v1: 29명 사전 구성 → v2: 템플릿 기반 자동 생성 + 이후 자유 편집
+
+---
+
+#### Story 7.4: Cascade 규칙 + 삭제 방지
+**Points:** 2 SP | **Priority:** P0
+
+**As a** 관리자
+**I want** 비서 삭제가 방지되고, 부서 삭제 시 에이전트가 안전하게 처리되는 것을
+**So that** 실수로 핵심 구조를 파괴하지 않는다
+
+**Acceptance Criteria:**
+- [ ] 비서(is_secretary=true) 삭제 시도 → ORG_SECRETARY_DELETE_DENIED 에러
+- [ ] 부서 삭제 시 소속 에이전트 → department_id = null (미할당)
+- [ ] 에이전트 삭제 시 진행 중 세션 → 세션 완료 후 삭제 (soft delete)
+- [ ] 삭제 확인 모달: "이 에이전트는 현재 3개 세션이 진행 중입니다"
+
+**Technical Notes:**
+- 하드 삭제 아님. is_active = false로 soft delete
+
+---
+
+#### Story 7.5: NEXUS 읽기 전용 조직도
+**Points:** 3 SP | **Priority:** P1
+
+**As a** 관리자/CEO
+**I want** 현재 조직 구조를 시각적으로 확인하는 것을
+**So that** 부서/에이전트 관계를 한눈에 파악할 수 있다
+
+**Acceptance Criteria:**
+- [ ] React Flow 기반 읽기 전용 조직도
+- [ ] ELK.js 계층 레이아웃 (상위→하위 자동 배치)
+- [ ] 노드: 부서(파란), 에이전트(초록), 비서(금색) 구분
+- [ ] 에이전트 노드: 이름, tier, 상태(active/inactive) 표시
+- [ ] 드래그 이동 + 줌 인/아웃
+- [ ] 에이전트 50+ 시: React.lazy() 동적 로드 (번들 최적화)
+
+**Technical Notes:**
+- Phase 3 NEXUS 편집기의 전단계. 읽기 전용만 먼저 구현
+- React Flow + ELK.js (아키텍처 선택). Cytoscape는 스케치바이브 전용
+
+---
+
+## Epic 8: N-Tier Hierarchy System
+
+**Phase:** 3 (Week 6)
+**Priority:** P1
+**Story Points:** 12 SP
+**Dependencies:** Epic 7 (에이전트 CRUD)
+**Architecture:** FR24~29 (Tier & Cost), E6 (model-selector), D1 (tier_configs 테이블)
+
+### Goal
+고정 3계급(Manager/Specialist/Worker)에서 회사별 N단계 계층으로 전환. tier_configs 테이블 기반 동적 관리.
+
+### Stories
+
+#### Story 8.1: tier_configs 테이블 + enum→integer 마이그레이션
+**Points:** 3 SP | **Priority:** P0
+
+**As a** 시스템
+**I want** 에이전트 tier가 enum이 아닌 integer(1~N)로 관리되는 것을
+**So that** 회사별로 자유롭게 계층을 추가할 수 있다
+
+**Acceptance Criteria:**
+- [ ] tier_configs 테이블: id, company_id, tier_level(int), name, model_preference, max_tools, description
+- [ ] 기존 agents.tier enum → agents.tier_level integer 마이그레이션
+- [ ] 마이그레이션 매핑: Manager=1, Specialist=2, Worker=3
+- [ ] 무중단 마이그레이션 (NFR-DI)
+- [ ] getDB(companyId).tierConfigs() 스코프 쿼리 추가
+
+**Technical Notes:**
+- v1: 3계급 고정 → v2: N계급 동적 (회사별 configurable)
+
+---
+
+#### Story 8.2: Tier CRUD API + UI
+**Points:** 3 SP | **Priority:** P1
+
+**As a** 관리자
+**I want** 회사별 계층 구조를 자유롭게 관리하는 것을
+**So that** "인턴→사원→대리→팀장→임원" 같은 커스텀 계층을 만들 수 있다
+
+**Acceptance Criteria:**
+- [ ] REST API: POST/PUT/DELETE `/api/admin/tier-configs`
+- [ ] tier_level 순서 자동 관리 (드래그 정렬)
+- [ ] model_preference 설정: claude-opus-4-6, claude-sonnet-4-6, claude-haiku-4-5
+- [ ] max_tools: tier별 사용 가능 도구 수 제한
+- [ ] Admin UI: Tier 관리 페이지
+
+---
+
+#### Story 8.3: 모델 자동 배정 + 비용 최적화
+**Points:** 3 SP | **Priority:** P1
+
+**As a** 관리자
+**I want** tier별로 AI 모델이 자동 배정되어 비용이 최적화되는 것을
+**So that** 상위 tier = 고성능 모델, 하위 tier = 저비용 모델
+
+**Acceptance Criteria:**
+- [ ] model-selector.ts에서 tier_configs 조회 → 모델 매핑 (E6)
+- [ ] 에이전트 생성 시 tier에 따라 모델 자동 배정
+- [ ] 관리자가 개별 에이전트 모델 오버라이드 가능
+- [ ] 비용 대시보드: tier별 비용 집계 표시
+
+---
+
+#### Story 8.4: maxDepth 회사별 설정
+**Points:** 3 SP | **Priority:** P1
+
+**As a** 관리자
+**I want** 핸드오프 최대 깊이를 회사별로 설정하는 것을
+**So that** 복잡한 조직은 깊이를 늘리고, 단순 조직은 줄일 수 있다
+
+**Acceptance Criteria:**
+- [ ] company_settings 테이블 또는 tier_configs에 max_handoff_depth 추가
+- [ ] SessionContext.maxDepth = 회사 설정값 (기본 5)
+- [ ] Admin UI: 핸드오프 깊이 설정 슬라이더 (1~10)
+- [ ] 깊이 변경 시 진행 중 세션에는 영향 없음 (새 세션부터 적용)
+
+---
+
+## Epic 9: NEXUS Visual Organization Editor
+
+**Phase:** 3 (Week 6~7)
+**Priority:** P1
+**Story Points:** 16 SP
+**Dependencies:** Epic 7 (조직 관리 API), Epic 8 (tier 시스템)
+**Architecture:** React Flow + ELK.js, FR30~37
+
+### Goal
+React Flow + ELK.js 기반 NEXUS 시각적 조직 편집기. 드래그&드롭으로 에이전트를 부서 간 이동하고, 계층 구조를 시각적으로 편집.
+
+### Stories
+
+#### Story 9.1: NEXUS React Flow 캔버스 기반
+**Points:** 3 SP | **Priority:** P0
+
+**As a** 관리자
+**I want** 조직 구조를 시각적 캔버스에서 보고 편집하는 것을
+**So that** 직관적으로 조직을 관리할 수 있다
+
+**Acceptance Criteria:**
+- [ ] React Flow 캔버스: 줌, 팬, 미니맵
+- [ ] ELK.js 계층 레이아웃 자동 배치 (위→아래)
+- [ ] 60fps 렌더링 (NFR-P: Canvas 렌더링)
+- [ ] aria 접근성 내장 (React Flow 기본)
+- [ ] React.lazy() 동적 로드 (번들 최적화)
+- [ ] admin 패키지에 위치
+
+**Technical Notes:**
+- SketchVibe(Cytoscape) ≠ NEXUS(React Flow). 완전 분리 (아키텍처)
+
+---
+
+#### Story 9.2: NEXUS 노드 시각화
+**Points:** 3 SP | **Priority:** P0
+
+**As a** 관리자
+**I want** 부서, 에이전트, 인간 직원이 구분되는 노드로 표시되는 것을
+**So that** 한눈에 조직 구성을 파악할 수 있다
+
+**Acceptance Criteria:**
+- [ ] 노드 타입: 부서(직사각형, 파란), 에이전트(원형, 초록), 인간(사각형, 보라), 비서(팔각형, 금색)
+- [ ] 에이전트 노드: 이름, tier 레벨, 상태 아이콘 (active/inactive/busy)
+- [ ] 부서 노드: 이름, 소속 에이전트 수, 매니저 표시
+- [ ] 엣지: 부서→에이전트 소속 관계, 매니저→부하 위임 관계
+- [ ] 인간 노드: 이름, 역할, CLI 토큰 상태 (등록/미등록)
+
+---
+
+#### Story 9.3: 드래그&드롭 편집
+**Points:** 5 SP | **Priority:** P1
+
+**As a** 관리자
+**I want** 에이전트를 드래그하여 다른 부서로 이동하는 것을
+**So that** UI에서 직관적으로 조직을 재편할 수 있다
+
+**Acceptance Criteria:**
+- [ ] 에이전트 노드 드래그 → 부서 노드 위 드롭 → API 호출 (department_id 변경)
+- [ ] 드롭 가능 영역 하이라이트 (부서 노드 호버)
+- [ ] 실시간 레이아웃 재배치 (ELK.js)
+- [ ] Undo 기능 (Ctrl+Z)
+- [ ] 비서 이동 불가 (is_secretary → CEO 직속 고정)
+- [ ] 멀티 선택 (Ctrl+클릭) → 일괄 이동
+
+---
+
+#### Story 9.4: 속성 패널
+**Points:** 3 SP | **Priority:** P1
+
+**As a** 관리자
+**I want** 노드를 선택하면 우측 패널에서 상세 정보를 편집하는 것을
+**So that** 캔버스에서 벗어나지 않고 에이전트 설정을 변경할 수 있다
+
+**Acceptance Criteria:**
+- [ ] 노드 클릭 → 우측 속성 패널 표시
+- [ ] 에이전트 속성: 이름, tier, 모델, allowed_tools, Soul 편집 링크
+- [ ] 부서 속성: 이름, 설명, 매니저 지정 드롭다운
+- [ ] 인라인 저장 (자동 저장 + 낙관적 업데이트)
+
+---
+
+#### Story 9.5: NEXUS 내보내기 + 인쇄
+**Points:** 2 SP | **Priority:** P2
+
+**As a** 관리자
+**I want** 조직도를 이미지/PDF로 내보내는 것을
+**So that** 보고서나 발표에 사용할 수 있다
+
+**Acceptance Criteria:**
+- [ ] PNG 내보내기 (React Flow fitView → toImage)
+- [ ] SVG 내보내기
+- [ ] 인쇄 최적화 (배경 흰색, 고해상도)
+
+---
+
+## Epic 10: Semantic Search & Knowledge Enhancement
+
+**Phase:** 4 (Week 8)
+**Priority:** P1
+**Story Points:** 14 SP
+**Dependencies:** Epic 2 (agent-loop), Epic 7 (조직 관리)
+**Architecture:** pgvector, Gemini Embedding, FR47~53
+
+### Goal
+기존 Jaccard 키워드 매칭을 pgvector 의미 검색으로 교체. 부서별 지식 자동 주입 강화.
+
+### Stories
+
+#### Story 10.1: pgvector 확장 설치 + 스키마
+**Points:** 2 SP | **Priority:** P0
+
+**As a** 시스템
+**I want** PostgreSQL에 pgvector 확장이 설치되고 벡터 컬럼이 추가되는 것을
+**So that** 의미 기반 유사도 검색이 가능하다
+
+**Acceptance Criteria:**
+- [ ] `CREATE EXTENSION IF NOT EXISTS vector` 실행
+- [ ] knowledge_docs 테이블에 `embedding vector(768)` 컬럼 추가 (Gemini dim)
+- [ ] NULL 허용 (기존 문서는 점진적 임베딩)
+- [ ] 마이그레이션 파일 생성
+- [ ] pgvector-node 설치 + Drizzle ORM 연동 확인
+
+**Technical Notes:**
+- 동일 서버 PostgreSQL → pgvector 확장 지원 확인
+- Gemini Embedding 768차원
+
+---
+
+#### Story 10.2: Gemini Embedding 파이프라인
+**Points:** 3 SP | **Priority:** P0
+
+**As a** 시스템
+**I want** 지식 문서가 업로드되면 자동으로 벡터 임베딩이 생성되는 것을
+**So that** 의미 검색이 가능하다
+
+**Acceptance Criteria:**
+- [ ] `@google/genai` 기반 Gemini Embedding API 호출
+- [ ] 문서 업로드/수정 시 자동 임베딩 생성
+- [ ] 기존 문서 일괄 임베딩 스크립트 (마이그레이션)
+- [ ] 임베딩 실패 시 embedding = NULL (검색에서 제외, 에러 아님)
+- [ ] 비용 제한: 월 $5 이하 (NFR-C2)
+
+---
+
+#### Story 10.3: 의미 검색 API
+**Points:** 3 SP | **Priority:** P0
+
+**As a** 에이전트/사용자
+**I want** "삼성전자 투자 분석"으로 검색하면 관련 문서가 의미적으로 매칭되는 것을
+**So that** 키워드 일치 없이도 관련 문서를 찾을 수 있다
+
+**Acceptance Criteria:**
+- [ ] `/api/workspace/knowledge/search` 엔드포인트
+- [ ] 쿼리 → Gemini Embedding → pgvector cosine similarity
+- [ ] Top-K 결과 반환 (기본 5개)
+- [ ] 유사도 점수(score) 포함
+- [ ] fallback: 임베딩 없는 문서는 기존 LIKE 검색 병행
+
+---
+
+#### Story 10.4: 부서별 지식 자동 주입 강화
+**Points:** 3 SP | **Priority:** P1
+
+**As a** 에이전트
+**I want** 부서별 관련 지식이 Soul에 자동 주입되는 것을
+**So that** 추가 검색 없이 전문 지식을 활용할 수 있다
+
+**Acceptance Criteria:**
+- [ ] soul-renderer.ts 확장: 부서별 상위 K개 관련 문서 자동 주입
+- [ ] `{{knowledge_context}}` 새 변수 추가 (E4 확장)
+- [ ] 주입 크기 제한: 최대 2,000 토큰 (비용 최적화)
+- [ ] v1 spec #16: RAG 문서 저장소 + 부서별 지식 자동 주입
+
+**Technical Notes:**
+- v1: knowledge-injector 서비스 → v2: soul-renderer.ts에 통합
+
+---
+
+#### Story 10.5: 지식 관리 UI 개선
+**Points:** 3 SP | **Priority:** P1
+
+**As a** 관리자
+**I want** 지식 문서를 부서별로 관리하고 임베딩 상태를 확인하는 것을
+**So that** 효과적으로 지식 베이스를 운영할 수 있다
+
+**Acceptance Criteria:**
+- [ ] 폴더 구조 유지 (v1 호환)
+- [ ] 드래그&드롭 업로드
+- [ ] 임베딩 상태 표시: 완료 / 진행 중 / 실패
+- [ ] 부서별 지식 할당 UI
+- [ ] 유사 문서 추천 (correlation)
+
+---
+
+## Epic 11: NotebookLM & SketchVibe MCP
+
+**Phase:** 4 (Week 8~9)
+**Priority:** P1
+**Story Points:** 14 SP
+**Dependencies:** Epic 2 (agent-loop), Epic 10 (지식 시스템)
+**Architecture:** NotebookLM MCP 29 tools, SketchVibe Stdio MCP, FR54~60
+
+### Goal
+NotebookLM MCP 연동(오디오 브리핑, 마인드맵, 슬라이드)과 SketchVibe MCP 서버 분리.
+
+### Stories
+
+#### Story 11.1: NotebookLM MCP 클라이언트 연동
+**Points:** 3 SP | **Priority:** P1
+
+**As a** CEO
+**I want** 지식 문서로 오디오 브리핑을 생성하는 것을
+**So that** 이동 중에 음성으로 보고를 들을 수 있다
+
+**Acceptance Criteria:**
+- [ ] `notebooklm-mcp` Python Stdio 프로세스 연동
+- [ ] 주요 도구 6개: create_notebook, add_source, generate_audio, get_mindmap, create_slides, summarize
+- [ ] 오디오 생성 → 파일 저장 + URL 반환
+- [ ] 텔레그램 전송 연동 (음성 파일 → 텔레그램 봇 → CEO)
+
+**Technical Notes:**
+- NotebookLM MCP: 29개 도구 중 핵심 6개 우선 연동
+- Python Stdio: Bun에서 child_process.spawn으로 실행
+
+---
+
+#### Story 11.2: SketchVibe MCP 서버 분리
+**Points:** 5 SP | **Priority:** P1
+
+**As a** CEO/개발자
+**I want** SketchVibe를 MCP 서버로 분리하여 독립 운영하는 것을
+**So that** 스케치바이브가 별도 프로세스로 안정적으로 동작한다
+
+**Acceptance Criteria:**
+- [ ] `packages/server/src/mcp/sketchvibe-mcp.ts` — MCP Stdio 서버 구현
+- [ ] `@modelcontextprotocol/sdk` 기반
+- [ ] 도구: read_canvas, add_node, update_node, delete_node, add_edge, save_diagram
+- [ ] Cytoscape.js 유지 (v1 호환)
+- [ ] Mermaid <-> Cytoscape 양방향 변환 (v1 spec 7.3)
+- [ ] 별도 엔트리포인트: `bun run mcp:sketchvibe`
+
+**Technical Notes:**
+- NEXUS(React Flow) != SketchVibe(Cytoscape). 완전 분리
+- v1 spec 7: SketchVibe 기능 전부 유지
+
+---
+
+#### Story 11.3: SketchVibe AI 실시간 편집
+**Points:** 3 SP | **Priority:** P1
+
+**As a** CEO
+**I want** AI가 실시간으로 캔버스에 노드를 추가/수정하는 것을
+**So that** "그림 그려서 AI랑 같이 보면서 대화"할 수 있다
+
+**Acceptance Criteria:**
+- [ ] MCP SSE 연동: AI가 add_node/update_node 호출 → 프론트 캔버스 반영
+- [ ] 8종 노드 타입: agent, system, api, decide, db, start, end, note (v1 호환)
+- [ ] 드래그 이동, 더블클릭 이름 편집, Delete 삭제
+- [ ] 연결 모드: Space바 토글 + Ctrl+클릭 멀티선택
+- [ ] edgehandles: 드래그로 화살표 생성
+- [ ] compound parent: subgraph 그룹핑
+
+**Technical Notes:**
+- v1 spec 7.2~7.4 전체 기능 재현
+
+---
+
+#### Story 11.4: 저장/불러오기 + 지식 연동
+**Points:** 3 SP | **Priority:** P1
+
+**As a** CEO
+**I want** 다이어그램을 저장하고 지식 베이스에서 불러오는 것을
+**So that** 이전 작업을 이어서 할 수 있다
+
+**Acceptance Criteria:**
+- [ ] 확인된 다이어그램 저장 (`/api/sketchvibe/confirmed`)
+- [ ] 지식 베이스에서 flowchart 불러오기
+- [ ] 저장 시 Mermaid 코드 + Cytoscape JSON 둘 다 저장
+- [ ] 버전 히스토리 (최근 10개)
+
+---
+
+## Epic 12: Testing & Quality Infrastructure
+
+**Phase:** Supporting (전 Phase에 걸쳐)
+**Priority:** P0 — 품질 보증
+**Story Points:** 12 SP
+**Dependencies:** Epic 1 (기반), Epic 2 (엔진)
+**Architecture:** D10 (테스트 전략), E9 (SDK 모킹), E10 (CI 경계)
+
+### Goal
+SDK 모킹 표준, 단위/통합/주간 테스트 인프라, Graceful Shutdown, 주간 실제 SDK 통합 테스트를 구축.
+
+### Stories
+
+#### Story 12.1: SDK 모킹 표준 + 헬퍼
+**Points:** 3 SP | **Priority:** P0
+
+**As a** 개발자
+**I want** SDK query()를 손쉽게 모킹하여 테스트하는 것을
+**So that** CI에서 비용 $0으로 엔진 전체를 테스트할 수 있다
+
+**Acceptance Criteria:**
+- [ ] `packages/server/src/__tests__/helpers/sdk-mock.ts` 생성 (S4)
+- [ ] `mock.module('@anthropic-ai/claude-agent-sdk', ...)` 표준 패턴 (E9)
+- [ ] Agent.query() 모킹: AsyncGenerator 반환
+- [ ] 커스텀 응답 설정: `mockAgent({ responses: ['response1', 'response2'] })`
+- [ ] call_agent 도구 호출 시뮬레이션: `mockAgent({ toolCalls: [{ name: 'call_agent', input: {...} }] })`
+- [ ] agent-loop.ts 함수 자체는 실제 실행 (Hook, SessionContext 전파 테스트)
+
+**Technical Notes:**
+- `@zapier/secret-scrubber`는 순수 함수 → 모킹 불필요, 실제 실행
+
+---
+
+#### Story 12.2: 주간 실제 SDK 통합 테스트
+**Points:** 2 SP | **Priority:** P1
+
+**As a** QA
+**I want** 주 1회 실제 SDK query()를 사용한 통합 테스트가 자동 실행되는 것을
+**So that** SDK 업데이트로 인한 호환성 문제를 조기에 발견한다
+
+**Acceptance Criteria:**
+- [ ] `.github/workflows/weekly-sdk-test.yml` 생성
+- [ ] 매주 월요일 03:00 UTC 스케줄 + workflow_dispatch
+- [ ] `packages/server/src/__tests__/sdk/real-sdk.test.ts` 생성
+- [ ] 실제 query() 호출 → 응답 수신 확인 (비용 ~$1/회)
+- [ ] 토큰 로그 금지 (보안)
+- [ ] 실패 시 GitHub Actions 알림
+
+---
+
+#### Story 12.3: 단위 테스트 스위트
+**Points:** 3 SP | **Priority:** P0
+
+**As a** 개발자
+**I want** 엔진 핵심 모듈의 단위 테스트가 CI에서 자동 실행되는 것을
+**So that** 회귀를 즉시 발견한다
+
+**Acceptance Criteria:**
+- [ ] soul-renderer.test.ts — 6변수 치환 + 누락 + 빈 DB (Story 2.3과 연동)
+- [ ] model-selector.test.ts — tier 매핑 + 기본값 (Story 2.4와 연동)
+- [ ] scoped-query.test.ts — 격리 검증 (Story 1.2와 연동)
+- [ ] error-codes.test.ts — 중복 없음 (Story 1.4와 연동)
+- [ ] 전체 CI 실행 시간 < 30초
+
+---
+
+#### Story 12.4: A/B 품질 테스트 프레임워크
+**Points:** 2 SP | **Priority:** P2
+
+**As a** QA
+**I want** v1 엔진과 v2 엔진의 응답 품질을 비교하는 것을
+**So that** 엔진 교체가 품질 저하 없이 이루어졌음을 확인한다
+
+**Acceptance Criteria:**
+- [ ] 10개 표준 프롬프트 세트 정의
+- [ ] v1 결과 스냅샷 저장
+- [ ] v2 결과 생성 → 비교 매트릭스
+- [ ] 평가 기준: 응답 길이, 도구 호출 수, 핸드오프 체인, 완성도
+- [ ] 릴리스 전 수동 실행 (비용 ~$5/회)
+
+**Technical Notes:**
+- NFR-O2: 응답 품질 A/B 테스트
+
+---
+
+#### Story 12.5: .dockerignore + Dockerfile 최적화
+**Points:** 2 SP | **Priority:** P1
+
+**As a** DevOps
+**I want** Docker 빌드에 불필요한 파일이 포함되지 않는 것을
+**So that** 이미지 크기와 빌드 시간이 최적화된다
+
+**Acceptance Criteria:**
+- [ ] .dockerignore 업데이트: `.github/`, `_bmad*`, `_poc/`, `_uxui*` (S6)
+- [ ] Dockerfile COPY 목록: 새 의존성 반영
+- [ ] ARM64 Docker 빌드 확인
+- [ ] 이미지 크기 < 500MB
+
+---
+
+## Dependency Graph (Epic 간)
 
 ```
-Epic 0 (Foundation) [완료]
-  |
-  v
-Epic 1 (Data Layer & Security)
-  |
-  +----------------------+
-  v                      v
-Epic 2 (Organization)   Epic 3 (LLM & Agent)  [parallel -- both depend on Epic 1 only]
-  |                      |
-  |                      +----------+
-  |                      v          v
-  |                    Epic 4    Epic 7
-  |                    (Tools)   (Cost Mgmt)
-  |                      |
-  |                      v
-  +---------------> Epic 5 (Orchestration & Command)  [needs Epic 2 + Epic 4]
-  |                      |
-  |                      +----------+----------+
-  |                      v          v          v
-  |                    Epic 6    Epic 8    Epic 11
-  |                    (Dashboard) (Quality+) (AGORA)
-  |                      |
-  |                      v
-  |                    Epic 17
-  |                    (History/Archive/Perf)
-  |
-  +---------------> Epic 9 (Multi-tenancy & Admin)
-  |                      |
-  |                      v
-  |                    Epic 19 (Messenger, Phase 3)
-  |
-  v
-Epic 10 (Strategy) <-- Epic 4 (Finance tools)
-Epic 12 (SNS) <---- Epic 4 (Marketing tools)
-Epic 13 (SketchVibe) <-- Epic 5 (Command Center)
-Epic 14 (Cron & ARGOS) <-- Epic 5
-Epic 15 (Telegram) <-- Epic 5 + Epic 14
-Epic 16 (Knowledge & Memory) <-- Epic 3 + Epic 5
-Epic 18 (Workflow) <-- Epic 14 + Epic 5
-Epic 20 (Platform) <-- Epic 2 + Epic 18
+Epic 1 (Foundation) ──→ Epic 2 (Engine Core) ──→ Epic 3 (Hooks)
+                                  │                    │
+                                  ├────────────────────┤
+                                  ▼                    ▼
+                           Epic 4 (Migration) ──→ Epic 5 (Secretary)
+                                                       │
+                                                       ├──→ Epic 6 (Hub UX)
+                                                       └──→ Epic 7 (Org Mgmt) ──→ Epic 8 (N-Tier)
+                                                                    │                    │
+                                                                    └────────────────────┤
+                                                                                         ▼
+                                                                                  Epic 9 (NEXUS)
+
+Epic 2 ──→ Epic 10 (Semantic Search)
+Epic 2 ──→ Epic 11 (NotebookLM/SketchVibe)
+Epic 1 ──→ Epic 12 (Testing) ─── spans all phases ───
 ```
 
-**Critical Path (Phase 1 MVP):**
-```
-Epic 0 -> Epic 1 -> Epic 2 + Epic 3 (parallel) -> Epic 4 -> Epic 5 -> Epic 6 + Epic 7 + Epic 8 + Epic 9 (parallel)
-```
+## v1 Feature Coverage Matrix
 
----
-
-## PRD FR Coverage Validation
-
-| FR Group | FR Numbers | Epic | Phase |
-|----------|-----------|------|-------|
-| Organization Mgmt | FR1-FR12 (12) | Epic 2 | P0 |
-| Command Center | FR13-FR18 (6) | Epic 5 | P0 |
-| Orchestration | FR19-FR25 (7) | Epic 5 | P0 |
-| Tool & LLM | FR26-FR34 (9) | Epic 3 + Epic 4 | P0 |
-| Monitoring | FR35-FR37, FR41 (4) | Epic 6 | P1 |
-| Cost Management | FR38-FR40 (3) | Epic 7 | P1 |
-| Security Foundation | FR42,46,48,49 (4) | Epic 1 | P0 |
-| Multi-tenancy & Users | FR43-45,47 (4) | Epic 9 | P1 |
-| Quality Mgmt (P0) | FR50-FR51 (2) | Epic 5 | P0 |
-| Quality Mgmt (P1) | FR52-FR55 (4) | Epic 8 | P1 |
-| Investment & Finance | FR56-FR62 (7) | Epic 10 | Phase 2 |
-| AGORA | FR63 (1) | Epic 11 | Phase 2 |
-| SketchVibe | FR64 (1) | Epic 13 | Phase 2 |
-| SNS | FR65 (1) | Epic 12 | Phase 2 |
-| Cron | FR66 (1) | Epic 14 | Phase 2 |
-| ARGOS | FR67 (1) | Epic 14 | Phase 2 |
-| Telegram | FR68 (1) | Epic 15 | Phase 2 |
-| Knowledge RAG | FR69 (1) | Epic 16 | Phase 2 |
-| Agent Memory | FR70 (1) | Epic 16 | Phase 2 |
-| History | FR71 (1) | Epic 17 | Phase 2 |
-| Archive | FR72 (1) | Epic 17 | Phase 2 |
-| Performance | FR73 (1) | Epic 17 | Phase 2 |
-| Workflow | FR74 (1) | Epic 18 | Phase 2 |
-| Predictive WF | FR75 (1) | Epic 18 | Phase 2 |
-| Messenger | FR76 (1) | Epic 19 | Phase 3 |
-| **Total** | **76 FRs** | **20 Epics** | **100% coverage** |
-
----
-
-## UX Design Coverage
-
-| UX Screen | Epic | Phase |
-|-----------|------|-------|
-| CEO App #1 Dashboard | Epic 6 | P1 |
-| CEO App #2 Command Center | Epic 5 | P0 |
-| CEO App #3 Strategy Room | Epic 10 | Phase 2 |
-| CEO App #4 SketchVibe | Epic 13 | Phase 2 |
-| CEO App #5 AGORA Debate | Epic 11 | Phase 2 |
-| CEO App #6 SNS Publishing | Epic 12 | Phase 2 |
-| CEO App #7 Activity Log | Epic 6 | P1 |
-| CEO App #8 History | Epic 17 | Phase 2 |
-| CEO App #9 Archive | Epic 17 | Phase 2 |
-| CEO App #10 Performance | Epic 17 | Phase 2 |
-| CEO App #11 Cron | Epic 14 | Phase 2 |
-| CEO App #12 ARGOS | Epic 14 | Phase 2 |
-| CEO App #13 Knowledge | Epic 16 | Phase 2 |
-| CEO App #14 Settings | Epic 9 | P1 |
-| Admin A1 Org Tree | Epic 2 | P0 |
-| Admin A2 Dept Mgmt | Epic 2 | P0 |
-| Admin A3 Agent Mgmt | Epic 2 | P0 |
-| Admin A4 Employee Mgmt | Epic 9 | P1 |
-| Admin A5 Tool Mgmt | Epic 4 | P0 |
-| Admin A6 Cost Dashboard | Epic 7 | P1 |
-| Admin A7 Org Templates | Epic 2 | P0 |
-| Admin A8 Company Settings | Epic 9 | P1 |
-
----
-
-## v1 Feature Spec Coverage
-
-| v1 Feature (#) | Epic | Phase | Note |
+| v1 기능 (spec) | Epic | Story | 상태 |
 |----------------|------|-------|------|
-| #1 Command Center | Epic 5 | P0 | Command input + delegation chain |
-| #2 Agent Organization | Epic 2 | P0 | Extended to dynamic CRUD |
-| #3 Tool System | Epic 4 | P0 | 30+ core tools |
-| #4 LLM Router | Epic 3 | P0 | 3 providers + Batch |
-| #5 AGORA Debate | Epic 11 | Phase 2 | |
-| #6 Strategy Room | Epic 10 | Phase 2 | |
-| #7 SketchVibe | Epic 13 | Phase 2 | |
-| #8 SNS Publishing | Epic 12 | Phase 2 | |
-| #9 Dashboard | Epic 6 | P1 | |
-| #10 Activity Log | Epic 6 | P1 | |
-| #11 History | Epic 17 | Phase 2 | |
-| #12 Archive | Epic 17 | Phase 2 | |
-| #13 Performance | Epic 17 | Phase 2 | |
-| #14 Workflow | Epic 18 | Phase 2 | |
-| #15 Cron | Epic 14 | Phase 2 | |
-| #16 Knowledge | Epic 16 | Phase 2 | |
-| #17 ARGOS | Epic 14 | Phase 2 | |
-| #18 Telegram | Epic 15 | Phase 2 | |
-| #19 Quality Gate | Epic 5 (P0) + Epic 8 (P1) | P0/P1 | |
-| #20 Agent Memory | Epic 16 | Phase 2 | |
-| #21 Cost Management | Epic 7 | P1 | |
-| #22 CEO Ideas | Distributed across epics | All | #001->E10, #005->All, #007->E5, #009->E13, #010->E5, #011->E2 |
-| **Total** | **22/22 covered** | | **100%** |
-
----
-
-## User Stories
-
-> 각 스토리는 1~2일 구현 가능한 단위로 분할. ID 형식: E{epic}-S{story}. 스토리 포인트(SP): 1=반나절, 2=하루, 3=하루 반, 5=이틀.
-
----
-
-### Epic 1: Data Layer & Security Foundation
-
-| ID | Title | SP | PRD | 의존성 |
-|----|-------|-----|-----|--------|
-| E1-S1 | Phase 1 Drizzle 스키마 확장 | 3 | FR42 | Epic 0 |
-| E1-S2 | 테넌트 격리 미들웨어 | 3 | FR42, NFR10 | E1-S1 |
-| E1-S3 | RBAC 미들웨어 | 2 | FR48 | E1-S1 |
-| E1-S4 | 감사 로그 시스템 | 2 | FR49, NFR13 | E1-S1 |
-| E1-S5 | 크리덴셜 볼트 확장 | 2 | FR46 | E1-S1 |
-| E1-S6 | 시드 데이터 + 조직 템플릿 데이터 | 2 | FR10 | E1-S1 |
-| E1-S7 | 테넌트 격리 통합 테스트 | 2 | NFR10 | E1-S2, E1-S3 |
-
-**E1-S1: Phase 1 Drizzle 스키마 확장**
-- **설명:** companies, departments, agents, commands, tasks, tool_invocations, cost_records, credentials, quality_reviews, presets, org_templates, audit_logs 테이블을 Drizzle ORM 스키마로 정의하고 마이그레이션 생성
-- **수용 기준:**
-  - [ ] 12개 Phase 1 테이블 스키마 정의 완료 (모든 테이블에 companyId 칼럼 포함)
-  - [ ] Drizzle 마이그레이션 파일 생성 + 적용 성공
-  - [ ] 기존 admin_users, users 테이블과의 관계 정의 (FK)
-  - [ ] 모든 테이블에 createdAt, updatedAt 타임스탬프 포함
-
-**E1-S2: 테넌트 격리 미들웨어**
-- **설명:** Hono 미들웨어로 JWT에서 companyId를 추출하고, 모든 DB 쿼리에 companyId WHERE 절을 자동 주입하는 테넌트 격리 시스템 구현
-- **수용 기준:**
-  - [ ] JWT payload에서 companyId 자동 추출
-  - [ ] Drizzle 쿼리 헬퍼가 모든 SELECT/UPDATE/DELETE에 companyId 필터 자동 추가
-  - [ ] companyId 불일치 시 403 반환
-  - [ ] companyId 없는 요청은 인증 실패 처리
-
-**E1-S3: RBAC 미들웨어**
-- **설명:** JWT에서 role(super_admin/company_admin/ceo/employee) 추출 후 API 엔드포인트별 접근 제어 미들웨어 구현
-- **수용 기준:**
-  - [ ] 역할별 허용 엔드포인트 매트릭스 정의
-  - [ ] 권한 없는 접근 시 403 반환 + 감사 로그 기록
-  - [ ] Super Admin은 전체 접근, Employee는 자기 부서만 접근
-  - [ ] 미들웨어 체이닝: auth -> tenant -> rbac 순서
-
-**E1-S4: 감사 로그 시스템**
-- **설명:** 금융 거래/조직 변경/권한 변경을 삭제 불가 감사 로그에 기록하는 시스템 구현
-- **수용 기준:**
-  - [ ] audit_logs 테이블에 who/what/when/result 기록
-  - [ ] DELETE/UPDATE 쿼리 금지 (INSERT ONLY)
-  - [ ] 조직 변경(부서/에이전트 CRUD) 시 자동 감사 기록
-  - [ ] API 응답에 감사 로그 ID 포함
-
-**E1-S5: 크리덴셜 볼트 확장**
-- **설명:** Epic 0의 AES-256-GCM 볼트를 회사별(companyId)로 분리하여 LLM API 키, KIS API 키 등을 회사별로 관리
-- **수용 기준:**
-  - [ ] credentials 테이블에 companyId 기반 격리 적용
-  - [ ] 회사별 독립 API 키 저장/조회/갱신
-  - [ ] 크리덴셜 접근 시 감사 로그 기록
-  - [ ] 로그에 크리덴셜 평문 노출 금지 (NFR12)
-
-**E1-S6: 시드 데이터 + 조직 템플릿 데이터**
-- **설명:** 비서실장(시스템 에이전트) + 3종 조직 템플릿("투자분석", "마케팅", "올인원") 시드 데이터 생성
-- **수용 기준:**
-  - [ ] 비서실장 시스템 에이전트 시드: isSystem=true, tier=manager, Soul 문서 포함
-  - [ ] 3종 조직 템플릿 시드: 각 템플릿에 부서 + 에이전트 정의
-  - [ ] 시드 스크립트 실행 시 멱등성 보장 (중복 실행 시 에러 없음)
-
-**E1-S7: 테넌트 격리 통합 테스트**
-- **설명:** 테넌트 격리 + RBAC가 정상 동작하는지 검증하는 통합 테스트 작성
-- **수용 기준:**
-  - [ ] 회사A 데이터가 회사B 쿼리에 절대 노출되지 않는 테스트
-  - [ ] 역할별 API 접근 제한 테스트 (CEO가 Admin 전용 API 접근 시 403)
-  - [ ] companyId 조작 시도 시 차단 테스트
-  - [ ] 기존 201건 테스트 전부 통과 유지
-
----
-
-### Epic 2: Dynamic Organization Management
-
-| ID | Title | SP | PRD | 의존성 |
-|----|-------|-----|-----|--------|
-| E2-S1 | 부서 CRUD API | 3 | FR1 | E1-S1 |
-| E2-S2 | 에이전트 CRUD API | 3 | FR2-FR5 | E1-S1 |
-| E2-S3 | Cascade 분석/처리 엔진 | 3 | FR6-FR8 | E2-S1, E2-S2 |
-| E2-S4 | 조직 템플릿 적용 API | 2 | FR10, NFR35 | E2-S1, E2-S2 |
-| E2-S5 | 조직도 트리 뷰 UI (Admin) | 3 | FR9, UX A1 | E2-S1, E2-S2 |
-| E2-S6 | 부서 관리 UI (Admin) | 2 | FR1, UX A2 | E2-S1 |
-| E2-S7 | 에이전트 관리 + Soul 편집 UI (Admin) | 3 | FR2-3, FR11, UX A3 | E2-S2 |
-| E2-S8 | 조직 템플릿 UI + 에이전트 부서 이동 | 2 | FR4, FR10, FR12, UX A7 | E2-S4 |
-| E2-S9 | CEO 앱 조직도 읽기 전용 뷰 | 2 | FR9 | E2-S5 |
-
-**E2-S1: 부서 CRUD API**
-- **설명:** departments 테이블에 대한 CRUD REST API 구현 (OrganizationService)
-- **수용 기준:**
-  - [ ] POST/GET/PUT/DELETE /api/departments 엔드포인트 동작
-  - [ ] companyId 기반 격리 적용
-  - [ ] 부서명 중복 검증 (같은 회사 내)
-  - [ ] 감사 로그 자동 기록
-
-**E2-S2: 에이전트 CRUD API**
-- **설명:** agents 테이블에 대한 CRUD API + 시스템 에이전트 보호 로직 구현
-- **수용 기준:**
-  - [ ] POST/GET/PUT/DELETE /api/agents 엔드포인트 동작
-  - [ ] 에이전트 생성 시 이름, tier, modelName, allowedTools, soulMarkdown, departmentId 지정
-  - [ ] isSystem=true 에이전트 삭제 시 403 반환 (FR5)
-  - [ ] 에이전트 삭제 대신 미배속 전환 (departmentId=null, isActive=false)
-  - [ ] 메모리/학습 기록 아카이브 + 비용 기록 영구 보존 (FR8)
-
-**E2-S3: Cascade 분석/처리 엔진**
-- **설명:** 부서 삭제 시 영향 분석 + cascade 처리 (진행 중 작업 대기/강제 종료, 에이전트 미배속 전환)
-- **수용 기준:**
-  - [ ] DELETE /api/departments/:id 시 cascade 영향 분석 반환 (작업 수, 에이전트 수, 비용)
-  - [ ] mode=wait_completion: 진행 중 작업 완료까지 삭제 보류
-  - [ ] mode=force: 즉시 작업 종료 + 부분 결과 저장
-  - [ ] 하위 에이전트 전원 미배속 전환 + 메모리 아카이브
-  - [ ] 비용 기록 영구 보존 (아카이브 부서 항목으로)
-
-**E2-S4: 조직 템플릿 적용 API**
-- **설명:** 조직 템플릿 선택 시 부서 + 에이전트를 일괄 생성하는 API 구현
-- **수용 기준:**
-  - [ ] POST /api/org-templates/:id/apply -> 부서 + 에이전트 일괄 생성
-  - [ ] 3종 템플릿("투자분석", "마케팅", "올인원") 각각 정상 적용
-  - [ ] 적용 시간 < 2분 (NFR35)
-  - [ ] 중복 적용 시 기존 조직과 병합 옵션 제공
-
-**E2-S5: 조직도 트리 뷰 UI (Admin)**
-- **설명:** 관리자 콘솔에서 부서-팀장-전문가 계층을 트리 형태로 표시하는 조직도 UI
-- **수용 기준:**
-  - [ ] 트리 뷰에서 부서 > Manager > Specialist/Worker 계층 표시
-  - [ ] 에이전트 상태 뱃지 표시 (유휴/작업중/에러)
-  - [ ] 미배속 에이전트 별도 영역 표시
-  - [ ] 에이전트 클릭 시 상세 정보 사이드패널
-
-**E2-S6: 부서 관리 UI (Admin)**
-- **설명:** 관리자 콘솔 부서 관리 화면 (A2) -- 부서 목록, 생성/편집/삭제 폼, cascade 경고
-- **수용 기준:**
-  - [ ] 부서 목록 테이블 (이름, 에이전트 수, 상태)
-  - [ ] 부서 생성/편집 폼
-  - [ ] 부서 삭제 시 cascade 경고 팝업 (영향 분석 표시)
-  - [ ] "완료 대기" / "강제 종료" 모드 선택
-
-**E2-S7: 에이전트 관리 + Soul 편집 UI (Admin)**
-- **설명:** 관리자 콘솔 에이전트 관리 화면 (A3) -- 에이전트 목록, CRUD 폼, Soul 마크다운 편집기
-- **수용 기준:**
-  - [ ] 에이전트 목록 (이름, 계급, 모델, 부서, 상태)
-  - [ ] 에이전트 생성/편집 폼 (이름, tier, model, departmentId)
-  - [ ] Soul 마크다운 편집기 (textarea + 미리보기)
-  - [ ] 시스템 에이전트는 삭제 버튼 비활성화 + 시각적 구분 (FR5)
-
-**E2-S8: 조직 템플릿 UI + 에이전트 부서 이동**
-- **설명:** 조직 템플릿 선택/적용 UI (A7) + 드래그 앤 드롭 에이전트 부서 이동
-- **수용 기준:**
-  - [ ] 조직 템플릿 3종 카드 표시 + "적용" 버튼
-  - [ ] 템플릿 적용 시 진행 상태 표시
-  - [ ] 조직도에서 드래그 앤 드롭으로 에이전트 부서 이동 (FR4)
-  - [ ] 부서별 표준 템플릿(Soul/도구 기본값) 설정 UI (FR12)
-
-**E2-S9: CEO 앱 조직도 읽기 전용 뷰**
-- **설명:** CEO 앱에서 현재 조직 구조를 읽기 전용으로 확인하는 화면
-- **수용 기준:**
-  - [ ] 트리 뷰 조직도 표시 (Admin 뷰와 동일 데이터, 편집 불가)
-  - [ ] 에이전트 상태 뱃지 (유휴/작업중/에러) 실시간 반영
-  - [ ] 에이전트 클릭 시 상세 정보 표시 (Soul 요약, 허용 도구)
-
----
-
-### Epic 3: LLM Multi-Provider & Agent Execution
-
-| ID | Title | SP | PRD | 의존성 |
-|----|-------|-----|-----|--------|
-| E3-S1 | LLM 프로바이더 어댑터 (Claude/GPT/Gemini) | 3 | FR32 | Epic 0 |
-| E3-S2 | LLMRouter + 3계급 자동 모델 배정 | 3 | FR30, FR31 | E3-S1 |
-| E3-S3 | 프로바이더 Fallback 전략 | 2 | FR34, NFR26 | E3-S2 |
-| E3-S4 | AgentRunner 무상태 실행기 | 3 | FR26, NFR11 | E3-S2, E1-S5 |
-| E3-S5 | 비용 기록 시스템 (models.yaml + CostTracker) | 2 | FR38 | E3-S2 |
-| E3-S6 | BatchCollector + /배치실행 | 2 | FR33 | E3-S2 |
-| E3-S7 | LLM 통합 테스트 + Fallback 테스트 | 2 | NFR22, NFR26 | E3-S3, E3-S4 |
-
-**E3-S1: LLM 프로바이더 어댑터 (Claude/GPT/Gemini)**
-- **설명:** Anthropic, OpenAI, Google 3사 SDK를 래핑하는 LLMProvider 인터페이스 + 어댑터 구현
-- **수용 기준:**
-  - [ ] LLMProvider 인터페이스: call(request), estimateCost(tokens), supportsBatch
-  - [ ] AnthropicAdapter: Claude Sonnet/Haiku 호출 + 도구 호출 응답 파싱
-  - [ ] OpenAIAdapter: GPT-4.1/mini 호출 + 도구 호출 응답 파싱
-  - [ ] GoogleAdapter: Gemini Pro/Flash 호출 + 도구 호출 응답 파싱
-  - [ ] 각 어댑터에 타임아웃 30초 적용 (NFR3)
-
-**E3-S2: LLMRouter + 3계급 자동 모델 배정**
-- **설명:** 에이전트 계급(tier)에 따라 LLM 모델을 자동 배정하고, 수동 변경도 가능한 라우터
-- **수용 기준:**
-  - [ ] Manager=claude-sonnet-4-6, Specialist=claude-haiku-4-5, Worker=claude-haiku-4-5 자동 배정
-  - [ ] agents.modelName 수동 설정 시 자동 배정 오버라이드 (FR31)
-  - [ ] models.yaml: 모델별 input/output 1M 토큰당 가격 정의
-  - [ ] 라우팅 결정 로그 기록
-
-**E3-S3: 프로바이더 Fallback 전략**
-- **설명:** 프로바이더 장애 시 자동 fallback (Claude -> GPT -> Gemini) 구현
-- **수용 기준:**
-  - [ ] 프로바이더 호출 실패 시 5초 내 다음 프로바이더로 전환 (NFR26)
-  - [ ] fallback 순서: Claude -> GPT -> Gemini (같은 등급 모델로)
-  - [ ] 모든 프로바이더 실패 시 에러 반환 + 사용자 알림
-  - [ ] fallback 발생 시 감사 로그 기록
-
-**E3-S4: AgentRunner 무상태 실행기**
-- **설명:** Soul + 지식 + 도구 정의로 시스템 프롬프트를 조립하고 LLM을 호출하는 무상태 실행기
-- **수용 기준:**
-  - [ ] buildSystemPrompt(agent): Soul 마크다운 + allowed_tools 정의 조립
-  - [ ] LLM 호출 후 도구 호출 응답 감지 -> ToolPool에 위임 -> 결과를 LLM에 피드백
-  - [ ] 에이전트 프롬프트에 크리덴셜 평문 노출 금지 (NFR11)
-  - [ ] 실행 결과: {content, toolsUsed, tokenCount, cost}
-
-**E3-S5: 비용 기록 시스템 (models.yaml + CostTracker)**
-- **설명:** 모든 LLM 호출마다 models.yaml 기반 비용을 산출하고 cost_records에 기록
-- **수용 기준:**
-  - [ ] models.yaml: 모델별 input/output 토큰 가격 정의
-  - [ ] CostTracker: LLM 응답의 usage(input_tokens, output_tokens)로 비용 계산
-  - [ ] cost_records 테이블에 agentId, modelName, inputTokens, outputTokens, cost, companyId 기록
-  - [ ] companyId 기반 격리 적용
-
-**E3-S6: BatchCollector + /배치실행**
-- **설명:** 비긴급 LLM 요청을 큐에 수집하고, /배치실행 명령 시 일괄 전송하는 Batch API 수집기
-- **수용 기준:**
-  - [ ] BatchCollector: 비긴급 요청 큐에 저장 (최대 1000건 NFR19)
-  - [ ] /배치실행 명령 시 큐의 모든 요청 일괄 전송
-  - [ ] /배치상태 명령 시 큐 현황 반환 (대기/진행/완료 건수)
-  - [ ] Anthropic Batch API 활용 (50% 할인)
-
-**E3-S7: LLM 통합 테스트 + Fallback 테스트**
-- **설명:** 3사 LLM 호출 성공 + fallback 전환 동작을 검증하는 통합 테스트
-- **수용 기준:**
-  - [ ] Claude/GPT/Gemini 각각 단독 호출 성공 테스트
-  - [ ] 프로바이더 모킹을 통한 fallback 전환 테스트
-  - [ ] 비용 기록 정확성 테스트 (models.yaml 가격 기반)
-  - [ ] AgentRunner + 도구 호출 연동 테스트
-
----
-
-### Epic 4: Tool System
-
-| ID | Title | SP | PRD | 의존성 |
-|----|-------|-----|-----|--------|
-| E4-S1 | ToolPool 레지스트리 + Zod 검증 프레임워크 | 3 | FR26 | E3-S4 |
-| E4-S2 | 서버 사이드 allowed_tools 권한 검증 | 2 | FR27, NFR14 | E4-S1, E2-S2 |
-| E4-S3 | 공통 도구 15종 구현 (common) | 3 | FR26 | E4-S1 |
-| E4-S4 | 도메인 도구 15종 구현 (analysis/legal/tech) | 3 | FR26 | E4-S1 |
-| E4-S5 | 도구 호출 로그 시스템 | 2 | FR29 | E4-S1 |
-| E4-S6 | 관리자 콘솔 도구 관리 UI (A5) | 3 | FR28, UX A5 | E4-S1, E4-S2 |
-
-**E4-S1: ToolPool 레지스트리 + Zod 검증 프레임워크**
-- **설명:** 도구 등록, Zod 파라미터 검증, 실행, 결과 반환(4000자 초과 시 요약) 프레임워크
-- **수용 기준:**
-  - [ ] ToolDefinition 인터페이스: name, description, parameters(Zod), execute()
-  - [ ] ToolPool.register(tool): 도구 등록
-  - [ ] ToolPool.execute(name, params): Zod 검증 -> 실행 -> 결과 반환
-  - [ ] 결과 > 4000자 시 자동 요약 절삭
-
-**E4-S2: 서버 사이드 allowed_tools 권한 검증**
-- **설명:** 에이전트가 LLM 응답에서 도구를 호출할 때 서버에서 allowed_tools 검증
-- **수용 기준:**
-  - [ ] AgentRunner가 도구 호출 전 agent.allowedTools에 포함 여부 서버에서 검증
-  - [ ] 권한 없는 도구 호출 시 자동 차단 + 로그 기록
-  - [ ] 차단 시 에이전트에게 "권한 없음" 메시지 반환 (재시도 방지)
-
-**E4-S3: 공통 도구 15종 구현 (common)**
-- **설명:** real_web_search, calculator, translator, spreadsheet_tool, chart_generator, email_sender, file_manager, date_utils, json_parser, text_summarizer, url_fetcher, markdown_converter, regex_matcher, unit_converter, random_generator
-- **수용 기준:**
-  - [ ] 15종 도구 각각 Zod 스키마 + execute() 구현
-  - [ ] 각 도구 단위 테스트 통과
-  - [ ] real_web_search: 실제 웹 검색 결과 반환
-
-**E4-S4: 도메인 도구 15종 구현 (analysis/legal/tech)**
-- **설명:** stock_price_checker, news_aggregator, sentiment_analyzer, company_analyzer, market_overview, law_search, contract_reviewer, trademark_similarity, patent_search, uptime_monitor, security_scanner, code_quality, dns_lookup, ssl_checker, port_scanner
-- **수용 기준:**
-  - [ ] 15종 도구 각각 Zod 스키마 + execute() 구현
-  - [ ] 각 도구 단위 테스트 통과
-  - [ ] 외부 API 연동 도구는 타임아웃 설정
-
-**E4-S5: 도구 호출 로그 시스템**
-- **설명:** 모든 도구 호출을 tool_invocations 테이블에 기록하는 로그 시스템
-- **수용 기준:**
-  - [ ] tool_invocations에 agentId, toolName, input, output, duration, status, companyId 기록
-  - [ ] 크리덴셜/API 키 자동 마스킹 (NFR12)
-  - [ ] 쿼리 API: 에이전트별/도구별/시간별 필터
-
-**E4-S6: 관리자 콘솔 도구 관리 UI (A5)**
-- **설명:** 관리자 콘솔에서 도구 카탈로그 조회 + 에이전트별 허용 도구 체크박스 매트릭스
-- **수용 기준:**
-  - [ ] 도구 카탈로그: 전체 도구 목록 (이름, 카테고리, 설명)
-  - [ ] 에이전트별 체크박스 매트릭스: 에이전트 x 도구 권한 설정
-  - [ ] 권한 변경 시 감사 로그 기록
-  - [ ] 카테고리별 일괄 선택/해제
-
----
-
-### Epic 5: Orchestration Engine & Command Center
-
-| ID | Title | SP | PRD | 의존성 |
-|----|-------|-----|-----|--------|
-| E5-S1 | CommandRouter + 명령 타입 분류 | 2 | FR13, FR15 | E2-S2 |
-| E5-S2 | ChiefOfStaff 자동 분류 + 위임 | 3 | FR19 | E3-S4, E5-S1 |
-| E5-S3 | Manager 위임 + 병렬 Specialist 실행 | 3 | FR20, FR21 | E5-S2, E4-S1 |
-| E5-S4 | Manager 종합 + ChiefOfStaff 품질 검수 | 3 | FR22, FR50, FR51 | E5-S3 |
-| E5-S5 | /전체 + /순차 명령 처리 | 2 | FR24, FR25 | E5-S3 |
-| E5-S6 | 딥워크 자율 다단계 작업 | 2 | FR23 | E3-S4, E4-S1 |
-| E5-S7 | 사령관실 UI: 채팅 입력 + @멘션 + 슬래시 | 3 | FR13-15, UX #2 | E5-S1 |
-| E5-S8 | 위임 체인 실시간 표시 (WebSocket) | 3 | FR17, NFR4 | E5-S2 |
-| E5-S9 | 보고서 뷰 + 피드백 | 2 | FR18, FR22 | E5-S4 |
-| E5-S10 | 프리셋 CRUD + 슬래시 팝업 | 2 | FR16, FR15 | E5-S7 |
-| E5-S11 | 오케스트레이션 통합 테스트 | 2 | NFR20 | E5-S4 |
-
-**E5-S1: CommandRouter + 명령 타입 분류**
-- **설명:** POST /api/commands로 수신된 명령을 타입별로 분류 (일반텍스트/@멘션/슬래시)
-- **수용 기준:**
-  - [ ] 명령 타입 분류: text(일반), mention(@), slash(/)
-  - [ ] @멘션 파싱: "@CIO 분석해줘" -> targetAgentId + text 추출
-  - [ ] 슬래시 파싱: "/전체 시장 분석" -> slashType + text 추출
-  - [ ] commands 테이블에 명령 저장 (companyId, userId, text, type, status)
-
-**E5-S2: ChiefOfStaff 자동 분류 + 위임**
-- **설명:** 비서실장 에이전트가 LLM으로 명령을 분석하여 적합한 부서/Manager에게 위임
-- **수용 기준:**
-  - [ ] ChiefOfStaff.classify(command): LLM 호출 -> {departmentId, managerId, priority, taskBreakdown}
-  - [ ] 분류 결과에 따라 해당 Manager에게 TaskRequest 전송
-  - [ ] @멘션 시 분류 건너뛰고 직접 해당 Manager에게 위임
-  - [ ] WebSocket command 채널로 "분류 중..." 상태 전송
-
-**E5-S3: Manager 위임 + 병렬 Specialist 실행**
-- **설명:** Manager가 작업을 분해하여 하위 Specialist에게 병렬 배분 + 결과 수집
-- **수용 기준:**
-  - [ ] Manager.delegate(task): LLM 호출 -> 하위 작업 분해 + Specialist 배정
-  - [ ] Promise.allSettled로 Specialist 병렬 실행 (부서당 최대 10명 NFR7)
-  - [ ] Manager 자체 분석 수행 (#007 5번째 분석가)
-  - [ ] WebSocket delegation 채널로 각 Specialist 진행 상태 전송
-
-**E5-S4: Manager 종합 + ChiefOfStaff 품질 검수**
-- **설명:** Manager 결과 종합 + 비서실장 5항목 품질 검수 + 자동 재작업
-- **수용 기준:**
-  - [ ] Manager.synthesize(): 자체 분석 + Specialist 결과 종합 -> 부서 보고서
-  - [ ] ChiefOfStaff.review(): 5항목 검수 (결론/근거/리스크/형식/논리)
-  - [ ] FAIL 시 자동 재작업 (최대 2회) -> 2회 실패 후 경고 플래그 달아 전달
-  - [ ] quality_reviews 테이블에 검수 결과 기록
-
-**E5-S5: /전체 + /순차 명령 처리**
-- **설명:** /전체(모든 Manager 동시 위임) + /순차(Manager 순차 위임) 명령 구현
-- **수용 기준:**
-  - [ ] /전체: 모든 활성 Manager에게 동시 위임 -> 결과 종합
-  - [ ] /순차: Manager 순차 위임 -> 이전 결과를 다음 Manager에게 전달 -> 누적 종합
-  - [ ] WebSocket으로 진행 상태 실시간 전송
-
-**E5-S6: 딥워크 자율 다단계 작업**
-- **설명:** 에이전트가 자율적으로 다단계 작업(계획 -> 수집 -> 분석 -> 초안 -> 최종)을 수행
-- **수용 기준:**
-  - [ ] 단계별 자율 진행: 도구 호출 -> 결과 분석 -> 추가 도구 호출 반복
-  - [ ] 최대 도구 호출 횟수 제한 (기본 10회)
-  - [ ] 각 단계별 WebSocket 상태 전송
-  - [ ] 전체 체인 5분 타임아웃 (NFR2)
-
-**E5-S7: 사령관실 UI: 채팅 입력 + @멘션 + 슬래시**
-- **설명:** CEO 앱 사령관실의 채팅형 입력 UI -- @멘션 자동완성, 슬래시 명령 팝업
-- **수용 기준:**
-  - [ ] 채팅형 입력 바 (텍스트 입력 + 전송 버튼)
-  - [ ] @ 입력 시 활성 Manager 목록 자동완성 팝업
-  - [ ] / 입력 시 슬래시 8종 명령 팝업
-  - [ ] 명령 전송 후 대화 이력에 추가
-
-**E5-S8: 위임 체인 실시간 표시 (WebSocket)**
-- **설명:** 오케스트레이션 진행 중 에이전트 이름 + 단계 + 경과 시간 + 도구 호출을 실시간 표시
-- **수용 기준:**
-  - [ ] WebSocket command/delegation/tool 3채널 구독
-  - [ ] 위임 체인 시각화: 에이전트 이름 + 현재 단계 + 경과 시간
-  - [ ] 도구 호출 시 도구 이름 + 상태 표시
-  - [ ] < 500ms 이벤트 전달 (NFR4)
-
-**E5-S9: 보고서 뷰 + 피드백**
-- **설명:** 최종 보고서 마크다운 렌더링 + 품질 뱃지(PASS/FAIL) + 비용 요약 + 피드백
-- **수용 기준:**
-  - [ ] 마크다운 보고서 렌더링
-  - [ ] 품질 게이트 뱃지 (PASS=초록, FAIL=빨강, WARNING=노랑)
-  - [ ] 비용 요약 (토큰 수 + 비용 합계)
-  - [ ] thumbs up/down 피드백 버튼 (FR18)
-
-**E5-S10: 프리셋 CRUD + 슬래시 팝업**
-- **설명:** 자주 쓰는 명령을 프리셋으로 저장/실행 + 슬래시 명령 전체 팝업 UI
-- **수용 기준:**
-  - [ ] 프리셋 CRUD API: POST/GET/PUT/DELETE /api/presets
-  - [ ] 프리셋 목록 UI + 클릭 시 사령관실에 명령 자동 입력
-  - [ ] 프리셋에서 직접 실행 기능
-  - [ ] /명령어 입력 시 전체 슬래시 명령 목록 표시
-
-**E5-S11: 오케스트레이션 통합 테스트**
-- **설명:** 전체 오케스트레이션 파이프라인 E2E 테스트
-- **수용 기준:**
-  - [ ] "삼성전자 분석" -> 비서실장 분류 -> Manager 위임 -> Specialist 병렬 -> 종합 -> 검수 -> 보고서
-  - [ ] @멘션 직접 지정 동작 테스트
-  - [ ] /전체, /순차 명령 동작 테스트
-  - [ ] 타임아웃, 에러 복구 시나리오 테스트
-
----
-
-### Epic 6: Dashboard & Activity Monitoring
-
-| ID | Title | SP | PRD | 의존성 |
-|----|-------|-----|-----|--------|
-| E6-S1 | 대시보드 집계 API (4개 요약 카드) | 2 | FR35 | E5-S4 |
-| E6-S2 | 작전현황 대시보드 UI | 3 | FR35-36, FR41, UX #1 | E6-S1 |
-| E6-S3 | 통신로그 4탭 API | 2 | FR37 | E5-S4, E4-S5 |
-| E6-S4 | 통신로그 4탭 UI | 3 | FR37, UX #7 | E6-S3 |
-| E6-S5 | WebSocket 실시간 대시보드 갱신 | 2 | FR35, NFR4 | E6-S2 |
-| E6-S6 | 퀵 액션 + 만족도 차트 | 2 | FR41 | E6-S2 |
-
-**E6-S1: 대시보드 집계 API**
-- **수용 기준:** 4개 요약 카드(작업 현황/비용/에이전트 수/연동 상태) API, AI 사용량 프로바이더별 집계 API, 예산 진행률 API
-
-**E6-S2: 작전현황 대시보드 UI**
-- **수용 기준:** 4개 요약 카드 렌더링, AI 사용량 막대 그래프 (프로바이더별), 예산 진행 바 (초록→노랑→빨강), UI 초기 로딩 < 3초 (NFR5)
-
-**E6-S3: 통신로그 4탭 API**
-- **수용 기준:** 활동(에이전트 활동 로그), 통신(위임 기록 from→to, 비용, 토큰), QA(품질 검수 결과), 도구(도구 호출 기록) 각 탭 필터+페이지네이션 API
-
-**E6-S4: 통신로그 4탭 UI**
-- **수용 기준:** 4탭 네비게이션, 각 탭별 테이블 + 필터, 상세 모달 (클릭 시), 실시간 새 항목 자동 추가
-
-**E6-S5: WebSocket 실시간 대시보드 갱신**
-- **수용 기준:** cost + agent-status WebSocket 채널 구독, 새 데이터 발생 시 카드/차트 자동 갱신 (새로고침 불필요)
-
-**E6-S6: 퀵 액션 + 만족도 차트**
-- **수용 기준:** 퀵 액션 버튼(루틴+시스템 명령) 클릭 시 사령관실에 명령 자동 입력, 만족도 원형 차트(thumbs up/down 집계), 최근 사용 명령어 표시
-
----
-
-### Epic 7: Cost Management System
-
-| ID | Title | SP | PRD | 의존성 |
-|----|-------|-----|-----|--------|
-| E7-S1 | 3축 비용 집계 API | 2 | FR38 | E3-S5 |
-| E7-S2 | 예산 한도 설정 + 자동 차단 | 3 | FR39 | E7-S1 |
-| E7-S3 | 비용 대시보드 UI (Admin A6) | 3 | FR40, UX A6 | E7-S1 |
-| E7-S4 | CEO 앱 비용 카드 + 드릴다운 | 2 | FR40 | E7-S1 |
-| E7-S5 | 예산 초과 WebSocket 알림 | 1 | FR39 | E7-S2 |
-
-**E7-S1: 3축 비용 집계 API**
-- **수용 기준:** GET /api/costs/summary 에이전트별/모델별/부서별 실시간 합산, 일일/주간/월간 집계, companyId 격리
-
-**E7-S2: 예산 한도 설정 + 자동 차단**
-- **수용 기준:** 일일/월 예산 한도 설정 API, 한도 도달 시 LLM 호출 자동 차단, 차단 시 WebSocket cost 채널로 CEO 알림, 예산 초과 발생률 < 5% (NFR33)
-
-**E7-S3: 비용 대시보드 UI (Admin A6)**
-- **수용 기준:** 도넛 차트(부서별 비용), 막대 차트(에이전트별 비용), 예산 진행 바 + 한도 설정 폼, 기간 필터(일/주/월)
-
-**E7-S4: CEO 앱 비용 카드 + 드릴다운**
-- **수용 기준:** 작전현황 내 비용 카드 (오늘 비용 + 누적), 클릭 시 부서별/에이전트별 드릴다운
-
-**E7-S5: 예산 초과 WebSocket 알림**
-- **수용 기준:** 예산 80%/100% 도달 시 WebSocket cost 채널로 알림 전송, CEO 앱에 토스트 알림 표시
-
----
-
-### Epic 8: Quality Gate Enhancement
-
-| ID | Title | SP | PRD | 의존성 |
-|----|-------|-----|-----|--------|
-| E8-S1 | quality_rules.yaml 정의 + 파서 | 2 | FR53 | E5-S4 |
-| E8-S2 | 자동 규칙 검수 엔진 (yaml + LLM 하이브리드) | 3 | FR53, FR54 | E8-S1 |
-| E8-S3 | 환각 탐지 자동화 | 2 | FR54 | E8-S2, E4-S1 |
-| E8-S4 | 프롬프트 인젝션 방어 | 2 | FR55 | E3-S4 |
-| E8-S5 | QA 탭 강화 UI | 2 | FR52 | E6-S4 |
-
-**E8-S1~S5 요약:**
-- S1: yaml 규칙 파일 구조 정의(완전성/정확성/형식) + 파싱 로직
-- S2: yaml 규칙 기반 자동 검수 + LLM 기반 세밀 검수 하이브리드 엔진
-- S3: 도구 조회 실제 데이터 vs 에이전트 응답 비교로 환각 탐지
-- S4: 시스템/사용자 프롬프트 분리, 출력에서 크리덴셜/시스템프롬프트 패턴 필터링
-- S5: 통신로그 QA 탭에서 규칙별 검수 상세 결과 확인 UI
-
----
-
-### Epic 9: Multi-tenancy & Admin Console
-
-| ID | Title | SP | PRD | 의존성 |
-|----|-------|-----|-----|--------|
-| E9-S1 | 회사 CRUD API | 2 | FR43 | E1-S2 |
-| E9-S2 | Human 직원 관리 API | 3 | FR44, FR45 | E9-S1 |
-| E9-S3 | 직원 사령관실 접근 제한 | 2 | FR45 | E9-S2, E5-S7 |
-| E9-S4 | 직원 관리 UI (Admin A4) | 2 | FR44, UX A4 | E9-S2 |
-| E9-S5 | 회사 설정 UI (Admin A8) | 2 | UX A8 | E9-S1 |
-| E9-S6 | Admin ↔ CEO 앱 전환 | 2 | | E9-S1 |
-| E9-S7 | 온보딩 위저드 | 2 | NFR34 | E2-S4, E9-S6 |
-| E9-S8 | CEO 앱 설정 화면 (UX #14) | 2 | UX #14 | E9-S1 |
-
-**E9-S1~S8 요약:**
-- S1: 회사 생성 -> companyId 발급 -> 관리자 계정 생성 API
-- S2: 직원 초대 + 워크스페이스 생성 + 부서별 접근 권한 API
-- S3: 직원이 @멘션에 자기 부서 Manager만, 비용은 자기 부서만 보이도록 제한
-- S4: 직원 테이블 + 초대 폼 + 권한 체크리스트 UI
-- S5: 회사 정보 + API 키 관리 UI
-- S6: JWT 세션 공유로 Admin ↔ CEO 앱 재로그인 없이 전환
-- S7: Admin 첫 접속 시 5단계 온보딩 가이드 (10분 이내 목표 NFR34)
-- S8: CEO 앱 설정 화면 (프로필, 알림, 투자 성향 등)
-
----
-
-### Epic 10: Strategy Room & Trading
-
-| ID | Title | SP | PRD | 의존성 |
-|----|-------|-----|-----|--------|
-| E10-S1 | 전략실 스키마 (watchlist, portfolio, trade_orders) | 2 | FR56 | E1-S1 |
-| E10-S2 | KIS 증권 API 어댑터 (시세 + 주문) | 3 | FR58, NFR27 | E1-S5 |
-| E10-S3 | Finance 도구 5종 구현 | 3 | FR26 | E4-S1 |
-| E10-S4 | CIO+VECTOR 분리 오케스트레이션 | 3 | FR57, FR58 | E5-S3, E10-S2 |
-| E10-S5 | 자율/승인 실행 + 투자 성향 리스크 제어 | 2 | FR59, FR60 | E10-S4 |
-| E10-S6 | 실거래/모의거래 분리 | 2 | FR61 | E10-S2 |
-| E10-S7 | 전략실 UI: 포트폴리오 + 관심종목 | 3 | FR56, UX #3 | E10-S1 |
-| E10-S8 | 매매 승인/이력 UI | 2 | FR59, FR62 | E10-S5 |
-
----
-
-### Epic 11: AGORA Debate Engine
-
-| ID | Title | SP | PRD | 의존성 |
-|----|-------|-----|-----|--------|
-| E11-S1 | AGORA 엔진: 라운드 관리 + 합의 판정 | 3 | FR63 | E3-S4 |
-| E11-S2 | /토론 + /심층토론 명령 통합 | 2 | FR63 | E5-S1, E11-S1 |
-| E11-S3 | WebSocket debate 채널 스트리밍 | 2 | FR63 | E11-S1 |
-| E11-S4 | AGORA UI: 라운드 타임라인 + 발언 카드 | 3 | FR63, UX #5 | E11-S3 |
-| E11-S5 | Diff 뷰 + 토론 결과 사령관실 삽입 | 2 | FR63 | E11-S4 |
-
----
-
-### Epic 12: SNS Publishing
-
-| ID | Title | SP | PRD | 의존성 |
-|----|-------|-----|-----|--------|
-| E12-S1 | SNS 콘텐츠 관리 API (생성/승인/반려) | 2 | FR65 | E5-S1 |
-| E12-S2 | Marketing 도구 3종 구현 | 2 | FR26 | E4-S1 |
-| E12-S3 | Selenium 자동 발행 엔진 (5개 플랫폼) | 5 | FR65, NFR29 | E12-S1 |
-| E12-S4 | 예약 발행 큐 + 카드뉴스 | 2 | FR65 | E12-S1 |
-| E12-S5 | SNS 통신국 UI | 3 | FR65, UX #6 | E12-S1 |
-
----
-
-### Epic 13: SketchVibe Canvas
-
-| ID | Title | SP | PRD | 의존성 |
-|----|-------|-----|-----|--------|
-| E13-S1 | Cytoscape.js 캔버스: 8종 노드 + 연결 | 3 | FR64 | |
-| E13-S2 | Mermaid ↔ Cytoscape 양방향 변환 | 3 | FR64 | E13-S1 |
-| E13-S3 | MCP SSE 연동: AI 실시간 캔버스 조작 | 3 | FR64 | E13-S2, E3-S4 |
-| E13-S4 | 저장/불러오기 + 지식 베이스 연동 | 2 | FR64 | E13-S1 |
-| E13-S5 | SketchVibe UI 통합 (사령관실 연동) | 2 | FR64, UX #4 | E13-S3, E5-S7 |
-
----
-
-### Epic 14: Cron Scheduler & ARGOS
-
-| ID | Title | SP | PRD | 의존성 |
-|----|-------|-----|-----|--------|
-| E14-S1 | 크론 스케줄러 서비스 + CRUD API | 3 | FR66 | E5-S1 |
-| E14-S2 | 크론 실행 엔진 (명령 자동 실행 + 결과 기록) | 2 | FR66 | E14-S1 |
-| E14-S3 | ARGOS 트리거 조건 설정 + 자동 수집 | 3 | FR67 | E4-S1 |
-| E14-S4 | 크론기지 UI (UX #11) | 2 | FR66, UX #11 | E14-S1 |
-| E14-S5 | ARGOS UI (UX #12) | 2 | FR67, UX #12 | E14-S3 |
-| E14-S6 | 상태 바: 데이터/AI OK/NG + 비용 | 1 | FR67 | E14-S3 |
-
----
-
-### Epic 15: Telegram Integration
-
-| ID | Title | SP | PRD | 의존성 |
-|----|-------|-----|-----|--------|
-| E15-S1 | 텔레그램 Bot API Webhook 연동 | 2 | FR68 | E5-S1 |
-| E15-S2 | 텔레그램 명령 파싱 (@멘션 + 텍스트) | 2 | FR68 | E15-S1 |
-| E15-S3 | 결과 전송 + 크론 결과 자동 전송 | 2 | FR68 | E15-S2, E14-S2 |
-
----
-
-### Epic 16: Knowledge Base & Agent Memory
-
-| ID | Title | SP | PRD | 의존성 |
-|----|-------|-----|-----|--------|
-| E16-S1 | 정보국 스키마 (knowledge_docs, agent_memories) | 1 | FR69 | E1-S1 |
-| E16-S2 | 문서 저장소 CRUD API + 폴더 관리 | 2 | FR69 | E16-S1 |
-| E16-S3 | 부서별 지식 자동 주입 (AgentRunner 연동) | 3 | FR69 | E16-S2, E3-S4 |
-| E16-S4 | 에이전트 메모리: 자동 학습 추출 + 저장 | 3 | FR70 | E16-S1, E5-S4 |
-| E16-S5 | 정보국 UI (UX #13) + 드래그&드롭 업로드 | 2 | FR69, UX #13 | E16-S2 |
-| E16-S6 | 유사 작업 시 이전 학습 자동 참고 | 2 | FR70 | E16-S4 |
-
----
-
-### Epic 17: History, Archive & Performance
-
-| ID | Title | SP | PRD | 의존성 |
-|----|-------|-----|-----|--------|
-| E17-S1 | 작전일지 API (검색/필터/북마크/태그) | 2 | FR71 | E5-S1 |
-| E17-S2 | 작전일지 UI + A/B 비교 + 리플레이 | 3 | FR71, UX #8 | E17-S1 |
-| E17-S3 | 기밀문서 API (아카이브/필터/유사 문서) | 2 | FR72 | E5-S4 |
-| E17-S4 | 기밀문서 UI | 2 | FR72, UX #9 | E17-S3 |
-| E17-S5 | 전력분석 API (Soul Gym + 성능 지표) | 2 | FR73 | E3-S5, E5-S4 |
-| E17-S6 | 전력분석 UI + Soul Gym 제안 | 3 | FR73, UX #10 | E17-S5 |
-| E17-S7 | 품질 대시보드 (통과율/평균점수/실패목록) | 2 | FR73 | E5-S4, E8-S2 |
-
----
-
-### Epic 18: Workflow Automation
-
-| ID | Title | SP | PRD | 의존성 |
-|----|-------|-----|-----|--------|
-| E18-S1 | 워크플로우 CRUD API + 다단계 스텝 정의 | 3 | FR74 | E5-S1 |
-| E18-S2 | 워크플로우 실행 엔진 (순차/병렬 스텝) | 3 | FR74 | E18-S1, E14-S2 |
-| E18-S3 | 예측 워크플로우: 패턴 분석 + 자동 제안 | 2 | FR75 | E18-S1 |
-| E18-S4 | 워크플로우 빌더 UI | 3 | FR74 | E18-S1 |
-| E18-S5 | 실행 상태 실시간 모니터링 UI | 2 | FR74 | E18-S2 |
-
----
-
-### Epic 19: Internal Messenger
-
-| ID | Title | SP | PRD | 의존성 |
-|----|-------|-----|-----|--------|
-| E19-S1 | 메신저 스키마 (conversations, messages) | 1 | FR76 | E9-S2 |
-| E19-S2 | 실시간 채팅 API + WebSocket 채널 | 3 | FR76 | E19-S1 |
-| E19-S3 | 1:1 + 그룹 메시지 UI | 3 | FR76 | E19-S2 |
-| E19-S4 | AI 분석 결과 공유 (보고서 → 메신저 전달) | 2 | FR76 | E19-S3, E5-S9 |
-| E19-S5 | companyId 기반 채팅 격리 | 1 | FR76 | E19-S2 |
-
----
-
-### Epic 20: Platform Extensions
-
-| ID | Title | SP | PRD | 의존성 |
-|----|-------|-----|-----|--------|
-| E20-S1 | 조직 템플릿 마켓 API + UI | 3 | Vision | E2-S4 |
-| E20-S2 | 에이전트 마켓플레이스 (Soul/도구 교환) | 3 | Vision | E2-S7 |
-| E20-S3 | 공개 API + API 키 발급 | 3 | Vision | E9-S1 |
-| E20-S4 | 워크플로우 빌더 (노코드 비주얼) | 5 | Vision | E18-S4 |
-| E20-S5 | 플랫폼 통합 테스트 | 2 | Vision | E20-S1~S4 |
-
----
-
-## Story Count Summary
-
-| Epic | Stories | Total SP |
-|------|---------|----------|
-| Epic 1: Data Layer & Security | 7 | 16 |
-| Epic 2: Dynamic Organization | 9 | 23 |
-| Epic 3: LLM & Agent Execution | 7 | 17 |
-| Epic 4: Tool System | 6 | 16 |
-| Epic 5: Orchestration & Command | 11 | 27 |
-| Epic 6: Dashboard & Monitoring | 6 | 14 |
-| Epic 7: Cost Management | 5 | 11 |
-| Epic 8: Quality Gate Enhancement | 5 | 11 |
-| Epic 9: Multi-tenancy & Admin | 8 | 17 |
-| Epic 10: Strategy & Trading | 8 | 20 |
-| Epic 11: AGORA Debate | 5 | 12 |
-| Epic 12: SNS Publishing | 5 | 14 |
-| Epic 13: SketchVibe Canvas | 5 | 13 |
-| Epic 14: Cron & ARGOS | 6 | 13 |
-| Epic 15: Telegram | 3 | 6 |
-| Epic 16: Knowledge & Memory | 6 | 13 |
-| Epic 17: History/Archive/Perf | 7 | 16 |
-| Epic 18: Workflow Automation | 5 | 13 |
-| Epic 19: Internal Messenger | 5 | 10 |
-| Epic 20: Platform Extensions | 5 | 16 |
-| **Total** | **124** | **298 SP** |
-
-**Phase 분포:**
-- P0 (Epic 1~5): 40 stories, 99 SP
-- P1 (Epic 6~9): 24 stories, 53 SP
-- Phase 2 (Epic 10~18): 50 stories, 120 SP
-- Phase 3 (Epic 19~20): 10 stories, 26 SP
-
----
-
-## Final Validation
-
-> 모든 기획 산출물(PRD, Architecture, UX Design, v1 Feature Spec)과 에픽/스토리를 교차 검증하여 누락, 불일치, 리스크를 식별한다.
-
----
-
-### 1. PRD Functional Requirements Coverage Matrix
-
-모든 76개 FR이 최소 1개 스토리에 매핑되었는지 검증.
-
-| FR | 설명 | Story | Epic | Phase | Status |
-|----|------|-------|------|-------|--------|
-| FR1 | 부서 CRUD | E2-S1, E2-S6 | Epic 2 | P0 | Covered |
-| FR2 | 에이전트 생성 (이름/계급/모델/도구/Soul) | E2-S2, E2-S7 | Epic 2 | P0 | Covered |
-| FR3 | 에이전트 수정/삭제 | E2-S2, E2-S7 | Epic 2 | P0 | Covered |
-| FR4 | 에이전트 부서 이동 | E2-S8 | Epic 2 | P0 | Covered |
-| FR5 | 시스템 에이전트 삭제 차단 | E2-S2, E2-S7 | Epic 2 | P0 | Covered |
-| FR6 | cascade 영향 분석 | E2-S3, E2-S6 | Epic 2 | P0 | Covered |
-| FR7 | cascade 완료 대기/강제 종료 | E2-S3, E2-S6 | Epic 2 | P0 | Covered |
-| FR8 | 메모리 아카이브 + 비용 영구 보존 + 미배속 전환 | E2-S2, E2-S3 | Epic 2 | P0 | Covered |
-| FR9 | 조직도 트리 뷰 | E2-S5, E2-S9 | Epic 2 | P0 | Covered |
-| FR10 | 조직 템플릿 일괄 생성 | E2-S4, E2-S8 | Epic 2 | P0 | Covered |
-| FR11 | Soul 편집 | E2-S7 | Epic 2 | P0 | Covered |
-| FR12 | 부서별 표준 템플릿 | E2-S8 | Epic 2 | P0 | Covered |
-| FR13 | 자연어 텍스트 명령 | E5-S1, E5-S7 | Epic 5 | P0 | Covered |
-| FR14 | @멘션 특정 Manager 지정 | E5-S1, E5-S7 | Epic 5 | P0 | Covered |
-| FR15 | 슬래시 8종 | E5-S1, E5-S7, E5-S10 | Epic 5 | P0 | Covered |
-| FR16 | 프리셋 저장/실행 | E5-S10 | Epic 5 | P0 | Covered |
-| FR17 | 위임 체인 실시간 표시 | E5-S8 | Epic 5 | P0 | Covered |
-| FR18 | thumbs up/down 피드백 | E5-S9 | Epic 5 | P0 | Covered |
-| FR19 | 비서실장 자동 분류 + 위임 | E5-S2 | Epic 5 | P0 | Covered |
-| FR20 | Manager 병렬 배분 | E5-S3 | Epic 5 | P0 | Covered |
-| FR21 | Manager 자체 분석 (#007) | E5-S3 | Epic 5 | P0 | Covered |
-| FR22 | 비서실장 최종 보고서 (#010) | E5-S4, E5-S9 | Epic 5 | P0 | Covered |
-| FR23 | 딥워크 자율 다단계 | E5-S6 | Epic 5 | P0 | Covered |
-| FR24 | /전체 동시 위임 | E5-S5 | Epic 5 | P0 | Covered |
-| FR25 | /순차 순차 위임 | E5-S5 | Epic 5 | P0 | Covered |
-| FR26 | 에이전트 도구 호출 | E4-S1, E4-S3, E4-S4 | Epic 4 | P0 | Covered |
-| FR27 | 서버 사이드 도구 권한 강제 | E4-S2 | Epic 4 | P0 | Covered |
-| FR28 | 에이전트별 허용 도구 설정 | E4-S6 | Epic 4 | P0 | Covered |
-| FR29 | 도구 호출 로그 | E4-S5 | Epic 4 | P0 | Covered |
-| FR30 | 계급별 LLM 모델 자동 배정 | E3-S2 | Epic 3 | P0 | Covered |
-| FR31 | LLM 모델 수동 변경 | E3-S2 | Epic 3 | P0 | Covered |
-| FR32 | 3사 프로바이더 라우팅 | E3-S1, E3-S2 | Epic 3 | P0 | Covered |
-| FR33 | Batch API 일괄 처리 | E3-S6 | Epic 3 | P0 | Covered |
-| FR34 | 프로바이더 fallback | E3-S3 | Epic 3 | P0 | Covered |
-| FR35 | 홈 대시보드 요약 카드 | E6-S1, E6-S2 | Epic 6 | P1 | Covered |
-| FR36 | AI 사용량 그래프 | E6-S2 | Epic 6 | P1 | Covered |
-| FR37 | 통신로그 4탭 | E6-S3, E6-S4 | Epic 6 | P1 | Covered |
-| FR38 | 3축 비용 추적 | E7-S1, E3-S5 | Epic 7 | P1 | Covered |
-| FR39 | 예산 한도 + 자동 차단 | E7-S2, E7-S5 | Epic 7 | P1 | Covered |
-| FR40 | 비용 차트 시각화 | E7-S3, E7-S4 | Epic 7 | P1 | Covered |
-| FR41 | 만족도 통계 대시보드 | E6-S6 | Epic 6 | P1 | Covered |
-| FR42 | companyId 데이터 격리 | E1-S2, E1-S7 | Epic 1 | P0 | Covered |
-| FR43 | 회사 생성 + 관리자 계정 | E9-S1 | Epic 9 | P1 | Covered |
-| FR44 | Human 직원 워크스페이스 | E9-S2, E9-S4 | Epic 9 | P1 | Covered |
-| FR45 | 직원 자기 워크스페이스 제한 | E9-S3 | Epic 9 | P1 | Covered |
-| FR46 | AES-256-GCM 크리덴셜 | E1-S5 | Epic 1 | P0 | Covered |
-| FR47 | 크리덴셜 프롬프트 노출 금지 | E3-S4, E8-S4 | Epic 3/8 | P0/P1 | Covered |
-| FR48 | JWT RBAC | E1-S3 | Epic 1 | P0 | Covered |
-| FR49 | 삭제 불가 감사 로그 | E1-S4 | Epic 1 | P0 | Covered |
-| FR50 | 비서실장 5항목 검수 | E5-S4 | Epic 5 | P0 | Covered |
-| FR51 | 자동 재작업 | E5-S4 | Epic 5 | P0 | Covered |
-| FR52 | QA 탭 검수 결과 확인 | E8-S5 | Epic 8 | P1 | Covered |
-| FR53 | quality_rules.yaml 자동 검수 | E8-S1, E8-S2 | Epic 8 | P1 | Covered |
-| FR54 | 환각 탐지 | E8-S3 | Epic 8 | P1 | Covered |
-| FR55 | 프롬프트 인젝션 방어 | E8-S4 | Epic 8 | P1 | Covered |
-| FR56 | 포트폴리오 대시보드 | E10-S1, E10-S7 | Epic 10 | Phase 2 | Covered |
-| FR57 | CIO + 4명 전문가 병렬 투자 분석 | E10-S4 | Epic 10 | Phase 2 | Covered |
-| FR58 | KIS API 매매 주문 | E10-S2, E10-S4 | Epic 10 | Phase 2 | Covered |
-| FR59 | 자율/승인 실행 모드 | E10-S5, E10-S8 | Epic 10 | Phase 2 | Covered |
-| FR60 | 투자 성향 리스크 제어 | E10-S5 | Epic 10 | Phase 2 | Covered |
-| FR61 | 실거래/모의거래 분리 | E10-S6 | Epic 10 | Phase 2 | Covered |
-| FR62 | 주문 이력 영구 보존 | E10-S8 | Epic 10 | Phase 2 | Covered |
-| FR63 | AGORA 토론 | E11-S1~S5 | Epic 11 | Phase 2 | Covered |
-| FR64 | SketchVibe 캔버스 | E13-S1~S5 | Epic 13 | Phase 2 | Covered |
-| FR65 | SNS 5개 플랫폼 발행 | E12-S1~S5 | Epic 12 | Phase 2 | Covered |
-| FR66 | 크론 스케줄러 | E14-S1, E14-S2, E14-S4 | Epic 14 | Phase 2 | Covered |
-| FR67 | ARGOS 트리거 수집 | E14-S3, E14-S5, E14-S6 | Epic 14 | Phase 2 | Covered |
-| FR68 | 텔레그램 명령/수신 | E15-S1~S3 | Epic 15 | Phase 2 | Covered |
-| FR69 | 정보국 RAG 지식 관리 | E16-S1~S3, E16-S5 | Epic 16 | Phase 2 | Covered |
-| FR70 | 에이전트 자동 학습 메모리 | E16-S4, E16-S6 | Epic 16 | Phase 2 | Covered |
-| FR71 | 작전일지 이력/리플레이 | E17-S1, E17-S2 | Epic 17 | Phase 2 | Covered |
-| FR72 | 기밀문서 아카이브 | E17-S3, E17-S4 | Epic 17 | Phase 2 | Covered |
-| FR73 | 전력분석 Soul Gym | E17-S5~S7 | Epic 17 | Phase 2 | Covered |
-| FR74 | 워크플로우 파이프라인 | E18-S1, E18-S2, E18-S4 | Epic 18 | Phase 2 | Covered |
-| FR75 | 예측 워크플로우 (#004) | E18-S3 | Epic 18 | Phase 2 | Covered |
-| FR76 | 사내 메신저 | E19-S1~S5 | Epic 19 | Phase 3 | Covered |
-
-**Result: 76/76 FRs covered. 0 gaps.**
-
----
-
-### 2. v1 Feature Spec Coverage Matrix
-
-v1-feature-spec.md의 22개 기능 영역 + 7개 CEO 아이디어가 모두 스토리에 매핑되었는지 검증.
-
-| # | v1 Feature | Story Coverage | Epic | Phase | Status |
-|---|-----------|----------------|------|-------|--------|
-| 1 | 사령관실 (명령 입력/라우팅/@멘션/슬래시/프리셋) | E5-S1, E5-S7, E5-S10 | Epic 5 | P0 | Covered |
-| 2 | 에이전트 조직 (3계급/Soul/딥워크) | E2-S1~S9, E5-S6 | Epic 2/5 | P0 | Covered |
-| 3 | 도구 시스템 (125+/권한/ToolPool) | E4-S1~S6, E10-S3, E12-S2 | Epic 4/10/12 | P0/Phase 2 | Covered |
-| 4 | LLM 멀티 프로바이더 (10종/Batch) | E3-S1~S7 | Epic 3 | P0 | Covered |
-| 5 | AGORA 토론 (2/3라운드/SSE/Diff) | E11-S1~S5 | Epic 11 | Phase 2 | Covered |
-| 6 | 전략실 (포트폴리오/자동매매/CIO+VECTOR) | E10-S1~S8 | Epic 10 | Phase 2 | Covered |
-| 7 | SketchVibe (Cytoscape/Mermaid/MCP SSE) | E13-S1~S5 | Epic 13 | Phase 2 | Covered |
-| 8 | SNS 통신국 (5플랫폼/승인/Selenium) | E12-S1~S5 | Epic 12 | Phase 2 | Covered |
-| 9 | 작전현황 대시보드 (카드/차트/퀵액션) | E6-S1~S6 | Epic 6 | P1 | Covered |
-| 10 | 통신로그 (활동/통신/QA/도구 4탭) | E6-S3, E6-S4 | Epic 6 | P1 | Covered |
-| 11 | 작전일지 (검색/A/B비교/리플레이) | E17-S1, E17-S2 | Epic 17 | Phase 2 | Covered |
-| 12 | 기밀문서 (아카이브/필터/유사 문서) | E17-S3, E17-S4 | Epic 17 | Phase 2 | Covered |
-| 13 | 전력분석 (Soul Gym/품질/성능) | E17-S5~S7 | Epic 17 | Phase 2 | Covered |
-| 14 | 자동화 워크플로우 (다단계/상태) | E18-S1~S5 | Epic 18 | Phase 2 | Covered |
-| 15 | 크론기지 (cron CRUD/활성화) | E14-S1, E14-S2, E14-S4 | Epic 14 | Phase 2 | Covered |
-| 16 | 정보국 (RAG/폴더/드래그&드롭) | E16-S1~S3, E16-S5 | Epic 16 | Phase 2 | Covered |
-| 17 | ARGOS (트리거/자동 수집/상태) | E14-S3, E14-S5, E14-S6 | Epic 14 | Phase 2 | Covered |
-| 18 | 텔레그램 (명령/결과/크론 전송) | E15-S1~S3 | Epic 15 | Phase 2 | Covered |
-| 19 | 품질 게이트 (5항목/yaml/환각/재작업) | E5-S4(P0), E8-S1~S5(P1) | Epic 5/8 | P0/P1 | Covered |
-| 20 | 에이전트 메모리 (자동 학습/주입) | E16-S4, E16-S6 | Epic 16 | Phase 2 | Covered |
-| 21 | 비용 관리 (3축/예산/차트) | E3-S5, E7-S1~S5 | Epic 3/7 | P0/P1 | Covered |
-| 22 | CEO 아이디어 7개 | (아래 상세) | 분산 | 분산 | Covered |
-
-**CEO 아이디어 매핑:**
-
-| # | 아이디어 | Story | 구현 위치 |
-|---|---------|-------|----------|
-| #001 | CIO+VECTOR 분리 | E10-S4 | Strategy Room 오케스트레이션 |
-| #004 | 예측 워크플로우 | E18-S3 | 패턴 분석 + 자동 제안 |
-| #005 | 메모리 금지 원칙 | 모든 에픽 | 아키텍처 원칙으로 전체 적용 |
-| #007 | 처장=5번째 분석가 | E5-S3 | Manager 자체 분석 수행 |
-| #009 | SketchVibe 캔버스 | E13-S1~S5 | Cytoscape + MCP SSE |
-| #010 | 비서실장=편집장 | E5-S4 | 5항목 품질 검수 |
-| #011 | 부서별 표준 템플릿 | E2-S8 | Soul/도구 기본값 설정 |
-
-**Result: 22/22 v1 features covered. 7/7 CEO ideas covered. 0 gaps.**
-
----
-
-### 3. UX Screen Coverage Matrix
-
-UX Design의 22개 화면(CEO 앱 14 + Admin 8)이 모두 스토리에 매핑되었는지 검증.
-
-| UX Screen | v1 Spec # | Story | Epic | Phase | Status |
-|-----------|-----------|-------|------|-------|--------|
-| CEO #1 작전현황 | #9 | E6-S2, E6-S5, E6-S6 | Epic 6 | P1 | Covered |
-| CEO #2 사령관실 | #1 | E5-S7, E5-S8, E5-S9, E5-S10 | Epic 5 | P0 | Covered |
-| CEO #3 전략실 | #6 | E10-S7, E10-S8 | Epic 10 | Phase 2 | Covered |
-| CEO #4 SketchVibe | #7 | E13-S5 | Epic 13 | Phase 2 | Covered |
-| CEO #5 AGORA 토론 | #5 | E11-S4, E11-S5 | Epic 11 | Phase 2 | Covered |
-| CEO #6 SNS 통신국 | #8 | E12-S5 | Epic 12 | Phase 2 | Covered |
-| CEO #7 통신로그 | #10 | E6-S4 | Epic 6 | P1 | Covered |
-| CEO #8 작전일지 | #11 | E17-S2 | Epic 17 | Phase 2 | Covered |
-| CEO #9 기밀문서 | #12 | E17-S4 | Epic 17 | Phase 2 | Covered |
-| CEO #10 전력분석 | #13 | E17-S6, E17-S7 | Epic 17 | Phase 2 | Covered |
-| CEO #11 크론기지 | #15 | E14-S4 | Epic 14 | Phase 2 | Covered |
-| CEO #12 ARGOS | #17 | E14-S5 | Epic 14 | Phase 2 | Covered |
-| CEO #13 정보국 | #16 | E16-S5 | Epic 16 | Phase 2 | Covered |
-| CEO #14 설정 | - | E9-S8 | Epic 9 | P1 | Covered |
-| Admin A1 조직도 | - | E2-S5 | Epic 2 | P0 | Covered |
-| Admin A2 부서 관리 | - | E2-S6 | Epic 2 | P0 | Covered |
-| Admin A3 에이전트 관리 | - | E2-S7 | Epic 2 | P0 | Covered |
-| Admin A4 직원 관리 | - | E9-S4 | Epic 9 | P1 | Covered |
-| Admin A5 도구 관리 | - | E4-S6 | Epic 4 | P0 | Covered |
-| Admin A6 비용 대시보드 | - | E7-S3 | Epic 7 | P1 | Covered |
-| Admin A7 조직 템플릿 | - | E2-S8 | Epic 2 | P0 | Covered |
-| Admin A8 회사 설정 | - | E9-S5 | Epic 9 | P1 | Covered |
-
-**Result: 22/22 UX screens covered. 0 gaps.**
-
----
-
-### 4. Gap Analysis
-
-#### 4.1 PRD Requirements Gap
-
-**Gaps found: 0**
-
-모든 76개 FR이 최소 1개 스토리에 매핑됨. P0 FR(FR1-FR34, FR42, FR46, FR48-FR51)은 모두 P0 에픽(Epic 1-5)에 포함. P1 FR(FR35-FR41, FR43-FR45, FR47, FR52-FR55)은 모두 P1 에픽(Epic 6-9)에 포함. Phase 2/3 FR은 해당 Phase 에픽에 포함.
-
-#### 4.2 v1 Feature Gap
-
-**Gaps found: 0**
-
-v1-feature-spec.md의 22개 기능 영역과 7개 CEO 아이디어가 모두 스토리에 매핑됨. 도구 수량 관련: v1은 125+ 도구였으나, P0에서 30+ 핵심 도구(E4-S3, E4-S4)를 구현하고, Phase 2에서 도메인별 도구(Finance=E10-S3, Marketing=E12-S2)를 추가하는 단계적 접근. 최종적으로 v1 수준의 도구 커버리지 달성.
-
-#### 4.3 Architecture Alignment
-
-10개 Architecture Decision과의 정렬:
-
-| Decision # | 내용 | 매핑 에픽 | Status |
-|-----------|------|----------|--------|
-| #1 | Orchestration Engine | Epic 5 | Aligned |
-| #2 | Agent Execution Model | Epic 3 | Aligned |
-| #3 | LLM Provider Router | Epic 3 | Aligned |
-| #4 | Tool System | Epic 4 | Aligned |
-| #5 | Dynamic Org + Cascade | Epic 2 | Aligned |
-| #6 | Quality Gate Pipeline | Epic 5 (P0) + Epic 8 (P1) | Aligned |
-| #7 | Cost Tracking System | Epic 3 (CostTracker) + Epic 7 (비용 관리) | Aligned |
-| #8 | Real-time Communication | Epic 5 (WebSocket), Epic 6 (대시보드) | Aligned |
-| #9 | Tenant Isolation | Epic 1 (미들웨어), Epic 9 (멀티테넌시) | Aligned |
-| #10 | Data Architecture | Epic 1 (스키마) | Aligned |
-
----
-
-### 5. Dependency Validation
-
-#### 5.1 Circular Dependency Check
-
-에픽 간 의존성 그래프에서 순환 의존성 검사:
-
-```
-Epic 0 -> Epic 1 -> Epic 2 -> (Epic 5, Epic 9)
-                  -> Epic 3 -> (Epic 4, Epic 7)
-                                Epic 4 -> Epic 5
-Epic 5 -> (Epic 6, Epic 8, Epic 10, Epic 11, Epic 12, Epic 13, Epic 14, Epic 16, Epic 17, Epic 18)
-Epic 9 -> Epic 19
-Epic 14 -> (Epic 15, Epic 18)
-Epic 18 -> Epic 20
-Epic 2 -> Epic 20
-```
-
-**Result: No circular dependencies detected.** 모든 의존성은 방향성 비순환 그래프(DAG).
-
-#### 5.2 Cross-Epic Story Dependency Validation
-
-Phase가 역전되는 의존성(P1 스토리가 P0 스토리에 의존 등)은 정상 방향임을 확인:
-
-- E9-S3 (P1) depends on E5-S7 (P0): P1 -> P0 의존 (정상)
-- E8-S5 (P1) depends on E6-S4 (P1): 같은 Phase (정상)
-- E8-S3 (P1) depends on E4-S1 (P0): P1 -> P0 의존 (정상)
-- E15-S3 (Phase 2) depends on E14-S2 (Phase 2): 같은 Phase (정상)
-- E20-S4 (Phase 3) depends on E18-S4 (Phase 2): Phase 3 -> Phase 2 (정상)
-
-**Result: No reverse-phase dependencies. All dependencies flow from earlier to later phases.**
-
----
-
-### 6. Story Quality Check
-
-#### 6.1 Acceptance Criteria Coverage
-
-| Phase | Stories | Stories with AC | AC Coverage |
-|-------|---------|----------------|-------------|
-| P0 (Epic 1-5) | 40 | 40 | 100% |
-| P1 (Epic 6-9) | 24 | 24 | 100% |
-| Phase 2 (Epic 10-18) | 50 | 50 | 100% |
-| Phase 3 (Epic 19-20) | 10 | 10 | 100% |
-
-P0 스토리는 상세 AC (4-5개 체크박스), P1은 간결 AC, Phase 2/3는 요약 AC. 모든 스토리에 최소 1개 이상 AC 포함.
-
-#### 6.2 Story Point Distribution
-
-| SP | Count | Percentage |
-|----|-------|-----------|
-| 1 | 5 | 4.0% |
-| 2 | 68 | 54.8% |
-| 3 | 49 | 39.5% |
-| 5 | 2 | 1.6% |
-
-- SP 2~3이 전체의 94.4%로 적절한 분포 (1~2일 작업 단위)
-- SP 5 스토리 2개: E12-S3 (Selenium 5플랫폼), E20-S4 (노코드 워크플로우 빌더) -- sprint planning 시 분할 검토 필요
-
-#### 6.3 Story Sizing Outliers
-
-| Story | SP | 우려 | 권장 |
-|-------|----|------|------|
-| E12-S3 | 5 | Selenium 5개 플랫폼 자동 발행 | sprint planning 시 플랫폼별 분할 검토 |
-| E20-S4 | 5 | 노코드 워크플로우 빌더 | Phase 3이므로 구현 시점에 분할 |
-| E5-S3 | 3 | 5개 컴포넌트 (위임+병렬+종합+자체분석+WebSocket) | v1 코드 참조로 SP=3 달성 가능 |
-
----
-
-### 7. Risk Assessment
-
-#### 7.1 High-Risk Stories
-
-| Story | Risk | Impact | Mitigation |
-|-------|------|--------|------------|
-| E5-S2~S4 | 오케스트레이션 복잡도 | 전체 시스템 핵심 기능 | v1 코드 참조 + E5-S11 통합 테스트 |
-| E3-S1 | 3사 LLM SDK 호환성 | 에이전트 작동 불가 | E3-S3 fallback + E3-S7 통합 테스트 |
-| E1-S2 | 테넌트 격리 누락 | 데이터 유출 (Critical) | E1-S7 격리 통합 테스트 |
-| E10-S2 | KIS API 연동 복잡도 | 자동매매 기능 불가 | 모의거래 우선 + E10-S6 환경 분리 |
-| E12-S3 | Selenium 5 플랫폼 | 각 플랫폼 anti-bot 대응 | 플랫폼별 분할 구현 |
-| E5-S8 | WebSocket 실시간 안정성 | UX 저하 | Epic 0 EventBus 재사용 + 재연결 로직 |
-
-#### 7.2 Technical Debt Risks
-
-| 영역 | Risk | Phase | Mitigation |
-|------|------|-------|------------|
-| 도구 수량 | P0에서 30+, v1의 125+까지 단계적 확장 필요 | Phase 2 | 도메인 에픽에서 도구 추가 (E10-S3, E12-S2) |
-| 테스트 커버리지 | Epic 2, 4에 전용 테스트 스토리 없음 | P0 | TEA 단계에서 자동 생성 (BMAD 워크플로우) |
-| P1 스토리 상세도 | P1 스토리 AC가 P0보다 간결 | P1 | create-story BMAD 단계에서 상세화 |
-
----
-
-### 8. Implementation Order Recommendation
-
-#### Phase 1 MVP -- P0 (Critical Path)
-
-```
-Sprint 1: Epic 1 (Data Layer) -- 7 stories, 16 SP
-  E1-S1 스키마 -> E1-S2 테넌트 -> E1-S3 RBAC -> E1-S4 감사 -> E1-S5 볼트 -> E1-S6 시드 -> E1-S7 테스트
-
-Sprint 2-3: Epic 2 + Epic 3 (병렬 가능)
-  Epic 2: 부서/에이전트 CRUD -> cascade -> 템플릿 -> UI (9 stories, 23 SP)
-  Epic 3: LLM 어댑터 -> 라우터 -> fallback -> AgentRunner -> 비용 -> 배치 -> 테스트 (7 stories, 17 SP)
-
-Sprint 4: Epic 4 (Tool System) -- 6 stories, 16 SP
-  ToolPool -> 권한 -> 30+ 도구 -> 로그 -> UI
-
-Sprint 5-6: Epic 5 (Orchestration) -- 11 stories, 27 SP
-  Backend: S1~S6 -> Frontend: S7~S10 -> Test: S11
-```
-
-#### Phase 1 MVP -- P1
-
-```
-Sprint 7: Epic 6 + Epic 7 (병렬 가능)
-  Epic 6: 대시보드 API -> UI -> WebSocket -> 퀵 액션 (6 stories, 14 SP)
-  Epic 7: 비용 API -> 예산 한도 -> UI -> 알림 (5 stories, 11 SP)
-
-Sprint 8: Epic 8 + Epic 9 (병렬 가능)
-  Epic 8: yaml 정의 -> 검수 엔진 -> 환각 탐지 -> 인젝션 방어 -> UI (5 stories, 11 SP)
-  Epic 9: 회사 CRUD -> 직원 관리 -> 권한 제한 -> UI -> 온보딩 (8 stories, 17 SP)
-```
-
-#### Phase 2 (우선순위 순)
-
-```
-1. Epic 10: Strategy Room (8 stories, 20 SP) -- 높음
-2. Epic 11: AGORA Debate (5 stories, 12 SP) -- 높음
-3. Epic 12: SNS Publishing (5 stories, 14 SP) -- 높음
-4. Epic 13: SketchVibe (5 stories, 13 SP) -- 중간
-5. Epic 14: Cron & ARGOS (6 stories, 13 SP) -- 중간
-6. Epic 15: Telegram (3 stories, 6 SP) -- 중간 (Epic 14 이후)
-7. Epic 16: Knowledge & Memory (6 stories, 13 SP) -- 중간
-8. Epic 17: History/Archive/Perf (7 stories, 16 SP) -- 낮음
-9. Epic 18: Workflow Automation (5 stories, 13 SP) -- 낮음
-```
-
-#### Phase 3
-
-```
-Epic 19: Internal Messenger (5 stories, 10 SP)
-Epic 20: Platform Extensions (5 stories, 16 SP)
-```
-
----
-
-### 9. Summary Statistics
-
-| Metric | Value |
-|--------|-------|
-| Total Epics | 20 (+ Epic 0 완료) |
-| Total Stories | 124 |
-| Total Story Points | 298 SP |
-| P0 Stories / SP | 40 / 99 |
-| P1 Stories / SP | 24 / 53 |
-| Phase 2 Stories / SP | 50 / 120 |
-| Phase 3 Stories / SP | 10 / 26 |
-| PRD FR Coverage | 76/76 (100%) |
+| 사령관실 (명령 입력) | 5 | 5.3, 5.6 | Covered: 슬래시/멘션/프리셋 |
+| 명령 처리 흐름 | 5 | 5.2 | Covered: Soul 기반 라우팅 |
+| 실시간 상태 표시 | 6 | 6.3 | Covered: SSE 상태 머신 |
+| 에이전트 조직 | 7 | 7.1~7.4 | Covered: 동적 CRUD |
+| 에이전트 3계급 | 8 | 8.1~8.3 | Covered: N-Tier 확장 |
+| Soul 시스템 | 7 | 7.2 | Covered: 웹 UI 편집 |
+| 자율 딥워크 | 5 | 5.7 | Covered: Soul 패턴 |
+| 도구 시스템 125+ | 3 | 3.1 | Covered: 권한 제어 |
+| LLM 멀티 프로바이더 | 2 | 2.4 | Covered: Phase 1~4 Claude, Phase 5+ 멀티 |
+| AGORA 토론 | 4 | 4.2 | Covered: import 교체 |
+| 전략실 자동매매 | 4 | 4.2 | Covered: import 교체 (불가침) |
+| 스케치바이브 | 11 | 11.2~11.4 | Covered: MCP 분리 |
+| SNS 통신국 | — | — | 유지 (불가침) |
+| 대시보드 | — | — | 유지 (기존 Epic) |
+| 통신로그 | — | — | 유지 (기존 Epic) |
+| 작전일지 | — | — | 유지 (기존 Epic) |
+| 기밀문서 | — | — | 유지 (기존 Epic) |
+| 전력분석 | — | — | 유지 (기존 Epic) |
+| 워크플로우 | — | — | 유지 (기존 Epic) |
+| 크론기지 | — | — | 유지 (기존 Epic) |
+| 정보국 (Knowledge) | 10 | 10.4~10.5 | Covered: pgvector 강화 |
+| ARGOS | 4 | 4.2 | Covered: import 교체 (불가침) |
+| 텔레그램 | 4 | 4.2 | Covered: import 교체 (불가침) |
+| 품질 게이트 | 5 | 5.7 | Covered: Soul 기반 QA |
+| 에이전트 메모리 | 6 | 6.4 | Covered: autoLearn |
+| 비용 관리 | 3 | 3.5 | Covered: cost-tracker Hook |
+| CEO 아이디어 | 5, 7 | 5.4 | Covered: 반영 |
+
+## Architecture Decision Coverage
+
+| 결정 | Epic | 참조 |
+|------|------|------|
+| D1 getDB(companyId) | 1 | Story 1.2 |
+| D2 CLI 토큰 만료 | 4 | Story 4.1 |
+| D3 에러 코드 체계 | 1 | Story 1.4 |
+| D4 Hook 파이프라인 순서 | 3 | Story 3.1~3.6 |
+| D5 SessionContext | 2 | Story 2.1 |
+| D6 단일 진입점 | 2 | Story 2.2 |
+| D7 도구 권한 저장 | 3 | Story 3.1 |
+| D8 캐싱 없음 | — | Phase 5+ |
+| D9 로거 | 1 | Story 1.3 |
+| D10 테스트 전략 | 12 | Story 12.1~12.4 |
+| D11 WebSocket 유지 | 4, 6 | Story 4.6, 6.5 |
+| D12 토큰 등록시만 검증 | 5 | Story 5.1 |
+| D13~D16 Deferred | — | Phase 5+ |
+
+## Engine Pattern Coverage
+
+| 패턴 | Epic | 참조 |
+|------|------|------|
+| E1 SessionContext 전파 | 2 | Story 2.1, 2.6 |
+| E2 Hook 구현 표준 | 3 | Story 3.1~3.5 |
+| E3 getDB CRUD 격리 | 1 | Story 1.2 |
+| E4 Soul 템플릿 변수 | 2 | Story 2.3 |
+| E5 SSE 이벤트 발행 | 2 | Story 2.1, 2.5 |
+| E6 model-selector 매핑 | 2, 8 | Story 2.4, 8.3 |
+| E7 순차 핸드오프 | 2 | Story 2.6 |
+| E8 engine/ 공개 API 경계 | 1 | Story 1.6 |
+| E9 SDK 모킹 표준 | 12 | Story 12.1 |
+| E10 CI 경계 검증 | 1 | Story 1.6 |
+
+## Summary Statistics
+
+| 항목 | 수치 |
+|------|------|
+| Epics | 12 |
+| Stories | 64 |
+| Total SP | 174 |
+| Phase 1 SP | 60 (33%) |
+| Phase 2 SP | 46 (26%) |
+| Phase 3 SP | 28 (16%) |
+| Phase 4 SP | 28 (16%) |
+| Supporting SP | 12 (7%) |
+| P0 Stories | 42 (58%) |
+| P1 Stories | 24 (33%) |
+| P2 Stories | 6 (8%) |
+| D1~D16 Coverage | 12/16 (4 deferred to Phase 5+) |
+| E1~E10 Coverage | 10/10 (100%) |
 | v1 Feature Coverage | 22/22 (100%) |
-| CEO Ideas Coverage | 7/7 (100%) |
-| UX Screen Coverage | 22/22 (100%) |
-| Architecture Decisions Aligned | 10/10 (100%) |
-| Circular Dependencies | 0 |
-| Reverse-Phase Dependencies | 0 |
-| High-Risk Stories | 6 (all with mitigations) |
-| SP=5 Outliers | 2 (flagged for sprint split) |
-| Average SP per Story | 2.40 |
-| Average Stories per Epic | 6.2 |
-
-**Final Assessment: Implementation Ready.** 모든 PRD 요구사항, v1 기능, UX 화면, 아키텍처 결정이 124개 스토리에 매핑되었으며, 순환 의존성 없이 단계적 구현이 가능하다.
