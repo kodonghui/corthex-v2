@@ -80,7 +80,7 @@ export function CommandCenterPage() {
   return (
     <div
       data-testid="command-center-page"
-      className="h-full flex flex-col bg-zinc-950 overflow-hidden"
+      className="flex flex-col h-full bg-slate-900"
     >
       {/* Pipeline bar — always visible at top */}
       <PipelineVisualization
@@ -88,13 +88,38 @@ export function CommandCenterPage() {
         delegationSteps={activeSteps}
       />
 
+      {/* Mobile tab bar — only shown on small screens, above content */}
+      <div className="flex md:hidden border-b border-slate-700">
+        <button
+          data-testid="mobile-tab-chat"
+          onClick={() => setMobileTab('chat')}
+          className={`flex-1 py-2.5 text-sm font-medium text-center transition-colors ${
+            mobileTab === 'chat'
+              ? 'text-blue-400 border-b-2 border-blue-400'
+              : 'text-slate-500'
+          }`}
+        >
+          대화
+        </button>
+        <button
+          data-testid="mobile-tab-report"
+          onClick={() => setMobileTab('report')}
+          className={`flex-1 py-2.5 text-sm font-medium text-center transition-colors ${
+            mobileTab === 'report'
+              ? 'text-blue-400 border-b-2 border-blue-400'
+              : 'text-slate-500'
+          }`}
+        >
+          보고서
+        </button>
+      </div>
+
       {/* Main body: left thread + right report, fills remaining height */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* ── Left column: message thread ── */}
         <div
-          className={`flex flex-col border-r border-zinc-800 min-w-0
-            ${mobileTab === 'chat' ? 'flex' : 'hidden'}
-            md:flex md:w-[420px] lg:w-[480px] xl:w-[520px]`}
+          className={`w-[420px] flex-col border-r border-slate-700
+            ${mobileTab === 'chat' ? 'flex' : 'hidden md:flex'}`}
         >
           <MessageThread
             messages={messages}
@@ -133,32 +158,6 @@ export function CommandCenterPage() {
         presets={presetItems}
         onOpenPresets={() => setShowPresetManager(true)}
       />
-
-      {/* Mobile tab switcher — only shown on small screens */}
-      <div className="md:hidden flex border-t border-zinc-800 bg-zinc-950">
-        <button
-          data-testid="view-tab-chat"
-          onClick={() => setMobileTab('chat')}
-          className={`flex-1 py-3 text-xs font-medium transition-colors ${
-            mobileTab === 'chat'
-              ? 'text-zinc-100 border-t-2 border-corthex-accent -mt-px'
-              : 'text-zinc-500 hover:text-zinc-300'
-          }`}
-        >
-          Thread
-        </button>
-        <button
-          data-testid="view-tab-report"
-          onClick={() => setMobileTab('report')}
-          className={`flex-1 py-3 text-xs font-medium transition-colors ${
-            mobileTab === 'report'
-              ? 'text-zinc-100 border-t-2 border-corthex-accent -mt-px'
-              : 'text-zinc-500 hover:text-zinc-300'
-          }`}
-        >
-          Deliverable
-        </button>
-      </div>
 
       {/* Modals */}
       {detailModalId && (

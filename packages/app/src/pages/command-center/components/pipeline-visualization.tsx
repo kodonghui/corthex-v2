@@ -42,113 +42,6 @@ function getDescriptionFromSteps(steps: DelegationStep[], role: string): string 
   return descriptions[lastStep.event] || lastStep.event
 }
 
-const STATUS_CONFIG = {
-  done: {
-    dot: 'bg-emerald-500',
-    label: 'text-emerald-400',
-    ring: 'border-emerald-800',
-    bg: 'bg-emerald-950/40',
-    badge: 'bg-emerald-900/50 text-emerald-400',
-    text: 'Done',
-  },
-  working: {
-    dot: 'bg-blue-400 animate-pulse',
-    label: 'text-blue-400',
-    ring: 'border-blue-800',
-    bg: 'bg-blue-950/40',
-    badge: 'bg-blue-900/50 text-blue-400',
-    text: 'Working',
-  },
-  waiting: {
-    dot: 'bg-zinc-600',
-    label: 'text-zinc-500',
-    ring: 'border-zinc-700/60',
-    bg: 'bg-zinc-900/30',
-    badge: 'bg-zinc-800/60 text-zinc-500',
-    text: 'Waiting',
-  },
-  failed: {
-    dot: 'bg-red-500',
-    label: 'text-red-400',
-    ring: 'border-red-800',
-    bg: 'bg-red-950/30',
-    badge: 'bg-red-900/50 text-red-400',
-    text: 'Failed',
-  },
-}
-
-const ROLE_ICONS: Record<string, React.ReactNode> = {
-  Manager: (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-      <circle cx="7" cy="4.5" r="2.5" stroke="currentColor" strokeWidth="1.3" />
-      <path d="M2 12.5c0-2.5 2.2-4.5 5-4.5s5 2 5 4.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-    </svg>
-  ),
-  Analyst: (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-      <path d="M2 10.5l2.5-3.5 2.5 1.5 3.5-5 1.5 2.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ),
-  Writer: (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-      <path d="M3 11l1.5-1.5 5-5 1.5 1.5-5 5-1.5 1.5z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
-      <path d="M9.5 4.5l1.5-1.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-    </svg>
-  ),
-  Designer: (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-      <rect x="2" y="3" width="10" height="8" rx="1" stroke="currentColor" strokeWidth="1.3" />
-      <path d="M4 8l2-2 1.5 1 2.5-2.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ),
-}
-
-const ROLE_COLORS: Record<string, string> = {
-  Manager: 'text-violet-400',
-  Analyst: 'text-blue-400',
-  Writer: 'text-amber-400',
-  Designer: 'text-emerald-400',
-}
-
-function PipelineStep({ stage, isLast }: { stage: PipelineStage; isLast: boolean }) {
-  const cfg = STATUS_CONFIG[stage.status]
-  const iconColor = ROLE_COLORS[stage.role] || 'text-zinc-400'
-
-  return (
-    <div
-      data-testid="delegation-step"
-      className="flex items-center gap-0"
-    >
-      {/* Step card */}
-      <div className={`flex items-center gap-2.5 px-3 py-2 rounded-lg border ${cfg.ring} ${cfg.bg} min-w-0`}>
-        {/* Status dot */}
-        <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${cfg.dot}`} />
-        {/* Role icon */}
-        <span className={`flex-shrink-0 ${iconColor}`}>
-          {ROLE_ICONS[stage.role] || (
-            <span className="text-xs font-bold">{stage.role.charAt(0)}</span>
-          )}
-        </span>
-        {/* Text */}
-        <div className="flex flex-col min-w-0">
-          <span className="text-xs font-medium text-zinc-200 leading-tight whitespace-nowrap">{stage.role}</span>
-          <span className={`text-[10px] leading-tight whitespace-nowrap ${cfg.label}`}>{stage.description}</span>
-        </div>
-      </div>
-
-      {/* Connector arrow */}
-      {!isLast && (
-        <div className="flex items-center mx-1.5 flex-shrink-0">
-          <div className="w-5 h-px bg-zinc-700" />
-          <svg width="5" height="8" viewBox="0 0 5 8" fill="none" className="text-zinc-600 -ml-px">
-            <path d="M1 1l3 3-3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
-      )}
-    </div>
-  )
-}
-
 export function PipelineVisualization({ activeCommandId, delegationSteps }: Props) {
   const defaultStages: PipelineStage[] = [
     { id: '1', name: 'Manager', role: 'Manager', status: 'waiting', description: 'Routing task' },
@@ -168,55 +61,74 @@ export function PipelineVisualization({ activeCommandId, delegationSteps }: Prop
   const hasFailed = stages.some((s) => s.status === 'failed')
   const hasActive = stages.some((s) => s.status === 'working' || s.status === 'done')
 
+  if (!activeCommandId) {
+    return (
+      <div
+        data-testid="pipeline-bar"
+        aria-live="polite"
+        className="flex items-center gap-3 px-4 h-16 border-b border-slate-700 bg-slate-900 shrink-0"
+      >
+        <span className="w-2 h-2 rounded-full bg-slate-600" />
+        <p className="text-xs text-slate-600">명령을 입력하면 처리 파이프라인이 표시됩니다</p>
+      </div>
+    )
+  }
+
   return (
     <div
-      data-testid="delegation-chain"
-      className="flex-shrink-0 flex items-center gap-3 px-4 py-2.5 border-b border-zinc-800 bg-zinc-950 overflow-x-auto"
+      data-testid="pipeline-bar"
+      aria-live="polite"
+      className="flex items-center gap-2 px-4 h-16 border-b border-slate-700 bg-slate-900 shrink-0 overflow-x-auto"
     >
-      {/* Label */}
-      <div className="flex items-center gap-2 flex-shrink-0">
-        <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-600 select-none">
-          Pipeline
-        </span>
-        {hasActive && !hasFailed && (
-          <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-        )}
-        {hasFailed && (
-          <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
-        )}
-      </div>
+      {/* Header dot */}
+      {hasActive && !hasFailed && (
+        <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse shrink-0" />
+      )}
+      {hasFailed && (
+        <span className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
+      )}
+      {!hasActive && !hasFailed && (
+        <span className="w-2 h-2 rounded-full bg-slate-600 shrink-0" />
+      )}
 
-      {/* Divider */}
-      <div className="w-px h-4 bg-zinc-800 flex-shrink-0" />
+      {/* Stages */}
+      {stages.map((stage, idx) => {
+        const dotClass =
+          stage.status === 'done' ? 'bg-emerald-500' :
+          stage.status === 'working' ? 'bg-blue-500 animate-pulse' :
+          stage.status === 'failed' ? 'bg-red-500' :
+          'bg-slate-600'
 
-      {/* Steps row */}
-      <div className="flex items-center flex-shrink-0">
-        {stages.map((stage, idx) => (
-          <PipelineStep
-            key={stage.id}
-            stage={stage}
-            isLast={idx === stages.length - 1 && !hasFailed}
-          />
-        ))}
+        const textClass =
+          stage.status === 'done' ? 'text-slate-300' :
+          stage.status === 'working' ? 'text-slate-300' :
+          stage.status === 'failed' ? 'text-slate-300' :
+          'text-slate-500'
 
-        {hasFailed && (
-          <>
-            <div className="flex items-center mx-1.5">
-              <div className="w-5 h-px bg-red-800" />
-              <svg width="5" height="8" viewBox="0 0 5 8" fill="none" className="text-red-700 -ml-px">
-                <path d="M1 1l3 3-3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+        const descClass =
+          stage.status === 'done' ? 'text-slate-500' :
+          stage.status === 'working' ? 'text-slate-500' :
+          stage.status === 'failed' ? 'text-slate-500' :
+          'text-slate-600'
+
+        return (
+          <div key={stage.id} className="flex items-center gap-2 shrink-0">
+            <div
+              data-testid={`pipeline-stage-${stage.role.toLowerCase()}`}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
+            >
+              <span className={`w-2 h-2 rounded-full ${dotClass}`} />
+              <span className={`text-xs font-medium ${textClass}`}>{stage.role}</span>
+              <span className={`text-xs max-w-[120px] truncate ${descClass}`}>{stage.description}</span>
             </div>
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-red-800 bg-red-950/30">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-red-400">
-                <circle cx="6" cy="6" r="5" stroke="currentColor" strokeWidth="1.3" />
-                <path d="M4 4l4 4M8 4l-4 4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-              </svg>
-              <span className="text-xs font-medium text-red-400">Failed</span>
-            </div>
-          </>
-        )}
-      </div>
+
+            {/* Connector arrow */}
+            {idx < stages.length - 1 && (
+              <span className={`text-xs ${hasFailed ? 'text-red-500' : 'text-slate-600'}`}>→</span>
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }

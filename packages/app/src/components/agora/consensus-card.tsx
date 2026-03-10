@@ -26,37 +26,37 @@ export function ConsensusCard({ result }: { result: DebateResult }) {
   const style = CONSENSUS_STYLES[result.consensus]
 
   return (
-    <div className={cn('rounded-xl border p-4 space-y-3', style.bg, style.border)}>
+    <div data-testid="consensus-card" className={cn('rounded-xl border p-4 space-y-3', style.bg, style.border)}>
       {/* Header */}
       <div className="flex items-center gap-2">
         <span className="text-lg">{style.icon}</span>
-        <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">{style.label}</h3>
-        <span className="text-[10px] text-zinc-400 font-mono ml-auto">{result.roundCount}R</span>
+        <h3 className="text-sm font-bold text-slate-100">{style.label}</h3>
+        <span className="text-[10px] text-slate-400 font-mono ml-auto">{result.roundCount}R</span>
       </div>
 
       {/* Summary */}
-      <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed">{result.summary}</p>
+      <p className="text-sm text-slate-300 leading-relaxed">{result.summary}</p>
 
       {/* Positions */}
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">다수 의견</p>
-          <p className="text-xs text-zinc-600 dark:text-zinc-400">{result.majorityPosition}</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">다수 의견</p>
+          <p className="text-xs text-slate-400">{result.majorityPosition}</p>
         </div>
         <div className="space-y-1">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">소수 의견</p>
-          <p className="text-xs text-zinc-600 dark:text-zinc-400">{result.minorityPosition}</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">소수 의견</p>
+          <p className="text-xs text-slate-400">{result.minorityPosition}</p>
         </div>
       </div>
 
       {/* Key arguments */}
       {result.keyArguments.length > 0 && (
         <div className="space-y-1">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">핵심 논점</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">핵심 논점</p>
           <ul className="space-y-1">
             {result.keyArguments.map((arg, i) => (
-              <li key={i} className="text-xs text-zinc-600 dark:text-zinc-400 flex gap-1.5">
-                <span className="text-zinc-400 shrink-0">•</span>
+              <li key={i} className="text-xs text-slate-400 flex gap-1.5">
+                <span className="text-slate-500 shrink-0">•</span>
                 <span>{arg}</span>
               </li>
             ))}

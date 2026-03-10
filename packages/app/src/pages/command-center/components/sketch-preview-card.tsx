@@ -73,9 +73,9 @@ export function SketchPreviewCard({ mermaid, description, commandId }: Props) {
   }, [saveName, saveMutation])
 
   return (
-    <div data-testid="sketch-preview" className="rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden bg-white dark:bg-zinc-800">
+    <div data-testid={`sketch-preview-${commandId}`} className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden mt-2">
       {/* Mini canvas preview */}
-      <div className="h-48 bg-zinc-50 dark:bg-zinc-900 relative">
+      <div className="h-48 bg-slate-900/50 relative">
         {nodes.length > 0 ? (
           <ReactFlow
             nodes={nodes}
@@ -94,69 +94,58 @@ export function SketchPreviewCard({ mermaid, description, commandId }: Props) {
             <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
           </ReactFlow>
         ) : (
-          <div className="flex items-center justify-center h-full text-sm text-zinc-400">
+          <div className="flex items-center justify-center h-full text-sm text-slate-400">
             다이어그램 미리보기를 로드할 수 없습니다
           </div>
         )}
       </div>
 
-      {/* Description */}
-      <div className="px-3 py-2 border-t border-zinc-100 dark:border-zinc-700">
-        <p className="text-xs text-zinc-600 dark:text-zinc-300">{description}</p>
-      </div>
-
-      {/* Action buttons */}
-      <div className="flex items-center gap-2 px-3 py-2 border-t border-zinc-100 dark:border-zinc-700">
-        <button
-          onClick={handleOpenInEditor}
-          className="flex-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
-        >
-          SketchVibe에서 열기
-        </button>
-        <button
-          onClick={() => setShowSaveDialog(true)}
-          className="px-3 py-1.5 text-xs font-medium rounded-lg border border-zinc-200 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
-        >
-          저장
-        </button>
-        <button
-          onClick={handleCopyMermaid}
-          className="px-3 py-1.5 text-xs font-medium rounded-lg border border-zinc-200 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors relative"
-        >
-          {copyToast ? '복사됨!' : 'Mermaid 복사'}
-        </button>
-      </div>
-
-      {/* Save dialog */}
-      {showSaveDialog && (
-        <div className="px-3 py-2 border-t border-zinc-100 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900">
-          <label className="text-xs text-zinc-500 mb-1 block">스케치 이름</label>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={saveName}
-              onChange={(e) => setSaveName(e.target.value)}
-              className="flex-1 px-2 py-1.5 text-xs rounded-lg border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
-              autoFocus
-              onKeyDown={(e) => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') setShowSaveDialog(false) }}
-            />
-            <button
-              onClick={handleSave}
-              disabled={saveMutation.isPending}
-              className="px-3 py-1.5 text-xs font-medium rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 transition-colors"
-            >
-              {saveMutation.isPending ? '저장 중...' : '확인'}
-            </button>
-            <button
-              onClick={() => setShowSaveDialog(false)}
-              className="px-3 py-1.5 text-xs rounded-lg border border-zinc-200 dark:border-zinc-600 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
-            >
-              취소
-            </button>
-          </div>
-          {saveMutation.isSuccess && (
-            <p className="text-xs text-emerald-600 mt-1">스케치가 저장되었습니다</p>
-          )}
+      {/* Action buttons / Save dialog */}
+      {showSaveDialog ? (
+        <div className="flex items-center gap-2 p-3 border-t border-slate-700">
+          <input
+            type="text"
+            value={saveName}
+            onChange={(e) => setSaveName(e.target.value)}
+            className="flex-1 bg-slate-700 border border-slate-600 rounded-lg px-2 py-1 text-xs text-white outline-none"
+            placeholder="스케치 이름"
+            autoFocus
+            onKeyDown={(e) => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') setShowSaveDialog(false) }}
+          />
+          <button
+            onClick={handleSave}
+            disabled={saveMutation.isPending}
+            className="text-xs px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition-colors"
+          >
+            {saveMutation.isPending ? '저장 중...' : '확인'}
+          </button>
+          <button
+            onClick={() => setShowSaveDialog(false)}
+            className="text-xs px-3 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 transition-colors"
+          >
+            취소
+          </button>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2 p-3 border-t border-slate-700">
+          <button
+            onClick={handleOpenInEditor}
+            className="text-xs px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors"
+          >
+            SketchVibe에서 열기
+          </button>
+          <button
+            onClick={() => setShowSaveDialog(true)}
+            className="text-xs px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 font-medium transition-colors"
+          >
+            저장
+          </button>
+          <button
+            onClick={handleCopyMermaid}
+            className="text-xs px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 font-medium transition-colors"
+          >
+            {copyToast ? '복사됨!' : 'Mermaid 복사'}
+          </button>
         </div>
       )}
     </div>
@@ -168,13 +157,8 @@ export function SketchPreviewCard({ mermaid, description, commandId }: Props) {
  */
 export function SketchLoadingCard() {
   return (
-    <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden bg-white dark:bg-zinc-800">
-      <div className="h-32 bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center">
-        <div className="text-center">
-          <span className="animate-spin text-2xl inline-block mb-2">🎨</span>
-          <p className="text-xs text-zinc-400">다이어그램 생성 중...</p>
-        </div>
-      </div>
+    <div data-testid="sketch-loading" className="h-32 bg-slate-800/50 border border-slate-700 rounded-xl flex items-center justify-center mt-2">
+      <span className="text-sm text-slate-400 animate-pulse">다이어그램 생성 중...</span>
     </div>
   )
 }
@@ -184,9 +168,9 @@ export function SketchLoadingCard() {
  */
 export function SketchErrorCard({ error }: { error: string }) {
   return (
-    <div className="rounded-xl border border-red-200 dark:border-red-800 overflow-hidden bg-red-50 dark:bg-red-900/20 px-4 py-3">
-      <p className="text-sm text-red-600 dark:text-red-400">다이어그램 생성에 실패했습니다.</p>
-      <p className="text-xs text-red-500 dark:text-red-500 mt-1">{error}</p>
+    <div className="bg-red-950/50 border border-red-900/50 rounded-xl px-4 py-3 mt-2">
+      <p className="text-sm text-red-400">다이어그램 생성에 실패했습니다.</p>
+      <p className="text-xs text-red-500 mt-1">{error}</p>
     </div>
   )
 }

@@ -69,9 +69,9 @@ export function AgoraPage() {
   }, [])
 
   return (
-    <div className="flex h-full">
+    <div data-testid="agora-page" className="flex h-full bg-slate-900">
       {/* Left panel: debate list (hidden on mobile when viewing detail) */}
-      <div className={`w-72 shrink-0 border-r border-zinc-200 dark:border-zinc-800 ${mobileView === 'detail' ? 'hidden md:block' : ''}`}>
+      <div className={`w-72 shrink-0 border-r border-slate-700 ${mobileView === 'detail' ? 'hidden md:block' : ''}`}>
         <DebateListPanel
           selectedId={selectedDebate?.id ?? null}
           onSelect={handleSelectDebate}
@@ -84,16 +84,20 @@ export function AgoraPage() {
         {debate ? (
           <>
             {/* Mobile back button */}
-            <div className="md:hidden shrink-0 px-4 py-2 border-b border-zinc-200 dark:border-zinc-800">
-              <button onClick={handleBackToList} className="text-xs text-indigo-500 hover:text-indigo-400">
+            <div className="md:hidden shrink-0 px-4 py-2 border-b border-slate-700">
+              <button
+                data-testid="debate-back-to-list-btn"
+                onClick={handleBackToList}
+                className="text-xs text-blue-400 hover:text-blue-300"
+              >
                 ← 목록으로
               </button>
             </div>
 
             {/* Topic header */}
-            <div className="shrink-0 px-4 py-3 border-b border-zinc-200 dark:border-zinc-800">
+            <div data-testid="debate-topic-header" className="shrink-0 px-4 py-3 border-b border-slate-700">
               <div className="flex items-center gap-2">
-                <h2 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">{debate.topic}</h2>
+                <h2 className="text-sm font-bold text-slate-100 truncate">{debate.topic}</h2>
                 {debate.status === 'in-progress' && (
                   <span className="flex items-center gap-1 text-[10px] text-emerald-500 shrink-0">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -101,7 +105,7 @@ export function AgoraPage() {
                   </span>
                 )}
               </div>
-              <p className="text-[10px] text-zinc-400 mt-0.5">
+              <p className="text-[10px] text-slate-400 mt-0.5">
                 {debate.debateType === 'deep-debate' ? '심층토론' : '토론'} · {debate.participants.length}명 · Round {debate.rounds.length}/{debate.maxRounds}
               </p>
             </div>
@@ -111,10 +115,11 @@ export function AgoraPage() {
 
             {/* Back to chat button (when debate completed and came from chat) */}
             {fromChat && debate.status === 'completed' && (
-              <div className="shrink-0 px-4 py-3 border-t border-zinc-200 dark:border-zinc-800">
+              <div className="shrink-0 px-4 py-3 border-t border-slate-700">
                 <button
+                  data-testid="back-to-chat-btn"
                   onClick={() => navigate('/chat')}
-                  className="w-full py-2 text-xs font-medium text-indigo-500 hover:text-indigo-400 bg-indigo-500/10 hover:bg-indigo-500/20 rounded-lg transition-colors"
+                  className="w-full py-2 text-xs font-medium text-blue-400 hover:text-blue-300 bg-blue-500/10 hover:bg-blue-500/20 rounded-lg transition-colors"
                 >
                   ← 사령관실로 돌아가기
                 </button>
@@ -122,7 +127,7 @@ export function AgoraPage() {
             )}
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-zinc-400 dark:text-zinc-500">
+          <div className="flex-1 flex items-center justify-center text-slate-500">
             <div className="text-center space-y-2">
               <p className="text-3xl opacity-30">🗣️</p>
               <p className="text-sm">토론을 선택하거나 새 토론을 시작하세요</p>
@@ -133,7 +138,7 @@ export function AgoraPage() {
 
       {/* Right panel: debate info (desktop only) */}
       {debate && (
-        <div className="hidden lg:block w-72 shrink-0 border-l border-zinc-200 dark:border-zinc-800">
+        <div className="hidden lg:block w-72 shrink-0 border-l border-slate-700">
           <DebateInfoPanel debate={debate} />
         </div>
       )}

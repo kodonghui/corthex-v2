@@ -1,12 +1,11 @@
 import { useState, useMemo } from 'react'
-import { Modal, Input } from '@corthex/ui'
 import type { Agent } from './types'
 
 const statusColors: Record<string, string> = {
-  online: 'bg-green-400',
-  working: 'bg-yellow-400 animate-pulse',
-  error: 'bg-red-400',
-  offline: 'bg-zinc-400',
+  online: 'bg-emerald-500',
+  working: 'bg-amber-500 animate-pulse',
+  error: 'bg-red-500',
+  offline: 'bg-slate-600',
 }
 
 const statusLabels: Record<string, string> = {
@@ -48,69 +47,77 @@ export function AgentListModal({
   const searchDisabled = agents.length <= 3
 
   return (
-    <Modal isOpen={true} onClose={onClose} className="max-w-md max-h-[80vh] flex flex-col p-0">
-      {/* 헤더 */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-200 dark:border-zinc-700">
-        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">에이전트 선택</h3>
-        <button
-          onClick={onClose}
-          className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 text-lg leading-none"
-        >
-          &times;
-        </button>
-      </div>
+    <div
+      data-testid="agent-list-modal"
+      role="dialog"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
+    >
+      <div className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-md mx-4 max-h-[70vh] flex flex-col">
+        {/* 헤더 */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-700 shrink-0">
+          <h3 className="text-lg font-semibold text-slate-50">에이전트 선택</h3>
+          <button
+            onClick={onClose}
+            className="text-slate-500 hover:text-slate-300 p-1 rounded-lg hover:bg-slate-700 transition-colors"
+          >
+            ✕
+          </button>
+        </div>
 
-      {/* 검색 */}
-      <div className="px-5 py-3 border-b border-zinc-200 dark:border-zinc-700">
-        <Input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="에이전트 검색..."
-          disabled={searchDisabled}
-        />
-      </div>
+        {/* 검색 */}
+        <div className="px-5 py-3">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="이름 또는 역할 검색..."
+            disabled={searchDisabled}
+            className="w-full bg-slate-700 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-white outline-none placeholder-slate-500 disabled:opacity-40 transition-colors"
+          />
+        </div>
 
-      {/* 에이전트 목록 */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-1">
-        {filtered.length === 0 ? (
-          <p className="text-center text-sm text-zinc-400 py-6">검색 결과가 없습니다</p>
-        ) : (
-          filtered.map((agent) => {
-            const isOffline = agent.status === 'offline'
-            const initial = agent.name.charAt(0)
+        {/* 에이전트 목록 */}
+        <div className="flex-1 overflow-y-auto">
+          {filtered.length === 0 ? (
+            <p className="text-center text-sm text-slate-500 py-6">검색 결과가 없습니다</p>
+          ) : (
+            filtered.map((agent) => {
+              const isOffline = agent.status === 'offline'
+              const initial = agent.name.charAt(0)
 
-            return (
-              <button
-                key={agent.id}
-                onClick={() => !isOffline && onSelect(agent)}
-                disabled={isOffline}
-                className={`w-full text-left flex items-center gap-3 px-3 py-3 rounded-lg transition-colors ${
-                  isOffline
-                    ? 'opacity-50 cursor-not-allowed'
-                    : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer'
-                }`}
-              >
-                {/* 아바타 */}
-                <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 font-bold text-sm flex items-center justify-center shrink-0">
-                  {initial}
-                </div>
+              return (
+                <button
+                  key={agent.id}
+                  data-testid={`agent-item-${agent.id}`}
+                  onClick={() => !isOffline && onSelect(agent)}
+                  disabled={isOffline}
+                  className={`w-full flex items-center gap-3 px-5 py-3 hover:bg-slate-700/50 transition-colors ${
+                    isOffline ? 'opacity-40 cursor-not-allowed' : ''
+                  }`}
+                >
+                  {/* 아바타 */}
+                  <span className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-sm font-bold text-slate-300 shrink-0 relative">
+                    {initial}
+                    <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-slate-800 ${statusColors[agent.status]}`} />
+                  </span>
 
-                {/* 정보 */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    {agent.isSecretary && <span className="text-xs">⭐</span>}
-                    <span className="text-sm font-medium truncate">{agent.name}</span>
-                    <span className={`w-2 h-2 rounded-full shrink-0 ${statusColors[agent.status]}`} />
-                    <span className="text-[10px] text-zinc-400">{statusLabels[agent.status]}</span>
+                  {/* 정보 */}
+                  <div className="flex-1 min-w-0 text-left">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-slate-200">{agent.name}</span>
+                      {agent.isSecretary && (
+                        <span className="text-xs px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">⭐ 비서</span>
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-400 truncate mt-0.5">{agent.role}</p>
                   </div>
-                  <p className="text-xs text-zinc-400 truncate mt-0.5">{agent.role}</p>
-                </div>
-              </button>
-            )
-          })
-        )}
+                </button>
+              )
+            })
+          )}
+        </div>
       </div>
-    </Modal>
+    </div>
   )
 }

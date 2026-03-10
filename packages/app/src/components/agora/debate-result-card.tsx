@@ -46,16 +46,16 @@ export function DebateResultCard({ debateId, topic, result }: DebateResultCardPr
       </div>
 
       {/* Topic */}
-      <p className="text-xs font-medium text-zinc-900 dark:text-zinc-100">{topic}</p>
+      <p className="text-xs font-medium text-slate-100">{topic}</p>
 
       {/* Summary */}
-      <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">{result.summary}</p>
+      <p className="text-xs text-slate-400 leading-relaxed">{result.summary}</p>
 
       {/* Key Arguments (max 3) */}
       {result.keyArguments.length > 0 && (
         <ul className="space-y-0.5">
           {result.keyArguments.slice(0, 3).map((arg, i) => (
-            <li key={i} className="text-[10px] text-zinc-500 flex gap-1.5">
+            <li key={i} className="text-[10px] text-slate-500 flex gap-1.5">
               <span className="shrink-0">•</span>
               <span className="line-clamp-1">{arg}</span>
             </li>
@@ -66,7 +66,7 @@ export function DebateResultCard({ debateId, topic, result }: DebateResultCardPr
       {/* Action */}
       <button
         onClick={() => navigate(`/agora?debateId=${debateId}`)}
-        className="text-[10px] text-indigo-500 hover:text-indigo-400 transition-colors"
+        className="text-[10px] text-blue-400 hover:text-blue-300 transition-colors"
       >
         AGORA에서 보기 →
       </button>

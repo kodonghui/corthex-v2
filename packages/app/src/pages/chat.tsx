@@ -131,7 +131,7 @@ export function ChatPage() {
   )
 
   return (
-    <div className="flex h-full">
+    <div data-testid="chat-page" className="flex h-full bg-slate-900">
       {/* 세션 패널 — 모바일에서는 showChat일 때 숨김 */}
       <div className={`${showChat ? 'hidden md:flex' : 'flex'} w-full md:w-72 shrink-0`}>
         <SessionPanel
