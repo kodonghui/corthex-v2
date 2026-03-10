@@ -60,6 +60,13 @@ Bad: "professional colors" → Good: `bg-slate-900 (#0f172a)`
 Bad: "add sidebar" → Good: `w-64 fixed left-0 h-screen bg-slate-900 border-r border-slate-700`
 Workers/team agents follow the same standard. "Vague" = instant FAIL in party mode.
 
+## Engine Patterns (Phase 1)
+- All agent execution → `engine/agent-loop.ts` (single entry point, Hook bypass impossible)
+- DB access → `getDB(ctx.companyId)` only (read+write). Direct `db` import forbidden in business logic
+- engine/ public API: `agent-loop.ts` + `types.ts` only. No imports from hooks/, soul-renderer, etc.
+- SDK `@anthropic-ai/claude-agent-sdk`: exact pin version (no ^). Manual update only after PoC re-run
+- Full architecture: `_bmad-output/planning-artifacts/architecture.md` → D1~D16, E1~E10
+
 ## Coding Conventions
 - Filenames: kebab-case lowercase
 - Imports: must match `git ls-files` casing exactly (Linux CI is case-sensitive)

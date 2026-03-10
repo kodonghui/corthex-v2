@@ -1,1180 +1,1132 @@
 ---
-stepsCompleted: [step-01-init, step-02-context, step-03-starter, step-04-decisions, step-05-patterns, step-06-structure, step-07-validation]
+stepsCompleted: [1, 2, 3, 4, 5, 6, 7]
+partyModeRounds: 32
 inputDocuments:
   - _bmad-output/planning-artifacts/prd.md
-  - _bmad-output/planning-artifacts/product-brief-corthex-v2-2026-03-07.md
+  - _bmad-output/planning-artifacts/product-brief-corthex-v2-engine-refactor-2026-03-10.md
   - _bmad-output/planning-artifacts/v1-feature-spec.md
+  - _poc/agent-engine-v3/POC-RESULT.md
+  - _bmad-output/planning-artifacts/ux-design-specification.md
 workflowType: 'architecture'
 project_name: 'corthex-v2'
 user_name: 'ubuntu'
-date: '2026-03-07'
+date: '2026-03-11'
+partyModeRounds: 15
 ---
 
 # Architecture Decision Document
 
-_CORTHEX v2 - AI Agent Orchestration Platform (Dynamic Organization Management)_
+_CORTHEX v2 — AI Agent Orchestration Platform (Dynamic Organization Management)_
 
 ## Project Context Analysis
 
 ### Requirements Overview
 
-**Functional Requirements:**
-76 FRs across 9 capability areas:
-1. 조직 관리 (12 FRs): 부서/에이전트 CRUD, cascade 처리, 시스템 에이전트 보호, 조직도 시각화, 템플릿, Soul 편집
-2. 사령관실 (6 FRs): 자연어 명령, @멘션, 슬래시 8종, 프리셋, 위임 체인 실시간 표시, 피드백
-3. 오케스트레이션 (7 FRs): 비서실장 자동 분류, Manager 위임/종합(5번째 분석가 #007), 비서실장=편집장(#010), 딥워크, /전체, /순차
-4. 도구 & LLM (9 FRs): allowed_tools 서버 강제, 도구 로그, 3계급 자동 모델 배정, 멀티 프로바이더 라우팅, Batch API, fallback
-5. 모니터링 & 비용 (7 FRs): 대시보드 카드, 사용량 그래프, 통신로그 4탭, 3축 비용 추적, 예산 한도/자동 차단, 만족도 통계
-6. 보안 & 멀티테넌시 (8 FRs): companyId 격리, 회사/직원 CRUD, 워크스페이스, AES-256-GCM 볼트, 크리덴셜 프롬프트 노출 금지, JWT RBAC, 감사 로그
-7. 품질 관리 (6 FRs): 5항목 검수, 자동 재작업, QA 로그, quality_rules.yaml, 환각 탐지, 프롬프트 인젝션 방어
-8. 투자 & 금융 Phase 2 (7 FRs): 전략실 대시보드, CIO+VECTOR(#001), KIS 자동매매, 자율/승인 실행, 투자 성향 리스크, 실/모의 분리, 주문 영구 보존
-9. 협업 & 확장 Phase 2/3 (14 FRs): AGORA, SketchVibe, SNS, 크론, ARGOS, 텔레그램, RAG, 메모리, 작전일지, 기밀문서, 전력분석, 자동화, 예측 워크플로우(#004), 사내 메신저
+**Functional Requirements (72개, 12 Capability Areas):**
 
-**핵심 아키텍처 과제**: 오케스트레이션 엔진 -- CEO 명령 -> 비서실장 자동 분류 -> Manager 위임 -> 병렬 Specialist 실행(실제 도구 호출) -> Manager 종합(+자체 분석) -> 비서실장 품질 검수 -> CEO 보고. 비동기 멀티스텝 워크플로우 엔진.
+| Area | FR 수 | Phase | 아키텍처 영향 |
+|------|-------|-------|-------------|
+| Agent Execution | 10 | 1 | SDK query() 래퍼, call_agent MCP, N단계 핸드오프, 병렬 실행, 순환 감지 |
+| Secretary & Orchestration | 10 | 2 | Soul 기반 라우팅, 비서 유무 분기 허브 UX 2종, 에이전트 메타데이터 자동 주입 |
+| Soul Management | 5 | 1~2 | 템플릿 변수 치환 엔진, DB→Soul 동적 바인딩, 금지 섹션 자동 삽입 |
+| Organization Management | 8 | 2~3 | CRUD API + NEXUS React Flow UI, 비서실장 삭제 방지 |
+| Tier & Cost | 6 | 1+3 | tier_configs 테이블, enum→integer 마이그레이션, cost-tracker Hook |
+| Security & Audit | 6 | 1~2 | Hook 5개 (permission/credential/delegation/cost/redactor) |
+| Real-time Monitoring | 4 | 1~2 | WebSocket 핸드오프 추적, 에러 투명성, 메모리 모니터링 |
+| Library (Knowledge & Briefing) | 7 | 4+유지 | pgvector 의미검색, NotebookLM MCP, 텔레그램 전송 |
+| Dev Collaboration | 2 | 4 | 스케치바이브 Stdio MCP 서버 |
+| Onboarding | 3 | 2 | CLI 토큰 검증, 기본 조직 자동 생성 |
+| v1 Compat & UX | 7 | 유지+2 | 대화 기록, autoLearn, 파일 첨부, 마크다운 렌더링 |
+| Phase 5+ Reserved | 4 | 5+ | 검색, 테마, 감사 로그 조회, 키보드 접근성 |
 
-**Non-Functional Requirements (37개):**
-- Performance (7): 단순 < 60초, 복합 < 5분, LLM 단일 < 30초, WebSocket < 500ms, UI FCP < 3초, 시세 60초, 부서당 병렬 10명
-- Security (7): AES-256-GCM, JWT 15분/7일, companyId WHERE 필수, 프롬프트 크리덴셜 금지, 로그 마스킹, 감사 로그 영구, allowed_tools 서버 강제
-- Scalability (5): Phase 1 단일(1~3사), Phase 3 3+사, 부서 20/에이전트 100 한도, WebSocket 50, Batch 큐 1000
-- Reliability (6): 오케스트레이션 95%+, 도구 90%+, LLM 실패 5%-, WebSocket 99.5%, 재연결 3초, 이벤트 캐치업
-- Integration (4): fallback < 5초, KIS 체결 < 10초, 개별 도구 장애 격리, Selenium 60초 타임아웃
-- Cost Efficiency (4): 3계급 40%+ 절감, Batch 60%+, Manager<$0.50/Spec<$0.10/Worker<$0.05, 예산 초과 5%-
-- Operability (4): 온보딩 10분, 템플릿 2분, 배포 5분, 모니터링 알림 1분
+**Non-Functional Requirements (61개, 12 Categories):**
+
+| Category | 개수 | P0 | 아키텍처 영향 |
+|---------|------|-----|-------------|
+| Performance | 12 | 3 | call_agent E2E ≤60초, API P95 ±10%, NEXUS 60fps |
+| Security | 7 | 7 | 전부 P0. CLI 토큰 AES-256, Hook 5개 보안 체계 |
+| Scalability | 7 | 4 | 동시 20세션, 200MB/세션, 24GB 서버, SDK graceful degradation |
+| Availability | 3 | 0 | 99%, 30분 복구, 일일 DB 백업 |
+| Accessibility | 4 | 0 | WCAG 2.1 AA, 색상 대비, aria-live |
+| Data Integrity | 7 | 0 | 마이그레이션 무중단, 벡터 NULL 허용, 대화 무제한 보관 |
+| External Dependencies | 3 | 2 | Claude CLI 장애 격리, 부분 장애 비전파 |
+| Operations | 8 | 1 | 응답 품질 A/B, 비서 라우팅 80%+, Soul 반영 80%+ |
+| Cost | 2 | 0 | 인프라 월 $10 이하, Embedding 월 $5 이하 |
+| Logging | 3 | 0 | JSON 구조화, 30일 보관, 에러 알림 |
+| Browser | 3 | 1 | Chrome P0, Safari P1, Firefox/Edge P2 |
+| Code Quality | 1 | 0 | CLAUDE.md 컨벤션 준수 |
 
 **Scale & Complexity:**
-- Primary domain: Full-stack TypeScript SaaS B2B
-- Complexity level: High
-- Estimated components: ~35 server modules + ~50 frontend components + ~15 shared types
+
+- Primary domain: Full-stack SaaS B2B (developer_tool 40% / web_app 30% / saas_b2b 30%)
+- Complexity level: **High** (29/40 — 아키텍처 변경 5/5, 회귀 범위 5/5)
+- Project context: Brownfield (Core Engine Replacement)
+- Estimated architectural components: ~15개 (엔진 7파일 + Hook 5개 + MCP 2개 + DB 마이그레이션)
+
+### Infrastructure Baseline
+
+| 항목 | 스펙 |
+|------|------|
+| Provider | Oracle Cloud ARM Ampere A1 Flex |
+| CPU | Neoverse-N1 4코어 (하이퍼스레딩 없음) |
+| RAM | **24GB** |
+| OS | Linux aarch64 |
+| Runtime | Bun + Docker |
+| CI/CD | GitHub Actions self-hosted runner (**동일 서버** — 배포 중 가용 CPU 감소) |
+| CDN | Cloudflare |
+| DB | PostgreSQL + pgvector (**동일 서버**) |
+| CLI Max | $220/월 × 2개 = $440/월 |
+
+**병목 분석:**
+- 메모리: ~~제약 아님~~ — 24GB면 200MB/세션 × 50세션도 10GB
+- **CPU가 병목**: 4코어(HT 없음). 가용 ~2.5코어(Bun 서버 + Docker/OS 제외). 동시 spawn 시 CPU 스파이크 주의
+- 네트워크: Anthropic API 호출 latency가 지배적 (LLM 응답 대기)
+
+**동시 세션 용량 분석:**
+
+| 시나리오 | 동시 프로세스 | CPU 부하 | 메모리 | 판정 |
+|---------|------------|---------|--------|------|
+| 단순 대화 10개 | 10 | 낮음 (I/O 대기) | ~2GB | ✅ 여유 |
+| 3단계 핸드오프 5개 | 15 | 중간 (spawn 스파이크) | ~3GB | ✅ 가능 |
+| 3단계 핸드오프 10개 | 30 | 높음 (spawn 동시) | ~6GB | ⚠️ 경계 |
+| 5단계 핸드오프 10개 | 50 | 위험 (4코어 포화) | ~10GB | ❌ CPU 병목 |
+
+**결론:** 동시 세션 상한 **20**이 현실적. CLI rate limit에 의해 추가 하향 가능 (Phase 1 부하 테스트로 확정).
 
 ### Technical Constraints & Dependencies
 
-**기존 코드베이스 (Epic 0 Foundation):**
-- Turborepo 모노레포: server(Hono+Bun), app(React+Vite), admin(React+Vite), ui(CVA), shared(types)
-- DB: PostgreSQL(Neon serverless) + Drizzle ORM, 마이그레이션 구성 완료
-- 실시간: Hono 내장 WebSocket + EventBus 7채널 멀티플렉싱
-- 보안: AES-256-GCM 크리덴셜 볼트, JWT 인증(admin_users + users 분리)
-- 테스트: bun:test 201건 통과
-- 배포: GitHub Actions -> Cloudflare 캐시 퍼지
+| 제약 | 영향 |
+|------|------|
+| Oracle VPS ARM64, **24GB RAM, 4코어** | CPU가 병목. 동시 세션 상한 20 |
+| CI/CD runner 동일 서버 | 배포 중 가용 CPU 감소 → 배포 시간대 세션 제한 고려 |
+| Claude Agent SDK 0.2.72 (0.x) | Breaking change 가능. agent-loop.ts 1파일 격리 필수 |
+| Zod v4 (v3→v4) | MCP 도구 스키마 정의. 기존 drizzle-zod와 호환 확인 |
+| Bun runtime | Node.js와 SDK 호환성 PoC 통과 확인 완료 |
+| CLI Max $220 × 2개 | Human별 토큰 1:1 매핑. 토큰 풀 패턴은 Phase 5+ 검토 |
+| 기존 코드베이스 | Epic 1~20 전체 기능 회귀 검증 필수 |
+| Turborepo 모노레포 | packages/admin, app, ui, shared, server |
 
-**외부 의존성:**
-- LLM: Anthropic SDK, OpenAI SDK, Google Generative AI SDK
-- 금융: KIS 증권 API (REST, OAuth2)
-- 메시징: Telegram Bot API (Webhook)
-- SNS: Selenium WebDriver (헤드리스)
-- DB: Neon PostgreSQL (serverless driver + connection pooling)
+### Cross-Cutting Concerns Identified
 
-**아키텍처 원칙 (CEO 아이디어 #005):**
-- 메모리 금지: 모든 정보는 명시적 파일로 관리. 숨김 저장소/암묵적 상태 금지
-- 투명성: 모든 에이전트 판단/도구 호출/비용이 통신로그에 기록
-- 감사 가능성: 작전일지, 통신로그, 비용 기록으로 과거 행동 재현
+1. **CLI 토큰 전파 (Token Propagation)**: 최초 명령자 토큰이 핸드오프 체인 전체에 전파. 에이전트 실행, 보안 Hook, 비용 추적 3개 레이어를 관통.
 
-### Cross-Cutting Concerns
+2. **멀티테넌시 (company_id)**: 모든 DB 쿼리, 에이전트 세션, 조직 관리, 비용 추적에 company_id 격리 적용.
 
-1. **테넌트 격리**: 모든 DB 쿼리, WebSocket 채널, API 엔드포인트에 companyId 필터 필수. ORM 미들웨어 자동 주입
-2. **비용 추적**: 모든 LLM 호출마다 토큰 + 비용 기록. 에이전트/모델/부서별 집계. 예산 한도 초과 시 자동 차단
-3. **감사 로그**: 금융 거래, 조직 변경, 권한 변경은 삭제 불가 로그. 도구 호출, 위임 체인 전부 기록
-4. **실시간 업데이트**: 에이전트 상태, 위임 체인 진행, 비용 변경을 WebSocket으로 클라이언트에 푸시
-5. **에러 복구**: LLM 장애 시 fallback, 도구 실패 시 부분 결과 반환, 타임아웃으로 무한 대기 방지
-6. **크리덴셜 보호**: 에이전트 프롬프트에 크리덴셜 전달 금지. 서버 사이드 주입. 로그 자동 마스킹
-7. **동적 조직 cascade**: 부서 삭제 시 진행 작업 대기/강제 종료 선택, 메모리 아카이브, 비용 영구 보존, 에이전트 미배속 전환
+3. **실시간 이벤트 버스**: Hook에서 WebSocket으로 핸드오프 이벤트 발행 → 허브 트래커에서 소비. EventEmitter(인프로세스) — 단일 서버에 충분. 인터페이스 추상화하여 Phase 5+ Redis 교체 대비.
+
+4. **SDK 격리 경계**: agent-loop.ts 1파일만 SDK에 의존. 나머지 전체 코드베이스는 SDK-agnostic 인터페이스만 사용.
+
+5. **Soul 템플릿 변수 치환**: DB 데이터(agent_list, subordinate_list, tool_list)를 query() 호출 전 Soul에 동적 주입. 에이전트 CRUD와 실행 엔진 양쪽에 영향.
+
+6. **에러 투명성**: 모든 핸드오프 실패를 사용자에게 명시적으로 표시. "블랙박스 에러 0건" 요구사항.
+
+### Party Mode 도출 — 핵심 아키텍처 사전 결정 (6라운드)
+
+**결정 1: SessionContext 패턴**
+
+핸드오프 체인 전체를 관통하는 불변 컨텍스트 객체. call_agent 핸들러에서 spread 복사하여 하위에 전달.
+
+```typescript
+interface SessionContext {
+  cliToken: string;        // FR38: 최초 명령자 CLI 토큰
+  userId: string;          // 멀티테넌시 + 비용 귀속
+  companyId: string;       // Row-level 격리
+  depth: number;           // FR4: 현재 핸드오프 깊이
+  sessionId: string;       // NFR-LOG1: 전체 체인 추적
+  startedAt: number;       // NFR-P8: 120초 타임아웃
+  maxDepth: number;        // ORC-1: 회사별 configurable (기본 5)
+  visitedAgents: string[]; // FR9: 순환 감지 (브랜치별 path)
+}
+```
+
+- 병렬 핸드오프 시 각 브랜치가 **독립 복사본** 보유 (visitedAgents가 분기)
+- 순환 감지 = "같은 브랜치 내 재방문" (글로벌 Set이 아님)
+
+**결정 2: 단일 진입점 원칙**
+
+```
+[허브]  [텔레그램]  [ARGOS 크론잡]  [AGORA]  [자동매매]  [스케치바이브 MCP]
+   \       |           |            |          |           /
+    ▼      ▼           ▼            ▼          ▼          ▼
+   ┌─────────────────────────────────────────────────────────┐
+   │             agent-loop.ts (단일 진입점)                    │
+   │   SessionContext 생성 → Hook 파이프라인 → SDK query()      │
+   └─────────────────────────────────────────────────────────┘
+```
+
+모든 에이전트 실행 경로(허브, 텔레그램, ARGOS, AGORA, 자동매매, 스케치바이브)가 반드시 agent-loop.ts를 통과. Hook 우회 불가 = 보안 일관성 보장.
+
+**결정 3: Hook 파이프라인 실행 순서**
+
+```
+PreToolUse (도구 호출 전):
+  1. tool-permission-guard → 비허용 도구 deny (이후 Hook 실행 안 함)
+
+PostToolUse (도구 호출 후):
+  1. credential-scrubber → 민감 패턴 마스킹 (보안 최우선!)
+  2. output-redactor → 추가 패턴 마스킹
+  3. delegation-tracker → 마스킹된 안전한 데이터로 WebSocket 이벤트 발행
+
+Stop (세션 종료):
+  1. cost-tracker → 비용 기록
+```
+
+순서 위반 시 보안 사고: delegation-tracker가 credential-scrubber보다 먼저 실행되면 마스킹 안 된 토큰이 WebSocket으로 브로드캐스트됨.
+
+**결정 4: SSE 어댑터 레이어**
+
+`engine/sse-adapter.ts` (~30줄) — SDK AsyncGenerator<SDKMessage> → 기존 SSE 이벤트 형식 변환.
+- agent-loop.ts는 SDK에만 집중
+- SSE 어댑터는 프론트 호환에만 집중
+- Phase 1에서 프론트엔드 수정 0을 보장하는 핵심 레이어
+
+**결정 5: Pre-spawn 이벤트 시퀀스**
+
+```
+사용자 메시지 전송 (0ms)
+  → 서버 수신 즉시: SSE "accepted" (50ms) → 프론트: "명령 접수됨" + 로딩
+  → SDK spawn (~2초)
+  → SDK ready: SSE "processing" → 프론트: "비서실장 분석 중..."
+  → 응답 스트리밍: SSE "message" chunks
+```
+
+agent-loop.ts가 query() 호출 전에 먼저 "accepted" 이벤트를 발행하여 SDK spawn 지연(~2초)을 체감 지연 없이 흡수.
+
+### Phase 1 마이그레이션 체크리스트 (사전 식별)
+
+| 항목 | 설명 |
+|------|------|
+| agent-runner.ts import 전수 조사 | `grep -r "agent-runner" packages/server/src/` |
+| SSE 이벤트 형식 호환 매핑 | 기존 이벤트(processing/message/delegation) → 신규 SDK 메시지 |
+| 호출 경로 매핑 | AGORA, 자동매매(VECTOR), 크론잡, 텔레그램 → agent-loop.ts |
+| 기존 테스트 목록 | agent-runner 의존 테스트 식별 + 신규 엔진 대응 |
+| 비서 없는 허브 API | 부서별 그룹핑 + lastUsedAt 정렬 (50+ 에이전트 대응) |
+
+### PRD 수정 대기 목록 (아키텍처 완성 후 일괄 적용)
+
+| 항목 | 현재값 | 수정값 | 근거 |
+|------|-------|--------|------|
+| NFR-SC1 동시 세션 | 10 | **20** | CPU 4코어 기준 (CLI rate limit으로 추가 조정 가능) |
+| NFR-SC2 세션 메모리 | ≤ 50MB | **≤ 200MB** | 24GB RAM 기준 |
+| NFR-SC7 총 메모리 | ≤ 3GB (4GB 기준) | **≤ 16GB (24GB 기준)** | 서버 실제 스펙 |
+| NFR-P7 5단계 메모리 | ≤ 50MB | **≤ 200MB** | 24GB RAM 기준 |
+| OPS-1 동시 세션 제한 | 기본 10 | **기본 20** | NFR-SC1과 일치 |
+| 곳곳 "4GB" 표현 | Oracle VPS 4GB | **Oracle VPS 24GB ARM64 4코어** | 서버 실제 스펙 |
 
 ## Starter Template Evaluation
 
 ### Primary Technology Domain
 
-Full-stack TypeScript 모노레포 (Turborepo) -- Epic 0 Foundation에서 이미 확립됨.
+**Brownfield Core Engine Replacement** — 기존 Turborepo 모노레포 위에 증분 아키텍처. 새 스타터 불필요.
 
-### Starter Options Considered
+### Existing Technology Stack (확립됨)
 
-| 옵션 | 평가 | 결과 |
+| 항목 | 선택 | 비고 |
 |------|------|------|
-| 기존 코드베이스 (Brownfield) | Epic 0에서 5개 패키지 + 201건 테스트 + CI/CD 파이프라인 완료 | **채택** |
-| T3 Stack (create-t3-app) | Next.js 기반. 현재 Hono+Vite 구조와 호환 불가 | 불채택 |
-| Turborepo 공식 starter | 기본 패키지 구조만 제공. 현재 코드가 더 풍부 | 불채택 |
-| 처음부터 구축 | 이미 구축 완료. 불필요한 재작업 | 불채택 |
+| Monorepo | Turborepo | packages/admin, app, ui, shared, server |
+| Runtime | Bun | PoC에서 SDK 호환 확인 |
+| Backend | Hono | createBunWebSocket, RPC 지원 |
+| Frontend | React 19 + Vite 6 | SPA 2개 (app, admin) |
+| Styling | Tailwind CSS 4 | @corthex/ui CVA 기반 |
+| DB | PostgreSQL + Drizzle ORM | Phase 3 pgvector 확장 |
+| State | Zustand + TanStack Query | 실시간 캐시 업데이트 패턴 |
+| Auth | JWT | RBAC (Admin/CEO/Human) |
+| Realtime | WebSocket (Hono) | 7채널 멀티플렉싱 |
+| Deploy | Docker → Oracle ARM64 + GitHub Actions self-hosted | 동일 서버 |
+| CDN | Cloudflare | 캐시 퍼지 자동화 |
+| Test | bun:test (서버) | — |
 
-### Selected Starter: 기존 코드베이스 (Brownfield)
+### New Dependencies by Phase
 
-**선택 근거:** Epic 0 Foundation이 모든 기초 아키텍처를 이미 구현 완료. 새 starter를 적용하면 기존 201건 테스트, WebSocket EventBus, 크리덴셜 볼트, JWT 인증 등을 재구현해야 하므로 비효율적.
+**Phase 1 (엔진):**
 
-**기존 Foundation이 제공하는 아키텍처 결정:**
+| 패키지 | 용도 | 위치 |
+|--------|------|------|
+| `@anthropic-ai/claude-agent-sdk@0.2.x` | 에이전트 실행 엔진 | engine/agent-loop.ts |
+| `@zapier/secret-scrubber` | credential/output Hook | engine/hooks/ |
+| `hono-rate-limiter` | 동시 세션 제한 (429) | server middleware |
+| `drizzle-zod` (Zod v4) | DB→Zod→TS 타입 자동 생성 | shared/ |
+| `llm-cost-tracker` | 비용 추적 Hook | engine/hooks/cost-tracker.ts |
+| `croner` | ARGOS 크론잡 (Bun 네이티브) | services/ |
 
-**Language & Runtime:**
+**Phase 2 (오케스트레이션):**
 
-| 결정 | 선택 | 버전 |
-|------|------|------|
-| Language | TypeScript (strict) | TS 5.x |
-| Runtime | Bun | 1.3.10 |
-| Monorepo | Turborepo | v2 |
+| 패키지 | 용도 | 위치 |
+|--------|------|------|
+| `assistant-ui` | 허브 채팅 UI (SSE, 마크다운, 접근성) | app/ |
 
-**Server Framework:**
+**Phase 3 (시각화):**
 
-| 결정 | 선택 | 비고 |
-|------|------|------|
-| HTTP Framework | Hono | v4, 경량 + Bun 최적화 |
-| ORM | Drizzle ORM | v0.39, PostgreSQL 스키마 정의 |
-| DB | Neon PostgreSQL | serverless driver + connection pooling |
-| WebSocket | Hono 내장 | 7채널 멀티플렉싱 EventBus 구현 완료 |
-| 암호화 | AES-256-GCM | 크리덴셜 볼트 구현 완료 |
+| 패키지 | 용도 | 위치 |
+|--------|------|------|
+| `React Flow` + `ELK.js` | NEXUS 조직도 (드래그&드롭, 계층 레이아웃) | admin/ |
 
-**Frontend Framework:**
+**Phase 4 (지능화):**
 
-| 결정 | 선택 | 비고 |
-|------|------|------|
-| UI Framework | React | v19 |
-| Build Tool | Vite | v6 |
-| Styling | Tailwind CSS | v4 |
-| Client State | Zustand | v5 |
-| Server State | TanStack Query | v5 |
-| Routing | React Router DOM | v7 |
-| Component Library | @corthex/ui (CVA) | 자체 구축 |
+| 패키지 | 용도 | 위치 |
+|--------|------|------|
+| `pgvector-node` | 벡터 유사도 검색 | server/ |
+| `@google/genai` | Gemini Embedding API | server/ |
+| `notebooklm-mcp` | NotebookLM MCP (Python Stdio) | server/ |
+| `@modelcontextprotocol/sdk` | 스케치바이브 MCP 서버 | server/src/mcp/ |
 
-**Testing:**
+### Package Placement Decisions
 
-| 결정 | 선택 | 비고 |
-|------|------|------|
-| Server Tests | bun:test | 201건 통과 |
-| Frontend Tests | Vitest | + testing-library |
+**engine/ 위치:** `packages/server/src/engine/`
+- 서버 내부. SDK 의존성이 server 패키지에 국한됨
+- 별도 패키지 분리 불필요
 
-**Development Experience:**
+**MCP 위치:** `packages/server/src/mcp/`
+- 스케치바이브 MCP가 서버 Hono API를 호출하므로 같은 패키지
+- 별도 엔트리포인트: `packages/server/src/mcp/sketchvibe-mcp.ts`
 
-| 결정 | 선택 | 비고 |
-|------|------|------|
-| 패키지 매니저 | Bun | workspace 프로토콜 |
-| 린팅 | ESLint + Prettier | monorepo 설정 |
-| CI/CD | GitHub Actions | main push -> 자동 배포 -> Cloudflare 캐시 퍼지 |
-| 환경 변수 | .env | 패키지별 분리 |
+**Hono RPC:** 신규 API(Phase 2~3)에만 적용. 기존 API 불가침. 점진적 전환 전략.
 
-**Code Organization (기존 구조):**
-```
-corthex-v2/
-  packages/
-    server/    -- Hono + Bun backend (API + WebSocket + Services)
-    app/       -- React + Vite SPA (CEO/직원용 메인 앱)
-    admin/     -- React + Vite SPA (관리자 콘솔)
-    ui/        -- Shared component library (CVA-based)
-    shared/    -- Shared TypeScript types
-```
+### Code Disposition Matrix (삭제/교체/동결/불가침)
 
-**Note:** 프로젝트 초기화 스토리 불필요 -- 이미 Foundation 완료.
+| 파일 | 처분 | 시점 | 대체 |
+|------|------|------|------|
+| `services/agent-runner.ts` | 교체 | Phase 1 | `engine/agent-loop.ts` |
+| `services/delegation-tracker.ts` | 교체 | Phase 1 | `engine/hooks/delegation-tracker.ts` |
+| `services/chief-of-staff.ts` | 삭제 | Phase 2 (Soul 검증 후) | 비서 Soul + call_agent |
+| `services/manager-delegate.ts` | 삭제 | Phase 2 (Soul 검증 후) | 매니저 Soul + call_agent |
+| `services/cio-orchestrator.ts` | 삭제 | Phase 2 (Soul 검증 후) | CIO Soul + call_agent |
+| `services/llm-router.ts` | **동결** | Phase 1~4 | `engine/model-selector.ts` (신규 ~20줄) |
+| `services/trading/*` | 불가침 | — | — |
+| `services/telegram/*` | 불가침 | — | 음성 전송 연동만 추가 |
+| `services/selenium/*` | 불가침 | — | — |
+
+**llm-router.ts 동결 근거:**
+- Phase 1~4는 Claude 전용 → 크로스 프로바이더 폴백 불필요
+- SDK query()에 모델 폴백 없음 → model-selector가 tier→model 매핑만 담당
+- Phase 5+ "멀티 LLM 동적 라우팅" 시 부활 또는 재설계
+
+### Frontend Library Decisions
+
+**허브 채팅 UI: assistant-ui**
+- React 전용, Vite SPA 궁합 좋음
+- AI SDK 비종속 (Vercel AI Elements와 차별점)
+- SSE 스트리밍, 마크다운, 접근성 내장
+- 폴백: React 19 미호환 시 직접 구현 (~300줄)
+- Phase 2 시작 전 React 19 호환성 확인 필수
+
+**NEXUS 조직도: React Flow + ELK.js**
+- 네이티브 React (Cytoscape 래퍼 대비 안정적)
+- ELK.js 계층 레이아웃 = 조직도에 최적
+- 접근성 aria 내장, 60fps (Canvas 렌더링)
+
+**스케치바이브: Cytoscape.js 유지**
+- 자유 캔버스(마인드맵, 플로우차트) = 비구조적 → Cytoscape가 적합
+- v1 호환성 유지
+
+**번들 최적화:** NEXUS(React Flow)와 스케치바이브(Cytoscape) 모두 admin 패키지에 존재. `React.lazy()` 동적 import로 라우트별 청크 분리 → 초기 번들에 미포함.
+
+### Dependency Verification Strategy
+
+Phase 1 첫 스토리로 **"의존성 검증"** 실행:
+1. 모든 Phase 1 패키지 설치
+2. `turbo build` 성공 확인
+3. `bun test` 전체 통과 확인
+4. Zod v4 ↔ 기존 Zod v3 충돌 여부 확인 (`grep -r "from 'zod'" packages/`)
+5. Dockerfile COPY 목록 업데이트
+6. ARM64 Docker 빌드 확인
+7. pino Bun 호환성 테스트 (실패 시 consola 폴백)
 
 ## Core Architectural Decisions
-
-> Starter(Epic 0)가 이미 결정한 항목(프레임워크, DB, 런타임 등)은 제외. v2 신규 아키텍처 결정만 기술.
 
 ### Decision Priority Analysis
 
 **Critical Decisions (구현 차단):**
-1. 오케스트레이션 엔진 아키텍처
-2. 에이전트 실행 모델
-3. LLM 프로바이더 라우터 설계
-4. 도구 시스템 아키텍처
-5. 동적 조직 관리 + Cascade 엔진
 
-**Important Decisions (아키텍처 형태 결정):**
-6. 품질 게이트 파이프라인
-7. 비용 추적 시스템
-8. 실시간 통신 프로토콜
-9. 테넌트 격리 미들웨어
-10. 데이터 아키텍처 (스키마 설계)
+| # | 결정 | 선택 | 근거 |
+|---|------|------|------|
+| D1 | company_id 격리 | **getDB(companyId) 패턴** — db 직접 export 금지, 타입 레벨 강제 | 컴파일 타임 안전성. lint 규칙 없이 격리 보장 |
+| D2 | CLI 토큰 만료 처리 | **진행 중 세션 완료, 새 세션만 차단** | SDK spawn 시점에만 토큰 필요. Phase 1 실제 테스트로 확인 |
+| D3 | 에러 코드 체계 | **도메인 프리픽스** (AUTH_/AGENT_/SESSION_/HANDOFF_/TOOL_/ORG_) | HTTP + SSE 통합 코드 체계. 프론트 일관 에러 처리 |
+| D4 | Hook 파이프라인 순서 | **보안 먼저** — PreToolUse: permission → PostToolUse: scrubber→redactor→delegation → Stop: cost | 순서 위반 = 보안 사고 (마스킹 안 된 토큰 WebSocket 노출) |
+| D5 | SessionContext | **불변 객체, 9필드, 브랜치별 path** | 병렬 핸드오프 시 독립 복사. 순환 감지 = 같은 브랜치 내 재방문 |
+| D6 | 단일 진입점 | **모든 실행 경로 → agent-loop.ts** | 허브/텔레그램/ARGOS/AGORA/자동매매/스케치바이브 전부 동일 경로. Hook 우회 불가 |
 
-**Deferred Decisions (Post-MVP):**
-11. 수평 확장 전략 (Phase 3)
-12. 에이전트 마켓플레이스 아키텍처 (Phase 3)
-13. 벡터 DB 선택 -- RAG/정보국 (Phase 2)
-14. 사내 메신저 실시간 아키텍처 (Phase 3)
+**Important Decisions (아키텍처 형성):**
 
-### 1. Orchestration Engine
+| # | 결정 | 선택 | 근거 |
+|---|------|------|------|
+| D7 | 도구 권한 저장 | **agents 테이블 JSON 배열** (allowed_tools jsonb) | 단순, 조인 불필요. SQL replace로 리네임 대응 가능 |
+| D8 | 캐싱 | **없음** (Phase 1~4) | 24GB 서버, 12쿼리 × 1ms = 12ms (LLM 응답 대비 0.1%) |
+| D9 | 로거 | **pino 우선 + consola 폴백 + 어댑터 래핑** | JSON 구조화, child logger(sessionId 자동 주입). 교체 비용 0 |
+| D10 | 테스트 전략 | **단위+모킹통합(CI 매커밋) + 실제SDK(주1회)** | SDK query() 모킹, CORTHEX 코드(call_agent/Hook/Context)는 실제 실행. 비용 $0 |
+| D11 | WebSocket 이벤트 | **Phase 1 기존 형식 유지, Phase 2에서 전환** | 프론트 수정 최소화 |
+| D12 | 토큰 유효성 검증 | **등록 시만** (세션 시작 시 검증 안 함) | 오버헤드 제거. SDK 에러로 런타임 감지 |
 
-**결정:** 이벤트 기반 파이프라인 + 타입된 TaskRequest/TaskResponse 메시지
+**Deferred Decisions (Phase 5+):**
 
-**아키텍처 흐름:**
-```
-CommandCenter (UI)
-  -> POST /api/commands {text, type, target}
-    -> CommandRouter (명령 타입 분류)
-      -> OrchestratorService.process(command)
-        -> ChiefOfStaff.classify(command)           // LLM 호출
-          -> Returns: {departmentId, priority, taskBreakdown}
-        -> Manager.delegate(task)                    // LLM 호출
-          -> Returns: {subtasks: SubTask[]}
-        -> Parallel: Specialist.execute(subtask)[]   // LLM + 도구 호출
-          -> Each returns: {result, toolsUsed, cost}
-        -> Manager.synthesize(results)               // LLM 호출 (#007: 자체 분석 + 종합)
-        -> ChiefOfStaff.review(report)               // LLM 호출 (#010: 편집장 역할)
-          -> Pass: CEO에게 전달
-          -> Fail: 재작업 루프 (최대 2회)
-        -> WebSocket: 각 단계마다 상태 이벤트 푸시
-```
+| # | 결정 | 이유 |
+|---|------|------|
+| D13 | 캐싱 전략 | 에이전트 100명+ 시 재검토 |
+| D14 | 토큰 풀 (N개 토큰) | 현재 1:1 매핑 충분. CLI Max 2개지만 Human별 할당 |
+| D15 | 크로스 프로바이더 폴백 | Phase 1~4 Claude 전용 |
+| D16 | API 버저닝 | Phase 1~4 단일 버전 |
 
-**핵심 설계:**
-- 각 단계는 비동기 함수로 LLM 호출 수행
-- 단계 간 통신은 타입된 TaskRequest/TaskResponse 객체
-- WebSocket으로 각 단계 전환 시 상태 이벤트 전송
-- 단계별 타임아웃 (기본 60초/LLM 호출, 전체 체인 5분)
-- 실패 시 graceful degradation -- 부분 결과로 계속 진행
-- /전체: 모든 Manager에게 동시 위임 + 결과 종합
-- /순차: Manager 순차 위임 + 결과 누적
+### Data Architecture
 
-### 2. Agent Execution Model
-
-**결정:** Agent = 설정(Soul DB) + 런타임(AgentRunner 무상태 실행)
-
-**Agent 정의 (DB 스키마):**
-```typescript
-interface Agent {
-  id: string;
-  companyId: string;
-  name: string;              // "CIO", "종목분석가"
-  tier: 'manager' | 'specialist' | 'worker';
-  departmentId: string | null;  // null = 미배속
-  modelName: string;         // "claude-sonnet-4-6"
-  soulMarkdown: string;      // 성격, 전문성, 원칙
-  allowedTools: string[];    // 허용 도구 목록
-  isSystem: boolean;         // true = 삭제 불가 시스템 에이전트
-  isActive: boolean;
-}
-```
-
-**AgentRunner (무상태 실행기):**
-```typescript
-class AgentRunner {
-  async execute(agent: Agent, task: TaskRequest): Promise<TaskResponse> {
-    const systemPrompt = buildSystemPrompt(agent);  // soul + knowledge + tools
-    const llmResponse = await llmRouter.call({
-      model: agent.modelName,
-      system: systemPrompt,
-      messages: task.messages,
-      tools: getToolDefinitions(agent.allowedTools),
-    });
-    // 도구 호출 처리 + 비용 기록 + 결과 반환
-  }
-}
-```
-
-**3계급 역할 구분:**
-- **Manager**: 하위 위임 + 자체 분석(5번째 분석가 #007) + 결과 종합. 고급 모델(Sonnet)
-- **Specialist**: 도구 활용 전문 분석/작업 수행. 중급 모델(Haiku)
-- **Worker**: 단순 작업(요약, 스케줄). 경량 모델(Haiku)
-
-### 3. LLM Provider Router
-
-**결정:** Strategy 패턴 + 프로바이더별 어댑터
+**멀티테넌시 격리: getDB(companyId) 패턴**
 
 ```typescript
-interface LLMProvider {
-  call(request: LLMRequest): Promise<LLMResponse>;
-  supportsBatch: boolean;
-  estimateCost(tokens: TokenCount): number;
-}
-
-class LLMRouter {
-  providers: Map<string, LLMProvider>;  // anthropic, openai, google
-
-  async call(request: LLMRequest): Promise<LLMResponse> {
-    const provider = this.resolveProvider(request.model);
-    try {
-      const response = await provider.call(request);
-      await this.trackCost(request, response);  // 항상 비용 기록
-      return response;
-    } catch (err) {
-      return this.fallback(request, err);  // Claude -> GPT -> Gemini
-    }
-  }
-}
-```
-
-**모델 매핑:**
-
-| Model ID | Provider | 용도 | 비용 등급 |
-|----------|----------|------|----------|
-| claude-sonnet-4-6 | Anthropic | Manager 기본 | 고급 |
-| claude-haiku-4-5 | Anthropic | Specialist/Worker 기본 | 경량 |
-| gpt-4.1 | OpenAI | Manager 대체 | 고급 |
-| gpt-4.1-mini | OpenAI | Specialist 대체 | 경량 |
-| gemini-2.5-pro | Google | Manager 대체 | 고급 |
-| gemini-2.5-flash | Google | Worker 대체 | 경량 |
-
-**Batch API:**
-- BatchCollector가 비긴급 요청 수집
-- CEO가 /배치실행 또는 임계치 도달 시 자동 플러시
-- 50% 비용 할인
-
-**Fallback 전략:**
-- 프로바이더 장애 감지: 3회 연속 실패 또는 5초 타임아웃
-- 자동 전환: Anthropic -> OpenAI -> Google (동일 등급 모델로)
-- 전환 소요 < 5초 (NFR26)
-
-### 4. Tool System
-
-**결정:** ToolPool 레지스트리 + 서버 사이드 권한 검증 실행
-
-```typescript
-interface Tool {
-  name: string;
-  description: string;
-  category: string;       // finance, legal, marketing, tech, common
-  parameters: ZodSchema;
-  execute(params: unknown, context: ToolContext): Promise<ToolResult>;
-}
-
-class ToolPool {
-  tools: Map<string, Tool>;
-
-  async invoke(agent: Agent, toolName: string, params: unknown): Promise<ToolResult> {
-    // 1. 권한 검증: agent.allowedTools에 toolName 포함? (서버 강제, NFR14)
-    // 2. 파라미터 Zod 검증
-    // 3. 도구 실행 (ToolContext에 companyId 주입)
-    // 4. 결과 > 4000자 시 요약 절삭
-    // 5. 호출 로그 기록 (agent, tool, input, output, duration)
-    // 6. 결과 반환
-  }
-}
-```
-
-**도구 카테고리 (125+):**
-- **Finance** (Phase 2): kr_stock, dart_api, sec_edgar, backtest_engine, kis_trading
-- **Legal**: law_search, contract_reviewer, trademark_similarity
-- **Marketing**: sns_manager, seo_analyzer, hashtag_recommender
-- **Tech**: uptime_monitor, security_scanner, code_quality
-- **Common** (P0 핵심 30+): real_web_search, spreadsheet_tool, chart_generator, email_sender, file_manager, calculator, date_utils, translator
-
-### 5. Dynamic Organization Management + Cascade Engine
-
-**결정:** 조직 변경 이벤트 + Cascade 분석기 + 안전 처리
-
-**조직 CRUD:**
-```typescript
-// 부서 삭제 시 cascade 분석
-interface CascadeAnalysis {
-  departmentId: string;
-  activeTaskCount: number;      // 진행 중 작업 수
-  agentCount: number;           // 하위 에이전트 수
-  totalCost: number;            // 누적 비용
-  memoryCount: number;          // 학습 기록 수
-}
-
-class OrganizationService {
-  async deleteDepartment(deptId: string, mode: 'wait' | 'force'): Promise<void> {
-    const analysis = await this.analyzeCascade(deptId);
-
-    if (mode === 'wait') {
-      await this.waitForActiveTasks(deptId);  // 진행 중 작업 완료 대기
-    } else {
-      await this.forceStopTasks(deptId);       // 강제 종료
-    }
-
-    await this.archiveMemories(deptId);         // 메모리 아카이브
-    // 비용 기록은 영구 보존 (삭제 안 함)
-    await this.unassignAgents(deptId);          // 에이전트 미배속 전환 (삭제 아님)
-    await this.softDeleteDepartment(deptId);    // 부서 soft delete
-  }
-}
-```
-
-**시스템 에이전트 보호:**
-- `isSystem: true` 에이전트는 삭제 API 호출 시 403 반환
-- 비서실장(Chief of Staff)은 모든 회사에 시스템 에이전트로 자동 생성
-- UI에서 시스템 에이전트는 잠금 아이콘으로 시각 구분
-
-**조직 템플릿:**
-```typescript
-interface OrgTemplate {
-  id: string;
-  name: string;                    // "투자분석", "마케팅", "법무"
-  departments: TemplateDepart[];    // 부서 + 에이전트 프리셋
-}
-// 템플릿 적용 시 부서/에이전트 일괄 생성 (2분 내, NFR35)
-```
-
-### 6. Quality Gate Pipeline
-
-**결정:** 5항목 루브릭 + LLM 기반 자동 검수
-
-```typescript
-interface QualityCheckResult {
-  conclusion: 'pass' | 'fail';
-  scores: {
-    conclusionQuality: number;   // 결론 명확성 (1-5)
-    evidenceSources: number;     // 근거 출처 (1-5)
-    riskAssessment: number;      // 리스크 언급 (1-5)
-    formatCompliance: number;    // 형식 준수 (1-5)
-    logicalCoherence: number;    // 논리적 일관성 (1-5)
+// db/scoped-query.ts (~30줄)
+export function getDB(companyId: string) {
+  if (!companyId) throw new Error('companyId required');
+  return {
+    agents: () => db.select().from(agents).where(eq(agents.companyId, companyId)),
+    departments: () => db.select().from(departments).where(eq(departments.companyId, companyId)),
+    tierConfigs: () => db.select().from(tierConfigs).where(eq(tierConfigs.companyId, companyId)),
+    knowledgeDocs: () => db.select().from(knowledgeDocs).where(eq(knowledgeDocs.companyId, companyId)),
+    // 테이블별 스코프
   };
-  feedback?: string;             // 재작업 지시 (fail 시)
 }
+
+// 직접 db 객체는 내부 전용 (마이그레이션, 시드 데이터)
+// 신규 코드: getDB(ctx.companyId).agents() 형태로만 접근
+// 기존 코드: 점진적 전환 (Phase 1에서는 공존)
 ```
 
-- **P0**: 비서실장이 LLM으로 5항목 검수 (간이)
-- **P1**: quality_rules.yaml 자동 규칙 + 환각 탐지 자동화
-- Pass 기준: 평균 >= 3.5, 개별 점수 모두 >= 2
-- Fail: 피드백 포함 자동 재작업 (최대 2회)
-- 2회 실패 후: 경고 플래그 달아 CEO에게 전달
+**도구 권한 저장:**
+- `agents.allowed_tools` → `jsonb` 컬럼 (`["kr_stock", "web_search", ...]`)
+- tool-permission-guard Hook: `agent.allowedTools.includes(toolName)`
+- 도구 리네임 시: `UPDATE agents SET allowed_tools = replace(...)::jsonb`
 
-### 7. Cost Tracking System
+**캐싱:** 없음. 에이전트 50명 = DB 행 50개, 조회 ≤ 1ms. Phase 5+ 재검토.
 
-**결정:** LLM 호출별 실시간 기록 + 3축 집계
+### Authentication & Security
 
+**CLI 토큰 생명주기:**
+- 등록: Admin이 CLI 토큰 입력 → [검증] → SDK 간단 query()로 유효성 확인
+- 실행: agent-loop.ts에서 query(env: { ANTHROPIC_API_KEY: cliToken }) 주입
+- 만료: 진행 중 세션 완료 허용, 새 세션만 차단 ("CLI 토큰이 만료되었습니다")
+- 보안: query() 호출 후 토큰 변수 즉시 null (NFR-S2). Soul에 토큰 절대 주입 안 함 (SEC-6)
+
+**에러 코드 체계:**
+
+| 프리픽스 | 도메인 | 예시 |
+|---------|--------|------|
+| `AUTH_` | 인증/인가 | `AUTH_TOKEN_EXPIRED`, `AUTH_FORBIDDEN` |
+| `AGENT_` | 에이전트 실행 | `AGENT_NOT_FOUND`, `AGENT_TIMEOUT`, `AGENT_SPAWN_FAILED` |
+| `SESSION_` | 세션 관리 | `SESSION_LIMIT_EXCEEDED`, `SESSION_MEMORY_LIMIT` |
+| `HANDOFF_` | 핸드오프 | `HANDOFF_DEPTH_EXCEEDED`, `HANDOFF_CIRCULAR`, `HANDOFF_TARGET_NOT_FOUND` |
+| `TOOL_` | 도구 | `TOOL_PERMISSION_DENIED`, `TOOL_EXECUTION_FAILED` |
+| `ORG_` | 조직 관리 | `ORG_SECRETARY_DELETE_DENIED`, `ORG_TIER_LIMIT_EXCEEDED` |
+
+HTTP + SSE 양쪽에서 동일 코드 체계 사용.
+
+### API & Communication Patterns
+
+**API 응답 형식 (CLAUDE.md 준수):**
 ```typescript
-interface CostRecord {
-  id: string;
-  companyId: string;
-  agentId: string;
-  departmentId: string;
-  modelName: string;
-  inputTokens: number;
-  outputTokens: number;
-  cost: number;              // USD, models.yaml 가격표 기준
-  isBatch: boolean;          // Batch API 여부
-  taskId: string;
-  timestamp: Date;
-}
+// 성공
+{ success: true, data: T }
+// 실패
+{ success: false, error: { code: string, message: string } }
 ```
 
-- **models.yaml**: 모델별 input/output 1M 토큰당 가격 정의
-- **3축 집계**: 에이전트별, 모델별, 부서별 실시간 합산
-- **예산 관리**: 일일 한도 + 월 한도 (회사별 설정)
-- **한도 초과**: 자동 차단 + CEO 알림 (WebSocket cost 채널)
-- **대시보드**: 도넛 차트(부서별 비용), 막대 차트(에이전트별 비용)
-
-### 8. Real-time Communication Protocol
-
-**결정:** WebSocket 7채널 멀티플렉싱 + EventBus (Epic 0 확장)
-
-**채널 정의:**
-
-| 채널 | 이벤트 | 용도 |
-|------|--------|------|
-| `agent-status` | agent-started, agent-completed, agent-error | 에이전트 생명주기 |
-| `delegation` | task-delegated, task-accepted, task-completed | 위임 체인 |
-| `command` | command-received, command-processing, command-done | 명령 생명주기 |
-| `cost` | cost-updated, budget-warning, budget-exceeded | 비용 추적 |
-| `tool` | tool-invoked, tool-completed, tool-failed | 도구 실행 |
-| `debate` | round-started, agent-spoke, round-ended, debate-done | AGORA (Phase 2) |
-| `nexus` | node-added, node-updated, canvas-changed | SketchVibe (Phase 2) |
-
-**서버 EventBus:**
-```typescript
-class EventBus {
-  emit(channel: string, event: string, data: unknown, companyId: string): void;
-  // companyId 기반 테넌트 격리 -- 해당 회사의 WebSocket 연결에만 전송
-}
+**SSE 이벤트 시퀀스 (Pre-spawn 포함):**
+```
+event: accepted    ← 서버 수신 즉시 (50ms). 프론트: "명령 접수됨" + 로딩
+event: processing  ← SDK spawn 완료 (~2초). 프론트: "비서실장 분석 중..."
+event: handoff     ← call_agent 실행 시. 프론트: 트래커 업데이트
+event: message     ← 응답 스트리밍 chunk
+event: error       ← 에러 발생 시. { code, message, agentName }
+event: done        ← 세션 완료. { costUsd, tokensUsed }
 ```
 
-**클라이언트:** 자동 재연결 (지수 백오프, 3초 내 NFR24) + 미수신 이벤트 캐치업 (NFR25)
+**WebSocket:** Phase 1 기존 이벤트 형식 유지. Phase 2에서 handoff 채널 Hook 기반 전환.
 
-### 9. Tenant Isolation Middleware
+### Frontend Architecture
 
-**결정:** Drizzle ORM 미들웨어 + API 미들웨어 이중 검증
+**상태 관리 패턴:**
+- Zustand: 로컬 UI 상태 (사이드바 열림/닫힘, 모달)
+- TanStack Query: 서버 상태 (에이전트 목록, 조직도, 비용). WebSocket 이벤트로 캐시 자동 무효화
+- SSE 스트림: 채팅 메시지 (assistant-ui가 관리)
 
-```typescript
-// API 미들웨어: JWT에서 companyId 추출 + 요청 검증
-const tenantMiddleware = async (c, next) => {
-  const { companyId } = c.get('jwtPayload');
-  c.set('companyId', companyId);
-  // 요청 body의 companyId와 불일치 시 403
-  await next();
-};
+**비서 유무 분기 (Phase 2):**
+- `hasSecretary: boolean` → 허브 레이아웃 분기
+- 비서 있음: 채팅 입력만 (에이전트 목록 숨김)
+- 비서 없음: 에이전트 선택 → 채팅. 50+ 에이전트 시 부서별 그룹핑 + lastUsedAt 정렬
 
-// DB 쿼리: 모든 SELECT/UPDATE/DELETE에 companyId WHERE 자동 주입
-// ORM helper 함수로 강제
-const withTenant = (companyId: string) => ({
-  where: eq(table.companyId, companyId)
-});
-```
+**번들 최적화:** React.lazy() 동적 import. NEXUS/스케치바이브 라우트별 청크 분리.
 
-- 파일 저장소: `/{companyId}/` 디렉토리 분리
-- WebSocket: companyId 네임스페이스로 격리
-- API 키(크리덴셜 볼트): 회사별 별도 엔트리
+### Infrastructure & Deployment
 
-### 10. Data Architecture
+**배포 전략:**
+- Docker graceful shutdown → 신규 컨테이너 시작 (NFR-O1)
+- CI/CD runner 동일 서버 → 배포 시간대 에이전트 세션 가용 CPU 감소 주의
+- Cloudflare CDN 캐시 퍼지 (GitHub Actions 자동)
 
-**핵심 테이블:**
+**모니터링:**
+- 로거: pino (우선) / consola (폴백). 어댑터 래핑으로 교체 비용 0
+- child logger 패턴: SessionContext에서 sessionId/companyId/agentId 자동 주입
+- 구조화 로그: `{ timestamp, level, sessionId, agentId, companyId, event, data }`
+- 로그 보관: 30일 (NFR-LOG2)
 
-| 테이블 | 용도 | 테넌트 격리 |
-|--------|------|-----------|
-| companies | 회사/테넌트 레지스트리 | N/A (root) |
-| admin_users | 관리자 콘솔 사용자 | No |
-| users | 앱 사용자 (CEO/Human 직원) | Yes (companyId) |
-| departments | 부서 계층 | Yes |
-| agents | 에이전트 정의 + Soul | Yes |
-| commands | CEO 명령 이력 | Yes |
-| tasks | 오케스트레이션 작업 추적 | Yes |
-| tool_invocations | 도구 호출 감사 로그 | Yes |
-| cost_records | LLM 비용 추적 | Yes |
-| credentials | 암호화 API 키 (AES-256-GCM) | Yes |
-| quality_reviews | QA 게이트 결과 | Yes |
-| presets | 명령 프리셋 | Yes |
-| cron_jobs | 스케줄 작업 | Yes |
-| org_templates | 조직 템플릿 | Global + Custom |
-| audit_logs | 감사 로그 (삭제 불가) | Yes |
+**테스트 인프라:**
 
-**Phase 2 추가 테이블:**
+| 레이어 | 도구 | CI 실행 | 비용 |
+|--------|------|---------|------|
+| 단위 테스트 | bun:test | ✅ 매 커밋 | $0 |
+| 모킹 통합 테스트 | bun:test + SDK 모킹 | ✅ 매 커밋 | $0 |
+| 실제 SDK 통합 테스트 | bun:test + 실제 query() | 주 1회 스케줄 | ~$1/회 |
+| A/B 품질 테스트 | 수동 10개 프롬프트 | 릴리스 전 | ~$5/회 |
 
-| 테이블 | 용도 |
-|--------|------|
-| watchlist | 종목 관심 목록 |
-| portfolio | 투자 포트폴리오 |
-| trade_orders | 매매 주문 (영구 보존) |
-| debates | AGORA 토론 기록 |
-| sketches | SketchVibe 다이어그램 |
-| sns_content | SNS 발행 큐 |
-| knowledge_docs | RAG 문서 저장소 |
-| agent_memories | 에이전트 학습 기록 |
+모킹 전략: SDK query()만 모킹, CORTHEX 코드(call_agent/Hook/SessionContext/soul-renderer)는 전부 실제 실행.
 
-**마이그레이션:** Drizzle Kit generate + migrate (기존 구성 활용)
+### New Files Summary (Phase 1)
+
+| 파일 | 줄 수 | 역할 |
+|------|------|------|
+| `engine/agent-loop.ts` | ~50 | SDK query() 래퍼 + SessionContext + pre-spawn 이벤트 |
+| `engine/soul-renderer.ts` | ~40 | Soul 템플릿 변수 치환 (6종: agent_list, subordinate_list, tool_list, department_name, owner_name, specialty) |
+| `engine/model-selector.ts` | ~20 | tier_configs → model 매핑 |
+| `engine/sse-adapter.ts` | ~30 | SDK AsyncGenerator → 기존 SSE 이벤트 변환 (프론트 호환) |
+| `engine/hooks/tool-permission-guard.ts` | ~20 | PreToolUse: 비허용 도구 deny |
+| `engine/hooks/credential-scrubber.ts` | ~20 | PostToolUse: @zapier/secret-scrubber 기반 |
+| `engine/hooks/output-redactor.ts` | ~15 | PostToolUse: 추가 패턴 마스킹 |
+| `engine/hooks/delegation-tracker.ts` | ~30 | PostToolUse: call_agent 시 WebSocket 이벤트 |
+| `engine/hooks/cost-tracker.ts` | ~20 | Stop: llm-cost-tracker 기반 비용 기록 |
+| `tool-handlers/builtins/call-agent.ts` | ~40 | N단계 핸드오프 (SessionContext 복제 + 재귀 spawn) |
+| `db/scoped-query.ts` | ~30 | getDB(companyId) 멀티테넌시 래퍼 |
+| `db/logger.ts` | ~10 | pino/consola 어댑터 |
+| **총** | **~325줄** | 기존 ~1,200줄 삭제 → **73% 순 삭제** |
 
 ### Decision Impact Analysis
 
-**구현 순서 (의존성 기반):**
-1. 테넌트 격리 미들웨어 (모든 API의 기반)
-2. 데이터 아키텍처 -- 스키마 + 마이그레이션
-3. 동적 조직 관리 (부서/에이전트 CRUD + cascade)
-4. LLM 프로바이더 라우터 (에이전트 실행의 기반)
-5. 에이전트 실행 모델 (AgentRunner)
-6. 도구 시스템 (에이전트가 사용)
-7. 오케스트레이션 엔진 (위 모든 컴포넌트 조합)
-8. 비용 추적 (LLM 호출에 삽입)
-9. 실시간 통신 (오케스트레이션에 이벤트 추가)
-10. 품질 게이트 (오케스트레이션 파이프라인에 삽입)
+**구현 순서 (Phase 1 내):**
+1. 의존성 검증 (패키지 설치 + turbo build)
+2. db/scoped-query.ts + db/logger.ts (기반)
+3. engine/agent-loop.ts + engine/model-selector.ts (핵심)
+4. engine/soul-renderer.ts (Soul 변수 치환)
+5. engine/hooks/ × 5 (보안 체계)
+6. tool-handlers/builtins/call-agent.ts (핸드오프)
+7. engine/sse-adapter.ts (프론트 호환)
+8. 라우트 import 변경 (agent-runner → agent-loop)
+9. 통합 테스트 (3단계 핸드오프)
+10. 회귀 테스트 (Epic 1~20)
 
-**Cross-Component Dependencies:**
-
-| 컴포넌트 | 의존 대상 |
-|----------|----------|
-| OrchestratorService | ChiefOfStaff, AgentRunner, EventBus, QualityGate |
-| ChiefOfStaff | LLMRouter |
-| AgentRunner | LLMRouter, ToolPool |
-| LLMRouter | Provider Adapters, CostTracker |
-| ToolPool | 개별 Tool 구현, 크리덴셜 볼트 |
-| EventBus | WebSocket Handler |
-| CostTracker | DB (cost_records) |
-| QualityGate | LLMRouter |
-| OrganizationService | DB, EventBus (조직 변경 이벤트) |
-| CredentialVault | Crypto 유틸리티 |
+**교차 의존성:**
+- SessionContext는 agent-loop, call-agent, hooks, logger 전부에서 사용
+- getDB는 soul-renderer, model-selector, call-agent에서 사용
+- sse-adapter는 agent-loop의 출력을 변환 (agent-loop 완성 후 작성)
 
 ## Implementation Patterns & Consistency Rules
 
-> AI 에이전트 간 구현 충돌을 방지하는 일관성 규칙. "어떻게 구현할 것인가"에 집중.
+_Party Mode 4라운드, 17개 개선사항(P1~P17) 반영_
 
-### Naming Conventions
+### 핵심 3줄 요약 (AI 에이전트용)
 
-| 컨텍스트 | 규칙 | 예시 | 금지 예시 |
-|----------|------|------|----------|
-| 파일명 | kebab-case 소문자 | `agent-runner.ts`, `cost-tracker.ts` | `AgentRunner.ts`, `costTracker.ts` |
-| DB 테이블 | snake_case 복수형 | `cost_records`, `tool_invocations` | `CostRecord`, `costRecords` |
-| DB 칼럼 | snake_case | `company_id`, `created_at` | `companyId`, `CreatedAt` |
-| API 엔드포인트 | kebab-case 복수형 | `/api/agents`, `/api/cost-records` | `/api/Agent`, `/api/costRecord` |
-| TypeScript 타입/인터페이스 | PascalCase | `AgentRunner`, `TaskRequest` | `agentRunner`, `AGENT_RUNNER` |
-| 함수명 | camelCase | `processCommand`, `trackCost` | `process_command`, `ProcessCommand` |
-| 상수 | UPPER_SNAKE_CASE | `MAX_RETRY_COUNT`, `DEFAULT_TIMEOUT_MS` | `maxRetryCount`, `defaultTimeout` |
-| Zustand Store | `use{Name}Store` | `useCommandStore`, `useAgentStore` | `commandStore`, `CommandStore` |
-| React 컴포넌트 | PascalCase | `CommandCenter`, `AgentCard` | `commandCenter`, `agent-card` |
-| WebSocket 이벤트 | kebab-case | `agent-started`, `task-delegated` | `agentStarted`, `AGENT_STARTED` |
-| 환경 변수 | UPPER_SNAKE_CASE | `DATABASE_URL`, `ENCRYPTION_KEY` | `databaseUrl`, `database-url` |
+1. **모든 길은 agent-loop.ts로 통한다** — 진입점 + Hook + SSE. 우회 불가.
+2. **DB는 getDB(ctx.companyId)로만** — 읽기 + 쓰기 전부. 직접 db 금지.
+3. **engine/ 밖에서 engine 내부 건드리지 마** — 공개 API는 agent-loop.ts + types.ts 2개뿐.
 
-### API Response Format
+### Pattern Categories Defined
+
+**충돌 지점 22개, Engine 패턴 10개(E1~E10), Anti-Pattern 6개**
+
+| 카테고리 | 충돌 수 | 위험도 |
+|---------|--------|--------|
+| Naming (기존 확립) | 4 | 낮음 |
+| Engine 신규 패턴 | 6 | **높음** |
+| Hook 패턴 | 4 | **높음** |
+| SessionContext 전파 | 3 | **높음** |
+| 테스트 패턴 | 3 | 중간 |
+| 에러 코드 확장 | 2 | 중간 |
+
+### Naming Patterns (기존 확립 — 변경 없음)
+
+| 항목 | 규칙 | 예시 |
+|------|------|------|
+| DB 테이블 | snake_case, **복수형** | `agents`, `tier_configs`, `chat_messages` |
+| DB 컬럼 | snake_case, FK는 `_id` 접미사 | `company_id`, `is_active`, `created_at` |
+| DB Enum (JS) | camelCase | `userRoleEnum`, `agentStatusEnum` |
+| DB Enum (SQL) | snake_case 문자열 | `'user_role'`, `'agent_status'` |
+| API 엔드포인트 | `/api/{scope}/{resource}` 복수형 | `/api/admin/agents`, `/api/workspace/chat` |
+| 쿼리 파라미터 | camelCase | `?departmentId=...&isActive=true` |
+| 파일명 | kebab-case (예외: `App.tsx`) | `agent-loop.ts`, `cost-tracker.ts` |
+| 컴포넌트 | PascalCase export | `ChatArea`, `CreateDebateModal` |
+| Hook 파일 | `use-{feature}.ts` | `use-budget-alerts.ts` |
+| Store 파일 | `{feature}-store.ts` | `auth-store.ts` → `useAuthStore` |
+| 테스트 파일 | `{feature}.test.ts` in `__tests__/` | `auth.test.ts`, `crypto.test.ts` |
+| JSON 필드 | camelCase | `{ companyId, isActive, createdAt }` |
+
+### Type Boundary Map (P12)
+
+```
+@corthex/shared/types.ts  → TenantContext, UserRole, AgentTier, ApiResponse, ApiError
+                             (프론트+서버 공용. CLI 토큰 관련 타입 절대 없음)
+
+packages/server/src/types.ts → AppEnv (Hono Variables)
+                                (서버 미들웨어 전용)
+
+engine/types.ts             → SessionContext, PreToolHookResult, SSEEvent, RunAgentOptions
+                             (server 내부 전용. shared로 re-export 금지 — P1)
+```
+
+### Engine Patterns (E1~E10)
+
+#### E1: SessionContext 전파 규칙
 
 ```typescript
-// 성공 응답
-{ success: true, data: T }
-
-// 에러 응답
-{ success: false, error: { code: string, message: string } }
-
-// 페이지네이션 응답
-{ success: true, data: T[], pagination: { page: number, limit: number, total: number } }
+// engine/types.ts — readonly 타입 레벨 불변 (P13)
+export interface SessionContext {
+  readonly cliToken: string;
+  readonly userId: string;
+  readonly companyId: string;
+  readonly depth: number;
+  readonly sessionId: string;
+  readonly startedAt: number;
+  readonly maxDepth: number;
+  readonly visitedAgents: readonly string[];
+}
 ```
 
 **규칙:**
-- 모든 API 응답은 `{ success, data | error }` 래퍼 사용 (직접 반환 금지)
-- HTTP 상태 코드: 200(성공), 201(생성), 400(입력 오류), 401(인증 실패), 403(권한 없음), 404(미존재), 500(서버 에러)
-- 날짜는 ISO 8601 문자열 (`2026-03-07T12:00:00Z`)
-- JSON 필드명은 camelCase (DB snake_case와 다름 -- ORM이 변환)
+- `Readonly` + `readonly string[]` → `ctx.depth = 1` 컴파일 에러
+- 하위 전달 시 반드시 spread 복사: `{ ...ctx, depth: ctx.depth + 1, visitedAgents: [...ctx.visitedAgents, newId] }`
+- agent-loop.ts 이외에서 SessionContext 생성 금지
+- engine/types.ts는 **server 내부 전용** — shared re-export 금지 (P1)
 
-### Error Handling Pattern
+#### E2: Hook 구현 표준
 
 ```typescript
-// 서버: Hono 글로벌 에러 핸들러
-app.onError((err, c) => {
-  console.error(`[${c.req.method}] ${c.req.url}`, err);
-  return c.json({ success: false, error: { code: 'INTERNAL_ERROR', message: err.message } }, 500);
-});
+// PreToolUse Hook
+(ctx: SessionContext, toolName: string, toolInput: unknown) => PreToolHookResult
 
-// 오케스트레이션: Graceful Degradation
-try {
-  const result = await specialist.execute(task);
-  return result;
-} catch (err) {
-  eventBus.emit('agent-status', 'agent-error', { agentId, error: err.message }, companyId);
-  return { result: null, error: err.message, partial: true };  // 부분 결과로 계속
+// PostToolUse Hook
+(ctx: SessionContext, toolName: string, toolOutput: string) => string
+
+// Stop Hook
+(ctx: SessionContext, usage: { inputTokens: number; outputTokens: number }) => void
+```
+
+**규칙:**
+- 모든 Hook의 첫 번째 파라미터는 `SessionContext`
+- Hook 내부에서 다른 Hook 호출 금지
+- Hook 에러 → `HOOK_PIPELINE_ERROR` 코드로 SSE error 발행 + 세션 중단 (P4)
+
+#### E3: getDB(companyId) 사용 규칙 (P2 반영 — WRITE 포함)
+
+```typescript
+export function getDB(companyId: string) {
+  if (!companyId) throw new Error('companyId required');
+  return {
+    // READ
+    agents: () => db.select().from(agents).where(eq(agents.companyId, companyId)),
+    departments: () => db.select().from(departments).where(eq(departments.companyId, companyId)),
+    tierConfigs: () => db.select().from(tierConfigs).where(eq(tierConfigs.companyId, companyId)),
+
+    // WRITE — companyId 자동 주입
+    insertAgent: (data: Omit<NewAgent, 'companyId'>) =>
+      db.insert(agents).values({ ...data, companyId }),
+    updateAgent: (id: string, data: Partial<Agent>) =>
+      db.update(agents).set(data).where(and(eq(agents.id, id), eq(agents.companyId, companyId))),
+    deleteAgent: (id: string) =>
+      db.delete(agents).where(and(eq(agents.id, id), eq(agents.companyId, companyId))),
+    // Phase 1: engine이 사용하는 테이블만. 나머지 점진 추가.
+  };
+}
+```
+
+**규칙:**
+- 비즈니스 로직: 반드시 `getDB(ctx.companyId)` 사용
+- `db` 직접 import 허용: 마이그레이션, 시드, 시스템 쿼리만
+- UPDATE/DELETE에도 companyId WHERE 자동 적용 → 타사 데이터 변경 불가
+
+#### E4: Soul 템플릿 변수 규칙
+
+6개 변수: `{{agent_list}}`, `{{subordinate_list}}`, `{{tool_list}}`, `{{department_name}}`, `{{owner_name}}`, `{{specialty}}`
+
+**규칙:**
+- `{{변수명}}` 이중 중괄호만 사용. soul-renderer.ts만 치환 수행.
+- 치환 실패 시 빈 문자열 대체 (에러 아님)
+- Soul에 사용자 입력 직접 삽입 절대 금지 (prompt injection)
+
+#### E5: SSE 이벤트 발행 규칙
+
+```typescript
+type SSEEvent =
+  | { type: 'accepted'; sessionId: string }
+  | { type: 'processing'; agentName: string }
+  | { type: 'handoff'; from: string; to: string; depth: number }
+  | { type: 'message'; content: string }
+  | { type: 'error'; code: string; message: string; agentName?: string }
+  | { type: 'done'; costUsd: number; tokensUsed: number };
+```
+
+6개 이벤트 타입만 허용. 추가 시 프론트 동시 수정 필수.
+
+#### E6: model-selector 티어 매핑
+
+`tierConfig.modelPreference → SDK model string`. Phase 1~4 Claude 전용. 라우팅 로직 추가 금지 (llm-router.ts 동결).
+
+#### E7: 병렬 핸드오프 제한 (P7)
+
+**Phase 1: 순차 실행만.** 병렬 핸드오프(`Promise.all`)는 Phase 2+에서 branchId 기반 SSE 분리와 함께 구현.
+
+```typescript
+// Phase 1 ✅
+for (const target of handoffTargets) {
+  await runAgent(childCtx, target.soul, msg);
 }
 
-// 프론트엔드: TanStack Query 에러 처리
-const { data, error, isLoading } = useQuery({
-  queryKey: ['agents', companyId],
-  queryFn: () => api.get('/api/agents'),
-  retry: 2,
-});
+// Phase 2+ (branchId 추가 후)
+await Promise.all(targets.map(t => runAgent({ ...childCtx, branchId: uuid() }, t.soul, msg)));
 ```
 
-**규칙:**
-- LLM 호출 실패: fallback 프로바이더 자동 전환 (LLMRouter 내부)
-- 도구 실패: 해당 도구 결과만 null, 오케스트레이션 계속
-- WebSocket 끊김: 클라이언트 자동 재연결 (지수 백오프, 최대 3초)
-- 예산 초과: 자동 차단 + WebSocket `budget-exceeded` 이벤트
-- 절대 금지: 에러 무시(catch 빈 블록), 사용자에게 스택 트레이스 노출
+#### E8: engine/ 공개 API 경계 (P8)
 
-### Test Organization
+**외부에서 import 허용하는 파일 2개만:**
+- `engine/agent-loop.ts` — `runAgent()` 함수
+- `engine/types.ts` — `SessionContext`, `SSEEvent` 등 타입
 
-```
-packages/server/src/__tests__/
-  unit/                    # 단위 테스트 (bun:test)
-    services/              # 서비스 로직 테스트
-    utils/                 # 유틸리티 함수 테스트
-  api/                     # API 통합 테스트
+나머지(hooks/, soul-renderer, model-selector, sse-adapter)는 engine 내부 전용. **barrel export(index.ts) 만들지 않음.**
 
-packages/app/src/__tests__/
-  components/              # 컴포넌트 테스트 (vitest + testing-library)
-  hooks/                   # Custom hook 테스트
-```
-
-**규칙:**
-- 서버 테스트: `bun:test` 사용. `describe/it/expect` 패턴
-- 프론트엔드 테스트: `vitest` + `@testing-library/react`
-- 테스트 파일명: `{대상}.test.ts` (예: `agent-runner.test.ts`)
-- 테스트 위치: `__tests__/` 디렉토리 하위 (co-located 아님)
-- 최소 커버리지 대상: 서비스 레이어 (orchestrator, agent-runner, llm-router, tool-pool, cost-tracker)
-
-### Import Conventions
+#### E9: SDK 모킹 표준 (P10)
 
 ```typescript
-// 1. 외부 패키지
-import { Hono } from 'hono';
-import { eq } from 'drizzle-orm';
+import { mock } from 'bun:test';
 
-// 2. 모노레포 패키지 (workspace)
-import type { Agent, TaskRequest } from '@corthex/shared';
-import { Button, Card } from '@corthex/ui';
-
-// 3. 프로젝트 내부 (상대 경로)
-import { db } from '../db/schema';
-import { llmRouter } from '../services/llm-router';
-```
-
-**규칙:**
-- import 순서: 외부 -> workspace -> 내부 (빈 줄로 구분)
-- import 경로는 `git ls-files` 케이싱과 정확히 일치 (Linux CI 대소문자 구분)
-- 타입만 import 시 `import type` 사용
-- barrel export(`index.ts`)는 `@corthex/shared`, `@corthex/ui`에서만 사용
-
-### State Management Pattern
-
-**서버 사이드 (Zustand 없음):**
-- 모든 상태는 DB에 저장 (메모리 금지 원칙 #005)
-- 서비스는 무상태 -- 요청마다 DB에서 읽고 DB에 쓴다
-- 캐시는 TanStack Query가 클라이언트에서 관리
-
-**클라이언트 사이드:**
-```typescript
-// Zustand: UI 상태 (WebSocket 연결, 현재 사용자, 테마)
-const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  setUser: (user) => set({ user }),
+mock.module('@anthropic-ai/claude-agent-sdk', () => ({
+  Agent: class {
+    query = mock(() => ({
+      async *[Symbol.asyncIterator]() {
+        yield { type: 'text', content: 'mocked response' };
+      }
+    }));
+  }
 }));
-
-// TanStack Query: 서버 데이터 (에이전트 목록, 비용, 명령 이력)
-const useAgents = () => useQuery({
-  queryKey: ['agents'],
-  queryFn: () => api.get('/api/agents'),
-});
-
-// WebSocket 이벤트 -> TanStack Query 무효화
-ws.on('agent-status', () => {
-  queryClient.invalidateQueries({ queryKey: ['agents'] });
-});
+// agent-loop.ts 함수 자체는 실제 실행 → call_agent, Hook, SessionContext 전파 전부 테스트됨
 ```
 
-**규칙:**
-- Zustand: 순수 UI 상태만 (서버 데이터 캐시 금지)
-- TanStack Query: 모든 서버 데이터 (GET 요청 캐시 + 무효화)
-- WebSocket 이벤트 -> `queryClient.invalidateQueries()` 로 실시간 반영
-- 낙관적 업데이트는 CRUD 작업에만 사용 (위험한 금융 작업 제외)
+`@zapier/secret-scrubber`는 순수 함수 → 모킹 불필요, 실제 실행.
 
-### Logging Pattern
+#### E10: engine 경계 CI 검증 (P15)
+
+```bash
+# ci/engine-boundary-check.sh
+if grep -rn "from.*engine/hooks/" packages/server/src/routes/ packages/server/src/lib/; then
+  echo "ERROR: Direct hook import from outside engine/"
+  exit 1
+fi
+```
+
+CI에서 자동 실행. engine/ 외부에서 hooks 직접 import 시 빌드 실패.
+
+### Error Code Strategy (P3, P4, P9)
+
+**에러 코드 서술 체계 통합:**
 
 ```typescript
-// 구조화된 로깅 (서버)
-console.log(JSON.stringify({
-  level: 'info',
-  service: 'orchestrator',
-  action: 'command-processed',
-  companyId,
-  commandId,
-  duration: Date.now() - startTime,
-  agentCount: agents.length,
-}));
+// error-codes.ts — 레지스트리
+export const ERROR_CODES = {
+  // 기존 숫자 코드 → 서술 별명
+  AUTH_001: 'AUTH_INVALID_CREDENTIALS',
+  AUTH_002: 'AUTH_TOKEN_EXPIRED',
+  AUTH_003: 'AUTH_FORBIDDEN',
+  AGENT_001: 'AGENT_NOT_FOUND',
+  RATE_001: 'RATE_LIMIT_EXCEEDED',
+
+  // 신규 (서술 체계만)
+  AGENT_SPAWN_FAILED: 'AGENT_SPAWN_FAILED',
+  AGENT_TIMEOUT: 'AGENT_TIMEOUT',
+  SESSION_LIMIT_EXCEEDED: 'SESSION_LIMIT_EXCEEDED',
+  HANDOFF_DEPTH_EXCEEDED: 'HANDOFF_DEPTH_EXCEEDED',
+  HANDOFF_CIRCULAR: 'HANDOFF_CIRCULAR',
+  HANDOFF_TARGET_NOT_FOUND: 'HANDOFF_TARGET_NOT_FOUND',
+  TOOL_PERMISSION_DENIED: 'TOOL_PERMISSION_DENIED',
+  HOOK_PIPELINE_ERROR: 'HOOK_PIPELINE_ERROR',
+} as const;
 ```
 
-**규칙:**
-- 로그 레벨: `error`(장애), `warn`(주의), `info`(정상 이벤트), `debug`(개발)
-- 모든 로그에 `companyId` 포함 (테넌트 추적)
-- 크리덴셜/API 키는 로그에 절대 노출 금지 (자동 마스킹)
-- 금융 거래 로그: 별도 `audit_logs` 테이블에 영구 저장
+**에러 메시지 하이브리드 (P9):**
+- 기존 코드: 한국어 메시지 유지 (회귀 방지)
+- 신규 engine 코드: 영어 메시지 (디버깅용)
+- 프론트: `errorMessages` 맵에서 코드→한국어 변환
+- 미등록 코드 fallback (P11): `"오류가 발생했습니다 (코드: {code})"`
 
-### Validation Pattern
+### Pattern Verification Strategy (P14)
 
-```typescript
-// API 입력 검증: Zod 스키마
-const createAgentSchema = z.object({
-  name: z.string().min(1).max(50),
-  tier: z.enum(['manager', 'specialist', 'worker']),
-  departmentId: z.string().uuid().nullable(),
-  modelName: z.string(),
-  allowedTools: z.array(z.string()),
-});
+| 패턴 | 검증 방법 | 테스트 유형 |
+|------|----------|-----------|
+| E1 SessionContext 불변 | `readonly` 타입 | `tsc --noEmit` |
+| E2 Hook 시그니처 | 타입 체크 + 단위 | 단위 테스트 |
+| E3 getDB CRUD 격리 | companyId 격리 | 통합 (tenant-isolation.test.ts) |
+| E4 Soul 변수 치환 | 결과 검증 | 단위 테스트 |
+| E5 SSE 이벤트 타입 | 타입 유니언 | `tsc --noEmit` |
+| E7 순차 핸드오프 | 3단계 E2E | 모킹 통합 |
+| E8 engine/ 경계 | import 패턴 | CI 스크립트 (E10) |
+| E9 SDK 모킹 | 모킹 통합 실행 | CI |
 
-// Hono 라우트에서 사용
-app.post('/api/agents', async (c) => {
-  const body = createAgentSchema.parse(await c.req.json());
-  // ... 비즈니스 로직
-});
+### Anti-Patterns (하지 말 것)
+
+| Anti-Pattern | 왜 위험한가 | 올바른 패턴 |
+|-------------|-----------|-----------|
+| `db.select().from(agents)` 직접 쿼리 | companyId 누락 = 타사 데이터 노출 | `getDB(ctx.companyId).agents()` |
+| `db.delete(agents).where(eq(agents.id, id))` 직접 삭제 | companyId 없이 삭제 = 타사 데이터 삭제 | `getDB(ctx.companyId).deleteAgent(id)` |
+| `ctx.depth += 1` 직접 변경 | 병렬 핸드오프 시 공유 상태 오염 | `{ ...ctx, depth: ctx.depth + 1 }` |
+| `import { Agent } from '@anthropic-ai/...'` engine 밖 | SDK 변경 시 전체 코드 수정 | `engine/types.ts` 인터페이스만 사용 |
+| `import { credentialScrubber } from '../engine/hooks/...'` | 파이프라인 순서 깨짐 | agent-loop.ts만 Hook 호출 |
+| `console.log(error)` | 비구조화, sessionId 누락 | `log.error({ event, data })` |
+| Soul에 `` `${userInput}` `` 삽입 | Prompt injection | `{{변수명}}` + soul-renderer.ts |
+| `engine/types.ts`를 shared re-export | 프론트에 cliToken 타입 노출 | server 내부 import만 |
+
+### CLAUDE.md Update Items (구현 시 추가 — P16, P17)
+
+구현 단계에서 CLAUDE.md에 아래 내용 추가:
+
+```markdown
+## Engine Patterns (Phase 1)
+- 모든 길은 agent-loop.ts로 통한다 (Hook 우회 불가)
+- DB는 getDB(ctx.companyId)로만 (읽기+쓰기)
+- engine/ 밖에서 engine 내부 건드리지 마 (공개 API: agent-loop.ts + types.ts)
+- 상세: _bmad-output/planning-artifacts/architecture.md → E1~E10
 ```
-
-**규칙:**
-- 모든 API 입력은 Zod 스키마로 검증 (시스템 경계)
-- 서비스 내부 함수 간에는 TypeScript 타입으로 충분 (이중 검증 금지)
-- Zod 스키마 파일 위치: 해당 라우트 파일 상단 또는 `schemas/` 디렉토리
-
-### Enforcement Guidelines
-
-**모든 AI 에이전트 필수 준수:**
-1. 파일명은 반드시 kebab-case 소문자
-2. API 응답은 반드시 `{ success, data | error }` 래퍼
-3. DB 쿼리에 반드시 companyId WHERE 절 포함 (tenantMiddleware가 강제)
-4. LLM 호출은 반드시 LLMRouter를 통해 (직접 SDK 호출 금지)
-5. 도구 호출은 반드시 ToolPool을 통해 (권한 검증 우회 금지)
-6. 모든 비용 발생 호출은 CostTracker에 기록
-7. 에이전트 프롬프트에 크리덴셜 절대 포함 금지
-8. import 경로는 git ls-files 케이싱과 정확 일치
-
-**Anti-Patterns (금지 목록):**
-- `any` 타입 사용 (unknown + type guard 사용)
-- catch 블록에서 에러 무시
-- 서버에서 전역 변수로 상태 저장 (DB 사용)
-- 프론트엔드에서 직접 fetch (TanStack Query useQuery/useMutation 사용)
-- 하드코딩된 모델명/가격 (models.yaml 참조)
-- console.log에 크리덴셜/토큰 노출
 
 ## Project Structure & Boundaries
+
+_Party Mode 4라운드, 19개 개선사항(S1~S19) 반영_
+
+### Document Navigation (S19)
+
+1. Project Context Analysis (Step 2) — 요구사항, 인프라, 제약
+2. Starter Template Evaluation (Step 3) — 기존 스택, 신규 의존성, 코드 처분
+3. Core Architectural Decisions (Step 4) — D1~D16
+4. Implementation Patterns (Step 5) — E1~E10, 에러 코드, Anti-Pattern
+5. **Project Structure & Boundaries (Step 6)** — 디렉토리, 경계, 매핑
+6. Validation (Step 7) — 완성도 체크
 
 ### Complete Project Directory Structure
 
 ```
 corthex-v2/
 ├── .github/
-│   └── workflows/
-│       └── deploy.yml                   # CI/CD: main push -> build -> deploy -> CF purge
+│   ├── workflows/
+│   │   ├── deploy.yml                    # 기존 + Phase 1: engine-boundary-check 추가
+│   │   └── weekly-sdk-test.yml           # NEW Phase 1: 주1회 실제 SDK 통합 테스트
+│   └── scripts/
+│       └── engine-boundary-check.sh      # NEW Phase 1: E10 import 경계 검증 (S2)
+│
 ├── packages/
 │   ├── server/
-│   │   ├── package.json
 │   │   └── src/
-│   │       ├── index.ts                 # Hono app 엔트리 + WebSocket 설정
-│   │       ├── types.ts                 # 서버 전용 타입
+│   │       ├── index.ts                  # 기존 + Phase 1: graceful shutdown (S16)
+│   │       ├── types.ts                  # 기존: AppEnv
+│   │       │
 │   │       ├── db/
-│   │       │   ├── schema.ts            # Drizzle 스키마 (전체 테이블 정의)
-│   │       │   ├── seed.ts              # 초기 데이터 (시스템 에이전트, 기본 템플릿)
-│   │       │   └── migrations/          # Drizzle Kit 마이그레이션
-│   │       ├── middleware/
-│   │       │   ├── auth.ts              # JWT 인증 (adminAuth + userAuth)
-│   │       │   ├── tenant.ts            # companyId 주입 + 격리 검증
-│   │       │   └── rate-limit.ts        # 회사별 속도 제한
+│   │       │   ├── schema.ts             # 기존
+│   │       │   ├── index.ts              # 기존
+│   │       │   ├── migrations/           # 기존
+│   │       │   ├── scoped-query.ts       # NEW Phase 1: getDB(companyId) (~30줄)
+│   │       │   └── logger.ts             # NEW Phase 1: pino/consola 어댑터 (~10줄)
+│   │       │
+│   │       ├── engine/                   # NEW Phase 1: 에이전트 실행 엔진
+│   │       │   ├── agent-loop.ts         # 단일 진입점 + 세션 레지스트리 (~50줄) — 공개 API
+│   │       │   ├── types.ts              # SessionContext, SSEEvent — 공개 API (server 전용, S1)
+│   │       │   ├── soul-renderer.ts      # 내부 전용 (~40줄)
+│   │       │   ├── model-selector.ts     # 내부 전용 (~20줄)
+│   │       │   ├── sse-adapter.ts        # 내부 전용 (~30줄)
+│   │       │   └── hooks/                # 내부 전용
+│   │       │       ├── tool-permission-guard.ts
+│   │       │       ├── credential-scrubber.ts
+│   │       │       ├── output-redactor.ts
+│   │       │       ├── delegation-tracker.ts
+│   │       │       └── cost-tracker.ts
+│   │       │
+│   │       ├── tool-handlers/builtins/
+│   │       │   ├── call-agent.ts         # NEW Phase 1: N단계 핸드오프 (~40줄)
+│   │       │   └── ...                   # 기존 125개 도구
+│   │       │
 │   │       ├── routes/
-│   │       │   ├── auth.ts              # 로그인/가입/토큰갱신
-│   │       │   ├── commands.ts          # 사령관실 명령 API
-│   │       │   ├── agents.ts            # 에이전트 CRUD + Soul 편집
-│   │       │   ├── departments.ts       # 부서 CRUD + cascade
-│   │       │   ├── tools.ts             # 도구 관리 API
-│   │       │   ├── cost.ts              # 비용 추적/집계 API
-│   │       │   ├── presets.ts           # 명령 프리셋 API
-│   │       │   ├── quality.ts           # 품질 검수 결과 API
-│   │       │   ├── admin/               # 관리자 전용 라우트
-│   │       │   │   ├── companies.ts     # 회사 CRUD
-│   │       │   │   ├── users.ts         # 사용자 관리
-│   │       │   │   ├── credentials.ts   # API 키 관리
-│   │       │   │   └── templates.ts     # 조직 템플릿 관리
-│   │       │   ├── strategy.ts          # 전략실 API (Phase 2)
-│   │       │   ├── debates.ts           # AGORA API (Phase 2)
-│   │       │   ├── sketches.ts          # SketchVibe API (Phase 2)
-│   │       │   ├── sns.ts               # SNS 발행 API (Phase 2)
-│   │       │   ├── cron.ts              # 크론 스케줄러 API (Phase 2)
-│   │       │   ├── knowledge.ts         # 지식 베이스 API (Phase 2)
-│   │       │   └── telegram.ts          # 텔레그램 웹훅 (Phase 2)
-│   │       ├── services/
-│   │       │   ├── orchestrator.ts      # 메인 오케스트레이션 엔진
-│   │       │   ├── chief-of-staff.ts    # 명령 분류 + 품질 검수 (#010)
-│   │       │   ├── agent-runner.ts      # 에이전트 LLM 실행 (무상태)
-│   │       │   ├── llm-router.ts        # 멀티 프로바이더 라우팅 + fallback
-│   │       │   ├── tool-pool.ts         # 도구 레지스트리 + 권한 검증 실행
-│   │       │   ├── cost-tracker.ts      # 비용 기록 + 예산 관리
-│   │       │   ├── quality-gate.ts      # 5항목 루브릭 검수
-│   │       │   ├── organization.ts      # 조직 CRUD + cascade 엔진
-│   │       │   ├── batch-collector.ts   # Batch API 큐 관리
-│   │       │   ├── credential-vault.ts  # AES-256-GCM 암복호화
-│   │       │   ├── agora-engine.ts      # 토론 오케스트레이션 (Phase 2)
-│   │       │   ├── cron-scheduler.ts    # 크론 실행 (Phase 2)
-│   │       │   └── argos-collector.ts   # 정보 수집 (Phase 2)
-│   │       ├── tools/                   # 도구 구현 (125+)
-│   │       │   ├── common/              # P0: web-search, calculator, translator 등 30+
-│   │       │   ├── finance/             # Phase 2: kr-stock, kis-trading, dart-api
-│   │       │   ├── legal/               # law-search, contract-reviewer
-│   │       │   ├── marketing/           # sns-manager, seo-analyzer
-│   │       │   └── tech/               # uptime-monitor, security-scanner
-│   │       ├── ws/
-│   │       │   ├── handler.ts           # WebSocket 연결 핸들러
-│   │       │   └── event-bus.ts         # EventBus (7채널 멀티플렉싱)
+│   │       │   ├── admin/
+│   │       │   │   ├── agents.ts         # 기존 + Phase 2: Soul CRUD
+│   │       │   │   ├── tier-configs.ts   # NEW Phase 3
+│   │       │   │   └── ...               # 기존
+│   │       │   └── workspace/
+│   │       │       ├── chat.ts           # 기존: 세션 REST CRUD (S3)
+│   │       │       ├── hub.ts            # NEW Phase 1: SSE 스트리밍 진입점 (S3, S7)
+│   │       │       └── ...               # 기존
+│   │       │
+│   │       ├── middleware/
+│   │       │   ├── rate-limiter.ts       # NEW Phase 1: 세션 제한
+│   │       │   └── ...                   # 기존 (auth, error, tenant, rbac)
+│   │       │
 │   │       ├── lib/
-│   │       │   ├── llm/                 # LLM 프로바이더 어댑터
-│   │       │   │   ├── anthropic.ts     # Claude SDK 래퍼
-│   │       │   │   ├── openai.ts        # GPT SDK 래퍼
-│   │       │   │   └── google.ts        # Gemini SDK 래퍼
-│   │       │   └── crypto.ts            # AES-256-GCM 유틸리티
-│   │       ├── config/
-│   │       │   └── models.yaml          # 모델별 가격표 (input/output per 1M tokens)
-│   │       ├── utils/
-│   │       │   ├── token-counter.ts     # 토큰 카운팅
-│   │       │   └── prompt-builder.ts    # 시스템 프롬프트 조립 (Soul + 지식 + 도구)
+│   │       │   ├── error-codes.ts        # NEW Phase 1: 에러 코드 레지스트리 (~30줄)
+│   │       │   └── ...                   # 기존
+│   │       │
+│   │       ├── services/                 # 처분 매트릭스 적용
+│   │       │   ├── agent-runner.ts       # → Phase 1 교체 (engine/agent-loop.ts)
+│   │       │   ├── delegation-tracker.ts # → Phase 1 교체 (engine/hooks/)
+│   │       │   ├── chief-of-staff.ts     # → Phase 2 삭제
+│   │       │   ├── llm-router.ts         # → 동결 (Phase 5+)
+│   │       │   ├── trading/              # 불가침 (import 교체만 허용 — S12)
+│   │       │   ├── telegram/             # 불가침 (import 교체만 허용 — S12)
+│   │       │   └── selenium/             # 불가침
+│   │       │
+│   │       ├── mcp/                      # NEW Phase 4
+│   │       │   └── sketchvibe-mcp.ts
+│   │       │
 │   │       └── __tests__/
 │   │           ├── unit/
-│   │           │   ├── services/        # orchestrator, agent-runner, llm-router 등
-│   │           │   └── utils/           # token-counter, prompt-builder 등
-│   │           └── api/                 # API 통합 테스트
+│   │           │   ├── soul-renderer.test.ts     # NEW Phase 1
+│   │           │   ├── model-selector.test.ts    # NEW Phase 1
+│   │           │   ├── scoped-query.test.ts      # NEW Phase 1
+│   │           │   └── error-codes.test.ts       # NEW Phase 1
+│   │           ├── integration/
+│   │           │   ├── agent-loop.test.ts        # NEW Phase 1
+│   │           │   ├── hook-pipeline.test.ts     # NEW Phase 1
+│   │           │   ├── handoff-chain.test.ts     # NEW Phase 1
+│   │           │   └── tenant-isolation.test.ts  # 기존 + Phase 1
+│   │           ├── sdk/
+│   │           │   └── real-sdk.test.ts          # NEW Phase 1 (주1회)
+│   │           └── helpers/
+│   │               ├── test-utils.ts             # 기존
+│   │               └── sdk-mock.ts               # NEW Phase 1 (S4)
 │   │
-│   ├── app/                             # CEO/직원용 메인 앱
-│   │   ├── package.json
+│   ├── app/                              # 허브 SPA
 │   │   └── src/
-│   │       ├── main.tsx                 # React 앱 엔트리
-│   │       ├── App.tsx                  # 라우터 설정
-│   │       ├── pages/
-│   │       │   ├── command-center/      # 사령관실 (P0)
-│   │       │   │   ├── index.tsx
-│   │       │   │   └── components/      # CommandInput, DelegationChain, ReportViewer
-│   │       │   ├── dashboard/           # 작전현황 대시보드 (P1)
-│   │       │   │   ├── index.tsx
-│   │       │   │   └── components/      # SummaryCards, UsageChart, CostChart
-│   │       │   ├── agents/              # 에이전트 관리 + Soul 편집 (P0)
-│   │       │   │   ├── index.tsx
-│   │       │   │   └── components/      # AgentCard, SoulEditor, OrgTree
-│   │       │   ├── activity/            # 통신로그 (P1)
-│   │       │   │   ├── index.tsx
-│   │       │   │   └── components/      # ActivityTab, CommTab, QATab, ToolTab
-│   │       │   ├── strategy/            # 전략실 (Phase 2)
-│   │       │   ├── nexus/               # SketchVibe 캔버스 (Phase 2)
-│   │       │   ├── history/             # 작전일지 (Phase 2)
-│   │       │   ├── archive/             # 기밀문서 (Phase 2)
-│   │       │   ├── performance/         # 전력분석 (Phase 2)
-│   │       │   ├── knowledge/           # 정보국 (Phase 2)
-│   │       │   ├── schedule/            # 크론 스케줄러 (Phase 2)
-│   │       │   ├── sns/                 # SNS 통신국 (Phase 2)
-│   │       │   ├── argos/               # 정보 수집 (Phase 2)
-│   │       │   └── workflow/            # 자동화 워크플로우 (Phase 2)
 │   │       ├── components/
-│   │       │   ├── command/             # CommandInput, PresetSelector, MentionPopup
-│   │       │   ├── agent/               # AgentCard, StatusBadge, TierIcon
-│   │       │   ├── report/              # ReportViewer, FeedbackButtons, QualityBadge
-│   │       │   └── layout/              # AppShell, Sidebar, Header, Navigation
-│   │       ├── stores/
-│   │       │   ├── auth-store.ts        # 인증 상태 (JWT, 사용자 정보)
-│   │       │   ├── command-store.ts     # 명령 입력 상태
-│   │       │   ├── ws-store.ts          # WebSocket 연결 상태
-│   │       │   └── ui-store.ts          # UI 상태 (사이드바, 테마)
-│   │       ├── hooks/
-│   │       │   ├── use-command.ts       # 명령 전송 + 위임 체인 구독
-│   │       │   ├── use-agents.ts        # 에이전트 CRUD 쿼리
-│   │       │   ├── use-websocket.ts     # WebSocket 연결 + 이벤트 구독
-│   │       │   └── use-cost.ts          # 비용 데이터 쿼리
-│   │       ├── lib/
-│   │       │   └── api.ts              # API 클라이언트 (TanStack Query 설정)
-│   │       └── __tests__/
-│   │           ├── components/
-│   │           └── hooks/
-│   │
-│   ├── admin/                           # 관리자 콘솔
-│   │   ├── package.json
-│   │   └── src/
-│   │       ├── main.tsx
-│   │       ├── App.tsx
-│   │       ├── pages/
-│   │       │   ├── companies/           # 회사 CRUD
-│   │       │   ├── users/               # 사용자 관리
-│   │       │   ├── agents/              # 에이전트 관리 (전체 회사)
-│   │       │   ├── departments/         # 부서 관리 + cascade
-│   │       │   ├── credentials/         # API 키 관리
-│   │       │   ├── templates/           # 조직 템플릿 관리
-│   │       │   ├── cost/                # 전체/회사별 비용 대시보드
-│   │       │   └── settings/            # 시스템 설정
-│   │       ├── components/
-│   │       ├── stores/
-│   │       ├── hooks/
+│   │       │   ├── hub/                  # NEW Phase 2
+│   │       │   └── chat/                 # 기존 + Phase 2
 │   │       └── lib/
+│   │           └── error-messages.ts     # NEW Phase 2 (S10: Phase 1→2 이동)
 │   │
-│   ├── ui/                              # 공유 컴포넌트 라이브러리
-│   │   ├── package.json
-│   │   └── src/
-│   │       ├── button.tsx
-│   │       ├── card.tsx
-│   │       ├── input.tsx
-│   │       ├── modal.tsx
-│   │       ├── table.tsx
-│   │       ├── tabs.tsx
-│   │       ├── badge.tsx
-│   │       ├── chart.tsx               # 도넛/막대 차트 컴포넌트
-│   │       └── index.ts                # barrel export
+│   ├── admin/                            # 관리자 SPA
+│   │   └── src/components/
+│   │       ├── nexus/                    # NEW Phase 3: React Flow
+│   │       └── sketchvibe/              # 기존 Cytoscape
 │   │
-│   └── shared/                          # 공유 타입
-│       ├── package.json
-│       └── src/
-│           ├── types/
-│           │   ├── agent.ts             # Agent, Department, OrgTemplate
-│           │   ├── command.ts           # Command, TaskRequest, TaskResponse
-│           │   ├── tool.ts              # Tool, ToolResult, ToolContext
-│           │   ├── cost.ts              # CostRecord, Budget, CostSummary
-│           │   ├── quality.ts           # QualityCheckResult, QualityScore
-│           │   ├── auth.ts              # User, AdminUser, JWTPayload
-│           │   ├── ws-events.ts         # 7채널 이벤트 타입 정의
-│           │   └── api.ts              # ApiResponse<T>, PaginatedResponse<T>
-│           └── index.ts                 # barrel export
+│   ├── ui/                               # @corthex/ui
+│   └── shared/                           # @corthex/shared (CLI 토큰 타입 없음)
 │
-├── turbo.json                           # Turborepo 파이프라인
-├── package.json                         # 루트 workspace
-├── .env.example                         # 환경 변수 템플릿
-└── drizzle.config.ts                    # Drizzle Kit 설정
+├── Dockerfile                            # 기존 + Phase 1: 의존성
+├── .dockerignore                         # 기존 + .github/, _bmad*, _poc/, _uxui* (S6)
+└── CLAUDE.md                             # 구현 시: Engine Patterns 추가
 ```
 
-### Component Boundaries
+### "불가침" 정의 명확화 (S12)
 
-| 컴포넌트 | 책임 | 의존 대상 | 제공 인터페이스 |
-|----------|------|----------|---------------|
-| OrchestratorService | 명령 수명주기 관리 | ChiefOfStaff, AgentRunner, EventBus, QualityGate | `process(command): Promise<Report>` |
-| ChiefOfStaff | 명령 분류 + 최종 검수 | LLMRouter | `classify(command)`, `review(report)` |
-| AgentRunner | 에이전트 LLM 실행 | LLMRouter, ToolPool | `execute(agent, task): Promise<TaskResponse>` |
-| LLMRouter | LLM 프로바이더 라우팅 | Provider Adapters, CostTracker | `call(request): Promise<LLMResponse>` |
-| ToolPool | 도구 레지스트리 + 실행 | Tool 구현체, CredentialVault | `invoke(agent, toolName, params): Promise<ToolResult>` |
-| OrganizationService | 조직 CRUD + cascade | DB, EventBus | `createDept()`, `deleteDept(mode)`, `moveAgent()` |
-| CostTracker | 비용 기록 + 예산 | DB | `record(costRecord)`, `checkBudget(companyId)` |
-| QualityGate | 5항목 검수 | LLMRouter | `check(report): Promise<QualityCheckResult>` |
-| EventBus | 이벤트 멀티플렉싱 | WebSocket Handler | `emit(channel, event, data, companyId)` |
-| CredentialVault | 암복호화 | Crypto | `encrypt(key)`, `decrypt(key)` |
+**불가침 = 비즈니스 로직/기능을 변경하지 않음**
 
-### FR Category to Structure Mapping
+| 허용 | 금지 |
+|------|------|
+| import 경로 변경 (agent-runner → agent-loop) | 트레이딩 로직 수정 |
+| SessionContext 생성 코드 추가 | 텔레그램 메시지 포맷 변경 |
+| 에러 핸들링 패턴 통합 | 기능 추가/제거 |
 
-| FR 영역 | 서버 모듈 | 프론트엔드 페이지 | 공유 타입 |
-|---------|----------|----------------|----------|
-| 조직 관리 (FR1-12) | routes/departments, routes/agents, services/organization | app/pages/agents, admin/pages/departments | types/agent.ts |
-| 사령관실 (FR13-18) | routes/commands, routes/presets | app/pages/command-center | types/command.ts |
-| 오케스트레이션 (FR19-25) | services/orchestrator, services/chief-of-staff, services/agent-runner | (WebSocket 이벤트로 표시) | types/command.ts |
-| 도구 & LLM (FR26-34) | services/tool-pool, services/llm-router, tools/*, services/batch-collector | (서버 내부) | types/tool.ts |
-| 모니터링 (FR35-41) | routes/cost | app/pages/dashboard, app/pages/activity | types/cost.ts |
-| 보안 (FR42-49) | middleware/auth, middleware/tenant, routes/admin/* | admin/pages/* | types/auth.ts |
-| 품질 (FR50-55) | services/quality-gate, routes/quality | app/pages/activity (QA 탭) | types/quality.ts |
-| 투자 Phase 2 (FR56-62) | routes/strategy, tools/finance/* | app/pages/strategy | - |
-| 협업 Phase 2/3 (FR63-76) | routes/debates, routes/sketches, routes/sns 등 | app/pages/nexus, sns 등 | - |
+### runAgent() 호출자 전체 목록 (S11)
 
-### Data Flow: Command Execution
+| # | 호출자 | 라우트/서비스 | Phase 1 수정 | SessionContext 소스 |
+|---|--------|-------------|-------------|-------------------|
+| 1 | 허브 채팅 | `routes/workspace/hub.ts` (NEW) | 신규 작성 | HTTP JWT → tenant |
+| 2 | 텔레그램 봇 | `services/telegram/handler.ts` | import 교체 | 봇 설정 companyId |
+| 3 | ARGOS 크론잡 | `services/argos/scheduler.ts` | import 교체 | 크론 설정 companyId |
+| 4 | AGORA 토론 | `routes/workspace/agora.ts` | import 교체 | HTTP JWT → tenant |
+| 5 | 자동매매 | `services/trading/executor.ts` | import 교체 | 트레이딩 설정 companyId |
+| 6 | 스케치바이브 MCP | `mcp/sketchvibe-mcp.ts` | Phase 4 | MCP 컨텍스트 |
+
+### Architectural Boundaries
 
 ```
-1. Client: POST /api/commands {text: "삼성전자 분석"}
-   ↓
-2. routes/commands.ts → OrchestratorService.process()
-   ↓ EventBus.emit('command', 'command-processing')
-3. ChiefOfStaff.classify() → {departmentId, taskBreakdown}
-   ↓ EventBus.emit('delegation', 'task-delegated', {from: 'CoS', to: 'CIO'})
-4. AgentRunner.execute(CIO) → subtasks[]
-   ↓ EventBus.emit('delegation', 'task-delegated', {from: 'CIO', to: 'analysts'})
-5. Parallel: AgentRunner.execute(analyst1..N)
-   ↓ ToolPool.invoke() → EventBus.emit('tool', 'tool-invoked')
-   ↓ CostTracker.record() → EventBus.emit('cost', 'cost-updated')
-6. AgentRunner.execute(CIO).synthesize() — #007 자체 분석 포함
-   ↓
-7. QualityGate.check(report)
-   ├── Pass → EventBus.emit('command', 'command-done', {report})
-   └── Fail → AgentRunner rework (max 2) → QualityGate 재검수
-   ↓
-8. WebSocket → Client: 보고서 렌더링 + thumbs up/down
+외부 클라이언트 (브라우저)
+    │
+    ├─ HTTP ──→ Hono Routes ──→ Middleware (auth → tenant → rbac)
+    │              │
+    │              ├─ /api/admin/*     → getDB() → Response
+    │              ├─ /api/workspace/* → getDB() → Response
+    │              └─ /api/workspace/hub → engine/agent-loop → SSE Stream
+    │
+    └─ WebSocket ──→ 7채널 멀티플렉싱 ──→ 프론트 캐시 무효화
 ```
 
-### External Integration Points
+**의존성 규칙:**
 
-| 외부 시스템 | 연동 파일 | 인증 | Phase |
-|------------|----------|------|-------|
-| Claude API | lib/llm/anthropic.ts | API Key (CredentialVault) | P0 |
-| GPT API | lib/llm/openai.ts | API Key (CredentialVault) | P0 |
-| Gemini API | lib/llm/google.ts | API Key (CredentialVault) | P0 |
-| KIS 증권 | tools/finance/kis-trading.ts | OAuth2 (CredentialVault) | Phase 2 |
-| 텔레그램 | routes/telegram.ts | Bot Token (CredentialVault) | Phase 2 |
-| Selenium | tools/marketing/sns-manager.ts | 세션 쿠키 | Phase 2 |
-| Neon PostgreSQL | db/schema.ts | Connection String (.env) | Epic 0 완료 |
+| 레이어 | 의존 가능 | 의존 금지 |
+|--------|----------|----------|
+| routes/ | middleware/, lib/, engine/(공개 2개만), db/ | engine/hooks/, services/(교체 대상) |
+| engine/ | db/scoped-query, db/logger, lib/websocket | routes/, middleware/, services/ |
+| engine/hooks/ | engine/types, db/logger, 외부 라이브러리 | 다른 hook, engine/agent-loop |
+| services/(불가침) | db/, lib/ | engine/ (독립 운영) |
+
+### Phase 1 Change Summary (S14, S17)
+
+| 구분 | 수 | 내역 |
+|------|----|------|
+| 새 파일 | ~20 | engine 7 + hooks 5 + call-agent + db 2 + error-codes + rate-limiter + hub.ts + 테스트 5 + sdk-mock + CI 2 |
+| 수정 파일 | ~9 | telegram + argos + agora + trading + chat.ts + error.ts + Dockerfile + .dockerignore + deploy.yml |
+| 삭제 파일 | 2 | agent-runner.ts + delegation-tracker.ts |
+| **총** | **~31** | 신규 ~375줄, 삭제 ~1,200줄 = **순 -825줄 (69% 삭제)** |
+
+### Phase 1 Regression Test Matrix (S15, S18)
+
+| 영역 | 테스트 방법 | 자동화 | 필수 |
+|------|-----------|--------|------|
+| 허브 채팅 SSE | API 통합 테스트 | ✅ CI | ✅ |
+| 3단계 핸드오프 | SDK 모킹 통합 | ✅ CI | ✅ |
+| Hook 파이프라인 순서 | 단위 테스트 | ✅ CI | ✅ |
+| getDB 테넌트 격리 | 통합 테스트 | ✅ CI | ✅ |
+| Soul 변수 치환 | 단위 테스트 | ✅ CI | ✅ |
+| SSE 이벤트 형식 호환 | 통합 테스트 | ✅ CI | ✅ |
+| AGORA 토론 | API 테스트 | ✅ CI | ✅ |
+| WebSocket 이벤트 | 통합 테스트 | ✅ CI | ✅ |
+| 텔레그램 봇 | **수동** (실제 봇) | ❌ | ⚠️ 배포 후 |
+| ARGOS 크론잡 | 수동 트리거 | ⚠️ 반자동 | ⚠️ 배포 후 |
+| 자동매매 | **수동** (실제 API) | ❌ | ⚠️ 배포 후 |
+| 기존 도구 125개 | 타입 체크 + 샘플 5개 | ⚠️ 부분 | ✅ |
+
+**CI 자동화: 8개, 수동: 3개, 반자동: 1개**
+
+### Requirements to Structure Mapping
+
+**Phase 1 (엔진):**
+
+| FR/NFR | 파일 위치 |
+|--------|----------|
+| FR1~10 Agent Execution | `engine/agent-loop.ts`, `engine/hooks/*`, `call-agent.ts` |
+| FR38 CLI 토큰 전파 | `engine/types.ts` (SessionContext.cliToken) |
+| FR4 N단계 핸드오프 | `tool-handlers/builtins/call-agent.ts` |
+| FR9 순환 감지 | `engine/types.ts` (visitedAgents), `call-agent.ts` |
+| SEC-1~6 보안 | `engine/hooks/*` |
+| NFR-SC1 동시 20세션 | `middleware/rate-limiter.ts` |
+| NFR-LOG1~3 로깅 | `db/logger.ts` |
+| D1 멀티테넌시 | `db/scoped-query.ts` |
+| D3 에러 코드 | `lib/error-codes.ts` |
+| NFR-O1 Graceful shutdown | `engine/agent-loop.ts` (세션 레지스트리) |
+
+### Cross-Cutting Concerns Mapping
+
+| 관심사 | 관련 파일 |
+|--------|----------|
+| CLI 토큰 전파 | `engine/types.ts` → `agent-loop.ts` → `call-agent.ts` → hooks |
+| 멀티테넌시 | `middleware/tenant.ts` → `db/scoped-query.ts` → 전체 라우트 |
+| 실시간 이벤트 | `engine/hooks/delegation-tracker.ts` → `lib/websocket.ts` → 프론트 stores |
+| 에러 투명성 | `lib/error-codes.ts` → `engine/sse-adapter.ts` → `app/lib/error-messages.ts` |
+| 비용 추적 | `engine/hooks/cost-tracker.ts` → DB → admin 대시보드 |
+
+### Weekly SDK Test CI (S8)
+
+```yaml
+# .github/workflows/weekly-sdk-test.yml
+name: Weekly SDK Integration Test
+on:
+  schedule:
+    - cron: '0 3 * * 1'  # 매주 월요일 03:00 UTC
+  workflow_dispatch: {}
+jobs:
+  sdk-test:
+    runs-on: self-hosted
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.CORTHEX_CLI_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: bun install
+      - run: bun test packages/server/src/__tests__/sdk/
+```
+
+보안: self-hosted runner (같은 VPS), GitHub Secrets 마스킹, 테스트 코드에서 토큰 로그 금지.
 
 ## Architecture Validation Results
 
-### Coherence Validation
+_Party Mode 3라운드, 13개 개선사항(V1~V13) 반영_
 
-**Decision Compatibility:**
-- 10개 핵심 결정 간 기술 충돌 없음
-- Hono(v4) + Bun(1.3.10) + Drizzle(v0.39) + Neon PostgreSQL: 검증된 조합 (Epic 0에서 201건 테스트 통과)
-- React(v19) + Vite(v6) + Tailwind(v4) + Zustand(v5) + TanStack Query(v5): 최신 안정 버전 호환
-- LLM SDK 3종(Anthropic/OpenAI/Google): 독립 어댑터 패턴으로 상호 간섭 없음
-- TypeScript strict 모드가 모든 패키지에 일관 적용
+### Coherence Validation ✅
 
-**Pattern Consistency:**
-- Naming Convention 12개 규칙이 모든 Decision/Structure에 일관 반영
-- API Response Format `{ success, data | error }`이 routes 전체에 통일
-- Error Handling: 서버(Hono 글로벌) + 오케스트레이션(graceful degradation) + 프론트(TanStack retry) 3계층 일관
-- State Management: Zustand(UI만) + TanStack Query(서버 데이터) + WebSocket(실시간 무효화) 경계 명확
-- Validation: Zod는 시스템 경계(API 입력)에서만 사용, 내부는 TypeScript 타입 -- 이중 검증 없음
+- **Decision Compatibility:** D1~D16 전부 호환. 충돌 없음.
+- **Pattern Consistency:** E1~E10 전부 SessionContext 기반 일관. Naming 체계 통일.
+- **Structure Alignment:** engine/ 위치 → SDK 의존성 server 국한. 타입 3파일 경계 명확.
 
-**Structure Alignment:**
-- 디렉토리 트리의 모든 파일이 Decision 1-10의 컴포넌트와 1:1 매핑
-- Component Boundaries 10개의 의존성이 Cross-Component Dependencies 테이블과 정확 일치
-- 5개 패키지(server/app/admin/ui/shared) 간 의존 방향: shared <- ui <- app/admin, shared <- server (순환 없음)
-- Phase 주석(P0/P1/Phase 2)이 PRD Phased Development 분류와 정확 일치
+### Requirements Coverage ✅
 
-### Requirements Coverage Validation
+- **FR 72개:** 68/72 Phase 1~4 커버 + 4개 Phase 5+ Deferred (차단 없음 — V2)
+- **NFR P0 19개:** 19/19 전부 커버 (보안 7개, 성능 3개, 확장성 4개, 외부 2개, 브라우저 1개, 운영 1개, 코드 1개)
+- **Phase 5+ Deferred:** D13(캐싱), D14(토큰 풀 — SessionContext 변경 주의), D15(크로스 프로바이더), D16(API 버저닝)
 
-**Functional Requirements Coverage (76 FRs):**
+### Implementation Readiness ✅
 
-| FR 영역 | FRs | 아키텍처 지원 | 검증 |
-|---------|-----|-------------|------|
-| 조직 관리 (FR1-12) | 12 | Decision 5 (OrganizationService + CascadeEngine), routes/departments, routes/agents | 완전 커버 |
-| 사령관실 (FR13-18) | 6 | Decision 1 (Orchestration), routes/commands, app/command-center | 완전 커버 |
-| 오케스트레이션 (FR19-25) | 7 | Decision 1+2 (Orchestrator + AgentRunner), #007/#010 반영 | 완전 커버 |
-| 도구 & LLM (FR26-34) | 9 | Decision 3+4 (LLMRouter + ToolPool), 3계급 모델 배정 | 완전 커버 |
-| 모니터링 & 비용 (FR35-41) | 7 | Decision 7+8 (CostTracker + WebSocket), app/dashboard | 완전 커버 |
-| 보안 & 멀티테넌시 (FR42-49) | 8 | Decision 9 (Tenant Isolation), middleware/auth+tenant, admin/* | 완전 커버 |
-| 품질 관리 (FR50-55) | 6 | Decision 6 (QualityGate), 5항목 루브릭 | 완전 커버 |
-| 투자 Phase 2 (FR56-62) | 7 | routes/strategy, tools/finance/*, Phase 2 표기 | 완전 커버 |
-| 협업 Phase 2/3 (FR63-76) | 14 | routes/debates+sketches+sns+cron+knowledge+telegram, Phase 2/3 표기 | 완전 커버 |
-| **합계** | **76** | | **76/76 = 100%** |
+- **Decision Completeness:** D1~D16 전부 선택+근거+코드 예시 ✅
+- **Pattern Completeness:** E1~E10 코드 예시 + Anti-Pattern 8개 ✅
+- **Structure Completeness:** 디렉토리 트리 + 호출자 6곳 + Phase 1 ~31파일 변경 ✅
 
-**CEO Ideas Coverage:**
+### Process Statistics (V9)
 
-| CEO 아이디어 | 아키텍처 반영 |
-|-------------|-------------|
-| #001 CIO+VECTOR | Decision 2 Agent 정의 + Phase 2 strategy 라우트 |
-| #004 예측 워크플로우 | Phase 2/3 workflow 페이지 |
-| #005 메모리 금지 | State Management 패턴: 서버 무상태 + DB 저장 원칙 |
-| #007 Manager=5번째 분석가 | Decision 1 Orchestration: Manager.synthesize() 자체 분석 포함 |
-| #010 비서실장=편집장 | Decision 1 Orchestration: ChiefOfStaff.review() 최종 검수 |
+| 항목 | 수치 |
+|------|------|
+| Steps | 7/7 완료 |
+| Party Mode 라운드 | **~32** (Step 2: 6, 3: 5, 4: 4, 5: 4, 6: 4, 7: 3 + 이전 세션 6) |
+| 개선사항 | **~54** (P1~P17 + S1~S19 + V1~V13 + 이전 5) |
+| 결정 | D1~D16 (16개) |
+| 패턴 | E1~E10 (10개) |
+| Anti-Pattern | 8개 |
 
-**Non-Functional Requirements Coverage (37 NFRs):**
+### Dependency Version Strategy (V1, V6)
 
-| NFR 카테고리 | 건수 | 아키텍처 대응 |
-|-------------|------|-------------|
-| Performance (7) | 7 | 단계별 타임아웃(60초/5분), WebSocket <500ms (EventBus), FCP <3초 (Vite+React) |
-| Security (7) | 7 | AES-256-GCM(CredentialVault), JWT(middleware/auth), companyId WHERE(tenant.ts), 로그 마스킹(Logging Pattern) |
-| Scalability (5) | 5 | Phase 1 단일 인스턴스, 부서 20/에이전트 100 한도(OrganizationService), WebSocket 50(EventBus) |
-| Reliability (6) | 6 | LLM fallback(LLMRouter), 도구 장애 격리(ToolPool), WebSocket 재연결 3초(use-websocket.ts) |
-| Integration (4) | 4 | Provider Adapter 패턴, KIS OAuth2(CredentialVault), 도구별 타임아웃(ToolPool) |
-| Cost Efficiency (4) | 4 | 3계급 모델 배정(Decision 3), Batch API(batch-collector.ts), 예산 자동 차단(CostTracker) |
-| Operability (4) | 4 | 조직 템플릿 2분(OrgTemplate), CI/CD 5분(deploy.yml), WebSocket 알림(EventBus) |
+- **0.x 패키지** (SDK `0.2.72`): exact pin, 수동 업데이트만
+- **1.x+ 패키지**: `^` 허용 + `bun.lockb` lockfile 커밋 (V11)
+- SDK 업데이트 절차: 릴리즈 노트 → PoC 8개 재실행 → 통과 시 bump
 
-### Implementation Readiness Validation
+### UX Handoff Items (V5, V7)
 
-**Decision Completeness:**
-- 10개 핵심 결정 모두 TypeScript 인터페이스/클래스 코드 예시 포함
-- 모델 매핑 테이블 6개 모델 + 가격 등급 명시
-- 구현 순서 10단계 의존성 기반 정렬 제공
-- Cross-Component Dependencies 테이블로 인터페이스 계약 명확
+UX Design 시작 시 입력으로 전달:
 
-**Structure Completeness:**
-- ~100개 파일의 완전한 디렉토리 트리 (파일명 + 주석 + Phase 표기)
-- 10개 컴포넌트 경계 테이블 (책임, 의존, 인터페이스 시그니처)
-- 7개 외부 연동 지점 (파일, 인증 방식, Phase 명시)
-- FR-to-Structure 매핑 9개 영역 x 3계층(서버/프론트/타입) 완비
-
-**Pattern Completeness:**
-- 12개 Naming Convention + 금지 예시
-- API Response/Error Handling/Validation 코드 예시
-- 8개 필수 준수 규칙 + 6개 Anti-Pattern
-- Import 순서, State Management, Logging 패턴 코드 수준 정의
-
-### Gap Analysis Results
-
-**Critical Gaps: 0건**
-- 구현 차단 요소 없음. 10개 결정이 76 FRs를 완전 커버.
-
-**Important Gaps: 0건**
-- 모든 패턴에 코드 예시 제공. 컴포넌트 경계와 인터페이스 명확.
-
-**Nice-to-Have (향후 개선 가능):**
-1. Phase 2 도구 125+개의 개별 파라미터 스키마 -- 구현 시 점진 정의
-2. WebSocket 이벤트 페이로드 상세 타입 -- ws-events.ts에서 구현 시 확정
-3. models.yaml 실제 가격 데이터 -- 구현 시 최신 가격 반영
-4. quality_rules.yaml 상세 규칙 -- P1에서 도메인별 규칙 정의
-
-> 모두 구현 단계에서 자연스럽게 해결되는 항목. 아키텍처 결정 수준에서는 불필요.
-
-### Validation Issues Addressed
-
-이슈 없음. 6개 스텝 모두 Reviewer 3라운드 PASS (총 18라운드, 0건 major issue).
+| 아키텍처 결정 | UX 영향 |
+|-------------|--------|
+| SSE 6개 이벤트 (E5) | accepted→processing→handoff→message→error→done UI 상태 설계 |
+| 비서 유무 분기 | 허브 레이아웃 2종 (채팅만 vs 에이전트 선택+채팅) |
+| 에이전트 50+ 그룹핑 | 부서별 + lastUsedAt 정렬 UI |
+| 핸드오프 추적 | 실시간 from→to 트래커 표시 |
+| 에러 투명성 | 핸드오프 실패 시 사용자 명시적 표시 |
+| Phase 1 순차 핸드오프 | 병렬 분기 UI는 Phase 2+ |
 
 ### Architecture Completeness Checklist
 
-**Requirements Analysis**
-- [x] 프로젝트 컨텍스트 분석 (76 FRs + 37 NFRs + 7 Cross-Cutting)
-- [x] 규모 및 복잡도 평가 (~35 서버 모듈 + ~50 프론트 컴포넌트)
-- [x] 기술 제약 식별 (Epic 0 + 외부 의존성 + #005 원칙)
-- [x] Cross-Cutting Concerns 매핑 (7개)
+**✅ Step 2 — Requirements Analysis**
+- [x] 72 FR + 61 NFR 분석
+- [x] 인프라 24GB RAM, 4코어 ARM64
+- [x] 동시 세션 20 용량 분석
+- [x] 교차 관심사 6개
 
-**Architectural Decisions**
-- [x] 핵심 결정 10개 문서화 (버전 + 코드 예시)
-- [x] 기술 스택 완전 명세 (Runtime + Server + Frontend + Testing)
-- [x] 통합 패턴 정의 (LLM Adapter + Tool Registry + EventBus)
-- [x] 성능 고려 반영 (타임아웃, fallback, Batch API)
+**✅ Step 3 — Starter Template**
+- [x] 브라운필드 + 기존 스택
+- [x] Phase별 신규 의존성 15개
+- [x] 코드 처분 매트릭스
 
-**Implementation Patterns**
-- [x] Naming Convention 확립 (12개 규칙)
-- [x] 구조 패턴 정의 (디렉토리 트리 + 컴포넌트 경계)
-- [x] 통신 패턴 명세 (API Response + WebSocket 7채널 + Error Handling)
-- [x] 프로세스 패턴 문서화 (Validation + Logging + State Management)
+**✅ Step 4 — Decisions**
+- [x] D1~D16 (Critical 6 + Important 6 + Deferred 4)
 
-**Project Structure**
-- [x] 완전한 디렉토리 구조 정의 (~100파일)
-- [x] 컴포넌트 경계 확립 (10개)
-- [x] 통합 지점 매핑 (7개 외부 시스템)
-- [x] 요구사항-구조 매핑 완료 (9 영역 x 3 계층)
+**✅ Step 5 — Patterns**
+- [x] E1~E10 + Anti-Pattern 8개
+- [x] 에러 코드 레지스트리 + 타입 경계 맵
 
-### Architecture Readiness Assessment
+**✅ Step 6 — Structure**
+- [x] 완전한 디렉토리 트리
+- [x] 호출자 6곳 + 회귀 테스트 매트릭스
+- [x] Phase 1: ~31파일, 순 -825줄
 
-**Overall Status:** READY FOR IMPLEMENTATION
+**✅ Step 7 — Validation**
+- [x] 전체 결정 호환성 검증
+- [x] FR 72개 + NFR P0 19개 커버리지
+- [x] 방어선 다중 확인 (CI + tsc + 코드리뷰)
 
-**Confidence Level:** HIGH
+### Readiness Assessment
 
-**Key Strengths:**
-1. Epic 0 Foundation 위에 구축 -- 201건 테스트 통과된 기반 코드 존재
-2. 10개 핵심 결정 모두 TypeScript 인터페이스 + 코드 예시 제공 -- AI 에이전트 즉시 구현 가능
-3. 구현 순서 10단계가 의존성 기반으로 정렬 -- 병렬 작업 충돌 방지
-4. Phase 구분(P0/P1/Phase 2/3)이 디렉토리 주석에 명시 -- 스프린트 계획 직접 활용
-5. v1 핵심 기능(오케스트레이션, 도구, LLM, 품질, 비용) 전부 아키텍처 지원 확인
+**Overall: READY FOR IMPLEMENTATION**
 
-**Areas for Future Enhancement:**
-1. 수평 확장 전략 (Phase 3 -- 멀티 인스턴스/로드 밸런싱)
-2. 벡터 DB 선택 (Phase 2 -- RAG/정보국용)
-3. 에이전트 마켓플레이스 아키텍처 (Phase 3)
-4. 사내 메신저 실시간 아키텍처 (Phase 3)
+**Confidence: HIGH** — 32라운드 파티, 54개 개선사항, PoC 8/8 검증 완료
 
-### Implementation Handoff
+**ROI (V13):** 코드 69% 감소 (1,200줄→375줄) + 기능 100% 유지 + 보안 강화 + 확장성 추가
 
-**AI Agent Guidelines:**
-- 모든 아키텍처 결정을 문서 그대로 구현할 것
-- Implementation Patterns의 8개 필수 규칙 + 6개 Anti-Pattern 엄수
-- 프로젝트 구조와 컴포넌트 경계 준수
-- 아키텍처 질문은 이 문서를 최우선 참조
+### Post-Architecture Actions (V3, V10)
 
-**First Implementation Priority:**
-구현 순서 Decision Impact Analysis 기준:
-1. 테넌트 격리 미들웨어 (모든 API 기반)
-2. 데이터 아키텍처 (스키마 + 마이그레이션)
-3. 동적 조직 관리 (부서/에이전트 CRUD + cascade)
-4. LLM 프로바이더 라우터
-5. 에이전트 실행 모델 (AgentRunner)
+**즉시 실행 (아키텍처 완료의 일부):**
+1. ~~CLAUDE.md Engine Patterns 추가~~ → 이 커밋에 포함
+2. PRD 메모리 스펙 수정 — NFR-SC1(10→20), NFR-SC2(50→200MB), NFR-SC7(3→16GB), OPS-1(10→20), "4GB"→"24GB ARM64 4코어"
+
+**다음 Pipeline 단계:**
+1. UX Design → `/bmad-bmm-create-ux-design` (UX Handoff Items 참조)
+2. Epics & Stories → `/bmad-bmm-create-epics-and-stories`
+3. Phase 1 첫 스토리: 의존성 검증 (bun.lockb 추적 확인 포함 — V11)
