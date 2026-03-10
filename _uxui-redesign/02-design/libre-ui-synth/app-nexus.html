@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>조직도 (Nexus) — CORTHEX v2</title>
+  <!-- API: GET /api/workspace/nexus/org -->
+  <!-- API: GET /api/workspace/nexus/layout -->
+  <!-- API: PUT /api/workspace/nexus/layout -->
+  <!-- API: GET /api/workspace/agents/{id} -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    h1,h2,h3,h4,h5,h6,.font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
+    code,pre,.font-mono { font-family: 'JetBrains Mono', monospace; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #f5f5f4; }
+    ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }
+  </style>
+</head>
+<body class="bg-stone-50">
+
+<!-- ===== SIDEBAR ===== -->
+<aside class="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-10">
+
+  <!-- Logo -->
+  <div class="px-5 py-4 border-b border-stone-200 flex-shrink-0">
+    <div class="flex items-center gap-2.5">
+      <div class="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
+        <i data-lucide="zap" class="w-4 h-4 text-white"></i>
+      </div>
+      <span class="text-sm font-bold text-stone-900" style="font-family:'Plus Jakarta Sans',sans-serif">CORTHEX</span>
+      <span class="text-[10px] text-stone-400 ml-0.5" style="font-family:'JetBrains Mono',monospace">v2</span>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-5">
+
+    <div>
+      <p class="px-2 mb-1.5 text-[11px] font-semibold uppercase tracking-widest text-stone-500">워크스페이스</p>
+      <ul class="space-y-0.5">
+        <li><a href="app-home.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors duration-150"><i data-lucide="home" class="w-4 h-4 flex-shrink-0"></i>홈</a></li>
+        <li><a href="app-command-center.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors duration-150"><i data-lucide="terminal" class="w-4 h-4 flex-shrink-0"></i>커맨드 센터</a></li>
+        <li><a href="app-chat.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors duration-150"><i data-lucide="message-square" class="w-4 h-4 flex-shrink-0"></i>AI 채팅</a></li>
+        <li><a href="app-dashboard.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors duration-150"><i data-lucide="layout-dashboard" class="w-4 h-4 flex-shrink-0"></i>대시보드</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <p class="px-2 mb-1.5 text-[11px] font-semibold uppercase tracking-widest text-stone-500">조직</p>
+      <ul class="space-y-0.5">
+        <li><a href="app-agents.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors duration-150"><i data-lucide="bot" class="w-4 h-4 flex-shrink-0"></i>에이전트</a></li>
+        <li><a href="app-departments.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors duration-150"><i data-lucide="building-2" class="w-4 h-4 flex-shrink-0"></i>부서</a></li>
+        <li><a href="app-nexus.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm bg-violet-50 text-violet-700 font-medium"><i data-lucide="git-branch" class="w-4 h-4 flex-shrink-0"></i>조직도 (Nexus)</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <p class="px-2 mb-1.5 text-[11px] font-semibold uppercase tracking-widest text-stone-500">업무도구</p>
+      <ul class="space-y-0.5">
+        <li><a href="app-trading.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors duration-150"><i data-lucide="trending-up" class="w-4 h-4 flex-shrink-0"></i>트레이딩</a></li>
+        <li><a href="app-agora.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors duration-150"><i data-lucide="users" class="w-4 h-4 flex-shrink-0"></i>Agora</a></li>
+        <li><a href="app-sns.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors duration-150"><i data-lucide="share-2" class="w-4 h-4 flex-shrink-0"></i>SNS</a></li>
+        <li><a href="app-messenger.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors duration-150"><i data-lucide="send" class="w-4 h-4 flex-shrink-0"></i>메신저</a></li>
+        <li><a href="app-knowledge.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors duration-150"><i data-lucide="book-open" class="w-4 h-4 flex-shrink-0"></i>지식베이스</a></li>
+        <li><a href="app-files.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors duration-150"><i data-lucide="folder" class="w-4 h-4 flex-shrink-0"></i>파일</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <p class="px-2 mb-1.5 text-[11px] font-semibold uppercase tracking-widest text-stone-500">기록 &amp; 분석</p>
+      <ul class="space-y-0.5">
+        <li><a href="app-reports.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors duration-150"><i data-lucide="bar-chart-2" class="w-4 h-4 flex-shrink-0"></i>리포트</a></li>
+        <li><a href="app-ops-log.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors duration-150"><i data-lucide="scroll-text" class="w-4 h-4 flex-shrink-0"></i>운영 로그</a></li>
+        <li><a href="app-jobs.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors duration-150"><i data-lucide="list-checks" class="w-4 h-4 flex-shrink-0"></i>작업 현황</a></li>
+        <li><a href="app-costs.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors duration-150"><i data-lucide="credit-card" class="w-4 h-4 flex-shrink-0"></i>비용</a></li>
+        <li><a href="app-activity-log.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors duration-150"><i data-lucide="activity" class="w-4 h-4 flex-shrink-0"></i>활동 로그</a></li>
+        <li><a href="app-performance.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors duration-150"><i data-lucide="gauge" class="w-4 h-4 flex-shrink-0"></i>성과 분석</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <p class="px-2 mb-1.5 text-[11px] font-semibold uppercase tracking-widest text-stone-500">설정</p>
+      <ul class="space-y-0.5">
+        <li><a href="app-argos.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors duration-150"><i data-lucide="eye" class="w-4 h-4 flex-shrink-0"></i>Argos 모니터링</a></li>
+        <li><a href="app-classified.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors duration-150"><i data-lucide="shield" class="w-4 h-4 flex-shrink-0"></i>기밀</a></li>
+        <li><a href="app-credentials.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors duration-150"><i data-lucide="key" class="w-4 h-4 flex-shrink-0"></i>크리덴셜</a></li>
+        <li><a href="app-notifications.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors duration-150"><i data-lucide="bell" class="w-4 h-4 flex-shrink-0"></i>알림</a></li>
+        <li><a href="app-settings.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors duration-150"><i data-lucide="settings" class="w-4 h-4 flex-shrink-0"></i>설정</a></li>
+      </ul>
+    </div>
+
+  </nav>
+
+  <!-- User Profile -->
+  <div class="px-4 py-4 border-t border-stone-200 flex-shrink-0">
+    <div class="flex items-center gap-2.5">
+      <div class="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center text-violet-700 text-xs font-bold flex-shrink-0">김</div>
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-medium text-stone-900 truncate">김대표</p>
+        <p class="text-xs text-stone-500 truncate">CEO · ACME Corp</p>
+      </div>
+      <button class="text-stone-400 hover:text-stone-600 transition-colors">
+        <i data-lucide="chevrons-up-down" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<!-- ===== MAIN CONTENT ===== -->
+<main class="ml-60 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="h-14 bg-white border-b border-stone-200 flex items-center justify-between px-6 sticky top-0 z-10 flex-shrink-0">
+    <h1 class="text-base font-semibold text-stone-900" style="font-family:'Plus Jakarta Sans',sans-serif">조직도 (Nexus)</h1>
+    <div class="flex items-center gap-2">
+      <button class="flex items-center gap-1.5 text-stone-600 hover:bg-stone-100 rounded-lg px-3 py-1.5 text-sm transition-colors">
+        <i data-lucide="zoom-out" class="w-3.5 h-3.5"></i>
+      </button>
+      <span class="text-xs text-stone-400 font-mono">100%</span>
+      <button class="flex items-center gap-1.5 text-stone-600 hover:bg-stone-100 rounded-lg px-3 py-1.5 text-sm transition-colors">
+        <i data-lucide="zoom-in" class="w-3.5 h-3.5"></i>
+      </button>
+      <div class="w-px h-5 bg-stone-200 mx-1"></div>
+      <button class="flex items-center gap-1.5 bg-white border border-stone-200 hover:border-stone-300 text-stone-700 rounded-lg px-4 py-2 text-sm font-medium transition-colors">
+        <i data-lucide="layout-template" class="w-3.5 h-3.5"></i>
+        레이아웃 자동 정렬
+      </button>
+      <button class="flex items-center gap-1.5 bg-violet-600 hover:bg-violet-700 text-white rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-150">
+        <i data-lucide="save" class="w-4 h-4"></i>
+        저장
+      </button>
+    </div>
+  </header>
+
+  <!-- Guide Banner -->
+  <div class="mx-6 mt-4 flex items-center gap-2 bg-blue-50 border border-blue-100 rounded-lg px-4 py-2.5 flex-shrink-0">
+    <i data-lucide="info" class="w-4 h-4 text-blue-500 flex-shrink-0"></i>
+    <p class="text-xs text-blue-700">조직도를 드래그하여 재배치할 수 있어요. 실제 구현에서는 인터랙티브 캔버스로 동작합니다.</p>
+  </div>
+
+  <!-- Main canvas + right panel -->
+  <div class="flex flex-1 gap-0 p-6 pt-4">
+
+    <!-- ── ORG CHART CANVAS ── -->
+    <div class="flex-1 bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden relative" style="min-height:600px">
+
+      <!-- Grid background pattern -->
+      <svg class="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+            <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#f0efee" stroke-width="0.8"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#grid)" />
+
+        <!-- ─── SVG Connection Lines ─── -->
+        <!-- ACME Corp → 비서실 -->
+        <line x1="430" y1="100" x2="430" y2="148" stroke="#e2e0de" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <!-- 비서실 → Departments (horizontal bus) -->
+        <line x1="160" y1="250" x2="700" y2="250" stroke="#e2e0de" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <!-- verticals from bus to each dept -->
+        <line x1="160" y1="250" x2="160" y2="310" stroke="#e2e0de" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <line x1="310" y1="250" x2="310" y2="310" stroke="#e2e0de" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <line x1="460" y1="250" x2="460" y2="310" stroke="#e2e0de" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <line x1="610" y1="250" x2="610" y2="310" stroke="#e2e0de" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <line x1="760" y1="250" x2="760" y2="310" stroke="#e2e0de" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <!-- bus → 비서실 bottom -->
+        <line x1="430" y1="200" x2="430" y2="250" stroke="#e2e0de" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+        <!-- agent connectors from 마케팅 -->
+        <line x1="285" y1="390" x2="285" y2="430" stroke="#e2e0de" stroke-width="1" stroke-dasharray="3,3"/>
+        <line x1="335" y1="390" x2="335" y2="430" stroke="#e2e0de" stroke-width="1" stroke-dasharray="3,3"/>
+        <!-- agent connectors from 전략투자 -->
+        <line x1="435" y1="390" x2="435" y2="430" stroke="#e2e0de" stroke-width="1" stroke-dasharray="3,3"/>
+        <line x1="485" y1="390" x2="485" y2="430" stroke="#e2e0de" stroke-width="1" stroke-dasharray="3,3"/>
+      </svg>
+
+      <!-- ── Level 0: ACME Corp ── -->
+      <div class="absolute" style="left:340px;top:48px;width:180px">
+        <div class="bg-white border-2 border-violet-400 rounded-xl px-4 py-3 shadow-md text-center">
+          <div class="w-8 h-8 bg-violet-600 rounded-lg mx-auto mb-2 flex items-center justify-center">
+            <i data-lucide="building" class="w-4 h-4 text-white"></i>
+          </div>
+          <p class="text-sm font-bold text-stone-900" style="font-family:'Plus Jakarta Sans',sans-serif">ACME Corp</p>
+          <p class="text-[11px] text-stone-500 mt-0.5">김대표 · CEO</p>
+        </div>
+      </div>
+
+      <!-- ── Level 1: 비서실 ── -->
+      <div class="absolute" style="left:350px;top:150px;width:160px">
+        <div class="bg-violet-50 border border-violet-200 rounded-xl px-3 py-2.5 shadow-sm text-center hover:border-violet-400 transition-colors cursor-pointer">
+          <div class="flex items-center justify-center gap-1.5 mb-1">
+            <span class="text-base">🏢</span>
+            <p class="text-xs font-bold text-violet-800" style="font-family:'Plus Jakarta Sans',sans-serif">비서실</p>
+          </div>
+          <div class="flex items-center justify-center gap-1 mt-1">
+            <div class="w-4 h-4 rounded-full bg-violet-200 border border-white flex items-center justify-center text-[8px] font-bold text-violet-800">이나</div>
+            <p class="text-[10px] text-violet-600">에이전트 2명</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Level 2: Department boxes ── -->
+
+      <!-- 마케팅부서 -->
+      <div class="absolute" style="left:100px;top:312px;width:130px">
+        <div class="bg-blue-50 border border-blue-200 rounded-xl px-3 py-2.5 shadow-sm text-center hover:border-blue-400 transition-colors cursor-pointer">
+          <div class="flex items-center justify-center gap-1 mb-1">
+            <span class="text-sm">📢</span>
+            <p class="text-[11px] font-bold text-blue-800" style="font-family:'Plus Jakarta Sans',sans-serif">마케팅</p>
+          </div>
+          <p class="text-[10px] text-blue-600">5명</p>
+        </div>
+      </div>
+
+      <!-- 전략투자부서 -->
+      <div class="absolute" style="left:250px;top:312px;width:130px">
+        <div class="bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2.5 shadow-sm text-center hover:border-emerald-400 transition-colors cursor-pointer">
+          <div class="flex items-center justify-center gap-1 mb-1">
+            <span class="text-sm">💹</span>
+            <p class="text-[11px] font-bold text-emerald-800" style="font-family:'Plus Jakarta Sans',sans-serif">전략투자</p>
+          </div>
+          <p class="text-[10px] text-emerald-600">4명</p>
+        </div>
+      </div>
+
+      <!-- 법무부서 -->
+      <div class="absolute" style="left:400px;top:312px;width:130px">
+        <div class="bg-amber-50 border border-amber-200 rounded-xl px-3 py-2.5 shadow-sm text-center hover:border-amber-400 transition-colors cursor-pointer">
+          <div class="flex items-center justify-center gap-1 mb-1">
+            <span class="text-sm">⚖️</span>
+            <p class="text-[11px] font-bold text-amber-800" style="font-family:'Plus Jakarta Sans',sans-serif">법무</p>
+          </div>
+          <p class="text-[10px] text-amber-600">3명</p>
+        </div>
+      </div>
+
+      <!-- 연구개발부서 -->
+      <div class="absolute" style="left:550px;top:312px;width:130px">
+        <div class="bg-rose-50 border border-rose-200 rounded-xl px-3 py-2.5 shadow-sm text-center hover:border-rose-400 transition-colors cursor-pointer">
+          <div class="flex items-center justify-center gap-1 mb-1">
+            <span class="text-sm">🔬</span>
+            <p class="text-[11px] font-bold text-rose-800" style="font-family:'Plus Jakarta Sans',sans-serif">연구개발</p>
+          </div>
+          <p class="text-[10px] text-rose-600">4명</p>
+        </div>
+      </div>
+
+      <!-- 비서실 직속 에이전트 -->
+      <div class="absolute" style="left:700px;top:312px;width:130px">
+        <div class="bg-violet-50 border border-violet-200 rounded-xl px-3 py-2.5 shadow-sm text-center hover:border-violet-400 transition-colors cursor-pointer">
+          <div class="flex items-center justify-center gap-1 mb-1">
+            <span class="text-sm">🏢</span>
+            <p class="text-[11px] font-bold text-violet-800" style="font-family:'Plus Jakarta Sans',sans-serif">비서실 직속</p>
+          </div>
+          <p class="text-[10px] text-violet-600">2명</p>
+        </div>
+      </div>
+
+      <!-- ── Level 3: Agent Cards (마케팅 소속) ── -->
+      <div class="absolute" style="left:100px;top:430px;width:118px">
+        <div class="bg-white border border-stone-200 rounded-lg px-2.5 py-2 shadow-sm hover:border-violet-300 hover:shadow-md transition-all cursor-pointer" onclick="selectAgent('박준형')">
+          <div class="flex items-center gap-1.5">
+            <div class="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-[8px] font-bold flex-shrink-0">박준</div>
+            <div class="min-w-0">
+              <p class="text-[11px] font-semibold text-stone-900 truncate">박준형</p>
+              <p class="text-[10px] text-stone-500 truncate">마케팅팀장</p>
+            </div>
+          </div>
+          <div class="mt-1.5 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-orange-400 inline-block"></span>
+            <span class="text-[10px] text-stone-500">작업중</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="absolute" style="left:228px;top:430px;width:118px">
+        <div class="bg-white border border-stone-200 rounded-lg px-2.5 py-2 shadow-sm hover:border-violet-300 hover:shadow-md transition-all cursor-pointer" onclick="selectAgent('최민지')">
+          <div class="flex items-center gap-1.5">
+            <div class="w-5 h-5 rounded-full bg-rose-100 flex items-center justify-center text-rose-700 text-[8px] font-bold flex-shrink-0">최민</div>
+            <div class="min-w-0">
+              <p class="text-[11px] font-semibold text-stone-900 truncate">최민지</p>
+              <p class="text-[10px] text-stone-500 truncate">카피라이터</p>
+            </div>
+          </div>
+          <div class="mt-1.5 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-orange-400 inline-block"></span>
+            <span class="text-[10px] text-stone-500">작업중</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agent Cards (전략투자 소속) -->
+      <div class="absolute" style="left:356px;top:430px;width:118px">
+        <div class="bg-white border border-stone-200 rounded-lg px-2.5 py-2 shadow-sm hover:border-violet-300 hover:shadow-md transition-all cursor-pointer" onclick="selectAgent('김재원')">
+          <div class="flex items-center gap-1.5">
+            <div class="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 text-[8px] font-bold flex-shrink-0">김재</div>
+            <div class="min-w-0">
+              <p class="text-[11px] font-semibold text-stone-900 truncate">김재원</p>
+              <p class="text-[10px] text-stone-500 truncate">투자분석가</p>
+            </div>
+          </div>
+          <div class="mt-1.5 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+            <span class="text-[10px] text-stone-500">온라인</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="absolute" style="left:484px;top:430px;width:118px">
+        <div class="bg-white border border-stone-200 rounded-lg px-2.5 py-2 shadow-sm hover:border-violet-300 hover:shadow-md transition-all cursor-pointer" onclick="selectAgent('정도현')">
+          <div class="flex items-center gap-1.5">
+            <div class="w-5 h-5 rounded-full bg-stone-100 flex items-center justify-center text-stone-500 text-[8px] font-bold flex-shrink-0">정도</div>
+            <div class="min-w-0">
+              <p class="text-[11px] font-semibold text-stone-700 truncate">정도현</p>
+              <p class="text-[10px] text-stone-400 truncate">데이터분석가</p>
+            </div>
+          </div>
+          <div class="mt-1.5 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-stone-400 inline-block"></span>
+            <span class="text-[10px] text-stone-400">오프라인</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agent (비서실 직속 이나경) -->
+      <div class="absolute" style="left:700px;top:430px;width:118px">
+        <div class="bg-white border-2 border-violet-200 rounded-lg px-2.5 py-2 shadow-sm hover:border-violet-400 hover:shadow-md transition-all cursor-pointer" onclick="selectAgent('이나경')">
+          <div class="flex items-center gap-1.5">
+            <div class="w-5 h-5 rounded-full bg-violet-100 flex items-center justify-center text-violet-700 text-[8px] font-bold flex-shrink-0">이나</div>
+            <div class="min-w-0">
+              <p class="text-[11px] font-semibold text-stone-900 truncate">이나경</p>
+              <p class="text-[10px] text-stone-500 truncate">비서실장</p>
+            </div>
+          </div>
+          <div class="mt-1.5 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+            <span class="text-[10px] text-stone-500">온라인</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Legend (bottom left) -->
+      <div class="absolute bottom-4 left-4 bg-white border border-stone-200 rounded-lg px-3 py-2.5 shadow-sm">
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-stone-500 mb-2">범례</p>
+        <div class="space-y-1.5">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+            <span class="text-[11px] text-stone-600">Online</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-orange-400 inline-block"></span>
+            <span class="text-[11px] text-stone-600">Working</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span>
+            <span class="text-[11px] text-stone-600">Error</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-stone-400 inline-block"></span>
+            <span class="text-[11px] text-stone-600">Offline</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /canvas -->
+
+    <!-- ── RIGHT PANEL: Selected Node Info ── -->
+    <div class="w-60 flex-shrink-0 ml-4 flex flex-col gap-3" id="rightPanel">
+
+      <!-- Selected Agent Info Card -->
+      <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-4" id="agentPanel">
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-stone-500 mb-3">선택된 노드</p>
+
+        <!-- Agent Avatar + Name -->
+        <div class="flex flex-col items-center text-center mb-4">
+          <div class="w-14 h-14 rounded-full bg-violet-100 flex items-center justify-center text-violet-700 text-lg font-bold mb-2">이나</div>
+          <h3 class="text-sm font-bold text-stone-900" style="font-family:'Plus Jakarta Sans',sans-serif">이나경</h3>
+          <p class="text-xs text-stone-500">비서실장</p>
+          <span class="mt-2 inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 rounded-full px-2.5 py-0.5 text-xs font-medium">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+            온라인
+          </span>
+        </div>
+
+        <!-- Info rows -->
+        <div class="space-y-2 mb-4">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] text-stone-500">계급</span>
+            <span class="text-xs font-medium text-violet-700 bg-violet-50 px-2 py-0.5 rounded-full">Manager</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] text-stone-500">소속</span>
+            <span class="text-xs text-stone-700">비서실</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] text-stone-500">오늘 작업</span>
+            <span class="text-xs font-semibold text-stone-900">12건</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] text-stone-500">성공률</span>
+            <span class="text-xs font-semibold text-emerald-600">97%</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] text-stone-500">모델</span>
+            <span class="text-[10px] text-stone-600" style="font-family:'JetBrains Mono',monospace">claude-3-5-sonnet</span>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <button class="w-full flex items-center justify-center gap-1.5 bg-violet-600 hover:bg-violet-700 text-white rounded-lg px-3 py-2 text-xs font-semibold transition-all duration-150">
+            <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> 채팅하기
+          </button>
+          <button class="w-full flex items-center justify-center gap-1.5 bg-white border border-stone-200 hover:border-stone-300 text-stone-700 rounded-lg px-3 py-2 text-xs font-medium transition-colors">
+            <i data-lucide="pencil" class="w-3.5 h-3.5"></i> 편집
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-4">
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-stone-500 mb-3">조직 요약</p>
+        <div class="space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-stone-600">전체 에이전트</span>
+            <span class="text-xs font-bold text-stone-900">24</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-stone-600">온라인</span>
+            <span class="text-xs font-semibold text-emerald-600">8</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-stone-600">작업중</span>
+            <span class="text-xs font-semibold text-orange-600">5</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-stone-600">오프라인</span>
+            <span class="text-xs font-semibold text-stone-500">11</span>
+          </div>
+          <div class="h-px bg-stone-100"></div>
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-stone-600">부서 수</span>
+            <span class="text-xs font-bold text-stone-900">5</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /right panel -->
+
+  </div><!-- /flex main area -->
+
+</main>
+
+<script>
+  lucide.createIcons();
+  function selectAgent(name) {
+    // In the real implementation, this would update the right panel via API.
+    console.log('Selected agent:', name);
+  }
+</script>
+</body>
+</html>

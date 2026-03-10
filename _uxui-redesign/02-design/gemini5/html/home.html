@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORTHEX v2 - Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"
+        rel="stylesheet" crossorigin="anonymous">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mono: {
+                            900: '#000000',
+                            800: '#111111',
+                            500: '#666666',
+                            400: '#999999',
+                            100: '#eeeeee',
+                            50: '#ffffff',
+                        },
+                        status: {
+                            red: '#ff3b30',
+                            green: '#34c759'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Satoshi', 'Pretendard', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+                    },
+                    fontSize: {
+                        'hero': ['4rem', { lineHeight: '1', letterSpacing: '-0.05em', fontWeight: '900' }],
+                        'display': ['2.5rem', { lineHeight: '1.1', letterSpacing: '-0.04em', fontWeight: '800' }],
+                        'h1': ['2rem', { lineHeight: '1.2', letterSpacing: '-0.03em', fontWeight: '700' }],
+                        'h2': ['1.5rem', { lineHeight: '1.3', letterSpacing: '-0.02em', fontWeight: '600' }],
+                        'h3': ['1.25rem', { lineHeight: '1.4', letterSpacing: '-0.01em', fontWeight: '600' }],
+                        'body-l': ['1.125rem', { lineHeight: '1.6', letterSpacing: '0', fontWeight: '500' }],
+                        'body': ['1rem', { lineHeight: '1.6', letterSpacing: '0', fontWeight: '400' }],
+                        'body-s': ['0.875rem', { lineHeight: '1.5', letterSpacing: '0.01em', fontWeight: '400' }],
+                        'caption': ['0.75rem', { lineHeight: '1.4', letterSpacing: '0.05em', fontWeight: '500' }],
+                    },
+                    spacing: {
+                        'section': '8rem',
+                        'block': '4rem',
+                        'item': '2rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex">
+
+    <!-- Sidebar Navigation (Typography Focused) -->
+    <nav class="w-64 border-r border-mono-800 p-8 flex flex-col justify-between shrink-0 h-screen sticky top-0">
+        <div>
+            <div class="text-h2 font-bold tracking-tighter mb-16">CORTHEX</div>
+
+            <ul class="space-y-6">
+                <!-- API: N/A - Local Navigation -->
+                <li><a href="home.html" class="text-mono-50 font-bold tracking-tight">Home</a></li>
+                <li><a href="command-center.html"
+                        class="text-mono-500 hover:text-mono-100 transition-colors tracking-tight">Command Center</a>
+                </li>
+                <li><a href="chat.html"
+                        class="text-mono-500 hover:text-mono-100 transition-colors tracking-tight">Chat</a></li>
+                <li><a href="dashboard.html"
+                        class="text-mono-500 hover:text-mono-100 transition-colors tracking-tight">Dashboard</a></li>
+
+                <li class="pt-8 text-caption text-mono-600 uppercase tracking-widest">Workspace</li>
+                <li><a href="trading.html"
+                        class="text-mono-500 hover:text-mono-100 transition-colors tracking-tight">Trading</a></li>
+                <li><a href="agora.html"
+                        class="text-mono-500 hover:text-mono-100 transition-colors tracking-tight">Agora</a></li>
+                <li><a href="nexus.html"
+                        class="text-mono-500 hover:text-mono-100 transition-colors tracking-tight">Nexus</a></li>
+                <li><a href="agents.html"
+                        class="text-mono-500 hover:text-mono-100 transition-colors tracking-tight">Agents</a></li>
+            </ul>
+        </div>
+
+        <div class="space-y-4">
+            <!-- API: GET /api/auth/me -->
+            <div class="text-mono-400 text-body-s">ubuntu@corthex.com</div>
+            <div class="flex items-center gap-2 text-mono-600 text-caption font-mono uppercase tracking-widest">
+                <span class="w-1.5 h-1.5 rounded-full bg-status-green animate-pulse"></span>
+                System Core Online
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1 px-16 py-12 lg:px-32 max-w-[1400px]">
+
+        <header class="mb-section pt-16">
+            <!-- API: GET /api/workspace/dashboard/summary (Partial) -->
+            <div class="text-mono-500 text-caption tracking-widest uppercase mb-6">workspace overview</div>
+            <h1 class="text-hero leading-tight">김대표님,<br>오늘의 작전 통제소입니다.</h1>
+        </header>
+
+        <!-- Quick Layout (No Cards, Margin Based) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
+
+            <!-- Left Column: Actions -->
+            <div class="lg:col-span-8 flex flex-col gap-block">
+
+                <section>
+                    <h2 class="text-mono-600 text-caption tracking-widest uppercase mb-8">Quick Commands</h2>
+                    <div class="space-y-4">
+                        <a href="command-center.html" class="block group">
+                            <h3
+                                class="text-display font-medium text-mono-400 group-hover:text-mono-50 transition-colors inline-block">
+                                전체 시황 브리핑</h3>
+                            <span
+                                class="text-display font-medium text-mono-600 opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-4 inline-block">→</span>
+                        </a>
+                        <a href="command-center.html" class="block group">
+                            <h3
+                                class="text-display font-medium text-mono-400 group-hover:text-mono-50 transition-colors inline-block">
+                                기술 블로그 초안 작성</h3>
+                            <span
+                                class="text-display font-medium text-mono-600 opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-4 inline-block">→</span>
+                        </a>
+                        <!-- API: PUT /api/workspace/dashboard/quick-actions -->
+                        <button class="block mt-8 text-body-l text-mono-500 hover:text-mono-100 transition-colors">
+                            + 새로운 빠른 실행 추가
+                        </button>
+                    </div>
+                </section>
+
+                <section class="border-t border-mono-800 pt-block">
+                    <!-- API: GET /api/workspace/notifications (Limit 3) -->
+                    <h2 class="text-mono-600 text-caption tracking-widest uppercase mb-8">Recent Intel</h2>
+                    <ul class="space-y-6">
+                        <li
+                            class="flex justify-between items-baseline group cursor-pointer border-b border-mono-800/30 pb-4">
+                            <div class="text-h3 font-medium text-mono-100 group-hover:text-mono-50 transition-colors">
+                                종목분석가가 삼성전자 리포트를 제출했습니다.</div>
+                            <div class="text-mono-500 text-caption font-mono">10 MINS AGO</div>
+                        </li>
+                        <li
+                            class="flex justify-between items-baseline group cursor-pointer border-b border-mono-800/30 pb-4">
+                            <div class="text-h3 font-medium text-mono-400 group-hover:text-mono-50 transition-colors">
+                                마케팅부서 9월 예산 한도의 80%를 초과했습니다.</div>
+                            <div class="text-mono-500 text-caption font-mono">1 HOUR AGO</div>
+                        </li>
+                        <li
+                            class="flex justify-between items-baseline group cursor-pointer border-b border-mono-800/30 pb-4">
+                            <div class="text-h3 font-medium text-mono-400 group-hover:text-mono-50 transition-colors">
+                                AGORA: 신사업 진출 (A/B안) 토론이 종료되었습니다.</div>
+                            <div class="text-mono-500 text-caption font-mono">2 HOURS AGO</div>
+                        </li>
+                    </ul>
+                </section>
+
+            </div>
+
+            <!-- Right Column: Status Lists -->
+            <div class="lg:col-span-4">
+
+                <section>
+                    <!-- API: GET /api/workspace/agents -->
+                    <h2 class="text-mono-600 text-caption tracking-widest uppercase mb-8">Active Units</h2>
+
+                    <div class="space-y-6">
+                        <div
+                            class="flex items-baseline justify-between transition-opacity hover:opacity-100 opacity-80 cursor-pointer">
+                            <div>
+                                <h4 class="text-h3 font-bold">비서실장</h4>
+                                <p class="text-mono-500 text-caption mt-1">SYSTEM / CLAUDE 3.5</p>
+                            </div>
+                            <span class="text-status-green flex items-center gap-2 text-caption font-mono uppercase">
+                                <span class="w-1.5 h-1.5 rounded-full bg-status-green animate-pulse"></span>
+                                Online
+                            </span>
+                        </div>
+
+                        <div
+                            class="flex items-baseline justify-between transition-opacity hover:opacity-100 opacity-60 cursor-pointer">
+                            <div>
+                                <h4 class="text-body-l font-bold">CIO</h4>
+                                <p class="text-mono-500 text-caption mt-1">MANAGER / STRATEGY</p>
+                            </div>
+                            <span class="text-mono-500 flex items-center gap-2 text-caption font-mono uppercase">
+                                <span class="w-1.5 h-1.5 rounded-full bg-mono-500"></span>
+                                Idle
+                            </span>
+                        </div>
+
+                        <div
+                            class="flex items-baseline justify-between transition-opacity hover:opacity-100 opacity-60 cursor-pointer">
+                            <div>
+                                <h4 class="text-body-l font-bold">콘텐츠 전문가</h4>
+                                <p class="text-mono-500 text-caption mt-1">SPECIALIST / MARKETING</p>
+                            </div>
+                            <span class="text-mono-50 flex items-center gap-2 text-caption font-mono uppercase">
+                                <span class="w-1.5 h-1.5 rounded-sm bg-mono-50 animate-pulse"></span>
+                                Working
+                            </span>
+                        </div>
+                    </div>
+
+                    <a href="agents.html"
+                        class="block mt-8 text-caption text-mono-500 hover:text-mono-100 border-b border-mono-800 inline-block pb-1 transition-colors uppercase tracking-widest">
+                        View Organization →
+                    </a>
+                </section>
+
+                <section class="border-t border-mono-800 pt-block mt-block">
+                    <!-- API: GET /api/workspace/dashboard/costs -->
+                    <h2 class="text-mono-600 text-caption tracking-widest uppercase mb-8">Daily Burn Rate</h2>
+
+                    <div>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-display font-medium text-mono-50 tracking-tighter">$24.80</span>
+                        </div>
+                        <div class="text-mono-500 text-body-s mt-2">
+                            <span class="text-mono-100">72%</span> of daily budget ($35.00)
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

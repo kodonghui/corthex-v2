@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORTHEX v2 - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"
+        rel="stylesheet" crossorigin="anonymous">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mono: {
+                            900: '#000000',
+                            800: '#111111',
+                            500: '#666666',
+                            400: '#999999',
+                            100: '#eeeeee',
+                            50: '#ffffff',
+                        },
+                        status: {
+                            red: '#ff3b30',
+                            green: '#34c759'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Satoshi', 'Pretendard', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+                    },
+                    fontSize: {
+                        'hero': ['4rem', { lineHeight: '1', letterSpacing: '-0.05em', fontWeight: '900' }],
+                        'display': ['2.5rem', { lineHeight: '1.1', letterSpacing: '-0.04em', fontWeight: '800' }],
+                        'h1': ['2rem', { lineHeight: '1.2', letterSpacing: '-0.03em', fontWeight: '700' }],
+                        'h2': ['1.5rem', { lineHeight: '1.3', letterSpacing: '-0.02em', fontWeight: '600' }],
+                        'h3': ['1.25rem', { lineHeight: '1.4', letterSpacing: '-0.01em', fontWeight: '600' }],
+                        'body-l': ['1.125rem', { lineHeight: '1.6', letterSpacing: '0', fontWeight: '500' }],
+                        'body': ['1rem', { lineHeight: '1.6', letterSpacing: '0', fontWeight: '400' }],
+                        'body-s': ['0.875rem', { lineHeight: '1.5', letterSpacing: '0.01em', fontWeight: '400' }],
+                        'caption': ['0.75rem', { lineHeight: '1.4', letterSpacing: '0.05em', fontWeight: '500' }],
+                    },
+                    spacing: {
+                        'section': '8rem',
+                        'block': '4rem',
+                        'item': '2rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen">
+
+    <nav class="flex justify-between items-center px-16 py-8 border-b border-mono-800">
+        <a href="home.html" class="text-h2 font-bold tracking-tighter">CORTHEX</a>
+        <div class="flex gap-8 text-body-s font-medium">
+            <!-- API: N/A - Sub Navigation -->
+            <a href="home.html" class="text-mono-500 hover:text-mono-50 transition-colors">Home</a>
+            <a href="command-center.html" class="text-mono-500 hover:text-mono-50 transition-colors">Command Center</a>
+            <a href="#" class="text-mono-50 transition-colors line-through decoration-mono-500">Dashboard Metrics</a>
+            <a href="costs.html" class="text-mono-500 hover:text-mono-50 transition-colors">Costs Details</a>
+        </div>
+        <div class="text-mono-600 text-caption font-mono uppercase tracking-widest">Workspace Data</div>
+    </nav>
+
+    <main class="px-16 py-16 lg:px-32 max-w-[1600px] mx-auto space-y-section">
+
+        <header>
+            <h1 class="text-hero font-bold tracking-tighter text-mono-100">Performance & Metrics</h1>
+            <p class="text-h2 text-mono-500 mt-4 tracking-tight max-w-3xl">This month's operational efficiency, agent
+                usage, budget tracking, and systemic health indicators.</p>
+
+            <div class="mt-8 flex gap-4 text-body-s font-mono uppercase tracking-widest">
+                <!-- API: GET /api/workspace/dashboard/summary?period=... -->
+                <button class="text-mono-50 border-b border-mono-50 pb-1">This Month</button>
+                <button class="text-mono-600 hover:text-mono-400 pb-1 transition-colors">Last Month</button>
+                <button class="text-mono-600 hover:text-mono-400 pb-1 transition-colors">YTD</button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-16 gap-y-section">
+
+            <!-- Usage Stats -->
+            <section>
+                <!-- API: GET /api/workspace/dashboard/usage -->
+                <h2 class="text-mono-600 text-caption tracking-widest uppercase mb-12">Total Usage (Tokens)</h2>
+                <div class="flex items-baseline gap-4 mb-16">
+                    <span class="text-[8rem] leading-none font-bold tracking-tighter">142<span
+                            class="text-mono-500">M</span></span>
+                </div>
+
+                <!-- Typographical Bar Chart replacement -->
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex justify-between text-body-s font-mono text-mono-400 mb-2">
+                            <span>Claude 3.5 Sonnet</span>
+                            <span>84M (59%)</span>
+                        </div>
+                        <div class="w-full h-px bg-mono-800">
+                            <div class="w-[59%] h-px bg-mono-50 shadow-[0_0_10px_rgba(255,255,255,0.5)]"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-body-s font-mono text-mono-400 mb-2">
+                            <span>Claude 3 Haiku</span>
+                            <span>42M (29%)</span>
+                        </div>
+                        <div class="w-full h-px bg-mono-800">
+                            <div class="w-[29%] h-px bg-mono-500"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-body-s font-mono text-mono-400 mb-2">
+                            <span>GPT-4o</span>
+                            <span>16M (12%)</span>
+                        </div>
+                        <div class="w-full h-px bg-mono-800">
+                            <div class="w-[12%] h-px bg-mono-600"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Budget Overview -->
+            <section>
+                <!-- API: GET /api/workspace/dashboard/budget -->
+                <h2 class="text-mono-600 text-caption tracking-widest uppercase mb-12">Monthly Budget</h2>
+                <div class="flex justify-between items-end mb-16">
+                    <div class="flex items-baseline gap-4">
+                        <span class="text-[8rem] leading-none font-bold tracking-tighter">$420</span>
+                    </div>
+                    <div class="text-h2 font-mono text-mono-500 tracking-tighter">/ $500</div>
+                </div>
+
+                <div class="w-full h-4 border border-mono-800 p-0.5 mt-8">
+                    <!-- Progress bar -->
+                    <div class="h-full bg-mono-50 w-[84%] relative">
+                        <!-- Projection Marker -->
+                        <!-- API: GET /api/workspace/dashboard/budget (projectedMonthEndUsd) -->
+                        <div class="absolute -top-6 right-0 text-caption font-mono text-mono-400 translate-x-1/2">PROJ:
+                            $480</div>
+                        <div class="absolute -top-1 -bottom-1 w-0.5 bg-mono-400 right-0"></div>
+                    </div>
+                </div>
+                <div class="flex justify-between mt-4 text-mono-500 text-caption font-mono uppercase tracking-widest">
+                    <span>Burn Rate: Normal</span>
+                    <span class="text-status-red mix-blend-screen">84% CONSUMED</span>
+                </div>
+            </section>
+
+            <!-- Costs Breakdown By Agent -->
+            <section class="border-t border-mono-800 pt-16">
+                <!-- API: GET /api/workspace/dashboard/costs/by-agent -->
+                <h2 class="text-mono-600 text-caption tracking-widest uppercase mb-12">Top Agent Expenditure</h2>
+
+                <ul class="space-y-8">
+                    <li class="flex justify-between items-baseline group">
+                        <div class="flex-1">
+                            <h3
+                                class="text-h3 font-medium text-mono-100 group-hover:underline decoration-mono-500 underline-offset-4">
+                                비서실장</h3>
+                            <div class="text-mono-500 text-caption font-mono mt-1">SYSTEM / CLAUDE 3.5 SONNET</div>
+                        </div>
+                        <div class="text-h2 font-bold font-mono text-mono-50 tracking-tighter">$145.20</div>
+                    </li>
+                    <li
+                        class="flex justify-between items-baseline group opacity-70 hover:opacity-100 transition-opacity">
+                        <div class="flex-1">
+                            <h3
+                                class="text-h3 font-medium text-mono-100 group-hover:underline decoration-mono-500 underline-offset-4">
+                                CIO</h3>
+                            <div class="text-mono-500 text-caption font-mono mt-1">STRATEGY / CLAUDE 3.5 SONNET</div>
+                        </div>
+                        <div class="text-h2 font-bold font-mono text-mono-400 tracking-tighter">$98.50</div>
+                    </li>
+                    <li
+                        class="flex justify-between items-baseline group opacity-50 hover:opacity-100 transition-opacity">
+                        <div class="flex-1">
+                            <h3
+                                class="text-h3 font-medium text-mono-100 group-hover:underline decoration-mono-500 underline-offset-4">
+                                종목분석가</h3>
+                            <div class="text-mono-500 text-caption font-mono mt-1">STRATEGY / CLAUDE 3 HAIKU</div>
+                        </div>
+                        <div class="text-h2 font-bold font-mono text-mono-500 tracking-tighter">$32.10</div>
+                    </li>
+                    <li
+                        class="flex justify-between items-baseline group opacity-40 hover:opacity-100 transition-opacity">
+                        <div class="flex-1">
+                            <h3
+                                class="text-h3 font-medium text-mono-100 group-hover:underline decoration-mono-500 underline-offset-4">
+                                SNS 콘텐츠 전문가</h3>
+                            <div class="text-mono-500 text-caption font-mono mt-1">MARKETING / GPT-4O</div>
+                        </div>
+                        <div class="text-h2 font-bold font-mono text-mono-600 tracking-tighter">$28.40</div>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- Satisfaction & Command Volume -->
+            <section class="border-t border-mono-800 pt-16 flex flex-col justify-between">
+                <div>
+                    <!-- API: GET /api/workspace/dashboard/satisfaction -->
+                    <h2 class="text-mono-600 text-caption tracking-widest uppercase mb-12">Task Success & Satisfaction
+                    </h2>
+
+                    <div class="grid grid-cols-2 gap-8">
+                        <div>
+                            <div class="text-mono-600 text-caption font-mono mb-2">Ochestration Success</div>
+                            <div class="text-display font-bold tracking-tighter">98.4%</div>
+                        </div>
+                        <div>
+                            <!-- API: GET /api/workspace/dashboard/summary (tasks) -->
+                            <div class="text-mono-600 text-caption font-mono mb-2">Total Commands</div>
+                            <div class="text-display font-bold tracking-tighter">1,204</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-16">
+                    <!-- Typographic Feedback Spread -->
+                    <div class="flex w-full text-center text-caption font-mono tracking-widest border border-mono-800">
+                        <div class="bg-mono-50 text-mono-900 py-3 w-[82%]">POSITIVE 82%</div>
+                        <div class="bg-mono-800 text-mono-400 py-3 w-[12%]">NEUTRAL 12%</div>
+                        <div class="bg-mono-900 text-mono-600 py-3 w-[6%] border-l border-mono-800">NEG 6%</div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+</body>
+
+</html>

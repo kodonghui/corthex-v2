@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>기밀문서 — CORTHEX v2</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; }
+    code,pre { font-family: 'JetBrains Mono', monospace; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #fafaf9; }
+    ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }
+  </style>
+</head>
+<body class="bg-stone-50 min-h-screen flex">
+
+<!-- SIDEBAR -->
+<aside class="w-60 fixed left-0 top-0 bottom-0 bg-white border-r border-stone-200 flex flex-col z-20">
+  <div class="p-4 border-b border-stone-200">
+    <div class="flex items-center gap-2.5">
+      <div class="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center"><span class="text-white font-bold text-sm">C</span></div>
+      <span class="font-bold text-stone-900" style="font-family:'Plus Jakarta Sans',sans-serif;">CORTHEX</span>
+    </div>
+  </div>
+  <div class="px-4 py-3 border-b border-stone-200">
+    <div class="flex items-center gap-2.5">
+      <div class="w-7 h-7 bg-violet-100 rounded-full flex items-center justify-center"><span class="text-violet-700 text-xs font-semibold">김</span></div>
+      <div><div class="text-xs font-semibold text-stone-900">김대표</div><div class="text-[10px] text-stone-400">Owner</div></div>
+    </div>
+  </div>
+  <nav class="flex-1 p-3 overflow-y-auto space-y-0.5">
+    <p class="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-stone-400">메인</p>
+    <a href="app-home.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-stone-600 hover:bg-stone-50 text-sm"><i data-lucide="home" class="w-4 h-4"></i>홈</a>
+    <a href="app-dashboard.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-stone-600 hover:bg-stone-50 text-sm"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>대시보드</a>
+    <a href="app-command-center.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-stone-600 hover:bg-stone-50 text-sm"><i data-lucide="terminal" class="w-4 h-4"></i>커맨드 센터</a>
+    <p class="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-stone-400 mt-2">조직</p>
+    <a href="app-agents.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-stone-600 hover:bg-stone-50 text-sm"><i data-lucide="bot" class="w-4 h-4"></i>AI 에이전트</a>
+    <a href="app-departments.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-stone-600 hover:bg-stone-50 text-sm"><i data-lucide="building-2" class="w-4 h-4"></i>부서</a>
+    <p class="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-stone-400 mt-2">커뮤니케이션</p>
+    <a href="app-chat.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-stone-600 hover:bg-stone-50 text-sm"><i data-lucide="message-circle" class="w-4 h-4"></i>채팅</a>
+    <a href="app-agora.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-stone-600 hover:bg-stone-50 text-sm"><i data-lucide="users" class="w-4 h-4"></i>아고라</a>
+    <a href="app-messenger.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-stone-600 hover:bg-stone-50 text-sm"><i data-lucide="send" class="w-4 h-4"></i>메신저</a>
+    <a href="app-notifications.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-stone-600 hover:bg-stone-50 text-sm"><i data-lucide="bell" class="w-4 h-4"></i>알림</a>
+    <p class="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-stone-400 mt-2">업무</p>
+    <a href="app-jobs.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-stone-600 hover:bg-stone-50 text-sm"><i data-lucide="briefcase" class="w-4 h-4"></i>잡(Jobs)</a>
+    <a href="app-nexus.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-stone-600 hover:bg-stone-50 text-sm"><i data-lucide="share-2" class="w-4 h-4"></i>넥서스</a>
+    <a href="app-sns.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-stone-600 hover:bg-stone-50 text-sm"><i data-lucide="rss" class="w-4 h-4"></i>SNS 관리</a>
+    <a href="app-trading.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-stone-600 hover:bg-stone-50 text-sm"><i data-lucide="trending-up" class="w-4 h-4"></i>트레이딩</a>
+    <p class="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-stone-400 mt-2">지식·파일</p>
+    <a href="app-knowledge.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-stone-600 hover:bg-stone-50 text-sm"><i data-lucide="book-open" class="w-4 h-4"></i>지식베이스</a>
+    <a href="app-files.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-stone-600 hover:bg-stone-50 text-sm"><i data-lucide="folder" class="w-4 h-4"></i>파일</a>
+    <a href="app-classified.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg bg-violet-50 text-violet-700 text-sm font-medium"><i data-lucide="shield" class="w-4 h-4"></i>기밀문서</a>
+    <a href="app-reports.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-stone-600 hover:bg-stone-50 text-sm"><i data-lucide="file-text" class="w-4 h-4"></i>보고서</a>
+    <p class="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-stone-400 mt-2">분석·특수</p>
+    <a href="app-performance.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-stone-600 hover:bg-stone-50 text-sm"><i data-lucide="bar-chart-2" class="w-4 h-4"></i>전력분석</a>
+    <a href="app-costs.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-stone-600 hover:bg-stone-50 text-sm"><i data-lucide="credit-card" class="w-4 h-4"></i>비용 관리</a>
+    <a href="app-activity-log.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-stone-600 hover:bg-stone-50 text-sm"><i data-lucide="activity" class="w-4 h-4"></i>활동 로그</a>
+    <a href="app-argos.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-stone-600 hover:bg-stone-50 text-sm"><i data-lucide="eye" class="w-4 h-4"></i>아르고스</a>
+    <a href="app-credentials.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-stone-600 hover:bg-stone-50 text-sm"><i data-lucide="key" class="w-4 h-4"></i>크리덴셜</a>
+    <a href="app-ops-log.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-stone-600 hover:bg-stone-50 text-sm"><i data-lucide="list" class="w-4 h-4"></i>운영 로그</a>
+    <a href="app-settings.html" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-stone-600 hover:bg-stone-50 text-sm mt-2"><i data-lucide="settings" class="w-4 h-4"></i>설정</a>
+  </nav>
+</aside>
+
+<!-- MAIN -->
+<main class="ml-60 flex-1 p-6 min-h-screen">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-xl font-bold text-stone-900">기밀문서</h1>
+      <p class="text-sm text-stone-500 mt-0.5">보안 등급별 에이전트 생성 문서 아카이브 — API: GET /api/workspace/archive</p>
+    </div>
+    <div class="relative">
+      <i data-lucide="search" class="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+      <input type="text" placeholder="문서 검색..." class="rounded-lg border border-stone-200 pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent w-56">
+    </div>
+  </div>
+
+  <div class="flex gap-5">
+    <!-- LEFT: Folder Tree (180px) -->
+    <div class="w-44 flex-shrink-0">
+      <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-3 space-y-0.5">
+        <p class="px-2 py-1 text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-1">보안 등급</p>
+
+        <button class="w-full text-left flex items-center justify-between px-2.5 py-2 rounded-lg text-stone-600 hover:bg-stone-50 text-sm group">
+          <div class="flex items-center gap-2">
+            <i data-lucide="unlock" class="w-3.5 h-3.5 text-emerald-500"></i>
+            <span class="text-xs font-medium">PUBLIC</span>
+          </div>
+          <span class="bg-stone-100 text-stone-500 rounded-full px-1.5 py-0.5 text-[10px] font-medium">12</span>
+        </button>
+
+        <button class="w-full text-left flex items-center justify-between px-2.5 py-2 rounded-lg text-stone-600 hover:bg-stone-50 text-sm">
+          <div class="flex items-center gap-2">
+            <i data-lucide="lock" class="w-3.5 h-3.5 text-amber-500"></i>
+            <span class="text-xs font-medium">INTERNAL</span>
+          </div>
+          <span class="bg-stone-100 text-stone-500 rounded-full px-1.5 py-0.5 text-[10px] font-medium">18</span>
+        </button>
+
+        <button class="w-full text-left flex items-center justify-between px-2.5 py-2 rounded-lg bg-red-50 text-red-700 text-sm">
+          <div class="flex items-center gap-2">
+            <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-red-600"></i>
+            <span class="text-xs font-semibold">CONFIDENTIAL</span>
+          </div>
+          <span class="bg-red-100 text-red-600 rounded-full px-1.5 py-0.5 text-[10px] font-medium">8</span>
+        </button>
+
+        <button class="w-full text-left flex items-center justify-between px-2.5 py-2 rounded-lg text-stone-600 hover:bg-stone-50 text-sm">
+          <div class="flex items-center gap-2">
+            <i data-lucide="shield-x" class="w-3.5 h-3.5 text-stone-800"></i>
+            <span class="text-xs font-medium">SECRET</span>
+          </div>
+          <span class="bg-stone-800 text-white rounded-full px-1.5 py-0.5 text-[10px] font-medium">3</span>
+        </button>
+
+        <div class="mt-4 pt-3 border-t border-stone-100">
+          <p class="px-2 py-1 text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-1">전체</p>
+          <div class="px-2.5 py-1.5 text-xs text-stone-500">총 41건</div>
+          <div class="px-2.5 py-1.5 text-xs text-stone-500">이번달 +7건</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Document List -->
+    <div class="flex-1 min-w-0">
+      <!-- Breadcrumb -->
+      <div class="flex items-center gap-2 text-xs text-stone-400 mb-3">
+        <i data-lucide="folder-open" class="w-3.5 h-3.5 text-red-500"></i>
+        <span class="text-red-600 font-semibold">CONFIDENTIAL</span>
+        <span>— 8건</span>
+      </div>
+
+      <!-- Table — API: GET /api/workspace/archive/{id} -->
+      <div class="bg-white rounded-xl border border-stone-200 shadow-sm">
+        <table class="w-full">
+          <thead>
+            <tr class="bg-stone-50 border-b border-stone-100">
+              <th class="text-left px-5 py-3 text-[11px] font-semibold uppercase tracking-widest text-stone-500">제목</th>
+              <th class="text-center px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-stone-500 w-32">보안 등급</th>
+              <th class="text-left px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-stone-500">요약</th>
+              <th class="text-left px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-stone-500 w-20">에이전트</th>
+              <th class="text-center px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-stone-500 w-20">품질점수</th>
+              <th class="text-right px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-stone-500 w-20">날짜</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Row 1 -->
+            <tr class="border-b border-stone-100 hover:bg-stone-50/50 transition-colors cursor-pointer">
+              <td class="px-5 py-4">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 bg-red-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="file-text" class="w-4 h-4 text-red-500"></i>
+                  </div>
+                  <div>
+                    <div class="text-sm font-semibold text-stone-900">삼성전자 내부 가치 분석</div>
+                    <div class="text-xs text-stone-400 mt-0.5">PDF · 14페이지</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-4 text-center">
+                <span class="bg-red-50 text-red-700 border border-red-200 rounded-full px-2.5 py-0.5 text-xs font-semibold">CONFIDENTIAL</span>
+              </td>
+              <td class="px-4 py-4 text-sm text-stone-600 leading-relaxed">삼성전자 실제 내재 가치 DCF 분석. 적정 주가 94,000원 산출.</td>
+              <td class="px-4 py-4">
+                <div class="flex items-center gap-1.5">
+                  <div class="w-5 h-5 bg-violet-100 rounded-full flex items-center justify-center"><span class="text-[9px] font-semibold text-violet-700">김</span></div>
+                  <span class="text-xs text-stone-600">김재원</span>
+                </div>
+              </td>
+              <td class="px-4 py-4 text-center">
+                <div class="flex flex-col items-center gap-1">
+                  <span class="text-sm font-bold text-emerald-700">95</span>
+                  <div class="w-10 bg-stone-100 rounded-full h-1"><div class="bg-emerald-500 h-1 rounded-full" style="width:95%"></div></div>
+                </div>
+              </td>
+              <td class="px-4 py-4 text-right text-xs text-stone-500">오늘</td>
+            </tr>
+            <!-- Row 2 -->
+            <tr class="border-b border-stone-100 hover:bg-stone-50/50 transition-colors cursor-pointer">
+              <td class="px-5 py-4">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 bg-red-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="file-text" class="w-4 h-4 text-red-500"></i>
+                  </div>
+                  <div>
+                    <div class="text-sm font-semibold text-stone-900">경쟁사 약점 분석 보고서</div>
+                    <div class="text-xs text-stone-400 mt-0.5">PDF · 22페이지</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-4 text-center">
+                <span class="bg-red-50 text-red-700 border border-red-200 rounded-full px-2.5 py-0.5 text-xs font-semibold">CONFIDENTIAL</span>
+              </td>
+              <td class="px-4 py-4 text-sm text-stone-600 leading-relaxed">국내 상위 5개 경쟁사 전략적 약점 및 진입 가능 시장 분석.</td>
+              <td class="px-4 py-4">
+                <div class="flex items-center gap-1.5">
+                  <div class="w-5 h-5 bg-emerald-100 rounded-full flex items-center justify-center"><span class="text-[9px] font-semibold text-emerald-700">이</span></div>
+                  <span class="text-xs text-stone-600">이나경</span>
+                </div>
+              </td>
+              <td class="px-4 py-4 text-center">
+                <div class="flex flex-col items-center gap-1">
+                  <span class="text-sm font-bold text-emerald-700">88</span>
+                  <div class="w-10 bg-stone-100 rounded-full h-1"><div class="bg-emerald-500 h-1 rounded-full" style="width:88%"></div></div>
+                </div>
+              </td>
+              <td class="px-4 py-4 text-right text-xs text-stone-500">어제</td>
+            </tr>
+            <!-- Row 3 — SECRET -->
+            <tr class="border-b border-stone-100 hover:bg-stone-900/5 transition-colors cursor-pointer bg-stone-900/[0.02]">
+              <td class="px-5 py-4">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 bg-stone-800 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="file-lock-2" class="w-4 h-4 text-white"></i>
+                  </div>
+                  <div>
+                    <div class="text-sm font-semibold text-stone-900">M&A 타겟 후보 목록</div>
+                    <div class="text-xs text-stone-400 mt-0.5">암호화 PDF · 8페이지</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-4 text-center">
+                <span class="bg-stone-900 text-white rounded-full px-2.5 py-0.5 text-xs font-semibold">SECRET</span>
+              </td>
+              <td class="px-4 py-4 text-sm text-stone-600 leading-relaxed">인수 합병 검토 후보 기업 7곳 리스트 및 예비 실사 평가.</td>
+              <td class="px-4 py-4">
+                <div class="flex items-center gap-1.5">
+                  <div class="w-5 h-5 bg-emerald-100 rounded-full flex items-center justify-center"><span class="text-[9px] font-semibold text-emerald-700">이</span></div>
+                  <span class="text-xs text-stone-600">이나경</span>
+                </div>
+              </td>
+              <td class="px-4 py-4 text-center">
+                <div class="flex flex-col items-center gap-1">
+                  <span class="text-sm font-bold text-emerald-700">97</span>
+                  <div class="w-10 bg-stone-100 rounded-full h-1"><div class="bg-emerald-500 h-1 rounded-full" style="width:97%"></div></div>
+                </div>
+              </td>
+              <td class="px-4 py-4 text-right text-xs text-stone-500">3일 전</td>
+            </tr>
+            <!-- Row 4 -->
+            <tr class="border-b border-stone-100 hover:bg-stone-50/50 transition-colors cursor-pointer">
+              <td class="px-5 py-4">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 bg-red-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="file-text" class="w-4 h-4 text-red-500"></i>
+                  </div>
+                  <div>
+                    <div class="text-sm font-semibold text-stone-900">법인세 절감 전략</div>
+                    <div class="text-xs text-stone-400 mt-0.5">PDF · 18페이지</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-4 text-center">
+                <span class="bg-red-50 text-red-700 border border-red-200 rounded-full px-2.5 py-0.5 text-xs font-semibold">CONFIDENTIAL</span>
+              </td>
+              <td class="px-4 py-4 text-sm text-stone-600 leading-relaxed">2026 사업연도 법인세 절감 가능 항목 분석 및 절세 시나리오.</td>
+              <td class="px-4 py-4">
+                <div class="flex items-center gap-1.5">
+                  <div class="w-5 h-5 bg-rose-100 rounded-full flex items-center justify-center"><span class="text-[9px] font-semibold text-rose-700">이</span></div>
+                  <span class="text-xs text-stone-600">이소연</span>
+                </div>
+              </td>
+              <td class="px-4 py-4 text-center">
+                <div class="flex flex-col items-center gap-1">
+                  <span class="text-sm font-bold text-emerald-700">91</span>
+                  <div class="w-10 bg-stone-100 rounded-full h-1"><div class="bg-emerald-500 h-1 rounded-full" style="width:91%"></div></div>
+                </div>
+              </td>
+              <td class="px-4 py-4 text-right text-xs text-stone-500">1주 전</td>
+            </tr>
+            <!-- Row 5 — SECRET -->
+            <tr class="hover:bg-stone-900/5 transition-colors cursor-pointer bg-stone-900/[0.02]">
+              <td class="px-5 py-4">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 bg-stone-800 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="file-lock-2" class="w-4 h-4 text-white"></i>
+                  </div>
+                  <div>
+                    <div class="text-sm font-semibold text-stone-900">인사 구조조정 시나리오</div>
+                    <div class="text-xs text-stone-400 mt-0.5">암호화 PDF · 11페이지</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-4 text-center">
+                <span class="bg-stone-900 text-white rounded-full px-2.5 py-0.5 text-xs font-semibold">SECRET</span>
+              </td>
+              <td class="px-4 py-4 text-sm text-stone-600 leading-relaxed">조직 효율화를 위한 인사 재편 3개 시나리오 및 영향 분석.</td>
+              <td class="px-4 py-4">
+                <div class="flex items-center gap-1.5">
+                  <div class="w-5 h-5 bg-emerald-100 rounded-full flex items-center justify-center"><span class="text-[9px] font-semibold text-emerald-700">이</span></div>
+                  <span class="text-xs text-stone-600">이나경</span>
+                </div>
+              </td>
+              <td class="px-4 py-4 text-center">
+                <div class="flex flex-col items-center gap-1">
+                  <span class="text-sm font-bold text-emerald-700">93</span>
+                  <div class="w-10 bg-stone-100 rounded-full h-1"><div class="bg-emerald-500 h-1 rounded-full" style="width:93%"></div></div>
+                </div>
+              </td>
+              <td class="px-4 py-4 text-right text-xs text-stone-500">2주 전</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Security Level Guide -->
+      <div class="mt-5 bg-white rounded-xl border border-stone-200 shadow-sm p-5">
+        <h4 class="text-sm font-bold text-stone-900 mb-3 flex items-center gap-2">
+          <i data-lucide="info" class="w-4 h-4 text-stone-400"></i>보안 등급 안내
+        </h4>
+        <div class="grid grid-cols-4 gap-3">
+          <div class="p-3 bg-emerald-50 rounded-lg border border-emerald-100">
+            <div class="flex items-center gap-1.5 mb-1.5">
+              <i data-lucide="unlock" class="w-3.5 h-3.5 text-emerald-600"></i>
+              <span class="text-xs font-bold text-emerald-700">PUBLIC</span>
+            </div>
+            <p class="text-xs text-stone-600">일반 공개 가능. 마케팅·홍보 자료. 접근 제한 없음.</p>
+          </div>
+          <div class="p-3 bg-amber-50 rounded-lg border border-amber-100">
+            <div class="flex items-center gap-1.5 mb-1.5">
+              <i data-lucide="lock" class="w-3.5 h-3.5 text-amber-600"></i>
+              <span class="text-xs font-bold text-amber-700">INTERNAL</span>
+            </div>
+            <p class="text-xs text-stone-600">사내 한정. 운영·전략 문서. 임직원만 접근 가능.</p>
+          </div>
+          <div class="p-3 bg-red-50 rounded-lg border border-red-100">
+            <div class="flex items-center gap-1.5 mb-1.5">
+              <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-red-600"></i>
+              <span class="text-xs font-bold text-red-700">CONFIDENTIAL</span>
+            </div>
+            <p class="text-xs text-stone-600">기밀. 임원 및 권한 에이전트만 접근. 외부 유출 금지.</p>
+          </div>
+          <div class="p-3 bg-stone-100 rounded-lg border border-stone-200">
+            <div class="flex items-center gap-1.5 mb-1.5">
+              <i data-lucide="shield-x" class="w-3.5 h-3.5 text-stone-800"></i>
+              <span class="text-xs font-bold text-stone-800">SECRET</span>
+            </div>
+            <p class="text-xs text-stone-600">최고 기밀. 비밀번호 + 2차 인증 필요. CEO 승인 후 접근.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>lucide.createIcons();</script>
+</body>
+</html>

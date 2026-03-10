@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>워크플로우 — CORTHEX Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; }
+    code,pre { font-family: 'JetBrains Mono', monospace; }
+    .flow-arrow {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+    .flow-arrow::after {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: #d6d3d1;
+      flex-shrink: 0;
+    }
+    .flow-arrow:last-child::after { display: none; }
+  </style>
+</head>
+<body class="bg-stone-50 min-h-screen">
+
+  <!-- Sidebar -->
+  <aside class="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-10">
+    <div class="px-5 py-4 border-b border-stone-100">
+      <div class="flex items-center gap-2 mb-1">
+        <span class="bg-violet-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded tracking-widest">ADMIN</span>
+      </div>
+      <span class="text-lg font-bold text-stone-900" style="font-family:'Plus Jakarta Sans',sans-serif;">CORTHEX</span>
+    </div>
+    <nav class="flex-1 overflow-y-auto px-3 py-3 space-y-0.5">
+      <p class="text-[10px] font-semibold uppercase tracking-widest text-stone-400 px-2 py-1.5 mt-1">개요</p>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> 대시보드</a>
+      <p class="text-[10px] font-semibold uppercase tracking-widest text-stone-400 px-2 py-1.5 mt-2">조직 관리</p>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="building-2" class="w-4 h-4"></i> 회사 관리</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="users" class="w-4 h-4"></i> 사용자 관리</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="git-branch" class="w-4 h-4"></i> 부서 관리</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="bot" class="w-4 h-4"></i> 에이전트 관리</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="user-check" class="w-4 h-4"></i> 직원 관리</a>
+      <p class="text-[10px] font-semibold uppercase tracking-widest text-stone-400 px-2 py-1.5 mt-2">운영</p>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="circle-dollar-sign" class="w-4 h-4"></i> 비용 관리</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="activity" class="w-4 h-4"></i> 모니터링</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm bg-violet-50 text-violet-700 font-medium"><i data-lucide="workflow" class="w-4 h-4"></i> 워크플로우</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="key" class="w-4 h-4"></i> 크리덴셜</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="file-bar-chart" class="w-4 h-4"></i> 보고서</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="briefcase" class="w-4 h-4"></i> 작업 현황</a>
+      <p class="text-[10px] font-semibold uppercase tracking-widest text-stone-400 px-2 py-1.5 mt-2">설정</p>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="settings" class="w-4 h-4"></i> 시스템 설정</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="store" class="w-4 h-4"></i> 템플릿 마켓</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="user-plus" class="w-4 h-4"></i> 온보딩</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="shield" class="w-4 h-4"></i> 보안 로그</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="bell" class="w-4 h-4"></i> 알림 설정</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="database" class="w-4 h-4"></i> 데이터 관리</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="plug" class="w-4 h-4"></i> API 연동</a>
+    </nav>
+    <div class="px-3 py-3 border-t border-stone-100">
+      <div class="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-stone-50 cursor-pointer">
+        <div class="w-7 h-7 rounded-full bg-violet-100 flex items-center justify-center text-violet-700 font-semibold text-xs">A</div>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-semibold text-stone-800 truncate">관리자</p>
+          <p class="text-[10px] text-stone-500 truncate">admin@corthex.io</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="ml-60 p-8">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h1 class="text-xl font-bold text-stone-900">워크플로우</h1>
+        <p class="text-sm text-stone-500 mt-0.5">에이전트 간 자동화 흐름을 시각적으로 설계합니다.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-[10px] font-mono text-stone-400 bg-stone-100 px-2 py-1 rounded">GET /api/admin/workflows · POST /api/admin/workflows</span>
+        <button class="flex items-center gap-1.5 bg-violet-600 hover:bg-violet-700 text-white rounded-lg px-4 py-2 text-sm font-semibold">
+          <i data-lucide="plus" class="w-4 h-4"></i> 새 워크플로우
+        </button>
+      </div>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="grid grid-cols-4 gap-4 mb-6">
+      <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-4 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center"><i data-lucide="workflow" class="w-4 h-4 text-violet-600"></i></div>
+        <div><p class="text-lg font-bold text-stone-900" style="font-family:'Plus Jakarta Sans',sans-serif;">4</p><p class="text-xs text-stone-500">전체 워크플로우</p></div>
+      </div>
+      <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-4 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center"><i data-lucide="play" class="w-4 h-4 text-emerald-600"></i></div>
+        <div><p class="text-lg font-bold text-stone-900" style="font-family:'Plus Jakarta Sans',sans-serif;">3</p><p class="text-xs text-stone-500">활성</p></div>
+      </div>
+      <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-4 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center"><i data-lucide="zap" class="w-4 h-4 text-blue-600"></i></div>
+        <div><p class="text-lg font-bold text-stone-900" style="font-family:'Plus Jakarta Sans',sans-serif;">185</p><p class="text-xs text-stone-500">총 실행 횟수</p></div>
+      </div>
+      <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-4 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center"><i data-lucide="clock" class="w-4 h-4 text-amber-600"></i></div>
+        <div><p class="text-lg font-bold text-stone-900" style="font-family:'Plus Jakarta Sans',sans-serif;">4.2분</p><p class="text-xs text-stone-500">평균 실행 시간</p></div>
+      </div>
+    </div>
+
+    <!-- Workflow Cards Grid -->
+    <div class="grid grid-cols-2 gap-4 mb-6">
+
+      <!-- Workflow 1: 활성 -->
+      <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-5 cursor-pointer hover:border-violet-300 hover:shadow-md transition-all" onclick="selectWorkflow(0)">
+        <div class="flex items-start justify-between mb-3">
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="bg-emerald-50 text-emerald-700 rounded-full px-2.5 py-0.5 text-xs font-medium flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 활성
+              </span>
+              <span class="text-xs text-stone-400 bg-stone-100 rounded px-1.5 py-0.5">3단계</span>
+            </div>
+            <h3 class="font-bold text-stone-900 text-sm">일일 시황 분석 → SNS 발행</h3>
+            <p class="text-xs text-stone-500 mt-1">매일 오전 7시 시황 수집 → 투자 분석 → 인스타그램/트위터 자동 발행</p>
+          </div>
+          <div class="w-9 h-9 rounded-lg bg-violet-100 flex items-center justify-center flex-shrink-0 ml-3">
+            <i data-lucide="trending-up" class="w-5 h-5 text-violet-600"></i>
+          </div>
+        </div>
+        <div class="flex items-center justify-between text-xs text-stone-500 mb-3">
+          <span>마지막 실행: 오늘 07:30</span>
+          <span class="font-medium text-stone-700">총 45회</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="flex-1 bg-white border border-stone-200 text-stone-700 rounded-lg py-1.5 text-xs font-medium hover:bg-stone-50 flex items-center justify-center gap-1">
+            <i data-lucide="edit-3" class="w-3 h-3"></i> 편집
+          </button>
+          <button class="flex-1 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg py-1.5 text-xs font-medium hover:bg-emerald-100 flex items-center justify-center gap-1">
+            <i data-lucide="play" class="w-3 h-3"></i> 실행
+          </button>
+          <button class="flex-1 bg-white border border-stone-200 text-stone-600 rounded-lg py-1.5 text-xs font-medium hover:bg-stone-50 flex items-center justify-center gap-1">
+            <i data-lucide="copy" class="w-3 h-3"></i> 복제
+          </button>
+        </div>
+      </div>
+
+      <!-- Workflow 2: 활성 -->
+      <div class="bg-white rounded-xl border-2 border-violet-500 shadow-md p-5 cursor-pointer" onclick="selectWorkflow(1)">
+        <div class="flex items-start justify-between mb-3">
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="bg-emerald-50 text-emerald-700 rounded-full px-2.5 py-0.5 text-xs font-medium flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 활성
+              </span>
+              <span class="text-xs text-stone-400 bg-stone-100 rounded px-1.5 py-0.5">4단계</span>
+              <span class="text-xs text-violet-600 bg-violet-50 rounded px-1.5 py-0.5 font-medium">선택됨</span>
+            </div>
+            <h3 class="font-bold text-stone-900 text-sm">신규 뉴스 → 투자 분석 → 알림</h3>
+            <p class="text-xs text-stone-500 mt-1">뉴스 수집 → 투자 유의미성 판별 → 조건 충족 시 Slack 알림 발송</p>
+          </div>
+          <div class="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0 ml-3">
+            <i data-lucide="newspaper" class="w-5 h-5 text-blue-600"></i>
+          </div>
+        </div>
+        <div class="flex items-center justify-between text-xs text-stone-500 mb-3">
+          <span>마지막 실행: 오늘 10:00</span>
+          <span class="font-medium text-stone-700">총 120회</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="flex-1 bg-violet-600 text-white rounded-lg py-1.5 text-xs font-medium hover:bg-violet-700 flex items-center justify-center gap-1">
+            <i data-lucide="edit-3" class="w-3 h-3"></i> 편집
+          </button>
+          <button class="flex-1 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg py-1.5 text-xs font-medium hover:bg-emerald-100 flex items-center justify-center gap-1">
+            <i data-lucide="play" class="w-3 h-3"></i> 실행
+          </button>
+          <button class="flex-1 bg-white border border-stone-200 text-stone-600 rounded-lg py-1.5 text-xs font-medium hover:bg-stone-50 flex items-center justify-center gap-1">
+            <i data-lucide="copy" class="w-3 h-3"></i> 복제
+          </button>
+        </div>
+      </div>
+
+      <!-- Workflow 3: 비활성 -->
+      <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-5 cursor-pointer hover:border-violet-300 hover:shadow-md transition-all opacity-70" onclick="selectWorkflow(2)">
+        <div class="flex items-start justify-between mb-3">
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="bg-stone-100 text-stone-500 rounded-full px-2.5 py-0.5 text-xs font-medium flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-stone-400"></span> 비활성
+              </span>
+              <span class="text-xs text-stone-400 bg-stone-100 rounded px-1.5 py-0.5">3단계</span>
+            </div>
+            <h3 class="font-bold text-stone-900 text-sm">계약서 입력 → 법무 검토 → 보고</h3>
+            <p class="text-xs text-stone-500 mt-1">계약서 PDF 업로드 → 법무 AI 검토 → 리스크 보고서 생성</p>
+          </div>
+          <div class="w-9 h-9 rounded-lg bg-stone-100 flex items-center justify-center flex-shrink-0 ml-3">
+            <i data-lucide="file-text" class="w-5 h-5 text-stone-400"></i>
+          </div>
+        </div>
+        <div class="flex items-center justify-between text-xs text-stone-500 mb-3">
+          <span>마지막 실행: 1주 전</span>
+          <span class="font-medium text-stone-700">총 8회</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="flex-1 bg-white border border-stone-200 text-stone-700 rounded-lg py-1.5 text-xs font-medium hover:bg-stone-50 flex items-center justify-center gap-1">
+            <i data-lucide="edit-3" class="w-3 h-3"></i> 편집
+          </button>
+          <button class="flex-1 bg-stone-50 border border-stone-200 text-stone-500 rounded-lg py-1.5 text-xs font-medium flex items-center justify-center gap-1 cursor-not-allowed" disabled>
+            <i data-lucide="play" class="w-3 h-3"></i> 실행
+          </button>
+          <button class="flex-1 bg-white border border-stone-200 text-stone-600 rounded-lg py-1.5 text-xs font-medium hover:bg-stone-50 flex items-center justify-center gap-1">
+            <i data-lucide="copy" class="w-3 h-3"></i> 복제
+          </button>
+        </div>
+      </div>
+
+      <!-- Workflow 4: 활성 -->
+      <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-5 cursor-pointer hover:border-violet-300 hover:shadow-md transition-all" onclick="selectWorkflow(3)">
+        <div class="flex items-start justify-between mb-3">
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="bg-emerald-50 text-emerald-700 rounded-full px-2.5 py-0.5 text-xs font-medium flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 활성
+              </span>
+              <span class="text-xs text-stone-400 bg-stone-100 rounded px-1.5 py-0.5">4단계</span>
+            </div>
+            <h3 class="font-bold text-stone-900 text-sm">주간 성과 → 보고서 → 이메일 발송</h3>
+            <p class="text-xs text-stone-500 mt-1">매주 금요일 KPI 집계 → 보고서 생성 → 전체 팀 이메일 발송</p>
+          </div>
+          <div class="w-9 h-9 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0 ml-3">
+            <i data-lucide="bar-chart-2" class="w-5 h-5 text-amber-600"></i>
+          </div>
+        </div>
+        <div class="flex items-center justify-between text-xs text-stone-500 mb-3">
+          <span>마지막 실행: 어제</span>
+          <span class="font-medium text-stone-700">총 12회</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="flex-1 bg-white border border-stone-200 text-stone-700 rounded-lg py-1.5 text-xs font-medium hover:bg-stone-50 flex items-center justify-center gap-1">
+            <i data-lucide="edit-3" class="w-3 h-3"></i> 편집
+          </button>
+          <button class="flex-1 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg py-1.5 text-xs font-medium hover:bg-emerald-100 flex items-center justify-center gap-1">
+            <i data-lucide="play" class="w-3 h-3"></i> 실행
+          </button>
+          <button class="flex-1 bg-white border border-stone-200 text-stone-600 rounded-lg py-1.5 text-xs font-medium hover:bg-stone-50 flex items-center justify-center gap-1">
+            <i data-lucide="copy" class="w-3 h-3"></i> 복제
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Workflow Visualization: "신규 뉴스 → 투자 분석 → 알림" -->
+    <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-5">
+      <div class="flex items-center justify-between mb-5">
+        <div>
+          <h3 class="font-bold text-stone-900 text-sm">워크플로우 시각화 미리보기</h3>
+          <p class="text-xs text-stone-500 mt-0.5">신규 뉴스 → 투자 분석 → 알림 (선택됨)</p>
+        </div>
+        <span class="text-[10px] font-mono text-stone-400 bg-stone-100 px-2 py-1 rounded">PUT /api/admin/workflows/{id}</span>
+      </div>
+
+      <!-- Flow Diagram -->
+      <div class="flex items-center gap-0 overflow-x-auto pb-2">
+
+        <!-- Node 1: Trigger -->
+        <div class="flow-arrow">
+          <div class="flex flex-col items-center gap-1.5 flex-shrink-0">
+            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+              <i data-lucide="rss" class="w-5 h-5 text-blue-600"></i>
+            </div>
+            <div class="bg-blue-50 border border-blue-200 rounded-lg px-3 py-2.5 text-center w-32">
+              <p class="text-[10px] font-semibold uppercase tracking-widest text-blue-500 mb-0.5">트리거</p>
+              <p class="text-xs font-bold text-stone-800">뉴스 수집</p>
+              <p class="text-[10px] text-stone-500 mt-0.5">15분마다</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Arrow 1 -->
+        <div class="flex items-center gap-0 flex-shrink-0 mx-1">
+          <div class="w-8 h-px bg-stone-300"></div>
+          <div class="w-0 h-0 border-t-4 border-b-4 border-l-6 border-transparent border-l-stone-300" style="border-left-width:6px"></div>
+        </div>
+
+        <!-- Node 2: Analysis -->
+        <div class="flow-arrow">
+          <div class="flex flex-col items-center gap-1.5 flex-shrink-0">
+            <div class="w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center">
+              <i data-lucide="brain" class="w-5 h-5 text-violet-600"></i>
+            </div>
+            <div class="bg-violet-50 border border-violet-200 rounded-lg px-3 py-2.5 text-center w-32">
+              <p class="text-[10px] font-semibold uppercase tracking-widest text-violet-500 mb-0.5">에이전트</p>
+              <p class="text-xs font-bold text-stone-800">투자 분석</p>
+              <p class="text-[10px] text-stone-500 mt-0.5">박준형 (AI)</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Arrow 2 -->
+        <div class="flex items-center gap-0 flex-shrink-0 mx-1">
+          <div class="w-8 h-px bg-stone-300"></div>
+          <div class="w-0 h-0 border-t-4 border-b-4 border-l-6 border-transparent border-l-stone-300" style="border-left-width:6px"></div>
+        </div>
+
+        <!-- Node 3: Condition -->
+        <div class="flow-arrow">
+          <div class="flex flex-col items-center gap-1.5 flex-shrink-0">
+            <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+              <i data-lucide="git-branch" class="w-5 h-5 text-amber-600"></i>
+            </div>
+            <div class="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5 text-center w-32">
+              <p class="text-[10px] font-semibold uppercase tracking-widest text-amber-500 mb-0.5">조건</p>
+              <p class="text-xs font-bold text-stone-800">유의미한가?</p>
+              <p class="text-[10px] text-stone-500 mt-0.5">신뢰도 ≥ 0.7</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Arrow 3 -->
+        <div class="flex items-center gap-0 flex-shrink-0 mx-1">
+          <div class="w-8 h-px bg-stone-300"></div>
+          <div class="w-0 h-0 border-t-4 border-b-4 border-l-6 border-transparent border-l-stone-300" style="border-left-width:6px"></div>
+        </div>
+
+        <!-- Node 4: Action -->
+        <div class="flex flex-col items-center gap-1.5 flex-shrink-0">
+          <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
+            <i data-lucide="bell-ring" class="w-5 h-5 text-emerald-600"></i>
+          </div>
+          <div class="bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2.5 text-center w-32">
+            <p class="text-[10px] font-semibold uppercase tracking-widest text-emerald-500 mb-0.5">액션</p>
+            <p class="text-xs font-bold text-stone-800">알림 발송</p>
+            <p class="text-[10px] text-stone-500 mt-0.5">Slack + 이메일</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Execution History mini -->
+      <div class="mt-5 pt-4 border-t border-stone-100">
+        <p class="text-xs font-semibold text-stone-600 mb-2">최근 실행 이력</p>
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between text-xs py-1.5 px-3 bg-emerald-50 rounded-lg">
+            <span class="text-stone-600 font-mono">오늘 10:00:15</span>
+            <span class="text-emerald-600 font-medium">성공 — 알림 발송됨 (신뢰도 0.88)</span>
+            <span class="text-stone-400">2분 12초</span>
+          </div>
+          <div class="flex items-center justify-between text-xs py-1.5 px-3 bg-stone-50 rounded-lg">
+            <span class="text-stone-600 font-mono">오늘 09:45:03</span>
+            <span class="text-stone-500">스킵 — 유의미하지 않음 (신뢰도 0.42)</span>
+            <span class="text-stone-400">58초</span>
+          </div>
+          <div class="flex items-center justify-between text-xs py-1.5 px-3 bg-emerald-50 rounded-lg">
+            <span class="text-stone-600 font-mono">오늘 09:30:07</span>
+            <span class="text-emerald-600 font-medium">성공 — 알림 발송됨 (신뢰도 0.93)</span>
+            <span class="text-stone-400">1분 45초</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function selectWorkflow(idx) {
+      // Visual feedback only (in real app would load workflow data)
+      const cards = document.querySelectorAll('.col-span-2 ~ .grid > div, main > .grid-cols-2 > div');
+    }
+    lucide.createIcons();
+  </script>
+</body>
+</html>

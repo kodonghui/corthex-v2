@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>홈 — CORTHEX v2</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    h1, h2, h3, h4, h5, h6, .font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .font-mono, code, pre { font-family: 'JetBrains Mono', monospace; }
+    @keyframes blink-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+    .animate-blink { animation: blink-pulse 2s ease-in-out infinite; }
+  </style>
+</head>
+<body class="bg-stone-50">
+
+<!-- 사이드바 -->
+<aside class="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-10">
+  <div class="h-14 flex items-center px-4 border-b border-stone-200">
+    <div class="flex items-center gap-2.5">
+      <div class="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
+        <span class="text-white font-bold text-sm">C</span>
+      </div>
+      <span class="font-bold text-stone-900 text-[15px]" style="font-family: 'Plus Jakarta Sans', sans-serif">CORTHEX</span>
+    </div>
+  </div>
+  <nav class="flex-1 overflow-y-auto p-3 space-y-0.5">
+    <div class="mb-4">
+      <p class="text-[11px] font-semibold uppercase tracking-widest text-stone-400 px-3 mb-2">워크스페이스</p>
+      <a href="app-home.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm bg-violet-50 text-violet-700 font-medium group">
+        <i data-lucide="home" class="w-4 h-4 flex-shrink-0"></i><span>홈</span>
+      </a>
+      <a href="app-command-center.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 font-normal transition-colors duration-150 group">
+        <i data-lucide="terminal" class="w-4 h-4 flex-shrink-0"></i><span>사령관실</span>
+      </a>
+      <a href="app-chat.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors duration-150 group">
+        <i data-lucide="message-circle" class="w-4 h-4 flex-shrink-0"></i><span>채팅</span>
+      </a>
+      <a href="app-dashboard.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors duration-150 group">
+        <i data-lucide="layout-dashboard" class="w-4 h-4 flex-shrink-0"></i><span>대시보드</span>
+      </a>
+    </div>
+    <div class="mb-4">
+      <p class="text-[11px] font-semibold uppercase tracking-widest text-stone-400 px-3 mb-2">조직</p>
+      <a href="app-agents.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors">
+        <i data-lucide="users" class="w-4 h-4"></i><span>에이전트</span>
+      </a>
+      <a href="app-departments.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors">
+        <i data-lucide="building-2" class="w-4 h-4"></i><span>부서</span>
+      </a>
+      <a href="app-nexus.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors">
+        <i data-lucide="git-branch" class="w-4 h-4"></i><span>조직도 (Nexus)</span>
+      </a>
+    </div>
+    <div class="mb-4">
+      <p class="text-[11px] font-semibold uppercase tracking-widest text-stone-400 px-3 mb-2">업무 도구</p>
+      <a href="app-trading.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors">
+        <i data-lucide="trending-up" class="w-4 h-4"></i><span>트레이딩</span>
+      </a>
+      <a href="app-agora.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors">
+        <i data-lucide="megaphone" class="w-4 h-4"></i><span>아고라</span>
+      </a>
+      <a href="app-sns.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors">
+        <i data-lucide="share-2" class="w-4 h-4"></i><span>SNS</span>
+      </a>
+      <a href="app-messenger.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors">
+        <i data-lucide="messages-square" class="w-4 h-4"></i><span>메신저</span>
+      </a>
+      <a href="app-knowledge.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors">
+        <i data-lucide="book-open" class="w-4 h-4"></i><span>지식베이스</span>
+      </a>
+      <a href="app-files.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors">
+        <i data-lucide="folder" class="w-4 h-4"></i><span>파일</span>
+      </a>
+    </div>
+    <div class="mb-4">
+      <p class="text-[11px] font-semibold uppercase tracking-widest text-stone-400 px-3 mb-2">기록 &amp; 분석</p>
+      <a href="app-reports.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors">
+        <i data-lucide="file-text" class="w-4 h-4"></i><span>보고서</span>
+      </a>
+      <a href="app-ops-log.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors">
+        <i data-lucide="scroll-text" class="w-4 h-4"></i><span>작전일지</span>
+      </a>
+      <a href="app-jobs.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors">
+        <i data-lucide="clock" class="w-4 h-4"></i><span>예약 작업</span>
+      </a>
+      <a href="app-costs.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors">
+        <i data-lucide="dollar-sign" class="w-4 h-4"></i><span>비용</span>
+      </a>
+      <a href="app-activity-log.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors">
+        <i data-lucide="activity" class="w-4 h-4"></i><span>활동 로그</span>
+      </a>
+      <a href="app-performance.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors">
+        <i data-lucide="bar-chart-2" class="w-4 h-4"></i><span>전력분석</span>
+      </a>
+      <a href="app-argos.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors">
+        <i data-lucide="eye" class="w-4 h-4"></i><span>아르고스</span>
+      </a>
+      <a href="app-classified.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors">
+        <i data-lucide="lock" class="w-4 h-4"></i><span>기밀문서</span>
+      </a>
+    </div>
+    <div>
+      <p class="text-[11px] font-semibold uppercase tracking-widest text-stone-400 px-3 mb-2">설정</p>
+      <a href="app-credentials.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors">
+        <i data-lucide="key" class="w-4 h-4"></i><span>크리덴셜</span>
+      </a>
+      <a href="app-notifications.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors">
+        <i data-lucide="bell" class="w-4 h-4"></i><span>알림</span>
+      </a>
+      <a href="app-settings.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-100 transition-colors">
+        <i data-lucide="settings" class="w-4 h-4"></i><span>설정</span>
+      </a>
+    </div>
+  </nav>
+  <div class="p-3 border-t border-stone-200">
+    <div class="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-stone-100 cursor-pointer transition-colors">
+      <div class="w-7 h-7 bg-violet-100 rounded-full flex items-center justify-center flex-shrink-0">
+        <span class="text-violet-700 font-semibold text-xs">김</span>
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-xs font-medium text-stone-800 truncate">김대표</p>
+        <p class="text-[10px] text-stone-400 truncate">kim@acme.co.kr</p>
+      </div>
+      <i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 text-stone-400 flex-shrink-0"></i>
+    </div>
+  </div>
+</aside>
+
+<!-- 메인 -->
+<div class="ml-60 min-h-screen bg-stone-50">
+  <!-- 헤더 -->
+  <header class="h-14 bg-white border-b border-stone-200 flex items-center px-6 sticky top-0 z-10">
+    <div class="flex items-center justify-between w-full">
+      <div class="flex items-center gap-2 text-sm text-stone-500">
+        <span>홈</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button class="relative text-stone-600 hover:bg-stone-100 rounded-lg px-3 py-1.5 text-sm transition-colors duration-150">
+          <i data-lucide="bell" class="w-4 h-4"></i>
+          <span class="absolute top-1.5 right-2 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
+        </button>
+        <a href="app-command-center.html" class="bg-violet-600 hover:bg-violet-700 text-white rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-150 flex items-center gap-2">
+          <i data-lucide="terminal" class="w-4 h-4"></i>
+          <span>새 명령</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 콘텐츠 -->
+  <main class="p-6 space-y-6">
+
+    <!-- API: GET /api/workspace/home/summary -->
+    <!-- 웰컴 배너 -->
+    <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-6 flex items-start justify-between">
+      <div>
+        <h1 class="text-[32px] font-bold tracking-tight text-stone-900" style="font-family: 'Plus Jakarta Sans', sans-serif">
+          안녕하세요, 김대표님 👋
+        </h1>
+        <p class="text-sm text-stone-500 mt-1.5">
+          2026년 3월 10일 (화) · 오늘도 CORTHEX와 함께 최고의 하루를 만들어보세요.
+        </p>
+        <div class="flex items-center gap-3 mt-4">
+          <a href="app-command-center.html" class="bg-violet-600 hover:bg-violet-700 text-white rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-150 flex items-center gap-2">
+            <i data-lucide="terminal" class="w-4 h-4"></i> 사령관실 열기
+          </a>
+          <a href="app-dashboard.html" class="bg-white border border-stone-200 hover:border-stone-300 text-stone-700 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 flex items-center gap-2">
+            <i data-lucide="bar-chart-2" class="w-4 h-4"></i> 대시보드 보기
+          </a>
+        </div>
+      </div>
+      <div class="text-right flex-shrink-0">
+        <span class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 rounded-full px-2.5 py-0.5 text-xs font-medium">
+          <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-blink"></span>
+          전체 시스템 정상
+        </span>
+        <p class="text-xs text-stone-400 mt-1.5">마지막 동기화: 방금 전</p>
+        <p class="text-xs text-stone-400 mt-0.5">활성 에이전트: 18 / 24</p>
+      </div>
+    </div>
+
+    <!-- API: GET /api/workspace/home/kpi -->
+    <!-- KPI 카드 4개 -->
+    <div class="grid grid-cols-4 gap-4">
+      <!-- 총 에이전트 -->
+      <div class="bg-white rounded-xl border border-stone-200 shadow-sm hover:border-violet-200 hover:shadow-md transition-all duration-150 p-5">
+        <div class="flex items-start justify-between mb-3">
+          <p class="text-[11px] font-semibold uppercase tracking-widest text-stone-500">총 에이전트</p>
+          <div class="w-9 h-9 bg-violet-50 rounded-lg flex items-center justify-center">
+            <i data-lucide="users" class="w-4.5 h-4.5 text-violet-600"></i>
+          </div>
+        </div>
+        <p class="text-[32px] font-bold tracking-tight text-stone-900 leading-none" style="font-family: 'Plus Jakarta Sans', sans-serif">24</p>
+        <p class="text-xs text-emerald-600 mt-2 flex items-center gap-1">
+          <i data-lucide="trending-up" class="w-3 h-3"></i> 지난달 대비 +3명
+        </p>
+        <div class="flex gap-1.5 mt-3">
+          <span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 rounded-full px-2 py-0.5 text-[10px] font-medium">
+            <span class="w-1 h-1 bg-emerald-500 rounded-full"></span> 온라인 18
+          </span>
+          <span class="inline-flex items-center gap-1 bg-stone-100 text-stone-500 rounded-full px-2 py-0.5 text-[10px] font-medium">
+            오프라인 6
+          </span>
+        </div>
+      </div>
+
+      <!-- 오늘 완료 작업 -->
+      <div class="bg-white rounded-xl border border-stone-200 shadow-sm hover:border-violet-200 hover:shadow-md transition-all duration-150 p-5">
+        <div class="flex items-start justify-between mb-3">
+          <p class="text-[11px] font-semibold uppercase tracking-widest text-stone-500">오늘 완료 작업</p>
+          <div class="w-9 h-9 bg-orange-50 rounded-lg flex items-center justify-center">
+            <i data-lucide="check-circle-2" class="w-4.5 h-4.5 text-orange-500"></i>
+          </div>
+        </div>
+        <p class="text-[32px] font-bold tracking-tight text-stone-900 leading-none" style="font-family: 'Plus Jakarta Sans', sans-serif">47</p>
+        <p class="text-xs text-emerald-600 mt-2 flex items-center gap-1">
+          <i data-lucide="trending-up" class="w-3 h-3"></i> 어제 대비 +12건
+        </p>
+        <div class="mt-3">
+          <div class="w-full bg-stone-100 rounded-full h-1.5">
+            <div class="bg-orange-500 h-1.5 rounded-full" style="width: 78%"></div>
+          </div>
+          <p class="text-[10px] text-stone-400 mt-1">목표 60개 중 47개 (78%)</p>
+        </div>
+      </div>
+
+      <!-- 이번 달 비용 -->
+      <div class="bg-white rounded-xl border border-stone-200 shadow-sm hover:border-violet-200 hover:shadow-md transition-all duration-150 p-5">
+        <div class="flex items-start justify-between mb-3">
+          <p class="text-[11px] font-semibold uppercase tracking-widest text-stone-500">이번 달 비용</p>
+          <div class="w-9 h-9 bg-emerald-50 rounded-lg flex items-center justify-center">
+            <i data-lucide="dollar-sign" class="w-4.5 h-4.5 text-emerald-600"></i>
+          </div>
+        </div>
+        <p class="text-[32px] font-bold tracking-tight text-stone-900 leading-none" style="font-family: 'Plus Jakarta Sans', sans-serif">$12.40</p>
+        <p class="text-xs text-stone-500 mt-2 flex items-center gap-1">
+          <i data-lucide="calendar" class="w-3 h-3"></i> 예산 $50 중 24.8%
+        </p>
+        <div class="mt-3">
+          <div class="w-full bg-stone-100 rounded-full h-1.5">
+            <div class="bg-emerald-500 h-1.5 rounded-full" style="width: 24.8%"></div>
+          </div>
+          <p class="text-[10px] text-stone-400 mt-1">잔여 예산 $37.60</p>
+        </div>
+      </div>
+
+      <!-- 만족도 -->
+      <div class="bg-white rounded-xl border border-stone-200 shadow-sm hover:border-violet-200 hover:shadow-md transition-all duration-150 p-5">
+        <div class="flex items-start justify-between mb-3">
+          <p class="text-[11px] font-semibold uppercase tracking-widest text-stone-500">에이전트 만족도</p>
+          <div class="w-9 h-9 bg-violet-50 rounded-lg flex items-center justify-center">
+            <i data-lucide="star" class="w-4.5 h-4.5 text-violet-600"></i>
+          </div>
+        </div>
+        <p class="text-[32px] font-bold tracking-tight text-stone-900 leading-none" style="font-family: 'Plus Jakarta Sans', sans-serif">89%</p>
+        <p class="text-xs text-emerald-600 mt-2 flex items-center gap-1">
+          <i data-lucide="trending-up" class="w-3 h-3"></i> 지난주 대비 +4%p
+        </p>
+        <div class="mt-3 flex gap-0.5 h-4">
+          <div class="bg-violet-600 rounded-l-sm h-full" style="width: 89%"></div>
+          <div class="bg-stone-100 rounded-r-sm h-full" style="width: 11%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- API: POST /api/workspace/command-center/commands -->
+    <!-- 빠른 명령 입력 -->
+    <div class="bg-white rounded-xl border border-stone-200 shadow-sm hover:border-violet-200 hover:shadow-md transition-all duration-150 p-5">
+      <h2 class="text-lg font-semibold text-stone-900 mb-3" style="font-family: 'Plus Jakarta Sans', sans-serif">
+        오늘의 첫 명령을 내려보세요
+      </h2>
+      <div class="flex gap-3">
+        <input
+          type="text"
+          placeholder="예: 오늘 마케팅 동향을 분석하고 SNS 게시물 3개를 작성해줘"
+          class="flex-1 rounded-lg border border-stone-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent text-stone-800 placeholder-stone-400"
+        />
+        <button class="bg-violet-600 hover:bg-violet-700 text-white rounded-lg px-5 py-2.5 text-sm font-semibold transition-all duration-150 flex items-center gap-2 whitespace-nowrap">
+          <i data-lucide="send" class="w-4 h-4"></i> 실행
+        </button>
+      </div>
+      <div class="flex flex-wrap gap-2 mt-3 items-center">
+        <p class="text-xs text-stone-400">빠른 선택:</p>
+        <button class="bg-white border border-stone-200 hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700 text-stone-600 rounded-full px-3 py-1 text-xs font-medium transition-all duration-150">
+          📊 오늘 시장 동향 분석
+        </button>
+        <button class="bg-white border border-stone-200 hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700 text-stone-600 rounded-full px-3 py-1 text-xs font-medium transition-all duration-150">
+          📱 SNS 콘텐츠 3개 작성
+        </button>
+        <button class="bg-white border border-stone-200 hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700 text-stone-600 rounded-full px-3 py-1 text-xs font-medium transition-all duration-150">
+          💰 투자 포트폴리오 검토
+        </button>
+        <button class="bg-white border border-stone-200 hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700 text-stone-600 rounded-full px-3 py-1 text-xs font-medium transition-all duration-150">
+          📋 일일 업무 보고서 생성
+        </button>
+        <button class="bg-white border border-stone-200 hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700 text-stone-600 rounded-full px-3 py-1 text-xs font-medium transition-all duration-150">
+          🔍 경쟁사 모니터링
+        </button>
+      </div>
+    </div>
+
+    <!-- 하단 2열 -->
+    <div class="grid grid-cols-3 gap-4">
+
+      <!-- API: GET /api/workspace/agents/status -->
+      <!-- 에이전트 현황 (2/3) -->
+      <div class="col-span-2 bg-white rounded-xl border border-stone-200 shadow-sm hover:border-violet-200 hover:shadow-md transition-all duration-150">
+        <div class="px-5 py-4 border-b border-stone-100 flex items-center justify-between">
+          <h2 class="text-lg font-semibold text-stone-900" style="font-family: 'Plus Jakarta Sans', sans-serif">에이전트 현황</h2>
+          <a href="app-agents.html" class="text-stone-600 hover:bg-stone-100 rounded-lg px-3 py-1.5 text-sm transition-colors duration-150 flex items-center gap-1">
+            전체 보기 <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </a>
+        </div>
+        <div class="divide-y divide-stone-100">
+          <!-- 이나경 -->
+          <div class="px-5 py-3.5 flex items-center gap-4 hover:bg-stone-50 transition-colors duration-150 cursor-pointer">
+            <div class="w-8 h-8 bg-violet-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <span class="text-violet-700 font-semibold text-sm">이</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-stone-800">이나경</p>
+              <p class="text-xs text-stone-400">비서실장 · claude-3-5-sonnet-20241022</p>
+            </div>
+            <span class="inline-flex items-center gap-1.5 bg-orange-50 text-orange-600 rounded-full px-2.5 py-0.5 text-xs font-medium">
+              <span class="w-1.5 h-1.5 bg-orange-500 rounded-full animate-blink"></span> 작업 중
+            </span>
+            <div class="text-right min-w-[80px]">
+              <p class="text-xs font-medium text-stone-700">12 완료</p>
+              <p class="text-[10px] text-stone-400">오늘 $1.24</p>
+            </div>
+          </div>
+          <!-- 박준형 -->
+          <div class="px-5 py-3.5 flex items-center gap-4 hover:bg-stone-50 transition-colors duration-150 cursor-pointer">
+            <div class="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <span class="text-emerald-700 font-semibold text-sm">박</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-stone-800">박준형</p>
+              <p class="text-xs text-stone-400">마케팅팀장 · claude-3-5-sonnet-20241022</p>
+            </div>
+            <span class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 rounded-full px-2.5 py-0.5 text-xs font-medium">
+              <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span> 대기 중
+            </span>
+            <div class="text-right min-w-[80px]">
+              <p class="text-xs font-medium text-stone-700">8 완료</p>
+              <p class="text-[10px] text-stone-400">오늘 $0.87</p>
+            </div>
+          </div>
+          <!-- 김재원 -->
+          <div class="px-5 py-3.5 flex items-center gap-4 hover:bg-stone-50 transition-colors duration-150 cursor-pointer">
+            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <span class="text-blue-700 font-semibold text-sm">김</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-stone-800">김재원</p>
+              <p class="text-xs text-stone-400">투자분석가 · gpt-4o-2024-11-20</p>
+            </div>
+            <span class="inline-flex items-center gap-1.5 bg-orange-50 text-orange-600 rounded-full px-2.5 py-0.5 text-xs font-medium">
+              <span class="w-1.5 h-1.5 bg-orange-500 rounded-full animate-blink"></span> 작업 중
+            </span>
+            <div class="text-right min-w-[80px]">
+              <p class="text-xs font-medium text-stone-700">5 완료</p>
+              <p class="text-[10px] text-stone-400">오늘 $2.10</p>
+            </div>
+          </div>
+          <!-- 이소연 -->
+          <div class="px-5 py-3.5 flex items-center gap-4 hover:bg-stone-50 transition-colors duration-150 cursor-pointer">
+            <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <span class="text-red-700 font-semibold text-sm">이</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-stone-800">이소연</p>
+              <p class="text-xs text-stone-400">법무전문가 · claude-3-opus-20240229</p>
+            </div>
+            <span class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 rounded-full px-2.5 py-0.5 text-xs font-medium">
+              <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span> 대기 중
+            </span>
+            <div class="text-right min-w-[80px]">
+              <p class="text-xs font-medium text-stone-700">3 완료</p>
+              <p class="text-[10px] text-stone-400">오늘 $0.45</p>
+            </div>
+          </div>
+          <!-- 최민지 -->
+          <div class="px-5 py-3.5 flex items-center gap-4 hover:bg-stone-50 transition-colors duration-150 cursor-pointer">
+            <div class="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <span class="text-amber-700 font-semibold text-sm">최</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-stone-800">최민지</p>
+              <p class="text-xs text-stone-400">카피라이터 · claude-3-5-haiku-20241022</p>
+            </div>
+            <span class="inline-flex items-center gap-1.5 bg-orange-50 text-orange-600 rounded-full px-2.5 py-0.5 text-xs font-medium">
+              <span class="w-1.5 h-1.5 bg-orange-500 rounded-full animate-blink"></span> 작업 중
+            </span>
+            <div class="text-right min-w-[80px]">
+              <p class="text-xs font-medium text-stone-700">15 완료</p>
+              <p class="text-[10px] text-stone-400">오늘 $0.32</p>
+            </div>
+          </div>
+          <!-- 한지훈 -->
+          <div class="px-5 py-3.5 flex items-center gap-4 hover:bg-stone-50 transition-colors duration-150 cursor-pointer">
+            <div class="w-8 h-8 bg-stone-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <span class="text-stone-500 font-semibold text-sm">한</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-stone-800">한지훈</p>
+              <p class="text-xs text-stone-400">데이터분석가 · gemini-1.5-pro-002</p>
+            </div>
+            <span class="inline-flex items-center gap-1.5 bg-red-50 text-red-700 rounded-full px-2.5 py-0.5 text-xs font-medium">
+              <span class="w-1.5 h-1.5 bg-red-500 rounded-full"></span> 오류
+            </span>
+            <div class="text-right min-w-[80px]">
+              <p class="text-xs font-medium text-stone-700">4 완료</p>
+              <p class="text-[10px] text-stone-400">오늘 $0.78</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 우측 패널 -->
+      <div class="space-y-4">
+        <!-- API: GET /api/workspace/reports/recent -->
+        <!-- 최근 보고서 -->
+        <div class="bg-white rounded-xl border border-stone-200 shadow-sm hover:border-violet-200 hover:shadow-md transition-all duration-150">
+          <div class="px-5 py-4 border-b border-stone-100 flex items-center justify-between">
+            <h2 class="text-base font-semibold text-stone-900" style="font-family: 'Plus Jakarta Sans', sans-serif">최근 보고서</h2>
+            <a href="app-reports.html" class="text-xs text-stone-400 hover:text-stone-600 transition-colors">전체 →</a>
+          </div>
+          <div class="divide-y divide-stone-100">
+            <div class="px-5 py-3 hover:bg-stone-50 transition-colors cursor-pointer">
+              <div class="flex items-start gap-2.5">
+                <div class="w-7 h-7 bg-violet-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <i data-lucide="file-text" class="w-3.5 h-3.5 text-violet-600"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-medium text-stone-800 truncate">3월 마케팅 전략 보고서</p>
+                  <p class="text-[10px] text-stone-400 mt-0.5">박준형 · 2시간 전</p>
+                </div>
+              </div>
+            </div>
+            <div class="px-5 py-3 hover:bg-stone-50 transition-colors cursor-pointer">
+              <div class="flex items-start gap-2.5">
+                <div class="w-7 h-7 bg-emerald-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <i data-lucide="trending-up" class="w-3.5 h-3.5 text-emerald-600"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-medium text-stone-800 truncate">KOSPI 200 투자 분석</p>
+                  <p class="text-[10px] text-stone-400 mt-0.5">김재원 · 4시간 전</p>
+                </div>
+              </div>
+            </div>
+            <div class="px-5 py-3 hover:bg-stone-50 transition-colors cursor-pointer">
+              <div class="flex items-start gap-2.5">
+                <div class="w-7 h-7 bg-amber-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <i data-lucide="scale" class="w-3.5 h-3.5 text-amber-600"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-medium text-stone-800 truncate">개인정보처리방침 개정안 검토</p>
+                  <p class="text-[10px] text-stone-400 mt-0.5">이소연 · 어제 17:30</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 퀵 액션 -->
+        <div class="bg-white rounded-xl border border-stone-200 shadow-sm hover:border-violet-200 hover:shadow-md transition-all duration-150 p-5">
+          <h2 class="text-base font-semibold text-stone-900 mb-3" style="font-family: 'Plus Jakarta Sans', sans-serif">퀵 액션</h2>
+          <div class="grid grid-cols-2 gap-2">
+            <button class="flex flex-col items-center gap-2 p-3 rounded-lg border border-stone-200 hover:border-violet-200 hover:bg-violet-50 transition-all duration-150 group cursor-pointer">
+              <div class="w-8 h-8 bg-violet-50 group-hover:bg-violet-100 rounded-lg flex items-center justify-center transition-colors">
+                <i data-lucide="image" class="w-4 h-4 text-violet-600"></i>
+              </div>
+              <span class="text-[11px] font-medium text-stone-600 group-hover:text-violet-700 transition-colors text-center leading-tight">이미지 생성</span>
+            </button>
+            <button class="flex flex-col items-center gap-2 p-3 rounded-lg border border-stone-200 hover:border-violet-200 hover:bg-violet-50 transition-all duration-150 group cursor-pointer">
+              <div class="w-8 h-8 bg-violet-50 group-hover:bg-violet-100 rounded-lg flex items-center justify-center transition-colors">
+                <i data-lucide="share-2" class="w-4 h-4 text-violet-600"></i>
+              </div>
+              <span class="text-[11px] font-medium text-stone-600 group-hover:text-violet-700 transition-colors text-center leading-tight">SNS 발행</span>
+            </button>
+            <button class="flex flex-col items-center gap-2 p-3 rounded-lg border border-stone-200 hover:border-violet-200 hover:bg-violet-50 transition-all duration-150 group cursor-pointer">
+              <div class="w-8 h-8 bg-violet-50 group-hover:bg-violet-100 rounded-lg flex items-center justify-center transition-colors">
+                <i data-lucide="trending-up" class="w-4 h-4 text-violet-600"></i>
+              </div>
+              <span class="text-[11px] font-medium text-stone-600 group-hover:text-violet-700 transition-colors text-center leading-tight">투자 분석</span>
+            </button>
+            <button class="flex flex-col items-center gap-2 p-3 rounded-lg border border-stone-200 hover:border-violet-200 hover:bg-violet-50 transition-all duration-150 group cursor-pointer">
+              <div class="w-8 h-8 bg-violet-50 group-hover:bg-violet-100 rounded-lg flex items-center justify-center transition-colors">
+                <i data-lucide="file-text" class="w-4 h-4 text-violet-600"></i>
+              </div>
+              <span class="text-[11px] font-medium text-stone-600 group-hover:text-violet-700 transition-colors text-center leading-tight">보고서 작성</span>
+            </button>
+            <button class="flex flex-col items-center gap-2 p-3 rounded-lg border border-stone-200 hover:border-violet-200 hover:bg-violet-50 transition-all duration-150 group cursor-pointer">
+              <div class="w-8 h-8 bg-violet-50 group-hover:bg-violet-100 rounded-lg flex items-center justify-center transition-colors">
+                <i data-lucide="search" class="w-4 h-4 text-violet-600"></i>
+              </div>
+              <span class="text-[11px] font-medium text-stone-600 group-hover:text-violet-700 transition-colors text-center leading-tight">시장 조사</span>
+            </button>
+            <button class="flex flex-col items-center gap-2 p-3 rounded-lg border border-stone-200 hover:border-violet-200 hover:bg-violet-50 transition-all duration-150 group cursor-pointer">
+              <div class="w-8 h-8 bg-violet-50 group-hover:bg-violet-100 rounded-lg flex items-center justify-center transition-colors">
+                <i data-lucide="mail" class="w-4 h-4 text-violet-600"></i>
+              </div>
+              <span class="text-[11px] font-medium text-stone-600 group-hover:text-violet-700 transition-colors text-center leading-tight">이메일 작성</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  lucide.createIcons();
+</script>
+</body>
+</html>

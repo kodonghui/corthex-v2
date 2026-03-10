@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>온보딩 설정 — CORTHEX Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; }
+    code,pre { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-stone-50 min-h-screen">
+
+  <!-- Sidebar -->
+  <aside class="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-10">
+    <div class="px-5 py-4 border-b border-stone-100">
+      <div class="flex items-center gap-2 mb-1">
+        <span class="bg-violet-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded tracking-widest">ADMIN</span>
+      </div>
+      <span class="text-lg font-bold text-stone-900" style="font-family:'Plus Jakarta Sans',sans-serif;">CORTHEX</span>
+    </div>
+    <nav class="flex-1 overflow-y-auto px-3 py-3 space-y-0.5">
+      <p class="text-[10px] font-semibold uppercase tracking-widest text-stone-400 px-2 py-1.5 mt-1">개요</p>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> 대시보드</a>
+      <p class="text-[10px] font-semibold uppercase tracking-widest text-stone-400 px-2 py-1.5 mt-2">조직 관리</p>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="building-2" class="w-4 h-4"></i> 회사 관리</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="users" class="w-4 h-4"></i> 사용자 관리</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="git-branch" class="w-4 h-4"></i> 부서 관리</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="bot" class="w-4 h-4"></i> 에이전트 관리</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="user-check" class="w-4 h-4"></i> 직원 관리</a>
+      <p class="text-[10px] font-semibold uppercase tracking-widest text-stone-400 px-2 py-1.5 mt-2">운영</p>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="circle-dollar-sign" class="w-4 h-4"></i> 비용 관리</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="activity" class="w-4 h-4"></i> 모니터링</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="workflow" class="w-4 h-4"></i> 워크플로우</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="key" class="w-4 h-4"></i> 크리덴셜</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="file-bar-chart" class="w-4 h-4"></i> 보고서</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="briefcase" class="w-4 h-4"></i> 작업 현황</a>
+      <p class="text-[10px] font-semibold uppercase tracking-widest text-stone-400 px-2 py-1.5 mt-2">설정</p>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="settings" class="w-4 h-4"></i> 시스템 설정</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="store" class="w-4 h-4"></i> 템플릿 마켓</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm bg-violet-50 text-violet-700 font-medium"><i data-lucide="user-plus" class="w-4 h-4"></i> 온보딩</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="shield" class="w-4 h-4"></i> 보안 로그</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="bell" class="w-4 h-4"></i> 알림 설정</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="database" class="w-4 h-4"></i> 데이터 관리</a>
+      <a href="#" class="flex items-center gap-2.5 px-2 py-2 rounded-lg text-sm text-stone-600 hover:bg-stone-50"><i data-lucide="plug" class="w-4 h-4"></i> API 연동</a>
+    </nav>
+    <div class="px-3 py-3 border-t border-stone-100">
+      <div class="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-stone-50 cursor-pointer">
+        <div class="w-7 h-7 rounded-full bg-violet-100 flex items-center justify-center text-violet-700 font-semibold text-xs">A</div>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-semibold text-stone-800 truncate">관리자</p>
+          <p class="text-[10px] text-stone-500 truncate">admin@corthex.io</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="ml-60 p-8">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h1 class="text-xl font-bold text-stone-900">온보딩 설정</h1>
+        <p class="text-sm text-stone-500 mt-0.5">신규 회사 온보딩 프로세스 관리 — 목표: 회원가입 후 10분 이내 첫 보고서 수신</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-[10px] font-mono text-stone-400 bg-stone-100 px-2 py-1 rounded">GET /api/admin/onboarding/{companyId}</span>
+        <select class="rounded-lg border border-stone-200 px-3 py-2 text-sm bg-white text-stone-700 focus:outline-none focus:ring-2 focus:ring-violet-500">
+          <option>ACME Corp</option>
+          <option>TechVentures</option>
+          <option>LegalPlus</option>
+          <option>StartupXYZ</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Stats Banner -->
+    <div class="grid grid-cols-3 gap-4 mb-6">
+      <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-4 flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center">
+          <i data-lucide="timer" class="w-5 h-5 text-blue-600"></i>
+        </div>
+        <div>
+          <p class="text-base font-bold text-stone-900" style="font-family:'Plus Jakarta Sans',sans-serif;">8분 12초</p>
+          <p class="text-xs text-stone-500">평균 완료 시간</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-4 flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-violet-100 flex items-center justify-center">
+          <i data-lucide="check-circle-2" class="w-5 h-5 text-violet-600"></i>
+        </div>
+        <div>
+          <p class="text-base font-bold text-stone-900" style="font-family:'Plus Jakarta Sans',sans-serif;">78%</p>
+          <p class="text-xs text-stone-500">4단계까지 완료율</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-4 flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-emerald-100 flex items-center justify-center">
+          <i data-lucide="target" class="w-5 h-5 text-emerald-600"></i>
+        </div>
+        <div>
+          <p class="text-base font-bold text-stone-900" style="font-family:'Plus Jakarta Sans',sans-serif;">82%</p>
+          <p class="text-xs text-stone-500">10분 목표 달성률</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-5">
+      <!-- Checklist Steps (2/3) -->
+      <div class="col-span-2 space-y-4">
+        <!-- Step Progress Card -->
+        <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-5">
+          <div class="flex items-center justify-between mb-5">
+            <div>
+              <h3 class="font-bold text-stone-900 text-sm">ACME Corp 온보딩 진행 현황</h3>
+              <p class="text-xs text-stone-500 mt-0.5">가입일: 2025-01-15 · 완료: 5/6단계</p>
+            </div>
+            <div class="text-right">
+              <p class="text-xs text-stone-500">전체 진행률</p>
+              <p class="text-lg font-bold text-violet-700" style="font-family:'Plus Jakarta Sans',sans-serif;">83%</p>
+            </div>
+          </div>
+
+          <!-- Progress bar -->
+          <div class="h-1.5 bg-stone-100 rounded-full overflow-hidden mb-6">
+            <div class="h-full bg-violet-500 rounded-full" style="width:83%"></div>
+          </div>
+
+          <!-- Steps -->
+          <div class="relative">
+            <!-- Connector line -->
+            <div class="absolute left-5 top-6 bottom-6 w-px bg-stone-200"></div>
+
+            <div class="space-y-4">
+              <!-- Step 1 -->
+              <div class="flex gap-4 relative">
+                <div class="w-10 h-10 rounded-full bg-emerald-100 border-2 border-emerald-400 flex items-center justify-center flex-shrink-0 z-10">
+                  <i data-lucide="check" class="w-5 h-5 text-emerald-600"></i>
+                </div>
+                <div class="flex-1 pt-1.5">
+                  <div class="flex items-center justify-between">
+                    <p class="text-sm font-semibold text-stone-800">1단계: 회사 정보 입력</p>
+                    <span class="text-xs text-emerald-600 font-medium">완료 (2025-01-15)</span>
+                  </div>
+                  <p class="text-xs text-stone-500 mt-0.5">회사명, 슬러그, 기본 언어 및 시간대 설정</p>
+                </div>
+              </div>
+
+              <!-- Step 2 -->
+              <div class="flex gap-4 relative">
+                <div class="w-10 h-10 rounded-full bg-emerald-100 border-2 border-emerald-400 flex items-center justify-center flex-shrink-0 z-10">
+                  <i data-lucide="check" class="w-5 h-5 text-emerald-600"></i>
+                </div>
+                <div class="flex-1 pt-1.5">
+                  <div class="flex items-center justify-between">
+                    <p class="text-sm font-semibold text-stone-800">2단계: 크리덴셜 등록 (LLM CLI 토큰)</p>
+                    <span class="text-xs text-emerald-600 font-medium">완료</span>
+                  </div>
+                  <p class="text-xs text-stone-500 mt-0.5">Anthropic CLI 토큰 AES-256-GCM 암호화 저장</p>
+                </div>
+              </div>
+
+              <!-- Step 3 -->
+              <div class="flex gap-4 relative">
+                <div class="w-10 h-10 rounded-full bg-emerald-100 border-2 border-emerald-400 flex items-center justify-center flex-shrink-0 z-10">
+                  <i data-lucide="check" class="w-5 h-5 text-emerald-600"></i>
+                </div>
+                <div class="flex-1 pt-1.5">
+                  <div class="flex items-center justify-between">
+                    <p class="text-sm font-semibold text-stone-800">3단계: 조직 템플릿 선택</p>
+                    <span class="text-xs text-emerald-600 font-medium">완료</span>
+                  </div>
+                  <p class="text-xs text-stone-500 mt-0.5">"중소기업 표준" 선택 — 마케팅/리서치/법무/재무 4개 부서 자동 생성</p>
+                </div>
+              </div>
+
+              <!-- Step 4 -->
+              <div class="flex gap-4 relative">
+                <div class="w-10 h-10 rounded-full bg-emerald-100 border-2 border-emerald-400 flex items-center justify-center flex-shrink-0 z-10">
+                  <i data-lucide="check" class="w-5 h-5 text-emerald-600"></i>
+                </div>
+                <div class="flex-1 pt-1.5">
+                  <div class="flex items-center justify-between">
+                    <p class="text-sm font-semibold text-stone-800">4단계: 첫 명령 실행</p>
+                    <span class="text-xs text-emerald-600 font-medium">완료 — 7분 23초 만에 달성!</span>
+                  </div>
+                  <p class="text-xs text-stone-500 mt-0.5">Command Center에서 첫 번째 에이전트 명령 성공적으로 실행</p>
+                </div>
+              </div>
+
+              <!-- Step 5 -->
+              <div class="flex gap-4 relative">
+                <div class="w-10 h-10 rounded-full bg-emerald-100 border-2 border-emerald-400 flex items-center justify-center flex-shrink-0 z-10">
+                  <i data-lucide="check" class="w-5 h-5 text-emerald-600"></i>
+                </div>
+                <div class="flex-1 pt-1.5">
+                  <div class="flex items-center justify-between">
+                    <p class="text-sm font-semibold text-stone-800">5단계: 첫 보고서 수신</p>
+                    <span class="text-xs text-emerald-600 font-medium">완료</span>
+                  </div>
+                  <p class="text-xs text-stone-500 mt-0.5">AI 에이전트가 생성한 첫 번째 보고서를 수신 및 확인</p>
+                </div>
+              </div>
+
+              <!-- Step 6 — incomplete -->
+              <div class="flex gap-4 relative">
+                <div class="w-10 h-10 rounded-full bg-stone-100 border-2 border-stone-300 flex items-center justify-center flex-shrink-0 z-10">
+                  <span class="text-xs font-bold text-stone-400">6</span>
+                </div>
+                <div class="flex-1 pt-1.5">
+                  <div class="flex items-center justify-between">
+                    <p class="text-sm font-semibold text-stone-500">6단계: 크론 설정</p>
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs text-stone-400">미완료</span>
+                      <button class="bg-violet-600 hover:bg-violet-700 text-white rounded-lg px-3 py-1.5 text-xs font-semibold">안내 보내기</button>
+                    </div>
+                  </div>
+                  <p class="text-xs text-stone-400 mt-0.5">정기 자동 실행 스케줄(크론) 설정으로 완전 자동화 달성</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guide Editor -->
+        <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-5">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-stone-900 text-sm">온보딩 가이드 편집</h3>
+            <span class="text-[10px] font-mono text-stone-400">PUT /api/admin/onboarding/{companyId}/steps</span>
+          </div>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-xs font-semibold text-stone-600 mb-1.5">2단계 안내 문구 (크리덴셜 등록)</label>
+              <textarea class="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none" rows="2">Anthropic Claude CLI 구독 토큰을 등록하세요. 토큰은 AES-256-GCM으로 안전하게 암호화됩니다.</textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-600 mb-1.5">6단계 안내 문구 (크론 설정)</label>
+              <textarea class="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none" rows="2">크론 표현식으로 에이전트를 정기 자동 실행하세요. 예: "0 9 * * 1-5" = 평일 오전 9시 자동 실행</textarea>
+            </div>
+            <div class="flex justify-end">
+              <button class="bg-violet-600 hover:bg-violet-700 text-white rounded-lg px-4 py-2 text-sm font-semibold">가이드 저장</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div class="space-y-4">
+        <!-- All companies progress -->
+        <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-5">
+          <h3 class="font-bold text-stone-900 text-sm mb-4">전체 회사 온보딩 현황</h3>
+          <div class="space-y-4">
+            <div>
+              <div class="flex justify-between text-xs mb-1"><span class="font-medium text-stone-700">ACME Corp</span><span class="text-emerald-600 font-medium">5/6단계</span></div>
+              <div class="h-1.5 bg-stone-100 rounded-full overflow-hidden"><div class="h-full bg-emerald-500 rounded-full" style="width:83%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs mb-1"><span class="font-medium text-stone-700">TechVentures</span><span class="text-emerald-600 font-medium">6/6단계</span></div>
+              <div class="h-1.5 bg-stone-100 rounded-full overflow-hidden"><div class="h-full bg-emerald-500 rounded-full" style="width:100%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs mb-1"><span class="font-medium text-stone-700">LegalPlus</span><span class="text-emerald-600 font-medium">6/6단계</span></div>
+              <div class="h-1.5 bg-stone-100 rounded-full overflow-hidden"><div class="h-full bg-emerald-500 rounded-full" style="width:100%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs mb-1"><span class="font-medium text-stone-700">StartupXYZ</span><span class="text-amber-600 font-medium">3/6단계</span></div>
+              <div class="h-1.5 bg-stone-100 rounded-full overflow-hidden"><div class="h-full bg-amber-400 rounded-full" style="width:50%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tips -->
+        <div class="bg-violet-50 border border-violet-100 rounded-xl p-5">
+          <h3 class="font-bold text-violet-900 text-sm mb-3">온보딩 최적화 팁</h3>
+          <div class="space-y-2.5">
+            <div class="flex gap-2 text-xs text-violet-800">
+              <i data-lucide="lightbulb" class="w-3.5 h-3.5 text-violet-500 flex-shrink-0 mt-0.5"></i>
+              <span>4단계(첫 명령 실행)에서 68%의 이탈이 발생합니다. 명확한 예시 명령어 제공 권장.</span>
+            </div>
+            <div class="flex gap-2 text-xs text-violet-800">
+              <i data-lucide="lightbulb" class="w-3.5 h-3.5 text-violet-500 flex-shrink-0 mt-0.5"></i>
+              <span>크리덴셜 입력 UI에 CLI 토큰 발급 바로가기 링크를 추가하면 완료 시간이 2분 단축됩니다.</span>
+            </div>
+            <div class="flex gap-2 text-xs text-violet-800">
+              <i data-lucide="lightbulb" class="w-3.5 h-3.5 text-violet-500 flex-shrink-0 mt-0.5"></i>
+              <span>6단계 미완료 회사에 D+3 자동 이메일 발송 설정 권장.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-5">
+          <h3 class="font-bold text-stone-900 text-sm mb-3">빠른 액션</h3>
+          <div class="space-y-2">
+            <button class="w-full text-left flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-stone-50 text-sm text-stone-700">
+              <i data-lucide="send" class="w-4 h-4 text-stone-400"></i> 미완료 회사 일괄 안내
+            </button>
+            <button class="w-full text-left flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-stone-50 text-sm text-stone-700">
+              <i data-lucide="download" class="w-4 h-4 text-stone-400"></i> 온보딩 현황 CSV 내보내기
+            </button>
+            <button class="w-full text-left flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-stone-50 text-sm text-stone-700">
+              <i data-lucide="edit-3" class="w-4 h-4 text-stone-400"></i> 전체 가이드 일괄 편집
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>
