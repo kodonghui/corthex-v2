@@ -1,23 +1,23 @@
 # 현재 작업 상태
-> 마지막 업데이트: 2026-03-09 12:50
+> 마지막 업데이트: 2026-03-10 03:30
 
 ## 지금 하고 있는 것
-- UXUI 리팩토링 파이프라인 Phase 0 완료, Phase 1 진행 직전
-- Playwright e2e 테스트 환경 세팅 완료 (packages/e2e)
+- VS Code Claude Code에서 Subframe UXUI 리팩토링 준비 완료
 
 ## 핵심 결정사항
-- Playwright 테스트는 배포 URL(corthex-hq.com) 대상 — 이유: 실제 사용자 환경과 동일
-- VS Code Playwright 확장 사용 (Show Browser로 시각적 확인) — 이유: 비개발자가 테스트 과정 관찰 가능
-- mobile 프로젝트는 Chromium 사용 — 이유: WebKit 미설치, Chromium이면 충분
-- .env.test 경로는 path.resolve(__dirname) 사용 — 이유: VS Code 확장이 프로젝트 루트에서 실행되므로 상대경로 불가
+- Subframe 중심 파이프라인 v8 확정 — design(브라우저 프리뷰) → develop(코드 변환)
+- 이 서버(Ubuntu)에서는 Subframe MCP OAuth 불가 → VS Code에서 작업
+- 이전 리디자인 4회 실패 → 전부 원복 완료
+- 모든 페이지 처음부터 다시 (dashboard 포함)
+- Pro Max = 참고 DB, LibreUIUX = 감사 도구, Subframe = 디자인+코드 생성 도구
 
 ## 다음 할 것
-1. Phase 1 — 스모크 테스트 결과 리포트 생성 (phase1-baseline.md)
-2. admin 3개 페이지 버그 확인 (admin-home, costs, settings → 로그인 페이지로 튕김)
-3. 페이지별 UXUI 리팩토링 시작 (spec → Banana2 → code → Playwright)
+1. VS Code에서 `/kdh-uxui-pipeline design command-center` 실행
+2. Subframe 디자인 확인 → 확정 → `/kdh-uxui-pipeline develop command-center`
+3. 1순위 9페이지 순서: command-center → chat → dashboard → trading → agora → nexus → agents → departments → credentials
 
 ## 주의사항
-- 새 패키지 추가 시 Dockerfile COPY 목록 반드시 업데이트 (lockfile 불일치 방지)
-- 커밋 전 `./node_modules/.bin/tsc --noEmit -p packages/server/tsconfig.json` 실행 (npx tsc 안 됨)
-- admin 스모크 테스트 64/67 통과 (3개 실패는 앱 자체 버그)
-- 메모리 브랜치(claude/review-photos-jV8j4) main에 머지 완료
+- 커밋 전 `npx tsc --noEmit -p packages/server/tsconfig.json` 필수
+- 배포 후 완료까지 대기 → 사용자에게 보고
+- Subframe 컴포넌트: packages/app/src/ui/components/ (50개+)
+- .subframe/sync.json 프로젝트 ID: fe1d14ed3033

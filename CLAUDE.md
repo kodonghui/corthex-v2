@@ -8,10 +8,10 @@
 
 ## Deploy
 - main push -> GitHub Actions -> Cloudflare cache purge
-- Post-deploy report: build #N + changes + where to check (table format)
 - **Before commit+push**: `npx tsc --noEmit -p packages/server/tsconfig.json` (deploy fails on type errors)
 - Common type errors: wrong union values (check shared/types.ts), wrong c.set() keys (check server/types.ts), case-sensitive imports (use `git ls-files`)
 - Team agents must also run tsc before reporting completion
+- **After push**: wait for deploy to finish (`gh run list -L 1`), then report to user: build #N + changes + where to check (table format). Do NOT move to next task until deploy is confirmed
 
 ## v1 Feature Spec (top priority reference)
 - Path: `_bmad-output/planning-artifacts/v1-feature-spec.md`
