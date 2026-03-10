@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORTHEX v2 - 결재선 및 보고체계 (Admin Report Lines)</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        background: { DEFAULT: '#faf8f5', alt: '#f5f0eb' },
+                        surface: { DEFAULT: '#ffffff', alt: '#fdfcfb' },
+                        primary: { DEFAULT: '#5a7247', hover: '#4b603b', light: '#e8ece5' },
+                        secondary: { DEFAULT: '#c4622d', hover: '#a85325', light: '#faebe4' },
+                        accent: { DEFAULT: '#d4a843', hover: '#be963b', light: '#fbf4e4' },
+                        text: { main: '#2d2c2a', muted: '#73706c', light: '#a6a39f' },
+                        border: { DEFAULT: '#e5e0d8', focus: '#c7c0b5' }
+                    },
+                    fontFamily: {
+                        sans: ['"Pretendard Variable"', 'sans-serif'],
+                        serif: ['"Noto Serif KR"', 'serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'card': '0 8px 30px -4px rgba(0, 0, 0, 0.04), 0 4px 10px -2px rgba(0, 0, 0, 0.02)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: theme('colors.background.DEFAULT');
+            color: theme('colors.text.main');
+        }
+
+        .card {
+            background-color: theme('colors.surface.DEFAULT');
+            border-radius: 1rem;
+            box-shadow: theme('boxShadow.card');
+            border: 1px solid theme('colors.border.DEFAULT');
+        }
+
+        .nav-item {
+            display: flex;
+            items-center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            color: theme('colors.text.muted');
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            background-color: theme('colors.background.alt');
+            color: theme('colors.text.main');
+        }
+
+        .nav-item.active {
+            background-color: theme('colors.primary.light');
+            color: theme('colors.primary.hover');
+            font-weight: 600;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: theme('colors.border.focus');
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body class="flex h-screen overflow-hidden text-sm">
+
+    <!-- Admin Sidebar -->
+    <aside class="w-64 bg-surface border-r border-border flex flex-col h-full z-10 shadow-soft shrink-0">
+        <div class="p-6 border-b border-border">
+            <h2 class="font-serif text-2xl tracking-tight text-primary font-bold">CORTHEX</h2>
+            <div class="flex items-center gap-1 mt-1">
+                <span
+                    class="bg-primary/10 text-primary border border-primary/20 px-1.5 py-0.5 rounded text-[10px] font-bold">ADMIN
+                    PANEL</span>
+            </div>
+        </div>
+
+        <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
+            <p class="px-4 text-[10px] font-bold text-text-light uppercase tracking-widest mb-2">조직 및 권한</p>
+            <a href="admin-org-chart.html" class="nav-item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                    </path>
+                </svg>
+                전체 조직도
+            </a>
+            <a href="admin-org-templates.html" class="nav-item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                    </path>
+                </svg>
+                조직 템플릿
+            </a>
+            <a href="admin-report-lines.html" class="nav-item active">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                    </path>
+                </svg>
+                결재선/보고체계
+            </a>
+
+            <p class="px-4 text-[10px] font-bold text-text-light uppercase tracking-widest mt-6 mb-2">플랫폼 관리로 돌아가기</p>
+            <a href="admin-dashboard.html" class="nav-item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                    </path>
+                </svg>
+                전체 대시보드
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-border">
+            <a href="home.html"
+                class="flex items-center justify-center gap-2 p-2 rounded-lg bg-surface border border-border text-text-muted hover:bg-background-alt transition-colors w-full text-xs font-bold">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                    </path>
+                </svg>
+                워크스페이스 복귀
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <!-- API: GET /api/admin/org/report-lines -->
+    <main class="flex-1 overflow-y-auto px-8 py-10 relative">
+        <header class="mb-10 lg:flex lg:justify-between lg:items-end border-b border-border pb-6">
+            <div>
+                <h1 class="text-3xl font-serif text-text-main font-bold mb-2">결재선 및 보고 체계 규칙</h1>
+                <p class="text-text-muted">에이전트가 단독으로 처리할 수 있는 권한 범위와, 인간 매니저(Human-in-the-loop)의 최종 승인이 필요한 작업 규칙을
+                    정의합니다.</p>
+            </div>
+
+            <div class="mt-4 lg:mt-0">
+                <button
+                    class="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-xl transition-colors font-medium shadow-sm flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    새 승인 규칙 생성
+                </button>
+            </div>
+        </header>
+
+        <div class="space-y-6">
+
+            <!-- Rule 1 -->
+            <div class="card p-0 overflow-hidden flex flex-col lg:flex-row">
+                <div
+                    class="bg-background-alt p-6 border-b lg:border-b-0 lg:border-r border-border min-w-[250px] flex flex-col justify-center">
+                    <div class="flex items-center gap-2 mb-3">
+                        <svg class="w-5 h-5 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                            </path>
+                        </svg>
+                        <h3 class="font-bold text-base text-text-main">재무 지출 결의</h3>
+                    </div>
+                    <p class="text-xs text-text-muted mb-4">재무/회계 부서 에이전트가 예산을 집행하거나 비용을 승인할 때 적용되는 규칙입니다.</p>
+                    <span
+                        class="inline-flex items-center gap-1.5 bg-surface border border-border px-2 py-1 rounded text-[10px] text-text-main w-max">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> 활성 상태
+                    </span>
+                </div>
+
+                <div class="p-6 flex-1 bg-surface">
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-4">
+                            <div
+                                class="w-8 h-8 rounded bg-background border border-border flex items-center justify-center text-text-muted font-bold text-xs shrink-0 mt-1">
+                                If</div>
+                            <div class="flex-1 bg-background-alt border border-border rounded-lg p-3 text-sm">
+                                <span
+                                    class="bg-surface px-2 py-0.5 rounded border border-border font-mono text-xs mr-2">조건
+                                    1</span>
+                                지출 금액이 <strong class="text-secondary">$1,000 USD</strong> 이상일 경우
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div
+                                class="w-8 h-8 rounded bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-xs shrink-0 mt-1">
+                                Then</div>
+                            <div class="flex-1 border border-border rounded-lg p-3 text-sm shadow-sm">
+                                <span class="text-text-muted text-xs block mb-2">다음 순서로 결재/보고 진행:</span>
+                                <ol class="relative border-l border-border-focus ml-3 space-y-4">
+                                    <li class="pl-6 relative">
+                                        <div
+                                            class="absolute w-3 h-3 bg-surface border-2 border-primary rounded-full -left-[6.5px] top-1.5">
+                                        </div>
+                                        <div class="font-bold text-text-main text-sm">인간 재무 책임자 (Human CFO) 승인 <span
+                                                class="text-red-500">*필수</span></div>
+                                        <p class="text-xs text-text-muted mt-1">슬랙(Slack) 승인 알림 발송 및 즉각 대기</p>
+                                    </li>
+                                    <li class="pl-6 relative">
+                                        <div
+                                            class="absolute w-3 h-3 bg-surface border-2 border-border-focus rounded-full -left-[6.5px] top-1.5">
+                                        </div>
+                                        <div class="font-bold text-text-main text-sm">CEO 에이전트 (Nexus) 사후 참조</div>
+                                        <p class="text-xs text-text-muted mt-1">지출 내역 요약 보고 (일간 회의)</p>
+                                    </li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rule 2 -->
+            <div class="card p-0 overflow-hidden flex flex-col lg:flex-row">
+                <div
+                    class="bg-background-alt p-6 border-b lg:border-b-0 lg:border-r border-border min-w-[250px] flex flex-col justify-center">
+                    <div class="flex items-center gap-2 mb-3">
+                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z">
+                            </path>
+                        </svg>
+                        <h3 class="font-bold text-base text-text-main">소셜 미디어 퍼블리싱 (블라인드)</h3>
+                    </div>
+                    <p class="text-xs text-text-muted mb-4">마케팅 에이전트가 외부 채널(트위터/링크드인)에 콘텐츠를 자동 포스팅할 때 적용됩니다.</p>
+                    <span
+                        class="inline-flex items-center gap-1.5 bg-surface border border-border px-2 py-1 rounded text-[10px] text-text-main w-max">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> 활성 상태
+                    </span>
+                </div>
+
+                <div class="p-6 flex-1 bg-surface opacity-70">
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-4">
+                            <div
+                                class="w-8 h-8 rounded bg-background border border-border flex items-center justify-center text-text-muted font-bold text-xs shrink-0 mt-1">
+                                If</div>
+                            <div class="flex-1 bg-background-alt border border-border rounded-lg p-3 text-sm">
+                                <span
+                                    class="bg-surface px-2 py-0.5 rounded border border-border font-mono text-xs mr-2">조건
+                                    1</span>
+                                게시판 분류가 <strong class="text-primary">'일반 홍보 (General PR)'</strong> 인 경우
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div
+                                class="w-8 h-8 rounded bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-xs shrink-0 mt-1">
+                                Then</div>
+                            <div class="flex-1 border border-border rounded-lg p-3 text-sm flex items-center gap-3">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-text-main text-sm">인간 승인 없이 자동 퍼블리싱 허용 (Auto-publish)
+                                    </div>
+                                    <p class="text-xs text-text-muted mt-1">마케팅 리드 에이전트 단계에서 자체 리뷰 후 즉시 배포</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+</body>
+
+</html>

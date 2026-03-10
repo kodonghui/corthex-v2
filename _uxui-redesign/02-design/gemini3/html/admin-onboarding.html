@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORTHEX v2 - Tenant Onboarding</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['Roboto Mono', 'monospace'] },
+                    colors: {
+                        dark: { 50: '#1a1a2e', 100: '#151525', 200: '#11111e', 300: '#0d0d18', 400: '#0a0a0f', 900: '#050508' },
+                        accent: { purple: '#a855f7', cyan: '#22d3ee' }
+                    },
+                    backgroundImage: { 'gradient-accent': 'linear-gradient(to right, #a855f7, #22d3ee)' },
+                    boxShadow: { 'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.3)', 'glow': '0 0 20px rgba(168, 85, 247, 0.3), 0 0 40px rgba(34, 211, 238, 0.2)' }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer components {
+            body { @apply bg-dark-900 text-gray-200 font-sans antialiased font-light min-h-screen overflow-hidden flex selection:bg-accent-cyan/30 selection:text-white; }
+            .bg-ambient { @apply fixed inset-0 z-[-1] pointer-events-none; }
+            .bg-ambient::before { content: ''; @apply absolute top-[-30%] left-[20%] w-[60vw] h-[60vw] rounded-full bg-blue-600/10 blur-[150px]; }
+            .bg-ambient::after { content: ''; @apply absolute bottom-[-20%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-accent-cyan/5 blur-[120px]; }
+            
+            .glass-panel { @apply bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] shadow-glass rounded-2xl overflow-hidden transition-all duration-300; }
+            
+            .nav-item { @apply flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/[0.05] transition-colors font-medium text-sm; }
+            .nav-item.active { @apply text-white bg-white/[0.08] shadow-[inset_2px_0_0_0_rgba(34,211,238,1)]; }
+            
+            .btn { @apply inline-flex items-center justify-center px-4 py-2 font-medium text-sm rounded-lg transition-all gap-2 cursor-pointer; }
+            .btn-primary { @apply bg-gradient-accent text-white hover:shadow-glow hover:opacity-90; }
+            .btn-secondary { @apply bg-white/[0.05] border border-white/[0.1] text-white hover:bg-white/[0.1]; }
+            
+            .text-gradient { @apply bg-gradient-accent bg-clip-text text-transparent; }
+            
+            .scrollbar-hide::-webkit-scrollbar { display: none; }
+            .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-ambient"></div>
+
+    <aside class="w-64 border-r border-white/[0.08] bg-dark-400/80 backdrop-blur-xl flex flex-col h-full z-20 shrink-0">
+        <div class="h-16 flex items-center px-6 border-b border-white/[0.05]">
+            <h1 class="text-xl font-bold tracking-wider text-gradient">CORTHEX</h1>
+            <span
+                class="ml-2 px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30">ADMIN</span>
+        </div>
+        <div class="flex-1 overflow-y-auto scrollbar-hide py-6 px-4 space-y-8">
+            <div class="space-y-1">
+                <a href="admin-dashboard.html" class="nav-item"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                    Global Dashboard</a>
+            </div>
+
+            <div class="space-y-1">
+                <p class="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Platform
+                    Administration</p>
+                <a href="admin-api-keys.html" class="nav-item"><i data-lucide="key-square" class="w-4 h-4"></i> Platform
+                    API Keys</a>
+                <a href="admin-costs.html" class="nav-item"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> Global
+                    Costs</a>
+                <a href="admin-monitoring.html" class="nav-item"><i data-lucide="activity" class="w-4 h-4"></i> System
+                    Monitoring</a>
+                <a href="admin-companies.html" class="nav-item"><i data-lucide="building-2" class="w-4 h-4"></i> Tenancy
+                    / Companies</a>
+                <a href="admin-onboarding.html" class="nav-item active"><i data-lucide="inbox" class="w-4 h-4"></i>
+                    Provisioning Queue</a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full relative z-10 overflow-hidden">
+
+        <header
+            class="h-16 flex items-center justify-between px-8 border-b border-white/[0.05] bg-dark-300/50 backdrop-blur shrink-0">
+            <div class="flex items-center gap-4">
+                <span class="text-sm font-medium text-gray-300"><i data-lucide="inbox"
+                        class="w-4 h-4 inline mr-2 text-accent-cyan"></i>Tenant Onboarding Queue</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-xs text-gray-500 font-mono">2 Pending Requests</span>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-8 scrollbar-hide">
+
+            <!-- Queue List (API: GET /api/admin/onboarding) -->
+            <div class="max-w-4xl mx-auto space-y-6">
+
+                <h2 class="text-xl font-medium text-white mb-6">Workspace Provisioning Requests</h2>
+
+                <!-- Request 1 -->
+                <div class="glass-panel p-6 border-l-4 border-l-amber-500 hover:border-white/10 transition-all">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <h3 class="text-lg font-bold text-white">Acme Corp</h3>
+                                <span
+                                    class="bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded text-[10px] border border-amber-500/20 font-bold tracking-wider">AWAITING
+                                    APPROVAL</span>
+                            </div>
+                            <p class="text-xs text-gray-500 font-mono">Requested: Oct 15, 2025 • Plan: Enterprise Custom
+                            </p>
+                        </div>
+                        <img src="https://ui-avatars.com/api/?name=A+C&background=f59e0b&color=fff&rounded=true"
+                            class="w-10 h-10 border border-white/10 rounded-lg">
+                    </div>
+
+                    <div class="bg-dark-300/50 rounded-lg p-4 border border-white/5 space-y-2 mb-6 text-sm">
+                        <div class="flex gap-4">
+                            <span class="text-gray-500 w-24">Admin Email:</span>
+                            <span class="text-white font-mono">ceo@acme.corp</span>
+                        </div>
+                        <div class="flex gap-4">
+                            <span class="text-gray-500 w-24">Initial Seats:</span>
+                            <span class="text-white font-mono">150 Users</span>
+                        </div>
+                        <div class="flex gap-4">
+                            <span class="text-gray-500 w-24">Note:</span>
+                            <span class="text-gray-300 italic">"We need HIPAA compliant DB isolation."</span>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-4 border-t border-white/5">
+                        <button class="btn btn-secondary text-xs">Reject Request</button>
+                        <button class="btn btn-primary text-xs"><i data-lucide="check" class="w-3 h-3"></i> Approve &
+                            Provision</button>
+                    </div>
+                </div>
+
+                <!-- Request 2 -->
+                <div class="glass-panel p-6 border-l-4 border-l-blue-500 opacity-80">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <h3 class="text-lg font-bold text-gray-300">Stark Industries</h3>
+                                <span
+                                    class="bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded text-[10px] border border-blue-500/20 font-bold tracking-wider">PROVISIONING...</span>
+                            </div>
+                            <p class="text-[10px] text-gray-500 font-mono">Requested: Oct 14, 2025 • Plan: Enterprise
+                                Standard</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 mb-4">
+                        <div>
+                            <div class="flex justify-between text-[10px] text-gray-500 mb-1 font-mono uppercase">
+                                <span>DB Schema Initialization</span>
+                                <span>65%</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-dark-200 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-500" style="width: 65%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-400 flex items-center gap-2"><i data-lucide="loader"
+                            class="w-3 h-3 animate-spin"></i> Spawning Default Agent Pods...</p>
+                </div>
+
+                <!-- History Log -->
+                <div class="mt-12">
+                    <h3 class="text-sm font-medium text-gray-400 mb-4 px-2 uppercase tracking-wider">Recent Onboardings
+                    </h3>
+                    <div class="glass-panel overflow-hidden">
+                        <div class="p-4 border-b border-white/5 flex gap-4 text-xs hover:bg-white/[0.02]">
+                            <span class="text-gray-500 font-mono w-24">Oct 10, 2025</span>
+                            <span class="text-emerald-400 font-bold w-16">SUCCESS</span>
+                            <span class="text-gray-300">Provisioned workspace <span
+                                    class="text-white font-medium">Globex Corp</span> (tn_globex_99)</span>
+                        </div>
+                        <div class="p-4 border-b border-white/5 flex gap-4 text-xs hover:bg-white/[0.02]">
+                            <span class="text-gray-500 font-mono w-24">Oct 05, 2025</span>
+                            <span class="text-rose-400 font-bold w-16">REJECTED</span>
+                            <span class="text-gray-300">Request from <span class="text-white font-medium">Spam
+                                    LLC</span> denied by System Admin.</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

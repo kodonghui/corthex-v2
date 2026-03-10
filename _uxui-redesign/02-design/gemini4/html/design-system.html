@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORTHEX v2 Design System - Natural Organic</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        background: {
+                            DEFAULT: '#faf8f5',
+                            alt: '#f5f0eb',
+                        },
+                        surface: {
+                            DEFAULT: '#ffffff',
+                            alt: '#fdfcfb',
+                        },
+                        primary: {
+                            DEFAULT: '#5a7247', // olive green
+                            hover: '#4b603b',
+                            light: '#e8ece5', // soft olive for backgrounds
+                        },
+                        secondary: {
+                            DEFAULT: '#c4622d', // terracotta
+                            hover: '#a85325',
+                            light: '#faebe4',
+                        },
+                        accent: {
+                            DEFAULT: '#d4a843', // mustard
+                            hover: '#be963b',
+                            light: '#fbf4e4',
+                        },
+                        text: {
+                            main: '#2d2c2a',
+                            muted: '#73706c',
+                            light: '#a6a39f',
+                        },
+                        border: {
+                            DEFAULT: '#e5e0d8',
+                            focus: '#c7c0b5',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Pretendard Variable"', 'Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', 'sans-serif'],
+                        serif: ['"Noto Serif KR"', 'serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'card': '0 8px 30px -4px rgba(0, 0, 0, 0.04), 0 4px 10px -2px rgba(0, 0, 0, 0.02)',
+                        'float': '0 12px 40px -6px rgba(0, 0, 0, 0.08)',
+                    },
+                    borderRadius: {
+                        'lg': '0.5rem',
+                        'xl': '0.75rem',
+                        '2xl': '1rem',
+                        '3xl': '1.5rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: theme('colors.background.DEFAULT');
+            color: theme('colors.text.main');
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        .font-serif {
+            font-family: theme('fontFamily.serif');
+            letter-spacing: -0.02em;
+        }
+
+        .card {
+            background-color: theme('colors.surface.DEFAULT');
+            border-radius: theme('borderRadius.2xl');
+            box-shadow: theme('boxShadow.card');
+            padding: 1.5rem;
+            border: 1px solid theme('colors.border.DEFAULT');
+            transition: box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: theme('boxShadow.float');
+        }
+
+        .btn-primary {
+            background-color: theme('colors.primary.DEFAULT');
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: theme('borderRadius.xl');
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 2px 8px theme('colors.primary.light');
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            background-color: theme('colors.primary.hover');
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(90, 114, 71, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: theme('colors.secondary.DEFAULT');
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: theme('borderRadius.xl');
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary:hover {
+            background-color: theme('colors.secondary.hover');
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: theme('colors.text.main');
+            border: 1px solid theme('colors.border.focus');
+            padding: 0.75rem 1.5rem;
+            border-radius: theme('borderRadius.xl');
+            font-weight: 500;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-outline:hover {
+            background-color: theme('colors.background.alt');
+            border-color: theme('colors.text.muted');
+        }
+
+        .btn-icon {
+            padding: 0.5rem;
+            border-radius: theme('borderRadius.lg');
+            color: theme('colors.text.muted');
+            transition: all 0.2s;
+        }
+
+        .btn-icon:hover {
+            background-color: theme('colors.background.alt');
+            color: theme('colors.text.main');
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid theme('colors.border.DEFAULT');
+            border-radius: theme('borderRadius.xl');
+            background-color: theme('colors.surface.DEFAULT');
+            color: theme('colors.text.main');
+            transition: all 0.2s;
+            font-family: theme('fontFamily.sans');
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: theme('colors.primary.DEFAULT');
+            box-shadow: 0 0 0 3px theme('colors.primary.light');
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .badge-primary {
+            background-color: theme('colors.primary.light');
+            color: theme('colors.primary.hover');
+        }
+
+        .badge-accent {
+            background-color: theme('colors.accent.light');
+            color: theme('colors.accent.hover');
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: theme('colors.border.focus');
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: theme('colors.text.muted');
+        }
+    </style>
+</head>
+
+<body class="p-8 md:p-12 lg:p-16 max-w-7xl mx-auto space-y-16">
+    <header class="border-b border-border pb-8">
+        <h1 class="text-4xl font-serif text-text-main mb-4">CORTHEX v2 Design System</h1>
+        <p class="text-lg text-text-muted font-sans max-w-2xl leading-relaxed">
+            "Natural Organic" 디자인 방향성. Notion, Things 3, Bear App에서 영감을 받아 따뜻하고 편안한 느낌을 주는 B2B SaaS UI입니다.
+        </p>
+    </header>
+
+    <section>
+        <h2 class="text-2xl font-serif mb-6 flex items-center gap-3">
+            <span class="w-2 h-2 rounded-full bg-primary block"></span> Color Palette
+        </h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+            <!-- Backgrounds -->
+            <div class="space-y-2">
+                <div
+                    class="h-24 rounded-xl bg-background border border-border flex items-center justify-center shadow-sm">
+                    <span class="text-sm font-medium text-text-muted">#faf8f5</span>
+                </div>
+                <p class="text-sm font-medium">Background Base</p>
+            </div>
+            <div class="space-y-2">
+                <div
+                    class="h-24 rounded-xl bg-background-alt border border-border flex items-center justify-center shadow-sm">
+                    <span class="text-sm font-medium text-text-muted">#f5f0eb</span>
+                </div>
+                <p class="text-sm font-medium">Background Alt</p>
+            </div>
+            <!-- Surface -->
+            <div class="space-y-2">
+                <div
+                    class="h-24 rounded-xl bg-surface border border-border flex items-center justify-center shadow-soft">
+                    <span class="text-sm font-medium text-text-muted">#ffffff</span>
+                </div>
+                <p class="text-sm font-medium">Card Surface</p>
+            </div>
+            <!-- Primary -->
+            <div class="space-y-2">
+                <div class="h-24 rounded-xl bg-primary flex items-center justify-center shadow-soft">
+                    <span class="text-sm font-medium text-white/90">#5a7247</span>
+                </div>
+                <p class="text-sm font-medium">Olive Green</p>
+            </div>
+            <!-- Secondary -->
+            <div class="space-y-2">
+                <div class="h-24 rounded-xl bg-secondary flex items-center justify-center shadow-soft">
+                    <span class="text-sm font-medium text-white/90">#c4622d</span>
+                </div>
+                <p class="text-sm font-medium">Terracotta</p>
+            </div>
+            <!-- Accent -->
+            <div class="space-y-2">
+                <div class="h-24 rounded-xl bg-accent flex items-center justify-center shadow-soft">
+                    <span class="text-sm font-medium text-white/90">#d4a843</span>
+                </div>
+                <p class="text-sm font-medium">Mustard</p>
+            </div>
+
+            <!-- Text Colors -->
+            <div class="space-y-2">
+                <div class="h-24 rounded-xl bg-text-main flex items-center justify-center shadow-sm">
+                    <span class="text-sm font-medium text-white/90">#2d2c2a</span>
+                </div>
+                <p class="text-sm font-medium">Text Main</p>
+            </div>
+            <div class="space-y-2">
+                <div class="h-24 rounded-xl bg-text-muted flex items-center justify-center shadow-sm">
+                    <span class="text-sm font-medium text-white/90">#73706c</span>
+                </div>
+                <p class="text-sm font-medium">Text Muted</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="text-2xl font-serif mb-6 flex items-center gap-3">
+            <span class="w-2 h-2 rounded-full bg-secondary block"></span> Typography
+        </h2>
+        <div class="card space-y-8">
+            <div class="pb-6 border-b border-border">
+                <p class="text-sm text-text-light mb-2 uppercase tracking-wide">Heading 1 (Serif)</p>
+                <h1 class="text-4xl md:text-5xl font-serif">자연스럽고 편안한 업무 경험</h1>
+            </div>
+            <div class="pb-6 border-b border-border">
+                <p class="text-sm text-text-light mb-2 uppercase tracking-wide">Heading 2 (Serif)</p>
+                <h2 class="text-3xl font-serif">조직도 및 부서 관리</h2>
+            </div>
+            <div class="pb-6 border-b border-border">
+                <p class="text-sm text-text-light mb-2 uppercase tracking-wide">Heading 3 (Serif)</p>
+                <h3 class="text-xl font-serif">새로운 워크플로우 생성</h3>
+            </div>
+            <div class="pb-6 border-b border-border">
+                <p class="text-sm text-text-light mb-2 uppercase tracking-wide">Body Text (Sans-serif)</p>
+                <p class="text-base leading-relaxed text-text-muted max-w-3xl">
+                    CORTHEX v2는 복잡한 B2B 솔루션의 무거운 느낌을 덜어내고, 사용자가 편안하게 시스템을 사용할 수 있도록 디자인되었습니다. 부드러운 여백과 따뜻한 색감은 장시간 화면을
+                    보는 실무자의 피로도를 낮춥니다.
+                </p>
+            </div>
+            <div>
+                <p class="text-sm text-text-light mb-2 uppercase tracking-wide">Small Text (Sans-serif)</p>
+                <p class="text-sm text-text-muted">마지막 업데이트: 2026년 3월 10일 오후 7시 45분</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="text-2xl font-serif mb-6 flex items-center gap-3">
+            <span class="w-2 h-2 rounded-full bg-accent block"></span> UI Components
+        </h2>
+
+        <div class="grid lg:grid-cols-2 gap-8">
+            <!-- Buttons & Badges -->
+            <div class="card space-y-8">
+                <div>
+                    <h3 class="font-serif text-lg mb-4">Buttons</h3>
+                    <div class="flex flex-wrap gap-4">
+                        <button class="btn-primary">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            새 에이전트 생성
+                        </button>
+                        <button class="btn-secondary">
+                            결제 업데이트
+                        </button>
+                        <button class="btn-outline">
+                            취소
+                        </button>
+                        <button class="btn-outline text-red-600 hover:bg-red-50 hover:border-red-200">
+                            삭제
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-serif text-lg mb-4">Badges & Tags</h3>
+                    <div class="flex flex-wrap gap-3">
+                        <span class="badge badge-primary">활성 상태</span>
+                        <span class="badge badge-accent">검토 대기중</span>
+                        <span class="badge bg-background-alt text-text-muted">보관됨</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Elements -->
+            <div class="card space-y-6">
+                <h3 class="font-serif text-lg mb-2">Form Elements</h3>
+                <div>
+                    <label class="block text-sm font-medium text-text-main mb-2">에이전트 이름</label>
+                    <input type="text" class="input-field" placeholder="ex. 데이터 분석가 알파">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-main mb-2">설명</label>
+                    <textarea class="input-field min-h-[100px] resize-y"
+                        placeholder="에이전트의 역할과 권한을 간단히 적어주세요..."></textarea>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="check1"
+                        class="w-4 h-4 rounded text-primary focus:ring-primary border-border">
+                    <label for="check1" class="text-sm text-text-main">공용 템플릿으로 저장하기</label>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="text-2xl font-serif mb-6 flex items-center gap-3">
+            <span class="w-2 h-2 rounded-full border border-border block"></span> Card Layouts
+        </h2>
+
+        <div class="grid md:grid-cols-2 gap-6">
+            <!-- Data Card -->
+            <div class="card group cursor-pointer border border-transparent hover:border-border transition-all">
+                <div class="flex justify-between items-start mb-4">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-primary-light flex items-center justify-center text-primary mb-4 p-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                            </path>
+                        </svg>
+                    </div>
+                    <button class="btn-icon p-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+                <h3 class="text-xl font-serif text-text-main mb-2">분석 리포트 생성기</h3>
+                <p class="text-sm text-text-muted mb-6 leading-relaxed">
+                    월간 매출 데이터 포맷을 정제하고 슬랙으로 자동 발송하는 역할을 수행합니다.
+                </p>
+                <div class="flex items-center justify-between pt-4 border-t border-border">
+                    <span class="badge badge-primary">활성</span>
+                    <span class="text-xs text-text-light flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        3분 전 업데이트
+                    </span>
+                </div>
+            </div>
+
+            <!-- Dashboard Metric Card -->
+            <div class="card flex flex-col justify-center">
+                <p class="text-sm font-medium text-text-muted mb-1">이번 달 사용 금액</p>
+                <div class="flex items-baseline gap-2 mb-2">
+                    <h2 class="text-4xl font-serif text-text-main">₩1,245,000</h2>
+                    <span class="text-sm font-medium text-red-500 flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                        +12%
+                    </span>
+                </div>
+                <p class="text-sm text-text-light mt-4">예상 청구 금액: ₩1,500,000</p>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>

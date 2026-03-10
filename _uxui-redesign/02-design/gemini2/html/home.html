@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORTHEX - Home</title>
+    <!-- API: GET /api/workspace/dashboard/summary -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;900&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'neo-bg': '#F4F4F0',
+                        'neo-black': '#1E1E1E',
+                        'neo-yellow': '#FFE800',
+                        'neo-lime': '#BFFF00',
+                        'neo-pink': '#FF3366',
+                        'neo-blue': '#00E5FF',
+                        'neo-orange': '#FF6600',
+                    },
+                    boxShadow: {
+                        'neo-sm': '2px 2px 0px 0px rgba(30,30,30,1)',
+                        'neo': '4px 4px 0px 0px rgba(30, 30, 30, 1)',
+                        'neo-lg': '8px 8px 0px 0px rgba(30, 30, 30, 1)',
+                    },
+                    borderWidth: { '3': '3px' },
+                    fontFamily: { sans: ['"Space Grotesk"', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F4F4F0;
+            color: #1E1E1E;
+        }
+
+        .neo-border {
+            border: 3px solid #1E1E1E;
+        }
+
+        .neo-shadow {
+            box-shadow: 4px 4px 0px 0px rgba(30, 30, 30, 1);
+        }
+
+        .neo-shadow-sm {
+            box-shadow: 2px 2px 0px 0px rgba(30, 30, 30, 1);
+        }
+
+        .neo-card {
+            border: 3px solid #1E1E1E;
+            box-shadow: 8px 8px 0px 0px rgba(30, 30, 30, 1);
+            background-color: white;
+        }
+
+        .neo-btn {
+            border: 3px solid #1E1E1E;
+            box-shadow: 4px 4px 0px 0px rgba(30, 30, 30, 1);
+            transition: all 0.1s ease-in-out;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .neo-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px 0px rgba(30, 30, 30, 1);
+        }
+
+        .neo-btn:active {
+            transform: translate(4px, 4px);
+            box-shadow: 0px 0px 0px 0px rgba(30, 30, 30, 1);
+        }
+
+        .nav-item.active {
+            background-color: #BFFF00;
+            border: 3px solid #1E1E1E;
+            box-shadow: 2px 2px 0px 0px rgba(30, 30, 30, 1);
+        }
+
+        .nav-item:hover:not(.active) {
+            background-color: #E5E5E5;
+        }
+    </style>
+</head>
+
+<body class="flex h-screen overflow-hidden text-neo-black">
+
+    <!-- Sidebar Navigation -->
+    <nav class="w-64 border-r-3 border-neo-black bg-white flex flex-col h-full z-10 shrink-0">
+        <div class="p-6 border-b-3 border-neo-black bg-neo-yellow">
+            <h1 class="text-3xl font-black tracking-tight uppercase">CORTHEX</h1>
+            <p class="font-bold text-xs mt-1 bg-white inline-block px-1 neo-border">WORKSPACE</p>
+        </div>
+
+        <div class="flex-grow overflow-y-auto p-4 space-y-2">
+            <!-- API: GET /api/auth/me -->
+            <a href="home.html" class="nav-item active flex items-center gap-3 p-3 font-bold">
+                <span
+                    class="w-6 h-6 bg-neo-pink text-white flex items-center justify-center neo-border text-xs">H</span>
+                Home
+            </a>
+            <a href="command-center.html" class="nav-item flex items-center gap-3 p-3 font-bold transition-colors">
+                <span class="w-6 h-6 bg-white flex items-center justify-center neo-border text-xs">C</span> Command
+                Center
+            </a>
+            <a href="dashboard.html" class="nav-item flex items-center gap-3 p-3 font-bold transition-colors">
+                <span class="w-6 h-6 bg-white flex items-center justify-center neo-border text-xs">D</span> Dashboard
+            </a>
+            <a href="chat.html" class="nav-item flex items-center gap-3 p-3 font-bold transition-colors">
+                <span class="w-6 h-6 bg-white flex items-center justify-center neo-border text-xs">M</span> Chat & Msgs
+            </a>
+
+            <div class="pt-4 border-t-3 border-neo-black mt-4 mb-2"></div>
+
+            <a href="agents.html" class="nav-item flex items-center gap-3 p-3 font-bold transition-colors">
+                <span class="w-6 h-6 bg-white flex items-center justify-center neo-border text-xs">A</span> Agents
+            </a>
+            <a href="departments.html" class="nav-item flex items-center gap-3 p-3 font-bold transition-colors">
+                <span class="w-6 h-6 bg-white flex items-center justify-center neo-border text-xs">O</span> Departments
+            </a>
+            <a href="trading.html" class="nav-item flex items-center gap-3 p-3 font-bold transition-colors">
+                <span class="w-6 h-6 bg-white flex items-center justify-center neo-border text-xs">$</span> Strategy /
+                Trade
+            </a>
+            <a href="costs.html" class="nav-item flex items-center gap-3 p-3 font-bold transition-colors">
+                <span class="w-6 h-6 bg-white flex items-center justify-center neo-border text-xs">₩</span> Costs &
+                Budget
+            </a>
+        </div>
+
+        <div class="p-4 border-t-3 border-neo-black bg-neo-bg">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 bg-neo-blue neo-border neo-shadow-sm flex items-center justify-center font-black text-xl">
+                    KC
+                </div>
+                <div>
+                    <div class="font-bold text-sm leading-tight">Kim CEO</div>
+                    <div class="text-xs font-bold text-gray-500">Startup Corp</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex flex-col h-full overflow-y-auto bg-neo-bg relative">
+        <div class="pointer-events-none absolute inset-0 opacity-[0.03]"
+            style="background-image: radial-gradient(#1E1E1E 2px, transparent 2px); background-size: 24px 24px;"></div>
+
+        <!-- Topbar -->
+        <header
+            class="h-16 border-b-3 border-neo-black bg-white flex items-center justify-between px-8 sticky top-0 z-10 shrink-0">
+            <h2 class="text-2xl font-black uppercase">Home Base</h2>
+            <div class="flex items-center gap-4">
+                <!-- API: GET /api/workspace/notifications/count -->
+                <button class="neo-btn bg-neo-yellow p-2 flex items-center justify-center relative">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    <span
+                        class="absolute -top-2 -right-2 bg-neo-pink text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-neo-black">3</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <div class="p-8 max-w-6xl w-full mx-auto space-y-12">
+
+            <!-- Welcome Hero -->
+            <section class="neo-card bg-neo-blue p-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+                <div>
+                    <h2 class="text-5xl font-black uppercase mb-4 tracking-tight">System Online, Commander.</h2>
+                    <p class="text-xl font-bold max-w-xl">Your AI agents are currently executing 12 active workflows.
+                        Daily budget is looking healthy.</p>
+                </div>
+                <div class="shrink-0 text-center">
+                    <div class="text-6xl font-black bg-white px-4 py-2 neo-border neo-shadow inline-block">24</div>
+                    <p class="font-bold uppercase mt-3 tracking-widest text-sm">Active Agents</p>
+                </div>
+            </section>
+
+            <!-- Quick Action Command Input (Lite Version) -->
+            <!-- API: POST /api/workspace/commands -->
+            <section class="neo-card p-6 bg-white flex flex-col gap-4">
+                <div class="flex items-center gap-3 border-b-3 border-neo-black pb-4">
+                    <div class="w-8 h-8 bg-neo-lime neo-border flex items-center justify-center">
+                        <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"
+                            fill="none">
+                            <path d="M5 12h14"></path>
+                            <path d="M12 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-black uppercase">Quick Direct Command</h3>
+                </div>
+                <div class="flex gap-4">
+                    <input type="text" placeholder="@ChiefOfStaff Summarize yesterday's sales report..."
+                        class="flex-grow p-4 text-xl neo-border neo-shadow bg-neo-bg focus:outline-none focus:bg-white placeholder:text-gray-400 font-medium">
+                    <button class="neo-btn bg-neo-lime text-xl px-8 uppercase tracking-wider">Execute</button>
+                </div>
+                <div class="flex gap-3 text-sm font-bold uppercase overflow-x-auto pb-2">
+                    <span class="bg-neo-bg px-2 py-1 neo-border shrink-0 cursor-pointer hover:bg-neo-yellow">/trade
+                        TSLA</span>
+                    <span class="bg-neo-bg px-2 py-1 neo-border shrink-0 cursor-pointer hover:bg-neo-yellow">/debate Mkt
+                        Strategy</span>
+                    <span class="bg-neo-bg px-2 py-1 neo-border shrink-0 cursor-pointer hover:bg-neo-yellow">/report
+                        Weekly</span>
+                </div>
+            </section>
+
+            <!-- Three Column Status -->
+            <div class="grid md:grid-cols-3 gap-8">
+
+                <!-- Active Depts -->
+                <div class="neo-card bg-neo-yellow p-6 flex flex-col">
+                    <h3
+                        class="text-2xl font-black uppercase mb-6 flex justify-between items-center border-b-3 border-neo-black pb-2">
+                        Departments
+                        <span class="bg-white text-sm px-2 py-1 neo-border">4 Total</span>
+                    </h3>
+                    <div class="space-y-4 flex-grow">
+                        <div class="bg-white p-3 neo-border neo-shadow-sm flex justify-between items-center font-bold">
+                            Marketing <span class="text-neo-pink">Busy</span>
+                        </div>
+                        <div class="bg-white p-3 neo-border neo-shadow-sm flex justify-between items-center font-bold">
+                            Strategy <span class="text-neo-lime">Idle</span>
+                        </div>
+                        <div class="bg-white p-3 neo-border neo-shadow-sm flex justify-between items-center font-bold">
+                            R&D Lab <span class="text-neo-pink">Busy</span>
+                        </div>
+                    </div>
+                    <a href="departments.html" class="neo-btn bg-white w-full py-3 mt-6 text-center text-sm">MANAGE
+                        ORG</a>
+                </div>
+
+                <!-- Recent Activity -->
+                <!-- API: GET /api/workspace/activity-log -->
+                <div class="neo-card bg-white p-6 md:col-span-2">
+                    <h3
+                        class="text-2xl font-black uppercase mb-6 border-b-3 border-neo-black pb-2 flex items-center justify-between">
+                        Live Timeline
+                        <a href="activity-log.html" class="text-sm border-b-2 border-neo-black hover:text-neo-pink">View
+                            All</a>
+                    </h3>
+                    <div
+                        class="space-y-0 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-neo-black before:to-transparent">
+
+                        <!-- Item -->
+                        <div
+                            class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group mb-8">
+                            <div
+                                class="flex items-center justify-center w-10 h-10 rounded-full border-3 border-neo-black bg-neo-pink text-white shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 neo-shadow-sm z-10 font-bold text-xs">
+                                SV</div>
+                            <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 neo-card bg-neo-bg">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="font-black">SEO Robot</span>
+                                    <span class="text-xs font-bold text-gray-500">1m ago</span>
+                                </div>
+                                <p class="text-sm font-medium">Published new blog post on "AI Automation Trends 2026"
+                                    via SNS Agency.</p>
+                            </div>
+                        </div>
+
+                        <!-- Item -->
+                        <div
+                            class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group mb-8">
+                            <div
+                                class="flex items-center justify-center w-10 h-10 rounded-full border-3 border-neo-black bg-neo-lime text-neo-black shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 neo-shadow-sm z-10 font-bold text-xs">
+                                TR</div>
+                            <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 neo-card bg-white">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="font-black">Vector (Trader)</span>
+                                    <span class="text-xs font-bold text-gray-500">15m ago</span>
+                                </div>
+                                <p class="text-sm font-medium">Executed BUY order: 15 shares of TSLA @ market price.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

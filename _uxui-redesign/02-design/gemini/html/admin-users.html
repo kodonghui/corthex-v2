@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORTHEX v2 Admin - System Users</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans KR', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    colors: {
+                        base: { 50: '#fcfbf9', 100: '#f5f3ec', 200: '#e8e4d9', 300: '#d5cfc1' },
+                        text: { main: '#2c2c2c', muted: '#6b6b6b' },
+                        accent: { coral: '#e57373', terracotta: '#e07a5f', amber: '#f4a261', green: '#81b29a', blue: '#4A90E2', purple: '#9b5de5' }
+                    },
+                    boxShadow: { 'soft': '0 4px 20px rgba(0, 0, 0, 0.03)', 'soft-lg': '0 10px 40px rgba(0, 0, 0, 0.06)' },
+                    borderRadius: { '2xl': '1rem', '3xl': '1.5rem', '4xl': '2rem' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f5f3ec;
+            color: #2c2c2c;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .panel {
+            background-color: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            border: 1px solid #e8e4d9;
+        }
+    </style>
+</head>
+
+<body class="flex h-screen font-sans antialiased overflow-hidden">
+
+    <!-- Admin Sidebar -->
+    <aside class="w-72 flex flex-col justify-between py-8 px-6 border-r border-[#e8e4d9] bg-[#fcfbf9] z-20 shrink-0">
+        <div>
+            <div class="flex items-center justify-between mb-10">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-8 h-8 rounded-full bg-text-main flex items-center justify-center text-white font-bold text-lg">
+                        A</div>
+                    <span class="text-xl font-bold tracking-tight text-text-main">Admin Console</span>
+                </div>
+            </div>
+
+            <nav class="space-y-1.5">
+                <a href="#"
+                    class="flex items-center gap-3 px-4 py-2.5 text-text-muted hover:text-text-main hover:bg-white/50 rounded-xl transition-colors">
+                    <i class="ph ph-gauge text-lg"></i> Global Dashboard
+                </a>
+
+                <div class="pt-6 pb-2 px-4 text-[11px] font-bold text-base-300 uppercase tracking-wider">조직 및 권한 관리
+                    (Global)</div>
+                <a href="#"
+                    class="flex items-center gap-3 px-4 py-2.5 text-text-muted hover:text-text-main hover:bg-white/50 rounded-xl transition-colors">
+                    <i class="ph ph-briefcase text-lg"></i> Departments
+                </a>
+                <a href="#"
+                    class="flex items-center gap-3 px-4 py-2.5 text-text-muted hover:text-text-main hover:bg-white/50 rounded-xl transition-colors">
+                    <i class="ph ph-users-three text-lg"></i> Global Employees
+                </a>
+                <a href="#"
+                    class="flex items-center gap-3 px-4 py-2.5 text-text-muted hover:text-text-main hover:bg-white/50 rounded-xl transition-colors">
+                    <i class="ph ph-robot text-lg"></i> Global Agents
+                </a>
+                <!-- Active menu -->
+                <a href="#"
+                    class="flex items-center gap-3 px-4 py-3 font-medium text-accent-terracotta bg-white rounded-xl border border-[#e8e4d9] shadow-sm transition-colors">
+                    <i class="ph ph-key text-lg"></i> System Users
+                </a>
+
+                <div class="pt-6 pb-2 px-4 text-[11px] font-bold text-base-300 uppercase tracking-wider">고객사 관리</div>
+                <a href="#"
+                    class="flex items-center gap-3 px-4 py-2.5 text-text-muted hover:text-text-main hover:bg-white/50 rounded-xl transition-colors">
+                    <i class="ph ph-buildings text-lg"></i> Tenants
+                </a>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto px-12 py-10 relative hide-scrollbar">
+
+        <header
+            class="flex justify-between items-end mb-8 sticky top-0 bg-[#f5f3ec]/90 backdrop-blur-md z-10 pt-2 pb-4">
+            <div>
+                <h1 class="text-3xl font-bold tracking-tight text-text-main">System Users (Super Admins)</h1>
+                <p class="text-text-muted mt-2 text-sm">CORTHEX 플랫폼 자체를 관리하는 시스템 최상위 관리자 계정 목록입니다.</p>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button
+                    class="bg-text-main text-white px-5 py-2.5 flex items-center gap-2 rounded-xl text-sm font-bold shadow-soft hover:bg-opacity-90 transition-colors">
+                    <i class="ph ph-user-plus text-lg"></i> Add Admin
+                </button>
+            </div>
+        </header>
+
+        <!-- System Admin Notice -->
+        <div class="bg-[#fff5f2] border border-accent-terracotta/30 rounded-2xl p-5 mb-8 flex items-start gap-4">
+            <div
+                class="w-8 h-8 rounded-full bg-accent-terracotta/20 text-accent-terracotta flex items-center justify-center shrink-0 mt-0.5">
+                <i class="ph ph-warning-circle text-lg"></i></div>
+            <div>
+                <h4 class="font-bold text-text-main mb-1">최상위 권한자 관리 경고</h4>
+                <p class="text-sm text-text-muted">이곳에 나열된 계정은 모든 테넌트(고객사)의 접속 로그, 청구 정보, 전역 리소스 설정에 접근할 수 있는 Super
+                    Admin 권한을 가집니다. 계정 발급 및 권한 관리에 각별히 유의하십시오. 2FA(이중 인증) 사용이 강제됩니다.</p>
+            </div>
+        </div>
+
+        <!-- Admin Users Table -->
+        <div class="panel overflow-hidden">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr
+                        class="bg-[#fcfbf9] text-[11px] uppercase tracking-wider text-text-muted border-b border-[#e8e4d9]">
+                        <th class="px-6 py-4 font-bold">Admin Account</th>
+                        <th class="px-6 py-4 font-bold">Role & Access Level</th>
+                        <th class="px-6 py-4 font-bold">Security (2FA)</th>
+                        <th class="px-6 py-4 font-bold">Last Login (IP)</th>
+                        <th class="px-6 py-4 text-center font-bold">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="text-sm text-text-main divide-y divide-[#e8e4d9]">
+
+                    <!-- Super Admin 1 -->
+                    <tr class="hover:bg-[#fcfbf9] transition-colors group">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-9 h-9 rounded-full bg-text-main flex items-center justify-center text-white font-bold">
+                                    UB</div>
+                                <div>
+                                    <h4 class="font-bold text-text-main">ubuntu (You)</h4>
+                                    <p class="text-xs text-text-muted mt-0.5 font-mono">sysadmin@corthex.ai</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span
+                                class="px-2 py-1 rounded bg-[#fff5f2] text-accent-terracotta border border-accent-terracotta/20 text-xs font-bold w-max flex items-center gap-1.5"><i
+                                    class="ph ph-shield-star"></i> Root Admin</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <i class="ph ph-check-circle text-accent-green text-lg"></i>
+                                <span class="text-xs font-bold text-text-main">Enabled (YubiKey)</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-xs font-bold text-text-main mb-0.5">Current Session</div>
+                            <span class="text-[10px] text-text-muted font-mono flex items-center gap-1"><i
+                                    class="ph ph-globe"></i> 142.250.207.46 (KR)</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <button class="text-text-muted hover:text-text-main opacity-50 cursor-not-allowed"
+                                title="Cannot edit root account"><i class="ph ph-dots-three text-lg"></i></button>
+                        </td>
+                    </tr>
+
+                    <!-- Secondary Admin -->
+                    <tr class="hover:bg-[#fcfbf9] transition-colors group">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-9 h-9 rounded-full bg-base-300 flex items-center justify-center text-text-main font-bold">
+                                    MJ</div>
+                                <div>
+                                    <h4 class="font-bold text-text-main">Minsu Jung</h4>
+                                    <p class="text-xs text-text-muted mt-0.5 font-mono">mjung@corthex.ai</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span
+                                class="px-2 py-1 rounded bg-base-100 text-text-muted border border-[#e8e4d9] text-xs font-bold w-max flex items-center gap-1.5"><i
+                                    class="ph ph-shield-check"></i> Billing Ops</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <i class="ph ph-check-circle text-accent-green text-lg"></i>
+                                <span class="text-xs font-bold text-text-main">Enabled (OTP)</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-xs text-text-main mb-0.5">2 days ago</div>
+                            <span class="text-[10px] text-text-muted font-mono flex items-center gap-1"><i
+                                    class="ph ph-globe"></i> 118.235.15.8 (KR)</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <button class="text-text-muted hover:text-text-main"><i
+                                    class="ph ph-dots-three text-lg"></i></button>
+                        </td>
+                    </tr>
+
+                    <!-- DevOps Admin -->
+                    <tr class="hover:bg-[#fcfbf9] transition-colors group">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-9 h-9 rounded-full bg-accent-blue/10 flex items-center justify-center text-accent-blue font-bold">
+                                    AK</div>
+                                <div>
+                                    <h4 class="font-bold text-text-main">Alex Kim</h4>
+                                    <p class="text-xs text-text-muted mt-0.5 font-mono">devops@corthex.ai</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span
+                                class="px-2 py-1 rounded bg-accent-blue/10 text-accent-blue border border-accent-blue/20 text-xs font-bold w-max flex items-center gap-1.5"><i
+                                    class="ph ph-hard-drives"></i> Sys Ops</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <i class="ph ph-warning-circle text-accent-amber text-lg"></i>
+                                <span class="text-xs font-bold text-accent-amber">Pending Setup</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-[11px] text-text-muted italic">Never logged in</div>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <button class="text-text-muted hover:text-text-main"><i
+                                    class="ph ph-dots-three text-lg"></i></button>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+    </main>
+
+</body>
+
+</html>

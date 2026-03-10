@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORTHEX v2 Admin - Global Employees</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans KR', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    colors: {
+                        base: { 50: '#fcfbf9', 100: '#f5f3ec', 200: '#e8e4d9', 300: '#d5cfc1' },
+                        text: { main: '#2c2c2c', muted: '#6b6b6b' },
+                        accent: { coral: '#e57373', terracotta: '#e07a5f', amber: '#f4a261', green: '#81b29a', blue: '#4A90E2', purple: '#9b5de5' }
+                    },
+                    boxShadow: { 'soft': '0 4px 20px rgba(0, 0, 0, 0.03)', 'soft-lg': '0 10px 40px rgba(0, 0, 0, 0.06)' },
+                    borderRadius: { '2xl': '1rem', '3xl': '1.5rem', '4xl': '2rem' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f5f3ec;
+            color: #2c2c2c;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .panel {
+            background-color: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            border: 1px solid #e8e4d9;
+        }
+    </style>
+</head>
+
+<body class="flex h-screen font-sans antialiased overflow-hidden">
+
+    <!-- Admin Sidebar -->
+    <aside class="w-72 flex flex-col justify-between py-8 px-6 border-r border-[#e8e4d9] bg-[#fcfbf9] z-20 shrink-0">
+        <div>
+            <div class="flex items-center justify-between mb-10">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-8 h-8 rounded-full bg-text-main flex items-center justify-center text-white font-bold text-lg">
+                        A</div>
+                    <span class="text-xl font-bold tracking-tight text-text-main">Admin Console</span>
+                </div>
+            </div>
+
+            <nav class="space-y-1.5">
+                <a href="#"
+                    class="flex items-center gap-3 px-4 py-2.5 text-text-muted hover:text-text-main hover:bg-white/50 rounded-xl transition-colors">
+                    <i class="ph ph-gauge text-lg"></i> Global Dashboard
+                </a>
+
+                <div class="pt-6 pb-2 px-4 text-[11px] font-bold text-base-300 uppercase tracking-wider">조직 및 권한 관리
+                    (Global)</div>
+                <a href="admin-departments.html"
+                    class="flex items-center gap-3 px-4 py-2.5 text-text-muted hover:text-text-main hover:bg-white/50 rounded-xl transition-colors">
+                    <i class="ph ph-briefcase text-lg"></i> Departments
+                </a>
+                <!-- Active menu -->
+                <a href="#"
+                    class="flex items-center gap-3 px-4 py-3 font-medium text-accent-terracotta bg-white rounded-xl border border-[#e8e4d9] shadow-sm transition-colors">
+                    <i class="ph ph-users-three text-lg"></i> Global Employees
+                </a>
+                <a href="#"
+                    class="flex items-center gap-3 px-4 py-2.5 text-text-muted hover:text-text-main hover:bg-white/50 rounded-xl transition-colors">
+                    <i class="ph ph-robot text-lg"></i> Global Agents
+                </a>
+                <a href="#"
+                    class="flex items-center gap-3 px-4 py-2.5 text-text-muted hover:text-text-main hover:bg-white/50 rounded-xl transition-colors">
+                    <i class="ph ph-key text-lg"></i> System Users
+                </a>
+
+                <div class="pt-6 pb-2 px-4 text-[11px] font-bold text-base-300 uppercase tracking-wider">고객사 관리</div>
+                <a href="#"
+                    class="flex items-center gap-3 px-4 py-2.5 text-text-muted hover:text-text-main hover:bg-white/50 rounded-xl transition-colors">
+                    <i class="ph ph-buildings text-lg"></i> Tenants
+                </a>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto px-12 py-10 relative hide-scrollbar">
+
+        <header
+            class="flex justify-between items-end mb-8 sticky top-0 bg-[#f5f3ec]/90 backdrop-blur-md z-10 pt-2 pb-4">
+            <div>
+                <h1 class="text-3xl font-bold tracking-tight text-text-main">Global Employees</h1>
+                <p class="text-text-muted mt-2 text-sm">플랫폼에 등록된 전체 B2B 기업의 Human(인간) 직원 계정을 통합 모니터링합니다.</p>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button
+                    class="bg-white border border-[#e8e4d9] text-text-main px-4 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-base-50 transition-colors flex items-center gap-2">
+                    <i class="ph ph-download-simple text-lg"></i> Export CSV
+                </button>
+            </div>
+        </header>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="panel p-5 bg-white">
+                <h3 class="text-xs font-bold text-text-muted uppercase tracking-wider mb-1">Total Employees</h3>
+                <div class="text-2xl font-bold text-text-main">1,248</div>
+            </div>
+            <div class="panel p-5 bg-white border-l-4 border-l-accent-blue">
+                <h3 class="text-xs font-bold text-text-muted uppercase tracking-wider mb-1">Active Today</h3>
+                <div class="text-2xl font-bold text-accent-blue">892</div>
+            </div>
+            <div class="panel p-5 bg-white">
+                <h3 class="text-xs font-bold text-text-muted uppercase tracking-wider mb-1">Pending Invites</h3>
+                <div class="text-2xl font-bold text-text-main">45</div>
+            </div>
+            <div class="panel p-5 bg-[#fdf5f5] border border-accent-coral/30">
+                <h3 class="text-xs font-bold text-accent-coral uppercase tracking-wider mb-1">Suspended</h3>
+                <div class="text-2xl font-bold text-accent-coral">12</div>
+            </div>
+        </div>
+
+        <!-- Search & Filter -->
+        <div class="flex gap-2 mb-6">
+            <div class="relative w-80">
+                <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-sm"></i>
+                <input type="text" placeholder="이름, 이메일, 테넌트명 검색..."
+                    class="w-full bg-white border border-[#e8e4d9] outline-none text-sm pl-9 pr-4 py-2.5 rounded-lg text-text-main placeholder:text-base-300 shadow-sm focus:border-accent-terracotta/50">
+            </div>
+
+            <select
+                class="bg-white border border-[#e8e4d9] px-3 py-2.5 rounded-lg text-text-main text-sm font-medium shadow-sm outline-none cursor-pointer">
+                <option>Tenant: All</option>
+                <option>MegaCorp AI Ltd.</option>
+                <option>Global Retails</option>
+            </select>
+
+            <select
+                class="bg-white border border-[#e8e4d9] px-3 py-2.5 rounded-lg text-text-main text-sm font-medium shadow-sm outline-none cursor-pointer">
+                <option>Status: Active</option>
+                <option>Status: Pending</option>
+                <option>Status: Suspended</option>
+            </select>
+
+            <select
+                class="bg-white border border-[#e8e4d9] px-3 py-2.5 rounded-lg text-text-main text-sm font-medium shadow-sm outline-none cursor-pointer">
+                <option>Role: All</option>
+                <option>Role: CEO (Admin)</option>
+                <option>Role: Member</option>
+            </select>
+        </div>
+
+        <!-- Employees Table -->
+        <div class="panel overflow-hidden">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr
+                        class="bg-[#fcfbf9] text-[11px] uppercase tracking-wider text-text-muted border-b border-[#e8e4d9]">
+                        <th class="px-6 py-4 font-bold">Employee</th>
+                        <th class="px-6 py-4 font-bold">Tenant (Company)</th>
+                        <th class="px-6 py-4 font-bold">Role</th>
+                        <th class="px-6 py-4 font-bold">Departments Access</th>
+                        <th class="px-6 py-4 font-bold">Status & Last Active</th>
+                        <th class="px-6 py-4 text-center font-bold">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="text-sm text-text-main divide-y divide-[#e8e4d9]">
+
+                    <!-- CEO Role -->
+                    <tr class="hover:bg-[#fcfbf9] transition-colors group">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <img src="https://i.pravatar.cc/100?img=11" alt="avatar"
+                                    class="w-9 h-9 rounded-full object-cover">
+                                <div>
+                                    <h4 class="font-bold text-text-main">David Kim</h4>
+                                    <p class="text-xs text-text-muted mt-0.5">david.k@megacorp.ai</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="font-medium text-text-main">MegaCorp AI Ltd.</span>
+                            <p class="text-[10px] text-text-muted font-mono mt-0.5">ten_8x9a2_mcorp</p>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span
+                                class="px-2 py-1 rounded bg-[#fff5f2] text-accent-terracotta border border-accent-terracotta/20 text-xs font-bold w-max flex items-center gap-1"><i
+                                    class="ph ph-crown"></i> CEO / Admin</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="text-xs text-text-muted font-bold">All Departments</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2 mb-1">
+                                <div class="w-1.5 h-1.5 rounded-full bg-accent-green"></div>
+                                <span class="text-xs font-bold">Active</span>
+                            </div>
+                            <span class="text-[11px] text-text-muted">Just now</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <button class="text-text-muted hover:text-text-main"><i
+                                    class="ph ph-dots-three text-lg"></i></button>
+                        </td>
+                    </tr>
+
+                    <!-- Member Role -->
+                    <tr class="hover:bg-[#fcfbf9] transition-colors group">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-9 h-9 rounded-full bg-base-200 text-text-muted flex items-center justify-center font-bold">
+                                    SL</div>
+                                <div>
+                                    <h4 class="font-bold text-text-main">Sarah Lee</h4>
+                                    <p class="text-xs text-text-muted mt-0.5">sarah@globalretails.com</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="font-medium text-text-main">Global Retails</span>
+                            <p class="text-[10px] text-text-muted font-mono mt-0.5">ten_4b2c1_gret</p>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span
+                                class="px-2 py-1 rounded bg-base-100 text-text-muted border border-[#e8e4d9] text-xs font-medium w-max">Member</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex flex-wrap gap-1">
+                                <span
+                                    class="px-1.5 py-0.5 bg-base-100 rounded text-[10px] whitespace-nowrap border border-[#e8e4d9]">Marketing</span>
+                                <span
+                                    class="px-1.5 py-0.5 bg-base-100 rounded text-[10px] whitespace-nowrap border border-[#e8e4d9]">CS</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2 mb-1">
+                                <div class="w-1.5 h-1.5 rounded-full bg-accent-green"></div>
+                                <span class="text-xs font-bold">Active</span>
+                            </div>
+                            <span class="text-[11px] text-text-muted">2 hours ago</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <button class="text-text-muted hover:text-text-main"><i
+                                    class="ph ph-dots-three text-lg"></i></button>
+                        </td>
+                    </tr>
+
+                    <!-- Suspended Role -->
+                    <tr class="hover:bg-[#fcfbf9] transition-colors group bg-accent-coral/5">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-9 h-9 rounded-full bg-accent-coral/20 text-accent-coral flex items-center justify-center font-bold">
+                                    MJ</div>
+                                <div class="opacity-60">
+                                    <h4 class="font-bold text-text-main line-through">Mike Johnson</h4>
+                                    <p class="text-xs text-text-muted mt-0.5">mike.j@techstart.io</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 opacity-60">
+                            <span class="font-medium text-text-main">TechStart Inc.</span>
+                            <p class="text-[10px] text-text-muted font-mono mt-0.5">ten_7y1m3_tst</p>
+                        </td>
+                        <td class="px-6 py-4 opacity-60">
+                            <span
+                                class="px-2 py-1 rounded bg-base-100 text-text-muted border border-[#e8e4d9] text-xs font-medium w-max">Member</span>
+                        </td>
+                        <td class="px-6 py-4 opacity-60">
+                            <span class="text-xs text-text-muted italic">Access Revoked</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2 mb-1">
+                                <div class="w-1.5 h-1.5 rounded-full bg-accent-coral"></div>
+                                <span class="text-xs font-bold text-accent-coral">Suspended</span>
+                            </div>
+                            <span class="text-[11px] text-text-muted">Since Oct 12, 2026</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <button class="text-text-main font-bold text-xs hover:underline">Restore</button>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+            <div class="py-4 px-6 border-t border-[#e8e4d9] flex justify-between items-center bg-[#fcfbf9]">
+                <span class="text-xs text-text-muted">Showing 1 to 3 of 1,248 employees</span>
+                <div class="flex gap-1">
+                    <button
+                        class="w-8 h-8 rounded border border-[#e8e4d9] bg-white text-text-muted flex items-center justify-center hover:text-text-main hover:bg-base-50 transition-colors cursor-not-allowed opacity-50"><i
+                            class="ph ph-caret-left"></i></button>
+                    <button
+                        class="w-8 h-8 rounded border border-[#e8e4d9] bg-text-main text-white flex items-center justify-center text-sm font-bold">1</button>
+                    <button
+                        class="w-8 h-8 rounded border border-[#e8e4d9] bg-white text-text-main flex items-center justify-center hover:bg-base-50 transition-colors text-sm">2</button>
+                    <button
+                        class="w-8 h-8 rounded border border-[#e8e4d9] bg-white text-text-main flex items-center justify-center hover:bg-base-50 transition-colors text-sm">3</button>
+                    <span class="w-8 h-8 flex items-center justify-center text-text-muted">...</span>
+                    <button
+                        class="w-8 h-8 rounded border border-[#e8e4d9] bg-white text-text-muted flex items-center justify-center hover:text-text-main hover:bg-base-50 transition-colors"><i
+                            class="ph ph-caret-right"></i></button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+</body>
+
+</html>

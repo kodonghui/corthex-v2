@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORTHEX v2 - Global Workspaces</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['Roboto Mono', 'monospace'] },
+                    colors: {
+                        dark: { 50: '#1a1a2e', 100: '#151525', 200: '#11111e', 300: '#0d0d18', 400: '#0a0a0f', 900: '#050508' },
+                        accent: { purple: '#a855f7', cyan: '#22d3ee' }
+                    },
+                    backgroundImage: { 'gradient-accent': 'linear-gradient(to right, #a855f7, #22d3ee)' },
+                    boxShadow: { 'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.3)', 'glow': '0 0 20px rgba(168, 85, 247, 0.3), 0 0 40px rgba(34, 211, 238, 0.2)' }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer components {
+            body { @apply bg-dark-900 text-gray-200 font-sans antialiased font-light min-h-screen overflow-hidden flex selection:bg-blue-500/30 selection:text-white; }
+            .bg-ambient { @apply fixed inset-0 z-[-1] pointer-events-none; }
+            .bg-ambient::before { content: ''; @apply absolute top-[-30%] left-[20%] w-[60vw] h-[60vw] rounded-full bg-blue-600/10 blur-[150px]; }
+            .bg-ambient::after { content: ''; @apply absolute bottom-[-20%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-accent-cyan/5 blur-[120px]; }
+            
+            .glass-panel { @apply bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] shadow-glass rounded-2xl overflow-hidden transition-all duration-300; }
+            
+            .nav-item { @apply flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/[0.05] transition-colors font-medium text-sm; }
+            .nav-item.active { @apply text-white bg-white/[0.08] shadow-[inset_2px_0_0_0_rgba(59,130,246,0.5)]; }
+            
+            .btn { @apply inline-flex items-center justify-center px-4 py-2 font-medium text-sm rounded-lg transition-all gap-2 cursor-pointer; }
+            .btn-primary { @apply bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:opacity-90; }
+            
+            .text-gradient { @apply bg-gradient-accent bg-clip-text text-transparent; }
+            
+            .scrollbar-hide::-webkit-scrollbar { display: none; }
+            .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-ambient"></div>
+
+    <aside class="w-64 border-r border-white/[0.08] bg-dark-400/80 backdrop-blur-xl flex flex-col h-full z-20 shrink-0">
+        <div class="h-16 flex items-center px-6 border-b border-white/[0.05]">
+            <h1 class="text-xl font-bold tracking-wider text-gradient">CORTHEX</h1>
+            <span
+                class="ml-2 px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30">ADMIN</span>
+        </div>
+        <div class="flex-1 overflow-y-auto scrollbar-hide py-6 px-4 space-y-8">
+            <div class="space-y-1">
+                <a href="admin-dashboard.html" class="nav-item"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                    Global Dashboard</a>
+            </div>
+
+            <div class="space-y-1">
+                <p class="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Platform
+                    Administration</p>
+                <a href="admin-api-keys.html" class="nav-item"><i data-lucide="key-square" class="w-4 h-4"></i> Platform
+                    API Keys</a>
+                <a href="admin-costs.html" class="nav-item"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> Global
+                    Costs</a>
+                <a href="admin-companies.html" class="nav-item active"><i data-lucide="building-2" class="w-4 h-4"></i>
+                    Tenancy / Companies</a>
+                <a href="admin-settings.html" class="nav-item"><i data-lucide="settings" class="w-4 h-4"></i> Platform
+                    Settings</a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full relative z-10 overflow-hidden">
+
+        <header
+            class="h-16 flex items-center justify-between px-8 border-b border-white/[0.05] bg-dark-300/50 backdrop-blur shrink-0">
+            <div class="flex items-center gap-4">
+                <span class="text-sm font-medium text-gray-300"><i data-lucide="building-2"
+                        class="w-4 h-4 inline mr-2 text-blue-400"></i>Workspace & Tenancy Directory</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <button class="btn btn-primary text-xs py-1.5"><i data-lucide="building" class="w-3 h-3"></i> Provision
+                    New Workspace</button>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-8 scrollbar-hide">
+
+            <div class="glass-panel p-4 mb-6 flex justify-between items-center gap-4">
+                <div class="relative flex-1 max-w-md">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                    <input type="text" placeholder="Search workspaces by name or tenant ID..."
+                        class="w-full bg-dark-200/50 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white focus:outline-none focus:border-blue-500/50">
+                </div>
+                <div class="flex gap-2">
+                    <select
+                        class="bg-dark-200/50 border border-white/10 text-xs px-3 py-2 rounded-lg text-gray-300 appearance-none pr-8 focus:outline-none">
+                        <option>Plan: All</option>
+                        <option>Enterprise</option>
+                        <option>Pro</option>
+                        <option>Starter</option>
+                    </select>
+                    <select
+                        class="bg-dark-200/50 border border-white/10 text-xs px-3 py-2 rounded-lg text-gray-300 appearance-none pr-8 focus:outline-none">
+                        <option>Status: Active</option>
+                        <option>Suspended</option>
+                        <option>In Trial</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Tenancy List (API: GET /api/admin/companies) -->
+            <div class="glass-panel overflow-hidden">
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr
+                            class="bg-white/[0.02] text-gray-400 border-b border-white/5 uppercase text-[10px] tracking-wider">
+                            <th class="py-4 px-6 font-medium">Workspace / Tenant ID</th>
+                            <th class="py-4 px-6 font-medium">Subscription Plan</th>
+                            <th class="py-4 px-6 font-medium">Metrics (Users / Agents)</th>
+                            <th class="py-4 px-6 font-medium">Monthly Cost Limit</th>
+                            <th class="py-4 px-6 font-medium text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-300">
+
+                        <tr class="border-b border-white/5 hover:bg-white/[0.02] transition-colors group">
+                            <td class="py-4 px-6">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-8 h-8 rounded bg-gradient-to-br from-indigo-500 to-purple-600 flex-center text-white text-xs font-bold">
+                                        GT</div>
+                                    <div>
+                                        <p class="font-medium text-white group-hover:text-blue-400 transition-colors">
+                                            Global Tech Inc.</p>
+                                        <p class="text-[10px] text-gray-500 font-mono">tn_globaltech_001</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4 px-6">
+                                <span
+                                    class="bg-accent-purple/20 text-accent-purple px-2 py-0.5 rounded text-[10px] border border-accent-purple/20">Enterprise
+                                    Custom</span>
+                            </td>
+                            <td class="py-4 px-6">
+                                <div class="flex gap-4 text-xs font-mono">
+                                    <span class="flex items-center gap-1 text-gray-400"><i data-lucide="users"
+                                            class="w-3 h-3 text-gray-500"></i> 1,240</span>
+                                    <span class="flex items-center gap-1 text-gray-400"><i data-lucide="bot"
+                                            class="w-3 h-3 text-accent-cyan"></i> 142</span>
+                                </div>
+                            </td>
+                            <td class="py-4 px-6 font-mono text-xs">
+                                <div class="flex items-center gap-2">
+                                    <span>$20,000</span>
+                                    <div class="w-16 h-1 rounded flex-1 bg-dark-300 overflow-hidden">
+                                        <div class="h-full bg-blue-500" style="width: 65%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4 px-6 text-right">
+                                <button
+                                    class="text-xs font-medium text-blue-400 hover:text-white transition-colors">Manage</button>
+                            </td>
+                        </tr>
+
+                        <tr class="border-b border-white/5 hover:bg-white/[0.02] transition-colors group">
+                            <td class="py-4 px-6">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-8 h-8 rounded bg-blue-500/10 border border-blue-500/20 text-blue-400 flex-center text-xs font-bold">
+                                        ND</div>
+                                    <div>
+                                        <p class="font-medium text-white group-hover:text-blue-400 transition-colors">
+                                            Nexus Dynamics</p>
+                                        <p class="text-[10px] text-gray-500 font-mono">tn_nexusdyn_442</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4 px-6">
+                                <span
+                                    class="bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded text-[10px] border border-blue-500/20">Enterprise
+                                    Standard</span>
+                            </td>
+                            <td class="py-4 px-6">
+                                <div class="flex gap-4 text-xs font-mono">
+                                    <span class="flex items-center gap-1 text-gray-400"><i data-lucide="users"
+                                            class="w-3 h-3 text-gray-500"></i> 45</span>
+                                    <span class="flex items-center gap-1 text-gray-400"><i data-lucide="bot"
+                                            class="w-3 h-3 text-accent-cyan"></i> 12</span>
+                                </div>
+                            </td>
+                            <td class="py-4 px-6 font-mono text-xs">
+                                <div class="flex items-center gap-2">
+                                    <span>$5,000</span>
+                                    <div class="w-16 h-1 rounded flex-1 bg-dark-300 overflow-hidden">
+                                        <div class="h-full bg-rose-500" style="width: 95%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4 px-6 text-right">
+                                <button
+                                    class="text-xs font-medium text-blue-400 hover:text-white transition-colors">Manage</button>
+                            </td>
+                        </tr>
+
+                        <tr class="border-b border-white/5 hover:bg-white/[0.02] transition-colors group opacity-70">
+                            <td class="py-4 px-6">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-8 h-8 rounded bg-dark-300 border border-white/10 text-gray-400 flex-center text-xs font-bold">
+                                        SS</div>
+                                    <div>
+                                        <p
+                                            class="font-medium text-gray-300 group-hover:text-blue-400 transition-colors">
+                                            Solaris Startups</p>
+                                        <p class="text-[10px] text-gray-500 font-mono">tn_solaris_891</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4 px-6">
+                                <span
+                                    class="bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded text-[10px] border border-gray-500/20">Pro
+                                    Trial</span>
+                            </td>
+                            <td class="py-4 px-6">
+                                <div class="flex gap-4 text-xs font-mono">
+                                    <span class="flex items-center gap-1 text-gray-400"><i data-lucide="users"
+                                            class="w-3 h-3 text-gray-500"></i> 12</span>
+                                    <span class="flex items-center gap-1 text-gray-400"><i data-lucide="bot"
+                                            class="w-3 h-3 text-accent-cyan"></i> 3</span>
+                                </div>
+                            </td>
+                            <td class="py-4 px-6 font-mono text-xs">
+                                <div class="flex items-center gap-2">
+                                    <span>$500</span>
+                                    <div class="w-16 h-1 rounded flex-1 bg-dark-300 overflow-hidden">
+                                        <div class="h-full bg-emerald-400" style="width: 15%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4 px-6 text-right">
+                                <button
+                                    class="text-xs font-medium text-blue-400 hover:text-white transition-colors">Manage</button>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+                <div class="p-4 border-t border-white/5 flex justify-between items-center text-xs text-gray-500">
+                    Showing 1-10 of 142 Active Workspaces.
+                    <div class="flex gap-1">
+                        <button class="px-2 py-1 rounded bg-white/5 hover:bg-white/10 disabled:opacity-50">Prev</button>
+                        <button class="px-2 py-1 rounded bg-white/5 hover:bg-white/10">Next</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

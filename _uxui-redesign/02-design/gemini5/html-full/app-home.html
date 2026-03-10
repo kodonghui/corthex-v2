@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORTHEX v2 - 홈 대시보드</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter & Noto Sans KR -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons (for soft, rounded elegant icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Tailwind Config for Warm/Soft Theme (Things 3 / Bear inspired) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans KR', 'sans-serif'],
+                    },
+                    colors: {
+                        base: {
+                            50: '#fcfbf9',  // Background (Cream)
+                            100: '#f5f3ec', // Hover state
+                            200: '#e8e4d9', // Dividers
+                            300: '#d5cfc1', // Borders
+                        },
+                        text: {
+                            main: '#2c2c2c', // Primary text
+                            muted: '#6b6b6b', // Secondary text
+                        },
+                        accent: {
+                            coral: '#e57373',
+                            terracotta: '#e07a5f',
+                            amber: '#f4a261',
+                            green: '#81b29a', // For positive indicators
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px rgba(0, 0, 0, 0.03)',
+                        'soft-lg': '0 10px 40px rgba(0, 0, 0, 0.04)',
+                    },
+                    borderRadius: {
+                        '2xl': '1rem',
+                        '3xl': '1.5rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #fcfbf9;
+            color: #2c2c2c;
+            /* Subtly hide scrollbar for clean look */
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        body::-webkit-scrollbar {
+            display: none;
+        }
+        .card {
+            background-color: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            border: 1px solid #f5f3ec;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+        }
+        .sidebar-item {
+            transition: all 0.2s ease;
+        }
+        .sidebar-item:hover, .sidebar-item.active {
+            background-color: #f5f3ec;
+            color: #e07a5f;
+            border-radius: 1rem;
+        }
+    </style>
+</head>
+<body class="flex h-screen font-sans antialiased">
+
+    <!-- Sidebar -->
+    <aside class="w-64 flex flex-col justify-between py-8 px-4 border-r border-base-200 bg-base-50/50 backdrop-blur-md">
+        <div>
+            <!-- Logo -->
+            <div class="flex items-center gap-3 px-4 mb-10">
+                <div class="w-8 h-8 rounded-full bg-accent-terracotta flex items-center justify-center text-white font-bold text-lg">
+                    C
+                </div>
+                <span class="text-xl font-bold tracking-tight text-text-main">CORTHEX</span>
+            </div>
+
+            <!-- Navigation -->
+            <!-- Associated APIs for Nav: general workspace routing -->
+            <nav class="space-y-2">
+                <a href="#" class="sidebar-item active flex items-center gap-3 px-4 py-3 font-medium text-text-main">
+                    <i class="ph ph-squares-four text-xl"></i>
+                    홈
+                </a>
+                <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 text-text-muted">
+                    <i class="ph ph-terminal-window text-xl"></i>
+                    사령관실
+                </a>
+                <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 text-text-muted">
+                    <i class="ph ph-chats text-xl"></i>
+                    채팅
+                </a>
+                <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 text-text-muted">
+                    <i class="ph ph-chart-line-up text-xl"></i>
+                    전략실
+                </a>
+                <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 text-text-muted">
+                    <i class="ph ph-users-three text-xl"></i>
+                    부서 및 직원
+                </a>
+            </nav>
+        </div>
+
+        <div>
+            <!-- Bottom Nav -->
+            <nav class="space-y-2">
+                <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 text-text-muted">
+                    <i class="ph ph-gear text-xl"></i>
+                    설정
+                </a>
+                <!-- User Profile -->
+                <div class="mt-4 px-4 py-3 flex items-center gap-3 border-t border-base-200">
+                    <img src="https://i.pravatar.cc/100?img=11" alt="Profile" class="w-10 h-10 rounded-full border border-base-300">
+                    <div>
+                        <p class="text-sm font-semibold text-text-main">김대표</p>
+                        <p class="text-xs text-text-muted">CEO</p>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-full overflow-y-auto px-10 py-8">
+        
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-3xl font-bold tracking-tight text-text-main">작전현황</h1>
+                <p class="text-text-muted mt-1 text-sm">현재 CORTHEX 조직의 활동 및 상태 요약입니다.</p>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <!-- 퀵 액션 (API: GET /api/workspace/dashboard/quick-actions) -->
+                <button class="px-5 py-2.5 bg-accent-terracotta text-white font-medium rounded-full hover:bg-opacity-90 transition-colors shadow-soft flex items-center gap-2">
+                    <i class="ph ph-lightning text-lg"></i>
+                    새로운 작전 지시
+                </button>
+                <div class="relative">
+                    <button class="w-10 h-10 rounded-full bg-white border border-base-200 flex items-center justify-center text-text-main hover:bg-base-100 transition-colors">
+                        <i class="ph ph-bell text-xl"></i>
+                        <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-accent-coral rounded-full border-2 border-white"></span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Summary Cards -->
+        <!-- API: GET /api/workspace/dashboard/summary -->
+        <div class="grid grid-cols-4 gap-6 mb-8">
+            <div class="card p-6 flex flex-col">
+                <div class="w-10 h-10 rounded-full bg-[#fdece6] text-accent-terracotta flex items-center justify-center mb-4">
+                    <i class="ph ph-check-circle text-xl"></i>
+                </div>
+                <h3 class="text-sm font-medium text-text-muted mb-1">오늘 완료된 작업</h3>
+                <div class="text-3xl font-bold text-text-main">124<span class="text-sm font-medium text-text-muted ml-1">건</span></div>
+                <div class="mt-2 text-xs font-medium text-accent-green flex items-center gap-1">
+                    <i class="ph ph-trend-up"></i> 어제 대비 12% 증가
+                </div>
+            </div>
+
+            <div class="card p-6 flex flex-col">
+                <div class="w-10 h-10 rounded-full bg-[#e8f3ef] text-accent-green flex items-center justify-center mb-4">
+                    <i class="ph ph-robot text-xl"></i>
+                </div>
+                <h3 class="text-sm font-medium text-text-muted mb-1">활성 에이전트</h3>
+                <div class="text-3xl font-bold text-text-main">18<span class="text-sm font-medium text-text-muted ml-1">/ 24명</span></div>
+                <div class="mt-2 text-xs font-medium text-text-muted">
+                    6개 부서에서 근무 중
+                </div>
+            </div>
+
+            <div class="card p-6 flex flex-col">
+                <div class="w-10 h-10 rounded-full bg-[#fef5ec] text-accent-amber flex items-center justify-center mb-4">
+                    <i class="ph ph-coins text-xl"></i>
+                </div>
+                <h3 class="text-sm font-medium text-text-muted mb-1">오늘 사용 비용</h3>
+                <div class="text-3xl font-bold text-text-main">$4.20</div>
+                <div class="mt-2 text-xs font-medium text-text-muted flex items-center gap-1">
+                    <i class="ph ph-trend-down text-accent-green"></i> 3계급 모델 배정으로 42% 절감
+                </div>
+            </div>
+
+            <div class="card p-6 flex flex-col">
+                <div class="w-10 h-10 rounded-full bg-[#f5f3ec] text-text-main flex items-center justify-center mb-4">
+                    <i class="ph ph-plugs-connected text-xl"></i>
+                </div>
+                <h3 class="text-sm font-medium text-text-muted mb-1">연동 서비스 상태</h3>
+                <div class="flex items-center gap-2 mt-1">
+                    <span class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#e8f3ef] text-accent-green text-xs font-bold">
+                        <span class="w-1.5 h-1.5 rounded-full bg-accent-green"></span> KIS 증권
+                    </span>
+                    <span class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#e8f3ef] text-accent-green text-xs font-bold">
+                        <span class="w-1.5 h-1.5 rounded-full bg-accent-green"></span> Claude
+                    </span>
+                </div>
+                <div class="mt-3 text-xs font-medium text-text-muted">
+                    125+ 도구 정상 작동
+                </div>
+            </div>
+        </div>
+
+        <!-- Lower Section (Charts & Bars) -->
+        <div class="grid grid-cols-3 gap-6">
+            
+            <!-- Usage Graph -->
+            <!-- API: GET /api/workspace/dashboard/usage -->
+            <div class="col-span-2 card p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-lg font-bold text-text-main">LLM 사용량 추이</h2>
+                    <select class="px-3 py-1.5 bg-base-50 border border-base-200 rounded-full text-sm font-medium text-text-muted focus:outline-none">
+                        <option>최근 7일</option>
+                        <option>이번 달</option>
+                    </select>
+                </div>
+                <!-- Placeholder for Chart.js / Recharts -->
+                <div class="h-64 w-full bg-base-50 rounded-2xl border border-base-200 border-dashed flex items-center justify-center text-text-muted flex-col gap-2 relative overflow-hidden">
+                    <i class="ph ph-chart-line text-3xl opacity-50"></i>
+                    <span class="text-sm font-medium opacity-50">[ 차트 컴포넌트 렌더링 영역 ]</span>
+                    
+                    <!-- decorative illustrative line -->
+                    <svg class="absolute bottom-0 w-full h-1/2 opacity-20" viewBox="0 0 100 100" preserveAspectRatio="none">
+                        <path d="M0,100 L0,80 Q25,100 50,50 T100,20 L100,100 Z" fill="#e07a5f"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-6">
+                <!-- Budget Management -->
+                <!-- API: GET /api/workspace/dashboard/budget -->
+                <div class="card p-6 flex-1">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-bold text-text-main">예산 관리</h2>
+                        <i class="ph ph-wallet text-xl text-text-muted"></i>
+                    </div>
+                    
+                    <div class="mb-5">
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-text-muted font-medium">이번 달 예산 ($200)</span>
+                            <span class="font-bold text-text-main">62% 사용</span>
+                        </div>
+                        <div class="w-full h-3 bg-base-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-accent-terracotta rounded-full" style="width: 62%;"></div>
+                        </div>
+                        <p class="text-xs text-text-muted mt-2 text-right">$124 / $200</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-text-muted">마케팅부</span>
+                                <span class="font-medium text-text-main">$58</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-base-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-accent-amber rounded-full" style="width: 45%;"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-text-muted">투자전략실</span>
+                                <span class="font-medium text-text-main">$42</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-base-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-accent-coral rounded-full" style="width: 35%;"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-text-muted">법무팀</span>
+                                <span class="font-medium text-text-main">$24</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-base-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-accent-green rounded-full" style="width: 20%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Satisfaction -->
+                <!-- API: GET /api/workspace/dashboard/satisfaction -->
+                <div class="card p-6 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-base font-bold text-text-main mb-1">CEO 만족도</h2>
+                        <div class="text-xs text-text-muted flex items-center gap-1">
+                            품질 검수 통과율
+                        </div>
+                    </div>
+                    <div class="w-16 h-16 rounded-full border-4 border-accent-green border-r-base-100 flex items-center justify-center transform -rotate-45">
+                        <span class="text-lg font-bold text-text-main transform rotate-45">92%</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Marketplace | CORTHEX v2 Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        black: '#000000',
+                        gray: { 900: '#111111', 500: '#666666', 300: '#999999', 100: '#EEEEEE' },
+                        white: '#FFFFFF',
+                        status: { green: '#22c55e', red: '#ef4444' }
+                    },
+                    letterSpacing: { tighter: '-0.04em', tight: '-0.02em', normal: '0', wide: '0.02em', wider: '0.04em', widest: '0.1em' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: theme('colors.white');
+            color: theme('colors.black');
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+
+        ::selection {
+            background-color: theme('colors.black');
+            color: theme('colors.white');
+        }
+
+        .title-display {
+            font-size: 4rem;
+            line-height: 1;
+            font-weight: 800;
+            letter-spacing: theme('letterSpacing.tighter');
+        }
+
+        .title-1 {
+            font-size: 2.5rem;
+            line-height: 1.1;
+            font-weight: 700;
+            letter-spacing: theme('letterSpacing.tight');
+        }
+
+        .title-2 {
+            font-size: 1.5rem;
+            line-height: 1.2;
+            font-weight: 600;
+            letter-spacing: theme('letterSpacing.tight');
+        }
+
+        .title-3 {
+            font-size: 1.125rem;
+            line-height: 1.4;
+            font-weight: 600;
+        }
+
+        .body-base {
+            font-size: 0.9375rem;
+            line-height: 1.6;
+            font-weight: 400;
+            color: theme('colors.gray.900');
+        }
+
+        .body-small {
+            font-size: 0.8125rem;
+            line-height: 1.5;
+            font-weight: 400;
+            color: theme('colors.gray.500');
+        }
+
+        .label-mono {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: theme('letterSpacing.widest');
+            color: theme('colors.gray.300');
+        }
+    </style>
+</head>
+
+<body class="flex h-screen overflow-hidden">
+
+    <nav class="w-72 flex flex-col justify-between py-12 px-10 flex-shrink-0 bg-gray-50 border-r border-gray-100">
+        <div>
+            <div class="mb-24 flex items-center">
+                <span class="title-2 tracking-tighter">CORTHEX</span>
+                <span class="label-mono ml-3 text-status-red bg-red-50 px-2 py-1">ADMIN</span>
+            </div>
+
+            <ul class="space-y-10">
+                <li><a href="dashboard.html" class="body-base text-gray-500 hover:text-black transition-colors">Platform
+                        Overview</a></li>
+                <li class="space-y-6 pt-4">
+                    <span class="label-mono text-gray-300 block mb-4">MARKETPLACES</span>
+                    <ul class="space-y-6 pl-4">
+                        <li><a href="template-market.html"
+                                class="body-base text-gray-500 hover:text-black transition-colors">Preset Market</a>
+                        </li>
+                        <!-- GET /api/admin/market/agents -->
+                        <li><a href="agent-marketplace.html" class="title-3 transition-colors">Agent Market</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="flex-1 overflow-y-auto p-16 lg:p-32 bg-white flex flex-col">
+
+        <header class="mb-20 flex justify-between items-end border-b border-black pb-8">
+            <div>
+                <h1 class="title-display mb-6">Agent App Store</h1>
+                <p class="body-base max-w-2xl text-gray-500">
+                    Third-party developer ecosystem. Individual AI agents mapped to specific domains, sold a-la-carte to
+                    tenants.
+                </p>
+            </div>
+            <div class="flex space-x-6">
+                <!-- GET /api/admin/market/agents/revenue -->
+                <button class="label-mono text-black border-b border-black font-bold">REVENUE REPORTS</button>
+            </div>
+        </header>
+
+        <div class="flex-1 min-h-0 bg-white">
+
+            <div class="table w-full border-b border-black">
+                <div class="table-row label-mono text-gray-300">
+                    <div class="table-cell pb-6 w-1/3">AGENT LISTING</div>
+                    <div class="table-cell pb-6">AUTHOR / VENDOR</div>
+                    <div class="table-cell pb-6">PRICING MODEL</div>
+                    <div class="table-cell pb-6">INSTALLS</div>
+                    <div class="table-cell pb-6 text-right">ACTION</div>
+                </div>
+
+                <!-- Live Listing -->
+                <div class="table-row group hover:bg-gray-50 cursor-pointer transition-colors">
+                    <div class="table-cell py-8 border-t border-gray-100 align-middle">
+                        <div class="flex items-center space-x-6">
+                            <div
+                                class="w-12 h-12 bg-black flex items-center justify-center font-bold text-white title-3 tracking-tighter">
+                                S</div>
+                            <div>
+                                <span class="title-3 block mb-1">SEO Optimizer Bot</span>
+                                <span class="label-mono text-status-green border border-status-green px-1">LIVE</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-cell py-8 border-t border-gray-100 align-middle body-small text-gray-500">
+                        MarketingPros Inc.
+                    </div>
+                    <div class="table-cell py-8 border-t border-gray-100 align-middle">
+                        <span class="body-base text-gray-900 font-medium">$29 / mo</span>
+                    </div>
+                    <div class="table-cell py-8 border-t border-gray-100 align-middle title-3 text-gray-900">
+                        1,420
+                    </div>
+                    <div class="table-cell py-8 border-t border-gray-100 align-middle text-right">
+                        <button class="label-mono text-gray-300 hover:text-status-red transition-colors">DELIST</button>
+                    </div>
+                </div>
+
+                <!-- Pending Review Listing -->
+                <div class="table-row group hover:bg-gray-50 cursor-pointer transition-colors">
+                    <div class="table-cell py-8 border-t border-gray-100 align-middle">
+                        <div class="flex items-center space-x-6">
+                            <div
+                                class="w-12 h-12 bg-gray-100 flex items-center justify-center font-bold text-black title-3 tracking-tighter border border-dashed border-black">
+                                F</div>
+                            <div>
+                                <span class="title-3 block mb-1">Forex Arbitrage Sniffer</span>
+                                <span class="label-mono text-status-red border border-status-red px-1 bg-red-50">MANUAL
+                                    REVIEW REQUIRED</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-cell py-8 border-t border-gray-100 align-middle body-small text-gray-500">
+                        @quant_anon
+                    </div>
+                    <div class="table-cell py-8 border-t border-gray-100 align-middle">
+                        <span class="body-base text-gray-900 font-medium">$500 + 0.1% transaction</span>
+                    </div>
+                    <div class="table-cell py-8 border-t border-gray-100 align-middle title-3 text-gray-300">
+                        0
+                    </div>
+                    <div class="table-cell py-8 border-t border-gray-100 align-middle text-right">
+                        <button
+                            class="label-mono bg-black text-white px-4 py-2 hover:bg-gray-900 transition-colors">REVIEW
+                            SPEC</button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Manager | CORTHEX v2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        black: '#000000',
+                        gray: { 900: '#111111', 500: '#666666', 300: '#999999', 100: '#EEEEEE' },
+                        white: '#FFFFFF',
+                        status: { green: '#22c55e', red: '#ef4444' }
+                    },
+                    letterSpacing: { tighter: '-0.04em', tight: '-0.02em', normal: '0', wide: '0.02em', wider: '0.04em', widest: '0.1em' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: theme('colors.white');
+            color: theme('colors.black');
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+
+        ::selection {
+            background-color: theme('colors.black');
+            color: theme('colors.white');
+        }
+
+        .title-display {
+            font-size: 4rem;
+            line-height: 1;
+            font-weight: 800;
+            letter-spacing: theme('letterSpacing.tighter');
+        }
+
+        .title-1 {
+            font-size: 2.5rem;
+            line-height: 1.1;
+            font-weight: 700;
+            letter-spacing: theme('letterSpacing.tight');
+        }
+
+        .title-2 {
+            font-size: 1.5rem;
+            line-height: 1.2;
+            font-weight: 600;
+            letter-spacing: theme('letterSpacing.tight');
+        }
+
+        .title-3 {
+            font-size: 1.125rem;
+            line-height: 1.4;
+            font-weight: 600;
+        }
+
+        .body-base {
+            font-size: 0.9375rem;
+            line-height: 1.6;
+            font-weight: 400;
+            color: theme('colors.gray.900');
+        }
+
+        .body-small {
+            font-size: 0.8125rem;
+            line-height: 1.5;
+            font-weight: 400;
+            color: theme('colors.gray.500');
+        }
+
+        .label-mono {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: theme('letterSpacing.widest');
+            color: theme('colors.gray.300');
+        }
+    </style>
+</head>
+
+<body class="flex h-screen overflow-hidden">
+
+    <!-- Global Nav -->
+    <nav class="w-64 border-r border-gray-100 flex flex-col justify-between py-8 px-6 flex-shrink-0">
+        <div>
+            <div class="mb-16">
+                <span class="title-2 tracking-tighter">CORTHEX</span>
+                <span class="label-mono ml-2">v2</span>
+            </div>
+
+            <ul class="space-y-6">
+                <li><a href="home.html" class="body-base hover:text-gray-500 transition-colors">Home</a></li>
+                <li><a href="dashboard.html" class="body-base hover:text-gray-500 transition-colors">Dashboard</a></li>
+                <li><a href="command-center.html" class="body-base hover:text-gray-500 transition-colors">Command
+                        Center</a></li>
+            </ul>
+        </div>
+
+        <div class="space-y-6">
+            <ul class="space-y-6 pb-6 border-b border-gray-100">
+                <li><a href="agents.html" class="body-small hover:text-black transition-colors">Agents</a></li>
+                <li><a href="knowledge.html" class="body-small hover:text-gray-500 transition-colors pl-4">Knowledge
+                        Base</a></li>
+                <!-- GET /api/workspace/files -->
+                <li><a href="files.html"
+                        class="title-3 font-medium transition-colors border-l-2 border-black pl-4">Files & Assets</a>
+                </li>
+                <li><a href="costs.html" class="body-small hover:text-black transition-colors mt-4">Costs</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="flex-1 flex flex-col bg-white h-full relative">
+
+        <header class="p-12 lg:px-24 border-b border-gray-100 shrink-0 flex justify-between items-end">
+            <div>
+                <h1 class="title-display mb-2">Drive</h1>
+                <p class="body-base text-gray-500">
+                    Raw file storage. PDFs, CSVs, and context files before ingestion to Knowledge DB.
+                </p>
+            </div>
+            <div class="flex space-x-4">
+                <button
+                    class="label-mono border border-gray-300 text-gray-500 px-4 py-2 hover:border-black hover:text-black transition-colors">NEW
+                    FOLDER</button>
+                <!-- POST /api/workspace/files/upload -->
+                <button class="bg-black text-white px-6 py-2 label-mono hover:bg-gray-900 transition-colors">UPLOAD
+                    FILE</button>
+            </div>
+        </header>
+
+        <div class="p-4 px-12 lg:px-24 border-b border-gray-100 bg-gray-50 flex space-x-6 text-label-mono">
+            <button class="label-mono text-black font-semibold">/ root</button>
+            <button class="label-mono text-gray-500 hover:text-black transition-colors">/ Q3_Financials</button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto px-12 lg:px-24 py-8">
+
+            <!-- Header Row -->
+            <div class="grid grid-cols-12 gap-4 pb-4 border-b border-black label-mono text-gray-500">
+                <div class="col-span-6">NAME</div>
+                <div class="col-span-2">SIZE</div>
+                <div class="col-span-2">SYNC STATE</div>
+                <div class="col-span-2 text-right">DATE</div>
+            </div>
+
+            <!-- List (GET /api/workspace/files) -->
+            <div
+                class="grid grid-cols-12 gap-4 py-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors items-center group">
+                <div class="col-span-6 flex items-center space-x-4">
+                    <span class="font-mono text-gray-300">📄</span>
+                    <span class="body-base font-medium group-hover:underline">aapl_q3_report.pdf</span>
+                </div>
+                <div class="col-span-2 body-base text-gray-500">4.2 MB</div>
+                <div class="col-span-2">
+                    <span class="label-mono text-status-green border border-status-green px-2 py-1">VECTORIZED</span>
+                </div>
+                <div class="col-span-2 text-right body-small text-gray-500">Oct 24, 2026</div>
+            </div>
+
+            <div
+                class="grid grid-cols-12 gap-4 py-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors items-center group">
+                <div class="col-span-6 flex items-center space-x-4">
+                    <span class="font-mono text-gray-300">📄</span>
+                    <span class="body-base font-medium group-hover:underline">msft_earnings_call.txt</span>
+                </div>
+                <div class="col-span-2 body-base text-gray-500">142 KB</div>
+                <div class="col-span-2">
+                    <span class="label-mono text-status-green border border-status-green px-2 py-1">VECTORIZED</span>
+                </div>
+                <div class="col-span-2 text-right body-small text-gray-500">Oct 23, 2026</div>
+            </div>
+
+            <div
+                class="grid grid-cols-12 gap-4 py-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors items-center group">
+                <div class="col-span-6 flex items-center space-x-4">
+                    <span class="font-mono text-gray-300">📊</span>
+                    <span class="body-base font-medium group-hover:underline">trading_log_2026_Q2.csv</span>
+                </div>
+                <div class="col-span-2 body-base text-gray-500">12.8 MB</div>
+                <div class="col-span-2">
+                    <span class="label-mono text-gray-500 border border-gray-300 px-2 py-1 text-black">RAW
+                        (PENDING)</span>
+                </div>
+                <div class="col-span-2 text-right body-small text-gray-500">Jul 01, 2026</div>
+            </div>
+
+            <!-- Folder -->
+            <div
+                class="grid grid-cols-12 gap-4 py-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors items-center group">
+                <div class="col-span-6 flex items-center space-x-4">
+                    <span class="font-mono text-black">📁</span>
+                    <span class="body-base font-medium group-hover:underline">Archive_2025</span>
+                </div>
+                <div class="col-span-2 body-base text-gray-500">--</div>
+                <div class="col-span-2">
+                    <span class="label-mono text-gray-300">-</span>
+                </div>
+                <div class="col-span-2 text-right body-small text-gray-500">Dec 31, 2025</div>
+            </div>
+
+        </div>
+
+        <!-- Drag & Drop Zone Overlay (Hidden by default, shown on drag) -->
+        <!-- <div class="absolute inset-0 bg-white/90 z-50 border-4 border-dashed border-black m-8 flex items-center justify-center pointer-events-none opacity-0">
+            <span class="title-1">DROP TO UPLOAD TO /Q3_Financials</span>
+        </div> -->
+
+    </main>
+
+</body>
+
+</html>

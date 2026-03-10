@@ -29,13 +29,9 @@
 - Always create fresh (overwrite existing docs, never skip)
 - Commit per stage: `docs(planning): {stage} complete -- {N} party rounds`
 
-### Party Mode: Single Worker Self-Review
-- 1 Worker writes + self-reviews 3 rounds (not 2-person ping-pong)
-- Round lenses: Collaborative → Adversarial → Forensic
-- Worker re-reads file each round (no memory-based review)
-- YOLO mode: auto-proceed, no menus, no waiting
-- Check: real features? concrete plan? covers v1 spec?
-- PASS/FAIL by Worker. Pass = 0 major objections
+### Party Mode
+- Use the real BMAD party mode workflow (multi-agent discussion)
+- Do NOT override with single-worker self-review
 
 ### Story Development (5 mandatory BMAD skills per story)
 1. `bmad-bmm-create-story` → story file
@@ -71,23 +67,13 @@ Workers/team agents follow the same standard. "Vague" = instant FAIL in party mo
 - API response: `{ success: true, data }` / `{ success: false, error: { code, message } }`
 - Tests: bun:test (server)
 
-## Context Memory (compaction survival)
-- Auto-save to `.claude/memory/working-state.md` on key decisions and natural breakpoints
+## Context Memory & Compaction
+- Auto-save to `.claude/memory/working-state.md` on key decisions
 - Record: (1) current work (2) key decisions (3) next steps (4) warnings
-- Session end: save summary to `.claude/memory/YYYY-MM-DD-topic.md`
+- **"컴팩대비"** = user trigger: update working-state.md + MEMORY.md + update log immediately
 - New session: read working-state.md + recent session logs first
 
 ## Update Log (absolute rule)
 - **Every session must log changes** to `.claude/updates/YYYY-MM-DD-topic.md`
-- Log must include: (1) what was changed (2) why (3) files affected (4) result/outcome
-- Format: markdown, specific file paths and line numbers where relevant
-- One log file per topic per day (append if same topic, new file if different topic)
-- Examples of what to log:
-  - New feature added: what it does, which files, API endpoints
-  - Bug fix: what was broken, root cause, what was changed
-  - Refactoring: what was restructured, why, before/after
-  - Config change: what setting, old value → new value
-  - Deployment: build number, what was deployed, any issues
-  - Design decision: what was decided, alternatives considered, rationale
-- This is NOT optional. Every meaningful change gets logged. "I forgot" is not acceptable.
-- Logs accumulate over time and become valuable project history/context for future sessions.
+- Include: what changed, why, files affected, result
+- NOT optional. Every meaningful change gets logged.

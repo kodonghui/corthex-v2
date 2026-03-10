@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Users | CORTHEX v2 Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        black: '#000000',
+                        gray: { 900: '#111111', 500: '#666666', 300: '#999999', 100: '#EEEEEE' },
+                        white: '#FFFFFF',
+                        status: { green: '#22c55e', red: '#ef4444' }
+                    },
+                    letterSpacing: { tighter: '-0.04em', tight: '-0.02em', normal: '0', wide: '0.02em', wider: '0.04em', widest: '0.1em' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: theme('colors.white');
+            color: theme('colors.black');
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+
+        ::selection {
+            background-color: theme('colors.black');
+            color: theme('colors.white');
+        }
+
+        .title-display {
+            font-size: 4rem;
+            line-height: 1;
+            font-weight: 800;
+            letter-spacing: theme('letterSpacing.tighter');
+        }
+
+        .title-1 {
+            font-size: 2.5rem;
+            line-height: 1.1;
+            font-weight: 700;
+            letter-spacing: theme('letterSpacing.tight');
+        }
+
+        .title-2 {
+            font-size: 1.5rem;
+            line-height: 1.2;
+            font-weight: 600;
+            letter-spacing: theme('letterSpacing.tight');
+        }
+
+        .title-3 {
+            font-size: 1.125rem;
+            line-height: 1.4;
+            font-weight: 600;
+        }
+
+        .body-base {
+            font-size: 0.9375rem;
+            line-height: 1.6;
+            font-weight: 400;
+            color: theme('colors.gray.900');
+        }
+
+        .body-small {
+            font-size: 0.8125rem;
+            line-height: 1.5;
+            font-weight: 400;
+            color: theme('colors.gray.500');
+        }
+
+        .label-mono {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: theme('letterSpacing.widest');
+            color: theme('colors.gray.300');
+        }
+    </style>
+</head>
+
+<body class="flex h-screen overflow-hidden">
+
+    <nav class="w-72 flex flex-col justify-between py-12 px-10 flex-shrink-0 bg-gray-50 border-r border-gray-100">
+        <div>
+            <div class="mb-24 flex items-center">
+                <span class="title-2 tracking-tighter">CORTHEX</span>
+                <span class="label-mono ml-3 text-status-red bg-red-50 px-2 py-1">ADMIN</span>
+            </div>
+
+            <ul class="space-y-10">
+                <li><a href="dashboard.html" class="body-base text-gray-500 hover:text-black transition-colors">Platform
+                        Overview</a></li>
+                <li class="space-y-6 pt-4">
+                    <span class="label-mono text-gray-300 block mb-4">TENANT MANAGEMENT</span>
+                    <ul class="space-y-6 pl-4">
+                        <li><a href="companies.html"
+                                class="body-base text-gray-500 hover:text-black transition-colors">Companies</a></li>
+                        <!-- GET /api/admin/users -->
+                        <li><a href="users.html" class="title-3 transition-colors">Global Users</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="flex-1 overflow-y-auto p-16 lg:p-32 bg-white flex flex-col">
+
+        <header class="mb-32 flex justify-between items-end border-b border-black pb-8">
+            <div class="w-2/3">
+                <h1 class="title-display mb-6">Global User Directory</h1>
+                <input type="text" placeholder="Search by email, name, or UUID across all 42 tenants..."
+                    class="w-full title-3 font-light placeholder-gray-300 border-none focus:outline-none focus:ring-0">
+            </div>
+        </header>
+
+        <div class="flex-1 min-h-0 bg-white">
+
+            <table class="w-full text-left">
+                <thead>
+                    <tr>
+                        <th class="label-mono text-gray-500 pb-6 border-b border-gray-300">USER</th>
+                        <th class="label-mono text-gray-500 pb-6 border-b border-gray-300">TENANT</th>
+                        <th class="label-mono text-gray-500 pb-6 border-b border-gray-300">ROLE</th>
+                        <th class="label-mono text-gray-500 pb-6 border-b border-gray-300">LAST LOGIN</th>
+                        <th class="label-mono text-gray-500 pb-6 border-b border-gray-300 text-right">GLOBAL AUDIT</th>
+                    </tr>
+                </thead>
+                <tbody class="body-base text-gray-900">
+
+                    <tr class="group hover:bg-gray-50 cursor-pointer transition-colors">
+                        <td class="py-6 border-b border-gray-100">
+                            <span class="title-3 block mb-1">Jane Doe</span>
+                            <span class="body-small text-gray-500 font-mono">jane.doe@acme.co</span>
+                        </td>
+                        <td class="py-6 border-b border-gray-100">
+                            <a href="companies.html"
+                                class="label-mono text-black border-b border-black hover:text-gray-500 hover:border-gray-500 pb-0.5">ACME
+                                CORP</a>
+                        </td>
+                        <td class="py-6 border-b border-gray-100">
+                            <span class="label-mono border border-black px-2 py-1">TENANT_ADMIN</span>
+                        </td>
+                        <td class="py-6 border-b border-gray-100 body-small text-gray-500">
+                            2 hours ago (IP: 192.168.1.1)
+                        </td>
+                        <td class="py-6 border-b border-gray-100 text-right">
+                            <button class="label-mono text-gray-300 hover:text-black transition-colors">VIEW LOGS
+                                -></button>
+                        </td>
+                    </tr>
+
+                    <tr class="group hover:bg-gray-50 cursor-pointer transition-colors">
+                        <td class="py-6 border-b border-gray-100">
+                            <span class="title-3 block mb-1">Mark Zuckerberg</span>
+                            <span class="body-small text-gray-500 font-mono">mz@meta.com</span>
+                        </td>
+                        <td class="py-6 border-b border-gray-100">
+                            <a href="companies.html"
+                                class="label-mono text-black border-b border-black hover:text-gray-500 hover:border-gray-500 pb-0.5">META</a>
+                        </td>
+                        <td class="py-6 border-b border-gray-100">
+                            <span class="label-mono border border-gray-300 px-2 py-1 text-gray-500">USER</span>
+                        </td>
+                        <td class="py-6 border-b border-gray-100 body-small text-gray-500">
+                            12 days ago (IP: 10.0.0.5)
+                        </td>
+                        <td class="py-6 border-b border-gray-100 text-right">
+                            <button class="label-mono text-gray-300 hover:text-black transition-colors">VIEW LOGS
+                                -></button>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+            <div class="mt-12 text-center">
+                <button class="label-mono text-gray-500 hover:text-black transition-colors">LOAD MORE RESULTS</button>
+            </div>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

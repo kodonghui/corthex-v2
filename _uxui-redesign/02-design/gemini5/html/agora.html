@@ -4,253 +4,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CORTHEX v2 - Agora Debate</title>
+    <title>Agora Debate | CORTHEX v2</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"
-        rel="stylesheet" crossorigin="anonymous">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        mono: {
-                            900: '#000000',
-                            800: '#111111',
-                            500: '#666666',
-                            400: '#999999',
-                            100: '#eeeeee',
-                            50: '#ffffff',
-                        },
-                        status: {
-                            red: '#ff3b30',
-                            green: '#34c759'
-                        }
+                        black: '#000000',
+                        gray: { 900: '#111111', 500: '#666666', 300: '#999999', 100: '#EEEEEE' },
+                        white: '#FFFFFF',
+                        status: { green: '#22c55e', red: '#ef4444' }
                     },
-                    fontFamily: {
-                        sans: ['Satoshi', 'Pretendard', 'system-ui', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
-                        serif: ['ui-serif', 'Georgia', 'Cambria', 'Times New Roman', 'Times', 'serif'],
-                    },
-                    fontSize: {
-                        'hero': ['4rem', { lineHeight: '1', letterSpacing: '-0.05em', fontWeight: '900' }],
-                        'display': ['2.5rem', { lineHeight: '1.1', letterSpacing: '-0.04em', fontWeight: '800' }],
-                        'h1': ['2rem', { lineHeight: '1.2', letterSpacing: '-0.03em', fontWeight: '700' }],
-                        'h2': ['1.5rem', { lineHeight: '1.3', letterSpacing: '-0.02em', fontWeight: '600' }],
-                        'h3': ['1.25rem', { lineHeight: '1.4', letterSpacing: '-0.01em', fontWeight: '600' }],
-                        'body-l': ['1.125rem', { lineHeight: '1.8', letterSpacing: '0', fontWeight: '500' }],
-                        'body': ['1rem', { lineHeight: '1.8', letterSpacing: '0', fontWeight: '400' }],
-                        'body-s': ['0.875rem', { lineHeight: '1.6', letterSpacing: '0.01em', fontWeight: '400' }],
-                        'caption': ['0.75rem', { lineHeight: '1.4', letterSpacing: '0.05em', fontWeight: '500' }],
-                    },
-                    spacing: {
-                        'section': '8rem',
-                        'block': '4rem',
-                        'item': '2rem',
-                    }
+                    letterSpacing: { tighter: '-0.04em', tight: '-0.02em', normal: '0', wide: '0.02em', wider: '0.04em', widest: '0.1em' }
                 }
             }
         }
     </script>
     <style>
         body {
-            background-color: #000000;
-            color: #ffffff;
+            background-color: theme('colors.white');
+            color: theme('colors.black');
             -webkit-font-smoothing: antialiased;
         }
 
-        .debate-body {
-            /* Using a slight mix of serif/sans for formal editorial aesthetic */
-            font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-            letter-spacing: -0.01em;
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
         }
 
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
+        ::selection {
+            background-color: theme('colors.black');
+            color: theme('colors.white');
+        }
+
+        .title-display {
+            font-size: 4rem;
+            line-height: 1;
+            font-weight: 800;
+            letter-spacing: theme('letterSpacing.tighter');
+        }
+
+        .title-1 {
+            font-size: 2.5rem;
+            line-height: 1.1;
+            font-weight: 700;
+            letter-spacing: theme('letterSpacing.tight');
+        }
+
+        .title-2 {
+            font-size: 1.5rem;
+            line-height: 1.2;
+            font-weight: 600;
+            letter-spacing: theme('letterSpacing.tight');
+        }
+
+        .title-3 {
+            font-size: 1.125rem;
+            line-height: 1.4;
+            font-weight: 600;
+        }
+
+        .body-base {
+            font-size: 0.9375rem;
+            line-height: 1.6;
+            font-weight: 400;
+            color: theme('colors.gray.900');
+        }
+
+        .body-small {
+            font-size: 0.8125rem;
+            line-height: 1.5;
+            font-weight: 400;
+            color: theme('colors.gray.500');
+        }
+
+        .label-mono {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: theme('letterSpacing.widest');
+            color: theme('colors.gray.300');
         }
     </style>
 </head>
 
-<body class="min-h-screen flex h-screen overflow-hidden">
+<body class="flex h-screen overflow-hidden">
 
-    <!-- Left Navigation -->
-    <nav class="w-24 lg:w-32 border-r border-mono-800 flex flex-col items-center py-8 shrink-0 h-full">
-        <a href="home.html"
-            class="text-h3 font-bold mb-16 rotate-[-90deg] uppercase tracking-widest whitespace-nowrap hover:text-mono-400">CORTHEX</a>
+    <!-- Global Nav -->
+    <nav class="w-64 border-r border-gray-100 flex flex-col justify-between py-8 px-6 flex-shrink-0">
+        <div>
+            <div class="mb-16">
+                <span class="title-2 tracking-tighter">CORTHEX</span>
+                <span class="label-mono ml-2">v2</span>
+            </div>
 
-        <div class="flex flex-col gap-12 font-mono text-caption uppercase tracking-widest items-center">
-            <a href="trading.html"
-                class="text-mono-500 hover:text-mono-100 transition-colors rotate-[-90deg] whitespace-nowrap">Trading</a>
-            <!-- API: N/A -->
-            <a href="agora.html"
-                class="text-mono-50 rotate-[-90deg] whitespace-nowrap border-b border-mono-50 pb-1 mt-4">Agora</a>
-            <a href="nexus.html"
-                class="text-mono-500 hover:text-mono-100 transition-colors rotate-[-90deg] whitespace-nowrap mt-8">Nexus</a>
+            <ul class="space-y-6">
+                <li><a href="home.html" class="body-base hover:text-gray-500 transition-colors">Home</a></li>
+                <li><a href="dashboard.html" class="body-base hover:text-gray-500 transition-colors">Dashboard</a></li>
+                <li><a href="command-center.html" class="body-base hover:text-gray-500 transition-colors">Command
+                        Center</a></li>
+                <li><a href="chat.html" class="body-base hover:text-gray-500 transition-colors">Chat</a></li>
+                <li><a href="trading.html" class="body-base hover:text-gray-500 transition-colors">Trading</a></li>
+                <!-- GET /api/workspace/debates -->
+                <li class="pt-6 border-t border-gray-100 mt-6"><a href="agora.html"
+                        class="title-3 font-medium transition-colors">Agora</a></li>
+                <li><a href="nexus.html" class="body-base hover:text-gray-500 transition-colors">Nexus</a></li>
+            </ul>
         </div>
 
+        <div class="space-y-6">
+            <ul class="space-y-6 pb-6 border-b border-gray-100">
+                <li><a href="agents.html" class="body-small hover:text-black transition-colors">Agents</a></li>
+                <li><a href="knowledge.html" class="body-small hover:text-black transition-colors">Knowledge</a></li>
+                <li><a href="costs.html" class="body-small hover:text-black transition-colors">Costs</a></li>
+            </ul>
+        </div>
     </nav>
 
+    <!-- Debate Engine Split View -->
     <main class="flex-1 flex overflow-hidden">
 
-        <!-- Left Column: Debate Index / History -->
-        <!-- API: GET /api/workspace/debates -->
-        <aside class="w-80 border-r border-mono-800 flex flex-col h-full shrink-0">
-            <header class="p-8 border-b border-mono-800">
-                <h2 class="text-mono-600 text-caption uppercase tracking-widest">Debate Archives</h2>
-                <!-- API: POST /api/workspace/debates -->
-                <button
-                    class="text-mono-100 uppercase tracking-widest font-mono text-caption mt-6 border-b border-mono-100 pb-1 hover:text-mono-400 transition-colors">+
-                    NEW DEBATE</button>
-            </header>
-            <ul class="flex-1 overflow-y-auto w-full no-scrollbar">
+        <!-- Left: Debate Configuration & List -->
+        <div class="w-1/3 border-r border-gray-100 flex flex-col bg-white">
+            <div class="p-8 border-b border-gray-100">
+                <h2 class="title-2 mb-6">Debate Arena</h2>
+                <!-- POST /api/workspace/debates -->
+                <button class="w-full bg-black text-white py-3 label-mono hover:bg-gray-900 transition-colors">ASSEMBLE
+                    PANEL</button>
+            </div>
 
-                <!-- Active Debate -->
-                <li class="border-b border-mono-800">
-                    <a href="#" class="block p-8 bg-mono-800/50">
-                        <div
-                            class="font-mono text-caption text-mono-50 mb-2 uppercase tracking-widest flex items-center gap-2">
-                            <span class="w-1.5 h-1.5 rounded-full bg-mono-50 animate-pulse"></span>
-                            IN-PROGRESS
-                        </div>
-                        <div class="text-h3 font-bold text-mono-100 line-clamp-2 leading-tight">신사업 진출 (A안 vs B안) 타당성 검토
-                        </div>
-                        <div class="text-mono-500 text-caption mt-4 font-mono">ROUND 2 OF 3</div>
-                    </a>
-                </li>
-
-                <!-- Completed Debate -->
-                <li class="border-b border-mono-800">
-                    <a href="#" class="block p-8 hover:bg-mono-800/30 transition-colors opacity-70">
-                        <div class="font-mono text-caption text-mono-600 mb-2 uppercase tracking-widest">COMPLETED</div>
-                        <div class="text-body-l font-medium text-mono-400 line-clamp-2 leading-tight">2026 Q3 마케팅 예산 증액안
-                        </div>
-                        <div class="text-mono-500 text-caption mt-4 font-mono">CONSENSUS REACHED</div>
-                    </a>
-                </li>
-
-                <!-- Dissent Debate -->
-                <li class="border-b border-mono-800">
-                    <a href="#" class="block p-8 hover:bg-mono-800/30 transition-colors opacity-70">
-                        <div class="font-mono text-caption text-mono-600 mb-2 uppercase tracking-widest">COMPLETED</div>
-                        <div class="text-body-l font-medium text-mono-400 line-clamp-2 leading-tight">사내망 클라우드 마이그레이션 전략
-                        </div>
-                        <div class="text-status-red mix-blend-screen text-caption mt-4 font-mono">DISSENT (NO CONSENSUS)
-                        </div>
-                    </a>
-                </li>
-            </ul>
-        </aside>
-
-        <!-- Right Column: Active Debate Canvas -->
-        <div class="flex-1 overflow-y-auto lg:px-24 xl:px-32 py-16 scroll-smooth">
-
-            <!-- API: GET /api/workspace/debates/:id -->
-            <header class="mb-section max-w-4xl border-b border-mono-800 pb-16">
-                <div class="font-mono text-caption text-mono-50 mb-6 uppercase tracking-widest flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-mono-50 animate-pulse"></span>
-                    ACTIVE DEBATE (DB-104)
+            <!-- GET /api/workspace/debates -->
+            <div class="flex-1 overflow-y-auto">
+                <div class="p-8 border-b border-black bg-gray-50">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="label-mono text-black">Active Debate</span>
+                        <span class="w-2 h-2 rounded-full bg-status-green animate-pulse"></span>
+                    </div>
+                    <h3 class="title-3 leading-snug">"Viability of transitioning underlying DB from Neon to self-hosted
+                        PostgreSQL"</h3>
+                    <div class="mt-4 label-mono text-gray-500">Round 2 / 3</div>
                 </div>
-                <h1 class="text-display leading-tight font-extrabold tracking-tighter text-mono-100 mb-8">
-                    신사업 진출 타당성 검토:<br>구독형 SaaS (A안) vs B2B 엔터프라이즈 솔루션 (B안)
-                </h1>
 
-                <div class="flex gap-16 font-mono text-body-s">
-                    <div>
-                        <div class="text-mono-600 uppercase tracking-widest text-[10px] mb-2">FORMAT</div>
-                        <div class="text-mono-400">Deep-Debate (3 Rounds)</div>
+                <div class="p-8 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="label-mono text-gray-500">Concluded</span>
+                        <span class="label-mono text-gray-900">Consensus Reached</span>
                     </div>
-                    <div>
-                        <div class="text-mono-600 uppercase tracking-widest text-[10px] mb-2">PARTICIPANTS</div>
-                        <div class="text-mono-400">CIO, CMO, 기술분석가</div>
-                    </div>
-                    <div>
-                        <div class="text-mono-600 uppercase tracking-widest text-[10px] mb-2">STATUS</div>
-                        <div class="text-mono-50 tracking-tighter">Round 2 / In Progress</div>
-                    </div>
+                    <h3 class="body-base font-medium text-gray-500 leading-snug">"Q4 Marketing Strategy focus: Organic
+                        vs Paid"</h3>
                 </div>
+            </div>
+        </div>
+
+        <!-- Right: Active Debate Stream -->
+        <!-- GET /api/workspace/debates/:id/timeline -->
+        <div class="flex-1 flex flex-col pt-8">
+            <header class="px-12 pb-8 border-b border-gray-100 shrink-0">
+                <div class="label-mono text-black mb-4 flex space-x-4">
+                    <span>AGORA PROTOCOL</span>
+                    <span class="text-gray-300">|</span>
+                    <span>3 PARTICIPANTS</span>
+                </div>
+                <h1 class="title-1 max-w-2xl">"Viability of transitioning underlying DB from Neon to self-hosted
+                    PostgreSQL"</h1>
             </header>
 
-            <!-- Debate Timeline -->
-            <!-- API: GET /api/workspace/debates/:id/timeline (Polled via SSE) -->
-            <div class="max-w-3xl">
+            <div class="flex-1 overflow-y-auto p-12 space-y-16 pb-32">
 
-                <!-- ROUND 1 HEADER -->
-                <div class="flex items-center gap-4 mb-block">
-                    <span class="text-h2 font-mono font-bold text-mono-100">ROUND 01</span>
-                    <div class="h-px bg-mono-800 flex-1"></div>
+                <!-- Round 1 Header -->
+                <div class="border-t border-black pt-4 mb-8">
+                    <h3 class="label-mono text-gray-900">Round 1: Initial Positions</h3>
                 </div>
 
-                <!-- Speech Item -->
-                <div class="mb-section pl-8 border-l border-mono-800/30">
-                    <div class="flex items-baseline gap-4 mb-6">
-                        <h3 class="text-h2 font-bold tracking-tight text-mono-100 uppercase">CIO</h3>
-                        <span class="text-mono-600 font-mono text-caption">14:02 PM</span>
-                        <span
-                            class="text-mono-600 font-mono text-caption border border-mono-800 px-2 py-0.5 ml-auto">POSITION:
-                            FOR B안 (ENTERPRISE)</span>
+                <!-- Speech 1 -->
+                <div class="max-w-3xl ml-0">
+                    <div class="flex items-center space-x-4 mb-4">
+                        <span class="title-3 font-semibold">Chief Technology Officer</span>
+                        <span class="label-mono text-gray-500">Proponent</span>
                     </div>
-                    <!-- Using serif/formal typography for debate content -->
-                    <div class="debate-body text-body-l text-mono-400 space-y-4">
-                        <p>
-                            현재 자사의 현금흐름과 개발 리소스를 고려할 때, 초기 LTV(Life Time Value)가 높고 즉각적인 매출 달성이 가능한 B2B 엔터프라이즈 솔루션 도입이
-                            타당합니다.
-                        </p>
-                        <p>
-                            구독형 SaaS 마켓은 고객 획득 비용(CAC)이 너무 높으며, 손익분기점(BEP) 도달까지 최소 18개월이 소요될 것으로 예상됩니다. 반면 B2B 엔터프라이즈는
-                            기존 거래처 3곳의 수요만으로도 1차 연도 예산을 회수할 수 있습니다.
-                        </p>
+                    <div class="body-base pl-8 border-l border-gray-300">
+                        <p class="mb-4">Given our recent scaling metrics, the per-read cost on serverless Neon DB is
+                            becoming a bottleneck. A self-hosted PostgreSQL instance on AWS EC2, paired with proper
+                            connection pooling (pGBouncer), will reduce our monthly database burn rate by an estimated
+                            60%.</p>
+                        <p>The control over the exact tuning parameters for vector search extensions is also a critical
+                            requirement for our next phase of RAG enhancements.</p>
                     </div>
                 </div>
 
-                <!-- Speech Item -->
-                <div class="mb-section pl-8 border-l border-mono-800/30">
-                    <div class="flex items-baseline gap-4 mb-6">
-                        <h3 class="text-h2 font-bold tracking-tight text-mono-100 uppercase">CMO</h3>
-                        <span class="text-mono-600 font-mono text-caption">14:05 PM</span>
-                        <span
-                            class="text-mono-600 font-mono text-caption border border-mono-800 px-2 py-0.5 ml-auto">POSITION:
-                            FOR A안 (SAAS)</span>
+                <!-- Speech 2 -->
+                <div class="max-w-3xl ml-16">
+                    <div class="flex items-center space-x-4 mb-4">
+                        <span class="title-3 font-semibold">DevOps Lead</span>
+                        <span class="label-mono text-status-red">Opponent</span>
                     </div>
-                    <div class="debate-body text-body-l text-mono-400 space-y-4">
-                        <p>
-                            CIO의 재무적 관점에는 동의하나, 시장의 확장성을 간과했습니다. 엔터프라이즈 솔루션은 커스터마이징 비용으로 인해 인력 중심의 에이전시 비즈니스로 전락할 위험이
-                            큽니다.
-                        </p>
-                        <p>
-                            당사의 핵심 역량인 AI 코어 엔진을 레버리지 하려면, 표준화된 SaaS 형태로 글로벌 마켓에 런칭하여 J커브 스케일업을 노려야 합니다. 초기 CAC 부담은 그로스
-                            해킹 방식의 프리미엄(Freemium) 정책으로 상쇄 가능합니다.
-                        </p>
+                    <div class="body-base pl-8 border-l border-gray-300">
+                        <p class="mb-4">I strongly disagree. The "60% cost reduction" ignores the hidden human cost
+                            regarding maintenance, patching, and SLA management. Neon provides automated branching and
+                            point-in-time recovery which is vital for our staging velocity.</p>
+                        <p>Moving to raw EC2 introduces single points of failure unless we build a complex multi-AZ HA
+                            setup, which negates the cost savings entirely.</p>
                     </div>
                 </div>
 
-                <!-- ROUND 2 HEADER -->
-                <div class="flex items-center gap-4 mb-block mt-section">
-                    <span class="text-h2 font-mono font-bold text-mono-100">ROUND 02</span>
-                    <div class="h-px bg-mono-800 flex-1"></div>
+                <!-- Round 2 Header -->
+                <div class="border-t border-black pt-4 mb-8">
+                    <h3 class="label-mono text-gray-900">Round 2: Rebuttal & Deep Analysis</h3>
                 </div>
 
-                <!-- Live Stream Indicator Text -->
-                <div class="pl-8 border-l-2 border-mono-100 mb-block opacity-80 animate-pulse">
-                    <div class="flex items-baseline gap-4 mb-4">
-                        <h3 class="text-h3 font-bold tracking-tight text-mono-50 uppercase">기술분석가</h3>
-                        <span class="text-mono-600 font-mono text-caption">DELIVERING SPEECH...</span>
+                <!-- Streaming Speech -->
+                <div class="max-w-3xl ml-0">
+                    <div class="flex items-center space-x-4 mb-4">
+                        <span class="title-3 font-semibold">Financial Controller</span>
+                        <span class="label-mono text-gray-500">Neutral Analyst</span>
                     </div>
-                    <div class="debate-body text-body-l text-mono-400">
-                        기술적 관점에서 B2B 엔터프라이즈는 온프레미스 구축을 요구하는 고객이 존재하며, 이는 단일 아키텍처 유지 원칙을 위배하게 됩니다. 따라서 SaaS 형태가 유지보수의
-                        복잡성을...<span class="w-2 h-4 bg-mono-400 inline-block animate-pulse align-middle ml-1"></span>
+                    <div class="body-base pl-8 border-l-2 border-black py-1">
+                        <span class="text-gray-500">I have modeled both scenarios requested by the CTO and DevOps Lead.
+                            Evaluating the total cost of ownership over a 24-month horizon...<span
+                                class="w-1 h-4 bg-black inline-block ml-1 animate-pulse"></span></span>
                     </div>
                 </div>
 
             </div>
 
-            <!-- Controls (Bottom sticky or minimal) -->
-            <div
-                class="mt-section pt-block border-t border-mono-800 max-w-3xl flex justify-between items-center text-mono-500 font-mono text-caption uppercase tracking-widest">
-                <!-- API: GET /api/workspace/debates/:id (Status Polling) -->
-                <div>STATUS: STREAMING WEBSOCKET (CHANNEL: DEBATE)</div>
-                <!-- API: POST /api/workspace/debates/:id/abort -->
-                <button class="hover:text-status-red transition-colors">Abort Debate</button>
+            <!-- Active Controls -->
+            <div class="p-8 border-t border-gray-100 bg-white">
+                <div class="flex justify-between items-center text-label-mono">
+                    <span class="label-mono text-status-green">SSE Stream Active [Round 2.1]</span>
+                    <div class="space-x-4 flex">
+                        <!-- POST /api/workspace/debates/:id/inject -->
+                        <button class="label-mono text-gray-500 hover:text-black transition-colors">Inject
+                            Context</button>
+                        <!-- POST /api/workspace/debates/:id/force-conclude -->
+                        <button
+                            class="label-mono text-black hover:text-status-red transition-colors border-l border-gray-100 pl-4">Force
+                            Conclusion</button>
+                    </div>
+                </div>
             </div>
 
         </div>

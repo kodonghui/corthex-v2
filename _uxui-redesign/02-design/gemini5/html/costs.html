@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Costs & Usage | CORTHEX v2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        black: '#000000',
+                        gray: { 900: '#111111', 500: '#666666', 300: '#999999', 100: '#EEEEEE' },
+                        white: '#FFFFFF',
+                        status: { green: '#22c55e', red: '#ef4444' }
+                    },
+                    letterSpacing: { tighter: '-0.04em', tight: '-0.02em', normal: '0', wide: '0.02em', wider: '0.04em', widest: '0.1em' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: theme('colors.white');
+            color: theme('colors.black');
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+
+        ::selection {
+            background-color: theme('colors.black');
+            color: theme('colors.white');
+        }
+
+        .title-display {
+            font-size: 4rem;
+            line-height: 1;
+            font-weight: 800;
+            letter-spacing: theme('letterSpacing.tighter');
+        }
+
+        .title-1 {
+            font-size: 2.5rem;
+            line-height: 1.1;
+            font-weight: 700;
+            letter-spacing: theme('letterSpacing.tight');
+        }
+
+        .title-2 {
+            font-size: 1.5rem;
+            line-height: 1.2;
+            font-weight: 600;
+            letter-spacing: theme('letterSpacing.tight');
+        }
+
+        .title-3 {
+            font-size: 1.125rem;
+            line-height: 1.4;
+            font-weight: 600;
+        }
+
+        .body-base {
+            font-size: 0.9375rem;
+            line-height: 1.6;
+            font-weight: 400;
+            color: theme('colors.gray.900');
+        }
+
+        .body-small {
+            font-size: 0.8125rem;
+            line-height: 1.5;
+            font-weight: 400;
+            color: theme('colors.gray.500');
+        }
+
+        .label-mono {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: theme('letterSpacing.widest');
+            color: theme('colors.gray.300');
+        }
+    </style>
+</head>
+
+<body class="flex h-screen overflow-hidden">
+
+    <!-- Global Nav -->
+    <nav class="w-64 border-r border-gray-100 flex flex-col justify-between py-8 px-6 flex-shrink-0">
+        <div>
+            <div class="mb-16">
+                <span class="title-2 tracking-tighter">CORTHEX</span>
+                <span class="label-mono ml-2">v2</span>
+            </div>
+
+            <ul class="space-y-6">
+                <li><a href="home.html" class="body-base hover:text-gray-500 transition-colors">Home</a></li>
+                <li><a href="dashboard.html" class="body-base hover:text-gray-500 transition-colors">Dashboard</a></li>
+                <li><a href="command-center.html" class="body-base hover:text-gray-500 transition-colors">Command
+                        Center</a></li>
+            </ul>
+        </div>
+
+        <div class="space-y-6">
+            <ul class="space-y-6 pb-6 border-b border-gray-100">
+                <li><a href="agents.html" class="body-small hover:text-black transition-colors">Agents</a></li>
+                <li><a href="knowledge.html" class="body-small hover:text-black transition-colors">Knowledge Base</a>
+                </li>
+                <li><a href="files.html" class="body-small hover:text-black transition-colors">Files & Assets</a></li>
+                <!-- GET /api/workspace/dashboard/costs -->
+                <li><a href="costs.html"
+                        class="title-3 font-medium transition-colors border-l-2 border-black pl-4">Costs & Usage</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="flex-1 overflow-y-auto p-12 lg:p-24 relative bg-white">
+
+        <header class="mb-24 flex justify-between items-end">
+            <div>
+                <h1 class="title-display mb-6">Financial Impact</h1>
+                <p class="body-base max-w-2xl text-gray-500">
+                    Granular tracking of LLM API costs across agents, departments, and specific operations.
+                </p>
+            </div>
+            <div class="text-right">
+                <select class="label-mono text-black border-b border-black pb-1 focus:outline-none bg-transparent">
+                    <option>October 2026</option>
+                    <option>September 2026</option>
+                    <option>August 2026</option>
+                </select>
+            </div>
+        </header>
+
+        <!-- High-level Summary -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-24">
+            <div class="border-t-[3px] border-black pt-6">
+                <span class="label-mono text-gray-500 block mb-4">TOTAL SPEND (MTD)</span>
+                <div class="title-display tracking-tight">$424.50</div>
+                <div class="mt-4 flex items-center space-x-2">
+                    <span class="label-mono text-status-red flex items-center"><svg class="w-3 h-3 mr-1" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg> +12% vs last month</span>
+                </div>
+            </div>
+            <div class="border-t border-gray-300 pt-6">
+                <span class="label-mono text-gray-500 block mb-4">PROJECTED EOM</span>
+                <div class="title-display text-gray-300 tracking-tight">$812.00</div>
+            </div>
+            <div class="border-t border-gray-300 pt-6">
+                <span class="label-mono text-gray-500 block mb-4">BUDGET LIMIT</span>
+                <div class="title-display tracking-tight">$1,000</div>
+                <div class="mt-4 w-full bg-gray-100 h-2">
+                    <div class="bg-black h-2" style="width: 42%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-24">
+
+            <!-- Cost by Department -->
+            <!-- GET /api/workspace/dashboard/costs/by-dept -->
+            <section>
+                <h2 class="label-mono text-black mb-8 border-b border-black pb-4">Spend by Department</h2>
+
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex justify-between items-end mb-2">
+                            <span class="title-3">Investment Strategy</span>
+                            <span class="body-base font-semibold">$245.10</span>
+                        </div>
+                        <div class="w-full bg-gray-100 h-3">
+                            <div class="bg-black h-3" style="width: 58%;"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-end mb-2">
+                            <span class="title-3">Marketing & Comms</span>
+                            <span class="body-base font-semibold">$112.40</span>
+                        </div>
+                        <div class="w-full bg-gray-100 h-3">
+                            <div class="bg-gray-500 h-3" style="width: 26%;"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-end mb-2">
+                            <span class="title-3 text-gray-500">System Ops</span>
+                            <span class="body-base font-semibold text-gray-500">$67.00</span>
+                        </div>
+                        <div class="w-full bg-gray-100 h-3">
+                            <div class="bg-gray-300 h-3" style="width: 16%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Top Spending Agents -->
+            <!-- GET /api/workspace/dashboard/costs/by-agent -->
+            <section>
+                <h2 class="label-mono text-black mb-8 border-b border-black pb-4">Top Spending Entities (Agents &
+                    Scripts)</h2>
+
+                <div class="table w-full">
+                    <div class="table-row border-b border-gray-300 label-mono text-gray-500">
+                        <div class="table-cell pb-4 align-bottom">ENTITY NAME</div>
+                        <div class="table-cell pb-4 align-bottom">MODEL</div>
+                        <div class="table-cell pb-4 align-bottom text-right">TOKENS (M)</div>
+                        <div class="table-cell pb-4 align-bottom text-right">COST</div>
+                    </div>
+
+                    <div class="table-row group hover:bg-gray-50 cursor-pointer">
+                        <div class="table-cell py-4 border-b border-gray-100 font-medium">Chief Investment Officer</div>
+                        <div class="table-cell py-4 border-b border-gray-100 body-small text-gray-500">Sonnet 3.5</div>
+                        <div class="table-cell py-4 border-b border-gray-100 text-right body-base">12.4</div>
+                        <div class="table-cell py-4 border-b border-gray-100 text-right font-medium">$142.10</div>
+                    </div>
+
+                    <div class="table-row group hover:bg-gray-50 cursor-pointer">
+                        <div class="table-cell py-4 border-b border-gray-100 font-medium">Secretary General</div>
+                        <div class="table-cell py-4 border-b border-gray-100 body-small text-gray-500">Sonnet 3.5</div>
+                        <div class="table-cell py-4 border-b border-gray-100 text-right body-base">8.1</div>
+                        <div class="table-cell py-4 border-b border-gray-100 text-right font-medium">$88.40</div>
+                    </div>
+
+                    <div class="table-row group hover:bg-gray-50 cursor-pointer">
+                        <div class="table-cell py-4 border-b border-gray-100 font-medium text-gray-500">[CRON] Daily SEC
+                            Ingest</div>
+                        <div class="table-cell py-4 border-b border-gray-100 body-small text-gray-500">Haiku 3.0</div>
+                        <div class="table-cell py-4 border-b border-gray-100 text-right body-base text-gray-500">45.2
+                        </div>
+                        <div class="table-cell py-4 border-b border-gray-100 text-right font-medium text-gray-500">
+                            $54.20</div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Callout / Settings Link -->
+        <div class="mt-24 bg-gray-50 p-12 border border-gray-200 flex justify-between items-center">
+            <div>
+                <h3 class="title-3 mb-2">Hard Budget Limits</h3>
+                <p class="body-base text-gray-500">System is configured to halt all non-essential Tier 3 agent
+                    operations if spend exceeds $1,000.</p>
+            </div>
+            <!-- Links to settings.html config section -->
+            <button
+                class="label-mono border border-black px-6 py-3 hover:bg-black hover:text-white transition-colors">CONFIGURE
+                LIMITS</button>
+        </div>
+
+    </main>
+
+</body>
+
+</html>

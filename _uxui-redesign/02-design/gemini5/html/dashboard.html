@@ -4,241 +4,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CORTHEX v2 - Dashboard</title>
+    <title>Dashboard | CORTHEX v2</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"
-        rel="stylesheet" crossorigin="anonymous">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        mono: {
-                            900: '#000000',
-                            800: '#111111',
-                            500: '#666666',
-                            400: '#999999',
-                            100: '#eeeeee',
-                            50: '#ffffff',
-                        },
-                        status: {
-                            red: '#ff3b30',
-                            green: '#34c759'
-                        }
+                        black: '#000000',
+                        gray: { 900: '#111111', 500: '#666666', 300: '#999999', 100: '#EEEEEE' },
+                        white: '#FFFFFF',
+                        status: { green: '#22c55e', red: '#ef4444' }
                     },
-                    fontFamily: {
-                        sans: ['Satoshi', 'Pretendard', 'system-ui', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
-                    },
-                    fontSize: {
-                        'hero': ['4rem', { lineHeight: '1', letterSpacing: '-0.05em', fontWeight: '900' }],
-                        'display': ['2.5rem', { lineHeight: '1.1', letterSpacing: '-0.04em', fontWeight: '800' }],
-                        'h1': ['2rem', { lineHeight: '1.2', letterSpacing: '-0.03em', fontWeight: '700' }],
-                        'h2': ['1.5rem', { lineHeight: '1.3', letterSpacing: '-0.02em', fontWeight: '600' }],
-                        'h3': ['1.25rem', { lineHeight: '1.4', letterSpacing: '-0.01em', fontWeight: '600' }],
-                        'body-l': ['1.125rem', { lineHeight: '1.6', letterSpacing: '0', fontWeight: '500' }],
-                        'body': ['1rem', { lineHeight: '1.6', letterSpacing: '0', fontWeight: '400' }],
-                        'body-s': ['0.875rem', { lineHeight: '1.5', letterSpacing: '0.01em', fontWeight: '400' }],
-                        'caption': ['0.75rem', { lineHeight: '1.4', letterSpacing: '0.05em', fontWeight: '500' }],
-                    },
-                    spacing: {
-                        'section': '8rem',
-                        'block': '4rem',
-                        'item': '2rem',
-                    }
+                    letterSpacing: { tighter: '-0.04em', tight: '-0.02em', normal: '0', wide: '0.02em', wider: '0.04em', widest: '0.1em' }
                 }
             }
         }
     </script>
     <style>
         body {
-            background-color: #000000;
-            color: #ffffff;
+            background-color: theme('colors.white');
+            color: theme('colors.black');
             -webkit-font-smoothing: antialiased;
+        }
+
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+
+        ::selection {
+            background-color: theme('colors.black');
+            color: theme('colors.white');
+        }
+
+        .title-display {
+            font-size: 4rem;
+            line-height: 1;
+            font-weight: 800;
+            letter-spacing: theme('letterSpacing.tighter');
+        }
+
+        .title-1 {
+            font-size: 2.5rem;
+            line-height: 1.1;
+            font-weight: 700;
+            letter-spacing: theme('letterSpacing.tight');
+        }
+
+        .title-2 {
+            font-size: 1.5rem;
+            line-height: 1.2;
+            font-weight: 600;
+            letter-spacing: theme('letterSpacing.tight');
+        }
+
+        .title-3 {
+            font-size: 1.125rem;
+            line-height: 1.4;
+            font-weight: 600;
+        }
+
+        .body-base {
+            font-size: 0.9375rem;
+            line-height: 1.6;
+            font-weight: 400;
+            color: theme('colors.gray.900');
+        }
+
+        .body-small {
+            font-size: 0.8125rem;
+            line-height: 1.5;
+            font-weight: 400;
+            color: theme('colors.gray.500');
+        }
+
+        .label-mono {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: theme('letterSpacing.widest');
+            color: theme('colors.gray.300');
         }
     </style>
 </head>
 
-<body class="min-h-screen">
+<body class="flex h-screen overflow-hidden">
 
-    <nav class="flex justify-between items-center px-16 py-8 border-b border-mono-800">
-        <a href="home.html" class="text-h2 font-bold tracking-tighter">CORTHEX</a>
-        <div class="flex gap-8 text-body-s font-medium">
-            <!-- API: N/A - Sub Navigation -->
-            <a href="home.html" class="text-mono-500 hover:text-mono-50 transition-colors">Home</a>
-            <a href="command-center.html" class="text-mono-500 hover:text-mono-50 transition-colors">Command Center</a>
-            <a href="#" class="text-mono-50 transition-colors line-through decoration-mono-500">Dashboard Metrics</a>
-            <a href="costs.html" class="text-mono-500 hover:text-mono-50 transition-colors">Costs Details</a>
+    <!-- Global Nav -->
+    <nav class="w-64 border-r border-gray-100 flex flex-col justify-between py-8 px-6 flex-shrink-0">
+        <div>
+            <div class="mb-16">
+                <span class="title-2 tracking-tighter">CORTHEX</span>
+                <span class="label-mono ml-2">v2</span>
+            </div>
+
+            <ul class="space-y-6">
+                <li><a href="home.html" class="body-base font-medium hover:text-gray-500 transition-colors">Home</a>
+                </li>
+                <!-- API endpoints for navigation are not strictly endpoints, but represent areas -->
+                <!-- GET /api/workspace/dashboard/summary -->
+                <li><a href="dashboard.html" class="title-3 hover:text-gray-500 transition-colors">Dashboard</a></li>
+                <!-- GET /api/workspace/commands -->
+                <li><a href="command-center.html" class="body-base hover:text-gray-500 transition-colors">Command
+                        Center</a></li>
+                <!-- GET /api/workspace/chat/sessions -->
+                <li><a href="chat.html" class="body-base hover:text-gray-500 transition-colors">Chat</a></li>
+                <li class="pt-6 border-t border-gray-100 mt-6"><a href="trading.html"
+                        class="body-base hover:text-gray-500 transition-colors">Trading</a></li>
+                <li><a href="agora.html" class="body-base hover:text-gray-500 transition-colors">Agora</a></li>
+                <li><a href="nexus.html" class="body-base hover:text-gray-500 transition-colors">Nexus</a></li>
+            </ul>
         </div>
-        <div class="text-mono-600 text-caption font-mono uppercase tracking-widest">Workspace Data</div>
+
+        <div class="space-y-6">
+            <ul class="space-y-6 pb-6 border-b border-gray-100">
+                <!-- GET /api/workspace/agents -->
+                <li><a href="agents.html" class="body-small hover:text-black transition-colors">Agents</a></li>
+                <li><a href="knowledge.html" class="body-small hover:text-black transition-colors">Knowledge</a></li>
+                <!-- GET /api/workspace/dashboard/costs -->
+                <li><a href="costs.html" class="body-small hover:text-black transition-colors">Costs</a></li>
+            </ul>
+            <div class="flex items-center space-x-3 cursor-pointer">
+                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center title-3">E</div>
+                <div>
+                    <div class="label-mono text-black">Workspace</div>
+                    <div class="body-small">elddl.com</div>
+                </div>
+            </div>
+        </div>
     </nav>
 
-    <main class="px-16 py-16 lg:px-32 max-w-[1600px] mx-auto space-y-section">
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto p-12 lg:p-24 relative">
 
-        <header>
-            <h1 class="text-hero font-bold tracking-tighter text-mono-100">Performance & Metrics</h1>
-            <p class="text-h2 text-mono-500 mt-4 tracking-tight max-w-3xl">This month's operational efficiency, agent
-                usage, budget tracking, and systemic health indicators.</p>
-
-            <div class="mt-8 flex gap-4 text-body-s font-mono uppercase tracking-widest">
-                <!-- API: GET /api/workspace/dashboard/summary?period=... -->
-                <button class="text-mono-50 border-b border-mono-50 pb-1">This Month</button>
-                <button class="text-mono-600 hover:text-mono-400 pb-1 transition-colors">Last Month</button>
-                <button class="text-mono-600 hover:text-mono-400 pb-1 transition-colors">YTD</button>
-            </div>
+        <header class="mb-20">
+            <!-- API: GET /api/workspace/dashboard/summary -->
+            <h1 class="title-display mb-6">Operations</h1>
+            <p class="body-base max-w-2xl text-gray-500">
+                Aggregated view of tenant activities, agent throughput, and systemic costs. All systems nominal.
+            </p>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-16 gap-y-section">
-
-            <!-- Usage Stats -->
-            <section>
-                <!-- API: GET /api/workspace/dashboard/usage -->
-                <h2 class="text-mono-600 text-caption tracking-widest uppercase mb-12">Total Usage (Tokens)</h2>
-                <div class="flex items-baseline gap-4 mb-16">
-                    <span class="text-[8rem] leading-none font-bold tracking-tighter">142<span
-                            class="text-mono-500">M</span></span>
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-16 mb-24">
+            <!-- API: GET /api/workspace/dashboard/summary (tasks) -->
+            <div>
+                <span class="label-mono text-gray-500 block mb-4">Active Tasks</span>
+                <span class="title-display">14</span>
+                <p class="body-small mt-2">4 compiling, 10 analyzing</p>
+            </div>
+            <!-- API: GET /api/workspace/dashboard/summary (cost) -->
+            <div>
+                <span class="label-mono text-gray-500 block mb-4">Today's Inference</span>
+                <span class="title-display">$12.4</span>
+                <p class="body-small mt-2">24% of daily budget</p>
+            </div>
+            <!-- API: GET /api/workspace/dashboard/summary (agents) -->
+            <div>
+                <span class="label-mono text-gray-500 block mb-4">Active Agents</span>
+                <div class="flex items-center space-x-4">
+                    <span class="title-display">8</span>
+                    <span class="w-3 h-3 rounded-full bg-status-green"></span>
                 </div>
+                <p class="body-small mt-2">All specialized units online</p>
+            </div>
+        </section>
 
-                <!-- Typographical Bar Chart replacement -->
-                <div class="space-y-6">
-                    <div>
-                        <div class="flex justify-between text-body-s font-mono text-mono-400 mb-2">
-                            <span>Claude 3.5 Sonnet</span>
-                            <span>84M (59%)</span>
-                        </div>
-                        <div class="w-full h-px bg-mono-800">
-                            <div class="w-[59%] h-px bg-mono-50 shadow-[0_0_10px_rgba(255,255,255,0.5)]"></div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-body-s font-mono text-mono-400 mb-2">
-                            <span>Claude 3 Haiku</span>
-                            <span>42M (29%)</span>
-                        </div>
-                        <div class="w-full h-px bg-mono-800">
-                            <div class="w-[29%] h-px bg-mono-500"></div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-body-s font-mono text-mono-400 mb-2">
-                            <span>GPT-4o</span>
-                            <span>16M (12%)</span>
-                        </div>
-                        <div class="w-full h-px bg-mono-800">
-                            <div class="w-[12%] h-px bg-mono-600"></div>
-                        </div>
-                    </div>
+        <!-- API: GET /api/workspace/dashboard/usage -->
+        <section class="mb-24">
+            <h3 class="title-2 mb-8">Throughput (7d)</h3>
+            <div class="h-64 border-b border-gray-100 flex items-end space-x-2 pb-4">
+                <!-- Extremely minimal chart representation (css bars) -->
+                <div class="w-full bg-gray-100 h-[60%] hover:bg-black transition-colors"></div>
+                <div class="w-full bg-gray-100 h-[80%] hover:bg-black transition-colors"></div>
+                <div class="w-full bg-gray-100 h-[40%] hover:bg-black transition-colors"></div>
+                <div class="w-full bg-gray-100 h-[90%] hover:bg-black transition-colors"></div>
+                <div class="w-full bg-gray-100 h-[100%] hover:bg-black transition-colors"></div>
+                <div class="w-full bg-gray-100 h-[50%] hover:bg-black transition-colors"></div>
+                <div class="w-full bg-black h-[75%] transition-colors relative group">
+                    <div
+                        class="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap label-mono text-black">
+                        TODAY / 244K</div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- Budget Overview -->
-            <section>
-                <!-- API: GET /api/workspace/dashboard/budget -->
-                <h2 class="text-mono-600 text-caption tracking-widest uppercase mb-12">Monthly Budget</h2>
-                <div class="flex justify-between items-end mb-16">
-                    <div class="flex items-baseline gap-4">
-                        <span class="text-[8rem] leading-none font-bold tracking-tighter">$420</span>
-                    </div>
-                    <div class="text-h2 font-mono text-mono-500 tracking-tighter">/ $500</div>
-                </div>
-
-                <div class="w-full h-4 border border-mono-800 p-0.5 mt-8">
-                    <!-- Progress bar -->
-                    <div class="h-full bg-mono-50 w-[84%] relative">
-                        <!-- Projection Marker -->
-                        <!-- API: GET /api/workspace/dashboard/budget (projectedMonthEndUsd) -->
-                        <div class="absolute -top-6 right-0 text-caption font-mono text-mono-400 translate-x-1/2">PROJ:
-                            $480</div>
-                        <div class="absolute -top-1 -bottom-1 w-0.5 bg-mono-400 right-0"></div>
-                    </div>
-                </div>
-                <div class="flex justify-between mt-4 text-mono-500 text-caption font-mono uppercase tracking-widest">
-                    <span>Burn Rate: Normal</span>
-                    <span class="text-status-red mix-blend-screen">84% CONSUMED</span>
-                </div>
-            </section>
-
-            <!-- Costs Breakdown By Agent -->
-            <section class="border-t border-mono-800 pt-16">
-                <!-- API: GET /api/workspace/dashboard/costs/by-agent -->
-                <h2 class="text-mono-600 text-caption tracking-widest uppercase mb-12">Top Agent Expenditure</h2>
-
-                <ul class="space-y-8">
-                    <li class="flex justify-between items-baseline group">
-                        <div class="flex-1">
-                            <h3
-                                class="text-h3 font-medium text-mono-100 group-hover:underline decoration-mono-500 underline-offset-4">
-                                비서실장</h3>
-                            <div class="text-mono-500 text-caption font-mono mt-1">SYSTEM / CLAUDE 3.5 SONNET</div>
-                        </div>
-                        <div class="text-h2 font-bold font-mono text-mono-50 tracking-tighter">$145.20</div>
-                    </li>
-                    <li
-                        class="flex justify-between items-baseline group opacity-70 hover:opacity-100 transition-opacity">
-                        <div class="flex-1">
-                            <h3
-                                class="text-h3 font-medium text-mono-100 group-hover:underline decoration-mono-500 underline-offset-4">
-                                CIO</h3>
-                            <div class="text-mono-500 text-caption font-mono mt-1">STRATEGY / CLAUDE 3.5 SONNET</div>
-                        </div>
-                        <div class="text-h2 font-bold font-mono text-mono-400 tracking-tighter">$98.50</div>
-                    </li>
-                    <li
-                        class="flex justify-between items-baseline group opacity-50 hover:opacity-100 transition-opacity">
-                        <div class="flex-1">
-                            <h3
-                                class="text-h3 font-medium text-mono-100 group-hover:underline decoration-mono-500 underline-offset-4">
-                                종목분석가</h3>
-                            <div class="text-mono-500 text-caption font-mono mt-1">STRATEGY / CLAUDE 3 HAIKU</div>
-                        </div>
-                        <div class="text-h2 font-bold font-mono text-mono-500 tracking-tighter">$32.10</div>
-                    </li>
-                    <li
-                        class="flex justify-between items-baseline group opacity-40 hover:opacity-100 transition-opacity">
-                        <div class="flex-1">
-                            <h3
-                                class="text-h3 font-medium text-mono-100 group-hover:underline decoration-mono-500 underline-offset-4">
-                                SNS 콘텐츠 전문가</h3>
-                            <div class="text-mono-500 text-caption font-mono mt-1">MARKETING / GPT-4O</div>
-                        </div>
-                        <div class="text-h2 font-bold font-mono text-mono-600 tracking-tighter">$28.40</div>
-                    </li>
-                </ul>
-            </section>
-
-            <!-- Satisfaction & Command Volume -->
-            <section class="border-t border-mono-800 pt-16 flex flex-col justify-between">
+        <!-- API: GET /api/workspace/dashboard/satisfaction -->
+        <section>
+            <h3 class="title-2 mb-8">Quality Gate Index</h3>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
                 <div>
-                    <!-- API: GET /api/workspace/dashboard/satisfaction -->
-                    <h2 class="text-mono-600 text-caption tracking-widest uppercase mb-12">Task Success & Satisfaction
-                    </h2>
-
-                    <div class="grid grid-cols-2 gap-8">
-                        <div>
-                            <div class="text-mono-600 text-caption font-mono mb-2">Ochestration Success</div>
-                            <div class="text-display font-bold tracking-tighter">98.4%</div>
-                        </div>
-                        <div>
-                            <!-- API: GET /api/workspace/dashboard/summary (tasks) -->
-                            <div class="text-mono-600 text-caption font-mono mb-2">Total Commands</div>
-                            <div class="text-display font-bold tracking-tighter">1,204</div>
-                        </div>
+                    <div class="flex justify-between items-end mb-4 border-b border-black pb-2">
+                        <span class="body-base font-medium">Approval Rate</span>
+                        <span class="title-3">94.2%</span>
+                    </div>
+                    <div
+                        class="flex justify-between items-end mb-4 border-b border-gray-100 pb-2 hover:border-gray-500 transition-colors cursor-default">
+                        <span class="body-base">Total Reports</span>
+                        <span class="body-base">142</span>
+                    </div>
+                    <div
+                        class="flex justify-between items-end mb-4 border-b border-gray-100 pb-2 hover:border-gray-500 transition-colors cursor-default">
+                        <span class="body-base">First-pass Success</span>
+                        <span class="body-base">128</span>
                     </div>
                 </div>
 
-                <div class="mt-16">
-                    <!-- Typographic Feedback Spread -->
-                    <div class="flex w-full text-center text-caption font-mono tracking-widest border border-mono-800">
-                        <div class="bg-mono-50 text-mono-900 py-3 w-[82%]">POSITIVE 82%</div>
-                        <div class="bg-mono-800 text-mono-400 py-3 w-[12%]">NEUTRAL 12%</div>
-                        <div class="bg-mono-900 text-mono-600 py-3 w-[6%] border-l border-mono-800">NEG 6%</div>
-                    </div>
+                <div class="bg-gray-100 p-8">
+                    <h4 class="label-mono text-black mb-6">Recent Anomaly</h4>
+                    <p class="body-base mb-4">
+                        "Market manipulation report rejected by Secretary Agent due to insufficient citation for Q2
+                        earnings projection."
+                    </p>
+                    <p class="body-small">
+                        Action: Auto-assigned to Research Dept. Resolving in 2m.
+                    </p>
                 </div>
-            </section>
+            </div>
+        </section>
 
-        </div>
+        <footer class="mt-32 pt-8 border-t border-black pb-12 flex justify-between items-center">
+            <span class="label-mono text-black">CORTHEX v2 / DASHBOARD</span>
+            <span class="label-mono text-status-green flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-status-green"></div>WS CONNECTED
+            </span>
+        </footer>
+
     </main>
 
 </body>

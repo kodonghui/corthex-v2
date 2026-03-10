@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Template Market | CORTHEX v2 Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        black: '#000000',
+                        gray: { 900: '#111111', 500: '#666666', 300: '#999999', 100: '#EEEEEE' },
+                        white: '#FFFFFF',
+                        status: { green: '#22c55e', red: '#ef4444' }
+                    },
+                    letterSpacing: { tighter: '-0.04em', tight: '-0.02em', normal: '0', wide: '0.02em', wider: '0.04em', widest: '0.1em' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: theme('colors.white');
+            color: theme('colors.black');
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+
+        ::selection {
+            background-color: theme('colors.black');
+            color: theme('colors.white');
+        }
+
+        .title-display {
+            font-size: 4rem;
+            line-height: 1;
+            font-weight: 800;
+            letter-spacing: theme('letterSpacing.tighter');
+        }
+
+        .title-1 {
+            font-size: 2.5rem;
+            line-height: 1.1;
+            font-weight: 700;
+            letter-spacing: theme('letterSpacing.tight');
+        }
+
+        .title-2 {
+            font-size: 1.5rem;
+            line-height: 1.2;
+            font-weight: 600;
+            letter-spacing: theme('letterSpacing.tight');
+        }
+
+        .title-3 {
+            font-size: 1.125rem;
+            line-height: 1.4;
+            font-weight: 600;
+        }
+
+        .body-base {
+            font-size: 0.9375rem;
+            line-height: 1.6;
+            font-weight: 400;
+            color: theme('colors.gray.900');
+        }
+
+        .body-small {
+            font-size: 0.8125rem;
+            line-height: 1.5;
+            font-weight: 400;
+            color: theme('colors.gray.500');
+        }
+
+        .label-mono {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: theme('letterSpacing.widest');
+            color: theme('colors.gray.300');
+        }
+    </style>
+</head>
+
+<body class="flex h-screen overflow-hidden">
+
+    <nav class="w-72 flex flex-col justify-between py-12 px-10 flex-shrink-0 bg-gray-50 border-r border-gray-100">
+        <div>
+            <div class="mb-24 flex items-center">
+                <span class="title-2 tracking-tighter">CORTHEX</span>
+                <span class="label-mono ml-3 text-status-red bg-red-50 px-2 py-1">ADMIN</span>
+            </div>
+
+            <ul class="space-y-10">
+                <li><a href="dashboard.html" class="body-base text-gray-500 hover:text-black transition-colors">Platform
+                        Overview</a></li>
+                <li class="space-y-6 pt-4">
+                    <span class="label-mono text-gray-300 block mb-4">MARKETPLACES</span>
+                    <ul class="space-y-6 pl-4">
+                        <!-- GET /api/admin/market/templates -->
+                        <li><a href="template-market.html" class="title-3 transition-colors">Preset Market</a></li>
+                        <li><a href="agent-marketplace.html"
+                                class="body-base text-gray-500 hover:text-black transition-colors">Agent Market</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="flex-1 overflow-y-auto p-16 lg:p-32 bg-white">
+
+        <header class="mb-32 flex justify-between items-end border-b border-black pb-8">
+            <div>
+                <h1 class="title-display mb-6">Template Market Admin</h1>
+                <p class="body-base max-w-2xl text-gray-500">
+                    Curation and pricing controls for the public facing department & org preset marketplace.
+                </p>
+            </div>
+            <button
+                class="label-mono border border-black text-black px-6 py-3 hover:bg-black hover:text-white transition-colors">REVIEW
+                SUBMISSIONS</button>
+        </header>
+
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-24">
+
+            <!-- Curated Promoted Templates -->
+            <section>
+                <h2 class="label-mono text-gray-500 mb-8 border-b border-gray-100 pb-2">FEATURED IN TENANT HUB</h2>
+
+                <div class="space-y-8">
+                    <div class="border border-black p-8 group flex items-start justify-between">
+                        <div>
+                            <span class="label-mono bg-black text-white px-2 py-1 mb-4 inline-block">SYSTEM
+                                OFFICIAL</span>
+                            <h3 class="title-2 mb-2">Enterprise HR Core</h3>
+                            <p class="body-small text-gray-500 max-w-sm mb-4">Handles recruitment processing, employee
+                                queries, and policy QA across the vector DB.</p>
+                            <span class="title-3 text-black font-medium">Included in Base</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="label-mono text-gray-300 block mb-2">INSTALLS</span>
+                            <span class="title-3 block mb-6">412</span>
+                            <button
+                                class="label-mono text-gray-500 hover:text-black transition-colors">UNFEATURE</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Community Approvals -->
+            <section>
+                <h2 class="label-mono text-gray-500 mb-8 border-b border-gray-100 pb-2">COMMUNITY MONETIZATION LISTINGS
+                </h2>
+
+                <div class="space-y-8">
+                    <div
+                        class="border border-gray-200 p-8 group flex items-start justify-between hover:border-black transition-colors">
+                        <div>
+                            <span
+                                class="label-mono border border-gray-300 text-gray-500 px-2 py-1 mb-4 inline-block">PARTNER:
+                                QUANT_LOGIC</span>
+                            <h3 class="title-2 mb-2">HFT Arb Pod</h3>
+                            <p class="body-small text-gray-500 max-w-sm mb-4">High-Frequency Sentiment Analysis +
+                                Execution strategy pod. Uses 3 specialized agents.</p>
+                            <span class="title-3 text-status-green font-medium">$499 / mo</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="label-mono text-gray-300 block mb-2">REVENUE SHARE</span>
+                            <span class="title-3 block mb-6">15%</span>
+                            <button class="label-mono text-black border-b border-black">EDIT TERMS</button>
+                        </div>
+                    </div>
+
+                    <div class="border border-gray-200 p-8 group flex items-start justify-between bg-gray-50">
+                        <div>
+                            <span
+                                class="label-mono text-status-red border border-status-red px-2 py-1 mb-4 inline-block">PENDING
+                                APPROVAL</span>
+                            <h3 class="title-2 mb-2 text-gray-500">Legal Audit Shell</h3>
+                            <p class="body-small text-gray-500 max-w-sm">Submitted by 'Dev_LegalTech'. Awaiting QA
+                                review for prompt injection vulnerabilities.</p>
+                        </div>
+                        <div class="text-right flex flex-col items-end space-y-4 pt-12">
+                            <button
+                                class="label-mono bg-black text-white px-4 py-2 hover:bg-gray-900 transition-colors w-full">APPROVE</button>
+                            <button
+                                class="label-mono text-status-red border border-status-red px-4 py-2 hover:bg-red-50 w-full transition-colors">REJECT</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORTHEX v2 Admin - Tenant Org Chart Viewer</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans KR', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    colors: {
+                        base: { 50: '#fcfbf9', 100: '#f5f3ec', 200: '#e8e4d9', 300: '#d5cfc1' },
+                        text: { main: '#2c2c2c', muted: '#6b6b6b' },
+                        accent: { coral: '#e57373', terracotta: '#e07a5f', amber: '#f4a261', green: '#81b29a', blue: '#4A90E2', purple: '#9b5de5' }
+                    },
+                    boxShadow: { 'soft': '0 4px 20px rgba(0, 0, 0, 0.03)', 'soft-lg': '0 10px 40px rgba(0, 0, 0, 0.06)' },
+                    borderRadius: { '2xl': '1rem', '3xl': '1.5rem', '4xl': '2rem' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #fcfbf9;
+            color: #2c2c2c;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Dotted background for canvas */
+        .canvas-bg {
+            background-image: radial-gradient(#d5cfc1 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        /* Connecting Lines */
+        .org-line-vertical {
+            position: absolute;
+            width: 2px;
+            background-color: #d5cfc1;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 0;
+        }
+
+        .org-line-horizontal {
+            position: absolute;
+            height: 2px;
+            background-color: #d5cfc1;
+            top: 0;
+            z-index: 0;
+        }
+
+        .org-card {
+            position: relative;
+            z-index: 10;
+            background: white;
+            border-radius: 1rem;
+            border: 1px solid #e8e4d9;
+            padding: 1rem;
+            width: 220px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+        }
+    </style>
+</head>
+
+<body class="flex flex-col h-screen font-sans antialiased overflow-hidden">
+
+    <!-- Top Nav (Compact Admin) -->
+    <header
+        class="h-16 bg-white border-b border-[#e8e4d9] flex items-center justify-between px-6 z-20 shrink-0 shadow-sm">
+        <div class="flex items-center gap-4">
+            <button
+                class="w-8 h-8 rounded-full bg-base-100 flex items-center justify-center text-text-muted hover:bg-[#e8e4d9] transition-colors">
+                <i class="ph ph-arrow-left text-lg"></i>
+            </button>
+            <div>
+                <h1 class="font-bold text-text-main text-sm flex items-center gap-2">MegaCorp AI Ltd. (ten_8x9a2_mcorp)
+                    <span class="text-text-muted font-normal">/ Organization Canvas</span></h1>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 border border-[#e8e4d9] bg-base-50 rounded-lg p-1">
+                <button
+                    class="w-8 h-8 rounded shrink-0 flex items-center justify-center text-text-muted hover:text-text-main"><i
+                        class="ph ph-minus"></i></button>
+                <span class="text-xs font-bold font-mono">100%</span>
+                <button
+                    class="w-8 h-8 rounded shrink-0 flex items-center justify-center text-text-muted hover:text-text-main"><i
+                        class="ph ph-plus"></i></button>
+            </div>
+            <button class="bg-text-main text-white px-4 py-2 rounded-lg text-xs font-bold shadow-soft">View
+                Mode</button>
+        </div>
+    </header>
+
+    <!-- Canvas Area -->
+    <main class="flex-1 canvas-bg relative overflow-auto hide-scrollbar cursor-grab active:cursor-grabbing p-12">
+
+        <div class="flex flex-col items-center w-max min-w-full relative mt-10">
+
+            <!-- Root: CEO -->
+            <div class="org-card border-accent-terracotta/40 shadow-[0_0_15px_rgba(229,115,115,0.1)]">
+                <div class="flex items-center gap-3 mb-3">
+                    <img src="https://i.pravatar.cc/100?img=11" alt="avatar"
+                        class="w-10 h-10 rounded-full object-cover border-2 border-accent-terracotta/20">
+                    <div>
+                        <h4 class="font-bold text-text-main text-sm">David Kim</h4>
+                        <p class="text-[10px] uppercase font-bold text-accent-terracotta mt-0.5"><i
+                                class="ph ph-crown mr-0.5"></i> CEO / Admin</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="org-line-vertical h-12" style="top: 88px;"></div>
+
+            <!-- Level 1: System Chief (비서실장) -->
+            <div class="org-card border-text-main/20 mt-12">
+                <div class="flex items-center gap-3 mb-3">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-text-main flex items-center justify-center text-white text-xl shadow-sm">
+                        <i class="ph ph-robot"></i></div>
+                    <div>
+                        <h4 class="font-bold text-text-main text-sm">System Chief</h4>
+                        <p class="text-[10px] uppercase font-bold text-text-muted mt-0.5"><i
+                                class="ph ph-lock-key mr-0.5"></i> System Agent</p>
+                    </div>
+                </div>
+                <div class="flex gap-1 flex-wrap">
+                    <span
+                        class="px-1.5 py-0.5 rounded bg-base-100 text-[10px] border border-[#e8e4d9] text-text-muted font-mono">claude-3-opus</span>
+                    <span
+                        class="px-1.5 py-0.5 rounded bg-base-100 text-[10px] border border-[#e8e4d9] text-text-muted">Orchestrator</span>
+                </div>
+            </div>
+
+            <div class="org-line-vertical h-12" style="top: 247px;"></div>
+
+            <!-- Horizontal distributor line -->
+            <div class="org-line-horizontal" style="top: 295px; left: calc(50% - 300px); width: 600px;"></div>
+
+            <!-- Level 2: Departments Container -->
+            <div class="flex gap-16 mt-12 relative w-max" style="transform: translateX(0);">
+
+                <!-- Marketing Dept -->
+                <div class="flex flex-col items-center relative gap-8">
+                    <!-- Drop line from horizontal -->
+                    <div class="w-[2px] h-12 bg-[#d5cfc1] absolute -top-12 left-1/2 -translate-x-1/2 z-0"></div>
+
+                    <div
+                        class="w-[240px] bg-[#fff5f2] border border-accent-terracotta/20 rounded-2xl p-4 shadow-sm z-10">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-bold text-accent-terracotta text-sm flex items-center gap-2"><i
+                                    class="ph ph-megaphone"></i> Marketing</h3>
+                        </div>
+
+                        <!-- Manager -->
+                        <div class="bg-white rounded-xl p-3 border border-accent-terracotta/10 shadow-sm mb-3">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="font-bold text-text-main text-xs">CMO_Agent</span>
+                                <span
+                                    class="text-[9px] bg-accent-terracotta/10 text-accent-terracotta px-1.5 rounded font-bold uppercase">MGR</span>
+                            </div>
+                            <span class="text-[9px] text-text-muted font-mono">claude-3-sonnet</span>
+                        </div>
+
+                        <!-- Specialists -->
+                        <div class="bg-white/60 rounded-xl p-3 border border-[#e8e4d9] border-dashed">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-medium text-text-main text-[11px]"><i
+                                            class="ph ph-robot text-accent-blue mr-1"></i>Content_Gen</span>
+                                    <span
+                                        class="text-[9px] bg-base-200 text-text-muted px-1.5 rounded font-mono">SPEC</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="font-medium text-text-main text-[11px]"><i
+                                            class="ph ph-robot text-accent-blue mr-1"></i>SEO_Analyzer</span>
+                                    <span
+                                        class="text-[9px] bg-base-200 text-text-muted px-1.5 rounded font-mono">SPEC</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Human Members -->
+                        <div class="mt-3 pt-3 border-t border-accent-terracotta/10 flex gap-1.5 justify-center">
+                            <div
+                                class="w-6 h-6 rounded-full bg-base-300 flex items-center justify-center text-[9px] font-bold text-text-main ring-2 ring-white">
+                                SL</div>
+                            <div
+                                class="w-6 h-6 rounded-full bg-base-300 flex items-center justify-center text-[9px] font-bold text-text-main ring-2 ring-white">
+                                T1</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Investment Dept -->
+                <div class="flex flex-col items-center relative gap-8">
+                    <!-- Drop line from horizontal -->
+                    <div class="w-[2px] h-12 bg-[#d5cfc1] absolute -top-12 left-1/2 -translate-x-1/2 z-0"></div>
+
+                    <div class="w-[240px] bg-[#f0f9f4] border border-accent-green/20 rounded-2xl p-4 shadow-sm z-10">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-bold text-accent-green text-sm flex items-center gap-2"><i
+                                    class="ph ph-chart-line-up"></i> Strategy (Invest)</h3>
+                        </div>
+
+                        <!-- Manager -->
+                        <div class="bg-white rounded-xl p-3 border border-accent-green/10 shadow-sm mb-3">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="font-bold text-text-main text-xs">CIO_Agent</span>
+                                <span
+                                    class="text-[9px] bg-accent-green/10 text-accent-green px-1.5 rounded font-bold uppercase">MGR</span>
+                            </div>
+                            <span class="text-[9px] text-text-muted font-mono">gpt-4-turbo</span>
+                        </div>
+
+                        <!-- Specialists -->
+                        <div class="bg-white/60 rounded-xl p-3 border border-[#e8e4d9] border-dashed mb-3">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-medium text-text-main text-[11px]"><i
+                                            class="ph ph-robot text-accent-blue mr-1"></i>Macro_Analysis</span>
+                                    <span
+                                        class="text-[9px] bg-base-200 text-text-muted px-1.5 rounded font-mono">SPEC</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="font-medium text-text-main text-[11px]"><i
+                                            class="ph ph-robot text-accent-blue mr-1"></i>Tech_Analysis</span>
+                                    <span
+                                        class="text-[9px] bg-base-200 text-text-muted px-1.5 rounded font-mono">SPEC</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Worker / Exec -->
+                        <div class="bg-white rounded-xl p-2 border-l-2 border-l-accent-coral shadow-sm">
+                            <div class="flex items-center justify-between">
+                                <span
+                                    class="font-bold text-text-main text-[11px] text-accent-coral flex items-center gap-1.5"><i
+                                        class="ph ph-lightning"></i> VECTOR_Bot</span>
+                                <span
+                                    class="text-[9px] bg-base-200 text-text-muted px-1.5 rounded font-mono">WORKER</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- CS Dept -->
+                <div class="flex flex-col items-center relative gap-8">
+                    <!-- Drop line from horizontal -->
+                    <div class="w-[2px] h-12 bg-[#d5cfc1] absolute -top-12 left-1/2 -translate-x-1/2 z-0"></div>
+
+                    <div
+                        class="w-[240px] bg-[#eef4f9] border border-accent-blue/20 rounded-2xl p-4 shadow-sm z-10 opacity-70">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-bold text-accent-blue text-sm flex items-center gap-2"><i
+                                    class="ph ph-chat-circle-text"></i> Customer Success</h3>
+                            <i class="ph ph-moon text-text-muted text-xs"></i>
+                        </div>
+
+                        <div class="bg-white rounded-xl p-3 border border-[#e8e4d9] shadow-sm mb-3">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-text-main text-xs">Support_Router</span>
+                                <span
+                                    class="text-[9px] bg-base-200 text-text-muted px-1.5 rounded font-bold uppercase">MGR</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Details Sidebar Overlay (Hidden by Default, Mockup shows it slightly visible) -->
+    <div
+        class="absolute right-0 top-16 bottom-0 w-80 bg-white border-l border-[#e8e4d9] shadow-xl transform translate-x-full transition-transform duration-300 z-30">
+        <!-- Content placeholder -->
+    </div>
+
+</body>
+
+</html>

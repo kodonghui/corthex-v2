@@ -4,260 +4,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CORTHEX v2 - SNS Ops</title>
+    <title>SNS Integration | CORTHEX v2</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"
-        rel="stylesheet" crossorigin="anonymous">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        mono: {
-                            900: '#000000',
-                            800: '#111111',
-                            500: '#666666',
-                            400: '#999999',
-                            100: '#eeeeee',
-                            50: '#ffffff',
-                        },
-                        status: {
-                            red: '#ff3b30',
-                            green: '#34c759'
-                        }
+                        black: '#000000',
+                        gray: { 900: '#111111', 500: '#666666', 300: '#999999', 100: '#EEEEEE' },
+                        white: '#FFFFFF',
+                        status: { green: '#22c55e', red: '#ef4444' }
                     },
-                    fontFamily: {
-                        sans: ['Satoshi', 'Pretendard', 'system-ui', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
-                    },
-                    fontSize: {
-                        'hero': ['4rem', { lineHeight: '1', letterSpacing: '-0.05em', fontWeight: '900' }],
-                        'display': ['2.5rem', { lineHeight: '1.1', letterSpacing: '-0.04em', fontWeight: '800' }],
-                        'h1': ['2rem', { lineHeight: '1.2', letterSpacing: '-0.03em', fontWeight: '700' }],
-                        'h2': ['1.5rem', { lineHeight: '1.3', letterSpacing: '-0.02em', fontWeight: '600' }],
-                        'h3': ['1.25rem', { lineHeight: '1.4', letterSpacing: '-0.01em', fontWeight: '600' }],
-                        'body-l': ['1.125rem', { lineHeight: '1.6', letterSpacing: '0', fontWeight: '500' }],
-                        'body': ['1rem', { lineHeight: '1.6', letterSpacing: '0', fontWeight: '400' }],
-                        'body-s': ['0.875rem', { lineHeight: '1.5', letterSpacing: '0.01em', fontWeight: '400' }],
-                        'caption': ['0.75rem', { lineHeight: '1.4', letterSpacing: '0.05em', fontWeight: '500' }],
-                    },
-                    spacing: {
-                        'section': '8rem',
-                        'block': '4rem',
-                        'item': '2rem',
-                    }
+                    letterSpacing: { tighter: '-0.04em', tight: '-0.02em', normal: '0', wide: '0.02em', wider: '0.04em', widest: '0.1em' }
                 }
             }
         }
     </script>
     <style>
         body {
-            background-color: #000000;
-            color: #ffffff;
+            background-color: theme('colors.white');
+            color: theme('colors.black');
             -webkit-font-smoothing: antialiased;
         }
 
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
         }
 
-        @keyframes blink {
-            50% {
-                opacity: 0;
-            }
+        ::selection {
+            background-color: theme('colors.black');
+            color: theme('colors.white');
         }
 
-        .cursor-blink {
-            animation: blink 1s step-end infinite;
+        .title-display {
+            font-size: 4rem;
+            line-height: 1;
+            font-weight: 800;
+            letter-spacing: theme('letterSpacing.tighter');
+        }
+
+        .title-1 {
+            font-size: 2.5rem;
+            line-height: 1.1;
+            font-weight: 700;
+            letter-spacing: theme('letterSpacing.tight');
+        }
+
+        .title-2 {
+            font-size: 1.5rem;
+            line-height: 1.2;
+            font-weight: 600;
+            letter-spacing: theme('letterSpacing.tight');
+        }
+
+        .title-3 {
+            font-size: 1.125rem;
+            line-height: 1.4;
+            font-weight: 600;
+        }
+
+        .body-base {
+            font-size: 0.9375rem;
+            line-height: 1.6;
+            font-weight: 400;
+            color: theme('colors.gray.900');
+        }
+
+        .body-small {
+            font-size: 0.8125rem;
+            line-height: 1.5;
+            font-weight: 400;
+            color: theme('colors.gray.500');
+        }
+
+        .label-mono {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: theme('letterSpacing.widest');
+            color: theme('colors.gray.300');
         }
     </style>
 </head>
 
-<body class="min-h-screen flex h-screen overflow-hidden">
+<body class="flex h-screen overflow-hidden">
 
-    <!-- Left Navigation -->
-    <nav class="w-24 lg:w-32 border-r border-mono-800 flex flex-col items-center py-8 shrink-0 h-full">
-        <a href="home.html"
-            class="text-h3 font-bold mb-16 rotate-[-90deg] uppercase tracking-widest whitespace-nowrap hover:text-mono-400">CORTHEX</a>
+    <!-- Global Nav -->
+    <nav class="w-64 border-r border-gray-100 flex flex-col justify-between py-8 px-6 flex-shrink-0">
+        <div>
+            <div class="mb-16">
+                <span class="title-2 tracking-tighter">CORTHEX</span>
+                <span class="label-mono ml-2">v2</span>
+            </div>
 
-        <div class="flex flex-col gap-12 font-mono text-caption uppercase tracking-widest items-center">
-            <!-- API: N/A -->
-            <a href="sns.html"
-                class="text-mono-50 rotate-[-90deg] whitespace-nowrap border-b border-mono-50 pb-1 mt-4">SNS Ops</a>
-            <a href="messenger.html"
-                class="text-mono-500 hover:text-mono-100 transition-colors rotate-[-90deg] whitespace-nowrap mt-8">Messenger</a>
-        </div>
-
-    </nav>
-
-    <main class="flex-1 flex overflow-hidden">
-
-        <!-- Column 1: Scraped Feeds -->
-        <div class="w-1/3 flex flex-col border-r border-mono-800 overflow-hidden shrink-0">
-            <header class="p-8 border-b border-mono-800 bg-mono-900 sticky top-0 z-10 shrink-0">
-                <h2 class="text-mono-600 text-caption uppercase tracking-widest mb-2 font-mono">Input Stream</h2>
-                <h1 class="text-h2 font-bold tracking-tighter">Scraped Intel</h1>
-            </header>
-
-            <!-- API: GET /api/workspace/sns/feeds -->
-            <ul class="flex-1 overflow-y-auto no-scrollbar pb-32">
-                <li class="p-8 border-b border-mono-800 hover:bg-mono-900 transition-colors cursor-pointer group">
-                    <div
-                        class="flex justify-between items-baseline mb-4 font-mono text-caption text-mono-500 uppercase tracking-widest">
-                        <span>[SOURCE: X / TWITTER]</span>
-                        <span>12 MINS AGO</span>
-                    </div>
-                    <div
-                        class="text-body font-medium text-mono-100 leading-relaxed mb-4 group-hover:underline decoration-mono-600 underline-offset-4">
-                        "Sam Altman just announced a massive API cost reduction. This changes everything for AI startups
-                        operating on thin margins."
-                    </div>
-                    <!-- API: POST /api/workspace/sns/drafts (from feed) -->
-                    <div class="font-mono text-caption text-mono-600 group-hover:text-mono-100 transition-colors">
-                        > GENERATE HOT-TAKE DRAFT
-                    </div>
-                </li>
-                <li
-                    class="p-8 border-b border-mono-800 hover:bg-mono-900 transition-colors cursor-pointer group opacity-80">
-                    <div
-                        class="flex justify-between items-baseline mb-4 font-mono text-caption text-mono-500 uppercase tracking-widest">
-                        <span>[SOURCE: LINKEDIN]</span>
-                        <span>1 HOUR AGO</span>
-                    </div>
-                    <div
-                        class="text-body font-medium text-mono-400 leading-relaxed mb-4 group-hover:underline decoration-mono-600 underline-offset-4">
-                        "B2B SaaS 마케팅의 본질은 결국 '얼마나 고객의 시간을 찾아주는가'이다. 기능 나열식 카피는 버려라."
-                    </div>
-                    <div class="font-mono text-caption text-mono-600 group-hover:text-mono-100 transition-colors">
-                        > REPURPOSE FOR BRAND CHANNEL
-                    </div>
-                </li>
+            <ul class="space-y-6">
+                <li><a href="home.html" class="body-base hover:text-gray-500 transition-colors">Home</a></li>
+                <li><a href="dashboard.html" class="body-base hover:text-gray-500 transition-colors">Dashboard</a></li>
+                <!-- Represents social media / marketing domain -->
+                <!-- GET /api/workspace/sns/channels -->
+                <li><a href="sns.html" class="title-3 font-medium transition-colors">Marketing / SNS</a></li>
+                <li><a href="agora.html" class="body-base hover:text-gray-500 transition-colors">Agora</a></li>
             </ul>
         </div>
+    </nav>
 
-        <!-- Column 2: AI Drafts & Composition -->
-        <div class="w-1/3 flex flex-col border-r border-mono-800 overflow-hidden shrink-0 bg-mono-900">
-            <header class="p-8 border-b border-mono-800 sticky top-0 z-10 shrink-0">
-                <h2 class="text-mono-600 text-caption uppercase tracking-widest mb-2 font-mono">Agent Output</h2>
-                <h1 class="text-h2 font-bold tracking-tighter">Copywriting Station</h1>
-            </header>
+    <!-- Main Content: SNS View Split -->
+    <main class="flex-1 flex overflow-hidden">
 
-            <div class="flex-1 overflow-y-auto p-8 space-y-12 no-scrollbar pb-32">
+        <!-- Left: Channels & Pending Approvals -->
+        <div class="w-1/3 min-w-[350px] border-r border-gray-100 flex flex-col bg-white">
+            <div class="p-8 border-b border-gray-100">
+                <h2 class="title-2 mb-2">Broadcasting</h2>
+                <p class="body-small text-gray-500">Manage outgoing communications</p>
+            </div>
 
-                <!-- Active Draft -->
-                <!-- API: GET /api/workspace/sns/drafts/:id -->
-                <div class="border border-mono-500/30 p-8 shadow-[0_0_20px_rgba(255,255,255,0.02)]">
-                    <div class="flex justify-between items-center mb-6 border-b border-mono-800 pb-2">
-                        <span
-                            class="font-mono text-caption text-mono-100 uppercase tracking-widest flex items-center gap-2">
-                            <span class="w-1.5 h-1.5 bg-mono-100 rounded-sm"></span>
-                            ACTIVE DRAFT (X / TWITTER)
-                        </span>
-                        <span class="font-mono text-[10px] text-mono-600">BY: SNS 콘텐츠 전문가</span>
-                    </div>
+            <div class="flex-1 overflow-y-auto">
+                <div class="p-8">
+                    <!-- GET /api/workspace/sns/drafts -->
+                    <h3 class="label-mono text-black mb-6">Awaiting Approval (2)</h3>
 
-                    <div class="text-h3 font-medium text-mono-50 leading-normal mb-8 outline-none"
-                        contenteditable="true">
-                        오픈AI의 API 가격 인하는 단순한 원가 절감이 아닙니다. 이건 '더 공격적인 멀티 에이전트 오케스트레이션'을 구축하라는 시그널입니다.<span
-                            class="cursor-blink border-r border-mono-100 mx-1"></span>
-                        <span class="text-mono-600">이제 단일 프롬프트 최적화보다, 수십 개의 에이전트가 협업하는 파이프라인 설계 능력이 승패를 가릅니다.</span>
-                    </div>
-
-                    <div class="flex justify-between items-center">
-                        <button
-                            class="font-mono text-caption uppercase tracking-widest text-mono-500 hover:text-mono-100 transition-colors">Generate
-                            Alt Hook -></button>
-                        <!-- API: POST /api/workspace/sns/posts -->
-                        <button
-                            class="bg-mono-50 text-mono-900 font-bold uppercase tracking-widest px-4 py-2 hover:bg-mono-400 transition-colors text-caption">Publish
-                            Now</button>
+                    <div class="border border-black p-4 mb-4 hover:bg-gray-50 cursor-pointer">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="label-mono text-gray-500">LINKEDIN</span>
+                            <span class="label-mono text-status-red animate-pulse">ACTION REQ</span>
+                        </div>
+                        <p class="body-small text-gray-900 line-clamp-2 mb-4">"We are excited to announce our new Q4
+                            restructuring regarding the tech sector portfolio allocation..."</p>
+                        <div class="flex justify-between items-center border-t border-gray-100 pt-3">
+                            <span class="body-small text-gray-500">By: Marketing Dept</span>
+                            <!-- POST /api/workspace/sns/drafts/:id/approve -->
+                            <button class="label-mono bg-black text-white px-3 py-1 hover:bg-gray-900">REVIEW</button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Previous Drafts List -->
-                <!-- API: GET /api/workspace/sns/drafts -->
-                <div>
-                    <h3 class="font-mono text-caption text-mono-600 uppercase tracking-widest mb-4">Pending Approvals
-                    </h3>
+                <div class="p-8 border-t border-gray-100">
+                    <h3 class="label-mono text-black mb-6">Active Channels</h3>
+                    <!-- GET /api/workspace/sns/channels -->
                     <ul class="space-y-4">
-                        <li class="group cursor-pointer">
-                            <div
-                                class="text-body-s font-medium text-mono-400 group-hover:text-mono-100 transition-colors line-clamp-2">
-                                [LINKEDIN] 지난 달 B2B 리드 제너레이션 효율을 300% 높인 실험 결과 공유합니다...
-                            </div>
-                            <div class="font-mono text-[10px] text-mono-600 mt-1">AWAITING CEO APPROVAL</div>
+                        <li class="flex justify-between items-center group cursor-pointer">
+                            <span class="body-base font-medium group-hover:underline">X (Twitter)</span>
+                            <span class="w-2 h-2 rounded-full bg-status-green"></span>
                         </li>
-                        <li class="group cursor-pointer">
-                            <div
-                                class="text-body-s font-medium text-mono-400 group-hover:text-mono-100 transition-colors line-clamp-2">
-                                [BLOG POST TEXT] CORTHEX v2 아키텍처 다이어그램 및 설계 철학...
-                            </div>
-                            <div class="font-mono text-[10px] text-mono-600 mt-1">REQUIRES REVISION (TECHNICAL TEAM)
-                            </div>
+                        <li class="flex justify-between items-center group cursor-pointer">
+                            <span class="body-base font-medium group-hover:underline">LinkedIn</span>
+                            <span class="w-2 h-2 rounded-full bg-status-green"></span>
+                        </li>
+                        <li class="flex justify-between items-center group cursor-pointer">
+                            <span class="body-base font-medium text-gray-500 group-hover:text-black">Medium Blog</span>
+                            <span class="w-2 h-2 rounded-full bg-black"></span>
                         </li>
                     </ul>
                 </div>
-
             </div>
         </div>
 
-        <!-- Column 3: Live Threads (Monitoring) -->
-        <div class="flex-1 flex flex-col overflow-hidden">
-            <header class="p-8 border-b border-mono-800 sticky top-0 z-10 shrink-0">
-                <h2 class="text-mono-600 text-caption uppercase tracking-widest mb-2 font-mono">Market Perception</h2>
-                <h1 class="text-h2 font-bold tracking-tighter">Live Threads</h1>
+        <!-- Right: Content Editor / Composer -->
+        <div class="flex-1 flex flex-col bg-white h-full relative">
+            <header class="p-8 border-b border-gray-100 flex justify-between items-center shrink-0">
+                <h2 class="title-2">Draft Editor</h2>
+                <div class="label-mono text-gray-500">Draft ID: MKT-DRAFT-24A</div>
             </header>
 
-            <div class="flex-1 overflow-y-auto p-8 space-y-12 no-scrollbar pb-32">
+            <div class="flex-1 p-12 lg:px-24 overflow-y-auto">
 
-                <!-- Active Post Thread -->
-                <!-- API: GET /api/workspace/sns/posts?status=active -->
-                <div class="border-l-2 border-mono-100 pl-6 pb-8">
-                    <div
-                        class="font-mono text-caption text-mono-500 uppercase tracking-widest mb-4 flex justify-between">
-                        <span>LIVE: 2 HRS AGO [X/TWITTER]</span>
-                        <span>ENG: +1,240</span>
-                    </div>
-                    <div class="text-body font-medium text-mono-100 leading-relaxed mb-6">
-                        "저희 에이전트들은 주말에도 쉬지 않고 코딩합니다. CORTHEX 도입 후 개발팀의 주말 잔업이 0으로 수렴했습니다."
-                    </div>
-
-                    <!-- Replies & Engagement -->
-                    <div class="space-y-4 mt-8">
-                        <h4 class="font-mono text-caption text-mono-600 uppercase tracking-widest mb-4">Comments &
-                            Auto-Replies</h4>
-
-                        <div class="flex gap-4">
-                            <span class="font-mono text-mono-500">> @tech_bro:</span>
-                            <div class="text-body-s text-mono-400">결국 QA는 비용이 들지 않나요? 환각 제어는 어떻게 하셨는지 궁금합니다.</div>
-                        </div>
-
-                        <div class="flex gap-4 pl-4 border-l border-mono-800 ml-4 mt-2">
-                            <span class="font-mono text-mono-500">> [AGENT REPLY]:</span>
-                            <div class="text-body-s text-mono-100">자가 검증(Self-Reflection) 루프를 도입하여 에러율을 0.01% 미만으로 통제하고
-                                있습니다. 자세한 아키텍처는 기술 블로그 링크를 참조해주세요. [link]</div>
-                        </div>
+                <div class="mb-12 border-b border-black pb-4">
+                    <div class="flex items-center space-x-6">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" class="accent-black" checked>
+                            <span class="label-mono text-black">LINKEDIN</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" class="accent-black">
+                            <span class="label-mono text-gray-500">X (TWITTER)</span>
+                        </label>
                     </div>
                 </div>
 
-                <!-- Another Thread -->
-                <div class="border-l border-mono-800 pl-6 pb-8 opacity-60">
-                    <div
-                        class="font-mono text-caption text-mono-600 uppercase tracking-widest mb-4 flex justify-between">
-                        <span>POSTED: YESTERDAY [LINKEDIN]</span>
-                        <span>ENG: +450</span>
-                    </div>
-                    <div class="text-body font-medium text-mono-400 leading-relaxed mb-6 line-clamp-2">
-                        "스타트업 초기에 값비싼 시니어 1명을 채용하는 것보다, 특정 도메인에 특화된 AI 에이전트 3기를 고용하는 것이 압도적으로 유리합니다."
-                    </div>
+                <!-- PATCH /api/workspace/sns/drafts/:id -->
+                <textarea
+                    class="w-full h-96 border-none bg-transparent title-3 text-black focus:outline-none resize-none placeholder-gray-300"
+                    placeholder="Agent drafted content will appear here...">"We are excited to announce our new Q4 restructuring regarding the tech sector portfolio allocation. By leveraging CORTHEX v2 analysis pipelines, we've identified key resilience markers in healthcare infrastructure leading into 2027. Read our full reasoning..."</textarea>
 
-                    <div class="font-mono text-caption text-mono-500 uppercase tracking-widest mt-4">
-                        2 PENDING INQUIRIES (DM LIKELY)
-                    </div>
+                <div class="mt-8 border border-gray-100 p-6 bg-gray-50">
+                    <h4 class="label-mono text-gray-500 mb-4">Agent Reasoning Log</h4>
+                    <p class="body-small text-gray-500 font-mono">
+                        -> Initialized by MGR_MKT based on CIO Rebalance Action.<br>
+                        -> Verified compliance policies: PASS.<br>
+                        -> Adjusted tone for LinkedIn audience (Professional/Analytical).
+                    </p>
                 </div>
+            </div>
 
+            <!-- Sticky Actions -->
+            <div
+                class="absolute bottom-0 w-full bg-white p-8 border-t border-gray-100 flex justify-between items-center">
+                <!-- POST /api/workspace/sns/drafts/:id/reject -->
+                <button class="label-mono text-gray-500 hover:text-status-red transition-colors">DISCARD /
+                    REJECT</button>
+                <div class="space-x-4">
+                    <!-- POST /api/workspace/sns/drafts/:id/revise -->
+                    <button
+                        class="label-mono text-black border border-black px-6 py-3 hover:bg-gray-100 transition-colors">REQUEST
+                        REVISION</button>
+                    <!-- POST /api/workspace/sns/drafts/:id/approve -->
+                    <button class="label-mono bg-black text-white px-6 py-3 hover:bg-gray-900 transition-colors">APPROVE
+                        & PUBLISH</button>
+                </div>
             </div>
         </div>
 

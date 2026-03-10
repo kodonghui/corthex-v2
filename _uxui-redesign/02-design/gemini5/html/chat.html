@@ -4,219 +4,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CORTHEX v2 - Chat</title>
+    <title>Chat | CORTHEX v2</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"
-        rel="stylesheet" crossorigin="anonymous">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        mono: {
-                            900: '#000000',
-                            800: '#111111',
-                            500: '#666666',
-                            400: '#999999',
-                            100: '#eeeeee',
-                            50: '#ffffff',
-                        },
-                        status: {
-                            red: '#ff3b30',
-                            green: '#34c759'
-                        }
+                        black: '#000000',
+                        gray: { 900: '#111111', 500: '#666666', 300: '#999999', 100: '#EEEEEE' },
+                        white: '#FFFFFF',
+                        status: { green: '#22c55e', red: '#ef4444' }
                     },
-                    fontFamily: {
-                        sans: ['Satoshi', 'Pretendard', 'system-ui', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
-                    },
-                    fontSize: {
-                        'hero': ['4rem', { lineHeight: '1', letterSpacing: '-0.05em', fontWeight: '900' }],
-                        'display': ['2.5rem', { lineHeight: '1.1', letterSpacing: '-0.04em', fontWeight: '800' }],
-                        'h1': ['2rem', { lineHeight: '1.2', letterSpacing: '-0.03em', fontWeight: '700' }],
-                        'h2': ['1.5rem', { lineHeight: '1.3', letterSpacing: '-0.02em', fontWeight: '600' }],
-                        'h3': ['1.25rem', { lineHeight: '1.4', letterSpacing: '-0.01em', fontWeight: '600' }],
-                        'body-l': ['1.125rem', { lineHeight: '1.6', letterSpacing: '0', fontWeight: '500' }],
-                        'body': ['1rem', { lineHeight: '1.6', letterSpacing: '0', fontWeight: '400' }],
-                        'body-s': ['0.875rem', { lineHeight: '1.5', letterSpacing: '0.01em', fontWeight: '400' }],
-                        'caption': ['0.75rem', { lineHeight: '1.4', letterSpacing: '0.05em', fontWeight: '500' }],
-                    },
-                    spacing: {
-                        'section': '8rem',
-                        'block': '4rem',
-                        'item': '2rem',
-                    }
+                    letterSpacing: { tighter: '-0.04em', tight: '-0.02em', normal: '0', wide: '0.02em', wider: '0.04em', widest: '0.1em' }
                 }
             }
         }
     </script>
     <style>
         body {
-            background-color: #000000;
-            color: #ffffff;
+            background-color: theme('colors.white');
+            color: theme('colors.black');
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Input styling */
-        .chat-input:focus {
-            outline: none;
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+
+        ::selection {
+            background-color: theme('colors.black');
+            color: theme('colors.white');
+        }
+
+        .title-display {
+            font-size: 4rem;
+            line-height: 1;
+            font-weight: 800;
+            letter-spacing: theme('letterSpacing.tighter');
+        }
+
+        .title-1 {
+            font-size: 2.5rem;
+            line-height: 1.1;
+            font-weight: 700;
+            letter-spacing: theme('letterSpacing.tight');
+        }
+
+        .title-2 {
+            font-size: 1.5rem;
+            line-height: 1.2;
+            font-weight: 600;
+            letter-spacing: theme('letterSpacing.tight');
+        }
+
+        .title-3 {
+            font-size: 1.125rem;
+            line-height: 1.4;
+            font-weight: 600;
+        }
+
+        .body-base {
+            font-size: 0.9375rem;
+            line-height: 1.6;
+            font-weight: 400;
+            color: theme('colors.gray.900');
+        }
+
+        .body-small {
+            font-size: 0.8125rem;
+            line-height: 1.5;
+            font-weight: 400;
+            color: theme('colors.gray.500');
+        }
+
+        .label-mono {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: theme('letterSpacing.widest');
+            color: theme('colors.gray.300');
         }
     </style>
 </head>
 
-<body class="min-h-screen flex h-screen overflow-hidden">
+<body class="flex h-screen overflow-hidden">
 
-    <!-- Sidebar: Sessions List -->
-    <!-- API: GET /api/workspace/chat/sessions -->
-    <aside class="w-80 border-r border-mono-800 flex flex-col h-full bg-mono-900 shrink-0">
-        <div class="p-8 border-b border-mono-800 shrink-0">
-            <a href="home.html"
-                class="text-h2 font-bold tracking-tighter hover:text-mono-400 transition-colors block mb-8">CORTHEX</a>
-            <div class="flex justify-between items-center">
-                <h2 class="text-mono-600 text-caption tracking-widest uppercase">Chat Sessions</h2>
-                <!-- API: POST /api/workspace/chat/sessions -->
-                <button class="text-mono-50 hover:text-mono-400 transition-colors text-h2 leading-none">+</button>
+    <!-- Global Nav -->
+    <nav class="w-64 border-r border-gray-100 flex flex-col justify-between py-8 px-6 flex-shrink-0">
+        <div>
+            <div class="mb-16">
+                <span class="title-2 tracking-tighter">CORTHEX</span>
+                <span class="label-mono ml-2">v2</span>
             </div>
+
+            <ul class="space-y-6">
+                <li><a href="home.html" class="body-base hover:text-gray-500 transition-colors">Home</a></li>
+                <!-- GET /api/workspace/dashboard/summary -->
+                <li><a href="dashboard.html" class="body-base hover:text-gray-500 transition-colors">Dashboard</a></li>
+                <!-- POST /api/workspace/commands -->
+                <li><a href="command-center.html" class="body-base hover:text-gray-500 transition-colors">Command
+                        Center</a></li>
+                <!-- GET /api/workspace/chat/sessions -->
+                <li><a href="chat.html" class="title-3 font-medium transition-colors">Chat</a></li>
+                <li class="pt-6 border-t border-gray-100 mt-6"><a href="trading.html"
+                        class="body-base hover:text-gray-500 transition-colors">Trading</a></li>
+                <li><a href="agora.html" class="body-base hover:text-gray-500 transition-colors">Agora</a></li>
+                <li><a href="nexus.html" class="body-base hover:text-gray-500 transition-colors">Nexus</a></li>
+            </ul>
         </div>
 
-        <ul class="flex-1 overflow-y-auto w-full">
-            <!-- Active Session -->
-            <li class="border-b border-mono-800">
-                <a href="#" class="block p-8 bg-mono-800/50">
-                    <div class="text-h3 font-bold text-mono-50 mb-2 truncate">브랜드 마케팅 전략 논의</div>
-                    <div class="text-mono-400 text-body-s flex gap-4 font-mono">
-                        <span>SNS 콘텐츠 전문가</span>
-                        <span class="text-mono-600">10:42 AM</span>
-                    </div>
-                </a>
-            </li>
+        <div class="space-y-6">
+            <ul class="space-y-6 pb-6 border-b border-gray-100">
+                <!-- GET /api/workspace/agents -->
+                <li><a href="agents.html" class="body-small hover:text-black transition-colors">Agents</a></li>
+                <li><a href="knowledge.html" class="body-small hover:text-black transition-colors">Knowledge</a></li>
+                <!-- GET /api/workspace/dashboard/costs -->
+                <li><a href="costs.html" class="body-small hover:text-black transition-colors">Costs</a></li>
+            </ul>
+        </div>
+    </nav>
 
-            <!-- Inactive Sessions -->
-            <li class="border-b border-mono-800">
-                <a href="#" class="block p-8 hover:bg-mono-800/30 transition-colors opacity-70 hover:opacity-100">
-                    <div class="text-body-l font-medium text-mono-100 mb-2 truncate">리팩토링 코드 리뷰 세션</div>
-                    <div class="text-mono-500 text-body-s flex gap-4 font-mono">
-                        <span>시니어 개발자</span>
-                        <span class="text-mono-600">Yesterday</span>
-                    </div>
-                </a>
-            </li>
-            <li class="border-b border-mono-800">
-                <a href="#" class="block p-8 hover:bg-mono-800/30 transition-colors opacity-70 hover:opacity-100">
-                    <div class="text-body-l font-medium text-mono-100 mb-2 truncate">경쟁사 동향 분석</div>
-                    <div class="text-mono-500 text-body-s flex gap-4 font-mono">
-                        <span>시황분석가</span>
-                        <span class="text-mono-600">Mar 08</span>
-                    </div>
-                </a>
-            </li>
-        </ul>
+    <!-- Session Sidebar -->
+    <aside class="w-80 border-r border-gray-100 flex flex-col bg-white flex-shrink-0">
+        <div class="p-8 border-b border-gray-100">
+            <!-- POST /api/workspace/chat/sessions -->
+            <button class="w-full bg-black text-white py-3 label-mono hover:bg-gray-900 transition-colors">NEW
+                SESSION</button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-4 space-y-2">
+            <!-- API: GET /api/workspace/chat/sessions -->
+            <div class="p-4 bg-gray-100 cursor-pointer">
+                <span class="label-mono text-gray-500 mb-1 block">Strategy Dept / CIO</span>
+                <h4 class="body-base font-medium truncate">Q3 Portfolio Review</h4>
+                <div class="mt-2 text-label-mono text-gray-300">10 mins ago</div>
+            </div>
+            <div class="p-4 hover:bg-gray-100 cursor-pointer transition-colors border border-transparent">
+                <span class="label-mono text-gray-500 mb-1 block">Marketing Dept</span>
+                <h4 class="body-base font-medium truncate text-gray-500">Drafting SNS Copy</h4>
+                <div class="mt-2 text-label-mono text-gray-300">2 hours ago</div>
+            </div>
+            <div class="p-4 hover:bg-gray-100 cursor-pointer transition-colors border border-transparent">
+                <span class="label-mono text-gray-500 mb-1 block">Legal Dept</span>
+                <h4 class="body-base font-medium truncate text-gray-500">Contract Review: Vendor X</h4>
+                <div class="mt-2 text-label-mono text-gray-300">Yesterday</div>
+            </div>
+        </div>
     </aside>
 
-    <!-- Main Chat Area -->
-    <!-- API: GET /api/workspace/chat/sessions/:sessionId/messages -->
-    <main class="flex-1 flex flex-col h-full bg-mono-900 overflow-hidden relative">
+    <!-- Chat Area -->
+    <main class="flex-1 flex flex-col h-full bg-white relative">
 
-        <!-- Chat Header -->
-        <header class="p-8 border-b border-mono-800 flex justify-between items-baseline shrink-0">
+        <header class="p-8 border-b border-gray-100 flex justify-between items-center bg-white z-10 w-full">
             <div>
-                <h1 class="text-display font-medium tracking-tighter">브랜드 마케팅 전략 논의</h1>
-                <div class="text-mono-500 text-body-s mt-2 font-mono">Session ID: CH-8492 · Participant: SNS 콘텐츠 전문가
-                </div>
+                <h2 class="title-2 mb-1">Q3 Portfolio Review</h2>
+                <!-- GET /api/workspace/agents/:id -->
+                <p class="body-base text-gray-500">Agent: Chief Investment Officer (Strategy Dept)</p>
             </div>
-            <!-- API: DELETE /api/workspace/chat/sessions/:sessionId -->
-            <button
-                class="text-caption uppercase tracking-widest text-mono-600 hover:text-status-red transition-colors">End
-                Session</button>
+            <div class="label-mono text-gray-300">Cost: $1.24 (Session)</div>
         </header>
 
-        <!-- Transcript Window -->
-        <div class="flex-1 overflow-y-auto p-12 lg:px-32 space-y-12 pb-32">
+        <!-- Messages Area -->
+        <div class="flex-1 overflow-y-auto p-12 lg:px-24 pb-48">
 
-            <!-- Turn (Agent) -->
-            <div class="typography-item">
-                <div class="font-mono text-body-s uppercase tracking-widest text-mono-500 mb-4 flex items-center gap-4">
-                    <span>SNS 콘텐츠 전문가</span>
-                    <span class="w-1.5 h-1.5 rounded-sm bg-mono-500"></span>
-                    <span class="text-mono-600">10:30 AM</span>
+            <!-- API: GET /api/workspace/chat/sessions/:sessionId/messages -->
+
+            <!-- Agent Message -->
+            <div class="mb-12 max-w-3xl">
+                <div class="flex items-center space-x-3 mb-2">
+                    <span class="label-mono text-black">Chief Investment Officer</span>
+                    <span class="label-mono text-gray-300">10:45 AM</span>
                 </div>
-                <div class="text-h3 font-medium text-mono-100 leading-relaxed max-w-4xl">
-                    대표님, 어제 논의했던 신규 브랜드 캠페인건 관련하여 타겟 30대 직장인 대상의 인스타그램 릴스 스크립트 초안을 3가지 버전으로 기획했습니다. 검토하시겠습니까?
+                <div class="body-base">
+                    <p class="mb-4">I've reviewed the current portfolio allocations and cross-referenced them with the
+                        latest Q3 macro reports. The tech sector exposure is currently at 42%, which exceeds our defined
+                        risk parameter of 35%.</p>
+                    <p>I recommend rebalancing by taking profits on AAPL and MSFT, and reallocating towards the
+                        defensive sectors.</p>
                 </div>
-                <!-- API: GET /api/workspace/chat/sessions/:sessionId/delegations -->
-                <div class="mt-6 text-mono-500 text-body-s border-l border-mono-800 pl-4 py-1">
-                    [ATTACHED REPORT: marketing_draft_v1.md]
+
+                <!-- Tools / Inner Monologue -->
+                <div class="mt-4 p-4 bg-gray-100 border-l border-black">
+                    <span class="label-mono text-gray-500 mb-2 block">Tool Execution</span>
+                    <div class="body-small text-gray-500">[kis_portfolio_balance] -> Rebalancing matrix generated.</div>
                 </div>
             </div>
 
-            <!-- Turn (User) -->
-            <div class="typography-item">
-                <div class="font-mono text-body-s uppercase tracking-widest text-mono-100 mb-4 flex items-center gap-4">
-                    <span>김대표 (CEO)</span>
-                    <span class="w-1.5 h-1.5 rounded-full bg-mono-100"></span>
-                    <span class="text-mono-600">10:35 AM</span>
+            <!-- User Message -->
+            <div class="mb-12 max-w-3xl ml-auto text-right">
+                <div class="flex items-center justify-end space-x-3 mb-2">
+                    <span class="label-mono text-gray-300 text-right">10:48 AM</span>
+                    <span class="label-mono text-black text-right">CEO Kim</span>
                 </div>
-                <div class="text-h2 font-bold text-mono-50 leading-relaxed max-w-4xl">
-                    초안 봤어. A안의 도입부가 너무 길어. 처음 3초 안에 시선을 잡을 수 있게 후킹한 텍스트로 수정해줘. 그리고 해시태그는 최근 트렌드에 맞게 10개 추출해서 덧붙여.
-                </div>
-            </div>
-
-            <!-- Turn (Agent) -->
-            <div class="typography-item">
-                <div class="font-mono text-body-s uppercase tracking-widest text-mono-500 mb-4 flex items-center gap-4">
-                    <span>SNS 콘텐츠 전문가</span>
-                    <span
-                        class="w-1.5 h-1.5 rounded-sm bg-status-green animate-pulse shadow-[0_0_8px_rgba(52,199,89,0.5)]"></span>
-                    <span class="text-mono-600">10:36 AM</span>
-                </div>
-                <!-- Tool Call Indicator -->
-                <!-- API: GET /api/workspace/chat/sessions/:sessionId/tool-calls -->
-                <div class="font-mono text-caption text-mono-600 mb-4">
-                    > [TOOL] execute: fetch_instagram_trends(query="직장인 점심") ... OK (842ms)
-                </div>
-                <div class="text-h3 font-medium text-mono-100 leading-relaxed max-w-4xl">
-                    수정 완료했습니다. 도입부는 직장인들의 점심시간 공감대를 건드리는 도발적인 질문으로 3초 내에 시선을 끌도록 변경했습니다.<br><br>
-                    <strong>[수정된 A안 도입부]</strong><br>
-                    "아직도 점심시간에 뭐 먹을지 고민하세요? 딱 3초만 투자하세요."<br><br>
-                    <strong>[트렌드 해시태그]</strong><br>
-                    #직장인점심 #점심메뉴추천 #점심시간 #직딩 #직딩스타그램 #소확행 #직장인일상 #점심회식 #혼밥 #오운완
+                <div class="body-base">
+                    <p>Can you simulate the impact of reducing tech to 30% and moving the rest into healthcare?</p>
                 </div>
             </div>
 
-            <!-- Typing Indicator (Streaming / Pending) text -->
-            <div class="typography-item opacity-50">
-                <div class="font-mono text-body-s uppercase tracking-widest text-mono-500 mb-4 flex items-center gap-4">
-                    <span>SNS 콘텐츠 전문가</span>
-                    <span class="text-mono-600">...</span>
+            <!-- Agent Message (Streaming state) -->
+            <div class="mb-12 max-w-3xl">
+                <div class="flex items-center space-x-3 mb-2">
+                    <span class="label-mono text-black">Chief Investment Officer</span>
+                    <span class="w-2 h-2 rounded-full bg-black animate-pulse"></span>
+                </div>
+                <!-- SSE Stream response -->
+                <div class="body-base text-gray-500 border-l border-gray-300 pl-4 py-1">
+                    Running simulation on the KIS sandbox environment. Adjusting weights...
                 </div>
             </div>
 
         </div>
 
-        <!-- Sticky Input Area -->
-        <div
-            class="absolute bottom-0 left-0 w-full p-8 lg:px-32 bg-gradient-to-t from-mono-900 via-mono-900 to-transparent pt-32">
-            <!-- API: POST /api/workspace/chat/sessions/:sessionId/messages -->
-            <div
-                class="flex items-center border-b border-mono-600 focus-within:border-mono-50 transition-colors pb-4 bg-mono-900">
-                <span class="text-h3 font-mono text-mono-100 mr-6">Awaiting Input...</span>
-                <input type="text"
-                    class="chat-input w-full bg-transparent text-h2 font-medium placeholder:text-mono-800"
-                    placeholder="Type here">
-                <button
-                    class="text-caption uppercase tracking-widest text-mono-400 hover:text-mono-50 transition-colors font-mono">Send
-                    ↵</button>
-            </div>
-            <!-- API: N/A - Local UI Controls -->
-            <div
-                class="flex gap-6 mt-6 justify-between items-center text-mono-600 text-caption font-mono uppercase tracking-widest">
-                <div class="flex gap-6">
-                    <button class="hover:text-mono-100 transition-colors">Attach File</button>
-                    <button class="hover:text-mono-100 transition-colors">Insert Context</button>
+        <!-- Sticky Chat Input -->
+        <!-- POST /api/workspace/chat/sessions/:sessionId/messages -->
+        <div class="absolute bottom-0 w-full bg-white p-8 border-t border-gray-100">
+            <div class="max-w-4xl mx-auto flex flex-col relative">
+                <div class="relative flex items-center">
+                    <span class="absolute left-6 title-2 text-gray-300">></span>
+                    <input type="text" placeholder="Type message to the CIO..."
+                        class="w-full bg-gray-100 text-black py-4 pl-12 pr-32 body-base focus:outline-none focus:ring-1 focus:ring-black placeholder-gray-500 rounded-none transition-shadow">
+                    <button
+                        class="absolute right-4 bg-black text-white px-6 py-2 label-mono hover:bg-gray-900 transition-colors">SEND</button>
                 </div>
-                <div>Model: Claude 3.5 Sonnet</div>
             </div>
         </div>
 

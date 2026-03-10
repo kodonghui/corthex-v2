@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORTHEX v2 Admin - Billing Plans</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'Noto Sans KR', 'sans-serif'] },
+                    colors: {
+                        base: { 50: '#fcfbf9', 100: '#f5f3ec', 200: '#e8e4d9', 300: '#d5cfc1' },
+                        text: { main: '#2c2c2c', muted: '#6b6b6b' },
+                        accent: { coral: '#e57373', terracotta: '#e07a5f', amber: '#f4a261', green: '#81b29a', blue: '#4A90E2', purple: '#9b5de5' }
+                    },
+                    boxShadow: { 'soft': '0 4px 20px rgba(0, 0, 0, 0.03)', 'soft-lg': '0 10px 40px rgba(0, 0, 0, 0.06)' },
+                    borderRadius: { '2xl': '1rem', '3xl': '1.5rem', '4xl': '2rem' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #fcfbf9;
+            color: #2c2c2c;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .plan-card {
+            background-color: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            border: 1px solid #e8e4d9;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
+            border-color: #d5cfc1;
+        }
+
+        .tab-btn {
+            position: relative;
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #2c2c2c;
+        }
+    </style>
+</head>
+
+<body class="flex h-screen font-sans antialiased overflow-hidden">
+
+    <!-- Admin Sidebar -->
+    <aside class="w-72 flex flex-col justify-between py-8 px-6 border-r border-[#e8e4d9] bg-[#fcfbf9] z-20 shrink-0">
+        <div>
+            <div class="flex items-center justify-between mb-10">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-8 h-8 rounded-full bg-text-main flex items-center justify-center text-white font-bold text-lg">
+                        A</div>
+                    <span class="text-xl font-bold tracking-tight text-text-main">Admin Console</span>
+                </div>
+            </div>
+
+            <nav class="space-y-1.5">
+                <a href="#"
+                    class="flex items-center gap-3 px-4 py-2.5 text-text-muted hover:text-text-main hover:bg-white/50 rounded-xl transition-colors">
+                    <i class="ph ph-gauge text-lg"></i> Global Dashboard
+                </a>
+
+                <div class="pt-6 pb-2 px-4 text-[11px] font-bold text-base-300 uppercase tracking-wider">고객사 및 결제</div>
+                <a href="#"
+                    class="flex items-center gap-3 px-4 py-2.5 text-text-muted hover:text-text-main hover:bg-white/50 rounded-xl transition-colors">
+                    <i class="ph ph-buildings text-lg"></i> Tenants
+                </a>
+                <!-- Active menu -->
+                <a href="#"
+                    class="flex items-center gap-3 px-4 py-3 font-medium text-accent-terracotta bg-white rounded-xl border border-[#e8e4d9] shadow-sm transition-colors">
+                    <i class="ph ph-credit-card text-lg"></i> Billing & Revenue
+                </a>
+
+                <div class="pt-6 pb-2 px-4 text-[11px] font-bold text-base-300 uppercase tracking-wider">시스템 자원 및 운영
+                </div>
+                <a href="#"
+                    class="flex items-center gap-3 px-4 py-2.5 text-text-muted hover:text-text-main hover:bg-white/50 rounded-xl transition-colors">
+                    <i class="ph ph-cpu text-lg"></i> Platform Metrics
+                </a>
+
+                <div class="pt-6 pb-2 px-4 text-[11px] font-bold text-base-300 uppercase tracking-wider">설정</div>
+                <a href="#"
+                    class="flex items-center gap-3 px-4 py-2.5 text-text-muted hover:text-text-main hover:bg-white/50 rounded-xl transition-colors">
+                    <i class="ph ph-gear text-lg"></i> Settings
+                </a>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto relative hide-scrollbar">
+
+        <header class="px-12 py-8 bg-[#fcfbf9] border-b border-[#e8e4d9] sticky top-0 z-10">
+            <h1 class="text-3xl font-bold tracking-tight text-text-main">Billing & Revenue</h1>
+            <p class="text-text-muted mt-2 text-sm">요금제별 기능 제한, 사용자당 가격 및 토큰 한도를 설정합니다.</p>
+
+            <!-- Quick Sub-nav -->
+            <div class="flex gap-6 mt-8">
+                <button
+                    class="tab-btn pb-3 text-sm font-medium text-text-muted hover:text-text-main transition-colors">Overview</button>
+                <button class="tab-btn active pb-3 text-sm font-bold text-text-main">Plans & Pricing</button>
+                <button
+                    class="tab-btn pb-3 text-sm font-medium text-text-muted hover:text-text-main transition-colors">Invoices</button>
+                <button
+                    class="tab-btn pb-3 text-sm font-medium text-text-muted hover:text-text-main transition-colors">Tax
+                    & Compliance</button>
+            </div>
+        </header>
+
+        <div class="px-12 py-10 bg-base-50/30">
+
+            <div class="flex justify-between items-center mb-8">
+                <h2
+                    class="text-lg font-bold text-text-main border border-[#e8e4d9] bg-white px-4 py-1.5 rounded-lg shadow-sm">
+                    Stripe 연결: 연동됨 <i class="ph ph-check-circle text-accent-green ml-1"></i>
+                </h2>
+                <div class="flex gap-3">
+                    <button
+                        class="px-5 py-2.5 bg-white border border-[#e8e4d9] text-text-main text-sm font-bold rounded-xl shadow-sm hover:bg-base-50 transition-colors">취소</button>
+                    <button
+                        class="px-5 py-2.5 bg-accent-terracotta text-white text-sm font-bold rounded-xl shadow-soft hover:bg-opacity-90 transition-colors flex items-center gap-2"><i
+                            class="ph ph-floppy-disk"></i> 퍼블리시 (라이브 적용)</button>
+                </div>
+            </div>
+
+            <!-- Pricing Tier Editor -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-20">
+
+                <!-- Starter Plan -->
+                <div class="plan-card">
+                    <div class="p-8 border-b border-[#e8e4d9]">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-xl text-text-main">Starter</h3>
+                            <button class="text-text-muted hover:text-text-main"><i
+                                    class="ph ph-dots-three text-xl"></i></button>
+                        </div>
+
+                        <div class="mb-6">
+                            <label
+                                class="block text-[10px] font-bold text-text-muted uppercase tracking-wider mb-1">Base
+                                Price (Monthly)</label>
+                            <div class="relative">
+                                <span
+                                    class="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted font-bold">$</span>
+                                <input type="text" value="49"
+                                    class="w-full bg-[#fcfbf9] border border-[#e8e4d9] outline-none text-2xl font-bold pl-8 pr-4 py-2 rounded-xl text-text-main focus:border-text-main/30">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-[10px] font-bold text-text-muted uppercase tracking-wider mb-1">Stripe
+                                Product ID</label>
+                            <input type="text" value="prod_NMqk8sY2"
+                                class="w-full bg-[#fcfbf9] border border-[#e8e4d9] outline-none text-xs font-mono pl-3 pr-3 py-2 rounded-lg text-text-muted"
+                                readonly>
+                        </div>
+                    </div>
+
+                    <div class="p-8 flex-1 bg-white/50">
+                        <h4 class="text-xs font-bold text-text-main mb-4">Features & Limits</h4>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-text-muted">Max Members</span>
+                                <input type="number" value="10"
+                                    class="w-16 bg-[#fcfbf9] border border-[#e8e4d9] text-center rounded text-text-main font-bold outline-none py-1">
+                            </div>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-text-muted">Max Active Agents</span>
+                                <input type="number" value="5"
+                                    class="w-16 bg-[#fcfbf9] border border-[#e8e4d9] text-center rounded text-text-main font-bold outline-none py-1">
+                            </div>
+                            <div class="flex justify-between items-center text-sm pt-2 border-t border-[#e8e4d9]">
+                                <span class="text-text-muted leading-tight">Included Tokens<br><span
+                                        class="text-[10px]">Per month</span></span>
+                                <div class="flex gap-1 items-center">
+                                    <input type="number" value="5"
+                                        class="w-16 bg-[#fcfbf9] border border-[#e8e4d9] text-right rounded text-text-main font-bold outline-none py-1 px-2">
+                                    <span class="text-text-muted text-xs">M</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-text-muted">Overage Price / 1M</span>
+                                <div
+                                    class="flex gap-1 items-center bg-[#fcfbf9] border border-[#e8e4d9] px-2 rounded w-20">
+                                    <span class="text-text-muted text-xs">$</span>
+                                    <input type="number" value="3.5"
+                                        class="w-full bg-transparent text-right text-text-main font-bold outline-none py-1">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Business Plan -->
+                <div class="plan-card border-accent-blue/30 relative">
+                    <div class="absolute -top-3 inset-x-0 flex justify-center">
+                        <span
+                            class="bg-accent-blue text-white text-[10px] font-bold px-3 py-0.5 rounded-full uppercase tracking-wider shadow-sm">Most
+                            Popular</span>
+                    </div>
+
+                    <div class="p-8 border-b border-[#e8e4d9]">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-xl text-text-main">Business Pro</h3>
+                            <button class="text-text-muted hover:text-text-main"><i
+                                    class="ph ph-dots-three text-xl"></i></button>
+                        </div>
+
+                        <div class="mb-6">
+                            <label
+                                class="block text-[10px] font-bold text-text-muted uppercase tracking-wider mb-1">Base
+                                Price (Monthly)</label>
+                            <div class="relative">
+                                <span
+                                    class="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted font-bold">$</span>
+                                <input type="text" value="299"
+                                    class="w-full bg-[#fcfbf9] border border-[#e8e4d9] outline-none text-2xl font-bold pl-8 pr-4 py-2 rounded-xl text-text-main focus:border-text-main/30">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-[10px] font-bold text-text-muted uppercase tracking-wider mb-1">Stripe
+                                Product ID</label>
+                            <input type="text" value="prod_BQk9j3M1"
+                                class="w-full bg-[#fcfbf9] border border-[#e8e4d9] outline-none text-xs font-mono pl-3 pr-3 py-2 rounded-lg text-text-muted"
+                                readonly>
+                        </div>
+                    </div>
+
+                    <div class="p-8 flex-1 bg-white/50">
+                        <h4 class="text-xs font-bold text-text-main mb-4">Features & Limits</h4>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-text-muted">Max Members</span>
+                                <input type="number" value="50"
+                                    class="w-16 bg-[#fcfbf9] border border-[#e8e4d9] text-center rounded text-text-main font-bold outline-none py-1">
+                            </div>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-text-muted">Max Active Agents</span>
+                                <input type="number" value="25"
+                                    class="w-16 bg-[#fcfbf9] border border-[#e8e4d9] text-center rounded text-text-main font-bold outline-none py-1">
+                            </div>
+                            <div class="flex justify-between items-center text-sm pt-2 border-t border-[#e8e4d9]">
+                                <span class="text-text-muted leading-tight">Included Tokens<br><span
+                                        class="text-[10px]">Per month</span></span>
+                                <div class="flex gap-1 items-center">
+                                    <input type="number" value="50"
+                                        class="w-16 bg-[#fcfbf9] border border-[#e8e4d9] text-right rounded text-text-main font-bold outline-none py-1 px-2">
+                                    <span class="text-text-muted text-xs">M</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-text-muted">Overage Price / 1M</span>
+                                <div
+                                    class="flex gap-1 items-center bg-[#fcfbf9] border border-[#e8e4d9] px-2 rounded w-20">
+                                    <span class="text-text-muted text-xs">$</span>
+                                    <input type="number" value="2.5"
+                                        class="w-full bg-transparent text-right text-text-main font-bold outline-none py-1">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enterprise Plan -->
+                <div class="plan-card">
+                    <div class="p-8 border-b border-[#e8e4d9]">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-xl text-text-main flex items-center gap-2">Enterprise <i
+                                    class="ph ph-buildings text-text-muted text-lg"></i></h3>
+                            <button class="text-text-muted hover:text-text-main"><i
+                                    class="ph ph-dots-three text-xl"></i></button>
+                        </div>
+
+                        <div class="mb-6">
+                            <label
+                                class="block text-[10px] font-bold text-text-muted uppercase tracking-wider mb-1">Custom
+                                Pricing (Contact Sales)</label>
+                            <div
+                                class="w-full bg-[#fcfbf9] border border-[#e8e4d9] text-text-muted text-sm font-bold px-4 py-3 rounded-xl flex justify-center opacity-70">
+                                영업팀 협의 (Custom)
+                            </div>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-[10px] font-bold text-text-muted uppercase tracking-wider mb-1">Stripe
+                                Product Category</label>
+                            <input type="text" value="Enterprise / Negotiated"
+                                class="w-full bg-[#fcfbf9] border border-[#e8e4d9] outline-none text-xs pl-3 pr-3 py-2 rounded-lg text-text-muted"
+                                readonly>
+                        </div>
+                    </div>
+
+                    <div class="p-8 flex-1 bg-white/50">
+                        <h4 class="text-xs font-bold text-text-main mb-4">Features & Limits</h4>
+                        <div class="space-y-4">
+                            <div class="flex items-start gap-2 text-sm text-text-main font-medium">
+                                <i class="ph ph-check-circle text-accent-green mt-0.5"></i> 무제한 사용자 멤버 (SSO 지원)
+                            </div>
+                            <div class="flex items-start gap-2 text-sm text-text-main font-medium">
+                                <i class="ph ph-check-circle text-accent-green mt-0.5"></i> 무제한 에이전트 생성
+                            </div>
+                            <div class="flex items-start gap-2 text-sm text-text-main font-medium">
+                                <i class="ph ph-check-circle text-accent-green mt-0.5"></i> 커스텀 LLM 및 로컬 모델 연동
+                            </div>
+                            <div class="flex items-start gap-2 text-sm text-text-main font-medium">
+                                <i class="ph ph-check-circle text-accent-green mt-0.5"></i> VPC Peering 및 전용 인프라
+                            </div>
+                            <div class="flex items-start gap-2 text-sm text-text-main font-medium">
+                                <i class="ph ph-check-circle text-accent-green mt-0.5"></i> 24/7 전담 기술 지원
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add New Button -->
+                <button
+                    class="col-span-1 md:col-span-3 h-20 border-2 border-dashed border-[#e8e4d9] hover:border-[#d5cfc1] rounded-2xl flex items-center justify-center gap-2 text-text-muted hover:text-text-main font-bold transition-colors bg-white/50">
+                    <i class="ph ph-plus text-xl"></i> 새로운 커스텀 플랜 추가
+                </button>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

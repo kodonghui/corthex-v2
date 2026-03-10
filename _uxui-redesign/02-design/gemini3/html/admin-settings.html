@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORTHEX v2 - Platform Settings</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['Roboto Mono', 'monospace'] },
+                    colors: {
+                        dark: { 50: '#1a1a2e', 100: '#151525', 200: '#11111e', 300: '#0d0d18', 400: '#0a0a0f', 900: '#050508' },
+                        accent: { purple: '#a855f7', cyan: '#22d3ee' }
+                    },
+                    backgroundImage: { 'gradient-accent': 'linear-gradient(to right, #a855f7, #22d3ee)' },
+                    boxShadow: { 'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.3)', 'glow': '0 0 20px rgba(168, 85, 247, 0.3), 0 0 40px rgba(34, 211, 238, 0.2)' }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer components {
+            body { @apply bg-dark-900 text-gray-200 font-sans antialiased font-light min-h-screen overflow-hidden flex selection:bg-gray-500/30 selection:text-white; }
+            .bg-ambient { @apply fixed inset-0 z-[-1] pointer-events-none; }
+            .bg-ambient::before { content: ''; @apply absolute top-[-30%] left-[20%] w-[60vw] h-[60vw] rounded-full bg-blue-600/10 blur-[150px]; }
+            .bg-ambient::after { content: ''; @apply absolute bottom-[-20%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-accent-purple/5 blur-[120px]; }
+            
+            .glass-panel { @apply bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] shadow-glass rounded-2xl overflow-hidden transition-all duration-300; }
+            
+            .nav-item { @apply flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/[0.05] transition-colors font-medium text-sm; }
+            .nav-item.active { @apply text-white bg-white/[0.08] shadow-[inset_2px_0_0_0_rgba(255,255,255,0.3)]; }
+            
+            .btn { @apply inline-flex items-center justify-center px-4 py-2 font-medium text-sm rounded-lg transition-all gap-2 cursor-pointer; }
+            .btn-primary { @apply bg-white text-black hover:bg-gray-200; }
+            
+            .text-gradient { @apply bg-gradient-accent bg-clip-text text-transparent; }
+            
+            .scrollbar-hide::-webkit-scrollbar { display: none; }
+            .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+            
+            /* Toggle Switch */
+            .toggle-checkbox:checked { @apply right-0 border-accent-cyan; right: 0; left: auto; border-color: #22d3ee; }
+            .toggle-checkbox:checked + .toggle-label { @apply bg-accent-cyan; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-ambient"></div>
+
+    <aside class="w-64 border-r border-white/[0.08] bg-dark-400/80 backdrop-blur-xl flex flex-col h-full z-20 shrink-0">
+        <div class="h-16 flex items-center px-6 border-b border-white/[0.05]">
+            <h1 class="text-xl font-bold tracking-wider text-gradient">CORTHEX</h1>
+            <span
+                class="ml-2 px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30">ADMIN</span>
+        </div>
+        <div class="flex-1 overflow-y-auto scrollbar-hide py-6 px-4 space-y-8">
+            <div class="space-y-1">
+                <a href="admin-dashboard.html" class="nav-item"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                    Global Dashboard</a>
+            </div>
+
+            <div class="space-y-1">
+                <p class="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Platform
+                    Administration</p>
+                <a href="admin-api-keys.html" class="nav-item"><i data-lucide="key-square" class="w-4 h-4"></i> Platform
+                    API Keys</a>
+                <a href="admin-costs.html" class="nav-item"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> Global
+                    Costs</a>
+                <a href="admin-companies.html" class="nav-item"><i data-lucide="building-2" class="w-4 h-4"></i> Tenancy
+                    / Companies</a>
+                <a href="admin-settings.html" class="nav-item active"><i data-lucide="settings" class="w-4 h-4"></i>
+                    Platform Settings</a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full relative z-10 overflow-hidden">
+
+        <header
+            class="h-16 flex items-center justify-between px-8 border-b border-white/[0.05] bg-dark-300/50 backdrop-blur shrink-0">
+            <div class="flex items-center gap-4">
+                <span class="text-sm font-medium text-gray-300"><i data-lucide="settings"
+                        class="w-4 h-4 inline mr-2 text-gray-400"></i>Global Platform Settings</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <button class="btn btn-primary text-xs py-1.5 px-6">Save Changes</button>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-8 scrollbar-hide">
+            <div class="max-w-4xl mx-auto space-y-8">
+
+                <div class="glass-panel overflow-hidden">
+                    <div class="p-6 border-b border-white/5 bg-dark-300/30">
+                        <h3 class="text-base font-medium text-white">System Defaults</h3>
+                        <p class="text-xs text-gray-500 mt-1">Configure baseline limits for newly provisioned
+                            workspaces.</p>
+                    </div>
+                    <div class="p-6 space-y-6">
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-400 mb-2">Default Base AI
+                                    Model</label>
+                                <select
+                                    class="w-full bg-dark-200/50 border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-300 appearance-none focus:outline-none">
+                                    <option>Claude 3.5 Sonnet (Recommended)</option>
+                                    <option>GPT-4o Mini</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-400 mb-2">Default Monthly Token Limit
+                                    (Soft)</label>
+                                <input type="number" value="1000000"
+                                    class="w-full bg-dark-200/50 border border-white/10 rounded-lg px-3 py-2 text-sm text-white font-mono focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel overflow-hidden border-rose-500/20">
+                    <div class="p-6 border-b border-white/5 bg-rose-500/5">
+                        <h3 class="text-base font-medium text-rose-400 flex items-center gap-2"><i
+                                data-lucide="shield-alert" class="w-4 h-4"></i> Danger Zone</h3>
+                        <p class="text-xs text-gray-500 mt-1">Platform-altering actions affecting all tenants.</p>
+                    </div>
+                    <div class="p-6 space-y-6">
+
+                        <div class="flex justify-between items-center pb-6 border-b border-white/5">
+                            <div>
+                                <h4 class="text-sm font-medium text-white">Maintenance Mode</h4>
+                                <p class="text-xs text-gray-500 mt-1">Lock out non-admin users and pause all background
+                                    agents.</p>
+                            </div>
+                            <div
+                                class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                                <input type="checkbox" name="toggle" id="maintenance"
+                                    class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-dark-300 appearance-none cursor-pointer transition-colors duration-200 ease-in-out" />
+                                <label for="maintenance"
+                                    class="toggle-label block overflow-hidden h-5 rounded-full bg-dark-300 cursor-pointer"></label>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h4 class="text-sm font-medium text-white">Global Agent Killswitch</h4>
+                                <p class="text-xs text-gray-500 mt-1">Force terminate all running agent pods globally.
+                                    Used for severe cost overruns.</p>
+                            </div>
+                            <button
+                                class="px-4 py-2 rounded-lg bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-500 hover:text-white transition-colors text-xs font-bold uppercase tracking-wider">Execute
+                                Killswitch</button>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

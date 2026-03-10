@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORTHEX v2 Admin - Internal API Keys</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans KR', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    colors: {
+                        base: { 50: '#fcfbf9', 100: '#f5f3ec', 200: '#e8e4d9', 300: '#d5cfc1' },
+                        text: { main: '#2c2c2c', muted: '#6b6b6b' },
+                        accent: { coral: '#e57373', terracotta: '#e07a5f', amber: '#f4a261', green: '#81b29a', blue: '#4A90E2', purple: '#9b5de5' }
+                    },
+                    boxShadow: { 'soft': '0 4px 20px rgba(0, 0, 0, 0.03)', 'soft-lg': '0 10px 40px rgba(0, 0, 0, 0.06)' },
+                    borderRadius: { '2xl': '1rem', '3xl': '1.5rem', '4xl': '2rem' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f5f3ec;
+            color: #2c2c2c;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .panel {
+            background-color: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            border: 1px solid #e8e4d9;
+        }
+    </style>
+</head>
+
+<body class="flex h-screen font-sans antialiased overflow-hidden">
+
+    <!-- Admin Sidebar -->
+    <aside class="w-72 flex flex-col justify-between py-8 px-6 border-r border-[#e8e4d9] bg-[#fcfbf9] z-20 shrink-0">
+        <div>
+            <div class="flex items-center justify-between mb-10">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-8 h-8 rounded-full bg-text-main flex items-center justify-center text-white font-bold text-lg">
+                        A</div>
+                    <span class="text-xl font-bold tracking-tight text-text-main">Admin Console</span>
+                </div>
+            </div>
+
+            <nav class="space-y-1.5">
+                <a href="#"
+                    class="flex items-center gap-3 px-4 py-2.5 text-text-muted hover:text-text-main hover:bg-white/50 rounded-xl transition-colors">
+                    <i class="ph ph-gauge text-lg"></i> Global Dashboard
+                </a>
+
+                <div class="pt-6 pb-2 px-4 text-[11px] font-bold text-base-300 uppercase tracking-wider">환경설정 및 연동</div>
+                <a href="admin-credentials.html"
+                    class="flex items-center gap-3 px-4 py-2.5 text-text-muted hover:text-text-main hover:bg-white/50 rounded-xl transition-colors">
+                    <i class="ph ph-shield-key text-lg"></i> Platform Credentials
+                </a>
+                <a href="#"
+                    class="flex items-center gap-3 px-4 py-2.5 text-text-muted hover:text-text-main hover:bg-white/50 rounded-xl transition-colors">
+                    <i class="ph ph-wrench text-lg"></i> Global Tools Reg
+                </a>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto px-12 py-10 relative hide-scrollbar">
+
+        <header
+            class="flex justify-between items-end mb-8 sticky top-0 bg-[#f5f3ec]/90 backdrop-blur-md z-10 pt-2 pb-4">
+            <div>
+                <h1 class="text-3xl font-bold tracking-tight text-text-main">Internal API Keys</h1>
+                <p class="text-text-muted mt-2 text-sm">CORTHEX 백엔드 시스템에 접근하기 위해 발급된 서비스 및 어드민 전용 API Key 목록입니다.</p>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button
+                    class="bg-text-main text-white px-5 py-2.5 flex items-center gap-2 rounded-xl text-sm font-bold shadow-soft hover:bg-opacity-90 transition-colors">
+                    <i class="ph ph-key text-lg"></i> Generate New Key
+                </button>
+            </div>
+        </header>
+
+        <!-- Search & Filter -->
+        <div class="flex gap-4 mb-6">
+            <div class="relative w-96">
+                <i class="ph ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-text-muted text-sm"></i>
+                <input type="text" placeholder="Key Name, Prefix 검색..."
+                    class="w-full bg-white border border-[#e8e4d9] outline-none text-sm pl-10 pr-4 py-2.5 rounded-lg text-text-main placeholder:text-base-300 shadow-sm focus:border-accent-terracotta/50 transition-colors">
+            </div>
+            <select
+                class="bg-white border border-[#e8e4d9] px-4 py-2.5 rounded-lg text-text-main text-sm font-medium shadow-sm outline-none cursor-pointer">
+                <option>Status: All</option>
+                <option>Active</option>
+                <option>Revoked</option>
+            </select>
+        </div>
+
+        <!-- API Keys Table -->
+        <div class="panel overflow-hidden">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr
+                        class="bg-[#fcfbf9] text-[11px] uppercase tracking-wider text-text-muted border-b border-[#e8e4d9]">
+                        <th class="px-6 py-4 font-bold">Key Name</th>
+                        <th class="px-6 py-4 font-bold">Token Prefix</th>
+                        <th class="px-6 py-4 font-bold">Permissions</th>
+                        <th class="px-6 py-4 font-bold">Created / Expire</th>
+                        <th class="px-6 py-4 text-center font-bold">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="text-sm text-text-main divide-y divide-[#e8e4d9]">
+
+                    <tr class="hover:bg-[#fcfbf9] transition-colors group">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full bg-accent-green mb-0.5"></div>
+                                <h4 class="font-bold text-text-main">Backend Service Worker</h4>
+                            </div>
+                            <p class="text-[10px] text-text-muted mt-0.5 ml-4">Used by main backend microservices</p>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div
+                                class="bg-base-50 border border-[#e8e4d9] rounded px-2 py-1 font-mono text-xs w-max text-text-muted">
+                                ctx_sys_x8k2...
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span
+                                class="px-2 py-1 rounded bg-[#fff5f2] text-accent-terracotta border border-accent-terracotta/20 text-[10px] font-bold uppercase w-max">Full
+                                System Access</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-[11px] text-text-main mb-0.5">Oct 01, 2026</div>
+                            <div class="text-[10px] text-text-muted">Never expires</div>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <button class="text-accent-coral hover:underline text-xs font-bold">Revoke</button>
+                        </td>
+                    </tr>
+
+                    <tr class="hover:bg-[#fcfbf9] transition-colors group">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full bg-accent-green mb-0.5"></div>
+                                <h4 class="font-bold text-text-main">Webhook Listener</h4>
+                            </div>
+                            <p class="text-[10px] text-text-muted mt-0.5 ml-4">Stripe billing webhooks integration</p>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div
+                                class="bg-base-50 border border-[#e8e4d9] rounded px-2 py-1 font-mono text-xs w-max text-text-muted">
+                                ctx_hook_m9p...
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span
+                                class="px-2 py-1 rounded bg-base-100 border border-[#e8e4d9] text-text-muted text-[10px] font-bold uppercase w-max">Billing
+                                (Write)</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-[11px] text-text-main mb-0.5">Sep 15, 2026</div>
+                            <div class="text-[10px] text-text-muted">Expires: Sep 15, 2027</div>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <button class="text-accent-coral hover:underline text-xs font-bold">Revoke</button>
+                        </td>
+                    </tr>
+
+                    <tr class="bg-base-50 transition-colors group opacity-60">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full bg-base-300 mb-0.5"></div>
+                                <h4 class="font-bold text-text-muted line-through">Legacy Data Migration</h4>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div
+                                class="bg-transparent border border-[#d5cfc1] rounded px-2 py-1 font-mono text-xs w-max text-base-300">
+                                ctx_mig_a1b2...
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span
+                                class="px-2 py-1 rounded bg-transparent border border-[#d5cfc1] text-base-300 text-[10px] font-bold uppercase w-max">Read
+                                Only (Global)</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-[11px] text-text-muted mb-0.5">Aug 01, 2026</div>
+                            <div class="text-[10px] text-accent-coral font-bold">Revoked</div>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="text-xs text-base-300"><i class="ph ph-trash"></i></span>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+    </main>
+
+</body>
+
+</html>

@@ -4,267 +4,222 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CORTHEX v2 - Nexus Briefing</title>
+    <title>Nexus Map | CORTHEX v2</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"
-        rel="stylesheet" crossorigin="anonymous">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        mono: {
-                            900: '#000000',
-                            800: '#111111',
-                            500: '#666666',
-                            400: '#999999',
-                            100: '#eeeeee',
-                            50: '#ffffff',
-                        },
-                        status: {
-                            red: '#ff3b30',
-                            green: '#34c759'
-                        }
+                        black: '#000000',
+                        gray: { 900: '#111111', 500: '#666666', 300: '#999999', 100: '#EEEEEE' },
+                        white: '#FFFFFF',
+                        status: { green: '#22c55e', red: '#ef4444' }
                     },
-                    fontFamily: {
-                        sans: ['Satoshi', 'Pretendard', 'system-ui', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
-                        serif: ['ui-serif', 'Georgia', 'Cambria', 'Times New Roman', 'Times', 'serif'],
-                    },
-                    fontSize: {
-                        'hero': ['4rem', { lineHeight: '1', letterSpacing: '-0.05em', fontWeight: '900' }],
-                        'display': ['2.5rem', { lineHeight: '1.1', letterSpacing: '-0.04em', fontWeight: '800' }],
-                        'h1': ['2rem', { lineHeight: '1.2', letterSpacing: '-0.03em', fontWeight: '700' }],
-                        'h2': ['1.5rem', { lineHeight: '1.3', letterSpacing: '-0.02em', fontWeight: '600' }],
-                        'h3': ['1.25rem', { lineHeight: '1.4', letterSpacing: '-0.01em', fontWeight: '600' }],
-                        'body-l': ['1.125rem', { lineHeight: '1.8', letterSpacing: '0', fontWeight: '500' }],
-                        'body': ['1rem', { lineHeight: '1.8', letterSpacing: '0', fontWeight: '400' }],
-                        'body-s': ['0.875rem', { lineHeight: '1.6', letterSpacing: '0.01em', fontWeight: '400' }],
-                        'caption': ['0.75rem', { lineHeight: '1.4', letterSpacing: '0.05em', fontWeight: '500' }],
-                    },
-                    spacing: {
-                        'section': '8rem',
-                        'block': '4rem',
-                        'item': '2rem',
-                    }
+                    letterSpacing: { tighter: '-0.04em', tight: '-0.02em', normal: '0', wide: '0.02em', wider: '0.04em', widest: '0.1em' }
                 }
             }
         }
     </script>
     <style>
         body {
-            background-color: #000000;
-            color: #ffffff;
+            background-color: theme('colors.white');
+            color: theme('colors.black');
             -webkit-font-smoothing: antialiased;
         }
 
-        .editorial-body {
-            font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-            letter-spacing: -0.01em;
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
         }
 
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
+        ::selection {
+            background-color: theme('colors.black');
+            color: theme('colors.white');
+        }
+
+        .title-display {
+            font-size: 4rem;
+            line-height: 1;
+            font-weight: 800;
+            letter-spacing: theme('letterSpacing.tighter');
+        }
+
+        .title-1 {
+            font-size: 2.5rem;
+            line-height: 1.1;
+            font-weight: 700;
+            letter-spacing: theme('letterSpacing.tight');
+        }
+
+        .title-2 {
+            font-size: 1.5rem;
+            line-height: 1.2;
+            font-weight: 600;
+            letter-spacing: theme('letterSpacing.tight');
+        }
+
+        .title-3 {
+            font-size: 1.125rem;
+            line-height: 1.4;
+            font-weight: 600;
+        }
+
+        .body-base {
+            font-size: 0.9375rem;
+            line-height: 1.6;
+            font-weight: 400;
+            color: theme('colors.gray.900');
+        }
+
+        .body-small {
+            font-size: 0.8125rem;
+            line-height: 1.5;
+            font-weight: 400;
+            color: theme('colors.gray.500');
+        }
+
+        .label-mono {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: theme('letterSpacing.widest');
+            color: theme('colors.gray.300');
+        }
+
+        /* Grid background for the node map */
+        .bg-grid {
+            background-image:
+                radial-gradient(circle, theme('colors.gray.300') 1px, transparent 1px);
+            background-size: 2rem 2rem;
+            background-position: center center;
         }
     </style>
 </head>
 
-<body class="min-h-screen flex h-screen overflow-hidden">
+<body class="flex h-screen overflow-hidden">
 
-    <!-- Left Navigation -->
-    <nav class="w-24 lg:w-32 border-r border-mono-800 flex flex-col items-center py-8 shrink-0 h-full">
-        <a href="home.html"
-            class="text-h3 font-bold mb-16 rotate-[-90deg] uppercase tracking-widest whitespace-nowrap hover:text-mono-400">CORTHEX</a>
+    <!-- Global Nav -->
+    <nav class="w-64 border-r border-gray-100 flex flex-col justify-between py-8 px-6 flex-shrink-0 bg-white z-20">
+        <div>
+            <div class="mb-16">
+                <span class="title-2 tracking-tighter">CORTHEX</span>
+                <span class="label-mono ml-2">v2</span>
+            </div>
 
-        <div class="flex flex-col gap-12 font-mono text-caption uppercase tracking-widest items-center">
-            <a href="trading.html"
-                class="text-mono-500 hover:text-mono-100 transition-colors rotate-[-90deg] whitespace-nowrap">Trading</a>
-            <a href="agora.html"
-                class="text-mono-500 hover:text-mono-100 transition-colors rotate-[-90deg] whitespace-nowrap mt-4">Agora</a>
-            <!-- API: N/A -->
-            <a href="nexus.html"
-                class="text-mono-50 rotate-[-90deg] whitespace-nowrap border-b border-mono-50 pb-1 mt-8">Nexus</a>
+            <ul class="space-y-6">
+                <li><a href="home.html" class="body-base hover:text-gray-500 transition-colors">Home</a></li>
+                <li><a href="dashboard.html" class="body-base hover:text-gray-500 transition-colors">Dashboard</a></li>
+                <li><a href="command-center.html" class="body-base hover:text-gray-500 transition-colors">Command
+                        Center</a></li>
+                <li><a href="chat.html" class="body-base hover:text-gray-500 transition-colors">Chat</a></li>
+                <li><a href="trading.html" class="body-base hover:text-gray-500 transition-colors">Trading</a></li>
+                <li><a href="agora.html" class="body-base hover:text-gray-500 transition-colors">Agora</a></li>
+                <!-- GET /api/workspace/nexus/org-data -->
+                <li class="pt-6 border-t border-gray-100 mt-6"><a href="nexus.html"
+                        class="title-3 font-medium transition-colors">Nexus</a></li>
+            </ul>
         </div>
 
+        <div class="space-y-6">
+            <ul class="space-y-6 pb-6 border-b border-gray-100">
+                <li><a href="agents.html" class="body-small hover:text-black transition-colors">Agents</a></li>
+                <li><a href="knowledge.html" class="body-small hover:text-black transition-colors">Knowledge</a></li>
+                <li><a href="costs.html" class="body-small hover:text-black transition-colors">Costs</a></li>
+            </ul>
+        </div>
     </nav>
 
-    <main class="flex-1 flex overflow-hidden">
+    <!-- Map Canvas Area -->
+    <main class="flex-1 relative bg-gray-50 bg-grid cursor-move">
 
-        <!-- Left Column: Briefing Index -->
-        <!-- API: GET /api/workspace/nexus/briefings -->
-        <aside class="w-80 border-r border-mono-800 flex flex-col h-full shrink-0">
-            <header class="p-8 border-b border-mono-800">
-                <h2 class="text-mono-600 text-caption uppercase tracking-widest">Nexus Intelligence</h2>
-                <!-- Search input for briefings -->
-                <input type="text" placeholder="Search Briefings..."
-                    class="mt-6 w-full bg-transparent border-b border-mono-800 pb-2 text-body-s font-mono focus:outline-none focus:border-mono-100 transition-colors placeholder:text-mono-600">
-            </header>
+        <!-- Controls Overlay -->
+        <div class="absolute top-8 left-8 z-10">
+            <h1 class="title-2 bg-white px-4 py-2 border border-black inline-block shadow-sm">Topology / Organization
+            </h1>
+            <p class="label-mono mt-4 bg-white px-3 py-1 inline-block border border-gray-100 text-gray-500">8 Nodes / 3
+                Clusters</p>
+        </div>
 
-            <ul class="flex-1 overflow-y-auto w-full no-scrollbar">
+        <div class="absolute top-8 right-8 z-10 flex space-x-2">
+            <!-- Mock controls for ReactFlow type canvas -->
+            <button
+                class="w-10 h-10 bg-white border border-gray-100 flex items-center justify-center hover:bg-gray-100">+</button>
+            <button
+                class="w-10 h-10 bg-white border border-gray-100 flex items-center justify-center hover:bg-gray-100">-</button>
+            <button
+                class="px-4 h-10 bg-white border border-gray-100 flex items-center justify-center label-mono hover:bg-black hover:text-white transition-colors">RESET
+                LAYOUT</button>
+        </div>
 
-                <!-- Active / Latest Briefing -->
-                <li class="border-b border-mono-800">
-                    <a href="#" class="block p-8 bg-mono-800/50">
-                        <div class="font-mono text-caption text-mono-50 mb-2 uppercase tracking-widest">LATEST REPORT
-                        </div>
-                        <div class="text-h3 font-bold text-mono-100 line-clamp-2 leading-tight tracking-tight">2026 Q3
-                            핵심 마케팅 전략 및 예산 배분 타당성 종합 검토</div>
-                        <div class="text-mono-500 text-caption mt-4 font-mono">CONFIDENCE: 92% · 2 HRS AGO</div>
-                    </a>
-                </li>
+        <!-- Simulated Graph Nodes (SVG or purely CSS positioning in Reality, using absolute div here for mockup) -->
+        <!-- API: GET /api/workspace/nexus/graph -->
 
-                <!-- Older Briefing -->
-                <li class="border-b border-mono-800">
-                    <a href="#" class="block p-8 hover:bg-mono-800/30 transition-colors opacity-70">
-                        <div class="font-mono text-caption text-mono-600 mb-2 uppercase tracking-widest">ARCHIVED</div>
-                        <div class="text-body-l font-medium text-mono-400 line-clamp-2 leading-tight tracking-tight">
-                            클라우드 인프라 제공업체 (AWS vs GCP) 전환 리스크 분석</div>
-                        <div class="text-mono-500 text-caption mt-4 font-mono">CONFIDENCE: 88% · OCT 12</div>
-                    </a>
-                </li>
+        <!-- Central Node: Secretary -->
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <!-- Connecting lines (simulated) -->
+            <svg class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] pointer-events-none -z-10"
+                style="overflow:visible;">
+                <!-- Line to Strategy -->
+                <path d="M 0 0 C 0 -150, 200 -150, 200 -200" stroke="#000" stroke-width="1.5" fill="none"
+                    opacity="0.2" />
+                <!-- Line to Marketing -->
+                <path d="M 0 0 C 0 150, -200 150, -200 200" stroke="#000" stroke-width="1.5" fill="none"
+                    opacity="0.2" />
+                <path d="M 0 0 C 150 0, 250 150, 250 200" stroke="#000" stroke-width="1.5" fill="none" opacity="0.2" />
+            </svg>
 
-            </ul>
-        </aside>
-
-        <!-- Right Column: Briefing Document -->
-        <div class="flex-1 overflow-y-auto lg:px-24 xl:px-48 py-24 scroll-smooth">
-
-            <!-- Document Header -->
-            <!-- API: GET /api/workspace/nexus/briefings/:id -->
-            <header class="mb-section max-w-4xl border-b-2 border-mono-100 pb-16">
-                <!-- Top metadata -->
-                <div
-                    class="flex justify-between items-start font-mono text-caption uppercase tracking-widest text-mono-500 mb-12">
-                    <div>
-                        <span class="block mb-1 text-mono-600">DOCUMENT CLASSIFICATION</span>
-                        <span class="text-mono-100 border border-mono-100 px-2 py-0.5">EXECUTIVE BRIEFING</span>
-                    </div>
-                    <div class="text-right">
-                        <span class="block mb-1 text-mono-600">REFERENCE ID</span>
-                        <span class="text-mono-400">NX-B-2026-042</span>
-                    </div>
-                    <div class="text-right">
-                        <span class="block mb-1 text-mono-600">TIMESTAMP</span>
-                        <span class="text-mono-400">14:30:22 / TZO+9</span>
-                    </div>
+            <div
+                class="bg-black text-white p-6 w-64 shadow-lg border border-gray-900 z-20 relative hover:bg-gray-900 transition-colors cursor-pointer">
+                <div class="flex justify-between items-start mb-4 border-b border-gray-500 pb-2">
+                    <span class="label-mono text-gray-300">SYSTEM / ROOT</span>
+                    <span class="w-2 h-2 rounded-full bg-status-green"></span>
                 </div>
+                <h3 class="title-3 leading-tight">Secretary General</h3>
+                <p class="body-small text-gray-500 mt-2">Routing & Triage</p>
+            </div>
+        </div>
 
-                <h1 class="text-display leading-tight font-extrabold tracking-tighter text-mono-100 mb-8">
-                    2026 Q3 핵심 마케팅 전략 및 예산 배분 타당성 종합 검토
-                </h1>
+        <!-- Strategy Cluster -->
+        <div class="absolute top-[20%] left-[65%]">
+            <div
+                class="bg-white p-6 w-64 border-2 border-black z-20 relative hover:shadow-xl transition-shadow cursor-pointer group">
+                <div class="absolute -top-3 left-4 bg-white px-2 label-mono text-gray-500">DEPT: STRATEGY</div>
+                <div class="flex justify-between items-start mb-4">
+                    <span class="label-mono text-black group-hover:underline">MANAGER</span>
+                </div>
+                <h3 class="title-3 leading-tight group-hover:text-gray-500 transition-colors">Chief Investment Officer
+                </h3>
+                <p class="body-small text-gray-500 mt-2">Sonnet 3.5</p>
+            </div>
+        </div>
 
-                <p class="editorial-body text-h2 text-mono-400 leading-relaxed font-medium">
-                    본 브리핑은 3개 주요 부서(전략, 재무, 마케팅)의 관점을 취합하여 NEXUS AI 코어가 92%의 신뢰도로 도출한 최종 의사결정 권고안입니다.
-                </p>
-            </header>
+        <!-- Marketing Cluster -->
+        <div class="absolute top-[75%] left-[25%]">
+            <div
+                class="bg-white p-6 w-64 border border-gray-300 z-20 relative hover:border-black transition-colors cursor-pointer">
+                <div class="absolute -top-3 left-4 bg-gray-50 px-2 label-mono text-gray-500">DEPT: MARKETING</div>
+                <div class="flex justify-between items-start mb-4">
+                    <span class="label-mono text-gray-500">SPECIALIST</span>
+                    <span class="w-2 h-2 rounded-full bg-status-green"></span>
+                </div>
+                <h3 class="title-3 leading-tight body-base font-medium">Content Strategist</h3>
+                <p class="body-small text-gray-500 mt-2">Haiku 3.0</p>
+            </div>
+        </div>
 
-            <!-- Document Body -->
-            <article class="max-w-3xl">
-
-                <!-- Section: Executive Summary -->
-                <section class="mb-section">
-                    <h2
-                        class="text-mono-50 text-caption font-mono uppercase tracking-widest mb-8 flex items-center gap-4">
-                        <span class="w-2 h-2 rounded-sm bg-mono-50"></span>
-                        Synthesized Intelligence
-                    </h2>
-                    <div class="editorial-body text-body-l text-mono-100 space-y-6">
-                        <p>
-                            Q3 마케팅 예산 증액(기존 대비 +20%) 안건에 대하여, 재무적 리스크보다 시장 선점을 통한 점유율 확대의 기대 수익이 더 크다는 결론에 도달했습니다.
-                        </p>
-                        <p>
-                            다만, 전액 증액보다는 <strong>조건부 10% 증액 및 10% 유보금 편성</strong>으로 리스크를 헤지(Hedge)하는 하이브리드 전략을 채택할 것을
-                            권고합니다. 이는 마케팅부의 공격적인 성장 목표를 지원하면서도, 재무부의 현금흐름 보수성을 충족시킵니다.
-                        </p>
-                    </div>
-                </section>
-
-                <!-- Section: Perspectives Breakdown -->
-                <section class="mb-section">
-                    <h2
-                        class="text-mono-50 text-caption font-mono uppercase tracking-widest mb-8 flex items-center gap-4">
-                        <span class="w-8 h-px bg-mono-800"></span>
-                        Perspective Breakdown
-                    </h2>
-
-                    <div class="space-y-12 pl-8 border-l border-mono-800">
-
-                        <!-- Perspective 1 -->
-                        <div>
-                            <div class="flex items-baseline gap-4 mb-4">
-                                <h3 class="text-h3 font-bold tracking-tight text-mono-400 uppercase">CMO (Marketing)
-                                </h3>
-                                <span
-                                    class="text-status-green font-mono text-[10px] uppercase border border-status-green/30 px-1">AGREES</span>
-                            </div>
-                            <div class="editorial-body text-body text-mono-400">
-                                신규 타겟층 확보를 위해 초기 3개월간 공격적인 퍼포먼스 마케팅이 필수적입니다. 경쟁사가 예산을 축소하는 현시점이 점유율을 뺏어올 최적의 타이밍입니다.
-                            </div>
-                        </div>
-
-                        <!-- Perspective 2 -->
-                        <div>
-                            <div class="flex items-baseline gap-4 mb-4">
-                                <h3 class="text-h3 font-bold tracking-tight text-mono-400 uppercase">CFO (Finance)</h3>
-                                <span
-                                    class="text-status-red mix-blend-screen font-mono text-[10px] uppercase border border-status-red/30 px-1">CAUTION</span>
-                            </div>
-                            <div class="editorial-body text-body text-mono-400">
-                                하반기 거시경제 불확실성을 고려할 때, 확정되지 않은 ROAS(광고수익률)에 예산의 20%를 선제적으로 태우는 것은 현금유동성 악화 리스크가 있습니다. 방어적
-                                예산 운용이 필요합니다.
-                            </div>
-                        </div>
-
-                        <!-- Perspective 3 -->
-                        <div>
-                            <div class="flex items-baseline gap-4 mb-4">
-                                <h3 class="text-h3 font-bold tracking-tight text-mono-400 uppercase">CIO (Strategy)</h3>
-                                <span
-                                    class="text-mono-50 font-mono text-[10px] uppercase border border-mono-500 px-1 text-mono-500">NEUTRAL</span>
-                            </div>
-                            <div class="editorial-body text-body text-mono-400">
-                                마케팅의 당위성은 인정되나, 채널별 효율 최적화를 선행해야 합니다. 데이터 기반의 A/B 테스트를 통한 소규모 검증 후 스케일업하는 단계적 접근을 제안합니다.
-                            </div>
-                        </div>
-
-                    </div>
-                </section>
-
-                <!-- Section: Actionable Conclusion -->
-                <section class="mt-section pt-16 border-t-[4px] border-mono-100">
-                    <h2 class="text-h2 font-extrabold tracking-tighter text-mono-100 mb-8 uppercase">Actionable
-                        Conclusion</h2>
-
-                    <ul class="text-body-l text-mono-100 font-medium space-y-6">
-                        <li class="flex gap-4">
-                            <span class="font-mono text-mono-500">01.</span>
-                            <span>초기 예산 10% 조건부 승인 및 즉각적인 퍼포먼스 캠페인 런칭.</span>
-                        </li>
-                        <li class="flex gap-4">
-                            <span class="font-mono text-mono-500">02.</span>
-                            <span>런칭 후 4주간 ROAS 150% 달성 시, 유보금 10% 추가 집행 승인.</span>
-                        </li>
-                        <li class="flex gap-4">
-                            <span class="font-mono text-mono-500">03.</span>
-                            <span>전략부서는 매주 CAC 대비 LTV 전환율을 모니터링하여 경영진에 보고.</span>
-                        </li>
-                    </ul>
-
-                    <!-- API: PUT /api/workspace/nexus/briefings/:id/approve -->
-                    <div class="mt-16 flex gap-8 font-mono text-caption uppercase tracking-widest">
-                        <button
-                            class="bg-mono-100 text-mono-900 py-4 px-8 hover:bg-mono-400 transition-colors font-bold">Approve
-                            Action Plan</button>
-                        <button
-                            class="border border-mono-800 text-mono-500 py-4 px-8 hover:bg-mono-900 hover:text-mono-100 transition-colors">Request
-                            Revision</button>
-                    </div>
-                </section>
-
-            </article>
-
+        <div class="absolute top-[75%] left-[65%]">
+            <div
+                class="bg-white p-4 w-56 border border-gray-100 z-20 relative hover:border-black transition-colors cursor-pointer opacity-90">
+                <div class="flex justify-between items-start mb-2">
+                    <span class="label-mono text-gray-300">WORKER</span>
+                </div>
+                <h3 class="body-base leading-tight font-medium">Data Scraper</h3>
+                <p class="body-small text-gray-300 mt-1">GPT-4o Mini</p>
+            </div>
         </div>
 
     </main>

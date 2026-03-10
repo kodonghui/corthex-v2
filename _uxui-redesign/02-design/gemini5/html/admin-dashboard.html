@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORTHEX v2 - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet" crossorigin="anonymous">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mono: {
+                            900: '#000000',
+                            800: '#111111',
+                            500: '#666666',
+                            400: '#999999',
+                            100: '#eeeeee',
+                            50: '#ffffff',
+                        },
+                        status: {
+                            red: '#ff3b30',
+                            green: '#34c759'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Satoshi', 'Pretendard', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+                    },
+                    fontSize: {
+                        'hero': ['4rem', { lineHeight: '1', letterSpacing: '-0.05em', fontWeight: '900' }],
+                        'display': ['2.5rem', { lineHeight: '1.1', letterSpacing: '-0.04em', fontWeight: '800' }],
+                        'h1': ['2rem', { lineHeight: '1.2', letterSpacing: '-0.03em', fontWeight: '700' }],
+                        'h2': ['1.5rem', { lineHeight: '1.3', letterSpacing: '-0.02em', fontWeight: '600' }],
+                        'h3': ['1.25rem', { lineHeight: '1.4', letterSpacing: '-0.01em', fontWeight: '600' }],
+                        'body-l': ['1.125rem', { lineHeight: '1.6', letterSpacing: '0', fontWeight: '500' }],
+                        'body': ['1rem', { lineHeight: '1.6', letterSpacing: '0', fontWeight: '400' }],
+                        'body-s': ['0.875rem', { lineHeight: '1.5', letterSpacing: '0.01em', fontWeight: '400' }],
+                        'caption': ['0.75rem', { lineHeight: '1.4', letterSpacing: '0.05em', fontWeight: '500' }],
+                    },
+                    spacing: {
+                        'section': '8rem',
+                        'block': '4rem',
+                        'item': '2rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Admin specific styling usually has a distinct top nav or border */
+        .admin-border {
+            border-top: 4px solid #fff;
+        }
+
+        .metric-card {
+            border: 1px solid #333;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body class="min-h-screen admin-border">
+
+    <nav class="flex justify-between items-center px-16 py-8 border-b border-mono-800 sticky top-0 bg-mono-900 z-50">
+        <div class="flex items-center gap-8">
+            <a href="admin-dashboard.html" class="text-h2 font-bold tracking-tighter hover:text-mono-400 transition-colors">CORTHEX</a>
+            <div class="text-caption text-mono-900 uppercase tracking-widest bg-mono-100 px-3 py-1 font-bold">
+                WORKSPACE ADMIN
+            </div>
+        </div>
+        
+        <div class="flex gap-8 text-caption font-mono uppercase tracking-widest text-mono-500 items-center">
+            <a href="home.html" class="hover:text-mono-100 transition-colors">EXIT BACK TO APP -></a>
+        </div>
+    </nav>
+
+    <main class="grid grid-cols-1 lg:grid-cols-12 min-h-[calc(100vh-80px)]">
+        
+        <!-- Left Sidebar: Admin Navigation -->
+        <aside class="lg:col-span-3 border-r border-mono-800 p-16 pt-32 lg:sticky lg:top-[80px] lg:h-[calc(100vh-80px)] overflow-y-auto">
+            
+            <div class="space-y-12 text-body-s font-mono uppercase tracking-widest">
+                
+                <div>
+                    <h3 class="text-mono-600 mb-4 pb-2 border-b border-mono-800">Overview</h3>
+                    <ul class="space-y-4">
+                        <li><a href="admin-dashboard.html" class="text-mono-100 font-bold border-l-2 border-mono-100 pl-3 -ml-4 block">Dashboard</a></li>
+                        <li><a href="#" class="text-mono-500 hover:text-mono-100 transition-colors block">Monitoring</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-mono-600 mb-4 pb-2 border-b border-mono-800">Organization</h3>
+                    <ul class="space-y-4">
+                        <li><a href="#" class="text-mono-500 hover:text-mono-100 transition-colors block">Agents</a></li>
+                        <li><a href="#" class="text-mono-500 hover:text-mono-100 transition-colors block">Departments</a></li>
+                        <li><a href="#" class="text-mono-500 hover:text-mono-100 transition-colors block">Employees</a></li>
+                        <li><a href="#" class="text-mono-500 hover:text-mono-100 transition-colors block">Org Chart</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-mono-600 mb-4 pb-2 border-b border-mono-800">Resources</h3>
+                    <ul class="space-y-4">
+                        <li><a href="#" class="text-mono-500 hover:text-mono-100 transition-colors block">Credentials & API Keys</a></li>
+                        <li><a href="#" class="text-mono-500 hover:text-mono-100 transition-colors block">Tools</a></li>
+                        <li><a href="#" class="text-mono-500 hover:text-mono-100 transition-colors block">Costs & Billing</a></li>
+                    </ul>
+                </div>
+                
+                 <div>
+                    <h3 class="text-mono-600 mb-4 pb-2 border-b border-mono-800">Marketplace</h3>
+                    <ul class="space-y-4">
+                        <li><a href="#" class="text-mono-500 hover:text-mono-100 transition-colors block">Soul Templates</a></li>
+                        <li><a href="#" class="text-mono-500 hover:text-mono-100 transition-colors block">Agent Market</a></li>
+                    </ul>
+                </div>
+
+            </div>
+        </aside>
+
+        <!-- Right Content: Dashboard -->
+        <section class="lg:col-span-9 p-16 lg:px-32 pt-32 pb-32">
+            
+            <header class="mb-section pb-16 border-b border-mono-800 flex justify-between items-end">
+                <div>
+                    <div class="text-mono-500 font-mono text-caption uppercase tracking-widest mb-6">Workspace: ACME Corp</div>
+                    <h1 class="text-hero leading-tight tracking-tighter">Admin Overview</h1>
+                </div>
+                <div class="text-right font-mono text-caption uppercase tracking-widest text-mono-500 space-y-2">
+                    <div>PLAN: <span class="text-mono-100">ENTERPRISE</span></div>
+                    <div>STATUS: <span class="text-status-green mix-blend-screen">ACTIVE</span></div>
+                </div>
+            </header>
+
+            <!-- Key Metrics -->
+            <!-- API: GET /api/admin/dashboard/metrics -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-section">
+                
+                <div class="metric-card">
+                    <div class="font-mono text-caption text-mono-500 uppercase tracking-widest mb-12">Active Agents</div>
+                    <div>
+                        <div class="text-[4rem] font-bold leading-none tracking-tighter font-mono">142</div>
+                        <div class="mt-4 font-mono text-caption text-mono-600 uppercase tracking-widest">/ Limit: 500</div>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="font-mono text-caption text-mono-500 uppercase tracking-widest mb-12">MTD Compute Spend</div>
+                    <div>
+                        <div class="text-[4rem] font-bold leading-none tracking-tighter font-mono">$4.2<span class="text-h1 text-mono-500">K</span></div>
+                        <div class="mt-4 font-mono text-caption text-status-red uppercase tracking-widest">+18% vs Last Month</div>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="font-mono text-caption text-mono-500 uppercase tracking-widest mb-12">System Health</div>
+                    <div>
+                        <div class="text-[4rem] font-bold leading-none tracking-tighter font-mono text-status-green mix-blend-screen">100<span class="text-h1 opacity-50">%</span></div>
+                        <div class="mt-4 font-mono text-caption text-mono-600 uppercase tracking-widest">All Services Operational</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Recent Activity / Alerts -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-32">
+                
+                <!-- Admin Audit Log -->
+                <!-- API: GET /api/admin/audit-log -->
+                <div>
+                    <h2 class="text-mono-600 text-caption tracking-widest uppercase mb-8 font-mono border-b border-mono-800 pb-2 flex justify-between">
+                        <span>Recent Admin Actions</span>
+                        <a href="#" class="hover:text-mono-100 transition-colors">VIEW ALL -></a>
+                    </h2>
+                    
+                    <ul class="space-y-6 font-mono text-body-s">
+                        <li class="group cursor-pointer">
+                            <div class="text-mono-500 mb-1 text-[10px] uppercase tracking-widest">Today 14:22 | By: CEO</div>
+                            <div class="text-mono-100 group-hover:underline decoration-mono-600 underline-offset-4">Created new Department 'Global Expansion TF'</div>
+                        </li>
+                        <li class="group cursor-pointer">
+                            <div class="text-mono-500 mb-1 text-[10px] uppercase tracking-widest">Yesterday 09:15 | By: SYSTEM</div>
+                            <div class="text-mono-100 group-hover:underline decoration-mono-600 underline-offset-4">Auto-scaled Agent 'DATA_CRAWLER' instances to 5.</div>
+                        </li>
+                        <li class="group cursor-pointer">
+                            <div class="text-mono-500 mb-1 text-[10px] uppercase tracking-widest">Mar 08 17:40 | By: IT_ADMIN</div>
+                            <div class="text-mono-100 group-hover:underline decoration-mono-600 underline-offset-4">Revoked API Key (AWS_PROD_READ) from '마케팅팀'.</div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Usage Warnings -->
+                <div>
+                    <h2 class="text-mono-600 text-caption tracking-widest uppercase mb-8 font-mono border-b border-mono-800 pb-2">Resource Warnings</h2>
+                    
+                    <ul class="space-y-6 font-mono text-body-s">
+                        <li class="flex gap-4 items-start p-4 border border-mono-800 bg-mono-900 group cursor-pointer hover:border-mono-600 transition-colors">
+                            <span class="text-status-red mt-1">!</span>
+                            <div>
+                                <div class="text-mono-100 mb-1 tracking-widest uppercase text-caption">Database Storage at 85%</div>
+                                <div class="text-mono-400">Vector DB 'V-1536' requires scaling soon. Recommend adding 500GB volume.</div>
+                            </div>
+                        </li>
+                        <li class="flex gap-4 items-start p-4 border border-mono-800 bg-mono-900 group cursor-pointer hover:border-mono-600 transition-colors">
+                            <span class="text-mono-400 mt-1">i</span>
+                            <div>
+                                <div class="text-mono-100 mb-1 tracking-widest uppercase text-caption">Unused Agent Detected</div>
+                                <div class="text-mono-400">Agent 'TEMP_TESTER' has 0 invocations in 30 days. Consider terminating to save costs.</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+        </section>
+    </main>
+
+</body>
+</html>

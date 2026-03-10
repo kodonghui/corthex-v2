@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messenger | CORTHEX v2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        black: '#000000',
+                        gray: { 900: '#111111', 500: '#666666', 300: '#999999', 100: '#EEEEEE' },
+                        white: '#FFFFFF',
+                        status: { green: '#22c55e', red: '#ef4444' }
+                    },
+                    letterSpacing: { tighter: '-0.04em', tight: '-0.02em', normal: '0', wide: '0.02em', wider: '0.04em', widest: '0.1em' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: theme('colors.white');
+            color: theme('colors.black');
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+
+        ::selection {
+            background-color: theme('colors.black');
+            color: theme('colors.white');
+        }
+
+        .title-display {
+            font-size: 4rem;
+            line-height: 1;
+            font-weight: 800;
+            letter-spacing: theme('letterSpacing.tighter');
+        }
+
+        .title-1 {
+            font-size: 2.5rem;
+            line-height: 1.1;
+            font-weight: 700;
+            letter-spacing: theme('letterSpacing.tight');
+        }
+
+        .title-2 {
+            font-size: 1.5rem;
+            line-height: 1.2;
+            font-weight: 600;
+            letter-spacing: theme('letterSpacing.tight');
+        }
+
+        .title-3 {
+            font-size: 1.125rem;
+            line-height: 1.4;
+            font-weight: 600;
+        }
+
+        .body-base {
+            font-size: 0.9375rem;
+            line-height: 1.6;
+            font-weight: 400;
+            color: theme('colors.gray.900');
+        }
+
+        .body-small {
+            font-size: 0.8125rem;
+            line-height: 1.5;
+            font-weight: 400;
+            color: theme('colors.gray.500');
+        }
+
+        .label-mono {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: theme('letterSpacing.widest');
+            color: theme('colors.gray.300');
+        }
+    </style>
+</head>
+
+<body class="flex h-screen overflow-hidden">
+
+    <!-- Global Nav -->
+    <nav class="w-64 border-r border-gray-100 flex flex-col justify-between py-8 px-6 flex-shrink-0">
+        <div>
+            <div class="mb-16">
+                <span class="title-2 tracking-tighter">CORTHEX</span>
+                <span class="label-mono ml-2">v2</span>
+            </div>
+
+            <ul class="space-y-6">
+                <li><a href="home.html" class="body-base hover:text-gray-500 transition-colors">Home</a></li>
+                <li><a href="dashboard.html" class="body-base hover:text-gray-500 transition-colors">Dashboard</a></li>
+                <li><a href="command-center.html" class="body-base hover:text-gray-500 transition-colors">Command
+                        Center</a></li>
+                <li><a href="chat.html" class="body-base hover:text-gray-500 transition-colors">Chat</a></li>
+                <!-- Represents internal communications, potentially intertwined with chat but distinct for channels -->
+                <!-- GET /api/workspace/communications -->
+                <li class="pt-6 border-t border-gray-100 mt-6"><a href="messenger.html"
+                        class="title-3 font-medium transition-colors">Comms / Messengers</a></li>
+            </ul>
+        </div>
+        <div class="space-y-6">
+            <ul class="space-y-6 pb-6 border-b border-gray-100">
+                <li><a href="agents.html" class="body-small hover:text-black transition-colors">Agents</a></li>
+                <li><a href="knowledge.html" class="body-small hover:text-black transition-colors">Knowledge</a></li>
+                <li><a href="costs.html" class="body-small hover:text-black transition-colors">Costs</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Channels Sidebar -->
+    <aside class="w-80 border-r border-gray-100 flex flex-col bg-white flex-shrink-0">
+        <div class="p-8 border-b border-gray-100">
+            <h2 class="title-2 mb-6">Channels</h2>
+            <button
+                class="w-full border border-black text-black py-2 label-mono hover:bg-black hover:text-white transition-colors">+
+                NEW CHANNEL</button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-4 space-y-2">
+            <!-- GET /api/workspace/communications/channels -->
+            <div class="p-4 bg-gray-100 cursor-pointer">
+                <span class="label-mono text-black font-semibold"># general-alerts</span>
+            </div>
+            <div
+                class="p-4 hover:bg-gray-100 cursor-pointer transition-colors border border-transparent flex justify-between">
+                <span class="label-mono text-gray-500 font-semibold"># trading-desk</span>
+                <span class="w-2 h-2 rounded-full bg-status-red mt-1"></span>
+            </div>
+            <div class="p-4 hover:bg-gray-100 cursor-pointer transition-colors border border-transparent">
+                <span class="label-mono text-gray-500 font-semibold"># marketing-sync</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Chat Area -->
+    <main class="flex-1 flex flex-col h-full bg-white relative">
+
+        <header class="p-8 border-b border-gray-100 flex justify-between items-center bg-white z-10 w-full shrink-0">
+            <div>
+                <h2 class="title-2 mb-1"># general-alerts</h2>
+                <p class="body-base text-gray-500">System-wide notifications and high-level agent broadcasts.</p>
+            </div>
+            <div class="label-mono text-gray-300">8 Members (Human & Agent)</div>
+        </header>
+
+        <!-- Messages Area -->
+        <div class="flex-1 overflow-y-auto p-12 lg:px-24">
+
+            <!-- System Message -->
+            <div class="mb-12 border-l-2 border-black pl-6 py-2">
+                <div class="flex items-center space-x-3 mb-2">
+                    <span class="label-mono text-black font-bold">SYSTEM</span>
+                    <span class="label-mono text-gray-300">08:00 AM</span>
+                </div>
+                <div class="body-base text-gray-900">
+                    <p>Daily Knowledge DB Vectorization completed successfully. (Added: 1,204 docs, Removed: 12).</p>
+                </div>
+            </div>
+
+            <!-- Agent Broadcast Message -->
+            <div class="mb-12 max-w-2xl">
+                <div class="flex items-center space-x-3 mb-2">
+                    <span class="label-mono text-black">Chief Technology Officer</span>
+                    <span class="label-mono text-gray-300">09:15 AM</span>
+                </div>
+                <div class="body-base">
+                    <p>Alert: API Latency for external market data provider (Finch) has exceeded 500ms for the past 10
+                        minutes. Will monitor. Fallback to secondary provider invoked.</p>
+                </div>
+            </div>
+
+            <!-- Human Message -->
+            <div class="mb-12 max-w-2xl ml-auto text-right">
+                <div class="flex items-center justify-end space-x-3 mb-2">
+                    <span class="label-mono text-gray-300 text-right">09:20 AM</span>
+                    <span class="label-mono text-black text-right">DevOps Lead (Human)</span>
+                </div>
+                <div class="body-base text-gray-500">
+                    <p>Noted. I'll check the Finch dev dashboard to see if there's an ongoing incident.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Sticky Chat Input -->
+        <!-- POST /api/workspace/communications/channels/:id/messages -->
+        <div class="p-8 border-t border-gray-100 bg-white shrink-0">
+            <div class="max-w-4xl mx-auto flex flex-col relative">
+                <div class="relative flex items-center">
+                    <span class="absolute left-6 title-2 text-gray-300">#</span>
+                    <input type="text" placeholder="Message #general-alerts (Use @ to tag agents)..."
+                        class="w-full bg-gray-100 text-black py-4 pl-12 pr-32 body-base focus:outline-none focus:ring-1 focus:ring-black placeholder-gray-500 rounded-none transition-shadow">
+                    <button
+                        class="absolute right-4 text-black label-mono hover:text-gray-500 transition-colors font-bold tracking-widest">SEND</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+</body>
+
+</html>

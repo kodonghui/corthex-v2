@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORTHEX v2 - Performance Metrics</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['Roboto Mono', 'monospace'] },
+                    colors: {
+                        dark: { 50: '#1a1a2e', 100: '#151525', 200: '#11111e', 300: '#0d0d18', 400: '#0a0a0f', 900: '#050508' },
+                        accent: { purple: '#a855f7', cyan: '#22d3ee' }
+                    },
+                    backgroundImage: { 'gradient-accent': 'linear-gradient(to right, #a855f7, #22d3ee)' },
+                    boxShadow: { 'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.3)', 'glow': '0 0 20px rgba(168, 85, 247, 0.3), 0 0 40px rgba(34, 211, 238, 0.2)' }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer components {
+            body { @apply bg-dark-400 text-gray-200 font-sans antialiased font-light min-h-screen overflow-hidden flex selection:bg-accent-purple/30 selection:text-white; }
+            .bg-ambient { @apply fixed inset-0 z-[-1] pointer-events-none; }
+            .bg-ambient::before { content: ''; @apply absolute top-[-20%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-accent-purple/10 blur-[120px]; }
+            .bg-ambient::after { content: ''; @apply absolute bottom-[-20%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-accent-cyan/10 blur-[120px]; }
+            
+            .glass-panel { @apply bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] shadow-glass rounded-2xl overflow-hidden transition-all duration-300; }
+            
+            .nav-item { @apply flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/[0.05] transition-colors font-medium text-sm; }
+            .nav-item.active { @apply text-white bg-white/[0.08] shadow-[inset_2px_0_0_0_rgba(168,85,247,1)]; }
+            
+            .btn { @apply inline-flex items-center justify-center px-4 py-2 font-medium text-sm rounded-lg transition-all gap-2 cursor-pointer; }
+            .btn-primary { @apply bg-gradient-accent text-white hover:shadow-glow hover:opacity-90; }
+            .btn-secondary { @apply bg-white/[0.05] border border-white/[0.1] text-white hover:bg-white/[0.1]; }
+            
+            .text-gradient { @apply bg-gradient-accent bg-clip-text text-transparent; }
+            .num-bold { @apply font-semibold tracking-tight; }
+            
+            .scrollbar-hide::-webkit-scrollbar { display: none; }
+            .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-ambient"></div>
+
+    <aside class="w-64 border-r border-white/[0.08] bg-dark-300/50 backdrop-blur-xl flex flex-col h-full z-20 shrink-0">
+        <div class="h-16 flex items-center px-6 border-b border-white/[0.05]">
+            <h1 class="text-xl font-bold tracking-wider text-gradient">CORTHEX</h1>
+            <span class="ml-2 px-1.5 py-0.5 rounded text-[10px] font-medium bg-white/10 text-gray-300">v2</span>
+        </div>
+        <div class="flex-1 overflow-y-auto scrollbar-hide py-6 px-4 space-y-8">
+            <div class="space-y-1">
+                <a href="home.html" class="nav-item"><i data-lucide="home" class="w-4 h-4"></i> Home</a>
+                <a href="command-center.html" class="nav-item"><i data-lucide="terminal" class="w-4 h-4"></i> Command
+                    Center</a>
+                <a href="dashboard.html" class="nav-item"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                    Dashboard</a>
+            </div>
+
+            <div class="space-y-1">
+                <p class="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Systems</p>
+                <a href="activity-log.html" class="nav-item"><i data-lucide="activity-square" class="w-4 h-4"></i>
+                    Activity Log</a>
+                <a href="costs.html" class="nav-item"><i data-lucide="calculator" class="w-4 h-4"></i> Resource
+                    Costs</a>
+                <a href="performance.html" class="nav-item active"><i data-lucide="gauge" class="w-4 h-4"></i>
+                    Performance Metrics</a>
+                <a href="argos.html" class="nav-item"><i data-lucide="eye" class="w-4 h-4"></i> Argos Monitor</a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full relative z-10 overflow-hidden">
+
+        <header
+            class="h-16 flex items-center justify-between px-8 border-b border-white/[0.05] bg-dark-400/50 backdrop-blur shrink-0">
+            <div class="flex items-center gap-4">
+                <span class="text-sm font-medium text-gray-300"><i data-lucide="gauge"
+                        class="w-4 h-4 inline mr-2 text-emerald-400"></i>System Performance</span>
+                <span
+                    class="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">All
+                    Systems Operational</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <select
+                    class="bg-dark-300/80 border border-white/10 text-xs px-3 py-1.5 rounded-lg text-white appearance-none pr-8 cursor-pointer focus:outline-none focus:border-accent-purple/50">
+                    <option>Last 1 Hour</option>
+                    <option>Last 24 Hours</option>
+                    <option>Last 7 Days</option>
+                </select>
+                <div
+                    class="text-[10px] text-gray-500 flex items-center gap-2 border border-white/10 px-3 py-1.5 rounded-lg bg-dark-300">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Live
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-8 scrollbar-hide">
+            <div class="max-w-7xl mx-auto space-y-6">
+
+                <!-- KPI Gauges (API: GET /api/workspace/performance/metrics) -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="glass-panel p-5">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-wider mb-2 font-semibold">API Latency
+                            (p95)</p>
+                        <div class="flex items-end gap-2">
+                            <h3 class="text-3xl num-bold text-white">124<span
+                                    class="text-sm font-normal text-gray-500 ml-1">ms</span></h3>
+                        </div>
+                        <div class="w-full h-1 bg-dark-200 rounded-full overflow-hidden mt-3">
+                            <div class="h-full bg-emerald-400 rounded-full" style="width: 25%"></div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-5">
+                        <p
+                            class="text-[10px] text-gray-500 uppercase tracking-wider mb-2 font-semibold flex justify-between">
+                            LLM Response <span class="text-amber-400">Avg</span></p>
+                        <div class="flex items-end gap-2">
+                            <h3 class="text-3xl num-bold text-white">2.4<span
+                                    class="text-sm font-normal text-gray-500 ml-1">s</span></h3>
+                        </div>
+                        <div class="w-full h-1 bg-dark-200 rounded-full overflow-hidden mt-3">
+                            <div class="h-full bg-amber-400 rounded-full" style="width: 45%"></div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-5">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-wider mb-2 font-semibold">Worker CPU Load
+                        </p>
+                        <div class="flex items-end gap-2">
+                            <h3 class="text-3xl num-bold text-white">42<span
+                                    class="text-sm font-normal text-gray-500 ml-1">%</span></h3>
+                        </div>
+                        <div class="w-full h-1 bg-dark-200 rounded-full overflow-hidden mt-3">
+                            <div class="h-full bg-blue-400 rounded-full" style="width: 42%"></div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-5">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-wider mb-2 font-semibold">Memory Usage
+                        </p>
+                        <div class="flex items-end gap-2">
+                            <h3 class="text-3xl num-bold text-white">12.4<span
+                                    class="text-sm font-normal text-gray-500 ml-1">GB</span></h3>
+                        </div>
+                        <div class="w-full h-1 bg-dark-200 rounded-full overflow-hidden mt-3">
+                            <div class="h-full bg-accent-purple rounded-full" style="width: 78%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-6">
+                    <!-- Event Loop Latency Chart -->
+                    <div class="col-span-2 glass-panel p-6 flex flex-col">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-sm font-medium text-white">Gateway Requests & Latency</h3>
+                            <div class="flex items-center gap-3 text-[10px]">
+                                <span class="flex items-center gap-1 text-gray-400"><span
+                                        class="w-2 h-2 rounded-full bg-emerald-400"></span> Requests/sec</span>
+                                <span class="flex items-center gap-1 text-gray-400"><span
+                                        class="w-2 h-2 rounded-full bg-rose-400"></span> Latency (ms)</span>
+                            </div>
+                        </div>
+                        <div class="w-full h-64 relative">
+                            <canvas id="latencyChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Local Worker Nodes -->
+                    <div class="glass-panel p-6 flex flex-col">
+                        <h3 class="text-sm font-medium text-white mb-6">Executor Nodes</h3>
+
+                        <div class="space-y-4">
+                            <!-- Node 1 -->
+                            <div class="p-3 bg-dark-300/50 rounded-lg border border-white/5">
+                                <div class="flex justify-between items-center mb-2">
+                                    <div class="flex items-center gap-2">
+                                        <i data-lucide="server" class="w-4 h-4 text-gray-400"></i>
+                                        <span class="text-xs text-white font-medium">Worker-Alpha</span>
+                                    </div>
+                                    <span class="text-[10px] text-emerald-400">Healthy</span>
+                                </div>
+                                <div class="flex justify-between text-[10px] text-gray-500 mb-1">
+                                    <span>CPU: 45%</span>
+                                    <span>RAM: 4.2GB</span>
+                                </div>
+                                <div class="w-full h-1 bg-dark-200 rounded-full overflow-hidden">
+                                    <div class="h-full bg-emerald-400" style="width: 45%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Node 2 -->
+                            <div class="p-3 bg-dark-300/50 rounded-lg border border-white/5">
+                                <div class="flex justify-between items-center mb-2">
+                                    <div class="flex items-center gap-2">
+                                        <i data-lucide="server" class="w-4 h-4 text-gray-400"></i>
+                                        <span class="text-xs text-white font-medium">Worker-Beta</span>
+                                    </div>
+                                    <span class="text-[10px] text-amber-400">High Load</span>
+                                </div>
+                                <div class="flex justify-between text-[10px] text-gray-500 mb-1">
+                                    <span>CPU: 88%</span>
+                                    <span>RAM: 6.8GB</span>
+                                </div>
+                                <div class="w-full h-1 bg-dark-200 rounded-full overflow-hidden">
+                                    <div class="h-full bg-amber-400" style="width: 88%"></div>
+                                </div>
+                            </div>
+
+                            <!-- DB Node -->
+                            <div class="p-3 bg-dark-300/50 rounded-lg border border-white/5">
+                                <div class="flex justify-between items-center mb-2">
+                                    <div class="flex items-center gap-2">
+                                        <i data-lucide="database" class="w-4 h-4 text-accent-purple"></i>
+                                        <span class="text-xs text-white font-medium">VectorDB Primary</span>
+                                    </div>
+                                    <span class="text-[10px] text-emerald-400">Healthy</span>
+                                </div>
+                                <div class="flex justify-between text-[10px] text-gray-500 mb-1">
+                                    <span>IOPS: 420</span>
+                                    <span>Storage: 62%</span>
+                                </div>
+                                <div class="w-full h-1 bg-dark-200 rounded-full overflow-hidden">
+                                    <div class="h-full bg-accent-purple" style="width: 62%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+
+        // Chart.js Configuration for Latency
+        const ctx = document.getElementById('latencyChart').getContext('2d');
+
+        const labels = Array.from({ length: 60 }, (_, i) => `-${60 - i}m`);
+        const rpsData = Array.from({ length: 60 }, () => Math.floor(Math.random() * 50) + 10);
+        const latData = Array.from({ length: 60 }, () => Math.floor(Math.random() * 40) + 80);
+        // Spike
+        latData[45] = 250; latData[46] = 210; latData[47] = 150;
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Requests/sec',
+                        data: rpsData,
+                        borderColor: '#34d399',
+                        borderWidth: 2,
+                        yAxisID: 'y',
+                        tension: 0.3,
+                        pointRadius: 0
+                    },
+                    {
+                        label: 'Latency (ms)',
+                        data: latData,
+                        borderColor: '#fb7185',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        yAxisID: 'y1',
+                        tension: 0.3,
+                        pointRadius: 0
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                interaction: { mode: 'index', intersect: false },
+                scales: {
+                    x: { grid: { display: false }, ticks: { maxTicksLimit: 6, font: { size: 10 }, color: '#9ca3af' } },
+                    y: {
+                        type: 'linear', display: true, position: 'left',
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { color: '#34d399', font: { size: 10 } }
+                    },
+                    y1: {
+                        type: 'linear', display: true, position: 'right',
+                        grid: { drawOnChartArea: false },
+                        ticks: { color: '#fb7185', font: { size: 10 } }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
