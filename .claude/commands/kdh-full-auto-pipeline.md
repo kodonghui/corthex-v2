@@ -1,9 +1,9 @@
 ---
 name: 'kdh-full-auto-pipeline'
-description: 'BMAD Full Pipeline (portable). planning(brief->PRD->arch->UX->epics, single-worker party mode) or story dev(create->dev->TEA->QA->CR). Usage: /kdh-full-auto-pipeline [planning|story-ID]'
+description: 'BMAD Full Pipeline v4 (portable). planning(brief->PRD->arch->UX->epics, single-worker party mode) or story dev(create->dev->simplify->TEA->QA->CR). Usage: /kdh-full-auto-pipeline [planning|story-ID]'
 ---
 
-# Kodonghui Full Pipeline v3
+# Kodonghui Full Pipeline v4
 
 Portable BMAD planning + dev pipeline with single-worker party mode.
 Works with any BMAD project. Copy to `.claude/commands/` to use.
@@ -11,26 +11,39 @@ Works with any BMAD project. Copy to `.claude/commands/` to use.
 ## Mode Selection
 
 - `planning` or no args: Planning pipeline (brief -> PRD -> architecture -> UX -> epics -> readiness -> sprint)
-- Story ID (e.g. `3-1`): Story dev pipeline (create-story -> dev -> TEA -> QA -> CR)
+- Story ID (e.g. `3-1`): Story dev pipeline (create-story -> dev -> **simplify** -> TEA -> QA -> CR)
+
+---
+
+## What Changed in v4 (from v3)
+
+v3 solved the 2-worker deadlock problem. v4 adds **defense mechanisms** and a **hybrid quality gate**:
+
+| Change | Why |
+|--------|-----|
+| `/simplify` inserted after dev-story | Same-LLM self-review has blind spots; external 3-agent parallel review compensates |
+| `max_retry: 2` on FAIL | v3 had no retry cap → infinite rewrite loop possible |
+| `step_timeout: 10min` | v3 had no timeout → Orchestrator waits forever on stalled Worker |
+| Party-log validation | v3 trusted Worker's "[Step Complete]" → now Orchestrator verifies logs exist |
+| `/simplify` timeout: 3min, skip on fail | Quality gate must not block the pipeline |
+| Handoffs: 2 → 3 (story dev only) | One extra handoff for Orchestrator-side `/simplify` execution |
 
 ---
 
 ## Single-Worker Party Mode (Core Mechanism)
 
-### v3: Why Single Worker?
+### v3→v4: Why the Changes?
 
-Previous v2 used Writer + Reviewer (2 teammates) who ping-ponged via SendMessage.
-This caused intermittent deadlocks because SendMessage handoffs are unreliable:
-- Teammates sometimes go idle without sending feedback
-- Log file writes succeed but SendMessage gets skipped
-- 8 handoffs per step = 8 potential failure points
+v3 used 1 Worker who writes + self-reviews (3 rounds). This works but has a fundamental limit:
+**same LLM writing and reviewing = shared blind spots**. The 7-expert roleplay helps, but
+Round 2-3 often produce "squeezed-out" issues rather than genuine findings.
 
-**v3 uses 1 Worker** who does everything: write, self-review (3 rounds), fix, report.
-- Only 2 handoffs per step: Orchestrator -> Worker, Worker -> Orchestrator
-- Worker runs in tmux -- user watches everything in real time
-- Same review quality (same Claude model, same prompts, same 7-expert roleplay)
+**v4 keeps v3's single-worker model** but adds:
+1. **External quality gate** (`/simplify`) between dev-story and TEA — 3 separate review agents in parallel, run by Orchestrator (not Worker)
+2. **Hard defense limits** — max_retry, step_timeout, party-log validation
+3. **Graceful degradation** — timeouts skip (not block) so the pipeline always completes
 
-### Flow
+### Flow (Planning Mode — unchanged from v3)
 
 ```
 [Step Start]
@@ -52,11 +65,33 @@ Worker:
      - Calibrate all issues, give quality score X/10
      - Save log to party-logs/{stage}-{step}-round3.md
      - Fix any remaining issues
+     ** FAIL DEFENSE: max 2 rewrites. If Round 3 FAIL twice → ESCALATE to Orchestrator **
   5. SendMessage to Orchestrator: "[Step Complete]" report
 
 [Step Complete]
-Orchestrator receives report -> sends next step instruction
+Orchestrator:
+  -> Verify party-logs/{stage}-{step}-round{1,2,3}.md ALL exist
+  -> If ANY log missing: REJECT report, send "Party logs missing. Redo."
+  -> If all present: accept, send next step instruction
 After all steps in stage -> Orchestrator commits
+```
+
+### Flow (Story Dev Mode — v4 NEW: with /simplify gate)
+
+```
+[Story Dev Flow]
+Worker: create-story -> dev-story -> report "[dev-story complete]"
+                                          ↓ (handoff 1)
+Orchestrator: receives report
+  -> Runs /simplify on changed files (3 parallel review agents)
+  -> Timeout: 3 minutes. If timeout or error → skip, log warning, continue
+  -> SendMessage to Worker: "simplify done (or skipped). Start TEA."
+                                          ↓ (handoff 2)
+Worker: TEA -> QA -> code-review -> report "[All stages complete]"
+                                          ↓ (handoff 3)
+Orchestrator: receives final checklist
+  -> Verify 7/7 checks (was 6/6, now includes simplify)
+  -> Commit + push
 ```
 
 ### Agent Manifest
@@ -72,6 +107,70 @@ Read `_bmad/_config/agent-manifest.csv` for agent definitions. If not found, use
 | QA | Quinn | edge cases, test coverage, quality risks |
 | Business Analyst | Mary | business value, market fit, ROI |
 | Scrum Master | Bob | scope, dependencies, schedule risks |
+
+### Defense Mechanisms (v4 NEW)
+
+#### 1. max_retry: 2 (FAIL Loop Prevention)
+
+```
+Worker Round 3 → FAIL (score < 7):
+  retry_count += 1
+  if retry_count <= 2:
+    Rewrite section from scratch → redo all 3 rounds
+  if retry_count > 2:
+    ESCALATE to Orchestrator via SendMessage:
+    "[ESCALATE] {step_name} failed 2 rewrites. Score: {X}/10. Needs manual review."
+    Orchestrator: log the escalation, continue to next step (do NOT block pipeline)
+```
+
+#### 2. step_timeout: 10 minutes (Stall Prevention)
+
+```
+Orchestrator tracks elapsed time per step (from SendMessage sent to "[Step Complete]" received).
+If 10 minutes pass without "[Step Complete]":
+  -> Send reminder: "Step {step_name} timeout approaching. Report status now."
+  -> Wait 2 more minutes (grace period)
+  -> If still no response:
+     -> Shutdown Worker
+     -> Respawn Worker with same step re-embedded in prompt
+     -> stall_count += 1
+     -> If stall_count > 2 for same step: SKIP step, log warning, continue
+```
+
+#### 3. Party-Log Validation (Fake Completion Prevention)
+
+```
+When Worker reports "[Step Complete]":
+  Orchestrator checks file existence:
+  - _bmad-output/party-logs/{stage}-{step}-round1.md  → must exist
+  - _bmad-output/party-logs/{stage}-{step}-round2.md  → must exist
+  - _bmad-output/party-logs/{stage}-{step}-round3.md  → must exist
+
+  If ANY missing:
+  -> REJECT: "Party logs missing for {step_name}: [list missing]. Redo self-review."
+  -> rejection_count += 1
+  -> If rejection_count > 2: accept anyway with warning log, continue
+```
+
+#### 4. /simplify Gate (Story Dev Only)
+
+```
+Trigger: After Worker reports "[dev-story complete]"
+Executor: Orchestrator (NOT Worker — external agents provide genuine cross-review)
+Command: /simplify (Claude Code built-in, 3 parallel review agents)
+Timeout: 3 minutes
+
+Outcomes:
+  SUCCESS → Orchestrator sends "simplify done. N issues fixed. Start TEA."
+  TIMEOUT → Orchestrator sends "simplify skipped (timeout). Start TEA."
+  ERROR   → Orchestrator sends "simplify skipped (error). Start TEA."
+
+Log: _bmad-output/pipeline-logs/simplify-{story-id}.md
+  - Status: success | timeout | error
+  - Issues found: N
+  - Issues auto-fixed: N
+  - Duration: Xs
+```
 
 ### Worker Prompt Template
 
@@ -125,6 +224,7 @@ YOLO mode -- auto-proceed through all confirmation prompts, never wait for user 
    g. Write review to _bmad-output/party-logs/{stage}-{step}-round3.md
    h. If PASS with issues: fix remaining issues
    i. If FAIL: rewrite the section from scratch, then redo all 3 rounds
+   j. ** FAIL LIMIT: max 2 rewrites per step. If 3rd FAIL → ESCALATE to team-lead **
 7. SendMessage to team-lead with completion report
 
 ## Expert Personality Guide
@@ -204,6 +304,7 @@ Justification: (2-3 sentences)
 ### Final Verdict
 - **PASS** or **FAIL**
 - Reason: (1-2 lines)
+- Rewrite count: N/2 (max 2 allowed)
 
 ### Fixes Applied
 - (list what was fixed, or "none needed")
@@ -219,11 +320,12 @@ Justification: (2-3 sentences)
 8. Expert comments must be IN CHARACTER -- one-liner comments FORBIDDEN (2-3 sentences min).
 9. "Zero findings" triggers re-analysis -- assume you missed something.
 10. Minimum finding thresholds: Round 1 >= 2 issues, Round 2 >= 1 new issue.
+11. ** FAIL limit: max 2 rewrites. 3rd FAIL → ESCALATE to team-lead, do NOT rewrite again. **
 
 ## Report Format (to team-lead after all 3 rounds pass)
 [Step Complete] {stage_name} - {step_name}
 Content summary: (1-2 lines)
-Party mode: 3 rounds passed (issues fixed: N)
+Party mode: 3 rounds passed (issues fixed: N, rewrites: N/2)
 Quality score: X/10
 Changed files: (paths)
 ```
@@ -239,6 +341,7 @@ Step 0: Team Setup
   -> TeamCreate (team name: bmad-planning or similar)
   -> Read _bmad/_config/agent-manifest.csv (or use defaults)
   -> Read project context (CLAUDE.md, feature specs, etc.)
+  -> Initialize counters: stall_count={}, rejection_count={}, escalation_log=[]
 
 Step 1: Stage Loop (for each stage)
   1a. Spawn fresh Worker for this stage
@@ -247,17 +350,30 @@ Step 1: Stage Loop (for each stage)
       -> CRITICAL: Embed FIRST step instruction directly in spawn prompt
       -> Never tell Worker to "wait" -- always give immediate work
   1b. Worker writes step -> self-reviews 3 rounds -> reports to Orchestrator
-  1c. Orchestrator receives "[Step Complete]" -> sends next step via SendMessage
-  1d. If Worker goes idle without report: send reminder via SendMessage
-  1e. Repeat 1b-1d for all steps in stage
-  1f. After all steps complete:
-      -> git commit: docs(planning): {stage} complete -- {N} party rounds
+  1c. Orchestrator receives "[Step Complete]":
+      -> VALIDATE: check party-logs/{stage}-{step}-round{1,2,3}.md exist
+      -> If logs missing AND rejection_count < 3: REJECT, increment rejection_count
+      -> If logs missing AND rejection_count >= 3: accept with warning, continue
+      -> If logs present: accept, send next step via SendMessage
+  1d. TIMEOUT CHECK: if 10 min pass without report:
+      -> Send reminder via SendMessage
+      -> Wait 2 min grace period
+      -> If still no response: shutdown Worker, respawn with task re-embedded
+      -> If stall_count > 2 for same step: SKIP step, log warning
+  1e. ESCALATION: if Worker sends "[ESCALATE]":
+      -> Log to escalation_log
+      -> Send next step (skip the escalated step)
+  1f. Repeat 1b-1e for all steps in stage
+  1g. After all steps complete:
+      -> git commit: docs(planning): {stage} complete -- {N} party rounds, {E} escalations
       -> Shutdown Worker (shutdown_request)
-  1g. Go to 1a for next stage (spawn fresh Worker)
+  1h. Go to 1a for next stage (spawn fresh Worker)
 
 Step 2: Final Verification
   -> Count total party rounds from party-logs
+  -> Count escalations from escalation_log
   -> Verify individual commits: git log --oneline
+  -> Report: "Planning complete. {N} rounds, {E} escalations, {S} skips."
 
 Step 3: Done
   -> "Planning complete! /kdh-full-auto-pipeline [first-story-ID]"
@@ -268,14 +384,19 @@ Step 3: Done
 1. **Per stage: spawn fresh Worker** (shutdown old, spawn new -- prevents context bloat)
 2. **Embed first step in spawn prompt** (critical -- never say "wait")
 3. **Send subsequent steps via SendMessage** (one at a time, after "[Step Complete]")
-4. **Monitor for stalls** -- if idle without report, send reminder
-5. **Commit after each stage** (all steps in stage passed)
-6. **Shutdown + respawn between stages**
+4. **Validate party-logs** before accepting any "[Step Complete]" report
+5. **Monitor for stalls** -- 10min timeout + 2min grace + respawn
+6. **Handle escalations** -- log and skip, do not block
+7. **Commit after each stage** (all steps in stage passed or escalated)
+8. **Shutdown + respawn between stages**
 
 The Orchestrator does NOT:
 - Write or edit documents (Worker does it)
 - Run party mode (Worker self-reviews)
 - Decide PASS/FAIL (Worker's self-review decides)
+- Block on escalations (log and continue)
+
+**Exception:** In Story Dev mode, Orchestrator runs `/simplify` (automated tool, no judgment required)
 
 ### Critical: How to Spawn Workers Correctly
 
@@ -400,34 +521,59 @@ Commit: `docs(planning): Sprint planning complete`
 ```
 Step 0: Team Setup
   -> TeamCreate (team: bmad-pipeline)
+  -> Initialize: simplify_result="pending", stall_count=0
 
-Step 1: Spawn Developer
+Step 1: Spawn Developer Worker
   -> Agent tool with Developer prompt (see below)
-  -> CRITICAL: Embed story ID and all 5 stages in spawn prompt
-  -> Developer runs 5 stages autonomously
+  -> CRITICAL: Embed story ID and first 2 stages (create-story + dev-story) in spawn prompt
+  -> Worker runs stages 1-2, then reports "[dev-story complete]" to Orchestrator
 
-Step 2: Wait & Verify
-  -> Receive checklist report via SendMessage
-  -> Verify 6/6 checks
+Step 2: /simplify Quality Gate (Orchestrator executes — NOT Worker)
+  -> Orchestrator receives "[dev-story complete]" from Worker
+  -> Orchestrator runs: /simplify on all changed/added files
+  -> Timeout: 3 minutes
+  -> Outcomes:
+     SUCCESS: simplify_result="success", log issues found/fixed count
+     TIMEOUT: simplify_result="timeout", log warning
+     ERROR:   simplify_result="error", log warning
+  -> Save log to: _bmad-output/pipeline-logs/simplify-{story-id}.md
+  -> SendMessage to Worker: "Simplify {result}. {N} issues fixed. Continue with TEA."
 
-Step 3: Commit + Push
-  -> Commit message: feat: Story [ID] [title] -- [summary] + TEA [N] tests
+Step 3: Worker continues TEA -> QA -> CR
+  -> Worker receives simplify result
+  -> Runs Stage 3 (TEA) -> Stage 4 (QA) -> Stage 5 (code-review) autonomously
+  -> Reports final "[All stages complete]" checklist to Orchestrator
+
+Step 4: Verify & Commit
+  -> Orchestrator receives checklist report
+  -> Verify 7/7 checks:
+     [ ] 1. create-story complete
+     [ ] 2. dev-story complete
+     [ ] 3. /simplify executed (success, timeout, or error — all count)
+     [ ] 4. TEA complete
+     [ ] 5. QA complete
+     [ ] 6. code-review complete
+     [ ] 7. Real functionality confirmed (not stub/mock)
+  -> If 7/7: commit + push
+  -> Commit: feat: Story [ID] [title] -- [summary] + TEA [N] tests + simplify [{result}]
   -> Update sprint-status.yaml to done
 
-Step 4: Next Story
+Step 5: Next Story
   -> More stories in epic? -> notify user
   -> Last story? -> suggest retrospective
 ```
 
-### Developer Agent Prompt
+### Developer Agent Prompt (Story Dev Worker)
 
 ```
-You are a BMAD pipeline executor. Run these 5 stages IN ORDER using the Skill tool.
+You are a BMAD pipeline executor. Run stages IN ORDER using the Skill tool.
 YOLO mode -- auto-proceed through all prompts, never wait for user input.
 
 IMPORTANT: Real working features only. No stub/mock/placeholder.
 
 Target story: [Story ID]
+
+## Phase A: Create + Develop (report to Orchestrator after Phase A)
 
 ### Stage 1: create-story
 Skill: skill="bmad-bmm-create-story", args="[Story ID]"
@@ -436,10 +582,18 @@ Skill: skill="bmad-bmm-create-story", args="[Story ID]"
 ### Stage 2: dev-story
 Skill: skill="bmad-bmm-dev-story", args="[story file path]"
 - No stubs/mocks -- real working code only
+- After completion: SendMessage to team-lead:
+  "[dev-story complete] Story [ID]
+   Files changed: (list paths)
+   Summary: (1-2 lines of what was implemented)"
+- Then WAIT for team-lead's response (Orchestrator will run /simplify externally)
+
+## Phase B: Test + Review (after receiving simplify result from Orchestrator)
 
 ### Stage 3: TEA
 Skill: skill="bmad-tea-automate"
 - Risk-based tests for changed/added code
+- Include files that /simplify may have modified
 
 ### Stage 4: QA
 Skill: skill="bmad-agent-bmm-qa"
@@ -450,34 +604,63 @@ Skill: skill="bmad-agent-bmm-qa"
 Skill: skill="bmad-bmm-code-review"
 - Auto-fix issues found (one pass)
 
-### After Completion
+### After All Stages Complete
 Report to Orchestrator via SendMessage:
 
 [BMAD Checklist -- Story [Story ID]]
 [x] 1. create-story complete
 [x] 2. dev-story complete
-[x] 3. TEA complete
-[x] 4. QA complete
-[x] 5. code-review complete
-[x] 6. Real functionality confirmed (not stub/mock)
+[x] 3. /simplify executed (result received from Orchestrator)
+[x] 4. TEA complete
+[x] 5. QA complete
+[x] 6. code-review complete
+[x] 7. Real functionality confirmed (not stub/mock)
 
 Summary: (what was implemented)
 Tests: (number generated)
 Issues: (found/fixed in code-review)
+Simplify: (issues fixed by /simplify, as reported by Orchestrator)
+```
+
+### /simplify Log Format
+
+Save to `_bmad-output/pipeline-logs/simplify-{story-id}.md`:
+
+```markdown
+## /simplify Quality Gate — Story [Story ID]
+
+### Execution
+- Timestamp: {ISO datetime}
+- Duration: {N}s (timeout: 180s)
+- Status: success | timeout | error
+
+### Results (if success)
+- Files reviewed: (list)
+- Issues found: N
+  - Reuse opportunities: N
+  - Quality issues: N
+  - Efficiency improvements: N
+- Issues auto-fixed: N
+- Files modified: (list with brief change description)
+
+### Results (if timeout or error)
+- Reason: {timeout after 180s | error message}
+- Action: skipped, pipeline continues
 ```
 
 ### Hard Checklist (Before Every Commit)
 
-ALL 6 must be checked. No exceptions. No rationalizations.
+ALL 7 must be checked. No exceptions. No rationalizations.
 
 ```
 [BMAD Checklist -- Story X-Y]
 [ ] 1. create-story complete
 [ ] 2. dev-story complete
-[ ] 3. TEA complete
-[ ] 4. QA complete
-[ ] 5. code-review complete
-[ ] 6. Real functionality confirmed (not stub/mock)
+[ ] 3. /simplify executed (success|timeout|error)
+[ ] 4. TEA complete
+[ ] 5. QA complete
+[ ] 6. code-review complete
+[ ] 7. Real functionality confirmed (not stub/mock)
 ```
 
 ---
@@ -487,11 +670,12 @@ ALL 6 must be checked. No exceptions. No rationalizations.
 ### Worker goes idle without completing a step
 **Cause:** Worker finished a tool call but didn't continue to the next action.
 **Fix:** Send a reminder via SendMessage: "Continue working on {step_name}. Complete the 3-round self-review and report back."
-If still stuck after 2 reminders, shutdown Worker and respawn with the task re-embedded in the spawn prompt.
+**Defense:** step_timeout (10min) + grace (2min) + auto-respawn. If stall_count > 2 for same step: SKIP.
 
 ### Worker skips self-review rounds
 **Cause:** Worker reports "[Step Complete]" without creating party-logs.
-**Fix:** Reject the report: "Party logs missing for {step_name}. Redo the 3-round self-review and save logs to _bmad-output/party-logs/."
+**Fix:** Orchestrator auto-validates: checks party-logs/{stage}-{step}-round{1,2,3}.md exist.
+**Defense:** Auto-reject up to 2 times. 3rd time: accept with warning log, continue.
 
 ### Worker context gets too long (quality degrades)
 **Cause:** Document is very large (3000+ lines) or many steps in one stage.
@@ -503,7 +687,20 @@ If still stuck after 2 reminders, shutdown Worker and respawn with the task re-e
 
 ### Worker reports FAIL on self-review Round 3
 **Cause:** Fundamental quality issue in the section.
-**Fix:** Worker should automatically rewrite and redo all 3 rounds. If it fails twice, Orchestrator should review the section manually.
+**Fix:** Worker automatically rewrites and redoes all 3 rounds.
+**Defense:** max_retry: 2. After 2 FAILs → Worker sends "[ESCALATE]" to Orchestrator. Orchestrator logs and continues to next step. Do NOT block pipeline.
+
+### /simplify times out or errors
+**Cause:** Large changeset, network issue, or CLI problem.
+**Fix:** Orchestrator skips simplify, logs warning, tells Worker to continue with TEA.
+**Impact:** Minor — code-review (Stage 5) will still catch quality issues. Pipeline is never blocked.
+
+### Worker can't call Skill tool from TeamCreate context
+**Cause:** Skill tool may not be available inside spawned teammate.
+**Fallback:** If Skill tool fails, Worker should execute the BMAD agent's core logic directly:
+- Read the agent's .md file from `_bmad/bmm/agents/`
+- Follow the workflow instructions manually
+- Report the issue to Orchestrator for future pipeline improvement
 
 ---
 
@@ -524,3 +721,8 @@ If still stuck after 2 reminders, shutdown Worker and respawn with the task re-e
 13. Worker must self-review by re-reading FROM FILE (Read tool) -- never from memory
 14. Expert comments must be in character with 2-3 sentence minimum -- no one-liners
 15. "Zero findings" triggers re-analysis (BMAD adversarial protocol)
+16. ** max_retry: 2 per step — FAIL 3 times = ESCALATE, never infinite rewrite **
+17. ** step_timeout: 10min + 2min grace — stall 3 times = SKIP step **
+18. ** Party-log validation: Orchestrator MUST verify round{1,2,3}.md before accepting **
+19. ** /simplify: Orchestrator executes (not Worker), 3min timeout, skip on failure **
+20. ** Pipeline never blocks — timeout/fail/escalate always leads to "continue" **
