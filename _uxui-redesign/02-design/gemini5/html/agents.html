@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORTHEX v2 - Agents Organization</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"
+        rel="stylesheet" crossorigin="anonymous">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mono: {
+                            900: '#000000',
+                            800: '#111111',
+                            500: '#666666',
+                            400: '#999999',
+                            100: '#eeeeee',
+                            50: '#ffffff',
+                        },
+                        status: {
+                            red: '#ff3b30',
+                            green: '#34c759'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Satoshi', 'Pretendard', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+                    },
+                    fontSize: {
+                        'hero': ['4rem', { lineHeight: '1', letterSpacing: '-0.05em', fontWeight: '900' }],
+                        'display': ['2.5rem', { lineHeight: '1.1', letterSpacing: '-0.04em', fontWeight: '800' }],
+                        'h1': ['2rem', { lineHeight: '1.2', letterSpacing: '-0.03em', fontWeight: '700' }],
+                        'h2': ['1.5rem', { lineHeight: '1.3', letterSpacing: '-0.02em', fontWeight: '600' }],
+                        'h3': ['1.25rem', { lineHeight: '1.4', letterSpacing: '-0.01em', fontWeight: '600' }],
+                        'body-l': ['1.125rem', { lineHeight: '1.6', letterSpacing: '0', fontWeight: '500' }],
+                        'body': ['1rem', { lineHeight: '1.6', letterSpacing: '0', fontWeight: '400' }],
+                        'body-s': ['0.875rem', { lineHeight: '1.5', letterSpacing: '0.01em', fontWeight: '400' }],
+                        'caption': ['0.75rem', { lineHeight: '1.4', letterSpacing: '0.05em', fontWeight: '500' }],
+                    },
+                    spacing: {
+                        'section': '8rem',
+                        'block': '4rem',
+                        'item': '2rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .org-line {
+            position: relative;
+        }
+
+        .org-line::before {
+            content: '';
+            position: absolute;
+            left: -2rem;
+            top: 2.5rem;
+            bottom: -2rem;
+            width: 1px;
+            background-color: #333;
+            z-index: 0;
+        }
+
+        .org-item {
+            position: relative;
+        }
+
+        .org-item::before {
+            content: '';
+            position: absolute;
+            left: -2rem;
+            top: 1.25rem;
+            width: 1.5rem;
+            height: 1px;
+            background-color: #333;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen">
+
+    <nav class="flex justify-between items-center px-16 py-8 border-b border-mono-800 sticky top-0 bg-mono-900 z-50">
+        <a href="home.html" class="text-h2 font-bold tracking-tighter">CORTHEX</a>
+        <div class="flex gap-8 text-body-s font-medium">
+            <!-- API: N/A - Sub Navigation -->
+            <a href="home.html" class="text-mono-500 hover:text-mono-50 transition-colors">Home</a>
+            <a href="command-center.html" class="text-mono-500 hover:text-mono-50 transition-colors">Command Center</a>
+        </div>
+        <div class="text-mono-600 text-caption font-mono uppercase tracking-widest">
+            <!-- API: GET /api/workspace/agents (count) -->
+            Active Units: <span class="text-mono-100 font-bold ml-2">12</span>
+        </div>
+    </nav>
+
+    <main class="px-16 py-16 lg:px-32 max-w-[1400px] mx-auto pb-32">
+
+        <header class="mb-section pt-16 flex justify-between items-end border-b border-mono-800 pb-16">
+            <div>
+                <div class="text-mono-400 text-caption font-mono uppercase tracking-widest mb-6">Workspace Map</div>
+                <h1 class="text-hero leading-tight tracking-tighter">Agents<br>Organization</h1>
+            </div>
+
+            <div class="flex gap-8">
+                <a href="departments.html"
+                    class="text-h3 font-medium text-mono-500 hover:text-mono-100 transition-colors underline decoration-mono-800 underline-offset-8">Departments</a>
+                <!-- API: GET /api/workspace/agents -->
+                <a href="#"
+                    class="text-h3 font-medium text-mono-50 line-through decoration-mono-50 transition-colors">Agents</a>
+            </div>
+        </header>
+
+        <!-- API: GET /api/workspace/departments (with agents included) -->
+        <div class="space-y-section">
+
+            <!-- System Command -->
+            <section>
+                <h2
+                    class="text-mono-600 text-h3 tracking-widest uppercase mb-12 font-mono border-b border-mono-800/50 pb-4 inline-block">
+                    SYSTEM COMMAND</h2>
+
+                <!-- Agent Item -->
+                <div
+                    class="flex items-center gap-16 group cursor-pointer lg:w-3/4 hover:bg-mono-900 transition-colors -mx-8 px-8 py-4">
+                    <div class="w-1/3">
+                        <h3
+                            class="text-display font-medium text-mono-100 tracking-tighter group-hover:underline decoration-mono-500 underline-offset-8">
+                            김대표 (You)</h3>
+                        <p class="text-mono-500 text-caption font-mono uppercase tracking-widest mt-2">HUMAN / CEO</p>
+                    </div>
+                    <div class="w-1/3 font-mono text-caption text-mono-500 space-y-2">
+                        <div class="flex justify-between border-b border-mono-800/50 pb-1">
+                            <span>AUTHORITY</span>
+                            <span class="text-mono-100">ROOT LEVEL 0</span>
+                        </div>
+                        <div class="flex justify-between pt-1">
+                            <span>STATUS</span>
+                            <span class="text-status-green flex gap-2 items-center"><span
+                                    class="w-1.5 h-1.5 bg-status-green rounded-full"></span>ONLINE</span>
+                        </div>
+                    </div>
+                    <!-- API: GET /api/workspace/agents/:id/stats -->
+                    <div class="w-1/3 text-right">
+                        <span
+                            class="text-mono-800 text-display font-bold group-hover:text-mono-600 transition-colors tracking-tighter">00</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Secretariat Dept -->
+            <section class="org-line pl-8 border-l border-mono-800/30">
+                <h2 class="text-mono-600 text-h3 tracking-widest uppercase mb-12 font-mono flex items-center gap-4">
+                    <span>DEPT: SECRETARIAT</span>
+                    <span class="bg-mono-800 text-mono-400 text-[10px] px-2 py-0.5 rounded-sm">1 AGENT</span>
+                </h2>
+
+                <!-- Agent Item -->
+                <div
+                    class="org-item flex items-center gap-16 group cursor-pointer lg:w-3/4 hover:bg-mono-900 transition-colors -mx-8 px-8 py-4 ml-8">
+                    <div class="w-1/3">
+                        <h3
+                            class="text-h1 font-bold text-mono-100 tracking-tight group-hover:underline decoration-mono-500 underline-offset-8">
+                            비서실장</h3>
+                        <p class="text-mono-500 text-caption font-mono uppercase tracking-widest mt-2">SYS-ADMIN /
+                            CLAUDE 3.5 SONNET</p>
+                    </div>
+                    <div class="w-1/3 font-mono text-caption text-mono-500 space-y-2">
+                        <div class="flex justify-between border-b border-mono-800/50 pb-1">
+                            <span>COST YTD</span>
+                            <span class="text-mono-100">$245.20</span>
+                        </div>
+                        <div class="flex justify-between pt-1">
+                            <span>STATUS</span>
+                            <span class="text-mono-500 flex gap-2 items-center"><span
+                                    class="w-1.5 h-1.5 bg-mono-500 rounded-sm"></span>IDLE</span>
+                        </div>
+                    </div>
+                    <div class="w-1/3 text-right">
+                        <span
+                            class="text-mono-800 text-display font-bold group-hover:text-mono-600 transition-colors tracking-tighter">01</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Strategy Dept -->
+            <section class="org-line pl-8 border-l border-mono-800/30">
+                <h2 class="text-mono-600 text-h3 tracking-widest uppercase mb-12 font-mono flex items-center gap-4">
+                    <span>DEPT: STRATEGY</span>
+                    <span class="bg-mono-800 text-mono-400 text-[10px] px-2 py-0.5 rounded-sm">2 AGENTS</span>
+                </h2>
+
+                <div class="space-y-4">
+                    <!-- Agent Item -->
+                    <div
+                        class="org-item flex items-center gap-16 group cursor-pointer lg:w-3/4 hover:bg-mono-900 transition-colors -mx-8 px-8 py-4 ml-8">
+                        <div class="w-1/3">
+                            <h3
+                                class="text-h1 font-bold text-mono-100 tracking-tight group-hover:underline decoration-mono-500 underline-offset-8">
+                                CIO</h3>
+                            <p class="text-mono-500 text-caption font-mono uppercase tracking-widest mt-2">MANAGER /
+                                GPT-4O</p>
+                        </div>
+                        <div class="w-1/3 font-mono text-caption text-mono-500 space-y-2">
+                            <div class="flex justify-between border-b border-mono-800/50 pb-1">
+                                <span>COST YTD</span>
+                                <span class="text-mono-100">$184.50</span>
+                            </div>
+                            <div class="flex justify-between pt-1">
+                                <span>STATUS</span>
+                                <span class="text-mono-500 flex gap-2 items-center"><span
+                                        class="w-1.5 h-1.5 bg-mono-500 rounded-sm"></span>IDLE</span>
+                            </div>
+                        </div>
+                        <div class="w-1/3 text-right">
+                            <span
+                                class="text-mono-800 text-display font-bold group-hover:text-mono-600 transition-colors tracking-tighter">02</span>
+                        </div>
+                    </div>
+
+                    <!-- Agent Item -->
+                    <div
+                        class="org-item flex items-center gap-16 group cursor-pointer lg:w-3/4 hover:bg-mono-900 transition-colors -mx-8 px-8 py-4 ml-8">
+                        <div class="w-1/3">
+                            <h3
+                                class="text-h1 font-bold text-mono-100 tracking-tight opacity-70 group-hover:opacity-100 group-hover:underline decoration-mono-500 underline-offset-8">
+                                종목분석가</h3>
+                            <p class="text-mono-500 text-caption font-mono uppercase tracking-widest mt-2">SPECIALIST /
+                                CLAUDE 3 HAIKU</p>
+                        </div>
+                        <div class="w-1/3 font-mono text-caption text-mono-500 space-y-2">
+                            <div class="flex justify-between border-b border-mono-800/50 pb-1">
+                                <span>COST YTD</span>
+                                <span class="text-mono-100">$42.80</span>
+                            </div>
+                            <div class="flex justify-between pt-1">
+                                <span>STATUS</span>
+                                <span class="text-mono-100 flex gap-2 items-center"><span
+                                        class="w-1.5 h-1.5 bg-mono-100 rounded-sm animate-pulse"></span>WORKING
+                                    (TX-902)</span>
+                            </div>
+                        </div>
+                        <div class="w-1/3 text-right">
+                            <span
+                                class="text-mono-800 text-display font-bold group-hover:text-mono-600 transition-colors tracking-tighter">03</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Marketing Dept -->
+            <section class="org-line pl-8 border-l border-mono-800/30">
+                <h2 class="text-mono-600 text-h3 tracking-widest uppercase mb-12 font-mono flex items-center gap-4">
+                    <span>DEPT: MARKETING</span>
+                    <span class="bg-mono-800 text-mono-400 text-[10px] px-2 py-0.5 rounded-sm">1 AGENT</span>
+                </h2>
+
+                <div class="space-y-4">
+                    <!-- Agent Item -->
+                    <div
+                        class="org-item flex items-center gap-16 group cursor-pointer lg:w-3/4 hover:bg-mono-900 transition-colors -mx-8 px-8 py-4 ml-8">
+                        <div class="w-1/3">
+                            <h3
+                                class="text-h1 font-bold text-mono-100 tracking-tight group-hover:underline decoration-mono-500 underline-offset-8">
+                                SNS 콘텐츠 전문가</h3>
+                            <p class="text-mono-500 text-caption font-mono uppercase tracking-widest mt-2">SPECIALIST /
+                                GPT-4O</p>
+                        </div>
+                        <div class="w-1/3 font-mono text-caption text-mono-500 space-y-2">
+                            <div class="flex justify-between border-b border-mono-800/50 pb-1">
+                                <span>COST YTD</span>
+                                <span class="text-mono-100">$84.20</span>
+                            </div>
+                            <div class="flex justify-between pt-1">
+                                <span>STATUS</span>
+                                <span class="text-mono-500 flex gap-2 items-center"><span
+                                        class="w-1.5 h-1.5 bg-mono-500 rounded-sm"></span>IDLE</span>
+                            </div>
+                        </div>
+                        <div class="w-1/3 text-right">
+                            <span
+                                class="text-mono-800 text-display font-bold group-hover:text-mono-600 transition-colors tracking-tighter">04</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

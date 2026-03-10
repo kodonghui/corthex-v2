@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORTHEX v2 - Nexus Briefing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"
+        rel="stylesheet" crossorigin="anonymous">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mono: {
+                            900: '#000000',
+                            800: '#111111',
+                            500: '#666666',
+                            400: '#999999',
+                            100: '#eeeeee',
+                            50: '#ffffff',
+                        },
+                        status: {
+                            red: '#ff3b30',
+                            green: '#34c759'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Satoshi', 'Pretendard', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+                        serif: ['ui-serif', 'Georgia', 'Cambria', 'Times New Roman', 'Times', 'serif'],
+                    },
+                    fontSize: {
+                        'hero': ['4rem', { lineHeight: '1', letterSpacing: '-0.05em', fontWeight: '900' }],
+                        'display': ['2.5rem', { lineHeight: '1.1', letterSpacing: '-0.04em', fontWeight: '800' }],
+                        'h1': ['2rem', { lineHeight: '1.2', letterSpacing: '-0.03em', fontWeight: '700' }],
+                        'h2': ['1.5rem', { lineHeight: '1.3', letterSpacing: '-0.02em', fontWeight: '600' }],
+                        'h3': ['1.25rem', { lineHeight: '1.4', letterSpacing: '-0.01em', fontWeight: '600' }],
+                        'body-l': ['1.125rem', { lineHeight: '1.8', letterSpacing: '0', fontWeight: '500' }],
+                        'body': ['1rem', { lineHeight: '1.8', letterSpacing: '0', fontWeight: '400' }],
+                        'body-s': ['0.875rem', { lineHeight: '1.6', letterSpacing: '0.01em', fontWeight: '400' }],
+                        'caption': ['0.75rem', { lineHeight: '1.4', letterSpacing: '0.05em', fontWeight: '500' }],
+                    },
+                    spacing: {
+                        'section': '8rem',
+                        'block': '4rem',
+                        'item': '2rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .editorial-body {
+            font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+            letter-spacing: -0.01em;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex h-screen overflow-hidden">
+
+    <!-- Left Navigation -->
+    <nav class="w-24 lg:w-32 border-r border-mono-800 flex flex-col items-center py-8 shrink-0 h-full">
+        <a href="home.html"
+            class="text-h3 font-bold mb-16 rotate-[-90deg] uppercase tracking-widest whitespace-nowrap hover:text-mono-400">CORTHEX</a>
+
+        <div class="flex flex-col gap-12 font-mono text-caption uppercase tracking-widest items-center">
+            <a href="trading.html"
+                class="text-mono-500 hover:text-mono-100 transition-colors rotate-[-90deg] whitespace-nowrap">Trading</a>
+            <a href="agora.html"
+                class="text-mono-500 hover:text-mono-100 transition-colors rotate-[-90deg] whitespace-nowrap mt-4">Agora</a>
+            <!-- API: N/A -->
+            <a href="nexus.html"
+                class="text-mono-50 rotate-[-90deg] whitespace-nowrap border-b border-mono-50 pb-1 mt-8">Nexus</a>
+        </div>
+
+    </nav>
+
+    <main class="flex-1 flex overflow-hidden">
+
+        <!-- Left Column: Briefing Index -->
+        <!-- API: GET /api/workspace/nexus/briefings -->
+        <aside class="w-80 border-r border-mono-800 flex flex-col h-full shrink-0">
+            <header class="p-8 border-b border-mono-800">
+                <h2 class="text-mono-600 text-caption uppercase tracking-widest">Nexus Intelligence</h2>
+                <!-- Search input for briefings -->
+                <input type="text" placeholder="Search Briefings..."
+                    class="mt-6 w-full bg-transparent border-b border-mono-800 pb-2 text-body-s font-mono focus:outline-none focus:border-mono-100 transition-colors placeholder:text-mono-600">
+            </header>
+
+            <ul class="flex-1 overflow-y-auto w-full no-scrollbar">
+
+                <!-- Active / Latest Briefing -->
+                <li class="border-b border-mono-800">
+                    <a href="#" class="block p-8 bg-mono-800/50">
+                        <div class="font-mono text-caption text-mono-50 mb-2 uppercase tracking-widest">LATEST REPORT
+                        </div>
+                        <div class="text-h3 font-bold text-mono-100 line-clamp-2 leading-tight tracking-tight">2026 Q3
+                            핵심 마케팅 전략 및 예산 배분 타당성 종합 검토</div>
+                        <div class="text-mono-500 text-caption mt-4 font-mono">CONFIDENCE: 92% · 2 HRS AGO</div>
+                    </a>
+                </li>
+
+                <!-- Older Briefing -->
+                <li class="border-b border-mono-800">
+                    <a href="#" class="block p-8 hover:bg-mono-800/30 transition-colors opacity-70">
+                        <div class="font-mono text-caption text-mono-600 mb-2 uppercase tracking-widest">ARCHIVED</div>
+                        <div class="text-body-l font-medium text-mono-400 line-clamp-2 leading-tight tracking-tight">
+                            클라우드 인프라 제공업체 (AWS vs GCP) 전환 리스크 분석</div>
+                        <div class="text-mono-500 text-caption mt-4 font-mono">CONFIDENCE: 88% · OCT 12</div>
+                    </a>
+                </li>
+
+            </ul>
+        </aside>
+
+        <!-- Right Column: Briefing Document -->
+        <div class="flex-1 overflow-y-auto lg:px-24 xl:px-48 py-24 scroll-smooth">
+
+            <!-- Document Header -->
+            <!-- API: GET /api/workspace/nexus/briefings/:id -->
+            <header class="mb-section max-w-4xl border-b-2 border-mono-100 pb-16">
+                <!-- Top metadata -->
+                <div
+                    class="flex justify-between items-start font-mono text-caption uppercase tracking-widest text-mono-500 mb-12">
+                    <div>
+                        <span class="block mb-1 text-mono-600">DOCUMENT CLASSIFICATION</span>
+                        <span class="text-mono-100 border border-mono-100 px-2 py-0.5">EXECUTIVE BRIEFING</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="block mb-1 text-mono-600">REFERENCE ID</span>
+                        <span class="text-mono-400">NX-B-2026-042</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="block mb-1 text-mono-600">TIMESTAMP</span>
+                        <span class="text-mono-400">14:30:22 / TZO+9</span>
+                    </div>
+                </div>
+
+                <h1 class="text-display leading-tight font-extrabold tracking-tighter text-mono-100 mb-8">
+                    2026 Q3 핵심 마케팅 전략 및 예산 배분 타당성 종합 검토
+                </h1>
+
+                <p class="editorial-body text-h2 text-mono-400 leading-relaxed font-medium">
+                    본 브리핑은 3개 주요 부서(전략, 재무, 마케팅)의 관점을 취합하여 NEXUS AI 코어가 92%의 신뢰도로 도출한 최종 의사결정 권고안입니다.
+                </p>
+            </header>
+
+            <!-- Document Body -->
+            <article class="max-w-3xl">
+
+                <!-- Section: Executive Summary -->
+                <section class="mb-section">
+                    <h2
+                        class="text-mono-50 text-caption font-mono uppercase tracking-widest mb-8 flex items-center gap-4">
+                        <span class="w-2 h-2 rounded-sm bg-mono-50"></span>
+                        Synthesized Intelligence
+                    </h2>
+                    <div class="editorial-body text-body-l text-mono-100 space-y-6">
+                        <p>
+                            Q3 마케팅 예산 증액(기존 대비 +20%) 안건에 대하여, 재무적 리스크보다 시장 선점을 통한 점유율 확대의 기대 수익이 더 크다는 결론에 도달했습니다.
+                        </p>
+                        <p>
+                            다만, 전액 증액보다는 <strong>조건부 10% 증액 및 10% 유보금 편성</strong>으로 리스크를 헤지(Hedge)하는 하이브리드 전략을 채택할 것을
+                            권고합니다. 이는 마케팅부의 공격적인 성장 목표를 지원하면서도, 재무부의 현금흐름 보수성을 충족시킵니다.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Section: Perspectives Breakdown -->
+                <section class="mb-section">
+                    <h2
+                        class="text-mono-50 text-caption font-mono uppercase tracking-widest mb-8 flex items-center gap-4">
+                        <span class="w-8 h-px bg-mono-800"></span>
+                        Perspective Breakdown
+                    </h2>
+
+                    <div class="space-y-12 pl-8 border-l border-mono-800">
+
+                        <!-- Perspective 1 -->
+                        <div>
+                            <div class="flex items-baseline gap-4 mb-4">
+                                <h3 class="text-h3 font-bold tracking-tight text-mono-400 uppercase">CMO (Marketing)
+                                </h3>
+                                <span
+                                    class="text-status-green font-mono text-[10px] uppercase border border-status-green/30 px-1">AGREES</span>
+                            </div>
+                            <div class="editorial-body text-body text-mono-400">
+                                신규 타겟층 확보를 위해 초기 3개월간 공격적인 퍼포먼스 마케팅이 필수적입니다. 경쟁사가 예산을 축소하는 현시점이 점유율을 뺏어올 최적의 타이밍입니다.
+                            </div>
+                        </div>
+
+                        <!-- Perspective 2 -->
+                        <div>
+                            <div class="flex items-baseline gap-4 mb-4">
+                                <h3 class="text-h3 font-bold tracking-tight text-mono-400 uppercase">CFO (Finance)</h3>
+                                <span
+                                    class="text-status-red mix-blend-screen font-mono text-[10px] uppercase border border-status-red/30 px-1">CAUTION</span>
+                            </div>
+                            <div class="editorial-body text-body text-mono-400">
+                                하반기 거시경제 불확실성을 고려할 때, 확정되지 않은 ROAS(광고수익률)에 예산의 20%를 선제적으로 태우는 것은 현금유동성 악화 리스크가 있습니다. 방어적
+                                예산 운용이 필요합니다.
+                            </div>
+                        </div>
+
+                        <!-- Perspective 3 -->
+                        <div>
+                            <div class="flex items-baseline gap-4 mb-4">
+                                <h3 class="text-h3 font-bold tracking-tight text-mono-400 uppercase">CIO (Strategy)</h3>
+                                <span
+                                    class="text-mono-50 font-mono text-[10px] uppercase border border-mono-500 px-1 text-mono-500">NEUTRAL</span>
+                            </div>
+                            <div class="editorial-body text-body text-mono-400">
+                                마케팅의 당위성은 인정되나, 채널별 효율 최적화를 선행해야 합니다. 데이터 기반의 A/B 테스트를 통한 소규모 검증 후 스케일업하는 단계적 접근을 제안합니다.
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- Section: Actionable Conclusion -->
+                <section class="mt-section pt-16 border-t-[4px] border-mono-100">
+                    <h2 class="text-h2 font-extrabold tracking-tighter text-mono-100 mb-8 uppercase">Actionable
+                        Conclusion</h2>
+
+                    <ul class="text-body-l text-mono-100 font-medium space-y-6">
+                        <li class="flex gap-4">
+                            <span class="font-mono text-mono-500">01.</span>
+                            <span>초기 예산 10% 조건부 승인 및 즉각적인 퍼포먼스 캠페인 런칭.</span>
+                        </li>
+                        <li class="flex gap-4">
+                            <span class="font-mono text-mono-500">02.</span>
+                            <span>런칭 후 4주간 ROAS 150% 달성 시, 유보금 10% 추가 집행 승인.</span>
+                        </li>
+                        <li class="flex gap-4">
+                            <span class="font-mono text-mono-500">03.</span>
+                            <span>전략부서는 매주 CAC 대비 LTV 전환율을 모니터링하여 경영진에 보고.</span>
+                        </li>
+                    </ul>
+
+                    <!-- API: PUT /api/workspace/nexus/briefings/:id/approve -->
+                    <div class="mt-16 flex gap-8 font-mono text-caption uppercase tracking-widest">
+                        <button
+                            class="bg-mono-100 text-mono-900 py-4 px-8 hover:bg-mono-400 transition-colors font-bold">Approve
+                            Action Plan</button>
+                        <button
+                            class="border border-mono-800 text-mono-500 py-4 px-8 hover:bg-mono-900 hover:text-mono-100 transition-colors">Request
+                            Revision</button>
+                    </div>
+                </section>
+
+            </article>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

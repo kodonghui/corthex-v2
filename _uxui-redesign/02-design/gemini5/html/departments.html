@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORTHEX v2 - Departments</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"
+        rel="stylesheet" crossorigin="anonymous">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mono: {
+                            900: '#000000',
+                            800: '#111111',
+                            500: '#666666',
+                            400: '#999999',
+                            100: '#eeeeee',
+                            50: '#ffffff',
+                        },
+                        status: {
+                            red: '#ff3b30',
+                            green: '#34c759'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Satoshi', 'Pretendard', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+                    },
+                    fontSize: {
+                        'hero': ['4rem', { lineHeight: '1', letterSpacing: '-0.05em', fontWeight: '900' }],
+                        'display': ['2.5rem', { lineHeight: '1.1', letterSpacing: '-0.04em', fontWeight: '800' }],
+                        'h1': ['2rem', { lineHeight: '1.2', letterSpacing: '-0.03em', fontWeight: '700' }],
+                        'h2': ['1.5rem', { lineHeight: '1.3', letterSpacing: '-0.02em', fontWeight: '600' }],
+                        'h3': ['1.25rem', { lineHeight: '1.4', letterSpacing: '-0.01em', fontWeight: '600' }],
+                        'body-l': ['1.125rem', { lineHeight: '1.6', letterSpacing: '0', fontWeight: '500' }],
+                        'body': ['1rem', { lineHeight: '1.6', letterSpacing: '0', fontWeight: '400' }],
+                        'body-s': ['0.875rem', { lineHeight: '1.5', letterSpacing: '0.01em', fontWeight: '400' }],
+                        'caption': ['0.75rem', { lineHeight: '1.4', letterSpacing: '0.05em', fontWeight: '500' }],
+                    },
+                    spacing: {
+                        'section': '8rem',
+                        'block': '4rem',
+                        'item': '2rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen">
+
+    <nav class="flex justify-between items-center px-16 py-8 border-b border-mono-800 sticky top-0 bg-mono-900 z-50">
+        <a href="home.html" class="text-h2 font-bold tracking-tighter">CORTHEX</a>
+        <div class="flex gap-8 text-body-s font-medium">
+            <!-- API: N/A - Sub Navigation -->
+            <a href="home.html" class="text-mono-500 hover:text-mono-50 transition-colors">Home</a>
+            <a href="dashboard.html" class="text-mono-500 hover:text-mono-50 transition-colors">Dashboard</a>
+        </div>
+        <div class="text-mono-600 text-caption font-mono uppercase tracking-widest">
+            Workspace Configuration
+        </div>
+    </nav>
+
+    <main class="px-16 py-16 lg:px-32 max-w-[1400px] mx-auto pb-32">
+
+        <header class="mb-section pt-16 flex justify-between items-end border-b border-mono-800 pb-16">
+            <div>
+                <div class="text-mono-400 text-caption font-mono uppercase tracking-widest mb-6">Structures & Budgets
+                </div>
+                <h1 class="text-hero leading-tight tracking-tighter">Departments</h1>
+            </div>
+
+            <div class="flex gap-8">
+                <!-- API: GET /api/workspace/departments -->
+                <a href="#"
+                    class="text-h3 font-medium text-mono-50 line-through decoration-mono-50 transition-colors">Departments</a>
+                <a href="agents.html"
+                    class="text-h3 font-medium text-mono-500 hover:text-mono-100 transition-colors underline decoration-mono-800 underline-offset-8">Agents</a>
+            </div>
+        </header>
+
+        <div class="space-y-section">
+
+            <!-- Department Block -->
+            <!-- API: GET /api/workspace/departments/:id -->
+            <section class="group">
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-baseline gap-8 mb-12">
+                    <h2
+                        class="text-display font-extrabold tracking-tighter group-hover:text-mono-400 transition-colors cursor-pointer">
+                        SECRETARIAT <span class="text-mono-500 font-normal ml-4">비서실</span></h2>
+                    <!-- API: GET /api/workspace/departments/:id (budget) -->
+                    <div class="text-right">
+                        <div class="text-h1 font-mono tracking-tighter">$150 <span
+                                class="text-h3 text-mono-600 font-sans">/ MO</span></div>
+                        <div class="text-mono-500 text-caption font-mono mt-2 uppercase tracking-widest">ALLOCATED
+                            BUDGET</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-16 border-t border-mono-800 pt-8">
+                    <!-- Column: Goals -->
+                    <div class="lg:col-span-2">
+                        <h3 class="text-mono-600 text-caption tracking-widest uppercase mb-6 font-mono">Department
+                            Objectives</h3>
+                        <ul class="space-y-4 text-body-l text-mono-100 font-medium tracking-tight">
+                            <li class="flex gap-4 items-start">
+                                <span class="font-mono text-mono-500 text-caption mt-1.5">—</span>
+                                <p>CEO의 일상적인 커뮤니케이션 및 스케줄링 간소화.</p>
+                            </li>
+                            <li class="flex gap-4 items-start">
+                                <span class="font-mono text-mono-500 text-caption mt-1.5">—</span>
+                                <p>타 부서(마케팅, 전략, 재무) 최상위 명령 라우팅 및 의도 분석 정확도 99% 유지.</p>
+                            </li>
+                            <li class="flex gap-4 items-start">
+                                <span class="font-mono text-mono-500 text-caption mt-1.5">—</span>
+                                <p>사내 주요 데이터(지식 베이스) 인덱싱 및 빠른 질의응답 지원.</p>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column: Details -->
+                    <div>
+                        <ul class="space-y-6 font-mono text-caption text-mono-400">
+                            <li class="flex justify-between border-b border-mono-800 pb-2">
+                                <span>HEAD OF DEPT</span>
+                                <span class="text-mono-100">비서실장 (Lead)</span>
+                            </li>
+                            <li class="flex justify-between border-b border-mono-800 pb-2">
+                                <span>REPORTING LINE</span>
+                                <span class="text-mono-100">DIRECT TO CEO</span>
+                            </li>
+                            <li class="flex justify-between border-b border-mono-800 pb-2">
+                                <span>MEMBERS</span>
+                                <span class="text-mono-100">1 AGENT</span>
+                            </li>
+                            <li class="flex justify-between border-b border-mono-800 pb-2">
+                                <span>BURN RATE</span>
+                                <span class="text-status-green mix-blend-screen">OPTIMAL (42%)</span>
+                            </li>
+                        </ul>
+                        <!-- API: PUT /api/workspace/departments/:id -->
+                        <button
+                            class="mt-8 text-mono-600 hover:text-mono-50 transition-colors uppercase tracking-widest font-mono text-caption border border-mono-800 px-4 py-2 w-full">Edit
+                            Department Config</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Department Block -->
+            <section class="group">
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-baseline gap-8 mb-12">
+                    <h2
+                        class="text-display font-extrabold tracking-tighter group-hover:text-mono-400 transition-colors cursor-pointer">
+                        STRATEGY <span class="text-mono-500 font-normal ml-4">전략실</span></h2>
+                    <!-- API: GET /api/workspace/departments/:id (budget) -->
+                    <div class="text-right">
+                        <div class="text-h1 font-mono tracking-tighter">$800 <span
+                                class="text-h3 text-mono-600 font-sans">/ MO</span></div>
+                        <div class="text-mono-500 text-caption font-mono mt-2 uppercase tracking-widest">ALLOCATED
+                            BUDGET</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-16 border-t border-mono-800 pt-8">
+                    <!-- Column: Goals -->
+                    <div class="lg:col-span-2">
+                        <h3 class="text-mono-600 text-caption tracking-widest uppercase mb-6 font-mono">Department
+                            Objectives</h3>
+                        <ul class="space-y-4 text-body-l text-mono-100 font-medium tracking-tight">
+                            <li class="flex gap-4 items-start">
+                                <span class="font-mono text-mono-500 text-caption mt-1.5">—</span>
+                                <p>전사적 트레이딩 파이프라인(Algorithmic Trading) 24/7 자동화 모니터링 및 수익 창출.</p>
+                            </li>
+                            <li class="flex gap-4 items-start">
+                                <span class="font-mono text-mono-500 text-caption mt-1.5">—</span>
+                                <p>신사업 발굴 타당성 검토 및 재무 리스크 헤징 스크립트 작성.</p>
+                            </li>
+                            <li class="flex gap-4 items-start">
+                                <span class="font-mono text-mono-500 text-caption mt-1.5">—</span>
+                                <p>일일 거시 경제 데이터 취합 및 시장 모니터링 자동 보고서 생성.</p>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column: Details -->
+                    <div>
+                        <ul class="space-y-6 font-mono text-caption text-mono-400">
+                            <li class="flex justify-between border-b border-mono-800 pb-2">
+                                <span>HEAD OF DEPT</span>
+                                <span class="text-mono-100">CIO (Lead)</span>
+                            </li>
+                            <li class="flex justify-between border-b border-mono-800 pb-2">
+                                <span>REPORTING LINE</span>
+                                <span class="text-mono-100">DIRECT TO CEO</span>
+                            </li>
+                            <li class="flex justify-between border-b border-mono-800 pb-2">
+                                <span>MEMBERS</span>
+                                <span class="text-mono-100">2 AGENTS</span>
+                            </li>
+                            <li class="flex justify-between border-b border-mono-800 pb-2">
+                                <span>BURN RATE</span>
+                                <span class="text-status-red mix-blend-screen animate-pulse">HIGH (85%)</span>
+                            </li>
+                        </ul>
+                        <!-- API: PUT /api/workspace/departments/:id -->
+                        <button
+                            class="mt-8 text-mono-600 hover:text-mono-50 transition-colors uppercase tracking-widest font-mono text-caption border border-mono-800 px-4 py-2 w-full">Edit
+                            Department Config</button>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Add Department -->
+        <!-- API: POST /api/workspace/departments -->
+        <div class="mt-section pt-16 border-t border-mono-800 text-center">
+            <button
+                class="text-h2 font-medium text-mono-600 hover:text-mono-50 transition-colors border-b-2 border-transparent hover:border-mono-50 pb-2 tracking-tighter inline-block">
+                + Add New Department
+            </button>
+        </div>
+
+    </main>
+
+</body>
+
+</html>
