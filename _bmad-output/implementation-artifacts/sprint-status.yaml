@@ -1,8 +1,12 @@
-# generated: 2026-03-07
-# project: corthex-v2
-# project_key: NOKEY
-# tracking_system: file-system
-# story_location: _bmad-output/implementation-artifacts
+# Sprint Status — CORTHEX v2 Engine Refactor
+# Generated from epics.md (2026-03-11)
+# All stories reset to backlog for fresh engine refactor implementation
+
+project: corthex-v2-engine-refactor
+generated: "2026-03-10"
+total_epics: 12
+total_stories: 64
+total_sp: 174
 
 # STATUS DEFINITIONS:
 # ==================
@@ -11,370 +15,543 @@
 #   - in-progress: Epic actively being worked on
 #   - done: All stories in epic completed
 #
-# Epic Status Transitions:
-#   - backlog -> in-progress: Automatically when first story is created (via create-story)
-#   - in-progress -> done: Manually when all stories reach 'done' status
-#
 # Story Status:
 #   - backlog: Story only exists in epic file
 #   - ready-for-dev: Story file created in stories folder
 #   - in-progress: Developer actively working on implementation
-#   - review: Ready for code review (via Dev's code-review workflow)
+#   - review: Ready for code review
 #   - done: Story completed
 #
-# Retrospective Status:
-#   - optional: Can be completed but not required
-#   - done: Retrospective has been completed
-#
-# WORKFLOW NOTES:
-# ===============
-# - Epic transitions to 'in-progress' automatically when first story is created
-# - Stories can be worked in parallel if team capacity allows
-# - SM typically creates next story after previous one is 'done' to incorporate learnings
-# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
-#
-# PHASE STRUCTURE:
-# ================
-# P0 (MVP Core): Epic 1-5 (40 stories, 99 SP)
-# P1 (MVP Complete): Epic 6-9 (24 stories, 53 SP)
-# Phase 2 (Domain Features): Epic 10-18 (50 stories, 120 SP)
-# Phase 3 (Extensions): Epic 19-20 (10 stories, 26 SP)
-#
-# CRITICAL PATH (P0):
-# Epic 0 [done] -> Epic 1 -> Epic 2 + Epic 3 (parallel) -> Epic 4 -> Epic 5
-#
+# DEPENDENCY GRAPH:
+# Epic 1 -> Epic 2 -> Epic 3 -> Epic 4 -> Epic 5 -> Epic 6
+#                                               \-> Epic 7 -> Epic 8
+#                                                        \--> Epic 9 (also needs Epic 8)
+# Epic 2 -> Epic 10
+# Epic 2 -> Epic 11 (also needs Epic 10)
+# Epic 1 -> Epic 12 (spans all phases)
+
+phases:
+  - name: "Phase 1: Engine Foundation"
+    duration: "2 weeks"
+    epics:
+      - id: epic-1
+        title: "Engine Foundation & Infrastructure"
+        priority: P0
+        sp: 13
+        status: backlog
+        dependencies: []
+        architecture: "D1 (getDB), D3 (에러 코드), D9 (로거), E3, E10"
+        stories:
+          - id: "1.1"
+            title: "Phase 1 의존성 검증 및 설치"
+            sp: 3
+            priority: P0
+            status: backlog
+            blocked_by: []
+          - id: "1.2"
+            title: "getDB(companyId) 멀티테넌시 래퍼"
+            sp: 3
+            priority: P0
+            status: backlog
+            blocked_by: []
+          - id: "1.3"
+            title: "구조화 로거 어댑터"
+            sp: 2
+            priority: P0
+            status: backlog
+            blocked_by: []
+          - id: "1.4"
+            title: "에러 코드 레지스트리"
+            sp: 2
+            priority: P0
+            status: backlog
+            blocked_by: []
+          - id: "1.5"
+            title: "세션 Rate Limiter 미들웨어"
+            sp: 2
+            priority: P1
+            status: backlog
+            blocked_by: ["1.4"]
+          - id: "1.6"
+            title: "CI Engine 경계 검증 스크립트"
+            sp: 1
+            priority: P1
+            status: backlog
+            blocked_by: []
+
+      - id: epic-2
+        title: "Agent Engine Core"
+        priority: P0
+        sp: 18
+        status: backlog
+        dependencies: ["epic-1"]
+        architecture: "D5 (SessionContext), D6 (단일 진입점), E1, E4, E5, E6, E7, E8"
+        stories:
+          - id: "2.1"
+            title: "engine/types.ts — SessionContext & SSE 타입 정의"
+            sp: 2
+            priority: P0
+            status: backlog
+            blocked_by: []
+          - id: "2.2"
+            title: "agent-loop.ts — SDK query() 래퍼 + 단일 진입점"
+            sp: 5
+            priority: P0
+            status: backlog
+            blocked_by: ["1.2", "1.3", "1.4", "2.1"]
+          - id: "2.3"
+            title: "soul-renderer.ts — Soul 템플릿 변수 치환"
+            sp: 3
+            priority: P0
+            status: backlog
+            blocked_by: ["1.2"]
+          - id: "2.4"
+            title: "model-selector.ts — 티어→모델 매핑"
+            sp: 1
+            priority: P0
+            status: backlog
+            blocked_by: ["1.2"]
+          - id: "2.5"
+            title: "sse-adapter.ts — SDK→기존 SSE 변환"
+            sp: 2
+            priority: P0
+            status: backlog
+            blocked_by: ["2.1"]
+          - id: "2.6"
+            title: "call-agent.ts — N단계 핸드오프 도구"
+            sp: 5
+            priority: P0
+            status: backlog
+            blocked_by: ["2.2"]
+
+      - id: epic-3
+        title: "Hook System & Security Pipeline"
+        priority: P0
+        sp: 15
+        status: backlog
+        dependencies: ["epic-2"]
+        architecture: "D4 (Hook 순서), E2, SEC-1~6"
+        stories:
+          - id: "3.1"
+            title: "tool-permission-guard — PreToolUse Hook"
+            sp: 3
+            priority: P0
+            status: backlog
+            blocked_by: ["2.2"]
+          - id: "3.2"
+            title: "credential-scrubber — PostToolUse Hook (보안 최우선)"
+            sp: 3
+            priority: P0
+            status: backlog
+            blocked_by: ["2.2"]
+          - id: "3.3"
+            title: "output-redactor — PostToolUse Hook"
+            sp: 2
+            priority: P0
+            status: backlog
+            blocked_by: ["3.2"]
+          - id: "3.4"
+            title: "delegation-tracker — PostToolUse Hook"
+            sp: 3
+            priority: P0
+            status: backlog
+            blocked_by: ["3.3"]
+          - id: "3.5"
+            title: "cost-tracker — Stop Hook"
+            sp: 2
+            priority: P1
+            status: backlog
+            blocked_by: ["2.2"]
+          - id: "3.6"
+            title: "Hook 파이프라인 통합 테스트"
+            sp: 2
+            priority: P0
+            status: backlog
+            blocked_by: ["3.1", "3.2", "3.3", "3.4", "3.5"]
+
+      - id: epic-4
+        title: "Engine Migration & Regression"
+        priority: P0
+        sp: 14
+        status: backlog
+        dependencies: ["epic-2", "epic-3"]
+        architecture: "D2 (CLI 토큰 만료), D11 (WebSocket 유지), S11 (호출자 6곳), S12 (불가침)"
+        stories:
+          - id: "4.1"
+            title: "hub.ts — SSE 스트리밍 진입점"
+            sp: 3
+            priority: P0
+            status: backlog
+            blocked_by: ["2.2", "2.5"]
+          - id: "4.2"
+            title: "호출자 Import 전환 (텔레그램, ARGOS, AGORA, 자동매매)"
+            sp: 3
+            priority: P0
+            status: backlog
+            blocked_by: ["2.2"]
+          - id: "4.3"
+            title: "기존 서비스 교체/삭제"
+            sp: 2
+            priority: P0
+            status: backlog
+            blocked_by: ["4.1", "4.2"]
+          - id: "4.4"
+            title: "Graceful Shutdown 구현"
+            sp: 2
+            priority: P1
+            status: backlog
+            blocked_by: ["2.2"]
+          - id: "4.5"
+            title: "3단계 핸드오프 통합 테스트"
+            sp: 2
+            priority: P0
+            status: backlog
+            blocked_by: ["2.6", "3.6"]
+          - id: "4.6"
+            title: "Epic 1~20 회귀 테스트"
+            sp: 2
+            priority: P0
+            status: backlog
+            blocked_by: ["4.1", "4.2", "4.3"]
+
+  - name: "Phase 2: Orchestration"
+    duration: "3 weeks"
+    epics:
+      - id: epic-5
+        title: "Secretary System & Soul Orchestration"
+        priority: P0
+        sp: 16
+        status: backlog
+        dependencies: ["epic-2", "epic-4"]
+        architecture: "FR11~20 (Secretary & Orchestration), E4 (Soul 변수)"
+        stories:
+          - id: "5.1"
+            title: "비서 에이전트 DB 필드 및 설정"
+            sp: 2
+            priority: P0
+            status: backlog
+            blocked_by: []
+          - id: "5.2"
+            title: "비서 Soul 템플릿 작성"
+            sp: 3
+            priority: P0
+            status: backlog
+            blocked_by: ["2.3", "5.1"]
+          - id: "5.3"
+            title: "슬래시 명령어 파서"
+            sp: 3
+            priority: P0
+            status: backlog
+            blocked_by: ["4.1"]
+          - id: "5.4"
+            title: "매니저 Soul 표준 템플릿"
+            sp: 2
+            priority: P0
+            status: backlog
+            blocked_by: ["2.3"]
+          - id: "5.5"
+            title: "기존 오케스트레이터 삭제"
+            sp: 2
+            priority: P0
+            status: backlog
+            blocked_by: ["5.2", "5.3", "5.4"]
+          - id: "5.6"
+            title: "@멘션 + 프리셋 시스템"
+            sp: 2
+            priority: P1
+            status: backlog
+            blocked_by: ["4.1"]
+          - id: "5.7"
+            title: "자율 딥워크 + 품질 게이트"
+            sp: 2
+            priority: P1
+            status: backlog
+            blocked_by: ["5.2"]
+
+      - id: epic-6
+        title: "Hub UX — 2 Layout Variants"
+        priority: P0
+        sp: 14
+        status: backlog
+        dependencies: ["epic-5"]
+        architecture: "UX Design (비서 유무 분기), D11→WebSocket 전환"
+        stories:
+          - id: "6.1"
+            title: "비서 있음 레이아웃 (풀 위드 채팅)"
+            sp: 3
+            priority: P0
+            status: backlog
+            blocked_by: ["5.2"]
+          - id: "6.2"
+            title: "비서 없음 레이아웃 (에이전트 선택 + 채팅)"
+            sp: 3
+            priority: P0
+            status: backlog
+            blocked_by: []
+          - id: "6.3"
+            title: "SSE 상태 머신 + 에러 투명성"
+            sp: 3
+            priority: P0
+            status: backlog
+            blocked_by: ["2.5", "1.4"]
+          - id: "6.4"
+            title: "대화 기록 + autoLearn"
+            sp: 2
+            priority: P1
+            status: backlog
+            blocked_by: ["6.1"]
+          - id: "6.5"
+            title: "WebSocket 핸드오프 채널 전환"
+            sp: 3
+            priority: P1
+            status: backlog
+            blocked_by: ["3.4"]
+
+      - id: epic-7
+        title: "Organization Management"
+        priority: P0
+        sp: 16
+        status: backlog
+        dependencies: ["epic-5"]
+        architecture: "FR30~37 (Organization), UX (NEXUS 읽기전용)"
+        stories:
+          - id: "7.1"
+            title: "부서 CRUD API + UI"
+            sp: 3
+            priority: P0
+            status: backlog
+            blocked_by: []
+          - id: "7.2"
+            title: "에이전트 CRUD API + UI (Soul 편집 포함)"
+            sp: 5
+            priority: P0
+            status: backlog
+            blocked_by: ["7.1"]
+          - id: "7.3"
+            title: "조직 템플릿 + 온보딩"
+            sp: 3
+            priority: P1
+            status: backlog
+            blocked_by: ["7.1", "7.2"]
+          - id: "7.4"
+            title: "Cascade 규칙 + 삭제 방지"
+            sp: 2
+            priority: P0
+            status: backlog
+            blocked_by: ["7.1", "7.2"]
+          - id: "7.5"
+            title: "NEXUS 읽기 전용 조직도"
+            sp: 3
+            priority: P1
+            status: backlog
+            blocked_by: ["7.1", "7.2"]
+
+  - name: "Phase 3: Tier & Visualization"
+    duration: "2 weeks"
+    epics:
+      - id: epic-8
+        title: "N-Tier Hierarchy System"
+        priority: P1
+        sp: 12
+        status: backlog
+        dependencies: ["epic-7"]
+        architecture: "FR24~29 (Tier & Cost), E6 (model-selector), D1 (tier_configs)"
+        stories:
+          - id: "8.1"
+            title: "tier_configs 테이블 + enum→integer 마이그레이션"
+            sp: 3
+            priority: P0
+            status: backlog
+            blocked_by: []
+          - id: "8.2"
+            title: "Tier CRUD API + UI"
+            sp: 3
+            priority: P1
+            status: backlog
+            blocked_by: ["8.1"]
+          - id: "8.3"
+            title: "모델 자동 배정 + 비용 최적화"
+            sp: 3
+            priority: P1
+            status: backlog
+            blocked_by: ["8.1", "2.4"]
+          - id: "8.4"
+            title: "maxDepth 회사별 설정"
+            sp: 3
+            priority: P1
+            status: backlog
+            blocked_by: ["8.1"]
+
+      - id: epic-9
+        title: "NEXUS Visual Organization Editor"
+        priority: P1
+        sp: 16
+        status: backlog
+        dependencies: ["epic-7", "epic-8"]
+        architecture: "React Flow + ELK.js, FR30~37"
+        stories:
+          - id: "9.1"
+            title: "NEXUS React Flow 캔버스 기반"
+            sp: 3
+            priority: P0
+            status: backlog
+            blocked_by: []
+          - id: "9.2"
+            title: "NEXUS 노드 시각화"
+            sp: 3
+            priority: P0
+            status: backlog
+            blocked_by: ["9.1"]
+          - id: "9.3"
+            title: "드래그&드롭 편집"
+            sp: 5
+            priority: P1
+            status: backlog
+            blocked_by: ["9.2", "7.2"]
+          - id: "9.4"
+            title: "속성 패널"
+            sp: 3
+            priority: P1
+            status: backlog
+            blocked_by: ["9.2"]
+          - id: "9.5"
+            title: "NEXUS 내보내기 + 인쇄"
+            sp: 2
+            priority: P2
+            status: backlog
+            blocked_by: ["9.1"]
+
+  - name: "Phase 4: Intelligence"
+    duration: "2 weeks"
+    epics:
+      - id: epic-10
+        title: "Semantic Search & Knowledge Enhancement"
+        priority: P1
+        sp: 14
+        status: backlog
+        dependencies: ["epic-2", "epic-7"]
+        architecture: "pgvector, Gemini Embedding, FR47~53"
+        stories:
+          - id: "10.1"
+            title: "pgvector 확장 설치 + 스키마"
+            sp: 2
+            priority: P0
+            status: backlog
+            blocked_by: []
+          - id: "10.2"
+            title: "Gemini Embedding 파이프라인"
+            sp: 3
+            priority: P0
+            status: backlog
+            blocked_by: ["10.1"]
+          - id: "10.3"
+            title: "의미 검색 API"
+            sp: 3
+            priority: P0
+            status: backlog
+            blocked_by: ["10.2"]
+          - id: "10.4"
+            title: "부서별 지식 자동 주입 강화"
+            sp: 3
+            priority: P1
+            status: backlog
+            blocked_by: ["10.3", "2.3"]
+          - id: "10.5"
+            title: "지식 관리 UI 개선"
+            sp: 3
+            priority: P1
+            status: backlog
+            blocked_by: ["10.3"]
+
+      - id: epic-11
+        title: "NotebookLM & SketchVibe MCP"
+        priority: P1
+        sp: 14
+        status: backlog
+        dependencies: ["epic-2", "epic-10"]
+        architecture: "NotebookLM MCP 29 tools, SketchVibe Stdio MCP, FR54~60"
+        stories:
+          - id: "11.1"
+            title: "NotebookLM MCP 클라이언트 연동"
+            sp: 3
+            priority: P1
+            status: backlog
+            blocked_by: []
+          - id: "11.2"
+            title: "SketchVibe MCP 서버 분리"
+            sp: 5
+            priority: P1
+            status: backlog
+            blocked_by: ["2.2"]
+          - id: "11.3"
+            title: "SketchVibe AI 실시간 편집"
+            sp: 3
+            priority: P1
+            status: backlog
+            blocked_by: ["11.2"]
+          - id: "11.4"
+            title: "저장/불러오기 + 지식 연동"
+            sp: 3
+            priority: P1
+            status: backlog
+            blocked_by: ["11.2", "10.3"]
+
+  - name: "Supporting"
+    duration: "Ongoing (spans all phases)"
+    epics:
+      - id: epic-12
+        title: "Testing & Quality Infrastructure"
+        priority: P0
+        sp: 12
+        status: backlog
+        dependencies: ["epic-1", "epic-2"]
+        architecture: "D10 (테스트 전략), E9 (SDK 모킹), E10 (CI 경계)"
+        stories:
+          - id: "12.1"
+            title: "SDK 모킹 표준 + 헬퍼"
+            sp: 3
+            priority: P0
+            status: backlog
+            blocked_by: ["2.2"]
+          - id: "12.2"
+            title: "주간 실제 SDK 통합 테스트"
+            sp: 2
+            priority: P1
+            status: backlog
+            blocked_by: ["12.1"]
+          - id: "12.3"
+            title: "단위 테스트 스위트"
+            sp: 3
+            priority: P0
+            status: backlog
+            blocked_by: ["1.2", "1.4", "2.3", "2.4"]
+          - id: "12.4"
+            title: "A/B 품질 테스트 프레임워크"
+            sp: 2
+            priority: P2
+            status: backlog
+            blocked_by: ["12.1"]
+          - id: "12.5"
+            title: ".dockerignore + Dockerfile 최적화"
+            sp: 2
+            priority: P1
+            status: backlog
+            blocked_by: ["1.1"]
+
+# CRITICAL PATH:
+# Epic 1 -> Epic 2 -> Epic 3 -> Epic 4 -> Epic 5 -> Epic 6/7 -> Epic 8/9
+# Phase 4 (Epic 10, 11) can start after Epic 2, parallel with Phase 2-3
+# Epic 12 spans all phases, starts with Epic 1
+
 # RECOMMENDED IMPLEMENTATION ORDER:
-# 1. Epic 1 (Data Layer) - foundation for everything
-# 2. Epic 2 (Dynamic Org) + Epic 3 (LLM) - parallel after Epic 1
-# 3. Epic 4 (Tools) - needs Epic 3
-# 4. Epic 5 (Orchestration) - convergence point, needs Epic 2 + Epic 4
-# 5. Epic 6-9 (P1) - parallel after Epic 5
-# 6. Epic 10-18 (Phase 2) - domain features
-# 7. Epic 19-20 (Phase 3) - extensions
-
-generated: "2026-03-07"
-project: corthex-v2
-project_key: NOKEY
-tracking_system: file-system
-story_location: _bmad-output/implementation-artifacts
-
-development_status:
-  # ============================================================
-  # Epic 0: Foundation (COMPLETED)
-  # Turborepo monorepo, Hono+Bun server, React+Vite SPA x2,
-  # PostgreSQL+Drizzle, WebSocket EventBus, AES-256-GCM vault,
-  # JWT auth, bun:test 201 tests passing
-  # ============================================================
-  epic-0: done
-  epic-0-retrospective: done
-
-  # ============================================================
-  # Phase 1 MVP -- P0 (Must Have)
-  # ============================================================
-
-  # ============================================================
-  # Epic 1: Data Layer & Security Foundation (7 stories, 16 SP)
-  # FRs: FR42, FR46, FR48, FR49 | NFRs: NFR10, NFR12, NFR13
-  # Dependencies: Epic 0 (done)
-  # ============================================================
-  epic-1: done
-  1-1-phase1-drizzle-schema-extension: done
-  1-2-tenant-isolation-middleware: done
-  1-3-rbac-middleware: done
-  1-4-audit-log-system: done
-  1-5-credential-vault-extension: done
-  1-6-seed-data-org-templates: done
-  1-7-tenant-isolation-integration-test: done
-  epic-1-retrospective: done
-
-  # ============================================================
-  # Epic 2: Dynamic Organization Management (9 stories, 23 SP)
-  # FRs: FR1-FR12 | UX: Admin A1, A2, A3, A7, CEO org view
-  # Dependencies: Epic 1
-  # ============================================================
-  epic-2: done
-  2-1-department-crud-api: done
-  2-2-agent-crud-api: done
-  2-3-cascade-analysis-engine: done
-  2-4-org-template-apply-api: done
-  2-5-org-tree-view-ui-admin: done
-  2-6-department-management-ui-admin: done
-  2-7-agent-management-soul-editor-ui-admin: done
-  2-8-org-template-ui-agent-move: done
-  2-9-ceo-app-org-readonly-view: done
-  epic-2-retrospective: done
-
-  # ============================================================
-  # Epic 3: LLM Multi-Provider & Agent Execution (7 stories, 17 SP)
-  # FRs: FR26-FR34 (LLM) | NFRs: NFR3, NFR11, NFR22, NFR26
-  # Dependencies: Epic 1
-  # ============================================================
-  epic-3: done
-  3-1-llm-provider-adapters-claude-gpt-gemini: done
-  3-2-llm-router-3tier-model-assignment: done
-  3-3-provider-fallback-strategy: done
-  3-4-agent-runner-stateless-executor: done
-  3-5-cost-recording-system-models-yaml: done
-  3-6-batch-collector-batch-execute: done
-  3-7-llm-integration-fallback-test: done
-  epic-3-retrospective: done
-
-  # ============================================================
-  # Epic 4: Tool System (6 stories, 16 SP)
-  # FRs: FR26-FR29 | NFRs: NFR14 | UX: Admin A5
-  # Dependencies: Epic 3 (AgentRunner), Epic 2 (agents table)
-  # ============================================================
-  epic-4: done
-  4-1-toolpool-registry-zod-framework: done
-  4-2-server-side-allowed-tools-enforcement: done
-  4-3-common-tools-15-implementation: done
-  4-4-domain-tools-15-implementation: done
-  4-5-tool-invocation-log-system: done
-  4-6-admin-tool-management-ui-a5: done
-  epic-4-retrospective: done
-
-  # ============================================================
-  # Epic 5: Orchestration Engine & Command Center (11 stories, 27 SP)
-  # FRs: FR13-FR25, FR50-FR51 | NFRs: NFR1, NFR2, NFR4, NFR20
-  # UX: CEO #2 (Command Center)
-  # Dependencies: Epic 2 (org data), Epic 4 (tools)
-  # ============================================================
-  epic-5: done
-  5-1-command-router-type-classification: done
-  5-2-chief-of-staff-auto-classify-delegate: done
-  5-3-manager-delegate-parallel-specialist: done
-  5-4-manager-synthesis-quality-gate: done
-  5-5-all-sequential-command-processing: done
-  5-6-deepwork-autonomous-multistep: done
-  5-7-command-center-ui-chat-mention-slash: done
-  5-8-delegation-chain-realtime-websocket: done
-  5-9-report-view-feedback: done
-  5-10-preset-crud-slash-popup: done
-  5-11-orchestration-integration-test: done
-  epic-5-retrospective: done
-
-  # ============================================================
-  # Phase 1 MVP -- P1 (Should Have)
-  # ============================================================
-
-  # ============================================================
-  # Epic 6: Dashboard & Activity Monitoring (6 stories, 14 SP)
-  # FRs: FR35-FR37, FR41 | NFRs: NFR4, NFR5
-  # UX: CEO #1 (Dashboard), CEO #7 (Activity Log)
-  # Dependencies: Epic 5
-  # ============================================================
-  epic-6: done
-  6-1-dashboard-aggregation-api: done
-  6-2-operations-dashboard-ui: done
-  6-3-activity-log-4tab-api: done
-  6-4-activity-log-4tab-ui: done
-  6-5-websocket-realtime-dashboard-refresh: done
-  6-6-quick-actions-satisfaction-chart: done
-  epic-6-retrospective: done
-
-  # ============================================================
-  # Epic 7: Cost Management System (5 stories, 11 SP)
-  # FRs: FR38-FR40 | NFRs: NFR30, NFR33
-  # UX: Admin A6, CEO cost card
-  # Dependencies: Epic 3 (CostTracker)
-  # ============================================================
-  epic-7: done
-  7-1-3axis-cost-aggregation-api: done
-  7-2-budget-limit-auto-block: done
-  7-3-cost-dashboard-ui-admin-a6: done
-  7-4-ceo-app-cost-card-drilldown: done
-  7-5-budget-exceeded-websocket-alert: done
-  epic-7-retrospective: done
-
-  # ============================================================
-  # Epic 8: Quality Gate Enhancement (5 stories, 11 SP)
-  # FRs: FR52-FR55
-  # Dependencies: Epic 5 (P0 quality gate)
-  # ============================================================
-  epic-8: done
-  8-1-quality-rules-yaml-parser: done
-  8-2-auto-rule-inspection-engine: done
-  8-3-hallucination-detection: done
-  8-4-prompt-injection-defense: done
-  8-5-qa-tab-enhanced-ui: done
-  epic-8-retrospective: done
-
-  # ============================================================
-  # Epic 9: Multi-tenancy & Admin Console (8 stories, 17 SP)
-  # FRs: FR43-FR45, FR47 | NFRs: NFR34
-  # UX: Admin A4, A8, Onboarding, CEO #14
-  # Dependencies: Epic 1 (tenant), Epic 2 (org)
-  # ============================================================
-  epic-9: done
-  9-1-company-crud-api: done
-  9-2-human-employee-management-api: done
-  9-3-employee-command-center-restriction: done
-  9-4-employee-management-ui-admin-a4: done
-  9-5-company-settings-ui-admin-a8: done
-  9-6-admin-ceo-app-switching: done
-  9-7-onboarding-wizard: done
-  9-8-ceo-app-settings-screen: done
-  epic-9-retrospective: done
-
-  # ============================================================
-  # Phase 2 -- v1 Feature Migration (Domain Features)
-  # ============================================================
-
-  # ============================================================
-  # Epic 10: Strategy Room & Trading (8 stories, 20 SP)
-  # FRs: FR56-FR62 | NFRs: NFR27
-  # UX: CEO #3 (Strategy Room)
-  # Dependencies: Epic 5, Epic 4
-  # ============================================================
-  epic-10: done
-  10-1-strategy-schema-watchlist-portfolio-orders: done
-  10-2-kis-securities-api-adapter: done
-  10-3-finance-tools-5-implementation: done
-  10-4-cio-vector-separation-orchestration: done
-  10-5-autonomous-approval-execution-risk-control: done
-  10-6-real-paper-trading-separation: done
-  10-7-strategy-room-ui-portfolio-watchlist: done
-  10-8-trading-approval-history-ui: done
-  epic-10-retrospective: optional
-
-  # ============================================================
-  # Epic 11: AGORA Debate Engine (5 stories, 12 SP)
-  # FRs: FR63
-  # UX: CEO #5 (AGORA)
-  # Dependencies: Epic 5, Epic 3
-  # ============================================================
-  epic-11: done
-  11-1-agora-engine-round-management-consensus: done
-  11-2-debate-deep-debate-command-integration: done
-  11-3-websocket-debate-channel-streaming: done
-  11-4-agora-ui-round-timeline-speech-cards: done
-  11-5-diff-view-debate-result-insertion: done
-  epic-11-retrospective: optional
-
-  # ============================================================
-  # Epic 12: SNS Publishing (5 stories, 14 SP)
-  # FRs: FR65 | NFRs: NFR29
-  # UX: CEO #6 (SNS)
-  # Dependencies: Epic 4, Epic 5
-  # ============================================================
-  epic-12: done
-  12-1-sns-content-management-api: done
-  12-2-marketing-tools-3-implementation: done
-  12-3-selenium-auto-publish-engine-5-platforms: done
-  12-4-scheduled-publish-queue-card-news: done
-  12-5-sns-publishing-ui: done
-  epic-12-retrospective: optional
-
-  # ============================================================
-  # Epic 13: SketchVibe Canvas (5 stories, 13 SP)
-  # FRs: FR64
-  # UX: CEO #4 (SketchVibe)
-  # Dependencies: Epic 5, Epic 3
-  # ============================================================
-  epic-13: done
-  13-1-cytoscape-canvas-8-node-types-connection: done
-  13-2-mermaid-cytoscape-bidirectional-conversion: done
-  13-3-mcp-sse-ai-realtime-canvas-manipulation: done
-  13-4-save-load-knowledge-base-integration: done
-  13-5-sketchvibe-ui-integration-command-center: done
-  epic-13-retrospective: optional
-
-  # ============================================================
-  # Epic 14: Cron Scheduler & ARGOS (6 stories, 13 SP)
-  # FRs: FR66-FR67
-  # UX: CEO #11 (Cron), CEO #12 (ARGOS)
-  # Dependencies: Epic 5, Epic 4
-  # ============================================================
-  epic-14: done
-  14-1-cron-scheduler-service-crud-api: done
-  14-2-cron-execution-engine-auto-run: done
-  14-3-argos-trigger-condition-auto-collect: done
-  14-4-cron-base-ui: done
-  14-5-argos-ui: done
-  14-6-status-bar-data-ai-ok-ng-cost: done
-  epic-14-retrospective: optional
-
-  # ============================================================
-  # Epic 15: Telegram Integration (3 stories, 6 SP)
-  # FRs: FR68
-  # Dependencies: Epic 5, Epic 14
-  # ============================================================
-  epic-15: done
-  15-1-telegram-bot-api-webhook: done
-  15-2-telegram-command-parsing-mention-text: done
-  15-3-result-send-cron-result-auto-send: done
-  epic-15-retrospective: optional
-
-  # ============================================================
-  # Epic 16: Knowledge Base & Agent Memory (6 stories, 13 SP)
-  # FRs: FR69-FR70
-  # UX: CEO #13 (Knowledge)
-  # Dependencies: Epic 3, Epic 5
-  # ============================================================
-  epic-16: done
-  16-1-knowledge-schema-docs-memories: done
-  16-2-document-store-crud-api-folder-management: done
-  16-3-department-knowledge-auto-injection: done
-  16-4-agent-memory-auto-learning-extraction: done
-  16-5-knowledge-ui-drag-drop-upload: done
-  16-6-similar-task-previous-learning-auto-reference: done
-  epic-16-retrospective: optional
-
-  # ============================================================
-  # Epic 17: History, Archive & Performance (7 stories, 16 SP)
-  # FRs: FR71-FR73
-  # UX: CEO #8 (History), CEO #9 (Archive), CEO #10 (Performance)
-  # Dependencies: Epic 5, Epic 7, Epic 8
-  # ============================================================
-  epic-17: done
-  17-1-operation-log-api-search-filter-bookmark: done
-  17-2-operation-log-ui-ab-compare-replay: done
-  17-3-classified-docs-api-archive-filter-similar: done
-  17-4-classified-docs-ui: done
-  17-5-performance-analysis-api-soul-gym: done
-  17-6-performance-analysis-ui-soul-gym-suggestions: done
-  17-7-quality-dashboard-pass-rate-avg-score: done
-  epic-17-retrospective: optional
-
-  # ============================================================
-  # Epic 18: Workflow Automation (5 stories, 13 SP)
-  # FRs: FR74-FR75
-  # Dependencies: Epic 14, Epic 5
-  # ============================================================
-  epic-18: done
-  18-1-workflow-crud-api-multistep-definition: done
-  18-2-workflow-execution-engine-sequential-parallel: done
-  18-3-predictive-workflow-pattern-analysis: done
-  18-4-workflow-builder-ui: done
-  18-5-execution-status-realtime-monitoring-ui: done
-  epic-18-retrospective: done
-
-  # ============================================================
-  # Phase 3 -- Extensions (12+ months)
-  # ============================================================
-
-  # ============================================================
-  # Epic 19: Internal Messenger (5 stories, 10 SP)
-  # FRs: FR76
-  # Dependencies: Epic 9
-  # ============================================================
-  epic-19: done
-  19-1-messenger-schema-conversations-messages: done
-  19-2-realtime-chat-api-websocket-channel: done
-  19-3-one-on-one-group-message-ui: done
-  19-4-ai-analysis-result-sharing: done
-  19-5-company-id-based-chat-isolation: done
-  epic-19-retrospective: done
-
-  # ============================================================
-  # Epic 20: Platform Extensions (5 stories, 16 SP)
-  # PRD: Vision (Phase 3)
-  # Dependencies: Epic 2, Epic 18
-  # ============================================================
-  epic-20: done
-  20-1-org-template-market-api-ui: done
-  20-2-agent-marketplace-soul-tool-exchange: done
-  20-3-public-api-key-issuance: done
-  20-4-workflow-builder-nocode-visual: done
-  20-5-platform-integration-test: done
-  epic-20-retrospective: done
+# 1. Epic 1 (Foundation) - no dependencies
+# 2. Epic 2 (Engine Core) - needs Epic 1
+# 3. Epic 3 (Hooks) - needs Epic 2
+# 4. Epic 4 (Migration) - needs Epic 2 + 3
+# 5. Epic 5 (Secretary) - needs Epic 2 + 4
+# 6. Epic 6 (Hub UX) + Epic 7 (Org Mgmt) - parallel after Epic 5
+# 7. Epic 8 (N-Tier) - needs Epic 7
+# 8. Epic 9 (NEXUS) - needs Epic 7 + 8
+# 9. Epic 10 (Semantic Search) - can start after Epic 2
+# 10. Epic 11 (NotebookLM/SketchVibe) - needs Epic 2 + 10
+# 11. Epic 12 (Testing) - ongoing from Epic 1
