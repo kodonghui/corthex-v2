@@ -7,11 +7,10 @@ BMAD 프레임워크 기반 자동화 파이프라인 패키지.
 
 ## 이게 뭔가요?
 
-소프트웨어 프로젝트를 만들 때 **기획 -> 개발 -> UXUI 리팩토링** 전 과정을 자동으로 진행해주는 도구입니다.
+소프트웨어 프로젝트를 만들 때 **기획 -> 개발** 전 과정을 자동으로 진행해주는 도구입니다.
 
 - **기획 파이프라인**: 아이디어를 Product Brief -> PRD -> Architecture -> UX -> Epics 순서로 구체화
 - **개발 파이프라인**: 각 스토리를 create -> dev -> test -> QA -> code-review 순서로 구현
-- **UXUI 파이프라인** v7: Pro Max(디자인 데이터) + LibreUIUX(디자인 원칙) + BMAD(파티모드) → 3-Phase: Diagnose → Redesign → Verify
 - **파티모드**: 7명의 AI 전문가가 매 단계마다 토론하면서 품질 검증 (tmux에서 실시간 관찰 가능!)
 
 ---
@@ -53,16 +52,15 @@ v3에서는 **Worker 1명이 작성 + 리뷰를 모두 처리**합니다.
 # 기획+개발 파이프라인
 cp kodonghui_full_pipeline/kdh-full-auto-pipeline.md [프로젝트]/.claude/commands/
 
-# UXUI 리팩토링 파이프라인 (선택)
-cp kodonghui_full_pipeline/kdh-uxui-pipeline.md [프로젝트]/.claude/commands/
+# UXUI 리팩토링 파이프라인 (LibreUIUX 기반)
+cp kodonghui_full_pipeline/kdh-libre-uxui-full-auto-pipeline.md [프로젝트]/.claude/commands/
 ```
 
 ### 방법 2: 글로벌 설치 (모든 프로젝트에서 사용)
 
 ```bash
-# 홈 디렉토리의 .claude/commands/에 복사
 cp kodonghui_full_pipeline/kdh-full-auto-pipeline.md ~/.claude/commands/
-cp kodonghui_full_pipeline/kdh-uxui-pipeline.md ~/.claude/commands/
+cp kodonghui_full_pipeline/kdh-libre-uxui-full-auto-pipeline.md ~/.claude/commands/
 ```
 
 ### 주의: 중복 방지
@@ -88,37 +86,31 @@ Claude Code에서 아래 명령어를 입력하면 됩니다:
 ```
 -> 스토리 3-1의 개발 파이프라인 실행 (create -> dev -> TEA -> QA -> CR)
 
-### UXUI 리팩토링 v7 (개발 완료 후)
+### UXUI 리팩토링 (개발 완료 후, LibreUIUX 기반)
 ```
-/kdh-uxui-pipeline                     <- 진행 상황 + 다음 할 일
-/kdh-uxui-pipeline phase0              <- 테스트 환경 세팅 (최초 1회)
-/kdh-uxui-pipeline phase1              <- 스모크 테스트
-/kdh-uxui-pipeline diagnose chat       <- Phase 1: 7차원 진단 + 점수
-/kdh-uxui-pipeline redesign chat       <- Phase 2: 레이아웃 재설계 + 코드 구현
-/kdh-uxui-pipeline verify chat         <- Phase 3: 파티모드 + 재감사 + 테스트
-/kdh-uxui-pipeline batch 1             <- 1순위 전체 자동 (diagnose→redesign→verify)
-/kdh-uxui-pipeline phase3              <- 시각 회귀 기준 등록
-/kdh-uxui-pipeline final               <- 최종 전체 검증
+/kdh-libre-uxui-full-auto-pipeline foundation        <- 브랜드 가이드 수립 (1회)
+/kdh-libre-uxui-full-auto-pipeline page chat          <- 특정 페이지 리팩토링
+/kdh-libre-uxui-full-auto-pipeline batch 1            <- 1순위 페이지 전체 자동
+/kdh-libre-uxui-full-auto-pipeline status             <- 진행 상황 확인
 ```
 
-**UXUI 파이프라인 v7 워크플로우:**
+**UXUI 파이프라인 워크플로우:**
 ```
-1. phase0 — 테스트 환경 세팅
-2. phase1 — 전 페이지 스모크 테스트
-3. 페이지별 3-Phase 반복:
-   a. diagnose — Pro Max 디자인 데이터 + LibreUIUX 7차원 분석 → 점수 + 개선 우선순위
-   b. redesign — 레이아웃 재설계 + 코드 구현 (색상만 바꾸면 FAIL)
-   c. verify — 파티모드 3라운드 + 재감사(+2점 상승 필수) + 반응형/접근성 + 테스트
-4. phase3 — 시각 회귀 기준 등록
-5. final — 전체 검증
+Phase A: Foundation (1회) — 7개 LibreUIUX 스킬 순차 실행
+  A-1 brand-systems → A-2 jungian-archetypes → A-3 major-arcana →
+  A-4 archetypal-combinations → A-5 design-principles →
+  A-6 design-masters → A-7 design-movements
+  → brand-guide.md 통합 문서 생성
+
+Phase B: Per-Page (페이지마다 반복) — 5개 libre 명령어 순차 실행
+  B-1 libre-ui-modern (생성) → B-2 libre-ui-critique (비평) →
+  B-3 libre-ui-responsive (반응형) → B-4 libre-a11y-audit (접근성) →
+  B-5 libre-ui-review (종합 7/10 이상이면 합격)
 ```
 
-**사전 준비 (필수):**
-1. `_uxui-refactoring/CONFIG.md` — 프로젝트 설정 (페이지 목록, 스택, 배포 URL)
-2. `.claude/skills/ui-ux-pro-max/` — Pro Max 스킬 설치
-3. `.claude/commands/libre-*.md` — LibreUIUX 명령어 5개 설치
-4. `python3 .claude/skills/ui-ux-pro-max/scripts/search.py "..." --design-system --persist` — 디자인 시스템 생성
-5. (선택) Subframe 컴포넌트 라이브러리 설치
+**사전 준비:**
+- `.claude/commands/libre-*.md` — LibreUIUX 명령어 6개 설치
+- LibreUIUX 내장 스킬 사용 가능 환경 (brand-systems, jungian-archetypes 등)
 
 ---
 
@@ -305,10 +297,10 @@ FAIL -> 처음부터 재작성 -> 3라운드 재실행
 
 ```
 kodonghui_full_pipeline/
-  README.md                         <- 지금 보고 있는 파일
-  kdh-full-auto-pipeline.md          <- 기획+개발 파이프라인 커맨드
-  kdh-uxui-pipeline.md               <- UXUI 리팩토링 파이프라인 커맨드
-  example_CLAUDE.md.md               <- CLAUDE.md 예시 (프로젝트에 맞게 수정)
+  README.md                              <- 지금 보고 있는 파일
+  kdh-full-auto-pipeline.md               <- 기획+개발 파이프라인 커맨드
+  kdh-libre-uxui-full-auto-pipeline.md    <- UXUI 리팩토링 파이프라인 커맨드 (LibreUIUX 기반)
+  example_CLAUDE.md.md                    <- CLAUDE.md 예시 (프로젝트에 맞게 수정)
 ```
 
 ---
