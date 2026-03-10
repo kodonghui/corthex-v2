@@ -1,18 +1,21 @@
 "use client";
 import React from "react";
 
-const styles = `body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
+const styles = `
+body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
     .font-mono { font-family: "JetBrains Mono", monospace; }
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 2px; }
-    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }`;
+    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }
+`;
 
 function AppArgos() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* API: GET /api/argos/monitors, GET /api/argos/alerts, POST /api/argos/rules */}
+{/* API: GET /api/argos/monitors, GET /api/argos/alerts, POST /api/argos/rules */}
   {/* Sidebar */}
   <aside className="w-60 min-w-[240px] bg-zinc-900 border-r border-zinc-800 flex flex-col fixed h-full z-20">
     <div className="h-12 border-b border-zinc-800 flex items-center px-4 gap-3 flex-shrink-0">
@@ -137,7 +140,7 @@ function AppArgos() {
               <span className="text-xs font-mono text-zinc-500 w-4">1</span>
               <div className="flex-1">
                 <span className="text-xs font-medium text-zinc-300">#삼성전자</span>
-                <div className="h-1 bg-zinc-800 rounded-full mt-1"><div className="h-1 bg-blue-500 rounded-full" style={{"width":"90%"}}></div></div>
+                <div className="h-1 bg-zinc-800 rounded-full mt-1"><div className="h-1 bg-blue-500 rounded-full" style={{width: "90%"}}></div></div>
               </div>
               <span className="text-xs text-green-400 font-mono">+1,240</span>
             </div>
@@ -145,7 +148,7 @@ function AppArgos() {
               <span className="text-xs font-mono text-zinc-500 w-4">2</span>
               <div className="flex-1">
                 <span className="text-xs font-medium text-zinc-300">#AI투자</span>
-                <div className="h-1 bg-zinc-800 rounded-full mt-1"><div className="h-1 bg-purple-500 rounded-full" style={{"width":"75%"}}></div></div>
+                <div className="h-1 bg-zinc-800 rounded-full mt-1"><div className="h-1 bg-purple-500 rounded-full" style={{width: "75%"}}></div></div>
               </div>
               <span className="text-xs text-green-400 font-mono">+892</span>
             </div>
@@ -153,7 +156,7 @@ function AppArgos() {
               <span className="text-xs font-mono text-zinc-500 w-4">3</span>
               <div className="flex-1">
                 <span className="text-xs font-medium text-zinc-300">#반도체</span>
-                <div className="h-1 bg-zinc-800 rounded-full mt-1"><div className="h-1 bg-orange-500 rounded-full" style={{"width":"68%"}}></div></div>
+                <div className="h-1 bg-zinc-800 rounded-full mt-1"><div className="h-1 bg-orange-500 rounded-full" style={{width: "68%"}}></div></div>
               </div>
               <span className="text-xs text-green-400 font-mono">+734</span>
             </div>
@@ -161,7 +164,7 @@ function AppArgos() {
               <span className="text-xs font-mono text-zinc-500 w-4">4</span>
               <div className="flex-1">
                 <span className="text-xs font-medium text-zinc-300">#연준금리</span>
-                <div className="h-1 bg-zinc-800 rounded-full mt-1"><div className="h-1 bg-yellow-500 rounded-full" style={{"width":"55%"}}></div></div>
+                <div className="h-1 bg-zinc-800 rounded-full mt-1"><div className="h-1 bg-yellow-500 rounded-full" style={{width: "55%"}}></div></div>
               </div>
               <span className="text-xs text-green-400 font-mono">+521</span>
             </div>
@@ -169,7 +172,7 @@ function AppArgos() {
               <span className="text-xs font-mono text-zinc-500 w-4">5</span>
               <div className="flex-1">
                 <span className="text-xs font-medium text-zinc-300">#HBM</span>
-                <div className="h-1 bg-zinc-800 rounded-full mt-1"><div className="h-1 bg-green-500 rounded-full" style={{"width":"40%"}}></div></div>
+                <div className="h-1 bg-zinc-800 rounded-full mt-1"><div className="h-1 bg-green-500 rounded-full" style={{width: "40%"}}></div></div>
               </div>
               <span className="text-xs text-green-400 font-mono">+380</span>
             </div>

@@ -1,18 +1,21 @@
 "use client";
 import React from "react";
 
-const styles = `body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
+const styles = `
+body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
     .font-mono { font-family: "JetBrains Mono", monospace; }
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 2px; }
-    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }`;
+    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }
+`;
 
 function AdminCosts() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* GET /api/admin/costs — returns cost breakdown by department, agent, daily_trend */}
+{/* GET /api/admin/costs — returns cost breakdown by department, agent, daily_trend */}
   {/* Sidebar */}
   <aside className="w-60 min-w-[240px] bg-zinc-900 border-r border-zinc-800 flex flex-col fixed h-full z-20">
     <div className="h-12 border-b border-zinc-800 flex items-center px-4 gap-3 flex-shrink-0">
@@ -99,7 +102,7 @@ function AdminCosts() {
                 <span className="font-mono text-zinc-300">₩1,284K</span>
               </div>
               <div className="h-2 bg-zinc-800 rounded-full">
-                <div className="h-2 bg-blue-500 rounded-full" style={{"width":"64%"}}></div>
+                <div className="h-2 bg-blue-500 rounded-full" style={{width: "64%"}}></div>
               </div>
             </div>
             <div>
@@ -108,7 +111,7 @@ function AdminCosts() {
                 <span className="font-mono text-zinc-300">₩842K</span>
               </div>
               <div className="h-2 bg-zinc-800 rounded-full">
-                <div className="h-2 bg-purple-500 rounded-full" style={{"width":"42%"}}></div>
+                <div className="h-2 bg-purple-500 rounded-full" style={{width: "42%"}}></div>
               </div>
             </div>
             <div>
@@ -117,7 +120,7 @@ function AdminCosts() {
                 <span className="font-mono text-zinc-300">₩721K</span>
               </div>
               <div className="h-2 bg-zinc-800 rounded-full">
-                <div className="h-2 bg-green-500 rounded-full" style={{"width":"36%"}}></div>
+                <div className="h-2 bg-green-500 rounded-full" style={{width: "36%"}}></div>
               </div>
             </div>
             <div>
@@ -126,7 +129,7 @@ function AdminCosts() {
                 <span className="font-mono text-zinc-300">₩634K</span>
               </div>
               <div className="h-2 bg-zinc-800 rounded-full">
-                <div className="h-2 bg-yellow-500 rounded-full" style={{"width":"32%"}}></div>
+                <div className="h-2 bg-yellow-500 rounded-full" style={{width: "32%"}}></div>
               </div>
             </div>
             <div>
@@ -135,7 +138,7 @@ function AdminCosts() {
                 <span className="font-mono text-zinc-300">₩806K</span>
               </div>
               <div className="h-2 bg-zinc-800 rounded-full">
-                <div className="h-2 bg-orange-500 rounded-full" style={{"width":"40%"}}></div>
+                <div className="h-2 bg-orange-500 rounded-full" style={{width: "40%"}}></div>
               </div>
             </div>
           </div>

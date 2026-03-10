@@ -2,7 +2,8 @@
 import React from "react";
 import { Activity, BarChart2, Bell, BookOpen, Bot, Building2, Camera, ChevronRight, ChevronsUpDown, CreditCard, Eye, Folder, Gauge, GitBranch, Home, Key, LayoutDashboard, ListChecks, Lock, MessageSquare, Monitor, Plug, Save, ScrollText, Send, Settings, Share2, Shield, ShieldCheck, Smartphone, Terminal, TrendingUp, UserCircle, Users, Zap } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1,h2,h3,h4,h5,h6,.font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
     code,pre,.font-mono { font-family: 'JetBrains Mono', monospace; }
     ::-webkit-scrollbar { width: 5px; }
@@ -10,25 +11,14 @@ const styles = `* { font-family: 'Inter', sans-serif; }
     ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }
     /* Toggle Switch */
     .toggle-bg { transition: background-color 0.2s; }
-    .toggle-dot { transition: transform 0.2s; }`;
+    .toggle-dot { transition: transform 0.2s; }
+`;
 
 function AppSettings() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* API: GET /api/workspace/settings */}
-  {/* API: PUT /api/workspace/settings */}
-  {/* API: PUT /api/workspace/settings/profile */}
-  {/* API: PUT /api/workspace/settings/password */}
-  {/* API: PUT /api/workspace/settings/notifications */}
-  {/* API: POST /api/workspace/settings/2fa/enable */}
-  
-  
-  
-  
-
-
-
 {/* ===== SIDEBAR ===== */}
 <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-10">
 
@@ -38,8 +28,8 @@ function AppSettings() {
       <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
         <Zap className="w-4 h-4 text-white" />
       </div>
-      <span className="text-sm font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
-      <span className="text-[10px] text-stone-400 ml-0.5" style={{"fontFamily":"'JetBrains Mono',monospace"}}>v2</span>
+      <span className="text-sm font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+      <span className="text-[10px] text-stone-400 ml-0.5" style={{fontFamily: "'JetBrains Mono',monospace"}}>v2</span>
     </div>
   </div>
 
@@ -121,9 +111,9 @@ function AppSettings() {
 <main className="ml-60 min-h-screen">
 
   {/* Header */}
-  
-    <h1 className="text-base font-semibold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>설정</h1>
-  
+  <header className="h-14 bg-white border-b border-stone-200 flex items-center justify-between px-6 sticky top-0 z-10">
+    <h1 className="text-base font-semibold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>설정</h1>
+  </header>
 
   <div className="p-6 flex gap-6">
 
@@ -178,7 +168,7 @@ function AppSettings() {
       <div id="tab-profile">
 
         <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-6">
-          <h2 className="text-sm font-bold text-stone-900 mb-5" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>프로필 정보</h2>
+          <h2 className="text-sm font-bold text-stone-900 mb-5" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>프로필 정보</h2>
 
           {/* Avatar Upload */}
           <div className="flex items-center gap-5 mb-6 pb-6 border-b border-stone-100">
@@ -189,7 +179,7 @@ function AppSettings() {
               </button>
             </div>
             <div>
-              <p className="text-sm font-semibold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>프로필 사진</p>
+              <p className="text-sm font-semibold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>프로필 사진</p>
               <p className="text-xs text-stone-500 mt-0.5">JPG, PNG 최대 2MB</p>
               <div className="flex gap-2 mt-2">
                 <button className="text-xs text-violet-600 hover:text-violet-700 font-medium">사진 업로드</button>
@@ -278,7 +268,7 @@ function AppSettings() {
               <Bell className="w-4 h-4 text-stone-600" />
             </div>
             <div className="text-left">
-              <p className="text-sm font-semibold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>알림 설정</p>
+              <p className="text-sm font-semibold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>알림 설정</p>
               <p className="text-xs text-stone-500 mt-0.5">작업완료, 에러, 비용경고 알림을 개별 설정</p>
             </div>
           </div>
@@ -333,7 +323,7 @@ function AppSettings() {
               <ShieldCheck className="w-4 h-4 text-stone-600" />
             </div>
             <div className="text-left">
-              <p className="text-sm font-semibold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>보안</p>
+              <p className="text-sm font-semibold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>보안</p>
               <p className="text-xs text-stone-500 mt-0.5">비밀번호 변경 및 2단계 인증 설정</p>
             </div>
           </div>
@@ -390,7 +380,7 @@ function AppSettings() {
               <LayoutDashboard className="w-4 h-4 text-stone-600" />
             </div>
             <div className="text-left">
-              <p className="text-sm font-semibold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>워크스페이스</p>
+              <p className="text-sm font-semibold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>워크스페이스</p>
               <p className="text-xs text-stone-500 mt-0.5">워크스페이스 이름, 로고, 기본 설정</p>
             </div>
           </div>
@@ -406,7 +396,7 @@ function AppSettings() {
               <Plug className="w-4 h-4 text-stone-600" />
             </div>
             <div className="text-left">
-              <p className="text-sm font-semibold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>연동 서비스</p>
+              <p className="text-sm font-semibold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>연동 서비스</p>
               <p className="text-xs text-stone-500 mt-0.5">Slack, Google Drive, Notion 등 외부 서비스 연결</p>
             </div>
           </div>
@@ -422,7 +412,7 @@ function AppSettings() {
               <CreditCard className="w-4 h-4 text-stone-600" />
             </div>
             <div className="text-left">
-              <p className="text-sm font-semibold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>결제/구독</p>
+              <p className="text-sm font-semibold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>결제/구독</p>
               <p className="text-xs text-stone-500 mt-0.5">현재 플랜: <span className="font-medium text-violet-700">Pro</span> · 다음 청구일 2026-04-01</p>
             </div>
           </div>
@@ -432,7 +422,7 @@ function AppSettings() {
 
       {/* Danger Zone */}
       <div className="bg-white rounded-xl border border-red-100 shadow-sm p-5">
-        <h3 className="text-sm font-bold text-red-700 mb-3" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>위험 구역</h3>
+        <h3 className="text-sm font-bold text-red-700 mb-3" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>위험 구역</h3>
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <div>

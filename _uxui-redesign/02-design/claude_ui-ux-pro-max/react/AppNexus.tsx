@@ -1,18 +1,21 @@
 "use client";
 import React from "react";
 
-const styles = `body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
+const styles = `
+body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
     .font-mono { font-family: "JetBrains Mono", monospace; }
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 2px; }
-    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }`;
+    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }
+`;
 
 function AppNexus() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* API: GET /api/nexus/canvas, PUT /api/nexus/canvas */}
+{/* API: GET /api/nexus/canvas, PUT /api/nexus/canvas */}
   {/* Sidebar */}
   <aside className="w-60 min-w-[240px] bg-zinc-900 border-r border-zinc-800 flex flex-col fixed h-full z-20">
     <div className="h-12 border-b border-zinc-800 flex items-center px-4 gap-3 flex-shrink-0">
@@ -94,9 +97,9 @@ function AppNexus() {
         </div>
 
         {/* Canvas area */}
-        <div className="flex-1 relative bg-zinc-950 overflow-hidden" style={{"backgroundImage":"radial-gradient(circle, #3f3f46 1px, transparent 1px)","backgroundSize":"24px 24px"}}>
+        <div className="flex-1 relative bg-zinc-950 overflow-hidden" style={{backgroundImage: "radial-gradient(circle, #3f3f46 1px, transparent 1px)", backgroundSize: "24px 24px"}}>
           {/* SVG org chart */}
-          <svg className="absolute inset-0 w-full h-full" style={{"overflow":"visible"}}>
+          <svg className="absolute inset-0 w-full h-full" style={{overflow: "visible"}}>
             {/* Connections */}
             <line x1="420" y1="80" x2="200" y2="180" stroke="#3f3f46" strokeWidth="1.5"/>
             <line x1="420" y1="80" x2="420" y2="180" stroke="#3f3f46" strokeWidth="1.5"/>

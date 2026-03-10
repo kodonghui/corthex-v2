@@ -2,25 +2,28 @@
 import React from "react";
 import { Activity, AlertCircle, AlertTriangle, BarChart2, Bell, BookOpen, Bot, Briefcase, Building2, Calendar, CreditCard, Download, Eye, FileText, Folder, Home, Key, LayoutDashboard, List, MessageCircle, PieChart, Rss, Send, Settings, Settings2, Share2, Shield, Terminal, TrendingUp, Users, Zap } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; }
     code,pre { font-family: 'JetBrains Mono', monospace; }
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: #fafaf9; }
-    ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }`;
+    ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }
+`;
 
 function AppCosts() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* SIDEBAR */}
+{/* SIDEBAR */}
 <aside className="w-60 fixed left-0 top-0 bottom-0 bg-white border-r border-stone-200 flex flex-col z-20">
   <div className="p-4 border-b border-stone-200">
     <div className="flex items-center gap-2.5">
       <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
         <span className="text-white font-bold text-sm">C</span>
       </div>
-      <span className="font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+      <span className="font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
     </div>
   </div>
   <div className="px-4 py-3 border-b border-stone-200">
@@ -96,7 +99,7 @@ function AppCosts() {
           <Zap className="w-4 h-4 text-violet-600" />
         </div>
       </div>
-      <div className="text-2xl font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>$2.34</div>
+      <div className="text-2xl font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>$2.34</div>
       <div className="text-xs text-emerald-600 mt-1.5 flex items-center gap-1">
         <TrendingUp className="w-3 h-3" />어제 대비 +$0.12
       </div>
@@ -108,7 +111,7 @@ function AppCosts() {
           <Calendar className="w-4 h-4 text-emerald-600" />
         </div>
       </div>
-      <div className="text-2xl font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>$12.40</div>
+      <div className="text-2xl font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>$12.40</div>
       <div className="text-xs text-stone-500 mt-1.5">₩16,120 (환율 1,300원)</div>
     </div>
     <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-5">
@@ -118,7 +121,7 @@ function AppCosts() {
           <PieChart className="w-4 h-4 text-amber-600" />
         </div>
       </div>
-      <div className="text-2xl font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>62%</div>
+      <div className="text-2xl font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>62%</div>
       <div className="text-xs text-amber-600 mt-1.5 flex items-center gap-1">
         <AlertTriangle className="w-3 h-3" />예산 소진 주의
       </div>
@@ -130,7 +133,7 @@ function AppCosts() {
           <TrendingUp className="w-4 h-4 text-red-500" />
         </div>
       </div>
-      <div className="text-2xl font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>$20.10</div>
+      <div className="text-2xl font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>$20.10</div>
       <div className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
         <AlertCircle className="w-3 h-3" />예산 $0.10 초과 예상
       </div>
@@ -150,7 +153,7 @@ function AppCosts() {
       </div>
     </div>
     <div className="w-full bg-stone-100 rounded-full h-3 mb-2 relative">
-      <div className="bg-amber-400 h-3 rounded-full transition-all duration-500" style={{"width":"62%"}}></div>
+      <div className="bg-amber-400 h-3 rounded-full transition-all duration-500" style={{width: "62%"}}></div>
     </div>
     <div className="flex justify-between text-xs text-stone-400 mt-1 mb-3">
       <span>₩0</span>
@@ -170,40 +173,40 @@ function AppCosts() {
       <h3 className="font-bold text-stone-900 text-sm">비용 추이 — 최근 7일</h3>
       <span className="bg-violet-50 text-violet-700 rounded-full px-2.5 py-0.5 text-xs font-medium">일별 집계</span>
     </div>
-    <div className="flex items-end gap-3" style={{"height":"120px"}}>
+    <div className="flex items-end gap-3" style={{height: "120px"}}>
       <div className="flex-1 flex flex-col items-center gap-1">
-        <span className="text-[10px] text-stone-500" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$1.42</span>
-        <div className="w-full bg-violet-200 rounded-t-md" style={{"height":"48px"}}></div>
+        <span className="text-[10px] text-stone-500" style={{fontFamily: "'JetBrains Mono',monospace"}}>$1.42</span>
+        <div className="w-full bg-violet-200 rounded-t-md" style={{height: "48px"}}></div>
         <span className="text-[10px] text-stone-400">3/4</span>
       </div>
       <div className="flex-1 flex flex-col items-center gap-1">
-        <span className="text-[10px] text-stone-500" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$1.85</span>
-        <div className="w-full bg-violet-200 rounded-t-md" style={{"height":"62px"}}></div>
+        <span className="text-[10px] text-stone-500" style={{fontFamily: "'JetBrains Mono',monospace"}}>$1.85</span>
+        <div className="w-full bg-violet-200 rounded-t-md" style={{height: "62px"}}></div>
         <span className="text-[10px] text-stone-400">3/5</span>
       </div>
       <div className="flex-1 flex flex-col items-center gap-1">
-        <span className="text-[10px] text-stone-500" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$1.21</span>
-        <div className="w-full bg-violet-200 rounded-t-md" style={{"height":"40px"}}></div>
+        <span className="text-[10px] text-stone-500" style={{fontFamily: "'JetBrains Mono',monospace"}}>$1.21</span>
+        <div className="w-full bg-violet-200 rounded-t-md" style={{height: "40px"}}></div>
         <span className="text-[10px] text-stone-400">3/6</span>
       </div>
       <div className="flex-1 flex flex-col items-center gap-1">
-        <span className="text-[10px] text-stone-500" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$2.10</span>
-        <div className="w-full bg-violet-300 rounded-t-md" style={{"height":"70px"}}></div>
+        <span className="text-[10px] text-stone-500" style={{fontFamily: "'JetBrains Mono',monospace"}}>$2.10</span>
+        <div className="w-full bg-violet-300 rounded-t-md" style={{height: "70px"}}></div>
         <span className="text-[10px] text-stone-400">3/7</span>
       </div>
       <div className="flex-1 flex flex-col items-center gap-1">
-        <span className="text-[10px] text-stone-500" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$1.68</span>
-        <div className="w-full bg-violet-200 rounded-t-md" style={{"height":"56px"}}></div>
+        <span className="text-[10px] text-stone-500" style={{fontFamily: "'JetBrains Mono',monospace"}}>$1.68</span>
+        <div className="w-full bg-violet-200 rounded-t-md" style={{height: "56px"}}></div>
         <span className="text-[10px] text-stone-400">3/8</span>
       </div>
       <div className="flex-1 flex flex-col items-center gap-1">
-        <span className="text-[10px] text-stone-500" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$2.22</span>
-        <div className="w-full bg-violet-300 rounded-t-md" style={{"height":"74px"}}></div>
+        <span className="text-[10px] text-stone-500" style={{fontFamily: "'JetBrains Mono',monospace"}}>$2.22</span>
+        <div className="w-full bg-violet-300 rounded-t-md" style={{height: "74px"}}></div>
         <span className="text-[10px] text-stone-400">3/9</span>
       </div>
       <div className="flex-1 flex flex-col items-center gap-1">
-        <span className="text-[10px] text-violet-700 font-semibold" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$2.34</span>
-        <div className="w-full bg-violet-600 rounded-t-md" style={{"height":"78px"}}></div>
+        <span className="text-[10px] text-violet-700 font-semibold" style={{fontFamily: "'JetBrains Mono',monospace"}}>$2.34</span>
+        <div className="w-full bg-violet-600 rounded-t-md" style={{height: "78px"}}></div>
         <span className="text-[10px] text-violet-600 font-semibold">오늘</span>
       </div>
     </div>
@@ -238,11 +241,11 @@ function AppCosts() {
                 <div><div className="text-sm font-medium text-stone-900">김재원</div><div className="text-xs text-stone-400">전략부서 · Specialist</div></div>
               </div>
             </td>
-            <td className="px-4 py-3.5 text-right"><span className="text-sm font-semibold text-stone-900" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$4.20</span></td>
+            <td className="px-4 py-3.5 text-right"><span className="text-sm font-semibold text-stone-900" style={{fontFamily: "'JetBrains Mono',monospace"}}>$4.20</span></td>
             <td className="px-4 py-3.5 text-right"><span className="text-sm text-stone-600">145회</span></td>
-            <td className="px-4 py-3.5 text-right"><span className="text-sm text-stone-600" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$0.029</span></td>
+            <td className="px-4 py-3.5 text-right"><span className="text-sm text-stone-600" style={{fontFamily: "'JetBrains Mono',monospace"}}>$0.029</span></td>
             <td className="px-4 py-3.5 text-right"><span className="bg-violet-50 text-violet-700 rounded-full px-2.5 py-0.5 text-xs font-medium">34%</span></td>
-            <td className="px-4 py-3.5"><div className="w-full bg-stone-100 rounded-full h-1.5"><div className="bg-violet-500 h-1.5 rounded-full" style={{"width":"34%"}}></div></div></td>
+            <td className="px-4 py-3.5"><div className="w-full bg-stone-100 rounded-full h-1.5"><div className="bg-violet-500 h-1.5 rounded-full" style={{width: "34%"}}></div></div></td>
           </tr>
           <tr className="border-b border-stone-100 hover:bg-stone-50/50 transition-colors">
             <td className="px-5 py-3.5">
@@ -251,11 +254,11 @@ function AppCosts() {
                 <div><div className="text-sm font-medium text-stone-900">박준형</div><div className="text-xs text-stone-400">마케팅부서 · Manager</div></div>
               </div>
             </td>
-            <td className="px-4 py-3.5 text-right"><span className="text-sm font-semibold text-stone-900" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$2.80</span></td>
+            <td className="px-4 py-3.5 text-right"><span className="text-sm font-semibold text-stone-900" style={{fontFamily: "'JetBrains Mono',monospace"}}>$2.80</span></td>
             <td className="px-4 py-3.5 text-right"><span className="text-sm text-stone-600">220회</span></td>
-            <td className="px-4 py-3.5 text-right"><span className="text-sm text-stone-600" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$0.013</span></td>
+            <td className="px-4 py-3.5 text-right"><span className="text-sm text-stone-600" style={{fontFamily: "'JetBrains Mono',monospace"}}>$0.013</span></td>
             <td className="px-4 py-3.5 text-right"><span className="bg-violet-50 text-violet-700 rounded-full px-2.5 py-0.5 text-xs font-medium">23%</span></td>
-            <td className="px-4 py-3.5"><div className="w-full bg-stone-100 rounded-full h-1.5"><div className="bg-violet-400 h-1.5 rounded-full" style={{"width":"23%"}}></div></div></td>
+            <td className="px-4 py-3.5"><div className="w-full bg-stone-100 rounded-full h-1.5"><div className="bg-violet-400 h-1.5 rounded-full" style={{width: "23%"}}></div></div></td>
           </tr>
           <tr className="border-b border-stone-100 hover:bg-stone-50/50 transition-colors">
             <td className="px-5 py-3.5">
@@ -264,11 +267,11 @@ function AppCosts() {
                 <div><div className="text-sm font-medium text-stone-900">이나경</div><div className="text-xs text-stone-400">비서실 · Manager</div></div>
               </div>
             </td>
-            <td className="px-4 py-3.5 text-right"><span className="text-sm font-semibold text-stone-900" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$2.30</span></td>
+            <td className="px-4 py-3.5 text-right"><span className="text-sm font-semibold text-stone-900" style={{fontFamily: "'JetBrains Mono',monospace"}}>$2.30</span></td>
             <td className="px-4 py-3.5 text-right"><span className="text-sm text-stone-600">380회</span></td>
-            <td className="px-4 py-3.5 text-right"><span className="text-sm text-stone-600" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$0.006</span></td>
+            <td className="px-4 py-3.5 text-right"><span className="text-sm text-stone-600" style={{fontFamily: "'JetBrains Mono',monospace"}}>$0.006</span></td>
             <td className="px-4 py-3.5 text-right"><span className="bg-emerald-50 text-emerald-700 rounded-full px-2.5 py-0.5 text-xs font-medium">19%</span></td>
-            <td className="px-4 py-3.5"><div className="w-full bg-stone-100 rounded-full h-1.5"><div className="bg-emerald-500 h-1.5 rounded-full" style={{"width":"19%"}}></div></div></td>
+            <td className="px-4 py-3.5"><div className="w-full bg-stone-100 rounded-full h-1.5"><div className="bg-emerald-500 h-1.5 rounded-full" style={{width: "19%"}}></div></div></td>
           </tr>
           <tr className="border-b border-stone-100 hover:bg-stone-50/50 transition-colors">
             <td className="px-5 py-3.5">
@@ -277,11 +280,11 @@ function AppCosts() {
                 <div><div className="text-sm font-medium text-stone-900">최민지</div><div className="text-xs text-stone-400">마케팅부서 · Worker</div></div>
               </div>
             </td>
-            <td className="px-4 py-3.5 text-right"><span className="text-sm font-semibold text-stone-900" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$1.90</span></td>
+            <td className="px-4 py-3.5 text-right"><span className="text-sm font-semibold text-stone-900" style={{fontFamily: "'JetBrains Mono',monospace"}}>$1.90</span></td>
             <td className="px-4 py-3.5 text-right"><span className="text-sm text-stone-600">290회</span></td>
-            <td className="px-4 py-3.5 text-right"><span className="text-sm text-stone-600" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$0.007</span></td>
+            <td className="px-4 py-3.5 text-right"><span className="text-sm text-stone-600" style={{fontFamily: "'JetBrains Mono',monospace"}}>$0.007</span></td>
             <td className="px-4 py-3.5 text-right"><span className="bg-amber-50 text-amber-700 rounded-full px-2.5 py-0.5 text-xs font-medium">15%</span></td>
-            <td className="px-4 py-3.5"><div className="w-full bg-stone-100 rounded-full h-1.5"><div className="bg-amber-400 h-1.5 rounded-full" style={{"width":"15%"}}></div></div></td>
+            <td className="px-4 py-3.5"><div className="w-full bg-stone-100 rounded-full h-1.5"><div className="bg-amber-400 h-1.5 rounded-full" style={{width: "15%"}}></div></div></td>
           </tr>
           <tr className="hover:bg-stone-50/50 transition-colors">
             <td className="px-5 py-3.5">
@@ -290,17 +293,17 @@ function AppCosts() {
                 <div><div className="text-sm font-medium text-stone-900">이소연</div><div className="text-xs text-stone-400">법무팀 · Specialist</div></div>
               </div>
             </td>
-            <td className="px-4 py-3.5 text-right"><span className="text-sm font-semibold text-stone-900" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$1.20</span></td>
+            <td className="px-4 py-3.5 text-right"><span className="text-sm font-semibold text-stone-900" style={{fontFamily: "'JetBrains Mono',monospace"}}>$1.20</span></td>
             <td className="px-4 py-3.5 text-right"><span className="text-sm text-stone-600">85회</span></td>
-            <td className="px-4 py-3.5 text-right"><span className="text-sm text-stone-600" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$0.014</span></td>
+            <td className="px-4 py-3.5 text-right"><span className="text-sm text-stone-600" style={{fontFamily: "'JetBrains Mono',monospace"}}>$0.014</span></td>
             <td className="px-4 py-3.5 text-right"><span className="bg-stone-100 text-stone-600 rounded-full px-2.5 py-0.5 text-xs font-medium">10%</span></td>
-            <td className="px-4 py-3.5"><div className="w-full bg-stone-100 rounded-full h-1.5"><div className="bg-stone-400 h-1.5 rounded-full" style={{"width":"10%"}}></div></div></td>
+            <td className="px-4 py-3.5"><div className="w-full bg-stone-100 rounded-full h-1.5"><div className="bg-stone-400 h-1.5 rounded-full" style={{width: "10%"}}></div></div></td>
           </tr>
         </tbody>
       </table>
       <div className="px-5 py-3.5 border-t border-stone-100 flex justify-between items-center bg-stone-50/50 rounded-b-xl">
         <span className="text-xs text-stone-400">총 5명 에이전트 · 1,120회 호출</span>
-        <span className="text-sm font-bold text-stone-700" style={{"fontFamily":"'JetBrains Mono',monospace"}}>합계: $12.40</span>
+        <span className="text-sm font-bold text-stone-700" style={{fontFamily: "'JetBrains Mono',monospace"}}>합계: $12.40</span>
       </div>
     </div>
 
@@ -317,12 +320,12 @@ function AppCosts() {
           </tr>
         </thead>
         <tbody>
-          <tr className="border-b border-stone-100 hover:bg-stone-50/50"><td className="px-5 py-3.5"><div className="text-sm font-medium text-stone-900">claude-sonnet-4</div><div className="text-xs text-stone-400">Anthropic</div></td><td className="px-4 py-3.5 text-right text-sm font-semibold text-stone-900" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$8.20</td><td className="px-4 py-3.5 text-right text-sm text-stone-600">830회</td><td className="px-4 py-3.5 text-right"><span className="bg-violet-50 text-violet-700 rounded-full px-2.5 py-0.5 text-xs font-medium">66%</span></td><td className="px-4 py-3.5"><div className="w-full bg-stone-100 rounded-full h-1.5"><div className="bg-violet-500 h-1.5 rounded-full" style={{"width":"66%"}}></div></div></td></tr>
-          <tr className="border-b border-stone-100 hover:bg-stone-50/50"><td className="px-5 py-3.5"><div className="text-sm font-medium text-stone-900">claude-haiku-3.5</div><div className="text-xs text-stone-400">Anthropic</div></td><td className="px-4 py-3.5 text-right text-sm font-semibold text-stone-900" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$2.80</td><td className="px-4 py-3.5 text-right text-sm text-stone-600">210회</td><td className="px-4 py-3.5 text-right"><span className="bg-emerald-50 text-emerald-700 rounded-full px-2.5 py-0.5 text-xs font-medium">23%</span></td><td className="px-4 py-3.5"><div className="w-full bg-stone-100 rounded-full h-1.5"><div className="bg-emerald-500 h-1.5 rounded-full" style={{"width":"23%"}}></div></div></td></tr>
-          <tr className="hover:bg-stone-50/50"><td className="px-5 py-3.5"><div className="text-sm font-medium text-stone-900">gpt-4o</div><div className="text-xs text-stone-400">OpenAI</div></td><td className="px-4 py-3.5 text-right text-sm font-semibold text-stone-900" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$1.40</td><td className="px-4 py-3.5 text-right text-sm text-stone-600">80회</td><td className="px-4 py-3.5 text-right"><span className="bg-amber-50 text-amber-700 rounded-full px-2.5 py-0.5 text-xs font-medium">11%</span></td><td className="px-4 py-3.5"><div className="w-full bg-stone-100 rounded-full h-1.5"><div className="bg-amber-400 h-1.5 rounded-full" style={{"width":"11%"}}></div></div></td></tr>
+          <tr className="border-b border-stone-100 hover:bg-stone-50/50"><td className="px-5 py-3.5"><div className="text-sm font-medium text-stone-900">claude-sonnet-4</div><div className="text-xs text-stone-400">Anthropic</div></td><td className="px-4 py-3.5 text-right text-sm font-semibold text-stone-900" style={{fontFamily: "'JetBrains Mono',monospace"}}>$8.20</td><td className="px-4 py-3.5 text-right text-sm text-stone-600">830회</td><td className="px-4 py-3.5 text-right"><span className="bg-violet-50 text-violet-700 rounded-full px-2.5 py-0.5 text-xs font-medium">66%</span></td><td className="px-4 py-3.5"><div className="w-full bg-stone-100 rounded-full h-1.5"><div className="bg-violet-500 h-1.5 rounded-full" style={{width: "66%"}}></div></div></td></tr>
+          <tr className="border-b border-stone-100 hover:bg-stone-50/50"><td className="px-5 py-3.5"><div className="text-sm font-medium text-stone-900">claude-haiku-3.5</div><div className="text-xs text-stone-400">Anthropic</div></td><td className="px-4 py-3.5 text-right text-sm font-semibold text-stone-900" style={{fontFamily: "'JetBrains Mono',monospace"}}>$2.80</td><td className="px-4 py-3.5 text-right text-sm text-stone-600">210회</td><td className="px-4 py-3.5 text-right"><span className="bg-emerald-50 text-emerald-700 rounded-full px-2.5 py-0.5 text-xs font-medium">23%</span></td><td className="px-4 py-3.5"><div className="w-full bg-stone-100 rounded-full h-1.5"><div className="bg-emerald-500 h-1.5 rounded-full" style={{width: "23%"}}></div></div></td></tr>
+          <tr className="hover:bg-stone-50/50"><td className="px-5 py-3.5"><div className="text-sm font-medium text-stone-900">gpt-4o</div><div className="text-xs text-stone-400">OpenAI</div></td><td className="px-4 py-3.5 text-right text-sm font-semibold text-stone-900" style={{fontFamily: "'JetBrains Mono',monospace"}}>$1.40</td><td className="px-4 py-3.5 text-right text-sm text-stone-600">80회</td><td className="px-4 py-3.5 text-right"><span className="bg-amber-50 text-amber-700 rounded-full px-2.5 py-0.5 text-xs font-medium">11%</span></td><td className="px-4 py-3.5"><div className="w-full bg-stone-100 rounded-full h-1.5"><div className="bg-amber-400 h-1.5 rounded-full" style={{width: "11%"}}></div></div></td></tr>
         </tbody>
       </table>
-      <div className="px-5 py-3.5 border-t border-stone-100 bg-stone-50/50 rounded-b-xl flex justify-between"><span className="text-xs text-stone-400">3가지 모델 사용 중</span><span className="text-sm font-bold text-stone-700" style={{"fontFamily":"'JetBrains Mono',monospace"}}>합계: $12.40</span></div>
+      <div className="px-5 py-3.5 border-t border-stone-100 bg-stone-50/50 rounded-b-xl flex justify-between"><span className="text-xs text-stone-400">3가지 모델 사용 중</span><span className="text-sm font-bold text-stone-700" style={{fontFamily: "'JetBrains Mono',monospace"}}>합계: $12.40</span></div>
     </div>
 
     {/* Dept Tab */}
@@ -338,13 +341,13 @@ function AppCosts() {
           </tr>
         </thead>
         <tbody>
-          <tr className="border-b border-stone-100 hover:bg-stone-50/50"><td className="px-5 py-3.5 text-sm font-medium text-stone-900">마케팅부서</td><td className="px-4 py-3.5 text-right text-sm font-semibold text-stone-900" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$4.70</td><td className="px-4 py-3.5 text-right text-sm text-stone-600">2명</td><td className="px-4 py-3.5 text-right"><span className="bg-violet-50 text-violet-700 rounded-full px-2.5 py-0.5 text-xs font-medium">38%</span></td><td className="px-4 py-3.5"><div className="w-full bg-stone-100 rounded-full h-1.5"><div className="bg-violet-500 h-1.5 rounded-full" style={{"width":"38%"}}></div></div></td></tr>
-          <tr className="border-b border-stone-100 hover:bg-stone-50/50"><td className="px-5 py-3.5 text-sm font-medium text-stone-900">전략부서</td><td className="px-4 py-3.5 text-right text-sm font-semibold text-stone-900" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$4.20</td><td className="px-4 py-3.5 text-right text-sm text-stone-600">1명</td><td className="px-4 py-3.5 text-right"><span className="bg-emerald-50 text-emerald-700 rounded-full px-2.5 py-0.5 text-xs font-medium">34%</span></td><td className="px-4 py-3.5"><div className="w-full bg-stone-100 rounded-full h-1.5"><div className="bg-emerald-500 h-1.5 rounded-full" style={{"width":"34%"}}></div></div></td></tr>
-          <tr className="border-b border-stone-100 hover:bg-stone-50/50"><td className="px-5 py-3.5 text-sm font-medium text-stone-900">비서실</td><td className="px-4 py-3.5 text-right text-sm font-semibold text-stone-900" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$2.30</td><td className="px-4 py-3.5 text-right text-sm text-stone-600">1명</td><td className="px-4 py-3.5 text-right"><span className="bg-amber-50 text-amber-700 rounded-full px-2.5 py-0.5 text-xs font-medium">19%</span></td><td className="px-4 py-3.5"><div className="w-full bg-stone-100 rounded-full h-1.5"><div className="bg-amber-400 h-1.5 rounded-full" style={{"width":"19%"}}></div></div></td></tr>
-          <tr className="hover:bg-stone-50/50"><td className="px-5 py-3.5 text-sm font-medium text-stone-900">법무팀</td><td className="px-4 py-3.5 text-right text-sm font-semibold text-stone-900" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$1.20</td><td className="px-4 py-3.5 text-right text-sm text-stone-600">1명</td><td className="px-4 py-3.5 text-right"><span className="bg-stone-100 text-stone-600 rounded-full px-2.5 py-0.5 text-xs font-medium">10%</span></td><td className="px-4 py-3.5"><div className="w-full bg-stone-100 rounded-full h-1.5"><div className="bg-stone-400 h-1.5 rounded-full" style={{"width":"10%"}}></div></div></td></tr>
+          <tr className="border-b border-stone-100 hover:bg-stone-50/50"><td className="px-5 py-3.5 text-sm font-medium text-stone-900">마케팅부서</td><td className="px-4 py-3.5 text-right text-sm font-semibold text-stone-900" style={{fontFamily: "'JetBrains Mono',monospace"}}>$4.70</td><td className="px-4 py-3.5 text-right text-sm text-stone-600">2명</td><td className="px-4 py-3.5 text-right"><span className="bg-violet-50 text-violet-700 rounded-full px-2.5 py-0.5 text-xs font-medium">38%</span></td><td className="px-4 py-3.5"><div className="w-full bg-stone-100 rounded-full h-1.5"><div className="bg-violet-500 h-1.5 rounded-full" style={{width: "38%"}}></div></div></td></tr>
+          <tr className="border-b border-stone-100 hover:bg-stone-50/50"><td className="px-5 py-3.5 text-sm font-medium text-stone-900">전략부서</td><td className="px-4 py-3.5 text-right text-sm font-semibold text-stone-900" style={{fontFamily: "'JetBrains Mono',monospace"}}>$4.20</td><td className="px-4 py-3.5 text-right text-sm text-stone-600">1명</td><td className="px-4 py-3.5 text-right"><span className="bg-emerald-50 text-emerald-700 rounded-full px-2.5 py-0.5 text-xs font-medium">34%</span></td><td className="px-4 py-3.5"><div className="w-full bg-stone-100 rounded-full h-1.5"><div className="bg-emerald-500 h-1.5 rounded-full" style={{width: "34%"}}></div></div></td></tr>
+          <tr className="border-b border-stone-100 hover:bg-stone-50/50"><td className="px-5 py-3.5 text-sm font-medium text-stone-900">비서실</td><td className="px-4 py-3.5 text-right text-sm font-semibold text-stone-900" style={{fontFamily: "'JetBrains Mono',monospace"}}>$2.30</td><td className="px-4 py-3.5 text-right text-sm text-stone-600">1명</td><td className="px-4 py-3.5 text-right"><span className="bg-amber-50 text-amber-700 rounded-full px-2.5 py-0.5 text-xs font-medium">19%</span></td><td className="px-4 py-3.5"><div className="w-full bg-stone-100 rounded-full h-1.5"><div className="bg-amber-400 h-1.5 rounded-full" style={{width: "19%"}}></div></div></td></tr>
+          <tr className="hover:bg-stone-50/50"><td className="px-5 py-3.5 text-sm font-medium text-stone-900">법무팀</td><td className="px-4 py-3.5 text-right text-sm font-semibold text-stone-900" style={{fontFamily: "'JetBrains Mono',monospace"}}>$1.20</td><td className="px-4 py-3.5 text-right text-sm text-stone-600">1명</td><td className="px-4 py-3.5 text-right"><span className="bg-stone-100 text-stone-600 rounded-full px-2.5 py-0.5 text-xs font-medium">10%</span></td><td className="px-4 py-3.5"><div className="w-full bg-stone-100 rounded-full h-1.5"><div className="bg-stone-400 h-1.5 rounded-full" style={{width: "10%"}}></div></div></td></tr>
         </tbody>
       </table>
-      <div className="px-5 py-3.5 border-t border-stone-100 bg-stone-50/50 rounded-b-xl flex justify-between"><span className="text-xs text-stone-400">4개 부서</span><span className="text-sm font-bold text-stone-700" style={{"fontFamily":"'JetBrains Mono',monospace"}}>합계: $12.40</span></div>
+      <div className="px-5 py-3.5 border-t border-stone-100 bg-stone-50/50 rounded-b-xl flex justify-between"><span className="text-xs text-stone-400">4개 부서</span><span className="text-sm font-bold text-stone-700" style={{fontFamily: "'JetBrains Mono',monospace"}}>합계: $12.40</span></div>
     </div>
   </div>
 </main>

@@ -2,24 +2,27 @@
 import React from "react";
 import { Activity, AlertCircle, AlertTriangle, Bot, Briefcase, Building2, Code2, DollarSign, FlaskConical, GitBranch, GitFork, Info, KeyRound, LayoutDashboard, LayoutTemplate, Megaphone, Network, Plus, Rocket, Scale, Settings, ShoppingBag, Sparkles, Store, Trash2, TrendingUp, TriangleAlert, UserCog, UserPlus, UserX, Users, Wrench, X } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; }
     code,pre { font-family: 'JetBrains Mono', monospace; }
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 50; display: flex; align-items: center; justify-content: center; }
     .avatar-stack { display: flex; }
     .avatar-stack .av { width: 24px; height: 24px; border-radius: 50%; border: 2px solid white; margin-left: -6px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; }
-    .avatar-stack .av:first-child { margin-left: 0; }`;
+    .avatar-stack .av:first-child { margin-left: 0; }
+`;
 
 function AdminDepartments() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* Sidebar */}
+{/* Sidebar */}
   <aside className="w-64 min-h-screen bg-white border-r border-stone-200 flex flex-col fixed left-0 top-0 z-10 overflow-y-auto">
     <div className="px-5 py-5 border-b border-stone-100 flex-shrink-0">
       <div className="flex items-center gap-2">
         <span className="bg-violet-100 text-violet-700 text-xs font-semibold px-2 py-0.5 rounded">ADMIN</span>
-        <span className="font-bold text-stone-900 text-lg" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+        <span className="font-bold text-stone-900 text-lg" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
       </div>
     </div>
     <div className="px-4 py-3 border-b border-stone-100 flex-shrink-0">

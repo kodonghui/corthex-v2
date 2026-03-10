@@ -2,28 +2,20 @@
 import React from "react";
 import { Activity, BarChart2, Bell, BookOpen, Bot, Building, Building2, ChevronsUpDown, CreditCard, Eye, Folder, Gauge, GitBranch, Home, Info, Key, LayoutDashboard, LayoutTemplate, ListChecks, MessageCircle, MessageSquare, Pencil, Save, ScrollText, Send, Settings, Share2, Shield, Terminal, TrendingUp, Users, Zap, ZoomIn, ZoomOut } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1,h2,h3,h4,h5,h6,.font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
     code,pre,.font-mono { font-family: 'JetBrains Mono', monospace; }
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: #f5f5f4; }
-    ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }`;
+    ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }
+`;
 
 function AppNexus() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* API: GET /api/workspace/nexus/org */}
-  {/* API: GET /api/workspace/nexus/layout */}
-  {/* API: PUT /api/workspace/nexus/layout */}
-  {/* API: GET /api/workspace/agents/{id} */}
-  
-  
-  
-  
-
-
-
 {/* ===== SIDEBAR ===== */}
 <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-10">
 
@@ -33,8 +25,8 @@ function AppNexus() {
       <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
         <Zap className="w-4 h-4 text-white" />
       </div>
-      <span className="text-sm font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
-      <span className="text-[10px] text-stone-400 ml-0.5" style={{"fontFamily":"'JetBrains Mono',monospace"}}>v2</span>
+      <span className="text-sm font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+      <span className="text-[10px] text-stone-400 ml-0.5" style={{fontFamily: "'JetBrains Mono',monospace"}}>v2</span>
     </div>
   </div>
 
@@ -116,8 +108,8 @@ function AppNexus() {
 <main className="ml-60 min-h-screen flex flex-col">
 
   {/* Header */}
-  
-    <h1 className="text-base font-semibold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>조직도 (Nexus)</h1>
+  <header className="h-14 bg-white border-b border-stone-200 flex items-center justify-between px-6 sticky top-0 z-10 flex-shrink-0">
+    <h1 className="text-base font-semibold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>조직도 (Nexus)</h1>
     <div className="flex items-center gap-2">
       <button className="flex items-center gap-1.5 text-stone-600 hover:bg-stone-100 rounded-lg px-3 py-1.5 text-sm transition-colors">
         <ZoomOut className="w-3.5 h-3.5" />
@@ -136,7 +128,7 @@ function AppNexus() {
         저장
       </button>
     </div>
-  
+  </header>
 
   {/* Guide Banner */}
   <div className="mx-6 mt-4 flex items-center gap-2 bg-blue-50 border border-blue-100 rounded-lg px-4 py-2.5 flex-shrink-0">
@@ -148,7 +140,7 @@ function AppNexus() {
   <div className="flex flex-1 gap-0 p-6 pt-4">
 
     {/* ── ORG CHART CANVAS ── */}
-    <div className="flex-1 bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden relative" style={{"minHeight":"600px"}}>
+    <div className="flex-1 bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden relative" style={{minHeight: "600px"}}>
 
       {/* Grid background pattern */}
       <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -182,22 +174,22 @@ function AppNexus() {
       </svg>
 
       {/* ── Level 0: ACME Corp ── */}
-      <div className="absolute" style={{"left":"340px","top":"48px","width":"180px"}}>
+      <div className="absolute" style={{left: "340px", top: "48px", width: "180px"}}>
         <div className="bg-white border-2 border-violet-400 rounded-xl px-4 py-3 shadow-md text-center">
           <div className="w-8 h-8 bg-violet-600 rounded-lg mx-auto mb-2 flex items-center justify-center">
             <Building className="w-4 h-4 text-white" />
           </div>
-          <p className="text-sm font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>ACME Corp</p>
+          <p className="text-sm font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>ACME Corp</p>
           <p className="text-[11px] text-stone-500 mt-0.5">김대표 · CEO</p>
         </div>
       </div>
 
       {/* ── Level 1: 비서실 ── */}
-      <div className="absolute" style={{"left":"350px","top":"150px","width":"160px"}}>
+      <div className="absolute" style={{left: "350px", top: "150px", width: "160px"}}>
         <div className="bg-violet-50 border border-violet-200 rounded-xl px-3 py-2.5 shadow-sm text-center hover:border-violet-400 transition-colors cursor-pointer">
           <div className="flex items-center justify-center gap-1.5 mb-1">
             <span className="text-base">🏢</span>
-            <p className="text-xs font-bold text-violet-800" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>비서실</p>
+            <p className="text-xs font-bold text-violet-800" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>비서실</p>
           </div>
           <div className="flex items-center justify-center gap-1 mt-1">
             <div className="w-4 h-4 rounded-full bg-violet-200 border border-white flex items-center justify-center text-[8px] font-bold text-violet-800">이나</div>
@@ -209,62 +201,62 @@ function AppNexus() {
       {/* ── Level 2: Department boxes ── */}
 
       {/* 마케팅부서 */}
-      <div className="absolute" style={{"left":"100px","top":"312px","width":"130px"}}>
+      <div className="absolute" style={{left: "100px", top: "312px", width: "130px"}}>
         <div className="bg-blue-50 border border-blue-200 rounded-xl px-3 py-2.5 shadow-sm text-center hover:border-blue-400 transition-colors cursor-pointer">
           <div className="flex items-center justify-center gap-1 mb-1">
             <span className="text-sm">📢</span>
-            <p className="text-[11px] font-bold text-blue-800" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>마케팅</p>
+            <p className="text-[11px] font-bold text-blue-800" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>마케팅</p>
           </div>
           <p className="text-[10px] text-blue-600">5명</p>
         </div>
       </div>
 
       {/* 전략투자부서 */}
-      <div className="absolute" style={{"left":"250px","top":"312px","width":"130px"}}>
+      <div className="absolute" style={{left: "250px", top: "312px", width: "130px"}}>
         <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2.5 shadow-sm text-center hover:border-emerald-400 transition-colors cursor-pointer">
           <div className="flex items-center justify-center gap-1 mb-1">
             <span className="text-sm">💹</span>
-            <p className="text-[11px] font-bold text-emerald-800" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>전략투자</p>
+            <p className="text-[11px] font-bold text-emerald-800" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>전략투자</p>
           </div>
           <p className="text-[10px] text-emerald-600">4명</p>
         </div>
       </div>
 
       {/* 법무부서 */}
-      <div className="absolute" style={{"left":"400px","top":"312px","width":"130px"}}>
+      <div className="absolute" style={{left: "400px", top: "312px", width: "130px"}}>
         <div className="bg-amber-50 border border-amber-200 rounded-xl px-3 py-2.5 shadow-sm text-center hover:border-amber-400 transition-colors cursor-pointer">
           <div className="flex items-center justify-center gap-1 mb-1">
             <span className="text-sm">⚖️</span>
-            <p className="text-[11px] font-bold text-amber-800" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>법무</p>
+            <p className="text-[11px] font-bold text-amber-800" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>법무</p>
           </div>
           <p className="text-[10px] text-amber-600">3명</p>
         </div>
       </div>
 
       {/* 연구개발부서 */}
-      <div className="absolute" style={{"left":"550px","top":"312px","width":"130px"}}>
+      <div className="absolute" style={{left: "550px", top: "312px", width: "130px"}}>
         <div className="bg-rose-50 border border-rose-200 rounded-xl px-3 py-2.5 shadow-sm text-center hover:border-rose-400 transition-colors cursor-pointer">
           <div className="flex items-center justify-center gap-1 mb-1">
             <span className="text-sm">🔬</span>
-            <p className="text-[11px] font-bold text-rose-800" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>연구개발</p>
+            <p className="text-[11px] font-bold text-rose-800" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>연구개발</p>
           </div>
           <p className="text-[10px] text-rose-600">4명</p>
         </div>
       </div>
 
       {/* 비서실 직속 에이전트 */}
-      <div className="absolute" style={{"left":"700px","top":"312px","width":"130px"}}>
+      <div className="absolute" style={{left: "700px", top: "312px", width: "130px"}}>
         <div className="bg-violet-50 border border-violet-200 rounded-xl px-3 py-2.5 shadow-sm text-center hover:border-violet-400 transition-colors cursor-pointer">
           <div className="flex items-center justify-center gap-1 mb-1">
             <span className="text-sm">🏢</span>
-            <p className="text-[11px] font-bold text-violet-800" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>비서실 직속</p>
+            <p className="text-[11px] font-bold text-violet-800" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>비서실 직속</p>
           </div>
           <p className="text-[10px] text-violet-600">2명</p>
         </div>
       </div>
 
       {/* ── Level 3: Agent Cards (마케팅 소속) ── */}
-      <div className="absolute" style={{"left":"100px","top":"430px","width":"118px"}}>
+      <div className="absolute" style={{left: "100px", top: "430px", width: "118px"}}>
         <div className="bg-white border border-stone-200 rounded-lg px-2.5 py-2 shadow-sm hover:border-violet-300 hover:shadow-md transition-all cursor-pointer" onClick="selectAgent('박준형')">
           <div className="flex items-center gap-1.5">
             <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-[8px] font-bold flex-shrink-0">박준</div>
@@ -280,7 +272,7 @@ function AppNexus() {
         </div>
       </div>
 
-      <div className="absolute" style={{"left":"228px","top":"430px","width":"118px"}}>
+      <div className="absolute" style={{left: "228px", top: "430px", width: "118px"}}>
         <div className="bg-white border border-stone-200 rounded-lg px-2.5 py-2 shadow-sm hover:border-violet-300 hover:shadow-md transition-all cursor-pointer" onClick="selectAgent('최민지')">
           <div className="flex items-center gap-1.5">
             <div className="w-5 h-5 rounded-full bg-rose-100 flex items-center justify-center text-rose-700 text-[8px] font-bold flex-shrink-0">최민</div>
@@ -297,7 +289,7 @@ function AppNexus() {
       </div>
 
       {/* Agent Cards (전략투자 소속) */}
-      <div className="absolute" style={{"left":"356px","top":"430px","width":"118px"}}>
+      <div className="absolute" style={{left: "356px", top: "430px", width: "118px"}}>
         <div className="bg-white border border-stone-200 rounded-lg px-2.5 py-2 shadow-sm hover:border-violet-300 hover:shadow-md transition-all cursor-pointer" onClick="selectAgent('김재원')">
           <div className="flex items-center gap-1.5">
             <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 text-[8px] font-bold flex-shrink-0">김재</div>
@@ -313,7 +305,7 @@ function AppNexus() {
         </div>
       </div>
 
-      <div className="absolute" style={{"left":"484px","top":"430px","width":"118px"}}>
+      <div className="absolute" style={{left: "484px", top: "430px", width: "118px"}}>
         <div className="bg-white border border-stone-200 rounded-lg px-2.5 py-2 shadow-sm hover:border-violet-300 hover:shadow-md transition-all cursor-pointer" onClick="selectAgent('정도현')">
           <div className="flex items-center gap-1.5">
             <div className="w-5 h-5 rounded-full bg-stone-100 flex items-center justify-center text-stone-500 text-[8px] font-bold flex-shrink-0">정도</div>
@@ -330,7 +322,7 @@ function AppNexus() {
       </div>
 
       {/* Agent (비서실 직속 이나경) */}
-      <div className="absolute" style={{"left":"700px","top":"430px","width":"118px"}}>
+      <div className="absolute" style={{left: "700px", top: "430px", width: "118px"}}>
         <div className="bg-white border-2 border-violet-200 rounded-lg px-2.5 py-2 shadow-sm hover:border-violet-400 hover:shadow-md transition-all cursor-pointer" onClick="selectAgent('이나경')">
           <div className="flex items-center gap-1.5">
             <div className="w-5 h-5 rounded-full bg-violet-100 flex items-center justify-center text-violet-700 text-[8px] font-bold flex-shrink-0">이나</div>
@@ -381,7 +373,7 @@ function AppNexus() {
         {/* Agent Avatar + Name */}
         <div className="flex flex-col items-center text-center mb-4">
           <div className="w-14 h-14 rounded-full bg-violet-100 flex items-center justify-center text-violet-700 text-lg font-bold mb-2">이나</div>
-          <h3 className="text-sm font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>이나경</h3>
+          <h3 className="text-sm font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>이나경</h3>
           <p className="text-xs text-stone-500">비서실장</p>
           <span className="mt-2 inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 rounded-full px-2.5 py-0.5 text-xs font-medium">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
@@ -409,7 +401,7 @@ function AppNexus() {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-[11px] text-stone-500">모델</span>
-            <span className="text-[10px] text-stone-600" style={{"fontFamily":"'JetBrains Mono',monospace"}}>claude-3-5-sonnet</span>
+            <span className="text-[10px] text-stone-600" style={{fontFamily: "'JetBrains Mono',monospace"}}>claude-3-5-sonnet</span>
           </div>
         </div>
 

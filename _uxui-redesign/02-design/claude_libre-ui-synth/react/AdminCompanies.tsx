@@ -2,21 +2,24 @@
 import React from "react";
 import { Activity, Bell, Bot, Briefcase, Building2, CircleDollarSign, Database, FileBarChart, GitBranch, Key, LayoutDashboard, Plug, Plus, Search, Settings, Shield, ShieldAlert, Store, UserCheck, UserPlus, Users, Workflow } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; }
-    code,pre { font-family: 'JetBrains Mono', monospace; }`;
+    code,pre { font-family: 'JetBrains Mono', monospace; }
+`;
 
 function AdminCompanies() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* Sidebar */}
+{/* Sidebar */}
   <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-10">
     <div className="px-5 py-4 border-b border-stone-100">
       <div className="flex items-center gap-2 mb-1">
         <span className="bg-violet-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded tracking-widest">ADMIN</span>
       </div>
-      <span className="text-lg font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+      <span className="text-lg font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
     </div>
     <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5">
       <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 px-2 py-1.5 mt-1">개요</p>
@@ -86,7 +89,7 @@ function AdminCompanies() {
           <Building2 className="w-5 h-5 text-violet-600" />
         </div>
         <div>
-          <p className="text-xl font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>4</p>
+          <p className="text-xl font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>4</p>
           <p className="text-xs text-stone-500">총 회사</p>
         </div>
       </div>
@@ -95,7 +98,7 @@ function AdminCompanies() {
           <Bot className="w-5 h-5 text-blue-600" />
         </div>
         <div>
-          <p className="text-xl font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>48</p>
+          <p className="text-xl font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>48</p>
           <p className="text-xs text-stone-500">총 에이전트</p>
         </div>
       </div>
@@ -104,7 +107,7 @@ function AdminCompanies() {
           <Users className="w-5 h-5 text-emerald-600" />
         </div>
         <div>
-          <p className="text-xl font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>11</p>
+          <p className="text-xl font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>11</p>
           <p className="text-xs text-stone-500">총 직원</p>
         </div>
       </div>
@@ -113,7 +116,7 @@ function AdminCompanies() {
           <CircleDollarSign className="w-5 h-5 text-amber-600" />
         </div>
         <div>
-          <p className="text-xl font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>$22.40</p>
+          <p className="text-xl font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>$22.40</p>
           <p className="text-xs text-stone-500">이번 달 합계</p>
         </div>
       </div>
@@ -310,14 +313,14 @@ function AdminCompanies() {
           <div className="flex items-center gap-3">
             <span className="text-xs text-stone-500 w-16">Starter</span>
             <div className="flex-1 h-2 bg-stone-100 rounded-full overflow-hidden">
-              <div className="h-full bg-stone-400 rounded-full" style={{"width":"20%"}}></div>
+              <div className="h-full bg-stone-400 rounded-full" style={{width: "20%"}}></div>
             </div>
             <span className="text-xs font-semibold text-stone-700">$20</span>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-xs text-stone-500 w-16">Pro</span>
             <div className="flex-1 h-2 bg-stone-100 rounded-full overflow-hidden">
-              <div className="h-full bg-violet-500 rounded-full" style={{"width":"80%"}}></div>
+              <div className="h-full bg-violet-500 rounded-full" style={{width: "80%"}}></div>
             </div>
             <span className="text-xs font-semibold text-stone-700">$98</span>
           </div>

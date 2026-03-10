@@ -2,23 +2,26 @@
 import React from "react";
 import { Activity, BarChart2, Bell, BookOpen, Bot, Briefcase, Building2, CreditCard, Eye, FileLock2, FileText, Folder, FolderOpen, Home, Info, Key, LayoutDashboard, List, Lock, MessageCircle, Rss, Search, Send, Settings, Share2, Shield, ShieldAlert, ShieldX, Terminal, TrendingUp, Unlock, Users } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; }
     code,pre { font-family: 'JetBrains Mono', monospace; }
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: #fafaf9; }
-    ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }`;
+    ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }
+`;
 
 function AppClassified() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* SIDEBAR */}
+{/* SIDEBAR */}
 <aside className="w-60 fixed left-0 top-0 bottom-0 bg-white border-r border-stone-200 flex flex-col z-20">
   <div className="p-4 border-b border-stone-200">
     <div className="flex items-center gap-2.5">
       <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center"><span className="text-white font-bold text-sm">C</span></div>
-      <span className="font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+      <span className="font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
     </div>
   </div>
   <div className="px-4 py-3 border-b border-stone-200">
@@ -170,7 +173,7 @@ function AppClassified() {
               <td className="px-4 py-4 text-center">
                 <div className="flex flex-col items-center gap-1">
                   <span className="text-sm font-bold text-emerald-700">95</span>
-                  <div className="w-10 bg-stone-100 rounded-full h-1"><div className="bg-emerald-500 h-1 rounded-full" style={{"width":"95%"}}></div></div>
+                  <div className="w-10 bg-stone-100 rounded-full h-1"><div className="bg-emerald-500 h-1 rounded-full" style={{width: "95%"}}></div></div>
                 </div>
               </td>
               <td className="px-4 py-4 text-right text-xs text-stone-500">오늘</td>
@@ -201,7 +204,7 @@ function AppClassified() {
               <td className="px-4 py-4 text-center">
                 <div className="flex flex-col items-center gap-1">
                   <span className="text-sm font-bold text-emerald-700">88</span>
-                  <div className="w-10 bg-stone-100 rounded-full h-1"><div className="bg-emerald-500 h-1 rounded-full" style={{"width":"88%"}}></div></div>
+                  <div className="w-10 bg-stone-100 rounded-full h-1"><div className="bg-emerald-500 h-1 rounded-full" style={{width: "88%"}}></div></div>
                 </div>
               </td>
               <td className="px-4 py-4 text-right text-xs text-stone-500">어제</td>
@@ -232,7 +235,7 @@ function AppClassified() {
               <td className="px-4 py-4 text-center">
                 <div className="flex flex-col items-center gap-1">
                   <span className="text-sm font-bold text-emerald-700">97</span>
-                  <div className="w-10 bg-stone-100 rounded-full h-1"><div className="bg-emerald-500 h-1 rounded-full" style={{"width":"97%"}}></div></div>
+                  <div className="w-10 bg-stone-100 rounded-full h-1"><div className="bg-emerald-500 h-1 rounded-full" style={{width: "97%"}}></div></div>
                 </div>
               </td>
               <td className="px-4 py-4 text-right text-xs text-stone-500">3일 전</td>
@@ -263,7 +266,7 @@ function AppClassified() {
               <td className="px-4 py-4 text-center">
                 <div className="flex flex-col items-center gap-1">
                   <span className="text-sm font-bold text-emerald-700">91</span>
-                  <div className="w-10 bg-stone-100 rounded-full h-1"><div className="bg-emerald-500 h-1 rounded-full" style={{"width":"91%"}}></div></div>
+                  <div className="w-10 bg-stone-100 rounded-full h-1"><div className="bg-emerald-500 h-1 rounded-full" style={{width: "91%"}}></div></div>
                 </div>
               </td>
               <td className="px-4 py-4 text-right text-xs text-stone-500">1주 전</td>
@@ -294,7 +297,7 @@ function AppClassified() {
               <td className="px-4 py-4 text-center">
                 <div className="flex flex-col items-center gap-1">
                   <span className="text-sm font-bold text-emerald-700">93</span>
-                  <div className="w-10 bg-stone-100 rounded-full h-1"><div className="bg-emerald-500 h-1 rounded-full" style={{"width":"93%"}}></div></div>
+                  <div className="w-10 bg-stone-100 rounded-full h-1"><div className="bg-emerald-500 h-1 rounded-full" style={{width: "93%"}}></div></div>
                 </div>
               </td>
               <td className="px-4 py-4 text-right text-xs text-stone-500">2주 전</td>

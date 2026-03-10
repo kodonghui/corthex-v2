@@ -2,18 +2,21 @@
 import React from "react";
 import { Activity, BarChart2, Bell, BookOpen, Bot, Building2, CheckCircle, Clock, Copy, CreditCard, Database, FileText, GitBranch, Info, Key, LayoutDashboard, Link2Off, Package, Plug, Plus, Settings, ShieldCheck, Store, User, UserCheck, Users, Webhook, Zap } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; } h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; } code,pre { font-family: 'JetBrains Mono', monospace; }`;
+const styles = `
+* { font-family: 'Inter', sans-serif; } h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; } code,pre { font-family: 'JetBrains Mono', monospace; }
+`;
 
 function AdminApiKeys() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* Sidebar */}
+{/* Sidebar */}
 <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-10">
   <div className="px-5 py-4 border-b border-stone-100">
     <div className="flex items-center gap-2.5">
       <span className="text-[10px] font-bold bg-violet-600 text-white px-1.5 py-0.5 rounded tracking-widest">ADMIN</span>
-      <span className="font-bold text-stone-900 text-base" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+      <span className="font-bold text-stone-900 text-base" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
     </div>
   </div>
   <div className="px-4 py-3 border-b border-stone-100 flex items-center gap-2.5">
@@ -247,43 +250,43 @@ function AdminApiKeys() {
         {/* Day 1 */}
         <div className="flex-1 flex flex-col items-center gap-1.5">
           <span className="text-[10px] text-stone-400 font-medium">842</span>
-          <div className="w-full bg-violet-100 rounded-t-md" style={{"height":"67%"}}></div>
+          <div className="w-full bg-violet-100 rounded-t-md" style={{height: "67%"}}></div>
           <span className="text-[10px] text-stone-400">3/4</span>
         </div>
         {/* Day 2 */}
         <div className="flex-1 flex flex-col items-center gap-1.5">
           <span className="text-[10px] text-stone-400 font-medium">1,023</span>
-          <div className="w-full bg-violet-200 rounded-t-md" style={{"height":"82%"}}></div>
+          <div className="w-full bg-violet-200 rounded-t-md" style={{height: "82%"}}></div>
           <span className="text-[10px] text-stone-400">3/5</span>
         </div>
         {/* Day 3 */}
         <div className="flex-1 flex flex-col items-center gap-1.5">
           <span className="text-[10px] text-stone-400 font-medium">756</span>
-          <div className="w-full bg-violet-100 rounded-t-md" style={{"height":"60%"}}></div>
+          <div className="w-full bg-violet-100 rounded-t-md" style={{height: "60%"}}></div>
           <span className="text-[10px] text-stone-400">3/6</span>
         </div>
         {/* Day 4 */}
         <div className="flex-1 flex flex-col items-center gap-1.5">
           <span className="text-[10px] text-stone-400 font-medium">1,247</span>
-          <div className="w-full bg-violet-500 rounded-t-md" style={{"height":"100%"}}></div>
+          <div className="w-full bg-violet-500 rounded-t-md" style={{height: "100%"}}></div>
           <span className="text-[10px] text-violet-600 font-semibold">3/7</span>
         </div>
         {/* Day 5 */}
         <div className="flex-1 flex flex-col items-center gap-1.5">
           <span className="text-[10px] text-stone-400 font-medium">934</span>
-          <div className="w-full bg-violet-200 rounded-t-md" style={{"height":"75%"}}></div>
+          <div className="w-full bg-violet-200 rounded-t-md" style={{height: "75%"}}></div>
           <span className="text-[10px] text-stone-400">3/8</span>
         </div>
         {/* Day 6 */}
         <div className="flex-1 flex flex-col items-center gap-1.5">
           <span className="text-[10px] text-stone-400 font-medium">612</span>
-          <div className="w-full bg-violet-100 rounded-t-md" style={{"height":"49%"}}></div>
+          <div className="w-full bg-violet-100 rounded-t-md" style={{height: "49%"}}></div>
           <span className="text-[10px] text-stone-400">3/9</span>
         </div>
         {/* Day 7 (오늘) */}
         <div className="flex-1 flex flex-col items-center gap-1.5">
           <span className="text-[10px] text-stone-400 font-medium">428</span>
-          <div className="w-full bg-violet-300 rounded-t-md border-2 border-dashed border-violet-400" style={{"height":"34%"}}></div>
+          <div className="w-full bg-violet-300 rounded-t-md border-2 border-dashed border-violet-400" style={{height: "34%"}}></div>
           <span className="text-[10px] text-stone-400">오늘</span>
         </div>
       </div>

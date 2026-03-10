@@ -2,31 +2,22 @@
 import React from "react";
 import { Activity, BarChart2, Bell, BookOpen, Bot, Building2, ChevronLeft, ChevronRight, ChevronsUpDown, Cpu, CreditCard, Eye, Filter, Folder, Gauge, GitBranch, Home, Key, LayoutDashboard, ListChecks, MessageCircle, MessageSquare, Pencil, Plus, ScrollText, Search, Send, Settings, Share2, Shield, Terminal, TrendingUp, User, Users, Zap } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1,h2,h3,h4,h5,h6,.font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
     code,pre,.font-mono { font-family: 'JetBrains Mono', monospace; }
     @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.35} }
     .animate-pulse-dot { animation: pulse-dot 1.8s ease-in-out infinite; }
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: #f5f5f4; }
-    ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }`;
+    ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }
+`;
 
 function AppAgents() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* API: GET /api/workspace/agents */}
-  {/* API: POST /api/workspace/agents */}
-  {/* API: GET /api/workspace/agents/{id} */}
-  {/* API: PATCH /api/workspace/agents/{id} */}
-  {/* API: DELETE /api/workspace/agents/{id} */}
-  
-  
-  
-  
-
-
-
 {/* ===== SIDEBAR ===== */}
 <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-10">
 
@@ -36,8 +27,8 @@ function AppAgents() {
       <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
         <Zap className="w-4 h-4 text-white" />
       </div>
-      <span className="text-sm font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
-      <span className="text-[10px] text-stone-400 ml-0.5" style={{"fontFamily":"'JetBrains Mono',monospace"}}>v2</span>
+      <span className="text-sm font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+      <span className="text-[10px] text-stone-400 ml-0.5" style={{fontFamily: "'JetBrains Mono',monospace"}}>v2</span>
     </div>
   </div>
 
@@ -124,8 +115,8 @@ function AppAgents() {
 <main className="ml-60 min-h-screen">
 
   {/* Header */}
-  
-    <h1 className="text-base font-semibold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>에이전트</h1>
+  <header className="h-14 bg-white border-b border-stone-200 flex items-center justify-between px-6 sticky top-0 z-10">
+    <h1 className="text-base font-semibold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>에이전트</h1>
     <div className="flex items-center gap-2">
       <button className="flex items-center gap-1.5 bg-white border border-stone-200 hover:border-stone-300 text-stone-700 rounded-lg px-4 py-2 text-sm font-medium transition-colors">
         <Filter className="w-3.5 h-3.5" />
@@ -136,7 +127,7 @@ function AppAgents() {
         에이전트 추가
       </button>
     </div>
-  
+  </header>
 
   <div className="p-6">
 
@@ -188,7 +179,7 @@ function AppAgents() {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center text-violet-700 text-sm font-bold flex-shrink-0">이나</div>
             <div>
-              <p className="text-sm font-semibold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>이나경</p>
+              <p className="text-sm font-semibold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>이나경</p>
               <p className="text-xs text-stone-500">비서실장</p>
             </div>
           </div>
@@ -208,22 +199,22 @@ function AppAgents() {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-semibold uppercase tracking-widest text-stone-500">모델</span>
-            <span className="text-xs text-stone-600" style={{"fontFamily":"'JetBrains Mono',monospace"}}>claude-3-5-sonnet</span>
+            <span className="text-xs text-stone-600" style={{fontFamily: "'JetBrains Mono',monospace"}}>claude-3-5-sonnet</span>
           </div>
         </div>
         <div className="flex items-center justify-between py-3 border-t border-stone-100 mb-3">
           <div className="text-center">
-            <p className="text-base font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>12</p>
+            <p className="text-base font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>12</p>
             <p className="text-[11px] text-stone-500">오늘 작업</p>
           </div>
           <div className="w-px h-8 bg-stone-100"></div>
           <div className="text-center">
-            <p className="text-base font-bold text-emerald-600" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>97%</p>
+            <p className="text-base font-bold text-emerald-600" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>97%</p>
             <p className="text-[11px] text-stone-500">성공률</p>
           </div>
           <div className="w-px h-8 bg-stone-100"></div>
           <div className="text-center">
-            <p className="text-base font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>3.2s</p>
+            <p className="text-base font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>3.2s</p>
             <p className="text-[11px] text-stone-500">평균 응답</p>
           </div>
         </div>
@@ -243,7 +234,7 @@ function AppAgents() {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-sm font-bold flex-shrink-0">박준</div>
             <div>
-              <p className="text-sm font-semibold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>박준형</p>
+              <p className="text-sm font-semibold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>박준형</p>
               <p className="text-xs text-stone-500">마케팅팀장</p>
             </div>
           </div>
@@ -263,7 +254,7 @@ function AppAgents() {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-semibold uppercase tracking-widest text-stone-500">모델</span>
-            <span className="text-xs text-stone-600" style={{"fontFamily":"'JetBrains Mono',monospace"}}>claude-3-5-sonnet</span>
+            <span className="text-xs text-stone-600" style={{fontFamily: "'JetBrains Mono',monospace"}}>claude-3-5-sonnet</span>
           </div>
         </div>
         {/* Working progress indicator */}
@@ -273,22 +264,22 @@ function AppAgents() {
             <span className="text-[11px] text-orange-600">62%</span>
           </div>
           <div className="w-full bg-orange-100 rounded-full h-1.5">
-            <div className="bg-orange-400 h-1.5 rounded-full transition-all" style={{"width":"62%"}}></div>
+            <div className="bg-orange-400 h-1.5 rounded-full transition-all" style={{width: "62%"}}></div>
           </div>
         </div>
         <div className="flex items-center justify-between py-3 border-t border-stone-100 mb-3">
           <div className="text-center">
-            <p className="text-base font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>8</p>
+            <p className="text-base font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>8</p>
             <p className="text-[11px] text-stone-500">오늘 작업</p>
           </div>
           <div className="w-px h-8 bg-stone-100"></div>
           <div className="text-center">
-            <p className="text-base font-bold text-emerald-600" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>94%</p>
+            <p className="text-base font-bold text-emerald-600" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>94%</p>
             <p className="text-[11px] text-stone-500">성공률</p>
           </div>
           <div className="w-px h-8 bg-stone-100"></div>
           <div className="text-center">
-            <p className="text-base font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>4.1s</p>
+            <p className="text-base font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>4.1s</p>
             <p className="text-[11px] text-stone-500">평균 응답</p>
           </div>
         </div>
@@ -308,7 +299,7 @@ function AppAgents() {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 text-sm font-bold flex-shrink-0">김재</div>
             <div>
-              <p className="text-sm font-semibold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>김재원</p>
+              <p className="text-sm font-semibold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>김재원</p>
               <p className="text-xs text-stone-500">투자분석가</p>
             </div>
           </div>
@@ -328,22 +319,22 @@ function AppAgents() {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-semibold uppercase tracking-widest text-stone-500">모델</span>
-            <span className="text-xs text-stone-600" style={{"fontFamily":"'JetBrains Mono',monospace"}}>claude-3-opus</span>
+            <span className="text-xs text-stone-600" style={{fontFamily: "'JetBrains Mono',monospace"}}>claude-3-opus</span>
           </div>
         </div>
         <div className="flex items-center justify-between py-3 border-t border-stone-100 mb-3">
           <div className="text-center">
-            <p className="text-base font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>15</p>
+            <p className="text-base font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>15</p>
             <p className="text-[11px] text-stone-500">오늘 작업</p>
           </div>
           <div className="w-px h-8 bg-stone-100"></div>
           <div className="text-center">
-            <p className="text-base font-bold text-emerald-600" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>98%</p>
+            <p className="text-base font-bold text-emerald-600" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>98%</p>
             <p className="text-[11px] text-stone-500">성공률</p>
           </div>
           <div className="w-px h-8 bg-stone-100"></div>
           <div className="text-center">
-            <p className="text-base font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>5.8s</p>
+            <p className="text-base font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>5.8s</p>
             <p className="text-[11px] text-stone-500">평균 응답</p>
           </div>
         </div>
@@ -363,7 +354,7 @@ function AppAgents() {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 text-sm font-bold flex-shrink-0">이소</div>
             <div>
-              <p className="text-sm font-semibold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>이소연</p>
+              <p className="text-sm font-semibold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>이소연</p>
               <p className="text-xs text-stone-500">법무전문가</p>
             </div>
           </div>
@@ -383,22 +374,22 @@ function AppAgents() {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-semibold uppercase tracking-widest text-stone-500">모델</span>
-            <span className="text-xs text-stone-600" style={{"fontFamily":"'JetBrains Mono',monospace"}}>claude-3-5-sonnet</span>
+            <span className="text-xs text-stone-600" style={{fontFamily: "'JetBrains Mono',monospace"}}>claude-3-5-sonnet</span>
           </div>
         </div>
         <div className="flex items-center justify-between py-3 border-t border-stone-100 mb-3">
           <div className="text-center">
-            <p className="text-base font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>5</p>
+            <p className="text-base font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>5</p>
             <p className="text-[11px] text-stone-500">오늘 작업</p>
           </div>
           <div className="w-px h-8 bg-stone-100"></div>
           <div className="text-center">
-            <p className="text-base font-bold text-emerald-600" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>100%</p>
+            <p className="text-base font-bold text-emerald-600" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>100%</p>
             <p className="text-[11px] text-stone-500">성공률</p>
           </div>
           <div className="w-px h-8 bg-stone-100"></div>
           <div className="text-center">
-            <p className="text-base font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>8.2s</p>
+            <p className="text-base font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>8.2s</p>
             <p className="text-[11px] text-stone-500">평균 응답</p>
           </div>
         </div>
@@ -418,7 +409,7 @@ function AppAgents() {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center text-rose-700 text-sm font-bold flex-shrink-0">최민</div>
             <div>
-              <p className="text-sm font-semibold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>최민지</p>
+              <p className="text-sm font-semibold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>최민지</p>
               <p className="text-xs text-stone-500">카피라이터</p>
             </div>
           </div>
@@ -438,7 +429,7 @@ function AppAgents() {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-semibold uppercase tracking-widest text-stone-500">모델</span>
-            <span className="text-xs text-stone-600" style={{"fontFamily":"'JetBrains Mono',monospace"}}>claude-3-5-haiku</span>
+            <span className="text-xs text-stone-600" style={{fontFamily: "'JetBrains Mono',monospace"}}>claude-3-5-haiku</span>
           </div>
         </div>
         <div className="mb-3 p-2.5 bg-orange-50 rounded-lg border border-orange-100">
@@ -447,22 +438,22 @@ function AppAgents() {
             <span className="text-[11px] text-orange-600">80%</span>
           </div>
           <div className="w-full bg-orange-100 rounded-full h-1.5">
-            <div className="bg-orange-400 h-1.5 rounded-full transition-all" style={{"width":"80%"}}></div>
+            <div className="bg-orange-400 h-1.5 rounded-full transition-all" style={{width: "80%"}}></div>
           </div>
         </div>
         <div className="flex items-center justify-between py-3 border-t border-stone-100 mb-3">
           <div className="text-center">
-            <p className="text-base font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>20</p>
+            <p className="text-base font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>20</p>
             <p className="text-[11px] text-stone-500">오늘 작업</p>
           </div>
           <div className="w-px h-8 bg-stone-100"></div>
           <div className="text-center">
-            <p className="text-base font-bold text-emerald-600" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>92%</p>
+            <p className="text-base font-bold text-emerald-600" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>92%</p>
             <p className="text-[11px] text-stone-500">성공률</p>
           </div>
           <div className="w-px h-8 bg-stone-100"></div>
           <div className="text-center">
-            <p className="text-base font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>2.1s</p>
+            <p className="text-base font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>2.1s</p>
             <p className="text-[11px] text-stone-500">평균 응답</p>
           </div>
         </div>
@@ -482,7 +473,7 @@ function AppAgents() {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-stone-500 text-sm font-bold flex-shrink-0">정도</div>
             <div>
-              <p className="text-sm font-semibold text-stone-700" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>정도현</p>
+              <p className="text-sm font-semibold text-stone-700" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>정도현</p>
               <p className="text-xs text-stone-500">데이터분석가</p>
             </div>
           </div>
@@ -502,22 +493,22 @@ function AppAgents() {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-semibold uppercase tracking-widest text-stone-500">모델</span>
-            <span className="text-xs text-stone-500" style={{"fontFamily":"'JetBrains Mono',monospace"}}>claude-3-5-haiku</span>
+            <span className="text-xs text-stone-500" style={{fontFamily: "'JetBrains Mono',monospace"}}>claude-3-5-haiku</span>
           </div>
         </div>
         <div className="flex items-center justify-between py-3 border-t border-stone-100 mb-3">
           <div className="text-center">
-            <p className="text-base font-bold text-stone-400" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>0</p>
+            <p className="text-base font-bold text-stone-400" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>0</p>
             <p className="text-[11px] text-stone-400">오늘 작업</p>
           </div>
           <div className="w-px h-8 bg-stone-100"></div>
           <div className="text-center">
-            <p className="text-base font-bold text-stone-400" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>—</p>
+            <p className="text-base font-bold text-stone-400" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>—</p>
             <p className="text-[11px] text-stone-400">성공률</p>
           </div>
           <div className="w-px h-8 bg-stone-100"></div>
           <div className="text-center">
-            <p className="text-base font-bold text-stone-400" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>—</p>
+            <p className="text-base font-bold text-stone-400" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>—</p>
             <p className="text-[11px] text-stone-400">평균 응답</p>
           </div>
         </div>

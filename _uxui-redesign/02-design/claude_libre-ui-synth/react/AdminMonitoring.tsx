@@ -2,23 +2,26 @@
 import React from "react";
 import { Activity, Bell, Bot, Briefcase, Building2, CircleDollarSign, Database, FileBarChart, GitBranch, Key, Layers, LayoutDashboard, Plug, Radio, Server, Settings, Shield, Store, UserCheck, UserPlus, Users, Workflow } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; }
     code,pre { font-family: 'JetBrains Mono', monospace; }
     .pulse-dot { animation: pulse 2s cubic-bezier(0.4,0,0.6,1) infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }`;
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+`;
 
 function AdminMonitoring() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* Sidebar */}
+{/* Sidebar */}
   <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-10">
     <div className="px-5 py-4 border-b border-stone-100">
       <div className="flex items-center gap-2 mb-1">
         <span className="bg-violet-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded tracking-widest">ADMIN</span>
       </div>
-      <span className="text-lg font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+      <span className="text-lg font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
     </div>
     <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5">
       <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 px-2 py-1.5 mt-1">개요</p>
@@ -230,7 +233,7 @@ function AdminMonitoring() {
                 <span className="text-sm font-bold text-stone-800 font-mono">12</span>
               </div>
               <div className="h-2 bg-stone-100 rounded-full overflow-hidden">
-                <div className="h-full bg-violet-500 rounded-full" style={{"width":"48%"}}></div>
+                <div className="h-full bg-violet-500 rounded-full" style={{width: "48%"}}></div>
               </div>
               <div className="flex justify-between mt-1">
                 <span className="text-[10px] text-stone-400">0</span>
@@ -245,7 +248,7 @@ function AdminMonitoring() {
                 <span className="text-sm font-bold text-stone-800 font-mono">3</span>
               </div>
               <div className="h-2 bg-stone-100 rounded-full overflow-hidden">
-                <div className="h-full bg-blue-500 rounded-full" style={{"width":"30%"}}></div>
+                <div className="h-full bg-blue-500 rounded-full" style={{width: "30%"}}></div>
               </div>
               <div className="flex justify-between mt-1">
                 <span className="text-[10px] text-stone-400">0</span>
@@ -260,7 +263,7 @@ function AdminMonitoring() {
                 <span className="text-sm font-bold text-stone-800 font-mono">28%</span>
               </div>
               <div className="h-2 bg-stone-100 rounded-full overflow-hidden">
-                <div className="h-full bg-emerald-500 rounded-full" style={{"width":"28%"}}></div>
+                <div className="h-full bg-emerald-500 rounded-full" style={{width: "28%"}}></div>
               </div>
               <div className="flex justify-between mt-1">
                 <span className="text-[10px] text-stone-400">0%</span>
@@ -275,7 +278,7 @@ function AdminMonitoring() {
                 <span className="text-sm font-bold text-stone-800 font-mono">2.4 / 8GB</span>
               </div>
               <div className="h-2 bg-stone-100 rounded-full overflow-hidden">
-                <div className="h-full bg-amber-400 rounded-full" style={{"width":"30%"}}></div>
+                <div className="h-full bg-amber-400 rounded-full" style={{width: "30%"}}></div>
               </div>
               <div className="flex justify-between mt-1">
                 <span className="text-[10px] text-stone-400">0GB</span>

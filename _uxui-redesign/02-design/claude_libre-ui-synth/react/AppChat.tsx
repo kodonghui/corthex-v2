@@ -2,7 +2,8 @@
 import React from "react";
 import { Activity, BarChart2, Bell, BookOpen, Building2, ChevronsUpDown, Clock, DollarSign, Download, Eye, FileText, Folder, GitBranch, Home, Image, Key, LayoutDashboard, Lock, Megaphone, MessageCircle, MessagesSquare, MoreHorizontal, Paperclip, Plus, ScrollText, Search, Send, Settings, Share2, Terminal, TrendingUp, Users, X } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1, h2, h3, h4, h5, h6, .font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
     .font-mono, code, pre { font-family: 'JetBrains Mono', monospace; }
     @keyframes blink-pulse {
@@ -25,20 +26,22 @@ const styles = `* { font-family: 'Inter', sans-serif; }
     /* 에이전트 목록 스크롤바 */
     .list-scroll::-webkit-scrollbar { width: 3px; }
     .list-scroll::-webkit-scrollbar-track { background: transparent; }
-    .list-scroll::-webkit-scrollbar-thumb { background: #e7e5e4; border-radius: 2px; }`;
+    .list-scroll::-webkit-scrollbar-thumb { background: #e7e5e4; border-radius: 2px; }
+`;
 
 function AppChat() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* 사이드바 */}
+{/* 사이드바 */}
 <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-10">
   <div className="h-14 flex items-center px-4 border-b border-stone-200">
     <div className="flex items-center gap-2.5">
       <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
         <span className="text-white font-bold text-sm">C</span>
       </div>
-      <span className="font-bold text-stone-900 text-[15px]" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>CORTHEX</span>
+      <span className="font-bold text-stone-900 text-[15px]" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>CORTHEX</span>
     </div>
   </div>
   <nav className="flex-1 overflow-y-auto p-3 space-y-0.5">
@@ -145,14 +148,14 @@ function AppChat() {
 </aside>
 
 {/* 메인: 3분할 레이아웃 */}
-<div className="ml-60 flex" style={{"height":"100vh"}}>
+<div className="ml-60 flex" style={{height: "100vh"}}>
 
   {/* API: GET /api/workspace/chat/sessions */}
   {/* 좌측: 에이전트 목록 (200px) */}
   <div className="w-[200px] flex-shrink-0 bg-white border-r border-stone-200 flex flex-col">
     {/* 헤더 */}
     <div className="h-14 flex items-center px-3 border-b border-stone-200">
-      <p className="text-sm font-semibold text-stone-900 flex-1" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>채팅</p>
+      <p className="text-sm font-semibold text-stone-900 flex-1" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>채팅</p>
       <button className="w-7 h-7 bg-violet-600 hover:bg-violet-700 rounded-lg flex items-center justify-center transition-colors">
         <Plus className="w-3.5 h-3.5 text-white" />
       </button>
@@ -332,7 +335,7 @@ function AppChat() {
           <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-orange-500 rounded-full border-2 border-white animate-blink"></span>
         </div>
         <div>
-          <p className="text-sm font-semibold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>이나경 · 비서실장</p>
+          <p className="text-sm font-semibold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>이나경 · 비서실장</p>
           <p className="text-[10px] text-stone-400">작업 중 · claude-3-5-sonnet-20241022</p>
         </div>
       </div>
@@ -494,7 +497,7 @@ function AppChat() {
 
     {/* 헤더 */}
     <div className="h-14 flex items-center px-4 border-b border-stone-200">
-      <p className="text-sm font-semibold text-stone-900 flex-1" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>에이전트 정보</p>
+      <p className="text-sm font-semibold text-stone-900 flex-1" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>에이전트 정보</p>
       <button className="text-stone-400 hover:text-stone-600 transition-colors">
         <X className="w-4 h-4" />
       </button>
@@ -508,7 +511,7 @@ function AppChat() {
         </div>
         <span className="absolute bottom-0.5 right-0.5 w-4 h-4 bg-orange-500 rounded-full border-2 border-white animate-blink"></span>
       </div>
-      <p className="text-base font-bold text-stone-900 mb-0.5" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>이나경</p>
+      <p className="text-base font-bold text-stone-900 mb-0.5" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>이나경</p>
       <p className="text-xs text-stone-500">비서실장</p>
       <span className="inline-flex items-center gap-1.5 bg-orange-50 text-orange-600 rounded-full px-2.5 py-0.5 text-xs font-medium mt-2">
         <span className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-blink"></span>
@@ -539,19 +542,19 @@ function AppChat() {
         <p className="text-[11px] font-semibold uppercase tracking-widest text-stone-400 mb-2">오늘 활동</p>
         <div className="grid grid-cols-2 gap-2">
           <div className="bg-stone-50 rounded-lg px-3 py-2.5 border border-stone-100 text-center">
-            <p className="text-lg font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>12</p>
+            <p className="text-lg font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>12</p>
             <p className="text-[10px] text-stone-400">완료 작업</p>
           </div>
           <div className="bg-stone-50 rounded-lg px-3 py-2.5 border border-stone-100 text-center">
-            <p className="text-lg font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>3</p>
+            <p className="text-lg font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>3</p>
             <p className="text-[10px] text-stone-400">진행 중</p>
           </div>
           <div className="bg-stone-50 rounded-lg px-3 py-2.5 border border-stone-100 text-center">
-            <p className="text-sm font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>$1.24</p>
+            <p className="text-sm font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>$1.24</p>
             <p className="text-[10px] text-stone-400">오늘 비용</p>
           </div>
           <div className="bg-stone-50 rounded-lg px-3 py-2.5 border border-stone-100 text-center">
-            <p className="text-lg font-bold text-emerald-600" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>92%</p>
+            <p className="text-lg font-bold text-emerald-600" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>92%</p>
             <p className="text-[10px] text-stone-400">성공률</p>
           </div>
         </div>
@@ -562,7 +565,7 @@ function AppChat() {
         <p className="text-[11px] font-semibold uppercase tracking-widest text-stone-400 mb-2">오늘 대화</p>
         <div className="flex items-center gap-3">
           <div className="flex-1 bg-stone-100 rounded-full h-1.5">
-            <div className="bg-violet-500 h-1.5 rounded-full" style={{"width":"68%"}}></div>
+            <div className="bg-violet-500 h-1.5 rounded-full" style={{width: "68%"}}></div>
           </div>
           <span className="text-xs font-medium text-stone-700">17회</span>
         </div>

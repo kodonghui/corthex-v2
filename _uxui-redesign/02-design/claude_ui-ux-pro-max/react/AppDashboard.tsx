@@ -1,18 +1,21 @@
 "use client";
 import React from "react";
 
-const styles = `body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
+const styles = `
+body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
     .font-mono { font-family: "JetBrains Mono", monospace; }
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 2px; }
-    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }`;
+    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }
+`;
 
 function AppDashboard() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* API: GET /api/dashboard/stats, GET /api/dashboard/activities */}
+{/* API: GET /api/dashboard/stats, GET /api/dashboard/activities */}
   {/* Sidebar */}
   <aside className="w-60 min-w-[240px] bg-zinc-900 border-r border-zinc-800 flex flex-col fixed h-full z-20">
     <div className="h-12 border-b border-zinc-800 flex items-center px-4 gap-3 flex-shrink-0">
@@ -103,31 +106,31 @@ function AppDashboard() {
           <h3 className="text-sm font-semibold text-zinc-50 mb-4">명령 트렌드 (최근 7일)</h3>
           <div className="flex items-end gap-2 h-32">
             <div className="flex-1 flex flex-col items-center gap-1">
-              <div className="w-full bg-blue-500/70 rounded-sm" style={{"height":"45%"}}></div>
+              <div className="w-full bg-blue-500/70 rounded-sm" style={{height: "45%"}}></div>
               <span className="text-xs text-zinc-600">월</span>
             </div>
             <div className="flex-1 flex flex-col items-center gap-1">
-              <div className="w-full bg-blue-500/70 rounded-sm" style={{"height":"60%"}}></div>
+              <div className="w-full bg-blue-500/70 rounded-sm" style={{height: "60%"}}></div>
               <span className="text-xs text-zinc-600">화</span>
             </div>
             <div className="flex-1 flex flex-col items-center gap-1">
-              <div className="w-full bg-blue-500/70 rounded-sm" style={{"height":"38%"}}></div>
+              <div className="w-full bg-blue-500/70 rounded-sm" style={{height: "38%"}}></div>
               <span className="text-xs text-zinc-600">수</span>
             </div>
             <div className="flex-1 flex flex-col items-center gap-1">
-              <div className="w-full bg-blue-500/70 rounded-sm" style={{"height":"75%"}}></div>
+              <div className="w-full bg-blue-500/70 rounded-sm" style={{height: "75%"}}></div>
               <span className="text-xs text-zinc-600">목</span>
             </div>
             <div className="flex-1 flex flex-col items-center gap-1">
-              <div className="w-full bg-blue-500/70 rounded-sm" style={{"height":"90%"}}></div>
+              <div className="w-full bg-blue-500/70 rounded-sm" style={{height: "90%"}}></div>
               <span className="text-xs text-zinc-600">금</span>
             </div>
             <div className="flex-1 flex flex-col items-center gap-1">
-              <div className="w-full bg-blue-500/30 rounded-sm" style={{"height":"30%"}}></div>
+              <div className="w-full bg-blue-500/30 rounded-sm" style={{height: "30%"}}></div>
               <span className="text-xs text-zinc-600">토</span>
             </div>
             <div className="flex-1 flex flex-col items-center gap-1">
-              <div className="w-full bg-blue-500 rounded-sm" style={{"height":"65%"}}></div>
+              <div className="w-full bg-blue-500 rounded-sm" style={{height: "65%"}}></div>
               <span className="text-xs text-zinc-600">오늘</span>
             </div>
           </div>
@@ -143,7 +146,7 @@ function AppDashboard() {
           {/* CSS donut simulation */}
           <div className="flex items-center justify-center mb-4">
             <div className="relative w-24 h-24">
-              <div className="w-24 h-24 rounded-full" style={{"background":"conic-gradient(#3b82f6 0% 35%, #a855f7 35% 60%, #22c55e 60% 78%, #eab308 78% 90%, #3f3f46 90% 100%)"}}></div>
+              <div className="w-24 h-24 rounded-full" style={{background: "conic-gradient(#3b82f6 0% 35%, #a855f7 35% 60%, #22c55e 60% 78%, #eab308 78% 90%, #3f3f46 90% 100%)"}}></div>
               <div className="absolute inset-3 bg-zinc-900 rounded-full flex items-center justify-center">
                 <span className="text-xs text-zinc-400 font-mono">$23.40</span>
               </div>

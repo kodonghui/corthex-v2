@@ -2,7 +2,8 @@
 import React from "react";
 import { Activity, BarChart2, Bot, Briefcase, Building2, ChevronDown, Database, DollarSign, Download, FileText, GitBranch, GitFork, KeyRound, LayoutDashboard, Move, Plus, Save, Settings, Shield, Sparkles, Store, UserPlus, Users, Workflow, Wrench } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; }
     code,pre { font-family: 'JetBrains Mono', monospace; }
 
@@ -66,17 +67,19 @@ const styles = `* { font-family: 'Inter', sans-serif; }
     }
     .status-dot-online { background: #10b981; box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2); }
     .status-dot-working { background: #f59e0b; box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2); }
-    .status-dot-offline { background: #9ca3af; }`;
+    .status-dot-offline { background: #9ca3af; }
+`;
 
 function AdminOrgChart() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* Sidebar */}
+{/* Sidebar */}
   <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-40">
     <div className="px-5 py-4 border-b border-stone-100 flex items-center gap-2.5">
       <span className="bg-violet-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded tracking-wider">ADMIN</span>
-      <span className="font-bold text-stone-900 text-base" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+      <span className="font-bold text-stone-900 text-base" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
     </div>
     <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5 text-sm">
       <a href="/admin/dashboard" className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-stone-600 hover:bg-stone-100"><LayoutDashboard className="w-4 h-4" />대시보드</a>
@@ -174,7 +177,7 @@ function AdminOrgChart() {
             {/* 비서실 Agents */}
             <div className="flex items-start gap-3">
               {/* 이나경 (selected) */}
-              <div onClick="selectNode('이나경')" className="agent-node selected bg-white border-2 border-violet-400 rounded-xl p-3 w-36 cursor-pointer shadow-sm" style={{"boxShadow":"0 0 0 3px rgba(124,58,237,0.15)"}}>
+              <div onClick="selectNode('이나경')" className="agent-node selected bg-white border-2 border-violet-400 rounded-xl p-3 w-36 cursor-pointer shadow-sm" style={{boxShadow: "0 0 0 3px rgba(124,58,237,0.15)"}}>
                 <div className="relative mb-2">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-400 to-violet-600 flex items-center justify-center text-white text-sm font-bold mx-auto">이</div>
                   <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full status-dot-online border-2 border-white"></span>
@@ -341,7 +344,7 @@ function AdminOrgChart() {
         {/* Soul Preview */}
         <div className="p-4 border-b border-stone-100">
           <p className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2">소울 미리보기</p>
-          <div className="bg-stone-50 rounded-lg p-3 text-[10px] text-stone-600 leading-relaxed" style={{"fontFamily":"'JetBrains Mono',monospace"}}>
+          <div className="bg-stone-50 rounded-lg p-3 text-[10px] text-stone-600 leading-relaxed" style={{fontFamily: "'JetBrains Mono',monospace"}}>
             당신은 CORTHEX의 비서실장 AI 에이전트입니다. 명령을 분류하고 적절한 부서로 위임하며, 결과를 종합하여 보고합니다. 신중하고 정확한 커뮤니케이션...
           </div>
           <p className="text-[10px] text-stone-400 mt-1.5 flex items-center gap-1">

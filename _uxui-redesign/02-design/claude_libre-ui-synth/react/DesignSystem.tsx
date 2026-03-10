@@ -2,7 +2,8 @@
 import React from "react";
 import { Activity, AlertCircle, AlertTriangle, Bell, Bot, Box, Check, CheckCircle, ChevronDown, ChevronRight, Clock, Cpu, Database, Download, Eye, FileBarChart, FileText, Inbox, Info, Layers, LayoutDashboard, Lock, MessageSquare, MoreHorizontal, MousePointerClick, Move, Palette, Plus, RefreshCw, Rocket, Search, Sidebar, Sparkles, Square, Tag, TextCursorInput, Trash2, TrendingUp, Type, User, UserCircle, Users, WifiOff, X, XCircle, Zap } from "lucide-react";
 
-const styles = `body { font-family: 'Inter', sans-serif; }
+const styles = `
+body { font-family: 'Inter', sans-serif; }
   h1, h2, h3, h4, h5, h6, .font-heading { font-family: 'Plus Jakarta Sans', sans-serif; }
   code, pre, .font-mono { font-family: 'JetBrains Mono', monospace; }
 
@@ -29,13 +30,15 @@ const styles = `body { font-family: 'Inter', sans-serif; }
   .color-chip:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
 
   /* Sidebar scroll */
-  .sidebar { scrollbar-width: thin; scrollbar-color: #E7E5E4 transparent; }`;
+  .sidebar { scrollbar-width: thin; scrollbar-color: #E7E5E4 transparent; }
+`;
 
 function DesignSystem() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* Layout */}
+{/* Layout */}
 <div className="flex min-h-screen">
 
   {/* ══════════════════════════════════════════
@@ -58,45 +61,45 @@ function DesignSystem() {
     {/* Nav Links */}
     <nav className="flex-1 px-3 py-4 space-y-0.5">
       <div className="px-3 py-1.5 text-xs font-600 text-stone-400 uppercase tracking-wider">기초</div>
-      <a href="#colors" className="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-700 cursor-pointer">
+      <a href="/app/#colors" className="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-700 cursor-pointer">
         <Palette className="w-4 h-4" /> 색상 Colors
       </a>
-      <a href="#typography" className="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-700 cursor-pointer">
+      <a href="/app/#typography" className="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-700 cursor-pointer">
         <Type className="w-4 h-4" /> 타이포그래피
       </a>
-      <a href="#spacing" className="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-700 cursor-pointer">
+      <a href="/app/#spacing" className="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-700 cursor-pointer">
         <Move className="w-4 h-4" /> 간격 Spacing
       </a>
-      <a href="#radius" className="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-700 cursor-pointer">
+      <a href="/app/#radius" className="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-700 cursor-pointer">
         <Square className="w-4 h-4" /> Border Radius
       </a>
-      <a href="#shadows" className="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-700 cursor-pointer">
+      <a href="/app/#shadows" className="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-700 cursor-pointer">
         <Layers className="w-4 h-4" /> 그림자 Shadows
       </a>
 
       <div className="px-3 py-1.5 mt-3 text-xs font-600 text-stone-400 uppercase tracking-wider">컴포넌트</div>
-      <a href="#buttons" className="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-700 cursor-pointer">
+      <a href="/app/#buttons" className="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-700 cursor-pointer">
         <MousePointerClick className="w-4 h-4" /> 버튼 Buttons
       </a>
-      <a href="#inputs" className="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-700 cursor-pointer">
+      <a href="/app/#inputs" className="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-700 cursor-pointer">
         <TextCursorInput className="w-4 h-4" /> 입력 Inputs
       </a>
-      <a href="#cards" className="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-700 cursor-pointer">
+      <a href="/app/#cards" className="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-700 cursor-pointer">
         <LayoutDashboard className="w-4 h-4" /> 카드 Cards
       </a>
-      <a href="#badges" className="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-700 cursor-pointer">
+      <a href="/app/#badges" className="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-700 cursor-pointer">
         <Tag className="w-4 h-4" /> 배지 Badges
       </a>
-      <a href="#alerts" className="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-700 cursor-pointer">
+      <a href="/app/#alerts" className="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-700 cursor-pointer">
         <Bell className="w-4 h-4" /> 알림 Alerts
       </a>
-      <a href="#avatars" className="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-700 cursor-pointer">
+      <a href="/app/#avatars" className="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-700 cursor-pointer">
         <UserCircle className="w-4 h-4" /> 아바타 Avatar
       </a>
-      <a href="#navigation" className="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-700 cursor-pointer">
+      <a href="/app/#navigation" className="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-700 cursor-pointer">
         <Sidebar className="w-4 h-4" /> 내비게이션
       </a>
-      <a href="#empty-states" className="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-700 cursor-pointer">
+      <a href="/app/#empty-states" className="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-stone-700 cursor-pointer">
         <Inbox className="w-4 h-4" /> 빈 상태
       </a>
     </nav>
@@ -380,42 +383,42 @@ function DesignSystem() {
       <div className="bg-white rounded-xl border border-stone-200 shadow p-6 space-y-3">
         <div className="flex items-center gap-4">
           <div className="w-24 text-right font-mono text-xs text-stone-400">4px · p-1</div>
-          <div className="h-5 bg-violet-100 rounded" style={{"width":"4px"}}></div>
+          <div className="h-5 bg-violet-100 rounded" style={{width: "4px"}}></div>
           <div className="text-xs text-stone-500">아이콘 내부 여백</div>
         </div>
         <div className="flex items-center gap-4">
           <div className="w-24 text-right font-mono text-xs text-stone-400">8px · p-2</div>
-          <div className="h-5 bg-violet-200 rounded" style={{"width":"8px"}}></div>
+          <div className="h-5 bg-violet-200 rounded" style={{width: "8px"}}></div>
           <div className="text-xs text-stone-500">배지, 칩 내부 여백</div>
         </div>
         <div className="flex items-center gap-4">
           <div className="w-24 text-right font-mono text-xs text-stone-400">12px · p-3</div>
-          <div className="h-5 bg-violet-300 rounded" style={{"width":"12px"}}></div>
+          <div className="h-5 bg-violet-300 rounded" style={{width: "12px"}}></div>
           <div className="text-xs text-stone-500">버튼 내부 여백 (sm)</div>
         </div>
         <div className="flex items-center gap-4">
           <div className="w-24 text-right font-mono text-xs text-stone-400">16px · p-4</div>
-          <div className="h-5 bg-violet-400 rounded" style={{"width":"16px"}}></div>
+          <div className="h-5 bg-violet-400 rounded" style={{width: "16px"}}></div>
           <div className="text-xs text-stone-500">버튼 내부 여백 (md), 카드 내부</div>
         </div>
         <div className="flex items-center gap-4">
           <div className="w-24 text-right font-mono text-xs text-stone-400">20px · p-5</div>
-          <div className="h-5 bg-violet-500 rounded" style={{"width":"20px"}}></div>
+          <div className="h-5 bg-violet-500 rounded" style={{width: "20px"}}></div>
           <div className="text-xs text-stone-500">카드 내부 여백 (md)</div>
         </div>
         <div className="flex items-center gap-4">
           <div className="w-24 text-right font-mono text-xs text-stone-400">24px · p-6</div>
-          <div className="h-5 bg-violet-600 rounded" style={{"width":"24px"}}></div>
+          <div className="h-5 bg-violet-600 rounded" style={{width: "24px"}}></div>
           <div className="text-xs text-stone-500">섹션 내부 여백, 사이드바</div>
         </div>
         <div className="flex items-center gap-4">
           <div className="w-24 text-right font-mono text-xs text-stone-400">32px · p-8</div>
-          <div className="h-5 bg-violet-700 rounded" style={{"width":"32px"}}></div>
+          <div className="h-5 bg-violet-700 rounded" style={{width: "32px"}}></div>
           <div className="text-xs text-stone-500">페이지 패딩, 모달 내부</div>
         </div>
         <div className="flex items-center gap-4">
           <div className="w-24 text-right font-mono text-xs text-stone-400">48px · p-12</div>
-          <div className="h-5 bg-violet-800 rounded" style={{"width":"48px"}}></div>
+          <div className="h-5 bg-violet-800 rounded" style={{width: "48px"}}></div>
           <div className="text-xs text-stone-500">섹션 간격, 빈 상태 여백</div>
         </div>
       </div>
@@ -770,7 +773,7 @@ function DesignSystem() {
         </div>
 
         {/* Hover Card */}
-        <div className="bg-white rounded-xl border border-violet-200 shadow-md p-5 cursor-pointer" style={{"boxShadow":"0 4px 12px rgba(124,58,237,0.08)"}}>
+        <div className="bg-white rounded-xl border border-violet-200 shadow-md p-5 cursor-pointer" style={{boxShadow: "0 4px 12px rgba(124,58,237,0.08)"}}>
           <div className="flex items-start justify-between mb-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-violet-100 rounded-lg flex items-center justify-center">

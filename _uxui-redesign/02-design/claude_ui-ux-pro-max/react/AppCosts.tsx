@@ -1,18 +1,21 @@
 "use client";
 import React from "react";
 
-const styles = `body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
+const styles = `
+body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
     .font-mono { font-family: "JetBrains Mono", monospace; }
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 2px; }
-    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }`;
+    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }
+`;
 
 function AppCosts() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* API: GET /api/costs/summary, GET /api/costs/breakdown */}
+{/* API: GET /api/costs/summary, GET /api/costs/breakdown */}
   {/* Sidebar */}
   <aside className="w-60 min-w-[240px] bg-zinc-900 border-r border-zinc-800 flex flex-col fixed h-full z-20">
     <div className="h-12 border-b border-zinc-800 flex items-center px-4 gap-3 flex-shrink-0">
@@ -90,7 +93,7 @@ function AppCosts() {
           <div className="text-xs text-zinc-500 mb-2">예산 대비</div>
           <div className="text-2xl font-semibold text-yellow-400">78%</div>
           <div className="flex items-center gap-2 mt-2">
-            <div className="h-1.5 bg-zinc-800 rounded-full flex-1"><div className="h-1.5 bg-yellow-500 rounded-full" style={{"width":"78%"}}></div></div>
+            <div className="h-1.5 bg-zinc-800 rounded-full flex-1"><div className="h-1.5 bg-yellow-500 rounded-full" style={{width: "78%"}}></div></div>
             <span className="text-xs font-mono text-zinc-500">$30.00</span>
           </div>
         </div>
@@ -107,27 +110,27 @@ function AppCosts() {
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <span className="text-xs text-zinc-400 w-24">전략기획부</span>
-            <div className="flex-1 h-2 bg-zinc-800 rounded-full"><div className="h-2 bg-blue-500 rounded-full" style={{"width":"70%"}}></div></div>
+            <div className="flex-1 h-2 bg-zinc-800 rounded-full"><div className="h-2 bg-blue-500 rounded-full" style={{width: "70%"}}></div></div>
             <span className="text-xs font-mono text-zinc-300 w-14 text-right">$8.19</span>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-xs text-zinc-400 w-24">마케팅부</span>
-            <div className="flex-1 h-2 bg-zinc-800 rounded-full"><div className="h-2 bg-purple-500 rounded-full" style={{"width":"50%"}}></div></div>
+            <div className="flex-1 h-2 bg-zinc-800 rounded-full"><div className="h-2 bg-purple-500 rounded-full" style={{width: "50%"}}></div></div>
             <span className="text-xs font-mono text-zinc-300 w-14 text-right">$5.85</span>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-xs text-zinc-400 w-24">비서실</span>
-            <div className="flex-1 h-2 bg-zinc-800 rounded-full"><div className="h-2 bg-green-500 rounded-full" style={{"width":"36%"}}></div></div>
+            <div className="flex-1 h-2 bg-zinc-800 rounded-full"><div className="h-2 bg-green-500 rounded-full" style={{width: "36%"}}></div></div>
             <span className="text-xs font-mono text-zinc-300 w-14 text-right">$4.21</span>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-xs text-zinc-400 w-24">정보분석부</span>
-            <div className="flex-1 h-2 bg-zinc-800 rounded-full"><div className="h-2 bg-orange-500 rounded-full" style={{"width":"24%"}}></div></div>
+            <div className="flex-1 h-2 bg-zinc-800 rounded-full"><div className="h-2 bg-orange-500 rounded-full" style={{width: "24%"}}></div></div>
             <span className="text-xs font-mono text-zinc-300 w-14 text-right">$2.81</span>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-xs text-zinc-400 w-24">기술개발부</span>
-            <div className="flex-1 h-2 bg-zinc-800 rounded-full"><div className="h-2 bg-zinc-500 rounded-full" style={{"width":"20%"}}></div></div>
+            <div className="flex-1 h-2 bg-zinc-800 rounded-full"><div className="h-2 bg-zinc-500 rounded-full" style={{width: "20%"}}></div></div>
             <span className="text-xs font-mono text-zinc-300 w-14 text-right">$2.34</span>
           </div>
         </div>

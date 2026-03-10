@@ -2,23 +2,26 @@
 import React from "react";
 import { Activity, BarChart2, Bell, BookOpen, Bot, Briefcase, Building2, Check, Clock, CreditCard, DollarSign, Edit2, Eye, FileText, Folder, GitBranch, Home, Key, LayoutDashboard, List, MessageCircle, MinusCircle, Newspaper, Plus, Rss, Scale, Send, Settings, Share2, Shield, Terminal, TrendingDown, TrendingUp, Users, Zap } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; }
     code,pre { font-family: 'JetBrains Mono', monospace; }
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: #fafaf9; }
-    ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }`;
+    ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }
+`;
 
 function AppArgos() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* SIDEBAR */}
+{/* SIDEBAR */}
 <aside className="w-60 fixed left-0 top-0 bottom-0 bg-white border-r border-stone-200 flex flex-col z-20">
   <div className="p-4 border-b border-stone-200">
     <div className="flex items-center gap-2.5">
       <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center"><span className="text-white font-bold text-sm">C</span></div>
-      <span className="font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+      <span className="font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
     </div>
   </div>
   <div className="px-4 py-3 border-b border-stone-200">
@@ -96,7 +99,7 @@ function AppArgos() {
       <div className="flex items-center gap-2">
         <DollarSign className="w-4 h-4 text-stone-400" />
         <span className="text-xs font-medium text-stone-700">오늘 비용</span>
-        <span className="text-xs font-semibold text-stone-900" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$0.45</span>
+        <span className="text-xs font-semibold text-stone-900" style={{fontFamily: "'JetBrains Mono',monospace"}}>$0.45</span>
       </div>
       <div className="ml-auto text-xs text-stone-400">마지막 갱신: 오늘 11:34:12</div>
     </div>
@@ -267,35 +270,35 @@ function AppArgos() {
       </thead>
       <tbody>
         <tr className="border-b border-stone-100 hover:bg-stone-50/50 transition-colors">
-          <td className="px-5 py-3 text-sm text-stone-500" style={{"fontFamily":"'JetBrains Mono',monospace"}}>11:00</td>
+          <td className="px-5 py-3 text-sm text-stone-500" style={{fontFamily: "'JetBrains Mono',monospace"}}>11:00</td>
           <td className="px-4 py-3 text-sm text-stone-800">매시간 시황 체크</td>
           <td className="px-4 py-3 text-sm text-stone-600">김재원</td>
           <td className="px-4 py-3 text-sm text-stone-700">KOSPI +0.8% · 삼성전자 +5.2% 급등 — 리포트 2페이지 생성</td>
           <td className="px-4 py-3 text-center"><span className="bg-emerald-50 text-emerald-700 rounded-full px-2 py-0.5 text-xs font-medium">완료</span></td>
         </tr>
         <tr className="border-b border-stone-100 hover:bg-stone-50/50 transition-colors">
-          <td className="px-5 py-3 text-sm text-stone-500" style={{"fontFamily":"'JetBrains Mono',monospace"}}>10:15</td>
+          <td className="px-5 py-3 text-sm text-stone-500" style={{fontFamily: "'JetBrains Mono',monospace"}}>10:15</td>
           <td className="px-4 py-3 text-sm text-stone-800">실시간 뉴스 분석</td>
           <td className="px-4 py-3 text-sm text-stone-600">이나경</td>
           <td className="px-4 py-3 text-sm text-stone-700">"AI" 키워드 22건 감지 — 헤드라인 요약 생성 완료</td>
           <td className="px-4 py-3 text-center"><span className="bg-emerald-50 text-emerald-700 rounded-full px-2 py-0.5 text-xs font-medium">완료</span></td>
         </tr>
         <tr className="border-b border-stone-100 hover:bg-stone-50/50 transition-colors">
-          <td className="px-5 py-3 text-sm text-stone-500" style={{"fontFamily":"'JetBrains Mono',monospace"}}>09:23</td>
+          <td className="px-5 py-3 text-sm text-stone-500" style={{fontFamily: "'JetBrains Mono',monospace"}}>09:23</td>
           <td className="px-4 py-3 text-sm text-stone-800">삼성전자 급등 알림</td>
           <td className="px-4 py-3 text-sm text-stone-600">김재원</td>
           <td className="px-4 py-3 text-sm text-stone-700">삼성전자 +5.2% 감지 → 즉시 알림 + 분석 보고서 생성</td>
           <td className="px-4 py-3 text-center"><span className="bg-emerald-50 text-emerald-700 rounded-full px-2 py-0.5 text-xs font-medium">완료</span></td>
         </tr>
         <tr className="border-b border-stone-100 hover:bg-stone-50/50 transition-colors">
-          <td className="px-5 py-3 text-sm text-stone-500" style={{"fontFamily":"'JetBrains Mono',monospace"}}>어제 09:00</td>
+          <td className="px-5 py-3 text-sm text-stone-500" style={{fontFamily: "'JetBrains Mono',monospace"}}>어제 09:00</td>
           <td className="px-4 py-3 text-sm text-stone-800">주간 법령 모니터링</td>
           <td className="px-4 py-3 text-sm text-stone-600">이소연</td>
           <td className="px-4 py-3 text-sm text-stone-700">자본시장법 개정안 2건 감지 — 법무 검토 의견서 작성</td>
           <td className="px-4 py-3 text-center"><span className="bg-emerald-50 text-emerald-700 rounded-full px-2 py-0.5 text-xs font-medium">완료</span></td>
         </tr>
         <tr className="hover:bg-stone-50/50 transition-colors">
-          <td className="px-5 py-3 text-sm text-stone-500" style={{"fontFamily":"'JetBrains Mono',monospace"}}>어제 15:30</td>
+          <td className="px-5 py-3 text-sm text-stone-500" style={{fontFamily: "'JetBrains Mono',monospace"}}>어제 15:30</td>
           <td className="px-4 py-3 text-sm text-stone-800">실시간 뉴스 분석</td>
           <td className="px-4 py-3 text-sm text-stone-600">이나경</td>
           <td className="px-4 py-3 text-sm text-stone-700">"반도체" 키워드 15건 감지 — 요약 완료</td>

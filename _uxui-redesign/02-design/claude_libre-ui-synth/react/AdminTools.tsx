@@ -2,17 +2,20 @@
 import React from "react";
 import { Activity, AlertTriangle, BarChart2, Bot, Building2, Database, DollarSign, FileEdit, FileSearch, FileText, GitBranch, GitFork, Globe, Image, Info, Instagram, KeyRound, LayoutDashboard, Mail, Monitor, Scale, Search, Settings, Shield, ShoppingCart, Sparkles, Store, TrendingUp, UserPlus, Users, Workflow, Wrench } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; } h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; } code,pre { font-family: 'JetBrains Mono', monospace; }`;
+const styles = `
+* { font-family: 'Inter', sans-serif; } h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; } code,pre { font-family: 'JetBrains Mono', monospace; }
+`;
 
 function AdminTools() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* Sidebar */}
+{/* Sidebar */}
   <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-40">
     <div className="px-5 py-4 border-b border-stone-100 flex items-center gap-2.5">
       <span className="bg-violet-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded tracking-wider">ADMIN</span>
-      <span className="font-bold text-stone-900 text-base" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+      <span className="font-bold text-stone-900 text-base" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
     </div>
     <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5 text-sm">
       <a href="/admin/dashboard" className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-stone-600 hover:bg-stone-100"><LayoutDashboard className="w-4 h-4" />대시보드</a>
@@ -77,22 +80,22 @@ function AdminTools() {
       <div className="grid grid-cols-4 gap-4 mb-5">
         <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-4">
           <p className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-1">전체 도구</p>
-          <p className="text-2xl font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>125</p>
+          <p className="text-2xl font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>125</p>
           <p className="text-xs text-stone-400 mt-0.5">6개 카테고리</p>
         </div>
         <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-4">
           <p className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-1">활성 도구</p>
-          <p className="text-2xl font-bold text-emerald-600" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>118</p>
+          <p className="text-2xl font-bold text-emerald-600" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>118</p>
           <p className="text-xs text-stone-400 mt-0.5">94.4% 가동 중</p>
         </div>
         <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-4">
           <p className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-1">오늘 총 호출</p>
-          <p className="text-2xl font-bold text-violet-600" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>1,416</p>
+          <p className="text-2xl font-bold text-violet-600" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>1,416</p>
           <p className="text-xs text-stone-400 mt-0.5">전일 대비 +12%</p>
         </div>
         <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-4">
           <p className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-1">비활성 (크리덴셜 만료)</p>
-          <p className="text-2xl font-bold text-amber-600" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>7</p>
+          <p className="text-2xl font-bold text-amber-600" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>7</p>
           <p className="text-xs text-stone-400 mt-0.5">갱신 필요</p>
         </div>
       </div>
@@ -137,7 +140,7 @@ function AdminTools() {
               <td className="px-4 py-3"><span className="text-sm font-semibold text-stone-800">12 에이전트</span></td>
               <td className="px-4 py-3">
                 <div className="flex items-center gap-1.5">
-                  <div className="flex-1 h-1.5 bg-stone-100 rounded-full w-16"><div className="h-1.5 bg-violet-500 rounded-full" style={{"width":"57%"}}></div></div>
+                  <div className="flex-1 h-1.5 bg-stone-100 rounded-full w-16"><div className="h-1.5 bg-violet-500 rounded-full" style={{width: "57%"}}></div></div>
                   <span className="text-sm text-stone-700 font-medium">324회</span>
                 </div>
               </td>
@@ -159,7 +162,7 @@ function AdminTools() {
               <td className="px-4 py-3"><span className="text-sm font-semibold text-stone-800">2 에이전트</span></td>
               <td className="px-4 py-3">
                 <div className="flex items-center gap-1.5">
-                  <div className="flex-1 h-1.5 bg-stone-100 rounded-full w-16"><div className="h-1.5 bg-sky-500 rounded-full" style={{"width":"25%"}}></div></div>
+                  <div className="flex-1 h-1.5 bg-stone-100 rounded-full w-16"><div className="h-1.5 bg-sky-500 rounded-full" style={{width: "25%"}}></div></div>
                   <span className="text-sm text-stone-700 font-medium">145회</span>
                 </div>
               </td>
@@ -183,7 +186,7 @@ function AdminTools() {
               <td className="px-4 py-3"><span className="text-sm font-semibold text-stone-800">1 에이전트</span></td>
               <td className="px-4 py-3">
                 <div className="flex items-center gap-1.5">
-                  <div className="flex-1 h-1.5 bg-stone-100 rounded-full w-16"><div className="h-1.5 bg-sky-500 rounded-full" style={{"width":"2%"}}></div></div>
+                  <div className="flex-1 h-1.5 bg-stone-100 rounded-full w-16"><div className="h-1.5 bg-sky-500 rounded-full" style={{width: "2%"}}></div></div>
                   <span className="text-sm text-stone-700 font-medium">12회</span>
                 </div>
               </td>
@@ -207,7 +210,7 @@ function AdminTools() {
               <td className="px-4 py-3"><span className="text-sm font-semibold text-stone-800">3 에이전트</span></td>
               <td className="px-4 py-3">
                 <div className="flex items-center gap-1.5">
-                  <div className="flex-1 h-1.5 bg-stone-100 rounded-full w-16"><div className="h-1.5 bg-rose-400 rounded-full" style={{"width":"8%"}}></div></div>
+                  <div className="flex-1 h-1.5 bg-stone-100 rounded-full w-16"><div className="h-1.5 bg-rose-400 rounded-full" style={{width: "8%"}}></div></div>
                   <span className="text-sm text-stone-700 font-medium">45회</span>
                 </div>
               </td>
@@ -229,7 +232,7 @@ function AdminTools() {
               <td className="px-4 py-3"><span className="text-sm text-stone-500">1 에이전트</span></td>
               <td className="px-4 py-3">
                 <div className="flex items-center gap-1.5">
-                  <div className="flex-1 h-1.5 bg-stone-100 rounded-full w-16"><div className="h-1.5 bg-stone-300 rounded-full" style={{"width":"1%"}}></div></div>
+                  <div className="flex-1 h-1.5 bg-stone-100 rounded-full w-16"><div className="h-1.5 bg-stone-300 rounded-full" style={{width: "1%"}}></div></div>
                   <span className="text-sm text-stone-400 font-medium">8회</span>
                 </div>
               </td>
@@ -255,7 +258,7 @@ function AdminTools() {
               <td className="px-4 py-3"><span className="text-sm font-semibold text-stone-800">8 에이전트</span></td>
               <td className="px-4 py-3">
                 <div className="flex items-center gap-1.5">
-                  <div className="flex-1 h-1.5 bg-stone-100 rounded-full w-16"><div className="h-1.5 bg-violet-500 rounded-full" style={{"width":"100%"}}></div></div>
+                  <div className="flex-1 h-1.5 bg-stone-100 rounded-full w-16"><div className="h-1.5 bg-violet-500 rounded-full" style={{width: "100%"}}></div></div>
                   <span className="text-sm text-stone-700 font-medium">567회</span>
                 </div>
               </td>
@@ -277,7 +280,7 @@ function AdminTools() {
               <td className="px-4 py-3"><span className="text-sm font-semibold text-stone-800">6 에이전트</span></td>
               <td className="px-4 py-3">
                 <div className="flex items-center gap-1.5">
-                  <div className="flex-1 h-1.5 bg-stone-100 rounded-full w-16"><div className="h-1.5 bg-violet-400 rounded-full" style={{"width":"41%"}}></div></div>
+                  <div className="flex-1 h-1.5 bg-stone-100 rounded-full w-16"><div className="h-1.5 bg-violet-400 rounded-full" style={{width: "41%"}}></div></div>
                   <span className="text-sm text-stone-700 font-medium">234회</span>
                 </div>
               </td>
@@ -299,7 +302,7 @@ function AdminTools() {
               <td className="px-4 py-3"><span className="text-sm font-semibold text-stone-800">1 에이전트</span></td>
               <td className="px-4 py-3">
                 <div className="flex items-center gap-1.5">
-                  <div className="flex-1 h-1.5 bg-stone-100 rounded-full w-16"><div className="h-1.5 bg-amber-400 rounded-full" style={{"width":"8%"}}></div></div>
+                  <div className="flex-1 h-1.5 bg-stone-100 rounded-full w-16"><div className="h-1.5 bg-amber-400 rounded-full" style={{width: "8%"}}></div></div>
                   <span className="text-sm text-stone-700 font-medium">45회</span>
                 </div>
               </td>
@@ -321,7 +324,7 @@ function AdminTools() {
               <td className="px-4 py-3"><span className="text-sm font-semibold text-stone-800">2 에이전트</span></td>
               <td className="px-4 py-3">
                 <div className="flex items-center gap-1.5">
-                  <div className="flex-1 h-1.5 bg-stone-100 rounded-full w-16"><div className="h-1.5 bg-emerald-400 rounded-full" style={{"width":"4%"}}></div></div>
+                  <div className="flex-1 h-1.5 bg-stone-100 rounded-full w-16"><div className="h-1.5 bg-emerald-400 rounded-full" style={{width: "4%"}}></div></div>
                   <span className="text-sm text-stone-700 font-medium">23회</span>
                 </div>
               </td>
@@ -343,7 +346,7 @@ function AdminTools() {
               <td className="px-4 py-3"><span className="text-sm font-semibold text-stone-800">4 에이전트</span></td>
               <td className="px-4 py-3">
                 <div className="flex items-center gap-1.5">
-                  <div className="flex-1 h-1.5 bg-stone-100 rounded-full w-16"><div className="h-1.5 bg-blue-400 rounded-full" style={{"width":"2%"}}></div></div>
+                  <div className="flex-1 h-1.5 bg-stone-100 rounded-full w-16"><div className="h-1.5 bg-blue-400 rounded-full" style={{width: "2%"}}></div></div>
                   <span className="text-sm text-stone-700 font-medium">12회</span>
                 </div>
               </td>

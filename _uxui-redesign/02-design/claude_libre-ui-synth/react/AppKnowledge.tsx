@@ -2,7 +2,8 @@
 import React from "react";
 import { ArrowRight, BarChart2, Book, BookOpen, Bot, Brain, Building2, ChevronDown, ChevronRight, ChevronsUpDown, Clock, CreditCard, ExternalLink, FileBarChart, FileText, Folder, FolderPlus, Home, Instagram, Layers, LayoutDashboard, MessageCircle, MoreHorizontal, Network, Scale, ScrollText, Search, Settings, Share2, Target, Terminal, TrendingUp, Upload } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1,h2,h3,h4,h5,h6 { font-family: 'Plus Jakarta Sans', sans-serif; }
     code,pre { font-family: 'JetBrains Mono', monospace; }
     .sidebar-item { transition: background-color 0.15s ease; }
@@ -16,19 +17,21 @@ const styles = `* { font-family: 'Inter', sans-serif; }
     .doc-row:hover td { background-color: #fafaf9; }
     .sub-item { padding-left: 28px; }
     .usage-bar { height: 3px; background-color: #e7e5e4; border-radius: 2px; }
-    .usage-bar-fill { height: 3px; background-color: #7c3aed; border-radius: 2px; transition: width 0.3s ease; }`;
+    .usage-bar-fill { height: 3px; background-color: #7c3aed; border-radius: 2px; transition: width 0.3s ease; }
+`;
 
 function AppKnowledge() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* Sidebar */}
+{/* Sidebar */}
   <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-10 overflow-y-auto">
     <div className="px-4 py-5 flex items-center gap-3 border-b border-stone-100 flex-shrink-0">
       <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center flex-shrink-0">
-        <span className="text-white font-bold text-sm" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>C</span>
+        <span className="text-white font-bold text-sm" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>C</span>
       </div>
-      <span className="font-bold text-stone-900 text-base" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+      <span className="font-bold text-stone-900 text-base" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
     </div>
 
     <nav className="flex-1 px-3 py-4 space-y-0.5">
@@ -233,7 +236,7 @@ function AppKnowledge() {
               <p className="text-[10px] text-stone-500">42 / 1,000 문서</p>
             </div>
             <div className="usage-bar">
-              <div className="usage-bar-fill" style={{"width":"4.2%"}}></div>
+              <div className="usage-bar-fill" style={{width: "4.2%"}}></div>
             </div>
           </div>
         </div>
@@ -318,7 +321,7 @@ function AppKnowledge() {
                 <td className="px-4 py-3.5">
                   <div className="flex items-center gap-2">
                     <div className="w-24 bg-stone-100 rounded-full h-1.5">
-                      <div className="bg-violet-500 h-1.5 rounded-full" style={{"width":"100%"}}></div>
+                      <div className="bg-violet-500 h-1.5 rounded-full" style={{width: "100%"}}></div>
                     </div>
                     <span className="text-xs font-semibold text-violet-600">128회</span>
                   </div>
@@ -358,7 +361,7 @@ function AppKnowledge() {
                 <td className="px-4 py-3.5">
                   <div className="flex items-center gap-2">
                     <div className="w-24 bg-stone-100 rounded-full h-1.5">
-                      <div className="bg-violet-500 h-1.5 rounded-full" style={{"width":"35%"}}></div>
+                      <div className="bg-violet-500 h-1.5 rounded-full" style={{width: "35%"}}></div>
                     </div>
                     <span className="text-xs font-semibold text-stone-600">45회</span>
                   </div>
@@ -398,7 +401,7 @@ function AppKnowledge() {
                 <td className="px-4 py-3.5">
                   <div className="flex items-center gap-2">
                     <div className="w-24 bg-stone-100 rounded-full h-1.5">
-                      <div className="bg-violet-500 h-1.5 rounded-full" style={{"width":"52%"}}></div>
+                      <div className="bg-violet-500 h-1.5 rounded-full" style={{width: "52%"}}></div>
                     </div>
                     <span className="text-xs font-semibold text-stone-600">67회</span>
                   </div>
@@ -438,7 +441,7 @@ function AppKnowledge() {
                 <td className="px-4 py-3.5">
                   <div className="flex items-center gap-2">
                     <div className="w-24 bg-stone-100 rounded-full h-1.5">
-                      <div className="bg-violet-500 h-1.5 rounded-full" style={{"width":"9%"}}></div>
+                      <div className="bg-violet-500 h-1.5 rounded-full" style={{width: "9%"}}></div>
                     </div>
                     <span className="text-xs font-semibold text-stone-600">12회</span>
                   </div>
@@ -478,7 +481,7 @@ function AppKnowledge() {
                 <td className="px-4 py-3.5">
                   <div className="flex items-center gap-2">
                     <div className="w-24 bg-stone-100 rounded-full h-1.5">
-                      <div className="bg-violet-500 h-1.5 rounded-full" style={{"width":"69%"}}></div>
+                      <div className="bg-violet-500 h-1.5 rounded-full" style={{width: "69%"}}></div>
                     </div>
                     <span className="text-xs font-semibold text-stone-600">89회</span>
                   </div>

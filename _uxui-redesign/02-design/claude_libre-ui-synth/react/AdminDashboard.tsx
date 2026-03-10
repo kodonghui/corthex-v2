@@ -2,7 +2,8 @@
 import React from "react";
 import { Activity, AlertCircle, AlertTriangle, Bot, Briefcase, Building2, CheckCircle2, Clock, Code2, Database, DollarSign, ExternalLink, GitBranch, GitFork, KeyRound, LayoutDashboard, LayoutTemplate, Network, RefreshCw, Rocket, Server, Settings, ShoppingBag, Sparkles, Store, TrendingUp, UserCog, UserPlus, Users, Wifi, Wrench } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; }
     code,pre { font-family: 'JetBrains Mono', monospace; }
     .donut-ring {
@@ -22,18 +23,20 @@ const styles = `* { font-family: 'Inter', sans-serif; }
       width: 80px; height: 80px;
       background: white; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-    }`;
+    }
+`;
 
 function AdminDashboard() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* Sidebar */}
+{/* Sidebar */}
   <aside className="w-64 min-h-screen bg-white border-r border-stone-200 flex flex-col fixed left-0 top-0 z-10 overflow-y-auto">
     <div className="px-5 py-5 border-b border-stone-100 flex-shrink-0">
       <div className="flex items-center gap-2">
         <span className="bg-violet-100 text-violet-700 text-xs font-semibold px-2 py-0.5 rounded">ADMIN</span>
-        <span className="font-bold text-stone-900 text-lg" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+        <span className="font-bold text-stone-900 text-lg" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
       </div>
     </div>
     <div className="px-4 py-3 border-b border-stone-100 flex-shrink-0">
@@ -102,7 +105,7 @@ function AdminDashboard() {
             <Bot className="w-5 h-5 text-violet-600" />
           </div>
         </div>
-        <p className="text-3xl font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>24</p>
+        <p className="text-3xl font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>24</p>
         <p className="text-xs text-emerald-600 font-medium mt-1.5 flex items-center gap-1">
           <TrendingUp className="w-3 h-3" />+3 이번 달 신규
         </p>
@@ -114,10 +117,10 @@ function AdminDashboard() {
             <DollarSign className="w-5 h-5 text-amber-600" />
           </div>
         </div>
-        <p className="text-3xl font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>$12.40</p>
+        <p className="text-3xl font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>$12.40</p>
         <div className="mt-2">
           <div className="flex justify-between text-xs text-stone-500 mb-1"><span>예산 대비</span><span className="font-semibold text-amber-600">62%</span></div>
-          <div className="h-1.5 bg-stone-100 rounded-full overflow-hidden"><div className="h-full bg-amber-400 rounded-full" style={{"width":"62%"}}></div></div>
+          <div className="h-1.5 bg-stone-100 rounded-full overflow-hidden"><div className="h-full bg-amber-400 rounded-full" style={{width: "62%"}}></div></div>
         </div>
       </div>
       <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-5">
@@ -127,7 +130,7 @@ function AdminDashboard() {
             <Users className="w-5 h-5 text-blue-600" />
           </div>
         </div>
-        <p className="text-3xl font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>5명</p>
+        <p className="text-3xl font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>5명</p>
         <p className="text-xs text-stone-500 mt-1.5 flex items-center gap-1">
           <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>전원 정상 접속
         </p>
@@ -139,7 +142,7 @@ function AdminDashboard() {
             <CheckCircle2 className="w-5 h-5 text-emerald-600" />
           </div>
         </div>
-        <p className="text-3xl font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>1,247</p>
+        <p className="text-3xl font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>1,247</p>
         <p className="text-xs text-stone-500 mt-1.5">이번 달 누적</p>
       </div>
     </div>
@@ -160,7 +163,7 @@ function AdminDashboard() {
             <div className="donut-ring">
               <div className="donut-inner">
                 <div className="text-center">
-                  <p className="text-lg font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>24</p>
+                  <p className="text-lg font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>24</p>
                   <p className="text-[10px] text-stone-400 leading-none">총</p>
                 </div>
               </div>
@@ -207,23 +210,23 @@ function AdminDashboard() {
           <div className="space-y-3.5">
             <div>
               <div className="flex justify-between text-sm mb-1.5"><span className="text-stone-600">전략투자부서</span><span className="font-semibold text-stone-900">$5.20</span></div>
-              <div className="h-2 bg-stone-100 rounded-full overflow-hidden"><div className="h-full bg-emerald-500 rounded-full" style={{"width":"83%"}}></div></div>
+              <div className="h-2 bg-stone-100 rounded-full overflow-hidden"><div className="h-full bg-emerald-500 rounded-full" style={{width: "83%"}}></div></div>
             </div>
             <div>
               <div className="flex justify-between text-sm mb-1.5"><span className="text-stone-600">마케팅부서</span><span className="font-semibold text-stone-900">$4.80</span></div>
-              <div className="h-2 bg-stone-100 rounded-full overflow-hidden"><div className="h-full bg-blue-500 rounded-full" style={{"width":"77%"}}></div></div>
+              <div className="h-2 bg-stone-100 rounded-full overflow-hidden"><div className="h-full bg-blue-500 rounded-full" style={{width: "77%"}}></div></div>
             </div>
             <div>
               <div className="flex justify-between text-sm mb-1.5"><span className="text-stone-600">연구개발부서</span><span className="font-semibold text-stone-900">$3.10</span></div>
-              <div className="h-2 bg-stone-100 rounded-full overflow-hidden"><div className="h-full bg-rose-500 rounded-full" style={{"width":"50%"}}></div></div>
+              <div className="h-2 bg-stone-100 rounded-full overflow-hidden"><div className="h-full bg-rose-500 rounded-full" style={{width: "50%"}}></div></div>
             </div>
             <div>
               <div className="flex justify-between text-sm mb-1.5"><span className="text-stone-600">비서실</span><span className="font-semibold text-stone-900">$2.30</span></div>
-              <div className="h-2 bg-stone-100 rounded-full overflow-hidden"><div className="h-full bg-violet-500 rounded-full" style={{"width":"37%"}}></div></div>
+              <div className="h-2 bg-stone-100 rounded-full overflow-hidden"><div className="h-full bg-violet-500 rounded-full" style={{width: "37%"}}></div></div>
             </div>
             <div>
               <div className="flex justify-between text-sm mb-1.5"><span className="text-stone-600">법무부서</span><span className="font-semibold text-stone-900">$1.20</span></div>
-              <div className="h-2 bg-stone-100 rounded-full overflow-hidden"><div className="h-full bg-amber-400 rounded-full" style={{"width":"19%"}}></div></div>
+              <div className="h-2 bg-stone-100 rounded-full overflow-hidden"><div className="h-full bg-amber-400 rounded-full" style={{width: "19%"}}></div></div>
             </div>
           </div>
         </div>
@@ -377,7 +380,7 @@ function AdminDashboard() {
 
         {/* 이번 달 요약 */}
         <div className="bg-gradient-to-br from-violet-600 to-violet-800 rounded-xl p-5 text-white shadow-sm">
-          <h2 className="font-bold mb-4" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>이번 달 요약</h2>
+          <h2 className="font-bold mb-4" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>이번 달 요약</h2>
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-violet-200 text-sm">신규 에이전트</span>

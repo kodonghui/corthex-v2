@@ -2,27 +2,30 @@
 import React from "react";
 import { Activity, ArrowRight, BarChart2, Bell, BookOpen, Building2, Calendar, CheckCircle2, ChevronsUpDown, Clock, DollarSign, Eye, FileText, Folder, GitBranch, Home, Image, Key, LayoutDashboard, Lock, Mail, Megaphone, MessageCircle, MessagesSquare, Scale, ScrollText, Search, Send, Settings, Share2, Star, Terminal, TrendingUp, Users } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1, h2, h3, h4, h5, h6, .font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
     .font-mono, code, pre { font-family: 'JetBrains Mono', monospace; }
     @keyframes blink-pulse {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.35; }
     }
-    .animate-blink { animation: blink-pulse 2s ease-in-out infinite; }`;
+    .animate-blink { animation: blink-pulse 2s ease-in-out infinite; }
+`;
 
 function AppHome() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* 사이드바 */}
+{/* 사이드바 */}
 <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-10">
   <div className="h-14 flex items-center px-4 border-b border-stone-200">
     <div className="flex items-center gap-2.5">
       <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
         <span className="text-white font-bold text-sm">C</span>
       </div>
-      <span className="font-bold text-stone-900 text-[15px]" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>CORTHEX</span>
+      <span className="font-bold text-stone-900 text-[15px]" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>CORTHEX</span>
     </div>
   </div>
   <nav className="flex-1 overflow-y-auto p-3 space-y-0.5">
@@ -131,7 +134,7 @@ function AppHome() {
 {/* 메인 */}
 <div className="ml-60 min-h-screen bg-stone-50">
   {/* 헤더 */}
-  
+  <header className="h-14 bg-white border-b border-stone-200 flex items-center px-6 sticky top-0 z-10">
     <div className="flex items-center justify-between w-full">
       <div className="flex items-center gap-2 text-sm text-stone-500">
         <span>홈</span>
@@ -147,7 +150,7 @@ function AppHome() {
         </a>
       </div>
     </div>
-  
+  </header>
 
   {/* 콘텐츠 */}
   <main className="p-6 space-y-6">
@@ -156,7 +159,7 @@ function AppHome() {
     {/* 웰컴 배너 */}
     <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-6 flex items-start justify-between">
       <div>
-        <h1 className="text-[32px] font-bold tracking-tight text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>
+        <h1 className="text-[32px] font-bold tracking-tight text-stone-900" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>
           안녕하세요, 김대표님 👋
         </h1>
         <p className="text-sm text-stone-500 mt-1.5">
@@ -192,7 +195,7 @@ function AppHome() {
             <Users className="w-4.5 h-4.5 text-violet-600" />
           </div>
         </div>
-        <p className="text-[32px] font-bold tracking-tight text-stone-900 leading-none" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>24</p>
+        <p className="text-[32px] font-bold tracking-tight text-stone-900 leading-none" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>24</p>
         <p className="text-xs text-emerald-600 mt-2 flex items-center gap-1">
           <TrendingUp className="w-3 h-3" /> 지난달 대비 +3명
         </p>
@@ -214,13 +217,13 @@ function AppHome() {
             <CheckCircle2 className="w-4.5 h-4.5 text-orange-500" />
           </div>
         </div>
-        <p className="text-[32px] font-bold tracking-tight text-stone-900 leading-none" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>47</p>
+        <p className="text-[32px] font-bold tracking-tight text-stone-900 leading-none" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>47</p>
         <p className="text-xs text-emerald-600 mt-2 flex items-center gap-1">
           <TrendingUp className="w-3 h-3" /> 어제 대비 +12건
         </p>
         <div className="mt-3">
           <div className="w-full bg-stone-100 rounded-full h-1.5">
-            <div className="bg-orange-500 h-1.5 rounded-full" style={{"width":"78%"}}></div>
+            <div className="bg-orange-500 h-1.5 rounded-full" style={{width: "78%"}}></div>
           </div>
           <p className="text-[10px] text-stone-400 mt-1">목표 60개 중 47개 (78%)</p>
         </div>
@@ -234,13 +237,13 @@ function AppHome() {
             <DollarSign className="w-4.5 h-4.5 text-emerald-600" />
           </div>
         </div>
-        <p className="text-[32px] font-bold tracking-tight text-stone-900 leading-none" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>$12.40</p>
+        <p className="text-[32px] font-bold tracking-tight text-stone-900 leading-none" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>$12.40</p>
         <p className="text-xs text-stone-500 mt-2 flex items-center gap-1">
           <Calendar className="w-3 h-3" /> 예산 $50 중 24.8%
         </p>
         <div className="mt-3">
           <div className="w-full bg-stone-100 rounded-full h-1.5">
-            <div className="bg-emerald-500 h-1.5 rounded-full" style={{"width":"24.8%"}}></div>
+            <div className="bg-emerald-500 h-1.5 rounded-full" style={{width: "24.8%"}}></div>
           </div>
           <p className="text-[10px] text-stone-400 mt-1">잔여 예산 $37.60</p>
         </div>
@@ -254,13 +257,13 @@ function AppHome() {
             <Star className="w-4.5 h-4.5 text-violet-600" />
           </div>
         </div>
-        <p className="text-[32px] font-bold tracking-tight text-stone-900 leading-none" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>89%</p>
+        <p className="text-[32px] font-bold tracking-tight text-stone-900 leading-none" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>89%</p>
         <p className="text-xs text-emerald-600 mt-2 flex items-center gap-1">
           <TrendingUp className="w-3 h-3" /> 지난주 대비 +4%p
         </p>
         <div className="mt-3 flex gap-0.5 h-4">
-          <div className="bg-violet-600 rounded-l-sm h-full" style={{"width":"89%"}}></div>
-          <div className="bg-stone-100 rounded-r-sm h-full" style={{"width":"11%"}}></div>
+          <div className="bg-violet-600 rounded-l-sm h-full" style={{width: "89%"}}></div>
+          <div className="bg-stone-100 rounded-r-sm h-full" style={{width: "11%"}}></div>
         </div>
       </div>
     </div>
@@ -268,7 +271,7 @@ function AppHome() {
     {/* API: POST /api/workspace/command-center/commands */}
     {/* 빠른 명령 입력 */}
     <div className="bg-white rounded-xl border border-stone-200 shadow-sm hover:border-violet-200 hover:shadow-md transition-all duration-150 p-5">
-      <h2 className="text-lg font-semibold text-stone-900 mb-3" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>
+      <h2 className="text-lg font-semibold text-stone-900 mb-3" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>
         오늘의 첫 명령을 내려보세요
       </h2>
       <div className="flex gap-3">
@@ -308,7 +311,7 @@ function AppHome() {
       {/* 에이전트 현황 (2/3) */}
       <div className="col-span-2 bg-white rounded-xl border border-stone-200 shadow-sm hover:border-violet-200 hover:shadow-md transition-all duration-150">
         <div className="px-5 py-4 border-b border-stone-100 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>에이전트 현황</h2>
+          <h2 className="text-lg font-semibold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>에이전트 현황</h2>
           <a href="/app/agents" className="text-stone-600 hover:bg-stone-100 rounded-lg px-3 py-1.5 text-sm transition-colors duration-150 flex items-center gap-1">
             전체 보기 <ArrowRight className="w-3.5 h-3.5" />
           </a>
@@ -425,7 +428,7 @@ function AppHome() {
         {/* 최근 보고서 */}
         <div className="bg-white rounded-xl border border-stone-200 shadow-sm hover:border-violet-200 hover:shadow-md transition-all duration-150">
           <div className="px-5 py-4 border-b border-stone-100 flex items-center justify-between">
-            <h2 className="text-base font-semibold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>최근 보고서</h2>
+            <h2 className="text-base font-semibold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>최근 보고서</h2>
             <a href="/app/reports" className="text-xs text-stone-400 hover:text-stone-600 transition-colors">전체 →</a>
           </div>
           <div className="divide-y divide-stone-100">
@@ -467,7 +470,7 @@ function AppHome() {
 
         {/* 퀵 액션 */}
         <div className="bg-white rounded-xl border border-stone-200 shadow-sm hover:border-violet-200 hover:shadow-md transition-all duration-150 p-5">
-          <h2 className="text-base font-semibold text-stone-900 mb-3" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>퀵 액션</h2>
+          <h2 className="text-base font-semibold text-stone-900 mb-3" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>퀵 액션</h2>
           <div className="grid grid-cols-2 gap-2">
             <button className="flex flex-col items-center gap-2 p-3 rounded-lg border border-stone-200 hover:border-violet-200 hover:bg-violet-50 transition-all duration-150 group cursor-pointer">
               <div className="w-8 h-8 bg-violet-50 group-hover:bg-violet-100 rounded-lg flex items-center justify-center transition-colors">

@@ -1,17 +1,20 @@
 "use client";
 import React from "react";
 
-const styles = `body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
+const styles = `
+body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
     .font-mono { font-family: "JetBrains Mono", monospace; }
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 2px; }`;
+    ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 2px; }
+`;
 
 function DesignSystem() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      <div className="mb-8 pb-6 border-b border-zinc-800">
+<div className="mb-8 pb-6 border-b border-zinc-800">
     <div className="flex items-center gap-3 mb-2">
       <div className="w-7 h-7 bg-blue-500 rounded-md flex items-center justify-center">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
@@ -28,57 +31,57 @@ function DesignSystem() {
     <div className="grid grid-cols-2 gap-3">
       <div className="space-y-2">
         <div className="flex items-center gap-3 p-3 bg-zinc-900 rounded-lg border border-zinc-800">
-          <div className="w-8 h-8 rounded" style={{"background":"#09090b","border":"1px solid #3f3f46"}}></div>
+          <div className="w-8 h-8 rounded" style={{background: "#09090b", border: "1px solid #3f3f46"}}></div>
           <div><div className="text-xs font-medium text-zinc-300">bg</div><div className="text-xs text-zinc-600 font-mono">#09090b · zinc-950</div></div>
         </div>
         <div className="flex items-center gap-3 p-3 bg-zinc-900 rounded-lg border border-zinc-800">
-          <div className="w-8 h-8 rounded" style={{"background":"#18181b"}}></div>
+          <div className="w-8 h-8 rounded" style={{background: "#18181b"}}></div>
           <div><div className="text-xs font-medium text-zinc-300">surface</div><div className="text-xs text-zinc-600 font-mono">#18181b · zinc-900</div></div>
         </div>
         <div className="flex items-center gap-3 p-3 bg-zinc-900 rounded-lg border border-zinc-800">
-          <div className="w-8 h-8 rounded" style={{"background":"#27272a"}}></div>
+          <div className="w-8 h-8 rounded" style={{background: "#27272a"}}></div>
           <div><div className="text-xs font-medium text-zinc-300">surface-2</div><div className="text-xs text-zinc-600 font-mono">#27272a · zinc-800</div></div>
         </div>
         <div className="flex items-center gap-3 p-3 bg-zinc-900 rounded-lg border border-zinc-800">
-          <div className="w-8 h-8 rounded" style={{"background":"#3f3f46"}}></div>
+          <div className="w-8 h-8 rounded" style={{background: "#3f3f46"}}></div>
           <div><div className="text-xs font-medium text-zinc-300">border</div><div className="text-xs text-zinc-600 font-mono">#3f3f46 · zinc-700</div></div>
         </div>
         <div className="flex items-center gap-3 p-3 bg-zinc-900 rounded-lg border border-zinc-800">
-          <div className="w-8 h-8 rounded" style={{"background":"#fafafa"}}></div>
+          <div className="w-8 h-8 rounded" style={{background: "#fafafa"}}></div>
           <div><div className="text-xs font-medium text-zinc-300">text-primary</div><div className="text-xs text-zinc-600 font-mono">#fafafa · zinc-50</div></div>
         </div>
         <div className="flex items-center gap-3 p-3 bg-zinc-900 rounded-lg border border-zinc-800">
-          <div className="w-8 h-8 rounded" style={{"background":"#a1a1aa"}}></div>
+          <div className="w-8 h-8 rounded" style={{background: "#a1a1aa"}}></div>
           <div><div className="text-xs font-medium text-zinc-300">text-secondary</div><div className="text-xs text-zinc-600 font-mono">#a1a1aa · zinc-400</div></div>
         </div>
         <div className="flex items-center gap-3 p-3 bg-zinc-900 rounded-lg border border-zinc-800">
-          <div className="w-8 h-8 rounded" style={{"background":"#71717a"}}></div>
+          <div className="w-8 h-8 rounded" style={{background: "#71717a"}}></div>
           <div><div className="text-xs font-medium text-zinc-300">text-muted</div><div className="text-xs text-zinc-600 font-mono">#71717a · zinc-500</div></div>
         </div>
       </div>
       <div className="space-y-2">
         <div className="flex items-center gap-3 p-3 bg-zinc-900 rounded-lg border border-zinc-800">
-          <div className="w-8 h-8 rounded" style={{"background":"#3b82f6"}}></div>
+          <div className="w-8 h-8 rounded" style={{background: "#3b82f6"}}></div>
           <div><div className="text-xs font-medium text-zinc-300">blue — primary actions</div><div className="text-xs text-zinc-600 font-mono">#3b82f6 · blue-500</div></div>
         </div>
         <div className="flex items-center gap-3 p-3 bg-zinc-900 rounded-lg border border-zinc-800">
-          <div className="w-8 h-8 rounded" style={{"background":"#22c55e"}}></div>
+          <div className="w-8 h-8 rounded" style={{background: "#22c55e"}}></div>
           <div><div className="text-xs font-medium text-zinc-300">green — success / positive</div><div className="text-xs text-zinc-600 font-mono">#22c55e · green-500</div></div>
         </div>
         <div className="flex items-center gap-3 p-3 bg-zinc-900 rounded-lg border border-zinc-800">
-          <div className="w-8 h-8 rounded" style={{"background":"#ef4444"}}></div>
+          <div className="w-8 h-8 rounded" style={{background: "#ef4444"}}></div>
           <div><div className="text-xs font-medium text-zinc-300">red — error / negative</div><div className="text-xs text-zinc-600 font-mono">#ef4444 · red-500</div></div>
         </div>
         <div className="flex items-center gap-3 p-3 bg-zinc-900 rounded-lg border border-zinc-800">
-          <div className="w-8 h-8 rounded" style={{"background":"#eab308"}}></div>
+          <div className="w-8 h-8 rounded" style={{background: "#eab308"}}></div>
           <div><div className="text-xs font-medium text-zinc-300">yellow — warning</div><div className="text-xs text-zinc-600 font-mono">#eab308 · yellow-500</div></div>
         </div>
         <div className="flex items-center gap-3 p-3 bg-zinc-900 rounded-lg border border-zinc-800">
-          <div className="w-8 h-8 rounded" style={{"background":"#a855f7"}}></div>
+          <div className="w-8 h-8 rounded" style={{background: "#a855f7"}}></div>
           <div><div className="text-xs font-medium text-zinc-300">purple — AI-related</div><div className="text-xs text-zinc-600 font-mono">#a855f7 · purple-500</div></div>
         </div>
         <div className="flex items-center gap-3 p-3 bg-zinc-900 rounded-lg border border-zinc-800">
-          <div className="w-8 h-8 rounded" style={{"background":"#f97316"}}></div>
+          <div className="w-8 h-8 rounded" style={{background: "#f97316"}}></div>
           <div><div className="text-xs font-medium text-zinc-300">orange — live / active</div><div className="text-xs text-zinc-600 font-mono">#f97316 · orange-500</div></div>
         </div>
       </div>

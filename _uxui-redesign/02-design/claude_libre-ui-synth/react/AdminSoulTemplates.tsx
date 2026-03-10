@@ -2,17 +2,20 @@
 import React from "react";
 import { Activity, BarChart2, Bot, Building2, CheckCircle, Clipboard, Code2, Copy, Crown, Database, DollarSign, Edit2, Eye, FileText, GitBranch, GitFork, KeyRound, LayoutDashboard, LineChart, Lock, Megaphone, Microscope, PenTool, Plus, Scale, Settings, Shield, Sparkles, Store, Trash2, User, UserCircle, UserPlus, Users, Workflow, Wrench } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; } h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; } code,pre { font-family: 'JetBrains Mono', monospace; }`;
+const styles = `
+* { font-family: 'Inter', sans-serif; } h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; } code,pre { font-family: 'JetBrains Mono', monospace; }
+`;
 
 function AdminSoulTemplates() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* Sidebar */}
+{/* Sidebar */}
   <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-40">
     <div className="px-5 py-4 border-b border-stone-100 flex items-center gap-2.5">
       <span className="bg-violet-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded tracking-wider">ADMIN</span>
-      <span className="font-bold text-stone-900 text-base" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+      <span className="font-bold text-stone-900 text-base" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
     </div>
     <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5 text-sm">
       <a href="/admin/dashboard" className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-stone-600 hover:bg-stone-100"><LayoutDashboard className="w-4 h-4" />대시보드</a>
@@ -289,7 +292,7 @@ function AdminSoulTemplates() {
           </div>
         </div>
         <div className="bg-stone-50 rounded-xl border border-stone-100 p-4">
-          <pre className="text-xs text-stone-700 leading-relaxed whitespace-pre-wrap" style={{"fontFamily":"'JetBrains Mono',monospace"}}>당신은 CORTHEX의 마케팅 전문 AI 에이전트입니다.
+          <pre className="text-xs text-stone-700 leading-relaxed whitespace-pre-wrap" style={{fontFamily: "'JetBrains Mono',monospace"}}>당신은 CORTHEX의 마케팅 전문 AI 에이전트입니다.
 
 ## 역할 및 전문 영역
 - 디지털 마케팅 전략 수립 및 실행

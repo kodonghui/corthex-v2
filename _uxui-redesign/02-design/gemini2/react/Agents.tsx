@@ -1,0 +1,320 @@
+"use client";
+import React from "react";
+
+const styles = `
+body {
+            background-color: #F4F4F0;
+            color: #1E1E1E;
+        }
+
+        .neo-border {
+            border: 3px solid #1E1E1E;
+        }
+
+        .neo-shadow {
+            box-shadow: 4px 4px 0px 0px rgba(30, 30, 30, 1);
+        }
+
+        .neo-shadow-sm {
+            box-shadow: 2px 2px 0px 0px rgba(30, 30, 30, 1);
+        }
+
+        .neo-card {
+            border: 3px solid #1E1E1E;
+            box-shadow: 8px 8px 0px 0px rgba(30, 30, 30, 1);
+            background-color: white;
+        }
+
+        .neo-btn {
+            border: 3px solid #1E1E1E;
+            box-shadow: 4px 4px 0px 0px rgba(30, 30, 30, 1);
+            transition: all 0.1s ease-in-out;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .neo-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px 0px rgba(30, 30, 30, 1);
+        }
+
+        .neo-btn:active {
+            transform: translate(4px, 4px);
+            box-shadow: 0px 0px 0px 0px rgba(30, 30, 30, 1);
+        }
+
+        .nav-item.active {
+            background-color: #BFFF00;
+            border: 3px solid #1E1E1E;
+            box-shadow: 2px 2px 0px 0px rgba(30, 30, 30, 1);
+        }
+
+        .nav-item:hover:not(.active) {
+            background-color: #E5E5E5;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+            border-left: 3px solid #1E1E1E;
+            border-top: 3px solid #1E1E1E;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #F4F4F0;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1E1E1E;
+            border: 2px solid #F4F4F0;
+        }
+`;
+
+function Agents() {
+  return (
+    <>{"
+"}
+      <style dangerouslySetInnerHTML={{__html: styles}} />
+{/* Sidebar Navigation */}
+    <nav className="w-64 border-r-3 border-neo-black bg-white flex flex-col h-full z-10 shrink-0">
+        <div className="p-6 border-b-3 border-neo-black bg-neo-yellow">
+            <h1 className="text-3xl font-black tracking-tight uppercase">CORTHEX</h1>
+            <p className="font-bold text-xs mt-1 bg-white inline-block px-1 neo-border">WORKSPACE</p>
+        </div>
+        <div className="flex-grow overflow-y-auto p-4 space-y-2">
+            <a href="/app/home" className="nav-item flex items-center gap-3 p-3 font-bold transition-colors">
+                <span className="w-6 h-6 bg-white flex items-center justify-center neo-border text-xs">H</span> Home
+            </a>
+            <a href="/app/command-center" className="nav-item flex items-center gap-3 p-3 font-bold transition-colors">
+                <span className="w-6 h-6 bg-white flex items-center justify-center neo-border text-xs">C</span> Command
+                Center
+            </a>
+            <div className="pt-4 border-t-3 border-neo-black mt-4 mb-2"></div>
+            <a href="/app/agents" className="nav-item active flex items-center gap-3 p-3 font-bold transition-colors">
+                <span
+                    className="w-6 h-6 bg-neo-pink text-white flex items-center justify-center neo-border text-xs shadow-[2px_2px_0px_#000]">A</span>
+                Agents
+            </a>
+            <a href="/app/departments" className="nav-item flex items-center gap-3 p-3 font-bold transition-colors">
+                <span className="w-6 h-6 bg-white flex items-center justify-center neo-border text-xs">O</span> Departments
+            </a>
+            <a href="/app/reports" className="nav-item flex items-center gap-3 p-3 font-bold transition-colors">
+                <span className="w-6 h-6 bg-white flex items-center justify-center neo-border text-xs">R</span> Reports
+            </a>
+        </div>
+    </nav>
+
+    {/* Main Content */}
+    <main className="flex-grow flex flex-col h-full bg-neo-bg overflow-y-auto w-full">
+
+        {/* Topbar */}
+        <header
+            className="h-16 border-b-3 border-neo-black bg-white flex items-center justify-between px-8 sticky top-0 z-20 shrink-0">
+            <div className="flex items-center gap-4">
+                <h2 className="text-2xl font-black uppercase">Agents Roster</h2>
+                <span
+                    className="bg-neo-black text-white px-2 py-0.5 text-xs font-bold neo-border shadow-[2px_2px_0px_#BFFF00]">24
+                    Active</span>
+            </div>
+            <div className="flex items-center gap-4">
+                <input type="text" placeholder="Search Agents..."
+                    className="neo-input p-1.5 px-3 text-sm focus:outline-none w-64 bg-white hidden sm:block" />
+            </div>
+        </header>
+
+        <div className="p-8 max-w-7xl mx-auto space-y-10 w-full">
+
+            {/* Filters */}
+            <div className="flex flex-wrap gap-4 items-center mb-6">
+                <button
+                    className="bg-neo-black text-white px-4 py-2 text-sm font-bold uppercase border-3 border-neo-black shadow-[4px_4px_0px_#FF3366]">All
+                    Agents</button>
+                <button
+                    className="bg-white hover:bg-neo-yellow px-4 py-2 text-sm font-bold uppercase border-3 border-neo-black shadow-[4px_4px_0px_#000] transition-colors">System
+                    (1)</button>
+                <button
+                    className="bg-white hover:bg-neo-yellow px-4 py-2 text-sm font-bold uppercase border-3 border-neo-black shadow-[4px_4px_0px_#000] transition-colors">Managers
+                    (4)</button>
+                <button
+                    className="bg-white hover:bg-neo-yellow px-4 py-2 text-sm font-bold uppercase border-3 border-neo-black shadow-[4px_4px_0px_#000] transition-colors">Specialists
+                    (12)</button>
+                <button
+                    className="bg-white hover:bg-neo-yellow px-4 py-2 text-sm font-bold uppercase border-3 border-neo-black shadow-[4px_4px_0px_#000] transition-colors">Workers
+                    (7)</button>
+
+                <div className="ml-auto">
+                    <select
+                        className="p-2 border-3 border-neo-black bg-white font-bold cursor-pointer hover:bg-gray-100 outline-none shadow-[2px_2px_0px_#000]">
+                        <option>Sort by: Name A-Z</option>
+                        <option>Sort by: Tier Level</option>
+                        <option>Sort by: Cost (High-Low)</option>
+                    </select>
+                </div>
+            </div>
+
+            {/* Agent Grid */}
+            {/* API: GET /api/workspace/agents */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                {/* Agent Card 1 (System) */}
+                <div
+                    className="neo-card bg-neo-black text-white flex flex-col relative overflow-hidden group hover:-translate-y-2 transition-transform">
+                    <div
+                        className="p-4 border-b-3 border-white bg-neo-yellow text-neo-black flex justify-between items-center z-10">
+                        <span
+                            className="font-black text-xs uppercase tracking-widest border border-black px-1 pb-px bg-white">System
+                            Agent</span>
+                        <div className="w-2 h-2 rounded-full bg-neo-lime border border-black animate-pulse"></div>
+                    </div>
+                    <div
+                        className="absolute -right-6 -top-6 text-[100px] opacity-10 font-black pointer-events-none group-hover:scale-110 transition-transform">
+                        ★</div>
+                    <div className="p-6 flex-grow z-10 flex flex-col">
+                        <div className="flex items-center gap-4 mb-4">
+                            <div
+                                className="w-16 h-16 rounded-full bg-white text-neo-black border-3 border-white flex items-center justify-center font-black text-2xl shadow-sm -rotate-6">
+                                CS</div>
+                            <div>
+                                <h3 className="text-2xl font-black uppercase">Chief of Staff</h3>
+                                <p className="text-sm font-bold text-neo-yellow">Global Orchestrator</p>
+                            </div>
+                        </div>
+                        <p className="text-sm border-l-3 border-neo-pink pl-3 mb-4 flex-grow opacity-90 line-clamp-3">
+                            Automatically classifies incoming CEO commands, drafts delegation hierarchies, and enforces
+                            quality gates.</p>
+                        <div
+                            className="flex justify-between items-center text-xs font-bold border-t-2 border-neo-pink pt-4">
+                            <span>Type: Claude 3.5 Sonnet</span>
+                            <span className="bg-neo-pink px-2 py-0.5 border border-white">Undeletable</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Agent Card 2 */}
+                <div className="neo-card bg-white flex flex-col relative group hover:-translate-y-2 transition-transform">
+                    <div className="p-4 border-b-3 border-neo-black bg-neo-bg flex justify-between items-center z-10">
+                        <span
+                            className="font-black text-xs uppercase tracking-widest border border-black px-1 pb-px bg-white">Manager
+                            (Tier 1)</span>
+                        <div className="w-2 h-2 rounded-full bg-neo-lime border border-black"></div>
+                    </div>
+                    <div
+                        className="p-6 flex-grow z-10 flex flex-col items-start bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMCwwLDAsMC4wNSkiLz48L3N2Zz4=')]">
+                        <div className="flex items-center gap-4 mb-4">
+                            <div
+                                className="w-16 h-16 rounded-full bg-neo-pink text-white border-3 border-neo-black flex items-center justify-center font-black text-2xl shadow-sm rotate-3">
+                                CM</div>
+                            <div>
+                                <h3 className="text-2xl font-black uppercase">CMO Agent</h3>
+                                <p
+                                    className="text-sm font-bold text-gray-600 bg-white px-1 inline-block border border-black mt-1">
+                                    Marketing Dept</p>
+                            </div>
+                        </div>
+                        <p className="text-sm border-l-3 border-neo-lime pl-3 mb-4 flex-grow bg-white/80 p-1">Manages the
+                            marketing workflow, coordinates SEO Bot and Social Poster, and compiles weekly growth
+                            reports.</p>
+                        <div className="w-full flex justify-between items-center text-xs font-bold bg-white p-2 neo-border">
+                            <span>Claude 3.5 Sonnet</span>
+                            <button
+                                className="bg-neo-black text-white px-2 hover:bg-neo-yellow hover:text-neo-black border border-transparent hover:border-black transition-colors">Edit
+                                Soul</button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Agent Card 3 */}
+                <div
+                    className="neo-card bg-white flex flex-col relative group hover:-translate-y-2 transition-transform opacity-75 grayscale-[30%]">
+                    <div className="p-4 border-b-3 border-neo-black bg-gray-200 flex justify-between items-center z-10">
+                        <span
+                            className="font-black text-xs uppercase tracking-widest border border-black px-1 pb-px bg-white">Specialist
+                            (Tier 2)</span>
+                        <div className="w-2 h-2 rounded-full bg-neo-black border border-black"></div>
+                    </div>
+                    <div className="p-6 flex-grow z-10 flex flex-col">
+                        <div className="flex items-center gap-4 mb-4">
+                            <div
+                                className="w-16 h-16 rounded-full bg-neo-lime text-neo-black border-3 border-neo-black flex items-center justify-center font-black text-2xl shadow-sm -rotate-3">
+                                SE</div>
+                            <div>
+                                <h3 className="text-2xl font-black uppercase text-gray-600">SEO Bot</h3>
+                                <p
+                                    className="text-sm font-bold text-gray-500 bg-white px-1 -ml-1 mt-1 border border-transparent">
+                                    Marketing Dept</p>
+                            </div>
+                        </div>
+                        <p className="text-sm border-l-3 border-gray-400 pl-3 mb-4 flex-grow text-gray-500">Analyzes weekly
+                            search trends and prepares keyword optimization templates.</p>
+                        <div className="flex gap-2 mb-4 shrink-0 overflow-hidden text-[10px] font-bold">
+                            <span className="border border-black px-1 whitespace-nowrap">tools: google_search</span>
+                            <span className="border border-black px-1 whitespace-nowrap">tools: analytics_api</span>
+                        </div>
+                        <div
+                            className="w-full flex justify-between items-center text-xs font-bold bg-gray-100 p-2 border-2 border-neo-black">
+                            <span className="text-gray-600">STATUS: IDLE</span>
+                            <button className="bg-white border border-black px-2 hover:bg-neo-lime transition-colors">Wake
+                                Up</button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Agent Card 4 */}
+                <div className="neo-card bg-white flex flex-col relative group hover:-translate-y-2 transition-transform">
+                    <div className="p-4 border-b-3 border-neo-black bg-neo-bg flex justify-between items-center z-10">
+                        <span
+                            className="font-black text-xs uppercase tracking-widest border border-black px-1 pb-px bg-white">Worker
+                            (Tier 3)</span>
+                        <div className="w-2 h-2 rounded-full bg-neo-lime border border-black animate-pulse"></div>
+                    </div>
+                    <div className="p-6 flex-grow z-10 flex flex-col bg-neo-blue/5">
+                        <div className="flex items-center gap-4 mb-4">
+                            <div
+                                className="w-16 h-16 rounded-full bg-neo-blue text-neo-black border-3 border-neo-black flex items-center justify-center font-black text-2xl shadow-sm rotate-6">
+                                SP</div>
+                            <div>
+                                <h3 className="text-2xl font-black uppercase">Social Poster</h3>
+                                <p
+                                    className="text-sm font-bold text-gray-600 bg-white px-1 inline-block border border-black mt-1">
+                                    Marketing Dept</p>
+                            </div>
+                        </div>
+                        <p className="text-sm border-l-3 border-neo-blue pl-3 mb-4 flex-grow">Executes automated posting to
+                            Twitter, LinkedIn, and Facebook via Selenium routines.</p>
+                        <div className="flex gap-2 mb-4 shrink-0 overflow-hidden text-[10px] font-bold">
+                            <span className="border border-black px-1 bg-white">tools: sns_publish</span>
+                            <span className="border border-black px-1 bg-white">+ 2 more</span>
+                        </div>
+                        <div className="w-full flex justify-between items-center text-xs font-bold bg-white p-2 neo-border">
+                            <span>Claude 3.5 Haiku</span>
+                            <button
+                                className="bg-neo-black text-white px-2 hover:bg-neo-yellow hover:text-neo-black border border-transparent hover:border-black transition-colors">Edit
+                                Soul</button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Add New Agent Card */}
+                <div
+                    className="neo-card bg-neo-bg border-dashed border-4 border-gray-400 flex flex-col items-center justify-center p-8 hover:border-neo-black hover:bg-white transition-all cursor-pointer group min-h-[320px] shadow-none hover:shadow-[8px_8px_0px_#1E1E1E]">
+                    <div
+                        className="w-20 h-20 rounded-full bg-white border-4 border-gray-300 group-hover:border-neo-black flex items-center justify-center mb-4 transition-colors">
+                        <svg className="text-gray-400 group-hover:text-neo-black transition-colors" width="32" height="32"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </div>
+                    <h3
+                        className="font-black text-xl text-gray-500 group-hover:text-neo-black uppercase tracking-wider transition-colors">
+                        Hire Agent</h3>
+                </div>
+
+            </div>
+        </div>
+    </main>
+    </>
+  );
+}
+
+export default Agents;

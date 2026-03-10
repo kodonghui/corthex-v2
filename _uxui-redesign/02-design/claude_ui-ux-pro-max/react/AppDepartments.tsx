@@ -1,18 +1,21 @@
 "use client";
 import React from "react";
 
-const styles = `body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
+const styles = `
+body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
     .font-mono { font-family: "JetBrains Mono", monospace; }
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 2px; }
-    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }`;
+    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }
+`;
 
 function AppDepartments() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* API: GET /api/departments, GET /api/agents */}
+{/* API: GET /api/departments, GET /api/agents */}
   {/* Sidebar */}
   <aside className="w-60 min-w-[240px] bg-zinc-900 border-r border-zinc-800 flex flex-col fixed h-full z-20">
     <div className="h-12 border-b border-zinc-800 flex items-center px-4 gap-3 flex-shrink-0">
@@ -96,7 +99,7 @@ function AppDepartments() {
                 <div className="text-xs font-mono text-zinc-300">$4.21 / $8.00</div>
               </div>
               <div className="w-20">
-                <div className="h-1 bg-zinc-800 rounded-full"><div className="h-1 bg-blue-500 rounded-full" style={{"width":"53%"}}></div></div>
+                <div className="h-1 bg-zinc-800 rounded-full"><div className="h-1 bg-blue-500 rounded-full" style={{width: "53%"}}></div></div>
               </div>
               <span className="px-2 py-0.5 rounded-full text-xs bg-green-500/10 text-green-400">정상</span>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#71717a" strokeWidth="2"><path d="M19 9l-7 7-7-7"/></svg>
@@ -126,7 +129,7 @@ function AppDepartments() {
                 <div className="text-xs font-mono text-zinc-300">$8.19 / $12.00</div>
               </div>
               <div className="w-20">
-                <div className="h-1 bg-zinc-800 rounded-full"><div className="h-1 bg-yellow-500 rounded-full" style={{"width":"68%"}}></div></div>
+                <div className="h-1 bg-zinc-800 rounded-full"><div className="h-1 bg-yellow-500 rounded-full" style={{width: "68%"}}></div></div>
               </div>
               <span className="px-2 py-0.5 rounded-full text-xs bg-blue-500/10 text-blue-400">활성</span>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#71717a" strokeWidth="2"><path d="M5 15l7-7 7 7"/></svg>
@@ -176,7 +179,7 @@ function AppDepartments() {
                 <div className="text-xs font-mono text-zinc-300">$5.85 / $8.00</div>
               </div>
               <div className="w-20">
-                <div className="h-1 bg-zinc-800 rounded-full"><div className="h-1 bg-yellow-500 rounded-full" style={{"width":"73%"}}></div></div>
+                <div className="h-1 bg-zinc-800 rounded-full"><div className="h-1 bg-yellow-500 rounded-full" style={{width: "73%"}}></div></div>
               </div>
               <span className="px-2 py-0.5 rounded-full text-xs bg-yellow-500/10 text-yellow-400">주의</span>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#71717a" strokeWidth="2"><path d="M19 9l-7 7-7-7"/></svg>
@@ -205,7 +208,7 @@ function AppDepartments() {
                 <div className="text-xs font-mono text-zinc-300">$2.81 / $6.00</div>
               </div>
               <div className="w-20">
-                <div className="h-1 bg-zinc-800 rounded-full"><div className="h-1 bg-green-500 rounded-full" style={{"width":"47%"}}></div></div>
+                <div className="h-1 bg-zinc-800 rounded-full"><div className="h-1 bg-green-500 rounded-full" style={{width: "47%"}}></div></div>
               </div>
               <span className="px-2 py-0.5 rounded-full text-xs bg-green-500/10 text-green-400">정상</span>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#71717a" strokeWidth="2"><path d="M19 9l-7 7-7-7"/></svg>
@@ -234,7 +237,7 @@ function AppDepartments() {
                 <div className="text-xs font-mono text-zinc-300">$2.34 / $6.00</div>
               </div>
               <div className="w-20">
-                <div className="h-1 bg-zinc-800 rounded-full"><div className="h-1 bg-green-500 rounded-full" style={{"width":"39%"}}></div></div>
+                <div className="h-1 bg-zinc-800 rounded-full"><div className="h-1 bg-green-500 rounded-full" style={{width: "39%"}}></div></div>
               </div>
               <span className="px-2 py-0.5 rounded-full text-xs bg-green-500/10 text-green-400">정상</span>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#71717a" strokeWidth="2"><path d="M19 9l-7 7-7-7"/></svg>

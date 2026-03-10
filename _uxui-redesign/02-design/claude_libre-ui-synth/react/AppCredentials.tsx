@@ -2,23 +2,26 @@
 import React from "react";
 import { Activity, AlertTriangle, BarChart2, Bell, BookOpen, Bot, BrainCircuit, Briefcase, Building2, Calendar, Clock, Cpu, CreditCard, Edit2, Eye, EyeOff, FileText, Folder, Home, Info, Instagram, Key, LayoutDashboard, List, Lock, MessageCircle, PenTool, Plus, RotateCw, Rss, Search, Send, Settings, Share2, Shield, ShieldCheck, Terminal, Trash2, TrendingUp, Users } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; }
     code,pre { font-family: 'JetBrains Mono', monospace; }
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: #fafaf9; }
-    ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }`;
+    ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }
+`;
 
 function AppCredentials() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* SIDEBAR */}
+{/* SIDEBAR */}
 <aside className="w-60 fixed left-0 top-0 bottom-0 bg-white border-r border-stone-200 flex flex-col z-20">
   <div className="p-4 border-b border-stone-200">
     <div className="flex items-center gap-2.5">
       <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center"><span className="text-white font-bold text-sm">C</span></div>
-      <span className="font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+      <span className="font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
     </div>
   </div>
   <div className="px-4 py-3 border-b border-stone-200">
@@ -90,19 +93,19 @@ function AppCredentials() {
   {/* Status Summary */}
   <div className="grid grid-cols-4 gap-4 mb-6">
     <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-4 text-center">
-      <div className="text-2xl font-bold text-stone-900 mb-1" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>6</div>
+      <div className="text-2xl font-bold text-stone-900 mb-1" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>6</div>
       <div className="text-xs text-stone-500">전체 크리덴셜</div>
     </div>
     <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-4 text-center">
-      <div className="text-2xl font-bold text-emerald-700 mb-1" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>3</div>
+      <div className="text-2xl font-bold text-emerald-700 mb-1" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>3</div>
       <div className="text-xs text-stone-500">정상 활성</div>
     </div>
     <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-4 text-center">
-      <div className="text-2xl font-bold text-amber-600 mb-1" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>2</div>
+      <div className="text-2xl font-bold text-amber-600 mb-1" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>2</div>
       <div className="text-xs text-stone-500">만료 임박</div>
     </div>
     <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-4 text-center">
-      <div className="text-2xl font-bold text-red-600 mb-1" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>1</div>
+      <div className="text-2xl font-bold text-red-600 mb-1" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>1</div>
       <div className="text-xs text-stone-500">만료됨</div>
     </div>
   </div>
@@ -123,7 +126,7 @@ function AppCredentials() {
         <div className="flex items-center gap-5 text-xs text-stone-500">
           <div className="flex items-center gap-1.5">
             <Key className="w-3 h-3" />
-            <code className="bg-stone-100 px-2 py-0.5 rounded text-stone-700" style={{"fontFamily":"'JetBrains Mono',monospace"}}>****...***8f2a</code>
+            <code className="bg-stone-100 px-2 py-0.5 rounded text-stone-700" style={{fontFamily: "'JetBrains Mono',monospace"}}>****...***8f2a</code>
           </div>
           <div className="flex items-center gap-1.5">
             <Calendar className="w-3 h-3" />
@@ -167,7 +170,7 @@ function AppCredentials() {
         <div className="flex items-center gap-5 text-xs text-stone-500">
           <div className="flex items-center gap-1.5">
             <Key className="w-3 h-3" />
-            <code className="bg-stone-100 px-2 py-0.5 rounded text-stone-700" style={{"fontFamily":"'JetBrains Mono',monospace"}}>****...***3c9d</code>
+            <code className="bg-stone-100 px-2 py-0.5 rounded text-stone-700" style={{fontFamily: "'JetBrains Mono',monospace"}}>****...***3c9d</code>
           </div>
           <div className="flex items-center gap-1.5">
             <Calendar className="w-3 h-3" />
@@ -211,7 +214,7 @@ function AppCredentials() {
         <div className="flex items-center gap-5 text-xs text-stone-500">
           <div className="flex items-center gap-1.5">
             <Key className="w-3 h-3" />
-            <code className="bg-stone-100 px-2 py-0.5 rounded text-stone-700" style={{"fontFamily":"'JetBrains Mono',monospace"}}>****...***7b1e</code>
+            <code className="bg-stone-100 px-2 py-0.5 rounded text-stone-700" style={{fontFamily: "'JetBrains Mono',monospace"}}>****...***7b1e</code>
           </div>
           <div className="flex items-center gap-1.5 text-amber-600">
             <Calendar className="w-3 h-3" />
@@ -255,7 +258,7 @@ function AppCredentials() {
         <div className="flex items-center gap-5 text-xs text-stone-500">
           <div className="flex items-center gap-1.5">
             <Key className="w-3 h-3" />
-            <code className="bg-stone-100 px-2 py-0.5 rounded text-stone-700" style={{"fontFamily":"'JetBrains Mono',monospace"}}>****...***2a4f</code>
+            <code className="bg-stone-100 px-2 py-0.5 rounded text-stone-700" style={{fontFamily: "'JetBrains Mono',monospace"}}>****...***2a4f</code>
           </div>
           <div className="flex items-center gap-1.5 text-red-600">
             <Calendar className="w-3 h-3" />
@@ -301,7 +304,7 @@ function AppCredentials() {
         <div className="flex items-center gap-5 text-xs text-stone-500">
           <div className="flex items-center gap-1.5">
             <Key className="w-3 h-3" />
-            <code className="bg-stone-100 px-2 py-0.5 rounded text-stone-700" style={{"fontFamily":"'JetBrains Mono',monospace"}}>****...***5c7g</code>
+            <code className="bg-stone-100 px-2 py-0.5 rounded text-stone-700" style={{fontFamily: "'JetBrains Mono',monospace"}}>****...***5c7g</code>
           </div>
           <div className="flex items-center gap-1.5">
             <Calendar className="w-3 h-3" />
@@ -345,7 +348,7 @@ function AppCredentials() {
         <div className="flex items-center gap-5 text-xs text-stone-400">
           <div className="flex items-center gap-1.5">
             <Key className="w-3 h-3" />
-            <code className="bg-stone-200 px-2 py-0.5 rounded text-stone-500" style={{"fontFamily":"'JetBrains Mono',monospace"}}>****...***9d2h</code>
+            <code className="bg-stone-200 px-2 py-0.5 rounded text-stone-500" style={{fontFamily: "'JetBrains Mono',monospace"}}>****...***9d2h</code>
           </div>
           <div className="flex items-center gap-1.5">
             <Calendar className="w-3 h-3" />

@@ -2,21 +2,24 @@
 import React from "react";
 import { Activity, Bell, Bot, Briefcase, Building2, CircleDollarSign, Cpu, Database, FileBarChart, GitBranch, Key, LayoutDashboard, Plug, Settings, Shield, SlidersHorizontal, Store, UserCheck, UserPlus, Users, Wallet, Workflow } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; }
-    code,pre { font-family: 'JetBrains Mono', monospace; }`;
+    code,pre { font-family: 'JetBrains Mono', monospace; }
+`;
 
 function AdminSettings() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* Sidebar */}
+{/* Sidebar */}
   <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-10">
     <div className="px-5 py-4 border-b border-stone-100">
       <div className="flex items-center gap-2 mb-1">
         <span className="bg-violet-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded tracking-widest">ADMIN</span>
       </div>
-      <span className="text-lg font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+      <span className="text-lg font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
     </div>
     <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5">
       <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 px-2 py-1.5 mt-1">개요</p>

@@ -1,18 +1,21 @@
 "use client";
 import React from "react";
 
-const styles = `body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
+const styles = `
+body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
     .font-mono { font-family: "JetBrains Mono", monospace; }
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 2px; }
-    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }`;
+    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }
+`;
 
 function AppOpsLog() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* API: GET /api/commands?page=1&limit=50, GET /api/commands/:id */}
+{/* API: GET /api/commands?page=1&limit=50, GET /api/commands/:id */}
   {/* Sidebar */}
   <aside className="w-60 min-w-[240px] bg-zinc-900 border-r border-zinc-800 flex flex-col fixed h-full z-20">
     <div className="h-12 border-b border-zinc-800 flex items-center px-4 gap-3 flex-shrink-0">
@@ -96,7 +99,7 @@ function AppOpsLog() {
           <div className="flex items-start gap-4 px-4 py-3">
             <div className="flex flex-col items-center gap-1 flex-shrink-0">
               <span className="text-xs font-mono text-zinc-500">14:18</span>
-              <div className="w-px flex-1 bg-zinc-800" style={{"minHeight":"16px"}}></div>
+              <div className="w-px flex-1 bg-zinc-800" style={{minHeight: "16px"}}></div>
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 mb-1">

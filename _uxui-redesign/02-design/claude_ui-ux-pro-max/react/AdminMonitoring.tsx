@@ -1,18 +1,21 @@
 "use client";
 import React from "react";
 
-const styles = `body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
+const styles = `
+body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
     .font-mono { font-family: "JetBrains Mono", monospace; }
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 2px; }
-    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }`;
+    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }
+`;
 
 function AdminMonitoring() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* GET /api/admin/monitoring — returns service health, server metrics, incidents */}
+{/* GET /api/admin/monitoring — returns service health, server metrics, incidents */}
   {/* Sidebar */}
   <aside className="w-60 min-w-[240px] bg-zinc-900 border-r border-zinc-800 flex flex-col fixed h-full z-20">
     <div className="h-12 border-b border-zinc-800 flex items-center px-4 gap-3 flex-shrink-0">
@@ -150,7 +153,7 @@ function AdminMonitoring() {
                 <span className="font-mono text-zinc-300">34%</span>
               </div>
               <div className="h-2 bg-zinc-800 rounded-full">
-                <div className="h-2 bg-green-500 rounded-full" style={{"width":"34%"}}></div>
+                <div className="h-2 bg-green-500 rounded-full" style={{width: "34%"}}></div>
               </div>
             </div>
             <div>
@@ -159,7 +162,7 @@ function AdminMonitoring() {
                 <span className="font-mono text-zinc-300">5.2GB / 24GB</span>
               </div>
               <div className="h-2 bg-zinc-800 rounded-full">
-                <div className="h-2 bg-blue-500 rounded-full" style={{"width":"22%"}}></div>
+                <div className="h-2 bg-blue-500 rounded-full" style={{width: "22%"}}></div>
               </div>
             </div>
             <div>
@@ -168,7 +171,7 @@ function AdminMonitoring() {
                 <span className="font-mono text-zinc-300">128GB / 500GB</span>
               </div>
               <div className="h-2 bg-zinc-800 rounded-full">
-                <div className="h-2 bg-purple-500 rounded-full" style={{"width":"26%"}}></div>
+                <div className="h-2 bg-purple-500 rounded-full" style={{width: "26%"}}></div>
               </div>
             </div>
             <div>
@@ -177,7 +180,7 @@ function AdminMonitoring() {
                 <span className="font-mono text-zinc-300">18 / 100</span>
               </div>
               <div className="h-2 bg-zinc-800 rounded-full">
-                <div className="h-2 bg-zinc-500 rounded-full" style={{"width":"18%"}}></div>
+                <div className="h-2 bg-zinc-500 rounded-full" style={{width: "18%"}}></div>
               </div>
             </div>
           </div>

@@ -2,7 +2,8 @@
 import React from "react";
 import { Activity, AlertTriangle, BarChart2, Bell, BookOpen, Bookmark, Building2, Check, ChevronsUpDown, Clock, Copy, DollarSign, Download, Eye, FileText, Folder, GitBranch, History, Home, Info, Key, LayoutDashboard, Lock, Megaphone, MessageCircle, MessagesSquare, Pencil, ScrollText, Send, Settings, Share2, Square, Terminal, TrendingUp, Users } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1, h2, h3, h4, h5, h6, .font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
     .font-mono, code, pre { font-family: 'JetBrains Mono', monospace; }
     @keyframes blink-pulse {
@@ -16,20 +17,22 @@ const styles = `* { font-family: 'Inter', sans-serif; }
     }
     .typing-dot:nth-child(1) { animation: typing-dot 1.2s infinite 0s; }
     .typing-dot:nth-child(2) { animation: typing-dot 1.2s infinite 0.2s; }
-    .typing-dot:nth-child(3) { animation: typing-dot 1.2s infinite 0.4s; }`;
+    .typing-dot:nth-child(3) { animation: typing-dot 1.2s infinite 0.4s; }
+`;
 
 function AppCommandCenter() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* 사이드바 */}
+{/* 사이드바 */}
 <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-10">
   <div className="h-14 flex items-center px-4 border-b border-stone-200">
     <div className="flex items-center gap-2.5">
       <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
         <span className="text-white font-bold text-sm">C</span>
       </div>
-      <span className="font-bold text-stone-900 text-[15px]" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>CORTHEX</span>
+      <span className="font-bold text-stone-900 text-[15px]" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>CORTHEX</span>
     </div>
   </div>
   <nav className="flex-1 overflow-y-auto p-3 space-y-0.5">
@@ -140,10 +143,10 @@ function AppCommandCenter() {
 
   {/* 헤더 */}
   {/* API: GET /api/workspace/command-center/summary */}
-  
+  <header className="h-14 bg-white border-b border-stone-200 flex items-center px-6 sticky top-0 z-10 flex-shrink-0">
     <div className="flex items-center justify-between w-full">
       <div className="flex items-center gap-3">
-        <span className="text-sm font-semibold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>사령관실</span>
+        <span className="text-sm font-semibold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>사령관실</span>
         <span className="inline-flex items-center gap-1.5 bg-orange-50 text-orange-600 rounded-full px-2.5 py-0.5 text-xs font-medium">
           <span className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-blink"></span>
           실행 중 3개
@@ -158,10 +161,10 @@ function AppCommandCenter() {
         </button>
       </div>
     </div>
-  
+  </header>
 
   {/* 2분할 본문 */}
-  <div className="flex flex-1 overflow-hidden" style={{"height":"calc(100vh - 56px)"}}>
+  <div className="flex flex-1 overflow-hidden" style={{height: "calc(100vh - 56px)"}}>
 
     {/* 좌측 패널 40% — 명령 입력 + 히스토리 */}
     <div className="w-[40%] flex flex-col border-r border-stone-200 bg-white overflow-hidden">
@@ -311,7 +314,7 @@ function AppCommandCenter() {
       {/* 우측 헤더 */}
       <div className="px-6 py-3.5 bg-white border-b border-stone-200 flex items-center justify-between flex-shrink-0">
         <div>
-          <p className="text-sm font-semibold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>
+          <p className="text-sm font-semibold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>
             3월 마케팅 트렌드 분석 + SNS 게시물 작성
           </p>
           <p className="text-xs text-stone-400 mt-0.5">실행 시작: 2026-03-10 14:23:07 · 경과 4분 12초</p>
@@ -332,7 +335,7 @@ function AppCommandCenter() {
 
         {/* 위임 체인 시각화 */}
         <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-5">
-          <h3 className="text-sm font-semibold text-stone-900 mb-4" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>위임 체인</h3>
+          <h3 className="text-sm font-semibold text-stone-900 mb-4" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>위임 체인</h3>
 
           <div className="relative">
             {/* 연결선 */}
@@ -402,7 +405,7 @@ function AppCommandCenter() {
         {/* AI 응답 결과 — 완료된 보고서 형태 (이전 실행 결과 미리보기) */}
         <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-5">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>이전 결과 — KOSPI 200 투자 분석 (완료)</h3>
+            <h3 className="text-sm font-semibold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>이전 결과 — KOSPI 200 투자 분석 (완료)</h3>
             <div className="flex items-center gap-2">
               <button className="bg-white border border-stone-200 hover:border-stone-300 text-stone-700 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-150 flex items-center gap-1.5">
                 <Download className="w-3.5 h-3.5" /> PDF 저장
@@ -426,35 +429,35 @@ function AppCommandCenter() {
                 <div className="flex items-center gap-3">
                   <span className="text-xs text-stone-600 w-20 flex-shrink-0">반도체</span>
                   <div className="flex-1 bg-stone-100 rounded-full h-2">
-                    <div className="bg-violet-500 h-2 rounded-full" style={{"width":"34%"}}></div>
+                    <div className="bg-violet-500 h-2 rounded-full" style={{width: "34%"}}></div>
                   </div>
                   <span className="text-xs font-medium text-stone-700 w-8 text-right">34%</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-xs text-stone-600 w-20 flex-shrink-0">소비재</span>
                   <div className="flex-1 bg-stone-100 rounded-full h-2">
-                    <div className="bg-violet-400 h-2 rounded-full" style={{"width":"22%"}}></div>
+                    <div className="bg-violet-400 h-2 rounded-full" style={{width: "22%"}}></div>
                   </div>
                   <span className="text-xs font-medium text-stone-700 w-8 text-right">22%</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-xs text-stone-600 w-20 flex-shrink-0">바이오</span>
                   <div className="flex-1 bg-stone-100 rounded-full h-2">
-                    <div className="bg-emerald-400 h-2 rounded-full" style={{"width":"18%"}}></div>
+                    <div className="bg-emerald-400 h-2 rounded-full" style={{width: "18%"}}></div>
                   </div>
                   <span className="text-xs font-medium text-stone-700 w-8 text-right">18%</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-xs text-stone-600 w-20 flex-shrink-0">금융</span>
                   <div className="flex-1 bg-stone-100 rounded-full h-2">
-                    <div className="bg-amber-400 h-2 rounded-full" style={{"width":"16%"}}></div>
+                    <div className="bg-amber-400 h-2 rounded-full" style={{width: "16%"}}></div>
                   </div>
                   <span className="text-xs font-medium text-stone-700 w-8 text-right">16%</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-xs text-stone-600 w-20 flex-shrink-0">기타</span>
                   <div className="flex-1 bg-stone-100 rounded-full h-2">
-                    <div className="bg-stone-400 h-2 rounded-full" style={{"width":"10%"}}></div>
+                    <div className="bg-stone-400 h-2 rounded-full" style={{width: "10%"}}></div>
                   </div>
                   <span className="text-xs font-medium text-stone-700 w-8 text-right">10%</span>
                 </div>

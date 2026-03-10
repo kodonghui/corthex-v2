@@ -2,29 +2,20 @@
 import React from "react";
 import { Activity, BarChart2, Bell, BookOpen, Bot, Building2, ChevronsUpDown, CreditCard, DollarSign, Eye, Folder, Gauge, GitBranch, Home, Key, LayoutDashboard, ListChecks, MessageSquare, MoreHorizontal, Plus, ScrollText, Send, Settings, Settings2, Share2, Shield, Terminal, TrendingUp, Users, Zap } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1,h2,h3,h4,h5,h6,.font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
     code,pre,.font-mono { font-family: 'JetBrains Mono', monospace; }
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: #f5f5f4; }
-    ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }`;
+    ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }
+`;
 
 function AppDepartments() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* API: GET /api/workspace/departments */}
-  {/* API: POST /api/workspace/departments */}
-  {/* API: GET /api/workspace/departments/{id} */}
-  {/* API: PATCH /api/workspace/departments/{id} */}
-  {/* API: DELETE /api/workspace/departments/{id} */}
-  
-  
-  
-  
-
-
-
 {/* ===== SIDEBAR ===== */}
 <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-10">
 
@@ -34,8 +25,8 @@ function AppDepartments() {
       <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
         <Zap className="w-4 h-4 text-white" />
       </div>
-      <span className="text-sm font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
-      <span className="text-[10px] text-stone-400 ml-0.5" style={{"fontFamily":"'JetBrains Mono',monospace"}}>v2</span>
+      <span className="text-sm font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+      <span className="text-[10px] text-stone-400 ml-0.5" style={{fontFamily: "'JetBrains Mono',monospace"}}>v2</span>
     </div>
   </div>
 
@@ -117,8 +108,8 @@ function AppDepartments() {
 <main className="ml-60 min-h-screen">
 
   {/* Header */}
-  
-    <h1 className="text-base font-semibold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>부서</h1>
+  <header className="h-14 bg-white border-b border-stone-200 flex items-center justify-between px-6 sticky top-0 z-10">
+    <h1 className="text-base font-semibold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>부서</h1>
     <div className="flex items-center gap-2">
       <a href="/app/nexus" className="flex items-center gap-1.5 bg-white border border-stone-200 hover:border-stone-300 text-stone-700 rounded-lg px-4 py-2 text-sm font-medium transition-colors">
         <GitBranch className="w-3.5 h-3.5" />
@@ -129,7 +120,7 @@ function AppDepartments() {
         부서 추가
       </button>
     </div>
-  
+  </header>
 
   <div className="p-6">
 
@@ -142,7 +133,7 @@ function AppDepartments() {
           </div>
           <div>
             <p className="text-xs text-stone-500">총 부서</p>
-            <p className="text-lg font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>5</p>
+            <p className="text-lg font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>5</p>
           </div>
         </div>
         <div className="w-px h-10 bg-stone-100"></div>
@@ -152,7 +143,7 @@ function AppDepartments() {
           </div>
           <div>
             <p className="text-xs text-stone-500">총 에이전트</p>
-            <p className="text-lg font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>24</p>
+            <p className="text-lg font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>24</p>
           </div>
         </div>
         <div className="w-px h-10 bg-stone-100"></div>
@@ -162,7 +153,7 @@ function AppDepartments() {
           </div>
           <div>
             <p className="text-xs text-stone-500">이번 달 작업</p>
-            <p className="text-lg font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>1,040</p>
+            <p className="text-lg font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>1,040</p>
           </div>
         </div>
         <div className="w-px h-10 bg-stone-100"></div>
@@ -172,7 +163,7 @@ function AppDepartments() {
           </div>
           <div>
             <p className="text-xs text-stone-500">이번 달 비용</p>
-            <p className="text-lg font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>$16.80</p>
+            <p className="text-lg font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>$16.80</p>
           </div>
         </div>
         <div className="ml-auto flex items-center gap-1.5 text-xs text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full font-medium">
@@ -190,7 +181,7 @@ function AppDepartments() {
         <div className="flex items-start gap-3 mb-4">
           <div className="w-11 h-11 bg-violet-100 rounded-xl flex items-center justify-center text-2xl flex-shrink-0">🏢</div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-sm font-bold text-stone-900 truncate" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>비서실</h3>
+            <h3 className="text-sm font-bold text-stone-900 truncate" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>비서실</h3>
             <p className="text-xs text-stone-500 mt-0.5">CEO 직속 지원 조직</p>
           </div>
           <button className="text-stone-400 hover:text-stone-600 transition-colors flex-shrink-0">
@@ -212,11 +203,11 @@ function AppDepartments() {
         <div className="grid grid-cols-2 gap-2 mb-4">
           <div className="bg-stone-50 rounded-lg p-2.5">
             <p className="text-[11px] font-semibold uppercase tracking-widest text-stone-500 mb-0.5">이번 달 작업</p>
-            <p className="text-sm font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>145건</p>
+            <p className="text-sm font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>145건</p>
           </div>
           <div className="bg-stone-50 rounded-lg p-2.5">
             <p className="text-[11px] font-semibold uppercase tracking-widest text-stone-500 mb-0.5">이번 달 비용</p>
-            <p className="text-sm font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>$2.30</p>
+            <p className="text-sm font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>$2.30</p>
           </div>
         </div>
 
@@ -227,7 +218,7 @@ function AppDepartments() {
             <span className="text-[11px] font-medium text-stone-700">23%</span>
           </div>
           <div className="w-full bg-stone-100 rounded-full h-1.5">
-            <div className="bg-violet-400 h-1.5 rounded-full" style={{"width":"23%"}}></div>
+            <div className="bg-violet-400 h-1.5 rounded-full" style={{width: "23%"}}></div>
           </div>
         </div>
 
@@ -242,7 +233,7 @@ function AppDepartments() {
         <div className="flex items-start gap-3 mb-4">
           <div className="w-11 h-11 bg-blue-100 rounded-xl flex items-center justify-center text-2xl flex-shrink-0">📢</div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-sm font-bold text-stone-900 truncate" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>마케팅부서</h3>
+            <h3 className="text-sm font-bold text-stone-900 truncate" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>마케팅부서</h3>
             <p className="text-xs text-stone-500 mt-0.5">브랜드 마케팅 · SNS · 카피</p>
           </div>
           <button className="text-stone-400 hover:text-stone-600 transition-colors flex-shrink-0">
@@ -262,11 +253,11 @@ function AppDepartments() {
         <div className="grid grid-cols-2 gap-2 mb-4">
           <div className="bg-stone-50 rounded-lg p-2.5">
             <p className="text-[11px] font-semibold uppercase tracking-widest text-stone-500 mb-0.5">이번 달 작업</p>
-            <p className="text-sm font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>320건</p>
+            <p className="text-sm font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>320건</p>
           </div>
           <div className="bg-stone-50 rounded-lg p-2.5">
             <p className="text-[11px] font-semibold uppercase tracking-widest text-stone-500 mb-0.5">이번 달 비용</p>
-            <p className="text-sm font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>$4.80</p>
+            <p className="text-sm font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>$4.80</p>
           </div>
         </div>
 
@@ -276,7 +267,7 @@ function AppDepartments() {
             <span className="text-[11px] font-medium text-stone-700">48%</span>
           </div>
           <div className="w-full bg-stone-100 rounded-full h-1.5">
-            <div className="bg-blue-400 h-1.5 rounded-full" style={{"width":"48%"}}></div>
+            <div className="bg-blue-400 h-1.5 rounded-full" style={{width: "48%"}}></div>
           </div>
         </div>
 
@@ -291,7 +282,7 @@ function AppDepartments() {
         <div className="flex items-start gap-3 mb-4">
           <div className="w-11 h-11 bg-emerald-100 rounded-xl flex items-center justify-center text-2xl flex-shrink-0">💹</div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-sm font-bold text-stone-900 truncate" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>전략투자부서</h3>
+            <h3 className="text-sm font-bold text-stone-900 truncate" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>전략투자부서</h3>
             <p className="text-xs text-stone-500 mt-0.5">투자 분석 · 포트폴리오</p>
           </div>
           <button className="text-stone-400 hover:text-stone-600 transition-colors flex-shrink-0">
@@ -311,11 +302,11 @@ function AppDepartments() {
         <div className="grid grid-cols-2 gap-2 mb-4">
           <div className="bg-stone-50 rounded-lg p-2.5">
             <p className="text-[11px] font-semibold uppercase tracking-widest text-stone-500 mb-0.5">이번 달 작업</p>
-            <p className="text-sm font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>280건</p>
+            <p className="text-sm font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>280건</p>
           </div>
           <div className="bg-stone-50 rounded-lg p-2.5">
             <p className="text-[11px] font-semibold uppercase tracking-widest text-stone-500 mb-0.5">이번 달 비용</p>
-            <p className="text-sm font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>$5.20</p>
+            <p className="text-sm font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>$5.20</p>
           </div>
         </div>
 
@@ -325,7 +316,7 @@ function AppDepartments() {
             <span className="text-[11px] font-medium text-amber-600">87%</span>
           </div>
           <div className="w-full bg-stone-100 rounded-full h-1.5">
-            <div className="bg-amber-400 h-1.5 rounded-full" style={{"width":"87%"}}></div>
+            <div className="bg-amber-400 h-1.5 rounded-full" style={{width: "87%"}}></div>
           </div>
         </div>
 
@@ -340,7 +331,7 @@ function AppDepartments() {
         <div className="flex items-start gap-3 mb-4">
           <div className="w-11 h-11 bg-amber-100 rounded-xl flex items-center justify-center text-2xl flex-shrink-0">⚖️</div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-sm font-bold text-stone-900 truncate" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>법무부서</h3>
+            <h3 className="text-sm font-bold text-stone-900 truncate" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>법무부서</h3>
             <p className="text-xs text-stone-500 mt-0.5">계약 검토 · 법률 자문</p>
           </div>
           <button className="text-stone-400 hover:text-stone-600 transition-colors flex-shrink-0">
@@ -360,11 +351,11 @@ function AppDepartments() {
         <div className="grid grid-cols-2 gap-2 mb-4">
           <div className="bg-stone-50 rounded-lg p-2.5">
             <p className="text-[11px] font-semibold uppercase tracking-widest text-stone-500 mb-0.5">이번 달 작업</p>
-            <p className="text-sm font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>85건</p>
+            <p className="text-sm font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>85건</p>
           </div>
           <div className="bg-stone-50 rounded-lg p-2.5">
             <p className="text-[11px] font-semibold uppercase tracking-widest text-stone-500 mb-0.5">이번 달 비용</p>
-            <p className="text-sm font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>$1.40</p>
+            <p className="text-sm font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>$1.40</p>
           </div>
         </div>
 
@@ -374,7 +365,7 @@ function AppDepartments() {
             <span className="text-[11px] font-medium text-stone-700">14%</span>
           </div>
           <div className="w-full bg-stone-100 rounded-full h-1.5">
-            <div className="bg-amber-400 h-1.5 rounded-full" style={{"width":"14%"}}></div>
+            <div className="bg-amber-400 h-1.5 rounded-full" style={{width: "14%"}}></div>
           </div>
         </div>
 
@@ -389,7 +380,7 @@ function AppDepartments() {
         <div className="flex items-start gap-3 mb-4">
           <div className="w-11 h-11 bg-rose-100 rounded-xl flex items-center justify-center text-2xl flex-shrink-0">🔬</div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-sm font-bold text-stone-900 truncate" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>연구개발부서</h3>
+            <h3 className="text-sm font-bold text-stone-900 truncate" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>연구개발부서</h3>
             <p className="text-xs text-stone-500 mt-0.5">신사업 리서치 · R&amp;D</p>
           </div>
           <button className="text-stone-400 hover:text-stone-600 transition-colors flex-shrink-0">
@@ -409,11 +400,11 @@ function AppDepartments() {
         <div className="grid grid-cols-2 gap-2 mb-4">
           <div className="bg-stone-50 rounded-lg p-2.5">
             <p className="text-[11px] font-semibold uppercase tracking-widest text-stone-500 mb-0.5">이번 달 작업</p>
-            <p className="text-sm font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>210건</p>
+            <p className="text-sm font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>210건</p>
           </div>
           <div className="bg-stone-50 rounded-lg p-2.5">
             <p className="text-[11px] font-semibold uppercase tracking-widest text-stone-500 mb-0.5">이번 달 비용</p>
-            <p className="text-sm font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>$3.10</p>
+            <p className="text-sm font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>$3.10</p>
           </div>
         </div>
 
@@ -423,7 +414,7 @@ function AppDepartments() {
             <span className="text-[11px] font-medium text-stone-700">62%</span>
           </div>
           <div className="w-full bg-stone-100 rounded-full h-1.5">
-            <div className="bg-rose-400 h-1.5 rounded-full" style={{"width":"62%"}}></div>
+            <div className="bg-rose-400 h-1.5 rounded-full" style={{width: "62%"}}></div>
           </div>
         </div>
 
@@ -439,7 +430,7 @@ function AppDepartments() {
           <Plus className="w-6 h-6 text-stone-400" />
         </div>
         <div className="text-center">
-          <p className="text-sm font-semibold text-stone-600" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>새 부서 추가</p>
+          <p className="text-sm font-semibold text-stone-600" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>새 부서 추가</p>
           <p className="text-xs text-stone-400 mt-0.5">에이전트를 부서로 묶어 관리하세요</p>
         </div>
       </div>

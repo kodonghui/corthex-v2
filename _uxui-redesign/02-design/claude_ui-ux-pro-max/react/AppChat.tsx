@@ -1,18 +1,21 @@
 "use client";
 import React from "react";
 
-const styles = `body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
+const styles = `
+body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
     .font-mono { font-family: "JetBrains Mono", monospace; }
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 2px; }
-    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }`;
+    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }
+`;
 
 function AppChat() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* API: GET /api/chats, POST /api/chats, GET /api/chats/:id/messages */}
+{/* API: GET /api/chats, POST /api/chats, GET /api/chats/:id/messages */}
   {/* Sidebar */}
   <aside className="w-60 min-w-[240px] bg-zinc-900 border-r border-zinc-800 flex flex-col fixed h-full z-20">
     <div className="h-12 border-b border-zinc-800 flex items-center px-4 gap-3 flex-shrink-0">
@@ -202,9 +205,9 @@ function AppChat() {
                   <p>분석 완료 후 아고라에서 CIO봇(매수 찬성)과 VECTOR(신중론)의 토론을 편성하겠습니다. 현재 분석 진행 중입니다 —</p>
                   {/* Typing indicator */}
                   <div className="flex items-center gap-1 mt-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style={{"animationDelay":"0ms"}}></div>
-                    <div className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style={{"animationDelay":"150ms"}}></div>
-                    <div className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style={{"animationDelay":"300ms"}}></div>
+                    <div className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style={{animationDelay: "0ms"}}></div>
+                    <div className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style={{animationDelay: "150ms"}}></div>
+                    <div className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style={{animationDelay: "300ms"}}></div>
                   </div>
                 </div>
                 <span className="text-xs text-zinc-600 mt-1 block">비서실장 · 작성 중...</span>

@@ -1,18 +1,21 @@
 "use client";
 import React from "react";
 
-const styles = `body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
+const styles = `
+body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
     .font-mono { font-family: "JetBrains Mono", monospace; }
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 2px; }
-    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }`;
+    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }
+`;
 
 function AdminOnboarding() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* GET /api/admin/onboarding — returns onboarding list with progress, steps completed */}
+{/* GET /api/admin/onboarding — returns onboarding list with progress, steps completed */}
   {/* Sidebar */}
   <aside className="w-60 min-w-[240px] bg-zinc-900 border-r border-zinc-800 flex flex-col fixed h-full z-20">
     <div className="h-12 border-b border-zinc-800 flex items-center px-4 gap-3 flex-shrink-0">
@@ -123,7 +126,7 @@ function AdminOnboarding() {
                 </div>
               </div>
               <div className="mt-3 h-1.5 bg-zinc-800 rounded-full ml-9">
-                <div className="h-1.5 bg-blue-500 rounded-full" style={{"width":"50%"}}></div>
+                <div className="h-1.5 bg-blue-500 rounded-full" style={{width: "50%"}}></div>
               </div>
             </div>
 
@@ -137,7 +140,7 @@ function AdminOnboarding() {
                 <span className="text-xs text-zinc-500 font-mono">D+0</span>
               </div>
               <div className="mt-2 ml-9 h-1.5 bg-zinc-800 rounded-full">
-                <div className="h-1.5 bg-orange-500 rounded-full" style={{"width":"20%"}}></div>
+                <div className="h-1.5 bg-orange-500 rounded-full" style={{width: "20%"}}></div>
               </div>
               <div className="text-xs text-zinc-600 mt-1 ml-9">1/5 단계 완료</div>
             </div>

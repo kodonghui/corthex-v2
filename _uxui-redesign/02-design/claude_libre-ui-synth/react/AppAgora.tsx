@@ -2,7 +2,8 @@
 import React from "react";
 import { Activity, BarChart2, Bell, BookOpen, Bot, Briefcase, Building2, Eye, FileBarChart, Folder, Home, Key, LayoutDashboard, MessageCircle, MessageSquare, Network, Play, Plus, Receipt, Scroll, Settings, Share2, Shield, Terminal, TrendingUp, Users, X } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1,h2,h3,h4,h5,h6,.font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
     code,pre { font-family: 'JetBrains Mono', monospace; }
     @keyframes pulse-glow {
@@ -14,13 +15,15 @@ const styles = `* { font-family: 'Inter', sans-serif; }
       0% { transform: scale(1); opacity: 0.8; }
       100% { transform: scale(1.6); opacity: 0; }
     }
-    .live-ring { animation: live-ring 1.2s ease-out infinite; }`;
+    .live-ring { animation: live-ring 1.2s ease-out infinite; }
+`;
 
 function AppAgora() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* Sidebar */}
+{/* Sidebar */}
   <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-40">
     <div className="px-4 py-4 border-b border-stone-100 flex items-center gap-3">
       <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
@@ -172,11 +175,11 @@ function AppAgora() {
                 </div>
                 <p className="text-sm text-stone-700 leading-relaxed">"지난 분기 디지털 채널 전환율 데이터를 보면 ROI가 오프라인 대비 2.3배 높습니다. 타겟팅 정밀도 향상으로 예산 효율화가 가능하며..."</p>
                 <div className="mt-2 flex gap-1">
-                  <div className="h-1 w-2 bg-violet-400 rounded-full pulse-dot" style={{"animationDelay":"0s"}}></div>
-                  <div className="h-1.5 w-2 bg-violet-400 rounded-full pulse-dot" style={{"animationDelay":"0.2s"}}></div>
-                  <div className="h-2 w-2 bg-violet-400 rounded-full pulse-dot" style={{"animationDelay":"0.4s"}}></div>
-                  <div className="h-1.5 w-2 bg-violet-400 rounded-full pulse-dot" style={{"animationDelay":"0.6s"}}></div>
-                  <div className="h-1 w-2 bg-violet-400 rounded-full pulse-dot" style={{"animationDelay":"0.8s"}}></div>
+                  <div className="h-1 w-2 bg-violet-400 rounded-full pulse-dot" style={{animationDelay: "0s"}}></div>
+                  <div className="h-1.5 w-2 bg-violet-400 rounded-full pulse-dot" style={{animationDelay: "0.2s"}}></div>
+                  <div className="h-2 w-2 bg-violet-400 rounded-full pulse-dot" style={{animationDelay: "0.4s"}}></div>
+                  <div className="h-1.5 w-2 bg-violet-400 rounded-full pulse-dot" style={{animationDelay: "0.6s"}}></div>
+                  <div className="h-1 w-2 bg-violet-400 rounded-full pulse-dot" style={{animationDelay: "0.8s"}}></div>
                 </div>
               </div>
             </div>

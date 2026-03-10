@@ -2,21 +2,24 @@
 import React from "react";
 import { Activity, Bell, Bot, Briefcase, Building2, Check, CheckCircle2, CircleDollarSign, Database, Download, Edit3, FileBarChart, GitBranch, Key, LayoutDashboard, Lightbulb, Plug, Send, Settings, Shield, Store, Target, Timer, UserCheck, UserPlus, Users, Workflow } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; }
-    code,pre { font-family: 'JetBrains Mono', monospace; }`;
+    code,pre { font-family: 'JetBrains Mono', monospace; }
+`;
 
 function AdminOnboarding() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* Sidebar */}
+{/* Sidebar */}
   <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-10">
     <div className="px-5 py-4 border-b border-stone-100">
       <div className="flex items-center gap-2 mb-1">
         <span className="bg-violet-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded tracking-widest">ADMIN</span>
       </div>
-      <span className="text-lg font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+      <span className="text-lg font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
     </div>
     <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5">
       <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 px-2 py-1.5 mt-1">개요</p>
@@ -80,7 +83,7 @@ function AdminOnboarding() {
           <Timer className="w-5 h-5 text-blue-600" />
         </div>
         <div>
-          <p className="text-base font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>8분 12초</p>
+          <p className="text-base font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>8분 12초</p>
           <p className="text-xs text-stone-500">평균 완료 시간</p>
         </div>
       </div>
@@ -89,7 +92,7 @@ function AdminOnboarding() {
           <CheckCircle2 className="w-5 h-5 text-violet-600" />
         </div>
         <div>
-          <p className="text-base font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>78%</p>
+          <p className="text-base font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>78%</p>
           <p className="text-xs text-stone-500">4단계까지 완료율</p>
         </div>
       </div>
@@ -98,7 +101,7 @@ function AdminOnboarding() {
           <Target className="w-5 h-5 text-emerald-600" />
         </div>
         <div>
-          <p className="text-base font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>82%</p>
+          <p className="text-base font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>82%</p>
           <p className="text-xs text-stone-500">10분 목표 달성률</p>
         </div>
       </div>
@@ -116,13 +119,13 @@ function AdminOnboarding() {
             </div>
             <div className="text-right">
               <p className="text-xs text-stone-500">전체 진행률</p>
-              <p className="text-lg font-bold text-violet-700" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>83%</p>
+              <p className="text-lg font-bold text-violet-700" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>83%</p>
             </div>
           </div>
 
           {/* Progress bar */}
           <div className="h-1.5 bg-stone-100 rounded-full overflow-hidden mb-6">
-            <div className="h-full bg-violet-500 rounded-full" style={{"width":"83%"}}></div>
+            <div className="h-full bg-violet-500 rounded-full" style={{width: "83%"}}></div>
           </div>
 
           {/* Steps */}
@@ -251,19 +254,19 @@ function AdminOnboarding() {
           <div className="space-y-4">
             <div>
               <div className="flex justify-between text-xs mb-1"><span className="font-medium text-stone-700">ACME Corp</span><span className="text-emerald-600 font-medium">5/6단계</span></div>
-              <div className="h-1.5 bg-stone-100 rounded-full overflow-hidden"><div className="h-full bg-emerald-500 rounded-full" style={{"width":"83%"}}></div></div>
+              <div className="h-1.5 bg-stone-100 rounded-full overflow-hidden"><div className="h-full bg-emerald-500 rounded-full" style={{width: "83%"}}></div></div>
             </div>
             <div>
               <div className="flex justify-between text-xs mb-1"><span className="font-medium text-stone-700">TechVentures</span><span className="text-emerald-600 font-medium">6/6단계</span></div>
-              <div className="h-1.5 bg-stone-100 rounded-full overflow-hidden"><div className="h-full bg-emerald-500 rounded-full" style={{"width":"100%"}}></div></div>
+              <div className="h-1.5 bg-stone-100 rounded-full overflow-hidden"><div className="h-full bg-emerald-500 rounded-full" style={{width: "100%"}}></div></div>
             </div>
             <div>
               <div className="flex justify-between text-xs mb-1"><span className="font-medium text-stone-700">LegalPlus</span><span className="text-emerald-600 font-medium">6/6단계</span></div>
-              <div className="h-1.5 bg-stone-100 rounded-full overflow-hidden"><div className="h-full bg-emerald-500 rounded-full" style={{"width":"100%"}}></div></div>
+              <div className="h-1.5 bg-stone-100 rounded-full overflow-hidden"><div className="h-full bg-emerald-500 rounded-full" style={{width: "100%"}}></div></div>
             </div>
             <div>
               <div className="flex justify-between text-xs mb-1"><span className="font-medium text-stone-700">StartupXYZ</span><span className="text-amber-600 font-medium">3/6단계</span></div>
-              <div className="h-1.5 bg-stone-100 rounded-full overflow-hidden"><div className="h-full bg-amber-400 rounded-full" style={{"width":"50%"}}></div></div>
+              <div className="h-1.5 bg-stone-100 rounded-full overflow-hidden"><div className="h-full bg-amber-400 rounded-full" style={{width: "50%"}}></div></div>
             </div>
           </div>
         </div>

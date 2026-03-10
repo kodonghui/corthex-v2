@@ -2,7 +2,8 @@
 import React from "react";
 import { Activity, BarChart2, Bell, BellRing, Bot, Brain, Briefcase, Building2, CircleDollarSign, Clock, Copy, Database, Edit3, FileBarChart, FileText, GitBranch, Key, LayoutDashboard, Newspaper, Play, Plug, Plus, Rss, Settings, Shield, Store, TrendingUp, UserCheck, UserPlus, Users, Workflow, Zap } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; }
     code,pre { font-family: 'JetBrains Mono', monospace; }
     .flow-arrow {
@@ -18,19 +19,21 @@ const styles = `* { font-family: 'Inter', sans-serif; }
       background: #d6d3d1;
       flex-shrink: 0;
     }
-    .flow-arrow:last-child::after { display: none; }`;
+    .flow-arrow:last-child::after { display: none; }
+`;
 
 function AdminWorkflows() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* Sidebar */}
+{/* Sidebar */}
   <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-10">
     <div className="px-5 py-4 border-b border-stone-100">
       <div className="flex items-center gap-2 mb-1">
         <span className="bg-violet-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded tracking-widest">ADMIN</span>
       </div>
-      <span className="text-lg font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+      <span className="text-lg font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
     </div>
     <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5">
       <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 px-2 py-1.5 mt-1">개요</p>
@@ -88,19 +91,19 @@ function AdminWorkflows() {
     <div className="grid grid-cols-4 gap-4 mb-6">
       <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-4 flex items-center gap-3">
         <div className="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center"><Workflow className="w-4 h-4 text-violet-600" /></div>
-        <div><p className="text-lg font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>4</p><p className="text-xs text-stone-500">전체 워크플로우</p></div>
+        <div><p className="text-lg font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>4</p><p className="text-xs text-stone-500">전체 워크플로우</p></div>
       </div>
       <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-4 flex items-center gap-3">
         <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center"><Play className="w-4 h-4 text-emerald-600" /></div>
-        <div><p className="text-lg font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>3</p><p className="text-xs text-stone-500">활성</p></div>
+        <div><p className="text-lg font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>3</p><p className="text-xs text-stone-500">활성</p></div>
       </div>
       <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-4 flex items-center gap-3">
         <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center"><Zap className="w-4 h-4 text-blue-600" /></div>
-        <div><p className="text-lg font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>185</p><p className="text-xs text-stone-500">총 실행 횟수</p></div>
+        <div><p className="text-lg font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>185</p><p className="text-xs text-stone-500">총 실행 횟수</p></div>
       </div>
       <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-4 flex items-center gap-3">
         <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center"><Clock className="w-4 h-4 text-amber-600" /></div>
-        <div><p className="text-lg font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>4.2분</p><p className="text-xs text-stone-500">평균 실행 시간</p></div>
+        <div><p className="text-lg font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>4.2분</p><p className="text-xs text-stone-500">평균 실행 시간</p></div>
       </div>
     </div>
 
@@ -275,7 +278,7 @@ function AdminWorkflows() {
         {/* Arrow 1 */}
         <div className="flex items-center gap-0 flex-shrink-0 mx-1">
           <div className="w-8 h-px bg-stone-300"></div>
-          <div className="w-0 h-0 border-t-4 border-b-4 border-l-6 border-transparent border-l-stone-300" style={{"borderLeftWidth":"6px"}}></div>
+          <div className="w-0 h-0 border-t-4 border-b-4 border-l-6 border-transparent border-l-stone-300" style={{borderLeftWidth: "6px"}}></div>
         </div>
 
         {/* Node 2: Analysis */}
@@ -295,7 +298,7 @@ function AdminWorkflows() {
         {/* Arrow 2 */}
         <div className="flex items-center gap-0 flex-shrink-0 mx-1">
           <div className="w-8 h-px bg-stone-300"></div>
-          <div className="w-0 h-0 border-t-4 border-b-4 border-l-6 border-transparent border-l-stone-300" style={{"borderLeftWidth":"6px"}}></div>
+          <div className="w-0 h-0 border-t-4 border-b-4 border-l-6 border-transparent border-l-stone-300" style={{borderLeftWidth: "6px"}}></div>
         </div>
 
         {/* Node 3: Condition */}
@@ -315,7 +318,7 @@ function AdminWorkflows() {
         {/* Arrow 3 */}
         <div className="flex items-center gap-0 flex-shrink-0 mx-1">
           <div className="w-8 h-px bg-stone-300"></div>
-          <div className="w-0 h-0 border-t-4 border-b-4 border-l-6 border-transparent border-l-stone-300" style={{"borderLeftWidth":"6px"}}></div>
+          <div className="w-0 h-0 border-t-4 border-b-4 border-l-6 border-transparent border-l-stone-300" style={{borderLeftWidth: "6px"}}></div>
         </div>
 
         {/* Node 4: Action */}

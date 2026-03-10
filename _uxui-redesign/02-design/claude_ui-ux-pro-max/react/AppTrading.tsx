@@ -1,18 +1,21 @@
 "use client";
 import React from "react";
 
-const styles = `body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
+const styles = `
+body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
     .font-mono { font-family: "JetBrains Mono", monospace; }
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 2px; }
-    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }`;
+    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }
+`;
 
 function AppTrading() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* API: GET /api/strategy/portfolio, GET /api/strategy/positions */}
+{/* API: GET /api/strategy/portfolio, GET /api/strategy/positions */}
   {/* Sidebar */}
   <aside className="w-60 min-w-[240px] bg-zinc-900 border-r border-zinc-800 flex flex-col fixed h-full z-20">
     <div className="h-12 border-b border-zinc-800 flex items-center px-4 gap-3 flex-shrink-0">
@@ -241,11 +244,11 @@ function AppTrading() {
               <div className="space-y-2">
                 <div>
                   <div className="flex justify-between text-xs mb-1"><span className="text-zinc-500">포트폴리오 집중도</span><span className="text-yellow-400">중간</span></div>
-                  <div className="h-1 bg-zinc-800 rounded-full"><div className="h-1 bg-yellow-500 rounded-full" style={{"width":"60%"}}></div></div>
+                  <div className="h-1 bg-zinc-800 rounded-full"><div className="h-1 bg-yellow-500 rounded-full" style={{width: "60%"}}></div></div>
                 </div>
                 <div>
                   <div className="flex justify-between text-xs mb-1"><span className="text-zinc-500">변동성 (VaR 95%)</span><span className="text-green-400">낮음</span></div>
-                  <div className="h-1 bg-zinc-800 rounded-full"><div className="h-1 bg-green-500 rounded-full" style={{"width":"30%"}}></div></div>
+                  <div className="h-1 bg-zinc-800 rounded-full"><div className="h-1 bg-green-500 rounded-full" style={{width: "30%"}}></div></div>
                 </div>
               </div>
             </div>

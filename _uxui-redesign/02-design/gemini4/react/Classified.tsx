@@ -1,0 +1,309 @@
+"use client";
+import React from "react";
+
+const styles = `
+body {
+            background-color: inherit /* FIXME: theme value not in map */;
+            color: #e5e5e5;
+        }
+
+        .card {
+            background-color: inherit /* FIXME: theme value not in map */;
+            border-radius: 1rem;
+            box-shadow: inherit /* FIXME: theme value not in map */;
+            border: 1px solid #333;
+        }
+
+        .nav-item {
+            display: flex;
+            items-center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            color: #a3a3a3;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+
+        .nav-item.active {
+            background-color: rgba(234, 179, 8, 0.1);
+            color: #eab308;
+            font-weight: 600;
+            border: 1px solid rgba(234, 179, 8, 0.2);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #404040;
+            border-radius: 3px;
+        }
+
+        .matrix-bg {
+            background-color: inherit /* FIXME: theme value not in map */;
+            background-image: radial-gradient(circle at 50% 0%, rgba(212, 168, 67, 0.08) 0%, transparent 50%),
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+        }
+
+        /* Blur effect for redacted text */
+        .redacted {
+            filter: blur(4px);
+            user-select: none;
+            transition: filter 0.3s;
+            cursor: help;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 2px;
+        }
+
+        .redacted:hover {
+            filter: blur(0px);
+        }
+`;
+
+function Classified() {
+  return (
+    <>{"
+"}
+      <style dangerouslySetInnerHTML={{__html: styles}} />
+{/* Sidebar */}
+    <aside className="w-64 bg-secure-light border-r border-[#333] flex flex-col h-full z-10 shadow-glow shrink-0">
+        <div className="p-6 border-b border-[#333]">
+            <h2 className="font-serif text-2xl tracking-tight text-accent font-bold">CORTHEX</h2>
+            <div className="flex items-center gap-1 mt-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
+                <p className="text-xs text-red-400 font-mono tracking-wider">RESTRICTED AREA</p>
+            </div>
+        </div>
+
+        <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
+            <a href="/app/home" className="nav-item">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                안전 구역으로 복귀
+            </a>
+
+            <p className="px-4 text-[10px] font-bold text-accent uppercase tracking-widest mt-6 mb-2">기밀 문서 제어</p>
+
+            <a href="/app/argos" className="nav-item">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                    </path>
+                </svg>
+                할루시네이션 적발기록
+            </a>
+            <a href="/app/classified" className="nav-item active">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                    </path>
+                </svg>
+                기밀 문서 접근 제어
+            </a>
+            <a href="#" className="nav-item">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                        d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z">
+                    </path>
+                </svg>
+                마스킹 키워드 규칙 (DLP)
+            </a>
+        </nav>
+
+        <div className="p-4 border-t border-[#333] bg-black/20">
+            <div className="flex items-center gap-3">
+                <div
+                    className="w-8 h-8 rounded bg-[#333] border border-[#444] flex items-center justify-center text-white font-bold font-mono text-xs">
+                    CEO</div>
+                <div>
+                    <p className="font-mono text-[10px] text-[#888] mb-0.5">CLEARANCE LEVEL: 5</p>
+                    <p className="font-medium text-white text-xs">김대표</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    {/* Main Content */}
+    {/* API: GET /api/workspace/classified/documents */}
+    <main className="flex-1 overflow-y-auto px-8 py-10 relative">
+        <header className="mb-10 lg:flex lg:justify-between lg:items-end border-b border-[#333] pb-6">
+            <div className="mb-4 lg:mb-0">
+                <div className="flex items-center gap-3 mb-2">
+                    <h1 className="text-3xl font-serif text-white font-bold tracking-tight">기밀 문서 접근 제어 (Classified)</h1>
+                    <span
+                        className="bg-red-500/10 border border-red-500/30 text-red-500 px-2 py-0.5 rounded text-[10px] font-bold font-mono uppercase tracking-widest">Top
+                        Secret</span>
+                </div>
+                <p className="text-[#888] font-mono text-xs">이곳에 업로드된 문서는 최고 권한자(CEO)가 지정한 특정 에이전트(예: 감사역, 재무 CFO봇)만 읽을 수
+                    있습니다. 일반 에이전트의 RAG 검색에서는 완전히 배제됩니다.</p>
+            </div>
+
+            <button
+                className="bg-accent/10 border border-accent/30 text-accent px-4 py-2 rounded-lg hover:bg-accent/20 transition-colors font-mono font-medium shadow-glow text-xs flex items-center gap-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                </svg>
+                기밀 문서 다이렉트 업로드
+            </button>
+        </header>
+
+        <div className="grid lg:grid-cols-3 gap-8">
+
+            {/* Left: Classified Vault List */}
+            <div className="lg:col-span-2 space-y-4">
+
+                {/* Security Notice */}
+                <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 flex gap-3 items-start mb-6">
+                    <svg className="w-5 h-5 text-blue-400 mt-0.5 shrink-0" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div>
+                        <p className="text-xs text-blue-300 font-mono leading-relaxed">기밀 문서는 암호화되어 클라우드에 저장되며, 열람 시 자동 데이터
+                            유출 방지(DLP) 패턴이 적용됩니다. 허가된 에이전트라도 요약 시 민감 정보(주민번호, 계좌, 매출 원 데이터)는 자동 <span
+                                className="bg-black text-white px-1">마스킹(***)</span> 처리하여 사용자에게 반환됩니다.</p>
+                    </div>
+                </div>
+
+                {/* Vault Item 1 */}
+                <div className="card p-0 border-[#333] hover:border-[#555] transition-colors overflow-hidden group">
+                    <div className="p-4 border-b border-[#333] bg-[#1a1a1a] flex justify-between items-center">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-black border border-[#333] flex items-center justify-center rounded">
+                                <svg className="w-4 h-4 text-accent" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd"
+                                        d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                                        clipRule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3
+                                    className="font-mono text-sm text-white font-bold group-hover:text-accent transition-colors">
+                                    Project_Omega_M&A_Valuation.xlsx</h3>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <span className="text-[10px] text-[#666] font-mono">14.2 MB • 암호화 완료 (AES-256)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span
+                                className="bg-red-500/10 text-red-400 text-[10px] font-mono border border-red-500/20 px-2 py-0.5 rounded">Level
+                                5</span>
+                        </div>
+                    </div>
+                    <div className="p-4 bg-secure-light text-xs font-mono text-[#888]">
+                        <p className="mb-2 uppercase text-[10px] font-bold text-[#555] tracking-widest">접근 허가된 에이전트 목록</p>
+                        <div className="flex gap-2">
+                            <span
+                                className="px-2 py-1 bg-black border border-[#333] rounded text-white flex items-center gap-1"><span
+                                    className="w-1.5 h-1.5 rounded-full bg-accent"></span> 감사역 (Auditor)</span>
+                            <span
+                                className="px-2 py-1 bg-black border border-[#333] rounded text-white flex items-center gap-1"><span
+                                    className="w-1.5 h-1.5 rounded-full bg-accent"></span> 재무 분석봇 (CFO)</span>
+                            <button
+                                className="px-2 py-1 bg-[#222] border border-[#333] border-dashed rounded text-[#666] hover:text-white transition-colors">+
+                                추가</button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Vault Item 2 */}
+                <div className="card p-0 border-[#333] hover:border-[#555] transition-colors overflow-hidden group">
+                    <div className="p-4 border-b border-[#333] bg-[#1a1a1a] flex justify-between items-center">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-black border border-[#333] flex items-center justify-center rounded">
+                                <svg className="w-4 h-4 text-[#888]" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd"
+                                        d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
+                                        clipRule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3
+                                    className="font-mono text-sm text-white font-bold group-hover:text-accent transition-colors">
+                                    2024_하반기_인사고과_초안.pdf</h3>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <span className="text-[10px] text-[#666] font-mono">2.1 MB • 암호화 완료 (AES-256)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span
+                                className="bg-orange-500/10 text-orange-400 text-[10px] font-mono border border-orange-500/20 px-2 py-0.5 rounded">Level
+                                4</span>
+                        </div>
+                    </div>
+                    <div className="p-4 bg-secure-light text-xs font-mono text-[#888]">
+                        <p className="mb-2 uppercase text-[10px] font-bold text-[#555] tracking-widest">접근 허가된 에이전트 목록</p>
+                        <div className="flex gap-2">
+                            <span
+                                className="px-2 py-1 bg-black border border-[#333] rounded text-white flex items-center gap-1"><span
+                                    className="w-1.5 h-1.5 rounded-full bg-accent"></span> 인사보안 파트장</span>
+                            <button
+                                className="px-2 py-1 bg-[#222] border border-[#333] border-dashed rounded text-[#666] hover:text-white transition-colors">+
+                                추가</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            {/* Right: DLP / Masking Preview */}
+            <div className="space-y-6">
+                <div className="card p-5 border-[#333] bg-[#111]">
+                    <h3
+                        className="font-mono text-sm font-bold text-accent mb-4 border-b border-[#333] pb-2 flex items-center gap-2">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1">
+                            </path>
+                        </svg>
+                        DLP 데이터 마스킹 테스트 뷰어
+                    </h3>
+
+                    <p className="text-[10px] font-mono text-[#666] mb-3">허가된 에이전트가 문서를 읽고 답변을 생성할 때, 관리자가 아닌 일반 사용자(팀원)가
+                        접속했다면 아래와 같이 표시됩니다. (Hover 하여 확인)</p>
+
+                    <div
+                        className="bg-black border border-[#222] p-4 rounded font-mono text-xs leading-relaxed text-[#bbb]">
+                        > "요청하신 Omega 인수 건 요약입니다.<br />
+                        현재 대상 기업의 현금 보유고는 <span
+                            className="redacted text-red-400 font-bold px-1 rounded">₩24,500,000,000</span>이며, <br />
+                        대표이사 <span className="redacted text-red-400 font-bold px-1 rounded">제임스 본드</span>의 핵심 개인 계좌 <span
+                            className="redacted text-red-400 font-bold px-1 rounded">123-456-7890</span>로 <br />
+                        이면 계약금 <span className="redacted text-red-400 font-bold px-1 rounded">$1.5M</span> 송금 정황이..."
+                    </div>
+
+                    <div className="mt-4 pt-4 border-t border-[#333]">
+                        <button
+                            className="w-full bg-transparent border border-[#444] text-[#888] font-mono text-xs py-2 rounded hover:bg-[#222] hover:text-white transition-colors">
+                            마스킹 규칙(Regex) 편집기 열기
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+    </>
+  );
+}
+
+export default Classified;

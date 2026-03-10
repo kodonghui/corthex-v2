@@ -1,0 +1,311 @@
+"use client";
+import React from "react";
+
+const styles = `
+body {
+            background-color: #fcfbf9;
+            color: #2c2c2c;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .session-item {
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .session-item:hover {
+            background-color: #fcfbf9;
+            border-color: #e8e4d9;
+        }
+
+        .session-item.active {
+            background-color: white;
+            border-color: #e8e4d9;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+        }
+
+        .bubble-user {
+            background-color: #e07a5f;
+            color: white;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 15px rgba(224, 122, 95, 0.15);
+        }
+
+        .bubble-agent {
+            background-color: white;
+            color: #2c2c2c;
+            border: 1px solid #e8e4d9;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        }
+
+        /* dot typing animation */
+        .typing-dot {
+            animation: typing 1.4s infinite ease-in-out both;
+        }
+
+        .typing-dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes typing {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+                opacity: 0.3;
+            }
+
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+`;
+
+function AppChat() {
+  return (
+    <>{"
+"}
+      <style dangerouslySetInnerHTML={{__html: styles}} />
+{/* Primary Sidebar */}
+    <aside
+        className="w-64 flex flex-col justify-between py-8 px-4 border-r border-base-200 bg-base-50/50 backdrop-blur-md z-20 shrink-0">
+        <div>
+            <div className="flex items-center gap-3 px-4 mb-10">
+                <div
+                    className="w-8 h-8 rounded-full bg-accent-terracotta flex items-center justify-center text-white font-bold text-lg">
+                    C</div>
+                <span className="text-xl font-bold tracking-tight text-text-main">CORTHEX</span>
+            </div>
+            <nav className="space-y-2">
+                <a href="#"
+                    className="sidebar-item flex items-center gap-3 px-4 py-3 text-text-muted hover:bg-base-100 rounded-2xl transition-colors">
+                    <i className="ph ph-squares-four text-xl"></i> 홈
+                </a>
+                <a href="#"
+                    className="sidebar-item flex items-center gap-3 px-4 py-3 text-text-muted hover:bg-base-100 rounded-2xl transition-colors">
+                    <i className="ph ph-terminal-window text-xl"></i> 사령관실
+                </a>
+                <a href="#"
+                    className="sidebar-item active flex items-center gap-3 px-4 py-3 font-medium text-accent-terracotta bg-base-100 rounded-2xl transition-colors">
+                    <i className="ph ph-chats text-xl"></i> 채팅
+                </a>
+                <a href="#"
+                    className="sidebar-item flex items-center gap-3 px-4 py-3 text-text-muted hover:bg-base-100 rounded-2xl transition-colors">
+                    <i className="ph ph-chart-line-up text-xl"></i> 전략실
+                </a>
+            </nav>
+        </div>
+        <div>
+            <nav className="space-y-2">
+                <div className="mt-4 px-4 py-3 flex items-center gap-3 border-t border-base-200">
+                    <img src="https://i.pravatar.cc/100?img=11" alt="Profile"
+                        className="w-10 h-10 rounded-full border border-base-300" />
+                    <div>
+                        <p className="text-sm font-semibold text-text-main">김대표</p>
+                        <p className="text-xs text-text-muted">CEO</p>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </aside>
+
+    {/* Secondary Sidebar (Sessions List) */}
+    {/* API: GET /api/workspace/chat/sessions */}
+    <aside className="w-80 border-r border-base-200 bg-base-100/30 flex flex-col h-full z-10 shrink-0">
+        <div className="p-6 pb-2">
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-text-main">대화 목록</h2>
+                <button
+                    className="w-8 h-8 rounded-full bg-white border border-base-200 flex items-center justify-center text-text-main shadow-sm hover:bg-base-50 transition-colors">
+                    <i className="ph ph-plus"></i>
+                </button>
+            </div>
+            {/* Search */}
+            <div className="relative mb-4">
+                <i className="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"></i>
+                <input type="text" placeholder="대화 검색..."
+                    className="w-full bg-white border border-base-200 rounded-xl py-2 pl-9 pr-3 text-sm focus:outline-none focus:border-base-300 shadow-sm placeholder:text-base-300" />
+            </div>
+        </div>
+
+        {/* List */}
+        <div className="flex-1 overflow-y-auto hide-scrollbar px-4 pb-4 space-y-2">
+            {/* Session Item (Active) */}
+            <div className="session-item active p-4 rounded-2xl cursor-pointer">
+                <div className="flex justify-between items-start mb-1">
+                    <h4 className="font-bold text-sm text-text-main truncate pr-2">3분기 마케팅 전략 리뷰</h4>
+                    <span className="text-[10px] text-text-muted shrink-0 whitespace-nowrap">오전 10:42</span>
+                </div>
+                <p className="text-[13px] text-text-muted truncate mb-2">네, 해당 레퍼런스를 바탕으로 개선안을 도출해보겠습니다.</p>
+                <div className="flex items-center gap-1.5">
+                    <div
+                        className="w-5 h-5 rounded-full bg-white border border-accent-amber flex items-center justify-center text-[10px] text-accent-amber shadow-sm">
+                        <i className="ph ph-robot"></i></div>
+                    <span className="text-[11px] font-medium text-text-main">콘텐츠 전문가 (Specialist)</span>
+                </div>
+            </div>
+
+            {/* Session Item */}
+            <div className="session-item p-4 rounded-2xl cursor-pointer">
+                <div className="flex justify-between items-start mb-1">
+                    <h4 className="font-bold text-sm text-text-main truncate pr-2">경쟁사 B사 동향 파악</h4>
+                    <span className="text-[10px] text-text-muted shrink-0 whitespace-nowrap">어제</span>
+                </div>
+                <p className="text-[13px] text-text-muted truncate mb-2">총 3개의 주요 변동 사항이 감지되었습니다. 보고서를 확인하시겠습니까?</p>
+                <div className="flex items-center gap-1.5">
+                    <div
+                        className="w-5 h-5 rounded-full bg-white border border-text-main flex items-center justify-center text-[10px] text-text-main shadow-sm">
+                        <i className="ph ph-robot"></i></div>
+                    <span className="text-[11px] font-medium text-text-main">시장조사원 (Worker)</span>
+                </div>
+            </div>
+
+            {/* Session Item */}
+            <div className="session-item p-4 rounded-2xl cursor-pointer">
+                <div className="flex justify-between items-start mb-1">
+                    <h4 className="font-bold text-sm text-text-main truncate pr-2">영업이익 감소 원인 분석</h4>
+                    <span className="text-[10px] text-text-muted shrink-0 whitespace-nowrap">월요일</span>
+                </div>
+                <p className="text-[13px] text-text-muted truncate mb-2">지시하신 기간 동안의 판관비 증가율이 15%를 상회했습니다.</p>
+                <div className="flex items-center gap-1.5">
+                    <div
+                        className="w-5 h-5 rounded-full bg-white border border-accent-terracotta flex items-center justify-center text-[10px] text-accent-terracotta shadow-sm">
+                        <i className="ph ph-robot"></i></div>
+                    <span className="text-[11px] font-medium text-text-main">재무관리자 (Manager)</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    {/* Main Chat Area */}
+    <main className="flex-1 flex flex-col h-full bg-[#fcfbf9]/50 relative">
+        {/* Chat Header */}
+        <header
+            className="flex justify-between items-center px-8 py-5 bg-white/60 backdrop-blur-md border-b border-base-200 z-10 shrink-0">
+            <div className="flex items-center gap-4">
+                <div
+                    className="w-12 h-12 rounded-full bg-white border-2 border-accent-amber shadow-soft flex items-center justify-center text-accent-amber text-xl">
+                    <i className="ph ph-robot"></i>
+                </div>
+                <div>
+                    <h2 className="text-lg font-bold text-text-main">3분기 마케팅 전략 리뷰</h2>
+                    <div className="flex items-center gap-2 mt-0.5">
+                        <span className="w-2 h-2 rounded-full bg-accent-green"></span>
+                        <span className="text-xs font-semibold text-text-main">콘텐츠 전문가</span>
+                        <span className="text-[10px] text-text-muted px-1.5 py-0.5 bg-base-100 rounded">Specialist</span>
+                        <span className="text-[10px] text-text-muted px-1.5 py-0.5 bg-base-100 rounded">Claude 3.5
+                            Haiku</span>
+                    </div>
+                </div>
+            </div>
+            <div className="flex gap-2">
+                <button
+                    className="w-10 h-10 rounded-full flex items-center justify-center text-text-muted hover:bg-base-100 transition-colors">
+                    <i className="ph ph-magnifying-glass text-lg"></i>
+                </button>
+                <button
+                    className="w-10 h-10 rounded-full flex items-center justify-center text-text-muted hover:bg-base-100 transition-colors">
+                    <i className="ph ph-dots-three text-xl"></i>
+                </button>
+            </div>
+        </header>
+
+        {/* Chat History */}
+        {/* API: GET /api/workspace/chat/sessions/:sessionId/messages */}
+        <div className="flex-1 overflow-y-auto px-8 py-8 space-y-6 hide-scrollbar flex flex-col">
+
+            <div className="text-center my-2">
+                <span className="text-xs font-medium text-text-muted bg-base-100 px-3 py-1 rounded-full">오늘</span>
+            </div>
+
+            {/* Agent Message */}
+            <div className="flex gap-4 max-w-3xl">
+                <div
+                    className="w-8 h-8 rounded-full bg-white border border-accent-amber shadow-sm flex items-center justify-center text-accent-amber shrink-0 mt-1">
+                    <i className="ph ph-robot text-sm"></i>
+                </div>
+                <div>
+                    <div className="bubble-agent px-5 py-3.5 text-[15px] leading-relaxed">
+                        <p>CEO님, 요청하신 경쟁사 A의 3분기 디지털 마케팅 캠페인 수집이 완료되었습니다. 주요 메시지는 "연결의 혁신"으로 보이며, 주로 인스타그램 릴스를 통해 2030
+                            타겟팅을 강화하고 있습니다.</p>
+                        <p className="mt-2">우리 조직의 다음 전략에 어떻게 반영할지 의견을 주시겠습니까?</p>
+                    </div>
+                    <span className="text-[10px] text-text-muted mt-1.5 ml-1 block">오전 10:35 • 도구 호출 완료 (웹 스크래퍼)</span>
+                </div>
+            </div>
+
+            {/* User Message */}
+            <div className="flex gap-4 max-w-3xl self-end flex-row-reverse">
+                <div className="w-8 h-8 rounded-full border border-base-200 shrink-0 mt-1 overflow-hidden">
+                    <img src="https://i.pravatar.cc/100?img=11" alt="Profile" className="w-full h-full object-cover" />
+                </div>
+                <div>
+                    <div className="bubble-user px-5 py-3.5 text-[15px] leading-relaxed">
+                        <p>우리는 "효율성"에 더 초점을 맞추자. B2B 고객들이 주로 보는 링크드인을 타겟으로 잡고, 구체적인 수치를 곁들인 정보성 카드뉴스를 시리즈로 기획해봐.</p>
+                    </div>
+                    <span className="text-[10px] text-text-muted mt-1.5 mr-1 block text-right">오전 10:41</span>
+                </div>
+            </div>
+
+            {/* Agent Typing Indicator (SSE placeholder) */}
+            <div className="flex gap-4 max-w-3xl">
+                <div
+                    className="w-8 h-8 rounded-full bg-white border border-accent-amber shadow-sm flex items-center justify-center text-accent-amber shrink-0 mt-1">
+                    <i className="ph ph-robot text-sm"></i>
+                </div>
+                <div className="bubble-agent px-5 py-4 w-20 flex items-center justify-center gap-1.5">
+                    <div className="w-2 h-2 rounded-full bg-base-300 typing-dot"></div>
+                    <div className="w-2 h-2 rounded-full bg-base-300 typing-dot"></div>
+                    <div className="w-2 h-2 rounded-full bg-base-300 typing-dot"></div>
+                </div>
+            </div>
+
+            <div id="bottom-anchor"></div>
+        </div>
+
+        {/* Compose Area */}
+        {/* API: POST /api/workspace/chat/sessions/:sessionId/messages */}
+        <div className="px-8 pb-8 pt-4 bg-gradient-to-t from-[#fcfbf9] to-transparent shrink-0">
+            <div
+                className="bg-white border text-text-main border-base-200 rounded-3xl p-2 shadow-soft-lg group focus-within:border-[#d5cfc1] focus-within:shadow-[0_10px_40px_rgba(224,122,95,0.08)] transition-all flex items-end">
+                <button
+                    className="w-10 h-10 rounded-full flex items-center justify-center text-text-muted hover:bg-base-100 transition-colors shrink-0 mb-1"
+                    title="파일 첨부">
+                    <i className="ph ph-plus-circle text-2xl"></i>
+                </button>
+                <textarea placeholder="에이전트에게 보낼 메시지를 입력하세요..."
+                    className="flex-1 bg-transparent resize-none outline-none font-medium px-2 py-3.5 max-h-32 min-h-[52px] overflow-y-auto placeholder:text-base-300 text-[15px]"
+                    rows="1"></textarea>
+                <button
+                    className="w-10 h-10 bg-accent-terracotta text-white rounded-full flex items-center justify-center hover:bg-opacity-90 transition-colors shadow-soft shrink-0 mb-1 ml-2">
+                    <i className="ph ph-arrow-up text-lg font-bold"></i>
+                </button>
+            </div>
+        </div>
+    </main>
+    </>
+  );
+}
+
+export default AppChat;

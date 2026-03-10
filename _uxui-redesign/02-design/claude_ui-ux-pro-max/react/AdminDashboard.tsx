@@ -1,18 +1,21 @@
 "use client";
 import React from "react";
 
-const styles = `body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
+const styles = `
+body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
     .font-mono { font-family: "JetBrains Mono", monospace; }
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 2px; }
-    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }`;
+    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }
+`;
 
 function AdminDashboard() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* GET /api/admin/dashboard — returns kpi, events, department_distribution */}
+{/* GET /api/admin/dashboard — returns kpi, events, department_distribution */}
   {/* Sidebar */}
   <aside className="w-60 min-w-[240px] bg-zinc-900 border-r border-zinc-800 flex flex-col fixed h-full z-20">
     <div className="h-12 border-b border-zinc-800 flex items-center px-4 gap-3 flex-shrink-0">
@@ -97,59 +100,59 @@ function AdminDashboard() {
           <div className="text-sm font-medium mb-4">일별 CLI 토큰 사용량 (최근 14일)</div>
           <div className="h-40 flex items-end gap-1.5">
             <div className="flex-1 flex flex-col items-center gap-1">
-              <div className="w-full bg-blue-500/30 rounded-sm" style={{"height":"55%"}}></div>
+              <div className="w-full bg-blue-500/30 rounded-sm" style={{height: "55%"}}></div>
               <span className="text-xs text-zinc-600">2/25</span>
             </div>
             <div className="flex-1 flex flex-col items-center gap-1">
-              <div className="w-full bg-blue-500/30 rounded-sm" style={{"height":"72%"}}></div>
+              <div className="w-full bg-blue-500/30 rounded-sm" style={{height: "72%"}}></div>
               <span className="text-xs text-zinc-600">2/26</span>
             </div>
             <div className="flex-1 flex flex-col items-center gap-1">
-              <div className="w-full bg-blue-500/30 rounded-sm" style={{"height":"48%"}}></div>
+              <div className="w-full bg-blue-500/30 rounded-sm" style={{height: "48%"}}></div>
               <span className="text-xs text-zinc-600">2/27</span>
             </div>
             <div className="flex-1 flex flex-col items-center gap-1">
-              <div className="w-full bg-blue-500/30 rounded-sm" style={{"height":"88%"}}></div>
+              <div className="w-full bg-blue-500/30 rounded-sm" style={{height: "88%"}}></div>
               <span className="text-xs text-zinc-600">2/28</span>
             </div>
             <div className="flex-1 flex flex-col items-center gap-1">
-              <div className="w-full bg-blue-500/30 rounded-sm" style={{"height":"63%"}}></div>
+              <div className="w-full bg-blue-500/30 rounded-sm" style={{height: "63%"}}></div>
               <span className="text-xs text-zinc-600">3/1</span>
             </div>
             <div className="flex-1 flex flex-col items-center gap-1">
-              <div className="w-full bg-blue-500/30 rounded-sm" style={{"height":"45%"}}></div>
+              <div className="w-full bg-blue-500/30 rounded-sm" style={{height: "45%"}}></div>
               <span className="text-xs text-zinc-600">3/2</span>
             </div>
             <div className="flex-1 flex flex-col items-center gap-1">
-              <div className="w-full bg-blue-500/30 rounded-sm" style={{"height":"39%"}}></div>
+              <div className="w-full bg-blue-500/30 rounded-sm" style={{height: "39%"}}></div>
               <span className="text-xs text-zinc-600">3/3</span>
             </div>
             <div className="flex-1 flex flex-col items-center gap-1">
-              <div className="w-full bg-blue-500/50 rounded-sm" style={{"height":"75%"}}></div>
+              <div className="w-full bg-blue-500/50 rounded-sm" style={{height: "75%"}}></div>
               <span className="text-xs text-zinc-600">3/4</span>
             </div>
             <div className="flex-1 flex flex-col items-center gap-1">
-              <div className="w-full bg-blue-500/50 rounded-sm" style={{"height":"82%"}}></div>
+              <div className="w-full bg-blue-500/50 rounded-sm" style={{height: "82%"}}></div>
               <span className="text-xs text-zinc-600">3/5</span>
             </div>
             <div className="flex-1 flex flex-col items-center gap-1">
-              <div className="w-full bg-blue-500/50 rounded-sm" style={{"height":"91%"}}></div>
+              <div className="w-full bg-blue-500/50 rounded-sm" style={{height: "91%"}}></div>
               <span className="text-xs text-zinc-600">3/6</span>
             </div>
             <div className="flex-1 flex flex-col items-center gap-1">
-              <div className="w-full bg-blue-500/50 rounded-sm" style={{"height":"67%"}}></div>
+              <div className="w-full bg-blue-500/50 rounded-sm" style={{height: "67%"}}></div>
               <span className="text-xs text-zinc-600">3/7</span>
             </div>
             <div className="flex-1 flex flex-col items-center gap-1">
-              <div className="w-full bg-blue-500/50 rounded-sm" style={{"height":"58%"}}></div>
+              <div className="w-full bg-blue-500/50 rounded-sm" style={{height: "58%"}}></div>
               <span className="text-xs text-zinc-600">3/8</span>
             </div>
             <div className="flex-1 flex flex-col items-center gap-1">
-              <div className="w-full bg-blue-500/50 rounded-sm" style={{"height":"74%"}}></div>
+              <div className="w-full bg-blue-500/50 rounded-sm" style={{height: "74%"}}></div>
               <span className="text-xs text-zinc-600">3/9</span>
             </div>
             <div className="flex-1 flex flex-col items-center gap-1">
-              <div className="w-full bg-blue-500 rounded-sm" style={{"height":"84%"}}></div>
+              <div className="w-full bg-blue-500 rounded-sm" style={{height: "84%"}}></div>
               <span className="text-xs text-zinc-500 font-semibold">3/10</span>
             </div>
           </div>
@@ -159,23 +162,23 @@ function AdminDashboard() {
           <div className="space-y-2">
             <div>
               <div className="flex justify-between text-xs mb-0.5"><span className="text-zinc-400">AI 전략실</span><span className="text-zinc-500">14</span></div>
-              <div className="h-1.5 bg-zinc-800 rounded-full"><div className="h-1.5 bg-blue-500 rounded-full" style={{"width":"33%"}}></div></div>
+              <div className="h-1.5 bg-zinc-800 rounded-full"><div className="h-1.5 bg-blue-500 rounded-full" style={{width: "33%"}}></div></div>
             </div>
             <div>
               <div className="flex justify-between text-xs mb-0.5"><span className="text-zinc-400">리서치팀</span><span className="text-zinc-500">8</span></div>
-              <div className="h-1.5 bg-zinc-800 rounded-full"><div className="h-1.5 bg-purple-500 rounded-full" style={{"width":"19%"}}></div></div>
+              <div className="h-1.5 bg-zinc-800 rounded-full"><div className="h-1.5 bg-purple-500 rounded-full" style={{width: "19%"}}></div></div>
             </div>
             <div>
               <div className="flex justify-between text-xs mb-0.5"><span className="text-zinc-400">운영팀</span><span className="text-zinc-500">7</span></div>
-              <div className="h-1.5 bg-zinc-800 rounded-full"><div className="h-1.5 bg-green-500 rounded-full" style={{"width":"17%"}}></div></div>
+              <div className="h-1.5 bg-zinc-800 rounded-full"><div className="h-1.5 bg-green-500 rounded-full" style={{width: "17%"}}></div></div>
             </div>
             <div>
               <div className="flex justify-between text-xs mb-0.5"><span className="text-zinc-400">보안팀</span><span className="text-zinc-500">6</span></div>
-              <div className="h-1.5 bg-zinc-800 rounded-full"><div className="h-1.5 bg-yellow-500 rounded-full" style={{"width":"14%"}}></div></div>
+              <div className="h-1.5 bg-zinc-800 rounded-full"><div className="h-1.5 bg-yellow-500 rounded-full" style={{width: "14%"}}></div></div>
             </div>
             <div>
               <div className="flex justify-between text-xs mb-0.5"><span className="text-zinc-400">기타</span><span className="text-zinc-500">7</span></div>
-              <div className="h-1.5 bg-zinc-800 rounded-full"><div className="h-1.5 bg-zinc-600 rounded-full" style={{"width":"17%"}}></div></div>
+              <div className="h-1.5 bg-zinc-800 rounded-full"><div className="h-1.5 bg-zinc-600 rounded-full" style={{width: "17%"}}></div></div>
             </div>
           </div>
         </div>

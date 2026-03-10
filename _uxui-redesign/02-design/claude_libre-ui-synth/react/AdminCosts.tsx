@@ -2,21 +2,24 @@
 import React from "react";
 import { Activity, Bell, Bot, Briefcase, Building2, CircleDollarSign, Database, Download, FileBarChart, GitBranch, Key, LayoutDashboard, Plug, Settings, Shield, Store, TrendingDown, UserCheck, UserPlus, Users, Workflow } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; }
-    code,pre { font-family: 'JetBrains Mono', monospace; }`;
+    code,pre { font-family: 'JetBrains Mono', monospace; }
+`;
 
 function AdminCosts() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* Sidebar */}
+{/* Sidebar */}
   <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-10">
     <div className="px-5 py-4 border-b border-stone-100">
       <div className="flex items-center gap-2 mb-1">
         <span className="bg-violet-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded tracking-widest">ADMIN</span>
       </div>
-      <span className="text-lg font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+      <span className="text-lg font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
     </div>
     <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5">
       <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 px-2 py-1.5 mt-1">개요</p>
@@ -74,7 +77,7 @@ function AdminCosts() {
     <div className="grid grid-cols-4 gap-4 mb-6">
       <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-5">
         <p className="text-xs font-semibold uppercase tracking-widest text-stone-500 mb-3">이번 달 총 비용</p>
-        <p className="text-2xl font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>$12.40</p>
+        <p className="text-2xl font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>$12.40</p>
         <div className="flex items-center gap-1.5 mt-2">
           <span className="flex items-center gap-0.5 text-xs font-medium text-emerald-600 bg-emerald-50 rounded-full px-2 py-0.5">
             <TrendingDown className="w-3 h-3" /> -8.2%
@@ -84,24 +87,24 @@ function AdminCosts() {
       </div>
       <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-5">
         <p className="text-xs font-semibold uppercase tracking-widest text-stone-500 mb-3">예산 사용률</p>
-        <p className="text-2xl font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>62%</p>
+        <p className="text-2xl font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>62%</p>
         <div className="mt-2">
           <div className="h-1.5 bg-stone-100 rounded-full overflow-hidden">
-            <div className="h-full bg-violet-500 rounded-full" style={{"width":"62%"}}></div>
+            <div className="h-full bg-violet-500 rounded-full" style={{width: "62%"}}></div>
           </div>
           <p className="text-xs text-stone-400 mt-1">$12.40 / $20.00</p>
         </div>
       </div>
       <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-5">
         <p className="text-xs font-semibold uppercase tracking-widest text-stone-500 mb-3">예상 월말 비용</p>
-        <p className="text-2xl font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>$20.10</p>
+        <p className="text-2xl font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>$20.10</p>
         <div className="flex items-center gap-1.5 mt-2">
           <span className="text-xs font-medium text-amber-600 bg-amber-50 rounded-full px-2 py-0.5">예산 초과 위험</span>
         </div>
       </div>
       <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-5">
         <p className="text-xs font-semibold uppercase tracking-widest text-stone-500 mb-3">전월 총 비용</p>
-        <p className="text-2xl font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>$13.51</p>
+        <p className="text-2xl font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>$13.51</p>
         <div className="flex items-center gap-1.5 mt-2">
           <span className="text-xs text-stone-400">2026년 2월 확정</span>
         </div>
@@ -154,7 +157,7 @@ function AdminCosts() {
               <td className="px-4 py-3 text-sm text-right">
                 <div className="flex items-center justify-end gap-2">
                   <div className="w-16 h-1.5 bg-stone-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-violet-500 rounded-full" style={{"width":"25.8%"}}></div>
+                    <div className="h-full bg-violet-500 rounded-full" style={{width: "25.8%"}}></div>
                   </div>
                   <span className="text-stone-500 w-10 text-right">25.8%</span>
                 </div>
@@ -177,7 +180,7 @@ function AdminCosts() {
               <td className="px-4 py-3 text-sm text-right">
                 <div className="flex items-center justify-end gap-2">
                   <div className="w-16 h-1.5 bg-stone-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-violet-500 rounded-full" style={{"width":"39.1%"}}></div>
+                    <div className="h-full bg-violet-500 rounded-full" style={{width: "39.1%"}}></div>
                   </div>
                   <span className="text-stone-500 w-10 text-right">39.1%</span>
                 </div>
@@ -200,7 +203,7 @@ function AdminCosts() {
               <td className="px-4 py-3 text-sm text-right">
                 <div className="flex items-center justify-end gap-2">
                   <div className="w-16 h-1.5 bg-stone-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-violet-500 rounded-full" style={{"width":"16.9%"}}></div>
+                    <div className="h-full bg-violet-500 rounded-full" style={{width: "16.9%"}}></div>
                   </div>
                   <span className="text-stone-500 w-10 text-right">16.9%</span>
                 </div>
@@ -223,7 +226,7 @@ function AdminCosts() {
               <td className="px-4 py-3 text-sm text-right">
                 <div className="flex items-center justify-end gap-2">
                   <div className="w-16 h-1.5 bg-stone-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-violet-500 rounded-full" style={{"width":"18.1%"}}></div>
+                    <div className="h-full bg-violet-500 rounded-full" style={{width: "18.1%"}}></div>
                   </div>
                   <span className="text-stone-500 w-10 text-right">18.1%</span>
                 </div>
@@ -256,7 +259,7 @@ function AdminCosts() {
               <td className="px-4 py-3 text-sm text-right font-semibold text-stone-800">$8.90</td>
               <td className="px-4 py-3 text-sm text-right">
                 <div className="flex items-center justify-end gap-2">
-                  <div className="w-16 h-1.5 bg-stone-100 rounded-full"><div className="h-full bg-violet-500 rounded-full" style={{"width":"71.8%"}}></div></div>
+                  <div className="w-16 h-1.5 bg-stone-100 rounded-full"><div className="h-full bg-violet-500 rounded-full" style={{width: "71.8%"}}></div></div>
                   <span className="text-stone-500 w-10 text-right">71.8%</span>
                 </div>
               </td>
@@ -268,7 +271,7 @@ function AdminCosts() {
               <td className="px-4 py-3 text-sm text-right font-semibold text-stone-800">$2.80</td>
               <td className="px-4 py-3 text-sm text-right">
                 <div className="flex items-center justify-end gap-2">
-                  <div className="w-16 h-1.5 bg-stone-100 rounded-full"><div className="h-full bg-green-500 rounded-full" style={{"width":"22.6%"}}></div></div>
+                  <div className="w-16 h-1.5 bg-stone-100 rounded-full"><div className="h-full bg-green-500 rounded-full" style={{width: "22.6%"}}></div></div>
                   <span className="text-stone-500 w-10 text-right">22.6%</span>
                 </div>
               </td>
@@ -280,7 +283,7 @@ function AdminCosts() {
               <td className="px-4 py-3 text-sm text-right font-semibold text-stone-800">$0.70</td>
               <td className="px-4 py-3 text-sm text-right">
                 <div className="flex items-center justify-end gap-2">
-                  <div className="w-16 h-1.5 bg-stone-100 rounded-full"><div className="h-full bg-blue-400 rounded-full" style={{"width":"5.6%"}}></div></div>
+                  <div className="w-16 h-1.5 bg-stone-100 rounded-full"><div className="h-full bg-blue-400 rounded-full" style={{width: "5.6%"}}></div></div>
                   <span className="text-stone-500 w-10 text-right">5.6%</span>
                 </div>
               </td>
@@ -311,7 +314,7 @@ function AdminCosts() {
               <td className="px-4 py-3 text-sm">
                 <div className="flex items-center gap-2">
                   <div className="flex-1 h-1.5 bg-stone-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-violet-500 rounded-full" style={{"width":"41.9%"}}></div>
+                    <div className="h-full bg-violet-500 rounded-full" style={{width: "41.9%"}}></div>
                   </div>
                   <span className="text-stone-500 text-xs w-10">41.9%</span>
                 </div>
@@ -324,7 +327,7 @@ function AdminCosts() {
               <td className="px-4 py-3 text-sm">
                 <div className="flex items-center gap-2">
                   <div className="flex-1 h-1.5 bg-stone-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-blue-500 rounded-full" style={{"width":"39.1%"}}></div>
+                    <div className="h-full bg-blue-500 rounded-full" style={{width: "39.1%"}}></div>
                   </div>
                   <span className="text-stone-500 text-xs w-10">39.1%</span>
                 </div>
@@ -337,7 +340,7 @@ function AdminCosts() {
               <td className="px-4 py-3 text-sm">
                 <div className="flex items-center gap-2">
                   <div className="flex-1 h-1.5 bg-stone-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-500 rounded-full" style={{"width":"16.9%"}}></div>
+                    <div className="h-full bg-emerald-500 rounded-full" style={{width: "16.9%"}}></div>
                   </div>
                   <span className="text-stone-500 text-xs w-10">16.9%</span>
                 </div>
@@ -350,7 +353,7 @@ function AdminCosts() {
               <td className="px-4 py-3 text-sm">
                 <div className="flex items-center gap-2">
                   <div className="flex-1 h-1.5 bg-stone-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-amber-500 rounded-full" style={{"width":"2%"}}></div>
+                    <div className="h-full bg-amber-500 rounded-full" style={{width: "2%"}}></div>
                   </div>
                   <span className="text-stone-500 text-xs w-10">2.0%</span>
                 </div>
@@ -366,37 +369,37 @@ function AdminCosts() {
         <div className="flex items-end gap-3 h-40">
           <div className="flex-1 flex flex-col items-center gap-1">
             <span className="text-xs text-stone-500 font-mono">$1.20</span>
-            <div className="w-full bg-violet-200 rounded-t" style={{"height":"48%"}}></div>
+            <div className="w-full bg-violet-200 rounded-t" style={{height: "48%"}}></div>
             <span className="text-[10px] text-stone-400">3/4</span>
           </div>
           <div className="flex-1 flex flex-col items-center gap-1">
             <span className="text-xs text-stone-500 font-mono">$1.85</span>
-            <div className="w-full bg-violet-300 rounded-t" style={{"height":"74%"}}></div>
+            <div className="w-full bg-violet-300 rounded-t" style={{height: "74%"}}></div>
             <span className="text-[10px] text-stone-400">3/5</span>
           </div>
           <div className="flex-1 flex flex-col items-center gap-1">
             <span className="text-xs text-stone-500 font-mono">$1.40</span>
-            <div className="w-full bg-violet-200 rounded-t" style={{"height":"56%"}}></div>
+            <div className="w-full bg-violet-200 rounded-t" style={{height: "56%"}}></div>
             <span className="text-[10px] text-stone-400">3/6</span>
           </div>
           <div className="flex-1 flex flex-col items-center gap-1">
             <span className="text-xs text-stone-500 font-mono">$2.50</span>
-            <div className="w-full bg-violet-500 rounded-t" style={{"height":"100%"}}></div>
+            <div className="w-full bg-violet-500 rounded-t" style={{height: "100%"}}></div>
             <span className="text-[10px] text-stone-400">3/7</span>
           </div>
           <div className="flex-1 flex flex-col items-center gap-1">
             <span className="text-xs text-stone-500 font-mono">$1.10</span>
-            <div className="w-full bg-violet-200 rounded-t" style={{"height":"44%"}}></div>
+            <div className="w-full bg-violet-200 rounded-t" style={{height: "44%"}}></div>
             <span className="text-[10px] text-stone-400">3/8</span>
           </div>
           <div className="flex-1 flex flex-col items-center gap-1">
             <span className="text-xs text-stone-500 font-mono">$2.05</span>
-            <div className="w-full bg-violet-400 rounded-t" style={{"height":"82%"}}></div>
+            <div className="w-full bg-violet-400 rounded-t" style={{height: "82%"}}></div>
             <span className="text-[10px] text-stone-400">3/9</span>
           </div>
           <div className="flex-1 flex flex-col items-center gap-1">
             <span className="text-xs text-stone-500 font-mono">$2.30</span>
-            <div className="w-full bg-violet-600 rounded-t" style={{"height":"92%"}}></div>
+            <div className="w-full bg-violet-600 rounded-t" style={{height: "92%"}}></div>
             <span className="text-[10px] text-stone-400 font-semibold text-violet-700">오늘</span>
           </div>
         </div>

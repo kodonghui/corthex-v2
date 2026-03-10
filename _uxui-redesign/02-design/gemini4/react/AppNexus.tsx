@@ -1,0 +1,123 @@
+"use client";
+import React from "react";
+
+const styles = `
+@layer base { body { @apply bg-background text-text-main font-sans antialiased; } h1, h2, h3 { @apply font-serif text-text-main; } }
+        @layer components { .card { @apply bg-surface rounded-2xl shadow-soft border border-border p-6; } .nav-item { @apply flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-text-main hover:bg-surface-alt transition-colors; } .nav-item.active { @apply bg-surface-alt font-semibold text-primary-700; } }
+        /* Simple tree connector lines via CSS */
+        .org-tree ul { @apply relative pt-6 text-center whitespace-nowrap; }
+        .org-tree li { @apply inline-flex flex-col items-center relative py-6 px-4 text-center; }
+        .org-tree li::before, .org-tree li::after { content: ''; @apply absolute top-0 right-1/2 border-t border-border w-1/2 h-6; }
+        .org-tree li::after { @apply right-auto left-1/2 border-l border-border; }
+        .org-tree li:only-child::after, .org-tree li:only-child::before { @apply hidden; }
+        .org-tree li:only-child { @apply pt-0; }
+        .org-tree li:first-child::before, .org-tree li:last-child::after { @apply border-none; }
+        .org-tree li:last-child::before { @apply border-r rounded-tr-[8px]; }
+        .org-tree li:first-child::after { @apply rounded-tl-[8px]; }
+        .org-tree ul ul::before { content: ''; @apply absolute top-0 left-1/2 border-l border-border w-0 h-6 -translate-x-px; }
+`;
+
+function AppNexus() {
+  return (
+    <>{"
+"}
+      <style dangerouslySetInnerHTML={{__html: styles}} />
+<aside className="w-64 flex-shrink-0 inset-y-0 left-0 bg-surface border-r border-border flex flex-col z-10">
+        <div className="h-16 flex items-center px-6 border-b border-border mr-4">
+            <div
+                className="w-6 h-6 rounded bg-primary-600 mr-2 flex items-center justify-center text-white text-xs font-bold">
+                C</div>
+            <span className="font-serif font-bold text-lg">CORTHEX</span>
+        </div>
+        <div className="flex-1 overflow-y-auto py-4 flex flex-col gap-1 px-3">
+            <a href="/app/home" className="nav-item"><svg className="w-4 h-4" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                    </path>
+                </svg>홈</a>
+            <a href="/app/nexus" className="nav-item active"><svg className="w-4 h-4 text-primary-600" fill="none"
+                    stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                    </path>
+                </svg>넥서스 (조직도)</a>
+        </div>
+    </aside>
+
+    <main className="flex-1 p-8 md:p-12 relative overflow-auto">
+        <header className="mb-10 flex items-center justify-between">
+            <div>
+                <h1 className="text-3xl font-bold font-serif mb-2">넥서스 (조직 인프라)</h1>
+                <p className="text-text-muted">AI 에이전트의 부서 배치 및 위임 체계(조직도)를 시각화합니다.</p>
+            </div>
+        </header>
+
+        <section className="max-w-6xl mx-auto overflow-x-auto">
+            <div className="org-tree inline-block min-w-full">
+                <ul>
+                    <li>
+                        <div
+                            className="inline-flex flex-col items-center card text-center p-4 border border-primary-200 bg-surface hover:shadow-md cursor-pointer min-w-[160px] z-10 relative">
+                            <div
+                                className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold mb-2">
+                                CEO</div>
+                            <h3 className="font-serif font-bold text-base mb-0.5">김대표</h3>
+                            <p className="text-xs text-text-muted">사용자</p>
+                        </div>
+                        <ul>
+                            <li>
+                                <div
+                                    className="inline-flex flex-col items-center card text-center p-4 bg-surface hover:shadow-md cursor-pointer min-w-[160px] z-10 relative">
+                                    <h3 className="font-serif font-bold text-base mb-0.5">비서실장</h3>
+                                    <p className="text-xs text-text-muted">Manager · 시스템 에이전트</p>
+                                </div>
+                                <ul>
+                                    <li>
+                                        <div
+                                            className="inline-flex flex-col items-center card text-center p-4 bg-surface hover:shadow-md cursor-pointer min-w-[140px] z-10 relative border-t-4 border-t-secondary-400">
+                                            <h3 className="font-serif font-bold text-sm mb-0.5">마케팅부서</h3>
+                                            <p className="text-[10px] text-text-muted text-wrap px-2">콘텐츠, SEO, SNS 발행</p>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div
+                                            className="inline-flex flex-col items-center card text-center p-4 bg-surface hover:shadow-md cursor-pointer min-w-[140px] z-10 relative border-t-4 border-t-primary-600">
+                                            <h3 className="font-serif font-bold text-sm mb-0.5">전략실 (CIO)</h3>
+                                            <p className="text-[10px] text-text-muted text-wrap px-2">종목 분석, 포트폴리오 기획</p>
+                                        </div>
+                                        <ul>
+                                            <li>
+                                                <div
+                                                    className="inline-flex flex-col items-center card px-3 py-2 bg-white min-w-[100px] z-10 relative rounded-xl text-xs border border-border shadow-sm">
+                                                    <span className="font-medium">종목분석가</span>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div
+                                                    className="inline-flex flex-col items-center card px-3 py-2 bg-white min-w-[100px] z-10 relative rounded-xl text-xs border border-border shadow-sm">
+                                                    <span className="font-medium">리스크관리자</span>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <div
+                                            className="inline-flex flex-col items-center card text-center p-4 bg-surface hover:shadow-md cursor-pointer min-w-[140px] z-10 relative border-t-4 border-t-accent-600">
+                                            <h3 className="font-serif font-bold text-sm mb-0.5">법무부</h3>
+                                            <p className="text-[10px] text-text-muted text-wrap px-2">문서 검토, 로직 점검</p>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </section>
+    </main>
+    </>
+  );
+}
+
+export default AppNexus;

@@ -1,0 +1,390 @@
+"use client";
+import React from "react";
+
+const styles = `
+body {
+            background-color: inherit /* FIXME: theme value not in map */;
+            color: inherit /* FIXME: theme value not in map */;
+        }
+
+        .card {
+            background-color: inherit /* FIXME: theme value not in map */;
+            border-radius: 1rem;
+            box-shadow: inherit /* FIXME: theme value not in map */;
+            border: 1px solid inherit /* FIXME: theme value not in map */;
+        }
+
+        .nav-item {
+            display: flex;
+            items-center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            color: inherit /* FIXME: theme value not in map */;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            background-color: inherit /* FIXME: theme value not in map */;
+            color: inherit /* FIXME: theme value not in map */;
+        }
+
+        .nav-item.active {
+            background-color: inherit /* FIXME: theme value not in map */;
+            color: inherit /* FIXME: theme value not in map */;
+            font-weight: 600;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: inherit /* FIXME: theme value not in map */;
+            border-radius: 3px;
+        }
+
+        /* Market specific styling - KR market convention (Red=Up, Blue=Down) */
+        .text-up {
+            color: #ef4444;
+        }
+
+        .text-down {
+            color: #3b82f6;
+        }
+
+        .bg-up-light {
+            background-color: #fee2e2;
+            color: #ef4444;
+        }
+
+        .bg-down-light {
+            background-color: #dbeafe;
+            color: #3b82f6;
+        }
+`;
+
+function Trading() {
+  return (
+    <>{"
+"}
+      <style dangerouslySetInnerHTML={{__html: styles}} />
+{/* Sidebar */}
+    <aside className="w-64 bg-surface border-r border-border flex flex-col h-full z-10 shadow-soft shrink-0">
+        <div className="p-6">
+            <h2 className="font-serif text-2xl tracking-tight text-primary font-bold">CORTHEX</h2>
+            <p className="text-xs text-text-light mt-1">회사명: 알파 랩스</p>
+        </div>
+
+        <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
+            <a href="/app/home" className="nav-item">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                    </path>
+                </svg>
+                홈 대시보드
+            </a>
+            <a href="/app/command-center" className="nav-item">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                        d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z">
+                    </path>
+                </svg>
+                사령관실
+            </a>
+            <a href="/app/trading" className="nav-item active">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+                전략실 (투자동향)
+            </a>
+            <a href="/app/agora" className="nav-item">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                        d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z">
+                    </path>
+                </svg>
+                AGORA (토론장)
+            </a>
+        </nav>
+
+        <div className="p-4 border-t border-border">
+            <div className="bg-background-alt rounded-xl p-3 mb-4">
+                <p className="text-xs font-medium text-text-muted mb-1">KIS 증권 API 연결 상태</p>
+                <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                    <span className="text-sm font-bold text-primary">정상 연동중 (실거래)</span>
+                </div>
+            </div>
+            <div className="flex items-center gap-3">
+                <div
+                    className="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center text-primary font-bold">
+                    이</div>
+                <div>
+                    <p className="font-medium text-text-main">이사장 (CEO)</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    {/* Main Content */}
+    <main className="flex-1 overflow-y-auto relative">
+        <div className="px-8 py-10 max-w-7xl mx-auto space-y-8">
+            <header className="flex justify-between items-end">
+                <div>
+                    <h1 className="text-3xl font-serif text-text-main mb-2">포트폴리오 대시보드</h1>
+                    <p className="text-text-muted">CIO(투자 총괄)와 4명의 분석가가 자동매매 및 포트폴리오 관리를 수행합니다.</p>
+                </div>
+
+                <div className="flex gap-2">
+                    <span
+                        className="bg-surface border border-border text-text-main px-4 py-2 rounded-xl text-sm font-medium shadow-sm flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-primary border border-white"></span>
+                        KIS 실거래 모드
+                    </span>
+                    <button
+                        className="bg-primary text-white px-4 py-2 rounded-xl hover:bg-primary-hover transition-colors font-medium shadow-sm flex items-center gap-2">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4">
+                            </path>
+                        </svg>
+                        새 전략 실행
+                    </button>
+                </div>
+            </header>
+
+            {/* API: GET /api/workspace/strategy/portfolios */}
+            <div className="grid lg:grid-cols-4 gap-6">
+                {/* Portfolio Summary */}
+                <div
+                    className="card lg:col-span-3 flex justify-between p-8 bg-surface overflow-hidden relative border-none shadow-[0_8px_30px_-4px_rgba(196,98,45,0.06)]">
+                    {/* Deco */}
+                    <div
+                        className="absolute right-0 top-0 w-64 h-64 bg-secondary-light rounded-bl-full opacity-30 pointer-events-none">
+                    </div>
+
+                    <div className="z-10 flex flex-col justify-center">
+                        <p className="text-sm font-medium text-text-muted mb-2">총 자산 평가액 (KRW)</p>
+                        <div className="flex items-baseline gap-3 mb-2">
+                            <h2 className="text-5xl font-serif text-text-main tracking-tight">248,500,000</h2>
+                        </div>
+                        <div className="flex items-center gap-2 mt-2">
+                            <span className="text-sm font-medium bg-up-light px-2 py-0.5 rounded flex items-center">
+                                <svg className="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                        d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                                </svg>
+                                +4.2% (1주)
+                            </span>
+                            <span className="text-xs text-text-light font-sans ml-2">투자 원금: 238,000,000</span>
+                        </div>
+                    </div>
+
+                    <div className="hidden md:flex gap-12 z-10 text-right justify-end items-center mr-8">
+                        <div>
+                            <p className="text-sm text-text-muted mb-1">실현 수익</p>
+                            <p className="text-xl font-serif text-up tracking-tight">+10,500,000</p>
+                        </div>
+                        <div>
+                            <p className="text-sm text-text-muted mb-1">보유 현금 (D+2)</p>
+                            <p className="text-xl font-serif text-text-main tracking-tight">45,200,000</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* API: GET /api/workspace/strategy/orders/pending */}
+                {/* Auto-trading Status */}
+                <div className="card p-6 flex flex-col justify-between border-l-4 border-l-secondary bg-surface relative">
+                    <div>
+                        <div className="flex justify-between items-start mb-4">
+                            <h3 className="font-serif text-lg">자동매매 승인 <span
+                                    className="bg-secondary text-white text-[10px] px-1.5 py-0.5 rounded-full relative -top-0.5 ml-1">1</span>
+                            </h3>
+                            <button className="text-text-muted hover:text-text-main"><svg className="w-4 h-4" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                        d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                </svg></button>
+                        </div>
+                        <p className="text-xs text-text-muted mb-3 leading-relaxed">CIO가 새로운 포트폴리오 리밸런싱 주문을 제안했습니다. 승인이
+                            필요합니다.</p>
+
+                        <div className="bg-background-alt p-3 rounded-lg border border-border">
+                            <div className="flex justify-between items-center mb-1">
+                                <span className="font-bold text-sm">삼성전자</span>
+                                <span className="text-xs font-medium text-up">매수</span>
+                            </div>
+                            <div className="flex justify-between items-center text-xs text-text-muted">
+                                <span>200주 목표가</span>
+                                <span>74,500원 이하</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button
+                        className="w-full mt-4 py-2 bg-text-main text-white rounded-xl hover:bg-black transition-colors font-medium text-sm">
+                        상세 검토/승인
+                    </button>
+                </div>
+            </div>
+
+            <div className="grid lg:grid-cols-3 gap-8">
+                {/* Holding Shares (2 cols) */}
+                {/* API: GET /api/workspace/strategy/shares */}
+                <div className="card lg:col-span-2 p-0 overflow-hidden">
+                    <div className="p-5 border-b border-border bg-surface-alt flex justify-between items-center">
+                        <h3 className="text-lg font-serif">보유 종목</h3>
+                        <span className="text-xs text-text-light flex items-center gap-1">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                </path>
+                            </svg>
+                            60초 전 갱신
+                        </span>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr
+                                    className="border-b border-border text-xs text-text-muted uppercase tracking-wider bg-background-alt/50">
+                                    <th className="p-4 font-medium">종목/심볼</th>
+                                    <th className="p-4 font-medium text-right">현재가</th>
+                                    <th className="p-4 font-medium text-right">보유수량</th>
+                                    <th className="p-4 font-medium text-right">평가금액</th>
+                                    <th className="p-4 font-medium text-right">수익률</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-border">
+                                <tr className="hover:bg-background-alt/50 transition-colors">
+                                    <td className="p-4">
+                                        <p className="font-bold text-text-main">삼성전자</p>
+                                        <p className="text-xs text-text-muted">005930.KS</p>
+                                    </td>
+                                    <td className="p-4 text-right">
+                                        <p className="font-medium">75,200</p>
+                                        <p className="text-xs text-up">+1.2%</p>
+                                    </td>
+                                    <td className="p-4 text-right font-sans">
+                                        1,200
+                                    </td>
+                                    <td className="p-4 text-right">
+                                        <p className="font-medium">90,240,000</p>
+                                    </td>
+                                    <td className="p-4 text-right">
+                                        <span className="bg-up-light px-2 py-1 rounded text-xs font-medium">+8.4%</span>
+                                    </td>
+                                </tr>
+                                <tr className="hover:bg-background-alt/50 transition-colors">
+                                    <td className="p-4">
+                                        <p className="font-bold text-text-main">SK하이닉스</p>
+                                        <p className="text-xs text-text-muted">000660.KS</p>
+                                    </td>
+                                    <td className="p-4 text-right">
+                                        <p className="font-medium">164,000</p>
+                                        <p className="text-xs text-up">+2.5%</p>
+                                    </td>
+                                    <td className="p-4 text-right font-sans">
+                                        450
+                                    </td>
+                                    <td className="p-4 text-right">
+                                        <p className="font-medium">73,800,000</p>
+                                    </td>
+                                    <td className="p-4 text-right">
+                                        <span className="bg-up-light px-2 py-1 rounded text-xs font-medium">+15.2%</span>
+                                    </td>
+                                </tr>
+                                <tr className="hover:bg-background-alt/50 transition-colors">
+                                    <td className="p-4">
+                                        <p className="font-bold text-text-main">Tesla</p>
+                                        <p className="text-xs text-text-muted">TSLA.US</p>
+                                    </td>
+                                    <td className="p-4 text-right">
+                                        <p className="font-medium">$198.45</p>
+                                        <p className="text-xs text-down">-1.8%</p>
+                                    </td>
+                                    <td className="p-4 text-right font-sans">
+                                        150
+                                    </td>
+                                    <td className="p-4 text-right">
+                                        <p className="font-medium">39,260,000</p>
+                                    </td>
+                                    <td className="p-4 text-right">
+                                        <span className="bg-down-light px-2 py-1 rounded text-xs font-medium">-4.5%</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {/* Watchlist (1 col) */}
+                {/* API: GET /api/workspace/strategy/watchlist */}
+                <div className="card p-0 flex flex-col h-[400px]">
+                    <div className="p-5 border-b border-border bg-surface-alt flex justify-between items-center">
+                        <h3 className="text-lg font-serif">관심 종목</h3>
+                        <button
+                            className="w-6 h-6 rounded-md border border-border flex items-center justify-center text-text-muted hover:text-primary transition-colors">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                    d="M12 4v16m8-8H4"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                        <div
+                            className="p-3 border border-border rounded-xl  hover:border-border transition-colors flex justify-between items-center group cursor-pointer bg-background-alt">
+                            <div>
+                                <p className="font-bold text-text-main text-sm">NAVER</p>
+                                <p className="text-[10px] text-text-muted">CIO 주시중 👀</p>
+                            </div>
+                            <div className="text-right">
+                                <p className="font-medium text-sm">189,500</p>
+                                <p className="text-[11px] font-medium text-down">-0.5%</p>
+                            </div>
+                        </div>
+                        <div
+                            className="p-3 border border-border rounded-xl  hover:border-border transition-colors flex justify-between items-center group cursor-pointer bg-background-alt">
+                            <div>
+                                <p className="font-bold text-text-main text-sm">Microsoft</p>
+                                <p className="text-[10px] text-text-muted">목표가 도달 임박</p>
+                            </div>
+                            <div className="text-right">
+                                <p className="font-medium text-sm">$412.30</p>
+                                <p className="text-[11px] font-medium text-up">+1.4%</p>
+                            </div>
+                        </div>
+                        <div
+                            className="p-3 border border-border rounded-xl hover:border-border transition-colors flex justify-between items-center group cursor-pointer bg-background-alt">
+                            <div>
+                                <p className="font-bold text-text-main text-sm">Apple</p>
+                            </div>
+                            <div className="text-right">
+                                <p className="font-medium text-sm">$172.50</p>
+                                <p className="text-[11px] font-medium text-down">-2.1%</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="p-4 border-t border-border mt-auto">
+                        <button
+                            className="w-full py-2.5 border border-border text-text-main rounded-xl hover:bg-background-alt transition-colors font-medium text-sm flex items-center justify-center gap-2">
+                            <div
+                                className="w-5 h-5 rounded-full bg-primary-light text-primary flex items-center justify-center font-bold text-[10px]">
+                                C</div>
+                            CIO에게 관심종목 전체 분석 요청
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    </>
+  );
+}
+
+export default Trading;

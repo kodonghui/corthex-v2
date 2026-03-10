@@ -1,18 +1,21 @@
 "use client";
 import React from "react";
 
-const styles = `body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
+const styles = `
+body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
     .font-mono { font-family: "JetBrains Mono", monospace; }
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 2px; }
-    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }`;
+    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }
+`;
 
 function AppAgora() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* API: GET /api/agora/debates, POST /api/agora/debates, WS /ws/agora */}
+{/* API: GET /api/agora/debates, POST /api/agora/debates, WS /ws/agora */}
   {/* Sidebar */}
   <aside className="w-60 min-w-[240px] bg-zinc-900 border-r border-zinc-800 flex flex-col fixed h-full z-20">
     <div className="h-12 border-b border-zinc-800 flex items-center px-4 gap-3 flex-shrink-0">
@@ -201,9 +204,9 @@ function AppAgora() {
                   <span className="text-xs font-medium text-red-300">VECTOR</span>
                 </div>
                 <div className="bg-red-500/5 border border-red-500/20 rounded-xl rounded-tr-sm px-4 py-2 flex items-center gap-1">
-                  <div className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style={{"animationDelay":"0ms"}}></div>
-                  <div className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style={{"animationDelay":"150ms"}}></div>
-                  <div className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style={{"animationDelay":"300ms"}}></div>
+                  <div className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style={{animationDelay: "0ms"}}></div>
+                  <div className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style={{animationDelay: "150ms"}}></div>
+                  <div className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style={{animationDelay: "300ms"}}></div>
                 </div>
               </div>
               <div className="w-8 h-8 bg-red-500/20 border border-red-500/30 rounded-full flex items-center justify-center flex-shrink-0">

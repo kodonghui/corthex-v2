@@ -2,23 +2,26 @@
 import React from "react";
 import { Activity, BarChart2, Bell, BookOpen, Bot, Brain, Briefcase, Building2, CheckCircle, CreditCard, Download, Eye, FileText, Folder, Home, Key, LayoutDashboard, List, MessageCircle, Rss, Send, Settings, Share2, Shield, Terminal, Timer, TrendingDown, TrendingUp, Users } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; }
     code,pre { font-family: 'JetBrains Mono', monospace; }
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: #fafaf9; }
-    ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }`;
+    ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }
+`;
 
 function AppPerformance() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* SIDEBAR */}
+{/* SIDEBAR */}
 <aside className="w-60 fixed left-0 top-0 bottom-0 bg-white border-r border-stone-200 flex flex-col z-20">
   <div className="p-4 border-b border-stone-200">
     <div className="flex items-center gap-2.5">
       <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center"><span className="text-white font-bold text-sm">C</span></div>
-      <span className="font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+      <span className="font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
     </div>
   </div>
   <div className="px-4 py-3 border-b border-stone-200">
@@ -88,7 +91,7 @@ function AppPerformance() {
         <span className="text-sm text-stone-500">총 에이전트</span>
         <div className="w-8 h-8 bg-violet-50 rounded-lg flex items-center justify-center"><Bot className="w-4 h-4 text-violet-600" /></div>
       </div>
-      <div className="text-2xl font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>24</div>
+      <div className="text-2xl font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>24</div>
       <div className="text-xs text-stone-500 mt-1.5">활성 5 · 대기 19</div>
     </div>
     <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-5">
@@ -96,7 +99,7 @@ function AppPerformance() {
         <span className="text-sm text-stone-500">평균 성공률</span>
         <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center"><CheckCircle className="w-4 h-4 text-emerald-600" /></div>
       </div>
-      <div className="text-2xl font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>94.2%</div>
+      <div className="text-2xl font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>94.2%</div>
       <div className="text-xs text-emerald-600 mt-1.5 flex items-center gap-1"><TrendingUp className="w-3 h-3" />지난달 대비 +1.3%</div>
     </div>
     <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-5">
@@ -104,7 +107,7 @@ function AppPerformance() {
         <span className="text-sm text-stone-500">이번달 총 비용</span>
         <div className="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center"><CreditCard className="w-4 h-4 text-amber-600" /></div>
       </div>
-      <div className="text-2xl font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>$12.40</div>
+      <div className="text-2xl font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>$12.40</div>
       <div className="text-xs text-stone-500 mt-1.5">예산 62% 소진</div>
     </div>
     <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-5">
@@ -112,7 +115,7 @@ function AppPerformance() {
         <span className="text-sm text-stone-500">평균 응답 시간</span>
         <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center"><Timer className="w-4 h-4 text-blue-600" /></div>
       </div>
-      <div className="text-2xl font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>3.2초</div>
+      <div className="text-2xl font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>3.2초</div>
       <div className="text-xs text-emerald-600 mt-1.5 flex items-center gap-1"><TrendingDown className="w-3 h-3" />지난달 대비 -0.4초</div>
     </div>
   </div>
@@ -150,11 +153,11 @@ function AppPerformance() {
           <td className="px-4 py-3.5 text-right text-sm text-stone-700 font-medium">380</td>
           <td className="px-4 py-3.5 text-right">
             <div className="flex items-center justify-end gap-2">
-              <div className="w-16 bg-stone-100 rounded-full h-1.5"><div className="bg-emerald-500 h-1.5 rounded-full" style={{"width":"98.2%"}}></div></div>
+              <div className="w-16 bg-stone-100 rounded-full h-1.5"><div className="bg-emerald-500 h-1.5 rounded-full" style={{width: "98.2%"}}></div></div>
               <span className="text-sm font-semibold text-emerald-700">98.2%</span>
             </div>
           </td>
-          <td className="px-4 py-3.5 text-right text-sm text-stone-600" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$0.006</td>
+          <td className="px-4 py-3.5 text-right text-sm text-stone-600" style={{fontFamily: "'JetBrains Mono',monospace"}}>$0.006</td>
           <td className="px-4 py-3.5 text-right text-sm text-stone-600">1.2초</td>
           <td className="px-4 py-3.5 text-center"><span className="bg-emerald-50 text-emerald-700 rounded-full px-2.5 py-0.5 text-xs font-medium">최적 ✓</span></td>
         </tr>
@@ -171,11 +174,11 @@ function AppPerformance() {
           <td className="px-4 py-3.5 text-right text-sm text-stone-700 font-medium">145</td>
           <td className="px-4 py-3.5 text-right">
             <div className="flex items-center justify-end gap-2">
-              <div className="w-16 bg-stone-100 rounded-full h-1.5"><div className="bg-emerald-500 h-1.5 rounded-full" style={{"width":"97.8%"}}></div></div>
+              <div className="w-16 bg-stone-100 rounded-full h-1.5"><div className="bg-emerald-500 h-1.5 rounded-full" style={{width: "97.8%"}}></div></div>
               <span className="text-sm font-semibold text-emerald-700">97.8%</span>
             </div>
           </td>
-          <td className="px-4 py-3.5 text-right text-sm text-stone-600" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$0.029</td>
+          <td className="px-4 py-3.5 text-right text-sm text-stone-600" style={{fontFamily: "'JetBrains Mono',monospace"}}>$0.029</td>
           <td className="px-4 py-3.5 text-right text-sm text-stone-600">5.4초</td>
           <td className="px-4 py-3.5 text-center"><span className="bg-emerald-50 text-emerald-700 rounded-full px-2.5 py-0.5 text-xs font-medium">최적 ✓</span></td>
         </tr>
@@ -192,11 +195,11 @@ function AppPerformance() {
           <td className="px-4 py-3.5 text-right text-sm text-stone-700 font-medium">85</td>
           <td className="px-4 py-3.5 text-right">
             <div className="flex items-center justify-end gap-2">
-              <div className="w-16 bg-stone-100 rounded-full h-1.5"><div className="bg-emerald-500 h-1.5 rounded-full" style={{"width":"100%"}}></div></div>
+              <div className="w-16 bg-stone-100 rounded-full h-1.5"><div className="bg-emerald-500 h-1.5 rounded-full" style={{width: "100%"}}></div></div>
               <span className="text-sm font-semibold text-emerald-700">100%</span>
             </div>
           </td>
-          <td className="px-4 py-3.5 text-right text-sm text-stone-600" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$0.014</td>
+          <td className="px-4 py-3.5 text-right text-sm text-stone-600" style={{fontFamily: "'JetBrains Mono',monospace"}}>$0.014</td>
           <td className="px-4 py-3.5 text-right text-sm text-stone-600">3.1초</td>
           <td className="px-4 py-3.5 text-center"><span className="bg-emerald-50 text-emerald-700 rounded-full px-2.5 py-0.5 text-xs font-medium">최적 ✓</span></td>
         </tr>
@@ -213,11 +216,11 @@ function AppPerformance() {
           <td className="px-4 py-3.5 text-right text-sm text-stone-700 font-medium">220</td>
           <td className="px-4 py-3.5 text-right">
             <div className="flex items-center justify-end gap-2">
-              <div className="w-16 bg-stone-100 rounded-full h-1.5"><div className="bg-amber-400 h-1.5 rounded-full" style={{"width":"94.1%"}}></div></div>
+              <div className="w-16 bg-stone-100 rounded-full h-1.5"><div className="bg-amber-400 h-1.5 rounded-full" style={{width: "94.1%"}}></div></div>
               <span className="text-sm font-semibold text-amber-700">94.1%</span>
             </div>
           </td>
-          <td className="px-4 py-3.5 text-right text-sm text-stone-600" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$0.013</td>
+          <td className="px-4 py-3.5 text-right text-sm text-stone-600" style={{fontFamily: "'JetBrains Mono',monospace"}}>$0.013</td>
           <td className="px-4 py-3.5 text-right text-sm text-stone-600">2.8초</td>
           <td className="px-4 py-3.5 text-center"><span className="bg-amber-50 text-amber-700 rounded-full px-2.5 py-0.5 text-xs font-medium">개선 권고 ⚠</span></td>
         </tr>
@@ -234,11 +237,11 @@ function AppPerformance() {
           <td className="px-4 py-3.5 text-right text-sm text-stone-700 font-medium">290</td>
           <td className="px-4 py-3.5 text-right">
             <div className="flex items-center justify-end gap-2">
-              <div className="w-16 bg-stone-100 rounded-full h-1.5"><div className="bg-red-400 h-1.5 rounded-full" style={{"width":"89.3%"}}></div></div>
+              <div className="w-16 bg-stone-100 rounded-full h-1.5"><div className="bg-red-400 h-1.5 rounded-full" style={{width: "89.3%"}}></div></div>
               <span className="text-sm font-semibold text-red-600">89.3%</span>
             </div>
           </td>
-          <td className="px-4 py-3.5 text-right text-sm text-stone-600" style={{"fontFamily":"'JetBrains Mono',monospace"}}>$0.007</td>
+          <td className="px-4 py-3.5 text-right text-sm text-stone-600" style={{fontFamily: "'JetBrains Mono',monospace"}}>$0.007</td>
           <td className="px-4 py-3.5 text-right text-sm text-stone-600">2.1초</td>
           <td className="px-4 py-3.5 text-center"><span className="bg-red-50 text-red-700 rounded-full px-2.5 py-0.5 text-xs font-medium">주의 필요 ●</span></td>
         </tr>

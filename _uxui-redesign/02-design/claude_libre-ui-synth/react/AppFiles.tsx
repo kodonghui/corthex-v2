@@ -2,7 +2,8 @@
 import React from "react";
 import { BarChart2, BookOpen, Bot, Building2, ChevronsUpDown, Clock, CreditCard, File, FileBarChart, FileEdit, FileText, Folder, FolderOpen, FolderPlus, HardDrive, Home, Image, LayoutDashboard, LayoutGrid, List, MessageCircle, MoreHorizontal, Network, ScrollText, Search, Settings, Share2, Table2, Terminal, TrendingUp, Upload, UploadCloud } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1,h2,h3,h4,h5,h6 { font-family: 'Plus Jakarta Sans', sans-serif; }
     code,pre { font-family: 'JetBrains Mono', monospace; }
     .sidebar-item { transition: background-color 0.15s ease; }
@@ -16,19 +17,21 @@ const styles = `* { font-family: 'Inter', sans-serif; }
     .file-card.selected { border-color: #7c3aed; box-shadow: 0 0 0 2px rgba(124,58,237,0.1); }
     .view-btn.active { background-color: #7c3aed; color: white; }
     .breadcrumb-sep::before { content: '/'; color: #a8a29e; margin: 0 4px; }
-    .drop-zone-active { border-color: #7c3aed; background-color: #f5f3ff; }`;
+    .drop-zone-active { border-color: #7c3aed; background-color: #f5f3ff; }
+`;
 
 function AppFiles() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* Sidebar */}
+{/* Sidebar */}
   <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-10 overflow-y-auto">
     <div className="px-4 py-5 flex items-center gap-3 border-b border-stone-100 flex-shrink-0">
       <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center flex-shrink-0">
-        <span className="text-white font-bold text-sm" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>C</span>
+        <span className="text-white font-bold text-sm" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>C</span>
       </div>
-      <span className="font-bold text-stone-900 text-base" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+      <span className="font-bold text-stone-900 text-base" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
     </div>
 
     <nav className="flex-1 px-3 py-4 space-y-0.5">
@@ -415,7 +418,7 @@ function AppFiles() {
       {/* Usage Bar */}
       <div className="flex-1 flex items-center gap-3">
         <div className="flex-1 bg-stone-100 rounded-full h-2">
-          <div className="bg-gradient-to-r from-violet-500 to-violet-400 h-2 rounded-full" style={{"width":"28%"}}></div>
+          <div className="bg-gradient-to-r from-violet-500 to-violet-400 h-2 rounded-full" style={{width: "28%"}}></div>
         </div>
         <span className="text-sm font-semibold text-stone-700 flex-shrink-0">2.8 GB</span>
         <span className="text-sm text-stone-400 flex-shrink-0">/ 10 GB</span>

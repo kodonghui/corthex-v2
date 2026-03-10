@@ -2,7 +2,8 @@
 import React from "react";
 import { BarChart2, BookOpen, Bot, Building2, CheckCircle, ChevronDown, ChevronLeft, ChevronRight, ChevronsUpDown, Clock, CreditCard, Download, FileBarChart, Folder, GitBranch, Home, LayoutDashboard, MessageCircle, Network, ScrollText, Search, Settings, Share2, SlidersHorizontal, Terminal, Timer, TrendingUp, Zap } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1,h2,h3,h4,h5,h6 { font-family: 'Plus Jakarta Sans', sans-serif; }
     code,pre { font-family: 'JetBrains Mono', monospace; }
     .sidebar-item { transition: background-color 0.15s ease; }
@@ -14,19 +15,21 @@ const styles = `* { font-family: 'Inter', sans-serif; }
     .detail-panel { display: none; }
     .detail-panel.open { display: block; }
     .chevron-icon { transition: transform 0.2s ease; }
-    .chevron-icon.rotated { transform: rotate(180deg); }`;
+    .chevron-icon.rotated { transform: rotate(180deg); }
+`;
 
 function AppOpsLog() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* Sidebar */}
+{/* Sidebar */}
   <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-10 overflow-y-auto">
     <div className="px-4 py-5 flex items-center gap-3 border-b border-stone-100 flex-shrink-0">
       <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center flex-shrink-0">
-        <span className="text-white font-bold text-sm" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>C</span>
+        <span className="text-white font-bold text-sm" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>C</span>
       </div>
-      <span className="font-bold text-stone-900 text-base" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+      <span className="font-bold text-stone-900 text-base" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
     </div>
 
     <nav className="flex-1 px-3 py-4 space-y-0.5">
@@ -189,7 +192,7 @@ function AppOpsLog() {
       {/* Log 1: 이나경 */}
       <div className="log-card bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
         <div className="p-4 flex items-start gap-4">
-          <div className="flex flex-col items-center gap-1.5 flex-shrink-0" style={{"minWidth":"72px"}}>
+          <div className="flex flex-col items-center gap-1.5 flex-shrink-0" style={{minWidth: "72px"}}>
             <span className="text-xs font-medium text-stone-400">10:32</span>
             <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center mt-1">
               <span className="text-emerald-700 text-xs font-bold">이나</span>
@@ -246,7 +249,7 @@ function AppOpsLog() {
       {/* Log 2: 박준형 */}
       <div className="log-card bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
         <div className="p-4 flex items-start gap-4">
-          <div className="flex flex-col items-center gap-1.5 flex-shrink-0" style={{"minWidth":"72px"}}>
+          <div className="flex flex-col items-center gap-1.5 flex-shrink-0" style={{minWidth: "72px"}}>
             <span className="text-xs font-medium text-stone-400">09:15</span>
             <div className="w-10 h-10 bg-sky-100 rounded-full flex items-center justify-center mt-1">
               <span className="text-sky-700 text-xs font-bold">박준</span>
@@ -306,7 +309,7 @@ function AppOpsLog() {
       {/* Log 3: 김재원 */}
       <div className="log-card bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
         <div className="p-4 flex items-start gap-4">
-          <div className="flex flex-col items-center gap-1.5 flex-shrink-0" style={{"minWidth":"72px"}}>
+          <div className="flex flex-col items-center gap-1.5 flex-shrink-0" style={{minWidth: "72px"}}>
             <span className="text-xs font-medium text-stone-400">18:40</span>
             <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center mt-1">
               <span className="text-amber-700 text-xs font-bold">김재</span>
@@ -367,7 +370,7 @@ function AppOpsLog() {
       {/* Log 4: 이소연 */}
       <div className="log-card bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
         <div className="p-4 flex items-start gap-4">
-          <div className="flex flex-col items-center gap-1.5 flex-shrink-0" style={{"minWidth":"72px"}}>
+          <div className="flex flex-col items-center gap-1.5 flex-shrink-0" style={{minWidth: "72px"}}>
             <span className="text-xs font-medium text-stone-400">14:15</span>
             <div className="w-10 h-10 bg-rose-100 rounded-full flex items-center justify-center mt-1">
               <span className="text-rose-700 text-xs font-bold">이소</span>
@@ -420,7 +423,7 @@ function AppOpsLog() {
       {/* Log 5: 최민지 */}
       <div className="log-card bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
         <div className="p-4 flex items-start gap-4">
-          <div className="flex flex-col items-center gap-1.5 flex-shrink-0" style={{"minWidth":"72px"}}>
+          <div className="flex flex-col items-center gap-1.5 flex-shrink-0" style={{minWidth: "72px"}}>
             <span className="text-xs font-medium text-stone-400">11:30</span>
             <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mt-1">
               <span className="text-purple-700 text-xs font-bold">최민</span>

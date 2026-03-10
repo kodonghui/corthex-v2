@@ -1,18 +1,21 @@
 "use client";
 import React from "react";
 
-const styles = `body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
+const styles = `
+body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
     .font-mono { font-family: "JetBrains Mono", monospace; }
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 2px; }
-    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }`;
+    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }
+`;
 
 function AppPerformance() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* API: GET /api/performance/agents, GET /api/performance/quality-gates */}
+{/* API: GET /api/performance/agents, GET /api/performance/quality-gates */}
   {/* Sidebar */}
   <aside className="w-60 min-w-[240px] bg-zinc-900 border-r border-zinc-800 flex flex-col fixed h-full z-20">
     <div className="h-12 border-b border-zinc-800 flex items-center px-4 gap-3 flex-shrink-0">
@@ -187,28 +190,28 @@ function AppPerformance() {
           </div>
           <div className="text-zinc-700">→</div>
           <div className="flex-1 text-center">
-            <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-md py-6 mb-2" style={{"marginTop":"16px"}}>
+            <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-md py-6 mb-2" style={{marginTop: "16px"}}>
               <span className="text-lg font-semibold text-yellow-300">87</span>
               <span className="text-xs text-zinc-600 block mt-1">품질 검사</span>
             </div>
           </div>
           <div className="text-zinc-700">→</div>
           <div className="flex-1 text-center">
-            <div className="bg-orange-500/10 border border-orange-500/20 rounded-md py-4 mb-2" style={{"marginTop":"32px"}}>
+            <div className="bg-orange-500/10 border border-orange-500/20 rounded-md py-4 mb-2" style={{marginTop: "32px"}}>
               <span className="text-lg font-semibold text-orange-300">24</span>
               <span className="text-xs text-zinc-600 block mt-1">재작업</span>
             </div>
           </div>
           <div className="text-zinc-700">→</div>
           <div className="flex-1 text-center">
-            <div className="bg-green-500/10 border border-green-500/20 rounded-md py-3 mb-2" style={{"marginTop":"40px"}}>
+            <div className="bg-green-500/10 border border-green-500/20 rounded-md py-3 mb-2" style={{marginTop: "40px"}}>
               <span className="text-lg font-semibold text-green-300">1,248</span>
               <span className="text-xs text-zinc-600 block mt-1">최종 완료</span>
             </div>
           </div>
           <div className="text-zinc-700">→</div>
           <div className="flex-1 text-center">
-            <div className="bg-red-500/10 border border-red-500/20 rounded-md py-2 mb-2" style={{"marginTop":"48px"}}>
+            <div className="bg-red-500/10 border border-red-500/20 rounded-md py-2 mb-2" style={{marginTop: "48px"}}>
               <span className="text-lg font-semibold text-red-300">36</span>
               <span className="text-xs text-zinc-600 block mt-1">최종 실패</span>
             </div>

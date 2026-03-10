@@ -2,7 +2,8 @@
 import React from "react";
 import { ArrowRight, ArrowUpDown, BarChart2, BookOpen, Bot, Briefcase, Building2, ChevronsUpDown, Clock, CreditCard, Eye, FileBarChart, Folder, Home, LayoutDashboard, Loader, MessageCircle, Network, Plus, ScrollText, Search, Settings, Share2, ShieldCheck, Terminal, TrendingUp } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1,h2,h3,h4,h5,h6 { font-family: 'Plus Jakarta Sans', sans-serif; }
     code,pre { font-family: 'JetBrains Mono', monospace; }
     .sidebar-item { transition: background-color 0.15s ease; }
@@ -10,19 +11,21 @@ const styles = `* { font-family: 'Inter', sans-serif; }
     .sidebar-item.active { background-color: #ede9fe; }
     .sidebar-item.active span, .sidebar-item.active i { color: #7c3aed; }
     .report-card { transition: box-shadow 0.15s ease, transform 0.15s ease; }
-    .report-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.08); transform: translateY(-1px); }`;
+    .report-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.08); transform: translateY(-1px); }
+`;
 
 function AppReports() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* Sidebar */}
+{/* Sidebar */}
   <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-10 overflow-y-auto">
     <div className="px-4 py-5 flex items-center gap-3 border-b border-stone-100 flex-shrink-0">
       <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center flex-shrink-0">
-        <span className="text-white font-bold text-sm" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>C</span>
+        <span className="text-white font-bold text-sm" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>C</span>
       </div>
-      <span className="font-bold text-stone-900 text-base" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+      <span className="font-bold text-stone-900 text-base" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
     </div>
 
     <nav className="flex-1 px-3 py-4 space-y-0.5">
@@ -188,7 +191,7 @@ function AppReports() {
         {/* Quality Score */}
         <div className="flex items-center gap-2 mb-4">
           <div className="flex-1 bg-stone-100 rounded-full h-1.5">
-            <div className="bg-emerald-500 h-1.5 rounded-full" style={{"width":"95%"}}></div>
+            <div className="bg-emerald-500 h-1.5 rounded-full" style={{width: "95%"}}></div>
           </div>
           <span className="text-xs font-bold text-emerald-600">95/100</span>
         </div>
@@ -222,7 +225,7 @@ function AppReports() {
         <p className="text-xs text-stone-500 leading-relaxed mb-4 flex-1">인스타그램 팔로워 +1,240명(+8.3%), 평균 도달률 12.4%. 릴스 조회수 45만 돌파. 전월 대비 인게이지먼트율 2.1%p 상승. 4월 개선 방향 제안 포함.</p>
         <div className="flex items-center gap-2 mb-4">
           <div className="flex-1 bg-stone-100 rounded-full h-1.5">
-            <div className="bg-emerald-500 h-1.5 rounded-full" style={{"width":"88%"}}></div>
+            <div className="bg-emerald-500 h-1.5 rounded-full" style={{width: "88%"}}></div>
           </div>
           <span className="text-xs font-bold text-emerald-600">88/100</span>
         </div>
@@ -256,7 +259,7 @@ function AppReports() {
         <p className="text-xs text-stone-500 leading-relaxed mb-4 flex-1">42개 조항 분석 완료. 위험 조항 3개 식별(12조·18조·28조) 및 수정 제안 포함. 계약 체결 전 반드시 검토해야 할 핵심 수정 사항 정리.</p>
         <div className="flex items-center gap-2 mb-4">
           <div className="flex-1 bg-stone-100 rounded-full h-1.5">
-            <div className="bg-emerald-500 h-1.5 rounded-full" style={{"width":"92%"}}></div>
+            <div className="bg-emerald-500 h-1.5 rounded-full" style={{width: "92%"}}></div>
           </div>
           <span className="text-xs font-bold text-emerald-600">92/100</span>
         </div>
@@ -290,7 +293,7 @@ function AppReports() {
         <p className="text-xs text-stone-500 leading-relaxed mb-4 flex-1">3월 첫째 주 전사 업무 현황 요약. 완료 업무 18건, 진행 중 7건, 보류 2건. 주요 리스크 2개 항목 및 다음 주 우선순위 과제 5개 도출.</p>
         <div className="flex items-center gap-2 mb-4">
           <div className="flex-1 bg-stone-100 rounded-full h-1.5">
-            <div className="bg-emerald-500 h-1.5 rounded-full" style={{"width":"90%"}}></div>
+            <div className="bg-emerald-500 h-1.5 rounded-full" style={{width: "90%"}}></div>
           </div>
           <span className="text-xs font-bold text-emerald-600">90/100</span>
         </div>
@@ -324,7 +327,7 @@ function AppReports() {
         <p className="text-xs text-stone-500 leading-relaxed mb-4 flex-1">현재 주가 $842 기준 12개월 목표가 $950 설정. AI 데이터센터 수요 지속 성장, Blackwell GPU 출하 증가 근거. 매수 비중 5%→8% 상향 권고.</p>
         <div className="flex items-center gap-2 mb-4">
           <div className="flex-1 bg-stone-100 rounded-full h-1.5">
-            <div className="bg-emerald-500 h-1.5 rounded-full" style={{"width":"97%"}}></div>
+            <div className="bg-emerald-500 h-1.5 rounded-full" style={{width: "97%"}}></div>
           </div>
           <span className="text-xs font-bold text-emerald-600">97/100</span>
         </div>
@@ -358,7 +361,7 @@ function AppReports() {
         <p className="text-xs text-stone-500 leading-relaxed mb-4 flex-1">3~4월 봄 시즌 캠페인 전략 기획. 인스타그램·카카오 광고 예산 500만원 배분 방안 및 기대 ROAS 3.2x 목표. 크리에이티브 소재 방향성 5종 제안.</p>
         <div className="flex items-center gap-2 mb-4">
           <div className="flex-1 bg-stone-100 rounded-full h-1.5">
-            <div className="bg-yellow-400 h-1.5 rounded-full" style={{"width":"85%"}}></div>
+            <div className="bg-yellow-400 h-1.5 rounded-full" style={{width: "85%"}}></div>
           </div>
           <span className="text-xs font-bold text-yellow-600">85/100</span>
         </div>

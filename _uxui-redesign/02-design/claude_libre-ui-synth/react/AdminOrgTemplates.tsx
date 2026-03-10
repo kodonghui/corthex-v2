@@ -2,19 +2,22 @@
 import React from "react";
 import { Activity, BarChart2, Bell, Bot, Building, Building2, Clock, Copy, CreditCard, Database, FileText, GitBranch, Info, Key, LayoutDashboard, MoreHorizontal, Package, Plug, Plus, Settings, ShieldCheck, Store, User, UserCheck, Users } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; } h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; } code,pre { font-family: 'JetBrains Mono', monospace; }`;
+const styles = `
+* { font-family: 'Inter', sans-serif; } h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; } code,pre { font-family: 'JetBrains Mono', monospace; }
+`;
 
 function AdminOrgTemplates() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* Sidebar */}
+{/* Sidebar */}
 <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-10">
   {/* Logo */}
   <div className="px-5 py-4 border-b border-stone-100">
     <div className="flex items-center gap-2.5">
       <span className="text-[10px] font-bold bg-violet-600 text-white px-1.5 py-0.5 rounded tracking-widest">ADMIN</span>
-      <span className="font-bold text-stone-900 text-base" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+      <span className="font-bold text-stone-900 text-base" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
     </div>
   </div>
 

@@ -1,0 +1,231 @@
+"use client";
+import React from "react";
+import { Activity, ActivitySquare, Bell, BellDot, Bot, Check, CheckCheck, CheckSquare, CreditCard, Eye, FileCheck2, Home, Inbox, LayoutDashboard, Settings, ShieldQuestion, TriangleAlert } from "lucide-react";
+
+const styles = `
+@layer components {
+            body { @apply bg-dark-400 text-gray-200 font-sans antialiased font-light min-h-screen overflow-hidden flex selection:bg-accent-purple/30 selection:text-white; }
+            .bg-ambient { @apply fixed inset-0 z-[-1] pointer-events-none; }
+            .bg-ambient::before { content: ''; @apply absolute top-[-20%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-accent-purple/10 blur-[120px]; }
+            .bg-ambient::after { content: ''; @apply absolute bottom-[-20%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-accent-cyan/10 blur-[120px]; }
+            
+            .glass-panel { @apply bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] shadow-glass rounded-2xl overflow-hidden transition-all duration-300; }
+            
+            .nav-item { @apply flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/[0.05] transition-colors font-medium text-sm; }
+            .nav-item.active { @apply text-white bg-white/[0.08] shadow-[inset_2px_0_0_0_rgba(168,85,247,1)]; }
+            
+            .btn { @apply inline-flex items-center justify-center px-4 py-2 font-medium text-sm rounded-lg transition-all gap-2 cursor-pointer; }
+            .btn-primary { @apply bg-gradient-accent text-white hover:shadow-glow hover:opacity-90; }
+            .btn-secondary { @apply bg-white/[0.05] border border-white/[0.1] text-white hover:bg-white/[0.1]; }
+            .btn-icon { @apply p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/[0.1]; }
+            
+            .text-gradient { @apply bg-gradient-accent bg-clip-text text-transparent; }
+            
+            .scrollbar-hide::-webkit-scrollbar { display: none; }
+            .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+            .badge { @apply inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium border uppercase tracking-wider; }
+            
+            /* Notification specific */
+            .notif-item { @apply flex gap-4 p-5 border-b border-white/5 hover:bg-white/[0.02] transition-colors cursor-pointer group; }
+            .notif-item.unread { @apply bg-accent-purple/5 border-l-2 border-l-accent-purple; }
+        }
+`;
+
+function Notifications() {
+  return (
+    <>{"
+"}
+      <style dangerouslySetInnerHTML={{__html: styles}} />
+<div className="bg-ambient"></div>
+
+    <aside className="w-64 border-r border-white/[0.08] bg-dark-300/50 backdrop-blur-xl flex flex-col h-full z-20 shrink-0">
+        <div className="h-16 flex items-center px-6 border-b border-white/[0.05]">
+            <h1 className="text-xl font-bold tracking-wider text-gradient">CORTHEX</h1>
+            <span className="ml-2 px-1.5 py-0.5 rounded text-[10px] font-medium bg-white/10 text-gray-300">v2</span>
+        </div>
+        <div className="flex-1 overflow-y-auto scrollbar-hide py-6 px-4 space-y-8">
+            <div className="space-y-1">
+                <a href="/app/home" className="nav-item"><Home className="w-4 h-4" /> Home</a>
+                <a href="/app/dashboard" className="nav-item"><LayoutDashboard className="w-4 h-4" />
+                    Dashboard</a>
+            </div>
+
+            <div className="space-y-1">
+                <p className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Systems</p>
+                <a href="/app/activity-log" className="nav-item"><ActivitySquare className="w-4 h-4" />
+                    Activity Log</a>
+            </div>
+
+            <div className="space-y-1">
+                <p className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">User</p>
+                <a href="/app/notifications" className="nav-item active">
+                    <Bell className="w-4 h-4" /> Notifications
+                    <span
+                        className="ml-auto bg-accent-purple text-white text-[10px] px-1.5 py-0.5 rounded-full font-semibold">3</span>
+                </a>
+                <a href="/app/settings" className="nav-item"><Settings className="w-4 h-4" /> Settings</a>
+            </div>
+        </div>
+    </aside>
+
+    <main className="flex-1 flex flex-col h-full relative z-10 overflow-hidden">
+
+        <header
+            className="h-16 flex items-center justify-between px-8 border-b border-white/[0.05] bg-dark-400/50 backdrop-blur shrink-0">
+            <div className="flex items-center gap-4">
+                <span className="text-sm font-medium text-gray-300"><Bell
+                        className="w-4 h-4 inline mr-2 text-accent-purple" />Inbox & Alerts</span>
+            </div>
+            <div className="flex items-center gap-3">
+                <button className="btn btn-secondary text-xs py-1.5"><CheckCheck className="w-3 h-3" /> Mark
+                    all as read</button>
+            </div>
+        </header>
+
+        <div className="flex-1 overflow-y-auto p-8 scrollbar-hide flex gap-8">
+
+            {/* Filter Sidebar */}
+            <div className="w-64 shrink-0 flex flex-col gap-2">
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-2">Filters</h3>
+
+                <button
+                    className="flex items-center justify-between w-full px-3 py-2 rounded-lg bg-white/5 text-white text-sm font-medium border border-white/10">
+                    <span className="flex items-center gap-2"><Inbox className="w-4 h-4 text-accent-purple" />
+                        All Inbox</span>
+                    <span className="text-[10px] bg-white/10 px-1.5 py-0.5 rounded w-6 text-center">12</span>
+                </button>
+                <button
+                    className="flex items-center justify-between w-full px-3 py-2 rounded-lg text-gray-400 hover:bg-white/[0.02] hover:text-white transition-colors text-sm">
+                    <span className="flex items-center gap-2"><BellDot className="w-4 h-4 text-rose-400" />
+                        Unread</span>
+                    <span
+                        className="text-[10px] bg-rose-500/20 text-rose-400 px-1.5 py-0.5 rounded w-6 text-center">3</span>
+                </button>
+                <button
+                    className="flex items-center justify-between w-full px-3 py-2 rounded-lg text-gray-400 hover:bg-white/[0.02] hover:text-white transition-colors text-sm">
+                    <span className="flex items-center gap-2"><CheckSquare
+                            className="w-4 h-4 text-amber-400" /> Approvals</span>
+                    <span
+                        className="text-[10px] bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded w-6 text-center">1</span>
+                </button>
+                <button
+                    className="flex items-center justify-between w-full px-3 py-2 rounded-lg text-gray-400 hover:bg-white/[0.02] hover:text-white transition-colors text-sm">
+                    <span className="flex items-center gap-2"><Bot className="w-4 h-4 text-emerald-400" />
+                        Agent Events</span>
+                </button>
+                <button
+                    className="flex items-center justify-between w-full px-3 py-2 rounded-lg text-gray-400 hover:bg-white/[0.02] hover:text-white transition-colors text-sm">
+                    <span className="flex items-center gap-2"><TriangleAlert
+                            className="w-4 h-4 text-orange-400" /> System Alerts</span>
+                </button>
+            </div>
+
+            {/* API: GET /api/workspace/notifications */}
+            <div className="flex-1 glass-panel flex flex-col">
+                <div className="p-4 border-b border-white/5 flex gap-2">
+                    <input type="text" placeholder="Search notifications..."
+                        className="w-full bg-dark-300/50 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-accent-purple/50" />
+                </div>
+
+                <div className="flex-1 overflow-y-auto scrollbar-hide">
+
+                    {/* Notification: Unread Approval Request */}
+                    <div className="notif-item unread">
+                        <div
+                            className="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/20 flex-center text-amber-400 shrink-0">
+                            <ShieldQuestion className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1">
+                            <div className="flex justify-between items-start mb-1">
+                                <h4 className="text-sm font-medium text-white group-hover:text-amber-400 transition-colors">
+                                    Action Approval Required</h4>
+                                <span className="text-[10px] text-gray-400 whitespace-nowrap ml-4">10 mins ago</span>
+                            </div>
+                            <p className="text-xs text-gray-300 font-light mb-3"><strong>Marketing Agent</strong> has
+                                drafted a new SNS campaign and is requesting approval to publish to 3 networks.</p>
+
+                            <div className="flex gap-2">
+                                <button className="btn btn-secondary text-xs py-1.5 border-dashed border-white/20"><Eye className="w-3 h-3" /> Review Draft</button>
+                                <button
+                                    className="btn btn-primary text-xs py-1.5 bg-gradient-to-r from-emerald-500 to-emerald-400"><Check className="w-3 h-3" /> Approve</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Notification: Unread Agent Event */}
+                    <div className="notif-item unread">
+                        <div
+                            className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex-center text-emerald-400 shrink-0">
+                            <FileCheck2 className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1">
+                            <div className="flex justify-between items-start mb-1">
+                                <h4 className="text-sm font-medium text-white">Report Generation Complete</h4>
+                                <span className="text-[10px] text-gray-400 whitespace-nowrap ml-4">1 hour ago</span>
+                            </div>
+                            <p className="text-xs text-gray-300 font-light mt-1"><strong>Strategy CIO</strong> finished
+                                compiling "Q3 M&A Target Analysis". The PDF is now available in your reports dashboard.
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Notification: Unread Message */}
+                    <div className="notif-item unread">
+                        <div
+                            className="w-10 h-10 rounded-full bg-accent-purple/20 border border-accent-purple/30 flex-center text-white shrink-0 font-bold text-xs">
+                            JD
+                        </div>
+                        <div className="flex-1">
+                            <div className="flex justify-between items-start mb-1">
+                                <h4 className="text-sm font-medium text-white">John Doe mentioned you</h4>
+                                <span className="text-[10px] text-gray-400 whitespace-nowrap ml-4">3 hours ago</span>
+                            </div>
+                            <p className="text-xs text-gray-300 font-light mt-1 text-accent-purple">@admin <span
+                                    className="text-gray-300">Could you increase the monthly spending limit for the
+                                    DataScraper agent?</span></p>
+                        </div>
+                    </div>
+
+                    {/* Notification: Read System Alert */}
+                    <div className="notif-item">
+                        <div
+                            className="w-10 h-10 rounded-full bg-dark-300 border border-white/5 flex-center text-gray-500 shrink-0">
+                            <Activity className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1">
+                            <div className="flex justify-between items-start mb-1">
+                                <h4 className="text-sm font-medium text-gray-400">System Update Applied</h4>
+                                <span className="text-[10px] text-gray-500 whitespace-nowrap ml-4">Yesterday</span>
+                            </div>
+                            <p className="text-xs text-gray-500 font-light mt-1">Platform updated to version 2.4.1. This
+                                includes performance improvements for the Nexus Canvas.</p>
+                        </div>
+                    </div>
+
+                    {/* Notification: Read Billing Alert */}
+                    <div className="notif-item">
+                        <div
+                            className="w-10 h-10 rounded-full bg-dark-300 border border-white/5 flex-center text-gray-500 shrink-0">
+                            <CreditCard className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1">
+                            <div className="flex justify-between items-start mb-1">
+                                <h4 className="text-sm font-medium text-gray-400">Invoice Available</h4>
+                                <span className="text-[10px] text-gray-500 whitespace-nowrap ml-4">Oct 01, 2026</span>
+                            </div>
+                            <p className="text-xs text-gray-500 font-light mt-1">Your monthly invoice for September 2026 has
+                                been generated ($1,142.00).</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+    </>
+  );
+}
+
+export default Notifications;

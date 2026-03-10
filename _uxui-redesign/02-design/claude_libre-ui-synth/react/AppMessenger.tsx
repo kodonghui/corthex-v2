@@ -2,15 +2,18 @@
 import React from "react";
 import { Activity, ArrowRight, BarChart2, Bell, BookOpen, Bot, Briefcase, Building2, Calendar, Download, Eye, FileBarChart, FileSpreadsheet, FileText, Folder, Home, Key, LayoutDashboard, MessageCircle, MessageSquare, MoreHorizontal, Network, Paperclip, Phone, Plus, Receipt, Scroll, Search, Send, Settings, Share2, Shield, Smile, Terminal, TrendingUp, Users, Video, Zap } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1,h2,h3,h4,h5,h6,.font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
-    code,pre { font-family: 'JetBrains Mono', monospace; }`;
+    code,pre { font-family: 'JetBrains Mono', monospace; }
+`;
 
 function AppMessenger() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* Sidebar Nav */}
+{/* Sidebar Nav */}
   <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-40">
     <div className="px-4 py-4 border-b border-stone-100 flex items-center gap-3">
       <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">

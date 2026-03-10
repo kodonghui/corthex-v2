@@ -1,18 +1,21 @@
 "use client";
 import React from "react";
 
-const styles = `body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
+const styles = `
+body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
     .font-mono { font-family: "JetBrains Mono", monospace; }
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 2px; }
-    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }`;
+    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }
+`;
 
 function AdminDepartments() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* GET /api/admin/departments — returns dept list with agent_count, employee_count, cost */}
+{/* GET /api/admin/departments — returns dept list with agent_count, employee_count, cost */}
   {/* Sidebar */}
   <aside className="w-60 min-w-[240px] bg-zinc-900 border-r border-zinc-800 flex flex-col fixed h-full z-20">
     <div className="h-12 border-b border-zinc-800 flex items-center px-4 gap-3 flex-shrink-0">
@@ -176,7 +179,7 @@ function AdminDepartments() {
               <div className="text-xs text-zinc-500 mb-1">이번 달 CLI 토큰 소진</div>
               <div className="text-lg font-mono font-semibold text-zinc-200">₩1,284,320</div>
               <div className="mt-2 h-1.5 bg-zinc-800 rounded-full">
-                <div className="h-1.5 bg-blue-500 rounded-full" style={{"width":"64%"}}></div>
+                <div className="h-1.5 bg-blue-500 rounded-full" style={{width: "64%"}}></div>
               </div>
               <div className="flex justify-between text-xs text-zinc-600 mt-1"><span>0</span><span>월 한도 ₩2,000,000</span></div>
             </div>

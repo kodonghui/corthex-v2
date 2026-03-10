@@ -2,28 +2,20 @@
 import React from "react";
 import { Activity, AlertTriangle, BarChart2, Bell, BookOpen, Bot, Building2, CheckCheck, CheckCircle2, ChevronsUpDown, Clock, CreditCard, Eye, Folder, Gauge, GitBranch, Home, Key, LayoutDashboard, ListChecks, LoaderCircle, MessageSquare, ScrollText, Send, Settings, Settings2, Share2, Shield, Terminal, TrendingUp, UserPlus, Users, XCircle, Zap } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1,h2,h3,h4,h5,h6,.font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
     code,pre,.font-mono { font-family: 'JetBrains Mono', monospace; }
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: #f5f5f4; }
-    ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }`;
+    ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }
+`;
 
 function AppNotifications() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* API: GET /api/workspace/notifications */}
-  {/* API: PATCH /api/workspace/notifications/{id}/read */}
-  {/* API: POST /api/workspace/notifications/read-all */}
-  {/* API: DELETE /api/workspace/notifications/{id} */}
-  
-  
-  
-  
-
-
-
 {/* ===== SIDEBAR ===== */}
 <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-10">
 
@@ -33,8 +25,8 @@ function AppNotifications() {
       <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
         <Zap className="w-4 h-4 text-white" />
       </div>
-      <span className="text-sm font-bold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
-      <span className="text-[10px] text-stone-400 ml-0.5" style={{"fontFamily":"'JetBrains Mono',monospace"}}>v2</span>
+      <span className="text-sm font-bold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+      <span className="text-[10px] text-stone-400 ml-0.5" style={{fontFamily: "'JetBrains Mono',monospace"}}>v2</span>
     </div>
   </div>
 
@@ -122,9 +114,9 @@ function AppNotifications() {
 <main className="ml-60 min-h-screen">
 
   {/* Header */}
-  
+  <header className="h-14 bg-white border-b border-stone-200 flex items-center justify-between px-6 sticky top-0 z-10">
     <div className="flex items-center gap-2.5">
-      <h1 className="text-base font-semibold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>알림</h1>
+      <h1 className="text-base font-semibold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>알림</h1>
       <span className="inline-flex items-center justify-center min-w-[22px] h-[22px] rounded-full bg-violet-600 text-white text-[11px] font-bold px-1.5">4</span>
     </div>
     <div className="flex items-center gap-2">
@@ -137,7 +129,7 @@ function AppNotifications() {
         모두 읽음 처리
       </button>
     </div>
-  
+  </header>
 
   <div className="p-6 max-w-3xl">
 

@@ -2,7 +2,8 @@
 import React from "react";
 import { Activity, BarChart2, BookOpen, Bot, Building2, CalendarClock, CheckCircle, ChevronsUpDown, Clock, CreditCard, FileBarChart, FileSearch, Folder, Home, Instagram, LayoutDashboard, Megaphone, MessageCircle, Network, Pause, PauseCircle, Pencil, PlayCircle, Plus, Presentation, Receipt, Rss, Scale, ScrollText, Settings, Share2, Sun, Terminal, Trash2, TrendingUp } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1,h2,h3,h4,h5,h6 { font-family: 'Plus Jakarta Sans', sans-serif; }
     code,pre { font-family: 'JetBrains Mono', monospace; }
     .sidebar-item { transition: background-color 0.15s ease; }
@@ -17,19 +18,21 @@ const styles = `* { font-family: 'Inter', sans-serif; }
     .toggle-track.on { background-color: #7c3aed; }
     .toggle-thumb { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; background-color: white; border-radius: 50%; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
     .toggle-track.on .toggle-thumb { transform: translateX(16px); }
-    tr:hover td { background-color: #fafaf9; }`;
+    tr:hover td { background-color: #fafaf9; }
+`;
 
 function AppJobs() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* Sidebar */}
+{/* Sidebar */}
   <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-10 overflow-y-auto">
     <div className="px-4 py-5 flex items-center gap-3 border-b border-stone-100 flex-shrink-0">
       <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center flex-shrink-0">
-        <span className="text-white font-bold text-sm" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>C</span>
+        <span className="text-white font-bold text-sm" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>C</span>
       </div>
-      <span className="font-bold text-stone-900 text-base" style={{"fontFamily":"'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
+      <span className="font-bold text-stone-900 text-base" style={{fontFamily: "'Plus Jakarta Sans',sans-serif"}}>CORTHEX</span>
     </div>
 
     <nav className="flex-1 px-3 py-4 space-y-0.5">

@@ -1,18 +1,21 @@
 "use client";
 import React from "react";
 
-const styles = `body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
+const styles = `
+body { font-family: "Inter", system-ui, sans-serif; background: #09090b; color: #fafafa; }
     .font-mono { font-family: "JetBrains Mono", monospace; }
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 2px; }
-    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }`;
+    @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }
+`;
 
 function AppJobs() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* API: GET /api/jobs, GET /api/jobs/:id, POST /api/jobs/:id/retry */}
+{/* API: GET /api/jobs, GET /api/jobs/:id, POST /api/jobs/:id/retry */}
   {/* Sidebar */}
   <aside className="w-60 min-w-[240px] bg-zinc-900 border-r border-zinc-800 flex flex-col fixed h-full z-20">
     <div className="h-12 border-b border-zinc-800 flex items-center px-4 gap-3 flex-shrink-0">
@@ -97,7 +100,7 @@ function AppJobs() {
               <td className="py-3 px-4 text-xs font-mono text-zinc-500">JOB-2847</td>
               <td className="py-3 px-4">
                 <div className="text-sm text-zinc-300">삼성전자 Q1 실적 분석</div>
-                <div className="mt-1 h-1 bg-zinc-800 rounded-full w-32"><div className="h-1 bg-blue-500 rounded-full animate-pulse" style={{"width":"60%"}}></div></div>
+                <div className="mt-1 h-1 bg-zinc-800 rounded-full w-32"><div className="h-1 bg-blue-500 rounded-full animate-pulse" style={{width: "60%"}}></div></div>
                 <div className="text-xs text-zinc-600 mt-0.5">60% 완료</div>
               </td>
               <td className="py-3 px-4 text-xs text-zinc-400">김대표</td>
@@ -111,7 +114,7 @@ function AppJobs() {
               <td className="py-3 px-4 text-xs font-mono text-zinc-500">JOB-2846</td>
               <td className="py-3 px-4">
                 <div className="text-sm text-zinc-300">아고라 토론: 삼성전자 매수vs매도</div>
-                <div className="mt-1 h-1 bg-zinc-800 rounded-full w-32"><div className="h-1 bg-orange-500 rounded-full animate-pulse" style={{"width":"40%"}}></div></div>
+                <div className="mt-1 h-1 bg-zinc-800 rounded-full w-32"><div className="h-1 bg-orange-500 rounded-full animate-pulse" style={{width: "40%"}}></div></div>
                 <div className="text-xs text-zinc-600 mt-0.5">Round 2/5</div>
               </td>
               <td className="py-3 px-4 text-xs text-zinc-400">비서실장</td>

@@ -2,7 +2,8 @@
 import React from "react";
 import { Activity, BarChart2, Bell, BookOpen, Building2, Calendar, CheckCircle2, ChevronsUpDown, Clock, DollarSign, Download, Eye, FileText, Folder, GitBranch, Home, Key, LayoutDashboard, Lock, Megaphone, MessageCircle, MessagesSquare, ScrollText, Settings, Share2, Terminal, TrendingUp, Users, Zap } from "lucide-react";
 
-const styles = `* { font-family: 'Inter', sans-serif; }
+const styles = `
+* { font-family: 'Inter', sans-serif; }
     h1, h2, h3, h4, h5, h6, .font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
     .font-mono, code, pre { font-family: 'JetBrains Mono', monospace; }
     @keyframes blink-pulse {
@@ -15,20 +16,22 @@ const styles = `* { font-family: 'Inter', sans-serif; }
     }
     .bar-chart-bar:hover {
       filter: brightness(1.1);
-    }`;
+    }
+`;
 
 function AppDashboard() {
   return (
-    <>      
+    <>{"
+"}
       <style dangerouslySetInnerHTML={{__html: styles}} />
-      {/* 사이드바 */}
+{/* 사이드바 */}
 <aside className="w-60 fixed left-0 top-0 h-screen bg-white border-r border-stone-200 flex flex-col z-10">
   <div className="h-14 flex items-center px-4 border-b border-stone-200">
     <div className="flex items-center gap-2.5">
       <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
         <span className="text-white font-bold text-sm">C</span>
       </div>
-      <span className="font-bold text-stone-900 text-[15px]" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>CORTHEX</span>
+      <span className="font-bold text-stone-900 text-[15px]" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>CORTHEX</span>
     </div>
   </div>
   <nav className="flex-1 overflow-y-auto p-3 space-y-0.5">
@@ -138,10 +141,10 @@ function AppDashboard() {
 <div className="ml-60 min-h-screen bg-stone-50">
 
   {/* 헤더 */}
-  
+  <header className="h-14 bg-white border-b border-stone-200 flex items-center px-6 sticky top-0 z-10">
     <div className="flex items-center justify-between w-full">
       <div className="flex items-center gap-3">
-        <span className="text-sm font-semibold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>작전 대시보드</span>
+        <span className="text-sm font-semibold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>작전 대시보드</span>
         <span className="text-sm text-stone-400">2026년 3월 10일</span>
       </div>
       <div className="flex items-center gap-2">
@@ -155,7 +158,7 @@ function AppDashboard() {
         </button>
       </div>
     </div>
-  
+  </header>
 
   {/* 콘텐츠 */}
   <main className="p-6 space-y-6">
@@ -172,7 +175,7 @@ function AppDashboard() {
             <Terminal className="w-4 h-4 text-violet-600" />
           </div>
         </div>
-        <p className="text-[32px] font-bold tracking-tight text-stone-900 leading-none" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>23</p>
+        <p className="text-[32px] font-bold tracking-tight text-stone-900 leading-none" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>23</p>
         <p className="text-xs text-emerald-600 mt-2 flex items-center gap-1">
           <TrendingUp className="w-3 h-3" /> 어제(18)보다 +5
         </p>
@@ -191,13 +194,13 @@ function AppDashboard() {
             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           </div>
         </div>
-        <p className="text-[32px] font-bold tracking-tight text-stone-900 leading-none" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>91.3%</p>
+        <p className="text-[32px] font-bold tracking-tight text-stone-900 leading-none" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>91.3%</p>
         <p className="text-xs text-emerald-600 mt-2 flex items-center gap-1">
           <TrendingUp className="w-3 h-3" /> 주간 평균 88%
         </p>
         <div className="mt-2">
           <div className="w-full bg-stone-100 rounded-full h-1.5">
-            <div className="bg-emerald-500 h-1.5 rounded-full" style={{"width":"91.3%"}}></div>
+            <div className="bg-emerald-500 h-1.5 rounded-full" style={{width: "91.3%"}}></div>
           </div>
         </div>
       </div>
@@ -210,7 +213,7 @@ function AppDashboard() {
             <DollarSign className="w-4 h-4 text-amber-600" />
           </div>
         </div>
-        <p className="text-[32px] font-bold tracking-tight text-stone-900 leading-none" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>$1.87</p>
+        <p className="text-[32px] font-bold tracking-tight text-stone-900 leading-none" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>$1.87</p>
         <p className="text-xs text-stone-500 mt-2 flex items-center gap-1">
           <Calendar className="w-3 h-3" /> 일평균 $1.42
         </p>
@@ -225,13 +228,13 @@ function AppDashboard() {
             <Zap className="w-4 h-4 text-violet-600" />
           </div>
         </div>
-        <p className="text-[32px] font-bold tracking-tight text-stone-900 leading-none" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>18<span className="text-base text-stone-400 font-normal"> / 24</span></p>
+        <p className="text-[32px] font-bold tracking-tight text-stone-900 leading-none" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>18<span className="text-base text-stone-400 font-normal"> / 24</span></p>
         <p className="text-xs text-stone-500 mt-2 flex items-center gap-1">
           <Users className="w-3 h-3" /> 오프라인 6 · 오류 1
         </p>
         <div className="mt-2">
           <div className="w-full bg-stone-100 rounded-full h-1.5">
-            <div className="bg-violet-500 h-1.5 rounded-full" style={{"width":"75%"}}></div>
+            <div className="bg-violet-500 h-1.5 rounded-full" style={{width: "75%"}}></div>
           </div>
         </div>
       </div>
@@ -246,7 +249,7 @@ function AppDashboard() {
       <div className="col-span-2 bg-white rounded-xl border border-stone-200 shadow-sm hover:border-violet-200 hover:shadow-md transition-all duration-150 p-5">
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h2 className="text-lg font-semibold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>일별 비용 추이</h2>
+            <h2 className="text-lg font-semibold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>일별 비용 추이</h2>
             <p className="text-xs text-stone-400 mt-0.5">최근 14일 · CLI 토큰 사용량</p>
           </div>
           <div className="flex items-center gap-3 text-xs text-stone-500">
@@ -261,97 +264,97 @@ function AppDashboard() {
           {/* 날짜별 데이터: [anthropic, openai, google] */}
           <div className="flex flex-col items-center gap-1 flex-1 group cursor-pointer">
             <div className="w-full flex flex-col items-center gap-0.5">
-              <div className="w-full bg-violet-500 bar-chart-bar rounded-sm" style={{"height":"42px"}}></div>
-              <div className="w-full bg-emerald-400 bar-chart-bar rounded-sm" style={{"height":"16px"}}></div>
-              <div className="w-full bg-amber-400 bar-chart-bar rounded-sm" style={{"height":"8px"}}></div>
+              <div className="w-full bg-violet-500 bar-chart-bar rounded-sm" style={{height: "42px"}}></div>
+              <div className="w-full bg-emerald-400 bar-chart-bar rounded-sm" style={{height: "16px"}}></div>
+              <div className="w-full bg-amber-400 bar-chart-bar rounded-sm" style={{height: "8px"}}></div>
             </div>
             <span className="text-[9px] text-stone-400 group-hover:text-stone-600 transition-colors">2/26</span>
           </div>
           <div className="flex flex-col items-center gap-1 flex-1 group cursor-pointer">
             <div className="w-full flex flex-col items-center gap-0.5">
-              <div className="w-full bg-violet-500 bar-chart-bar rounded-sm" style={{"height":"36px"}}></div>
-              <div className="w-full bg-emerald-400 bar-chart-bar rounded-sm" style={{"height":"20px"}}></div>
-              <div className="w-full bg-amber-400 bar-chart-bar rounded-sm" style={{"height":"6px"}}></div>
+              <div className="w-full bg-violet-500 bar-chart-bar rounded-sm" style={{height: "36px"}}></div>
+              <div className="w-full bg-emerald-400 bar-chart-bar rounded-sm" style={{height: "20px"}}></div>
+              <div className="w-full bg-amber-400 bar-chart-bar rounded-sm" style={{height: "6px"}}></div>
             </div>
             <span className="text-[9px] text-stone-400 group-hover:text-stone-600 transition-colors">2/27</span>
           </div>
           <div className="flex flex-col items-center gap-1 flex-1 group cursor-pointer">
             <div className="w-full flex flex-col items-center gap-0.5">
-              <div className="w-full bg-violet-500 bar-chart-bar rounded-sm" style={{"height":"54px"}}></div>
-              <div className="w-full bg-emerald-400 bar-chart-bar rounded-sm" style={{"height":"22px"}}></div>
-              <div className="w-full bg-amber-400 bar-chart-bar rounded-sm" style={{"height":"10px"}}></div>
+              <div className="w-full bg-violet-500 bar-chart-bar rounded-sm" style={{height: "54px"}}></div>
+              <div className="w-full bg-emerald-400 bar-chart-bar rounded-sm" style={{height: "22px"}}></div>
+              <div className="w-full bg-amber-400 bar-chart-bar rounded-sm" style={{height: "10px"}}></div>
             </div>
             <span className="text-[9px] text-stone-400 group-hover:text-stone-600 transition-colors">2/28</span>
           </div>
           <div className="flex flex-col items-center gap-1 flex-1 group cursor-pointer">
             <div className="w-full flex flex-col items-center gap-0.5">
-              <div className="w-full bg-violet-500 bar-chart-bar rounded-sm" style={{"height":"28px"}}></div>
-              <div className="w-full bg-emerald-400 bar-chart-bar rounded-sm" style={{"height":"12px"}}></div>
-              <div className="w-full bg-amber-400 bar-chart-bar rounded-sm" style={{"height":"5px"}}></div>
+              <div className="w-full bg-violet-500 bar-chart-bar rounded-sm" style={{height: "28px"}}></div>
+              <div className="w-full bg-emerald-400 bar-chart-bar rounded-sm" style={{height: "12px"}}></div>
+              <div className="w-full bg-amber-400 bar-chart-bar rounded-sm" style={{height: "5px"}}></div>
             </div>
             <span className="text-[9px] text-stone-400 group-hover:text-stone-600 transition-colors">3/1</span>
           </div>
           <div className="flex flex-col items-center gap-1 flex-1 group cursor-pointer">
             <div className="w-full flex flex-col items-center gap-0.5">
-              <div className="w-full bg-violet-500 bar-chart-bar rounded-sm" style={{"height":"60px"}}></div>
-              <div className="w-full bg-emerald-400 bar-chart-bar rounded-sm" style={{"height":"26px"}}></div>
-              <div className="w-full bg-amber-400 bar-chart-bar rounded-sm" style={{"height":"12px"}}></div>
+              <div className="w-full bg-violet-500 bar-chart-bar rounded-sm" style={{height: "60px"}}></div>
+              <div className="w-full bg-emerald-400 bar-chart-bar rounded-sm" style={{height: "26px"}}></div>
+              <div className="w-full bg-amber-400 bar-chart-bar rounded-sm" style={{height: "12px"}}></div>
             </div>
             <span className="text-[9px] text-stone-400 group-hover:text-stone-600 transition-colors">3/2</span>
           </div>
           <div className="flex flex-col items-center gap-1 flex-1 group cursor-pointer">
             <div className="w-full flex flex-col items-center gap-0.5">
-              <div className="w-full bg-violet-500 bar-chart-bar rounded-sm" style={{"height":"48px"}}></div>
-              <div className="w-full bg-emerald-400 bar-chart-bar rounded-sm" style={{"height":"18px"}}></div>
-              <div className="w-full bg-amber-400 bar-chart-bar rounded-sm" style={{"height":"8px"}}></div>
+              <div className="w-full bg-violet-500 bar-chart-bar rounded-sm" style={{height: "48px"}}></div>
+              <div className="w-full bg-emerald-400 bar-chart-bar rounded-sm" style={{height: "18px"}}></div>
+              <div className="w-full bg-amber-400 bar-chart-bar rounded-sm" style={{height: "8px"}}></div>
             </div>
             <span className="text-[9px] text-stone-400 group-hover:text-stone-600 transition-colors">3/3</span>
           </div>
           <div className="flex flex-col items-center gap-1 flex-1 group cursor-pointer">
             <div className="w-full flex flex-col items-center gap-0.5">
-              <div className="w-full bg-violet-500 bar-chart-bar rounded-sm" style={{"height":"32px"}}></div>
-              <div className="w-full bg-emerald-400 bar-chart-bar rounded-sm" style={{"height":"14px"}}></div>
-              <div className="w-full bg-amber-400 bar-chart-bar rounded-sm" style={{"height":"6px"}}></div>
+              <div className="w-full bg-violet-500 bar-chart-bar rounded-sm" style={{height: "32px"}}></div>
+              <div className="w-full bg-emerald-400 bar-chart-bar rounded-sm" style={{height: "14px"}}></div>
+              <div className="w-full bg-amber-400 bar-chart-bar rounded-sm" style={{height: "6px"}}></div>
             </div>
             <span className="text-[9px] text-stone-400 group-hover:text-stone-600 transition-colors">3/4</span>
           </div>
           <div className="flex flex-col items-center gap-1 flex-1 group cursor-pointer">
             <div className="w-full flex flex-col items-center gap-0.5">
-              <div className="w-full bg-violet-500 bar-chart-bar rounded-sm" style={{"height":"44px"}}></div>
-              <div className="w-full bg-emerald-400 bar-chart-bar rounded-sm" style={{"height":"20px"}}></div>
-              <div className="w-full bg-amber-400 bar-chart-bar rounded-sm" style={{"height":"9px"}}></div>
+              <div className="w-full bg-violet-500 bar-chart-bar rounded-sm" style={{height: "44px"}}></div>
+              <div className="w-full bg-emerald-400 bar-chart-bar rounded-sm" style={{height: "20px"}}></div>
+              <div className="w-full bg-amber-400 bar-chart-bar rounded-sm" style={{height: "9px"}}></div>
             </div>
             <span className="text-[9px] text-stone-400 group-hover:text-stone-600 transition-colors">3/5</span>
           </div>
           <div className="flex flex-col items-center gap-1 flex-1 group cursor-pointer">
             <div className="w-full flex flex-col items-center gap-0.5">
-              <div className="w-full bg-violet-500 bar-chart-bar rounded-sm" style={{"height":"70px"}}></div>
-              <div className="w-full bg-emerald-400 bar-chart-bar rounded-sm" style={{"height":"30px"}}></div>
-              <div className="w-full bg-amber-400 bar-chart-bar rounded-sm" style={{"height":"14px"}}></div>
+              <div className="w-full bg-violet-500 bar-chart-bar rounded-sm" style={{height: "70px"}}></div>
+              <div className="w-full bg-emerald-400 bar-chart-bar rounded-sm" style={{height: "30px"}}></div>
+              <div className="w-full bg-amber-400 bar-chart-bar rounded-sm" style={{height: "14px"}}></div>
             </div>
             <span className="text-[9px] text-stone-400 group-hover:text-stone-600 transition-colors">3/6</span>
           </div>
           <div className="flex flex-col items-center gap-1 flex-1 group cursor-pointer">
             <div className="w-full flex flex-col items-center gap-0.5">
-              <div className="w-full bg-violet-500 bar-chart-bar rounded-sm" style={{"height":"38px"}}></div>
-              <div className="w-full bg-emerald-400 bar-chart-bar rounded-sm" style={{"height":"16px"}}></div>
-              <div className="w-full bg-amber-400 bar-chart-bar rounded-sm" style={{"height":"7px"}}></div>
+              <div className="w-full bg-violet-500 bar-chart-bar rounded-sm" style={{height: "38px"}}></div>
+              <div className="w-full bg-emerald-400 bar-chart-bar rounded-sm" style={{height: "16px"}}></div>
+              <div className="w-full bg-amber-400 bar-chart-bar rounded-sm" style={{height: "7px"}}></div>
             </div>
             <span className="text-[9px] text-stone-400 group-hover:text-stone-600 transition-colors">3/7</span>
           </div>
           <div className="flex flex-col items-center gap-1 flex-1 group cursor-pointer">
             <div className="w-full flex flex-col items-center gap-0.5">
-              <div className="w-full bg-violet-500 bar-chart-bar rounded-sm" style={{"height":"52px"}}></div>
-              <div className="w-full bg-emerald-400 bar-chart-bar rounded-sm" style={{"height":"24px"}}></div>
-              <div className="w-full bg-amber-400 bar-chart-bar rounded-sm" style={{"height":"11px"}}></div>
+              <div className="w-full bg-violet-500 bar-chart-bar rounded-sm" style={{height: "52px"}}></div>
+              <div className="w-full bg-emerald-400 bar-chart-bar rounded-sm" style={{height: "24px"}}></div>
+              <div className="w-full bg-amber-400 bar-chart-bar rounded-sm" style={{height: "11px"}}></div>
             </div>
             <span className="text-[9px] text-stone-400 group-hover:text-stone-600 transition-colors">3/8</span>
           </div>
           <div className="flex flex-col items-center gap-1 flex-1 group cursor-pointer">
             <div className="w-full flex flex-col items-center gap-0.5">
-              <div className="w-full bg-violet-500 bar-chart-bar rounded-sm" style={{"height":"46px"}}></div>
-              <div className="w-full bg-emerald-400 bar-chart-bar rounded-sm" style={{"height":"22px"}}></div>
-              <div className="w-full bg-amber-400 bar-chart-bar rounded-sm" style={{"height":"10px"}}></div>
+              <div className="w-full bg-violet-500 bar-chart-bar rounded-sm" style={{height: "46px"}}></div>
+              <div className="w-full bg-emerald-400 bar-chart-bar rounded-sm" style={{height: "22px"}}></div>
+              <div className="w-full bg-amber-400 bar-chart-bar rounded-sm" style={{height: "10px"}}></div>
             </div>
             <span className="text-[9px] text-stone-400 group-hover:text-stone-600 transition-colors">3/9</span>
           </div>
@@ -359,9 +362,9 @@ function AppDashboard() {
           <div className="flex flex-col items-center gap-1 flex-1 group cursor-pointer relative">
             <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-violet-600 text-white text-[9px] px-1.5 py-0.5 rounded font-medium whitespace-nowrap">오늘</div>
             <div className="w-full flex flex-col items-center gap-0.5">
-              <div className="w-full bg-violet-600 bar-chart-bar rounded-sm" style={{"height":"32px"}}></div>
-              <div className="w-full bg-emerald-500 bar-chart-bar rounded-sm" style={{"height":"14px"}}></div>
-              <div className="w-full bg-amber-500 bar-chart-bar rounded-sm" style={{"height":"6px"}}></div>
+              <div className="w-full bg-violet-600 bar-chart-bar rounded-sm" style={{height: "32px"}}></div>
+              <div className="w-full bg-emerald-500 bar-chart-bar rounded-sm" style={{height: "14px"}}></div>
+              <div className="w-full bg-amber-500 bar-chart-bar rounded-sm" style={{height: "6px"}}></div>
             </div>
             <span className="text-[9px] text-violet-600 font-semibold">3/10</span>
           </div>
@@ -374,7 +377,7 @@ function AppDashboard() {
         {/* 이번 달 예산 */}
         {/* API: GET /api/workspace/dashboard/budget */}
         <div className="bg-white rounded-xl border border-stone-200 shadow-sm hover:border-violet-200 hover:shadow-md transition-all duration-150 p-5">
-          <h2 className="text-base font-semibold text-stone-900 mb-4" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>이번 달 예산</h2>
+          <h2 className="text-base font-semibold text-stone-900 mb-4" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>이번 달 예산</h2>
 
           <div className="space-y-3">
             {/* 전체 */}
@@ -384,7 +387,7 @@ function AppDashboard() {
                 <span className="text-xs font-semibold text-stone-800">$12.40 / $50.00</span>
               </div>
               <div className="w-full bg-stone-100 rounded-full h-2">
-                <div className="bg-emerald-500 h-2 rounded-full transition-all duration-500" style={{"width":"24.8%"}}></div>
+                <div className="bg-emerald-500 h-2 rounded-full transition-all duration-500" style={{width: "24.8%"}}></div>
               </div>
               <p className="text-[10px] text-stone-400 mt-1">잔여 $37.60 (75.2%)</p>
             </div>
@@ -396,7 +399,7 @@ function AppDashboard() {
                 <span className="text-xs text-stone-600">$7.82</span>
               </div>
               <div className="w-full bg-stone-100 rounded-full h-1.5">
-                <div className="bg-violet-500 h-1.5 rounded-full" style={{"width":"63%"}}></div>
+                <div className="bg-violet-500 h-1.5 rounded-full" style={{width: "63%"}}></div>
               </div>
             </div>
 
@@ -407,7 +410,7 @@ function AppDashboard() {
                 <span className="text-xs text-stone-600">$3.12</span>
               </div>
               <div className="w-full bg-stone-100 rounded-full h-1.5">
-                <div className="bg-emerald-400 h-1.5 rounded-full" style={{"width":"25%"}}></div>
+                <div className="bg-emerald-400 h-1.5 rounded-full" style={{width: "25%"}}></div>
               </div>
             </div>
 
@@ -418,7 +421,7 @@ function AppDashboard() {
                 <span className="text-xs text-stone-600">$1.46</span>
               </div>
               <div className="w-full bg-stone-100 rounded-full h-1.5">
-                <div className="bg-amber-400 h-1.5 rounded-full" style={{"width":"12%"}}></div>
+                <div className="bg-amber-400 h-1.5 rounded-full" style={{width: "12%"}}></div>
               </div>
             </div>
           </div>
@@ -427,7 +430,7 @@ function AppDashboard() {
         {/* LLM 프로바이더 상태 */}
         {/* API: GET /api/workspace/dashboard/providers */}
         <div className="bg-white rounded-xl border border-stone-200 shadow-sm hover:border-violet-200 hover:shadow-md transition-all duration-150 p-5">
-          <h2 className="text-base font-semibold text-stone-900 mb-3" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>LLM 프로바이더</h2>
+          <h2 className="text-base font-semibold text-stone-900 mb-3" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>LLM 프로바이더</h2>
           <div className="space-y-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
@@ -484,7 +487,7 @@ function AppDashboard() {
     {/* API: GET /api/workspace/dashboard/agent-performance */}
     <div className="bg-white rounded-xl border border-stone-200 shadow-sm hover:border-violet-200 hover:shadow-md transition-all duration-150">
       <div className="px-5 py-4 border-b border-stone-100 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-stone-900" style={{"fontFamily":"'Plus Jakarta Sans', sans-serif"}}>에이전트별 성능 (오늘)</h2>
+        <h2 className="text-lg font-semibold text-stone-900" style={{fontFamily: "'Plus Jakarta Sans', sans-serif"}}>에이전트별 성능 (오늘)</h2>
         <a href="/app/performance" className="text-stone-600 hover:bg-stone-100 rounded-lg px-3 py-1.5 text-sm transition-colors duration-150 flex items-center gap-1">
           전력분석 →
         </a>
@@ -517,7 +520,7 @@ function AppDashboard() {
               <td className="px-5 py-3.5 text-center">
                 <div className="flex items-center justify-center gap-2">
                   <div className="w-16 bg-stone-100 rounded-full h-1.5">
-                    <div className="bg-emerald-500 h-1.5 rounded-full" style={{"width":"92%"}}></div>
+                    <div className="bg-emerald-500 h-1.5 rounded-full" style={{width: "92%"}}></div>
                   </div>
                   <span className="text-xs text-stone-700 font-medium">92%</span>
                 </div>
@@ -544,7 +547,7 @@ function AppDashboard() {
               <td className="px-5 py-3.5 text-center">
                 <div className="flex items-center justify-center gap-2">
                   <div className="w-16 bg-stone-100 rounded-full h-1.5">
-                    <div className="bg-emerald-500 h-1.5 rounded-full" style={{"width":"100%"}}></div>
+                    <div className="bg-emerald-500 h-1.5 rounded-full" style={{width: "100%"}}></div>
                   </div>
                   <span className="text-xs text-stone-700 font-medium">100%</span>
                 </div>
@@ -571,7 +574,7 @@ function AppDashboard() {
               <td className="px-5 py-3.5 text-center">
                 <div className="flex items-center justify-center gap-2">
                   <div className="w-16 bg-stone-100 rounded-full h-1.5">
-                    <div className="bg-emerald-500 h-1.5 rounded-full" style={{"width":"80%"}}></div>
+                    <div className="bg-emerald-500 h-1.5 rounded-full" style={{width: "80%"}}></div>
                   </div>
                   <span className="text-xs text-stone-700 font-medium">80%</span>
                 </div>
@@ -598,7 +601,7 @@ function AppDashboard() {
               <td className="px-5 py-3.5 text-center">
                 <div className="flex items-center justify-center gap-2">
                   <div className="w-16 bg-stone-100 rounded-full h-1.5">
-                    <div className="bg-emerald-500 h-1.5 rounded-full" style={{"width":"100%"}}></div>
+                    <div className="bg-emerald-500 h-1.5 rounded-full" style={{width: "100%"}}></div>
                   </div>
                   <span className="text-xs text-stone-700 font-medium">100%</span>
                 </div>
@@ -625,7 +628,7 @@ function AppDashboard() {
               <td className="px-5 py-3.5 text-center">
                 <div className="flex items-center justify-center gap-2">
                   <div className="w-16 bg-stone-100 rounded-full h-1.5">
-                    <div className="bg-emerald-500 h-1.5 rounded-full" style={{"width":"93%"}}></div>
+                    <div className="bg-emerald-500 h-1.5 rounded-full" style={{width: "93%"}}></div>
                   </div>
                   <span className="text-xs text-stone-700 font-medium">93%</span>
                 </div>
@@ -652,7 +655,7 @@ function AppDashboard() {
               <td className="px-5 py-3.5 text-center">
                 <div className="flex items-center justify-center gap-2">
                   <div className="w-16 bg-stone-100 rounded-full h-1.5">
-                    <div className="bg-amber-400 h-1.5 rounded-full" style={{"width":"75%"}}></div>
+                    <div className="bg-amber-400 h-1.5 rounded-full" style={{width: "75%"}}></div>
                   </div>
                   <span className="text-xs text-stone-700 font-medium">75%</span>
                 </div>

@@ -1,0 +1,361 @@
+"use client";
+import React from "react";
+
+const styles = `
+body {
+            background-color: #0a0a0f;
+            color: #f3f4f6;
+            background-image: radial-gradient(circle at 15% 50%, rgba(168, 85, 247, 0.05), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(34, 211, 238, 0.05), transparent 25%);
+            background-attachment: fixed;
+            font-weight: 300;
+            line-height: 1.5;
+        }
+
+        .num-bold {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            letter-spacing: -0.05em;
+        }
+
+        .glass-panel {
+            background-color: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #a855f7 0%, #22d3ee 100%);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-sm;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-glass {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 0.5rem;
+            padding: 0.4rem 0.8rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+            cursor: pointer;
+            font-weight: 400;
+            text-sm;
+        }
+
+        .btn-glass:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-icon {
+            background: transparent;
+            border: 1px solid transparent;
+            color: #9ca3af;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .btn-icon:hover {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        /* Chat bubbles */
+        .bubble-agent {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem 1rem 1rem 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .bubble-user {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(34, 211, 238, 0.2));
+            border: 1px solid rgba(34, 211, 238, 0.3);
+            border-radius: 1rem 1rem 0 1rem;
+            backdrop-filter: blur(10px);
+        }
+`;
+
+function Messenger() {
+  return (
+    <>{"
+"}
+      <style dangerouslySetInnerHTML={{__html: styles}} />
+{/* Sidebar Navigation */}
+    <aside
+        className="w-64 flex flex-col border-r border-white/5 bg-[#0a0a0f]/80 backdrop-blur-xl h-full shrink-0 relative z-20 hidden md:flex">
+        <div className="p-6">
+            <h1 className="text-xl font-bold tracking-tight text-white mb-2">CORTHEX <span
+                    className="text-xs font-normal text-white/40 ml-1">v2</span></h1>
+        </div>
+
+        <div className="p-4 flex-1 overflow-y-auto w-full">
+            <div className="mb-4">
+                <div className="text-xs text-white/30 font-semibold mb-2 px-2 uppercase tracking-wider">Workspace</div>
+                <nav className="space-y-1">
+                    <a href="/app/home"
+                        className="flex items-center gap-3 px-3 py-2 text-white/60 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                        <i className="fas fa-home w-4"></i> <span>홈</span>
+                    </a>
+                </nav>
+            </div>
+
+            <div className="mb-4">
+                <div className="text-xs text-white/30 font-semibold mb-2 px-2 uppercase tracking-wider">Communication</div>
+                <nav className="space-y-1">
+                    <a href="/app/sns"
+                        className="flex items-center gap-3 px-3 py-2 text-white/60 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                        <i className="fas fa-hashtag w-4"></i> <span>SNS (에이전트 피드)</span>
+                    </a>
+                    <a href="/app/messenger"
+                        className="flex items-center gap-3 px-3 py-2 text-white bg-white/10 rounded-lg border border-white/10 transition-colors">
+                        <i className="fas fa-paper-plane w-4 text-accent-cyan"></i> <span>메신저 (Direct Message)</span>
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </aside>
+
+    {/* Main Split View */}
+    <main className="flex-1 flex overflow-hidden">
+
+        {/* Left Panel: Conversation List (API: GET /api/workspace/messenger/conversations) */}
+        <section className="w-80 border-r border-white/5 bg-[#0a0a0f]/50 backdrop-blur-md flex flex-col shrink-0 z-10">
+            <header className="p-4 border-b border-white/5">
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-lg font-bold">Direct Messages</h2>
+                    <button className="btn-icon"><i className="fas fa-edit"></i></button>
+                </div>
+                <div className="relative">
+                    <i
+                        className="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-white/30 text-xs"></i>
+                    <input type="text"
+                        className="w-full bg-black/40 border border-white/10 rounded-lg pl-8 pr-3 py-2 text-sm text-white focus:outline-none focus:border-accent-cyan/50 transition-colors placeholder-white/30"
+                        placeholder="에이전트 검색..." />
+                </div>
+            </header>
+
+            <div className="flex-1 overflow-y-auto">
+                <div className="p-2 space-y-1">
+
+                    {/* Selected DM */}
+                    <div
+                        className="flex items-center gap-3 p-3 rounded-xl bg-white/10 border border-white/10 cursor-pointer relative overflow-hidden group">
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-accent-cyan"></div>
+                        <div className="relative">
+                            <div
+                                className="w-12 h-12 rounded-full bg-base-200 border-2 border-accent-cyan flex items-center justify-center shadow-[0_0_10px_rgba(34,211,238,0.3)]">
+                                <i className="fas fa-chart-pie text-accent-cyan text-sm"></i>
+                            </div>
+                            <div
+                                className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 border-2 border-[#151525] rounded-full">
+                            </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <div className="flex justify-between items-baseline mb-1">
+                                <h3 className="text-sm font-bold text-white truncate">데이터분석가</h3>
+                                <span className="text-[10px] text-white/40">10:42 AM</span>
+                            </div>
+                            <p className="text-xs text-white/60 truncate">네, 이전 분기 비교 데이터를 차트로 정리했습니다.</p>
+                        </div>
+                    </div>
+
+                    {/* Unread DM */}
+                    <div
+                        className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 border border-transparent cursor-pointer transition-colors group">
+                        <div className="relative">
+                            <div
+                                className="w-12 h-12 rounded-full bg-base-200 border-2 border-accent-purple flex items-center justify-center">
+                                <i className="fas fa-user-tie text-accent-purple text-sm"></i>
+                            </div>
+                            <div
+                                className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 border-2 border-[#151525] rounded-full">
+                            </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <div className="flex justify-between items-baseline mb-1">
+                                <h3 className="text-sm font-bold text-white truncate">비서실장</h3>
+                                <span className="text-[10px] text-accent-cyan font-medium">9:15 AM</span>
+                            </div>
+                            <p className="text-xs text-white font-medium truncate">오전 데일리 리포트를 요약해 두었습니다.</p>
+                        </div>
+                        <div className="w-2 h-2 rounded-full bg-accent-cyan shrink-0"></div>
+                    </div>
+
+                    {/* Read DM */}
+                    <div
+                        className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 border border-transparent cursor-pointer transition-colors group">
+                        <div className="relative">
+                            <div
+                                className="w-12 h-12 rounded-full bg-base-200 border border-white/20 flex items-center justify-center">
+                                <i className="fas fa-pen-nib text-white/60 text-sm"></i>
+                            </div>
+                            <div
+                                className="absolute -bottom-1 -right-1 w-3 h-3 bg-white/20 border-2 border-[#151525] rounded-full">
+                            </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <div className="flex justify-between items-baseline mb-1">
+                                <h3 className="text-sm font-medium text-white/80 truncate">정작가</h3>
+                                <span className="text-[10px] text-white/30">어제</span>
+                            </div>
+                            <p className="text-xs text-white/40 truncate">초안 작성 완료했습니다. 확인 부탁드립니다.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        {/* Right Panel: Chat Interface */}
+        <section className="flex-1 flex flex-col relative bg-[#0a0a0f]">
+
+            {/* Target Agent Header */}
+            <header
+                className="p-4 border-b border-white/5 bg-[#0a0a0f]/80 backdrop-blur-xl shrink-0 flex justify-between items-center z-20">
+                <div className="flex items-center gap-3">
+                    <div
+                        className="w-10 h-10 rounded-full bg-base-200 border-2 border-accent-cyan flex flex-col items-center justify-center shadow-[0_0_10px_rgba(34,211,238,0.3)]">
+                        <i className="fas fa-chart-pie text-accent-cyan text-xs"></i>
+                    </div>
+                    <div>
+                        <h2 className="text-base font-bold text-white flex items-center gap-2">
+                            데이터분석가
+                            <span
+                                className="bg-blue-400/20 text-blue-400 text-[10px] px-1.5 py-0.5 rounded border border-blue-400/30">Specialist</span>
+                        </h2>
+                        <div className="text-xs text-green-400 flex items-center gap-1.5">
+                            <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div> 7ms 응답 지연 (Online)
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex gap-2">
+                    <button className="btn-icon" title="에이전트 정보"><i className="fas fa-info-circle"></i></button>
+                    <button className="btn-icon" title="설정"><i className="fas fa-cog"></i></button>
+                </div>
+            </header>
+
+            {/* Chat History (API: GET /api/workspace/messenger/conversations/:id/messages) */}
+            <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
+
+                {/* Date separator */}
+                <div className="flex justify-center my-6">
+                    <span
+                        className="text-[10px] text-white/30 font-mono bg-white/5 px-3 py-1 rounded-full border border-white/5 uppercase tracking-widest">Today</span>
+                </div>
+
+                {/* User Message */}
+                <div className="flex flex-col items-end gap-1">
+                    <div className="bubble-user p-4 max-w-[80%] md:max-w-[70%] text-[15px] font-light shadow-lg">
+                        이번 3분기 지역별 매출 데이터 취합했어? 유럽 지역 쪽에 집중해서 리포트 포맷으로 보여줘.
+                    </div>
+                    <div className="text-[10px] text-white/30 mr-1">10:40 AM</div>
+                </div>
+
+                {/* Agent Message (Thinking process) */}
+                <div className="flex flex-col items-start gap-1">
+                    <div className="flex items-center gap-2 ml-1 text-xs text-white/40 mb-1">
+                        <i className="fas fa-cog fa-spin"></i> 데이터베이스 쿼링 및 분석 중...
+                    </div>
+                </div>
+
+                {/* Agent Message (Result) */}
+                <div className="flex flex-col items-start gap-1">
+                    <div className="flex items-end gap-3 max-w-[85%]">
+                        <div
+                            className="w-8 h-8 rounded-full bg-base-200 border border-accent-cyan flex items-center justify-center shrink-0 mb-1">
+                            <i className="fas fa-chart-pie text-accent-cyan text-[10px]"></i>
+                        </div>
+                        <div className="bubble-agent p-5 text-[15px] font-light shadow-lg leading-relaxed">
+                            네, 이전 분기(Q2) 비교 데이터를 포함하여 리포트를 정리했습니다.
+                            <br /><br />
+                            🇪🇺 <strong>유럽 지역 분석 요약</strong><br />
+                            - 전체 매출: $1.2M (전 분기 대비 <span className="text-red-400">▼12%</span>)<br />
+                            - 주요 원인: 영국 지사의 B2B 엔터프라이즈 라이센스 갱신 지연 (3건, 약 $150k 규모)<br />
+                            - 반면, 독일 지역의 신규 SMB 고객 획득은 전 분기 대비 8% 상승했습니다.
+                            <br /><br />
+
+                            {/* Embedded Chart/Data Table Mock */}
+                            <div className="mt-4 bg-black/40 border border-white/10 rounded-lg p-3">
+                                <div className="flex justify-between items-center mb-2">
+                                    <span className="text-xs font-mono text-white/50">data_export_eu.csv</span>
+                                    <button className="text-accent-cyan text-[10px] hover:underline">RAW 데이터 보기</button>
+                                </div>
+                                {/* Minimal bar chart representation */}
+                                <div className="space-y-2 mt-3">
+                                    <div className="flex items-center gap-2 text-xs">
+                                        <span className="w-6 text-white/50">Q2</span>
+                                        <div className="h-1.5 bg-blue-500/50 rounded-full w-full"></div>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-xs">
+                                        <span className="w-6 text-white/50">Q3</span>
+                                        <div className="h-1.5 bg-red-400/50 rounded-full w-4/5"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <br />
+                            이 하락 원인에 대하여 마케팅 캠페인 데이터와 교차 분석을 추가로 진행할까요?
+                        </div>
+                    </div>
+                    <div className="text-[10px] text-white/30 ml-12 mt-1">10:42 AM</div>
+                </div>
+
+            </div>
+
+            {/* Input Area (API: POST /api/workspace/messenger/conversations/:id/messages) */}
+            <div className="p-6 bg-gradient-to-t from-[#0a0a0f] to-transparent z-20 shrink-0">
+                <div
+                    className="glass-panel p-2 flex items-end shadow-2xl bg-[#151525]/90 backdrop-blur-xl border-accent-cyan/20">
+                    <button className="btn-icon mb-1.5 ml-1.5 !text-white/40 hover:!text-white" title="파일 첨부 (데이터 소스)"><i
+                            className="fas fa-paperclip text-lg"></i></button>
+
+                    <textarea
+                        className="flex-1 bg-transparent border-none text-white px-4 py-3.5 resize-none focus:outline-none min-h-[56px] font-light placeholder-white/30 text-sm"
+                        placeholder="메시지를 입력하세요 (Shift + Enter로 줄바꿈)..." rows="1"></textarea>
+
+                    <button
+                        className="bg-gradient-accent text-white w-11 h-11 rounded-lg flex items-center justify-center hover:opacity-90 transition-opacity ml-2 mb-1.5 mr-1.5 shadow-[0_0_15px_rgba(34,211,238,0.3)]">
+                        <i className="fas fa-paper-plane text-sm"></i>
+                    </button>
+                </div>
+                <div className="text-center mt-2 text-[10px] text-white/30 font-mono">
+                    <i className="fas fa-lock mr-1"></i> End-to-end encrypted with Agent Trust Protocol
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+    </>
+  );
+}
+
+export default Messenger;
