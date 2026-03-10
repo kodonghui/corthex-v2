@@ -1,7 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { Card, Skeleton } from '@corthex/ui'
 import { api } from '../lib/api'
 import type { DashboardBudget } from '@corthex/shared'
 
@@ -92,11 +91,13 @@ function PeriodSelector({
         <button
           key={p}
           onClick={() => onPeriodChange(p)}
-          className={`px-3 py-1.5 text-xs rounded-lg transition-colors ${
+          className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
             period === p
-              ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 font-medium'
-              : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+              ? 'bg-blue-600/20 text-blue-400'
+              : 'text-slate-400 hover:bg-slate-700'
           }`}
+          aria-pressed={period === p}
+          data-testid={`period-${p}`}
         >
           {p === '7d' ? '7일' : p === '30d' ? '30일' : '직접 설정'}
         </button>
@@ -107,14 +108,14 @@ function PeriodSelector({
             type="date"
             value={customStart}
             onChange={(e) => onCustomStartChange(e.target.value)}
-            className="px-2 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100"
+            className="px-2 py-1.5 text-xs rounded-lg border border-slate-600 bg-slate-800 text-slate-200 outline-none focus:border-blue-500"
           />
-          <span className="text-zinc-400 text-xs">~</span>
+          <span className="text-slate-500 text-xs">~</span>
           <input
             type="date"
             value={customEnd}
             onChange={(e) => onCustomEndChange(e.target.value)}
-            className="px-2 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100"
+            className="px-2 py-1.5 text-xs rounded-lg border border-slate-600 bg-slate-800 text-slate-200 outline-none focus:border-blue-500"
           />
         </div>
       )}
@@ -132,9 +133,11 @@ function BudgetWarningBanner({ budget }: { budget: DashboardBudget }) {
     <div
       className={`px-4 py-3 rounded-xl text-sm font-medium ${
         isExceeded
-          ? 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800'
-          : 'bg-yellow-50 dark:bg-yellow-950/30 text-yellow-700 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-800'
+          ? 'bg-red-500/10 text-red-400 border border-red-500/30'
+          : 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
       }`}
+      role="alert"
+      data-testid="budget-warning"
     >
       {isExceeded
         ? `예산 초과! 현재 ${budget.usagePercent.toFixed(0)}% 사용 — 자동 차단이 활성화될 수 있습니다`
@@ -156,7 +159,6 @@ function CostOverviewSection({
   const providerCosts = useMemo(() => {
     const map: Record<string, number> = {}
     for (const m of costData.byModel) {
-      // Extract provider from model name
       const provider = m.model.startsWith('claude')
         ? 'anthropic'
         : m.model.startsWith('gpt') || m.model.startsWith('o1') || m.model.startsWith('o3') || m.model.startsWith('o4')
@@ -177,7 +179,7 @@ function CostOverviewSection({
   // Build donut gradient
   const donutGradient = useMemo(() => {
     if (providerCosts.length === 0 || totalCost <= 0) {
-      return 'conic-gradient(#D4D4D8 0deg 360deg)'
+      return 'conic-gradient(#334155 0deg 360deg)'
     }
     let currentAngle = 0
     const segments: string[] = []
@@ -187,7 +189,6 @@ function CostOverviewSection({
       segments.push(`${color} ${currentAngle}deg ${currentAngle + pct}deg`)
       currentAngle += pct
     }
-    // Fill remaining with gray if rounding leaves gaps
     if (currentAngle < 360) {
       const lastColor = PROVIDER_COLORS[providerCosts[providerCosts.length - 1][0]] ?? '#9CA3AF'
       segments.push(`${lastColor} ${currentAngle}deg 360deg`)
@@ -196,91 +197,75 @@ function CostOverviewSection({
   }, [providerCosts, totalCost])
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4" data-testid="cost-summary">
       {/* Total Cost */}
-      <Card>
-        <div className="px-5 py-4">
-          <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wide mb-2">
-            총 비용
-          </p>
-          <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
-            ${totalCost.toFixed(2)}
-          </p>
-          <p className="text-xs text-zinc-500 mt-1">
-            최근 {costData.days}일 합계
-          </p>
-        </div>
-      </Card>
+      <div className="bg-slate-800/50 border border-slate-700 rounded-xl px-5 py-4">
+        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">총 비용</p>
+        <p className="text-3xl font-bold text-slate-50">${totalCost.toFixed(2)}</p>
+        <p className="text-xs text-slate-500 mt-1">최근 {costData.days}일 합계</p>
+      </div>
 
       {/* Budget Usage */}
-      <Card>
-        <div className="px-5 py-4">
-          <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wide mb-2">
-            예산 사용률
-          </p>
-          <p className={`text-3xl font-bold ${
-            usagePercent >= 100
-              ? 'text-red-500'
-              : usagePercent >= 80
-                ? 'text-yellow-500'
-                : 'text-emerald-500'
-          }`}>
-            {usagePercent.toFixed(0)}%
-          </p>
-          <p className="text-xs text-zinc-500 mt-1">
-            {budget
-              ? `$${budget.currentMonthSpendUsd.toFixed(2)} / $${budget.monthlyBudgetUsd.toFixed(0)}`
-              : '예산 미설정'}
-          </p>
-        </div>
-      </Card>
+      <div className="bg-slate-800/50 border border-slate-700 rounded-xl px-5 py-4">
+        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">예산 사용률</p>
+        <p className={`text-3xl font-bold ${
+          usagePercent >= 100
+            ? 'text-red-500'
+            : usagePercent >= 80
+              ? 'text-amber-400'
+              : 'text-emerald-400'
+        }`}>
+          {usagePercent.toFixed(0)}%
+        </p>
+        <p className="text-xs text-slate-500 mt-1">
+          {budget
+            ? `$${budget.currentMonthSpendUsd.toFixed(2)} / $${budget.monthlyBudgetUsd.toFixed(0)}`
+            : '예산 미설정'}
+        </p>
+      </div>
 
       {/* Provider Donut */}
-      <Card>
-        <div className="px-5 py-4">
-          <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wide mb-3">
-            프로바이더별 비용
-          </p>
-          <div className="flex items-center gap-4">
-            {/* Donut */}
-            <div className="relative w-20 h-20 flex-shrink-0">
-              <div
-                className="w-full h-full rounded-full"
-                style={{ background: donutGradient }}
-                role="img"
-                aria-label="프로바이더별 비용 비율"
-              />
-              <div className="absolute inset-2.5 rounded-full bg-white dark:bg-zinc-900 flex items-center justify-center">
-                <span className="text-[10px] font-bold text-zinc-700 dark:text-zinc-300">
-                  ${totalCost.toFixed(0)}
-                </span>
-              </div>
-            </div>
-            {/* Legend */}
-            <div className="flex-1 space-y-1.5">
-              {providerCosts.map(([provider, cost]) => (
-                <div key={provider} className="flex items-center justify-between text-xs">
-                  <span className="flex items-center gap-1.5">
-                    <span
-                      className="w-2 h-2 rounded-sm inline-block"
-                      style={{ backgroundColor: PROVIDER_COLORS[provider] ?? '#9CA3AF' }}
-                    />
-                    <span className="text-zinc-600 dark:text-zinc-400">
-                      {PROVIDER_LABELS[provider] ?? provider}
-                    </span>
-                  </span>
-                  <span className="font-medium text-zinc-900 dark:text-zinc-100">
-                    ${cost.toFixed(2)}
-                  </span>
-                </div>
-              ))}
-              {providerCosts.length === 0 && (
-                <span className="text-zinc-400 text-xs">데이터 없음</span>
-              )}
+      <div className="bg-slate-800/50 border border-slate-700 rounded-xl px-5 py-4">
+        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">프로바이더별 비용</p>
+        <div className="flex items-center gap-4">
+          {/* Donut */}
+          <div className="relative w-20 h-20 flex-shrink-0">
+            <div
+              className="w-full h-full rounded-full"
+              style={{ background: donutGradient }}
+              role="img"
+              aria-label="프로바이더별 비용 비율"
+            />
+            <div className="absolute inset-2.5 rounded-full bg-slate-800 flex items-center justify-center">
+              <span className="text-[10px] font-bold text-slate-200">
+                ${totalCost.toFixed(0)}
+              </span>
             </div>
           </div>
+          {/* Legend */}
+          <div className="flex-1 space-y-1.5">
+            {providerCosts.map(([provider, cost]) => (
+              <div key={provider} className="flex items-center justify-between text-xs">
+                <span className="flex items-center gap-1.5">
+                  <span
+                    className="w-2 h-2 rounded-sm inline-block"
+                    style={{ backgroundColor: PROVIDER_COLORS[provider] ?? '#9CA3AF' }}
+                  />
+                  <span className="text-slate-400">
+                    {PROVIDER_LABELS[provider] ?? provider}
+                  </span>
+                </span>
+                <span className="font-medium text-slate-200">
+                  ${cost.toFixed(2)}
+                </span>
+              </div>
+            ))}
+            {providerCosts.length === 0 && (
+              <span className="text-slate-500 text-xs">데이터 없음</span>
+            )}
+          </div>
         </div>
-      </Card>
+      </div>
     </div>
   )
 }
@@ -299,52 +284,48 @@ function TopAgentsSection({ agents }: { agents: { agentId: string; agentName: st
   const maxCost = sorted[0]?.costUsd ?? 1
 
   return (
-    <Card>
-      <div className="px-5 py-4">
-        <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-3">
-          에이전트별 비용 순위
-        </h3>
-        {display.length === 0 ? (
-          <div className="h-24 flex items-center justify-center text-sm text-zinc-400">
-            데이터가 없습니다
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {display.map((agent, i) => {
-              const barWidth = maxCost > 0 ? (agent.costUsd / maxCost) * 100 : 0
-              return (
-                <div key={agent.agentId} className="flex items-center gap-3">
-                  <span className="text-xs text-zinc-400 w-5 text-right font-mono">{i + 1}</span>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-0.5">
-                      <span className="text-sm text-zinc-900 dark:text-zinc-100 truncate">{agent.agentName}</span>
-                      <span className="text-xs font-mono text-zinc-700 dark:text-zinc-300 ml-2 flex-shrink-0">
-                        ${agent.costUsd.toFixed(2)}
-                      </span>
-                    </div>
-                    <div className="h-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-indigo-500 dark:bg-indigo-400 transition-all"
-                        style={{ width: `${barWidth}%` }}
-                      />
-                    </div>
-                    <span className="text-[10px] text-zinc-400">{formatNumber(agent.count)} 호출</span>
+    <div className="bg-slate-800/50 border border-slate-700 rounded-xl px-5 py-4" data-testid="top-agents">
+      <h3 className="text-sm font-semibold text-slate-300 mb-3">에이전트별 비용 순위</h3>
+      {display.length === 0 ? (
+        <div className="h-24 flex items-center justify-center text-sm text-slate-500">
+          데이터가 없습니다
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {display.map((agent, i) => {
+            const barWidth = maxCost > 0 ? (agent.costUsd / maxCost) * 100 : 0
+            return (
+              <div key={agent.agentId} className="flex items-center gap-3">
+                <span className="text-xs text-slate-500 w-5 text-right font-mono">{i + 1}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-0.5">
+                    <span className="text-sm text-slate-100 truncate">{agent.agentName}</span>
+                    <span className="text-xs font-mono text-slate-300 ml-2 flex-shrink-0">
+                      ${agent.costUsd.toFixed(2)}
+                    </span>
                   </div>
+                  <div className="h-1.5 rounded-full bg-slate-700 overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-blue-500 transition-all"
+                      style={{ width: `${barWidth}%` }}
+                    />
+                  </div>
+                  <span className="text-[10px] text-slate-500">{formatNumber(agent.count)} 호출</span>
                 </div>
-              )
-            })}
-          </div>
-        )}
-        {sorted.length > 10 && (
-          <button
-            onClick={() => setShowAll((v) => !v)}
-            className="mt-3 text-xs text-indigo-600 dark:text-indigo-400 hover:underline"
-          >
-            {showAll ? '접기' : `더보기 (${sorted.length - 10}개)`}
-          </button>
-        )}
-      </div>
-    </Card>
+              </div>
+            )
+          })}
+        </div>
+      )}
+      {sorted.length > 10 && (
+        <button
+          onClick={() => setShowAll((v) => !v)}
+          className="mt-3 text-xs text-blue-400 hover:text-blue-300 hover:underline"
+        >
+          {showAll ? '접기' : `더보기 (${sorted.length - 10}개)`}
+        </button>
+      )}
+    </div>
   )
 }
 
@@ -369,44 +350,40 @@ function DailyCostChart({
   const maxCost = Math.max(...items.map((d) => d.costMicro), 1)
 
   return (
-    <Card>
-      <div className="px-5 py-4">
-        <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-4">
-          일일 비용 추이
-        </h3>
+    <div className="bg-slate-800/50 border border-slate-700 rounded-xl px-5 py-4" data-testid="daily-chart">
+      <h3 className="text-sm font-semibold text-slate-300 mb-4">일일 비용 추이</h3>
 
-        {isLoading ? (
-          <Skeleton className="h-40 w-full" />
-        ) : items.length === 0 ? (
-          <div className="h-40 flex items-center justify-center text-sm text-zinc-400">
-            데이터가 없습니다
-          </div>
-        ) : (
-          <div className="flex items-end gap-[2px] h-40">
-            {items.map((d) => {
-              const pct = (d.costMicro / maxCost) * 100
-              return (
+      {isLoading ? (
+        <div className="h-40 w-full bg-slate-700/50 rounded animate-pulse" />
+      ) : items.length === 0 ? (
+        <div className="h-40 flex items-center justify-center text-sm text-slate-500">
+          데이터가 없습니다
+        </div>
+      ) : (
+        <div className="flex items-end gap-[2px] h-40">
+          {items.map((d) => {
+            const pct = (d.costMicro / maxCost) * 100
+            return (
+              <div
+                key={d.date}
+                className="flex-1 flex flex-col items-center justify-end h-full min-w-0 group relative"
+              >
                 <div
-                  key={d.date}
-                  className="flex-1 flex flex-col items-center justify-end h-full min-w-0 group relative"
-                >
-                  <div
-                    className="w-full bg-indigo-500 dark:bg-indigo-400 rounded-t transition-all hover:bg-indigo-600 dark:hover:bg-indigo-300 min-h-[2px]"
-                    style={{ height: `${Math.max(pct, 1)}%` }}
-                  />
-                  <span className="text-[8px] text-zinc-400 mt-1 truncate w-full text-center">
-                    {d.date.slice(5)}
-                  </span>
-                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-zinc-800 text-white text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap z-10">
-                    ${microToUsd(d.costMicro)}
-                  </div>
+                  className="w-full bg-blue-500 rounded-t transition-all hover:bg-blue-400 min-h-[2px]"
+                  style={{ height: `${Math.max(pct, 1)}%` }}
+                />
+                <span className="text-[8px] text-slate-500 mt-1 truncate w-full text-center">
+                  {d.date.slice(5)}
+                </span>
+                <div className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-700 text-slate-100 text-[10px] px-2 py-1 rounded-lg whitespace-nowrap z-10 shadow-lg">
+                  ${microToUsd(d.costMicro)}
                 </div>
-              )
-            })}
-          </div>
-        )}
-      </div>
-    </Card>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -414,30 +391,26 @@ function DailyCostChart({
 
 function CostsSkeleton() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="costs-loading">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[1, 2, 3].map((i) => (
-          <Card key={i}>
-            <div className="px-5 py-4 space-y-2">
-              <Skeleton className="h-3 w-20" />
-              <Skeleton className="h-8 w-24" />
-              <Skeleton className="h-3 w-32" />
-            </div>
-          </Card>
+          <div key={i} className="bg-slate-800/50 border border-slate-700 rounded-xl px-5 py-4 space-y-2">
+            <div className="h-3 w-20 bg-slate-700 rounded animate-pulse" />
+            <div className="h-8 w-24 bg-slate-700 rounded animate-pulse" />
+            <div className="h-3 w-32 bg-slate-700 rounded animate-pulse" />
+          </div>
         ))}
       </div>
-      <Card>
-        <div className="px-5 py-4">
-          <Skeleton className="h-4 w-40 mb-3" />
-          <Skeleton className="h-40 w-full" />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-slate-800/50 border border-slate-700 rounded-xl px-5 py-4">
+          <div className="h-4 w-40 bg-slate-700 rounded animate-pulse mb-3" />
+          <div className="h-40 w-full bg-slate-700 rounded animate-pulse" />
         </div>
-      </Card>
-      <Card>
-        <div className="px-5 py-4">
-          <Skeleton className="h-4 w-40 mb-3" />
-          <Skeleton className="h-32 w-full" />
+        <div className="bg-slate-800/50 border border-slate-700 rounded-xl px-5 py-4">
+          <div className="h-4 w-40 bg-slate-700 rounded animate-pulse mb-3" />
+          <div className="h-40 w-full bg-slate-700 rounded animate-pulse" />
         </div>
-      </Card>
+      </div>
     </div>
   )
 }
@@ -456,7 +429,6 @@ export function CostsPage() {
     return getDatesForDays(days)
   }, [period, days, customStart, customEnd])
 
-  // Calculate effective days for the costs endpoint (which only accepts ?days=N)
   const effectiveDays = useMemo(() => {
     if (period !== 'custom') return days
     const diff = Math.ceil(
@@ -465,7 +437,6 @@ export function CostsPage() {
     return Math.max(diff, 1)
   }, [period, days, customStart, customEnd])
 
-  // Cost overview (uses days-based endpoint)
   const { data: costRes, isLoading: costLoading } = useQuery({
     queryKey: ['costs-overview', effectiveDays, period === 'custom' ? `${startDate}-${endDate}` : ''],
     queryFn: () =>
@@ -474,13 +445,11 @@ export function CostsPage() {
       ),
   })
 
-  // Budget
   const { data: budgetRes, isLoading: budgetLoading } = useQuery({
     queryKey: ['costs-budget'],
     queryFn: () => api.get<{ data: DashboardBudget }>('/workspace/dashboard/budget'),
   })
 
-  // Agent breakdown (workspace-scoped with date range)
   const { data: agentRes } = useQuery({
     queryKey: ['costs-by-agent-ceo', startDate, endDate],
     queryFn: () =>
@@ -493,7 +462,6 @@ export function CostsPage() {
   const budget = budgetRes?.data
   const agentItems = agentRes?.data?.items ?? []
 
-  // Convert agent microdollars to USD for display
   const agentsByUsd = useMemo(
     () =>
       agentItems.map((a) => ({
@@ -513,20 +481,22 @@ export function CostsPage() {
   }, [])
 
   return (
-    <div className="h-full overflow-y-auto">
+    <div className="h-full overflow-y-auto bg-slate-900" data-testid="costs-page">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between flex-wrap gap-3">
+      <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate('/dashboard')}
-            className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
+            className="text-slate-400 hover:text-slate-200 transition-colors"
             aria-label="대시보드로 돌아가기"
           >
-            &larr;
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
           </button>
           <div>
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">비용 분석</h2>
-            <p className="text-xs text-zinc-500 mt-0.5">AI 운영 비용을 상세하게 분석합니다</p>
+            <h2 className="text-lg font-semibold text-slate-50">비용 분석</h2>
+            <p className="text-xs text-slate-500 mt-0.5">AI 운영 비용을 상세하게 분석합니다</p>
           </div>
         </div>
         <PeriodSelector
@@ -543,25 +513,26 @@ export function CostsPage() {
         {isLoading && !costData ? (
           <CostsSkeleton />
         ) : !costData ? (
-          <div className="text-center py-12 text-sm text-zinc-500">
-            데이터를 불러올 수 없습니다
+          <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="costs-empty">
+            <svg className="w-10 h-10 text-slate-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <h3 className="text-base font-medium text-slate-300 mb-2">데이터가 없습니다</h3>
+            <p className="text-sm text-slate-500">선택한 기간에 해당하는 비용 데이터가 없습니다</p>
           </div>
         ) : (
           <>
             {/* Budget Warning Banner */}
             {budget && <BudgetWarningBanner budget={budget} />}
 
-            {/* Cost Overview: total, budget %, provider donut */}
+            {/* Cost Overview */}
             <CostOverviewSection costData={costData} budget={budget} />
 
             {/* Two-column: Agents + Daily Chart */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Top Agents */}
               <TopAgentsSection
                 agents={agentsByUsd.length > 0 ? agentsByUsd : costData.byAgent}
               />
-
-              {/* Daily Cost Trend */}
               <DailyCostChart startDate={startDate} endDate={endDate} />
             </div>
           </>

@@ -91,11 +91,11 @@ function formatFileSize(bytes: number) {
 }
 
 function getFileIcon(mimeType: string) {
-  if (mimeType === 'application/pdf') return { icon: '📄', color: 'text-red-500' }
+  if (mimeType === 'application/pdf') return { icon: '📄', color: 'text-red-400' }
   if (mimeType.includes('spreadsheet') || mimeType.includes('excel')) return { icon: '📊', color: 'text-green-500' }
   if (mimeType.includes('word') || mimeType === 'application/msword') return { icon: '📝', color: 'text-blue-500' }
-  if (mimeType === 'application/zip') return { icon: '📦', color: 'text-zinc-500' }
-  return { icon: '📎', color: 'text-zinc-400' }
+  if (mimeType === 'application/zip') return { icon: '📦', color: 'text-slate-500' }
+  return { icon: '📎', color: 'text-slate-400' }
 }
 
 function AttachmentRenderer({ attachments }: { attachments: FileAttachment[] }) {
@@ -123,14 +123,14 @@ function AttachmentRenderer({ attachments }: { attachments: FileAttachment[] }) 
             href={`/api/workspace/files/${file.id}/download`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 border border-zinc-700 rounded-lg p-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 max-w-64"
+            className="flex items-center gap-3 border border-slate-700 rounded-lg p-3 hover:bg-slate-800 max-w-64"
           >
             <span className={`text-xl ${color}`}>{icon}</span>
             <div className="min-w-0 flex-1">
               <p className="text-sm truncate">{file.filename}</p>
-              <p className="text-xs text-zinc-400">{formatFileSize(file.sizeBytes)}</p>
+              <p className="text-xs text-slate-400">{formatFileSize(file.sizeBytes)}</p>
             </div>
-            <span className="text-zinc-400 text-sm shrink-0">↓</span>
+            <span className="text-slate-400 text-sm shrink-0">↓</span>
           </a>
         )
       })}
@@ -259,57 +259,57 @@ function ChannelSettingsModal({
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
       <div
-        className="bg-white dark:bg-zinc-900 rounded-lg w-full max-w-md max-h-[80vh] md:max-h-[80vh] h-full md:h-auto overflow-y-auto shadow-xl"
+        className="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-md max-h-[80vh] md:max-h-[80vh] h-full md:h-auto overflow-y-auto shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="px-4 py-3 border-b border-zinc-200 dark:border-zinc-700 flex items-center justify-between">
+        <div className="px-4 py-3 border-b border-slate-700 flex items-center justify-between">
           <h3 className="font-semibold">채널 설정</h3>
-          <button onClick={onClose} className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300">
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-200">
             ✕
           </button>
         </div>
 
         <div className="p-4 space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-600 dark:text-zinc-400">채널 이름</label>
+            <label className="text-sm font-medium text-slate-400">채널 이름</label>
             <input
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
-              className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm"
+              className="w-full px-3 py-2 border border-slate-600 rounded-lg bg-slate-800 text-sm"
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-600 dark:text-zinc-400">설명</label>
+            <label className="text-sm font-medium text-slate-400">설명</label>
             <input
               value={editDesc}
               onChange={(e) => setEditDesc(e.target.value)}
               placeholder="채널 설명 (선택)"
-              className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm"
+              className="w-full px-3 py-2 border border-slate-600 rounded-lg bg-slate-800 text-sm"
             />
           </div>
           <button
             onClick={handleSave}
             disabled={updateChannel.isPending || (editName === detail?.name && editDesc === (detail?.description || ''))}
-            className="w-full px-3 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 disabled:opacity-50"
+            className="w-full px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-500 disabled:opacity-50"
           >
             {updateChannel.isPending ? '저장 중...' : '저장'}
           </button>
 
-          <div className="border-t border-zinc-200 dark:border-zinc-700 pt-4">
-            <h4 className="text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-2">
+          <div className="border-t border-slate-700 pt-4">
+            <h4 className="text-sm font-medium text-slate-400 mb-2">
               멤버 ({members.length}명)
             </h4>
             <div className="space-y-1 max-h-32 overflow-y-auto">
               {members.map((m) => (
-                <div key={m.id} className="flex items-center justify-between py-1 px-2 rounded hover:bg-zinc-50 dark:hover:bg-zinc-800">
+                <div key={m.id} className="flex items-center justify-between py-1 px-2 rounded hover:bg-slate-700">
                   <span className="text-sm">
-                    <span className={onlineUserIds.has(m.id) ? 'text-emerald-500' : 'text-zinc-400'}>{onlineUserIds.has(m.id) ? '●' : '○'}</span>
-                    {' '}{m.name} <span className="text-xs text-zinc-500">({m.role})</span>
+                    <span className={onlineUserIds.has(m.id) ? 'text-emerald-400' : 'text-slate-400'}>{onlineUserIds.has(m.id) ? '●' : '○'}</span>
+                    {' '}{m.name} <span className="text-xs text-slate-500">({m.role})</span>
                   </span>
                   {m.id !== userId && (
                     <button
                       onClick={() => removeMember.mutate(m.id)}
-                      className="text-xs text-red-500 hover:text-red-700"
+                      className="text-xs text-red-400 hover:text-red-300"
                     >
                       제거
                     </button>
@@ -323,17 +323,17 @@ function ChannelSettingsModal({
                 value={memberSearch}
                 onChange={(e) => setMemberSearch(e.target.value)}
                 placeholder="유저 검색하여 추가..."
-                className="w-full px-3 py-1.5 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm"
+                className="w-full px-3 py-1.5 border border-slate-600 rounded-lg bg-slate-800 text-sm"
               />
               {memberSearch && filteredUsers.length > 0 && (
-                <div className="mt-1 max-h-24 overflow-y-auto border border-zinc-200 dark:border-zinc-700 rounded-md">
+                <div className="mt-1 max-h-24 overflow-y-auto border border-slate-700 rounded-md">
                   {filteredUsers.map((u) => (
                     <button
                       key={u.id}
                       onClick={() => { addMember.mutate(u.id); setMemberSearch('') }}
-                      className="w-full text-left px-3 py-1.5 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                      className="w-full text-left px-3 py-1.5 text-sm hover:bg-slate-700"
                     >
-                      {u.name} <span className="text-xs text-zinc-500">({u.role})</span>
+                      {u.name} <span className="text-xs text-slate-500">({u.role})</span>
                     </button>
                   ))}
                 </div>
@@ -341,11 +341,11 @@ function ChannelSettingsModal({
             </div>
           </div>
 
-          <div className="border-t border-zinc-200 dark:border-zinc-700 pt-4 space-y-2">
+          <div className="border-t border-slate-700 pt-4 space-y-2">
             <button
               onClick={handleLeave}
               disabled={leaveChannel.isPending}
-              className="w-full px-3 py-2 border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 text-sm rounded-md hover:bg-red-50 dark:hover:bg-red-950 disabled:opacity-50"
+              className="w-full px-3 py-2 border border-amber-500/50 text-amber-400 text-sm rounded-lg hover:bg-amber-500/10 disabled:opacity-50"
             >
               채널 나가기
             </button>
@@ -353,7 +353,7 @@ function ChannelSettingsModal({
               <button
                 onClick={handleDelete}
                 disabled={deleteChannel.isPending}
-                className="w-full px-3 py-2 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 disabled:opacity-50"
+                className="w-full px-3 py-2 bg-red-600 hover:bg-red-500 text-white text-sm rounded-lg disabled:opacity-50"
               >
                 채널 삭제
               </button>
@@ -495,24 +495,24 @@ function ThreadPanel({
   }
 
   return (
-    <div className="fixed inset-0 md:static md:w-80 border-l border-zinc-200 dark:border-zinc-800 flex flex-col bg-white dark:bg-zinc-950 z-40">
-      <div className="px-3 py-2 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+    <div className="fixed inset-0 md:static md:w-80 border-l border-slate-700 flex flex-col bg-slate-900 z-40" data-testid="thread-panel">
+      <div className="px-3 py-2 border-b border-slate-700 flex items-center justify-between">
         <span className="text-sm font-medium">스레드</span>
-        <button onClick={onClose} className="p-2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 text-sm">✕</button>
+        <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-200 text-sm">✕</button>
       </div>
 
       {/* 원본 메시지 */}
-      <div className="px-3 py-2 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900">
-        <p className="text-xs text-zinc-500 mb-0.5">{parentMessage.userName}</p>
+      <div className="px-4 py-3 border-b border-slate-700/50 bg-slate-800/30">
+        <p className="text-xs text-slate-500 mb-0.5">{parentMessage.userName}</p>
         <p className="text-sm">{parentMessage.content}</p>
         {parentMessage.attachments && <AttachmentRenderer attachments={parentMessage.attachments} />}
-        <p className="text-xs text-zinc-400 mt-0.5">{formatTime(parentMessage.createdAt)}</p>
+        <p className="text-xs text-slate-400 mt-0.5">{formatTime(parentMessage.createdAt)}</p>
       </div>
 
       {/* 답글 목록 */}
       <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2">
         {replies.length === 0 && (
-          <p className="text-xs text-zinc-400 text-center mt-4">아직 답글이 없습니다.</p>
+          <p className="text-xs text-slate-400 text-center mt-4">아직 답글이 없습니다.</p>
         )}
         {replies.map((reply) => {
           const isMe = reply.userId === userId
@@ -520,9 +520,9 @@ function ThreadPanel({
             <div key={reply.id} className="group">
               <div className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                 <div className="max-w-[85%]">
-                  {!isMe && <p className="text-xs text-zinc-500 mb-0.5">{reply.userName}</p>}
+                  {!isMe && <p className="text-xs text-slate-500 mb-0.5">{reply.userName}</p>}
                   <div className={`px-2.5 py-1.5 rounded-lg text-sm ${
-                    isMe ? 'bg-indigo-600 text-white' : 'bg-zinc-100 dark:bg-zinc-800'
+                    isMe ? 'bg-blue-600 text-white' : 'bg-slate-800'
                   }`}>
                     {reply.content}
                     {reply.attachments && <AttachmentRenderer attachments={reply.attachments} />}
@@ -536,8 +536,8 @@ function ThreadPanel({
                           onClick={() => toggleReaction(reply.id, r.emoji, r.userIds.includes(userId))}
                           className={`text-xs px-1.5 py-0.5 rounded-full border ${
                             r.userIds.includes(userId)
-                              ? 'border-indigo-400 bg-indigo-50 dark:bg-indigo-950'
-                              : 'border-zinc-200 dark:border-zinc-700'
+                              ? 'border-blue-500/50 bg-blue-600/10'
+                              : 'border-slate-700'
                           }`}
                         >
                           {r.emoji} {r.count}
@@ -545,7 +545,7 @@ function ThreadPanel({
                       ))}
                     </div>
                   )}
-                  <p className="text-xs text-zinc-400 mt-0.5">{formatTime(reply.createdAt)}</p>
+                  <p className="text-xs text-slate-400 mt-0.5">{formatTime(reply.createdAt)}</p>
                 </div>
               </div>
               {/* 호버 시 이모지 추가 */}
@@ -554,7 +554,7 @@ function ThreadPanel({
                   <button
                     key={e}
                     onClick={() => toggleReaction(reply.id, e, reply.reactions?.some((r) => r.emoji === e && r.userIds.includes(userId)) || false)}
-                    className="text-xs hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded px-0.5"
+                    className="text-xs hover:bg-slate-700 rounded px-0.5"
                   >
                     {e}
                   </button>
@@ -567,14 +567,14 @@ function ThreadPanel({
       </div>
 
       {/* 답글 입력 */}
-      <div className="px-3 py-2 border-t border-zinc-200 dark:border-zinc-800">
+      <div className="px-3 py-2 border-t border-slate-700">
         {threadPendingFiles.length > 0 && (
           <div className="mb-1.5 flex flex-wrap gap-1">
             {threadPendingFiles.map((f) => (
-              <div key={f.id} className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 rounded px-2 py-0.5 text-xs">
+              <div key={f.id} className="flex items-center gap-1 bg-slate-800 rounded px-2 py-0.5 text-xs">
                 <span className="truncate max-w-[100px]">{f.filename}</span>
-                <span className="text-zinc-400">{formatFileSize(f.sizeBytes)}</span>
-                <button onClick={() => setThreadPendingFiles((prev) => prev.filter((p) => p.id !== f.id))} className="text-zinc-400 hover:text-red-500">✕</button>
+                <span className="text-slate-400">{formatFileSize(f.sizeBytes)}</span>
+                <button onClick={() => setThreadPendingFiles((prev) => prev.filter((p) => p.id !== f.id))} className="text-slate-400 hover:text-red-400">✕</button>
               </div>
             ))}
           </div>
@@ -584,7 +584,7 @@ function ThreadPanel({
           <button
             onClick={() => threadFileInputRef.current?.click()}
             disabled={threadUploading || threadPendingFiles.length >= 5}
-            className="px-2 py-1.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 disabled:opacity-50"
+            className="px-2 py-1.5 text-slate-400 hover:text-slate-200 disabled:opacity-50"
             title="파일 첨부"
           >
             📎
@@ -598,12 +598,12 @@ function ThreadPanel({
               }
             }}
             placeholder="답글..."
-            className="flex-1 px-2.5 py-1.5 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm"
+            className="flex-1 px-2.5 py-1.5 border border-slate-600 rounded-lg bg-slate-800 text-sm"
           />
           <button
             onClick={handleThreadSend}
             disabled={(!replyText.trim() && threadPendingFiles.length === 0) || sendReply.isPending || threadUploading}
-            className="px-3 py-1.5 bg-indigo-600 text-white text-xs rounded-md hover:bg-indigo-700 disabled:opacity-50"
+            className="px-3 py-1.5 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-500 disabled:opacity-50"
           >
             전송
           </button>
@@ -622,26 +622,28 @@ export function MessengerPage() {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="px-6 py-3 border-b border-zinc-200 dark:border-zinc-800 flex items-center gap-4">
-        <h2 className="text-lg font-semibold">메신저</h2>
-        <div className="flex gap-1 bg-zinc-100 dark:bg-zinc-800 rounded-lg p-0.5">
+    <div className="h-full flex flex-col bg-slate-900" data-testid="messenger-page">
+      <div className="px-6 py-3 border-b border-slate-700 flex items-center gap-4">
+        <h2 className="text-xl font-semibold text-slate-50">메신저</h2>
+        <div className="flex gap-1 bg-slate-800 rounded-lg p-0.5">
           <button
             onClick={() => handleTabChange('channels')}
+            data-testid="messenger-tab-channels"
             className={`px-3 py-1 text-xs rounded-md transition-colors ${
               activeTab === 'channels'
-                ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-sm font-medium'
-                : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+                ? 'bg-slate-700 text-slate-100 shadow-sm font-medium'
+                : 'text-slate-500 hover:text-slate-300'
             }`}
           >
             채널
           </button>
           <button
             onClick={() => handleTabChange('conversations')}
+            data-testid="messenger-tab-conversations"
             className={`px-3 py-1 text-xs rounded-md transition-colors ${
               activeTab === 'conversations'
-                ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-sm font-medium'
-                : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+                ? 'bg-slate-700 text-slate-100 shadow-sm font-medium'
+                : 'text-slate-500 hover:text-slate-300'
             }`}
           >
             대화
@@ -771,6 +773,14 @@ function ChannelsView() {
     enabled: !!selectedChannel,
     refetchInterval: isConnected ? false : 30000,
   })
+
+  // 채널 상세 (멤버 수 표시용)
+  const { data: channelDetailData } = useQuery({
+    queryKey: ['messenger-channel-detail', selectedChannel],
+    queryFn: () => api.get<{ data: ChannelDetail }>(`/workspace/messenger/channels/${selectedChannel}`),
+    enabled: !!selectedChannel,
+  })
+  const channelDetail = channelDetailData?.data
 
   // WebSocket 실시간 메시지 수신
   useEffect(() => {
@@ -1018,47 +1028,48 @@ function ChannelsView() {
 
   return (
     <>
-      <div className="px-4 py-2 border-b border-zinc-200 dark:border-zinc-700 flex items-center justify-between">
-        <span className="text-xs text-zinc-500">채널 기반 메신저</span>
+      <div className="px-4 py-2 border-b border-slate-700 flex items-center justify-between" data-testid="channels-header">
+        <span className="text-xs text-slate-500">채널 기반 메신저</span>
         <button onClick={() => setShowCreate(!showCreate)}
-          className="px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700">
+          className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg"
+          data-testid="create-channel-btn">
           + 채널
         </button>
       </div>
 
       <div className="flex flex-1 min-h-0">
         {/* 채널 목록 (좌) — 모바일: showChat false일 때만 표시 */}
-        <div className={`w-full md:w-64 border-r border-zinc-200 dark:border-zinc-800 overflow-y-auto [-webkit-overflow-scrolling:touch] ${showChat ? 'hidden md:block' : ''}`}>
+        <div className={`w-full md:w-72 border-r border-slate-700 overflow-y-auto [-webkit-overflow-scrolling:touch] ${showChat ? 'hidden md:block' : ''}`} data-testid="channel-sidebar">
           {/* 검색 */}
-          <div ref={searchRef} className="relative p-2 border-b border-zinc-200 dark:border-zinc-700">
-            <div className="flex items-center gap-1.5 px-2 py-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-md">
-              <span className="text-zinc-400 text-sm">🔍</span>
+          <div ref={searchRef} className="relative p-2 border-b border-slate-700">
+            <div className="flex items-center gap-1.5 px-2 py-1.5 bg-slate-800 rounded-md">
+              <span className="text-slate-400 text-sm">🔍</span>
               <input
                 value={searchQuery}
                 onChange={(e) => { setSearchQuery(e.target.value); setShowSearchResults(true) }}
                 onFocus={() => debouncedSearch.length >= 2 && setShowSearchResults(true)}
                 onKeyDown={(e) => e.key === 'Escape' && setShowSearchResults(false)}
                 placeholder="메시지 검색..."
-                className="flex-1 bg-transparent text-sm outline-none placeholder-zinc-400"
+                className="flex-1 bg-transparent text-sm outline-none placeholder-slate-500"
               />
               {searchQuery && (
                 <button onClick={() => { setSearchQuery(''); setShowSearchResults(false) }}
-                  className="text-zinc-400 hover:text-zinc-600 text-xs">✕</button>
+                  className="text-slate-400 hover:text-slate-200 text-xs">✕</button>
               )}
             </div>
             {showSearchResults && searchResults.length > 0 && (
-              <div className="absolute left-2 right-2 top-full mt-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-md shadow-lg max-h-64 overflow-y-auto z-30">
+              <div className="absolute left-2 right-2 top-full mt-1 bg-slate-800 border border-slate-700 rounded-md shadow-lg max-h-64 overflow-y-auto z-30">
                 {searchResults.map((r) => (
                   <button
                     key={r.id}
                     onClick={() => { handleSelectChannel(r.channelId); setShowSearchResults(false); setSearchQuery('') }}
-                    className="w-full text-left px-3 py-2 hover:bg-zinc-50 dark:hover:bg-zinc-800 border-b border-zinc-100 dark:border-zinc-800 last:border-0"
+                    className="w-full text-left px-3 py-2 hover:bg-slate-700 border-b border-slate-700 last:border-0"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-medium text-indigo-500">#{r.channelName}</span>
-                      <span className="text-[10px] text-zinc-400">{formatTime(r.createdAt)}</span>
+                      <span className="text-xs font-medium text-blue-400">#{r.channelName}</span>
+                      <span className="text-[10px] text-slate-400">{formatTime(r.createdAt)}</span>
                     </div>
-                    <p className="text-xs text-zinc-500 mt-0.5">{r.userName}</p>
+                    <p className="text-xs text-slate-500 mt-0.5">{r.userName}</p>
                     <p className="text-sm truncate mt-0.5">
                       {r.content.length > 80 ? r.content.slice(0, 80) + '...' : r.content}
                     </p>
@@ -1067,24 +1078,24 @@ function ChannelsView() {
               </div>
             )}
             {showSearchResults && debouncedSearch.length >= 2 && searchResults.length === 0 && (
-              <div className="absolute left-2 right-2 top-full mt-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-md shadow-lg p-3 z-30">
-                <p className="text-xs text-zinc-400 text-center">검색 결과가 없습니다</p>
+              <div className="absolute left-2 right-2 top-full mt-1 bg-slate-800 border border-slate-700 rounded-md shadow-lg p-3 z-30">
+                <p className="text-xs text-slate-400 text-center">검색 결과가 없습니다</p>
               </div>
             )}
           </div>
           {showCreate && (
-            <div className="p-3 border-b border-zinc-200 dark:border-zinc-700 space-y-2">
+            <div className="p-3 border-b border-slate-700 space-y-2">
               <input value={createForm.name} onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
-                placeholder="채널명" className="w-full px-2 py-1 border border-zinc-300 dark:border-zinc-600 rounded text-sm bg-white dark:bg-zinc-800" />
+                placeholder="채널명" className="w-full px-2 py-1 border border-slate-600 rounded text-sm bg-slate-800" />
               <button onClick={() => createChannel.mutate(createForm)}
                 disabled={!createForm.name || createChannel.isPending}
-                className="w-full px-2 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700 disabled:opacity-50">
+                className="w-full px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-500 disabled:opacity-50">
                 생성
               </button>
             </div>
           )}
           {channels.length === 0 && !showCreate && (
-            <p className="p-3 text-xs text-zinc-500">채널이 없습니다. 새 채널을 만드세요.</p>
+            <p className="p-3 text-xs text-slate-500">채널이 없습니다. 새 채널을 만드세요.</p>
           )}
           {channels.map((ch) => {
             const unread = unreadCounts[ch.id] || 0
@@ -1092,10 +1103,10 @@ function ChannelsView() {
               <button
                 key={ch.id}
                 onClick={() => handleSelectChannel(ch.id)}
-                className={`w-full text-left px-3 py-2.5 text-sm border-b border-zinc-100 dark:border-zinc-800 transition-colors ${
+                className={`w-full text-left px-3 py-2.5 text-sm border-b border-slate-700 transition-colors ${
                   selectedChannel === ch.id
-                    ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300'
-                    : 'hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                    ? 'bg-blue-600/10 text-blue-400 bg-blue-600/10 text-blue-400'
+                    : 'hover:bg-slate-700'
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -1107,16 +1118,16 @@ function ChannelsView() {
                       </span>
                     )}
                     {ch.lastMessage && (
-                      <span className="text-xs text-zinc-400">{formatTime(ch.lastMessage.createdAt)}</span>
+                      <span className="text-xs text-slate-400">{formatTime(ch.lastMessage.createdAt)}</span>
                     )}
                   </div>
                 </div>
                 {ch.lastMessage ? (
-                  <p className="text-xs text-zinc-500 truncate mt-0.5">
+                  <p className="text-xs text-slate-500 truncate mt-0.5">
                     {ch.lastMessage.userName}: {ch.lastMessage.content}
                   </p>
                 ) : ch.description ? (
-                  <p className="text-xs text-zinc-500 truncate mt-0.5">{ch.description}</p>
+                  <p className="text-xs text-slate-500 truncate mt-0.5">{ch.description}</p>
                 ) : null}
               </button>
             )
@@ -1127,26 +1138,30 @@ function ChannelsView() {
         <div className={`flex-1 flex min-w-0 ${showChat ? '' : 'hidden md:flex'}`}>
           <div className="flex-1 flex flex-col min-w-0">
             {!selectedChannel ? (
-              <div className="flex-1 flex items-center justify-center text-zinc-400 text-sm">
+              <div className="flex-1 flex items-center justify-center text-slate-400 text-sm">
                 채널을 선택하세요
               </div>
             ) : (
               <>
                 {/* 채널 헤더 */}
-                <div className="px-4 py-2 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+                <div className="px-4 py-2.5 border-b border-slate-700 flex items-center justify-between shrink-0" data-testid="channel-header">
                   <div className="flex items-center gap-2 min-w-0">
                     <button
                       onClick={() => setShowChat(false)}
-                      className="md:hidden p-2 -ml-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 active:bg-zinc-200 dark:active:bg-zinc-700 text-sm text-zinc-600 dark:text-zinc-400 shrink-0"
+                      className="md:hidden p-2 -ml-2 rounded-lg hover:bg-slate-700 text-sm text-slate-400 shrink-0"
                     >
-                      ← 채널
+                      ←
                     </button>
-                    <span className="font-medium text-sm truncate">{selectedChannelData?.name}</span>
+                    <span className="font-medium text-sm text-slate-100 truncate">{selectedChannelData?.name}</span>
+                    {channelDetail?.memberCount && (
+                      <span className="text-xs text-slate-500 shrink-0">{channelDetail.memberCount}명</span>
+                    )}
                   </div>
                   <button
                     onClick={() => setShowSettings(true)}
-                    className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 text-lg"
+                    className="text-slate-400 hover:text-slate-200 text-lg"
                     title="채널 설정"
+                    data-testid="channel-settings-btn"
                   >
                     ⚙️
                   </button>
@@ -1155,7 +1170,7 @@ function ChannelsView() {
                 {/* 메시지 목록 */}
                 <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 [-webkit-overflow-scrolling:touch]">
                   {messages.length === 0 && (
-                    <p className="text-sm text-zinc-400 text-center mt-8">아직 메시지가 없습니다.</p>
+                    <p className="text-sm text-slate-400 text-center mt-8">아직 메시지가 없습니다.</p>
                   )}
                   {messages.map((msg) => {
                     const isMe = msg.userId === user?.id
@@ -1169,29 +1184,29 @@ function ChannelsView() {
                       >
                         <div className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                           <div className={`max-w-[70%] ${isMe ? 'order-2' : ''}`}>
-                            {!isMe && <p className="text-xs text-zinc-500 mb-0.5">{msg.userName}</p>}
+                            {!isMe && <p className="text-xs font-medium text-slate-400 mb-0.5">{msg.userName}</p>}
                             <div className="relative">
-                              <div className={`px-3 py-2 rounded-lg text-sm ${
+                              <div className={`px-3 py-2 rounded-lg text-sm max-w-[75%] ${
                                 isMe
-                                  ? 'bg-indigo-600 text-white'
-                                  : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
+                                  ? 'bg-blue-600 text-white rounded-br-sm'
+                                  : 'bg-slate-800 text-slate-100 rounded-bl-sm'
                               }`}>
                                 {msg.content}
                                 {msg.attachments && <AttachmentRenderer attachments={msg.attachments} />}
                               </div>
                               {/* 호버 시 액션 바 */}
                               {isHovered && (
-                                <div className={`absolute -top-7 ${isMe ? 'right-0' : 'left-0'} flex gap-0.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-md shadow-sm px-1 py-0.5 z-10`}>
+                                <div className={`absolute -top-7 ${isMe ? 'right-0' : 'left-0'} flex gap-0.5 bg-slate-800 border border-slate-700 rounded-md shadow-sm px-1 py-0.5 z-10`}>
                                   <button
                                     onClick={() => setShowEmojiPicker(showEmojiPicker === msg.id ? null : msg.id)}
-                                    className="text-xs hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded px-1 py-0.5"
+                                    className="text-xs hover:bg-slate-700 rounded px-1 py-0.5"
                                     title="리액션"
                                   >
                                     😀
                                   </button>
                                   <button
                                     onClick={() => setThreadMessage(msg)}
-                                    className="text-xs hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded px-1 py-0.5"
+                                    className="text-xs hover:bg-slate-700 rounded px-1 py-0.5"
                                     title="답글"
                                   >
                                     💬
@@ -1200,12 +1215,12 @@ function ChannelsView() {
                               )}
                               {/* 이모지 피커 */}
                               {showEmojiPicker === msg.id && (
-                                <div className={`absolute -top-14 ${isMe ? 'right-0' : 'left-0'} flex gap-0.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-md shadow-lg px-1.5 py-1 z-20`}>
+                                <div className={`absolute -top-14 ${isMe ? 'right-0' : 'left-0'} flex gap-0.5 bg-slate-800 border border-slate-700 rounded-md shadow-lg px-1.5 py-1 z-20`}>
                                   {EMOJI_LIST.map((e) => (
                                     <button
                                       key={e}
                                       onClick={() => toggleReaction(msg.id, e, msg.reactions?.some((r) => r.emoji === e && r.userIds.includes(user?.id || '')) || false)}
-                                      className="text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded px-1 py-0.5"
+                                      className="text-sm hover:bg-slate-700 rounded px-1 py-0.5"
                                     >
                                       {e}
                                     </button>
@@ -1222,8 +1237,8 @@ function ChannelsView() {
                                     onClick={() => toggleReaction(msg.id, r.emoji, r.userIds.includes(user?.id || ''))}
                                     className={`text-xs px-1.5 py-0.5 rounded-full border ${
                                       r.userIds.includes(user?.id || '')
-                                        ? 'border-indigo-400 bg-indigo-50 dark:bg-indigo-950'
-                                        : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300'
+                                        ? 'border-blue-500/50 bg-blue-600/10'
+                                        : 'border-slate-700 hover:border-slate-600'
                                     }`}
                                   >
                                     {r.emoji} {r.count}
@@ -1235,12 +1250,12 @@ function ChannelsView() {
                             {(msg.replyCount || 0) > 0 && (
                               <button
                                 onClick={() => setThreadMessage(msg)}
-                                className="text-xs text-indigo-500 hover:text-indigo-700 mt-0.5"
+                                className="text-xs text-blue-400 hover:text-blue-400 mt-0.5"
                               >
                                 {msg.replyCount}개 답글
                               </button>
                             )}
-                            <p className="text-xs text-zinc-400 mt-0.5">
+                            <p className="text-xs text-slate-400 mt-0.5">
                               {new Date(msg.createdAt).toLocaleTimeString('ko', { hour: '2-digit', minute: '2-digit' })}
                             </p>
                           </div>
@@ -1249,7 +1264,7 @@ function ChannelsView() {
                     )
                   })}
                   {typingAgent && (
-                    <div className="flex items-center gap-2 px-2 py-1 text-xs text-zinc-500">
+                    <div className="flex items-center gap-2 px-2 py-1 text-xs text-slate-500">
                       <span className="animate-pulse">🤖 {typingAgent}이(가) 입력 중...</span>
                     </div>
                   )}
@@ -1258,22 +1273,22 @@ function ChannelsView() {
 
                 {/* 입력 */}
                 <div
-                  className={`px-4 py-3 border-t border-zinc-200 dark:border-zinc-800 relative ${dragOver ? 'bg-indigo-50 dark:bg-indigo-950 border-indigo-400' : ''}`}
+                  className={`px-4 py-3 border-t border-slate-700 relative ${dragOver ? 'bg-blue-600/10 border-blue-500/50' : ''}`}
                   style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
                   onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
                   onDragLeave={() => setDragOver(false)}
                   onDrop={handleDrop}
                 >
                   {showMention && filteredAgents.length > 0 && (
-                    <div className="absolute bottom-full left-4 right-4 mb-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-md shadow-lg max-h-32 overflow-y-auto z-10">
+                    <div className="absolute bottom-full left-4 right-4 mb-1 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl max-h-48 overflow-y-auto w-64 z-10" data-testid="mention-popup">
                       {filteredAgents.map((a) => (
                         <button
                           key={a.id}
                           onClick={() => handleMentionSelect(a.name)}
-                          className="w-full text-left px-3 py-2 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 flex items-center gap-2"
+                          className="w-full text-left px-3 py-2 text-sm hover:bg-slate-700 flex items-center gap-2"
                         >
-                          <span className="text-indigo-500">@{a.name}</span>
-                          {a.role && <span className="text-xs text-zinc-500">({a.role})</span>}
+                          <span className="text-blue-400">@{a.name}</span>
+                          {a.role && <span className="text-xs text-slate-500">({a.role})</span>}
                         </button>
                       ))}
                     </div>
@@ -1281,10 +1296,10 @@ function ChannelsView() {
                   {pendingFiles.length > 0 && (
                     <div className="mb-2 flex flex-wrap gap-1.5">
                       {pendingFiles.map((f) => (
-                        <div key={f.id} className="flex items-center gap-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-md px-2.5 py-1 text-xs">
+                        <div key={f.id} className="flex items-center gap-1.5 bg-slate-800 rounded-md px-2.5 py-1 text-xs">
                           <span className="truncate max-w-[120px]">{f.filename}</span>
-                          <span className="text-zinc-400">{formatFileSize(f.sizeBytes)}</span>
-                          <button onClick={() => setPendingFiles((prev) => prev.filter((p) => p.id !== f.id))} className="text-zinc-400 hover:text-red-500 ml-0.5">✕</button>
+                          <span className="text-slate-400">{formatFileSize(f.sizeBytes)}</span>
+                          <button onClick={() => setPendingFiles((prev) => prev.filter((p) => p.id !== f.id))} className="text-slate-400 hover:text-red-400 ml-0.5">✕</button>
                         </div>
                       ))}
                     </div>
@@ -1294,7 +1309,7 @@ function ChannelsView() {
                     <button
                       onClick={() => fileInputRef.current?.click()}
                       disabled={uploading || pendingFiles.length >= 5}
-                      className="px-2 py-2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 disabled:opacity-50"
+                      className="p-2 text-slate-400 hover:text-slate-200 rounded-lg hover:bg-slate-700 disabled:opacity-50"
                       title="파일 첨부 (최대 5개)"
                     >
                       📎
@@ -1308,12 +1323,14 @@ function ChannelsView() {
                         if (e.key === 'Escape') setShowMention(false)
                       }}
                       placeholder="메시지를 입력하세요... (@로 에이전트 호출)"
-                      className="flex-1 px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-sm"
+                      className="flex-1 bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm"
+                      data-testid="channel-message-input"
                     />
                     <button
                       onClick={handleSend}
                       disabled={(!newMessage.trim() && pendingFiles.length === 0) || sendMessage.isPending || uploading}
-                      className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                      className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50"
+                      data-testid="channel-send-btn"
                     >
                       전송
                     </button>
@@ -1348,7 +1365,7 @@ function ChannelsView() {
       {/* 멘션 알림 토스트 */}
       {mentionToast && (
         <div
-          className="fixed bottom-4 right-4 bg-indigo-600 text-white px-4 py-3 rounded-lg shadow-lg cursor-pointer z-50 max-w-xs animate-in fade-in slide-in-from-bottom-2"
+          className="fixed bottom-4 right-4 bg-blue-600 text-white px-4 py-3 rounded-lg shadow-lg cursor-pointer z-50 max-w-xs animate-in fade-in slide-in-from-bottom-2"
           onClick={() => {
             const chMatch = mentionToast.actionUrl.match(/channelId=([^&]+)/)
             if (chMatch) handleSelectChannel(chMatch[1])

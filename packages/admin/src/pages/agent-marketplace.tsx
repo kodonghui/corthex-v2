@@ -23,13 +23,13 @@ function tierLabel(tier: string | null) {
 }
 
 function tierColor(tier: string | null) {
-  if (!tier) return 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
+  if (!tier) return 'bg-slate-700 text-slate-300'
   const map: Record<string, string> = {
-    manager: 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300',
-    specialist: 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300',
-    worker: 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300',
+    manager: 'bg-purple-500/20 text-purple-300 border border-purple-500/30',
+    specialist: 'bg-blue-500/20 text-blue-300 border border-blue-500/30',
+    worker: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30',
   }
-  return map[tier] || 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
+  return map[tier] || 'bg-slate-700 text-slate-300'
 }
 
 function MarketPreviewModal({
@@ -44,56 +44,61 @@ function MarketPreviewModal({
   importing: boolean
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
       <div
-        className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 max-w-3xl w-full mx-4 max-h-[85vh] overflow-y-auto"
+        data-testid="marketplace-preview-modal"
+        className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-6 max-w-3xl w-full mx-4 max-h-[85vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-start justify-between mb-4">
           <div>
-            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">{template.name}</h3>
-            <div className="flex items-center gap-2 mt-1">
+            <h3 className="text-lg font-semibold text-slate-50">{template.name}</h3>
+            <div className="flex items-center gap-2 mt-1.5">
               {template.category && (
-                <span className="text-xs px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-700 text-slate-300">
                   {template.category}
                 </span>
               )}
               {template.tier && (
-                <span className={`text-xs px-2 py-0.5 rounded-full ${tierColor(template.tier)}`}>
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${tierColor(template.tier)}`}>
                   {tierLabel(template.tier)}
                 </span>
               )}
               {template.isBuiltin && (
-                <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-500/20 text-amber-300 border border-amber-500/30">
                   내장
                 </span>
               )}
             </div>
           </div>
-          <button onClick={onClose} className="text-zinc-500 hover:text-zinc-700 text-lg">✕</button>
+          <button onClick={onClose} className="text-slate-500 hover:text-slate-300 transition-colors p-1 rounded-lg hover:bg-slate-700">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
         {template.description && (
-          <p className="text-sm text-zinc-500 mb-4">{template.description}</p>
+          <p className="text-sm text-slate-400 mb-4">{template.description}</p>
         )}
 
         <div className="mb-4">
-          <h4 className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">Soul 내용</h4>
-          <pre className="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap font-mono bg-zinc-50 dark:bg-zinc-800 rounded-lg p-4 max-h-60 overflow-y-auto">
+          <h4 className="text-sm font-medium text-slate-300 mb-2">Soul 내용</h4>
+          <pre className="text-sm text-slate-300 whitespace-pre-wrap font-mono bg-slate-900 rounded-lg p-4 max-h-60 overflow-y-auto border border-slate-700">
             {template.content}
           </pre>
         </div>
 
         {template.allowedTools && (template.allowedTools as string[]).length > 0 && (
           <div className="mb-4">
-            <h4 className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+            <h4 className="text-sm font-medium text-slate-300 mb-2">
               추천 도구 ({(template.allowedTools as string[]).length}개)
             </h4>
-            <div className="flex flex-wrap gap-1">
+            <div className="flex flex-wrap gap-1.5">
               {(template.allowedTools as string[]).map((tool) => (
                 <span
                   key={tool}
-                  className="text-xs px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300"
+                  className="text-xs px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/20 font-mono"
                 >
                   {tool}
                 </span>
@@ -102,12 +107,12 @@ function MarketPreviewModal({
           </div>
         )}
 
-        <div className="flex items-center justify-between pt-4 border-t border-zinc-200 dark:border-zinc-800">
-          <span className="text-xs text-zinc-400">다운로드 {template.downloadCount}회</span>
+        <div className="flex items-center justify-between pt-4 border-t border-slate-700">
+          <span className="text-xs text-slate-500">다운로드 {template.downloadCount}회</span>
           <button
             onClick={onImport}
             disabled={importing}
-            className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+            className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg px-5 py-2 transition-colors"
           >
             {importing ? '가져오는 중...' : '가져오기'}
           </button>
@@ -129,34 +134,39 @@ function MarketCard({
 
   return (
     <div
+      data-testid={`marketplace-card-${template.id}`}
       onClick={onClick}
-      className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5 cursor-pointer hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors"
+      className="bg-slate-800/50 border border-slate-700 rounded-xl p-5 cursor-pointer hover:border-blue-500/50 hover:bg-slate-800 transition-all duration-200"
     >
       <div className="flex items-start justify-between mb-2">
-        <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 line-clamp-1">
+        <h3 className="text-base font-semibold text-slate-50 line-clamp-1">
           {template.name}
         </h3>
-        <span className="text-xs text-zinc-400 whitespace-nowrap ml-2">
+        <span className="text-xs text-slate-500 whitespace-nowrap ml-2 font-mono">
           ↓ {template.downloadCount}
         </span>
       </div>
       <div className="flex items-center gap-1.5 mb-2">
         {template.category && (
-          <span className="text-xs px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-700 text-slate-300">
             {template.category}
           </span>
         )}
         {template.tier && (
-          <span className={`text-xs px-2 py-0.5 rounded-full ${tierColor(template.tier)}`}>
+          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${tierColor(template.tier)}`}>
             {tierLabel(template.tier)}
           </span>
         )}
-        {template.isBuiltin && <span className="text-xs text-amber-500">내장</span>}
+        {template.isBuiltin && (
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-500/20 text-amber-300 border border-amber-500/30">
+            내장
+          </span>
+        )}
       </div>
       {template.description && (
-        <p className="text-sm text-zinc-500 line-clamp-2 mb-2">{template.description}</p>
+        <p className="text-sm text-slate-400 line-clamp-2 mb-2">{template.description}</p>
       )}
-      <pre className="text-xs text-zinc-400 whitespace-pre-wrap line-clamp-3 font-mono">{truncated}</pre>
+      <pre className="text-xs text-slate-500 whitespace-pre-wrap line-clamp-3 font-mono leading-relaxed">{truncated}</pre>
     </div>
   )
 }
@@ -202,23 +212,23 @@ export function AgentMarketplacePage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">에이전트 마켓</h1>
-        <p className="text-sm text-zinc-500 mt-1">다른 회사가 공유한 에이전트 Soul 템플릿을 찾아 가져올 수 있습니다</p>
+      <div data-testid="marketplace-header">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-50">에이전트 마켓</h1>
+        <p className="text-sm text-slate-400 mt-1">다른 회사가 공유한 에이전트 Soul 템플릿을 찾아 가져올 수 있습니다</p>
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-3">
+      <div data-testid="marketplace-filters" className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="템플릿 검색..."
-          className="flex-1 px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+          className="flex-1 bg-slate-800 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 outline-none transition-colors"
         />
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
-          className="px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+          className="bg-slate-800 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm text-white outline-none transition-colors min-w-[160px]"
         >
           <option value="">전체 카테고리</option>
           {categories.map((cat) => (
@@ -228,7 +238,7 @@ export function AgentMarketplacePage() {
         <select
           value={tierFilter}
           onChange={(e) => setTierFilter(e.target.value)}
-          className="px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+          className="bg-slate-800 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm text-white outline-none transition-colors min-w-[130px]"
         >
           <option value="">전체 티어</option>
           <option value="manager">매니저</option>
@@ -238,12 +248,14 @@ export function AgentMarketplacePage() {
       </div>
 
       {isLoading ? (
-        <div className="text-center text-zinc-500 py-8">로딩 중...</div>
+        <div className="text-center text-slate-500 py-12">로딩 중...</div>
       ) : templates.length === 0 ? (
-        <div className="text-center text-zinc-500 py-12">
-          {search || categoryFilter || tierFilter
-            ? '검색 결과가 없습니다'
-            : '공개된 에이전트 템플릿이 없습니다'}
+        <div className="text-center py-16">
+          <p className="text-sm text-slate-400">
+            {search || categoryFilter || tierFilter
+              ? '검색 결과가 없습니다'
+              : '공개된 에이전트 템플릿이 없습니다'}
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -1,5 +1,4 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
-import { Button } from '@corthex/ui'
 import { SlashPopup, SLASH_COMMANDS, getFilteredCount } from './slash-popup'
 import type { PresetItem } from './slash-popup'
 import { MentionPopup } from './mention-popup'
@@ -171,10 +170,10 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
   const isEmpty = !text.trim()
 
   return (
-    <div className="relative border-t border-zinc-800 bg-zinc-950">
+    <div className="relative shrink-0 border-t border-slate-700/50 bg-gradient-to-t from-slate-900 to-slate-900/95 backdrop-blur-sm p-4">
       {/* Popups */}
       {showSlash && (
-        <div className="absolute bottom-full left-3 right-3 mb-1">
+        <div className="absolute bottom-full left-4 mb-2 z-50">
           <SlashPopup
             query={slashQuery}
             selectedIndex={slashIdx}
@@ -186,7 +185,7 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
         </div>
       )}
       {showMention && (
-        <div className="absolute bottom-full left-3 mb-1">
+        <div className="absolute bottom-full left-4 mb-2 z-50">
           <MentionPopup
             query={mentionQuery}
             selectedIndex={mentionIdx}
@@ -198,120 +197,94 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
         </div>
       )}
 
-      {/* Input wrapper */}
-      <div className="px-3 py-3">
-        <div className={`rounded-xl border transition-colors overflow-hidden ${
-          text ? 'border-zinc-600 bg-zinc-900' : 'border-zinc-800 bg-zinc-900 hover:border-zinc-700'
-        }`}>
-          {/* Target agent chip */}
-          {targetAgentId && (
-            <div className="flex items-center gap-2 px-4 pt-2.5">
-              <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-corthex-accent/10 border border-corthex-accent/30 text-corthex-accent-dark text-xs font-medium">
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className="opacity-70">
-                  <circle cx="5" cy="3.5" r="2" stroke="currentColor" strokeWidth="1.2" />
-                  <path d="M1 9c0-2 1.8-3 4-3s4 1 4 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-                </svg>
-                @{managers.find((m) => m.id === targetAgentId)?.name}
-                <button
-                  onClick={() => setTargetAgentId(undefined)}
-                  className="ml-0.5 opacity-60 hover:opacity-100"
-                >
-                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-                    <path d="M2 2l4 4M6 2L2 6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          )}
+      {/* Target agent chip */}
+      {targetAgentId && (
+        <span
+          data-testid="target-chip"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-500/15 text-blue-300 text-xs font-medium border border-blue-500/25 mb-3"
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+          <span>@{managers.find((m) => m.id === targetAgentId)?.name}</span>
+          <button
+            onClick={() => setTargetAgentId(undefined)}
+            className="hover:text-blue-100 transition-colors cursor-pointer ml-0.5"
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M3 3l6 6M9 3L3 9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+            </svg>
+          </button>
+        </span>
+      )}
 
-          {/* Textarea */}
+      {/* Input row */}
+      <div className="flex items-end gap-3">
+        {/* Action buttons */}
+        <div className="flex items-center gap-1 pb-1.5">
+          <button
+            type="button"
+            onClick={() => handleChange(text + '/')}
+            title="슬래시 명령"
+            className="p-2 rounded-xl text-slate-500 hover:text-blue-400 hover:bg-slate-800/80 transition-all cursor-pointer"
+          >
+            <span className="text-sm font-mono font-bold">/</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleChange(text + '@')}
+            title="에이전트 멘션"
+            className="p-2 rounded-xl text-slate-500 hover:text-cyan-400 hover:bg-slate-800/80 transition-all cursor-pointer"
+          >
+            <span className="text-sm font-bold">@</span>
+          </button>
+          <button
+            type="button"
+            data-testid="preset-manager-btn"
+            onClick={onOpenPresets}
+            title="템플릿"
+            className="p-2 rounded-xl text-slate-500 hover:text-amber-400 hover:bg-slate-800/80 transition-all cursor-pointer"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 2l5 3-5 3V2z" fill="currentColor" opacity="0.3" />
+              <rect x="2" y="1" width="12" height="14" rx="2" stroke="currentColor" strokeWidth="1.3" />
+              <path d="M5 8h6M5 11h4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Textarea */}
+        <div className="flex-1 relative">
           <textarea
             data-testid="command-input"
             ref={textareaRef}
             value={text}
             onChange={(e) => handleChange(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Give instructions to your AI team... (/ for commands, @ to mention)"
-            aria-label="Command input. Use @ to mention agents, / for commands"
-            rows={2}
-            className="w-full resize-none bg-transparent px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none leading-relaxed"
-            style={{ minHeight: '56px', maxHeight: '160px' }}
+            placeholder="명령을 입력하세요... (Enter 전송 · Shift+Enter 줄바꿈)"
+            aria-label="명령 입력"
+            rows={1}
+            className="w-full bg-slate-800/80 border border-slate-600/80 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 outline-none resize-none transition-all"
+            style={{ minHeight: '48px', maxHeight: '160px' }}
           />
-
-          {/* Bottom toolbar */}
-          <div className="flex items-center justify-between px-3 pb-2.5 pt-0">
-            {/* Left: trigger shortcuts */}
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={() => handleChange(text + '/')}
-                title="Commands (/)"
-                className="h-6 w-6 flex items-center justify-center rounded text-zinc-600 hover:text-zinc-300 hover:bg-zinc-800 transition-colors text-sm font-mono"
-              >
-                /
-              </button>
-              <button
-                type="button"
-                onClick={() => handleChange(text + '@')}
-                title="Mention agent (@)"
-                className="h-6 w-6 flex items-center justify-center rounded text-zinc-600 hover:text-zinc-300 hover:bg-zinc-800 transition-colors text-sm font-mono"
-              >
-                @
-              </button>
-
-              {/* Divider */}
-              <div className="w-px h-3 bg-zinc-800 mx-0.5" />
-
-              {/* Templates button */}
-              <button
-                type="button"
-                data-testid="preset-manager-btn"
-                onClick={onOpenPresets}
-                className="flex items-center gap-1.5 h-6 px-2 rounded text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 transition-colors text-xs"
-                title="Saved templates"
-              >
-                <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
-                  <rect x="1" y="1.5" width="9" height="8" rx="1" stroke="currentColor" strokeWidth="1.1" />
-                  <path d="M2.5 4.5h6M2.5 6.5h4" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
-                </svg>
-                Templates
-              </button>
-            </div>
-
-            {/* Right: send button */}
-            <button
-              data-testid="command-submit"
-              type="button"
-              onClick={handleSubmit}
-              disabled={isEmpty || isSubmitting}
-              aria-label="Send command"
-              className={`flex items-center gap-1.5 h-7 px-3 rounded-lg text-xs font-semibold transition-all ${
-                isEmpty || isSubmitting
-                  ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
-                  : 'bg-corthex-accent text-white hover:opacity-90 active:scale-95'
-              }`}
-            >
-              {isSubmitting ? (
-                <>
-                  <span className="w-3 h-3 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-                  Sending
-                </>
-              ) : (
-                <>
-                  Send
-                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className="opacity-80">
-                    <path d="M1.5 5h7M5 1.5L8.5 5 5 8.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </>
-              )}
-            </button>
-          </div>
         </div>
 
-        {/* Hint text */}
-        <p className="text-[10px] text-zinc-700 mt-1.5 pl-1">
-          Enter to send &middot; Shift+Enter for new line
-        </p>
+        {/* Send button — prominent primary */}
+        <button
+          data-testid="send-button"
+          type="button"
+          onClick={handleSubmit}
+          disabled={isEmpty || isSubmitting}
+          aria-label="명령 전송"
+          className="flex items-center gap-2 px-5 py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 shrink-0 cursor-pointer"
+        >
+          {isSubmitting ? (
+            <div className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+          ) : (
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M2 8h12M10 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          )}
+          <span className="hidden sm:inline">전송</span>
+        </button>
       </div>
     </div>
   )

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { cn, Tabs } from '@corthex/ui'
+import { cn } from '@corthex/ui'
 import type { Debate } from '@corthex/shared'
 import { DiffView } from './diff-view'
 
@@ -38,8 +38,8 @@ function formatDate(dateStr: string | null): string {
 }
 
 const TAB_ITEMS = [
-  { value: 'info', label: '정보' },
-  { value: 'diff', label: 'Diff' },
+  { value: 'info', label: '정보', testId: 'debate-info-tab' },
+  { value: 'diff', label: 'Diff', testId: 'debate-diff-tab' },
 ]
 
 export function DebateInfoPanel({ debate }: { debate: Debate }) {
@@ -55,15 +55,31 @@ export function DebateInfoPanel({ debate }: { debate: Debate }) {
     }
   }, [debate.id, debate.status])
 
-  const tabItems = TAB_ITEMS.map((item) =>
-    item.value === 'diff' ? { ...item, disabled: !isDiffEnabled } : item,
-  )
-
   return (
-    <div className="h-full flex flex-col overflow-hidden">
+    <div data-testid="debate-info-panel" className="h-full flex flex-col overflow-hidden">
       {/* Tabs */}
-      <div className="shrink-0">
-        <Tabs items={tabItems} value={activeTab} onChange={setActiveTab} />
+      <div className="shrink-0 flex border-b border-slate-700">
+        {TAB_ITEMS.map((tab) => {
+          const isDisabled = tab.value === 'diff' && !isDiffEnabled
+          const isActive = activeTab === tab.value
+          return (
+            <button
+              key={tab.value}
+              data-testid={tab.testId}
+              onClick={() => !isDisabled && setActiveTab(tab.value)}
+              disabled={isDisabled}
+              className={cn(
+                'flex-1 py-2.5 text-xs font-medium transition-colors border-b-2',
+                isActive
+                  ? 'border-blue-500 text-blue-400'
+                  : 'border-transparent text-slate-400 hover:text-slate-300',
+                isDisabled && 'opacity-40 cursor-not-allowed',
+              )}
+            >
+              {tab.label}
+            </button>
+          )
+        })}
       </div>
 
       {/* Content */}
@@ -84,11 +100,11 @@ function InfoContent({ debate }: { debate: Debate }) {
   return (
     <>
       {/* Header */}
-      <div className="px-4 py-3 border-b border-zinc-200 dark:border-zinc-800">
-        <h3 className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-2">
+      <div className="px-4 py-3 border-b border-slate-700">
+        <h3 className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-2">
           토론 정보
         </h3>
-        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{debate.topic}</p>
+        <p className="text-sm font-medium text-slate-100">{debate.topic}</p>
       </div>
 
       <div className="px-4 py-3 space-y-4">
@@ -104,12 +120,12 @@ function InfoContent({ debate }: { debate: Debate }) {
 
         {/* Participants */}
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-2">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-2">
             참여자 ({debate.participants.length})
           </p>
           <div className="space-y-1.5">
             {debate.participants.map((p) => (
-              <div key={p.agentId} className="flex items-center gap-2">
+              <div key={p.agentId} data-testid={`debate-participant-${p.agentId}`} className="flex items-center gap-2">
                 <div
                   className={cn(
                     'w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold',
@@ -119,8 +135,8 @@ function InfoContent({ debate }: { debate: Debate }) {
                   {p.agentName[0]}
                 </div>
                 <div>
-                  <p className="text-xs text-zinc-900 dark:text-zinc-100">{p.agentName}</p>
-                  <p className="text-[10px] text-zinc-400">{p.role}</p>
+                  <p className="text-xs text-slate-100">{p.agentName}</p>
+                  <p className="text-[10px] text-slate-400">{p.role}</p>
                 </div>
               </div>
             ))}
@@ -142,8 +158,8 @@ function InfoContent({ debate }: { debate: Debate }) {
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-[10px] text-zinc-400">{label}</span>
-      <span className="text-xs text-zinc-700 dark:text-zinc-300">{value}</span>
+      <span className="text-[10px] text-slate-400">{label}</span>
+      <span className="text-xs text-slate-300">{value}</span>
     </div>
   )
 }

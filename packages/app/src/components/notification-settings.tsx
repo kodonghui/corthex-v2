@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
-import { Card, Toggle } from '@corthex/ui'
+import { Toggle } from '@corthex/ui'
 
 type PrefsData = {
   inApp: boolean
@@ -82,22 +82,22 @@ export function NotificationSettings() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-testid="notification-settings">
       {/* SMTP 미설정 배너 */}
       {!emailConfigured && (
-        <div className="px-4 py-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 text-sm text-amber-700 dark:text-amber-300">
+        <div className="px-4 py-3 rounded-lg bg-amber-950/30 border border-amber-800/50 text-sm text-amber-300">
           이메일 알림을 사용하려면 관리자에게 SMTP 설정을 요청하세요
         </div>
       )}
 
       {/* 전체 설정 */}
-      <Card>
-        <div className="px-4 py-3 border-b border-zinc-100 dark:border-zinc-800">
-          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">전체 설정</p>
+      <div className="bg-slate-800/50 border border-slate-700 rounded-xl">
+        <div className="px-4 py-3 border-b border-slate-700">
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">전체 설정</p>
         </div>
-        <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
+        <div className="divide-y divide-slate-700">
           <div className="flex items-center justify-between px-4 py-3">
-            <span className="text-sm text-zinc-700 dark:text-zinc-300">앱 알림</span>
+            <span className="text-sm text-slate-300">앱 알림</span>
             <Toggle
               checked={prefs?.inApp ?? true}
               onChange={(v) => toggleGlobal('inApp', v)}
@@ -105,7 +105,7 @@ export function NotificationSettings() {
             />
           </div>
           <div className="flex items-center justify-between px-4 py-3">
-            <span className="text-sm text-zinc-700 dark:text-zinc-300">이메일 알림</span>
+            <span className="text-sm text-slate-300">이메일 알림</span>
             <Toggle
               checked={prefs?.email ?? false}
               onChange={(v) => toggleGlobal('email', v)}
@@ -114,17 +114,17 @@ export function NotificationSettings() {
             />
           </div>
         </div>
-      </Card>
+      </div>
 
       {/* 이벤트별 설정 */}
       {EVENT_CATEGORIES.map((cat) => (
-        <Card key={cat.label}>
-          <div className="px-4 py-3 border-b border-zinc-100 dark:border-zinc-800">
-            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">{cat.label}</p>
+        <div key={cat.label} className="bg-slate-800/50 border border-slate-700 rounded-xl">
+          <div className="px-4 py-3 border-b border-slate-700">
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{cat.label}</p>
           </div>
-          <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
+          <div className="divide-y divide-slate-700">
             {/* 헤더 */}
-            <div className="flex items-center px-4 py-2 text-[11px] text-zinc-400">
+            <div className="flex items-center px-4 py-2 text-[11px] text-slate-500">
               <span className="flex-1" />
               <span className="w-14 text-center">앱</span>
               <span className="w-14 text-center">이메일</span>
@@ -135,7 +135,7 @@ export function NotificationSettings() {
                 <div key={ev.key} className="flex items-center px-4 py-2.5">
                   <div className="flex items-center gap-2 flex-1 min-w-0">
                     <span className="text-sm">{ev.icon}</span>
-                    <span className="text-sm text-zinc-700 dark:text-zinc-300">{ev.label}</span>
+                    <span className="text-sm text-slate-300">{ev.label}</span>
                   </div>
                   <div className="w-14 flex justify-center">
                     <Toggle
@@ -157,11 +157,11 @@ export function NotificationSettings() {
               )
             })}
           </div>
-        </Card>
+        </div>
       ))}
 
       {/* 30일 보관 안내 */}
-      <p className="text-xs text-zinc-400 text-center py-2">
+      <p className="text-xs text-slate-500 text-center py-2">
         알림은 30일간 보관됩니다
       </p>
     </div>

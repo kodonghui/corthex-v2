@@ -43,9 +43,9 @@ export function StatusStepper({ status, createdAt, reviewedAt, scheduledAt, publ
   }
 
   return (
-    <div className="w-full py-3">
+    <div data-testid="status-stepper" className="w-full py-3">
       {(isRejected || isFailed) && (
-        <div className="mb-2 px-2 py-1.5 rounded bg-red-50 dark:bg-red-900/30 text-xs text-red-700 dark:text-red-300">
+        <div className="mb-2 px-2 py-1.5 rounded bg-red-500/10 border border-red-500/30 text-xs text-red-400">
           {isRejected ? '반려됨' : '발행 실패'}
         </div>
       )}
@@ -61,27 +61,27 @@ export function StatusStepper({ status, createdAt, reviewedAt, scheduledAt, publ
                 <div
                   className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all ${
                     failedStep
-                      ? 'border-red-500 bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
+                      ? 'border-red-500 bg-red-500/20 text-red-400'
                       : done
-                        ? 'border-green-500 bg-green-500 text-white'
+                        ? 'border-emerald-500 bg-emerald-500 text-white'
                         : active
-                          ? 'border-indigo-500 bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300'
-                          : 'border-zinc-300 dark:border-zinc-600 text-zinc-400'
+                          ? 'border-blue-500 bg-blue-500/20 text-blue-400'
+                          : 'border-slate-600 text-slate-500'
                   }`}
                 >
                   {failedStep ? '!' : done ? '✓' : idx + 1}
                 </div>
                 <span className={`text-[10px] mt-1 whitespace-nowrap ${
-                  failedStep ? 'text-red-600 font-medium' : done || active ? 'text-zinc-700 dark:text-zinc-300' : 'text-zinc-400'
+                  failedStep ? 'text-red-400 font-medium' : done || active ? 'text-slate-300' : 'text-slate-500'
                 }`}>
                   {step.label}
                 </span>
                 {timestamps[idx] && (
-                  <span className="text-[9px] text-zinc-400 mt-0.5">{timestamps[idx]}</span>
+                  <span className="text-[9px] text-slate-500 mt-0.5">{timestamps[idx]}</span>
                 )}
               </div>
               {idx < STEPS.length - 1 && (
-                <div className={`flex-1 h-0.5 mx-1 ${idx < currentIdx ? 'bg-green-500' : 'bg-zinc-200 dark:bg-zinc-700'}`} />
+                <div className={`flex-1 h-0.5 mx-1 ${idx < currentIdx ? 'bg-emerald-500' : 'bg-slate-700'}`} />
               )}
             </div>
           )

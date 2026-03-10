@@ -38,17 +38,17 @@ export function ExportKnowledgeDialog({ sketchId, sketchName, onClose }: ExportK
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
       <div
-        className="bg-zinc-900 border border-zinc-700 rounded-lg p-5 w-96 max-w-[90vw]"
+        className="bg-slate-900 border border-slate-700 rounded-lg p-5 w-96 max-w-[90vw]"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="text-sm font-semibold text-zinc-200 mb-4">지식 베이스에 다이어그램 저장</h3>
+        <h3 className="text-sm font-semibold text-slate-200 mb-4">지식 베이스에 다이어그램 저장</h3>
 
-        <label className="block text-xs text-zinc-400 mb-1">제목</label>
+        <label className="block text-xs text-slate-400 mb-1">제목</label>
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full px-3 py-1.5 bg-zinc-800 border border-zinc-700 rounded text-sm text-zinc-200 mb-3 focus:outline-none focus:border-indigo-500"
+          className="w-full px-3 py-1.5 bg-slate-800 border border-slate-700 rounded text-sm text-slate-200 mb-3 focus:outline-none focus:border-blue-500"
           placeholder="다이어그램 제목"
           autoFocus
           onKeyDown={(e) => {
@@ -58,11 +58,11 @@ export function ExportKnowledgeDialog({ sketchId, sketchName, onClose }: ExportK
           }}
         />
 
-        <label className="block text-xs text-zinc-400 mb-1">폴더</label>
+        <label className="block text-xs text-slate-400 mb-1">폴더</label>
         <select
           value={folderId}
           onChange={(e) => setFolderId(e.target.value)}
-          className="w-full px-3 py-1.5 bg-zinc-800 border border-zinc-700 rounded text-sm text-zinc-200 mb-4 focus:outline-none focus:border-indigo-500"
+          className="w-full px-3 py-1.5 bg-slate-800 border border-slate-700 rounded text-sm text-slate-200 mb-4 focus:outline-none focus:border-blue-500"
         >
           <option value="">루트 (폴더 없음)</option>
           {folders.map((f) => (
@@ -77,14 +77,14 @@ export function ExportKnowledgeDialog({ sketchId, sketchName, onClose }: ExportK
         <div className="flex justify-end gap-2">
           <button
             onClick={onClose}
-            className="px-3 py-1.5 text-xs text-zinc-400 hover:text-zinc-200 transition-colors"
+            className="px-3 py-1.5 text-xs text-slate-400 hover:text-slate-200 transition-colors"
           >
             취소
           </button>
           <button
             onClick={() => exportMutation.mutate({ title: title.trim(), folderId: folderId || undefined })}
             disabled={!title.trim() || exportMutation.isPending}
-            className="px-3 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 text-white rounded disabled:opacity-50 transition-colors"
+            className="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded disabled:opacity-50 transition-colors"
           >
             {exportMutation.isPending ? '저장 중...' : '저장'}
           </button>

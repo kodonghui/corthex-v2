@@ -951,14 +951,14 @@ export function OnboardingWizardPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto py-8">
+    <div className="max-w-2xl mx-auto py-8" data-testid="onboarding-page">
       {/* Step Indicator */}
-      <div className="flex justify-center mb-8">
+      <div className="flex justify-center mb-8" data-testid="onboarding-step-indicator">
         <StepIndicator current={currentStep} completed={completedSteps} />
       </div>
 
       {/* Progress bar */}
-      <div className="w-full h-1 bg-zinc-200 dark:bg-zinc-700 rounded-full mb-8">
+      <div className="w-full h-1 bg-zinc-200 dark:bg-zinc-700 rounded-full mb-8" data-testid="onboarding-progress">
         <div
           className="h-full bg-indigo-600 rounded-full transition-all duration-300"
           style={{ width: `${(currentStep / STEPS.length) * 100}%` }}

@@ -1,144 +1,313 @@
 ---
 name: 'kdh-uxui-pipeline'
-description: 'UXUI 리팩토링 파이프라인. Lovable 와이어프레임 + Claude Code 리팩토링 + 3라운드 파티모드 + Playwright QA. Usage: /kdh-uxui-pipeline [phase0|phase1|prompt PAGENAME|prompt-batch PRIORITY|code PAGENAME|code-batch PRIORITY|phase3|final]'
+description: 'UXUI 리팩토링 파이프라인 v7 (범용). Pro Max(디자인 데이터) + LibreUIUX(디자인 원칙) + BMAD(파티모드 QA). 3-Phase: Diagnose → Redesign → Verify. Usage: /kdh-uxui-pipeline [status|diagnose PAGE|redesign PAGE|verify PAGE|batch PRIORITY|phase0|phase1|phase3|final]'
 ---
 
-# UXUI Refactoring Pipeline v5 (범용)
+# UXUI Refactoring Pipeline v7 (범용)
 
-Lovable 와이어프레임(디자인) + Claude Code(코딩) + 3라운드 파티모드 + Playwright QA.
-**어떤 프로젝트에서든 복사해서 사용 가능.**
+**Pro Max + LibreUIUX + BMAD 통합. 어떤 프로젝트에서든 복사해서 사용 가능.**
 
-> **다른 프로젝트에서 사용할 때**: `_uxui-refactoring/CONFIG.md` 파일을 먼저 만드세요.
+4개 도구가 각자 역할을 나눠 **레이아웃부터 바꾸는 진짜 리디자인**을 수행한다.
+
+### 도구 역할 분담
+
+| 도구 | 역할 | 비유 | 필수? |
+|------|------|------|-------|
+| **Pro Max** | 디자인 데이터 (색상, 폰트, 스타일, UX 규칙) | 설계 도면집 | 필수 |
+| **LibreUIUX** | 디자인 원칙 + 품질 감사 (7차원 분석, 접근성, 반응형) | 감리관 | 필수 |
+| **BMAD Party Mode** | 3라운드 자기 리뷰 (7명 전문가 역할극) | 품질 검사관 | 필수 |
+| **Subframe** | 실시간 프리뷰 + 컴포넌트 라이브러리 | 모델하우스 + 자재 창고 | 선택 |
+
+### 핵심 교훈
+
+```
+"리디자인" = 레이아웃/구조 자체를 바꿔야 한다.
+색상/border만 바꾸면 → FAIL.
+```
 
 ---
 
-## 프로젝트 설정 (CONFIG.md)
+## 사전 준비: 4개 도구 전체 설치 가이드
 
-프로젝트 루트에 `_uxui-refactoring/CONFIG.md`를 아래 형식으로 만드세요:
+이 파이프라인은 4개 도구를 조합해서 씁니다.
+각 도구의 명령어는 **접두사(prefix)**를 붙여서 충돌을 방지합니다.
+
+| 도구 | 명령어 접두사 | 예시 |
+|------|-------------|------|
+| BMAD | `/bmad-` | `/bmad-party-mode`, `/bmad-bmm-code-review` |
+| LibreUIUX | `/libre-` | `/libre-ui-review`, `/libre-ui-synth` |
+| Pro Max | (스킬) | `ui-ux-pro-max` (python search.py 직접 호출) |
+| Subframe | `/subframe:` | `/subframe:design`, `/subframe:develop` |
+
+---
+
+### 1. CONFIG.md 생성 (필수)
+
+프로젝트 루트에 `_uxui-refactoring/CONFIG.md` 생성:
 
 ```markdown
 # UXUI Pipeline Config
 
-## 기본 정보
-- PROJECT_NAME: My Project
-- BASE_URL: https://my-app.com
-- ADMIN_URL: https://my-app.com/admin  (없으면 삭제)
+## Project Info
+- Name: {프로젝트명}
+- Stack: react / vue / nextjs / svelte / html-tailwind
+- CSS Framework: tailwind-v4 / tailwind-v3 / css-modules / styled-components
+- Test Framework: playwright / cypress / vitest
+- Deploy URL: https://example.com
+- Package Path: packages/app (또는 src/)
 
-## 프론트엔드 구조
-- FRAMEWORK: React + Vite + Tailwind  (또는 Next.js, Vue 등)
-- APP_DIR: packages/app  (또는 src/, app/ 등)
-- ADMIN_DIR: packages/admin  (없으면 삭제)
-- E2E_DIR: packages/e2e  (Playwright 테스트 위치)
-
-## 페이지 목록 (우선순위별)
-### 1순위
-| # | 패키지 | 페이지명 | 경로 |
-|---|--------|---------|------|
-| 01 | app | dashboard | /dashboard |
-| 02 | app | settings | /settings |
+## Page Mapping
+| # | 페이지명 | 경로 | 우선순위 |
+|---|---------|------|---------|
+| 01 | home | / | 1순위 |
+| 02 | dashboard | /dashboard | 1순위 |
 ...
 
-### 2순위
-...
-
-### 3순위
-...
+## Design References
+- Design System: design-system/{project}/MASTER.md (Pro Max 생성)
+- Style Guide: _uxui-refactoring/STYLE-GUIDE.md (있으면)
+- Component Library: src/ui/ (Subframe) 또는 src/components/ (커스텀)
 ```
 
-**CONFIG.md가 없으면?** → Claude가 프로젝트 구조를 자동 분석해서 제안합니다.
+---
+
+### 2. Pro Max 설치 (필수)
+
+UI/UX 디자인 데이터베이스. 68개 스타일, 97개 색상 팔레트, 57개 폰트 조합, 99개 UX 가이드라인, 25개 차트 타입, 13개 스택 가이드를 Python 스크립트로 검색.
+
+```bash
+# GitHub에서 클론
+git clone https://github.com/anthropics/ui-ux-pro-max.git /tmp/ui-ux-pro-max
+
+# 프로젝트에 스킬로 설치
+mkdir -p .claude/skills/ui-ux-pro-max
+cp -r /tmp/ui-ux-pro-max/scripts .claude/skills/ui-ux-pro-max/
+cp -r /tmp/ui-ux-pro-max/data .claude/skills/ui-ux-pro-max/
+cp /tmp/ui-ux-pro-max/SKILL.md .claude/skills/ui-ux-pro-max/
+
+# 설치 확인
+python3 .claude/skills/ui-ux-pro-max/scripts/search.py "test" --domain style
+```
+
+**SKILL.md 작성** (`.claude/skills/ui-ux-pro-max/SKILL.md`):
+```yaml
+---
+name: ui-ux-pro-max
+description: "UI/UX design intelligence. 50 styles, 21 palettes, 50 font pairings, 20 charts, 9 stacks."
+---
+```
+(이하 SKILL.md 전체 내용은 Pro Max 레포의 SKILL.md 참고)
+
+**설치 후 디자인 시스템 생성:**
+```bash
+# 전역 디자인 시스템 생성 + 저장
+python3 .claude/skills/ui-ux-pro-max/scripts/search.py "{프로젝트 키워드}" --design-system --persist -p "{프로젝트명}"
+
+# 페이지별 오버라이드 생성 (선택)
+python3 .claude/skills/ui-ux-pro-max/scripts/search.py "{페이지 키워드}" --design-system --persist -p "{프로젝트명}" --page "{페이지명}"
+```
+
+결과물:
+```
+design-system/{project}/MASTER.md          ← 전역 디자인 규칙
+design-system/{project}/pages/{page}.md    ← 페이지별 오버라이드
+```
+
+---
+
+### 3. LibreUIUX 설치 (필수)
+
+오픈소스 UXUI 프레임워크 (152 agents, 70 plugins).
+이 파이프라인에서 실제로 쓰는 명령어는 **5개**. 전부 `/libre-` 접두사를 붙여서 설치.
+
+```bash
+# GitHub에서 클론
+git clone https://github.com/LibreUIUX/LibreUIUX-Claude-Code.git /tmp/libreuiux
+
+# 1) 명령어 5개 복사 + libre- 접두사 이름으로 저장
+cp /tmp/libreuiux/plugins/ui-synth/commands/ui-synth.md         .claude/commands/libre-ui-synth.md
+cp /tmp/libreuiux/plugins/ui-review/commands/ui-review.md       .claude/commands/libre-ui-review.md
+cp /tmp/libreuiux/plugins/ui-critique/commands/ui-critique.md   .claude/commands/libre-ui-critique.md
+cp /tmp/libreuiux/plugins/ui-responsive/commands/ui-responsive.md .claude/commands/libre-ui-responsive.md
+cp /tmp/libreuiux/plugins/accessibility-compliance/commands/accessibility-audit.md .claude/commands/libre-a11y-audit.md
+
+# 2) 스킬(선택 — 추가 디자인 지식)
+mkdir -p .claude/skills
+cp -r /tmp/libreuiux/skills/brand-systems       .claude/skills/
+cp -r /tmp/libreuiux/skills/design-masters      .claude/skills/
+cp -r /tmp/libreuiux/skills/design-movements    .claude/skills/
+cp -r /tmp/libreuiux/skills/design-principles   .claude/skills/
+cp -r /tmp/libreuiux/skills/premium-saas-design .claude/skills/
+
+# 3) 플러그인(선택 — 깊은 참고용)
+mkdir -p .claude/plugins
+cp -r /tmp/libreuiux/plugins/* .claude/plugins/
+```
+
+**설치되는 `/libre-` 명령어:**
+
+| 명령어 | 역할 | 파이프라인에서 쓰는 곳 |
+|--------|------|----------------------|
+| `/libre-ui-review` | 7차원 분석 (1~10점) + ELEVATE/REFINE/REBUILD 판정 | Phase 1 진단 + Phase 3 재감사 |
+| `/libre-ui-synth` | 마스터 디자인 오케스트레이터 (아키타입+마스터리+접근성+보안+성능) | Phase 2 디자인 원칙 |
+| `/libre-ui-critique` | 8차원 디자인 피드백 | Phase 3 추가 감사 |
+| `/libre-ui-responsive` | 반응형 체크 (375/768/1024/1440px) | Phase 3 반응형 검증 |
+| `/libre-a11y-audit` | 접근성 감사 (WCAG, axe-core, ARIA) | Phase 3 접근성 검증 |
+
+**왜 `/libre-` 접두사?**
+- BMAD 명령어는 `/bmad-`, Subframe은 `/subframe:` 접두사를 씀
+- LibreUIUX도 `/libre-` 접두사를 붙여서 어떤 도구의 명령어인지 바로 구분
+- Claude Code 스킬 목록에서 검색할 때도 "libre"로 필터링 가능
+
+---
+
+### 4. BMAD 설치 (필수)
+
+BMAD 프레임워크는 파티모드(3라운드 자기 리뷰)를 제공합니다.
+이미 BMAD가 설치된 프로젝트에서는 이 단계 불필요.
+
+```bash
+# BMAD 프레임워크 설치 (이미 있으면 스킵)
+# bmad 스킬들이 .claude/commands/ 에 bmad- 접두사로 설치되어 있어야 함
+
+# 확인 방법:
+ls .claude/commands/bmad-*.md
+# bmad-party-mode.md, bmad-bmm-code-review.md 등이 있어야 함
+```
+
+**이 파이프라인에서 쓰는 BMAD 기능:**
+
+| 명령어/기능 | 역할 |
+|------------|------|
+| 파티모드 3라운드 | Worker가 직접 7명 전문가 역할극 (스킬 호출 아님, Worker가 직접 수행) |
+| `/bmad-bmm-code-review` | Phase 3에서 추가 코드 리뷰 (선택) |
+
+**중요:** 이 파이프라인에서 파티모드는 `Skill("bmad-party-mode")`를 호출하지 않습니다.
+대화형이라 멈추기 때문. Worker가 직접 역할극을 수행합니다.
+
+---
+
+### 5. Subframe 설치 (선택 — 실시간 프리뷰용)
+
+Subframe을 설치하면 **코딩 전에 브라우저에서 디자인을 미리 볼 수 있습니다.**
+안 설치해도 파이프라인은 동작하지만, preview 단계를 쓸 수 없습니다.
+
+```bash
+# Subframe MCP 서버 설정 (claude_desktop_config.json 또는 ~/.claude.json)
+# mcpServers에 subframe 추가 (Subframe 공식 문서 참고)
+
+# CLI로 프로젝트 초기화
+npx @subframe/cli@latest init \
+  --auth-token {TOKEN} \
+  -p {PROJECT_ID} \
+  --dir ./src/ui \
+  --alias "@/ui/*" \
+  --install \
+  --sync
+
+# 또는 /subframe:setup 스킬 사용
+```
+
+**설치되는 `/subframe:` 명령어:**
+
+| 명령어 | 역할 | 파이프라인에서 쓰는 곳 |
+|--------|------|----------------------|
+| `/subframe:setup` | 프로젝트 초기화 (CLI, 컴포넌트 동기화, Tailwind 설정) | 최초 1회 |
+| `/subframe:design` | Subframe 웹에서 페이지 디자인 → 브라우저 실시간 프리뷰 | Phase 2A 프리뷰 |
+| `/subframe:develop` | Subframe 디자인을 실제 코드로 변환 | Phase 2B 코드 적용 |
+| `/subframe:import` | 기존 디자인 시스템을 Subframe에 업로드 | 초기 설정 (선택) |
+
+**Subframe 프리뷰 흐름:**
+```
+/subframe:design → Subframe 웹사이트(app.subframe.com)에 디자인 생성
+→ 사용자가 브라우저에서 실시간 확인
+→ "이거 좋아!" → /subframe:develop 로 코드 적용
+→ "이 부분 바꿔줘" → 수정 → 다시 확인
+```
 
 ---
 
 ## Mode Selection
 
-- `phase0`: Playwright 환경 세팅 (한 번만)
-- `phase1`: 현재 기능 상태 점검 (스모크 테스트)
-- `prompt PAGENAME`: Lovable한테 보낼 와이어프레임 프롬프트 생성 + 3라운드 파티모드
-- `prompt-batch PRIORITY`: 해당 우선순위 전체 프롬프트 생성
-- `code PAGENAME`: Lovable 와이어프레임 기반 코드 리팩토링 + 3라운드 파티모드 + Playwright
-- `code-batch PRIORITY`: 해당 우선순위 전체 리팩토링
-- `phase3`: 시각 회귀 테스트 기준 이미지 등록
-- `final`: 최종 전체 검증
-- 인자 없음: 진행 상황 + 다음 작업 안내
+| 명령 | 설명 |
+|------|------|
+| `status` 또는 인자 없음 | 진행 상황 + 다음 작업 안내 |
+| `diagnose PAGE` | Phase 1: 현재 상태 7차원 진단 + 디자인 데이터 수집 |
+| `preview PAGE` | Phase 2A: Subframe에서 디자인 → 브라우저 실시간 프리뷰 (Subframe 설치 시) |
+| `redesign PAGE` | Phase 2B: 확정 디자인을 실제 코드에 적용 |
+| `verify PAGE` | Phase 3: 파티모드 3라운드 + 재감사 + 반응형/접근성 체크 |
+| `batch PRIORITY` | 해당 우선순위 전체 자동 (diagnose → preview → redesign → verify) |
+| `phase0` | 테스트 환경 세팅 (1회) |
+| `phase1` | 현재 기능 스모크 테스트 |
+| `phase3` | 시각 회귀 기준 등록 |
+| `final` | 최종 전체 검증 |
 
 ---
 
-## 핵심 원칙
+## 4-Phase 워크플로우
 
-### Lovable = 디자인 전권 위임
+```
+[Phase 1: DIAGNOSE] 현재 상태 진단
+  → Pro Max: 디자인 시스템 데이터 로드 (MASTER.md + 페이지 오버라이드)
+  → /libre-ui-review: 7차원 점수 (1~10) + ELEVATE/REFINE/REBUILD 판정
+  → 출력: 진단 리포트 + 개선 우선순위
 
-**Lovable이 결정하는 것:**
-- 레이아웃, 색상, 타이포그래피, spacing, 컴포넌트 디자인, 시각적 위계
-- 정보 밀도, 애니메이션, 아이콘, 다크/라이트 모드
-- 모든 시각적 결정 — 예외 없음
+[Phase 2A: PREVIEW] Subframe 실시간 프리뷰 (Subframe 설치 시)
+  → /subframe:design 으로 Subframe 웹사이트에 페이지 디자인 생성
+  → 사용자가 브라우저(app.subframe.com)에서 실시간 확인
+  → "이 부분 바꿔줘" → 수정 → 다시 확인 (반복)
+  → 사용자가 "이거 좋아!" 하면 다음 단계로
+  → 코딩 전에 눈으로 먼저 보고 확정하는 단계
 
-**프롬프트에 주는 것:**
-- 이 페이지가 뭘 하는 페이지인지 (목적)
-- 어떤 데이터가 표시되는지 (엔티티, 필드, 상태)
-- 사용자가 뭘 할 수 있는지 (모든 인터랙션)
-- UX 고려사항 (기능적 요구만 — 시각적 지시 제로)
+[Phase 2B: REDESIGN] 확정 디자인을 실제 코드에 적용
+  → preview 했으면: /subframe:develop 로 코드 변환 + 비즈니스 로직 연결
+  → preview 안 했으면: Worker가 직접 디자인 + 코딩 (Pro Max + /libre-ui-synth 참조)
+  → 기능 로직(API, state, handlers) 100% 유지
 
-**프롬프트에 절대 넣지 않는 것:**
-- 색상, 폰트, 크기, 비율, 레이아웃 구조, 배치 지시
+[Phase 3: VERIFY] 품질 검증
+  → BMAD 파티모드 3라운드 (Collaborative → Adversarial → Forensic)
+  → /libre-ui-review: 재감사 (Phase 1 점수와 비교, 최소 +2점 상승 필수)
+  → /libre-ui-critique: 8차원 디자인 피드백
+  → /libre-ui-responsive: 반응형 체크 (375/768/1024/1440px)
+  → /libre-a11y-audit: 접근성 감사 (WCAG, ARIA)
+  → 테스트 (Playwright/Cypress)
+```
 
-### 기능 로직 불변
+### 왜 Preview 단계가 있나?
 
-- API 호출, 상태관리, 이벤트 핸들러 100% 유지
-- UI/레이아웃/스타일만 변경
-- **현재 코드 기준** — 삭제된 기능 부활 방지
+```
+[Preview 없이]
+코드 수정 → 배포 → 사이트에서 확인 → "이거 뭐야?" → 다시 처음부터...
+
+[Preview 있으면]
+Subframe에서 미리보기 → 브라우저에서 실시간 확인 → "이거 좋아!" → 그때 코딩
+→ 코딩 전에 사용자가 직접 눈으로 확인하고 확정 → 재작업 방지
+```
 
 ---
 
 ## 작업 환경
 
 ```
-이 PC (VS Code) 한 곳에서 전부 진행
-
 오케스트레이터 (메인 Claude Code)
   → 팀 생성, Worker 스폰, 스텝 지시, 커밋+푸시
+  → 문서 작성/코딩 직접 안 함
 
 Worker (tmux 안의 Claude Code)
-  → 프롬프트 작성, 코드 리팩토링, 파티모드 3라운드, 테스트 작성
-
-Lovable (브라우저)
-  → 사용자가 프롬프트 복붙 → 와이어프레임 생성 → 스크린샷 저장
-
-테스트 대상: CONFIG.md의 BASE_URL (배포된 사이트)
+  → 진단, 디자인, 코딩, 파티모드, 테스트 전부 수행
+  → 사용자가 tmux에서 실시간 관찰 가능
 ```
 
 ---
 
-## 전체 흐름
+## Single-Worker 패턴
 
-```
-[Phase 0] Playwright 환경 세팅 (1회)
-    ↓
-[Phase 1] 현재 기능 상태 점검
-    ↓
-[Phase 2] 페이지별 리팩토링 (반복)
-    → A. prompt: Worker가 Lovable 프롬프트 생성 (현재 코드 분석 기반)
-    → B. 사용자가 Lovable에 복붙 → 와이어프레임 스크린샷 저장
-    → C. code: Worker가 와이어프레임 보고 코드 리팩토링 + 파티모드 3라운드
-    → D. Worker가 Playwright 테스트 작성 + 실행
-    → E. 오케스트레이터가 커밋 + 푸시
-    ↓
-[Phase 3] 시각 회귀 테스트 기준 등록
-    ↓
-[Phase 4] 최종 검증
-```
+- **1인 Worker**: 작성 + 자기 리뷰 3라운드 + 수정 + 보고 = 데드락 0
+- Worker는 tmux에서 실행 → 사용자가 실시간 관찰
+- 오케스트레이터 ↔ Worker 핸드오프 최소 2회 (지시, 완료보고)
+- 5페이지마다 Worker shutdown + 새 Worker 스폰 (컨텍스트 관리)
 
-**사용자가 직접 하는 것: B단계 (Lovable에 프롬프트 복붙 + 스크린샷 저장)만.**
-
----
-
-## Single-Worker 패턴 (kdh-full-auto-pipeline과 동일)
-
-1인 Worker가 작성 + 자기 리뷰 3라운드 + 수정 + 보고. 데드락 0.
-Worker는 tmux에서 실행 → 사용자가 실시간 관찰.
-
-### Agent Manifest
-
-Read `_bmad/_config/agent-manifest.csv` for agent definitions. If not found, use defaults:
+### Agent Manifest (파티모드 전문가)
 
 | Agent | Name | Focus |
 |-------|------|-------|
@@ -152,109 +321,378 @@ Read `_bmad/_config/agent-manifest.csv` for agent definitions. If not found, use
 
 ---
 
-## Party Mode: 3라운드
+## Mode: diagnose PAGE (Phase 1)
 
-kdh-full-auto-pipeline과 동일 구조. Worker가 혼자 7명 역할극.
-YOLO 모드 — 사용자 입력/확인 없이 전부 자동.
+### Worker 스폰 프롬프트
 
-**Round 1 (Collaborative):** 우호적 리뷰. 최소 2개 이슈. 크로스톡 2회+.
-**Round 2 (Adversarial):** 적대적 리뷰. 최소 1개 새 이슈. 기능 커버리지 확인.
-**Round 3 (Forensic):** 이슈 재평가. 품질 점수 X/10. PASS (7+) or FAIL (6-).
+```
+You are a senior UXUI analyst.
+You diagnose the current state of a page using Pro Max design data + LibreUIUX 7-dimension analysis.
+YOLO mode -- auto-proceed, never wait for user input.
 
-Party Log 형식: kdh-full-auto-pipeline의 형식과 동일.
-저장 경로: `_uxui-refactoring/party-logs/`
+## Your Task: Diagnose {페이지명} (page #{번호})
+
+### Step 1: Load Design System References
+1. Read _uxui-refactoring/CONFIG.md (프로젝트 설정)
+2. Read design-system/{project}/MASTER.md (전역 디자인 규칙)
+3. Read design-system/{project}/pages/{페이지명}.md (있으면 — 페이지 오버라이드)
+4. Read _uxui-refactoring/STYLE-GUIDE.md (있으면)
+
+### Step 2: Analyze Current Page Code
+1. Read ALL files in {page_path}/ (모든 소스 파일)
+2. Read relevant shared components
+3. Read relevant backend routes (API 엔드포인트, 데이터 형태)
+4. Map: 모든 표시 데이터, 사용자 액션, 상태 전환, API 호출
+
+### Step 3: Pro Max Design Data Query
+```bash
+python3 .claude/skills/ui-ux-pro-max/scripts/search.py "{페이지_키워드}" --domain style -n 5
+python3 .claude/skills/ui-ux-pro-max/scripts/search.py "{페이지_키워드}" --domain ux -n 5
+python3 .claude/skills/ui-ux-pro-max/scripts/search.py "{페이지_키워드}" --domain chart -n 3
+python3 .claude/skills/ui-ux-pro-max/scripts/search.py "layout responsive" --stack {stack}
+```
+
+### Step 4: LibreUIUX 7-Dimension Analysis
+/libre-ui-review 프레임워크를 직접 적용:
+
+1. **Archetypal Coherence** — 일관된 심리적 스토리?
+2. **Design Mastery** — 그리드, 타이포, 색상이론, 여백, 시각적 위계, 게슈탈트
+3. **Accessibility** — WCAG AA, 키보드, ARIA, 색상 대비, 터치 타겟
+4. **Security** — XSS, 입력 검증, 민감 데이터 노출
+5. **Performance** — 번들, 이미지, lazy loading, 코드 분할
+6. **Code Quality** — 컴포넌트 구조, 타입, 에러 처리, 재사용성
+7. **User Experience** — CTA, 네비게이션, 피드백, 상태 처리, 반응형
+
+각 차원 1~10점 + 종합 판정 (ELEVATE/REFINE/REBUILD)
+
+### Step 5: Write Diagnosis Report
+Save to: _uxui-refactoring/diagnose/{번호}-{페이지명}.md
+
+Structure:
+- Executive Summary (overall score, verdict, 7-dimension table)
+- Current State Analysis (ASCII layout, components, APIs, problems)
+- Design System Gap Analysis (MASTER.md vs current code)
+- Pro Max Recommendations (style, UX, charts)
+- 7-Dimension Detailed Scores
+- Redesign Priority List (layout changes first)
+- Available Components (Subframe or custom)
+
+### Step 6: Report to Orchestrator
+[Phase 1 Complete] diagnose-{번호}-{페이지명}
+Overall score: X/10
+Verdict: ELEVATE/REFINE/REBUILD
+Key findings: (2~3줄)
+Redesign priorities: (상위 3개)
+```
 
 ---
 
-## Mode: prompt PAGENAME
-
-### Worker가 하는 것
-
-```
-1. 현재 페이지 코드 읽기 (pages/, components/)
-2. 관련 백엔드 라우트/스키마 읽기
-3. Lovable 프롬프트 생성 → _uxui-refactoring/lovable-prompts/{번호}-{페이지명}.md
-   - What This Page Is For
-   - Data Displayed — In Detail
-   - User Actions
-   - UX Considerations
-   - What NOT to Include
-   (색상/폰트/레이아웃 등 시각적 지시 제로)
-4. 파티모드 3라운드
-   - Round 2 체크: 시각적 지시 없는지? 현재 코드에 있는 기능만인지?
-5. 오케스트레이터에게 완료 보고
-```
-
----
-
-## Mode: code PAGENAME
+## Mode: preview PAGE (Phase 2A — Subframe 실시간 프리뷰)
 
 ### 전제 조건
-- prompt 완료 + Lovable 와이어프레임 존재 (`_uxui-refactoring/wireframes/{번호}-{페이지명}.png`)
+- `diagnose PAGE` 완료 (진단 리포트 존재)
+- Subframe 설치됨 (미설치 시 이 단계 스킵 → 바로 redesign)
 
-### Worker가 하는 것
+### 이게 뭔가?
 
-```
-1. 와이어프레임 이미지 읽기 (디자인 목표)
-2. Lovable 프롬프트 읽기 (기능 요구사항)
-3. 현재 코드 읽기
-4. 코드 리팩토링 (UI/스타일만 변경, 기능 로직 불변)
-5. data-testid 추가
-6. 파티모드 3라운드
-   - Round 2 체크: 와이어프레임 매치? 기능 동일? data-testid 완전? 반응형?
-7. Playwright 테스트 작성 + 실행
-8. 오케스트레이터에게 완료 보고
-```
+코딩하기 전에 **Subframe 웹사이트(app.subframe.com)에서 디자인을 먼저 만들어서 브라우저로 확인**하는 단계.
+사용자가 직접 보고 "이거 좋아!" 해야 다음 단계(코딩)로 넘어간다.
 
-### 코딩 규칙
+### Worker 스폰 프롬프트
 
 ```
-1. 기능 로직 건드리지 말 것 — API 호출, 상태관리, 이벤트 핸들러 100% 유지
-2. UI/레이아웃/스타일만 변경
-3. data-testid 전부 추가
-4. 기존 data-testid 삭제 금지
-5. 새 파일 생성 최소화 (기존 파일 수정 선호)
-6. import 경로 대소문자 정확히 일치
+You are a senior UXUI designer.
+You create page designs in Subframe for real-time preview before coding.
+YOLO mode -- auto-proceed, never wait for user input.
+
+## Your Task: Create Subframe preview for {페이지명} (page #{번호})
+
+### Step 1: Read References
+1. Read _uxui-refactoring/diagnose/{번호}-{페이지명}.md (Phase 1 진단 결과)
+2. Read design-system/{project}/MASTER.md (전역 디자인 규칙)
+3. Read design-system/{project}/pages/{페이지명}.md (있으면)
+4. Read current page code (어떤 기능이 있는지 파악)
+
+### Step 2: Design in Subframe
+/subframe:design 스킬을 호출하여 Subframe에 페이지 디자인 생성.
+
+디자인할 때 반드시 포함:
+- Phase 1 진단에서 나온 개선 우선순위 반영
+- MASTER.md의 색상/폰트/스타일 적용
+- 레이아웃 구조를 현재와 다르게 (리디자인 핵심!)
+- 현재 페이지의 모든 기능 요소 배치
+- 로딩/에러/빈 상태 디자인
+
+### Step 3: Report to Orchestrator
+[Phase 2A Complete] preview-{번호}-{페이지명}
+Subframe page URL: (app.subframe.com 링크)
+Design summary: (레이아웃 변경점 2~3줄)
+User action needed: 브라우저에서 프리뷰 확인 후 "확정" 또는 "수정 요청"
+```
+
+### 사용자 확인 흐름
+
+```
+1. Worker가 Subframe에 디자인 생성 → URL 전달
+2. 사용자가 브라우저(app.subframe.com)에서 확인
+3. "좋아!" → redesign 단계로 진행
+   "바꿔줘" → Worker에게 수정 지시 → 다시 확인
+   "전체적으로 별로" → 다른 방향으로 다시 디자인
+4. 사용자 확정 → redesign PAGE 실행
+```
+
+### batch 모드에서의 preview
+
+batch 모드에서는 preview를 자동 스킵하고 바로 redesign으로 갑니다.
+개별 페이지(`preview PAGE`)에서만 사용.
+
+---
+
+## Mode: redesign PAGE (Phase 2B)
+
+### 전제 조건
+- `diagnose PAGE` 완료 (진단 리포트 존재)
+- `preview PAGE` 완료 시: Subframe 디자인 확정됨 → /subframe:develop 로 코드 변환
+- `preview PAGE` 미완료 시: Worker가 직접 디자인 + 코딩
+
+### Worker 스폰 프롬프트
+
+```
+You are a senior frontend developer AND UXUI designer.
+You REDESIGN pages — not just restyle. Layout structure MUST change.
+YOLO mode -- auto-proceed, never wait for user input.
+
+## CRITICAL: LAYOUT MUST CHANGE
+"리디자인" means the page layout/structure itself must be different.
+If you only change colors/borders/fonts without changing layout → INSTANT FAIL.
+Examples of REAL redesign:
+  - Grid 변경 (1-column → 2-column, flat list → bento grid)
+  - 새 시각화 추가 (chart, donut, progress bar, sparkline)
+  - 카드 구조 변경 (flat → gradient cards with effects)
+  - 정보 위계 재배치 (상단 KPI, 중앙 main, 하단 activity)
+  - 인터랙션 패턴 변경 (list → kanban, table → card grid)
+
+## CRITICAL: 기능 로직 불변
+API 호출, 상태관리, 이벤트 핸들러 100% 유지. UI만 변경.
+
+## CRITICAL: 구체적이고 자세하게
+hex/Tailwind/JSX 수준으로 구체적. 추상적 표현 금지.
+
+## Your References (MUST read)
+1. _uxui-refactoring/CONFIG.md — 프로젝트 설정
+2. design-system/{project}/MASTER.md — 전역 디자인 규칙
+3. design-system/{project}/pages/{페이지명}.md — 페이지 오버라이드 (있으면)
+4. _uxui-refactoring/diagnose/{번호}-{페이지명}.md — Phase 1 진단 결과
+5. _uxui-refactoring/STYLE-GUIDE.md — 종합 가이드 (있으면)
+6. 컴포넌트 라이브러리 (Subframe src/ui/ 또는 커스텀 components/)
+7. 현재 페이지 코드
+8. 백엔드 라우트 / 타입 정의
+
+## LibreUIUX 디자인 원칙 (/libre-ui-synth 내부 적용)
+- Archetypal Foundation: 브랜드 심리학적 의미
+- Design Mastery: 거장 원칙 — Dieter Rams, Vignelli, Bass
+- Technical Excellence: 접근성, 보안, 성능
+- Quality Assurance: 테스트
+- Deployment Readiness: SEO, Core Web Vitals
+
+## Your Task: Redesign {페이지명} (page #{번호})
+
+### Step 1: Read ALL References
+
+### Step 2: Design New Layout
+Save spec to: _uxui-refactoring/redesign/{번호}-{페이지명}-spec.md
+
+Include:
+1. **New Layout** (ASCII diagram — MUST differ from current)
+2. **Component Breakdown** — 각 컴포넌트의 정확한 Tailwind + JSX
+3. **Components from Library** — 기존 컴포넌트 활용 목록
+4. **New Visualizations** — 추가할 차트, 그래프 등
+5. **Responsive** — 375px, 768px, 1024px, 1440px
+6. **States** — Loading, Error, Empty (구체적 JSX)
+7. **data-testid Map** — 모든 인터랙티브 요소
+
+### Step 3: Implement Code
+- Design spec 따라 코드 수정
+- 기존 컴포넌트 라이브러리 활용
+- 기능 로직 100% 유지
+- 레이아웃 구조 자체를 변경
+
+### Step 4: Self-Check
+수정한 코드를 Read tool로 다시 읽고:
+- [ ] 레이아웃 구조가 확실히 다른가?
+- [ ] Design spec의 Tailwind이 정확히 적용됐는가?
+- [ ] 기능 로직이 100% 유지됐는가?
+- [ ] 컴포넌트 라이브러리를 활용했는가?
+- [ ] data-testid가 모두 추가됐는가?
+하나라도 NO → 즉시 수정
+
+### Step 5: Report to Orchestrator
+[Phase 2 Complete] redesign-{번호}-{페이지명}
+Layout changes: (이전 vs 이후 구조 변경 요약)
+Components used: (목록)
+Changed files: (경로들)
 ```
 
 ---
 
-## Mode: phase0 (Playwright 환경 세팅)
+## Mode: verify PAGE (Phase 3)
+
+### 전제 조건
+- `redesign PAGE` 완료
+
+### Worker 스폰 프롬프트
 
 ```
-1. CONFIG.md 읽기 (없으면 프로젝트 구조 분석 → 생성 제안)
-2. {E2E_DIR}/ 디렉토리 생성
-3. playwright.config.ts 생성 (CONFIG.md의 BASE_URL 기준)
-4. auth.setup.ts 생성
-5. smoke 테스트 파일 생성 (CONFIG.md의 페이지 목록 기반)
-6. npx playwright install chromium
-7. 사용자에게 .env.test 비밀번호 입력 요청
+You are a senior QA engineer AND UXUI auditor.
+You verify redesigned pages through BMAD party mode + LibreUIUX multi-audit.
+YOLO mode -- auto-proceed, never wait for user input.
+
+## CRITICAL: 비대화형 파티모드 (bmad-party-mode 스킬 호출 금지)
+Worker인 네가 직접 7명 전문가 역할극을 수행한다.
+
+## Your Task: Verify {페이지명} (page #{번호})
+
+### Step 1: Read All Files
+1. _uxui-refactoring/diagnose/{번호}-{페이지명}.md (Phase 1 점수)
+2. _uxui-refactoring/redesign/{번호}-{페이지명}-spec.md (design spec)
+3. ALL modified code files (Read tool — 기억으로 리뷰 금지)
+4. design-system/{project}/MASTER.md + pages/{페이지명}.md
+
+### Step 2: BMAD 파티모드 3라운드
+
+**Round 1 (Collaborative Lens):**
+1. 수정된 코드 전부 Read tool로 읽기
+2. 전문가 4~5명 우호적 리뷰 (인격 반영, 2~3문장, 크로스톡 2회+)
+3. LAYOUT CHANGE VERIFICATION:
+   - [ ] 레이아웃 구조가 이전과 다른가?
+   - [ ] 새 시각화가 추가됐는가?
+   - [ ] 색상만 바꾼 게 아닌가? (YES면 즉시 FAIL)
+4. 최소 2개 이슈
+5. party-logs/{번호}-{페이지명}-round1.md 저장
+6. 코드 수정
+
+**Round 2 (Adversarial Lens):**
+1. 수정된 코드 전부 Read tool로 다시 읽기
+2. 전문가 전원(7명) 적대적 모드, 각자 최소 1개 새 관찰
+3. CHECKLIST:
+   - [ ] Design spec 레이아웃과 코드 일치?
+   - [ ] Tailwind classes 정확?
+   - [ ] 기능 로직 100% 동일?
+   - [ ] data-testid 전부 추가?
+   - [ ] 반응형 정상?
+   - [ ] Loading/Error/Empty 상태 구현?
+   - [ ] Design system 준수?
+   - [ ] import 경로 정확?
+4. party-logs/{번호}-{페이지명}-round2.md 저장
+5. 코드 수정
+
+**Round 3 (Forensic Lens):**
+1. 최종 코드 Read tool로 읽기
+2. Round 1+2 이슈 재평가
+3. 각 전문가 최종 평가 (2~3문장, 인격)
+4. 품질 점수 X/10 + PASS(7+) / FAIL(6-)
+5. party-logs/{번호}-{페이지명}-round3.md 저장
+6. FAIL → 수정 후 3라운드 전체 재실행
+
+### Step 3: LibreUIUX 재감사 (7차원)
+- 7차원 점수 재채점
+- Phase 1 대비 최소 +2점 상승 필수 (미달 시 추가 수정)
+- _uxui-refactoring/verify/{번호}-{페이지명}-re-audit.md 저장
+
+### Step 4: LibreUIUX 추가 감사
+a) /libre-ui-critique — 8차원 디자인 피드백
+b) /libre-ui-responsive — 반응형 체크 (375/768/1024/1440px)
+c) /libre-a11y-audit — 접근성 감사 (WCAG, ARIA)
+이슈 있으면 코드 수정
+
+### Step 5: 테스트 작성 + 실행
+- 페이지 로드 확인
+- 주요 인터랙션
+- data-testid 존재 확인
+- 반응형 (desktop + mobile viewport)
+- 실패 시 수정 후 재실행
+
+### Step 6: Report to Orchestrator
+[Phase 3 Complete] verify-{번호}-{페이지명}
+Party mode: 3 rounds PASS (issues fixed: N)
+Quality score: X/10
+Re-audit score: X/10 (Phase 1 대비 +N점)
+Responsive: PASS/FAIL
+Accessibility: PASS/FAIL
+Tests: N passed
+Changed files: (경로들)
 ```
 
-## Mode: phase1
+---
+
+## Mode: batch PRIORITY
 
 ```
-1. npx playwright test src/tests/smoke/ 실행
-2. 결과 파싱 → 통과/실패 페이지 분류
+오케스트레이터:
+  1. CONFIG.md에서 해당 우선순위 페이지 목록 추출
+  2. TeamCreate로 팀 생성
+  3. 페이지별 순차 실행:
+     a. Worker 스폰 → diagnose (Phase 1)
+     b. SendMessage → redesign (Phase 2)
+     c. SendMessage → verify (Phase 3)
+     d. 완료 보고 → 검증 → 타입 체크 → 커밋+푸시
+  4. 5페이지마다 Worker shutdown + 새 Worker 스폰
+  5. 전체 완료 → 스모크 테스트 전체 실행
+```
+
+---
+
+## Mode: phase0 (테스트 환경 세팅)
+
+```
+1. CONFIG.md에서 테스트 프레임워크/배포 URL 읽기
+2. 테스트 디렉토리 생성 + 설정 파일 생성
+3. 테스트 러너 설치
+4. 인증 설정 (필요 시)
+```
+
+---
+
+## Mode: phase1 (스모크 테스트)
+
+```
+1. 전체 스모크 테스트 실행
+2. 결과 파싱 (통과/실패 분류)
 3. 요약 보고
 ```
 
-## Mode: phase3
+---
+
+## Mode: phase3 (시각 회귀 기준 등록)
 
 ```
-1. visual regression 테스트 파일 생성
-2. npx playwright test src/tests/visual/ --update-snapshots
-3. 기준 스크린샷 생성
-4. 커밋: test(visual): baseline screenshots
+1. visual regression 테스트 생성
+2. 기준 스크린샷 캡처
+3. 커밋: test(visual): baseline screenshots
 ```
 
-## Mode: final
+---
+
+## Mode: final (최종 전체 검증)
 
 ```
-1. smoke 테스트 (전 페이지 접근)
-2. interaction 테스트 (기능 동작)
-3. visual 테스트 (스크린샷 비교)
-4. 결과 종합 → 실패 시 수정 → 전부 통과 → 완료 선언
+1. 스모크 테스트 (전 페이지)
+2. 인터랙션 테스트 (기능 동작)
+3. 시각 회귀 테스트 (스크린샷 비교)
+4. 종합 리포트
+5. 실패 → Worker 수정
+6. 전부 통과 → 완료 선언
+```
+
+---
+
+## Mode: status
+
+```
+1. _uxui-refactoring/ 구조 확인
+2. 페이지별 진행 상태 테이블:
+   | # | 페이지 | diagnose | redesign | verify | 점수변화 |
+3. 다음 할 일 안내
 ```
 
 ---
@@ -263,10 +701,48 @@ Party Log 형식: kdh-full-auto-pipeline의 형식과 동일.
 
 ```
 _uxui-refactoring/
-├── CONFIG.md                 (프로젝트 설정 — 범용 사용 시 필수)
-├── lovable-prompts/          (Lovable 프롬프트)
-├── wireframes/               (Lovable 스크린샷)
-├── party-logs/               (파티모드 리뷰 로그)
+├── CONFIG.md                    (프로젝트 설정 — 범용 필수)
+├── STYLE-GUIDE.md               (종합 디자인 시스템 — 선택)
+├── diagnose/                    (Phase 1: 진단 리포트)
+├── redesign/                    (Phase 2: 디자인 스펙)
+├── verify/                      (Phase 3: 재감사 결과)
+└── party-logs/                  (파티모드 리뷰 로그)
+
+design-system/{project}/
+├── MASTER.md                    (Pro Max 전역 디자인 규칙)
+└── pages/                       (페이지별 오버라이드)
+```
+
+---
+
+## Party Log 형식
+
+### Round 1 (Collaborative):
+```
+## [Round 1 -- Collaborative] {페이지명}
+### Agent Discussion (인격 반영, 2~3문장, 크로스톡 2회+)
+### Layout Change Verification (체크리스트)
+### Issues Found (테이블)
+### Fixes Applied
+```
+
+### Round 2 (Adversarial):
+```
+## [Round 2 -- Adversarial] {페이지명}
+### Round 1 Fix Verification
+### Adversarial Discussion (전원 적대적)
+### Checklist Results (9개 항목)
+### New Issues Found
+### Fixes Applied
+```
+
+### Round 3 (Forensic):
+```
+## [Round 3 -- Final Judgment] {페이지명}
+### Issue Calibration (재평가)
+### Per-Agent Final Assessment (인격)
+### Quality Score: X/10
+### Verdict: PASS / FAIL
 ```
 
 ---
@@ -276,23 +752,102 @@ _uxui-refactoring/
 ```
 1. 첫 작업을 spawn 프롬프트에 포함 — "기다려" 금지
 2. mode=bypassPermissions
-3. 5개 이상 페이지 처리하면 shutdown + 새 Worker 스폰
-4. Worker가 멈추면 SendMessage로 리마인더
+3. 5페이지마다 shutdown + 새 Worker 스폰
+4. 멈추면 SendMessage 리마인더
+5. FAIL → 자동 재시도 1회 → 2번째 FAIL → 오케스트레이터 개입
 ```
+
+---
+
+## 트러블슈팅
+
+### Worker가 색상만 바꾸고 "완료" 보고
+핵심 실패 패턴. 즉시 FAIL.
+"Layout MUST change. You only changed colors. Redo with actual layout changes."
+
+### 재감사 점수가 +2점 미달
+"Need at least +2 improvement. Fix: (구체적 영역)."
+
+### Pro Max search.py 에러
+경로 확인: `.claude/skills/ui-ux-pro-max/scripts/search.py`
+
+### LibreUIUX 명령어 없음
+`.claude/commands/libre-*.md` 파일 존재 확인
 
 ---
 
 ## 절대 규칙
 
-1. **Lovable에게 디자인 전권 위임** — 프롬프트에 시각적 지시 제로
-2. **현재 코드 기준** — 삭제된 기능 부활 방지
-3. **기능 로직 건드리지 말 것** — UI/스타일만 변경
-4. **파티모드 3라운드 없이 커밋 금지**
-5. **Playwright 테스트 실패 시 커밋 금지**
-6. **data-testid 누락 시 커밋 금지**
-7. **파일에서 다시 읽어서 리뷰** (기억으로 리뷰 금지)
-8. **전문가 코멘트 2~3문장 이상** (인격 반영 필수)
-9. **"이슈 0개" = 재분석**
-10. **오케스트레이터는 코딩/파티모드 직접 안 함**
-11. **Worker spawn 시 첫 작업 포함 필수**
-12. **5페이지마다 Worker 교체**
+1. **레이아웃 구조 자체를 변경** — 색상만 바꾸면 FAIL
+2. **모든 산출물은 구체적이고 자세하게** — hex/Tailwind/JSX 수준
+3. **3-Phase 순서 준수** — diagnose → redesign → verify
+4. **Pro Max 디자인 시스템 참조 필수** — MASTER.md + 오버라이드
+5. **기능 로직 건드리지 말 것** — UI만 변경
+6. **파티모드 3라운드 없이 커밋 금지**
+7. **재감사 점수 +2점 이상**
+8. **테스트 없이 커밋 금지**
+9. **파일에서 다시 읽어서 리뷰** — 기억으로 리뷰 금지
+10. **전문가 코멘트 2~3문장 이상** — 인격 반영 필수
+11. **"이슈 0개" = 재분석**
+12. **오케스트레이터는 코딩/파티모드 안 함** — Worker 전담
+13. **Worker spawn 시 첫 작업 포함 필수**
+14. **5페이지마다 Worker 교체** — 컨텍스트 관리
+
+---
+
+## 다른 프로젝트에서 사용하기
+
+### 최소 설치 (필수 3개)
+
+```bash
+# 1. 파이프라인 명령어
+cp kodonghui_full_pipeline/kdh-uxui-pipeline.md  [프로젝트]/.claude/commands/
+
+# 2. Pro Max 스킬 (디자인 데이터)
+cp -r .claude/skills/ui-ux-pro-max/              [프로젝트]/.claude/skills/
+
+# 3. LibreUIUX 명령어 5개 (반드시 libre- 접두사로!)
+cp .claude/commands/libre-ui-review.md            [프로젝트]/.claude/commands/
+cp .claude/commands/libre-ui-synth.md             [프로젝트]/.claude/commands/
+cp .claude/commands/libre-ui-critique.md          [프로젝트]/.claude/commands/
+cp .claude/commands/libre-ui-responsive.md        [프로젝트]/.claude/commands/
+cp .claude/commands/libre-a11y-audit.md           [프로젝트]/.claude/commands/
+```
+
+### 추가 설치 (선택)
+
+```bash
+# 4. LibreUIUX 스킬 (디자인 지식 보강)
+cp -r .claude/skills/brand-systems/               [프로젝트]/.claude/skills/
+cp -r .claude/skills/design-masters/              [프로젝트]/.claude/skills/
+cp -r .claude/skills/design-movements/            [프로젝트]/.claude/skills/
+cp -r .claude/skills/design-principles/           [프로젝트]/.claude/skills/
+cp -r .claude/skills/premium-saas-design/         [프로젝트]/.claude/skills/
+
+# 5. Subframe (실시간 프리뷰) — /subframe:setup 으로 초기화
+# 6. BMAD 프레임워크 (파티모드) — 이미 있으면 불필요
+```
+
+### 설치 후 시작
+
+```bash
+# 1. CONFIG.md 작성
+# 2. 디자인 시스템 생성
+python3 .claude/skills/ui-ux-pro-max/scripts/search.py "{키워드}" --design-system --persist -p "{프로젝트명}"
+# 3. 시작!
+/kdh-uxui-pipeline diagnose {첫페이지}
+```
+
+### 접두사(prefix) 규칙
+
+모든 도구의 명령어에 접두사를 붙여서 충돌 방지:
+
+| 접두사 | 도구 | 예시 |
+|--------|------|------|
+| `/bmad-` | BMAD 프레임워크 | `/bmad-party-mode`, `/bmad-bmm-code-review` |
+| `/libre-` | LibreUIUX | `/libre-ui-review`, `/libre-ui-synth`, `/libre-a11y-audit` |
+| `/subframe:` | Subframe | `/subframe:design`, `/subframe:develop` |
+| `/kdh-` | 고동희 파이프라인 | `/kdh-uxui-pipeline`, `/kdh-full-auto-pipeline` |
+
+**새 명령어를 추가할 때도 해당 도구의 접두사를 붙일 것.**
+예: LibreUIUX에서 새 플러그인을 쓰려면 `libre-{이름}.md`로 저장.

@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../lib/api'
 import { useWsStore } from '../stores/ws-store'
-import { Card, Tabs, Skeleton } from '@corthex/ui'
+import { Tabs, Skeleton } from '@corthex/ui'
 import type { TabItem } from '@corthex/ui'
 import { NotificationSettings } from '../components/notification-settings'
 
@@ -16,11 +16,6 @@ type Notification = {
   isRead: boolean
   createdAt: string
 }
-
-const TABS: TabItem[] = [
-  { value: 'list', label: '알림 목록' },
-  { value: 'settings', label: '알림 설정' },
-]
 
 const TYPE_ICON: Record<string, string> = {
   chat_complete: '🔔',
@@ -134,8 +129,8 @@ export function NotificationsPage() {
   ]
 
   return (
-    <div className="p-4 sm:p-6 max-w-2xl mx-auto space-y-4">
-      <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">알림</h1>
+    <div className="p-4 sm:p-6 max-w-2xl mx-auto space-y-4" data-testid="notifications-page">
+      <h1 className="text-xl font-semibold tracking-tight text-slate-50">알림</h1>
 
       <Tabs items={tabsWithCount} value={activeTab} onChange={setTab} />
 
@@ -148,9 +143,10 @@ export function NotificationsPage() {
                 onClick={() => setFilter('all')}
                 className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                   filter === 'all'
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-300'
                 }`}
+                data-testid="filter-all"
               >
                 전체
               </button>
@@ -158,9 +154,10 @@ export function NotificationsPage() {
                 onClick={() => setFilter('unread')}
                 className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                   filter === 'unread'
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-300'
                 }`}
+                data-testid="filter-unread"
               >
                 미확인만
               </button>
@@ -168,7 +165,8 @@ export function NotificationsPage() {
             {unreadCount > 0 && (
               <button
                 onClick={() => markAllRead.mutate()}
-                className="text-xs text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 font-medium"
+                className="text-xs text-blue-400 hover:text-blue-300 font-medium transition-colors"
+                data-testid="mark-all-read"
               >
                 모두 읽음 ✓
               </button>
@@ -179,34 +177,35 @@ export function NotificationsPage() {
           {isLoading ? (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
-                <Skeleton key={i} className="h-16 rounded-lg" />
+                <Skeleton key={i} className="h-16 rounded-lg bg-slate-800" />
               ))}
             </div>
           ) : notifications.length === 0 ? (
-            <Card>
-              <div className="p-8 text-center text-sm text-zinc-500">
+            <div className="bg-slate-800/50 border border-slate-700 rounded-xl">
+              <div className="p-8 text-center text-sm text-slate-500">
                 {filter === 'unread' ? '미확인 알림이 없습니다' : '알림이 없습니다'}
               </div>
-            </Card>
+            </div>
           ) : (
             Object.entries(grouped).map(([group, items]) => (
               <div key={group}>
-                <p className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 mb-2">{group}</p>
+                <p className="text-xs font-semibold text-slate-500 mb-2">{group}</p>
                 <div className="space-y-1">
                   {items.map((n) => (
                     <button
                       key={n.id}
                       onClick={() => handleClick(n)}
-                      className={`w-full text-left flex items-start gap-3 px-4 py-3 rounded-lg transition-colors ${
+                      className={`w-full text-left flex items-start gap-3 px-4 py-3 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:ring-offset-0 ${
                         n.isRead
-                          ? 'hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
-                          : 'bg-indigo-50/50 dark:bg-indigo-950/20 hover:bg-indigo-50 dark:hover:bg-indigo-950/30'
+                          ? 'hover:bg-slate-800/50'
+                          : 'bg-blue-950/20 hover:bg-blue-950/30'
                       }`}
+                      data-testid={`notification-${n.id}`}
                     >
                       {/* 미읽음 인디케이터 */}
                       <div className="pt-1.5">
                         {!n.isRead ? (
-                          <div className="w-2 h-2 rounded-full bg-indigo-600" />
+                          <div className="w-2 h-2 rounded-full bg-blue-500" />
                         ) : (
                           <div className="w-2 h-2" />
                         )}
@@ -217,15 +216,15 @@ export function NotificationsPage() {
                       </span>
                       {/* 내용 */}
                       <div className="flex-1 min-w-0">
-                        <p className={`text-sm ${n.isRead ? 'text-zinc-600 dark:text-zinc-400' : 'text-zinc-900 dark:text-zinc-100 font-medium'}`}>
+                        <p className={`text-sm ${n.isRead ? 'text-slate-400' : 'text-slate-50 font-medium'}`}>
                           {n.title}
                         </p>
                         {n.body && (
-                          <p className="text-xs text-zinc-500 mt-0.5 truncate">{n.body}</p>
+                          <p className="text-xs text-slate-500 mt-0.5 truncate">{n.body}</p>
                         )}
                       </div>
                       {/* 시간 */}
-                      <span className="text-[11px] text-zinc-400 whitespace-nowrap pt-0.5">
+                      <span className="text-[11px] text-slate-500 whitespace-nowrap pt-0.5">
                         {timeAgo(n.createdAt)}
                       </span>
                     </button>

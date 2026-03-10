@@ -7,6 +7,7 @@ type SpeechCardProps = {
   content: string
   position: string
   roundNum: number
+  index?: number
   isLive?: boolean
 }
 
@@ -31,13 +32,13 @@ function getAvatarColor(agentId: string): string {
 
 const COLLAPSE_THRESHOLD = 200
 
-export function SpeechCard({ agentName, agentId, content, position, roundNum, isLive }: SpeechCardProps) {
+export function SpeechCard({ agentName, agentId, content, position, roundNum, index, isLive }: SpeechCardProps) {
   const [expanded, setExpanded] = useState(false)
   const isLong = content.length > COLLAPSE_THRESHOLD
   const displayContent = isLong && !expanded ? content.slice(0, COLLAPSE_THRESHOLD) + '...' : content
 
   return (
-    <div className="flex gap-3 group">
+    <div data-testid={index !== undefined ? `speech-card-${index}` : undefined} className="flex gap-3 group">
       {/* Avatar */}
       <div
         className={cn(
@@ -51,10 +52,10 @@ export function SpeechCard({ agentName, agentId, content, position, roundNum, is
       {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">{agentName}</span>
-          <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono">R{roundNum}</span>
+          <span className="text-xs font-bold text-slate-100">{agentName}</span>
+          <span className="text-[10px] text-slate-500 font-mono">R{roundNum}</span>
           {position && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 dark:text-indigo-300">
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400">
               {position}
             </span>
           )}
@@ -65,13 +66,13 @@ export function SpeechCard({ agentName, agentId, content, position, roundNum, is
             </span>
           )}
         </div>
-        <div className="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap leading-relaxed">
+        <div className="text-sm text-slate-300 whitespace-pre-wrap leading-relaxed">
           {displayContent}
         </div>
         {isLong && (
           <button
             onClick={() => setExpanded(!expanded)}
-            className="mt-1 text-xs text-indigo-500 hover:text-indigo-400 transition-colors"
+            className="mt-1 text-xs text-blue-400 hover:text-blue-300 transition-colors"
           >
             {expanded ? '접기' : '더 보기'}
           </button>

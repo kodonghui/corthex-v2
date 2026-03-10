@@ -66,7 +66,7 @@ function SummaryCards({ data }: { data: CostSummary | undefined }) {
   ]
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-testid="costs-summary-cards">
       {cards.map(c => (
         <Card key={c.label}>
           <CardContent>
@@ -262,7 +262,7 @@ function CostTabs({ startDate, endDate, companyId }: { startDate: string; endDat
     <Card>
       <CardContent>
         <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-3">3축 비용 분석</h2>
-        <Tabs items={tabs} value={tab} onChange={setTab} />
+        <Tabs items={tabs} value={tab} onChange={setTab} data-testid="costs-axis-tabs" />
         <div className="mt-4">
           {tab === 'agent' && (agentLoading ? <Skeleton className="h-32 w-full" /> : <AgentTable items={agentData?.data?.items ?? []} />)}
           {tab === 'model' && (modelLoading ? <Skeleton className="h-32 w-full" /> : <ModelTable items={modelData?.data?.items ?? []} />)}
@@ -302,7 +302,7 @@ function DailyChart({ companyId, endDate }: { companyId: string; endDate: string
     <Card>
       <CardContent>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">일일 비용 추이</h2>
+          <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100" data-testid="daily-chart-title">일일 비용 추이</h2>
           <div className="flex gap-1">
             {CHART_PERIODS.map(p => (
               <button
@@ -429,7 +429,7 @@ function BudgetPanel({ companyId, summaryData }: { companyId: string; summaryDat
   return (
     <Card>
       <CardContent>
-        <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-4">예산 설정</h2>
+        <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-4" data-testid="budget-panel-title">예산 설정</h2>
 
         {monthlyBudgetMicro > 0 && (
           <div className="mb-4">
@@ -483,6 +483,7 @@ function BudgetPanel({ companyId, summaryData }: { companyId: string; summaryDat
               onClick={handleSave}
               disabled={mutation.isPending}
               className="w-full"
+              data-testid="budget-save-btn"
             >
               {mutation.isPending ? '저장 중...' : '설정 저장'}
             </Button>
@@ -535,17 +536,17 @@ export function CostsPage() {
 
   if (!companyId) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6" data-testid="costs-page">
         <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">비용 관리</h1>
         <Card><CardContent>
-          <p className="text-sm text-zinc-500 text-center py-8">회사를 먼저 선택해주세요.</p>
+          <p className="text-sm text-zinc-500 text-center py-8" data-testid="costs-no-company">회사를 먼저 선택해주세요.</p>
         </CardContent></Card>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="costs-page">
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">비용 관리</h1>

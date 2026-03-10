@@ -103,9 +103,15 @@ const stepTypeLabels: Record<string, string> = {
 }
 
 const stepTypeColors: Record<string, string> = {
-  tool: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
-  llm: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300',
-  condition: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300',
+  tool: 'bg-blue-500/20 text-blue-400',
+  llm: 'bg-purple-500/20 text-purple-400',
+  condition: 'bg-amber-500/20 text-amber-400',
+}
+
+const stepTypeBorderColors: Record<string, string> = {
+  tool: 'border-blue-500/30',
+  llm: 'border-purple-500/30',
+  condition: 'border-amber-500/30',
 }
 
 // === Main Page ===
@@ -190,7 +196,11 @@ export function WorkflowsPage() {
   const suggestions = sugData?.data || []
 
   if (!selectedCompanyId) {
-    return <div className="text-zinc-500 dark:text-zinc-400">회사를 선택해주세요</div>
+    return (
+      <div className="flex items-center justify-center py-20 text-sm text-slate-500" data-testid="workflows-no-company">
+        회사를 선택해주세요
+      </div>
+    )
   }
 
   if (viewingExecutions) {
@@ -217,20 +227,22 @@ export function WorkflowsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">워크플로우 관리</h1>
+    <div className="space-y-6 p-6 bg-slate-900 min-h-full" data-testid="workflows-page">
+      <div className="flex items-center justify-between" data-testid="workflows-header">
+        <h1 className="text-2xl font-bold text-slate-50">워크플로우 관리</h1>
         <div className="flex gap-2">
           <button
             onClick={() => analyzeMut.mutate()}
             disabled={analyzeMut.isPending}
-            className="px-4 py-2 text-sm rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-50"
+            className="px-4 py-2 text-sm rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-700 disabled:opacity-50 transition-colors"
+            data-testid="analyze-button"
           >
             {analyzeMut.isPending ? '분석 중...' : '패턴 분석'}
           </button>
           <button
             onClick={() => setCreating(true)}
-            className="px-4 py-2 text-sm font-medium rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
+            className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+            data-testid="create-workflow-button"
           >
             + 새 워크플로우
           </button>
@@ -238,14 +250,15 @@ export function WorkflowsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-zinc-200 dark:border-zinc-700">
+      <div className="flex gap-1 border-b border-slate-700" data-testid="workflows-tabs">
         <button
           onClick={() => setTab('list')}
           className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
             tab === 'list'
-              ? 'border-indigo-600 text-indigo-700 dark:text-indigo-300'
-              : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+              ? 'border-blue-500 text-blue-400'
+              : 'border-transparent text-slate-400 hover:text-slate-200'
           }`}
+          data-testid="tab-list"
         >
           워크플로우 ({workflows.length})
         </button>
@@ -253,9 +266,10 @@ export function WorkflowsPage() {
           onClick={() => setTab('suggestions')}
           className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
             tab === 'suggestions'
-              ? 'border-indigo-600 text-indigo-700 dark:text-indigo-300'
-              : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+              ? 'border-blue-500 text-blue-400'
+              : 'border-transparent text-slate-400 hover:text-slate-200'
           }`}
+          data-testid="tab-suggestions"
         >
           제안 ({suggestions.length})
         </button>
@@ -263,41 +277,53 @@ export function WorkflowsPage() {
 
       {/* Workflow List */}
       {tab === 'list' && (
-        <div className="space-y-3">
-          {isLoading && <p className="text-zinc-500">로딩 중...</p>}
+        <div className="space-y-3" data-testid="workflow-list">
+          {isLoading && (
+            <div className="space-y-3" data-testid="workflows-loading">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="h-32 bg-slate-800/50 border border-slate-700 rounded-xl animate-pulse" />
+              ))}
+            </div>
+          )}
           {!isLoading && workflows.length === 0 && (
-            <div className="text-center py-12 text-zinc-500 dark:text-zinc-400">
-              <p className="text-lg mb-2">워크플로우가 없습니다</p>
-              <p className="text-sm">새 워크플로우를 만들거나 패턴 분석으로 자동 제안을 받아보세요.</p>
+            <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="workflows-empty">
+              <svg className="w-10 h-10 text-slate-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              <h3 className="text-lg font-medium text-slate-300 mb-2">워크플로우가 없습니다</h3>
+              <p className="text-sm text-slate-500">새 워크플로우를 만들거나 패턴 분석으로 자동 제안을 받아보세요.</p>
             </div>
           )}
           {workflows.map((wf) => (
             <div
               key={wf.id}
-              className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors"
+              className="p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:border-slate-600 transition-colors"
+              role="article"
+              aria-label={`워크플로우: ${wf.name}`}
+              data-testid={`workflow-card-${wf.id}`}
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{wf.name}</h3>
+                  <h3 className="text-base font-semibold text-slate-100">{wf.name}</h3>
                   {wf.description && (
-                    <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">{wf.description}</p>
+                    <p className="text-sm text-slate-400 mt-1">{wf.description}</p>
                   )}
-                  <div className="flex items-center gap-3 mt-2 text-xs text-zinc-500">
-                    <span className={wf.isActive ? 'text-green-600 dark:text-green-400' : 'text-zinc-400'}>
+                  <div className="flex items-center gap-3 mt-2 text-xs text-slate-500">
+                    <span className={wf.isActive ? 'text-emerald-400 font-medium' : 'text-slate-500'}>
                       {wf.isActive ? '활성' : '비활성'}
                     </span>
                     <span>{wf.steps.length}개 스텝</span>
                     <span>{new Date(wf.createdAt).toLocaleDateString('ko-KR')}</span>
                   </div>
                   {/* Mini DAG */}
-                  <div className="flex items-center gap-1 mt-2 flex-wrap">
+                  <div className="flex items-center gap-1 mt-3 flex-wrap">
                     {wf.steps.map((step, idx) => (
                       <span key={step.id} className="flex items-center gap-1">
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${stepTypeColors[step.type]}`}>
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${stepTypeColors[step.type]}`}>
                           {step.action}
                         </span>
                         {idx < wf.steps.length - 1 && (
-                          <span className="text-zinc-400 text-xs">→</span>
+                          <span className="text-slate-500 text-xs">→</span>
                         )}
                       </span>
                     ))}
@@ -308,13 +334,13 @@ export function WorkflowsPage() {
                     <button
                       onClick={() => executeMut.mutate(wf.id)}
                       disabled={executeMut.isPending}
-                      className="px-3 py-1.5 text-xs font-medium rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
+                      className="px-3 py-1.5 text-xs font-medium rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition-colors disabled:opacity-50"
                     >
                       {executeMut.isPending ? '실행 중...' : '실행'}
                     </button>
                     <button
                       onClick={() => setViewingExecutions(wf)}
-                      className="px-3 py-1.5 text-xs rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                      className="px-3 py-1.5 text-xs rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-700 transition-colors"
                     >
                       이력
                     </button>
@@ -322,7 +348,7 @@ export function WorkflowsPage() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => setEditingWorkflow(wf)}
-                      className="px-3 py-1.5 text-xs rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                      className="px-3 py-1.5 text-xs rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-700 transition-colors"
                     >
                       편집
                     </button>
@@ -330,7 +356,7 @@ export function WorkflowsPage() {
                       onClick={() => {
                         if (confirm('정말 삭제하시겠습니까?')) deleteMut.mutate(wf.id)
                       }}
-                      className="px-3 py-1.5 text-xs rounded-lg border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950"
+                      className="px-3 py-1.5 text-xs rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors"
                     >
                       삭제
                     </button>
@@ -344,27 +370,31 @@ export function WorkflowsPage() {
 
       {/* Suggestions */}
       {tab === 'suggestions' && (
-        <div className="space-y-3">
+        <div className="space-y-3" data-testid="suggestions-list">
           {suggestions.length === 0 && (
-            <div className="text-center py-12 text-zinc-500 dark:text-zinc-400">
-              <p className="text-lg mb-2">제안이 없습니다</p>
-              <p className="text-sm">"패턴 분석" 버튼을 눌러 반복 패턴을 감지해보세요.</p>
+            <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="suggestions-empty">
+              <svg className="w-10 h-10 text-slate-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              </svg>
+              <h3 className="text-lg font-medium text-slate-300 mb-2">제안이 없습니다</h3>
+              <p className="text-sm text-slate-500">"패턴 분석" 버튼을 눌러 반복 패턴을 감지해보세요.</p>
             </div>
           )}
           {suggestions.map((sug) => (
             <div
               key={sug.id}
-              className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900"
+              className="p-4 rounded-xl border border-slate-700 bg-slate-800/50"
+              data-testid={`suggestion-card-${sug.id}`}
             >
-              <p className="text-sm text-zinc-700 dark:text-zinc-300">{sug.reason}</p>
+              <p className="text-sm text-slate-300">{sug.reason}</p>
               <div className="flex items-center gap-1 mt-2 flex-wrap">
                 {(sug.suggestedSteps || []).map((step, idx) => (
                   <span key={step.id} className="flex items-center gap-1">
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${stepTypeColors[step.type] || 'bg-zinc-100 text-zinc-700'}`}>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${stepTypeColors[step.type] || 'bg-slate-600/50 text-slate-400'}`}>
                       {step.action}
                     </span>
                     {idx < sug.suggestedSteps.length - 1 && (
-                      <span className="text-zinc-400 text-xs">→</span>
+                      <span className="text-slate-500 text-xs">→</span>
                     )}
                   </span>
                 ))}
@@ -373,14 +403,14 @@ export function WorkflowsPage() {
                 <button
                   onClick={() => acceptMut.mutate(sug.id)}
                   disabled={acceptMut.isPending}
-                  className="px-3 py-1.5 text-xs font-medium rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
+                  className="px-3 py-1.5 text-xs font-medium rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition-colors disabled:opacity-50"
                 >
                   수락
                 </button>
                 <button
                   onClick={() => rejectMut.mutate(sug.id)}
                   disabled={rejectMut.isPending}
-                  className="px-3 py-1.5 text-xs rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-50"
+                  className="px-3 py-1.5 text-xs rounded-lg border border-slate-600 text-slate-400 hover:bg-slate-700 disabled:opacity-50 transition-colors"
                 >
                   거절
                 </button>
@@ -476,20 +506,20 @@ function WorkflowEditor({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6 bg-slate-900 min-h-full" data-testid="workflow-editor">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+        <h1 className="text-2xl font-bold text-slate-50">
           {isEditing ? '워크플로우 편집' : '새 워크플로우'}
         </h1>
         <div className="flex items-center gap-3">
           {/* Canvas/Form mode toggle */}
-          <div className="flex rounded-lg border border-zinc-300 dark:border-zinc-600 overflow-hidden">
+          <div className="flex rounded-lg border border-slate-600 overflow-hidden" data-testid="editor-mode-toggle">
             <button
               onClick={() => setEditorMode('canvas')}
               className={`px-3 py-1.5 text-xs font-medium transition-colors ${
                 editorMode === 'canvas'
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
               }`}
             >
               캔버스
@@ -498,38 +528,43 @@ function WorkflowEditor({
               onClick={() => setEditorMode('form')}
               className={`px-3 py-1.5 text-xs font-medium transition-colors ${
                 editorMode === 'form'
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
               }`}
             >
               폼
             </button>
           </div>
-          <button onClick={onClose} className="text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">
-            ← 목록으로
+          <button onClick={onClose} className="text-sm text-slate-400 hover:text-slate-200 transition-colors">
+            <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            목록으로
           </button>
         </div>
       </div>
 
       {/* Name & Description */}
-      <div className="space-y-4 p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900">
+      <div className="space-y-4 p-4 rounded-xl border border-slate-700 bg-slate-800/50" data-testid="workflow-form">
         <div>
-          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">이름 *</label>
+          <label className="block text-sm font-medium text-slate-300 mb-1">이름 *</label>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500/40 focus:outline-none"
+            className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-slate-50 outline-none transition-colors"
             placeholder="예: 일일 리포트 생성 파이프라인"
+            data-testid="workflow-name-input"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">설명</label>
+          <label className="block text-sm font-medium text-slate-300 mb-1">설명</label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
-            className="w-full px-3 py-2 text-sm border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500/40 focus:outline-none resize-none"
+            className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-slate-50 outline-none resize-none transition-colors"
             placeholder="워크플로우 설명 (선택)"
+            data-testid="workflow-desc-input"
           />
         </div>
       </div>
@@ -548,10 +583,11 @@ function WorkflowEditor({
           {/* Step Builder */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">스텝 ({steps.length})</h2>
+              <h2 className="text-lg font-semibold text-slate-100">스텝 ({steps.length})</h2>
               <button
                 onClick={addStep}
-                className="px-3 py-1.5 text-xs font-medium rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
+                className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+                data-testid="add-step-button"
               >
                 + 스텝 추가
               </button>
@@ -573,17 +609,18 @@ function WorkflowEditor({
           </div>
 
           {/* Save */}
-          <div className="flex gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-700">
+          <div className="flex gap-3 pt-4 border-t border-slate-700">
             <button
               onClick={handleSave}
               disabled={saving}
-              className="px-6 py-2 text-sm font-medium rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50"
+              className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-6 py-2 text-sm font-medium transition-colors disabled:opacity-50"
+              data-testid="save-workflow-button"
             >
               {saving ? '저장 중...' : isEditing ? '수정' : '생성'}
             </button>
             <button
               onClick={onClose}
-              className="px-6 py-2 text-sm rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              className="px-6 py-2 text-sm rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-700 transition-colors"
             >
               취소
             </button>
@@ -618,37 +655,37 @@ function StepForm({
   const otherSteps = allSteps.filter((s) => s.id !== step.id)
 
   return (
-    <div className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 space-y-3">
+    <div className="p-4 rounded-xl border border-slate-700 bg-slate-800/50 space-y-3" data-testid={`step-form-${index}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-mono text-zinc-400">#{index + 1}</span>
+          <span className="text-xs font-mono text-slate-500">#{index + 1}</span>
           <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${stepTypeColors[step.type]}`}>
             {stepTypeLabels[step.type]}
           </span>
         </div>
         <div className="flex items-center gap-1">
-          <button onClick={() => onMove(-1)} disabled={isFirst} className="p-1 text-xs text-zinc-400 hover:text-zinc-600 disabled:opacity-30">▲</button>
-          <button onClick={() => onMove(1)} disabled={isLast} className="p-1 text-xs text-zinc-400 hover:text-zinc-600 disabled:opacity-30">▼</button>
-          <button onClick={onRemove} className="p-1 text-xs text-red-400 hover:text-red-600 ml-2">✕</button>
+          <button onClick={() => onMove(-1)} disabled={isFirst} className="p-1 text-xs text-slate-400 hover:text-slate-200 disabled:opacity-30">▲</button>
+          <button onClick={() => onMove(1)} disabled={isLast} className="p-1 text-xs text-slate-400 hover:text-slate-200 disabled:opacity-30">▼</button>
+          <button onClick={onRemove} className="p-1 text-xs text-red-400 hover:text-red-300 ml-2">✕</button>
         </div>
       </div>
 
       <div className="grid grid-cols-3 gap-3">
         <div>
-          <label className="block text-xs font-medium text-zinc-500 mb-1">이름 *</label>
+          <label className="block text-xs font-medium text-slate-500 mb-1">이름 *</label>
           <input
             value={step.name}
             onChange={(e) => onUpdate({ name: e.target.value })}
-            className="w-full px-2 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-indigo-500/40 focus:outline-none"
+            className="w-full bg-slate-800 border border-slate-600 rounded-lg px-2 py-1.5 text-sm text-slate-50 outline-none focus:border-blue-500 transition-colors"
             placeholder="스텝 이름"
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-zinc-500 mb-1">타입</label>
+          <label className="block text-xs font-medium text-slate-500 mb-1">타입</label>
           <select
             value={step.type}
             onChange={(e) => onUpdate({ type: e.target.value as WorkflowStep['type'] })}
-            className="w-full px-2 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-indigo-500/40 focus:outline-none"
+            className="w-full bg-slate-800 border border-slate-600 rounded-lg px-2 py-1.5 text-sm text-slate-300 outline-none focus:border-blue-500 transition-colors"
           >
             <option value="tool">Tool</option>
             <option value="llm">LLM</option>
@@ -656,11 +693,11 @@ function StepForm({
           </select>
         </div>
         <div>
-          <label className="block text-xs font-medium text-zinc-500 mb-1">액션 *</label>
+          <label className="block text-xs font-medium text-slate-500 mb-1">액션 *</label>
           <input
             value={step.action}
             onChange={(e) => onUpdate({ action: e.target.value })}
-            className="w-full px-2 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-indigo-500/40 focus:outline-none"
+            className="w-full bg-slate-800 border border-slate-600 rounded-lg px-2 py-1.5 text-sm text-slate-50 outline-none focus:border-blue-500 transition-colors"
             placeholder={step.type === 'tool' ? 'search_web' : step.type === 'llm' ? 'summarize' : 'check_result'}
           />
         </div>
@@ -669,12 +706,12 @@ function StepForm({
       {/* Type-specific fields */}
       {step.type === 'llm' && (
         <div>
-          <label className="block text-xs font-medium text-zinc-500 mb-1">시스템 프롬프트</label>
+          <label className="block text-xs font-medium text-slate-500 mb-1">시스템 프롬프트</label>
           <textarea
             value={step.systemPrompt || ''}
             onChange={(e) => onUpdate({ systemPrompt: e.target.value || undefined })}
             rows={2}
-            className="w-full px-2 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 resize-none focus:ring-1 focus:ring-indigo-500/40 focus:outline-none"
+            className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-2 py-1.5 text-sm text-slate-50 outline-none resize-none transition-colors"
             placeholder="LLM에게 전달할 시스템 프롬프트"
           />
         </div>
@@ -683,11 +720,11 @@ function StepForm({
       {step.type === 'condition' && (
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-medium text-zinc-500 mb-1">True Branch</label>
+            <label className="block text-xs font-medium text-slate-500 mb-1">True Branch</label>
             <select
               value={step.trueBranch || ''}
               onChange={(e) => onUpdate({ trueBranch: e.target.value || undefined })}
-              className="w-full px-2 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-indigo-500/40 focus:outline-none"
+              className="w-full bg-slate-800 border border-slate-600 rounded-lg px-2 py-1.5 text-sm text-slate-300 outline-none focus:border-blue-500 transition-colors"
             >
               <option value="">선택 없음</option>
               {otherSteps.map((s) => (
@@ -696,11 +733,11 @@ function StepForm({
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-zinc-500 mb-1">False Branch</label>
+            <label className="block text-xs font-medium text-slate-500 mb-1">False Branch</label>
             <select
               value={step.falseBranch || ''}
               onChange={(e) => onUpdate({ falseBranch: e.target.value || undefined })}
-              className="w-full px-2 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-indigo-500/40 focus:outline-none"
+              className="w-full bg-slate-800 border border-slate-600 rounded-lg px-2 py-1.5 text-sm text-slate-300 outline-none focus:border-blue-500 transition-colors"
             >
               <option value="">선택 없음</option>
               {otherSteps.map((s) => (
@@ -713,7 +750,7 @@ function StepForm({
 
       {/* DependsOn */}
       <div>
-        <label className="block text-xs font-medium text-zinc-500 mb-1">의존 스텝 (dependsOn)</label>
+        <label className="block text-xs font-medium text-slate-500 mb-1">의존 스텝 (dependsOn)</label>
         <div className="flex flex-wrap gap-2">
           {otherSteps.map((s) => {
             const isSelected = step.dependsOn?.includes(s.id)
@@ -730,8 +767,8 @@ function StepForm({
                 }}
                 className={`text-xs px-2 py-1 rounded-full border transition-colors ${
                   isSelected
-                    ? 'bg-indigo-100 dark:bg-indigo-900/40 border-indigo-300 dark:border-indigo-600 text-indigo-700 dark:text-indigo-300'
-                    : 'border-zinc-300 dark:border-zinc-600 text-zinc-500 hover:border-zinc-400'
+                    ? 'bg-blue-600/20 border-blue-500/40 text-blue-400'
+                    : 'border-slate-600 text-slate-500 hover:border-slate-400'
                 }`}
               >
                 {s.name || s.action || s.id.slice(0, 8)}
@@ -739,7 +776,7 @@ function StepForm({
             )
           })}
           {otherSteps.length === 0 && (
-            <span className="text-xs text-zinc-400">다른 스텝이 없습니다</span>
+            <span className="text-xs text-slate-500">다른 스텝이 없습니다</span>
           )}
         </div>
       </div>
@@ -747,24 +784,24 @@ function StepForm({
       {/* Advanced: timeout, retryCount */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-zinc-500 mb-1">타임아웃 (ms)</label>
+          <label className="block text-xs font-medium text-slate-500 mb-1">타임아웃 (ms)</label>
           <input
             type="number"
             value={step.timeout || ''}
             onChange={(e) => onUpdate({ timeout: e.target.value ? Number(e.target.value) : undefined })}
-            className="w-full px-2 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-indigo-500/40 focus:outline-none"
+            className="w-full bg-slate-800 border border-slate-600 rounded-lg px-2 py-1.5 text-sm text-slate-50 outline-none focus:border-blue-500 transition-colors"
             placeholder="30000"
             min={1000}
             max={300000}
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-zinc-500 mb-1">재시도 횟수</label>
+          <label className="block text-xs font-medium text-slate-500 mb-1">재시도 횟수</label>
           <input
             type="number"
             value={step.retryCount ?? ''}
             onChange={(e) => onUpdate({ retryCount: e.target.value ? Number(e.target.value) : undefined })}
-            className="w-full px-2 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-indigo-500/40 focus:outline-none"
+            className="w-full bg-slate-800 border border-slate-600 rounded-lg px-2 py-1.5 text-sm text-slate-50 outline-none focus:border-blue-500 transition-colors"
             placeholder="0"
             min={0}
             max={3}
@@ -816,31 +853,44 @@ function ExecutionHistory({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6 bg-slate-900 min-h-full" data-testid="execution-history">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">실행 이력</h1>
-          <p className="text-sm text-zinc-500 mt-1">{workflow.name}</p>
+          <h1 className="text-2xl font-bold text-slate-50">실행 이력</h1>
+          <p className="text-sm text-slate-500 mt-1">{workflow.name}</p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={() => executeMut.mutate()}
             disabled={executeMut.isPending}
-            className="px-4 py-2 text-sm font-medium rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition-colors disabled:opacity-50"
           >
             {executeMut.isPending ? '실행 중...' : '지금 실행'}
           </button>
-          <button onClick={onClose} className="text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">
-            ← 목록으로
+          <button onClick={onClose} className="text-sm text-slate-400 hover:text-slate-200 transition-colors">
+            <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            목록으로
           </button>
         </div>
       </div>
 
-      {isLoading && <p className="text-zinc-500">로딩 중...</p>}
+      {isLoading && (
+        <div className="space-y-3">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="h-20 bg-slate-800/50 border border-slate-700 rounded-xl animate-pulse" />
+          ))}
+        </div>
+      )}
       {!isLoading && executions.length === 0 && (
-        <div className="text-center py-12 text-zinc-500 dark:text-zinc-400">
-          <p className="text-lg mb-2">실행 이력이 없습니다</p>
-          <p className="text-sm">"지금 실행" 버튼을 눌러 워크플로우를 실행해보세요.</p>
+        <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="executions-empty">
+          <svg className="w-10 h-10 text-slate-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <h3 className="text-lg font-medium text-slate-300 mb-2">실행 이력이 없습니다</h3>
+          <p className="text-sm text-slate-500">"지금 실행" 버튼을 눌러 워크플로우를 실행해보세요.</p>
         </div>
       )}
 
@@ -849,25 +899,26 @@ function ExecutionHistory({
           <button
             key={exec.id}
             onClick={() => setSelectedExecution(exec)}
-            className="w-full text-left p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors"
+            className="w-full text-left p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:border-slate-600 transition-colors"
+            data-testid={`execution-card-${exec.id}`}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
                   exec.status === 'success'
-                    ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
-                    : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
+                    ? 'bg-emerald-500/20 text-emerald-400'
+                    : 'bg-red-500/20 text-red-400'
                 }`}>
                   {exec.status === 'success' ? '성공' : '실패'}
                 </span>
-                <span className="text-sm text-zinc-700 dark:text-zinc-300">
+                <span className="text-sm text-slate-300">
                   {exec.stepSummaries.length}개 스텝
                 </span>
-                <span className="text-sm text-zinc-500">
+                <span className="text-sm text-slate-500">
                   {(exec.totalDurationMs / 1000).toFixed(1)}초
                 </span>
               </div>
-              <span className="text-xs text-zinc-400">
+              <span className="text-xs text-slate-500">
                 {new Date(exec.createdAt).toLocaleString('ko-KR')}
               </span>
             </div>
@@ -878,9 +929,9 @@ function ExecutionHistory({
                   key={step.stepId}
                   title={`${step.stepName}: ${step.status}`}
                   className={`h-2 flex-1 rounded-full ${
-                    step.status === 'completed' ? 'bg-green-400 dark:bg-green-600'
-                    : step.status === 'failed' ? 'bg-red-400 dark:bg-red-600'
-                    : 'bg-zinc-300 dark:bg-zinc-600'
+                    step.status === 'completed' ? 'bg-emerald-500/60'
+                    : step.status === 'failed' ? 'bg-red-500/60'
+                    : 'bg-slate-600'
                   }`}
                 />
               ))}
@@ -904,31 +955,34 @@ function ExecutionDetail({
   onBack: () => void
 }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6 bg-slate-900 min-h-full" data-testid="execution-detail">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">실행 상세</h1>
-          <p className="text-sm text-zinc-500 mt-1">{workflowName}</p>
+          <h1 className="text-2xl font-bold text-slate-50">실행 상세</h1>
+          <p className="text-sm text-slate-500 mt-1">{workflowName}</p>
         </div>
-        <button onClick={onBack} className="text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">
-          ← 이력으로
+        <button onClick={onBack} className="text-sm text-slate-400 hover:text-slate-200 transition-colors">
+          <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          이력으로
         </button>
       </div>
 
       {/* Summary */}
-      <div className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900">
+      <div className="p-4 rounded-xl border border-slate-700 bg-slate-800/50">
         <div className="flex items-center gap-4">
-          <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+          <span className={`px-3 py-1 rounded-full text-sm font-medium ${
             execution.status === 'success'
-              ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
-              : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
+              ? 'bg-emerald-500/20 text-emerald-400'
+              : 'bg-red-500/20 text-red-400'
           }`}>
             {execution.status === 'success' ? '성공' : '실패'}
           </span>
-          <span className="text-sm text-zinc-600 dark:text-zinc-400">
+          <span className="text-sm text-slate-400">
             총 소요시간: {(execution.totalDurationMs / 1000).toFixed(2)}초
           </span>
-          <span className="text-sm text-zinc-500">
+          <span className="text-sm text-slate-500">
             {new Date(execution.createdAt).toLocaleString('ko-KR')}
           </span>
         </div>
@@ -936,49 +990,50 @@ function ExecutionDetail({
 
       {/* Step Results */}
       <div className="space-y-3">
-        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+        <h2 className="text-lg font-semibold text-slate-100">
           스텝 결과 ({execution.stepSummaries.length})
         </h2>
         {execution.stepSummaries.map((step, idx) => (
           <div
             key={step.stepId}
-            className={`p-4 rounded-lg border bg-white dark:bg-zinc-900 ${
+            className={`p-4 rounded-xl border bg-slate-800/50 ${
               step.status === 'completed'
-                ? 'border-green-200 dark:border-green-800'
+                ? 'border-emerald-500/30'
                 : step.status === 'failed'
-                ? 'border-red-200 dark:border-red-800'
-                : 'border-zinc-200 dark:border-zinc-700'
+                ? 'border-red-500/30'
+                : 'border-slate-700'
             }`}
+            data-testid={`step-result-${idx}`}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <span className="text-xs font-mono text-zinc-400">#{idx + 1}</span>
-                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                <span className="text-xs font-mono text-slate-500">#{idx + 1}</span>
+                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                   step.status === 'completed'
-                    ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                    ? 'bg-emerald-500/20 text-emerald-400'
                     : step.status === 'failed'
-                    ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
-                    : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
+                    ? 'bg-red-500/20 text-red-400'
+                    : 'bg-slate-600/50 text-slate-400'
                 }`}>
                   {step.status === 'completed' ? '완료' : step.status === 'failed' ? '실패' : step.status}
                 </span>
-                <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                <span className="text-sm font-medium text-slate-100">
                   {step.stepName}
                 </span>
               </div>
-              <span className="text-xs text-zinc-500">
+              <span className="text-xs text-slate-500">
                 {step.durationMs >= 1000
                   ? `${(step.durationMs / 1000).toFixed(1)}초`
                   : `${step.durationMs}ms`}
               </span>
             </div>
             {step.error && (
-              <div className="mt-2 p-2 rounded bg-red-50 dark:bg-red-950/30 text-xs text-red-600 dark:text-red-400 font-mono">
+              <div className="mt-2 p-2 rounded-lg bg-red-500/10 text-xs text-red-400 font-mono">
                 {step.error}
               </div>
             )}
             {step.output != null && (
-              <div className="mt-2 p-2 rounded bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-600 dark:text-zinc-400 font-mono max-h-32 overflow-y-auto">
+              <div className="mt-2 p-2 rounded-lg bg-slate-900/50 text-xs text-slate-400 font-mono max-h-32 overflow-y-auto border border-slate-700">
                 {typeof step.output === 'string' ? step.output : JSON.stringify(step.output, null, 2)}
               </div>
             )}
@@ -997,34 +1052,36 @@ function DagPreview({ steps }: { steps: WorkflowStep[] }) {
   if (steps.length === 0) return null
 
   return (
-    <div className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/50">
-      <h3 className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-3">DAG 미리보기</h3>
+    <div className="p-4 rounded-xl border border-slate-700 bg-slate-900/50" aria-label="워크플로우 DAG 미리보기" data-testid="dag-preview">
+      <h3 className="text-sm font-medium text-slate-300 mb-3">DAG 미리보기</h3>
       <div className="space-y-2">
         {layers.map((layer, layerIdx) => (
           <div key={layerIdx}>
             {layerIdx > 0 && (
               <div className="flex justify-center py-1">
-                <span className="text-zinc-400 text-sm">↓</span>
+                <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                </svg>
               </div>
             )}
             <div className="flex gap-2 justify-center flex-wrap">
               {layer.map((step) => (
                 <div
                   key={step.id}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium border ${stepTypeColors[step.type]} border-current/20`}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium border ${stepTypeColors[step.type]} ${stepTypeBorderColors[step.type]}`}
                 >
                   <span className="opacity-60 mr-1">{stepTypeLabels[step.type]}:</span>
                   {step.name || step.action || '(미입력)'}
                 </div>
               ))}
               {layer.length > 1 && (
-                <span className="self-center text-[10px] text-zinc-400 ml-1">(병렬)</span>
+                <span className="self-center text-[10px] text-slate-500 ml-1">(병렬)</span>
               )}
             </div>
           </div>
         ))}
         {layers.reduce((acc, l) => acc + l.length, 0) < steps.length && (
-          <p className="text-xs text-amber-600 dark:text-amber-400 text-center mt-2">
+          <p className="text-xs text-amber-400 text-center mt-2">
             순환 의존성이 감지되었습니다
           </p>
         )}

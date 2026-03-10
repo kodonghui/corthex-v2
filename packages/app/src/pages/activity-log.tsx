@@ -4,8 +4,6 @@ import { useSearchParams } from 'react-router-dom'
 import { api } from '../lib/api'
 import { useActivityWs } from '../hooks/use-activity-ws'
 import { WsStatusIndicator } from '../components/ws-status-indicator'
-import { Tabs, Badge, Input, SkeletonTable, EmptyState } from '@corthex/ui'
-import type { TabItem } from '@corthex/ui'
 
 // === Types (matching server response) ===
 
@@ -138,28 +136,28 @@ type ToolInvocation = {
 
 // === Constants ===
 
-const TAB_ITEMS: TabItem[] = [
+const TAB_ITEMS = [
   { value: 'agents', label: '활동' },
   { value: 'delegations', label: '통신' },
   { value: 'quality', label: 'QA' },
   { value: 'tools', label: '도구' },
 ]
 
-const STATUS_BADGE: Record<string, { label: string; variant: 'success' | 'error' | 'info' | 'warning' | 'default' }> = {
-  completed: { label: '완료', variant: 'success' },
-  done: { label: '완료', variant: 'success' },
-  end: { label: '완료', variant: 'success' },
-  success: { label: '성공', variant: 'success' },
-  failed: { label: '실패', variant: 'error' },
-  error: { label: '오류', variant: 'error' },
-  working: { label: '진행중', variant: 'info' },
-  start: { label: '진행중', variant: 'info' },
-  running: { label: '진행중', variant: 'info' },
-  pass: { label: 'PASS', variant: 'success' },
-  fail: { label: 'FAIL', variant: 'error' },
-  warning: { label: '경고', variant: 'warning' },
-  clean: { label: '정상', variant: 'success' },
-  critical: { label: '위험', variant: 'error' },
+const STATUS_BADGE: Record<string, { label: string; classes: string }> = {
+  completed: { label: '완료', classes: 'bg-emerald-500/20 text-emerald-400' },
+  done: { label: '완료', classes: 'bg-emerald-500/20 text-emerald-400' },
+  end: { label: '완료', classes: 'bg-emerald-500/20 text-emerald-400' },
+  success: { label: '성공', classes: 'bg-emerald-500/20 text-emerald-400' },
+  failed: { label: '실패', classes: 'bg-red-500/20 text-red-400' },
+  error: { label: '오류', classes: 'bg-red-500/20 text-red-400' },
+  working: { label: '진행중', classes: 'bg-blue-500/20 text-blue-400' },
+  start: { label: '진행중', classes: 'bg-blue-500/20 text-blue-400' },
+  running: { label: '진행중', classes: 'bg-blue-500/20 text-blue-400' },
+  pass: { label: 'PASS', classes: 'bg-emerald-500/20 text-emerald-400' },
+  fail: { label: 'FAIL', classes: 'bg-red-500/20 text-red-400' },
+  warning: { label: '경고', classes: 'bg-amber-500/20 text-amber-400' },
+  clean: { label: '정상', classes: 'bg-emerald-500/20 text-emerald-400' },
+  critical: { label: '위험', classes: 'bg-red-500/20 text-red-400' },
 }
 
 const SCORE_LABELS: Record<string, string> = {
@@ -171,15 +169,15 @@ const SCORE_LABELS: Record<string, string> = {
 }
 
 const SEVERITY_STYLES: Record<string, string> = {
-  critical: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
-  major: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
-  minor: 'bg-zinc-100 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300',
+  critical: 'bg-red-500/20 text-red-400',
+  major: 'bg-amber-500/20 text-amber-400',
+  minor: 'bg-slate-600/50 text-slate-400',
 }
 
 const RESULT_STYLES: Record<string, string> = {
-  pass: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
-  warn: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
-  fail: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
+  pass: 'bg-emerald-500/20 text-emerald-400',
+  warn: 'bg-amber-500/20 text-amber-400',
+  fail: 'bg-red-500/20 text-red-400',
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -242,9 +240,9 @@ function scoreColor(pct: number): string {
 }
 
 function scoreTextColor(pct: number): string {
-  if (pct >= 80) return 'text-emerald-600 dark:text-emerald-400'
-  if (pct >= 60) return 'text-amber-600 dark:text-amber-400'
-  return 'text-red-600 dark:text-red-400'
+  if (pct >= 80) return 'text-emerald-400'
+  if (pct >= 60) return 'text-amber-400'
+  return 'text-red-400'
 }
 
 // === Main Page ===
@@ -334,26 +332,48 @@ export function ActivityLogPage() {
   const alertCount24h = securityQuery.data?.data?.count24h ?? 0
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col bg-slate-900" data-testid="activity-log-page">
       {/* Header */}
-      <div className="px-4 md:px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
-        <h2 className="text-lg font-semibold">통신로그</h2>
+      <div className="px-4 md:px-6 py-4 border-b border-slate-700 flex items-center justify-between" data-testid="activity-header">
+        <h2 className="text-lg font-semibold text-slate-50">통신로그</h2>
         <WsStatusIndicator />
       </div>
 
       {/* Tabs */}
-      <div className="px-4 md:px-6">
-        <Tabs items={TAB_ITEMS} value={tab} onChange={setTab} />
+      <div className="px-4 md:px-6 border-b border-slate-700" data-testid="activity-tabs">
+        <div className="flex gap-0" role="tablist">
+          {TAB_ITEMS.map(item => (
+            <button
+              key={item.value}
+              role="tab"
+              aria-selected={tab === item.value}
+              onClick={() => setTab(item.value)}
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                tab === item.value
+                  ? 'border-blue-500 text-blue-400'
+                  : 'border-transparent text-slate-400 hover:text-slate-200'
+              }`}
+              data-testid={`tab-${item.value}`}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Security Alert Banner (QA tab only) */}
       {tab === 'quality' && alertCount24h > 0 && (
         <div
-          className="mx-4 md:mx-6 mt-2 px-3 py-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md cursor-pointer flex items-center justify-between"
+          className="mx-4 md:mx-6 mt-2 px-3 py-2 bg-red-500/10 border border-red-500/30 rounded-xl cursor-pointer flex items-center justify-between hover:bg-red-500/15 transition-colors"
           onClick={() => setShowSecurityAlerts(!showSecurityAlerts)}
+          role="alert"
+          data-testid="security-alert-banner"
         >
           <div className="flex items-center gap-2">
-            <span className="text-red-600 dark:text-red-400 text-sm font-medium">
+            <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+            <span className="text-red-400 text-sm font-medium">
               보안 알림: 최근 24시간 {alertCount24h}건 차단
             </span>
           </div>
@@ -363,13 +383,13 @@ export function ActivityLogPage() {
 
       {/* Security Alerts Detail (collapsible) */}
       {tab === 'quality' && showSecurityAlerts && securityQuery.data?.data?.items && (
-        <div className="mx-4 md:mx-6 mb-2 p-3 bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900 rounded-b-md">
+        <div className="mx-4 md:mx-6 mb-2 p-3 bg-red-500/5 border border-red-500/20 rounded-b-xl" data-testid="security-alerts-detail">
           <table className="w-full text-xs">
             <thead>
-              <tr className="text-zinc-500 border-b dark:border-red-900/40">
+              <tr className="text-slate-500 border-b border-red-500/20">
                 <th className="text-left py-1 pr-2 font-medium">시간</th>
                 <th className="text-left py-1 pr-2 font-medium">유형</th>
-                <th className="text-left py-1 pr-2 font-medium">severity</th>
+                <th className="text-left py-1 pr-2 font-medium">심각도</th>
                 <th className="text-left py-1 font-medium">상세</th>
               </tr>
             </thead>
@@ -377,17 +397,19 @@ export function ActivityLogPage() {
               {securityQuery.data.data.items.slice(0, 10).map((alert) => {
                 const meta = alert.metadata as Record<string, unknown> | null
                 return (
-                  <tr key={alert.id} className="border-b border-red-100 dark:border-red-900/30">
-                    <td className="py-1.5 pr-2 text-zinc-500 whitespace-nowrap">{formatTime(alert.createdAt)}</td>
+                  <tr key={alert.id} className="border-b border-red-500/10">
+                    <td className="py-1.5 pr-2 text-slate-500 whitespace-nowrap">{formatTime(alert.createdAt)}</td>
                     <td className="py-1.5 pr-2">
-                      <Badge variant="error">{SECURITY_ACTION_LABELS[alert.action] || alert.action}</Badge>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-red-500/20 text-red-400">
+                        {SECURITY_ACTION_LABELS[alert.action] || alert.action}
+                      </span>
                     </td>
                     <td className="py-1.5 pr-2">
                       <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${SEVERITY_STYLES[(meta?.severity as string) || 'major']}`}>
                         {(meta?.severity as string) || 'major'}
                       </span>
                     </td>
-                    <td className="py-1.5 text-zinc-600 dark:text-zinc-400 truncate max-w-[300px]">
+                    <td className="py-1.5 text-slate-400 truncate max-w-[300px]">
                       {(meta?.pattern as string) || (meta?.threatType as string) || '-'}
                     </td>
                   </tr>
@@ -399,39 +421,51 @@ export function ActivityLogPage() {
       )}
 
       {/* Filters */}
-      <div className="px-4 md:px-6 py-3 border-b border-zinc-100 dark:border-zinc-800 flex flex-wrap gap-2 items-center">
-        <Input
-          placeholder="검색..."
-          value={searchInput}
-          onChange={(e) => { setSearchInput(e.target.value); setPage(1) }}
-          className="text-xs h-8 w-40 md:w-48"
-        />
+      <div className="px-4 md:px-6 py-3 border-b border-slate-700/50 flex flex-wrap gap-2 items-center" data-testid="activity-filters">
+        <div className="relative">
+          <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            placeholder="검색..."
+            value={searchInput}
+            onChange={(e) => { setSearchInput(e.target.value); setPage(1) }}
+            className="bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg pl-8 pr-3 py-2 text-xs text-slate-50 placeholder:text-slate-500 outline-none w-40 md:w-48 transition-colors"
+            data-testid="search-input"
+          />
+        </div>
         <input
           type="date"
           value={startDate}
           onChange={(e) => { setStartDate(e.target.value); setPage(1) }}
-          className="text-xs h-8 px-2 border border-zinc-200 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300"
+          className="text-xs h-8 px-2 border border-slate-600 rounded-lg bg-slate-800 text-slate-300 outline-none focus:border-blue-500"
+          data-testid="date-start"
         />
-        <span className="text-xs text-zinc-400">~</span>
+        <span className="text-xs text-slate-500">~</span>
         <input
           type="date"
           value={endDate}
           onChange={(e) => { setEndDate(e.target.value); setPage(1) }}
-          className="text-xs h-8 px-2 border border-zinc-200 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300"
+          className="text-xs h-8 px-2 border border-slate-600 rounded-lg bg-slate-800 text-slate-300 outline-none focus:border-blue-500"
+          data-testid="date-end"
         />
         {tab === 'tools' && (
-          <Input
-            placeholder="도구명 필터..."
-            value={toolNameFilter}
-            onChange={(e) => { setToolNameFilter(e.target.value); setPage(1) }}
-            className="text-xs h-8 w-32 md:w-40"
-          />
+          <div className="relative">
+            <input
+              placeholder="도구명 필터..."
+              value={toolNameFilter}
+              onChange={(e) => { setToolNameFilter(e.target.value); setPage(1) }}
+              className="bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-xs text-slate-50 placeholder:text-slate-500 outline-none w-32 md:w-40 transition-colors"
+              data-testid="tool-name-filter"
+            />
+          </div>
         )}
         {tab === 'quality' && (
           <select
             value={conclusionFilter}
             onChange={(e) => { setConclusionFilter(e.target.value); setPage(1) }}
-            className="text-xs h-8 px-2 border border-zinc-200 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300"
+            className="text-xs h-8 px-2 border border-slate-600 rounded-lg bg-slate-800 text-slate-300 outline-none focus:border-blue-500"
+            data-testid="conclusion-filter"
           >
             <option value="">전체 판정</option>
             <option value="pass">PASS</option>
@@ -441,15 +475,21 @@ export function ActivityLogPage() {
       </div>
 
       {/* Table Content */}
-      <div className="flex-1 overflow-auto px-4 md:px-6 py-3">
+      <div className="flex-1 overflow-auto px-4 md:px-6 py-3" data-testid="activity-content">
         {activeQuery.isLoading ? (
-          <SkeletonTable rows={8} />
+          <div className="space-y-2" data-testid="activity-loading">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="h-10 bg-slate-700/50 rounded animate-pulse" />
+            ))}
+          </div>
         ) : !activeQuery.data?.data?.items?.length ? (
-          <EmptyState
-            icon={<span className="text-3xl">📋</span>}
-            title="데이터가 없습니다"
-            description="선택한 기간에 해당하는 기록이 없습니다."
-          />
+          <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="activity-empty">
+            <svg className="w-10 h-10 text-slate-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            </svg>
+            <h3 className="text-base font-medium text-slate-300 mb-2">데이터가 없습니다</h3>
+            <p className="text-sm text-slate-500">선택한 기간에 해당하는 기록이 없습니다</p>
+          </div>
         ) : (
           <>
             {tab === 'agents' && <AgentsTable items={agentsQuery.data!.data.items} />}
@@ -468,23 +508,23 @@ export function ActivityLogPage() {
 
       {/* Pagination */}
       {totalCount > 0 && (
-        <div className="px-4 md:px-6 py-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
-          <span className="text-xs text-zinc-500">{totalCount.toLocaleString()}건</span>
+        <div className="px-4 md:px-6 py-3 border-t border-slate-700 flex items-center justify-between" data-testid="activity-pagination">
+          <span className="text-xs text-slate-500">{totalCount.toLocaleString()}건</span>
           <div className="flex items-center gap-2">
             <button
               disabled={page <= 1}
               onClick={() => setPage((p) => p - 1)}
-              className="px-3 py-1.5 text-xs border border-zinc-200 dark:border-zinc-700 rounded disabled:opacity-30 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+              className="px-3 py-1.5 text-xs border border-slate-600 rounded-lg text-slate-400 disabled:opacity-30 hover:bg-slate-700 transition-colors"
             >
               이전
             </button>
-            <span className="text-xs text-zinc-600 dark:text-zinc-400">
+            <span className="text-xs text-slate-400">
               {page} / {totalPages}
             </span>
             <button
               disabled={page >= totalPages}
               onClick={() => setPage((p) => p + 1)}
-              className="px-3 py-1.5 text-xs border border-zinc-200 dark:border-zinc-700 rounded disabled:opacity-30 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+              className="px-3 py-1.5 text-xs border border-slate-600 rounded-lg text-slate-400 disabled:opacity-30 hover:bg-slate-700 transition-colors"
             >
               다음
             </button>
@@ -498,16 +538,20 @@ export function ActivityLogPage() {
 // === Tab Tables ===
 
 function StatusBadge({ status }: { status: string }) {
-  const info = STATUS_BADGE[status] || { label: status, variant: 'default' as const }
-  return <Badge variant={info.variant}>{info.label}</Badge>
+  const info = STATUS_BADGE[status] || { label: status, classes: 'bg-slate-600/50 text-slate-400' }
+  return (
+    <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${info.classes}`}>
+      {info.label}
+    </span>
+  )
 }
 
 function AgentsTable({ items }: { items: AgentActivity[] }) {
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto" data-testid="agents-table">
       <table className="w-full text-sm min-w-[640px]">
         <thead>
-          <tr className="text-xs text-zinc-500 border-b dark:border-zinc-700">
+          <tr className="text-xs text-slate-500 border-b border-slate-700">
             <th className="text-left py-2 pr-3 font-medium">시간</th>
             <th className="text-left py-2 pr-3 font-medium">에이전트</th>
             <th className="text-left py-2 pr-3 font-medium">명령</th>
@@ -518,15 +562,15 @@ function AgentsTable({ items }: { items: AgentActivity[] }) {
         </thead>
         <tbody>
           {items.map((item) => (
-            <tr key={item.id} className="border-b border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
-              <td className="py-2.5 pr-3 text-xs text-zinc-500 whitespace-nowrap">{formatTime(item.createdAt)}</td>
-              <td className="py-2.5 pr-3 text-xs font-medium">{item.agentName || '-'}</td>
-              <td className="py-2.5 pr-3 text-xs truncate max-w-[200px]">{item.action}</td>
+            <tr key={item.id} className="border-b border-slate-700/50 hover:bg-slate-800/50 transition-colors">
+              <td className="py-2.5 pr-3 text-xs text-slate-500 whitespace-nowrap">{formatTime(item.createdAt)}</td>
+              <td className="py-2.5 pr-3 text-xs font-medium text-slate-200">{item.agentName || '-'}</td>
+              <td className="py-2.5 pr-3 text-xs text-slate-300 truncate max-w-[200px]">{item.action}</td>
               <td className="py-2.5 pr-3"><StatusBadge status={item.phase} /></td>
-              <td className="py-2.5 pr-3 text-xs text-right text-zinc-500">
+              <td className="py-2.5 pr-3 text-xs text-right text-slate-500">
                 {formatDuration((item.metadata as Record<string, unknown>)?.durationMs as number | undefined)}
               </td>
-              <td className="py-2.5 text-xs text-right text-zinc-500">{formatTokens(item.metadata)}</td>
+              <td className="py-2.5 text-xs text-right text-slate-500">{formatTokens(item.metadata)}</td>
             </tr>
           ))}
         </tbody>
@@ -537,10 +581,10 @@ function AgentsTable({ items }: { items: AgentActivity[] }) {
 
 function DelegationsTable({ items }: { items: Delegation[] }) {
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto" data-testid="delegations-table">
       <table className="w-full text-sm min-w-[640px]">
         <thead>
-          <tr className="text-xs text-zinc-500 border-b dark:border-zinc-700">
+          <tr className="text-xs text-slate-500 border-b border-slate-700">
             <th className="text-left py-2 pr-3 font-medium">시간</th>
             <th className="text-left py-2 pr-3 font-medium">발신 → 수신</th>
             <th className="text-left py-2 pr-3 font-medium">명령 요약</th>
@@ -554,20 +598,20 @@ function DelegationsTable({ items }: { items: Delegation[] }) {
             const cost = meta?.costUsd as number | undefined
             const tokens = meta?.totalTokens as number | undefined
             return (
-              <tr key={item.id} className="border-b border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
-                <td className="py-2.5 pr-3 text-xs text-zinc-500 whitespace-nowrap">{formatTime(item.createdAt)}</td>
+              <tr key={item.id} className="border-b border-slate-700/50 hover:bg-slate-800/50 transition-colors">
+                <td className="py-2.5 pr-3 text-xs text-slate-500 whitespace-nowrap">{formatTime(item.createdAt)}</td>
                 <td className="py-2.5 pr-3 text-xs">
-                  <span className="font-medium">{item.agentName || '시스템'}</span>
-                  <span className="text-zinc-400 mx-1">→</span>
-                  <span className="font-medium">{(meta?.toAgentName as string) || '-'}</span>
+                  <span className="font-medium text-slate-200">{item.agentName || '시스템'}</span>
+                  <span className="text-slate-500 mx-1">→</span>
+                  <span className="font-medium text-cyan-400">{(meta?.toAgentName as string) || '-'}</span>
                 </td>
-                <td className="py-2.5 pr-3 text-xs truncate max-w-[240px]">
+                <td className="py-2.5 pr-3 text-xs text-slate-300 truncate max-w-[240px]">
                   {item.input ? String(item.input).slice(0, 80) : '-'}
                 </td>
-                <td className="py-2.5 pr-3 text-xs text-right text-zinc-500">
+                <td className="py-2.5 pr-3 text-xs text-right text-slate-500">
                   {cost != null ? `$${Number(cost).toFixed(4)}` : '-'}
                 </td>
-                <td className="py-2.5 text-xs text-right text-zinc-500">
+                <td className="py-2.5 text-xs text-right text-slate-500">
                   {tokens != null ? Number(tokens).toLocaleString() : '-'}
                 </td>
               </tr>
@@ -591,10 +635,10 @@ function QualityTable({
   onToggle: (id: string) => void
 }) {
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto" data-testid="quality-table">
       <table className="w-full text-sm min-w-[560px]">
         <thead>
-          <tr className="text-xs text-zinc-500 border-b dark:border-zinc-700">
+          <tr className="text-xs text-slate-500 border-b border-slate-700">
             <th className="text-left py-2 pr-3 font-medium">시간</th>
             <th className="text-left py-2 pr-3 font-medium">명령</th>
             <th className="text-left py-2 pr-3 font-medium">검수 점수</th>
@@ -615,25 +659,26 @@ function QualityTable({
                 <td colSpan={5} className="p-0">
                   {/* Row header */}
                   <div
-                    className="flex items-center border-b border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 cursor-pointer"
+                    className="flex items-center cursor-pointer hover:bg-slate-800/50 transition-colors"
                     onClick={() => onToggle(item.id)}
+                    aria-expanded={expandedId === item.id}
                   >
-                    <div className="py-2.5 pr-3 text-xs text-zinc-500 whitespace-nowrap pl-0 min-w-[90px]">{formatTime(item.createdAt)}</div>
-                    <div className="py-2.5 pr-3 text-xs truncate max-w-[200px] flex-1">{item.commandText || '-'}</div>
+                    <div className="py-2.5 pr-3 text-xs text-slate-500 whitespace-nowrap pl-0 min-w-[90px]">{formatTime(item.createdAt)}</div>
+                    <div className="py-2.5 pr-3 text-xs text-slate-300 truncate max-w-[200px] flex-1">{item.commandText || '-'}</div>
                     <div className="py-2.5 pr-3 min-w-[120px]">
                       {pct != null ? (
                         <div className="flex items-center gap-2">
-                          <div className="flex-1 h-2 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                          <div className="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
                             <div className={`h-full rounded-full ${scoreColor(pct)}`} style={{ width: `${pct}%` }} />
                           </div>
                           <span className={`text-xs font-bold ${scoreTextColor(pct)}`}>{pct}%</span>
                         </div>
                       ) : (
-                        <span className="text-xs text-zinc-400">-</span>
+                        <span className="text-xs text-slate-500">-</span>
                       )}
                     </div>
                     <div className="py-2.5 pr-3 min-w-[60px]"><StatusBadge status={item.conclusion} /></div>
-                    <div className="py-2.5 text-xs text-right min-w-[50px]">{item.attemptNumber > 1 ? item.attemptNumber - 1 : 0}</div>
+                    <div className="py-2.5 text-xs text-right min-w-[50px] text-slate-400">{item.attemptNumber > 1 ? item.attemptNumber - 1 : 0}</div>
                   </div>
 
                   {/* Expanded detail panel */}
@@ -659,9 +704,9 @@ function QualityDetailPanel({ scores, feedback }: { scores: MergedScores; feedba
   const hasHallucination = scores.hallucinationReport != null
 
   return (
-    <div className="bg-zinc-50 dark:bg-zinc-800/40 border-b border-zinc-100 dark:border-zinc-800">
+    <div className="bg-slate-800/30 border-b border-slate-700" data-testid="qa-detail-panel">
       {/* Sub-tabs */}
-      <div className="px-4 pt-2 flex gap-1 border-b border-zinc-200 dark:border-zinc-700">
+      <div className="px-4 pt-2 flex gap-1 border-b border-slate-700">
         <DetailTabButton active={detailTab === 'rules'} onClick={() => setDetailTab('rules')}>
           규칙별 결과 {hasRules ? `(${scores.ruleResults!.length})` : ''}
         </DetailTabButton>
@@ -689,7 +734,7 @@ function QualityDetailPanel({ scores, feedback }: { scores: MergedScores; feedba
 
       {feedback && (
         <div className="px-4 pb-3">
-          <p className="text-[11px] text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap border-t border-zinc-200 dark:border-zinc-700 pt-2">
+          <p className="text-[11px] text-slate-400 whitespace-pre-wrap border-t border-slate-700 pt-2">
             {feedback}
           </p>
         </div>
@@ -704,8 +749,8 @@ function DetailTabButton({ active, onClick, children }: { active: boolean; onCli
       onClick={onClick}
       className={`px-3 py-1.5 text-[11px] font-medium rounded-t border-b-2 transition-colors ${
         active
-          ? 'border-blue-500 text-blue-600 dark:text-blue-400 bg-white dark:bg-zinc-800'
-          : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+          ? 'border-blue-500 text-blue-400 bg-slate-800'
+          : 'border-transparent text-slate-500 hover:text-slate-300'
       }`}
     >
       {children}
@@ -717,7 +762,7 @@ function DetailTabButton({ active, onClick, children }: { active: boolean; onCli
 
 function RuleResultsPanel({ ruleResults }: { ruleResults: RuleResult[] }) {
   if (ruleResults.length === 0) {
-    return <p className="text-xs text-zinc-500">규칙별 검수 데이터가 없습니다.</p>
+    return <p className="text-xs text-slate-500">규칙별 검수 데이터가 없습니다.</p>
   }
 
   // Group by category
@@ -732,12 +777,12 @@ function RuleResultsPanel({ ruleResults }: { ruleResults: RuleResult[] }) {
     <div className="space-y-3">
       {Object.entries(grouped).map(([category, rules]) => (
         <div key={category}>
-          <h4 className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-300 mb-1.5">
+          <h4 className="text-[11px] font-semibold text-slate-300 mb-1.5">
             {CATEGORY_LABELS[category] || category}
           </h4>
           <div className="space-y-1">
             {rules.map((rule) => (
-              <div key={rule.ruleId} className="flex items-start gap-2 px-2 py-1.5 rounded bg-white dark:bg-zinc-900/50">
+              <div key={rule.ruleId} className="flex items-start gap-2 px-2 py-1.5 rounded-lg bg-slate-900/50">
                 <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium shrink-0 ${SEVERITY_STYLES[rule.severity] || SEVERITY_STYLES.minor}`}>
                   {rule.severity}
                 </span>
@@ -745,12 +790,12 @@ function RuleResultsPanel({ ruleResults }: { ruleResults: RuleResult[] }) {
                   {rule.result === 'pass' ? 'PASS' : rule.result === 'warn' ? 'WARN' : 'FAIL'}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">{rule.ruleName}</span>
+                  <span className="text-xs font-medium text-slate-300">{rule.ruleName}</span>
                   {rule.message && (
-                    <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5 truncate">{rule.message}</p>
+                    <p className="text-[10px] text-slate-500 mt-0.5 truncate">{rule.message}</p>
                   )}
                 </div>
-                {rule.skipped && <span className="text-[10px] text-zinc-400 italic shrink-0">건너뜀</span>}
+                {rule.skipped && <span className="text-[10px] text-slate-500 italic shrink-0">건너뜀</span>}
               </div>
             ))}
           </div>
@@ -766,17 +811,17 @@ function RubricPanel({ rubricScores }: { rubricScores: RubricScore[] }) {
   return (
     <div className="space-y-2">
       {rubricScores.map((item) => (
-        <div key={item.id} className="flex items-center gap-3 px-2 py-1.5 rounded bg-white dark:bg-zinc-900/50">
+        <div key={item.id} className="flex items-center gap-3 px-2 py-1.5 rounded-lg bg-slate-900/50">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">{item.label}</span>
-              <span className="text-[10px] text-zinc-400">(가중치 {item.weight}%{item.critical ? ', 필수' : ''})</span>
+              <span className="text-xs font-medium text-slate-300">{item.label}</span>
+              <span className="text-[10px] text-slate-500">(가중치 {item.weight}%{item.critical ? ', 필수' : ''})</span>
             </div>
             {item.feedback && (
-              <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5 truncate">{item.feedback}</p>
+              <p className="text-[10px] text-slate-500 mt-0.5 truncate">{item.feedback}</p>
             )}
           </div>
-          <span className={`text-sm font-bold ${item.score >= 4 ? 'text-emerald-600 dark:text-emerald-400' : item.score >= 3 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'}`}>
+          <span className={`text-sm font-bold ${item.score >= 4 ? 'text-emerald-400' : item.score >= 3 ? 'text-amber-400' : 'text-red-400'}`}>
             {item.score}/5
           </span>
         </div>
@@ -796,17 +841,17 @@ function HallucinationPanel({ report }: { report: HallucinationReport }) {
       <div className="flex items-center gap-3 flex-wrap">
         <StatusBadge status={report.verdict} />
         <div className="flex gap-4 text-xs">
-          <span className="text-zinc-500">총 주장: <span className="font-medium text-zinc-700 dark:text-zinc-300">{report.totalClaims}</span></span>
-          <span className="text-zinc-500">검증: <span className="font-medium text-emerald-600">{report.verifiedClaims}</span></span>
-          <span className="text-zinc-500">불일치: <span className="font-medium text-red-600">{report.mismatchedClaims}</span></span>
-          <span className="text-zinc-500">미확인: <span className="font-medium text-amber-600">{report.unsourcedCount}</span></span>
+          <span className="text-slate-500">총 주장: <span className="font-medium text-slate-200">{report.totalClaims}</span></span>
+          <span className="text-slate-500">검증: <span className="font-medium text-emerald-400">{report.verifiedClaims}</span></span>
+          <span className="text-slate-500">불일치: <span className="font-medium text-red-400">{report.mismatchedClaims}</span></span>
+          <span className="text-slate-500">미확인: <span className="font-medium text-amber-400">{report.unsourcedCount}</span></span>
         </div>
       </div>
 
       {/* Score bar */}
       <div className="flex items-center gap-2">
-        <span className="text-[10px] text-zinc-500 w-16">환각 점수</span>
-        <div className="flex-1 h-2 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+        <span className="text-[10px] text-slate-500 w-16">환각 점수</span>
+        <div className="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
           <div
             className={`h-full rounded-full ${scoreColor(Math.round(report.score * 100))}`}
             style={{ width: `${Math.round(report.score * 100)}%` }}
@@ -819,36 +864,36 @@ function HallucinationPanel({ report }: { report: HallucinationReport }) {
 
       {/* Details */}
       {report.details && (
-        <p className="text-[10px] text-zinc-600 dark:text-zinc-400">{report.details}</p>
+        <p className="text-[10px] text-slate-400">{report.details}</p>
       )}
 
       {/* Claims list */}
       {report.claims.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[10px] font-medium text-zinc-500">주장별 검증 결과</span>
+            <span className="text-[10px] font-medium text-slate-500">주장별 검증 결과</span>
             {report.claims.length > 5 && (
-              <button onClick={() => setShowAll(!showAll)} className="text-[10px] text-blue-500 hover:underline">
+              <button onClick={() => setShowAll(!showAll)} className="text-[10px] text-blue-400 hover:underline">
                 {showAll ? '일부만 보기' : `전체 보기 (${report.claims.length})`}
               </button>
             )}
           </div>
           <div className="space-y-1">
             {(showAll ? report.claims : report.claims.filter(c => !c.verified || c.severity !== 'none').slice(0, 5)).map((cv, i) => (
-              <div key={i} className="flex items-start gap-2 px-2 py-1 rounded bg-white dark:bg-zinc-900/50 text-[10px]">
+              <div key={i} className="flex items-start gap-2 px-2 py-1 rounded-lg bg-slate-900/50 text-[10px]">
                 <span className={`shrink-0 mt-0.5 w-2 h-2 rounded-full ${
                   cv.verified ? 'bg-emerald-500' : cv.severity === 'critical' ? 'bg-red-500' : 'bg-amber-500'
                 }`} />
                 <div className="flex-1 min-w-0">
-                  <span className="text-zinc-700 dark:text-zinc-300 font-medium">{cv.claim.value}</span>
-                  <span className="text-zinc-400 ml-1">({cv.claim.type})</span>
-                  {cv.toolSource && <span className="text-blue-500 ml-1">via {cv.toolSource}</span>}
-                  {cv.discrepancy && <p className="text-red-500 mt-0.5">{cv.discrepancy}</p>}
+                  <span className="text-slate-300 font-medium">{cv.claim.value}</span>
+                  <span className="text-slate-500 ml-1">({cv.claim.type})</span>
+                  {cv.toolSource && <span className="text-blue-400 ml-1">via {cv.toolSource}</span>}
+                  {cv.discrepancy && <p className="text-red-400 mt-0.5">{cv.discrepancy}</p>}
                 </div>
                 <span className={`shrink-0 px-1 py-0.5 rounded ${
-                  cv.verified ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
-                  : cv.matched ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
-                  : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300'
+                  cv.verified ? 'bg-emerald-500/20 text-emerald-400'
+                  : cv.matched ? 'bg-red-500/20 text-red-400'
+                  : 'bg-slate-600/50 text-slate-400'
                 }`}>
                   {cv.verified ? '검증' : cv.matched ? '불일치' : '미확인'}
                 </span>
@@ -870,8 +915,8 @@ function LegacyScoresPanel({ scores }: { scores: MergedScores }) {
         const score = (scores as unknown as Record<string, number>)[key] ?? 0
         return (
           <div key={key} className="text-center">
-            <p className="text-[10px] text-zinc-500 mb-1">{label}</p>
-            <p className={`text-sm font-bold ${score >= 4 ? 'text-emerald-600 dark:text-emerald-400' : score >= 3 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'}`}>
+            <p className="text-[10px] text-slate-500 mb-1">{label}</p>
+            <p className={`text-sm font-bold ${score >= 4 ? 'text-emerald-400' : score >= 3 ? 'text-amber-400' : 'text-red-400'}`}>
               {score}/5
             </p>
           </div>
@@ -883,10 +928,10 @@ function LegacyScoresPanel({ scores }: { scores: MergedScores }) {
 
 function ToolsTable({ items }: { items: ToolInvocation[] }) {
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto" data-testid="tools-table">
       <table className="w-full text-sm min-w-[640px]">
         <thead>
-          <tr className="text-xs text-zinc-500 border-b dark:border-zinc-700">
+          <tr className="text-xs text-slate-500 border-b border-slate-700">
             <th className="text-left py-2 pr-3 font-medium">시간</th>
             <th className="text-left py-2 pr-3 font-medium">도구명</th>
             <th className="text-left py-2 pr-3 font-medium">에이전트</th>
@@ -897,13 +942,13 @@ function ToolsTable({ items }: { items: ToolInvocation[] }) {
         </thead>
         <tbody>
           {items.map((item) => (
-            <tr key={item.id} className="border-b border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
-              <td className="py-2.5 pr-3 text-xs text-zinc-500 whitespace-nowrap">{formatTime(item.createdAt)}</td>
-              <td className="py-2.5 pr-3 text-xs font-medium font-mono">{item.toolName}</td>
-              <td className="py-2.5 pr-3 text-xs">{item.agentName || '-'}</td>
-              <td className="py-2.5 pr-3 text-xs text-right text-zinc-500">{formatDuration(item.durationMs)}</td>
+            <tr key={item.id} className="border-b border-slate-700/50 hover:bg-slate-800/50 transition-colors">
+              <td className="py-2.5 pr-3 text-xs text-slate-500 whitespace-nowrap">{formatTime(item.createdAt)}</td>
+              <td className="py-2.5 pr-3 text-xs font-medium font-mono text-cyan-400">{item.toolName}</td>
+              <td className="py-2.5 pr-3 text-xs text-slate-300">{item.agentName || '-'}</td>
+              <td className="py-2.5 pr-3 text-xs text-right text-slate-500">{formatDuration(item.durationMs)}</td>
               <td className="py-2.5 pr-3"><StatusBadge status={item.status} /></td>
-              <td className="py-2.5 text-xs truncate max-w-[200px] text-zinc-500">{item.input || '-'}</td>
+              <td className="py-2.5 text-xs truncate max-w-[200px] text-slate-500">{item.input || '-'}</td>
             </tr>
           ))}
         </tbody>

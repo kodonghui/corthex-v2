@@ -193,23 +193,23 @@ export function ConversationChat({ conversationId, conversationDetail, currentUs
   const participantCount = conversationDetail?.participants.length ?? 0
 
   return (
-    <div className="flex-1 flex flex-col min-h-0">
+    <div className="flex-1 flex flex-col min-h-0" data-testid="conversation-chat">
       {/* 헤더 */}
-      <div className="px-4 py-2 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0">
+      <div className="px-4 py-2.5 border-b border-slate-700 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2 min-w-0">
           <button
             onClick={onBack}
-            className="md:hidden p-2 -ml-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-sm text-zinc-600 dark:text-zinc-400 shrink-0"
+            className="md:hidden p-2 -ml-2 rounded-lg hover:bg-slate-700 text-sm text-slate-400 shrink-0"
           >
             ←
           </button>
-          <span className="font-medium text-sm truncate">{displayName}</span>
-          <span className="text-xs text-zinc-400 shrink-0">{participantCount}명</span>
+          <span className="font-medium text-sm text-slate-100 truncate">{displayName}</span>
+          <span className="text-xs text-slate-500 shrink-0">{participantCount}명</span>
         </div>
         {conversationDetail?.type === 'group' && (
           <button
             onClick={() => setShowLeaveConfirm(true)}
-            className="text-xs text-red-500 hover:text-red-600 px-2 py-1 rounded hover:bg-red-50 dark:hover:bg-red-950"
+            className="text-xs text-red-400 hover:text-red-300 px-2 py-1 rounded hover:bg-red-500/10"
           >
             나가기
           </button>
@@ -221,16 +221,17 @@ export function ConversationChat({ conversationId, conversationDetail, currentUs
         ref={scrollContainerRef}
         onScroll={handleScroll}
         className="flex-1 overflow-y-auto px-4 py-2 space-y-1"
+        data-testid="conversation-messages"
       >
         {isFetchingNextPage && (
           <div className="text-center py-2">
-            <span className="text-xs text-zinc-400">이전 메시지 로딩...</span>
+            <span className="text-xs text-slate-400">이전 메시지 로딩...</span>
           </div>
         )}
         {hasNextPage && !isFetchingNextPage && (
           <button
             onClick={() => fetchNextPage()}
-            className="w-full text-center py-1 text-xs text-indigo-500 hover:text-indigo-600"
+            className="w-full text-center py-1 text-xs text-blue-400 hover:underline"
           >
             이전 메시지 더 보기
           </button>
@@ -240,7 +241,7 @@ export function ConversationChat({ conversationId, conversationDetail, currentUs
           if (msg.type === 'system') {
             return (
               <div key={msg.id} className="text-center py-1">
-                <span className="text-xs text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-3 py-1 rounded-full">
+                <span className="bg-slate-800 text-slate-500 text-xs px-3 py-1 rounded-full inline">
                   {msg.content}
                 </span>
               </div>
@@ -258,24 +259,25 @@ export function ConversationChat({ conversationId, conversationDetail, currentUs
                 className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className="max-w-[75%] border border-indigo-200 dark:border-indigo-800 rounded-lg overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
+                  className="max-w-[75%] border border-blue-500/30 rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
                   onClick={() => reportData.reportId && navigate(`/reports/${reportData.reportId}`)}
+                  data-testid={`ai-report-card-${msg.id}`}
                 >
-                  <div className="bg-indigo-50 dark:bg-indigo-950 px-3 py-2 border-b border-indigo-200 dark:border-indigo-800">
+                  <div className="bg-blue-600/10 px-3 py-2 border-b border-blue-500/20">
                     <div className="flex items-center gap-1.5">
                       <span className="text-sm">📄</span>
-                      <span className="text-xs font-medium text-indigo-700 dark:text-indigo-300">AI 보고서</span>
+                      <span className="text-xs font-medium text-blue-400">AI 보고서</span>
                     </div>
                   </div>
-                  <div className="px-3 py-2 bg-white dark:bg-zinc-900">
-                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">{reportData.title}</p>
+                  <div className="px-3 py-2 bg-slate-900">
+                    <p className="text-sm font-medium text-slate-100 truncate">{reportData.title}</p>
                     {reportData.summary && (
-                      <p className="text-xs text-zinc-500 mt-1 line-clamp-2">{reportData.summary}</p>
+                      <p className="text-xs text-slate-500 mt-1 line-clamp-2">{reportData.summary}</p>
                     )}
-                    <p className="text-[10px] text-indigo-500 mt-1.5">전체 보기 →</p>
+                    <p className="text-[10px] text-blue-400 mt-1.5">전체 보기 →</p>
                   </div>
                   <div className={`px-3 py-1 ${isMine ? 'text-right' : 'text-left'}`}>
-                    <span className="text-[10px] text-zinc-400">
+                    <span className="text-[10px] text-slate-500">
                       {new Date(msg.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
@@ -295,14 +297,14 @@ export function ConversationChat({ conversationId, conversationDetail, currentUs
                 <div
                   className={`px-3 py-2 rounded-lg text-sm ${
                     isMine
-                      ? 'bg-indigo-600 text-white rounded-br-sm'
-                      : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-bl-sm'
+                      ? 'bg-blue-600 text-white rounded-br-sm'
+                      : 'bg-slate-800 text-slate-100 rounded-bl-sm'
                   }`}
                 >
                   {msg.content}
                 </div>
                 <div className={`flex items-center gap-1 mt-0.5 ${isMine ? 'justify-end' : 'justify-start'}`}>
-                  <span className="text-[10px] text-zinc-400">
+                  <span className="text-[10px] text-slate-500">
                     {new Date(msg.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
@@ -331,13 +333,13 @@ export function ConversationChat({ conversationId, conversationDetail, currentUs
 
       {/* 타이핑 표시 */}
       {typingUsers.size > 0 && (
-        <div className="px-4 py-1 text-xs text-zinc-400">
+        <div className="px-4 py-1 text-xs text-slate-500">
           입력 중...
         </div>
       )}
 
       {/* 입력 영역 */}
-      <div className="px-4 py-3 border-t border-zinc-200 dark:border-zinc-800 shrink-0">
+      <div className="px-4 py-3 border-t border-slate-700 shrink-0">
         <div className="flex items-end gap-2">
           <textarea
             ref={inputRef}
@@ -351,12 +353,14 @@ export function ConversationChat({ conversationId, conversationDetail, currentUs
             }}
             placeholder="메시지를 입력하세요..."
             rows={1}
-            className="flex-1 px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 text-sm resize-none max-h-32 overflow-y-auto"
+            className="flex-1 bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm resize-none max-h-32 overflow-y-auto"
+            data-testid="conversation-input"
           />
           <button
             onClick={handleSend}
             disabled={!inputText.trim() || sendMessage.isPending}
-            className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 disabled:opacity-50 shrink-0"
+            className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50 shrink-0"
+            data-testid="conversation-send-btn"
           >
             전송
           </button>
@@ -366,13 +370,13 @@ export function ConversationChat({ conversationId, conversationDetail, currentUs
       {/* 나가기 확인 모달 */}
       {showLeaveConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white dark:bg-zinc-900 rounded-lg p-5 w-80 shadow-xl">
-            <h3 className="font-medium text-sm mb-3">대화방 나가기</h3>
-            <p className="text-xs text-zinc-500 mb-4">이 그룹 대화방에서 나가시겠습니까?</p>
+          <div className="bg-slate-800 border border-slate-700 rounded-2xl p-5 w-80 shadow-2xl">
+            <h3 className="font-medium text-sm text-slate-50 mb-3">대화방 나가기</h3>
+            <p className="text-xs text-slate-400 mb-4">이 그룹 대화방에서 나가시겠습니까?</p>
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setShowLeaveConfirm(false)}
-                className="px-3 py-1.5 text-xs rounded-md border border-zinc-300 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                className="px-3 py-1.5 text-xs rounded-lg border border-slate-600 hover:bg-slate-700"
               >
                 취소
               </button>
@@ -382,7 +386,7 @@ export function ConversationChat({ conversationId, conversationDetail, currentUs
                   setShowLeaveConfirm(false)
                 }}
                 disabled={leaveConversation.isPending}
-                className="px-3 py-1.5 text-xs rounded-md bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
+                className="px-3 py-1.5 text-xs rounded-lg bg-red-600 text-white hover:bg-red-500 disabled:opacity-50"
               >
                 나가기
               </button>
