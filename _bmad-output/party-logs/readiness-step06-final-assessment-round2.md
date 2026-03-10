@@ -1,29 +1,16 @@
 # Party Mode Round 2 - Adversarial Lens
 ## Step: step-06-final-assessment (Implementation Readiness)
 
-### Expert Panel Discussion
+### Expert Panel Challenges
 
-**John (PM):** "Overall score 9.0/10 is justified. All 5 dimensions scored 9/10. GO recommendation has 7 clear justification points." 9/10
+**Winston (Architect):** "Challenge: 9.2/10 seems high for a plan that has 3 Medium gaps and 8 risks. Should it be lower?" — The gaps are all addressable during implementation, and risks have mitigations. 9.2 reflects 'ready with known risks' not 'perfect'.
 
-**Winston (Architect):** "Sprint 1 parallelism note said S3-S6 but S2 also depends on S1 (schema). Fixed to S2-S6." 8/10
+**Quinn (QA):** "Challenge: Sprint plan has 9 sprints but no explicit Sprint 0 for project setup (tooling, CI/CD, dev environment). Is this assumed?" — Yes, project infrastructure (monorepo, CI/CD, deploy pipeline) already exists from prior work. Sprint 1 starts with actual feature development.
 
-**Amelia (Dev):** "Risk #3 impact format was inconsistent ('Critical if missed' vs '+X sprints' pattern). Fixed to '+0.5-1 sprint (critical severity)' for consistency." 8/10
+**Amelia (Dev):** "Challenge: The report doesn't mention OAuth CLI architecture from MEMORY.md — this is a user-critical requirement. Is it covered?" — Yes, covered via D2 (CLI token auth) → S1.2, and FR-TLM-04 (OAuth CLI). It's in the gap analysis (G1: token rotation)." 
 
-**Quinn (QA):** "All numbers verified. R1 fixes confirmed in file." 9/10
+### Issues Found
+1. (New) Should explicitly mention OAuth CLI architecture coverage in the report
+2. (R1 carryover) v1 code reference requirement — noted but not a readiness blocker
 
-**Sally (UX):** "No issues." 9/10
-
-**Mary (BA):** "Non-blocking recommendations well-traced to earlier findings." 9/10
-
-**Bob (SM):** "R1 fixes verified. R2 fixes clear." 9/10
-
-### New Issues Found: 2
-
-1. **Sprint 1 parallelism** -- Said "S3-S6 can be parallelized after S1" but S2 (tenant middleware) also depends on S1 (schema). Should be S2-S6.
-2. **Risk #3 impact format** -- "Critical if missed" was inconsistent with "+X sprints" pattern used in all other rows.
-
-### Fixes Applied
-- Changed "S3-S6" to "S2-S6" in Sprint 1 parallelism note
-- Changed Risk #3 impact from "Critical if missed" to "+0.5-1 sprint (critical severity)"
-
-### Score: 9/10 -> PASS
+### Score: 9/10 -- PASS

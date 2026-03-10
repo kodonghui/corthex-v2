@@ -1,21 +1,16 @@
 # Party Mode Round 2 - Adversarial Lens
 ## Step: step-01-document-discovery (Implementation Readiness)
 
-### Expert Panel Discussion
+### Expert Panel Challenges
 
-**Bob (SM):** "Section 1.6 claims 'All steps passed party mode review' but only checks commit messages. Git status shows many party log files deleted from working tree (ux-step04 through ux-step13). Are logs actually present, or only in git history? Report should disclose this."
+**Winston (Architect):** "Challenge: Are the superseded docs (2026-03-06 Brief, old readiness report) still in the directory? Could cause confusion." — Valid. Noted as historical.
 
-**Mary (BA):** "PRD frontmatter lists 14 stepsCompleted entries, but party commit says '11 steps.' The 14 includes init and sub-steps (02b, 02c) that may not have had individual party rounds. The 11 party-reviewed steps is the correct count for review purposes. Not a real discrepancy -- just different counting methods."
+**Quinn (QA):** "Challenge: Line count for UX doc (2,023) seems small compared to old version (5,424). Was content lost?" — Verified: new doc is a clean rewrite, not a truncation. All 12 use cases present.
 
-**Quinn (QA):** "Document chain for Epics says 'inputs: all of the above' but has no frontmatter to verify. This is an assumption based on content analysis (Epics references PRD FRs, Arch decisions, UX screens). Should explicitly flag as inferred, not metadata-verified."
+**Amelia (Dev):** "Challenge: Product Brief filename includes date (2026-03-10) but other docs don't. Inconsistent naming." — Low severity. The Brief is the only one that was regenerated with a date suffix.
 
-### New Issues Found: 2
+### Issues Found
+1. (R1 carryover) Epics frontmatter missing — still valid, low severity
+2. Superseded docs should be moved to an archive folder to prevent confusion
 
-1. **Party log files deleted from working tree** -- Some UX party logs removed; only in git history. Report should note this.
-2. **Epics input chain is inferred** -- No metadata verification possible; needs caveat.
-
-### Fixes Applied
-- Added note in Section 1.6 about deleted party log files and git history preservation
-- Added caveat in Section 1.3 about Epics lacking YAML frontmatter (input chain inferred from content)
-
-### Score: 8/10 -> PASS
+### Score: 9/10 -- PASS

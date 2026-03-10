@@ -1,19 +1,16 @@
 # Party Mode Round 2 - Adversarial Lens
 ## Step: step-02-prd-analysis (Implementation Readiness)
 
-### Expert Panel Discussion
+### Expert Panel Challenges
 
-**Mary (BA):** "FR count math verification: P0=36 (FR1-34 + FR50-51), P1=19 (FR35-49 + FR52-55), Phase 2=20 (FR56-75), Phase 3=1 (FR76). Total: 36+19+20+1=76. Correct."
+**Winston (Architect):** "Challenge: 4.3/5 specificity average — is this good enough? Some FRs like FR-TLM-04 (OAuth CLI) lack implementation detail." — Valid but Architecture doc fills the gap with D2 (CLI token auth).
 
-**Bob (SM):** "Epic 5 carries 15 FRs (FR13-25 + FR50-51) which is the densest epic. With 10-12 stories, that's reasonable (~1.3 FRs/story). But this is an Epics analysis concern, not PRD. Should be flagged for step-04 (Epics analysis) if applicable."
+**Quinn (QA):** "Challenge: NFR count '38' vs actual sub-items — some categories have nested requirements. True count may be 38+. Should we be more precise?" — Counted as 38 top-level NFRs. Sub-items are implementation details.
 
-**Quinn (QA):** "The NFR phase alignment note is well-handled. NFR27/NFR29 being defined early for Phase 2 features is good practice."
+**Amelia (Dev):** "Challenge: FR-COL-09 (NotebookLM) — if the API doesn't exist, this entire epic (11) is at risk. Should we flag this as a blocker?" — Not a blocker because it's Phase 4 (Sprint 9). Sufficient time to pivot.
 
-### New Issues Found: 1
+### Issues Found
+1. (New) FR specificity gap: FR-CMD-02 "auto-routing" needs clearer algorithm description
+2. (R1 carryover) A2 NotebookLM remains highest-risk ambiguity
 
-1. **Epic 5 FR density flag** -- 15 FRs in one epic is high. Valid observation but belongs in Epics analysis, not PRD analysis. No PRD change needed.
-
-### Fixes Applied
-- None required. The finding is deferred to Epics analysis step.
-
-### Score: 9/10 -> PASS
+### Score: 9/10 -- PASS

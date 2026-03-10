@@ -1,28 +1,16 @@
 # Party Mode Round 2 - Adversarial Lens
-## Step: step-05-epic-quality-review (Implementation Readiness)
+## Step: step-05-epic-quality (Implementation Readiness)
 
-### Expert Panel Discussion
+### Expert Panel Challenges
 
-**John (PM):** "P1 stories verified: E6(6)+E7(5)+E8(5)+E9(8)=24. P1 SP: 14+11+11+17=53. All correct." 9/10
+**Winston (Architect):** "Challenge: '98.3% testable' but the 3 untestable ACs are in risky areas (SNS automation, NEXUS performance, NotebookLM quality). These are exactly the areas most likely to have bugs." — Valid. Recommend adding: S4.4 AC3 → 'publish to Twitter test account', S9.2 AC4 → '100+ nodes at 60fps', S11.1 AC3 → 'audio duration within 10% of source text word count × 0.3s'.
 
-**Winston (Architect):** "E2 independence column was inaccurate: listed S8, S9 as independent but S8 depends on S4 (template API) and S9 depends on S5 (OrgTree). Fixed to show S5, S6, S7 as truly independent after API stories." 8/10
+**Quinn (QA):** "Challenge: Story count discrepancy — 43 top-level stories vs 64 sub-stories. Which is the actual unit of work?" — Top-level stories (43) are sprint-trackable units. Sub-stories (64) are implementation tasks within each story.
 
-**Amelia (Dev):** "E4 sequential chain omitted cross-epic dependency: E4-S2 requires both E4-S1 AND E2-S2. This is important for sprint planning -- E4 can't fully start until E2-S2 is done." 8/10
+**Amelia (Dev):** "Challenge: R7 mitigation says 'sustainable but no buffer' — that's not really a mitigation. What's the actual plan if developer is blocked for a week?" — Fair. Mitigation should include: 'Phase 4 features (NEXUS, NotebookLM) can be deferred; core functionality complete by Sprint 6.'
 
-**Quinn (QA):** "All numbers cross-checked. R1 fixes verified (S3=18 SP, throughput 12-18)." 9/10
+### Issues Found
+1. (New) 3 ACs need specific thresholds (see Winston's suggestions)
+2. (New) R7 mitigation needs strengthening — add deferral plan
 
-**Sally (UX):** "No UX-specific issues." 9/10
-
-**Mary (BA):** "Story independence corrections improve accuracy of sprint planning. No other issues." 9/10
-
-**Bob (SM):** "R1 fixes verified. R2 fix is clear." 9/10
-
-### New Issues Found: 1
-
-1. **Story independence inaccuracies** -- E2 and E4 independence/sequential columns had oversimplified dependency descriptions. E2-S8 depends on S4, E2-S9 depends on S5 (not fully independent). E4-S2 has cross-epic dependency on E2-S2 (not reflected in original).
-
-### Fixes Applied
-- Updated E2 independence: S5, S6, S7 truly independent; S8 needs S4, S9 needs S5
-- Updated E4 sequential: Added cross-epic dependency note (E4-S2 needs E2-S2)
-
-### Score: 9/10 -> PASS
+### Score: 8/10 -- PASS

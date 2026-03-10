@@ -1,21 +1,16 @@
 # Party Mode Round 3 - Forensic Lens
 ## Step: step-02-prd-analysis (Implementation Readiness)
 
-### Expert Panel Scoring
+### Expert Panel Verification
 
-**John (PM):** "Comprehensive. 8 sub-sections cover all PRD analysis dimensions." 9/10
-**Winston (Architect):** "Cross-reference tables precise. Priority alignment verified." 9/10
-**Sally (UX):** "Journey-level testability well-addressed." 9/10
-**Amelia (Dev):** "No fluff. Clear verdicts per section." 9/10
-**Quinn (QA):** "76/76 FR testability + 36/36 NFR measurability confirmed." 9/10
-**Mary (BA):** "Coverage table exhaustive. 21 rows, zero gaps." 9/10
-**Bob (SM):** "Summary aggregation clean and accurate." 9/10
+**John (PM):** "76 FRs verified across 9 areas. All ambiguities documented with severity levels." 9/10
+**Winston (Architect):** "Architecture fills PRD gaps for A1 (D2), A4 (D1). Only A2 (NotebookLM) remains truly ambiguous." 9/10
+**Mary (BA):** "38 NFRs verified. Measurability scores accurate." 9/10
+**Quinn (QA):** "All R1 and R2 issues documented. No new critical findings." 9/10
 
-### Remaining Minor Issues
-- None. Epic 5 density flag deferred to Epics analysis step (appropriate).
+### Remaining Issues
+- A2 (NotebookLM API) — accepted risk, Phase 4 deferral is adequate mitigation
 
 ### Final Score: 9/10 -- PASS
 
-### Verdict
-PRD Analysis section is complete, accurate, and confirms implementation readiness.
-No major objections. No remaining issues requiring fixes.
+PRD Analysis step complete. 76 FR at 4.3/5 specificity, 38 NFR at 4.5/5 measurability. 5 ambiguities identified, none critical.

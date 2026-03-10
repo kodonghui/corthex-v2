@@ -1,29 +1,16 @@
 # Party Mode Round 2 - Adversarial Lens
-## Step: step-03-epic-coverage-validation (Implementation Readiness)
+## Step: step-03-epic-coverage (Implementation Readiness)
 
-### Expert Panel Discussion
+### Expert Panel Challenges
 
-**John (PM):** "Section 3.8.2 sprint notation says '11 stories each area' but it's 11 combined (Epic 6: 6, Epic 7: 5). Same for Sprint 8: '13 each' should be '13 combined'." 8/10
+**Winston (Architect):** "Challenge: '100% FR coverage' claim — are we checking that each FR is substantively covered, or just that a story mentions the FR ID? S4.4 claiming to cover 3 v1 features (Telegram + Cron + SNS) seems superficial." — Valid concern. S4.4 at its allocated SP may be insufficient for 3 complex features.
 
-**Winston (Architect):** "DAG dependency Epic 3 -> Epic 7 verified: E7-S1 depends on E3-S5 (cost tracker). Valid cross-phase dependency flowing P0 -> P1." 9/10
+**Quinn (QA):** "Challenge: 10/10 engine patterns (E1~E10) mapped — but E1~E10 are implementation patterns, not features. They should emerge naturally from stories, not need explicit mapping." — Fair point, but having them mapped ensures nothing is forgotten.
 
-**Quinn (QA):** "SP math verified: 5+136+147+10 = 298 SP. 298/124 = 2.40 average. All correct." 9/10
+**Amelia (Dev):** "Challenge: G2 (NotebookLM API) rated Medium but could become Critical if Google never provides API. Should we have a contingency story?" — Epic 11 is Phase 4; contingency can be decided during Sprint 7-8 planning.
 
-**Mary (BA):** "FR47 (credential prompt block) spans both P0 (E3-S4) and P1 (E8-S4). Section 3.7 lists it as P1-only. Not critical since it's partially covered in P0." 8/10
+### Issues Found
+1. (New) S4.4 scope concern — may need to be split into 2-3 stories
+2. (R1 carryover) G1, G2, G3 still valid
 
-**Amelia (Dev):** "UX P0 screen count in Section 3.2b was wrong. CEO P0: 1 screen (사령관실). Admin P0: 5 screens (조직도, 부서관리, 에이전트관리, 도구관리, 조직템플릿). Total P0: 6 screens, not 5." 8/10
-
-**Sally (UX):** "Admin screen counting improved. P1 Admin screens: 직원관리(A4), 비용 대시보드(A6), 회사설정(A8) = 3. So 5+3=8 Admin total. Correct." 9/10
-
-**Bob (SM):** "Sprint notation fixes are practical improvements." 9/10
-
-### New Issues Found: 2
-
-1. **Sprint notation misleading** -- "each area" should be "combined/total"
-2. **UX P0 Admin screen count** -- Was 4, should be 5 (missing A7 조직 템플릿)
-
-### Fixes Applied
-- Fixed Sprint 7/8 notation to show individual epic breakdown + combined total
-- Fixed Admin P0 screen count to 5, P1 to 3, with explicit screen names
-
-### Score: 9/10 -> PASS
+### Score: 9/10 -- PASS

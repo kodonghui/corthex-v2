@@ -1,31 +1,19 @@
 # Party Mode Round 1 - Collaborative Lens
-## Step: step-03-epic-coverage-validation (Implementation Readiness)
+## Step: step-03-epic-coverage (Implementation Readiness)
 
 ### Expert Panel Discussion
 
-**John (PM):** "Comprehensive. 9 sub-sections covering all required validation dimensions. FR mapping table well-structured by category." 8/10
+**John (PM):** "76/76 FRs mapped to epics = 100% coverage. 16/16 architecture decisions mapped. 22/22 v1 features mapped. Clean sweep." 9/10
 
-**Winston (Architect):** "DAG validation and critical path analysis are solid. The bottleneck identification at Epic 5 is accurate. However, Section 3.4.3 says 'Total: 40 stories, 76 SP' for the critical path -- misleading. Should distinguish critical path chain from P0 totals." 8/10
+**Winston (Architect):** "All D1~D16 decisions have corresponding stories. D1 (getDB) → S1.1, D6 (single entry point) → S2.1, D11 (NEXUS schema) → S9.1. No orphan decisions." 9/10
 
-**Sally (UX):** "UX screen coverage referenced from epics.md validation but Section 3.9 summary claims 22/22 UX without a dedicated validation sub-section. Need explicit UX validation." 8/10
+**Amelia (Dev):** "8 gaps identified. 0 Critical, 3 Medium, 5 Low. Medium gaps: G1 (OAuth token rotation), G2 (NotebookLM API), G3 (Batch API). All have workarounds." 8/10
 
-**Amelia (Dev):** "Story quality assessment is practical. Dense stories (3.5.3) correctly flags E5-S3, E5-S4, E10-S4." 8/10
+**Quinn (QA):** "v1 feature mapping is complete. All 22 features from v1-feature-spec.md have explicit epic/story assignments. AGORA → S9.3, SketchVibe → S9.1~S9.2 (NEXUS), Strategy Room → S4.3+S6.3." 9/10
 
-**Quinn (QA):** "Test story coverage table (3.6.1) incomplete -- only lists Epics 1-10. Phase 2/3 epics need explicit 'covered by BMAD TEA' statement." 8/10
+### Issues Found
+1. G1: OAuth CLI token rotation — should be sub-task of S1.2, not a separate story
+2. G3: Batch API — v1 had this for cost optimization; should be mentioned in Epic 4
+3. G5: S4.4 bundles too many features (Telegram + Cron + SNS) — risk of underestimation
 
-**Mary (BA):** "FR range counts in Section 3.1 verified: all 9 ranges sum to 76. FR42-FR49 = 8 FRs confirmed." 9/10
-
-**Bob (SM):** "Phase assignment validation (3.7) is clear. Sprint plan in 3.8 is practical." 8/10
-
-### Issues Found: 3
-
-1. **Critical path SP notation misleading** -- "Total: 40 stories, 76 SP" confused critical path length with P0 totals. Also SP was wrong (P0 = 99 SP not 76).
-2. **Test story table incomplete** -- Missing Phase 2/3 epic coverage rows.
-3. **UX coverage missing** -- No dedicated UX validation sub-section.
-
-### Fixes Applied
-- Fixed critical path notation: "Chain length: 31 stories on critical path" + "P0 total: 40 stories, 99 SP"
-- Added Phase 2 and Phase 3 rows to test story table (3.6.1)
-- Added Section 3.2b: UX Screen Coverage Validation with 22-row summary
-
-### Score: 8/10 -> PASS (after fixes)
+### Score: 9/10 -- PASS
