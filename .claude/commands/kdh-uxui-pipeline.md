@@ -1,130 +1,406 @@
 ---
 name: 'kdh-uxui-pipeline'
-description: 'UXUI 리팩토링 파이프라인 v6. Claude 직접 디자인 + 코딩 + 3라운드 파티모드 + Playwright QA. Usage: /kdh-uxui-pipeline [phase0|phase1|design PAGENAME|design-batch PRIORITY|code PAGENAME|code-batch PRIORITY|phase3|final]'
+description: 'UXUI 리팩토링 파이프라인 v7. Pro Max(디자인 데이터) + LibreUIUX(디자인 원칙) + Subframe(컴포넌트) + BMAD(파티모드 QA). 3-Phase: Diagnose → Redesign → Verify. Usage: /kdh-uxui-pipeline [status|diagnose PAGE|redesign PAGE|verify PAGE|batch PRIORITY|phase0|phase1|phase3|final]'
 ---
 
-# CORTHEX UXUI Refactoring Pipeline v6
+# CORTHEX UXUI Refactoring Pipeline v7
 
-**Claude가 직접 디자인 + 코딩.** 외부 도구(Lovable/v0) 의존 제로.
-기능, 비전, 아키텍처, UX를 모두 고려한 전문적 디자인 스펙 → 코드 구현.
-3라운드 파티모드 + Playwright QA. tmux Worker가 실제 작업 수행.
+**Pro Max + LibreUIUX + Subframe + BMAD 통합.**
+4개 도구가 각자 역할을 나눠 **레이아웃부터 바꾸는 진짜 리디자인**을 수행한다.
+
+### 도구 역할 분담
+
+| 도구 | 역할 | 비유 |
+|------|------|------|
+| **Pro Max** | 디자인 데이터 (색상, 폰트, 스타일, UX 규칙) | 설계 도면집 |
+| **LibreUIUX** | 디자인 원칙 + 품질 감사 (7차원 분석, 접근성, 반응형) | 감리관 |
+| **Subframe** | 컴포넌트 라이브러리 (44개 프리빌트 컴포넌트) | 자재 창고 |
+| **BMAD Party Mode** | 3라운드 자기 리뷰 (7명 전문가 역할극) | 품질 검사관 |
+
+### 절대 교훈 (3번 실패에서 배운 것)
+
+```
+"리디자인" = 레이아웃/구조 자체를 바꿔야 한다.
+색상/border만 바꾸면 → 사용자 거부 → FAIL.
+dashboard.tsx만 성공한 이유: gradient cards, charts, donut, progress bars로 구조 자체를 바꿨기 때문.
+```
 
 ---
 
 ## Mode Selection
 
-- `phase0`: Playwright 환경 세팅 (한 번만)
-- `phase1`: 현재 기능 상태 점검 (스모크 테스트)
-- `design PAGENAME`: 해당 페이지 디자인 스펙 생성
-- `design-batch PRIORITY`: 해당 우선순위 전체 디자인 스펙 생성
-- `code PAGENAME`: 디자인 스펙 기반 코드 리팩토링 + 파티모드 3라운드 + Playwright
-- `code-batch PRIORITY`: 해당 우선순위 전체 리팩토링 일괄 실행
-- `phase3`: 시각 회귀 테스트 기준 이미지 등록
-- `final`: 최종 전체 검증
-- 인자 없음: 진행 상황 표시 + 다음 작업 안내
+| 명령 | 설명 |
+|------|------|
+| `status` 또는 인자 없음 | 진행 상황 + 다음 작업 안내 |
+| `diagnose PAGE` | Phase 1: 페이지 현재 상태 7차원 진단 + 디자인 데이터 수집 |
+| `redesign PAGE` | Phase 2: 레이아웃 재설계 + 코드 구현 |
+| `verify PAGE` | Phase 3: 파티모드 3라운드 + 재감사 + 반응형/접근성 체크 |
+| `batch PRIORITY` | 해당 우선순위 전체 자동 (diagnose → redesign → verify 연속) |
+| `phase0` | Playwright 환경 세팅 (1회) |
+| `phase1` | 현재 기능 스모크 테스트 |
+| `phase3` | 시각 회귀 기준 등록 |
+| `final` | 최종 전체 검증 |
 
 ---
 
-## 핵심 원칙
+## 3-Phase 워크플로우
 
-### Claude = 디자인 + 코딩 전부 직접 수행
+```
+[Phase 1: DIAGNOSE] 현재 상태 진단
+  → Pro Max: 디자인 시스템 데이터 로드 (MASTER.md + 페이지 오버라이드)
+  → /libre-ui-review: 7차원 점수 (1~10) + ELEVATE/REFINE/REBUILD 판정
+  → 출력: 진단 리포트 + 개선 우선순위
 
-이전 v5는 Lovable에게 디자인을 위임했다. v6는 **Claude가 직접 디자인**한다.
+[Phase 2: REDESIGN] 레이아웃 재설계 + 코드 구현
+  → Pro Max: 색상/폰트/스타일/UX 규칙 참조
+  → /libre-ui-synth: 디자인 원칙 (마스터리, 접근성, 성능) 적용
+  → Subframe: src/ui/ 컴포넌트 활용 (Button, Card, Table, Badge 등)
+  → Worker: 실제 코드 구현 (레이아웃 구조 자체를 변경)
 
-**Claude가 결정하는 것:**
-- 레이아웃 구조 (sidebar, header, grid, flex 등)
-- 색상 팔레트, 다크/라이트 모드
-- 타이포그래피 (font family, size scale, weight)
-- 간격 시스템 (spacing, padding, margin)
-- 컴포넌트 디자인 (카드, 모달, 테이블, 폼 등)
-- 시각적 위계, 정보 밀도
-- 애니메이션, 마이크로 인터랙션
-- 반응형 브레이크포인트, 모바일 적응
-- 아이콘 시스템, 상태 표현 (loading, error, empty, success)
-
-**디자인 시 반드시 고려하는 것:**
-1. **기능 (Functionality)**: 이 페이지가 실제로 하는 일, API 호출, 상태관리
-2. **비전 (Vision)**: CORTHEX는 AI 에이전트 기반 기업 운영 플랫폼 — 프로페셔널하고 현대적
-3. **아키텍처 (Architecture)**: 모노레포 구조, 공유 컴포넌트, 라우팅
-4. **UX 패턴 (UX)**: 정보 위계, 사용자 흐름, 접근성, 일관성
-5. **기존 디자인 시스템**: Tailwind CSS, 현재 사용 중인 컴포넌트/클래스 패턴 분석
-
-### 기능 로직 불변
-
-- API 호출, 상태관리, 이벤트 핸들러 100% 유지
-- UI/레이아웃/스타일/Tailwind 클래스만 변경
-- v2 백엔드에 **현재 존재하는** 기능만 반영 (v1 스펙 직접 참조 금지)
-
-### 모든 산출물은 구체적이고 자세하게 (CRITICAL)
-
-**디자인 스펙이든 코드든, 모든 스텝의 산출물은 반드시 구체적이고 자세하게 작성할 것.**
-- 색상: hex 코드까지 명시 (e.g., `bg-slate-900 (#0f172a)`)
-- 레이아웃: 정확한 Tailwind 클래스 (e.g., `grid grid-cols-12 gap-6`)
-- 타이포: 정확한 크기/굵기 (e.g., `text-2xl font-bold tracking-tight`)
-- 간격: 정확한 값 (e.g., `p-6 space-y-4`)
-- 컴포넌트: 전체 JSX 구조 + Tailwind 클래스 포함
-- 상태: loading skeleton, error alert, empty state 전부 구체적 디자인
-- 반응형: 각 브레이크포인트별 변화 명시
-- 영어로 작성해도 됨 — 구체성이 최우선
+[Phase 3: VERIFY] 품질 검증
+  → BMAD 파티모드 3라운드 (Collaborative → Adversarial → Forensic)
+  → /libre-ui-review: 재감사 (Phase 1 점수와 비교, 최소 +2점 상승 필수)
+  → /libre-ui-critique: 8차원 디자인 피드백
+  → /libre-ui-responsive: 반응형 체크 (375/768/1024/1440px)
+  → /libre-a11y-audit: 접근성 감사 (WCAG, ARIA)
+  → Playwright 테스트
+```
 
 ---
 
 ## 작업 환경
 
 ```
-이 PC (VS Code) 한 곳에서 전부 진행 — 외부 도구 없음
-
 오케스트레이터 (메인 Claude Code)
   → 팀 생성, Worker 스폰, 스텝 지시, 커밋+푸시
   → 문서 작성/코딩 직접 안 함
 
 Worker (tmux 안의 Claude Code)
-  → 디자인 스펙 작성, 코드 리팩토링, 파티모드 3라운드, 테스트 작성
+  → 진단, 디자인, 코딩, 파티모드, 테스트 전부 수행
   → 사용자가 tmux에서 실시간 관찰 가능
-
-Playwright (headless)
-  → 스모크 테스트 + 인터랙션 테스트
 
 테스트 대상: 배포 사이트 (https://corthex-hq.com)
 ```
 
 ---
 
-## 전체 흐름
+## Single-Worker 패턴 (kdh-full-auto-pipeline 동일)
+
+- **1인 Worker**: 작성 + 자기 리뷰 3라운드 + 수정 + 보고 = 데드락 0
+- Worker는 tmux에서 실행 → 사용자가 실시간 관찰
+- 오케스트레이터 ↔ Worker 핸드오프 최소 2회 (지시, 완료보고)
+- 5페이지마다 Worker shutdown + 새 Worker 스폰 (컨텍스트 관리)
+
+### 오케스트레이터가 하는 것
 
 ```
-[Phase 0] Playwright 환경 세팅 (1회)
-    ↓
-[Phase 1] 현재 기능 상태 점검 (스모크 테스트)
-    ↓
-[Phase 2] 페이지별 리팩토링 (반복) — 전체 자동화, 사용자 개입 없음
-    → A. design: Worker가 디자인 스펙 생성 (코드 분석 + 디자인 결정)
-    → B. code: Worker가 디자인 스펙대로 코드 리팩토링 + 파티모드 3라운드
-    → C. Worker가 Playwright 테스트 작성 + 실행
-    → D. 오케스트레이터가 타입 체크 + 커밋 + 푸시 (자동 배포)
-    ↓
-[Phase 3] 시각 회귀 테스트 기준 이미지 등록
-    ↓
-[Phase 4] 최종 전체 검증
+1. TeamCreate로 팀 생성
+2. Worker 스폰 (첫 작업을 spawn 프롬프트에 포함 — "기다려" 금지)
+3. Worker 완료 보고 수신
+4. 결과 검증 (파티 로그 존재, 점수 확인, +2점 상승 확인)
+5. 타입 체크: npx tsc --noEmit -p packages/server/tsconfig.json
+6. 커밋 + 푸시
+7. 다음 페이지로 SendMessage (또는 shutdown + 새 Worker 스폰)
 ```
 
-**사용자가 직접 하는 것: 없음. 전체 자동.**
+### 오케스트레이터가 하지 않는 것
+
+```
+- 진단/디자인/코딩 (Worker가 함)
+- 파티모드 실행 (Worker가 자기 리뷰)
+- PASS/FAIL 판정 (Worker가 자체 판정)
+- 테스트 작성/실행 (Worker가 함)
+```
 
 ---
 
-## Single-Worker 패턴 (kdh-full-auto-pipeline과 동일)
+## 디자인 참조 체계 (Worker가 반드시 읽는 것)
 
-### 왜 Single Worker인가?
+### 1단계: 디자인 시스템 (Pro Max 생성)
 
-- 2인 핑퐁(Writer+Reviewer) → SendMessage 데드락 빈번
-- **1인 Worker가 작성 + 자기 리뷰 3라운드 + 수정 + 보고** = 데드락 0
-- Worker는 tmux에서 실행 → 사용자가 실시간 관찰
-- 오케스트레이터 ↔ Worker 핸드오프 최소 2회(지시, 완료보고)
+```
+design-system/corthex/MASTER.md          ← 전역 디자인 규칙
+design-system/corthex/pages/{page}.md    ← 페이지별 오버라이드 (있으면 우선)
+```
 
-### Agent Manifest
+**로드 로직:**
+1. `design-system/corthex/pages/{page}.md` 확인
+2. 있으면 → 페이지 오버라이드 우선, MASTER.md 보충
+3. 없으면 → MASTER.md 단독 사용
 
-Read `_bmad/_config/agent-manifest.csv` for agent definitions. If not found, use defaults:
+### 2단계: Subframe 컴포넌트 (src/ui/)
 
+```
+packages/app/src/ui/
+├── components/     ← 44개 프리빌트 컴포넌트
+│   ├── Button.tsx, Badge.tsx, Card.tsx, Table.tsx...
+│   ├── TextField.tsx, Select.tsx, Switch.tsx...
+│   ├── Dialog.tsx, DropdownMenu.tsx, Tooltip.tsx...
+│   └── ...
+├── layouts/        ← 3개 레이아웃
+├── theme.css       ← Subframe 테마 (Work Sans, brand colors, shadows, radii)
+└── index.ts        ← 전체 export
+```
+
+**사용 규칙:**
+- 새 컴포넌트를 만들기 전에 Subframe에 같은 것이 있는지 먼저 확인
+- Subframe 컴포넌트는 `@/ui/components/Button` 형태로 import
+- 테마 토큰은 theme.css에서 정의된 것 사용 (brand-*, neutral-*, error-*, success-*)
+
+### 3단계: STYLE-GUIDE (종합 참고)
+
+```
+_uxui-refactoring/STYLE-GUIDE.md         ← 605줄 종합 디자인 시스템
+```
+
+- 6개 도메인 그라디언트 색상
+- 4단계 표면 계층
+- 14개 컴포넌트 패턴
+- 4개 페이지 레이아웃 템플릿
+
+### 4단계: 현재 코드 + 백엔드
+
+```
+packages/app/src/pages/{page}/           ← 현재 페이지 코드
+packages/app/src/components/             ← 공유 컴포넌트
+packages/server/src/routes/              ← API 엔드포인트
+packages/server/src/db/schema.ts         ← DB 스키마
+packages/shared/src/types.ts             ← 타입 정의
+```
+
+---
+
+## Mode: diagnose PAGE (Phase 1 — 현재 상태 진단)
+
+### Worker 스폰 프롬프트
+
+```
+You are a senior UXUI analyst for CORTHEX v2.
+You diagnose the current state of a page using Pro Max design data + LibreUIUX 7-dimension analysis.
+YOLO mode -- auto-proceed, never wait for user input.
+
+## Your Task: Diagnose {페이지명} (page #{번호})
+
+### Step 1: Load Design System References
+1. Read design-system/corthex/MASTER.md (전역 디자인 규칙)
+2. Read design-system/corthex/pages/{페이지명}.md (있으면 — 페이지 오버라이드)
+3. Read _uxui-refactoring/STYLE-GUIDE.md (종합 가이드)
+4. Read packages/app/src/ui/theme.css (Subframe 테마 토큰)
+
+### Step 2: Analyze Current Page Code
+1. Read ALL files in packages/app/src/pages/{페이지명}/ (모든 .tsx, .ts)
+2. Read relevant packages/app/src/components/ (이 페이지가 쓰는 공유 컴포넌트)
+3. Read relevant packages/server/src/routes/ (API 엔드포인트, 데이터 형태)
+4. Map: 모든 표시 데이터, 사용자 액션, 상태 전환, API 호출
+
+### Step 3: Pro Max Design Data Query
+Run these commands to get design recommendations:
+
+```bash
+# 페이지에 맞는 디자인 데이터 조회
+python3 .claude/skills/ui-ux-pro-max/scripts/search.py "{페이지_키워드}" --domain style -n 5
+python3 .claude/skills/ui-ux-pro-max/scripts/search.py "{페이지_키워드}" --domain ux -n 5
+python3 .claude/skills/ui-ux-pro-max/scripts/search.py "{페이지_키워드}" --domain chart -n 3
+python3 .claude/skills/ui-ux-pro-max/scripts/search.py "layout responsive" --stack react
+```
+
+### Step 4: LibreUIUX 7-Dimension Analysis
+/libre-ui-review 의 프레임워크를 직접 적용하여 7차원 분석 수행:
+
+1. **Archetypal Coherence** — 일관된 심리적 스토리를 전달하는가?
+2. **Design Mastery** — 그리드, 타이포, 색상이론, 여백, 시각적 위계, 게슈탈트
+3. **Accessibility** — WCAG AA, 키보드 네비게이션, ARIA, 색상 대비, 터치 타겟
+4. **Security** — XSS, 입력 검증, 민감 데이터 노출
+5. **Performance** — 번들 사이즈, 이미지 최적화, lazy loading, 코드 분할
+6. **Code Quality** — 컴포넌트 구조, 타입 안전성, 에러 처리, 재사용성
+7. **User Experience** — CTA 명확성, 네비게이션, 피드백, 로딩/에러/빈 상태, 반응형
+
+각 차원 1~10점 채점 + 종합 판정 (ELEVATE/REFINE/REBUILD)
+
+### Step 5: Write Diagnosis Report
+Save to: _uxui-refactoring/diagnose/{번호}-{페이지명}.md
+
+## Report Structure:
+
+# {번호}. {페이지명} — Diagnosis Report
+
+## Executive Summary
+- Overall Score: X/10
+- Verdict: ELEVATE / REFINE / REBUILD
+- 7-dimension score table
+
+## Current State Analysis
+- 현재 레이아웃 구조 (ASCII diagram)
+- 사용 중인 컴포넌트 목록
+- 기능 목록 (API 호출, 상태관리)
+- 현재 디자인의 문제점 (구체적: 어떤 클래스가 왜 문제인지)
+
+## Design System Gap Analysis
+- MASTER.md 대비 현재 코드의 괴리
+- 페이지 오버라이드에서 지정한 것 vs 현재 구현
+- Subframe 컴포넌트 중 활용 가능한 것 (현재 미사용)
+- STYLE-GUIDE.md 위반 사항
+
+## Pro Max Recommendations
+- 추천 스타일 + 적용 방법
+- 추천 UX 패턴 + 적용 방법
+- 추천 차트 타입 (해당 시)
+
+## 7-Dimension Detailed Scores
+(각 차원별 구체적 발견 + 개선 방향)
+
+## Redesign Priority List
+| 순위 | 영역 | 현재 | 목표 | 변경 범위 |
+|------|------|------|------|----------|
+(레이아웃 변경이 필요한 것 최우선)
+
+## Subframe Components to Use
+| 컴포넌트 | 용도 | import 경로 |
+|----------|------|-------------|
+
+### Step 6: Report to Orchestrator
+[Phase 1 Complete] diagnose-{번호}-{페이지명}
+Overall score: X/10
+Verdict: ELEVATE/REFINE/REBUILD
+Key findings: (2~3줄)
+Redesign priorities: (상위 3개)
+```
+
+---
+
+## Mode: redesign PAGE (Phase 2 — 레이아웃 재설계 + 코드 구현)
+
+### 전제 조건
+- `diagnose PAGE` 완료 (진단 리포트 존재)
+
+### Worker 스폰 프롬프트
+
+```
+You are a senior frontend developer AND UXUI designer for CORTHEX v2.
+You REDESIGN pages — not just restyle. Layout structure MUST change.
+YOLO mode -- auto-proceed, never wait for user input.
+
+## CRITICAL RULE: LAYOUT MUST CHANGE
+"리디자인" means the page layout/structure itself must be different.
+If you only change colors/borders/fonts without changing layout → INSTANT FAIL.
+Examples of REAL redesign:
+  - Grid 구조 변경 (1-column → 2-column split, flat list → bento grid)
+  - 새로운 시각화 추가 (chart, donut, progress bar, sparkline)
+  - 카드 구조 변경 (flat → gradient cards with glow effects)
+  - 정보 위계 재배치 (상단 KPI cards, 중앙 main content, 하단 activity)
+  - 인터랙션 패턴 변경 (list → kanban, table → card grid)
+
+## CRITICAL: 기능 로직 불변
+- API 호출, 상태관리, 이벤트 핸들러 100% 유지
+- UI/레이아웃/스타일/Tailwind 클래스만 변경
+- 새 시각화 추가는 OK (기존 데이터를 새로운 방식으로 표현)
+
+## CRITICAL: ALL DELIVERABLES MUST BE SPECIFIC AND DETAILED
+추상적/모호한 표현 금지. hex/Tailwind/JSX 수준으로 구체적으로.
+
+## Your References (MUST read before designing)
+
+### Design System (Pro Max)
+1. design-system/corthex/MASTER.md — 전역 규칙 (색상, 폰트, 스타일)
+2. design-system/corthex/pages/{페이지명}.md — 페이지 오버라이드 (있으면 우선)
+
+### Subframe Components (부품 창고)
+3. packages/app/src/ui/components/ — 44개 프리빌트 컴포넌트
+   - Button, Badge, IconButton, LinkButton
+   - Card, Table, TextField, TextArea, Select, Switch, Checkbox, RadioGroup
+   - Dialog, DropdownMenu, Tooltip, Tabs, Accordion
+   - Avatar, ProgressBar, Loader, Calendar, FullCalendar
+   - Alert, Toast, Breadcrumbs, Pagination
+   - import: @/ui/components/{ComponentName}
+4. packages/app/src/ui/theme.css — Subframe 테마 토큰
+
+### Diagnosis Report (Phase 1 결과)
+5. _uxui-refactoring/diagnose/{번호}-{페이지명}.md — 현재 상태 점수 + 개선 우선순위
+
+### Style Guide + Current Code
+6. _uxui-refactoring/STYLE-GUIDE.md — 종합 디자인 시스템 (605줄)
+7. packages/app/src/pages/{페이지명}/ — 현재 페이지 코드
+8. packages/app/src/components/ — 공유 컴포넌트
+9. packages/server/src/routes/ — API 엔드포인트
+10. packages/shared/src/types.ts — 타입 정의
+
+### LibreUIUX Design Principles (/libre-ui-synth 프레임워크)
+디자인 시 이 5단계 원칙을 내부적으로 적용:
+- Phase 1 (Archetypal Foundation): 브랜드 심리학적 의미 — CORTHEX = Ruler+Magician (권위+혁신)
+- Phase 2 (Design Mastery): 거장 원칙 적용 — Dieter Rams(less but better), Vignelli(grid), Bass(simplicity)
+- Phase 3 (Technical Excellence): 접근성(ARIA, keyboard), 보안(XSS 방지), 성능(lazy load)
+- Phase 4 (Quality Assurance): 컴포넌트 테스트, 접근성 테스트
+- Phase 5 (Deployment Readiness): SEO, Core Web Vitals, 크로스브라우저
+
+## Your Task: Redesign {페이지명} (page #{번호})
+
+### Step 1: Read ALL References
+- Design system (MASTER.md + page override)
+- Diagnosis report (scores, priorities, gaps)
+- Current page code (ALL files)
+- Subframe components (available inventory)
+- Backend routes (data shapes)
+
+### Step 2: Design New Layout
+Write design spec to: _uxui-refactoring/redesign/{번호}-{페이지명}-spec.md
+
+Include:
+1. **New Layout Structure** (ASCII diagram — MUST be different from current)
+   - Exact grid: `grid grid-cols-12 gap-6`, main=`col-span-8`, side=`col-span-4`
+   - Container: `max-w-7xl mx-auto px-6 py-6`
+2. **Component Breakdown** — 각 컴포넌트의 정확한 Tailwind 클래스 + JSX 구조
+3. **Subframe Components Used** — 어떤 Subframe 컴포넌트를 어디에 쓰는지
+4. **New Visualizations** — 추가할 차트, 그래프, 프로그레스바 등
+5. **Responsive Behavior** — 375px, 768px, 1024px, 1440px 각각
+6. **States** — Loading(skeleton), Error(alert), Empty(placeholder) 구체적 JSX
+7. **data-testid Map** — 모든 인터랙티브 요소
+
+### Step 3: Implement Code
+- Design spec에 따라 코드 수정
+- Subframe 컴포넌트 import하여 활용
+- 기능 로직(API, state, handlers) 100% 유지
+- 레이아웃 구조 자체를 변경 (색상만 바꾸면 FAIL)
+- data-testid 전부 추가
+- import 경로는 git ls-files 기준 대소문자 정확히 일치
+
+### Step 4: Self-Check (코딩 완료 직후)
+수정한 코드를 Read tool로 다시 읽고 체크:
+- [ ] 레이아웃 구조가 이전과 확실히 다른가? (구조 변경 증거)
+- [ ] Design spec의 Tailwind 클래스가 정확히 적용됐는가?
+- [ ] 기능 로직(API, state, handlers)이 100% 유지됐는가?
+- [ ] Subframe 컴포넌트를 최소 3개 이상 활용했는가?
+- [ ] data-testid가 모두 추가됐는가?
+- [ ] import 경로 대소문자가 정확한가?
+하나라도 NO → 즉시 수정
+
+### Step 5: Report to Orchestrator
+[Phase 2 Complete] redesign-{번호}-{페이지명}
+Layout changes: (구조 변경 요약 — 이전 vs 이후)
+Subframe components used: (목록)
+New visualizations: (추가된 것)
+Design spec: _uxui-refactoring/redesign/{번호}-{페이지명}-spec.md
+Changed files: (경로들)
+```
+
+---
+
+## Mode: verify PAGE (Phase 3 — 품질 검증)
+
+### 전제 조건
+- `redesign PAGE` 완료 (코드 변경 + design spec 존재)
+
+### Worker 스폰 프롬프트
+
+```
+You are a senior QA engineer AND UXUI auditor for CORTHEX v2.
+You verify redesigned pages through BMAD party mode + LibreUIUX multi-audit.
+YOLO mode -- auto-proceed, never wait for user input.
+
+## CRITICAL: 비대화형 파티모드 (bmad-party-mode 스킬 호출 금지)
+Worker인 네가 직접 7명 전문가 역할극을 수행한다.
+Skill("bmad-party-mode") 호출하지 마라 — 대화형이라 멈춘다.
+
+## Agent Manifest
 | Agent | Name | Focus |
 |-------|------|-------|
 | PM | John | user value, requirements gaps, priorities |
@@ -135,484 +411,163 @@ Read `_bmad/_config/agent-manifest.csv` for agent definitions. If not found, use
 | Business Analyst | Mary | business value, market fit, ROI |
 | Scrum Master | Bob | scope, dependencies, schedule risks |
 
-### 오케스트레이터가 하는 것
+## Your Task: Verify {페이지명} (page #{번호})
 
-```
-1. TeamCreate로 팀 생성
-2. Worker 스폰 (첫 작업을 spawn 프롬프트에 포함 — "기다려" 금지)
-3. Worker 완료 보고 수신
-4. 결과 검증 (파티 로그 존재, 품질 점수 확인)
-5. 타입 체크: npx tsc --noEmit -p packages/server/tsconfig.json
-6. 커밋 + 푸시
-7. 다음 페이지로 Worker에게 SendMessage (또는 shutdown + 새 Worker 스폰)
-```
+### Step 1: Read All Files
+1. Read diagnosis report: _uxui-refactoring/diagnose/{번호}-{페이지명}.md (Phase 1 점수)
+2. Read design spec: _uxui-refactoring/redesign/{번호}-{페이지명}-spec.md
+3. Read ALL modified code files (Read tool — 기억으로 리뷰 절대 금지)
+4. Read design-system/corthex/MASTER.md + pages/{페이지명}.md
 
-### 오케스트레이터가 하지 않는 것
-
-```
-- 디자인 스펙 작성 (Worker가 함)
-- 코드 리팩토링 (Worker가 함)
-- 파티모드 실행 (Worker가 자기 리뷰)
-- PASS/FAIL 판정 (Worker가 자체 판정)
-- 테스트 작성 (Worker가 함)
-```
-
----
-
-## Party Mode: 비대화형 3라운드 자기 리뷰 (kdh-full-auto-pipeline 방식)
-
-**Worker가 혼자서** 7명 전문가 역할극 수행. **완전 자동 — 사용자 입력/확인/메뉴 표시 일체 금지.**
-`bmad-party-mode` 스킬 호출 금지 (대화형이라 멈춤). Worker가 직접 역할극 + 로그 작성 + 수정까지 전부 처리.
-
-### 비대화형 실행 방법 (중요)
-
-```
-Worker는 bmad-party-mode 스킬을 호출하지 않는다.
-Worker가 직접:
-  1. 작성한 파일을 Read tool로 다시 읽는다 (기억 X, 반드시 파일에서)
-  2. 7명 전문가 역할을 순서대로 연기하면서 이슈를 찾는다
-  3. 이슈 테이블을 작성한다
-  4. party-logs/{파일명}.md에 Write tool로 저장한다
-  5. 발견된 이슈를 Edit tool로 원본 파일에서 즉시 수정한다
-  6. 다음 라운드로 넘어간다 (사용자 확인 없이)
-이 전체 과정에 사용자 개입 제로. YOLO 모드.
-```
-
-### Round 구조
+### Step 2: BMAD 파티모드 3라운드
 
 **Round 1 (Collaborative Lens):**
-- 작성한 파일을 Read tool로 다시 읽기 (기억으로 리뷰 절대 금지)
-- 전문가 4~5명이 우호적 관점에서 리뷰 (인격 반영, 2~3문장 이상)
-- 크로스톡 2회 이상 (전문가끼리 이름 부르며 대화)
-- 최소 2개 이슈 발견 (0개 = 의심하고 재분석)
-- 발견된 이슈를 Edit tool로 원본 파일에서 즉시 수정
-- party-logs에 Write tool로 저장
-
-**Round 2 (Adversarial Lens):**
-- 수정된 파일을 Read tool로 다시 읽기
-- 전문가 전원(7명)이 적대적 관점으로 전환
-- Round 1 수정이 진짜 고쳐졌는지 검증
-- 각 전문가 최소 1개 새 관찰 (Round 1에 없던 것)
-- 현재 백엔드 코드 기준으로 기능 커버리지 확인
-- 발견된 이슈를 Edit tool로 원본 파일에서 즉시 수정
-- party-logs에 Write tool로 저장
-
-**Round 3 (Forensic Lens):**
-- 최종 파일을 Read tool로 다시 읽기
-- Round 1+2의 모든 이슈를 재평가 (과장 → 하향, 과소평가 → 상향)
-- 각 전문가 최종 평가 (2~3문장, 인격 반영)
-- 품질 점수 X/10 + PASS (7+) 또는 FAIL (6-)
-- party-logs에 Write tool로 저장
-- FAIL → 수정 후 3라운드 전체 재실행
-
-### Party Log 형식
-
-저장 경로: `_uxui-refactoring/party-logs/`
-
-```
-_uxui-refactoring/party-logs/
-├── design-01-command-center-round1.md
-├── design-01-command-center-round2.md
-├── design-01-command-center-round3.md
-├── code-01-command-center-round1.md
-├── code-01-command-center-round2.md
-├── code-01-command-center-round3.md
-...
-```
-
-(라운드별 형식은 kdh-full-auto-pipeline과 동일 — 생략)
-
----
-
-## Mode: design PAGENAME (디자인 스펙 생성 + 비대화형 3라운드 자기 리뷰)
-
-### Worker 스폰 프롬프트
-
-```
-You are a senior UXUI designer AND frontend architect for CORTHEX v2.
-You create DETAILED, SPECIFIC design specifications that another developer can implement exactly.
-YOLO mode -- auto-proceed, never wait for user input.
-
-## CRITICAL: 비대화형 파티모드 (bmad-party-mode 스킬 호출 금지)
-파티모드는 Skill tool로 호출하지 않는다. Worker인 네가 직접 수행한다:
-1. 작성한 디자인 스펙 파일을 Read tool로 다시 읽는다 (기억으로 리뷰 절대 금지)
-2. 7명 전문가(John/Winston/Sally/Amelia/Quinn/Mary/Bob) 역할을 직접 연기한다
-3. 이슈 테이블을 작성하고, party-logs 파일에 Write tool로 저장한다
-4. 발견된 이슈를 Edit tool로 디자인 스펙 원본 파일에서 즉시 수정한다
-5. 다음 라운드로 자동 진행한다 (사용자 확인 없이, 메뉴 없이)
-
-## CRITICAL: ALL DELIVERABLES MUST BE SPECIFIC AND DETAILED
-Every output must be concrete, not vague. Examples:
-- BAD: "Use a professional color scheme"
-- GOOD: "Primary: #3b82f6 (blue-500), Surface: #0f172a (slate-900), Text: #f8fafc (slate-50), Accent: #22d3ee (cyan-400), Destructive: #ef4444 (red-500), Success: #22c55e (green-500)"
-- BAD: "Add a sidebar navigation"
-- GOOD: "Left sidebar, w-64 (256px), fixed position, bg-slate-900, border-r border-slate-700. Contains: logo area (h-16, flex items-center px-4), nav items (flex flex-col gap-1 px-3), each nav item (flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-colors)"
-
-## DESIGN PHILOSOPHY
-CORTHEX v2 is an AI-agent-powered enterprise operations platform.
-The UI should feel:
-- **Professional & Modern**: Clean lines, generous whitespace, subtle shadows
-- **Data-Dense but Readable**: Information-rich screens with clear visual hierarchy
-- **Dark-Mode First**: Deep slate backgrounds, high-contrast text, glowing accents
-- **Enterprise-Grade**: Polished like Linear, Vercel Dashboard, or Raycast
-- **Consistent**: Same patterns across all 42 pages
-
-## DESIGN SYSTEM FOUNDATION (use across all pages)
-Before designing page-specific UI, establish/reference these shared tokens:
-
-### Color Tokens
-- Background: slate-900 (#0f172a) primary, slate-800 (#1e293b) elevated, slate-950 (#020617) sunken
-- Text: slate-50 (#f8fafc) primary, slate-400 (#94a3b8) secondary, slate-500 (#64748b) tertiary
-- Border: slate-700 (#334155) default, slate-600 (#475569) hover
-- Primary: blue-500 (#3b82f6) action, blue-600 (#2563eb) hover
-- Accent: cyan-400 (#22d3ee) highlight, emerald-500 (#10b981) success
-- Destructive: red-500 (#ef4444), Warning: amber-500 (#f59e0b)
-- Status: green-500 online, yellow-500 busy, red-500 error, slate-500 offline
-
-### Typography Scale
-- Display: text-3xl font-bold tracking-tight
-- Heading: text-xl font-semibold
-- Subheading: text-sm font-medium uppercase tracking-wider text-slate-400
-- Body: text-sm text-slate-300
-- Caption: text-xs text-slate-500
-- Mono: font-mono text-xs (for code, IDs, timestamps)
-
-### Spacing System
-- Page padding: p-6 (24px)
-- Section gap: space-y-6
-- Card padding: p-4 or p-5
-- Compact list item: py-2 px-3
-- Button padding: px-4 py-2
-
-### Component Patterns
-- Card: bg-slate-800/50 border border-slate-700 rounded-xl shadow-sm
-- Button Primary: bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium
-- Button Secondary: bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg px-4 py-2 text-sm font-medium
-- Button Ghost: hover:bg-slate-800 text-slate-400 hover:text-white rounded-lg px-3 py-2
-- Input: bg-slate-800 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500
-- Badge: inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
-- Table Header: text-xs font-medium uppercase tracking-wider text-slate-400 border-b border-slate-700
-- Table Row: border-b border-slate-700/50 hover:bg-slate-800/50 transition-colors
-- Modal: fixed inset-0 bg-black/60 backdrop-blur-sm, content: bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl max-w-lg
-- Toast: fixed bottom-4 right-4, bg-slate-800 border border-slate-700 rounded-lg shadow-lg p-4
-- Skeleton: bg-slate-700 animate-pulse rounded
-
-### Responsive Breakpoints
-- Mobile: < 768px (single column, bottom nav, stacked cards)
-- Tablet: 768px-1024px (collapsible sidebar, 2-column grids)
-- Desktop: > 1024px (full sidebar, multi-column layouts)
-
-## Your References (MUST read before designing)
-1. Current page code: packages/{app|admin}/src/pages/{페이지명}/ — current functionality
-2. Backend routes: packages/server/src/routes/ — API endpoints, data shapes
-3. Database schema: packages/server/src/db/schema.ts — entity structure
-4. Shared types: packages/shared/src/types.ts — type definitions
-5. Other completed design specs: _uxui-refactoring/claude-prompts/ — consistency check
-6. Current shared components: packages/{app|admin}/src/components/ — reusable patterns
-
-IMPORTANT: Only describe features that CURRENTLY EXIST in the v2 codebase.
-
-## Your Task: Create design spec for {페이지명} (page #{번호})
-
-### Step 1: Deep Code Analysis
-- Read ALL files in the page directory (every .tsx, .ts file)
-- Read relevant backend route handlers
-- Read relevant DB schema tables
-- Read shared types used by this page
-- Read existing shared components (what's reusable?)
-- Map out: every piece of data displayed, every user action, every state transition, every API call
-
-### Step 2: Write Comprehensive Design Spec
-Save to: _uxui-refactoring/claude-prompts/{번호}-{페이지명}.md
-
-THE SPEC MUST BE EXTREMELY DETAILED AND SPECIFIC. Write in English for precision.
-Include exact Tailwind classes, exact layout structure, exact component hierarchy.
-
-Structure:
-
-# {번호}. {페이지명} — Design Specification
-
-## 1. Page Overview
-- Purpose: (what this page does, who uses it, when)
-- Key User Goals: (what users come here to accomplish)
-- Data Dependencies: (which API endpoints, what data shapes)
-- Current State: (brief analysis of what exists now and what needs to change)
-
-## 2. Page Layout Structure
-(ASCII diagram showing the exact layout grid)
-```
-┌─────────────────────────────────────────────────────┐
-│ Page Header                                          │
-│ [Breadcrumb] [Title]                    [Actions]   │
-├─────────────────────────────────────────────────────┤
-│ [Filter Bar / Tabs]                                  │
-├──────────────────────┬──────────────────────────────┤
-│ Main Content Area    │ Detail Panel (if applicable)  │
-│                      │                               │
-│                      │                               │
-└──────────────────────┴──────────────────────────────┘
-```
-
-- Exact grid: (e.g., `grid grid-cols-12 gap-6`, main=`col-span-8`, detail=`col-span-4`)
-- Container: (e.g., `max-w-7xl mx-auto px-6 py-6`)
-- Responsive behavior: (how layout changes at each breakpoint)
-
-## 3. Component Breakdown
-For EACH component on the page, specify:
-
-### 3.1 {ComponentName}
-- **Purpose**: what it does
-- **Container**: exact Tailwind classes (e.g., `bg-slate-800/50 border border-slate-700 rounded-xl p-5`)
-- **Layout**: internal layout classes (e.g., `flex items-center justify-between`)
-- **Content**:
-  - Element 1: `<h2 className="text-xl font-semibold text-white">Title</h2>`
-  - Element 2: `<p className="text-sm text-slate-400 mt-1">Subtitle</p>`
-  - ...
-- **Interactive Elements**:
-  - Button: exact classes, onClick handler (reference existing handler name)
-  - Input: exact classes, value binding, onChange handler
-  - ...
-- **States**:
-  - Loading: (skeleton UI with exact classes)
-  - Empty: (empty state design with icon, message, CTA)
-  - Error: (error alert design)
-  - Success: (success feedback design)
-- **data-testid**: (list all test IDs for this component)
-
-(Repeat for every component on the page)
-
-## 4. Interaction Specifications
-- Click flows: (what happens when user clicks X → Y → Z)
-- Form submissions: (validation rules, error display, success feedback)
-- Navigation: (where links/buttons go, how state transfers)
-- Keyboard shortcuts: (if any)
-- Drag & drop: (if any)
-- Real-time updates: (WebSocket events, polling intervals)
-
-## 5. Responsive Design
-### Desktop (> 1024px)
-- (full layout description)
-### Tablet (768px - 1024px)
-- (adapted layout — what collapses, what stacks)
-### Mobile (< 768px)
-- (mobile layout — single column, bottom actions, swipeable)
-
-## 6. Animation & Transitions
-- Page enter: (e.g., `animate-in fade-in slide-in-from-bottom-4 duration-300`)
-- Card hover: (e.g., `transition-all duration-200 hover:shadow-lg hover:border-slate-600`)
-- Modal open/close: (e.g., `transition-opacity duration-200`)
-- Loading transitions: (skeleton → content fade)
-- State changes: (e.g., status badge color transitions)
-
-## 7. Accessibility
-- ARIA labels for interactive elements
-- Focus management (tab order, focus trapping in modals)
-- Color contrast compliance (WCAG AA minimum)
-- Screen reader considerations
-
-## 8. data-testid Map
-| Element | data-testid | Type |
-|---------|-------------|------|
-| (every interactive element) | (exact ID) | button/input/link/... |
-
-### Step 3: 비대화형 자기 리뷰 3라운드 (직접 수행 — Skill 호출 금지)
-
-**Round 1 (Collaborative Lens):**
-1. 디자인 스펙 파일을 Read tool로 다시 읽기
+1. 수정된 코드 파일 전부를 Read tool로 읽기 (기억 금지)
 2. 전문가 4~5명이 우호적 관점으로 리뷰 (인격 반영, 2~3문장 이상, 크로스톡 2회+)
-3. 최소 2개 이슈 (0개 = 재분석)
-4. Write tool로 party-logs/design-{번호}-{페이지명}-round1.md 저장
-5. Edit tool로 디자인 스펙 파일에서 이슈 수정
-
-**Round 2 (Adversarial Lens):**
-1. 수정된 디자인 스펙 파일을 Read tool로 다시 읽기
-2. 전문가 전원(7명) 적대적 모드, 각자 최소 1개 새 관찰
-3. ADVERSARIAL CHECKLIST 검증:
-   - [ ] Tailwind classes are REAL and CORRECT? (no made-up classes)
-   - [ ] Layout is achievable with current Tailwind config?
-   - [ ] All data from actual API endpoints is accounted for?
-   - [ ] All interactive elements have event handlers mapped to existing code?
-   - [ ] Edge cases designed (empty, error, loading, mobile)?
-   - [ ] Consistent with design system tokens defined above?
-   - [ ] Consistent with other completed page designs?
-   - [ ] Specific enough for another developer to implement without guessing?
-   - [ ] data-testid for every interactive element?
-4. Write tool로 party-logs/design-{번호}-{페이지명}-round2.md 저장
-5. Edit tool로 디자인 스펙 파일에서 이슈 수정
-
-**Round 3 (Forensic Lens):**
-1. 최종 디자인 스펙 파일을 Read tool로 다시 읽기
-2. Round 1+2 이슈 재평가 + 각 전문가 최종 평가
-3. 품질 점수 X/10 + PASS(7+) / FAIL(6-)
-4. Write tool로 party-logs/design-{번호}-{페이지명}-round3.md 저장
-5. FAIL → 디자인 스펙 재작성 후 3라운드 전체 재실행
-
-### Step 4: Report to Orchestrator
-[Step Complete] design-{번호}-{페이지명}
-Content summary: (1~2줄)
-Party mode: 3 rounds passed (issues fixed: N)
-Quality score: X/10
-Changed files: (경로들)
-```
-
----
-
-## Mode: design-batch PRIORITY (일괄 디자인 스펙 생성)
-
-### 전체 흐름
-
-```
-오케스트레이터:
-  1. 해당 우선순위의 전체 페이지 목록 추출
-  2. Worker 스폰 (첫 페이지 작업을 spawn 프롬프트에 포함)
-  3. Worker가 페이지 1개 완료 보고 → 오케스트레이터가 다음 페이지 SendMessage
-  4. 5페이지마다 Worker shutdown + 새 Worker 스폰 (컨텍스트 관리)
-  5. 모든 페이지 완료 → 일괄 커밋 + 푸시
-  6. 사용자에게 완료 보고
-
-Worker 페이지당 작업:
-  1. 현재 코드 깊이 읽기 (페이지 파일 전부 + 백엔드 + 스키마 + 공유 컴포넌트)
-  2. 디자인 스펙 생성 → _uxui-refactoring/claude-prompts/{번호}-{페이지명}.md
-  3. 비대화형 파티모드 3라운드
-  4. 오케스트레이터에게 완료 보고 (SendMessage)
-```
-
----
-
-## Mode: code PAGENAME (디자인 스펙 기반 리팩토링 + 파티모드 + Playwright)
-
-### 전제 조건
-- `design PAGENAME` 완료 (디자인 스펙 파일 존재)
-
-### Worker 스폰 프롬프트
-
-```
-You are a senior frontend developer for CORTHEX v2. You implement UI changes based on detailed design specifications AND self-review with 3-round party mode.
-YOLO mode -- auto-proceed, never wait for user input.
-
-## CRITICAL: 비대화형 파티모드 (bmad-party-mode 스킬 호출 금지)
-
-## CRITICAL: ALL CODE MUST BE SPECIFIC AND DETAILED
-- Every Tailwind class must match the design spec exactly
-- Every component structure must follow the spec's JSX hierarchy
-- Every state (loading/error/empty) must be implemented as specified
-- Every data-testid must be added as specified
-- Do not approximate or "interpret" the design — implement it precisely
-
-## Your References (MUST read before coding)
-1. **Design Spec** (PRIMARY GUIDE): _uxui-refactoring/claude-prompts/{번호}-{페이지명}.md
-   - This is the blueprint. Follow it EXACTLY.
-   - Every Tailwind class, every layout decision, every component structure is specified.
-2. **Current page code**: packages/{app|admin}/src/pages/{페이지명}/ (what exists now)
-3. **Shared components**: packages/{app|admin}/src/components/ (what to reuse)
-
-## ABSOLUTE RULES (break any = instant FAIL)
-1. 기능 로직 건드리지 말 것 — API 호출, 상태관리, 이벤트 핸들러 100% 유지
-2. UI/레이아웃/스타일/Tailwind 클래스만 변경 — design spec에 맞춰서
-3. data-testid 전부 추가 (design spec의 testid map 참조)
-4. 기존 data-testid 삭제 금지
-5. 새 파일 생성 최소화 (기존 파일 수정 선호)
-6. import 경로는 git ls-files 기준 대소문자 정확히 일치
-
-## Your Task: Refactor {페이지명} (page #{번호})
-
-### Step 1: Read References
-- Read design spec (this is your blueprint)
-- Read all current page code files
-- Read relevant shared components
-
-### Step 2: Implement Design
-For each file in the page:
-1. Follow design spec's component breakdown exactly
-2. Apply exact Tailwind classes from the spec
-3. Implement the exact layout structure (grid, flex, positioning)
-4. Implement all states: loading (skeleton), error (alert), empty (placeholder)
-5. Add responsive classes as specified in the design spec
-6. Add transitions/animations as specified
-7. Add all data-testid attributes from the spec's testid map
-8. Preserve ALL existing functionality (API calls, state, handlers)
-
-### Step 3: 비대화형 자기 리뷰 3라운드
-
-**Round 1 (Collaborative Lens):**
-1. 수정한 코드 파일 전부를 Read tool로 다시 읽기
-2. 전문가 4~5명이 우호적 관점으로 리뷰
-3. 최소 2개 이슈
-4. party-logs/code-{번호}-{페이지명}-round1.md 저장
-5. 코드 수정
+3. **LAYOUT CHANGE VERIFICATION** (추가 체크):
+   - [ ] 레이아웃 구조가 이전과 확실히 다른가?
+   - [ ] 새로운 시각화(차트, 프로그레스바 등)가 추가됐는가?
+   - [ ] Subframe 컴포넌트가 활용됐는가?
+   - [ ] 색상만 바꾼 게 아닌가? (YES면 즉시 FAIL)
+4. 최소 2개 이슈 (0개 = 재분석)
+5. Write tool로 _uxui-refactoring/party-logs/{번호}-{페이지명}-round1.md 저장
+6. Edit tool로 코드에서 이슈 수정
 
 **Round 2 (Adversarial Lens):**
 1. 수정된 코드 파일 전부를 Read tool로 다시 읽기
-2. 전문가 전원(7명) 적대적 모드
+2. 전문가 전원(7명) 적대적 모드, 각자 최소 1개 새 관찰
 3. ADVERSARIAL CHECKLIST:
-   - [ ] Design spec layout matched exactly?
+   - [ ] Design spec 레이아웃과 코드가 정확히 일치?
    - [ ] Tailwind classes from spec applied correctly?
-   - [ ] 기능 로직이 100% 동일? (API calls, state, handlers)
-   - [ ] data-testid 전부 추가됨? (spec's testid map 대조)
-   - [ ] 기존 data-testid 삭제 안 됨?
-   - [ ] 반응형 (각 breakpoint에서 design spec대로)?
-   - [ ] 로딩/에러/빈 상태 UI가 design spec대로?
-   - [ ] 다른 페이지에 영향 없음?
+   - [ ] 기능 로직 100% 동일? (API calls, state, handlers)
+   - [ ] data-testid 전부 추가? (spec의 testid map 대조)
+   - [ ] Subframe 컴포넌트 정상 import + 렌더링?
+   - [ ] 반응형 (375px, 768px, 1024px, 1440px에서 spec대로)?
+   - [ ] 로딩/에러/빈 상태가 spec대로?
+   - [ ] Design system (MASTER.md + page override) 준수?
    - [ ] import 경로 대소문자 일치?
-4. party-logs/code-{번호}-{페이지명}-round2.md 저장
-5. 코드 수정
+   - [ ] 다른 페이지에 영향 없음?
+4. Write tool로 _uxui-refactoring/party-logs/{번호}-{페이지명}-round2.md 저장
+5. Edit tool로 코드에서 이슈 수정
 
 **Round 3 (Forensic Lens):**
-1. 최종 코드 파일을 Read tool로 다시 읽기
-2. 점수 X/10 + PASS/FAIL
-3. party-logs/code-{번호}-{페이지명}-round3.md 저장
-4. FAIL → 재수정 후 3라운드 재실행
+1. 최종 코드를 Read tool로 다시 읽기
+2. Round 1+2 이슈 재평가 (과장 → 하향, 과소평가 → 상향)
+3. 각 전문가 최종 평가 (2~3문장, 인격 반영)
+4. 품질 점수 X/10 + PASS(7+) / FAIL(6-)
+5. Write tool로 _uxui-refactoring/party-logs/{번호}-{페이지명}-round3.md 저장
+6. FAIL → 코드 수정 후 3라운드 전체 재실행
 
-### Step 4: Write Playwright Tests
-Save to: packages/e2e/src/tests/interaction/{app|admin}/{페이지명}.spec.ts
+### Step 3: LibreUIUX 재감사 (7차원)
+/libre-ui-review 프레임워크를 직접 적용하여 재감사:
+- 7차원 점수 다시 채점
+- **Phase 1 점수 대비 최소 +2점 상승 필수** (미달 시 추가 수정)
+- 결과를 _uxui-refactoring/verify/{번호}-{페이지명}-re-audit.md에 저장
+
+### Step 4: LibreUIUX 추가 감사
+
+**a) /libre-ui-critique 프레임워크 적용:**
+- 8차원 디자인 피드백 생성
+- 중요 이슈 있으면 코드 수정
+
+**b) /libre-ui-responsive 프레임워크 적용:**
+- 375px (mobile), 768px (tablet), 1024px (laptop), 1440px (desktop) 체크
+- 가로 스크롤 없는지, 터치 타겟 44px+ 인지, 네비게이션 적절한지
+- 이슈 있으면 코드 수정
+
+**c) /libre-a11y-audit 프레임워크 적용:**
+- WCAG AA 준수 (4.5:1 대비, ARIA, 키보드, 포커스)
+- 이슈 있으면 코드 수정
+
+### Step 5: Playwright 테스트 작성 + 실행
+
+Save to: packages/e2e/src/tests/interaction/app/{페이지명}.spec.ts
+
 - 페이지 로드 확인
 - 주요 인터랙션 (클릭, 입력, 내비게이션)
 - data-testid 존재 확인
 - 반응형 테스트 (desktop + mobile viewport)
 
-### Step 5: Run Tests
-- npx playwright test src/tests/interaction/{app|admin}/{페이지명}.spec.ts
-- npx playwright test src/tests/smoke/ (회귀 확인)
-- 실패 시 수정 후 재실행
+```bash
+npx playwright test src/tests/interaction/app/{페이지명}.spec.ts
+npx playwright test src/tests/smoke/ (회귀 확인)
+```
+
+실패 시 수정 후 재실행.
 
 ### Step 6: Report to Orchestrator
-[Step Complete] code-{번호}-{페이지명}
-Content summary: (1~2줄)
-Party mode: 3 rounds passed (issues fixed: N)
+[Phase 3 Complete] verify-{번호}-{페이지명}
+Party mode: 3 rounds PASS (issues fixed: N)
 Quality score: X/10
-Tests: N개 작성, 전부 통과
+Re-audit score: X/10 (Phase 1 대비 +N점)
+Responsive: PASS/FAIL
+Accessibility: PASS/FAIL
+Playwright: N tests passed
 Changed files: (경로들)
 ```
 
 ---
 
-## Mode: code-batch PRIORITY (일괄 리팩토링)
+## Mode: batch PRIORITY (일괄 실행)
+
+### 전체 흐름
 
 ```
-1. 해당 우선순위에서 design 완료 + code 미완료 페이지 목록 추출
-2. 페이지별로 순차 실행 (code PAGENAME과 동일)
-3. 5페이지마다 Worker shutdown + 새 Worker 스폰
-4. 전체 완료 후 스모크 테스트 전체 실행
+오케스트레이터:
+  1. 해당 우선순위 페이지 목록 추출
+  2. TeamCreate로 팀 생성
+  3. 페이지별 순차 실행:
+     a. Worker 스폰 → diagnose (Phase 1)
+     b. Worker에게 SendMessage → redesign (Phase 2)
+     c. Worker에게 SendMessage → verify (Phase 3)
+     d. Worker 완료 보고 → 오케스트레이터 검증
+     e. 타입 체크: npx tsc --noEmit -p packages/server/tsconfig.json
+     f. 커밋 + 푸시: feat(uxui): {페이지명} redesign — {변경요약}
+     g. 배포 보고
+  4. 5페이지마다 Worker shutdown + 새 Worker 스폰
+  5. 모든 페이지 완료 → 스모크 테스트 전체 실행
+  6. 사용자에게 완료 보고
+```
+
+### 페이지당 자동 흐름 (Worker 시점)
+
+```
+[diagnose] → 15분
+  Read design system + current code + Pro Max query
+  → 7-dimension analysis → score X/10 → REBUILD/REFINE/ELEVATE
+  → Report
+
+[redesign] → 30분
+  Read diagnosis + design system + Subframe inventory
+  → New layout design (ASCII diagram)
+  → Code implementation (layout MUST change)
+  → Self-check (6-point checklist)
+  → Report
+
+[verify] → 20분
+  Party mode 3 rounds (Collaborative → Adversarial → Forensic)
+  → Re-audit (7-dimension, +2점 상승 필수)
+  → Design critique + responsive + accessibility
+  → Playwright tests
+  → Report
 ```
 
 ---
 
 ## Mode: phase0 (Playwright 환경 세팅)
 
-한 번만 실행. packages/e2e/ 디렉토리에 Playwright 설정 생성.
-
 ```
 1. packages/e2e/ 디렉토리 확인 (이미 있으면 스킵)
 2. playwright.config.ts 생성 (baseURL: https://corthex-hq.com)
 3. auth.setup.ts 생성
-4. smoke 테스트 파일 생성 (42페이지)
+4. smoke 테스트 파일 생성
 5. npx playwright install chromium
-6. 사용자에게 .env.test 비밀번호 입력 요청
+6. .env.test 확인
 ```
 
 ---
 
-## Mode: phase1 (현재 기능 상태 점검)
+## Mode: phase1 (스모크 테스트)
 
 ```
 1. npx playwright test src/tests/smoke/ 실행
@@ -640,19 +595,103 @@ Changed files: (경로들)
 2. npx playwright test src/tests/interaction/ (기능 동작)
 3. npx playwright test src/tests/visual/ (스크린샷 비교)
 4. 결과 종합 리포트
-5. 실패 항목 있으면 Worker 스폰해서 수정
+5. 실패 항목 → Worker 스폰해서 수정
 6. 전부 통과 → "UXUI 리팩토링 완료" 선언
 ```
 
 ---
 
-## Mode: 인자 없음 (진행 상황 + 다음 안내)
+## Mode: status (진행 상황)
 
 ```
 1. _uxui-refactoring/ 폴더 구조 확인
-2. claude-prompts/, party-logs/ 존재 확인
-3. 현재 진행 상황 요약 (완료/진행중/남은 페이지)
+2. diagnose/, redesign/, verify/, party-logs/ 존재 확인
+3. 페이지별 진행 상태 테이블:
+   | # | 페이지 | diagnose | redesign | verify | 점수변화 |
+   |---|--------|----------|----------|--------|---------|
 4. 다음 할 일 안내
+```
+
+---
+
+## Party Log 형식
+
+저장 경로: `_uxui-refactoring/party-logs/`
+
+```
+_uxui-refactoring/party-logs/
+├── {번호}-{페이지명}-round1.md
+├── {번호}-{페이지명}-round2.md
+├── {번호}-{페이지명}-round3.md
+...
+```
+
+### Round 1 Log:
+```
+## [Party Mode Round 1 -- Collaborative Review] {페이지명}
+
+### Agent Discussion
+(Natural conversation between experts. Each speaks in character, 2-3 sentences min.)
+
+### Layout Change Verification
+- [ ] Layout structure is different from before
+- [ ] New visualizations added
+- [ ] Subframe components utilized
+- [ ] Not just color changes
+
+### Issues Found
+| # | Severity | Raised By | Issue | Suggestion |
+|---|----------|-----------|-------|------------|
+
+### Fixes Applied
+- (list)
+```
+
+### Round 2 Log:
+```
+## [Party Mode Round 2 -- Adversarial Review] {페이지명}
+
+### Round 1 Fix Verification
+| Issue # | Status | Detail |
+|---------|--------|--------|
+
+### Adversarial Agent Discussion
+(Experts in cynical mode)
+
+### Adversarial Checklist Results
+- [ ] Design spec layout matched?
+- [ ] Tailwind classes correct?
+- [ ] Functionality 100% preserved?
+- [ ] data-testid complete?
+- [ ] Subframe components working?
+- [ ] Responsive at all breakpoints?
+- [ ] Loading/error/empty states correct?
+- [ ] Design system compliance?
+- [ ] Import paths case-correct?
+
+### New Issues Found
+| # | Severity | Raised By | Issue | Suggestion |
+|---|----------|-----------|-------|------------|
+
+### Fixes Applied
+- (list)
+```
+
+### Round 3 Log:
+```
+## [Party Mode Round 3 -- Final Judgment] {페이지명}
+
+### Issue Calibration
+| # | Original Severity | Calibrated | Reason |
+|---|-------------------|------------|--------|
+
+### Per-Agent Final Assessment
+(Each expert: 2-3 sentences in character)
+
+### Quality Score: X/10
+Justification: (2-3 sentences)
+
+### Final Verdict: PASS / FAIL
 ```
 
 ---
@@ -661,19 +700,37 @@ Changed files: (경로들)
 
 ```
 _uxui-refactoring/
-├── claude-prompts/           (Worker가 생성한 상세 디자인 스펙)
+├── diagnose/                    (Phase 1: 진단 리포트)
 │   ├── 01-command-center.md
 │   ├── 02-chat.md
 │   ...
-├── lovable-prompts/          (v5에서 생성한 기능 프롬프트 — 참고용으로 유지)
-│   ├── 00-context.md
-│   ├── 01-command-center.md
+├── redesign/                    (Phase 2: 디자인 스펙)
+│   ├── 01-command-center-spec.md
+│   ├── 02-chat-spec.md
 │   ...
-├── party-logs/               (파티모드 리뷰 로그)
-│   ├── design-01-command-center-round1.md
-│   ├── code-01-command-center-round1.md
+├── verify/                      (Phase 3: 재감사 결과)
+│   ├── 01-command-center-re-audit.md
 │   ...
-└── wireframes/               (사용 안 함 — v6는 Claude 직접 디자인)
+├── party-logs/                  (파티모드 리뷰 로그)
+│   ├── 01-command-center-round1.md
+│   ├── 01-command-center-round2.md
+│   ├── 01-command-center-round3.md
+│   ...
+├── claude-prompts/              (v6 디자인 스펙 — 참고용 유지)
+├── lovable-prompts/             (v5 기능 프롬프트 — 참고용 유지)
+└── STYLE-GUIDE.md               (종합 디자인 시스템)
+
+design-system/corthex/
+├── MASTER.md                    (Pro Max 전역 디자인 규칙)
+└── pages/                       (페이지별 오버라이드)
+    ├── command-center.md
+    ├── chat.md
+    ├── trading.md
+    ├── agora.md
+    ├── nexus.md
+    ├── agents.md
+    ├── departments.md
+    └── credentials.md
 ```
 
 ---
@@ -684,7 +741,7 @@ _uxui-refactoring/
 |---|--------|---------|------|---------|
 | 01 | app | command-center | /command-center | 1순위 |
 | 02 | app | chat | /chat | 1순위 |
-| 03 | app | dashboard | /dashboard | 1순위 |
+| 03 | app | dashboard | /dashboard | 1순위 (완료) |
 | 04 | app | trading | /trading | 1순위 |
 | 05 | app | agora | /agora | 1순위 |
 | 06 | app | nexus | /nexus | 1순위 |
@@ -741,41 +798,46 @@ _uxui-refactoring/
 
 ## 트러블슈팅
 
-### Worker가 스텝 완료 없이 멈춤
-**해결:** SendMessage: "Continue working. Complete 3-round self-review and report back."
-2번 리마인더 후에도 안 되면 shutdown + 새 Worker 스폰.
+### Worker가 색상만 바꾸고 "완료" 보고
+**이 파이프라인의 핵심 실패 패턴.** 즉시 FAIL.
+"Layout structure MUST be different. You only changed colors/borders. Redo the redesign with actual layout changes: new grid structure, new visualizations, new component hierarchy."
 
 ### Worker가 파티모드 라운드를 건너뜀
-**해결:** 거부: "Party logs missing. Redo 3-round self-review."
+party-logs 누락 → 거부: "Party logs missing. Redo 3-round self-review."
 
-### Worker가 vague한 디자인 스펙을 씀
-**해결:** 즉시 FAIL. "Design spec is too vague. Every element needs exact Tailwind classes, exact layout, exact states. Rewrite with full specificity."
+### 재감사 점수가 +2점 미달
+추가 수정 지시: "Re-audit score improved only +N. Need at least +2. Fix: (구체적 영역)."
 
-### Worker가 삭제된 v1 기능을 포함함
-**해결:** FAIL. "Only describe features that exist in current v2 code. Read the actual code."
+### Worker가 Subframe 컴포넌트를 안 씀
+"Use Subframe components from packages/app/src/ui/components/. At least 3 components required."
 
 ### TypeScript 타입 체크 실패
-**해결:** Worker가 수정 또는 오케스트레이터가 직접 수정. 커밋 전 반드시 통과.
+Worker가 수정 또는 오케스트레이터가 직접 수정. 커밋 전 반드시 통과.
 
 ### Playwright 테스트 실패
-**해결:** 커밋+푸시 후 2분 대기 → 재실행. 인증 실패면 auth.setup.ts 확인.
+커밋+푸시 후 2분 대기 → 재실행. 인증 실패면 auth.setup.ts 확인.
+
+### Pro Max search.py 에러
+`python3 .claude/skills/ui-ux-pro-max/scripts/search.py` 경로 확인. 데이터 CSV 누락 시 재설치.
 
 ---
 
 ## 절대 규칙
 
-1. **Claude가 직접 디자인** — 외부 도구(Lovable/v0) 의존 없음
-2. **모든 산출물은 구체적이고 자세하게** — vague/abstract 금지, hex/Tailwind/JSX 수준으로
-3. **v2 현재 코드 기준** — v1-feature-spec 직접 참조 금지 (삭제된 기능 부활 방지)
-4. **기능 로직 건드리지 말 것** — UI/스타일만 변경
-5. **파티모드 3라운드 없이 커밋하지 말 것**
-6. **Playwright 테스트 실패 시 커밋 금지**
-7. **data-testid 누락 시 커밋 금지**
-8. **각 파티모드는 파일에서 다시 읽어서 리뷰** (기억으로 리뷰 금지)
-9. **전문가 코멘트는 2~3문장 이상** (한 줄짜리 금지, 인격 반영 필수)
-10. **"이슈 0개" = 재분석** (BMAD 프로토콜)
-11. **오케스트레이터는 코딩/파티모드 직접 안 함** — Worker가 전부 처리
-12. **Worker spawn 시 첫 작업 포함 필수** — "기다려" 금지
-13. **커밋 전 npx tsc --noEmit 필수**
-14. **5페이지마다 Worker shutdown + 새 Worker 스폰** (컨텍스트 관리)
-15. **디자인 일관성** — 모든 페이지가 동일한 디자인 시스템 토큰 사용
+1. **레이아웃 구조 자체를 변경해야 한다** — 색상/border만 바꾸면 FAIL
+2. **모든 산출물은 구체적이고 자세하게** — hex/Tailwind/JSX 수준
+3. **3-Phase 순서 준수** — diagnose → redesign → verify (건너뛰기 금지)
+4. **Pro Max 디자인 시스템 참조 필수** — MASTER.md + 페이지 오버라이드
+5. **Subframe 컴포넌트 최소 3개 활용** — 새로 만들기 전에 기존 부품 먼저
+6. **기능 로직 건드리지 말 것** — API/state/handlers 100% 유지
+7. **파티모드 3라운드 없이 커밋 금지** — 각 라운드는 파일에서 다시 읽어서 리뷰
+8. **재감사 점수 Phase 1 대비 +2점 이상** — 미달 시 추가 수정
+9. **Playwright 테스트 없이 커밋 금지**
+10. **data-testid 누락 시 커밋 금지**
+11. **전문가 코멘트 2~3문장 이상** — 한 줄짜리 금지, 인격 반영 필수
+12. **"이슈 0개" = 재분석** — BMAD 프로토콜
+13. **오케스트레이터는 코딩/파티모드 직접 안 함** — Worker가 전부 처리
+14. **Worker spawn 시 첫 작업 포함 필수** — "기다려" 금지
+15. **커밋 전 npx tsc --noEmit 필수**
+16. **5페이지마다 Worker shutdown + 새 Worker 스폰** — 컨텍스트 관리
+17. **디자인 일관성** — 모든 페이지가 design-system/corthex/ 토큰 사용

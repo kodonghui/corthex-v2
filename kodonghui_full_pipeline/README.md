@@ -11,7 +11,7 @@ BMAD 프레임워크 기반 자동화 파이프라인 패키지.
 
 - **기획 파이프라인**: 아이디어를 Product Brief -> PRD -> Architecture -> UX -> Epics 순서로 구체화
 - **개발 파이프라인**: 각 스토리를 create -> dev -> test -> QA -> code-review 순서로 구현
-- **UXUI 파이프라인** (NEW): Lovable 와이어프레임 → Claude Code 리팩토링 → Playwright 테스트
+- **UXUI 파이프라인** v7: Pro Max(디자인 데이터) + LibreUIUX(디자인 원칙) + BMAD(파티모드) → 3-Phase: Diagnose → Redesign → Verify
 - **파티모드**: 7명의 AI 전문가가 매 단계마다 토론하면서 품질 검증 (tmux에서 실시간 관찰 가능!)
 
 ---
@@ -88,34 +88,37 @@ Claude Code에서 아래 명령어를 입력하면 됩니다:
 ```
 -> 스토리 3-1의 개발 파이프라인 실행 (create -> dev -> TEA -> QA -> CR)
 
-### UXUI 리팩토링 (개발 완료 후)
+### UXUI 리팩토링 v7 (개발 완료 후)
 ```
-/kdh-uxui-pipeline                  <- 진행 상황 확인 + 다음 할 일 안내
-/kdh-uxui-pipeline phase0           <- Playwright 환경 세팅 (최초 1회)
-/kdh-uxui-pipeline phase1           <- 현재 기능 상태 스모크 테스트
-/kdh-uxui-pipeline prompt chat      <- "chat" 페이지 Lovable 프롬프트 생성 + 파티모드
-/kdh-uxui-pipeline code chat        <- Lovable 와이어프레임 보고 코딩 + 파티모드 + Playwright
-/kdh-uxui-pipeline phase3           <- 시각 회귀 테스트 기준 등록
-/kdh-uxui-pipeline final            <- 최종 전체 검증
+/kdh-uxui-pipeline                     <- 진행 상황 + 다음 할 일
+/kdh-uxui-pipeline phase0              <- 테스트 환경 세팅 (최초 1회)
+/kdh-uxui-pipeline phase1              <- 스모크 테스트
+/kdh-uxui-pipeline diagnose chat       <- Phase 1: 7차원 진단 + 점수
+/kdh-uxui-pipeline redesign chat       <- Phase 2: 레이아웃 재설계 + 코드 구현
+/kdh-uxui-pipeline verify chat         <- Phase 3: 파티모드 + 재감사 + 테스트
+/kdh-uxui-pipeline batch 1             <- 1순위 전체 자동 (diagnose→redesign→verify)
+/kdh-uxui-pipeline phase3              <- 시각 회귀 기준 등록
+/kdh-uxui-pipeline final               <- 최종 전체 검증
 ```
 
-**UXUI 파이프라인 워크플로우:**
+**UXUI 파이프라인 v7 워크플로우:**
 ```
-1. phase0 — Playwright 설치 + 테스트 골격 생성
-2. phase1 — 전 페이지 스모크 테스트 (현재 상태 파악)
-3. 페이지별 반복:
-   a. prompt {페이지명} — Lovable 프롬프트 생성 + 파티모드 3라운드
-   b. 사용자가 Lovable에 프롬프트 복붙 → 와이어프레임 스크린샷 저장
-   c. code {페이지명} — 와이어프레임 보고 코딩 + 파티모드 3라운드 + Playwright 테스트
-4. phase3 — 시각 회귀 테스트 기준 스크린샷 등록
+1. phase0 — 테스트 환경 세팅
+2. phase1 — 전 페이지 스모크 테스트
+3. 페이지별 3-Phase 반복:
+   a. diagnose — Pro Max 디자인 데이터 + LibreUIUX 7차원 분석 → 점수 + 개선 우선순위
+   b. redesign — 레이아웃 재설계 + 코드 구현 (색상만 바꾸면 FAIL)
+   c. verify — 파티모드 3라운드 + 재감사(+2점 상승 필수) + 반응형/접근성 + 테스트
+4. phase3 — 시각 회귀 기준 등록
 5. final — 전체 검증
 ```
 
-**UXUI 파이프라인 처음 쓸 때:**
-- 프로젝트 루트에 `_uxui-refactoring/CONFIG.md`를 만들어야 합니다
-- CONFIG.md에 배포 URL, 페이지 목록, 프론트엔드 구조를 적으면 됩니다
-- CONFIG.md 없이 실행하면 Claude가 프로젝트 구조를 분석해서 자동 제안합니다
-- 자세한 CONFIG.md 템플릿은 `kdh-uxui-pipeline.md` 상단에 있습니다
+**사전 준비 (필수):**
+1. `_uxui-refactoring/CONFIG.md` — 프로젝트 설정 (페이지 목록, 스택, 배포 URL)
+2. `.claude/skills/ui-ux-pro-max/` — Pro Max 스킬 설치
+3. `.claude/commands/libre-*.md` — LibreUIUX 명령어 5개 설치
+4. `python3 .claude/skills/ui-ux-pro-max/scripts/search.py "..." --design-system --persist` — 디자인 시스템 생성
+5. (선택) Subframe 컴포넌트 라이브러리 설치
 
 ---
 
