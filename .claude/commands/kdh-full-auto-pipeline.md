@@ -423,46 +423,96 @@ After step-02, wait for team-lead to assign the next step."
 
 Each step gets 3 self-review rounds by the Worker.
 
-#### Stage 1: Product Brief
-Skill: `bmad-bmm-create-product-brief`
-| Step | Party Rounds |
-|------|-------------|
-| step-02-vision | 3 |
-| step-03-users | 3 |
-| step-04-metrics | 3 |
-| step-05-scope | 3 |
-Commit: `docs(planning): Brief complete -- {N} party rounds`
+**SKIPPED (already completed):**
+- ~~Stage 1: Product Brief~~ ✅ (complete)
+- ~~Stage 2: PRD~~ ✅ (1,226 lines, 12 steps)
+- ~~Stage 3: Architecture~~ ✅ (1,150 lines, 7 steps, 32 party rounds)
 
-#### Stage 2: PRD
-Skill: `bmad-bmm-create-prd`
-| Step | Party Rounds |
-|------|-------------|
-| step-02-discovery | 3 |
-| step-02b-vision | 3 |
-| step-02c-executive-summary | 3 |
-| step-03-success | 3 |
-| step-04-journeys | 3 |
-| step-05-domain | 3 |
-| step-06-innovation | 3 |
-| step-07-project-type | 3 |
-| step-08-scoping | 3 |
-| step-09-functional | 3 |
-| step-10-nonfunctional | 3 |
-Commit: `docs(planning): PRD complete -- {N} party rounds`
+#### Stage 0: PRD Spec Fix (Orchestrator spawns Worker with 3-round self-review)
 
-#### Stage 3: Architecture
-Skill: `bmad-bmm-create-architecture`
-| Step | Party Rounds |
-|------|-------------|
-| step-02-context | 3 |
-| step-03-starter | 3 |
-| step-04-decisions | 3 |
-| step-05-patterns | 3 |
-| step-06-structure | 3 |
-| step-07-validation | 3 |
-Commit: `docs(planning): Architecture complete -- {N} party rounds`
+**Context:** Architecture Step 2에서 서버 실제 스펙 발견 (4GB → 24GB RAM, 4코어 ARM64). PRD의 메모리/세션 관련 NFR 6곳 수정 필요.
 
-#### Stage 4: UX Design
+**Worker Spawn Prompt (Stage 0):**
+```
+You are a BMAD PRD editor worker. Apply spec corrections and self-review 3 rounds.
+YOLO mode — auto-proceed, never wait for user input.
+
+## Your Task
+Edit `_bmad-output/planning-artifacts/prd.md` to apply these corrections from architecture validation:
+
+### Corrections to Apply (6 items)
+
+1. **NFR-SC1** (동시 세션): Find the line with "동시 세션" limit "10" → change to **20**
+   - Reason: CPU 4코어 기준, architecture D4 결정
+
+2. **NFR-SC2** (세션 메모리): Find "≤ 50MB" per session → change to **≤ 200MB**
+   - Reason: 24GB RAM 기준, 200MB × 20세션 = 4GB (여유 충분)
+
+3. **NFR-SC7** (총 메모리): Find "≤ 3GB" total memory → change to **≤ 16GB**
+   - Reason: 24GB 서버 기준 (DB + OS + Docker 제외 후 16GB 가용)
+
+4. **NFR-P7** (5단계 핸드오프 메모리): Find "≤ 50MB" per 5-depth chain → change to **≤ 200MB**
+   - Reason: NFR-SC2와 일치
+
+5. **OPS-1** (동시 세션 제한): Find "기본 10" → change to **기본 20**
+   - Reason: NFR-SC1과 일치
+
+6. **All "Oracle VPS 4GB" or "4GB" server references**: Replace with **"Oracle VPS 24GB ARM64 4코어 (Neoverse-N1)"**
+   - Search patterns: "Oracle VPS 4GB", "4GB RAM", "4GB 메모리"
+   - Do NOT change unrelated "4GB" references (e.g., file sizes)
+
+### How to Apply
+1. Read the ENTIRE prd.md file (it's ~1,226 lines — read in chunks if needed)
+2. Use grep/search to find EVERY occurrence of each correction target
+3. Apply each correction using Edit tool
+4. After ALL corrections applied, proceed to 3-round self-review
+
+### Self-Review Protocol (3 rounds)
+
+**Round 1 — Collaborative Lens:**
+- Re-read the ENTIRE prd.md FROM FILE (Read tool, not memory)
+- Check: did ALL 6 corrections get applied? Search for old values to verify
+- Cross-check against architecture.md "PRD 수정 대기 목록" table
+- Agents: John (PM) verifies requirement consistency, Winston (Architect) verifies numbers match architecture
+- Save log: _bmad-output/party-logs/prd-fix-round1.md
+- Fix any missed corrections
+
+**Round 2 — Adversarial Lens:**
+- Re-read prd.md FROM FILE fresh
+- Search for ANY remaining "4GB" references that should be "24GB"
+- Search for ANY remaining "10" session limits that should be "20"
+- Search for ANY remaining "50MB" that should be "200MB"
+- Adversarial check: did we accidentally change something we shouldn't have?
+  - "4GB" in non-server contexts (e.g., file size limits) should NOT be changed
+  - Agent tier names containing numbers should NOT be changed
+- Agents: Quinn (QA) hunts for missed occurrences, Mary (BA) checks business impact
+- Save log: _bmad-output/party-logs/prd-fix-round2.md
+- Fix any issues
+
+**Round 3 — Forensic Lens:**
+- Final re-read FROM FILE
+- Count: exactly how many lines were changed? List line numbers
+- Verify internal consistency: do the new numbers add up?
+  - 200MB/session × 20 sessions = 4GB (< 16GB total ✅)
+  - 20 sessions × 3-depth avg = 60 processes (CPU 4코어 경계 ⚠️ — this is OK, documented in architecture)
+- Quality score X/10, PASS/FAIL
+- Save log: _bmad-output/party-logs/prd-fix-round3.md
+- Report to team-lead
+
+### Reference Documents
+- Architecture: _bmad-output/planning-artifacts/architecture.md (Section: "PRD 수정 대기 목록")
+- PRD: _bmad-output/planning-artifacts/prd.md (target file)
+```
+
+**Orchestrator Actions:**
+1. Spawn Worker with above prompt
+2. Wait for "[Step Complete]" report
+3. Validate party-logs/prd-fix-round{1,2,3}.md exist
+4. Verify corrections via grep: `grep -n "4GB\|50MB\|기본 10" prd.md` should return 0 matches
+5. Commit: `docs(planning): PRD spec fix -- server 4GB→24GB, session 10→20, memory 50→200MB -- 3 party rounds`
+6. Shutdown Worker, proceed to Stage 1
+
+#### Stage 1: UX Design
 Skill: `bmad-bmm-create-ux-design`
 | Step | Party Rounds |
 |------|-------------|
@@ -480,7 +530,7 @@ Skill: `bmad-bmm-create-ux-design`
 | step-13-responsive-accessibility | 3 |
 Commit: `docs(planning): UX Design complete -- {N} party rounds`
 
-#### Stage 5: Epics & Stories
+#### Stage 2: Epics & Stories
 Skill: `bmad-bmm-create-epics-and-stories`
 | Step | Party Rounds |
 |------|-------------|
@@ -489,7 +539,7 @@ Skill: `bmad-bmm-create-epics-and-stories`
 | step-04-final-validation | 3 |
 Commit: `docs(planning): Epics complete -- {N} party rounds`
 
-#### Stage 6: Implementation Readiness
+#### Stage 3: Implementation Readiness
 Skill: `bmad-bmm-check-implementation-readiness`
 | Step | Party Rounds |
 |------|-------------|
@@ -501,12 +551,12 @@ Skill: `bmad-bmm-check-implementation-readiness`
 | step-06-final-assessment | 3 |
 Commit: `docs(planning): Readiness complete -- {N} party rounds`
 
-#### Stage 7: Sprint Planning
+#### Stage 4: Sprint Planning
 Skill: `bmad-bmm-sprint-planning`
 No party mode (just generates sprint-status.yaml).
 Commit: `docs(planning): Sprint planning complete`
 
-**Total: ~42 steps x 3 rounds = ~126 party rounds**
+**Total: ~24 steps x 3 rounds = ~72 party rounds** (Stage 0 PRD fix + Stage 1 UX 12 steps + Stage 2 Epics 3 steps + Stage 3 Readiness 6 steps + Stage 4 Sprint)
 
 ---
 
