@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import type { Preset } from '../../../hooks/use-presets'
 
 type Props = {
@@ -20,6 +20,7 @@ export function PresetManager({
   const [mode, setMode] = useState<'list' | 'create' | 'edit'>('list')
   const [editId, setEditId] = useState<string | null>(null)
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
+  const modalRef = useRef<HTMLDivElement>(null)
   const [name, setName] = useState('')
   const [command, setCommand] = useState('')
   const [description, setDescription] = useState('')
@@ -54,22 +55,48 @@ export function PresetManager({
     try { await onDelete(id); setDeleteConfirmId(null) } catch { /* toast */ }
   }, [onDelete])
 
+  // Focus trap: cycle focus within the modal
+  useEffect(() => {
+    const modal = modalRef.current
+    if (!modal) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { onClose(); return }
+      if (e.key !== 'Tab') return
+      const focusable = modal.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+      if (focusable.length === 0) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus() }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first.focus() }
+      }
+    }
+    modal.addEventListener('keydown', handleKeyDown)
+    return () => modal.removeEventListener('keydown', handleKeyDown)
+  }, [onClose])
+
   return (
     <div
       data-testid="preset-manager-modal"
       role="dialog"
+      aria-modal="true"
+      aria-labelledby="preset-modal-title"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
       onClick={(e) => e.target === e.currentTarget && mode === 'list' && onClose()}
     >
-      <div className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[80vh] flex flex-col">
+      <div ref={modalRef} className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[80vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-700 shrink-0">
-          <h3 className="text-lg font-semibold text-slate-50">
+          <h3 id="preset-modal-title" className="text-lg font-semibold text-slate-50">
             {mode === 'create' ? '새 프리셋 만들기' : mode === 'edit' ? '프리셋 수정' : '명령 프리셋'}
           </h3>
           <button
             onClick={mode === 'list' ? onClose : resetForm}
-            className="text-slate-500 hover:text-slate-300 p-1 rounded-lg hover:bg-slate-700 transition-colors"
+            aria-label="닫기"
+            className="text-slate-500 hover:text-slate-300 p-1 rounded-lg hover:bg-slate-700 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
           >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -114,7 +141,8 @@ export function PresetManager({
                             onClick={() => onExecute(preset.id)}
                             disabled={isExecuting}
                             title="실행"
-                            className="p-1 rounded text-emerald-400 hover:bg-slate-600 transition-colors"
+                            aria-label="실행"
+                            className="p-1 rounded text-emerald-400 hover:bg-slate-600 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
                           >
                             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                               <path d="M4 2l8 5-8 5V2z" fill="currentColor" />
@@ -126,7 +154,8 @@ export function PresetManager({
                               <button
                                 onClick={() => startEdit(preset)}
                                 title="수정"
-                                className="p-1 rounded text-slate-400 hover:bg-slate-600 transition-colors"
+                                aria-label="수정"
+                                className="p-1 rounded text-slate-400 hover:bg-slate-600 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
                               >
                                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                                   <path d="M3 10.5l1-1 5-5 1 1-5 5-1 1z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
@@ -137,7 +166,8 @@ export function PresetManager({
                               <button
                                 onClick={() => setDeleteConfirmId(preset.id)}
                                 title="삭제"
-                                className="p-1 rounded text-red-400 hover:bg-slate-600 transition-colors"
+                                aria-label="삭제"
+                                className="p-1 rounded text-red-400 hover:bg-slate-600 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
                               >
                                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                                   <path d="M3 4h8M5 4V3h4v1M5.5 6.5v3M8.5 6.5v3M4 4l.5 7h5l.5-7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
@@ -191,7 +221,7 @@ export function PresetManager({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="프리셋 이름"
-                className="w-full bg-slate-700 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-white outline-none"
+                className="w-full bg-slate-700 border border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-xl px-3 py-2 text-sm text-white outline-none"
                 maxLength={100}
               />
               <textarea
@@ -199,7 +229,7 @@ export function PresetManager({
                 onChange={(e) => setCommand(e.target.value)}
                 placeholder="명령어 내용"
                 rows={3}
-                className="w-full bg-slate-700 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-white outline-none resize-none h-24"
+                className="w-full bg-slate-700 border border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-xl px-3 py-2 text-sm text-white outline-none resize-none h-24"
                 maxLength={10000}
               />
               <input
@@ -207,13 +237,13 @@ export function PresetManager({
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="설명 (선택사항)"
-                className="w-full bg-slate-700 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-white outline-none"
+                className="w-full bg-slate-700 border border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-xl px-3 py-2 text-sm text-white outline-none"
                 maxLength={500}
               />
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="bg-slate-700 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-white outline-none"
+                className="bg-slate-700 border border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-xl px-3 py-2 text-sm text-white outline-none"
               >
                 <option value="">카테고리 선택</option>
                 {CATEGORIES.map((cat) => (

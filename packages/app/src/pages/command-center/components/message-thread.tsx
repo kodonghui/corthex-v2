@@ -1,7 +1,11 @@
-import { useRef, useEffect, useState, useCallback } from 'react'
+import { useRef, useEffect, useState, useCallback, memo, lazy, Suspense } from 'react'
 import { ReactFlowProvider } from '@xyflow/react'
-import { SketchPreviewCard, SketchLoadingCard } from './sketch-preview-card'
+import { SketchLoadingCard } from './sketch-preview-card'
 import type { CommandMessage } from '../../../stores/command-store'
+
+const LazySketchPreviewCard = lazy(() =>
+  import('./sketch-preview-card').then((mod) => ({ default: mod.SketchPreviewCard }))
+)
 
 type Props = {
   messages: CommandMessage[]
@@ -17,10 +21,16 @@ function formatTime(iso: string): string {
 }
 
 const EXAMPLE_COMMANDS = [
-  { text: '오늘 주요 뉴스 브리핑해줘', label: '뉴스 브리핑', icon: 'news' },
-  { text: '마케팅 전략 보고서 작성해줘', label: '보고서 작성', icon: 'report' },
-  { text: '이번 달 SNS 성과 분석해줘', label: '성과 분석', icon: 'chart' },
-]
+  { text: '오늘 주요 뉴스 브리핑해줘', label: '뉴스 브리핑', icon: 'news', color: 'blue' },
+  { text: '마케팅 전략 보고서 작성해줘', label: '보고서 작성', icon: 'report', color: 'amber' },
+  { text: '이번 달 SNS 성과 분석해줘', label: '성과 분석', icon: 'chart', color: 'emerald' },
+] as const
+
+const EXAMPLE_ICON_COLORS: Record<string, { iconBg: string; iconText: string; hoverBg: string }> = {
+  blue: { iconBg: 'bg-blue-500/10', iconText: 'text-blue-400', hoverBg: 'group-hover:bg-blue-500/20' },
+  amber: { iconBg: 'bg-amber-500/10', iconText: 'text-amber-400', hoverBg: 'group-hover:bg-amber-500/20' },
+  emerald: { iconBg: 'bg-emerald-500/10', iconText: 'text-emerald-400', hoverBg: 'group-hover:bg-emerald-500/20' },
+}
 
 const ROLE_COLORS: Record<string, { bg: string; text: string; border: string; gradient: string }> = {
   MANAGER: { bg: 'bg-violet-950', text: 'text-violet-300', border: 'border-violet-800', gradient: 'from-violet-600/20' },
@@ -29,7 +39,7 @@ const ROLE_COLORS: Record<string, { bg: string; text: string; border: string; gr
   DESIGNER: { bg: 'bg-emerald-950', text: 'text-emerald-300', border: 'border-emerald-800', gradient: 'from-emerald-600/20' },
 }
 
-function AgentAvatar({ name, role }: { name?: string; role?: string }) {
+const AgentAvatar = memo(function AgentAvatar({ name, role }: { name?: string; role?: string }) {
   const initial = name?.charAt(0)?.toUpperCase() || 'A'
   const c = role ? ROLE_COLORS[role] : undefined
   return (
@@ -41,9 +51,9 @@ function AgentAvatar({ name, role }: { name?: string; role?: string }) {
       {initial}
     </div>
   )
-}
+})
 
-function UserAvatar() {
+const UserAvatar = memo(function UserAvatar() {
   return (
     <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shrink-0" aria-label="User">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="text-white">
@@ -52,9 +62,9 @@ function UserAvatar() {
       </svg>
     </div>
   )
-}
+})
 
-function EmptyState({ onExampleClick }: { onExampleClick: (text: string) => void }) {
+const EmptyState = memo(function EmptyState({ onExampleClick }: { onExampleClick: (text: string) => void }) {
   return (
     <div
       data-testid="empty-state"
@@ -71,31 +81,34 @@ function EmptyState({ onExampleClick }: { onExampleClick: (text: string) => void
 
       {/* Example command cards */}
       <div className="grid grid-cols-1 gap-2.5 w-full max-w-xs">
-        {EXAMPLE_COMMANDS.map((cmd) => (
-          <button
-            key={cmd.text}
-            data-testid="example-command"
-            onClick={() => onExampleClick(cmd.text)}
-            className="flex items-center gap-3 p-3.5 rounded-xl bg-slate-800/40 border border-slate-700/50 hover:border-blue-500/30 hover:bg-slate-800/60 text-left transition-all duration-200 group cursor-pointer"
-          >
-            <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0 group-hover:bg-blue-500/20 transition-colors">
-              <svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+        {EXAMPLE_COMMANDS.map((cmd) => {
+          const colors = EXAMPLE_ICON_COLORS[cmd.color]
+          return (
+            <button
+              key={cmd.text}
+              data-testid="example-command"
+              onClick={() => onExampleClick(cmd.text)}
+              className="flex items-center gap-3 p-3.5 rounded-xl bg-slate-800/40 border border-slate-700/50 hover:border-blue-500/30 hover:bg-slate-800/60 text-left transition-all duration-200 group cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
+            >
+              <div className={`w-8 h-8 rounded-lg ${colors.iconBg} flex items-center justify-center shrink-0 ${colors.hoverBg} transition-colors`}>
+                <svg className={`w-4 h-4 ${colors.iconText}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+                </svg>
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-medium text-slate-300 group-hover:text-blue-300 transition-colors">{cmd.label}</p>
+                <p className="text-xs text-slate-600 mt-0.5 truncate">{cmd.text}</p>
+              </div>
+              <svg className="w-3.5 h-3.5 text-slate-600 group-hover:text-blue-400 transition-colors shrink-0" fill="none" viewBox="0 0 12 12">
+                <path d="M4.5 2.5l4 3.5-4 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-medium text-slate-300 group-hover:text-blue-300 transition-colors">{cmd.label}</p>
-              <p className="text-xs text-slate-600 mt-0.5 truncate">{cmd.text}</p>
-            </div>
-            <svg className="w-3.5 h-3.5 text-slate-600 group-hover:text-blue-400 transition-colors shrink-0" fill="none" viewBox="0 0 12 12">
-              <path d="M4.5 2.5l4 3.5-4 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-        ))}
+            </button>
+          )
+        })}
       </div>
     </div>
   )
-}
+})
 
 export function MessageThread({
   messages,
@@ -128,6 +141,7 @@ export function MessageThread({
     return (
       <div
         data-testid="message-loading-skeleton"
+        aria-busy={true}
         className="space-y-4 px-4 py-4"
       >
         {[1, 2, 3, 4].map((i) => (
@@ -250,11 +264,13 @@ export function MessageThread({
 
                   {msg.sketchResult && !msg.sketchLoading && (
                     <ReactFlowProvider>
-                      <SketchPreviewCard
-                        mermaid={msg.sketchResult.mermaid}
-                        description={msg.sketchResult.description}
-                        commandId={msg.commandId || ''}
-                      />
+                      <Suspense fallback={<SketchLoadingCard />}>
+                        <LazySketchPreviewCard
+                          mermaid={msg.sketchResult.mermaid}
+                          description={msg.sketchResult.description}
+                          commandId={msg.commandId || ''}
+                        />
+                      </Suspense>
                     </ReactFlowProvider>
                   )}
 

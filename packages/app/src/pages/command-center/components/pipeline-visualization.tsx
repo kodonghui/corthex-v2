@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import type { DelegationStep } from '../../../stores/command-store'
 
 type PipelineStage = {
@@ -65,7 +66,7 @@ const STAGE_ICONS: Record<string, React.ReactNode> = {
   ),
 }
 
-export function PipelineVisualization({ activeCommandId, delegationSteps }: Props) {
+export const PipelineVisualization = memo(function PipelineVisualization({ activeCommandId, delegationSteps }: Props) {
   const defaultStages: PipelineStage[] = [
     { id: '1', name: 'Manager', role: 'Manager', status: 'waiting', description: 'Routing task' },
     { id: '2', name: 'Analyst', role: 'Analyst', status: 'waiting', description: 'Extracting insights' },
@@ -90,8 +91,8 @@ export function PipelineVisualization({ activeCommandId, delegationSteps }: Prop
         aria-live="polite"
         className="flex items-center gap-3 px-6 py-3 border-b border-slate-800/80 shrink-0"
       >
-        <div className="w-8 h-8 rounded-lg bg-slate-800/60 flex items-center justify-center">
-          <span className="w-2 h-2 rounded-full bg-slate-600" />
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600/10 to-slate-800/60 flex items-center justify-center">
+          <span className="w-2 h-2 rounded-full bg-blue-500/40" />
         </div>
         <p className="text-xs text-slate-600">명령을 입력하면 처리 파이프라인이 표시됩니다</p>
       </div>
@@ -151,6 +152,8 @@ export function PipelineVisualization({ activeCommandId, delegationSteps }: Prop
           <div key={stage.id} className="flex items-center gap-3 shrink-0">
             <div
               data-testid={`pipeline-stage-${stage.role.toLowerCase()}`}
+              role="status"
+              aria-label={`${stage.role}: ${stage.description}`}
               className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl border transition-all duration-300 ${cardClass}`}
             >
               <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${iconBgClass}`}>
@@ -181,4 +184,4 @@ export function PipelineVisualization({ activeCommandId, delegationSteps }: Prop
       })}
     </div>
   )
-}
+})

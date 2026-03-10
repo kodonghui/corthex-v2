@@ -122,7 +122,9 @@ export function MentionPopup({ query, selectedIndex, agents, deptMap, onSelect, 
                     </span>
                   )}
                   {/* Status dot */}
-                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dot}`} />
+                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dot}`}>
+                    <span className="sr-only">{agent.status === 'ACTIVE' ? '활성 상태' : agent.status === 'BUSY' ? '작업 중' : '대기 상태'}</span>
+                  </span>
                 </button>
               )
             })}

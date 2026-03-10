@@ -130,19 +130,22 @@ export function SketchPreviewCard({ mermaid, description, commandId }: Props) {
         <div className="flex items-center gap-2 p-3 border-t border-slate-700">
           <button
             onClick={handleOpenInEditor}
-            className="text-xs px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors"
+            aria-label="SketchVibe에서 열기"
+            className="text-xs px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
           >
             SketchVibe에서 열기
           </button>
           <button
             onClick={() => setShowSaveDialog(true)}
-            className="text-xs px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 font-medium transition-colors"
+            aria-label="저장"
+            className="text-xs px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 font-medium transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
           >
             저장
           </button>
           <button
             onClick={handleCopyMermaid}
-            className="text-xs px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 font-medium transition-colors"
+            aria-label="Mermaid 코드 복사"
+            className="text-xs px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 font-medium transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
           >
             {copyToast ? '복사됨!' : 'Mermaid 복사'}
           </button>

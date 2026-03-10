@@ -78,6 +78,7 @@ export function DeliverableViewer({ commandId, command, onDetailClick, onClose }
             {qualityGate && (
               <span
                 data-testid={`quality-badge-${command.id}`}
+                aria-describedby={`quality-score-${command.id}`}
                 className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full border ${
                   qualityGate.passed
                     ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
@@ -85,13 +86,14 @@ export function DeliverableViewer({ commandId, command, onDetailClick, onClose }
                 }`}
               >
                 <span className={`w-1.5 h-1.5 rounded-full ${qualityGate.passed ? 'bg-emerald-400' : 'bg-red-400'}`} />
-                {qualityGate.passed ? 'PASS' : 'FAIL'} {qualityGate.totalScore}
+                <span id={`quality-score-${command.id}`}>{qualityGate.passed ? 'PASS' : 'FAIL'} {qualityGate.totalScore}</span>
               </span>
             )}
             <button
               onClick={onDetailClick}
               title="전체 보기"
-              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all cursor-pointer"
+              aria-label="전체 보기"
+              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M10 2h4v4M6 14H2v-4M14 2l-5 5M2 14l5-5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
@@ -100,7 +102,8 @@ export function DeliverableViewer({ commandId, command, onDetailClick, onClose }
             <button
               onClick={onClose}
               title="닫기"
-              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all cursor-pointer"
+              aria-label="닫기"
+              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
@@ -139,12 +142,16 @@ export function DeliverableViewer({ commandId, command, onDetailClick, onClose }
       {/* Content area */}
       <div className="flex-1 overflow-y-auto px-5 py-5">
         {command.result ? (
-          <div
-            className="prose prose-sm prose-invert max-w-none prose-headings:text-slate-100 prose-p:text-slate-300 prose-strong:text-slate-200 prose-code:text-cyan-400 prose-code:bg-slate-800 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-lg prose-a:text-blue-400 prose-blockquote:border-slate-600 prose-blockquote:text-slate-400 prose-pre:bg-slate-800/80 prose-pre:border prose-pre:border-slate-700/50 prose-pre:rounded-xl cursor-pointer"
-            onClick={onDetailClick}
-          >
-            <MarkdownRenderer content={command.result} />
-          </div>
+          <>
+            {/* Content sanitization is handled by MarkdownRenderer (no dangerouslySetInnerHTML) */}
+            <div
+              className="prose prose-sm prose-invert max-w-none prose-headings:text-slate-100 prose-p:text-slate-300 prose-strong:text-slate-200 prose-code:text-cyan-400 prose-code:bg-slate-800 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-lg prose-a:text-blue-400 prose-blockquote:border-slate-600 prose-blockquote:text-slate-400 prose-pre:bg-slate-800/80 prose-pre:border prose-pre:border-slate-700/50 prose-pre:rounded-xl cursor-pointer"
+              onClick={onDetailClick}
+            >
+              <MarkdownRenderer content={command.result} />
+            </div>
+            <p className="text-xs text-slate-600 text-center py-2 border-t border-slate-700/30">클릭하여 전체 보기</p>
+          </>
         ) : (
           <div className="flex flex-col items-center justify-center h-full gap-3">
             <div className="w-8 h-8 rounded-full border-2 border-slate-700 border-t-blue-500 animate-spin" />

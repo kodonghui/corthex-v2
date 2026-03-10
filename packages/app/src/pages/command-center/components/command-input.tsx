@@ -207,7 +207,8 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
           <span>@{managers.find((m) => m.id === targetAgentId)?.name}</span>
           <button
             onClick={() => setTargetAgentId(undefined)}
-            className="hover:text-blue-100 transition-colors cursor-pointer ml-0.5"
+            aria-label="대상 에이전트 제거"
+            className="hover:text-blue-100 transition-colors cursor-pointer ml-0.5 focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none rounded"
           >
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
               <path d="M3 3l6 6M9 3L3 9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
@@ -224,7 +225,8 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
             type="button"
             onClick={() => handleChange(text + '/')}
             title="슬래시 명령"
-            className="p-2 rounded-xl text-slate-500 hover:text-blue-400 hover:bg-slate-800/80 transition-all cursor-pointer"
+            aria-label="슬래시 명령"
+            className="p-2 rounded-xl text-slate-500 hover:text-blue-400 hover:bg-slate-800/80 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
           >
             <span className="text-sm font-mono font-bold">/</span>
           </button>
@@ -232,7 +234,8 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
             type="button"
             onClick={() => handleChange(text + '@')}
             title="에이전트 멘션"
-            className="p-2 rounded-xl text-slate-500 hover:text-cyan-400 hover:bg-slate-800/80 transition-all cursor-pointer"
+            aria-label="에이전트 멘션"
+            className="p-2 rounded-xl text-slate-500 hover:text-cyan-400 hover:bg-slate-800/80 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
           >
             <span className="text-sm font-bold">@</span>
           </button>
@@ -241,7 +244,8 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
             data-testid="preset-manager-btn"
             onClick={onOpenPresets}
             title="템플릿"
-            className="p-2 rounded-xl text-slate-500 hover:text-amber-400 hover:bg-slate-800/80 transition-all cursor-pointer"
+            aria-label="템플릿"
+            className="p-2 rounded-xl text-slate-500 hover:text-amber-400 hover:bg-slate-800/80 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M3 2l5 3-5 3V2z" fill="currentColor" opacity="0.3" />
@@ -274,7 +278,7 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
           onClick={handleSubmit}
           disabled={isEmpty || isSubmitting}
           aria-label="명령 전송"
-          className="flex items-center gap-2 px-5 py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 shrink-0 cursor-pointer"
+          className="flex items-center gap-2 px-5 py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 shrink-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
         >
           {isSubmitting ? (
             <div className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />

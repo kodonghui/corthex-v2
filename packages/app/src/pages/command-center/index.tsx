@@ -100,7 +100,7 @@ export function CommandCenterPage() {
               data-testid="ws-status-pill"
               className="hidden sm:flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
             >
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true" />
               실시간 연결됨
             </span>
           </div>
@@ -126,7 +126,7 @@ export function CommandCenterPage() {
               </div>
               <span className="text-xs font-semibold uppercase tracking-widest text-blue-400/80">명령 수</span>
             </div>
-            <p className="text-3xl font-black text-white tracking-tight">{userMsgCount}</p>
+            <p className="text-4xl font-black text-white tracking-tight">{userMsgCount}</p>
             <div className="flex items-center gap-2 mt-2 text-xs">
               <span className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-400">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
@@ -153,7 +153,7 @@ export function CommandCenterPage() {
               </div>
               <span className="text-xs font-semibold uppercase tracking-widest text-cyan-400/80">에이전트</span>
             </div>
-            <p className="text-3xl font-black text-white tracking-tight">{managers.length}</p>
+            <p className="text-4xl font-black text-white tracking-tight">{managers.length}</p>
             <div className="flex items-center gap-2 mt-2 text-xs">
               <span className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-400">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -180,7 +180,7 @@ export function CommandCenterPage() {
               </div>
               <span className="text-xs font-semibold uppercase tracking-widest text-emerald-400/80">파이프라인</span>
             </div>
-            <p className="text-3xl font-black text-white tracking-tight">{completedSteps}/{activeSteps.length || 0}</p>
+            <p className="text-4xl font-black text-white tracking-tight">{completedSteps}/{activeSteps.length || 0}</p>
             <div className="flex items-center gap-2 mt-2 text-xs">
               {activeCommandId ? (
                 <span className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-blue-500/10 text-blue-400">
@@ -217,7 +217,7 @@ export function CommandCenterPage() {
               </div>
               <span className="text-xs font-semibold uppercase tracking-widest text-amber-400/80">프리셋</span>
             </div>
-            <p className="text-3xl font-black text-white tracking-tight">{presets.length}</p>
+            <p className="text-4xl font-black text-white tracking-tight">{presets.length}</p>
             <div className="flex items-center gap-2 mt-2 text-xs">
               <span className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-amber-500/10 text-amber-400">
                 관리하기
