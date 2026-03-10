@@ -50,4 +50,4 @@ const CalendarRoot = React.forwardRef<
   );
 });
 
-export const Calendar = CalendarRoot;
+export const Calendar: React.FC<CalendarRootProps> = CalendarRoot as any;
