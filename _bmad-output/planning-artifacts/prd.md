@@ -707,7 +707,7 @@ Domain-Specific Requirements에서 상세히 정의된 규제 요구사항의 Sa
 
 **Resource Requirements:**
 - 개발: 1인 개발자 (현재 구조) + AI 코딩 어시스턴트
-- 인프라: Neon PostgreSQL (serverless, 무료 티어), Cloudflare Pages (무료), GitHub Actions (무료 티어)
+- 인프라: Oracle VPS 24GB ARM64 4코어 (Neoverse-N1) 서버, Neon PostgreSQL (serverless, 무료 티어), Cloudflare Pages (무료), GitHub Actions (무료 티어, self-hosted runner)
 - LLM: 사용자 자체 API 키 (개발 비용 부담 없음)
 - 예상 타임라인: Phase 1 MVP 3개월 (Epic 0 Foundation 이미 완료 기준)
 
@@ -939,6 +939,7 @@ P0 7개 중에서도 최소 동작 단위:
 | NFR5: 사령관실 UI 초기 로딩 < 3초 | First Contentful Paint (FCP) | 사용자 첫 인상. 3초 초과 시 이탈 가능 |
 | NFR6: 실시간 시세 갱신 주기 60초 | KIS API 시세 조회 간격 | KIS API 호출 제한 준수 + 투자 판단에 충분한 갱신 |
 | NFR7: 동시 에이전트 작업 부서당 최대 10명 | 병렬 LLM API 호출 수 | LLM API 동시 호출 제한 + 비용 통제 |
+| NFR7a: 5단계 핸드오프 체인 메모리 ≤ 200MB | CEO→비서실장→팀장→전문가→Worker 5단계 위임 시 체인 전체 메모리 | 24GB RAM 기준. 세션당 ≤ 200MB와 일치. 체인 깊이 5에서 에이전트당 ~40MB 배분 |
 
 ### Security
 
@@ -961,6 +962,9 @@ P0 7개 중에서도 최소 동작 단위:
 | NFR17: 회사당 부서 최대 20개, 에이전트 최대 100명 | DB 쿼리 성능 + LLM 비용 통제 | 초기 합리적 한도. 필요 시 조정 가능 |
 | NFR18: WebSocket 동시 연결 회사당 최대 50개 | WebSocket 서버 연결 관리 | Human 직원 50명 동시 접속 기준 |
 | NFR19: Batch API 큐 최대 1000건 대기 | 큐 사이즈 모니터링 | 비긴급 작업 대기열 한도. 초과 시 즉시 실행 전환 |
+| NFR20a: 동시 CLI 세션 최대 20개 | 서버 동시 접속 세션 수 | Oracle VPS 24GB ARM64 4코어 (Neoverse-N1) 기준. CPU 4코어 × 5 = 20세션 상한 |
+| NFR20b: 세션당 메모리 ≤ 200MB | 개별 세션 메모리 사용량 모니터링 | 24GB RAM 기준. 200MB × 20세션 = 4GB (총 메모리 한도 16GB 내 여유 충분) |
+| NFR20c: 총 메모리 사용량 ≤ 16GB | 서버 전체 프로세스 메모리 합계 | 24GB 서버 기준 — OS + DB + Docker 제외 후 16GB 가용. DB/캐시/에이전트 프로세스 포함 |
 
 ### Reliability
 
@@ -999,3 +1003,4 @@ P0 7개 중에서도 최소 동작 단위:
 | NFR35: 조직 템플릿 선택 ~ 첫 명령 가능까지 < 2분 | 템플릿 적용 ~ 사령관실 진입 시간 | 온보딩 핵심 흐름 속도 |
 | NFR36: main push → GitHub Actions → 배포 완료 < 5분 | CI/CD 파이프라인 소요 시간 | 배포 속도. Cloudflare 캐시 퍼지 포함 |
 | NFR37: 시스템 모니터링 알림 (에러율 급증, 예산 초과) 발생 < 1분 | 이벤트 발생 ~ 알림 전송 | 운영 이슈 신속 대응 |
+| NFR38: 동시 세션 제한 기본값 20 | 운영 설정 파라미터 | NFR20a과 일치. CLI rate limit으로 추가 조정 가능. 서버: Oracle VPS 24GB ARM64 4코어 (Neoverse-N1) |
