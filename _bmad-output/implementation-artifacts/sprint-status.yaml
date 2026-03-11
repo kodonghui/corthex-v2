@@ -205,7 +205,7 @@ phases:
             title: "3단계 핸드오프 통합 테스트"
             sp: 2
             priority: P0
-            status: backlog
+            status: review
             blocked_by: ["2.6", "3.6"]
           - id: "4.6"
             title: "Epic 1~20 회귀 테스트"
