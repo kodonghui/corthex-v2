@@ -1,12 +1,16 @@
 import { db } from '../db'
 import { departmentKnowledge, knowledgeDocs, knowledgeFolders, agentMemories } from '../db/schema'
 import { eq, and, desc, sql, inArray } from 'drizzle-orm'
+import { semanticSearch } from './semantic-search'
 
 // === Constants ===
 
 const DEPT_KNOWLEDGE_CHAR_BUDGET = 4000
+const SEMANTIC_KNOWLEDGE_CHAR_BUDGET = 8000 // ~2000 tokens — used by direct collectSemanticKnowledge() calls (e.g. {{knowledge_context}} via soul-renderer). Inside collectKnowledgeContext(), Layer 2 shares DEPT_KNOWLEDGE_CHAR_BUDGET with Layer 1.
 const AGENT_MEMORY_CHAR_BUDGET = 2000
 const DOC_CONTENT_MAX_CHARS = 2000
+const SEMANTIC_TOP_K = 5
+const SEMANTIC_THRESHOLD = 0.7
 const CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
 
 // === Cache ===
@@ -120,6 +124,78 @@ export async function collectDepartmentDocs(
   }
 
   return result
+}
+
+// === Layer 2 Enhanced: Semantic Knowledge from Department Folders ===
+
+async function getDepartmentFolderIds(
+  companyId: string,
+  departmentId: string,
+): Promise<string[]> {
+  const folders = await db
+    .select({ id: knowledgeFolders.id })
+    .from(knowledgeFolders)
+    .where(
+      and(
+        eq(knowledgeFolders.companyId, companyId),
+        eq(knowledgeFolders.departmentId, departmentId),
+        eq(knowledgeFolders.isActive, true),
+      ),
+    )
+  return folders.map(f => f.id)
+}
+
+export async function collectSemanticKnowledge(
+  companyId: string,
+  departmentId: string,
+  queryContext?: string,
+  charBudget = SEMANTIC_KNOWLEDGE_CHAR_BUDGET,
+): Promise<string | null> {
+  if (!queryContext || !queryContext.trim()) {
+    return null // No context to search with — caller should use recency-based fallback
+  }
+
+  // Get department folder IDs
+  const folderIds = await getDepartmentFolderIds(companyId, departmentId)
+  if (folderIds.length === 0) return null
+
+  // Semantic search within department folders
+  const results = await semanticSearch(companyId, queryContext, {
+    topK: SEMANTIC_TOP_K,
+    threshold: SEMANTIC_THRESHOLD,
+    folderIds,
+  })
+
+  if (!results || results.length === 0) return null
+
+  // Format results within char budget
+  const parts: string[] = []
+  let usedChars = 0
+
+  for (const doc of results) {
+    const scorePercent = Math.round(doc.score * 100)
+    const header = `#### ${doc.title} (관련도: ${scorePercent}%)\n`
+    let content = doc.content || ''
+
+    if (content.length > DOC_CONTENT_MAX_CHARS) {
+      content = content.slice(0, DOC_CONTENT_MAX_CHARS) + '\n[...truncated]'
+    }
+
+    const entry = header + content + '\n'
+    if (usedChars + entry.length > charBudget) {
+      // Try to fit with truncated content
+      const remaining = charBudget - usedChars - header.length - 20
+      if (remaining > 100) {
+        parts.push(header + content.slice(0, remaining) + '\n[...truncated]\n')
+      }
+      break
+    }
+
+    parts.push(entry)
+    usedChars += entry.length
+  }
+
+  return parts.length > 0 ? parts.join('\n') : null
 }
 
 // === Similarity Scoring ===
@@ -295,17 +371,22 @@ export async function collectKnowledgeContext(
   companyId: string,
   agentId: string,
   departmentId: string | null | undefined,
+  taskDescription?: string,
 ): Promise<string | null> {
   if (!departmentId) return null
 
-  const cacheKey = `${companyId}:dept:${departmentId}`
+  // Cache key includes task context hash for semantic-aware lookups
+  const taskHash = taskDescription
+    ? simpleHash(taskDescription.slice(0, 100))
+    : 'none'
+  const cacheKey = `${companyId}:dept:${departmentId}:${taskHash}`
   const cached = getCached(cacheKey)
   if (cached !== undefined) return cached
 
   const parts: string[] = []
   let totalChars = 0
 
-  // Layer 1: Department Knowledge (priority)
+  // Layer 1: Department Knowledge (priority — always recency-based)
   const deptKnowledge = await collectDepartmentKnowledge(companyId, departmentId)
   if (deptKnowledge.length > 0) {
     parts.push('### 부서 참고 자료\n')
@@ -317,16 +398,27 @@ export async function collectKnowledgeContext(
     }
   }
 
-  // Layer 2: Knowledge Docs in Department Folders
+  // Layer 2: Knowledge Docs — semantic search when taskDescription available, recency fallback
   const remainingBudget = DEPT_KNOWLEDGE_CHAR_BUDGET - totalChars
   if (remainingBudget > 200) {
-    const docs = await collectDepartmentDocs(companyId, departmentId, remainingBudget)
-    if (docs.length > 0) {
-      parts.push('\n### 관련 문서\n')
-      for (const doc of docs) {
-        parts.push(`#### ${doc.title}\n`)
-        if (doc.content) {
-          parts.push(`${doc.content}\n`)
+    // Try semantic search first when task context is available
+    const semanticResult = taskDescription
+      ? await collectSemanticKnowledge(companyId, departmentId, taskDescription, remainingBudget)
+      : null
+
+    if (semanticResult) {
+      parts.push('\n### 관련 문서 (의미 검색)\n')
+      parts.push(semanticResult)
+    } else {
+      // Fallback: recency-based document collection
+      const docs = await collectDepartmentDocs(companyId, departmentId, remainingBudget)
+      if (docs.length > 0) {
+        parts.push('\n### 관련 문서\n')
+        for (const doc of docs) {
+          parts.push(`#### ${doc.title}\n`)
+          if (doc.content) {
+            parts.push(`${doc.content}\n`)
+          }
         }
       }
     }

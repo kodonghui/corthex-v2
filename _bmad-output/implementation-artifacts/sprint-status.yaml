@@ -454,7 +454,7 @@ phases:
             title: "부서별 지식 자동 주입 강화"
             sp: 3
             priority: P1
-            status: backlog
+            status: done
             blocked_by: ["10.3", "2.3"]
           - id: "10.5"
             title: "지식 관리 UI 개선"

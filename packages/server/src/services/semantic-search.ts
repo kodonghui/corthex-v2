@@ -6,6 +6,7 @@ export interface SemanticSearchOptions {
   topK?: number
   threshold?: number
   folderId?: string
+  folderIds?: string[]
 }
 
 export interface SemanticSearchResult {
@@ -27,7 +28,7 @@ export async function semanticSearch(
   query: string,
   options: SemanticSearchOptions = {},
 ): Promise<SemanticSearchResult[] | null> {
-  const { topK = 5, threshold = 0.8, folderId } = options
+  const { topK = 5, threshold = 0.8, folderId, folderIds } = options
 
   // Get API key
   let apiKey: string | undefined
@@ -53,7 +54,9 @@ export async function semanticSearch(
 
   // Search using pgvector cosine similarity
   const dbHelper = getDB(companyId)
-  const results = await dbHelper.searchSimilarDocs(queryEmbedding, topK, threshold, folderId)
+  // folderIds takes precedence over folderId; both are optional
+  const folderFilter = folderIds && folderIds.length > 0 ? folderIds : folderId
+  const results = await dbHelper.searchSimilarDocs(queryEmbedding, topK, threshold, folderFilter)
 
   // Convert distance to score (score = 1 - distance, clamped to [0, 1])
   return results.map(row => ({

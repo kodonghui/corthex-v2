@@ -2,6 +2,7 @@ import { runAgent } from '../../engine/agent-loop'
 import { renderSoul } from '../../engine/soul-renderer'
 import { getDB } from '../../db/scoped-query'
 import { ERROR_CODES } from '../../lib/error-codes'
+import { collectKnowledgeContext } from '../../services/knowledge-injector'
 import type { SessionContext, SSEEvent } from '../../engine/types'
 
 /**
@@ -54,8 +55,18 @@ export async function* callAgent(
     visitedAgents: [...ctx.visitedAgents, targetAgentId] as readonly string[],
   }
 
-  // 5. Render target's soul template
-  const renderedSoul = await renderSoul(agent.soul || '', targetAgentId, ctx.companyId)
+  // 5. Render target's soul template (with knowledge_context if present — Story 10.4)
+  const soulText = agent.soul || ''
+  let soulExtraVars: Record<string, string> | undefined
+  if (soulText.includes('{{knowledge_context}}') && agent.departmentId) {
+    const knowledgeCtx = await collectKnowledgeContext(ctx.companyId, targetAgentId, agent.departmentId, message)
+    if (knowledgeCtx) {
+      soulExtraVars = { knowledge_context: knowledgeCtx }
+    }
+  }
+  const renderedSoul = soulExtraVars
+    ? await renderSoul(soulText, targetAgentId, ctx.companyId, soulExtraVars)
+    : await renderSoul(soulText, targetAgentId, ctx.companyId)
 
   // 6. Yield handoff event
   const currentAgentName = ctx.visitedAgents[ctx.visitedAgents.length - 1] || 'unknown'

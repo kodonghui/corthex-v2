@@ -8,6 +8,7 @@ import { sseStream } from '../../engine/sse-adapter'
 import { renderSoul } from '../../engine/soul-renderer'
 import { ERROR_CODES } from '../../lib/error-codes'
 import { getMaxHandoffDepth } from '../../services/handoff-depth-settings'
+import { collectKnowledgeContext } from '../../services/knowledge-injector'
 import type { AppEnv } from '../../types'
 import type { SessionContext } from '../../engine/types'
 
@@ -45,12 +46,12 @@ hubRoute.post('/stream', zValidator('json', streamSchema), async (c) => {
   }
 
   // Resolve target agent: explicit agentId > @mention > secretary
-  let targetAgent: { id: string; name: string; soul: string | null; tier: string } | null = null
+  let targetAgent: { id: string; name: string; soul: string | null; tier: string; departmentId: string | null } | null = null
 
   if (requestedAgentId) {
     const [agent] = await scopedDb.agentById(requestedAgentId)
     if (agent && agent.isActive !== false) {
-      targetAgent = { id: agent.id, name: agent.name, soul: agent.soul, tier: agent.tier }
+      targetAgent = { id: agent.id, name: agent.name, soul: agent.soul, tier: agent.tier, departmentId: agent.departmentId }
     }
   }
 
@@ -64,7 +65,7 @@ hubRoute.post('/stream', zValidator('json', streamSchema), async (c) => {
         (a) => (a.name === mention.name || a.nameEn === mention.name) && a.isActive !== false
       )
       if (found) {
-        targetAgent = { id: found.id, name: found.name, soul: found.soul, tier: found.tier }
+        targetAgent = { id: found.id, name: found.name, soul: found.soul, tier: found.tier, departmentId: found.departmentId }
         agentMessage = mention.cleanText
       } else {
         return sseErrorResponse(ERROR_CODES.AGENT_SPAWN_FAILED, `에이전트 '${mention.name}'을(를) 찾을 수 없습니다`)
@@ -75,16 +76,26 @@ hubRoute.post('/stream', zValidator('json', streamSchema), async (c) => {
       // Secretary fallback — reuse allAgents from above
       const secretary = allAgents.find((a) => a.isSecretary && a.isActive !== false)
       if (secretary) {
-        targetAgent = { id: secretary.id, name: secretary.name, soul: secretary.soul, tier: secretary.tier }
+        targetAgent = { id: secretary.id, name: secretary.name, soul: secretary.soul, tier: secretary.tier, departmentId: secretary.departmentId }
       } else {
         return sseErrorResponse(ERROR_CODES.AGENT_SPAWN_FAILED, '비서실장 에이전트가 설정되지 않았습니다')
       }
     }
   }
 
-  // Render soul template with variable substitution (E4)
+  // Render soul template with variable substitution (E4) + knowledge_context (Story 10.4)
+  const extraVars: Record<string, string> = {}
+  if (targetAgent.soul?.includes('{{knowledge_context}}') && targetAgent.departmentId) {
+    const knowledgeCtx = await collectKnowledgeContext(companyId, targetAgent.id, targetAgent.departmentId, agentMessage)
+    if (knowledgeCtx) {
+      extraVars.knowledge_context = knowledgeCtx
+    }
+  }
+  const hasExtraVars = Object.keys(extraVars).length > 0
   const soul = targetAgent.soul
-    ? await renderSoul(targetAgent.soul, targetAgent.id, companyId)
+    ? hasExtraVars
+      ? await renderSoul(targetAgent.soul, targetAgent.id, companyId, extraVars)
+      : await renderSoul(targetAgent.soul, targetAgent.id, companyId)
     : ''
 
   // Build SessionContext (E1)

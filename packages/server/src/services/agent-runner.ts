@@ -154,14 +154,17 @@ export class AgentRunner {
     }
 
     // Auto-inject department knowledge and agent memories
+    // Note: agent-runner uses raw soul (buildSystemPrompt doesn't call renderSoul),
+    // so we always inject knowledge here. Duplication prevention only applies in
+    // hub.ts/call-agent.ts where renderSoul() substitutes {{knowledge_context}}.
+    const taskDesc = typeof task.messages[0]?.content === 'string' ? task.messages[0].content : undefined
     if (agent.departmentId) {
-      const knowledgeCtx = await collectKnowledgeContext(agent.companyId, agent.id, agent.departmentId)
+      const knowledgeCtx = await collectKnowledgeContext(agent.companyId, agent.id, agent.departmentId, taskDesc)
       if (knowledgeCtx) {
         finalSystemPrompt += `\n\n## Department Knowledge\n\n${knowledgeCtx}`
         scanForCredentials(knowledgeCtx)
       }
     }
-    const taskDesc = typeof task.messages[0]?.content === 'string' ? task.messages[0].content : undefined
     const memoryCtx = await collectAgentMemoryContext(agent.companyId, agent.id, taskDesc)
     if (memoryCtx) {
       finalSystemPrompt += `\n\n## Agent Memories\n\n${memoryCtx}`
@@ -305,14 +308,17 @@ export class AgentRunner {
     }
 
     // Auto-inject department knowledge and agent memories
+    // Note: agent-runner uses raw soul (buildSystemPrompt doesn't call renderSoul),
+    // so we always inject knowledge here. Duplication prevention only applies in
+    // hub.ts/call-agent.ts where renderSoul() substitutes {{knowledge_context}}.
+    const streamTaskDesc = typeof task.messages[0]?.content === 'string' ? task.messages[0].content : undefined
     if (agent.departmentId) {
-      const knowledgeCtx = await collectKnowledgeContext(agent.companyId, agent.id, agent.departmentId)
+      const knowledgeCtx = await collectKnowledgeContext(agent.companyId, agent.id, agent.departmentId, streamTaskDesc)
       if (knowledgeCtx) {
         finalSystemPrompt += `\n\n## Department Knowledge\n\n${knowledgeCtx}`
         scanForCredentials(knowledgeCtx)
       }
     }
-    const streamTaskDesc = typeof task.messages[0]?.content === 'string' ? task.messages[0].content : undefined
     const memoryCtx = await collectAgentMemoryContext(agent.companyId, agent.id, streamTaskDesc)
     if (memoryCtx) {
       finalSystemPrompt += `\n\n## Agent Memories\n\n${memoryCtx}`

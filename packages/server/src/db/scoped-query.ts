@@ -1,4 +1,4 @@
-import { eq, or, sql, desc, and, isNotNull, asc } from 'drizzle-orm'
+import { eq, or, sql, desc, and, isNotNull, asc, inArray } from 'drizzle-orm'
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm'
 import { db } from './index'
 import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users, costRecords, presets, sketches, tierConfigs } from './schema'
@@ -111,8 +111,8 @@ export function getDB(companyId: string) {
         scopedWhere(knowledgeDocs.companyId, companyId, isNotNull(knowledgeDocs.embedding)),
       ),
 
-    // READ — vector similarity search (Story 10.1, extended by 10.3 with folderId filter)
-    searchSimilarDocs: (queryEmbedding: number[], topK = 5, threshold = 0.8, folderId?: string) => {
+    // READ — vector similarity search (Story 10.1, extended by 10.3/10.4 with folderId/folderIds filter)
+    searchSimilarDocs: (queryEmbedding: number[], topK = 5, threshold = 0.8, folderId?: string | string[]) => {
       const dist = cosineDistance(knowledgeDocs.embedding, queryEmbedding)
       const conditions = [
         withTenant(knowledgeDocs.companyId, companyId),
@@ -121,7 +121,13 @@ export function getDB(companyId: string) {
         sql`${dist} < ${threshold}`,
       ]
       if (folderId) {
-        conditions.push(eq(knowledgeDocs.folderId, folderId))
+        if (Array.isArray(folderId)) {
+          if (folderId.length > 0) {
+            conditions.push(inArray(knowledgeDocs.folderId, folderId))
+          }
+        } else {
+          conditions.push(eq(knowledgeDocs.folderId, folderId))
+        }
       }
       return db.select({
         id: knowledgeDocs.id,
