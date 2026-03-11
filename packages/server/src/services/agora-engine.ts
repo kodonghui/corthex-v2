@@ -2,9 +2,8 @@ import { eq, and, desc } from 'drizzle-orm'
 import { db } from '../db'
 import { debates, agents } from '../db/schema'
 import { eventBus } from '../lib/event-bus'
-import { collectAgentResponse } from '../engine/agent-loop'
-import { renderSoul } from '../engine/soul-renderer'
-import type { SessionContext } from '../engine/types'
+import { collectAgentResponse, renderSoul } from '../engine'
+import type { SessionContext } from '../engine'
 import type {
   DebateType,
   DebateStatus,

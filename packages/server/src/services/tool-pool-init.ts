@@ -1,10 +1,9 @@
-import { toolPool } from './tool-pool'
-import { setToolDefinitionProvider } from './agent-runner'
-
 /**
- * Wire ToolPool into AgentRunner.
- * Call once at server startup after tools are registered.
+ * Tool pool initialization — no-op after agent-runner removal.
+ * The new engine (engine/agent-loop.ts + SDK) manages tools directly.
+ * This file is kept for API compatibility (server/index.ts calls initToolPool()).
  */
+
 export function initToolPool(): void {
-  setToolDefinitionProvider((allowedTools) => toolPool.getDefinitions(allowedTools))
+  // no-op: agent-runner.setToolDefinitionProvider removed with old engine
 }

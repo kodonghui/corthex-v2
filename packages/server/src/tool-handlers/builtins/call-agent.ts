@@ -1,9 +1,8 @@
-import { runAgent } from '../../engine/agent-loop'
-import { renderSoul } from '../../engine/soul-renderer'
+import { runAgent, renderSoul } from '../../engine'
 import { getDB } from '../../db/scoped-query'
 import { ERROR_CODES } from '../../lib/error-codes'
 import { collectKnowledgeContext } from '../../services/knowledge-injector'
-import type { SessionContext, SSEEvent } from '../../engine/types'
+import type { SessionContext, SSEEvent } from '../../engine'
 
 /**
  * call_agent — N단계 핸드오프 도구 (E7: Phase 1 순차 전용)

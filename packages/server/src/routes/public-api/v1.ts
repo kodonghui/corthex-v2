@@ -3,12 +3,73 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { eq, and } from 'drizzle-orm'
 import { db } from '../../db'
-import { agents } from '../../db/schema'
+import { agents, commands } from '../../db/schema'
 import { apiKeyAuth } from '../../middleware/api-key-auth'
 import { HTTPError } from '../../middleware/error'
 import { classify, createCommand } from '../../services/command-router'
-import { process as chiefOfStaffProcess } from '../../services/chief-of-staff'
+import { collectAgentResponse, renderSoul } from '../../engine'
+import type { SessionContext } from '../../engine'
+import { getDB } from '../../db/scoped-query'
+import { getMaxHandoffDepth } from '../../services/handoff-depth-settings'
 import type { AppEnv } from '../../types'
+
+// === Agent execution helper (new engine) ===
+
+async function runAgentForCommand(opts: {
+  commandId: string
+  commandText: string
+  companyId: string
+  userId: string
+  targetAgentId?: string | null
+}): Promise<void> {
+  const { commandId, commandText, companyId, userId, targetAgentId } = opts
+  const scopedDb = getDB(companyId)
+
+  let agentRow: { id: string; soul: string | null } | null = null
+  if (targetAgentId) {
+    const [row] = await scopedDb.agentById(targetAgentId)
+    if (row && row.isActive !== false) agentRow = { id: row.id, soul: row.soul }
+  }
+  if (!agentRow) {
+    const allAgents = await scopedDb.agents()
+    const secretary = allAgents.find((a) => a.isSecretary && a.isActive !== false)
+    if (secretary) agentRow = { id: secretary.id, soul: secretary.soul }
+  }
+  if (!agentRow) {
+    await db.update(commands)
+      .set({ status: 'failed', result: '에이전트를 찾을 수 없습니다', completedAt: new Date() })
+      .where(and(eq(commands.id, commandId), eq(commands.companyId, companyId)))
+    return
+  }
+
+  const soul = agentRow.soul ? await renderSoul(agentRow.soul, agentRow.id, companyId) : ''
+  const ctx: SessionContext = {
+    cliToken: process.env.ANTHROPIC_API_KEY || '',
+    userId,
+    companyId,
+    depth: 0,
+    sessionId: commandId,
+    startedAt: Date.now(),
+    maxDepth: await getMaxHandoffDepth(companyId),
+    visitedAgents: [agentRow.id],
+  }
+
+  await db.update(commands)
+    .set({ status: 'processing' })
+    .where(and(eq(commands.id, commandId), eq(commands.companyId, companyId)))
+
+  try {
+    const result = await collectAgentResponse({ ctx, soul, message: commandText })
+    await db.update(commands)
+      .set({ status: 'completed', result, completedAt: new Date() })
+      .where(and(eq(commands.id, commandId), eq(commands.companyId, companyId)))
+  } catch (err) {
+    const errMsg = err instanceof Error ? err.message : 'Unknown error'
+    await db.update(commands)
+      .set({ status: 'failed', result: errMsg, completedAt: new Date() })
+      .where(and(eq(commands.id, commandId), eq(commands.companyId, companyId)))
+  }
+}
 
 export const publicApiV1Route = new Hono<AppEnv>()
 
@@ -99,15 +160,16 @@ publicApiV1Route.post('/commands', zValidator('json', commandSchema), async (c) 
     metadata: result.parsedMeta,
   })
 
-  // direct 명령은 ChiefOfStaff 비동기 처리
-  if (result.type === 'direct') {
-    chiefOfStaffProcess({
+  // direct/mention commands → new engine (fire-and-forget)
+  if (result.type === 'direct' || result.type === 'mention') {
+    runAgentForCommand({
       commandId: command.id,
       commandText: body.text,
       companyId: tenant.companyId,
       userId: tenant.userId,
+      targetAgentId: result.targetAgentId,
     }).catch((err) => {
-      console.error(`[PublicAPI] ChiefOfStaff process failed for command ${command.id}:`, err)
+      console.error(`[PublicAPI] runAgentForCommand failed for command ${command.id}:`, err)
     })
   }
 

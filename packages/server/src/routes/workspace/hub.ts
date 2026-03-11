@@ -3,14 +3,12 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { authMiddleware } from '../../middleware/auth'
 import { getDB } from '../../db/scoped-query'
-import { runAgent } from '../../engine/agent-loop'
-import { sseStream } from '../../engine/sse-adapter'
-import { renderSoul } from '../../engine/soul-renderer'
+import { runAgent, sseStream, renderSoul } from '../../engine'
 import { ERROR_CODES } from '../../lib/error-codes'
 import { getMaxHandoffDepth } from '../../services/handoff-depth-settings'
 import { collectKnowledgeContext } from '../../services/knowledge-injector'
 import type { AppEnv } from '../../types'
-import type { SessionContext } from '../../engine/types'
+import type { SessionContext } from '../../engine'
 
 export const hubRoute = new Hono<AppEnv>()
 

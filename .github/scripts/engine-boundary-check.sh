@@ -6,7 +6,7 @@
 
 set -euo pipefail
 
-SEARCH_DIRS="packages/server/src/routes/ packages/server/src/lib/ packages/server/src/middleware/"
+SEARCH_DIRS="packages/server/src/routes/ packages/server/src/lib/ packages/server/src/middleware/ packages/server/src/services/ packages/server/src/tool-handlers/"
 VIOLATIONS=0
 
 ALLOWED_CALLERS="hub.ts"

@@ -5,10 +5,71 @@ import { getDB } from '../../db/scoped-query'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { classify, createCommand } from '../../services/command-router'
-import { process as chiefOfStaffProcess } from '../../services/chief-of-staff'
-import { processAll } from '../../services/all-command-processor'
-import { processSequential } from '../../services/sequential-command-processor'
+import { collectAgentResponse, renderSoul } from '../../engine'
+import type { SessionContext } from '../../engine'
+import { getMaxHandoffDepth } from '../../services/handoff-depth-settings'
+import { db } from '../../db'
+import { commands } from '../../db/schema'
+import { eq, and } from 'drizzle-orm'
 import type { AppEnv } from '../../types'
+
+// === Agent execution helper (new engine) ===
+
+async function runAgentForCommand(opts: {
+  commandId: string
+  commandText: string
+  companyId: string
+  userId: string
+  targetAgentId?: string | null
+}): Promise<void> {
+  const { commandId, commandText, companyId, userId, targetAgentId } = opts
+  const scopedDb = getDB(companyId)
+
+  let agentRow: { id: string; soul: string | null } | null = null
+  if (targetAgentId) {
+    const [row] = await scopedDb.agentById(targetAgentId)
+    if (row && row.isActive !== false) agentRow = { id: row.id, soul: row.soul }
+  }
+  if (!agentRow) {
+    const allAgents = await scopedDb.agents()
+    const secretary = allAgents.find((a) => a.isSecretary && a.isActive !== false)
+    if (secretary) agentRow = { id: secretary.id, soul: secretary.soul }
+  }
+  if (!agentRow) {
+    await db.update(commands)
+      .set({ status: 'failed', result: '에이전트를 찾을 수 없습니다', completedAt: new Date() })
+      .where(and(eq(commands.id, commandId), eq(commands.companyId, companyId)))
+    return
+  }
+
+  const soul = agentRow.soul ? await renderSoul(agentRow.soul, agentRow.id, companyId) : ''
+  const ctx: SessionContext = {
+    cliToken: process.env.ANTHROPIC_API_KEY || '',
+    userId,
+    companyId,
+    depth: 0,
+    sessionId: commandId,
+    startedAt: Date.now(),
+    maxDepth: await getMaxHandoffDepth(companyId),
+    visitedAgents: [agentRow.id],
+  }
+
+  await db.update(commands)
+    .set({ status: 'processing' })
+    .where(and(eq(commands.id, commandId), eq(commands.companyId, companyId)))
+
+  try {
+    const result = await collectAgentResponse({ ctx, soul, message: commandText })
+    await db.update(commands)
+      .set({ status: 'completed', result, completedAt: new Date() })
+      .where(and(eq(commands.id, commandId), eq(commands.companyId, companyId)))
+  } catch (err) {
+    const errMsg = err instanceof Error ? err.message : 'Unknown error'
+    await db.update(commands)
+      .set({ status: 'failed', result: errMsg, completedAt: new Date() })
+      .where(and(eq(commands.id, commandId), eq(commands.companyId, companyId)))
+  }
+}
 
 export const presetsRoute = new Hono<AppEnv>()
 
@@ -163,35 +224,18 @@ presetsRoute.post('/:id/execute', async (c) => {
   // Increment sortOrder (usage frequency tracking)
   await scopedDb.incrementPresetSortOrder(id)
 
-  // Trigger processing based on what the preset command text actually is
+  // Trigger processing via new engine for executable command types
   const effectiveType = classResult.type
-  if (effectiveType === 'direct' || effectiveType === 'mention') {
-    chiefOfStaffProcess({
+  if (effectiveType === 'direct' || effectiveType === 'mention' || effectiveType === 'all' || effectiveType === 'sequential') {
+    const commandText = classResult.parsedMeta.slashArgs || preset.command
+    runAgentForCommand({
       commandId: command.id,
-      commandText: preset.command,
+      commandText,
       companyId: tenant.companyId,
       userId: tenant.userId,
-      targetAgentId: classResult.targetAgentId ?? undefined,
+      targetAgentId: classResult.targetAgentId,
     }).catch((err) => {
-      console.error(`[Preset] ChiefOfStaff process failed for command ${command.id}:`, err)
-    })
-  } else if (effectiveType === 'all') {
-    processAll({
-      commandId: command.id,
-      commandText: classResult.parsedMeta.slashArgs || preset.command,
-      companyId: tenant.companyId,
-      userId: tenant.userId,
-    }).catch((err) => {
-      console.error(`[Preset] AllCommand process failed for command ${command.id}:`, err)
-    })
-  } else if (effectiveType === 'sequential') {
-    processSequential({
-      commandId: command.id,
-      commandText: classResult.parsedMeta.slashArgs || preset.command,
-      companyId: tenant.companyId,
-      userId: tenant.userId,
-    }).catch((err) => {
-      console.error(`[Preset] SequentialCommand process failed for command ${command.id}:`, err)
+      console.error(`[Preset] runAgentForCommand failed for command ${command.id}:`, err)
     })
   }
 

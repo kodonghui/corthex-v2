@@ -6,9 +6,8 @@ import { createAuditLog, AUDIT_ACTIONS } from './audit-log'
 import type { ActorType } from './audit-log'
 import type { TemplateData } from './seed.service'
 import { MANAGER_SOUL_TEMPLATE, SECRETARY_SOUL_TEMPLATE } from '../lib/soul-templates'
-import { renderSoul } from '../engine/soul-renderer'
+import { renderSoul, selectModelFromDB } from '../engine'
 import { getDB } from '../db/scoped-query'
-import { selectModelFromDB } from '../engine/model-selector'
 
 /** Legacy tier string → integer level mapping (backward compat for enum tier field) */
 const TIER_STRING_TO_LEVEL: Record<string, number> = { manager: 1, specialist: 2, worker: 3 }

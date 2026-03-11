@@ -6,9 +6,8 @@ import { nightJobTriggers, argosEvents, chatSessions, chatMessages, agentMemory,
 import { eq, and, desc, sql } from 'drizzle-orm'
 import { eventBus } from '../lib/event-bus'
 import { createEvent, updateEventStatus } from './argos-service'
-import { collectAgentResponse } from '../engine/agent-loop'
-import { renderSoul } from '../engine/soul-renderer'
-import type { SessionContext } from '../engine/types'
+import { collectAgentResponse, renderSoul } from '../engine'
+import type { SessionContext } from '../engine'
 import { getMaxHandoffDepth } from './handoff-depth-settings'
 
 const ARGOS_POLL_INTERVAL_MS = 60_000 // 60초

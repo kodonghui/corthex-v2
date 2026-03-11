@@ -14,10 +14,11 @@ import { eq, and, desc, sum, sql } from 'drizzle-orm'
 import { decrypt } from '../lib/crypto'
 import { classify, createCommand, parseSlash, parseMention, resolveMentionAgent } from './command-router'
 import type { SlashType } from './command-router'
-import { process as chiefOfStaffProcess } from './chief-of-staff'
-import { processAll } from './all-command-processor'
-import { processSequential } from './sequential-command-processor'
 import { processDebateCommand } from './debate-command-handler'
+import { collectAgentResponse, renderSoul } from '../engine'
+import type { SessionContext } from '../engine'
+import { getDB } from '../db/scoped-query'
+import { getMaxHandoffDepth } from './handoff-depth-settings'
 import { logActivity } from '../lib/activity-logger'
 import { microToUsd } from '../lib/cost-tracker'
 import { batchCollector } from './batch-collector'
@@ -62,6 +63,66 @@ type TelegramConfig = {
 }
 
 type SendMessageResult = { ok: boolean; description?: string }
+
+// === Agent execution helper (new engine) ===
+
+async function runAgentForCommand(opts: {
+  commandId: string
+  commandText: string
+  companyId: string
+  userId: string
+  targetAgentId?: string | null
+}): Promise<string> {
+  const { commandId, commandText, companyId, userId, targetAgentId } = opts
+  const scopedDb = getDB(companyId)
+
+  let agentRow: { id: string; soul: string | null } | null = null
+  if (targetAgentId) {
+    const [row] = await scopedDb.agentById(targetAgentId)
+    if (row && row.isActive !== false) agentRow = { id: row.id, soul: row.soul }
+  }
+  if (!agentRow) {
+    const allAgents = await scopedDb.agents()
+    const secretary = allAgents.find((a) => a.isSecretary && a.isActive !== false)
+    if (secretary) agentRow = { id: secretary.id, soul: secretary.soul }
+  }
+  if (!agentRow) {
+    await db.update(commands)
+      .set({ status: 'failed', result: '에이전트를 찾을 수 없습니다', completedAt: new Date() })
+      .where(and(eq(commands.id, commandId), eq(commands.companyId, companyId)))
+    return '에이전트를 찾을 수 없습니다'
+  }
+
+  const soul = agentRow.soul ? await renderSoul(agentRow.soul, agentRow.id, companyId) : ''
+  const ctx: SessionContext = {
+    cliToken: process.env.ANTHROPIC_API_KEY || '',
+    userId,
+    companyId,
+    depth: 0,
+    sessionId: commandId,
+    startedAt: Date.now(),
+    maxDepth: await getMaxHandoffDepth(companyId),
+    visitedAgents: [agentRow.id],
+  }
+
+  await db.update(commands)
+    .set({ status: 'processing' })
+    .where(and(eq(commands.id, commandId), eq(commands.companyId, companyId)))
+
+  try {
+    const result = await collectAgentResponse({ ctx, soul, message: commandText })
+    await db.update(commands)
+      .set({ status: 'completed', result, completedAt: new Date() })
+      .where(and(eq(commands.id, commandId), eq(commands.companyId, companyId)))
+    return result
+  } catch (err) {
+    const errMsg = err instanceof Error ? err.message : 'Unknown error'
+    await db.update(commands)
+      .set({ status: 'failed', result: errMsg, completedAt: new Date() })
+      .where(and(eq(commands.id, commandId), eq(commands.companyId, companyId)))
+    throw err
+  }
+}
 
 // === Telegram Bot API Client ===
 
@@ -717,26 +778,26 @@ async function handleKoreanSlash(
 
   if (slashType === 'all') {
     await sendMessage(token, chatId, `⏳ 전체 명령 처리 중: _${(slashArgs || '').slice(0, 50)}_`)
-    processAll({
+    runAgentForCommand({
       commandId: cmd.id,
       commandText: slashArgs || originalText,
       companyId,
       userId: ceoChatId,
-    }).then((result: any) => {
-      onComplete(result?.content || result?.summary || '(전체 명령 완료)')
+    }).then((result) => {
+      onComplete(result || '(전체 명령 완료)')
     }).catch(err => {
       sendMessage(token, chatId, `❌ 전체 명령 실패: ${err instanceof Error ? err.message : ''}`).catch(() => {})
     })
 
   } else if (slashType === 'sequential') {
     await sendMessage(token, chatId, `⏳ 순차 명령 처리 중: _${(slashArgs || '').slice(0, 50)}_`)
-    processSequential({
+    runAgentForCommand({
       commandId: cmd.id,
       commandText: slashArgs || originalText,
       companyId,
       userId: ceoChatId,
-    }).then((result: any) => {
-      onComplete(result?.content || result?.summary || '(순차 명령 완료)')
+    }).then((result) => {
+      onComplete(result || '(순차 명령 완료)')
     }).catch(err => {
       sendMessage(token, chatId, `❌ 순차 명령 실패: ${err instanceof Error ? err.message : ''}`).catch(() => {})
     })
@@ -854,16 +915,16 @@ export async function handleUpdate(
           metadata: { commandId: cmd.id, source: 'telegram', mentionName: entityResult.mentionName },
         })
 
-        chiefOfStaffProcess({
+        runAgentForCommand({
           commandId: cmd.id,
           commandText: entityResult.cleanText || text,
           companyId: config.companyId,
           userId: ceoChatId,
           targetAgentId: agentId,
         }).then((result) => {
-          sendMessage(token, chatId, result.content || '(결과 없음)').catch(() => {})
+          sendMessage(token, chatId, result || '(결과 없음)').catch(() => {})
         }).catch((err) => {
-          console.error(`[TelegramBot] @mention ChiefOfStaff failed:`, err)
+          console.error(`[TelegramBot] @mention runAgent failed:`, err)
           sendMessage(token, chatId, `❌ @${entityResult.mentionName} 처리 실패: ${err instanceof Error ? err.message : ''}`).catch(() => {})
         })
       } catch (err) {
@@ -963,40 +1024,19 @@ export async function handleUpdate(
       }
     }
 
-    if (classifyResult.type === 'direct' || classifyResult.type === 'mention') {
-      chiefOfStaffProcess({
+    if (classifyResult.type === 'direct' || classifyResult.type === 'mention' || classifyResult.type === 'all' || classifyResult.type === 'sequential') {
+      const commandText = classifyResult.parsedMeta.slashArgs || text
+      runAgentForCommand({
         commandId: cmd.id,
-        commandText: text,
+        commandText,
         companyId: config.companyId,
         userId: ceoChatId,
         targetAgentId: classifyResult.targetAgentId ?? undefined,
       }).then((result) => {
-        onComplete(result.content || '(결과 없음)')
+        onComplete(result || '(결과 없음)')
       }).catch((err) => {
-        console.error(`[TelegramBot] ChiefOfStaff failed:`, err)
+        console.error(`[TelegramBot] runAgentForCommand failed:`, err)
         sendMessage(token, chatId, `❌ 오류 발생: ${err instanceof Error ? err.message : '처리 실패'}`).catch(() => {})
-      })
-    } else if (classifyResult.type === 'all') {
-      processAll({
-        commandId: cmd.id,
-        commandText: classifyResult.parsedMeta.slashArgs || text,
-        companyId: config.companyId,
-        userId: ceoChatId,
-      }).then((result: any) => {
-        onComplete(result?.content || result?.summary || '(전체 명령 완료)')
-      }).catch(err => {
-        sendMessage(token, chatId, `❌ 전체 명령 실패: ${err instanceof Error ? err.message : ''}`).catch(() => {})
-      })
-    } else if (classifyResult.type === 'sequential') {
-      processSequential({
-        commandId: cmd.id,
-        commandText: classifyResult.parsedMeta.slashArgs || text,
-        companyId: config.companyId,
-        userId: ceoChatId,
-      }).then((result: any) => {
-        onComplete(result?.content || result?.summary || '(순차 명령 완료)')
-      }).catch(err => {
-        sendMessage(token, chatId, `❌ 순차 명령 실패: ${err instanceof Error ? err.message : ''}`).catch(() => {})
       })
     } else if (classifyResult.parsedMeta.slashType === 'debate' || classifyResult.parsedMeta.slashType === 'deep_debate') {
       processDebateCommand({

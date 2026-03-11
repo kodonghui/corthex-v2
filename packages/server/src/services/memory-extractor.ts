@@ -1,10 +1,28 @@
 import { llmRouter, resolveModel } from './llm-router'
-import { scanForCredentials } from './agent-runner'
 import { clearKnowledgeCache } from './knowledge-injector'
 import { db } from '../db'
 import { agentMemories } from '../db/schema'
 import { eq, and, sql } from 'drizzle-orm'
 import type { LLMRouterContext } from './llm-router'
+
+// === Credential scanning (inlined from removed agent-runner.ts) ===
+
+const CREDENTIAL_PATTERNS = [
+  /sk-[a-zA-Z0-9_-]{20,}/,
+  /AIza[a-zA-Z0-9_-]{30,}/,
+  /Bearer\s+[a-zA-Z0-9_.-]{20,}/,
+  /API_KEY\s*=\s*[^\s]{10,}/i,
+  /SECRET\s*=\s*[^\s]{10,}/i,
+  /-----BEGIN\s+(RSA\s+)?PRIVATE\s+KEY-----/,
+]
+
+function scanForCredentials(text: string): void {
+  for (const pattern of CREDENTIAL_PATTERNS) {
+    if (pattern.test(text)) {
+      throw new Error(`Credential pattern detected (NFR11 violation). Pattern: ${pattern.source.slice(0, 30)}...`)
+    }
+  }
+}
 
 // === Constants ===
 

@@ -4,9 +4,9 @@
 
 project: corthex-v2-engine-refactor
 generated: "2026-03-10"
-total_epics: 12
-total_stories: 64
-total_sp: 174
+total_epics: 15
+total_stories: 70
+total_sp: 197
 
 # STATUS DEFINITIONS:
 # ==================
@@ -537,6 +537,66 @@ phases:
             priority: P1
             status: done
             blocked_by: ["1.1"]
+
+  - name: "Phase 5: Engine Cleanup"
+    duration: "1 day"
+    epics:
+      - id: epic-14
+        title: "Engine Cleanup — Hook Wiring + Dual Engine Removal + E8 Boundary Fix"
+        priority: P0
+        sp: 11
+        status: backlog
+        dependencies: ["epic-3", "epic-4"]
+        architecture: "D6 (single entry point), E8 (engine boundary), E10 (CI)"
+        stories:
+          - id: "14.1"
+            title: "Hook 5개 agent-loop.ts 연결"
+            sp: 3
+            priority: P0
+            status: backlog
+            blocked_by: []
+          - id: "14.2"
+            title: "E8 경계 위반 수정 + engine/index.ts 생성"
+            sp: 3
+            priority: P0
+            status: backlog
+            blocked_by: []
+          - id: "14.3"
+            title: "이중 엔진 제거 + 옛 서비스 삭제"
+            sp: 5
+            priority: P0
+            status: backlog
+            blocked_by: ["14.1", "14.2"]
+
+  - name: "Phase 6: Caching & Cost Optimization"
+    duration: "2 days"
+    epics:
+      - id: epic-15
+        title: "3-Layer Caching — Prompt Cache + Tool Cache + Semantic Cache"
+        priority: P0
+        sp: 12
+        status: backlog
+        dependencies: ["epic-14", "epic-10"]
+        architecture: "D8 (캐싱 전략 업데이트), pgvector, Claude API cache_control"
+        stories:
+          - id: "15.1"
+            title: "Prompt Caching (Claude API cache_control)"
+            sp: 2
+            priority: P0
+            status: backlog
+            blocked_by: []
+          - id: "15.2"
+            title: "Tool Result Caching (인메모리 Map + withCache)"
+            sp: 5
+            priority: P1
+            status: backlog
+            blocked_by: []
+          - id: "15.3"
+            title: "Semantic Caching (pgvector 유사 질문 재사용)"
+            sp: 5
+            priority: P2
+            status: backlog
+            blocked_by: ["15.1"]
 
 # CRITICAL PATH:
 # Epic 1 -> Epic 2 -> Epic 3 -> Epic 4 -> Epic 5 -> Epic 6/7 -> Epic 8/9
