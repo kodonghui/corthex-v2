@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm'
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm'
 import { db } from './index'
-import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users } from './schema'
+import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users, costRecords } from './schema'
 import { withTenant, scopedWhere, scopedInsert } from './tenant-helpers'
 
 type Agent = InferSelectModel<typeof agents>
@@ -47,5 +47,9 @@ export function getDB(companyId: string) {
       db.update(agents).set(data).where(scopedWhere(agents.companyId, companyId, eq(agents.id, id))).returning(),
     deleteAgent: (id: string) =>
       db.delete(agents).where(scopedWhere(agents.companyId, companyId, eq(agents.id, id))).returning(),
+
+    // WRITE — cost tracking (Story 3.5)
+    insertCostRecord: (data: Omit<InferInsertModel<typeof costRecords>, 'companyId'>) =>
+      db.insert(costRecords).values(scopedInsert(companyId, data)).returning(),
   }
 }
