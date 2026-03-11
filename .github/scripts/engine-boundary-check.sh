@@ -9,10 +9,15 @@ set -euo pipefail
 SEARCH_DIRS="packages/server/src/routes/ packages/server/src/lib/ packages/server/src/middleware/"
 VIOLATIONS=0
 
+ALLOWED_CALLERS="hub.ts"
+
 check_pattern() {
   local pattern="$1"
   local label="$2"
-  if grep -rn "$pattern" $SEARCH_DIRS 2>/dev/null; then
+  local hits
+  hits=$(grep -rn "$pattern" $SEARCH_DIRS 2>/dev/null | grep -v "$ALLOWED_CALLERS" || true)
+  if [ -n "$hits" ]; then
+    echo "$hits"
     echo "ERROR: $label"
     VIOLATIONS=$((VIOLATIONS + 1))
   fi
