@@ -364,12 +364,12 @@ export function TiersPage() {
       {/* Delete Confirmation */}
       <ConfirmDialog
         isOpen={!!deleteTier}
-        onClose={() => setDeleteTier(null)}
+        onCancel={() => setDeleteTier(null)}
         onConfirm={() => deleteTier && deleteMutation.mutate(deleteTier.id)}
         title={`"${deleteTier?.name}" 계층 삭제`}
         description="이 계층을 삭제하시겠습니까? 사용 중인 에이전트가 있으면 삭제할 수 없습니다."
-        confirmLabel={deleteMutation.isPending ? '삭제 중...' : '삭제'}
-        isDestructive
+        confirmText={deleteMutation.isPending ? '삭제 중...' : '삭제'}
+        variant="danger"
       />
     </div>
   )
