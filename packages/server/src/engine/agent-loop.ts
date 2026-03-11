@@ -85,6 +85,8 @@ export async function* runAgent(options: RunAgentOptions): AsyncGenerator<SSEEve
       message: errMessage,
     }
   } finally {
+    // Clear sensitive env data and unregister session
+    env.ANTHROPIC_API_KEY = ''
     activeSessions.delete(ctx.sessionId)
   }
 }
