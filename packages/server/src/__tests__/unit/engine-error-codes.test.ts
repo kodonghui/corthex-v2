@@ -5,7 +5,7 @@ import { join } from 'path'
 describe('엔진 에러 코드 레지스트리 (D3)', () => {
   test('모든 코드가 도메인 프리픽스로 시작', async () => {
     const { ERROR_CODES } = await import('../../lib/error-codes')
-    const validPrefixes = ['AUTH_', 'AGENT_', 'SESSION_', 'HANDOFF_', 'TOOL_', 'RATE_', 'HOOK_']
+    const validPrefixes = ['AUTH_', 'AGENT_', 'SESSION_', 'HANDOFF_', 'TOOL_', 'RATE_', 'HOOK_', 'SERVER_', 'ORG_']
 
     for (const [key, value] of Object.entries(ERROR_CODES)) {
       const hasPrefix = validPrefixes.some(p => value.startsWith(p))
