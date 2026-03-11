@@ -83,7 +83,7 @@ phases:
         title: "Agent Engine Core"
         priority: P0
         sp: 18
-        status: in-progress
+        status: done
         dependencies: ["epic-1"]
         architecture: "D5 (SessionContext), D6 (단일 진입점), E1, E4, E5, E6, E7, E8"
         stories:
@@ -121,7 +121,7 @@ phases:
             title: "call-agent.ts — N단계 핸드오프 도구"
             sp: 5
             priority: P0
-            status: backlog
+            status: done
             blocked_by: ["2.2"]
 
       - id: epic-3
