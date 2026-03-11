@@ -48,7 +48,7 @@ export interface AgentUpdateInput {
   ownerUserId?: string | null
 }
 
-interface TenantActor {
+export interface TenantActor {
   companyId: string
   userId: string
   isAdminUser?: boolean

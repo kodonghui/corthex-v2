@@ -8,6 +8,8 @@ import { createToken, authMiddleware } from '../middleware/auth'
 import { HTTPError } from '../middleware/error'
 import { logActivity } from '../lib/activity-logger'
 import { deployOrganization } from '../services/agent-org-deployer'
+import { applyDefaultTemplate } from '../services/onboarding'
+import { seedSystemAgent } from '../services/seed.service'
 import type { AppEnv } from '../types'
 
 export const authRoute = new Hono<AppEnv>()
@@ -77,8 +79,19 @@ authRoute.post('/auth/register', zValidator('json', registerSchema), async (c) =
       role: users.role,
     })
 
-  // 29-Agent Organization 자동 배치
-  const orgResult = await deployOrganization(company.id, user.id)
+  // 템플릿 기반 조직 자동 생성 (fallback: 29-agent 고정 배치)
+  const tenant = { companyId: company.id, userId: user.id, isAdminUser: false }
+  const templateResult = await applyDefaultTemplate(tenant)
+  let orgSummary: string
+  if (templateResult) {
+    orgSummary = `템플릿 "${templateResult.templateName}" 적용 — 부서 ${templateResult.departmentsCreated}개, 에이전트 ${templateResult.agentsCreated}명`
+  } else {
+    const orgResult = await deployOrganization(company.id, user.id)
+    orgSummary = `29명 에이전트 배치 (fallback) — ${orgResult.agentCount}명`
+  }
+
+  // 비서실장(Chief of Staff) 시스템 에이전트 생성 — 템플릿에 포함되지 않으므로 별도 생성
+  await seedSystemAgent(company.id, user.id)
 
   // JWT 발급 — 회사 등록자는 CEO 역할
   const token = await createToken({
@@ -94,7 +107,7 @@ authRoute.post('/auth/register', zValidator('json', registerSchema), async (c) =
     actorType: 'user',
     actorId: user.id,
     actorName: user.name,
-    action: `회사 등록: ${companyName} (${slug}) — ${orgResult.agentCount}명 에이전트 배치`,
+    action: `회사 등록: ${companyName} (${slug}) — ${orgSummary}`,
   })
 
   return c.json({

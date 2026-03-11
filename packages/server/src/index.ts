@@ -62,6 +62,7 @@ import { publicApiKeysRoute } from './routes/admin/public-api-keys'
 import { publicApiV1Route } from './routes/public-api/v1'
 import { superAdminCompaniesRoute } from './routes/super-admin/companies'
 
+import { onboardingRoute } from './routes/onboarding'
 import { commandsRoute } from './routes/commands'
 import { telegramWebhookRoute } from './routes/telegram-webhook'
 import { runMigrations } from './db'
@@ -119,6 +120,7 @@ app.use('/api/auth/register', loginRateLimit)    // 회원가입: 5/min
 app.use('/api/auth/accept-invite', loginRateLimit) // 초대 수락: 5/min
 
 app.route('/api', authRoute)
+app.route('/api', onboardingRoute)
 
 // Super Admin 라우트 (super_admin 역할만 접근)
 app.route('/api/super-admin', superAdminCompaniesRoute)

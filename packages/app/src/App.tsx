@@ -32,6 +32,7 @@ const PerformancePage = lazy(() => import('./pages/performance').then((m) => ({ 
 const HubPage = lazy(() => import('./pages/hub').then((m) => ({ default: m.HubPage })))
 const DepartmentsPage = lazy(() => import('./pages/departments').then((m) => ({ default: m.DepartmentsPage })))
 const AgentsPage = lazy(() => import('./pages/agents').then((m) => ({ default: m.AgentsPage })))
+const OnboardingPage = lazy(() => import('./pages/onboarding').then((m) => ({ default: m.OnboardingPage })))
 
 const queryClient = new QueryClient()
 
@@ -86,6 +87,16 @@ export function App() {
               <Suspense fallback={<PageSkeleton />}>
                 <LoginPage />
               </Suspense>
+            }
+          />
+          <Route
+            path="/onboarding"
+            element={
+              <ProtectedRoute>
+                <Suspense fallback={<PageSkeleton />}>
+                  <OnboardingPage />
+                </Suspense>
+              </ProtectedRoute>
             }
           />
           <Route
