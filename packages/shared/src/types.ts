@@ -437,6 +437,10 @@ export type AdminCostByTier = {
   agentCount: number
 }
 
+export interface HandoffDepthSettings {
+  maxHandoffDepth: number
+}
+
 export type AdminCostDaily = {
   date: string
   costMicro: number

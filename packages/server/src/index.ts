@@ -60,6 +60,7 @@ import { workspaceTemplateMarketRoute } from './routes/workspace/template-market
 import { workspaceAgentMarketplaceRoute } from './routes/workspace/agent-marketplace'
 import { publicApiKeysRoute } from './routes/admin/public-api-keys'
 import { tierConfigsRoute } from './routes/admin/tier-configs'
+import { companySettingsRoute } from './routes/admin/company-settings'
 import { publicApiV1Route } from './routes/public-api/v1'
 import { superAdminCompaniesRoute } from './routes/super-admin/companies'
 
@@ -147,6 +148,7 @@ app.route('/api/admin', securityRoute)
 app.route('/api/admin', employeesRoute)
 app.route('/api/admin', publicApiKeysRoute)
 app.route('/api/admin', tierConfigsRoute)
+app.route('/api/admin', companySettingsRoute)
 
 // 유저 워크스페이스 라우트 (각 파일 내부에서 authMiddleware 적용, 테넌트 격리)
 app.route('/api/workspace', workspaceAgentsRoute)

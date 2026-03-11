@@ -397,6 +397,97 @@ function ApiKeySection({ companyId }: { companyId: string }) {
   )
 }
 
+// === Handoff Depth Section ===
+
+function HandoffDepthSection({ companyId }: { companyId: string }) {
+  const qc = useQueryClient()
+  const addToast = useToastStore((s) => s.addToast)
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['handoff-depth', companyId],
+    queryFn: () => api.get<{ data: { maxHandoffDepth: number } }>('/admin/company-settings/handoff-depth'),
+    enabled: !!companyId,
+  })
+
+  const currentDepth = data?.data?.maxHandoffDepth ?? 5
+  const [depth, setDepth] = useState(currentDepth)
+  const [dirty, setDirty] = useState(false)
+
+  useEffect(() => {
+    if (data?.data) {
+      setDepth(data.data.maxHandoffDepth)
+      setDirty(false)
+    }
+  }, [data])
+
+  const mutation = useMutation({
+    mutationFn: (maxHandoffDepth: number) =>
+      api.put('/admin/company-settings/handoff-depth', { maxHandoffDepth }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['handoff-depth', companyId] })
+      setDirty(false)
+      addToast({ type: 'success', message: `핸드오프 깊이가 ${depth}으로 변경되었습니다` })
+    },
+    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
+  })
+
+  const handleChange = (v: number) => {
+    setDepth(v)
+    setDirty(v !== currentDepth)
+  }
+
+  if (isLoading) {
+    return (
+      <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5">
+        <Skeleton className="h-6 w-40 mb-4" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+    )
+  }
+
+  return (
+    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5" data-testid="settings-handoff-depth">
+      <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-1">핸드오프 깊이</h2>
+      <p className="text-xs text-zinc-500 mb-4">AI 에이전트 간 핸드오프 최대 깊이를 설정합니다. 값이 클수록 더 깊은 에이전트 체인이 가능합니다.</p>
+
+      <div className="flex items-center gap-4">
+        <input
+          type="range"
+          min={1}
+          max={10}
+          value={depth}
+          onChange={(e) => handleChange(Number(e.target.value))}
+          className="flex-1 h-2 bg-zinc-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+        />
+        <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 w-10 text-center tabular-nums">{depth}</span>
+      </div>
+
+      <div className="flex justify-between text-xs text-zinc-400 mt-1 px-0.5">
+        <span>1 (단순)</span>
+        <span>10 (복잡)</span>
+      </div>
+
+      {dirty && (
+        <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-700">
+          <button
+            onClick={() => { setDepth(currentDepth); setDirty(false) }}
+            className="px-4 py-2 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+          >
+            취소
+          </button>
+          <button
+            onClick={() => mutation.mutate(depth)}
+            disabled={mutation.isPending}
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+          >
+            {mutation.isPending ? '저장 중...' : '저장'}
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // === Default Settings Section ===
 
 function DefaultSettingsSection({
@@ -552,6 +643,7 @@ export function SettingsPage() {
 
       <CompanyInfoSection company={company} onSave={handleSaveInfo} />
       <ApiKeySection companyId={selectedCompanyId} />
+      <HandoffDepthSection companyId={selectedCompanyId} />
       <DefaultSettingsSection company={company} onSave={handleSaveSettings} />
     </div>
   )

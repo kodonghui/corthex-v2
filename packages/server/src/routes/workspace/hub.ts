@@ -7,6 +7,7 @@ import { runAgent } from '../../engine/agent-loop'
 import { sseStream } from '../../engine/sse-adapter'
 import { renderSoul } from '../../engine/soul-renderer'
 import { ERROR_CODES } from '../../lib/error-codes'
+import { getMaxHandoffDepth } from '../../services/handoff-depth-settings'
 import type { AppEnv } from '../../types'
 import type { SessionContext } from '../../engine/types'
 
@@ -95,7 +96,7 @@ hubRoute.post('/stream', zValidator('json', streamSchema), async (c) => {
     depth: 0,
     sessionId,
     startedAt: Date.now(),
-    maxDepth: 3,
+    maxDepth: await getMaxHandoffDepth(companyId),
     visitedAgents: [targetAgent.id],
   }
 

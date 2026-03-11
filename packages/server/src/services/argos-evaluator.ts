@@ -9,6 +9,7 @@ import { createEvent, updateEventStatus } from './argos-service'
 import { collectAgentResponse } from '../engine/agent-loop'
 import { renderSoul } from '../engine/soul-renderer'
 import type { SessionContext } from '../engine/types'
+import { getMaxHandoffDepth } from './handoff-depth-settings'
 
 const ARGOS_POLL_INTERVAL_MS = 60_000 // 60초
 const MAX_CONCURRENT_EVALUATIONS = 3
@@ -386,7 +387,7 @@ async function executeTriggeredAction(trigger: TriggerRow, eventData: Record<str
       depth: 0,
       sessionId: session.id,
       startedAt: Date.now(),
-      maxDepth: 3,
+      maxDepth: await getMaxHandoffDepth(trigger.companyId),
       visitedAgents: [agent.id],
     }
 

@@ -379,7 +379,7 @@ phases:
             title: "maxDepth 회사별 설정"
             sp: 3
             priority: P1
-            status: backlog
+            status: done
             blocked_by: ["8.1"]
 
       - id: epic-9
