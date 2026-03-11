@@ -272,7 +272,7 @@ phases:
         title: "Hub UX — 2 Layout Variants"
         priority: P0
         sp: 14
-        status: backlog
+        status: in-progress
         dependencies: ["epic-5"]
         architecture: "UX Design (비서 유무 분기), D11→WebSocket 전환"
         stories:
@@ -280,19 +280,19 @@ phases:
             title: "비서 있음 레이아웃 (풀 위드 채팅)"
             sp: 3
             priority: P0
-            status: backlog
+            status: review
             blocked_by: ["5.2"]
           - id: "6.2"
             title: "비서 없음 레이아웃 (에이전트 선택 + 채팅)"
             sp: 3
             priority: P0
-            status: backlog
+            status: review
             blocked_by: []
           - id: "6.3"
             title: "SSE 상태 머신 + 에러 투명성"
             sp: 3
             priority: P0
-            status: backlog
+            status: ready-for-dev
             blocked_by: ["2.5", "1.4"]
           - id: "6.4"
             title: "대화 기록 + autoLearn"
@@ -304,7 +304,7 @@ phases:
             title: "WebSocket 핸드오프 채널 전환"
             sp: 3
             priority: P1
-            status: backlog
+            status: done
             blocked_by: ["3.4"]
 
       - id: epic-7

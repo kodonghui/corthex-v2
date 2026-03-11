@@ -12,7 +12,7 @@ function makeCtx(overrides: Partial<SessionContext> = {}): SessionContext {
     companyId: 'company-1',
     depth: 1,
     sessionId: 'session-1',
-    startedAt: Date.now(),
+    startedAt: Date.now() - 500,
     maxDepth: 3,
     visitedAgents: ['secretary'],
     ...overrides,
@@ -33,19 +33,28 @@ describe('delegationTracker', () => {
     eventBus.removeAllListeners('delegation')
   })
 
-  test('emits handoff event for call_agent tool', () => {
+  test('emits handoff event for call_agent tool in { companyId, payload } format', () => {
     const ctx = makeCtx({ visitedAgents: ['secretary'], depth: 1 })
     delegationTracker(ctx, 'call_agent', 'response text', { targetAgentId: 'cmo-agent', message: 'hello' })
 
     expect(emitted).toHaveLength(1)
-    const event = emitted[0] as Record<string, unknown>
-    expect(event.type).toBe('handoff')
-    expect(event.from).toBe('secretary')
-    expect(event.to).toBe('cmo-agent')
-    expect(event.depth).toBe(1)
-    expect(event.sessionId).toBe('session-1')
-    expect(event.companyId).toBe('company-1')
-    expect(typeof event.timestamp).toBe('string')
+    const wrapper = emitted[0] as { companyId: string; payload: Record<string, unknown> }
+    expect(wrapper.companyId).toBe('company-1')
+
+    const payload = wrapper.payload
+    expect(payload.commandId).toBe('session-1')
+    expect(payload.event).toBe('HANDOFF')
+    expect(payload.agentId).toBe('secretary')
+    expect(payload.agentName).toBe('secretary')
+    expect(payload.phase).toBe('handoff')
+    expect(payload.companyId).toBe('company-1')
+    expect(typeof payload.elapsed).toBe('number')
+    expect(typeof payload.timestamp).toBe('string')
+
+    const data = payload.data as { from: string; to: string; depth: number }
+    expect(data.from).toBe('secretary')
+    expect(data.to).toBe('cmo-agent')
+    expect(data.depth).toBe(1)
   })
 
   test('does not emit for non-call_agent tools', () => {
@@ -68,16 +77,43 @@ describe('delegationTracker', () => {
   test('handles missing toolInput gracefully', () => {
     delegationTracker(makeCtx(), 'call_agent', 'response')
     expect(emitted).toHaveLength(1)
-    const event = emitted[0] as Record<string, unknown>
-    expect(event.to).toBe('unknown')
+    const wrapper = emitted[0] as { companyId: string; payload: Record<string, unknown> }
+    const data = wrapper.payload.data as { from: string; to: string }
+    expect(data.to).toBe('unknown')
   })
 
   test('uses last visitedAgent as from', () => {
     const ctx = makeCtx({ visitedAgents: ['secretary', 'cmo', 'content-specialist'] })
     delegationTracker(ctx, 'call_agent', 'response', { targetAgentId: 'writer' })
-    const event = emitted[0] as Record<string, unknown>
-    expect(event.from).toBe('content-specialist')
-    expect(event.to).toBe('writer')
+    const wrapper = emitted[0] as { companyId: string; payload: Record<string, unknown> }
+    expect(wrapper.payload.agentName).toBe('content-specialist')
+    const data = wrapper.payload.data as { from: string; to: string }
+    expect(data.from).toBe('content-specialist')
+    expect(data.to).toBe('writer')
+  })
+
+  test('elapsed is calculated from ctx.startedAt', () => {
+    const ctx = makeCtx({ startedAt: Date.now() - 1000 })
+    delegationTracker(ctx, 'call_agent', 'response', { targetAgentId: 'agent-x' })
+    const wrapper = emitted[0] as { companyId: string; payload: Record<string, unknown> }
+    const elapsed = wrapper.payload.elapsed as number
+    expect(elapsed).toBeGreaterThanOrEqual(900)
+    expect(elapsed).toBeLessThan(2000)
+  })
+
+  test('payload companyId matches wrapper companyId (tenant isolation)', () => {
+    const ctx = makeCtx({ companyId: 'tenant-abc' })
+    delegationTracker(ctx, 'call_agent', 'response', { targetAgentId: 'agent-x' })
+    const wrapper = emitted[0] as { companyId: string; payload: Record<string, unknown> }
+    expect(wrapper.companyId).toBe('tenant-abc')
+    expect(wrapper.payload.companyId).toBe('tenant-abc')
+  })
+
+  test('sessionId maps to commandId in payload', () => {
+    const ctx = makeCtx({ sessionId: 'my-session-uuid' })
+    delegationTracker(ctx, 'call_agent', 'response', { targetAgentId: 'agent-x' })
+    const wrapper = emitted[0] as { companyId: string; payload: Record<string, unknown> }
+    expect(wrapper.payload.commandId).toBe('my-session-uuid')
   })
 })
 
@@ -105,5 +141,12 @@ describe('TEA P0: delegation-tracker source introspection', () => {
 
   test('does not import getDB (no direct DB access)', () => {
     expect(src).not.toContain("from '../../db/scoped-query'")
+  })
+
+  test('emits { companyId, payload } wrapper format (Story 6.5)', () => {
+    // Verify the emit uses the wrapper structure
+    expect(src).toContain('companyId: ctx.companyId')
+    expect(src).toContain('payload:')
+    expect(src).toContain('commandId: ctx.sessionId')
   })
 })
