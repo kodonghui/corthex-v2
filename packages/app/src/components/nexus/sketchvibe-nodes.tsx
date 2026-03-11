@@ -218,6 +218,34 @@ export function NoteNode({ id, data, selected }: NodeProps) {
   )
 }
 
+// 9. Group (서브그래프 그룹핑)
+export function GroupNode({ id, data, selected }: NodeProps) {
+  const d = data as unknown as SvNodeData & { collapsed?: boolean }
+  const label = d.label || '그룹'
+  const onChange = useCallback(
+    (newLabel: string) => d.onLabelChange?.(id, newLabel),
+    [id, d.onLabelChange],
+  )
+
+  return (
+    <div
+      className={`rounded-lg border-2 border-dashed min-w-[200px] min-h-[120px] ${
+        selected ? 'border-cyan-400 bg-cyan-900/15' : 'border-slate-600 bg-slate-800/20'
+      }`}
+      style={{ padding: 12 }}
+    >
+      <div className="flex items-center gap-1 mb-2">
+        <span className="text-[10px] text-cyan-500 font-medium">GROUP</span>
+        <EditableLabel value={label} onChange={onChange} className="text-xs font-semibold text-cyan-300" />
+      </div>
+      <Handle type="target" position={Position.Top} className="!bg-cyan-400" />
+      <Handle type="target" position={Position.Left} className="!bg-cyan-400" />
+      <Handle type="source" position={Position.Bottom} className="!bg-cyan-400" />
+      <Handle type="source" position={Position.Right} className="!bg-cyan-400" />
+    </div>
+  )
+}
+
 export const sketchVibeNodeTypes = {
   start: StartNode,
   end: EndNode,
@@ -227,6 +255,7 @@ export const sketchVibeNodeTypes = {
   decide: DecideNode,
   db: DbNode,
   note: NoteNode,
+  group: GroupNode,
 }
 
 export type SvNodeType = keyof typeof sketchVibeNodeTypes

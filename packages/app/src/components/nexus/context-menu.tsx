@@ -7,17 +7,21 @@ type ContextMenuAction =
   | { type: 'duplicate'; nodeId: string }
   | { type: 'delete'; nodeId: string }
   | { type: 'add-node'; nodeType: SvNodeType; position: { x: number; y: number } }
+  | { type: 'group-selected' }
+  | { type: 'ungroup'; nodeId: string }
 
 interface ContextMenuProps {
   x: number
   y: number
   target: 'node' | 'pane'
   nodeId?: string
+  nodeType?: string
+  selectedCount?: number
   onAction: (action: ContextMenuAction) => void
   onClose: () => void
 }
 
-export function ContextMenu({ x, y, target, nodeId, onAction, onClose }: ContextMenuProps) {
+export function ContextMenu({ x, y, target, nodeId, nodeType, selectedCount, onAction, onClose }: ContextMenuProps) {
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -56,6 +60,21 @@ export function ContextMenu({ x, y, target, nodeId, onAction, onClose }: Context
             label="복제"
             onClick={() => onAction({ type: 'duplicate', nodeId })}
           />
+          {(selectedCount ?? 0) >= 2 && (
+            <>
+              <div className="border-t border-slate-800 my-1" />
+              <MenuItem
+                label="그룹 만들기"
+                onClick={() => onAction({ type: 'group-selected' })}
+              />
+            </>
+          )}
+          {nodeType === 'group' && (
+            <MenuItem
+              label="그룹 해제"
+              onClick={() => onAction({ type: 'ungroup', nodeId })}
+            />
+          )}
           <div className="border-t border-slate-800 my-1" />
           <MenuItem
             label="삭제"

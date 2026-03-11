@@ -40,6 +40,7 @@ const DEFAULT_LABELS: Record<SvNodeType, string> = {
   decide: '결정',
   db: '데이터베이스',
   note: '메모',
+  group: '그룹',
 }
 
 interface SketchDetail {
@@ -104,6 +105,10 @@ function NexusPageInner() {
   const [aiPreview, setAiPreview] = useState<{ nodes: Node[]; edges: Edge[]; description: string } | null>(null)
   const [undoStack, setUndoStack] = useState<CanvasSnapshot[]>([])
   const [redoStack, setRedoStack] = useState<CanvasSnapshot[]>([])
+
+  // === Connection Mode (Space bar toggle) ===
+  const [connectionMode, setConnectionMode] = useState(false)
+  const [pendingSource, setPendingSource] = useState<string | null>(null)
 
   // Agents & sessions
   const { data: agentsRes } = useQuery({
@@ -206,6 +211,9 @@ function NexusPageInner() {
 
   // Canvas context for AI (serialized as text)
   const canvasContext = useMemo(() => canvasToText(nodes, edges), [nodes, edges])
+
+  // Selected node count (memoized to avoid repeated filter in render)
+  const selectedCount = useMemo(() => nodes.filter((n) => n.selected).length, [nodes])
 
   // Node label change handler (for double-click editing)
   const handleLabelChange = useCallback(
@@ -352,6 +360,12 @@ function NexusPageInner() {
     )
   }, [handleEdgeLabelChange, setEdges])
 
+  // Refs for current nodes/edges (avoids stale closures in WS handlers)
+  const nodesRef = useRef(nodes)
+  nodesRef.current = nodes
+  const edgesRef = useRef(edges)
+  edgesRef.current = edges
+
   // Track dirty state on node/edge changes
   const nodesChangeRef = useRef(onNodesChange)
   nodesChangeRef.current = onNodesChange
@@ -375,6 +389,128 @@ function NexusPageInner() {
       }
     },
     [],
+  )
+
+  // === Space bar connection mode ===
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const isEditing = e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || (e.target instanceof HTMLElement && e.target.isContentEditable)
+      if (e.code === 'Space' && !e.repeat && !isEditing) {
+        e.preventDefault()
+        setConnectionMode(true)
+      }
+    }
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.code === 'Space') {
+        setConnectionMode(false)
+        setPendingSource(null)
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    document.addEventListener('keyup', handleKeyUp)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      document.removeEventListener('keyup', handleKeyUp)
+    }
+  }, [])
+
+  // Connection mode node click handler
+  const handleNodeClickForConnection = useCallback(
+    (_event: React.MouseEvent, node: Node) => {
+      if (!connectionMode) return
+      if (!pendingSource) {
+        setPendingSource(node.id)
+      } else if (pendingSource !== node.id) {
+        const newEdge: Edge = {
+          id: `e-${Date.now()}`,
+          source: pendingSource,
+          target: node.id,
+          type: 'editable',
+          data: { label: '', onEdgeLabelChange: handleEdgeLabelChange },
+        }
+        setEdges((eds) => [...eds, newEdge])
+        setPendingSource(null)
+        setDirty(true)
+      }
+    },
+    [connectionMode, pendingSource, handleEdgeLabelChange, setEdges],
+  )
+
+  // === Group/Ungroup ===
+  const handleGroupSelected = useCallback(() => {
+    const selected = nodes.filter((n) => n.selected && n.type !== 'group')
+    if (selected.length < 2) return
+
+    // Save undo
+    setUndoStack((prev) => [...prev.slice(-19), { nodes: [...nodes], edges: [...edges] }])
+    setRedoStack([])
+
+    // Calculate bounding box using measured dimensions when available
+    const bounds = selected.map((n) => {
+      const w = (n.measured?.width as number | undefined) ?? 160
+      const h = (n.measured?.height as number | undefined) ?? 80
+      return { left: n.position.x, top: n.position.y, right: n.position.x + w, bottom: n.position.y + h }
+    })
+    const minX = Math.min(...bounds.map((b) => b.left)) - 20
+    const minY = Math.min(...bounds.map((b) => b.top)) - 40
+    const maxX = Math.max(...bounds.map((b) => b.right)) + 20
+    const maxY = Math.max(...bounds.map((b) => b.bottom)) + 20
+
+    const groupId = `group-${Date.now()}`
+    const groupNode: Node = {
+      id: groupId,
+      type: 'group',
+      position: { x: minX, y: minY },
+      data: { label: '서브그래프', onLabelChange: handleLabelChange },
+      style: { width: maxX - minX, height: maxY - minY },
+    }
+
+    // Reparent selected nodes
+    const selectedIds = new Set(selected.map((n) => n.id))
+    setNodes((nds) => [
+      groupNode,
+      ...nds.map((n) =>
+        selectedIds.has(n.id)
+          ? {
+              ...n,
+              parentId: groupId,
+              position: { x: n.position.x - minX, y: n.position.y - minY },
+              selected: false,
+            }
+          : n,
+      ),
+    ])
+    setDirty(true)
+  }, [nodes, edges, setNodes, handleLabelChange])
+
+  const handleUngroupNode = useCallback(
+    (groupId: string) => {
+      const groupNode = nodes.find((n) => n.id === groupId)
+      if (!groupNode || groupNode.type !== 'group') return
+
+      // Save undo
+      setUndoStack((prev) => [...prev.slice(-19), { nodes: [...nodes], edges: [...edges] }])
+      setRedoStack([])
+
+      const groupPos = groupNode.position
+      setNodes((nds) =>
+        nds
+          .filter((n) => n.id !== groupId)
+          .map((n) =>
+            n.parentId === groupId
+              ? {
+                  ...n,
+                  parentId: undefined,
+                  position: { x: n.position.x + groupPos.x, y: n.position.y + groupPos.y },
+                }
+              : n,
+          ),
+      )
+      // Remove edges connected to group node
+      setEdges((eds) => eds.filter((e) => e.source !== groupId && e.target !== groupId))
+      setDirty(true)
+    },
+    [nodes, edges, setNodes, setEdges],
   )
 
   // Clear canvas
@@ -635,7 +771,7 @@ function NexusPageInner() {
 
   useEffect(() => {
     const handleNexusMessage = (data: unknown) => {
-      const msg = data as { type?: string; mermaid?: string; description?: string; error?: string; command?: string }
+      const msg = data as { type?: string; mermaid?: string; description?: string; error?: string; command?: string; toolName?: string }
       if (!msg?.type) return
 
       switch (msg.type) {
@@ -659,6 +795,27 @@ function NexusPageInner() {
           setAiLoading(false)
           break
         }
+        case 'canvas_mcp_update': {
+          // MCP tool 발 업데이트 — 즉시 적용 (프리뷰 없음)
+          if (!msg.mermaid) break
+          const mcpParsed = mermaidToCanvas(msg.mermaid)
+          if (mcpParsed.error) break
+          // Undo 스택에 현재 상태 저장 (ref로 최신값 참조)
+          setUndoStack((prev) => [...prev.slice(-19), { nodes: [...nodesRef.current], edges: [...edgesRef.current] }])
+          setRedoStack([])
+          const mcpNodes = mcpParsed.nodes.map((n) => ({
+            ...n,
+            data: { ...n.data, onLabelChange: handleLabelChange },
+          }))
+          const mcpEdges = mcpParsed.edges.map((e) => ({
+            ...e,
+            data: { ...e.data, onEdgeLabelChange: handleEdgeLabelChange },
+          }))
+          setNodes(mcpNodes)
+          setEdges(mcpEdges)
+          setDirty(true)
+          break
+        }
         case 'canvas_ai_error':
           setAiError(msg.error || 'AI 오류')
           setAiLoading(false)
@@ -668,7 +825,7 @@ function NexusPageInner() {
 
     addListener('nexus', handleNexusMessage)
     return () => removeListener('nexus', handleNexusMessage)
-  }, [addListener, removeListener, handleLabelChange, handleEdgeLabelChange])
+  }, [addListener, removeListener, handleLabelChange, handleEdgeLabelChange, setNodes, setEdges])
 
   // Context menu action handler
   const handleContextAction = useCallback(
@@ -726,9 +883,19 @@ function NexusPageInner() {
           }
           break
         }
+        case 'group-selected': {
+          handleGroupSelected()
+          break
+        }
+        case 'ungroup': {
+          if (action.nodeId) {
+            handleUngroupNode(action.nodeId)
+          }
+          break
+        }
       }
     },
-    [nodes, setNodes, setEdges, handleLabelChange, handleAddNode],
+    [nodes, setNodes, setEdges, handleLabelChange, handleAddNode, handleGroupSelected, handleUngroupNode],
   )
 
   return (
@@ -983,6 +1150,7 @@ function NexusPageInner() {
               onNodesChange={aiPreview ? undefined : handleNodesChange}
               onEdgesChange={aiPreview ? undefined : handleEdgesChange}
               onConnect={aiPreview ? undefined : onConnect}
+              onNodeClick={aiPreview ? undefined : handleNodeClickForConnection}
               nodeTypes={sketchVibeNodeTypes}
               edgeTypes={sketchVibeEdgeTypes}
               defaultEdgeOptions={{ type: 'editable' }}
@@ -990,18 +1158,21 @@ function NexusPageInner() {
               fitViewOptions={{ padding: 0.3 }}
               minZoom={0.1}
               maxZoom={3}
-              nodesDraggable={!aiPreview}
+              nodesDraggable={!aiPreview && !connectionMode}
               nodesConnectable={!aiPreview}
               deleteKeyCode={aiPreview ? [] : ['Backspace', 'Delete']}
+              multiSelectionKeyCode="Control"
               panOnScroll
               zoomOnPinch
               proOptions={{ hideAttribution: true }}
               onPaneClick={() => {
                 setShowToolbar(false)
                 setContextMenu(null)
+                if (connectionMode) setPendingSource(null)
               }}
               onNodeContextMenu={aiPreview ? undefined : (event, node) => handleContextMenu(event, node.id)}
               onPaneContextMenu={aiPreview ? undefined : (event) => handleContextMenu(event as unknown as React.MouseEvent)}
+              className={connectionMode ? 'cursor-crosshair' : ''}
             >
               <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#3f3f46" />
               <Controls />
@@ -1046,10 +1217,18 @@ function NexusPageInner() {
           <div data-testid="nexus-status-bar" className="px-3 py-1 border-t border-slate-800 bg-slate-900/80 flex items-center gap-3 text-[10px] text-slate-500">
             <span>노드 {nodes.length}개</span>
             <span>연결 {edges.length}개</span>
+            {selectedCount > 0 && (
+              <span className="text-blue-400">{selectedCount}개 선택됨</span>
+            )}
+            {connectionMode && (
+              <span className="text-cyan-400 font-semibold">
+                연결 모드 {pendingSource ? `(${pendingSource} →)` : '(노드 클릭)'}
+              </span>
+            )}
             {dirty && <span className="text-amber-500">미저장</span>}
             {autoSaveToast && <span className="text-emerald-400">자동 저장됨</span>}
             {undoStack.length > 0 && <span className="text-slate-600">Undo {undoStack.length}</span>}
-            <span className="hidden sm:inline text-slate-500">더블클릭: 이름 편집 | Delete: 삭제 | 핸들 드래그: 연결 | 우클릭: 메뉴</span>
+            <span className="hidden sm:inline text-slate-500">Space: 연결 | Ctrl+클릭: 멀티선택 | 더블클릭: 편집 | Del: 삭제</span>
           </div>
         </div>
 
@@ -1077,6 +1256,8 @@ function NexusPageInner() {
           y={contextMenu.y}
           target={contextMenu.target}
           nodeId={contextMenu.nodeId}
+          nodeType={contextMenu.nodeId ? nodes.find((n) => n.id === contextMenu.nodeId)?.type : undefined}
+          selectedCount={selectedCount}
           onAction={handleContextAction as (action: unknown) => void}
           onClose={() => setContextMenu(null)}
         />
