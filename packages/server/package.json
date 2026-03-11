@@ -11,7 +11,10 @@
     "db:migrate": "drizzle-kit migrate",
     "test": "bun test src/__tests__/",
     "test:unit": "bun test src/__tests__/unit/",
-    "test:api": "bun test src/__tests__/api/"
+    "test:api": "bun test src/__tests__/api/",
+    "test:sdk": "bun test src/__tests__/sdk/",
+    "mcp:sketchvibe": "bun run src/mcp/sketchvibe-mcp.ts",
+    "ab-test": "bun run scripts/ab-quality-test.ts"
   },
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "0.2.72",
@@ -19,6 +22,7 @@
     "@corthex/shared": "workspace:*",
     "@google/generative-ai": "^0.24.1",
     "@hono/zod-validator": "^0.5",
+    "@modelcontextprotocol/sdk": "^1.27.1",
     "@neondatabase/serverless": "^1.0.2",
     "@zapier/secret-scrubber": "^1.1.6",
     "croner": "^10.0.1",
