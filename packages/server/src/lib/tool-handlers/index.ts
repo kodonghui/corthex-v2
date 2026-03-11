@@ -54,6 +54,12 @@ import { dartApi } from './builtins/dart-api'
 import { secEdgar } from './builtins/sec-edgar'
 import { backtestEngine } from './builtins/backtest-engine'
 import { kisTrading } from './builtins/kis-trading'
+import { notebooklmCreateNotebook } from './builtins/notebooklm-create-notebook'
+import { notebooklmAddSource } from './builtins/notebooklm-add-source'
+import { notebooklmGenerateAudio } from './builtins/notebooklm-generate-audio'
+import { notebooklmGetMindmap } from './builtins/notebooklm-get-mindmap'
+import { notebooklmCreateSlides } from './builtins/notebooklm-create-slides'
+import { notebooklmSummarize } from './builtins/notebooklm-summarize'
 
 // 내장 핸들러 등록
 registry.register('get_current_time', getCurrentTime)
@@ -111,6 +117,12 @@ registry.register('dart_api', dartApi)
 registry.register('sec_edgar', secEdgar)
 registry.register('backtest_engine', backtestEngine)
 registry.register('kis_trading', kisTrading)
+registry.register('notebooklm_create_notebook', notebooklmCreateNotebook)
+registry.register('notebooklm_add_source', notebooklmAddSource)
+registry.register('notebooklm_generate_audio', notebooklmGenerateAudio)
+registry.register('notebooklm_get_mindmap', notebooklmGetMindmap)
+registry.register('notebooklm_create_slides', notebooklmCreateSlides)
+registry.register('notebooklm_summarize', notebooklmSummarize)
 
 export { registry } from './registry'
 export type { ToolHandler, ToolExecContext } from './types'
