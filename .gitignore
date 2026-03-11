@@ -32,3 +32,12 @@ uploads/
 
 # A/B test results (generated, not committed)
 packages/server/ab-results/
+
+# Python cache
+__pycache__/
+
+# Local Claude settings
+.claude/settings.local.json
+
+# Large binary files
+*.zip
