@@ -1,6 +1,6 @@
 # Story 2.5: sse-adapter.ts — SDK→기존 SSE 변환
 
-Status: in-progress
+Status: done
 
 ## Story
 
@@ -74,8 +74,10 @@ data: {"costUsd":0.01,"tokensUsed":150}
 ### Function Signatures
 
 ```typescript
-export function formatSSE(event: SSEEvent): string
-export function streamSSE(events: AsyncGenerator<SSEEvent>): ReadableStream<Uint8Array>
+// 단일 export: sseStream
+export async function* sseStream(events: AsyncGenerator<SSEEvent>): AsyncGenerator<string>
+// 내부 헬퍼 (unexported): formatSSE
+function formatSSE(event: SSEEvent): string
 ```
 
 ### Implementation
@@ -83,23 +85,17 @@ export function streamSSE(events: AsyncGenerator<SSEEvent>): ReadableStream<Uint
 ```typescript
 import type { SSEEvent } from './types'
 
-export function formatSSE(event: SSEEvent): string {
-  const { type, ...data } = event
-  return `event: ${type}\ndata: ${JSON.stringify(data)}\n\n`
+export async function* sseStream(
+  events: AsyncGenerator<SSEEvent>
+): AsyncGenerator<string> {
+  for await (const event of events) {
+    yield formatSSE(event)
+  }
 }
 
-export function streamSSE(events: AsyncGenerator<SSEEvent>): ReadableStream<Uint8Array> {
-  const encoder = new TextEncoder()
-  return new ReadableStream({
-    async pull(controller) {
-      const { value, done } = await events.next()
-      if (done) {
-        controller.close()
-        return
-      }
-      controller.enqueue(encoder.encode(formatSSE(value)))
-    },
-  })
+function formatSSE(event: SSEEvent): string {
+  const { type, ...data } = event
+  return `event: ${type}\ndata: ${JSON.stringify(data)}\n\n`
 }
 ```
 
@@ -119,9 +115,10 @@ Claude Opus 4.6
 
 ### Completion Notes List
 
-- **sse-adapter.ts:** 26 lines. Two pure functions: `formatSSE` (SSEEvent→string) + `streamSSE` (AsyncGenerator→ReadableStream). No DB, no imports beyond types.
-- **Design choice:** Used `ReadableStream` with pull-based strategy (not AsyncGenerator<string>) — better fit for Hono Response streaming in hub.ts (Story 4.1).
-- **Tests:** 8 tests — 6 formatSSE (one per SSEEvent type) + 2 streamSSE (multi-event stream + empty generator). No mocking needed (pure functions).
+- **sse-adapter.ts:** 18 lines. `sseStream` (AsyncGenerator<SSEEvent>→AsyncGenerator<string>) + internal `formatSSE`. No DB, no imports beyond types.
+- **Refactored:** Changed from ReadableStream to AsyncGenerator<string> per team-lead spec. Simpler, composable. hub.ts can wrap to ReadableStream if needed.
+- **formatSSE:** unexported internal helper — only `sseStream` is public API.
+- **Tests:** 8 tests — 6 format verification (one per SSEEvent type via sseStream+single helper) + 2 sseStream (multi-event + empty generator). No mocking needed (pure functions).
 - **tsc:** 0 errors. All 8 tests pass.
 
 ### File List

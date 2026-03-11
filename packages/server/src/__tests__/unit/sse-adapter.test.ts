@@ -59,9 +59,9 @@ describe('sse-adapter (D4)', () => {
 
       const chunks = await collect(sseStream(generate()))
       expect(chunks).toHaveLength(3)
-      expect(chunks[0]).toContain('event: accepted')
-      expect(chunks[1]).toContain('event: message')
-      expect(chunks[2]).toContain('event: done')
+      expect(chunks[0]).toBe('event: accepted\ndata: {"sessionId":"sess-1"}\n\n')
+      expect(chunks[1]).toBe('event: message\ndata: {"content":"Hi"}\n\n')
+      expect(chunks[2]).toBe('event: done\ndata: {"costUsd":0.02,"tokensUsed":200}\n\n')
     })
 
     test('empty generator yields nothing', async () => {
@@ -71,6 +71,30 @@ describe('sse-adapter (D4)', () => {
 
       const chunks = await collect(sseStream(empty()))
       expect(chunks).toHaveLength(0)
+    })
+  })
+
+  describe('TEA risk-based tests', () => {
+    test('P1: error event with optional agentName field included in data', async () => {
+      const event: SSEEvent = { type: 'error', code: 'AGENT_SPAWN_FAILED', message: 'Timeout', agentName: 'secretary' }
+      const [result] = await collect(sseStream(single(event)))
+      expect(result).toBe('event: error\ndata: {"code":"AGENT_SPAWN_FAILED","message":"Timeout","agentName":"secretary"}\n\n')
+    })
+
+    test('P1: type field excluded from data JSON (only in event line)', async () => {
+      const [result] = await collect(sseStream(single({ type: 'message', content: 'test' })))
+      const dataLine = result.split('\n')[1]
+      const data = JSON.parse(dataLine.replace('data: ', ''))
+      expect(data).not.toHaveProperty('type')
+      expect(result.startsWith('event: message\n')).toBe(true)
+    })
+
+    test('P2: content with special chars (newlines, quotes, unicode) safely JSON-encoded', async () => {
+      const [result] = await collect(sseStream(single({ type: 'message', content: '줄바꿈\n"따옴표"\t탭' })))
+      expect(result).toContain('event: message\n')
+      const dataLine = result.split('\n').find(l => l.startsWith('data: '))!
+      const parsed = JSON.parse(dataLine.replace('data: ', ''))
+      expect(parsed.content).toBe('줄바꿈\n"따옴표"\t탭')
     })
   })
 })

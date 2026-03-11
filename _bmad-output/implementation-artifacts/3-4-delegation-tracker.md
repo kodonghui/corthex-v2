@@ -1,6 +1,6 @@
 # Story 3.4: delegation-tracker — PostToolUse Hook
 
-Status: review
+Status: done
 
 ## Story
 
