@@ -155,6 +155,7 @@ export const agents = pgTable('agents', {
   soul: text('soul'),  // 마크다운 성격 정의
   adminSoul: text('admin_soul'),  // 관리자가 설정한 원본 소울 (초기화용)
   status: agentStatusEnum('status').notNull().default('offline'),
+  ownerUserId: uuid('owner_user_id').references(() => users.id),  // CLI 토큰 소유 인간직원 매핑
   isSecretary: boolean('is_secretary').notNull().default(false),
   isSystem: boolean('is_system').notNull().default(false),  // 시스템 에이전트 삭제 보호
   allowedTools: jsonb('allowed_tools').default([]),  // string[] — 허용 도구 이름 목록
@@ -1117,6 +1118,7 @@ export const companiesRelations = relations(companies, ({ many }) => ({
 export const usersRelations = relations(users, ({ one, many }) => ({
   company: one(companies, { fields: [users.companyId], references: [companies.id] }),
   agents: many(agents),
+  ownedAgents: many(agents, { relationName: 'ownedAgents' }),
   cliCredentials: many(cliCredentials),
   apiKeys: many(apiKeys),
   chatSessions: many(chatSessions),
@@ -1128,6 +1130,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 export const agentsRelations = relations(agents, ({ one, many }) => ({
   company: one(companies, { fields: [agents.companyId], references: [companies.id] }),
   user: one(users, { fields: [agents.userId], references: [users.id] }),
+  ownerUser: one(users, { fields: [agents.ownerUserId], references: [users.id], relationName: 'ownedAgents' }),
   department: one(departments, { fields: [agents.departmentId], references: [departments.id] }),
   chatSessions: many(chatSessions),
   memory: many(agentMemory),

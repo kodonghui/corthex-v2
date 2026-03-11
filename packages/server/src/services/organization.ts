@@ -399,6 +399,11 @@ export async function deactivateAgent(tenant: TenantActor, agentId: string) {
     return { error: { status: 403, message: '시스템 에이전트는 삭제할 수 없습니다', code: 'AGENT_003' } }
   }
 
+  // Secretary agent protection (Story 5.1)
+  if (current.isSecretary) {
+    return { error: { status: 403, message: '비서 에이전트는 삭제할 수 없습니다', code: 'ORG_SECRETARY_DELETE_DENIED' } }
+  }
+
   // Soft deactivation: unassign from department + deactivate
   await db
     .update(agents)

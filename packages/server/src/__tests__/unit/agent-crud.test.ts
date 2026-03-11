@@ -130,9 +130,11 @@ const sampleAgent = {
   soul: '# Test Soul',
   adminSoul: '# Test Soul',
   status: 'offline' as const,
+  ownerUserId: null,
   isSecretary: false,
   isSystem: false,
   allowedTools: ['web_search'],
+  autoLearn: true,
   isActive: true,
   createdAt: new Date(),
   updatedAt: new Date(),
@@ -338,6 +340,20 @@ describe('Agent CRUD Service Functions', () => {
       expect(err.status).toBe(403)
       expect(err.code).toBe('AGENT_003')
       expect(err.message).toContain('시스템 에이전트')
+      expect(auditCalls).toHaveLength(0)
+    })
+
+    test('blocks secretary agent deletion with 403 (Story 5.1)', async () => {
+      const secretaryAgent = { ...sampleAgent, isSecretary: true }
+      currentChain = makeChain([[secretaryAgent]])
+
+      const result = await deactivateAgent(tenant, AGENT_ID)
+
+      expect(result).toHaveProperty('error')
+      const err = (result as any).error
+      expect(err.status).toBe(403)
+      expect(err.code).toBe('ORG_SECRETARY_DELETE_DENIED')
+      expect(err.message).toContain('비서 에이전트')
       expect(auditCalls).toHaveLength(0)
     })
 

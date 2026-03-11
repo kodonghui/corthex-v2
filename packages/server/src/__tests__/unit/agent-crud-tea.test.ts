@@ -140,9 +140,11 @@ const baseAgent = {
   soul: null,
   adminSoul: null,
   status: 'offline' as const,
+  ownerUserId: null,
   isSecretary: false,
   isSystem: false,
   allowedTools: [],
+  autoLearn: true,
   isActive: true,
   createdAt: new Date(),
   updatedAt: new Date(),
@@ -168,13 +170,16 @@ describe('TEA: Security - System Agent Protection (FR5)', () => {
     expect(err.message).toContain('시스템')
   })
 
-  test('allows deactivation of non-system agent even if isSecretary=true', async () => {
+  test('blocks deactivation of secretary agent (Story 5.1)', async () => {
     const nonSystemSecretary = { ...baseAgent, isSystem: false, isSecretary: true }
     currentChain = makeChain([[nonSystemSecretary]])
 
     const result = await deactivateAgent(tenantA, AGENT_ID)
 
-    expect(result).toHaveProperty('data')
+    expect(result).toHaveProperty('error')
+    const err = (result as any).error
+    expect(err.status).toBe(403)
+    expect(err.code).toBe('ORG_SECRETARY_DELETE_DENIED')
   })
 
   test('system agent protection does not generate audit log', async () => {
