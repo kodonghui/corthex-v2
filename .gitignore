@@ -26,3 +26,6 @@ bun.lockb
 
 # Claude plugins cache (large, auto-downloaded)
 .claude/plugins/
+
+# A/B test results (generated, not committed)
+packages/server/ab-results/

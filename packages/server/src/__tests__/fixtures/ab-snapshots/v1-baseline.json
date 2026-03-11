@@ -1,0 +1,97 @@
+{
+  "version": "v1",
+  "generatedAt": "2026-03-11T00:00:00Z",
+  "note": "v1 baseline snapshots — replace with actual v1 engine outputs before running A/B comparison",
+  "snapshots": [
+    {
+      "promptId": "translate-01",
+      "model": "gpt-4",
+      "response": "There is a strategy meeting at 10 AM today. The marketing team and the development team will attend together.",
+      "tokenCount": 85,
+      "durationMs": 1200,
+      "toolCallCount": 0,
+      "handoffDepth": 0
+    },
+    {
+      "promptId": "translate-02",
+      "model": "gpt-4",
+      "response": "분기별 실적 보고서에 따르면 매출이 15% 증가했으며, 이는 주로 동남아시아 시장 확장에 기인합니다.",
+      "tokenCount": 92,
+      "durationMs": 1100,
+      "toolCallCount": 0,
+      "handoffDepth": 0
+    },
+    {
+      "promptId": "coding-01",
+      "model": "gpt-4",
+      "response": "function deduplicate<T>(arr: T[], key?: keyof T): T[] {\n  if (!key) return [...new Set(arr)];\n  const seen = new Set();\n  return arr.filter(item => {\n    const k = item[key];\n    if (seen.has(k)) return false;\n    seen.add(k);\n    return true;\n  });\n}",
+      "tokenCount": 156,
+      "durationMs": 2300,
+      "toolCallCount": 0,
+      "handoffDepth": 0
+    },
+    {
+      "promptId": "coding-02",
+      "model": "gpt-4",
+      "response": "import { createMiddleware } from 'hono/factory';\n\nexport const timing = createMiddleware(async (c, next) => {\n  const start = Date.now();\n  await next();\n  const ms = Date.now() - start;\n  console.log(`${c.req.method} ${c.req.path} - ${ms}ms`);\n  c.header('X-Response-Time', `${ms}ms`);\n});",
+      "tokenCount": 142,
+      "durationMs": 1800,
+      "toolCallCount": 0,
+      "handoffDepth": 0
+    },
+    {
+      "promptId": "analysis-01",
+      "model": "gpt-4",
+      "response": "매출 추세 분석:\n- 전반적 상승 추세: 1월 1200만 → 5월 2100만 (75% 증가)\n- 이상치: 3월 1100만 (전월 대비 -26.7% 급락)\n- 4~5월 강한 반등 후 6월 소폭 조정\n- 평균 매출: 1,600만원",
+      "tokenCount": 198,
+      "durationMs": 2500,
+      "toolCallCount": 0,
+      "handoffDepth": 0
+    },
+    {
+      "promptId": "analysis-02",
+      "model": "gpt-4",
+      "response": "스택 비교:\n\n(A) React+Express+PostgreSQL:\n장점: 생태계 크기, SQL 관계형 데이터, 채용 용이\n단점: Express 성능 한계, 보일러플레이트\n\n(B) Vue+Fastify+MongoDB:\n장점: 높은 성능, 유연한 스키마, 학습 곡선 낮음\n단점: 복잡한 쿼리 어려움, Vue 생태계 상대적 소규모",
+      "tokenCount": 245,
+      "durationMs": 3100,
+      "toolCallCount": 0,
+      "handoffDepth": 0
+    },
+    {
+      "promptId": "summary-01",
+      "model": "gpt-4",
+      "response": "1. Q3 전략회의에서 SNS 확대와 모바일 앱 출시를 동시 추진하기로 결정\n2. 모바일 앱에 70% 리소스(예산 5억원 중) 우선 배정\n3. 8월까지 1차 릴리스 목표",
+      "tokenCount": 112,
+      "durationMs": 1500,
+      "toolCallCount": 0,
+      "handoffDepth": 0
+    },
+    {
+      "promptId": "summary-02",
+      "model": "gpt-4",
+      "response": "에러 원인: agent-loop.ts에서 runAgent 호출 시 SessionContext의 companyId가 undefined인 상태로 soul-renderer를 거쳐 getDB에 전달됨. companyId 가드가 없는 호출 경로 존재. 수정: runAgent 진입점에서 companyId 검증 추가 필요.",
+      "tokenCount": 134,
+      "durationMs": 1400,
+      "toolCallCount": 0,
+      "handoffDepth": 0
+    },
+    {
+      "promptId": "creative-01",
+      "model": "gpt-4",
+      "response": "1. \"AI 팀을 구축하세요, 코드 한 줄 없이\"\n2. \"당신의 AI 조직, 오케스트라처럼 지휘하세요\"\n3. \"에이전트는 일하고, 당신은 결정하세요\"\n4. \"스타트업의 속도로, 대기업의 AI 역량을\"\n5. \"29명의 AI 직원, 월 $10으로\"",
+      "tokenCount": 168,
+      "durationMs": 2000,
+      "toolCallCount": 0,
+      "handoffDepth": 0
+    },
+    {
+      "promptId": "creative-02",
+      "model": "gpt-4",
+      "response": "# CORTHEX 개발자 온보딩\n\n## 환영합니다!\nCORTHEX는 AI 에이전트 오케스트레이션 플랫폼입니다.\n\n## 기술 스택\n- Runtime: Bun\n- Backend: Hono\n- Frontend: React + Vite\n- Database: PostgreSQL + Drizzle ORM\n\n## 시작하기\n1. `git clone` 후 `bun install`\n2. `.env` 설정\n3. `bun run dev`로 개발 서버 시작",
+      "tokenCount": 187,
+      "durationMs": 2200,
+      "toolCallCount": 0,
+      "handoffDepth": 0
+    }
+  ]
+}
