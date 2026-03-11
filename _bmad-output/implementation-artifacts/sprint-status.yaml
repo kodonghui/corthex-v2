@@ -367,7 +367,7 @@ phases:
             title: "Tier CRUD API + UI"
             sp: 3
             priority: P1
-            status: backlog
+            status: done
             blocked_by: ["8.1"]
           - id: "8.3"
             title: "모델 자동 배정 + 비용 최적화"

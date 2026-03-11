@@ -32,6 +32,7 @@ const PerformancePage = lazy(() => import('./pages/performance').then((m) => ({ 
 const HubPage = lazy(() => import('./pages/hub').then((m) => ({ default: m.HubPage })))
 const DepartmentsPage = lazy(() => import('./pages/departments').then((m) => ({ default: m.DepartmentsPage })))
 const AgentsPage = lazy(() => import('./pages/agents').then((m) => ({ default: m.AgentsPage })))
+const TiersPage = lazy(() => import('./pages/tiers').then((m) => ({ default: m.TiersPage })))
 const OnboardingPage = lazy(() => import('./pages/onboarding').then((m) => ({ default: m.OnboardingPage })))
 
 const queryClient = new QueryClient()
@@ -132,6 +133,7 @@ export function App() {
             <Route path="performance" element={<Suspense fallback={<PageSkeleton />}><PerformancePage /></Suspense>} />
             <Route path="departments" element={<Suspense fallback={<PageSkeleton />}><DepartmentsPage /></Suspense>} />
             <Route path="agents" element={<Suspense fallback={<PageSkeleton />}><AgentsPage /></Suspense>} />
+            <Route path="tiers" element={<Suspense fallback={<PageSkeleton />}><TiersPage /></Suspense>} />
             <Route path="settings" element={<Suspense fallback={<PageSkeleton />}><SettingsPage /></Suspense>} />
           </Route>
         </Routes>
