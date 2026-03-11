@@ -305,3 +305,31 @@ describe('자격증명: 타사 자격증명 접근 불가', () => {
     expect(res.status).toBe(404)
   })
 })
+
+// =============================================
+// 6. getDB(companyId) 래퍼 격리 검증 (D1, E3)
+// =============================================
+describe('getDB(companyId) 래퍼 격리', () => {
+  test('빈 companyId로 getDB 호출 → Error', async () => {
+    const { getDB } = await import('../db/scoped-query')
+    expect(() => getDB('')).toThrow('companyId required')
+  })
+
+  test('서로 다른 companyId → 독립 스코프', async () => {
+    const { getDB } = await import('../db/scoped-query')
+    const realDb = getDB(REAL_COMPANY_ID)
+    const fakeDb = getDB(FAKE_COMPANY_ID)
+
+    // 별개의 래퍼 객체
+    expect(realDb).not.toBe(fakeDb)
+
+    // 메서드 존재 확인
+    expect(typeof realDb.agents).toBe('function')
+    expect(typeof realDb.insertAgent).toBe('function')
+    expect(typeof realDb.updateAgent).toBe('function')
+    expect(typeof realDb.deleteAgent).toBe('function')
+    expect(typeof fakeDb.agents).toBe('function')
+    expect(typeof fakeDb.departments).toBe('function')
+    expect(typeof fakeDb.knowledgeDocs).toBe('function')
+  })
+})
