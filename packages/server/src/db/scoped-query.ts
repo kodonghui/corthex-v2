@@ -1,7 +1,7 @@
 import { eq, or, sql, desc } from 'drizzle-orm'
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm'
 import { db } from './index'
-import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users, costRecords, presets } from './schema'
+import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users, costRecords, presets, sketches, sketchVersions } from './schema'
 import { withTenant, scopedWhere, scopedInsert } from './tenant-helpers'
 
 type Agent = InferSelectModel<typeof agents>
@@ -77,5 +77,15 @@ export function getDB(companyId: string) {
     incrementPresetSortOrder: (id: string) =>
       db.update(presets).set({ sortOrder: sql`${presets.sortOrder} + 1`, updatedAt: new Date() })
         .where(scopedWhere(presets.companyId, companyId, eq(presets.id, id))),
+
+    // READ — sketches (Story 11.2)
+    sketches: () =>
+      db.select().from(sketches).where(withTenant(sketches.companyId, companyId)).orderBy(desc(sketches.updatedAt)),
+    sketchById: (id: string) =>
+      db.select().from(sketches).where(scopedWhere(sketches.companyId, companyId, eq(sketches.id, id))),
+
+    // WRITE — sketches (Story 11.2)
+    updateSketch: (id: string, data: Partial<{ name: string; graphData: unknown; updatedAt: Date }>) =>
+      db.update(sketches).set(data).where(scopedWhere(sketches.companyId, companyId, eq(sketches.id, id))).returning(),
   }
 }
