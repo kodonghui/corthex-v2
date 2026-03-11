@@ -1,10 +1,10 @@
 import { eq, and, desc } from 'drizzle-orm'
 import { db } from '../db'
 import { debates, agents } from '../db/schema'
-import { agentRunner } from './agent-runner'
 import { eventBus } from '../lib/event-bus'
-import type { AgentConfig } from './agent-runner'
-import type { LLMRouterContext } from './llm-router'
+import { collectAgentResponse } from '../engine/agent-loop'
+import { renderSoul } from '../engine/soul-renderer'
+import type { SessionContext } from '../engine/types'
 import type {
   DebateType,
   DebateStatus,
@@ -162,11 +162,15 @@ async function executeDebateRounds(
 
   const agentMap = new Map(agentRows.map(a => [a.id, a]))
 
-  const context: LLMRouterContext = {
-    companyId,
-    agentId: 'agora-engine',
-    agentName: 'AGORA Engine',
-    source: 'delegation',
+  // Cache rendered souls per agent for the debate duration (avoids 6 DB queries × rounds × participants)
+  const soulCache = new Map<string, string>()
+  async function getCachedSoul(agentRow: typeof agents.$inferSelect): Promise<string> {
+    if (!agentRow.soul) return ''
+    const cached = soulCache.get(agentRow.id)
+    if (cached !== undefined) return cached
+    const rendered = await renderSoul(agentRow.soul, agentRow.id, companyId)
+    soulCache.set(agentRow.id, rendered)
+    return rendered
   }
 
   for (let roundNum = 1; roundNum <= debate.maxRounds; roundNum++) {
@@ -178,28 +182,24 @@ async function executeDebateRounds(
       const agentRow = agentMap.get(participant.agentId)
       if (!agentRow) continue
 
-      const agentConfig: AgentConfig = {
-        id: agentRow.id,
+      const soul = await getCachedSoul(agentRow)
+
+      const ctx: SessionContext = {
+        cliToken: process.env.ANTHROPIC_API_KEY || '',
+        userId: 'agora-system',
         companyId,
-        name: agentRow.name,
-        nameEn: agentRow.nameEn,
-        tier: agentRow.tier as 'manager' | 'specialist' | 'worker',
-        modelName: agentRow.modelName || 'claude-sonnet-4-6',
-        soul: agentRow.soul,
-        allowedTools: [],
-        isActive: true,
+        depth: 0,
+        sessionId: crypto.randomUUID(),
+        startedAt: Date.now(),
+        maxDepth: 1,
+        visitedAgents: [agentRow.id],
       }
 
       const prompt = buildSpeechPrompt(debate.topic, participant, roundNum, allRounds)
 
       try {
-        const result = await agentRunner.execute(
-          agentConfig,
-          { messages: [{ role: 'user', content: prompt }] },
-          context,
-        )
-
-        const content = (result.content || '').slice(0, MAX_SPEECH_LENGTH)
+        const rawContent = await collectAgentResponse({ ctx, soul, message: prompt })
+        const content = (rawContent || '[응답 없음]').slice(0, MAX_SPEECH_LENGTH)
 
         const speech: DebateSpeech = {
           agentId: participant.agentId,
@@ -235,8 +235,8 @@ async function executeDebateRounds(
     emitDebateEvent(debateId, companyId, 'round-ended', { roundNum, speechCount: speeches.length })
   }
 
-  // Detect consensus
-  const result = await detectConsensus(debate.topic, allRounds, participants, context, agentMap)
+  // Detect consensus (pass soulCache to avoid re-rendering)
+  const result = await detectConsensus(debate.topic, allRounds, participants, companyId, agentMap, soulCache)
 
   // Update to completed
   await db
@@ -288,31 +288,28 @@ export async function detectConsensus(
   topic: string,
   rounds: DebateRound[],
   participants: DebateParticipant[],
-  context: LLMRouterContext,
+  companyId: string,
   agentMap: Map<string, typeof agents.$inferSelect>,
+  soulCache?: Map<string, string>,
 ): Promise<DebateResult> {
-  // Use first participant as synthesis agent (or fallback)
   const firstAgent = agentMap.get(participants[0]?.agentId)
+  const agentId = firstAgent?.id || 'agora-synthesis'
 
-  const synthesisConfig: AgentConfig = firstAgent ? {
-    id: firstAgent.id,
-    companyId: context.companyId,
-    name: firstAgent.name,
-    nameEn: firstAgent.nameEn,
-    tier: 'manager',
-    modelName: firstAgent.modelName || 'claude-sonnet-4-6',
-    soul: null,
-    allowedTools: [],
-    isActive: true,
-  } : {
-    id: 'agora-synthesis',
-    companyId: context.companyId,
-    name: 'AGORA 종합관',
-    tier: 'manager',
-    modelName: 'claude-sonnet-4-6',
-    soul: null,
-    allowedTools: [],
-    isActive: true,
+  let soul = ''
+  if (firstAgent?.soul) {
+    const cached = soulCache?.get(firstAgent.id)
+    soul = cached !== undefined ? cached : await renderSoul(firstAgent.soul, firstAgent.id, companyId)
+  }
+
+  const ctx: SessionContext = {
+    cliToken: process.env.ANTHROPIC_API_KEY || '',
+    userId: 'agora-system',
+    companyId,
+    depth: 0,
+    sessionId: crypto.randomUUID(),
+    startedAt: Date.now(),
+    maxDepth: 1,
+    visitedAgents: [agentId],
   }
 
   const allSpeeches = rounds.flatMap(r =>
@@ -337,13 +334,8 @@ ${allSpeeches}
 }`
 
   try {
-    const result = await agentRunner.execute(
-      synthesisConfig,
-      { messages: [{ role: 'user', content: prompt }] },
-      context,
-    )
-
-    const parsed = parseConsensusResponse(result.content || '', rounds.length)
+    const text = await collectAgentResponse({ ctx, soul, message: prompt })
+    const parsed = parseConsensusResponse(text, rounds.length)
     return parsed
   } catch {
     // Fallback: determine consensus from positions

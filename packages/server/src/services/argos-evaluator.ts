@@ -6,6 +6,9 @@ import { nightJobTriggers, argosEvents, chatSessions, chatMessages, agentMemory,
 import { eq, and, desc, sql } from 'drizzle-orm'
 import { eventBus } from '../lib/event-bus'
 import { createEvent, updateEventStatus } from './argos-service'
+import { collectAgentResponse } from '../engine/agent-loop'
+import { renderSoul } from '../engine/soul-renderer'
+import type { SessionContext } from '../engine/types'
 
 const ARGOS_POLL_INTERVAL_MS = 60_000 // 60초
 const MAX_CONCURRENT_EVALUATIONS = 3
@@ -345,7 +348,7 @@ async function executeTriggeredAction(trigger: TriggerRow, eventData: Record<str
   try {
     // Get agent info
     const [agent] = await db
-      .select({ id: agents.id, name: agents.name, isSecretary: agents.isSecretary })
+      .select({ id: agents.id, name: agents.name, isSecretary: agents.isSecretary, soul: agents.soul })
       .from(agents)
       .where(eq(agents.id, trigger.agentId))
       .limit(1)
@@ -371,29 +374,26 @@ async function executeTriggeredAction(trigger: TriggerRow, eventData: Record<str
       content: trigger.instruction,
     })
 
-    // Execute via orchestration pipeline
-    let result: string
+    // Execute via engine/agent-loop (D6 single entry point)
+    const soul = agent.soul
+      ? await renderSoul(agent.soul, agent.id, trigger.companyId)
+      : ''
 
-    if (agent.isSecretary) {
-      const { orchestrateSecretary } = await import('../lib/orchestrator')
-      const response = await orchestrateSecretary({
-        secretaryAgentId: agent.id,
-        sessionId: session.id,
-        companyId: trigger.companyId,
-        userMessage: trigger.instruction,
-        userId: trigger.userId,
-      })
-      result = typeof response === 'string' ? response : JSON.stringify(response)
-    } else {
-      const { generateAgentResponse } = await import('../lib/ai')
-      const response = await generateAgentResponse({
-        agentId: agent.id,
-        sessionId: session.id,
-        companyId: trigger.companyId,
-        userMessage: trigger.instruction,
-        userId: trigger.userId,
-      })
-      result = typeof response === 'string' ? response : JSON.stringify(response)
+    const ctx: SessionContext = {
+      cliToken: process.env.ANTHROPIC_API_KEY || '',
+      userId: trigger.userId,
+      companyId: trigger.companyId,
+      depth: 0,
+      sessionId: session.id,
+      startedAt: Date.now(),
+      maxDepth: 3,
+      visitedAgents: [agent.id],
+    }
+
+    const result = await collectAgentResponse({ ctx, soul, message: trigger.instruction })
+
+    if (!result) {
+      throw new Error('에이전트 응답이 비어 있습니다')
     }
 
     // Save agent message

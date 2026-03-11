@@ -90,3 +90,13 @@ export async function* runAgent(options: RunAgentOptions): AsyncGenerator<SSEEve
     activeSessions.delete(ctx.sessionId)
   }
 }
+
+/** Fire-and-collect: run agent and return concatenated message text */
+export async function collectAgentResponse(options: RunAgentOptions): Promise<string> {
+  const parts: string[] = []
+  for await (const event of runAgent(options)) {
+    if (event.type === 'message') parts.push(event.content)
+    if (event.type === 'error') throw new Error(event.message)
+  }
+  return parts.join('')
+}

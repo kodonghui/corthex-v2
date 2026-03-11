@@ -187,7 +187,7 @@ phases:
             title: "호출자 Import 전환 (텔레그램, ARGOS, AGORA, 자동매매)"
             sp: 3
             priority: P0
-            status: backlog
+            status: done
             blocked_by: ["2.2"]
           - id: "4.3"
             title: "기존 서비스 교체/삭제"
