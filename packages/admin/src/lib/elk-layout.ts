@@ -123,6 +123,8 @@ export async function computeElkLayout(orgData: OrgChartData): Promise<{ nodes: 
         type: 'agent',
         position: { x: 0, y: 0 },
         data: {
+          agentId: agent.id,
+          departmentId: agent.departmentId,
           name: agent.name,
           tier: agent.tier,
           tierLevel: agent.tierLevel,
@@ -192,6 +194,8 @@ export async function computeElkLayout(orgData: OrgChartData): Promise<{ nodes: 
         type: 'agent',
         position: { x: 0, y: 0 },
         data: {
+          agentId: agent.id,
+          departmentId: null,
           name: agent.name,
           tier: agent.tier,
           tierLevel: agent.tierLevel,

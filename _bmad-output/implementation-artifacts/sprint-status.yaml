@@ -406,13 +406,13 @@ phases:
             title: "드래그&드롭 편집"
             sp: 5
             priority: P1
-            status: backlog
+            status: done
             blocked_by: ["9.2", "7.2"]
           - id: "9.4"
             title: "속성 패널"
             sp: 3
             priority: P1
-            status: backlog
+            status: review
             blocked_by: ["9.2"]
           - id: "9.5"
             title: "NEXUS 내보내기 + 인쇄"

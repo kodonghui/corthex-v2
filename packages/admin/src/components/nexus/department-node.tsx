@@ -7,13 +7,20 @@ type DepartmentNodeData = {
   agentCount: number
   employeeCount: number
   managerName: string | null
+  isDropTarget?: boolean
 }
 
 export const DepartmentNode = memo(function DepartmentNode({ data, selected }: { data: DepartmentNodeData; selected?: boolean }) {
+  const isDropTarget = data.isDropTarget === true
+
   return (
     <div
-      className={`px-4 py-3 rounded-xl bg-blue-950 border-2 shadow-md min-w-[240px] ${
-        selected ? 'border-blue-400 ring-2 ring-blue-400/50' : 'border-blue-600'
+      className={`px-4 py-3 rounded-xl bg-blue-950 border-2 shadow-md min-w-[240px] transition-all duration-150 ${
+        isDropTarget
+          ? 'border-blue-400 border-dashed ring-2 ring-blue-400 ring-offset-2 ring-offset-slate-900 scale-105'
+          : selected
+            ? 'border-blue-400 ring-2 ring-blue-400/50'
+            : 'border-blue-600'
       }`}
       data-testid="nexus-department-node"
     >

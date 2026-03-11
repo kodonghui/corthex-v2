@@ -4,13 +4,20 @@ import { Handle, Position } from '@xyflow/react'
 type UnassignedGroupNodeData = {
   name: string
   agentCount: number
+  isDropTarget?: boolean
 }
 
 export const UnassignedGroupNode = memo(function UnassignedGroupNode({ data, selected }: { data: UnassignedGroupNodeData; selected?: boolean }) {
+  const isDropTarget = data.isDropTarget === true
+
   return (
     <div
-      className={`px-4 py-3 rounded-xl bg-orange-950/30 border-2 border-dashed shadow-md min-w-[240px] ${
-        selected ? 'border-blue-400 ring-2 ring-blue-400/50' : 'border-orange-500'
+      className={`px-4 py-3 rounded-xl bg-orange-950/30 border-2 border-dashed shadow-md min-w-[240px] transition-all duration-150 ${
+        isDropTarget
+          ? 'border-blue-400 ring-2 ring-blue-400 ring-offset-2 ring-offset-slate-900 scale-105'
+          : selected
+            ? 'border-blue-400 ring-2 ring-blue-400/50'
+            : 'border-orange-500'
       }`}
       data-testid="nexus-unassigned-group-node"
     >

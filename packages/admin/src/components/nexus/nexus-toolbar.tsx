@@ -5,10 +5,17 @@ type NexusToolbarProps = {
   isDirty: boolean
   isSaving: boolean
   isExporting: boolean
+  selectedCount: number
+  canUndo: boolean
+  canRedo: boolean
+  undoLabel: string
+  redoLabel: string
   onToggleEditMode: () => void
   onAutoLayout: () => void
   onSaveLayout: () => void
   onFitView: () => void
+  onUndo: () => void
+  onRedo: () => void
   onExportPng: () => void
   onExportSvg: () => void
   onExportJson: () => void
@@ -20,10 +27,17 @@ export const NexusToolbar = memo(function NexusToolbar({
   isDirty,
   isSaving,
   isExporting,
+  selectedCount,
+  canUndo,
+  canRedo,
+  undoLabel,
+  redoLabel,
   onToggleEditMode,
   onAutoLayout,
   onSaveLayout,
   onFitView,
+  onUndo,
+  onRedo,
   onExportPng,
   onExportSvg,
   onExportJson,
@@ -95,6 +109,40 @@ export const NexusToolbar = memo(function NexusToolbar({
       >
         {isSaving ? '저장 중...' : '저장'}
       </button>
+
+      {/* Undo/Redo — edit mode only */}
+      {isEditMode && (
+        <>
+          <div className="w-px bg-slate-600" />
+          <button
+            onClick={onUndo}
+            disabled={!canUndo}
+            className={`px-2 py-1.5 text-xs font-medium rounded-md transition-colors ${
+              canUndo ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-700/50 text-slate-500 cursor-not-allowed'
+            }`}
+            title={undoLabel || '실행 취소 (Ctrl+Z)'}
+          >
+            ↩
+          </button>
+          <button
+            onClick={onRedo}
+            disabled={!canRedo}
+            className={`px-2 py-1.5 text-xs font-medium rounded-md transition-colors ${
+              canRedo ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-700/50 text-slate-500 cursor-not-allowed'
+            }`}
+            title={redoLabel || '다시 실행 (Ctrl+Shift+Z)'}
+          >
+            ↪
+          </button>
+        </>
+      )}
+
+      {/* Selection counter */}
+      {selectedCount > 0 && (
+        <span className="px-2 py-1.5 text-[10px] font-medium rounded-md bg-amber-800 text-amber-200">
+          {selectedCount}개 선택
+        </span>
+      )}
 
       {/* Fit view */}
       <button

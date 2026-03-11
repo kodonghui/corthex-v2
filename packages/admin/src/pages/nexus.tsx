@@ -21,6 +21,8 @@ import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
 import { useToastStore } from '../stores/toast-store'
 import { computeElkLayout, type OrgChartData } from '../lib/elk-layout'
+import { findDropTarget } from '../lib/nexus-hit-test'
+import { useNexusUndo } from '../hooks/use-nexus-undo'
 import { CompanyNode } from '../components/nexus/company-node'
 import { DepartmentNode } from '../components/nexus/department-node'
 import { AgentNode } from '../components/nexus/agent-node'
@@ -28,6 +30,7 @@ import { HumanNode } from '../components/nexus/human-node'
 import { UnassignedGroupNode } from '../components/nexus/unassigned-group-node'
 import { NexusToolbar } from '../components/nexus/nexus-toolbar'
 import { exportToPng, exportToSvg, exportToJson, printCanvas } from '../lib/nexus-export'
+import { PropertyPanel } from '../components/nexus/property-panel'
 import { Skeleton } from '@corthex/ui'
 
 // Register custom node types
@@ -80,16 +83,29 @@ function NexusCanvas() {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
   const [isExporting, setIsExporting] = useState(false)
 
+  // Drag-drop state
+  const [draggingAgentId, setDraggingAgentId] = useState<string | null>(null)
+  const [selectedAgentIds, setSelectedAgentIds] = useState<Set<string>>(new Set())
+  const dragStartPosRef = useRef<{ x: number; y: number } | null>(null)
+
   // Ref to track if we applied saved layout (to avoid ELK overriding it)
   const appliedSavedLayout = useRef(false)
   const reactFlowRef = useRef<HTMLDivElement>(null)
+
+  // Refetch helper for undo/redo
+  const refetchOrgChart = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['org-chart', selectedCompanyId] })
+  }, [queryClient, selectedCompanyId])
+
+  // Undo/Redo system
+  const { pushAction, undo, redo, canUndo, canRedo, undoLabel, redoLabel } = useNexusUndo(refetchOrgChart)
 
   // Fetch org data
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['org-chart', selectedCompanyId],
     queryFn: () => api.get<{ data: OrgChartData }>(`/admin/org-chart?companyId=${encodeURIComponent(selectedCompanyId!)}`),
     enabled: !!selectedCompanyId,
-    refetchInterval: 30_000, // Poll every 30s for real-time updates (admin has no WS)
+    refetchInterval: 30_000,
   })
 
   // Fetch saved layout
@@ -113,7 +129,7 @@ function NexusCanvas() {
     },
   })
 
-  // Compute ELK layout when data changes, applying saved positions if available
+  // Compute ELK layout when data changes
   useEffect(() => {
     if (!data?.data) return
     let stale = false
@@ -123,7 +139,6 @@ function NexusCanvas() {
       .then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
         if (stale) return
 
-        // Apply saved positions if available
         const saved = savedLayout?.data
         if (saved?.nodePositions) {
           const positioned = layoutedNodes.map((n) => {
@@ -147,11 +162,10 @@ function NexusCanvas() {
     return () => { stale = true }
   }, [data, savedLayout, setNodes, setEdges])
 
-  // Handle nodes change — track position changes for dirty flag (edit mode only)
+  // Handle nodes change — track dirty
   const handleNodesChange = useCallback(
     (changes: NodeChange[]) => {
       onNodesChange(changes)
-      // Only track dirty in edit mode — view mode drags are exploratory
       if (!isEditMode) return
       const hasPositionChange = changes.some(
         (c) => c.type === 'position' && 'dragging' in c && !c.dragging,
@@ -163,22 +177,190 @@ function NexusCanvas() {
     [onNodesChange, isEditMode],
   )
 
-  // Node click — select node
+  // Node click — select node / multi-select agents
   const handleNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
     setSelectedNodeId(node.id)
-  }, [])
+
+    if (isEditMode && node.type === 'agent') {
+      const agentData = node.data as { isSecretary?: boolean }
+      if (agentData.isSecretary) return
+
+      if (_.ctrlKey || _.metaKey) {
+        setSelectedAgentIds((prev) => {
+          const next = new Set(prev)
+          if (next.has(node.id)) {
+            next.delete(node.id)
+          } else {
+            next.add(node.id)
+          }
+          return next
+        })
+      } else {
+        setSelectedAgentIds(new Set())
+      }
+    }
+  }, [isEditMode])
 
   // Pane click — deselect
   const handlePaneClick = useCallback(() => {
     setSelectedNodeId(null)
+    setSelectedAgentIds(new Set())
   }, [])
+
+  // Drag start — check if agent, prevent secretary
+  const handleNodeDragStart: (event: React.MouseEvent, node: Node, nodes: Node[]) => void = useCallback((_event, node) => {
+    if (!isEditMode || node.type !== 'agent') {
+      setDraggingAgentId(null)
+      return
+    }
+
+    const agentData = node.data as { isSecretary?: boolean }
+    if (agentData.isSecretary) {
+      addToast({ type: 'info', message: '비서 에이전트는 이동할 수 없습니다. CEO 직속으로 고정됩니다.' })
+      setDraggingAgentId(null)
+      return
+    }
+
+    setDraggingAgentId(node.id)
+    dragStartPosRef.current = { x: node.position.x, y: node.position.y }
+  }, [isEditMode, addToast])
+
+  // Drag — update drop target highlights
+  const handleNodeDrag: (event: React.MouseEvent, node: Node, nodes: Node[]) => void = useCallback((_event, node, dragNodes) => {
+    if (!draggingAgentId || node.id !== draggingAgentId) return
+
+    const agentData = node.data as { departmentId?: string | null }
+    const target = findDropTarget(node.id, node.position, dragNodes, agentData.departmentId ?? null)
+
+    setNodes((prevNodes) =>
+      prevNodes.map((n) => {
+        if (n.type === 'department' || n.type === 'unassigned-group') {
+          const shouldHighlight = target?.targetNodeId === n.id
+          const currentHighlight = (n.data as { isDropTarget?: boolean }).isDropTarget
+          if (shouldHighlight !== currentHighlight) {
+            return { ...n, data: { ...n.data, isDropTarget: shouldHighlight } }
+          }
+        }
+        return n
+      }),
+    )
+  }, [draggingAgentId, setNodes])
+
+  // Drag stop — execute drop if target found
+  const handleNodeDragStop: (event: React.MouseEvent, node: Node, nodes: Node[]) => void = useCallback(async (_event, node) => {
+    // Clear all drop targets
+    setNodes((prevNodes) =>
+      prevNodes.map((n) => {
+        if ((n.type === 'department' || n.type === 'unassigned-group') && (n.data as { isDropTarget?: boolean }).isDropTarget) {
+          return { ...n, data: { ...n.data, isDropTarget: false } }
+        }
+        return n
+      }),
+    )
+
+    if (!draggingAgentId || node.id !== draggingAgentId) {
+      setDraggingAgentId(null)
+      return
+    }
+
+    const agentData = node.data as { agentId?: string; departmentId?: string | null; name?: string }
+    const target = findDropTarget(node.id, node.position, nodes, agentData.departmentId ?? null)
+
+    setDraggingAgentId(null)
+
+    if (!target) {
+      // Reset position if no valid drop
+      if (dragStartPosRef.current) {
+        setNodes((prevNodes) =>
+          prevNodes.map((n) =>
+            n.id === node.id ? { ...n, position: dragStartPosRef.current! } : n,
+          ),
+        )
+      }
+      dragStartPosRef.current = null
+      return
+    }
+
+    dragStartPosRef.current = null
+
+    // Check if batch move
+    const isMultiSelect = selectedAgentIds.has(node.id) && selectedAgentIds.size > 1
+    const agentIdsToMove = isMultiSelect ? [...selectedAgentIds] : [node.id]
+
+    try {
+      if (isMultiSelect) {
+        const agentsForUndo = agentIdsToMove.map((nid) => {
+          const agentNode = nodes.find((n) => n.id === nid)
+          const ad = agentNode?.data as { agentId?: string; departmentId?: string | null; name?: string } | undefined
+          return {
+            agentId: ad?.agentId ?? nid.replace('agent-', ''),
+            agentName: ad?.name ?? '',
+            fromDeptId: ad?.departmentId ?? null,
+          }
+        })
+
+        await api.patch('/admin/nexus/agents/department', {
+          agentIds: agentsForUndo.map((a) => a.agentId),
+          departmentId: target.departmentId,
+        })
+
+        pushAction({
+          type: 'batch-move',
+          agents: agentsForUndo,
+          toDeptId: target.departmentId,
+          toDeptName: target.deptName,
+        })
+
+        addToast({ type: 'success', message: `${agentsForUndo.length}개 에이전트가 ${target.deptName}(으)로 이동되었습니다` })
+        setSelectedAgentIds(new Set())
+      } else {
+        const realAgentId = agentData.agentId ?? node.id.replace('agent-', '')
+        await api.patch(`/admin/nexus/agent/${realAgentId}/department`, {
+          departmentId: target.departmentId,
+        })
+
+        const fromDeptNode = agentData.departmentId
+          ? nodes.find((n) => n.id === `dept-${agentData.departmentId}`)
+          : null
+        const fromDeptName = fromDeptNode
+          ? (fromDeptNode.data as { name?: string }).name ?? '부서'
+          : '미배속'
+
+        pushAction({
+          type: 'move-agent',
+          agentId: realAgentId,
+          agentName: agentData.name ?? '',
+          fromDeptId: agentData.departmentId ?? null,
+          toDeptId: target.departmentId,
+          fromDeptName,
+          toDeptName: target.deptName,
+        })
+
+        addToast({ type: 'success', message: `${agentData.name}이(가) ${target.deptName}(으)로 이동되었습니다` })
+      }
+
+      refetchOrgChart()
+    } catch {
+      addToast({ type: 'error', message: '에이전트 이동에 실패했습니다' })
+      if (dragStartPosRef.current) {
+        setNodes((prevNodes) =>
+          prevNodes.map((n) =>
+            n.id === node.id ? { ...n, position: dragStartPosRef.current! } : n,
+          ),
+        )
+        dragStartPosRef.current = null
+      }
+    }
+  }, [draggingAgentId, nodes, selectedAgentIds, setNodes, pushAction, addToast, refetchOrgChart])
 
   // Toggle edit mode
   const handleToggleEditMode = useCallback(() => {
     setIsEditMode((prev) => {
       const next = !prev
       if (next) {
-        addToast({ type: 'info', message: '편집 모드입니다. 노드를 드래그하여 위치를 변경하세요.' })
+        addToast({ type: 'info', message: '편집 모드입니다. 에이전트를 부서로 드래그하여 이동하세요.' })
+      } else {
+        setSelectedAgentIds(new Set())
       }
       return next
     })
@@ -213,6 +395,27 @@ function NexusCanvas() {
   const handleFitView = useCallback(() => {
     fitView({ padding: 0.2 })
   }, [fitView])
+
+  // Undo/Redo handlers
+  const handleUndo = useCallback(async () => {
+    const action = await undo()
+    if (action) {
+      const label = action.type === 'move-agent'
+        ? `${action.agentName} 이동이 취소되었습니다`
+        : '일괄 이동이 취소되었습니다'
+      addToast({ type: 'info', message: label })
+    }
+  }, [undo, addToast])
+
+  const handleRedo = useCallback(async () => {
+    const action = await redo()
+    if (action) {
+      const label = action.type === 'move-agent'
+        ? `${action.agentName} 이동이 다시 실행되었습니다`
+        : '일괄 이동이 다시 실행되었습니다'
+      addToast({ type: 'info', message: label })
+    }
+  }, [redo, addToast])
 
   // Export handlers
   const handleExportPng = useCallback(async () => {
@@ -258,17 +461,41 @@ function NexusCanvas() {
     setTimeout(() => printCanvas(), 200)
   }, [fitView])
 
-  // Keyboard shortcut: Ctrl+S to save
+  // Adjust canvas when property panel opens/closes
+  useEffect(() => {
+    if (layoutReady) {
+      const t = setTimeout(() => fitView({ padding: 0.2 }), 100)
+      return () => clearTimeout(t)
+    }
+  }, [selectedNodeId, layoutReady, fitView])
+
+  // Keyboard shortcuts
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault()
         if (isDirty) handleSaveLayout()
       }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault()
+        if (isEditMode) handleUndo()
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && e.shiftKey) {
+        e.preventDefault()
+        if (isEditMode) handleRedo()
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+        e.preventDefault()
+        if (isEditMode) handleRedo()
+      }
+      if (e.key === 'Escape') {
+        setSelectedAgentIds(new Set())
+        setSelectedNodeId(null)
+      }
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [isDirty, handleSaveLayout])
+  }, [isDirty, handleSaveLayout, isEditMode, handleUndo, handleRedo])
 
   if (!selectedCompanyId) {
     return (
@@ -325,48 +552,68 @@ function NexusCanvas() {
           </div>
         </div>
       ) : (
-        <div ref={reactFlowRef} className="relative bg-slate-900 border border-slate-700 rounded-xl overflow-hidden" style={{ height: 'calc(100vh - 140px)' }}>
-          <NexusToolbar
-            isEditMode={isEditMode}
-            isDirty={isDirty}
-            isSaving={saveMutation.isPending}
-            isExporting={isExporting}
-            onToggleEditMode={handleToggleEditMode}
-            onAutoLayout={handleAutoLayout}
-            onSaveLayout={handleSaveLayout}
-            onFitView={handleFitView}
-            onExportPng={handleExportPng}
-            onExportSvg={handleExportSvg}
-            onExportJson={handleExportJson}
-            onPrint={handlePrint}
-          />
-          {layoutReady && (
-            <ReactFlow
-              nodes={nodes}
-              edges={edges}
-              onNodesChange={handleNodesChange}
-              onEdgesChange={onEdgesChange}
-              onNodeClick={handleNodeClick}
-              onPaneClick={handlePaneClick}
-              nodeTypes={nodeTypes}
-              nodesDraggable={true}
-              nodesConnectable={isEditMode}
-              elementsSelectable={true}
-              fitView
-              fitViewOptions={{ padding: 0.2 }}
-              minZoom={0.1}
-              maxZoom={2}
-            >
-              <Controls
-                className="!bg-slate-800 !border-slate-700 !rounded-lg [&>button]:!bg-slate-800 [&>button]:!border-slate-700 [&>button]:!text-slate-300 [&>button:hover]:!bg-slate-700"
-              />
-              <MiniMap
-                nodeColor={miniMapNodeColor}
-                maskColor="rgba(15, 23, 42, 0.7)"
-                className="!bg-slate-800 !border-slate-700 !rounded-lg"
-              />
-              <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#334155" />
-            </ReactFlow>
+        <div className="flex" style={{ height: 'calc(100vh - 140px)' }}>
+          <div ref={reactFlowRef} className="flex-1 relative bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
+            <NexusToolbar
+              isEditMode={isEditMode}
+              isDirty={isDirty}
+              isSaving={saveMutation.isPending}
+              isExporting={isExporting}
+              selectedCount={selectedAgentIds.size}
+              canUndo={canUndo}
+              canRedo={canRedo}
+              undoLabel={undoLabel}
+              redoLabel={redoLabel}
+              onToggleEditMode={handleToggleEditMode}
+              onAutoLayout={handleAutoLayout}
+              onSaveLayout={handleSaveLayout}
+              onFitView={handleFitView}
+              onUndo={handleUndo}
+              onRedo={handleRedo}
+              onExportPng={handleExportPng}
+              onExportSvg={handleExportSvg}
+              onExportJson={handleExportJson}
+              onPrint={handlePrint}
+            />
+            {layoutReady && (
+              <ReactFlow
+                nodes={nodes}
+                edges={edges}
+                onNodesChange={handleNodesChange}
+                onEdgesChange={onEdgesChange}
+                onNodeClick={handleNodeClick}
+                onPaneClick={handlePaneClick}
+                onNodeDragStart={handleNodeDragStart}
+                onNodeDrag={handleNodeDrag}
+                onNodeDragStop={handleNodeDragStop}
+                nodeTypes={nodeTypes}
+                nodesDraggable={true}
+                nodesConnectable={isEditMode}
+                elementsSelectable={true}
+                fitView
+                fitViewOptions={{ padding: 0.2 }}
+                minZoom={0.1}
+                maxZoom={2}
+              >
+                <Controls
+                  className="!bg-slate-800 !border-slate-700 !rounded-lg [&>button]:!bg-slate-800 [&>button]:!border-slate-700 [&>button]:!text-slate-300 [&>button:hover]:!bg-slate-700"
+                />
+                <MiniMap
+                  nodeColor={miniMapNodeColor}
+                  maskColor="rgba(15, 23, 42, 0.7)"
+                  className="!bg-slate-800 !border-slate-700 !rounded-lg"
+                />
+                <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#334155" />
+              </ReactFlow>
+            )}
+          </div>
+          {selectedNodeId && data?.data && (
+            <PropertyPanel
+              selectedNodeId={selectedNodeId}
+              orgData={data.data}
+              onClose={() => setSelectedNodeId(null)}
+              onSelectNode={(nodeId) => setSelectedNodeId(nodeId)}
+            />
           )}
         </div>
       )}
