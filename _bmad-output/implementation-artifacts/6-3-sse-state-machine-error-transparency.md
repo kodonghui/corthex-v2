@@ -1,6 +1,6 @@
 # Story 6.3: SSE 상태 머신 + 에러 투명성
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -34,46 +34,46 @@ so that 블랙박스 에러 0건을 달성한다.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: SSE 상태 머신 hook 생성 (AC: #4)
-  - [ ] 1.1: `packages/app/src/hooks/use-sse-state-machine.ts` — 상태 머신 핵심 로직
-  - [ ] 1.2: SSE 상태 타입 정의 (`SSEConnectionState`)
-  - [ ] 1.3: `EventSource` 기반 SSE 연결 관리 (connect/disconnect/reconnect)
-  - [ ] 1.4: 상태 전이 규칙 정의 (idle→connecting→accepted→processing→streaming→done/error)
-  - [ ] 1.5: 타임아웃 처리 (30초 연결 타임아웃, 120초 세션 타임아웃)
-  - [ ] 1.6: 네트워크 에러 감지 + 자동 재시도 (최대 2회, 지수 백오프)
+- [x]Task 1: SSE 상태 머신 hook 생성 (AC: #4)
+  - [x]1.1: `packages/app/src/hooks/use-sse-state-machine.ts` — 상태 머신 핵심 로직
+  - [x]1.2: SSE 상태 타입 정의 (`SSEConnectionState`)
+  - [x]1.3: `EventSource` 기반 SSE 연결 관리 (connect/disconnect/reconnect)
+  - [x]1.4: 상태 전이 규칙 정의 (idle→connecting→accepted→processing→streaming→done/error)
+  - [x]1.5: 타임아웃 처리 (30초 연결 타임아웃, 120초 세션 타임아웃)
+  - [x]1.6: 네트워크 에러 감지 + 자동 재시도 (최대 2회, 지수 백오프)
 
-- [ ] Task 2: 에러 메시지 한국어 변환 파일 생성 (AC: #2)
-  - [ ] 2.1: `packages/app/src/lib/error-messages.ts` — 에러 코드 → 한국어 매핑
-  - [ ] 2.2: 서버 `error-codes.ts`의 모든 코드에 대한 한국어 메시지 작성
-  - [ ] 2.3: 미등록 코드 fallback 함수 `getErrorMessage(code: string): string`
-  - [ ] 2.4: 기존 `api.ts`의 `errorMessages` 맵을 `error-messages.ts`로 이전/통합
+- [x]Task 2: 에러 메시지 한국어 변환 파일 생성 (AC: #2)
+  - [x]2.1: `packages/app/src/lib/error-messages.ts` — 에러 코드 → 한국어 매핑
+  - [x]2.2: 서버 `error-codes.ts`의 모든 코드에 대한 한국어 메시지 작성
+  - [x]2.3: 미등록 코드 fallback 함수 `getErrorMessage(code: string): string`
+  - [x]2.4: 기존 `api.ts`의 `errorMessages` 맵을 `error-messages.ts`로 이전/통합
 
-- [ ] Task 3: SSE 이벤트 → UI 상태 매핑 (AC: #1)
-  - [ ] 3.1: `use-sse-state-machine.ts`에서 6개 SSE 이벤트 파싱 로직
-  - [ ] 3.2: `accepted` 이벤트 → `accepted` 상태 + sessionId 저장
-  - [ ] 3.3: `processing` 이벤트 → `processing` 상태 + agentName 저장
-  - [ ] 3.4: `handoff` 이벤트 → 핸드오프 목록에 { from, to, depth } 추가
-  - [ ] 3.5: `message` 이벤트 → `streaming` 상태 + 텍스트 누적
-  - [ ] 3.6: `error` 이벤트 → `error` 상태 + 에러 메시지 한국어 변환
-  - [ ] 3.7: `done` 이벤트 → `done` 상태 + { costUsd, tokensUsed } 저장
+- [x]Task 3: SSE 이벤트 → UI 상태 매핑 (AC: #1)
+  - [x]3.1: `use-sse-state-machine.ts`에서 6개 SSE 이벤트 파싱 로직
+  - [x]3.2: `accepted` 이벤트 → `accepted` 상태 + sessionId 저장
+  - [x]3.3: `processing` 이벤트 → `processing` 상태 + agentName 저장
+  - [x]3.4: `handoff` 이벤트 → 핸드오프 목록에 { from, to, depth } 추가
+  - [x]3.5: `message` 이벤트 → `streaming` 상태 + 텍스트 누적
+  - [x]3.6: `error` 이벤트 → `error` 상태 + 에러 메시지 한국어 변환
+  - [x]3.7: `done` 이벤트 → `done` 상태 + { costUsd, tokensUsed } 저장
 
-- [ ] Task 4: 핸드오프 실패 에러 투명성 (AC: #3)
-  - [ ] 4.1: 에러 이벤트에서 `agentName` 필드 활용 — 어떤 에이전트에서 실패했는지 표시
-  - [ ] 4.2: 핸드오프 관련 에러 코드 특별 처리:
+- [x]Task 4: 핸드오프 실패 에러 투명성 (AC: #3)
+  - [x]4.1: 에러 이벤트에서 `agentName` 필드 활용 — 어떤 에이전트에서 실패했는지 표시
+  - [x]4.2: 핸드오프 관련 에러 코드 특별 처리:
     - `HANDOFF_DEPTH_EXCEEDED`: "위임 깊이 제한({depth}단계)을 초과했습니다"
     - `HANDOFF_CIRCULAR`: "순환 위임이 감지되었습니다 ({agentName})"
     - `HANDOFF_TARGET_NOT_FOUND`: "위임 대상 에이전트를 찾을 수 없습니다"
-  - [ ] 4.3: 에러 배너 UI — 코드, 에이전트 이름, 한국어 메시지 표시
+  - [x]4.3: 에러 배너 UI — 코드, 에이전트 이름, 한국어 메시지 표시
 
-- [ ] Task 5: 기존 `use-chat-stream.ts`와 통합 (AC: #1, #4)
-  - [ ] 5.1: 새 SSE 상태 머신을 기존 WebSocket 기반 `use-chat-stream.ts`와 병행 지원
-  - [ ] 5.2: Hub 페이지에서 SSE 모드 우선, 기존 채팅에서 WebSocket 유지
-  - [ ] 5.3: 공통 인터페이스 추출 (streamingText, isStreaming, error, toolCalls 등)
+- [x]Task 5: 기존 `use-chat-stream.ts`와 통합 (AC: #1, #4)
+  - [x]5.1: 새 SSE 상태 머신을 기존 WebSocket 기반 `use-chat-stream.ts`와 병행 지원
+  - [x]5.2: Hub 페이지에서 SSE 모드 우선, 기존 채팅에서 WebSocket 유지
+  - [x]5.3: 공통 인터페이스 추출 (streamingText, isStreaming, error, toolCalls 등)
 
-- [ ] Task 6: `api.ts` errorMessages 통합 (AC: #2)
-  - [ ] 6.1: 기존 `api.ts`의 `errorMessages` → `error-messages.ts`로 이전
-  - [ ] 6.2: `api.ts`에서 `error-messages.ts` import 사용으로 전환
-  - [ ] 6.3: 중복 제거, 단일 소스 유지
+- [x]Task 6: `api.ts` errorMessages 통합 (AC: #2)
+  - [x]6.1: 기존 `api.ts`의 `errorMessages` → `error-messages.ts`로 이전
+  - [x]6.2: `api.ts`에서 `error-messages.ts` import 사용으로 전환
+  - [x]6.3: 중복 제거, 단일 소스 유지
 
 ## Dev Notes
 

@@ -1,13 +1,6 @@
-const API_BASE = '/api'
+import { getErrorMessage } from './error-messages'
 
-const errorMessages: Record<string, string> = {
-  AUTH_001: '아이디 또는 비밀번호가 올바르지 않습니다',
-  AUTH_002: '로그인이 만료되었습니다. 다시 로그인해주세요',
-  AUTH_004: '로그인 시도가 너무 많습니다',
-  USER_001: '직원을 찾을 수 없습니다',
-  TENANT_001: '접근 권한이 없습니다',
-  RATE_001: '요청이 너무 많습니다. 잠시 후 다시 시도해주세요',
-}
+const API_BASE = '/api'
 
 export class RateLimitError extends Error {
   retryAfter: number
@@ -47,7 +40,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: { message: 'Network error' } }))
     const code = err.error?.code as string | undefined
-    const message = (code && errorMessages[code]) || err.error?.message || `HTTP ${res.status}`
+    const message = code ? getErrorMessage(code) : (err.error?.message || `HTTP ${res.status}`)
     throw new Error(message)
   }
 
