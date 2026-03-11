@@ -24,6 +24,9 @@ bun.lockb
 # Logs
 *.log
 
+# User uploads (runtime data)
+uploads/
+
 # Claude plugins cache (large, auto-downloaded)
 .claude/plugins/
 
