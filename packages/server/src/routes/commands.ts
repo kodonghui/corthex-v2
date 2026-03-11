@@ -15,6 +15,9 @@ import { processAll } from '../services/all-command-processor'
 import { processSequential } from '../services/sequential-command-processor'
 import { processDebateCommand } from '../services/debate-command-handler'
 import { processSketchCommand } from '../services/sketch-command-handler'
+import { processToolCheck } from '../services/tool-check-handler'
+import { processBatchRun, processBatchStatus } from '../services/batch-command-handler'
+import { processCommandsList } from '../services/commands-list-handler'
 import type { AppEnv } from '../types'
 
 export const commandsRoute = new Hono<AppEnv>()
@@ -141,6 +144,50 @@ commandsRoute.post('/', zValidator('json', submitCommandSchema), promptGuardMidd
       userId: tenant.userId,
     }).catch((err) => {
       console.error(`[SketchCommand] process failed for command ${command.id}:`, err)
+    })
+  }
+
+  // For /도구점검 commands, trigger ToolCheckHandler
+  if (result.parsedMeta.slashType === 'tool_check') {
+    processToolCheck({
+      commandId: command.id,
+      companyId: tenant.companyId,
+      userId: tenant.userId,
+    }).catch((err) => {
+      console.error(`[ToolCheck] process failed for command ${command.id}:`, err)
+    })
+  }
+
+  // For /배치실행 commands, trigger BatchRunHandler
+  if (result.parsedMeta.slashType === 'batch_run') {
+    processBatchRun({
+      commandId: command.id,
+      companyId: tenant.companyId,
+      userId: tenant.userId,
+    }).catch((err) => {
+      console.error(`[BatchRun] process failed for command ${command.id}:`, err)
+    })
+  }
+
+  // For /배치상태 commands, trigger BatchStatusHandler
+  if (result.parsedMeta.slashType === 'batch_status') {
+    processBatchStatus({
+      commandId: command.id,
+      companyId: tenant.companyId,
+      userId: tenant.userId,
+    }).catch((err) => {
+      console.error(`[BatchStatus] process failed for command ${command.id}:`, err)
+    })
+  }
+
+  // For /명령어 commands, trigger CommandsListHandler
+  if (result.parsedMeta.slashType === 'commands_list') {
+    processCommandsList({
+      commandId: command.id,
+      companyId: tenant.companyId,
+      userId: tenant.userId,
+    }).catch((err) => {
+      console.error(`[CommandsList] process failed for command ${command.id}:`, err)
     })
   }
 
