@@ -11,9 +11,8 @@ import {
   createAgent,
   updateAgent,
   deactivateAgent,
+  previewSoul,
 } from '../../services/organization'
-import { renderSoul } from '../../engine/soul-renderer'
-import { getDB } from '../../db/scoped-query'
 
 export const agentsRoute = new Hono<AppEnv>()
 
@@ -131,28 +130,6 @@ agentsRoute.post('/agents/:id/soul-preview', zValidator('json', soulPreviewSchem
     return c.json({ success: true, data: { rendered: '', variables: {} } })
   }
 
-  // Render soul with variable substitution
-  const rendered = await renderSoul(soulText, id, tenant.companyId)
-
-  // Extract variables used: re-fetch the variable map for display
-  const scopedDb = getDB(tenant.companyId)
-  const [agentRow] = await scopedDb.agentById(id)
-  const [allAgents, subordinates, tools, dept, owner] = await Promise.all([
-    scopedDb.agents(),
-    scopedDb.agentsByReportTo(id),
-    scopedDb.agentToolsWithDefs(id),
-    agentRow?.departmentId ? scopedDb.departmentById(agentRow.departmentId) : Promise.resolve([]),
-    scopedDb.userById(agentRow?.userId ?? ''),
-  ])
-
-  const variables: Record<string, string> = {
-    agent_list: allAgents.map((a: { name: string; role: string | null }) => `${a.name}(${a.role || ''})`).join(', '),
-    subordinate_list: subordinates.map((a: { name: string; role: string | null }) => `${a.name}(${a.role || ''})`).join(', '),
-    tool_list: tools.map((t: { name: string; description: string | null }) => `${t.name}: ${t.description || ''}`).join(', '),
-    department_name: dept[0]?.name || '',
-    owner_name: owner[0]?.name || '',
-    specialty: agentRow?.role || '',
-  }
-
-  return c.json({ success: true, data: { rendered, variables } })
+  const result = await previewSoul(tenant.companyId, id, soulText)
+  return c.json({ success: true, data: result })
 })

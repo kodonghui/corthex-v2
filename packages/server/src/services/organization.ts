@@ -6,6 +6,8 @@ import { createAuditLog, AUDIT_ACTIONS } from './audit-log'
 import type { ActorType } from './audit-log'
 import type { TemplateData } from './seed.service'
 import { MANAGER_SOUL_TEMPLATE, SECRETARY_SOUL_TEMPLATE } from '../lib/soul-templates'
+import { renderSoul } from '../engine/soul-renderer'
+import { getDB } from '../db/scoped-query'
 
 export interface DepartmentInput {
   name: string
@@ -908,4 +910,46 @@ export async function applyTemplate(
   })
 
   return { data: summary }
+}
+
+// ============================================================
+// Soul Preview
+// ============================================================
+
+export interface SoulPreviewResult {
+  rendered: string
+  variables: Record<string, string>
+}
+
+/**
+ * Render a soul template with variable substitution and return the result + variable map.
+ * Wraps engine/soul-renderer to keep engine boundary clean (E10).
+ */
+export async function previewSoul(
+  companyId: string,
+  agentId: string,
+  soulText: string,
+): Promise<SoulPreviewResult> {
+  const rendered = await renderSoul(soulText, agentId, companyId)
+
+  const scopedDb = getDB(companyId)
+  const [agentRow] = await scopedDb.agentById(agentId)
+  const [allAgents, subordinates, tools, dept, owner] = await Promise.all([
+    scopedDb.agents(),
+    scopedDb.agentsByReportTo(agentId),
+    scopedDb.agentToolsWithDefs(agentId),
+    agentRow?.departmentId ? scopedDb.departmentById(agentRow.departmentId) : Promise.resolve([]),
+    scopedDb.userById(agentRow?.userId ?? ''),
+  ])
+
+  const variables: Record<string, string> = {
+    agent_list: allAgents.map((a: { name: string; role: string | null }) => `${a.name}(${a.role || ''})`).join(', '),
+    subordinate_list: subordinates.map((a: { name: string; role: string | null }) => `${a.name}(${a.role || ''})`).join(', '),
+    tool_list: tools.map((t: { name: string; description: string | null }) => `${t.name}: ${t.description || ''}`).join(', '),
+    department_name: dept[0]?.name || '',
+    owner_name: owner[0]?.name || '',
+    specialty: agentRow?.role || '',
+  }
+
+  return { rendered, variables }
 }
