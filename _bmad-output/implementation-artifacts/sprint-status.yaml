@@ -280,13 +280,13 @@ phases:
             title: "비서 있음 레이아웃 (풀 위드 채팅)"
             sp: 3
             priority: P0
-            status: review
+            status: done
             blocked_by: ["5.2"]
           - id: "6.2"
             title: "비서 없음 레이아웃 (에이전트 선택 + 채팅)"
             sp: 3
             priority: P0
-            status: review
+            status: done
             blocked_by: []
           - id: "6.3"
             title: "SSE 상태 머신 + 에러 투명성"

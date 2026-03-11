@@ -29,6 +29,7 @@ const AgoraPage = lazy(() => import('./pages/agora').then((m) => ({ default: m.A
 const ClassifiedPage = lazy(() => import('./pages/classified').then((m) => ({ default: m.ClassifiedPage })))
 const KnowledgePage = lazy(() => import('./pages/knowledge').then((m) => ({ default: m.KnowledgePage })))
 const PerformancePage = lazy(() => import('./pages/performance').then((m) => ({ default: m.PerformancePage })))
+const HubPage = lazy(() => import('./pages/hub').then((m) => ({ default: m.HubPage })))
 
 const queryClient = new QueryClient()
 
@@ -93,6 +94,7 @@ export function App() {
             }
           >
             <Route index element={<Suspense fallback={<PageSkeleton />}><HomePage /></Suspense>} />
+            <Route path="hub" element={<Suspense fallback={<PageSkeleton />}><HubPage /></Suspense>} />
             <Route path="command-center" element={<Suspense fallback={<PageSkeleton />}><CommandCenterPage /></Suspense>} />
             <Route path="chat" element={<Suspense fallback={<PageSkeleton />}><ChatPage /></Suspense>} />
             <Route path="jobs" element={<Suspense fallback={<PageSkeleton />}><JobsPage /></Suspense>} />
