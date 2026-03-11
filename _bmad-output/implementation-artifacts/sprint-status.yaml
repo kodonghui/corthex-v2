@@ -58,7 +58,7 @@ phases:
             title: "구조화 로거 어댑터"
             sp: 2
             priority: P0
-            status: backlog
+            status: done
             blocked_by: []
           - id: "1.4"
             title: "에러 코드 레지스트리"
