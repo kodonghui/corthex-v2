@@ -1,6 +1,6 @@
 # Story 4.5: 3단계 핸드오프 통합 테스트
 
-Status: review
+Status: done
 
 ## Story
 

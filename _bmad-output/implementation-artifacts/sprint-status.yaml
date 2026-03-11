@@ -173,7 +173,7 @@ phases:
         title: "Engine Migration & Regression"
         priority: P0
         sp: 14
-        status: in-progress
+        status: done
         dependencies: ["epic-2", "epic-3"]
         architecture: "D2 (CLI 토큰 만료), D11 (WebSocket 유지), S11 (호출자 6곳), S12 (불가침)"
         stories:
@@ -193,7 +193,7 @@ phases:
             title: "기존 서비스 교체/삭제"
             sp: 2
             priority: P0
-            status: backlog
+            status: done
             blocked_by: ["4.1", "4.2"]
           - id: "4.4"
             title: "Graceful Shutdown 구현"
@@ -205,13 +205,13 @@ phases:
             title: "3단계 핸드오프 통합 테스트"
             sp: 2
             priority: P0
-            status: review
+            status: done
             blocked_by: ["2.6", "3.6"]
           - id: "4.6"
             title: "Epic 1~20 회귀 테스트"
             sp: 2
             priority: P0
-            status: backlog
+            status: done
             blocked_by: ["4.1", "4.2", "4.3"]
 
   - name: "Phase 2: Orchestration"
