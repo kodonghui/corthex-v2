@@ -1,11 +1,12 @@
 import { db } from '../db'
-import { costRecords, agents, departments } from '../db/schema'
-import { sql, and, eq, gte, lte, sum, count, desc, inArray } from 'drizzle-orm'
+import { costRecords, agents, departments, tierConfigs } from '../db/schema'
+import { sql, and, eq, gte, lte, sum, count, desc, inArray, asc } from 'drizzle-orm'
 import { getModelConfig } from '../config/models'
 import type {
   AdminCostByAgent,
   AdminCostByModel,
   AdminCostByDepartment,
+  AdminCostByTier,
   AdminCostSummary,
   AdminCostDaily,
 } from '@corthex/shared'
@@ -203,5 +204,44 @@ export async function getDaily(companyId: string, range: DateRange): Promise<Adm
     inputTokens: r.inputTokens ?? 0,
     outputTokens: r.outputTokens ?? 0,
     callCount: r.callCount ?? 0,
+  }))
+}
+
+/**
+ * Cost per tier level (GROUP BY agents.tierLevel, LEFT JOIN tier_configs for name)
+ */
+export async function getByTier(companyId: string, range: DateRange, departmentIds?: string[]): Promise<AdminCostByTier[]> {
+  const conditions = dateConditions(companyId, range)
+
+  // Employee department scope: only include agents from assigned departments
+  if (departmentIds) {
+    if (departmentIds.length === 0) return []
+    conditions.push(inArray(agents.departmentId, departmentIds))
+  }
+
+  const rows = await db
+    .select({
+      tierLevel: agents.tierLevel,
+      tierName: tierConfigs.name,
+      totalCostMicro: sum(costRecords.costUsdMicro).mapWith(Number),
+      agentCount: sql<number>`COUNT(DISTINCT ${costRecords.agentId})`.mapWith(Number),
+      callCount: count(),
+    })
+    .from(costRecords)
+    .innerJoin(agents, eq(costRecords.agentId, agents.id))
+    .leftJoin(tierConfigs, and(
+      eq(agents.tierLevel, tierConfigs.tierLevel),
+      eq(tierConfigs.companyId, companyId),
+    ))
+    .where(and(...conditions))
+    .groupBy(agents.tierLevel, tierConfigs.name)
+    .orderBy(asc(agents.tierLevel))
+
+  return rows.map(r => ({
+    tierLevel: r.tierLevel,
+    tierName: r.tierName ?? null,
+    totalCostMicro: r.totalCostMicro ?? 0,
+    callCount: r.callCount ?? 0,
+    agentCount: r.agentCount ?? 0,
   }))
 }

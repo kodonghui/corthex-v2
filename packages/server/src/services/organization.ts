@@ -8,6 +8,10 @@ import type { TemplateData } from './seed.service'
 import { MANAGER_SOUL_TEMPLATE, SECRETARY_SOUL_TEMPLATE } from '../lib/soul-templates'
 import { renderSoul } from '../engine/soul-renderer'
 import { getDB } from '../db/scoped-query'
+import { selectModelFromDB } from '../engine/model-selector'
+
+/** Legacy tier string → integer level mapping (backward compat for enum tier field) */
+const TIER_STRING_TO_LEVEL: Record<string, number> = { manager: 1, specialist: 2, worker: 3 }
 
 export interface DepartmentInput {
   name: string
@@ -26,6 +30,7 @@ export interface AgentInput {
   nameEn?: string | null
   role?: string | null
   tier?: 'manager' | 'specialist' | 'worker'
+  tierLevel?: number
   modelName?: string
   allowedTools?: string[]
   soul?: string | null
@@ -38,6 +43,7 @@ export interface AgentUpdateInput {
   nameEn?: string | null
   role?: string | null
   tier?: 'manager' | 'specialist' | 'worker'
+  tierLevel?: number
   modelName?: string
   departmentId?: string | null
   allowedTools?: string[]
@@ -315,6 +321,14 @@ export async function createAgent(tenant: TenantActor, input: AgentInput) {
     }
   }
 
+  // Determine tierLevel: explicit > tier string fallback > default 2
+  const tierLevel = input.tierLevel ?? TIER_STRING_TO_LEVEL[input.tier ?? ''] ?? 2
+
+  // Auto-assign model from tier_configs if modelName not explicitly provided
+  const modelName = input.modelName
+    ? input.modelName
+    : await selectModelFromDB(tierLevel, tenant.companyId)
+
   const [agent] = await db
     .insert(agents)
     .values(scopedInsert(tenant.companyId, {
@@ -324,7 +338,8 @@ export async function createAgent(tenant: TenantActor, input: AgentInput) {
       nameEn: input.nameEn ?? null,
       role: input.role ?? null,
       tier: input.tier ?? 'specialist',
-      modelName: input.modelName ?? 'claude-haiku-4-5',
+      tierLevel,
+      modelName,
       allowedTools: input.allowedTools ?? [],
       soul: soulValue,
       adminSoul: soulValue,
@@ -387,8 +402,17 @@ export async function updateAgent(
     }
   }
 
+  // Auto-assign model when tierLevel changes and modelName not explicitly provided
+  const resolvedModelName = (input.tierLevel !== undefined && !input.modelName)
+    ? await selectModelFromDB(input.tierLevel, tenant.companyId)
+    : input.modelName
+
   // Build update set -- sync adminSoul when soul is updated
-  const updateData: Record<string, unknown> = { ...input, updatedAt: new Date() }
+  const updateData: Record<string, unknown> = {
+    ...input,
+    ...(resolvedModelName !== undefined && { modelName: resolvedModelName }),
+    updatedAt: new Date(),
+  }
   if (input.soul !== undefined) {
     updateData.adminSoul = input.soul
   }

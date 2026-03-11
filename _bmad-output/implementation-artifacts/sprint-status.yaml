@@ -373,7 +373,7 @@ phases:
             title: "모델 자동 배정 + 비용 최적화"
             sp: 3
             priority: P1
-            status: backlog
+            status: done
             blocked_by: ["8.1", "2.4"]
           - id: "8.4"
             title: "maxDepth 회사별 설정"

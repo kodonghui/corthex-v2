@@ -180,6 +180,18 @@ dashboardRoute.get('/dashboard/costs/daily', zValidator('query', costDateRangeSc
   })
 })
 
+// GET /api/workspace/dashboard/costs/by-tier — tier별 비용 집계 (Story 8.3)
+dashboardRoute.get('/dashboard/costs/by-tier', zValidator('query', costDateRangeSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const query = c.req.valid('query')
+  const endDate = query.endDate ? new Date(query.endDate + 'T23:59:59.999Z') : new Date()
+  const startDate = query.startDate
+    ? new Date(query.startDate + 'T00:00:00.000Z')
+    : new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000)
+  const items = await costAggregation.getByTier(tenant.companyId, { startDate, endDate }, tenant.departmentIds)
+  return c.json({ success: true, data: { items } })
+})
+
 // GET /api/workspace/dashboard/agents — 에이전트 상태 overview
 dashboardRoute.get('/dashboard/agents', async (c) => {
   const tenant = c.get('tenant')

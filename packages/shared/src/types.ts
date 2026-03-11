@@ -429,6 +429,14 @@ export type AdminCostSummary = {
   trendPercent: number  // vs previous same-length period
 }
 
+export type AdminCostByTier = {
+  tierLevel: number
+  tierName: string | null
+  totalCostMicro: number
+  callCount: number
+  agentCount: number
+}
+
 export type AdminCostDaily = {
   date: string
   costMicro: number
