@@ -24,6 +24,7 @@ import { securityRoute } from './routes/admin/security'
 import { employeesRoute } from './routes/admin/employees'
 import { workspaceAgentsRoute } from './routes/workspace/agents'
 import { chatRoute } from './routes/workspace/chat'
+import { hubRoute } from './routes/workspace/hub'
 import { profileRoute } from './routes/workspace/profile'
 import { reportsRoute } from './routes/workspace/reports'
 import { jobsRoute } from './routes/workspace/jobs'
@@ -131,6 +132,7 @@ app.route('/api/admin', publicApiKeysRoute)
 // 유저 워크스페이스 라우트 (각 파일 내부에서 authMiddleware 적용, 테넌트 격리)
 app.route('/api/workspace', workspaceAgentsRoute)
 app.route('/api/workspace/chat', chatRoute)
+app.route('/api/workspace/hub', hubRoute)
 app.route('/api/workspace', profileRoute)
 app.route('/api/workspace', reportsRoute)
 app.route('/api/workspace/jobs', jobsRoute)
