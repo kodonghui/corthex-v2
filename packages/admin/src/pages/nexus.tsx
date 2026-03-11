@@ -24,8 +24,10 @@ import { computeElkLayout, type OrgChartData } from '../lib/elk-layout'
 import { CompanyNode } from '../components/nexus/company-node'
 import { DepartmentNode } from '../components/nexus/department-node'
 import { AgentNode } from '../components/nexus/agent-node'
+import { HumanNode } from '../components/nexus/human-node'
 import { UnassignedGroupNode } from '../components/nexus/unassigned-group-node'
 import { NexusToolbar } from '../components/nexus/nexus-toolbar'
+import { exportToPng, exportToSvg, exportToJson, printCanvas } from '../lib/nexus-export'
 import { Skeleton } from '@corthex/ui'
 
 // Register custom node types
@@ -33,6 +35,7 @@ const nodeTypes: NodeTypes = {
   company: CompanyNode,
   department: DepartmentNode,
   agent: AgentNode,
+  human: HumanNode,
   'unassigned-group': UnassignedGroupNode,
 } as unknown as NodeTypes
 
@@ -48,6 +51,7 @@ function miniMapNodeColor(node: { type?: string }) {
     case 'company': return '#e2e8f0'
     case 'department': return '#3b82f6'
     case 'agent': return '#10b981'
+    case 'human': return '#a855f7'
     case 'unassigned-group': return '#f59e0b'
     default: return '#64748b'
   }
@@ -74,9 +78,11 @@ function NexusCanvas() {
   const [isEditMode, setIsEditMode] = useState(false)
   const [isDirty, setIsDirty] = useState(false)
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
+  const [isExporting, setIsExporting] = useState(false)
 
   // Ref to track if we applied saved layout (to avoid ELK overriding it)
   const appliedSavedLayout = useRef(false)
+  const reactFlowRef = useRef<HTMLDivElement>(null)
 
   // Fetch org data
   const { data, isLoading, isError, refetch } = useQuery({
@@ -208,6 +214,50 @@ function NexusCanvas() {
     fitView({ padding: 0.2 })
   }, [fitView])
 
+  // Export handlers
+  const handleExportPng = useCallback(async () => {
+    const el = reactFlowRef.current
+    if (!el || !data?.data) return
+    setIsExporting(true)
+    try {
+      await exportToPng(el, data.data.company.name)
+      addToast({ type: 'success', message: 'PNG 이미지가 다운로드되었습니다' })
+    } catch {
+      addToast({ type: 'error', message: 'PNG 내보내기에 실패했습니다' })
+    } finally {
+      setIsExporting(false)
+    }
+  }, [data, addToast])
+
+  const handleExportSvg = useCallback(async () => {
+    const el = reactFlowRef.current
+    if (!el || !data?.data) return
+    setIsExporting(true)
+    try {
+      await exportToSvg(el, data.data.company.name)
+      addToast({ type: 'success', message: 'SVG 파일이 다운로드되었습니다' })
+    } catch {
+      addToast({ type: 'error', message: 'SVG 내보내기에 실패했습니다' })
+    } finally {
+      setIsExporting(false)
+    }
+  }, [data, addToast])
+
+  const handleExportJson = useCallback(() => {
+    if (!data?.data) return
+    try {
+      exportToJson(data.data, data.data.company.name)
+      addToast({ type: 'success', message: 'JSON 데이터가 다운로드되었습니다' })
+    } catch {
+      addToast({ type: 'error', message: 'JSON 내보내기에 실패했습니다' })
+    }
+  }, [data, addToast])
+
+  const handlePrint = useCallback(() => {
+    fitView({ padding: 0.1 })
+    setTimeout(() => printCanvas(), 200)
+  }, [fitView])
+
   // Keyboard shortcut: Ctrl+S to save
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -254,6 +304,7 @@ function NexusCanvas() {
 
   const org = data.data
   const totalAgents = org.departments.reduce((s, d) => s + d.agents.length, 0) + org.unassignedAgents.length
+  const totalEmployees = org.departments.reduce((s, d) => s + (d.employees?.length ?? 0), 0) + (org.unassignedEmployees?.length ?? 0)
   const isEmpty = org.departments.length === 0 && org.unassignedAgents.length === 0
 
   return (
@@ -261,7 +312,7 @@ function NexusCanvas() {
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold tracking-tight text-slate-50">NEXUS 조직도</h1>
         <span className="text-xs text-slate-500">
-          {org.departments.length}개 부서 · {totalAgents}명 에이전트
+          {org.departments.length}개 부서 · {totalAgents}명 에이전트{totalEmployees > 0 && ` · ${totalEmployees}명 직원`}
           {isDirty && <span className="ml-2 text-amber-400">· 변경사항 있음</span>}
         </span>
       </div>
@@ -274,15 +325,20 @@ function NexusCanvas() {
           </div>
         </div>
       ) : (
-        <div className="relative bg-slate-900 border border-slate-700 rounded-xl overflow-hidden" style={{ height: 'calc(100vh - 140px)' }}>
+        <div ref={reactFlowRef} className="relative bg-slate-900 border border-slate-700 rounded-xl overflow-hidden" style={{ height: 'calc(100vh - 140px)' }}>
           <NexusToolbar
             isEditMode={isEditMode}
             isDirty={isDirty}
             isSaving={saveMutation.isPending}
+            isExporting={isExporting}
             onToggleEditMode={handleToggleEditMode}
             onAutoLayout={handleAutoLayout}
             onSaveLayout={handleSaveLayout}
             onFitView={handleFitView}
+            onExportPng={handleExportPng}
+            onExportSvg={handleExportSvg}
+            onExportJson={handleExportJson}
+            onPrint={handlePrint}
           />
           {layoutReady && (
             <ReactFlow

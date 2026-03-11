@@ -7,6 +7,7 @@ export type OrgAgent = {
   name: string
   role: string | null
   tier: 'manager' | 'specialist' | 'worker'
+  tierLevel: number | null
   modelName: string
   departmentId: string | null
   status: string
@@ -14,6 +15,17 @@ export type OrgAgent = {
   isSystem: boolean
   soul: string | null
   allowedTools: string[] | null
+  reportTo: string | null
+  ownerUserId: string | null
+}
+
+export type OrgEmployee = {
+  id: string
+  name: string
+  username: string
+  role: string
+  hasCliToken: boolean
+  agentCount: number
 }
 
 export type OrgDept = {
@@ -21,12 +33,14 @@ export type OrgDept = {
   name: string
   description: string | null
   agents: OrgAgent[]
+  employees: OrgEmployee[]
 }
 
 export type OrgChartData = {
   company: { id: string; name: string; slug: string }
   departments: OrgDept[]
   unassignedAgents: OrgAgent[]
+  unassignedEmployees: OrgEmployee[]
 }
 
 // Node dimensions
@@ -34,7 +48,16 @@ const NODE_SIZES = {
   company: { width: 280, height: 70 },
   department: { width: 240, height: 60 },
   agent: { width: 200, height: 80 },
+  human: { width: 200, height: 70 },
   'unassigned-group': { width: 240, height: 60 },
+} as const
+
+// Edge styles by type
+export const EDGE_STYLES = {
+  membership: { stroke: '#10b981', strokeWidth: 1.5 },
+  employment: { stroke: '#a855f7', strokeWidth: 1.5 },
+  delegation: { stroke: '#f59e0b', strokeWidth: 1.5, strokeDasharray: '5 5' },
+  ownership: { stroke: '#a855f7', strokeWidth: 1, strokeDasharray: '8 4 2 4' },
 } as const
 
 const elk = new ELK()
@@ -43,9 +66,21 @@ export async function computeElkLayout(orgData: OrgChartData): Promise<{ nodes: 
   const nodes: Node[] = []
   const edges: Edge[] = []
 
+  // Collect all agents for cross-references (reportTo, ownerUserId)
+  const allAgents = orgData.departments.flatMap((d) => d.agents).concat(orgData.unassignedAgents)
+
+  // Count subordinates per agent (reportTo)
+  const subordinateCount = new Map<string, number>()
+  for (const a of allAgents) {
+    if (a.reportTo) {
+      subordinateCount.set(a.reportTo, (subordinateCount.get(a.reportTo) ?? 0) + 1)
+    }
+  }
+
   // Company root node
   const companyNodeId = `company-${orgData.company.id}`
-  const totalAgents = orgData.departments.reduce((s, d) => s + d.agents.length, 0) + orgData.unassignedAgents.length
+  const totalAgents = allAgents.length
+  const allEmployees = orgData.departments.flatMap((d) => d.employees ?? []).concat(orgData.unassignedEmployees ?? [])
   nodes.push({
     id: companyNodeId,
     type: 'company',
@@ -53,14 +88,25 @@ export async function computeElkLayout(orgData: OrgChartData): Promise<{ nodes: 
     data: { name: orgData.company.name, deptCount: orgData.departments.length, agentCount: totalAgents },
   })
 
-  // Department nodes + agent nodes
+  // Department nodes + agent nodes + employee nodes
   for (const dept of orgData.departments) {
     const deptNodeId = `dept-${dept.id}`
+
+    // Find manager name for this department
+    const manager = dept.agents.find((a) => a.tier === 'manager')
+    const employeeCount = (dept.employees ?? []).length
+
     nodes.push({
       id: deptNodeId,
       type: 'department',
       position: { x: 0, y: 0 },
-      data: { name: dept.name, description: dept.description, agentCount: dept.agents.length },
+      data: {
+        name: dept.name,
+        description: dept.description,
+        agentCount: dept.agents.length,
+        employeeCount,
+        managerName: manager?.name ?? null,
+      },
     })
     edges.push({
       id: `edge-${companyNodeId}-${deptNodeId}`,
@@ -69,19 +115,56 @@ export async function computeElkLayout(orgData: OrgChartData): Promise<{ nodes: 
       style: { stroke: '#3b82f6', strokeWidth: 2 },
     })
 
+    // Agent nodes within department
     for (const agent of dept.agents) {
       const agentNodeId = `agent-${agent.id}`
       nodes.push({
         id: agentNodeId,
         type: 'agent',
         position: { x: 0, y: 0 },
-        data: { name: agent.name, tier: agent.tier, status: agent.status, isSecretary: agent.isSecretary, isSystem: agent.isSystem },
+        data: {
+          name: agent.name,
+          tier: agent.tier,
+          tierLevel: agent.tierLevel,
+          status: agent.status,
+          isSecretary: agent.isSecretary,
+          isSystem: agent.isSystem,
+          subordinateCount: subordinateCount.get(agent.id) ?? 0,
+        },
       })
       edges.push({
         id: `edge-${deptNodeId}-${agentNodeId}`,
         source: deptNodeId,
         target: agentNodeId,
-        style: { stroke: '#10b981', strokeWidth: 1.5 },
+        type: 'membership',
+        style: { ...EDGE_STYLES.membership },
+      })
+    }
+
+    // Employee nodes within department
+    for (const emp of dept.employees ?? []) {
+      const humanNodeId = `human-${emp.id}`
+      // Only add if not already added (employee may be in multiple departments)
+      if (!nodes.some((n) => n.id === humanNodeId)) {
+        nodes.push({
+          id: humanNodeId,
+          type: 'human',
+          position: { x: 0, y: 0 },
+          data: {
+            name: emp.name,
+            username: emp.username,
+            role: emp.role,
+            hasCliToken: emp.hasCliToken,
+            agentCount: emp.agentCount,
+          },
+        })
+      }
+      edges.push({
+        id: `edge-${deptNodeId}-${humanNodeId}`,
+        source: deptNodeId,
+        target: humanNodeId,
+        type: 'employment',
+        style: { ...EDGE_STYLES.employment },
       })
     }
   }
@@ -108,14 +191,84 @@ export async function computeElkLayout(orgData: OrgChartData): Promise<{ nodes: 
         id: agentNodeId,
         type: 'agent',
         position: { x: 0, y: 0 },
-        data: { name: agent.name, tier: agent.tier, status: agent.status, isSecretary: agent.isSecretary, isSystem: agent.isSystem },
+        data: {
+          name: agent.name,
+          tier: agent.tier,
+          tierLevel: agent.tierLevel,
+          status: agent.status,
+          isSecretary: agent.isSecretary,
+          isSystem: agent.isSystem,
+          subordinateCount: subordinateCount.get(agent.id) ?? 0,
+        },
       })
       edges.push({
         id: `edge-${unassignedGroupId}-${agentNodeId}`,
         source: unassignedGroupId,
         target: agentNodeId,
-        style: { stroke: '#f59e0b', strokeWidth: 1.5 },
+        style: { ...EDGE_STYLES.membership },
       })
+    }
+  }
+
+  // Unassigned employees
+  for (const emp of orgData.unassignedEmployees ?? []) {
+    const humanNodeId = `human-${emp.id}`
+    if (!nodes.some((n) => n.id === humanNodeId)) {
+      nodes.push({
+        id: humanNodeId,
+        type: 'human',
+        position: { x: 0, y: 0 },
+        data: {
+          name: emp.name,
+          username: emp.username,
+          role: emp.role,
+          hasCliToken: emp.hasCliToken,
+          agentCount: emp.agentCount,
+        },
+      })
+      // Connect unassigned employees directly to company
+      edges.push({
+        id: `edge-${companyNodeId}-${humanNodeId}`,
+        source: companyNodeId,
+        target: humanNodeId,
+        style: { ...EDGE_STYLES.employment },
+      })
+    }
+  }
+
+  // Delegation edges (manager→subordinate via reportTo)
+  for (const agent of allAgents) {
+    if (agent.reportTo) {
+      const sourceId = `agent-${agent.reportTo}`
+      const targetId = `agent-${agent.id}`
+      // Only add if both nodes exist
+      if (nodes.some((n) => n.id === sourceId) && nodes.some((n) => n.id === targetId)) {
+        edges.push({
+          id: `delegate-${agent.reportTo}-${agent.id}`,
+          source: sourceId,
+          target: targetId,
+          type: 'delegation',
+          style: { ...EDGE_STYLES.delegation },
+          markerEnd: { type: 'arrowclosed' as const, color: '#f59e0b' },
+        })
+      }
+    }
+  }
+
+  // Ownership edges (human→agent via ownerUserId)
+  for (const agent of allAgents) {
+    if (agent.ownerUserId) {
+      const sourceId = `human-${agent.ownerUserId}`
+      const targetId = `agent-${agent.id}`
+      if (nodes.some((n) => n.id === sourceId) && nodes.some((n) => n.id === targetId)) {
+        edges.push({
+          id: `owner-${agent.ownerUserId}-${agent.id}`,
+          source: sourceId,
+          target: targetId,
+          type: 'ownership',
+          style: { ...EDGE_STYLES.ownership },
+        })
+      }
     }
   }
 

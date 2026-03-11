@@ -17,42 +17,83 @@ const TIER_BADGE: Record<string, { bg: string; label: string }> = {
 type AgentNodeData = {
   name: string
   tier: string
+  tierLevel: number | null
   status: string
   isSecretary: boolean
   isSystem: boolean
+  subordinateCount: number
 }
 
 export const AgentNode = memo(function AgentNode({ data, selected }: { data: AgentNodeData; selected?: boolean }) {
   const status = STATUS_DOT[data.status] || STATUS_DOT.offline
   const tier = TIER_BADGE[data.tier] || TIER_BADGE.worker
   const isSecretary = data.isSecretary
+  const tierLevelStr = data.tierLevel != null ? ` T${data.tierLevel}` : ''
 
   const bgColor = isSecretary ? 'bg-amber-950' : 'bg-emerald-950'
   const borderColor = selected
     ? 'border-blue-400 ring-2 ring-blue-400/50'
     : isSecretary ? 'border-amber-500' : 'border-emerald-600'
 
+  // Secretary uses octagonal clip-path for visual distinction
+  const secretaryClipStyle = isSecretary
+    ? { clipPath: 'polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)' }
+    : undefined
+
+  // Secretary needs a wrapper for the octagon shape with border effect
+  if (isSecretary) {
+    return (
+      <div className="relative" data-testid="nexus-agent-node" data-secretary="true">
+        <Handle type="target" position={Position.Top} className="!bg-amber-400 !w-2 !h-2" />
+        {/* Octagon outer border */}
+        <div
+          className={`${selected ? 'bg-blue-400' : 'bg-amber-500'} min-w-[220px]`}
+          style={{ clipPath: 'polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)', padding: '2px' }}
+        >
+          {/* Octagon inner content */}
+          <div
+            className={`px-5 py-4 ${bgColor} min-w-[216px]`}
+            style={secretaryClipStyle}
+          >
+            <div className="flex items-center gap-2">
+              <span className={`w-2 h-2 rounded-full flex-shrink-0 ${status.color} ${status.pulse ? 'animate-pulse' : ''}`} />
+              <span className="text-sm font-medium truncate text-amber-100">{data.name}</span>
+            </div>
+            <div className="flex items-center gap-1.5 mt-1.5">
+              <span className={`text-[10px] px-1.5 py-0.5 rounded ${tier.bg}`}>{tier.label}{tierLevelStr}</span>
+              <span className="text-[10px] text-amber-400">{status.label}</span>
+              <div className="flex gap-1 ml-auto">
+                <span className="text-[10px] px-1 py-0.5 rounded bg-amber-800 text-amber-200">비서</span>
+                {data.subordinateCount > 0 && (
+                  <span className="text-[10px] px-1 py-0.5 rounded bg-slate-700 text-slate-300">↓{data.subordinateCount}</span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div
       className={`px-4 py-3 rounded-xl ${bgColor} border-2 ${borderColor} shadow-md min-w-[200px]`}
       data-testid="nexus-agent-node"
     >
-      <Handle type="target" position={Position.Top} className={isSecretary ? '!bg-amber-400 !w-2 !h-2' : '!bg-emerald-400 !w-2 !h-2'} />
+      <Handle type="target" position={Position.Top} className="!bg-emerald-400 !w-2 !h-2" />
       <div className="flex items-center gap-2">
         <span className={`w-2 h-2 rounded-full flex-shrink-0 ${status.color} ${status.pulse ? 'animate-pulse' : ''}`} />
-        <span className={`text-sm font-medium truncate ${isSecretary ? 'text-amber-100' : 'text-emerald-100'}`}>
-          {data.name}
-        </span>
+        <span className="text-sm font-medium truncate text-emerald-100">{data.name}</span>
       </div>
       <div className="flex items-center gap-1.5 mt-1.5">
-        <span className={`text-[10px] px-1.5 py-0.5 rounded ${tier.bg}`}>{tier.label}</span>
-        <span className={`text-[10px] ${isSecretary ? 'text-amber-400' : 'text-emerald-400'}`}>{status.label}</span>
+        <span className={`text-[10px] px-1.5 py-0.5 rounded ${tier.bg}`}>{tier.label}{tierLevelStr}</span>
+        <span className="text-[10px] text-emerald-400">{status.label}</span>
         <div className="flex gap-1 ml-auto">
-          {isSecretary && (
-            <span className="text-[10px] px-1 py-0.5 rounded bg-amber-800 text-amber-200">비서</span>
-          )}
           {data.isSystem && (
             <span className="text-[10px] px-1 py-0.5 rounded bg-slate-700 text-slate-300">시스템</span>
+          )}
+          {data.subordinateCount > 0 && (
+            <span className="text-[10px] px-1 py-0.5 rounded bg-slate-700 text-slate-300">↓{data.subordinateCount}</span>
           )}
         </div>
       </div>

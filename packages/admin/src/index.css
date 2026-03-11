@@ -13,3 +13,23 @@
   from { transform: translateX(100%); }
   to { transform: translateX(0); }
 }
+
+/* NEXUS print styles */
+@media print {
+  body > *:not(#root) { display: none !important; }
+  aside, nav, header, [data-testid="sidebar"] { display: none !important; }
+  .react-flow__controls { display: none !important; }
+  .react-flow__minimap { display: none !important; }
+  [data-testid="nexus-toolbar"] { display: none !important; }
+  .react-flow__background { display: none !important; }
+  .react-flow { background: white !important; }
+  [data-testid="nexus-page"] {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  [data-testid="nexus-page"] > :not([class*="bg-slate-900"]) { display: none !important; }
+}

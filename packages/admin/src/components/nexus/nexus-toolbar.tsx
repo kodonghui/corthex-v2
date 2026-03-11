@@ -1,24 +1,58 @@
-import { memo } from 'react'
+import { memo, useState, useRef, useEffect } from 'react'
 
 type NexusToolbarProps = {
   isEditMode: boolean
   isDirty: boolean
   isSaving: boolean
+  isExporting: boolean
   onToggleEditMode: () => void
   onAutoLayout: () => void
   onSaveLayout: () => void
   onFitView: () => void
+  onExportPng: () => void
+  onExportSvg: () => void
+  onExportJson: () => void
+  onPrint: () => void
 }
 
 export const NexusToolbar = memo(function NexusToolbar({
   isEditMode,
   isDirty,
   isSaving,
+  isExporting,
   onToggleEditMode,
   onAutoLayout,
   onSaveLayout,
   onFitView,
+  onExportPng,
+  onExportSvg,
+  onExportJson,
+  onPrint,
 }: NexusToolbarProps) {
+  const [exportOpen, setExportOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  // Close dropdown on outside click or Escape key
+  useEffect(() => {
+    if (!exportOpen) return
+    function handleClick(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as HTMLElement)) {
+        setExportOpen(false)
+      }
+    }
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') setExportOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('mousedown', handleClick)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [exportOpen])
+
+  const menuItemClass = 'w-full text-left px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-700 transition-colors'
+
   return (
     <div
       className="absolute top-4 left-1/2 -translate-x-1/2 z-10 bg-slate-800/90 backdrop-blur border border-slate-700 rounded-lg px-3 py-2 flex gap-2 shadow-lg"
@@ -70,6 +104,46 @@ export const NexusToolbar = memo(function NexusToolbar({
       >
         전체 보기
       </button>
+
+      <div className="w-px bg-slate-600" />
+
+      {/* Export dropdown */}
+      <div className="relative" ref={dropdownRef}>
+        <button
+          onClick={() => setExportOpen((v) => !v)}
+          disabled={isExporting}
+          className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+            isExporting
+              ? 'bg-slate-700/50 text-slate-500 cursor-not-allowed'
+              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+          }`}
+          title="내보내기"
+          data-testid="nexus-export-btn"
+        >
+          {isExporting ? '내보내는 중...' : '내보내기'}
+        </button>
+
+        {exportOpen && (
+          <div
+            className="absolute top-full right-0 mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl overflow-hidden min-w-[140px]"
+            data-testid="nexus-export-menu"
+          >
+            <button className={menuItemClass} onClick={() => { setExportOpen(false); onExportPng() }}>
+              PNG 이미지
+            </button>
+            <button className={menuItemClass} onClick={() => { setExportOpen(false); onExportSvg() }}>
+              SVG 벡터
+            </button>
+            <button className={menuItemClass} onClick={() => { setExportOpen(false); onExportJson() }}>
+              JSON 데이터
+            </button>
+            <div className="border-t border-slate-700" />
+            <button className={menuItemClass} onClick={() => { setExportOpen(false); onPrint() }}>
+              인쇄
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   )
 })
