@@ -221,7 +221,7 @@ phases:
         title: "Secretary System & Soul Orchestration"
         priority: P0
         sp: 16
-        status: backlog
+        status: in-progress
         dependencies: ["epic-2", "epic-4"]
         architecture: "FR11~20 (Secretary & Orchestration), E4 (Soul 변수)"
         stories:
@@ -229,7 +229,7 @@ phases:
             title: "비서 에이전트 DB 필드 및 설정"
             sp: 2
             priority: P0
-            status: backlog
+            status: done
             blocked_by: []
           - id: "5.2"
             title: "비서 Soul 템플릿 작성"
@@ -241,13 +241,13 @@ phases:
             title: "슬래시 명령어 파서"
             sp: 3
             priority: P0
-            status: backlog
+            status: done
             blocked_by: ["4.1"]
           - id: "5.4"
             title: "매니저 Soul 표준 템플릿"
             sp: 2
             priority: P0
-            status: backlog
+            status: done
             blocked_by: ["2.3"]
           - id: "5.5"
             title: "기존 오케스트레이터 삭제"
@@ -259,7 +259,7 @@ phases:
             title: "@멘션 + 프리셋 시스템"
             sp: 2
             priority: P1
-            status: backlog
+            status: done
             blocked_by: ["4.1"]
           - id: "5.7"
             title: "자율 딥워크 + 품질 게이트"

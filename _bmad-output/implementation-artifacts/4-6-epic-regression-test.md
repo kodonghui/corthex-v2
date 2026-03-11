@@ -1,6 +1,6 @@
 # Story 4.6: Epic 1~20 회귀 테스트
 
-Status: review
+Status: done
 
 ## Story
 
@@ -107,7 +107,7 @@ data: {"costUsd":0.05,"tokensUsed":1500}
 
 ### WebSocket 이벤트 채널 (D11)
 
-기존 EventBus 7채널: agent-update, delegation-update, cost-update, error-alert, system-status, session-start, session-end
+기존 EventBus 10채널: activity, agent-status, notification, night-job, command, delegation, tool, cost, argos, debate
 이 형식이 엔진 교체 후에도 유지되어야 함.
 
 ### Story 4.2 호출자 전환 확인 대상
@@ -179,4 +179,4 @@ Claude Opus 4.6
 
 ### File List
 
-- `packages/server/src/__tests__/integration/sse-format-regression.test.ts` — NEW (19 regression tests)
+- `packages/server/src/__tests__/integration/sse-format-regression.test.ts` — NEW (30 regression tests: 19 dev + 11 TEA)
