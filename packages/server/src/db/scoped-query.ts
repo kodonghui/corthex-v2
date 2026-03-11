@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm'
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm'
 import { db } from './index'
-import { agents, departments, knowledgeDocs } from './schema'
+import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users } from './schema'
 import { withTenant, scopedWhere, scopedInsert } from './tenant-helpers'
 
 type Agent = InferSelectModel<typeof agents>
@@ -24,6 +24,21 @@ export function getDB(companyId: string) {
       db.select().from(departments).where(withTenant(departments.companyId, companyId)),
     knowledgeDocs: () =>
       db.select().from(knowledgeDocs).where(withTenant(knowledgeDocs.companyId, companyId)),
+
+    // READ — soul-renderer용 단건/관계 조회 (Story 2.3, E4)
+    agentById: (id: string) =>
+      db.select().from(agents).where(scopedWhere(agents.companyId, companyId, eq(agents.id, id))),
+    agentsByReportTo: (agentId: string) =>
+      db.select().from(agents).where(scopedWhere(agents.companyId, companyId, eq(agents.reportTo, agentId))),
+    agentToolsWithDefs: (agentId: string) =>
+      db.select({ name: toolDefinitions.name, description: toolDefinitions.description })
+        .from(agentTools)
+        .innerJoin(toolDefinitions, eq(agentTools.toolId, toolDefinitions.id))
+        .where(scopedWhere(agentTools.companyId, companyId, eq(agentTools.agentId, agentId), eq(agentTools.isEnabled, true), eq(toolDefinitions.isActive, true))),
+    departmentById: (id: string) =>
+      db.select().from(departments).where(scopedWhere(departments.companyId, companyId, eq(departments.id, id))),
+    userById: (id: string) =>
+      db.select().from(users).where(scopedWhere(users.companyId, companyId, eq(users.id, id))),
 
     // WRITE — companyId 자동 주입, 결과 반환
     insertAgent: (data: Omit<NewAgent, 'companyId'>) =>

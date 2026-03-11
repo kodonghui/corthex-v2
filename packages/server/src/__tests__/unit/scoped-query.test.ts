@@ -69,14 +69,22 @@ describe('TEA P1: .returning() on mutations', () => {
 })
 
 describe('TEA P1: getDB 메서드 카운트', () => {
-  test('READ 3개 + WRITE 3개 = 6개 메서드', async () => {
+  test('READ 8개 + WRITE 3개 = 11개 메서드', async () => {
     const { getDB } = await import('../../db/scoped-query')
     const scopedDb = getDB('test-company-id')
     const keys = Object.keys(scopedDb)
-    expect(keys.length).toBe(6)
+    expect(keys.length).toBe(11)
+    // Original READ (3)
     expect(keys).toContain('agents')
     expect(keys).toContain('departments')
     expect(keys).toContain('knowledgeDocs')
+    // soul-renderer READ (5, Story 2.3)
+    expect(keys).toContain('agentById')
+    expect(keys).toContain('agentsByReportTo')
+    expect(keys).toContain('agentToolsWithDefs')
+    expect(keys).toContain('departmentById')
+    expect(keys).toContain('userById')
+    // WRITE (3)
     expect(keys).toContain('insertAgent')
     expect(keys).toContain('updateAgent')
     expect(keys).toContain('deleteAgent')

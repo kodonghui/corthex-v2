@@ -103,7 +103,7 @@ phases:
             title: "soul-renderer.ts — Soul 템플릿 변수 치환"
             sp: 3
             priority: P0
-            status: backlog
+            status: done
             blocked_by: ["1.2"]
           - id: "2.4"
             title: "model-selector.ts — 티어→모델 매핑"
