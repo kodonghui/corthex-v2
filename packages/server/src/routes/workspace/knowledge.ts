@@ -11,6 +11,7 @@ import { clearKnowledgeCache, getInjectionPreview } from '../../services/knowled
 import { consolidateMemories } from '../../services/memory-extractor'
 import { triggerEmbedding } from '../../services/embedding-service'
 import { semanticSearch } from '../../services/semantic-search'
+import { getDB } from '../../db/scoped-query'
 import type { AppEnv } from '../../types'
 import { join } from 'path'
 import { existsSync, mkdirSync } from 'fs'
@@ -384,12 +385,18 @@ knowledgeRoute.get('/docs', async (c) => {
     .from(knowledgeDocs)
     .where(whereClause)
 
-  const docs = await db.select()
+  const rawDocs = await db.select()
     .from(knowledgeDocs)
     .where(whereClause)
     .orderBy(desc(knowledgeDocs.updatedAt))
     .limit(limit)
     .offset(offset)
+
+  const docs = rawDocs.map(doc => ({
+    ...doc,
+    embedding: undefined,
+    embeddingStatus: (doc.embeddedAt ? 'done' : 'none') as 'done' | 'none',
+  }))
 
   const total = totalResult.count
   return c.json({
@@ -414,7 +421,38 @@ knowledgeRoute.get('/docs/:id', async (c) => {
 
   if (!doc) throw new HTTPError(404, '문서를 찾을 수 없습니다')
 
-  return c.json({ data: doc })
+  return c.json({ data: { ...doc, embedding: undefined, embeddingStatus: (doc.embeddedAt ? 'done' : 'none') as 'done' | 'none' } })
+})
+
+// GET /docs/:id/similar — 유사 문서 추천 (임베딩 기반 Top-3)
+knowledgeRoute.get('/docs/:id/similar', async (c) => {
+  const tenant = c.get('tenant')
+  const docId = c.req.param('id')
+
+  const [doc] = await db.select({ embedding: knowledgeDocs.embedding })
+    .from(knowledgeDocs)
+    .where(and(
+      eq(knowledgeDocs.id, docId),
+      eq(knowledgeDocs.companyId, tenant.companyId),
+      eq(knowledgeDocs.isActive, true),
+    ))
+    .limit(1)
+
+  if (!doc?.embedding) {
+    return c.json({ data: [] })
+  }
+
+  const results = await getDB(tenant.companyId).searchSimilarDocs(doc.embedding, 4, 0.8)
+  const similar = results
+    .filter(r => r.id !== docId)
+    .slice(0, 3)
+    .map(r => ({
+      id: r.id,
+      title: r.title,
+      score: Math.max(0, 1 - Number(r.distance)),
+    }))
+
+  return c.json({ data: similar })
 })
 
 // PATCH /docs/:id — 문서 수정 (+ 버전 스냅샷 자동 생성)

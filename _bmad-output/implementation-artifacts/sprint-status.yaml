@@ -386,7 +386,7 @@ phases:
         title: "NEXUS Visual Organization Editor"
         priority: P1
         sp: 16
-        status: backlog
+        status: in-progress
         dependencies: ["epic-7", "epic-8"]
         architecture: "React Flow + ELK.js, FR30~37"
         stories:
@@ -394,7 +394,7 @@ phases:
             title: "NEXUS React Flow 캔버스 기반"
             sp: 3
             priority: P0
-            status: backlog
+            status: review
             blocked_by: []
           - id: "9.2"
             title: "NEXUS 노드 시각화"
@@ -428,7 +428,7 @@ phases:
         title: "Semantic Search & Knowledge Enhancement"
         priority: P1
         sp: 14
-        status: in-progress
+        status: done
         dependencies: ["epic-2", "epic-7"]
         architecture: "pgvector, Gemini Embedding, FR47~53"
         stories:
@@ -460,7 +460,7 @@ phases:
             title: "지식 관리 UI 개선"
             sp: 3
             priority: P1
-            status: backlog
+            status: done
             blocked_by: ["10.3"]
 
       - id: epic-11
@@ -493,7 +493,7 @@ phases:
             title: "저장/불러오기 + 지식 연동"
             sp: 3
             priority: P1
-            status: backlog
+            status: review
             blocked_by: ["11.2", "10.3"]
 
   - name: "Supporting"

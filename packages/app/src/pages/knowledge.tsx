@@ -20,6 +20,8 @@ type KnowledgeFolder = {
   documentCount: number
 }
 
+type EmbeddingStatus = 'done' | 'pending' | 'none'
+
 type KnowledgeDoc = {
   id: string
   title: string
@@ -33,6 +35,9 @@ type KnowledgeDoc = {
   updatedBy: string | null
   createdAt: string
   updatedAt: string
+  embeddingStatus?: EmbeddingStatus
+  embeddedAt?: string | null
+  embeddingModel?: string | null
 }
 
 type DocVersion = {
@@ -223,9 +228,11 @@ function DocsTab({ showFolderTree, queryClient }: { showFolderTree: boolean; que
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
   const [dragOver, setDragOver] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [searchMode, setSearchMode] = useState<'keyword' | 'semantic' | 'hybrid'>('hybrid')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const debouncedSearch = useDebounce(searchInput, 300)
+  const isSearchActive = debouncedSearch.trim().length > 0
 
   const buildParams = useCallback(() => {
     const params = new URLSearchParams({ page: String(page), limit: String(PAGE_SIZE) })
@@ -236,9 +243,22 @@ function DocsTab({ showFolderTree, queryClient }: { showFolderTree: boolean; que
     return params.toString()
   }, [page, debouncedSearch, selectedFolderId, selectedTag, contentTypeFilter])
 
+  // Semantic/hybrid search query (uses /search endpoint)
+  const searchQuery = useQuery({
+    queryKey: ['knowledge-search', debouncedSearch, searchMode, selectedFolderId],
+    queryFn: () => {
+      const params = new URLSearchParams({ q: debouncedSearch, mode: searchMode, topK: '10' })
+      if (selectedFolderId) params.set('folderId', selectedFolderId)
+      return api.get<{ data: { docs: Array<KnowledgeDoc & { score: number | null; highlight: string }>; folders: unknown[]; searchMode: string } }>(`/workspace/knowledge/search?${params}`)
+    },
+    enabled: isSearchActive,
+  })
+
+  // Regular docs listing (when not searching)
   const docsQuery = useQuery({
     queryKey: ['knowledge-docs', page, debouncedSearch, selectedFolderId, selectedTag, contentTypeFilter],
-    queryFn: () => api.get<{ data: { items: KnowledgeDoc[]; page: number; limit: number; total: number } }>(`/workspace/knowledge/docs?${buildParams()}`),
+    queryFn: () => api.get<{ data: KnowledgeDoc[]; pagination: { page: number; limit: number; total: number; totalPages: number } }>(`/workspace/knowledge/docs?${buildParams()}`),
+    enabled: !isSearchActive,
   })
 
   const foldersQuery = useQuery({
@@ -251,10 +271,14 @@ function DocsTab({ showFolderTree, queryClient }: { showFolderTree: boolean; que
     queryFn: () => api.get<{ data: TagInfo[] }>('/workspace/knowledge/tags'),
   })
 
-  const items = docsQuery.data?.data?.items ?? []
-  const total = docsQuery.data?.data?.total ?? 0
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
+  // Derive items from search or listing
+  const searchDocs = searchQuery.data?.data?.docs ?? []
+  const listDocs = (Array.isArray(docsQuery.data?.data) ? docsQuery.data.data : []) as KnowledgeDoc[]
+  const items = isSearchActive ? searchDocs : listDocs
+  const total = isSearchActive ? searchDocs.length : (docsQuery.data?.pagination?.total ?? 0)
+  const totalPages = isSearchActive ? 1 : Math.max(1, Math.ceil(total / PAGE_SIZE))
   const folders = foldersQuery.data?.data ?? []
+  const resultSearchMode = isSearchActive ? (searchQuery.data?.data?.searchMode ?? null) : null
 
   // Upload handler
   const handleUploadFiles = useCallback(async (files: FileList | File[]) => {
@@ -328,6 +352,10 @@ function DocsTab({ showFolderTree, queryClient }: { showFolderTree: boolean; que
             onDelete={(id) => setDeleteConfirmId(id)}
             onShowVersions={(id) => setShowVersions(id)}
             queryClient={queryClient}
+            onNavigateDoc={(docId) => {
+              api.get<{ data: KnowledgeDoc }>(`/workspace/knowledge/docs/${docId}`)
+                .then(res => { if (res.data) setDetailDoc(res.data) })
+            }}
           />
         ) : (
           <>
@@ -344,6 +372,22 @@ function DocsTab({ showFolderTree, queryClient }: { showFolderTree: boolean; que
                   className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 outline-none transition-colors"
                   data-testid="doc-search"
                 />
+              </div>
+              {/* Search mode toggle */}
+              <div className="flex rounded-lg overflow-hidden border border-slate-600" data-testid="search-mode-toggle">
+                {(['hybrid', 'semantic', 'keyword'] as const).map(mode => (
+                  <button
+                    key={mode}
+                    onClick={() => { setSearchMode(mode); setPage(1) }}
+                    className={`px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                      searchMode === mode
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-slate-700 text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    {mode === 'hybrid' ? '혼합' : mode === 'semantic' ? '의미' : '키워드'}
+                  </button>
+                ))}
               </div>
               <select
                 value={contentTypeFilter}
@@ -385,6 +429,14 @@ function DocsTab({ showFolderTree, queryClient }: { showFolderTree: boolean; que
               />
             </div>
 
+            {/* Search result mode label */}
+            {isSearchActive && resultSearchMode && (
+              <div className="px-6 py-1.5 text-xs text-slate-400 border-b border-slate-700/30">
+                {resultSearchMode === 'semantic' ? '의미 검색 결과' : resultSearchMode === 'hybrid' ? '혼합 검색 결과' : '키워드 검색 결과'}
+                {' '}({total}건)
+              </div>
+            )}
+
             {/* Document list with drop zone */}
             <div
               className={`flex-1 overflow-auto p-6 relative transition-colors ${
@@ -403,7 +455,7 @@ function DocsTab({ showFolderTree, queryClient }: { showFolderTree: boolean; que
                 </div>
               )}
 
-              {docsQuery.isLoading ? (
+              {(isSearchActive ? searchQuery.isLoading : docsQuery.isLoading) ? (
                 <SkeletonTable rows={8} />
               ) : items.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="docs-empty">
@@ -425,8 +477,10 @@ function DocsTab({ showFolderTree, queryClient }: { showFolderTree: boolean; que
                     <thead>
                       <tr className="border-b border-slate-700">
                         <th className="text-left py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">제목</th>
+                        {isSearchActive && <th className="text-center py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-16">유사도</th>}
                         <th className="text-left py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-24">유형</th>
                         <th className="text-left py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">태그</th>
+                        <th className="text-center py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-20">임베딩</th>
                         <th className="text-right py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-32">수정일</th>
                       </tr>
                     </thead>
@@ -443,7 +497,12 @@ function DocsTab({ showFolderTree, queryClient }: { showFolderTree: boolean; que
                               <svg className="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                               </svg>
-                              <span className="text-sm font-medium text-slate-100 truncate">{doc.title}</span>
+                              <div className="min-w-0">
+                                <span className="text-sm font-medium text-slate-100 truncate block">{doc.title}</span>
+                                {isSearchActive && 'highlight' in doc && typeof (doc as Record<string, unknown>).highlight === 'string' && (
+                                  <span className="text-xs text-slate-400 truncate block mt-0.5">{(doc as Record<string, string>).highlight}</span>
+                                )}
+                              </div>
                               {doc.fileUrl && (
                                 <svg className="w-3 h-3 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
@@ -451,6 +510,15 @@ function DocsTab({ showFolderTree, queryClient }: { showFolderTree: boolean; que
                               )}
                             </div>
                           </td>
+                          {isSearchActive && (
+                            <td className="py-3 px-4 text-center">
+                              {'score' in doc && (doc as Record<string, unknown>).score != null ? (
+                                <Badge variant="info">{Math.round(Number((doc as Record<string, unknown>).score) * 100)}%</Badge>
+                              ) : (
+                                <span className="text-slate-500 text-xs">—</span>
+                              )}
+                            </td>
+                          )}
                           <td className="py-3 px-4">
                             <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${CONTENT_TYPE_COLORS[doc.contentType]}`}>
                               {CONTENT_TYPE_LABELS[doc.contentType] || doc.contentType}
@@ -463,6 +531,15 @@ function DocsTab({ showFolderTree, queryClient }: { showFolderTree: boolean; que
                               ))}
                               {doc.tags.length > 3 && <span className="text-[10px] text-slate-500">+{doc.tags.length - 3}</span>}
                             </div>
+                          </td>
+                          <td className="py-3 px-4 text-center">
+                            {doc.embeddingStatus === 'done' ? (
+                              <Badge variant="success">완료</Badge>
+                            ) : doc.embeddingStatus === 'pending' ? (
+                              <span className="text-amber-400 text-xs">대기</span>
+                            ) : (
+                              <span className="text-slate-500 text-xs">—</span>
+                            )}
                           </td>
                           <td className="py-3 px-4 text-right text-xs text-slate-400">{formatRelative(doc.updatedAt)}</td>
                         </tr>
@@ -802,7 +879,7 @@ function FolderNode({
 // === Doc Detail View ===
 
 function DocDetailView({
-  doc, folders, onBack, onEdit, onDelete, onShowVersions, queryClient,
+  doc, folders, onBack, onEdit, onDelete, onShowVersions, queryClient, onNavigateDoc,
 }: {
   doc: KnowledgeDoc
   folders: KnowledgeFolder[]
@@ -811,10 +888,18 @@ function DocDetailView({
   onDelete: (id: string) => void
   onShowVersions: (id: string) => void
   queryClient: ReturnType<typeof useQueryClient>
+  onNavigateDoc?: (docId: string) => void
 }) {
   const detailQuery = useQuery({
     queryKey: ['knowledge-doc-detail', doc.id],
     queryFn: () => api.get<{ data: KnowledgeDoc }>(`/workspace/knowledge/docs/${doc.id}`),
+  })
+
+  const similarQuery = useQuery({
+    queryKey: ['knowledge-similar', doc.id],
+    queryFn: () => api.get<{ data: Array<{ id: string; title: string; score: number }> }>(`/workspace/knowledge/docs/${doc.id}/similar`),
+    staleTime: 60_000,
+    enabled: !!doc.id,
   })
 
   const fullDoc = detailQuery.data?.data ?? doc
@@ -885,6 +970,75 @@ function DocDetailView({
           </div>
         </div>
       )}
+
+      {/* Department assignment info */}
+      {(() => {
+        const findFolder = (fid: string | null, list: KnowledgeFolder[]): KnowledgeFolder | null => {
+          if (!fid) return null
+          for (const f of list) {
+            if (f.id === fid) return f
+            const child = findFolder(fid, f.children)
+            if (child) return child
+          }
+          return null
+        }
+        const folder = findFolder(fullDoc.folderId, folders)
+        if (!folder) return null
+        return (
+          <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4" data-testid="dept-assignment">
+            <h4 className="text-sm font-semibold text-slate-300 mb-2">부서 연결</h4>
+            <div className="flex items-center gap-2 text-sm text-slate-400">
+              <span>폴더: {folder.name}</span>
+              {folder.departmentName ? (
+                <Badge variant="info">{folder.departmentName}</Badge>
+              ) : (
+                <span className="text-slate-500">(부서 미연결)</span>
+              )}
+            </div>
+          </div>
+        )
+      })()}
+
+      {/* Embedding status */}
+      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+        <h4 className="text-sm font-semibold text-slate-300 mb-2">임베딩 상태</h4>
+        <div className="flex items-center gap-2">
+          {fullDoc.embeddingStatus === 'done' ? (
+            <>
+              <Badge variant="success">완료</Badge>
+              {fullDoc.embeddingModel && <span className="text-xs text-slate-500">{fullDoc.embeddingModel}</span>}
+              {fullDoc.embeddedAt && <span className="text-xs text-slate-500">{formatRelative(fullDoc.embeddedAt)}</span>}
+            </>
+          ) : (
+            <span className="text-xs text-slate-500">임베딩 없음 — 문서 수정 시 자동 생성됩니다</span>
+          )}
+        </div>
+      </div>
+
+      {/* Similar documents */}
+      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4" data-testid="similar-docs">
+        <h4 className="text-sm font-semibold text-slate-300 mb-3">유사 문서</h4>
+        {similarQuery.isLoading ? (
+          <p className="text-xs text-slate-500">유사 문서 검색 중...</p>
+        ) : !similarQuery.data?.data?.length ? (
+          <p className="text-xs text-slate-500">
+            {fullDoc.embeddingStatus === 'done' ? '유사 문서가 없습니다' : '임베딩이 없어 유사 문서를 찾을 수 없습니다'}
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {similarQuery.data.data.map(sim => (
+              <div
+                key={sim.id}
+                className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-700/30 cursor-pointer transition-colors"
+                onClick={() => onNavigateDoc?.(sim.id)}
+              >
+                <span className="text-sm text-slate-200 truncate">{sim.title}</span>
+                <Badge variant="info">{Math.round(sim.score * 100)}%</Badge>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
