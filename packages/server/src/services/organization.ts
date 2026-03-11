@@ -5,6 +5,7 @@ import { withTenant, scopedWhere, scopedInsert } from '../db/tenant-helpers'
 import { createAuditLog, AUDIT_ACTIONS } from './audit-log'
 import type { ActorType } from './audit-log'
 import type { TemplateData } from './seed.service'
+import { MANAGER_SOUL_TEMPLATE, SECRETARY_SOUL_TEMPLATE } from '../lib/soul-templates'
 
 export interface DepartmentInput {
   name: string
@@ -26,6 +27,8 @@ export interface AgentInput {
   modelName?: string
   allowedTools?: string[]
   soul?: string | null
+  isSecretary?: boolean
+  ownerUserId?: string | null
 }
 
 export interface AgentUpdateInput {
@@ -39,6 +42,8 @@ export interface AgentUpdateInput {
   soul?: string | null
   status?: 'online' | 'working' | 'error' | 'offline'
   isActive?: boolean
+  isSecretary?: boolean
+  ownerUserId?: string | null
 }
 
 interface TenantActor {
@@ -280,6 +285,16 @@ export async function createAgent(tenant: TenantActor, input: AgentInput) {
     return { error: { status: 409, message: '같은 이름의 에이전트가 이미 있습니다', code: 'AGENT_002' } }
   }
 
+  // Determine default soul template if none provided
+  let soulValue = input.soul ?? null
+  if (!soulValue) {
+    if (input.isSecretary) {
+      soulValue = SECRETARY_SOUL_TEMPLATE
+    } else if (input.tier === 'manager') {
+      soulValue = MANAGER_SOUL_TEMPLATE
+    }
+  }
+
   const [agent] = await db
     .insert(agents)
     .values(scopedInsert(tenant.companyId, {
@@ -291,8 +306,10 @@ export async function createAgent(tenant: TenantActor, input: AgentInput) {
       tier: input.tier ?? 'specialist',
       modelName: input.modelName ?? 'claude-haiku-4-5',
       allowedTools: input.allowedTools ?? [],
-      soul: input.soul ?? null,
-      adminSoul: input.soul ?? null,
+      soul: soulValue,
+      adminSoul: soulValue,
+      isSecretary: input.isSecretary ?? false,
+      ownerUserId: input.ownerUserId ?? null,
       status: 'offline',
     }))
     .returning()
