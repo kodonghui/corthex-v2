@@ -5,6 +5,7 @@ import { api } from '../../lib/api'
 import { useHubStream } from '../../hooks/use-hub-stream'
 import { useWsStore } from '../../stores/ws-store'
 import { HandoffTracker } from './handoff-tracker'
+import { SessionSidebar } from './session-sidebar'
 
 type Agent = {
   id: string
@@ -118,12 +119,15 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
     toolCalls,
     error,
     costUsd,
+    learnedCount,
     sessionId: streamSessionId,
     sendMessage: hubSendMessage,
     stopStream,
     clearError,
     reset,
   } = useHubStream()
+
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   // Find or create a session with the secretary
   const { data: sessionsData } = useQuery({
@@ -269,14 +273,37 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
   const isProcessing = streamState === 'accepted' || streamState === 'processing' || streamState === 'streaming'
 
   return (
-    <div
-      data-testid="secretary-hub-layout"
-      className="flex flex-col h-full bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950"
-    >
+    <div data-testid="secretary-hub-layout" className="flex h-full">
+      {/* Session sidebar */}
+      <SessionSidebar
+        secretaryId={secretary.id}
+        activeSessionId={effectiveSessionId}
+        onSelectSession={(id) => {
+          setActiveSessionId(id)
+          if (id) {
+            queryClient.invalidateQueries({ queryKey: ['messages', id] })
+          }
+        }}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
+
+      {/* Main chat area */}
+      <div className="flex-1 flex flex-col bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 min-w-0">
       {/* Header */}
       <div className="px-6 py-4 border-b border-slate-800/80 shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
+            <button
+              data-testid="sidebar-toggle-btn"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition-colors lg:hidden"
+              aria-label="대화 목록 열기"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+              </svg>
+            </button>
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-500/20">
               {secretary.name.charAt(0)}
             </div>
@@ -293,6 +320,11 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            {learnedCount > 0 && (
+              <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                {learnedCount}개 학습됨
+              </span>
+            )}
             {costUsd != null && (
               <span className="text-xs text-slate-500">
                 ${costUsd.toFixed(4)}
@@ -345,6 +377,14 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
         {isFetchingNextPage && (
           <div className="flex justify-center py-2">
             <div className="w-5 h-5 border-2 border-slate-600 border-t-blue-500 rounded-full animate-spin" />
+          </div>
+        )}
+        {/* 대화 시작 마커 (모든 기록 로드 완료) */}
+        {!hasNextPage && messages.length > 0 && !isFetchingNextPage && (
+          <div className="flex items-center gap-3 py-3 px-2">
+            <div className="flex-1 h-px bg-slate-700/50" />
+            <span className="text-xs text-slate-500 shrink-0">대화 시작</span>
+            <div className="flex-1 h-px bg-slate-700/50" />
           </div>
         )}
         {hasNextPage && !isFetchingNextPage && (
@@ -645,6 +685,7 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
             </button>
           )}
         </div>
+      </div>
       </div>
     </div>
   )

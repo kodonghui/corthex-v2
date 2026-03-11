@@ -12,6 +12,7 @@ import { orchestrateSecretary } from '../../lib/orchestrator'
 import { logActivity } from '../../lib/activity-logger'
 import { notifyChatComplete, notifyToolError } from '../../lib/notifier'
 import { broadcastToChannel } from '../../ws/channels'
+import { extractAndSaveMemories } from '../../services/memory-extractor'
 import type { AppEnv } from '../../types'
 
 export const chatRoute = new Hono<AppEnv>()
@@ -175,9 +176,9 @@ chatRoute.post(
 
     if (!session) throw new HTTPError(404, '세션을 찾을 수 없습니다', 'CHAT_002')
 
-    // 에이전트가 비서인지 확인
+    // 에이전트 정보 확인 (비서 여부 + autoLearn)
     const [agent] = await db
-      .select({ isSecretary: agents.isSecretary, name: agents.name })
+      .select({ isSecretary: agents.isSecretary, name: agents.name, autoLearn: agents.autoLearn })
       .from(agents)
       .where(eq(agents.id, session.agentId))
       .limit(1)
@@ -239,10 +240,12 @@ chatRoute.post(
           if (!hasStreamedTokens) {
             broadcastToChannel(channelKey, { type: 'token', content: aiContent })
           }
-          broadcastToChannel(channelKey, { type: 'done', sessionId })
+          // autoLearn + done은 비서/일반 공통으로 아래에서 처리
         } else {
           // 일반 에이전트: 스트리밍
           aiContent = await generateAgentResponseStream(chatCtx, (event: StreamEvent) => {
+            // done 이벤트는 autoLearn 후 아래에서 직접 발행 (learnedCount 포함)
+            if (event.type === 'done') return
             broadcastToChannel(channelKey, event)
             if (event.type === 'tool-end' && event.error) {
               notifyToolError(tenant.userId, tenant.companyId, event.toolName)
@@ -256,6 +259,30 @@ chatRoute.post(
           sessionId,
           sender: 'agent',
           content: aiContent,
+        })
+
+        // autoLearn: 작업 완료 후 학습 포인트 자동 추출 (v1 spec #20)
+        let learnedCount = 0
+        if (agent?.autoLearn !== false && aiContent) {
+          try {
+            const result = await extractAndSaveMemories({
+              companyId: tenant.companyId,
+              agentId: session.agentId,
+              taskDescription: content,
+              taskResult: aiContent,
+              source: 'hub-chat',
+            })
+            learnedCount = result.saved
+          } catch {
+            // autoLearn 실패는 무시 (fire-and-forget)
+          }
+        }
+
+        // done 이벤트에 학습 결과 포함
+        broadcastToChannel(channelKey, {
+          type: 'done',
+          sessionId,
+          ...(learnedCount > 0 ? { learnedCount } : {}),
         })
 
         // 알림 생성 (fire-and-forget)
