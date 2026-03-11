@@ -353,7 +353,7 @@ phases:
         title: "N-Tier Hierarchy System"
         priority: P1
         sp: 12
-        status: in-progress
+        status: done
         dependencies: ["epic-7"]
         architecture: "FR24~29 (Tier & Cost), E6 (model-selector), D1 (tier_configs)"
         stories:
@@ -386,7 +386,7 @@ phases:
         title: "NEXUS Visual Organization Editor"
         priority: P1
         sp: 16
-        status: in-progress
+        status: done
         dependencies: ["epic-7", "epic-8"]
         architecture: "React Flow + ELK.js, FR30~37"
         stories:
@@ -400,7 +400,7 @@ phases:
             title: "NEXUS 노드 시각화"
             sp: 3
             priority: P0
-            status: review
+            status: done
             blocked_by: ["9.1"]
           - id: "9.3"
             title: "드래그&드롭 편집"
@@ -412,7 +412,7 @@ phases:
             title: "속성 패널"
             sp: 3
             priority: P1
-            status: review
+            status: done
             blocked_by: ["9.2"]
           - id: "9.5"
             title: "NEXUS 내보내기 + 인쇄"
@@ -467,7 +467,7 @@ phases:
         title: "NotebookLM & SketchVibe MCP"
         priority: P1
         sp: 14
-        status: in-progress
+        status: done
         dependencies: ["epic-2", "epic-10"]
         architecture: "NotebookLM MCP 29 tools, SketchVibe Stdio MCP, FR54~60"
         stories:
@@ -503,7 +503,7 @@ phases:
         title: "Testing & Quality Infrastructure"
         priority: P0
         sp: 12
-        status: in-progress
+        status: done
         dependencies: ["epic-1", "epic-2"]
         architecture: "D10 (테스트 전략), E9 (SDK 모킹), E10 (CI 경계)"
         stories:
