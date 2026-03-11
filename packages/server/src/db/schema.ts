@@ -1,5 +1,6 @@
 import { pgTable, text, timestamp, uuid, varchar, boolean, jsonb, integer, pgEnum, index, unique, uniqueIndex, real, primaryKey } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
+import { vector } from './pgvector'
 
 // === Enums ===
 export const userRoleEnum = pgEnum('user_role', ['admin', 'user'])
@@ -1550,6 +1551,9 @@ export const knowledgeDocs = pgTable('knowledge_docs', {
   contentType: varchar('content_type', { length: 50 }).notNull().default('markdown'),
   fileUrl: text('file_url'),  // uploaded file reference
   tags: jsonb('tags').$type<string[]>().default([]),
+  embedding: vector('embedding', { dimensions: 768 }),  // pgvector: Gemini Embedding 768-dim, NULL = not yet embedded
+  embeddingModel: varchar('embedding_model', { length: 50 }),  // e.g. 'gemini-embedding-001'
+  embeddedAt: timestamp('embedded_at'),  // last embedding timestamp
   createdBy: uuid('created_by').notNull().references(() => users.id),
   updatedBy: uuid('updated_by').references(() => users.id),
   isActive: boolean('is_active').notNull().default(true),

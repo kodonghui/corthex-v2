@@ -1,8 +1,9 @@
-import { eq, or, sql, desc } from 'drizzle-orm'
+import { eq, or, sql, desc, and, isNotNull, asc } from 'drizzle-orm'
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm'
 import { db } from './index'
 import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users, costRecords, presets, sketches, tierConfigs } from './schema'
 import { withTenant, scopedWhere, scopedInsert } from './tenant-helpers'
+import { cosineDistance } from './pgvector'
 
 type Agent = InferSelectModel<typeof agents>
 type NewAgent = InferInsertModel<typeof agents>
@@ -103,5 +104,33 @@ export function getDB(companyId: string) {
       db.update(tierConfigs).set(data).where(scopedWhere(tierConfigs.companyId, companyId, eq(tierConfigs.id, id))).returning(),
     deleteTierConfig: (id: string) =>
       db.delete(tierConfigs).where(scopedWhere(tierConfigs.companyId, companyId, eq(tierConfigs.id, id))).returning(),
+
+    // READ — knowledge docs with embedding (Story 10.1)
+    knowledgeDocsWithEmbedding: () =>
+      db.select().from(knowledgeDocs).where(
+        scopedWhere(knowledgeDocs.companyId, companyId, isNotNull(knowledgeDocs.embedding)),
+      ),
+
+    // READ — vector similarity search (Story 10.1, used by 10.3)
+    searchSimilarDocs: (queryEmbedding: number[], topK = 5, threshold = 0.8) => {
+      const dist = cosineDistance(knowledgeDocs.embedding, queryEmbedding)
+      return db.select({
+        id: knowledgeDocs.id,
+        title: knowledgeDocs.title,
+        content: knowledgeDocs.content,
+        folderId: knowledgeDocs.folderId,
+        tags: knowledgeDocs.tags,
+        distance: dist.as('distance'),
+      })
+        .from(knowledgeDocs)
+        .where(and(
+          withTenant(knowledgeDocs.companyId, companyId),
+          isNotNull(knowledgeDocs.embedding),
+          eq(knowledgeDocs.isActive, true),
+          sql`${dist} < ${threshold}`,
+        ))
+        .orderBy(asc(sql`${dist}`))
+        .limit(topK)
+    },
   }
 }

@@ -428,7 +428,7 @@ phases:
         title: "Semantic Search & Knowledge Enhancement"
         priority: P1
         sp: 14
-        status: backlog
+        status: in-progress
         dependencies: ["epic-2", "epic-7"]
         architecture: "pgvector, Gemini Embedding, FR47~53"
         stories:
@@ -436,7 +436,7 @@ phases:
             title: "pgvector 확장 설치 + 스키마"
             sp: 2
             priority: P0
-            status: backlog
+            status: done
             blocked_by: []
           - id: "10.2"
             title: "Gemini Embedding 파이프라인"
