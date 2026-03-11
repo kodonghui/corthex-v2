@@ -111,9 +111,18 @@ export function getDB(companyId: string) {
         scopedWhere(knowledgeDocs.companyId, companyId, isNotNull(knowledgeDocs.embedding)),
       ),
 
-    // READ — vector similarity search (Story 10.1, used by 10.3)
-    searchSimilarDocs: (queryEmbedding: number[], topK = 5, threshold = 0.8) => {
+    // READ — vector similarity search (Story 10.1, extended by 10.3 with folderId filter)
+    searchSimilarDocs: (queryEmbedding: number[], topK = 5, threshold = 0.8, folderId?: string) => {
       const dist = cosineDistance(knowledgeDocs.embedding, queryEmbedding)
+      const conditions = [
+        withTenant(knowledgeDocs.companyId, companyId),
+        isNotNull(knowledgeDocs.embedding),
+        eq(knowledgeDocs.isActive, true),
+        sql`${dist} < ${threshold}`,
+      ]
+      if (folderId) {
+        conditions.push(eq(knowledgeDocs.folderId, folderId))
+      }
       return db.select({
         id: knowledgeDocs.id,
         title: knowledgeDocs.title,
@@ -123,12 +132,7 @@ export function getDB(companyId: string) {
         distance: dist.as('distance'),
       })
         .from(knowledgeDocs)
-        .where(and(
-          withTenant(knowledgeDocs.companyId, companyId),
-          isNotNull(knowledgeDocs.embedding),
-          eq(knowledgeDocs.isActive, true),
-          sql`${dist} < ${threshold}`,
-        ))
+        .where(and(...conditions))
         .orderBy(asc(sql`${dist}`))
         .limit(topK)
     },

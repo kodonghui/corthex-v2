@@ -448,7 +448,7 @@ phases:
             title: "의미 검색 API"
             sp: 3
             priority: P0
-            status: backlog
+            status: done
             blocked_by: ["10.2"]
           - id: "10.4"
             title: "부서별 지식 자동 주입 강화"

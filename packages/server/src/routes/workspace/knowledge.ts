@@ -10,6 +10,7 @@ import { KNOWLEDGE_TEMPLATES } from '../../lib/knowledge-templates'
 import { clearKnowledgeCache, getInjectionPreview } from '../../services/knowledge-injector'
 import { consolidateMemories } from '../../services/memory-extractor'
 import { triggerEmbedding } from '../../services/embedding-service'
+import { semanticSearch } from '../../services/semantic-search'
 import type { AppEnv } from '../../types'
 import { join } from 'path'
 import { existsSync, mkdirSync } from 'fs'
@@ -1098,61 +1099,162 @@ knowledgeRoute.delete('/docs/:id/tags', async (c) => {
 // UNIFIED SEARCH
 // ══════════════════════════════════════════════════════════
 
-// GET /search — 통합 검색 (문서 + 폴더)
+// GET /search — 통합 검색 (keyword / semantic / hybrid 모드)
 knowledgeRoute.get('/search', async (c) => {
   const tenant = c.get('tenant')
   const q = c.req.query('q')
+  const rawMode = c.req.query('mode') || 'hybrid'
+  const mode: 'keyword' | 'semantic' | 'hybrid' = ['keyword', 'semantic', 'hybrid'].includes(rawMode) ? rawMode as 'keyword' | 'semantic' | 'hybrid' : 'hybrid'
+  const topK = Math.min(20, Math.max(1, Number(c.req.query('topK')) || 5))
   const page = Math.max(1, Number(c.req.query('page')) || 1)
   const limit = Math.min(100, Math.max(1, Number(c.req.query('limit')) || 20))
+  const folderId = c.req.query('folderId') || undefined
   const offset = (page - 1) * limit
 
   if (!q || q.trim().length === 0) {
     throw new HTTPError(400, '검색어가 필요합니다')
   }
 
-  const searchPattern = `%${q}%`
-
-  // Search docs
-  const docConditions = and(
-    eq(knowledgeDocs.companyId, tenant.companyId),
-    eq(knowledgeDocs.isActive, true),
-    or(
-      ilike(knowledgeDocs.title, searchPattern),
-      ilike(knowledgeDocs.content, searchPattern),
-    ),
-  )
-
-  const [docTotal] = await db.select({ count: count() })
-    .from(knowledgeDocs)
-    .where(docConditions)
-
-  const docs = await db.select()
-    .from(knowledgeDocs)
-    .where(docConditions)
-    .orderBy(desc(knowledgeDocs.updatedAt))
-    .limit(limit)
-    .offset(offset)
-
-  // Add match highlights for docs
-  const docsWithHighlights = docs.map(doc => {
-    let highlight = ''
-    const content = doc.content || ''
+  // Helper: generate highlight from content
+  const generateHighlight = (content: string | null, query: string): string => {
+    if (!content) return ''
     const lowerContent = content.toLowerCase()
-    const lowerQuery = q.toLowerCase()
+    const lowerQuery = query.toLowerCase()
     const matchIndex = lowerContent.indexOf(lowerQuery)
     if (matchIndex >= 0) {
       const start = Math.max(0, matchIndex - 50)
-      const end = Math.min(content.length, matchIndex + q.length + 50)
-      highlight = (start > 0 ? '...' : '') + content.slice(start, end) + (end < content.length ? '...' : '')
+      const end = Math.min(content.length, matchIndex + query.length + 50)
+      return (start > 0 ? '...' : '') + content.slice(start, end) + (end < content.length ? '...' : '')
     }
-    return { ...doc, highlight }
-  })
+    // For semantic results, show first 150 chars as context
+    return content.length > 150 ? content.slice(0, 150) + '...' : content
+  }
 
-  // Search folders (no pagination)
-  const folders = await db.select()
+  // Helper: keyword (LIKE) search
+  const keywordSearch = async () => {
+    const searchPattern = `%${q}%`
+    const docConditions = and(
+      eq(knowledgeDocs.companyId, tenant.companyId),
+      eq(knowledgeDocs.isActive, true),
+      or(
+        ilike(knowledgeDocs.title, searchPattern),
+        ilike(knowledgeDocs.content, searchPattern),
+      ),
+      folderId ? eq(knowledgeDocs.folderId, folderId) : undefined,
+    )
+
+    const [docTotal] = await db.select({ count: count() })
+      .from(knowledgeDocs)
+      .where(docConditions)
+
+    const docs = await db.select()
+      .from(knowledgeDocs)
+      .where(docConditions)
+      .orderBy(desc(knowledgeDocs.updatedAt))
+      .limit(limit)
+      .offset(offset)
+
+    return {
+      docs: docs.map(doc => ({
+        ...doc,
+        score: null as number | null,
+        highlight: generateHighlight(doc.content, q),
+      })),
+      total: docTotal.count,
+    }
+  }
+
+  // Semantic search mode
+  if (mode === 'semantic') {
+    const semanticResults = await semanticSearch(tenant.companyId, q, { topK, folderId })
+
+    if (!semanticResults) {
+      // Fallback to keyword search when semantic search fails
+      const kwResult = await keywordSearch()
+      const folders = await searchFolders(tenant.companyId, q)
+      return c.json({
+        data: { docs: kwResult.docs, folders, searchMode: 'keyword' as const },
+        pagination: { page, limit, total: kwResult.total, totalPages: Math.ceil(kwResult.total / limit) },
+      })
+    }
+
+    const folders = await searchFolders(tenant.companyId, q)
+    return c.json({
+      data: {
+        docs: semanticResults.map(r => ({
+          ...r,
+          highlight: generateHighlight(r.content, q),
+        })),
+        folders,
+        searchMode: 'semantic' as const,
+      },
+      pagination: { page: 1, limit: topK, total: semanticResults.length, totalPages: 1 },
+    })
+  }
+
+  // Keyword search mode
+  if (mode === 'keyword') {
+    const kwResult = await keywordSearch()
+    const folders = await searchFolders(tenant.companyId, q)
+    return c.json({
+      data: { docs: kwResult.docs, folders, searchMode: 'keyword' as const },
+      pagination: { page, limit, total: kwResult.total, totalPages: Math.ceil(kwResult.total / limit) },
+    })
+  }
+
+  // Hybrid mode (default): semantic first, supplement with keyword if needed
+  let searchMode: 'hybrid' | 'keyword' = 'hybrid'
+  let hybridDocs: Array<{
+    id: string
+    title: string
+    content: string | null
+    folderId: string | null
+    tags: string[] | null
+    score: number | null
+    highlight: string
+    [key: string]: unknown
+  }> = []
+
+  const semanticResults = await semanticSearch(tenant.companyId, q, { topK, folderId })
+
+  if (semanticResults && semanticResults.length > 0) {
+    hybridDocs = semanticResults.map(r => ({
+      id: r.id,
+      title: r.title,
+      content: r.content,
+      folderId: r.folderId,
+      tags: r.tags,
+      score: r.score,
+      highlight: generateHighlight(r.content, q),
+    }))
+  }
+
+  // Supplement with keyword search if semantic results < topK (or failed entirely)
+  if (!semanticResults || semanticResults.length < topK) {
+    searchMode = semanticResults ? 'hybrid' : 'keyword'
+    const kwResult = await keywordSearch()
+    const semanticIds = new Set(hybridDocs.map(d => d.id))
+    const supplementDocs = kwResult.docs
+      .filter(d => !semanticIds.has(d.id))
+      .slice(0, topK - hybridDocs.length)
+
+    hybridDocs = [...hybridDocs, ...supplementDocs]
+  }
+
+  const folders = await searchFolders(tenant.companyId, q)
+  return c.json({
+    data: { docs: hybridDocs, folders, searchMode },
+    pagination: { page: 1, limit: topK, total: hybridDocs.length, totalPages: 1 },
+  })
+})
+
+// Helper: search folders by name/description
+async function searchFolders(companyId: string, q: string) {
+  const searchPattern = `%${q}%`
+  return db.select()
     .from(knowledgeFolders)
     .where(and(
-      eq(knowledgeFolders.companyId, tenant.companyId),
+      eq(knowledgeFolders.companyId, companyId),
       eq(knowledgeFolders.isActive, true),
       or(
         ilike(knowledgeFolders.name, searchPattern),
@@ -1161,12 +1263,7 @@ knowledgeRoute.get('/search', async (c) => {
     ))
     .orderBy(asc(knowledgeFolders.name))
     .limit(20)
-
-  return c.json({
-    data: { docs: docsWithHighlights, folders },
-    pagination: { page, limit, total: docTotal.count, totalPages: Math.ceil(docTotal.count / limit) },
-  })
-})
+}
 
 // ══════════════════════════════════════════════════════════
 // AGENT MEMORIES CRUD

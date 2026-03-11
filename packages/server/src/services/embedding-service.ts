@@ -24,7 +24,7 @@ function getGenAI(apiKey: string): GoogleGenerativeAI {
 /**
  * Extract API key from credential vault result (handles different field names).
  */
-function extractApiKey(credentials: Record<string, string>): string | undefined {
+export function extractApiKey(credentials: Record<string, string>): string | undefined {
   return credentials.api_key || credentials.apiKey || Object.values(credentials)[0]
 }
 
