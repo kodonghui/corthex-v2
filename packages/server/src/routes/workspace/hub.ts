@@ -33,9 +33,18 @@ hubRoute.post('/stream', zValidator('json', streamSchema), async (c) => {
   const { companyId, userId } = tenant
   const scopedDb = getDB(companyId)
 
+  // Preset shortcut detection: if message exactly matches a preset name, expand it (Story 5.6)
+  let agentMessage = message
+  const userPresets = await scopedDb.presetsByUser(userId)
+  const matchedPreset = userPresets.find((p) => p.name === message.trim())
+  if (matchedPreset) {
+    agentMessage = matchedPreset.command
+    // Increment sortOrder for usage frequency tracking (non-blocking)
+    scopedDb.incrementPresetSortOrder(matchedPreset.id).catch(() => {})
+  }
+
   // Resolve target agent: explicit agentId > @mention > secretary
   let targetAgent: { id: string; name: string; soul: string | null; tier: string } | null = null
-  let agentMessage = message
 
   if (requestedAgentId) {
     const [agent] = await scopedDb.agentById(requestedAgentId)
@@ -47,7 +56,7 @@ hubRoute.post('/stream', zValidator('json', streamSchema), async (c) => {
   if (!targetAgent) {
     // Single agents() call shared between @mention and secretary resolution
     const allAgents = await scopedDb.agents()
-    const mention = parseMention(message)
+    const mention = parseMention(agentMessage)
 
     if (mention) {
       const found = allAgents.find(

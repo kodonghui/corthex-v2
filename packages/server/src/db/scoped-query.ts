@@ -1,11 +1,13 @@
-import { eq } from 'drizzle-orm'
+import { eq, or, sql, desc } from 'drizzle-orm'
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm'
 import { db } from './index'
-import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users, costRecords } from './schema'
+import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users, costRecords, presets } from './schema'
 import { withTenant, scopedWhere, scopedInsert } from './tenant-helpers'
 
 type Agent = InferSelectModel<typeof agents>
 type NewAgent = InferInsertModel<typeof agents>
+type Preset = InferSelectModel<typeof presets>
+type NewPreset = InferInsertModel<typeof presets>
 
 /**
  * getDB(companyId) — 멀티테넌시 격리 래퍼 (Architecture D1, E3)
@@ -51,5 +53,29 @@ export function getDB(companyId: string) {
     // WRITE — cost tracking (Story 3.5)
     insertCostRecord: (data: Omit<InferInsertModel<typeof costRecords>, 'companyId'>) =>
       db.insert(costRecords).values(scopedInsert(companyId, data)).returning(),
+
+    // READ — presets (Story 5.6)
+    presetsByUser: (userId: string) =>
+      db.select().from(presets).where(
+        scopedWhere(presets.companyId, companyId, eq(presets.isActive, true),
+          or(eq(presets.userId, userId), eq(presets.isGlobal, true))!),
+      ).orderBy(desc(presets.sortOrder), desc(presets.createdAt)),
+    presetById: (id: string) =>
+      db.select().from(presets).where(scopedWhere(presets.companyId, companyId, eq(presets.id, id))),
+    presetByName: (name: string, userId: string) =>
+      db.select().from(presets).where(
+        scopedWhere(presets.companyId, companyId, eq(presets.name, name), eq(presets.userId, userId)),
+      ),
+
+    // WRITE — presets (Story 5.6)
+    insertPreset: (data: Omit<NewPreset, 'companyId'>) =>
+      db.insert(presets).values(scopedInsert(companyId, data)).returning(),
+    updatePreset: (id: string, data: Partial<Omit<Preset, 'id' | 'companyId'>>) =>
+      db.update(presets).set(data).where(scopedWhere(presets.companyId, companyId, eq(presets.id, id))).returning(),
+    deletePreset: (id: string) =>
+      db.delete(presets).where(scopedWhere(presets.companyId, companyId, eq(presets.id, id))).returning(),
+    incrementPresetSortOrder: (id: string) =>
+      db.update(presets).set({ sortOrder: sql`${presets.sortOrder} + 1`, updatedAt: new Date() })
+        .where(scopedWhere(presets.companyId, companyId, eq(presets.id, id))),
   }
 }

@@ -1,9 +1,7 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { eq, and, or, desc, sql } from 'drizzle-orm'
-import { db } from '../../db'
-import { presets } from '../../db/schema'
+import { getDB } from '../../db/scoped-query'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { classify, createCommand } from '../../services/command-router'
@@ -38,33 +36,22 @@ const updatePresetSchema = z.object({
 presetsRoute.post('/', zValidator('json', createPresetSchema), async (c) => {
   const tenant = c.get('tenant')
   const body = c.req.valid('json')
+  const scopedDb = getDB(tenant.companyId)
 
   // Name duplicate check within same company + user
-  const [existing] = await db
-    .select({ id: presets.id })
-    .from(presets)
-    .where(and(
-      eq(presets.companyId, tenant.companyId),
-      eq(presets.userId, tenant.userId),
-      eq(presets.name, body.name),
-    ))
-    .limit(1)
+  const [existing] = await scopedDb.presetByName(body.name, tenant.userId)
 
   if (existing) {
     throw new HTTPError(409, '같은 이름의 프리셋이 이미 존재합니다', 'PRESET_DUPLICATE')
   }
 
-  const [preset] = await db
-    .insert(presets)
-    .values({
-      companyId: tenant.companyId,
-      userId: tenant.userId,
-      name: body.name,
-      command: body.command,
-      description: body.description ?? null,
-      category: body.category ?? null,
-    })
-    .returning()
+  const [preset] = await scopedDb.insertPreset({
+    userId: tenant.userId,
+    name: body.name,
+    command: body.command,
+    description: body.description ?? null,
+    category: body.category ?? null,
+  })
 
   return c.json({ success: true, data: preset }, 201)
 })
@@ -72,19 +59,9 @@ presetsRoute.post('/', zValidator('json', createPresetSchema), async (c) => {
 // GET /api/workspace/presets — 프리셋 목록 (본인 + isGlobal)
 presetsRoute.get('/', async (c) => {
   const tenant = c.get('tenant')
+  const scopedDb = getDB(tenant.companyId)
 
-  const result = await db
-    .select()
-    .from(presets)
-    .where(and(
-      eq(presets.companyId, tenant.companyId),
-      eq(presets.isActive, true),
-      or(
-        eq(presets.userId, tenant.userId),
-        eq(presets.isGlobal, true),
-      ),
-    ))
-    .orderBy(desc(presets.sortOrder), desc(presets.createdAt))
+  const result = await scopedDb.presetsByUser(tenant.userId)
 
   return c.json({ success: true, data: result })
 })
@@ -94,16 +71,10 @@ presetsRoute.patch('/:id', zValidator('json', updatePresetSchema), async (c) => 
   const tenant = c.get('tenant')
   const id = c.req.param('id')
   const body = c.req.valid('json')
+  const scopedDb = getDB(tenant.companyId)
 
   // Verify ownership
-  const [existing] = await db
-    .select({ id: presets.id, userId: presets.userId })
-    .from(presets)
-    .where(and(
-      eq(presets.id, id),
-      eq(presets.companyId, tenant.companyId),
-    ))
-    .limit(1)
+  const [existing] = await scopedDb.presetById(id)
 
   if (!existing) {
     throw new HTTPError(404, '프리셋을 찾을 수 없습니다', 'PRESET_NOT_FOUND')
@@ -115,18 +86,8 @@ presetsRoute.patch('/:id', zValidator('json', updatePresetSchema), async (c) => 
 
   // Name duplicate check if name is changing
   if (body.name) {
-    const [dup] = await db
-      .select({ id: presets.id })
-      .from(presets)
-      .where(and(
-        eq(presets.companyId, tenant.companyId),
-        eq(presets.userId, tenant.userId),
-        eq(presets.name, body.name),
-        sql`${presets.id} != ${id}`,
-      ))
-      .limit(1)
-
-    if (dup) {
+    const [dup] = await scopedDb.presetByName(body.name, tenant.userId)
+    if (dup && dup.id !== id) {
       throw new HTTPError(409, '같은 이름의 프리셋이 이미 존재합니다', 'PRESET_DUPLICATE')
     }
   }
@@ -139,11 +100,7 @@ presetsRoute.patch('/:id', zValidator('json', updatePresetSchema), async (c) => 
   if (body.sortOrder !== undefined) updateData.sortOrder = body.sortOrder
   if (body.isActive !== undefined) updateData.isActive = body.isActive
 
-  const [updated] = await db
-    .update(presets)
-    .set(updateData)
-    .where(and(eq(presets.id, id), eq(presets.companyId, tenant.companyId)))
-    .returning()
+  const [updated] = await scopedDb.updatePreset(id, updateData as any)
 
   return c.json({ success: true, data: updated })
 })
@@ -152,16 +109,10 @@ presetsRoute.patch('/:id', zValidator('json', updatePresetSchema), async (c) => 
 presetsRoute.delete('/:id', async (c) => {
   const tenant = c.get('tenant')
   const id = c.req.param('id')
+  const scopedDb = getDB(tenant.companyId)
 
   // Verify ownership
-  const [existing] = await db
-    .select({ id: presets.id, userId: presets.userId })
-    .from(presets)
-    .where(and(
-      eq(presets.id, id),
-      eq(presets.companyId, tenant.companyId),
-    ))
-    .limit(1)
+  const [existing] = await scopedDb.presetById(id)
 
   if (!existing) {
     throw new HTTPError(404, '프리셋을 찾을 수 없습니다', 'PRESET_NOT_FOUND')
@@ -171,9 +122,7 @@ presetsRoute.delete('/:id', async (c) => {
     throw new HTTPError(403, '본인의 프리셋만 삭제할 수 있습니다', 'PRESET_FORBIDDEN')
   }
 
-  await db
-    .delete(presets)
-    .where(and(eq(presets.id, id), eq(presets.companyId, tenant.companyId)))
+  await scopedDb.deletePreset(id)
 
   return c.json({ success: true, data: { deleted: true } })
 })
@@ -182,21 +131,11 @@ presetsRoute.delete('/:id', async (c) => {
 presetsRoute.post('/:id/execute', async (c) => {
   const tenant = c.get('tenant')
   const id = c.req.param('id')
+  const scopedDb = getDB(tenant.companyId)
 
-  // Load preset
-  const [preset] = await db
-    .select()
-    .from(presets)
-    .where(and(
-      eq(presets.id, id),
-      eq(presets.companyId, tenant.companyId),
-      eq(presets.isActive, true),
-      or(
-        eq(presets.userId, tenant.userId),
-        eq(presets.isGlobal, true),
-      ),
-    ))
-    .limit(1)
+  // Load preset — must be active + owned or global
+  const allPresets = await scopedDb.presetsByUser(tenant.userId)
+  const preset = allPresets.find((p) => p.id === id)
 
   if (!preset) {
     throw new HTTPError(404, '프리셋을 찾을 수 없습니다', 'PRESET_NOT_FOUND')
@@ -222,10 +161,7 @@ presetsRoute.post('/:id/execute', async (c) => {
   })
 
   // Increment sortOrder (usage frequency tracking)
-  await db
-    .update(presets)
-    .set({ sortOrder: sql`${presets.sortOrder} + 1`, updatedAt: new Date() })
-    .where(eq(presets.id, id))
+  await scopedDb.incrementPresetSortOrder(id)
 
   // Trigger processing based on what the preset command text actually is
   const effectiveType = classResult.type

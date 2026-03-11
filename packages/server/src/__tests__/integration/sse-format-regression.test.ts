@@ -247,3 +247,100 @@ describe('Tool Type Definitions', () => {
     expect(sampleTools).toHaveLength(5)
   })
 })
+
+// ================================================================
+// 6. TEA: sseStream() AsyncGenerator Integration (P0 gap)
+// ================================================================
+
+import { sseStream } from '../../engine/sse-adapter'
+
+describe('TEA: sseStream() AsyncGenerator Integration', () => {
+  test('sseStream yields formatted SSE strings from event generator', async () => {
+    async function* mockEvents(): AsyncGenerator<SSEEvent> {
+      yield { type: 'accepted', sessionId: 'test-1' }
+      yield { type: 'message', content: 'hello' }
+      yield { type: 'done', costUsd: 0, tokensUsed: 0 }
+    }
+
+    const results: string[] = []
+    for await (const chunk of sseStream(mockEvents())) {
+      results.push(chunk)
+    }
+
+    expect(results).toHaveLength(3)
+    expect(results[0]).toBe('event: accepted\ndata: {"sessionId":"test-1"}\n\n')
+    expect(results[1]).toBe('event: message\ndata: {"content":"hello"}\n\n')
+    expect(results[2]).toBe('event: done\ndata: {"costUsd":0,"tokensUsed":0}\n\n')
+  })
+
+  test('sseStream handles empty generator gracefully', async () => {
+    async function* emptyEvents(): AsyncGenerator<SSEEvent> {
+      // no events
+    }
+
+    const results: string[] = []
+    for await (const chunk of sseStream(emptyEvents())) {
+      results.push(chunk)
+    }
+
+    expect(results).toHaveLength(0)
+  })
+})
+
+// ================================================================
+// 7. TEA: Engine Module Public API Exports (P0 gap)
+// ================================================================
+
+describe('TEA: Engine Module Public API Surface', () => {
+  test('agent-loop exports runAgent and getActiveSessions', async () => {
+    const agentLoop = await import('../../engine/agent-loop')
+    expect(typeof agentLoop.runAgent).toBe('function')
+    expect(typeof agentLoop.getActiveSessions).toBe('function')
+  })
+
+  test('sse-adapter exports sseStream', async () => {
+    const adapter = await import('../../engine/sse-adapter')
+    expect(typeof adapter.sseStream).toBe('function')
+  })
+
+  test('soul-renderer exports renderSoul', async () => {
+    const renderer = await import('../../engine/soul-renderer')
+    expect(typeof renderer.renderSoul).toBe('function')
+  })
+
+  test('model-selector exports selectModel', async () => {
+    const selector = await import('../../engine/model-selector')
+    expect(typeof selector.selectModel).toBe('function')
+  })
+
+  test('types exports are importable (SessionContext, SSEEvent, Tool, RunAgentOptions, PreToolHookResult)', async () => {
+    const types = await import('../../engine/types')
+    // Types are compile-time only, but the module should be importable
+    expect(types).toBeDefined()
+  })
+})
+
+// ================================================================
+// 8. TEA: model-selector Tier Mapping (P1 gap)
+// ================================================================
+
+import { selectModel } from '../../engine/model-selector'
+
+describe('TEA: model-selector Tier Mapping', () => {
+  test('manager tier → claude-sonnet-4-6', () => {
+    expect(selectModel('manager')).toBe('claude-sonnet-4-6')
+  })
+
+  test('specialist tier → claude-sonnet-4-6', () => {
+    expect(selectModel('specialist')).toBe('claude-sonnet-4-6')
+  })
+
+  test('worker tier → claude-haiku-4-5', () => {
+    expect(selectModel('worker')).toBe('claude-haiku-4-5')
+  })
+
+  test('unknown tier → fallback to claude-haiku-4-5', () => {
+    expect(selectModel('unknown')).toBe('claude-haiku-4-5')
+    expect(selectModel('')).toBe('claude-haiku-4-5')
+  })
+})
