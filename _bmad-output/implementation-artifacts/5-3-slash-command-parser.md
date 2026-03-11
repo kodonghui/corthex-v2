@@ -1,6 +1,6 @@
 # Story 5.3: 슬래시 명령어 파서
 
-Status: review
+Status: done
 
 ## Story
 

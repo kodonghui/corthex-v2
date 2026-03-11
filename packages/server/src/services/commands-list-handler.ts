@@ -107,13 +107,6 @@ export function formatCommandsListReport(
   lines.push('## 📋 사용 가능한 명령어')
   lines.push('')
 
-  // Group builtins by category
-  const categories = new Map<string, BuiltinCommand[]>()
-  for (const cmd of builtins) {
-    if (!categories.has(cmd.category)) categories.set(cmd.category, [])
-    categories.get(cmd.category)!.push(cmd)
-  }
-
   lines.push('### 기본 명령어')
   lines.push('')
   lines.push('| 명령어 | 설명 | 사용법 |')

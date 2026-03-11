@@ -1,6 +1,6 @@
 # Story 5.6: @멘션 + 프리셋 시스템
 
-Status: review
+Status: done
 
 ## Story
 
