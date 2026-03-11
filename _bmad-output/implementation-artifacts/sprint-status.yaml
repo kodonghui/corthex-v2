@@ -199,7 +199,7 @@ phases:
             title: "Graceful Shutdown 구현"
             sp: 2
             priority: P1
-            status: backlog
+            status: done
             blocked_by: ["2.2"]
           - id: "4.5"
             title: "3단계 핸드오프 통합 테스트"

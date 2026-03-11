@@ -70,6 +70,7 @@ import { startArgosEngine, stopArgosEngine } from './services/argos-evaluator'
 import { startCronEngine, stopCronEngine } from './services/cron-execution-engine'
 import { startTriggerWorker, stopTriggerWorker } from './lib/trigger-worker'
 import { startSnsScheduleChecker, stopSnsScheduleChecker } from './lib/sns-schedule-checker'
+import { getActiveSessions } from './engine/agent-loop'
 import { loginRateLimit, apiRateLimit } from './middleware/rate-limit'
 import { wsRoute, websocket, broadcastServerRestart } from './ws/server'
 import { eventBus } from './lib/event-bus'
@@ -79,6 +80,9 @@ import type { AppEnv } from './types'
 
 const app = new Hono<AppEnv>()
 const isProd = process.env.NODE_ENV === 'production'
+
+/** Graceful shutdown flag — when true, new API requests get 503 (NFR-O1) */
+export let isShuttingDown = false
 
 // 글로벌 미들웨어
 app.use('*', logger())
@@ -95,6 +99,17 @@ app.onError(errorHandler)
 // 공개 라우트 (인증 불필요) — health는 rate limit 이전에 등록
 app.route('/api', healthRoute)
 app.route('/api/telegram', telegramWebhookRoute)  // Telegram Webhook (공개, rate limit 적용)
+
+// Graceful shutdown — reject new requests with 503 (health excluded for LB/Docker)
+app.use('/api/*', async (c, next) => {
+  if (isShuttingDown && !c.req.path.startsWith('/api/health')) {
+    return c.json({
+      success: false,
+      error: { code: 'SERVER_SHUTTING_DOWN', message: 'Server is shutting down, please retry' }
+    }, 503)
+  }
+  await next()
+})
 
 // Rate Limiting (health 제외)
 app.use('/api/*', apiRateLimit)          // 일반 API: 100/min
@@ -266,19 +281,37 @@ runMigrations().then(() => {
   startSnsScheduleChecker()
 })
 
-// Graceful Shutdown — SIGTERM 시 WS 클라이언트 알림 후 종료
+// Graceful Shutdown — wait for active agent sessions before exit (NFR-O1)
 process.on('SIGTERM', async () => {
-  console.log('🛑 SIGTERM 수신 — 클라이언트 연결 종료 중...')
+  isShuttingDown = true
+  const sessions = getActiveSessions()
+  console.log(`Graceful shutdown initiated, ${sessions.size} active sessions remaining`)
+
+  // Stop background workers
   stopJobWorker()
   await stopCronEngine()
   stopTriggerWorker()
   await stopArgosEngine()
   stopSnsScheduleChecker()
   broadcastServerRestart()
-  setTimeout(() => {
-    console.log('✅ 서버 종료')
-    process.exit(0)
-  }, 10_000)
+
+  // Force exit after 120s (NFR-P8)
+  const forceTimer = setTimeout(() => {
+    console.log(`Force shutdown — ${getActiveSessions().size} sessions abandoned`)
+    process.exit(1)
+  }, 120_000)
+  // Prevent timer from keeping process alive if sessions finish
+  if (forceTimer.unref) forceTimer.unref()
+
+  // Poll every 5s until all sessions complete
+  while (getActiveSessions().size > 0) {
+    console.log(`Waiting for ${getActiveSessions().size} active sessions...`)
+    await new Promise(r => setTimeout(r, 5_000))
+  }
+
+  clearTimeout(forceTimer)
+  console.log('All sessions completed, shutting down')
+  process.exit(0)
 })
 
 export default {
