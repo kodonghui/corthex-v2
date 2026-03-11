@@ -9,6 +9,7 @@ import { HTTPError } from '../../middleware/error'
 import { KNOWLEDGE_TEMPLATES } from '../../lib/knowledge-templates'
 import { clearKnowledgeCache, getInjectionPreview } from '../../services/knowledge-injector'
 import { consolidateMemories } from '../../services/memory-extractor'
+import { triggerEmbedding } from '../../services/embedding-service'
 import type { AppEnv } from '../../types'
 import { join } from 'path'
 import { existsSync, mkdirSync } from 'fs'
@@ -327,6 +328,9 @@ knowledgeRoute.post('/docs', zValidator('json', createDocSchema), async (c) => {
     createdBy: tenant.userId,
   }).returning()
 
+  // Async embedding generation (fire-and-forget, does not delay response)
+  triggerEmbedding(doc.id, tenant.companyId)
+
   return c.json({ data: doc })
 })
 
@@ -477,6 +481,11 @@ knowledgeRoute.patch('/docs/:id', zValidator('json', updateDocSchema), async (c)
     ))
     .returning()
 
+  // Re-embed if content or title changed
+  if (body.content !== undefined || body.title !== undefined) {
+    triggerEmbedding(docId, tenant.companyId)
+  }
+
   return c.json({ data: updated })
 })
 
@@ -581,6 +590,9 @@ knowledgeRoute.post('/docs/upload', async (c) => {
     .set({ fileUrl })
     .where(eq(knowledgeDocs.id, doc.id))
     .returning()
+
+  // Async embedding generation (fire-and-forget)
+  triggerEmbedding(doc.id, tenant.companyId)
 
   return c.json({ data: { doc: updated, fileUrl } })
 })
