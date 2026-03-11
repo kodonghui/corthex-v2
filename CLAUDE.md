@@ -77,7 +77,7 @@ Workers/team agents follow the same standard. "Vague" = instant FAIL in party mo
 ## Context Memory & Compaction
 - Auto-save to `.claude/memory/working-state.md` on key decisions
 - Record: (1) current work (2) key decisions (3) next steps (4) warnings
-- **"컴팩대비"** = user trigger: update working-state.md + MEMORY.md + update log immediately
+- **"컴팩대비"** = user trigger: update working-state.md + MEMORY.md + update log immediately + **git commit+push all uncommitted changes** (서버 워커가 최신 상태를 볼 수 있도록)
 - New session: read working-state.md + recent session logs first
 
 ## Update Log (absolute rule)
