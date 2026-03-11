@@ -331,7 +331,7 @@ phases:
             title: "조직 템플릿 + 온보딩"
             sp: 3
             priority: P1
-            status: backlog
+            status: review
             blocked_by: ["7.1", "7.2"]
           - id: "7.4"
             title: "Cascade 규칙 + 삭제 방지"
@@ -343,7 +343,7 @@ phases:
             title: "NEXUS 읽기 전용 조직도"
             sp: 3
             priority: P1
-            status: backlog
+            status: done
             blocked_by: ["7.1", "7.2"]
 
   - name: "Phase 3: Tier & Visualization"
