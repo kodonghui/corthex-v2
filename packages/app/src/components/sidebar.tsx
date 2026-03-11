@@ -34,6 +34,7 @@ const navSections: NavSection[] = [
     label: '운영',
     items: [
       { to: '/org', label: '조직도', icon: '🏢' },
+      { to: '/departments', label: '부서 관리', icon: '🏗️' },
       { to: '/sns', label: 'SNS', icon: '📱' },
       { to: '/messenger', label: '메신저', icon: '💭' },
       { to: '/dashboard', label: '작전현황', icon: '📊' },

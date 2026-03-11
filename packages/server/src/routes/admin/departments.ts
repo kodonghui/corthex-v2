@@ -43,7 +43,7 @@ const updateDepartmentSchema = z.object({
 departmentsRoute.get('/departments', async (c) => {
   const tenant = c.get('tenant')
   const result = await getDepartments(tenant.companyId)
-  return c.json({ data: result })
+  return c.json({ success: true, data: result })
 })
 
 // GET /api/admin/departments/tree -- tenant-scoped tree view (must be before :id)
@@ -73,7 +73,7 @@ departmentsRoute.get('/departments/tree', async (c) => {
     agents: allAgents.filter(a => a.departmentId === d.id),
   }))
 
-  return c.json({ data: tree })
+  return c.json({ success: true, data: tree })
 })
 
 // GET /api/admin/departments/:id/cascade-analysis -- cascade impact report (must be before :id)
@@ -82,7 +82,7 @@ departmentsRoute.get('/departments/:id/cascade-analysis', async (c) => {
   const id = c.req.param('id')
   const result = await analyzeCascade(tenant.companyId, id)
   throwIfError(result as any)
-  return c.json({ data: (result as any).data })
+  return c.json({ success: true, data: (result as any).data })
 })
 
 // GET /api/admin/departments/:id -- single department by ID
@@ -91,7 +91,7 @@ departmentsRoute.get('/departments/:id', async (c) => {
   const id = c.req.param('id')
   const dept = await getDepartmentById(tenant.companyId, id)
   if (!dept) throw new HTTPError(404, '부서를 찾을 수 없습니다', 'DEPT_001')
-  return c.json({ data: dept })
+  return c.json({ success: true, data: dept })
 })
 
 // POST /api/admin/departments
@@ -100,7 +100,7 @@ departmentsRoute.post('/departments', zValidator('json', createDepartmentSchema)
   const body = c.req.valid('json')
   const result = await createDepartment(tenant, body)
   if ('error' in result) throw new HTTPError(result.error!.status, result.error!.message, result.error!.code)
-  return c.json({ data: result.data }, 201)
+  return c.json({ success: true, data: result.data }, 201)
 })
 
 // PATCH /api/admin/departments/:id
@@ -110,7 +110,7 @@ departmentsRoute.patch('/departments/:id', zValidator('json', updateDepartmentSc
   const body = c.req.valid('json')
   const result = await updateDepartment(tenant, id, body)
   if ('error' in result) throw new HTTPError(result.error!.status, result.error!.message, result.error!.code)
-  return c.json({ data: result.data })
+  return c.json({ success: true, data: result.data })
 })
 
 // DELETE /api/admin/departments/:id?mode=force|wait_completion
@@ -126,5 +126,5 @@ departmentsRoute.delete('/departments/:id', async (c) => {
 
   const result = await executeCascade(tenant, id, modeParam)
   throwIfError(result as any)
-  return c.json({ data: (result as any).data })
+  return c.json({ success: true, data: (result as any).data })
 })
