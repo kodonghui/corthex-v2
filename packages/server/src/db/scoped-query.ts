@@ -1,13 +1,15 @@
 import { eq, or, sql, desc } from 'drizzle-orm'
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm'
 import { db } from './index'
-import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users, costRecords, presets, sketches, sketchVersions } from './schema'
+import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users, costRecords, presets, sketches, tierConfigs } from './schema'
 import { withTenant, scopedWhere, scopedInsert } from './tenant-helpers'
 
 type Agent = InferSelectModel<typeof agents>
 type NewAgent = InferInsertModel<typeof agents>
 type Preset = InferSelectModel<typeof presets>
 type NewPreset = InferInsertModel<typeof presets>
+type TierConfig = InferSelectModel<typeof tierConfigs>
+type NewTierConfig = InferInsertModel<typeof tierConfigs>
 
 /**
  * getDB(companyId) — 멀티테넌시 격리 래퍼 (Architecture D1, E3)
@@ -87,5 +89,19 @@ export function getDB(companyId: string) {
     // WRITE — sketches (Story 11.2)
     updateSketch: (id: string, data: Partial<{ name: string; graphData: unknown; updatedAt: Date }>) =>
       db.update(sketches).set(data).where(scopedWhere(sketches.companyId, companyId, eq(sketches.id, id))).returning(),
+
+    // READ — tier configs (Story 8.1)
+    tierConfigs: () =>
+      db.select().from(tierConfigs).where(withTenant(tierConfigs.companyId, companyId)).orderBy(tierConfigs.tierLevel),
+    tierConfigByLevel: (level: number) =>
+      db.select().from(tierConfigs).where(scopedWhere(tierConfigs.companyId, companyId, eq(tierConfigs.tierLevel, level))),
+
+    // WRITE — tier configs (Story 8.1)
+    insertTierConfig: (data: Omit<NewTierConfig, 'companyId'>) =>
+      db.insert(tierConfigs).values(scopedInsert(companyId, data)).returning(),
+    updateTierConfig: (id: string, data: Partial<Omit<TierConfig, 'id' | 'companyId'>>) =>
+      db.update(tierConfigs).set(data).where(scopedWhere(tierConfigs.companyId, companyId, eq(tierConfigs.id, id))).returning(),
+    deleteTierConfig: (id: string) =>
+      db.delete(tierConfigs).where(scopedWhere(tierConfigs.companyId, companyId, eq(tierConfigs.id, id))).returning(),
   }
 }

@@ -148,7 +148,8 @@ export const agents = pgTable('agents', {
   departmentId: uuid('department_id').references(() => departments.id),
   name: varchar('name', { length: 100 }).notNull(),
   role: varchar('role', { length: 200 }),
-  tier: agentTierEnum('tier').notNull().default('specialist'),
+  tier: agentTierEnum('tier').notNull().default('specialist'),  // deprecated: use tierLevel (Story 8.1)
+  tierLevel: integer('tier_level').notNull().default(2),  // 1=Manager, 2=Specialist, 3=Worker (dynamic N-tier)
   nameEn: varchar('name_en', { length: 100 }),
   modelName: varchar('model_name', { length: 100 }).notNull().default('claude-haiku-4-5'),
   reportTo: uuid('report_to'),  // self-reference to parent agent
@@ -167,7 +168,23 @@ export const agents = pgTable('agents', {
   companyIdx: index('agents_company_idx').on(table.companyId),
 }))
 
-// === 4a. notification_preferences — 유저별 알림 설정 ===
+// === 4a. tier_configs — 회사별 N-Tier 계층 설정 (Epic 8, Story 8.1) ===
+export const tierConfigs = pgTable('tier_configs', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  tierLevel: integer('tier_level').notNull(),
+  name: varchar('name', { length: 100 }).notNull(),
+  modelPreference: varchar('model_preference', { length: 100 }).notNull().default('claude-haiku-4-5'),
+  maxTools: integer('max_tools').notNull().default(10),
+  description: text('description'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('tier_configs_company_idx').on(table.companyId),
+  uniqueTierLevel: unique('tier_configs_company_level_unique').on(table.companyId, table.tierLevel),
+}))
+
+// === 4b. notification_preferences — 유저별 알림 설정 ===
 export const notificationPreferences = pgTable('notification_preferences', {
   id: uuid('id').primaryKey().defaultRandom(),
   userId: uuid('user_id').notNull().references(() => users.id),
@@ -1113,6 +1130,7 @@ export const companiesRelations = relations(companies, ({ many }) => ({
   presets: many(presets),
   orgTemplates: many(orgTemplates),
   auditLogs: many(auditLogs),
+  tierConfigs: many(tierConfigs),
 }))
 
 export const usersRelations = relations(users, ({ one, many }) => ({
@@ -1142,6 +1160,10 @@ export const departmentsRelations = relations(departments, ({ one, many }) => ({
   agents: many(agents),
   knowledge: many(departmentKnowledge),
   employeeDepartments: many(employeeDepartments),
+}))
+
+export const tierConfigsRelations = relations(tierConfigs, ({ one }) => ({
+  company: one(companies, { fields: [tierConfigs.companyId], references: [companies.id] }),
 }))
 
 export const employeeDepartmentsRelations = relations(employeeDepartments, ({ one }) => ({

@@ -71,12 +71,26 @@ export type Agent = {
   nameEn: string | null
   role: string
   tier: AgentTier
+  tierLevel: number
   modelName: string
   departmentId: string | null
   reportTo: string | null
   soul: string
   status: AgentStatus
   createdAt: Date
+}
+
+// === Tier 설정 (Story 8.1) ===
+export type TierConfig = {
+  id: string
+  companyId: string
+  tierLevel: number
+  name: string
+  modelPreference: string
+  maxTools: number
+  description: string | null
+  createdAt: Date
+  updatedAt: Date
 }
 
 // === 채팅 메시지 ===
