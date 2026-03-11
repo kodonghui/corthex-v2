@@ -1,9 +1,9 @@
 ---
 name: 'kdh-full-auto-pipeline'
-description: 'BMAD Full Pipeline v5.1 (team agents + swarm). planning(3-agent real party) or story dev(single/parallel/swarm). Usage: /kdh-full-auto-pipeline [planning|story-ID|parallel ID1 ID2...|swarm epic-N]'
+description: 'BMAD Full Pipeline v5.2 (team agents + swarm). planning(3-agent real party) or story dev(single/parallel/swarm). Usage: /kdh-full-auto-pipeline [planning|story-ID|parallel ID1 ID2...|swarm epic-N]'
 ---
 
-# Kodonghui Full Pipeline v5.1
+# Kodonghui Full Pipeline v5.2
 
 BMAD pipeline with **team agent real party**, **parallel story dev**, and **swarm auto-epic**.
 "Brief만 참여 → 자러감 → 아침에 완성" 가능.
@@ -16,6 +16,16 @@ BMAD pipeline with **team agent real party**, **parallel story dev**, and **swar
 - `swarm epic-N`: **Swarm auto-epic** — registers ALL stories as tasks, 3 workers self-organize (v5.1)
 
 ---
+
+## What Changed in v5.2 (from v5.1)
+
+| Change | Why |
+|--------|-----|
+| **Writer Skill prohibition** | Writer called Skill tool → skill auto-completed all steps → Critics never reviewed. Now explicitly forbidden with fallback instructions. |
+| **Step file paths in Planning Stages** | v5.1 listed `Skill: bmad-bmm-*` → Orchestrator told Writer to call skills. Now lists actual step file paths. |
+| **Explicit per-step loop in Writer prompt** | v5.1 Writer prompt was ambiguous about when to stop and request review. Now has 5-phase mandatory loop with WAIT points. |
+| **Anti-Pattern documentation** | 3 production failures documented as warnings to prevent recurrence. |
+| **Orchestrator step instruction format** | v5.1 said "embed step context". Now specifies exact message format with file paths. |
 
 ## What Changed in v5.1 (from v5.0)
 
@@ -152,49 +162,113 @@ If TeamCreate fails or critics don't respond within 5 minutes:
 
 ---
 
-## Writer Prompt Template (Planning Mode)
+### ⛔ CRITICAL ANTI-PATTERNS (v5.2 — learned from production failures)
+
+These failures ACTUALLY HAPPENED. They are not hypothetical.
+
+#### Anti-Pattern 1: Writer calls Skill tool for planning documents
+**What happened:** Writer called `skill="bmad-bmm-create-product-brief"`. The skill's internal YOLO mode auto-proceeded through ALL steps (2→3→4→5→6) without stopping. Critics waited forever for `[Review Request]` that never came.
+**Root cause:** Skill tool runs a complete workflow internally. It has its own step-loop with menu auto-selection (YOLO). There is NO hook to pause mid-skill and SendMessage to critics.
+**Fix:** Planning mode Writer MUST NEVER use the Skill tool. Writer reads BMAD step files with the Read tool and manually writes each section. Only story dev workers use the Skill tool.
+
+#### Anti-Pattern 2: Writer writes all steps then sends one review request
+**What happened:** Writer wrote steps 2-6 all at once, then sent one "[Review Request]" for the entire document. Critics couldn't give step-by-step feedback.
+**Root cause:** Writer prompt said "write the section" but didn't enforce one-step-at-a-time discipline.
+**Fix:** Writer MUST follow this exact loop: write ONE step → SendMessage "[Review Request]" → WAIT for BOTH critics → fix → get verified → ONLY THEN proceed to next step. Orchestrator validates that party-logs exist PER STEP.
+
+#### Anti-Pattern 3: Orchestrator says "run this skill" to Writer
+**What happened:** Orchestrator's step instruction said "Execute skill=bmad-bmm-create-ux-design". Writer dutifully called the Skill tool.
+**Root cause:** Planning Stages section listed `Skill: bmad-bmm-create-ux-design`, implying Skill tool usage.
+**Fix:** Planning Stages now list STEP FILE PATHS, not skill names. Orchestrator sends step file path to Writer, not skill name.
+
+---
+
+## Writer Prompt Template (Planning Mode — v5.2 FIXED)
 
 ```
 You are a BMAD planning document WRITER in team "{team_name}".
 Model: sonnet. YOLO mode — auto-proceed, never wait for user input.
 
+## ⛔ CRITICAL PROHIBITION
+You MUST NEVER use the Skill tool for planning documents.
+- ❌ FORBIDDEN: skill="bmad-bmm-create-product-brief"
+- ❌ FORBIDDEN: skill="bmad-bmm-create-prd"
+- ❌ FORBIDDEN: skill="bmad-bmm-create-ux-design"
+- ❌ FORBIDDEN: skill="bmad-bmm-create-architecture"
+- ❌ FORBIDDEN: skill="bmad-bmm-create-epics-and-stories"
+- ❌ FORBIDDEN: Any skill that writes planning documents
+The Skill tool runs a complete workflow internally and BYPASSES the critic review loop.
+
 ## Your Role
 You WRITE document sections and FIX them based on critic feedback.
 You do NOT self-review — two independent Critics will review your work.
 
-## Your Workflow (per step)
-1. Receive step instruction from Orchestrator (team-lead)
-2. Read all reference documents (PRD, Brief, v1-feature-spec, architecture, etc.)
-3. Read prior decisions: _bmad-output/context-snapshots/*.md (if any exist)
-4. Write the section in the target document file — concrete, specific, no placeholders
-5. SendMessage to "critic-a": "[Review Request] {step_name} written. File: {path} lines {N}-{M}"
-6. SendMessage to "critic-b": "[Review Request] {step_name} written. File: {path} lines {N}-{M}"
-7. WAIT for both Critics to send feedback
-8. Read BOTH critic review logs FROM FILE (not from memory):
-   - _bmad-output/party-logs/{stage}-{step}-critic-a.md
-   - _bmad-output/party-logs/{stage}-{step}-critic-b.md
-9. Apply ALL fixes to the document file
-10. Write fix summary to _bmad-output/party-logs/{stage}-{step}-fixes.md
-11. SendMessage to "critic-a": "[Fixes Applied] Fixed {N} issues. Please verify."
-12. SendMessage to "critic-b": "[Fixes Applied] Fixed {N} issues. Please verify."
-13. WAIT for verification scores from both Critics
-14. If both scores avg >= 7: PASS
-    → Save context-snapshot to _bmad-output/context-snapshots/{stage}-{step}-snapshot.md
-      Format (5 lines max):
-        ## {step_name}
-        - Decisions: (what was decided and why, 1-2 lines)
-        - Constraints: (what the next step MUST respect, 1 line)
-        - Connections: (how this relates to previous steps, 1 line)
+## How You Write Content (instead of using Skill tool)
+1. Receive step instruction from Orchestrator: includes STEP FILE PATH
+2. Read the step file with the Read tool (e.g. `_bmad/bmm/workflows/.../steps/step-02-vision.md`)
+3. Extract the CONTENT TEMPLATE from the step file (the markdown structure to append)
+4. Read ALL reference documents listed below
+5. Write the section content — filling the template with real, specific, concrete content
+6. Append/write the content to the output document file
+7. Note the line numbers you wrote (start-end)
+8. SendMessage to BOTH critics with exact file path + line numbers
+
+## Reference Documents (read BEFORE writing any step)
+- v1-feature-spec: _bmad-output/planning-artifacts/v1-feature-spec.md
+- architecture: _bmad-output/planning-artifacts/architecture.md
+- prd: _bmad-output/planning-artifacts/prd.md
+- Prior decisions: _bmad-output/context-snapshots/*.md (all files, if any exist)
+- Epic-specific input: (provided by Orchestrator in step instruction)
+
+## Your Per-Step Loop (MANDATORY — no shortcuts)
+For EACH step the Orchestrator assigns:
+
+### Phase 1: Write
+1. Read the step file (path from Orchestrator)
+2. Read reference documents (above list + any step-specific refs)
+3. Read prior context-snapshots for decisions from earlier steps
+4. Write the section in the output document — concrete, specific, no placeholders
+5. Record: which file, which lines (start line - end line)
+
+### Phase 2: Request Review
+6. SendMessage to "critic-a": "[Review Request] {step_name} written. File: {path} lines {start}-{end}. Step file: {step_file_path}"
+7. SendMessage to "critic-b": "[Review Request] {step_name} written. File: {path} lines {start}-{end}. Step file: {step_file_path}"
+8. STOP AND WAIT. Do NOT write the next step. Do NOT do anything until BOTH critics respond.
+
+### Phase 3: Fix
+9. When BOTH critics have sent "[Feedback]" messages:
+10. Read BOTH critic review logs FROM FILE (Read tool, not from message):
+    - _bmad-output/party-logs/{stage}-{step}-critic-a.md
+    - _bmad-output/party-logs/{stage}-{step}-critic-b.md
+11. Apply ALL suggested fixes to the document
+12. Write fix summary: _bmad-output/party-logs/{stage}-{step}-fixes.md
+
+### Phase 4: Verify
+13. SendMessage to "critic-a": "[Fixes Applied] Fixed {N} issues. Please verify {path} lines {start}-{end}"
+14. SendMessage to "critic-b": "[Fixes Applied] Fixed {N} issues. Please verify {path} lines {start}-{end}"
+15. STOP AND WAIT for both verification scores.
+
+### Phase 5: Score & Next
+16. If avg score >= 7: PASS
+    → Save context-snapshot: _bmad-output/context-snapshots/{stage}-{step}-snapshot.md
+      ## {step_name}
+      - Decisions: (what was decided and why)
+      - Constraints: (what next step MUST respect)
+      - Connections: (how this relates to previous steps)
     → SendMessage to team-lead: "[Step Complete] {step_name}. Score: {avg}/10"
-15. If avg < 7 AND retry < 2: rewrite from scratch, go back to step 3
-16. If avg < 7 AND retry >= 2: SendMessage to team-lead: "[ESCALATE] {step_name}"
+    → WAIT for next step instruction from Orchestrator. Do NOT auto-proceed.
+17. If avg < 7 AND retry < 2: rewrite section from scratch, go back to Phase 1
+18. If avg < 7 AND retry >= 2: SendMessage to team-lead: "[ESCALATE] {step_name}"
 
 ## Rules
-- No stubs/mocks/placeholders — concrete, real, specific content only
-- Always read references BEFORE writing
-- Always read critic logs FROM FILE (Read tool), never from message memory
-- Reference v1-feature-spec.md for feature coverage
-- Only do the step instructed. Do NOT skip ahead.
+- ⛔ NEVER use the Skill tool (see prohibition above)
+- ⛔ NEVER write more than ONE step before sending review request
+- ⛔ NEVER auto-proceed to next step — WAIT for Orchestrator's instruction
+- ✅ Always read step file with Read tool to understand what content to write
+- ✅ Always read references BEFORE writing
+- ✅ Always read critic logs FROM FILE (Read tool), never from message memory
+- ✅ Always include exact line numbers in review requests
+- ✅ No stubs/mocks/placeholders — concrete, real, specific content only
 ```
 
 ## Critic-A Prompt Template (Product + UX + Business)
@@ -352,7 +426,7 @@ Step 1: Spawn Team for Stage
   → Read ALL _bmad-output/context-snapshots/*.md for "Prior Decisions" injection
   → Spawn Writer (model=sonnet, mode=bypassPermissions):
     - Include: stage context, reference file paths, prior decisions
-    - CRITICAL: Embed FIRST step instruction in spawn prompt
+    - CRITICAL: Embed FIRST step instruction in spawn prompt (use "[Step Instruction]" format — see Step 2a)
   → Spawn Critic-A (model=sonnet, mode=bypassPermissions):
     - Include: role description, reference file paths, prior decisions
     - Prompt: "WAIT for Writer's [Review Request] before starting"
@@ -362,16 +436,28 @@ Step 1: Spawn Team for Stage
   (Critics waiting is OK here — they WILL receive Writer's DM as their trigger)
 
 Step 2: Step Loop
-  2a. Writer writes + requests review → Critics review in parallel → cross-talk → feedback
-  2b. Writer fixes → Critics verify → score → PASS or retry
-  2c. Orchestrator receives "[Step Complete]" from Writer:
-      → VALIDATE: check critic-a.md, critic-b.md, fixes.md exist
-      → If missing: REJECT (up to 2x)
-      → If present: accept
-  2d. TIMEOUT: 10min + 2min grace → shutdown team, respawn with snapshots
-  2e. ESCALATION: log and skip
-  2f. Send next step to Writer via SendMessage (Critics auto-trigger on Writer's review request)
-  2g. Repeat for all steps in stage
+  2a. Orchestrator sends step instruction to Writer via SendMessage:
+      "[Step Instruction] Execute {step_name}.
+       Step file: {full_path_to_step_file}
+       Output file: {output_document_path}
+       References: {comma-separated list of reference doc paths}
+       Epic-specific input: {path to research doc or prior brief, if applicable}
+
+       Read the step file, extract the content template, write the section.
+       Then SendMessage to critic-a and critic-b with [Review Request]."
+  2b. Writer writes + requests review → Critics review in parallel → cross-talk → feedback
+  2c. Writer fixes → Critics verify → score → PASS or retry
+  2d. Orchestrator receives "[Step Complete]" from Writer:
+      → VALIDATE: check ALL 3 party-log files exist:
+        - _bmad-output/party-logs/{stage}-{step}-critic-a.md
+        - _bmad-output/party-logs/{stage}-{step}-critic-b.md
+        - _bmad-output/party-logs/{stage}-{step}-fixes.md
+      → If ANY missing: REJECT. SendMessage to Writer: "[REJECTED] Missing party-logs: {list}. Redo review cycle."
+      → If present: ACCEPT
+  2e. TIMEOUT: 10min + 2min grace → shutdown team, respawn with snapshots
+  2f. ESCALATION: log and skip
+  2g. Send NEXT step instruction to Writer (same format as 2a)
+  2h. Repeat for all steps in stage
 
 Step 3: Stage Complete
   → git commit: docs(planning): {stage} complete -- {N} steps, team-party, {E} escalations
@@ -399,37 +485,116 @@ Critics: verify all 6 applied, no unintended changes, numbers consistent.
 Commit: `docs(planning): PRD spec fix -- server 4GB→24GB, session 10→20, memory 50→200MB`
 
 #### Stage 1: UX Design
-Skill: `bmad-bmm-create-ux-design`
-| Step | Description |
-|------|-------------|
-| step-02 | discovery |
-| step-03 | core-experience |
-| step-04 | emotional-response |
-| step-05 | inspiration |
-| step-06 | design-system |
-| step-07 | defining-experience |
-| step-08 | visual-foundation |
-| step-09 | design-directions |
-| step-10 | user-journeys |
-| step-11 | component-strategy |
-| step-12 | ux-patterns |
-| step-13 | responsive-accessibility |
+Workflow dir: `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/`
+Template: `ux-design-template.md`
+Output: `_bmad-output/planning-artifacts/ux-design.md`
+
+| Step | File | Content Section |
+|------|------|----------------|
+| step-02 | `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-02-discovery.md` | Discovery |
+| step-03 | `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-03-core-experience.md` | Core Experience |
+| step-04 | `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-04-emotional-response.md` | Emotional Response |
+| step-05 | `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-05-inspiration.md` | Inspiration |
+| step-06 | `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-06-design-system.md` | Design System |
+| step-07 | `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-07-defining-experience.md` | Defining Experience |
+| step-08 | `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-08-visual-foundation.md` | Visual Foundation |
+| step-09 | `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-09-design-directions.md` | Design Directions |
+| step-10 | `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-10-user-journeys.md` | User Journeys |
+| step-11 | `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-11-component-strategy.md` | Component Strategy |
+| step-12 | `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-12-ux-patterns.md` | UX Patterns |
+| step-13 | `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-13-responsive-accessibility.md` | Responsive & Accessibility |
+| step-14 | `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-14-complete.md` | Final Review + Completion |
+
+Orchestrator sends to Writer per step:
+  "[Step Instruction] Execute step-02 (Discovery).
+   Step file: _bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-02-discovery.md
+   Output file: _bmad-output/planning-artifacts/ux-design.md
+   References: _bmad-output/planning-artifacts/v1-feature-spec.md, _bmad-output/planning-artifacts/prd.md, _bmad-output/planning-artifacts/architecture.md
+   Read the step file, extract the content template, write the section.
+   Then SendMessage to critic-a and critic-b with [Review Request]."
+
 Commit: `docs(planning): UX Design complete -- {N} steps, team-party`
 
 #### Stage 2: Epics & Stories
-Skill: `bmad-bmm-create-epics-and-stories`
-Steps: step-02-design-epics, step-03-create-stories, step-04-final-validation
+Workflow dir: `_bmad/bmm/workflows/3-solutioning/create-epics-and-stories/`
+Template: `_bmad/bmm/workflows/3-solutioning/create-epics-and-stories/templates/epics-template.md`
+Output: `_bmad-output/planning-artifacts/epics-and-stories.md`
+
+| Step | File | Content Section |
+|------|------|----------------|
+| step-01 | `_bmad/bmm/workflows/3-solutioning/create-epics-and-stories/steps/step-01-validate-prerequisites.md` | Validate Prerequisites |
+| step-02 | `_bmad/bmm/workflows/3-solutioning/create-epics-and-stories/steps/step-02-design-epics.md` | Design Epics |
+| step-03 | `_bmad/bmm/workflows/3-solutioning/create-epics-and-stories/steps/step-03-create-stories.md` | Create Stories |
+| step-04 | `_bmad/bmm/workflows/3-solutioning/create-epics-and-stories/steps/step-04-final-validation.md` | Final Validation |
+
 Commit: `docs(planning): Epics complete -- {N} steps, team-party`
 
 #### Stage 3: Implementation Readiness
-Skill: `bmad-bmm-check-implementation-readiness`
-Steps: step-01 through step-06
+Workflow dir: `_bmad/bmm/workflows/3-solutioning/check-implementation-readiness/`
+Template: `_bmad/bmm/workflows/3-solutioning/check-implementation-readiness/templates/readiness-report-template.md`
+Output: `_bmad-output/planning-artifacts/implementation-readiness.md`
+
+| Step | File | Content Section |
+|------|------|----------------|
+| step-01 | `_bmad/bmm/workflows/3-solutioning/check-implementation-readiness/steps/step-01-document-discovery.md` | Document Discovery |
+| step-02 | `_bmad/bmm/workflows/3-solutioning/check-implementation-readiness/steps/step-02-prd-analysis.md` | PRD Analysis |
+| step-03 | `_bmad/bmm/workflows/3-solutioning/check-implementation-readiness/steps/step-03-epic-coverage-validation.md` | Epic Coverage Validation |
+| step-04 | `_bmad/bmm/workflows/3-solutioning/check-implementation-readiness/steps/step-04-ux-alignment.md` | UX Alignment |
+| step-05 | `_bmad/bmm/workflows/3-solutioning/check-implementation-readiness/steps/step-05-epic-quality-review.md` | Epic Quality Review |
+| step-06 | `_bmad/bmm/workflows/3-solutioning/check-implementation-readiness/steps/step-06-final-assessment.md` | Final Assessment |
+
 Commit: `docs(planning): Readiness complete -- {N} steps, team-party`
 
 #### Stage 4: Sprint Planning
-Skill: `bmad-bmm-sprint-planning`
 No party mode (automated generation).
 Commit: `docs(planning): Sprint planning complete`
+
+**Reference — Brief stage step files (for future use):**
+Workflow dir: `_bmad/bmm/workflows/1-analysis/create-product-brief/`
+Template: `_bmad/bmm/workflows/1-analysis/create-product-brief/product-brief.template.md`
+
+| Step | File | Content Section |
+|------|------|----------------|
+| step-02 | `_bmad/bmm/workflows/1-analysis/create-product-brief/steps/step-02-vision.md` | Executive Summary + Core Vision |
+| step-03 | `_bmad/bmm/workflows/1-analysis/create-product-brief/steps/step-03-users.md` | Target Users + Personas |
+| step-04 | `_bmad/bmm/workflows/1-analysis/create-product-brief/steps/step-04-metrics.md` | Success Metrics + KPIs |
+| step-05 | `_bmad/bmm/workflows/1-analysis/create-product-brief/steps/step-05-scope.md` | MVP Scope + Future Vision |
+| step-06 | `_bmad/bmm/workflows/1-analysis/create-product-brief/steps/step-06-complete.md` | Final Review + Completion |
+
+**Reference — PRD stage step files (for future use):**
+Workflow dir: `_bmad/bmm/workflows/2-plan-workflows/create-prd/`
+Template: `_bmad/bmm/workflows/2-plan-workflows/create-prd/templates/prd-template.md`
+
+Create-PRD steps (steps-c):
+
+| Step | File | Content Section |
+|------|------|----------------|
+| step-02 | `_bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/step-02-discovery.md` | Discovery |
+| step-02b | `_bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/step-02b-vision.md` | Vision |
+| step-02c | `_bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/step-02c-executive-summary.md` | Executive Summary |
+| step-03 | `_bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/step-03-success.md` | Success Metrics |
+| step-04 | `_bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/step-04-journeys.md` | User Journeys |
+| step-05 | `_bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/step-05-domain.md` | Domain |
+| step-06 | `_bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/step-06-innovation.md` | Innovation |
+| step-07 | `_bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/step-07-project-type.md` | Project Type |
+| step-08 | `_bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/step-08-scoping.md` | Scoping |
+| step-09 | `_bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/step-09-functional.md` | Functional Requirements |
+| step-10 | `_bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/step-10-nonfunctional.md` | Non-Functional Requirements |
+| step-11 | `_bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/step-11-polish.md` | Polish |
+| step-12 | `_bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/step-12-complete.md` | Final Review + Completion |
+
+**Reference — Architecture stage step files (for future use):**
+Workflow dir: `_bmad/bmm/workflows/3-solutioning/create-architecture/`
+
+| Step | File | Content Section |
+|------|------|----------------|
+| step-02 | `_bmad/bmm/workflows/3-solutioning/create-architecture/steps/step-02-context.md` | Context |
+| step-03 | `_bmad/bmm/workflows/3-solutioning/create-architecture/steps/step-03-starter.md` | Starter |
+| step-04 | `_bmad/bmm/workflows/3-solutioning/create-architecture/steps/step-04-decisions.md` | Decisions |
+| step-05 | `_bmad/bmm/workflows/3-solutioning/create-architecture/steps/step-05-patterns.md` | Patterns |
+| step-06 | `_bmad/bmm/workflows/3-solutioning/create-architecture/steps/step-06-structure.md` | Structure |
+| step-07 | `_bmad/bmm/workflows/3-solutioning/create-architecture/steps/step-07-validation.md` | Validation |
+| step-08 | `_bmad/bmm/workflows/3-solutioning/create-architecture/steps/step-08-complete.md` | Final Review + Completion |
 
 ---
 
@@ -790,6 +955,10 @@ You are SELF-ORGANIZING: pick your own tasks from the task board.
 ### /simplify times out or errors
 **Fix:** Skip, log, continue. code-review still catches issues.
 
+### Writer called Skill tool instead of reading step file
+**Cause:** Anti-Pattern #1 (see CRITICAL ANTI-PATTERNS section above).
+**Fix:** Shut down Writer. Respawn Writer with explicit prohibition. Inject context-snapshots. Resend step instruction in "[Step Instruction]" format with full step file path.
+
 ---
 
 ## Absolute Rules
@@ -800,7 +969,7 @@ You are SELF-ORGANIZING: pick your own tasks from the task board.
 4. Never treat stub/mock/placeholder as "complete"
 5. Never skip planning stages because "file already exists" — always fresh
 6. Never batch planning stages into one commit — individual commits per stage
-7. BMAD agents: no menus, execute immediately (YOLO)
+7. BMAD skills: no menus, execute immediately (YOLO) — BUT planning mode Writer NEVER uses Skill tool (see Anti-Pattern #1)
 8. Planning stages: create fresh every time (overwrite existing)
 9. Workers run in tmux (visible to user in split-pane)
 10. Workers stay alive for all steps within a STAGE — shutdown and respawn between stages
@@ -824,3 +993,6 @@ You are SELF-ORGANIZING: pick your own tasks from the task board.
 28. Swarm: task timeout 20min → task returns to board (owner=null). Another worker picks up.
 29. Swarm: Orchestrator generates epic completion report after all tasks done
 30. Swarm: merge in dependency order. Merge conflict → spawn fix-worker (5min). Unresolvable → skip + log.
+31. Planning Writer MUST NEVER call the Skill tool. Content is written manually by reading step files.
+32. Planning Writer MUST write exactly ONE step, then SendMessage to BOTH critics, then WAIT. No batching steps.
+33. Orchestrator MUST send step file paths (not skill names) in Writer instructions. Format: "[Step Instruction] ..."
