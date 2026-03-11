@@ -18,6 +18,7 @@ const ReportLinesPage = lazy(() => import('./pages/report-lines').then((m) => ({
 const SoulTemplatesPage = lazy(() => import('./pages/soul-templates').then((m) => ({ default: m.SoulTemplatesPage })))
 const MonitoringPage = lazy(() => import('./pages/monitoring').then((m) => ({ default: m.MonitoringPage })))
 const OrgChartPage = lazy(() => import('./pages/org-chart').then((m) => ({ default: m.OrgChartPage })))
+const NexusPage = lazy(() => import('./pages/nexus').then((m) => ({ default: m.NexusPage })))
 const OrgTemplatesPage = lazy(() => import('./pages/org-templates').then((m) => ({ default: m.OrgTemplatesPage })))
 const EmployeesPage = lazy(() => import('./pages/employees').then((m) => ({ default: m.EmployeesPage })))
 const SettingsPage = lazy(() => import('./pages/settings').then((m) => ({ default: m.SettingsPage })))
@@ -94,6 +95,7 @@ export function App() {
             <Route path="soul-templates" element={<Suspense fallback={<PageSkeleton />}><SoulTemplatesPage /></Suspense>} />
             <Route path="monitoring" element={<Suspense fallback={<PageSkeleton />}><MonitoringPage /></Suspense>} />
             <Route path="org-chart" element={<Suspense fallback={<PageSkeleton />}><OrgChartPage /></Suspense>} />
+            <Route path="nexus" element={<Suspense fallback={<PageSkeleton />}><NexusPage /></Suspense>} />
             <Route path="org-templates" element={<Suspense fallback={<PageSkeleton />}><OrgTemplatesPage /></Suspense>} />
             <Route path="workflows" element={<Suspense fallback={<PageSkeleton />}><WorkflowsPage /></Suspense>} />
             <Route path="template-market" element={<Suspense fallback={<PageSkeleton />}><TemplateMarketPage /></Suspense>} />

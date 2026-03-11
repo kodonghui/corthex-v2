@@ -13,6 +13,8 @@
     "@corthex/shared": "workspace:*",
     "@corthex/ui": "workspace:*",
     "@tanstack/react-query": "^5.90.21",
+    "@xyflow/react": "^12.10.1",
+    "elkjs": "^0.11.1",
     "react": "^19",
     "react-dom": "^19",
     "react-router-dom": "^7",

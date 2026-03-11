@@ -24,6 +24,7 @@ const nav = [
   { to: '/soul-templates', label: '소울 템플릿', icon: '✨' },
   { to: '/monitoring', label: '시스템 모니터링', icon: '🖥️' },
   { to: '/org-chart', label: '조직도', icon: '🏗️' },
+  { to: '/nexus', label: 'NEXUS 조직도', icon: '🔮' },
   { to: '/org-templates', label: '조직 템플릿', icon: '📋' },
   { to: '/template-market', label: '템플릿 마켓', icon: '🛒' },
   { to: '/agent-marketplace', label: '에이전트 마켓', icon: '🧠' },
