@@ -394,7 +394,7 @@ phases:
             title: "NEXUS React Flow 캔버스 기반"
             sp: 3
             priority: P0
-            status: review
+            status: done
             blocked_by: []
           - id: "9.2"
             title: "NEXUS 노드 시각화"

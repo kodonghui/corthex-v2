@@ -22,13 +22,15 @@ type AgentNodeData = {
   isSystem: boolean
 }
 
-export const AgentNode = memo(function AgentNode({ data }: { data: AgentNodeData }) {
+export const AgentNode = memo(function AgentNode({ data, selected }: { data: AgentNodeData; selected?: boolean }) {
   const status = STATUS_DOT[data.status] || STATUS_DOT.offline
   const tier = TIER_BADGE[data.tier] || TIER_BADGE.worker
   const isSecretary = data.isSecretary
 
-  const borderColor = isSecretary ? 'border-amber-500' : 'border-emerald-600'
   const bgColor = isSecretary ? 'bg-amber-950' : 'bg-emerald-950'
+  const borderColor = selected
+    ? 'border-blue-400 ring-2 ring-blue-400/50'
+    : isSecretary ? 'border-amber-500' : 'border-emerald-600'
 
   return (
     <div

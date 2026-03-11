@@ -6,10 +6,12 @@ type UnassignedGroupNodeData = {
   agentCount: number
 }
 
-export const UnassignedGroupNode = memo(function UnassignedGroupNode({ data }: { data: UnassignedGroupNodeData }) {
+export const UnassignedGroupNode = memo(function UnassignedGroupNode({ data, selected }: { data: UnassignedGroupNodeData; selected?: boolean }) {
   return (
     <div
-      className="px-4 py-3 rounded-xl bg-orange-950/30 border-2 border-dashed border-orange-500 shadow-md min-w-[240px]"
+      className={`px-4 py-3 rounded-xl bg-orange-950/30 border-2 border-dashed shadow-md min-w-[240px] ${
+        selected ? 'border-blue-400 ring-2 ring-blue-400/50' : 'border-orange-500'
+      }`}
       data-testid="nexus-unassigned-group-node"
     >
       <Handle type="target" position={Position.Top} className="!bg-orange-400 !w-2 !h-2" />

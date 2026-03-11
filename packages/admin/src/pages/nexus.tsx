@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   ReactFlow,
   Controls,
@@ -7,20 +7,25 @@ import {
   Background,
   useNodesState,
   useEdgesState,
+  useReactFlow,
+  ReactFlowProvider,
   type NodeTypes,
   type Node,
   type Edge,
+  type NodeChange,
   BackgroundVariant,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 
 import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
+import { useToastStore } from '../stores/toast-store'
 import { computeElkLayout, type OrgChartData } from '../lib/elk-layout'
 import { CompanyNode } from '../components/nexus/company-node'
 import { DepartmentNode } from '../components/nexus/department-node'
 import { AgentNode } from '../components/nexus/agent-node'
 import { UnassignedGroupNode } from '../components/nexus/unassigned-group-node'
+import { NexusToolbar } from '../components/nexus/nexus-toolbar'
 import { Skeleton } from '@corthex/ui'
 
 // Register custom node types
@@ -30,6 +35,12 @@ const nodeTypes: NodeTypes = {
   agent: AgentNode,
   'unassigned-group': UnassignedGroupNode,
 } as unknown as NodeTypes
+
+// Saved layout data shape
+type SavedLayoutData = {
+  nodePositions: Record<string, { x: number; y: number }>
+  viewport?: { x: number; y: number; zoom: number }
+} | null
 
 // MiniMap color mapping
 function miniMapNodeColor(node: { type?: string }) {
@@ -51,35 +62,163 @@ function NexusSkeleton() {
   )
 }
 
-export function NexusPage() {
+function NexusCanvas() {
   const selectedCompanyId = useAdminStore((s) => s.selectedCompanyId)
+  const addToast = useToastStore((s) => s.addToast)
+  const queryClient = useQueryClient()
+  const { fitView } = useReactFlow()
+
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([] as Node[])
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([] as Edge[])
   const [layoutReady, setLayoutReady] = useState(false)
+  const [isEditMode, setIsEditMode] = useState(false)
+  const [isDirty, setIsDirty] = useState(false)
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
 
+  // Ref to track if we applied saved layout (to avoid ELK overriding it)
+  const appliedSavedLayout = useRef(false)
+
+  // Fetch org data
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['org-chart', selectedCompanyId],
     queryFn: () => api.get<{ data: OrgChartData }>(`/admin/org-chart?companyId=${encodeURIComponent(selectedCompanyId!)}`),
     enabled: !!selectedCompanyId,
+    refetchInterval: 30_000, // Poll every 30s for real-time updates (admin has no WS)
   })
 
-  // Compute ELK layout when data changes (with stale guard)
+  // Fetch saved layout
+  const { data: savedLayout } = useQuery({
+    queryKey: ['nexus-layout', selectedCompanyId],
+    queryFn: () => api.get<{ data: SavedLayoutData }>('/admin/nexus/layout'),
+    enabled: !!selectedCompanyId,
+  })
+
+  // Save layout mutation
+  const saveMutation = useMutation({
+    mutationFn: (layoutData: { nodePositions: Record<string, { x: number; y: number }>; viewport?: { x: number; y: number; zoom: number } }) =>
+      api.put('/admin/nexus/layout', layoutData),
+    onSuccess: () => {
+      setIsDirty(false)
+      queryClient.invalidateQueries({ queryKey: ['nexus-layout', selectedCompanyId] })
+      addToast({ type: 'success', message: '레이아웃이 저장되었습니다' })
+    },
+    onError: () => {
+      addToast({ type: 'error', message: '레이아웃 저장에 실패했습니다' })
+    },
+  })
+
+  // Compute ELK layout when data changes, applying saved positions if available
   useEffect(() => {
     if (!data?.data) return
     let stale = false
     setLayoutReady(false)
+
     computeElkLayout(data.data)
       .then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
         if (stale) return
-        setNodes(layoutedNodes)
+
+        // Apply saved positions if available
+        const saved = savedLayout?.data
+        if (saved?.nodePositions) {
+          const positioned = layoutedNodes.map((n) => {
+            const pos = saved.nodePositions[n.id]
+            return pos ? { ...n, position: pos } : n
+          })
+          setNodes(positioned)
+          appliedSavedLayout.current = true
+        } else {
+          setNodes(layoutedNodes)
+          appliedSavedLayout.current = false
+        }
+
         setEdges(layoutedEdges)
         setLayoutReady(true)
+        setIsDirty(false)
       })
       .catch((err) => {
         if (!stale) console.error('ELK layout failed:', err)
       })
     return () => { stale = true }
-  }, [data, setNodes, setEdges])
+  }, [data, savedLayout, setNodes, setEdges])
+
+  // Handle nodes change — track position changes for dirty flag (edit mode only)
+  const handleNodesChange = useCallback(
+    (changes: NodeChange[]) => {
+      onNodesChange(changes)
+      // Only track dirty in edit mode — view mode drags are exploratory
+      if (!isEditMode) return
+      const hasPositionChange = changes.some(
+        (c) => c.type === 'position' && 'dragging' in c && !c.dragging,
+      )
+      if (hasPositionChange) {
+        setIsDirty(true)
+      }
+    },
+    [onNodesChange, isEditMode],
+  )
+
+  // Node click — select node
+  const handleNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
+    setSelectedNodeId(node.id)
+  }, [])
+
+  // Pane click — deselect
+  const handlePaneClick = useCallback(() => {
+    setSelectedNodeId(null)
+  }, [])
+
+  // Toggle edit mode
+  const handleToggleEditMode = useCallback(() => {
+    setIsEditMode((prev) => {
+      const next = !prev
+      if (next) {
+        addToast({ type: 'info', message: '편집 모드입니다. 노드를 드래그하여 위치를 변경하세요.' })
+      }
+      return next
+    })
+  }, [addToast])
+
+  // Auto layout (re-run ELK)
+  const handleAutoLayout = useCallback(() => {
+    if (!data?.data) return
+    computeElkLayout(data.data)
+      .then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
+        setNodes(layoutedNodes)
+        setEdges(layoutedEdges)
+        setIsDirty(true)
+        addToast({ type: 'info', message: '자동 정렬이 완료되었습니다' })
+      })
+      .catch((err) => {
+        console.error('Auto layout failed:', err)
+        addToast({ type: 'error', message: '자동 정렬에 실패했습니다' })
+      })
+  }, [data, setNodes, setEdges, addToast])
+
+  // Save layout
+  const handleSaveLayout = useCallback(() => {
+    const positions: Record<string, { x: number; y: number }> = {}
+    for (const node of nodes) {
+      positions[node.id] = { x: node.position.x, y: node.position.y }
+    }
+    saveMutation.mutate({ nodePositions: positions })
+  }, [nodes, saveMutation])
+
+  // Fit view handler
+  const handleFitView = useCallback(() => {
+    fitView({ padding: 0.2 })
+  }, [fitView])
+
+  // Keyboard shortcut: Ctrl+S to save
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault()
+        if (isDirty) handleSaveLayout()
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [isDirty, handleSaveLayout])
 
   if (!selectedCompanyId) {
     return (
@@ -123,6 +262,7 @@ export function NexusPage() {
         <h1 className="text-xl font-semibold tracking-tight text-slate-50">NEXUS 조직도</h1>
         <span className="text-xs text-slate-500">
           {org.departments.length}개 부서 · {totalAgents}명 에이전트
+          {isDirty && <span className="ml-2 text-amber-400">· 변경사항 있음</span>}
         </span>
       </div>
 
@@ -134,16 +274,27 @@ export function NexusPage() {
           </div>
         </div>
       ) : (
-        <div className="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden" style={{ height: 'calc(100vh - 140px)' }}>
+        <div className="relative bg-slate-900 border border-slate-700 rounded-xl overflow-hidden" style={{ height: 'calc(100vh - 140px)' }}>
+          <NexusToolbar
+            isEditMode={isEditMode}
+            isDirty={isDirty}
+            isSaving={saveMutation.isPending}
+            onToggleEditMode={handleToggleEditMode}
+            onAutoLayout={handleAutoLayout}
+            onSaveLayout={handleSaveLayout}
+            onFitView={handleFitView}
+          />
           {layoutReady && (
             <ReactFlow
               nodes={nodes}
               edges={edges}
-              onNodesChange={onNodesChange}
+              onNodesChange={handleNodesChange}
               onEdgesChange={onEdgesChange}
+              onNodeClick={handleNodeClick}
+              onPaneClick={handlePaneClick}
               nodeTypes={nodeTypes}
               nodesDraggable={true}
-              nodesConnectable={false}
+              nodesConnectable={isEditMode}
               elementsSelectable={true}
               fitView
               fitViewOptions={{ padding: 0.2 }}
@@ -164,5 +315,14 @@ export function NexusPage() {
         </div>
       )}
     </div>
+  )
+}
+
+// Wrap with ReactFlowProvider for useReactFlow access
+export function NexusPage() {
+  return (
+    <ReactFlowProvider>
+      <NexusCanvas />
+    </ReactFlowProvider>
   )
 }

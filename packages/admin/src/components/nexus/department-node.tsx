@@ -7,10 +7,12 @@ type DepartmentNodeData = {
   agentCount: number
 }
 
-export const DepartmentNode = memo(function DepartmentNode({ data }: { data: DepartmentNodeData }) {
+export const DepartmentNode = memo(function DepartmentNode({ data, selected }: { data: DepartmentNodeData; selected?: boolean }) {
   return (
     <div
-      className="px-4 py-3 rounded-xl bg-blue-950 border-2 border-blue-600 shadow-md min-w-[240px]"
+      className={`px-4 py-3 rounded-xl bg-blue-950 border-2 shadow-md min-w-[240px] ${
+        selected ? 'border-blue-400 ring-2 ring-blue-400/50' : 'border-blue-600'
+      }`}
       data-testid="nexus-department-node"
     >
       <Handle type="target" position={Position.Top} className="!bg-blue-400 !w-2 !h-2" />
