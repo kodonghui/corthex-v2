@@ -22,9 +22,14 @@ ARG GITHUB_SHA=
 ENV BUILD_NUMBER=$BUILD_NUMBER
 ENV GITHUB_SHA=$GITHUB_SHA
 
-# 소스 전체 복사 후 의존성 설치 + 빌드
-COPY . .
-RUN bun install --frozen-lockfile
+# 빌드 설정 먼저 복사 (레이어 캐싱 — 설정 변경 시에만 재빌드)
+COPY turbo.json tsconfig.json package.json bun.lock ./
+
+# deps 스테이지에서 node_modules 재활용 (중복 install 제거)
+COPY --from=deps /app/node_modules ./node_modules
+
+# 소스 복사 + 빌드
+COPY packages/ ./packages/
 RUN bunx turbo build
 
 # === Stage 3: 프로덕션 ===
@@ -40,9 +45,6 @@ COPY --from=builder /app/package.json ./
 # 프론트엔드 빌드 결과물
 COPY --from=builder /app/packages/app/dist ./public/app
 COPY --from=builder /app/packages/admin/dist ./public/admin
-
-# Drizzle 마이그레이션
-COPY --from=builder /app/packages/server/src/db/migrations ./packages/server/src/db/migrations
 
 ENV NODE_ENV=production
 ENV PORT=3000

@@ -1,19 +1,50 @@
+# === Version Control & CI ===
 node_modules
 .git
 .github
 .turbo
+
+# === Environment Files ===
 .env
 .env.local
 .env.*.local
 .env.production
+.env.example
+
+# === Build Artifacts ===
 dist
 *.tsbuildinfo
 *.log
+
+# === IDE & OS ===
 .vscode
 .idea
 .DS_Store
 Thumbs.db
+*.swp
+*.swo
+
+# === Dev/Planning Docs (not needed for build) ===
 _bmad*
 _poc/
 _uxui*
+_enhancement-plans/
+_tools-idea/
+kodonghui_full_pipeline/
 .claude/
+
+# === Non-build Files ===
+memory/
+nanobanana-output/
+uploads/
+docs/
+README.md
+DEPLOYMENT.md
+CLAUDE.md
+docker-compose.yml
+test_auto_accept_real.txt
+
+# === Test Files (not needed in production) ===
+**/__tests__/
+**/*.test.ts
+**/*.spec.ts
