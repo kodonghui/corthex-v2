@@ -7,7 +7,7 @@ import {
   findSecretaryAgent,
   getActiveManagers,
   parseLLMJson,
-} from './chief-of-staff'
+} from '../lib/orchestration-helpers'
 import { delegate as managerDelegate, formatDelegationResult } from './manager-delegate'
 import { delegationTracker } from './delegation-tracker'
 import { db } from '../db'

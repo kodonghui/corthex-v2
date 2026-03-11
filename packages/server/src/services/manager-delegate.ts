@@ -1,5 +1,11 @@
+/**
+ * @deprecated This file is deprecated. Manager delegation is now handled by Soul templates
+ * (lib/soul-templates.ts MANAGER_SOUL_TEMPLATE) + call_agent MCP tool (tool-handlers/builtins/call-agent.ts).
+ * Utility functions have been moved to lib/orchestration-helpers.ts.
+ * See: Story 5.5 — 기존 오케스트레이터 삭제
+ */
 import { agentRunner, type AgentConfig } from './agent-runner'
-import { makeContext, toAgentConfig, createOrchTask, completeOrchTask } from './chief-of-staff'
+import { makeContext, toAgentConfig, createOrchTask, completeOrchTask } from '../lib/orchestration-helpers'
 import { delegationTracker } from './delegation-tracker'
 import { db } from '../db'
 import { agents } from '../db/schema'

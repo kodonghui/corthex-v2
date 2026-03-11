@@ -1,3 +1,13 @@
+/**
+ * @deprecated This file is deprecated. The orchestration pipeline (classify -> delegate -> synthesize -> quality gate)
+ * is being replaced by Soul-based orchestration via engine/agent-loop.ts + routes/workspace/hub.ts.
+ *
+ * Utility functions (makeContext, toAgentConfig, createOrchTask, etc.) have been extracted to
+ * lib/orchestration-helpers.ts. This file re-exports them for backward compatibility.
+ *
+ * See: Story 5.5 — 기존 오케스트레이터 삭제
+ */
+
 import { agentRunner, type AgentConfig } from './agent-runner'
 import { extractAndSaveMemories } from './memory-extractor'
 import { delegationTracker } from './delegation-tracker'
@@ -14,36 +24,32 @@ import { eq, and } from 'drizzle-orm'
 import type { LLMRouterContext } from './llm-router'
 import type { ToolExecutor } from '@corthex/shared'
 
-export function makeContext(companyId: string, agent: AgentConfig): LLMRouterContext {
-  return { companyId, agentId: agent.id, agentName: agent.name, source: 'delegation' }
-}
+// Re-export utilities from orchestration-helpers for backward compatibility
+// Callers should migrate to importing directly from '../lib/orchestration-helpers'
+export {
+  makeContext,
+  toAgentConfig,
+  createOrchTask,
+  completeOrchTask,
+  findSecretaryAgent,
+  getActiveManagers,
+  parseLLMJson,
+  isInvestmentDepartment,
+  getActiveDepartments,
+} from '../lib/orchestration-helpers'
 
-export function toAgentConfig(row: {
-  id: string
-  companyId: string
-  name: string
-  nameEn: string | null
-  tier: string
-  modelName: string | null
-  soul: string | null
-  [key: string]: unknown
-  allowedTools: unknown
-  isActive: boolean
-}): AgentConfig {
-  return {
-    id: row.id,
-    companyId: row.companyId,
-    name: row.name,
-    nameEn: row.nameEn,
-    tier: row.tier as 'manager' | 'specialist' | 'worker',
-    modelName: row.modelName ?? 'claude-sonnet-4-6',
-    soul: row.soul,
-    allowedTools: (row.allowedTools as string[]) ?? [],
-    isActive: row.isActive,
-    departmentId: (row.departmentId as string | null) ?? null,
-    autoLearn: (row.autoLearn as boolean | undefined) ?? true,
-  }
-}
+// Import for local use within this file (aliased to avoid conflict with re-exports)
+import {
+  makeContext as _makeContext,
+  toAgentConfig as _toAgentConfig,
+  createOrchTask as _createOrchTask,
+  completeOrchTask as _completeOrchTask,
+  findSecretaryAgent as _findSecretaryAgent,
+  getActiveManagers as _getActiveManagers,
+  parseLLMJson as _parseLLMJson,
+  isInvestmentDepartment as _isInvestmentDepartment,
+  getActiveDepartments as _getActiveDepartments,
+} from '../lib/orchestration-helpers'
 
 // === Types ===
 
@@ -142,153 +148,6 @@ const QUALITY_GATE_PROMPT = `당신은 품질 검수관입니다. 에이전트�
 반드시 아래 JSON 형식으로만 응답하세요 (다른 텍스트 없이):
 {"scores": {"conclusionClarity": 4, "evidenceSufficiency": 3, "riskMention": 3, "formatAdequacy": 4, "logicalConsistency": 4}, "totalScore": 18, "passed": true, "feedback": null}`
 
-// === Helper: Parse JSON from LLM response ===
-
-export function parseLLMJson<T>(raw: string): T | null {
-  // Strip markdown code blocks if present
-  let cleaned = raw.trim()
-  const codeBlockMatch = cleaned.match(/```(?:json)?\s*\n?([\s\S]*?)\n?\s*```/)
-  if (codeBlockMatch) {
-    cleaned = codeBlockMatch[1].trim()
-  }
-  // Try parsing raw if not a code block
-  try {
-    return JSON.parse(cleaned) as T
-  } catch {
-    // Try extracting first { ... } or [ ... ] block
-    const jsonMatch = cleaned.match(/\{[\s\S]*\}/)
-    if (jsonMatch) {
-      try {
-        return JSON.parse(jsonMatch[0]) as T
-      } catch {
-        return null
-      }
-    }
-    return null
-  }
-}
-
-// === Orchestration Task Recording ===
-
-export async function createOrchTask(params: {
-  companyId: string
-  commandId: string
-  agentId: string
-  parentTaskId?: string | null
-  type: string
-  input: string
-}) {
-  const [task] = await db
-    .insert(orchestrationTasks)
-    .values({
-      companyId: params.companyId,
-      commandId: params.commandId,
-      agentId: params.agentId,
-      parentTaskId: params.parentTaskId ?? null,
-      type: params.type,
-      input: params.input,
-      status: 'running',
-      startedAt: new Date(),
-    })
-    .returning()
-  return task
-}
-
-export async function completeOrchTask(taskId: string, output: string, status: 'completed' | 'failed', startedAt: Date | null) {
-  await db
-    .update(orchestrationTasks)
-    .set({
-      output,
-      status,
-      completedAt: new Date(),
-      durationMs: startedAt ? Date.now() - startedAt.getTime() : 0,
-    })
-    .where(eq(orchestrationTasks.id, taskId))
-}
-
-// === Find Secretary Agent ===
-
-export async function findSecretaryAgent(companyId: string): Promise<AgentConfig | null> {
-  const [secretary] = await db
-    .select()
-    .from(agents)
-    .where(
-      and(
-        eq(agents.companyId, companyId),
-        eq(agents.isSystem, true),
-        eq(agents.isSecretary, true),
-        eq(agents.isActive, true),
-      ),
-    )
-    .limit(1)
-
-  if (!secretary) return null
-
-  return toAgentConfig(secretary)
-}
-
-// === Get Active Managers ===
-
-export async function getActiveManagers(companyId: string) {
-  return db
-    .select({
-      id: agents.id,
-      name: agents.name,
-      nameEn: agents.nameEn,
-      role: agents.role,
-      departmentId: agents.departmentId,
-      tier: agents.tier,
-      modelName: agents.modelName,
-      soul: agents.soul,
-      allowedTools: agents.allowedTools,
-      isActive: agents.isActive,
-    })
-    .from(agents)
-    .where(
-      and(
-        eq(agents.companyId, companyId),
-        eq(agents.tier, 'manager'),
-        eq(agents.isActive, true),
-        eq(agents.isSecretary, false),
-      ),
-    )
-}
-
-// === Get Active Departments ===
-
-async function getActiveDepartments(companyId: string) {
-  return db
-    .select({
-      id: departments.id,
-      name: departments.name,
-      description: departments.description,
-    })
-    .from(departments)
-    .where(
-      and(
-        eq(departments.companyId, companyId),
-        eq(departments.isActive, true),
-      ),
-    )
-}
-
-// === Investment Department Detection ===
-
-const INVESTMENT_KEYWORDS = ['투자', '금융', '전략', 'investment', 'finance', 'strategy', 'trading', 'cio']
-
-export async function isInvestmentDepartment(departmentId: string, companyId: string): Promise<boolean> {
-  const [dept] = await db
-    .select({ name: departments.name, description: departments.description })
-    .from(departments)
-    .where(and(eq(departments.id, departmentId), eq(departments.companyId, companyId)))
-    .limit(1)
-
-  if (!dept) return false
-
-  const searchText = [dept.name, dept.description].filter(Boolean).join(' ').toLowerCase()
-  return INVESTMENT_KEYWORDS.some(kw => searchText.includes(kw))
-}
-
 // === Core Functions ===
 
 export async function classify(
@@ -297,8 +156,8 @@ export async function classify(
   secretaryAgent: AgentConfig,
   toolExecutor?: ToolExecutor,
 ): Promise<ClassificationResult | null> {
-  const deptList = await getActiveDepartments(companyId)
-  const managerList = await getActiveManagers(companyId)
+  const deptList = await _getActiveDepartments(companyId)
+  const managerList = await _getActiveManagers(companyId)
 
   if (managerList.length === 0) {
     return null // No managers to delegate to
@@ -313,11 +172,11 @@ export async function classify(
       context: classifyPrompt,
       maxToolIterations: 0, // No tools needed for classification
     },
-    makeContext(companyId, secretaryAgent),
+    _makeContext(companyId, secretaryAgent),
     toolExecutor,
   )
 
-  const parsed = parseLLMJson<ClassificationResult>(response.content)
+  const parsed = _parseLLMJson<ClassificationResult>(response.content)
   if (!parsed) return null
 
   // Validate referenced IDs exist
@@ -359,7 +218,7 @@ export async function delegate(
       context: context ?? undefined,
       maxToolIterations: 5,
     },
-    makeContext(companyId, managerAgent),
+    _makeContext(companyId, managerAgent),
     toolExecutor,
   )
 
@@ -390,10 +249,10 @@ ${result}`
       context: QUALITY_GATE_PROMPT,
       maxToolIterations: 0,
     },
-    makeContext(companyId, secretaryAgent),
+    _makeContext(companyId, secretaryAgent),
   )
 
-  const parsed = parseLLMJson<{
+  const parsed = _parseLLMJson<{
     scores: QualityScores
     totalScore: number
     passed: boolean
@@ -498,7 +357,7 @@ export async function process(options: ProcessOptions): Promise<ChiefOfStaffResu
     .where(and(eq(commands.id, commandId), eq(commands.companyId, companyId)))
 
   // Find secretary agent
-  const secretaryAgent = await findSecretaryAgent(companyId)
+  const secretaryAgent = await _findSecretaryAgent(companyId)
   if (!secretaryAgent) {
     await updateCommandFailed(commandId, companyId, '비서실장 에이전트를 찾을 수 없습니다')
     delegationTracker.failed(companyId, commandId, '비서실장 에이전트 없음')
@@ -529,14 +388,14 @@ export async function process(options: ProcessOptions): Promise<ChiefOfStaffResu
       .limit(1)
 
     if (target) {
-      managerAgent = toAgentConfig(target)
+      managerAgent = _toAgentConfig(target)
     }
   } else {
     // Auto-classify
     delegationTracker.classify(companyId, commandId)
     phases.push('classify')
 
-    const classifyTask = await createOrchTask({
+    const classifyTask = await _createOrchTask({
       companyId,
       commandId,
       agentId: secretaryAgent.id,
@@ -549,7 +408,7 @@ export async function process(options: ProcessOptions): Promise<ChiefOfStaffResu
 
       if (!classification || classification.confidence < 0.5) {
         // Low confidence — secretary handles directly
-        await completeOrchTask(classifyTask.id, JSON.stringify(classification), 'completed', classifyTask.startedAt)
+        await _completeOrchTask(classifyTask.id, JSON.stringify(classification), 'completed', classifyTask.startedAt)
         delegationTracker.classified(companyId, commandId, classification ?? { departmentId: '', managerId: secretaryAgent.id, confidence: 0, reasoning: '분류 불가' })
         phases.push('secretary-direct')
 
@@ -561,7 +420,7 @@ export async function process(options: ProcessOptions): Promise<ChiefOfStaffResu
           reasoning: '분류 불가 — 비서실장 직접 처리',
         }
       } else {
-        await completeOrchTask(classifyTask.id, JSON.stringify(classification), 'completed', classifyTask.startedAt)
+        await _completeOrchTask(classifyTask.id, JSON.stringify(classification), 'completed', classifyTask.startedAt)
         delegationTracker.classified(companyId, commandId, classification)
 
         // Load the target manager
@@ -572,12 +431,12 @@ export async function process(options: ProcessOptions): Promise<ChiefOfStaffResu
           .limit(1)
 
         if (targetManager) {
-          managerAgent = toAgentConfig(targetManager)
+          managerAgent = _toAgentConfig(targetManager)
         }
       }
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : String(err)
-      await completeOrchTask(classifyTask.id, errorMsg, 'failed', classifyTask.startedAt)
+      await _completeOrchTask(classifyTask.id, errorMsg, 'failed', classifyTask.startedAt)
 
       // Fallback to secretary
       managerAgent = secretaryAgent
@@ -608,7 +467,7 @@ export async function process(options: ProcessOptions): Promise<ChiefOfStaffResu
   // === Phase 2: Delegate ===
   // Detect investment department for CIO+VECTOR pipeline
   const isInvestment = classification?.departmentId
-    ? await isInvestmentDepartment(classification.departmentId, companyId)
+    ? await _isInvestmentDepartment(classification.departmentId, companyId)
     : false
 
   phases.push('delegate')

@@ -1,11 +1,12 @@
-// CIO 3-Phase Orchestration Service
-// Implements v1 CIO Manager pattern:
-//   Phase 1: 시황/종목/기술 전문가 병렬 분석
-//   Phase 2: 리스크 전문가 순차 분석 (Phase 1 결과 기반)
-//   Phase 3: CIO 종합 보고서 + Trade Proposals
+/**
+ * @deprecated CIO 3-Phase Orchestration Service — deprecated.
+ * CIO orchestration will be handled by CIO Soul template + call_agent MCP tool.
+ * Utility functions have been moved to lib/orchestration-helpers.ts.
+ * See: Story 5.5 — 기존 오케스트레이터 삭제
+ */
 
 import { agentRunner, type AgentConfig } from './agent-runner'
-import { makeContext, createOrchTask, completeOrchTask } from './chief-of-staff'
+import { makeContext, createOrchTask, completeOrchTask } from '../lib/orchestration-helpers'
 import { getSpecialists, dispatchSpecialists, type SpecialistResult } from './manager-delegate'
 import { delegationTracker } from './delegation-tracker'
 import { db } from '../db'

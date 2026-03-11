@@ -1,5 +1,11 @@
+/**
+ * @deprecated This file is deprecated. Manager synthesis is now handled by Soul templates
+ * (lib/soul-templates.ts) which include the 4-section report format directly in the Soul.
+ * Utility functions have been moved to lib/orchestration-helpers.ts.
+ * See: Story 5.5 — 기존 오케스트레이터 삭제
+ */
 import { agentRunner, type AgentConfig } from './agent-runner'
-import { makeContext, createOrchTask, completeOrchTask } from './chief-of-staff'
+import { makeContext, createOrchTask, completeOrchTask } from '../lib/orchestration-helpers'
 import { delegationTracker } from './delegation-tracker'
 import { formatDelegationResult, type ManagerDelegationResult, type SpecialistResult } from './manager-delegate'
 import type { ToolExecutor } from '@corthex/shared'
