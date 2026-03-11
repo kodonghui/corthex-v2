@@ -14,16 +14,20 @@
     "test:api": "bun test src/__tests__/api/"
   },
   "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "0.2.72",
     "@anthropic-ai/sdk": "^0.78.0",
     "@corthex/shared": "workspace:*",
     "@google/generative-ai": "^0.24.1",
     "@hono/zod-validator": "^0.5",
     "@neondatabase/serverless": "^1.0.2",
+    "@zapier/secret-scrubber": "^1.1.6",
     "croner": "^10.0.1",
     "drizzle-orm": "^0.39",
     "hono": "^4",
+    "hono-rate-limiter": "^0.5.3",
     "js-yaml": "^4.1.1",
     "openai": "^6.27.0",
+    "pino": "^10.3.1",
     "postgres": "^3.4",
     "web-push": "^3.6.7",
     "zod": "^3.24"

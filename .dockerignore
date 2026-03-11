@@ -13,3 +13,7 @@ dist
 .idea
 .DS_Store
 Thumbs.db
+_bmad*
+_poc/
+_uxui*
+.claude/

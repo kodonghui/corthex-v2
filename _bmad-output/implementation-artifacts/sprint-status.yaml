@@ -38,7 +38,7 @@ phases:
         title: "Engine Foundation & Infrastructure"
         priority: P0
         sp: 13
-        status: backlog
+        status: in-progress
         dependencies: []
         architecture: "D1 (getDB), D3 (에러 코드), D9 (로거), E3, E10"
         stories:
@@ -46,7 +46,7 @@ phases:
             title: "Phase 1 의존성 검증 및 설치"
             sp: 3
             priority: P0
-            status: backlog
+            status: done
             blocked_by: []
           - id: "1.2"
             title: "getDB(companyId) 멀티테넌시 래퍼"
