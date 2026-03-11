@@ -154,7 +154,7 @@ phases:
             title: "delegation-tracker — PostToolUse Hook"
             sp: 3
             priority: P0
-            status: backlog
+            status: review
             blocked_by: ["3.3"]
           - id: "3.5"
             title: "cost-tracker — Stop Hook"
