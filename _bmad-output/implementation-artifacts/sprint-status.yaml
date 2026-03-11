@@ -109,7 +109,7 @@ phases:
             title: "model-selector.ts — 티어→모델 매핑"
             sp: 1
             priority: P0
-            status: backlog
+            status: done
             blocked_by: ["1.2"]
           - id: "2.5"
             title: "sse-adapter.ts — SDK→기존 SSE 변환"
