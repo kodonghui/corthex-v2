@@ -9,9 +9,9 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod'
-import { eq, and, desc, max } from 'drizzle-orm'
+import { eq, and, desc, max, sql, ilike, or } from 'drizzle-orm'
 import { db } from '../db/index'
-import { sketches, sketchVersions } from '../db/schema'
+import { sketches, sketchVersions, knowledgeDocs } from '../db/schema'
 import {
   parseMermaid,
   canvasToMermaidCode,
@@ -398,6 +398,178 @@ server.registerTool('save_diagram', {
           nodeCount: graphData.nodes.length,
           edgeCount: graphData.edges.length,
         }),
+      }],
+    }
+  } catch (err) {
+    return errorResult(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`)
+  }
+})
+
+// --- Tool 7: search_knowledge (Story 11.4) ---
+server.registerTool('search_knowledge', {
+  title: 'Search Knowledge Base',
+  description: 'Search the knowledge base for related diagrams and documents using keyword matching',
+  inputSchema: {
+    query: z.string().describe('Search query text'),
+    companyId: z.string().describe('Company ID for tenant isolation'),
+    limit: z.number().optional().describe('Max results (default 5)'),
+  },
+}, async ({ query, companyId, limit }) => {
+  try {
+    const maxResults = limit ?? 5
+    const searchPattern = `%${query}%`
+
+    const results = await db
+      .select({
+        id: knowledgeDocs.id,
+        title: knowledgeDocs.title,
+        content: knowledgeDocs.content,
+        contentType: knowledgeDocs.contentType,
+        folderId: knowledgeDocs.folderId,
+      })
+      .from(knowledgeDocs)
+      .where(and(
+        eq(knowledgeDocs.companyId, companyId),
+        eq(knowledgeDocs.isActive, true),
+        or(
+          ilike(knowledgeDocs.title, searchPattern),
+          ilike(knowledgeDocs.content, searchPattern),
+        ),
+      ))
+      .orderBy(desc(knowledgeDocs.updatedAt))
+      .limit(maxResults)
+
+    const data = results.map(r => ({
+      id: r.id,
+      title: r.title,
+      contentType: r.contentType,
+      hasMermaid: r.content?.includes('```mermaid') ?? false,
+      preview: r.content?.slice(0, 300) || null,
+    }))
+
+    return {
+      content: [{
+        type: 'text' as const,
+        text: JSON.stringify({ results: data, total: data.length, query }, null, 2),
+      }],
+    }
+  } catch (err) {
+    return errorResult(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`)
+  }
+})
+
+// --- Tool 8: load_from_knowledge (Story 11.4) ---
+server.registerTool('load_from_knowledge', {
+  title: 'Load From Knowledge',
+  description: 'Load a Mermaid diagram from knowledge base into the current canvas',
+  inputSchema: {
+    sketchId: z.string().describe('Canvas ID to load into'),
+    companyId: z.string().describe('Company ID for tenant isolation'),
+    docId: z.string().describe('Knowledge document ID to load from'),
+    mode: z.enum(['replace', 'merge']).optional().describe('Replace canvas or merge (default: replace)'),
+  },
+}, async ({ sketchId, companyId, docId, mode }) => {
+  try {
+    const sketch = await getSketch(sketchId, companyId)
+    if (!sketch) return errorResult(`Error: Canvas '${sketchId}' not found`)
+
+    const [doc] = await db
+      .select({ id: knowledgeDocs.id, title: knowledgeDocs.title, content: knowledgeDocs.content })
+      .from(knowledgeDocs)
+      .where(and(eq(knowledgeDocs.id, docId), eq(knowledgeDocs.companyId, companyId), eq(knowledgeDocs.isActive, true)))
+      .limit(1)
+
+    if (!doc) return errorResult(`Error: Knowledge document '${docId}' not found`)
+
+    let mermaidCode = doc.content || ''
+    const match = mermaidCode.match(/```mermaid\s*\n([\s\S]*?)```/)
+    if (match) mermaidCode = match[1].trim()
+    if (!mermaidCode) return errorResult('Error: No Mermaid code found in document')
+
+    const parsed = parseMermaid(mermaidCode)
+    if (parsed.error) return errorResult(`Error: Mermaid parse failed — ${parsed.error}`)
+
+    const newNodes: CanvasNode[] = parsed.nodes.map((n, i) => ({
+      id: n.id,
+      type: (VALID_NODE_TYPES.includes(n.nodeType as SvNodeType) ? n.nodeType : 'note') as SvNodeType,
+      position: { x: 100 + (i % 4) * 250, y: 100 + Math.floor(i / 4) * 150 },
+      data: { label: n.label },
+    }))
+
+    const newEdges: CanvasEdge[] = parsed.edges.map((e) => ({
+      id: e.id,
+      source: e.source,
+      target: e.target,
+      type: 'editable',
+      ...(e.label ? { data: { label: e.label } } : {}),
+    }))
+
+    let finalGraphData: GraphData
+    const loadMode = mode || 'replace'
+
+    if (loadMode === 'merge') {
+      const existing = parseGraphData(sketch.graphData)
+
+      // Version backup before merge (CR fix)
+      if (existing.nodes.length > 0) {
+        await createVersion(sketchId, existing)
+      }
+
+      const maxY = existing.nodes.reduce((m, n) => Math.max(m, n.position.y), 0)
+      const offsetY = maxY + 200
+      const existingIds = new Set(existing.nodes.map(n => n.id))
+
+      // Dedup node IDs (CR fix)
+      const idMap = new Map<string, string>()
+      const mergedNodes = newNodes.map(n => {
+        let nodeId = n.id
+        if (existingIds.has(nodeId)) nodeId = `${nodeId}_merge_${Date.now()}`
+        idMap.set(n.id, nodeId)
+        return { ...n, id: nodeId, position: { x: n.position.x, y: n.position.y + offsetY } }
+      })
+      const mergedEdges = newEdges.map(e => ({
+        ...e,
+        id: `merge-${Date.now()}-${e.id}`,
+        source: idMap.get(e.source) || e.source,
+        target: idMap.get(e.target) || e.target,
+      }))
+
+      finalGraphData = {
+        nodes: [...existing.nodes, ...mergedNodes],
+        edges: [...existing.edges, ...mergedEdges],
+      }
+    } else {
+      finalGraphData = { nodes: newNodes, edges: newEdges }
+    }
+
+    // Save version before replacing
+    if (loadMode === 'replace') {
+      const currentData = parseGraphData(sketch.graphData)
+      if (currentData.nodes.length > 0) {
+        await createVersion(sketchId, currentData)
+      }
+    }
+
+    await updateSketchGraphData(sketchId, companyId, finalGraphData)
+
+    // Link sketch ↔ knowledgeDoc
+    await db.update(sketches).set({ knowledgeDocId: docId }).where(eq(sketches.id, sketchId))
+    await db.update(knowledgeDocs).set({ linkedSketchId: sketchId }).where(eq(knowledgeDocs.id, docId))
+
+    const mermaid = graphToMermaid(finalGraphData)
+
+    return {
+      content: [{
+        type: 'text' as const,
+        text: JSON.stringify({
+          loaded: true,
+          mode: loadMode,
+          sourceDocId: docId,
+          sourceTitle: doc.title,
+          nodeCount: finalGraphData.nodes.length,
+          edgeCount: finalGraphData.edges.length,
+          mermaid,
+        }, null, 2),
       }],
     }
   } catch (err) {

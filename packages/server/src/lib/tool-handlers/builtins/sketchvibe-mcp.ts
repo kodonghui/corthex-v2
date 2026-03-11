@@ -9,7 +9,7 @@ import type { ToolHandler } from '../types'
 import { callSketchVibeTool } from '../../../mcp/stdio-client'
 import { broadcastToCompany } from '../../../ws/channels'
 
-const MUTATION_TOOLS = new Set(['add_node', 'update_node', 'delete_node', 'add_edge'])
+const MUTATION_TOOLS = new Set(['add_node', 'update_node', 'delete_node', 'add_edge', 'load_from_knowledge'])
 
 function makeSketchVibeHandler(toolName: string): ToolHandler {
   return async (input, ctx) => {
@@ -43,3 +43,5 @@ export const svUpdateNode = makeSketchVibeHandler('update_node')
 export const svDeleteNode = makeSketchVibeHandler('delete_node')
 export const svAddEdge = makeSketchVibeHandler('add_edge')
 export const svSaveDiagram = makeSketchVibeHandler('save_diagram')
+export const svSearchKnowledge = makeSketchVibeHandler('search_knowledge')
+export const svLoadFromKnowledge = makeSketchVibeHandler('load_from_knowledge')

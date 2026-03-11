@@ -60,7 +60,7 @@ import { notebooklmGenerateAudio } from './builtins/notebooklm-generate-audio'
 import { notebooklmGetMindmap } from './builtins/notebooklm-get-mindmap'
 import { notebooklmCreateSlides } from './builtins/notebooklm-create-slides'
 import { notebooklmSummarize } from './builtins/notebooklm-summarize'
-import { svReadCanvas, svAddNode, svUpdateNode, svDeleteNode, svAddEdge, svSaveDiagram } from './builtins/sketchvibe-mcp'
+import { svReadCanvas, svAddNode, svUpdateNode, svDeleteNode, svAddEdge, svSaveDiagram, svSearchKnowledge, svLoadFromKnowledge } from './builtins/sketchvibe-mcp'
 
 // 내장 핸들러 등록
 registry.register('get_current_time', getCurrentTime)
@@ -132,6 +132,8 @@ registry.register('sv_update_node', svUpdateNode)
 registry.register('sv_delete_node', svDeleteNode)
 registry.register('sv_add_edge', svAddEdge)
 registry.register('sv_save_diagram', svSaveDiagram)
+registry.register('sv_search_knowledge', svSearchKnowledge)
+registry.register('sv_load_from_knowledge', svLoadFromKnowledge)
 
 export { registry } from './registry'
 export type { ToolHandler, ToolExecContext } from './types'

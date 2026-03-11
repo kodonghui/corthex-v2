@@ -10,6 +10,8 @@ import { HTTPError } from '../../middleware/error'
 import { logActivity } from '../../lib/activity-logger'
 import { parseMermaid } from '@corthex/shared'
 import { interpretCanvasCommand } from '../../services/canvas-ai'
+import { triggerEmbedding } from '../../services/embedding-service'
+import { semanticSearch } from '../../services/semantic-search'
 import type { AppEnv } from '../../types'
 
 export const sketchesRoute = new Hono<AppEnv>()
@@ -354,9 +356,260 @@ sketchesRoute.post(
       action: `SketchVibe: 지식 베이스 내보내기 — ${body.title}`,
     })
 
-    return c.json({ data: { docId: doc.id, title: doc.title, folderId: doc.folderId } }, 201)
+    // Story 11.4: auto-embed + bidirectional link
+    triggerEmbedding(doc.id, tenant.companyId)
+
+    // Link knowledgeDoc → sketch
+    await db
+      .update(knowledgeDocs)
+      .set({ linkedSketchId: id })
+      .where(eq(knowledgeDocs.id, doc.id))
+
+    // Link sketch → knowledgeDoc
+    await db
+      .update(sketches)
+      .set({ knowledgeDocId: doc.id })
+      .where(eq(sketches.id, id))
+
+    return c.json({ data: { docId: doc.id, title: doc.title, folderId: doc.folderId, embeddingTriggered: true } }, 201)
   },
 )
+
+// POST /api/workspace/sketches/import-knowledge/:docId — 지식 문서에서 캔버스 생성 (Story 11.4)
+sketchesRoute.post('/import-knowledge/:docId', async (c) => {
+  const tenant = c.get('tenant')
+  const docId = c.req.param('docId')
+
+  const [doc] = await db
+    .select({ id: knowledgeDocs.id, title: knowledgeDocs.title, content: knowledgeDocs.content, contentType: knowledgeDocs.contentType })
+    .from(knowledgeDocs)
+    .where(and(eq(knowledgeDocs.id, docId), eq(knowledgeDocs.companyId, tenant.companyId), eq(knowledgeDocs.isActive, true)))
+    .limit(1)
+
+  if (!doc) throw new HTTPError(404, '지식 문서를 찾을 수 없습니다', 'SKETCH_IMPORT_001')
+
+  // Extract Mermaid code from content
+  let mermaidCode = doc.content || ''
+  const match = mermaidCode.match(/```mermaid\s*\n([\s\S]*?)```/)
+  if (match) mermaidCode = match[1].trim()
+
+  if (!mermaidCode) throw new HTTPError(400, '문서에서 Mermaid 코드를 찾을 수 없습니다', 'SKETCH_IMPORT_002')
+
+  const result = parseMermaid(mermaidCode)
+  if (result.error) throw new HTTPError(400, `Mermaid 파싱 실패: ${result.error}`, 'MERMAID_001')
+
+  const graphNodes = result.nodes.map((n, i) => ({
+    id: n.id,
+    type: n.nodeType,
+    position: { x: 100 + (i % 4) * 250, y: 100 + Math.floor(i / 4) * 150 },
+    data: { label: n.label },
+  }))
+
+  const graphEdges = result.edges.map((e) => ({
+    id: e.id,
+    source: e.source,
+    target: e.target,
+    type: 'editable',
+    data: { label: e.label },
+  }))
+
+  const graphData = { nodes: graphNodes, edges: graphEdges }
+
+  const [created] = await db
+    .insert(sketches)
+    .values({
+      companyId: tenant.companyId,
+      name: `${doc.title} (지식에서 가져옴)`.slice(0, 200),
+      graphData,
+      knowledgeDocId: doc.id,
+      createdBy: tenant.userId,
+    })
+    .returning()
+
+  // Link back: knowledgeDoc → sketch
+  await db
+    .update(knowledgeDocs)
+    .set({ linkedSketchId: created.id })
+    .where(eq(knowledgeDocs.id, doc.id))
+
+  logActivity({
+    companyId: tenant.companyId,
+    type: 'system',
+    phase: 'end',
+    actorType: 'user',
+    actorId: tenant.userId,
+    action: `SketchVibe: 지식에서 가져오기 — ${doc.title}`,
+  })
+
+  return c.json({
+    data: created,
+    meta: { nodesCount: result.nodes.length, edgesCount: result.edges.length, sourceDocId: doc.id, warnings: result.warnings },
+  }, 201)
+})
+
+// POST /api/workspace/sketches/:id/merge-knowledge/:docId — 지식 문서를 기존 캔버스에 병합 (Story 11.4)
+sketchesRoute.post('/:id/merge-knowledge/:docId', async (c) => {
+  const tenant = c.get('tenant')
+  const sketchId = c.req.param('id')
+  const docId = c.req.param('docId')
+
+  const [sketch] = await db
+    .select()
+    .from(sketches)
+    .where(and(eq(sketches.id, sketchId), eq(sketches.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!sketch) throw new HTTPError(404, '캔버스를 찾을 수 없습니다', 'SKETCH_001')
+
+  const [doc] = await db
+    .select({ id: knowledgeDocs.id, title: knowledgeDocs.title, content: knowledgeDocs.content })
+    .from(knowledgeDocs)
+    .where(and(eq(knowledgeDocs.id, docId), eq(knowledgeDocs.companyId, tenant.companyId), eq(knowledgeDocs.isActive, true)))
+    .limit(1)
+
+  if (!doc) throw new HTTPError(404, '지식 문서를 찾을 수 없습니다', 'SKETCH_IMPORT_001')
+
+  let mermaidCode = doc.content || ''
+  const match = mermaidCode.match(/```mermaid\s*\n([\s\S]*?)```/)
+  if (match) mermaidCode = match[1].trim()
+
+  if (!mermaidCode) throw new HTTPError(400, '문서에서 Mermaid 코드를 찾을 수 없습니다', 'SKETCH_IMPORT_002')
+
+  const result = parseMermaid(mermaidCode)
+  if (result.error) throw new HTTPError(400, `Mermaid 파싱 실패: ${result.error}`, 'MERMAID_001')
+
+  // Version backup before merge (Story 11.4 CR fix)
+  const existingData = sketch.graphData as { nodes?: Array<{ id: string; position?: { x: number; y: number } }>; edges?: unknown[] }
+  const existingNodes = existingData?.nodes || []
+  const existingEdges = existingData?.edges || []
+
+  if (existingNodes.length > 0) {
+    const [maxRow] = await db
+      .select({ maxVer: max(sketchVersions.version) })
+      .from(sketchVersions)
+      .where(eq(sketchVersions.sketchId, sketchId))
+    const nextVersion = ((maxRow?.maxVer as number | null) ?? 0) + 1
+    await db.insert(sketchVersions).values({
+      sketchId,
+      version: nextVersion,
+      graphData: sketch.graphData,
+    })
+  }
+
+  // Merge: add new nodes with offset to avoid overlap
+  const maxY = existingNodes.reduce((m, n) => Math.max(m, n.position?.y ?? 0), 0)
+  const offsetY = maxY + 200
+
+  const existingIds = new Set(existingNodes.map(n => n.id))
+
+  const newNodes = result.nodes.map((n, i) => {
+    let nodeId = n.id
+    if (existingIds.has(nodeId)) nodeId = `${nodeId}_merge_${Date.now()}`
+    return {
+      id: nodeId,
+      type: n.nodeType,
+      position: { x: 100 + (i % 4) * 250, y: offsetY + Math.floor(i / 4) * 150 },
+      data: { label: n.label },
+    }
+  })
+
+  // Map old IDs to potentially renamed IDs
+  const idMap = new Map<string, string>()
+  result.nodes.forEach((n, i) => { idMap.set(n.id, newNodes[i].id) })
+
+  const newEdges = result.edges.map((e) => ({
+    id: `merge-${Date.now()}-${e.id}`,
+    source: idMap.get(e.source) || e.source,
+    target: idMap.get(e.target) || e.target,
+    type: 'editable',
+    data: { label: e.label },
+  }))
+
+  const mergedGraphData = {
+    nodes: [...existingNodes, ...newNodes],
+    edges: [...existingEdges, ...newEdges],
+  }
+
+  const [updated] = await db
+    .update(sketches)
+    .set({ graphData: mergedGraphData, updatedAt: new Date() })
+    .where(eq(sketches.id, sketchId))
+    .returning()
+
+  return c.json({
+    data: updated,
+    meta: { addedNodes: newNodes.length, addedEdges: newEdges.length, sourceDocId: doc.id },
+  })
+})
+
+// GET /api/workspace/sketches/search-knowledge — 의미검색으로 관련 지식 찾기 (Story 11.4)
+sketchesRoute.get('/search-knowledge', async (c) => {
+  const tenant = c.get('tenant')
+  const q = c.req.query('q')
+
+  if (!q || q.trim().length === 0) {
+    throw new HTTPError(400, '검색어를 입력하세요', 'SEARCH_001')
+  }
+  if (q.length > 500) {
+    throw new HTTPError(400, '검색어는 500자 이하로 입력하세요', 'SEARCH_002')
+  }
+
+  // Semantic search (returns null on failure → fallback to keyword)
+  const semanticResults = await semanticSearch(tenant.companyId, q, { topK: 10, threshold: 0.6 })
+
+  if (semanticResults && semanticResults.length > 0) {
+    // Mermaid docs first, then others
+    const sorted = semanticResults.sort((a, b) => {
+      const aMermaid = a.content?.includes('```mermaid') ? 1 : 0
+      const bMermaid = b.content?.includes('```mermaid') ? 1 : 0
+      if (aMermaid !== bMermaid) return bMermaid - aMermaid
+      return b.score - a.score
+    })
+
+    return c.json({
+      data: sorted.map(r => ({
+        id: r.id,
+        title: r.title,
+        contentType: r.content?.includes('```mermaid') ? 'mermaid' : 'markdown',
+        score: Math.round(r.score * 100) / 100,
+        preview: r.content?.slice(0, 200) || null,
+        folderId: r.folderId,
+      })),
+      meta: { mode: 'semantic', total: sorted.length },
+    })
+  }
+
+  // Fallback: keyword search
+  const searchPattern = `%${q}%`
+  const keywordResults = await db
+    .select({
+      id: knowledgeDocs.id,
+      title: knowledgeDocs.title,
+      content: knowledgeDocs.content,
+      contentType: knowledgeDocs.contentType,
+      folderId: knowledgeDocs.folderId,
+    })
+    .from(knowledgeDocs)
+    .where(and(
+      eq(knowledgeDocs.companyId, tenant.companyId),
+      eq(knowledgeDocs.isActive, true),
+      sql`(${knowledgeDocs.title} ILIKE ${searchPattern} OR ${knowledgeDocs.content} ILIKE ${searchPattern})`,
+    ))
+    .orderBy(desc(knowledgeDocs.updatedAt))
+    .limit(10)
+
+  return c.json({
+    data: keywordResults.map(r => ({
+      id: r.id,
+      title: r.title,
+      contentType: r.contentType,
+      score: null,
+      preview: r.content?.slice(0, 200) || null,
+      folderId: r.folderId,
+    })),
+    meta: { mode: 'keyword', total: keywordResults.length },
+  })
+})
 
 // GET /api/workspace/sketches/:id/versions — 스케치 버전 히스토리
 sketchesRoute.get('/:id/versions', async (c) => {

@@ -493,7 +493,7 @@ phases:
             title: "저장/불러오기 + 지식 연동"
             sp: 3
             priority: P1
-            status: review
+            status: done
             blocked_by: ["11.2", "10.3"]
 
   - name: "Supporting"

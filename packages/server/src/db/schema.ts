@@ -913,6 +913,7 @@ export const sketches = pgTable('sketches', {
   companyId: uuid('company_id').notNull().references(() => companies.id),
   name: varchar('name', { length: 200 }).notNull(),
   graphData: jsonb('graph_data').notNull().default('{"nodes":[],"edges":[]}'),
+  knowledgeDocId: uuid('knowledge_doc_id'),  // FK to knowledgeDocs — linked knowledge document (Story 11.4)
   createdBy: uuid('created_by').notNull().references(() => users.id),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
@@ -1554,6 +1555,7 @@ export const knowledgeDocs = pgTable('knowledge_docs', {
   embedding: vector('embedding', { dimensions: 768 }),  // pgvector: Gemini Embedding 768-dim, NULL = not yet embedded
   embeddingModel: varchar('embedding_model', { length: 50 }),  // e.g. 'gemini-embedding-001'
   embeddedAt: timestamp('embedded_at'),  // last embedding timestamp
+  linkedSketchId: uuid('linked_sketch_id'),  // FK to sketches — linked canvas (Story 11.4)
   createdBy: uuid('created_by').notNull().references(() => users.id),
   updatedBy: uuid('updated_by').references(() => users.id),
   isActive: boolean('is_active').notNull().default(true),

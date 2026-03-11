@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../../lib/api'
 
@@ -16,19 +16,33 @@ interface KnowledgeDocItem {
   updatedAt: string
 }
 
+interface SearchResult {
+  id: string
+  title: string
+  contentType: string
+  score: number | null
+  preview: string | null
+  folderId: string | null
+}
+
 interface CanvasSidebarProps {
   currentSketchId: string | null
   onLoad: (id: string) => void
   onNew: () => void
   onLoadFromKnowledge?: (mermaidCode: string, title: string) => void
+  onImportFromKnowledge?: (docId: string) => void
 }
 
 type TabType = 'sketches' | 'knowledge'
 
-export function CanvasSidebar({ currentSketchId, onLoad, onNew, onLoadFromKnowledge }: CanvasSidebarProps) {
+export function CanvasSidebar({ currentSketchId, onLoad, onNew, onLoadFromKnowledge, onImportFromKnowledge }: CanvasSidebarProps) {
   const queryClient = useQueryClient()
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<TabType>('sketches')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [isSearching, setIsSearching] = useState(false)
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([])
+  const [searchMode, setSearchMode] = useState<string | null>(null)
 
   const { data: sketchesRes, isLoading: sketchesLoading } = useQuery({
     queryKey: ['sketches'],
@@ -61,10 +75,36 @@ export function CanvasSidebar({ currentSketchId, onLoad, onNew, onLoadFromKnowle
 
   const handleKnowledgeImport = (doc: KnowledgeDocItem) => {
     if (!doc.content || !onLoadFromKnowledge) return
-    // Extract Mermaid code from ```mermaid ... ``` block
     const match = doc.content.match(/```mermaid\s*\n([\s\S]*?)```/)
     const mermaidCode = match ? match[1].trim() : doc.content
     onLoadFromKnowledge(mermaidCode, doc.title)
+  }
+
+  const handleSearch = useCallback(async () => {
+    if (!searchQuery.trim()) {
+      setSearchResults([])
+      setSearchMode(null)
+      return
+    }
+    setIsSearching(true)
+    try {
+      const res = await api.get<{ data: SearchResult[]; meta: { mode: string; total: number } }>(
+        `/workspace/sketches/search-knowledge?q=${encodeURIComponent(searchQuery)}`,
+      )
+      setSearchResults(res.data)
+      setSearchMode(res.meta?.mode || 'keyword')
+    } catch {
+      setSearchResults([])
+      setSearchMode(null)
+    } finally {
+      setIsSearching(false)
+    }
+  }, [searchQuery])
+
+  const handleSearchImport = (result: SearchResult) => {
+    if (onImportFromKnowledge) {
+      onImportFromKnowledge(result.id)
+    }
   }
 
   return (
@@ -191,41 +231,100 @@ export function CanvasSidebar({ currentSketchId, onLoad, onNew, onLoadFromKnowle
 
       {/* Knowledge base tab */}
       {activeTab === 'knowledge' && (
-        <div className="flex-1 overflow-y-auto">
-          {knowledgeLoading && (
-            <div className="px-3 py-4 text-xs text-slate-500 text-center">불러오는 중...</div>
-          )}
+        <div className="flex flex-col flex-1">
+          {/* Search input */}
+          <div className="px-3 py-2 border-b border-slate-800">
+            <div className="flex gap-1">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                placeholder="지식 검색..."
+                className="flex-1 px-2 py-1 text-[10px] bg-slate-800 border border-slate-700 rounded text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500"
+              />
+              <button
+                onClick={handleSearch}
+                disabled={isSearching}
+                className="px-2 py-1 text-[10px] bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded transition-colors"
+              >
+                {isSearching ? '...' : '검색'}
+              </button>
+            </div>
+            {searchMode && (
+              <div className="text-[9px] text-slate-600 mt-1">
+                {searchMode === 'semantic' ? '의미 검색' : '키워드 검색'} — {searchResults.length}건
+              </div>
+            )}
+          </div>
 
-          {!knowledgeLoading && knowledgeDocs.length === 0 && (
-            <div className="px-3 py-4 text-xs text-slate-500 text-center">
-              Mermaid 다이어그램이 없어요.
-              <br />
-              캔버스에서 &quot;지식 베이스에 저장&quot;으로 내보내보세요.
+          {/* Search results */}
+          {searchResults.length > 0 && (
+            <div className="border-b border-slate-700">
+              <div className="px-3 py-1 text-[9px] text-slate-500 bg-slate-800/50">검색 결과</div>
+              {searchResults.map((r) => (
+                <div
+                  key={r.id}
+                  className="group px-3 py-2 border-b border-slate-800/50 cursor-pointer hover:bg-slate-800/50 transition-colors"
+                  onClick={() => handleSearchImport(r)}
+                >
+                  <div className="flex items-center justify-between gap-1">
+                    <span className="text-xs text-slate-200 truncate flex-1">{r.title}</span>
+                    <div className="flex items-center gap-1 shrink-0">
+                      {r.score !== null && (
+                        <span className="text-[9px] text-cyan-400">{Math.round(r.score * 100)}%</span>
+                      )}
+                      {r.contentType === 'mermaid' && (
+                        <span className="text-[9px] px-1 py-0 bg-emerald-900/50 text-emerald-400 rounded">mermaid</span>
+                      )}
+                    </div>
+                  </div>
+                  {r.preview && (
+                    <div className="text-[9px] text-slate-500 mt-0.5 truncate">{r.preview.slice(0, 80)}</div>
+                  )}
+                </div>
+              ))}
             </div>
           )}
 
-          {knowledgeDocs.map((doc) => (
-            <div
-              key={doc.id}
-              className="group px-3 py-2 border-b border-slate-800/50 cursor-pointer hover:bg-slate-800/50 transition-colors"
-              onClick={() => handleKnowledgeImport(doc)}
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-slate-200 truncate flex-1">{doc.title}</span>
-                <span className="text-[9px] text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                  가져오기
-                </span>
+          {/* Mermaid docs list */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="px-3 py-1 text-[9px] text-slate-500 bg-slate-800/30">Mermaid 다이어그램</div>
+            {knowledgeLoading && (
+              <div className="px-3 py-4 text-xs text-slate-500 text-center">불러오는 중...</div>
+            )}
+
+            {!knowledgeLoading && knowledgeDocs.length === 0 && (
+              <div className="px-3 py-4 text-xs text-slate-500 text-center">
+                Mermaid 다이어그램이 없어요.
+                <br />
+                캔버스에서 &quot;지식 베이스에 저장&quot;으로 내보내보세요.
               </div>
-              <div className="text-[10px] text-slate-500 mt-0.5">
-                {new Date(doc.updatedAt).toLocaleDateString('ko-KR', {
-                  month: 'short',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
+            )}
+
+            {knowledgeDocs.map((doc) => (
+              <div
+                key={doc.id}
+                className="group px-3 py-2 border-b border-slate-800/50 cursor-pointer hover:bg-slate-800/50 transition-colors"
+                onClick={() => handleKnowledgeImport(doc)}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-200 truncate flex-1">{doc.title}</span>
+                  <span className="text-[9px] text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                    가져오기
+                  </span>
+                </div>
+                <div className="text-[10px] text-slate-500 mt-0.5">
+                  {new Date(doc.updatedAt).toLocaleDateString('ko-KR', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
     </div>

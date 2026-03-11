@@ -263,6 +263,40 @@ function NexusPageInner() {
     [dirty, setNodes, setEdges, handleLabelChange, handleEdgeLabelChange, reactFlowInstance],
   )
 
+  // Import from knowledge by docId (Story 11.4 — creates new sketch linked to knowledge doc)
+  const handleImportFromKnowledge = useCallback(
+    async (docId: string) => {
+      try {
+        const res = await api.post<{ data: { id: string; name: string; graphData: { nodes: Node[]; edges: Edge[] } }; meta: { nodesCount: number } }>(
+          `/workspace/sketches/import-knowledge/${docId}`,
+          {},
+        )
+        const sketch = res.data
+        if (sketch) {
+          const restoredNodes = (sketch.graphData?.nodes || []).map((n: Node) => ({
+            ...n,
+            data: { ...n.data, onLabelChange: handleLabelChange },
+          }))
+          const restoredEdges = (sketch.graphData?.edges || []).map((e: Edge) => ({
+            ...e,
+            type: e.type || 'editable',
+            data: { ...e.data, onEdgeLabelChange: handleEdgeLabelChange },
+          }))
+          setNodes(restoredNodes)
+          setEdges(restoredEdges)
+          setCurrentSketchId(sketch.id)
+          setCurrentSketchName(sketch.name)
+          setDirty(false)
+          queryClient.invalidateQueries({ queryKey: ['sketches'] })
+          setTimeout(() => reactFlowInstance?.fitView({ padding: 0.2 }), 100)
+        }
+      } catch (err) {
+        console.error('Failed to import from knowledge:', err)
+      }
+    },
+    [setNodes, setEdges, handleLabelChange, handleEdgeLabelChange, reactFlowInstance, queryClient],
+  )
+
   // === Load pending graph data from command center ===
   useEffect(() => {
     const pending = sessionStorage.getItem('pendingGraphData')
@@ -1041,6 +1075,7 @@ function NexusPageInner() {
               onLoad={handleLoadSketch}
               onNew={handleNewCanvas}
               onLoadFromKnowledge={handleLoadFromKnowledge}
+              onImportFromKnowledge={handleImportFromKnowledge}
             />
           </div>
         )}
