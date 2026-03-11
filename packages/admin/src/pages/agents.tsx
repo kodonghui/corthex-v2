@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { api } from '../lib/api'
+import { api, ApiError } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
 import { useAuthStore } from '../stores/auth-store'
 import { useToastStore } from '../stores/toast-store'
@@ -113,6 +113,8 @@ export function AgentsPage() {
   const [detailTab, setDetailTab] = useState<DetailTab>('info')
   const [editForm, setEditForm] = useState<Partial<Agent>>({})
   const [deactivateTarget, setDeactivateTarget] = useState<Agent | null>(null)
+  const [activeSessionCount, setActiveSessionCount] = useState<number | null>(null)
+  const [forceDeactivate, setForceDeactivate] = useState(false)
 
   // Filters
   const [filterDept, setFilterDept] = useState('')
@@ -181,15 +183,35 @@ export function AgentsPage() {
   })
 
   const deactivateMutation = useMutation({
-    mutationFn: (id: string) => api.delete(`/admin/agents/${id}`),
+    mutationFn: ({ id, force }: { id: string; force?: boolean }) =>
+      api.delete(`/admin/agents/${id}${force ? '?force=true' : ''}`),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['agents'] })
       setDeactivateTarget(null)
       setSelectedAgent(null)
+      setActiveSessionCount(null)
+      setForceDeactivate(false)
       addToast({ type: 'success', message: '에이전트가 비활성화되었습니다' })
     },
-    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
+    onError: (err: Error) => {
+      if (err instanceof ApiError && err.code === 'AGENT_ACTIVE_SESSIONS' && err.data?.activeTaskCount) {
+        setActiveSessionCount(Number(err.data.activeTaskCount))
+        return
+      }
+      addToast({ type: 'error', message: err.message })
+    },
   })
+
+  function openDeactivateModal(agent: Agent) {
+    setDeactivateTarget(agent)
+    setActiveSessionCount(null)
+    setForceDeactivate(false)
+  }
+
+  function handleDeactivateConfirm() {
+    if (!deactivateTarget) return
+    deactivateMutation.mutate({ id: deactivateTarget.id, force: forceDeactivate })
+  }
 
   function handleTierChange(tier: 'manager' | 'specialist' | 'worker') {
     const tierOpt = TIER_OPTIONS.find((t) => t.value === tier)
@@ -540,7 +562,7 @@ export function AgentsPage() {
                         {a.isActive && !a.isSystem && (
                           <button
                             data-testid={`agents-deactivate-${a.id}`}
-                            onClick={() => setDeactivateTarget(a)}
+                            onClick={() => openDeactivateModal(a)}
                             className="text-xs text-red-400 hover:text-red-300 font-medium transition-colors"
                           >
                             비활성화
@@ -779,7 +801,7 @@ export function AgentsPage() {
             {!selectedAgent.isSystem && selectedAgent.isActive && (
               <div className="px-6 py-5 border-t border-slate-700/40">
                 <button
-                  onClick={() => setDeactivateTarget(selectedAgent)}
+                  onClick={() => openDeactivateModal(selectedAgent)}
                   className="text-xs text-red-400 hover:text-red-300 font-medium transition-colors"
                 >
                   이 에이전트 비활성화
@@ -792,7 +814,7 @@ export function AgentsPage() {
 
       {/* ── Deactivate Confirmation Modal ── */}
       {deactivateTarget && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setDeactivateTarget(null)}>
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => { setDeactivateTarget(null); setActiveSessionCount(null); setForceDeactivate(false) }}>
           <div
             data-testid="agents-deactivate-modal"
             className="bg-gradient-to-b from-slate-800 to-slate-900 rounded-2xl border border-slate-700/60 shadow-2xl w-full max-w-md mx-4"
@@ -810,6 +832,22 @@ export function AgentsPage() {
               <p className="text-sm text-slate-300">
                 <strong className="text-white">&quot;{deactivateTarget.name}&quot;</strong> 에이전트를 비활성화하시겠습니까?
               </p>
+              {activeSessionCount !== null && activeSessionCount > 0 && (
+                <div data-testid="agents-active-sessions-warning" className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 text-sm text-amber-300">
+                  <p className="font-semibold mb-1">이 에이전트는 현재 {activeSessionCount}개 세션이 진행 중입니다</p>
+                  <p className="text-xs text-amber-400/70">강제 비활성화하면 진행 중인 세션이 영향받을 수 있습니다.</p>
+                  <label className="flex items-center gap-2 mt-3 cursor-pointer">
+                    <input
+                      data-testid="agents-force-deactivate-checkbox"
+                      type="checkbox"
+                      checked={forceDeactivate}
+                      onChange={(e) => setForceDeactivate(e.target.checked)}
+                      className="rounded border-amber-500/50"
+                    />
+                    <span className="text-xs text-amber-300">강제 비활성화 (세션 무시)</span>
+                  </label>
+                </div>
+              )}
               <div className="bg-slate-800/60 rounded-xl p-4 text-xs text-slate-400 space-y-1.5 border border-slate-700/40">
                 <p className="flex items-center gap-2"><span className="w-1 h-1 rounded-full bg-slate-600" /> 에이전트가 미배속으로 전환됩니다</p>
                 <p className="flex items-center gap-2"><span className="w-1 h-1 rounded-full bg-slate-600" /> 메모리/학습 기록이 아카이브됩니다</p>
@@ -819,18 +857,18 @@ export function AgentsPage() {
             <div className="flex justify-end gap-3 px-6 py-5 border-t border-slate-700/40">
               <button
                 data-testid="agents-deactivate-cancel"
-                onClick={() => setDeactivateTarget(null)}
+                onClick={() => { setDeactivateTarget(null); setActiveSessionCount(null); setForceDeactivate(false) }}
                 className="px-4 py-2.5 text-sm text-slate-400 hover:text-white rounded-xl hover:bg-slate-700/60 transition-all"
               >
                 취소
               </button>
               <button
                 data-testid="agents-deactivate-confirm"
-                onClick={() => deactivateMutation.mutate(deactivateTarget.id)}
-                disabled={deactivateMutation.isPending}
+                onClick={handleDeactivateConfirm}
+                disabled={deactivateMutation.isPending || (activeSessionCount !== null && activeSessionCount > 0 && !forceDeactivate)}
                 className="px-5 py-2.5 bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-all shadow-lg shadow-red-500/20"
               >
-                {deactivateMutation.isPending ? '처리 중...' : '비활성화'}
+                {deactivateMutation.isPending ? '처리 중...' : (activeSessionCount && activeSessionCount > 0 && forceDeactivate) ? '강제 비활성화' : '비활성화'}
               </button>
             </div>
           </div>

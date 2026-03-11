@@ -449,7 +449,7 @@ export function DepartmentsPage() {
                   <div data-testid="departments-preservation-notice" className="bg-slate-800 rounded-lg p-3 text-xs text-slate-400 space-y-1">
                     <p>* 학습 기록은 아카이브에 보존됩니다</p>
                     <p>* 비용 기록은 영구 보존됩니다 (회계 추적)</p>
-                    <p>* 에이전트는 미배속으로 전환됩니다</p>
+                    <p>* 에이전트는 미배속으로 전환되지만 활성 상태가 유지됩니다</p>
                   </div>
                 </>
               ) : null}

@@ -57,6 +57,24 @@ function actorType(tenant: TenantActor): ActorType {
 }
 
 /**
+ * Count active (pending/running) orchestration tasks for an agent.
+ * Shared by deactivateAgent and analyzeCascade.
+ */
+async function countActiveTasks(companyId: string, agentId: string): Promise<number> {
+  const [r] = await db
+    .select({ cnt: count() })
+    .from(orchestrationTasks)
+    .where(
+      and(
+        withTenant(orchestrationTasks.companyId, companyId),
+        eq(orchestrationTasks.agentId, agentId),
+        inArray(orchestrationTasks.status, ['pending', 'running']),
+      ),
+    )
+  return Number(r?.cnt ?? 0)
+}
+
+/**
  * Get all departments for a company (tenant-scoped).
  * Returns both active and inactive departments for admin management.
  */
@@ -397,9 +415,11 @@ export async function updateAgent(
 /**
  * Deactivate an agent (soft delete).
  * System agents (isSystem=true) cannot be deactivated (403).
+ * Secretary agents (isSecretary=true) cannot be deactivated (403).
+ * If active sessions exist and force=false, returns 409 with activeTaskCount.
  * Sets departmentId=null, isActive=false, status='offline'.
  */
-export async function deactivateAgent(tenant: TenantActor, agentId: string) {
+export async function deactivateAgent(tenant: TenantActor, agentId: string, force?: boolean) {
   // Get current state
   const [current] = await db
     .select()
@@ -419,6 +439,21 @@ export async function deactivateAgent(tenant: TenantActor, agentId: string) {
   // Secretary agent protection (Story 5.1)
   if (current.isSecretary) {
     return { error: { status: 403, message: '비서 에이전트는 삭제할 수 없습니다', code: 'ORG_SECRETARY_DELETE_DENIED' } }
+  }
+
+  // Active session check (Story 7.4) — skip when force=true
+  if (!force) {
+    const activeTaskCount = await countActiveTasks(tenant.companyId, agentId)
+    if (activeTaskCount > 0) {
+      return {
+        error: {
+          status: 409,
+          message: `이 에이전트는 현재 ${activeTaskCount}개 세션이 진행 중입니다`,
+          code: 'AGENT_ACTIVE_SESSIONS',
+          data: { activeTaskCount },
+        },
+      }
+    }
   }
 
   // Soft deactivation: unassign from department + deactivate
@@ -510,18 +545,7 @@ export async function analyzeCascade(
   let totalCostUsdMicro = 0
 
   for (const agent of deptAgents) {
-    // Count active tasks for this agent
-    const [taskResult] = await db
-      .select({ cnt: count() })
-      .from(orchestrationTasks)
-      .where(
-        and(
-          withTenant(orchestrationTasks.companyId, companyId),
-          eq(orchestrationTasks.agentId, agent.id),
-          inArray(orchestrationTasks.status, ['pending', 'running']),
-        ),
-      )
-    const activeTaskCount = Number(taskResult?.cnt ?? 0)
+    const activeTaskCount = await countActiveTasks(companyId, agent.id)
 
     // Sum costs for this agent
     const [costResult] = await db
@@ -637,15 +661,13 @@ export async function executeCascade(
     }
   }
 
-  // Unassign all agents in department (batch update)
+  // Unassign all agents in department (keep active, only remove department)
   if (analysis.agentCount > 0) {
     const agentIds = analysis.agentBreakdown.map((a) => a.id)
     await db
       .update(agents)
       .set({
         departmentId: null,
-        isActive: false,
-        status: 'offline',
         updatedAt: new Date(),
       })
       .where(
@@ -675,7 +697,7 @@ export async function executeCascade(
       agentCount: analysis.agentCount,
       isActive: true,
     },
-    after: { isActive: false },
+    after: { isActive: false, agentsUnassigned: analysis.agentCount },
     metadata: {
       mode: mode ?? 'immediate',
       analysis: {

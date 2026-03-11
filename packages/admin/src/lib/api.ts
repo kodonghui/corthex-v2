@@ -21,6 +21,16 @@ class RateLimitError extends Error {
   }
 }
 
+export class ApiError extends Error {
+  code?: string
+  data?: Record<string, unknown>
+  constructor(message: string, code?: string, data?: Record<string, unknown>) {
+    super(message)
+    this.code = code
+    this.data = data
+  }
+}
+
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const token = localStorage.getItem('corthex_admin_token')
   const res = await fetch(`${API_BASE}${path}`, {
@@ -49,7 +59,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     const err = await res.json().catch(() => ({ error: { message: 'Network error' } }))
     const code = err.error?.code as string | undefined
     const message = (code && errorMessages[code]) || err.error?.message || `HTTP ${res.status}`
-    throw new Error(message)
+    throw new ApiError(message, code, err.data)
   }
 
   return res.json()

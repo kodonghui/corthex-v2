@@ -319,13 +319,13 @@ phases:
             title: "부서 CRUD API + UI"
             sp: 3
             priority: P0
-            status: review
+            status: done
             blocked_by: []
           - id: "7.2"
             title: "에이전트 CRUD API + UI (Soul 편집 포함)"
             sp: 5
             priority: P0
-            status: ready-for-dev
+            status: done
             blocked_by: ["7.1"]
           - id: "7.3"
             title: "조직 템플릿 + 온보딩"
@@ -337,7 +337,7 @@ phases:
             title: "Cascade 규칙 + 삭제 방지"
             sp: 2
             priority: P0
-            status: backlog
+            status: done
             blocked_by: ["7.1", "7.2"]
           - id: "7.5"
             title: "NEXUS 읽기 전용 조직도"
@@ -475,13 +475,13 @@ phases:
             title: "NotebookLM MCP 클라이언트 연동"
             sp: 3
             priority: P1
-            status: review
+            status: done
             blocked_by: []
           - id: "11.2"
             title: "SketchVibe MCP 서버 분리"
             sp: 5
             priority: P1
-            status: review
+            status: done
             blocked_by: ["2.2"]
           - id: "11.3"
             title: "SketchVibe AI 실시간 편집"

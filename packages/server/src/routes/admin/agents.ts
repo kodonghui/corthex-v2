@@ -94,12 +94,25 @@ agentsRoute.patch('/agents/:id', zValidator('json', updateAgentSchema), async (c
   return c.json({ success: true, data: result.data })
 })
 
-// DELETE /api/admin/agents/:id -- soft deactivation (not hard delete)
+// DELETE /api/admin/agents/:id?force=true -- soft deactivation (not hard delete)
 agentsRoute.delete('/agents/:id', async (c) => {
   const tenant = c.get('tenant')
   const id = c.req.param('id')
-  const result = await deactivateAgent(tenant, id)
-  if ('error' in result) throw new HTTPError(result.error!.status, result.error!.message, result.error!.code)
+  const force = c.req.query('force') === 'true'
+  const result = await deactivateAgent(tenant, id, force)
+  if ('error' in result) {
+    const err = result.error!
+    // Include activeTaskCount in error response for frontend modal
+    if (err.code === 'AGENT_ACTIVE_SESSIONS') {
+      const data = 'data' in err ? (err as { data: Record<string, unknown> }).data : undefined
+      return c.json({
+        success: false,
+        error: { code: err.code, message: err.message },
+        data,
+      }, 409)
+    }
+    throw new HTTPError(err.status, err.message, err.code)
+  }
   return c.json({ success: true, data: result.data })
 })
 
