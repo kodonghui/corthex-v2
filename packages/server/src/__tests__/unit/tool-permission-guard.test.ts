@@ -1,86 +1,112 @@
-import { describe, it, expect } from 'bun:test'
-import { checkToolPermission, hasWildcard } from '../../services/tool-permission-guard'
+import { describe, test, expect, mock, beforeEach } from 'bun:test'
+import type { SessionContext } from '../../engine/types'
 
-describe('tool-permission-guard', () => {
-  describe('checkToolPermission', () => {
-    it('allows tool when in allowedTools list', () => {
-      const result = checkToolPermission(['web_search', 'calculator'], 'web_search')
-      expect(result.allowed).toBe(true)
-      expect(result.reason).toBeUndefined()
-    })
+// --- Mocks ---
 
-    it('denies tool when not in allowedTools list', () => {
-      const result = checkToolPermission(['web_search', 'calculator'], 'email_sender')
-      expect(result.allowed).toBe(false)
-      expect(result.reason).toContain('TOOL_NOT_PERMITTED')
-      expect(result.reason).toContain('email_sender')
-    })
+const mockAgentById = mock(() => Promise.resolve([]))
+const mockGetDB = mock(() => ({ agentById: mockAgentById }))
 
-    it('denies all tools when allowedTools is empty', () => {
-      const result = checkToolPermission([], 'web_search')
-      expect(result.allowed).toBe(false)
-      expect(result.reason).toContain('TOOL_NOT_PERMITTED')
-      expect(result.reason).toContain('no tools permitted')
-    })
+mock.module('../../db/scoped-query', () => ({ getDB: mockGetDB }))
 
-    it('denies all tools when allowedTools is undefined', () => {
-      const result = checkToolPermission(undefined, 'web_search')
-      expect(result.allowed).toBe(false)
-      expect(result.reason).toContain('TOOL_NOT_PERMITTED')
-    })
+// Import AFTER mocking
+const { toolPermissionGuard } = await import('../../engine/hooks/tool-permission-guard')
 
-    it('denies all tools when allowedTools is null', () => {
-      const result = checkToolPermission(null, 'web_search')
-      expect(result.allowed).toBe(false)
-      expect(result.reason).toContain('TOOL_NOT_PERMITTED')
-    })
+// --- Helpers ---
 
-    it('allows any tool when wildcard "*" is in allowedTools', () => {
-      const result = checkToolPermission(['*'], 'any_tool_name')
-      expect(result.allowed).toBe(true)
-    })
+function makeCtx(overrides: Partial<SessionContext> = {}): SessionContext {
+  return {
+    cliToken: 'test-token',
+    userId: 'user-1',
+    companyId: 'company-1',
+    depth: 0,
+    sessionId: 'session-1',
+    startedAt: Date.now(),
+    maxDepth: 3,
+    visitedAgents: ['agent-1'],
+    ...overrides,
+  }
+}
 
-    it('allows tool with wildcard among other tools', () => {
-      const result = checkToolPermission(['web_search', '*'], 'random_tool')
-      expect(result.allowed).toBe(true)
-    })
+// --- Tests ---
 
-    it('returns specific error message with tool name', () => {
-      const result = checkToolPermission(['calculator'], 'secret_admin_tool')
-      expect(result.reason).toBe('TOOL_NOT_PERMITTED: secret_admin_tool is not in your allowed tools')
-    })
-
-    it('handles single tool in allowedTools', () => {
-      expect(checkToolPermission(['only_tool'], 'only_tool').allowed).toBe(true)
-      expect(checkToolPermission(['only_tool'], 'other_tool').allowed).toBe(false)
-    })
-
-    it('is case-sensitive for tool names', () => {
-      const result = checkToolPermission(['Web_Search'], 'web_search')
-      expect(result.allowed).toBe(false)
-    })
+describe('toolPermissionGuard', () => {
+  beforeEach(() => {
+    mockAgentById.mockReset()
+    mockGetDB.mockReset()
+    mockGetDB.mockReturnValue({ agentById: mockAgentById })
   })
 
-  describe('hasWildcard', () => {
-    it('returns true when allowedTools contains "*"', () => {
-      expect(hasWildcard(['*'])).toBe(true)
-      expect(hasWildcard(['web_search', '*'])).toBe(true)
-    })
+  test('call_agent is always allowed without DB lookup', async () => {
+    const result = await toolPermissionGuard(makeCtx(), 'call_agent', {})
+    expect(result).toEqual({ allow: true })
+    expect(mockGetDB).not.toHaveBeenCalled()
+  })
 
-    it('returns false when allowedTools does not contain "*"', () => {
-      expect(hasWildcard(['web_search', 'calculator'])).toBe(false)
-    })
+  test('empty allowedTools allows all tools', async () => {
+    mockAgentById.mockResolvedValue([{ allowedTools: [] }])
+    const result = await toolPermissionGuard(makeCtx(), 'sns_manager', {})
+    expect(result).toEqual({ allow: true })
+  })
 
-    it('returns false for empty array', () => {
-      expect(hasWildcard([])).toBe(false)
-    })
+  test('null/undefined allowedTools allows all tools', async () => {
+    mockAgentById.mockResolvedValue([{ allowedTools: null }])
+    const result = await toolPermissionGuard(makeCtx(), 'kr_stock', {})
+    expect(result).toEqual({ allow: true })
+  })
 
-    it('returns false for undefined', () => {
-      expect(hasWildcard(undefined)).toBe(false)
-    })
+  test('tool in allowedTools is allowed', async () => {
+    mockAgentById.mockResolvedValue([{ allowedTools: ['sns_manager', 'web_search'] }])
+    const result = await toolPermissionGuard(makeCtx(), 'sns_manager', {})
+    expect(result).toEqual({ allow: true })
+  })
 
-    it('returns false for null', () => {
-      expect(hasWildcard(null)).toBe(false)
-    })
+  test('tool NOT in allowedTools is denied with TOOL_PERMISSION_DENIED', async () => {
+    mockAgentById.mockResolvedValue([{ allowedTools: ['sns_manager', 'web_search'] }])
+    const result = await toolPermissionGuard(makeCtx(), 'kr_stock', {})
+    expect(result).toEqual({ allow: false, reason: 'TOOL_PERMISSION_DENIED' })
+  })
+
+  test('uses last visitedAgent as currentAgentId for DB lookup', async () => {
+    mockAgentById.mockResolvedValue([{ allowedTools: [] }])
+    const ctx = makeCtx({ visitedAgents: ['secretary', 'cmo', 'content-specialist'] })
+    await toolPermissionGuard(ctx, 'web_search', {})
+    expect(mockGetDB).toHaveBeenCalledWith('company-1')
+    expect(mockAgentById).toHaveBeenCalledWith('content-specialist')
+  })
+
+  test('agent not found in DB allows all tools (defensive)', async () => {
+    mockAgentById.mockResolvedValue([])
+    const result = await toolPermissionGuard(makeCtx(), 'any_tool', {})
+    expect(result).toEqual({ allow: true })
+  })
+})
+
+// --- TEA P0: Source Code Introspection ---
+
+describe('TEA P0: tool-permission-guard source introspection', () => {
+  const fs = require('fs')
+  const src = fs.readFileSync(
+    require('path').resolve(__dirname, '../../engine/hooks/tool-permission-guard.ts'),
+    'utf-8',
+  )
+
+  test('uses ERROR_CODES constant, no hardcoded error strings', () => {
+    expect(src).toContain('ERROR_CODES.TOOL_PERMISSION_DENIED')
+    expect(src).not.toMatch(/reason:\s*['"]TOOL_PERMISSION_DENIED['"]/)
+  })
+
+  test('imports getDB from scoped-query, not direct db', () => {
+    expect(src).toContain("from '../../db/scoped-query'")
+    expect(src).not.toContain("from '../../db/index'")
+    expect(src).not.toMatch(/import\s.*\bdb\b.*from/)
+  })
+
+  test('returns Promise<PreToolHookResult> (async function)', () => {
+    expect(src).toContain('async function toolPermissionGuard')
+    expect(src).toContain('Promise<PreToolHookResult>')
+  })
+
+  test('cliToken is never accessed (no token leakage)', () => {
+    expect(src).not.toContain('ctx.cliToken')
   })
 })
