@@ -29,13 +29,14 @@ phases:
       step-2-3: { name: "Landing Deep Analysis", status: completed, party: 3R, score: 9.25 }
   phase-3:
     name: Design System
-    status: in-progress
+    status: completed
+    score: 9.65
     steps:
-      step-3-1: { name: "Design Tokens", status: pending, party: 3R }
-      step-3-2: { name: "Component Strategy", status: pending, party: 3R }
+      step-3-1: { name: "Design Tokens", status: completed, party: 3R, score: 9.65 }
+      step-3-2: { name: "Component Strategy", status: completed, party: 3R, score: 9.65 }
   phase-4:
     name: Theme Creation
-    status: pending
+    status: in-progress
     steps:
       step-4-1: { name: "Creative Themes", status: pending, party: 3R }
       step-4-2: { name: "Accessibility Audit", status: pending, party: 1R }
