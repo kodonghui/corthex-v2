@@ -352,20 +352,21 @@ Phase 1 첫 스토리로 **"의존성 검증"** 실행:
 | # | 결정 | 선택 | 근거 |
 |---|------|------|------|
 | D7 | 도구 권한 저장 | **agents 테이블 JSON 배열** (allowed_tools jsonb) | 단순, 조인 불필요. SQL replace로 리네임 대응 가능 |
-| D8 | 캐싱 | **없음** (Phase 1~4) | 24GB 서버, 12쿼리 × 1ms = 12ms (LLM 응답 대비 0.1%) |
+| D8 | DB 쿼리 캐싱 | **없음** (Phase 1~4 유지) | 24GB 서버, 12쿼리 × 1ms = 12ms (LLM 응답 대비 0.1%). Epic 15 Claude API 토큰 캐싱 · 도구 결과 캐싱 · Semantic 캐싱은 D8 적용 범위(DB 쿼리) 밖 별도 레이어로 추가 — D8 위반 아님 |
 | D9 | 로거 | **pino 우선 + consola 폴백 + 어댑터 래핑** | JSON 구조화, child logger(sessionId 자동 주입). 교체 비용 0 |
 | D10 | 테스트 전략 | **단위+모킹통합(CI 매커밋) + 실제SDK(주1회)** | SDK query() 모킹, CORTHEX 코드(call_agent/Hook/Context)는 실제 실행. 비용 $0 |
 | D11 | WebSocket 이벤트 | **Phase 1 기존 형식 유지, Phase 2에서 전환** | 프론트 수정 최소화 |
 | D12 | 토큰 유효성 검증 | **등록 시만** (세션 시작 시 검증 안 함) | 오버헤드 제거. SDK 에러로 런타임 감지 |
+| D13 | Claude API · 도구 · Semantic 캐싱 전략 | **Epic 15 조기 구현** (Phase 1~3 전체 적용) | Prompt Cache: $27/월 즉각 절감, 에이전트 수와 무관. D8(DB 쿼리 캐싱 없음) 위반 아님 — 별개 레이어. 세부 결정 D17~D20은 `epic-15-architecture-addendum.md` 참조. Phase 4+ Redis 전환은 D21로 별도 Deferred 등록 |
 
 **Deferred Decisions (Phase 5+):**
 
 | # | 결정 | 이유 |
 |---|------|------|
-| D13 | 캐싱 전략 | 에이전트 100명+ 시 재검토 |
 | D14 | 토큰 풀 (N개 토큰) | 현재 1:1 매핑 충분. CLI Max 2개지만 Human별 할당 |
 | D15 | 크로스 프로바이더 폴백 | Phase 1~4 Claude 전용 |
 | D16 | API 버저닝 | Phase 1~4 단일 버전 |
+| D21 | Tool Cache Redis 전환 | 단일 서버(Phase 1~3)에서는 인메모리 Map으로 충분. 다중 서버 배포(Phase 4+) 전환 시 프로세스 간 캐시 공유 필요 → Redis 도입. `lib/tool-cache.ts`의 `cacheStore` 구현체만 교체, `withCache()` API 유지 |
 
 ### Data Architecture
 
@@ -394,7 +395,69 @@ export function getDB(companyId: string) {
 - tool-permission-guard Hook: `agent.allowedTools.includes(toolName)`
 - 도구 리네임 시: `UPDATE agents SET allowed_tools = replace(...)::jsonb`
 
-**캐싱:** 없음. 에이전트 50명 = DB 행 50개, 조회 ≤ 1ms. Phase 5+ 재검토.
+**DB 쿼리 캐싱:** 없음 (D8 유지). 에이전트 50명 = DB 행 50개, 조회 ≤ 1ms. D8 범위 내 재검토 불필요.
+
+**Claude API · 도구 · Semantic 캐싱 (Epic 15 — D13 조기 구현):** 아래 별도 섹션 참조.
+
+---
+
+### Caching Architecture (Epic 15)
+
+**3-레이어 캐싱 구조 — 런타임 실행 순서:**
+
+```
+사용자 메시지 수신 → agent-loop.ts
+  ↓
+[Layer 1] Semantic Cache 확인 (agent.enableSemanticCache=true만)
+  → engine/semantic-cache.ts → getDB(companyId).findSemanticCache()
+  → cosine similarity ≥ 0.95 AND TTL 24h 내: 즉시 반환 (LLM 미호출)
+  → 미스/오류: graceful fallback → 계속
+  ↓
+[Layer 2] Prompt Cache 적용 LLM 호출
+  → systemPrompt: [{ type:'text', text:soul, cache_control:{ type:'ephemeral' } }]
+  → Anthropic 서버 캐시 히트: TTFT 85% 단축, 비용 기본 × 0.1
+  → 도구 호출 발생 시 ↓
+[Layer 3] Tool Cache 확인
+  → lib/tool-cache.ts → withCache(toolName, ttlMs, fn)
+  → 히트: 외부 API 미호출, 캐시 결과 반환
+  → 미스: 외부 API 호출 → 캐시 저장
+  → 오류: graceful fallback → 원본 함수 직접 실행 (NFR-CACHE-R1)
+  ↓
+LLM 응답 완성 → saveToSemanticCache (내부에서 CREDENTIAL_PATTERNS 마스킹 후 저장 — callee 처리, enableSemanticCache=true만)
+  → 오류: 무시 + log.warn (세션 중단 없음)
+```
+
+**파일 배치 (D17~D20 — `epic-15-architecture-addendum.md` 참조):**
+
+| 파일 | 위치 | E8 적용 | 역할 |
+|------|------|---------|------|
+| `engine/semantic-cache.ts` | `engine/` 내부 | ✅ E8 적용 (D19) | checkSemanticCache + saveToSemanticCache. agent-loop.ts 전용 |
+| `lib/tool-cache.ts` | `lib/` (engine 밖) | ❌ E8 대상 외 (D18) | withCache() 래퍼 + LRU Map. 도구 핸들러에서 직접 import 가능 |
+| `lib/tool-cache-config.ts` | `lib/` | ❌ | 도구별 TTL 등록 테이블 (7개 초기 도구) |
+
+**멀티테넌시 격리 (D20):**
+- Tool Cache 키: `${companyId}:${toolName}:${JSON.stringify(Object.entries(params).sort())}` — companyId 누락 시 원본 함수 실행 (타입 강제)
+- Semantic Cache: `getDB(companyId)` 프록시 + SQL `company_id = $1` 조건 필수
+- 회사 간 캐시 교차 접근 구조적 불가
+
+**보안 — D20 결정 (세부: `epic-15-architecture-addendum.md` D20 참조):**
+- LLM `fullResponse`는 어떤 Hook도 sanitize하지 않음: `tool-permission-guard`(PreToolUse: 도구 실행 허가), `credential-scrubber`(PostToolUse: 도구 출력 민감 패턴 마스킹), Stop Hook(usage 토큰만)
+- `saveToSemanticCache` 내부(callee)에서 `CREDENTIAL_PATTERNS` 정규식 직접 적용 필수 — raw LLM 응답 직접 저장 금지
+
+**E8 경계 검증 — CI `engine-boundary-check.sh` 추가 패턴:**
+```bash
+grep -r 'engine/semantic-cache' packages/server/src --include='*.ts' \
+  | grep -v 'engine/agent-loop.ts' \
+  | grep -v 'engine/semantic-cache.ts'
+# 0줄 = OK, 1줄+ = E8 VIOLATION
+```
+
+**Deferred (Phase 4+):**
+- Redis 전환: 다중 서버 배포 시 `lib/tool-cache.ts` cacheStore 구현체만 교체 (withCache() API 유지)
+- 1시간 TTL 자동 전환: 30일+ 히트율 데이터 축적 후 결정
+- semantic_cache 에이전트별 격리: agent_id 컬럼 추가는 요건 발생 시
+
+---
 
 ### Authentication & Security
 
@@ -795,7 +858,7 @@ _Party Mode 4라운드, 19개 개선사항(S1~S19) 반영_
 
 1. Project Context Analysis (Step 2) — 요구사항, 인프라, 제약
 2. Starter Template Evaluation (Step 3) — 기존 스택, 신규 의존성, 코드 처분
-3. Core Architectural Decisions (Step 4) — D1~D16
+3. Core Architectural Decisions (Step 4) — D1~D21 (D17~D20 Epic 15 — `epic-15-architecture-addendum.md`)
 4. Implementation Patterns (Step 5) — E1~E10, 에러 코드, Anti-Pattern
 5. **Project Structure & Boundaries (Step 6)** — 디렉토리, 경계, 매핑
 6. Validation (Step 7) — 완성도 체크
@@ -1036,7 +1099,7 @@ _Party Mode 3라운드, 13개 개선사항(V1~V13) 반영_
 
 ### Coherence Validation ✅
 
-- **Decision Compatibility:** D1~D16 전부 호환. 충돌 없음.
+- **Decision Compatibility:** D1~D21 전부 호환 (D13 Epic 15 조기 구현, D17~D20 신규 캐싱 결정 — `epic-15-architecture-addendum.md` 참조). 충돌 없음.
 - **Pattern Consistency:** E1~E10 전부 SessionContext 기반 일관. Naming 체계 통일.
 - **Structure Alignment:** engine/ 위치 → SDK 의존성 server 국한. 타입 3파일 경계 명확.
 
@@ -1044,11 +1107,12 @@ _Party Mode 3라운드, 13개 개선사항(V1~V13) 반영_
 
 - **FR 72개:** 68/72 Phase 1~4 커버 + 4개 Phase 5+ Deferred (차단 없음 — V2)
 - **NFR P0 19개:** 19/19 전부 커버 (보안 7개, 성능 3개, 확장성 4개, 외부 2개, 브라우저 1개, 운영 1개, 코드 1개)
-- **Phase 5+ Deferred:** D13(캐싱), D14(토큰 풀 — SessionContext 변경 주의), D15(크로스 프로바이더), D16(API 버저닝)
+- **Phase 5+ Deferred:** D14(토큰 풀 — SessionContext 변경 주의), D15(크로스 프로바이더), D16(API 버저닝)
+- **Epic 15 조기 구현:** D13(Claude API · 도구 · Semantic 캐싱) — Important Decisions 이동, Phase 1부터 적용. D17~D20 신규 결정 + D21 Deferred(Redis 전환) — 세부: `epic-15-architecture-addendum.md`
 
 ### Implementation Readiness ✅
 
-- **Decision Completeness:** D1~D16 전부 선택+근거+코드 예시 ✅
+- **Decision Completeness:** D1~D21 전부 선택+근거+코드 예시 ✅ (D17~D20은 `epic-15-architecture-addendum.md`에 상세 기술)
 - **Pattern Completeness:** E1~E10 코드 예시 + Anti-Pattern 8개 ✅
 - **Structure Completeness:** 디렉토리 트리 + 호출자 6곳 + Phase 1 ~31파일 변경 ✅
 
@@ -1059,7 +1123,7 @@ _Party Mode 3라운드, 13개 개선사항(V1~V13) 반영_
 | Steps | 7/7 완료 |
 | Party Mode 라운드 | **~32** (Step 2: 6, 3: 5, 4: 4, 5: 4, 6: 4, 7: 3 + 이전 세션 6) |
 | 개선사항 | **~54** (P1~P17 + S1~S19 + V1~V13 + 이전 5) |
-| 결정 | D1~D16 (16개) |
+| 결정 | D1~D21 (D13 조기 구현 + D17~D20 Epic 15 신규 — addendum 참조) |
 | 패턴 | E1~E10 (10개) |
 | Anti-Pattern | 8개 |
 
@@ -1096,7 +1160,7 @@ UX Design 시작 시 입력으로 전달:
 - [x] 코드 처분 매트릭스
 
 **✅ Step 4 — Decisions**
-- [x] D1~D16 (Critical 6 + Important 6 + Deferred 4)
+- [x] D1~D21 (Critical 6 + Important 7(D13 포함) + Deferred 4(D14~D16,D21) + D17~D20 Epic 15 신규 — addendum 참조)
 
 **✅ Step 5 — Patterns**
 - [x] E1~E10 + Anti-Pattern 8개
