@@ -574,28 +574,28 @@ phases:
       - id: epic-15
         title: "3-Layer Caching — Prompt Cache + Tool Cache + Semantic Cache"
         priority: P0
-        sp: 12
-        status: backlog
+        sp: 34
+        status: in-progress
         dependencies: ["epic-14", "epic-10"]
-        architecture: "D8 (캐싱 전략 업데이트), pgvector, Claude API cache_control"
+        architecture: "D17-D21 (Caching Architecture), D8 확장, pgvector, Claude API cache_control"
         stories:
           - id: "15.1"
-            title: "Prompt Caching (Claude API cache_control)"
-            sp: 2
+            title: "Prompt Caching (Claude API cache_control + ContentBlock[])"
+            sp: 5
             priority: P0
-            status: backlog
+            status: ready-for-dev
             blocked_by: []
           - id: "15.2"
-            title: "Tool Result Caching (인메모리 Map + withCache)"
-            sp: 5
+            title: "Tool Result Caching (인메모리 Map + withCache + LRU)"
+            sp: 8
             priority: P1
-            status: backlog
+            status: ready-for-dev
             blocked_by: []
           - id: "15.3"
-            title: "Semantic Caching (pgvector 유사 질문 재사용)"
-            sp: 5
-            priority: P2
-            status: backlog
+            title: "Semantic Caching (pgvector + Admin UX + ARGOS cleanup)"
+            sp: 21
+            priority: P0
+            status: ready-for-dev
             blocked_by: ["15.1"]
 
 # CRITICAL PATH:
