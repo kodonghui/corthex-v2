@@ -36,13 +36,14 @@ phases:
       step-3-2: { name: "Component Strategy", status: completed, party: 3R, score: 9.65 }
   phase-4:
     name: Theme Creation
-    status: in-progress
+    status: completed
+    score: 8.38
     steps:
-      step-4-1: { name: "Creative Themes", status: pending, party: 3R }
-      step-4-2: { name: "Accessibility Audit", status: pending, party: 1R }
+      step-4-1: { name: "Creative Themes", status: completed, party: 3R, score: 9.0 }
+      step-4-2: { name: "Accessibility Audit", status: completed, party: 1R, score: 7.75 }
   phase-5:
     name: Prompt Engineering
-    status: pending
+    status: in-progress
     steps:
       step-5-1: { name: "Web Stitch Prompt", status: pending, party: 3R }
       step-5-2: { name: "App Stitch Prompt", status: pending, party: 3R }
