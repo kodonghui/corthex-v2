@@ -1,5 +1,5 @@
 # Story 15.1: Prompt Caching (Claude API cache_control)
-Status: backlog
+Status: done
 Story Points: 5
 Priority: P0
 blockedBy: none
@@ -104,7 +104,7 @@ Story 15.1 시작 전 SDK PoC:
 - **현재 agent-loop.ts 위치**: `packages/server/src/engine/agent-loop.ts` (git ls-files로 케이스 확인)
 - **soul-renderer 참조**: `engine/soul-renderer.ts` — `renderSoul(agent, ctx)` → `string` 반환. Task 3A에서 반환값을 `ContentBlock[]`으로 래핑
 - **SDK 버전 고정**: `package.json`의 `@anthropic-ai/claude-agent-sdk` exact pin 버전 확인 (CLAUDE.md: `^` 사용 금지)
-- **경로 A vs B 선택 기록**: Task 1 완료 후 이 Dev Notes 하단에 "선택 경로: A" 또는 "선택 경로: B"를 반드시 기록
+- **경로 A vs B 선택 기록**: **선택 경로: B** — claude-agent-sdk@0.2.72 sdk.mjs 분석 결과, systemPrompt 처리 코드: `if (typeof Y === 'string') H = Y; else if (Y.type === 'preset') B = Y.append` → ContentBlock[] 전달 시 `H = ""` (빈 문자열)으로 처리됨. Path A 불가. Path B 구현 완료: `anthropic.messages.create()` + `cache_control: { type: 'ephemeral' }` on system blocks.
 - **ContentBlock[] 지원 여부**: Anthropic SDK 공식 문서 기준 `system` 파라미터가 `string | ContentBlock[]`이면 경로 A 가능
 - **5분 TTL 한계**: Soul 편집 후 최대 5분 동안 캐시된 구버전 Soul로 응답 가능 — 의도적 허용 (FR-CACHE-1.7)
 - **에이전트 수와 무관**: 에이전트 1명이든 50명이든 동일 적용

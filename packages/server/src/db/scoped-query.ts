@@ -40,6 +40,11 @@ export function getDB(companyId: string) {
         .from(agentTools)
         .innerJoin(toolDefinitions, eq(agentTools.toolId, toolDefinitions.id))
         .where(scopedWhere(agentTools.companyId, companyId, eq(agentTools.agentId, agentId), eq(agentTools.isEnabled, true), eq(toolDefinitions.isActive, true))),
+    agentToolsWithSchema: (agentId: string) =>
+      db.select({ name: toolDefinitions.name, description: toolDefinitions.description, inputSchema: toolDefinitions.inputSchema })
+        .from(agentTools)
+        .innerJoin(toolDefinitions, eq(agentTools.toolId, toolDefinitions.id))
+        .where(scopedWhere(agentTools.companyId, companyId, eq(agentTools.agentId, agentId), eq(agentTools.isEnabled, true), eq(toolDefinitions.isActive, true))),
     departmentById: (id: string) =>
       db.select().from(departments).where(scopedWhere(departments.companyId, companyId, eq(departments.id, id))),
     userById: (id: string) =>
