@@ -10,6 +10,7 @@ import { outputRedactor } from './hooks/output-redactor'
 import { delegationTracker } from './hooks/delegation-tracker'
 import { costTracker } from './hooks/cost-tracker'
 import type { UsageInfo } from './hooks/cost-tracker'
+import { checkSemanticCache, saveToSemanticCache } from './semantic-cache'
 
 /** Session registry for graceful shutdown (NFR-O1) */
 const activeSessions = new Map<string, SessionContext>()
@@ -70,6 +71,23 @@ export async function* runAgent(options: RunAgentOptions): AsyncGenerator<SSEEve
     const [agentRecord] = await getDB(ctx.companyId).agentById(agentName)
     const model = selectModel(agentRecord?.tierLevel ?? (agentRecord?.tier ?? 'worker'))
 
+    // [Layer 1] Semantic Cache check (D19, D20) — Story 15.3
+    if (agentRecord?.enableSemanticCache) {
+      try {
+        const cacheResult = await checkSemanticCache(ctx.companyId, message)
+        if (cacheResult) {
+          log.info({ event: 'semantic_cache_hit', companyId: ctx.companyId, agentId: agentName, similarity: cacheResult.similarity }, 'Semantic cache hit')
+          // Yield cache response as SSE events (costUsd: 0)
+          yield { type: 'message', content: cacheResult.response }
+          yield { type: 'done', costUsd: 0, tokensUsed: 0 }
+          return
+        }
+        log.info({ event: 'semantic_cache_miss', companyId: ctx.companyId, agentId: agentName }, 'Semantic cache miss')
+      } catch {
+        // NFR-CACHE-R2: graceful fallback — continue to LLM
+      }
+    }
+
     // Load agent tools from DB (with inputSchema for API tool definitions)
     const toolRecords = await getDB(ctx.companyId).agentToolsWithSchema(agentName)
     const agentApiTools: Anthropic.Messages.Tool[] = toolRecords.map(t => ({
@@ -98,6 +116,8 @@ export async function* runAgent(options: RunAgentOptions): AsyncGenerator<SSEEve
     let totalOutputTokens = 0
     let totalCacheReadTokens = 0
     let totalCacheCreationTokens = 0
+    // Collect full response text for semantic cache save (Story 15.3)
+    const fullResponseParts: string[] = []
 
     // Multi-turn tool loop (max 10 turns = maxTurns equivalent)
     for (let turn = 0; turn < 10; turn++) {
@@ -132,6 +152,7 @@ export async function* runAgent(options: RunAgentOptions): AsyncGenerator<SSEEve
       for (const block of response.content) {
         if (block.type === 'text' && block.text) {
           yield { type: 'message', content: block.text }
+          fullResponseParts.push(block.text)
         }
       }
 
@@ -210,6 +231,16 @@ export async function* runAgent(options: RunAgentOptions): AsyncGenerator<SSEEve
     // Drain any remaining pending events
     while (pendingEvents.length > 0) {
       yield pendingEvents.shift()!
+    }
+
+    // [Layer 1] Save to Semantic Cache after successful LLM response (Story 15.3)
+    if (agentRecord?.enableSemanticCache && fullResponseParts.length > 0) {
+      const fullResponse = fullResponseParts.join('')
+      try {
+        await saveToSemanticCache(ctx.companyId, message, fullResponse)
+      } catch {
+        // NFR-CACHE-R2: ignore errors — log.warn handled inside saveToSemanticCache
+      }
     }
 
     // Build UsageInfo for cost tracking (AC#5: cache token fields)

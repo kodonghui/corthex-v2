@@ -1,5 +1,5 @@
 # Story 15.3: Semantic Caching (pgvector + Admin UX)
-Status: backlog
+Status: done
 Story Points: 21
 Priority: P0
 blockedBy: 15.1 (권장 — Prompt Cache 베이스라인 TTFT 측정 후 시작)
@@ -116,7 +116,7 @@ so that repeated/similar queries respond in ≤ 100ms at $0 LLM cost, with per-a
     - `CREDENTIAL_PATTERNS`: **`packages/server/src/lib/credential-patterns.ts`에서 import** (복사 절대 금지 — 패턴 불일치 시 NFR-CACHE-S3 위반, 아래 Dev Notes 참조)
     - `getDB(companyId).insertSemanticCache({ queryText: query, queryEmbedding: embedding, response: sanitizedResponse, ttlHours: 24 })` 호출
     - 오류 시: `log.warn({ event:'semantic_cache_error', op:'save', err })` + 무시 (세션 중단 없음)
-  - [ ] Gemini `text-embedding-004` 재활용: Epic 10의 `getEmbedding(text)` → `number[]` (768차원)
+  - [ ] Gemini `text-embedding-004` 재활용: `generateEmbedding(apiKey, text)` from `services/embedding-service.ts` → `number[] | null` (768차원, null 시 graceful fallback — NFR-CACHE-R2). apiKey 획득: Dev Notes Google API key 패턴 참조
   - [ ] E8 준수: 직접 `db` import 금지 — `getDB(companyId)` 프록시만 사용
 
 - [ ] Task 4: agent-loop.ts Semantic Cache 레이어 통합 (AC: #1, #2, #3, #5)
@@ -206,11 +206,23 @@ so that repeated/similar queries respond in ≤ 100ms at $0 LLM cost, with per-a
     - CREDENTIAL_PATTERNS 마스킹: `sk-ant-cli-*` 패턴이 저장 전 마스킹됨
   - [ ] `engine-boundary-check.sh` 실행 — 0줄 (E8 OK)
   - [ ] 기존 agent-loop 테스트 전부 통과 확인
+  - [ ] **NFR-P7 통합 테스트** (Neon DB 실계 연결, CI 분리): `INTEGRATION_TEST=true bun test` — `findSemanticCache()` + `insertSemanticCache()` 왕복 레이턴시 ≤ 50ms (p95)
 
 ## Dev Notes
 
 - **pgvector 확인**: `packages/server` DB에 pgvector extension 활성화 여부 확인 (`SELECT * FROM pg_extension WHERE extname='vector'`) — Epic 10에서 이미 활성화됨
-- **Gemini embedding 재사용**: Epic 10.2의 `getEmbedding()` 함수 위치 확인 (`packages/server/src/lib/embedding.ts` 또는 유사 경로) — `text-embedding-004`, 768차원
+- **Embedding 함수**: `packages/server/src/services/embedding-service.ts` line 45의 `generateEmbedding(apiKey: string, text: string): Promise<number[] | null>` 사용 — `text-embedding-004`, 768차원. `getEmbedding()` 또는 `lib/embedding.ts`는 존재하지 않음 (오류)
+- **Google API key 획득 패턴** (`packages/server/src/services/semantic-search.ts` lines 34~49 동일 패턴):
+  ```typescript
+  const credentials = await getCredentials(companyId, 'google_ai')
+  const apiKey = extractApiKey(credentials)
+  if (!apiKey) {
+    log.warn({ event: 'semantic_cache_error', op: 'embedding', reason: 'no_google_api_key' })
+    return null
+  }
+  const embedding = await generateEmbedding(apiKey, text)
+  if (!embedding) return null
+  ```
 - **CREDENTIAL_PATTERNS 공유 방식 결정**: `packages/server/src/lib/credential-patterns.ts`로 추출 후 `credential-scrubber.ts`와 `engine/semantic-cache.ts` 양쪽에서 import. **복사(copy) 절대 금지** — 향후 패턴 업데이트 시 복사본 불일치 → `semantic_cache` 테이블에 credential 저장 보안 취약점(NFR-CACHE-S3 위반). `engine/` 내부 모듈 간 직접 import 불필요 — `lib/` 공유 상수로 해결
 - **getDB 프록시 확인**: `packages/server/src/db/scoped-query.ts` 현재 메서드 목록 확인 후 `findSemanticCache`, `insertSemanticCache` 추가
 - **hnsw vs ivfflat**: PRD Appendix A 주석 — `ivfflat + vector_l2_ops` 금지, `hnsw + vector_cosine_ops` 사용 (cosine similarity 쿼리 인덱스 최적화)

@@ -51,6 +51,7 @@ export interface AgentUpdateInput {
   isActive?: boolean
   isSecretary?: boolean
   ownerUserId?: string | null
+  enableSemanticCache?: boolean
 }
 
 export interface TenantActor {

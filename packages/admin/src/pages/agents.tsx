@@ -19,7 +19,12 @@ type Agent = {
   isSystem: boolean
   isActive: boolean
   allowedTools: string[]
+  enableSemanticCache: boolean
   createdAt: string
+}
+
+type AgentDetail = Agent & {
+  semanticCacheRecommendation: 'safe' | 'warning' | 'none'
 }
 type Department = { id: string; name: string }
 type SoulTemplate = { id: string; name: string; content: string; isBuiltin: boolean }
@@ -115,6 +120,7 @@ export function AgentsPage() {
   const [deactivateTarget, setDeactivateTarget] = useState<Agent | null>(null)
   const [activeSessionCount, setActiveSessionCount] = useState<number | null>(null)
   const [forceDeactivate, setForceDeactivate] = useState(false)
+  const [showCacheDisableModal, setShowCacheDisableModal] = useState(false)
 
   // Filters
   const [filterDept, setFilterDept] = useState('')
@@ -140,6 +146,13 @@ export function AgentsPage() {
     queryFn: () => api.get<{ data: SoulTemplate[] }>(`/admin/soul-templates?companyId=${selectedCompanyId}`),
     enabled: !!selectedCompanyId,
   })
+
+  const { data: agentDetailData } = useQuery({
+    queryKey: ['agent-detail', selectedCompanyId, selectedAgent?.id],
+    queryFn: () => api.get<{ data: AgentDetail }>(`/admin/agents/${selectedAgent!.id}?companyId=${selectedCompanyId}`),
+    enabled: !!selectedCompanyId && !!selectedAgent,
+  })
+  const agentDetail = agentDetailData?.data
 
   const agents = agentData?.data || []
   const depts = deptData?.data || []
@@ -227,6 +240,7 @@ export function AgentsPage() {
       modelName: agent.modelName,
       departmentId: agent.departmentId,
       soul: agent.soul,
+      enableSemanticCache: agent.enableSemanticCache ?? false,
     })
     setDetailTab('info')
   }
@@ -254,7 +268,29 @@ export function AgentsPage() {
       tier: editForm.tier,
       modelName: editForm.modelName,
       departmentId: editForm.departmentId ?? null,
+      enableSemanticCache: editForm.enableSemanticCache,
     })
+  }
+
+  function handleCacheToggle(newValue: boolean) {
+    if (!newValue && editForm.enableSemanticCache) {
+      // ON → OFF: show confirmation modal
+      setShowCacheDisableModal(true)
+    } else {
+      // OFF → ON: immediate, no modal
+      setEditForm({ ...editForm, enableSemanticCache: true })
+      if (selectedAgent) {
+        updateMutation.mutate({ id: selectedAgent.id, enableSemanticCache: true })
+      }
+    }
+  }
+
+  function confirmCacheDisable() {
+    setShowCacheDisableModal(false)
+    setEditForm({ ...editForm, enableSemanticCache: false })
+    if (selectedAgent) {
+      updateMutation.mutate({ id: selectedAgent.id, enableSemanticCache: false })
+    }
   }
 
   function handleSaveSoul() {
@@ -704,6 +740,43 @@ export function AgentsPage() {
                       {depts.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
                     </select>
                   </div>
+
+                  {/* 캐싱 설정 — Story 15.3 */}
+                  <div className="pt-4 border-t border-slate-700/40">
+                    <label className="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-3">캐싱 설정</label>
+                    <div className="flex items-center justify-between px-4 py-3.5 bg-slate-800/60 border border-slate-700/50 rounded-xl">
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm text-slate-200 font-medium">응답 캐싱</span>
+                        {agentDetail?.semanticCacheRecommendation === 'none' && (
+                          <span data-testid="cache-rec-none" className="text-xs text-rose-400 font-medium">✗ 실시간 데이터, 캐시 부적합</span>
+                        )}
+                        {agentDetail?.semanticCacheRecommendation === 'warning' && (
+                          <span data-testid="cache-rec-warning" className="text-xs text-amber-400 font-medium">⚠ 단기 갱신 도구 포함</span>
+                        )}
+                        {agentDetail?.semanticCacheRecommendation === 'safe' && (
+                          <span data-testid="cache-rec-safe" className="text-xs text-emerald-400 font-medium">✓ 캐시 적합</span>
+                        )}
+                      </div>
+                      {/* Switch toggle */}
+                      <button
+                        data-testid="agents-semantic-cache-toggle"
+                        role="switch"
+                        aria-checked={editForm.enableSemanticCache ?? false}
+                        onClick={() => handleCacheToggle(!(editForm.enableSemanticCache ?? false))}
+                        className={`relative inline-flex items-center w-11 h-6 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/50 ${
+                          editForm.enableSemanticCache ? 'bg-indigo-500' : 'bg-slate-600'
+                        }`}
+                      >
+                        <span className={`inline-block w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                          editForm.enableSemanticCache ? 'translate-x-6' : 'translate-x-1'
+                        }`} />
+                      </button>
+                    </div>
+                    <p className="mt-2 text-xs text-slate-500">
+                      오케스트레이터 또는 Library 즉각 반영 에이전트는 OFF를 권장합니다
+                    </p>
+                  </div>
+
                   <div className="flex gap-3 justify-end pt-5 border-t border-slate-700/40">
                     <button
                       data-testid="agents-save-info"
@@ -869,6 +942,42 @@ export function AgentsPage() {
                 className="px-5 py-2.5 bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-all shadow-lg shadow-red-500/20"
               >
                 {deactivateMutation.isPending ? '처리 중...' : (activeSessionCount && activeSessionCount > 0 && forceDeactivate) ? '강제 비활성화' : '비활성화'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Cache Disable Confirmation Modal — Story 15.3 ── */}
+      {showCacheDisableModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setShowCacheDisableModal(false)}>
+          <div
+            data-testid="agents-cache-disable-modal"
+            className="bg-gradient-to-b from-slate-800 to-slate-900 rounded-2xl border border-slate-700/60 shadow-2xl w-full max-w-md mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="px-6 py-5 border-b border-slate-700/40">
+              <h2 className="text-lg font-bold text-white">응답 캐싱을 비활성화하시겠습니까?</h2>
+            </div>
+            <div className="px-6 py-5">
+              <p className="text-sm text-slate-300">
+                각 응답의 저장 시점부터 24시간이 지나면 자동 만료됩니다. (즉시 삭제 아님)
+              </p>
+            </div>
+            <div className="flex justify-end gap-3 px-6 py-5 border-t border-slate-700/40">
+              <button
+                data-testid="agents-cache-disable-cancel"
+                onClick={() => setShowCacheDisableModal(false)}
+                className="px-4 py-2.5 text-sm text-slate-400 hover:text-white rounded-xl hover:bg-slate-700/60 transition-all"
+              >
+                취소
+              </button>
+              <button
+                data-testid="agents-cache-disable-confirm"
+                onClick={confirmCacheDisable}
+                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition-all"
+              >
+                확인
               </button>
             </div>
           </div>

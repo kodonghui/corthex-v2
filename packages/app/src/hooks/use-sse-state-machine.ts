@@ -321,7 +321,9 @@ export function useSSEStateMachine(options?: SSEStateMachineOptions): SSEStateMa
 
             switch (evt.event) {
               case 'accepted':
-                transition('accepted')
+                // Story 15.3: 300ms delay before showing spinner (base ux-design-spec override)
+                // Semantic cache hits resolve in <=100ms — immediate spinner causes flicker
+                setTimeout(() => transition('accepted'), 300)
                 if (evt.data.sessionId) {
                   setSessionId(evt.data.sessionId as string)
                 }

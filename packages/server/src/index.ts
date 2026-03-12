@@ -75,6 +75,7 @@ import { startArgosEngine, stopArgosEngine } from './services/argos-evaluator'
 import { startCronEngine, stopCronEngine } from './services/cron-execution-engine'
 import { startTriggerWorker, stopTriggerWorker } from './lib/trigger-worker'
 import { startSnsScheduleChecker, stopSnsScheduleChecker } from './lib/sns-schedule-checker'
+import { startSemanticCacheCleanup, stopSemanticCacheCleanup } from './lib/semantic-cache-cleanup'
 import { getActiveSessions } from './engine/agent-loop'
 import { loginRateLimit, apiRateLimit } from './middleware/rate-limit'
 import { wsRoute, websocket, broadcastServerRestart } from './ws/server'
@@ -289,6 +290,7 @@ runMigrations().then(() => {
   startTriggerWorker()
   startArgosEngine()
   startSnsScheduleChecker()
+  startSemanticCacheCleanup()
 })
 
 // Graceful Shutdown — wait for active agent sessions before exit (NFR-O1)
@@ -303,6 +305,7 @@ process.on('SIGTERM', async () => {
   stopTriggerWorker()
   await stopArgosEngine()
   stopSnsScheduleChecker()
+  stopSemanticCacheCleanup()
   broadcastServerRestart()
 
   // Force exit after 120s (NFR-P8)

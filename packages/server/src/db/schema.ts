@@ -162,6 +162,7 @@ export const agents = pgTable('agents', {
   isSystem: boolean('is_system').notNull().default(false),  // 시스템 에이전트 삭제 보호
   allowedTools: jsonb('allowed_tools').default([]),  // string[] — 허용 도구 이름 목록
   autoLearn: boolean('auto_learn').notNull().default(true),  // 자동 학습 메모리 추출 on/off
+  enableSemanticCache: boolean('enable_semantic_cache').notNull().default(false),  // Story 15.3: semantic caching
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
@@ -1778,4 +1779,17 @@ export const workflowSuggestions = pgTable('workflow_suggestions', {
 export const workflowSuggestionsRelations = relations(workflowSuggestions, ({ one }) => ({
   company: one(companies, { fields: [workflowSuggestions.companyId], references: [companies.id] }),
   user: one(users, { fields: [workflowSuggestions.userId], references: [users.id] }),
+}))
+
+// === Story 15.3: semantic_cache — Semantic Caching (D19/D20) ===
+export const semanticCache = pgTable('semantic_cache', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull(),
+  queryText: text('query_text').notNull(),
+  queryEmbedding: vector('query_embedding', { dimensions: 768 }).notNull(),
+  response: text('response').notNull(),
+  ttlHours: integer('ttl_hours').notNull().default(24),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('semantic_cache_company_idx').on(table.companyId),
 }))

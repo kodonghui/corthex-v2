@@ -13,6 +13,7 @@ import {
   deactivateAgent,
   previewSoul,
 } from '../../services/organization'
+import { getCacheRecommendation } from '../../lib/tool-cache-config'
 
 export const agentsRoute = new Hono<AppEnv>()
 
@@ -47,6 +48,7 @@ const updateAgentSchema = z.object({
   isActive: z.boolean().optional(),
   isSecretary: z.boolean().optional(),
   ownerUserId: z.string().uuid().nullable().optional(),
+  enableSemanticCache: z.boolean().optional(),
 })
 
 const soulPreviewSchema = z.object({
@@ -73,7 +75,22 @@ agentsRoute.get('/agents/:id', async (c) => {
   const id = c.req.param('id')
   const agent = await getAgentById(tenant.companyId, id)
   if (!agent) throw new HTTPError(404, '에이전트를 찾을 수 없습니다', 'AGENT_001')
-  return c.json({ success: true, data: agent })
+
+  // Story 15.3: compute semanticCacheRecommendation based on tool TTLs
+  const allowedTools: string[] = Array.isArray(agent.allowedTools) ? (agent.allowedTools as string[]) : []
+  let semanticCacheRecommendation: 'safe' | 'warning' | 'none' = 'safe'
+  for (const toolName of allowedTools) {
+    const rec = getCacheRecommendation(toolName)
+    if (rec === 'none') {
+      semanticCacheRecommendation = 'none'
+      break
+    }
+    if (rec === 'warning') {
+      semanticCacheRecommendation = 'warning'
+    }
+  }
+
+  return c.json({ success: true, data: { ...agent, semanticCacheRecommendation } })
 })
 
 // POST /api/admin/agents

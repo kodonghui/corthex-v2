@@ -28,6 +28,18 @@ check_pattern "from.*engine/soul-renderer" "Direct soul-renderer import from out
 check_pattern "from.*engine/model-selector" "Direct model-selector import from outside engine/"
 check_pattern "from.*engine/sse-adapter" "Direct sse-adapter import from outside engine/"
 
+# Story 15.3: semantic-cache E8 boundary check (D19)
+# engine/semantic-cache.ts must only be imported by engine/agent-loop.ts
+SEMANTIC_VIOLATIONS=$(grep -rn "engine/semantic-cache" packages/server/src --include="*.ts" 2>/dev/null \
+  | grep -v "engine/agent-loop.ts" \
+  | grep -v "engine/semantic-cache.ts" \
+  | grep -v "__tests__/" || true)
+if [ -n "$SEMANTIC_VIOLATIONS" ]; then
+  echo "$SEMANTIC_VIOLATIONS"
+  echo "ERROR: engine/semantic-cache imported outside agent-loop.ts (E8 violation)"
+  VIOLATIONS=$((VIOLATIONS + 1))
+fi
+
 if [ "$VIOLATIONS" -gt 0 ]; then
   echo ""
   echo "FAIL: $VIOLATIONS engine boundary violation(s) found (E8, E10)"

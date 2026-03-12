@@ -1,9 +1,10 @@
 import { eq, or, sql, desc, and, isNotNull, asc, inArray } from 'drizzle-orm'
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm'
 import { db } from './index'
-import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users, costRecords, presets, sketches, tierConfigs } from './schema'
+import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users, costRecords, presets, sketches, tierConfigs, semanticCache } from './schema'
 import { withTenant, scopedWhere, scopedInsert } from './tenant-helpers'
 import { cosineDistance } from './pgvector'
+import { toSql as pgvectorToSql } from 'pgvector'
 
 type Agent = InferSelectModel<typeof agents>
 type NewAgent = InferInsertModel<typeof agents>
@@ -115,6 +116,35 @@ export function getDB(companyId: string) {
       db.select().from(knowledgeDocs).where(
         scopedWhere(knowledgeDocs.companyId, companyId, isNotNull(knowledgeDocs.embedding)),
       ),
+
+    // READ — semantic cache lookup (Story 15.3, D19/D20)
+    // Returns best match with cosine similarity >= threshold AND within TTL window
+    findSemanticCache: async (embedding: number[], threshold: number): Promise<{ response: string; similarity: number } | null> => {
+      const vectorStr = pgvectorToSql(embedding)
+      const rows = await db.execute(sql`
+        SELECT response, 1 - (query_embedding <=> ${vectorStr}::vector) AS similarity
+        FROM semantic_cache
+        WHERE company_id = ${companyId}::uuid
+          AND 1 - (query_embedding <=> ${vectorStr}::vector) >= ${threshold}
+          AND created_at > NOW() - ttl_hours * INTERVAL '1 hour'
+        ORDER BY query_embedding <=> ${vectorStr}::vector
+        LIMIT 1
+      `)
+      const row = (rows as unknown as { rows: { response: string; similarity: number }[] }).rows?.[0]
+        ?? (rows as unknown as { response: string; similarity: number }[])[0]
+        ?? null
+      if (!row) return null
+      return { response: row.response as string, similarity: Number(row.similarity) }
+    },
+
+    // WRITE — semantic cache insert (Story 15.3, D19/D20)
+    insertSemanticCache: async (data: { queryText: string; queryEmbedding: number[]; response: string; ttlHours: number }): Promise<void> => {
+      const vectorStr = pgvectorToSql(data.queryEmbedding)
+      await db.execute(sql`
+        INSERT INTO semantic_cache (company_id, query_text, query_embedding, response, ttl_hours)
+        VALUES (${companyId}::uuid, ${data.queryText}, ${vectorStr}::vector, ${data.response}, ${data.ttlHours})
+      `)
+    },
 
     // READ — vector similarity search (Story 10.1, extended by 10.3/10.4 with folderId/folderIds filter)
     searchSimilarDocs: (queryEmbedding: number[], topK = 5, threshold = 0.8, folderId?: string | string[]) => {

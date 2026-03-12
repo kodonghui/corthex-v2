@@ -77,6 +77,7 @@ export type Agent = {
   reportTo: string | null
   soul: string
   status: AgentStatus
+  enableSemanticCache: boolean
   createdAt: Date
 }
 
