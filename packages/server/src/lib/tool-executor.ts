@@ -13,6 +13,8 @@ import { eq, and } from 'drizzle-orm'
 import { registry } from './tool-handlers'
 import { getCredentials as vaultGetCredentials } from '../services/credential-vault'
 import type { ToolExecContext } from './tool-handlers'
+import { withCache } from './tool-cache'
+import { getToolTtl } from './tool-cache-config'
 
 // === Claude API tool 타입 ===
 export type ClaudeTool = Anthropic.Messages.Tool
@@ -162,7 +164,9 @@ export async function executeTool(
     }
 
     const result = await Promise.race([
-      Promise.resolve(fn(input, enrichedCtx)),
+      withCache(toolName, getToolTtl(toolName), ctx.companyId, input, () =>
+        Promise.resolve(fn(input, enrichedCtx)),
+      ),
       new Promise<never>((_, reject) => {
         timeoutId = setTimeout(() => reject(new Error('TOOL_TIMEOUT')), TOOL_TIMEOUT_MS)
       }),
