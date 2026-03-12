@@ -43,13 +43,14 @@ phases:
       step-4-2: { name: "Accessibility Audit", status: completed, party: 1R, score: 7.75 }
   phase-5:
     name: Prompt Engineering
-    status: in-progress
+    status: completed
+    score: 9.5
     steps:
-      step-5-1: { name: "Web Stitch Prompt", status: pending, party: 3R }
-      step-5-2: { name: "App Stitch Prompt", status: pending, party: 3R }
+      step-5-1: { name: "Web Stitch Prompt", status: completed, party: 3R, score: 9.3 }
+      step-5-2: { name: "App Stitch Prompt", status: completed, party: 3R, score: 9.7 }
   phase-6:
     name: External Generation
-    status: waiting-for-pipeline
+    status: waiting-for-user
     note: "User manual - Stitch"
   phase-7:
     name: Integration
