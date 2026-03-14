@@ -1,9 +1,9 @@
 ---
 name: 'kdh-full-auto-pipeline'
-description: 'BMAD Full Pipeline v5.2 (team agents + swarm). planning(3-agent real party) or story dev(single/parallel/swarm). Usage: /kdh-full-auto-pipeline [planning|story-ID|parallel ID1 ID2...|swarm epic-N]'
+description: 'BMAD Full Pipeline v5.3 (team agents + swarm). planning(3-agent real party) or story dev(single/parallel/swarm). Usage: /kdh-full-auto-pipeline [planning|story-ID|parallel ID1 ID2...|swarm epic-N]'
 ---
 
-# Kodonghui Full Pipeline v5.2
+# Kodonghui Full Pipeline v5.3
 
 BMAD pipeline with **team agent real party**, **parallel story dev**, and **swarm auto-epic**.
 "Brief만 참여 → 자러감 → 아침에 완성" 가능.
@@ -16,6 +16,17 @@ BMAD pipeline with **team agent real party**, **parallel story dev**, and **swar
 - `swarm epic-N`: **Swarm auto-epic** — registers ALL stories as tasks, 3 workers self-organize (v5.1)
 
 ---
+
+## What Changed in v5.3 (from v5.2)
+
+| Change | Why |
+|--------|-----|
+| **Shutdown-before-continue race fix** | Orchestrator sent shutdown_request then cancel — Critics processed shutdown first, died. Now: NEVER send shutdown_request until ready to fully commit to shutdown. |
+| **Stage transition: shutdown-first protocol** | v5.2 sent shutdown + cancel in sequence. v5.3: wait for ALL agents to confirm idle/complete → THEN send shutdown_request → wait for ALL approvals → THEN TeamDelete → THEN TeamCreate new. |
+| **Force-cleanup fallback** | TeamDelete fails if members listed as "active" after tmux kill. Now: `rm -rf ~/.claude/teams/{name} ~/.claude/tasks/{name}` as fallback, then retry TeamDelete/TeamCreate. |
+| **Anti-Patterns 4-6** | 3 new production failures documented. |
+| **Context compaction resilience** | Orchestrator MUST update working-state.md before any step that might trigger compaction. On resume: read working-state.md + pipeline-status + all snapshots before continuing. |
+| **Batching allowance** | v5.2 Rule 32 said "exactly ONE step". v5.3: batching up to 2 related small steps is OK (e.g., step-03+04). Rule 32 updated. |
 
 ## What Changed in v5.2 (from v5.1)
 
@@ -180,6 +191,40 @@ These failures ACTUALLY HAPPENED. They are not hypothetical.
 **What happened:** Orchestrator's step instruction said "Execute skill=bmad-bmm-create-ux-design". Writer dutifully called the Skill tool.
 **Root cause:** Planning Stages section listed `Skill: bmad-bmm-create-ux-design`, implying Skill tool usage.
 **Fix:** Planning Stages now list STEP FILE PATHS, not skill names. Orchestrator sends step file path to Writer, not skill name.
+
+#### Anti-Pattern 4: Shutdown-then-cancel race condition (v5.3)
+**What happened:** Orchestrator sent `shutdown_request` to all 3 agents, then immediately sent `[CANCEL SHUTDOWN]` message. Critics processed `shutdown_request` before the cancel message arrived → Critics terminated. Writer survived because it was busy processing step completion.
+**Root cause:** `shutdown_request` and regular messages go through the same inbox. Agent processes whichever arrives first. There is NO mechanism to cancel a pending shutdown_request.
+**Fix:** NEVER send `shutdown_request` unless you are 100% committed to shutting down that agent. Stage transition protocol:
+1. Wait for Writer to report `[Step Complete]` for the LAST step
+2. Confirm all party-logs exist
+3. ONLY THEN send `shutdown_request` to ALL agents
+4. Wait for ALL shutdown approvals
+5. THEN `TeamDelete`
+6. THEN `TeamCreate` for next stage
+If you need to continue work, send a regular message instead. Never mix shutdown with continuation.
+
+#### Anti-Pattern 5: TeamDelete fails after tmux kill (v5.3)
+**What happened:** After Critics terminated (Anti-Pattern 4), their tmux panes were killed with `tmux kill-pane`. But `TeamDelete` still failed with "Cannot cleanup team with 2 active members". Had to manually `rm -rf` team directories.
+**Root cause:** TeamDelete checks config.json `isActive` flags, not tmux process state. Killing tmux panes doesn't update config.json.
+**Fix:** Fallback cleanup protocol:
+```
+1. TeamDelete (try normal path)
+2. If fails with "active members":
+   → tmux kill-pane for each member's paneId
+   → rm -rf ~/.claude/teams/{team-name} ~/.claude/tasks/{team-name}
+   → TeamDelete (should succeed now, clears session context)
+   → If still fails: TeamCreate will work after rm -rf
+```
+
+#### Anti-Pattern 6: Context compaction breaks orchestrator continuity (v5.3)
+**What happened:** During a long planning pipeline (Brief + PRD = ~2 hours), the orchestrator's context window compacted. After compaction, the orchestrator lost track of which step was in progress, what instructions were sent, and what the team state was. Had to manually re-assess state from files.
+**Root cause:** Long-running pipelines generate many idle notifications and teammate messages that fill the context window. Compaction summarizes but loses precise state.
+**Fix:**
+1. Orchestrator MUST update `working-state.md` after EVERY stage completion (not just at end)
+2. Orchestrator MUST update `working-state.md` before any potentially large step (FR+NFR sections, etc.)
+3. On resume after compaction: read `working-state.md` + `pipeline-status.yaml` + ALL `context-snapshots/*.md` BEFORE sending any messages
+4. Include in working-state.md: current team name, current step, team member pane IDs, last instruction sent
 
 ---
 
@@ -959,6 +1004,18 @@ You are SELF-ORGANIZING: pick your own tasks from the task board.
 **Cause:** Anti-Pattern #1 (see CRITICAL ANTI-PATTERNS section above).
 **Fix:** Shut down Writer. Respawn Writer with explicit prohibition. Inject context-snapshots. Resend step instruction in "[Step Instruction]" format with full step file path.
 
+### Orchestrator sent shutdown then tried to cancel (v5.3)
+**Cause:** Anti-Pattern #4. Orchestrator sent shutdown_request to critics, then realized work should continue, sent cancel message. Critics already approved shutdown and terminated.
+**Fix:** NEVER send shutdown_request unless fully committed. If you need to ask a question, use regular message. Shutdown is irreversible once the agent processes it.
+
+### TeamDelete fails after force-killing tmux panes (v5.3)
+**Cause:** Anti-Pattern #5. Config.json still lists members as active.
+**Fix:** `rm -rf ~/.claude/teams/{name} ~/.claude/tasks/{name}` → then `TeamDelete` (clears session context) → then `TeamCreate` for new team.
+
+### Orchestrator loses state after context compaction (v5.3)
+**Cause:** Anti-Pattern #6. Long pipeline fills context → compaction → lose precise state.
+**Fix:** On resume: read working-state.md + check output file line count + read latest context-snapshot + check party-logs → reconstruct state → continue.
+
 ---
 
 ## Absolute Rules
@@ -994,5 +1051,9 @@ You are SELF-ORGANIZING: pick your own tasks from the task board.
 29. Swarm: Orchestrator generates epic completion report after all tasks done
 30. Swarm: merge in dependency order. Merge conflict → spawn fix-worker (5min). Unresolvable → skip + log.
 31. Planning Writer MUST NEVER call the Skill tool. Content is written manually by reading step files.
-32. Planning Writer MUST write exactly ONE step, then SendMessage to BOTH critics, then WAIT. No batching steps.
+32. Planning Writer MUST write max 2 related steps, then SendMessage to BOTH critics, then WAIT. Batching 2 small related steps (e.g., step-03+04) is OK for efficiency.
 33. Orchestrator MUST send step file paths (not skill names) in Writer instructions. Format: "[Step Instruction] ..."
+34. Stage transition: NEVER send shutdown_request until ALL steps in the stage are verified PASS. Shutdown is irreversible — no cancel mechanism exists. (Anti-Pattern #4)
+35. If TeamDelete fails with "active members": force cleanup with `rm -rf ~/.claude/teams/{name} ~/.claude/tasks/{name}`, then TeamDelete, then TeamCreate. (Anti-Pattern #5)
+36. Orchestrator MUST update working-state.md after EVERY stage completion and before potentially large steps. On resume after compaction: read working-state.md + output file + snapshots before continuing. (Anti-Pattern #6)
+37. Stage transition protocol (STRICT ORDER): Writer reports final [Step Complete] → Orchestrator verifies party-logs → git commit → shutdown_request to ALL → wait ALL approvals → TeamDelete → TeamCreate new → spawn fresh team with all snapshots
