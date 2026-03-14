@@ -615,3 +615,278 @@ phases:
 # 9. Epic 10 (Semantic Search) - can start after Epic 2
 # 10. Epic 11 (NotebookLM/SketchVibe) - needs Epic 2 + 10
 # 11. Epic 12 (Testing) - ongoing from Epic 1
+
+# =============================================================================
+# TOOL INTEGRATION — Epics 16-21 (CORTHEX Tool Integration Phase 1)
+# Generated: 2026-03-14
+# Readiness: READY (8.9/10) — implementation-readiness.md
+# =============================================================================
+
+  - name: "Phase 7: Tool Integration (Phase 1)"
+    duration: "3-4 weeks"
+    epics:
+      - id: epic-16
+        title: "Credential Management Infrastructure"
+        priority: P0
+        sp: 11
+        status: pending
+        dependencies: ["epic-1", "epic-2", "epic-3"]
+        architecture: "D23 (AES-256-GCM), D28 (scrubber extension), E11 (credential pattern)"
+        frs_covered: "FR-CM1~6, FR-SO1 (D28 scrubber extension)"
+        stories:
+          - id: "16.1"
+            title: "Dependency Verification & Dockerfile Setup (ARM64 + MCP PoC)"
+            sp: 3
+            priority: P0
+            status: pending
+            blocked_by: []
+          - id: "16.2"
+            title: "Credentials DB Schema & Migration"
+            sp: 1
+            priority: P0
+            status: pending
+            blocked_by: []
+          - id: "16.3"
+            title: "AES-256-GCM Credential Crypto Library"
+            sp: 2
+            priority: P0
+            status: pending
+            blocked_by: ["16.1"]
+          - id: "16.4"
+            title: "getDB() Credential CRUD Methods"
+            sp: 2
+            priority: P0
+            status: pending
+            blocked_by: ["16.2", "16.3"]
+          - id: "16.5"
+            title: "Admin Credentials CRUD API Routes"
+            sp: 2
+            priority: P0
+            status: pending
+            blocked_by: ["16.3", "16.4"]
+          - id: "16.6"
+            title: "Credential-Scrubber D28 Extension"
+            sp: 2
+            priority: P0
+            status: pending
+            blocked_by: ["16.4", "16.5"]
+
+      - id: epic-17
+        title: "Built-in Tool Handlers"
+        priority: P0
+        sp: 16
+        status: pending
+        dependencies: ["epic-16"]
+        architecture: "D24 (Puppeteer pool), D29 (4 indexes), E13 (BuiltinToolHandler), E14 (withPuppeteer), E16 (callExternalApi), E17 (telemetry)"
+        frs_covered: "FR-DP1~2, FR-CP1~2, FR-WD1, FR-TA1~3, FR-SO2, FR-SO7"
+        stories:
+          - id: "17.1a"
+            title: "Tool Types, Engine Enforcement & callExternalApi Utility"
+            sp: 2
+            priority: P0
+            status: pending
+            blocked_by: []
+          - id: "17.1b"
+            title: "Telemetry DB — tool_call_events + D29 Indexes + getDB() Methods + allowed_tools JSONB"
+            sp: 3
+            priority: P0
+            status: pending
+            blocked_by: ["17.1a"]
+          - id: "17.2"
+            title: "Puppeteer Pool + md_to_pdf Tool Handler"
+            sp: 5
+            priority: P0
+            status: pending
+            blocked_by: ["17.1a", "17.1b", "16.1"]
+          - id: "17.3"
+            title: "read_web_page Tool Handler (Jina Reader)"
+            sp: 2
+            priority: P0
+            status: pending
+            blocked_by: ["17.1a", "17.1b"]
+          - id: "17.4"
+            title: "publish_tistory Tool Handler"
+            sp: 3
+            priority: P0
+            status: pending
+            blocked_by: ["17.1a", "17.1b", "16.5"]
+          - id: "17.5"
+            title: "upload_media Tool Handler (Cloudflare R2)"
+            sp: 3
+            priority: P0
+            status: pending
+            blocked_by: ["17.1a", "17.1b", "16.5", "16.1"]
+
+      - id: epic-18
+        title: "MCP Server Infrastructure"
+        priority: P0
+        sp: 21
+        status: pending
+        dependencies: ["epic-16", "epic-17"]
+        architecture: "D22 (agent_mcp_access default OFF), D25 (stdio Phase 1), D26 (lazy spawn + 120s timeout), E12 (8-stage lifecycle)"
+        frs_covered: "FR-CM4~5, FR-MCP1~6, FR-TA4, FR-SO3"
+        notes: "Stories 18.3+18.4 are HIGH complexity — allocate 1.5x estimates. Run expanded PoC (tools/call round-trip) before 18.3."
+        stories:
+          - id: "18.1"
+            title: "MCP DB Schema — mcp_server_configs, agent_mcp_access, mcp_lifecycle_events"
+            sp: 3
+            priority: P0
+            status: pending
+            blocked_by: ["16.1"]
+          - id: "18.2"
+            title: "MCP Transport Interface & stdio Implementation"
+            sp: 3
+            priority: P0
+            status: pending
+            blocked_by: ["18.1", "16.1"]
+          - id: "18.3"
+            title: "mcp-manager.ts — RESOLVE→SPAWN→INIT→DISCOVER (Stages 1–4)"
+            sp: 5
+            priority: P0
+            status: pending
+            blocked_by: ["18.1", "18.2", "16.4"]
+          - id: "18.4"
+            title: "mcp-manager.ts — MERGE→EXECUTE→RETURN→TEARDOWN (Stages 5–8)"
+            sp: 5
+            priority: P0
+            status: pending
+            blocked_by: ["18.3"]
+          - id: "18.5"
+            title: "agent-loop.ts MCP Integration — RESOLVE stage + MCP Merge + Scrubber Init"
+            sp: 5
+            priority: P0
+            status: pending
+            blocked_by: ["18.3", "18.4", "16.6"]
+          - id: "18.6"
+            title: "Admin MCP Server CRUD API Routes"
+            sp: 3
+            priority: P0
+            status: pending
+            blocked_by: ["18.1", "18.3"]
+
+      - id: epic-19
+        title: "Admin UI — Credential, Tool, MCP, Reports"
+        priority: P0
+        sp: 11
+        status: pending
+        dependencies: ["epic-16", "epic-17", "epic-18"]
+        architecture: "Admin routes: credentials.ts, mcp-servers.ts, agent-tools.ts, reports.ts"
+        frs_covered: "FR-CM1~3 (UI), FR-TA1~2 (UI), FR-MCP1~3 (UI), FR-RM5~6"
+        notes: "Story 19.5 MUST be scheduled after Epic 20 stories 20.1+20.3 complete (cross-epic dep). Stories 19.1~19.4 can start after 16.5, 17.1, 18.6."
+        stories:
+          - id: "19.1"
+            title: "Admin Credentials UI Page"
+            sp: 2
+            priority: P0
+            status: pending
+            blocked_by: ["16.5"]
+          - id: "19.2"
+            title: "Agent Tool Toggle UI"
+            sp: 2
+            priority: P0
+            status: pending
+            blocked_by: ["17.1a", "17.1b"]
+          - id: "19.3"
+            title: "Admin MCP Servers UI Page"
+            sp: 3
+            priority: P0
+            status: pending
+            blocked_by: ["18.6"]
+          - id: "19.4"
+            title: "Agent-MCP Access Matrix UI"
+            sp: 2
+            priority: P0
+            status: pending
+            blocked_by: ["18.6", "19.3"]
+          - id: "19.5"
+            title: "Admin Reports UI & Human Reports UI"
+            sp: 3
+            priority: P0
+            status: pending
+            blocked_by: ["20.1", "20.3"]
+            notes: "Schedule AFTER Epic 20 stories 20.1+20.3"
+
+      - id: epic-20
+        title: "Report & Distribution System"
+        priority: P0
+        sp: 11
+        status: pending
+        dependencies: ["epic-16", "epic-17"]
+        architecture: "D27 (channel phases: web_dashboard/pdf_email P1, notion P2), E15 (Promise.allSettled partial failure)"
+        frs_covered: "FR-RM1~4, NFR-I3 (send_email MIME)"
+        notes: "Story 20.4: check existing send_email handler for MIME attachment support before implementing."
+        stories:
+          - id: "20.1"
+            title: "Reports DB Schema & getDB() Methods"
+            sp: 2
+            priority: P0
+            status: pending
+            blocked_by: []
+          - id: "20.2"
+            title: "save_report Tool Handler with Partial Failure Contract"
+            sp: 3
+            priority: P0
+            status: pending
+            blocked_by: ["20.1", "17.1a", "17.1b", "17.2"]
+          - id: "20.3"
+            title: "list_reports & get_report Tool Handlers"
+            sp: 2
+            priority: P0
+            status: pending
+            blocked_by: ["20.1", "17.1a"]
+          - id: "20.4"
+            title: "pdf_email Channel — send_email MIME Attachment Upgrade"
+            sp: 3
+            priority: P0
+            status: pending
+            blocked_by: ["20.2", "17.2"]
+
+      - id: epic-21
+        title: "Integration Testing & Security Audit"
+        priority: P0
+        sp: 13
+        status: pending
+        dependencies: ["epic-16", "epic-17", "epic-18", "epic-19", "epic-20"]
+        architecture: "All D22–D29, E11–E17 (final validation)"
+        frs_covered: "FR-SO1 (coverage audit), FR-SO7 (zero blackbox), NFR-S1~5, NFR-P5, NFR-R1~3"
+        notes: "Story 21.4 Security Gate failure = production deploy blocked + Phase 2 blocked. All 6 Go/No-Go Gates must pass."
+        stories:
+          - id: "21.1"
+            title: "Credential Security Audit & Scrubber Coverage Verification"
+            sp: 3
+            priority: P0
+            status: pending
+            blocked_by: ["16.3", "16.6", "18.4"]
+          - id: "21.2"
+            title: "Tool Telemetry & Pipeline E2E Gate Validation"
+            sp: 3
+            priority: P0
+            status: pending
+            blocked_by: ["17.1a", "17.1b", "17.2", "20.2"]
+          - id: "21.3"
+            title: "Multi-Tenant Isolation Tests"
+            sp: 3
+            priority: P0
+            status: pending
+            blocked_by: ["16.4", "18.1", "20.1", "18.3"]
+          - id: "21.4"
+            title: "Phase 1 Go/No-Go Gate Validation"
+            sp: 5
+            priority: P0
+            status: pending
+            blocked_by: ["21.1", "21.2", "21.3"]
+
+# TOOL INTEGRATION CRITICAL PATH:
+# Epic 16 -> Epic 17 -> Epic 18 -> Epic 20 -> Epic 21
+# Epic 16 -> Epic 17 -> Epic 19 (19.1~19.4, partial)
+# Epic 20 (20.1+20.3) -> Epic 19.5
+# All -> Epic 21
+
+# TOOL INTEGRATION STORY SUMMARY:
+# Epic 16: 6 stories (11 SP) — Credential foundation
+# Epic 17: 6 stories (16 SP) — Built-in tools
+# Epic 18: 6 stories (21 SP) — MCP infrastructure [HIGH RISK: 18.3+18.4]
+# Epic 19: 5 stories (11 SP) — Admin UI [NOTE: 19.5 after Epic 20]
+# Epic 20: 4 stories (11 SP) — Report system
+# Epic 21: 4 stories (13 SP) — Integration testing + Go/No-Go gates
+# TOTAL: 31 stories, 83 SP
