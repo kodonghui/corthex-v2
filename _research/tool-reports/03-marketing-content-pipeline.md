@@ -535,6 +535,221 @@ bun add googleapis              # YouTube Data API
 
 ---
 
+---
+
+## 11. CLI-Anything 통합 계획 (Remotion + FFmpeg)
+
+> **CLI-Anything**: [HKUDS/CLI-Anything](https://github.com/HKUDS/CLI-Anything) (13,242 stars)
+> Claude Code 플러그인. 소프트웨어 소스코드를 분석해서 Python CLI + JSON 인터페이스를 자동 생성.
+> AI 에이전트가 subprocess로 진짜 소프트웨어를 직접 제어할 수 있게 해줌.
+
+### 11.1 왜 CLI-Anything인가?
+
+현재 문제:
+```
+CORTHEX 에이전트 → Remotion API (Node.js 코드 직접 작성 필요)
+CORTHEX 에이전트 → FFmpeg (복잡한 CLI 옵션 암기 필요)
+```
+
+CLI-Anything 적용 후:
+```
+CORTHEX 에이전트 → cli-anything CLI (자연어 수준 명령)
+                   → Remotion: "30초 릴스 만들어, 이미지 5장, 자막 포함"
+                   → FFmpeg: "이 영상에 BGM 합성하고 9:16으로 자르기"
+```
+
+### 11.2 Remotion × CLI-Anything
+
+**생성 명령:**
+```bash
+# Claude Code에서 실행
+/plugin install cli-anything
+/cli-anything https://github.com/remotion-dev/remotion
+```
+
+**예상 생성 CLI 구조:**
+```
+agent-harness/cli_anything/remotion/
+├── cli.py              # Click CLI 진입점
+├── composition.py      # 컴포지션 관리 (create, list, render)
+├── render.py           # 렌더링 (MP4/GIF/WebM)
+├── preview.py          # 프리뷰 서버
+├── assets.py           # 에셋 관리 (이미지, 오디오, 폰트)
+└── tests/
+    ├── test_composition.py
+    └── test_render.py
+```
+
+**핵심 CLI 명령 (예상):**
+```bash
+# 컴포지션 생성
+cli-anything remotion composition create \
+  --id "marketing-reel" \
+  --width 1080 --height 1920 \
+  --fps 30 --duration-seconds 30 \
+  --json
+
+# 렌더링
+cli-anything remotion render \
+  --composition-id "marketing-reel" \
+  --output "/tmp/reel.mp4" \
+  --codec h264 \
+  --props '{"scenes": [...], "bgm": "/tmp/bgm.mp3"}' \
+  --json
+
+# 에셋 추가
+cli-anything remotion assets add \
+  --type image \
+  --path "/tmp/scene1.png" \
+  --start-frame 0 --duration-frames 90 \
+  --json
+```
+
+**CORTHEX 도구 핸들러 통합:**
+```typescript
+// packages/server/src/lib/tool-handlers/builtins/compose-video.ts
+import { execSync } from 'child_process'
+
+const composeVideoSchema = z.object({
+  action: z.enum(['create_composition', 'add_scene', 'render', 'add_audio']),
+  // create_composition
+  width: z.number().default(1080),
+  height: z.number().default(1920),
+  fps: z.number().default(30),
+  duration_seconds: z.number().default(30),
+  // add_scene
+  image_path: z.string().optional(),
+  start_second: z.number().optional(),
+  duration: z.number().optional(),
+  // render
+  composition_id: z.string().optional(),
+  output_path: z.string().optional(),
+  codec: z.enum(['h264', 'h265', 'vp8', 'gif']).default('h264'),
+  // add_audio
+  audio_path: z.string().optional(),
+  volume: z.number().default(1.0),
+})
+
+// CLI-Anything가 생성한 CLI를 subprocess로 호출
+async function executeRemotion(action: string, args: Record<string, unknown>) {
+  const cmd = `cli-anything remotion ${action} ${
+    Object.entries(args)
+      .filter(([_, v]) => v !== undefined)
+      .map(([k, v]) => `--${k.replace(/_/g, '-')} ${JSON.stringify(v)}`)
+      .join(' ')
+  } --json`
+  const result = execSync(cmd, { encoding: 'utf-8', timeout: 300_000 }) // 5분 타임아웃
+  return JSON.parse(result)
+}
+```
+
+**에이전트 사용 시나리오 (영상 제작자 AI):**
+```
+1. 부서장: "LeetMaster 프로모션 릴스 만들어"
+2. 기획자 → 스크립트 5장면 작성
+3. 디자이너 → Replicate Flux로 이미지 5장 생성 → /tmp/scene1~5.png
+4. 영상 제작자:
+   a. compose_video(action: 'create_composition', width: 1080, height: 1920, duration_seconds: 30)
+   b. compose_video(action: 'add_scene', image_path: '/tmp/scene1.png', start_second: 0, duration: 6) × 5
+   c. text_to_speech(text: "나레이션...") → /tmp/narration.mp3
+   d. compose_video(action: 'add_audio', audio_path: '/tmp/narration.mp3')
+   e. compose_video(action: 'render', output_path: '/tmp/reel.mp4')
+5. 퍼블리셔 → publish_instagram(type: 'reel', media_urls: [...])
+```
+
+### 11.3 FFmpeg × CLI-Anything
+
+**생성 명령:**
+```bash
+/cli-anything https://github.com/FFmpeg/FFmpeg
+```
+
+**핵심 CLI 명령 (예상):**
+```bash
+# 영상 합성 (이미지 + 오디오 → MP4)
+cli-anything ffmpeg compose \
+  --images "/tmp/scene*.png" \
+  --audio "/tmp/narration.mp3" \
+  --output "/tmp/video.mp4" \
+  --fps 30 \
+  --transition fade --transition-duration 0.5 \
+  --json
+
+# 영상 크롭 (16:9 → 9:16 세로형)
+cli-anything ffmpeg crop \
+  --input "/tmp/video.mp4" \
+  --aspect-ratio "9:16" \
+  --output "/tmp/reel.mp4" \
+  --json
+
+# 자막 합성
+cli-anything ffmpeg subtitle \
+  --input "/tmp/video.mp4" \
+  --srt "/tmp/subtitles.srt" \
+  --font-size 48 --font-color white \
+  --position bottom \
+  --output "/tmp/video_subtitled.mp4" \
+  --json
+
+# BGM 합성
+cli-anything ffmpeg mix-audio \
+  --video "/tmp/video.mp4" \
+  --bgm "/tmp/bgm.mp3" --bgm-volume 0.3 \
+  --output "/tmp/final.mp4" \
+  --json
+
+# 썸네일 추출
+cli-anything ffmpeg thumbnail \
+  --input "/tmp/video.mp4" \
+  --timestamp "00:00:05" \
+  --output "/tmp/thumb.png" \
+  --json
+```
+
+**Remotion vs FFmpeg 역할 분담:**
+| 작업 | Remotion | FFmpeg |
+|------|----------|--------|
+| React 컴포넌트 기반 영상 | ✅ 주력 | ❌ |
+| 이미지 슬라이드쇼 | ✅ | ✅ (더 빠름) |
+| 오디오 합성/믹싱 | 기본 | ✅ 주력 |
+| 자막 하드코딩 | React 오버레이 | ✅ (ASS/SRT) |
+| 영상 크롭/리사이즈 | ❌ | ✅ 주력 |
+| 포맷 변환 | ❌ | ✅ 주력 |
+| 추천 워크플로우 | **제작** | **후처리** |
+
+### 11.4 주의사항
+
+1. **CLI-Anything 제약**: 소프트웨어가 서버에 설치되어 있어야 함
+   - Remotion: `bun add remotion @remotion/cli @remotion/renderer` (Node.js, 설치 간단)
+   - FFmpeg: `apt install ffmpeg` (시스템 패키지, 이미 많은 서버에 설치됨)
+2. **라이선스**: CLI-Anything 자체에 LICENSE 파일 없음 — 상업적 사용 전 확인 필요
+3. **Node.js 프로젝트 호환성**: CLI-Anything는 주로 C/C++/Python 소프트웨어에 검증됨. Remotion은 Node.js이므로 CLI 생성 품질 테스트 필요
+4. **렌더링 시간**: Remotion 30초 영상 렌더링 ~2-5분. FFmpeg 후처리 ~10-30초. 에이전트 타임아웃 설정 필수
+5. **디스크 공간**: 영상 작업은 임시 파일 많이 생성 → /tmp 정리 로직 필요
+
+### 11.5 BMAD Epic 스토리 제안
+
+```
+Epic: 마케팅 영상 자동화 (CLI-Anything 통합)
+
+Story 1: FFmpeg CLI-Anything 래퍼 설치 + compose_video_ffmpeg 도구
+  - /cli-anything FFmpeg → CLI 생성
+  - 기본 도구: crop, mix-audio, subtitle, thumbnail
+  - 테스트: 이미지 5장 → 30초 슬라이드쇼 MP4
+
+Story 2: Remotion CLI-Anything 래퍼 설치 + compose_video_remotion 도구
+  - /cli-anything remotion → CLI 생성
+  - 기본 도구: create_composition, add_scene, render
+  - 테스트: React 컴포넌트 기반 30초 영상
+
+Story 3: 영상 제작 파이프라인 통합
+  - Remotion(제작) → FFmpeg(후처리) → R2(업로드) → publish_youtube/instagram
+  - 에이전트 핸드오프 워크플로우 완성
+  - E2E 테스트: "프로모션 릴스 만들어" → 인스타 업로드까지
+```
+
+---
+
 ## Sources
 - [Instagram Graph API Guide 2026](https://elfsight.com/blog/instagram-graph-api-complete-developer-guide-for-2026/)
 - [instagram-publisher GitHub](https://github.com/yuvraj108c/instagram-publisher)

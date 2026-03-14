@@ -473,6 +473,269 @@ mcp_server_configs 테이블:
 
 ---
 
+---
+
+## 12. CLI-Anything 통합 계획 (Crawlee)
+
+> **CLI-Anything**: [HKUDS/CLI-Anything](https://github.com/HKUDS/CLI-Anything) (13,242 stars)
+> Claude Code 플러그인. 소프트웨어 소스코드를 분석해서 Python CLI + JSON 인터페이스를 자동 생성.
+> AI 에이전트가 subprocess로 진짜 소프트웨어를 직접 제어할 수 있게 해줌.
+
+### 12.1 왜 Crawlee × CLI-Anything인가?
+
+현재 문제:
+```
+CORTHEX 에이전트 → Crawlee API (TypeScript 코드 직접 작성 필요)
+  → PlaywrightCrawler 인스턴스 생성
+  → requestHandler 콜백 정의
+  → enqueueLinks 전략 설정
+  → 결과 수집 로직 작성
+  = 에이전트가 복잡한 코드를 매번 생성해야 함
+```
+
+CLI-Anything 적용 후:
+```
+CORTHEX 에이전트 → cli-anything crawlee (명령 한 줄)
+  → "이 사이트 전체 크롤링해서 제품 가격 추출"
+  → "네이버 블로그 검색 결과 100개 수집"
+  → "경쟁사 사이트 변경사항 모니터링"
+  = 복잡한 크롤러 코드 없이 CLI 명령으로 제어
+```
+
+### 12.2 Crawlee CLI-Anything 생성
+
+**생성 명령:**
+```bash
+# Claude Code에서 실행
+/plugin install cli-anything
+/cli-anything https://github.com/apify/crawlee
+```
+
+**예상 생성 CLI 구조:**
+```
+agent-harness/cli_anything/crawlee/
+├── cli.py                  # Click CLI 진입점
+├── crawler.py              # 크롤러 관리 (create, run, status)
+├── request_queue.py        # 요청 큐 (add, list, clear)
+├── dataset.py              # 데이터셋 (list, export, query)
+├── proxy.py                # 프록시 설정
+├── session_pool.py         # 세션 풀 관리
+└── tests/
+    ├── test_crawler.py
+    └── test_dataset.py
+```
+
+### 12.3 핵심 CLI 명령 (예상)
+
+```bash
+# 사이트 크롤링 (기본)
+cli-anything crawlee crawl \
+  --url "https://competitor.com/products" \
+  --max-pages 50 \
+  --crawler-type playwright \
+  --output-format json \
+  --json
+
+# CSS 선택자로 구조화 데이터 추출
+cli-anything crawlee extract \
+  --url "https://shop.example.com/products" \
+  --selectors '{"name": "h2.product-name", "price": "span.price", "image": "img.product-image@src"}' \
+  --max-pages 100 \
+  --output "/tmp/products.json" \
+  --json
+
+# 링크 탐색 전략 지정
+cli-anything crawlee crawl \
+  --url "https://blog.naver.com/search?query=LeetMaster" \
+  --link-selector "a.post-title" \
+  --max-depth 2 \
+  --max-pages 50 \
+  --wait-for "div.post-content" \
+  --json
+
+# 데이터셋 내보내기
+cli-anything crawlee dataset export \
+  --dataset-id "latest" \
+  --format csv \
+  --output "/tmp/crawl-results.csv" \
+  --json
+
+# 프록시 설정 (차단 우회)
+cli-anything crawlee proxy set \
+  --urls "http://proxy1:8080,http://proxy2:8080" \
+  --rotation round-robin \
+  --json
+
+# 세션 관리 (로그인 유지)
+cli-anything crawlee session create \
+  --name "naver-login" \
+  --cookies-file "/tmp/naver-cookies.json" \
+  --json
+
+# 크롤링 상태 확인
+cli-anything crawlee status \
+  --run-id "abc123" \
+  --json
+```
+
+### 12.4 CORTHEX 도구 핸들러 통합
+
+```typescript
+// packages/server/src/lib/tool-handlers/builtins/crawl-site.ts
+import { execSync } from 'child_process'
+
+const crawlSiteSchema = z.object({
+  action: z.enum(['crawl', 'extract', 'monitor', 'export']),
+
+  // crawl
+  url: z.string().url().describe('크롤링 시작 URL'),
+  max_pages: z.number().default(20).describe('최대 페이지 수'),
+  crawler_type: z.enum(['cheerio', 'playwright']).default('cheerio')
+    .describe('cheerio=빠름(정적), playwright=느림(JS렌더링)'),
+  max_depth: z.number().default(3).describe('링크 탐색 깊이'),
+  link_selector: z.string().optional().describe('탐색할 링크 CSS 선택자'),
+  wait_for: z.string().optional().describe('JS 렌더링 대기 CSS 선택자'),
+
+  // extract
+  selectors: z.record(z.string()).optional()
+    .describe('구조화 추출: {"필드명": "CSS선택자"} 형식'),
+
+  // monitor
+  check_interval: z.number().optional().describe('모니터링 간격 (분)'),
+  notify_on_change: z.boolean().default(true),
+
+  // export
+  format: z.enum(['json', 'csv', 'markdown']).default('json'),
+  output_path: z.string().optional(),
+})
+
+async function executeCrawlee(action: string, args: Record<string, unknown>) {
+  const flagArgs = Object.entries(args)
+    .filter(([_, v]) => v !== undefined)
+    .map(([k, v]) => {
+      const flag = `--${k.replace(/_/g, '-')}`
+      if (typeof v === 'boolean') return v ? flag : ''
+      return `${flag} ${typeof v === 'object' ? JSON.stringify(JSON.stringify(v)) : JSON.stringify(String(v))}`
+    })
+    .filter(Boolean)
+    .join(' ')
+
+  const cmd = `cli-anything crawlee ${action} ${flagArgs} --json`
+  const result = execSync(cmd, {
+    encoding: 'utf-8',
+    timeout: 600_000, // 10분 (대규모 크롤링)
+    maxBuffer: 50 * 1024 * 1024, // 50MB
+  })
+  return JSON.parse(result)
+}
+```
+
+### 12.5 에이전트 사용 시나리오
+
+**시나리오 1: 경쟁사 가격 모니터링 (마케팅팀)**
+```
+마케팅 부서장: "경쟁사 3곳의 코딩 교육 가격 수집해줘"
+
+리서치 에이전트:
+1. crawl_site(action: 'extract',
+     url: 'https://competitor1.com/pricing',
+     selectors: {"plan": "h3.plan-name", "price": "span.price", "features": "ul.features"},
+     max_pages: 5)
+2. 같은 방식으로 competitor2, competitor3 크롤링
+3. 결과 비교표 생성 → 부서장에게 보고
+```
+
+**시나리오 2: 블로그 콘텐츠 소싱 (카피라이터)**
+```
+카피라이터: "LeetMaster 관련 네이버 블로그 글 30개 수집"
+
+1. crawl_site(action: 'crawl',
+     url: 'https://search.naver.com/search.naver?query=LeetMaster',
+     link_selector: 'a.title_link',
+     max_pages: 30,
+     crawler_type: 'playwright',
+     wait_for: 'div.search_result')
+2. 수집된 글에서 트렌드/키워드 분석
+3. 콘텐츠 기획에 반영
+```
+
+**시나리오 3: 법률/규제 모니터링 (관리팀)**
+```
+관리 에이전트: "개인정보보호법 개정안 모니터링"
+
+1. crawl_site(action: 'monitor',
+     url: 'https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=...',
+     check_interval: 60,  // 1시간마다
+     notify_on_change: true)
+2. 변경 감지 시 → 관리자에게 알림 + 변경 내용 요약
+```
+
+### 12.6 기존 도구와의 관계 (업데이트)
+
+```
+┌─ L0: 즉시 사용 (API 호출만) ────────────────────────┐
+│  read_web_page (Jina Reader) — 단일 페이지, 무료      │
+│  search_web (기존) — 검색 결과 링크 목록               │
+└──────────────────────────────────────────────────────┘
+
+┌─ L1: MCP 연동 (설정만) ─────────────────────────────┐
+│  Firecrawl MCP — 12개 도구, 사이트맵 크롤링           │
+│  Bright Data MCP — 차단 우회, 한국 사이트             │
+│  Playwright MCP — 로그인 필요 사이트                  │
+└──────────────────────────────────────────────────────┘
+
+┌─ L2: CLI-Anything (NEW) ────────────────────────────┐
+│  crawl_site (Crawlee via CLI-Anything)               │
+│  → 대규모 커스텀 크롤링, 구조화 추출, 모니터링         │
+│  → Firecrawl보다 세밀한 제어, 무료, 로컬 실행          │
+│  → CLI-Anything가 Crawlee API를 CLI로 래핑            │
+└──────────────────────────────────────────────────────┘
+```
+
+**언제 뭘 쓸까:**
+| 상황 | 도구 | 이유 |
+|------|------|------|
+| 페이지 하나 읽기 | Jina Reader | 무료, 1줄 |
+| 사이트 10페이지 크롤링 | Firecrawl | API 간편 |
+| 구조화 데이터 추출 (가격, 상품명) | Crawlee CLI-Anything | 선택자 기반 정밀 추출 |
+| 100+ 페이지 대규모 크롤링 | Crawlee CLI-Anything | 큐잉, 재시도, 세션 관리 |
+| 차단 심한 한국 사이트 | Bright Data | 프록시 네트워크 |
+| 로그인 필요 (다음카페) | Playwright MCP | 브라우저 자동화 |
+| 정기 모니터링 | Crawlee CLI-Anything | cron + 변경 감지 |
+
+### 12.7 주의사항
+
+1. **CLI-Anything + TypeScript 프로젝트**: Crawlee는 TypeScript/Node.js 프로젝트. CLI-Anything는 주로 C/C++/Python 소프트웨어에서 검증됨. Crawlee CLI 생성 품질 사전 테스트 필수
+2. **대안**: CLI-Anything가 Crawlee를 제대로 래핑 못하면 → Crawlee TypeScript API를 직접 래핑하는 thin wrapper 도구를 수동 작성 (현재 섹션 5.1의 코드 참고)
+3. **robots.txt**: CLI-Anything 생성 CLI가 robots.txt 자동 체크하는지 확인. 없으면 래퍼에서 추가
+4. **메모리**: Playwright 크롤러 ~200MB. 동시 크롤링 작업 수 제한 필요 (서버 24GB 기준 max 5-10 동시)
+5. **라이선스**: Crawlee는 Apache 2.0 (상업 사용 OK). CLI-Anything은 LICENSE 없음 — 확인 필요
+
+### 12.8 BMAD Epic 스토리 제안
+
+```
+Epic: 웹 크롤링 고급 도구 (CLI-Anything 통합)
+
+Story 1: Crawlee CLI-Anything 래퍼 생성 + crawl_site 도구 등록
+  - /cli-anything crawlee → CLI 생성
+  - crawl + extract 기본 명령 검증
+  - CORTHEX 도구 핸들러 등록 (tool-handlers/builtins/crawl-site.ts)
+  - 테스트: 정적 사이트 10페이지 크롤링
+
+Story 2: 구조화 데이터 추출 + 모니터링
+  - CSS 선택자 기반 extract 명령 구현
+  - 정기 모니터링 (cron + 변경 감지 + 알림)
+  - 테스트: 쇼핑몰 상품 가격 50개 추출
+
+Story 3: Firecrawl/Jina 폴백 체인 구현
+  - 도구 체인: Jina(빠름) → Firecrawl(중간) → Crawlee(세밀)
+  - 자동 폴백: Jina 실패 시 Firecrawl, Firecrawl 실패 시 Crawlee
+  - Tool Cache 적용 (동일 URL 5분 캐시)
+  - 테스트: JS 렌더링 사이트에서 자동 폴백 확인
+```
+
+---
+
 ## Sources
 - [Firecrawl GitHub](https://github.com/firecrawl/firecrawl) — 85,000+ stars
 - [Firecrawl MCP](https://github.com/firecrawl/firecrawl-mcp-server)

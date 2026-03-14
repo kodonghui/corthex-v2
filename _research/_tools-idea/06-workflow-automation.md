@@ -187,6 +187,141 @@ docker run -d \
 
 ---
 
+## CLI-Anything 통합 계획
+
+> 추가일: 2026-03-14 | CLI-Anything (https://github.com/HKUDS/CLI-Anything) 적용 분석
+
+### 개요
+
+CLI-Anything는 GUI 소프트웨어의 코드베이스를 자동 분석해서 AI 에이전트가 사용할 수 있는 Python CLI + JSON 출력 인터페이스를 자동 생성하는 Claude Code 플러그인이다. GitHub 13,000+ Stars, 2026-03-08 출시, 활발한 개발 중.
+
+### 적용 대상: n8n + Flowise + Langflow
+
+| 도구 | GitHub | 언어 | CLI-Anything 적합도 | 이유 |
+|------|--------|------|-------------------|------|
+| **n8n** | n8n-io/n8n (100K+ stars) | TypeScript | ⭐⭐⭐ 높음 | 오픈소스, REST API 있으나 워크플로우 CRUD를 CLI로 단순화하면 에이전트가 "워크플로우 만들어서 실행해"를 한 줄로 처리 가능 |
+| **Flowise** | FlowiseAI/Flowise (30K+ stars) | TypeScript | ⭐⭐ 중간 | 오픈소스, API 있으나 chatflow/agentflow 구성이 복잡 → CLI로 추상화하면 에이전트가 AI 워크플로우 빌딩 가능 |
+| **Langflow** | langflow-ai/langflow (50K+ stars) | Python | ⭐⭐ 중간 | MCP 지원이 이미 있어서 CLI-Anything 필요성 낮음. 단, MCP 미사용 시 대안 |
+
+### n8n × CLI-Anything 구체적 통합 설계
+
+#### 1단계: CLI-Anything으로 n8n 래핑
+
+```bash
+# Claude Code에서 실행
+/plugin marketplace add HKUDS/CLI-Anything
+/plugin install cli-anything
+/cli-anything https://github.com/n8n-io/n8n
+```
+
+CLI-Anything 7단계 파이프라인이 자동 실행:
+1. **Phase 1 (분석)**: n8n TypeScript 소스 스캔, REST API 엔드포인트 파악, GUI 동작→API 매핑
+2. **Phase 2 (설계)**: `workflow`, `execution`, `credential`, `node` 명령 그룹 설계
+3. **Phase 3 (구현)**: Python Click CLI 생성 → n8n REST API를 subprocess/HTTP로 호출
+4. **Phase 4-6 (테스트)**: 유닛 + E2E 테스트
+5. **Phase 7 (패키징)**: `pip install cli-anything-n8n`
+
+#### 2단계: 생성될 CLI 명령어 (예상)
+
+```bash
+# 워크플로우 관리
+cli-anything-n8n workflow list --json
+cli-anything-n8n workflow create --name "인스타 자동 포스팅" --template instagram-auto
+cli-anything-n8n workflow activate --id 42
+cli-anything-n8n workflow execute --id 42 --input '{"topic": "AI 트렌드"}'
+
+# 실행 결과 조회
+cli-anything-n8n execution list --workflow-id 42 --status success --json
+cli-anything-n8n execution get --id 1234 --json
+
+# 크리덴셜 관리
+cli-anything-n8n credential list --json
+cli-anything-n8n credential create --type openai --name "GPT-4" --data '{"apiKey":"sk-..."}'
+
+# 노드 정보
+cli-anything-n8n node list --category ai --json
+```
+
+#### 3단계: CORTHEX 에이전트 연동
+
+```
+CORTHEX 에이전트 → call_tool("execute_cli") → cli-anything-n8n → n8n REST API → 워크플로우 실행
+```
+
+**도구 등록:**
+```typescript
+// packages/server/src/lib/tool-handlers/builtins/n8n-workflow.ts
+const n8nWorkflowSchema = z.object({
+  action: z.enum(['list', 'create', 'execute', 'status']),
+  workflow_id: z.number().optional(),
+  workflow_name: z.string().optional(),
+  input_data: z.record(z.unknown()).optional(),
+})
+
+// 내부적으로 cli-anything-n8n 호출 또는 n8n REST API 직접 호출
+// CLI-Anything이 생성한 CLI 래퍼를 subprocess로 실행
+```
+
+**활용 시나리오:**
+```
+사용자: "매일 아침 9시에 인스타 자동 포스팅 워크플로우 만들어"
+  ↓
+마케팅 부서장 (CORTHEX 에이전트)
+  ↓ call_tool("n8n_workflow", { action: "create", ... })
+  ↓
+cli-anything-n8n workflow create --name "인스타-일일-포스팅" --json
+  ↓
+n8n REST API: POST /api/v1/workflows
+  ↓
+결과: { "id": 42, "name": "인스타-일일-포스팅", "active": true }
+```
+
+### Flowise × CLI-Anything
+
+```bash
+/cli-anything https://github.com/FlowiseAI/Flowise
+```
+
+**생성될 CLI (예상):**
+```bash
+cli-anything-flowise chatflow list --json
+cli-anything-flowise chatflow create --name "고객문의 RAG" --template rag-basic
+cli-anything-flowise chatflow predict --id abc --question "반품 정책이 뭔가요?"
+cli-anything-flowise agentflow create --name "리서치 에이전트" --tools search,web_browse
+```
+
+**CORTHEX 활용**: CORTHEX 에이전트가 Flowise에서 AI 챗봇/RAG를 자동으로 구성하고 테스트 가능.
+
+### 설치 전제조건
+
+| 항목 | 필요사항 |
+|------|---------|
+| n8n 서버 | Oracle VPS에 Docker로 설치 (이미 추천됨) |
+| CLI-Anything | Claude Code 플러그인 설치 |
+| Python 3.10+ | CLI 실행 환경 |
+| 대상 소프트웨어 소스 | GitHub에서 클론 (자동) |
+
+### 주의사항
+
+1. **라이선스 미명시**: CLI-Anything 저장소에 LICENSE 파일 없음 → 상업적 사용 전 확인 필요
+2. **출시 6일 신규 프로젝트**: 프로덕션 사용 전 충분한 검증 필요
+3. **Python 래퍼**: CLI-Anything은 Python Click으로 생성 → CORTHEX(TypeScript)에서 subprocess 호출 또는 n8n REST API 직접 호출 병행
+4. **n8n 자체 REST API 존재**: CLI-Anything 없이도 직접 REST API 호출 가능. CLI-Anything의 가치는 "AI가 이해하기 쉬운 JSON 구조로 래핑"하는 것
+5. **레이스 컨디션 이슈(#51)**: 멀티 세션에서 상태 동기화 문제 보고됨 → 단일 에이전트 사용 시 문제 없음
+
+### BMAD Epic 기획 시 참고
+
+```
+Epic: n8n 워크플로우 자동화 통합
+  Story 1: n8n Docker 설치 + API 키 발급 (1SP)
+  Story 2: CLI-Anything으로 n8n CLI 래퍼 생성 + 검증 (3SP)
+  Story 3: n8n_workflow 도구 구현 (list/create/execute/status) (5SP)
+  Story 4: 마케팅 워크플로우 템플릿 3개 생성 (3SP)
+  Story 5: CORTHEX 마케팅 에이전트 Soul에 n8n 도구 연동 (2SP)
+```
+
+---
+
 ## 참고 출처
 - https://n8n.io/pricing/
 - https://n8n.io/workflows/categories/ai/
