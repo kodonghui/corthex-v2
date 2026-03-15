@@ -19,11 +19,11 @@ phases:
       1-3: { name: "Landing Page Research", status: complete, party: 2R, score: 7.0 }
   phase-2:
     name: Deep Analysis
-    status: in_progress
+    status: complete
     steps:
-      2-1: { name: "Web Options Deep Analysis", status: pending, party: 3R, critic_model: opus }
-      2-2: { name: "App Options Deep Analysis", status: pending, party: 3R, critic_model: opus }
-      2-3: { name: "Landing Options Deep Analysis", status: pending, party: 3R, critic_model: opus }
+      2-1: { name: "Web Options Deep Analysis", status: complete, party: 3R, critic_model: opus, score: 8.5 }
+      2-2: { name: "App Options Deep Analysis", status: complete, party: 3R, critic_model: opus, score: 8.2 }
+      2-3: { name: "Landing Options Deep Analysis", status: complete, party: 3R, critic_model: opus, score: 7.2, note: "6.8 initial → 7.2 after 3 blocking fixes" }
   phase-3:
     name: Design System
     status: pending

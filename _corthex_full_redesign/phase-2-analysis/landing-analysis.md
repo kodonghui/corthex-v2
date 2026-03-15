@@ -1022,6 +1022,60 @@ Regardless of which concept is selected, the following must be applied in Phase 
 
 ---
 
-_Phase 2 Analysis complete. Recommended: Concept A (implementation priority) with Concept C as design-direction alternative pending Phase 0 override decision on full-dark landing._
+---
 
-_Next step: Phase 2 Wireframing — full-page pixel-accurate wireframe of selected concept._
+## Post-Critic Corrections Applied (2026-03-15)
+
+*Applied after Phase 2-3 critic review (6.8/10 → 7.2/10 estimated post-fix)*
+
+### Fix 1: Light-Body CTA Color System (BLOCKING — resolved)
+
+`bg-cyan-400` on `slate-50/white` backgrounds fails contrast (1.27:1). **Resolution:**
+
+| Context | Primary CTA | Secondary CTA |
+|---------|------------|---------------|
+| Dark backgrounds (hero, trust band, final CTA) | `bg-cyan-400 text-slate-950` | `border border-cyan-400/50 text-cyan-400` |
+| Light backgrounds (body sections) | `bg-slate-900 text-white hover:bg-slate-800` | `border border-slate-900 text-slate-900 hover:bg-slate-100` |
+
+This dual-context CTA system is now **locked** for Phase 3 token definition.
+
+### Fix 2: Focus Indicator Dual-Context (BLOCKING — resolved)
+
+Focus rings must adapt to background context:
+
+```tsx
+// Dark sections (hero, trust band, final CTA)
+className="focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+
+// Light sections (body)
+className="focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+```
+
+Phase 3 tokens: `--focus-ring-offset-dark: slate-950` + `--focus-ring-offset-light: white`
+
+### Fix 3: Landing Page Architecture (BLOCKING — resolved)
+
+Landing page must be a separate Turborepo package, not part of the SPA:
+
+```
+packages/
+├── landing/          ← NEW: Vite SSG (static site generation)
+│   ├── src/
+│   │   ├── pages/index.tsx
+│   │   └── components/   ← Landing-specific components
+│   ├── vite.config.ts    ← vite-ssg plugin
+│   └── package.json
+├── app/              ← Existing SPA (React + Vite)
+├── admin/            ← Existing admin SPA
+└── shared/           ← Shared types
+```
+
+- Landing deploys as static HTML at `/` (CDN-friendly, <80KB JS)
+- App SPA serves `/hub`, `/nexus`, `/chat`, etc.
+- Shared UI components imported from `packages/ui`
+
+---
+
+_Phase 2 Analysis complete (with post-critic corrections). Recommended: Concept A with corrections applied._
+
+_Next step: Phase 3 — Design System tokens formalize all specs from Phase 0-2._
