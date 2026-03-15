@@ -1813,6 +1813,27 @@ export const agentReports = pgTable('agent_reports', {
   companyDateIdx: index('agent_reports_company_date').on(table.companyId, table.createdAt),
 }))
 
+// === Story 17.1b: tool_call_events — Telemetry (D29, FR-SO2, E17) ===
+// Write-only for engine; read via admin route. D29: 4 indexes for Phase 2 Audit + Pipeline Gate SQL.
+export const toolCallEvents = pgTable('tool_call_events', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  agentId: uuid('agent_id').references(() => agents.id),
+  runId: text('run_id').notNull(),    // E17: groups all tool calls in one pipeline session
+  toolName: text('tool_name').notNull(),
+  startedAt: timestamp('started_at').notNull(),
+  completedAt: timestamp('completed_at'),
+  success: boolean('success'),
+  errorCode: text('error_code'),      // e.g. 'TOOL_QUOTA_EXHAUSTED', 'TOOL_NOT_ALLOWED'
+  durationMs: integer('duration_ms'),
+}, (t) => ({
+  // D29: 3 compound indexes + run_id index (Pipeline Gate SQL: SELECT ... WHERE run_id = $1)
+  idxCompanyDate:      index('tce_company_date').on(t.companyId, t.startedAt),
+  idxCompanyAgentDate: index('tce_company_agent_date').on(t.companyId, t.agentId, t.startedAt),
+  idxCompanyToolDate:  index('tce_company_tool_date').on(t.companyId, t.toolName, t.startedAt),
+  idxRunId:            index('tce_run_id').on(t.runId),
+}))
+
 // === Story 15.3: semantic_cache — Semantic Caching (D19/D20) ===
 export const semanticCache = pgTable('semantic_cache', {
   id: uuid('id').primaryKey().defaultRandom(),

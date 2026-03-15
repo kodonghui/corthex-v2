@@ -1,7 +1,7 @@
 import { eq, or, sql, desc, and, isNotNull, asc, inArray, type SQL } from 'drizzle-orm'
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm'
 import { db } from './index'
-import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users, costRecords, presets, sketches, tierConfigs, semanticCache, agentReports } from './schema'
+import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users, costRecords, presets, sketches, tierConfigs, semanticCache, agentReports, toolCallEvents } from './schema'
 import { withTenant, scopedWhere, scopedInsert } from './tenant-helpers'
 import { cosineDistance } from './pgvector'
 import { toSql as pgvectorToSql } from 'pgvector'
@@ -12,6 +12,7 @@ type Preset = InferSelectModel<typeof presets>
 type NewPreset = InferInsertModel<typeof presets>
 type TierConfig = InferSelectModel<typeof tierConfigs>
 type NewTierConfig = InferInsertModel<typeof tierConfigs>
+type NewToolCallEvent = InferInsertModel<typeof toolCallEvents>
 
 /**
  * getDB(companyId) — 멀티테넌시 격리 래퍼 (Architecture D1, E3)
@@ -221,5 +222,27 @@ export function getDB(companyId: string) {
         .set({ distributionResults: results })
         .where(scopedWhere(agentReports.companyId, companyId, eq(agentReports.id, reportId)))
         .returning(),
+
+    // === Story 17.1b: Tool Call Events (D29, FR-SO2, E17 telemetry pattern) ===
+    // E17 pattern: INSERT before logic → UPDATE in try/finally (captures durationMs, success, errorCode)
+    // Write-only for engine — reads happen via admin route (not through getDB for now)
+
+    // WRITE — insert telemetry row at tool call start, returns [{id}] for updateToolCallEvent
+    insertToolCallEvent: (data: Omit<NewToolCallEvent, 'companyId' | 'id'>) =>
+      db.insert(toolCallEvents).values({
+        ...data,
+        companyId: companyId as any,
+      }).returning({ id: toolCallEvents.id }),
+
+    // WRITE — update telemetry row at tool call completion (try/finally guarantees execution)
+    updateToolCallEvent: (eventId: string, update: {
+      completedAt?: Date
+      success?: boolean
+      errorCode?: string | null
+      durationMs?: number
+    }) =>
+      db.update(toolCallEvents)
+        .set(update)
+        .where(and(eq(toolCallEvents.id, eventId), eq(toolCallEvents.companyId, companyId as any))),
   }
 }
