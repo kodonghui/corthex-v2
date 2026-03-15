@@ -656,7 +656,7 @@ phases:
             title: "getDB() Credential CRUD Methods"
             sp: 2
             priority: P0
-            status: pending
+            status: done
             blocked_by: ["16.2", "16.3"]
           - id: "16.5"
             title: "Admin Credentials CRUD API Routes"

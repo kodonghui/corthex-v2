@@ -1,7 +1,8 @@
 import { eq, or, sql, desc, and, isNotNull, asc, inArray, type SQL } from 'drizzle-orm'
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm'
 import { db } from './index'
-import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users, costRecords, presets, sketches, tierConfigs, semanticCache, agentReports, toolCallEvents, mcpServerConfigs, agentMcpAccess, mcpLifecycleEvents } from './schema'
+import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users, costRecords, presets, sketches, tierConfigs, semanticCache, agentReports, toolCallEvents, mcpServerConfigs, agentMcpAccess, mcpLifecycleEvents, credentials } from './schema'
+import { decrypt } from '../lib/credential-crypto'
 import { withTenant, scopedWhere, scopedInsert } from './tenant-helpers'
 import { cosineDistance } from './pgvector'
 import { toSql as pgvectorToSql } from 'pgvector'
@@ -307,5 +308,56 @@ export function getDB(companyId: string) {
           eq(mcpLifecycleEvents.event, 'spawn'),
           sql`${mcpLifecycleEvents.createdAt} < NOW() - INTERVAL '${sql.raw(String(olderThanSeconds))} seconds'`,
         )),
+
+    // === Story 16.4: Credential CRUD (D23, E11, FR-CM1~3, FR-CM6) ===
+
+    // READ — list credentials for Admin UI (encryptedValue intentionally excluded — AC1, D28 security)
+    listCredentials: () =>
+      db.select({ id: credentials.id, keyName: credentials.keyName, updatedAt: credentials.updatedAt })
+        .from(credentials)
+        .where(eq(credentials.companyId, companyId))
+        .orderBy(asc(credentials.keyName)),
+
+    // READ — list all credentials with decrypted plaintext (D28 scrubber only — AC2)
+    // Async: must await decrypt() for each row
+    listCredentialsForScrubber: async () => {
+      const rows = await db.select({
+        keyName: credentials.keyName,
+        encryptedValue: credentials.encryptedValue,
+      }).from(credentials).where(eq(credentials.companyId, companyId))
+      return Promise.all(rows.map(async (row) => ({
+        keyName: row.keyName,
+        plaintext: await decrypt(row.encryptedValue),
+      })))
+    },
+
+    // READ — single credential by keyName for E11 RESOLVE stage (returns full row including encryptedValue)
+    getCredential: (keyName: string) =>
+      db.select().from(credentials)
+        .where(and(eq(credentials.companyId, companyId), eq(credentials.keyName, keyName)))
+        .limit(1),
+
+    // WRITE — insert encrypted credential with audit trail (AC3)
+    insertCredential: (data: { keyName: string; encryptedValue: string }, userId: string) =>
+      db.insert(credentials).values({
+        companyId,
+        keyName: data.keyName,
+        encryptedValue: data.encryptedValue,
+        createdByUserId: userId,
+        updatedByUserId: userId,
+      }).returning(),
+
+    // WRITE — update encryptedValue + refresh audit trail (AC5)
+    updateCredential: (keyName: string, encryptedValue: string, userId: string) =>
+      db.update(credentials)
+        .set({ encryptedValue, updatedByUserId: userId, updatedAt: new Date() })
+        .where(and(eq(credentials.companyId, companyId), eq(credentials.keyName, keyName)))
+        .returning(),
+
+    // WRITE — delete credential scoped by companyId + keyName (AC6)
+    deleteCredential: (keyName: string) =>
+      db.delete(credentials)
+        .where(and(eq(credentials.companyId, companyId), eq(credentials.keyName, keyName)))
+        .returning(),
   }
 }
