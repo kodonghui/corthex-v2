@@ -1,9 +1,9 @@
 ---
 name: 'kdh-uxui-redesign-full-auto-pipeline'
-description: 'UXUI Redesign Pipeline v3.0 (Libre+BMAD+KDH). 8 Phases, 3 Critics, archetypal themes, premium SaaS quality.'
+description: 'UXUI Redesign Pipeline v3.1 (Libre+BMAD+KDH + 2.1.76 enhancements). 8 Phases, 3 Critics, archetypal themes, premium SaaS quality.'
 ---
 
-# CORTHEX UXUI Redesign Pipeline v3.0
+# CORTHEX UXUI Redesign Pipeline v3.1
 
 Phase 0~5 auto → Phase 6 manual (Stitch) → Phase 7 integration.
 Output root: `_corthex_full_redesign/`
@@ -633,6 +633,15 @@ Contents: decisions, design tokens referenced, libre tools applied, constraints 
 - Pipeline never blocks — timeout/fail/escalate always leads to "continue".
 - Anti-patterns: Writer must NOT call Skill tool, NOT batch steps, NOT skip critic review.
 - Troubleshoot: vague output → critics reject (score 0). No references → expand search domains. Stitch HTML fallback. tsc --noEmit before commit.
+
+### 2.1.76 Enhancements (auto-applied)
+
+- **1M context window**: Opus 4.6 기본 100만 토큰 → Phase 0~5 연속 실행 시 압축 거의 없음
+- **PostCompact hook**: 만약 압축이 발생해도 working-state.md + context-snapshots 자동 보존 (hooks.json)
+- **Stale worktree auto-cleanup**: Phase 7 Integration 중 중단된 worktree 자동 정리 (Claude Code 내장)
+- **Background agent partial results**: Writer/Critic 타임아웃 시에도 거기까지 작성한 내용 보존됨
+- **Token estimation fix**: 토큰 과다 계산 수정 → 불필요한 조기 압축 방지 (2.1.75)
+- **SessionEnd hook timeout**: 15초로 확장 → 종료 시 정리 작업 충분히 완료
 
 ## Core Rules
 

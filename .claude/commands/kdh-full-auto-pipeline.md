@@ -1,9 +1,9 @@
 ---
 name: 'kdh-full-auto-pipeline'
-description: 'BMAD Full Pipeline v7.0 (team agents + swarm). Usage: /kdh-full-auto-pipeline [planning|story-ID|parallel ID1 ID2...|swarm epic-N]'
+description: 'BMAD Full Pipeline v7.1 (team agents + swarm + 2.1.76 enhancements). Usage: /kdh-full-auto-pipeline [planning|story-ID|parallel ID1 ID2...|swarm epic-N]'
 ---
 
-# Kodonghui Full Pipeline v7.0
+# Kodonghui Full Pipeline v7.1
 
 ## Mode Selection
 
@@ -43,9 +43,9 @@ description: 'BMAD Full Pipeline v7.0 (team agents + swarm). Usage: /kdh-full-au
 Additional safeguards:
 - TeamDelete fails after tmux kill → `rm -rf ~/.claude/teams/{name} ~/.claude/tasks/{name}`, retry
 - Shutdown stall → 30s timeout → `tmux kill-pane` → force cleanup
-- Context compaction → update working-state.md after EVERY stage + before large steps
+- Context compaction → PostCompact hook auto-saves working-state.md + git commit (2.1.76)
 - Swarm workers skip skills → Orchestrator verifies story file + skill report before accepting
-- Stale resources → Pipeline startup: `git worktree prune` + remove old dirs + kill orphan panes
+- Stale resources → Claude Code 2.1.76 auto-cleans stale worktrees + cleanup.sh handles tmux/sessions
 
 ---
 
@@ -329,8 +329,17 @@ Rules: no files outside story scope. Shared files → ask team-lead. If Skill fa
 | max_stalls | 3 | SKIP step |
 | shutdown_timeout | 30s | Non-responding → tmux kill-pane → force cleanup |
 | /simplify | 3min timeout | Skip on fail, code-review still catches issues |
+| context_window | 1M tokens (Opus 4.6) | 압축 없이 Epic 전체 처리 가능. 조기 압축 방지됨 (2.1.75 fix) |
 
 Party-log validation: Orchestrator MUST verify critic-a.md + critic-b.md + critic-c.md + fixes.md exist before accepting [Step Complete]. Missing → REJECT (up to 2x, then accept with warning).
+
+### 2.1.76 Enhancements (auto-applied)
+
+- **PostCompact hook**: 컨텍스트 압축 후 working-state.md 자동 저장 + git commit (hooks.json 설정됨)
+- **Stale worktree auto-cleanup**: 중단된 parallel/swarm 후 남은 worktree 자동 삭제 (Claude Code 내장)
+- **Background agent partial results**: 워커를 kill해도 거기까지의 결과가 대화에 보존됨
+- **SessionEnd hook timeout**: 15초로 설정 (기본 1.5초 → `CLAUDE_CODE_SESSIONEND_HOOKS_TIMEOUT_MS=15000`)
+- **1M context window**: Opus 4.6 기본 100만 토큰. 대규모 Epic도 압축 없이 처리
 
 ---
 
