@@ -547,7 +547,9 @@ interface ToolCallCardProps {
 ```
 Expandable card showing tool execution. Header shows tool name + status. Collapsed: 1 line. Expanded: input JSON + output. `bg-slate-800/50 rounded-lg border border-slate-700 p-3`. `JetBrains Mono` for JSON content.
 
-**Dependencies:** StatusDot, shadcn/ui Collapsible (Radix)
+**ARIA:** `aria-expanded={isOpen}`, `aria-controls="tool-call-{id}-content"`. Keyboard: Enter/Space to toggle.
+
+**Dependencies:** StatusDot, shadcn/ui Collapsible (Radix — provides built-in ARIA)
 
 ---
 
@@ -589,6 +591,17 @@ interface NexusCanvasProps {
 Full-bleed React Flow canvas. `bg-[#040D1A]`. Shell detects `/nexus` → removes padding, collapses sidebar to 64px. `minZoom={0.1} maxZoom={2.0} fitView`. Background: dot pattern `#1E293B gap-24`.
 
 **Dependencies:** `@xyflow/react` v12, AgentNode, DeptClusterNode, HandoffEdge, NexusToolbar, NexusMiniMap, NexusControls
+
+**Keyboard Accessibility (Phase 2 fix #7):**
+- React Flow v12 built-in keyboard nav enabled via `proOptions`
+- Tab: cycle between nodes in DOM order
+- Arrow keys: pan canvas (when no node selected)
+- Arrow keys + Shift: move selected node
+- Enter/Space: select/deselect node
+- `+`/`-` or Ctrl+scroll: zoom
+- Escape: deselect all
+- `aria-label` on canvas: `"NEXUS 조직도"` ("NEXUS organization chart")
+- Each node: `role="button" aria-label="{agentName}, {departmentName}, status: {status}"`
 
 ---
 
@@ -807,7 +820,27 @@ interface AgentFormProps {
 ```
 Create/edit agent form. Fields: name, department (Select), tier (Select), system prompt (Textarea), model (Select), tools (multi-select), soul description. Validation with react-hook-form + zod.
 
-**Dependencies:** shadcn/ui Input, Select, Textarea, Button, Label; react-hook-form, zod
+**Dependencies:** shadcn/ui Input, Select, Textarea, Button, Label; `react-hook-form` + `@hookform/resolvers/zod` + `zod`
+
+---
+
+#### SoulEditor
+```
+File:    components/agents/soul-editor.tsx
+Stitch:  hand-coded
+Base:    Custom (CodeMirror lite or plain textarea with mono font)
+```
+```tsx
+interface SoulEditorProps {
+  agentId: string;
+  soul: string;
+  onChange: (soul: string) => void;
+  readOnly?: boolean;
+}
+```
+Agent personality/soul editor. `JetBrains Mono 13px/400/1.625` (design-tokens `mono-base`). `bg-slate-900 border border-slate-700 rounded-xl p-4`. Markdown raw view with line numbers. Auto-save debounce (1000ms).
+
+**Dependencies:** None (plain textarea with mono styling, or CodeMirror if syntax highlighting needed)
 
 ---
 
@@ -2623,10 +2656,12 @@ const NexusCanvas = React.lazy(() => import('./components/nexus/nexus-canvas'));
 const CommandPalette = React.lazy(() => import('./components/ui/command-palette'));
 const ContextPanel = React.lazy(() => import('./components/shell/context-panel'));
 
-// In router:
-<Suspense fallback={<LoadingSpinner size="lg" />}>
-  <NexusCanvas />
-</Suspense>
+// In router — always wrap with ErrorBoundary + Suspense:
+<ErrorBoundary fallback={<ChunkLoadError onRetry={() => window.location.reload()} />}>
+  <Suspense fallback={<LoadingSpinner size="lg" />}>
+    <NexusCanvas />
+  </Suspense>
+</ErrorBoundary>
 ```
 
 ### 8.2 Route-Level Code Splits

@@ -260,6 +260,13 @@ Every text/background pair used across all surfaces, validated:
   --color-warning:       #FBBF24;  /* amber-400 */
   --color-error:         #F87171;  /* red-400 */
   --color-working:       #60A5FA;  /* blue-400 */
+
+  /* Budget thresholds (TrackerCostMeter) */
+  --budget-warning-threshold: 0.7;   /* 70% → switch to amber-400 */
+  --budget-danger-threshold:  0.9;   /* 90% → switch to red-400 */
+
+  /* Interaction states */
+  --opacity-disabled: 0.4;
 }
 ```
 
@@ -292,6 +299,8 @@ npm install @fontsource/inter @fontsource/jetbrains-mono
 --font-ui:   'Inter', 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Helvetica Neue', 'Arial', sans-serif;
 --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
 ```
+
+**Font display:** @fontsource defaults to `font-display: swap`. No additional configuration needed. Fonts render with system fallback first, then swap to Inter/JetBrains Mono when loaded.
 
 **The 2-Font Rule (Vignelli):** Inter and JetBrains Mono NEVER mix within the same text block. Context switch = typeface switch. No `font-light` (300) or `font-thin` (100) on dark backgrounds — too thin to read.
 
@@ -1189,7 +1198,9 @@ const config: Config = {
     },
   },
 
-  plugins: [],
+  plugins: [
+    require('tailwindcss-animate'),  // Required for shadcn/ui animation classes (animate-in, fade-in, zoom-in, etc.)
+  ],
 };
 
 export default config;

@@ -26,25 +26,26 @@ phases:
       2-3: { name: "Landing Options Deep Analysis", status: complete, party: 3R, critic_model: opus, score: 7.2, note: "6.8 initial → 7.2 after 3 blocking fixes" }
   phase-3:
     name: Design System
-    status: pending
+    status: complete
     steps:
-      3-1: { name: "Design Tokens", status: pending, party: 3R, critic_model: opus }
-      3-2: { name: "Component Strategy", status: pending, party: 3R }
+      3-1: { name: "Design Tokens", status: complete, party: 3R, critic_model: opus, score: 8.9, note: "5 fixes applied (budget tokens, disabled opacity, tailwindcss-animate, font-display)" }
+      3-2: { name: "Component Strategy", status: complete, party: 3R, critic_model: opus, score: 8.5, note: "5 fixes applied (NEXUS keyboard a11y, SoulEditor, ToolCallCard ARIA, ErrorBoundary, form validation stack)" }
   phase-4:
     name: Theme Creation
-    status: pending
+    status: complete
     steps:
-      4-1: { name: "Creative Themes", status: pending, party: 3R }
-      4-2: { name: "Accessibility Audit", status: pending, party: 1R }
+      4-1: { name: "Creative Themes", status: complete, party: 3R, critic_model: opus, score: 8.7, note: "5 themes (Sovereign/Imperial/Tactical/Mystic/Stealth), 3 fixes applied" }
+      4-2: { name: "Accessibility Audit", status: complete, party: 1R, score: 9.0, note: "81 items audited, 77 pass, 4 conditional (Phase 7 verification), 0 fail. WCAG 2.1 AA confirmed." }
   phase-5:
     name: Prompt Engineering
-    status: pending
+    status: complete
     steps:
-      5-1: { name: "Web Stitch Prompt", status: pending, party: 3R }
-      5-2: { name: "App Stitch Prompt", status: pending, party: 3R }
+      5-1: { name: "Web Stitch Prompt", status: complete, party: 3R, critic_model: opus, score: 8.5, note: "9 screen prompts, 11 hand-coded exclusions, 2 fixes applied" }
+      5-2: { name: "App Stitch Prompt", status: complete, party: 3R, critic_model: opus, score: 8.5, note: "6 screen prompts, 7 hand-coded exclusions, 7 Capacitor plugins, 2 fixes applied" }
   phase-6:
     name: External Generation
     status: pending
+    note: "Manual — user pastes Phase 5 prompts into Google Stitch"
   phase-7:
     name: Integration
     status: pending
