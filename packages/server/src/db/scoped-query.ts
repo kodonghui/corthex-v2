@@ -1,7 +1,7 @@
-import { eq, or, sql, desc, and, isNotNull, asc, inArray } from 'drizzle-orm'
+import { eq, or, sql, desc, and, isNotNull, asc, inArray, type SQL } from 'drizzle-orm'
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm'
 import { db } from './index'
-import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users, costRecords, presets, sketches, tierConfigs, semanticCache } from './schema'
+import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users, costRecords, presets, sketches, tierConfigs, semanticCache, agentReports } from './schema'
 import { withTenant, scopedWhere, scopedInsert } from './tenant-helpers'
 import { cosineDistance } from './pgvector'
 import { toSql as pgvectorToSql } from 'pgvector'
@@ -177,5 +177,49 @@ export function getDB(companyId: string) {
         .orderBy(asc(sql`${dist}`))
         .limit(topK)
     },
+
+    // READ — reports list (Story 20.1, FR-RM3, D27)
+    // Excludes content field for performance — use getReport() for full content
+    listReports: (filter?: { type?: string }) => {
+      const conditions: SQL[] = [eq(agentReports.companyId, companyId as any)]
+      if (filter?.type) conditions.push(eq(agentReports.type, filter.type))
+      return db.select({
+        id: agentReports.id,
+        title: agentReports.title,
+        type: agentReports.type,
+        tags: agentReports.tags,
+        createdAt: agentReports.createdAt,
+        agentId: agentReports.agentId,
+      })
+        .from(agentReports)
+        .where(and(...conditions))
+        .orderBy(desc(agentReports.createdAt))
+    },
+
+    // READ — single report with full content (Story 20.1, FR-RM4, D27)
+    // Returns empty array if not found — caller handles empty result (Scenario 3)
+    getReport: (id: string) =>
+      db.select().from(agentReports).where(scopedWhere(agentReports.companyId, companyId, eq(agentReports.id, id))),
+
+    // WRITE — insert new report (Story 20.1, FR-RM1, D27)
+    // Returns [{id}] — report ID for distribution tracking (E15)
+    insertReport: (data: { title: string; content: string; type?: string; runId: string; agentId?: string; tags?: string[] }) =>
+      db.insert(agentReports).values({
+        companyId: companyId as any,
+        title: data.title,
+        content: data.content,
+        type: data.type ?? null,
+        runId: data.runId,
+        agentId: data.agentId ?? null,
+        tags: data.tags ?? [],
+      }).returning({ id: agentReports.id }),
+
+    // WRITE — update distribution_results JSONB (Story 20.1, FR-RM2, E15)
+    // Partial failure contract: channel results stored regardless of individual success/failure
+    updateReportDistribution: (reportId: string, results: Record<string, string>) =>
+      db.update(agentReports)
+        .set({ distributionResults: results })
+        .where(scopedWhere(agentReports.companyId, companyId, eq(agentReports.id, reportId)))
+        .returning(),
   }
 }

@@ -820,7 +820,7 @@ phases:
             title: "Reports DB Schema & getDB() Methods"
             sp: 2
             priority: P0
-            status: pending
+            status: done
             blocked_by: []
           - id: "20.2"
             title: "save_report Tool Handler with Partial Failure Contract"

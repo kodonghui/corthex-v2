@@ -1796,6 +1796,23 @@ export const credentials = pgTable('credentials', {
   companyKeyUniq: unique('credentials_company_key_uniq').on(table.companyId, table.keyName),
 }))
 
+// === Story 20.1: agent_reports — AI Agent Report Storage (D27, E15, FR-RM1~4) ===
+// Distinct from human `reports` table — stores AI-generated markdown reports with distribution tracking
+export const agentReports = pgTable('agent_reports', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  agentId: uuid('agent_id').references(() => agents.id),
+  runId: text('run_id').notNull(),
+  title: text('title').notNull(),
+  content: text('content').notNull(),
+  type: text('type'),
+  tags: jsonb('tags').$type<string[]>().notNull().default([]),
+  distributionResults: jsonb('distribution_results').$type<Record<string, string>>(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  companyDateIdx: index('agent_reports_company_date').on(table.companyId, table.createdAt),
+}))
+
 // === Story 15.3: semantic_cache — Semantic Caching (D19/D20) ===
 export const semanticCache = pgTable('semantic_cache', {
   id: uuid('id').primaryKey().defaultRandom(),
