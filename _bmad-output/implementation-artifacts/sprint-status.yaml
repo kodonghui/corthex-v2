@@ -668,7 +668,7 @@ phases:
             title: "Credential-Scrubber D28 Extension"
             sp: 2
             priority: P0
-            status: pending
+            status: done
             blocked_by: ["16.4", "16.5"]
 
       - id: epic-17

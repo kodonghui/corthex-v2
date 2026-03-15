@@ -1,55 +1,51 @@
 ---
-stepsCompleted: ['step-01-preflight-and-context', 'step-02-identify-targets', 'step-03-generate-tests']
-lastStep: 'step-03-generate-tests'
-lastSaved: '2026-03-08'
+stepsCompleted: ['step-01-preflight-and-context', 'step-02-identify-targets', 'step-03-generate-tests', 'step-04-validate-and-summarize']
+lastStep: 'step-04-validate-and-summarize'
+lastSaved: '2026-03-15'
+story: '16.6'
+totalTests: 34
+devStoryTests: 29
+teaTests: 5
+passing: 34
+failing: 0
 ---
 
-# TEA Summary: Story 16-6 Similar Task Previous Learning Auto Reference
+# TEA Summary: Story 16.6 — Credential-Scrubber D28 Extension
 
 ## Stack & Framework
 - Stack: fullstack (Bun backend + React frontend)
 - Test framework: bun:test
 - Playwright: disabled
 - Pact: none
+- Execution mode: sequential
 
 ## Risk Analysis
 
 ### P0 (Critical)
-- Keyword extraction correctness (Korean + English + mixed)
-- Similarity scoring accuracy (Jaccard + substring boost)
-- Threshold boundary precision (0.2 cutoff)
-- Backward compatibility (no taskDescription → generic path)
+- Empty-string credential in list corrupts output (split('') inserts REDACTED between every char)
+- Audit log contains plaintext credential value (NFR-S2 security violation)
+- Session credential isolation (cross-session data leak)
 
 ### P1 (High)
-- Cache key differentiation (different tasks → different cache)
-- Large memory set performance (20+ memories scored)
-- charBudget enforcement
-- Full pipeline roundtrip (extract → save → match)
-
-### P2 (Medium)
-- Edge inputs (emoji, whitespace, stopwords-only)
-- Symmetric Jaccard property
-- Empty/null context handling
+- Release of session A affects session B (Map isolation)
+- Credential that is substring of another (scrubbing order)
+- MCP tool output exempt from scrubbing (AC5)
 
 ## Test Coverage
 
-### Existing (44 tests from dev)
-- extractTaskKeywords: 10 tests
-- calculateSimilarity: 9 tests
-- collectSimilarMemories: 6 tests
-- collectAgentMemoryContext routing: 3 tests
-- AgentRunner passing: 3 tests
-- Context population: 3 tests
-- Cache differentiation: 1 test
-- Edge cases: 8 tests
-- simpleHash: 1 test
+### Dev-Story Tests (29 tests)
+- Static pattern scrubbing: 7 tests (Claude tokens, Telegram, KIS, JSON payloads, passthrough)
+- AC1 init(): 3 tests (export, _testSetSession helper, empty init)
+- AC2 credentialScrubber: 6 tests (exact match, multiple occurrences, multiple credentials, no-match, session isolation, regex metacharacter safety)
+- AC3 release(): 2 tests (export, post-release no-scrub)
+- AC4 empty credentials: 2 tests (empty list passthrough, no-init fallback)
+- AC5 MCP: 2 tests (MCP tool scrubbed, toolName in log)
+- TEA P0 source introspection: 7 tests
 
-### TEA Added (18 tests)
-- Threshold boundary: 2 tests (exact at 0.2, just below)
-- Keyword robustness: 5 tests (stopwords-only, Korean stopwords, whitespace, newlines, emoji)
-- Similarity precision: 3 tests (large sets, duplicates, symmetry)
-- collectSimilarMemories advanced: 3 tests (many memories, empty list, all below threshold)
-- Full pipeline roundtrip: 2 tests (similar/unrelated tasks, progressive matching)
-- Backward compatibility: 3 tests (no param, undefined, empty string)
+### TEA Added (5 tests)
+- P0: Empty-string credential guard — 2 tests (empty-only list, mixed empty+valid)
+- P0: Audit log security — 1 test (console.info spy verifies no plaintext in log)
+- P1: Release isolation — 1 test (release A, B unaffected)
+- P1: Substring credential ordering — 1 test (both scrubbed correctly)
 
-## Total: 62 tests, all passing
+## Total: 34 tests, 34 passing, 0 failing
