@@ -36,6 +36,23 @@ RUN bunx turbo build
 FROM oven/bun:1.3.10-alpine AS production
 WORKDIR /app
 
+# Story 16.1 (D24): Puppeteer ARM64 — Alpine용 시스템 Chromium + 한국어 폰트
+# 이유: puppeteer 번들 Chromium은 x64 전용이라 ARM64에서 ENOEXEC 발생
+# 해결: apk로 Chromium 설치 + PUPPETEER_EXECUTABLE_PATH로 경로 명시
+# 한국어 폰트 (FR-DP2: md_to_pdf 한국어 렌더링 — 두부 문자 방지)
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    font-noto \
+    font-noto-cjk
+
+# Puppeteer: 번들 Chromium 다운로드 건너뜀 (시스템 Chromium 사용)
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
 # 서버 소스 + 의존 패키지 (소스 직접 실행 — 번들링 이슈 회피)
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=builder /app/packages/server ./packages/server

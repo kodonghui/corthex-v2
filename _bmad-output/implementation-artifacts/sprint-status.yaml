@@ -638,7 +638,7 @@ phases:
             title: "Dependency Verification & Dockerfile Setup (ARM64 + MCP PoC)"
             sp: 3
             priority: P0
-            status: in-progress
+            status: done
             blocked_by: []
           - id: "16.2"
             title: "Credentials DB Schema & Migration"
