@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX Mobile Operations Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1dd4ed",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#102022",
+                        "surface": "#16282b",
+                        "surface-alt": "#1c3135",
+                        "border-subtle": "#274247",
+                        "text-muted": "#88aeb4"
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display flex justify-center">
+<div class="relative flex h-auto min-h-screen w-full max-w-md flex-col bg-background-light dark:bg-background-dark group/design-root overflow-x-hidden">
+<!-- Sticky Header -->
+<div class="sticky top-0 z-50 flex items-center bg-background-light dark:bg-background-dark/95 backdrop-blur-md p-4 justify-between border-b border-border-subtle">
+<div class="text-slate-900 dark:text-slate-100 flex size-12 shrink-0 items-center material-symbols-outlined">
+            calendar_today
+        </div>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight flex-1 text-center">Dashboard</h2>
+<div class="flex w-12 items-center justify-end">
+<button class="flex items-center justify-center overflow-hidden rounded-xl h-12 bg-transparent text-slate-900 dark:text-slate-100 min-w-0 p-0 material-symbols-outlined">
+                search
+            </button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto pb-24">
+<!-- Metric Cards Grid -->
+<div class="grid grid-cols-2 gap-4 p-4">
+<div class="flex flex-col gap-2 rounded-xl p-5 border border-border-subtle bg-surface">
+<p class="text-text-muted text-sm font-medium leading-normal">활성 작업</p>
+<div class="flex items-end justify-between">
+<p class="text-slate-900 dark:text-slate-100 font-mono text-2xl font-bold leading-tight">24</p>
+<p class="text-emerald-400 text-sm font-medium leading-normal bg-emerald-400/10 px-2 py-0.5 rounded">+12%</p>
+</div>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-5 border border-border-subtle bg-surface">
+<p class="text-text-muted text-sm font-medium leading-normal">에이전트</p>
+<div class="flex items-end justify-between">
+<p class="text-slate-900 dark:text-slate-100 font-mono text-2xl font-bold leading-tight">12</p>
+<p class="text-text-muted text-sm font-medium leading-normal"><span class="text-primary">8</span> active</p>
+</div>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-5 border border-border-subtle bg-surface">
+<p class="text-text-muted text-sm font-medium leading-normal">오늘 비용</p>
+<div class="flex items-end justify-between">
+<p class="text-slate-900 dark:text-slate-100 font-mono text-2xl font-bold leading-tight">$42.50</p>
+<p class="text-rose-400 text-sm font-medium leading-normal bg-rose-400/10 px-2 py-0.5 rounded">-8%</p>
+</div>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-5 border border-border-subtle bg-surface justify-between">
+<div class="flex justify-between items-center">
+<p class="text-text-muted text-sm font-medium leading-normal">성공률</p>
+<p class="text-slate-900 dark:text-slate-100 font-mono text-xl font-bold">94%</p>
+</div>
+<div class="rounded-full bg-surface-alt h-1.5 w-full mt-2 overflow-hidden">
+<div class="h-full rounded-full bg-primary" style="width: 94%;"></div>
+</div>
+</div>
+</div>
+<!-- Weekly Usage Bar Chart -->
+<div class="px-4 py-2">
+<div class="flex flex-col gap-4 rounded-xl border border-border-subtle bg-surface p-6">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-text-muted text-sm font-medium leading-normal">주간 사용량</p>
+<p class="text-slate-900 dark:text-slate-100 font-mono text-3xl font-bold leading-tight mt-1">$320.00</p>
+</div>
+<p class="text-emerald-400 text-sm font-medium leading-normal bg-emerald-400/10 px-2 py-1 rounded">+15%</p>
+</div>
+<div class="grid min-h-[160px] grid-cols-7 gap-2 items-end justify-items-center mt-4">
+<div class="w-full flex flex-col items-center gap-2 h-full justify-end">
+<div class="w-full rounded-t-sm bg-primary/40 hover:bg-primary transition-colors h-[30%]"></div>
+<p class="text-text-muted font-mono text-[10px] uppercase tracking-wider">Mon</p>
+</div>
+<div class="w-full flex flex-col items-center gap-2 h-full justify-end">
+<div class="w-full rounded-t-sm bg-primary/40 hover:bg-primary transition-colors h-[10%]"></div>
+<p class="text-text-muted font-mono text-[10px] uppercase tracking-wider">Tue</p>
+</div>
+<div class="w-full flex flex-col items-center gap-2 h-full justify-end">
+<div class="w-full rounded-t-sm bg-primary h-[100%] shadow-[0_0_10px_rgba(29,212,237,0.3)]"></div>
+<p class="text-primary font-mono text-[10px] uppercase tracking-wider font-bold">Wed</p>
+</div>
+<div class="w-full flex flex-col items-center gap-2 h-full justify-end">
+<div class="w-full rounded-t-sm bg-primary/40 hover:bg-primary transition-colors h-[50%]"></div>
+<p class="text-text-muted font-mono text-[10px] uppercase tracking-wider">Thu</p>
+</div>
+<div class="w-full flex flex-col items-center gap-2 h-full justify-end">
+<div class="w-full rounded-t-sm bg-primary/40 hover:bg-primary transition-colors h-[90%]"></div>
+<p class="text-text-muted font-mono text-[10px] uppercase tracking-wider">Fri</p>
+</div>
+<div class="w-full flex flex-col items-center gap-2 h-full justify-end">
+<div class="w-full rounded-t-sm bg-primary/40 hover:bg-primary transition-colors h-[60%]"></div>
+<p class="text-text-muted font-mono text-[10px] uppercase tracking-wider">Sat</p>
+</div>
+<div class="w-full flex flex-col items-center gap-2 h-full justify-end">
+<div class="w-full rounded-t-sm bg-primary/40 hover:bg-primary transition-colors h-[80%]"></div>
+<p class="text-text-muted font-mono text-[10px] uppercase tracking-wider">Sun</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Activity List -->
+<div class="px-4 py-6">
+<h3 class="text-slate-900 dark:text-slate-100 text-lg font-bold mb-4">최근 활동</h3>
+<div class="flex flex-col gap-3">
+<div class="flex items-center gap-4 rounded-xl border border-border-subtle bg-surface p-4">
+<div class="h-2 w-2 rounded-full bg-emerald-400 shrink-0 shadow-[0_0_8px_rgba(52,211,153,0.5)]"></div>
+<div class="flex-1 min-w-0">
+<p class="text-slate-900 dark:text-slate-100 text-sm font-medium truncate">Data Pipeline Sync</p>
+<p class="text-text-muted text-xs truncate">Agent Alpha completed successfully</p>
+</div>
+<p class="text-text-muted font-mono text-xs shrink-0">2m ago</p>
+</div>
+<div class="flex items-center gap-4 rounded-xl border border-border-subtle bg-surface p-4">
+<div class="h-2 w-2 rounded-full bg-primary shrink-0 shadow-[0_0_8px_rgba(29,212,237,0.5)] animate-pulse"></div>
+<div class="flex-1 min-w-0">
+<p class="text-slate-900 dark:text-slate-100 text-sm font-medium truncate">Model Training</p>
+<p class="text-text-muted text-xs truncate">Epoch 45/100 in progress</p>
+</div>
+<p class="text-text-muted font-mono text-xs shrink-0">15m ago</p>
+</div>
+<div class="flex items-center gap-4 rounded-xl border border-border-subtle bg-surface p-4">
+<div class="h-2 w-2 rounded-full bg-rose-500 shrink-0 shadow-[0_0_8px_rgba(244,63,94,0.5)]"></div>
+<div class="flex-1 min-w-0">
+<p class="text-slate-900 dark:text-slate-100 text-sm font-medium truncate">API Gateway Error</p>
+<p class="text-text-muted text-xs truncate">Connection timeout on endpoint /v2/auth</p>
+</div>
+<p class="text-text-muted font-mono text-xs shrink-0">1h ago</p>
+</div>
+<div class="flex items-center gap-4 rounded-xl border border-border-subtle bg-surface p-4">
+<div class="h-2 w-2 rounded-full bg-emerald-400 shrink-0"></div>
+<div class="flex-1 min-w-0">
+<p class="text-slate-900 dark:text-slate-100 text-sm font-medium truncate">Database Backup</p>
+<p class="text-text-muted text-xs truncate">Automated snapshot created</p>
+</div>
+<p class="text-text-muted font-mono text-xs shrink-0">3h ago</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation Bar -->
+<div class="fixed bottom-0 w-full max-w-md flex gap-2 border-t border-border-subtle bg-surface-alt px-4 pb-6 pt-3 z-50">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
+<div class="flex h-8 items-center justify-center material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">
+                home
+            </div>
+<p class="text-xs font-medium leading-normal tracking-[0.015em]">Dashboard</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-text-muted hover:text-primary transition-colors" href="#">
+<div class="flex h-8 items-center justify-center material-symbols-outlined">
+                group
+            </div>
+<p class="text-xs font-medium leading-normal tracking-[0.015em]">Agents</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-text-muted hover:text-primary transition-colors" href="#">
+<div class="flex h-8 items-center justify-center material-symbols-outlined">
+                work
+            </div>
+<p class="text-xs font-medium leading-normal tracking-[0.015em]">Tasks</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-text-muted hover:text-primary transition-colors" href="#">
+<div class="flex h-8 items-center justify-center material-symbols-outlined">
+                settings
+            </div>
+<p class="text-xs font-medium leading-normal tracking-[0.015em]">Settings</p>
+</a>
+</div>
+</div>
+</body></html>

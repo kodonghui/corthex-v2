@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX Mobile Login Screen Interface</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13c8ec",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#101f22",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex justify-center items-center">
+<!-- Mobile Device Container (iPhone 14 Pro aspect ratio approx) -->
+<div class="relative flex h-[852px] w-[393px] flex-col bg-slate-950 overflow-x-hidden rounded-[3rem] shadow-2xl border-8 border-slate-900 mx-auto my-8 sm:my-0">
+<!-- Status Bar Area (Visual only) -->
+<div class="h-12 w-full shrink-0 flex items-center justify-between px-6 pt-2">
+<span class="text-white text-sm font-medium">9:41</span>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-white text-sm">signal_cellular_4_bar</span>
+<span class="material-symbols-outlined text-white text-sm">wifi</span>
+<span class="material-symbols-outlined text-white text-sm">battery_full</span>
+</div>
+</div>
+<div class="flex-1 flex flex-col justify-center px-4 pb-12 pt-6">
+<!-- Branding -->
+<div class="text-center mb-10">
+<h1 class="text-white tracking-tight text-[36px] font-bold leading-tight pb-1 inline-block border-b-4 border-primary">CORTHEX</h1>
+<p class="text-slate-400 text-base font-normal leading-normal mt-3">AI 조직 관리 플랫폼</p>
+</div>
+<!-- Login Form -->
+<form class="flex flex-col gap-4">
+<!-- Email Input -->
+<div class="flex flex-col w-full">
+<label class="flex flex-col w-full">
+<span class="text-white text-sm font-medium leading-normal pb-2 px-1">이메일 주소</span>
+<div class="flex w-full items-stretch rounded-xl bg-slate-900 border border-slate-800 focus-within:border-primary transition-colors">
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-0 border-none bg-transparent h-14 placeholder:text-slate-500 p-4 rounded-r-none border-r-0 pr-2 text-base font-normal leading-normal" placeholder="이메일을 입력하세요" type="email" value=""/>
+<div class="text-slate-500 flex items-center justify-center pr-4 rounded-r-xl">
+<span class="material-symbols-outlined text-[24px]">mail</span>
+</div>
+</div>
+</label>
+</div>
+<!-- Password Input -->
+<div class="flex flex-col w-full">
+<label class="flex flex-col w-full">
+<span class="text-white text-sm font-medium leading-normal pb-2 px-1">비밀번호</span>
+<div class="flex w-full items-stretch rounded-xl bg-slate-900 border border-slate-800 focus-within:border-primary transition-colors">
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-0 border-none bg-transparent h-14 placeholder:text-slate-500 p-4 rounded-r-none border-r-0 pr-2 text-base font-normal leading-normal" placeholder="비밀번호를 입력하세요" type="password" value=""/>
+<div class="text-slate-500 flex items-center justify-center pr-4 rounded-r-xl cursor-pointer hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[24px]">visibility</span>
+</div>
+</div>
+</label>
+</div>
+<!-- Login Button -->
+<div class="pt-2">
+<button class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-14 bg-primary text-slate-950 text-base font-bold leading-normal tracking-wide hover:bg-primary/90 transition-colors" type="button">
+<span class="truncate">로그인</span>
+</button>
+</div>
+<!-- Divider -->
+<div class="flex items-center justify-center gap-4 py-4">
+<div class="h-px bg-slate-800 flex-1"></div>
+<span class="text-slate-500 text-sm font-medium">또는</span>
+<div class="h-px bg-slate-800 flex-1"></div>
+</div>
+<!-- Secondary Login (Google) -->
+<div>
+<button class="flex w-full cursor-pointer items-center justify-center gap-3 overflow-hidden rounded-xl h-14 bg-slate-900 text-white border border-slate-800 text-base font-medium leading-normal hover:bg-slate-800 transition-colors" type="button">
+<!-- Custom Google Icon (Simplified for pure HTML/CSS without external assets) -->
+<div class="w-5 h-5 rounded-full bg-white flex items-center justify-center text-slate-900 font-bold text-xs" data-alt="Google Logo abstract">G</div>
+<span class="truncate">Google로 계속하기</span>
+</button>
+</div>
+</form>
+<!-- Sign Up Link -->
+<div class="mt-8 text-center">
+<p class="text-slate-400 text-sm">
+                    계정이 없으신가요? 
+                    <a class="text-primary font-medium hover:underline ml-1" href="#">회원가입</a>
+</p>
+</div>
+</div>
+<!-- Home Indicator (Visual only) -->
+<div class="h-8 w-full flex justify-center items-end pb-2">
+<div class="w-1/3 h-1 bg-slate-600 rounded-full"></div>
+</div>
+</div>
+</body></html>

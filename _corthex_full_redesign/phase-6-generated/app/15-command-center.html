@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX Command Center</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#1dd4ed",
+            "background-light": "#f6f8f8",
+            "background-dark": "#102022",
+          },
+          fontFamily: {
+            "display": ["Inter", "sans-serif"],
+            "mono": ["JetBrains Mono", "monospace"],
+          },
+          borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+        },
+      },
+    }
+  </script>
+<style>
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col antialiased selection:bg-primary/30">
+<!-- Sticky Header -->
+<header class="sticky top-0 z-50 flex items-center justify-between p-4 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800">
+<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors text-slate-900 dark:text-slate-100">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="text-lg font-bold tracking-tight">명령 센터</h1>
+<div class="w-10 flex items-center justify-center">
+<button class="text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto pb-[140px]">
+<div class="p-4 space-y-8">
+<!-- Active Command Section -->
+<section>
+<h2 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3 pl-1">Active Command</h2>
+<!-- Active Command Card -->
+<div class="bg-slate-900 border border-primary rounded-xl p-5 shadow-[0_4px_20px_-4px_rgba(29,212,237,0.2)] relative overflow-hidden">
+<!-- Subtle glow effect background -->
+<div class="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+<p class="text-white font-medium text-lg mb-8 leading-snug relative z-10">2월 매출 보고서를 작성하고 마케팅부에 공유해줘</p>
+<!-- Pipeline -->
+<div class="flex items-center justify-between mb-8 relative z-10 px-2">
+<!-- Connecting lines -->
+<div class="absolute left-6 right-6 top-4 -translate-y-1/2 h-0.5 bg-slate-800 rounded-full z-0"></div>
+<div class="absolute left-6 top-4 -translate-y-1/2 h-0.5 bg-emerald-500 rounded-full z-0 w-[45%] shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
+<!-- Step 1: Completed -->
+<div class="relative z-10 flex flex-col items-center gap-2 w-16">
+<div class="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white shadow-[0_0_12px_rgba(16,185,129,0.6)] ring-4 ring-slate-900">
+<span class="material-symbols-outlined text-[16px] font-bold">check</span>
+</div>
+<span class="text-[10px] font-bold text-emerald-400 tracking-wide text-center">데이터 수집</span>
+</div>
+<!-- Step 2: Active (Blue Pulse) -->
+<div class="relative z-10 flex flex-col items-center gap-2 w-16">
+<div class="absolute inset-0 top-0 left-1/2 -translate-x-1/2 w-8 h-8 bg-blue-500/40 rounded-full animate-ping"></div>
+<div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white ring-4 ring-slate-900 shadow-[0_0_16px_rgba(59,130,246,0.8)] relative">
+<span class="material-symbols-outlined text-[16px]">edit_document</span>
+</div>
+<span class="text-[10px] font-bold text-blue-400 tracking-wide text-center">보고서 작성</span>
+</div>
+<!-- Step 3: Pending -->
+<div class="relative z-10 flex flex-col items-center gap-2 w-16">
+<div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-500 ring-4 ring-slate-900">
+<span class="material-symbols-outlined text-[16px]">share</span>
+</div>
+<span class="text-[10px] font-medium text-slate-500 tracking-wide text-center">공유</span>
+</div>
+</div>
+<!-- Telemetry -->
+<div class="flex items-center justify-between border-t border-slate-800/80 pt-4 relative z-10">
+<div class="flex items-center gap-2 text-slate-300">
+<span class="material-symbols-outlined text-[18px]">data_usage</span>
+<span class="text-sm font-medium">2/3 완료</span>
+</div>
+<div class="flex items-center gap-2 text-primary font-mono text-sm font-bold bg-primary/10 px-3 py-1 rounded-md border border-primary/20">
+<span class="material-symbols-outlined text-[16px]">timer</span>
+<span>3분 42초</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Recent Commands Section -->
+<section>
+<h2 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3 pl-1">최근 명령</h2>
+<div class="space-y-3">
+<!-- Item 1: Success -->
+<div class="bg-white dark:bg-slate-800/40 rounded-xl p-4 border border-slate-200 dark:border-slate-800 flex items-start gap-4 hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
+<div class="mt-1 w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.6)] flex-shrink-0"></div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-medium text-slate-900 dark:text-slate-100 mb-1 truncate">Q4 리뷰 미팅 요약본 노션에 정리해줘</p>
+<div class="flex items-center gap-2">
+<p class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">14:30 · 11.24</p>
+</div>
+</div>
+<span class="flex-shrink-0 px-2.5 py-1 bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-wider rounded border border-emerald-200 dark:border-emerald-500/20">Success</span>
+</div>
+<!-- Item 2: Error -->
+<div class="bg-white dark:bg-slate-800/40 rounded-xl p-4 border border-slate-200 dark:border-slate-800 flex items-start gap-4 hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
+<div class="mt-1 w-2 h-2 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.6)] flex-shrink-0"></div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-medium text-slate-900 dark:text-slate-100 mb-1 truncate">고객 데이터베이스 동기화 스크립트 실행</p>
+<div class="flex items-center gap-2">
+<p class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">10:15 · 11.24</p>
+</div>
+</div>
+<span class="flex-shrink-0 px-2.5 py-1 bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 text-[10px] font-bold uppercase tracking-wider rounded border border-red-200 dark:border-red-500/20">Error</span>
+</div>
+<!-- Item 3: Success -->
+<div class="bg-white dark:bg-slate-800/40 rounded-xl p-4 border border-slate-200 dark:border-slate-800 flex items-start gap-4 hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
+<div class="mt-1 w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.6)] flex-shrink-0"></div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-medium text-slate-900 dark:text-slate-100 mb-1 truncate">주간 소셜 미디어 포스트 초안 생성 및 예약</p>
+<div class="flex items-center gap-2">
+<p class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">09:00 · 11.23</p>
+</div>
+</div>
+<span class="flex-shrink-0 px-2.5 py-1 bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-wider rounded border border-emerald-200 dark:border-emerald-500/20">Success</span>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Fixed Bottom Input Area -->
+<div class="fixed bottom-0 left-0 right-0 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 pt-3 pb-8 px-4 flex flex-col gap-3 z-50">
+<!-- Quick Mentions Row -->
+<div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 -mx-4 px-4">
+<button class="flex-shrink-0 px-3.5 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-full text-xs font-medium border border-slate-200 dark:border-slate-700 hover:border-primary hover:text-primary dark:hover:border-primary dark:hover:text-primary transition-colors flex items-center gap-1">
+<span class="text-primary font-bold">@</span>비서
+      </button>
+<button class="flex-shrink-0 px-3.5 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-full text-xs font-medium border border-slate-200 dark:border-slate-700 hover:border-primary hover:text-primary dark:hover:border-primary dark:hover:text-primary transition-colors flex items-center gap-1">
+<span class="text-primary font-bold">@</span>SNS매니저
+      </button>
+<button class="flex-shrink-0 px-3.5 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-full text-xs font-medium border border-slate-200 dark:border-slate-700 hover:border-primary hover:text-primary dark:hover:border-primary dark:hover:text-primary transition-colors flex items-center gap-1">
+<span class="text-primary font-bold">@</span>데이터분석가
+      </button>
+<button class="flex-shrink-0 px-3.5 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-full text-xs font-medium border border-slate-200 dark:border-slate-700 hover:border-primary hover:text-primary dark:hover:border-primary dark:hover:text-primary transition-colors flex items-center gap-1">
+<span class="text-primary font-bold">@</span>디자이너
+      </button>
+</div>
+<!-- Input Field & Send Button -->
+<div class="flex items-end gap-3">
+<div class="flex-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl flex items-center px-4 py-3 shadow-sm focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all group">
+<span class="material-symbols-outlined text-slate-400 mr-2 group-focus-within:text-primary transition-colors text-[20px]">terminal</span>
+<input class="w-full bg-transparent border-none focus:ring-0 text-slate-900 dark:text-slate-100 text-[15px] placeholder:text-slate-400 dark:placeholder:text-slate-500 p-0" placeholder="새로운 명령을 입력하세요..." type="text"/>
+<button class="text-slate-400 hover:text-primary dark:hover:text-primary transition-colors ml-2">
+<span class="material-symbols-outlined text-[20px]">mic</span>
+</button>
+</div>
+<button class="w-[52px] h-[52px] bg-primary rounded-xl flex items-center justify-center text-slate-900 shadow-[0_4px_12px_rgba(29,212,237,0.3)] hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all flex-shrink-0">
+<span class="material-symbols-outlined text-[24px]">send</span>
+</button>
+</div>
+<!-- Home Indicator Area (iOS safe area padding) -->
+</div>
+</body></html>

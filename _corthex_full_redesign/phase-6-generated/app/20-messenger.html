@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX Mobile Agent Messenger Interface</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13c8ec",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#101f22",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex justify-center">
+<div class="relative flex h-auto min-h-screen w-full max-w-md flex-col overflow-x-hidden border-x border-slate-200 dark:border-slate-800">
+<!-- Header -->
+<div class="sticky top-0 z-10 flex items-center justify-between px-4 py-3 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+<h2 class="text-xl font-bold tracking-tight">메신저</h2>
+<button class="flex h-10 w-10 items-center justify-center rounded-full text-primary hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined">edit_square</span>
+</button>
+</div>
+<!-- Search -->
+<div class="px-4 py-3">
+<div class="relative">
+<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined text-xl">search</span>
+</div>
+<input class="block w-full rounded-xl border-0 bg-slate-100 dark:bg-slate-800/50 py-2.5 pl-10 pr-4 text-sm placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-primary dark:text-slate-100 transition-colors" placeholder="Search" type="text"/>
+</div>
+</div>
+<!-- Thread List -->
+<div class="flex-1 overflow-y-auto">
+<!-- Thread 1 (Unread) -->
+<div class="group relative flex items-center gap-4 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer border-b border-slate-100 dark:border-slate-800/50">
+<div class="relative shrink-0">
+<div class="h-11 w-11 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 dark:from-primary/30 dark:to-primary/10 flex items-center justify-center border border-primary/20">
+<span class="material-symbols-outlined text-primary">smart_toy</span>
+</div>
+<div class="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 ring-2 ring-background-light dark:ring-background-dark"></div>
+</div>
+<div class="flex-1 min-w-0 flex flex-col justify-center">
+<div class="flex items-baseline justify-between gap-2 mb-0.5">
+<p class="text-base font-semibold truncate text-slate-900 dark:text-slate-50">비서 에이전트</p>
+<p class="text-xs font-medium text-primary shrink-0">10:23</p>
+</div>
+<div class="flex items-center gap-2">
+<p class="text-sm font-medium text-slate-800 dark:text-slate-200 truncate flex-1">새로운 일정이 추가되었습니다. 확인하시겠습니까?</p>
+<div class="h-2 w-2 rounded-full bg-primary shrink-0"></div>
+</div>
+</div>
+</div>
+<!-- Thread 2 (Unread) -->
+<div class="group relative flex items-center gap-4 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer border-b border-slate-100 dark:border-slate-800/50">
+<div class="relative shrink-0">
+<div class="h-11 w-11 rounded-full bg-slate-200 dark:bg-slate-700 bg-cover bg-center" data-alt="Portrait of SNS Manager" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAJNpt2VNU4bNtyqiJJwDwOPExgfpuGexpBmn-XguuHx0nTbo4Sdv9iGbJHk3p4KSSIkCL4nUZqfA-9uGJoT6zjDDXsCXEX49wM_zzHt5EDUlaElCxsFclPJPZpe3bTCHOaYpf5VvbB_7kqsuzSFFCV9y5KCnPiqbFHczz8tMtJct7nTIu-VnQrp2Wj4cdsJapkfV7zXpg7PSaoJaZyhISLMl6Q8KaNvThrSHlZmzqXSw-7cxXxYkVeWU_-sp0YIxgo32WigDAifw');"></div>
+</div>
+<div class="flex-1 min-w-0 flex flex-col justify-center">
+<div class="flex items-baseline justify-between gap-2 mb-0.5">
+<p class="text-base font-semibold truncate text-slate-900 dark:text-slate-50">SNS 매니저</p>
+<p class="text-xs font-medium text-primary shrink-0">어제</p>
+</div>
+<div class="flex items-center gap-2">
+<p class="text-sm font-medium text-slate-800 dark:text-slate-200 truncate flex-1">주간 리포트가 완성되어 공유드립니다.</p>
+<div class="h-2 w-2 rounded-full bg-primary shrink-0"></div>
+</div>
+</div>
+</div>
+<!-- Thread 3 (Read) -->
+<div class="group relative flex items-center gap-4 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer border-b border-slate-100 dark:border-slate-800/50">
+<div class="relative shrink-0">
+<div class="h-11 w-11 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center border border-indigo-500/20">
+<span class="material-symbols-outlined text-indigo-400">monitoring</span>
+</div>
+<div class="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-slate-400 ring-2 ring-background-light dark:ring-background-dark"></div>
+</div>
+<div class="flex-1 min-w-0 flex flex-col justify-center">
+<div class="flex items-baseline justify-between gap-2 mb-0.5">
+<p class="text-base font-medium truncate text-slate-700 dark:text-slate-300">데이터 분석 팀</p>
+<p class="text-xs font-normal text-slate-500 dark:text-slate-400 shrink-0">화요일</p>
+</div>
+<div class="flex items-center gap-2">
+<p class="text-sm font-normal text-slate-500 dark:text-slate-400 truncate flex-1">이전 분기 데이터 분석 결과입니다.</p>
+</div>
+</div>
+</div>
+<!-- Thread 4 (Read) -->
+<div class="group relative flex items-center gap-4 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer border-b border-slate-100 dark:border-slate-800/50">
+<div class="relative shrink-0">
+<div class="h-11 w-11 rounded-full bg-slate-200 dark:bg-slate-700 bg-cover bg-center" data-alt="Portrait of Developer" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBq99FCMTIsQfZOEycWL2qpzM_SLEN5NG_X2XDxq3sWXkyyGCArbimK7gaJEJLBAk-xZEwJdIx-lyDhfBjWMzhebTSVMAVrxurlcUBgfrbxQP03zsoMFNATE6WQu6g0ZPjxQ1i62Nwg5vMGSPGeBjfLPk12FzBLhVGK1FoeIaoc9UqMKvCVU68M6XB2eKMu22C6gfC0oiyxpn2L_XUXDIYf8jVN97L9pV1XYBSaTkywia1ekgaVam6Qzj1r4AevM6T-s-8DImnJeg');"></div>
+</div>
+<div class="flex-1 min-w-0 flex flex-col justify-center">
+<div class="flex items-baseline justify-between gap-2 mb-0.5">
+<p class="text-base font-medium truncate text-slate-700 dark:text-slate-300">개발자 A</p>
+<p class="text-xs font-normal text-slate-500 dark:text-slate-400 shrink-0">10/12</p>
+</div>
+<div class="flex items-center gap-2">
+<p class="text-sm font-normal text-slate-500 dark:text-slate-400 truncate flex-1">API 연동 테스트 완료했습니다.</p>
+</div>
+</div>
+</div>
+<div class="h-20"></div> <!-- Bottom padding for nav bar -->
+</div>
+<!-- BottomNavBar -->
+<div class="fixed bottom-0 w-full max-w-md bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 pb-safe">
+<div class="flex px-2 pb-2 pt-2">
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium tracking-wide">Home</span>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">chat</span>
+<span class="text-[10px] font-medium tracking-wide">Messenger</span>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors" href="#">
+<span class="material-symbols-outlined">task_alt</span>
+<span class="text-[10px] font-medium tracking-wide">Tasks</span>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium tracking-wide">Profile</span>
+</a>
+</div>
+</div>
+</div>
+</body></html>

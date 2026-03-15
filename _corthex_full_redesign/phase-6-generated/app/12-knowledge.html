@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX Mobile Knowledge Base</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1dd4ed",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#102022",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col antialiased w-full max-w-md mx-auto relative overflow-x-hidden shadow-2xl">
+<header class="sticky top-0 z-10 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+<div class="flex flex-col gap-2 p-4 pb-2">
+<div class="flex items-center h-12 justify-between">
+<p class="text-slate-900 dark:text-white tracking-tight text-2xl font-bold leading-tight">지식 베이스</p>
+<button class="flex items-center justify-center rounded-xl h-10 w-10 bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined text-[24px]">add</span>
+</button>
+</div>
+</div>
+<div class="px-4 pb-3">
+<label class="flex flex-col h-10 w-full">
+<div class="flex w-full flex-1 items-stretch rounded-xl h-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 overflow-hidden focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/50 transition-all">
+<div class="text-slate-400 dark:text-slate-500 flex items-center justify-center pl-3">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden bg-transparent text-slate-900 dark:text-white focus:outline-none focus:ring-0 border-none h-full placeholder:text-slate-400 dark:placeholder:text-slate-500 px-3 text-sm font-normal leading-normal" placeholder="문서 및 데이터 검색..." value=""/>
+</div>
+</label>
+</div>
+<div class="flex gap-2 px-4 pb-3 overflow-x-auto no-scrollbar">
+<button class="flex h-8 shrink-0 items-center justify-center rounded-lg bg-primary text-slate-900 px-4 transition-colors">
+<span class="text-sm font-medium leading-normal">전체</span>
+</button>
+<button class="flex h-8 shrink-0 items-center justify-center rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-4 hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">
+<span class="text-sm font-medium leading-normal">문서</span>
+</button>
+<button class="flex h-8 shrink-0 items-center justify-center rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-4 hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">
+<span class="text-sm font-medium leading-normal">FAQ</span>
+</button>
+<button class="flex h-8 shrink-0 items-center justify-center rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-4 hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">
+<span class="text-sm font-medium leading-normal">데이터</span>
+</button>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto pb-24">
+<div class="flex flex-col gap-3 p-4">
+<div class="flex gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 justify-between items-start group hover:border-primary/50 transition-colors cursor-pointer">
+<div class="flex items-start gap-4">
+<div class="text-primary flex items-center justify-center rounded-lg bg-primary/10 shrink-0 h-12 w-12">
+<span class="material-symbols-outlined text-[24px]">description</span>
+</div>
+<div class="flex flex-1 flex-col justify-center gap-1">
+<p class="text-slate-900 dark:text-white text-base font-bold leading-tight group-hover:text-primary transition-colors">2월 매출 보고서</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal leading-snug line-clamp-2">2024년 2월 전체 매출 및 수익 요약 보고서.</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">영업부</span>
+<span class="font-mono text-xs text-slate-400 dark:text-slate-500">2.4 MB</span>
+</div>
+</div>
+</div>
+<div class="shrink-0 pt-1">
+<div class="flex size-6 items-center justify-center">
+<span class="material-symbols-outlined text-green-500 text-[18px]">check_circle</span>
+</div>
+</div>
+</div>
+<div class="flex gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 justify-between items-start group hover:border-primary/50 transition-colors cursor-pointer">
+<div class="flex items-start gap-4">
+<div class="text-purple-500 flex items-center justify-center rounded-lg bg-purple-500/10 shrink-0 h-12 w-12">
+<span class="material-symbols-outlined text-[24px]">database</span>
+</div>
+<div class="flex flex-1 flex-col justify-center gap-1">
+<p class="text-slate-900 dark:text-white text-base font-bold leading-tight group-hover:text-primary transition-colors">고객 데이터베이스</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal leading-snug line-clamp-2">Q1 신규 가입자 및 활동 로그 데이터베이스 덤프.</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">데이터팀</span>
+<span class="font-mono text-xs text-slate-400 dark:text-slate-500">14.8 MB</span>
+</div>
+</div>
+</div>
+<div class="shrink-0 pt-1">
+<div class="flex size-6 items-center justify-center">
+<span class="material-symbols-outlined text-slate-300 dark:text-slate-600 text-[18px]">cloud_sync</span>
+</div>
+</div>
+</div>
+<div class="flex gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 justify-between items-start group hover:border-primary/50 transition-colors cursor-pointer">
+<div class="flex items-start gap-4">
+<div class="text-orange-500 flex items-center justify-center rounded-lg bg-orange-500/10 shrink-0 h-12 w-12">
+<span class="material-symbols-outlined text-[24px]">help</span>
+</div>
+<div class="flex flex-1 flex-col justify-center gap-1">
+<p class="text-slate-900 dark:text-white text-base font-bold leading-tight group-hover:text-primary transition-colors">플랫폼 사용 가이드 (FAQ)</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal leading-snug line-clamp-2">신규 입사자를 위한 내부 시스템 사용 FAQ 정리.</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">HR</span>
+<span class="font-mono text-xs text-slate-400 dark:text-slate-500">856 KB</span>
+</div>
+</div>
+</div>
+<div class="shrink-0 pt-1">
+<div class="flex size-6 items-center justify-center">
+<span class="material-symbols-outlined text-green-500 text-[18px]">check_circle</span>
+</div>
+</div>
+</div>
+<div class="flex gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 justify-between items-start group hover:border-primary/50 transition-colors cursor-pointer">
+<div class="flex items-start gap-4">
+<div class="text-blue-500 flex items-center justify-center rounded-lg bg-blue-500/10 shrink-0 h-12 w-12">
+<span class="material-symbols-outlined text-[24px]">analytics</span>
+</div>
+<div class="flex flex-1 flex-col justify-center gap-1">
+<p class="text-slate-900 dark:text-white text-base font-bold leading-tight group-hover:text-primary transition-colors">2024 마케팅 전략</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal leading-snug line-clamp-2">하반기 캠페인 기획안 및 예산 배정 문서.</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">마케팅</span>
+<span class="font-mono text-xs text-slate-400 dark:text-slate-500">5.2 MB</span>
+</div>
+</div>
+</div>
+<div class="shrink-0 pt-1">
+<div class="flex size-6 items-center justify-center">
+<span class="material-symbols-outlined text-green-500 text-[18px]">check_circle</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<div class="fixed bottom-[72px] w-full max-w-md mx-auto px-4 pointer-events-none">
+<div class="bg-slate-800/90 dark:bg-slate-900/90 backdrop-blur-md rounded-xl p-3 flex justify-between items-center border border-slate-700 dark:border-slate-800 shadow-lg pointer-events-auto">
+<div class="flex flex-col">
+<span class="text-xs text-slate-400 font-medium">총 문서</span>
+<span class="font-mono text-sm text-white">1,248</span>
+</div>
+<div class="w-px h-8 bg-slate-700"></div>
+<div class="flex flex-col">
+<span class="text-xs text-slate-400 font-medium">저장 용량</span>
+<span class="font-mono text-sm text-white">45.2 GB</span>
+</div>
+<div class="w-px h-8 bg-slate-700"></div>
+<div class="flex flex-col">
+<span class="text-xs text-slate-400 font-medium">데이터 청크</span>
+<span class="font-mono text-sm text-primary">8,492</span>
+</div>
+</div>
+</div>
+<nav class="fixed bottom-0 w-full max-w-md mx-auto bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 z-50">
+<div class="flex justify-around items-center px-2 py-2">
+<a class="flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-primary transition-colors p-2" href="#">
+<span class="material-symbols-outlined text-[24px]">home</span>
+<span class="text-[10px] font-medium">홈</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-primary transition-colors p-2" href="#">
+<span class="material-symbols-outlined text-[24px]">check_box</span>
+<span class="text-[10px] font-medium">작업</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 text-primary p-2 relative" href="#">
+<div class="absolute -top-1 w-8 h-1 bg-primary rounded-full"></div>
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+<span class="text-[10px] font-medium">지식</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-primary transition-colors p-2" href="#">
+<span class="material-symbols-outlined text-[24px]">settings</span>
+<span class="text-[10px] font-medium">설정</span>
+</a>
+</div>
+<div class="h-6 w-full bg-transparent"></div>
+</nav>
+</body></html>

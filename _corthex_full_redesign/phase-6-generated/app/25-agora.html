@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX Mobile Agora Marketplace Interface</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13c8ec",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#101f22",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 flex justify-center items-center min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full max-w-[430px] flex-col bg-background-light dark:bg-background-dark overflow-x-hidden shadow-2xl ring-1 ring-slate-200 dark:ring-slate-800">
+<!-- Header -->
+<header class="sticky top-0 z-50 flex items-center justify-between bg-background-light/90 dark:bg-background-dark/90 p-4 pb-2 backdrop-blur-md">
+<h2 class="text-slate-900 dark:text-white text-xl font-bold leading-tight tracking-tight flex-1">아고라</h2>
+<div class="flex w-12 items-center justify-end">
+<button class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined text-[24px]">add</span>
+</button>
+</div>
+</header>
+<!-- Search -->
+<div class="px-4 py-3 sticky top-[56px] z-40 bg-background-light dark:bg-background-dark">
+<label class="flex flex-col w-full h-12">
+<div class="flex w-full flex-1 items-stretch rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 focus-within:ring-2 focus-within:ring-primary/50 focus-within:border-primary/50 transition-all">
+<div class="flex items-center justify-center pl-4 text-slate-400 dark:text-slate-500">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="w-full flex-1 bg-transparent px-3 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 border-none focus:ring-0" placeholder="템플릿, 에이전트, 워크플로우 검색" type="text"/>
+</div>
+</label>
+</div>
+<!-- Categories -->
+<div class="flex gap-2 px-4 py-2 overflow-x-auto scrollbar-hide sticky top-[116px] z-30 bg-background-light dark:bg-background-dark border-b border-slate-200 dark:border-slate-800">
+<button class="flex h-8 shrink-0 items-center justify-center rounded-full bg-primary px-4 text-white text-sm font-medium transition-colors">전체</button>
+<button class="flex h-8 shrink-0 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 px-4 text-slate-600 dark:text-slate-300 text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">에이전트</button>
+<button class="flex h-8 shrink-0 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 px-4 text-slate-600 dark:text-slate-300 text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">워크플로우</button>
+<button class="flex h-8 shrink-0 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 px-4 text-slate-600 dark:text-slate-300 text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">프롬프트</button>
+<button class="flex h-8 shrink-0 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 px-4 text-slate-600 dark:text-slate-300 text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">도구</button>
+</div>
+<!-- Content List -->
+<main class="flex-1 overflow-y-auto px-4 py-4 space-y-4 pb-24">
+<!-- Item 1 -->
+<article class="flex flex-col gap-3 rounded-xl bg-white dark:bg-slate-900 p-4 border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex justify-between items-start">
+<div class="flex gap-2 items-center">
+<span class="inline-flex items-center rounded-md bg-primary/10 px-2 py-1 text-xs font-medium text-primary ring-1 ring-inset ring-primary/20">에이전트</span>
+<div class="flex items-center gap-1 text-amber-500 text-xs font-medium">
+<span class="material-symbols-outlined text-[14px] fill-current">star</span>
+                            4.9
+                        </div>
+</div>
+<span class="inline-flex items-center rounded-md bg-emerald-500/10 px-2 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">무료</span>
+</div>
+<div class="flex gap-4">
+<div class="h-16 w-16 shrink-0 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white shadow-inner" data-alt="Abstract gradient icon representing marketing copywriting">
+<span class="material-symbols-outlined text-[32px]">edit_document</span>
+</div>
+<div class="flex flex-1 flex-col justify-center gap-1">
+<h3 class="text-slate-900 dark:text-white text-base font-bold leading-tight line-clamp-1">마케팅 카피라이터 에이전트</h3>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal leading-snug line-clamp-2">블로그와 SNS를 위한 고품질 카피라이팅을 자동화합니다.</p>
+</div>
+</div>
+<div class="flex items-center justify-between mt-1 text-xs text-slate-400 dark:text-slate-500">
+<div class="flex items-center gap-2">
+<span class="font-medium">CorthexTeam</span>
+<span class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">download</span>
+                            1.2k
+                        </span>
+</div>
+</div>
+</article>
+<!-- Item 2 -->
+<article class="flex flex-col gap-3 rounded-xl bg-white dark:bg-slate-900 p-4 border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex justify-between items-start">
+<div class="flex gap-2 items-center">
+<span class="inline-flex items-center rounded-md bg-violet-500/10 px-2 py-1 text-xs font-medium text-violet-600 dark:text-violet-400 ring-1 ring-inset ring-violet-500/20">워크플로우</span>
+<div class="flex items-center gap-1 text-amber-500 text-xs font-medium">
+<span class="material-symbols-outlined text-[14px] fill-current">star</span>
+                            4.7
+                        </div>
+</div>
+<span class="inline-flex items-center rounded-md bg-slate-100 dark:bg-slate-800 px-2 py-1 text-xs font-bold text-slate-700 dark:text-slate-300">$4.99</span>
+</div>
+<div class="flex gap-4">
+<div class="h-16 w-16 shrink-0 rounded-lg bg-gradient-to-br from-violet-400 to-purple-600 flex items-center justify-center text-white shadow-inner" data-alt="Abstract gradient icon representing data analysis workflow">
+<span class="material-symbols-outlined text-[32px]">analytics</span>
+</div>
+<div class="flex flex-1 flex-col justify-center gap-1">
+<h3 class="text-slate-900 dark:text-white text-base font-bold leading-tight line-clamp-1">데이터 분석 파이프라인</h3>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal leading-snug line-clamp-2">CSV 데이터를 분석하고 시각화 리포트를 생성하는 자동화 워크플로우.</p>
+</div>
+</div>
+<div class="flex items-center justify-between mt-1 text-xs text-slate-400 dark:text-slate-500">
+<div class="flex items-center gap-2">
+<span class="font-medium">DataNinja</span>
+<span class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">download</span>
+                            850
+                        </span>
+</div>
+</div>
+</article>
+<!-- Item 3 -->
+<article class="flex flex-col gap-3 rounded-xl bg-white dark:bg-slate-900 p-4 border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex justify-between items-start">
+<div class="flex gap-2 items-center">
+<span class="inline-flex items-center rounded-md bg-primary/10 px-2 py-1 text-xs font-medium text-primary ring-1 ring-inset ring-primary/20">에이전트</span>
+<div class="flex items-center gap-1 text-amber-500 text-xs font-medium">
+<span class="material-symbols-outlined text-[14px] fill-current">star</span>
+                            5.0
+                        </div>
+</div>
+<span class="inline-flex items-center rounded-md bg-emerald-500/10 px-2 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">무료</span>
+</div>
+<div class="flex gap-4">
+<div class="h-16 w-16 shrink-0 rounded-lg bg-gradient-to-br from-orange-400 to-rose-500 flex items-center justify-center text-white shadow-inner" data-alt="Abstract gradient icon representing code review agent">
+<span class="material-symbols-outlined text-[32px]">code_blocks</span>
+</div>
+<div class="flex flex-1 flex-col justify-center gap-1">
+<h3 class="text-slate-900 dark:text-white text-base font-bold leading-tight line-clamp-1">시니어 코드 리뷰어</h3>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal leading-snug line-clamp-2">PR 리뷰, 보안 취약점 점검 및 리팩토링 제안을 수행하는 개발 에이전트.</p>
+</div>
+</div>
+<div class="flex items-center justify-between mt-1 text-xs text-slate-400 dark:text-slate-500">
+<div class="flex items-center gap-2">
+<span class="font-medium">DevCorp</span>
+<span class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">download</span>
+                            3.4k
+                        </span>
+</div>
+</div>
+</article>
+</main>
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 w-full max-w-[430px] flex gap-2 border-t border-slate-200 dark:border-slate-800 bg-background-light/90 dark:bg-background-dark/90 px-4 pb-safe pt-2 backdrop-blur-md pb-6">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">home</span>
+<p class="text-[10px] font-medium leading-normal tracking-wide">홈</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
+<span class="material-symbols-outlined text-[24px] fill-current">storefront</span>
+<p class="text-[10px] font-medium leading-normal tracking-wide">아고라</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">smart_toy</span>
+<p class="text-[10px] font-medium leading-normal tracking-wide">에이전트</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">settings</span>
+<p class="text-[10px] font-medium leading-normal tracking-wide">설정</p>
+</a>
+</nav>
+</div>
+</body></html>

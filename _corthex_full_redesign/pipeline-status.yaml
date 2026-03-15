@@ -46,13 +46,19 @@ phases:
     name: External Generation (Stitch MCP)
     status: complete
     projectId: "1459313405794412216"
-    note: "All 16 screens generated via Stitch MCP (Gemini 3 Pro). Visual review PASS."
+    note: "All screens generated via Stitch MCP (Gemini 3 Pro). Web 28 + App 27 + Landing 1 = 56 total."
     steps:
       6-1: { name: "Create Stitch Project", status: complete, projectId: "1459313405794412216" }
       6-2: { name: "Generate Web Screens", status: complete, screens: "28/28", note: "All 28 pages: Shell, Hub, Chat, Dashboard, Agents, Departments, Jobs, Settings, NEXUS, Login, Command Center, SNS, Trading, Notifications, Knowledge, Costs, Performance, Reports, Files, Activity Log, Ops Log, Messenger, Agora, Classified, Cron, ARGOS, Onboarding, Org" }
-      6-3: { name: "Generate App Screens", status: complete, screens: "6/6", note: "App Shell, Hub, Chat, NEXUS, Jobs, Profile" }
+      6-3: { name: "Generate App Screens", status: complete, screens: "27/27", note: "Original 6 (Shell, Hub, Chat, NEXUS, Jobs, Profile) + 21 new (Dashboard, Agents, Departments, Settings, Notifications, Knowledge, Costs, Activity Log, Command Center, Reports, Performance, SNS, Trading, Messenger, Ops Log, Files, Org, Login, Agora, Classified, Tiers)" }
       6-4: { name: "Generate Landing Page", status: complete, screens: "1/1" }
       6-5: { name: "Visual Review", status: complete, verdict: "PASS — no re-generation needed" }
   phase-7:
     name: Integration
-    status: pending
+    status: in-progress
+    note: "Phase 7 ~70% complete. Tokens+layout+sidebar+64 components+routing+API map+a11y+color migration+API hooks+themes+landing done. tsc pre-existing 10K+ errors (packages/ui jsx flag, test files)."
+    steps:
+      7-1: { name: "Component Decomposition", status: complete, note: "64 TSX components across 28 screens, Gemini prompts generated" }
+      7-2: { name: "Routing & State", status: complete, note: "routing-plan.md complete, all 29 routes mapped" }
+      7-3: { name: "API Binding", status: complete, note: "api-binding-map.md complete, all screens mapped to endpoints" }
+      7-4: { name: "Accessibility Audit", status: complete, note: "accessibility-audit.md complete" }
