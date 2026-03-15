@@ -12,14 +12,14 @@ phases:
       0-2: { name: "Vision & Identity", status: complete, party: 3R, critic_model: sonnet, score: 8.67 }
   phase-1:
     name: Research
-    status: in_progress
+    status: complete
     steps:
-      1-1: { name: "Web Dashboard Layout Research", status: in_progress, party: 2R }
-      1-2: { name: "App Layout Research", status: pending, party: 2R }
-      1-3: { name: "Landing Page Research", status: pending, party: 2R }
+      1-1: { name: "Web Dashboard Layout Research", status: complete, party: 2R, score: 8.0 }
+      1-2: { name: "App Layout Research", status: complete, party: 2R, score: 7.5 }
+      1-3: { name: "Landing Page Research", status: complete, party: 2R, score: 7.0 }
   phase-2:
     name: Deep Analysis
-    status: pending
+    status: in_progress
     steps:
       2-1: { name: "Web Options Deep Analysis", status: pending, party: 3R, critic_model: opus }
       2-2: { name: "App Options Deep Analysis", status: pending, party: 3R, critic_model: opus }
