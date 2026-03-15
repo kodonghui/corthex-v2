@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX Reports &amp; Analysis Interface</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#20d3ee",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#020617",
+                        "card-dark": "#0f172a",
+                        "border-dark": "#1e293b",
+                        "text-muted": "#94a3b8"
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen overflow-hidden flex flex-col">
+<header class="flex-none flex items-center justify-between whitespace-nowrap border-b border-solid border-border-dark px-10 py-3 bg-card-dark">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-slate-100">
+<div class="size-6 text-primary">
+<svg fill="currentColor" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M39.475 21.6262C40.358 21.4363 40.6863 21.5589 40.7581 21.5934C40.7876 21.655 40.8547 21.857 40.8082 22.3336C40.7408 23.0255 40.4502 24.0046 39.8572 25.2301C38.6799 27.6631 36.5085 30.6631 33.5858 33.5858C30.6631 36.5085 27.6632 38.6799 25.2301 39.8572C24.0046 40.4502 23.0255 40.7407 22.3336 40.8082C21.8571 40.8547 21.6551 40.7875 21.5934 40.7581C21.5589 40.6863 21.4363 40.358 21.6262 39.475C21.8562 38.4054 22.4689 36.9657 23.5038 35.2817C24.7575 33.2417 26.5497 30.9744 28.7621 28.762C30.9744 26.5497 33.2417 24.7574 35.2817 23.5037C36.9657 22.4689 38.4054 21.8562 39.475 21.6262ZM4.41189 29.2403L18.7597 43.5881C19.8813 44.7097 21.4027 44.9179 22.7217 44.7893C24.0585 44.659 25.5148 44.1631 26.9723 43.4579C29.9052 42.0387 33.2618 39.5667 36.4142 36.4142C39.5667 33.2618 42.0387 29.9052 43.4579 26.9723C44.1631 25.5148 44.659 24.0585 44.7893 22.7217C44.9179 21.4027 44.7097 19.8813 43.5881 18.7597L29.2403 4.41187C27.8527 3.02428 25.8765 3.02573 24.2861 3.36776C22.6081 3.72863 20.7334 4.58419 18.8396 5.74801C16.4978 7.18716 13.9881 9.18353 11.5858 11.5858C9.18354 13.988 7.18717 16.4978 5.74802 18.8396C4.58421 20.7334 3.72865 22.6081 3.36778 24.2861C3.02574 25.8765 3.02429 27.8527 4.41189 29.2403Z" fill-rule="evenodd"></path>
+</svg>
+</div>
+<h2 class="text-slate-100 text-lg font-bold leading-tight tracking-[-0.015em]">CORTHEX</h2>
+</div>
+<div class="flex items-center gap-9">
+<a class="text-text-muted hover:text-slate-100 transition-colors text-sm font-medium leading-normal" href="#">Dashboard</a>
+<a class="text-text-muted hover:text-slate-100 transition-colors text-sm font-medium leading-normal" href="#">Agents</a>
+<a class="text-primary text-sm font-medium leading-normal border-b-2 border-primary pb-1" href="#">Reports</a>
+<a class="text-text-muted hover:text-slate-100 transition-colors text-sm font-medium leading-normal" href="#">Settings</a>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<label class="flex flex-col min-w-40 !h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded h-full bg-background-dark border border-border-dark focus-within:border-primary/50 transition-colors">
+<div class="text-text-muted flex items-center justify-center pl-4 pr-2">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="w-full min-w-0 flex-1 bg-transparent text-slate-100 focus:outline-none placeholder:text-text-muted px-2 text-sm" placeholder="Search..." value=""/>
+</div>
+</label>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8 ring-2 ring-border-dark" data-alt="User Avatar Profile Picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAI0w3t_E0L6BPU8kX0qxGGXdM3tWtX3u7d774Lm5g9o01j7S5YI0UKn4PsxTqSNjldWh5gf57i2b9L5bOon2c9kLTl5oIPEx9tNR1iw3m8jzjN81ka-fRNxavyuuf35-FzgSvgqIJuQTvnebIF98i3zgqKdBBoF1iGXKxgk1qvf2Scpm_k7lE5yJSKJ69jAC9k2aTp1sMRDC-lBaaHIqWpUSp-HlxkxRu1ZRQRQ_dW1RfDPI8aXQnC3CDfsYTuQls23MVUnwHFeg");'></div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<main class="flex-1 flex flex-col border-r border-border-dark overflow-y-auto">
+<div class="flex flex-wrap items-center justify-between gap-3 p-6 pb-4">
+<div class="flex flex-col gap-1">
+<h1 class="text-slate-100 tracking-tight text-2xl font-bold leading-tight">Reports (보고서)</h1>
+<p class="text-text-muted text-sm font-normal leading-normal">Browse and view AI-generated business reports</p>
+</div>
+<button class="flex cursor-pointer items-center justify-center gap-2 rounded px-4 py-2 bg-primary hover:bg-primary/90 text-background-dark text-sm font-semibold transition-colors">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>New Report</span>
+</button>
+</div>
+<div class="px-6 py-2">
+<label class="flex flex-col w-full h-10">
+<div class="flex w-full flex-1 items-stretch rounded bg-card-dark border border-border-dark focus-within:border-primary/50 transition-colors">
+<div class="text-text-muted flex items-center justify-center pl-4 pr-2">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="w-full min-w-0 flex-1 bg-transparent text-slate-100 focus:outline-none placeholder:text-text-muted px-2 text-sm" placeholder="Search reports by title or agent..."/>
+</div>
+</label>
+</div>
+<div class="flex gap-2 p-6 pt-4 flex-wrap">
+<button class="flex h-8 items-center justify-center rounded bg-border-dark px-4 text-slate-100 text-sm font-medium hover:bg-border-dark/80 transition-colors">All</button>
+<button class="flex h-8 items-center justify-center rounded px-4 text-text-muted text-sm font-medium hover:bg-card-dark transition-colors border border-transparent hover:border-border-dark">Completed</button>
+<button class="flex h-8 items-center justify-center rounded px-4 text-text-muted text-sm font-medium hover:bg-card-dark transition-colors border border-transparent hover:border-border-dark">Drafting</button>
+<button class="flex h-8 items-center justify-center rounded px-4 text-text-muted text-sm font-medium hover:bg-card-dark transition-colors border border-transparent hover:border-border-dark">Reviewing</button>
+</div>
+<div class="flex flex-col px-6 gap-2 pb-6">
+<div class="group flex items-center justify-between p-4 rounded-lg bg-card-dark border border-primary/30 cursor-pointer hover:border-primary/50 transition-colors">
+<div class="flex items-start gap-4">
+<div class="text-primary flex items-center justify-center rounded bg-primary/10 size-10 shrink-0 mt-0.5">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-3 mb-1">
+<p class="text-slate-100 text-base font-medium leading-tight">3월 실적 보고서</p>
+<span class="inline-flex items-center rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-400 ring-1 ring-inset ring-emerald-500/20">완료</span>
+</div>
+<p class="text-text-muted text-sm flex items-center gap-2">
+<span>Agent: Alpha-1</span>
+<span>·</span>
+<span class="font-mono text-xs">2023-04-01 10:00</span>
+</p>
+</div>
+</div>
+</div>
+<div class="group flex items-center justify-between p-4 rounded-lg bg-background-dark border border-transparent hover:bg-card-dark hover:border-border-dark cursor-pointer transition-colors">
+<div class="flex items-start gap-4">
+<div class="text-slate-400 flex items-center justify-center rounded bg-card-dark border border-border-dark size-10 shrink-0 mt-0.5">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-3 mb-1">
+<p class="text-slate-300 text-base font-medium leading-tight">Q1 글로벌 마켓 동향 분석</p>
+<span class="inline-flex items-center rounded-full bg-blue-500/10 px-2 py-0.5 text-xs font-medium text-blue-400 ring-1 ring-inset ring-blue-500/20">작성 중</span>
+</div>
+<p class="text-text-muted text-sm flex items-center gap-2">
+<span>Agent: Market-Tracker</span>
+<span>·</span>
+<span class="font-mono text-xs">2023-04-02 14:30</span>
+</p>
+</div>
+</div>
+</div>
+<div class="group flex items-center justify-between p-4 rounded-lg bg-background-dark border border-transparent hover:bg-card-dark hover:border-border-dark cursor-pointer transition-colors">
+<div class="flex items-start gap-4">
+<div class="text-slate-400 flex items-center justify-center rounded bg-card-dark border border-border-dark size-10 shrink-0 mt-0.5">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-3 mb-1">
+<p class="text-slate-300 text-base font-medium leading-tight">신규 프로덕트 리스크 평가</p>
+<span class="inline-flex items-center rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-400 ring-1 ring-inset ring-amber-500/20">검토 중</span>
+</div>
+<p class="text-text-muted text-sm flex items-center gap-2">
+<span>Agent: Risk-Assessor</span>
+<span>·</span>
+<span class="font-mono text-xs">2023-04-03 09:15</span>
+</p>
+</div>
+</div>
+</div>
+<div class="group flex items-center justify-between p-4 rounded-lg bg-background-dark border border-transparent hover:bg-card-dark hover:border-border-dark cursor-pointer transition-colors">
+<div class="flex items-start gap-4">
+<div class="text-slate-400 flex items-center justify-center rounded bg-card-dark border border-border-dark size-10 shrink-0 mt-0.5">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-3 mb-1">
+<p class="text-slate-300 text-base font-medium leading-tight">주간 보안 위협 요약</p>
+<span class="inline-flex items-center rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-400 ring-1 ring-inset ring-emerald-500/20">완료</span>
+</div>
+<p class="text-text-muted text-sm flex items-center gap-2">
+<span>Agent: Sec-Watch</span>
+<span>·</span>
+<span class="font-mono text-xs">2023-04-04 18:00</span>
+</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<aside class="w-[600px] flex-none bg-card-dark flex flex-col h-full border-l border-border-dark">
+<div class="p-6 border-b border-border-dark flex-none">
+<div class="flex justify-between items-start mb-4">
+<h2 class="text-xl font-bold text-slate-100 leading-tight">3월 실적 보고서</h2>
+<div class="flex gap-2">
+<button class="p-2 text-text-muted hover:text-slate-100 hover:bg-border-dark rounded transition-colors" title="다운로드 (Download)">
+<span class="material-symbols-outlined text-[20px]">download</span>
+</button>
+<button class="p-2 text-text-muted hover:text-slate-100 hover:bg-border-dark rounded transition-colors" title="공유 (Share)">
+<span class="material-symbols-outlined text-[20px]">share</span>
+</button>
+<button class="p-2 text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded transition-colors" title="삭제 (Delete)">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+<div class="flex items-center gap-4 text-sm text-text-muted">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">smart_toy</span>
+<span>Alpha-1</span>
+</div>
+<span>|</span>
+<span class="font-mono text-xs">2023-04-01 10:00:23 UTC</span>
+<span>|</span>
+<span class="inline-flex items-center rounded bg-emerald-500/10 px-1.5 py-0.5 text-xs font-medium text-emerald-400">완료</span>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-6 text-slate-300 text-sm leading-relaxed prose prose-invert max-w-none prose-headings:text-slate-100 prose-a:text-primary">
+<h3 class="text-lg font-semibold text-slate-100 mb-4">1. 개요</h3>
+<p class="mb-4">본 보고서는 2023년 3월 한 달간의 주요 사업 부문별 실적을 분석하고 향후 과제를 도출하기 위해 작성되었습니다. AI 에이전트 Alpha-1이 제공된 원시 데이터를 바탕으로 자동 생성하였습니다.</p>
+<h3 class="text-lg font-semibold text-slate-100 mt-6 mb-4">2. 주요 성과 지표 (KPI)</h3>
+<ul class="list-disc pl-5 mb-4 space-y-2">
+<li><strong>매출:</strong> 전월 대비 <span class="text-emerald-400 font-mono">15% 증가</span> ($1.2M 달성)</li>
+<li><strong>신규 고객 확보:</strong> 목표치 대비 <span class="text-emerald-400 font-mono">10% 초과</span> 달성</li>
+<li><strong>운영 비용:</strong> 프로세스 최적화를 통해 전월 대비 <span class="text-emerald-400 font-mono">5% 절감</span></li>
+</ul>
+<h3 class="text-lg font-semibold text-slate-100 mt-6 mb-4">3. 부문별 상세 분석</h3>
+<p class="mb-4">B2B 영업 부문에서 특히 두드러진 성장을 보였으며, 이는 신규 출시된 프리미엄 티어의 시장 반응이 긍정적이었기 때문입니다. 반면 B2C 부문은 마케팅 채널 재조정으로 인해 일시적인 성장 둔화가 관찰되었습니다.</p>
+<div class="bg-background-dark p-4 rounded border border-border-dark my-4 font-mono text-xs text-text-muted">
+                    &gt; 데이터 추출 출처: Q1_Sales_DB.sql<br/>
+                    &gt; 분석 모델: CORTEX-Analytical-v2.1<br/>
+                    &gt; 신뢰도 점수: 94.2%
+                </div>
+</div>
+<div class="p-6 border-t border-border-dark bg-background-dark flex-none">
+<h4 class="text-sm font-semibold text-slate-100 mb-4">Comments (1)</h4>
+<div class="flex gap-3 mb-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8 ring-1 ring-border-dark flex-none" data-alt="Reviewer Avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAq7MpdUduf_ig44E25MLJ15e1i92mHgtN-kqbcLdpy0NORcq4rsQ9ztukLCSgRRYYh7PxJZU-sHxjtuvxod8-cMmIwkJoiYAqnINrbwYOQHbGz8UsB0dUvGYk_PoqvhkbrSg872Pfn9AQ1JpPPKBFnRWs8_hnM9Zxmbm5avei0RsEPVHqIuMBBFaxEd-ZkvlL2Okdmyd7aeVtbJXRw_AoVW8n3za-qXRMjz_ccqEbN9H39ADnucvKp2Loy3yVqGusiNl38pYpOTQ");'></div>
+<div class="flex flex-col bg-card-dark p-3 rounded-lg border border-border-dark flex-1">
+<div class="flex items-center justify-between mb-1">
+<span class="text-xs font-semibold text-slate-200">Jane Director</span>
+<span class="text-[10px] text-text-muted font-mono">Today, 11:30</span>
+</div>
+<p class="text-sm text-slate-300">내용 확인했습니다. B2C 부문 마케팅 재조정 관련 상세 내용은 다음 주 회의에서 다루도록 하죠.</p>
+</div>
+</div>
+<div class="flex gap-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8 ring-1 ring-border-dark flex-none" data-alt="Current User Avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC_kdq8PF8LcuKrXgw97Hyyx0UwHcH581BcWSq--H0Jj-oUFCpEYikCAkiDtXU1TWmBNwJa7KlFB3lKsdZfPaDBanlZrStgyb_sSSdKwloVOFLjA5-CUq1oRJwL-ww_Rd40QBZjDTrnwEM1icmii7nfDd-eBmj3p5llM3B7Z7c2rbTCddg-9Ux9NkEpfD8rOtMenHUIz4vj1JzlYAWNjy5DGsXiYIvxyGjnldHEPoWRjlq7HP_uZi4XAjr-Wz0McnaPC2gRfiDUBA");'></div>
+<div class="flex flex-1 items-stretch rounded border border-border-dark bg-card-dark focus-within:border-primary/50 transition-colors">
+<input class="w-full bg-transparent border-none text-sm text-slate-100 focus:ring-0 placeholder:text-text-muted px-3 py-2" placeholder="Add a comment..." type="text"/>
+<button class="px-3 text-primary hover:text-primary/80 transition-colors font-medium text-sm">Post</button>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</body></html>

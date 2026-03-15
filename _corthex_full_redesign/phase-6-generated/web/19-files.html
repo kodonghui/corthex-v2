@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX File Management Browser</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#20d3ee",
+                        "background-light": "#f8fafc",
+                        "background-dark": "#0f172a",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1e293b",
+                        "border-light": "#e2e8f0",
+                        "border-dark": "#334155",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display antialiased">
+<div class="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-border-light dark:border-border-dark px-10 py-4 bg-surface-light dark:bg-surface-dark sticky top-0 z-10">
+<div class="flex items-center gap-4 text-slate-900 dark:text-white">
+<div class="size-6 text-primary">
+<svg fill="currentColor" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M39.475 21.6262C40.358 21.4363 40.6863 21.5589 40.7581 21.5934C40.7876 21.655 40.8547 21.857 40.8082 22.3336C40.7408 23.0255 40.4502 24.0046 39.8572 25.2301C38.6799 27.6631 36.5085 30.6631 33.5858 33.5858C30.6631 36.5085 27.6632 38.6799 25.2301 39.8572C24.0046 40.4502 23.0255 40.7407 22.3336 40.8082C21.8571 40.8547 21.6551 40.7875 21.5934 40.7581C21.5589 40.6863 21.4363 40.358 21.6262 39.475C21.8562 38.4054 22.4689 36.9657 23.5038 35.2817C24.7575 33.2417 26.5497 30.9744 28.7621 28.762C30.9744 26.5497 33.2417 24.7574 35.2817 23.5037C36.9657 22.4689 38.4054 21.8562 39.475 21.6262ZM4.41189 29.2403L18.7597 43.5881C19.8813 44.7097 21.4027 44.9179 22.7217 44.7893C24.0585 44.659 25.5148 44.1631 26.9723 43.4579C29.9052 42.0387 33.2618 39.5667 36.4142 36.4142C39.5667 33.2618 42.0387 29.9052 43.4579 26.9723C44.1631 25.5148 44.659 24.0585 44.7893 22.7217C44.9179 21.4027 44.7097 19.8813 43.5881 18.7597L29.2403 4.41187C27.8527 3.02428 25.8765 3.02573 24.2861 3.36776C22.6081 3.72863 20.7334 4.58419 18.8396 5.74801C16.4978 7.18716 13.9881 9.18353 11.5858 11.5858C9.18354 13.988 7.18717 16.4978 5.74802 18.8396C4.58421 20.7334 3.72865 22.6081 3.36778 24.2861C3.02574 25.8765 3.02429 27.8527 4.41189 29.2403Z" fill-rule="evenodd"></path>
+</svg>
+</div>
+<h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">CORTHEX</h2>
+</div>
+<div class="flex flex-1 justify-end items-center gap-6">
+<nav class="flex items-center gap-6">
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-sm font-medium text-primary" href="#">Files</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Agents</a>
+</nav>
+<div class="h-6 w-px bg-border-light dark:bg-border-dark"></div>
+<button class="flex cursor-pointer items-center justify-center rounded bg-primary text-slate-900 text-sm font-bold h-9 px-5 hover:bg-primary/90 transition-colors">
+<span class="material-symbols-outlined mr-2 text-[18px]">upload</span>
+                        업로드
+                    </button>
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-9 ring-2 ring-primary/30" data-alt="User avatar placeholder" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC1-KVsT10F78v6KPyYHa_0EmwZz_6CtLUizjnE5Bz71yjMkkhFt0RevcEBfXgGMO_as_c6wIP9652WwGj47N7hBlvffp4-fe4ZcAbdqvVAAPyIe7ECQQNc16m7qXi8DTjJYIDpsO1j1lz0IyLQaT0cjOgdjRQ4ugeeQ6RKEp5kezHYtfSJEn9xBBRq23fZHvONqQVQbNmOz3jzfEjW1qkrMQd88IQTcxACnXDsmSzhmolrreJk-PDeCl96nVs1G_cU5CAxVdGMwQ");'></div>
+</div>
+</header>
+<main class="flex-1 w-full max-w-7xl mx-auto px-10 py-8 flex flex-col gap-6">
+<div class="flex items-center justify-between">
+<h1 class="text-[32px] font-bold leading-tight">Files (파일)</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex h-8 items-center justify-center rounded bg-primary text-slate-900 px-4 text-sm font-medium transition-colors">전체</button>
+<button class="flex h-8 items-center justify-center rounded bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark px-4 text-sm font-medium hover:border-primary/50 transition-colors">이미지</button>
+<button class="flex h-8 items-center justify-center rounded bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark px-4 text-sm font-medium hover:border-primary/50 transition-colors">문서</button>
+<button class="flex h-8 items-center justify-center rounded bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark px-4 text-sm font-medium hover:border-primary/50 transition-colors">기타</button>
+</div>
+<div class="w-full">
+<label class="flex items-center w-full h-12 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-primary focus-within:border-primary transition-shadow">
+<span class="material-symbols-outlined text-slate-400 pl-4">search</span>
+<input class="w-full bg-transparent border-none text-sm px-3 focus:outline-none focus:ring-0 placeholder-slate-400 dark:placeholder-slate-500" placeholder="Search files, formats, or uploaders..." type="text"/>
+</label>
+</div>
+<div class="flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed border-border-light dark:border-slate-700 bg-surface-light/50 dark:bg-surface-dark/50 p-12 hover:border-primary/50 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-4xl text-slate-400 dark:text-slate-500">cloud_upload</span>
+<div class="text-center">
+<p class="text-lg font-bold mb-1">Drag and drop files here</p>
+<p class="text-sm text-slate-500 dark:text-slate-400">or click to browse from your computer</p>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+<!-- File Card 1 -->
+<div class="flex flex-col rounded-lg border border-border-light dark:border-slate-800 bg-surface-light dark:bg-slate-900 p-4 hover:border-primary/50 transition-colors group cursor-pointer relative overflow-hidden">
+<div class="flex items-start justify-between mb-4">
+<div class="size-10 rounded bg-red-500/10 text-red-500 flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">picture_as_pdf</span>
+</div>
+<button class="text-slate-400 hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<h3 class="font-medium text-sm truncate mb-1" title="Q3_Financial_Report_Final_v2.pdf">Q3_Financial_Report_Final_v2.pdf</h3>
+<div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mt-auto pt-2">
+<span class="font-mono">2.4 MB</span>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px]">smart_toy</span>
+<span>Agent Alpha</span>
+</div>
+</div>
+</div>
+<!-- File Card 2 -->
+<div class="flex flex-col rounded-lg border border-border-light dark:border-slate-800 bg-surface-light dark:bg-slate-900 p-4 hover:border-primary/50 transition-colors group cursor-pointer relative overflow-hidden">
+<div class="flex items-start justify-between mb-4">
+<div class="size-10 rounded bg-blue-500/10 text-blue-500 flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">image</span>
+</div>
+<button class="text-slate-400 hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<h3 class="font-medium text-sm truncate mb-1" title="hero_banner_campaign_2024.png">hero_banner_campaign_2024.png</h3>
+<div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mt-auto pt-2">
+<span class="font-mono">5.1 MB</span>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px]">person</span>
+<span>You</span>
+</div>
+</div>
+</div>
+<!-- File Card 3 -->
+<div class="flex flex-col rounded-lg border border-border-light dark:border-slate-800 bg-surface-light dark:bg-slate-900 p-4 hover:border-primary/50 transition-colors group cursor-pointer relative overflow-hidden">
+<div class="flex items-start justify-between mb-4">
+<div class="size-10 rounded bg-green-500/10 text-green-500 flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">table_chart</span>
+</div>
+<button class="text-slate-400 hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<h3 class="font-medium text-sm truncate mb-1" title="user_metrics_export_oct.xlsx">user_metrics_export_oct.xlsx</h3>
+<div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mt-auto pt-2">
+<span class="font-mono">845 KB</span>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px]">smart_toy</span>
+<span>DataBot</span>
+</div>
+</div>
+</div>
+<!-- File Card 4 -->
+<div class="flex flex-col rounded-lg border border-border-light dark:border-slate-800 bg-surface-light dark:bg-slate-900 p-4 hover:border-primary/50 transition-colors group cursor-pointer relative overflow-hidden">
+<div class="flex items-start justify-between mb-4">
+<div class="size-10 rounded bg-purple-500/10 text-purple-500 flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">movie</span>
+</div>
+<button class="text-slate-400 hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<h3 class="font-medium text-sm truncate mb-1" title="product_demo_v1.mp4">product_demo_v1.mp4</h3>
+<div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mt-auto pt-2">
+<span class="font-mono">124 MB</span>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px]">smart_toy</span>
+<span>Agent Bravo</span>
+</div>
+</div>
+</div>
+<!-- File Card 5 -->
+<div class="flex flex-col rounded-lg border border-border-light dark:border-slate-800 bg-surface-light dark:bg-slate-900 p-4 hover:border-primary/50 transition-colors group cursor-pointer relative overflow-hidden">
+<div class="flex items-start justify-between mb-4">
+<div class="size-10 rounded bg-blue-400/10 text-blue-400 flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">description</span>
+</div>
+<button class="text-slate-400 hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<h3 class="font-medium text-sm truncate mb-1" title="project_specifications.docx">project_specifications.docx</h3>
+<div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mt-auto pt-2">
+<span class="font-mono">1.2 MB</span>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px]">person</span>
+<span>You</span>
+</div>
+</div>
+</div>
+<!-- File Card 6 -->
+<div class="flex flex-col rounded-lg border border-border-light dark:border-slate-800 bg-surface-light dark:bg-slate-900 p-4 hover:border-primary/50 transition-colors group cursor-pointer relative overflow-hidden">
+<div class="flex items-start justify-between mb-4">
+<div class="size-10 rounded bg-teal-500/10 text-teal-500 flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">csv</span>
+</div>
+<button class="text-slate-400 hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<h3 class="font-medium text-sm truncate mb-1" title="raw_sensor_data_2023.csv">raw_sensor_data_2023.csv</h3>
+<div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mt-auto pt-2">
+<span class="font-mono">15.8 MB</span>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px]">smart_toy</span>
+<span>DataBot</span>
+</div>
+</div>
+</div>
+<!-- File Card 7 -->
+<div class="flex flex-col rounded-lg border border-border-light dark:border-slate-800 bg-surface-light dark:bg-slate-900 p-4 hover:border-primary/50 transition-colors group cursor-pointer relative overflow-hidden">
+<div class="flex items-start justify-between mb-4">
+<div class="size-10 rounded bg-orange-500/10 text-orange-500 flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">image</span>
+</div>
+<button class="text-slate-400 hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<h3 class="font-medium text-sm truncate mb-1" title="office_party_2023.jpg">office_party_2023.jpg</h3>
+<div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mt-auto pt-2">
+<span class="font-mono">3.4 MB</span>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px]">person</span>
+<span>You</span>
+</div>
+</div>
+</div>
+<!-- File Card 8 -->
+<div class="flex flex-col rounded-lg border border-border-light dark:border-slate-800 bg-surface-light dark:bg-slate-900 p-4 hover:border-primary/50 transition-colors group cursor-pointer relative overflow-hidden">
+<div class="flex items-start justify-between mb-4">
+<div class="size-10 rounded bg-slate-500/10 text-slate-500 dark:text-slate-400 flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">markdown</span>
+</div>
+<button class="text-slate-400 hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<h3 class="font-medium text-sm truncate mb-1" title="README.md">README.md</h3>
+<div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mt-auto pt-2">
+<span class="font-mono">12 KB</span>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px]">smart_toy</span>
+<span>Agent Alpha</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+</body></html>

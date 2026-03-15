@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX SNS Content Management Interface</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#20d3ee",
+          "background-light": "#f6f8f8",
+          "background-dark": "#101f22",
+        },
+        fontFamily: {
+          "display": ["Inter", "sans-serif"],
+          "mono": ["JetBrains Mono", "monospace"]
+        },
+        borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+      },
+    },
+  }
+</script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<div class="px-40 flex flex-1 justify-center py-5">
+<div class="layout-content-container flex flex-col max-w-[1200px] flex-1">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 px-10 py-3 mb-6">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-slate-900 dark:text-white">
+<div class="size-6 text-primary">
+<span class="material-symbols-outlined text-[24px]">hexagon</span>
+</div>
+<h2 class="text-slate-900 dark:text-white text-xl font-bold leading-tight tracking-[-0.015em] font-mono">CORTHEX</h2>
+</div>
+<label class="flex flex-col min-w-40 !h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-xl h-full bg-slate-100 dark:bg-slate-800">
+<div class="text-slate-500 dark:text-slate-400 flex items-center justify-center pl-4 rounded-l-xl">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-slate-900 dark:text-white focus:outline-0 focus:ring-0 border-none bg-transparent focus:border-none h-full placeholder:text-slate-500 dark:placeholder:text-slate-400 px-4 rounded-l-none border-l-0 pl-2 text-sm font-medium leading-normal" placeholder="Search" value=""/>
+</div>
+</label>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<nav class="flex items-center gap-9 hidden md:flex">
+<a class="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white text-sm font-medium leading-normal transition-colors" href="#">대시보드</a>
+<a class="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white text-sm font-medium leading-normal transition-colors" href="#">프로젝트</a>
+<a class="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white text-sm font-medium leading-normal transition-colors" href="#">고객</a>
+<a class="text-slate-900 dark:text-white text-sm font-bold leading-normal" href="#">SNS 관리</a>
+<a class="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white text-sm font-medium leading-normal transition-colors" href="#">설정</a>
+</nav>
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-background-dark text-sm font-bold leading-normal tracking-[0.015em] transition-transform hover:scale-105">
+<span class="truncate">새 프로젝트</span>
+</button>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border border-slate-200 dark:border-slate-700" data-alt="User Avatar Profile Picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDIFzviS3Rq54_mE3nJS22IwUIdHVa4i5nrvfuMI-eGgpdmInr0NSkVr8DNvqWsruFLXdZ-js2v47qljtumoIsew43ucBGfpC2gu9EUwbRxBr2gDFgE6iYzySD_ujU4PY2-0jHrBnzftn3St50M1wExDLBW-JNV8Wg8eC5-4Y5knb2s9UXOiFfZ_IPsfTqVA5OynKGMybWqyxXqlC9VYJ6L0oDUDtaDK5EZQXODefZpeT-5xhQZegNmRVW7j8a8p-GSZGM30zeUBw");'></div>
+</div>
+</header>
+<main class="flex-1 px-10">
+<div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+<div class="flex min-w-72 flex-col gap-2">
+<h1 class="text-slate-900 dark:text-white tracking-tight text-3xl font-bold leading-tight">SNS 관리</h1>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium leading-normal">콘텐츠 생성, 예약 및 다중 플랫폼 통계 분석을 관리하세요.</p>
+</div>
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-5 bg-primary text-background-dark text-sm font-bold leading-normal transition-opacity hover:opacity-90">
+<span class="material-symbols-outlined text-[18px] mr-2">add</span>
+<span class="truncate">콘텐츠 생성</span>
+</button>
+</div>
+<div class="mb-6">
+<div class="flex border-b border-slate-200 dark:border-slate-800 gap-8 overflow-x-auto">
+<a class="flex flex-col items-center justify-center border-b-2 border-primary text-primary pb-3 pt-2 px-1 whitespace-nowrap" href="#">
+<p class="text-sm font-bold leading-normal">콘텐츠</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-2 border-transparent text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 pb-3 pt-2 px-1 whitespace-nowrap transition-colors" href="#">
+<p class="text-sm font-medium leading-normal">발행 대기</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-2 border-transparent text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 pb-3 pt-2 px-1 whitespace-nowrap transition-colors" href="#">
+<p class="text-sm font-medium leading-normal">카드뉴스</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-2 border-transparent text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 pb-3 pt-2 px-1 whitespace-nowrap transition-colors" href="#">
+<p class="text-sm font-medium leading-normal">통계</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-2 border-transparent text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 pb-3 pt-2 px-1 whitespace-nowrap transition-colors" href="#">
+<p class="text-sm font-medium leading-normal">계정</p>
+</a>
+</div>
+</div>
+<div class="flex gap-3 mb-6 flex-wrap">
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-slate-200 dark:bg-slate-800 px-4 text-slate-900 dark:text-white text-sm font-bold leading-normal border border-slate-300 dark:border-slate-700">전체</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-transparent px-4 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 text-sm font-medium leading-normal border border-slate-200 dark:border-slate-800 transition-colors">Instagram</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-transparent px-4 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 text-sm font-medium leading-normal border border-slate-200 dark:border-slate-800 transition-colors">LinkedIn</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-transparent px-4 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 text-sm font-medium leading-normal border border-slate-200 dark:border-slate-800 transition-colors">Twitter</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-transparent px-4 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 text-sm font-medium leading-normal border border-slate-200 dark:border-slate-800 transition-colors ml-auto">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+필터
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-12">
+<article class="flex flex-col rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+<div class="p-5 flex flex-col gap-4 h-full">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-2">
+<div class="bg-violet-100 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 rounded-md px-2 py-1 text-xs font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">photo_camera</span>
+Instagram
+</div>
+<span class="text-slate-500 dark:text-slate-400 text-xs font-medium font-mono">2023-10-25 14:30</span>
+</div>
+<div class="bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-md px-2 py-1 text-xs font-bold">
+발행됨
+</div>
+</div>
+<p class="text-slate-800 dark:text-slate-200 text-sm leading-relaxed line-clamp-3">
+CORTHEX 2.0 업데이트 안내! 🚀 새로운 데이터 분석 도구와 통합된 소셜 미디어 관리 기능을 만나보세요. 더 빠르고 직관적인 인터페이스로 업무 효율을 높일 수 있습니다. #CORTHEX #업데이트 #데이터분석
+</p>
+<div class="bg-slate-100 dark:bg-slate-800 rounded-lg h-40 w-full bg-cover bg-center mt-auto" data-alt="Abstract app update promotional banner" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAjnAUwqnUElAZV_zoXu9FOpSQNwCB0MA3fWIUxJ4QjNgtF5w9MQf2aoHLF_HGI_nwzlRkboSG_hX3o0T5UPp8Czyne5v7mVcDun1FCWwiggvl-CxjBbY_wHmxhlMco8mHKFtbesPN-NJhE7pxiWEWvWckblpk37mTH14n1e2c0t-jVmFugX2uyV7P3A65ZuQwxTbUUx5DiNS0LlYvF1VDKUHlaOZTP3Fy_Km0p88AVGuAgr9zOGSCweKTACl9KuSveun36tOcevQ");'></div>
+<div class="flex items-center gap-6 mt-2 pt-4 border-t border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+<span class="text-xs font-mono font-medium">1,245</span>
+</div>
+<div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined text-[18px]">chat_bubble</span>
+<span class="text-xs font-mono font-medium">84</span>
+</div>
+<div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined text-[18px]">share</span>
+<span class="text-xs font-mono font-medium">32</span>
+</div>
+<button class="ml-auto text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+<span class="material-symbols-outlined text-[20px]">more_horiz</span>
+</button>
+</div>
+</div>
+</article>
+<article class="flex flex-col rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+<div class="p-5 flex flex-col gap-4 h-full">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-2">
+<div class="bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-md px-2 py-1 text-xs font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">work</span>
+LinkedIn
+</div>
+<span class="text-slate-500 dark:text-slate-400 text-xs font-medium font-mono">2023-10-27 09:00</span>
+</div>
+<div class="bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-md px-2 py-1 text-xs font-bold">
+예약됨
+</div>
+</div>
+<p class="text-slate-800 dark:text-slate-200 text-sm leading-relaxed line-clamp-3">
+기업용 데이터 분석의 새로운 기준. CORTHEX 엔터프라이즈 솔루션이 어떻게 포춘 500대 기업의 의사결정 프로세스를 혁신하고 있는지 백서에서 확인하세요. 심층적인 인사이트와 실제 도입 사례를 제공합니다.
+</p>
+<div class="bg-slate-100 dark:bg-slate-800 rounded-lg h-40 w-full bg-cover bg-center mt-auto" data-alt="Corporate data analysis whitepaper cover" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBXoGWVn1fKdEptid-WFQQaR3ckHbFyzptpZ9N9v9Hg2Qtq-XUqWfjnOHH8wWwRRtq83s9MhiYVlV5mV7CY2S7cqbDO0mp6haMUwJKmchlAPY5BEsuo5_asFesgIZQun7aAf1so4fbAd851IqV9Ya8V90MgUsVYAYvcGTb_6YCfg3Sb4XLM2-l3-SWfSsUpdYCXbNOnhB_mMG75Xug__4TMJnm6BSpjRdAd1zlrkKIXh7-4d7gl1wEeJD2RaC3UtD22ZQva9A5jhA");'></div>
+<div class="flex items-center gap-6 mt-2 pt-4 border-t border-slate-100 dark:border-slate-800 opacity-50">
+<div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+<span class="text-xs font-mono font-medium">-</span>
+</div>
+<div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined text-[18px]">chat_bubble</span>
+<span class="text-xs font-mono font-medium">-</span>
+</div>
+<div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined text-[18px]">share</span>
+<span class="text-xs font-mono font-medium">-</span>
+</div>
+<button class="ml-auto text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+<span class="material-symbols-outlined text-[20px]">more_horiz</span>
+</button>
+</div>
+</div>
+</article>
+</div>
+</main>
+</div>
+</div>
+</div>
+</div>
+</body></html>

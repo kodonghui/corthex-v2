@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX Command Center Delegation Interface</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#20d3ee",
+                        "primary-focus": "#06b6d4",
+                        "accent-violet": "#8b5cf6",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#020617", // slate-950
+                        "surface-dark": "#0f172a", // slate-900
+                        "surface-darker": "#1e293b", // slate-800
+                        "text-main-dark": "#f8fafc", // slate-50
+                        "text-muted-dark": "#94a3b8", // slate-400
+                        "border-dark": "#334155", // slate-700
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .blinking-cursor {
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-text-main-dark font-display min-h-screen flex flex-col antialiased">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-border-dark px-6 py-4 bg-surface-dark sticky top-0 z-10">
+<div class="flex items-center gap-3">
+<div class="text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">neurology</span>
+</div>
+<h2 class="text-lg font-bold leading-tight tracking-tight uppercase">CORTHEX<span class="text-text-muted-dark ml-2 font-medium">Command Center</span></h2>
+</div>
+<div class="flex items-center gap-8">
+<nav class="flex items-center gap-6 hidden md:flex">
+<a class="text-text-muted-dark hover:text-text-main-dark transition-colors text-sm font-medium" href="#">Dashboard</a>
+<a class="text-text-muted-dark hover:text-text-main-dark transition-colors text-sm font-medium" href="#">Agents</a>
+<a class="text-primary text-sm font-medium border-b-2 border-primary pb-1" href="#">Pipelines</a>
+<a class="text-text-muted-dark hover:text-text-main-dark transition-colors text-sm font-medium" href="#">Settings</a>
+</nav>
+<div class="flex items-center gap-4 border-l border-border-dark pl-6">
+<button class="text-text-muted-dark hover:text-text-main-dark transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="bg-surface-darker rounded-full size-8 flex items-center justify-center border border-border-dark">
+<span class="material-symbols-outlined text-sm">person</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Grid -->
+<main class="flex-1 flex w-full max-w-[1600px] mx-auto overflow-hidden h-[calc(100vh-65px)]">
+<!-- Left Panel: Command Thread (8 columns equivalent in flex) -->
+<div class="flex-[8] flex flex-col border-r border-border-dark relative overflow-y-auto">
+<!-- Thread Header -->
+<div class="sticky top-0 bg-background-dark/95 backdrop-blur-sm z-10 border-b border-border-dark p-4 flex justify-between items-center">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-text-muted-dark">forum</span>
+<h3 class="font-semibold text-lg">Active Session: Q3 Analysis</h3>
+</div>
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-400 ring-1 ring-inset ring-emerald-500/20">Running</span>
+</div>
+</div>
+<!-- Thread Content -->
+<div class="flex flex-col gap-6 p-6">
+<!-- System Message -->
+<div class="flex items-start gap-4 mx-auto max-w-3xl w-full">
+<div class="mt-1 flex-shrink-0 size-8 rounded bg-surface-darker border border-border-dark flex items-center justify-center">
+<span class="material-symbols-outlined text-text-muted-dark text-sm">memory</span>
+</div>
+<div class="flex-1">
+<div class="text-xs text-text-muted-dark mb-1 flex items-center gap-2">
+<span class="font-semibold text-text-main-dark">System</span>
+<span>09:58 AM</span>
+</div>
+<div class="text-sm text-text-muted-dark bg-surface-dark rounded-lg p-3 border border-border-dark">
+                            Session initialized. Main Coordinator agent ready. Loaded context: 'q3_sales_raw.csv', 'financial_goals_2023.pdf'.
+                        </div>
+</div>
+</div>
+<!-- User Command -->
+<div class="flex items-start gap-4 mx-auto max-w-3xl w-full">
+<div class="mt-1 flex-shrink-0 size-8 rounded-full bg-surface-darker border border-border-dark flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">person</span>
+</div>
+<div class="flex-1">
+<div class="text-xs text-text-muted-dark mb-1 flex items-center gap-2">
+<span class="font-semibold text-text-main-dark">Commander</span>
+<span>10:00 AM</span>
+</div>
+<div class="text-sm font-mono text-text-main-dark bg-surface-dark rounded-lg p-3 border border-border-dark">
+<span class="text-primary">/delegate</span> analyze_q3_report <span class="text-accent-violet">--agent DataAgent</span> <span class="text-text-muted-dark">--format markdown</span>
+</div>
+</div>
+</div>
+<!-- Coordinator Response -->
+<div class="flex items-start gap-4 mx-auto max-w-3xl w-full">
+<div class="mt-1 flex-shrink-0 size-8 rounded bg-primary/20 border border-primary/30 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-sm">hub</span>
+</div>
+<div class="flex-1">
+<div class="text-xs text-text-muted-dark mb-1 flex items-center gap-2">
+<span class="font-semibold text-text-main-dark">Coordinator</span>
+<span>10:00 AM</span>
+</div>
+<div class="text-sm text-text-main-dark">
+                            Understood. Delegating Q3 report analysis to DataAgent. Preparing context handoff.
+                        </div>
+<!-- Delegation Card -->
+<div class="mt-3 flex items-stretch justify-between gap-4 rounded-xl bg-surface-darker border border-accent-violet/30 p-4 shadow-sm relative overflow-hidden group">
+<div class="absolute top-0 left-0 w-1 h-full bg-accent-violet"></div>
+<div class="flex flex-col gap-2 flex-1 pl-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-accent-violet text-sm">switch_access_shortcut</span>
+<p class="text-sm font-bold text-text-main-dark">Agent Delegation</p>
+</div>
+<p class="text-text-muted-dark text-xs font-mono">Handing off to <span class="text-accent-violet">DataAgent</span></p>
+<div class="mt-2 flex gap-2">
+<span class="inline-flex items-center rounded-md bg-surface-dark px-2 py-1 text-xs font-medium text-text-muted-dark ring-1 ring-inset ring-border-dark">Context: 2 files</span>
+<span class="inline-flex items-center rounded-md bg-surface-dark px-2 py-1 text-xs font-medium text-text-muted-dark ring-1 ring-inset ring-border-dark">Tokens: ~4.2k</span>
+</div>
+</div>
+<button class="self-start flex items-center gap-1 text-xs font-medium text-text-muted-dark hover:text-text-main-dark bg-surface-dark px-3 py-1.5 rounded-lg border border-border-dark transition-colors">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+                                View Context
+                            </button>
+</div>
+</div>
+</div>
+<!-- DataAgent Tool Call -->
+<div class="flex items-start gap-4 mx-auto max-w-3xl w-full">
+<div class="mt-1 flex-shrink-0 size-8 rounded bg-accent-violet/20 border border-accent-violet/30 flex items-center justify-center">
+<span class="material-symbols-outlined text-accent-violet text-sm">analytics</span>
+</div>
+<div class="flex-1">
+<div class="text-xs text-text-muted-dark mb-1 flex items-center gap-2">
+<span class="font-semibold text-text-main-dark">DataAgent</span>
+<span>10:01 AM</span>
+</div>
+<div class="text-sm text-text-main-dark mb-3">
+                            Received. Executing data extraction tools.
+                        </div>
+<!-- Tool Call Card -->
+<div class="flex items-center justify-between gap-4 rounded-xl bg-surface-dark border border-border-dark p-3">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded bg-surface-darker flex items-center justify-center border border-border-dark">
+<span class="material-symbols-outlined text-text-muted-dark text-sm">build</span>
+</div>
+<div class="flex flex-col">
+<p class="text-sm font-bold text-text-main-dark font-mono">Tool Call: fetch_quarterly_data</p>
+<div class="flex items-center gap-2 mt-0.5">
+<span class="flex size-2 rounded-full bg-emerald-500"></span>
+<p class="text-text-muted-dark text-xs">Complete</p>
+<span class="text-border-dark">•</span>
+<p class="text-text-muted-dark text-xs font-mono">420ms</p>
+</div>
+</div>
+</div>
+<button class="text-text-muted-dark hover:text-text-main-dark transition-colors">
+<span class="material-symbols-outlined text-sm">code</span>
+</button>
+</div>
+</div>
+</div>
+<!-- DataAgent Streaming Response -->
+<div class="flex items-start gap-4 mx-auto max-w-3xl w-full pb-20">
+<div class="mt-1 flex-shrink-0 size-8 rounded bg-accent-violet/20 border border-accent-violet/30 flex items-center justify-center">
+<span class="material-symbols-outlined text-accent-violet text-sm">analytics</span>
+</div>
+<div class="flex-1">
+<div class="text-xs text-text-muted-dark mb-1 flex items-center gap-2">
+<span class="font-semibold text-text-main-dark">DataAgent</span>
+<span>10:01 AM</span>
+</div>
+<div class="text-sm text-text-main-dark leading-relaxed">
+                            Data retrieved successfully. Total revenue for Q3 is $4.2M, representing a 15% increase from Q2. I am now compiling the metrics into the requested markdown format, focusing on key performance indicators across regions. Give me a moment to generate the visualizations<span class="inline-block w-2 h-4 bg-primary ml-1 align-middle blinking-cursor"></span>
+</div>
+</div>
+</div>
+</div>
+<!-- Input Area (Fixed at bottom of left panel) -->
+<div class="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-background-dark via-background-dark to-transparent">
+<div class="mx-auto max-w-3xl relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-text-muted-dark text-lg">terminal</span>
+</div>
+<input class="block w-full rounded-xl border-border-dark bg-surface-dark pl-10 pr-12 py-3 text-sm text-text-main-dark focus:border-primary focus:ring-primary font-mono placeholder:text-text-muted-dark" placeholder="Enter command or message (e.g., /delegate, /stop)..." type="text"/>
+<div class="absolute inset-y-0 right-0 pr-2 flex items-center">
+<button class="p-1.5 bg-primary/20 text-primary rounded-lg hover:bg-primary/30 transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-sm font-bold">arrow_upward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Panel: Info & Tracking (4 columns equivalent) -->
+<div class="flex-[4] bg-surface-dark flex flex-col overflow-y-auto border-l border-border-dark">
+<div class="p-6 flex flex-col gap-6">
+<!-- Session Info -->
+<div class="flex flex-col gap-3">
+<h4 class="text-xs font-semibold text-text-muted-dark uppercase tracking-wider">Session Info</h4>
+<div class="bg-surface-darker rounded-xl border border-border-dark p-4 flex flex-col gap-3">
+<div class="flex justify-between items-center">
+<span class="text-sm text-text-muted-dark">Duration</span>
+<span class="text-sm font-mono text-text-main-dark">00:14:23</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-sm text-text-muted-dark">Tokens (In/Out)</span>
+<span class="text-sm font-mono text-text-main-dark">8.4k / 2.1k</span>
+</div>
+<div class="h-px w-full bg-border-dark my-1"></div>
+<div class="flex justify-between items-center">
+<span class="text-sm text-text-muted-dark">Est. Cost</span>
+<span class="text-sm font-mono text-primary">$1.23</span>
+</div>
+</div>
+</div>
+<!-- Delegation Pipeline -->
+<div class="flex flex-col gap-3">
+<h4 class="text-xs font-semibold text-text-muted-dark uppercase tracking-wider">Delegation Pipeline</h4>
+<div class="bg-surface-darker rounded-xl border border-border-dark p-5">
+<ul class="relative flex flex-col gap-4">
+<!-- Step 1 -->
+<li class="relative flex gap-4 items-start">
+<div class="absolute top-6 left-[11px] bottom-[-20px] w-px bg-border-dark"></div>
+<div class="relative z-10 flex size-6 items-center justify-center rounded-full bg-surface-dark border border-border-dark">
+<span class="material-symbols-outlined text-[14px] text-emerald-400">check</span>
+</div>
+<div class="flex flex-col">
+<p class="text-sm font-medium text-text-main-dark">Command Parsed</p>
+<p class="text-xs text-text-muted-dark">Coordinator initialized</p>
+</div>
+</li>
+<!-- Step 2 -->
+<li class="relative flex gap-4 items-start">
+<div class="absolute top-6 left-[11px] bottom-[-20px] w-px bg-border-dark"></div>
+<div class="relative z-10 flex size-6 items-center justify-center rounded-full bg-surface-dark border border-border-dark">
+<span class="material-symbols-outlined text-[14px] text-emerald-400">check</span>
+</div>
+<div class="flex flex-col">
+<p class="text-sm font-medium text-text-main-dark">Context Assembly</p>
+<p class="text-xs text-text-muted-dark">Loaded relevant documents</p>
+</div>
+</li>
+<!-- Step 3 -->
+<li class="relative flex gap-4 items-start">
+<div class="absolute top-6 left-[11px] bottom-[-20px] w-px bg-border-dark"></div>
+<div class="relative z-10 flex size-6 items-center justify-center rounded-full bg-accent-violet/20 border border-accent-violet/50 ring-2 ring-background-dark">
+<div class="size-2 rounded-full bg-accent-violet"></div>
+</div>
+<div class="flex flex-col">
+<p class="text-sm font-medium text-accent-violet">Agent Handoff: DataAgent</p>
+<p class="text-xs text-text-muted-dark">Executing fetch_quarterly_data...</p>
+</div>
+</li>
+<!-- Step 4 -->
+<li class="relative flex gap-4 items-start">
+<div class="relative z-10 flex size-6 items-center justify-center rounded-full bg-surface-dark border border-border-dark">
+</div>
+<div class="flex flex-col">
+<p class="text-sm font-medium text-text-muted-dark">Synthesis</p>
+<p class="text-xs text-text-muted-dark">Pending return to Coordinator</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<!-- Deliverables -->
+<div class="flex flex-col gap-3">
+<h4 class="text-xs font-semibold text-text-muted-dark uppercase tracking-wider">Deliverables</h4>
+<div class="bg-surface-darker rounded-xl border border-border-dark p-2 flex flex-col gap-1">
+<!-- Item 1 -->
+<div class="flex items-center justify-between p-2 hover:bg-surface-dark rounded-lg transition-colors group cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-text-muted-dark text-lg">markdown</span>
+<div class="flex flex-col">
+<span class="text-sm text-text-main-dark font-mono">q3_analysis_report.md</span>
+<span class="text-xs text-primary italic">Generating...</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-text-muted-dark opacity-0 group-hover:opacity-100 transition-opacity text-sm">download</span>
+</div>
+<!-- Item 2 -->
+<div class="flex items-center justify-between p-2 hover:bg-surface-dark rounded-lg transition-colors group cursor-pointer opacity-50">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-text-muted-dark text-lg">image</span>
+<div class="flex flex-col">
+<span class="text-sm text-text-muted-dark font-mono">q3_revenue_chart.png</span>
+<span class="text-xs text-text-muted-dark">Pending</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

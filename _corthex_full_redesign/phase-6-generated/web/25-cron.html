@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX - 크론기지</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1dd4ed",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#020617", // slate-950
+                        "surface-dark": "#0f172a", // slate-900
+                        "border-dark": "#1e293b", // slate-800
+                        "text-main": "#f8fafc", // slate-50
+                        "text-muted": "#94a3b8", // slate-400
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-text-main font-display min-h-screen flex flex-col overflow-hidden">
+<!-- Top Navigation -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-300 dark:border-border-dark px-6 py-3 shrink-0 bg-white dark:bg-surface-dark">
+<div class="flex items-center gap-4">
+<div class="size-6 text-primary">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M39.475 21.6262C40.358 21.4363 40.6863 21.5589 40.7581 21.5934C40.7876 21.655 40.8547 21.857 40.8082 22.3336C40.7408 23.0255 40.4502 24.0046 39.8572 25.2301C38.6799 27.6631 36.5085 30.6631 33.5858 33.5858C30.6631 36.5085 27.6632 38.6799 25.2301 39.8572C24.0046 40.4502 23.0255 40.7407 22.3336 40.8082C21.8571 40.8547 21.6551 40.7875 21.5934 40.7581C21.5589 40.6863 21.4363 40.358 21.6262 39.475C21.8562 38.4054 22.4689 36.9657 23.5038 35.2817C24.7575 33.2417 26.5497 30.9744 28.7621 28.762C30.9744 26.5497 33.2417 24.7574 35.2817 23.5037C36.9657 22.4689 38.4054 21.8562 39.475 21.6262ZM4.41189 29.2403L18.7597 43.5881C19.8813 44.7097 21.4027 44.9179 22.7217 44.7893C24.0585 44.659 25.5148 44.1631 26.9723 43.4579C29.9052 42.0387 33.2618 39.5667 36.4142 36.4142C39.5667 33.2618 42.0387 29.9052 43.4579 26.9723C44.1631 25.5148 44.659 24.0585 44.7893 22.7217C44.9179 21.4027 44.7097 19.8813 43.5881 18.7597L29.2403 4.41187C27.8527 3.02428 25.8765 3.02573 24.2861 3.36776C22.6081 3.72863 20.7334 4.58419 18.8396 5.74801C16.4978 7.18716 13.9881 9.18353 11.5858 11.5858C9.18354 13.988 7.18717 16.4978 5.74802 18.8396C4.58421 20.7334 3.72865 22.6081 3.36778 24.2861C3.02574 25.8765 3.02429 27.8527 4.41189 29.2403Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<h2 class="text-lg font-bold tracking-tight">CORTHEX</h2>
+</div>
+<div class="flex flex-1 justify-end gap-8 items-center">
+<nav class="flex items-center gap-6">
+<a class="text-slate-600 dark:text-text-muted hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors" href="#">대시보드</a>
+<a class="text-slate-600 dark:text-text-muted hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors" href="#">에이전트</a>
+<a class="text-primary text-sm font-medium border-b-2 border-primary pb-1" href="#">크론기지</a>
+<a class="text-slate-600 dark:text-text-muted hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors" href="#">설정</a>
+</nav>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8 bg-slate-200 dark:bg-slate-800" data-alt="User Avatar Placeholder" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBnSSsER6anOOi1EDJU8tPwYXFdy1CB8g_lwQm91wY-b-2mOq7rK8nRoQW_QKXqGyvTtAkEMIa0zS5nMSkCx9cVGqFTLi8uiQs9zOI8IA3rTHgC4q-iEky-_xyqUcoHDNXHmKV_BpGB9u9C2QD6SWGzbZNjg98RGalpeBFgehar-nIdxT9O5ni0wDj1Wq3ufnk8wxNnGkQNldrpVkCB7sdwLItPs_XSpgaPWYAkFHDUfghvY7mnhvw7N-VlY9qbzNP8t8WC5RT9Cg");'></div>
+</div>
+</header>
+<!-- Main Content Layout -->
+<main class="flex flex-1 overflow-hidden">
+<!-- Left Panel: Job List -->
+<aside class="w-[400px] flex flex-col border-r border-slate-300 dark:border-border-dark bg-white dark:bg-surface-dark shrink-0">
+<div class="p-4 border-b border-slate-300 dark:border-border-dark">
+<h1 class="text-2xl font-bold mb-1">크론기지</h1>
+<p class="text-slate-500 dark:text-text-muted text-sm">자동화된 작업 스케줄링 관리</p>
+</div>
+<div class="flex border-b border-slate-300 dark:border-border-dark px-4 gap-6">
+<button class="text-primary text-sm font-bold border-b-[3px] border-primary pb-3 pt-4">
+                    활성 작업
+                </button>
+<button class="text-slate-500 dark:text-text-muted hover:text-slate-700 dark:hover:text-slate-300 text-sm font-bold border-b-[3px] border-transparent pb-3 pt-4 transition-colors">
+                    일시 중지됨
+                </button>
+</div>
+<!-- List -->
+<div class="flex-1 overflow-y-auto">
+<div class="p-2 space-y-1">
+<!-- Job Item (Active) -->
+<div class="flex gap-3 bg-slate-100 dark:bg-background-dark p-3 rounded-lg border border-primary/30 cursor-pointer">
+<div class="text-primary flex items-center justify-center rounded bg-primary/10 shrink-0 size-10">
+<span class="material-symbols-outlined">schedule</span>
+</div>
+<div class="flex flex-1 flex-col justify-center min-w-0">
+<p class="text-sm font-medium truncate">매일 뉴스 브리핑</p>
+<p class="text-slate-500 dark:text-text-muted text-xs truncate mt-0.5">Agent: NewsBot</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="font-mono text-[10px] bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-700 dark:text-slate-300">0 9 * * *</span>
+<span class="text-[10px] text-slate-500 dark:text-text-muted truncate">Next: 2024-03-20 09:00</span>
+</div>
+</div>
+<div class="shrink-0 pt-1">
+<div class="size-2.5 rounded-full bg-green-500"></div>
+</div>
+</div>
+<!-- Job Item 2 -->
+<div class="flex gap-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-3 rounded-lg border border-transparent cursor-pointer transition-colors">
+<div class="text-slate-600 dark:text-slate-400 flex items-center justify-center rounded bg-slate-200 dark:bg-slate-800 shrink-0 size-10">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div class="flex flex-1 flex-col justify-center min-w-0">
+<p class="text-sm font-medium truncate">주간 보고서 생성</p>
+<p class="text-slate-500 dark:text-text-muted text-xs truncate mt-0.5">Agent: ReportGenius</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="font-mono text-[10px] bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-700 dark:text-slate-300">0 18 * * 5</span>
+<span class="text-[10px] text-slate-500 dark:text-text-muted truncate">Next: 2024-03-22 18:00</span>
+</div>
+</div>
+<div class="shrink-0 pt-1">
+<div class="size-2.5 rounded-full bg-green-500"></div>
+</div>
+</div>
+<!-- Job Item 3 -->
+<div class="flex gap-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-3 rounded-lg border border-transparent cursor-pointer transition-colors">
+<div class="text-slate-600 dark:text-slate-400 flex items-center justify-center rounded bg-slate-200 dark:bg-slate-800 shrink-0 size-10">
+<span class="material-symbols-outlined">database</span>
+</div>
+<div class="flex flex-1 flex-col justify-center min-w-0">
+<p class="text-sm font-medium truncate">데이터 백업 동기화</p>
+<p class="text-slate-500 dark:text-text-muted text-xs truncate mt-0.5">Agent: DataSync</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="font-mono text-[10px] bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-700 dark:text-slate-300">*/30 * * * *</span>
+<span class="text-[10px] text-slate-500 dark:text-text-muted truncate">Next: 2024-03-20 08:30</span>
+</div>
+</div>
+<div class="shrink-0 pt-1">
+<div class="size-2.5 rounded-full bg-yellow-500"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="p-4 border-t border-slate-300 dark:border-border-dark">
+<button class="w-full bg-primary hover:bg-primary/90 text-slate-900 font-bold py-2 px-4 rounded transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">add</span> 새 작업 생성
+                </button>
+</div>
+</aside>
+<!-- Right Panel: Job Details -->
+<section class="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark p-6">
+<div class="max-w-4xl mx-auto space-y-6">
+<!-- Header -->
+<div class="flex items-center justify-between pb-4 border-b border-slate-300 dark:border-border-dark">
+<div class="flex items-center gap-4">
+<h2 class="text-xl font-bold">작업 상세: 매일 뉴스 브리핑</h2>
+<span class="px-2 py-1 bg-green-500/10 text-green-500 text-xs font-bold rounded-full border border-green-500/20">Active</span>
+</div>
+<div class="flex gap-2">
+<button class="px-3 py-1.5 border border-slate-300 dark:border-border-dark text-slate-700 dark:text-slate-300 rounded text-sm hover:bg-slate-100 dark:hover:bg-surface-dark transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">pause</span> 중지
+                        </button>
+<button class="px-3 py-1.5 bg-primary/10 text-primary border border-primary/30 rounded text-sm hover:bg-primary/20 transition-colors flex items-center gap-1 font-medium">
+<span class="material-symbols-outlined text-sm">save</span> 저장
+                        </button>
+</div>
+</div>
+<!-- Form grid -->
+<div class="grid grid-cols-2 gap-6">
+<!-- General Info -->
+<div class="space-y-4">
+<h3 class="text-sm font-bold text-slate-500 dark:text-text-muted uppercase tracking-wider">기본 정보</h3>
+<div>
+<label class="block text-xs font-medium text-slate-500 dark:text-text-muted mb-1">작업 이름</label>
+<input class="w-full bg-white dark:bg-surface-dark border border-slate-300 dark:border-border-dark rounded px-3 py-2 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-shadow" type="text" value="매일 뉴스 브리핑"/>
+</div>
+<div>
+<label class="block text-xs font-medium text-slate-500 dark:text-text-muted mb-1">할당된 에이전트</label>
+<select class="w-full bg-white dark:bg-surface-dark border border-slate-300 dark:border-border-dark rounded px-3 py-2 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-shadow appearance-none">
+<option>NewsBot</option>
+<option>ReportGenius</option>
+<option>DataSync</option>
+</select>
+</div>
+<div>
+<label class="block text-xs font-medium text-slate-500 dark:text-text-muted mb-1">실행 명령/프롬프트</label>
+<textarea class="w-full bg-white dark:bg-surface-dark border border-slate-300 dark:border-border-dark rounded px-3 py-2 text-sm font-mono focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-shadow resize-none" rows="4">Fetch top tech news from selected sources, summarize key points, and format as a brief markdown report.</textarea>
+</div>
+</div>
+<!-- Schedule & Limits -->
+<div class="space-y-4">
+<h3 class="text-sm font-bold text-slate-500 dark:text-text-muted uppercase tracking-wider">스케줄 &amp; 제한</h3>
+<div>
+<label class="block text-xs font-medium text-slate-500 dark:text-text-muted mb-1 flex justify-between">
+<span>크론 표현식</span>
+<a class="text-primary hover:underline" href="#">프리셋</a>
+</label>
+<div class="flex gap-2 mb-2">
+<button class="px-2 py-1 text-xs bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded hover:bg-slate-300 dark:hover:bg-slate-700">Hourly</button>
+<button class="px-2 py-1 text-xs bg-primary/20 text-primary border border-primary/30 rounded">Daily</button>
+<button class="px-2 py-1 text-xs bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded hover:bg-slate-300 dark:hover:bg-slate-700">Weekly</button>
+</div>
+<input class="w-full bg-slate-50 dark:bg-[#020617] border border-slate-300 dark:border-border-dark rounded px-3 py-2 text-lg font-mono tracking-widest text-center text-primary focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-shadow" type="text" value="0 9 * * *"/>
+<p class="text-xs text-slate-500 dark:text-text-muted mt-1 text-center">매일 오전 09:00</p>
+</div>
+<div class="grid grid-cols-2 gap-4 pt-2">
+<div>
+<label class="block text-xs font-medium text-slate-500 dark:text-text-muted mb-1">최대 실행 시간</label>
+<div class="flex items-center">
+<input class="w-full bg-white dark:bg-surface-dark border border-slate-300 dark:border-border-dark rounded-l px-3 py-2 text-sm font-mono focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-shadow border-r-0" type="number" value="300"/>
+<span class="bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-border-dark rounded-r px-3 py-2 text-sm text-slate-500">sec</span>
+</div>
+</div>
+<div>
+<label class="block text-xs font-medium text-slate-500 dark:text-text-muted mb-1">재시도 횟수</label>
+<input class="w-full bg-white dark:bg-surface-dark border border-slate-300 dark:border-border-dark rounded px-3 py-2 text-sm font-mono focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-shadow" type="number" value="3"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Execution History -->
+<div class="mt-8 pt-6 border-t border-slate-300 dark:border-border-dark">
+<h3 class="text-sm font-bold text-slate-500 dark:text-text-muted uppercase tracking-wider mb-4">최근 실행 기록</h3>
+<div class="bg-white dark:bg-surface-dark border border-slate-300 dark:border-border-dark rounded-lg overflow-hidden">
+<table class="w-full text-left text-sm">
+<thead class="bg-slate-50 dark:bg-[#0f172a] border-b border-slate-200 dark:border-border-dark text-slate-500 dark:text-text-muted text-xs uppercase">
+<tr>
+<th class="px-4 py-3 font-medium">타임스탬프</th>
+<th class="px-4 py-3 font-medium">상태</th>
+<th class="px-4 py-3 font-medium">소요 시간</th>
+<th class="px-4 py-3 font-medium">비용 (Tokens)</th>
+<th class="px-4 py-3 font-medium text-right">로그</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-200 dark:divide-border-dark font-mono text-xs">
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="px-4 py-3">2024-03-19 09:00:02</td>
+<td class="px-4 py-3">
+<span class="inline-flex items-center gap-1 text-green-600 dark:text-green-400">
+<span class="material-symbols-outlined text-[14px]">check_circle</span> Success
+                                        </span>
+</td>
+<td class="px-4 py-3 text-slate-600 dark:text-slate-400">45.2s</td>
+<td class="px-4 py-3 text-slate-600 dark:text-slate-400">1,240</td>
+<td class="px-4 py-3 text-right">
+<button class="text-primary hover:underline">View</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="px-4 py-3">2024-03-18 09:00:05</td>
+<td class="px-4 py-3">
+<span class="inline-flex items-center gap-1 text-green-600 dark:text-green-400">
+<span class="material-symbols-outlined text-[14px]">check_circle</span> Success
+                                        </span>
+</td>
+<td class="px-4 py-3 text-slate-600 dark:text-slate-400">42.8s</td>
+<td class="px-4 py-3 text-slate-600 dark:text-slate-400">1,185</td>
+<td class="px-4 py-3 text-right">
+<button class="text-primary hover:underline">View</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors bg-red-50/50 dark:bg-red-900/10">
+<td class="px-4 py-3">2024-03-17 09:00:01</td>
+<td class="px-4 py-3">
+<span class="inline-flex items-center gap-1 text-red-600 dark:text-red-400">
+<span class="material-symbols-outlined text-[14px]">error</span> Failed
+                                        </span>
+</td>
+<td class="px-4 py-3 text-slate-600 dark:text-slate-400">12.1s</td>
+<td class="px-4 py-3 text-slate-600 dark:text-slate-400">320</td>
+<td class="px-4 py-3 text-right">
+<button class="text-primary hover:underline">View</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+</main>
+</body></html>

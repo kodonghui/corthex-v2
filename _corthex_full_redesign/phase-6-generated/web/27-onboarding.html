@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX Onboarding Template Selection Interface</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1dd4ed",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#0f172a", // Slate-900 base for dark mode
+                        "surface-dark": "#1e293b", // Slate-800 for cards
+                        "surface-darker": "#0f172a", // Slate-900
+                        "border-dark": "#334155", // Slate-700
+                        "text-muted": "#94a3b8", // Slate-400
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col items-center">
+<!-- Header / Logo Area (Optional, implies platform branding) -->
+<header class="w-full max-w-7xl mx-auto p-6 flex justify-start items-center">
+<div class="flex items-center gap-2">
+<!-- Placeholder for CORTHEX Logo -->
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-background-dark font-bold text-xl">hub</span>
+</div>
+<span class="text-xl font-bold tracking-tight">CORTHEX</span>
+</div>
+</header>
+<main class="w-full max-w-[960px] flex-1 flex flex-col px-6 pb-12 pt-4">
+<!-- Progress Bar Component -->
+<div class="flex flex-col gap-3 p-4 mb-4">
+<div class="flex gap-6 justify-between items-end">
+<p class="text-primary text-base font-semibold leading-normal">템플릿 선택</p>
+<p class="text-text-muted text-sm font-medium leading-normal">Step 1 of 3</p>
+</div>
+<div class="rounded-full bg-surface-dark overflow-hidden h-2">
+<div class="h-full rounded-full bg-primary" style="width: 33%;"></div>
+</div>
+</div>
+<!-- Header -->
+<div class="flex flex-col gap-3 p-4 mb-6">
+<h1 class="text-4xl font-black leading-tight tracking-[-0.033em]">조직 템플릿 선택</h1>
+<p class="text-text-muted text-lg font-normal leading-normal">AI 에이전트 네트워크의 기본 구조를 선택하세요.</p>
+</div>
+<!-- Template Cards -->
+<div class="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-4 px-4 py-3 mb-8">
+<!-- Startup (Selected) -->
+<div class="flex flex-1 flex-col gap-5 rounded-2xl border-2 border-primary bg-surface-dark p-6 relative shadow-[0_0_15px_rgba(29,212,237,0.1)]">
+<div class="flex items-center justify-between">
+<h2 class="text-xl font-bold leading-tight flex items-center gap-2">
+                        스타트업
+                        <span aria-hidden="true" class="material-symbols-outlined text-primary text-lg">check_circle</span>
+</h2>
+<span class="text-background-dark text-xs font-bold leading-none tracking-wide uppercase rounded-full bg-primary px-3 py-1.5 text-center">추천</span>
+</div>
+<div class="flex flex-col gap-3 mt-2">
+<div class="text-sm font-medium leading-normal flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-xl leading-none">check</span>
+                        기본 부서 3개
+                    </div>
+<div class="text-sm font-medium leading-normal flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-xl leading-none">check</span>
+                        에이전트 5명
+                    </div>
+<div class="text-sm font-medium leading-normal flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-xl leading-none">check</span>
+                        빠른 배포에 적합
+                    </div>
+</div>
+</div>
+<!-- Enterprise (Unselected) -->
+<div class="flex flex-1 flex-col gap-5 rounded-2xl border border-border-dark bg-surface-darker p-6 hover:border-text-muted transition-colors cursor-pointer">
+<div class="flex items-center justify-between">
+<h2 class="text-xl font-bold leading-tight text-slate-300">엔터프라이즈</h2>
+</div>
+<div class="flex flex-col gap-3 mt-2 text-slate-400">
+<div class="text-sm font-medium leading-normal flex items-start gap-3">
+<span class="material-symbols-outlined text-text-muted text-xl leading-none">check</span>
+                        모든 부서 템플릿 제공
+                    </div>
+<div class="text-sm font-medium leading-normal flex items-start gap-3">
+<span class="material-symbols-outlined text-text-muted text-xl leading-none">check</span>
+                        무제한 에이전트 확장
+                    </div>
+<div class="text-sm font-medium leading-normal flex items-start gap-3">
+<span class="material-symbols-outlined text-text-muted text-xl leading-none">check</span>
+                        고급 권한 제어
+                    </div>
+</div>
+</div>
+<!-- Custom (Unselected) -->
+<div class="flex flex-1 flex-col gap-5 rounded-2xl border border-border-dark bg-surface-darker p-6 hover:border-text-muted transition-colors cursor-pointer">
+<div class="flex items-center justify-between">
+<h2 class="text-xl font-bold leading-tight text-slate-300">커스텀</h2>
+</div>
+<div class="flex flex-col gap-3 mt-2 text-slate-400">
+<div class="text-sm font-medium leading-normal flex items-start gap-3">
+<span class="material-symbols-outlined text-text-muted text-xl leading-none">check</span>
+                        빈 캔버스에서 직접 구성
+                    </div>
+<div class="text-sm font-medium leading-normal flex items-start gap-3">
+<span class="material-symbols-outlined text-text-muted text-xl leading-none">check</span>
+                        자유로운 에이전트 할당
+                    </div>
+<div class="text-sm font-medium leading-normal flex items-start gap-3">
+<span class="material-symbols-outlined text-text-muted text-xl leading-none">check</span>
+                        기존 인프라 통합 유연성
+                    </div>
+</div>
+</div>
+</div>
+<!-- Configuration Preview -->
+<div class="px-4 mt-2">
+<h3 class="text-lg font-bold leading-tight tracking-[-0.015em] pb-4">스타트업 구성 미리보기</h3>
+<div class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4">
+<!-- Dept 1 -->
+<div class="flex flex-1 gap-4 rounded-xl border border-border-dark bg-surface-darker p-5 flex-col hover:bg-surface-dark transition-colors">
+<div class="w-12 h-12 rounded-lg bg-surface-dark flex items-center justify-center text-primary border border-border-dark">
+<span class="material-symbols-outlined text-2xl">business_center</span>
+</div>
+<div class="flex flex-col gap-1">
+<h4 class="text-base font-bold leading-tight">총무부</h4>
+<p class="text-text-muted text-sm font-medium">에이전트 2명 할당됨</p>
+</div>
+</div>
+<!-- Dept 2 -->
+<div class="flex flex-1 gap-4 rounded-xl border border-border-dark bg-surface-darker p-5 flex-col hover:bg-surface-dark transition-colors">
+<div class="w-12 h-12 rounded-lg bg-surface-dark flex items-center justify-center text-primary border border-border-dark">
+<span class="material-symbols-outlined text-2xl">campaign</span>
+</div>
+<div class="flex flex-col gap-1">
+<h4 class="text-base font-bold leading-tight">마케팅부</h4>
+<p class="text-text-muted text-sm font-medium">에이전트 2명 할당됨</p>
+</div>
+</div>
+<!-- Dept 3 -->
+<div class="flex flex-1 gap-4 rounded-xl border border-border-dark bg-surface-darker p-5 flex-col hover:bg-surface-dark transition-colors">
+<div class="w-12 h-12 rounded-lg bg-surface-dark flex items-center justify-center text-primary border border-border-dark">
+<span class="material-symbols-outlined text-2xl">insights</span>
+</div>
+<div class="flex flex-col gap-1">
+<h4 class="text-base font-bold leading-tight">분석부</h4>
+<p class="text-text-muted text-sm font-medium">에이전트 1명 할당됨</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex justify-between items-center mt-12 px-4 pt-6 border-t border-border-dark">
+<button class="px-6 py-3 rounded-xl text-text-muted font-semibold hover:text-slate-200 transition-colors">
+                건너뛰기
+            </button>
+<button class="px-8 py-3 rounded-xl bg-primary text-background-dark font-bold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20 flex items-center gap-2">
+                다음 단계
+                <span class="material-symbols-outlined text-lg">arrow_forward</span>
+</button>
+</div>
+</main>
+</body></html>

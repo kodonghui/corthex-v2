@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX Activity Communication Log</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#20d3ee",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#101f22",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<div class="px-4 md:px-10 lg:px-40 flex flex-1 justify-center py-5">
+<div class="layout-content-container flex flex-col w-full max-w-[1200px] flex-1">
+<!-- Header -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 px-4 md:px-10 py-3 mb-6">
+<div class="flex items-center gap-4 text-slate-900 dark:text-white">
+<div class="size-6 text-primary">
+<span class="material-symbols-outlined text-[24px]">hub</span>
+</div>
+<h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">CORTHEX</h2>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<div class="hidden md:flex items-center gap-9">
+<a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary text-sm font-medium leading-normal transition-colors" href="#">대시보드</a>
+<a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary text-sm font-medium leading-normal transition-colors" href="#">에이전트</a>
+<a class="text-primary text-sm font-bold leading-normal border-b-2 border-primary pb-1" href="#">통신로그</a>
+<a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary text-sm font-medium leading-normal transition-colors" href="#">설정</a>
+</div>
+<div class="flex gap-2">
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-slate-900 hover:bg-primary/90 transition-colors text-sm font-bold leading-normal tracking-[0.015em]">
+<span class="truncate">새 작업</span>
+</button>
+<button class="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5 transition-colors">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<button class="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5 transition-colors">
+<span class="material-symbols-outlined text-[20px]">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Page Title & Description -->
+<div class="flex flex-wrap justify-between gap-3 px-4 mb-6">
+<div class="flex min-w-72 flex-col gap-2">
+<h1 class="text-slate-900 dark:text-white tracking-tight text-[32px] font-bold leading-tight">통신로그</h1>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal leading-normal">모든 AI 에이전트의 활동 및 시스템 이벤트를 모니터링합니다.</p>
+</div>
+</div>
+<!-- Filters & Search -->
+<div class="flex flex-col md:flex-row gap-4 px-4 mb-6 justify-between items-start md:items-center">
+<div class="flex gap-2 flex-wrap">
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-800 pl-4 pr-2 transition-colors">
+<span class="text-slate-700 dark:text-slate-200 text-sm font-medium leading-normal">에이전트</span>
+<span class="material-symbols-outlined text-[18px] text-slate-500 dark:text-slate-400">expand_more</span>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-800 pl-4 pr-2 transition-colors">
+<span class="text-slate-700 dark:text-slate-200 text-sm font-medium leading-normal">작업 유형</span>
+<span class="material-symbols-outlined text-[18px] text-slate-500 dark:text-slate-400">expand_more</span>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-800 pl-4 pr-2 transition-colors">
+<span class="text-slate-700 dark:text-slate-200 text-sm font-medium leading-normal">날짜</span>
+<span class="material-symbols-outlined text-[18px] text-slate-500 dark:text-slate-400">expand_more</span>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-800 pl-4 pr-2 transition-colors">
+<span class="text-slate-700 dark:text-slate-200 text-sm font-medium leading-normal">상태</span>
+<span class="material-symbols-outlined text-[18px] text-slate-500 dark:text-slate-400">expand_more</span>
+</button>
+</div>
+<div class="w-full md:w-72">
+<label class="flex flex-col w-full h-10">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 focus-within:border-primary dark:focus-within:border-primary transition-colors">
+<div class="text-slate-400 dark:text-slate-500 flex items-center justify-center pl-3">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 bg-transparent text-slate-900 dark:text-white focus:outline-none focus:ring-0 border-none h-full placeholder:text-slate-400 dark:placeholder:text-slate-500 px-3 text-sm font-normal leading-normal" placeholder="이벤트 검색..." value=""/>
+</div>
+</label>
+</div>
+</div>
+<!-- Activity Feed -->
+<div class="flex flex-col gap-3 px-4 pb-8">
+<!-- Event Item 1: Complete -->
+<div class="flex gap-4 bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800/60 rounded-xl p-4 hover:border-slate-300 dark:hover:border-slate-700 transition-colors relative overflow-hidden group">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500"></div>
+<div class="flex items-start gap-4 w-full">
+<div class="relative">
+<div class="bg-slate-200 dark:bg-slate-800 aspect-square bg-cover rounded-full h-12 w-12 border-2 border-white dark:border-slate-900 shadow-sm flex items-center justify-center text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined text-[24px]">description</span>
+</div>
+<div class="absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white dark:border-slate-900 bg-emerald-500"></div>
+</div>
+<div class="flex flex-1 flex-col justify-center gap-1">
+<div class="flex flex-wrap items-center gap-2">
+<p class="text-slate-900 dark:text-white text-base font-semibold leading-tight">보고서 작성 완료</p>
+<span class="inline-flex items-center rounded-full bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-400 ring-1 ring-inset ring-emerald-600/20 dark:ring-emerald-500/20">완료</span>
+<span class="inline-flex items-center rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-xs font-medium text-slate-600 dark:text-slate-300 ring-1 ring-inset ring-slate-500/20">Data-Agent-Alpha</span>
+</div>
+<p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-relaxed">Data-Agent-Alpha가 Q3 재무 분석 보고서를 완성했습니다.</p>
+</div>
+<div class="flex flex-col items-end shrink-0 gap-1 text-right">
+<p class="font-mono text-slate-500 dark:text-slate-400 text-sm font-medium tracking-tight">10:32:15</p>
+<p class="text-slate-400 dark:text-slate-500 text-xs font-normal">2분 전</p>
+</div>
+</div>
+</div>
+<!-- Event Item 2: Delegation -->
+<div class="flex gap-4 bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800/60 rounded-xl p-4 hover:border-slate-300 dark:hover:border-slate-700 transition-colors relative overflow-hidden group">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-violet-500"></div>
+<div class="flex items-start gap-4 w-full">
+<div class="relative">
+<div class="bg-slate-200 dark:bg-slate-800 aspect-square bg-cover rounded-full h-12 w-12 border-2 border-white dark:border-slate-900 shadow-sm flex items-center justify-center text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined text-[24px]">forward</span>
+</div>
+<div class="absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white dark:border-slate-900 bg-violet-500"></div>
+</div>
+<div class="flex flex-1 flex-col justify-center gap-1">
+<div class="flex flex-wrap items-center gap-2">
+<p class="text-slate-900 dark:text-white text-base font-semibold leading-tight">위임 시작</p>
+<span class="inline-flex items-center rounded-full bg-violet-50 dark:bg-violet-500/10 px-2 py-0.5 text-xs font-medium text-violet-700 dark:text-violet-400 ring-1 ring-inset ring-violet-600/20 dark:ring-violet-500/20">위임됨</span>
+<span class="inline-flex items-center rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-xs font-medium text-slate-600 dark:text-slate-300 ring-1 ring-inset ring-slate-500/20">Manager-Agent</span>
+</div>
+<p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-relaxed">Manager-Agent가 Research-Agent-Beta에게 시장 조사 작업을 위임했습니다.</p>
+</div>
+<div class="flex flex-col items-end shrink-0 gap-1 text-right">
+<p class="font-mono text-slate-500 dark:text-slate-400 text-sm font-medium tracking-tight">10:28:42</p>
+<p class="text-slate-400 dark:text-slate-500 text-xs font-normal">5분 전</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>
