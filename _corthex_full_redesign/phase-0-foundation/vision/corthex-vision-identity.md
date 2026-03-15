@@ -1,762 +1,470 @@
-# CORTHEX v2 — Vision & Identity
+# CORTHEX v2 — Vision & Identity Document
 
-> This document defines who CORTHEX is, what it means, who uses it, and all design principles
-> that govern every visual decision in the full redesign.
-> **Every screen design must trace back to a principle stated here.**
-
----
-
-## 1. What is CORTHEX?
-
-### 1.1 Elevator Pitch
-
-CORTHEX is an **AI organization management platform** that lets non-developers build, manage, and operate a complete AI team — without writing a single line of code. You draw an org chart. You give each agent a Soul (personality document in plain text). CORTHEX runs the team.
-
-Where other AI tools give you a chatbot or a pipeline, CORTHEX gives you an organization. The CEO types "삼성전자 분석해줘" — and a chain of specialized AI agents (비서실장 → CIO → 시황분석전문가 → 기술분석전문가) executes, coordinates, and returns a 12-page investment report. The user didn't manage the routing. The org chart did.
-
-### 1.2 The Problem It Solves
-
-AI agents today face an organizational problem, not a technical one. The tools exist. The missing piece is structure:
-
-| Problem | Current state | CORTHEX's answer |
-|---------|--------------|-----------------|
-| **Who does what?** | User must prompt-engineer routing manually | Org chart + Soul defines routing automatically |
-| **How do I control 10+ agents?** | Config files, Python code, YAML | Visual canvas (NEXUS) — drag, connect, save |
-| **What is the AI actually doing?** | Black box spinner | Tracker panel: live delegation chain, agent name, elapsed time |
-| **How do I change agent behavior?** | Code edit → deploy | Edit Soul markdown in browser → instant effect |
-| **How do I keep costs under control?** | Manual token counting | Tier budget limits + dashboard cost bars |
-
-AI needs organizational structure. CORTHEX provides it — without requiring engineering knowledge.
-
-### 1.3 Why It Exists
-
-CORTHEX was created from a specific observation: **a solo founder with a well-designed CORTHEX organization can compete with a team of 10 specialists.** The constraint isn't AI capability — it's organizational design. CORTHEX closes that gap by making AI org design as accessible as drawing a chart.
-
-The core thesis: **AI agents need a company to work in. CORTHEX is that company.**
+_Design philosophy, brand direction, and aesthetic principles for the UXUI redesign._
+_Grounded in real product surfaces. Zero placeholders._
 
 ---
 
-## 2. Core Vision
+## 1. Product Vision
 
-### 2.1 The Vision Statement
+### What CORTHEX Is
 
-> **"조직도를 그리면 AI 팀이 움직인다."**
-> Draw the org chart — and the AI team moves.
+CORTHEX is a **B2B AI organizational management platform**. Companies build internal AI agent organizations — departments, hierarchies, tiers — and interact with them through a unified command interface. It is not a chatbot. It is not an AI assistant. It is an **organizational operating system** where every AI agent has a role, a rank, and a purpose.
 
-This is not a metaphor. It is a literal product description. The NEXUS canvas is a visual org chart editor where the nodes are real AI agents with real behaviors. When you connect 비서실장 to CTO to 백엔드전문가 on the canvas and save, that routing is live. The org chart IS the program.
+The platform has three surfaces:
 
-### 2.2 Dynamic Org Management as the Fundamental Differentiator
+| Surface | Audience | Primary Job |
+|---------|----------|-------------|
+| **User App** (`/`) | Employees using the AI org daily | Command agents, monitor activity, review reports |
+| **Admin Panel** (`/admin`) | Company admins building the AI org | Create agents, set tiers, manage credentials, configure MCP tools |
+| **Landing Page** | Prospective customers | Understand CORTHEX's value, sign up |
 
-v1 CORTHEX had 29 fixed agents in a fixed hierarchy. v2 breaks this completely:
+### The Core Problem Solved
 
-- **Admin can create unlimited departments** (not just the 2 v1 headquarters)
-- **Admin can create any number of AI agents** with any name, Soul, tier, and parent agent
-- **Admin can edit Soul in the browser** and changes take effect without server restart
-- **Admin can delete, restructure, and reassign** — the org chart is never static
+Most organizations experimenting with AI have a fragmentation problem: one team uses Claude, another uses GPT, a third has a custom bot — with no organizational coherence. CORTHEX solves this by giving AI agents:
 
-This is not a configuration improvement. It is the core product thesis:
-**A v1-style fixed agent team is a product. A v2 dynamic AI organization is a platform.**
+1. **Ranks (Tiers)** — Manager (tier 1) delegates to Specialists (tier 2) who delegate to Workers (tier 3)
+2. **Departments** — Agents grouped by function (Marketing, Engineering, Finance)
+3. **Memory (Soul)** — Each agent has a persistent system prompt + knowledge base
+4. **Tools** — Real-world integrations (web search, MCP, API calls)
 
-Every company using CORTHEX will have a different org chart. That difference IS the value.
+The user doesn't prompt an AI. They command their organization.
 
-### 2.3 The NEXUS Metaphor — Visual Org Chart as Living Nervous System
+### Who It's For
 
-**NEXUS** (Latin: "connection/link") is the visual org chart editor and the central metaphor for the entire product.
+**Primary persona:** Mid-size Korean companies (50–500 employees) building AI-assisted internal operations — marketing automation, report generation, research, monitoring, scheduled intelligence gathering. The operator is typically a **C-suite executive or department head** who configures agents to run tasks autonomously on their behalf.
 
-The NEXUS canvas should feel like:
-- **Figma** — direct manipulation, instant visual feedback, no modals
-- **A company org chart** — hierarchical layout, named nodes, reporting lines
-- **A nervous system** — when you change a connection, the whole system re-routes
-
-Design implication: The NEXUS canvas node graph is the product's most iconic visual element. It should appear in marketing, in empty states (a simplified version), and in onboarding. When users think of CORTHEX, they should think of their org chart — the living one, with agents that think.
-
-The visual metaphor family for all of CORTHEX:
-- **Neural network** (connected intelligence)
-- **Command center** (ARGOS: always watching, always running)
-- **Corporate HQ** (structure, hierarchy, reporting lines)
-- **Constellation** (named agents as stars, connections as light paths)
-
-Do NOT use: robots, gears, chat bubbles, magic wands. CORTHEX is not a chatbot or a toy.
+**Mental model the UI must reinforce:** A command room. The user is the commander. Agents report to them. The interface should feel like a well-organized ops center, not a chat app.
 
 ---
 
-## 3. Who Uses CORTHEX?
+## 2. Brand Identity
 
-### 3.1 Primary Persona: 비개발자 조직 관리자 (Non-Developer Org Manager)
+### Brand Archetype: The Sovereign Sage
 
-**Name**: 김대표 (CEO, solo founder or small company owner)
-**Role**: CEO or founder who makes final decisions, does not write code
-**Context**: Running a small company with no engineering budget, or an investor managing their own research
+CORTHEX occupies the intersection of two Jungian archetypes:
 
-**What they need**:
-- To issue commands in natural Korean — no prompt engineering
-- To see exactly which agent is doing what, in real time
-- To trust that the AI is not hallucinating or going off-script
-- To edit agent behavior without calling a developer
+**The Ruler/Sovereign** — Commands flow downward through tiers. Order, authority, organizational power. The Ruler brand communicates: "This platform lets you control something powerful." Premium, structured, commanding.
 
-**What they fear**:
-- "The AI did something I didn't intend"
-- "I don't know why it responded this way"
-- "Costs are out of control"
-- "It feels like a toy, not a business tool"
+**The Sage** — Intelligence, knowledge, discernment. The Sage brand communicates: "This platform makes you smarter." Analytical, precise, trustworthy.
 
-**Design implication**: The Hub is their home. The Tracker is their trust instrument. Every agent action must be named, visible, and attributable. Errors must say which agent failed and what it attempted, not "오류가 발생했습니다."
+The combination produces a brand that is: **authoritative but not arrogant, intelligent but not cold, premium but not inaccessible**.
 
-### 3.2 Secondary Persona: 기술 관리자 (Technical Admin)
+### Brand Personality
 
-**Name**: 이팀장 (Company Admin — `admin_role: 'admin'` user in `admin_users` table. Uses the Admin console at `/admin`, NOT the workspace app.)
-**Role**: Sets up and maintains the organization's AI infrastructure
-**Context**: Managing CORTHEX on behalf of an entire company — creating departments, assigning agents, controlling budgets, reviewing audit logs
+| Attribute | Expression | Anti-Pattern |
+|-----------|-----------|--------------|
+| **Authoritative** | Clear hierarchy, decisive CTA placement, no visual hesitation | Overuse of disclaimers, hedging copy |
+| **Precise** | Exact numbers ("3개 에이전트", "₩12,450"), no rounded vague data | "약" (approximately), empty states with no data |
+| **Dark-Intelligent** | Deep slate/navy base, luminous accent colors — like a war room at 2am | Pastels, playful gradients, consumer-app softness |
+| **Structured** | Every element has a grid home. No floating orphan components | Freeform layouts, inconsistent spacing |
+| **Efficient** | One click to act. Dense but scannable information | Blank space padding, decorative-only elements |
 
-**What they need**:
-- Full CRUD control over departments, agents, human employees
-- NEXUS canvas to visualize and validate the org design
-- Audit logs to track who changed what
-- Tier budget configuration per department
-- ARGOS schedule management
+### Brand Voice (UI Copy)
 
-**What they fear**:
-- "An employee misconfigured an agent and we don't know what it changed"
-- "We're spending too much on the wrong agents"
-- "The org chart is out of date and I can't tell"
+| Context | Tone | Example |
+|---------|------|---------|
+| Empty states | Directive, not apologetic | "에이전트를 생성하여 첫 팀을 구성하세요" (not "아직 에이전트가 없어요") |
+| Error messages | Clinical, precise | "인증 실패: 토큰이 만료되었습니다 (AUTH_TOKEN_EXPIRED)" |
+| Loading states | Implied status | "에이전트 응답 생성 중..." — not "잠시만 기다려 주세요" |
+| Success feedback | Minimal, factual | "저장되었습니다" — not "완료! 🎉" |
+| CTAs | Imperative | "허브 열기", "에이전트 배정", "보고서 생성" |
 
-**Design implication**: The Admin panel is their workspace. It should feel like enterprise software — dense, functional, full audit trail visibility. Company dropdown at top. Every action should be reversible or logged.
-
-### 3.3 What They Both Care About: Control, Visibility, Trust
-
-| Dimension | Manifestation in UI |
-|-----------|-------------------|
-| **Control** | Tier budget bars, agent on/off toggles, ARGOS enable/disable, Soul override |
-| **Visibility** | Tracker panel (live chain), audit logs, cost analytics, ARGOS run history |
-| **Trust** | Named agents (never "AI"), error attribution, Soul preview before save, NEXUS visual confirmation |
+Korean-first. All UI copy defaults to 존댓말 for informational text; button labels use imperative (명령형) without formal suffixes.
 
 ---
 
-## 4. Emotional Design Direction
+## 3. Design Philosophy
 
-### 4.1 What Users Should Feel
+### Master Reference: Dieter Rams' Ten Principles — Applied to CORTHEX
 
-**In control** — CORTHEX manages complexity so the user doesn't have to, but they can always see inside. The 3-column Hub layout (SessionPanel + ChatArea + TrackerPanel) is specifically designed for situational awareness: the user sees history, the current exchange, AND the live chain simultaneously.
+Rams' "Ten Principles of Good Design" (Braun, 1970s) are directly applicable to enterprise SaaS:
 
-**Professional** — CORTHEX manages real business operations. Budget decisions, investment analysis, content publishing. The visual language must feel enterprise-grade: dark sidebars, precise data labels, monospace cost figures. Not a consumer app.
+| Rams' Principle | CORTHEX Application |
+|-----------------|---------------------|
+| **Good design is innovative** | Dark-mode-first at launch (2023-era expectation, not novelty) |
+| **Good design makes a product useful** | Every page earns its place in the 30-route app. No decorative pages. |
+| **Good design is aesthetic** | Consistent 8px grid, typographic rhythm, intentional color use |
+| **Good design makes a product understandable** | Tier badges (색상 코딩), status dots (언제나 동일), department grouping |
+| **Good design is unobtrusive** | Chrome fades away during Hub conversations. UI serves the work. |
+| **Good design is honest** | Agent status is real-time accurate. Never show "online" for an offline agent. |
+| **Good design is long-lasting** | Swiss Grid-derived layout. Not tied to any 2025 trend cycle. |
+| **Good design is thorough** | Every error state designed. Every loading state present. No "undefined" in UI. |
+| **Good design is environmentally friendly** | (Server-rendered where possible, SSE over polling, 3-layer cache) |
+| **Good design is as little design as possible** | No decorative borders. No shadows-for-shadows-sake. Each visual element serves hierarchy. |
 
-**Intelligent** — The tool itself should feel smart. Agent names in responses, cost badges on completion, AGORA consensus/dissent analysis. The product understands its own complexity and surfaces it as useful data.
+### Movement Reference: Swiss International Style (Grid + Type)
 
-**Trusted** — Transparent AI decisions. Every handoff is named. Every cost is shown. Every error is attributed. No black boxes.
+The **Swiss International Style** (1950s–60s, Müller-Brockmann, Vignelli) defined modern information design: mathematical grids, flush-left typography, no decoration for decoration's sake. This is the closest historical movement to enterprise dashboard design.
 
-### 4.2 Emotional Moments Hierarchy
+**Applied to CORTHEX:**
+- **12-column grid** at desktop, 4-column at mobile, 8-column at tablet
+- **Flush-left alignment** for all data tables, agent lists, activity logs
+- **Type as primary visual element** — well-set Korean + Latin typography carries the visual weight without iconographic clutter
+- **White/dark space is earned, not assumed** — every bit of padding has a structural reason
 
-These 6 moments are the product's emotional backbone. Design investment must protect and amplify them.
+### Movement Reference: Dark Tech UI (2020s)
 
-| Rank | Moment | Screen | Design requirement |
-|------|--------|--------|-------------------|
-| 🥇 #1 | Tracker cascade — watching delegation chain unfold | Hub / TrackerPanel | 300ms stagger animation per step. Agent name + elapsed time. Cost badge pulses on `done` event. |
-| 🥈 #2 | "명령 접수됨" instant acknowledgment | Hub / ChatArea | SSE `accepted` event triggers UI in ≤50ms. Zero perceived latency between submit and first response. |
-| 🥉 #3 | NEXUS save — org change reflected immediately | Admin / NEXUS | Optimistic update: canvas reflects change before server confirms. Zero loading spinner. "즉시 적용됨" not "저장됨". |
-| 4 | AGORA consensus badge | AGORA | After all speeches render: consensus/dissent/partial badge animates in. The decision moment. |
-| 5 | Report delivered — markdown formatted | Hub / ChatArea | Final response renders with section headers, tables, code blocks. Professional output that feels earned. |
-| 6 | Budget bar crosses threshold | Dashboard | Bar color transition (green→amber at 70%, amber→red at 90%). Animated. Feels like a real instrument panel. |
+The contemporary "dark tech" aesthetic — popularized by Vercel, Linear, Raycast, Resend — defines CORTHEX's atmospheric direction:
 
-### 4.3 What CORTHEX is NOT — Design Anti-Patterns to Avoid
+- Deep `zinc-950` / `slate-900` backgrounds (not pure black)
+- Subtle `slate-800` borders and card surfaces
+- Luminous accent colors against the dark field (indigo, emerald, amber)
+- Monospace font pairings for data/IDs/code
+- Restrained motion — micro-animations only (status pulse, skeleton shimmer)
 
-| What CORTHEX is NOT | Anti-pattern to avoid | Correct pattern |
-|--------------------|----------------------|----------------|
-| **Not a chatbot interface** | Full-screen input box, no context panels | 3-column layout — session history + chat + tracker always visible |
-| **Not playful or casual** | Rounded corners everywhere, pastel colors, emoji in content | Sharp edges on data components, emoji only in nav (established pattern), dark sidebars |
-| **Not cluttered** | Showing all 29 nav items flat, no grouping | Grouped nav (업무 6 / 운영 16 / 시스템 2) with Hub as default |
-| **Not a black box** | Generic spinner + "처리 중..." | Tracker with named agent + step number + elapsed time |
-| **Not overwhelming** | Showing everything at once | Progressive disclosure: Hub → Tracker expands on first handoff |
+This movement is appropriate because CORTHEX's users are power users operating in professional contexts. The dark aesthetic signals seriousness and reduces eye strain during extended sessions.
 
-> **Note on nav emoji**: The sidebar uses emoji icons (🏠 🔗 🎖️ etc.) — this is **intentional and contained**. Emoji function as compact visual landmarks in a dense 27-item nav list, not decoration. Do NOT extend emoji use outside the sidebar. For all component icons, use Lucide React (Section 13).
+### Movement Reference: Glassmorphism (Selective Use)
 
----
+**Not wholesale** — glassmorphism is used only where depth-of-layer needs visual expression:
+- Modal overlays: `backdrop-blur-xl bg-slate-900/80`
+- Command palette (Hub input area): frosted inset against the chat background
+- Tooltip/popover surfaces: translucent bleed from background
 
-## 5. Brand Personality
-
-### 5.1 Core Identity: Military Precision × AI Intelligence
-
-CORTHEX lives at the intersection of two worlds:
-
-| Military Precision | AI Intelligence |
-|------------------|----------------|
-| Command structures (tiers, departments) | Soul-based autonomy (natural language personality) |
-| Clear reporting lines (NEXUS org chart) | Emergent behavior from Soul documents |
-| Always-on surveillance (ARGOS: 100 eyes) | Creates — doesn't just execute |
-| Cost accountability (budget limits per tier) | Multi-agent deliberation (AGORA) |
-| "작전현황" (Operations Status) | "그룹 토론" (AI boardroom) |
-
-**The tension is the identity.** CORTHEX is disciplined enough to enforce org charts and tier hierarchies, but intelligent enough that the org chart actually *thinks* and makes decisions.
-
-### 5.2 Voice: Confident, Precise, Trustworthy
-
-| Voice dimension | Guideline | Example |
-|----------------|-----------|---------|
-| **Authority** | Command center, not consumer app | "명령 접수됨" not "Your request is being processed!" |
-| **Precision** | Numbers, names, facts — never vague | "비서실장 → CTO → 백엔드전문가 (D2, $0.0042)" not "AI is working" |
-| **Economy** | Minimum words, maximum information | "비용 $0.0042 · 1,240 토큰" not "Great work! Your AI used some tokens today." |
-| **Transparency** | Name the agent, show the chain, never hide errors | "CTO 응답 없음 → 비서실장 직접 처리 중" not "An error occurred" |
-| **Respect** | User is CEO. Treat them as commander. | Status updates like mission briefings, not loading spinners |
-
-### 5.3 Name Meaning and Brand Codenames
-
-**CORTHEX** = **COR** (Latin: heart/core) + **CORTEX** (brain's outer layer — higher-order thinking)
-The name encodes the product: a thinking core. The cerebral cortex of your business — the intelligence layer that routes commands, delegates work, and synthesizes results.
-
-| Codename | Meaning | Feature | Design use |
-|---------|---------|---------|-----------|
-| **NEXUS** | Latin: "connection/link" | Visual org chart editor | The constellation metaphor: nodes as agents, edges as authority |
-| **AGORA** | Ancient Greek public square | Multi-agent debate engine | Speech cards in sequence, consensus badge, deliberation UI |
-| **ARGOS** | Greek giant with 100 eyes — never sleeps | Cron scheduler | Status dot always visible, "last run: X min ago" |
-| **Soul** | Personality + orchestration rules | Agent system prompt editor | Full-screen markdown editor, live preview |
-| **Tracker** | Live delegation chain viewer | Real-time handoff visualization | The product's emotional centerpiece in Hub |
-| **Hub** (허브) | Central connection point | Main command interface | The product's home screen — 3-column |
-| **Library** (라이브러리) | Searchable knowledge repository | RAG knowledge base | Document grid + semantic search |
-| **Tier** (티어) | Rank/level — cost and authority | Dynamic agent hierarchy | Badge: T1 Manager / T2 Specialist / T3 Worker |
-
-### 5.4 Color Emotion Targets
-
-The color system must evoke **authority**, **precision**, and **trust** — not friendliness or excitement.
-
-- **Indigo (#4F46E5)** — Intelligence, active work, selection. The "thinking" color.
-- **Zinc (dark grays)** — Structure, professional restraint, the foundation.
-- **Green (#22C55E)** — Certainty, success, system health. Earned, not default.
-- **Amber (#F59E0B)** — Attention required. Not danger — advisory.
-- **Red (#EF4444)** — Failure, exceeded limit, critical error. Rare but unmistakable.
-
-### 5.5 Typography Personality: Authoritative but Approachable
-
-- **Work Sans** (primary) — Currently loaded in `packages/app/index.html` via Google Fonts. Professional appearance, excellent legibility at small sizes.
-- **System mono** — `font-mono` Tailwind class. For costs, IDs, Soul editor. Signals: "this is data, not marketing."
-- Rule: **Typography hierarchy through weight and size, not color.** Color is reserved for status signals.
+Glassmorphism is avoided for primary content surfaces (cards, tables, sidebars) — only for secondary layers that float above the primary surface.
 
 ---
 
-## 6. Feature Hierarchy
+## 4. Visual System Direction
 
-### 6.1 Priority Framework
+### Color Philosophy
 
-Features are not equal. Design polish must match product value.
+CORTHEX uses a **dark neutral base + semantic accent system**. Colors communicate function, not decoration.
 
-#### P0 — Always Visible (Zero-click access, highest design polish)
+#### Base Palette (Dark Theme — Primary)
 
-These features are visible on every session. If they feel wrong, the whole product feels wrong.
+| Role | Token Name | Hex (approx.) | Usage |
+|------|-----------|---------------|-------|
+| Page background | `bg-zinc-950` | #09090b | Full-page base |
+| Surface (cards, panels) | `bg-slate-900` | #0f172a | Content containers |
+| Surface elevated | `bg-slate-800` | #1e293b | Cards within panels, table rows hover |
+| Border | `border-slate-700` | #334155 | Dividers, input borders |
+| Text primary | `text-slate-100` | #f1f5f9 | Headings, primary labels |
+| Text secondary | `text-slate-400` | #94a3b8 | Subtitles, metadata, timestamps |
+| Text muted | `text-slate-500` | #64748b | Disabled states, placeholder text (4.82:1 on zinc-950 — WCAG AA pass) |
 
-| Feature | Location | Why P0 |
-|---------|---------|--------|
-| Hub — ChatArea (input + messages) | `/hub` center column | Every use starts here |
-| Hub — TrackerPanel (handoff chain) | `/hub` right column | CORTHEX's most unique real-time UI |
-| Hub — SessionPanel (session list) | `/hub` left column | Context switching between work sessions |
-| App Sidebar Navigation | All app pages | Primary wayfinding |
-| Agent status indicators | Hub / SessionPanel header | Real-time health of the AI team |
+#### Accent Palette (Semantic)
 
-#### P1 — One Click Away (High design polish, frequently used)
+| Role | Token | Tailwind Class | Usage |
+|------|-------|----------------|-------|
+| Primary CTA | Indigo | `bg-indigo-600` | Primary buttons, active nav items, links |
+| Primary CTA hover | Indigo | `bg-indigo-700` | Button hover state |
+| Secretary highlight | Amber | `bg-amber-500/15 text-amber-400` | COS badge, secretary agent identifier |
+| Status: Online | Emerald | `bg-emerald-400 animate-pulse` | Agent online dot |
+| Status: Working | Blue | `bg-blue-400 animate-pulse` | Agent actively processing |
+| Status: Error | Red | `bg-red-400` | Agent error state |
+| Status: Offline | Slate | `bg-slate-500` | Agent offline dot |
+| Tier 1 (Manager) | Violet | `text-violet-400` | Tier badge for manager-level agents |
+| Tier 2 (Specialist) | Sky | `text-sky-400` | Tier badge for specialist-level agents |
+| Tier 3 (Worker) | Slate | `text-slate-400` | Tier badge for worker-level agents |
 
-| Feature | Location | Why P1 |
-|---------|---------|--------|
-| NEXUS Canvas | Admin `/nexus` | Core value proposition for admins |
-| **SketchVibe AI Canvas** | App `/nexus` (SketchVibe panel within NEXUS page) | Demo moment: "type 'add backend team under CTO' → watch nodes appear on canvas." MCP-powered live canvas editing. |
-| AGORA debate room | `/agora` | "AI boardroom" — premium differentiator |
-| Dashboard / Operations | `/dashboard` | Daily check-in for cost/performance |
-| Knowledge Library | `/knowledge` | Powers agent intelligence |
-| Agent Soul editor | Admin `/agents/:id` | Code-free programming interface |
-| ARGOS scheduler | `/argos` | "AI works while you sleep" |
+#### Classification Palette (Archive/Security)
 
-#### P2 — Settings / Admin (Functional, clean, no decoration)
+| Level | Color | Classes |
+|-------|-------|---------|
+| public | Emerald | `bg-emerald-500/10 text-emerald-400` |
+| internal | Blue | `bg-blue-500/10 text-blue-400` |
+| confidential | Amber | `bg-amber-500/10 text-amber-400` |
+| secret | Red | `bg-red-500/10 text-red-400` |
 
-| Feature | Location | Why P2 |
-|---------|---------|--------|
-| Department management | Admin `/departments` | Setup-time task, not daily |
-| Agent CRUD | Admin `/agents` | Initial configuration |
-| Human employee management | Admin `/employees` | HR-adjacent, not AI-core |
-| Tier configuration | Admin `/tiers` | Configuration task |
-| Budget limits | Admin settings | Policy setup |
-| Audit logs | Admin `/audit-logs` | Compliance, occasional review |
-| Notification preferences | App settings | Utility |
+#### Light Theme (Secondary, for Landing Page + Login)
 
-#### P3 — Power User / Advanced (Functional, minimal investment)
+The login page currently uses `bg-white dark:bg-zinc-950` — a clean white light theme. The landing page will use a light variant.
 
-| Feature | Location | Why P3 |
-|---------|---------|--------|
-| Trading / Strategy Room | `/trading` | High-value but niche use case |
-| SNS Management | `/sns` | Content pipeline, standard patterns |
-| Files | `/files` | File manager, commodity UX |
-| Activity / Operations Log | `/ops-log` | Dense data tables, filter UX only |
-| Cost Analytics deep-dive | `/cost-analytics` | Power user reporting |
-| Soul Gym (performance) | `/performance` | Advanced agent tuning |
+| Role | Class | Usage |
+|------|-------|-------|
+| Page background | `bg-white` / `bg-slate-50` | Landing, login |
+| Surface | `bg-white shadow-sm` | Cards on landing |
+| Text | `text-slate-900` | Primary headings |
+| Text secondary | `text-slate-500` | Body copy |
 
-### 6.2 Screen Design Priority Order
+### Typography System
 
-When design time is limited, sequence work in this order:
+#### Font Stack Recommendation
 
-1. **Hub** — 3-column layout: TrackerPanel + ChatArea + SessionPanel
-2. **NEXUS Canvas** (Admin) — React Flow org editor
-3. **AGORA** — debate timeline + speech cards + consensus badge
-4. **Dashboard** — operations stats + cost bars + agent status
-5. **Knowledge Library** — document grid + semantic search
-6. **Admin Agent CRUD** — CRUD table + Soul preview panel
-7. **Trading / Strategy Room**
-8. **All other pages**
+| Role | Font | Fallback | Rationale |
+|------|------|----------|-----------|
+| **Display / Brand** | Geist (Vercel) | Inter | Modern, geometric, excellent at all weights. Matches the dark-tech aesthetic. |
+| **Body / UI** | Pretendard | Geist, Inter | Gold standard for Korean+Latin mixed typography. Consistent vertical metrics. |
+| **Code / IDs / Monospace** | JetBrains Mono | 'Fira Code', monospace | Used for `sessionId`, `agentId`, error codes, cost values, tool call parameters |
 
----
+#### Scale (8px base unit)
 
-## 7. Competitive Positioning
+| Level | Size | Weight | Line Height | Usage |
+|-------|------|--------|-------------|-------|
+| Display | 32px / 2rem | 700 | 1.2 | Page titles (Dashboard, Hub) |
+| Heading 1 | 24px / 1.5rem | 600 | 1.3 | Section headers |
+| Heading 2 | 18px / 1.125rem | 600 | 1.4 | Card titles, panel headers |
+| Heading 3 | 15px / 0.9375rem | 500 | 1.4 | Sub-section labels |
+| Body | 14px / 0.875rem | 400 | 1.6 | Primary body text |
+| Small | 12px / 0.75rem | 400 | 1.5 | Metadata, timestamps, badges |
+| Mono | 13px / 0.8125rem | 400 | 1.5 | IDs, session tokens, costs |
 
-### 7.1 vs. Slack (Communication Platform)
+### Spacing & Grid
 
-| Dimension | Slack | CORTHEX |
-|-----------|-------|---------|
-| Core metaphor | Chat channels | Org chart with AI agents |
-| Work output | Messages and notifications | Analysis reports, executed tasks, automated schedules |
-| Agents | Bots (limited, command-based) | AI agents with Souls, tiers, autonomous decision-making |
-| Who works | Humans | AI agents + Human employees in the same org |
-| What they share | Information | Task results and structured work products |
+**Base unit: 4px (Tailwind 1 = 4px)**
 
-**Key difference**: CORTHEX is not a communication tool. It's an execution tool. Agents don't chat — they work, delegate, and report.
+All layout spacing uses multiples of 4px. Primary layout spacings:
 
-### 7.2 vs. Linear / Jira (Project Management)
+| Context | Value | Tailwind |
+|---------|-------|---------|
+| Page padding (desktop) | 24px | `p-6` |
+| Page padding (mobile) | 16px | `p-4` |
+| Card inner padding | 20px | `p-5` |
+| Gap between cards | 16px | `gap-4` |
+| Form field vertical gap | 16px | `space-y-4` |
+| Section vertical gap | 32px | `space-y-8` |
+| Nav item height | 40px | `h-10` |
+| Table row height | 48px | `h-12` |
 
-| Dimension | Linear/Jira | CORTHEX |
-|-----------|------------|---------|
-| Core metaphor | Issues/tasks in a backlog | Live AI agents executing work right now |
-| Who assigns work | Human managers | The CEO by typing a command (agent routes it) |
-| Work execution | Humans pick up tasks | AI agents execute autonomously |
-| Status tracking | Issue status (todo/in-progress/done) | Real-time delegation chain (Tracker panel) |
-| Automation | Simple rule-based | Full AI reasoning + tool use |
+### Iconography
 
-**Key difference**: CORTHEX is not a project manager. There are no tickets to create. The CEO types a request; the AI team handles routing, execution, and reporting automatically.
+**Library: Lucide React** (already in use via `@corthex/ui` patterns — consistent with Tailwind ecosystem)
 
-### 7.3 vs. Custom AI Dashboards (CrewAI / LangGraph / AutoGen)
+Icon sizing:
+- Nav icons: 20px (`size-5`)
+- Inline/button icons: 16px (`size-4`)
+- Empty state icons: 48px (`size-12`)
+- Status dots: 8px custom `div` (not icons)
 
-| Dimension | Custom AI Dashboards | CORTHEX |
-|-----------|---------------------|---------|
-| Target user | Developers (Python required) | Non-developers (no code) |
-| Org configuration | Code / YAML / config files | Visual canvas (NEXUS) + plain text Soul |
-| Agent personality | Prompt strings in code | Soul markdown edited in browser |
-| Deployment | Engineers push code | Admin saves in browser |
-| Cost visibility | Manual logging | Built-in tier budgets + dashboard |
-
-**Key difference**: CORTHEX is not a developer tool. A CEO can restructure the AI organization in 5 minutes without calling an engineer.
-
-### 7.4 What Makes CORTHEX's UI Unique
-
-Three UI elements that no competitor has in this combination:
-
-1. **NEXUS canvas** — A live org chart where nodes ARE the routing logic. Not a visualization of code — it IS the code.
-2. **Tracker panel** — Real-time named delegation chain visible while chat is active. The user watches their AI team work.
-3. **Soul editor** — Plain text markdown editing of agent personality/behavior, with instant effect. The "code editor" for non-developers.
-
-The Hub's 3-column layout is the visual signature of CORTHEX: the product that shows you your team while you command it.
+Icon color: `text-slate-400` default, `text-slate-100` on active, `text-indigo-400` on primary action.
 
 ---
 
-## 8. Design Principles
+## 5. UX Principles
 
-These 8 principles govern every design decision in the redesign. If a visual choice cannot be justified by one of these principles, it should be removed.
+### Principle 1: Hierarchy is Sacred
 
-### Principle 1: Name the Machine
-**Every AI action must be attributed to a named agent, never to "AI" generically.**
+CORTHEX's product metaphor is a military/corporate hierarchy. The visual design must reinforce this:
 
-- ❌ "AI가 처리 중입니다..."
-- ✅ "비서실장이 분석 중... (34s)"
-- Rationale: The value proposition IS the team. Anonymizing agents destroys the org chart metaphor and kills trust.
+- **Tier 1 (Manager)** agents receive visual primacy: larger cards, violet accent, "COS" badge for the Secretary
+- **Handoff chain** must be visually traceable in activity logs: indented delegation tree, connector lines
+- **Org chart (NEXUS)** is the single canonical representation of the hierarchy — all other views derive from it
 
-### Principle 2: Depth is Data
-**Never hide complexity — surface it as structured information.**
+**Rule:** Never show agents as a flat list without tier context visible.
 
-- Tracker panel exists because watching 비서실장 → CIO → 전문가 cascade IS the product, not a loading state to hide.
-- Cost ($0.0042) and tokens (1,240) are always shown on completion — not buried in settings.
-- Tier badges (T1/T2/T3) visible in all agent-related contexts.
-- Rationale: CORTHEX users are business decision-makers who demand accountability.
+### Principle 2: The Hub is the Center of Gravity
 
-### Principle 3: Zero-Delay Feedback
-**The user must perceive zero latency between action and system acknowledgment.**
+`/hub` is where users spend 80% of their time. Its UX must be:
 
-- Hub submit → "명령 접수됨" badge in ≤50ms (SSE `accepted` event)
-- NEXUS save → canvas updates optimistically before server confirms
-- Soul save → agent status dot changes to "working" immediately
-- Rationale: Agent execution takes 5–60 seconds. The bridge between human action and machine response must feel instant.
+- **Full-screen capable** — no sidebar chrome during conversation
+- **Instantly responsive** — SSE streaming begins within 500ms of send
+- **Token-transparent** — running cost + token count visible in the `done` event
+- **Error-recoverable** — stream error event shows human-readable message + retry option (POST-based fetch, manual reconnect)
 
-### Principle 4: The Commander's View
-**Design for situational awareness, not simplicity.**
+The Hub input is not a chatbox. It is a **command terminal**. The visual metaphor should be closer to a military radio than a consumer messaging app.
 
-- Hub's 3-column layout (SessionPanel + ChatArea + TrackerPanel) is intentional. The user needs session history AND live tracking AND the current conversation in simultaneous view.
-- Dashboard is a mission control panel, not a marketing landing page. Dense is correct.
-- Admin sidebar is flat (no groups) — admins scan all options fast.
-- Rationale: CORTHEX users are decision-makers who need all relevant information in peripheral vision.
+### Principle 3: Data Before Decoration
 
-### Principle 5: Show the Org, Not the AI
-**Users should see their organization structure, not raw AI interfaces.**
+Every pixel either communicates data or enables action. The visual hierarchy on any page is:
 
-- Hub shows: agent names, tier badges, department context — not model names or token usage (until completion).
-- NEXUS shows: org hierarchy, connection lines, named nodes — not JSON config or system prompts.
-- Errors show: which agent, what it attempted, suggested recovery — not stack traces.
-- Soul editor must support line numbers and syntax highlighting — requires **CodeMirror 6** (not a plain `<textarea>`). Specify this library before implementation.
-- Rationale: CORTHEX's interface is an org management tool. The AI infrastructure is the engine, not the product.
+1. **Status** (is something wrong right now? Error states first.)
+2. **Primary data** (what is on this page?)
+3. **Actions** (what can the user do?)
+4. **Metadata** (timestamps, IDs, counts)
+5. **Navigation** (where can the user go?)
 
-### Principle 6: Hierarchy Through Typography, Not Color
-**Use font weight and size to establish visual hierarchy. Reserve color exclusively for status signals.**
+No page should have decorative illustrations, empty hero sections, or padding that exceeds 24px on primary content areas without structural justification.
 
-Status colors (semantic use ONLY):
-- `text-green-500` (#22C55E) — online, success, within budget
-- `text-indigo-600` (#4F46E5) — active, working, selected
-- `text-amber-500` (#F59E0B) — warning, at 70% threshold
-- `text-red-500` (#EF4444) — error, failed, over budget
-- `text-zinc-400` (#A1A1AA) — disabled, offline, secondary
+### Principle 4: Real-Time Must Feel Real
 
-Do NOT use color for section differentiation, feature distinction, or decorative purposes.
+7 WebSocket channels + SSE streaming are core to CORTHEX's value proposition. The UI must make this visible:
 
-### Principle 7: Dark Mode is First-Class
-**CORTHEX is built for extended professional use. Dark mode is the reference design.**
+- **Activity Log** (`/activity-log`): WebSocket `useActivityWs` hook appends rows in real-time. New rows must animate in (slide-down, 150ms) — not just appear.
+- **Agent status dots**: Poll or WS — always accurate. An `animate-pulse` green dot for a working agent communicates life.
+- **Hub stream**: Token-by-token text rendering (not wait-for-complete). Cursor blink while streaming.
+- **ARGOS jobs**: Live progress. `running` jobs show spinner; `done` shows checkmark with timestamp.
 
-- Dark sidebar (`bg-zinc-900`) is already implemented — maintain this.
-- Main content: `bg-zinc-950` (dark) / `bg-white` (light).
-- All color combinations must pass WCAG AA contrast in both modes.
-- Rationale: Command centers, trading terminals, developer tools — all use dark mode as their professional signal.
+### Principle 5: Density Without Clutter
 
-### Principle 8: Desktop-First, Information-Dense
-**Min-width 1280px. No mobile layouts. Optimize for information density, not whitespace.**
+Enterprise users have large monitors and process large amounts of information. CORTHEX must support **high information density** without feeling cluttered:
 
-- Sidebars fixed (`w-60`). Content fills remaining viewport.
-- Tables show ≥6 columns without horizontal scroll.
-- Padding: `p-4` and `gap-4` as standard. Never `p-12` or `gap-8` except for top-level page margins.
-- Rationale: Explicitly documented constraint. CORTHEX app and admin are desktop-only (Technical Spec Section 8.6).
+- **Tables over cards** for list views with more than 4 data fields (Admin: Users, Departments, Agents, Costs)
+- **Cards over tables** for entity previews with status and actions (App: Home agent grid, Dashboard)
+- **Collapsible panels** for secondary information (Agent detail drawer, Delegation chain viewer)
+- **Sticky headers** on long tables — user must always see column labels
+- **Progressive disclosure** — show 5 items, "더 보기" (Show more) expands
+
+### Principle 6: Mobile is Secondary, Not Absent
+
+The user app targets desktop-primary users (command & control context). But:
+- Login page: must be mobile-functional (logging in from a phone is realistic)
+- Hub page: must be usable on tablet (iPad-class devices)
+- Admin panel: tablet-accessible for monitoring; keyboard interactions remain fully functional
+
+Responsive breakpoints:
+- Mobile: < 640px (sm)
+- Tablet: 640–1024px (sm–lg)
+- Desktop: 1024–1440px (lg–xl)
+- Wide: > 1440px (2xl)
+
+The app sidebar collapses to a bottom nav sheet on mobile. Admin sidebar hides behind a hamburger menu.
 
 ---
 
-## 9. Color System
+## 6. Surface-Specific Direction
 
-### 9.1 Base Palette (Tailwind CSS 4)
+### 6-A. User App (`packages/app/`)
 
-| Role | Light mode | Dark mode | Hex (Light / Dark) |
-|------|-----------|-----------|-------------------|
-| Page background | `bg-white` | `bg-zinc-950` | #FFFFFF / #09090B |
-| App sidebar background | `bg-zinc-50` | `bg-zinc-900` | #FAFAFA / #18181B |
-| **Admin sidebar background** | **`bg-white`** | **`bg-zinc-900`** | **#FFFFFF / #18181B** |
-| Card / Panel background | `bg-white` | `bg-zinc-900` | #FFFFFF / #18181B |
-| Elevated panel | `bg-zinc-50` | `bg-zinc-800` | #FAFAFA / #27272A |
-| Border | `border-zinc-200` | `border-zinc-800` | #E4E4E7 / #27272A |
-| Primary accent | `bg-indigo-600` | `bg-indigo-600` | #4F46E5 / #4F46E5 |
-| Primary hover | `bg-indigo-700` | `bg-indigo-500` | #4338CA / #6366F1 |
-| Active nav (background) | `bg-indigo-50` | `bg-indigo-950` | #EEF2FF / #1E1B4B |
-| Active nav (text) | `text-indigo-700` | `text-indigo-300` | #3730A3 / #A5B4FC |
-| **Nav item hover** | **`bg-zinc-100`** | **`bg-zinc-800`** | **#F4F4F5 / #27272A** |
-| Disabled / inactive | `text-zinc-400` | `text-zinc-400` | #A1A1AA / #A1A1AA |
-| Skeleton loader | `bg-zinc-200` | `bg-zinc-700` | #E4E4E7 / #3F3F46 |
+**Aesthetic:** Dark command center. Deep `zinc-950` background. The user is an executive operating in low-light.
 
-**Sources**: `packages/app/src/components/sidebar.tsx` (active item, hover classes), `packages/admin/src/components/sidebar.tsx` line 89 (`bg-white`).
-
-> **Note (theme-color)**: `packages/app/index.html` line 8 sets `<meta name="theme-color" content="#6366f1">` (indigo-500). This should be updated to `#4F46E5` (indigo-600) to match the primary accent defined above.
-
-> ⚠️ App and Admin sidebars intentionally diverge in light mode (app: zinc-50, admin: white). Admin uses `border-r border-zinc-200` to compensate for the lower contrast.
-
-> ⚠️ **Slate → Zinc Migration**: The current Hub implementation (`pages/hub/secretary-hub-layout.tsx`, `handoff-tracker.tsx`, `session-sidebar.tsx`) uses the **slate palette** (`bg-slate-900`, `bg-slate-800`, `text-slate-400`). The redesign target migrates Hub to the **zinc palette** documented in this section. When redesigning Hub components, replace all `slate-*` classes with the equivalent `zinc-*` classes. The main App sidebar and admin already use zinc.
-
-### 9.2 Status Colors
-
-| Status | Tailwind class | OKLCH token | Hex | Use case |
-|--------|--------------|-------------|-----|---------|
-| Online / Success | `text-green-500` | `--color-corthex-success` (emerald-600 approx) | #22C55E | Agent online, task success, budget safe |
-| Working / Active | `text-indigo-600` | `--color-corthex-accent` | #4F46E5 | Agent executing, SSE active, selected |
-| Warning | `text-amber-500` | `--color-corthex-warning` | #F59E0B | Budget 70%+, slow response, pending |
-| Error / Failed | `text-red-500` | `--color-corthex-error` | #EF4444 | Agent error, task failed, budget exceeded |
-| Offline / Disabled | `text-zinc-400` | — | #A1A1AA | Agent offline, disabled element |
-
-> Note: `--color-corthex-success` is oklch(emerald-600) which is slightly different from Tailwind's `green-500`. Use `text-green-500` in new UI for consistency. The OKLCH token is available for CSS custom property use.
-
-### 9.3 Feature-Specific Color Rules
-
-| Feature | Color rule |
-|---------|-----------|
-| Tracker steps | Active: indigo-600, Completed: green-500, Failed: red-500 |
-| AGORA speech tier badges | Manager=`bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300` (#3730A3/#A5B4FC), Specialist=`bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300` (#6D28D9/#C4B5FD), Worker=`bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400` (#52525B/#A1A1AA) |
-| Budget progress bar | green-500 (0–70%) → amber-500 (70–90%) → red-500 (90–100%) |
-| Debate outcome badge | Consensus=green-500, Dissent=red-500, Partial=amber-500 |
-| Tier tier badge text | `text-xs font-mono bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded` |
-
-### 9.4 Design Token Mapping (OKLCH ↔ Tailwind)
-
-`packages/app/src/index.css` defines OKLCH-based tokens via Tailwind 4's `@theme`. Use tokens for CSS variable contexts; use Tailwind classes in JSX.
-
-| Semantic role | CSS token | Tailwind class | When to use token |
-|--------------|-----------|---------------|-------------------|
-| Primary accent | `var(--color-corthex-accent)` | `bg-indigo-600 / text-indigo-600` | CSS custom properties, `border-color` in CSS |
-| Accent (dark) | `var(--color-corthex-accent-dark)` | `text-indigo-400` | CSS-only dark mode overrides |
-| Success | `var(--color-corthex-success)` | `text-green-500` | CSS contexts only; prefer Tailwind in JSX |
-| Warning | `var(--color-corthex-warning)` | `text-amber-500` | CSS contexts only |
-| Error | `var(--color-corthex-error)` | `text-red-500` | CSS contexts only |
-| Slide-in animation | `var(--animate-slide-in)` | — | `animation: var(--animate-slide-in)` in CSS |
-| Slide-up animation | `var(--animate-slide-up)` | — | `animation: var(--animate-slide-up)` in CSS |
-
-**Rule**: In JSX/Tailwind, use Tailwind classes. In `*.css` files, use `corthex-*` tokens. Never create a third system.
-
-### 9.5 Dark Mode Component Layering Rules
-
-In dark mode, each nesting level needs distinct background to show boundaries. **Invisible borders are a design failure.**
-
-| Layer | Dark bg | Light bg | Rule |
-|-------|---------|---------|------|
-| Page | `bg-zinc-950` | `bg-white` | Root page container |
-| Sidebar | `bg-zinc-900` | `bg-zinc-50` (app) / `bg-white` (admin) | Always has `border-r` |
-| Card | `bg-zinc-900` | `bg-white` | Must have `border border-zinc-800` in dark mode |
-| Panel (elevated) | `bg-zinc-800` | `bg-zinc-50` | Nested inside card; no border needed (bg contrast sufficient) |
-| Sub-panel | `bg-zinc-800/50` | `bg-zinc-100` | Use opacity variant for subtle nesting |
-
-**Warning**: `border-zinc-800` = `bg-zinc-800` in dark mode — invisible. If card bg is `bg-zinc-900`, use `border-zinc-700` for visible card borders in dark mode.
-
-### 9.6 Interactive States
-
-Every interactive element needs all 4 states specified. These are the standards.
-
-#### Primary Button
-
-| State | Classes |
-|-------|---------|
-| Default | `bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium` |
-| Hover | `hover:bg-indigo-700` |
-| Active/Pressed | `active:bg-indigo-800` |
-| Disabled | `disabled:bg-zinc-200 disabled:text-zinc-400 disabled:cursor-not-allowed dark:disabled:bg-zinc-700 dark:disabled:text-zinc-500` |
-| Loading | `opacity-70 cursor-not-allowed` + `Loader2` icon with `animate-spin` |
-
-#### Secondary / Ghost Button
-
-| State | Classes |
-|-------|---------|
-| Default | `border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 px-4 py-2 rounded-lg text-sm` |
-| Hover | `hover:bg-zinc-100 dark:hover:bg-zinc-800` |
-| Disabled | `disabled:opacity-50 disabled:cursor-not-allowed` |
-
-#### Input / Textarea
-
-| State | Classes |
-|-------|---------|
-| Default | `border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 rounded-lg px-3 py-2 text-sm` |
-| Focus | `focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent` |
-| Error | `border-red-500 dark:border-red-500 focus:ring-red-500` |
-| Disabled | `disabled:bg-zinc-100 dark:disabled:bg-zinc-800 disabled:text-zinc-400 disabled:cursor-not-allowed` |
-
-#### Focus Ring Standard (keyboard navigation)
+**Primary sidebar:** Left rail, 64px collapsed / 240px expanded. Icons with labels on expanded. Collapsed state shows only icons + tooltips. Nav groups:
 
 ```
-focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2
-focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-950
+Section: 핵심 (Core)
+  - 홈 (/)
+  - 허브 (/hub)
+  - 대시보드 (/dashboard)
+
+Section: 작전 (Operations)
+  - 야간작업 (/jobs)
+  - ARGOS (/argos)
+  - 통신 (/command-center)
+
+Section: 정보 (Intelligence)
+  - 아카이브 (/classified)
+  - 지식 (/knowledge)
+  - 보고서 (/reports)
+  - 활동 (/activity-log)
+
+Section: 조직 (Organization)
+  - NEXUS (/nexus)
+  - 부서 (/departments)
+  - 에이전트 (/agents)
+  - 성과 (/performance)
+
+Section: 기타
+  - 알림 (/notifications)
+  - 설정 (/settings)
 ```
 
-Use `focus-visible:` (not `focus:`) to avoid rings on mouse clicks. Required for WCAG AA keyboard navigation.
+### Feature Priority Hierarchy
+
+| Priority | Features | Visibility |
+|----------|----------|-----------|
+| **P0** (Always visible) | Hub, Chat, NEXUS, Dashboard, Home | Primary nav, top of sidebar |
+| **P1** (One click away) | Agents, Departments, Jobs, Reports, Command Center, ARGOS | Grouped nav sections |
+| **P2** (Secondary nav) | SNS, Trading, Messenger, Knowledge, AGORA, Tiers, Performance | Lower sidebar or "더보기" |
+| **P3** (Power user/admin) | Costs, Activity Log, Settings, Classified, Cron, Files, Notifications | Settings/utility area |
+
+**Card pattern (established):** `rounded-2xl bg-gradient-to-br from-{color}-600/15 via-slate-800/80 to-slate-800/80`
+
+**Hub page (unique layout):** Two-panel split: left = session list + agent selector, right = conversation. Full-screen toggle hides left panel. SSE stream renders token-by-token. Status bar shows: agent name, model, running token count, cost (shown only after `done` event).
+
+### 6-B. Admin Panel (`packages/admin/`)
+
+**Aesthetic:** Functional, high-density, data-first. Less atmospheric than the user app. Closer to Linear or Vercel dashboard.
+
+**Same dark base** (`zinc-950`, `slate-900`) but **less gradient, more table**. Admin users are configuring the system, not commanding it.
+
+**Top navigation bar** (not sidebar) at mobile, **left sidebar** at desktop (same 64px/240px pattern).
+
+**Key admin surfaces:**
+- `DashboardPage` — Metrics overview (agent count, cost MTD, active sessions)
+- `AgentsPage` — Full CRUD table. Columns: name, tier, department, status, tools count, model
+- `TiersPage` — Tier hierarchy editor. Visual tier tree showing model assignments
+- `NexusPage` — React Flow canvas. Agent nodes draggable, connections show delegation paths
+- `CostsPage` — Cost breakdown by agent, model, time period. Chart + table
+- `MonitoringPage` — Live session viewer. Expandable session rows showing tool calls
+
+**Table pattern:**
+```
+sticky header (bg-slate-900 border-b border-slate-700)
+  row: h-12, hover:bg-slate-800/50
+  first column: font-medium text-slate-100
+  data columns: text-slate-400 text-sm
+  action column: right-aligned, gap-2 icon buttons
+```
+
+### 6-C. Landing Page
+
+**Aesthetic:** Light mode primary (`bg-white` / `bg-slate-50`). Corporate but not stiff. Should communicate scale and intelligence.
+
+**Dark Hero Section** — contrast inversion: hero is dark (`bg-zinc-950` with indigo gradient mesh), then page transitions to light for features/pricing.
+
+**Key sections (in order):**
+1. Hero — Tagline, primary CTA ("무료로 시작하기"), product screenshot
+2. Social proof — Customer logos or testimonials
+3. Feature grid — 6 features with icons: 계층 조직, 실시간 모니터링, 지식 관리, 보안 필터링, MCP 연동, 성과 추적
+4. How it works — 3-step visual (1: 조직 구성 → 2: 에이전트 배정 → 3: 성과 확인)
+5. Pricing tiers
+6. CTA section
+7. Footer
 
 ---
 
-## 10. Typography
+## 7. Motion & Interaction Principles
 
-### 10.1 Font Stack
+### Motion Budget
 
-**Primary: Work Sans** — Currently loaded in `packages/app/index.html` via Google Fonts (weights 400/500/600/700).
-```html
-<!-- packages/app/index.html line 14 -->
-<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-```
-Korean fallback: `'Work Sans', -apple-system, 'Apple SD Gothic Neo', sans-serif`
+**Conservative.** Animation serves communication, not entertainment.
 
-> ⚠️ **Admin loads no custom font** (`packages/admin/index.html` has no font link). Action item: add Work Sans to admin `index.html` for visual consistency across both apps.
+| Animation Type | Duration | Easing | Usage |
+|---------------|----------|--------|-------|
+| Page transition | 150ms | ease-out | Route change fade |
+| Modal open | 200ms | ease-out | Scale from 0.95 + opacity |
+| Modal close | 150ms | ease-in | Reverse |
+| Toast appear | 300ms | spring | Slide from right |
+| Skeleton shimmer | 1.5s | linear | Loading placeholder |
+| Status pulse | 2s | ease-in-out | Online/working dots |
+| Activity row append | 150ms | ease-out | Slide down |
+| Hub stream cursor | 500ms | step-end | Blink cursor |
+| Sidebar expand | 200ms | ease-in-out | Width transition |
 
-**Monospace: system mono** — `font-mono` Tailwind class (system monospace stack). For cost figures, agent IDs, build numbers. Soul editor requires **CodeMirror 6** (plain `<textarea>` is insufficient for line numbers).
+**No** parallax, particle effects, hero video backgrounds, lottie animations, or scroll-triggered complex animations. These are appropriate for consumer apps, not B2B command centers.
 
-### 10.2 Type Scale
+### Interaction States (All Interactive Elements)
 
-| Use case | Tailwind classes | Size / Weight |
-|---------|----------------|--------------|
-| Page title | `text-xl font-semibold text-zinc-900 dark:text-zinc-100` | 20px / 600 |
-| Section header | `text-sm font-semibold uppercase tracking-wide text-zinc-400` | 14px / 600 |
-| Agent name (prominent) | `text-base font-medium text-zinc-900 dark:text-zinc-100` | 16px / 500 |
-| Body primary | `text-sm text-zinc-700 dark:text-zinc-300` | 14px / 400 |
-| Body secondary | `text-xs text-zinc-500 dark:text-zinc-400` | 12px / 400 |
-| Nav item (inactive) | `text-sm text-zinc-700 dark:text-zinc-300` | 14px / 400 |
-| Nav item (active) | `text-sm font-medium text-indigo-700 dark:text-indigo-300` | 14px / 500 |
-| Monospace data | `font-mono text-xs text-zinc-600 dark:text-zinc-400` | 12px / 400 |
-| Cost figure | `font-mono text-sm font-medium text-zinc-700 dark:text-zinc-300` | 14px / 500 |
-| Empty state heading | `text-base font-medium text-zinc-500 dark:text-zinc-400` | 16px / 500 |
-
-### 10.3 Markdown Rendering Scale (`MarkdownRenderer` component)
-
-AI agent responses in Hub ChatArea, Reports page, and Performance/Soul Gym render markdown. These specs apply to the `MarkdownRenderer` component.
-
-| Element | Tailwind classes | Notes |
-|---------|----------------|-------|
-| `h1` | `text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-6 mb-3` | Rare — report title level |
-| `h2` | `text-xl font-semibold text-zinc-900 dark:text-zinc-100 mt-5 mb-2` | Section headers in reports |
-| `h3` | `text-lg font-semibold text-zinc-800 dark:text-zinc-200 mt-4 mb-2` | Sub-sections |
-| `h4` | `text-base font-semibold text-zinc-800 dark:text-zinc-200 mt-3 mb-1` | |
-| `p` | `text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed mb-3` | Body text |
-| `ul / ol` | `text-sm text-zinc-700 dark:text-zinc-300 pl-4 mb-3 space-y-1` | |
-| `code` (inline) | `font-mono text-xs bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-700 dark:text-zinc-300` | |
-| `pre > code` (block) | `font-mono text-xs bg-zinc-900 dark:bg-zinc-950 text-zinc-300 p-4 rounded-lg overflow-x-auto` | |
-| `blockquote` | `border-l-4 border-indigo-500 pl-4 text-zinc-500 dark:text-zinc-400 italic` | |
-| `table` | `w-full text-sm border-collapse` | |
-| `thead` | `bg-zinc-100 dark:bg-zinc-800 font-semibold text-zinc-700 dark:text-zinc-300` | |
-| `td / th` | `px-3 py-2 border border-zinc-200 dark:border-zinc-700` | |
-| `hr` | `border-zinc-200 dark:border-zinc-800 my-4` | |
+Every interactive element must have 4 states explicitly designed:
+1. **Default** — rest state
+2. **Hover** — `hover:` prefix, subtle background shift (`bg-slate-800/50`)
+3. **Active/Pressed** — `active:` prefix, slight scale down (`scale-[0.98]`)
+4. **Disabled** — `opacity-50 cursor-not-allowed pointer-events-none`
+5. **Focus** — `focus-visible:ring-2 ring-indigo-500 ring-offset-2 ring-offset-slate-950`
 
 ---
 
-## 11. Spacing & Layout System
+## 8. Constraints for Implementation
 
-### 11.1 Spacing Tokens
+### Non-Negotiable Technical Constraints
 
-| Token | Value | Common use |
-|-------|-------|-----------|
-| `p-1` / `gap-1` | 4px | Icon padding, tight list items |
-| `p-2` / `gap-2` | 8px | Button padding, badge padding |
-| `p-3` / `gap-3` | 12px | Nav item: `px-3 py-2` (current sidebar standard) |
-| `p-4` / `gap-4` | 16px | Card padding, section padding — standard unit |
-| `p-6` / `gap-6` | 24px | Page content padding, between major cards |
-| `p-8` / `gap-8` | 32px | Between major page sections only |
+1. **Dark mode first** — `document.documentElement.classList.toggle('dark', dark)` is the mechanism. All components must have `dark:` variants. Light mode is secondary.
+2. **Tailwind CSS 4** — No arbitrary values where a Tailwind class exists. No inline styles for spacing/color.
+3. **CVA-based components** — All shared components through `@corthex/ui`. No raw Tailwind outside of page-level layout code.
+4. **No emoji in UI** — Onboarding template icons (🏢💻📢📈) are functional data; avoid emoji in navigation, buttons, or headings.
+5. **Korean typography** — `word-break: keep-all` for all Korean text. Pretendard covers both KR + Latin.
+6. **Status dot sizes** — 8px (`w-2 h-2`) for inline, 10px (`w-2.5 h-2.5`) for agent cards. Never icon-based.
+7. **Table density** — Row height 48px minimum for touch accessibility. No row heights below 40px.
+8. **Sidebar width** — Collapsed: 64px. Expanded: 240px (app) / 256px (admin). These match existing component measurements.
 
-### 11.2 Layout Grids
+### Preserved Patterns (Do Not Break)
 
-**App (packages/app) — all pages except Hub:**
-```
-┌─────────────────────────────────────────────────────────┐
-│ Sidebar (w-60 fixed)  │  Main Content Area (flex-1)     │
-└─────────────────────────────────────────────────────────┘
-```
+These patterns are established in existing code and must be honored in redesign:
 
-**⚠️ CURRENT STATE vs REDESIGN TARGET**
-
-> The 3-column layout below is the **redesign target** defined in Phase 0-1 Technical Spec Section 2.4.1.
-> The current implementation (`packages/app/src/pages/hub/`) is **2-column** with a horizontal tracker bar.
-
-**Current implementation (2-column):**
-```
-┌──────────────────┬──────────────────────────────────────────────┐
-│ SessionSidebar   │ Main area (flex-1)                            │
-│ (w-64 fixed)     │  ├─ HandoffTracker (horizontal bar, border-b) │
-│ bg-slate-900     │  └─ ChatArea (flex-1)                         │
-└──────────────────┴──────────────────────────────────────────────┘
-```
-*Sources: `pages/hub/secretary-hub-layout.tsx` line 276 (layout), `pages/hub/session-sidebar.tsx` line 94 (`w-64 bg-slate-900`), `pages/hub/handoff-tracker.tsx` line 15 (`bg-slate-800/60 border-b` = horizontal bar)*
-
-**Redesign target (3-column per Technical Spec Section 2.4.1):**
-```
-┌──────────────┬─────────────────────────┬────────────────────┐
-│ SessionPanel │ ChatArea (flex-1)        │ TrackerPanel (w-80)│
-│ (w-64 fixed) │                         │ or icon-strip(w-12)│
-└──────────────┴─────────────────────────┴────────────────────┘
-```
-> ⚠️ **REDESIGN TARGET** — Current Hub implementation is 2-column `[SessionPanel w-64 slate][Main flex-1]` with slate palette (`bg-slate-900`, `border-slate-700`). TrackerPanel is a horizontal bar inside Main, not a right sidebar. This 3-column zinc spec is the redesign target, not current state.
-
-> ⚠️ **Implementation note**: Current Hub (`secretary-hub-layout.tsx`) renders 2-column (`<SessionSidebar w-64>` + `<Main flex-1>` with horizontal HandoffTracker). The 3-column layout above is the redesign target. Implementation requires: (1) adopting `session-panel.tsx` (w-72) as new SessionPanel, (2) migrating `handoff-tracker.tsx` to right-column `w-80` panel, (3) migrating palette from slate → zinc throughout.
-
-**Redesign Hub fixed-width math at 1280px viewport:**
-- App sidebar: `w-60` = 240px
-- SessionPanel: `w-64` = 256px (matches current SessionSidebar width)
-- TrackerPanel (expanded): `w-80` = 320px
-- **Total fixed: 816px → ChatArea `flex-1` = 464px minimum**
-- TrackerPanel collapsed (`w-12` = 48px) → ChatArea expands to 736px
-
-The TrackerPanel in the redesign is a **right sidebar** replacing the current horizontal handoff bar. It collapses to `w-12` icon strip when no active handoffs, auto-expands on first `handoff` SSE event.
-
-**Admin (packages/admin):**
-```
-┌──────────────────────────────────────────────────────────┐
-│ Sidebar (w-60 fixed)  │  Main Content Area (flex-1)      │
-│ + Company dropdown    │  + optional right detail panel   │
-└──────────────────────────────────────────────────────────┘
-```
+| Pattern | Current Implementation | Must Preserve |
+|---------|----------------------|---------------|
+| Auth store | `useAuthStore` Zustand, `localStorage` token | Token handling logic unchanged |
+| Route structure | React Router v6, `basename="/admin"` for admin | All 30 app + 24 admin routes unchanged |
+| API format | `{ success, data }` / `{ success, error: { code, message } }` | Error display must show error.message |
+| SSE event types | `accepted/processing/handoff/message/error/done` | Hub UI must handle all 6 events |
+| Multitenant | `companyId` in all operations | No cross-company data display |
+| Code splitting | All pages are `React.lazy()` + `<Suspense>` | `PageSkeleton` pattern preserved |
 
 ---
 
-## 12. Motion & Animation
+## 9. Competitive Differentiation
 
-### 12.1 Animation Budget
+| Platform | Visual Identity | CORTHEX Difference |
+|----------|----------------|-------------------|
+| ChatGPT | Minimal white, consumer-friendly | CORTHEX is darker, more structured, B2B command-center |
+| Linear | Dark, minimal, developer tool | CORTHEX has more visual hierarchy (tiers, org structure) |
+| Notion | Light, flexible, editorial | CORTHEX is prescriptive — org structure is the core, not free-form docs |
+| Vercel Dashboard | Dark, data-dense, developer | CORTHEX borrows this aesthetic but for non-developer executives |
+| Intercom (Admin) | Light, SaaS-clean, support-focused | CORTHEX is darker, more intelligence/ops-focused |
 
-CORTHEX is a professional tool. Animation must serve function, not entertainment.
-
-| Animation type | Duration | Easing | Use case |
-|---------------|---------|--------|---------|
-| Micro-interaction (hover/focus) | 150ms | `ease-out` | Button hover, dropdown open |
-| Panel expand/collapse | 250ms | `ease-in-out` | TrackerPanel expand, sidebar collapse |
-| SSE step appear | 300ms | `ease-out` | New Tracker step slides in |
-| Status dot change | 200ms | `ease-in-out` | Agent status: online→working→offline |
-| Cost bar fill | 500ms | `ease-out` | Dashboard budget bar on page load |
-| Page transition fade | 150ms | `ease-out` | Route change |
-
-### 12.2 Tracker Panel Animation Spec (Most Important)
-
-Use `transition-[transform,opacity]` (NOT `transition-all`) for Tracker rows — prevents full-property repaints on rapid SSE `handoff` events (3–5 per chain).
-
-**Expand — on each `handoff` SSE event:**
-1. New step row: `translateY(20px)→translateY(0)`, `opacity:0→1`, `transition-[transform,opacity] duration-300 ease-out`
-2. Previous step: pulse indicator stops → `✓` checkmark appears, 200ms
-3. New step: agent name with `animate-pulse` indigo dot
-4. Depth badge (`D2`, `D3`): `scale(120%)→scale(100%)`, 150ms ease-out
-
-**Collapse — TrackerPanel w-80 → w-12 (user toggles or no active handoffs):**
-1. Panel content fades out: `opacity:1→0`, 100ms ease-in
-2. Width collapses: `w-80→w-12`, `transition-all duration-250 ease-in-out`, starts after 100ms delay
-3. Icon strip appears at `w-12` with `animate-fade-in` 150ms
-
-**CSS**: `transition-[width] duration-250 ease-in-out` on the TrackerPanel container.
-
-### 12.3 AGORA Speech Animation Spec
-
-AGORA uses polling (not SSE). Speech rendering is client-controlled after `GET /:id/timeline` returns.
-
-The `-16px` entrance requires a custom keyframe NOT in the existing `index.css`. Add to `packages/app/src/index.css`:
-```css
-@keyframes speech-enter {
-  from { transform: translateX(-16px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-```
-
-Then:
-1. Each speech card: `animation: speech-enter 400ms ease-out forwards`
-2. Stagger: 200ms JS delay between each card (`setTimeout` with index * 200)
-3. Consensus badge: `scale(0.8)→scale(1.0)`, `opacity:0→1`, 300ms — use Tailwind: `transition-[transform,opacity] duration-300`
-
-> **Alternative**: If using Framer Motion in the project, use `<motion.div initial={{ x: -16, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.4, delay: index * 0.2 }} />`.
-
-### 12.4 Chat Auto-Scroll Behavior
-
-ChatArea auto-scroll must handle the case where the user scrolls up while SSE messages are streaming:
-
-- **Default**: auto-scroll to bottom on each SSE `message` chunk
-- **Scroll lock**: if `scrollPosition < scrollHeight - 200px` (user has scrolled up), pause auto-scroll
-- **Resume indicator**: show a floating "⬇ 최신 메시지로" pill: `fixed bottom-20 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-xs px-3 py-1 rounded-full cursor-pointer shadow-lg`
-- **Resume trigger**: clicking the pill, OR user submits a new message (next SSE stream starts)
+**CORTHEX's visual signature:** Dark command-center base + luminous status colors + typographic hierarchy (tier system) + Korean-first copy precision.
 
 ---
 
-## 13. Iconography
-
-### 13.1 Current System (from sidebar.tsx — maintain as is)
-
-Sidebar navigation uses **emoji icons**. This is established convention. Do not replace.
-
-| Category | Examples | System |
-|---------|----------|--------|
-| Nav icons | 🏠 🔗 🎖️ 💬 📈 🗣️ 📄 📁 🏢 🏗️ 🤖 📊 📱 💭 💰 📞 📋 🔒 💪 📚 ⏰ 🔍 🔔 ⚙️ | Emoji |
-| Status indicators | Colored `rounded-full` div | Tailwind CSS |
-| Action buttons | Lucide React icons | SVG |
-| Agent tier badges | Text pills: `T1`, `T2`, `T3` | Text + CSS |
-
-### 13.2 Lucide React Icon Recommendations
-
-Use **Lucide React** for all non-nav action icons:
-
-| Icon | Usage |
-|------|-------|
-| `ChevronRight` / `ChevronDown` | Expand/collapse |
-| `ArrowRight` | Handoff direction in Tracker |
-| `Check` / `X` | Completed / failed step |
-| `Loader2` (animated spin) | Working state |
-| `Brain` | Soul / AI agent context |
-| `Network` | NEXUS / org chart |
-| `BarChart3` | Cost / performance charts |
-| `Mic` | Voice briefing |
-| `Plus` | Add action (department, agent, session) |
-| `Trash2` | Delete (destructive, red context only) |
-
----
-
-*Document generated: 2026-03-12*
-*Reference sources: prd.md (vision, mission, personas), v1-feature-spec.md (feature set), architecture.md (design constraints), phase-0-step-1-snapshot.md (established layout constraints), sidebar.tsx (active color system)*
+_This document is a living reference. All color values should be verified against the implemented Tailwind config. Typography recommendations require font loading configuration in the Vite builds._

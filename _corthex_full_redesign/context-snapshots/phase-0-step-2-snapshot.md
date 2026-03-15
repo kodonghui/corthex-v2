@@ -1,88 +1,73 @@
-# Context Snapshot — Phase 0, Step 2: CORTHEX Vision & Identity
+# Phase 0-2 Context Snapshot — Vision & Identity
 
-**Date**: 2026-03-12
-**Score**: 8.75/10 (Critic-A: 8.5/10, Critic-B: 9/10) — PASS
-**Output file**: `_corthex_full_redesign/phase-0-foundation/vision/corthex-vision-identity.md` (762 lines)
+**Date:** 2026-03-15
+**Status:** PASS (avg 8.67/10)
+**Output:** `_corthex_full_redesign/phase-0-foundation/vision/corthex-vision-identity.md`
 
----
+## Key Decisions for Subsequent Phases
 
-## Key Decisions & Facts Established
+### Brand Archetype
+- **Sovereign Sage** (Ruler + Sage) — authoritative, intelligent, premium, structured, efficient
+- Voice: Korean 존댓말 default, button labels 명령형, no emoji, clinical error messages
 
-### Brand Identity
-- **Product vision**: "조직도를 그리면 AI 팀이 움직인다." — Draw the org chart, the AI team moves
-- **Name meaning**: COR (heart/core) + CORTEX (higher-order thinking) = the cerebral cortex of your business
-- **Positioning**: Military Precision × AI Intelligence — NOT a chatbot, NOT playful
-- **Primary personas**: 김대표 (CEO/non-developer, workspace app) and 이팀장 (Company Admin, `admin_role:'admin'`, `/admin`)
+### Design Movement
+- **Swiss International Style** (primary) — 12-col grid, flush-left, type-driven
+- **Dark Tech UI** (atmospheric) — zinc-950/slate-900 base, luminous accents
+- **Glassmorphism** (selective) — modals only, backdrop-blur-xl bg-slate-900/80
 
-### Design System (Verified against codebase)
-- **Font**: Work Sans (NOT Inter) — `packages/app/index.html` line 14 Google Fonts. Admin has NO custom font (action: add Work Sans to admin/index.html)
-- **Active nav**: `bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300` (both sidebars)
-- **App sidebar**: `bg-zinc-50 dark:bg-zinc-900`
-- **Admin sidebar**: `bg-white dark:bg-zinc-900 border-r` (different from app)
-- **Nav hover**: `hover:bg-zinc-100 dark:hover:bg-zinc-800`
-- **Primary accent**: `bg-indigo-600` / `#4F46E5` (note: theme-color meta uses `#6366f1` — needs update)
-- **OKLCH tokens** in `index.css`: `--color-corthex-accent/success/warning/error` — use in CSS, use Tailwind in JSX
-- **Disabled (WCAG AA)**: `text-zinc-400` (#A1A1AA) both modes — 5.9:1 on zinc-950 ✅
-
-### Hub Architecture (CRITICAL — Current ≠ Redesign Target)
-- **Current state** (`secretary-hub-layout.tsx` line 276): 2-column `[SessionSidebar w-64 bg-slate-900][Main flex-1]` with `HandoffTracker` as horizontal bar at top (`bg-slate-800/60 border-b`)
-- **Redesign target**: 3-column `[SessionPanel w-64][ChatArea flex-1][TrackerPanel w-80]` with TrackerPanel as right sidebar
-- **Implementation requires**: (1) adopt `session-panel.tsx` as new SessionPanel, (2) migrate HandoffTracker to right column w-80, (3) migrate slate → zinc throughout Hub
-- **Hub math at 1280px**: w-60 + w-64 + w-80 = 816px fixed, ChatArea = 464px minimum
-
-### Feature Hierarchy
-- **P0** (always visible): Hub 3-column + SessionPanel header agent status + App Sidebar
-- **P1** (one-click): NEXUS Canvas (Admin), SketchVibe (App `/nexus` panel), AGORA (`/agora`), Dashboard, Library, Soul editor, ARGOS
-- **P2** (settings): Dept/Agent/Employee CRUD, Tiers, Budget, Audit logs, Notifications
-- **P3** (power user): Trading, SNS, Files, Ops Log, Cost Analytics, Soul Gym (`/performance`)
-
-### Correct Routes (verified App.tsx)
-- AGORA: `/agora` (NOT `/debate`)
-- Soul Gym: `/performance` (NOT `/soul-gym`)
-- SketchVibe: App `/nexus` panel (NOT a separate route)
-- NEXUS Canvas: both Admin `/admin/nexus` AND App `/nexus`
-
-### Color Layering (dark mode)
-- Page: `bg-zinc-950` → Card: `bg-zinc-900` (use `border-zinc-700` for visible card border) → Panel: `bg-zinc-800` → Sub-panel: `bg-zinc-800/50`
-- **Warning**: `border-zinc-800` = `bg-zinc-800` = invisible border in dark mode
-
-### Animation
-- Tracker rows: `transition-[transform,opacity]` NOT `transition-all` (prevents jank on rapid SSE events)
-- AGORA speech entrance: requires custom `@keyframes speech-enter { from { transform: translateX(-16px); opacity: 0; } }` — NOT in index.css yet
-- Tracker step: uses existing `slide-up` keyframe from index.css
+### Color System
+- Base: zinc-950 (page), slate-900 (surface), slate-800 (elevated), slate-700 (border)
+- Text: slate-100 (primary), slate-400 (secondary), slate-500 (muted — 4.82:1 verified)
+- CTA: indigo-600 (primary), indigo-700 (hover)
+- Status: emerald-400 (online), blue-400 (working), red-400 (error), slate-500 (offline)
+- Tier: violet-400 (T1), sky-400 (T2), slate-400 (T3)
+- Secretary: amber-500/15 + amber-400
+- Light theme (landing/login): bg-white, bg-slate-50, text-slate-900
 
 ### Typography
-- Markdown rendering: Section 10.3 — full h1-h4, code inline/block, blockquote, table spec
-- Soul editor: requires CodeMirror 6 (textarea insufficient for line numbers)
+- Display/Brand: **Geist** (Vercel)
+- Body/UI: **Pretendard** (Korean+Latin)
+- Monospace: **JetBrains Mono**
+- Scale: 32px Display → 12px Small, 4px base unit
 
-### 8 Design Principles
-1. Name the Machine — every AI action attributed to named agent
-2. Depth is Data — surface complexity, don't hide it
-3. Zero-Delay Feedback — ≤50ms acknowledgment on Hub submit
-4. The Commander's View — situational awareness over simplicity
-5. Show the Org, Not the AI — org chart metaphor always visible
-6. Hierarchy Through Typography, Not Color — color = status signals only
-7. Dark Mode First-Class — dark mode is the professional reference
-8. Desktop-First, Information-Dense — min-width 1280px, no mobile
+### Layout
+- App sidebar: 64px collapsed / 240px expanded
+- Admin sidebar: 64px / 256px
+- 12-column grid desktop, 8-col tablet, 4-col mobile
+- Breakpoints: sm(640), lg(1024), xl(1440), 2xl(1440+)
+- Card pattern: rounded-2xl + gradient from-{color}-600/15
 
----
+### Feature Priority
+- P0: Hub, Chat, NEXUS, Dashboard, Home
+- P1: Agents, Departments, Jobs, Reports, Command Center, ARGOS
+- P2: SNS, Trading, Messenger, Knowledge, AGORA, Tiers, Performance
+- P3: Costs, Activity Log, Settings, Classified, Cron, Files, Notifications
 
-## Issues Fixed (total: 22 across all rounds)
+### Motion
+- Conservative: 150ms page, 200ms modal, 300ms toast, 1.5s skeleton
+- No parallax, particles, hero videos, lottie
 
-Key fixes:
-- Work Sans (not Inter) — 2 occurrences fixed
-- Hub 2-column vs 3-column REDESIGN TARGET labeling
-- WCAG AA disabled color failure
-- AGORA/SoulGym/SketchVibe route corrections
-- OKLCH token documentation
-- Dark mode layering rules
-- Interactive states (button/input/focus ring spec)
-- Markdown rendering scale (13 elements)
-- Chat auto-scroll behavior
-- TrackerPanel collapse animation
-- AGORA keyframe spec
+### Design Masters Applied
+- Rams: 10 principles mapped to CORTHEX (every element earns its place)
+- Vignelli: 3-font constraint (Geist + Pretendard + JetBrains Mono)
+- Muller-Brockmann: 12-col mathematical grid
+- Bass: reductionism for icon/logo direction
 
----
+### UX Principles (6)
+1. Hierarchy is Sacred (tier visual primacy)
+2. Hub is Center of Gravity (80% time)
+3. Data Before Decoration (status → data → actions → metadata → nav)
+4. Real-Time Must Feel Real (streaming animations)
+5. Density Without Clutter (tables vs cards criteria)
+6. Mobile is Secondary, Not Absent
 
-## Next Step
-Phase 0-3: (waiting for Orchestrator instruction)
+## Libre Tools Applied
+- Design Masters (Rams, Vignelli, Muller-Brockmann)
+- Design Movements (Swiss International, Dark Tech, Glassmorphism)
+- Design Principles (gestalt, hierarchy, contrast)
+
+## Connections to Next Steps
+- Phase 1: Research dashboards matching Swiss + Dark Tech aesthetic
+- Phase 2: Score options against these 6 UX principles + Rams' principles
+- Phase 3: Operationalize color tokens, typography scale, grid into tailwind.config
+- Phase 4: Themes override the base accent palette while preserving structure

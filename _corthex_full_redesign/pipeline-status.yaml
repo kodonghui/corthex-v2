@@ -1,20 +1,20 @@
 pipeline: uxui-redesign
-version: v1.1
-started: 2026-03-15T04:40:00Z
+version: v3.1
+started: 2026-03-15T05:00:00Z
 mode: all
 
 phases:
   phase-0:
     name: Foundation
-    status: in_progress
+    status: complete
     steps:
-      0-1: { name: "Technical Spec", status: pending, party: 3R, critic_model: opus }
-      0-2: { name: "Vision & Identity", status: pending, party: 3R, critic_model: sonnet }
+      0-1: { name: "Technical Spec", status: complete, party: 3R, critic_model: opus, score: 8.83 }
+      0-2: { name: "Vision & Identity", status: complete, party: 3R, critic_model: sonnet, score: 8.67 }
   phase-1:
     name: Research
-    status: pending
+    status: in_progress
     steps:
-      1-1: { name: "Web Dashboard Layout Research", status: pending, party: 2R }
+      1-1: { name: "Web Dashboard Layout Research", status: in_progress, party: 2R }
       1-2: { name: "App Layout Research", status: pending, party: 2R }
       1-3: { name: "Landing Page Research", status: pending, party: 2R }
   phase-2:

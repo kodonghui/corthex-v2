@@ -1,69 +1,51 @@
-# Context Snapshot — Phase 0, Step 1: CORTHEX Technical Spec
+# Phase 0-1 Context Snapshot — Technical Spec
 
-**Date**: 2026-03-12
-**Score**: 9.5/10 (Critic-A: 10/10, Critic-B: 9/10) — PASS
-**Output file**: `_corthex_full_redesign/phase-0-foundation/spec/corthex-technical-spec.md` (1,024 lines)
+**Date:** 2026-03-15
+**Status:** PASS (avg 8.83/10)
+**Output:** `_corthex_full_redesign/phase-0-foundation/spec/corthex-technical-spec.md` (1649 lines)
 
----
+## Key Facts for Subsequent Phases
 
-## Key Decisions & Facts Established
+### Tech Stack
+- Monorepo: server (Hono+Bun), app (React 19+Vite 6), admin (React 19+Vite 6), ui (CVA), shared (types)
+- DB: PostgreSQL + pgvector on Neon, Drizzle ORM
+- State: Zustand (UI) + TanStack Query (server cache)
+- Real-time: SSE (6 event types, POST-based fetch) + WebSocket (7 channels) + polling
+- Styling: Tailwind CSS 4, dark-mode class strategy
+- Agent SDK: @anthropic-ai/claude-agent-sdk 0.2.x (pinned)
 
-### Architecture
-- **Monorepo**: Turborepo — server (Hono+Bun), app (React+Vite), admin (React+Vite), ui, shared
-- **Single engine entry point**: `engine/agent-loop.ts` — all calls (Hub, ARGOS, AGORA, trading, telegram, SketchVibe) route through here
-- **3-Layer Caching**: Semantic (engine/, pgvector, cosine≥0.95) → Prompt (cache_control:ephemeral) → Tool (lib/tool-cache.ts, withCache())
-- **Multi-tenancy**: `getDB(companyId)` mandatory for all business logic DB access
+### Page Count
+- App: 30 routes (login, onboarding, home, hub, command-center, chat, jobs, reports, sns, messenger, dashboard, ops-log, nexus, trading, files, org, notifications, activity-log, costs, cron, argos, agora, classified, knowledge, performance, departments, agents, tiers, settings)
+- Admin: 24 routes
 
-### RBAC (critical — confusing if missed)
-- UX "CEO/employee" → DB `users.role: 'user'` (user_role enum: admin|user)
-- UX "Company Admin" → DB `admin_users.role: 'admin'` (admin_role enum: superadmin|admin)
-- UX "Super Admin" → DB `admin_users.role: 'superadmin'`, companyId: null
-- NO `ceo` or `employee` enum at DB level
+### Critical Design Constraints
+- v1 must-haves: 12 features (command center, soul editor, autoLearn, conversation history, file attachments, tool call cards, markdown rendering, delegation chain, NEXUS canvas, AGORA debate, trading, budget alert)
+- NFR: 20 concurrent sessions, 60fps NEXUS, 120s hard timeout, P95 200ms API
+- Login page uses different colors: bg-white/zinc-950, button bg-indigo-600 (not slate dark theme)
+- Department scoping: employees see only their dept's agents
 
-### AGORA Interaction Model (NOT streaming — must not confuse)
-- `POST /api/workspace/debates` → create
-- `POST /api/workspace/debates/:id/start` → async start (returns immediately)
-- Poll `GET /:id` every 2s until `status: 'completed'`
-- `GET /:id/timeline` → full speech array (render all at once, client-side animation optional)
-- **Zero SSE endpoints in debates.ts**
+### Existing Color System (from actual code)
+- Backgrounds: slate-900/950 (page), slate-800/40-80 (cards)
+- Text: white (primary), slate-400/500 (secondary)
+- Accents: cyan-400 (active), violet-400 (jobs), emerald-400 (success), amber-400 (secretary), red-400 (error), blue-400 (working)
+- Card pattern: rounded-2xl + gradient from-{color}-600/15 via-slate-800/80 to-slate-800/80
 
-### Hub Layout (3-column — critical for all Hub design)
-- `[SessionPanel (left)] [ChatArea (flex-1 center)] [TrackerPanel (right w-80 = 320px)]`
-- TrackerPanel: persistent, collapses to icon-strip (w-12) when no active handoffs
-- Auto-expands on first `handoff` SSE event
+### Data Model
+- 35+ tables, 25 enums
+- Multi-tenancy: companyId in every query via getDB()
+- Key tables: agents (with soul/adminSoul/tierLevel/allowedTools), chat_sessions+messages, delegations, cost_records
 
-### Navigation (from actual sidebar.tsx code)
-**App Sidebar** (w-60, bg-zinc-50): 4 groups — (ungrouped top 3: 홈/허브/사령관실) + 업무 (6 items) + 운영 (16 items) + 시스템 (2 items)
-**Admin Sidebar** (w-60, bg-white): Flat list 18 items + settings footer. Company dropdown at top.
+### Engine
+- Single entry: engine/agent-loop.ts → runAgent()
+- E8 boundary: only agent-loop.ts + types.ts are public API
+- Hook pipeline: PreToolUse (permission) → PostToolUse (scrub→redact→track) → Stop (cost)
+- 3-layer cache: Prompt (D17), Tool (D18), Semantic (D19)
 
-### Design Constraints
-- Desktop-only (min-width 1280px), no responsive layouts for app or admin
-- Onboarding (app /onboarding, admin /onboarding) — DEFERRED, not in scope
-- /admin/audit-logs exists in backend but NOT in admin sidebar nav yet (designer should add)
+## Libre Tools Applied
+None (Phase 0-1 is technical analysis only)
 
-### Terminology (canonical v2)
-- 허브(Hub) not 사령관실 for main command screen label
-- 정보국(Library) for knowledge base nav label
-- 티어(Tier) not 계급 for agent hierarchy
-
-### Pages Count
-- App: 29 pages (2 deferred)
-- Admin: 22 pages (1 deferred, 1 needs sidebar addition: audit-logs)
-
----
-
-## Issues Fixed in This Step
-- Removed 2 fabricated endpoints (AGORA SSE, /workspace/costs)
-- Added complete navigation sidebar structure (Section 9) from actual sidebar.tsx code
-- Added Tracker Panel spec with 3-column layout constraint
-- Added RBAC mapping table
-- Added 5 missing DB tables (admin_sessions, invitations, employee_departments, notification_preferences, audit_logs)
-- Added /admin/audit-logs page (Section 3.22)
-- Added desktop-only constraint, terminology map, UI states catalogue
-- Marked onboarding as DEFERRED
-- Fixed WebSocket envelope format { channel, type, payload }
-
----
-
-## Next Step
-Phase 0-2: CORTHEX Vision & Identity (waiting for Orchestrator instruction)
+## Connections to Next Steps
+- Phase 0-2 needs: vision + identity based on this tech foundation
+- Phase 1 needs: page list + API map for research targeting
+- Phase 2 needs: NFR budgets + color system for scoring criteria
+- Phase 3 needs: existing Tailwind classes as baseline for token design
