@@ -141,7 +141,7 @@ describe('AC2: encrypt→decrypt round-trip', () => {
 
 // ── AC4: tamper detection ─────────────────────────────────────────────────────
 describe('AC4: tamper detection — DOMException on corrupted ciphertext', () => {
-  it('throws when ciphertext bytes are flipped', async () => {
+  it('throws DOMException (or subclass) when ciphertext bytes are flipped (AC2)', async () => {
     const ciphertext = await encrypt('my-api-key-value');
     const [ivPart, ciphertextPart] = ciphertext.split(':');
 
@@ -150,10 +150,11 @@ describe('AC4: tamper detection — DOMException on corrupted ciphertext', () =>
     bytes[0] ^= 0xff;
     const tampered = ivPart + ':' + bytes.toString('base64');
 
-    await expect(decrypt(tampered)).rejects.toThrow();
+    // Web Crypto API throws DOMException on authTag mismatch (AC2 — "DOMException or subclass")
+    await expect(decrypt(tampered)).rejects.toBeInstanceOf(DOMException);
   });
 
-  it('throws when authTag bytes are corrupted (last 16 bytes)', async () => {
+  it('throws DOMException (or subclass) when authTag bytes are corrupted (last 16 bytes)', async () => {
     const ciphertext = await encrypt('my-api-key-value');
     const [ivPart, ciphertextPart] = ciphertext.split(':');
 
@@ -162,10 +163,10 @@ describe('AC4: tamper detection — DOMException on corrupted ciphertext', () =>
     bytes[bytes.length - 1] ^= 0x01;
     const tampered = ivPart + ':' + bytes.toString('base64');
 
-    await expect(decrypt(tampered)).rejects.toThrow();
+    await expect(decrypt(tampered)).rejects.toBeInstanceOf(DOMException);
   });
 
-  it('throws when IV is altered', async () => {
+  it('throws DOMException (or subclass) when IV is altered', async () => {
     const ciphertext = await encrypt('my-api-key-value');
     const [ivPart, ciphertextPart] = ciphertext.split(':');
 
@@ -173,7 +174,7 @@ describe('AC4: tamper detection — DOMException on corrupted ciphertext', () =>
     iv[0] ^= 0xff;
     const tampered = iv.toString('base64') + ':' + ciphertextPart;
 
-    await expect(decrypt(tampered)).rejects.toThrow();
+    await expect(decrypt(tampered)).rejects.toBeInstanceOf(DOMException);
   });
 
   it('throws on missing colon separator (invalid format)', async () => {
@@ -332,5 +333,53 @@ describe('[TEA P1] Large credential values', () => {
     const ciphertextPart = ciphertext.split(':')[1]!;
     const bytes = Buffer.from(ciphertextPart, 'base64');
     expect(bytes.byteLength).toBe(plaintext.length + 16); // + authTag
+  });
+});
+
+// ── Story 21.1: AC1 — Extended plaintext coverage (20+ unique strings) ────────
+describe('[AC1] Extended plaintext coverage — 20+ unique test strings', () => {
+  it('handles HTML/XSS special characters (double-quote, single-quote, lt, gt, amp)', async () => {
+    const plaintext = '"\'<>&';
+    const ciphertext = await encrypt(plaintext);
+    const recovered = await decrypt(ciphertext);
+    expect(recovered).toBe(plaintext);
+  });
+
+  it('handles exact story spec Korean phrase: 한글 테스트', async () => {
+    const plaintext = '한글 테스트';
+    const ciphertext = await encrypt(plaintext);
+    const recovered = await decrypt(ciphertext);
+    expect(recovered).toBe(plaintext);
+  });
+
+  it('handles multi-line text (newlines in credential value)', async () => {
+    const plaintext = 'line1\nline2\nline3';
+    const ciphertext = await encrypt(plaintext);
+    const recovered = await decrypt(ciphertext);
+    expect(recovered).toBe(plaintext);
+  });
+
+  it('handles exactly 1KB credential value', async () => {
+    const plaintext = 'x'.repeat(1024); // exactly 1KB
+    const ciphertext = await encrypt(plaintext);
+    const recovered = await decrypt(ciphertext);
+    expect(recovered).toBe(plaintext);
+    // AES-GCM output: len(plaintext) + 16 authTag bytes
+    const bytes = Buffer.from(ciphertext.split(':')[1]!, 'base64');
+    expect(bytes.byteLength).toBe(1024 + 16);
+  });
+
+  it('handles JWT-like token with dots and slashes', async () => {
+    const plaintext = 'Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ1c2VyLTEyMyJ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+    const ciphertext = await encrypt(plaintext);
+    const recovered = await decrypt(ciphertext);
+    expect(recovered).toBe(plaintext);
+  });
+
+  it('handles emoji characters (UTF-8 multibyte: 🔑🔐🗝️)', async () => {
+    const plaintext = '🔑🔐🗝️';
+    const ciphertext = await encrypt(plaintext);
+    const recovered = await decrypt(ciphertext);
+    expect(recovered).toBe(plaintext);
   });
 });

@@ -855,7 +855,7 @@ phases:
             title: "Credential Security Audit & Scrubber Coverage Verification"
             sp: 3
             priority: P0
-            status: pending
+            status: done
             blocked_by: ["16.3", "16.6", "18.4"]
           - id: "21.2"
             title: "Tool Telemetry & Pipeline E2E Gate Validation"

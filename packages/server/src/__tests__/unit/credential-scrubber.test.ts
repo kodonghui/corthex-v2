@@ -388,6 +388,41 @@ describe('TEA P1: Release isolation — release of one session does not affect a
   })
 })
 
+describe('FR-MCP6: AGENT_MCP_CREDENTIAL_MISSING — key name logged, value not exposed', () => {
+  test('error code contains key name but not plaintext credential value', async () => {
+    const { ToolError } = await import('../../lib/tool-error')
+    const err = new ToolError(
+      'AGENT_MCP_CREDENTIAL_MISSING',
+      'AGENT_MCP_CREDENTIAL_MISSING: notion_integration_token',
+    )
+    expect(err.code).toBe('AGENT_MCP_CREDENTIAL_MISSING')
+    expect(err.message).toContain('notion_integration_token') // key name ✓
+    expect(err.message).not.toContain('secret-actual-value') // value ✗
+  })
+
+  test('AGENT_MCP_CREDENTIAL_MISSING error code is registered in error-codes.ts', async () => {
+    const { ERROR_CODES } = await import('../../lib/error-codes')
+    expect(ERROR_CODES.AGENT_MCP_CREDENTIAL_MISSING).toBe('AGENT_MCP_CREDENTIAL_MISSING')
+  })
+
+  test('mcp-manager.ts resolveCredentials throws ToolError with key name, never credential value', async () => {
+    // Source introspection: error message contains credKey (key name), not the decrypted value
+    const fs = await import('fs')
+    const src = fs.readFileSync(
+      new URL('../../engine/mcp/mcp-manager.ts', import.meta.url).pathname,
+      'utf-8',
+    )
+    // Must throw with AGENT_MCP_CREDENTIAL_MISSING code
+    expect(src).toContain("'AGENT_MCP_CREDENTIAL_MISSING'")
+    // Error message must contain key name (credKey), NOT a decrypted credential value
+    expect(src).toContain('credKey')
+    // The throw must NOT expose the decrypted value (decrypt() only called after rows.length check)
+    const throwLine = src.split('\n').find((l) => l.includes("throw new ToolError('AGENT_MCP_CREDENTIAL_MISSING'"))
+    expect(throwLine).toBeDefined()
+    expect(throwLine).not.toContain('decrypt(')
+  })
+})
+
 describe('TEA P1: Scrubbing order — credential substring relationships handled correctly', () => {
   test('longer credential containing shorter as substring — both scrubbed independently', async () => {
     const { _testSetSession, credentialScrubber } = await import('../../engine/hooks/credential-scrubber')

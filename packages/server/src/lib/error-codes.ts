@@ -24,6 +24,9 @@ export const ERROR_CODES = {
   // Credential route errors (Story 16.5)
   CREDENTIAL_DUPLICATE_KEY: 'CREDENTIAL_DUPLICATE_KEY',
   CREDENTIAL_NOT_FOUND: 'CREDENTIAL_NOT_FOUND',
+
+  // MCP credential errors (FR-MCP6 — Story 21.1)
+  AGENT_MCP_CREDENTIAL_MISSING: 'AGENT_MCP_CREDENTIAL_MISSING',
 } as const
 
 export type ErrorCode = typeof ERROR_CODES[keyof typeof ERROR_CODES]
