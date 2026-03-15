@@ -44,8 +44,15 @@ phases:
       5-2: { name: "App Stitch Prompt", status: complete, party: 3R, critic_model: opus, score: 8.5, note: "6 screen prompts, 7 hand-coded exclusions, 7 Capacitor plugins, 2 fixes applied" }
   phase-6:
     name: External Generation
-    status: pending
-    note: "Manual — user pastes Phase 5 prompts into Google Stitch"
+    status: fallback-manual
+    note: "Stitch MCP tools not registered in session. Manual generation required."
+    fallback_reason: "MCP server configured in mcp.json but tools not loaded as deferred tools"
+    instructions: |
+      1. Open https://stitch.withgoogle.com/
+      2. Paste prompts from phase-5-prompts/stitch-prompt-web.md (9 screens)
+      3. Paste prompts from phase-5-prompts/stitch-prompt-app.md (6 screens)
+      4. Save generated HTML to phase-6-generated/web/ and phase-6-generated/app/
+      5. Save screenshots to same folders as .png
   phase-7:
     name: Integration
     status: pending
