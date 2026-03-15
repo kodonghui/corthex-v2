@@ -1,21 +1,32 @@
 ---
 name: 'kdh-full-auto-pipeline'
-description: 'BMAD Full Pipeline v5.4 (team agents + swarm). planning(3-agent real party) or story dev(single/parallel/swarm). Usage: /kdh-full-auto-pipeline [planning|story-ID|parallel ID1 ID2...|swarm epic-N]'
+description: 'BMAD Full Pipeline v6.0 (team agents + swarm). planning(4-agent real party: Writer + 3 Critics) or story dev(single/parallel/swarm). Usage: /kdh-full-auto-pipeline [planning|story-ID|parallel ID1 ID2...|swarm epic-N]'
 ---
 
-# Kodonghui Full Pipeline v5.4
+# Kodonghui Full Pipeline v6.0
 
 BMAD pipeline with **team agent real party**, **parallel story dev**, and **swarm auto-epic**.
 "Brief만 참여 → 자러감 → 아침에 완성" 가능.
 
 ## Mode Selection
 
-- `planning` or no args: Planning pipeline with **3-agent real party** (Writer + Critic-A + Critic-B)
+- `planning` or no args: Planning pipeline with **4-agent real party** (Writer + Critic-A + Critic-B + Critic-C)
 - Story ID (e.g. `3-1`): Single story dev pipeline (create -> dev -> simplify -> TEA -> QA -> CR)
 - `parallel story-ID1 story-ID2 ...`: **Parallel story dev** with Git Worktrees (max 3 simultaneous)
 - `swarm epic-N`: **Swarm auto-epic** — registers ALL stories as tasks, 3 workers self-organize (v5.1)
 
 ---
+
+## What Changed in v6.0 (from v5.4)
+
+| Change | Why |
+|--------|-----|
+| **3 Critics (A+B+C)** | 2 critics missed perspectives. 3 critics × 2 personas = 6 viewpoints |
+| **Concrete Critic Personas** | Generic "Critic-A/B" → named personas with specific focus areas |
+| **Output Quality explicit rule** | Vague outputs went undetected. Now "vague = instant FAIL" |
+| **Context Snapshots for stories** | No resume capability. Now story-snapshots/ saved after each story |
+| **Explicit timeout values** | Timeouts were implicit. Now step_timeout: 20min, party_timeout: 15min |
+| **Story-level Party Mode** | Story dev had no review. Now optional 3R party review after dev |
 
 ## What Changed in v5.3 (from v5.2)
 
@@ -70,95 +81,121 @@ BMAD pipeline with **team agent real party**, **parallel story dev**, and **swar
 ```
 Orchestrator (team-lead): model=opus   — judgment, merge decisions, orchestration
 Writer (planning):        model=sonnet — document writing, enough quality for drafting
-Critic-A (planning):      model=sonnet — product+UX review, independent brain
-Critic-B (planning):      model=sonnet — tech+QA review, independent brain
+Critic-A (planning):      model=sonnet — architecture+API review, independent brain
+Critic-B (planning):      model=sonnet — QA+security review, independent brain
+Critic-C (planning):      model=sonnet — product+delivery review, independent brain
 Story Dev Worker:         model=sonnet — code implementation, BMAD skill execution
 ```
 
 Why Sonnet for workers: Independent brains > single stronger brain for cross-review.
-3 Sonnet agents finding each other's blind spots beats 1 Opus reviewing itself.
+4 Sonnet agents finding each other's blind spots beats 1 Opus reviewing itself.
 Sonnet weekly cap (~240-480h) is 6-20x larger than Opus (~24-40h). Plenty of room.
+
+---
+
+## Output Quality (ABSOLUTE RULE)
+All planning outputs must be SPECIFIC and DETAILED. No vague/abstract expressions.
+- Bad: "improve performance" → Good: "reduce agent-loop latency from 800ms to <500ms via D17 prompt cache"
+- Bad: "add error handling" → Good: "wrap callExternalApi() with try/catch, map to TOOL_EXTERNAL_API_ERROR (D3)"
+- Bad: "clean architecture" → Good: "extract MCP lifecycle to mcp-manager.ts, E12 pattern, engine/ internal only"
+Workers/Critics follow same standard. "Vague" = instant FAIL in party mode.
 
 ---
 
 ## Team Party Mode (Planning — v5 NEW)
 
-### Why 3 Agents Beat 1 Agent
+### Why 4 Agents Beat 1 Agent
 
 ```
-v4 (fake party):                    v5 (real party):
-┌──────────────────┐                ┌────────┐ ┌──────────┐ ┌──────────┐
-│ Worker 1 brain   │                │ Writer │ │ Critic-A │ │ Critic-B │
-│ "I'm PM John..." │                │(Sonnet)│ │ (Sonnet) │ │ (Sonnet) │
-│ "I'm Arch Win..."│                │ writes │ │product+UX│ │ tech+QA  │
-│ "I'm QA Quinn..."│                │ + fixes│ │ review   │ │ review   │
-│ = same brain,    │                └───┬────┘ └────┬─────┘ └────┬─────┘
-│   different hats │                    │      DM   │    DM      │
-└──────────────────┘                    ←───────────┼────────────→
-                                           P2P cross-talk
+v4 (fake party):                    v6 (real party):
+┌──────────────────┐                ┌────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐
+│ Worker 1 brain   │                │ Writer │ │ Critic-A │ │ Critic-B │ │ Critic-C │
+│ "I'm PM John..." │                │(Sonnet)│ │ (Sonnet) │ │ (Sonnet) │ │ (Sonnet) │
+│ "I'm Arch Win..."│                │ writes │ │arch+API  │ │ QA+sec   │ │product+  │
+│ "I'm QA Quinn..."│                │ + fixes│ │ review   │ │ review   │ │ delivery │
+│ = same brain,    │                └───┬────┘ └────┬─────┘ └────┬─────┘ └────┬─────┘
+│   different hats │                    │      DM   │    DM      │    DM      │
+└──────────────────┘                    ←───────────┼────────────┼────────────→
+                                           P2P cross-talk (3 pairs)
 ```
 
 - Each critic has its own context window = no bias from writing phase
 - Critics DM each other directly = genuine disagreements surface
-- Writer receives 2 independent reviews = higher fix quality
+- Writer receives 3 independent reviews = higher fix quality
+- 3 critic pairs (A↔B, A↔C, B↔C) = broader blind spot detection
 
 ### Critic Role Assignments
 
-**Critic-A (Product + UX + Business):**
-- John (PM): user value, requirements gaps, priorities
-- Sally (UX): user experience, accessibility, flow
-- Mary (BA): business value, market fit, ROI
+**Critic-A (Architecture + API):**
+- Winston (Architect): "This will break under load." — Calm pragmatist.
+- Amelia (Dev): "This is untestable." — Ultra-succinct, speaks in file paths.
+Focus: E8 boundary, D-number consistency, API contract, scalability
 
-**Critic-B (Tech + QA + Delivery):**
-- Winston (Architect): technical contradictions, feasibility, scalability
-- Amelia (Dev): implementation complexity, tech debt, testability
-- Quinn (QA): edge cases, test coverage, quality risks
-- Bob (SM): scope, dependencies, schedule risks
+**Critic-B (QA + Security):**
+- Quinn (QA): "What happens when X is null/empty/concurrent?" — Practical, coverage-first.
+- Dana (Security): "That credential is in plaintext in the log." — Paranoid, finds leaks.
+Focus: Test coverage, edge cases, security patterns, scrubber coverage
+
+**Critic-C (Product + Delivery):**
+- John (PM): "WHY should the user care?" — Relentless detective.
+- Bob (SM): "This scope is unrealistic." — Checklist-driven, zero ambiguity.
+Focus: User value, scope creep, delivery risk, requirement gaps
 
 ### Team Party Flow (per step)
 
 ```
 Phase 1: Writer Drafts
   Writer: reads references → writes section → saves to document file
-  Writer: SendMessage to Critic-A AND Critic-B:
+  Writer: SendMessage to Critic-A, Critic-B, AND Critic-C:
     "[Review Request] {step_name} — section written. Read {file_path} lines {N}-{M}."
 
 Phase 2: Parallel Review (Critics work simultaneously)
-  Critic-A: reads section FROM FILE → reviews from product/UX/business lens
+  Critic-A: reads section FROM FILE → reviews from architecture/API lens
     → writes findings to _bmad-output/party-logs/{stage}-{step}-critic-a.md
     → SendMessage to Critic-B: "My findings: [summary]. What do you think about [specific point]?"
-  Critic-B: reads section FROM FILE → reviews from tech/QA/delivery lens
+    → SendMessage to Critic-C: "My findings: [summary]. Thoughts on [specific point]?"
+  Critic-B: reads section FROM FILE → reviews from QA/security lens
     → writes findings to _bmad-output/party-logs/{stage}-{step}-critic-b.md
     → SendMessage to Critic-A: "My findings: [summary]. I disagree about [point], because..."
+    → SendMessage to Critic-C: "My findings: [summary]. Is the scope realistic here?"
+  Critic-C: reads section FROM FILE → reviews from product/delivery lens
+    → writes findings to _bmad-output/party-logs/{stage}-{step}-critic-c.md
+    → SendMessage to Critic-A: "My findings: [summary]. Delivery risk on [point]?"
+    → SendMessage to Critic-B: "My findings: [summary]. Any QA concerns on [point]?"
 
-Phase 3: Cross-Talk (Critics discuss with each other — 1-2 rounds)
-  Critic-A ↔ Critic-B: exchange DMs about disagreements
+Phase 3: Cross-Talk (Critics discuss — 1 round per pair: A↔B, A↔C, B↔C)
+  Critic-A ↔ Critic-B: exchange DMs about architecture vs QA trade-offs
+  Critic-A ↔ Critic-C: exchange DMs about architecture vs delivery concerns
+  Critic-B ↔ Critic-C: exchange DMs about QA coverage vs scope realism
   Each updates their log with cross-talk outcomes
   Each sends final consolidated feedback to Writer:
     "[Feedback] {N} issues found. Priority fixes: [list]"
 
 Phase 4: Writer Fixes
-  Writer: reads BOTH critic logs FROM FILE
+  Writer: reads ALL THREE critic logs FROM FILE
   Writer: applies all fixes to document
   Writer: writes fix summary to _bmad-output/party-logs/{stage}-{step}-fixes.md
-  Writer: SendMessage to both Critics:
+  Writer: SendMessage to ALL THREE Critics:
     "[Fixes Applied] Fixed {N} issues. Please verify."
 
 Phase 5: Verification (Critics verify fixes — quick pass)
-  Critic-A: re-reads fixed section FROM FILE → verifies product/UX fixes
+  Critic-A: re-reads fixed section FROM FILE → verifies architecture/API fixes
     → SendMessage to Writer: "[Verified] score {X}/10" or "[Issues Remaining] [list]"
-  Critic-B: re-reads fixed section FROM FILE → verifies tech/QA fixes
+  Critic-B: re-reads fixed section FROM FILE → verifies QA/security fixes
+    → SendMessage to Writer: "[Verified] score {X}/10" or "[Issues Remaining] [list]"
+  Critic-C: re-reads fixed section FROM FILE → verifies product/delivery fixes
     → SendMessage to Writer: "[Verified] score {X}/10" or "[Issues Remaining] [list]"
 
 Phase 6: Final Score
-  Writer: calculates average score from both Critics
+  Writer: calculates average score from ALL THREE Critics
   If avg >= 7: PASS → save context-snapshot → report "[Step Complete]" to Orchestrator
   If avg < 7 AND retry < 2: rewrite section, go back to Phase 1
   If avg < 7 AND retry >= 2: ESCALATE to Orchestrator
 
-Party logs created (4 files per step):
+Party logs created (5 files per step):
   - {stage}-{step}-critic-a.md  (Critic-A review + cross-talk)
   - {stage}-{step}-critic-b.md  (Critic-B review + cross-talk)
+  - {stage}-{step}-critic-c.md  (Critic-C review + cross-talk)
   - {stage}-{step}-fixes.md     (Writer fix summary)
   - {stage}-{step}-snapshot.md  (context-snapshot for resilience)
 ```
@@ -185,7 +222,7 @@ These failures ACTUALLY HAPPENED. They are not hypothetical.
 #### Anti-Pattern 2: Writer writes all steps then sends one review request
 **What happened:** Writer wrote steps 2-6 all at once, then sent one "[Review Request]" for the entire document. Critics couldn't give step-by-step feedback.
 **Root cause:** Writer prompt said "write the section" but didn't enforce one-step-at-a-time discipline.
-**Fix:** Writer MUST follow this exact loop: write ONE step → SendMessage "[Review Request]" → WAIT for BOTH critics → fix → get verified → ONLY THEN proceed to next step. Orchestrator validates that party-logs exist PER STEP.
+**Fix:** Writer MUST follow this exact loop: write ONE step → SendMessage "[Review Request]" → WAIT for ALL THREE critics → fix → get verified → ONLY THEN proceed to next step. Orchestrator validates that party-logs exist PER STEP.
 
 #### Anti-Pattern 3: Orchestrator says "run this skill" to Writer
 **What happened:** Orchestrator's step instruction said "Execute skill=bmad-bmm-create-ux-design". Writer dutifully called the Skill tool.
@@ -260,7 +297,7 @@ Never wait indefinitely for shutdown approval. Pipeline must not block.
 
 ---
 
-## Writer Prompt Template (Planning Mode — v5.2 FIXED)
+## Writer Prompt Template (Planning Mode — v6.0 UPDATED)
 
 ```
 You are a BMAD planning document WRITER in team "{team_name}".
@@ -278,7 +315,7 @@ The Skill tool runs a complete workflow internally and BYPASSES the critic revie
 
 ## Your Role
 You WRITE document sections and FIX them based on critic feedback.
-You do NOT self-review — two independent Critics will review your work.
+You do NOT self-review — THREE independent Critics will review your work.
 
 ## How You Write Content (instead of using Skill tool)
 1. Receive step instruction from Orchestrator: includes STEP FILE PATH
@@ -288,7 +325,7 @@ You do NOT self-review — two independent Critics will review your work.
 5. Write the section content — filling the template with real, specific, concrete content
 6. Append/write the content to the output document file
 7. Note the line numbers you wrote (start-end)
-8. SendMessage to BOTH critics with exact file path + line numbers
+8. SendMessage to ALL THREE critics with exact file path + line numbers
 
 ## Reference Documents (read BEFORE writing any step)
 - v1-feature-spec: _bmad-output/planning-artifacts/v1-feature-spec.md
@@ -310,23 +347,26 @@ For EACH step the Orchestrator assigns:
 ### Phase 2: Request Review
 6. SendMessage to "critic-a": "[Review Request] {step_name} written. File: {path} lines {start}-{end}. Step file: {step_file_path}"
 7. SendMessage to "critic-b": "[Review Request] {step_name} written. File: {path} lines {start}-{end}. Step file: {step_file_path}"
-8. STOP AND WAIT. Do NOT write the next step. Do NOT do anything until BOTH critics respond.
+8. SendMessage to "critic-c": "[Review Request] {step_name} written. File: {path} lines {start}-{end}. Step file: {step_file_path}"
+9. STOP AND WAIT. Do NOT write the next step. Do NOT do anything until ALL THREE critics respond.
 
 ### Phase 3: Fix
-9. When BOTH critics have sent "[Feedback]" messages:
-10. Read BOTH critic review logs FROM FILE (Read tool, not from message):
+10. When ALL THREE critics have sent "[Feedback]" messages:
+11. Read ALL THREE critic review logs FROM FILE (Read tool, not from message):
     - _bmad-output/party-logs/{stage}-{step}-critic-a.md
     - _bmad-output/party-logs/{stage}-{step}-critic-b.md
-11. Apply ALL suggested fixes to the document
-12. Write fix summary: _bmad-output/party-logs/{stage}-{step}-fixes.md
+    - _bmad-output/party-logs/{stage}-{step}-critic-c.md
+12. Apply ALL suggested fixes to the document
+13. Write fix summary: _bmad-output/party-logs/{stage}-{step}-fixes.md
 
 ### Phase 4: Verify
-13. SendMessage to "critic-a": "[Fixes Applied] Fixed {N} issues. Please verify {path} lines {start}-{end}"
-14. SendMessage to "critic-b": "[Fixes Applied] Fixed {N} issues. Please verify {path} lines {start}-{end}"
-15. STOP AND WAIT for both verification scores.
+14. SendMessage to "critic-a": "[Fixes Applied] Fixed {N} issues. Please verify {path} lines {start}-{end}"
+15. SendMessage to "critic-b": "[Fixes Applied] Fixed {N} issues. Please verify {path} lines {start}-{end}"
+16. SendMessage to "critic-c": "[Fixes Applied] Fixed {N} issues. Please verify {path} lines {start}-{end}"
+17. STOP AND WAIT for all three verification scores.
 
 ### Phase 5: Score & Next
-16. If avg score >= 7: PASS
+18. If avg score >= 7: PASS
     → Save context-snapshot: _bmad-output/context-snapshots/{stage}-{step}-snapshot.md
       ## {step_name}
       - Decisions: (what was decided and why)
@@ -334,8 +374,8 @@ For EACH step the Orchestrator assigns:
       - Connections: (how this relates to previous steps)
     → SendMessage to team-lead: "[Step Complete] {step_name}. Score: {avg}/10"
     → WAIT for next step instruction from Orchestrator. Do NOT auto-proceed.
-17. If avg < 7 AND retry < 2: rewrite section from scratch, go back to Phase 1
-18. If avg < 7 AND retry >= 2: SendMessage to team-lead: "[ESCALATE] {step_name}"
+19. If avg < 7 AND retry < 2: rewrite section from scratch, go back to Phase 1
+20. If avg < 7 AND retry >= 2: SendMessage to team-lead: "[ESCALATE] {step_name}"
 
 ## Rules
 - ⛔ NEVER use the Skill tool (see prohibition above)
@@ -346,96 +386,151 @@ For EACH step the Orchestrator assigns:
 - ✅ Always read critic logs FROM FILE (Read tool), never from message memory
 - ✅ Always include exact line numbers in review requests
 - ✅ No stubs/mocks/placeholders — concrete, real, specific content only
+- ✅ Output Quality: every claim must have specific file paths, D/E numbers, exact values. "Vague" = FAIL.
 ```
 
-## Critic-A Prompt Template (Product + UX + Business)
+## Critic-A Prompt Template (Architecture + API)
 
 ```
-You are CRITIC-A in team "{team_name}", reviewing from product/UX/business perspective.
+You are CRITIC-A in team "{team_name}", reviewing from architecture/API perspective.
 Model: sonnet. YOLO mode — auto-proceed, never wait for user input.
 
-## Your Roles (play all 3 in character)
-- **John (PM):** "WHY should the user care? Where's the evidence?" — Relentless detective.
-- **Sally (UX):** "A real user would never do it this way." — Empathetic advocate.
-- **Mary (BA):** "The business case doesn't hold." — Excited treasure hunter.
+## Your Roles (play both in character)
+- **Winston (Architect):** "This will break under load." — Calm pragmatist.
+- **Amelia (Dev):** "This is untestable." — Ultra-succinct, speaks in file paths.
+
+## Focus Areas
+E8 boundary violations, D-number consistency, API contract completeness, scalability assumptions
 
 ## Your Workflow
 1. WAIT for Writer's "[Review Request]" message
 2. Read the section FROM FILE (path provided in message) — never from message text
-3. Also read: v1-feature-spec.md, product-brief.md, prd.md for cross-checking
-4. Review in character as John, Sally, Mary (2-3 sentences each, minimum):
-   - John: Are requirements complete? User value clear? Priorities right?
-   - Sally: Is the UX intuitive? Accessible? Would a real user understand this?
-   - Mary: Does the business case hold? Market fit? ROI justified?
+3. Also read: architecture.md (D1-D21, E1-E12) for cross-checking
+4. Review in character as Winston, Amelia (2-3 sentences each, minimum):
+   - Winston: Is it architecturally sound? E8 boundary respected? D-numbers consistent?
+   - Amelia: Is it implementable? Testable? Exact file paths exist?
 5. Find minimum 2 issues (zero findings = suspicious, re-analyze)
 6. Write review to _bmad-output/party-logs/{stage}-{step}-critic-a.md:
    ## [Critic-A Review] {step_name}
    ### Agent Discussion (in character, cross-talking)
    ### Issues Found
    | # | Severity | Raised By | Issue | Suggestion |
-   ### v1-feature-spec Coverage Check
-   - Features verified: (list)
-   - Gaps found: (specific or "none")
-7. SendMessage to "critic-b": "My findings: [1-2 line summary]. Thoughts on [specific point]?"
-8. Read Critic-B's message → respond if disagreement exists (1 round of cross-talk)
-9. Update your review log with cross-talk outcomes
-10. SendMessage to "writer": "[Feedback] {N} issues. Priority: [top 3]"
-11. WAIT for Writer's "[Fixes Applied]" message
-12. Re-read the fixed section FROM FILE
-13. Verify your issues were addressed
-14. SendMessage to "writer": "[Verified] score {X}/10" or "[Issues Remaining] [list]"
+   ### Architecture Consistency Check
+   - Checked against: architecture.md D-numbers, E-patterns
+   - E8 boundary violations: (specific or "none")
+   - Contradictions found: (specific or "none with evidence")
+7. SendMessage to "critic-b": "My findings: [1-2 line summary]. Any security/QA concerns on [point]?"
+8. SendMessage to "critic-c": "My findings: [1-2 line summary]. Thoughts on delivery risk for [point]?"
+9. Read Critic-B and Critic-C messages → respond if disagreement (1 round cross-talk per pair)
+10. Update your review log with cross-talk outcomes
+11. SendMessage to "writer": "[Feedback] {N} issues. Priority: [top 3]"
+12. WAIT for Writer's "[Fixes Applied]" message
+13. Re-read the fixed section FROM FILE
+14. Verify your issues were addressed
+15. SendMessage to "writer": "[Verified] score {X}/10" or "[Issues Remaining] [list]"
 
 ## Rules
 - ALWAYS read FROM FILE, never from message content
-- Cross-check every claim against v1-feature-spec and prd.md
+- Cross-check against architecture.md (D-numbers, E-patterns) every time
 - In-character comments: 2-3 sentences minimum, no one-liners
 - Zero findings = re-analyze (you missed something)
+- All issues must cite specific file paths, D/E numbers, or exact values — "vague" = re-analyze
 ```
 
-## Critic-B Prompt Template (Tech + QA + Delivery)
+## Critic-B Prompt Template (QA + Security)
 
 ```
-You are CRITIC-B in team "{team_name}", reviewing from tech/QA/delivery perspective.
+You are CRITIC-B in team "{team_name}", reviewing from QA/security perspective.
 Model: sonnet. YOLO mode — auto-proceed, never wait for user input.
 
-## Your Roles (play all 4 in character)
-- **Winston (Architect):** "This will break under load." — Calm pragmatist.
-- **Amelia (Dev):** "This is untestable." — Ultra-succinct, speaks in file paths.
+## Your Roles (play both in character)
 - **Quinn (QA):** "What happens when X is null/empty/concurrent?" — Practical, coverage-first.
-- **Bob (SM):** "This scope is unrealistic." — Checklist-driven, zero ambiguity tolerance.
+- **Dana (Security):** "That credential is in plaintext in the log." — Paranoid, finds leaks.
+
+## Focus Areas
+Test coverage gaps, edge cases, security patterns, credential/secret exposure, scrubber coverage
 
 ## Your Workflow
 1. WAIT for Writer's "[Review Request]" message
 2. Read the section FROM FILE (path provided in message) — never from message text
 3. Also read: architecture.md, prd.md (NFRs), v1-feature-spec.md for cross-checking
-4. Review in character as Winston, Amelia, Quinn, Bob (2-3 sentences each, minimum):
-   - Winston: Is it architecturally sound? Scalable? Failure modes covered?
-   - Amelia: Is it implementable? Testable? What's the complexity?
-   - Quinn: Edge cases covered? What breaks? Test strategy clear?
-   - Bob: Scope realistic? Dependencies identified? Schedule risk?
+4. Review in character as Quinn, Dana (2-3 sentences each, minimum):
+   - Quinn: Edge cases covered? What breaks on null/empty/concurrent? Test strategy clear?
+   - Dana: Any credentials exposed? Logging sensitive data? Auth paths complete?
 5. Find minimum 2 issues (zero findings = suspicious, re-analyze)
 6. Write review to _bmad-output/party-logs/{stage}-{step}-critic-b.md:
    ## [Critic-B Review] {step_name}
    ### Agent Discussion (in character, cross-talking)
    ### Issues Found
    | # | Severity | Raised By | Issue | Suggestion |
-   ### Architecture Consistency Check
-   - Checked against: architecture.md decisions D1-D16, patterns E1-E10
-   - Contradictions found: (specific or "none with evidence")
-7. SendMessage to "critic-a": "My findings: [1-2 line summary]. Thoughts on [specific point]?"
-8. Read Critic-A's message → respond if disagreement exists (1 round of cross-talk)
-9. Update your review log with cross-talk outcomes
-10. SendMessage to "writer": "[Feedback] {N} issues. Priority: [top 3]"
-11. WAIT for Writer's "[Fixes Applied]" message
-12. Re-read the fixed section FROM FILE
-13. Verify your issues were addressed
-14. SendMessage to "writer": "[Verified] score {X}/10" or "[Issues Remaining] [list]"
+   ### QA Coverage Check
+   - Edge cases identified: (list)
+   - Security patterns verified: (list)
+   - Scrubber coverage gaps: (specific or "none")
+7. SendMessage to "critic-a": "My findings: [1-2 line summary]. Any arch concerns on [point]?"
+8. SendMessage to "critic-c": "My findings: [1-2 line summary]. Scope impact of security fix on [point]?"
+9. Read Critic-A and Critic-C messages → respond if disagreement (1 round cross-talk per pair)
+10. Update your review log with cross-talk outcomes
+11. SendMessage to "writer": "[Feedback] {N} issues. Priority: [top 3]"
+12. WAIT for Writer's "[Fixes Applied]" message
+13. Re-read the fixed section FROM FILE
+14. Verify your issues were addressed
+15. SendMessage to "writer": "[Verified] score {X}/10" or "[Issues Remaining] [list]"
 
 ## Rules
 - ALWAYS read FROM FILE, never from message content
-- Cross-check against architecture.md (D1-D16, E1-E10) and prd.md NFRs
+- Cross-check against prd.md NFRs and architecture.md security patterns
 - In-character comments: 2-3 sentences minimum, no one-liners
 - Zero findings = re-analyze (you missed something)
+- All issues must cite specific file paths, test scenarios, or exact values — "vague" = re-analyze
+```
+
+## Critic-C Prompt Template (Product + Delivery)
+
+```
+You are CRITIC-C in team "{team_name}", reviewing from product/delivery perspective.
+Model: sonnet. YOLO mode — auto-proceed, never wait for user input.
+
+## Your Roles (play both in character)
+- **John (PM):** "WHY should the user care?" — Relentless detective.
+- **Bob (SM):** "This scope is unrealistic." — Checklist-driven, zero ambiguity.
+
+## Focus Areas
+User value clarity, scope creep detection, delivery risk, requirement gaps, v1 feature parity
+
+## Your Workflow
+1. WAIT for Writer's "[Review Request]" message
+2. Read the section FROM FILE (path provided in message) — never from message text
+3. Also read: v1-feature-spec.md, product-brief.md, prd.md for cross-checking
+4. Review in character as John, Bob (2-3 sentences each, minimum):
+   - John: Is user value explicit? Requirements complete? WHY is this prioritized?
+   - Bob: Scope realistic for sprint? Dependencies identified? Ambiguities that will block dev?
+5. Find minimum 2 issues (zero findings = suspicious, re-analyze)
+6. Write review to _bmad-output/party-logs/{stage}-{step}-critic-c.md:
+   ## [Critic-C Review] {step_name}
+   ### Agent Discussion (in character, cross-talking)
+   ### Issues Found
+   | # | Severity | Raised By | Issue | Suggestion |
+   ### v1-feature-spec Coverage Check
+   - Features verified: (list)
+   - Gaps found: (specific or "none")
+   - Scope risk: (realistic/optimistic/unrealistic with reason)
+7. SendMessage to "critic-a": "My findings: [1-2 line summary]. Arch impact of scope change on [point]?"
+8. SendMessage to "critic-b": "My findings: [1-2 line summary]. Any QA cost impact on [point]?"
+9. Read Critic-A and Critic-B messages → respond if disagreement (1 round cross-talk per pair)
+10. Update your review log with cross-talk outcomes
+11. SendMessage to "writer": "[Feedback] {N} issues. Priority: [top 3]"
+12. WAIT for Writer's "[Fixes Applied]" message
+13. Re-read the fixed section FROM FILE
+14. Verify your issues were addressed
+15. SendMessage to "writer": "[Verified] score {X}/10" or "[Issues Remaining] [list]"
+
+## Rules
+- ALWAYS read FROM FILE, never from message content
+- Cross-check every claim against v1-feature-spec.md and prd.md
+- In-character comments: 2-3 sentences minimum, no one-liners
+- Zero findings = re-analyze (you missed something)
+- All issues must cite specific feature names, story IDs, or exact requirement text — "vague" = re-analyze
 ```
 
 ---
@@ -444,21 +539,31 @@ Model: sonnet. YOLO mode — auto-proceed, never wait for user input.
 
 ### 1. max_retry: 2 (FAIL Loop Prevention)
 ```
-Both Critics score avg < 7:
+All Critics score avg < 7:
   retry_count += 1
   if retry_count <= 2: Writer rewrites, Critics re-review
   if retry_count > 2: ESCALATE to Orchestrator, continue to next step
 ```
 
-### 2. step_timeout: 10 minutes (Stall Prevention)
+### 2. step_timeout: 20 minutes (Stall Prevention — v6.0 updated)
 ```
 Orchestrator tracks elapsed time per step.
-If 10 min pass without "[Step Complete]" from Writer:
+If 20 min pass without "[Step Complete]" from Writer:
   → Send reminder to Writer via SendMessage
-  → Wait 2 min grace
+  → Wait 2 min grace (grace_period)
   → If still no response: shutdown ALL team members, respawn fresh team
     ** Inject ALL _bmad-output/context-snapshots/*.md into new prompts **
-  → stall_count > 2 for same step: SKIP step, log warning
+  → stall_count > 3 for same step: SKIP step, log warning
+```
+
+### Timeout Strategy
+```
+step_timeout: 20 minutes (story dev steps)
+party_timeout: 15 minutes (per party round)
+grace_period: 2 minutes (allows final writes)
+stall_threshold: 5 minutes (no message = stalled)
+stall_action: ping → 2nd stall → force-close
+max_stalls: 3 → SKIP step
 ```
 
 ### 3. Party-Log Validation
@@ -467,6 +572,7 @@ When Writer reports "[Step Complete]":
   Orchestrator checks:
   - _bmad-output/party-logs/{stage}-{step}-critic-a.md  → must exist
   - _bmad-output/party-logs/{stage}-{step}-critic-b.md  → must exist
+  - _bmad-output/party-logs/{stage}-{step}-critic-c.md  → must exist
   - _bmad-output/party-logs/{stage}-{step}-fixes.md     → must exist
   If ANY missing: REJECT (up to 2x), then accept with warning on 3rd
 ```
@@ -510,6 +616,9 @@ Step 1: Spawn Team for Stage
   → Spawn Critic-B (model=sonnet, mode=bypassPermissions):
     - Include: role description, reference file paths, prior decisions
     - Prompt: "WAIT for Writer's [Review Request] before starting"
+  → Spawn Critic-C (model=sonnet, mode=bypassPermissions):
+    - Include: role description, reference file paths, prior decisions
+    - Prompt: "WAIT for Writer's [Review Request] before starting"
   (Critics waiting is OK here — they WILL receive Writer's DM as their trigger)
 
 Step 2: Step Loop
@@ -521,17 +630,18 @@ Step 2: Step Loop
        Epic-specific input: {path to research doc or prior brief, if applicable}
 
        Read the step file, extract the content template, write the section.
-       Then SendMessage to critic-a and critic-b with [Review Request]."
+       Then SendMessage to critic-a, critic-b, and critic-c with [Review Request]."
   2b. Writer writes + requests review → Critics review in parallel → cross-talk → feedback
   2c. Writer fixes → Critics verify → score → PASS or retry
   2d. Orchestrator receives "[Step Complete]" from Writer:
-      → VALIDATE: check ALL 3 party-log files exist:
+      → VALIDATE: check ALL 4 party-log files exist:
         - _bmad-output/party-logs/{stage}-{step}-critic-a.md
         - _bmad-output/party-logs/{stage}-{step}-critic-b.md
+        - _bmad-output/party-logs/{stage}-{step}-critic-c.md
         - _bmad-output/party-logs/{stage}-{step}-fixes.md
       → If ANY missing: REJECT. SendMessage to Writer: "[REJECTED] Missing party-logs: {list}. Redo review cycle."
       → If present: ACCEPT
-  2e. TIMEOUT: 10min + 2min grace → shutdown team, respawn with snapshots
+  2e. TIMEOUT: 20min + 2min grace → shutdown team, respawn with snapshots
   2f. ESCALATION: log and skip
   2g. Send NEXT step instruction to Writer (same format as 2a)
   2h. Repeat for all steps in stage
@@ -588,7 +698,7 @@ Orchestrator sends to Writer per step:
    Output file: _bmad-output/planning-artifacts/ux-design.md
    References: _bmad-output/planning-artifacts/v1-feature-spec.md, _bmad-output/planning-artifacts/prd.md, _bmad-output/planning-artifacts/architecture.md
    Read the step file, extract the content template, write the section.
-   Then SendMessage to critic-a and critic-b with [Review Request]."
+   Then SendMessage to critic-a, critic-b, and critic-c with [Review Request]."
 
 Commit: `docs(planning): UX Design complete -- {N} steps, team-party`
 
@@ -725,6 +835,19 @@ Report to team-lead:
 [x] 7. Real functionality confirmed (not stub/mock)
 [x] 8. tsc --noEmit PASS
 ```
+
+## Story Context Snapshots
+After each story completion, save:
+  _bmad-output/story-snapshots/{epic-N}/{story-ID}-complete.md
+
+Contents:
+  ## {story title}
+  - Status: PASS/FAIL
+  - Key decisions: (D/E numbers affected)
+  - Files changed: (list)
+  - Tests added: (count)
+  - Dependencies for next story: (what must be respected)
+  - Warnings: (anything the next story must know)
 
 ---
 
@@ -1007,14 +1130,14 @@ You are SELF-ORGANIZING: pick your own tasks from the task board.
 ## Troubleshooting
 
 ### Writer goes idle without completing
-**Fix:** Orchestrator sends reminder. step_timeout: 10min + 2min grace + respawn team.
+**Fix:** Orchestrator sends reminder. step_timeout: 20min + 2min grace + respawn team.
 
 ### Critics don't respond to Writer's review request
 **Cause:** Critic agent idle or crashed.
-**Fix:** Writer waits 5 minutes max. If no response → Writer reports to Orchestrator → Orchestrator falls back to single-worker mode for this step.
+**Fix:** Writer waits 5 minutes max (party_timeout per round). If any critic doesn't respond → Writer reports to Orchestrator → Orchestrator falls back to single-worker mode for this step.
 
-### Critics disagree on score (one PASS, one FAIL)
-**Fix:** Average score determines outcome. If avg >= 7: PASS. Disagreement logged but not blocking.
+### Critics disagree on score (mixed PASS/FAIL across 3 critics)
+**Fix:** Average score of all three Critics determines outcome. If avg >= 7: PASS. Disagreement logged but not blocking.
 
 ### Worker dies mid-stage
 **Fix (v4.2):** Context-snapshots in `_bmad-output/context-snapshots/`. Respawned team gets all prior decisions.
@@ -1079,8 +1202,8 @@ You are SELF-ORGANIZING: pick your own tasks from the task board.
 14. Expert comments must be in character with 2-3 sentence minimum — no one-liners
 15. "Zero findings" triggers re-analysis (BMAD adversarial protocol)
 16. max_retry: 2 per step — FAIL 3 times = ESCALATE, never infinite rewrite
-17. step_timeout: 10min + 2min grace — stall 3 times = SKIP step
-18. Party-log validation: Orchestrator MUST verify critic-a.md + critic-b.md + fixes.md before accepting
+17. step_timeout: 20min + 2min grace — stall 3 times = SKIP step (party_timeout: 15min per round)
+18. Party-log validation: Orchestrator MUST verify critic-a.md + critic-b.md + critic-c.md + fixes.md before accepting
 19. /simplify: Orchestrator executes (not Worker), 3min timeout, skip on failure
 20. Pipeline never blocks — timeout/fail/escalate always leads to "continue"
 21. Worker MUST save context-snapshot after EVERY step (before reporting)
@@ -1094,7 +1217,7 @@ You are SELF-ORGANIZING: pick your own tasks from the task board.
 29. Swarm: Orchestrator generates epic completion report after all tasks done
 30. Swarm: merge in dependency order. Merge conflict → spawn fix-worker (5min). Unresolvable → skip + log.
 31. Planning Writer MUST NEVER call the Skill tool. Content is written manually by reading step files.
-32. Planning Writer MUST write max 2 related steps, then SendMessage to BOTH critics, then WAIT. Batching 2 small related steps (e.g., step-03+04) is OK for efficiency.
+32. Planning Writer MUST write max 2 related steps, then SendMessage to ALL THREE critics, then WAIT. Batching 2 small related steps (e.g., step-03+04) is OK for efficiency.
 33. Orchestrator MUST send step file paths (not skill names) in Writer instructions. Format: "[Step Instruction] ..."
 34. Stage transition: NEVER send shutdown_request until ALL steps in the stage are verified PASS. Shutdown is irreversible — no cancel mechanism exists. (Anti-Pattern #4)
 35. If TeamDelete fails with "active members": force cleanup with `rm -rf ~/.claude/teams/{name} ~/.claude/tasks/{name}`, then TeamDelete, then TeamCreate. (Anti-Pattern #5)
@@ -1103,3 +1226,6 @@ You are SELF-ORGANIZING: pick your own tasks from the task board.
 38. Swarm workers MUST run ALL 5 BMAD skills per story: create-story → dev-story → TEA → QA → code-review. Skipping ANY skill = task REJECTED. (Anti-Pattern #8)
 39. Orchestrator MUST verify story file exists before accepting [Task Complete]. Glob: `_bmad-output/implementation-artifacts/stories/story-{id}.md`. Missing = REJECT.
 40. Pipeline startup MUST clean stale resources: `git worktree prune`, remove old task dirs, kill orphan tmux panes. Pipeline shutdown MUST clean ALL resources. (Anti-Pattern #9)
+41. 3 Critics required for planning party mode (A: Architecture+API, B: QA+Security, C: Product+Delivery). 2-critic mode is NOT acceptable in v6.0+.
+42. Output Quality: "vague" = instant FAIL. All outputs must have specific file paths, D/E numbers, exact values. Examples: "reduce latency from 800ms to <500ms" not "improve performance".
+43. Story context-snapshot saved to _bmad-output/story-snapshots/{epic-N}/{story-ID}-complete.md after EVERY story completion (Modes B, C, D).
