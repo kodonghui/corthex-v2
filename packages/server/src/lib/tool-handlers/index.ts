@@ -61,6 +61,8 @@ import { notebooklmGetMindmap } from './builtins/notebooklm-get-mindmap'
 import { notebooklmCreateSlides } from './builtins/notebooklm-create-slides'
 import { notebooklmSummarize } from './builtins/notebooklm-summarize'
 import { svReadCanvas, svAddNode, svUpdateNode, svDeleteNode, svAddEdge, svSaveDiagram, svSearchKnowledge, svLoadFromKnowledge } from './builtins/sketchvibe-mcp'
+import { listReports } from './builtins/list-reports'
+import { getReport } from './builtins/get-report'
 
 // 내장 핸들러 등록
 registry.register('get_current_time', getCurrentTime)
@@ -124,6 +126,10 @@ registry.register('notebooklm_generate_audio', notebooklmGenerateAudio)
 registry.register('notebooklm_get_mindmap', notebooklmGetMindmap)
 registry.register('notebooklm_create_slides', notebooklmCreateSlides)
 registry.register('notebooklm_summarize', notebooklmSummarize)
+
+// Story 20.3: Report retrieval tools (FR-RM3, FR-RM4)
+registry.register('list_reports', listReports)
+registry.register('get_report', getReport)
 
 // SketchVibe MCP 도구 (Story 11.2)
 registry.register('sv_read_canvas', svReadCanvas)
