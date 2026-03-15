@@ -1,0 +1,68 @@
+import { LucideIcon, TrendingUp, TrendingDown } from 'lucide-react'
+
+export interface MetricCardProps {
+    title: string;
+    value: string;
+    icon: LucideIcon;
+    trend?: 'up' | 'down';
+    trendValue?: string;
+    progress?: number;
+    progressLabel?: string;
+    progressMaxUrl?: string;
+    valuePrefix?: string;
+}
+
+export function MetricCard({
+    title,
+    value,
+    icon: Icon,
+    trend,
+    trendValue,
+    progress,
+    progressLabel,
+    progressMaxUrl,
+    valuePrefix
+}: MetricCardProps) {
+    return (
+        <div className="bg-slate-900 rounded-xl p-6 border border-slate-800 shadow-sm flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+                <p className="text-slate-400 text-sm font-medium uppercase tracking-wider">{title}</p>
+                <div className="w-8 h-8 rounded-lg bg-[rgba(34,211,238,0.10)] flex items-center justify-center text-cyan-400">
+                    <Icon className="w-4 h-4" />
+                </div>
+            </div>
+
+            {progress !== undefined ? (
+                <div className="flex flex-col gap-3">
+                    <p className="text-slate-50 text-3xl font-mono font-bold tracking-tight">
+                        {valuePrefix}{value}
+                    </p>
+                    <div className="flex flex-col gap-1.5">
+                        <div className="flex justify-between text-xs font-mono text-slate-400">
+                            <span>{progressLabel}</span>
+                            <span>{progressMaxUrl}</span>
+                        </div>
+                        <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                            <div
+                                className="bg-cyan-400 h-1.5 rounded-full"
+                                style={{ width: `${progress}%` }}
+                            />
+                        </div>
+                    </div>
+                </div>
+            ) : (
+                <div className="flex items-baseline gap-3">
+                    <p className="text-slate-50 text-3xl font-mono font-bold tracking-tight">
+                        {valuePrefix}{value}
+                    </p>
+                    {trend && (
+                        <p className={`${trend === 'up' ? 'text-emerald-500' : 'text-red-500'} text-sm font-mono font-bold flex items-center tabular-nums`}>
+                            {trend === 'up' ? <TrendingUp className="w-3.5 h-3.5 mr-0.5" /> : <TrendingDown className="w-3.5 h-3.5 mr-0.5" />}
+                            {trend === 'up' ? '+' : '-'}{trendValue}
+                        </p>
+                    )}
+                </div>
+            )}
+        </div>
+    )
+}

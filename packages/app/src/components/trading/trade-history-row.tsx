@@ -1,0 +1,19 @@
+export interface TradeHistoryRowProps {
+    time: string;
+    type: 'Buy' | 'Sell';
+    price: string;
+    amount: string;
+}
+
+export function TradeHistoryRow({ time, type, price, amount }: TradeHistoryRowProps) {
+    return (
+        <tr className="border-b border-slate-700/50 hover:bg-slate-800 transition-colors">
+            <td className="py-2.5 px-4 text-slate-400">{time}</td>
+            <td className="py-2.5 px-4">
+                <span className={type === 'Buy' ? 'text-emerald-500' : 'text-red-500'}>{type}</span>
+            </td>
+            <td className="py-2.5 px-4 text-right text-slate-100">{price}</td>
+            <td className="py-2.5 px-4 text-right text-slate-100">{amount}</td>
+        </tr>
+    )
+}

@@ -1,0 +1,45 @@
+import { ReactNode } from 'react'
+
+export interface ActivityLogItemProps {
+    title: string;
+    statusText: string;
+    statusBadgeClass: string;
+    agentName: string;
+    description: string;
+    time: string;
+    timeAgo: string;
+    icon: ReactNode;
+    themeColorClass: string; // e.g., 'bg-emerald-500', 'bg-violet-500'
+}
+
+export function ActivityLogItem({ title, statusText, statusBadgeClass, agentName, description, time, timeAgo, icon, themeColorClass }: ActivityLogItemProps) {
+    return (
+        <div className="flex gap-4 bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800/60 rounded-xl p-4 hover:border-slate-300 dark:hover:border-slate-700 transition-colors relative overflow-hidden group">
+            <div className={`absolute left-0 top-0 bottom-0 w-1 ${themeColorClass}`}></div>
+            <div className="flex items-start gap-4 w-full">
+                <div className="relative">
+                    <div className="bg-slate-200 dark:bg-slate-800 aspect-square bg-cover rounded-full h-12 w-12 border-2 border-white dark:border-slate-900 shadow-sm flex items-center justify-center text-slate-500 dark:text-slate-400">
+                        {icon}
+                    </div>
+                    <div className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white dark:border-slate-900 ${themeColorClass}`}></div>
+                </div>
+                <div className="flex flex-1 flex-col justify-center gap-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                        <p className="text-slate-900 dark:text-white text-base font-semibold leading-tight">{title}</p>
+                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${statusBadgeClass}`}>
+                            {statusText}
+                        </span>
+                        <span className="inline-flex items-center rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-xs font-medium text-slate-600 dark:text-slate-300 ring-1 ring-inset ring-slate-500/20">
+                            {agentName}
+                        </span>
+                    </div>
+                    <p className="text-slate-600 dark:text-slate-400 text-sm font-normal leading-relaxed">{description}</p>
+                </div>
+                <div className="flex flex-col items-end shrink-0 gap-1 text-right">
+                    <p className="font-mono text-slate-500 dark:text-slate-400 text-sm font-medium tracking-tight">{time}</p>
+                    <p className="text-slate-400 dark:text-slate-500 text-xs font-normal">{timeAgo}</p>
+                </div>
+            </div>
+        </div>
+    )
+}
