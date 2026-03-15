@@ -650,7 +650,7 @@ phases:
             title: "AES-256-GCM Credential Crypto Library"
             sp: 2
             priority: P0
-            status: pending
+            status: done
             blocked_by: ["16.1"]
           - id: "16.4"
             title: "getDB() Credential CRUD Methods"
