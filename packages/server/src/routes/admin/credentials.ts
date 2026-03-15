@@ -5,8 +5,11 @@ import { eq, and } from 'drizzle-orm'
 import { db } from '../../db'
 import { cliCredentials } from '../../db/schema'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
+import { tenantMiddleware } from '../../middleware/tenant'
 import { HTTPError } from '../../middleware/error'
 import { encrypt } from '../../lib/crypto'
+import { encrypt as encryptCredential } from '../../lib/credential-crypto'
+import { getDB } from '../../db/scoped-query'
 import {
   SUPPORTED_PROVIDERS,
   listCredentials,
@@ -161,4 +164,88 @@ credentialsRoute.delete('/api-keys/:id', async (c) => {
   )
 
   return c.json({ data: { message: '삭제되었습니다' } })
+})
+
+// === Story 16.5: Tool Credential CRUD (D23, E11, FR-CM1~4, FR-CM6) ===
+
+const credentialWriteSchema = z.object({
+  keyName: z.string().min(1).max(255),
+  value: z.string().min(1),
+})
+
+const credentialUpdateSchema = z.object({
+  value: z.string().min(1),
+})
+
+export function isDuplicateKeyError(err: unknown): boolean {
+  if (typeof err === 'object' && err !== null) {
+    const e = err as Record<string, unknown>
+    if (e.code === '23505') return true
+    if (e.cause && typeof e.cause === 'object') {
+      return (e.cause as Record<string, unknown>).code === '23505'
+    }
+  }
+  return false
+}
+
+// GET /api/admin/credentials — masked list (AC2)
+credentialsRoute.get('/credentials', tenantMiddleware, async (c) => {
+  const tenant = c.get('tenant')
+  const rows = await getDB(tenant.companyId).listCredentials()
+  return c.json({ success: true, data: rows })
+})
+
+// POST /api/admin/credentials — register new credential (AC1, AC5)
+credentialsRoute.post('/credentials', tenantMiddleware, zValidator('json', credentialWriteSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const { keyName, value } = c.req.valid('json')
+  const encryptedValue = await encryptCredential(value)
+
+  try {
+    const [row] = await getDB(tenant.companyId).insertCredential(
+      { keyName, encryptedValue },
+      tenant.userId,
+    )
+    return c.json({ success: true, data: { id: row!.id, keyName: row!.keyName, updatedAt: row!.updatedAt } }, 201)
+  } catch (err: unknown) {
+    if (isDuplicateKeyError(err)) {
+      return c.json({ success: false, error: { code: 'CREDENTIAL_DUPLICATE_KEY', message: 'Key name already exists' } }, 409)
+    }
+    throw err
+  }
+})
+
+// PUT /api/admin/credentials/:keyName — update credential (AC3)
+credentialsRoute.put('/credentials/:keyName', tenantMiddleware, zValidator('json', credentialUpdateSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const keyName = c.req.param('keyName')
+  const { value } = c.req.valid('json')
+  const encryptedValue = await encryptCredential(value)
+
+  const rows = await getDB(tenant.companyId).updateCredential(keyName, encryptedValue, tenant.userId)
+  if (rows.length === 0) {
+    return c.json({ success: false, error: { code: 'CREDENTIAL_NOT_FOUND', message: 'Credential not found' } }, 404)
+  }
+  return c.json({ success: true, data: { keyName: rows[0]!.keyName, updatedAt: rows[0]!.updatedAt } })
+})
+
+// DELETE /api/admin/credentials/:keyName — audit log then delete (AC4)
+credentialsRoute.delete('/credentials/:keyName', tenantMiddleware, async (c) => {
+  const tenant = c.get('tenant')
+  const keyName = c.req.param('keyName')
+
+  // AC4: Audit log BEFORE delete
+  console.info(JSON.stringify({
+    event: 'credential_deleted',
+    keyName,
+    companyId: tenant.companyId,
+    userId: tenant.userId,
+    timestamp: new Date().toISOString(),
+  }))
+
+  const rows = await getDB(tenant.companyId).deleteCredential(keyName)
+  if (rows.length === 0) {
+    return c.json({ success: false, error: { code: 'CREDENTIAL_NOT_FOUND', message: 'Credential not found' } }, 404)
+  }
+  return c.json({ success: true })
 })

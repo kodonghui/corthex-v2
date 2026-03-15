@@ -1,85 +1,60 @@
 ---
 stepsCompleted: ['step-01-preflight-and-context', 'step-02-identify-targets', 'step-03-generate-tests', 'step-04-validate-and-summarize']
 lastStep: 'step-04-validate-and-summarize'
-lastSaved: '2026-03-08'
-story: '16-5-knowledge-ui-drag-drop-upload'
+lastSaved: '2026-03-15'
+story: '16-5-admin-credentials-crud-api-routes'
 ---
 
-# TEA Automation Summary -- Story 16-5
+# TEA Summary: Story 16.5 — Admin Credentials CRUD API Routes
 
 ## Preflight
 
-- **Stack**: fullstack (Bun + React/Vite)
-- **Test Framework**: bun:test (서버), vitest (프론트엔드)
-- **Mode**: BMad-Integrated (story + epics artifacts available)
-- **Execution Mode**: Sequential
+- **Stack**: fullstack (bun:test backend)
+- **Execution Mode**: sequential (swarm worker — no subagent support)
+- **Mode**: BMad-Integrated (Story 16.5 ACs + Dev Notes loaded)
+- **Target**: `packages/server/src/routes/admin/credentials.ts` (4 new CRUD routes + isDuplicateKeyError helper)
 
-## Coverage Plan
+## Risk Analysis
 
-### Targets Identified
+| Risk Area | Priority | Tests Added |
+|-----------|----------|-------------|
+| Zod rejects empty keyName (min(1)) — prevents empty-string credential key | P0 | 1 |
+| Zod rejects empty value (min(1)) — prevents empty-string as credential value | P0 | 1 |
+| Zod rejects keyName > 255 chars (max(255)) | P0 | 1 |
+| Valid payload passes credentialWriteSchema | P0 | 1 |
+| credentialUpdateSchema rejects empty value | P0 | 1 |
+| insertCredential row[0]! non-null assertion — DB INSERT always returns row | P0 | 2 |
+| isDuplicateKeyError handles undefined/number/string-cause edge cases | P1 | 3 |
+| tenantMiddleware applied to all 4 credential routes (source code verification) | P0 | 2 |
+| E11 compliance — encryptCredential from credential-crypto (not legacy crypto.ts) | P0 | 1 |
 
-| Target | Level | Priority | Status |
-|--------|-------|----------|--------|
-| Helper functions (formatDate, formatRelative, findFolderName, flattenFolders) | Unit | P0 | ✅ Covered |
-| Query param builders (buildDocsParams, buildMemoryParams) | Unit | P0 | ✅ Covered |
-| Filter chip generation logic | Unit | P1 | ✅ Covered |
-| Pagination calculation | Unit | P1 | ✅ Covered |
-| Content type detection & rendering logic | Unit | P1 | ✅ Covered |
-| Tag rendering with overflow | Unit | P1 | ✅ Covered |
-| Confidence bar color logic | Unit | P1 | ✅ Covered |
-| Folder tree structure validation | Unit | P1 | ✅ Covered |
-| Form validation (doc create/edit) | Unit | P0 | ✅ Covered |
-| Memory form validation | Unit | P0 | ✅ Covered |
-| Tab switching | Unit | P2 | ✅ Covered |
-| Folder selection state | Unit | P2 | ✅ Covered |
-| API endpoint paths | Unit | P1 | ✅ Covered |
-| Deep nesting (4 levels) | Unit | P1 | ✅ TEA Added |
-| Upload edge cases | Unit | P1 | ✅ TEA Added |
-| Content rendering logic | Unit | P1 | ✅ TEA Added |
-| Memory filtering combinations | Unit | P1 | ✅ TEA Added |
-| Query key generation | Unit | P2 | ✅ TEA Added |
-| Drag state management | Unit | P1 | ✅ TEA Added |
-| Modal state machine | Unit | P1 | ✅ TEA Added |
-| Korean label verification | Unit | P0 | ✅ TEA Added |
+## Coverage Summary
 
-### Not Targeted (Out of Scope)
+| Test Group | Count | Priority |
+|---|---|---|
+| Route structure (credentialsRoute is Hono, isDuplicateKeyError exported) | 2 | P0 |
+| AC5: isDuplicateKeyError detection paths (direct code, nested cause, non-dupe) | 5 | P0 |
+| AC1: POST encrypt non-deterministic + response shape (no encryptedValue) | 2 | P0 |
+| AC2: GET masked list shape + response format | 2 | P0 |
+| AC3: PUT 404 + success response shape | 3 | P0 |
+| AC4: DELETE audit log payload + success/404 responses | 3 | P0 |
+| AC5: 409 response shape + Drizzle-wrapped error | 2 | P0 |
+| [Security] encryptedValue never in responses (list + insert) | 2 | P0 |
+| [TEA P0] credentialWriteSchema validation (empty keyName, empty value, >255, valid) | 4 | P0 |
+| [TEA P0] credentialUpdateSchema validation (empty value) | 1 | P0 |
+| [TEA P0] insertCredential row non-null assertion (defined + undefined cases) | 2 | P0 |
+| [TEA P1] isDuplicateKeyError edge cases (undefined, number, string cause) | 3 | P1 |
+| [TEA P0] tenantMiddleware on all 4 routes (source code verification) | 2 | P0 |
+| [TEA P0] E11 compliance — encryptCredential from credential-crypto | 1 | P0 |
+| **Total** | **34** | — |
 
-- E2E browser tests (no Playwright configured)
-- Server API tests (backend already fully tested in E16-S2)
-- DOM rendering tests (would require jsdom setup not in project)
+## Test Files
 
-## Test Results
+- `packages/server/src/__tests__/unit/admin-credentials-crud.test.ts` — 34 tests (21 dev-story + 13 TEA)
 
-| Metric | Value |
-|--------|-------|
-| Total tests | 130 |
-| Original (dev-story) | 92 |
-| TEA-generated | 38 |
-| Pass | 130 |
-| Fail | 0 |
-| Test suites | 1 file |
-| Duration | 61ms |
+## Results
 
-## TEA-Generated Test Suites
-
-1. **Deep Folder Nesting** (4 tests) -- 4-level nested folder flattening, indentation, deep find
-2. **Upload Edge Cases** (4 tests) -- empty files, multi-file, FormData with/without folderId
-3. **Document Content Rendering** (6 tests) -- markdown/mermaid/html/text rendering logic, file-only download
-4. **Memory Filtering Combinations** (5 tests) -- agent filter, type filter, combined, no results, all
-5. **Query Key Generation** (6 tests) -- docs/folders/memories/detail/version key structure
-6. **Drag State Management** (4 tests) -- state transitions: initial, enter, leave, drop
-7. **Modal State Machine** (3 tests) -- create open, edit open, closed states
-8. **Korean Label Verification** (3 tests) -- tab labels, memory types, no English in user-facing text
-9. **Additional API Endpoints** (3 tests) -- restore, consolidate, tags endpoints
-
-## Risk Assessment
-
-- **Low Risk**: All helper functions fully covered with edge cases
-- **Medium Risk**: Component rendering relies on @corthex/ui (tested externally)
-- **Accepted Risk**: No DOM integration tests (project uses bun:test without jsdom)
-
-## Recommendations
-
-1. Consider adding Vitest + @testing-library/react tests when team adopts DOM testing
-2. E2E tests recommended for drag-and-drop upload flow when Playwright is added
-3. Current coverage is sufficient for the story's acceptance criteria
+```
+bun test packages/server/src/__tests__/unit/admin-credentials-crud.test.ts
+34 pass, 0 fail, 81 expect() calls
+```

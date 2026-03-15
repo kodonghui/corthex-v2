@@ -20,6 +20,10 @@ export const ERROR_CODES = {
 
   // Credential errors (E11, D3 extension — Story 16.3)
   CREDENTIAL_TEMPLATE_UNRESOLVED: 'CREDENTIAL_TEMPLATE_UNRESOLVED',
+
+  // Credential route errors (Story 16.5)
+  CREDENTIAL_DUPLICATE_KEY: 'CREDENTIAL_DUPLICATE_KEY',
+  CREDENTIAL_NOT_FOUND: 'CREDENTIAL_NOT_FOUND',
 } as const
 
 export type ErrorCode = typeof ERROR_CODES[keyof typeof ERROR_CODES]
