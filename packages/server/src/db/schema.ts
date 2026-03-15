@@ -1813,6 +1813,52 @@ export const agentReports = pgTable('agent_reports', {
   companyDateIdx: index('agent_reports_company_date').on(table.companyId, table.createdAt),
 }))
 
+// === Story 18.1: mcp_server_configs — MCP Server Registry (FR-MCP1~3, D25, NFR-I3) ===
+// Admin-managed MCP server definitions. transport field: 'stdio' (Phase 1), 'sse'/'http' (Phase 2+).
+export const mcpServerConfigs = pgTable('mcp_server_configs', {
+  id:          uuid('id').primaryKey().defaultRandom(),
+  companyId:   uuid('company_id').notNull().references(() => companies.id),
+  displayName: text('display_name').notNull(),
+  transport:   text('transport').notNull(),         // 'stdio' | 'sse' | 'http'
+  command:     text('command'),                     // e.g., 'npx' (stdio only)
+  args:        jsonb('args').$type<string[]>().default([]),   // e.g., ['-y', '@notionhq/notion-mcp-server']
+  env:         jsonb('env').$type<Record<string, string>>().default({}),  // {'NOTION_TOKEN': '{{credential:xxx}}'}
+  isActive:    boolean('is_active').notNull().default(true),
+  createdAt:   timestamp('created_at').notNull().defaultNow(),
+  updatedAt:   timestamp('updated_at').notNull().defaultNow(),
+}, (t) => ({
+  companyIdx: index('mcp_server_configs_company_idx').on(t.companyId),
+}))
+
+// === Story 18.1: agent_mcp_access — Per-Agent MCP Access Control (FR-MCP2, D22) ===
+// Composite PK (agent_id, mcp_server_id). Default OFF — must be explicitly granted by Admin.
+// Both FKs use cascade delete so removing an agent or MCP server auto-cleans access rows.
+export const agentMcpAccess = pgTable('agent_mcp_access', {
+  agentId:     uuid('agent_id').notNull().references(() => agents.id, { onDelete: 'cascade' }),
+  mcpServerId: uuid('mcp_server_id').notNull().references(() => mcpServerConfigs.id, { onDelete: 'cascade' }),
+  grantedAt:   timestamp('granted_at').notNull().defaultNow(),
+}, (t) => ({
+  pk: primaryKey({ columns: [t.agentId, t.mcpServerId] }),
+}))
+
+// === Story 18.1: mcp_lifecycle_events — MCP Process Lifecycle Audit (FR-SO3, NFR-R3) ===
+// Tracks spawn/init/discover/execute/teardown/error per session. Used for zombie process detection.
+// NFR-R3: SELECT WHERE event != 'teardown' AND created_at < NOW() - INTERVAL '30 seconds'
+//   AND session_id NOT IN (SELECT session_id WHERE event = 'teardown') → Admin alert
+export const mcpLifecycleEvents = pgTable('mcp_lifecycle_events', {
+  id:          uuid('id').primaryKey().defaultRandom(),
+  companyId:   uuid('company_id').notNull().references(() => companies.id),
+  mcpServerId: uuid('mcp_server_id').references(() => mcpServerConfigs.id),
+  sessionId:   text('session_id').notNull(),         // SessionContext.sessionId for zombie detection
+  event:       text('event').notNull(),              // 'spawn'|'init'|'discover'|'execute'|'teardown'|'error'
+  latencyMs:   integer('latency_ms'),                // NFR-P2 warm start latency source
+  errorCode:   text('error_code'),                   // e.g., 'AGENT_MCP_CREDENTIAL_MISSING'
+  createdAt:   timestamp('created_at').notNull().defaultNow(),
+}, (t) => ({
+  idxCompanyMcp: index('mle_company_mcp').on(t.companyId, t.mcpServerId, t.createdAt),
+  idxSession:    index('mle_session').on(t.sessionId),
+}))
+
 // === Story 17.1b: tool_call_events — Telemetry (D29, FR-SO2, E17) ===
 // Write-only for engine; read via admin route. D29: 4 indexes for Phase 2 Audit + Pipeline Gate SQL.
 export const toolCallEvents = pgTable('tool_call_events', {

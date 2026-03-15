@@ -1,7 +1,7 @@
 import { eq, or, sql, desc, and, isNotNull, asc, inArray, type SQL } from 'drizzle-orm'
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm'
 import { db } from './index'
-import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users, costRecords, presets, sketches, tierConfigs, semanticCache, agentReports, toolCallEvents } from './schema'
+import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users, costRecords, presets, sketches, tierConfigs, semanticCache, agentReports, toolCallEvents, mcpServerConfigs, agentMcpAccess, mcpLifecycleEvents } from './schema'
 import { withTenant, scopedWhere, scopedInsert } from './tenant-helpers'
 import { cosineDistance } from './pgvector'
 import { toSql as pgvectorToSql } from 'pgvector'
@@ -13,6 +13,8 @@ type NewPreset = InferInsertModel<typeof presets>
 type TierConfig = InferSelectModel<typeof tierConfigs>
 type NewTierConfig = InferInsertModel<typeof tierConfigs>
 type NewToolCallEvent = InferInsertModel<typeof toolCallEvents>
+type NewMcpServerConfig = InferInsertModel<typeof mcpServerConfigs>
+type NewMcpLifecycleEvent = InferInsertModel<typeof mcpLifecycleEvents>
 
 /**
  * getDB(companyId) — 멀티테넌시 격리 래퍼 (Architecture D1, E3)
@@ -244,5 +246,66 @@ export function getDB(companyId: string) {
       db.update(toolCallEvents)
         .set(update)
         .where(and(eq(toolCallEvents.id, eventId), eq(toolCallEvents.companyId, companyId as any))),
+
+    // === Story 18.1: MCP Server Configs (FR-MCP1~3, D25) ===
+
+    // READ — list active MCP servers for this company (mcp-manager RESOLVE stage)
+    listMcpServers: () =>
+      db.select().from(mcpServerConfigs)
+        .where(and(eq(mcpServerConfigs.companyId, companyId as any), eq(mcpServerConfigs.isActive, true))),
+
+    // READ — single MCP server by id (admin route lookup + validation)
+    getMcpServerById: (id: string) =>
+      db.select().from(mcpServerConfigs)
+        .where(and(eq(mcpServerConfigs.id, id), eq(mcpServerConfigs.companyId, companyId as any)))
+        .limit(1),
+
+    // READ — all MCP servers accessible to a specific agent (JOIN via agent_mcp_access)
+    // C1 fix: double companyId check prevents cross-tenant access (D22)
+    getMcpServersForAgent: (agentId: string) =>
+      db.select({ mcp: mcpServerConfigs }).from(agentMcpAccess)
+        .innerJoin(mcpServerConfigs, eq(agentMcpAccess.mcpServerId, mcpServerConfigs.id))
+        .where(and(
+          eq(agentMcpAccess.agentId, agentId),
+          eq(mcpServerConfigs.companyId, companyId as any),  // cross-tenant isolation
+          eq(mcpServerConfigs.isActive, true),
+        )),
+
+    // WRITE — insert new MCP server (admin CRUD, Story 18.6)
+    insertMcpServer: (data: Omit<NewMcpServerConfig, 'companyId' | 'id' | 'createdAt' | 'updatedAt'>) =>
+      db.insert(mcpServerConfigs).values({ ...data, companyId: companyId as any }).returning({ id: mcpServerConfigs.id }),
+
+    // WRITE — update MCP server (admin CRUD, Story 18.6)
+    updateMcpServer: (id: string, data: Partial<Pick<NewMcpServerConfig, 'displayName' | 'transport' | 'command' | 'args' | 'env' | 'isActive'>>) =>
+      db.update(mcpServerConfigs)
+        .set({ ...data, updatedAt: new Date() })
+        .where(and(eq(mcpServerConfigs.id, id), eq(mcpServerConfigs.companyId, companyId as any))),
+
+    // === Story 18.1: Agent MCP Access Control (FR-MCP2, D22 default OFF) ===
+
+    // WRITE — grant agent access to an MCP server (Admin explicit grant)
+    grantMcpAccess: (agentId: string, mcpServerId: string) =>
+      db.insert(agentMcpAccess).values({ agentId, mcpServerId }).onConflictDoNothing(),
+
+    // WRITE — revoke agent access to an MCP server
+    revokeMcpAccess: (agentId: string, mcpServerId: string) =>
+      db.delete(agentMcpAccess)
+        .where(and(eq(agentMcpAccess.agentId, agentId), eq(agentMcpAccess.mcpServerId, mcpServerId))),
+
+    // === Story 18.1: MCP Lifecycle Events (FR-SO3, NFR-R3 zombie detection) ===
+
+    // WRITE — log MCP lifecycle event (mcp-manager calls at each stage)
+    insertMcpLifecycleEvent: (data: Omit<NewMcpLifecycleEvent, 'companyId' | 'id' | 'createdAt'>) =>
+      db.insert(mcpLifecycleEvents).values({ ...data, companyId: companyId as any }),
+
+    // READ — zombie process detection: sessions with spawn but no teardown after N seconds (NFR-R3)
+    getActiveMcpSessions: (olderThanSeconds: number) =>
+      db.select({ sessionId: mcpLifecycleEvents.sessionId, mcpServerId: mcpLifecycleEvents.mcpServerId })
+        .from(mcpLifecycleEvents)
+        .where(and(
+          eq(mcpLifecycleEvents.companyId, companyId as any),
+          eq(mcpLifecycleEvents.event, 'spawn'),
+          sql`${mcpLifecycleEvents.createdAt} < NOW() - INTERVAL '${sql.raw(String(olderThanSeconds))} seconds'`,
+        )),
   }
 }

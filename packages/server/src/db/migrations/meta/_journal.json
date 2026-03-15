@@ -239,6 +239,13 @@
       "when": 1773936000054,
       "tag": "0054_tool-call-events",
       "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "7",
+      "when": 1774022400055,
+      "tag": "0055_mcp-db-schema",
+      "breakpoints": true
     }
   ]
 }
