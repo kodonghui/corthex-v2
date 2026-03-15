@@ -3,59 +3,65 @@ import { NavLink } from 'react-router-dom'
 import { useAuthStore } from '../stores/auth-store'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../lib/api'
+import {
+  LayoutDashboard, Terminal, Monitor, MessageSquare, TrendingUp, Users,
+  Clock, FileText, FolderOpen, Network, Building2, Bot, Layers, Share2,
+  Send, Activity, DollarSign, History, Shield, Lock, BookOpen, Timer,
+  Search, Bell, Settings, BarChart3
+} from 'lucide-react'
 
 declare const __BUILD_NUMBER__: string
 declare const __BUILD_HASH__: string
 declare const __BUILD_TIME__: string
 
-type NavItem = { to: string; label: string; icon: string }
+type NavItem = { to: string; label: string; icon: React.ComponentType<{ className?: string }> }
 type NavSection = { label?: string; items: NavItem[] }
 
 const navSections: NavSection[] = [
   {
+    label: 'COMMAND',
     items: [
-      { to: '/', label: '홈', icon: '🏠' },
-      { to: '/hub', label: '허브', icon: '🔗' },
-      { to: '/command-center', label: '사령관실', icon: '🎖️' },
+      { to: '/', label: '대시보드', icon: LayoutDashboard },
+      { to: '/hub', label: '허브', icon: Terminal },
+      { to: '/command-center', label: '사령관실', icon: Monitor },
+      { to: '/nexus', label: 'NEXUS', icon: Network },
+      { to: '/chat', label: '채팅', icon: MessageSquare },
     ],
   },
   {
-    label: '업무',
+    label: 'ORGANIZATION',
     items: [
-      { to: '/chat', label: '채팅', icon: '💬' },
-      { to: '/trading', label: '전략실', icon: '📈' },
-      { to: '/agora', label: 'AGORA 토론', icon: '🗣️' },
-      { to: '/jobs', label: '야간작업', icon: '🌙' },
-      { to: '/reports', label: '보고서', icon: '📄' },
-      { to: '/files', label: '파일', icon: '📁' },
+      { to: '/agents', label: '에이전트', icon: Bot },
+      { to: '/departments', label: '부서', icon: Building2 },
+      { to: '/jobs', label: '작업', icon: Clock },
+      { to: '/org', label: '조직도', icon: Network },
+      { to: '/tiers', label: '티어', icon: Layers },
+      { to: '/reports', label: '보고서', icon: FileText },
     ],
   },
   {
-    label: '운영',
+    label: 'TOOLS',
     items: [
-      { to: '/org', label: '조직도', icon: '🏢' },
-      { to: '/departments', label: '부서 관리', icon: '🏗️' },
-      { to: '/agents', label: '에이전트 관리', icon: '🤖' },
-      { to: '/tiers', label: '계층 관리', icon: '📊' },
-      { to: '/sns', label: 'SNS', icon: '📱' },
-      { to: '/messenger', label: '메신저', icon: '💭' },
-      { to: '/dashboard', label: '작전현황', icon: '📊' },
-      { to: '/costs', label: '비용 분석', icon: '💰' },
-      { to: '/activity-log', label: '통신로그', icon: '📞' },
-      { to: '/ops-log', label: '작전일지', icon: '📋' },
-      { to: '/classified', label: '기밀문서', icon: '🔒' },
-      { to: '/performance', label: '전력분석', icon: '💪' },
-      { to: '/knowledge', label: '정보국', icon: '📚' },
-      { to: '/cron', label: '크론기지', icon: '⏰' },
-      { to: '/argos', label: 'ARGOS', icon: '🔍' },
-      { to: '/nexus', label: 'NEXUS', icon: '🔗' },
+      { to: '/sns', label: 'SNS', icon: Share2 },
+      { to: '/trading', label: '전략실', icon: TrendingUp },
+      { to: '/messenger', label: '메신저', icon: Send },
+      { to: '/knowledge', label: '라이브러리', icon: BookOpen },
+      { to: '/agora', label: 'AGORA', icon: Users },
+      { to: '/files', label: '파일', icon: FolderOpen },
     ],
   },
   {
-    label: '시스템',
+    label: 'SYSTEM',
     items: [
-      { to: '/notifications', label: '알림', icon: '🔔' },
-      { to: '/settings', label: '설정', icon: '⚙️' },
+      { to: '/costs', label: '비용', icon: DollarSign },
+      { to: '/performance', label: '전력분석', icon: BarChart3 },
+      { to: '/activity-log', label: '통신로그', icon: History },
+      { to: '/ops-log', label: '작전일지', icon: Shield },
+      { to: '/classified', label: '기밀문서', icon: Lock },
+      { to: '/cron', label: '크론기지', icon: Timer },
+      { to: '/argos', label: 'ARGOS', icon: Search },
+      { to: '/notifications', label: '알림', icon: Bell },
+      { to: '/settings', label: '설정', icon: Settings },
     ],
   },
 ]
@@ -77,7 +83,6 @@ function SwitchToAdminButton() {
       const res = await api.post<{ data: { token: string; user: { id: string; name: string; role: string }; targetUrl: string } }>('/auth/switch-app', {
         targetApp: 'admin',
       })
-      // Admin 앱 localStorage에 토큰 저장
       localStorage.setItem('corthex_admin_token', res.data.token)
       localStorage.setItem('corthex_admin_user', JSON.stringify(res.data.user))
       window.location.href = res.data.targetUrl
@@ -93,7 +98,7 @@ function SwitchToAdminButton() {
     <button
       onClick={handleSwitch}
       disabled={switching}
-      className="flex items-center gap-2 w-full px-2 py-2 text-xs font-medium rounded-lg transition-colors text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950 hover:bg-indigo-100 dark:hover:bg-indigo-900"
+      className="flex items-center gap-2 w-full px-2 py-2 text-xs font-medium rounded-lg transition-colors text-cyan-300 bg-[rgba(34,211,238,0.10)] hover:bg-[rgba(34,211,238,0.15)]"
     >
       <span>⇄</span>
       <span>{switching ? '전환 중...' : '관리자 콘솔'}</span>
@@ -112,23 +117,18 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
   const unreadCount = countData?.data?.unread ?? 0
 
   return (
-    <aside className="w-60 h-full flex flex-col bg-zinc-50 dark:bg-zinc-900">
+    <aside className="w-[280px] h-full flex flex-col bg-[#020617] border-r border-slate-800">
       {/* 로고 */}
-      <div className="px-4 h-14 flex items-center border-b border-zinc-200 dark:border-zinc-800">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs font-bold">
-            C
-          </div>
-          <span className="text-sm font-bold tracking-tight text-zinc-900 dark:text-zinc-100">CORTHEX</span>
-        </div>
+      <div className="px-4 h-14 flex items-center">
+        <span className="text-lg font-semibold tracking-tight text-slate-50">CORTHEX</span>
       </div>
 
       {/* 네비게이션 */}
-      <nav className="flex-1 px-2 py-3 overflow-y-auto space-y-4">
+      <nav className="flex-1 px-3 py-2 overflow-y-auto space-y-5">
         {navSections.map((section, si) => (
           <div key={si}>
             {section.label && (
-              <p className="px-3 mb-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+              <p className="px-3 mb-2 text-[11px] font-medium uppercase tracking-widest text-slate-400">
                 {section.label}
               </p>
             )}
@@ -140,17 +140,17 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
                   end={item.to === '/'}
                   onClick={onNavClick}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                    `flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] transition-colors ${
                       isActive
-                        ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 font-medium'
-                        : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                        ? 'bg-[rgba(34,211,238,0.10)] text-cyan-400 font-medium border-l-2 border-cyan-400 pl-[10px]'
+                        : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'
                     }`
                   }
                 >
-                  <span className="text-base leading-none">{item.icon}</span>
+                  <item.icon className="w-5 h-5 shrink-0" />
                   <span className="flex-1">{item.label}</span>
                   {item.to === '/notifications' && unreadCount > 0 && (
-                    <span className="ml-auto px-1.5 py-0.5 rounded-full bg-indigo-600 text-white text-[10px] font-bold leading-none">
+                    <span className="ml-auto px-1.5 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
                       {unreadCount > 99 ? '99+' : unreadCount}
                     </span>
                   )}
@@ -162,21 +162,26 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
       </nav>
 
       {/* 유저 정보 */}
-      <div className="px-3 py-3 border-t border-zinc-200 dark:border-zinc-800 space-y-2">
+      <div className="px-3 py-3 border-t border-slate-800 space-y-2">
         <SwitchToAdminButton />
         <div className="flex items-center justify-between px-2">
-          <div>
-            <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{user?.name}</p>
-            <p className="text-xs text-zinc-500">{user?.role === 'admin' ? '관리자' : '유저'}</p>
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-slate-700 text-slate-300 flex items-center justify-center text-xs font-medium">
+              {user?.name?.charAt(0) || '?'}
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-50">{user?.name}</p>
+              <p className="text-xs text-slate-400">{user?.role === 'admin' ? '관리자' : '유저'}</p>
+            </div>
           </div>
           <button
             onClick={logout}
-            className="text-xs text-zinc-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+            className="text-xs text-slate-400 hover:text-red-400 transition-colors"
           >
             로그아웃
           </button>
         </div>
-        <div className="px-2 text-[10px] text-zinc-400 dark:text-zinc-600 font-mono">
+        <div className="px-2 text-[10px] text-slate-600 font-mono">
           #{__BUILD_NUMBER__}{__BUILD_HASH__ ? ` · ${__BUILD_HASH__}` : ''}
         </div>
       </div>

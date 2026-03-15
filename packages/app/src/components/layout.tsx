@@ -8,6 +8,7 @@ import { NightJobListener } from './night-job-listener'
 import { BudgetAlertListener } from './budget-alert-listener'
 import { InstallBanner } from './install-banner'
 import { PushPermission } from './push-permission'
+import { Menu } from 'lucide-react'
 
 export function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -24,13 +25,11 @@ export function Layout() {
     }, 200)
   }, [sidebarOpen])
 
-  // 라우트 변경 시 사이드바 즉시 닫기
   useEffect(() => {
     setSidebarOpen(false)
     setClosing(false)
   }, [location.pathname])
 
-  // Esc 키로 사이드바 닫기
   useEffect(() => {
     if (!sidebarOpen) return
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -40,7 +39,6 @@ export function Layout() {
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [sidebarOpen, closeSidebar])
 
-  // 뒤로가기로 사이드바 닫기
   useEffect(() => {
     if (!sidebarOpen) return
     const handlePopState = () => {
@@ -61,41 +59,33 @@ export function Layout() {
     <NotificationListener />
     <NightJobListener />
     <BudgetAlertListener />
-    <div className="h-screen flex flex-col lg:flex-row bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
+    <div className="h-screen flex flex-col lg:flex-row bg-[#020617] text-slate-50">
       {/* 데스크톱 사이드바 (lg 이상) */}
-      <div className="hidden lg:block border-r border-zinc-200 dark:border-zinc-800">
+      <div className="hidden lg:block border-r border-slate-800">
         <Sidebar />
       </div>
 
       {/* 모바일 상단바 (lg 미만) */}
-      <header className="lg:hidden flex flex-col sticky top-0 z-30 shrink-0 bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
-        {/* safe area 스페이서 (노치/Dynamic Island) */}
+      <header className="lg:hidden flex flex-col sticky top-0 z-30 shrink-0 bg-slate-900 border-b border-slate-800">
         <div className="h-[env(safe-area-inset-top)]" />
         <div className="h-14 flex items-center justify-between px-4">
         <div className="flex items-center gap-3">
           <button
             onClick={openSidebar}
-            className="p-1.5 -ml-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+            className="p-1.5 -ml-1.5 rounded-lg hover:bg-slate-800 transition-colors"
             aria-label="메뉴 열기"
           >
-            <svg className="w-5 h-5 text-zinc-600 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-            </svg>
+            <Menu className="w-5 h-5 text-slate-400" />
           </button>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-indigo-600 text-white flex items-center justify-center text-[10px] font-bold">
-              C
-            </div>
-            <span className="text-sm font-bold tracking-tight">CORTHEX</span>
-          </div>
+          <span className="text-lg font-semibold tracking-tight text-slate-50">CORTHEX</span>
         </div>
-        <div className="w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xs font-medium">
+        <div className="w-7 h-7 rounded-full bg-slate-700 text-slate-300 flex items-center justify-center text-xs font-medium">
           {user?.name?.charAt(0) || '?'}
         </div>
         </div>
       </header>
 
-      {/* 메인 콘텐츠 (공유) */}
+      {/* 메인 콘텐츠 */}
       <main className="flex-1 overflow-auto">
         <Outlet />
       </main>
@@ -104,10 +94,10 @@ export function Layout() {
       {(sidebarOpen || closing) && (
         <div className="lg:hidden fixed inset-0 z-40" role="dialog" aria-modal="true">
           <div
-            className={`absolute inset-0 bg-black/40 transition-opacity duration-200 ${closing ? 'opacity-0' : 'opacity-100'}`}
+            className={`absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-200 ${closing ? 'opacity-0' : 'opacity-100'}`}
             onClick={closeSidebar}
           />
-          <div className={`absolute inset-y-0 left-0 w-60 shadow-xl transition-transform duration-200 ease-out ${closing ? '-translate-x-full' : 'translate-x-0 animate-slide-in'}`}>
+          <div className={`absolute inset-y-0 left-0 w-[280px] shadow-xl transition-transform duration-200 ease-out ${closing ? '-translate-x-full' : 'translate-x-0 animate-slide-in'}`}>
             <Sidebar onNavClick={closeSidebar} />
           </div>
         </div>
