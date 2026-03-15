@@ -27,6 +27,7 @@ const WorkflowsPage = lazy(() => import('./pages/workflows').then((m) => ({ defa
 const TemplateMarketPage = lazy(() => import('./pages/template-market').then((m) => ({ default: m.TemplateMarketPage })))
 const AgentMarketplacePage = lazy(() => import('./pages/agent-marketplace').then((m) => ({ default: m.AgentMarketplacePage })))
 const ApiKeysPage = lazy(() => import('./pages/api-keys').then((m) => ({ default: m.ApiKeysPage })))
+const AgentReportsPage = lazy(() => import('./pages/agent-reports').then((m) => ({ default: m.AgentReportsPage })))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -101,6 +102,7 @@ export function App() {
             <Route path="template-market" element={<Suspense fallback={<PageSkeleton />}><TemplateMarketPage /></Suspense>} />
             <Route path="agent-marketplace" element={<Suspense fallback={<PageSkeleton />}><AgentMarketplacePage /></Suspense>} />
             <Route path="api-keys" element={<Suspense fallback={<PageSkeleton />}><ApiKeysPage /></Suspense>} />
+            <Route path="agent-reports" element={<Suspense fallback={<PageSkeleton />}><AgentReportsPage /></Suspense>} />
             <Route path="settings" element={<Suspense fallback={<PageSkeleton />}><SettingsPage /></Suspense>} />
             <Route path="onboarding" element={<Suspense fallback={<PageSkeleton />}><OnboardingWizardPage /></Suspense>} />
           </Route>
