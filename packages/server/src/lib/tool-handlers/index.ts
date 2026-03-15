@@ -63,6 +63,7 @@ import { notebooklmSummarize } from './builtins/notebooklm-summarize'
 import { svReadCanvas, svAddNode, svUpdateNode, svDeleteNode, svAddEdge, svSaveDiagram, svSearchKnowledge, svLoadFromKnowledge } from './builtins/sketchvibe-mcp'
 import { listReports } from './builtins/list-reports'
 import { getReport } from './builtins/get-report'
+import { mdToPdf } from './builtins/md-to-pdf'
 
 // 내장 핸들러 등록
 registry.register('get_current_time', getCurrentTime)
@@ -126,6 +127,9 @@ registry.register('notebooklm_generate_audio', notebooklmGenerateAudio)
 registry.register('notebooklm_get_mindmap', notebooklmGetMindmap)
 registry.register('notebooklm_create_slides', notebooklmCreateSlides)
 registry.register('notebooklm_summarize', notebooklmSummarize)
+
+// Story 17.2: PDF generation (D24, E14)
+registry.register('md_to_pdf', mdToPdf)
 
 // Story 20.3: Report retrieval tools (FR-RM3, FR-RM4)
 registry.register('list_reports', listReports)
