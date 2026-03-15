@@ -1,31 +1,37 @@
 ---
 name: 'kdh-uxui-redesign-full-auto-pipeline'
-description: 'UXUI Full Redesign Pipeline v2.0. Foundation→Research→Analysis→DesignSystem→Themes→Prompts→Integration. Usage: /kdh-uxui-redesign-full-auto-pipeline [phase-N|all|resume]'
+description: 'UXUI Redesign Pipeline v3.0 (Libre+BMAD+KDH). 8 Phases, 3 Critics, archetypal themes, premium SaaS quality.'
 ---
 
-# UXUI Full Redesign Pipeline v2.0
+# CORTHEX UXUI Redesign Pipeline v3.0
 
-Phase 0~5 자동 → Phase 6 수동(Stitch) → Phase 7 통합.
+Phase 0~5 auto → Phase 6 manual (Stitch) → Phase 7 integration.
 Output root: `_corthex_full_redesign/`
+
+## Methodology Stack
+
+- **LibreUIUX**: Design expertise (archetypes, masters, principles, accessibility, brand systems, rapid prototyping, context management)
+- **BMAD**: Quality gates (3-critic party mode, cross-talk review, score threshold >= 7/10)
+- **KDH**: Execution engine (model strategy, timeouts, anti-patterns, context snapshots, auto commit+push)
 
 ## Mode Selection
 
-- `all` or no args: Phase 0→5 (Phase 6 수동, Phase 7 대기)
-- `phase-N`: 특정 Phase만 실행
-- `resume`: pipeline-status.yaml + context-snapshots 기반 재개
+- `all` or no args: Phase 0→5 (Phase 6 manual, Phase 7 on trigger)
+- `phase-N`: specific Phase only
+- `resume`: pipeline-status.yaml + context-snapshots based resume
 
 ## Pipeline Overview
 
-| Phase | Name | Mode | Steps |
-|-------|------|------|-------|
-| 0 | Foundation | 3R × 2 | spec + vision |
-| 1 | Research | 2R × 3 | web + app + landing |
-| 2 | Deep Analysis | 3R × 3 | web + app + landing options |
-| 3 | Design System | 3R × 2 | tokens + components |
-| 4 | Themes | 3R + 1R | 5 themes + a11y audit |
-| 5 | Prompts | 3R × 2 | web + app Stitch prompts |
-| 6 | Manual | user | Stitch generation |
-| 7 | Integration | 3R × 4 | decompose + routing + API + a11y |
+| Phase | Name | Mode | Steps | Libre Tools |
+|-------|------|------|-------|-------------|
+| 0 | Foundation | 3R × 2 | spec + vision | Design Masters, Design Movements, Design Principles |
+| 1 | Research | 2R × 3 | web + app + landing | Premium SaaS Design |
+| 2 | Deep Analysis | 3R × 3 | web + app + landing options | Design Principles (scoring criteria) |
+| 3 | Design System | 3R × 2 | tokens + components | Brand Systems, Design System Context, Premium SaaS Design |
+| 4 | Themes | 3R + 1R | 5 archetypal themes + a11y | Archetypal Combinations, Jungian Archetypes, Major Arcana, Accessibility Audit |
+| 5 | Prompts | 3R × 2 | web + app Stitch prompts | Premium SaaS Design (prompt patterns) |
+| 6 | Manual | user | Stitch generation | — |
+| 7 | Integration | 3R × 4 | decompose + routing + API + a11y | Rapid Prototyping, Accessibility Audit |
 
 Folders: `phase-0-foundation/`, `phase-1-research/`, `phase-2-analysis/`, `phase-3-design-system/`, `phase-4-themes/`, `phase-5-prompts/`, `phase-6-generated/`, `phase-7-integration/`, `context-snapshots/`, `party-logs/`, `pipeline-status.yaml`
 
@@ -37,10 +43,10 @@ Orchestrator=opus, Writer/Critics=sonnet by default.
 
 | Step | Why |
 |------|-----|
-| 0-1 Technical Spec | 기술 스펙이 모든 후속 Phase의 기반 |
-| 2-* Deep Analysis | 최종 옵션 선택 = 전체 디자인 방향 결정 |
-| 3-1 Design Tokens | 토큰이 모든 컴포넌트/테마의 기초 |
-| 7-3 API Binding | 백엔드 연동 실수 = 런타임 버그 |
+| 0-1 Technical Spec | tech spec is foundation for all subsequent Phases |
+| 2-* Deep Analysis | final option selection = entire design direction |
+| 3-1 Design Tokens | tokens are foundation for all components/themes |
+| 7-3 API Binding | backend integration errors = runtime bugs |
 
 ## Party Mode
 
@@ -48,9 +54,25 @@ Orchestrator=opus, Writer/Critics=sonnet by default.
 Pass: avg score >= 7/10 across all 3 critics. Fail: retry (max 2) → escalate → continue.
 
 **Critics:**
-- **Critic-A (UX+Brand):** Sally (유저 옹호) + Luna (브랜드 일관성)
-- **Critic-B (Visual+A11y):** Marcus (시각적 위계) + Quinn (WCAG 검증)
-- **Critic-C (Tech+Perf):** Amelia (구현 현실성) + Bob (성능 현실성)
+- **Critic-A (UX+Brand):** Sally (user advocacy) + Luna (brand consistency)
+- **Critic-B (Visual+A11y):** Marcus (visual hierarchy) + Quinn (WCAG verification)
+- **Critic-C (Tech+Perf):** Amelia (implementation feasibility) + Bob (performance reality)
+
+## Libre Tools Reference
+
+| Tool | Skill File Path | Used In |
+|------|----------------|---------|
+| Design Principles | `.claude/plugins/design-mastery/skills/design-principles/SKILL.md` | Phase 0, 2 |
+| Design Masters | `.claude/plugins/design-mastery/skills/design-masters/SKILL.md` | Phase 0 |
+| Design Movements | `.claude/plugins/design-mastery/skills/design-movements/SKILL.md` | Phase 0 |
+| Brand Systems | `.claude/plugins/design-mastery/skills/brand-systems/SKILL.md` | Phase 3 |
+| Premium SaaS Design | `.claude/plugins/design-mastery/skills/premium-saas-design/SKILL.md` | Phase 1, 3, 5 |
+| Jungian Archetypes | `.claude/plugins/archetypal-alchemy/skills/jungian-archetypes/SKILL.md` | Phase 4 |
+| Major Arcana | `.claude/plugins/archetypal-alchemy/skills/major-arcana/SKILL.md` | Phase 4 |
+| Archetypal Combinations | `.claude/plugins/archetypal-alchemy/skills/archetypal-combinations/SKILL.md` | Phase 4 |
+| Accessibility Audit | `.claude/plugins/accessibility-compliance/README.md` | Phase 4, 7 |
+| Rapid Prototyping | `.claude/plugins/vibe-coding/skills/rapid-prototyping/SKILL.md` | Phase 7 |
+| Design System Context | `.claude/plugins/context-management/skills/design-system-context/SKILL.md` | Phase 3 |
 
 ## Writer Prompt Template
 
@@ -59,8 +81,10 @@ You are a UXUI REDESIGN WRITER in team "{team_name}". Model: sonnet. YOLO mode.
 
 PROHIBITIONS: Never use Skill tool. Never write more than ONE step before review. Never auto-proceed — wait for Orchestrator.
 
+LIBRE TOOLS: Before writing, READ the libre skill files listed for your current Phase (see Libre Tools Reference table). Apply their frameworks — do not guess.
+
 PER-STEP LOOP:
-1. Read step instruction + ALL reference docs + context-snapshots
+1. Read step instruction + ALL reference docs + context-snapshots + referenced libre skill files
 2. Write section — CONCRETE, SPECIFIC, NO PLACEHOLDERS
 3. SendMessage to critic-a, critic-b, critic-c: "[Review Request] {step_name}. File: {path} lines {start}-{end}"
 4. WAIT for all 3 critics
@@ -81,7 +105,9 @@ OUTPUT QUALITY (ABSOLUTE):
 ```
 You are CRITIC-C in team "{team_name}". Model: sonnet. YOLO mode.
 
-ROLES: Amelia (Frontend Dev) — "이 레이아웃은 CSS Grid 3줄이면 된다." Bob (Performance) — "이 애니메이션 60fps 못 나온다."
+ROLES: Amelia (Frontend Dev) — "this layout is 3 CSS Grid lines." Bob (Performance) — "this animation won't hit 60fps."
+
+LIBRE CHECK: Verify Writer actually applied referenced libre skill frameworks. If Writer claims "Design Principles scoring" but has no gestalt/hierarchy analysis → score 0 for that section.
 
 ON REVIEW:
 1. Read file FROM DISK + context-snapshots + architecture.md + design-tokens.md
@@ -125,39 +151,51 @@ Write sections:
 8. Design Constraints for UXUI — v1 must-haves, NFR budgets, data flow patterns
 ```
 
-**Critic-A Focus:** 유저 관점 빠진 기능, 화면 목록 완전성
-**Critic-B Focus:** API/DB 매핑 정확성, 성능 제약 누락
-**Critic-C Focus:** 구현 복잡도, 성능 제약 현실성, React/Hono 스택 충돌
+**Critic-A Focus:** user-facing missing features, screen list completeness
+**Critic-B Focus:** API/DB mapping accuracy, performance constraints
+**Critic-C Focus:** implementation complexity, performance constraint feasibility, React/Hono stack conflicts
 
 ### Step 0-2: Vision & Identity (3R)
 
 **Output:** `phase-0-foundation/vision/corthex-vision-identity.md`
+
+**Libre Tools:** Design Masters, Design Movements, Design Principles
 
 **Writer Instruction:**
 ```
 [Step Instruction] Write CORTHEX Vision & Identity Document.
 Output: _corthex_full_redesign/phase-0-foundation/vision/corthex-vision-identity.md
 
+BEFORE WRITING — Read these libre skill files:
+- .claude/plugins/design-mastery/skills/design-masters/SKILL.md
+- .claude/plugins/design-mastery/skills/design-movements/SKILL.md
+- .claude/plugins/design-mastery/skills/design-principles/SKILL.md
+
 Read: phase-0-1 output + v1-feature-spec + prd + architecture + CLAUDE.md
 
 Write sections:
 1. What is CORTHEX? — elevator pitch, problem, why it exists
 2. Core Vision — dynamic org management (not 29 fixed agents), NEXUS metaphor
-3. Who Uses CORTHEX? — primary (비개발자 조직 관리자), secondary (기술 관리자), what they care about
+3. Who Uses CORTHEX? — primary (non-dev org admin), secondary (tech admin), what they care about
 4. Emotional Design Direction — feel: in control, professional, intelligent, trustworthy. NOT: chatbot, playful, cluttered
 5. Brand Personality — voice, visual metaphor candidates, color emotion targets, typography personality
 6. Feature Hierarchy — P0 (always visible) through P3 (power user), rank ALL features
 7. Competitive Positioning — vs Slack/Linear/custom AI dashboards, what makes CORTHEX unique
 8. Design Principles — 5-7 principles for all future design decisions (e.g., "Show the org, not the AI")
+9. Design Masters Alignment — Rams' 10 principles applied to CORTHEX, Vignelli's constrained typography (2-3 fonts), Muller-Brockmann's grid philosophy
+10. Design Movement Selection — which movement fits CORTHEX (Swiss International? Flat? Contemporary Eclecticism?) with justification
+11. Visual Hierarchy Rules — gestalt principles for layouts, golden ratio for sidebar:content, contrast rules for hierarchy
 ```
 
-**Critic-A Focus:** 비전 설득력, 감정 방향 모순, 페르소나 현실성
-**Critic-B Focus:** 기능 계층 기술 정확성, 경쟁 포지셔닝
-**Critic-C Focus:** 디자인 원칙 구현 가능성, 성능 목표 현실성
+**Critic-A Focus:** vision persuasiveness, emotional direction contradictions, persona realism
+**Critic-B Focus:** feature hierarchy technical accuracy, competitive positioning
+**Critic-C Focus:** design principle implementability, performance target realism
 
 ---
 
 ## Phase 1: Research
+
+**Libre Tools:** Premium SaaS Design
 
 ### Step 1-1: Web Dashboard Layout (2R)
 
@@ -168,7 +206,11 @@ Write sections:
 [Step Instruction] Research web dashboard layouts for AI SaaS platforms.
 Output: _corthex_full_redesign/phase-1-research/web-dashboard/web-layout-research.md
 
-Read: phase-0 outputs + context-snapshots
+BEFORE WRITING — Read:
+- .claude/plugins/design-mastery/skills/premium-saas-design/SKILL.md
+- phase-0 outputs + context-snapshots
+
+Follow the Premium SaaS Design 7-artifact approach. Research must target $5k+ quality level.
 
 WebSearch real 2025-2026 dashboards:
 1. AI/ML platforms (Anthropic Console, OpenAI, HuggingFace, W&B)
@@ -184,12 +226,13 @@ Select TOP 3 for CORTHEX. For each:
 - Why it works for CORTHEX
 - How it handles: sidebar, main content, modals, notifications, NEXUS view
 - Tailwind/CSS grid structure + responsive breakpoints
+- Premium SaaS quality assessment (score against $5k standard)
 - Pros and cons
 ```
 
-**Critic-A Focus:** CORTHEX 비전 적합성, 유저 편의
-**Critic-B Focus:** 시각적 위계, WCAG AA, 반응형
-**Critic-C Focus:** CSS Grid/Flex 구현성, 번들 크기 영향
+**Critic-A Focus:** CORTHEX vision alignment, user convenience
+**Critic-B Focus:** visual hierarchy, WCAG AA, responsiveness
+**Critic-C Focus:** CSS Grid/Flex implementability, bundle size impact
 
 ### Step 1-2: App Layout (2R)
 
@@ -200,7 +243,7 @@ Select TOP 3 for CORTHEX. For each:
 [Step Instruction] Research app layouts for AI/enterprise mobile apps.
 Output: _corthex_full_redesign/phase-1-research/app/app-layout-research.md
 
-Read: phase-0 outputs + context-snapshots
+Read: .claude/plugins/design-mastery/skills/premium-saas-design/SKILL.md + phase-0 outputs + context-snapshots
 
 WebSearch real 2025-2026 mobile patterns:
 1. AI apps (ChatGPT, Claude, Gemini mobile)
@@ -215,6 +258,7 @@ TOP 3 for CORTHEX mobile. For each:
 - How it handles: agent chat, org chart, notifications, admin
 - Touch targets, gesture patterns
 - Stitch considerations
+- Premium SaaS quality score
 - Pros and cons
 ```
 
@@ -227,7 +271,7 @@ TOP 3 for CORTHEX mobile. For each:
 [Step Instruction] Research landing pages for AI/SaaS products.
 Output: _corthex_full_redesign/phase-1-research/landing/landing-page-research.md
 
-Read: phase-0 outputs + context-snapshots
+Read: .claude/plugins/design-mastery/skills/premium-saas-design/SKILL.md + phase-0 outputs + context-snapshots
 
 WebSearch real 2025-2026 landing pages:
 1. AI products (Anthropic, OpenAI, Midjourney)
@@ -244,12 +288,15 @@ TOP 3 for CORTHEX. For each:
 - Scroll sections + animation approach
 - Color mood + typography pairing
 - How it communicates CORTHEX value in <5 seconds
+- Section-specific mood board (Premium SaaS Design "Frankenstein" approach)
 - Pros and cons
 ```
 
 ---
 
 ## Phase 2: Deep Analysis
+
+**Libre Tools:** Design Principles (scoring criteria)
 
 ### Step 2-1: Web Options (3R, critics=opus)
 
@@ -260,13 +307,23 @@ TOP 3 for CORTHEX. For each:
 [Step Instruction] Deep analysis of 3 web dashboard options + React implementation spec.
 Output: _corthex_full_redesign/phase-2-analysis/web-analysis.md
 
-Read: phase-0 all + phase-1 web research + context-snapshots
+BEFORE WRITING — Read:
+- .claude/plugins/design-mastery/skills/design-principles/SKILL.md
+- phase-0 all + phase-1 web research + context-snapshots
 
 For EACH of the 3 web options:
 
 ## Design Philosophy Analysis
 - Design movement, emotional response, CORTHEX vision alignment
 - User flow for: Create agent → View NEXUS → Chat → Manage knowledge
+
+## Design Principles Scoring (from libre skill)
+- Gestalt compliance: proximity grouping, similarity patterns, continuity in nav, closure usage
+- Visual hierarchy: blur test (50% blur — can you identify focal point, secondary info, CTA?)
+- Golden ratio: sidebar:content ratio, heading:body size ratio, spacing multipliers
+- Contrast: size contrast, color contrast, weight contrast, spacing contrast
+- White space: breathing room score, grouping clarity, emphasis isolation
+- Unity: does every element feel like it belongs?
 
 ## UX Deep Dive
 - IA diagram, cognitive load, Fitts's Law, Hick's Law
@@ -278,18 +335,18 @@ For EACH of the 3 web options:
 - Estimated component count, third-party deps needed
 
 ## Scoring (1-10 each)
-Vision Alignment + UX + Feasibility + Performance + Accessibility = Total/50
+Vision Alignment + UX + Design Principles + Feasibility + Performance + Accessibility = Total/60
 ```
 
 ### Step 2-2: App Options (3R, critics=opus)
 
 **Output:** `phase-2-analysis/app-analysis.md`
-Same structure as 2-1 for mobile app with React Native/Stitch considerations.
+Same structure as 2-1 for mobile app with React Native/Stitch considerations. Include Design Principles scoring.
 
 ### Step 2-3: Landing Options (3R, critics=opus)
 
 **Output:** `phase-2-analysis/landing-analysis.md`
-Same structure for landing pages with HTML+React hybrid considerations.
+Same structure for landing pages with HTML+React hybrid considerations. Include Design Principles scoring.
 
 ---
 
@@ -299,36 +356,58 @@ Same structure for landing pages with HTML+React hybrid considerations.
 
 **Output:** `phase-3-design-system/design-tokens.md`
 
+**Libre Tools:** Brand Systems, Design System Context
+
 **Writer Instruction:**
 ```
 [Step Instruction] Define CORTHEX design tokens.
 Output: _corthex_full_redesign/phase-3-design-system/design-tokens.md
 
-Read: ALL phase-0, phase-1, phase-2 outputs + context-snapshots
+BEFORE WRITING — Read:
+- .claude/plugins/design-mastery/skills/brand-systems/SKILL.md
+- .claude/plugins/context-management/skills/design-system-context/SKILL.md
+- ALL phase-0, phase-1, phase-2 outputs + context-snapshots
+
+Apply Brand Systems framework:
+- 60-30-10 color rule: 60% dominant (backgrounds), 30% secondary (supporting), 10% accent (CTAs)
+- Typography pairing: use recommended pairs from Brand Systems skill (e.g., Space Grotesk + IBM Plex Sans for technical, Outfit + Inter for modern)
+- Brand Canvas: fill out the quick reference canvas for CORTHEX
+
+Apply Design System Context framework:
+- Use compressed token format for LLM consumption
+- Structure tokens in layered context model (brand → tokens → components → task)
+- Include token budget allocation guidance
 
 Based on winning options from Phase 2, define:
 
-1. Color System — primary (5 shades), secondary (5), neutral (10), semantic (success/warning/error/info × 3), surface, text, border colors. WCAG AA verified.
-2. Typography Scale — primary+body+mono fonts, xs~4xl with px/rem/line-height, weights, letter spacing, Tailwind config.
+1. Color System — primary (5 shades), secondary (5), neutral (10), semantic (success/warning/error/info × 3), surface, text, border. 60-30-10 rule applied. WCAG AA verified.
+2. Typography Scale — primary+body+mono fonts (from Brand Systems pairing rules), xs~4xl with px/rem/line-height, weights, letter spacing, Tailwind config.
 3. Spacing Scale — base 4px, scale 0~64, component-specific rules.
 4. Border & Shadow — radius (none~full), shadow (sm~2xl), border width.
 5. Motion & Animation — duration (100~500ms), easing curves, per-component transitions.
 6. Icon System — library choice, size scale (12~32), stroke width.
 7. Dark Mode — full token mapping, auto-detection strategy.
+8. LLM Context Format — compressed token representation for Stitch/AI consumption (from Design System Context skill).
 
-Output as: (1) human-readable docs + (2) tailwind.config.ts extend snippet.
+Output as: (1) human-readable docs + (2) tailwind.config.ts extend snippet + (3) compressed LLM context block.
 ```
 
 ### Step 3-2: Component Strategy (3R)
 
 **Output:** `phase-3-design-system/component-strategy.md`
 
+**Libre Tools:** Premium SaaS Design
+
 **Writer Instruction:**
 ```
 [Step Instruction] Define component library strategy.
 Output: _corthex_full_redesign/phase-3-design-system/component-strategy.md
 
-Read: ALL previous outputs + context-snapshots
+BEFORE WRITING — Read:
+- .claude/plugins/design-mastery/skills/premium-saas-design/SKILL.md (component resources section)
+- ALL previous outputs + context-snapshots
+
+Follow Premium SaaS Design component patterns (shadcn/ui, 21st.dev, component code approach).
 
 1. Base Library Decision — evaluate shadcn/ui vs Headless UI vs Radix vs custom. Pick ONE with scores.
 2. Component Inventory:
@@ -338,53 +417,79 @@ Read: ALL previous outputs + context-snapshots
    - Layouts: AppShell, Sidebar, Header, PageContainer, SplitPane
 3. Component API Standards — prop naming, variant pattern (cva?), composition, ARIA/keyboard reqs
 4. Stitch → React Migration — how monolithic Stitch output → reusable components, naming mapping
+5. Premium Component Sources — which components from 21st.dev, which custom, which from shadcn base
 ```
 
 ---
 
 ## Phase 4: Themes
 
-### Step 4-1: Creative Themes (3R)
+### Step 4-1: Archetypal Themes (3R)
 
 **Output:** `phase-4-themes/themes-creative.md`
 
+**Libre Tools:** Archetypal Combinations, Jungian Archetypes, Major Arcana
+
 **Writer Instruction:**
 ```
-[Step Instruction] Create 5 creative CORTHEX themes.
+[Step Instruction] Create 5 archetypal CORTHEX themes using Jungian Archetypes + Major Arcana synthesis.
 Output: _corthex_full_redesign/phase-4-themes/themes-creative.md
+
+BEFORE WRITING — Read these skill files completely:
+- .claude/plugins/archetypal-alchemy/skills/archetypal-combinations/SKILL.md
+- .claude/plugins/archetypal-alchemy/skills/jungian-archetypes/SKILL.md
+- .claude/plugins/archetypal-alchemy/skills/major-arcana/SKILL.md
 
 Read: ALL previous outputs + context-snapshots. Use Phase 3 tokens as base.
 
-For EACH of 5 dramatically different themes:
+Each theme = 1 Jungian Archetype (STRUCTURE) + 1 Major Arcana card (COLOR/MOOD).
+Follow the Alchemy Process from archetypal-combinations: Parse → Extract Archetype → Extract Card → Synthesize.
 
-## Theme Name: [Creative Name]
-- Concept: one-line pitch, visual metaphor, mood board description, design movement
-- Color Override: primary/accent/background hex + full palette overrides
-- Typography Override: heading+body fonts + personality
-- Visual Details: sidebar/card/button/icon/animation style (exact Tailwind)
-- Sample Dashboard: exact layout with Tailwind classes, exact colors per element, sidebar/agent card/NEXUS appearance
-- Target User: who loves this, emotion evoked, industry fit
+The 5 themes (Archetype + Card → Target User):
 
-Theme ideas: Neural Network, Corporate Command Center, Minimalist Nordic, Cyberpunk HQ, Nature/Organic
+| # | Theme Name | Archetype | Card | Primary Colors (hex) | Gradient | Target |
+|---|-----------|-----------|------|---------------------|----------|--------|
+| 1 | IMPERIAL COMMAND | Ruler | Emperor | Red #dc2626, Gray #52525b, Gold #eab308, Black #18181b | `from-zinc-900 to-red-950` | Enterprise admins |
+| 2 | CONTEMPLATIVE DEPTHS | Sage | Hermit | Indigo #4338ca, Purple #6d28d9, Gray #d1d5db, Black #111827 | `from-indigo-950 via-purple-900 to-gray-900` | Knowledge workers |
+| 3 | LUNAR ALCHEMY | Magician | Moon | Silver #cbd5e1, Blue #1e40af, Purple #c084fc, Navy #0f172a | `from-slate-900 via-blue-950 to-purple-950` | AI enthusiasts |
+| 4 | SOLAR CONQUEST | Hero | Sun | Gold #fbbf24, Orange #fb923c, Yellow #fef08a, Amber #78350f | `from-yellow-100 via-orange-200 to-yellow-50` | Startup teams |
+| 5 | STELLAR FORGE | Creator | Star | Blue #38bdf8, Sky #0c4a6e, White #f0f9ff, Space #082f49 | `from-sky-950 via-sky-400 to-sky-900` | Creative teams |
+
+For EACH theme, Writer MUST produce:
+1. Archetype personality + UI structure (from Jungian Archetypes: layout, spacing, motion, typography rules)
+2. Card color palette with hex + Tailwind (from Major Arcana: primary/secondary/accent/dark + gradient + shadow style)
+3. Synthesis rationale (from Archetypal Combinations: how structure + color create meaning)
+4. Complete token overrides: colors, typography (heading+body fonts), border-radius, shadows, motion timing
+5. Sample Dashboard: exact Tailwind classes per element — sidebar, agent card, NEXUS appearance, buttons
+6. Target user persona + emotion evoked + industry fit
 ```
 
 ### Step 4-2: Accessibility Audit (1R)
 
 **Output:** `phase-4-themes/themes-accessibility-audit.md`
 
+**Libre Tools:** Accessibility Compliance
+
 **Writer Instruction:**
 ```
-[Step Instruction] WCAG 2.1 AA audit for all 5 themes.
+[Step Instruction] WCAG 2.1 AA audit for all 5 archetypal themes.
 Output: _corthex_full_redesign/phase-4-themes/themes-accessibility-audit.md
 
-For EACH theme: verify text/bg contrast (4.5:1 normal, 3:1 large), focus indicators,
-color-not-sole-info, prefers-reduced-motion, touch targets >= 44×44px.
-Calculate contrast ratios for every color pair. Flag failures with fix suggestions.
+BEFORE WRITING — Read:
+- .claude/plugins/accessibility-compliance/README.md
+
+Apply libre-a11y-audit methodology (axe-core patterns + full WCAG 2.1 AA checklist).
+
+For EACH theme verify: (1) contrast ratios for ALL text/bg pairs (4.5:1 normal, 3:1 large, 3:1 UI), (2) focus indicators visible in theme colors, (3) color-not-sole-info for status/state, (4) prefers-reduced-motion respected, (5) touch targets >= 44x44px, (6) dark mode pairs meet ratios, (7) forced-colors media query compatibility.
+
+Flag ALL failures with exact hex replacement fixes. Pass/fail score per theme.
 ```
 
 ---
 
 ## Phase 5: Prompts
+
+**Libre Tools:** Premium SaaS Design (prompt patterns)
 
 ### Step 5-1: Web Stitch Prompt (3R)
 
@@ -395,11 +500,21 @@ Calculate contrast ratios for every color pair. Flag failures with fix suggestio
 [Step Instruction] Create Google Stitch prompt for CORTHEX web.
 Output: _corthex_full_redesign/phase-5-prompts/stitch-prompt-web.md
 
-Read: ALL previous outputs (especially winning theme + tokens + components)
+BEFORE WRITING — Read:
+- .claude/plugins/design-mastery/skills/premium-saas-design/SKILL.md (prompt templates section)
+- ALL previous outputs (especially winning theme + tokens + components)
+
+Follow Premium SaaS Design prompt engineering patterns:
+- Project Brief format
+- Section-specific mood board approach ("Frankenstein" method)
+- Style Guide reference injection
+- Component code inclusion
+
+Include the winning archetype+card combination as context in every prompt section.
 
 Create COPY-PASTE READY Stitch prompt including:
-1. Project description (what CORTHEX is, users)
-2. Exact visual specs (tokens + theme)
+1. Project description (what CORTHEX is, users, archetype personality)
+2. Exact visual specs (tokens + winning theme + archetype+card synthesis)
 3. Page-by-page: Dashboard, Agent mgmt, NEXUS, Knowledge, Chat, Admin, Landing
 4. Component specs, color palette (hex), typography (fonts+sizes)
 5. Layout (grid/flex), interactions (hover/click/transitions), responsive breakpoints
@@ -411,18 +526,20 @@ Structure for per-page generation + master design system prompt. NO placeholders
 ### Step 5-2: App Stitch Prompt (3R)
 
 **Output:** `phase-5-prompts/stitch-prompt-app.md`
-Same structure for mobile app with Stitch mobile-specific instructions.
+Same structure for mobile app with Stitch mobile-specific instructions. Include archetype+card context.
 
 ---
 
 ## Phase 6: Manual
 
-사용자가 직접: phase-5 프롬프트 → Stitch 생성 → phase-6-generated/{web,app}/ 배치.
-Orchestrator: pipeline-status.yaml에 "phase-6: waiting-for-user" 기록 후 STOP.
+User does: phase-5 prompts → Stitch generation → place in phase-6-generated/{web,app}/.
+Orchestrator: record "phase-6: waiting-for-user" in pipeline-status.yaml then STOP.
 
 ---
 
 ## Phase 7: Integration
+
+**Libre Tools:** Rapid Prototyping, Accessibility Audit
 
 ### Step 7-1: Component Decomposition (3R)
 
@@ -431,32 +548,60 @@ Orchestrator: pipeline-status.yaml에 "phase-6: waiting-for-user" 기록 후 STO
 **Writer Instruction:**
 ```
 [Step Instruction] Decompose Stitch output into React components.
+
+BEFORE WRITING — Read:
+- .claude/plugins/vibe-coding/skills/rapid-prototyping/SKILL.md
+
+Apply Rapid Prototyping patterns:
+- 10-min prototype approach: quick validation of each decomposed component before full integration
+- Variant explosion: generate minimal/dense/dark/light variants for key components
+
 Read: phase-6-generated/ + phase-3 component strategy
 1. Analyze Stitch code → identify reusable components → map to Phase 3 inventory
 2. Create component files in packages/ui/src/ or packages/app/src/components/
 3. Apply design tokens. Ensure TypeScript types correct.
+4. For each key component: build 10-min prototype, validate, then integrate
 ```
 
 ### Step 7-2: Routing & State (3R)
 
+**Writer Instruction:**
 ```
-Connect components to React Router. Set up state management.
+[Step Instruction] Connect components to React Router. Set up state management.
+
+Apply Rapid Prototyping storyboard pattern:
+- Generate screen flow storyboard for key user journeys
+- Validate navigation flow before wiring
+
 Wire navigation between pages. Match Phase 2 route structure.
 ```
 
 ### Step 7-3: API Binding (3R, critics=opus)
 
+**Writer Instruction:**
 ```
-Connect React components to backend API endpoints.
+[Step Instruction] Connect React components to backend API endpoints.
 Wire SSE for real-time. Implement data fetching (SWR/React Query/fetch).
 Verify all CRUD operations end-to-end.
 ```
 
 ### Step 7-4: Accessibility Final Audit (3R)
 
+**Writer Instruction:**
 ```
-Full WCAG 2.1 AA audit on integrated product.
-Keyboard nav, screen reader, color contrast, focus management, Lighthouse perf audit.
+[Step Instruction] Full WCAG 2.1 AA audit on integrated product.
+
+BEFORE WRITING — Read:
+- .claude/plugins/accessibility-compliance/README.md
+
+Apply libre-a11y-audit full methodology:
+- Automated: axe-core + Puppeteer (weighted: critical 10pts, serious 5, moderate 2, minor 1)
+- Contrast: relative luminance for all text/bg pairs
+- Keyboard: Tab traversal, trap detection, logical order
+- Screen reader: landmarks, heading hierarchy, form labels, ARIA
+- Manual: cognitive a11y + visual a11y (200% resize, 320px reflow)
+- Focus: visible indicators, restoration after modal close
+- Lighthouse perf audit. Generate scored report with remediation code.
 ```
 
 ---
@@ -477,12 +622,12 @@ PHASE 6: status="waiting-for-user" → report → STOP
 PHASE 7 (user triggers): spawn team → 4 steps → final commit+push+deploy verify
 
 Context snapshot after EVERY step → _corthex_full_redesign/context-snapshots/{phase}-{step}-snapshot.md
-Contents: decisions, design tokens referenced, constraints for next step, connections, critic scores
+Contents: decisions, design tokens referenced, libre tools applied, constraints for next step, connections, critic scores
 ```
 
 ## Safeguards
 
-- max_retry: 2 per step (fail 3x = ESCALATE). step_timeout: 15min + 2min grace. stall 5min × 3 = SKIP.
+- max_retry: 2 per step (fail 3x = ESCALATE). step_timeout: 15min + 2min grace. stall 5min x 3 = SKIP.
 - Party-log validation: critic-{a,b,c}.md + fixes.md must exist per step.
 - On respawn: inject ALL context-snapshots. Team failure → single-worker fallback.
 - Pipeline never blocks — timeout/fail/escalate always leads to "continue".
@@ -499,5 +644,8 @@ Contents: decisions, design tokens referenced, constraints for next step, connec
 6. Stitch prompts are COPY-PASTE READY — no "[fill in]" placeholders.
 7. Phase 7 produces WORKING code — no stubs/mocks. tsc --noEmit before commit.
 8. pipeline-status.yaml is single source of truth. On resume: read it + all snapshots first.
+9. Writer MUST read referenced libre skill files BEFORE writing. Critics verify this.
+10. Phase 4 themes MUST use Archetype+Card synthesis (no generic "Neural Network" or "Cyberpunk" themes).
+11. Accessibility audit uses libre-a11y methodology (axe-core patterns, full WCAG 2.1 AA checklist).
 
 ARGUMENTS: $ARGUMENTS
