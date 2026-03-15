@@ -12,5 +12,10 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true
-  }
+  },
+  "exclude": [
+    "_uxui-redesign",
+    "_corthex_full_redesign",
+    "_bmad-output"
+  ]
 }
