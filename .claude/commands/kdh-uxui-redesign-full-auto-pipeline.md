@@ -557,7 +557,11 @@ Same structure for mobile app with Stitch mobile-specific instructions. Include 
 4. git commit "docs(uxui-redesign): Phase 6-2 web screens generated via Stitch MCP"
 ```
 
-**Expected screens (from Phase 5):** Dashboard, Agent Management, NEXUS, Knowledge, Chat, Admin Settings, Auth/Login
+**Expected screens: ALL app routes must have a corresponding Stitch screen.**
+Generate screens for EVERY page in the app, not just the Phase 5 prompt screens.
+Analyze `packages/app/src/pages/` to enumerate all routes, then generate a Stitch prompt for each.
+Minimum expected (28 screens): App Shell, Hub, Chat, Dashboard, Agents, Departments, Jobs, Settings, NEXUS, Login, Onboarding, Command Center, Trading, SNS, Messenger, Agora, Reports, Files, Org, Knowledge, Costs, Performance, Activity Log, Ops Log, Classified, Cron, ARGOS, Notifications.
+Phase 5 prompts cover ~9 core screens; the orchestrator must generate prompts for remaining pages by analyzing their existing React code structure.
 
 ### Step 6-3: Generate App Screens
 
@@ -609,7 +613,21 @@ If Stitch MCP fails (auth error, API down, rate limit):
 
 **Output:** `phase-7-integration/component-decomposition.md` + actual code
 
-**Writer Instruction:**
+**Delegation Strategy:** HTML→React conversion is REPETITIVE work. Delegate to Gemini/external AI.
+Claude generates detailed Gemini prompts (with exact class names, prop types, file paths), user runs them, Claude integrates results.
+
+**Orchestrator Action:**
+```
+1. Generate Gemini prompts for HTML→React conversion:
+   a. Prompt 1: Existing component color/icon migration (layout.tsx, sidebar.tsx)
+   b. Prompt 2-N: Stitch HTML → React component extraction (batch by screen group)
+   Each prompt includes: exact Tailwind classes, TypeScript prop interfaces, file paths
+2. Save prompts to phase-7-integration/gemini-prompts.md
+3. Claude focuses on: design token updates, routing plan, API binding map, accessibility audit
+4. When user provides Gemini output → Claude integrates into codebase, fixes tsc errors, wires state
+```
+
+**Writer Instruction (for non-delegatable work):**
 ```
 [Step Instruction] Decompose Stitch output into React components.
 

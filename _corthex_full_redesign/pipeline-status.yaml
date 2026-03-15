@@ -49,7 +49,7 @@ phases:
     note: "All 16 screens generated via Stitch MCP (Gemini 3 Pro). Visual review PASS."
     steps:
       6-1: { name: "Create Stitch Project", status: complete, projectId: "1459313405794412216" }
-      6-2: { name: "Generate Web Screens", status: complete, screens: "9/9", note: "App Shell, Hub, Chat, Dashboard, Agents, Departments, Jobs, Settings, NEXUS" }
+      6-2: { name: "Generate Web Screens", status: complete, screens: "28/28", note: "All 28 pages: Shell, Hub, Chat, Dashboard, Agents, Departments, Jobs, Settings, NEXUS, Login, Command Center, SNS, Trading, Notifications, Knowledge, Costs, Performance, Reports, Files, Activity Log, Ops Log, Messenger, Agora, Classified, Cron, ARGOS, Onboarding, Org" }
       6-3: { name: "Generate App Screens", status: complete, screens: "6/6", note: "App Shell, Hub, Chat, NEXUS, Jobs, Profile" }
       6-4: { name: "Generate Landing Page", status: complete, screens: "1/1" }
       6-5: { name: "Visual Review", status: complete, verdict: "PASS — no re-generation needed" }
