@@ -21,9 +21,18 @@ interface MockDB {
   updateToolCallEvent: ReturnType<typeof mock>
   insertReport: ReturnType<typeof mock>
   updateReportDistribution: ReturnType<typeof mock>
+  getCredential: ReturnType<typeof mock>
 }
 
 let mockDB: MockDB
+
+const SMTP_CREDS: Record<string, string> = {
+  smtp_host: 'smtp.example.com',
+  smtp_user: 'user@example.com',
+  smtp_password: 'secret',
+  smtp_port: '587',
+  smtp_recipient: 'ceo@corp.com',
+}
 
 function setupMocks() {
   mockDB = {
@@ -31,6 +40,12 @@ function setupMocks() {
     updateToolCallEvent: mock(() => Promise.resolve([])),
     insertReport: mock(() => Promise.resolve([{ id: 'rpt-001' }])),
     updateReportDistribution: mock(() => Promise.resolve([])),
+    // getCredential: returns mock credential row for SMTP keys (needed for pdf_email channel)
+    getCredential: mock((keyName: string) => {
+      const val = SMTP_CREDS[keyName]
+      if (!val) return Promise.resolve([])
+      return Promise.resolve([{ encryptedValue: val }])
+    }),
   }
 }
 
@@ -38,6 +53,32 @@ function setupMocks() {
 
 mock.module('../../db/scoped-query', () => ({
   getDB: (_companyId: string) => mockDB,
+}))
+
+// Mock credential-crypto to avoid CREDENTIAL_ENCRYPTION_KEY validation at module load
+mock.module('../../lib/credential-crypto', () => ({
+  decrypt: (v: string) => Promise.resolve(v),
+  _validateKeyHex: () => {},
+}))
+
+// Mock puppeteer-pool (pdf_email channel uses withPuppeteer)
+mock.module('../../lib/puppeteer-pool', () => ({
+  withPuppeteer: async (_fn: any) => 'MOCK_PDF_BASE64',
+  ToolResourceUnavailableError: class ToolResourceUnavailableError extends Error {
+    constructor(msg: string) { super(msg); this.name = 'ToolResourceUnavailableError' }
+  },
+}))
+
+// Mock nodemailer (pdf_email channel uses it)
+mock.module('nodemailer', () => ({
+  createTransport: () => ({
+    sendMail: () => Promise.resolve({ messageId: 'mock-id' }),
+  }),
+}))
+
+// Mock marked (pdf_email uses marked.parse)
+mock.module('marked', () => ({
+  marked: { parse: (md: string) => `<p>${md}</p>` },
 }))
 
 // --- Test context factory ---

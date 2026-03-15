@@ -14,9 +14,12 @@
  *   google_drive: Phase 4
  */
 import { z } from 'zod'
+import { marked } from 'marked'
 import type { BuiltinToolHandler, ToolCallContext } from '../../engine'
 import { ToolError } from '../../lib/tool-error'
 import { getDB } from '../../db/scoped-query'
+import { decrypt } from '../../lib/credential-crypto'
+import { withPuppeteer, ToolResourceUnavailableError } from '../../lib/puppeteer-pool'
 
 // --- Channel types ---
 
@@ -24,24 +27,139 @@ type ChannelResult =
   | { status: 'success'; channel: string }
   | { status: 'failed'; channel: string; error: string }
 
+// --- Corporate HTML builder for pdf_email channel ---
+
+function buildCorporateHtml(htmlBody: string): string {
+  return `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0; padding: 0; color: #1e293b; line-height: 1.7; }
+  .header { background: #0f172a; color: #f8fafc; padding: 24px 40px; font-size: 14px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+  .content { padding: 40px; }
+  h1 { color: #0f172a; font-size: 24px; margin-bottom: 16px; border-bottom: 2px solid #3b82f6; padding-bottom: 8px; }
+  h2 { color: #0f172a; font-size: 20px; margin-top: 32px; }
+  h3 { color: #334155; font-size: 16px; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; }
+  th { background: #0f172a; color: #f8fafc; padding: 10px 12px; text-align: left; font-weight: 600; }
+  td { border: 1px solid #e2e8f0; padding: 10px 12px; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  pre { background: #1e293b; color: #e2e8f0; padding: 16px; border-radius: 6px; overflow-x: auto; }
+  code { font-family: monospace; font-size: 0.9em; }
+  blockquote { border-left: 4px solid #3b82f6; margin-left: 0; padding-left: 16px; color: #64748b; }
+</style>
+</head>
+<body>
+<div class="header">CORTHEX Intelligence Report</div>
+<div class="content">${htmlBody}</div>
+</body>
+</html>`
+}
+
 // --- Channel dispatcher (E15) ---
 
 async function distributeToChannel(
   reportId: string,
-  _content: string,
+  content: string,
+  title: string,
   channel: string,
-  _ctx: ToolCallContext,
+  ctx: ToolCallContext,
 ): Promise<ChannelResult> {
   switch (channel) {
     case 'web_dashboard':
       // Phase 1: report in DB = automatically accessible via web_dashboard — no extra distribution
       return { status: 'success', channel }
 
-    case 'pdf_email':
-      // Phase 1: md_to_pdf + send_email chain (Story 20.4 implements the full chain)
-      // This stub returns success to allow partial failure contract testing
-      // Story 20.4 will replace this with actual md_to_pdf → send_email flow
+    case 'pdf_email': {
+      // Phase 1: md_to_pdf(corporate) → send_email(attachment: PDF) (Story 20.4, D27)
+      // Step 1: Get SMTP credentials
+      const db = getDB(ctx.companyId)
+      const [hostRow, userRow, passRow, portRow, recipientRow] = await Promise.all([
+        db.getCredential('smtp_host'),
+        db.getCredential('smtp_user'),
+        db.getCredential('smtp_password'),
+        db.getCredential('smtp_port'),
+        db.getCredential('smtp_recipient'),
+      ])
+
+      if (!hostRow.length) {
+        throw new ToolError('TOOL_CREDENTIAL_INVALID', 'smtp_host not configured — register SMTP credentials in admin settings')
+      }
+      if (!userRow.length) {
+        throw new ToolError('TOOL_CREDENTIAL_INVALID', 'smtp_user not configured — register SMTP credentials in admin settings')
+      }
+      if (!passRow.length) {
+        throw new ToolError('TOOL_CREDENTIAL_INVALID', 'smtp_password not configured — register SMTP credentials in admin settings')
+      }
+
+      const smtpHost = await decrypt(hostRow[0].encryptedValue)
+      const smtpUser = await decrypt(userRow[0].encryptedValue)
+      const smtpPass = await decrypt(passRow[0].encryptedValue)
+      const smtpPort = portRow.length ? Number(await decrypt(portRow[0].encryptedValue)) || 587 : 587
+      // Recipient: use smtp_recipient if configured, otherwise fall back to smtp_user (send-to-self)
+      const recipientEmail = recipientRow.length
+        ? await decrypt(recipientRow[0].encryptedValue)
+        : smtpUser
+
+      // Step 2: Generate PDF via Puppeteer (corporate style — same as md_to_pdf handler)
+      let base64Pdf: string
+      try {
+        base64Pdf = await withPuppeteer(async (browser) => {
+          const page = await browser.newPage()
+          try {
+            const htmlBody = marked.parse(content) as string
+            const html = buildCorporateHtml(htmlBody)
+            await page.setContent(html, { waitUntil: 'networkidle0', timeout: 20_000 })
+            const pdf = await page.pdf({
+              format: 'A4',
+              printBackground: true,
+              margin: { top: '0', bottom: '0', left: '0', right: '0' },
+            })
+            return Buffer.from(pdf).toString('base64')
+          } finally {
+            await page.close().catch(() => {})
+          }
+        })
+      } catch (err) {
+        if (err instanceof ToolResourceUnavailableError) {
+          throw new ToolError('TOOL_RESOURCE_UNAVAILABLE', `md_to_pdf failed: ${err.message}`)
+        }
+        throw new ToolError('TOOL_RESOURCE_UNAVAILABLE', 'PDF generation failed')
+      }
+
+      // Step 3: Send email with PDF as MIME attachment
+      // @ts-ignore — nodemailer optional dependency
+      const nodemailer = await import('nodemailer').catch(() => null)
+      if (!nodemailer) {
+        throw new ToolError('TOOL_EXTERNAL_SERVICE_ERROR', 'nodemailer not available')
+      }
+
+      const transporter = nodemailer.createTransport({
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpPort === 465,
+        auth: { user: smtpUser, pass: smtpPass },
+      })
+
+      const safeTitle = title.replace(/[/\\:*?"<>|]/g, '-')
+      await transporter.sendMail({
+        from: `"CORTHEX" <${smtpUser}>`,
+        to: recipientEmail,
+        subject: title,
+        html: '<p>CORTHEX AI 보고서가 첨부파일로 전달되었습니다.</p>',
+        attachments: [
+          {
+            filename: `${safeTitle}.pdf`,
+            content: base64Pdf,
+            encoding: 'base64',
+            contentType: 'application/pdf',
+          },
+        ],
+      })
+
       return { status: 'success', channel }
+    }
 
     case 'notion':
     case 'notebooklm':
@@ -113,7 +231,7 @@ export const handler: BuiltinToolHandler = {
       // === Step 2: Channel distribution (E15 partial failure — Promise.allSettled) ===
       const settled = await Promise.allSettled(
         distributeTo.map((channel) =>
-          distributeToChannel(reportId, content, channel, ctx),
+          distributeToChannel(reportId, content, title, channel, ctx),
         ),
       )
 
