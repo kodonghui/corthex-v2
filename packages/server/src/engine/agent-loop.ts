@@ -5,7 +5,8 @@ import { getDB } from '../db/scoped-query'
 import { selectModel } from './model-selector'
 import type { SessionContext, SSEEvent, RunAgentOptions } from './types'
 import { toolPermissionGuard } from './hooks/tool-permission-guard'
-import { credentialScrubber } from './hooks/credential-scrubber'
+import { credentialScrubber, init as scrubberInit, release as scrubberRelease } from './hooks/credential-scrubber'
+import { mcpManager } from './mcp/mcp-manager'
 import { outputRedactor } from './hooks/output-redactor'
 import { delegationTracker } from './hooks/delegation-tracker'
 import { costTracker } from './hooks/cost-tracker'
@@ -97,6 +98,9 @@ export async function* runAgent(options: RunAgentOptions): AsyncGenerator<SSEEve
       }
     }
 
+    // D28: Init credential scrubber FIRST — before any tool calls (Story 18.5)
+    await scrubberInit(ctx)
+
     // Load agent tools from DB (with inputSchema for API tool definitions)
     const toolRecords = await getDB(ctx.companyId).agentToolsWithSchema(agentName)
     const agentApiTools: Anthropic.Messages.Tool[] = toolRecords.map(t => ({
@@ -107,7 +111,30 @@ export async function* runAgent(options: RunAgentOptions): AsyncGenerator<SSEEve
         properties: {},
       },
     }))
-    const allTools: Anthropic.Messages.Tool[] = [CALL_AGENT_TOOL, ...agentApiTools]
+
+    // FR-MCP4: MERGE stage — load assigned MCP servers and get sessions for tool merge
+    // D26: lazy spawn — getOrSpawnSession is called here to get tool definitions for first turn,
+    // but spawned processes are fully torn down at session end (teardownAll in finally)
+    const mcpServerRows = await getDB(ctx.companyId).getMcpServersForAgent(agentName)
+    const mcpSessionsWithDisplayNames: Array<{ displayName: string; session: import('./mcp/mcp-manager').McpSession }> = []
+    for (const row of mcpServerRows) {
+      try {
+        const session = await mcpManager.getOrSpawnSession(ctx.sessionId, row.mcp.id, ctx.companyId)
+        mcpSessionsWithDisplayNames.push({ displayName: row.mcp.displayName, session })
+      } catch {
+        // If MCP server fails to spawn, skip it (don't block agent start)
+        log.warn({ event: 'mcp_spawn_failed', data: { mcpServerId: row.mcp.id } }, 'MCP session spawn failed at init')
+      }
+    }
+
+    const mergedMcpTools = mcpManager.getMergedTools([], mcpSessionsWithDisplayNames)
+    const mcpApiTools: Anthropic.Messages.Tool[] = mergedMcpTools.map(t => ({
+      name: t.name,
+      description: t.description || '',
+      input_schema: (t.inputSchema ?? { type: 'object' as const, properties: {} }) as Anthropic.Messages.Tool['input_schema'],
+    }))
+
+    const allTools: Anthropic.Messages.Tool[] = [CALL_AGENT_TOOL, ...agentApiTools, ...mcpApiTools]
 
     // System prompt with cache_control (D17: cache_control: { type:'ephemeral' })
     const systemBlocks: Anthropic.Messages.TextBlockParam[] = [{
@@ -220,6 +247,45 @@ export async function* runAgent(options: RunAgentOptions): AsyncGenerator<SSEEve
           continue
         }
 
+        // FR-MCP4 E12 EXECUTE stage: MCP tools have double-underscore namespace (notion__create_page)
+        if (block.name.includes('__')) {
+          let mcpOutput: string
+          try {
+            mcpOutput = await mcpManager.execute(
+              block.name,
+              toolInput,
+              ctx.sessionId,
+              ctx.companyId,
+              agentName,
+              ctx.runId,
+            )
+          } catch (err) {
+            const errMsg = err instanceof Error ? err.message : String(err)
+            mcpOutput = `[MCP tool error: ${errMsg}]`
+            toolResults.push({
+              type: 'tool_result',
+              tool_use_id: block.id,
+              content: mcpOutput,
+              is_error: true,
+            })
+            // D28: PostToolUse hook chain — MCP output also scrubbed
+            let output = credentialScrubber(ctx, block.name, mcpOutput)
+            output = outputRedactor(ctx, block.name, output)
+            delegationTracker(ctx, block.name, output, toolInput)
+            continue
+          }
+          toolResults.push({
+            type: 'tool_result',
+            tool_use_id: block.id,
+            content: mcpOutput,
+          })
+          // D28: PostToolUse hook chain — MCP output scrubbed (not exempt)
+          let mcpScrubbedOutput = credentialScrubber(ctx, block.name, mcpOutput)
+          mcpScrubbedOutput = outputRedactor(ctx, block.name, mcpScrubbedOutput)
+          delegationTracker(ctx, block.name, mcpScrubbedOutput, toolInput)
+          continue
+        }
+
         // Other tools: return not-implemented result (DB tools not executable in engine path)
         const otherOutput = `[Tool "${block.name}" is defined but not executable in this context]`
         toolResults.push({
@@ -275,6 +341,10 @@ export async function* runAgent(options: RunAgentOptions): AsyncGenerator<SSEEve
     }
   } finally {
     activeSessions.delete(ctx.sessionId)
+    // FR-MCP5 D4: TEARDOWN MCP sessions BEFORE Stop Hooks — independent of session outcome
+    mcpManager.teardownAll(ctx.sessionId, ctx.companyId).catch(() => {})
+    // D28: Release in-memory credential list to free memory
+    scrubberRelease(ctx.sessionId)
     // Fire-and-forget cost tracking with cache metrics (AC#6)
     if (usageInfo) {
       costTracker(ctx, usageInfo).catch(() => {})
