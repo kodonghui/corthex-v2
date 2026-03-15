@@ -1,11 +1,11 @@
 ---
 name: 'kdh-uxui-redesign-full-auto-pipeline'
-description: 'UXUI Redesign Pipeline v3.1 (Libre+BMAD+KDH + 2.1.76 enhancements). 8 Phases, 3 Critics, archetypal themes, premium SaaS quality.'
+description: 'UXUI Redesign Pipeline v4.0 (Libre+BMAD+KDH + Stitch MCP auto-generation). 8 Phases, 3 Critics, archetypal themes, premium SaaS quality.'
 ---
 
-# CORTHEX UXUI Redesign Pipeline v3.1
+# CORTHEX UXUI Redesign Pipeline v4.0
 
-Phase 0~5 auto → Phase 6 manual (Stitch) → Phase 7 integration.
+Phase 0~7 fully automated. Stitch MCP for UI generation (Phase 6), Claude for React conversion (Phase 7).
 Output root: `_corthex_full_redesign/`
 
 ## Methodology Stack
@@ -16,7 +16,7 @@ Output root: `_corthex_full_redesign/`
 
 ## Mode Selection
 
-- `all` or no args: Phase 0→5 (Phase 6 manual, Phase 7 on trigger)
+- `all` or no args: Phase 0→7 fully automated (Stitch MCP for Phase 6)
 - `phase-N`: specific Phase only
 - `resume`: pipeline-status.yaml + context-snapshots based resume
 
@@ -30,7 +30,7 @@ Output root: `_corthex_full_redesign/`
 | 3 | Design System | 3R × 2 | tokens + components | Brand Systems, Design System Context, Premium SaaS Design |
 | 4 | Themes | 3R + 1R | 5 archetypal themes + a11y | Archetypal Combinations, Jungian Archetypes, Major Arcana, Accessibility Audit |
 | 5 | Prompts | 3R × 2 | web + app Stitch prompts | Premium SaaS Design (prompt patterns) |
-| 6 | Manual | user | Stitch generation | — |
+| 6 | Stitch Generation | auto × 3 | web + app + landing via Stitch MCP | — |
 | 7 | Integration | 3R × 4 | decompose + routing + API + a11y | Rapid Prototyping, Accessibility Audit |
 
 Folders: `phase-0-foundation/`, `phase-1-research/`, `phase-2-analysis/`, `phase-3-design-system/`, `phase-4-themes/`, `phase-5-prompts/`, `phase-6-generated/`, `phase-7-integration/`, `context-snapshots/`, `party-logs/`, `pipeline-status.yaml`
@@ -530,10 +530,74 @@ Same structure for mobile app with Stitch mobile-specific instructions. Include 
 
 ---
 
-## Phase 6: Manual
+## Phase 6: Stitch Generation (Automated via MCP)
 
-User does: phase-5 prompts → Stitch generation → place in phase-6-generated/{web,app}/.
-Orchestrator: record "phase-6: waiting-for-user" in pipeline-status.yaml then STOP.
+**Requires:** Stitch MCP server configured in `~/.claude/mcp.json`
+
+### Step 6-1: Create Stitch Project
+
+**Orchestrator Action (no team needed):**
+```
+1. Call MCP tool `create_project` with name "corthex-uxui-redesign"
+2. Save returned projectId to pipeline-status.yaml under phase-6.projectId
+```
+
+### Step 6-2: Generate Web Screens
+
+**Orchestrator Action:**
+```
+1. Read phase-5-prompts/stitch-prompt-web.md
+2. For EACH screen prompt section:
+   a. Call MCP tool `generate_screen_from_text` with:
+      - projectId from step 6-1
+      - prompt text from the Phase 5 web prompt (per-screen section)
+   b. Call `get_screen_code` → save HTML to phase-6-generated/web/{screen-name}.html
+   c. Call `get_screen_image` → save screenshot to phase-6-generated/web/{screen-name}.png
+3. Verify: all screens listed in Phase 5 prompt have corresponding HTML files
+4. git commit "docs(uxui-redesign): Phase 6-2 web screens generated via Stitch MCP"
+```
+
+**Expected screens (from Phase 5):** Dashboard, Agent Management, NEXUS, Knowledge, Chat, Admin Settings, Auth/Login
+
+### Step 6-3: Generate App Screens
+
+**Orchestrator Action:**
+```
+Same as 6-2 but with phase-5-prompts/stitch-prompt-app.md
+Save to phase-6-generated/app/{screen-name}.html and .png
+git commit "docs(uxui-redesign): Phase 6-3 app screens generated via Stitch MCP"
+```
+
+### Step 6-4: Generate Landing Page
+
+**Orchestrator Action:**
+```
+Read phase-5-prompts/ for landing prompt (if exists, else derive from Phase 2-3 winning option + Phase 3 tokens)
+Generate via Stitch MCP → save to phase-6-generated/landing/
+git commit "docs(uxui-redesign): Phase 6-4 landing page generated via Stitch MCP"
+```
+
+### Step 6-5: Visual Review (1R)
+
+**Orchestrator Action:**
+```
+1. Read ALL generated screenshots (.png) from phase-6-generated/
+2. Compare against Phase 3 design tokens + Phase 4 winning theme
+3. Check: color accuracy, typography, layout structure, component presence
+4. If major discrepancy (wrong colors, missing sections, broken layout):
+   → Re-generate that screen with refined prompt (append "IMPORTANT: use exact colors..." fix)
+   → Max 2 retries per screen
+5. Write review to phase-6-generated/stitch-review.md
+6. git commit "docs(uxui-redesign): Phase 6 complete — Stitch generation reviewed"
+```
+
+### Stitch MCP Fallback
+
+If Stitch MCP fails (auth error, API down, rate limit):
+1. Log error to pipeline-status.yaml
+2. Set phase-6 status to "fallback-manual"
+3. Write instructions: "Paste prompts from phase-5-prompts/ into https://stitch.withgoogle.com/"
+4. STOP and notify user
 
 ---
 
@@ -617,9 +681,15 @@ FOR Phase 0~5:
   For each Step: send instruction → monitor (timeout 15min) → validate party-logs → verify score >= 7
   On Phase complete: git commit "docs(uxui-redesign): Phase {N} complete" → update status → shutdown team
 
-PHASE 6: status="waiting-for-user" → report → STOP
+PHASE 6 (Stitch MCP — no team needed):
+  Step 6-1: create_project → save projectId
+  Step 6-2: For each web screen → generate_screen_from_text → get_screen_code → get_screen_image → save to phase-6-generated/web/
+  Step 6-3: Same for app screens → phase-6-generated/app/
+  Step 6-4: Landing page → phase-6-generated/landing/
+  Step 6-5: Visual review (read screenshots, compare to tokens/theme) → retry if off
+  git commit after each sub-step. Fallback: if MCP fails → status="fallback-manual" → STOP
 
-PHASE 7 (user triggers): spawn team → 4 steps → final commit+push+deploy verify
+PHASE 7: spawn team → 4 steps → final commit+push+deploy verify
 
 Context snapshot after EVERY step → _corthex_full_redesign/context-snapshots/{phase}-{step}-snapshot.md
 Contents: decisions, design tokens referenced, libre tools applied, constraints for next step, connections, critic scores
@@ -650,7 +720,7 @@ Contents: decisions, design tokens referenced, libre tools applied, constraints 
 3. Every step produces a context-snapshot with exact token values.
 4. Phase 1 research cites REAL URLs and REAL products only.
 5. Design tokens include WCAG AA contrast ratios for all text/bg pairs.
-6. Stitch prompts are COPY-PASTE READY — no "[fill in]" placeholders.
+6. Stitch prompts are COPY-PASTE READY — no "[fill in]" placeholders. Phase 6 uses Stitch MCP (`@_davideast/stitch-mcp`) to auto-generate.
 7. Phase 7 produces WORKING code — no stubs/mocks. tsc --noEmit before commit.
 8. pipeline-status.yaml is single source of truth. On resume: read it + all snapshots first.
 9. Writer MUST read referenced libre skill files BEFORE writing. Critics verify this.
