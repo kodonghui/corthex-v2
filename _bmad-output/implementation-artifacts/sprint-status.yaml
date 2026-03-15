@@ -629,7 +629,7 @@ phases:
         title: "Credential Management Infrastructure"
         priority: P0
         sp: 11
-        status: in-progress
+        status: done
         dependencies: ["epic-1", "epic-2", "epic-3"]
         architecture: "D23 (AES-256-GCM), D28 (scrubber extension), E11 (credential pattern)"
         frs_covered: "FR-CM1~6, FR-SO1 (D28 scrubber extension)"
@@ -675,7 +675,7 @@ phases:
         title: "Built-in Tool Handlers"
         priority: P0
         sp: 16
-        status: pending
+        status: done
         dependencies: ["epic-16"]
         architecture: "D24 (Puppeteer pool), D29 (4 indexes), E13 (BuiltinToolHandler), E14 (withPuppeteer), E16 (callExternalApi), E17 (telemetry)"
         frs_covered: "FR-DP1~2, FR-CP1~2, FR-WD1, FR-TA1~3, FR-SO2, FR-SO7"
@@ -684,44 +684,44 @@ phases:
             title: "Tool Types, Engine Enforcement & callExternalApi Utility"
             sp: 2
             priority: P0
-            status: pending
+            status: done
             blocked_by: []
           - id: "17.1b"
             title: "Telemetry DB — tool_call_events + D29 Indexes + getDB() Methods + allowed_tools JSONB"
             sp: 3
             priority: P0
-            status: pending
+            status: done
             blocked_by: ["17.1a"]
           - id: "17.2"
             title: "Puppeteer Pool + md_to_pdf Tool Handler"
             sp: 5
             priority: P0
-            status: pending
+            status: done
             blocked_by: ["17.1a", "17.1b", "16.1"]
           - id: "17.3"
             title: "read_web_page Tool Handler (Jina Reader)"
             sp: 2
             priority: P0
-            status: pending
+            status: done
             blocked_by: ["17.1a", "17.1b"]
           - id: "17.4"
             title: "publish_tistory Tool Handler"
             sp: 3
             priority: P0
-            status: pending
+            status: done
             blocked_by: ["17.1a", "17.1b", "16.5"]
           - id: "17.5"
             title: "upload_media Tool Handler (Cloudflare R2)"
             sp: 3
             priority: P0
-            status: pending
+            status: done
             blocked_by: ["17.1a", "17.1b", "16.5", "16.1"]
 
       - id: epic-18
         title: "MCP Server Infrastructure"
         priority: P0
         sp: 21
-        status: pending
+        status: done
         dependencies: ["epic-16", "epic-17"]
         architecture: "D22 (agent_mcp_access default OFF), D25 (stdio Phase 1), D26 (lazy spawn + 120s timeout), E12 (8-stage lifecycle)"
         frs_covered: "FR-CM4~5, FR-MCP1~6, FR-TA4, FR-SO3"
@@ -731,44 +731,44 @@ phases:
             title: "MCP DB Schema — mcp_server_configs, agent_mcp_access, mcp_lifecycle_events"
             sp: 3
             priority: P0
-            status: pending
+            status: done
             blocked_by: ["16.1"]
           - id: "18.2"
             title: "MCP Transport Interface & stdio Implementation"
             sp: 3
             priority: P0
-            status: pending
+            status: done
             blocked_by: ["18.1", "16.1"]
           - id: "18.3"
             title: "mcp-manager.ts — RESOLVE→SPAWN→INIT→DISCOVER (Stages 1–4)"
             sp: 5
             priority: P0
-            status: pending
+            status: done
             blocked_by: ["18.1", "18.2", "16.4"]
           - id: "18.4"
             title: "mcp-manager.ts — MERGE→EXECUTE→RETURN→TEARDOWN (Stages 5–8)"
             sp: 5
             priority: P0
-            status: pending
+            status: done
             blocked_by: ["18.3"]
           - id: "18.5"
             title: "agent-loop.ts MCP Integration — RESOLVE stage + MCP Merge + Scrubber Init"
             sp: 5
             priority: P0
-            status: pending
+            status: done
             blocked_by: ["18.3", "18.4", "16.6"]
           - id: "18.6"
             title: "Admin MCP Server CRUD API Routes"
             sp: 3
             priority: P0
-            status: pending
+            status: done
             blocked_by: ["18.1", "18.3"]
 
       - id: epic-19
         title: "Admin UI — Credential, Tool, MCP, Reports"
         priority: P0
         sp: 11
-        status: pending
+        status: done
         dependencies: ["epic-16", "epic-17", "epic-18"]
         architecture: "Admin routes: credentials.ts, mcp-servers.ts, agent-tools.ts, reports.ts"
         frs_covered: "FR-CM1~3 (UI), FR-TA1~2 (UI), FR-MCP1~3 (UI), FR-RM5~6"
@@ -778,31 +778,31 @@ phases:
             title: "Admin Credentials UI Page"
             sp: 2
             priority: P0
-            status: pending
+            status: done
             blocked_by: ["16.5"]
           - id: "19.2"
             title: "Agent Tool Toggle UI"
             sp: 2
             priority: P0
-            status: pending
+            status: done
             blocked_by: ["17.1a", "17.1b"]
           - id: "19.3"
             title: "Admin MCP Servers UI Page"
             sp: 3
             priority: P0
-            status: pending
+            status: done
             blocked_by: ["18.6"]
           - id: "19.4"
             title: "Agent-MCP Access Matrix UI"
             sp: 2
             priority: P0
-            status: pending
+            status: done
             blocked_by: ["18.6", "19.3"]
           - id: "19.5"
             title: "Admin Reports UI & Human Reports UI"
             sp: 3
             priority: P0
-            status: pending
+            status: done
             blocked_by: ["20.1", "20.3"]
             notes: "Schedule AFTER Epic 20 stories 20.1+20.3"
 
@@ -810,7 +810,7 @@ phases:
         title: "Report & Distribution System"
         priority: P0
         sp: 11
-        status: pending
+        status: done
         dependencies: ["epic-16", "epic-17"]
         architecture: "D27 (channel phases: web_dashboard/pdf_email P1, notion P2), E15 (Promise.allSettled partial failure)"
         frs_covered: "FR-RM1~4, NFR-I3 (send_email MIME)"
@@ -826,19 +826,19 @@ phases:
             title: "save_report Tool Handler with Partial Failure Contract"
             sp: 3
             priority: P0
-            status: pending
+            status: done
             blocked_by: ["20.1", "17.1a", "17.1b", "17.2"]
           - id: "20.3"
             title: "list_reports & get_report Tool Handlers"
             sp: 2
             priority: P0
-            status: pending
+            status: done
             blocked_by: ["20.1", "17.1a"]
           - id: "20.4"
             title: "pdf_email Channel — send_email MIME Attachment Upgrade"
             sp: 3
             priority: P0
-            status: pending
+            status: done
             blocked_by: ["20.2", "17.2"]
 
       - id: epic-21

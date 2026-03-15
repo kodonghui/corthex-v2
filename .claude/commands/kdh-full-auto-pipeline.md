@@ -1,9 +1,9 @@
 ---
 name: 'kdh-full-auto-pipeline'
-description: 'BMAD Full Pipeline v5.3 (team agents + swarm). planning(3-agent real party) or story dev(single/parallel/swarm). Usage: /kdh-full-auto-pipeline [planning|story-ID|parallel ID1 ID2...|swarm epic-N]'
+description: 'BMAD Full Pipeline v5.4 (team agents + swarm). planning(3-agent real party) or story dev(single/parallel/swarm). Usage: /kdh-full-auto-pipeline [planning|story-ID|parallel ID1 ID2...|swarm epic-N]'
 ---
 
-# Kodonghui Full Pipeline v5.3
+# Kodonghui Full Pipeline v5.4
 
 BMAD pipeline with **team agent real party**, **parallel story dev**, and **swarm auto-epic**.
 "Brief만 참여 → 자러감 → 아침에 완성" 가능.
@@ -217,7 +217,18 @@ If you need to continue work, send a regular message instead. Never mix shutdown
    → If still fails: TeamCreate will work after rm -rf
 ```
 
-#### Anti-Pattern 6: Context compaction breaks orchestrator continuity (v5.3)
+#### Anti-Pattern 6: Shutdown response stall — agent never approves (v5.3)
+**What happened:** After Stage 4 complete, shutdown_request sent to all 3 agents. Writer and Critic-A approved, but Critic-B never responded — stalled indefinitely.
+**Root cause:** Agent may be mid-turn processing, context exhausted, or tmux process hung. No guarantee agents will respond to shutdown_request promptly.
+**Fix:** Shutdown timeout protocol:
+1. Send shutdown_request to ALL agents simultaneously
+2. Wait max 30 seconds for approvals
+3. After 30s, for any non-responding agent: `tmux kill-pane -t {paneId}`
+4. Force cleanup: `rm -rf ~/.claude/teams/{name} ~/.claude/tasks/{name}`
+5. Then TeamDelete → TeamCreate new team
+Never wait indefinitely for shutdown approval. Pipeline must not block.
+
+#### Anti-Pattern 7: Context compaction breaks orchestrator continuity (v5.3)
 **What happened:** During a long planning pipeline (Brief + PRD = ~2 hours), the orchestrator's context window compacted. After compaction, the orchestrator lost track of which step was in progress, what instructions were sent, and what the team state was. Had to manually re-assess state from files.
 **Root cause:** Long-running pipelines generate many idle notifications and teammate messages that fill the context window. Compaction summarizes but loses precise state.
 **Fix:**
@@ -225,6 +236,27 @@ If you need to continue work, send a regular message instead. Never mix shutdown
 2. Orchestrator MUST update `working-state.md` before any potentially large step (FR+NFR sections, etc.)
 3. On resume after compaction: read `working-state.md` + `pipeline-status.yaml` + ALL `context-snapshots/*.md` BEFORE sending any messages
 4. Include in working-state.md: current team name, current step, team member pane IDs, last instruction sent
+
+#### Anti-Pattern 8: Swarm workers skip create-story and QA skills (v5.4)
+**What happened:** Swarm workers received task descriptions from TaskList and went straight to coding. They skipped `bmad-bmm-create-story` (no story files created) and `bmad-agent-bmm-qa` (no QA reports). TEA tests and some code-review fixes happened, but 2 of 5 mandatory BMAD skills were entirely skipped across 26 stories.
+**Root cause:** Worker spawn prompt said "Execute Full BMAD Pipeline (5 skills)" but workers treated it as advisory. No enforcement mechanism — Orchestrator only verified TaskUpdate status, not whether each skill actually ran.
+**Fix:**
+1. Swarm Worker prompt MUST list skills as NUMBERED MANDATORY STEPS with explicit Skill tool calls
+2. Orchestrator MUST verify story file exists (glob `_bmad-output/implementation-artifacts/stories/story-{id}.md`) before accepting `[Task Complete]`
+3. Worker MUST report which skills were executed: `"Skills: create-story ✅ | dev-story ✅ | TEA ✅ | QA ✅ | CR ✅"`
+4. If any skill is missing from report → Orchestrator REJECTS and sends worker back to run missing skills
+5. Swarm Worker prompt now includes: "⛔ Skipping ANY of the 5 skills = task REJECTED by Orchestrator"
+
+#### Anti-Pattern 9: Stale worktrees, tmux panes, and team dirs accumulate (v5.4)
+**What happened:** After multiple pipeline runs, 78+ tmux panes, stale git worktrees, and old team/task directories accumulated. No cleanup between runs.
+**Root cause:** No cleanup protocol in pipeline startup or shutdown.
+**Fix:**
+1. Pipeline startup: clean stale resources BEFORE TeamCreate
+   - `git worktree prune` (remove prunable worktrees)
+   - Remove old task dirs: `rm -rf ~/.claude/tasks/{old-team-names}`
+   - Kill orphan tmux panes from previous runs
+2. Pipeline shutdown: clean ALL resources AFTER final report
+3. Orchestrator includes cleanup in stage transition protocol
 
 ---
 
@@ -910,16 +942,24 @@ You are SELF-ORGANIZING: pick your own tasks from the task board.
   → TaskUpdate: status="in_progress", owner="{my_name}"
   → Read the story file path from task description
 
-### 3. Execute Full BMAD Pipeline (5 skills)
-  a. skill="bmad-bmm-create-story", args="{story_id}" (skip if file exists)
+### 3. Execute Full BMAD Pipeline (5 skills — ALL MANDATORY, NONE SKIPPABLE)
+  ⛔ Skipping ANY of the 5 skills = task REJECTED by Orchestrator. No exceptions.
+
+  a. skill="bmad-bmm-create-story", args="{story_id}"
+     → MUST produce: _bmad-output/implementation-artifacts/stories/story-{id}.md
+     → Skip ONLY if this exact file already exists (check with Glob first)
   b. skill="bmad-bmm-dev-story", args="{story_file_path}"
      → No stubs/mocks — real working code only
+     → Input: the story file created in step (a)
   c. skill="bmad-tea-automate"
      → Risk-based tests for changed/added code
+     → MUST produce test files (*-tea.test.ts or similar)
   d. skill="bmad-agent-bmm-qa"
-     → No menu, execute immediately
+     → No menu, execute immediately (YOLO)
+     → MUST verify implementation matches acceptance criteria
   e. skill="bmad-bmm-code-review"
      → Auto-fix issues found
+     → MUST apply fixes, not just report them
 
 ### 4. Quality Check
   → npx tsc --noEmit -p packages/server/tsconfig.json
@@ -928,12 +968,15 @@ You are SELF-ORGANIZING: pick your own tasks from the task board.
 
 ### 5. Complete Task
   → TaskUpdate: status="completed"
-  → SendMessage to team-lead:
+  → SendMessage to team-lead (EXACT FORMAT — Orchestrator validates each field):
     "[Task Complete] Story {id}
+     Skills: create-story ✅ | dev-story ✅ | TEA ✅ | QA ✅ | CR ✅
+     Story file: _bmad-output/implementation-artifacts/stories/story-{id}.md
      Tests: {N} generated
      Issues: {N} found/fixed in code-review
      tsc: PASS
      Files changed: {list}"
+  → If ANY skill line shows ❌: Orchestrator will REJECT and send you back
 
 ### 6. Go Back to Step 1
 
@@ -1057,3 +1100,6 @@ You are SELF-ORGANIZING: pick your own tasks from the task board.
 35. If TeamDelete fails with "active members": force cleanup with `rm -rf ~/.claude/teams/{name} ~/.claude/tasks/{name}`, then TeamDelete, then TeamCreate. (Anti-Pattern #5)
 36. Orchestrator MUST update working-state.md after EVERY stage completion and before potentially large steps. On resume after compaction: read working-state.md + output file + snapshots before continuing. (Anti-Pattern #6)
 37. Stage transition protocol (STRICT ORDER): Writer reports final [Step Complete] → Orchestrator verifies party-logs → git commit → shutdown_request to ALL → wait ALL approvals → TeamDelete → TeamCreate new → spawn fresh team with all snapshots
+38. Swarm workers MUST run ALL 5 BMAD skills per story: create-story → dev-story → TEA → QA → code-review. Skipping ANY skill = task REJECTED. (Anti-Pattern #8)
+39. Orchestrator MUST verify story file exists before accepting [Task Complete]. Glob: `_bmad-output/implementation-artifacts/stories/story-{id}.md`. Missing = REJECT.
+40. Pipeline startup MUST clean stale resources: `git worktree prune`, remove old task dirs, kill orphan tmux panes. Pipeline shutdown MUST clean ALL resources. (Anti-Pattern #9)

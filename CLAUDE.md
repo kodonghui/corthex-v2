@@ -8,79 +8,42 @@
 
 ## Deploy
 - main push -> GitHub Actions -> Cloudflare cache purge
-- **Before commit+push**: `npx tsc --noEmit -p packages/server/tsconfig.json` (deploy fails on type errors)
-- Common type errors: wrong union values (check shared/types.ts), wrong c.set() keys (check server/types.ts), case-sensitive imports (use `git ls-files`)
-- Team agents must also run tsc before reporting completion
-- **After push**: wait for deploy to finish (`gh run list -L 1`), then report to user: build #N + changes + where to check (table format). Do NOT move to next task until deploy is confirmed
+- **After push**: wait for deploy (`gh run list -L 1`), report: build #N + changes + where to check
+- Common type errors: wrong union values (shared/types.ts), wrong c.set() keys (server/types.ts), case-sensitive imports (`git ls-files`)
 
 ## v1 Feature Spec (top priority reference)
 - Path: `_bmad-output/planning-artifacts/v1-feature-spec.md`
-- Rule: "if it worked in v1, it must work in v2"
-- No stub/mock/CRUD — real working features only
+- "if it worked in v1, it must work in v2". No stub/mock.
 
 ## v2 Direction
-- Not 29 fixed agents — admin can freely create/edit/delete departments, human staff, AI agents
-- Dynamic org management is the core difference
+- Not 29 fixed agents — admin freely creates/edits/deletes departments, staff, AI agents
 
 ## BMAD Workflow (absolute rules)
+- Planning: `/kdh-full-auto-pipeline planning`. Party mode required. Fresh every time.
+- Story Dev: 5 skills mandatory → create-story → dev-story → TEA → QA → code-review
+- Orchestrator only assigns + commits. Workers do everything else.
+- Prohibited: skipping skills, stub/mock as "done", orchestrator running party mode
 
-### Planning Pipeline
-- Run via `/bmad-full-pipeline planning`. All steps require party mode
-- Always create fresh (overwrite existing docs, never skip)
-- Commit per stage: `docs(planning): {stage} complete -- {N} party rounds`
+## Output Quality
+- Specific and detailed only. "Vague" = instant FAIL.
 
-### Party Mode
-- Use the real BMAD party mode workflow (multi-agent discussion)
-- Do NOT override with single-worker self-review
-
-### Story Development (5 mandatory BMAD skills per story)
-1. `bmad-bmm-create-story` → story file
-2. `bmad-bmm-dev-story` → implementation (**no stubs**)
-3. `bmad-tea-automate` → risk-based tests
-4. `bmad-agent-bmm-qa` → QA verification (auto-run, no menu)
-5. `bmad-bmm-code-review` → code review + auto-fix
-- Epic completion: run `bmad-bmm-retrospective`
-
-### Orchestrator Protocol
-- Main conversation = orchestrator. Real work = TeamCreate worker in tmux
-- Worker spawn must include first task (never "wait")
-- Orchestrator only: assign steps + commit. Worker does everything else
-- Commit only when 6-point checklist passes (create/dev/TEA/QA/CR/real functionality)
-
-### Prohibited
-- Implementing or reviewing code without BMAD skills
-- Skipping QA/TEA steps
-- Treating stub/mock as "done"
-- Orchestrator running party mode directly
-- Showing BMAD agent menus to user
-
-## Output Quality (absolute rule)
-All outputs must be **specific and detailed**. No vague/abstract expressions.
-Bad: "professional colors" → Good: `bg-slate-900 (#0f172a)`
-Bad: "add sidebar" → Good: `w-64 fixed left-0 h-screen bg-slate-900 border-r border-slate-700`
-Workers/team agents follow the same standard. "Vague" = instant FAIL in party mode.
-
-## Engine Patterns (Phase 1)
-- All agent execution → `engine/agent-loop.ts` (single entry point, Hook bypass impossible)
-- DB access → `getDB(ctx.companyId)` only (read+write). Direct `db` import forbidden in business logic
-- engine/ public API: `agent-loop.ts` + `types.ts` only. No imports from hooks/, soul-renderer, etc.
-- SDK `@anthropic-ai/claude-agent-sdk`: exact pin version (no ^). Manual update only after PoC re-run
-- Full architecture: `_bmad-output/planning-artifacts/architecture.md` → D1~D16, E1~E10
+## Engine Patterns
+- All execution → `engine/agent-loop.ts`. DB → `getDB(ctx.companyId)` only.
+- engine/ public API: `agent-loop.ts` + `types.ts` only
+- SDK pin version (no ^). Architecture: `_bmad-output/planning-artifacts/architecture.md`
 
 ## Coding Conventions
-- Filenames: kebab-case lowercase
-- Imports: must match `git ls-files` casing exactly (Linux CI is case-sensitive)
-- Components: PascalCase
-- API response: `{ success: true, data }` / `{ success: false, error: { code, message } }`
-- Tests: bun:test (server)
+- Files: kebab-case. Components: PascalCase. Imports: match `git ls-files` casing.
+- API: `{ success, data }` / `{ success, error: { code, message } }`. Tests: bun:test
 
-## Context Memory & Compaction
+## Context Memory
 - Auto-save to `.claude/memory/working-state.md` on key decisions
-- Record: (1) current work (2) key decisions (3) next steps (4) warnings
-- **"컴팩대비"** = user trigger: update working-state.md + MEMORY.md + update log immediately + **git commit+push all uncommitted changes** (서버 워커가 최신 상태를 볼 수 있도록)
-- New session: read working-state.md + recent session logs first
+- **"컴팩대비"** = update working-state + MEMORY.md + git commit+push all
+- New session: read working-state.md first
 
-## Update Log (absolute rule)
-- **Every session must log changes** to `.claude/updates/YYYY-MM-DD-topic.md`
-- Include: what changed, why, files affected, result
-- NOT optional. Every meaningful change gets logged.
+## Hooks (자동 강제 — `.claude/hooks.json`)
+다음 규칙들은 hooks로 자동 실행됨. CLAUDE.md에 적을 필요 없음:
+- **tsc 검증**: 커밋 전 자동 타입체크, 실패 시 커밋 차단
+- **시체 청소**: 세션 시작/종료 시 stale tmux, worktree, team dir 자동 제거
+- **컴팩대비 자동저장**: 컨텍스트 압축 전 working-state + uncommitted changes 자동 커밋
+- **업데이트 로그 리마인더**: 세션 종료 시 오늘 로그 없으면 경고
