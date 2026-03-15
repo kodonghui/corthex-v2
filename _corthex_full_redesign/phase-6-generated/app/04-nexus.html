@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX Mobile NEXUS Canvas</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#20d3ee",
+          "background-light": "#f6f8f8",
+          "background-dark": "#040D1A",
+          "surface-light": "#ffffff",
+          "surface-dark": "#101f22",
+          "surface-hover": "#1c2527",
+          "border-dark": "#283639",
+          "text-muted": "#9db5b9"
+        },
+        fontFamily: {
+          "display": ["Inter", "sans-serif"]
+        },
+        borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+      },
+    },
+  }
+</script>
+<style>
+  .dot-grid {
+    background-image: radial-gradient(circle, #1e293b 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+</style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col antialiased">
+<div class="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden">
+<header class="flex items-center justify-between p-4 pb-2 bg-surface-dark/80 backdrop-blur-sm sticky top-0 z-10 border-b border-border-dark/50">
+<div class="w-12"></div>
+<h2 class="text-slate-100 text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">NEXUS</h2>
+<div class="flex w-12 items-center justify-end">
+<button class="text-primary text-base font-bold leading-normal tracking-[0.015em] shrink-0 hover:opacity-80 transition-opacity">편집</button>
+</div>
+</header>
+<main class="@container flex flex-col h-full flex-1 relative">
+<div class="flex flex-1 flex-col absolute inset-0 pb-[80px]">
+<div class="dot-grid flex flex-1 flex-col items-center justify-center relative overflow-hidden">
+<div class="absolute inset-x-4 top-4 z-10">
+<label class="flex flex-col min-w-40 h-12 shadow-lg rounded-xl">
+<div class="flex w-full flex-1 items-stretch rounded-xl h-full bg-surface-dark/90 backdrop-blur-md border border-border-dark/50 overflow-hidden">
+<div class="text-text-muted flex items-center justify-center pl-4">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-slate-100 focus:outline-0 focus:ring-0 border-none bg-transparent h-full placeholder:text-text-muted px-4 pl-2 text-base font-normal" placeholder="Search nodes..." value=""/>
+</div>
+</label>
+</div>
+<p class="text-text-muted text-lg font-medium select-none z-0">React Flow 캔버스</p>
+<div class="absolute right-4 bottom-24 flex flex-col gap-3 z-10">
+<div class="flex flex-col gap-[1px] shadow-lg rounded-xl overflow-hidden bg-border-dark">
+<button class="flex size-11 items-center justify-center bg-surface-dark hover:bg-surface-hover transition-colors">
+<span class="material-symbols-outlined text-slate-100">add</span>
+</button>
+<button class="flex size-11 items-center justify-center bg-surface-dark hover:bg-surface-hover transition-colors">
+<span class="material-symbols-outlined text-slate-100">remove</span>
+</button>
+</div>
+<button class="flex size-11 items-center justify-center rounded-xl bg-surface-dark shadow-lg hover:bg-surface-hover transition-colors border border-border-dark/50">
+<span class="material-symbols-outlined text-slate-100">near_me</span>
+</button>
+</div>
+<button class="absolute bottom-6 right-4 flex size-14 items-center justify-center rounded-full bg-primary text-background-dark shadow-[0_4px_12px_rgba(32,211,238,0.3)] hover:scale-105 transition-transform z-20">
+<span class="material-symbols-outlined text-background-dark text-3xl">add</span>
+</button>
+</div>
+</div>
+</main>
+<nav class="flex gap-2 border-t border-border-dark bg-surface-dark px-4 pb-safe pt-2 mt-auto relative z-30 pb-4 h-[72px]">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-text-muted hover:text-slate-100 transition-colors" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">home</span>
+</div>
+<p class="text-[10px] font-medium leading-tight tracking-wide">Home</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">hub</span>
+</div>
+<p class="text-[10px] font-medium leading-tight tracking-wide">Nexus</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-text-muted hover:text-slate-100 transition-colors" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">search</span>
+</div>
+<p class="text-[10px] font-medium leading-tight tracking-wide">Search</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-text-muted hover:text-slate-100 transition-colors" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">person</span>
+</div>
+<p class="text-[10px] font-medium leading-tight tracking-wide">Profile</p>
+</a>
+</nav>
+</div>
+</body></html>

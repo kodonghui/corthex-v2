@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX Departments Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#20d3ee",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#0f171a", // Dark slate
+                        "surface": "#1e293b",
+                        "surface-hover": "#334155",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen">
+<div class="flex flex-col min-h-screen">
+<!-- TopNavBar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 px-6 lg:px-10 py-3 bg-white dark:bg-background-dark sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<div class="text-primary">
+<span class="material-symbols-outlined text-2xl">neurology</span>
+</div>
+<h2 class="text-lg font-bold leading-tight tracking-[-0.015em] text-slate-900 dark:text-white">CORTHEX</h2>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<nav class="hidden md:flex items-center gap-9">
+<a class="text-sm font-medium leading-normal text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors" href="#">대시보드</a>
+<a class="text-sm font-medium leading-normal text-primary" href="#">부서 관리</a>
+<a class="text-sm font-medium leading-normal text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors" href="#">에이전트 목록</a>
+<a class="text-sm font-medium leading-normal text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors" href="#">설정</a>
+</nav>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border border-slate-200 dark:border-slate-700" data-alt="User Avatar Profile Picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAg3uaBDDDdo7nz8UN7ePuTWRBhzMDUaeP29rYErZ6lay1ltI9HmK9gLJIL-M6jj5UqUzqwPKNzj8xxufoYeNq1qnq4CPp0lg1OWff9t_6nG0f81Q_b2Lo7KDjCrGFLBtgnWEuAflCMsZD1vwWerlDPH_wvO4vBaaZqLCg_UNjyerl0Fn5D1-BSrFlRKMHfXbZg7tnkXH8qrukU91hkliSrEp4OVHh9BjelzH8r69z6iTDhDq8fS_T_G4g-uumObNRC_ub53866OA");'></div>
+</div>
+</header>
+<main class="flex-1 layout-container flex flex-col items-center w-full pb-12">
+<div class="w-full max-w-[1200px] px-6 py-8">
+<!-- Page Header -->
+<div class="flex flex-wrap justify-between items-center gap-4 mb-8">
+<div>
+<h1 class="text-[32px] font-bold leading-tight tracking-tight text-slate-900 dark:text-white">부서 관리</h1>
+<p class="text-slate-500 dark:text-slate-400 mt-1">조직의 부서와 할당된 AI 에이전트를 관리합니다.</p>
+</div>
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 rounded-lg h-10 px-4 bg-primary hover:bg-primary/90 text-slate-900 font-semibold leading-normal transition-colors">
+<span class="material-symbols-outlined text-[20px]">add</span>
+<span>새 부서 추가</span>
+</button>
+</div>
+<!-- Departments Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
+<!-- Department Card 1 (Active) -->
+<div class="group flex flex-col bg-white dark:bg-surface border-2 border-primary rounded-xl overflow-hidden hover:shadow-lg dark:hover:shadow-primary/10 transition-all cursor-pointer">
+<div class="p-5 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-4">
+<h3 class="text-xl font-bold text-slate-900 dark:text-white">총무부</h3>
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary">
+<span class="material-symbols-outlined text-[16px]">robot_2</span>
+<span class="text-sm font-bold">3</span>
+</div>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400 mb-6 flex-1 line-clamp-3">조직의 전반적인 관리 및 행정 업무, 내부 자원 조율을 담당합니다.</p>
+<div class="flex justify-between items-end mt-auto pt-4 border-t border-slate-200 dark:border-slate-700">
+<div class="flex -space-x-2 overflow-hidden">
+<img alt="" class="inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-surface" data-alt="Avatar Agent A" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCoYxMEAO2975t4ocdthkAKAvOVxL5BlEfMKyvKPLzeE0-j29_55mf6nf7cI7m8drCaTOdNEaP7AGDp3VQBgVbeMht-XK1z7lWNPcqcuu1LztirRI1AJRGC6e6Dht_xFTuF1AEeHjUFTxxfX4sU70bpETmiuluAT1QHVEWLd_1MlnbOofc570Xm8lDAAWCXjy9xZFqgUs72zMcCn9cBabeh98Ejr7oUSQov-IrEIPzNAoXSibbchWvzmXYcxiWLHx8yA2ymciwRCA"/>
+<img alt="" class="inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-surface" data-alt="Avatar Agent B" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6KcC4aN9d80jDBLYKgpYc7gcmPpXraYN9a2V6efxm7Ic_b99VzXJxj0bw4fUjjozvyhOEQNouLzU_6RgMx1rcTEXwK9Fd19FJGFANn27S-6H-pTKTQb8fQ4Jl-McgawPHwRnDBvI-y3g_y_g5xkq_qoZONs5a4RN886hR1As2xWJcLF2Qzjqx-PAlsRjHdVQaaTHsV-Y4L4J02F4XPsxGSU-XsGR63dQZw6x1m64DDxhk4JP2oK85VuJMhAMi0opPADEUTpKpjg"/>
+<img alt="" class="inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-surface" data-alt="Avatar Agent C" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_P_6RMrFjCRx6BePtU1JCenADQLfu34OkGM2bvznax0ffV9nwB_6VuzGFs3Do1Nx4dwcBpve1rP9VElL4JRQdCZS6jjHDifLM9OIEZGl99RwU00_Z2sQNZR8prpiHEJL1okbWolYfnM4pYZcipGHQp9g3elUTNXmHIYypMAf6vaYyVEYy5jMefs6z1L_gY3fuK6i5r0Kv49EHKMziWF-b5D1ljTPxrKf2URv0kniF1jCgJJ61BmReuesx62Tyfh5xGXqyrXGNLw"/>
+</div>
+<div class="text-right">
+<span class="text-xs text-slate-500 dark:text-slate-400 block mb-0.5">월 예상 비용</span>
+<span class="font-mono text-sm font-semibold text-slate-900 dark:text-white">$450.00</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Department Card 2 -->
+<div class="group flex flex-col bg-white dark:bg-surface border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:border-primary/50 dark:hover:border-primary/50 transition-all cursor-pointer">
+<div class="p-5 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-4">
+<h3 class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">분석부</h3>
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined text-[16px]">robot_2</span>
+<span class="text-sm font-bold">5</span>
+</div>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400 mb-6 flex-1 line-clamp-3">방대한 데이터를 수집, 정제하고 비즈니스 의사결정을 위한 인사이트를 도출합니다.</p>
+<div class="flex justify-between items-end mt-auto pt-4 border-t border-slate-200 dark:border-slate-700">
+<div class="flex -space-x-2 overflow-hidden">
+<img alt="" class="inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-surface" data-alt="Avatar Agent D" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCK4mjAAALf65uFSXbbIp8itSzL0UbQsXh49ABOZQoUTwmJdaGkFS7e7RcVd5DUQKWIPhXoPrA2hVN6R__vbIU5rWp6H-kALfuywn4-aH2sy51ekTb8gbmCBt1imdOZhJfFb6-zU7ZALDVBGC5fN2b4pgKv8o9BVs2VjI_uIEr5DwGWiifw9R0Vm1Xw8NVLll2GSE52cftz8SzGBHtDTLX4FJ6qKQIW_LhVxUMPmrpGCeVAVhnux9-gBaAJkoQXPaJTbagjL7dq8Q"/>
+<img alt="" class="inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-surface" data-alt="Avatar Agent E" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCR_vm7ABnTdG3vZyWKOz-ZG3StAI349DMZRE04OHICwEkjRseX6JSnY-ZrHwyZmGbc5rgKvLHBEiczBn-x3PYLdi0GQakfulRoqrdLVdG6MHrA-Fa95qxNArpJe2ilZ0QAVvVlGbN2fxDDTjN7KetQLHzxn8TMyi1u7Wp2bRRg5NDu9DEJOFgd0tNJR7iCmNNRwhmAe2nUK1ur_paWxYlRNazCb1g5V4qzwodxOc_NHNQZe1LfW6MWOOVX7i3xnFYBPG7HiCrHHA"/>
+<img alt="" class="inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-surface" data-alt="Avatar Agent F" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUP8Qev0ix6rVfyoe4mNkZaGP4sYA4M8b5cCzjmyCl4Mj6o1rcs7fFDiNiBdSgsR6GoATMEV0LcMt0zkyANHiErafzAkhKqtsjgS_JiCN1KGNxE2WI-EENBfA70QYODKfUXDgTBtb1SwpQicRXNAvDns0L7KnuKYGkqyPWbWjh1LAsmFhVyCEIR7cELLsRu_LYRNnB0Y98wSIR9jCQxUKRq7aoMxAuWNRlurl60jlEju0x9zXrp3HzmQI7diYi-DAeqMApIEOsHQ"/>
+<div class="flex items-center justify-center h-8 w-8 rounded-full ring-2 ring-white dark:ring-surface bg-slate-100 dark:bg-slate-800 text-xs font-medium text-slate-600 dark:text-slate-300">+2</div>
+</div>
+<div class="text-right">
+<span class="text-xs text-slate-500 dark:text-slate-400 block mb-0.5">월 예상 비용</span>
+<span class="font-mono text-sm font-semibold text-slate-900 dark:text-white">$1,200.50</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Department Card 3 -->
+<div class="group flex flex-col bg-white dark:bg-surface border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:border-primary/50 dark:hover:border-primary/50 transition-all cursor-pointer">
+<div class="p-5 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-4">
+<h3 class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">마케팅부</h3>
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined text-[16px]">robot_2</span>
+<span class="text-sm font-bold">4</span>
+</div>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400 mb-6 flex-1 line-clamp-3">브랜드 관리, 시장 동향 분석 및 맞춤형 프로모션 캠페인을 기획하고 실행합니다.</p>
+<div class="flex justify-between items-end mt-auto pt-4 border-t border-slate-200 dark:border-slate-700">
+<div class="flex -space-x-2 overflow-hidden">
+<img alt="" class="inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-surface" data-alt="Avatar Agent G" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCeJCYfXHGjAkDwRWrtxgGabV8Up2FE9GYP2TqmEuY6puO9JeTxOzU5DBoc2gEUCQJn0vFeVZGIH8A8Nb_9MnymIBnqrjaSS87snc3U5OGz3D_Q2YW3dr3ManKcQApdrIhsxUcYfCRp9ClqeTQtTvsdHrMRQ-Jls75_OubQgSpc4zyVK137GJ-KTNbkwu3EBqIcr45xpNFzGkIZ9MjDkCCPsZNt-vG7jNLomzbGy_ZQuuJELqYjgVjvCEFUgVCJTj_NIRU5TUu-g"/>
+<img alt="" class="inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-surface" data-alt="Avatar Agent H" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfdF79k55an1o9DWq4ZkK1OepykyIcl-hT8Evm0giAaxUDvwYhBRWkdGCIxUwXjvu9iSNJiUU6HmWF3vnE42j70wEqWM9vkdEzmQ1vERMLHz1aioba8d2jHl4dD63qxo4rFHObXoma67iwp7MVDk5GcUDykkT1YLs3yavKksCtYmPJE0z1r6-6aIChhpx4IZ0De-32UgYFWds_lORn4sKtMWx8JSReganMIHqXXv3Eu76d6lUy4-c8DTk0e_RPfvXqC27WSQxm2g"/>
+<div class="flex items-center justify-center h-8 w-8 rounded-full ring-2 ring-white dark:ring-surface bg-slate-100 dark:bg-slate-800 text-xs font-medium text-slate-600 dark:text-slate-300">+2</div>
+</div>
+<div class="text-right">
+<span class="text-xs text-slate-500 dark:text-slate-400 block mb-0.5">월 예상 비용</span>
+<span class="font-mono text-sm font-semibold text-slate-900 dark:text-white">$850.00</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Department Card 4 -->
+<div class="group flex flex-col bg-white dark:bg-surface border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:border-primary/50 dark:hover:border-primary/50 transition-all cursor-pointer">
+<div class="p-5 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-4">
+<h3 class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">투자부</h3>
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined text-[16px]">robot_2</span>
+<span class="text-sm font-bold">2</span>
+</div>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400 mb-6 flex-1 line-clamp-3">시장 위험을 평가하고 자산 배분 최적화를 위한 퀀트 모델을 운영합니다.</p>
+<div class="flex justify-between items-end mt-auto pt-4 border-t border-slate-200 dark:border-slate-700">
+<div class="flex -space-x-2 overflow-hidden">
+<img alt="" class="inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-surface" data-alt="Avatar Agent I" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_d0DYFIRmhGl8fSQfn7SONzKnNOecQFe64zn0BS_1xLP3_cqUHgGSwGRNA1EnRq27-0ZNwGfG6Dx_--5oc6gGwDakYf0B0XgzSoiAYEVCWGWt-s6qDYA8gdRgerdrJF2Kq-YVhwuygCJRmrxd_xFbJqi0ytVKNMPiBQW2ZM2vIliGE-AxO3w1859u-CauXQrOpyWpypAC59E90qZQqOmGLHD1NR2Yrs5g1G2ZIGhmkkYJWHE3BPwMeIiU6pCOAcgNvmL-fYLYmw"/>
+<img alt="" class="inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-surface" data-alt="Avatar Agent J" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOe-biJ9buTqzNLFctTl7Z2xhHC7hkicevtPCaViG9fI6PaYsuPb_PYw6GzrgqYd6IOYGdBM9mL1e-lPqPKrz6vqS-AAExdv23RCVhwNqgvjLV8GqWl2ULS_4494gduYQfsyk8er3gms0Q6osGb7Nw7OK8VXUkLh25KNCx4yITepAJXmCXV_Jp-aJPMPYFuaENGoYBYZqk0FAuBADYbE5tlTjCwLBnDLPIFaGz4ufYBOdh4wRRyIPdtgBZ7XHdD8wf3SRCjOe0TA"/>
+</div>
+<div class="text-right">
+<span class="text-xs text-slate-500 dark:text-slate-400 block mb-0.5">월 예상 비용</span>
+<span class="font-mono text-sm font-semibold text-slate-900 dark:text-white">$2,100.00</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Divider -->
+<div class="w-full h-px bg-slate-200 dark:bg-slate-800 mb-8"></div>
+<!-- Department Detail Section -->
+<div class="flex flex-col gap-6">
+<!-- Detail Header -->
+<div class="flex flex-col gap-2">
+<nav aria-label="Breadcrumb" class="flex text-sm text-slate-500 dark:text-slate-400">
+<ol class="inline-flex items-center space-x-1 md:space-x-2">
+<li class="inline-flex items-center">
+<a class="hover:text-primary transition-colors" href="#">부서 목록</a>
+</li>
+<li>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-[16px] mx-1">chevron_right</span>
+<span class="text-slate-900 dark:text-slate-200 font-medium">총무부</span>
+</div>
+</li>
+</ol>
+</nav>
+<div class="flex flex-wrap justify-between items-end gap-4">
+<div>
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white">총무부 상세</h2>
+<p class="text-slate-500 dark:text-slate-400 mt-1 max-w-2xl">조직의 전반적인 관리 및 행정 업무, 내부 자원 조율을 담당합니다.</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center justify-center gap-2 rounded-lg h-9 px-4 bg-white dark:bg-surface border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm font-medium hover:bg-slate-50 dark:hover:bg-surface-hover transition-colors">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+                                    편집
+                                </button>
+<button class="flex items-center justify-center gap-2 rounded-lg h-9 px-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 text-sm font-medium hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+                                    삭제
+                                </button>
+</div>
+</div>
+</div>
+<!-- Assigned Agents List -->
+<div>
+<h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">group</span>
+                            할당된 에이전트 (3)
+                        </h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Agent Card 1 -->
+<div class="flex items-start gap-4 p-4 rounded-xl bg-white dark:bg-surface border border-slate-200 dark:border-slate-800">
+<div class="bg-primary/10 rounded-lg p-3 text-primary">
+<span class="material-symbols-outlined text-3xl">support_agent</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h4 class="text-base font-semibold text-slate-900 dark:text-white truncate">비서 에이전트</h4>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">활성</span>
+</div>
+<p class="text-sm text-slate-500 dark:text-slate-400 mb-3 truncate">일정 관리, 회의록 요약, 이메일 초안 작성</p>
+<div class="flex items-center gap-4 text-xs font-mono text-slate-400 dark:text-slate-500">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">memory</span>
+<span>GPT-4o</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">payments</span>
+<span>$120/mo</span>
+</div>
+</div>
+</div>
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<!-- Agent Card 2 -->
+<div class="flex items-start gap-4 p-4 rounded-xl bg-white dark:bg-surface border border-slate-200 dark:border-slate-800">
+<div class="bg-indigo-500/10 rounded-lg p-3 text-indigo-500">
+<span class="material-symbols-outlined text-3xl">dataset</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h4 class="text-base font-semibold text-slate-900 dark:text-white truncate">데이터 수집기</h4>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">활성</span>
+</div>
+<p class="text-sm text-slate-500 dark:text-slate-400 mb-3 truncate">내부 규정 및 공지사항 웹 스크래핑 및 인덱싱</p>
+<div class="flex items-center gap-4 text-xs font-mono text-slate-400 dark:text-slate-500">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">memory</span>
+<span>Claude-3.5-Sonnet</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">payments</span>
+<span>$180/mo</span>
+</div>
+</div>
+</div>
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<!-- Agent Card 3 -->
+<div class="flex items-start gap-4 p-4 rounded-xl bg-white dark:bg-surface border border-slate-200 dark:border-slate-800">
+<div class="bg-emerald-500/10 rounded-lg p-3 text-emerald-500">
+<span class="material-symbols-outlined text-3xl">summarize</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h4 class="text-base font-semibold text-slate-900 dark:text-white truncate">보고서 작성자</h4>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300">유휴</span>
+</div>
+<p class="text-sm text-slate-500 dark:text-slate-400 mb-3 truncate">주간/월간 비용 보고서 자동 생성 및 서식 지정</p>
+<div class="flex items-center gap-4 text-xs font-mono text-slate-400 dark:text-slate-500">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">memory</span>
+<span>GPT-4-Turbo</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">payments</span>
+<span>$150/mo</span>
+</div>
+</div>
+</div>
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

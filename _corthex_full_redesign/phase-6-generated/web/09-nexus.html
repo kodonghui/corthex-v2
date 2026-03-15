@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX NEXUS Network Canvas</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#20d3ee",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#040D1A",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .dot-grid {
+            background-image: radial-gradient(rgba(148, 163, 184, 0.2) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex overflow-hidden">
+<!-- Collapsed Navigation Rail -->
+<nav class="w-16 flex flex-col items-center py-4 bg-slate-100 dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex-shrink-0 z-10 relative">
+<!-- Logo -->
+<div class="mb-8 w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined font-bold">hexagon</span>
+</div>
+<!-- Primary Nav Items -->
+<div class="flex flex-col gap-4 flex-grow">
+<button class="w-10 h-10 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors" title="Home">
+<span class="material-symbols-outlined">home</span>
+</button>
+<button class="w-10 h-10 rounded-xl flex items-center justify-center bg-primary/20 text-primary transition-colors relative" title="Network (NEXUS)">
+<span class="material-symbols-outlined">hub</span>
+<div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-primary rounded-r-full"></div>
+</button>
+<button class="w-10 h-10 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors" title="Projects">
+<span class="material-symbols-outlined">folder</span>
+</button>
+<button class="w-10 h-10 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors" title="Analytics">
+<span class="material-symbols-outlined">bar_chart</span>
+</button>
+<button class="w-10 h-10 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors" title="Settings">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+<!-- Bottom Nav Items -->
+<div class="flex flex-col gap-4 mt-auto">
+<button class="w-10 h-10 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors" title="Help">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button class="w-10 h-10 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors" title="Logout">
+<span class="material-symbols-outlined">logout</span>
+</button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col relative h-screen">
+<!-- Toolbar -->
+<header class="h-12 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md flex items-center justify-between px-4 z-10 flex-shrink-0">
+<!-- Title Area -->
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">account_tree</span>
+<h1 class="text-sm font-bold tracking-wide">NEXUS</h1>
+</div>
+<div class="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-2"></div>
+<span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Global Operations Network</span>
+</div>
+<!-- Controls Area -->
+<div class="flex items-center gap-4">
+<!-- Zoom Controls -->
+<div class="flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5">
+<button class="w-7 h-7 flex items-center justify-center rounded-md hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors" title="Zoom Out">
+<span class="material-symbols-outlined text-sm">remove</span>
+</button>
+<span class="text-xs font-medium w-10 text-center text-slate-600 dark:text-slate-300">100%</span>
+<button class="w-7 h-7 flex items-center justify-center rounded-md hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors" title="Zoom In">
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+</div>
+<!-- Edit Mode Toggle -->
+<div class="flex items-center gap-2">
+<span class="text-xs font-medium text-slate-500 dark:text-slate-400">편집 모드</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+</label>
+</div>
+<!-- Export Button -->
+<button class="h-8 px-4 bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm">download</span>
+                    내보내기
+                </button>
+</div>
+</header>
+<!-- Canvas Area -->
+<div class="flex-1 relative dot-grid flex items-center justify-center overflow-hidden">
+<!-- Placeholder Content -->
+<div class="flex flex-col items-center gap-4 p-8 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm max-w-md text-center">
+<div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+<span class="material-symbols-outlined text-3xl text-primary">polyline</span>
+</div>
+<h2 class="text-lg font-bold">React Flow 캔버스가 여기에 렌더링됩니다</h2>
+<p class="text-sm text-slate-500 dark:text-slate-400">Interactive network visualization canvas. Use the toolbar above to manage view states.</p>
+<button class="mt-4 h-10 px-6 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-xl text-sm font-bold hover:opacity-90 transition-opacity">
+                    Initialize Workspace
+                </button>
+</div>
+<!-- Mini Map Placeholder (Bottom Right) -->
+<div class="absolute bottom-6 right-6 w-48 h-32 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg p-2 flex flex-col">
+<div class="text-[10px] font-medium text-slate-500 dark:text-slate-400 mb-1 px-1 flex justify-between items-center">
+<span>Minimap</span>
+<span class="material-symbols-outlined text-[14px] cursor-pointer hover:text-slate-900 dark:hover:text-slate-100">close_fullscreen</span>
+</div>
+<div class="flex-1 border border-slate-200 dark:border-slate-800 rounded-lg bg-slate-50 dark:bg-slate-950 relative overflow-hidden">
+<!-- Viewport Indicator -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-10 border border-primary bg-primary/10 rounded-sm"></div>
+</div>
+</div>
+</div>
+</main>
+</body></html>
