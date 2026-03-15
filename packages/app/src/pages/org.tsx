@@ -43,7 +43,7 @@ const STATUS_CONFIG: Record<string, { dot: string; shadow?: string; pulse?: bool
 }
 
 const TIER_CONFIG: Record<string, { classes: string; label: string }> = {
-  manager: { classes: 'bg-indigo-500/15 text-indigo-400', label: 'Manager' },
+  manager: { classes: 'bg-cyan-400/15 text-cyan-400', label: 'Manager' },
   specialist: { classes: 'bg-blue-500/15 text-blue-400', label: 'Specialist' },
   worker: { classes: 'bg-slate-500/15 text-slate-400', label: 'Worker' },
 }

@@ -147,10 +147,10 @@ export function HubPage() {
   // Loading state
   if (orgLoading) {
     return (
-      <div data-testid="hub-page" className="flex items-center justify-center h-full bg-zinc-50 dark:bg-zinc-900">
+      <div data-testid="hub-page" className="flex items-center justify-center h-full bg-slate-900">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-zinc-300 dark:border-zinc-600 border-t-indigo-500 rounded-full animate-spin" />
-          <p className="text-sm text-zinc-500">허브 로딩 중...</p>
+          <div className="w-8 h-8 border-2 border-slate-600 border-t-cyan-400 rounded-full animate-spin" />
+          <p className="text-sm text-slate-500">허브 로딩 중...</p>
         </div>
       </div>
     )
@@ -163,7 +163,7 @@ export function HubPage() {
 
   // No secretary — Story 6.2: agent picker + chat layout
   return (
-    <div data-testid="hub-page" className="flex h-full bg-zinc-50 dark:bg-zinc-900">
+    <div data-testid="hub-page" className="flex h-full bg-slate-900">
       {/* Left: Agent picker panel — hidden on mobile when chat is shown */}
       <div className={`${showChat ? 'hidden md:flex' : 'flex'} w-full md:w-72 shrink-0`}>
         <AgentPickerPanel

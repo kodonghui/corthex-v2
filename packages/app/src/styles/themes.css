@@ -1,0 +1,128 @@
+/* ══════════════════════════════════════════════════
+   CORTHEX Theme System — 5 Archetypal Themes
+   Each theme overrides CSS custom properties from index.css @theme block.
+   ══════════════════════════════════════════════════ */
+
+/* ── 1. SOVEREIGN SAGE (DEFAULT) ──────────────────
+   Ruler + Emperor: Cyan-400 + Slate dark
+   No overrides needed — matches index.css defaults
+   ─────────────────────────────────────────────────── */
+[data-theme="sovereign"] {
+  /* Default theme — all values inherited from @theme in index.css */
+}
+
+
+/* ── 2. IMPERIAL COMMAND ──────────────────────────
+   Ruler + Emperor: Imperial Red + Obsidian
+   ─────────────────────────────────────────────────── */
+[data-theme="imperial"] {
+  /* Primary Accent — Imperial Red */
+  --color-corthex-accent: #dc2626;
+  --color-corthex-accent-hover: #f87171;
+  --color-corthex-accent-deep: #b91c1c;
+  --color-corthex-accent-muted: rgba(220, 38, 38, 0.10);
+
+  /* Surfaces — Zinc/Obsidian palette */
+  --color-corthex-bg: #09090b;
+  --color-corthex-surface: #18181b;
+  --color-corthex-elevated: #27272a;
+  --color-corthex-border: #3f3f46;
+  --color-corthex-border-strong: #52525b;
+  --color-corthex-nexus-bg: #0a0a0b;
+
+  /* Text — Warm stone whites */
+  --color-corthex-text-primary: #fafaf9;
+  --color-corthex-text-secondary: #a1a1aa;
+  --color-corthex-text-disabled: #52525b;
+  --color-corthex-text-on-accent: #fafaf9;
+
+  /* Semantic — Handoff uses Royal Gold */
+  --color-corthex-handoff: #eab308;
+}
+
+
+/* ── 3. TACTICAL OPS ─────────────────────────────
+   Military dark green theme
+   ─────────────────────────────────────────────────── */
+[data-theme="tactical"] {
+  /* Primary Accent — Military Green */
+  --color-corthex-accent: #22c55e;
+  --color-corthex-accent-hover: #4ade80;
+  --color-corthex-accent-deep: #16a34a;
+  --color-corthex-accent-muted: rgba(34, 197, 94, 0.10);
+
+  /* Surfaces — Dark olive/military palette */
+  --color-corthex-bg: #0a0f0d;
+  --color-corthex-surface: #14201a;
+  --color-corthex-elevated: #1c2e24;
+  --color-corthex-border: #1c3a2a;
+  --color-corthex-border-strong: #2d5a3e;
+  --color-corthex-nexus-bg: #060b08;
+
+  /* Text */
+  --color-corthex-text-primary: #e8f5e9;
+  --color-corthex-text-secondary: #81c995;
+  --color-corthex-text-disabled: #2e5a3e;
+  --color-corthex-text-on-accent: #0a0f0d;
+
+  /* Semantic — Handoff uses olive/khaki */
+  --color-corthex-handoff: #a3e635;
+}
+
+
+/* ── 4. MYSTIC DEPTHS ────────────────────────────
+   Sage + Hermit: Deep Indigo + Purple
+   ─────────────────────────────────────────────────── */
+[data-theme="mystic"] {
+  /* Primary Accent — Deep Indigo */
+  --color-corthex-accent: #6366f1;
+  --color-corthex-accent-hover: #a5b4fc;
+  --color-corthex-accent-deep: #4338ca;
+  --color-corthex-accent-muted: rgba(99, 102, 241, 0.10);
+
+  /* Surfaces — Gray/Cave palette */
+  --color-corthex-bg: #030712;
+  --color-corthex-surface: #111827;
+  --color-corthex-elevated: #1f2937;
+  --color-corthex-border: #374151;
+  --color-corthex-border-strong: #4b5563;
+  --color-corthex-nexus-bg: #020617;
+
+  /* Text */
+  --color-corthex-text-primary: #f9fafb;
+  --color-corthex-text-secondary: #9ca3af;
+  --color-corthex-text-disabled: #4b5563;
+  --color-corthex-text-on-accent: #f9fafb;
+
+  /* Semantic — Handoff uses Twilight Purple */
+  --color-corthex-handoff: #8b5cf6;
+}
+
+
+/* ── 5. STEALTH MODE ─────────────────────────────
+   Pure minimal dark: near-black surfaces, minimal accent
+   ─────────────────────────────────────────────────── */
+[data-theme="stealth"] {
+  /* Primary Accent — Zinc/Silver minimal */
+  --color-corthex-accent: #a1a1aa;
+  --color-corthex-accent-hover: #d4d4d8;
+  --color-corthex-accent-deep: #71717a;
+  --color-corthex-accent-muted: rgba(161, 161, 170, 0.10);
+
+  /* Surfaces — Pure near-black */
+  --color-corthex-bg: #09090b;
+  --color-corthex-surface: #111111;
+  --color-corthex-elevated: #1a1a1a;
+  --color-corthex-border: #222222;
+  --color-corthex-border-strong: #333333;
+  --color-corthex-nexus-bg: #050505;
+
+  /* Text */
+  --color-corthex-text-primary: #e4e4e7;
+  --color-corthex-text-secondary: #71717a;
+  --color-corthex-text-disabled: #3f3f46;
+  --color-corthex-text-on-accent: #09090b;
+
+  /* Semantic — Handoff uses muted zinc */
+  --color-corthex-handoff: #a1a1aa;
+}

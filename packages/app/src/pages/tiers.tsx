@@ -74,7 +74,7 @@ function TierForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+        <label className="block text-xs font-medium text-slate-400 mb-1">
           계층명 <span className="text-red-500">*</span>
         </label>
         <Input
@@ -87,13 +87,13 @@ function TierForm({
         {nameError && <p className="text-xs text-red-500 mt-1">{nameError}</p>}
       </div>
       <div>
-        <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+        <label className="block text-xs font-medium text-slate-400 mb-1">
           AI 모델
         </label>
         <select
           value={modelPreference}
           onChange={(e) => setModelPreference(e.target.value)}
-          className="w-full px-3 py-2 text-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 text-sm bg-slate-900 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           {MODEL_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -101,8 +101,8 @@ function TierForm({
         </select>
       </div>
       <div>
-        <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-          최대 도구 수 <span className="text-zinc-400">(0 = 무제한)</span>
+        <label className="block text-xs font-medium text-slate-400 mb-1">
+          최대 도구 수 <span className="text-slate-500">(0 = 무제한)</span>
         </label>
         <Input
           type="number"
@@ -112,7 +112,7 @@ function TierForm({
         />
       </div>
       <div>
-        <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+        <label className="block text-xs font-medium text-slate-400 mb-1">
           설명
         </label>
         <Textarea
@@ -231,8 +231,8 @@ export function TiersPage() {
   if (isError) {
     return (
       <div data-testid="tiers-page" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700/50 rounded-xl p-6 text-center">
-          <p className="text-sm text-red-600 dark:text-red-400">계층 목록을 불러올 수 없습니다</p>
+        <div className="bg-red-900/20 border border-red-700/50 rounded-xl p-6 text-center">
+          <p className="text-sm text-red-400">계층 목록을 불러올 수 없습니다</p>
           <button onClick={() => refetch()} className="text-xs text-red-500 hover:text-red-400 underline mt-2">
             다시 시도
           </button>
@@ -246,8 +246,8 @@ export function TiersPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">계층 관리</h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
+          <h1 className="text-xl font-bold text-slate-50">계층 관리</h1>
+          <p className="text-sm text-slate-500 mt-0.5">
             {tiers.length}개 계층 (N-Tier 동적 관리)
           </p>
         </div>
@@ -271,7 +271,7 @@ export function TiersPage() {
             <div
               key={tier.id}
               data-testid={`tier-row-${tier.id}`}
-              className="flex items-center justify-between bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg px-4 py-3 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
+              className="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 hover:border-slate-700 transition-colors"
             >
               <div className="flex items-center gap-3 flex-1 min-w-0">
                 {/* Reorder buttons */}
@@ -279,7 +279,7 @@ export function TiersPage() {
                   <button
                     onClick={() => handleMoveUp(index)}
                     disabled={index === 0 || reorderMutation.isPending}
-                    className="px-1 py-0.5 text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="px-1 py-0.5 text-xs text-slate-500 hover:text-slate-400 disabled:opacity-30 disabled:cursor-not-allowed"
                     aria-label="위로 이동"
                   >
                     ▲
@@ -287,7 +287,7 @@ export function TiersPage() {
                   <button
                     onClick={() => handleMoveDown(index)}
                     disabled={index === tiers.length - 1 || reorderMutation.isPending}
-                    className="px-1 py-0.5 text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="px-1 py-0.5 text-xs text-slate-500 hover:text-slate-400 disabled:opacity-30 disabled:cursor-not-allowed"
                     aria-label="아래로 이동"
                   >
                     ▼
@@ -298,16 +298,16 @@ export function TiersPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <Badge variant="default">Lv.{tier.tierLevel}</Badge>
-                    <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">{tier.name}</h3>
+                    <h3 className="text-sm font-medium text-slate-50 truncate">{tier.name}</h3>
                   </div>
                   <div className="flex items-center gap-3 mt-0.5">
-                    <span className="text-xs text-zinc-500 dark:text-zinc-400">{getModelLabel(tier.modelPreference)}</span>
-                    <span className="text-xs text-zinc-400 dark:text-zinc-500">
+                    <span className="text-xs text-slate-500">{getModelLabel(tier.modelPreference)}</span>
+                    <span className="text-xs text-slate-500">
                       도구: {tier.maxTools === 0 ? '무제한' : `${tier.maxTools}개`}
                     </span>
                   </div>
                   {tier.description && (
-                    <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5 truncate">{tier.description}</p>
+                    <p className="text-xs text-slate-500 mt-0.5 truncate">{tier.description}</p>
                   )}
                 </div>
               </div>
@@ -315,14 +315,14 @@ export function TiersPage() {
               <div className="flex items-center gap-1 ml-4 shrink-0">
                 <button
                   onClick={() => setEditTier(tier)}
-                  className="px-2.5 py-1.5 text-xs text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+                  className="px-2.5 py-1.5 text-xs text-slate-500 hover:bg-slate-800 rounded-lg transition-colors"
                   aria-label={`${tier.name} 편집`}
                 >
                   편집
                 </button>
                 <button
                   onClick={() => setDeleteTier(tier)}
-                  className="px-2.5 py-1.5 text-xs text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                  className="px-2.5 py-1.5 text-xs text-red-500 hover:bg-red-900/20 rounded-lg transition-colors"
                   aria-label={`${tier.name} 삭제`}
                 >
                   삭제

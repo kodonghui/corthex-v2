@@ -96,7 +96,7 @@ const statusDotColors: Record<string, string> = {
   online: 'bg-green-500',
   working: 'bg-blue-500',
   error: 'bg-red-500',
-  offline: 'bg-zinc-400',
+  offline: 'bg-slate-400',
 }
 
 // ── Agent Form (shared between create & edit) ──
@@ -177,7 +177,7 @@ function AgentForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+        <label className="block text-xs font-medium text-slate-400 mb-1">
           에이전트 이름 <span className="text-red-500">*</span>
         </label>
         <Input
@@ -191,7 +191,7 @@ function AgentForm({
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">영문 이름</label>
+        <label className="block text-xs font-medium text-slate-400 mb-1">영문 이름</label>
         <Input
           value={nameEn}
           onChange={(e) => setNameEn(e.target.value)}
@@ -202,18 +202,18 @@ function AgentForm({
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">소속 부서</label>
+          <label className="block text-xs font-medium text-slate-400 mb-1">소속 부서</label>
           <Select options={deptOptions} value={departmentId} onChange={(e) => setDepartmentId(e.target.value)} />
         </div>
         <div>
-          <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">등급</label>
+          <label className="block text-xs font-medium text-slate-400 mb-1">등급</label>
           <Select options={tierOptions} value={tier} onChange={(e) => setTier(e.target.value as 'manager' | 'specialist' | 'worker')} />
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">모델명</label>
+          <label className="block text-xs font-medium text-slate-400 mb-1">모델명</label>
           <Input
             value={modelName}
             onChange={(e) => setModelName(e.target.value)}
@@ -221,7 +221,7 @@ function AgentForm({
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">역할/전문분야</label>
+          <label className="block text-xs font-medium text-slate-400 mb-1">역할/전문분야</label>
           <Input
             value={role}
             onChange={(e) => setRole(e.target.value)}
@@ -231,7 +231,7 @@ function AgentForm({
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">CLI 소유 인간직원</label>
+        <label className="block text-xs font-medium text-slate-400 mb-1">CLI 소유 인간직원</label>
         <Select options={userOptions} value={ownerUserId} onChange={(e) => setOwnerUserId(e.target.value)} />
       </div>
 
@@ -297,22 +297,22 @@ function SoulEditor({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Soul Editor (left) */}
         <div>
-          <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+          <label className="block text-xs font-medium text-slate-400 mb-1">
             Soul (마크다운)
           </label>
           <textarea
             value={soul}
             onChange={(e) => setSoul(e.target.value)}
-            className="w-full h-64 p-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm font-mono text-zinc-900 dark:text-zinc-100 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full h-64 p-3 rounded-lg border border-slate-700 bg-slate-900 text-sm font-mono text-slate-50 resize-y focus:outline-none focus:ring-2 focus:ring-cyan-400"
             placeholder="에이전트의 Soul을 작성하세요..."
           />
           <div className="mt-2">
-            <p className="text-[10px] font-medium text-zinc-500 dark:text-zinc-400 mb-1">사용 가능한 변수:</p>
+            <p className="text-[10px] font-medium text-slate-500 mb-1">사용 가능한 변수:</p>
             <div className="flex flex-wrap gap-1">
               {availableVars.map((v) => (
                 <span
                   key={v}
-                  className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-900"
+                  className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-[rgba(34,211,238,0.10)] text-cyan-300 cursor-pointer hover:bg-[rgba(34,211,238,0.15)]"
                   onClick={() => setSoul((prev) => prev + v)}
                   title="클릭하여 삽입"
                 >
@@ -326,22 +326,22 @@ function SoulEditor({
         {/* Preview (right) */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300">
+            <label className="block text-xs font-medium text-slate-400">
               프리뷰
             </label>
             <Button size="sm" variant="outline" onClick={handlePreview} disabled={isPreviewing}>
               {isPreviewing ? '로딩...' : '프리뷰 새로고침'}
             </Button>
           </div>
-          <div className="w-full h-64 p-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 overflow-y-auto whitespace-pre-wrap">
+          <div className="w-full h-64 p-3 rounded-lg border border-slate-700 bg-slate-800 text-sm text-slate-50 overflow-y-auto whitespace-pre-wrap">
             {preview ? preview.rendered || '(빈 결과)' : '프리뷰 버튼을 클릭하세요'}
           </div>
           {preview?.variables && Object.keys(preview.variables).length > 0 && (
             <div className="mt-2 space-y-1">
-              <p className="text-[10px] font-medium text-zinc-500 dark:text-zinc-400">치환된 변수:</p>
+              <p className="text-[10px] font-medium text-slate-500">치환된 변수:</p>
               {Object.entries(preview.variables).map(([key, val]) => (
-                <div key={key} className="text-[10px] font-mono text-zinc-600 dark:text-zinc-400 truncate">
-                  <span className="text-indigo-600 dark:text-indigo-400">{`{{${key}}}`}</span>
+                <div key={key} className="text-[10px] font-mono text-slate-500 truncate">
+                  <span className="text-cyan-400">{`{{${key}}}`}</span>
                   {' = '}
                   <span>{val || '(빈 값)'}</span>
                 </div>
@@ -502,8 +502,8 @@ export function AgentsPage() {
   if (isError) {
     return (
       <div data-testid="agents-page" className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700/50 rounded-xl p-6 text-center">
-          <p className="text-sm text-red-600 dark:text-red-400">에이전트 목록을 불러올 수 없습니다</p>
+        <div className="bg-red-900/20 border border-red-700/50 rounded-xl p-6 text-center">
+          <p className="text-sm text-red-400">에이전트 목록을 불러올 수 없습니다</p>
           <button onClick={() => refetch()} className="text-xs text-red-500 hover:text-red-400 underline mt-2">
             다시 시도
           </button>
@@ -517,8 +517,8 @@ export function AgentsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">에이전트 관리</h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
+          <h1 className="text-xl font-bold text-slate-50">에이전트 관리</h1>
+          <p className="text-sm text-slate-500 mt-0.5">
             {agents.length}개 에이전트
           </p>
         </div>
@@ -539,8 +539,8 @@ export function AgentsPage() {
               onClick={() => setFilterActive(f)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 filterActive === f
-                  ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300'
-                  : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                  ? 'bg-[rgba(34,211,238,0.10)] text-cyan-300'
+                  : 'text-slate-500 hover:bg-slate-800'
               }`}
             >
               {f === 'active' ? '활성' : f === 'inactive' ? '비활성' : '전체'}
@@ -564,7 +564,7 @@ export function AgentsPage() {
             <div
               key={agent.id}
               data-testid={`agent-row-${agent.id}`}
-              className={`flex items-center justify-between bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg px-4 py-3 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors ${
+              className={`flex items-center justify-between bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 hover:border-slate-700 transition-colors ${
                 !agent.isActive ? 'opacity-50' : ''
               }`}
             >
@@ -572,38 +572,38 @@ export function AgentsPage() {
                 <div className="flex items-center gap-2">
                   {/* Status dot */}
                   <span className={`w-2 h-2 rounded-full shrink-0 ${statusDotColors[agent.status] || statusDotColors.offline}`} title={statusLabels[agent.status]} />
-                  <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">{agent.name}</h3>
-                  {agent.nameEn && <span className="text-xs text-zinc-400 dark:text-zinc-500 truncate">({agent.nameEn})</span>}
+                  <h3 className="text-sm font-medium text-slate-50 truncate">{agent.name}</h3>
+                  {agent.nameEn && <span className="text-xs text-slate-500 truncate">({agent.nameEn})</span>}
                   <Badge variant={tierColors[agent.tier]}>{tierLabels[agent.tier]}</Badge>
                   {agent.isSecretary && <Badge variant="error">비서</Badge>}
                   {agent.isSystem && <Badge variant="default">시스템</Badge>}
                 </div>
                 <div className="flex items-center gap-3 mt-0.5">
-                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                  <span className="text-xs text-slate-500">
                     {agent.departmentId ? deptMap.get(agent.departmentId) || '부서' : '미배속'}
                   </span>
-                  <span className="text-xs text-zinc-400 dark:text-zinc-500">{agent.modelName}</span>
-                  {agent.role && <span className="text-xs text-zinc-400 dark:text-zinc-500 truncate">{agent.role}</span>}
+                  <span className="text-xs text-slate-500">{agent.modelName}</span>
+                  {agent.role && <span className="text-xs text-slate-500 truncate">{agent.role}</span>}
                 </div>
               </div>
               <div className="flex items-center gap-1 ml-4 shrink-0">
                 <button
                   onClick={() => { setEditAgent(agent); setEditTab('info') }}
-                  className="px-2.5 py-1.5 text-xs text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+                  className="px-2.5 py-1.5 text-xs text-slate-500 hover:bg-slate-800 rounded-lg transition-colors"
                   aria-label={`${agent.name} 편집`}
                 >
                   편집
                 </button>
                 <button
                   onClick={() => { setEditAgent(agent); setEditTab('soul') }}
-                  className="px-2.5 py-1.5 text-xs text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors"
+                  className="px-2.5 py-1.5 text-xs text-cyan-400 hover:bg-[rgba(34,211,238,0.10)] rounded-lg transition-colors"
                   aria-label={`${agent.name} Soul 편집`}
                 >
                   Soul
                 </button>
                 <button
                   onClick={() => setDeleteAgent(agent)}
-                  className="px-2.5 py-1.5 text-xs text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                  className="px-2.5 py-1.5 text-xs text-red-500 hover:bg-red-900/20 rounded-lg transition-colors"
                   aria-label={`${agent.name} 삭제`}
                   disabled={agent.isSystem || agent.isSecretary}
                   title={agent.isSystem ? '시스템 에이전트는 삭제할 수 없습니다' : agent.isSecretary ? '비서 에이전트는 삭제할 수 없습니다' : ''}
@@ -687,22 +687,22 @@ export function AgentsPage() {
         {deleteAgent && (
           <div className="space-y-4">
             {deleteAgent.isSecretary && (
-              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-lg p-3">
-                <p className="text-sm text-amber-800 dark:text-amber-300">
+              <div className="bg-amber-900/20 border border-amber-700/50 rounded-lg p-3">
+                <p className="text-sm text-amber-300">
                   비서 에이전트는 삭제할 수 없습니다.
                 </p>
               </div>
             )}
             {deleteAgent.isSystem && (
-              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-lg p-3">
-                <p className="text-sm text-amber-800 dark:text-amber-300">
+              <div className="bg-amber-900/20 border border-amber-700/50 rounded-lg p-3">
+                <p className="text-sm text-amber-300">
                   시스템 에이전트는 삭제할 수 없습니다.
                 </p>
               </div>
             )}
             {!deleteAgent.isSecretary && !deleteAgent.isSystem && (
               <>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                <p className="text-sm text-slate-500">
                   이 에이전트를 비활성화하시겠습니까? 에이전트가 부서에서 해제되고 비활성화됩니다.
                 </p>
                 <div className="flex gap-2 justify-end pt-2">

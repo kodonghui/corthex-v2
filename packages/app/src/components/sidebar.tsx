@@ -4,10 +4,10 @@ import { useAuthStore } from '../stores/auth-store'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import {
-  LayoutDashboard, Terminal, Monitor, MessageSquare, TrendingUp, Users,
+  LayoutDashboard, Terminal, MessageSquare, TrendingUp, Users,
   Clock, FileText, FolderOpen, Network, Building2, Bot, Layers, Share2,
-  Send, Activity, DollarSign, History, Shield, Lock, BookOpen, Timer,
-  Search, Bell, Settings, BarChart3
+  Send, DollarSign, History, Shield, Lock, BookOpen,
+  Settings, BarChart3
 } from 'lucide-react'
 
 declare const __BUILD_NUMBER__: string
@@ -21,9 +21,8 @@ const navSections: NavSection[] = [
   {
     label: 'COMMAND',
     items: [
-      { to: '/', label: '대시보드', icon: LayoutDashboard },
+      { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
       { to: '/hub', label: '허브', icon: Terminal },
-      { to: '/command-center', label: '사령관실', icon: Monitor },
       { to: '/nexus', label: 'NEXUS', icon: Network },
       { to: '/chat', label: '채팅', icon: MessageSquare },
     ],
@@ -34,7 +33,6 @@ const navSections: NavSection[] = [
       { to: '/agents', label: '에이전트', icon: Bot },
       { to: '/departments', label: '부서', icon: Building2 },
       { to: '/jobs', label: '작업', icon: Clock },
-      { to: '/org', label: '조직도', icon: Network },
       { to: '/tiers', label: '티어', icon: Layers },
       { to: '/reports', label: '보고서', icon: FileText },
     ],
@@ -58,9 +56,6 @@ const navSections: NavSection[] = [
       { to: '/activity-log', label: '통신로그', icon: History },
       { to: '/ops-log', label: '작전일지', icon: Shield },
       { to: '/classified', label: '기밀문서', icon: Lock },
-      { to: '/cron', label: '크론기지', icon: Timer },
-      { to: '/argos', label: 'ARGOS', icon: Search },
-      { to: '/notifications', label: '알림', icon: Bell },
       { to: '/settings', label: '설정', icon: Settings },
     ],
   },

@@ -62,16 +62,7 @@ export function App() {
   const checkAuth = useAuthStore((s) => s.checkAuth)
 
   useEffect(() => {
-    const stored = localStorage.getItem('corthex_theme') as 'system' | 'light' | 'dark' | null
-    const theme = stored || 'system'
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark')
-    } else if (theme === 'light') {
-      document.documentElement.classList.remove('dark')
-    } else {
-      const dark = window.matchMedia('(prefers-color-scheme: dark)').matches
-      document.documentElement.classList.toggle('dark', dark)
-    }
+    document.documentElement.classList.add('dark')
   }, [])
 
   useEffect(() => {
@@ -107,9 +98,9 @@ export function App() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<Suspense fallback={<PageSkeleton />}><HomePage /></Suspense>} />
+            <Route index element={<Navigate to="/hub" replace />} />
             <Route path="hub" element={<Suspense fallback={<PageSkeleton />}><HubPage /></Suspense>} />
-            <Route path="command-center" element={<Suspense fallback={<PageSkeleton />}><CommandCenterPage /></Suspense>} />
+            <Route path="command-center" element={<Navigate to="/hub" replace />} />
             <Route path="chat" element={<Suspense fallback={<PageSkeleton />}><ChatPage /></Suspense>} />
             <Route path="jobs" element={<Suspense fallback={<PageSkeleton />}><JobsPage /></Suspense>} />
             <Route path="reports" element={<Suspense fallback={<PageSkeleton />}><ReportsPage /></Suspense>} />
@@ -121,12 +112,12 @@ export function App() {
             <Route path="nexus" element={<Suspense fallback={<PageSkeleton />}><NexusPage /></Suspense>} />
             <Route path="trading" element={<Suspense fallback={<PageSkeleton />}><TradingPage /></Suspense>} />
             <Route path="files" element={<Suspense fallback={<PageSkeleton />}><FilesPage /></Suspense>} />
-            <Route path="org" element={<Suspense fallback={<PageSkeleton />}><OrgPage /></Suspense>} />
+            <Route path="org" element={<Navigate to="/nexus" replace />} />
             <Route path="notifications" element={<Suspense fallback={<PageSkeleton />}><NotificationsPage /></Suspense>} />
             <Route path="activity-log" element={<Suspense fallback={<PageSkeleton />}><ActivityLogPage /></Suspense>} />
             <Route path="costs" element={<Suspense fallback={<PageSkeleton />}><CostsPage /></Suspense>} />
-            <Route path="cron" element={<Suspense fallback={<PageSkeleton />}><CronBasePage /></Suspense>} />
-            <Route path="argos" element={<Suspense fallback={<PageSkeleton />}><ArgosPage /></Suspense>} />
+            <Route path="cron" element={<Navigate to="/jobs" replace />} />
+            <Route path="argos" element={<Navigate to="/jobs" replace />} />
             <Route path="agora" element={<Suspense fallback={<PageSkeleton />}><AgoraPage /></Suspense>} />
             <Route path="classified" element={<Suspense fallback={<PageSkeleton />}><ClassifiedPage /></Suspense>} />
             <Route path="knowledge" element={<Suspense fallback={<PageSkeleton />}><KnowledgePage /></Suspense>} />

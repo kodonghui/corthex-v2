@@ -52,49 +52,49 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-zinc-950">
+    <div className="min-h-screen flex items-center justify-center bg-slate-950">
       <div className="w-full max-w-sm space-y-8">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">CORTHEX</h1>
-          <p className="mt-2 text-sm text-zinc-500">로그인하여 워크스페이스에 접속하세요</p>
+          <h1 className="text-3xl font-bold text-slate-50">CORTHEX</h1>
+          <p className="mt-2 text-sm text-slate-500">로그인하여 워크스페이스에 접속하세요</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+            <label className="block text-sm font-medium text-slate-400 mb-1">
               아이디
             </label>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-slate-700 rounded-md bg-slate-900 text-slate-50 focus:outline-none focus:ring-2 focus:ring-cyan-400"
               required
               autoComplete="username"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+            <label className="block text-sm font-medium text-slate-400 mb-1">
               비밀번호
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-slate-700 rounded-md bg-slate-900 text-slate-50 focus:outline-none focus:ring-2 focus:ring-cyan-400"
               required
               autoComplete="current-password"
             />
           </div>
 
           {error && (
-            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+            <p className="text-sm text-red-400">{error}</p>
           )}
 
           <button
             type="submit"
             disabled={loading || countdown > 0}
-            className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-md text-sm font-medium transition-colors"
+            className="w-full py-2 px-4 bg-cyan-400 hover:bg-cyan-400 disabled:opacity-50 text-slate-950 rounded-md text-sm font-medium transition-colors"
           >
             {countdown > 0
               ? `${countdown}초 후 재시도`

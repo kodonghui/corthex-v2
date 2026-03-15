@@ -1,39 +1,88 @@
 import { Check } from 'lucide-react'
+import { useThemeStore, THEMES, type ThemeName } from '../../stores/theme-store'
 
-export interface ThemeColorProps {
-    colorClass: string;
-    selected?: boolean;
-}
-
-export function ThemeColor({ colorClass, selected }: ThemeColorProps) {
-    if (selected) {
-        return (
-            <button
-                className={`w-12 h-12 rounded-full ${colorClass} flex items-center justify-center ring-2 ring-offset-2 ring-offset-[#101f22] transition-all cursor-pointer`}
-                style={{ '--tw-ring-color': 'var(--tw-bg-opacity)' } as React.CSSProperties}
-            >
-                <Check className="text-white w-5 h-5" />
-            </button>
-        )
-    }
+export function ThemeSelector() {
+    const { theme, setTheme } = useThemeStore()
 
     return (
-        <button className={`w-12 h-12 rounded-full ${colorClass} hover:scale-110 transition-transform cursor-pointer`}></button>
+        <div className="flex flex-col gap-4">
+            <p className="text-base font-medium leading-normal text-corthex-text-primary">
+                테마
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {THEMES.map((t) => (
+                    <ThemeCard
+                        key={t.name}
+                        themeName={t.name}
+                        label={t.label}
+                        description={t.description}
+                        accent={t.accent}
+                        surface={t.surface}
+                        selected={theme === t.name}
+                        onSelect={setTheme}
+                    />
+                ))}
+            </div>
+        </div>
     )
 }
 
-export function ThemeSelector() {
+interface ThemeCardProps {
+    themeName: ThemeName
+    label: string
+    description: string
+    accent: string
+    surface: string
+    selected: boolean
+    onSelect: (theme: ThemeName) => void
+}
+
+function ThemeCard({
+    themeName,
+    label,
+    description,
+    accent,
+    surface,
+    selected,
+    onSelect,
+}: ThemeCardProps) {
     return (
-        <div className="flex flex-col gap-4">
-            <p className="text-base font-medium leading-normal text-slate-300">액센트 컬러</p>
-            <div className="flex items-center gap-4 flex-wrap">
-                <ThemeColor colorClass="bg-cyan-400" selected />
-                <ThemeColor colorClass="bg-amber-400" />
-                <ThemeColor colorClass="bg-emerald-400" />
-                <ThemeColor colorClass="bg-violet-400" />
-                <ThemeColor colorClass="bg-slate-400" />
-                <span className="ml-2 text-sm font-medium text-slate-400">Cyan (기본값)</span>
+        <button
+            onClick={() => onSelect(themeName)}
+            className={`
+                relative flex flex-col gap-2 p-4 rounded-lg border transition-all cursor-pointer text-left
+                ${selected
+                    ? 'border-corthex-accent ring-2 ring-corthex-accent/30 bg-corthex-elevated'
+                    : 'border-corthex-border hover:border-corthex-border-strong bg-corthex-surface hover:bg-corthex-elevated'
+                }
+            `}
+        >
+            {/* Color preview */}
+            <div className="flex items-center gap-2">
+                <div
+                    className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center"
+                    style={{ backgroundColor: accent }}
+                >
+                    {selected && <Check className="w-4 h-4" style={{ color: surface }} />}
+                </div>
+                <div
+                    className="w-8 h-8 rounded-full border border-white/10"
+                    style={{ backgroundColor: surface }}
+                />
             </div>
-        </div>
+
+            {/* Label */}
+            <div className="flex flex-col gap-0.5">
+                <span className="text-sm font-medium text-corthex-text-primary">{label}</span>
+                <span className="text-xs text-corthex-text-secondary">{description}</span>
+            </div>
+
+            {/* Selected indicator */}
+            {selected && (
+                <span className="absolute top-2 right-2 text-[10px] font-medium text-corthex-accent uppercase tracking-wider">
+                    active
+                </span>
+            )}
+        </button>
     )
 }

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./ui/theme.css";
+@import "./styles/themes.css";
 
 /* CORTHEX 디자인 토큰 — Phase 3 Sovereign Sage Theme */
 @theme {
