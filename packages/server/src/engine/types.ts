@@ -58,6 +58,21 @@ export interface ToolCallContext {
 }
 
 /**
+ * E12: McpSession — cached MCP server session (warm start reuse)
+ *
+ * Created at Stage 2 (SPAWN), populated with tools at Stage 4 (DISCOVER).
+ * Reused for all subsequent tool calls in the same agent session (D26 warm start).
+ */
+export interface McpSession {
+  readonly sessionId: string       // transport.sessionId (crypto.randomUUID)
+  readonly mcpServerId: string     // UUID of mcp_server_configs row
+  readonly agentSessionId: string  // SessionContext.sessionId (for teardown scoping)
+  tools: Array<{ name: string; description?: string; inputSchema: Record<string, unknown> }>
+  spawnedAt: number                // Date.now() at spawn
+  lastUsedAt: number               // Date.now() at last access (warm start update)
+}
+
+/**
  * E13: BuiltinToolHandler — interface for all built-in tool implementations
  *
  * Every handler in tool-handlers/builtins/ MUST implement this interface.
