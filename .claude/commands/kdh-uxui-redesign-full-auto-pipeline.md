@@ -1,9 +1,9 @@
 ---
 name: 'kdh-uxui-redesign-full-auto-pipeline'
-description: 'UXUI Full Redesign Pipeline v1.0 (team party mode). Foundation→Research→Analysis→DesignSystem→Themes→Prompts→Integration. Usage: /kdh-uxui-redesign-full-auto-pipeline [phase-N|all|resume]'
+description: 'UXUI Full Redesign Pipeline v1.1 (team party mode). Foundation→Research→Analysis→DesignSystem→Themes→Prompts→Integration. Usage: /kdh-uxui-redesign-full-auto-pipeline [phase-N|all|resume]'
 ---
 
-# UXUI Full Redesign Pipeline v1.0
+# UXUI Full Redesign Pipeline v1.1
 
 Complete UXUI redesign pipeline with **team agent party mode** at every phase.
 "Phase 0부터 시작 → 자러감 → 아침에 Phase 5까지 완성" 가능.
@@ -85,8 +85,9 @@ _corthex_full_redesign/
 ```
 Orchestrator (main conversation): model=opus   — judgment, phase transitions, quality gates
 Writer:                           model=sonnet  — document writing, research compilation
-Critic-A (Design + UX):          model=sonnet  — visual design, user experience, aesthetics
-Critic-B (Tech + Feasibility):   model=sonnet  — implementation feasibility, performance, accessibility
+Critic-A (UX + Brand):           model=sonnet  — user experience, brand identity, aesthetics
+Critic-B (Visual + Accessibility): model=sonnet — visual design, WCAG compliance, quality
+Critic-C (Tech + Performance):   model=sonnet  — implementation feasibility, performance, bundle size
 ```
 
 ---
@@ -96,34 +97,36 @@ Critic-B (Tech + Feasibility):   model=sonnet  — implementation feasibility, p
 ### Party Mode 3R (3 Round Review)
 
 ```
-Round 1: Writer writes section → Critic-A + Critic-B review in parallel → cross-talk → feedback
+Round 1: Writer writes section → Critic-A, Critic-B, AND Critic-C review in parallel → cross-talk → feedback
 Round 2: Writer revises → Critics re-review → cross-talk → feedback
 Round 3: Writer finalizes → Critics verify → score
 
-Pass condition: avg score >= 7/10
+Pass condition: avg score >= 7/10 (average of ALL THREE critics)
 Fail: retry (max 2) → escalate → continue
 ```
 
 ### Party Mode 2R (Research phases — lighter)
 
 ```
-Round 1: Writer compiles research → Critic-A + Critic-B review → cross-talk → feedback
+Round 1: Writer compiles research → Critic-A, Critic-B, AND Critic-C review → cross-talk → feedback
 Round 2: Writer revises → Critics verify → score
 
-Pass condition: avg score >= 7/10
+Pass condition: avg score >= 7/10 (average of ALL THREE critics)
 ```
 
 ### Critic Role Assignments (UXUI Specialized)
 
-**Critic-A (Design + UX + Brand):**
+**Critic-A (UX + Brand):**
 - **Sally (UX Designer):** "실제 유저가 이걸 3초 안에 이해할 수 있나?" — 유저 옹호자
-- **Marcus (Visual Designer):** "시각적 위계가 무너졌다. 여기에 시선이 먼저 가야 하는데." — 미적 판단
-- **Luna (Brand Strategist):** "CORTHEX의 정체성과 맞지 않는다. AI 조직관리 느낌이 안 난다." — 브랜드 일관성
+- **Luna (Brand Strategist):** "CORTHEX의 정체성과 맞지 않는다." — 브랜드 일관성
 
-**Critic-B (Tech + Feasibility + Accessibility):**
-- **Amelia (Frontend Dev):** "이 레이아웃은 CSS Grid로 3줄이면 된다. 이건 불가능." — 구현 현실성
-- **Quinn (QA + A11y):** "색상 대비 3.2:1, WCAG AA 불합격. 키보드 탭 순서 빠짐." — 접근성 + 품질
-- **Bob (Performance):** "이 애니메이션 60fps 못 나온다. 이미지 4MB는 3G에서 10초." — 성능 현실성
+**Critic-B (Visual + Accessibility):**
+- **Marcus (Visual Designer):** "시각적 위계가 무너졌다." — 미적 판단
+- **Quinn (QA + A11y):** "색상 대비 3.2:1, WCAG AA 불합격." — 접근성 + 품질
+
+**Critic-C (Tech + Performance):** [NEW in v1.1]
+- **Amelia (Frontend Dev):** "이 레이아웃은 CSS Grid로 3줄이면 된다." — 구현 현실성
+- **Bob (Performance):** "이 애니메이션 60fps 못 나온다." — 성능 현실성
 
 ### Writer Prompt Template (UXUI Mode)
 
@@ -150,21 +153,22 @@ Model: sonnet. YOLO mode — auto-proceed, never wait for user input.
 ### Phase 2: Request Review
 6. SendMessage to "critic-a": "[Review Request] {step_name}. File: {path} lines {start}-{end}"
 7. SendMessage to "critic-b": "[Review Request] {step_name}. File: {path} lines {start}-{end}"
-8. STOP AND WAIT for BOTH critics.
+8. SendMessage to "critic-c": "[Review Request] {step_name}. File: {path} lines {start}-{end}"
+9. STOP AND WAIT for ALL THREE critics.
 
 ### Phase 3: Fix
-9. Read BOTH critic logs FROM FILE
-10. Apply ALL fixes
-11. Write fix summary to party-logs/{phase}-{step}-fixes.md
+10. Read ALL THREE critic logs FROM FILE
+11. Apply ALL fixes
+12. Write fix summary to party-logs/{phase}-{step}-fixes.md
 
 ### Phase 4: Verify
-12. SendMessage to both critics: "[Fixes Applied]"
-13. WAIT for verification scores.
+13. SendMessage to all three critics: "[Fixes Applied]"
+14. WAIT for verification scores from ALL THREE critics.
 
 ### Phase 5: Score & Next
-14. avg >= 7: PASS → save context-snapshot → report to Orchestrator
-15. avg < 7 AND retry < 2: rewrite
-16. avg < 7 AND retry >= 2: ESCALATE
+15. avg of 3 critics >= 7: PASS → save context-snapshot → report to Orchestrator
+16. avg < 7 AND retry < 2: rewrite
+17. avg < 7 AND retry >= 2: ESCALATE
 
 ## Output Quality (ABSOLUTE RULE)
 All outputs must be SPECIFIC and DETAILED.
@@ -173,6 +177,60 @@ All outputs must be SPECIFIC and DETAILED.
 - Typography: exact font + weight + size (e.g., `Inter 600 text-lg (18px/28px)`)
 - Layout: exact CSS/Tailwind (e.g., `grid grid-cols-[280px_1fr] h-screen`)
 - No vague words: "clean", "modern", "professional" → replace with SPECIFIC visual specs
+```
+
+---
+
+## Critic-C Prompt Template (Tech + Performance)
+
+```
+You are CRITIC-C in team "{team_name}", reviewing from tech/performance perspective.
+Model: sonnet. YOLO mode.
+
+## Your Roles (play both in character)
+- **Amelia (Frontend Dev):** "이 레이아웃은 CSS Grid로 3줄이면 된다. 이건 불가능." — 구현 현실성
+- **Bob (Performance):** "이 애니메이션 60fps 못 나온다. 이미지 4MB는 3G에서 10초." — 성능 현실성
+
+## Your Workflow
+
+### On Review Request
+1. Read the file FROM DISK at the path given by Writer
+2. Also read _corthex_full_redesign/context-snapshots/*.md for prior decisions
+3. Also read _bmad-output/planning-artifacts/architecture.md and any design-tokens.md in _corthex_full_redesign/
+
+### Amelia's Review
+- Is this implementable in React/Tailwind? Be specific about what works and what doesn't.
+- Component count: is this realistic? Too many custom components needed?
+- Third-party dependencies: are any required that aren't already in the project?
+- CSS/layout feasibility: will the proposed layout actually work in the browser?
+
+### Bob's Review
+- Will it perform? Estimate bundle size impact for any new dependencies.
+- Image optimization: are any large images or heavy assets called for?
+- Animation fps: will proposed animations run at 60fps? Name specific problematic ones.
+- Loading time on slow connections: any critical path blockers?
+
+### Required Output
+- Find minimum 2 issues (one from Amelia, one from Bob)
+- Write review to _corthex_full_redesign/party-logs/{phase}-{step}-critic-c.md
+- Format:
+  ## Critic-C Review: {step_name}
+  ### Amelia (Frontend Dev)
+  [in-character comment, 2-3 sentences minimum]
+  Issues: [numbered list of specific problems]
+  ### Bob (Performance)
+  [in-character comment, 2-3 sentences minimum]
+  Issues: [numbered list of specific problems]
+  ### Score: {X}/10
+  ### Required Fixes: [numbered list]
+- Cross-talk: SendMessage to critic-a and critic-b with summary of tech/perf concerns
+
+## Rules
+- ALWAYS read FROM FILE before reviewing
+- Cross-check against architecture.md and design-tokens.md
+- In-character comments: 2-3 sentences minimum per role
+- Zero findings = re-analyze (not allowed to pass with no issues)
+- Score honestly: vague/unimplementable outputs score <= 4
 ```
 
 ---
@@ -260,6 +318,7 @@ For EACH table in schema.ts:
 
 **Critic-A Focus:** 유저 관점에서 빠진 기능이 없는지, 화면 목록이 완전한지
 **Critic-B Focus:** 기술적으로 정확한지, API/DB 매핑이 맞는지, 성능 제약 누락 없는지
+**Critic-C Focus:** 구현 복잡도 평가, 성능 제약이 현실적인지, React/Hono 스택과 충돌 없는지
 
 ### Step 0-2: Vision & Identity (Party 3R)
 
@@ -331,6 +390,7 @@ Example: "Show the org, not the AI" — users should see their organization stru
 
 **Critic-A Focus:** 비전이 설득력 있는지, 감정 방향이 모순 없는지, 유저 페르소나가 현실적인지
 **Critic-B Focus:** 기능 계층이 기술적으로 맞는지, 경쟁 포지셔닝이 정확한지
+**Critic-C Focus:** 디자인 원칙이 구현 가능한지, 성능 목표가 현실적인지 (Lighthouse 점수 등)
 
 ---
 
@@ -379,7 +439,8 @@ For each option:
 ```
 
 **Critic-A Focus:** 선택한 3개가 CORTHEX 비전에 맞는지, 유저가 실제로 편할지
-**Critic-B Focus:** 기술적 구현 가능성, 성능, 복잡도
+**Critic-B Focus:** 시각적 위계, WCAG AA 대비, 반응형 가능성
+**Critic-C Focus:** 기술적 구현 가능성, 성능, 복잡도 (CSS Grid/Flex 실현 여부, 번들 크기 영향)
 
 ### Step 1-2: App Layout Research (Party 2R)
 
@@ -833,7 +894,7 @@ Step 0: Setup
 Step 1: For each Phase (0 through 5):
   → Read pipeline-status.yaml for current state
   → Read ALL context-snapshots/*.md
-  → Spawn Writer + Critic-A + Critic-B for the Phase
+  → Spawn Writer + Critic-A + Critic-B + Critic-C for the Phase
   → For each Step in Phase:
     → Send [Step Instruction] to Writer
     → Monitor party mode (timeout: 15min per step)
@@ -865,11 +926,48 @@ Step 4: Report
 
 - max_retry: 2 per step (FAIL 3x = ESCALATE)
 - step_timeout: 15min + 2min grace (stall 3x = SKIP)
-- Party-log validation: critic-a.md + critic-b.md + fixes.md must exist
+- Party-log validation: critic-a.md + critic-b.md + critic-c.md + fixes.md must exist
 - Context-snapshot after EVERY step
 - On respawn: inject ALL context-snapshots
 - Team failure → single-worker fallback
 - Pipeline never blocks — timeout/fail/escalate always leads to "continue"
+
+---
+
+### Timeout Strategy
+- step_timeout: 15 minutes (per UXUI step)
+- party_timeout: 15 minutes (per party round)
+- grace_period: 2 minutes
+- stall_threshold: 5 minutes (no message = stalled)
+- max_stalls: 3 → SKIP step
+
+---
+
+### Anti-patterns & Failure Modes
+
+#### Inherited from kdh-full-auto-pipeline (v6.0)
+1. Writer calls Skill tool → bypasses critic review loop
+2. Writer batches all steps → critics can't give step-by-step feedback
+3. Orchestrator says "run this skill" → Writer calls Skill tool
+4. Shutdown-before-continue race
+5. Workers skip mandatory skills
+6. Stale resources (tmux/worktree/team) accumulate
+
+#### UXUI-Specific (to be filled after v1.1 execution)
+- [TBD — document failures during first run]
+
+---
+
+### Context Snapshot Schema
+After each step, save to: _corthex_full_redesign/context-snapshots/{phase}-{step}-snapshot.md
+
+Contents:
+  ## {step_name}
+  - Decisions: (what was decided and why)
+  - Design tokens referenced: (exact hex, Tailwind classes)
+  - Constraints for next step: (what MUST be respected)
+  - Connections: (how this relates to previous steps)
+  - Critic scores: A={X}/10, B={X}/10, C={X}/10
 
 ---
 
@@ -888,13 +986,16 @@ Step 4: Report
 11. Model strategy can be overridden by user request only
 12. pipeline-status.yaml is the single source of truth for progress
 13. On resume: read pipeline-status.yaml + ALL context-snapshots before proceeding
+14. 3 Critics required for all party mode phases (A: UX+Brand, B: Visual+A11y, C: Tech+Performance)
+15. Anti-patterns from kdh-full-auto apply to this pipeline (shared team engine)
+16. Context snapshots include exact design token values (hex, Tailwind classes, px)
 
 ---
 
 ## Troubleshooting
 
 ### Writer produces vague output ("clean colors", "modern layout")
-**Fix:** Critic-A and Critic-B MUST reject with specific replacement suggestions. Score 0 for vague outputs.
+**Fix:** Critic-A, Critic-B, and Critic-C MUST reject with specific replacement suggestions. Score 0 for vague outputs.
 
 ### Research phase finds no good references
 **Fix:** Expand search to adjacent domains (fintech dashboards, healthcare admin UIs, etc.)
