@@ -1781,6 +1781,21 @@ export const workflowSuggestionsRelations = relations(workflowSuggestions, ({ on
   user: one(users, { fields: [workflowSuggestions.userId], references: [users.id] }),
 }))
 
+// === Story 16.2: credentials — Encrypted API Key Storage (D23, FR-CM1, FR-CM6) ===
+export const credentials = pgTable('credentials', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id),
+  keyName: text('key_name').notNull(),
+  encryptedValue: text('encrypted_value').notNull(),
+  createdByUserId: text('created_by_user_id'),
+  updatedByUserId: text('updated_by_user_id'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  companyIdx: index('credentials_company_idx').on(table.companyId),
+  companyKeyUniq: unique('credentials_company_key_uniq').on(table.companyId, table.keyName),
+}))
+
 // === Story 15.3: semantic_cache — Semantic Caching (D19/D20) ===
 export const semanticCache = pgTable('semantic_cache', {
   id: uuid('id').primaryKey().defaultRandom(),
