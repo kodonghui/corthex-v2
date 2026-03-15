@@ -33,6 +33,7 @@ function makeCtx(overrides: Partial<SessionContext> = {}): SessionContext {
     startedAt: Date.now(),
     maxDepth: 3,
     visitedAgents: ['secretary'],
+    runId: 'test-run-1',  // E17: runId groups tool calls in one session
     ...overrides,
   }
 }
@@ -114,10 +115,10 @@ describe('Hook Pipeline Integration', () => {
     mockAgentById.mockResolvedValue([{ allowedTools: ['web_search'] }])
     const ctx = makeCtx()
 
-    // PreToolUse denies file_read
+    // PreToolUse denies file_read (FR-TA3: TOOL_NOT_ALLOWED format)
     const permission = await toolPermissionGuard(ctx, 'file_read', {})
     expect(permission.allow).toBe(false)
-    expect(permission.reason).toBe(ERROR_CODES.TOOL_PERMISSION_DENIED)
+    expect(permission.reason).toBe('TOOL_NOT_ALLOWED: file_read')
 
     // When permission denied, PostToolUse pipeline should NOT run
     // (verified by the fact that we don't call it — the engine skips PostToolUse on deny)

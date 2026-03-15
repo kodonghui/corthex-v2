@@ -7,12 +7,14 @@ describe('engine/types.ts 타입 정의 (E1, E5)', () => {
     const source = readFileSync(
       join(import.meta.dir, '../../engine/types.ts'), 'utf8'
     )
-    const fields = ['cliToken', 'userId', 'companyId', 'depth', 'sessionId', 'startedAt', 'maxDepth', 'visitedAgents']
+    const fields = ['cliToken', 'userId', 'companyId', 'depth', 'sessionId', 'startedAt', 'maxDepth', 'visitedAgents', 'runId']
     for (const field of fields) {
       expect(source).toContain(`readonly ${field}`)
     }
     // visitedAgents는 readonly string[]
     expect(source).toContain('readonly visitedAgents: readonly string[]')
+    // runId: UUID v4, injected at session start (E17)
+    expect(source).toContain('readonly runId: string')
   })
 
   test('SSEEvent 6종 유니언 타입 정의', () => {
@@ -72,11 +74,19 @@ describe('TEA P0: SSEEvent discriminated union 필드 검증', () => {
   })
 })
 
-describe('TEA P1: barrel export (index.ts) 없음', () => {
-  test('engine/ 디렉토리에 index.ts 없음 (E8)', () => {
+describe('TEA P1: barrel export (index.ts) — E8 public API barrel', () => {
+  test('engine/index.ts exists as E8 public API barrel (exports engine public API only)', () => {
     const { existsSync } = require('fs')
     const indexPath = join(import.meta.dir, '../../engine/index.ts')
-    expect(existsSync(indexPath)).toBe(false)
+    expect(existsSync(indexPath)).toBe(true)
+  })
+
+  test('engine/index.ts exports ToolCallContext and BuiltinToolHandler (Story 17.1a)', () => {
+    const src = readFileSync(
+      join(import.meta.dir, '../../engine/index.ts'), 'utf8'
+    )
+    expect(src).toContain('ToolCallContext')
+    expect(src).toContain('BuiltinToolHandler')
   })
 })
 

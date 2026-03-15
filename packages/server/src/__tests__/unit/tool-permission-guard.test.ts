@@ -23,6 +23,7 @@ function makeCtx(overrides: Partial<SessionContext> = {}): SessionContext {
     startedAt: Date.now(),
     maxDepth: 3,
     visitedAgents: ['agent-1'],
+    runId: 'test-run-1',
     ...overrides,
   }
 }
@@ -42,16 +43,18 @@ describe('toolPermissionGuard', () => {
     expect(mockGetDB).not.toHaveBeenCalled()
   })
 
-  test('empty allowedTools allows all tools', async () => {
+  // FR-TA3: empty allowedTools = TOOL_NOT_ALLOWED (no tools permitted)
+  test('empty allowedTools denies all built-in tools (FR-TA3)', async () => {
     mockAgentById.mockResolvedValue([{ allowedTools: [] }])
     const result = await toolPermissionGuard(makeCtx(), 'sns_manager', {})
-    expect(result).toEqual({ allow: true })
+    expect(result).toEqual({ allow: false, reason: 'TOOL_NOT_ALLOWED: sns_manager' })
   })
 
-  test('null/undefined allowedTools allows all tools', async () => {
+  // FR-TA3: null allowedTools = TOOL_NOT_ALLOWED (no tools permitted)
+  test('null/undefined allowedTools denies all built-in tools (FR-TA3)', async () => {
     mockAgentById.mockResolvedValue([{ allowedTools: null }])
     const result = await toolPermissionGuard(makeCtx(), 'kr_stock', {})
-    expect(result).toEqual({ allow: true })
+    expect(result).toEqual({ allow: false, reason: 'TOOL_NOT_ALLOWED: kr_stock' })
   })
 
   test('tool in allowedTools is allowed', async () => {
@@ -60,24 +63,26 @@ describe('toolPermissionGuard', () => {
     expect(result).toEqual({ allow: true })
   })
 
-  test('tool NOT in allowedTools is denied with TOOL_PERMISSION_DENIED', async () => {
+  // FR-TA3: TOOL_NOT_ALLOWED format (not TOOL_PERMISSION_DENIED)
+  test('tool NOT in allowedTools is denied with TOOL_NOT_ALLOWED: tool_name', async () => {
     mockAgentById.mockResolvedValue([{ allowedTools: ['sns_manager', 'web_search'] }])
     const result = await toolPermissionGuard(makeCtx(), 'kr_stock', {})
-    expect(result).toEqual({ allow: false, reason: 'TOOL_PERMISSION_DENIED' })
+    expect(result).toEqual({ allow: false, reason: 'TOOL_NOT_ALLOWED: kr_stock' })
   })
 
   test('uses last visitedAgent as currentAgentId for DB lookup', async () => {
-    mockAgentById.mockResolvedValue([{ allowedTools: [] }])
+    mockAgentById.mockResolvedValue([{ allowedTools: ['web_search'] }])
     const ctx = makeCtx({ visitedAgents: ['secretary', 'cmo', 'content-specialist'] })
     await toolPermissionGuard(ctx, 'web_search', {})
     expect(mockGetDB).toHaveBeenCalledWith('company-1')
     expect(mockAgentById).toHaveBeenCalledWith('content-specialist')
   })
 
-  test('agent not found in DB allows all tools (defensive)', async () => {
+  // FR-TA3: agent not found = treat as empty allowedTools = TOOL_NOT_ALLOWED
+  test('agent not found in DB denies all tools (FR-TA3: null agent = no tools)', async () => {
     mockAgentById.mockResolvedValue([])
     const result = await toolPermissionGuard(makeCtx(), 'any_tool', {})
-    expect(result).toEqual({ allow: true })
+    expect(result).toEqual({ allow: false, reason: 'TOOL_NOT_ALLOWED: any_tool' })
   })
 })
 
@@ -90,9 +95,9 @@ describe('TEA P0: tool-permission-guard source introspection', () => {
     'utf-8',
   )
 
-  test('uses ERROR_CODES constant, no hardcoded error strings', () => {
-    expect(src).toContain('ERROR_CODES.TOOL_PERMISSION_DENIED')
-    expect(src).not.toMatch(/reason:\s*['"]TOOL_PERMISSION_DENIED['"]/)
+  test('uses TOOL_NOT_ALLOWED format (FR-TA3), not hardcoded TOOL_PERMISSION_DENIED', () => {
+    expect(src).toContain('TOOL_NOT_ALLOWED')
+    expect(src).not.toContain('TOOL_PERMISSION_DENIED')
   })
 
   test('imports getDB from scoped-query, not direct db', () => {

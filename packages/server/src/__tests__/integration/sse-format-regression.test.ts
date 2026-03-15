@@ -114,7 +114,7 @@ describe('SSE Event Format Regression', () => {
 import type { SessionContext, RunAgentOptions, Tool, PreToolHookResult } from '../../engine/types'
 
 describe('Engine Types Integrity', () => {
-  test('SessionContext has all 8 required readonly fields', () => {
+  test('SessionContext has all 9 required readonly fields', () => {
     const ctx: SessionContext = {
       cliToken: 'token',
       userId: 'user-1',
@@ -124,10 +124,12 @@ describe('Engine Types Integrity', () => {
       startedAt: Date.now(),
       maxDepth: 3,
       visitedAgents: ['agent-1'],
+      runId: 'run-1',
     }
-    expect(Object.keys(ctx)).toHaveLength(8)
+    expect(Object.keys(ctx)).toHaveLength(9)
     expect(ctx.depth).toBe(0)
     expect(ctx.visitedAgents).toEqual(['agent-1'])
+    expect(ctx.runId).toBe('run-1')
   })
 
   test('RunAgentOptions has required ctx/soul/message + optional tools', () => {
@@ -135,7 +137,7 @@ describe('Engine Types Integrity', () => {
       ctx: {
         cliToken: 't', userId: 'u', companyId: 'c',
         depth: 0, sessionId: 's', startedAt: 0,
-        maxDepth: 3, visitedAgents: [],
+        maxDepth: 3, visitedAgents: [], runId: 'r',
       },
       soul: 'You are a helpful assistant',
       message: 'Hello',

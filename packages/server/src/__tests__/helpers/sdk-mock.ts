@@ -186,6 +186,7 @@ export function createMockSessionContext(overrides: Partial<SessionContext> = {}
     startedAt: Date.now(),
     maxDepth: 3,
     visitedAgents: ['test-agent'],
+    runId: `test-run-${Date.now()}`,  // E17: runId groups tool calls in one session
     ...overrides,
   }
 }

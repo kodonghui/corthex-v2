@@ -15,6 +15,11 @@ import { checkSemanticCache, saveToSemanticCache } from './semantic-cache'
 /** Session registry for graceful shutdown (NFR-O1) */
 const activeSessions = new Map<string, SessionContext>()
 
+/** Generate a UUID v4 for run tracking (E17: runId groups all tool calls in one session) */
+function generateRunId(): string {
+  return crypto.randomUUID()
+}
+
 export function getActiveSessions(): ReadonlyMap<string, SessionContext> {
   return activeSessions
 }
@@ -41,7 +46,11 @@ const CALL_AGENT_TOOL: Anthropic.Messages.Tool = {
  * systemPrompt (array → empty string at runtime), so Path A is not feasible.
  */
 export async function* runAgent(options: RunAgentOptions): AsyncGenerator<SSEEvent> {
-  const { ctx, soul, message } = options
+  const { soul, message } = options
+  // Inject runId at session start if not provided (E17: agent-loop.ts is responsible for runId)
+  const ctx: SessionContext = options.ctx.runId
+    ? options.ctx
+    : { ...options.ctx, runId: generateRunId() }
   const agentName = ctx.visitedAgents[ctx.visitedAgents.length - 1] || 'unknown'
   const log = createSessionLogger({
     sessionId: ctx.sessionId,
@@ -170,15 +179,16 @@ export async function* runAgent(options: RunAgentOptions): AsyncGenerator<SSEEve
       for (const block of toolUseBlocks) {
         const toolInput = block.input as Record<string, unknown>
 
-        // PreToolUse hook (tool-permission-guard)
+        // PreToolUse hook (tool-permission-guard, FR-TA3)
         const preResult = await toolPermissionGuard(ctx, block.name, toolInput)
         if (!preResult.allow) {
+          // TOOL_NOT_ALLOWED: tool_name format (FR-TA3, NFR-S5)
+          const blockedOutput = preResult.reason || `TOOL_NOT_ALLOWED: ${block.name}`
           pendingEvents.push({
             type: 'error',
-            code: preResult.reason || ERROR_CODES.TOOL_PERMISSION_DENIED,
-            message: `Tool "${block.name}" is not permitted`,
+            code: blockedOutput,
+            message: blockedOutput,
           })
-          const blockedOutput = `Tool "${block.name}" is not permitted`
           toolResults.push({
             type: 'tool_result',
             tool_use_id: block.id,

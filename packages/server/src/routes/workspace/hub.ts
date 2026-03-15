@@ -107,6 +107,7 @@ hubRoute.post('/stream', zValidator('json', streamSchema), async (c) => {
     startedAt: Date.now(),
     maxDepth: await getMaxHandoffDepth(companyId),
     visitedAgents: [targetAgent.id],
+    runId: crypto.randomUUID(),  // E17: runId groups all tool calls in this session
   }
 
   // SSE streaming response

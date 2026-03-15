@@ -207,6 +207,7 @@ describe('createMockSessionContext', () => {
       companyId: 'custom-company',
       depth: 2,
       visitedAgents: ['secretary', 'manager'],
+      runId: 'test-run-1',
     })
 
     expect(ctx.companyId).toBe('custom-company')

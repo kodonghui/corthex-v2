@@ -192,6 +192,7 @@ async function executeDebateRounds(
         startedAt: Date.now(),
         maxDepth: 1,
         visitedAgents: [agentRow.id],
+        runId: crypto.randomUUID(),  // E17: runId groups all tool calls in this session
       }
 
       const prompt = buildSpeechPrompt(debate.topic, participant, roundNum, allRounds)
@@ -309,6 +310,7 @@ export async function detectConsensus(
     startedAt: Date.now(),
     maxDepth: 1,
     visitedAgents: [agentId],
+    runId: crypto.randomUUID(),  // E17: runId groups all tool calls in this session
   }
 
   const allSpeeches = rounds.flatMap(r =>

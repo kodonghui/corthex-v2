@@ -63,6 +63,7 @@ describe('Story 4.2: Caller Import Migration', () => {
         startedAt: Date.now(),
         maxDepth: 3,
         visitedAgents: ['agent-1'],
+        runId: 'test-run-1',
       }
 
       const result = await collectAgentResponse({ ctx, soul: 'test soul', message: 'hello' })
@@ -112,6 +113,7 @@ describe('Story 4.2: Caller Import Migration', () => {
         startedAt: Date.now(),
         maxDepth: 3,
         visitedAgents: ['agent-1'],
+        runId: 'test-run-1',
       }
 
       expect(ctx.companyId).toBe('company-abc')
@@ -236,6 +238,7 @@ describe('Story 4.2: Caller Import Migration', () => {
         startedAt: Date.now(),
         maxDepth: 1,
         visitedAgents: ['agora-synthesis'],
+        runId: 'test-run-1',
       }
 
       expect(ctx.companyId).toBe('company-xyz')

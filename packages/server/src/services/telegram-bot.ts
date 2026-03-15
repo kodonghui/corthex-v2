@@ -103,6 +103,7 @@ async function runAgentForCommand(opts: {
     startedAt: Date.now(),
     maxDepth: await getMaxHandoffDepth(companyId),
     visitedAgents: [agentRow.id],
+    runId: crypto.randomUUID(),  // E17: runId groups all tool calls in this session
   }
 
   await db.update(commands)

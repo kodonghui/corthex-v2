@@ -22,6 +22,7 @@ function makeCtx(overrides: Partial<SessionContext> = {}): SessionContext {
     startedAt: Date.now(),
     maxDepth: 3,
     visitedAgents: ['agent-1'],
+    runId: 'test-run-1',
     ...overrides,
   }
 }

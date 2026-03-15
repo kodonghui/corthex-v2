@@ -14,6 +14,7 @@ function makeCtx(): SessionContext {
     startedAt: Date.now(),
     maxDepth: 3,
     visitedAgents: ['agent-1'],
+    runId: 'test-run-1',
   }
 }
 

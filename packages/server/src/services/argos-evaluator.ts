@@ -388,6 +388,7 @@ async function executeTriggeredAction(trigger: TriggerRow, eventData: Record<str
       startedAt: Date.now(),
       maxDepth: await getMaxHandoffDepth(trigger.companyId),
       visitedAgents: [agent.id],
+      runId: crypto.randomUUID(),  // E17: runId groups all tool calls in this session
     }
 
     const result = await collectAgentResponse({ ctx, soul, message: trigger.instruction })

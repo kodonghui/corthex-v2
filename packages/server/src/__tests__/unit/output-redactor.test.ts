@@ -11,6 +11,7 @@ const ctx: SessionContext = {
   startedAt: Date.now(),
   maxDepth: 3,
   visitedAgents: ['agent-1'],
+  runId: 'run-test-1',
 }
 
 const REDACTED = '[REDACTED]'

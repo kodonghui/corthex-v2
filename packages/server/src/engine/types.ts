@@ -1,4 +1,5 @@
 // Engine types — server internal only, do NOT re-export from shared/ (P1, S1)
+import type { z } from 'zod'
 
 /** E1: SessionContext — readonly immutable context for agent execution */
 export interface SessionContext {
@@ -10,6 +11,7 @@ export interface SessionContext {
   readonly startedAt: number
   readonly maxDepth: number
   readonly visitedAgents: readonly string[]
+  readonly runId: string  // UUID v4 generated at session start by agent-loop.ts (E17)
 }
 
 /** E5: SSE event types — 6 variants only */
@@ -40,4 +42,31 @@ export interface RunAgentOptions {
   soul: string
   message: string
   tools?: Tool[]
+}
+
+/**
+ * E13: ToolCallContext — context passed to built-in tool handlers
+ *
+ * Derived from SessionContext by agent-loop.ts per session.
+ * Handlers use ctx.companyId for getDB() and ctx.runId for E17 telemetry.
+ */
+export interface ToolCallContext {
+  readonly companyId: string
+  readonly agentId: string
+  readonly runId: string    // shared across all tool calls in one session (E17, Pipeline Gate)
+  readonly sessionId: string
+}
+
+/**
+ * E13: BuiltinToolHandler — interface for all built-in tool implementations
+ *
+ * Every handler in tool-handlers/builtins/ MUST implement this interface.
+ * execute() returns a string result on success, or throws ToolError on failure.
+ * Never throw generic Error — always throw ToolError with TOOL_/AGENT_ prefix code.
+ */
+export interface BuiltinToolHandler {
+  name: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  schema: z.ZodObject<any>
+  execute: (input: Record<string, unknown>, ctx: ToolCallContext) => Promise<string>
 }
