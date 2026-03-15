@@ -87,7 +87,20 @@ Critic-C (planning):      model=sonnet — product+delivery review, independent 
 Story Dev Worker:         model=sonnet — code implementation, BMAD skill execution
 ```
 
-Why Sonnet for workers: Independent brains > single stronger brain for cross-review.
+### Stage-Specific Model Overrides (critic_model)
+
+Critical decision stages use Opus for critics to ensure highest judgment quality:
+
+| Stage | Writer | Critics | Why Opus for Critics |
+|-------|--------|---------|---------------------|
+| Architecture (step-04 Decisions, step-05 Patterns) | sonnet | **opus** | D1~D29 결정은 전체 프로젝트 방향 결정. 잘못된 아키텍처 결정 = 나중에 재작업 |
+| Epics (step-02 Design Epics) — Critic-A only | sonnet | **Critic-A=opus**, B+C=sonnet | 에픽 범위/의존성 설계는 아키텍처 전문가 판단 필요 |
+| Security Audit (Epic 21 등) — Worker | **opus** | N/A (story dev) | 보안 감사는 미묘한 취약점 감지 필요 |
+| All other stages | sonnet | sonnet | Sonnet으로 충분. Opus 시간 절약 |
+
+Orchestrator는 해당 Stage 진입 시 Critic spawn에 `model: "opus"` 오버라이드를 적용.
+
+Why Sonnet by default: Independent brains > single stronger brain for cross-review.
 4 Sonnet agents finding each other's blind spots beats 1 Opus reviewing itself.
 Sonnet weekly cap (~240-480h) is 6-20x larger than Opus (~24-40h). Plenty of room.
 

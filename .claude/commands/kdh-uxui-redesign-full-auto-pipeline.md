@@ -90,6 +90,20 @@ Critic-B (Visual + Accessibility): model=sonnet — visual design, WCAG complian
 Critic-C (Tech + Performance):   model=sonnet  — implementation feasibility, performance, bundle size
 ```
 
+### Phase-Specific Model Overrides (critic_model)
+
+Critical decision phases use Opus for critics to ensure highest judgment quality:
+
+| Phase | Writer | Critics | Why Opus for Critics |
+|-------|--------|---------|---------------------|
+| Phase 0 Step 0-1 (Technical Spec) | sonnet | **opus** | 기술 스펙 정확도가 모든 후속 Phase의 기반 |
+| Phase 2 (Deep Analysis — Option Selection) | sonnet | **opus** | 3개 옵션 중 최종 선택 = 전체 디자인 방향 결정 |
+| Phase 3 Step 3-1 (Design Tokens) | sonnet | **opus** | 토큰이 모든 컴포넌트/테마의 기초. 잘못된 토큰 = 전면 재작업 |
+| Phase 7 Step 7-3 (API Binding) | sonnet | **opus** | 백엔드 연동 실수는 런타임 버그 직결 |
+| All other phases/steps | sonnet | sonnet | Sonnet으로 충분. Opus 시간 절약 |
+
+Orchestrator는 해당 Phase/Step 진입 시 Critic spawn에 `model: "opus"` 오버라이드를 적용.
+
 ---
 
 ## Team Party Mode
