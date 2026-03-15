@@ -1,62 +1,50 @@
-pipeline: uxui-full-redesign
-version: "1.0"
-started: "2026-03-12"
+pipeline: uxui-redesign
+version: v1.1
+started: 2026-03-15T04:40:00Z
 mode: all
 
 phases:
   phase-0:
     name: Foundation
-    status: completed
-    score: 9.1
+    status: in_progress
     steps:
-      step-0-1: { name: "Technical Spec", status: completed, party: 3R, score: 9.5 }
-      step-0-2: { name: "Vision & Identity", status: completed, party: 3R, score: 8.75 }
+      0-1: { name: "Technical Spec", status: pending, party: 3R, critic_model: opus }
+      0-2: { name: "Vision & Identity", status: pending, party: 3R, critic_model: sonnet }
   phase-1:
     name: Research
-    status: completed
-    score: 8.92
+    status: pending
     steps:
-      step-1-1: { name: "Web Dashboard Research", status: completed, party: 2R, score: 8.75 }
-      step-1-2: { name: "App Layout Research", status: completed, party: 2R, score: 8.65 }
-      step-1-3: { name: "Landing Page Research", status: completed, party: 2R, score: 9.35 }
+      1-1: { name: "Web Dashboard Layout Research", status: pending, party: 2R }
+      1-2: { name: "App Layout Research", status: pending, party: 2R }
+      1-3: { name: "Landing Page Research", status: pending, party: 2R }
   phase-2:
     name: Deep Analysis
-    status: completed
-    score: 9.27
+    status: pending
     steps:
-      step-2-1: { name: "Web Deep Analysis", status: completed, party: 3R, score: 9.2 }
-      step-2-2: { name: "App Deep Analysis", status: completed, party: 3R, score: 9.35 }
-      step-2-3: { name: "Landing Deep Analysis", status: completed, party: 3R, score: 9.25 }
+      2-1: { name: "Web Options Deep Analysis", status: pending, party: 3R, critic_model: opus }
+      2-2: { name: "App Options Deep Analysis", status: pending, party: 3R, critic_model: opus }
+      2-3: { name: "Landing Options Deep Analysis", status: pending, party: 3R, critic_model: opus }
   phase-3:
     name: Design System
-    status: completed
-    score: 9.65
+    status: pending
     steps:
-      step-3-1: { name: "Design Tokens", status: completed, party: 3R, score: 9.65 }
-      step-3-2: { name: "Component Strategy", status: completed, party: 3R, score: 9.65 }
+      3-1: { name: "Design Tokens", status: pending, party: 3R, critic_model: opus }
+      3-2: { name: "Component Strategy", status: pending, party: 3R }
   phase-4:
     name: Theme Creation
-    status: completed
-    score: 8.38
+    status: pending
     steps:
-      step-4-1: { name: "Creative Themes", status: completed, party: 3R, score: 9.0 }
-      step-4-2: { name: "Accessibility Audit", status: completed, party: 1R, score: 7.75 }
+      4-1: { name: "Creative Themes", status: pending, party: 3R }
+      4-2: { name: "Accessibility Audit", status: pending, party: 1R }
   phase-5:
     name: Prompt Engineering
-    status: completed
-    score: 9.5
+    status: pending
     steps:
-      step-5-1: { name: "Web Stitch Prompt", status: completed, party: 3R, score: 9.3 }
-      step-5-2: { name: "App Stitch Prompt", status: completed, party: 3R, score: 9.7 }
+      5-1: { name: "Web Stitch Prompt", status: pending, party: 3R }
+      5-2: { name: "App Stitch Prompt", status: pending, party: 3R }
   phase-6:
     name: External Generation
-    status: waiting-for-user
-    note: "User manual - Stitch"
+    status: pending
   phase-7:
     name: Integration
-    status: waiting-for-pipeline
-    steps:
-      step-7-1: { name: "Component Decomposition", status: pending, party: 3R }
-      step-7-2: { name: "Routing & State", status: pending, party: 3R }
-      step-7-3: { name: "API Binding", status: pending, party: 3R }
-      step-7-4: { name: "Accessibility Final", status: pending, party: 3R }
+    status: pending
