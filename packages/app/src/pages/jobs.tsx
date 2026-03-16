@@ -89,6 +89,9 @@ export function JobsPage() {
   const [expandedJob, setExpandedJob] = useState<string | null>(null)
   const [jobProgress, setJobProgress] = useState<Record<string, { progress: number; statusMessage: string }>>({})
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; type: 'job' | 'schedule' | 'trigger' | 'chain' } | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
+  const [typeFilter, setTypeFilter] = useState('')
 
   // 모달 상태
   const [modalType, setModalType] = useState<'oneTime' | 'schedule' | 'trigger'>('oneTime')
@@ -269,9 +272,35 @@ export function JobsPage() {
   }, [isConnected, user, subscribe, addListener, removeListener, wsHandler])
 
   const agentList = agentsData?.data || []
-  const jobs = jobsData?.data || []
-  const schedules = schedulesData?.data || []
-  const triggers = triggersData?.data || []
+  const allJobs = jobsData?.data || []
+  const allSchedules = schedulesData?.data || []
+  const allTriggers = triggersData?.data || []
+
+  // Apply search + filters
+  const sq = searchQuery.toLowerCase()
+  const jobs = allJobs.filter(j => {
+    if (sq && !j.instruction.toLowerCase().includes(sq) && !j.agentName.toLowerCase().includes(sq)) return false
+    if (statusFilter && j.status !== statusFilter) return false
+    if (typeFilter && typeFilter !== 'oneTime') return false
+    return true
+  })
+  const schedules = allSchedules.filter(s => {
+    if (sq && !s.instruction.toLowerCase().includes(sq) && !s.agentName.toLowerCase().includes(sq)) return false
+    if (statusFilter) {
+      const isActive = s.isActive
+      if (statusFilter === 'queued' && !isActive) return false
+      if (statusFilter === 'completed' && isActive) return false
+      if (statusFilter === 'processing' || statusFilter === 'failed') return false
+    }
+    if (typeFilter && typeFilter !== 'schedule') return false
+    return true
+  })
+  const triggers = allTriggers.filter(t => {
+    if (sq && !t.instruction.toLowerCase().includes(sq) && !t.agentName.toLowerCase().includes(sq)) return false
+    if (statusFilter && statusFilter !== (t.isActive ? 'queued' : 'completed')) return false
+    if (typeFilter && typeFilter !== 'trigger') return false
+    return true
+  })
 
   function closeModal() {
     setShowModal(false)
@@ -410,6 +439,51 @@ export function JobsPage() {
             <Plus className="w-4 h-4 mr-2" />
             <span>작업 생성</span>
           </button>
+        </div>
+      </div>
+
+      {/* Filters and Search -- Stitch style */}
+      <div className="w-full max-w-[1024px] mx-auto px-8">
+        <div className="flex flex-wrap items-center gap-4 py-4 mb-6 bg-slate-900/50 rounded-xl border border-slate-800 px-4">
+          <div className="flex-1 min-w-[200px]">
+            <div className="relative flex items-center w-full h-10 rounded-lg bg-slate-900 border border-slate-700 focus-within:border-cyan-400 transition-colors overflow-hidden">
+              <div className="flex items-center justify-center pl-3 text-slate-400">
+                <Search className="w-5 h-5" />
+              </div>
+              <input
+                className="w-full bg-transparent border-none text-sm text-slate-100 placeholder:text-slate-400 focus:ring-0 px-3 h-full focus:outline-none"
+                placeholder="작업 검색..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                data-testid="jobs-search"
+              />
+            </div>
+          </div>
+          <div className="flex gap-4">
+            <select
+              className="h-10 rounded-lg bg-slate-900 border border-slate-700 text-sm text-slate-100 focus:ring-1 focus:ring-cyan-400 focus:border-cyan-400 w-40 px-3"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              data-testid="jobs-status-filter"
+            >
+              <option value="">상태: 전체</option>
+              <option value="queued">대기</option>
+              <option value="processing">처리중</option>
+              <option value="completed">완료</option>
+              <option value="failed">실패</option>
+            </select>
+            <select
+              className="h-10 rounded-lg bg-slate-900 border border-slate-700 text-sm text-slate-100 focus:ring-1 focus:ring-cyan-400 focus:border-cyan-400 w-40 px-3"
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+              data-testid="jobs-type-filter"
+            >
+              <option value="">유형: 전체</option>
+              <option value="oneTime">일회성</option>
+              <option value="schedule">반복 스케줄</option>
+              <option value="trigger">트리거</option>
+            </select>
+          </div>
         </div>
       </div>
 
