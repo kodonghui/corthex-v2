@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { Bot, AlertTriangle, AlertCircle, ArrowLeftRight } from 'lucide-react'
+import { Bot, AlertTriangle, AlertCircle, ArrowLeftRight, Settings } from 'lucide-react'
 import { api } from '../lib/api'
 import { useWsStore } from '../stores/ws-store'
 import { Skeleton } from '@corthex/ui'
@@ -189,9 +189,10 @@ export function NotificationsPage() {
           )}
           <button
             onClick={() => setShowSettings(true)}
-            className="flex items-center justify-center rounded-lg h-9 px-3 text-slate-400 hover:text-slate-50 transition-colors"
+            className="flex items-center justify-center rounded-lg h-9 w-9 text-slate-400 hover:text-slate-50 transition-colors"
+            title="알림 설정"
           >
-            설정
+            <Settings className="w-5 h-5" />
           </button>
         </div>
       </div>
@@ -261,9 +262,9 @@ export function NotificationsPage() {
           </div>
         </div>
       ) : (
-        Object.entries(grouped).map(([group, items]) => (
+        Object.entries(grouped).map(([group, items], groupIdx) => (
           <div key={group}>
-            <h3 className="text-slate-50 text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-6">{group}</h3>
+            <h3 className={`text-slate-50 text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 ${groupIdx === 0 ? 'pt-6' : 'pt-2'}`}>{group}</h3>
             <div className="flex flex-col gap-2 px-4 pb-6">
               {items.map((n) => {
                 const iconStyle = TYPE_ICON_COLOR[n.type] || { bg: 'bg-cyan-500/10', text: 'text-cyan-400' }
