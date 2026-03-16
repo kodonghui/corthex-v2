@@ -4,6 +4,7 @@
 // PUT  /api/workspace/nexus/layout
 
 import { useCallback, useState, useMemo } from 'react'
+import { useAuthStore } from '../stores/auth-store'
 import {
   ReactFlow,
   Background,
@@ -151,7 +152,7 @@ function buildOrgGraph(org: OrgChartData['data']): { nodes: Node[]; edges: Edge[
 
 const oliveColor = '#5a7247'
 
-function NexusToolbar({ editMode, onToggleEditMode }: { editMode: boolean; onToggleEditMode: () => void }) {
+function NexusToolbar({ editMode, onToggleEditMode, isAdmin }: { editMode: boolean; onToggleEditMode: () => void; isAdmin: boolean }) {
   const { zoomIn, zoomOut, getZoom } = useReactFlow()
   const [zoom, setZoom] = useState(100)
 
@@ -179,21 +180,25 @@ function NexusToolbar({ editMode, onToggleEditMode }: { editMode: boolean; onTog
           </button>
         </div>
 
-        {/* Edit Mode */}
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-gray-400">편집 모드</span>
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input className="sr-only peer" type="checkbox" checked={editMode} onChange={onToggleEditMode} />
-            <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all" style={{ ['--tw-peer-checked-bg' as string]: oliveColor }} />
-          </label>
-        </div>
+        {/* Edit Mode — Admin only (FR32: CEO = read-only) */}
+        {isAdmin && (
+          <>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium text-gray-400">편집 모드</span>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input className="sr-only peer" type="checkbox" checked={editMode} onChange={onToggleEditMode} />
+                <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all" style={{ ['--tw-peer-checked-bg' as string]: oliveColor }} />
+              </label>
+            </div>
 
-        <button className="px-4 py-1.5 text-sm bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors shadow-sm">
-          Save Draft
-        </button>
-        <button className="px-4 py-1.5 text-sm text-white rounded-md hover:opacity-90 transition-colors shadow-sm" style={{ backgroundColor: oliveColor }}>
-          Publish Changes
-        </button>
+            <button className="px-4 py-1.5 text-sm bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors shadow-sm">
+              Save Draft
+            </button>
+            <button className="px-4 py-1.5 text-sm text-white rounded-md hover:opacity-90 transition-colors shadow-sm" style={{ backgroundColor: oliveColor }}>
+              Publish Changes
+            </button>
+          </>
+        )}
       </div>
     </header>
   )
@@ -204,6 +209,8 @@ function NexusToolbar({ editMode, onToggleEditMode }: { editMode: boolean; onTog
 function NexusPageInner() {
   const [selectedNode, setSelectedNode] = useState<NexusGraphNode | null>(null)
   const [editMode, setEditMode] = useState(false)
+  const user = useAuthStore((s) => s.user)
+  const isAdmin = user?.role === 'admin'
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['workspace-org-chart'],
@@ -246,7 +253,7 @@ function NexusPageInner() {
   if (isLoading) {
     return (
       <div data-testid="nexus-page" className="flex flex-col h-full" style={{ fontFamily: "'Pretendard', sans-serif" }}>
-        <NexusToolbar editMode={false} onToggleEditMode={() => {}} />
+        <NexusToolbar editMode={false} onToggleEditMode={() => {}} isAdmin={isAdmin} />
         <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: '#faf8f5', backgroundSize: '24px 24px', backgroundImage: 'radial-gradient(#d1cfcc 0.5px, transparent 0.5px)' }}>
           <div className="flex flex-col items-center gap-3">
             <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: oliveColor, borderTopColor: 'transparent' }} />
@@ -261,7 +268,7 @@ function NexusPageInner() {
   if (isError) {
     return (
       <div data-testid="nexus-page" className="flex flex-col h-full" style={{ fontFamily: "'Pretendard', sans-serif" }}>
-        <NexusToolbar editMode={false} onToggleEditMode={() => {}} />
+        <NexusToolbar editMode={false} onToggleEditMode={() => {}} isAdmin={isAdmin} />
         <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: '#faf8f5', backgroundSize: '24px 24px', backgroundImage: 'radial-gradient(#d1cfcc 0.5px, transparent 0.5px)' }}>
           <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
             <p className="text-sm text-red-600">조직도를 불러올 수 없습니다</p>
@@ -278,7 +285,7 @@ function NexusPageInner() {
   if (isEmpty) {
     return (
       <div data-testid="nexus-page" className="flex flex-col h-full" style={{ fontFamily: "'Pretendard', sans-serif" }}>
-        <NexusToolbar editMode={false} onToggleEditMode={() => {}} />
+        <NexusToolbar editMode={false} onToggleEditMode={() => {}} isAdmin={isAdmin} />
         <div className="flex-1 relative flex items-center justify-center overflow-hidden" style={{ backgroundColor: '#faf8f5', backgroundSize: '24px 24px', backgroundImage: 'radial-gradient(#d1cfcc 0.5px, transparent 0.5px)' }}>
           <div className="flex flex-col items-center gap-4 p-8 rounded-2xl border border-dashed border-gray-300 bg-white/80 backdrop-blur-sm max-w-md text-center">
             <div className="w-16 h-16 rounded-full flex items-center justify-center mb-2" style={{ backgroundColor: `${oliveColor}1a` }}>
@@ -299,7 +306,7 @@ function NexusPageInner() {
 
   return (
     <div data-testid="nexus-page" className="h-screen flex flex-col" style={{ fontFamily: "'Pretendard', sans-serif" }}>
-      <NexusToolbar editMode={editMode} onToggleEditMode={() => setEditMode(!editMode)} />
+      <NexusToolbar editMode={editMode} onToggleEditMode={() => setEditMode(!editMode)} isAdmin={isAdmin} />
       <main className="flex-1 flex overflow-hidden relative">
         {/* Left Sidebar (Tools) */}
         <aside className="w-16 bg-white border-r flex flex-col items-center py-6 gap-6 z-10" style={{ borderColor: '#f5f0eb' }}>

@@ -1,27 +1,27 @@
 @theme {
-  /* Colors — Sovereign Sage (Cyan-400 + Slate) */
-  --color-brand-50: rgb(236 254 255);
-  --color-brand-100: rgb(207 250 254);
-  --color-brand-200: rgb(165 243 252);
-  --color-brand-300: rgb(103 232 249);
-  --color-brand-400: rgb(34 211 238);
-  --color-brand-500: rgb(6 182 212);
-  --color-brand-600: rgb(8 145 178);
-  --color-brand-700: rgb(14 116 144);
-  --color-brand-800: rgb(21 94 117);
-  --color-brand-900: rgb(22 78 99);
+  /* Colors — Natural Organic (Olive + Beige) */
+  --color-brand-50: rgb(245 247 236);
+  --color-brand-100: rgb(230 237 209);
+  --color-brand-200: rgb(197 216 164);
+  --color-brand-300: rgb(163 196 138);
+  --color-brand-400: rgb(122 143 90);
+  --color-brand-500: rgb(96 108 56);
+  --color-brand-600: rgb(80 92 46);
+  --color-brand-700: rgb(64 76 36);
+  --color-brand-800: rgb(40 54 24);
+  --color-brand-900: rgb(30 40 18);
   --color-neutral-0: rgb(255 255 255);
-  --color-neutral-50: rgb(248 250 252);
-  --color-neutral-100: rgb(241 245 249);
-  --color-neutral-200: rgb(226 232 240);
-  --color-neutral-300: rgb(203 213 225);
-  --color-neutral-400: rgb(148 163 184);
-  --color-neutral-500: rgb(100 116 139);
-  --color-neutral-600: rgb(71 85 105);
-  --color-neutral-700: rgb(51 65 85);
-  --color-neutral-800: rgb(30 41 59);
-  --color-neutral-900: rgb(15 23 42);
-  --color-neutral-950: rgb(2 6 23);
+  --color-neutral-50: rgb(250 248 245);
+  --color-neutral-100: rgb(245 240 232);
+  --color-neutral-200: rgb(229 225 211);
+  --color-neutral-300: rgb(212 207 196);
+  --color-neutral-400: rgb(163 160 142);
+  --color-neutral-500: rgb(107 112 92);
+  --color-neutral-600: rgb(85 90 73);
+  --color-neutral-700: rgb(64 68 55);
+  --color-neutral-800: rgb(43 46 37);
+  --color-neutral-900: rgb(26 26 26);
+  --color-neutral-950: rgb(15 15 12);
   --color-error-50: rgb(254 242 242);
   --color-error-100: rgb(254 226 226);
   --color-error-200: rgb(254 202 202);
@@ -52,12 +52,12 @@
   --color-warning-700: rgb(180 83 9);
   --color-warning-800: rgb(146 64 14);
   --color-warning-900: rgb(120 53 15);
-  --color-brand-primary: rgb(34 211 238);
-  --color-default-font: rgb(248 250 252);
-  --color-subtext-color: rgb(148 163 184);
-  --color-neutral-border: rgb(30 41 59);
+  --color-brand-primary: rgb(96 108 56);
+  --color-default-font: rgb(26 26 26);
+  --color-subtext-color: rgb(107 112 92);
+  --color-neutral-border: rgb(229 225 211);
   --color-white: rgb(255 255 255);
-  --color-default-background: rgb(2 6 23);
+  --color-default-background: rgb(250 248 245);
 
   /* Fonts — Inter + JetBrains Mono */
   --text-caption: 12px;
@@ -114,13 +114,13 @@
   --font-heading-1: "Inter";
   --font-monospace-body: "JetBrains Mono";
 
-  /* Box shadows — Dark-optimized */
-  --shadow-sm: 0px 1px 2px 0px rgb(0 0 0 / 0.20);
-  --shadow-default: none;
-  --shadow-md: 0px 4px 6px -1px rgb(0 0 0 / 0.40);
-  --shadow-lg: 0px 10px 15px -3px rgb(0 0 0 / 0.40);
-  --shadow-overlay: 0px 25px 50px -12px rgb(0 0 0 / 0.70);
-  --shadow-glow: 0 0 20px rgba(34, 211, 238, 0.15);
+  /* Box shadows — Light-optimized */
+  --shadow-sm: 0px 1px 2px 0px rgb(0 0 0 / 0.05);
+  --shadow-default: 0px 1px 3px 0px rgb(0 0 0 / 0.08);
+  --shadow-md: 0px 4px 6px -1px rgb(0 0 0 / 0.08);
+  --shadow-lg: 0px 10px 15px -3px rgb(0 0 0 / 0.08);
+  --shadow-overlay: 0px 25px 50px -12px rgb(0 0 0 / 0.15);
+  --shadow-glow: 0 0 20px rgba(96, 108, 56, 0.10);
 
   /* Border radiuses */
   --radius-sm: 4px;

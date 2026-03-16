@@ -9,6 +9,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { Modal, ConfirmDialog, Button, Input, Textarea, Skeleton, EmptyState, Badge, toast } from '@corthex/ui'
+import { GitBranch, Search, ChevronRight, Plus, Users, Sparkles, Wrench, ListChecks, Filter, RefreshCw, Brain, Shield, SlidersHorizontal } from 'lucide-react'
 
 // ── Types ──
 
@@ -158,16 +159,16 @@ export function TiersPage() {
 
   // Fetch tier configs
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ['admin-tier-configs'],
-    queryFn: () => api.get<{ success: boolean; data: TierConfig[] }>('/admin/tier-configs'),
+    queryKey: ['workspace-tier-configs'],
+    queryFn: () => api.get<{ success: boolean; data: TierConfig[] }>('/workspace/tier-configs'),
   })
 
   // Create mutation
   const createMutation = useMutation({
     mutationFn: (body: Omit<TierFormData, 'description'> & { description: string }) =>
-      api.post('/admin/tier-configs', body),
+      api.post('/workspace/tier-configs', body),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-tier-configs'] })
+      queryClient.invalidateQueries({ queryKey: ['workspace-tier-configs'] })
       setCreateOpen(false)
       toast.success('계층이 생성되었습니다')
     },
@@ -179,7 +180,7 @@ export function TiersPage() {
     mutationFn: ({ id, body }: { id: string; body: Partial<TierFormData> }) =>
       api.patch(`/admin/tier-configs/${id}`, body),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-tier-configs'] })
+      queryClient.invalidateQueries({ queryKey: ['workspace-tier-configs'] })
       setEditTier(null)
       toast.success('계층이 수정되었습니다')
     },
@@ -190,7 +191,7 @@ export function TiersPage() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => api.delete(`/admin/tier-configs/${id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-tier-configs'] })
+      queryClient.invalidateQueries({ queryKey: ['workspace-tier-configs'] })
       setDeleteTier(null)
       toast.success('계층이 삭제되었습니다')
     },
@@ -199,9 +200,9 @@ export function TiersPage() {
 
   // Reorder mutation
   const reorderMutation = useMutation({
-    mutationFn: (order: string[]) => api.put('/admin/tier-configs/reorder', { order }),
+    mutationFn: (order: string[]) => api.put('/workspace/tier-configs/reorder', { order }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-tier-configs'] })
+      queryClient.invalidateQueries({ queryKey: ['workspace-tier-configs'] })
       toast.success('순서가 변경되었습니다')
     },
     onError: (err: Error) => toast.error(err.message),
@@ -274,7 +275,7 @@ export function TiersPage() {
         <header className="flex items-center justify-between whitespace-nowrap border-b border-solid px-6 md:px-20 py-4" style={{ borderColor: 'rgba(90,114,71,0.1)', backgroundColor: '#faf8f5' }}>
           <div className="flex items-center gap-8">
             <div className="flex items-center gap-3" style={{ color: '#5a7247' }}>
-              <span className="material-symbols-outlined text-3xl font-bold">account_tree</span>
+              <GitBranch className="w-8 h-8" />
               <h2 className="text-slate-900 text-lg font-bold leading-tight tracking-tight uppercase">CORTHEX <span style={{ color: 'rgba(90,114,71,0.7)' }}>v2</span></h2>
             </div>
             <nav className="hidden md:flex items-center gap-6">
@@ -288,7 +289,7 @@ export function TiersPage() {
             <label className="hidden sm:flex flex-col min-w-40 h-10 max-w-64">
               <div className="flex w-full flex-1 items-stretch rounded-xl h-full border bg-white" style={{ borderColor: 'rgba(90,114,71,0.2)' }}>
                 <div className="flex items-center justify-center pl-3" style={{ color: 'rgba(90,114,71,0.5)' }}>
-                  <span className="material-symbols-outlined">search</span>
+                  <Search className="w-5 h-5" />
                 </div>
                 <input
                   className="form-input flex w-full min-w-0 flex-1 border-none bg-transparent text-sm placeholder:text-slate-400 focus:ring-0"
@@ -310,7 +311,7 @@ export function TiersPage() {
             <div className="flex flex-col gap-2">
               <nav className="flex items-center gap-2 text-xs font-medium mb-1 uppercase tracking-wider" style={{ color: 'rgba(90,114,71,0.6)' }}>
                 <span>Workspace</span>
-                <span className="material-symbols-outlined text-[12px]">chevron_right</span>
+                <ChevronRight className="w-3 h-3" />
                 <span>Management</span>
               </nav>
               <h1 className="text-slate-900 text-4xl font-extrabold tracking-tight">Tier Permissions</h1>
@@ -321,7 +322,7 @@ export function TiersPage() {
               className="flex items-center gap-2 px-5 py-2.5 text-white rounded-xl font-semibold shadow-lg hover:opacity-90 transition-all"
               style={{ backgroundColor: '#5a7247', boxShadow: '0 10px 15px -3px rgba(90,114,71,0.2)' }}
             >
-              <span className="material-symbols-outlined text-sm">add</span>
+              <Plus className="w-4 h-4" />
               <span>New Tier</span>
             </button>
           </div>
@@ -330,7 +331,7 @@ export function TiersPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="p-6 rounded-xl bg-white border shadow-sm flex items-center gap-4" style={{ borderColor: 'rgba(90,114,71,0.1)' }}>
               <div className="size-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: '#5a7247' }}>
-                <span className="material-symbols-outlined">groups</span>
+                <Users className="w-5 h-5" />
               </div>
               <div>
                 <p className="text-sm text-slate-500">Active Tiers</p>
@@ -339,7 +340,7 @@ export function TiersPage() {
             </div>
             <div className="p-6 rounded-xl bg-white border shadow-sm flex items-center gap-4" style={{ borderColor: 'rgba(90,114,71,0.1)' }}>
               <div className="size-12 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center">
-                <span className="material-symbols-outlined">auto_awesome</span>
+                <Sparkles className="w-5 h-5" />
               </div>
               <div>
                 <p className="text-sm text-slate-500">Avg. Model Power</p>
@@ -348,7 +349,7 @@ export function TiersPage() {
             </div>
             <div className="p-6 rounded-xl bg-white border shadow-sm flex items-center gap-4" style={{ borderColor: 'rgba(90,114,71,0.1)' }}>
               <div className="size-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
-                <span className="material-symbols-outlined">build</span>
+                <Wrench className="w-5 h-5" />
               </div>
               <div>
                 <p className="text-sm text-slate-500">Tools Deployed</p>
@@ -370,15 +371,15 @@ export function TiersPage() {
             <div className="bg-white rounded-xl border shadow-xl overflow-hidden" style={{ borderColor: 'rgba(90,114,71,0.1)' }}>
               <div className="p-5 border-b flex justify-between items-center" style={{ borderColor: 'rgba(90,114,71,0.1)', backgroundColor: 'rgba(248,250,252,0.5)' }}>
                 <h3 className="font-bold text-slate-700 flex items-center gap-2">
-                  <span className="material-symbols-outlined" style={{ color: '#5a7247' }}>list_alt</span>
+                  <ListChecks className="w-5 h-5" style={{ color: '#5a7247' }} />
                   Active Configuration
                 </h3>
                 <div className="flex gap-2">
                   <button className="p-2 rounded-lg border hover:opacity-80" style={{ borderColor: 'rgba(90,114,71,0.2)', color: '#5a7247' }}>
-                    <span className="material-symbols-outlined text-sm">filter_list</span>
+                    <Filter className="w-4 h-4" />
                   </button>
                   <button onClick={() => refetch()} className="p-2 rounded-lg border hover:opacity-80" style={{ borderColor: 'rgba(90,114,71,0.2)', color: '#5a7247' }}>
-                    <span className="material-symbols-outlined text-sm">refresh</span>
+                    <RefreshCw className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -416,7 +417,7 @@ export function TiersPage() {
                           <td className="px-6 py-5 text-sm">
                             <div className="flex items-center gap-2">
                               <div className="size-6 rounded bg-slate-100 flex items-center justify-center">
-                                <span className="material-symbols-outlined text-sm text-slate-500">neurology</span>
+                                <Brain className="w-4 h-4 text-slate-500" />
                               </div>
                               <span className="font-medium text-slate-700">{getModelShortLabel(tier.modelPreference)}</span>
                             </div>
@@ -476,7 +477,7 @@ export function TiersPage() {
           <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="flex gap-4">
               <div className="size-10 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: '#5a7247' }}>
-                <span className="material-symbols-outlined">security</span>
+                <Shield className="w-5 h-5" />
               </div>
               <div>
                 <h4 className="font-bold mb-1">Permission Propagation</h4>
@@ -485,7 +486,7 @@ export function TiersPage() {
             </div>
             <div className="flex gap-4">
               <div className="size-10 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: '#5a7247' }}>
-                <span className="material-symbols-outlined">settings_suggest</span>
+                <SlidersHorizontal className="w-5 h-5" />
               </div>
               <div>
                 <h4 className="font-bold mb-1">Model Preference Logic</h4>
@@ -499,8 +500,8 @@ export function TiersPage() {
         <footer className="px-6 md:px-20 py-8 border-t mt-20" style={{ borderColor: 'rgba(90,114,71,0.1)' }}>
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-400 uppercase tracking-widest font-bold">
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-sm">copyright</span>
-              <span>2024 CORTHEX Dynamics</span>
+              <span className="text-sm">&copy;</span>
+              <span>2026 CORTHEX Dynamics</span>
             </div>
             <div className="flex gap-6">
               <a className="hover:opacity-80" href="#" style={{ color: '#5a7247' }}>API Documentation</a>

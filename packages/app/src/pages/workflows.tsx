@@ -110,45 +110,7 @@ export function WorkflowsPage() {
   // --- Detail view ---
   if (selectedWorkflow) {
     return (
-      <div className="flex h-screen w-full" style={{ fontFamily: "'Pretendard', sans-serif" }}>
-        {/* Sidebar */}
-        <div className="w-64 text-white flex flex-col h-full flex-shrink-0 z-20 shadow-lg" style={{ backgroundColor: '#5a7247' }}>
-          <div className="p-6 flex items-center gap-3 border-b" style={{ borderColor: '#4a5d23' }}>
-            <span className="material-symbols-outlined text-2xl">hub</span>
-            <h2 className="text-xl font-bold tracking-wide" style={{ fontFamily: "'Noto Serif KR', serif" }}>Workflows</h2>
-          </div>
-          <div className="p-6 flex flex-col gap-2">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="bg-white/20 aspect-square rounded-full" style={{ width: '40px', height: '40px' }}></div>
-              <div className="flex flex-col">
-                <h1 className="text-base font-bold" style={{ fontFamily: "'Noto Serif KR', serif" }}>CORTHEX v2</h1>
-                <p className="text-xs" style={{ color: '#c5d8a4' }}>Workflow Manager</p>
-              </div>
-            </div>
-            <div className="flex flex-col gap-1 mt-4">
-              <button
-                onClick={() => { setSelectedWorkflow(null); setExecutionsPage(1) }}
-                className="flex items-center gap-3 px-4 py-3 rounded-2xl transition-colors"
-                style={{ backgroundColor: 'transparent' }}
-                onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#6a8454')}
-                onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
-              >
-                <span className="material-symbols-outlined text-xl">arrow_back</span>
-                <span className="text-sm font-medium">Back to List</span>
-              </button>
-              <button
-                className="flex items-center gap-3 px-4 py-3 rounded-2xl shadow-inner"
-                style={{ backgroundColor: '#4a5d23' }}
-              >
-                <span className="material-symbols-outlined text-xl">account_tree</span>
-                <span className="text-sm font-medium">{detailLoading ? '...' : detail?.name || 'Workflow'}</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col relative overflow-hidden" style={{ backgroundColor: '#faf8f5' }}>
+      <div className="flex flex-col h-full w-full" style={{ fontFamily: "'Pretendard', sans-serif", backgroundColor: '#faf8f5' }}>
           {/* Header */}
           <header className="border-b px-8 py-6 flex items-center justify-between" style={{ backgroundColor: '#ffffff', borderColor: '#e5e1d3' }}>
             <div className="flex items-center gap-3">
@@ -297,7 +259,6 @@ export function WorkflowsPage() {
               </div>
             ) : null}
           </div>
-        </div>
 
         {/* Delete confirm */}
         {deleteTarget && (
@@ -328,61 +289,7 @@ export function WorkflowsPage() {
 
   // --- List view ---
   return (
-    <div className="flex h-screen w-full" style={{ fontFamily: "'Pretendard', sans-serif" }}>
-      {/* Sidebar */}
-      <div className="w-64 text-white flex flex-col h-full flex-shrink-0 z-20 shadow-lg" style={{ backgroundColor: '#5a7247' }}>
-        <div className="p-6 flex items-center gap-3 border-b" style={{ borderColor: '#4a5d23' }}>
-          <span className="material-symbols-outlined text-2xl">hub</span>
-          <h2 className="text-xl font-bold tracking-wide" style={{ fontFamily: "'Noto Serif KR', serif" }}>Workflows</h2>
-        </div>
-        <div className="p-6 flex flex-col gap-2">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="bg-white/20 aspect-square rounded-full" style={{ width: '40px', height: '40px' }}></div>
-            <div className="flex flex-col">
-              <h1 className="text-base font-bold" style={{ fontFamily: "'Noto Serif KR', serif" }}>CORTHEX v2</h1>
-              <p className="text-xs" style={{ color: '#c5d8a4' }}>Workflow Manager</p>
-            </div>
-          </div>
-          <div className="flex flex-col gap-1 mt-4">
-            <button
-              className="flex items-center gap-3 px-4 py-3 rounded-2xl shadow-inner"
-              style={{ backgroundColor: '#4a5d23' }}
-            >
-              <span className="material-symbols-outlined text-xl">account_tree</span>
-              <span className="text-sm font-medium">All Workflows</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('suggestions')}
-              className="flex items-center gap-3 px-4 py-3 rounded-2xl transition-colors"
-              style={{ backgroundColor: activeTab === 'suggestions' ? '#4a5d23' : 'transparent' }}
-              onMouseEnter={e => { if (activeTab !== 'suggestions') e.currentTarget.style.backgroundColor = '#6a8454' }}
-              onMouseLeave={e => { if (activeTab !== 'suggestions') e.currentTarget.style.backgroundColor = 'transparent' }}
-            >
-              <span className="material-symbols-outlined text-xl">tips_and_updates</span>
-              <span className="text-sm font-medium">Suggestions</span>
-              {suggestions.length > 0 && (
-                <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded-full" style={{ backgroundColor: '#c4622d' }}>
-                  {suggestions.length}
-                </span>
-              )}
-            </button>
-          </div>
-        </div>
-        <div className="mt-auto p-6 flex flex-col gap-1 border-t" style={{ borderColor: '#4a5d23' }}>
-          <button
-            className="flex items-center gap-3 px-4 py-3 rounded-2xl transition-colors"
-            style={{ backgroundColor: 'transparent' }}
-            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#6a8454')}
-            onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
-          >
-            <span className="material-symbols-outlined text-xl">settings</span>
-            <span className="text-sm font-medium">Settings</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col relative overflow-hidden" style={{ backgroundColor: '#faf8f5' }}>
+    <div className="flex flex-col h-full w-full" style={{ fontFamily: "'Pretendard', sans-serif", backgroundColor: '#faf8f5' }}>
         {/* Header */}
         <header className="border-b px-8 py-6" style={{ backgroundColor: '#ffffff', borderColor: '#e5e1d3' }}>
           <div className="flex items-center justify-between">
@@ -539,7 +446,6 @@ export function WorkflowsPage() {
             )}
           </div>
         </div>
-      </div>
 
       {/* Delete confirm */}
       {deleteTarget && (

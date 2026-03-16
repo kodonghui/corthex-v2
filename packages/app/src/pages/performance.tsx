@@ -18,7 +18,7 @@ import React, { useState, useEffect, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { Skeleton, SkeletonTable, EmptyState, Modal, ConfirmDialog, toast } from '@corthex/ui'
-import { Bot, CheckCircle, Timer, CreditCard, TrendingUp, TrendingDown, Lightbulb } from 'lucide-react'
+import { Bot, CheckCircle, Timer, CreditCard, TrendingUp, TrendingDown, Lightbulb, ShieldCheck, Star, AlertTriangle, AlertCircle, ArrowRight, Crown, Hexagon, Dumbbell, Sparkles, History, Headphones, Cloud } from 'lucide-react'
 import { api } from '../lib/api'
 import type {
   PerformanceSummary,
@@ -139,78 +139,7 @@ export function PerformancePage() {
   }, [])
 
   return (
-    <div className="min-h-screen flex" style={{ fontFamily: "'Public Sans', sans-serif", backgroundColor: bgLight, color: '#0f172a' }} data-testid="performance-page">
-      {/* Sidebar */}
-      <aside className="fixed inset-y-0 left-0 w-64 flex flex-col z-50" style={{ backgroundColor: secondaryGreen, borderRight: `1px solid ${oliveGreen}33` }}>
-        <div className="p-6 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: oliveGreen, color: bgLight }}>
-            <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>eco</span>
-          </div>
-          <div>
-            <h1 className="text-white text-lg font-bold leading-tight">CORTHEX v2</h1>
-            <p className="text-xs font-medium uppercase tracking-wider" style={{ color: `${oliveGreen}99` }}>Natural Analytics</p>
-          </div>
-        </div>
-        <nav className="flex-1 px-4 space-y-2 mt-4">
-          <a className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors" href="#" style={{ color: `${oliveGreen}b3` }}>
-            <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>dashboard</span>
-            <span className="text-sm font-medium">Dashboard</span>
-          </a>
-          <a className="flex items-center gap-3 px-4 py-3 text-white rounded-xl shadow-lg" href="#" style={{ backgroundColor: oliveGreen, boxShadow: `0 4px 14px ${oliveGreen}33` }}>
-            <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>analytics</span>
-            <span className="text-sm font-medium">Analytics</span>
-          </a>
-          <a className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors" href="#" style={{ color: `${oliveGreen}b3` }}>
-            <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>auto_awesome</span>
-            <span className="text-sm font-medium">Agent Souls</span>
-          </a>
-          <a className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors" href="#" style={{ color: `${oliveGreen}b3` }}>
-            <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>psychology_alt</span>
-            <span className="text-sm font-medium">Hallucinations</span>
-          </a>
-          <a className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors" href="#" style={{ color: `${oliveGreen}b3` }}>
-            <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>settings</span>
-            <span className="text-sm font-medium">Settings</span>
-          </a>
-        </nav>
-        <div className="p-4 mt-auto">
-          <div className="rounded-xl p-4" style={{ backgroundColor: `${oliveGreen}1a`, border: `1px solid ${oliveGreen}33` }}>
-            <p className="text-xs font-bold uppercase mb-2" style={{ color: oliveGreen }}>Soul Growth Plan</p>
-            <div className="w-full rounded-full h-1.5 mb-3" style={{ backgroundColor: `${oliveGreen}33` }}>
-              <div className="h-1.5 rounded-full" style={{ width: '75%', backgroundColor: oliveGreen }} />
-            </div>
-            <button className="w-full py-2 text-white text-xs font-bold rounded-lg transition-colors" style={{ backgroundColor: oliveGreen }}>
-              Upgrade Workspace
-            </button>
-          </div>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 ml-64 flex flex-col min-h-screen">
-        {/* Top Header */}
-        <header className="h-16 sticky top-0 z-40 px-8 flex items-center justify-between backdrop-blur-md" style={{ borderBottom: `1px solid ${oliveGreen}1a`, backgroundColor: `${bgLight}cc` }}>
-          <div className="flex items-center gap-4 flex-1">
-            <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'", color: oliveGreen }}>analytics</span>
-            <h2 className="text-slate-800 text-xl" style={{ fontFamily: "'Lora', serif" }}>Performance Summary</h2>
-            <div className="max-w-xs w-full ml-8">
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm" style={{ fontFamily: "'Material Symbols Outlined'" }}>search</span>
-                <input className="w-full pl-10 pr-4 py-1.5 bg-slate-100 border-none rounded-full text-sm" placeholder="Search agents or souls..." type="text" style={{ outline: 'none' }} />
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 ml-4">
-            <button className="p-2 rounded-full text-slate-600 relative" style={{ backgroundColor: 'transparent' }}>
-              <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>notifications</span>
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full" style={{ backgroundColor: earthBrown }} />
-            </button>
-            <div className="w-8 h-8 rounded-full overflow-hidden" style={{ backgroundColor: `${oliveGreen}33`, border: `1px solid ${oliveGreen}4d` }}>
-              <div className="w-full h-full flex items-center justify-center text-xs font-bold" style={{ color: oliveGreen }}>U</div>
-            </div>
-          </div>
-        </header>
-
+    <div className="min-h-screen" style={{ fontFamily: "'Public Sans', sans-serif", backgroundColor: bgLight, color: '#0f172a' }} data-testid="performance-page">
         {/* Dashboard Content */}
         <div className="p-8 space-y-8">
           {/* Hero Stats */}
@@ -228,7 +157,7 @@ export function PerformancePage() {
               <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow" style={{ border: `1px solid ${oliveGreen}1a` }}>
                 <div className="flex justify-between items-start mb-4">
                   <p className="text-slate-500 text-sm font-medium">Avg. Success Rate</p>
-                  <span className="material-symbols-outlined p-1.5 rounded-lg" style={{ fontFamily: "'Material Symbols Outlined'", color: oliveGreen, backgroundColor: `${oliveGreen}1a` }}>verified</span>
+                  <ShieldCheck className="w-5 h-5 p-1.5 rounded-lg" style={{ color: oliveGreen, backgroundColor: `${oliveGreen}1a`, width: 32, height: 32 }} />
                 </div>
                 <div className="flex items-baseline gap-2">
                   <h3 className="text-3xl font-bold text-slate-800">{summary.avgSuccessRate}%</h3>
@@ -239,7 +168,7 @@ export function PerformancePage() {
               <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow" style={{ border: `1px solid ${oliveGreen}1a` }}>
                 <div className="flex justify-between items-start mb-4">
                   <p className="text-slate-500 text-sm font-medium">Quality Score</p>
-                  <span className="material-symbols-outlined p-1.5 rounded-lg" style={{ fontFamily: "'Material Symbols Outlined'", color: accentGold, backgroundColor: `${accentGold}1a` }}>star</span>
+                  <Star className="w-5 h-5 p-1.5 rounded-lg" style={{ color: accentGold, backgroundColor: `${accentGold}1a`, width: 32, height: 32 }} />
                 </div>
                 <div className="flex items-baseline gap-2">
                   <h3 className="text-3xl font-bold text-slate-800">8.8<span className="text-lg text-slate-400">/10</span></h3>
@@ -250,7 +179,7 @@ export function PerformancePage() {
               <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow" style={{ border: `1px solid ${oliveGreen}1a` }}>
                 <div className="flex justify-between items-start mb-4">
                   <p className="text-slate-500 text-sm font-medium">Total Cost</p>
-                  <span className="material-symbols-outlined p-1.5 rounded-lg" style={{ fontFamily: "'Material Symbols Outlined'", color: earthBrown, backgroundColor: `${earthBrown}1a` }}>favorite</span>
+                  <CreditCard className="w-5 h-5 p-1.5 rounded-lg" style={{ color: earthBrown, backgroundColor: `${earthBrown}1a`, width: 32, height: 32 }} />
                 </div>
                 <div className="flex items-baseline gap-2">
                   <h3 className="text-3xl font-bold text-slate-800">${summary.totalCostThisMonth.toFixed(2)}</h3>
@@ -268,7 +197,7 @@ export function PerformancePage() {
               <div className="px-6 py-5 flex justify-between items-center" style={{ borderBottom: `1px solid ${oliveGreen}1a` }}>
                 <h3 className="text-lg font-bold text-slate-800" style={{ fontFamily: "'Lora', serif" }}>Agent Performance Matrix</h3>
                 <button className="text-sm font-bold flex items-center gap-1" style={{ color: oliveGreen }}>
-                  View Full Report <span className="material-symbols-outlined text-sm" style={{ fontFamily: "'Material Symbols Outlined'" }}>arrow_forward</span>
+                  View Full Report <ArrowRight className="w-4 h-4 inline" />
                 </button>
               </div>
               <div className="overflow-x-auto">
@@ -299,14 +228,15 @@ export function PerformancePage() {
                         const badge = PERFORMANCE_BADGE[level]
                         const stars = Math.round(agent.successRate / 20)
                         const agentColors = [oliveGreen, accentGold, earthBrown]
-                        const agentIcons = ['smart_toy', 'support_agent', 'cloud_done']
+                        const agentIconComponents = [Bot, Headphones, Cloud]
                         const idx = agents.indexOf(agent)
+                        const AgentIcon = agentIconComponents[idx % 3]
                         return (
                           <tr key={agent.id} className="cursor-pointer hover:bg-slate-50/50" onClick={() => setSelectedAgentId(agent.id)}>
                             <td className="px-6 py-4">
                               <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded flex items-center justify-center" style={{ backgroundColor: `${agentColors[idx % 3]}33`, color: agentColors[idx % 3] }}>
-                                  <span className="material-symbols-outlined text-lg" style={{ fontFamily: "'Material Symbols Outlined'" }}>{agentIcons[idx % 3]}</span>
+                                  <AgentIcon className="w-5 h-5" />
                                 </div>
                                 <span className="font-medium text-slate-700">{agent.name}</span>
                               </div>
@@ -326,7 +256,7 @@ export function PerformancePage() {
                             <td className="px-6 py-4">
                               <div className="flex gap-0.5">
                                 {Array.from({ length: 5 }).map((_, i) => (
-                                  <span key={i} className="material-symbols-outlined text-sm" style={{ fontFamily: "'Material Symbols Outlined'", color: i < stars ? accentGold : '#cbd5e1' }}>star</span>
+                                  <Star key={i} className="w-3.5 h-3.5" style={{ color: i < stars ? accentGold : '#cbd5e1' }} />
                                 ))}
                               </div>
                             </td>
@@ -335,9 +265,7 @@ export function PerformancePage() {
                                 backgroundColor: level === 'high' ? `${oliveGreen}1a` : level === 'mid' ? `${accentGold}1a` : '#f1f5f9',
                                 color: level === 'high' ? oliveGreen : level === 'mid' ? accentGold : '#64748b',
                               }}>
-                                <span className="material-symbols-outlined text-xs" style={{ fontFamily: "'Material Symbols Outlined'" }}>
-                                  {level === 'high' ? 'workspace_premium' : level === 'mid' ? 'trending_up' : 'warning'}
-                                </span>
+                                {level === 'high' ? <Crown className="w-3.5 h-3.5" /> : level === 'mid' ? <TrendingUp className="w-3.5 h-3.5" /> : <AlertTriangle className="w-3.5 h-3.5" />}
                                 {level.toUpperCase()}
                               </span>
                             </td>
@@ -356,7 +284,7 @@ export function PerformancePage() {
               <div className="space-y-6">
                 <div className="flex items-center justify-between p-4 bg-green-50 rounded-xl border border-green-200">
                   <div className="flex items-center gap-3">
-                    <span className="material-symbols-outlined text-green-600" style={{ fontFamily: "'Material Symbols Outlined'" }}>check_circle</span>
+                    <CheckCircle className="w-5 h-5 text-green-600" />
                     <div>
                       <p className="text-sm font-bold text-green-700">CLEAN</p>
                       <p className="text-xs text-green-600/80">{summary?.totalAgents ? Math.round(summary.totalAgents * 0.75) : 18} Agents</p>
@@ -366,7 +294,7 @@ export function PerformancePage() {
                 </div>
                 <div className="flex items-center justify-between p-4 bg-yellow-50 rounded-xl border border-yellow-200">
                   <div className="flex items-center gap-3">
-                    <span className="material-symbols-outlined text-yellow-600" style={{ fontFamily: "'Material Symbols Outlined'" }}>warning</span>
+                    <AlertTriangle className="w-5 h-5 text-yellow-600" />
                     <div>
                       <p className="text-sm font-bold text-yellow-700">WARNING</p>
                       <p className="text-xs text-yellow-600/80">{summary?.totalAgents ? Math.round(summary.totalAgents * 0.2) : 5} Agents</p>
@@ -376,7 +304,7 @@ export function PerformancePage() {
                 </div>
                 <div className="flex items-center justify-between p-4 bg-red-50 rounded-xl border border-red-200">
                   <div className="flex items-center gap-3">
-                    <span className="material-symbols-outlined text-red-600" style={{ fontFamily: "'Material Symbols Outlined'" }}>error</span>
+                    <AlertCircle className="w-5 h-5 text-red-600" />
                     <div>
                       <p className="text-sm font-bold text-red-700">CRITICAL</p>
                       <p className="text-xs text-red-600/80">{summary?.totalAgents ? Math.round(summary.totalAgents * 0.05) : 1} Agent</p>
@@ -399,7 +327,7 @@ export function PerformancePage() {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
               <div>
                 <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2" style={{ fontFamily: "'Lora', serif" }}>
-                  <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'", color: oliveGreen }}>fitness_center</span> Soul Gym
+                  <Dumbbell className="w-6 h-6" style={{ color: oliveGreen }} /> Soul Gym
                 </h2>
                 <p className="text-slate-500 text-sm mt-1">AI-driven improvements and natural resonance training for your agents.</p>
               </div>
@@ -422,13 +350,14 @@ export function PerformancePage() {
               ) : (
                 suggestions.slice(0, 3).map((s) => {
                   const typeBadge = SUGGESTION_TYPE_BADGE[s.suggestionType] || SUGGESTION_TYPE_BADGE['prompt-improve']
-                  const icons = ['lightbulb', 'auto_fix_high', 'history_edu']
+                  const iconComponents = [Lightbulb, Sparkles, History]
                   const iconColors = [accentGold, oliveGreen, earthBrown]
                   const idx = suggestions.indexOf(s)
+                  const SuggestionIcon = iconComponents[idx % 3]
                   return (
                     <div key={s.id} className="bg-white rounded-xl p-6 shadow-sm flex flex-col h-full cursor-pointer hover:shadow-md transition-shadow" style={{ border: `1px solid ${oliveGreen}1a` }} onClick={() => setConfirmTarget(s)}>
                       <div className="flex items-center gap-2 mb-4">
-                        <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'", color: iconColors[idx % 3] }}>{icons[idx % 3]}</span>
+                        <SuggestionIcon className="w-5 h-5" style={{ color: iconColors[idx % 3] }} />
                         <h4 className="font-bold text-slate-800">{s.agentName}</h4>
                       </div>
                       <p className="text-sm text-slate-600 flex-1">{s.description}</p>
@@ -461,7 +390,7 @@ export function PerformancePage() {
             <div className="relative h-64 w-full rounded-xl flex items-center justify-center overflow-hidden" style={{ backgroundColor: `${oliveGreen}0d` }}>
               <div className="relative z-10 flex flex-col items-center">
                 <div className="w-24 h-24 rounded-full flex items-center justify-center shadow-inner" style={{ backgroundColor: `${oliveGreen}33`, color: oliveGreen }}>
-                  <span className="material-symbols-outlined text-5xl" style={{ fontFamily: "'Material Symbols Outlined'" }}>hub</span>
+                  <Hexagon className="w-12 h-12" />
                 </div>
                 <p className="mt-4 font-bold text-slate-800">Resonance Frequency: 432Hz</p>
                 <p className="text-xs font-bold" style={{ color: oliveGreen }}>OPTIMAL SYNC</p>
@@ -469,17 +398,6 @@ export function PerformancePage() {
             </div>
           </section>
         </div>
-
-        {/* Footer */}
-        <footer className="mt-auto py-8 px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-400 text-sm" style={{ borderTop: `1px solid ${oliveGreen}1a` }}>
-          <p>&copy; 2024 CORTHEX v2. All agents are nurtured with care.</p>
-          <div className="flex gap-6">
-            <a className="transition-colors hover:opacity-80" href="#" style={{ color: oliveGreen }}>Documentation</a>
-            <a className="transition-colors hover:opacity-80" href="#" style={{ color: oliveGreen }}>API Reference</a>
-            <a className="transition-colors hover:opacity-80" href="#" style={{ color: oliveGreen }}>Support</a>
-          </div>
-        </footer>
-      </main>
 
       {/* Agent Detail Modal */}
       {selectedAgentId && (

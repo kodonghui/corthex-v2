@@ -146,7 +146,7 @@ export function LoginPage() {
 
         {/* Footer */}
         <footer className="mt-8 text-center text-sm text-gray-400">
-          <p>© 2024 CORTHEX. All rights reserved.</p>
+          <p>© 2026 CORTHEX. All rights reserved.</p>
           <div className="mt-2 space-x-4">
             <a className="hover:underline" href="#">개인정보처리방침</a>
             <a className="hover:underline" href="#">이용약관</a>

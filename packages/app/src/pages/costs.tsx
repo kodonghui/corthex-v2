@@ -16,6 +16,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../lib/api'
 import type { DashboardBudget } from '@corthex/shared'
+import { Brain, LayoutDashboard, CreditCard, Bot, FileText, Settings, Search, Bell, Wallet, SlidersHorizontal, Cloud, Download, ChevronLeft, ChevronRight, Zap, Code, Languages, Paintbrush } from 'lucide-react'
 
 // === Types ===
 
@@ -135,85 +136,7 @@ export function CostsPage() {
   }, [])
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ fontFamily: "'Public Sans', sans-serif", backgroundColor: organicBeige, color: '#0f172a' }}>
-      {/* Sidebar */}
-      <aside className="w-64 flex-shrink-0 border-r border-slate-200 bg-white flex flex-col z-20">
-        <div className="p-6 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white" style={{ backgroundColor: oliveGreen }}>
-            <span className="material-symbols-outlined text-2xl" style={{ fontFamily: "'Material Symbols Outlined'" }}>neurology</span>
-          </div>
-          <h2 className="text-xl font-bold tracking-tight text-slate-900">CORTHEX <span style={{ color: oliveGreen }}>v2</span></h2>
-        </div>
-        <nav className="flex-1 px-4 space-y-1">
-          <a className="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 rounded-xl transition-colors" href="#">
-            <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>dashboard</span>
-            <span className="font-medium">Dashboard</span>
-          </a>
-          <a className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors" href="#" style={{ backgroundColor: `${oliveGreen}1a`, color: oliveGreen }}>
-            <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>payments</span>
-            <span className="font-medium">Cost Analysis</span>
-          </a>
-          <a className="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 rounded-xl transition-colors" href="#">
-            <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>smart_toy</span>
-            <span className="font-medium">Agents</span>
-          </a>
-          <a className="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 rounded-xl transition-colors" href="#">
-            <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>description</span>
-            <span className="font-medium">Logs</span>
-          </a>
-          <div className="pt-4 pb-2 px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">System</div>
-          <a className="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 rounded-xl transition-colors" href="#">
-            <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>settings</span>
-            <span className="font-medium">Settings</span>
-          </a>
-        </nav>
-        {budget && (
-          <div className="p-4 border-t border-slate-100">
-            <div className="bg-slate-50 rounded-2xl p-4">
-              <p className="text-xs text-slate-500 mb-2">Monthly Budget</p>
-              <div className="w-full bg-slate-200 rounded-full h-1.5 mb-2">
-                <div className="h-1.5 rounded-full" style={{ width: `${Math.min(budget.usagePercent, 100)}%`, backgroundColor: oliveGreen }} />
-              </div>
-              <div className="flex justify-between text-xs font-semibold text-slate-700">
-                <span>${costData?.totalCostUsd.toFixed(0) ?? '0'}</span>
-                <span>${budget.monthlyBudgetUsd?.toFixed(0) ?? '2,000'}</span>
-              </div>
-            </div>
-          </div>
-        )}
-      </aside>
-
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-        {/* Top Navigation */}
-        <header className="h-16 flex items-center justify-between px-8 bg-white/80 backdrop-blur-md sticky top-0 z-10 border-b border-slate-100">
-          <div className="flex-1 max-w-md">
-            <div className="relative">
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl" style={{ fontFamily: "'Material Symbols Outlined'" }}>search</span>
-              <input
-                className="w-full bg-slate-50 border-none rounded-xl pl-10 pr-4 py-2 text-sm placeholder:text-slate-400"
-                placeholder="Search usage logs..."
-                type="text"
-                style={{ outline: 'none' }}
-              />
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <button className="p-2 text-slate-500 hover:bg-slate-50 rounded-full transition-colors relative">
-              <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>notifications</span>
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full border-2 border-white" style={{ backgroundColor: oliveGreen }} />
-            </button>
-            <div className="h-8 w-px bg-slate-200 mx-2" />
-            <div className="flex items-center gap-3">
-              <div className="text-right">
-                <p className="text-sm font-semibold text-slate-900">Workspace v2</p>
-                <p className="text-xs text-slate-500">Admin</p>
-              </div>
-              <div className="w-10 h-10 rounded-full bg-slate-200 border border-slate-200 flex items-center justify-center text-slate-500 text-xs font-bold">U</div>
-            </div>
-          </div>
-        </header>
-
+    <div className="min-h-screen overflow-y-auto" style={{ fontFamily: "'Public Sans', sans-serif", backgroundColor: organicBeige, color: '#0f172a' }}>
         {/* Content */}
         <div className="p-8 max-w-7xl mx-auto w-full" data-testid="costs-page">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
@@ -225,7 +148,7 @@ export function CostsPage() {
               className="flex items-center gap-2 text-white px-5 py-2.5 rounded-xl font-semibold shadow-lg transition-all hover:opacity-90"
               style={{ backgroundColor: oliveGreen, boxShadow: `0 4px 14px -2px ${oliveGreen}33` }}
             >
-              <span className="material-symbols-outlined text-xl" style={{ fontFamily: "'Material Symbols Outlined'" }}>account_balance_wallet</span>
+              <Wallet className="w-5 h-5" />
               <span>Set Monthly Budget</span>
             </button>
           </div>
@@ -254,7 +177,7 @@ export function CostsPage() {
                 <div className="bg-white p-6 rounded-2xl border border-slate-50" style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
                   <div className="flex justify-between items-start mb-4">
                     <div className="p-2 rounded-lg" style={{ backgroundColor: `${oliveGreen}1a`, color: oliveGreen }}>
-                      <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>payments</span>
+                      <CreditCard className="w-5 h-5" />
                     </div>
                     <span className="text-xs font-bold text-green-500 bg-green-50 px-2 py-1 rounded-lg">+12.5%</span>
                   </div>
@@ -265,7 +188,7 @@ export function CostsPage() {
                 <div className="bg-white p-6 rounded-2xl border border-slate-50" style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
                   <div className="flex justify-between items-start mb-4">
                     <div className="p-2 rounded-lg" style={{ backgroundColor: `${mustardTan}1a`, color: mustardTan }}>
-                      <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>temp_preferences_custom</span>
+                      <SlidersHorizontal className="w-5 h-5" />
                     </div>
                     <span className="text-xs font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-lg">-2.4%</span>
                   </div>
@@ -276,7 +199,7 @@ export function CostsPage() {
                 <div className="bg-white p-6 rounded-2xl border border-slate-50" style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
                   <div className="flex justify-between items-start mb-4">
                     <div className="p-2 rounded-lg" style={{ backgroundColor: '#3b82f61a', color: '#3b82f6' }}>
-                      <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>psychology</span>
+                      <Brain className="w-5 h-5" />
                     </div>
                     <span className="text-xs font-bold text-green-500 bg-green-50 px-2 py-1 rounded-lg">+18.2%</span>
                   </div>
@@ -287,7 +210,7 @@ export function CostsPage() {
                 <div className="bg-white p-6 rounded-2xl border border-slate-50" style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
                   <div className="flex justify-between items-start mb-4">
                     <div className="p-2 rounded-lg" style={{ backgroundColor: '#ef44441a', color: '#ef4444' }}>
-                      <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>cloud</span>
+                      <Cloud className="w-5 h-5" />
                     </div>
                     <span className="text-xs font-bold text-green-500 bg-green-50 px-2 py-1 rounded-lg">+5.1%</span>
                   </div>
@@ -376,7 +299,7 @@ export function CostsPage() {
                 <div className="px-8 py-6 border-b border-slate-50 flex justify-between items-center">
                   <h3 className="text-xl font-bold text-slate-900">Detailed Cost Records</h3>
                   <button className="text-sm font-semibold flex items-center gap-1 hover:underline" style={{ color: oliveGreen }}>
-                    <span className="material-symbols-outlined text-sm" style={{ fontFamily: "'Material Symbols Outlined'" }}>download</span>
+                    <Download className="w-4 h-4" />
                     Export CSV
                   </button>
                 </div>
@@ -402,14 +325,14 @@ export function CostsPage() {
                           const bgColors = ['#fff7ed', '#eff6ff', '#f0fdf4', '#faf5ff', '#fef2f2']
                           const iconColor = iconColors[i % iconColors.length]
                           const bgColor = bgColors[i % bgColors.length]
-                          const icons = ['bolt', 'code', 'translate', 'draw', 'cloud']
-                          const icon = icons[i % icons.length]
+                          const iconComps = [Zap, Code, Languages, Paintbrush, Cloud]
+                          const IconComp = iconComps[i % iconComps.length]
                           return (
                             <tr key={a.agentId || a.agentName} className="hover:bg-slate-50 transition-colors">
                               <td className="px-8 py-4">
                                 <div className="flex items-center gap-3">
                                   <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: bgColor }}>
-                                    <span className="material-symbols-outlined text-sm" style={{ fontFamily: "'Material Symbols Outlined'", color: iconColor }}>{icon}</span>
+                                    <IconComp className="w-4 h-4" style={{ color: iconColor }} />
                                   </div>
                                   <span className="font-medium text-slate-900">{a.agentName}</span>
                                 </div>
@@ -439,10 +362,10 @@ export function CostsPage() {
                   <p className="text-xs text-slate-500">Showing {Math.min(agentCostData.length, 10)} of {agentCostData.length} agents</p>
                   <div className="flex gap-2">
                     <button className="p-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
-                      <span className="material-symbols-outlined text-sm" style={{ fontFamily: "'Material Symbols Outlined'" }}>chevron_left</span>
+                      <ChevronLeft className="w-4 h-4" />
                     </button>
                     <button className="p-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
-                      <span className="material-symbols-outlined text-sm" style={{ fontFamily: "'Material Symbols Outlined'" }}>chevron_right</span>
+                      <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -450,7 +373,6 @@ export function CostsPage() {
             </>
           )}
         </div>
-      </main>
     </div>
   )
 }

@@ -102,38 +102,38 @@ export function Layout() {
     <NotificationListener />
     <NightJobListener />
     <BudgetAlertListener />
-    <div className="h-screen flex flex-col lg:flex-row bg-slate-950 text-slate-50">
+    <div className="h-screen flex flex-col lg:flex-row bg-[#faf8f5] text-[#1a1a1a]">
       {/* Desktop sidebar */}
       <div className="hidden lg:block">
         <Sidebar />
       </div>
 
       {/* Mobile top bar */}
-      <header className="lg:hidden flex flex-col sticky top-0 z-30 shrink-0 bg-slate-900 border-b border-slate-800">
+      <header className="lg:hidden flex flex-col sticky top-0 z-30 shrink-0 bg-white border-b border-[#e5e1d3]">
         <div className="h-[env(safe-area-inset-top)]" />
         <div className="h-14 flex items-center justify-between px-4">
           <div className="flex items-center gap-3">
             <button
               onClick={openSidebar}
-              className="p-1.5 -ml-1.5 rounded-lg hover:bg-slate-800 transition-colors"
+              className="p-1.5 -ml-1.5 rounded-lg hover:bg-[#f5f0e8] transition-colors"
               aria-label="메뉴 열기"
             >
-              <Menu className="w-5 h-5 text-slate-400" />
+              <Menu className="w-5 h-5 text-[#6b705c]" />
             </button>
-            <span className="text-lg font-semibold tracking-tight text-slate-50">CORTHEX</span>
+            <span className="text-lg font-semibold tracking-tight text-[#1a1a1a]">CORTHEX</span>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => navigate('/notifications')}
-              className="relative w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-50 transition-colors"
+              className="relative w-8 h-8 flex items-center justify-center rounded-lg text-[#6b705c] hover:bg-[#f5f0e8] hover:text-[#1a1a1a] transition-colors"
               aria-label="알림"
             >
               <Bell className="w-5 h-5" />
               {hasUnread && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-cyan-400 border-2 border-slate-900" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#606C38] border-2 border-white" />
               )}
             </button>
-            <div className="w-7 h-7 rounded-full bg-slate-700 text-slate-300 flex items-center justify-center text-xs font-medium">
+            <div className="w-7 h-7 rounded-full bg-[#606C38] text-white flex items-center justify-center text-xs font-medium">
               {user?.name?.charAt(0) || '?'}
             </div>
           </div>
@@ -143,36 +143,36 @@ export function Layout() {
       {/* Main content column */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Desktop top bar */}
-        <header className="hidden lg:flex h-14 items-center justify-between px-6 border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-10 shrink-0">
+        <header className="hidden lg:flex h-14 items-center justify-between px-6 border-b border-[#e5e1d3] bg-white/80 backdrop-blur-md sticky top-0 z-10 shrink-0">
           {/* Breadcrumbs */}
           <div className="flex items-center gap-2 text-sm">
-            <span className="text-slate-400 hover:text-slate-50 cursor-pointer transition-colors" onClick={() => navigate('/dashboard')}>CORTHEX</span>
-            <ChevronRight className="w-4 h-4 text-slate-600" />
-            <span className="font-medium text-slate-50">{pageName}</span>
+            <span className="text-[#6b705c] hover:text-[#1a1a1a] cursor-pointer transition-colors" onClick={() => navigate('/dashboard')}>CORTHEX</span>
+            <ChevronRight className="w-4 h-4 text-[#a3a08e]" />
+            <span className="font-medium text-[#1a1a1a]">{pageName}</span>
           </div>
           {/* Search + Notifications */}
           <div className="flex items-center gap-4">
             <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[#a3a08e]" />
               <input
-                className="w-full bg-slate-900 border border-slate-800 rounded-lg pl-9 pr-16 py-1.5 text-sm focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all placeholder:text-slate-400 text-slate-50 h-8"
+                className="w-full bg-[#f5f0e8] border border-[#e5e1d3] rounded-lg pl-9 pr-16 py-1.5 text-sm focus:outline-none focus:border-[#606C38] focus:ring-1 focus:ring-[#606C38] transition-all placeholder:text-[#a3a08e] text-[#1a1a1a] h-8"
                 placeholder="Search..."
                 type="text"
                 readOnly
               />
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                <kbd className="inline-flex items-center px-1.5 font-mono text-[10px] text-slate-400 bg-slate-800 border border-slate-700 rounded">Ctrl</kbd>
-                <kbd className="inline-flex items-center px-1.5 font-mono text-[10px] text-slate-400 bg-slate-800 border border-slate-700 rounded">K</kbd>
+                <kbd className="inline-flex items-center px-1.5 font-mono text-[10px] text-[#6b705c] bg-[#e5e1d3] border border-[#d4cfc4] rounded">Ctrl</kbd>
+                <kbd className="inline-flex items-center px-1.5 font-mono text-[10px] text-[#6b705c] bg-[#e5e1d3] border border-[#d4cfc4] rounded">K</kbd>
               </div>
             </div>
             <button
               onClick={() => navigate('/notifications')}
-              className="relative w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-900 hover:text-slate-50 transition-colors"
+              className="relative w-8 h-8 flex items-center justify-center rounded-lg text-[#6b705c] hover:bg-[#f5f0e8] hover:text-[#1a1a1a] transition-colors"
               aria-label="알림"
             >
               <Bell className="w-5 h-5" />
               {hasUnread && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-cyan-400 border-2 border-slate-950" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#606C38] border-2 border-white" />
               )}
             </button>
           </div>

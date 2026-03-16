@@ -2,34 +2,34 @@
 @import "./ui/theme.css";
 @import "./styles/themes.css";
 
-/* CORTHEX 디자인 토큰 — Phase 3 Sovereign Sage Theme */
+/* CORTHEX 디자인 토큰 — Natural Organic Theme (Light) */
 @theme {
-  /* Primary: Cyan-400 (9.1:1 AAA on slate-950) */
-  --color-corthex-accent: #22D3EE;
-  --color-corthex-accent-hover: #67E8F9;
-  --color-corthex-accent-deep: #06B6D4;
-  --color-corthex-accent-muted: rgba(34, 211, 238, 0.10);
+  /* Primary: Olive Green (#606C38) */
+  --color-corthex-accent: #606C38;
+  --color-corthex-accent-hover: #7a8f5a;
+  --color-corthex-accent-deep: #283618;
+  --color-corthex-accent-muted: rgba(96, 108, 56, 0.10);
 
   /* Semantic Colors */
   --color-corthex-success: #34D399;
   --color-corthex-warning: #FBBF24;
-  --color-corthex-error: #F87171;
+  --color-corthex-error: #c4622d;
   --color-corthex-info: #60A5FA;
   --color-corthex-handoff: #A78BFA;
 
-  /* Surface — Slate palette */
-  --color-corthex-bg: #020617;
-  --color-corthex-surface: #0F172A;
-  --color-corthex-elevated: #1E293B;
-  --color-corthex-border: #1E293B;
-  --color-corthex-border-strong: #334155;
-  --color-corthex-nexus-bg: #040D1A;
+  /* Surface — Natural Organic palette */
+  --color-corthex-bg: #faf8f5;
+  --color-corthex-surface: #ffffff;
+  --color-corthex-elevated: #f5f0e8;
+  --color-corthex-border: #e5e1d3;
+  --color-corthex-border-strong: #d4cfc4;
+  --color-corthex-nexus-bg: #f0ebe0;
 
   /* Text */
-  --color-corthex-text-primary: #F8FAFC;
-  --color-corthex-text-secondary: #94A3B8;
-  --color-corthex-text-disabled: #475569;
-  --color-corthex-text-on-accent: #020617;
+  --color-corthex-text-primary: #1a1a1a;
+  --color-corthex-text-secondary: #6b705c;
+  --color-corthex-text-disabled: #a3a08e;
+  --color-corthex-text-on-accent: #ffffff;
 
   /* Typography */
   --font-ui: 'Inter', 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;

@@ -23,13 +23,15 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   })
 
   if (res.status === 401) {
-    localStorage.removeItem('corthex_token')
-    localStorage.removeItem('corthex_user')
+    const err = await res.json().catch(() => ({ error: {} }))
+    const serverMessage = err?.error?.message
     const currentPath = window.location.pathname
     if (currentPath !== '/login') {
+      localStorage.removeItem('corthex_token')
+      localStorage.removeItem('corthex_user')
       window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`
     }
-    throw new Error('인증이 만료되었습니다')
+    throw new Error(serverMessage || '아이디 또는 비밀번호가 올바르지 않습니다')
   }
 
   if (res.status === 429) {

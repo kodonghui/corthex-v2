@@ -95,7 +95,7 @@ function SwitchToAdminButton() {
     <button
       onClick={handleSwitch}
       disabled={switching}
-      className="flex items-center gap-2 w-full px-3 py-2 text-xs font-medium rounded-lg transition-colors text-cyan-300 bg-cyan-400/10 hover:bg-cyan-400/15"
+      className="flex items-center gap-2 w-full px-3 py-2 text-xs font-medium rounded-lg transition-colors text-[#c5d8a4] bg-white/10 hover:bg-white/15"
     >
       <span>⇄</span>
       <span>{switching ? '전환 중...' : '관리자 콘솔'}</span>
@@ -114,16 +114,16 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
   const unreadCount = countData?.data?.unread ?? 0
 
   return (
-    <aside className="w-[280px] h-full flex flex-col bg-slate-900 border-r border-slate-800 shrink-0">
+    <aside className="w-[280px] h-full flex flex-col bg-[#283618] border-r border-[#3a4d28] shrink-0">
       {/* Brand */}
-      <div className="h-14 flex items-center px-6 border-b border-slate-800 shrink-0">
+      <div className="h-14 flex items-center px-6 border-b border-white/10 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded bg-cyan-400/20 flex items-center justify-center text-cyan-400">
+          <div className="w-8 h-8 rounded bg-[#606C38]/30 flex items-center justify-center text-[#c5d8a4]">
             <Hexagon className="w-5 h-5" />
           </div>
           <div className="flex flex-col">
-            <span className="font-bold tracking-widest text-sm leading-tight text-slate-50">CORTHEX</span>
-            <span className="text-[10px] text-slate-400 font-mono uppercase tracking-wider">Management Platform</span>
+            <span className="font-bold tracking-widest text-sm leading-tight text-white">CORTHEX</span>
+            <span className="text-[10px] text-[#a3c48a] font-mono uppercase tracking-wider">Management Platform</span>
           </div>
         </div>
       </div>
@@ -133,7 +133,7 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
         {navSections.map((section, si) => (
           <div key={si} className="flex flex-col gap-1">
             {section.label && (
-              <span className="px-3 text-[11px] font-mono text-slate-400 uppercase tracking-widest mb-1">
+              <span className="px-3 text-[11px] font-mono text-[#a3c48a] uppercase tracking-widest mb-1">
                 {section.label}
               </span>
             )}
@@ -146,8 +146,8 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                     isActive
-                      ? 'bg-cyan-400/10 text-cyan-400 font-medium'
-                      : 'text-slate-400 hover:bg-slate-800 hover:text-slate-50'
+                      ? 'bg-white/10 text-white font-medium'
+                      : 'text-[#a3c48a] hover:bg-white/10 hover:text-white'
                   }`
                 }
               >
@@ -165,25 +165,25 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
       </nav>
 
       {/* User Context */}
-      <div className="p-4 border-t border-slate-800 shrink-0 space-y-2">
+      <div className="p-4 border-t border-white/10 shrink-0 space-y-2">
         <SwitchToAdminButton />
-        <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800 transition-colors">
-          <div className="w-8 h-8 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center text-xs font-medium shrink-0">
+        <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors">
+          <div className="w-8 h-8 rounded-full bg-[#606C38] text-white flex items-center justify-center text-xs font-medium shrink-0">
             {user?.name?.charAt(0) || '?'}
           </div>
           <div className="flex flex-col flex-1 min-w-0">
-            <span className="text-sm font-medium text-slate-50 truncate">{user?.name}</span>
-            <span className="text-xs text-slate-400 truncate">{user?.role === 'admin' ? 'System Administrator' : 'User'}</span>
+            <span className="text-sm font-medium text-white truncate">{user?.name}</span>
+            <span className="text-xs text-[#a3c48a] truncate">{user?.role === 'admin' ? 'System Administrator' : 'User'}</span>
           </div>
           <button
             onClick={logout}
-            className="text-xs text-slate-500 hover:text-red-400 transition-colors shrink-0"
+            className="text-xs text-[#a3c48a]/70 hover:text-red-400 transition-colors shrink-0"
             aria-label="로그아웃"
           >
             로그아웃
           </button>
         </div>
-        <div className="px-2 text-[10px] text-slate-600 font-mono">
+        <div className="px-2 text-[10px] text-[#a3c48a]/50 font-mono">
           #{__BUILD_NUMBER__}{__BUILD_HASH__ ? ` · ${__BUILD_HASH__}` : ''}
         </div>
       </div>

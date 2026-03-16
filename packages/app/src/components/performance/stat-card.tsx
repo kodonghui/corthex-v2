@@ -1,4 +1,5 @@
 import { ReactNode } from 'react'
+import { TrendingUp, TrendingDown } from 'lucide-react'
 
 export interface StatCardProps {
     title: string;
@@ -21,9 +22,7 @@ export function StatCard({ title, value, icon, iconColorClass, trendValue, trend
             </div>
             <p className={`text-slate-900 dark:text-white text-3xl font-mono font-bold leading-tight mt-2 ${iconColorClass === 'text-emerald-500' && value.includes('%') ? 'text-emerald-500' : ''}`}>{value}</p>
             <div className="flex items-center gap-1 mt-1">
-                <span className={`material-symbols-outlined text-sm ${trendColorClass}`}>
-                    {isPositive ? 'trending_up' : 'trending_down'}
-                </span>
+                {isPositive ? <TrendingUp className={`w-4 h-4 ${trendColorClass}`} /> : <TrendingDown className={`w-4 h-4 ${trendColorClass}`} />}
                 <p className={`${trendColorClass} text-xs font-bold leading-normal`}>{trendValue} {trendText}</p>
             </div>
         </div>

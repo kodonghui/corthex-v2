@@ -10,7 +10,7 @@
 import { useCallback } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
-import { Plus, Filter, Camera, Briefcase, Heart, MessageCircle, Share2, MoreHorizontal } from 'lucide-react'
+import { Plus, Filter, Camera, Briefcase, Heart, MessageCircle, Share2, MoreHorizontal, Sparkles, LayoutGrid, Calendar, Clock, CheckCircle, Link, PlusCircle, FileText, AtSign, Play } from 'lucide-react'
 import { api } from '../lib/api'
 import { ContentTab } from '../components/sns/content-tab'
 import { QueueTab } from '../components/sns/queue-tab'
@@ -84,73 +84,7 @@ export function SnsPage() {
   const agents = agentsData?.data || []
 
   return (
-    <div data-testid="sns-page" className="min-h-screen flex" style={{ backgroundColor: '#faf8f5' }}>
-      {/* Fixed Sidebar */}
-      <aside className="w-64 fixed inset-y-0 left-0 bg-white border-r border-stone-200 flex flex-col z-50">
-        <div className="p-6">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center text-white" style={{ backgroundColor: '#6b705c' }}>
-              <span className="material-symbols-outlined">eco</span>
-            </div>
-            <div className="flex flex-col">
-              <h1 className="text-lg font-bold leading-none tracking-tight">CORTHEX v2</h1>
-              <p className="text-xs font-medium" style={{ color: '#6b705c' }}>Natural Organic Edition</p>
-            </div>
-          </div>
-          <nav className="space-y-1">
-            <a className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-stone-100 transition-colors" href="#">
-              <span className="material-symbols-outlined text-stone-500">dashboard</span>
-              <span className="text-sm font-medium">Dashboard</span>
-            </a>
-            <a className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors" style={{ backgroundColor: 'rgba(107,112,92,0.1)', color: '#6b705c' }} href="#">
-              <span className="material-symbols-outlined">share_reviews</span>
-              <span className="text-sm font-bold">SNS Management</span>
-            </a>
-            <a className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-stone-100 transition-colors" href="#">
-              <span className="material-symbols-outlined text-stone-500">analytics</span>
-              <span className="text-sm font-medium">Analytics</span>
-            </a>
-            <a className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-stone-100 transition-colors" href="#">
-              <span className="material-symbols-outlined text-stone-500">workspaces</span>
-              <span className="text-sm font-medium">Workspaces</span>
-            </a>
-            <a className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-stone-100 transition-colors" href="#">
-              <span className="material-symbols-outlined text-stone-500">settings</span>
-              <span className="text-sm font-medium">Settings</span>
-            </a>
-          </nav>
-        </div>
-        <div className="mt-auto p-4">
-          <button className="w-full flex items-center justify-center gap-2 bg-stone-100 hover:bg-stone-200 p-3 rounded-xl transition-all">
-            <span className="material-symbols-outlined text-sm">add</span>
-            <span className="text-sm font-bold">New Project</span>
-          </button>
-        </div>
-      </aside>
-
-      {/* Main Content Area */}
-      <main className="ml-64 flex-1 flex flex-col min-h-screen">
-        {/* Top Bar */}
-        <header className="h-16 bg-white/80 backdrop-blur-md border-b border-stone-200 px-8 flex items-center justify-between sticky top-0 z-40">
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined" style={{ color: '#6b705c' }}>hub</span>
-            <h2 className="text-xl font-bold tracking-tight">Social Content Hub</h2>
-          </div>
-          <div className="flex items-center gap-6">
-            <div className="relative group">
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within:text-primary transition-colors">search</span>
-              <input className="pl-10 pr-4 py-2 bg-stone-100 border-none rounded-xl text-sm focus:ring-2 w-64 transition-all" style={{ '--tw-ring-color': 'rgba(107,112,92,0.2)' } as React.CSSProperties} placeholder="Search content..." type="text" />
-            </div>
-            <button className="flex items-center gap-2 text-white px-4 py-2 rounded-xl text-sm font-bold hover:shadow-lg transition-all" style={{ backgroundColor: '#ec5b13' }}>
-              <span className="material-symbols-outlined text-sm">edit_square</span>
-              Create Post
-            </button>
-            <div className="w-10 h-10 rounded-full bg-stone-200 overflow-hidden border-2 border-white shadow-sm">
-              <img className="w-full h-full object-cover" alt="User profile avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCUfDRJiMmohK7YkDBlIgDjkUJEYWlpUlXHwwPmrITgzLs4cg8wXHz6p3TXpqupbX8RPi-UPl0wv-5qJY-8FypkXTtrZCYUvhlWuII-m5kfLJE66z5STNGVoMMwS8q7SyNLeqrtSXdUOYm0TibFqIZl6pRNhrIAsRC0fo84ZoKjqNZ717EMhAedkqnbCb6xJNH_EhYslyoaf00J_pwbPQ-pPh7rX_FBHDIOanLkpMqMi1v_QlU1RuUZXhnnIMmXIWMDHY87s5gmIQl" />
-            </div>
-          </div>
-        </header>
-
+    <div data-testid="sns-page" className="min-h-screen" style={{ backgroundColor: '#faf8f5' }}>
         {/* Content Area */}
         <div className="p-8 max-w-7xl mx-auto w-full">
           {/* Page Header & Action */}
@@ -160,7 +94,7 @@ export function SnsPage() {
               <p className="text-stone-500 max-w-lg">Orchestrate your social presence with AI-assisted generation and automated scheduling for natural brand growth.</p>
             </div>
             <button className="flex items-center gap-2 text-white px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-all shadow-md" style={{ backgroundColor: '#6b705c' }}>
-              <span className="material-symbols-outlined">auto_awesome</span>
+              <Sparkles className="w-5 h-5" />
               Generate New Content
             </button>
           </div>
@@ -210,7 +144,7 @@ export function SnsPage() {
                 </select>
               </div>
               <button className="ml-auto text-sm font-bold flex items-center gap-1 hover:underline" style={{ color: '#6b705c' }}>
-                <span className="material-symbols-outlined text-sm">view_kanban</span>
+                <LayoutGrid className="w-4 h-4" />
                 Switch to Board
               </button>
             </div>
@@ -227,13 +161,13 @@ export function SnsPage() {
                 </div>
                 <div className="absolute top-3 right-3">
                   <div className="w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-stone-800 shadow-sm">
-                    <span className="material-symbols-outlined text-sm">photo_camera</span>
+                    <Camera className="w-4 h-4" />
                   </div>
                 </div>
               </div>
               <div className="p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="material-symbols-outlined text-xs" style={{ color: '#6b705c' }}>calendar_today</span>
+                  <Calendar className="w-3.5 h-3.5" style={{ color: '#6b705c' }} />
                   <span className="text-xs text-stone-400">Created Oct 24, 2023</span>
                 </div>
                 <h3 className="font-bold text-lg mb-2 leading-tight group-hover:transition-colors" style={{ ['--tw-text-opacity' as string]: 1 }}>10 Tips for Morning Meditation</h3>
@@ -241,10 +175,10 @@ export function SnsPage() {
                 <div className="flex items-center justify-between pt-4 border-t border-stone-100">
                   <div className="flex -space-x-2">
                     <div className="w-6 h-6 rounded-full border-2 border-white bg-pink-100 flex items-center justify-center">
-                      <span className="material-symbols-outlined text-[10px]">photo_camera</span>
+                      <Camera className="w-2.5 h-2.5" />
                     </div>
                     <div className="w-6 h-6 rounded-full border-2 border-white bg-blue-100 flex items-center justify-center">
-                      <span className="material-symbols-outlined text-[10px]">article</span>
+                      <FileText className="w-2.5 h-2.5" />
                     </div>
                   </div>
                   <button className="text-xs font-bold uppercase tracking-widest transition-colors" style={{ color: '#6b705c' }}>Approve</button>
@@ -261,13 +195,13 @@ export function SnsPage() {
                 </div>
                 <div className="absolute top-3 right-3">
                   <div className="w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-stone-800 shadow-sm">
-                    <span className="material-symbols-outlined text-sm">alternate_email</span>
+                    <AtSign className="w-4 h-4" />
                   </div>
                 </div>
               </div>
               <div className="p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="material-symbols-outlined text-xs" style={{ color: '#6b705c' }}>schedule</span>
+                  <Clock className="w-3.5 h-3.5" style={{ color: '#6b705c' }} />
                   <span className="text-xs text-stone-400">Ready to Queue</span>
                 </div>
                 <h3 className="font-bold text-lg mb-2 leading-tight">Sustainable Living Trends 2024</h3>
@@ -275,7 +209,7 @@ export function SnsPage() {
                 <div className="flex items-center justify-between pt-4 border-t border-stone-100">
                   <div className="flex -space-x-2">
                     <div className="w-6 h-6 rounded-full border-2 border-white bg-stone-100 flex items-center justify-center">
-                      <span className="material-symbols-outlined text-[10px]">link</span>
+                      <Link className="w-2.5 h-2.5" />
                     </div>
                   </div>
                   <button className="text-xs font-bold text-stone-400 hover:text-stone-600 transition-colors uppercase tracking-widest">Edit Draft</button>
@@ -292,16 +226,16 @@ export function SnsPage() {
                 </div>
                 <div className="absolute top-3 right-3 flex flex-col gap-1">
                   <div className="w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-stone-800 shadow-sm">
-                    <span className="material-symbols-outlined text-sm">photo_camera</span>
+                    <Camera className="w-4 h-4" />
                   </div>
                   <div className="w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-stone-800 shadow-sm">
-                    <span className="material-symbols-outlined text-sm">movie</span>
+                    <Play className="w-4 h-4" />
                   </div>
                 </div>
               </div>
               <div className="p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="material-symbols-outlined text-xs" style={{ color: '#6b705c' }}>event_available</span>
+                  <Calendar className="w-3.5 h-3.5" style={{ color: '#6b705c' }} />
                   <span className="text-xs text-stone-400">Posting Tomorrow at 9:00 AM</span>
                 </div>
                 <h3 className="font-bold text-lg mb-2 leading-tight">The Ritual of Tea Making</h3>
@@ -309,7 +243,7 @@ export function SnsPage() {
                 <div className="flex items-center justify-between pt-4 border-t border-stone-100">
                   <div className="flex -space-x-2">
                     <div className="w-6 h-6 rounded-full border-2 border-white bg-pink-100 flex items-center justify-center">
-                      <span className="material-symbols-outlined text-[10px]">photo_camera</span>
+                      <Camera className="w-2.5 h-2.5" />
                     </div>
                   </div>
                   <button className="text-xs font-bold text-stone-400 hover:text-stone-600 transition-colors uppercase tracking-widest">Reschedule</button>
@@ -327,7 +261,7 @@ export function SnsPage() {
               </div>
               <div className="p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="material-symbols-outlined text-xs" style={{ color: '#6b705c' }}>check_circle</span>
+                  <CheckCircle className="w-3.5 h-3.5" style={{ color: '#6b705c' }} />
                   <span className="text-xs text-stone-400">Live for 2 days &bull; 1.2k reach</span>
                 </div>
                 <h3 className="font-bold text-lg mb-2 leading-tight">Natural Fabrics for Better Sleep</h3>
@@ -335,11 +269,11 @@ export function SnsPage() {
                 <div className="flex items-center justify-between pt-4 border-t border-stone-100">
                   <div className="flex gap-4">
                     <div className="flex items-center gap-1">
-                      <span className="material-symbols-outlined text-xs text-stone-400">favorite</span>
+                      <Heart className="w-3.5 h-3.5 text-stone-400" />
                       <span className="text-xs text-stone-400 font-bold">124</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <span className="material-symbols-outlined text-xs text-stone-400">chat_bubble</span>
+                      <MessageCircle className="w-3.5 h-3.5 text-stone-400" />
                       <span className="text-xs text-stone-400 font-bold">18</span>
                     </div>
                   </div>
@@ -351,14 +285,13 @@ export function SnsPage() {
             {/* Create New Empty Card */}
             <button className="border-2 border-dashed border-stone-200 rounded-xl flex flex-col items-center justify-center p-8 hover:bg-white transition-all group min-h-[320px]" style={{ ['--hover-border' as string]: 'rgba(107,112,92,0.4)' }}>
               <div className="w-12 h-12 rounded-full bg-stone-100 flex items-center justify-center mb-4 transition-colors" style={{ ['--group-hover-bg' as string]: 'rgba(107,112,92,0.1)' }}>
-                <span className="material-symbols-outlined text-stone-400 transition-colors">add_circle</span>
+                <PlusCircle className="w-5 h-5 text-stone-400 transition-colors" />
               </div>
               <span className="font-bold text-stone-500 group-hover:text-stone-800 transition-colors">New Manual Post</span>
               <span className="text-xs text-stone-400 mt-1">Or use AI Generator above</span>
             </button>
           </div>
         </div>
-      </main>
 
       {/* Mobile Stats Summary -- bottom card */}
       {tab === 'content' && <MobileStatsSummary />}

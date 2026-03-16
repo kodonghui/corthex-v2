@@ -31,6 +31,12 @@ hubRoute.post('/stream', zValidator('json', streamSchema), async (c) => {
   const tenant = c.get('tenant')
   const { message, sessionId: inputSessionId, agentId: requestedAgentId } = c.req.valid('json')
   const { companyId, userId } = tenant
+
+  // CLI 토큰 체크 — 없으면 에이전트 실행 불가
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return sseErrorResponse(ERROR_CODES.AGENT_SPAWN_FAILED, 'CLI 토큰이 등록되지 않았습니다')
+  }
+
   const scopedDb = getDB(companyId)
 
   // Preset shortcut detection: if message exactly matches a preset name, expand it (Story 5.6)

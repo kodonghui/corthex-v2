@@ -31,6 +31,20 @@ import {
   MessageSquare,
   Clock,
   Settings,
+  LayoutDashboard,
+  Network,
+  BarChart3,
+  Search,
+  Bell,
+  ArrowRight,
+  ChevronsUpDown,
+  Headphones,
+  Wallet,
+  Megaphone,
+  Gavel,
+  SlidersHorizontal,
+  Paintbrush,
+  Database,
 } from 'lucide-react'
 
 // ── Types ──
@@ -110,8 +124,8 @@ const statusConfig: Record<string, { dotBg: string; labelBg: string; labelText: 
   offline: { dotBg: 'bg-slate-400', labelBg: 'bg-slate-50', labelText: 'text-slate-500', label: 'Offline' },
 }
 
-const agentIcons: string[] = [
-  'support_agent', 'account_balance_wallet', 'campaign', 'gavel', 'settings_suggest', 'brush', 'database',
+const agentIconComponents = [
+  Headphones, Wallet, Megaphone, Gavel, SlidersHorizontal, Paintbrush, Database,
 ]
 
 // ── Agent Form ──
@@ -538,27 +552,27 @@ export function AgentsPage() {
   }
 
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ['admin-agents', filterDept, filterActive],
+    queryKey: ['workspace-agents', filterDept, filterActive],
     queryFn: () => api.get<{ success: boolean; data: Agent[] }>(`/admin/agents${buildQueryString()}`),
   })
 
   const { data: deptData } = useQuery({
-    queryKey: ['admin-departments'],
-    queryFn: () => api.get<{ success: boolean; data: Department[] }>('/admin/departments'),
+    queryKey: ['workspace-departments'],
+    queryFn: () => api.get<{ success: boolean; data: Department[] }>('/workspace/departments'),
   })
 
   const { data: userData } = useQuery({
-    queryKey: ['admin-users'],
-    queryFn: () => api.get<{ success: boolean; data: User[] }>('/admin/users'),
+    queryKey: ['workspace-employees'],
+    queryFn: () => api.get<{ success: boolean; data: User[] }>('/workspace/employees'),
   })
 
   const departmentsList = deptData?.data ?? []
   const usersList = userData?.data ?? []
 
   const createMutation = useMutation({
-    mutationFn: (body: Record<string, unknown>) => api.post('/admin/agents', body),
+    mutationFn: (body: Record<string, unknown>) => api.post('/workspace/agents', body),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-agents'] })
+      queryClient.invalidateQueries({ queryKey: ['workspace-agents'] })
       setCreateOpen(false)
       toast.success('에이전트가 생성되었습니다')
     },
@@ -568,7 +582,7 @@ export function AgentsPage() {
   const updateMutation = useMutation({
     mutationFn: ({ id, body }: { id: string; body: Record<string, unknown> }) => api.patch(`/admin/agents/${id}`, body),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-agents'] })
+      queryClient.invalidateQueries({ queryKey: ['workspace-agents'] })
       toast.success('에이전트가 수정되었습니다')
     },
     onError: (err: Error) => toast.error(err.message),
@@ -577,7 +591,7 @@ export function AgentsPage() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => api.delete(`/admin/agents/${id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-agents'] })
+      queryClient.invalidateQueries({ queryKey: ['workspace-agents'] })
       setDeleteAgent(null)
       setSelectedAgent(null)
       toast.success('에이전트가 비활성화되었습니다')
@@ -664,24 +678,24 @@ export function AgentsPage() {
         </div>
         <nav className="flex-1 px-4 py-6 space-y-2">
           <a className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 transition-colors" href="#">
-            <span className="material-symbols-outlined text-[24px]">dashboard</span>
+            <LayoutDashboard className="w-6 h-6" />
             <span className="text-sm font-medium">Dashboard</span>
           </a>
           <a className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/20 shadow-sm" href="#">
-            <span className="material-symbols-outlined text-[24px]">smart_toy</span>
+            <Bot className="w-6 h-6" />
             <span className="text-sm font-medium">Agents</span>
           </a>
           <a className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 transition-colors" href="#">
-            <span className="material-symbols-outlined text-[24px]">workspaces</span>
+            <Network className="w-6 h-6" />
             <span className="text-sm font-medium">Workspaces</span>
           </a>
           <a className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 transition-colors" href="#">
-            <span className="material-symbols-outlined text-[24px]">bar_chart</span>
+            <BarChart3 className="w-6 h-6" />
             <span className="text-sm font-medium">Analytics</span>
           </a>
           <div className="pt-4 mt-4 border-t border-white/10">
             <a className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 transition-colors" href="#">
-              <span className="material-symbols-outlined text-[24px]">settings</span>
+              <Settings className="w-6 h-6" />
               <span className="text-sm font-medium">Settings</span>
             </a>
           </div>
@@ -693,7 +707,7 @@ export function AgentsPage() {
               <p className="text-xs font-semibold truncate">Admin User</p>
               <p className="text-[10px] text-white/50 truncate">Pro Plan</p>
             </div>
-            <span className="material-symbols-outlined text-sm">unfold_more</span>
+            <ChevronsUpDown className="w-4 h-4" />
           </div>
         </div>
       </aside>
@@ -704,7 +718,7 @@ export function AgentsPage() {
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-40 backdrop-blur-md">
           <div className="flex items-center gap-4 flex-1 max-w-xl">
             <div className="relative w-full">
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
+              <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 className="w-full pl-10 pr-4 py-2 border-none rounded-xl focus:ring-2 text-sm"
                 style={{ backgroundColor: '#faf8f5', outlineColor: '#4a5d40' }}
@@ -717,14 +731,14 @@ export function AgentsPage() {
           </div>
           <div className="flex items-center gap-4">
             <button className="p-2 text-slate-500 hover:text-slate-700 transition-colors">
-              <span className="material-symbols-outlined">notifications</span>
+              <Bell className="w-5 h-5" />
             </button>
             <button
               onClick={() => setCreateOpen(true)}
               className="flex items-center gap-2 text-white px-4 py-2 rounded-xl text-sm font-medium hover:opacity-90 transition-all"
               style={{ backgroundColor: '#4a5d40' }}
             >
-              <span className="material-symbols-outlined text-[18px]">add</span>
+              <Plus className="w-[18px] h-[18px]" />
               Deploy Agent
             </button>
           </div>
@@ -786,7 +800,7 @@ export function AgentsPage() {
                 const status = statusConfig[agent.status] || statusConfig.offline
                 const tierBadge = tierBadgeStyles[agent.tier] || tierBadgeStyles.worker
                 const isSelected = selectedAgent?.id === agent.id
-                const iconName = agentIcons[idx % agentIcons.length]
+                const AgentIconComp = agentIconComponents[idx % agentIconComponents.length]
 
                 return (
                   <div
@@ -800,7 +814,7 @@ export function AgentsPage() {
                   >
                     <div className="flex justify-between items-start mb-4">
                       <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#f0f2ee', color: '#4a5d40' }}>
-                        <span className="material-symbols-outlined text-[28px]" style={{ fontVariationSettings: "'FILL' 1" }}>{iconName}</span>
+                        <AgentIconComp className="w-7 h-7" />
                       </div>
                       <div className={`flex items-center gap-1.5 px-2 py-1 ${status.labelBg} ${status.labelText} rounded-lg text-[10px] font-bold uppercase tracking-tight border`} style={{ borderColor: 'transparent' }}>
                         <span className={`w-2 h-2 rounded-full ${status.dotBg}`}></span>
@@ -819,7 +833,7 @@ export function AgentsPage() {
                           {tierLabels[agent.tier] || agent.tier}
                         </span>
                         <button className="hover:underline text-xs font-semibold flex items-center gap-1" style={{ color: '#4a5d40' }}>
-                          Configure <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+                          Configure <ArrowRight className="w-3.5 h-3.5 inline" />
                         </button>
                       </div>
                     </div>
@@ -833,7 +847,7 @@ export function AgentsPage() {
                 className="border-2 border-dashed border-slate-200 p-5 rounded-xl flex flex-col items-center justify-center text-center hover:border-opacity-50 transition-colors cursor-pointer group"
               >
                 <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 group-hover:text-white transition-all mb-3" style={{ ...(false ? { backgroundColor: '#4a5d40' } : {}) }}>
-                  <span className="material-symbols-outlined text-[32px]">add</span>
+                  <Plus className="w-8 h-8" />
                 </div>
                 <h3 className="font-bold text-slate-700">Deploy New Agent</h3>
                 <p className="text-slate-400 text-xs mt-1">Scale your workspace capacity</p>

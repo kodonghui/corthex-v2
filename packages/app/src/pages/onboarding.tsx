@@ -381,7 +381,7 @@ export function OnboardingPage() {
         </section>
         {/* Footer */}
         <footer className="mt-8 text-center text-stone-400 text-sm">
-          &copy; 2024 CORTHEX Corp. All rights reserved.
+          &copy; 2026 CORTHEX Corp. All rights reserved.
         </footer>
       </main>
     </div>

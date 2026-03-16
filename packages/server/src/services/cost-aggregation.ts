@@ -49,7 +49,7 @@ export async function getByAgent(companyId: string, range: DateRange, department
     .orderBy(desc(sum(costRecords.costUsdMicro)))
 
   return rows.map(r => ({
-    agentId: r.agentId ?? 'system',
+    agentId: r.agentId ?? null,
     agentName: r.agentName ?? 'System',
     totalCostMicro: r.totalCostMicro ?? 0,
     inputTokens: r.inputTokens ?? 0,

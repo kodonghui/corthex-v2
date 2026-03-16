@@ -10,6 +10,11 @@ import { HTTPError } from '../../middleware/error'
 import { isCeoOrAbove } from '@corthex/shared'
 import { logActivity } from '../../lib/activity-logger'
 import { detectCycleInDelegationRules } from '../../lib/orchestrator'
+import {
+  createAgent,
+  updateAgent as updateAgentService,
+  deactivateAgent,
+} from '../../services/organization'
 import type { AppEnv } from '../../types'
 
 export const workspaceAgentsRoute = new Hono<AppEnv>()
@@ -258,6 +263,95 @@ workspaceAgentsRoute.post('/agents/:id/soul/reset', async (c) => {
   })
 
   return c.json({ data: updated })
+})
+
+// === Agent CRUD (admin/ceo only) ===
+
+const createAgentSchema = z.object({
+  userId: z.string().uuid(),
+  departmentId: z.string().uuid().nullable().optional(),
+  name: z.string().min(1).max(100),
+  nameEn: z.string().max(100).nullable().optional(),
+  role: z.string().max(200).nullable().optional(),
+  tier: z.enum(['manager', 'specialist', 'worker']).optional(),
+  tierLevel: z.number().int().min(1).optional(),
+  modelName: z.string().max(100).optional(),
+  allowedTools: z.array(z.string()).optional(),
+  soul: z.string().nullable().optional(),
+  isSecretary: z.boolean().optional(),
+  ownerUserId: z.string().uuid().nullable().optional(),
+})
+
+const updateAgentSchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  nameEn: z.string().max(100).nullable().optional(),
+  role: z.string().max(200).nullable().optional(),
+  tier: z.enum(['manager', 'specialist', 'worker']).optional(),
+  tierLevel: z.number().int().min(1).optional(),
+  modelName: z.string().max(100).optional(),
+  departmentId: z.string().uuid().nullable().optional(),
+  allowedTools: z.array(z.string()).optional(),
+  soul: z.string().nullable().optional(),
+  status: z.enum(['online', 'working', 'error', 'offline']).optional(),
+  isActive: z.boolean().optional(),
+  isSecretary: z.boolean().optional(),
+  ownerUserId: z.string().uuid().nullable().optional(),
+  enableSemanticCache: z.boolean().optional(),
+})
+
+// POST /api/workspace/agents — create agent (admin/ceo only)
+workspaceAgentsRoute.post('/agents', zValidator('json', createAgentSchema), async (c) => {
+  const tenant = c.get('tenant')
+
+  if (!isCeoOrAbove(tenant.role)) {
+    throw new HTTPError(403, '에이전트 생성은 관리자만 가능합니다', 'AUTH_003')
+  }
+
+  const body = c.req.valid('json')
+  const result = await createAgent(tenant, body)
+  if ('error' in result) throw new HTTPError(result.error!.status, result.error!.message, result.error!.code)
+  return c.json({ success: true, data: result.data }, 201)
+})
+
+// PATCH /api/workspace/agents/:id — update agent (admin/ceo only)
+workspaceAgentsRoute.patch('/agents/:id', zValidator('json', updateAgentSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+
+  if (!isCeoOrAbove(tenant.role)) {
+    throw new HTTPError(403, '에이전트 수정은 관리자만 가능합니다', 'AUTH_003')
+  }
+
+  const body = c.req.valid('json')
+  const result = await updateAgentService(tenant, id, body)
+  if ('error' in result) throw new HTTPError(result.error!.status, result.error!.message, result.error!.code)
+  return c.json({ success: true, data: result.data })
+})
+
+// DELETE /api/workspace/agents/:id?force=true — deactivate agent (admin/ceo only)
+workspaceAgentsRoute.delete('/agents/:id', async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+
+  if (!isCeoOrAbove(tenant.role)) {
+    throw new HTTPError(403, '에이전트 삭제는 관리자만 가능합니다', 'AUTH_003')
+  }
+
+  const force = c.req.query('force') === 'true'
+  const result = await deactivateAgent(tenant, id, force)
+  if ('error' in result) {
+    const err = result.error!
+    if (err.code === 'AGENT_ACTIVE_SESSIONS') {
+      const data = 'data' in err ? (err as { data: Record<string, unknown> }).data : undefined
+      return c.json({
+        success: false,
+        error: { code: err.code, message: err.message },
+        data,
+      }, 409)
+    }
+    throw new HTTPError(err.status, err.message, err.code)
+  }
+  return c.json({ success: true, data: result.data })
 })
 
 // === 위임 규칙 CRUD (POST/DELETE) ===

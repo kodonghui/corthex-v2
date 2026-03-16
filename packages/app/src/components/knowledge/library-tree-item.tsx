@@ -1,4 +1,5 @@
 import { ReactNode } from 'react'
+import { ChevronDown, ChevronRight } from 'lucide-react'
 
 export interface LibraryTreeItemProps {
     label: string;
@@ -15,9 +16,7 @@ export function LibraryTreeItem({ label, icon, isExpanded, isActive, children }:
                     ? 'bg-cyan-400/10 text-cyan-400 border border-cyan-400/20'
                     : 'hover:bg-slate-800/50 text-slate-300'
                 }`}>
-                <span className={`material-symbols-outlined text-[16px] ${isActive ? '' : 'text-slate-500'}`}>
-                    {isExpanded ? 'expand_more' : 'chevron_right'}
-                </span>
+                {isExpanded ? <ChevronDown className={`w-4 h-4 ${isActive ? '' : 'text-slate-500'}`} /> : <ChevronRight className={`w-4 h-4 ${isActive ? '' : 'text-slate-500'}`} />}
                 <div className={`flex items-center ${isActive ? '' : 'text-slate-400'}`}>
                     {icon}
                 </div>

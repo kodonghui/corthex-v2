@@ -3,11 +3,12 @@
    Each theme overrides CSS custom properties from index.css @theme block.
    ══════════════════════════════════════════════════ */
 
-/* ── 1. SOVEREIGN SAGE (DEFAULT) ──────────────────
-   Ruler + Emperor: Cyan-400 + Slate dark
+/* ── 1. NATURAL ORGANIC (DEFAULT) ─────────────────
+   Olive Green + Beige light theme
    No overrides needed — matches index.css defaults
    ─────────────────────────────────────────────────── */
-[data-theme="sovereign"] {
+[data-theme="sovereign"],
+[data-theme="natural-organic"] {
   /* Default theme — all values inherited from @theme in index.css */
 }
 

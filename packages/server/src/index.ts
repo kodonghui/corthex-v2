@@ -24,6 +24,9 @@ import { qualityRulesRoute } from './routes/admin/quality-rules'
 import { securityRoute } from './routes/admin/security'
 import { employeesRoute } from './routes/admin/employees'
 import { workspaceAgentsRoute } from './routes/workspace/agents'
+import { workspaceDepartmentsRoute } from './routes/workspace/departments'
+import { workspaceTierConfigsRoute } from './routes/workspace/tier-configs'
+import { workspaceEmployeesRoute } from './routes/workspace/employees'
 import { chatRoute } from './routes/workspace/chat'
 import { hubRoute } from './routes/workspace/hub'
 import { profileRoute } from './routes/workspace/profile'
@@ -163,6 +166,9 @@ app.route('/api/admin', adminMcpServersRoute)
 
 // 유저 워크스페이스 라우트 (각 파일 내부에서 authMiddleware 적용, 테넌트 격리)
 app.route('/api/workspace', workspaceAgentsRoute)
+app.route('/api/workspace', workspaceDepartmentsRoute)
+app.route('/api/workspace', workspaceTierConfigsRoute)
+app.route('/api/workspace', workspaceEmployeesRoute)
 app.route('/api/workspace/chat', chatRoute)
 app.route('/api/workspace/hub', hubRoute)
 app.route('/api/workspace', profileRoute)
@@ -240,6 +246,9 @@ eventBus.on('debate', (data: { companyId: string; payload: unknown }) => {
     broadcastToChannel(`debate::${payload.debateId}`, data.payload)
   }
 })
+
+// API 404 — SPA fallback 전에 등록하여 존재하지 않는 API 엔드포인트를 잡음
+app.all('/api/*', (c) => c.json({ success: false, error: { code: 'NOT_FOUND', message: 'API endpoint not found' } }, 404))
 
 // 프로덕션: Bun 네이티브 정적 파일 서빙 (SPA 폴백 포함)
 if (isProd) {

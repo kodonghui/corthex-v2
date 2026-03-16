@@ -85,44 +85,6 @@ function groupUsageByDate(usage: DashboardUsageDay[]): DayData[] {
     }))
 }
 
-// === Sidebar Component ===
-
-function Sidebar() {
-  return (
-    <aside className="fixed inset-y-0 left-0 w-64 text-white p-6 flex flex-col z-50" style={{ backgroundColor: ORGANIC.oliveDark }}>
-      <div className="mb-10 px-2" data-purpose="sidebar-logo">
-        <h1 className="text-2xl font-bold tracking-tight" style={{ fontFamily: "'Noto Serif KR', serif" }}>
-          CORTHEX <span className="text-sm align-top ml-1" style={{ color: ORGANIC.sand }}>v2</span>
-        </h1>
-      </div>
-      <nav className="flex-1 space-y-1">
-        <a className="flex items-center space-x-3 px-4 py-3 text-white rounded-lg transition-colors" href="#" style={{ backgroundColor: ORGANIC.olive }}>
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
-          <span className="font-medium">대시보드</span>
-        </a>
-        <a className="flex items-center space-x-3 px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg transition-colors" href="#">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
-          <span>AI 에이전트 채팅</span>
-        </a>
-        <a className="flex items-center space-x-3 px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg transition-colors" href="#">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
-          <span>워크플로우 (Jobs)</span>
-        </a>
-        <a className="flex items-center space-x-3 px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg transition-colors" href="#">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
-          <span>보고서</span>
-        </a>
-      </nav>
-      <div className="mt-auto pt-6 border-t border-white/10" data-purpose="sidebar-footer">
-        <a className="flex items-center space-x-3 px-4 py-3 text-slate-400 hover:text-white transition-colors" href="#">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
-          <span>설정</span>
-        </a>
-      </div>
-    </aside>
-  )
-}
-
 // === Agent Status Grid ===
 
 function AgentStatusGrid({ data }: { data: DashboardSummary }) {
@@ -402,34 +364,6 @@ export function DashboardPage() {
   return (
     <div data-testid="dashboard-page" className="font-sans text-slate-800 antialiased" style={{ backgroundColor: ORGANIC.cream }}>
       <style>{customStyles}</style>
-      <div className="flex min-h-screen">
-        {/* Sidebar */}
-        <Sidebar />
-
-        {/* Main Content Area */}
-        <main className="ml-64 flex-1 flex flex-col min-h-screen">
-          {/* Topbar */}
-          <header className="h-16 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-40">
-            <div className="flex items-center space-x-4">
-              <span className="text-slate-400">워크스페이스:</span>
-              <div className="flex items-center space-x-1 font-medium cursor-pointer">
-                <span>나의 전략 연구소</span>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
-              </div>
-            </div>
-            <div className="flex items-center space-x-6">
-              <button className="relative text-slate-500 hover:text-slate-700 transition-colors">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
-                <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
-              </button>
-              <div className="flex items-center space-x-3 border-l pl-6 border-slate-200">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold" style={{ backgroundColor: ORGANIC.sand }}>C</div>
-                <span className="font-medium">CEO님</span>
-              </div>
-            </div>
-          </header>
-
-          {/* Content Scroll Area */}
           <div className="p-8 flex-1">
             {isLoading && !summary ? (
               <DashboardSkeleton />
@@ -494,13 +428,6 @@ export function DashboardPage() {
               </>
             )}
           </div>
-
-          {/* Footer Credits */}
-          <footer className="p-8 text-center">
-            <p className="text-sm text-slate-400">&copy; 2024 CORTHEX Technologies. All rights reserved.</p>
-          </footer>
-        </main>
-      </div>
     </div>
   )
 }

@@ -64,10 +64,6 @@ export function App() {
   const checkAuth = useAuthStore((s) => s.checkAuth)
 
   useEffect(() => {
-    document.documentElement.classList.add('dark')
-  }, [])
-
-  useEffect(() => {
     checkAuth()
   }, [checkAuth])
 

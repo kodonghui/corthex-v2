@@ -47,7 +47,7 @@ toolsRoute.get('/tools', async (c) => {
     ...t,
     handlerRegistered: t.handler ? !!registry.get(t.handler) : false,
   }))
-  return c.json({ data })
+  return c.json({ success: true, data })
 })
 
 // GET /api/admin/tools/catalog -- grouped by category (MUST be before /tools/:id)
@@ -98,7 +98,7 @@ toolsRoute.get('/tools/catalog', async (c) => {
     }
   }
 
-  return c.json({ data })
+  return c.json({ success: true, data })
 })
 
 // GET /api/admin/tools/:id
@@ -112,6 +112,7 @@ toolsRoute.get('/tools/:id', async (c) => {
   if (!tool) throw new HTTPError(404, '도구를 찾을 수 없습니다', 'TOOL_003')
 
   return c.json({
+    success: true,
     data: {
       ...tool,
       handlerRegistered: tool.handler ? !!registry.get(tool.handler) : false,
@@ -125,6 +126,7 @@ toolsRoute.post('/tools', zValidator('json', createToolSchema), async (c) => {
   const [tool] = await db.insert(toolDefinitions).values(body).returning()
 
   return c.json({
+    success: true,
     data: {
       ...tool,
       handlerRegistered: tool.handler ? !!registry.get(tool.handler) : false,
@@ -148,6 +150,7 @@ toolsRoute.put('/tools/:id', zValidator('json', updateToolSchema), async (c) => 
   const [updated] = await db.update(toolDefinitions).set(body).where(companyFilter).returning()
 
   return c.json({
+    success: true,
     data: {
       ...updated,
       handlerRegistered: updated.handler ? !!registry.get(updated.handler) : false,
@@ -205,7 +208,7 @@ toolsRoute.patch('/agents/:id/allowed-tools', zValidator('json', updateAllowedTo
     }).catch(() => {})
   }
 
-  return c.json({ data: { id: updated.id, name: updated.name, allowedTools: updated.allowedTools } })
+  return c.json({ success: true, data: { id: updated.id, name: updated.name, allowedTools: updated.allowedTools } })
 })
 
 // PATCH /api/admin/agents/:id/allowed-tools/batch -- category bulk add/remove
@@ -275,7 +278,7 @@ toolsRoute.patch('/agents/:id/allowed-tools/batch', zValidator('json', batchAllo
     }).catch(() => {})
   }
 
-  return c.json({ data: { id: updated.id, name: updated.name, allowedTools: updated.allowedTools } })
+  return c.json({ success: true, data: { id: updated.id, name: updated.name, allowedTools: updated.allowedTools } })
 })
 
 // === Agent-Tool Mapping ===
@@ -295,7 +298,7 @@ toolsRoute.get('/agent-tools', async (c) => {
   const result = await db.select().from(agentTools).where(
     and(eq(agentTools.agentId, agentId), eq(agentTools.companyId, tenant.companyId)),
   )
-  return c.json({ data: result })
+  return c.json({ success: true, data: result })
 })
 
 // POST /api/admin/agent-tools — 도구 할당
@@ -304,7 +307,7 @@ toolsRoute.post('/agent-tools', zValidator('json', assignToolSchema), async (c) 
   const body = c.req.valid('json')
   if (body.companyId !== tenant.companyId) throw new HTTPError(403, '다른 회사의 도구를 할당할 수 없습니다', 'TOOL_004')
   const [mapping] = await db.insert(agentTools).values(body).returning()
-  return c.json({ data: mapping }, 201)
+  return c.json({ success: true, data: mapping }, 201)
 })
 
 // PATCH /api/admin/agent-tools/:id — 토글 on/off
@@ -318,7 +321,7 @@ toolsRoute.patch('/agent-tools/:id', async (c) => {
     .where(and(eq(agentTools.id, id), eq(agentTools.companyId, tenant.companyId)))
     .returning()
   if (!mapping) throw new HTTPError(404, '매핑을 찾을 수 없습니다', 'TOOL_002')
-  return c.json({ data: mapping })
+  return c.json({ success: true, data: mapping })
 })
 
 // DELETE /api/admin/agent-tools/:id
@@ -329,5 +332,5 @@ toolsRoute.delete('/agent-tools/:id', async (c) => {
     and(eq(agentTools.id, id), eq(agentTools.companyId, tenant.companyId)),
   ).returning()
   if (!mapping) throw new HTTPError(404, '매핑을 찾을 수 없습니다', 'TOOL_002')
-  return c.json({ data: { message: '삭제되었습니다' } })
+  return c.json({ success: true, data: { message: '삭제되었습니다' } })
 })

@@ -23,7 +23,7 @@ performanceRoute.get('/performance/summary', async (c) => {
   const agentRows = await db.select({ count: count() })
     .from(agents)
     .where(and(eq(agents.companyId, companyId), eq(agents.isActive, true)))
-  const totalAgents = agentRows[0]?.count ?? 0
+  const totalAgents = Number(agentRows[0]?.count ?? 0)
 
   // This month commands
   const thisMonthCmds = await db.select({
@@ -34,8 +34,8 @@ performanceRoute.get('/performance/summary', async (c) => {
     gte(commands.createdAt, thisMonthStart),
   ))
 
-  const totalCmds = thisMonthCmds[0]?.total ?? 0
-  const completedCmds = thisMonthCmds[0]?.completed ?? 0
+  const totalCmds = Number(thisMonthCmds[0]?.total ?? 0)
+  const completedCmds = Number(thisMonthCmds[0]?.completed ?? 0)
   const avgSuccessRate = totalCmds > 0 ? Math.round((completedCmds / totalCmds) * 100) : 0
 
   // Last month commands for comparison
@@ -48,8 +48,8 @@ performanceRoute.get('/performance/summary', async (c) => {
     sql`${commands.createdAt} <= ${lastMonthEnd}`,
   ))
 
-  const lastTotal = lastMonthCmds[0]?.total ?? 0
-  const lastCompleted = lastMonthCmds[0]?.completed ?? 0
+  const lastTotal = Number(lastMonthCmds[0]?.total ?? 0)
+  const lastCompleted = Number(lastMonthCmds[0]?.completed ?? 0)
   const lastSuccessRate = lastTotal > 0 ? Math.round((lastCompleted / lastTotal) * 100) : 0
 
   // This month cost
@@ -156,8 +156,8 @@ performanceRoute.get('/performance/agents', async (c) => {
       gte(orchestrationTasks.createdAt, thirtyDaysAgo),
     ))
 
-    const totalCalls = taskStats[0]?.total ?? 0
-    const completedCalls = taskStats[0]?.completed ?? 0
+    const totalCalls = Number(taskStats[0]?.total ?? 0)
+    const completedCalls = Number(taskStats[0]?.completed ?? 0)
     const successRate = totalCalls > 0 ? Math.round((completedCalls / totalCalls) * 100) : 0
 
     // Cost for this agent in last 30 days
@@ -347,8 +347,8 @@ performanceRoute.get('/performance/agents/:id', async (c) => {
       gte(orchestrationTasks.createdAt, thirtyDaysAgo),
     ))
 
-  const totalCalls = totalTasks[0]?.count ?? 0
-  const successRate = totalCalls > 0 ? Math.round(((completedTasks[0]?.count ?? 0) / totalCalls) * 100) : 0
+  const totalCalls = Number(totalTasks[0]?.count ?? 0)
+  const successRate = totalCalls > 0 ? Math.round((Number(completedTasks[0]?.count ?? 0) / totalCalls) * 100) : 0
 
   const allowedTools = Array.isArray(agent.allowedTools) ? agent.allowedTools : []
   const soulSummary = agent.soul
@@ -414,9 +414,9 @@ performanceRoute.get('/performance/soul-gym', async (c) => {
       gte(orchestrationTasks.createdAt, thirtyDaysAgo),
     ))
 
-    const total = taskStats[0]?.total ?? 0
-    const completed = taskStats[0]?.completed ?? 0
-    const failed = taskStats[0]?.failed ?? 0
+    const total = Number(taskStats[0]?.total ?? 0)
+    const completed = Number(taskStats[0]?.completed ?? 0)
+    const failed = Number(taskStats[0]?.failed ?? 0)
     const successRate = total > 0 ? Math.round((completed / total) * 100) : 100
 
     // Skip agents with no activity or already optimal

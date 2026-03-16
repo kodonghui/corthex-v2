@@ -12,7 +12,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { Modal, Button, Input, Textarea, Skeleton, EmptyState, Badge, toast } from '@corthex/ui'
-import { Plus, Pencil, Trash2, Bot, Building2, ChevronRight, Users, MoreVertical, Cpu } from 'lucide-react'
+import { Plus, Pencil, Trash2, Bot, Building2, ChevronRight, Users, MoreVertical, Cpu, Leaf, LayoutDashboard, Network, Settings, Search, Bell, HelpCircle, Filter, TrendingUp, Zap, RefreshCw, UserPlus } from 'lucide-react'
 
 // ── Types ──
 
@@ -308,8 +308,8 @@ export function DepartmentsPage() {
   const [searchQuery, setSearchQuery] = useState('')
 
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ['admin-departments'],
-    queryFn: () => api.get<{ success: boolean; data: Department[] }>('/admin/departments'),
+    queryKey: ['workspace-departments'],
+    queryFn: () => api.get<{ success: boolean; data: Department[] }>('/workspace/departments'),
   })
 
   const { data: cascadeData, isLoading: cascadeLoading } = useQuery({
@@ -319,9 +319,9 @@ export function DepartmentsPage() {
   })
 
   const createMutation = useMutation({
-    mutationFn: (body: DeptFormData) => api.post('/admin/departments', body),
+    mutationFn: (body: DeptFormData) => api.post('/workspace/departments', body),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-departments'] })
+      queryClient.invalidateQueries({ queryKey: ['workspace-departments'] })
       setCreateOpen(false)
       toast.success('부서가 생성되었습니다')
     },
@@ -331,7 +331,7 @@ export function DepartmentsPage() {
   const updateMutation = useMutation({
     mutationFn: ({ id, body }: { id: string; body: Partial<DeptFormData> }) => api.patch(`/admin/departments/${id}`, body),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-departments'] })
+      queryClient.invalidateQueries({ queryKey: ['workspace-departments'] })
       if (editDept && selectedDept && editDept.id === selectedDept.id) {
         setSelectedDept(null)
       }
@@ -344,7 +344,7 @@ export function DepartmentsPage() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => api.delete(`/admin/departments/${id}?mode=force`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-departments'] })
+      queryClient.invalidateQueries({ queryKey: ['workspace-departments'] })
       if (deleteDept && selectedDept && deleteDept.id === selectedDept.id) {
         setSelectedDept(null)
       }
@@ -402,32 +402,32 @@ export function DepartmentsPage() {
       <aside className="w-64 flex-shrink-0 border-r border-slate-200 bg-white hidden md:flex flex-col">
         <div className="p-6 flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white" style={{ backgroundColor: '#4a6741' }}>
-            <span className="material-symbols-outlined">eco</span>
+            <Leaf className="w-5 h-5" />
           </div>
           <h2 className="text-xl font-bold tracking-tight" style={{ color: '#4a6741' }}>CORTHEX v2</h2>
         </div>
         <nav className="flex-1 px-4 space-y-2 mt-4">
           <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mb-2">Main Menu</div>
           <a className="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors" href="#">
-            <span className="material-symbols-outlined">dashboard</span>
+            <LayoutDashboard className="w-5 h-5" />
             <span className="text-sm font-medium">대시보드</span>
           </a>
           <a className="flex items-center gap-3 px-3 py-2 rounded-xl shadow-sm text-white transition-colors" href="#" style={{ backgroundColor: '#4a6741' }}>
-            <span className="material-symbols-outlined">corporate_fare</span>
+            <Building2 className="w-5 h-5" />
             <span className="text-sm font-medium">부서 관리</span>
           </a>
           <a className="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors" href="#">
-            <span className="material-symbols-outlined">smart_toy</span>
+            <Bot className="w-5 h-5" />
             <span className="text-sm font-medium">에이전트 설정</span>
           </a>
           <a className="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors" href="#">
-            <span className="material-symbols-outlined">workspaces</span>
+            <Network className="w-5 h-5" />
             <span className="text-sm font-medium">워크스페이스</span>
           </a>
           <div className="pt-4">
             <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mb-2">System</div>
             <a className="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors" href="#">
-              <span className="material-symbols-outlined">settings</span>
+              <Settings className="w-5 h-5" />
               <span className="text-sm font-medium">시스템 설정</span>
             </a>
           </div>
@@ -451,7 +451,7 @@ export function DepartmentsPage() {
         <header className="h-16 flex-shrink-0 flex items-center justify-between px-8 bg-white/80 backdrop-blur-md border-b border-slate-200 z-10">
           <div className="flex items-center flex-1">
             <div className="relative w-full max-w-md">
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+              <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 className="w-full pl-10 pr-4 py-2 bg-slate-100 border-none rounded-xl text-sm focus:ring-2 transition-all"
                 placeholder="부서 또는 에이전트 검색..."
@@ -463,11 +463,11 @@ export function DepartmentsPage() {
           </div>
           <div className="flex items-center gap-4">
             <button className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg relative transition-colors">
-              <span className="material-symbols-outlined">notifications</span>
+              <Bell className="w-5 h-5" />
               <span className="absolute top-2 right-2 w-2 h-2 rounded-full border-2 border-white" style={{ backgroundColor: '#ec5b13' }}></span>
             </button>
             <button className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors">
-              <span className="material-symbols-outlined">help</span>
+              <HelpCircle className="w-5 h-5" />
             </button>
           </div>
         </header>
@@ -480,7 +480,7 @@ export function DepartmentsPage() {
               <nav aria-label="Breadcrumb" className="flex mb-2">
                 <ol className="flex items-center space-x-2 text-xs text-slate-400 font-medium">
                   <li>Workspace</li>
-                  <li><span className="material-symbols-outlined text-[10px]">chevron_right</span></li>
+                  <li><ChevronRight className="w-2.5 h-2.5 inline" /></li>
                   <li style={{ color: '#4a6741' }}>부서 관리</li>
                 </ol>
               </nav>
@@ -489,7 +489,7 @@ export function DepartmentsPage() {
             </div>
             <div className="flex items-center gap-3">
               <button className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold transition-all">
-                <span className="material-symbols-outlined text-lg">filter_list</span>
+                <Filter className="w-5 h-5" />
                 필터
               </button>
               <button
@@ -497,7 +497,7 @@ export function DepartmentsPage() {
                 className="flex items-center gap-2 px-6 py-2.5 text-white rounded-xl text-sm font-semibold shadow-lg transition-all"
                 style={{ backgroundColor: '#4a6741' }}
               >
-                <span className="material-symbols-outlined text-lg">add</span>
+                <Plus className="w-5 h-5" />
                 새 부서 추가
               </button>
             </div>
@@ -507,7 +507,7 @@ export function DepartmentsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <div className="border p-4 rounded-2xl flex items-center gap-4" style={{ backgroundColor: 'rgba(74,103,65,0.05)', borderColor: 'rgba(74,103,65,0.1)' }}>
               <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'rgba(74,103,65,0.2)', color: '#4a6741' }}>
-                <span className="material-symbols-outlined">groups</span>
+                <Users className="w-5 h-5" />
               </div>
               <div>
                 <p className="text-xs font-semibold uppercase" style={{ color: 'rgba(74,103,65,0.7)' }}>전체 부서</p>
@@ -516,7 +516,7 @@ export function DepartmentsPage() {
             </div>
             <div className="border p-4 rounded-2xl flex items-center gap-4" style={{ backgroundColor: 'rgba(236,91,19,0.05)', borderColor: 'rgba(236,91,19,0.1)' }}>
               <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'rgba(236,91,19,0.2)', color: '#ec5b13' }}>
-                <span className="material-symbols-outlined">smart_toy</span>
+                <Bot className="w-5 h-5" />
               </div>
               <div>
                 <p className="text-xs font-semibold uppercase" style={{ color: 'rgba(236,91,19,0.7)' }}>활성 에이전트</p>
@@ -525,7 +525,7 @@ export function DepartmentsPage() {
             </div>
             <div className="bg-blue-500/5 border border-blue-500/10 p-4 rounded-2xl flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-500">
-                <span className="material-symbols-outlined">trending_up</span>
+                <TrendingUp className="w-5 h-5" />
               </div>
               <div>
                 <p className="text-xs font-semibold text-blue-500/70 uppercase">평균 효율</p>
@@ -534,7 +534,7 @@ export function DepartmentsPage() {
             </div>
             <div className="bg-amber-500/5 border border-amber-500/10 p-4 rounded-2xl flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-500">
-                <span className="material-symbols-outlined">bolt</span>
+                <Zap className="w-5 h-5" />
               </div>
               <div>
                 <p className="text-xs font-semibold text-amber-500/70 uppercase">응답 속도</p>
@@ -568,13 +568,13 @@ export function DepartmentsPage() {
                   >
                     <div className="flex justify-between items-start mb-4">
                       <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 overflow-hidden" style={{ backgroundColor: colors[colorIdx] }}>
-                        <span className="material-symbols-outlined text-[28px]" style={{ color: '#4a6741' }}>corporate_fare</span>
+                        <Building2 className="w-7 h-7" style={{ color: '#4a6741' }} />
                       </div>
                       <button
                         onClick={(e) => { e.stopPropagation(); setEditDept(dept) }}
                         className="p-2 text-slate-400 hover:text-slate-700 transition-colors"
                       >
-                        <span className="material-symbols-outlined">more_vert</span>
+                        <MoreVertical className="w-5 h-5" />
                       </button>
                     </div>
                     <h3 className="text-xl font-bold mb-2">{dept.name}</h3>
@@ -582,7 +582,7 @@ export function DepartmentsPage() {
                     <div className="space-y-4">
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-slate-400 flex items-center gap-1.5">
-                          <span className="material-symbols-outlined text-lg">smart_toy</span> 할당된 에이전트
+                          <Bot className="w-5 h-5" /> 할당된 에이전트
                         </span>
                         <span className="font-bold" style={{ color: '#4a6741' }}>--명</span>
                       </div>
@@ -601,7 +601,7 @@ export function DepartmentsPage() {
                           onClick={(e) => { e.stopPropagation(); setEditDept(dept) }}
                           className="px-3 py-2 border border-slate-200 hover:border-slate-400 text-slate-600 rounded-xl transition-all"
                         >
-                          <span className="material-symbols-outlined text-lg align-middle">edit</span>
+                          <Pencil className="w-5 h-5 align-middle inline" />
                         </button>
                       </div>
                     </div>
@@ -654,7 +654,7 @@ export function DepartmentsPage() {
             <div className="space-y-6">
               <div className="flex gap-4">
                 <div className="flex-shrink-0 w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center" style={{ color: '#4a6741' }}>
-                  <span className="material-symbols-outlined">update</span>
+                  <RefreshCw className="w-5 h-5" />
                 </div>
                 <div className="flex-1 border-b border-slate-100 pb-4">
                   <p className="text-sm font-medium">부서 에이전트가 <span className="font-bold" style={{ color: '#4a6741' }}>업데이트</span>되었습니다.</p>
@@ -663,7 +663,7 @@ export function DepartmentsPage() {
               </div>
               <div className="flex gap-4">
                 <div className="flex-shrink-0 w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center" style={{ color: '#ec5b13' }}>
-                  <span className="material-symbols-outlined">person_add</span>
+                  <UserPlus className="w-5 h-5" />
                 </div>
                 <div className="flex-1 border-b border-slate-100 pb-4">
                   <p className="text-sm font-medium">새로운 <span className="font-bold" style={{ color: '#4a6741' }}>에이전트가 할당</span>되었습니다.</p>
@@ -672,7 +672,7 @@ export function DepartmentsPage() {
               </div>
               <div className="flex gap-4">
                 <div className="flex-shrink-0 w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-amber-500">
-                  <span className="material-symbols-outlined">domain</span>
+                  <Building2 className="w-5 h-5" />
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-medium">부서 <span className="font-bold" style={{ color: '#4a6741' }}>설정이 수정</span>되었습니다.</p>

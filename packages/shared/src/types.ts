@@ -395,7 +395,7 @@ export type DashboardBudget = {
 // === 3축 비용 집계 (Admin) ===
 
 export type AdminCostByAgent = {
-  agentId: string
+  agentId: string | null
   agentName: string
   totalCostMicro: number
   inputTokens: number

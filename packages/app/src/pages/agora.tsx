@@ -234,7 +234,7 @@ export function AgoraPage() {
       {/* BEGIN: Footer */}
       <footer className="border-t mt-20 py-12 bg-white" style={{ borderColor: 'rgba(188,184,138,0.2)' }}>
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-sm text-slate-400">&copy; 2024 CORTHEX Labs. All reasoning is simulated by AGORA v2 Multi-Agent Engine.</p>
+          <p className="text-sm text-slate-400">&copy; 2026 CORTHEX Labs. All reasoning is simulated by AGORA v2 Multi-Agent Engine.</p>
           <div className="flex gap-8">
             <a className="text-sm transition-colors" style={{ color: '#808B6F' }} href="#">API Documentation</a>
             <a className="text-sm transition-colors" style={{ color: '#808B6F' }} href="#">Ethical Standards</a>

@@ -9,6 +9,7 @@
 // POST /workspace/ai/canvas-command { command, canvasContext }
 
 import { useCallback, useState, useEffect, useRef, useMemo } from 'react'
+import { Maximize, Share2 } from 'lucide-react'
 import {
   ReactFlow,
   Background,
@@ -686,73 +687,6 @@ function NexusPageInner() {
   // === RENDER ===
   return (
     <div className="flex h-screen w-full" style={{ fontFamily: "'Pretendard', sans-serif" }}>
-      {/* Sidebar */}
-      <div className="w-64 text-white flex flex-col h-full flex-shrink-0 z-20 shadow-lg" style={{ backgroundColor: '#5a7247' }}>
-        <div className="p-6 flex items-center gap-3 border-b" style={{ borderColor: '#4a5d23' }}>
-          <span className="material-symbols-outlined text-2xl">hub</span>
-          <h2 className="text-xl font-bold tracking-wide" style={{ fontFamily: "'Noto Serif KR', serif" }}>SketchVibe</h2>
-        </div>
-        <div className="p-6 flex flex-col gap-2">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="bg-white/20 aspect-square rounded-full" style={{ width: '40px', height: '40px' }}></div>
-            <div className="flex flex-col">
-              <h1 className="text-base font-bold" style={{ fontFamily: "'Noto Serif KR', serif" }}>CORTHEX v2</h1>
-              <p className="text-xs" style={{ color: '#c5d8a4' }}>AI Canvas Workspace</p>
-            </div>
-          </div>
-          <div className="flex flex-col gap-1 mt-4">
-            <button
-              onClick={handleNewCanvas}
-              className="flex items-center gap-3 px-4 py-3 rounded-2xl transition-colors"
-              style={{ backgroundColor: 'transparent' }}
-              onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#6a8454')}
-              onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
-            >
-              <span className="material-symbols-outlined text-xl">home</span>
-              <span className="text-sm font-medium">Home</span>
-            </button>
-            <button
-              onClick={() => setShowSidebar(!showSidebar)}
-              className="flex items-center gap-3 px-4 py-3 rounded-2xl shadow-inner"
-              style={{ backgroundColor: '#4a5d23' }}
-            >
-              <span className="material-symbols-outlined text-xl">folder</span>
-              <span className="text-sm font-medium">Workspaces</span>
-            </button>
-            <button
-              onClick={() => setShowMermaidModal(true)}
-              className="flex items-center gap-3 px-4 py-3 rounded-2xl transition-colors"
-              style={{ backgroundColor: 'transparent' }}
-              onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#6a8454')}
-              onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
-            >
-              <span className="material-symbols-outlined text-xl">dashboard</span>
-              <span className="text-sm font-medium">Templates</span>
-            </button>
-          </div>
-        </div>
-        <div className="mt-auto p-6 flex flex-col gap-1 border-t" style={{ borderColor: '#4a5d23' }}>
-          <button
-            className="flex items-center gap-3 px-4 py-3 rounded-2xl transition-colors"
-            style={{ backgroundColor: 'transparent' }}
-            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#6a8454')}
-            onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
-          >
-            <span className="material-symbols-outlined text-xl">settings</span>
-            <span className="text-sm font-medium">Settings</span>
-          </button>
-          <button
-            className="flex items-center gap-3 px-4 py-3 rounded-2xl transition-colors"
-            style={{ backgroundColor: 'transparent' }}
-            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#6a8454')}
-            onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
-          >
-            <span className="material-symbols-outlined text-xl">help</span>
-            <span className="text-sm font-medium">Help</span>
-          </button>
-        </div>
-      </div>
-
       {/* Main Canvas Area */}
       <div className="flex-1 flex flex-col relative overflow-hidden" style={{ backgroundColor: '#faf8f5' }}>
         {/* Top Bar */}
@@ -857,7 +791,7 @@ function NexusPageInner() {
             className="w-10 h-10 rounded-full shadow-md flex items-center justify-center border transition-colors"
             style={{ backgroundColor: '#ffffff', borderColor: '#e5e1d3', color: '#6a5d43' }}
           >
-            <span className="material-symbols-outlined text-xl">fit_screen</span>
+            <Maximize className="w-5 h-5" />
           </button>
         </div>
 
@@ -874,7 +808,7 @@ function NexusPageInner() {
                   className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
                   style={{ backgroundColor: '#f2f0e9', color: '#6a5d43' }}
                 >
-                  <span className="material-symbols-outlined">{config.icon || 'smart_toy'}</span>
+                  <span className="text-lg">{config.icon || '🤖'}</span>
                 </div>
                 <span className="text-[10px] font-medium" style={{ color: '#9c8d66' }}>{config.label || type}</span>
               </button>
@@ -888,7 +822,7 @@ function NexusPageInner() {
                 className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
                 style={{ backgroundColor: '#f2f0e9', color: '#6a5d43' }}
               >
-                <span className="material-symbols-outlined">ios_share</span>
+                <Share2 className="w-5 h-5" />
               </div>
               <span className="text-[10px] font-medium" style={{ color: '#9c8d66' }}>
                 {exportCopied ? 'Copied!' : 'Export'}

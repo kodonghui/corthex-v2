@@ -24,6 +24,7 @@ import { api } from '../lib/api'
 import { MarkdownRenderer } from '../components/markdown-renderer'
 import { useAuthStore } from '../stores/auth-store'
 import { toast } from '@corthex/ui'
+import { Sparkles, LayoutDashboard, FileText, BarChart3, Bot, Settings, Search, Plus, Wrench, Download, Share2, Trash2, Lightbulb, Send } from 'lucide-react'
 import { ShareToConversationModal } from '../components/messenger/share-to-conversation-modal'
 
 // === Constants ===
@@ -323,7 +324,7 @@ export function ReportsPage() {
         <aside className="w-64 bg-white border-r border-stone-200 flex flex-col shrink-0">
           <div className="p-6 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white" style={{ backgroundColor: oliveGreen }}>
-              <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>auto_awesome</span>
+              <Sparkles className="w-5 h-5" />
             </div>
             <div>
               <h1 className="text-lg font-bold tracking-tight text-stone-900">CORTHEX v2</h1>
@@ -332,24 +333,24 @@ export function ReportsPage() {
           </div>
           <nav className="flex-1 px-4 space-y-1">
             <a className="flex items-center gap-3 px-3 py-2 text-stone-600 hover:bg-stone-100 rounded-lg transition-colors" href="#">
-              <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>dashboard</span>
+              <LayoutDashboard className="w-5 h-5" />
               <span className="text-sm font-medium">Dashboard</span>
             </a>
             <a className="flex items-center gap-3 px-3 py-2 rounded-lg" href="#" style={{ backgroundColor: `${oliveGreen}1a`, color: oliveGreen }}>
-              <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>description</span>
+              <FileText className="w-5 h-5" />
               <span className="text-sm font-medium">Reports</span>
             </a>
             <a className="flex items-center gap-3 px-3 py-2 text-stone-600 hover:bg-stone-100 rounded-lg transition-colors" href="#">
-              <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>analytics</span>
+              <BarChart3 className="w-5 h-5" />
               <span className="text-sm font-medium">Analytics</span>
             </a>
             <a className="flex items-center gap-3 px-3 py-2 text-stone-600 hover:bg-stone-100 rounded-lg transition-colors" href="#">
-              <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>smart_toy</span>
+              <Bot className="w-5 h-5" />
               <span className="text-sm font-medium">Agents</span>
             </a>
             <div className="pt-4 pb-2 px-3 text-[10px] font-bold text-stone-400 uppercase tracking-widest">Settings</div>
             <a className="flex items-center gap-3 px-3 py-2 text-stone-600 hover:bg-stone-100 rounded-lg transition-colors" href="#">
-              <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>settings</span>
+              <Settings className="w-5 h-5" />
               <span className="text-sm font-medium">Workspace Settings</span>
             </a>
           </nav>
@@ -379,7 +380,7 @@ export function ReportsPage() {
             </div>
             <div className="flex items-center gap-4">
               <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-lg" style={{ fontFamily: "'Material Symbols Outlined'" }}>search</span>
+                <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
                 <input
                   className="pl-10 pr-4 py-2 bg-stone-100 border-none rounded-xl text-sm w-64 transition-all"
                   placeholder="Search reports..."
@@ -395,7 +396,7 @@ export function ReportsPage() {
                 style={{ backgroundColor: oliveGreen }}
                 data-testid="new-report-btn"
               >
-                <span className="material-symbols-outlined text-sm" style={{ fontFamily: "'Material Symbols Outlined'" }}>add</span>
+                <Plus className="w-4 h-4" />
                 New Report
               </button>
             </div>
@@ -456,7 +457,7 @@ export function ReportsPage() {
                         </div>
                         <h3 className="font-bold text-stone-900 mb-1 leading-tight">{r.title}</h3>
                         <div className="flex items-center gap-2 text-xs text-stone-500">
-                          <span className="material-symbols-outlined text-sm" style={{ fontFamily: "'Material Symbols Outlined'" }}>precision_manufacturing</span>
+                          <Wrench className="w-4 h-4" />
                           <span>Agent: {r.authorName}</span>
                         </div>
                       </div>
@@ -479,17 +480,17 @@ export function ReportsPage() {
                     <div className="flex gap-4">
                       {report.status !== 'draft' && (
                         <button onClick={handleDownload} disabled={downloading} className="p-2 hover:bg-stone-200 rounded-lg transition-colors">
-                          <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>download</span>
+                          <Download className="w-5 h-5" />
                         </button>
                       )}
                       {report.status !== 'draft' && (
                         <button onClick={() => setShowShareModal(true)} className="p-2 hover:bg-stone-200 rounded-lg transition-colors">
-                          <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>share</span>
+                          <Share2 className="w-5 h-5" />
                         </button>
                       )}
                       {isMyReport && report.status === 'draft' && (
                         <button onClick={() => setDeleteConfirmOpen(true)} className="p-2 hover:bg-stone-200 rounded-lg transition-colors text-red-500">
-                          <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>delete</span>
+                          <Trash2 className="w-5 h-5" />
                         </button>
                       )}
                     </div>
@@ -591,7 +592,7 @@ export function ReportsPage() {
                         {report.content && report.content.length > 100 && (
                           <div className="p-6 rounded-r-xl my-8" style={{ backgroundColor: `${oliveGreen}0d`, borderLeft: `4px solid ${oliveGreen}` }}>
                             <h4 className="font-bold mb-2 flex items-center gap-2" style={{ color: oliveGreen }}>
-                              <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>lightbulb</span>
+                              <Lightbulb className="w-5 h-5" />
                               AI Recommendation
                             </h4>
                             <p className="text-sm italic text-stone-700">
@@ -654,7 +655,7 @@ export function ReportsPage() {
                                 style={{ backgroundColor: oliveGreen, boxShadow: `0 4px 14px ${oliveGreen}4d` }}
                                 data-testid="comment-send-btn"
                               >
-                                <span className="material-symbols-outlined text-sm" style={{ fontFamily: "'Material Symbols Outlined'" }}>send</span>
+                                <Send className="w-4 h-4" />
                               </button>
                             </div>
                           </div>
