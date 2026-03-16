@@ -251,7 +251,7 @@ export function ToolsPage() {
                         <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">관리</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y" style={{ divideColor: '#f3f4f6' }}>
+                    <tbody className="divide-y" style={{ borderColor: '#f3f4f6' }}>
                       {filteredTools.map((tool) => {
                         const badge = categoryBadgeColors[tool.category] || categoryBadgeColors.common
                         return (

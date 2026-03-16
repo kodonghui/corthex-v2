@@ -275,7 +275,7 @@ export function CredentialsPage() {
                           <th className="px-6 py-4 text-right">관리</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y text-sm" style={{ divideColor: '#edf3e9' }}>
+                      <tbody className="divide-y text-sm" style={{ borderColor: '#edf3e9' }}>
                         {creds.map((c) => (
                           <tr key={c.id} data-testid={`credentials-cli-token-${c.id}`} className="hover:bg-[#f8faf7] transition-colors">
                             <td className="px-6 py-4">
@@ -440,7 +440,7 @@ export function CredentialsPage() {
                 {apiKeys.length === 0 ? (
                   <p data-testid="credentials-api-empty" className="px-6 py-8 text-center text-sm" style={{ color: '#83935d' }}>등록된 API 키가 없습니다</p>
                 ) : (
-                  <div className="divide-y" style={{ divideColor: '#edf3e9' }}>
+                  <div className="divide-y" style={{ borderColor: '#edf3e9' }}>
                     {apiKeys.map((k) => (
                       <div
                         key={k.id}
