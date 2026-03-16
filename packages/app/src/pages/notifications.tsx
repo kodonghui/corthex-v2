@@ -158,10 +158,10 @@ export function NotificationsPage() {
   ]
 
   return (
-    <div className="p-4 sm:p-6 max-w-2xl mx-auto space-y-4" data-testid="notifications-page">
+    <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 max-w-2xl mx-auto space-y-4" data-testid="notifications-page">
       {/* Header: mobile-optimized with "모두 읽음" right-aligned */}
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold tracking-tight text-slate-50">알림</h1>
+        <h1 className="text-lg sm:text-xl font-semibold tracking-tight text-slate-50">알림</h1>
         {unreadCount > 0 && (
           <button
             onClick={() => markAllRead.mutate()}

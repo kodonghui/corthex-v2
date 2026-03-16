@@ -274,7 +274,7 @@ export function DepartmentsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-slate-50">부서 관리</h1>
+          <h1 className="text-lg sm:text-xl font-bold text-slate-50">부서 관리</h1>
           <p className="text-sm text-slate-500 mt-0.5">
             {activeDepts.length}개 활성 부서
             {inactiveDepts.length > 0 && ` · ${inactiveDepts.length}개 비활성`}

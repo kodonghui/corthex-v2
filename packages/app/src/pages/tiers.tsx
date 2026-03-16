@@ -248,7 +248,7 @@ export function TiersPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-slate-50">계층 관리</h1>
+          <h1 className="text-lg sm:text-xl font-bold text-slate-50">계층 관리</h1>
           <p className="text-sm text-slate-500 mt-0.5">
             {tiers.length}개 계층 (N-Tier 동적 관리)
           </p>

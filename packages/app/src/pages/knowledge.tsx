@@ -175,7 +175,7 @@ export function KnowledgePage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <h1 className="text-lg sm:text-2xl font-bold text-slate-50 tracking-tight">지식 베이스</h1>
+            <h1 className="text-lg sm:text-xl font-bold text-slate-50 tracking-tight">지식 베이스</h1>
           </div>
           {/* Tabs */}
           <div className="flex gap-0">

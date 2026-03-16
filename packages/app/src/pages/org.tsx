@@ -344,7 +344,7 @@ export function OrgPage() {
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-50">{org.company.name}</h1>
+          <h1 className="text-lg sm:text-xl font-bold text-slate-50">{org.company.name}</h1>
           <p className="text-sm text-slate-400 mt-1">{org.departments.length}개 부서 · {totalAgents}명 에이전트</p>
         </div>
         {/* View mode toggle (mobile tree / list) */}

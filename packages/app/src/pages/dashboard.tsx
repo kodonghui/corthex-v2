@@ -35,7 +35,7 @@ function SummaryCards({ data }: { data: DashboardSummary }) {
   const budgetPct = data.cost.budgetUsagePercent
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-5">
+    <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-3 sm:gap-4">
       {/* Task Card */}
       <div
         data-testid="card-tasks"
@@ -51,7 +51,7 @@ function SummaryCards({ data }: { data: DashboardSummary }) {
             </div>
             <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-blue-400/80">작업 현황</span>
           </div>
-          <p className="text-2xl sm:text-4xl font-black text-white mb-2 sm:mb-4 tracking-tight font-mono">{data.tasks.total}</p>
+          <p className="text-2xl sm:text-4xl font-black text-white mb-2 sm:mb-4 tracking-tight font-mono tabular-nums">{data.tasks.total}</p>
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-3 text-[10px] sm:text-xs">
             <span className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-400">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> {data.tasks.completed} 완료
@@ -84,7 +84,7 @@ function SummaryCards({ data }: { data: DashboardSummary }) {
             </div>
             <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-violet-400/80">비용 현황</span>
           </div>
-          <p className="text-2xl sm:text-4xl font-black text-white mb-2 sm:mb-3 tracking-tight font-mono">${data.cost.todayUsd.toFixed(2)}</p>
+          <p className="text-2xl sm:text-4xl font-black text-white mb-2 sm:mb-3 tracking-tight font-mono tabular-nums">${data.cost.todayUsd.toFixed(2)}</p>
           <div className="mb-3">
             <div className="flex items-center justify-between text-xs text-slate-400 mb-1.5">
               <span>월 예산 사용률</span>
@@ -123,7 +123,7 @@ function SummaryCards({ data }: { data: DashboardSummary }) {
             </div>
             <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-cyan-400/80">에이전트</span>
           </div>
-          <p className="text-2xl sm:text-4xl font-black text-white mb-2 sm:mb-4 tracking-tight font-mono">{data.agents.total}</p>
+          <p className="text-2xl sm:text-4xl font-black text-white mb-2 sm:mb-4 tracking-tight font-mono tabular-nums">{data.agents.total}</p>
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-3 text-[10px] sm:text-xs">
             <span className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-400">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> {data.agents.active} 활성
@@ -210,7 +210,7 @@ function UsageChart({
   const maxTotal = useMemo(() => Math.max(...grouped.map((d) => d.total), 0.01), [grouped])
 
   return (
-    <div data-testid="usage-chart" className="rounded-2xl bg-slate-800/40 border border-slate-700/50 p-6 backdrop-blur-sm">
+    <div data-testid="usage-chart" className="rounded-xl sm:rounded-2xl bg-slate-800/40 border border-slate-700/50 p-4 sm:p-6 backdrop-blur-sm">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-base font-semibold text-white">AI 사용량</h3>
@@ -287,7 +287,7 @@ function UsageChart({
       )}
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-5 mt-4 pt-4 border-t border-slate-700/50">
+      <div className="flex items-center justify-center gap-3 sm:gap-4 mt-4 pt-4 border-t border-slate-700/50">
         {(['anthropic', 'openai', 'google'] as const).map((p) => (
           <span key={p} className="flex items-center gap-2 text-xs text-slate-400">
             <span className="w-3 h-3 rounded" style={{ backgroundColor: PROVIDER_COLORS[p] }} />
@@ -309,7 +309,7 @@ function BudgetBar({ data }: { data: DashboardBudget }) {
   const clampedUsage = Math.min(data.usagePercent, 100)
 
   return (
-    <div data-testid="budget-bar" className="rounded-2xl bg-slate-800/40 border border-slate-700/50 p-6 backdrop-blur-sm">
+    <div data-testid="budget-bar" className="rounded-xl sm:rounded-2xl bg-slate-800/40 border border-slate-700/50 p-4 sm:p-6 backdrop-blur-sm">
       <div className="flex items-center justify-between mb-2">
         <div>
           <h3 className="text-base font-semibold text-white">월 예산 진행률</h3>
@@ -411,8 +411,8 @@ function QuickActionsPanel() {
   if (actions.length === 0) return null
 
   return (
-    <div data-testid="quick-actions" className="rounded-2xl bg-slate-800/40 border border-slate-700/50 p-6 backdrop-blur-sm">
-      <h3 className="text-base font-semibold text-white mb-4">퀵 액션</h3>
+    <div data-testid="quick-actions" className="rounded-xl sm:rounded-2xl bg-slate-800/40 border border-slate-700/50 p-4 sm:p-6 backdrop-blur-sm">
+      <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">퀵 액션</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {actions.map((action) => (
           <button
@@ -420,7 +420,7 @@ function QuickActionsPanel() {
             data-testid={`quick-action-${action.id}`}
             onClick={() => handleClick(action)}
             disabled={executingId === action.id}
-            className="flex items-center gap-3 px-4 py-3.5 rounded-xl bg-slate-700/30 border border-slate-700/50 hover:bg-slate-700/60 hover:border-slate-600 transition-all duration-200 text-left disabled:opacity-40 disabled:cursor-wait group"
+            className="flex items-center gap-3 px-4 py-3.5 rounded-xl sm:rounded-2xl bg-slate-700/30 border border-slate-700/50 hover:bg-slate-700/60 hover:border-slate-600 transition-all duration-200 text-left disabled:opacity-40 disabled:cursor-wait group min-h-[44px]"
           >
             <span className="text-xl group-hover:scale-110 transition-transform">
               {executingId === action.id ? (
@@ -465,7 +465,7 @@ function SatisfactionChart() {
     : 'conic-gradient(#1e293b 0deg 360deg)'
 
   return (
-    <div data-testid="satisfaction-chart" className="rounded-2xl bg-slate-800/40 border border-slate-700/50 p-6 backdrop-blur-sm">
+    <div data-testid="satisfaction-chart" className="rounded-xl sm:rounded-2xl bg-slate-800/40 border border-slate-700/50 p-4 sm:p-6 backdrop-blur-sm">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-base font-semibold text-white">명령 만족도</h3>
@@ -543,7 +543,7 @@ function SatisfactionChart() {
 function DashboardSkeleton() {
   return (
     <div data-testid="dashboard-skeleton" className="space-y-4 sm:space-y-6 animate-in fade-in duration-300">
-      <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-5">
+      <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-3 sm:gap-4">
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="rounded-2xl bg-slate-800/40 border border-slate-700/50 p-6">
             <div className="flex items-center gap-3 mb-4">
@@ -558,7 +558,7 @@ function DashboardSkeleton() {
           </div>
         ))}
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
         <div className="rounded-2xl bg-slate-800/40 border border-slate-700/50 p-6 h-72">
           <div className="h-4 w-24 bg-slate-700/50 animate-pulse rounded mb-6" />
           <div className="h-52 bg-slate-700/20 animate-pulse rounded-xl" />
@@ -611,9 +611,9 @@ export function DashboardPage() {
   return (
     <div data-testid="dashboard-page" className="h-full overflow-y-auto bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950">
       {/* Header */}
-      <div data-testid="dashboard-header" className="flex items-center justify-between px-4 sm:px-8 py-4 sm:py-6 border-b border-slate-800/80">
+      <div data-testid="dashboard-header" className="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4 sm:py-6 border-b border-slate-800/80">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">작전현황</h1>
+          <h1 className="text-lg sm:text-xl font-black tracking-tight text-white">작전현황</h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">조직 전체 현황을 한눈에 파악합니다</p>
         </div>
         <div data-testid="ws-status" className="flex items-center gap-2">
@@ -629,7 +629,7 @@ export function DashboardPage() {
         </div>
       </div>
 
-      <div className="px-4 sm:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6 pb-12">
+      <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6 pb-12">
         {isLoading && !summary ? (
           <DashboardSkeleton />
         ) : summaryError && !summary ? (
@@ -644,7 +644,7 @@ export function DashboardPage() {
           <>
             {summary && <SummaryCards data={summary} />}
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
               {usage && (
                 <UsageChart
                   data={usage}
@@ -656,7 +656,7 @@ export function DashboardPage() {
               {budget && <BudgetBar data={budget} />}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
               <QuickActionsPanel />
               <SatisfactionChart />
             </div>

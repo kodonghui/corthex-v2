@@ -132,8 +132,8 @@ export function SettingsPage() {
   }, [])
 
   return (
-    <div className="p-4 md:p-8" data-testid="settings-page">
-      <h2 className="text-xl sm:text-2xl font-bold text-slate-50 mb-4">설정</h2>
+    <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6" data-testid="settings-page">
+      <h2 className="text-lg sm:text-xl font-bold text-slate-50 mb-4">설정</h2>
 
       <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         <Tabs items={TABS} value={activeTab} onChange={setTab} className="mb-6" />

@@ -307,7 +307,7 @@ export function OpsLogPage() {
   return (
     <div className="h-full flex flex-col bg-slate-900" data-testid="ops-log-page">
       {/* Header */}
-      <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-700 flex items-center justify-between">
+      <div className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 border-b border-slate-700 flex items-center justify-between">
         <h2 className="text-lg sm:text-xl font-bold text-slate-50 tracking-tight">작전일지</h2>
         <div className="flex items-center gap-2">
           {selectedIds.size === 2 && (

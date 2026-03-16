@@ -517,7 +517,7 @@ export function AgentsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-slate-50">에이전트 관리</h1>
+          <h1 className="text-lg sm:text-xl font-bold text-slate-50">에이전트 관리</h1>
           <p className="text-sm text-slate-500 mt-0.5">
             {agents.length}개 에이전트
           </p>

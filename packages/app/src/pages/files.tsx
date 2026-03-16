@@ -172,10 +172,10 @@ export function FilesPage() {
         </div>
       )}
 
-      <div className="p-4 sm:p-6 max-w-4xl mx-auto space-y-4">
+      <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 max-w-4xl mx-auto space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between" data-testid="files-header">
-          <h1 className="text-lg sm:text-xl font-bold text-slate-50 tracking-tight">파일</h1>
+          <h1 className="text-lg sm:text-xl font-bold text-slate-50 tracking-tight">파일 관리</h1>
           <div>
             <input ref={fileInputRef} type="file" hidden onChange={handleUpload} />
             <button

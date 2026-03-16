@@ -89,11 +89,11 @@ export function CommandCenterPage() {
       className="flex flex-col h-full bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950"
     >
       {/* Page Header */}
-      <div data-testid="command-center-header" className="px-6 py-5 border-b border-slate-800/80 shrink-0">
+      <div data-testid="command-center-header" className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-800/80 shrink-0">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-white">작전현황</h1>
-            <p className="text-sm text-slate-500 mt-1">AI 에이전트에게 명령을 내리고 결과를 확인합니다</p>
+            <h1 className="text-lg sm:text-xl font-black tracking-tight text-white">작전현황</h1>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">AI 에이전트에게 명령을 내리고 결과를 확인합니다</p>
           </div>
           <div className="flex items-center gap-3">
             <span
@@ -112,7 +112,7 @@ export function CommandCenterPage() {
         {/* Total Commands */}
         <div
           data-testid="kpi-card-commands"
-          className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600/20 via-slate-800 to-slate-800 border border-blue-500/20 p-5 hover:border-blue-500/40 transition-all duration-300 group"
+          className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-600/20 via-slate-800 to-slate-800 border border-blue-500/20 p-4 sm:p-6 hover:border-blue-500/40 transition-all duration-300 group"
           role="region"
           aria-label="Total commands"
         >
@@ -126,7 +126,7 @@ export function CommandCenterPage() {
               </div>
               <span className="text-xs font-semibold uppercase tracking-widest text-blue-400/80">명령 수</span>
             </div>
-            <p className="text-4xl font-black text-white tracking-tight">{userMsgCount}</p>
+            <p className="text-2xl sm:text-4xl font-black text-white tracking-tight font-mono tabular-nums">{userMsgCount}</p>
             <div className="flex items-center gap-2 mt-2 text-xs">
               <span className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-400">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
@@ -139,7 +139,7 @@ export function CommandCenterPage() {
         {/* Active Agents */}
         <div
           data-testid="kpi-card-agents"
-          className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-cyan-600/20 via-slate-800 to-slate-800 border border-cyan-500/20 p-5 hover:border-cyan-500/40 transition-all duration-300 group"
+          className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-cyan-600/20 via-slate-800 to-slate-800 border border-cyan-500/20 p-4 sm:p-6 hover:border-cyan-500/40 transition-all duration-300 group"
           role="region"
           aria-label="Active agents"
         >
@@ -153,7 +153,7 @@ export function CommandCenterPage() {
               </div>
               <span className="text-xs font-semibold uppercase tracking-widest text-cyan-400/80">에이전트</span>
             </div>
-            <p className="text-4xl font-black text-white tracking-tight">{managers.length}</p>
+            <p className="text-2xl sm:text-4xl font-black text-white tracking-tight font-mono tabular-nums">{managers.length}</p>
             <div className="flex items-center gap-2 mt-2 text-xs">
               <span className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-400">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -166,7 +166,7 @@ export function CommandCenterPage() {
         {/* Pipeline Status */}
         <div
           data-testid="kpi-card-pipeline"
-          className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-600/20 via-slate-800 to-slate-800 border border-emerald-500/20 p-5 hover:border-emerald-500/40 transition-all duration-300 group"
+          className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-emerald-600/20 via-slate-800 to-slate-800 border border-emerald-500/20 p-4 sm:p-6 hover:border-emerald-500/40 transition-all duration-300 group"
           role="region"
           aria-label="Pipeline status"
         >
@@ -180,7 +180,7 @@ export function CommandCenterPage() {
               </div>
               <span className="text-xs font-semibold uppercase tracking-widest text-emerald-400/80">파이프라인</span>
             </div>
-            <p className="text-4xl font-black text-white tracking-tight">{completedSteps}/{activeSteps.length || 0}</p>
+            <p className="text-2xl sm:text-4xl font-black text-white tracking-tight font-mono tabular-nums">{completedSteps}/{activeSteps.length || 0}</p>
             <div className="flex items-center gap-2 mt-2 text-xs">
               {activeCommandId ? (
                 <span className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-blue-500/10 text-blue-400">
@@ -200,7 +200,7 @@ export function CommandCenterPage() {
         {/* Presets */}
         <div
           data-testid="kpi-card-presets"
-          className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-600/20 via-slate-800 to-slate-800 border border-amber-500/20 p-5 hover:border-amber-500/40 transition-all duration-300 group cursor-pointer"
+          className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-amber-600/20 via-slate-800 to-slate-800 border border-amber-500/20 p-4 sm:p-6 hover:border-amber-500/40 transition-all duration-300 group cursor-pointer"
           role="region"
           aria-label="Saved presets"
           tabIndex={0}
@@ -217,7 +217,7 @@ export function CommandCenterPage() {
               </div>
               <span className="text-xs font-semibold uppercase tracking-widest text-amber-400/80">프리셋</span>
             </div>
-            <p className="text-4xl font-black text-white tracking-tight">{presets.length}</p>
+            <p className="text-2xl sm:text-4xl font-black text-white tracking-tight font-mono tabular-nums">{presets.length}</p>
             <div className="flex items-center gap-2 mt-2 text-xs">
               <span className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-amber-500/10 text-amber-400">
                 관리하기

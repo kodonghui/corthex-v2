@@ -334,15 +334,15 @@ export function ActivityLogPage() {
   return (
     <div className="h-full flex flex-col bg-slate-900" data-testid="activity-log-page">
       {/* Header — mobile sticky */}
-      <div className="sticky top-0 z-10 bg-slate-900/90 backdrop-blur-md px-4 md:px-6 py-4 border-b border-slate-700/50 flex items-center justify-between" data-testid="activity-header">
-        <h2 className="text-xl font-bold text-slate-50 tracking-tight">활동 로그</h2>
+      <div className="sticky top-0 z-10 bg-slate-900/90 backdrop-blur-md px-4 sm:px-6 lg:px-8 py-4 border-b border-slate-700/50 flex items-center justify-between" data-testid="activity-header">
+        <h2 className="text-lg sm:text-xl font-bold text-slate-50 tracking-tight">활동 로그</h2>
         <div className="flex items-center gap-2">
           <WsStatusIndicator />
         </div>
       </div>
 
       {/* Tabs — horizontally scrollable on mobile */}
-      <div className="px-4 md:px-6 border-b border-slate-700 overflow-x-auto no-scrollbar" data-testid="activity-tabs">
+      <div className="px-4 sm:px-6 lg:px-8 border-b border-slate-700 overflow-x-auto no-scrollbar" data-testid="activity-tabs">
         <div className="flex gap-0" role="tablist">
           {TAB_ITEMS.map(item => (
             <button
@@ -423,7 +423,7 @@ export function ActivityLogPage() {
       )}
 
       {/* Filters — mobile-friendly with scrollable row */}
-      <div className="px-4 md:px-6 py-3 border-b border-slate-700/50 flex flex-wrap gap-2 items-center overflow-x-auto no-scrollbar" data-testid="activity-filters">
+      <div className="px-4 sm:px-6 lg:px-8 py-3 border-b border-slate-700/50 flex flex-wrap gap-2 items-center overflow-x-auto no-scrollbar" data-testid="activity-filters">
         <div className="relative shrink-0 flex-1 min-w-[140px] max-w-[200px] md:max-w-[240px]">
           <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -477,7 +477,7 @@ export function ActivityLogPage() {
       </div>
 
       {/* Table Content */}
-      <div className="flex-1 overflow-auto px-4 md:px-6 py-3" data-testid="activity-content">
+      <div className="flex-1 overflow-auto px-4 sm:px-6 lg:px-8 py-3" data-testid="activity-content">
         {activeQuery.isLoading ? (
           <div className="space-y-2" data-testid="activity-loading">
             {Array.from({ length: 8 }).map((_, i) => (
@@ -510,7 +510,7 @@ export function ActivityLogPage() {
 
       {/* Pagination */}
       {totalCount > 0 && (
-        <div className="px-4 md:px-6 py-3 border-t border-slate-700 flex items-center justify-between" data-testid="activity-pagination">
+        <div className="px-4 sm:px-6 lg:px-8 py-3 border-t border-slate-700 flex items-center justify-between" data-testid="activity-pagination">
           <span className="text-xs text-slate-500">{totalCount.toLocaleString()}건</span>
           <div className="flex items-center gap-2">
             <button

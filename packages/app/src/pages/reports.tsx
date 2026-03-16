@@ -240,7 +240,7 @@ export function ReportsPage() {
   return (
     <div className="h-full flex flex-col bg-slate-900" data-testid="reports-page">
       {/* 헤더 */}
-      <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+      <div className="px-4 sm:px-6 lg:px-8 py-4 border-b border-slate-700 flex items-center justify-between">
         <div className="flex items-center gap-3">
           {view !== 'list' && (
             <button
@@ -251,7 +251,7 @@ export function ReportsPage() {
               ← 목록
             </button>
           )}
-          <h2 className="text-xl font-semibold text-slate-50">
+          <h2 className="text-lg sm:text-xl font-semibold text-slate-50">
             {view === 'list' ? '보고서' : view === 'create' ? '새 보고서' : '보고서 상세'}
           </h2>
         </div>
@@ -262,7 +262,7 @@ export function ReportsPage() {
               setContent('')
               setView('create')
             }}
-            className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium"
+            className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium min-h-[44px]"
             data-testid="new-report-btn"
           >
             + 새 보고서
@@ -274,7 +274,7 @@ export function ReportsPage() {
       <div className="flex-1 overflow-y-auto [-webkit-overflow-scrolling:touch]">
         {/* === 목록 뷰 === */}
         {view === 'list' && (
-          <div className="px-6 py-4 space-y-4 max-w-2xl">
+          <div className="px-4 sm:px-6 lg:px-8 py-4 space-y-4 max-w-2xl">
             {/* Tab Bar */}
             <div className="flex gap-1" data-testid="report-tabs">
               {tabs.map((tab) => (
@@ -373,7 +373,7 @@ export function ReportsPage() {
 
         {/* === 작성 뷰 === */}
         {view === 'create' && (
-          <div className="px-6 py-4 max-w-2xl space-y-4">
+          <div className="px-4 sm:px-6 lg:px-8 py-4 max-w-2xl space-y-4">
             <input
               type="text"
               value={title}
@@ -414,7 +414,7 @@ export function ReportsPage() {
 
         {/* === 상세 뷰 로딩 === */}
         {view === 'detail' && detailLoading && (
-          <div className="px-6 py-4 max-w-2xl space-y-4" data-testid="detail-loading">
+          <div className="px-4 sm:px-6 lg:px-8 py-4 max-w-2xl space-y-4" data-testid="detail-loading">
             <div className="h-4 w-24 bg-slate-700 animate-pulse rounded" />
             <div className="h-6 w-3/4 bg-slate-700 animate-pulse rounded" />
             {[...Array(10)].map((_, i) => (
@@ -425,7 +425,7 @@ export function ReportsPage() {
 
         {/* === 상세 뷰 === */}
         {view === 'detail' && !detailLoading && report && (
-          <div className="px-6 py-4 max-w-2xl space-y-6" data-testid="report-detail">
+          <div className="px-4 sm:px-6 lg:px-8 py-4 max-w-2xl space-y-6" data-testid="report-detail">
             {/* 상태 + 메타 정보 */}
             <div className="space-y-3">
               <div className="flex items-center gap-2 flex-wrap">

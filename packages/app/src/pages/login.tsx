@@ -60,6 +60,7 @@ export function LoginPage() {
         <div className="text-center">
           <h1 className="text-white tracking-tight text-3xl sm:text-4xl font-bold leading-tight pb-1 inline-block border-b-4 border-cyan-400">CORTHEX</h1>
           <p className="text-slate-400 text-sm sm:text-base mt-3">AI 조직 관리 플랫폼</p>
+
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">

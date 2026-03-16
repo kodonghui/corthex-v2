@@ -205,11 +205,11 @@ function CostOverviewSection({
   }, [providerCosts, totalCost])
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4" data-testid="cost-summary">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4" data-testid="cost-summary">
       {/* Total Cost — mobile-optimized with larger font-mono */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl px-4 sm:px-5 py-4">
+      <div className="bg-slate-800/50 border border-slate-700 rounded-xl sm:rounded-2xl p-4 sm:p-6">
         <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">총 비용</p>
-        <p className="text-3xl font-mono font-bold text-slate-50">${totalCost.toFixed(2)}</p>
+        <p className="text-3xl font-mono tabular-nums font-bold text-slate-50">${totalCost.toFixed(2)}</p>
         <div className="flex justify-between items-center mt-2">
           <p className="text-xs text-slate-500">최근 {costData.days}일 합계</p>
           {totalCost > 0 && (
@@ -224,7 +224,7 @@ function CostOverviewSection({
       </div>
 
       {/* Budget Usage — with progress bar for mobile */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl px-4 sm:px-5 py-4">
+      <div className="bg-slate-800/50 border border-slate-700 rounded-xl sm:rounded-2xl p-4 sm:p-6">
         <div className="flex justify-between items-start mb-2">
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">예산 사용률</p>
           <p className="text-xs font-mono text-slate-500">
@@ -257,7 +257,7 @@ function CostOverviewSection({
       </div>
 
       {/* Provider Donut */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl px-5 py-4">
+      <div className="bg-slate-800/50 border border-slate-700 rounded-xl sm:rounded-2xl p-4 sm:p-6">
         <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">프로바이더별 비용</p>
         <div className="flex items-center gap-4">
           {/* Donut */}
@@ -316,8 +316,8 @@ function TopAgentsSection({ agents }: { agents: { agentId: string; agentName: st
   const maxCost = sorted[0]?.costUsd ?? 1
 
   return (
-    <div className="bg-slate-800/50 border border-slate-700 rounded-xl px-4 sm:px-5 py-4" data-testid="top-agents">
-      <h3 className="text-base sm:text-sm font-bold sm:font-semibold text-slate-200 sm:text-slate-300 mb-4 sm:mb-3">에이전트별 비용 순위</h3>
+    <div className="bg-slate-800/50 border border-slate-700 rounded-xl sm:rounded-2xl p-4 sm:p-6" data-testid="top-agents">
+      <h3 className="text-lg sm:text-xl font-bold text-slate-200 mb-4 sm:mb-3">에이전트별 비용 순위</h3>
       {display.length === 0 ? (
         <div className="h-24 flex items-center justify-center text-sm text-slate-500">
           데이터가 없습니다
@@ -390,8 +390,8 @@ function DailyCostChart({
   const maxCost = Math.max(...items.map((d) => d.costMicro), 1)
 
   return (
-    <div className="bg-slate-800/50 border border-slate-700 rounded-xl px-4 sm:px-5 py-4" data-testid="daily-chart">
-      <h3 className="text-base sm:text-sm font-bold sm:font-semibold text-slate-200 sm:text-slate-300 mb-4">일별 비용 추이</h3>
+    <div className="bg-slate-800/50 border border-slate-700 rounded-xl sm:rounded-2xl p-4 sm:p-6" data-testid="daily-chart">
+      <h3 className="text-lg sm:text-xl font-bold text-slate-200 mb-4">일별 비용 추이</h3>
 
       {isLoading ? (
         <div className="h-40 w-full bg-slate-700/50 rounded animate-pulse" />
@@ -552,7 +552,7 @@ export function CostsPage() {
         />
       </div>
 
-      <div className="px-4 sm:px-6 py-4 space-y-6 max-w-6xl">
+      <div className="px-4 sm:px-6 lg:px-8 py-4 space-y-6 max-w-6xl">
         {isLoading && !costData ? (
           <CostsSkeleton />
         ) : !costData ? (
