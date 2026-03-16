@@ -147,7 +147,7 @@ export function ChatPage() {
 
       {/* 채팅 영역 -- Stitch 스타일 centered container */}
       <div className={`${!showChat ? 'hidden md:flex' : 'flex'} flex-1 min-w-0 justify-center py-4 px-4 sm:px-6 lg:px-8`}>
-        <div className="flex flex-col w-full max-w-[800px] flex-1 bg-slate-900 rounded-3xl border border-slate-800 shadow-xl overflow-hidden relative">
+        <div className="flex flex-col w-full max-w-[800px] flex-1 bg-[#111827] rounded-3xl border border-slate-800 shadow-xl overflow-hidden relative">
           <ChatArea
             agent={selectedAgent}
             sessionId={selectedSessionId}

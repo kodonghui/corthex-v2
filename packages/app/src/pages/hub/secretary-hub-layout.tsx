@@ -6,6 +6,7 @@ import { useHubStream } from '../../hooks/use-hub-stream'
 import { useWsStore } from '../../stores/ws-store'
 import { HandoffTracker } from './handoff-tracker'
 import { SessionSidebar } from './session-sidebar'
+import { Copy, MoreVertical } from 'lucide-react'
 
 type Agent = {
   id: string
@@ -307,7 +308,7 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
               <div className="flex flex-col">
                 <h1 className="text-slate-50 text-xl font-bold leading-tight">Terminal Interface</h1>
                 <p className="text-slate-400 text-xs font-mono uppercase tracking-wider mt-1">
-                  AI Agent Interaction Terminal // {secretary.name}
+                  AI Agent Interaction Terminal // Session ID: {effectiveSessionId ? effectiveSessionId.slice(0, 8).toUpperCase() : '----'}
                 </p>
               </div>
             </div>
@@ -332,6 +333,22 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
                 />
                 {isConnected ? '실시간 연결됨' : '연결 끊김'}
               </span>
+              <button
+                className="p-2 text-slate-400 hover:text-slate-50 rounded-md hover:bg-slate-800 transition-colors"
+                aria-label="터미널 복사"
+                onClick={() => {
+                  const text = messages.map((m) => `${m.sender === 'user' ? 'User' : secretary.name}: ${m.content}`).join('\n')
+                  navigator.clipboard.writeText(text)
+                }}
+              >
+                <Copy className="w-5 h-5" />
+              </button>
+              <button
+                className="p-2 text-slate-400 hover:text-slate-50 rounded-md hover:bg-slate-800 transition-colors"
+                aria-label="더보기"
+              >
+                <MoreVertical className="w-5 h-5" />
+              </button>
             </div>
           </div>
 
@@ -797,10 +814,24 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
               <h3 className="text-sm font-bold text-slate-50 uppercase tracking-wider mb-3">Session Cost</h3>
               <div className="flex items-end gap-2 mb-3">
                 <span className="text-3xl font-bold font-mono text-slate-50 tabular-nums">${costUsd.toFixed(2)}</span>
-                <span className="text-xs text-slate-400 mb-1">/ session</span>
+                <span className="text-xs text-slate-400 mb-1">/ $5.00 limit</span>
               </div>
               <div className="w-full bg-slate-800 rounded-full h-2 mb-3">
                 <div className="bg-amber-400 h-2 rounded-full" style={{ width: `${Math.min((costUsd / 5) * 100, 100)}%` }} />
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <span className="text-slate-400 block mb-0.5">Tokens (In)</span>
+                  <span className="font-mono text-slate-300 tabular-nums">
+                    {messages.reduce((sum, m) => sum + (m.sender === 'user' ? m.content.length : 0), 0).toLocaleString()}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block mb-0.5">Tokens (Out)</span>
+                  <span className="font-mono text-slate-300 tabular-nums">
+                    {messages.reduce((sum, m) => sum + (m.sender === 'agent' ? m.content.length : 0), 0).toLocaleString()}
+                  </span>
+                </div>
               </div>
             </div>
           )}
