@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { Modal, ConfirmDialog, Button, Input, Textarea, Skeleton, EmptyState, Badge, toast } from '@corthex/ui'
-import { Plus, Pencil, Trash2, Bot, Building2, ChevronRight } from 'lucide-react'
+import { Plus, Pencil, Trash2, Bot, Building2, ChevronRight, Users, MoreVertical, Cpu, DollarSign } from 'lucide-react'
 
 // ── Types ──
 
@@ -38,6 +38,16 @@ type CascadeAnalysis = {
 type DeptFormData = {
   name: string
   description: string
+}
+
+type DeptAgent = {
+  id: string
+  name: string
+  role: string | null
+  tier: 'manager' | 'specialist' | 'worker'
+  modelName: string
+  status: 'online' | 'working' | 'error' | 'offline'
+  isActive: boolean
 }
 
 // ── Department Form (shared between create & edit) ──
@@ -178,6 +188,152 @@ function CascadePanel({
   )
 }
 
+// ── Agent status helpers ──
+
+const STATUS_COLORS: Record<string, { bg: string; text: string; label: string }> = {
+  online: { bg: 'bg-green-900/30', text: 'text-green-400', label: '활성' },
+  working: { bg: 'bg-cyan-900/30', text: 'text-cyan-400', label: '작업 중' },
+  error: { bg: 'bg-red-900/30', text: 'text-red-400', label: '오류' },
+  offline: { bg: 'bg-slate-800', text: 'text-slate-400', label: '오프라인' },
+}
+
+const TIER_COLORS: Record<string, string> = {
+  manager: 'text-cyan-400 bg-cyan-500/10',
+  specialist: 'text-indigo-400 bg-indigo-500/10',
+  worker: 'text-emerald-400 bg-emerald-500/10',
+}
+
+// ── Detail Section ──
+
+function DepartmentDetailSection({
+  dept,
+  onEdit,
+  onDelete,
+  onClose,
+}: {
+  dept: Department
+  onEdit: () => void
+  onDelete: () => void
+  onClose: () => void
+}) {
+  // Fetch agents assigned to this department
+  const { data: agentsData, isLoading: agentsLoading } = useQuery({
+    queryKey: ['admin-agents', dept.id],
+    queryFn: () => api.get<{ success: boolean; data: DeptAgent[] }>(`/admin/agents?departmentId=${dept.id}`),
+    enabled: !!dept.id,
+  })
+
+  const agents = agentsData?.data ?? []
+
+  return (
+    <div className="flex flex-col gap-6">
+      {/* Detail Header */}
+      <div className="flex flex-col gap-2">
+        <nav aria-label="Breadcrumb" className="flex text-sm text-slate-400">
+          <ol className="inline-flex items-center space-x-1 md:space-x-2">
+            <li className="inline-flex items-center">
+              <button
+                onClick={onClose}
+                className="hover:text-cyan-400 transition-colors"
+              >
+                부서 목록
+              </button>
+            </li>
+            <li>
+              <div className="flex items-center">
+                <ChevronRight className="w-4 h-4 mx-1" />
+                <span className="text-slate-200 font-medium">{dept.name}</span>
+              </div>
+            </li>
+          </ol>
+        </nav>
+        <div className="flex flex-wrap justify-between items-end gap-4">
+          <div>
+            <h2 className="text-2xl font-bold text-white">{dept.name} 상세</h2>
+            <p className="text-slate-400 mt-1 max-w-2xl">
+              {dept.description || '설명 없음'}
+            </p>
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={onEdit}
+              className="flex items-center justify-center gap-2 rounded-lg h-9 px-4 bg-slate-900/50 border border-slate-700 text-slate-200 text-sm font-medium hover:bg-slate-800 transition-colors"
+            >
+              <Pencil className="w-[18px] h-[18px]" />
+              편집
+            </button>
+            <button
+              onClick={onDelete}
+              className="flex items-center justify-center gap-2 rounded-lg h-9 px-4 bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium hover:bg-red-500/20 transition-colors"
+            >
+              <Trash2 className="w-[18px] h-[18px]" />
+              삭제
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Assigned Agents List */}
+      <div>
+        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <Users className="w-5 h-5 text-cyan-400" />
+          할당된 에이전트 ({agentsLoading ? '...' : agents.length})
+        </h3>
+
+        {agentsLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[1, 2].map((i) => (
+              <Skeleton key={i} className="h-28 w-full rounded-xl" />
+            ))}
+          </div>
+        ) : agents.length === 0 ? (
+          <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 text-center">
+            <Bot className="w-8 h-8 text-slate-600 mx-auto mb-2" />
+            <p className="text-sm text-slate-500">이 부서에 할당된 에이전트가 없습니다</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {agents.map((agent) => {
+              const statusInfo = STATUS_COLORS[agent.status] ?? STATUS_COLORS.offline
+              const tierColor = TIER_COLORS[agent.tier] ?? TIER_COLORS.worker
+              return (
+                <div
+                  key={agent.id}
+                  className="flex items-start gap-4 p-4 rounded-xl bg-slate-900/50 border border-slate-800"
+                >
+                  <div className={`rounded-lg p-3 ${tierColor}`}>
+                    <Bot className="w-7 h-7" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-start mb-1">
+                      <h4 className="text-base font-semibold text-white truncate">{agent.name}</h4>
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${statusInfo.bg} ${statusInfo.text}`}>
+                        {statusInfo.label}
+                      </span>
+                    </div>
+                    <p className="text-sm text-slate-400 mb-3 truncate">
+                      {agent.role || '역할 미지정'}
+                    </p>
+                    <div className="flex items-center gap-4 text-xs font-mono text-slate-500">
+                      <div className="flex items-center gap-1">
+                        <Cpu className="w-3.5 h-3.5" />
+                        <span>{agent.modelName}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <span className="capitalize">{agent.tier}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ── Main Page ──
 
 export function DepartmentsPage() {
@@ -185,6 +341,7 @@ export function DepartmentsPage() {
   const [createOpen, setCreateOpen] = useState(false)
   const [editDept, setEditDept] = useState<Department | null>(null)
   const [deleteDept, setDeleteDept] = useState<Department | null>(null)
+  const [selectedDept, setSelectedDept] = useState<Department | null>(null)
 
   // Fetch departments
   const { data, isLoading, isError, refetch } = useQuery({
@@ -218,6 +375,11 @@ export function DepartmentsPage() {
       api.patch(`/admin/departments/${id}`, body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-departments'] })
+      // Update selectedDept if we just edited it
+      if (editDept && selectedDept && editDept.id === selectedDept.id) {
+        // Refetch will update, but we also need to refresh the selected reference
+        setSelectedDept(null)
+      }
       setEditDept(null)
       toast.success('부서가 수정되었습니다')
     },
@@ -231,6 +393,9 @@ export function DepartmentsPage() {
     mutationFn: (id: string) => api.delete(`/admin/departments/${id}?mode=force`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-departments'] })
+      if (deleteDept && selectedDept && deleteDept.id === selectedDept.id) {
+        setSelectedDept(null)
+      }
       setDeleteDept(null)
       toast.success('부서가 삭제되었습니다')
     },
@@ -242,6 +407,19 @@ export function DepartmentsPage() {
   const departments = data?.data ?? []
   const activeDepts = departments.filter((d) => d.isActive)
   const inactiveDepts = departments.filter((d) => !d.isActive)
+
+  // Keep selectedDept in sync with fetched data
+  const resolvedSelected = selectedDept
+    ? departments.find((d) => d.id === selectedDept.id) ?? null
+    : null
+
+  const handleCardClick = (dept: Department) => {
+    if (selectedDept?.id === dept.id) {
+      setSelectedDept(null)
+    } else {
+      setSelectedDept(dept)
+    }
+  }
 
   // Loading state
   if (isLoading) {
@@ -276,7 +454,7 @@ export function DepartmentsPage() {
       {/* Page Header */}
       <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
         <div>
-          <h1 className="text-[32px] font-bold leading-tight tracking-tight text-slate-50">부서 관리</h1>
+          <h1 className="text-[32px] font-bold leading-tight tracking-tight text-white">부서 관리</h1>
           <p className="text-slate-400 mt-1">
             조직의 부서와 할당된 AI 에이전트를 관리합니다.
             {activeDepts.length > 0 && (
@@ -307,59 +485,85 @@ export function DepartmentsPage() {
       {/* Departments Grid */}
       {activeDepts.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
-          {activeDepts.map((dept) => (
-            <div
-              key={dept.id}
-              data-testid={`dept-row-${dept.id}`}
-              className="group flex flex-col bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-cyan-400/50 transition-all cursor-pointer"
-              onClick={() => setEditDept(dept)}
-            >
-              <div className="p-5 flex-1 flex flex-col">
-                {/* Card header: name + icon */}
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-xl font-bold text-slate-50 group-hover:text-cyan-400 transition-colors">{dept.name}</h3>
-                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-800 text-slate-300">
-                    <Bot className="w-4 h-4" />
+          {activeDepts.map((dept) => {
+            const isSelected = resolvedSelected?.id === dept.id
+            return (
+              <div
+                key={dept.id}
+                data-testid={`dept-row-${dept.id}`}
+                className={`group flex flex-col rounded-xl overflow-hidden transition-all cursor-pointer ${
+                  isSelected
+                    ? 'bg-slate-900/50 border-2 border-cyan-400 shadow-lg shadow-cyan-400/10'
+                    : 'bg-slate-900/50 border border-slate-800 hover:border-cyan-400/50 hover:shadow-lg hover:shadow-cyan-400/10'
+                }`}
+                onClick={() => handleCardClick(dept)}
+              >
+                <div className="p-5 flex-1 flex flex-col">
+                  {/* Card header: name + agent count badge */}
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className={`text-xl font-bold transition-colors ${
+                      isSelected ? 'text-cyan-400' : 'text-white group-hover:text-cyan-400'
+                    }`}>
+                      {dept.name}
+                    </h3>
+                    <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full ${
+                      isSelected ? 'bg-cyan-400/10 text-cyan-400' : 'bg-slate-800 text-slate-300'
+                    }`}>
+                      <Bot className="w-4 h-4" />
+                    </div>
                   </div>
-                </div>
 
-                {/* Description */}
-                <p className="text-sm text-slate-400 mb-6 flex-1 line-clamp-3">
-                  {dept.description || '설명 없음'}
-                </p>
+                  {/* Description */}
+                  <p className="text-sm text-slate-400 mb-6 flex-1 line-clamp-3">
+                    {dept.description || '설명 없음'}
+                  </p>
 
-                {/* Footer */}
-                <div className="flex justify-between items-end mt-auto pt-4 border-t border-slate-700">
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-900/30 text-green-400">활성</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setEditDept(dept) }}
-                      className="text-slate-400 hover:text-cyan-400 transition-colors"
-                      aria-label={`${dept.name} 편집`}
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setDeleteDept(dept) }}
-                      className="text-slate-400 hover:text-red-400 transition-colors"
-                      aria-label={`${dept.name} 삭제`}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                  {/* Footer */}
+                  <div className="flex justify-between items-end mt-auto pt-4 border-t border-slate-700">
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-900/30 text-green-400">활성</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setEditDept(dept) }}
+                        className="text-slate-400 hover:text-cyan-400 transition-colors"
+                        aria-label={`${dept.name} 편집`}
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setDeleteDept(dept) }}
+                        className="text-slate-400 hover:text-red-400 transition-colors"
+                        aria-label={`${dept.name} 삭제`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
+      )}
+
+      {/* Detail Section (shown below grid when a department is selected) */}
+      {resolvedSelected && (
+        <>
+          <div className="w-full h-px bg-slate-800 mb-8" />
+          <DepartmentDetailSection
+            dept={resolvedSelected}
+            onEdit={() => setEditDept(resolvedSelected)}
+            onDelete={() => setDeleteDept(resolvedSelected)}
+            onClose={() => setSelectedDept(null)}
+          />
+        </>
       )}
 
       {/* Inactive departments */}
       {inactiveDepts.length > 0 && (
         <>
-          <div className="w-full h-px bg-slate-800 mb-8" />
+          <div className="w-full h-px bg-slate-800 mb-8 mt-12" />
           <div className="space-y-3">
             <p className="text-xs font-medium text-slate-500 uppercase tracking-wider px-1 mb-3">
               비활성 부서
