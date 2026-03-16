@@ -1,65 +1,7 @@
 import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { api } from '../lib/api'
 import { toast } from '@corthex/ui'
-
-// === Types ===
-
-type WorkflowStep = {
-  id: string
-  name: string
-  type: 'tool' | 'llm' | 'condition'
-  action: string
-  params?: Record<string, unknown>
-  agentId?: string
-  dependsOn?: string[]
-  trueBranch?: string
-  falseBranch?: string
-  systemPrompt?: string
-  timeout?: number
-  retryCount?: number
-}
-
-type Workflow = {
-  id: string
-  name: string
-  description: string | null
-  steps: WorkflowStep[]
-  isActive: boolean
-  createdBy: string
-  createdAt: string
-  updatedAt: string
-  recentExecutions?: Execution[]
-}
-
-type Execution = {
-  id: string
-  workflowId: string
-  status: 'success' | 'failed'
-  totalDurationMs: number
-  stepSummaries: StepSummary[]
-  triggeredBy: string
-  createdAt: string
-}
-
-type StepSummary = {
-  stepId: string
-  stepName: string
-  status: string
-  output: unknown | null
-  durationMs: number
-  error: string | null
-}
-
-type Suggestion = {
-  id: string
-  reason: string
-  suggestedSteps: WorkflowStep[]
-  status: 'pending' | 'accepted' | 'rejected'
-  createdAt: string
-}
-
-type ListMeta = { page: number; total: number }
+import type { WorkflowStep, Workflow, WorkflowExecution, WorkflowStepSummary, WorkflowSuggestion } from '@corthex/shared'
+import { useWorkflows, useWorkflowDetail, useWorkflowExecutions, useWorkflowSuggestions, useWorkflowMutations } from '../hooks/use-queries'
 
 // === Constants ===
 
@@ -82,7 +24,6 @@ type TabKey = 'workflows' | 'suggestions'
 // === Main Page ===
 
 export function WorkflowsPage() {
-  const queryClient = useQueryClient()
   const [activeTab, setActiveTab] = useState<TabKey>('workflows')
   const [selectedWorkflow, setSelectedWorkflow] = useState<string | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
@@ -91,98 +32,55 @@ export function WorkflowsPage() {
   const [executionsPage, setExecutionsPage] = useState(1)
 
   // --- Queries ---
-  const { data: workflowsData, isLoading } = useQuery({
-    queryKey: ['workflows'],
-    queryFn: () => api.get<{ success: boolean; data: Workflow[]; meta: ListMeta }>('/workspace/workflows?limit=100'),
-  })
-
-  const { data: detailData, isLoading: detailLoading } = useQuery({
-    queryKey: ['workflow-detail', selectedWorkflow],
-    queryFn: () => api.get<{ success: boolean; data: Workflow }>(`/workspace/workflows/${selectedWorkflow}`),
-    enabled: !!selectedWorkflow,
-  })
-
-  const { data: executionsData } = useQuery({
-    queryKey: ['workflow-executions', selectedWorkflow, executionsPage],
-    queryFn: () => api.get<{ success: boolean; data: Execution[]; meta: ListMeta }>(
-      `/workspace/workflows/${selectedWorkflow}/executions?page=${executionsPage}&limit=10`
-    ),
-    enabled: !!selectedWorkflow,
-  })
-
-  const { data: suggestionsData, isLoading: suggestionsLoading } = useQuery({
-    queryKey: ['workflow-suggestions'],
-    queryFn: () => api.get<{ success: boolean; data: Suggestion[]; meta: ListMeta }>('/workspace/workflows/suggestions?limit=100'),
-  })
+  const { data: workflowsData, isLoading } = useWorkflows(1, 100)
+  const { data: detailData, isLoading: detailLoading } = useWorkflowDetail(selectedWorkflow ?? undefined)
+  const { data: executionsData } = useWorkflowExecutions(selectedWorkflow ?? undefined, executionsPage)
+  const { data: suggestionsData, isLoading: suggestionsLoading } = useWorkflowSuggestions()
 
   // --- Mutations ---
-  const createWorkflow = useMutation({
-    mutationFn: (body: { name: string; description?: string; steps: WorkflowStep[] }) =>
-      api.post<{ success: boolean; data: Workflow }>('/workspace/workflows', body),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workflows'] })
-      setShowCreateModal(false)
-      setEditingWorkflow(null)
-      toast.success('워크플로우가 생성되었습니다')
-    },
-    onError: (err: Error) => toast.error(err.message),
-  })
+  const { create: createMutation, update: updateMutation, remove: deleteMutation, execute: executeMutation, acceptSuggestion, rejectSuggestion } = useWorkflowMutations()
 
-  const updateWorkflow = useMutation({
-    mutationFn: ({ id, ...body }: { id: string; name?: string; description?: string; steps?: WorkflowStep[] }) =>
-      api.put<{ success: boolean; data: Workflow }>(`/workspace/workflows/${id}`, body),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workflows'] })
-      queryClient.invalidateQueries({ queryKey: ['workflow-detail', selectedWorkflow] })
-      setShowCreateModal(false)
-      setEditingWorkflow(null)
-      toast.success('워크플로우가 수정되었습니다')
-    },
-    onError: (err: Error) => toast.error(err.message),
-  })
+  const handleCreate = (body: { name: string; description?: string; steps: WorkflowStep[] }) => {
+    createMutation.mutate(body, {
+      onSuccess: () => { setShowCreateModal(false); setEditingWorkflow(null); toast.success('워크플로우가 생성되었습니다') },
+      onError: (err: Error) => toast.error(err.message),
+    })
+  }
 
-  const deleteWorkflow = useMutation({
-    mutationFn: (id: string) => api.delete<{ success: boolean }>(`/workspace/workflows/${id}`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workflows'] })
-      setDeleteTarget(null)
-      if (selectedWorkflow === deleteTarget) setSelectedWorkflow(null)
-      toast.success('워크플로우가 삭제되었습니다')
-    },
-    onError: (err: Error) => toast.error(err.message),
-  })
+  const handleUpdate = (data: { id: string; name?: string; description?: string; steps?: WorkflowStep[] }) => {
+    updateMutation.mutate(data, {
+      onSuccess: () => { setShowCreateModal(false); setEditingWorkflow(null); toast.success('워크플로우가 수정되었습니다') },
+      onError: (err: Error) => toast.error(err.message),
+    })
+  }
 
-  const executeWorkflow = useMutation({
-    mutationFn: (id: string) =>
-      api.post<{ success: boolean; data: { executionId: string; status: string } }>(`/workspace/workflows/${id}/execute`, {}),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workflow-executions', selectedWorkflow] })
-      queryClient.invalidateQueries({ queryKey: ['workflow-detail', selectedWorkflow] })
-      toast.success('워크플로우가 실행되었습니다')
-    },
-    onError: (err: Error) => toast.error(err.message),
-  })
+  const handleDelete = (id: string) => {
+    deleteMutation.mutate(id, {
+      onSuccess: () => { setDeleteTarget(null); if (selectedWorkflow === id) setSelectedWorkflow(null); toast.success('워크플로우가 삭제되었습니다') },
+      onError: (err: Error) => toast.error(err.message),
+    })
+  }
 
-  const acceptSuggestion = useMutation({
-    mutationFn: (id: string) =>
-      api.post<{ success: boolean; data: { workflowId: string } }>(`/workspace/workflows/suggestions/${id}/accept`, {}),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workflow-suggestions'] })
-      queryClient.invalidateQueries({ queryKey: ['workflows'] })
-      toast.success('제안이 수락되었습니다')
-    },
-    onError: (err: Error) => toast.error(err.message),
-  })
+  const handleExecute = (id: string) => {
+    executeMutation.mutate(id, {
+      onSuccess: () => toast.success('워크플로우가 실행되었습니다'),
+      onError: (err: Error) => toast.error(err.message),
+    })
+  }
 
-  const rejectSuggestion = useMutation({
-    mutationFn: (id: string) =>
-      api.post<{ success: boolean }>(`/workspace/workflows/suggestions/${id}/reject`, {}),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workflow-suggestions'] })
-      toast.success('제안이 거절되었습니다')
-    },
-    onError: (err: Error) => toast.error(err.message),
-  })
+  const handleAcceptSuggestion = (id: string) => {
+    acceptSuggestion.mutate(id, {
+      onSuccess: () => toast.success('제안이 수락되었습니다'),
+      onError: (err: Error) => toast.error(err.message),
+    })
+  }
+
+  const handleRejectSuggestion = (id: string) => {
+    rejectSuggestion.mutate(id, {
+      onSuccess: () => toast.success('제안이 거절되었습니다'),
+      onError: (err: Error) => toast.error(err.message),
+    })
+  }
 
   const workflows = workflowsData?.data || []
   const suggestions = suggestionsData?.data || []
@@ -209,7 +107,7 @@ export function WorkflowsPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => { setSelectedWorkflow(null); setExecutionsPage(1) }}
-              className="text-sm text-slate-400 hover:text-slate-200"
+              className="text-sm text-slate-400 hover:text-slate-200 min-h-[44px] flex items-center px-3"
             >
               ← 목록
             </button>
@@ -220,12 +118,12 @@ export function WorkflowsPage() {
           {detail && (
             <div className="flex items-center gap-2">
               <button
-                onClick={() => executeWorkflow.mutate(detail.id)}
-                disabled={executeWorkflow.isPending}
+                onClick={() => handleExecute(detail.id)}
+                disabled={executeMutation.isPending}
                 className="bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50"
                 data-testid="execute-btn"
               >
-                {executeWorkflow.isPending ? '실행 중...' : '실행'}
+                {executeMutation.isPending ? '실행 중...' : '실행'}
               </button>
               <button
                 onClick={() => openEdit(detail)}
@@ -345,7 +243,7 @@ export function WorkflowsPage() {
         {/* Delete confirm */}
         {deleteTarget && (
           <DeleteConfirmModal
-            onConfirm={() => deleteWorkflow.mutate(deleteTarget)}
+            onConfirm={() => handleDelete(deleteTarget)}
             onCancel={() => setDeleteTarget(null)}
           />
         )}
@@ -354,12 +252,12 @@ export function WorkflowsPage() {
         {showCreateModal && (
           <WorkflowFormModal
             workflow={editingWorkflow}
-            isPending={createWorkflow.isPending || updateWorkflow.isPending}
+            isPending={createMutation.isPending || updateMutation.isPending}
             onSubmit={(data) => {
               if (editingWorkflow) {
-                updateWorkflow.mutate({ id: editingWorkflow.id, ...data })
+                handleUpdate({ id: editingWorkflow.id, ...data })
               } else {
-                createWorkflow.mutate(data)
+                handleCreate(data)
               }
             }}
             onClose={() => { setShowCreateModal(false); setEditingWorkflow(null) }}
@@ -430,6 +328,9 @@ export function WorkflowsPage() {
                 <div
                   key={wf.id}
                   onClick={() => setSelectedWorkflow(wf.id)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedWorkflow(wf.id) } }}
                   className="bg-slate-800/50 border border-slate-700 hover:border-slate-600 rounded-xl p-4 cursor-pointer transition-all"
                   data-testid={`workflow-item-${wf.id}`}
                 >
@@ -447,13 +348,13 @@ export function WorkflowsPage() {
                     <div className="flex items-center gap-2 ml-3">
                       <button
                         onClick={(e) => { e.stopPropagation(); openEdit(wf) }}
-                        className="text-xs text-slate-400 hover:text-slate-200"
+                        className="text-xs text-slate-400 hover:text-slate-200 min-h-[44px] px-3 flex items-center"
                       >
                         편집
                       </button>
                       <button
                         onClick={(e) => { e.stopPropagation(); setDeleteTarget(wf.id) }}
-                        className="text-xs text-red-400 hover:text-red-300"
+                        className="text-xs text-red-400 hover:text-red-300 min-h-[44px] px-3 flex items-center"
                       >
                         삭제
                       </button>
@@ -493,16 +394,16 @@ export function WorkflowsPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => acceptSuggestion.mutate(sg.id)}
+                      onClick={() => handleAcceptSuggestion(sg.id)}
                       disabled={acceptSuggestion.isPending}
-                      className="bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg px-3 py-1.5 text-xs font-medium disabled:opacity-50"
+                      className="bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg px-3 py-1.5 text-xs font-medium disabled:opacity-50 min-h-[44px]"
                     >
                       수락
                     </button>
                     <button
-                      onClick={() => rejectSuggestion.mutate(sg.id)}
+                      onClick={() => handleRejectSuggestion(sg.id)}
                       disabled={rejectSuggestion.isPending}
-                      className="border border-slate-600 text-slate-300 hover:bg-slate-800 rounded-lg px-3 py-1.5 text-xs disabled:opacity-50"
+                      className="border border-slate-600 text-slate-300 hover:bg-slate-800 rounded-lg px-3 py-1.5 text-xs disabled:opacity-50 min-h-[44px]"
                     >
                       거절
                     </button>
@@ -520,7 +421,7 @@ export function WorkflowsPage() {
       {/* Delete confirm */}
       {deleteTarget && (
         <DeleteConfirmModal
-          onConfirm={() => deleteWorkflow.mutate(deleteTarget)}
+          onConfirm={() => handleDelete(deleteTarget)}
           onCancel={() => setDeleteTarget(null)}
         />
       )}
@@ -529,12 +430,12 @@ export function WorkflowsPage() {
       {showCreateModal && (
         <WorkflowFormModal
           workflow={editingWorkflow}
-          isPending={createWorkflow.isPending || updateWorkflow.isPending}
+          isPending={createMutation.isPending || updateMutation.isPending}
           onSubmit={(data) => {
             if (editingWorkflow) {
-              updateWorkflow.mutate({ id: editingWorkflow.id, ...data })
+              handleUpdate({ id: editingWorkflow.id, ...data })
             } else {
-              createWorkflow.mutate(data)
+              handleCreate(data)
             }
           }}
           onClose={() => { setShowCreateModal(false); setEditingWorkflow(null) }}
@@ -546,7 +447,7 @@ export function WorkflowsPage() {
 
 // === Execution Card ===
 
-function ExecutionCard({ execution, statusInfo }: { execution: Execution; statusInfo: { label: string; className: string } }) {
+function ExecutionCard({ execution, statusInfo }: { execution: WorkflowExecution; statusInfo: { label: string; className: string } }) {
   const [expanded, setExpanded] = useState(false)
 
   return (
@@ -554,6 +455,9 @@ function ExecutionCard({ execution, statusInfo }: { execution: Execution; status
       <div
         className="px-4 py-3 flex items-center justify-between cursor-pointer hover:bg-slate-800"
         onClick={() => setExpanded(!expanded)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpanded(!expanded) } }}
       >
         <div className="flex items-center gap-3">
           <span className={`text-xs px-2 py-0.5 rounded ${statusInfo.className}`}>{statusInfo.label}</span>
@@ -572,7 +476,7 @@ function ExecutionCard({ execution, statusInfo }: { execution: Execution; status
       </div>
       {expanded && (
         <div className="px-4 py-3 border-t border-slate-800 space-y-2">
-          {(execution.stepSummaries as StepSummary[]).map((step) => (
+          {(execution.stepSummaries as WorkflowStepSummary[]).map((step) => (
             <div key={step.stepId} className="flex items-center justify-between text-xs">
               <div className="flex items-center gap-2">
                 <span className={`w-2 h-2 rounded-full ${step.status === 'completed' || step.status === 'success' ? 'bg-emerald-400' : step.status === 'failed' ? 'bg-red-400' : 'bg-slate-500'}`} />
@@ -596,9 +500,15 @@ function ExecutionCard({ execution, statusInfo }: { execution: Execution; status
 
 function DeleteConfirmModal({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-6 w-96 mx-4" data-testid="delete-confirm-modal">
-        <h3 className="text-sm font-semibold text-slate-100 mb-2">워크플로우 삭제</h3>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="delete-modal-title"
+      onKeyDown={(e) => { if (e.key === 'Escape') onCancel() }}
+    >
+      <div className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-6 w-96 mx-4" tabIndex={-1} data-testid="delete-confirm-modal">
+        <h3 id="delete-modal-title" className="text-sm font-semibold text-slate-100 mb-2">워크플로우 삭제</h3>
         <p className="text-xs text-slate-400 mb-4">이 워크플로우를 삭제하시겠습니까?</p>
         <div className="flex justify-end gap-2">
           <button onClick={onCancel} className="border border-slate-600 rounded-lg px-4 py-2 text-sm text-slate-300 hover:bg-slate-700">취소</button>
@@ -670,7 +580,7 @@ function WorkflowFormModal({ workflow, isPending, onSubmit, onClose }: {
 
   function handleSubmit() {
     if (!name.trim() || steps.length === 0) return
-    const validSteps = steps.filter(s => s.name.trim() && s.action.trim())
+    const validSteps = steps.filter(s => s.name?.trim() && s.action.trim())
     if (validSteps.length === 0) return
     onSubmit({
       name: name.trim(),
@@ -679,16 +589,24 @@ function WorkflowFormModal({ workflow, isPending, onSubmit, onClose }: {
     })
   }
 
-  const isValid = name.trim() && steps.some(s => s.name.trim() && s.action.trim())
+  const isValid = name.trim() && steps.some(s => s.name?.trim() && s.action.trim())
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="workflow-form-modal-title"
+      onKeyDown={(e) => { if (e.key === 'Escape') onClose() }}
+    >
       <div
         className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl max-w-xl w-full mx-4 p-4 sm:p-6 max-h-[85vh] overflow-y-auto"
         onClick={e => e.stopPropagation()}
+        tabIndex={-1}
         data-testid="workflow-form-modal"
       >
-        <h3 className="text-lg font-bold text-slate-50 mb-4">
+        <h3 id="workflow-form-modal-title" className="text-lg font-bold text-slate-50 mb-4">
           {workflow ? '워크플로우 수정' : '워크플로우 생성'}
         </h3>
 
@@ -768,7 +686,7 @@ function WorkflowFormModal({ workflow, isPending, onSubmit, onClose }: {
                 <div className="grid grid-cols-2 gap-2">
                   <input
                     type="text"
-                    value={step.name}
+                    value={step.name || ''}
                     onChange={e => updateStep(idx, { name: e.target.value })}
                     placeholder="단계 이름"
                     className={inputClass}

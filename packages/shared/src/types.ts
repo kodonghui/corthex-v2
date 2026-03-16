@@ -1030,10 +1030,17 @@ export type WorkflowStepType = 'tool' | 'llm' | 'condition'
 
 export type WorkflowStep = {
   id: string
+  name?: string
   type: WorkflowStepType
   action: string
   params?: Record<string, unknown>
+  agentId?: string
   dependsOn?: string[]
+  trueBranch?: string
+  falseBranch?: string
+  systemPrompt?: string
+  timeout?: number
+  retryCount?: number
 }
 
 export type Workflow = {
@@ -1056,6 +1063,33 @@ export type CreateWorkflowRequest = {
 
 export type UpdateWorkflowRequest = Partial<CreateWorkflowRequest> & {
   isActive?: boolean
+}
+
+export type WorkflowExecution = {
+  id: string
+  workflowId: string
+  status: 'success' | 'failed'
+  totalDurationMs: number
+  stepSummaries: WorkflowStepSummary[]
+  triggeredBy: string
+  createdAt: string
+}
+
+export type WorkflowStepSummary = {
+  stepId: string
+  stepName: string
+  status: string
+  output: unknown | null
+  durationMs: number
+  error: string | null
+}
+
+export type WorkflowSuggestion = {
+  id: string
+  reason: string
+  suggestedSteps: WorkflowStep[]
+  status: 'pending' | 'accepted' | 'rejected'
+  createdAt: string
 }
 
 // === Messenger (Epic 19) ===

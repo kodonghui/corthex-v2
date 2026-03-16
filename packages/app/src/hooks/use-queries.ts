@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
-import type { Agent, ArgosStatus, PerformanceSummary } from '@corthex/shared'
+import type { Agent, ArgosStatus, PerformanceSummary, WorkflowStep, Workflow, WorkflowExecution, WorkflowSuggestion } from '@corthex/shared'
 
 // === 1. Agent detail — HIGH priority ===
 
@@ -221,42 +221,6 @@ export function usePerformanceSummary() {
 
 // === 14. Workflows ===
 
-type WorkflowStep = {
-  id: string
-  name: string
-  type: 'tool' | 'llm' | 'condition'
-  action: string
-  params?: Record<string, unknown>
-  agentId?: string
-  dependsOn?: string[]
-  trueBranch?: string
-  falseBranch?: string
-  systemPrompt?: string
-  timeout?: number
-  retryCount?: number
-}
-
-type Workflow = {
-  id: string
-  name: string
-  description: string | null
-  steps: WorkflowStep[]
-  isActive: boolean
-  createdBy: string
-  createdAt: string
-  updatedAt: string
-}
-
-type WorkflowExecution = {
-  id: string
-  workflowId: string
-  status: 'success' | 'failed'
-  totalDurationMs: number
-  stepSummaries: unknown[]
-  triggeredBy: string
-  createdAt: string
-}
-
 type ListMeta = { page: number; total: number }
 
 export function useWorkflows(page = 1, limit = 20) {
@@ -285,7 +249,7 @@ export function useWorkflowExecutions(workflowId: string | undefined, page = 1) 
 export function useWorkflowSuggestions() {
   return useQuery({
     queryKey: ['workflow-suggestions'],
-    queryFn: () => api.get<{ success: boolean; data: { id: string; reason: string; suggestedSteps: WorkflowStep[]; status: string; createdAt: string }[]; meta: ListMeta }>('/workspace/workflows/suggestions?limit=100'),
+    queryFn: () => api.get<{ success: boolean; data: WorkflowSuggestion[]; meta: ListMeta }>('/workspace/workflows/suggestions?limit=100'),
   })
 }
 
@@ -321,5 +285,22 @@ export function useWorkflowMutations() {
     },
   })
 
-  return { create, update, remove, execute }
+  const acceptSuggestion = useMutation({
+    mutationFn: (id: string) =>
+      api.post<{ success: boolean; data: { workflowId: string } }>(`/workspace/workflows/suggestions/${id}/accept`, {}),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['workflow-suggestions'] })
+      queryClient.invalidateQueries({ queryKey: ['workflows'] })
+    },
+  })
+
+  const rejectSuggestion = useMutation({
+    mutationFn: (id: string) =>
+      api.post<{ success: boolean }>(`/workspace/workflows/suggestions/${id}/reject`, {}),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['workflow-suggestions'] })
+    },
+  })
+
+  return { create, update, remove, execute, acceptSuggestion, rejectSuggestion }
 }
