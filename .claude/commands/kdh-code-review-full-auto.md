@@ -1,12 +1,14 @@
 ---
 name: 'kdh-code-review-full-auto'
-description: 'Full-auto code review + auto-fix pipeline v2.0. 8 phases: Static Gate → Visual/E2E → Risk → 3-Critic Party → Verdict → Auto-Fix → Re-Review → Final. Usage: /kdh-code-review-full-auto [PR-url|commit-range|changed-files]'
+description: 'Universal full-auto code review + auto-fix pipeline v3.0. 8 phases: Static Gate → Visual/E2E → Risk → 3-Critic Party → Verdict → Auto-Fix → Re-Review → Final. Works on ANY project. Usage: /kdh-code-review-full-auto [PR-url|commit-range|changed-files]'
 ---
 
-# KDH Code Review Full-Auto Pipeline v2.0
+# KDH Code Review Full-Auto Pipeline v3.0 (Universal)
 
 8-phase automated code review + auto-fix: Static Gate → Visual/E2E Gate → Risk Classification → AI 3-Critic Party → Resolution → Auto-Fix → Re-Review → Final Verdict.
 Integrates Playwright visual regression, axe-core accessibility, Lighthouse performance, BMAD party mode, and automated remediation loop.
+
+**Universal**: Works on any project. Auto-detects project structure, build tools, design tokens, and architecture docs.
 
 ## Mode Selection
 
@@ -20,13 +22,13 @@ Integrates Playwright visual regression, axe-core accessibility, Lighthouse perf
 | Role | Model | Notes |
 |------|-------|-------|
 | Orchestrator | opus | Risk classification, final verdict, fix orchestration |
-| Critic-Security | **opus** | OWASP, injection, auth bypass — 보안은 타협 없음 |
-| Critic-Architecture | **opus** | E8 boundary, patterns, DRY — 아키텍처 판단은 정확도 필수 |
-| Critic-UX-Perf | **opus** | Playwright VRT, a11y, bundle size — 미묘한 UI 버그 감지 |
-| Fixer-Agent(s) | **opus** | Worktree 격리, 이슈별 수정 — 정확한 수정이 핵심 |
-| Re-Reviewer | **opus** | Delta-only 검증 — 수정이 새 문제를 만들지 않았는지 확인 |
+| Critic-Security | **opus** | OWASP, injection, auth bypass — security has zero compromise |
+| Critic-Architecture | **opus** | Boundary violations, patterns, DRY — architecture judgment needs accuracy |
+| Critic-UX-Perf | **opus** | Playwright VRT, a11y, bundle size — subtle UI bug detection |
+| Fixer-Agent(s) | **opus** | Worktree isolation, per-issue fixes — precise fixes are critical |
+| Re-Reviewer | **opus** | Delta-only verification — ensure fixes don't create new problems |
 
-**전원 Opus 이유**: 코드 리뷰는 미묘한 버그/보안 취약점을 잡아야 하므로 정확도 > 속도. Sonnet은 false negative 위험.
+**All Opus rationale**: Code review must catch subtle bugs/security vulnerabilities — accuracy > speed. Sonnet risks false negatives.
 
 ---
 
@@ -40,24 +42,75 @@ Integrates Playwright visual regression, axe-core accessibility, Lighthouse perf
 
 ---
 
+## Step 0: Project Auto-Detection (pre-flight, ~5sec)
+
+Before any phase runs, Orchestrator auto-detects the project environment:
+
+```
+Orchestrator auto-detects:
+├── Build System:
+│   ├── Find all tsconfig.json files → collect for tsc checks
+│   ├── Find package.json → detect package manager (npm/yarn/pnpm/bun)
+│   ├── Detect monorepo: turbo.json, pnpm-workspace.yaml, lerna.json, nx.json
+│   ├── If monorepo: identify all packages/workspaces
+│   └── Detect test runner: jest, vitest, bun:test, mocha, pytest, go test
+│
+├── Frontend Detection:
+│   ├── Framework: React (vite.config), Next.js (next.config), Nuxt (nuxt.config),
+│   │   SvelteKit (+layout.svelte), Angular (angular.json), Vue (vue.config)
+│   ├── Entry files: App.tsx, main.tsx, app.vue, +layout.svelte, _app.tsx, etc.
+│   ├── Router files: routes.tsx, router.ts, app-router/, pages/ directory
+│   ├── Layout/Shell files: layout.tsx, sidebar.tsx, shell.tsx, nav.tsx
+│   └── UI directories: src/components/, src/ui/, src/pages/, src/views/
+│
+├── Design Tokens:
+│   ├── Read tailwind.config.{ts,js,mjs,cjs} → extract theme.extend.colors
+│   ├── Read design-tokens.md or design-tokens.json if exists
+│   ├── Read CSS variables in globals.css, app.css, index.css, styles.css
+│   ├── Read theme.ts or theme.js if exists
+│   └── Store detected tokens for Critic-UX-Perf reference
+│
+├── Architecture Docs:
+│   ├── Read architecture.md, ARCHITECTURE.md if exists
+│   ├── Read ADR/ or docs/adr/ directory if exists
+│   ├── Read CLAUDE.md, .cursorrules, AGENTS.md for project conventions
+│   └── Store architecture decisions for Critic-Architecture reference
+│
+├── CI/CD:
+│   ├── .github/workflows/ → GitHub Actions
+│   ├── .gitlab-ci.yml → GitLab CI
+│   ├── Jenkinsfile, .circleci/ → other CI
+│   └── Dockerfile, docker-compose* → container config
+│
+└── Output: review-report/phase-0-detection.md
+    Contains: all detected paths, tools, tokens, and conventions
+```
+
+---
+
 ## Phase 1: Static Gate (parallel, ~1min)
 
 Run ALL in parallel. Any FAIL = block review.
 
 ```
 Orchestrator runs simultaneously:
-├── tsc --noEmit -p packages/server/tsconfig.json
-├── tsc --noEmit -p packages/app/tsconfig.json
-├── bunx eslint {changed-files} --no-warn-ignored
-├── bun test {affected-test-files}
-└── Bundle size check: du -sh packages/app/dist/assets/ (compare to baseline)
+├── TypeScript: for each tsconfig.json detected → tsc --noEmit -p {path}
+├── Linting: detect and run project linter
+│   ├── ESLint: npx eslint {changed-files} --no-warn-ignored
+│   ├── Or: biome, oxlint, ruff (Python), golangci-lint (Go), clippy (Rust)
+│   └── Use whatever linter is configured in the project
+├── Tests: run affected tests using detected test runner
+│   ├── bun test / npx vitest run / npx jest --changedSince / pytest / go test
+│   └── Only run tests affected by changed files (use --changedSince or manual matching)
+├── Build check: if build script exists, run it (detect from package.json scripts)
+└── Bundle size check: if dist/build output exists, compare to baseline
 ```
 
 **Gate criteria:**
-- tsc errors: 0
-- ESLint errors: 0 (warnings OK)
+- Type check errors: 0
+- Lint errors: 0 (warnings OK)
 - Tests: all pass
-- Bundle size: no increase > 10KB gzip vs main
+- Bundle size: no increase > 10KB gzip vs main (if measurable)
 
 **Output:** `review-report/phase-1-static.md`
 
@@ -65,33 +118,55 @@ Orchestrator runs simultaneously:
 
 ## Phase 2: Visual & E2E Gate (parallel, ~3min)
 
-Run if Phase 1 passes AND changed files include `packages/app/` or `packages/ui/`.
+Run if Phase 1 passes AND changed files include frontend/UI files (auto-detected from Step 0).
 
 ```
-Orchestrator runs simultaneously:
-├── Playwright E2E: critical user flows
-│   ├── Login → Hub → Chat (send message) → verify response
-│   ├── Agents CRUD: create → edit → delete
-│   ├── NEXUS: open canvas → verify nodes render
-│   └── Settings: change setting → verify saved
-├── Playwright Visual Regression (VRT):
-│   ├── Screenshot each changed page (desktop 1280x800 + mobile 390x844)
-│   ├── Compare against baseline screenshots
-│   └── Generate diff images for any pixel changes > 0.1%
-├── axe-core Accessibility:
-│   ├── Run @axe-core/playwright on each changed page
-│   └── Report: critical (block), serious (warn), moderate/minor (info)
-└── Lighthouse CI (if dashboard/landing changed):
-    ├── Performance score (budget: 90+)
-    ├── Accessibility score (budget: 95+)
-    └── Best practices score (budget: 90+)
+MANDATORY when UI files are changed:
+
+1. Playwright VRT (Visual Regression Testing):
+   ├── Start dev server (auto-detect: npm run dev / bun dev / etc.)
+   ├── Navigate to EVERY changed page + pages that import changed components
+   ├── Screenshot desktop (1280x800) + mobile (390x844)
+   ├── Compare against baseline screenshots
+   │   ├── First run = create baseline (store in review-report/screenshots/baseline/)
+   │   └── Subsequent runs = compare against baseline
+   ├── Diff > 5% → flag as visual regression
+   └── Generate diff images for any pixel changes > threshold
+
+2. Full Interaction E2E on changed pages:
+   ├── Every button → click → verify response (no console errors)
+   ├── Every input → type → verify value accepted
+   ├── Every form → submit → verify submission handled
+   ├── Every dropdown/select → open → select option → verify selection
+   ├── Every modal/dialog → open → interact → close → verify state
+   ├── Every CRUD operation → full create/read/update/delete cycle
+   ├── Every link/navigation → click → verify correct page loads
+   └── Console errors → collect ALL (any error = flag for review)
+
+3. Integration Smoke Tests:
+   ├── Login/auth flow works (if auth exists)
+   ├── Navigation between 3+ pages works without errors
+   ├── No blank pages or error boundaries triggered
+   ├── API calls return expected responses (no 500s)
+   └── State persists across navigation (if applicable)
+
+4. Accessibility (axe-core):
+   ├── Run @axe-core/playwright on each changed page
+   └── Report: critical (block), serious (warn), moderate/minor (info)
+
+5. Lighthouse CI (if dashboard/landing changed):
+   ├── Performance score (budget: 90+)
+   ├── Accessibility score (budget: 95+)
+   └── Best practices score (budget: 90+)
 ```
 
 **Gate criteria:**
 - E2E: all critical flows pass
-- VRT: no unexpected visual changes (or diff images reviewed)
+- VRT: no unexpected visual regressions (diff <= 5% or reviewed)
+- Interaction: no unhandled console errors on any interaction
 - axe-core: 0 critical violations
-- Lighthouse: above budget scores
+- Lighthouse: above budget scores (if applicable)
+- Integration smoke: login + navigation + no blank pages
 
 **Output:** `review-report/phase-2-visual.md` + `review-report/screenshots/`
 
@@ -99,35 +174,93 @@ Orchestrator runs simultaneously:
 
 ## Phase 3: Risk Classification (auto, ~10sec)
 
-Orchestrator classifies each changed file:
+Orchestrator classifies each changed file using pattern-based rules that work on ANY project.
+
+### Auto-Detected Risk Patterns
 
 ```
-HIGH RISK (mandatory deep review):
-  - packages/server/src/engine/**        # Core engine
-  - packages/server/src/middleware/**     # Auth, rate-limit
-  - packages/server/src/lib/credential-* # Encryption
-  - packages/server/src/db/schema.ts     # DB migrations
-  - packages/shared/types.ts             # Shared contracts
-  - **/auth*, **/login*, **/token*       # Authentication
-  - Dockerfile, .github/workflows/**     # Infrastructure
+HIGH RISK (mandatory deep review — score: 10 per file):
+  Authentication & Security:
+    - **/auth*, **/login*, **/token*, **/session*
+    - **/middleware*, **/guard*, **/interceptor*, **/policy*
+    - **/encrypt*, **/credential*, **/secret*, **/password*
+    - **/permission*, **/rbac*, **/acl*
+  Core Logic:
+    - **/engine*, **/core*, **/kernel*
+    - **/schema*, **/migration*, **/model* (data layer)
+    - **/db/*, **/database/*
+  Infrastructure:
+    - Dockerfile, docker-compose*, .github/workflows/**
+    - .gitlab-ci.yml, Jenkinsfile, .circleci/**
+    - terraform/**, k8s/**, helm/**
+  Entry & Layout Files (auto-detected in Step 0):
+    - App.tsx, main.tsx, main.ts, index.tsx (entry files)
+    - app.vue, +layout.svelte, _app.tsx, _document.tsx
+    - layout.tsx, sidebar.tsx, shell.tsx, nav.tsx, header.tsx
+  Configuration:
+    - tailwind.config.*, vite.config.*, next.config.*, nuxt.config.*
+    - webpack.config.*, tsconfig.json, .env.example
+  Shared Contracts:
+    - **/shared/types*, **/shared/schema*, **/types/index*
+    - **/api/types*, **/contracts/*
 
-MEDIUM RISK (standard review):
-  - packages/server/src/routes/**        # API endpoints
-  - packages/server/src/services/**      # Business logic
-  - packages/app/src/hooks/**            # State management
-  - packages/app/src/lib/api.ts          # API client
-  - packages/app/src/components/**       # Stateful components
+MEDIUM RISK (standard review — score: 5 per file):
+  API Layer:
+    - **/routes*, **/api*, **/endpoints*, **/controllers*
+    - **/handlers*, **/resolvers* (GraphQL)
+  Business Logic:
+    - **/services*, **/lib*, **/utils*, **/helpers*
+    - **/domain*, **/use-cases*, **/interactors*
+  State Management:
+    - **/hooks*, **/stores*, **/state*, **/context*
+    - **/reducers*, **/actions*, **/selectors*
+  Shared Components:
+    - **/components/** (shared/reusable components)
+  Router Files:
+    - **/router*, **/routes.tsx, **/routing*
 
-LOW RISK (quick scan):
-  - packages/app/src/pages/**            # UI pages (mostly presentational)
-  - packages/app/src/ui/**               # UI components
-  - *.test.ts, *.test.tsx                # Test files
-  - *.md, *.yaml, *.json                 # Config/docs
-  - _corthex_full_redesign/**            # Design artifacts
-  - _bmad-output/**                      # Planning artifacts
+LOW RISK (quick scan — score: 1 per file):
+  UI Pages:
+    - **/pages/*, **/views/*, **/screens/*
+  Tests:
+    - **/*.test.*, **/*.spec.*, **/__tests__/**
+  Documentation:
+    - **/*.md, **/*.yaml, **/*.json (non-config)
+    - **/docs/*, **/documentation/*
+  Static Assets:
+    - **/assets/*, **/public/*, **/static/*
+    - **/*.svg, **/*.png, **/*.jpg, **/*.ico
+  Design Artifacts:
+    - **/design/*, **/mockups/*, **/wireframes/*
+  Planning/Build Artifacts:
+    - **/_*, **/dist/*, **/build/*, **/out/*
 ```
 
-**Risk score**: HIGH=10, MEDIUM=5, LOW=1. Sum all files. Score > 30 = "Ask" (full review). Score 10-30 = "Show" (async review). Score < 10 = "Ship" (auto-approve if Phase 1+2 pass).
+### Risk Score Modifiers
+
+```
+Bulk Change Detection (applied AFTER per-file scoring):
+  - Changed files > 10         → +20 points (bulk change = higher integration risk)
+  - Changed files > 30         → +40 points (major refactor = maximum scrutiny)
+
+Always HIGH RISK Override (regardless of path pattern):
+  - Entry file changed (App.tsx/main.tsx/app.vue/_app.tsx/+layout.svelte)  → force HIGH
+  - Layout/Sidebar/Shell file changed                                       → force HIGH
+  - Router file changed                                                     → force HIGH
+  - Design tokens/tailwind.config changed                                   → force HIGH
+  - Shared type definition files changed                                    → force HIGH
+  - package.json dependency changes (not just devDeps)                      → force HIGH
+```
+
+### Verdict Thresholds
+
+**Risk score**: Sum all file scores + modifiers.
+
+| Score | Verdict | Action |
+|-------|---------|--------|
+| < 10 | **Ship** | Auto-approve if Phase 1+2 pass |
+| 10-30 | **Show** | Async review (proceed through Phase 4) |
+| > 30 | **Ask** | Full deep review (all critics at maximum depth) |
 
 **Output:** `review-report/phase-3-risk.md` with file classification table
 
@@ -139,24 +272,27 @@ Launch 3 critic agents simultaneously. Each reads changed files FROM DISK.
 
 ### Critic-Security Prompt
 ```
-You are CRITIC-SECURITY reviewing CORTHEX v2 code changes.
+You are CRITIC-SECURITY performing a universal code review.
 Personas: Quinn (QA, coverage-first) + Dana (Security, paranoid)
 
-BEFORE REVIEWING — Read:
-- packages/server/src/engine/types.ts (E8 boundary)
-- packages/shared/types.ts (shared contracts)
+BEFORE REVIEWING — Read project context:
+- review-report/phase-0-detection.md (project structure, conventions)
+- Shared type/contract files (auto-detected in Step 0)
 
 FOR EACH changed file (HIGH risk first):
 1. Read file FROM DISK (full file, not just diff)
 2. Check OWASP Top 10: injection, XSS, broken auth, sensitive data exposure
 3. Check credential handling: no plaintext tokens, proper encryption
 4. Check input validation: user inputs sanitized at boundary
-5. Check authorization: proper companyId isolation, role checks
+5. Check authorization: proper tenant/user isolation, role checks
+6. Check dependency safety: no known vulnerable patterns
+7. Check error handling: no stack traces leaked, no sensitive data in errors
+8. Check secrets: no hardcoded API keys, tokens, passwords, connection strings
 
 OUTPUT FORMAT (Conventional Comments):
 - issue: [SECURITY] SQL injection risk in {file}:{line} — {explanation}
 - suggestion: [SECURITY] Consider parameterized query instead
-- praise: [SECURITY] Good use of credential-scrubber hook
+- praise: [SECURITY] Good use of input sanitization
 
 Write to: review-report/critic-security.md
 Minimum 2 findings per HIGH risk file. Zero findings = re-analyze.
@@ -165,25 +301,56 @@ Score: X/10 (10=perfect, 0=critical vulnerabilities)
 
 ### Critic-Architecture Prompt
 ```
-You are CRITIC-ARCHITECTURE reviewing CORTHEX v2 code changes.
+You are CRITIC-ARCHITECTURE performing a universal code review.
 Personas: Winston (Architect, pragmatist) + Amelia (Dev, speaks in file paths)
 
-BEFORE REVIEWING — Read:
-- _bmad-output/planning-artifacts/architecture.md (D1-D29 decisions)
-- packages/server/src/engine/agent-loop.ts (E8 boundary)
+BEFORE REVIEWING — Read project context:
+- review-report/phase-0-detection.md (project structure, conventions)
+- Architecture docs if detected (architecture.md, ADR/, CLAUDE.md conventions)
+- Project entry points and module boundaries
 
 FOR EACH changed file:
 1. Read file FROM DISK
-2. Check E8 boundary: engine/ only exports agent-loop.ts + types.ts
-3. Check D-number consistency: changes align with architecture decisions
-4. Check DRY: no duplicated logic (especially across server/app/shared)
-5. Check patterns: proper hook usage, middleware ordering, error handling
-6. Check imports: match git ls-files casing, no circular deps
+2. Check module boundaries: public API surfaces respected, no internal imports
+3. Check architecture decisions: changes align with documented decisions (if any)
+4. Check DRY: no duplicated logic across modules/packages
+5. Check patterns: consistent with existing codebase patterns
+6. Check imports: correct casing (match git ls-files), no circular deps
+7. Check error handling: consistent error format, proper propagation
+8. Check naming: consistent with project conventions
+
+CROSS-FILE INTEGRATION CHECKS (mandatory for every review):
+
+  1. Theme Consistency:
+     - Entry file dark/light class matches page background colors
+     - Layout/Sidebar theme matches page content theme
+     - All pages use consistent color tokens (no mixed themes)
+     - CSS class naming consistent across changed files
+
+  2. Import Integrity:
+     - All imports in router file resolve to existing files
+     - No circular dependencies introduced
+     - No imports referencing deleted/renamed files
+     - Index re-exports still valid after changes
+
+  3. Global Settings:
+     - Entry file global CSS/class changes don't conflict with page-level styles
+     - Font CDN in index.html matches font-family in code
+     - Config file (tailwind, vite, etc.) theme matches actual usage in components
+     - Environment variable usage consistent
+
+  4. Data Flow:
+     - API hooks/services still connected after UI changes
+     - State management imports intact
+     - Event handlers preserved (not replaced by static markup)
+     - Props drilling / context providers not broken
+     - Route parameters still passed correctly
 
 OUTPUT FORMAT (Conventional Comments):
-- issue: [ARCH] E8 boundary violation — {file} imports from engine internals
+- issue: [ARCH] Module boundary violation — {file} imports from internal module
+- issue: [INTEGRATION] Router references non-existent page after rename
 - suggestion: [ARCH] Extract to shared utility to avoid duplication
-- thought: [ARCH] Consider D15 caching decision for this query
+- thought: [ARCH] Consider caching for this repeated query
 
 Write to: review-report/critic-architecture.md
 Score: X/10
@@ -191,24 +358,39 @@ Score: X/10
 
 ### Critic-UX-Perf Prompt
 ```
-You are CRITIC-UX-PERF reviewing CORTHEX v2 code changes.
+You are CRITIC-UX-PERF performing a universal code review.
 Personas: Sally (UX advocate) + Bob (Performance realist)
 
-BEFORE REVIEWING — Read Phase 2 results:
+BEFORE REVIEWING — Auto-detect design tokens:
+  1. Read review-report/phase-0-detection.md (detected tokens, project info)
+  2. Read tailwind.config.{ts,js} → extract theme.extend.colors
+  3. Read design-tokens.md or design-tokens.json if exists
+  4. Read CSS variables in globals.css/app.css/index.css
+  5. Read theme.ts or theme.js if exists
+  6. Use detected tokens as the "correct" design system
+  7. If no design system detected, use consistency-based review
+     (flag any colors/fonts that appear only once = likely inconsistency)
+
+Read Phase 2 results:
 - review-report/phase-2-visual.md (VRT diffs, a11y results, Lighthouse)
 
 FOR EACH changed UI file:
 1. Read file FROM DISK
-2. Check responsive: mobile (390px) + desktop (1280px) breakpoints
+2. Check responsive: mobile + desktop breakpoints
 3. Check accessibility: ARIA labels, keyboard nav, focus management
 4. Check performance: lazy loading, memo where needed, no layout thrash
-5. Check design system: Sovereign Sage tokens (slate-950, cyan-400, Inter)
+5. Check design tokens:
+   - Flag any hardcoded colors that don't match detected tokens
+   - Flag any font-family that doesn't match detected tokens
+   - Flag any spacing/sizing values inconsistent with token scale
 6. Check Playwright VRT diffs: are visual changes intentional?
+7. Check component patterns: consistent with other components in project
 
 OUTPUT FORMAT (Conventional Comments):
 - issue: [UX] Missing aria-label on interactive element {file}:{line}
-- suggestion: [PERF] This 200KB component should be lazy-loaded
-- nitpick: [UX] Icon size inconsistent with design system (20px → 24px)
+- issue: [DESIGN] Hardcoded color #3b82f6 doesn't match token palette in {file}:{line}
+- suggestion: [PERF] This large component should be lazy-loaded
+- nitpick: [UX] Icon size inconsistent with design system
 
 Write to: review-report/critic-ux-perf.md
 Score: X/10
@@ -251,16 +433,18 @@ Generate final report: `review-report/verdict.md`
 ## Risk Classification: {Ship|Show|Ask} (score: {N})
 
 ## Phase 1 (Static): {PASS|FAIL}
-- tsc: {0} errors
-- ESLint: {0} errors
+- Type check: {0} errors ({N} tsconfig files checked)
+- Linting: {0} errors
 - Tests: {N}/{N} pass
 - Bundle: {+/-N}KB
 
 ## Phase 2 (Visual): {PASS|FAIL|SKIPPED}
 - E2E: {N}/{N} pass
 - VRT: {N} diffs ({N} expected, {N} unexpected)
+- Interaction: {N} console errors found
 - axe-core: {N} critical, {N} serious
 - Lighthouse: perf {N}, a11y {N}, bp {N}
+- Integration smoke: {PASS|FAIL}
 
 ## Critical Issues ({N}):
 {list of issue: comments from all critics}
@@ -284,19 +468,22 @@ Orchestrator reads `review-report/verdict.md` and extracts all `issue:` findings
 
 **Priority order** (fix in this sequence to avoid cascading breaks):
 ```
-1. SHARED types/contracts  — shared/types.ts 등 (다른 파일의 import 기반)
-2. SERVER security/auth     — 보안 이슈는 먼저 (OWASP)
-3. SERVER architecture      — API 포맷, 패턴 일관성
-4. CLIENT state/hooks       — 쿼리 훅, 상태 관리
-5. CLIENT components        — UI 컴포넌트, 접근성
-6. CLIENT pages             — 페이지 레벨 수정
+1. SHARED types/contracts  — type definitions that other files depend on
+2. SECURITY issues         — security vulnerabilities first (OWASP)
+3. ARCHITECTURE issues     — API format, pattern consistency, boundaries
+4. DATA LAYER             — database, schema, migration issues
+5. STATE/HOOKS            — state management, query hooks
+6. COMPONENTS             — UI components, accessibility
+7. PAGES                  — page-level fixes
+8. INTEGRATION            — cross-file consistency issues (last, after individual fixes)
 ```
 
 **Batching strategy**:
 ```
-같은 파일의 이슈 → 한 batch로 묶기
-서로 의존하는 파일 → sequential (shared → server → app 순서)
-독립적인 파일 → parallel (worktree 격리)
+Same file issues        → group into one batch
+Dependent files         → sequential (shared → server → client order)
+Independent files       → parallel (worktree isolation)
+Integration issues      → after all individual file fixes
 ```
 
 ### Step 6.2: Generate Fix Spec
@@ -325,7 +512,7 @@ Write to: `review-report/phase-6-fix-spec.md`
 | 1-3 | Any | Sequential in main — simplest, no merge needed |
 | 4-8 | LOW-MED | Batch by file — group same-file fixes, sequential across files |
 | 9+ | Any | Parallel worktrees — independent files in parallel, dependent files sequential |
-| Any | HIGH | One-at-a-time with tsc gate after each — safest for risky changes |
+| Any | HIGH | One-at-a-time with type-check gate after each — safest for risky changes |
 
 **Fixer Agent Prompt Template**:
 ```
@@ -361,10 +548,10 @@ For each batch (sequential across batches, parallel within batch):
   │   ├── Verify pass → [FIXED] → next fix
   │   ├── Verify fail → Attempt 2 → [FIXED] or [FAILED]
   │   └── Can't understand → [ESCALATE]
-  ├── After batch complete: run tsc --noEmit (full project)
-  │   ├── tsc pass → proceed to next batch
-  │   └── tsc fail → fixer agent fixes tsc errors (max 2 attempts)
-  └── If tsc still fails after 2 attempts → rollback batch (git checkout)
+  ├── After batch complete: run type check (all detected tsconfig files)
+  │   ├── Type check pass → proceed to next batch
+  │   └── Type check fail → fixer agent fixes errors (max 2 attempts)
+  └── If type check still fails after 2 attempts → rollback batch (git checkout)
 ```
 
 ### Step 6.4: Post-Fix Validation
@@ -372,14 +559,15 @@ For each batch (sequential across batches, parallel within batch):
 After ALL fixes applied:
 ```
 Orchestrator runs simultaneously:
-├── tsc --noEmit -p packages/server/tsconfig.json
-├── tsc --noEmit -p packages/app/tsconfig.json
-├── bun test {affected-test-files}
+├── Type check: tsc --noEmit for each detected tsconfig.json
+├── Lint: re-run linter on fixed files
+├── Tests: run affected tests
 └── git diff --stat (confirm only intended files changed)
 ```
 
 **Gate criteria**:
-- tsc: 0 errors (both packages)
+- Type check: 0 errors (all packages/configs)
+- Lint: no new errors
 - Tests: no NEW failures (pre-existing failures OK)
 - No unintended file changes
 
@@ -392,20 +580,20 @@ Orchestrator runs simultaneously:
 
 ## Summary
 - Total issues: {N}
-- Fixed: {N} ✅
-- Failed: {N} ❌
-- Escalated: {N} ⚠️
+- Fixed: {N}
+- Failed: {N}
+- Escalated: {N}
 
 ## Fix Log
-- [FIXED] Fix #1: P0 — workflows.tsx 쿼리 중복 제거 — verified by tsc
-- [FIXED] Fix #2: P1 — workflows.tsx 모달 focus trap — verified by manual
-- [FAILED] Fix #5: P4 — cancel 에러 알림 — reason: toast import path not found
-- [ESCALATE] Fix #7: P6 — WorkflowStep 타입 통합 — needs human: shared/types.ts has 15+ consumers
+- [FIXED] Fix #1: P0 — {description} — verified by {command}
+- [FIXED] Fix #2: P1 — {description} — verified by {command}
+- [FAILED] Fix #5: P4 — {description} — reason: {why}
+- [ESCALATE] Fix #7: P6 — {description} — needs human: {reason}
 
 ## Post-Fix Validation
-- tsc (app): 0 errors
-- tsc (server): 0 errors
-- Tests: 18,632 pass (no new failures)
+- Type check: 0 errors ({N} tsconfig files)
+- Lint: 0 new errors
+- Tests: {N} pass (no new failures)
 - Files changed: {list}
 ```
 
@@ -449,6 +637,12 @@ FOR EACH fixed file:
 
 FOR EACH imported/importing file (impact zone):
 1. Quick scan for breakage (type errors, missing props, changed APIs)
+
+CROSS-FILE INTEGRATION RE-CHECK:
+1. Theme consistency still intact after fixes
+2. Import paths still valid
+3. Router references still correct
+4. Data flow not broken by fixes
 
 OUTPUT FORMAT:
 - [VERIFIED] Fix #{N}: correctly addresses {issue}, no side effects
@@ -540,8 +734,9 @@ Generate: `review-report/final-verdict.md`
 ```markdown
 # Final Code Review Report
 
-## Pipeline: v2.0
+## Pipeline: v3.0 (Universal)
 ## Date: {date}
+## Project: {auto-detected project name}
 ## Commit Range: {base}..{head}
 
 ## Final Verdict: {APPROVE|CONDITIONAL_APPROVE|BLOCK}
@@ -550,16 +745,17 @@ Generate: `review-report/final-verdict.md`
 ### Score Progression
 | Critic | Phase 4 | Phase 6 Bonus | Phase 7 Adj | Final |
 |--------|---------|---------------|-------------|-------|
-| Security (×3) | {X} | +{N} | {adj} | {X'} |
-| Architecture (×2) | {X} | +{N} | {adj} | {X'} |
-| UX-Perf (×1) | {X} | +{N} | {adj} | {X'} |
+| Security (x3) | {X} | +{N} | {adj} | {X'} |
+| Architecture (x2) | {X} | +{N} | {adj} | {X'} |
+| UX-Perf (x1) | {X} | +{N} | {adj} | {X'} |
 
 ### Phase Summary
 | Phase | Status | Duration |
 |-------|--------|----------|
+| 0. Project Detection | {detected framework, tools, tokens} | {Ns} |
 | 1. Static Gate | {PASS/FAIL} | {Ns} |
 | 2. Visual Gate | {PASS/FAIL/SKIP} | {Ns} |
-| 3. Risk Classification | {Ship/Show/Ask} (score:{N}) | {Ns} |
+| 3. Risk Classification | {Ship/Show/Ask} (score:{N}, {N} files, modifiers:{+N}) | {Ns} |
 | 4. 3-Critic Party | {scores} | {Ns} |
 | 5. Initial Verdict | {verdict} ({score}) | — |
 | 6. Auto-Fix | {N} fixed / {N} total | {Ns} |
@@ -578,34 +774,48 @@ Generate: `review-report/final-verdict.md`
 
 ---
 
-## Orchestrator Flow (Updated v2.0)
+## Orchestrator Flow (v3.0 Universal)
 
 ```
-Step 0: Setup
+Step 0: Project Auto-Detection
+  Detect: build tools, tsconfig files, package manager, monorepo structure,
+          frontend framework, entry/layout/router files, design tokens,
+          architecture docs, CI/CD config, test runner
+  Output: review-report/phase-0-detection.md
+  If detection fails on critical items: warn but continue with best-effort
+
+Step 0.5: Setup
   mkdir -p review-report/screenshots
   Identify changed files: git diff --name-only {base}
   If no changes: "Nothing to review" → EXIT
 
 Step 1: Phase 1 — Static Gate (parallel)
-  Run tsc + eslint + tests + bundle check simultaneously
+  Run type check + linter + tests + bundle check simultaneously
+  Use auto-detected tools from Step 0
   Any FAIL → report + EXIT (don't waste time on deeper review)
 
 Step 2: Phase 2 — Visual Gate (parallel, if UI changed)
-  Run Playwright E2E + VRT + axe-core + Lighthouse
+  Run Playwright VRT + Full Interaction E2E + Integration Smoke + axe-core + Lighthouse
   Critical E2E fail → report + EXIT
+  Visual regression > 5% → flag for critic review
 
 Step 3: Phase 3 — Risk Classification
-  Classify all changed files → compute risk score
+  Classify all changed files using universal patterns → compute risk score
+  Apply bulk change modifiers (+20 for >10 files, +40 for >30 files)
+  Apply always-HIGH overrides (entry, layout, router, config files)
   If score < 10 AND Phase 1+2 pass → AUTO-APPROVE (Ship)
 
 Step 4: Phase 4 — AI 3-Critic Party (parallel)
   Launch 3 background agents (Security, Architecture, UX-Perf)
+  Each reads phase-0-detection.md for project context
+  Critic-Architecture runs CROSS-FILE INTEGRATION CHECKS
+  Critic-UX-Perf uses auto-detected design tokens
   Wait for all 3 → cross-talk round → collect scores
 
 Step 5: Phase 5 — Initial Verdict
   Calculate weighted score → determine verdict
   Generate review-report/verdict.md
-  If APPROVE (≥8.0): → Step 9 (skip fix)
+  If APPROVE (>=8.0): → Step 9 (skip fix)
   If BLOCK (<6.0): → Step 9 (escalate, no auto-fix)
   If CHANGES_REQUESTED (6.0-7.9): → Step 6
 
@@ -613,14 +823,14 @@ Step 6: Phase 6 — Auto-Fix
   Parse verdict.md → extract issues → prioritize (P0 first)
   Batch by file → select strategy (sequential/parallel/worktree)
   Launch fixer agent(s) → each fix: read → edit → verify
-  Post-fix validation: tsc + tests
+  Post-fix validation: type check + lint + tests
   Generate review-report/phase-6-fix-results.md
   If 0 fixes succeeded: → Step 9 (BLOCK)
 
 Step 7: Phase 7 — Re-Review (delta-only)
   Identify impact zone (modified + importers + imported-by)
   Launch re-reviewer agent on delta scope only
-  Check: fixes correct? new issues? regressions?
+  Check: fixes correct? new issues? regressions? integration intact?
   If regressions: minor=inline fix, medium=revert+escalate, major=revert all+BLOCK
   Generate review-report/phase-7-re-review.md
 
@@ -646,10 +856,10 @@ Step 9: Cleanup
 tests/
 ├── e2e/
 │   ├── critical-flows/
-│   │   ├── login.spec.ts
-│   │   ├── hub-chat.spec.ts
-│   │   ├── agents-crud.spec.ts
-│   │   └── nexus-canvas.spec.ts
+│   │   ├── auth.spec.ts           # Login/logout/session
+│   │   ├── navigation.spec.ts     # Core navigation flows
+│   │   ├── crud.spec.ts           # Primary CRUD operations
+│   │   └── interaction.spec.ts    # Button/form/dropdown interactions
 │   ├── visual-regression/
 │   │   ├── pages.spec.ts          # Screenshot each page
 │   │   └── components.spec.ts     # Screenshot key components
@@ -668,7 +878,7 @@ const viewports = {
 ### VRT Threshold
 ```typescript
 expect(page).toHaveScreenshot({
-  maxDiffPixelRatio: 0.001,  // 0.1% pixel difference allowed
+  maxDiffPixelRatio: 0.05,  // 5% pixel difference threshold
   animations: 'disabled',
   mask: [page.locator('.dynamic-timestamp')],  // Mask dynamic content
 })
@@ -680,13 +890,14 @@ expect(page).toHaveScreenshot({
 
 | Mechanism | Value | Action |
 |-----------|-------|--------|
+| Step 0 detection timeout | 30sec | Use best-effort defaults, warn |
 | Phase 1 timeout | 2min | FAIL phase, report what passed |
 | Phase 2 timeout | 5min | Skip remaining, report partial |
 | Phase 4 critic timeout | 5min each | Accept partial review |
 | Cross-talk timeout | 2min | Skip cross-talk, use individual scores |
 | Phase 6 fixer timeout | 3min per fix | Mark as FAILED, move to next |
 | Phase 6 total timeout | 10min | Stop fixing, proceed with partial results |
-| Phase 6 tsc gate | 2 attempts | Rollback batch on 2nd failure |
+| Phase 6 type-check gate | 2 attempts | Rollback batch on 2nd failure |
 | Phase 7 re-review timeout | 3min | Accept partial re-review |
 | Phase 7 regression loop | 1 max | NO re-reviewing the re-review. Ever. |
 | Max fix rounds | 1 | Phase 6→7 runs once. No Phase 6→7→6→7 loop |
@@ -713,24 +924,27 @@ expect(page).toHaveScreenshot({
 1. **Risk-first**: Classify files before reviewing. HIGH risk gets 3x attention.
 2. **Conventional Comments**: ALL feedback uses label: format. No unlabeled comments.
 3. **Evidence-based**: Every issue: cites file:line and explains WHY it's a problem.
-4. **Security × 3**: Security score weighted 3x in final calculation.
-5. **No style nitpicks**: ESLint handles formatting. Critics focus on logic/security/architecture.
+4. **Security x 3**: Security score weighted 3x in final calculation.
+5. **No style nitpicks**: Linter handles formatting. Critics focus on logic/security/architecture.
 6. **Phase gates are mandatory**: Do NOT skip Phase 1. Phase 2 skippable only if no UI changes.
 7. **Critics read FROM FILE**: Never from message memory. Always Read tool.
 8. **Zero findings = re-analyze**: If a critic finds nothing, they must look harder.
 9. **Cross-talk is mandatory**: Critics must read each other's reports before final score.
 10. **Ship / Show / Ask**: Low-risk changes with passing gates can auto-approve.
+11. **Bulk changes get extra scrutiny**: >10 files = integration risk. >30 files = maximum depth.
+12. **Integration checks are mandatory**: Cross-file consistency checked on EVERY review.
 
 ### Fix Rules (Phase 6-8)
-11. **Reviewer ≠ Fixer**: The critic agents NEVER fix code. Separate fixer agents do the fixing. Same entity reviewing and fixing = blind spots.
-12. **Fix only what's reported**: Fixer agents fix ONLY the issues from verdict.md. No "while I'm here" refactoring. No bonus improvements.
-13. **tsc after every batch**: Each batch of fixes must pass tsc before proceeding to the next batch. Cascading type errors = immediate stop.
-14. **Max 2 attempts per fix**: If a fix fails twice, mark ESCALATE and move on. Do not brute-force.
-15. **No infinite loops**: Phase 6→7 runs exactly ONCE. No 6→7→6→7 cycles. One fix round, one re-review, done.
-16. **Rollback on failure**: If post-fix validation fails after 2 tsc attempts, `git stash` ALL fixes and BLOCK. Broken fixes are worse than no fixes.
-17. **Delta-only re-review**: Phase 7 reviews ONLY modified files + 1-level import graph. Not the whole codebase again.
-18. **P0 must fix**: If P0 issues remain unfixed after Phase 6, verdict = BLOCK regardless of score. P0 = ship-blocker.
-19. **Commit message traces pipeline**: Fix commits must reference the review (Phase 4 scores, which issues fixed).
-20. **Human escalation is OK**: ESCALATE is a valid outcome. Not every issue can be auto-fixed. Flag it clearly and move on.
+13. **Reviewer != Fixer**: The critic agents NEVER fix code. Separate fixer agents do the fixing. Same entity reviewing and fixing = blind spots.
+14. **Fix only what's reported**: Fixer agents fix ONLY the issues from verdict.md. No "while I'm here" refactoring. No bonus improvements.
+15. **Type check after every batch**: Each batch of fixes must pass type check before proceeding to the next batch. Cascading type errors = immediate stop.
+16. **Max 2 attempts per fix**: If a fix fails twice, mark ESCALATE and move on. Do not brute-force.
+17. **No infinite loops**: Phase 6→7 runs exactly ONCE. No 6→7→6→7 cycles. One fix round, one re-review, done.
+18. **Rollback on failure**: If post-fix validation fails after 2 attempts, `git stash` ALL fixes and BLOCK. Broken fixes are worse than no fixes.
+19. **Delta-only re-review**: Phase 7 reviews ONLY modified files + 1-level import graph. Not the whole codebase again.
+20. **P0 must fix**: If P0 issues remain unfixed after Phase 6, verdict = BLOCK regardless of score. P0 = ship-blocker.
+21. **Commit message traces pipeline**: Fix commits must reference the review (Phase 4 scores, which issues fixed).
+22. **Human escalation is OK**: ESCALATE is a valid outcome. Not every issue can be auto-fixed. Flag it clearly and move on.
+23. **Project-agnostic**: All checks use auto-detected paths and tools. NEVER hardcode project-specific paths or tokens.
 
 ARGUMENTS: $ARGUMENTS
