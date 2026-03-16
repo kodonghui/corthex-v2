@@ -5,16 +5,22 @@ import {
   Modal,
   Button,
   Input,
-  Textarea,
   Skeleton,
   EmptyState,
-  Badge,
   toast,
   Select,
   Toggle,
-  Tabs,
 } from '@corthex/ui'
-import { Plus, Pencil, Trash2, Bot, Eye } from 'lucide-react'
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  Bot,
+  CheckCircle,
+  MessageSquare,
+  Clock,
+  Settings,
+} from 'lucide-react'
 
 // ── Types ──
 
@@ -264,7 +270,7 @@ function AgentForm({
   )
 }
 
-// ── Soul Editor (edit modal, second tab) ──
+// ── Soul Editor (inline detail panel, Soul tab) ──
 
 function SoulEditor({
   agentId,
@@ -373,13 +379,314 @@ function SoulEditor({
   )
 }
 
+// ── Detail Panel Tabs ──
+
+type DetailTab = 'overview' | 'soul' | 'history' | 'settings'
+
+const detailTabItems: { value: DetailTab; label: string }[] = [
+  { value: 'overview', label: '개요' },
+  { value: 'soul', label: 'Soul' },
+  { value: 'history', label: '작업 이력' },
+  { value: 'settings', label: '설정' },
+]
+
+// ── Inline Detail Panel (below cards) ──
+
+function AgentDetailPanel({
+  agent,
+  deptName,
+  departments,
+  users,
+  onEdit,
+  onDelete,
+  onSoulSave,
+  isUpdating,
+}: {
+  agent: Agent
+  deptName: string
+  departments: Department[]
+  users: User[]
+  onEdit: (data: AgentFormData) => void
+  onDelete: () => void
+  onSoulSave: (soul: string) => void
+  isUpdating: boolean
+}) {
+  const [detailTab, setDetailTab] = useState<DetailTab>('overview')
+  const [isEditing, setIsEditing] = useState(false)
+
+  const gradient = tierGradients[agent.tier] || 'from-slate-400 to-slate-600'
+  const badgeColor = tierBadgeColors[agent.tier] || 'bg-slate-800 text-slate-300 border-slate-700'
+  const dotColor = statusDotColors[agent.status] || 'bg-slate-600'
+
+  // Mock activity data (from Stitch design) - in production this would come from API
+  const recentActivities = [
+    {
+      id: '1',
+      icon: 'success' as const,
+      title: '작업 완료',
+      detail: `최근 처리 완료`,
+      time: '방금 전',
+    },
+    {
+      id: '2',
+      icon: 'message' as const,
+      title: '문의 응답',
+      detail: `사용자 대화`,
+      time: '15분 전',
+    },
+    {
+      id: '3',
+      icon: 'success' as const,
+      title: '일정 조율 완료',
+      detail: `자동 처리`,
+      time: '1시간 전',
+    },
+  ]
+
+  const activityIconMap = {
+    success: <CheckCircle className="w-5 h-5" />,
+    message: <MessageSquare className="w-5 h-5" />,
+  }
+
+  const activityColorMap = {
+    success: 'bg-green-900/30 text-green-400',
+    message: 'bg-blue-900/30 text-blue-400',
+  }
+
+  return (
+    <div className="flex flex-col gap-6 p-4">
+      {/* Agent Header */}
+      <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+        <div className="flex items-center gap-6">
+          {/* Large Avatar */}
+          <div className={`w-24 h-24 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-lg relative`}>
+            <Bot className="w-10 h-10 text-white" />
+            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#101f22] rounded-full flex items-center justify-center">
+              <div className={`w-4 h-4 rounded-full ${dotColor}`} />
+            </div>
+          </div>
+          {/* Name + Info */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-3">
+              <h2 className="text-white text-3xl font-bold tracking-tight">{agent.name}</h2>
+              <span className={`px-2.5 py-1 rounded-md text-sm font-mono font-bold border ${badgeColor}`}>
+                {tierShortLabels[agent.tier] || 'T2'}
+              </span>
+            </div>
+            <p className="text-slate-400 text-base font-mono">
+              {deptName} · ID: {agent.id.slice(0, 8).toUpperCase()}
+            </p>
+            <p className="text-slate-300 text-sm max-w-lg mt-1">
+              {agent.role || tierLabels[agent.tier] || '에이전트'} · {agent.modelName}
+            </p>
+          </div>
+        </div>
+        {/* Action Buttons */}
+        <div className="flex gap-3 mt-4 md:mt-0">
+          <button
+            onClick={() => setIsEditing(true)}
+            className="flex items-center justify-center rounded-lg h-10 px-6 bg-slate-800 text-slate-300 text-sm font-bold border border-slate-700 hover:bg-slate-700 transition-colors"
+          >
+            <Pencil className="w-4 h-4 mr-2" />
+            편집
+          </button>
+          <button
+            onClick={onDelete}
+            disabled={agent.isSystem || agent.isSecretary}
+            className="flex items-center justify-center rounded-lg h-10 px-6 bg-red-500/10 text-red-400 text-sm font-bold border border-red-500/20 hover:bg-red-500/20 transition-colors disabled:opacity-30"
+          >
+            <Trash2 className="w-4 h-4 mr-2" />
+            삭제
+          </button>
+        </div>
+      </div>
+
+      {/* Detail Tabs */}
+      <div className="border-b border-slate-800 mt-6">
+        <div className="flex gap-8">
+          {detailTabItems.map((tab) => (
+            <button
+              key={tab.value}
+              onClick={() => setDetailTab(tab.value)}
+              className={`pb-4 border-b-2 text-sm transition-colors ${
+                detailTab === tab.value
+                  ? 'border-cyan-400 text-cyan-400 font-bold'
+                  : 'border-transparent text-slate-400 hover:text-slate-300 font-medium'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Tab Content */}
+      {detailTab === 'overview' && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-6">
+          {/* Activity List */}
+          <div className="lg:col-span-2 flex flex-col gap-4">
+            <h3 className="text-white font-bold text-lg mb-2">최근 활동</h3>
+            <div className="bg-slate-900/50 rounded-xl border border-slate-800 divide-y divide-slate-800">
+              {recentActivities.map((act) => (
+                <div key={act.id} className="p-4 flex items-center justify-between hover:bg-slate-800/50 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-10 h-10 rounded-lg ${activityColorMap[act.icon]} flex items-center justify-center`}>
+                      {activityIconMap[act.icon]}
+                    </div>
+                    <div>
+                      <p className="text-white font-medium text-sm">{act.title}</p>
+                      <p className="text-slate-400 text-xs font-mono mt-1">{act.detail}</p>
+                    </div>
+                  </div>
+                  <span className="text-slate-500 text-xs font-mono">{act.time}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Performance Stats */}
+          <div className="lg:col-span-1 flex flex-col gap-4">
+            <h3 className="text-white font-bold text-lg mb-2">성능 지표</h3>
+            <div className="bg-slate-800 rounded-xl p-6 border border-slate-700 shadow-sm relative overflow-hidden">
+              {/* Subtle background decoration */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-400/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
+              <div className="flex flex-col gap-6 relative z-10">
+                {/* Total Tasks */}
+                <div>
+                  <p className="text-slate-400 text-sm mb-1">총 처리 작업</p>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-mono font-bold tracking-tight text-white">--</span>
+                    <span className="text-cyan-400 text-xs font-mono">데이터 로딩</span>
+                  </div>
+                </div>
+                <div className="w-full h-px bg-slate-700/50" />
+                {/* Success Rate */}
+                <div>
+                  <p className="text-slate-400 text-sm mb-1">작업 성공률</p>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-mono font-bold tracking-tight text-white">--%</span>
+                  </div>
+                  <div className="w-full bg-slate-700 h-1.5 rounded-full mt-3 overflow-hidden">
+                    <div className="bg-cyan-400 h-full rounded-full" style={{ width: '0%' }} />
+                  </div>
+                </div>
+                <div className="w-full h-px bg-slate-700/50" />
+                {/* Cumulative API Cost */}
+                <div>
+                  <p className="text-slate-400 text-sm mb-1">누적 API 비용</p>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-slate-300 font-mono text-lg">$</span>
+                    <span className="text-2xl font-mono font-bold tracking-tight text-white">--</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {detailTab === 'soul' && (
+        <div className="mt-6">
+          <SoulEditor
+            agentId={agent.id}
+            initialSoul={agent.soul ?? ''}
+            onSave={onSoulSave}
+            isSaving={isUpdating}
+          />
+        </div>
+      )}
+
+      {detailTab === 'history' && (
+        <div className="mt-6">
+          <div className="bg-slate-900/50 rounded-xl border border-slate-800 p-8 text-center">
+            <Clock className="w-10 h-10 text-slate-600 mx-auto mb-3" />
+            <p className="text-slate-400 text-sm">작업 이력이 없습니다</p>
+            <p className="text-slate-500 text-xs mt-1">에이전트가 작업을 수행하면 여기에 기록됩니다</p>
+          </div>
+        </div>
+      )}
+
+      {detailTab === 'settings' && (
+        <div className="mt-6 space-y-4">
+          <div className="bg-slate-900/50 rounded-xl border border-slate-800 p-6">
+            <h4 className="text-white font-bold text-sm mb-4 flex items-center gap-2">
+              <Settings className="w-4 h-4 text-slate-400" />
+              에이전트 설정
+            </h4>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between py-2 border-b border-slate-800">
+                <span className="text-slate-400 text-sm">모델</span>
+                <span className="text-white text-sm font-mono">{agent.modelName}</span>
+              </div>
+              <div className="flex items-center justify-between py-2 border-b border-slate-800">
+                <span className="text-slate-400 text-sm">등급</span>
+                <span className="text-white text-sm">{tierLabels[agent.tier] || agent.tier}</span>
+              </div>
+              <div className="flex items-center justify-between py-2 border-b border-slate-800">
+                <span className="text-slate-400 text-sm">자동 학습</span>
+                <span className={`text-sm font-mono ${agent.autoLearn ? 'text-green-400' : 'text-slate-500'}`}>
+                  {agent.autoLearn ? 'ON' : 'OFF'}
+                </span>
+              </div>
+              <div className="flex items-center justify-between py-2 border-b border-slate-800">
+                <span className="text-slate-400 text-sm">비서 에이전트</span>
+                <span className={`text-sm font-mono ${agent.isSecretary ? 'text-cyan-400' : 'text-slate-500'}`}>
+                  {agent.isSecretary ? 'YES' : 'NO'}
+                </span>
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <span className="text-slate-400 text-sm">허용된 도구</span>
+                <span className="text-white text-sm font-mono">
+                  {agent.allowedTools.length > 0 ? `${agent.allowedTools.length}개` : '없음'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Form Modal (inline edit triggers modal) */}
+      {isEditing && (
+        <Modal
+          isOpen={isEditing}
+          onClose={() => setIsEditing(false)}
+          title={`"${agent.name}" 정보 편집`}
+        >
+          <AgentForm
+            initialData={{
+              userId: agent.userId,
+              name: agent.name,
+              nameEn: agent.nameEn ?? '',
+              departmentId: agent.departmentId ?? '',
+              tier: agent.tier,
+              modelName: agent.modelName,
+              role: agent.role ?? '',
+              isSecretary: agent.isSecretary,
+              ownerUserId: agent.ownerUserId ?? '',
+              soul: agent.soul ?? '',
+            }}
+            departments={departments}
+            users={users}
+            onSubmit={(data) => {
+              onEdit(data)
+              setIsEditing(false)
+            }}
+            onCancel={() => setIsEditing(false)}
+            isSubmitting={isUpdating}
+            submitLabel="저장"
+          />
+        </Modal>
+      )}
+    </div>
+  )
+}
+
 // ── Main Page ──
 
 export function AgentsPage() {
   const queryClient = useQueryClient()
   const [createOpen, setCreateOpen] = useState(false)
-  const [editAgent, setEditAgent] = useState<Agent | null>(null)
-  const [editTab, setEditTab] = useState('info')
+  const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null)
   const [deleteAgent, setDeleteAgent] = useState<Agent | null>(null)
   const [filterDept, setFilterDept] = useState('')
   const [filterActive, setFilterActive] = useState<'all' | 'active' | 'inactive'>('active')
@@ -431,8 +738,6 @@ export function AgentsPage() {
       api.patch(`/admin/agents/${id}`, body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-agents'] })
-      setEditAgent(null)
-      setEditTab('info')
       toast.success('에이전트가 수정되었습니다')
     },
     onError: (err: Error) => toast.error(err.message),
@@ -444,6 +749,7 @@ export function AgentsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-agents'] })
       setDeleteAgent(null)
+      setSelectedAgent(null)
       toast.success('에이전트가 비활성화되었습니다')
     },
     onError: (err: Error) => toast.error(err.message),
@@ -470,7 +776,7 @@ export function AgentsPage() {
   }
 
   const handleEdit = (formData: AgentFormData) => {
-    if (!editAgent) return
+    if (!selectedAgent) return
     const body: Record<string, unknown> = {
       name: formData.name,
       tier: formData.tier,
@@ -483,12 +789,12 @@ export function AgentsPage() {
     else body.nameEn = null
     if (formData.role) body.role = formData.role
     else body.role = null
-    updateMutation.mutate({ id: editAgent.id, body })
+    updateMutation.mutate({ id: selectedAgent.id, body })
   }
 
   const handleSoulSave = (soul: string) => {
-    if (!editAgent) return
-    updateMutation.mutate({ id: editAgent.id, body: { soul } })
+    if (!selectedAgent) return
+    updateMutation.mutate({ id: selectedAgent.id, body: { soul } })
   }
 
   // Filter department options
@@ -530,7 +836,7 @@ export function AgentsPage() {
     <div data-testid="agents-page" className="w-full max-w-[960px] mx-auto px-4 md:px-10 py-8">
       {/* Page Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <h1 className="text-slate-50 tracking-tight text-[32px] font-bold leading-tight">에이전트 디렉토리</h1>
+        <h1 className="text-white tracking-tight text-[32px] font-bold leading-tight">에이전트 디렉토리</h1>
         <button
           onClick={() => setCreateOpen(true)}
           className="flex items-center justify-center rounded-lg h-10 px-5 bg-cyan-400 text-slate-900 text-sm font-bold shadow-sm hover:bg-cyan-400/90 transition-colors"
@@ -549,7 +855,7 @@ export function AgentsPage() {
               onClick={() => setFilterActive(f)}
               className={`flex flex-col items-center justify-center border-b-[3px] pb-[13px] pt-4 transition-colors ${
                 filterActive === f
-                  ? 'border-cyan-400 text-slate-50'
+                  ? 'border-cyan-400 text-white'
                   : 'border-transparent text-slate-400 hover:text-slate-300'
               }`}
             >
@@ -582,15 +888,18 @@ export function AgentsPage() {
             const badgeColor = tierBadgeColors[agent.tier] || 'bg-slate-800 text-slate-300 border-slate-700'
             const dotColor = statusDotColors[agent.status] || 'bg-slate-600'
             const deptName = agent.departmentId ? deptMap.get(agent.departmentId) || '부서' : '미배속'
+            const isSelected = selectedAgent?.id === agent.id
 
             return (
               <div
                 key={agent.id}
                 data-testid={`agent-row-${agent.id}`}
-                className={`flex flex-col gap-4 p-5 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-cyan-400/50 transition-colors cursor-pointer group ${
-                  !agent.isActive ? 'opacity-50' : ''
-                }`}
-                onClick={() => { setEditAgent(agent); setEditTab('info') }}
+                className={`flex flex-col gap-4 p-5 rounded-xl bg-slate-900/50 border transition-colors cursor-pointer group ${
+                  isSelected
+                    ? 'border-cyan-400/50'
+                    : 'border-slate-800 hover:border-cyan-400/50'
+                } ${!agent.isActive ? 'opacity-50' : ''}`}
+                onClick={() => setSelectedAgent(isSelected ? null : agent)}
               >
                 {/* Top row: avatar + tier badge */}
                 <div className="flex items-start justify-between">
@@ -604,30 +913,43 @@ export function AgentsPage() {
 
                 {/* Name + department */}
                 <div>
-                  <h3 className="text-slate-50 text-lg font-bold leading-tight group-hover:text-cyan-400 transition-colors">
+                  <h3 className="text-white text-lg font-bold leading-tight group-hover:text-cyan-400 transition-colors">
                     {agent.name}
                   </h3>
                   <p className="text-slate-400 text-sm font-medium mt-1">{deptName}</p>
                 </div>
 
-                {/* Footer: status + badges */}
+                {/* Footer: status + work count badge */}
                 <div className="flex items-center justify-between mt-2 pt-4 border-t border-slate-800">
                   <div className="flex items-center gap-1.5">
                     <div className={`w-2 h-2 rounded-full ${dotColor}`} />
                     <span className="text-slate-300 text-xs font-mono">{statusLabels[agent.status]}</span>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    {agent.isSecretary && <Badge variant="error">비서</Badge>}
-                    {agent.isSystem && <Badge variant="default">SYS</Badge>}
-                    {!agent.isSecretary && !agent.isSystem && (
-                      <span className="text-slate-400 text-xs font-mono">{agent.role || ''}</span>
-                    )}
-                  </div>
+                  <span className="text-slate-400 text-xs font-mono">
+                    {agent.isSecretary ? '비서' : agent.isSystem ? 'SYS' : agent.role || ''}
+                  </span>
                 </div>
               </div>
             )
           })}
         </div>
+      )}
+
+      {/* Divider + Inline Detail Panel */}
+      {selectedAgent && (
+        <>
+          <div className="w-full h-px bg-slate-800 my-8" />
+          <AgentDetailPanel
+            agent={selectedAgent}
+            deptName={selectedAgent.departmentId ? deptMap.get(selectedAgent.departmentId) || '부서' : '미배속'}
+            departments={departmentsList}
+            users={usersList}
+            onEdit={handleEdit}
+            onDelete={() => setDeleteAgent(selectedAgent)}
+            onSoulSave={handleSoulSave}
+            isUpdating={updateMutation.isPending}
+          />
+        </>
       )}
 
       {/* Create Modal */}
@@ -640,85 +962,6 @@ export function AgentsPage() {
           isSubmitting={createMutation.isPending}
           submitLabel="생성"
         />
-      </Modal>
-
-      {/* Edit Modal (Tabs: info + soul) */}
-      <Modal
-        isOpen={!!editAgent}
-        onClose={() => { setEditAgent(null); setEditTab('info') }}
-        title={`"${editAgent?.name}" 에이전트 편집`}
-      >
-        {editAgent && (
-          <div className="space-y-4">
-            {/* Detail header inside modal */}
-            <div className="flex items-center gap-4 pb-4 border-b border-slate-800">
-              <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${tierGradients[editAgent.tier] || 'from-slate-400 to-slate-600'} flex items-center justify-center shadow-lg relative`}>
-                <Bot className="w-7 h-7 text-white" />
-                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-slate-950 rounded-full flex items-center justify-center">
-                  <div className={`w-3 h-3 rounded-full ${statusDotColors[editAgent.status] || 'bg-slate-600'}`} />
-                </div>
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <h2 className="text-slate-50 text-xl font-bold tracking-tight truncate">{editAgent.name}</h2>
-                  <span className={`px-2 py-0.5 rounded text-xs font-mono font-bold border ${tierBadgeColors[editAgent.tier] || 'bg-slate-800 text-slate-300 border-slate-700'}`}>
-                    {tierShortLabels[editAgent.tier] || 'T2'}
-                  </span>
-                </div>
-                <p className="text-slate-400 text-sm font-mono mt-0.5">
-                  {editAgent.departmentId ? deptMap.get(editAgent.departmentId) || '' : '미배속'} · {editAgent.modelName}
-                </p>
-              </div>
-              <button
-                onClick={() => setDeleteAgent(editAgent)}
-                disabled={editAgent.isSystem || editAgent.isSecretary}
-                className="flex items-center justify-center rounded-lg h-9 px-4 bg-red-500/10 text-red-400 text-sm font-bold border border-red-500/20 hover:bg-red-500/20 transition-colors disabled:opacity-30"
-              >
-                <Trash2 className="w-4 h-4 mr-1.5" />
-                삭제
-              </button>
-            </div>
-
-            <Tabs
-              items={[
-                { value: 'info', label: '기본 정보' },
-                { value: 'soul', label: 'Soul 편집' },
-              ]}
-              value={editTab}
-              onChange={setEditTab}
-            />
-            {editTab === 'info' && (
-              <AgentForm
-                initialData={{
-                  userId: editAgent.userId,
-                  name: editAgent.name,
-                  nameEn: editAgent.nameEn ?? '',
-                  departmentId: editAgent.departmentId ?? '',
-                  tier: editAgent.tier,
-                  modelName: editAgent.modelName,
-                  role: editAgent.role ?? '',
-                  isSecretary: editAgent.isSecretary,
-                  ownerUserId: editAgent.ownerUserId ?? '',
-                  soul: editAgent.soul ?? '',
-                }}
-                departments={departmentsList}
-                users={usersList}
-                onSubmit={handleEdit}
-                onCancel={() => { setEditAgent(null); setEditTab('info') }}
-                isSubmitting={updateMutation.isPending}
-                submitLabel="저장"
-              />
-            )}
-            {editTab === 'soul' && (
-              <SoulEditor
-                agentId={editAgent.id}
-                initialSoul={editAgent.soul ?? ''}
-                onSave={handleSoulSave}
-                isSaving={updateMutation.isPending}
-              />
-            )}
-          </div>
-        )}
       </Modal>
 
       {/* Delete Confirmation Modal */}
