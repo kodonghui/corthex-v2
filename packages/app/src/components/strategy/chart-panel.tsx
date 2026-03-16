@@ -2,12 +2,23 @@ import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../../lib/api'
-import { Button, Card, EmptyState, toast } from '@corthex/ui'
+import { Button, EmptyState, toast } from '@corthex/ui'
+import { ArrowUp, ArrowDown } from 'lucide-react'
 import { StockChart, type MarkerData } from './stock-chart'
 import { NotesPanel } from './notes-panel'
 import { ExportDialog } from './export-dialog'
 import { BacktestPanel } from './backtest-panel'
 import type { WatchlistItem } from './types'
+
+type RecentTrade = {
+  time: string
+  type: 'Buy' | 'Sell'
+  price: string
+  amount: string
+}
+
+const TIMEFRAMES = ['1H', '4H', '1D', '1W', '1M'] as const
+type Timeframe = typeof TIMEFRAMES[number]
 
 type PriceData = {
   name: string
@@ -59,6 +70,12 @@ export function ChartPanel() {
   const [backtestOpen, setBacktestOpen] = useState(false)
   const [markers, setMarkers] = useState<MarkerData[]>([])
   const [backtestParams, setBacktestParams] = useState<{ shortPeriod: number; longPeriod: number } | null>(null)
+  const [timeframe, setTimeframe] = useState<Timeframe>('1D')
+  const [recentTrades] = useState<RecentTrade[]>([
+    { time: '14:23:45', type: 'Buy', price: '64,230.50', amount: '0.150' },
+    { time: '14:23:12', type: 'Sell', price: '64,231.00', amount: '0.052' },
+    { time: '14:22:58', type: 'Buy', price: '64,228.75', amount: '1.200' },
+  ])
 
   // Parse backtest URL params for auto-run
   const btType = searchParams.get('bt')
@@ -164,89 +181,151 @@ export function ChartPanel() {
   const changeSign = price && !price.error && price.changeRate > 0 ? '+' : ''
 
   return (
-    <div className="p-4 h-full flex flex-col gap-3 overflow-y-auto">
-      <Card variant="bordered" className="shrink-0">
-        <div className="px-5 py-4">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-baseline gap-2 flex-wrap">
-              <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                {stock.stockName}
-              </h2>
-              <span className="text-sm text-zinc-400">{stock.stockCode}</span>
-              <span className="text-xs px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500">
-                {stock.market}
-              </span>
-            </div>
-            <div className="flex gap-1">
-              <Button size="sm" variant="ghost" onClick={() => setBacktestOpen(!backtestOpen)}>
-                {backtestOpen ? '백테스트 닫기' : '백테스트'}
-              </Button>
-              <Button size="sm" variant="ghost" onClick={shareUrl}>공유</Button>
-              <Button size="sm" variant="ghost" onClick={() => setExportOpen(true)}>내보내기</Button>
-            </div>
+    <div className="h-full flex flex-col overflow-y-auto">
+      {/* Chart Header — Stitch layout */}
+      <div className="flex-none p-6 border-b border-slate-700 flex justify-between items-end">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <h2 className="text-2xl font-bold text-slate-100">{stock.stockName}</h2>
+            <span className="px-2 py-0.5 bg-slate-700 text-xs rounded text-slate-400 font-medium">
+              {stock.market}
+            </span>
           </div>
-
           {price && !price.error && (
-            <div className="mt-2 flex items-baseline gap-3 flex-wrap">
-              <span className="text-2xl font-mono font-bold text-zinc-900 dark:text-zinc-100">
+            <div className="flex items-baseline gap-3">
+              <span className="text-3xl font-mono font-bold text-slate-100">
                 {formatPrice(price.price)}
               </span>
-              <span className={`text-sm font-medium ${changeColor}`}>
+              <span className={`font-mono font-medium flex items-center ${changeColor}`}>
+                {price.changeRate > 0 ? (
+                  <ArrowUp className="w-4 h-4" />
+                ) : price.changeRate < 0 ? (
+                  <ArrowDown className="w-4 h-4" />
+                ) : null}
                 {changeSign}{formatPrice(price.change)} ({changeSign}{price.changeRate.toFixed(2)}%)
               </span>
             </div>
           )}
-
-          {price && !price.error && (
-            <div className="mt-2 flex gap-4 text-xs text-zinc-400">
-              <span>시가 {formatPrice(price.open)}</span>
-              <span>고가 <span className="text-emerald-500">{formatPrice(price.high)}</span></span>
-              <span>저가 <span className="text-red-500">{formatPrice(price.low)}</span></span>
-              <span>거래량 {formatVolume(price.volume)}</span>
-            </div>
-          )}
-
-          <div className="mt-2 flex items-center gap-2 text-xs text-zinc-400">
+          {!price && <div className="text-sm text-slate-400 mt-1">{stock.stockCode}</div>}
+          <div className="mt-2 flex items-center gap-2 text-xs text-slate-400">
             {hasError && (
               <span className="text-amber-500">가격 정보를 불러올 수 없습니다</span>
             )}
             {!hasError && lastUpdated && (
               <span>마지막 갱신: {lastUpdated.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
             )}
-            {!marketOpen && <span className="text-zinc-500">장 마감</span>}
+            {!marketOpen && <span className="text-slate-500">장 마감</span>}
           </div>
         </div>
-      </Card>
+        {/* Timeframe Selectors + Action Buttons */}
+        <div className="flex items-center gap-2">
+          <div className="flex gap-1 bg-slate-900 p-1 rounded border border-slate-700">
+            {TIMEFRAMES.map((tf) => (
+              <button
+                key={tf}
+                onClick={() => setTimeframe(tf)}
+                className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
+                  timeframe === tf
+                    ? 'bg-slate-700 text-white'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                {tf}
+              </button>
+            ))}
+          </div>
+          <div className="flex gap-1 ml-2">
+            <Button size="sm" variant="ghost" onClick={() => setBacktestOpen(!backtestOpen)}>
+              {backtestOpen ? '백테스트 닫기' : '백테스트'}
+            </Button>
+            <Button size="sm" variant="ghost" onClick={shareUrl}>공유</Button>
+            <Button size="sm" variant="ghost" onClick={() => setExportOpen(true)}>내보내기</Button>
+          </div>
+        </div>
+      </div>
 
-      <Card variant="bordered" className="min-h-[240px] h-[40vh]">
+      {/* OHLCV bar */}
+      {price && !price.error && (
+        <div className="flex-none px-6 py-2 border-b border-slate-700/50 flex gap-4 text-xs text-slate-400">
+          <span>시가 {formatPrice(price.open)}</span>
+          <span>고가 <span className="text-emerald-500">{formatPrice(price.high)}</span></span>
+          <span>저가 <span className="text-red-500">{formatPrice(price.low)}</span></span>
+          <span>거래량 {formatVolume(price.volume)}</span>
+        </div>
+      )}
+
+      {/* Chart Area */}
+      <div className="flex-none h-[400px] border-b border-slate-700 relative bg-slate-900/50">
         {chartLoading && (
           <div className="flex items-center justify-center h-full">
-            <p className="text-sm text-zinc-400">차트 로딩 중...</p>
+            <p className="text-sm text-slate-400">차트 로딩 중...</p>
           </div>
         )}
         {!chartLoading && candles.length === 0 && (
           <div className="flex items-center justify-center h-full">
-            <p className="text-sm text-zinc-400">차트 데이터가 없습니다</p>
+            <p className="text-sm text-slate-400">차트 데이터가 없습니다</p>
           </div>
         )}
         {!chartLoading && candles.length > 0 && (
           <StockChart candles={candles} markers={markers} className="w-full h-full" />
         )}
-      </Card>
+      </div>
 
+      {/* Backtest Panel */}
       {backtestOpen && (
-        <BacktestPanel
-          stockCode={stockCode}
-          candles={candles}
-          onMarkers={setMarkers}
-          onParamsChange={setBacktestParams}
-          initialShort={autoBacktest ? spRaw : undefined}
-          initialLong={autoBacktest ? lpRaw : undefined}
-          autoRun={autoBacktest}
-        />
+        <div className="flex-none p-4">
+          <BacktestPanel
+            stockCode={stockCode}
+            candles={candles}
+            onMarkers={setMarkers}
+            onParamsChange={setBacktestParams}
+            initialShort={autoBacktest ? spRaw : undefined}
+            initialLong={autoBacktest ? lpRaw : undefined}
+            autoRun={autoBacktest}
+          />
+        </div>
       )}
 
-      <NotesPanel />
+      {/* Recent Trades Table — Stitch layout */}
+      <div className="flex-1 flex flex-col p-6">
+        <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Recent Trades</h3>
+        <div className="border border-slate-700 rounded bg-slate-900 overflow-hidden">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-slate-700 bg-slate-800/50 text-xs text-slate-400 uppercase tracking-wide">
+                <th className="py-3 px-4 font-medium">Time</th>
+                <th className="py-3 px-4 font-medium">Type</th>
+                <th className="py-3 px-4 font-medium text-right">Price</th>
+                <th className="py-3 px-4 font-medium text-right">Amount</th>
+              </tr>
+            </thead>
+            <tbody className="text-sm font-mono">
+              {recentTrades.map((trade, idx) => (
+                <tr
+                  key={idx}
+                  className={`hover:bg-slate-800 transition-colors ${
+                    idx < recentTrades.length - 1 ? 'border-b border-slate-700/50' : ''
+                  }`}
+                >
+                  <td className="py-2.5 px-4 text-slate-400">{trade.time}</td>
+                  <td className="py-2.5 px-4">
+                    <span className={trade.type === 'Buy' ? 'text-emerald-500' : 'text-red-500'}>
+                      {trade.type}
+                    </span>
+                  </td>
+                  <td className="py-2.5 px-4 text-right text-slate-100">{trade.price}</td>
+                  <td className="py-2.5 px-4 text-right text-slate-100">{trade.amount}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Notes Panel */}
+      <div className="flex-none px-4 pb-4">
+        <NotesPanel />
+      </div>
 
       <ExportDialog
         isOpen={exportOpen}

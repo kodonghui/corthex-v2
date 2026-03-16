@@ -6,6 +6,11 @@ import { EmptyState } from '@corthex/ui'
 import { ChatArea } from '../chat/chat-area'
 import type { Agent } from '../chat/types'
 
+const QUICK_ACTIONS = [
+  'Analyze Trend',
+  'Risk/Reward',
+] as const
+
 type StrategySession = {
   id: string
   agentId: string
@@ -90,8 +95,23 @@ export function ChatPanel() {
   }
 
   return (
-    <div className="h-full border-l border-zinc-200 dark:border-zinc-800 flex flex-col">
-      <ChatArea agent={agent} sessionId={session.id} />
+    <div className="h-full flex flex-col">
+      <div className="flex-1 min-h-0">
+        <ChatArea agent={agent} sessionId={session.id} />
+      </div>
+      {/* Quick Action Buttons — Stitch layout */}
+      <div className="flex-none px-4 pb-3">
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {QUICK_ACTIONS.map((action) => (
+            <button
+              key={action}
+              className="whitespace-nowrap px-3 py-1 bg-slate-700/50 hover:bg-slate-700 text-xs text-slate-400 rounded-full transition-colors border border-slate-700"
+            >
+              {action}
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

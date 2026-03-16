@@ -74,8 +74,8 @@ function SortableStockItem({
   }
 
   const changeColor = priceData
-    ? priceData.changeRate > 0 ? 'text-emerald-500' : priceData.changeRate < 0 ? 'text-red-500' : 'text-zinc-400'
-    : 'text-zinc-400'
+    ? priceData.changeRate > 0 ? 'text-emerald-500' : priceData.changeRate < 0 ? 'text-red-500' : 'text-slate-400'
+    : 'text-slate-400'
 
   return (
     <div
@@ -85,60 +85,62 @@ function SortableStockItem({
       tabIndex={0}
       onClick={onSelect}
       onKeyDown={(e) => e.key === 'Enter' && onSelect()}
-      className={`w-full flex items-center justify-between px-3 py-2.5 text-left text-sm transition-colors min-h-[44px] cursor-pointer ${
+      className={`w-full flex flex-col gap-1 px-4 py-3 text-left text-sm transition-colors cursor-pointer border-l-2 ${
         isCompareActive && isCompareChecked
-          ? 'bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400'
+          ? 'bg-slate-800 border-cyan-400'
           : isSelected
-            ? 'bg-zinc-100 dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400'
-            : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
+            ? 'bg-slate-800 border-cyan-400'
+            : 'border-transparent hover:bg-slate-800'
       }`}
     >
-      <div className="flex items-center gap-2 min-w-0">
-        {!isCompareActive && (
-          <span
-            {...attributes}
-            {...listeners}
-            className="shrink-0 cursor-grab text-zinc-300 dark:text-zinc-600 hover:text-zinc-500 text-xs select-none"
-            onClick={(e) => e.stopPropagation()}
-          >
-            ⠿
-          </span>
-        )}
-        {isCompareActive && (
-          <input
-            type="checkbox"
-            checked={isCompareChecked}
-            readOnly
-            className="accent-indigo-600 shrink-0"
-          />
-        )}
-        <div className="min-w-0 flex-1">
-          <div className="font-medium truncate">{stock.stockName}</div>
-          <div className="text-xs text-zinc-400">{stock.stockCode}</div>
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-2 min-w-0">
+          {!isCompareActive && (
+            <span
+              {...attributes}
+              {...listeners}
+              className="shrink-0 cursor-grab text-slate-600 hover:text-slate-400 text-xs select-none"
+              onClick={(e) => e.stopPropagation()}
+            >
+              ⠿
+            </span>
+          )}
+          {isCompareActive && (
+            <input
+              type="checkbox"
+              checked={isCompareChecked}
+              readOnly
+              className="accent-cyan-400 shrink-0"
+            />
+          )}
+          <span className="font-bold text-sm text-slate-100 truncate">{stock.stockName}</span>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          {priceData && (
+            <span className="font-mono text-sm text-slate-100">
+              {priceData.price.toLocaleString('ko-KR')}
+            </span>
+          )}
+          {!isCompareActive && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                onRemove()
+              }}
+              className="shrink-0 text-slate-500 hover:text-red-500 p-0.5 flex items-center justify-center transition-colors"
+              title="삭제"
+            >
+              x
+            </button>
+          )}
         </div>
       </div>
-      <div className="flex items-center gap-2 shrink-0">
+      <div className="flex justify-between items-center text-xs">
+        <span className="text-slate-400">{stock.stockCode}</span>
         {priceData && (
-          <div className="text-right">
-            <div className="text-xs font-mono text-zinc-700 dark:text-zinc-300">
-              {priceData.price.toLocaleString('ko-KR')}
-            </div>
-            <div className={`text-[10px] font-mono ${changeColor}`}>
-              {priceData.changeRate > 0 ? '+' : ''}{priceData.changeRate.toFixed(2)}%
-            </div>
-          </div>
-        )}
-        {!isCompareActive && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              onRemove()
-            }}
-            className="ml-1 shrink-0 text-zinc-400 hover:text-red-500 p-1 min-w-[28px] min-h-[28px] flex items-center justify-center"
-            title="삭제"
-          >
-            x
-          </button>
+          <span className={`font-mono ${changeColor}`}>
+            {priceData.changeRate > 0 ? '+' : ''}{priceData.changeRate.toFixed(2)}%
+          </span>
         )}
       </div>
     </div>
