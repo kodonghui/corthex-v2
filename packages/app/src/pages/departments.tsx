@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { Modal, ConfirmDialog, Button, Input, Textarea, Skeleton, EmptyState, Badge, toast } from '@corthex/ui'
+import { Plus, Pencil, Trash2, Bot, Building2, ChevronRight } from 'lucide-react'
 
 // ── Types ──
 
@@ -245,12 +246,13 @@ export function DepartmentsPage() {
   // Loading state
   if (isLoading) {
     return (
-      <div data-testid="departments-page" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-4">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-4 w-full" />
-        {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-16 w-full" />
-        ))}
+      <div data-testid="departments-page" className="w-full max-w-[1200px] mx-auto px-6 py-8 space-y-6">
+        <Skeleton className="h-10 w-48" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-52 w-full rounded-xl" />
+          ))}
+        </div>
       </div>
     )
   }
@@ -258,7 +260,7 @@ export function DepartmentsPage() {
   // Error state
   if (isError) {
     return (
-      <div data-testid="departments-page" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div data-testid="departments-page" className="w-full max-w-[1200px] mx-auto px-6 py-8">
         <div className="bg-red-900/20 border border-red-700/50 rounded-xl p-6 text-center">
           <p className="text-sm text-red-400">부서 목록을 불러올 수 없습니다</p>
           <button onClick={() => refetch()} className="text-xs text-red-500 hover:text-red-400 underline mt-2">
@@ -270,19 +272,28 @@ export function DepartmentsPage() {
   }
 
   return (
-    <div data-testid="departments-page" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div data-testid="departments-page" className="w-full max-w-[1200px] mx-auto px-6 py-8">
+      {/* Page Header */}
+      <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
         <div>
-          <h1 className="text-lg sm:text-xl font-bold text-slate-50">부서 관리</h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            {activeDepts.length}개 활성 부서
-            {inactiveDepts.length > 0 && ` · ${inactiveDepts.length}개 비활성`}
+          <h1 className="text-[32px] font-bold leading-tight tracking-tight text-slate-50">부서 관리</h1>
+          <p className="text-slate-400 mt-1">
+            조직의 부서와 할당된 AI 에이전트를 관리합니다.
+            {activeDepts.length > 0 && (
+              <span className="text-slate-500 ml-2">
+                {activeDepts.length}개 활성
+                {inactiveDepts.length > 0 && ` · ${inactiveDepts.length}개 비활성`}
+              </span>
+            )}
           </p>
         </div>
-        <Button size="sm" onClick={() => setCreateOpen(true)}>
-          + 부서 추가
-        </Button>
+        <button
+          onClick={() => setCreateOpen(true)}
+          className="flex items-center justify-center gap-2 rounded-lg h-10 px-4 bg-cyan-400 hover:bg-cyan-400/90 text-slate-900 font-semibold leading-normal transition-colors"
+        >
+          <Plus className="w-5 h-5" />
+          <span>새 부서 추가</span>
+        </button>
       </div>
 
       {/* Empty state */}
@@ -293,45 +304,51 @@ export function DepartmentsPage() {
         />
       )}
 
-      {/* Active departments */}
+      {/* Departments Grid */}
       {activeDepts.length > 0 && (
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
           {activeDepts.map((dept) => (
             <div
               key={dept.id}
               data-testid={`dept-row-${dept.id}`}
-              className="flex flex-col gap-3 bg-slate-900/40 border border-slate-800 rounded-xl p-4 hover:border-cyan-500/30 transition-colors group"
+              className="group flex flex-col bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-cyan-400/50 transition-all cursor-pointer"
+              onClick={() => setEditDept(dept)}
             >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-start gap-3 flex-1 min-w-0">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center">
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-bold text-slate-50 truncate group-hover:text-cyan-400 transition-colors">{dept.name}</h3>
-                      <Badge variant="success">활성</Badge>
-                    </div>
-                    {dept.description && (
-                      <p className="text-xs text-slate-500 mt-1 line-clamp-2">{dept.description}</p>
-                    )}
+              <div className="p-5 flex-1 flex flex-col">
+                {/* Card header: name + icon */}
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-xl font-bold text-slate-50 group-hover:text-cyan-400 transition-colors">{dept.name}</h3>
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-800 text-slate-300">
+                    <Bot className="w-4 h-4" />
                   </div>
                 </div>
-                <div className="flex items-center gap-0.5 shrink-0">
-                  <button
-                    onClick={() => setEditDept(dept)}
-                    className="px-2 sm:px-2.5 py-1.5 text-xs text-slate-500 hover:bg-slate-800 rounded-lg transition-colors"
-                    aria-label={`${dept.name} 편집`}
-                  >
-                    편집
-                  </button>
-                  <button
-                    onClick={() => setDeleteDept(dept)}
-                    className="px-2 sm:px-2.5 py-1.5 text-xs text-red-500 hover:bg-red-900/20 rounded-lg transition-colors"
-                    aria-label={`${dept.name} 삭제`}
-                  >
-                    삭제
-                  </button>
+
+                {/* Description */}
+                <p className="text-sm text-slate-400 mb-6 flex-1 line-clamp-3">
+                  {dept.description || '설명 없음'}
+                </p>
+
+                {/* Footer */}
+                <div className="flex justify-between items-end mt-auto pt-4 border-t border-slate-700">
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-900/30 text-green-400">활성</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setEditDept(dept) }}
+                      className="text-slate-400 hover:text-cyan-400 transition-colors"
+                      aria-label={`${dept.name} 편집`}
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setDeleteDept(dept) }}
+                      className="text-slate-400 hover:text-red-400 transition-colors"
+                      aria-label={`${dept.name} 삭제`}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -341,49 +358,30 @@ export function DepartmentsPage() {
 
       {/* Inactive departments */}
       {inactiveDepts.length > 0 && (
-        <div className="space-y-2">
-          <p className="text-xs font-medium text-slate-500 uppercase tracking-wider px-1">
-            비활성 부서
-          </p>
-          {inactiveDepts.map((dept) => (
-            <div
-              key={dept.id}
-              className="flex items-center justify-between bg-slate-900/50 border border-slate-800 rounded-lg px-4 py-3 opacity-60"
-            >
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-medium text-slate-500 truncate">{dept.name}</h3>
-                  <Badge variant="default">비활성</Badge>
+        <>
+          <div className="w-full h-px bg-slate-800 mb-8" />
+          <div className="space-y-3">
+            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider px-1 mb-3">
+              비활성 부서
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {inactiveDepts.map((dept) => (
+                <div
+                  key={dept.id}
+                  className="flex flex-col bg-slate-900/50 border border-slate-800 rounded-xl overflow-hidden opacity-60 p-5"
+                >
+                  <h3 className="text-lg font-bold text-slate-500 mb-2">{dept.name}</h3>
+                  {dept.description && (
+                    <p className="text-xs text-slate-500 line-clamp-2">{dept.description}</p>
+                  )}
+                  <div className="mt-auto pt-3">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-800 text-slate-400">비활성</span>
+                  </div>
                 </div>
-                {dept.description && (
-                  <p className="text-xs text-slate-500 mt-0.5 truncate">{dept.description}</p>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Summary Bar — mobile-friendly stats */}
-      {departments.length > 0 && (
-        <div className="sm:hidden rounded-xl bg-slate-800/80 border border-slate-700 p-3 px-4">
-          <div className="flex justify-between items-center font-mono text-xs">
-            <div className="flex gap-4">
-              <div className="flex flex-col">
-                <span className="text-slate-500 text-[10px] font-sans uppercase">부서</span>
-                <span className="font-bold text-slate-100">{activeDepts.length}</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-slate-500 text-[10px] font-sans uppercase">비활성</span>
-                <span className="font-bold text-slate-400">{inactiveDepts.length}</span>
-              </div>
-            </div>
-            <div className="flex flex-col text-right">
-              <span className="text-slate-500 text-[10px] font-sans uppercase">전체</span>
-              <span className="font-bold text-slate-100">{departments.length}</span>
+              ))}
             </div>
           </div>
-        </div>
+        </>
       )}
 
       {/* Create Modal */}
