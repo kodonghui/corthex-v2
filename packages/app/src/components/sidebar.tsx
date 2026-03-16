@@ -7,7 +7,7 @@ import {
   LayoutDashboard, Terminal, MessageSquare, TrendingUp, Users,
   Clock, FileText, FolderOpen, Network, Building2, Bot, Layers, Share2,
   Send, DollarSign, History, Shield, Lock, BookOpen, Paintbrush,
-  Settings, BarChart3, Workflow
+  Settings, BarChart3, Workflow, Hexagon,
 } from 'lucide-react'
 
 declare const __BUILD_NUMBER__: string
@@ -95,7 +95,7 @@ function SwitchToAdminButton() {
     <button
       onClick={handleSwitch}
       disabled={switching}
-      className="flex items-center gap-2 w-full px-2 py-2 text-xs font-medium rounded-lg transition-colors text-cyan-300 bg-[rgba(34,211,238,0.10)] hover:bg-[rgba(34,211,238,0.15)]"
+      className="flex items-center gap-2 w-full px-3 py-2 text-xs font-medium rounded-lg transition-colors text-cyan-300 bg-cyan-400/10 hover:bg-cyan-400/15"
     >
       <span>⇄</span>
       <span>{switching ? '전환 중...' : '관리자 콘솔'}</span>
@@ -114,66 +114,71 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
   const unreadCount = countData?.data?.unread ?? 0
 
   return (
-    <aside className="w-[280px] h-full flex flex-col bg-[#020617] border-r border-slate-800">
-      {/* 로고 */}
-      <div className="px-4 h-14 flex items-center">
-        <span className="text-lg font-semibold tracking-tight text-slate-50">CORTHEX</span>
+    <aside className="w-[280px] h-full flex flex-col bg-slate-900 border-r border-slate-800 shrink-0">
+      {/* Brand */}
+      <div className="h-14 flex items-center px-6 border-b border-slate-800 shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded bg-cyan-400/20 flex items-center justify-center text-cyan-400">
+            <Hexagon className="w-5 h-5" />
+          </div>
+          <div className="flex flex-col">
+            <span className="font-bold tracking-widest text-sm leading-tight text-slate-50">CORTHEX</span>
+            <span className="text-[10px] text-slate-400 font-mono uppercase tracking-wider">Management Platform</span>
+          </div>
+        </div>
       </div>
 
-      {/* 네비게이션 */}
-      <nav className="flex-1 px-3 py-2 overflow-y-auto space-y-5">
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto py-4 px-3 flex flex-col gap-6">
         {navSections.map((section, si) => (
-          <div key={si}>
+          <div key={si} className="flex flex-col gap-1">
             {section.label && (
-              <p className="px-3 mb-2 text-[11px] font-medium uppercase tracking-widest text-slate-400">
+              <span className="px-3 text-[11px] font-mono text-slate-400 uppercase tracking-widest mb-1">
                 {section.label}
-              </p>
+              </span>
             )}
-            <div className="space-y-0.5">
-              {section.items.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  end={item.to === '/'}
-                  onClick={onNavClick}
-                  className={({ isActive }) =>
-                    `flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] transition-colors ${
-                      isActive
-                        ? 'bg-[rgba(34,211,238,0.10)] text-cyan-400 font-medium border-l-2 border-cyan-400 pl-[10px]'
-                        : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'
-                    }`
-                  }
-                >
-                  <item.icon className="w-5 h-5 shrink-0" />
-                  <span className="flex-1">{item.label}</span>
-                  {item.to === '/notifications' && unreadCount > 0 && (
-                    <span className="ml-auto px-1.5 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
-                      {unreadCount > 99 ? '99+' : unreadCount}
-                    </span>
-                  )}
-                </NavLink>
-              ))}
-            </div>
+            {section.items.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.to === '/'}
+                onClick={onNavClick}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                    isActive
+                      ? 'bg-cyan-400/10 text-cyan-400 font-medium'
+                      : 'text-slate-400 hover:bg-slate-800 hover:text-slate-50'
+                  }`
+                }
+              >
+                <item.icon className="w-5 h-5 shrink-0" />
+                <span>{item.label}</span>
+                {item.to === '/notifications' && unreadCount > 0 && (
+                  <span className="ml-auto px-1.5 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
+              </NavLink>
+            ))}
           </div>
         ))}
       </nav>
 
-      {/* 유저 정보 */}
-      <div className="px-3 py-3 border-t border-slate-800 space-y-2">
+      {/* User Context */}
+      <div className="p-4 border-t border-slate-800 shrink-0 space-y-2">
         <SwitchToAdminButton />
-        <div className="flex items-center justify-between px-2">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-slate-700 text-slate-300 flex items-center justify-center text-xs font-medium">
-              {user?.name?.charAt(0) || '?'}
-            </div>
-            <div>
-              <p className="text-sm font-medium text-slate-50">{user?.name}</p>
-              <p className="text-xs text-slate-400">{user?.role === 'admin' ? '관리자' : '유저'}</p>
-            </div>
+        <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800 transition-colors">
+          <div className="w-8 h-8 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center text-xs font-medium shrink-0">
+            {user?.name?.charAt(0) || '?'}
+          </div>
+          <div className="flex flex-col flex-1 min-w-0">
+            <span className="text-sm font-medium text-slate-50 truncate">{user?.name}</span>
+            <span className="text-xs text-slate-400 truncate">{user?.role === 'admin' ? 'System Administrator' : 'User'}</span>
           </div>
           <button
             onClick={logout}
-            className="text-xs text-slate-400 hover:text-red-400 transition-colors"
+            className="text-xs text-slate-500 hover:text-red-400 transition-colors shrink-0"
+            aria-label="로그아웃"
           >
             로그아웃
           </button>

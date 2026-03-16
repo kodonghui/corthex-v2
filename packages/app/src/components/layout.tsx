@@ -1,20 +1,63 @@
-import { useState, useEffect, useCallback } from 'react'
-import { Outlet, useLocation } from 'react-router-dom'
+import { useState, useEffect, useCallback, useMemo } from 'react'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { Sidebar } from './sidebar'
 import { useAuthStore } from '../stores/auth-store'
+import { useQuery } from '@tanstack/react-query'
+import { api } from '../lib/api'
 import { ToastProvider } from '@corthex/ui'
 import { NotificationListener } from './notification-listener'
 import { NightJobListener } from './night-job-listener'
 import { BudgetAlertListener } from './budget-alert-listener'
 import { InstallBanner } from './install-banner'
 import { PushPermission } from './push-permission'
-import { Menu } from 'lucide-react'
+import { Menu, ChevronRight, Search, Bell } from 'lucide-react'
+
+const PAGE_NAMES: Record<string, string> = {
+  hub: 'Hub',
+  dashboard: 'Dashboard',
+  chat: 'Chat',
+  nexus: 'NEXUS',
+  sketchvibe: 'SketchVibe',
+  agents: 'Agents',
+  departments: 'Departments',
+  jobs: 'Jobs',
+  tiers: 'Tiers',
+  reports: 'Reports',
+  workflows: 'Workflows',
+  sns: 'SNS',
+  trading: 'Trading',
+  messenger: 'Messenger',
+  knowledge: 'Library',
+  agora: 'AGORA',
+  files: 'Files',
+  costs: 'Costs',
+  performance: 'Performance',
+  'activity-log': 'Activity Log',
+  'ops-log': 'Ops Log',
+  classified: 'Classified',
+  settings: 'Settings',
+  notifications: 'Notifications',
+}
 
 export function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [closing, setClosing] = useState(false)
   const user = useAuthStore((s) => s.user)
   const location = useLocation()
+  const navigate = useNavigate()
+
+  const pageName = useMemo(() => {
+    const segment = location.pathname.split('/').filter(Boolean)[0] || 'hub'
+    return PAGE_NAMES[segment] || segment.charAt(0).toUpperCase() + segment.slice(1)
+  }, [location.pathname])
+
+  const { data: notifData } = useQuery({
+    queryKey: ['notifications-count'],
+    queryFn: () => api.get<{ data: { unread: number } }>('/workspace/notifications/count'),
+    refetchInterval: 30000,
+    enabled: !!user,
+  })
+  const hasUnread = (notifData?.data?.unread ?? 0) > 0
 
   const closeSidebar = useCallback(() => {
     if (!sidebarOpen) return
@@ -59,38 +102,89 @@ export function Layout() {
     <NotificationListener />
     <NightJobListener />
     <BudgetAlertListener />
-    <div className="h-screen flex flex-col lg:flex-row bg-[#020617] text-slate-50">
-      {/* 데스크톱 사이드바 (lg 이상) */}
-      <div className="hidden lg:block border-r border-slate-800">
+    <div className="h-screen flex flex-col lg:flex-row bg-slate-950 text-slate-50">
+      {/* Desktop sidebar */}
+      <div className="hidden lg:block">
         <Sidebar />
       </div>
 
-      {/* 모바일 상단바 (lg 미만) */}
+      {/* Mobile top bar */}
       <header className="lg:hidden flex flex-col sticky top-0 z-30 shrink-0 bg-slate-900 border-b border-slate-800">
         <div className="h-[env(safe-area-inset-top)]" />
         <div className="h-14 flex items-center justify-between px-4">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={openSidebar}
-            className="p-1.5 -ml-1.5 rounded-lg hover:bg-slate-800 transition-colors"
-            aria-label="메뉴 열기"
-          >
-            <Menu className="w-5 h-5 text-slate-400" />
-          </button>
-          <span className="text-lg font-semibold tracking-tight text-slate-50">CORTHEX</span>
-        </div>
-        <div className="w-7 h-7 rounded-full bg-slate-700 text-slate-300 flex items-center justify-center text-xs font-medium">
-          {user?.name?.charAt(0) || '?'}
-        </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={openSidebar}
+              className="p-1.5 -ml-1.5 rounded-lg hover:bg-slate-800 transition-colors"
+              aria-label="메뉴 열기"
+            >
+              <Menu className="w-5 h-5 text-slate-400" />
+            </button>
+            <span className="text-lg font-semibold tracking-tight text-slate-50">CORTHEX</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => navigate('/notifications')}
+              className="relative w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-50 transition-colors"
+              aria-label="알림"
+            >
+              <Bell className="w-5 h-5" />
+              {hasUnread && (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-cyan-400 border-2 border-slate-900" />
+              )}
+            </button>
+            <div className="w-7 h-7 rounded-full bg-slate-700 text-slate-300 flex items-center justify-center text-xs font-medium">
+              {user?.name?.charAt(0) || '?'}
+            </div>
+          </div>
         </div>
       </header>
 
-      {/* 메인 콘텐츠 */}
-      <main className="flex-1 overflow-auto">
-        <Outlet />
-      </main>
+      {/* Main content column */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Desktop top bar */}
+        <header className="hidden lg:flex h-14 items-center justify-between px-6 border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-10 shrink-0">
+          {/* Breadcrumbs */}
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-slate-400 hover:text-slate-50 cursor-pointer transition-colors" onClick={() => navigate('/dashboard')}>CORTHEX</span>
+            <ChevronRight className="w-4 h-4 text-slate-600" />
+            <span className="font-medium text-slate-50">{pageName}</span>
+          </div>
+          {/* Search + Notifications */}
+          <div className="flex items-center gap-4">
+            <div className="relative w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-slate-400" />
+              <input
+                className="w-full bg-slate-900 border border-slate-800 rounded-lg pl-9 pr-16 py-1.5 text-sm focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all placeholder:text-slate-400 text-slate-50 h-8"
+                placeholder="Search..."
+                type="text"
+                readOnly
+              />
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                <kbd className="inline-flex items-center px-1.5 font-mono text-[10px] text-slate-400 bg-slate-800 border border-slate-700 rounded">⌘</kbd>
+                <kbd className="inline-flex items-center px-1.5 font-mono text-[10px] text-slate-400 bg-slate-800 border border-slate-700 rounded">K</kbd>
+              </div>
+            </div>
+            <button
+              onClick={() => navigate('/notifications')}
+              className="relative w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-900 hover:text-slate-50 transition-colors"
+              aria-label="알림"
+            >
+              <Bell className="w-5 h-5" />
+              {hasUnread && (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-cyan-400 border-2 border-slate-950" />
+              )}
+            </button>
+          </div>
+        </header>
 
-      {/* 모바일 사이드바 오버레이 */}
+        {/* Page content */}
+        <main className="flex-1 overflow-auto">
+          <Outlet />
+        </main>
+      </div>
+
+      {/* Mobile sidebar overlay */}
       {(sidebarOpen || closing) && (
         <div className="lg:hidden fixed inset-0 z-40" role="dialog" aria-modal="true">
           <div
