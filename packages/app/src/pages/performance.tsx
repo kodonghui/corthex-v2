@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { Skeleton, SkeletonTable, EmptyState, Modal, ConfirmDialog, toast } from '@corthex/ui'
+import { Bot, CheckCircle, Timer, CreditCard, TrendingUp, TrendingDown, Lightbulb } from 'lucide-react'
 import { api } from '../lib/api'
 import type {
   PerformanceSummary,
@@ -48,96 +49,6 @@ function getPerformanceLevel(successRate: number): string {
   return 'low'
 }
 
-// === Summary Cards ===
-
-function OverallScoreRing({ score }: { score: number }) {
-  const circumference = 2 * Math.PI * 45
-  const offset = circumference - (score / 100) * circumference
-  return (
-    <div className="relative flex h-[80px] w-[80px] items-center justify-center rounded-full bg-slate-900 shadow-[inset_0_0_10px_rgba(34,211,238,0.1)]">
-      <svg className="absolute h-full w-full -rotate-90" viewBox="0 0 100 100">
-        <circle className="stroke-cyan-500/20" cx="50" cy="50" fill="transparent" r="45" strokeWidth="8" />
-        <circle
-          className="stroke-cyan-400 transition-all duration-700"
-          cx="50" cy="50" fill="transparent" r="45"
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          strokeLinecap="round"
-          strokeWidth="8"
-        />
-      </svg>
-      <span className="text-slate-100 font-mono font-bold text-lg z-10">{score}%</span>
-    </div>
-  )
-}
-
-function SummaryCards({ data }: { data: PerformanceSummary }) {
-  const cards = [
-    {
-      icon: '🤖',
-      label: '전체 에이전트',
-      value: `${data.totalAgents}명`,
-      change: data.changes.agents,
-      changeSuffix: '',
-    },
-    {
-      icon: '🎯',
-      label: '평균 성공률',
-      value: `${data.avgSuccessRate}%`,
-      change: data.changes.successRate,
-      changeSuffix: '%',
-    },
-    {
-      icon: '💰',
-      label: '이번 달 비용',
-      value: `$${data.totalCostThisMonth.toFixed(2)}`,
-      change: data.changes.cost,
-      changeSuffix: '',
-    },
-    {
-      icon: '⏱️',
-      label: '평균 응답 시간',
-      value: data.avgResponseTimeMs > 1000
-        ? `${(data.avgResponseTimeMs / 1000).toFixed(1)}s`
-        : `${data.avgResponseTimeMs}ms`,
-      change: data.changes.responseTime,
-      changeSuffix: '',
-    },
-  ]
-
-  return (
-    <div data-testid="summary-cards">
-      {/* Mobile: Overall score ring + 2x2 metric grid */}
-      <div className="flex items-center justify-between rounded-xl bg-cyan-500/5 border border-cyan-500/10 p-5 mb-4 sm:hidden">
-        <div className="flex flex-col gap-1">
-          <p className="text-slate-300 text-sm font-bold">Overall Score</p>
-          <p className="text-cyan-400 text-2xl font-mono font-bold">{data.avgSuccessRate}점</p>
-        </div>
-        <OverallScoreRing score={data.avgSuccessRate} />
-      </div>
-
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {cards.map((card) => (
-          <div key={card.label} className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-            <div className="text-lg mb-1">{card.icon}</div>
-            <div className="text-xs text-slate-400 font-medium">{card.label}</div>
-            <div className="text-xl font-bold text-slate-50 mt-0.5 font-mono">{card.value}</div>
-            <div className="flex items-center gap-1 mt-1">
-              {card.change > 0 ? (
-                <span className="text-[10px] text-emerald-400">↑ +{card.change}{card.changeSuffix}</span>
-              ) : card.change < 0 ? (
-                <span className="text-[10px] text-red-400">↓ {card.change}{card.changeSuffix}</span>
-              ) : (
-                <span className="text-[10px] text-slate-500">— 0</span>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
 // === Performance Badge ===
 
 function PerformanceBadge({ successRate }: { successRate: number }) {
@@ -150,60 +61,101 @@ function PerformanceBadge({ successRate }: { successRate: number }) {
   )
 }
 
-// === Mobile Agent Ranking Bars ===
+// === Tier Badge ===
 
-const RANK_COLORS = [
-  { bg: 'bg-yellow-500/20', text: 'text-yellow-500', barBg: 'bg-cyan-400', cardBg: 'bg-cyan-500/10 border-cyan-500/20' },
-  { bg: 'bg-slate-300/20', text: 'text-slate-300', barBg: 'bg-cyan-400/80', cardBg: 'bg-cyan-500/5 border-cyan-500/10' },
-  { bg: 'bg-orange-400/20', text: 'text-orange-400', barBg: 'bg-cyan-400/60', cardBg: 'bg-cyan-500/5 border-cyan-500/10' },
-]
-
-function MobileAgentRanking({ onSelectAgent }: { onSelectAgent: (id: string) => void }) {
-  const { data: res, isLoading } = useQuery({
-    queryKey: ['performance-agents', 1, 'successRate', 'desc', '', ''],
-    queryFn: () =>
-      api.get<{ data: { items: AgentPerformance[]; page: number; total: number; totalPages: number } }>(
-        '/workspace/performance/agents?page=1&limit=5&sortBy=successRate&sortOrder=desc',
-      ),
-  })
-
-  const items = res?.data?.items ?? []
-
-  if (isLoading || items.length === 0) return null
-
+function TierBadge({ tier }: { tier: number | undefined }) {
+  const t = tier ?? 3
+  const styles = t === 1
+    ? 'bg-indigo-900/30 text-indigo-300 border-indigo-800/50'
+    : t === 2
+      ? 'bg-cyan-400/10 text-cyan-400 border-cyan-400/20'
+      : 'bg-slate-800 text-slate-300 border-slate-700'
   return (
-    <div className="sm:hidden" data-testid="mobile-agent-ranking">
-      <h3 className="text-base font-bold text-slate-100 mb-3">Agent Ranking</h3>
-      <div className="flex flex-col gap-2">
-        {items.slice(0, 5).map((agent, idx) => {
-          const rankStyle = RANK_COLORS[idx] || { bg: 'bg-slate-700', text: 'text-slate-400', barBg: 'bg-slate-500', cardBg: 'bg-transparent border-transparent' }
-          return (
-            <div
-              key={agent.id}
-              onClick={() => onSelectAgent(agent.id)}
-              className={`flex items-center gap-3 rounded-xl p-3 border cursor-pointer transition-colors hover:border-cyan-500/30 ${rankStyle.cardBg}`}
-            >
-              <div className={`flex h-8 w-8 items-center justify-center rounded-full ${rankStyle.bg} ${rankStyle.text} font-bold text-sm`}>
-                {idx + 1}
-              </div>
-              <div className="flex-1">
-                <div className="flex justify-between mb-1">
-                  <span className="text-slate-100 font-medium text-sm">{agent.name}</span>
-                  <span className="text-cyan-400 font-mono text-sm">{agent.successRate}%</span>
-                </div>
-                <div className="h-1.5 w-full rounded-full bg-cyan-500/10 overflow-hidden">
-                  <div className={`h-full ${rankStyle.barBg} rounded-full transition-all`} style={{ width: `${agent.successRate}%` }} />
-                </div>
-              </div>
-            </div>
-          )
-        })}
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium border font-mono ${styles}`}>
+      T{t}
+    </span>
+  )
+}
+
+// === Progress Bar for success rate ===
+
+function SuccessRateBar({ rate }: { rate: number }) {
+  const barColor = rate >= 90 ? 'bg-emerald-500' : rate >= 80 ? 'bg-emerald-500' : rate >= 70 ? 'bg-amber-500' : 'bg-red-500'
+  return (
+    <div className="flex items-center gap-3">
+      <div className="w-24 overflow-hidden rounded-full bg-slate-700 h-1.5">
+        <div className={`h-full rounded-full ${barColor}`} style={{ width: `${rate}%` }} />
       </div>
+      <span className="text-sm font-mono text-slate-300">{rate}%</span>
     </div>
   )
 }
 
-// === Agent Performance Table ===
+// === Summary Cards (Stitch-matching 4-column grid) ===
+
+function SummaryCards({ data }: { data: PerformanceSummary }) {
+  const responseTimeStr = data.avgResponseTimeMs > 1000
+    ? `${(data.avgResponseTimeMs / 1000).toFixed(1)}s`
+    : `${data.avgResponseTimeMs}ms`
+
+  const cards = [
+    {
+      icon: <Bot className="w-5 h-5 text-cyan-400" />,
+      label: 'Total Agents',
+      value: String(data.totalAgents),
+      change: data.changes.agents > 0 ? `+${data.changes.agents} this week` : `${data.changes.agents} this week`,
+      changeColor: data.changes.agents >= 0 ? 'text-emerald-500' : 'text-rose-500',
+      changeIcon: data.changes.agents >= 0 ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />,
+    },
+    {
+      icon: <CheckCircle className="w-5 h-5 text-emerald-500" />,
+      label: 'Avg Success Rate',
+      value: `${data.avgSuccessRate}%`,
+      valueColor: 'text-emerald-500',
+      change: `${data.changes.successRate > 0 ? '+' : ''}${data.changes.successRate}% from last month`,
+      changeColor: data.changes.successRate >= 0 ? 'text-emerald-500' : 'text-rose-500',
+      changeIcon: data.changes.successRate >= 0 ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />,
+    },
+    {
+      icon: <Timer className="w-5 h-5 text-amber-500" />,
+      label: 'Avg Response Time',
+      value: responseTimeStr,
+      change: `${data.changes.responseTime > 0 ? '+' : ''}${data.changes.responseTime}ms improvement`,
+      changeColor: data.changes.responseTime <= 0 ? 'text-emerald-500' : 'text-rose-500',
+      changeIcon: <TrendingDown className="w-3.5 h-3.5 text-emerald-500" />,
+    },
+    {
+      icon: <CreditCard className="w-5 h-5 text-indigo-500" />,
+      label: 'Total Cost',
+      value: `$${data.totalCostThisMonth.toFixed(2)}`,
+      change: data.changes.cost > 0 ? `+$${data.changes.cost.toFixed(2)} vs budget` : `$${data.changes.cost.toFixed(2)} vs budget`,
+      changeColor: data.changes.cost > 0 ? 'text-rose-500' : 'text-emerald-500',
+      changeIcon: data.changes.cost > 0 ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />,
+    },
+  ]
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-testid="summary-cards">
+      {cards.map((card) => (
+        <div key={card.label} className="flex flex-col gap-2 rounded-xl p-6 border border-slate-800 bg-slate-900/40 shadow-sm">
+          <div className="flex justify-between items-center">
+            <p className="text-slate-400 text-sm font-medium leading-normal">{card.label}</p>
+            {card.icon}
+          </div>
+          <p className={`text-3xl font-mono font-bold leading-tight mt-2 tabular-nums ${(card as Record<string, unknown>).valueColor ? String((card as Record<string, unknown>).valueColor) : 'text-slate-50'}`}>
+            {card.value}
+          </p>
+          <div className={`flex items-center gap-1 mt-1 ${card.changeColor}`}>
+            {card.changeIcon}
+            <p className="text-xs font-bold leading-normal">{card.change}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// === Agent Performance Table (Stitch-matching) ===
 
 type SortConfig = { by: string; order: 'asc' | 'desc' }
 
@@ -247,78 +199,10 @@ function AgentPerformanceTable({
     setPage(1)
   }
 
-  const SortableHeader = ({ column, label }: { column: string; label: string }) => (
-    <th
-      className={`text-[11px] font-medium uppercase tracking-wider px-4 py-3 text-left cursor-pointer select-none transition-colors ${
-        sortConfig.by === column ? 'text-slate-300' : 'text-slate-500 hover:text-slate-300'
-      }`}
-      onClick={() => handleSort(column)}
-    >
-      {label}
-      {sortConfig.by === column && (
-        <span className="ml-1">{sortConfig.order === 'asc' ? '↑' : '↓'}</span>
-      )}
-    </th>
-  )
-
-  const activeFilters = [
-    ...(roleFilter ? [{ key: 'role', label: `역할: ${ROLE_LABEL[roleFilter] || roleFilter}` }] : []),
-    ...(levelFilter ? [{ key: 'level', label: `수준: ${PERFORMANCE_BADGE[levelFilter]?.label || levelFilter}` }] : []),
-  ]
-
   return (
-    <div data-testid="agent-performance-table">
-      {/* Filter Bar */}
-      <div className="flex items-center gap-2 mb-3">
-        <select
-          value={roleFilter}
-          onChange={(e) => { setRoleFilter(e.target.value); setPage(1) }}
-          className="bg-slate-800 border border-slate-700 text-xs text-slate-300 rounded-lg px-2 py-1.5"
-          data-testid="role-filter"
-        >
-          <option value="">전체 역할</option>
-          <option value="manager">Manager</option>
-          <option value="specialist">Specialist</option>
-          <option value="worker">Worker</option>
-        </select>
-        <select
-          value={levelFilter}
-          onChange={(e) => { setLevelFilter(e.target.value); setPage(1) }}
-          className="bg-slate-800 border border-slate-700 text-xs text-slate-300 rounded-lg px-2 py-1.5"
-          data-testid="level-filter"
-        >
-          <option value="">전체 수준</option>
-          <option value="high">우수 (≥80%)</option>
-          <option value="mid">보통 (50-79%)</option>
-          <option value="low">개선 필요 (&lt;50%)</option>
-        </select>
-
-        {activeFilters.length > 0 && (
-          <div className="flex gap-1 ml-2">
-            {activeFilters.map((f) => (
-              <span
-                key={f.key}
-                className="bg-blue-500/10 text-blue-400 text-[11px] px-2 py-0.5 rounded-full flex items-center gap-1"
-              >
-                {f.label}
-                <button
-                  onClick={() => {
-                    if (f.key === 'role') setRoleFilter('')
-                    if (f.key === 'level') setLevelFilter('')
-                    setPage(1)
-                  }}
-                  className="hover:text-blue-200"
-                >
-                  ×
-                </button>
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Table */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden">
+    <div className="flex flex-col gap-4 mt-4" data-testid="agent-performance-table">
+      <h2 className="text-slate-50 text-xl font-bold leading-tight">Agent Performance Matrix</h2>
+      <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/60 shadow-sm">
         {isLoading ? (
           <div className="p-4">
             <SkeletonTable rows={5} />
@@ -328,91 +212,209 @@ function AgentPerformanceTable({
             조건에 맞는 에이전트가 없습니다
           </div>
         ) : (
-          <>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-slate-800/80 border-b border-slate-700">
-                    <SortableHeader column="name" label="에이전트" />
-                    <th className="text-[11px] font-medium text-slate-500 uppercase tracking-wider px-4 py-3 text-left">역할</th>
-                    <SortableHeader column="totalCalls" label="호출 수" />
-                    <SortableHeader column="successRate" label="성공률" />
-                    <SortableHeader column="avgCostUsd" label="평균 비용" />
-                    <SortableHeader column="avgResponseTimeMs" label="평균 시간" />
-                    <th className="text-[11px] font-medium text-slate-500 uppercase tracking-wider px-4 py-3 text-left">Soul Gym</th>
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-slate-800/50 border-b border-slate-800">
+                <th
+                  className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider cursor-pointer"
+                  onClick={() => handleSort('name')}
+                >
+                  Agent {sortConfig.by === 'name' && (sortConfig.order === 'asc' ? '↑' : '↓')}
+                </th>
+                <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider hidden sm:table-cell">
+                  Department
+                </th>
+                <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-center">
+                  Tier
+                </th>
+                <th
+                  className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right hidden md:table-cell cursor-pointer"
+                  onClick={() => handleSort('totalCalls')}
+                >
+                  Tasks {sortConfig.by === 'totalCalls' && (sortConfig.order === 'asc' ? '↑' : '↓')}
+                </th>
+                <th
+                  className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider cursor-pointer"
+                  onClick={() => handleSort('successRate')}
+                >
+                  Success Rate {sortConfig.by === 'successRate' && (sortConfig.order === 'asc' ? '↑' : '↓')}
+                </th>
+                <th
+                  className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right cursor-pointer"
+                  onClick={() => handleSort('avgResponseTimeMs')}
+                >
+                  Response {sortConfig.by === 'avgResponseTimeMs' && (sortConfig.order === 'asc' ? '↑' : '↓')}
+                </th>
+                <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right hidden lg:table-cell">
+                  Cost
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800">
+              {items.map((agent) => {
+                const responseTimeStr = agent.avgResponseTimeMs > 1000
+                  ? `${(agent.avgResponseTimeMs / 1000).toFixed(1)}s`
+                  : `${agent.avgResponseTimeMs}ms`
+                const responseColor = agent.avgResponseTimeMs > 3000
+                  ? 'text-rose-500'
+                  : agent.avgResponseTimeMs > 2500
+                    ? 'text-amber-500'
+                    : 'text-slate-400'
+                return (
+                  <tr
+                    key={agent.id}
+                    className="hover:bg-slate-800/30 transition-colors cursor-pointer"
+                    onClick={() => onSelectAgent(agent.id)}
+                    data-testid={`agent-row-${agent.id}`}
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-50">{agent.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400 hidden sm:table-cell">{agent.departmentName}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                      <TierBadge tier={(agent as Record<string, unknown>).tier as number | undefined} />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400 text-right font-mono tabular-nums hidden md:table-cell">
+                      {agent.totalCalls.toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <SuccessRateBar rate={agent.successRate} />
+                    </td>
+                    <td className={`px-6 py-4 whitespace-nowrap text-sm text-right font-mono tabular-nums ${responseColor}`}>
+                      {responseTimeStr}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400 text-right font-mono tabular-nums hidden lg:table-cell">
+                      ${agent.avgCostUsd.toFixed(2)}
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {items.map((agent) => {
-                    const roleBadge = ROLE_BADGE[agent.role] || ROLE_BADGE.worker
-                    return (
-                      <tr
-                        key={agent.id}
-                        className="border-b border-slate-700/30 hover:bg-slate-800/50 cursor-pointer transition-colors"
-                        onClick={() => onSelectAgent(agent.id)}
-                        data-testid={`agent-row-${agent.id}`}
-                      >
-                        <td className="px-4 py-3">
-                          <div className="text-xs font-medium text-slate-200">{agent.name}</div>
-                          <div className="text-[10px] text-slate-500">{agent.departmentName}</div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${roleBadge}`}>
-                            {ROLE_LABEL[agent.role] || agent.role}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-xs text-slate-300 font-mono text-right">{agent.totalCalls}</td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-1">
-                            <PerformanceBadge successRate={agent.successRate} />
-                            <span className="text-xs font-mono ml-1">{agent.successRate}%</span>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-xs text-slate-300 font-mono text-right">${agent.avgCostUsd.toFixed(3)}</td>
-                        <td className="px-4 py-3 text-xs text-slate-300 font-mono text-right">{agent.avgResponseTimeMs}ms</td>
-                        <td className="px-4 py-3">
-                          {agent.soulGymStatus === 'needs-attention' ? (
-                            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse inline-block" />
-                          ) : agent.soulGymStatus === 'has-suggestions' ? (
-                            <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
-                          ) : (
-                            <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
-                          )}
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="px-4 py-3 border-t border-slate-700 flex items-center justify-between">
-                <span className="text-[10px] text-slate-500">총 {total}명</span>
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    const p = i + 1
-                    return (
-                      <button
-                        key={p}
-                        onClick={() => setPage(p)}
-                        className={`w-8 h-8 text-xs rounded-lg transition-colors ${
-                          page === p
-                            ? 'bg-blue-600 text-white'
-                            : 'text-slate-400 hover:bg-slate-700'
-                        }`}
-                      >
-                        {p}
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
-          </>
+                )
+              })}
+            </tbody>
+          </table>
         )}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="px-4 py-3 flex items-center justify-between">
+          <span className="text-[10px] text-slate-500">총 {total}명</span>
+          <div className="flex items-center gap-1">
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              const p = i + 1
+              return (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  className={`w-8 h-8 text-xs rounded-lg transition-colors ${
+                    page === p
+                      ? 'bg-cyan-400/20 text-cyan-400'
+                      : 'text-slate-400 hover:bg-slate-700'
+                  }`}
+                >
+                  {p}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// === Improvement Suggestions (Stitch-matching) ===
+
+function SoulGymPanel() {
+  const queryClient = useQueryClient()
+  const [confirmTarget, setConfirmTarget] = useState<SoulGymSuggestion | null>(null)
+
+  const { data: res, isLoading } = useQuery({
+    queryKey: ['soul-gym-suggestions'],
+    queryFn: () => api.get<{ data: SoulGymSuggestion[] }>('/workspace/performance/soul-gym'),
+  })
+
+  const applyMutation = useMutation({
+    mutationFn: (id: string) =>
+      api.post(`/workspace/performance/soul-gym/${id}/apply`, {}),
+    onSuccess: () => {
+      toast.success('개선 제안이 적용되었습니다')
+      queryClient.invalidateQueries({ queryKey: ['soul-gym-suggestions'] })
+      queryClient.invalidateQueries({ queryKey: ['performance-agents'] })
+      queryClient.invalidateQueries({ queryKey: ['performance-summary'] })
+      setConfirmTarget(null)
+    },
+    onError: () => {
+      toast.error('적용에 실패했습니다')
+      setConfirmTarget(null)
+    },
+  })
+
+  const dismissMutation = useMutation({
+    mutationFn: (id: string) =>
+      api.post(`/workspace/performance/soul-gym/${id}/dismiss`, {}),
+    onSuccess: () => {
+      toast.success('제안을 무시했습니다')
+      queryClient.invalidateQueries({ queryKey: ['soul-gym-suggestions'] })
+    },
+  })
+
+  const suggestions = res?.data ?? []
+
+  return (
+    <div className="flex flex-col gap-4 mt-8 mb-12" data-testid="soul-gym-panel">
+      <h2 className="text-slate-50 text-xl font-bold leading-tight">개선 제안</h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {isLoading ? (
+          Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="rounded-xl p-5 border border-slate-800 bg-slate-900/40">
+              <Skeleton className="h-4 w-40 mb-3" />
+              <Skeleton className="h-12 w-full" />
+            </div>
+          ))
+        ) : suggestions.length === 0 ? (
+          <div className="col-span-3 text-center py-8 text-xs text-slate-500">
+            현재 개선이 필요한 에이전트가 없습니다
+          </div>
+        ) : (
+          suggestions.slice(0, 3).map((s) => {
+            const typeBadge = SUGGESTION_TYPE_BADGE[s.suggestionType] || SUGGESTION_TYPE_BADGE['prompt-improve']
+            return (
+              <div
+                key={s.id}
+                className="flex flex-col gap-3 rounded-xl p-5 border border-slate-800 bg-slate-900/40 hover:bg-slate-800/60 transition-colors cursor-pointer group"
+                onClick={() => setConfirmTarget(s)}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center size-10 rounded-lg bg-cyan-400/10 text-cyan-400">
+                    <Lightbulb className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-slate-50 text-sm font-bold">{s.agentName}</h3>
+                </div>
+                <p className="text-slate-400 text-sm">{s.description}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${typeBadge.className}`}>
+                    {typeBadge.label}
+                  </span>
+                  <span className="text-[10px] text-emerald-400 font-mono">+{s.expectedImprovement}%</span>
+                </div>
+              </div>
+            )
+          })
+        )}
+      </div>
+
+      {/* Confirm dialog */}
+      <ConfirmDialog
+        isOpen={!!confirmTarget}
+        onCancel={() => setConfirmTarget(null)}
+        onConfirm={() => confirmTarget && applyMutation.mutate(confirmTarget.id)}
+        title="Soul Gym 제안 적용"
+        description={
+          confirmTarget
+            ? `${confirmTarget.agentName}에게 '${SUGGESTION_TYPE_LABEL[confirmTarget.suggestionType]}' 제안을 적용하시겠습니까? 이 작업은 에이전트의 설정을 변경합니다.`
+            : ''
+        }
+        confirmText="적용"
+        variant="default"
+      />
     </div>
   )
 }
@@ -471,7 +473,7 @@ function AgentDetailModal({
               ].map((m) => (
                 <div key={m.label} className="bg-slate-900/50 border border-slate-700 rounded-lg p-3 text-center">
                   <div className="text-[10px] text-slate-500 font-medium">{m.label}</div>
-                  <div className="text-sm font-bold text-slate-50 mt-1">{m.value}</div>
+                  <div className="text-sm font-bold text-slate-50 mt-1 font-mono tabular-nums">{m.value}</div>
                 </div>
               ))}
             </div>
@@ -488,7 +490,7 @@ function AgentDetailModal({
                       title={`${day.date}: ${day.successRate}%`}
                     >
                       <div
-                        className="w-full rounded-t bg-blue-500/60 hover:bg-blue-500 transition-colors"
+                        className="w-full rounded-t bg-cyan-400/60 hover:bg-cyan-400 transition-colors"
                         style={{ height: `${Math.max(day.successRate, 2)}%` }}
                       />
                       <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block z-10">
@@ -519,7 +521,7 @@ function AgentDetailModal({
                         <span className="text-[10px] text-slate-400 w-12">{q.label}</span>
                         <div className="flex-1 h-4 bg-slate-700 rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-blue-500/60 rounded-full"
+                            className="h-full bg-cyan-400/60 rounded-full"
                             style={{ width: `${(q.count / maxCount) * 100}%` }}
                           />
                         </div>
@@ -579,154 +581,16 @@ function AgentDetailModal({
   )
 }
 
-// === Soul Gym Panel ===
-
-function SoulGymPanel() {
-  const queryClient = useQueryClient()
-  const [confirmTarget, setConfirmTarget] = useState<SoulGymSuggestion | null>(null)
-
-  const { data: res, isLoading } = useQuery({
-    queryKey: ['soul-gym-suggestions'],
-    queryFn: () => api.get<{ data: SoulGymSuggestion[] }>('/workspace/performance/soul-gym'),
-  })
-
-  const applyMutation = useMutation({
-    mutationFn: (id: string) =>
-      api.post(`/workspace/performance/soul-gym/${id}/apply`, {}),
-    onSuccess: () => {
-      toast.success('개선 제안이 적용되었습니다')
-      queryClient.invalidateQueries({ queryKey: ['soul-gym-suggestions'] })
-      queryClient.invalidateQueries({ queryKey: ['performance-agents'] })
-      queryClient.invalidateQueries({ queryKey: ['performance-summary'] })
-      setConfirmTarget(null)
-    },
-    onError: () => {
-      toast.error('적용에 실패했습니다')
-      setConfirmTarget(null)
-    },
-  })
-
-  const dismissMutation = useMutation({
-    mutationFn: (id: string) =>
-      api.post(`/workspace/performance/soul-gym/${id}/dismiss`, {}),
-    onSuccess: () => {
-      toast.success('제안을 무시했습니다')
-      queryClient.invalidateQueries({ queryKey: ['soul-gym-suggestions'] })
-    },
-  })
-
-  const suggestions = res?.data ?? []
-
-  return (
-    <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden" data-testid="soul-gym-panel">
-      {/* Header */}
-      <div className="px-4 py-3 flex items-center justify-between border-b border-slate-700">
-        <div className="flex items-center gap-2">
-          <span>💪</span>
-          <span className="text-sm font-semibold text-slate-50">Soul Gym 개선 제안</span>
-        </div>
-        {suggestions.length > 0 && (
-          <span className="text-[10px] bg-blue-500/15 text-blue-400 px-2 py-0.5 rounded-full">{suggestions.length}</span>
-        )}
-      </div>
-
-      {/* Body */}
-      <div className="p-4 space-y-3">
-        {isLoading ? (
-          <div className="space-y-3">
-            {[1, 2].map((i) => (
-              <div key={i} className="space-y-2">
-                <Skeleton className="h-4 w-48" />
-                <Skeleton className="h-12 w-full" />
-              </div>
-            ))}
-          </div>
-        ) : suggestions.length === 0 ? (
-          <div className="text-xs text-slate-500 text-center py-6">
-            <div className="mb-1">✨</div>
-            현재 개선이 필요한 에이전트가 없습니다
-          </div>
-        ) : (
-          suggestions.map((s) => {
-            const typeBadge = SUGGESTION_TYPE_BADGE[s.suggestionType] || SUGGESTION_TYPE_BADGE['prompt-improve']
-            return (
-              <div key={s.id} className="bg-slate-900/50 border border-slate-700 rounded-lg p-4">
-                {/* Header */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-slate-200">{s.agentName}</span>
-                    <span className="text-[10px] text-slate-500">현재 {s.currentSuccessRate}%</span>
-                  </div>
-                  <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${typeBadge.className}`}>
-                    {typeBadge.label}
-                  </span>
-                </div>
-
-                {/* Improvement Bar */}
-                <div className="mt-2 flex items-center gap-2">
-                  <span className="text-[10px] text-slate-500">예상 개선</span>
-                  <div className="w-24 h-2 bg-slate-700 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-emerald-500 rounded-full"
-                      style={{ width: `${s.expectedImprovement}%` }}
-                    />
-                  </div>
-                  <span className="text-[10px] text-emerald-400 font-mono">+{s.expectedImprovement}%</span>
-                  <span className="text-[10px] text-slate-500">(신뢰도 {s.confidence}%)</span>
-                </div>
-
-                {/* Description */}
-                <p className="text-xs text-slate-400 mt-2 leading-relaxed">{s.description}</p>
-
-                {/* Actions */}
-                <div className="flex justify-end gap-2 mt-3">
-                  <button
-                    onClick={() => dismissMutation.mutate(s.id)}
-                    className="text-xs text-slate-500 hover:text-slate-300 px-3 py-1.5 rounded-lg hover:bg-slate-700/50"
-                  >
-                    무시
-                  </button>
-                  <button
-                    onClick={() => setConfirmTarget(s)}
-                    className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium px-3 py-1.5 rounded-lg"
-                  >
-                    적용
-                  </button>
-                </div>
-              </div>
-            )
-          })
-        )}
-      </div>
-
-      {/* Confirm dialog */}
-      <ConfirmDialog
-        isOpen={!!confirmTarget}
-        onCancel={() => setConfirmTarget(null)}
-        onConfirm={() => confirmTarget && applyMutation.mutate(confirmTarget.id)}
-        title="Soul Gym 제안 적용"
-        description={
-          confirmTarget
-            ? `${confirmTarget.agentName}에게 '${SUGGESTION_TYPE_LABEL[confirmTarget.suggestionType]}' 제안을 적용하시겠습니까? 이 작업은 에이전트의 설정을 변경합니다.`
-            : ''
-        }
-        confirmText="적용"
-        variant="default"
-      />
-    </div>
-  )
-}
-
 // === Loading Skeleton ===
 
 function PerformanceSkeleton() {
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 space-y-2">
+          <div key={i} className="rounded-xl p-6 border border-slate-800 bg-slate-900/40 space-y-2">
             <Skeleton className="h-3 w-20" />
-            <Skeleton className="h-7 w-16" />
+            <Skeleton className="h-8 w-16" />
             <Skeleton className="h-3 w-32" />
           </div>
         ))}
@@ -845,7 +709,6 @@ function QualityTrendChart({ data }: { data: TrendItem[] }) {
   return (
     <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 mt-4" data-testid="quality-trend-chart">
       <div className="text-xs font-medium text-slate-300 mb-3">품질 추이</div>
-      {/* Legend */}
       <div className="flex items-center gap-4 mb-2">
         <div className="flex items-center gap-1.5 text-[10px]">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
@@ -856,7 +719,6 @@ function QualityTrendChart({ data }: { data: TrendItem[] }) {
           <span className="text-slate-400">실패</span>
         </div>
       </div>
-      {/* Chart */}
       <div className="flex items-end gap-1 h-40">
         {data.map((day) => {
           const total = day.passCount + day.failCount
@@ -1014,7 +876,7 @@ function QualityFailedList({ data }: { data: FailedItem[] }) {
         <div className="px-4 py-3 border-b border-slate-700">
           <span className="text-xs font-medium text-slate-300">최근 실패 리뷰</span>
         </div>
-        <div className="text-xs text-slate-500 text-center py-6">실패한 리뷰가 없습니다 ✨</div>
+        <div className="text-xs text-slate-500 text-center py-6">실패한 리뷰가 없습니다</div>
       </div>
     )
   }
@@ -1103,7 +965,6 @@ function QualityDashboardTab() {
 
   return (
     <div className="space-y-0" data-testid="quality-dashboard">
-      {/* Controls */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex bg-slate-800/50 rounded-lg p-0.5">
           {(['7d', '30d', 'all'] as const).map((p) => (
@@ -1163,30 +1024,12 @@ export function PerformancePage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-50" data-testid="performance-page">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        {/* Header */}
-        <div className="mb-2">
-          <h1 className="text-lg sm:text-xl font-bold text-slate-50">전력분석</h1>
-          <p className="text-sm text-slate-400 mt-1">에이전트 성능 분석, Soul Gym 개선 제안, 품질 대시보드</p>
-        </div>
-
-        {/* Tab Bar */}
-        <div className="flex bg-slate-800/50 border border-slate-700 rounded-xl p-1 mb-6" data-testid="tab-bar">
-          {(['agent', 'quality'] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`flex-1 text-center text-sm py-2.5 rounded-lg transition-colors font-medium cursor-pointer ${
-                activeTab === tab
-                  ? 'bg-slate-700 text-slate-50 shadow-sm'
-                  : 'text-slate-400 hover:text-slate-300'
-              }`}
-              data-testid={`tab-${tab}`}
-            >
-              {tab === 'agent' ? '에이전트 성능' : '품질 대시보드'}
-            </button>
-          ))}
+    <div className="min-h-screen bg-slate-950 text-slate-50" data-testid="performance-page">
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-8 lg:px-16 py-6">
+        {/* Page Header */}
+        <div className="flex flex-col gap-2 mb-8">
+          <h1 className="text-slate-50 text-[32px] font-bold leading-tight tracking-tight">전력분석</h1>
+          <p className="text-slate-400 text-sm font-normal leading-normal">에이전트 성능 대시보드</p>
         </div>
 
         {/* Tab Content */}
@@ -1203,8 +1046,6 @@ export function PerformancePage() {
             ) : (
               <div className="space-y-6">
                 {summary && <SummaryCards data={summary} />}
-                {/* Mobile Agent Ranking Bars — shown only on small screens */}
-                <MobileAgentRanking onSelectAgent={(id) => setSelectedAgentId(id)} />
                 <AgentPerformanceTable onSelectAgent={(id) => setSelectedAgentId(id)} />
                 <SoulGymPanel />
               </div>

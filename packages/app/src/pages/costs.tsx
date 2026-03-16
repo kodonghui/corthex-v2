@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
+import { TrendingUp, TrendingDown } from 'lucide-react'
 import { api } from '../lib/api'
 import type { DashboardBudget } from '@corthex/shared'
 
@@ -45,12 +46,12 @@ const PROVIDER_LABELS: Record<string, string> = {
   google: 'Google',
 }
 
-const AGENT_RANK_COLORS = [
-  'bg-cyan-400/20 text-cyan-400',
-  'bg-blue-500/20 text-blue-500',
-  'bg-purple-500/20 text-purple-500',
-  'bg-emerald-500/20 text-emerald-500',
-  'bg-amber-500/20 text-amber-500',
+const AGENT_DOT_COLORS = [
+  'bg-cyan-400',
+  'bg-indigo-500',
+  'bg-rose-500',
+  'bg-amber-500',
+  'bg-emerald-500',
 ]
 
 // === Helpers ===
@@ -74,59 +75,46 @@ function getDatesForDays(days: number) {
   }
 }
 
-// === Period Selector ===
+// === Period Tabs ===
 
-type PeriodType = '7d' | '30d' | 'custom'
+type PeriodType = 'today' | '7d' | '30d' | 'lastMonth' | 'custom'
 
-function PeriodSelector({
+const PERIOD_LABELS: Record<PeriodType, string> = {
+  today: 'Today',
+  '7d': 'Last 7 Days',
+  '30d': 'This Month',
+  lastMonth: 'Last Month',
+  custom: '직접 설정',
+}
+
+function PeriodTabs({
   period,
   onPeriodChange,
-  customStart,
-  customEnd,
-  onCustomStartChange,
-  onCustomEndChange,
 }: {
   period: PeriodType
   onPeriodChange: (p: PeriodType) => void
-  customStart: string
-  customEnd: string
-  onCustomStartChange: (v: string) => void
-  onCustomEndChange: (v: string) => void
 }) {
   return (
-    <div className="flex items-center gap-2 flex-wrap overflow-x-auto no-scrollbar">
-      {(['7d', '30d', 'custom'] as const).map((p) => (
-        <button
-          key={p}
-          onClick={() => onPeriodChange(p)}
-          className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
-            period === p
-              ? 'bg-blue-600/20 text-blue-400'
-              : 'text-slate-400 hover:bg-slate-700'
-          }`}
-          aria-pressed={period === p}
-          data-testid={`period-${p}`}
-        >
-          {p === '7d' ? '7일' : p === '30d' ? '30일' : '직접 설정'}
-        </button>
-      ))}
-      {period === 'custom' && (
-        <div className="flex items-center gap-1.5">
-          <input
-            type="date"
-            value={customStart}
-            onChange={(e) => onCustomStartChange(e.target.value)}
-            className="px-2 py-1.5 text-xs rounded-lg border border-slate-600 bg-slate-800 text-slate-200 outline-none focus:border-blue-500"
-          />
-          <span className="text-slate-500 text-xs">~</span>
-          <input
-            type="date"
-            value={customEnd}
-            onChange={(e) => onCustomEndChange(e.target.value)}
-            className="px-2 py-1.5 text-xs rounded-lg border border-slate-600 bg-slate-800 text-slate-200 outline-none focus:border-blue-500"
-          />
-        </div>
-      )}
+    <div className="pb-3 px-4">
+      <div className="flex border-b border-slate-800 gap-8">
+        {(['today', '7d', '30d', 'lastMonth'] as const).map((p) => (
+          <button
+            key={p}
+            onClick={() => onPeriodChange(p)}
+            className={`flex flex-col items-center justify-center border-b-[3px] pb-[13px] pt-4 transition-colors ${
+              period === p
+                ? 'border-b-cyan-400 text-slate-50'
+                : 'border-b-transparent text-slate-400 hover:text-slate-100'
+            }`}
+            aria-pressed={period === p}
+            data-testid={`period-${p}`}
+          >
+            <span className="text-sm font-bold leading-normal tracking-[0.015em]">
+              {PERIOD_LABELS[p]}
+            </span>
+          </button>
+        ))}
+      </div>
     </div>
   )
 }
@@ -139,7 +127,7 @@ function BudgetWarningBanner({ budget }: { budget: DashboardBudget }) {
   const isExceeded = budget.usagePercent >= 100
   return (
     <div
-      className={`px-4 py-3 rounded-xl text-sm font-medium ${
+      className={`px-4 py-3 rounded-lg text-sm font-medium ${
         isExceeded
           ? 'bg-red-500/10 text-red-400 border border-red-500/30'
           : 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
@@ -154,229 +142,18 @@ function BudgetWarningBanner({ budget }: { budget: DashboardBudget }) {
   )
 }
 
-// === Cost Overview Cards ===
-
-function CostOverviewSection({
-  costData,
-  budget,
-}: {
-  costData: CostOverview
-  budget: DashboardBudget | undefined
-}) {
-  // Group model costs by provider for donut
-  const providerCosts = useMemo(() => {
-    const map: Record<string, number> = {}
-    for (const m of costData.byModel) {
-      const provider = m.model.startsWith('claude')
-        ? 'anthropic'
-        : m.model.startsWith('gpt') || m.model.startsWith('o1') || m.model.startsWith('o3') || m.model.startsWith('o4')
-          ? 'openai'
-          : m.model.startsWith('gemini')
-            ? 'google'
-            : 'other'
-      map[provider] = (map[provider] ?? 0) + m.costUsd
-    }
-    return Object.entries(map)
-      .filter(([, v]) => v > 0)
-      .sort((a, b) => b[1] - a[1])
-  }, [costData.byModel])
-
-  const totalCost = costData.totalCostUsd
-  const usagePercent = budget?.usagePercent ?? 0
-
-  // Build donut gradient
-  const donutGradient = useMemo(() => {
-    if (providerCosts.length === 0 || totalCost <= 0) {
-      return 'conic-gradient(#334155 0deg 360deg)'
-    }
-    let currentAngle = 0
-    const segments: string[] = []
-    for (const [provider, cost] of providerCosts) {
-      const pct = (cost / totalCost) * 360
-      const color = PROVIDER_COLORS[provider] ?? '#9CA3AF'
-      segments.push(`${color} ${currentAngle}deg ${currentAngle + pct}deg`)
-      currentAngle += pct
-    }
-    if (currentAngle < 360) {
-      const lastColor = PROVIDER_COLORS[providerCosts[providerCosts.length - 1][0]] ?? '#9CA3AF'
-      segments.push(`${lastColor} ${currentAngle}deg 360deg`)
-    }
-    return `conic-gradient(${segments.join(', ')})`
-  }, [providerCosts, totalCost])
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4" data-testid="cost-summary">
-      {/* Total Cost — mobile-optimized with larger font-mono */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl sm:rounded-2xl p-4 sm:p-6">
-        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">총 비용</p>
-        <p className="text-3xl font-mono tabular-nums font-bold text-slate-50">${totalCost.toFixed(2)}</p>
-        <div className="flex justify-between items-center mt-2">
-          <p className="text-xs text-slate-500">최근 {costData.days}일 합계</p>
-          {totalCost > 0 && (
-            <div className="flex items-center text-emerald-500 bg-emerald-50/10 px-2 py-0.5 rounded text-xs font-medium">
-              <svg className="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
-              </svg>
-              {costData.days}d
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Budget Usage — with progress bar for mobile */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl sm:rounded-2xl p-4 sm:p-6">
-        <div className="flex justify-between items-start mb-2">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">예산 사용률</p>
-          <p className="text-xs font-mono text-slate-500">
-            {budget ? `$${budget.currentMonthSpendUsd.toFixed(2)} / $${budget.monthlyBudgetUsd.toFixed(0)}` : ''}
-          </p>
-        </div>
-        <p className={`text-3xl font-bold ${
-          usagePercent >= 100
-            ? 'text-red-500'
-            : usagePercent >= 80
-              ? 'text-amber-400'
-              : 'text-emerald-400'
-        }`}>
-          {usagePercent.toFixed(0)}%
-        </p>
-        {/* Budget progress bar — mobile-friendly visual */}
-        <div className="h-2 w-full bg-slate-700 rounded-full overflow-hidden mt-2">
-          <div
-            className={`h-full rounded-full transition-all ${
-              usagePercent >= 100 ? 'bg-red-500' : usagePercent >= 80 ? 'bg-amber-400' : 'bg-cyan-400'
-            }`}
-            style={{ width: `${Math.min(usagePercent, 100)}%` }}
-          />
-        </div>
-        <p className="text-xs text-slate-500 mt-1">
-          {budget
-            ? `$${Math.max(budget.monthlyBudgetUsd - budget.currentMonthSpendUsd, 0).toFixed(2)} remaining`
-            : '예산 미설정'}
-        </p>
-      </div>
-
-      {/* Provider Donut */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl sm:rounded-2xl p-4 sm:p-6">
-        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">프로바이더별 비용</p>
-        <div className="flex items-center gap-4">
-          {/* Donut */}
-          <div className="relative w-20 h-20 flex-shrink-0">
-            <div
-              className="w-full h-full rounded-full"
-              style={{ background: donutGradient }}
-              role="img"
-              aria-label="프로바이더별 비용 비율"
-            />
-            <div className="absolute inset-2.5 rounded-full bg-slate-800 flex items-center justify-center">
-              <span className="text-[10px] font-bold text-slate-200">
-                ${totalCost.toFixed(0)}
-              </span>
-            </div>
-          </div>
-          {/* Legend */}
-          <div className="flex-1 space-y-1.5">
-            {providerCosts.map(([provider, cost]) => (
-              <div key={provider} className="flex items-center justify-between text-xs">
-                <span className="flex items-center gap-1.5">
-                  <span
-                    className="w-2 h-2 rounded-sm inline-block"
-                    style={{ backgroundColor: PROVIDER_COLORS[provider] ?? '#9CA3AF' }}
-                  />
-                  <span className="text-slate-400">
-                    {PROVIDER_LABELS[provider] ?? provider}
-                  </span>
-                </span>
-                <span className="font-medium text-slate-200">
-                  ${cost.toFixed(2)}
-                </span>
-              </div>
-            ))}
-            {providerCosts.length === 0 && (
-              <span className="text-slate-500 text-xs">데이터 없음</span>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// === Top Agents by Cost ===
-
-function TopAgentsSection({ agents }: { agents: { agentId: string; agentName: string; costUsd: number; count: number }[] }) {
-  const [showAll, setShowAll] = useState(false)
-
-  const sorted = useMemo(
-    () => [...agents].sort((a, b) => b.costUsd - a.costUsd),
-    [agents],
-  )
-
-  const display = showAll ? sorted : sorted.slice(0, 10)
-  const maxCost = sorted[0]?.costUsd ?? 1
-
-  return (
-    <div className="bg-slate-800/50 border border-slate-700 rounded-xl sm:rounded-2xl p-4 sm:p-6" data-testid="top-agents">
-      <h3 className="text-lg sm:text-xl font-bold text-slate-200 mb-4 sm:mb-3">에이전트별 비용 순위</h3>
-      {display.length === 0 ? (
-        <div className="h-24 flex items-center justify-center text-sm text-slate-500">
-          데이터가 없습니다
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {display.map((agent, i) => {
-            const barWidth = maxCost > 0 ? (agent.costUsd / maxCost) * 100 : 0
-            const colorClass = AGENT_RANK_COLORS[i % AGENT_RANK_COLORS.length]
-            return (
-              <div key={agent.agentId} className="flex items-center gap-3 py-2 border-b border-slate-700/50 last:border-b-0">
-                {/* Agent icon circle */}
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${colorClass}`}>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-0.5">
-                    <span className="text-sm font-medium text-slate-100 truncate">{agent.agentName}</span>
-                    <span className="text-sm font-mono text-slate-200 ml-2 flex-shrink-0">
-                      ${agent.costUsd.toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="hidden sm:block">
-                    <div className="h-1.5 rounded-full bg-slate-700 overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-cyan-400 transition-all"
-                        style={{ width: `${barWidth}%` }}
-                      />
-                    </div>
-                    <span className="text-[10px] text-slate-500">{formatNumber(agent.count)} 호출</span>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      )}
-      {sorted.length > 10 && (
-        <button
-          onClick={() => setShowAll((v) => !v)}
-          className="mt-3 text-xs text-blue-400 hover:text-blue-300 hover:underline"
-        >
-          {showAll ? '접기' : `더보기 (${sorted.length - 10}개)`}
-        </button>
-      )}
-    </div>
-  )
-}
-
-// === Daily Cost Trend Chart ===
+// === Daily Cost Chart (SVG area chart) ===
 
 function DailyCostChart({
   startDate,
   endDate,
+  chartRange,
+  onChartRangeChange,
 }: {
   startDate: string
   endDate: string
+  chartRange: '1W' | '1M' | '3M'
+  onChartRangeChange: (r: '1W' | '1M' | '3M') => void
 }) {
   const { data, isLoading } = useQuery({
     queryKey: ['costs-daily-ceo', startDate, endDate],
@@ -387,43 +164,91 @@ function DailyCostChart({
   })
 
   const items = data?.data?.items ?? []
-  const maxCost = Math.max(...items.map((d) => d.costMicro), 1)
+  const totalCost = items.reduce((sum, d) => sum + d.costMicro, 0)
+  const totalCostUsd = totalCost / 1_000_000
 
   return (
-    <div className="bg-slate-800/50 border border-slate-700 rounded-xl sm:rounded-2xl p-4 sm:p-6" data-testid="daily-chart">
-      <h3 className="text-lg sm:text-xl font-bold text-slate-200 mb-4">일별 비용 추이</h3>
-
-      {isLoading ? (
-        <div className="h-40 w-full bg-slate-700/50 rounded animate-pulse" />
-      ) : items.length === 0 ? (
-        <div className="h-40 flex items-center justify-center text-sm text-slate-500">
-          데이터가 없습니다
+    <div className="flex min-w-72 flex-1 flex-col gap-2 rounded-lg border border-slate-800 bg-slate-900 p-6">
+      <div className="flex justify-between items-start">
+        <div>
+          <h3 className="text-slate-50 text-base font-semibold leading-normal">비용 추이 차트 (Cost Trend Chart)</h3>
+          <div className="flex items-baseline gap-3 mt-1">
+            <p className="text-slate-50 font-mono text-[32px] font-bold leading-tight tabular-nums">
+              ${totalCostUsd.toFixed(2)}
+            </p>
+            <div className="flex gap-1 items-center">
+              <span className="text-slate-400 text-sm">This Month</span>
+              <span className="text-emerald-400 text-sm font-medium ml-2">+5.2%</span>
+            </div>
+          </div>
         </div>
-      ) : (
-        <div className="flex items-end gap-[2px] h-32 sm:h-40 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-t from-cyan-400/10 to-transparent pointer-events-none" />
-          {items.map((d) => {
-            const pct = (d.costMicro / maxCost) * 100
-            return (
-              <div
-                key={d.date}
-                className="flex-1 flex flex-col items-center justify-end h-full min-w-0 group relative z-[1]"
-              >
-                <div
-                  className="w-full bg-cyan-400/80 rounded-t transition-all hover:bg-cyan-400 min-h-[2px]"
-                  style={{ height: `${Math.max(pct, 1)}%` }}
-                />
-                <span className="text-[8px] text-slate-500 mt-1 truncate w-full text-center">
-                  {d.date.slice(5)}
-                </span>
-                <div className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-700 text-slate-100 text-[10px] px-2 py-1 rounded-lg whitespace-nowrap z-10 shadow-lg">
-                  ${microToUsd(d.costMicro)}
-                </div>
-              </div>
-            )
-          })}
+        <div className="flex gap-2">
+          {(['1W', '1M', '3M'] as const).map((r) => (
+            <button
+              key={r}
+              onClick={() => onChartRangeChange(r)}
+              className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
+                chartRange === r
+                  ? 'bg-cyan-400/10 text-cyan-400 border border-cyan-400/20'
+                  : 'bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700'
+              }`}
+            >
+              {r}
+            </button>
+          ))}
         </div>
-      )}
+      </div>
+      <div className="flex min-h-[220px] flex-1 flex-col gap-4 py-6 w-full relative mt-4">
+        {isLoading ? (
+          <div className="h-full w-full bg-slate-800/50 rounded animate-pulse" />
+        ) : items.length === 0 ? (
+          <div className="h-full flex items-center justify-center text-sm text-slate-500">
+            데이터가 없습니다
+          </div>
+        ) : (
+          <>
+            <svg className="absolute inset-0 h-full w-full" fill="none" preserveAspectRatio="none" viewBox="0 0 100 100">
+              <defs>
+                <linearGradient id="chart-gradient-costs" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stopColor="#22d3ee" stopOpacity="1" />
+                  <stop offset="100%" stopColor="#22d3ee" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              {(() => {
+                const maxCost = Math.max(...items.map((d) => d.costMicro), 1)
+                const points = items.map((d, i) => {
+                  const x = items.length > 1 ? (i / (items.length - 1)) * 100 : 50
+                  const y = 100 - (d.costMicro / maxCost) * 80 - 10
+                  return `${x},${y}`
+                })
+                const pathD = `M${points.join(' L')}`
+                const areaD = `${pathD} L100,100 L0,100 Z`
+                return (
+                  <>
+                    <path d={areaD} fill="url(#chart-gradient-costs)" opacity="0.2" />
+                    <path d={pathD} stroke="#22d3ee" fill="none" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+                  </>
+                )
+              })()}
+            </svg>
+            <div className="flex justify-between w-full absolute bottom-0 px-2">
+              {items.length >= 5 ? (
+                <>
+                  <span className="text-slate-500 text-xs font-mono">{items[0]?.date.slice(8)}</span>
+                  <span className="text-slate-500 text-xs font-mono">{items[Math.floor(items.length * 0.25)]?.date.slice(8)}</span>
+                  <span className="text-slate-500 text-xs font-mono">{items[Math.floor(items.length * 0.5)]?.date.slice(8)}</span>
+                  <span className="text-slate-500 text-xs font-mono">{items[Math.floor(items.length * 0.75)]?.date.slice(8)}</span>
+                  <span className="text-slate-500 text-xs font-mono">{items[items.length - 1]?.date.slice(8)}</span>
+                </>
+              ) : (
+                items.map((d) => (
+                  <span key={d.date} className="text-slate-500 text-xs font-mono">{d.date.slice(8)}</span>
+                ))
+              )}
+            </div>
+          </>
+        )}
+      </div>
     </div>
   )
 }
@@ -432,26 +257,17 @@ function DailyCostChart({
 
 function CostsSkeleton() {
   return (
-    <div className="space-y-6" data-testid="costs-loading">
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-slate-800/50 border border-slate-700 rounded-xl px-5 py-4 space-y-2">
-            <div className="h-3 w-20 bg-slate-700 rounded animate-pulse" />
-            <div className="h-8 w-24 bg-slate-700 rounded animate-pulse" />
-            <div className="h-3 w-32 bg-slate-700 rounded animate-pulse" />
+    <div className="space-y-6 p-4" data-testid="costs-loading">
+      <div className="flex flex-wrap gap-4">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 border border-slate-800 bg-slate-900/50">
+            <div className="h-3 w-20 bg-slate-800 rounded animate-pulse" />
+            <div className="h-8 w-24 bg-slate-800 rounded animate-pulse" />
+            <div className="h-3 w-16 bg-slate-800 rounded animate-pulse" />
           </div>
         ))}
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl px-5 py-4">
-          <div className="h-4 w-40 bg-slate-700 rounded animate-pulse mb-3" />
-          <div className="h-40 w-full bg-slate-700 rounded animate-pulse" />
-        </div>
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl px-5 py-4">
-          <div className="h-4 w-40 bg-slate-700 rounded animate-pulse mb-3" />
-          <div className="h-40 w-full bg-slate-700 rounded animate-pulse" />
-        </div>
-      </div>
+      <div className="h-64 bg-slate-800/50 rounded-lg animate-pulse" />
     </div>
   )
 }
@@ -460,29 +276,20 @@ function CostsSkeleton() {
 
 export function CostsPage() {
   const navigate = useNavigate()
-  const [period, setPeriod] = useState<PeriodType>('7d')
-  const [customStart, setCustomStart] = useState(() => getDatesForDays(30).start)
-  const [customEnd, setCustomEnd] = useState(() => getDatesForDays(0).end)
+  const [period, setPeriod] = useState<PeriodType>('30d')
+  const [chartRange, setChartRange] = useState<'1W' | '1M' | '3M'>('1M')
 
-  const days = period === '7d' ? 7 : period === '30d' ? 30 : 0
+  const days = period === 'today' ? 1 : period === '7d' ? 7 : period === '30d' ? 30 : period === 'lastMonth' ? 30 : 30
+
   const { start: startDate, end: endDate } = useMemo(() => {
-    if (period === 'custom') return { start: customStart, end: customEnd }
     return getDatesForDays(days)
-  }, [period, days, customStart, customEnd])
-
-  const effectiveDays = useMemo(() => {
-    if (period !== 'custom') return days
-    const diff = Math.ceil(
-      (new Date(customEnd).getTime() - new Date(customStart).getTime()) / (24 * 60 * 60 * 1000),
-    )
-    return Math.max(diff, 1)
-  }, [period, days, customStart, customEnd])
+  }, [days])
 
   const { data: costRes, isLoading: costLoading } = useQuery({
-    queryKey: ['costs-overview', effectiveDays, period === 'custom' ? `${startDate}-${endDate}` : ''],
+    queryKey: ['costs-overview', days],
     queryFn: () =>
       api.get<{ data: CostOverview }>(
-        `/workspace/dashboard/costs?days=${effectiveDays}`,
+        `/workspace/dashboard/costs?days=${days}`,
       ),
   })
 
@@ -516,67 +323,185 @@ export function CostsPage() {
 
   const isLoading = costLoading || budgetLoading
 
+  // Find the most expensive model
+  const topModel = costData?.byModel?.length
+    ? [...costData.byModel].sort((a, b) => b.costUsd - a.costUsd)[0]
+    : null
+
+  // Daily average
+  const dailyAvg = costData ? costData.totalCostUsd / Math.max(costData.days, 1) : 0
+
+  // Active agents count
+  const activeAgentCount = costData?.byAgent?.length ?? 0
+
+  // Agent cost data for table
+  const agentCostData = agentsByUsd.length > 0
+    ? agentsByUsd.sort((a, b) => b.costUsd - a.costUsd)
+    : (costData?.byAgent ?? []).sort((a, b) => b.costUsd - a.costUsd)
+
   useEffect(() => {
     document.title = '비용 분석 - CORTHEX'
     return () => { document.title = 'CORTHEX' }
   }, [])
 
   return (
-    <div className="h-full overflow-y-auto bg-slate-900" data-testid="costs-page">
-      {/* Header — mobile sticky with compact layout */}
-      <div className="sticky top-0 z-10 bg-slate-900/80 backdrop-blur-md px-4 sm:px-6 py-4 border-b border-slate-700">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="text-slate-400 hover:text-slate-200 transition-colors p-2 rounded-full bg-slate-800 sm:bg-transparent"
-              aria-label="대시보드로 돌아가기"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <div>
-              <h2 className="text-lg sm:text-xl font-bold text-slate-50 tracking-tight">비용 분석</h2>
-              <p className="text-xs text-slate-500 mt-0.5 hidden sm:block">AI 운영 비용을 상세하게 분석합니다</p>
-            </div>
+    <div className="h-full overflow-y-auto bg-slate-950" data-testid="costs-page">
+      <div className="max-w-[960px] mx-auto flex-1 px-4 py-5">
+        {/* Page Title */}
+        <div className="flex flex-wrap justify-between gap-3 p-4">
+          <div className="flex min-w-72 flex-col gap-3">
+            <h1 className="text-slate-50 tracking-tight text-[32px] font-bold leading-tight">
+              비용 분석 (Cost Analytics)
+            </h1>
+            <p className="text-slate-400 text-sm font-normal leading-normal">
+              Detailed monitoring of resource expenditure and token usage.
+            </p>
           </div>
         </div>
-        <PeriodSelector
-          period={period}
-          onPeriodChange={setPeriod}
-          customStart={customStart}
-          customEnd={customEnd}
-          onCustomStartChange={setCustomStart}
-          onCustomEndChange={setCustomEnd}
-        />
-      </div>
 
-      <div className="px-4 sm:px-6 lg:px-8 py-4 space-y-6 max-w-6xl">
+        {/* Period Tabs */}
+        <PeriodTabs period={period} onPeriodChange={setPeriod} />
+
         {isLoading && !costData ? (
           <CostsSkeleton />
         ) : !costData ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="costs-empty">
-            <svg className="w-10 h-10 text-slate-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
+          <div className="flex flex-col items-center justify-center py-16 text-center p-4" data-testid="costs-empty">
             <h3 className="text-base font-medium text-slate-300 mb-2">데이터가 없습니다</h3>
             <p className="text-sm text-slate-500">선택한 기간에 해당하는 비용 데이터가 없습니다</p>
           </div>
         ) : (
           <>
             {/* Budget Warning Banner */}
-            {budget && <BudgetWarningBanner budget={budget} />}
+            {budget && (
+              <div className="px-4">
+                <BudgetWarningBanner budget={budget} />
+              </div>
+            )}
 
-            {/* Cost Overview */}
-            <CostOverviewSection costData={costData} budget={budget} />
+            {/* Summary Cards */}
+            <div className="flex flex-wrap gap-4 p-4" data-testid="cost-summary">
+              <div className="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 border border-slate-800 bg-slate-900/50">
+                <p className="text-slate-400 text-sm font-medium leading-normal">Total Monthly Cost</p>
+                <p className="text-slate-50 font-mono text-2xl font-bold leading-tight tabular-nums">
+                  ${costData.totalCostUsd.toFixed(2)}
+                </p>
+                <p className="text-emerald-400 text-sm font-medium leading-normal flex items-center gap-1">
+                  <TrendingUp className="w-3.5 h-3.5" /> +5.2%
+                </p>
+              </div>
+              <div className="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 border border-slate-800 bg-slate-900/50">
+                <p className="text-slate-400 text-sm font-medium leading-normal">Daily Average</p>
+                <p className="text-slate-50 font-mono text-2xl font-bold leading-tight tabular-nums">
+                  ${dailyAvg.toFixed(2)}
+                </p>
+                <p className="text-rose-400 text-sm font-medium leading-normal flex items-center gap-1">
+                  <TrendingDown className="w-3.5 h-3.5" /> -1.2%
+                </p>
+              </div>
+              <div className="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 border border-slate-800 bg-slate-900/50">
+                <p className="text-slate-400 text-sm font-medium leading-normal">Most Expensive Model</p>
+                <p className="text-slate-50 font-mono text-xl font-bold leading-tight truncate tabular-nums">
+                  {topModel?.model ?? '-'}
+                </p>
+                <p className="text-slate-500 text-sm font-medium leading-normal">
+                  {topModel ? `$${topModel.costUsd.toFixed(2)}` : '-'}
+                </p>
+              </div>
+              <div className="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 border border-slate-800 bg-slate-900/50">
+                <p className="text-slate-400 text-sm font-medium leading-normal">Active Agent Count</p>
+                <p className="text-slate-50 font-mono text-2xl font-bold leading-tight tabular-nums">
+                  {activeAgentCount}
+                </p>
+                <p className="text-emerald-400 text-sm font-medium leading-normal flex items-center gap-1">
+                  <TrendingUp className="w-3.5 h-3.5" /> +2
+                </p>
+              </div>
+            </div>
 
-            {/* Two-column: Agents + Daily Chart */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <TopAgentsSection
-                agents={agentsByUsd.length > 0 ? agentsByUsd : costData.byAgent}
+            {/* Cost Trend Chart */}
+            <div className="flex flex-wrap gap-4 px-4 py-4">
+              <DailyCostChart
+                startDate={startDate}
+                endDate={endDate}
+                chartRange={chartRange}
+                onChartRangeChange={setChartRange}
               />
-              <DailyCostChart startDate={startDate} endDate={endDate} />
+            </div>
+
+            {/* Two tables side by side */}
+            <div className="flex flex-wrap gap-4 px-4 py-4 pb-12">
+              {/* Cost by Model */}
+              <div className="flex-1 min-w-[300px] flex flex-col gap-4">
+                <h3 className="text-slate-50 text-base font-semibold px-1">모델별 비용 (Cost by Model)</h3>
+                <div className="rounded-lg border border-slate-800 bg-slate-900/50 overflow-hidden">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-slate-800 bg-slate-800/50">
+                        <th className="py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Model</th>
+                        <th className="py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right">Tokens</th>
+                        <th className="py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right">Cost</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800">
+                      {costData.byModel.length === 0 ? (
+                        <tr>
+                          <td colSpan={3} className="py-8 text-center text-sm text-slate-500">데이터 없음</td>
+                        </tr>
+                      ) : (
+                        costData.byModel.map((m) => (
+                          <tr key={m.model}>
+                            <td className="py-3 px-4 text-sm text-slate-50 font-medium">{m.model}</td>
+                            <td className="py-3 px-4 text-sm text-slate-400 font-mono text-right tabular-nums">
+                              {formatNumber(m.inputTokens + m.outputTokens)}
+                            </td>
+                            <td className="py-3 px-4 text-sm text-slate-50 font-mono text-right tabular-nums">
+                              ${m.costUsd.toFixed(2)}
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Cost by Agent */}
+              <div className="flex-1 min-w-[300px] flex flex-col gap-4">
+                <h3 className="text-slate-50 text-base font-semibold px-1">에이전트별 비용 (Cost by Agent)</h3>
+                <div className="rounded-lg border border-slate-800 bg-slate-900/50 overflow-hidden">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-slate-800 bg-slate-800/50">
+                        <th className="py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Agent</th>
+                        <th className="py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right">Runs</th>
+                        <th className="py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right">Cost</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800">
+                      {agentCostData.length === 0 ? (
+                        <tr>
+                          <td colSpan={3} className="py-8 text-center text-sm text-slate-500">데이터 없음</td>
+                        </tr>
+                      ) : (
+                        agentCostData.slice(0, 10).map((a, i) => (
+                          <tr key={a.agentId || a.agentName}>
+                            <td className="py-3 px-4 text-sm text-slate-50 font-medium flex items-center gap-2">
+                              <div className={`w-2 h-2 rounded-full ${AGENT_DOT_COLORS[i % AGENT_DOT_COLORS.length]}`} />
+                              {a.agentName}
+                            </td>
+                            <td className="py-3 px-4 text-sm text-slate-400 font-mono text-right tabular-nums">
+                              {formatNumber(a.count)}
+                            </td>
+                            <td className="py-3 px-4 text-sm text-slate-50 font-mono text-right tabular-nums">
+                              ${a.costUsd.toFixed(2)}
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </>
         )}

@@ -6,6 +6,7 @@ import { MarkdownRenderer } from '../components/markdown-renderer'
 import { useAuthStore } from '../stores/auth-store'
 import { toast } from '@corthex/ui'
 import { ShareToConversationModal } from '../components/messenger/share-to-conversation-modal'
+import { Plus, Search, FileText, Download, Share2, Trash2, Bot } from 'lucide-react'
 
 type Report = {
   id: string
@@ -28,10 +29,10 @@ type Comment = {
   createdAt: string
 }
 
-const STATUS_STYLES: Record<string, { label: string; className: string }> = {
-  draft: { label: '초안', className: 'bg-slate-700 text-slate-300' },
-  submitted: { label: '📤 CEO 보고 완료', className: 'bg-amber-500/20 text-amber-400' },
-  reviewed: { label: '검토 완료', className: 'bg-emerald-500/20 text-emerald-400' },
+const STATUS_STYLES: Record<string, { label: string; className: string; ringClass: string }> = {
+  draft: { label: '초안', className: 'bg-slate-700 text-slate-300', ringClass: '' },
+  submitted: { label: '작성 중', className: 'bg-blue-500/10 text-blue-400', ringClass: 'ring-1 ring-inset ring-blue-500/20' },
+  reviewed: { label: '완료', className: 'bg-emerald-500/10 text-emerald-400', ringClass: 'ring-1 ring-inset ring-emerald-500/20' },
 }
 
 export function ReportsPage() {
@@ -51,6 +52,7 @@ export function ReportsPage() {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [downloading, setDownloading] = useState(false)
   const [showShareModal, setShowShareModal] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
   // 보고서 목록
   const { data: reportsData, isLoading } = useQuery({
@@ -173,14 +175,21 @@ export function ReportsPage() {
     (r) => r.submittedTo === user?.id && r.authorId !== user?.id,
   )
 
-  const tabs = [
-    { value: 'all', label: `전체 (${reportList.length})` },
-    { value: 'mine', label: `내 보고서 (${myReports.length})` },
-    { value: 'received', label: `받은 보고서 (${receivedReports.length})` },
+  const filterTabs = [
+    { value: 'all', label: 'All' },
+    { value: 'reviewed', label: 'Completed' },
+    { value: 'draft', label: 'Drafting' },
+    { value: 'submitted', label: 'Reviewing' },
   ]
 
-  const filteredReports =
-    activeTab === 'mine' ? myReports : activeTab === 'received' ? receivedReports : reportList
+  const filteredReports = reportList.filter((r) => {
+    if (activeTab !== 'all' && r.status !== activeTab) return false
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase()
+      return r.title.toLowerCase().includes(q) || r.authorName.toLowerCase().includes(q)
+    }
+    return true
+  })
 
   const handleOpenDetail = useCallback(
     (id: string) => {
@@ -235,455 +244,452 @@ export function ReportsPage() {
     }
   }
 
-  const inputClass = 'w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/30 focus:outline-none'
+  const inputClass = 'w-full bg-slate-900 border border-slate-700 focus:border-cyan-500/50 rounded-lg px-4 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:outline-none text-slate-50'
 
-  return (
-    <div className="h-full flex flex-col bg-slate-900" data-testid="reports-page">
-      {/* 헤더 */}
-      <div className="px-4 sm:px-6 lg:px-8 py-4 border-b border-slate-700 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          {view !== 'list' && (
-            <button
-              onClick={handleBack}
-              className="text-sm text-slate-400 hover:text-slate-200"
-              data-testid="back-btn"
-            >
-              ← 목록
-            </button>
-          )}
-          <h2 className="text-lg sm:text-xl font-semibold text-slate-50">
-            {view === 'list' ? '보고서' : view === 'create' ? '새 보고서' : '보고서 상세'}
-          </h2>
-        </div>
-        {view === 'list' && (
-          <button
-            onClick={() => {
-              setTitle('')
-              setContent('')
-              setView('create')
-            }}
-            className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium min-h-[44px]"
-            data-testid="new-report-btn"
-          >
-            + 새 보고서
-          </button>
-        )}
-      </div>
+  // === List + Detail split layout (Stitch-matching) ===
 
-      {/* 본문 */}
-      <div className="flex-1 overflow-y-auto [-webkit-overflow-scrolling:touch]">
-        {/* === 목록 뷰 === */}
-        {view === 'list' && (
-          <div className="px-4 sm:px-6 lg:px-8 py-4 space-y-4 max-w-2xl">
-            {/* Tab Bar */}
-            <div className="flex gap-1" data-testid="report-tabs">
-              {tabs.map((tab) => (
+  if (view === 'list' || (view === 'detail' && report)) {
+    return (
+      <div className="h-full flex flex-col bg-slate-950 overflow-hidden" data-testid="reports-page">
+        <div className="flex flex-1 overflow-hidden">
+          {/* Left panel: List */}
+          <main className={`flex-1 flex flex-col overflow-y-auto ${view === 'detail' ? 'border-r border-slate-800' : ''}`}>
+            {/* Header */}
+            <div className="flex flex-wrap items-center justify-between gap-3 p-6 pb-4">
+              <div className="flex flex-col gap-1">
+                <h1 className="text-slate-50 tracking-tight text-2xl font-bold leading-tight">
+                  Reports (보고서)
+                </h1>
+                <p className="text-slate-400 text-sm font-normal leading-normal">
+                  Browse and view AI-generated business reports
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setTitle('')
+                  setContent('')
+                  setView('create')
+                }}
+                className="flex cursor-pointer items-center justify-center gap-2 rounded px-4 py-2 bg-cyan-400 hover:bg-cyan-400/90 text-slate-950 text-sm font-semibold transition-colors"
+                data-testid="new-report-btn"
+              >
+                <Plus className="w-4 h-4" />
+                <span>New Report</span>
+              </button>
+            </div>
+
+            {/* Search */}
+            <div className="px-6 py-2">
+              <label className="flex flex-col w-full h-10">
+                <div className="flex w-full flex-1 items-stretch rounded bg-slate-900 border border-slate-800 focus-within:border-cyan-500/50 transition-colors">
+                  <div className="text-slate-400 flex items-center justify-center pl-4 pr-2">
+                    <Search className="w-4 h-4" />
+                  </div>
+                  <input
+                    className="w-full min-w-0 flex-1 bg-transparent text-slate-50 focus:outline-none placeholder:text-slate-500 px-2 text-sm"
+                    placeholder="Search reports by title or agent..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+              </label>
+            </div>
+
+            {/* Filter Tabs */}
+            <div className="flex gap-2 p-6 pt-4 flex-wrap">
+              {filterTabs.map((tab) => (
                 <button
                   key={tab.value}
                   onClick={() => setActiveTab(tab.value)}
-                  className={`px-4 py-2 text-sm border-b-2 transition-colors ${
+                  className={`flex h-8 items-center justify-center rounded px-4 text-sm font-medium transition-colors ${
                     activeTab === tab.value
-                      ? 'border-blue-500 text-blue-400 font-medium'
-                      : 'border-transparent text-slate-400 hover:text-slate-200'
+                      ? 'bg-slate-800 text-slate-50'
+                      : 'text-slate-400 hover:bg-slate-900 border border-transparent hover:border-slate-800'
                   }`}
-                  data-testid={`report-tab-${tab.value}`}
                 >
                   {tab.label}
                 </button>
               ))}
             </div>
 
-            {isLoading ? (
-              <div className="space-y-3" data-testid="reports-loading">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-20 bg-slate-800 animate-pulse rounded-xl" />
-                ))}
-              </div>
-            ) : filteredReports.length === 0 ? (
-              <div className="text-center py-16" data-testid="reports-empty">
-                <p className="text-sm text-slate-400">
-                  {activeTab === 'received' ? '받은 보고서가 없습니다' : '아직 보고서가 없습니다'}
-                </p>
-                {activeTab === 'mine' && (
-                  <p className="text-xs text-slate-500 mt-1">새 보고서를 작성해보세요</p>
-                )}
-              </div>
-            ) : (
-              <div className="space-y-3" data-testid="reports-list">
-                {filteredReports.map((r) => {
+            {/* Report List */}
+            <div className="flex flex-col px-6 gap-2 pb-6">
+              {isLoading ? (
+                <div className="space-y-3" data-testid="reports-loading">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-20 bg-slate-900 animate-pulse rounded-lg" />
+                  ))}
+                </div>
+              ) : filteredReports.length === 0 ? (
+                <div className="text-center py-16 text-sm text-slate-400" data-testid="reports-empty">
+                  보고서가 없습니다
+                </div>
+              ) : (
+                filteredReports.map((r) => {
+                  const isSelected = selectedReport === r.id
                   const style = STATUS_STYLES[r.status] || STATUS_STYLES.draft
-                  const isSubmitted = r.status === 'submitted' || r.status === 'reviewed'
+                  const isCompleted = r.status === 'reviewed'
                   return (
-                    <article
+                    <div
                       key={r.id}
                       onClick={() => handleOpenDetail(r.id)}
-                      className="w-full text-left rounded-xl bg-slate-800/50 border border-slate-700 hover:border-slate-600 cursor-pointer transition-all p-4 flex flex-col gap-3"
+                      className={`group flex items-center justify-between p-4 rounded-lg cursor-pointer transition-colors ${
+                        isSelected
+                          ? 'bg-slate-900 border border-cyan-400/30 hover:border-cyan-400/50'
+                          : 'bg-slate-950 border border-transparent hover:bg-slate-900 hover:border-slate-800'
+                      }`}
                       data-testid={`report-item-${r.id}`}
                     >
-                      <div className="flex items-start gap-3">
-                        {/* File type badge icon */}
-                        <div className={`flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center ${
-                          isSubmitted ? 'bg-red-500/10 text-red-400' : 'bg-slate-700/50 text-slate-400'
+                      <div className="flex items-start gap-4">
+                        <div className={`flex items-center justify-center rounded size-10 shrink-0 mt-0.5 ${
+                          isSelected
+                            ? 'bg-cyan-400/10 text-cyan-400'
+                            : 'bg-slate-900 border border-slate-800 text-slate-400'
                         }`}>
-                          <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                          </svg>
+                          <FileText className="w-5 h-5" />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-medium text-sm text-slate-100 truncate">
-                            {r.title}
-                          </h3>
-                          <div className="flex items-center gap-2 mt-1 text-xs text-slate-500">
-                            <span className="font-medium text-slate-400">{r.authorName}</span>
-                            <span>·</span>
-                            <time className="font-mono text-[11px]">{new Date(r.submittedAt || r.updatedAt).toLocaleDateString('ko-KR')}</time>
+                        <div className="flex flex-col">
+                          <div className="flex items-center gap-3 mb-1">
+                            <p className={`text-base font-medium leading-tight ${isSelected ? 'text-slate-50' : 'text-slate-300'}`}>
+                              {r.title}
+                            </p>
+                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${style.className} ${style.ringClass}`}>
+                              {style.label}
+                            </span>
                           </div>
+                          <p className="text-slate-400 text-sm flex items-center gap-2">
+                            <span>Agent: {r.authorName}</span>
+                            <span>·</span>
+                            <span className="font-mono text-xs">
+                              {new Date(r.submittedAt || r.updatedAt).toLocaleDateString('ko-KR')}
+                            </span>
+                          </p>
                         </div>
                       </div>
-                      {r.content && (
-                        <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
-                          {(r.content || '').slice(0, 120)}
-                        </p>
-                      )}
-                      <div className="flex items-center justify-between pt-2 border-t border-slate-700/50">
-                        <div className="flex items-center gap-2">
-                          <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${style.className}`}>
-                            {style.label}
+                    </div>
+                  )
+                })
+              )}
+            </div>
+          </main>
+
+          {/* Right panel: Detail (Stitch sidebar style) */}
+          {view === 'detail' && report && (
+            <aside className="w-[600px] flex-none bg-slate-900 flex flex-col h-full border-l border-slate-800 hidden lg:flex">
+              {/* Detail Header */}
+              <div className="p-6 border-b border-slate-800 flex-none">
+                <div className="flex justify-between items-start mb-4">
+                  <h2 className="text-xl font-bold text-slate-50 leading-tight">{report.title}</h2>
+                  <div className="flex gap-2">
+                    {report.status !== 'draft' && (
+                      <button
+                        onClick={handleDownload}
+                        disabled={downloading}
+                        className="p-2 text-slate-400 hover:text-slate-50 hover:bg-slate-800 rounded transition-colors"
+                        title="다운로드 (Download)"
+                      >
+                        <Download className="w-5 h-5" />
+                      </button>
+                    )}
+                    {report.status !== 'draft' && (
+                      <button
+                        onClick={() => setShowShareModal(true)}
+                        className="p-2 text-slate-400 hover:text-slate-50 hover:bg-slate-800 rounded transition-colors"
+                        title="공유 (Share)"
+                      >
+                        <Share2 className="w-5 h-5" />
+                      </button>
+                    )}
+                    {isMyReport && report.status === 'draft' && (
+                      <button
+                        onClick={() => setDeleteConfirmOpen(true)}
+                        className="p-2 text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded transition-colors"
+                        title="삭제 (Delete)"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 text-sm text-slate-400">
+                  <div className="flex items-center gap-1.5">
+                    <Bot className="w-4 h-4" />
+                    <span>{report.authorName}</span>
+                  </div>
+                  <span>|</span>
+                  <span className="font-mono text-xs">
+                    {new Date(report.createdAt).toLocaleString('ko-KR')}
+                  </span>
+                  <span>|</span>
+                  <span className={`inline-flex items-center rounded px-1.5 py-0.5 text-xs font-medium ${STATUS_STYLES[report.status]?.className || ''}`}>
+                    {STATUS_STYLES[report.status]?.label || report.status}
+                  </span>
+                </div>
+              </div>
+
+              {/* Detail Body */}
+              <div className="flex-1 overflow-y-auto p-6">
+                {editMode ? (
+                  <div className="space-y-4">
+                    <input
+                      type="text"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      className={inputClass}
+                    />
+                    <textarea
+                      value={content}
+                      onChange={(e) => setContent(e.target.value)}
+                      rows={14}
+                      className={inputClass}
+                    />
+                    <div className="flex gap-3">
+                      <button
+                        onClick={handleSaveEdit}
+                        disabled={!title.trim() || updateReport.isPending}
+                        className="bg-cyan-400 hover:bg-cyan-400/90 text-slate-950 rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50"
+                      >
+                        {updateReport.isPending ? '저장 중...' : '저장'}
+                      </button>
+                      <button
+                        onClick={() => setEditMode(false)}
+                        className="text-slate-400 hover:text-slate-200 text-sm px-4 py-2"
+                      >
+                        취소
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <MarkdownRenderer
+                    content={report.content || '(내용 없음)'}
+                    className="prose prose-invert max-w-none text-slate-300 text-sm leading-relaxed prose-headings:text-slate-50 prose-a:text-cyan-400"
+                  />
+                )}
+
+                {/* Action Buttons */}
+                {!editMode && (
+                  <div className="flex gap-3 mt-6">
+                    {isMyReport && report.status === 'draft' && (
+                      <>
+                        <button
+                          onClick={handleStartEdit}
+                          className="border border-slate-700 text-slate-300 hover:bg-slate-800 rounded-lg px-4 py-2 text-sm"
+                          data-testid="edit-btn"
+                        >
+                          수정
+                        </button>
+                        <button
+                          onClick={() => setConfirmOpen(true)}
+                          disabled={submitReport.isPending}
+                          className="bg-cyan-400 hover:bg-cyan-400/90 text-slate-950 rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50"
+                          data-testid="submit-btn"
+                        >
+                          CEO에게 보고
+                        </button>
+                      </>
+                    )}
+                    {isReceivedReport && report.status === 'submitted' && (
+                      <button
+                        onClick={() => reviewReport.mutate()}
+                        disabled={reviewReport.isPending}
+                        className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50"
+                        data-testid="review-btn"
+                      >
+                        {reviewReport.isPending ? '처리 중...' : '검토 완료'}
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Comments Section */}
+              {report.status !== 'draft' && (
+                <div className="p-6 border-t border-slate-800 bg-slate-950 flex-none">
+                  <h4 className="text-sm font-semibold text-slate-50 mb-4">
+                    Comments ({comments.length})
+                  </h4>
+
+                  {remainingComments > 0 && (
+                    <button
+                      onClick={loadMoreComments}
+                      className="text-xs text-cyan-400 hover:underline mb-3"
+                    >
+                      이전 코멘트 {remainingComments}개 더 보기
+                    </button>
+                  )}
+
+                  {comments.map((c) => (
+                    <div key={c.id} className="flex gap-3 mb-4">
+                      <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 flex-none ring-1 ring-slate-700">
+                        <Bot className="w-4 h-4" />
+                      </div>
+                      <div className="flex flex-col bg-slate-900 p-3 rounded-lg border border-slate-800 flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-semibold text-slate-200">{c.authorName}</span>
+                          <span className="text-[10px] text-slate-500 font-mono">
+                            {new Date(c.createdAt).toLocaleString('ko-KR', {
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
                           </span>
                         </div>
-                        {isSubmitted && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); handleOpenDetail(r.id) }}
-                            className="flex items-center justify-center w-8 h-8 rounded-full text-cyan-400 hover:bg-cyan-500/10 transition-colors"
-                            aria-label="다운로드"
-                          >
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                            </svg>
-                          </button>
-                        )}
+                        <p className="text-sm text-slate-300">{c.content}</p>
                       </div>
-                    </article>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-        )}
+                    </div>
+                  ))}
 
-        {/* === 작성 뷰 === */}
-        {view === 'create' && (
-          <div className="px-4 sm:px-6 lg:px-8 py-4 max-w-2xl space-y-4">
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="보고서 제목"
-              className={inputClass}
-              data-testid="report-title-input"
-            />
-            <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="보고서 내용을 마크다운으로 작성하세요..."
-              rows={16}
-              className={inputClass}
-              data-testid="report-content-input"
-            />
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  if (!title.trim()) return
-                  createReport.mutate({ title: title.trim(), content })
-                }}
-                disabled={!title.trim() || createReport.isPending}
-                className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-5 py-2.5 text-sm font-medium disabled:opacity-50"
-                data-testid="save-draft-btn"
-              >
-                {createReport.isPending ? '저장 중...' : '초안 저장'}
-              </button>
-              <button
-                onClick={handleBack}
-                className="text-slate-400 hover:text-slate-200 text-sm px-5 py-2.5"
-              >
-                취소
-              </button>
-            </div>
-          </div>
-        )}
+                  <div className="flex gap-3">
+                    <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 flex-none ring-1 ring-slate-700">
+                      <Bot className="w-4 h-4" />
+                    </div>
+                    <div className="flex flex-1 items-stretch rounded border border-slate-800 bg-slate-900 focus-within:border-cyan-500/50 transition-colors">
+                      <input
+                        className="w-full bg-transparent border-none text-sm text-slate-50 focus:ring-0 placeholder:text-slate-500 px-3 py-2 focus:outline-none"
+                        placeholder="Add a comment..."
+                        type="text"
+                        value={commentInput}
+                        onChange={(e) => setCommentInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && commentInput.trim()) {
+                            createComment.mutate(commentInput.trim())
+                          }
+                        }}
+                        data-testid="comment-input"
+                      />
+                      <button
+                        onClick={() => {
+                          if (commentInput.trim()) createComment.mutate(commentInput.trim())
+                        }}
+                        disabled={!commentInput.trim() || createComment.isPending}
+                        className="px-3 text-cyan-400 hover:text-cyan-300 transition-colors font-medium text-sm disabled:opacity-50"
+                        data-testid="comment-send-btn"
+                      >
+                        Post
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </aside>
+          )}
+        </div>
 
-        {/* === 상세 뷰 로딩 === */}
-        {view === 'detail' && detailLoading && (
-          <div className="px-4 sm:px-6 lg:px-8 py-4 max-w-2xl space-y-4" data-testid="detail-loading">
-            <div className="h-4 w-24 bg-slate-700 animate-pulse rounded" />
-            <div className="h-6 w-3/4 bg-slate-700 animate-pulse rounded" />
-            {[...Array(10)].map((_, i) => (
-              <div key={i} className="h-4 w-full bg-slate-700 animate-pulse rounded" />
-            ))}
-          </div>
-        )}
-
-        {/* === 상세 뷰 === */}
-        {view === 'detail' && !detailLoading && report && (
-          <div className="px-4 sm:px-6 lg:px-8 py-4 max-w-2xl space-y-6" data-testid="report-detail">
-            {/* 상태 + 메타 정보 */}
+        {/* Mobile detail view (when no sidebar space) */}
+        {view === 'detail' && report && (
+          <div className="lg:hidden flex-1 overflow-y-auto px-4 sm:px-6 py-4 space-y-6">
+            <button onClick={handleBack} className="text-sm text-slate-400 hover:text-slate-200" data-testid="back-btn">
+              ← 목록
+            </button>
             <div className="space-y-3">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className={`text-xs px-2 py-0.5 rounded ${STATUS_STYLES[report.status]?.className || ''}`}>
-                  {report.status === 'submitted' || report.status === 'reviewed'
-                    ? '📤 CEO 보고 완료'
-                    : STATUS_STYLES[report.status]?.label || report.status}
+                  {STATUS_STYLES[report.status]?.label || report.status}
                 </span>
                 <span className="text-xs text-slate-500">
                   작성: {report.authorName} · {new Date(report.createdAt).toLocaleDateString('ko-KR')}
                 </span>
-                {report.submittedAt && (
-                  <span className="text-xs text-slate-500">
-                    · 제출: {new Date(report.submittedAt).toLocaleDateString('ko-KR')}
-                  </span>
-                )}
               </div>
-
-              {/* CEO 보고 완료 안내 */}
-              {report.status !== 'draft' && (
-                <p className="text-xs text-slate-500">
-                  CEO에게 보고된 보고서입니다. 본문 수정이 제한됩니다.
-                </p>
-              )}
-
-              {editMode ? (
-                <>
-                  <input
-                    type="text"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className={inputClass}
-                  />
-                  <textarea
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    rows={14}
-                    className={inputClass}
-                  />
-                  <div className="flex gap-3">
-                    <button
-                      onClick={handleSaveEdit}
-                      disabled={!title.trim() || updateReport.isPending}
-                      className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50"
-                    >
-                      {updateReport.isPending ? '저장 중...' : '저장'}
-                    </button>
-                    <button
-                      onClick={() => setEditMode(false)}
-                      className="text-slate-400 hover:text-slate-200 text-sm px-4 py-2"
-                    >
-                      취소
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <h2 className="text-xl font-bold text-slate-50">{report.title}</h2>
-                  <MarkdownRenderer
-                    content={report.content || '(내용 없음)'}
-                    className="bg-slate-800/50 rounded-xl p-5 min-h-[200px]"
-                  />
-                </>
-              )}
+              <h2 className="text-xl font-bold text-slate-50">{report.title}</h2>
+              <MarkdownRenderer
+                content={report.content || '(내용 없음)'}
+                className="prose prose-invert max-w-none text-slate-300 text-sm"
+              />
             </div>
-
-            {/* 액션 버튼 — 모바일 sticky */}
-            {!editMode && (
-              <div className="flex gap-3 border-t border-slate-700 pt-4 sm:static sticky bottom-0 bg-slate-900 pb-4 sm:pb-0">
-                {isMyReport && report.status === 'draft' && (
-                  <>
-                    <button
-                      onClick={handleStartEdit}
-                      className="border border-slate-600 text-slate-300 hover:bg-slate-800 rounded-lg px-4 py-2 text-sm"
-                      data-testid="edit-btn"
-                    >
-                      수정
-                    </button>
-                    <button
-                      onClick={() => setConfirmOpen(true)}
-                      disabled={submitReport.isPending}
-                      className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50"
-                      data-testid="submit-btn"
-                    >
-                      📤 CEO에게 보고
-                    </button>
-                    <button
-                      onClick={() => setDeleteConfirmOpen(true)}
-                      className="text-red-400 hover:text-red-300 text-sm px-4 py-2"
-                      data-testid="delete-btn"
-                    >
-                      삭제
-                    </button>
-                  </>
-                )}
-                {isReceivedReport && report.status === 'submitted' && (
-                  <button
-                    onClick={() => reviewReport.mutate()}
-                    disabled={reviewReport.isPending}
-                    className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50"
-                    data-testid="review-btn"
-                  >
-                    {reviewReport.isPending ? '처리 중...' : '검토 완료'}
-                  </button>
-                )}
-                {report.status !== 'draft' && (
-                  <>
-                    <button
-                      onClick={handleDownload}
-                      disabled={downloading}
-                      className="border border-slate-600 text-slate-300 hover:bg-slate-800 rounded-lg px-4 py-2 text-sm"
-                      data-testid="download-btn"
-                    >
-                      {downloading ? '다운로드 중...' : '📥 다운로드'}
-                    </button>
-                    <button
-                      onClick={() => setShowShareModal(true)}
-                      className="border border-slate-600 text-slate-300 hover:bg-slate-800 rounded-lg px-4 py-2 text-sm"
-                      data-testid="share-btn"
-                    >
-                      💬 메신저로 공유
-                    </button>
-                  </>
-                )}
-              </div>
-            )}
-
-            {/* 코멘트 섹션 (제출 이후만) */}
-            {report.status !== 'draft' && (
-              <div className="border-t border-slate-700 pt-4 space-y-4" data-testid="comments-section">
-                <h3 className="text-sm font-medium text-slate-500">
-                  코멘트 ({comments.length})
-                </h3>
-
-                {comments.length === 0 && (
-                  <p className="text-xs text-slate-500">아직 코멘트가 없습니다</p>
-                )}
-
-                {remainingComments > 0 && (
-                  <button
-                    onClick={loadMoreComments}
-                    className="text-xs text-blue-400 hover:underline"
-                  >
-                    이전 코멘트 {remainingComments}개 더 보기
-                  </button>
-                )}
-
-                {comments.map((c) => {
-                  const isCeo = c.authorId === report.submittedTo
-                  return (
-                    <div
-                      key={c.id}
-                      className={`max-w-[85%] rounded-xl px-4 py-3 ${
-                        isCeo
-                          ? 'ml-auto bg-blue-600/10'
-                          : 'mr-auto bg-slate-800/50'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-medium text-slate-300">
-                          {c.authorName}
-                        </span>
-                        <span className="text-[10px] text-slate-500">
-                          {new Date(c.createdAt).toLocaleString('ko-KR', {
-                            month: 'short',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </span>
-                      </div>
-                      <p className="text-sm whitespace-pre-wrap text-slate-300">
-                        {c.content}
-                      </p>
-                    </div>
-                  )
-                })}
-
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={commentInput}
-                    onChange={(e) => setCommentInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && commentInput.trim()) {
-                        createComment.mutate(commentInput.trim())
-                      }
-                    }}
-                    placeholder="코멘트 작성..."
-                    className="flex-1 bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-4 py-2 text-sm focus:outline-none"
-                    data-testid="comment-input"
-                  />
-                  <button
-                    onClick={() => {
-                      if (commentInput.trim()) createComment.mutate(commentInput.trim())
-                    }}
-                    disabled={!commentInput.trim() || createComment.isPending}
-                    className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50"
-                    data-testid="comment-send-btn"
-                  >
-                    전송
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* 에이전트와 이어서 논의하기 */}
-            {report.status !== 'draft' && (
-              <div className="border-t border-slate-700 pt-4">
-                <button
-                  onClick={() => navigate('/chat?newSession=true')}
-                  className="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl px-4 py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2"
-                  data-testid="agent-discussion-btn"
-                >
-                  <span>에이전트와 이어서 논의하기</span>
-                  <span className="text-xs text-slate-500">→</span>
-                </button>
-              </div>
-            )}
           </div>
         )}
+
+        {/* ConfirmDialog: CEO 보고 */}
+        {confirmOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-6 w-96">
+              <h3 className="text-sm font-semibold text-slate-100 mb-2">CEO에게 보고</h3>
+              <p className="text-xs text-slate-400 mb-4">이 보고서를 CEO에게 보고하시겠습니까? 보고 후 본문 수정이 제한됩니다.</p>
+              <div className="flex justify-end gap-2">
+                <button onClick={() => setConfirmOpen(false)} className="border border-slate-600 rounded-lg px-4 py-2 text-sm text-slate-300 hover:bg-slate-700">취소</button>
+                <button onClick={() => { setConfirmOpen(false); submitReport.mutate() }} className="bg-cyan-400 hover:bg-cyan-400/90 text-slate-950 rounded-lg px-4 py-2 text-sm font-medium">보고하기</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ConfirmDialog: 삭제 */}
+        {deleteConfirmOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-6 w-96">
+              <h3 className="text-sm font-semibold text-slate-100 mb-2">보고서 삭제</h3>
+              <p className="text-xs text-slate-400 mb-4">이 보고서를 삭제하시겠습니까? 되돌릴 수 없습니다.</p>
+              <div className="flex justify-end gap-2">
+                <button onClick={() => setDeleteConfirmOpen(false)} className="border border-slate-600 rounded-lg px-4 py-2 text-sm text-slate-300 hover:bg-slate-700">취소</button>
+                <button onClick={() => { setDeleteConfirmOpen(false); deleteReport.mutate() }} className="bg-red-600 hover:bg-red-500 text-white rounded-lg px-4 py-2 text-sm font-medium">삭제</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showShareModal && report && (
+          <ShareToConversationModal
+            reportId={report.id}
+            reportTitle={report.title}
+            onClose={() => setShowShareModal(false)}
+          />
+        )}
       </div>
+    )
+  }
 
-      {/* ConfirmDialog: CEO 보고 */}
-      {confirmOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-6 w-96">
-            <h3 className="text-sm font-semibold text-slate-100 mb-2">CEO에게 보고</h3>
-            <p className="text-xs text-slate-400 mb-4">이 보고서를 CEO에게 보고하시겠습니까? 보고 후 본문 수정이 제한됩니다.</p>
-            <div className="flex justify-end gap-2">
-              <button onClick={() => setConfirmOpen(false)} className="border border-slate-600 rounded-lg px-4 py-2 text-sm text-slate-300 hover:bg-slate-700">취소</button>
-              <button onClick={() => { setConfirmOpen(false); submitReport.mutate() }} className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium">보고하기</button>
-            </div>
+  // === Create view ===
+  if (view === 'create') {
+    return (
+      <div className="h-full flex flex-col bg-slate-950" data-testid="reports-page">
+        <div className="px-6 py-4 border-b border-slate-800 flex items-center gap-3">
+          <button onClick={handleBack} className="text-sm text-slate-400 hover:text-slate-200" data-testid="back-btn">
+            ← 목록
+          </button>
+          <h2 className="text-lg font-semibold text-slate-50">새 보고서</h2>
+        </div>
+        <div className="flex-1 overflow-y-auto px-6 py-4 max-w-2xl space-y-4">
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="보고서 제목"
+            className={inputClass}
+            data-testid="report-title-input"
+          />
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="보고서 내용을 마크다운으로 작성하세요..."
+            rows={16}
+            className={inputClass}
+            data-testid="report-content-input"
+          />
+          <div className="flex gap-3">
+            <button
+              onClick={() => {
+                if (!title.trim()) return
+                createReport.mutate({ title: title.trim(), content })
+              }}
+              disabled={!title.trim() || createReport.isPending}
+              className="bg-cyan-400 hover:bg-cyan-400/90 text-slate-950 rounded-lg px-5 py-2.5 text-sm font-medium disabled:opacity-50"
+              data-testid="save-draft-btn"
+            >
+              {createReport.isPending ? '저장 중...' : '초안 저장'}
+            </button>
+            <button
+              onClick={handleBack}
+              className="text-slate-400 hover:text-slate-200 text-sm px-5 py-2.5"
+            >
+              취소
+            </button>
           </div>
         </div>
-      )}
+      </div>
+    )
+  }
 
-      {/* ConfirmDialog: 삭제 */}
-      {deleteConfirmOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-6 w-96">
-            <h3 className="text-sm font-semibold text-slate-100 mb-2">보고서 삭제</h3>
-            <p className="text-xs text-slate-400 mb-4">이 보고서를 삭제하시겠습니까? 되돌릴 수 없습니다.</p>
-            <div className="flex justify-end gap-2">
-              <button onClick={() => setDeleteConfirmOpen(false)} className="border border-slate-600 rounded-lg px-4 py-2 text-sm text-slate-300 hover:bg-slate-700">취소</button>
-              <button onClick={() => { setDeleteConfirmOpen(false); deleteReport.mutate() }} className="bg-red-600 hover:bg-red-500 text-white rounded-lg px-4 py-2 text-sm font-medium">삭제</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showShareModal && report && (
-        <ShareToConversationModal
-          reportId={report.id}
-          reportTitle={report.title}
-          onClose={() => setShowShareModal(false)}
-        />
-      )}
-    </div>
-  )
+  // fallback
+  return null
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
+import { Search, ChevronDown, FileText, ArrowRight, CheckCircle, XCircle, AlertTriangle, Info } from 'lucide-react'
 import { api } from '../lib/api'
 import { useActivityWs } from '../hooks/use-activity-ws'
 import { WsStatusIndicator } from '../components/ws-status-indicator'
@@ -144,20 +145,20 @@ const TAB_ITEMS = [
 ]
 
 const STATUS_BADGE: Record<string, { label: string; classes: string }> = {
-  completed: { label: '완료', classes: 'bg-emerald-500/20 text-emerald-400' },
-  done: { label: '완료', classes: 'bg-emerald-500/20 text-emerald-400' },
-  end: { label: '완료', classes: 'bg-emerald-500/20 text-emerald-400' },
-  success: { label: '성공', classes: 'bg-emerald-500/20 text-emerald-400' },
-  failed: { label: '실패', classes: 'bg-red-500/20 text-red-400' },
-  error: { label: '오류', classes: 'bg-red-500/20 text-red-400' },
-  working: { label: '진행중', classes: 'bg-blue-500/20 text-blue-400' },
-  start: { label: '진행중', classes: 'bg-blue-500/20 text-blue-400' },
-  running: { label: '진행중', classes: 'bg-blue-500/20 text-blue-400' },
-  pass: { label: 'PASS', classes: 'bg-emerald-500/20 text-emerald-400' },
-  fail: { label: 'FAIL', classes: 'bg-red-500/20 text-red-400' },
-  warning: { label: '경고', classes: 'bg-amber-500/20 text-amber-400' },
-  clean: { label: '정상', classes: 'bg-emerald-500/20 text-emerald-400' },
-  critical: { label: '위험', classes: 'bg-red-500/20 text-red-400' },
+  completed: { label: '완료', classes: 'bg-emerald-500/10 text-emerald-400 ring-1 ring-inset ring-emerald-500/20' },
+  done: { label: '완료', classes: 'bg-emerald-500/10 text-emerald-400 ring-1 ring-inset ring-emerald-500/20' },
+  end: { label: '완료', classes: 'bg-emerald-500/10 text-emerald-400 ring-1 ring-inset ring-emerald-500/20' },
+  success: { label: '성공', classes: 'bg-emerald-500/10 text-emerald-400 ring-1 ring-inset ring-emerald-500/20' },
+  failed: { label: '실패', classes: 'bg-red-500/10 text-red-400 ring-1 ring-inset ring-red-500/20' },
+  error: { label: '오류', classes: 'bg-red-500/10 text-red-400 ring-1 ring-inset ring-red-500/20' },
+  working: { label: '진행중', classes: 'bg-blue-500/10 text-blue-400 ring-1 ring-inset ring-blue-500/20' },
+  start: { label: '진행중', classes: 'bg-blue-500/10 text-blue-400 ring-1 ring-inset ring-blue-500/20' },
+  running: { label: '진행중', classes: 'bg-blue-500/10 text-blue-400 ring-1 ring-inset ring-blue-500/20' },
+  pass: { label: 'PASS', classes: 'bg-emerald-500/10 text-emerald-400 ring-1 ring-inset ring-emerald-500/20' },
+  fail: { label: 'FAIL', classes: 'bg-red-500/10 text-red-400 ring-1 ring-inset ring-red-500/20' },
+  warning: { label: '경고', classes: 'bg-amber-500/10 text-amber-400 ring-1 ring-inset ring-amber-500/20' },
+  clean: { label: '정상', classes: 'bg-emerald-500/10 text-emerald-400 ring-1 ring-inset ring-emerald-500/20' },
+  critical: { label: '위험', classes: 'bg-red-500/10 text-red-400 ring-1 ring-inset ring-red-500/20' },
 }
 
 const SCORE_LABELS: Record<string, string> = {
@@ -243,6 +244,47 @@ function scoreTextColor(pct: number): string {
   if (pct >= 80) return 'text-emerald-400'
   if (pct >= 60) return 'text-amber-400'
   return 'text-red-400'
+}
+
+// === Status Icon Component ===
+
+function StatusIcon({ phase }: { phase: string }) {
+  if (['completed', 'done', 'end', 'success'].includes(phase)) {
+    return <CheckCircle className="w-5 h-5" />
+  }
+  if (['failed', 'error'].includes(phase)) {
+    return <XCircle className="w-5 h-5" />
+  }
+  if (phase === 'warning') {
+    return <AlertTriangle className="w-5 h-5" />
+  }
+  return <Info className="w-5 h-5" />
+}
+
+// === Status Badge ===
+
+function StatusBadgeEl({ status }: { status: string }) {
+  const info = STATUS_BADGE[status] || { label: status, classes: 'bg-slate-600/50 text-slate-400' }
+  return (
+    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${info.classes}`}>
+      {info.label}
+    </span>
+  )
+}
+
+// === Phase Icon Style ===
+
+const PHASE_ICON_STYLE: Record<string, { bg: string; text: string; accent: string }> = {
+  completed: { bg: 'bg-emerald-500/10', text: 'text-emerald-500', accent: 'bg-emerald-500' },
+  done: { bg: 'bg-emerald-500/10', text: 'text-emerald-500', accent: 'bg-emerald-500' },
+  end: { bg: 'bg-emerald-500/10', text: 'text-emerald-500', accent: 'bg-emerald-500' },
+  success: { bg: 'bg-emerald-500/10', text: 'text-emerald-500', accent: 'bg-emerald-500' },
+  failed: { bg: 'bg-red-500/10', text: 'text-red-500', accent: 'bg-red-500' },
+  error: { bg: 'bg-red-500/10', text: 'text-red-500', accent: 'bg-red-500' },
+  working: { bg: 'bg-cyan-400/10', text: 'text-cyan-400', accent: 'bg-cyan-400' },
+  start: { bg: 'bg-cyan-400/10', text: 'text-cyan-400', accent: 'bg-cyan-400' },
+  running: { bg: 'bg-cyan-400/10', text: 'text-cyan-400', accent: 'bg-cyan-400' },
+  warning: { bg: 'bg-amber-500/10', text: 'text-amber-500', accent: 'bg-amber-500' },
 }
 
 // === Main Page ===
@@ -332,49 +374,88 @@ export function ActivityLogPage() {
   const alertCount24h = securityQuery.data?.data?.count24h ?? 0
 
   return (
-    <div className="h-full flex flex-col bg-slate-900" data-testid="activity-log-page">
-      {/* Header — mobile sticky */}
-      <div className="sticky top-0 z-10 bg-slate-900/90 backdrop-blur-md px-4 sm:px-6 lg:px-8 py-4 border-b border-slate-700/50 flex items-center justify-between" data-testid="activity-header">
-        <h2 className="text-lg sm:text-xl font-bold text-slate-50 tracking-tight">활동 로그</h2>
-        <div className="flex items-center gap-2">
+    <div className="h-full flex flex-col bg-slate-950" data-testid="activity-log-page">
+      {/* Page Title & Description */}
+      <div className="px-4 md:px-10 py-6" data-testid="activity-header">
+        <div className="flex flex-wrap justify-between gap-3 mb-6">
+          <div className="flex min-w-72 flex-col gap-2">
+            <h1 className="text-slate-50 tracking-tight text-[32px] font-bold leading-tight">통신로그</h1>
+            <p className="text-slate-400 text-sm font-normal leading-normal">
+              모든 AI 에이전트의 활동 및 시스템 이벤트를 모니터링합니다.
+            </p>
+          </div>
           <WsStatusIndicator />
         </div>
-      </div>
 
-      {/* Tabs — horizontally scrollable on mobile */}
-      <div className="px-4 sm:px-6 lg:px-8 border-b border-slate-700 overflow-x-auto no-scrollbar" data-testid="activity-tabs">
-        <div className="flex gap-0" role="tablist">
-          {TAB_ITEMS.map(item => (
-            <button
-              key={item.value}
-              role="tab"
-              aria-selected={tab === item.value}
-              onClick={() => setTab(item.value)}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                tab === item.value
-                  ? 'border-cyan-400 text-cyan-400'
-                  : 'border-transparent text-slate-400 hover:text-slate-200'
-              }`}
-              data-testid={`tab-${item.value}`}
-            >
-              {item.label}
-            </button>
-          ))}
+        {/* Filters & Search (Stitch-matching) */}
+        <div className="flex flex-col md:flex-row gap-4 mb-6 justify-between items-start md:items-center">
+          <div className="flex gap-2 flex-wrap">
+            {TAB_ITEMS.map(item => (
+              <button
+                key={item.value}
+                onClick={() => setTab(item.value)}
+                className={`flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg pl-4 pr-2 transition-colors ${
+                  tab === item.value
+                    ? 'bg-cyan-400/10 border border-cyan-400/20 text-cyan-400'
+                    : 'bg-slate-800/50 border border-slate-700 hover:bg-slate-800 text-slate-200'
+                }`}
+                data-testid={`tab-${item.value}`}
+              >
+                <span className="text-sm font-medium leading-normal">{item.label}</span>
+                <ChevronDown className="w-4 h-4 text-slate-400" />
+              </button>
+            ))}
+            {tab === 'tools' && (
+              <input
+                placeholder="도구명 필터..."
+                value={toolNameFilter}
+                onChange={(e) => { setToolNameFilter(e.target.value); setPage(1) }}
+                className="h-9 bg-slate-800/50 border border-slate-700 focus:border-cyan-500 rounded-lg px-3 text-xs text-slate-50 placeholder:text-slate-500 outline-none w-32 md:w-40 transition-colors"
+                data-testid="tool-name-filter"
+              />
+            )}
+            {tab === 'quality' && (
+              <select
+                value={conclusionFilter}
+                onChange={(e) => { setConclusionFilter(e.target.value); setPage(1) }}
+                className="h-9 px-3 border border-slate-700 rounded-lg bg-slate-800/50 text-slate-300 text-xs outline-none focus:border-cyan-500"
+                data-testid="conclusion-filter"
+              >
+                <option value="">전체 판정</option>
+                <option value="pass">PASS</option>
+                <option value="fail">FAIL</option>
+              </select>
+            )}
+          </div>
+          <div className="w-full md:w-72">
+            <label className="flex flex-col w-full h-10">
+              <div className="flex w-full flex-1 items-stretch rounded-lg h-full border border-slate-700 bg-slate-900/50 focus-within:border-cyan-400 transition-colors">
+                <div className="text-slate-500 flex items-center justify-center pl-3">
+                  <Search className="w-4 h-4" />
+                </div>
+                <input
+                  className="flex w-full min-w-0 flex-1 bg-transparent text-slate-50 focus:outline-none focus:ring-0 border-none h-full placeholder:text-slate-500 px-3 text-sm font-normal leading-normal"
+                  placeholder="이벤트 검색..."
+                  value={searchInput}
+                  onChange={(e) => { setSearchInput(e.target.value); setPage(1) }}
+                  data-testid="search-input"
+                />
+              </div>
+            </label>
+          </div>
         </div>
       </div>
 
       {/* Security Alert Banner (QA tab only) */}
       {tab === 'quality' && alertCount24h > 0 && (
         <div
-          className="mx-4 md:mx-6 mt-2 px-3 py-2 bg-red-500/10 border border-red-500/30 rounded-xl cursor-pointer flex items-center justify-between hover:bg-red-500/15 transition-colors"
+          className="mx-4 md:mx-10 mb-4 px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl cursor-pointer flex items-center justify-between hover:bg-red-500/15 transition-colors"
           onClick={() => setShowSecurityAlerts(!showSecurityAlerts)}
           role="alert"
           data-testid="security-alert-banner"
         >
           <div className="flex items-center gap-2">
-            <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
+            <AlertTriangle className="w-4 h-4 text-red-400" />
             <span className="text-red-400 text-sm font-medium">
               보안 알림: 최근 24시간 {alertCount24h}건 차단
             </span>
@@ -385,7 +466,7 @@ export function ActivityLogPage() {
 
       {/* Security Alerts Detail (collapsible) */}
       {tab === 'quality' && showSecurityAlerts && securityQuery.data?.data?.items && (
-        <div className="mx-4 md:mx-6 mb-2 p-3 bg-red-500/5 border border-red-500/20 rounded-b-xl" data-testid="security-alerts-detail">
+        <div className="mx-4 md:mx-10 mb-4 p-3 bg-red-500/5 border border-red-500/20 rounded-b-xl" data-testid="security-alerts-detail">
           <table className="w-full text-xs">
             <thead>
               <tr className="text-slate-500 border-b border-red-500/20">
@@ -422,80 +503,105 @@ export function ActivityLogPage() {
         </div>
       )}
 
-      {/* Filters — mobile-friendly with scrollable row */}
-      <div className="px-4 sm:px-6 lg:px-8 py-3 border-b border-slate-700/50 flex flex-wrap gap-2 items-center overflow-x-auto no-scrollbar" data-testid="activity-filters">
-        <div className="relative shrink-0 flex-1 min-w-[140px] max-w-[200px] md:max-w-[240px]">
-          <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input
-            placeholder="검색..."
-            value={searchInput}
-            onChange={(e) => { setSearchInput(e.target.value); setPage(1) }}
-            className="w-full bg-slate-800 border border-slate-700 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 rounded-xl pl-8 pr-3 py-2 text-xs text-slate-50 placeholder:text-slate-500 outline-none transition-all"
-            data-testid="search-input"
-          />
-        </div>
-        <input
-          type="date"
-          value={startDate}
-          onChange={(e) => { setStartDate(e.target.value); setPage(1) }}
-          className="shrink-0 text-xs h-8 px-2 border border-slate-700 rounded-lg bg-slate-800 text-slate-300 outline-none focus:border-cyan-500"
-          data-testid="date-start"
-        />
-        <span className="text-xs text-slate-500 shrink-0">~</span>
-        <input
-          type="date"
-          value={endDate}
-          onChange={(e) => { setEndDate(e.target.value); setPage(1) }}
-          className="shrink-0 text-xs h-8 px-2 border border-slate-700 rounded-lg bg-slate-800 text-slate-300 outline-none focus:border-cyan-500"
-          data-testid="date-end"
-        />
-        {tab === 'tools' && (
-          <div className="relative">
-            <input
-              placeholder="도구명 필터..."
-              value={toolNameFilter}
-              onChange={(e) => { setToolNameFilter(e.target.value); setPage(1) }}
-              className="bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-xs text-slate-50 placeholder:text-slate-500 outline-none w-32 md:w-40 transition-colors"
-              data-testid="tool-name-filter"
-            />
-          </div>
-        )}
-        {tab === 'quality' && (
-          <select
-            value={conclusionFilter}
-            onChange={(e) => { setConclusionFilter(e.target.value); setPage(1) }}
-            className="text-xs h-8 px-2 border border-slate-600 rounded-lg bg-slate-800 text-slate-300 outline-none focus:border-blue-500"
-            data-testid="conclusion-filter"
-          >
-            <option value="">전체 판정</option>
-            <option value="pass">PASS</option>
-            <option value="fail">FAIL</option>
-          </select>
-        )}
-      </div>
-
-      {/* Table Content */}
-      <div className="flex-1 overflow-auto px-4 sm:px-6 lg:px-8 py-3" data-testid="activity-content">
+      {/* Activity Feed (Stitch-matching card style) */}
+      <div className="flex-1 overflow-auto px-4 md:px-10 pb-8" data-testid="activity-content">
         {activeQuery.isLoading ? (
-          <div className="space-y-2" data-testid="activity-loading">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="h-10 bg-slate-700/50 rounded animate-pulse" />
+          <div className="flex flex-col gap-3" data-testid="activity-loading">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-20 bg-slate-900/80 rounded-xl animate-pulse" />
             ))}
           </div>
         ) : !activeQuery.data?.data?.items?.length ? (
           <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="activity-empty">
-            <svg className="w-10 h-10 text-slate-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-            </svg>
+            <FileText className="w-10 h-10 text-slate-600 mb-4" />
             <h3 className="text-base font-medium text-slate-300 mb-2">데이터가 없습니다</h3>
             <p className="text-sm text-slate-500">선택한 기간에 해당하는 기록이 없습니다</p>
           </div>
         ) : (
-          <>
-            {tab === 'agents' && <AgentsTable items={agentsQuery.data!.data.items} />}
-            {tab === 'delegations' && <DelegationsTable items={delegationsQuery.data!.data.items} />}
+          <div className="flex flex-col gap-3">
+            {tab === 'agents' && agentsQuery.data!.data.items.map((item) => {
+              const iconStyle = PHASE_ICON_STYLE[item.phase] || { bg: 'bg-cyan-400/10', text: 'text-cyan-400', accent: 'bg-cyan-400' }
+              return (
+                <div
+                  key={item.id}
+                  className="flex gap-4 bg-slate-900/80 border border-slate-800/60 rounded-xl p-4 hover:border-slate-700 transition-colors relative overflow-hidden group"
+                >
+                  {/* Left accent bar */}
+                  <div className={`absolute left-0 top-0 bottom-0 w-1 ${iconStyle.accent}`} />
+                  <div className="flex items-start gap-4 w-full">
+                    {/* Avatar with status dot */}
+                    <div className="relative">
+                      <div className={`${iconStyle.bg} ${iconStyle.text} aspect-square rounded-full h-12 w-12 border-2 border-slate-900 shadow-sm flex items-center justify-center`}>
+                        <StatusIcon phase={item.phase} />
+                      </div>
+                      <div className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-slate-900 ${iconStyle.accent}`} />
+                    </div>
+                    <div className="flex flex-1 flex-col justify-center gap-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="text-slate-50 text-base font-semibold leading-tight">{item.action}</p>
+                        <StatusBadgeEl status={item.phase} />
+                        {item.agentName && (
+                          <span className="inline-flex items-center rounded-full bg-slate-800 px-2 py-0.5 text-xs font-medium text-slate-300 ring-1 ring-inset ring-slate-500/20">
+                            {item.agentName}
+                          </span>
+                        )}
+                      </div>
+                      {item.detail && (
+                        <p className="text-slate-400 text-sm font-normal leading-relaxed">{item.detail}</p>
+                      )}
+                    </div>
+                    <div className="flex flex-col items-end shrink-0 gap-1 text-right">
+                      <p className="font-mono text-slate-400 text-sm font-medium tracking-tight tabular-nums">
+                        {new Date(item.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                      </p>
+                      <p className="text-slate-500 text-xs font-normal">
+                        {formatTime(item.createdAt).split(' ')[0]}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+
+            {tab === 'delegations' && delegationsQuery.data!.data.items.map((item) => {
+              const meta = item.metadata as Record<string, unknown> | null
+              return (
+                <div
+                  key={item.id}
+                  className="flex gap-4 bg-slate-900/80 border border-slate-800/60 rounded-xl p-4 hover:border-slate-700 transition-colors relative overflow-hidden"
+                >
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-violet-500" />
+                  <div className="flex items-start gap-4 w-full">
+                    <div className="relative">
+                      <div className="bg-violet-500/10 text-violet-400 aspect-square rounded-full h-12 w-12 border-2 border-slate-900 shadow-sm flex items-center justify-center">
+                        <ArrowRight className="w-5 h-5" />
+                      </div>
+                      <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-slate-900 bg-violet-500" />
+                    </div>
+                    <div className="flex flex-1 flex-col justify-center gap-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="text-slate-50 text-base font-semibold leading-tight">위임</p>
+                        <StatusBadgeEl status={item.status} />
+                        <span className="inline-flex items-center rounded-full bg-slate-800 px-2 py-0.5 text-xs font-medium text-slate-300 ring-1 ring-inset ring-slate-500/20">
+                          {item.agentName || '시스템'}
+                        </span>
+                      </div>
+                      <p className="text-slate-400 text-sm font-normal leading-relaxed">
+                        {item.agentName || '시스템'} → {(meta?.toAgentName as string) || '-'}
+                        {item.input ? `: ${String(item.input).slice(0, 80)}` : ''}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-end shrink-0 gap-1 text-right">
+                      <p className="font-mono text-slate-400 text-sm font-medium tracking-tight tabular-nums">
+                        {new Date(item.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                      </p>
+                      <p className="text-slate-500 text-xs font-normal">{formatDuration(item.durationMs)}</p>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+
             {tab === 'quality' && (
               <QualityTable
                 items={qualityQuery.data!.data.items}
@@ -503,30 +609,31 @@ export function ActivityLogPage() {
                 onToggle={(id) => setExpandedQaId(expandedQaId === id ? null : id)}
               />
             )}
+
             {tab === 'tools' && <ToolsTable items={toolsQuery.data!.data.items} />}
-          </>
+          </div>
         )}
       </div>
 
       {/* Pagination */}
       {totalCount > 0 && (
-        <div className="px-4 sm:px-6 lg:px-8 py-3 border-t border-slate-700 flex items-center justify-between" data-testid="activity-pagination">
+        <div className="px-4 md:px-10 py-3 border-t border-slate-800 flex items-center justify-between" data-testid="activity-pagination">
           <span className="text-xs text-slate-500">{totalCount.toLocaleString()}건</span>
           <div className="flex items-center gap-2">
             <button
               disabled={page <= 1}
               onClick={() => setPage((p) => p - 1)}
-              className="px-3 py-1.5 text-xs border border-slate-600 rounded-lg text-slate-400 disabled:opacity-30 hover:bg-slate-700 transition-colors"
+              className="px-3 py-1.5 text-xs border border-slate-700 rounded-lg text-slate-400 disabled:opacity-30 hover:bg-slate-800 transition-colors"
             >
               이전
             </button>
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-slate-400 font-mono tabular-nums">
               {page} / {totalPages}
             </span>
             <button
               disabled={page >= totalPages}
               onClick={() => setPage((p) => p + 1)}
-              className="px-3 py-1.5 text-xs border border-slate-600 rounded-lg text-slate-400 disabled:opacity-30 hover:bg-slate-700 transition-colors"
+              className="px-3 py-1.5 text-xs border border-slate-700 rounded-lg text-slate-400 disabled:opacity-30 hover:bg-slate-800 transition-colors"
             >
               다음
             </button>
@@ -537,147 +644,7 @@ export function ActivityLogPage() {
   )
 }
 
-// === Tab Tables ===
-
-function StatusBadge({ status }: { status: string }) {
-  const info = STATUS_BADGE[status] || { label: status, classes: 'bg-slate-600/50 text-slate-400' }
-  return (
-    <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${info.classes}`}>
-      {info.label}
-    </span>
-  )
-}
-
-const PHASE_ICON_STYLE: Record<string, { bg: string; text: string }> = {
-  completed: { bg: 'bg-emerald-500/10', text: 'text-emerald-500' },
-  done: { bg: 'bg-emerald-500/10', text: 'text-emerald-500' },
-  end: { bg: 'bg-emerald-500/10', text: 'text-emerald-500' },
-  success: { bg: 'bg-emerald-500/10', text: 'text-emerald-500' },
-  failed: { bg: 'bg-red-500/10', text: 'text-red-500' },
-  error: { bg: 'bg-red-500/10', text: 'text-red-500' },
-  working: { bg: 'bg-cyan-400/10', text: 'text-cyan-400' },
-  start: { bg: 'bg-cyan-400/10', text: 'text-cyan-400' },
-  running: { bg: 'bg-cyan-400/10', text: 'text-cyan-400' },
-  warning: { bg: 'bg-amber-500/10', text: 'text-amber-500' },
-}
-
-function AgentsTable({ items }: { items: AgentActivity[] }) {
-  return (
-    <div data-testid="agents-table">
-      {/* Mobile card view */}
-      <div className="flex flex-col gap-2 md:hidden">
-        {items.map((item) => {
-          const iconStyle = PHASE_ICON_STYLE[item.phase] || { bg: 'bg-cyan-400/10', text: 'text-cyan-400' }
-          return (
-            <div key={item.id} className="flex items-start gap-3 bg-slate-800/50 rounded-xl p-4">
-              <div className={`${iconStyle.text} flex items-center justify-center rounded-full ${iconStyle.bg} shrink-0 size-10 mt-0.5`}>
-                <StatusIcon phase={item.phase} />
-              </div>
-              <div className="flex flex-col flex-1 min-w-0">
-                <div className="flex justify-between items-start gap-2 mb-1">
-                  <p className="text-sm font-semibold text-cyan-400 line-clamp-1">{item.agentName || '-'}</p>
-                  <p className="text-slate-500 text-xs font-mono shrink-0 pt-0.5">
-                    {new Date(item.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                  </p>
-                </div>
-                <p className="text-sm font-medium leading-snug line-clamp-2">{item.action}</p>
-              </div>
-            </div>
-          )
-        })}
-      </div>
-      {/* Desktop table view */}
-      <div className="overflow-x-auto hidden md:block">
-        <table className="w-full text-sm min-w-[640px]">
-          <thead>
-            <tr className="text-xs text-slate-500 border-b border-slate-700">
-              <th className="text-left py-2 pr-3 font-medium">시간</th>
-              <th className="text-left py-2 pr-3 font-medium">에이전트</th>
-              <th className="text-left py-2 pr-3 font-medium">명령</th>
-              <th className="text-left py-2 pr-3 font-medium">상태</th>
-              <th className="text-right py-2 pr-3 font-medium">소요시간</th>
-              <th className="text-right py-2 font-medium">토큰</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item) => (
-              <tr key={item.id} className="border-b border-slate-700/50 hover:bg-slate-800/50 transition-colors">
-                <td className="py-2.5 pr-3 text-xs text-slate-500 whitespace-nowrap">{formatTime(item.createdAt)}</td>
-                <td className="py-2.5 pr-3 text-xs font-medium text-slate-200">{item.agentName || '-'}</td>
-                <td className="py-2.5 pr-3 text-xs text-slate-300 truncate max-w-[200px]">{item.action}</td>
-                <td className="py-2.5 pr-3"><StatusBadge status={item.phase} /></td>
-                <td className="py-2.5 pr-3 text-xs text-right text-slate-500">
-                  {formatDuration((item.metadata as Record<string, unknown>)?.durationMs as number | undefined)}
-                </td>
-                <td className="py-2.5 text-xs text-right text-slate-500">{formatTokens(item.metadata)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  )
-}
-
-function StatusIcon({ phase }: { phase: string }) {
-  const svgClass = "w-5 h-5"
-  if (['completed', 'done', 'end', 'success'].includes(phase)) {
-    return <svg className={svgClass} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-  }
-  if (['failed', 'error'].includes(phase)) {
-    return <svg className={svgClass} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-  }
-  if (phase === 'warning') {
-    return <svg className={svgClass} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-  }
-  return <svg className={svgClass} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-}
-
-function DelegationsTable({ items }: { items: Delegation[] }) {
-  return (
-    <div className="overflow-x-auto" data-testid="delegations-table">
-      <table className="w-full text-sm min-w-[640px]">
-        <thead>
-          <tr className="text-xs text-slate-500 border-b border-slate-700">
-            <th className="text-left py-2 pr-3 font-medium">시간</th>
-            <th className="text-left py-2 pr-3 font-medium">발신 → 수신</th>
-            <th className="text-left py-2 pr-3 font-medium">명령 요약</th>
-            <th className="text-right py-2 pr-3 font-medium">비용</th>
-            <th className="text-right py-2 font-medium">토큰</th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((item) => {
-            const meta = item.metadata as Record<string, unknown> | null
-            const cost = meta?.costUsd as number | undefined
-            const tokens = meta?.totalTokens as number | undefined
-            return (
-              <tr key={item.id} className="border-b border-slate-700/50 hover:bg-slate-800/50 transition-colors">
-                <td className="py-2.5 pr-3 text-xs text-slate-500 whitespace-nowrap">{formatTime(item.createdAt)}</td>
-                <td className="py-2.5 pr-3 text-xs">
-                  <span className="font-medium text-slate-200">{item.agentName || '시스템'}</span>
-                  <span className="text-slate-500 mx-1">→</span>
-                  <span className="font-medium text-cyan-400">{(meta?.toAgentName as string) || '-'}</span>
-                </td>
-                <td className="py-2.5 pr-3 text-xs text-slate-300 truncate max-w-[240px]">
-                  {item.input ? String(item.input).slice(0, 80) : '-'}
-                </td>
-                <td className="py-2.5 pr-3 text-xs text-right text-slate-500">
-                  {cost != null ? `$${Number(cost).toFixed(4)}` : '-'}
-                </td>
-                <td className="py-2.5 text-xs text-right text-slate-500">
-                  {tokens != null ? Number(tokens).toLocaleString() : '-'}
-                </td>
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
-    </div>
-  )
-}
-
-// === Enhanced Quality Table ===
+// === Quality Table ===
 
 function QualityTable({
   items,
@@ -711,7 +678,6 @@ function QualityTable({
             return (
               <tr key={item.id} className="group">
                 <td colSpan={5} className="p-0">
-                  {/* Row header */}
                   <div
                     className="flex items-center cursor-pointer hover:bg-slate-800/50 transition-colors"
                     onClick={() => onToggle(item.id)}
@@ -731,11 +697,10 @@ function QualityTable({
                         <span className="text-xs text-slate-500">-</span>
                       )}
                     </div>
-                    <div className="py-2.5 pr-3 min-w-[60px]"><StatusBadge status={item.conclusion} /></div>
+                    <div className="py-2.5 pr-3 min-w-[60px]"><StatusBadgeEl status={item.conclusion} /></div>
                     <div className="py-2.5 text-xs text-right min-w-[50px] text-slate-400">{item.attemptNumber > 1 ? item.attemptNumber - 1 : 0}</div>
                   </div>
 
-                  {/* Expanded detail panel */}
                   {expandedId === item.id && scores && (
                     <QualityDetailPanel scores={scores} feedback={item.feedback} />
                   )}
@@ -749,7 +714,7 @@ function QualityTable({
   )
 }
 
-// === Quality Detail Panel (expanded view) ===
+// === Quality Detail Panel ===
 
 function QualityDetailPanel({ scores, feedback }: { scores: MergedScores; feedback: string | null }) {
   const [detailTab, setDetailTab] = useState<'rules' | 'rubric' | 'hallucination' | 'legacy'>('rules')
@@ -759,7 +724,6 @@ function QualityDetailPanel({ scores, feedback }: { scores: MergedScores; feedba
 
   return (
     <div className="bg-slate-800/30 border-b border-slate-700" data-testid="qa-detail-panel">
-      {/* Sub-tabs */}
       <div className="px-4 pt-2 flex gap-1 border-b border-slate-700">
         <DetailTabButton active={detailTab === 'rules'} onClick={() => setDetailTab('rules')}>
           규칙별 결과 {hasRules ? `(${scores.ruleResults!.length})` : ''}
@@ -803,7 +767,7 @@ function DetailTabButton({ active, onClick, children }: { active: boolean; onCli
       onClick={onClick}
       className={`px-3 py-1.5 text-[11px] font-medium rounded-t border-b-2 transition-colors ${
         active
-          ? 'border-blue-500 text-blue-400 bg-slate-800'
+          ? 'border-cyan-400 text-cyan-400 bg-slate-800'
           : 'border-transparent text-slate-500 hover:text-slate-300'
       }`}
     >
@@ -819,7 +783,6 @@ function RuleResultsPanel({ ruleResults }: { ruleResults: RuleResult[] }) {
     return <p className="text-xs text-slate-500">규칙별 검수 데이터가 없습니다.</p>
   }
 
-  // Group by category
   const grouped = ruleResults.reduce<Record<string, RuleResult[]>>((acc, r) => {
     const cat = r.category || 'other'
     if (!acc[cat]) acc[cat] = []
@@ -891,9 +854,8 @@ function HallucinationPanel({ report }: { report: HallucinationReport }) {
 
   return (
     <div className="space-y-3">
-      {/* Summary */}
       <div className="flex items-center gap-3 flex-wrap">
-        <StatusBadge status={report.verdict} />
+        <StatusBadgeEl status={report.verdict} />
         <div className="flex gap-4 text-xs">
           <span className="text-slate-500">총 주장: <span className="font-medium text-slate-200">{report.totalClaims}</span></span>
           <span className="text-slate-500">검증: <span className="font-medium text-emerald-400">{report.verifiedClaims}</span></span>
@@ -902,7 +864,6 @@ function HallucinationPanel({ report }: { report: HallucinationReport }) {
         </div>
       </div>
 
-      {/* Score bar */}
       <div className="flex items-center gap-2">
         <span className="text-[10px] text-slate-500 w-16">환각 점수</span>
         <div className="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
@@ -916,18 +877,16 @@ function HallucinationPanel({ report }: { report: HallucinationReport }) {
         </span>
       </div>
 
-      {/* Details */}
       {report.details && (
         <p className="text-[10px] text-slate-400">{report.details}</p>
       )}
 
-      {/* Claims list */}
       {report.claims.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-1">
             <span className="text-[10px] font-medium text-slate-500">주장별 검증 결과</span>
             {report.claims.length > 5 && (
-              <button onClick={() => setShowAll(!showAll)} className="text-[10px] text-blue-400 hover:underline">
+              <button onClick={() => setShowAll(!showAll)} className="text-[10px] text-cyan-400 hover:underline">
                 {showAll ? '일부만 보기' : `전체 보기 (${report.claims.length})`}
               </button>
             )}
@@ -941,7 +900,7 @@ function HallucinationPanel({ report }: { report: HallucinationReport }) {
                 <div className="flex-1 min-w-0">
                   <span className="text-slate-300 font-medium">{cv.claim.value}</span>
                   <span className="text-slate-500 ml-1">({cv.claim.type})</span>
-                  {cv.toolSource && <span className="text-blue-400 ml-1">via {cv.toolSource}</span>}
+                  {cv.toolSource && <span className="text-cyan-400 ml-1">via {cv.toolSource}</span>}
                   {cv.discrepancy && <p className="text-red-400 mt-0.5">{cv.discrepancy}</p>}
                 </div>
                 <span className={`shrink-0 px-1 py-0.5 rounded ${
@@ -960,7 +919,7 @@ function HallucinationPanel({ report }: { report: HallucinationReport }) {
   )
 }
 
-// === Legacy Scores Panel (existing 5-criteria) ===
+// === Legacy Scores Panel ===
 
 function LegacyScoresPanel({ scores }: { scores: MergedScores }) {
   return (
@@ -979,6 +938,8 @@ function LegacyScoresPanel({ scores }: { scores: MergedScores }) {
     </div>
   )
 }
+
+// === Tools Table ===
 
 function ToolsTable({ items }: { items: ToolInvocation[] }) {
   return (
@@ -1001,7 +962,7 @@ function ToolsTable({ items }: { items: ToolInvocation[] }) {
               <td className="py-2.5 pr-3 text-xs font-medium font-mono text-cyan-400">{item.toolName}</td>
               <td className="py-2.5 pr-3 text-xs text-slate-300">{item.agentName || '-'}</td>
               <td className="py-2.5 pr-3 text-xs text-right text-slate-500">{formatDuration(item.durationMs)}</td>
-              <td className="py-2.5 pr-3"><StatusBadge status={item.status} /></td>
+              <td className="py-2.5 pr-3"><StatusBadgeEl status={item.status} /></td>
               <td className="py-2.5 text-xs truncate max-w-[200px] text-slate-500">{item.input || '-'}</td>
             </tr>
           ))}
