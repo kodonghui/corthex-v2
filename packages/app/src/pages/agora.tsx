@@ -71,7 +71,7 @@ export function AgoraPage() {
   return (
     <div data-testid="agora-page" className="flex h-full bg-slate-900">
       {/* Left panel: debate list (hidden on mobile when viewing detail) */}
-      <div className={`w-72 shrink-0 border-r border-slate-700 ${mobileView === 'detail' ? 'hidden md:block' : ''}`}>
+      <div className={`w-full md:w-72 md:shrink-0 border-r border-slate-700 ${mobileView === 'detail' ? 'hidden md:block' : ''}`}>
         <DebateListPanel
           selectedId={selectedDebate?.id ?? null}
           onSelect={handleSelectDebate}
@@ -97,7 +97,7 @@ export function AgoraPage() {
             {/* Topic header */}
             <div data-testid="debate-topic-header" className="shrink-0 px-4 py-3 border-b border-slate-700">
               <div className="flex items-center gap-2">
-                <h2 className="text-sm font-bold text-slate-100 truncate">{debate.topic}</h2>
+                <h2 className="text-sm font-bold text-slate-100 truncate flex-1 min-w-0">{debate.topic}</h2>
                 {debate.status === 'in-progress' && (
                   <span className="flex items-center gap-1 text-[10px] text-emerald-500 shrink-0">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -105,9 +105,14 @@ export function AgoraPage() {
                   </span>
                 )}
               </div>
-              <p className="text-[10px] text-slate-400 mt-0.5">
-                {debate.debateType === 'deep-debate' ? '심층토론' : '토론'} · {debate.participants.length}명 · Round {debate.rounds.length}/{debate.maxRounds}
-              </p>
+              <div className="flex items-center gap-2 mt-1 flex-wrap">
+                <span className="inline-flex items-center rounded-md bg-cyan-400/10 px-2 py-0.5 text-[10px] font-medium text-cyan-400 ring-1 ring-inset ring-cyan-400/20">
+                  {debate.debateType === 'deep-debate' ? '심층토론' : '토론'}
+                </span>
+                <span className="text-[10px] text-slate-400">
+                  {debate.participants.length}명 · Round {debate.rounds.length}/{debate.maxRounds}
+                </span>
+              </div>
             </div>
 
             {/* Timeline */}

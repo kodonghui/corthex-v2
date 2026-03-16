@@ -35,6 +35,8 @@ type OrgChartData = {
 
 // ── Constants ──
 
+type ViewMode = 'tree' | 'list'
+
 const STATUS_CONFIG: Record<string, { dot: string; shadow?: string; pulse?: boolean; label: string; textColor: string }> = {
   online: { dot: 'bg-emerald-500', shadow: 'shadow-[0_0_6px_rgba(16,185,129,0.4)]', label: '온라인', textColor: 'text-emerald-400' },
   working: { dot: 'bg-blue-500', shadow: 'shadow-[0_0_6px_rgba(59,130,246,0.4)]', pulse: true, label: '작업 중', textColor: 'text-blue-400' },
@@ -199,8 +201,101 @@ function DepartmentSection({ dept, selectedAgentId, onSelectAgent }: { dept: Org
 
 // ── Main Page ──
 
+// ── Tree View (Mobile) ──
+
+function OrgTreeView({ org, onSelectAgent }: { org: OrgChartData['data']; onSelectAgent: (a: OrgAgent) => void }) {
+  return (
+    <div className="flex flex-col items-center py-6 px-4">
+      {/* Root node */}
+      <div className="relative w-full max-w-xs mx-auto mb-8">
+        <div className="bg-slate-800/80 border-2 border-cyan-400 rounded-xl p-4 shadow-lg relative z-10 flex flex-col items-center text-center">
+          <div className="absolute -top-3.5 bg-slate-950 px-2">
+            <span className="text-yellow-500 text-2xl">👑</span>
+          </div>
+          <h2 className="text-lg font-bold text-slate-50 mt-2">{org.company.name}</h2>
+          <p className="text-sm font-medium text-cyan-400 mt-1">Root</p>
+        </div>
+        {/* Vertical connector */}
+        {org.departments.length > 0 && (
+          <div className="absolute left-1/2 bottom-[-24px] w-px h-6 bg-slate-700 -translate-x-1/2" />
+        )}
+      </div>
+
+      {/* Departments in tree layout */}
+      {org.departments.length > 0 && (
+        <div className="relative w-full mb-6">
+          {/* Horizontal connector line */}
+          {org.departments.length > 1 && (
+            <div
+              className="absolute top-0 h-px bg-slate-700"
+              style={{
+                left: `${100 / (org.departments.length * 2)}%`,
+                right: `${100 / (org.departments.length * 2)}%`,
+              }}
+            />
+          )}
+          <div className={`grid gap-3 relative pt-6`} style={{ gridTemplateColumns: `repeat(${Math.min(org.departments.length, 3)}, minmax(0, 1fr))` }}>
+            {org.departments.map((dept) => (
+              <div key={dept.id} className="relative flex flex-col items-center">
+                {/* Vertical connector from horizontal line */}
+                <div className="absolute top-[-24px] left-1/2 w-px h-6 bg-slate-700 -translate-x-1/2" />
+                {/* Department node */}
+                <div className="w-full bg-slate-800/80 border border-slate-700 rounded-lg p-3 flex flex-col items-center text-center cursor-pointer hover:border-slate-600 transition-colors">
+                  <h3 className="text-sm font-semibold text-slate-50">{dept.name}</h3>
+                  <div className="flex items-center mt-1.5 gap-1 text-xs text-slate-400">
+                    <span>👥</span>
+                    <span>{dept.agents.length}</span>
+                  </div>
+                </div>
+                {/* Vertical connector to agents */}
+                {dept.agents.length > 0 && <div className="w-px h-4 bg-slate-700" />}
+                {/* Agent pills */}
+                <div className="flex flex-col gap-1.5 w-full">
+                  {sortAgentsByTier(dept.agents).slice(0, 3).map((agent) => {
+                    const status = STATUS_CONFIG[agent.status] || STATUS_CONFIG.offline
+                    const tier = TIER_CONFIG[agent.tier] || TIER_CONFIG.specialist
+                    return (
+                      <div
+                        key={agent.id}
+                        onClick={() => onSelectAgent(agent)}
+                        className="bg-slate-800/80 border border-slate-700 rounded-lg p-2 flex items-center gap-2 cursor-pointer hover:bg-slate-700/50 transition-colors"
+                      >
+                        <div className="relative">
+                          <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-[10px] font-bold text-slate-300">
+                            {agent.name.slice(0, 2)}
+                          </div>
+                          <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-slate-800 ${status.dot}`} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-semibold text-slate-200 truncate">{agent.name}</p>
+                          <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded ${tier.classes}`}>{tier.label}</span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                  {dept.agents.length > 3 && (
+                    <p className="text-[10px] text-slate-500 text-center">+{dept.agents.length - 3}명 더</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* NEXUS hint */}
+      <div className="mt-auto pt-8 pb-4 text-center w-full">
+        <p className="text-xs text-slate-500 flex items-center justify-center gap-1">
+          ℹ️ 전체 캔버스를 보려면 NEXUS 탭을 이용하세요.
+        </p>
+      </div>
+    </div>
+  )
+}
+
 export function OrgPage() {
   const [selectedAgent, setSelectedAgent] = useState<OrgAgent | null>(null)
+  const [viewMode, setViewMode] = useState<ViewMode>('list')
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['workspace-org-chart'],
@@ -247,9 +342,30 @@ export function OrgPage() {
   return (
     <div data-testid="org-page" className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-50">{org.company.name}</h1>
-        <p className="text-sm text-slate-400 mt-1">{org.departments.length}개 부서 · {totalAgents}명 에이전트</p>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-50">{org.company.name}</h1>
+          <p className="text-sm text-slate-400 mt-1">{org.departments.length}개 부서 · {totalAgents}명 에이전트</p>
+        </div>
+        {/* View mode toggle (mobile tree / list) */}
+        <div className="flex items-center bg-slate-800 rounded-lg p-1 md:hidden">
+          <button
+            onClick={() => setViewMode('tree')}
+            className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+              viewMode === 'tree' ? 'bg-slate-700 text-slate-50 shadow-sm' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            트리
+          </button>
+          <button
+            onClick={() => setViewMode('list')}
+            className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+              viewMode === 'list' ? 'bg-slate-700 text-slate-50 shadow-sm' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            리스트
+          </button>
+        </div>
       </div>
 
       {/* Empty state */}
@@ -261,12 +377,21 @@ export function OrgPage() {
         </div>
       )}
 
-      {/* Department sections */}
-      {!isEmpty && (
-        <div className="space-y-4">
-          {org.departments.map((dept) => (
-            <DepartmentSection key={dept.id} dept={dept} selectedAgentId={selectedAgent?.id || null} onSelectAgent={setSelectedAgent} />
-          ))}
+      {/* Tree view (mobile only) */}
+      {!isEmpty && viewMode === 'tree' && (
+        <div className="md:hidden">
+          <OrgTreeView org={org} onSelectAgent={setSelectedAgent} />
+        </div>
+      )}
+
+      {/* List view (default on desktop, toggle on mobile) */}
+      {!isEmpty && (viewMode === 'list' || typeof window !== 'undefined') && (
+        <div className={viewMode === 'tree' ? 'hidden md:block' : ''}>
+          <div className="space-y-4">
+            {org.departments.map((dept) => (
+              <DepartmentSection key={dept.id} dept={dept} selectedAgentId={selectedAgent?.id || null} onSelectAgent={setSelectedAgent} />
+            ))}
+          </div>
         </div>
       )}
 

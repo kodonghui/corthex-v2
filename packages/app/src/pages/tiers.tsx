@@ -25,10 +25,12 @@ type TierFormData = {
 }
 
 const MODEL_OPTIONS = [
-  { value: 'claude-opus-4-6', label: 'Claude Opus 4.6 (최고 성능)' },
-  { value: 'claude-sonnet-4-6', label: 'Claude Sonnet 4.6 (균형)' },
-  { value: 'claude-haiku-4-5', label: 'Claude Haiku 4.5 (경제적)' },
+  { value: 'claude-opus-4-6', label: 'Claude Opus 4.6 (최고 성능)', shortLabel: 'Opus', inputCost: '$15.00', outputCost: '$75.00' },
+  { value: 'claude-sonnet-4-6', label: 'Claude Sonnet 4.6 (균형)', shortLabel: 'Sonnet', inputCost: '$3.00', outputCost: '$15.00' },
+  { value: 'claude-haiku-4-5', label: 'Claude Haiku 4.5 (경제적)', shortLabel: 'Haiku', inputCost: '$0.25', outputCost: '$1.25' },
 ]
+
+const TIER_ICONS = ['👑', '🏷️', '⚙️'] // crown for top, tag for mid, gear for worker
 
 // ── Tier Form ──
 
@@ -264,9 +266,109 @@ export function TiersPage() {
         />
       )}
 
-      {/* Tier list — ordered by tierLevel */}
+      {/* Tier hierarchy cards (mobile) with connector lines */}
       {tiers.length > 0 && (
-        <div className="space-y-2">
+        <div className="md:hidden flex flex-col items-center gap-0">
+          {tiers.map((tier, index) => {
+            const isFirst = index === 0
+            const icon = TIER_ICONS[Math.min(index, TIER_ICONS.length - 1)]
+            return (
+              <div key={tier.id} className="w-full flex flex-col items-center">
+                {/* Connector line between cards */}
+                {index > 0 && (
+                  <div className="w-px h-6 bg-slate-700 my-[-0.25rem] relative z-0" />
+                )}
+                {/* Tier label for first card */}
+                {isFirst && (
+                  <div className="text-xs font-semibold text-cyan-400 uppercase tracking-wider mb-2">Top-Level Authority</div>
+                )}
+                <div
+                  data-testid={`tier-row-${tier.id}`}
+                  className={`w-full rounded-xl p-5 flex flex-col gap-3 relative z-10 ${
+                    isFirst
+                      ? 'bg-slate-800/80 border-2 border-cyan-400 shadow-lg'
+                      : 'bg-slate-800/80 border border-slate-700 shadow-md'
+                  }`}
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-xl ${
+                        isFirst ? 'bg-cyan-400/20' : 'bg-slate-700'
+                      }`}>
+                        {icon}
+                      </div>
+                      <div>
+                        <h2 className={`font-bold ${isFirst ? 'text-lg' : 'text-base'}`}>T{tier.tierLevel}: {tier.name}</h2>
+                        {tier.description && (
+                          <p className="text-xs text-slate-400">{tier.description}</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => setEditTier(tier)}
+                        className="px-2 py-1 text-xs text-slate-500 hover:bg-slate-700 rounded-lg transition-colors"
+                      >
+                        편집
+                      </button>
+                    </div>
+                  </div>
+                  {/* Model info card */}
+                  <div className="bg-slate-900/80 rounded-lg p-3 border border-slate-700 font-mono text-xs flex flex-col gap-1.5">
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Model:</span>
+                      <span className={isFirst ? 'text-cyan-400 font-medium' : 'text-slate-200'}>{getModelLabel(tier.modelPreference).split(' (')[0]}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">도구 제한:</span>
+                      <span>{tier.maxTools === 0 ? '무제한' : `${tier.maxTools}개`}</span>
+                    </div>
+                  </div>
+                  {/* Reorder + delete row */}
+                  <div className="flex items-center justify-between pt-1">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleMoveUp(index)}
+                        disabled={index === 0 || reorderMutation.isPending}
+                        className="px-2 py-1 text-xs text-slate-500 hover:text-slate-400 disabled:opacity-30 border border-slate-700 rounded"
+                      >
+                        ▲
+                      </button>
+                      <button
+                        onClick={() => handleMoveDown(index)}
+                        disabled={index === tiers.length - 1 || reorderMutation.isPending}
+                        className="px-2 py-1 text-xs text-slate-500 hover:text-slate-400 disabled:opacity-30 border border-slate-700 rounded"
+                      >
+                        ▼
+                      </button>
+                    </div>
+                    <button
+                      onClick={() => setDeleteTier(tier)}
+                      className="px-2 py-1 text-xs text-red-500 hover:bg-red-900/20 rounded transition-colors"
+                    >
+                      삭제
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+
+          {/* Add tier placeholder button (mobile) */}
+          <div className="w-px h-6 bg-slate-700 my-[-0.25rem]" />
+          <button
+            onClick={() => setCreateOpen(true)}
+            className="w-full border-2 border-dashed border-slate-700 hover:border-cyan-400 rounded-xl p-4 flex flex-col items-center justify-center gap-2 text-slate-500 hover:text-cyan-400 transition-colors"
+          >
+            <span className="text-xl">+</span>
+            <span className="text-sm font-medium">새 티어 추가</span>
+          </button>
+        </div>
+      )}
+
+      {/* Tier list — desktop (ordered by tierLevel) */}
+      {tiers.length > 0 && (
+        <div className="hidden md:block space-y-2">
           {tiers.map((tier, index) => (
             <div
               key={tier.id}
@@ -330,6 +432,30 @@ export function TiersPage() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Model Cost Summary (mobile) */}
+      {tiers.length > 0 && (
+        <div className="md:hidden bg-slate-800/80 border border-slate-700 rounded-xl p-4">
+          <h3 className="text-sm font-semibold mb-3 flex items-center gap-2 text-slate-50">
+            <span className="text-cyan-400">💰</span>
+            Model Cost Summary (per 1M tokens)
+          </h3>
+          <div className="font-mono text-xs w-full">
+            <div className="grid grid-cols-3 gap-2 py-2 border-b border-slate-700 text-slate-400">
+              <div>Model</div>
+              <div className="text-right">Input</div>
+              <div className="text-right">Output</div>
+            </div>
+            {MODEL_OPTIONS.map((opt, i) => (
+              <div key={opt.value} className={`grid grid-cols-3 gap-2 py-2 ${i < MODEL_OPTIONS.length - 1 ? 'border-b border-slate-700' : ''}`}>
+                <div className={`truncate ${i === 0 ? 'text-cyan-400' : 'text-slate-200'}`}>{opt.shortLabel}</div>
+                <div className="text-right text-slate-200">{opt.inputCost}</div>
+                <div className="text-right text-slate-200">{opt.outputCost}</div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

@@ -221,13 +221,16 @@ export function ClassifiedPage() {
       {/* Header */}
       <div className="px-4 md:px-6 py-4 border-b border-slate-700 flex items-center justify-between">
         <div className="flex items-center gap-3">
+          <div className="text-red-500 md:hidden">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+          </div>
+          <h2 className="text-lg font-semibold text-slate-50">기밀문서</h2>
           <button
             onClick={() => setShowFolderTree(!showFolderTree)}
             className="md:hidden px-2 py-1 text-xs border border-slate-700 rounded hover:bg-slate-800 text-slate-300"
           >
             {showFolderTree ? '폴더 숨기기' : '폴더 보기'}
           </button>
-          <h2 className="text-lg font-semibold text-slate-50">기밀문서</h2>
         </div>
         {detailId && (
           <button
@@ -240,22 +243,38 @@ export function ClassifiedPage() {
         )}
       </div>
 
+      {/* Security warning banner (mobile) */}
+      <div className="md:hidden px-4 py-3">
+        <div className="flex flex-col gap-3 rounded-xl border border-red-500/30 bg-red-500/10 p-4">
+          <div className="flex items-center gap-2">
+            <span className="text-red-400 text-lg">⚠</span>
+            <p className="text-red-400 text-sm font-bold uppercase tracking-wider">고도 보안 구역</p>
+          </div>
+          <p className="text-xs text-slate-300 leading-relaxed">
+            이 구역의 데이터는 암호화되어 있으며, 모든 접근 시 보안 로그가 기록됩니다.
+          </p>
+        </div>
+      </div>
+
       {/* Main content: 2-panel */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Left panel: Folder tree + Stats */}
+        {/* Left panel: Folder tree + Stats (overlay on mobile) */}
         {showFolderTree && (
-          <div data-testid="folder-sidebar" className="w-56 lg:w-64 border-r border-slate-700 bg-slate-900/80 flex flex-col overflow-y-auto flex-shrink-0">
-            {/* Stats */}
-            {stats && <StatsCard stats={stats} />}
+          <>
+            <div className="md:hidden fixed inset-0 bg-black/40 z-10" onClick={() => setShowFolderTree(false)} />
+            <div data-testid="folder-sidebar" className="fixed md:relative left-0 top-0 h-full z-20 w-64 lg:w-64 border-r border-slate-700 bg-slate-900 md:bg-slate-900/80 flex flex-col overflow-y-auto flex-shrink-0">
+              {/* Stats */}
+              {stats && <StatsCard stats={stats} />}
 
-            {/* Folder tree */}
-            <FolderTree
-              folders={folders}
-              selectedFolderId={selectedFolderId}
-              onSelectFolder={(id) => { setSelectedFolderId(id); setPage(1); setDetailId(null) }}
-              queryClient={queryClient}
-            />
-          </div>
+              {/* Folder tree */}
+              <FolderTree
+                folders={folders}
+                selectedFolderId={selectedFolderId}
+                onSelectFolder={(id) => { setSelectedFolderId(id); setPage(1); setDetailId(null); setShowFolderTree(false) }}
+                queryClient={queryClient}
+              />
+            </div>
+          </>
         )}
 
         {/* Right panel: List or Detail */}
