@@ -35,24 +35,24 @@ function SummaryCards({ data }: { data: DashboardSummary }) {
   const budgetPct = data.cost.budgetUsagePercent
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+    <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-5">
       {/* Task Card */}
       <div
         data-testid="card-tasks"
-        className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600/20 via-slate-800 to-slate-800 border border-blue-500/20 p-6 hover:border-blue-500/40 transition-all duration-300 group"
+        className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-600/20 via-slate-800 to-slate-800 border border-blue-500/20 p-4 sm:p-6 hover:border-blue-500/40 transition-all duration-300 group"
         role="region"
         aria-label="작업 현황"
       >
         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-blue-500/10 transition-colors" />
         <div className="relative">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
-              <svg className="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-4">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-blue-500/20 flex items-center justify-center">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
             </div>
-            <span className="text-xs font-semibold uppercase tracking-widest text-blue-400/80">작업 현황</span>
+            <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-blue-400/80">작업 현황</span>
           </div>
-          <p className="text-4xl font-black text-white mb-4 tracking-tight">{data.tasks.total}</p>
-          <div className="flex items-center gap-3 text-xs">
+          <p className="text-2xl sm:text-4xl font-black text-white mb-2 sm:mb-4 tracking-tight font-mono">{data.tasks.total}</p>
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-3 text-[10px] sm:text-xs">
             <span className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-400">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> {data.tasks.completed} 완료
             </span>
@@ -69,7 +69,7 @@ function SummaryCards({ data }: { data: DashboardSummary }) {
       {/* Cost Card — clickable → /costs */}
       <div
         data-testid="card-cost"
-        className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-600/20 via-slate-800 to-slate-800 border border-violet-500/20 p-6 cursor-pointer hover:border-violet-500/40 hover:shadow-lg hover:shadow-violet-500/5 transition-all duration-300 group"
+        className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-violet-600/20 via-slate-800 to-slate-800 border border-violet-500/20 p-4 sm:p-6 cursor-pointer hover:border-violet-500/40 hover:shadow-lg hover:shadow-violet-500/5 transition-all duration-300 group"
         role="region"
         aria-label="비용 현황"
         onClick={() => navigate('/costs')}
@@ -78,13 +78,13 @@ function SummaryCards({ data }: { data: DashboardSummary }) {
       >
         <div className="absolute top-0 right-0 w-32 h-32 bg-violet-500/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-violet-500/10 transition-colors" />
         <div className="relative">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-violet-500/20 flex items-center justify-center">
-              <svg className="w-5 h-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-4">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-violet-500/20 flex items-center justify-center">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </div>
-            <span className="text-xs font-semibold uppercase tracking-widest text-violet-400/80">비용 현황</span>
+            <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-violet-400/80">비용 현황</span>
           </div>
-          <p className="text-4xl font-black text-white mb-3 tracking-tight">${data.cost.todayUsd.toFixed(2)}</p>
+          <p className="text-2xl sm:text-4xl font-black text-white mb-2 sm:mb-3 tracking-tight font-mono">${data.cost.todayUsd.toFixed(2)}</p>
           <div className="mb-3">
             <div className="flex items-center justify-between text-xs text-slate-400 mb-1.5">
               <span>월 예산 사용률</span>
@@ -111,20 +111,20 @@ function SummaryCards({ data }: { data: DashboardSummary }) {
       {/* Agent Card */}
       <div
         data-testid="card-agents"
-        className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-cyan-600/20 via-slate-800 to-slate-800 border border-cyan-500/20 p-6 hover:border-cyan-500/40 transition-all duration-300 group"
+        className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-cyan-600/20 via-slate-800 to-slate-800 border border-cyan-500/20 p-4 sm:p-6 hover:border-cyan-500/40 transition-all duration-300 group"
         role="region"
         aria-label="에이전트 현황"
       >
         <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-cyan-500/10 transition-colors" />
         <div className="relative">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center">
-              <svg className="w-5 h-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-4">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-cyan-500/20 flex items-center justify-center">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
             </div>
-            <span className="text-xs font-semibold uppercase tracking-widest text-cyan-400/80">에이전트</span>
+            <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-cyan-400/80">에이전트</span>
           </div>
-          <p className="text-4xl font-black text-white mb-4 tracking-tight">{data.agents.total}</p>
-          <div className="flex items-center gap-3 text-xs">
+          <p className="text-2xl sm:text-4xl font-black text-white mb-2 sm:mb-4 tracking-tight font-mono">{data.agents.total}</p>
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-3 text-[10px] sm:text-xs">
             <span className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-400">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> {data.agents.active} 활성
             </span>
@@ -141,17 +141,17 @@ function SummaryCards({ data }: { data: DashboardSummary }) {
       {/* Integration Card */}
       <div
         data-testid="card-integrations"
-        className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-600/20 via-slate-800 to-slate-800 border border-amber-500/20 p-6 hover:border-amber-500/40 transition-all duration-300 group"
+        className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-amber-600/20 via-slate-800 to-slate-800 border border-amber-500/20 p-4 sm:p-6 hover:border-amber-500/40 transition-all duration-300 group col-span-2 sm:col-span-1"
         role="region"
         aria-label="연동 상태"
       >
         <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-amber-500/10 transition-colors" />
         <div className="relative">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
-              <svg className="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-4">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-amber-500/20 flex items-center justify-center">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
             </div>
-            <span className="text-xs font-semibold uppercase tracking-widest text-amber-400/80">연동 상태</span>
+            <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-amber-400/80">연동 상태</span>
           </div>
           <div className="space-y-2.5">
             {data.integrations.providers.map((p) => (
@@ -490,9 +490,9 @@ function SatisfactionChart() {
         </div>
       </div>
 
-      <div className="flex items-center gap-8">
+      <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8">
         {/* Donut chart */}
-        <div data-testid="donut-chart" className="relative w-36 h-36 flex-shrink-0">
+        <div data-testid="donut-chart" className="relative w-28 h-28 sm:w-36 sm:h-36 flex-shrink-0">
           <div
             className="w-full h-full rounded-full shadow-lg"
             style={{ background: gradient }}
@@ -542,8 +542,8 @@ function SatisfactionChart() {
 
 function DashboardSkeleton() {
   return (
-    <div data-testid="dashboard-skeleton" className="space-y-6 animate-in fade-in duration-300">
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+    <div data-testid="dashboard-skeleton" className="space-y-4 sm:space-y-6 animate-in fade-in duration-300">
+      <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-5">
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="rounded-2xl bg-slate-800/40 border border-slate-700/50 p-6">
             <div className="flex items-center gap-3 mb-4">
@@ -611,25 +611,25 @@ export function DashboardPage() {
   return (
     <div data-testid="dashboard-page" className="h-full overflow-y-auto bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950">
       {/* Header */}
-      <div data-testid="dashboard-header" className="flex items-center justify-between px-8 py-6 border-b border-slate-800/80">
+      <div data-testid="dashboard-header" className="flex items-center justify-between px-4 sm:px-8 py-4 sm:py-6 border-b border-slate-800/80">
         <div>
-          <h1 className="text-3xl font-black tracking-tight text-white">작전현황</h1>
-          <p className="text-sm text-slate-500 mt-1">조직 전체 현황을 한눈에 파악합니다</p>
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">작전현황</h1>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">조직 전체 현황을 한눈에 파악합니다</p>
         </div>
         <div data-testid="ws-status" className="flex items-center gap-2">
           {isConnected ? (
-            <span className="flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> 실시간 연결됨
+            <span className="flex items-center gap-2 text-xs font-medium px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> <span className="hidden sm:inline">실시간 연결됨</span><span className="sm:hidden">연결</span>
             </span>
           ) : (
-            <span className="flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
-              <span className="w-2 h-2 rounded-full bg-red-400" /> 연결 끊김
+            <span className="flex items-center gap-2 text-xs font-medium px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
+              <span className="w-2 h-2 rounded-full bg-red-400" /> <span className="hidden sm:inline">연결 끊김</span><span className="sm:hidden">끊김</span>
             </span>
           )}
         </div>
       </div>
 
-      <div className="px-8 py-6 space-y-6 pb-12">
+      <div className="px-4 sm:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6 pb-12">
         {isLoading && !summary ? (
           <DashboardSkeleton />
         ) : summaryError && !summary ? (

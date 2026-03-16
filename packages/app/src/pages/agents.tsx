@@ -528,19 +528,19 @@ export function AgentsPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-3">
-        <div className="w-48">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+        <div className="w-full sm:w-48">
           <Select options={filterDeptOptions} value={filterDept} onChange={(e) => setFilterDept(e.target.value)} />
         </div>
-        <div className="flex gap-1">
+        <div className="flex gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
           {(['active', 'all', 'inactive'] as const).map((f) => (
             <button
               key={f}
               onClick={() => setFilterActive(f)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
                 filterActive === f
-                  ? 'bg-[rgba(34,211,238,0.10)] text-cyan-300'
-                  : 'text-slate-500 hover:bg-slate-800'
+                  ? 'bg-cyan-400 text-slate-900'
+                  : 'bg-slate-800/50 text-slate-400 border border-slate-700/50 hover:bg-slate-800'
               }`}
             >
               {f === 'active' ? '활성' : f === 'inactive' ? '비활성' : '전체'}
@@ -559,51 +559,62 @@ export function AgentsPage() {
 
       {/* Agent list */}
       {agents.length > 0 && (
-        <div className="space-y-2">
-          {agents.map((agent) => (
+        <div className="space-y-2 sm:space-y-2">
+          {agents.map((agent) => {
+            const initials = (agent.nameEn || agent.name).slice(0, 2).toUpperCase()
+            const statusColor = agent.status === 'online' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]'
+              : agent.status === 'working' ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)] animate-pulse'
+              : agent.status === 'error' ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]'
+              : 'bg-slate-400'
+            return (
             <div
               key={agent.id}
               data-testid={`agent-row-${agent.id}`}
-              className={`flex items-center justify-between bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 hover:border-slate-700 transition-colors ${
+              className={`flex items-center gap-3 sm:gap-4 bg-slate-900/40 border border-slate-800 rounded-xl px-3 sm:px-4 py-3 sm:py-3 hover:border-cyan-500/30 transition-colors ${
                 !agent.isActive ? 'opacity-50' : ''
               }`}
             >
+              {/* Avatar with initials */}
+              <div className="flex-shrink-0 h-10 w-10 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-sm border border-cyan-500/30">
+                {initials}
+              </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  {/* Status dot */}
-                  <span className={`w-2 h-2 rounded-full shrink-0 ${statusDotColors[agent.status] || statusDotColors.offline}`} title={statusLabels[agent.status]} />
-                  <h3 className="text-sm font-medium text-slate-50 truncate">{agent.name}</h3>
-                  {agent.nameEn && <span className="text-xs text-slate-500 truncate">({agent.nameEn})</span>}
-                  <Badge variant={tierColors[agent.tier]}>{tierLabels[agent.tier]}</Badge>
+                <div className="flex items-center gap-2 mb-0.5">
+                  <h3 className="text-sm font-semibold text-slate-50 truncate">{agent.name}</h3>
+                  <span className="px-1.5 py-0.5 rounded-md bg-cyan-400/10 text-cyan-400 text-[10px] font-bold tracking-wider">{tierLabels[agent.tier]?.charAt(0) || 'S'}{agent.tier === 'manager' ? '1' : agent.tier === 'specialist' ? '2' : '3'}</span>
                   {agent.isSecretary && <Badge variant="error">비서</Badge>}
                   {agent.isSystem && <Badge variant="default">시스템</Badge>}
                 </div>
-                <div className="flex items-center gap-3 mt-0.5">
-                  <span className="text-xs text-slate-500">
+                <div className="flex items-center text-xs text-slate-500 gap-2">
+                  <span className="truncate max-w-[100px]">
                     {agent.departmentId ? deptMap.get(agent.departmentId) || '부서' : '미배속'}
                   </span>
-                  <span className="text-xs text-slate-500">{agent.modelName}</span>
-                  {agent.role && <span className="text-xs text-slate-500 truncate">{agent.role}</span>}
+                  <span className="w-1 h-1 rounded-full bg-slate-600 hidden sm:block" />
+                  <div className="flex items-center gap-1.5">
+                    <span className={`w-2 h-2 rounded-full shrink-0 ${statusColor}`} />
+                    <span className="font-mono text-xs">{statusLabels[agent.status]}</span>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center gap-1 ml-4 shrink-0">
+              {/* Actions — collapsed on mobile */}
+              <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
                 <button
                   onClick={() => { setEditAgent(agent); setEditTab('info') }}
-                  className="px-2.5 py-1.5 text-xs text-slate-500 hover:bg-slate-800 rounded-lg transition-colors"
+                  className="px-2 sm:px-2.5 py-1.5 text-xs text-slate-500 hover:bg-slate-800 rounded-lg transition-colors"
                   aria-label={`${agent.name} 편집`}
                 >
                   편집
                 </button>
                 <button
                   onClick={() => { setEditAgent(agent); setEditTab('soul') }}
-                  className="px-2.5 py-1.5 text-xs text-cyan-400 hover:bg-[rgba(34,211,238,0.10)] rounded-lg transition-colors"
+                  className="hidden sm:inline-flex px-2.5 py-1.5 text-xs text-cyan-400 hover:bg-[rgba(34,211,238,0.10)] rounded-lg transition-colors"
                   aria-label={`${agent.name} Soul 편집`}
                 >
                   Soul
                 </button>
                 <button
                   onClick={() => setDeleteAgent(agent)}
-                  className="px-2.5 py-1.5 text-xs text-red-500 hover:bg-red-900/20 rounded-lg transition-colors"
+                  className="hidden sm:inline-flex px-2.5 py-1.5 text-xs text-red-500 hover:bg-red-900/20 rounded-lg transition-colors"
                   aria-label={`${agent.name} 삭제`}
                   disabled={agent.isSystem || agent.isSecretary}
                   title={agent.isSystem ? '시스템 에이전트는 삭제할 수 없습니다' : agent.isSecretary ? '비서 에이전트는 삭제할 수 없습니다' : ''}
@@ -612,7 +623,7 @@ export function AgentsPage() {
                 </button>
               </div>
             </div>
-          ))}
+          )})}
         </div>
       )}
 

@@ -133,9 +133,11 @@ export function SettingsPage() {
 
   return (
     <div className="p-4 md:p-8" data-testid="settings-page">
-      <h2 className="text-2xl font-bold text-slate-50 mb-4">설정</h2>
+      <h2 className="text-xl sm:text-2xl font-bold text-slate-50 mb-4">설정</h2>
 
-      <Tabs items={TABS} value={activeTab} onChange={setTab} className="mb-6" />
+      <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <Tabs items={TABS} value={activeTab} onChange={setTab} className="mb-6" />
+      </div>
 
       <div className={WIDE_TABS.has(activeTab) ? 'max-w-3xl' : 'max-w-lg'}>
         {activeTab === 'profile' && <ProfileTab />}
@@ -438,17 +440,27 @@ function CommandCenterTab() {
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">사령관실 설정</p>
         </div>
         <div className="divide-y divide-slate-700">
-          <div className="flex items-center justify-between px-4 py-3">
-            <div>
-              <span className="text-sm text-slate-300">자동 스크롤</span>
-              <p className="text-[11px] text-slate-500">새 메시지가 올 때 자동으로 아래로 스크롤합니다</p>
+          <div className="flex items-center justify-between gap-4 px-4 py-3.5 active:bg-slate-800/50 transition-colors">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="hidden sm:flex items-center justify-center rounded-lg bg-slate-700/50 w-9 h-9 text-slate-300 shrink-0">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+              </div>
+              <div className="min-w-0">
+                <span className="text-sm text-slate-300 font-medium">자동 스크롤</span>
+                <p className="text-[11px] text-slate-500">새 메시지가 올 때 자동으로 아래로 스크롤합니다</p>
+              </div>
             </div>
             <Toggle checked={autoScroll} onChange={toggleAutoScroll} size="sm" />
           </div>
-          <div className="flex items-center justify-between px-4 py-3">
-            <div>
-              <span className="text-sm text-slate-300">알림 소리</span>
-              <p className="text-[11px] text-slate-500">에이전트 응답 완료 시 알림 소리를 재생합니다</p>
+          <div className="flex items-center justify-between gap-4 px-4 py-3.5 active:bg-slate-800/50 transition-colors">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="hidden sm:flex items-center justify-center rounded-lg bg-slate-700/50 w-9 h-9 text-slate-300 shrink-0">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+              </div>
+              <div className="min-w-0">
+                <span className="text-sm text-slate-300 font-medium">알림 소리</span>
+                <p className="text-[11px] text-slate-500">에이전트 응답 완료 시 알림 소리를 재생합니다</p>
+              </div>
             </div>
             <Toggle checked={sound} onChange={toggleSound} size="sm" />
           </div>
