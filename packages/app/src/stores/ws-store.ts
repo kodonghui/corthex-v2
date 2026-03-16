@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { toast } from '@corthex/ui'
 import type { WsChannel, WsOutboundMessage } from '@corthex/shared'
 
 type WsEventListener = (data: unknown) => void
@@ -39,14 +40,26 @@ export const useWsStore = create<WsState>((set, get) => ({
     const protocol = location.protocol === 'https:' ? 'wss' : 'ws'
     const ws = new WebSocket(`${protocol}://${location.host}/ws?token=${token}`)
 
-    ws.onopen = () => set({ isConnected: true, reconnectAttempt: 0 })
+    ws.onopen = () => {
+      const wasDisconnected = get().reconnectAttempt > 0
+      set({ isConnected: true, reconnectAttempt: 0 })
+      // FR49: Toast on reconnection (not first connect)
+      if (wasDisconnected) {
+        toast.success('서버 연결이 복구되었습니다')
+      }
+    }
 
     let serverRestarting = false
 
     ws.onclose = (event) => {
+      const wasConnected = get().isConnected
       set({ isConnected: false, socket: null })
       const noReconnect = [1000, 4001, 4002]
       if (!noReconnect.includes(event.code) && !serverRestarting) {
+        // FR49: Toast on unexpected disconnect
+        if (wasConnected) {
+          toast.warning('서버 연결이 끊어졌습니다. 재연결 중...')
+        }
         const attempt = get().reconnectAttempt
         const delay = getBackoffDelay(attempt)
         set({ reconnectAttempt: attempt + 1 })
@@ -59,6 +72,8 @@ export const useWsStore = create<WsState>((set, get) => ({
         const msg = JSON.parse(event.data) as WsOutboundMessage
         if (msg.type === 'server-restart') {
           serverRestarting = true
+          // FR49: Toast for server restart
+          toast.warning('서버가 재시작됩니다. 잠시 후 자동 재연결됩니다...')
           set({ reconnectAttempt: 0 })
           setTimeout(() => get().connect(token), BACKOFF_BASE)
           return
