@@ -1,6 +1,6 @@
 ---
 name: 'kdh-full-auto-pipeline'
-description: 'BMAD Full Pipeline v7.1 (team agents + swarm + 2.1.76 enhancements). Usage: /kdh-full-auto-pipeline [planning|story-ID|parallel ID1 ID2...|swarm epic-N]'
+description: 'BMAD Full Pipeline v7.2 (team agents + swarm + parallel batching + 2.1.76 enhancements). Usage: /kdh-full-auto-pipeline [planning|story-ID|parallel ID1 ID2...|swarm epic-N]'
 ---
 
 # Kodonghui Full Pipeline v7.1
@@ -355,3 +355,6 @@ Party-log validation: Orchestrator MUST verify critic-a.md + critic-b.md + criti
 8. tsc --noEmit MUST pass before any story dev commit.
 9. Update working-state.md after every stage + before large steps. On resume: read it first.
 10. Pipeline startup: clean stale worktrees/panes/dirs. Shutdown: clean all resources.
+11. **`계속` = run to completion.** Do NOT stop at intermediate milestones. Pipeline ends when ALL stories complete + tsc passes + code committed+pushed.
+12. **Batch parallelism for repetitive work**: When multiple independent files need similar changes (e.g., mobile styling, test generation), split into 4-5 batches and launch background agents simultaneously. Learned from UXUI Phase 7 retro.
+13. **Context snapshots**: Save decisions/state after every major step to `context-snapshots/` or `story-snapshots/`. On resume, read ALL snapshots before proceeding.

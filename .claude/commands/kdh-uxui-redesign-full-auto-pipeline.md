@@ -729,14 +729,43 @@ Context snapshot after EVERY step → _corthex_full_redesign/context-snapshots/{
 Contents: decisions, design tokens referenced, libre tools applied, constraints for next step, connections, critic scores
 ```
 
-## Safeguards
+## Anti-Patterns (from kdh-full-auto-pipeline + uxui retro)
 
-- max_retry: 2 per step (fail 3x = ESCALATE). step_timeout: 15min + 2min grace. stall 5min x 3 = SKIP.
+1. **Writer calls Skill tool** — Skill auto-completes, bypasses critic review. FIX: Writer reads step files manually.
+2. **Writer batches all steps** — Writes everything then sends one review. FIX: ONE step → review → fix → next.
+3. **Orchestrator stops at intermediate milestone** — Generates HTML but doesn't convert to React. FIX: `계속` = run to Phase 7 complete + tsc pass.
+4. **Phase 6 incomplete app coverage** — Only generates screens from Phase 5 prompt (6 screens), not all routes. FIX: Analyze all pages/ routes and generate screens for each.
+5. **Phase 7 sequential processing** — 21+ screens one-by-one is too slow. FIX: 4-5 parallel background agents.
+
+## Safeguards & Timeouts
+
+| Mechanism | Value | Action |
+|-----------|-------|--------|
+| max_retry | 2 per step | 3 fails → ESCALATE |
+| step_timeout | 15min + 2min grace | Reminder → grace → respawn with snapshots |
+| party_timeout | 10min per round | Critic unresponsive → single-worker fallback |
+| stall_threshold | 5min no message | Ping → 2nd stall → force-close |
+| max_stalls | 3 | SKIP step |
+| Phase 7 agent timeout | 10min per batch | Accept partial results |
+| Stitch MCP timeout | 5min per screen | Retry once → fallback manual |
+
+Additional:
 - Party-log validation: critic-{a,b,c}.md + fixes.md must exist per step.
 - On respawn: inject ALL context-snapshots. Team failure → single-worker fallback.
 - Pipeline never blocks — timeout/fail/escalate always leads to "continue".
-- Anti-patterns: Writer must NOT call Skill tool, NOT batch steps, NOT skip critic review.
-- Troubleshoot: vague output → critics reject (score 0). No references → expand search domains. Stitch HTML fallback. tsc --noEmit before commit.
+- Troubleshoot: vague output → critics reject (score 0). No references → expand search domains.
+
+## Completion Gate (ALL must pass)
+
+```
+[ ] Phase 0-5: all steps score >= 7/10
+[ ] Phase 6: all screens generated (web + app + landing), visual review PASS
+[ ] Phase 7: all screens converted to React, mobile-responsive patterns applied
+[ ] tsc --noEmit: 0 errors (app package)
+[ ] git commit + push: deployed successfully
+[ ] pipeline-status.yaml: all phases status=complete
+[ ] working-state.md: updated with final status
+```
 
 ### 2.1.76 Enhancements (auto-applied)
 
