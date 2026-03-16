@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
+import { Plus, Filter, Camera, Briefcase, Heart, MessageCircle, Share2, MoreHorizontal } from 'lucide-react'
 import { api } from '../lib/api'
 import { ContentTab } from '../components/sns/content-tab'
 import { QueueTab } from '../components/sns/queue-tab'
@@ -11,10 +12,10 @@ import type { SnsAccount, Agent } from '../components/sns/sns-types'
 
 const TAB_ITEMS = [
   { value: 'content', label: '콘텐츠' },
-  { value: 'queue', label: '발행 큐' },
+  { value: 'queue', label: '발행 대기' },
   { value: 'cardnews', label: '카드뉴스' },
   { value: 'stats', label: '통계' },
-  { value: 'accounts', label: '계정 관리' },
+  { value: 'accounts', label: '계정' },
 ]
 
 // Stats summary for mobile bottom card
@@ -28,16 +29,14 @@ function MobileStatsSummary() {
   if (!stats || stats.total === 0) return null
 
   const publishedCount = stats.byStatus.find((s) => s.status === 'published')?.count ?? 0
-  const totalLikes = 0 // computed from individual posts; use count as proxy
-  const totalReach = 0
 
   return (
-    <div className="sm:hidden fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-slate-900 via-slate-900 to-transparent pt-12 z-10 pointer-events-none">
-      <div className="bg-slate-800 rounded-xl shadow-lg border border-slate-700 p-4 pointer-events-auto">
+    <div className="sm:hidden fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-slate-950 via-slate-950 to-transparent pt-12 z-10 pointer-events-none">
+      <div className="bg-slate-900 rounded-xl shadow-lg border border-slate-800 p-4 pointer-events-auto">
         <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">이번 주</h3>
-        <div className="flex justify-between items-center divide-x divide-slate-700">
+        <div className="flex justify-between items-center divide-x divide-slate-800">
           <div className="flex flex-col items-center flex-1">
-            <span className="text-2xl font-semibold text-white font-mono tabular-nums">{publishedCount}</span>
+            <span className="text-2xl font-semibold text-slate-50 font-mono tabular-nums">{publishedCount}</span>
             <span className="text-[10px] text-slate-400 mt-1">발행됨</span>
           </div>
           <div className="flex flex-col items-center flex-1">
@@ -45,7 +44,7 @@ function MobileStatsSummary() {
             <span className="text-[10px] text-slate-400 mt-1">총 콘텐츠</span>
           </div>
           <div className="flex flex-col items-center flex-1">
-            <span className="text-2xl font-semibold text-white font-mono">{stats.byPlatform.length}</span>
+            <span className="text-2xl font-semibold text-slate-50 font-mono tabular-nums">{stats.byPlatform.length}</span>
             <span className="text-[10px] text-slate-400 mt-1">플랫폼</span>
           </div>
         </div>
@@ -76,32 +75,63 @@ export function SnsPage() {
   const agents = agentsData?.data || []
 
   return (
-    <div data-testid="sns-page" className="h-full flex flex-col bg-slate-900 relative">
-      {/* Header */}
-      <div className="h-14 px-4 sm:px-6 flex items-center justify-between border-b border-slate-700">
-        <h2 className="text-lg sm:text-xl font-semibold text-slate-50">SNS 통신국</h2>
-      </div>
-
-      {/* Tab Bar — horizontally scrollable on mobile */}
-      <div className="flex gap-1 px-4 sm:px-6 border-b border-slate-700/50 pt-2 overflow-x-auto no-scrollbar">
-        {TAB_ITEMS.map((item) => (
-          <button
-            key={item.value}
-            data-testid={`sns-tab-${item.value}`}
-            onClick={() => setTab(item.value)}
-            className={`border-b-2 text-sm px-3 sm:px-4 py-2.5 transition-colors whitespace-nowrap ${
-              tab === item.value
-                ? 'border-blue-500 text-blue-400 font-medium'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            {item.label}
+    <div data-testid="sns-page" className="h-full flex flex-col bg-slate-950 relative">
+      {/* Header + Title */}
+      <div className="px-6 sm:px-10 pt-6 pb-0">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+          <div className="flex min-w-72 flex-col gap-2">
+            <h1 className="text-slate-50 tracking-tight text-3xl font-bold leading-tight">SNS 관리</h1>
+            <p className="text-slate-400 text-sm font-medium leading-normal">콘텐츠 생성, 예약 및 다중 플랫폼 통계 분석을 관리하세요.</p>
+          </div>
+          <button className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-5 bg-cyan-400 text-slate-950 text-sm font-bold leading-normal transition-opacity hover:opacity-90">
+            <Plus className="w-[18px] h-[18px] mr-2" />
+            <span className="truncate">콘텐츠 생성</span>
           </button>
-        ))}
+        </div>
+
+        {/* Tab Bar */}
+        <div className="mb-6">
+          <div className="flex border-b border-slate-800 gap-8 overflow-x-auto no-scrollbar">
+            {TAB_ITEMS.map((item) => (
+              <button
+                key={item.value}
+                data-testid={`sns-tab-${item.value}`}
+                onClick={() => setTab(item.value)}
+                className={`flex flex-col items-center justify-center border-b-2 pb-3 pt-2 px-1 whitespace-nowrap transition-colors ${
+                  tab === item.value
+                    ? 'border-cyan-400 text-cyan-400'
+                    : 'border-transparent text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <p className={`text-sm leading-normal ${tab === item.value ? 'font-bold' : 'font-medium'}`}>{item.label}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Platform filter chips */}
+        {tab === 'content' && (
+          <div className="flex gap-3 mb-6 flex-wrap">
+            <button className="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-slate-800 px-4 text-slate-50 text-sm font-bold leading-normal border border-slate-700">전체</button>
+            <button className="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-transparent px-4 text-slate-400 hover:bg-slate-800/50 text-sm font-medium leading-normal border border-slate-800 transition-colors">
+              <Camera className="w-3.5 h-3.5" />
+              Instagram
+            </button>
+            <button className="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-transparent px-4 text-slate-400 hover:bg-slate-800/50 text-sm font-medium leading-normal border border-slate-800 transition-colors">
+              <Briefcase className="w-3.5 h-3.5" />
+              LinkedIn
+            </button>
+            <button className="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-transparent px-4 text-slate-400 hover:bg-slate-800/50 text-sm font-medium leading-normal border border-slate-800 transition-colors">Twitter</button>
+            <button className="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-transparent px-4 text-slate-400 hover:bg-slate-800/50 text-sm font-medium leading-normal border border-slate-800 transition-colors ml-auto">
+              <Filter className="w-[18px] h-[18px]" />
+              필터
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Content Area */}
-      <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-4 pb-28 sm:pb-4">
+      <div className="flex-1 overflow-y-auto px-6 sm:px-10 py-4 pb-28 sm:pb-4">
         {tab === 'content' && <ContentTab accounts={accounts} agents={agents} />}
         {tab === 'queue' && <QueueTab />}
         {tab === 'cardnews' && <CardNewsTab agents={agents} />}

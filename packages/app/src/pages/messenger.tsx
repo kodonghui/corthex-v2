@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
+import { Search, MoreVertical, ArrowUp, Paperclip, ArrowLeft } from 'lucide-react'
 import { api } from '../lib/api'
 import { useAuthStore } from '../stores/auth-store'
 import { useWsStore } from '../stores/ws-store'
@@ -259,12 +260,12 @@ function ChannelSettingsModal({
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
       <div
-        className="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-md max-h-[80vh] md:max-h-[80vh] h-full md:h-auto overflow-y-auto shadow-2xl"
+        className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md max-h-[80vh] md:max-h-[80vh] h-full md:h-auto overflow-y-auto shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="px-4 py-3 border-b border-slate-700 flex items-center justify-between">
-          <h3 className="font-semibold">채널 설정</h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-200">
+        <div className="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+          <h3 className="font-semibold text-slate-50">채널 설정</h3>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-200 transition-colors">
             ✕
           </button>
         </div>
@@ -275,7 +276,7 @@ function ChannelSettingsModal({
             <input
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-600 rounded-lg bg-slate-800 text-sm"
+              className="w-full px-3 py-2 border border-slate-700 rounded-lg bg-slate-800/50 text-sm focus:outline-none focus:ring-1 focus:ring-cyan-400 text-slate-200"
             />
           </div>
           <div className="space-y-2">
@@ -284,24 +285,24 @@ function ChannelSettingsModal({
               value={editDesc}
               onChange={(e) => setEditDesc(e.target.value)}
               placeholder="채널 설명 (선택)"
-              className="w-full px-3 py-2 border border-slate-600 rounded-lg bg-slate-800 text-sm"
+              className="w-full px-3 py-2 border border-slate-700 rounded-lg bg-slate-800/50 text-sm focus:outline-none focus:ring-1 focus:ring-cyan-400 text-slate-200 placeholder:text-slate-500"
             />
           </div>
           <button
             onClick={handleSave}
             disabled={updateChannel.isPending || (editName === detail?.name && editDesc === (detail?.description || ''))}
-            className="w-full px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-500 disabled:opacity-50"
+            className="w-full px-3 py-2 bg-cyan-400 text-slate-950 text-sm font-semibold rounded-lg hover:bg-cyan-400/90 disabled:opacity-50 transition-colors"
           >
             {updateChannel.isPending ? '저장 중...' : '저장'}
           </button>
 
-          <div className="border-t border-slate-700 pt-4">
+          <div className="border-t border-slate-800 pt-4">
             <h4 className="text-sm font-medium text-slate-400 mb-2">
               멤버 ({members.length}명)
             </h4>
             <div className="space-y-1 max-h-32 overflow-y-auto">
               {members.map((m) => (
-                <div key={m.id} className="flex items-center justify-between py-1 px-2 rounded hover:bg-slate-700">
+                <div key={m.id} className="flex items-center justify-between py-1 px-2 rounded hover:bg-slate-800">
                   <span className="text-sm">
                     <span className={onlineUserIds.has(m.id) ? 'text-emerald-400' : 'text-slate-400'}>{onlineUserIds.has(m.id) ? '●' : '○'}</span>
                     {' '}{m.name} <span className="text-xs text-slate-500">({m.role})</span>
@@ -323,7 +324,7 @@ function ChannelSettingsModal({
                 value={memberSearch}
                 onChange={(e) => setMemberSearch(e.target.value)}
                 placeholder="유저 검색하여 추가..."
-                className="w-full px-3 py-1.5 border border-slate-600 rounded-lg bg-slate-800 text-sm"
+                className="w-full px-3 py-1.5 border border-slate-700 rounded-lg bg-slate-800/50 text-sm focus:outline-none focus:ring-1 focus:ring-cyan-400 text-slate-200 placeholder:text-slate-500"
               />
               {memberSearch && filteredUsers.length > 0 && (
                 <div className="mt-1 max-h-24 overflow-y-auto border border-slate-700 rounded-md">
@@ -331,7 +332,7 @@ function ChannelSettingsModal({
                     <button
                       key={u.id}
                       onClick={() => { addMember.mutate(u.id); setMemberSearch('') }}
-                      className="w-full text-left px-3 py-1.5 text-sm hover:bg-slate-700"
+                      className="w-full text-left px-3 py-1.5 text-sm hover:bg-slate-800"
                     >
                       {u.name} <span className="text-xs text-slate-500">({u.role})</span>
                     </button>
@@ -341,11 +342,11 @@ function ChannelSettingsModal({
             </div>
           </div>
 
-          <div className="border-t border-slate-700 pt-4 space-y-2">
+          <div className="border-t border-slate-800 pt-4 space-y-2">
             <button
               onClick={handleLeave}
               disabled={leaveChannel.isPending}
-              className="w-full px-3 py-2 border border-amber-500/50 text-amber-400 text-sm rounded-lg hover:bg-amber-500/10 disabled:opacity-50"
+              className="w-full px-3 py-2 border border-amber-500/50 text-amber-400 text-sm rounded-lg hover:bg-amber-500/10 disabled:opacity-50 transition-colors"
             >
               채널 나가기
             </button>
@@ -353,7 +354,7 @@ function ChannelSettingsModal({
               <button
                 onClick={handleDelete}
                 disabled={deleteChannel.isPending}
-                className="w-full px-3 py-2 bg-red-600 hover:bg-red-500 text-white text-sm rounded-lg disabled:opacity-50"
+                className="w-full px-3 py-2 bg-red-600 hover:bg-red-500 text-white text-sm rounded-lg disabled:opacity-50 transition-colors"
               >
                 채널 삭제
               </button>
@@ -392,7 +393,7 @@ function ThreadPanel({
 
   const replies = threadData?.data || []
 
-  // WebSocket으로 스레드 답글 실시간 수신
+  // WebSocket thread replies
   useEffect(() => {
     if (!isConnected) return
 
@@ -407,7 +408,6 @@ function ThreadPanel({
             return { data: [...existing, { ...event.message!, reactions: [] }] }
           },
         )
-        // 메인 채널의 replyCount도 갱신
         queryClient.invalidateQueries({ queryKey: ['messenger-messages', channelId] })
       }
       if (event.type === 'reaction-update' && event.messageId) {
@@ -495,21 +495,21 @@ function ThreadPanel({
   }
 
   return (
-    <div className="fixed inset-0 md:static md:w-80 border-l border-slate-700 flex flex-col bg-slate-900 z-40" data-testid="thread-panel">
-      <div className="px-3 py-2 border-b border-slate-700 flex items-center justify-between">
-        <span className="text-sm font-medium">스레드</span>
-        <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-200 text-sm">✕</button>
+    <div className="fixed inset-0 md:static md:w-80 border-l border-slate-800 flex flex-col bg-slate-950 z-40" data-testid="thread-panel">
+      <div className="px-3 py-2 border-b border-slate-800 flex items-center justify-between">
+        <span className="text-sm font-medium text-slate-50">스레드</span>
+        <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-200 text-sm transition-colors">✕</button>
       </div>
 
-      {/* 원본 메시지 */}
-      <div className="px-4 py-3 border-b border-slate-700/50 bg-slate-800/30">
+      {/* Original message */}
+      <div className="px-4 py-3 border-b border-slate-800/50 bg-slate-900/30">
         <p className="text-xs text-slate-500 mb-0.5">{parentMessage.userName}</p>
-        <p className="text-sm">{parentMessage.content}</p>
+        <p className="text-sm text-slate-200">{parentMessage.content}</p>
         {parentMessage.attachments && <AttachmentRenderer attachments={parentMessage.attachments} />}
         <p className="text-xs text-slate-400 mt-0.5">{formatTime(parentMessage.createdAt)}</p>
       </div>
 
-      {/* 답글 목록 */}
+      {/* Replies */}
       <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2">
         {replies.length === 0 && (
           <p className="text-xs text-slate-400 text-center mt-4">아직 답글이 없습니다.</p>
@@ -521,13 +521,13 @@ function ThreadPanel({
               <div className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                 <div className="max-w-[85%]">
                   {!isMe && <p className="text-xs text-slate-500 mb-0.5">{reply.userName}</p>}
-                  <div className={`px-2.5 py-1.5 rounded-lg text-sm ${
-                    isMe ? 'bg-blue-600 text-white' : 'bg-slate-800'
+                  <div className={`px-3 py-2 rounded-2xl text-sm ${
+                    isMe ? 'bg-cyan-400/10 border border-cyan-400/20 text-slate-100 rounded-tr-sm' : 'bg-slate-800 text-slate-200 border border-slate-700/50 rounded-tl-sm'
                   }`}>
                     {reply.content}
                     {reply.attachments && <AttachmentRenderer attachments={reply.attachments} />}
                   </div>
-                  {/* 리액션 배지 */}
+                  {/* Reaction badges */}
                   {reply.reactions && reply.reactions.length > 0 && (
                     <div className="flex gap-1 mt-0.5 flex-wrap">
                       {reply.reactions.map((r) => (
@@ -536,7 +536,7 @@ function ThreadPanel({
                           onClick={() => toggleReaction(reply.id, r.emoji, r.userIds.includes(userId))}
                           className={`text-xs px-1.5 py-0.5 rounded-full border ${
                             r.userIds.includes(userId)
-                              ? 'border-blue-500/50 bg-blue-600/10'
+                              ? 'border-cyan-400/50 bg-cyan-400/10'
                               : 'border-slate-700'
                           }`}
                         >
@@ -545,16 +545,16 @@ function ThreadPanel({
                       ))}
                     </div>
                   )}
-                  <p className="text-xs text-slate-400 mt-0.5">{formatTime(reply.createdAt)}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{formatTime(reply.createdAt)}</p>
                 </div>
               </div>
-              {/* 호버 시 이모지 추가 */}
+              {/* Hover emoji add */}
               <div className="hidden group-hover:flex gap-0.5 mt-0.5">
                 {EMOJI_LIST.map((e) => (
                   <button
                     key={e}
                     onClick={() => toggleReaction(reply.id, e, reply.reactions?.some((r) => r.emoji === e && r.userIds.includes(userId)) || false)}
-                    className="text-xs hover:bg-slate-700 rounded px-0.5"
+                    className="text-xs hover:bg-slate-800 rounded px-0.5"
                   >
                     {e}
                   </button>
@@ -566,8 +566,8 @@ function ThreadPanel({
         <div ref={repliesEndRef} />
       </div>
 
-      {/* 답글 입력 */}
-      <div className="px-3 py-2 border-t border-slate-700">
+      {/* Reply input */}
+      <div className="px-3 py-2 border-t border-slate-800">
         {threadPendingFiles.length > 0 && (
           <div className="mb-1.5 flex flex-wrap gap-1">
             {threadPendingFiles.map((f) => (
@@ -584,10 +584,10 @@ function ThreadPanel({
           <button
             onClick={() => threadFileInputRef.current?.click()}
             disabled={threadUploading || threadPendingFiles.length >= 5}
-            className="px-2 py-1.5 text-slate-400 hover:text-slate-200 disabled:opacity-50"
+            className="p-2 text-slate-400 hover:text-cyan-400 disabled:opacity-50 transition-colors"
             title="파일 첨부"
           >
-            📎
+            <Paperclip className="w-4 h-4" />
           </button>
           <input
             value={replyText}
@@ -598,14 +598,14 @@ function ThreadPanel({
               }
             }}
             placeholder="답글..."
-            className="flex-1 px-2.5 py-1.5 border border-slate-600 rounded-lg bg-slate-800 text-sm"
+            className="flex-1 px-3 py-1.5 border border-slate-700 rounded-full bg-slate-800/50 text-sm focus:outline-none focus:ring-1 focus:ring-cyan-400 text-slate-200 placeholder:text-slate-500"
           />
           <button
             onClick={handleThreadSend}
             disabled={(!replyText.trim() && threadPendingFiles.length === 0) || sendReply.isPending || threadUploading}
-            className="px-3 py-1.5 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-500 disabled:opacity-50"
+            className="bg-cyan-400 hover:bg-cyan-400/90 text-slate-950 h-8 w-8 rounded-full flex items-center justify-center disabled:opacity-50 transition-colors shrink-0"
           >
-            전송
+            <ArrowUp className="w-4 h-4 font-bold" />
           </button>
         </div>
       </div>
@@ -622,18 +622,18 @@ export function MessengerPage() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-slate-900" data-testid="messenger-page">
-      {/* Header: mobile-optimized with search */}
-      <div className="px-4 sm:px-6 py-3 border-b border-slate-700 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <h2 className="text-lg sm:text-xl font-bold text-slate-50 tracking-tight">메신저</h2>
-          <div className="flex gap-1 bg-slate-800 rounded-lg p-0.5">
+    <div className="h-full flex flex-col bg-slate-950 overflow-hidden" data-testid="messenger-page">
+      {/* Header */}
+      <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between gap-3 shrink-0">
+        <div className="flex items-center gap-4">
+          <h2 className="text-xl font-bold text-slate-50 tracking-tight">메신저</h2>
+          <div className="flex gap-1 bg-slate-900 rounded-lg p-0.5">
             <button
               onClick={() => handleTabChange('channels')}
               data-testid="messenger-tab-channels"
               className={`px-3 py-1 text-xs rounded-md transition-colors ${
                 activeTab === 'channels'
-                  ? 'bg-slate-700 text-slate-100 shadow-sm font-medium'
+                  ? 'bg-slate-800 text-slate-100 shadow-sm font-medium'
                   : 'text-slate-500 hover:text-slate-300'
               }`}
             >
@@ -644,7 +644,7 @@ export function MessengerPage() {
               data-testid="messenger-tab-conversations"
               className={`px-3 py-1 text-xs rounded-md transition-colors ${
                 activeTab === 'conversations'
-                  ? 'bg-slate-700 text-slate-100 shadow-sm font-medium'
+                  ? 'bg-slate-800 text-slate-100 shadow-sm font-medium'
                   : 'text-slate-500 hover:text-slate-300'
               }`}
             >
@@ -694,20 +694,20 @@ function ChannelsView() {
   const searchRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // URL에서 channelId 파라미터 (알림 클릭 시)
+  // URL channelId param (from notification click)
   useEffect(() => {
     const chId = searchParams.get('channelId')
     if (chId) setSelectedChannel(chId)
   }, [searchParams])
 
-  // 검색 디바운스
+  // Search debounce
   useEffect(() => {
     if (searchQuery.length < 2) { setDebouncedSearch(''); return }
     const timer = setTimeout(() => setDebouncedSearch(searchQuery), 300)
     return () => clearTimeout(timer)
   }, [searchQuery])
 
-  // 검색 외부 클릭 닫기
+  // Close search on outside click
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
@@ -718,13 +718,13 @@ function ChannelsView() {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
-  // 채널 목록
+  // Channel list
   const { data: channelsData } = useQuery({
     queryKey: ['messenger-channels'],
     queryFn: () => api.get<{ data: Channel[] }>('/workspace/messenger/channels'),
   })
 
-  // 메시지 검색
+  // Message search
   const { data: searchData } = useQuery({
     queryKey: ['messenger-search', debouncedSearch],
     queryFn: () => api.get<{ data: SearchResult[] }>(`/workspace/messenger/search?q=${encodeURIComponent(debouncedSearch)}`),
@@ -732,14 +732,13 @@ function ChannelsView() {
   })
   const searchResults = searchData?.data || []
 
-  // 채널별 미읽음 카운트
+  // Unread counts
   const { data: unreadData } = useQuery({
     queryKey: ['messenger-unread'],
     queryFn: () => api.get<{ data: Record<string, number> }>('/workspace/messenger/channels/unread'),
     refetchInterval: 60000,
   })
 
-  // 서버 unread를 로컬 상태에 동기화
   useEffect(() => {
     if (unreadData?.data) {
       setUnreadCounts((prev) => {
@@ -754,13 +753,11 @@ function ChannelsView() {
     }
   }, [unreadData])
 
-  // 채널 읽음 처리
   const markRead = useMutation({
     mutationFn: (channelId: string) =>
       api.post(`/workspace/messenger/channels/${channelId}/read`, {}),
   })
 
-  // 채널 선택 핸들러
   const handleSelectChannel = useCallback((channelId: string) => {
     setSelectedChannel(channelId)
     setThreadMessage(null)
@@ -769,7 +766,6 @@ function ChannelsView() {
     markRead.mutate(channelId)
   }, [markRead])
 
-  // 메시지 (선택된 채널, WebSocket 미연결 시 30초 폴링 fallback)
   const { data: messagesData } = useQuery({
     queryKey: ['messenger-messages', selectedChannel],
     queryFn: () => api.get<{ data: Message[] }>(`/workspace/messenger/channels/${selectedChannel}/messages`),
@@ -777,7 +773,6 @@ function ChannelsView() {
     refetchInterval: isConnected ? false : 30000,
   })
 
-  // 채널 상세 (멤버 수 표시용)
   const { data: channelDetailData } = useQuery({
     queryKey: ['messenger-channel-detail', selectedChannel],
     queryFn: () => api.get<{ data: ChannelDetail }>(`/workspace/messenger/channels/${selectedChannel}`),
@@ -785,7 +780,7 @@ function ChannelsView() {
   })
   const channelDetail = channelDetailData?.data
 
-  // WebSocket 실시간 메시지 수신
+  // WebSocket real-time messages
   useEffect(() => {
     if (!selectedChannel || !isConnected) return
 
@@ -794,7 +789,6 @@ function ChannelsView() {
     const handler = (data: unknown) => {
       const event = data as { type: string; message?: Message; agentName?: string; messageId?: string; reactions?: ReactionGroup[] }
       if (event.type === 'new-message' && event.message) {
-        // 스레드 답글은 메인 목록에 추가하지 않음 (ThreadPanel에서 처리)
         if (!event.message.parentMessageId) {
           queryClient.setQueryData(
             ['messenger-messages', selectedChannel],
@@ -805,7 +799,6 @@ function ChannelsView() {
             },
           )
         } else {
-          // 스레드 답글이면 메인 메시지의 replyCount 갱신
           queryClient.setQueryData(
             ['messenger-messages', selectedChannel],
             (old: { data: Message[] } | undefined) => {
@@ -850,7 +843,7 @@ function ChannelsView() {
     }
   }, [selectedChannel, isConnected, subscribe, addListener, removeListener, queryClient])
 
-  // 알림 WS: messenger_mention 토스트
+  // Mention toast WS
   useEffect(() => {
     if (!isConnected || !user) return
     const notifKey = `notifications::${user.id}`
@@ -865,7 +858,7 @@ function ChannelsView() {
     return () => removeListener(notifKey, handler)
   }, [isConnected, user, addListener, removeListener])
 
-  // 모든 내 채널의 WS 구독 → unread 추적
+  // Subscribe all channels for unread tracking
   useEffect(() => {
     if (!isConnected || !channelsData?.data) return
     const channelIds = channelsData.data.map((ch) => ch.id)
@@ -927,13 +920,13 @@ function ChannelsView() {
       api.delete(`/workspace/messenger/channels/${selectedChannel}/messages/${msgId}/reactions/${encodeURIComponent(emoji)}`),
   })
 
-  // 에이전트 목록 (멘션 자동완성용)
+  // Agent list (mention autocomplete)
   const { data: agentsData } = useQuery({
     queryKey: ['agents'],
     queryFn: () => api.get<{ data: AgentInfo[] }>('/workspace/agents'),
   })
 
-  // 온라인 상태 (30초 폴링)
+  // Online status (30s polling)
   const { data: onlineData } = useQuery({
     queryKey: ['messenger-online-status'],
     queryFn: () => api.get<{ data: string[] }>('/workspace/messenger/online-status'),
@@ -949,12 +942,11 @@ function ChannelsView() {
   const messages = messagesData?.data || []
   const selectedChannelData = channels.find((ch) => ch.id === selectedChannel)
 
-  // 새 메시지 도착 시 스크롤
+  // Scroll on new message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages.length])
 
-  // 설정 모달에서 채널 삭제/나가기 시 선택 초기화
   const handleSettingsClose = () => {
     setShowSettings(false)
     if (selectedChannel && !channels.find((ch) => ch.id === selectedChannel)) {
@@ -1031,49 +1023,42 @@ function ChannelsView() {
 
   return (
     <>
-      <div className="px-4 py-2 border-b border-slate-700 flex items-center justify-between" data-testid="channels-header">
-        <span className="text-xs text-slate-500">채널 기반 메신저</span>
-        <button onClick={() => setShowCreate(!showCreate)}
-          className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg"
-          data-testid="create-channel-btn">
-          + 채널
-        </button>
-      </div>
-
-      <div className="flex flex-1 min-h-0">
-        {/* 채널 목록 (좌) — 모바일: showChat false일 때만 표시 */}
-        <div className={`w-full md:w-72 border-r border-slate-700 overflow-y-auto [-webkit-overflow-scrolling:touch] ${showChat ? 'hidden md:block' : ''}`} data-testid="channel-sidebar">
-          {/* 검색 */}
-          <div ref={searchRef} className="relative p-2 border-b border-slate-700">
-            <div className="flex items-center gap-1.5 px-2 py-1.5 bg-slate-800 rounded-md">
-              <span className="text-slate-400 text-sm">🔍</span>
+      {/* Stitch-style 2-panel layout */}
+      <div className="flex flex-1 overflow-hidden" data-testid="channels-header">
+        {/* Left Panel: Conversation List — Stitch: 320px sidebar */}
+        <aside className={`w-full md:w-[320px] shrink-0 border-r border-slate-800 bg-slate-950 flex flex-col ${showChat ? 'hidden md:flex' : 'flex'}`} data-testid="channel-sidebar">
+          {/* Search */}
+          <div ref={searchRef} className="p-4 border-b border-slate-800 relative">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-[18px] h-[18px]" />
               <input
                 value={searchQuery}
                 onChange={(e) => { setSearchQuery(e.target.value); setShowSearchResults(true) }}
                 onFocus={() => debouncedSearch.length >= 2 && setShowSearchResults(true)}
                 onKeyDown={(e) => e.key === 'Escape' && setShowSearchResults(false)}
-                placeholder="메시지 검색..."
-                className="flex-1 bg-transparent text-sm outline-none placeholder-slate-500"
+                className="w-full bg-slate-800/50 border-none rounded-lg py-2 pl-10 pr-4 text-sm focus:ring-1 focus:ring-cyan-400 outline-none placeholder:text-slate-500 text-slate-200"
+                placeholder="검색..."
+                type="text"
               />
               {searchQuery && (
                 <button onClick={() => { setSearchQuery(''); setShowSearchResults(false) }}
-                  className="text-slate-400 hover:text-slate-200 text-xs">✕</button>
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 text-xs">✕</button>
               )}
             </div>
             {showSearchResults && searchResults.length > 0 && (
-              <div className="absolute left-2 right-2 top-full mt-1 bg-slate-800 border border-slate-700 rounded-md shadow-lg max-h-64 overflow-y-auto z-30">
+              <div className="absolute left-4 right-4 top-full mt-1 bg-slate-900 border border-slate-800 rounded-lg shadow-lg max-h-64 overflow-y-auto z-30">
                 {searchResults.map((r) => (
                   <button
                     key={r.id}
                     onClick={() => { handleSelectChannel(r.channelId); setShowSearchResults(false); setSearchQuery('') }}
-                    className="w-full text-left px-3 py-2 hover:bg-slate-700 border-b border-slate-700 last:border-0"
+                    className="w-full text-left px-3 py-2 hover:bg-slate-800 border-b border-slate-800 last:border-0 transition-colors"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-medium text-blue-400">#{r.channelName}</span>
+                      <span className="text-xs font-medium text-cyan-400">#{r.channelName}</span>
                       <span className="text-[10px] text-slate-400">{formatTime(r.createdAt)}</span>
                     </div>
                     <p className="text-xs text-slate-500 mt-0.5">{r.userName}</p>
-                    <p className="text-sm truncate mt-0.5">
+                    <p className="text-sm truncate mt-0.5 text-slate-300">
                       {r.content.length > 80 ? r.content.slice(0, 80) + '...' : r.content}
                     </p>
                   </button>
@@ -1081,108 +1066,132 @@ function ChannelsView() {
               </div>
             )}
             {showSearchResults && debouncedSearch.length >= 2 && searchResults.length === 0 && (
-              <div className="absolute left-2 right-2 top-full mt-1 bg-slate-800 border border-slate-700 rounded-md shadow-lg p-3 z-30">
+              <div className="absolute left-4 right-4 top-full mt-1 bg-slate-900 border border-slate-800 rounded-lg shadow-lg p-3 z-30">
                 <p className="text-xs text-slate-400 text-center">검색 결과가 없습니다</p>
               </div>
             )}
           </div>
-          {showCreate && (
-            <div className="p-3 border-b border-slate-700 space-y-2">
-              <input value={createForm.name} onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
-                placeholder="채널명" className="w-full px-2 py-1 border border-slate-600 rounded text-sm bg-slate-800" />
-              <button onClick={() => createChannel.mutate(createForm)}
-                disabled={!createForm.name || createChannel.isPending}
-                className="w-full px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-500 disabled:opacity-50">
-                생성
+
+          {/* Create channel + channel list */}
+          <div className="flex-1 overflow-y-auto">
+            {/* Create button bar */}
+            <div className="px-4 py-2 border-b border-slate-800 flex items-center justify-end">
+              <button onClick={() => setShowCreate(!showCreate)}
+                className="px-3 py-1.5 bg-cyan-400 hover:bg-cyan-400/90 text-slate-950 text-sm font-semibold rounded-lg transition-colors"
+                data-testid="create-channel-btn">
+                + 채널
               </button>
             </div>
-          )}
-          {channels.length === 0 && !showCreate && (
-            <p className="p-3 text-xs text-slate-500">채널이 없습니다. 새 채널을 만드세요.</p>
-          )}
-          {channels.map((ch) => {
-            const unread = unreadCounts[ch.id] || 0
-            return (
-              <button
-                key={ch.id}
-                onClick={() => handleSelectChannel(ch.id)}
-                className={`w-full text-left flex items-center gap-3 px-3 sm:px-3 py-3 text-sm border-b border-slate-700/50 transition-colors ${
-                  selectedChannel === ch.id
-                    ? 'bg-cyan-400/5 border-l-2 border-l-cyan-400'
-                    : 'hover:bg-slate-800/30'
-                }`}
-              >
-                {/* Channel avatar with online dot */}
-                <div className="relative shrink-0">
-                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-cyan-400/20 to-cyan-400/5 flex items-center justify-center border border-cyan-400/20">
-                    <span className="text-cyan-400 text-sm font-bold">#</span>
+
+            {showCreate && (
+              <div className="p-4 border-b border-slate-800 space-y-2">
+                <input value={createForm.name} onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
+                  placeholder="채널명" className="w-full px-3 py-2 border border-slate-700 rounded-lg bg-slate-800/50 text-sm focus:outline-none focus:ring-1 focus:ring-cyan-400 text-slate-200 placeholder:text-slate-500" />
+                <button onClick={() => createChannel.mutate(createForm)}
+                  disabled={!createForm.name || createChannel.isPending}
+                  className="w-full px-3 py-2 bg-cyan-400 text-slate-950 text-xs font-semibold rounded-lg hover:bg-cyan-400/90 disabled:opacity-50 transition-colors">
+                  생성
+                </button>
+              </div>
+            )}
+            {channels.length === 0 && !showCreate && (
+              <p className="p-4 text-xs text-slate-500">채널이 없습니다. 새 채널을 만드세요.</p>
+            )}
+            {channels.map((ch) => {
+              const unread = unreadCounts[ch.id] || 0
+              return (
+                <button
+                  key={ch.id}
+                  onClick={() => handleSelectChannel(ch.id)}
+                  className={`w-full text-left flex items-center gap-3 p-4 transition-colors border-l-2 ${
+                    selectedChannel === ch.id
+                      ? 'bg-cyan-400/10 border-l-cyan-400'
+                      : 'hover:bg-slate-800/30 border-l-transparent'
+                  }`}
+                >
+                  {/* Channel avatar with online indicator */}
+                  <div className="relative shrink-0">
+                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-cyan-400/20 to-cyan-400/5 flex items-center justify-center border border-cyan-400/20">
+                      <span className="text-cyan-400 text-sm font-bold">#</span>
+                    </div>
+                    <div className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-500 border-2 border-slate-950" />
                   </div>
-                  <div className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-slate-900 md:hidden" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2 mb-0.5">
-                    <p className={`text-sm truncate ${unread > 0 ? 'font-bold text-slate-50' : 'font-medium text-slate-300'}`}>{ch.name}</p>
-                    <div className="flex items-center gap-1.5 shrink-0">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-baseline mb-0.5">
+                      <h3 className={`text-sm truncate ${unread > 0 ? 'font-semibold text-slate-50' : 'font-medium text-slate-300'}`}>{ch.name}</h3>
                       {ch.lastMessage && (
-                        <span className={`text-xs ${unread > 0 ? 'font-medium text-cyan-400' : 'text-slate-500'}`}>{formatTime(ch.lastMessage.createdAt)}</span>
+                        <span className={`text-xs shrink-0 ${unread > 0 ? 'font-medium text-cyan-400' : 'text-slate-500'}`}>{formatTime(ch.lastMessage.createdAt)}</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {ch.lastMessage ? (
+                        <p className={`text-sm truncate flex-1 ${unread > 0 ? 'text-slate-400 font-medium' : 'text-slate-500'}`}>
+                          {ch.lastMessage.userName}: {ch.lastMessage.content}
+                        </p>
+                      ) : ch.description ? (
+                        <p className="text-sm text-slate-500 truncate flex-1">{ch.description}</p>
+                      ) : null}
+                      {unread > 0 && (
+                        <div className="h-2 w-2 rounded-full bg-cyan-400 shrink-0" />
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    {ch.lastMessage ? (
-                      <p className={`text-xs truncate flex-1 ${unread > 0 ? 'font-medium text-slate-200' : 'text-slate-500'}`}>
-                        {ch.lastMessage.userName}: {ch.lastMessage.content}
-                      </p>
-                    ) : ch.description ? (
-                      <p className="text-xs text-slate-500 truncate flex-1">{ch.description}</p>
-                    ) : null}
-                    {unread > 0 && (
-                      <div className="h-2 w-2 rounded-full bg-cyan-400 shrink-0" />
-                    )}
-                  </div>
-                </div>
-              </button>
-            )
-          })}
-        </div>
+                </button>
+              )
+            })}
+          </div>
+        </aside>
 
-        {/* 메시지 영역 (우) — 모바일: showChat true일 때만 표시 */}
-        <div className={`flex-1 flex min-w-0 ${showChat ? '' : 'hidden md:flex'}`}>
-          <div className="flex-1 flex flex-col min-w-0">
+        {/* Right Panel: Chat Area */}
+        <main className={`flex-1 flex min-w-0 ${showChat ? '' : 'hidden md:flex'}`}>
+          <div className="flex-1 flex flex-col min-w-0 bg-slate-950">
             {!selectedChannel ? (
-              <div className="flex-1 flex items-center justify-center text-slate-400 text-sm">
+              <div className="flex-1 flex items-center justify-center text-slate-500 text-sm">
                 채널을 선택하세요
               </div>
             ) : (
               <>
-                {/* 채널 헤더 */}
-                <div className="px-4 py-2.5 border-b border-slate-700 flex items-center justify-between shrink-0" data-testid="channel-header">
-                  <div className="flex items-center gap-2 min-w-0">
+                {/* Chat Header — Stitch style */}
+                <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between shrink-0" data-testid="channel-header">
+                  <div className="flex items-center gap-4 min-w-0">
                     <button
                       onClick={() => setShowChat(false)}
-                      className="md:hidden p-2 -ml-2 rounded-lg hover:bg-slate-700 text-sm text-slate-400 shrink-0"
+                      className="md:hidden p-2 -ml-2 rounded-lg hover:bg-slate-800 text-slate-400 shrink-0 transition-colors"
                     >
-                      ←
+                      <ArrowLeft className="w-5 h-5" />
                     </button>
-                    <span className="font-medium text-sm text-slate-100 truncate">{selectedChannelData?.name}</span>
-                    {channelDetail?.memberCount && (
-                      <span className="text-xs text-slate-500 shrink-0">{channelDetail.memberCount}명</span>
-                    )}
+                    <div className="h-12 w-12 rounded-full bg-gradient-to-br from-cyan-400/20 to-cyan-400/5 flex items-center justify-center border border-cyan-400/20 shrink-0">
+                      <span className="text-cyan-400 font-bold">#</span>
+                    </div>
+                    <div className="min-w-0">
+                      <h2 className="text-lg font-semibold tracking-tight text-slate-50 truncate">{selectedChannelData?.name}</h2>
+                      <div className="flex items-center gap-1.5 text-sm text-slate-500">
+                        <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                        {channelDetail?.memberCount ? `${channelDetail.memberCount}명 참여` : '온라인'}
+                      </div>
+                    </div>
                   </div>
-                  <button
-                    onClick={() => setShowSettings(true)}
-                    className="text-slate-400 hover:text-slate-200 text-lg"
-                    title="채널 설정"
-                    data-testid="channel-settings-btn"
-                  >
-                    ⚙️
-                  </button>
+                  <div className="flex gap-2">
+                    <button className="p-2 text-slate-400 hover:text-slate-200 rounded-lg hover:bg-slate-800 transition-colors">
+                      <Search className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={() => setShowSettings(true)}
+                      className="p-2 text-slate-400 hover:text-slate-200 rounded-lg hover:bg-slate-800 transition-colors"
+                      title="채널 설정"
+                      data-testid="channel-settings-btn"
+                    >
+                      <MoreVertical className="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
 
-                {/* 메시지 목록 */}
-                <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 [-webkit-overflow-scrolling:touch]">
+                {/* Messages Area — Stitch style with rounded bubbles */}
+                <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6 [-webkit-overflow-scrolling:touch]">
                   {messages.length === 0 && (
-                    <p className="text-sm text-slate-400 text-center mt-8">아직 메시지가 없습니다.</p>
+                    <div className="flex justify-center my-2">
+                      <span className="text-xs font-medium text-slate-500 bg-slate-800/50 px-3 py-1 rounded-full">아직 메시지가 없습니다</span>
+                    </div>
                   )}
                   {messages.map((msg) => {
                     const isMe = msg.userId === user?.id
@@ -1194,112 +1203,185 @@ function ChannelsView() {
                         onMouseEnter={() => setHoveredMsgId(msg.id)}
                         onMouseLeave={() => { setHoveredMsgId(null); if (showEmojiPicker === msg.id) setShowEmojiPicker(null) }}
                       >
-                        <div className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                          <div className={`max-w-[70%] ${isMe ? 'order-2' : ''}`}>
-                            {!isMe && <p className="text-xs font-medium text-slate-400 mb-0.5">{msg.userName}</p>}
-                            <div className="relative">
-                              <div className={`px-3 py-2 rounded-lg text-sm max-w-[75%] ${
-                                isMe
-                                  ? 'bg-blue-600 text-white rounded-br-sm'
-                                  : 'bg-slate-800 text-slate-100 rounded-bl-sm'
-                              }`}>
-                                {msg.content}
-                                {msg.attachments && <AttachmentRenderer attachments={msg.attachments} />}
-                              </div>
-                              {/* 호버 시 액션 바 */}
-                              {isHovered && (
-                                <div className={`absolute -top-7 ${isMe ? 'right-0' : 'left-0'} flex gap-0.5 bg-slate-800 border border-slate-700 rounded-md shadow-sm px-1 py-0.5 z-10`}>
-                                  <button
-                                    onClick={() => setShowEmojiPicker(showEmojiPicker === msg.id ? null : msg.id)}
-                                    className="text-xs hover:bg-slate-700 rounded px-1 py-0.5"
-                                    title="리액션"
-                                  >
-                                    😀
-                                  </button>
-                                  <button
-                                    onClick={() => setThreadMessage(msg)}
-                                    className="text-xs hover:bg-slate-700 rounded px-1 py-0.5"
-                                    title="답글"
-                                  >
-                                    💬
-                                  </button>
+                        {isMe ? (
+                          /* My message — right aligned, Stitch style */
+                          <div className="flex justify-end gap-3 max-w-[80%] ml-auto">
+                            <div className="flex flex-col items-end gap-1">
+                              <div className="relative">
+                                <div className="bg-cyan-400/10 text-slate-100 p-3 rounded-2xl rounded-tr-sm text-sm leading-relaxed border border-cyan-400/20">
+                                  {msg.content}
+                                  {msg.attachments && <AttachmentRenderer attachments={msg.attachments} />}
                                 </div>
-                              )}
-                              {/* 이모지 피커 */}
-                              {showEmojiPicker === msg.id && (
-                                <div className={`absolute -top-14 ${isMe ? 'right-0' : 'left-0'} flex gap-0.5 bg-slate-800 border border-slate-700 rounded-md shadow-lg px-1.5 py-1 z-20`}>
-                                  {EMOJI_LIST.map((e) => (
+                                {/* Hover action bar */}
+                                {isHovered && (
+                                  <div className="absolute -top-7 right-0 flex gap-0.5 bg-slate-900 border border-slate-800 rounded-md shadow-sm px-1 py-0.5 z-10">
                                     <button
-                                      key={e}
-                                      onClick={() => toggleReaction(msg.id, e, msg.reactions?.some((r) => r.emoji === e && r.userIds.includes(user?.id || '')) || false)}
-                                      className="text-sm hover:bg-slate-700 rounded px-1 py-0.5"
+                                      onClick={() => setShowEmojiPicker(showEmojiPicker === msg.id ? null : msg.id)}
+                                      className="text-xs hover:bg-slate-800 rounded px-1 py-0.5"
+                                      title="리액션"
                                     >
-                                      {e}
+                                      😀
+                                    </button>
+                                    <button
+                                      onClick={() => setThreadMessage(msg)}
+                                      className="text-xs hover:bg-slate-800 rounded px-1 py-0.5"
+                                      title="답글"
+                                    >
+                                      💬
+                                    </button>
+                                  </div>
+                                )}
+                                {/* Emoji picker */}
+                                {showEmojiPicker === msg.id && (
+                                  <div className="absolute -top-14 right-0 flex gap-0.5 bg-slate-900 border border-slate-800 rounded-md shadow-lg px-1.5 py-1 z-20">
+                                    {EMOJI_LIST.map((e) => (
+                                      <button
+                                        key={e}
+                                        onClick={() => toggleReaction(msg.id, e, msg.reactions?.some((r) => r.emoji === e && r.userIds.includes(user?.id || '')) || false)}
+                                        className="text-sm hover:bg-slate-800 rounded px-1 py-0.5"
+                                      >
+                                        {e}
+                                      </button>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                              {/* Reaction badges */}
+                              {msg.reactions && msg.reactions.length > 0 && (
+                                <div className="flex gap-1 flex-wrap">
+                                  {msg.reactions.map((r) => (
+                                    <button
+                                      key={r.emoji}
+                                      onClick={() => toggleReaction(msg.id, r.emoji, r.userIds.includes(user?.id || ''))}
+                                      className={`text-xs px-1.5 py-0.5 rounded-full border ${
+                                        r.userIds.includes(user?.id || '')
+                                          ? 'border-cyan-400/50 bg-cyan-400/10'
+                                          : 'border-slate-700 hover:border-slate-600'
+                                      }`}
+                                    >
+                                      {r.emoji} {r.count}
                                     </button>
                                   ))}
                                 </div>
                               )}
+                              {/* Reply count */}
+                              {(msg.replyCount || 0) > 0 && (
+                                <button
+                                  onClick={() => setThreadMessage(msg)}
+                                  className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors"
+                                >
+                                  {msg.replyCount}개 답글
+                                </button>
+                              )}
+                              <span className="text-xs text-slate-500">{formatTime(msg.createdAt)}</span>
                             </div>
-                            {/* 리액션 배지 */}
-                            {msg.reactions && msg.reactions.length > 0 && (
-                              <div className="flex gap-1 mt-0.5 flex-wrap">
-                                {msg.reactions.map((r) => (
-                                  <button
-                                    key={r.emoji}
-                                    onClick={() => toggleReaction(msg.id, r.emoji, r.userIds.includes(user?.id || ''))}
-                                    className={`text-xs px-1.5 py-0.5 rounded-full border ${
-                                      r.userIds.includes(user?.id || '')
-                                        ? 'border-blue-500/50 bg-blue-600/10'
-                                        : 'border-slate-700 hover:border-slate-600'
-                                    }`}
-                                  >
-                                    {r.emoji} {r.count}
-                                  </button>
-                                ))}
-                              </div>
-                            )}
-                            {/* 답글 카운트 */}
-                            {(msg.replyCount || 0) > 0 && (
-                              <button
-                                onClick={() => setThreadMessage(msg)}
-                                className="text-xs text-blue-400 hover:text-blue-400 mt-0.5"
-                              >
-                                {msg.replyCount}개 답글
-                              </button>
-                            )}
-                            <p className="text-xs text-slate-400 mt-0.5">
-                              {new Date(msg.createdAt).toLocaleTimeString('ko', { hour: '2-digit', minute: '2-digit' })}
-                            </p>
                           </div>
-                        </div>
+                        ) : (
+                          /* Other's message — left aligned with avatar, Stitch style */
+                          <div className="flex justify-start gap-3 max-w-[80%]">
+                            <div className="h-8 w-8 rounded-full bg-slate-700 flex items-center justify-center shrink-0 mt-1 text-slate-400 text-xs font-bold">
+                              {msg.userName.charAt(0)}
+                            </div>
+                            <div className="flex flex-col items-start gap-1">
+                              <p className="text-xs font-medium text-slate-400 mb-0.5">{msg.userName}</p>
+                              <div className="relative">
+                                <div className="bg-slate-900 text-slate-200 p-4 rounded-2xl rounded-tl-sm text-sm leading-relaxed border border-slate-800 shadow-sm">
+                                  {msg.content}
+                                  {msg.attachments && <AttachmentRenderer attachments={msg.attachments} />}
+                                </div>
+                                {/* Hover action bar */}
+                                {isHovered && (
+                                  <div className="absolute -top-7 left-0 flex gap-0.5 bg-slate-900 border border-slate-800 rounded-md shadow-sm px-1 py-0.5 z-10">
+                                    <button
+                                      onClick={() => setShowEmojiPicker(showEmojiPicker === msg.id ? null : msg.id)}
+                                      className="text-xs hover:bg-slate-800 rounded px-1 py-0.5"
+                                      title="리액션"
+                                    >
+                                      😀
+                                    </button>
+                                    <button
+                                      onClick={() => setThreadMessage(msg)}
+                                      className="text-xs hover:bg-slate-800 rounded px-1 py-0.5"
+                                      title="답글"
+                                    >
+                                      💬
+                                    </button>
+                                  </div>
+                                )}
+                                {/* Emoji picker */}
+                                {showEmojiPicker === msg.id && (
+                                  <div className="absolute -top-14 left-0 flex gap-0.5 bg-slate-900 border border-slate-800 rounded-md shadow-lg px-1.5 py-1 z-20">
+                                    {EMOJI_LIST.map((e) => (
+                                      <button
+                                        key={e}
+                                        onClick={() => toggleReaction(msg.id, e, msg.reactions?.some((r) => r.emoji === e && r.userIds.includes(user?.id || '')) || false)}
+                                        className="text-sm hover:bg-slate-800 rounded px-1 py-0.5"
+                                      >
+                                        {e}
+                                      </button>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                              {/* Reaction badges */}
+                              {msg.reactions && msg.reactions.length > 0 && (
+                                <div className="flex gap-1 flex-wrap">
+                                  {msg.reactions.map((r) => (
+                                    <button
+                                      key={r.emoji}
+                                      onClick={() => toggleReaction(msg.id, r.emoji, r.userIds.includes(user?.id || ''))}
+                                      className={`text-xs px-1.5 py-0.5 rounded-full border ${
+                                        r.userIds.includes(user?.id || '')
+                                          ? 'border-cyan-400/50 bg-cyan-400/10'
+                                          : 'border-slate-700 hover:border-slate-600'
+                                      }`}
+                                    >
+                                      {r.emoji} {r.count}
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                              {/* Reply count */}
+                              {(msg.replyCount || 0) > 0 && (
+                                <button
+                                  onClick={() => setThreadMessage(msg)}
+                                  className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors"
+                                >
+                                  {msg.replyCount}개 답글
+                                </button>
+                              )}
+                              <span className="text-xs text-slate-500">{formatTime(msg.createdAt)}</span>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )
                   })}
                   {typingAgent && (
                     <div className="flex items-center gap-2 px-2 py-1 text-xs text-slate-500">
-                      <span className="animate-pulse">🤖 {typingAgent}이(가) 입력 중...</span>
+                      <span className="animate-pulse">{typingAgent}이(가) 입력 중...</span>
                     </div>
                   )}
                   <div ref={messagesEndRef} />
                 </div>
 
-                {/* 입력 */}
+                {/* Input Area — Stitch style: rounded full, attach + send */}
                 <div
-                  className={`px-4 py-3 border-t border-slate-700 relative ${dragOver ? 'bg-blue-600/10 border-blue-500/50' : ''}`}
+                  className={`p-4 shrink-0 ${dragOver ? 'bg-cyan-400/5 border-t border-cyan-400/30' : 'border-t border-slate-800'}`}
                   style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
                   onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
                   onDragLeave={() => setDragOver(false)}
                   onDrop={handleDrop}
                 >
                   {showMention && filteredAgents.length > 0 && (
-                    <div className="absolute bottom-full left-4 right-4 mb-1 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl max-h-48 overflow-y-auto w-64 z-10" data-testid="mention-popup">
+                    <div className="absolute bottom-full left-4 right-4 mb-1 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl max-h-48 overflow-y-auto w-64 z-10" data-testid="mention-popup">
                       {filteredAgents.map((a) => (
                         <button
                           key={a.id}
                           onClick={() => handleMentionSelect(a.name)}
-                          className="w-full text-left px-3 py-2 text-sm hover:bg-slate-700 flex items-center gap-2"
+                          className="w-full text-left px-3 py-2 text-sm hover:bg-slate-800 flex items-center gap-2 transition-colors"
                         >
-                          <span className="text-blue-400">@{a.name}</span>
+                          <span className="text-cyan-400">@{a.name}</span>
                           {a.role && <span className="text-xs text-slate-500">({a.role})</span>}
                         </button>
                       ))}
@@ -1317,14 +1399,14 @@ function ChannelsView() {
                     </div>
                   )}
                   <input type="file" ref={fileInputRef} hidden multiple accept={FILE_ACCEPT} onChange={(e) => { handleFileSelect(e.target.files); e.target.value = '' }} />
-                  <div className="flex gap-2">
+                  <div className="max-w-4xl mx-auto relative flex items-center bg-slate-900 border border-slate-800 rounded-full shadow-sm pr-2 pl-4 py-2 focus-within:ring-1 focus-within:ring-cyan-400 focus-within:border-cyan-400 transition-all">
                     <button
                       onClick={() => fileInputRef.current?.click()}
                       disabled={uploading || pendingFiles.length >= 5}
-                      className="p-2 text-slate-400 hover:text-slate-200 rounded-lg hover:bg-slate-700 disabled:opacity-50"
+                      className="text-slate-400 hover:text-cyan-400 transition-colors p-1 disabled:opacity-50"
                       title="파일 첨부 (최대 5개)"
                     >
-                      📎
+                      <Paperclip className="w-5 h-5" />
                     </button>
                     <input
                       ref={inputRef}
@@ -1335,24 +1417,27 @@ function ChannelsView() {
                         if (e.key === 'Escape') setShowMention(false)
                       }}
                       placeholder="메시지를 입력하세요... (@로 에이전트 호출)"
-                      className="flex-1 bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm"
+                      className="flex-1 bg-transparent border-none focus:ring-0 text-sm px-3 text-slate-200 placeholder:text-slate-500 h-9"
                       data-testid="channel-message-input"
                     />
                     <button
                       onClick={handleSend}
                       disabled={(!newMessage.trim() && pendingFiles.length === 0) || sendMessage.isPending || uploading}
-                      className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50"
+                      className="bg-cyan-400 hover:bg-cyan-400/90 text-slate-950 h-8 w-8 rounded-full flex items-center justify-center transition-colors ml-2 shrink-0 disabled:opacity-50"
                       data-testid="channel-send-btn"
                     >
-                      전송
+                      <ArrowUp className="w-4 h-4 font-bold" />
                     </button>
+                  </div>
+                  <div className="text-center mt-2">
+                    <span className="text-[11px] text-slate-500">AI 에이전트가 생성한 정보는 부정확할 수 있습니다.</span>
                   </div>
                 </div>
               </>
             )}
           </div>
 
-          {/* 스레드 패널 */}
+          {/* Thread panel */}
           {threadMessage && selectedChannel && user && (
             <ThreadPanel
               channelId={selectedChannel}
@@ -1361,10 +1446,10 @@ function ChannelsView() {
               onClose={() => setThreadMessage(null)}
             />
           )}
-        </div>
+        </main>
       </div>
 
-      {/* 채널 설정 모달 */}
+      {/* Channel settings modal */}
       {showSettings && selectedChannel && user && (
         <ChannelSettingsModal
           channelId={selectedChannel}
@@ -1374,17 +1459,17 @@ function ChannelsView() {
         />
       )}
 
-      {/* 멘션 알림 토스트 */}
+      {/* Mention notification toast */}
       {mentionToast && (
         <div
-          className="fixed bottom-4 right-4 bg-blue-600 text-white px-4 py-3 rounded-lg shadow-lg cursor-pointer z-50 max-w-xs animate-in fade-in slide-in-from-bottom-2"
+          className="fixed bottom-4 right-4 bg-cyan-400 text-slate-950 px-4 py-3 rounded-lg shadow-lg cursor-pointer z-50 max-w-xs animate-in fade-in slide-in-from-bottom-2"
           onClick={() => {
             const chMatch = mentionToast.actionUrl.match(/channelId=([^&]+)/)
             if (chMatch) handleSelectChannel(chMatch[1])
             setMentionToast(null)
           }}
         >
-          <p className="text-sm font-medium">@멘션 알림</p>
+          <p className="text-sm font-semibold">@멘션 알림</p>
           <p className="text-xs opacity-90 mt-0.5">{mentionToast.title}</p>
         </div>
       )}
