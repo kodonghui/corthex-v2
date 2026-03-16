@@ -307,13 +307,13 @@ export function OpsLogPage() {
   return (
     <div className="h-full flex flex-col bg-slate-900" data-testid="ops-log-page">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-slate-50">작전일지</h2>
+      <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-700 flex items-center justify-between">
+        <h2 className="text-lg sm:text-xl font-bold text-slate-50 tracking-tight">작전일지</h2>
         <div className="flex items-center gap-2">
           {selectedIds.size === 2 && (
             <button
               onClick={() => setCompareOpen(true)}
-              className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium"
+              className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium"
               data-testid="compare-btn"
             >
               비교
@@ -321,7 +321,7 @@ export function OpsLogPage() {
           )}
           <button
             onClick={handleExport}
-            className="border border-slate-600 text-slate-300 hover:bg-slate-800 rounded-lg px-4 py-2 text-sm"
+            className="border border-slate-600 text-slate-300 hover:bg-slate-800 rounded-lg px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm"
             data-testid="export-btn"
           >
             내보내기
@@ -329,8 +329,34 @@ export function OpsLogPage() {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="px-6 py-3 border-b border-slate-700/50 flex flex-wrap gap-2 items-center" data-testid="filters-row">
+      {/* Mobile severity filter chips */}
+      <div className="sm:hidden flex gap-2 px-4 py-3 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border-b border-slate-700/50" data-testid="mobile-severity-chips">
+        {[
+          { value: '', label: '전체', dot: '' },
+          { value: 'failed', label: '에러', dot: 'bg-red-500' },
+          { value: 'pending', label: '경고', dot: 'bg-amber-500' },
+          { value: 'processing', label: '정보', dot: 'bg-blue-500' },
+          { value: 'completed', label: '완료', dot: 'bg-emerald-500' },
+        ].map((chip) => (
+          <button
+            key={chip.value}
+            onClick={() => { setStatusFilter(chip.value); setPage(1) }}
+            className={`flex shrink-0 h-8 items-center justify-center rounded-full px-4 text-sm font-medium transition-colors ${
+              statusFilter === chip.value
+                ? 'bg-cyan-400/20 border border-cyan-400 text-cyan-400'
+                : 'bg-slate-800 border border-transparent text-slate-300 hover:bg-slate-700'
+            }`}
+          >
+            <span className="flex items-center gap-1.5">
+              {chip.dot && <span className={`w-2 h-2 rounded-full ${chip.dot} inline-block`} />}
+              {chip.label}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* Desktop filters */}
+      <div className="hidden sm:flex px-6 py-3 border-b border-slate-700/50 flex-wrap gap-2 items-center" data-testid="filters-row">
         <input
           placeholder="검색..."
           value={searchInput}
@@ -438,8 +464,8 @@ export function OpsLogPage() {
         </div>
       )}
 
-      {/* Table */}
-      <div className="flex-1 overflow-auto px-6 py-3" data-testid="ops-table">
+      {/* Table (desktop) + Card list (mobile) */}
+      <div className="flex-1 overflow-auto px-3 sm:px-6 py-3" data-testid="ops-table">
         {listQuery.isLoading ? (
           <div className="space-y-3" data-testid="ops-loading">
             {Array.from({ length: 8 }).map((_, i) => (
@@ -459,72 +485,122 @@ export function OpsLogPage() {
             </button>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm min-w-[800px]">
-              <thead>
-                <tr className="text-xs text-slate-500 border-b border-slate-700 font-medium">
-                  <th className="text-left py-2 pr-2 w-8">
-                    <span className="sr-only">선택</span>
-                  </th>
-                  <th className="text-left py-2 pr-3">시간</th>
-                  <th className="text-left py-2 pr-3">명령</th>
-                  <th className="text-left py-2 pr-3">유형</th>
-                  <th className="text-left py-2 pr-3">상태</th>
-                  <th className="text-left py-2 pr-3">에이전트</th>
-                  <th className="text-left py-2 pr-3">품질</th>
-                  <th className="text-right py-2 pr-3">소요시간</th>
-                  <th className="text-center py-2 w-8">★</th>
-                  <th className="text-center py-2 w-8">
-                    <span className="sr-only">메뉴</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map(item => (
-                  <tr
+          <>
+            {/* Mobile card view */}
+            <div className="sm:hidden flex flex-col gap-2" data-testid="ops-mobile-cards">
+              {items.map(item => {
+                const severityColor = item.status === 'failed' ? 'bg-red-500'
+                  : item.status === 'pending' ? 'bg-amber-500'
+                  : item.status === 'processing' ? 'bg-blue-500'
+                  : item.status === 'completed' ? 'bg-emerald-500'
+                  : 'bg-slate-500'
+                return (
+                  <div
                     key={item.id}
-                    className="border-b border-slate-800 hover:bg-slate-800/50 cursor-pointer transition-colors"
+                    className="flex gap-0 bg-slate-800 border border-slate-700 rounded-lg overflow-hidden relative cursor-pointer active:bg-slate-700/50"
                     onClick={() => setDetailId(item.id)}
-                    data-testid={`ops-row-${item.id}`}
+                    data-testid={`ops-card-${item.id}`}
                   >
-                    <td className="py-2.5 pr-2" onClick={e => e.stopPropagation()}>
-                      <input
-                        type="checkbox"
-                        checked={selectedIds.has(item.id)}
-                        onChange={() => toggleSelect(item.id)}
-                        disabled={!selectedIds.has(item.id) && selectedIds.size >= 2}
-                        className="w-3.5 h-3.5 rounded border-slate-600 accent-blue-500"
-                      />
-                    </td>
-                    <td className="py-2.5 pr-3 text-xs text-slate-500 whitespace-nowrap">{formatTime(item.createdAt)}</td>
-                    <td className="py-2.5 pr-3 text-xs text-slate-300 truncate max-w-[200px]" title={item.text}>{item.text}</td>
-                    <td className="py-2.5 pr-3">
-                      <span className="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded">{TYPE_LABELS[item.type] || item.type}</span>
-                    </td>
-                    <td className="py-2.5 pr-3">
-                      <StatusBadge status={item.status} />
-                    </td>
-                    <td className="py-2.5 pr-3 text-xs text-slate-400">{item.targetAgentName || '-'}</td>
-                    <td className="py-2.5 pr-3">
-                      <QualityBar score={item.qualityScore} />
-                    </td>
-                    <td className="py-2.5 pr-3 text-xs text-right text-slate-500">{formatDuration(item.durationMs)}</td>
-                    <td className="py-2.5 text-center" onClick={e => handleBookmarkToggle(item, e)}>
-                      <button className={`text-sm hover:scale-110 transition-transform ${item.isBookmarked ? 'text-amber-400' : 'text-slate-500'}`}>
-                        {item.isBookmarked ? '★' : '☆'}
-                      </button>
-                    </td>
-                    <td className="py-2.5 text-center" onClick={e => e.stopPropagation()}>
-                      <RowMenu
-                        onReplay={() => handleReplay(item.text)}
-                        onCopy={() => handleCopy(item.text)}
-                      />
-                    </td>
+                    {/* Severity bar */}
+                    <div className={`w-1 shrink-0 ${severityColor}`} />
+                    <div className="flex flex-col flex-1 py-3 px-3">
+                      <div className="flex justify-between items-start mb-1">
+                        <StatusBadge status={item.status} />
+                        <span className="font-mono text-xs text-slate-400">{formatTime(item.createdAt)}</span>
+                      </div>
+                      {item.targetAgentName && (
+                        <p className="text-slate-400 text-xs font-medium mb-1">{item.targetAgentName}</p>
+                      )}
+                      <p className="font-mono text-slate-200 text-sm leading-tight break-all line-clamp-2">{item.text}</p>
+                      <div className="flex items-center gap-3 mt-2">
+                        <span className="bg-slate-700 text-slate-300 text-[10px] px-1.5 py-0.5 rounded">{TYPE_LABELS[item.type] || item.type}</span>
+                        <span className="font-mono text-[10px] text-slate-500">{formatDuration(item.durationMs)}</span>
+                        {item.qualityScore != null && (
+                          <div className="flex-1 max-w-[60px]">
+                            <QualityBar score={item.qualityScore} />
+                          </div>
+                        )}
+                        <button
+                          className={`text-sm ml-auto ${item.isBookmarked ? 'text-amber-400' : 'text-slate-500'}`}
+                          onClick={e => handleBookmarkToggle(item, e)}
+                        >
+                          {item.isBookmarked ? '★' : '☆'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Desktop table */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-sm min-w-[800px]">
+                <thead>
+                  <tr className="text-xs text-slate-500 border-b border-slate-700 font-medium">
+                    <th className="text-left py-2 pr-2 w-8">
+                      <span className="sr-only">선택</span>
+                    </th>
+                    <th className="text-left py-2 pr-3">시간</th>
+                    <th className="text-left py-2 pr-3">명령</th>
+                    <th className="text-left py-2 pr-3">유형</th>
+                    <th className="text-left py-2 pr-3">상태</th>
+                    <th className="text-left py-2 pr-3">에이전트</th>
+                    <th className="text-left py-2 pr-3">품질</th>
+                    <th className="text-right py-2 pr-3">소요시간</th>
+                    <th className="text-center py-2 w-8">★</th>
+                    <th className="text-center py-2 w-8">
+                      <span className="sr-only">메뉴</span>
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {items.map(item => (
+                    <tr
+                      key={item.id}
+                      className="border-b border-slate-800 hover:bg-slate-800/50 cursor-pointer transition-colors"
+                      onClick={() => setDetailId(item.id)}
+                      data-testid={`ops-row-${item.id}`}
+                    >
+                      <td className="py-2.5 pr-2" onClick={e => e.stopPropagation()}>
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.has(item.id)}
+                          onChange={() => toggleSelect(item.id)}
+                          disabled={!selectedIds.has(item.id) && selectedIds.size >= 2}
+                          className="w-3.5 h-3.5 rounded border-slate-600 accent-blue-500"
+                        />
+                      </td>
+                      <td className="py-2.5 pr-3 text-xs text-slate-500 whitespace-nowrap">{formatTime(item.createdAt)}</td>
+                      <td className="py-2.5 pr-3 text-xs text-slate-300 truncate max-w-[200px]" title={item.text}>{item.text}</td>
+                      <td className="py-2.5 pr-3">
+                        <span className="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded">{TYPE_LABELS[item.type] || item.type}</span>
+                      </td>
+                      <td className="py-2.5 pr-3">
+                        <StatusBadge status={item.status} />
+                      </td>
+                      <td className="py-2.5 pr-3 text-xs text-slate-400">{item.targetAgentName || '-'}</td>
+                      <td className="py-2.5 pr-3">
+                        <QualityBar score={item.qualityScore} />
+                      </td>
+                      <td className="py-2.5 pr-3 text-xs text-right text-slate-500">{formatDuration(item.durationMs)}</td>
+                      <td className="py-2.5 text-center" onClick={e => handleBookmarkToggle(item, e)}>
+                        <button className={`text-sm hover:scale-110 transition-transform ${item.isBookmarked ? 'text-amber-400' : 'text-slate-500'}`}>
+                          {item.isBookmarked ? '★' : '☆'}
+                        </button>
+                      </td>
+                      <td className="py-2.5 text-center" onClick={e => e.stopPropagation()}>
+                        <RowMenu
+                          onReplay={() => handleReplay(item.text)}
+                          onCopy={() => handleCopy(item.text)}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
 

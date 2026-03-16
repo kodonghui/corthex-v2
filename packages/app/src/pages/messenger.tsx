@@ -623,31 +623,34 @@ export function MessengerPage() {
 
   return (
     <div className="h-full flex flex-col bg-slate-900" data-testid="messenger-page">
-      <div className="px-6 py-3 border-b border-slate-700 flex items-center gap-4">
-        <h2 className="text-xl font-semibold text-slate-50">메신저</h2>
-        <div className="flex gap-1 bg-slate-800 rounded-lg p-0.5">
-          <button
-            onClick={() => handleTabChange('channels')}
-            data-testid="messenger-tab-channels"
-            className={`px-3 py-1 text-xs rounded-md transition-colors ${
-              activeTab === 'channels'
-                ? 'bg-slate-700 text-slate-100 shadow-sm font-medium'
-                : 'text-slate-500 hover:text-slate-300'
-            }`}
-          >
-            채널
-          </button>
-          <button
-            onClick={() => handleTabChange('conversations')}
-            data-testid="messenger-tab-conversations"
-            className={`px-3 py-1 text-xs rounded-md transition-colors ${
-              activeTab === 'conversations'
-                ? 'bg-slate-700 text-slate-100 shadow-sm font-medium'
-                : 'text-slate-500 hover:text-slate-300'
-            }`}
-          >
-            대화
-          </button>
+      {/* Header: mobile-optimized with search */}
+      <div className="px-4 sm:px-6 py-3 border-b border-slate-700 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <h2 className="text-lg sm:text-xl font-bold text-slate-50 tracking-tight">메신저</h2>
+          <div className="flex gap-1 bg-slate-800 rounded-lg p-0.5">
+            <button
+              onClick={() => handleTabChange('channels')}
+              data-testid="messenger-tab-channels"
+              className={`px-3 py-1 text-xs rounded-md transition-colors ${
+                activeTab === 'channels'
+                  ? 'bg-slate-700 text-slate-100 shadow-sm font-medium'
+                  : 'text-slate-500 hover:text-slate-300'
+              }`}
+            >
+              채널
+            </button>
+            <button
+              onClick={() => handleTabChange('conversations')}
+              data-testid="messenger-tab-conversations"
+              className={`px-3 py-1 text-xs rounded-md transition-colors ${
+                activeTab === 'conversations'
+                  ? 'bg-slate-700 text-slate-100 shadow-sm font-medium'
+                  : 'text-slate-500 hover:text-slate-300'
+              }`}
+            >
+              대화
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1103,32 +1106,41 @@ function ChannelsView() {
               <button
                 key={ch.id}
                 onClick={() => handleSelectChannel(ch.id)}
-                className={`w-full text-left px-3 py-2.5 text-sm border-b border-slate-700 transition-colors ${
+                className={`w-full text-left flex items-center gap-3 px-3 sm:px-3 py-3 text-sm border-b border-slate-700/50 transition-colors ${
                   selectedChannel === ch.id
-                    ? 'bg-blue-600/10 text-blue-400 bg-blue-600/10 text-blue-400'
-                    : 'hover:bg-slate-700'
+                    ? 'bg-cyan-400/5 border-l-2 border-l-cyan-400'
+                    : 'hover:bg-slate-800/30'
                 }`}
               >
-                <div className="flex items-center justify-between">
-                  <p className={`font-medium truncate ${unread > 0 ? 'font-bold' : ''}`}>{ch.name}</p>
-                  <div className="flex items-center gap-1.5 ml-1 shrink-0">
+                {/* Channel avatar with online dot */}
+                <div className="relative shrink-0">
+                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-cyan-400/20 to-cyan-400/5 flex items-center justify-center border border-cyan-400/20">
+                    <span className="text-cyan-400 text-sm font-bold">#</span>
+                  </div>
+                  <div className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-slate-900 md:hidden" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2 mb-0.5">
+                    <p className={`text-sm truncate ${unread > 0 ? 'font-bold text-slate-50' : 'font-medium text-slate-300'}`}>{ch.name}</p>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {ch.lastMessage && (
+                        <span className={`text-xs ${unread > 0 ? 'font-medium text-cyan-400' : 'text-slate-500'}`}>{formatTime(ch.lastMessage.createdAt)}</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {ch.lastMessage ? (
+                      <p className={`text-xs truncate flex-1 ${unread > 0 ? 'font-medium text-slate-200' : 'text-slate-500'}`}>
+                        {ch.lastMessage.userName}: {ch.lastMessage.content}
+                      </p>
+                    ) : ch.description ? (
+                      <p className="text-xs text-slate-500 truncate flex-1">{ch.description}</p>
+                    ) : null}
                     {unread > 0 && (
-                      <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold text-white bg-red-500 rounded-full">
-                        {unread > 99 ? '99+' : unread}
-                      </span>
-                    )}
-                    {ch.lastMessage && (
-                      <span className="text-xs text-slate-400">{formatTime(ch.lastMessage.createdAt)}</span>
+                      <div className="h-2 w-2 rounded-full bg-cyan-400 shrink-0" />
                     )}
                   </div>
                 </div>
-                {ch.lastMessage ? (
-                  <p className="text-xs text-slate-500 truncate mt-0.5">
-                    {ch.lastMessage.userName}: {ch.lastMessage.content}
-                  </p>
-                ) : ch.description ? (
-                  <p className="text-xs text-slate-500 truncate mt-0.5">{ch.description}</p>
-                ) : null}
               </button>
             )
           })}
