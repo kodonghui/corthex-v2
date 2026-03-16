@@ -6,7 +6,7 @@ import { describe, it, expect } from 'bun:test'
 
 describe('Story 13-1: SketchVibe node types', () => {
   it('should export 8 node types', async () => {
-    const { sketchVibeNodeTypes } = await import('../components/nexus/sketchvibe-nodes')
+    const { sketchVibeNodeTypes } = await import('../components/sketchvibe/sketchvibe-nodes')
     const types = Object.keys(sketchVibeNodeTypes)
     expect(types).toHaveLength(8)
     expect(types).toContain('start')
@@ -20,7 +20,7 @@ describe('Story 13-1: SketchVibe node types', () => {
   })
 
   it('should export NODE_PALETTE with 8 items', async () => {
-    const { NODE_PALETTE } = await import('../components/nexus/sketchvibe-nodes')
+    const { NODE_PALETTE } = await import('../components/sketchvibe/sketchvibe-nodes')
     expect(NODE_PALETTE).toHaveLength(8)
     NODE_PALETTE.forEach((item) => {
       expect(item.type).toBeTruthy()
@@ -31,14 +31,14 @@ describe('Story 13-1: SketchVibe node types', () => {
   })
 
   it('NODE_PALETTE types should match sketchVibeNodeTypes keys', async () => {
-    const { sketchVibeNodeTypes, NODE_PALETTE } = await import('../components/nexus/sketchvibe-nodes')
+    const { sketchVibeNodeTypes, NODE_PALETTE } = await import('../components/sketchvibe/sketchvibe-nodes')
     const nodeTypeKeys = Object.keys(sketchVibeNodeTypes)
     const paletteTypes = NODE_PALETTE.map((p) => p.type)
     expect(paletteTypes.sort()).toEqual(nodeTypeKeys.sort())
   })
 
   it('SvNodeType should include all 8 types', async () => {
-    const { NODE_PALETTE } = await import('../components/nexus/sketchvibe-nodes')
+    const { NODE_PALETTE } = await import('../components/sketchvibe/sketchvibe-nodes')
     const expectedTypes = ['start', 'end', 'agent', 'system', 'api', 'decide', 'db', 'note']
     const actualTypes = NODE_PALETTE.map((p) => p.type)
     expectedTypes.forEach((t) => {
@@ -49,27 +49,27 @@ describe('Story 13-1: SketchVibe node types', () => {
 
 describe('Story 13-1: Edge types', () => {
   it('should export editable edge type', async () => {
-    const { sketchVibeEdgeTypes } = await import('../components/nexus/editable-edge')
+    const { sketchVibeEdgeTypes } = await import('../components/sketchvibe/editable-edge')
     expect(sketchVibeEdgeTypes).toBeDefined()
     expect(sketchVibeEdgeTypes.editable).toBeDefined()
   })
 
   it('EditableEdge component should be a function', async () => {
-    const { EditableEdge } = await import('../components/nexus/editable-edge')
+    const { EditableEdge } = await import('../components/sketchvibe/editable-edge')
     expect(typeof EditableEdge).toBe('function')
   })
 })
 
 describe('Story 13-1: Context menu', () => {
   it('ContextMenu component should be importable', async () => {
-    const { ContextMenu } = await import('../components/nexus/context-menu')
+    const { ContextMenu } = await import('../components/sketchvibe/context-menu')
     expect(typeof ContextMenu).toBe('function')
   })
 })
 
 describe('Story 13-1: Canvas sidebar', () => {
   it('CanvasSidebar component should be importable', async () => {
-    const { CanvasSidebar } = await import('../components/nexus/canvas-sidebar')
+    const { CanvasSidebar } = await import('../components/sketchvibe/canvas-sidebar')
     expect(typeof CanvasSidebar).toBe('function')
   })
 })
@@ -220,11 +220,11 @@ describe('Story 13-1: Default labels', () => {
   })
 })
 
-describe('Story 13-1: NexusPage module', () => {
-  it('NexusPage should be importable', async () => {
-    const mod = await import('../pages/nexus')
-    expect(mod.NexusPage).toBeDefined()
-    expect(typeof mod.NexusPage).toBe('function')
+describe('Story 13-1: SketchVibePage module', () => {
+  it('SketchVibePage should be importable', async () => {
+    const mod = await import('../pages/sketchvibe')
+    expect(mod.SketchVibePage).toBeDefined()
+    expect(typeof mod.SketchVibePage).toBe('function')
   })
 })
 
@@ -234,21 +234,21 @@ describe('Story 13-1: NexusPage module', () => {
 
 describe('TEA 13-1: NODE_PALETTE detailed validation (P1)', () => {
   it('each palette item should have unique type', async () => {
-    const { NODE_PALETTE } = await import('../components/nexus/sketchvibe-nodes')
+    const { NODE_PALETTE } = await import('../components/sketchvibe/sketchvibe-nodes')
     const types = NODE_PALETTE.map((p) => p.type)
     const uniqueTypes = new Set(types)
     expect(uniqueTypes.size).toBe(types.length)
   })
 
   it('each palette item should have unique color', async () => {
-    const { NODE_PALETTE } = await import('../components/nexus/sketchvibe-nodes')
+    const { NODE_PALETTE } = await import('../components/sketchvibe/sketchvibe-nodes')
     const colors = NODE_PALETTE.map((p) => p.color)
     const uniqueColors = new Set(colors)
     expect(uniqueColors.size).toBe(colors.length)
   })
 
   it('palette labels should all be Korean', async () => {
-    const { NODE_PALETTE } = await import('../components/nexus/sketchvibe-nodes')
+    const { NODE_PALETTE } = await import('../components/sketchvibe/sketchvibe-nodes')
     const koreanRegex = /[\uAC00-\uD7AF\u1100-\u11FF\u3130-\u318F\uA960-\uA97F\uD7B0-\uD7FF]/
     NODE_PALETTE.forEach((item) => {
       // Most labels should contain Korean (exception: 'API')
@@ -397,7 +397,7 @@ describe('TEA 13-1: Serialization robustness (P0 — data integrity)', () => {
 
 describe('TEA 13-1: Edge types validation (P1)', () => {
   it('sketchVibeEdgeTypes should only contain editable type', async () => {
-    const { sketchVibeEdgeTypes } = await import('../components/nexus/editable-edge')
+    const { sketchVibeEdgeTypes } = await import('../components/sketchvibe/editable-edge')
     const types = Object.keys(sketchVibeEdgeTypes)
     expect(types).toEqual(['editable'])
   })
@@ -432,7 +432,7 @@ describe('TEA 13-1: Node ID collision resistance (P1)', () => {
 
 describe('TEA 13-1: Context menu types validation (P1)', () => {
   it('ContextMenu should be exported as named export', async () => {
-    const mod = await import('../components/nexus/context-menu')
+    const mod = await import('../components/sketchvibe/context-menu')
     expect(mod).toHaveProperty('ContextMenu')
     expect(typeof mod.ContextMenu).toBe('function')
   })
@@ -440,7 +440,7 @@ describe('TEA 13-1: Context menu types validation (P1)', () => {
 
 describe('TEA 13-1: Canvas sidebar types validation (P1)', () => {
   it('CanvasSidebar should be exported as named export', async () => {
-    const mod = await import('../components/nexus/canvas-sidebar')
+    const mod = await import('../components/sketchvibe/canvas-sidebar')
     expect(mod).toHaveProperty('CanvasSidebar')
     expect(typeof mod.CanvasSidebar).toBe('function')
   })

@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect, useRef, useMemo } from 'react'
+import { useCallback, useState, useMemo } from 'react'
 import {
   ReactFlow,
   Background,
@@ -7,1384 +7,295 @@ import {
   MiniMap,
   useNodesState,
   useEdgesState,
-  addEdge,
   type Node,
   type Edge,
-  type Connection,
-  useReactFlow,
   ReactFlowProvider,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { api } from '../lib/api'
-import { ChatArea } from '../components/chat/chat-area'
-import { canvasToText, canvasToMermaid } from '../lib/canvas-to-mermaid'
-import { mermaidToCanvas } from '../lib/mermaid-to-canvas'
-import { sketchVibeNodeTypes, NODE_PALETTE, type SvNodeType } from '../components/nexus/sketchvibe-nodes'
-import { sketchVibeEdgeTypes } from '../components/nexus/editable-edge'
-import { ContextMenu } from '../components/nexus/context-menu'
-import { CanvasSidebar } from '../components/nexus/canvas-sidebar'
-import { ExportKnowledgeDialog } from '../components/nexus/export-knowledge-dialog'
-import { useAutoSave } from '../hooks/use-auto-save'
-import { useWsStore } from '../stores/ws-store'
-import type { Agent, Session } from '../components/chat/types'
+import { CompanyNode } from '../components/nexus/CompanyNode'
+import { DepartmentNode } from '../components/nexus/DepartmentNode'
+import { AgentNode } from '../components/nexus/AgentNode'
+import { NexusInfoPanel } from '../components/nexus/NexusInfoPanel'
+import type { NexusGraphNode } from '@corthex/shared'
 
-let nodeCounter = 0
+// ── Types ──
 
-const DEFAULT_LABELS: Record<SvNodeType, string> = {
-  start: '시작',
-  end: '종료',
-  agent: '에이전트',
-  system: '시스템',
-  api: '외부 API',
-  decide: '결정',
-  db: '데이터베이스',
-  note: '메모',
-  group: '그룹',
-}
-
-interface SketchDetail {
+type OrgAgent = {
   id: string
   name: string
-  graphData: { nodes: Node[]; edges: Edge[] }
-  createdAt: string
-  updatedAt: string
+  role: string | null
+  tier: 'manager' | 'specialist' | 'worker'
+  modelName: string
+  departmentId: string | null
+  status: string
+  isSecretary: boolean
+  isSystem: boolean
+  soul: string | null
+  allowedTools: string[] | null
 }
 
-type CanvasSnapshot = { nodes: Node[]; edges: Edge[] }
+type OrgDept = {
+  id: string
+  name: string
+  description: string | null
+  agents: OrgAgent[]
+}
+
+type OrgChartData = {
+  data: {
+    company: { id: string; name: string; slug: string }
+    departments: OrgDept[]
+    unassignedAgents: OrgAgent[]
+  }
+}
+
+// ── Node types for React Flow ──
+
+const nexusNodeTypes = {
+  company: CompanyNode,
+  department: DepartmentNode,
+  agent: AgentNode,
+}
+
+// ── Layout helpers ──
+
+const DEPT_SPACING_X = 280
+const AGENT_SPACING_Y = 70
+const AGENT_OFFSET_X = 40
+
+function buildOrgGraph(org: OrgChartData['data']): { nodes: Node[]; edges: Edge[] } {
+  const nodes: Node[] = []
+  const edges: Edge[] = []
+
+  // Company root node
+  const companyId = `company-${org.company.id}`
+  nodes.push({
+    id: companyId,
+    type: 'company',
+    position: { x: 400, y: 0 },
+    data: { label: org.company.name, slug: org.company.slug },
+  })
+
+  // Departments
+  const totalDepts = org.departments.length
+  const startX = 400 - ((totalDepts - 1) * DEPT_SPACING_X) / 2
+
+  org.departments.forEach((dept, di) => {
+    const deptId = `dept-${dept.id}`
+    const deptX = startX + di * DEPT_SPACING_X
+    const deptY = 140
+
+    nodes.push({
+      id: deptId,
+      type: 'department',
+      position: { x: deptX, y: deptY },
+      data: {
+        label: dept.name,
+        description: dept.description,
+        agentCount: dept.agents.length,
+      },
+    })
+
+    edges.push({
+      id: `e-${companyId}-${deptId}`,
+      source: companyId,
+      target: deptId,
+      type: 'smoothstep',
+    })
+
+    // Agents under department
+    dept.agents.forEach((agent, ai) => {
+      const agentId = `agent-${agent.id}`
+      nodes.push({
+        id: agentId,
+        type: 'agent',
+        position: {
+          x: deptX + AGENT_OFFSET_X * (ai % 2 === 0 ? -1 : 1),
+          y: deptY + 120 + ai * AGENT_SPACING_Y,
+        },
+        data: {
+          label: agent.name,
+          role: agent.role || '',
+          status: agent.status,
+          isSecretary: agent.isSecretary,
+          agentId: agent.id,
+          soul: agent.soul,
+        },
+      })
+
+      edges.push({
+        id: `e-${deptId}-${agentId}`,
+        source: deptId,
+        target: agentId,
+        type: 'smoothstep',
+      })
+    })
+  })
+
+  // Unassigned agents
+  if (org.unassignedAgents.length > 0) {
+    const unassignedX = startX + totalDepts * DEPT_SPACING_X + 100
+    org.unassignedAgents.forEach((agent, ai) => {
+      const agentId = `agent-${agent.id}`
+      nodes.push({
+        id: agentId,
+        type: 'agent',
+        position: { x: unassignedX, y: 140 + ai * AGENT_SPACING_Y },
+        data: {
+          label: agent.name,
+          role: agent.role || '',
+          status: agent.status,
+          isSecretary: agent.isSecretary,
+          agentId: agent.id,
+          soul: agent.soul,
+        },
+      })
+
+      edges.push({
+        id: `e-${companyId}-${agentId}`,
+        source: companyId,
+        target: agentId,
+        type: 'smoothstep',
+        style: { strokeDasharray: '5 5', stroke: '#f59e0b' },
+      })
+    })
+  }
+
+  return { nodes, edges }
+}
+
+// ── Inner component ──
 
 function NexusPageInner() {
-  const queryClient = useQueryClient()
-  const reactFlowInstance = useReactFlow()
+  const [selectedNode, setSelectedNode] = useState<NexusGraphNode | null>(null)
 
-  // Canvas state
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
-
-  // Sketch persistence state
-  const [currentSketchId, setCurrentSketchId] = useState<string | null>(null)
-  const [currentSketchName, setCurrentSketchName] = useState('')
-  const [dirty, setDirty] = useState(false)
-  const [showSaveDialog, setShowSaveDialog] = useState(false)
-  const [saveNameInput, setSaveNameInput] = useState('')
-  const [showSidebar, setShowSidebar] = useState(false)
-
-  // Mermaid import/export state
-  const [showMermaidModal, setShowMermaidModal] = useState(false)
-  const [mermaidInput, setMermaidInput] = useState('')
-  const [mermaidError, setMermaidError] = useState('')
-  const [exportCopied, setExportCopied] = useState(false)
-
-  // Chat state
-  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null)
-  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null)
-  const [chatOpen, setChatOpen] = useState(true)
-  const [showToolbar, setShowToolbar] = useState(false)
-
-  // Context menu state
-  const [contextMenu, setContextMenu] = useState<{
-    x: number
-    y: number
-    target: 'node' | 'pane'
-    nodeId?: string
-  } | null>(null)
-
-  // Export knowledge dialog
-  const [showExportKnowledge, setShowExportKnowledge] = useState(false)
-
-  // Auto-save toast
-  const [autoSaveToast, setAutoSaveToast] = useState(false)
-
-  // Mobile: canvas or chat view
-  const [mobileView, setMobileView] = useState<'canvas' | 'chat'>('canvas')
-
-  // === AI Canvas Command State ===
-  const [aiCommand, setAiCommand] = useState('')
-  const [aiLoading, setAiLoading] = useState(false)
-  const [aiError, setAiError] = useState('')
-  const [aiPreview, setAiPreview] = useState<{ nodes: Node[]; edges: Edge[]; description: string } | null>(null)
-  const [undoStack, setUndoStack] = useState<CanvasSnapshot[]>([])
-  const [redoStack, setRedoStack] = useState<CanvasSnapshot[]>([])
-
-  // === Connection Mode (Space bar toggle) ===
-  const [connectionMode, setConnectionMode] = useState(false)
-  const [pendingSource, setPendingSource] = useState<string | null>(null)
-
-  // Agents & sessions
-  const { data: agentsRes } = useQuery({
-    queryKey: ['agents'],
-    queryFn: () => api.get<{ data: Agent[] }>('/workspace/agents'),
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ['workspace-org-chart'],
+    queryFn: () => api.get<OrgChartData>('/workspace/org-chart'),
   })
 
-  const { data: sessionsRes } = useQuery({
-    queryKey: ['sessions'],
-    queryFn: () => api.get<{ data: Session[] }>('/workspace/chat/sessions'),
-  })
+  const graph = useMemo(() => {
+    if (!data?.data) return { nodes: [], edges: [] }
+    return buildOrgGraph(data.data)
+  }, [data])
 
-  const agents = agentsRes?.data || []
-  const sessions = sessionsRes?.data || []
+  const [nodes, , onNodesChange] = useNodesState(graph.nodes)
+  const [edges, , onEdgesChange] = useEdgesState(graph.edges)
 
-  const selectedAgent = useMemo(
-    () => agents.find((a) => a.id === selectedAgentId) || null,
-    [agents, selectedAgentId],
-  )
+  // Sync nodes/edges when data changes
+  const currentNodes = graph.nodes.length > 0 && nodes.length === 0 ? graph.nodes : nodes
+  const currentEdges = graph.edges.length > 0 && edges.length === 0 ? graph.edges : edges
 
-  // Create session mutation
-  const createSession = useMutation({
-    mutationFn: (agentId: string) =>
-      api.post<{ data: Session }>('/workspace/chat/sessions', { agentId }),
-    onSuccess: (res) => {
-      setSelectedSessionId(res.data.id)
-      queryClient.invalidateQueries({ queryKey: ['sessions'] })
-    },
-  })
-
-  // Sketch save/update mutations
-  const saveSketch = useMutation({
-    mutationFn: (data: { name: string; graphData: { nodes: Node[]; edges: Edge[] } }) =>
-      api.post<{ data: SketchDetail }>('/workspace/sketches', data),
-    onSuccess: (res) => {
-      setCurrentSketchId(res.data.id)
-      setCurrentSketchName(res.data.name)
-      setDirty(false)
-      setShowSaveDialog(false)
-      queryClient.invalidateQueries({ queryKey: ['sketches'] })
-    },
-  })
-
-  const updateSketch = useMutation({
-    mutationFn: (data: { id: string; graphData: { nodes: Node[]; edges: Edge[] }; name?: string }) =>
-      api.put<{ data: SketchDetail }>(`/workspace/sketches/${data.id}`, {
-        graphData: data.graphData,
-        ...(data.name ? { name: data.name } : {}),
-      }),
-    onSuccess: () => {
-      setDirty(false)
-      queryClient.invalidateQueries({ queryKey: ['sketches'] })
-    },
-  })
-
-  // Agent selection -> find or create session
-  const handleAgentSelect = useCallback(
-    (agentId: string) => {
-      setSelectedAgentId(agentId)
-      const existing = sessions.find((s) => s.agentId === agentId)
-      if (existing) {
-        setSelectedSessionId(existing.id)
-      } else {
-        createSession.mutate(agentId)
+  const handleNodeClick = useCallback(
+    (_: React.MouseEvent, node: Node) => {
+      if (node.type === 'agent') {
+        const d = node.data as Record<string, unknown>
+        setSelectedNode({
+          id: node.id,
+          type: 'agent',
+          label: d.label as string,
+          x: 0,
+          y: 0,
+          role: (d.role as string) || undefined,
+          status: (d.status as string) || 'offline',
+          isSecretary: (d.isSecretary as boolean) || false,
+          agentId: (d.agentId as string) || undefined,
+          soul: (d.soul as string) || undefined,
+        })
       }
     },
-    [sessions, createSession],
+    [],
   )
 
-  // Auto-select first agent if none selected
-  useEffect(() => {
-    if (!selectedAgentId && agents.length > 0) {
-      handleAgentSelect(agents[0].id)
-    }
-  }, [agents, selectedAgentId, handleAgentSelect])
-
-  // Auto-save hook
-  useAutoSave({
-    sketchId: currentSketchId,
-    dirty,
-    getGraphData: useCallback(() => {
-      const cleanNodes = nodes.map(({ data, ...rest }) => {
-        if (!data) return rest
-        const { onLabelChange: _, ...cleanData } = data as Record<string, unknown>
-        return { ...rest, data: cleanData }
-      })
-      const cleanEdges = edges.map(({ data, ...rest }) => {
-        if (!data) return rest
-        const { onEdgeLabelChange: _, ...cleanData } = data as Record<string, unknown>
-        return { ...rest, data: cleanData }
-      })
-      return { nodes: cleanNodes, edges: cleanEdges }
-    }, [nodes, edges]),
-    onSaved: useCallback(() => {
-      setDirty(false)
-      setAutoSaveToast(true)
-      setTimeout(() => setAutoSaveToast(false), 2000)
-    }, []),
-  })
-
-  // Canvas context for AI (serialized as text)
-  const canvasContext = useMemo(() => canvasToText(nodes, edges), [nodes, edges])
-
-  // Selected node count (memoized to avoid repeated filter in render)
-  const selectedCount = useMemo(() => nodes.filter((n) => n.selected).length, [nodes])
-
-  // Node label change handler (for double-click editing)
-  const handleLabelChange = useCallback(
-    (nodeId: string, label: string) => {
-      setNodes((nds) =>
-        nds.map((n) => (n.id === nodeId ? { ...n, data: { ...n.data, label } } : n)),
-      )
-      setDirty(true)
-    },
-    [setNodes],
-  )
-
-  // Edge label change handler
-  const handleEdgeLabelChange = useCallback(
-    (edgeId: string, label: string) => {
-      setEdges((eds) =>
-        eds.map((e) => (e.id === edgeId ? { ...e, data: { ...e.data, label } } : e)),
-      )
-      setDirty(true)
-    },
-    [setEdges],
-  )
-
-  // Load Mermaid from knowledge base
-  const handleLoadFromKnowledge = useCallback(
-    (mermaidCode: string, title: string) => {
-      if (dirty && !confirm(`현재 캔버스에 저장하지 않은 변경사항이 있어요. "${title}"을(를) 불러올까요?`)) return
-      const result = mermaidToCanvas(mermaidCode)
-      if (result.nodes.length > 0) {
-        const restoredNodes = result.nodes.map((n: Node) => ({
-          ...n,
-          data: { ...n.data, onLabelChange: handleLabelChange },
-        }))
-        const restoredEdges = result.edges.map((e: Edge) => ({
-          ...e,
-          type: e.type || 'editable',
-          data: { ...e.data, onEdgeLabelChange: handleEdgeLabelChange },
-        }))
-        setNodes(restoredNodes)
-        setEdges(restoredEdges)
-        setCurrentSketchId(null)
-        setCurrentSketchName(`${title} (지식 베이스)`)
-        setDirty(false)
-        setTimeout(() => reactFlowInstance?.fitView({ padding: 0.2 }), 100)
-      }
-    },
-    [dirty, setNodes, setEdges, handleLabelChange, handleEdgeLabelChange, reactFlowInstance],
-  )
-
-  // Import from knowledge by docId (Story 11.4 — creates new sketch linked to knowledge doc)
-  const handleImportFromKnowledge = useCallback(
-    async (docId: string) => {
-      try {
-        const res = await api.post<{ data: { id: string; name: string; graphData: { nodes: Node[]; edges: Edge[] } }; meta: { nodesCount: number } }>(
-          `/workspace/sketches/import-knowledge/${docId}`,
-          {},
-        )
-        const sketch = res.data
-        if (sketch) {
-          const restoredNodes = (sketch.graphData?.nodes || []).map((n: Node) => ({
-            ...n,
-            data: { ...n.data, onLabelChange: handleLabelChange },
-          }))
-          const restoredEdges = (sketch.graphData?.edges || []).map((e: Edge) => ({
-            ...e,
-            type: e.type || 'editable',
-            data: { ...e.data, onEdgeLabelChange: handleEdgeLabelChange },
-          }))
-          setNodes(restoredNodes)
-          setEdges(restoredEdges)
-          setCurrentSketchId(sketch.id)
-          setCurrentSketchName(sketch.name)
-          setDirty(false)
-          queryClient.invalidateQueries({ queryKey: ['sketches'] })
-          setTimeout(() => reactFlowInstance?.fitView({ padding: 0.2 }), 100)
-        }
-      } catch (err) {
-        console.error('Failed to import from knowledge:', err)
-      }
-    },
-    [setNodes, setEdges, handleLabelChange, handleEdgeLabelChange, reactFlowInstance, queryClient],
-  )
-
-  // === Load pending graph data from command center ===
-  useEffect(() => {
-    const pending = sessionStorage.getItem('pendingGraphData')
-    if (pending) {
-      try {
-        const data = JSON.parse(pending) as { nodes: Node[]; edges: Edge[] }
-        if (data.nodes && data.edges) {
-          const nodesWithHandlers = data.nodes.map((n: Node) => ({
-            ...n,
-            data: { ...n.data, onLabelChange: handleLabelChange },
-          }))
-          const edgesWithHandlers = data.edges.map((e: Edge) => ({
-            ...e,
-            data: { ...e.data, onEdgeLabelChange: handleEdgeLabelChange },
-          }))
-          setNodes(nodesWithHandlers)
-          setEdges(edgesWithHandlers)
-          setCurrentSketchId(null)
-          setCurrentSketchName('')
-          setDirty(true)
-          setTimeout(() => reactFlowInstance?.fitView(), 100)
-        }
-      } catch { /* ignore parse errors */ }
-      sessionStorage.removeItem('pendingGraphData')
-    }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Connect nodes with editable edge type
-  const onConnect = useCallback(
-    (connection: Connection) => {
-      setEdges((eds) =>
-        addEdge(
-          {
-            ...connection,
-            id: `e-${Date.now()}`,
-            type: 'editable',
-            data: { label: '', onEdgeLabelChange: handleEdgeLabelChange },
-          },
-          eds,
-        ),
-      )
-      setDirty(true)
-    },
-    [setEdges, handleEdgeLabelChange],
-  )
-
-  // Add node (from palette or context menu)
-  const handleAddNode = useCallback(
-    (type: SvNodeType, position?: { x: number; y: number }) => {
-      nodeCounter++
-      const id = `sv-${type}-${Date.now()}-${nodeCounter}`
-
-      // If position is screen coords from context menu, convert to flow coords
-      let flowPosition = position
-      if (position && reactFlowInstance) {
-        flowPosition = reactFlowInstance.screenToFlowPosition({ x: position.x, y: position.y })
-      }
-
-      const newNode: Node = {
-        id,
-        type,
-        position: flowPosition || {
-          x: 100 + Math.random() * 300,
-          y: 100 + Math.random() * 300,
-        },
-        data: { label: DEFAULT_LABELS[type], onLabelChange: handleLabelChange },
-      }
-      setNodes((nds) => [...nds, newNode])
-      setShowToolbar(false)
-      setDirty(true)
-    },
-    [setNodes, handleLabelChange, reactFlowInstance],
-  )
-
-  // Inject onLabelChange into all nodes and onEdgeLabelChange into all edges
-  useEffect(() => {
-    setNodes((nds) =>
-      nds.map((n) => {
-        if ((n.data as { onLabelChange?: unknown }).onLabelChange !== handleLabelChange) {
-          return { ...n, data: { ...n.data, onLabelChange: handleLabelChange } }
-        }
-        return n
-      }),
+  // Loading
+  if (isLoading) {
+    return (
+      <div data-testid="nexus-page" className="flex items-center justify-center h-full">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm text-slate-400">조직도를 불러오는 중...</p>
+        </div>
+      </div>
     )
-  }, [handleLabelChange, setNodes])
+  }
 
-  useEffect(() => {
-    setEdges((eds) =>
-      eds.map((e) => {
-        if ((e.data as { onEdgeLabelChange?: unknown } | undefined)?.onEdgeLabelChange !== handleEdgeLabelChange) {
-          return { ...e, data: { ...e.data, onEdgeLabelChange: handleEdgeLabelChange } }
-        }
-        return e
-      }),
+  // Error
+  if (isError) {
+    return (
+      <div data-testid="nexus-page" className="flex items-center justify-center h-full">
+        <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 text-center">
+          <p className="text-sm text-red-400">조직도를 불러올 수 없습니다</p>
+          <button
+            onClick={() => refetch()}
+            className="text-xs text-red-400 hover:text-red-300 underline mt-2"
+          >
+            다시 시도
+          </button>
+        </div>
+      </div>
     )
-  }, [handleEdgeLabelChange, setEdges])
+  }
 
-  // Refs for current nodes/edges (avoids stale closures in WS handlers)
-  const nodesRef = useRef(nodes)
-  nodesRef.current = nodes
-  const edgesRef = useRef(edges)
-  edgesRef.current = edges
+  const org = data?.data
+  const isEmpty =
+    !org || (org.departments.length === 0 && org.unassignedAgents.length === 0)
 
-  // Track dirty state on node/edge changes
-  const nodesChangeRef = useRef(onNodesChange)
-  nodesChangeRef.current = onNodesChange
-  const handleNodesChange = useCallback(
-    (changes: Parameters<typeof onNodesChange>[0]) => {
-      nodesChangeRef.current(changes)
-      if (changes.some((c) => c.type === 'position' || c.type === 'remove')) {
-        setDirty(true)
-      }
-    },
-    [],
-  )
-
-  const edgesChangeRef = useRef(onEdgesChange)
-  edgesChangeRef.current = onEdgesChange
-  const handleEdgesChange = useCallback(
-    (changes: Parameters<typeof onEdgesChange>[0]) => {
-      edgesChangeRef.current(changes)
-      if (changes.some((c) => c.type === 'remove')) {
-        setDirty(true)
-      }
-    },
-    [],
-  )
-
-  // === Space bar connection mode ===
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const isEditing = e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || (e.target instanceof HTMLElement && e.target.isContentEditable)
-      if (e.code === 'Space' && !e.repeat && !isEditing) {
-        e.preventDefault()
-        setConnectionMode(true)
-      }
-    }
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.code === 'Space') {
-        setConnectionMode(false)
-        setPendingSource(null)
-      }
-    }
-    document.addEventListener('keydown', handleKeyDown)
-    document.addEventListener('keyup', handleKeyUp)
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-      document.removeEventListener('keyup', handleKeyUp)
-    }
-  }, [])
-
-  // Connection mode node click handler
-  const handleNodeClickForConnection = useCallback(
-    (_event: React.MouseEvent, node: Node) => {
-      if (!connectionMode) return
-      if (!pendingSource) {
-        setPendingSource(node.id)
-      } else if (pendingSource !== node.id) {
-        const newEdge: Edge = {
-          id: `e-${Date.now()}`,
-          source: pendingSource,
-          target: node.id,
-          type: 'editable',
-          data: { label: '', onEdgeLabelChange: handleEdgeLabelChange },
-        }
-        setEdges((eds) => [...eds, newEdge])
-        setPendingSource(null)
-        setDirty(true)
-      }
-    },
-    [connectionMode, pendingSource, handleEdgeLabelChange, setEdges],
-  )
-
-  // === Group/Ungroup ===
-  const handleGroupSelected = useCallback(() => {
-    const selected = nodes.filter((n) => n.selected && n.type !== 'group')
-    if (selected.length < 2) return
-
-    // Save undo
-    setUndoStack((prev) => [...prev.slice(-19), { nodes: [...nodes], edges: [...edges] }])
-    setRedoStack([])
-
-    // Calculate bounding box using measured dimensions when available
-    const bounds = selected.map((n) => {
-      const w = (n.measured?.width as number | undefined) ?? 160
-      const h = (n.measured?.height as number | undefined) ?? 80
-      return { left: n.position.x, top: n.position.y, right: n.position.x + w, bottom: n.position.y + h }
-    })
-    const minX = Math.min(...bounds.map((b) => b.left)) - 20
-    const minY = Math.min(...bounds.map((b) => b.top)) - 40
-    const maxX = Math.max(...bounds.map((b) => b.right)) + 20
-    const maxY = Math.max(...bounds.map((b) => b.bottom)) + 20
-
-    const groupId = `group-${Date.now()}`
-    const groupNode: Node = {
-      id: groupId,
-      type: 'group',
-      position: { x: minX, y: minY },
-      data: { label: '서브그래프', onLabelChange: handleLabelChange },
-      style: { width: maxX - minX, height: maxY - minY },
-    }
-
-    // Reparent selected nodes
-    const selectedIds = new Set(selected.map((n) => n.id))
-    setNodes((nds) => [
-      groupNode,
-      ...nds.map((n) =>
-        selectedIds.has(n.id)
-          ? {
-              ...n,
-              parentId: groupId,
-              position: { x: n.position.x - minX, y: n.position.y - minY },
-              selected: false,
-            }
-          : n,
-      ),
-    ])
-    setDirty(true)
-  }, [nodes, edges, setNodes, handleLabelChange])
-
-  const handleUngroupNode = useCallback(
-    (groupId: string) => {
-      const groupNode = nodes.find((n) => n.id === groupId)
-      if (!groupNode || groupNode.type !== 'group') return
-
-      // Save undo
-      setUndoStack((prev) => [...prev.slice(-19), { nodes: [...nodes], edges: [...edges] }])
-      setRedoStack([])
-
-      const groupPos = groupNode.position
-      setNodes((nds) =>
-        nds
-          .filter((n) => n.id !== groupId)
-          .map((n) =>
-            n.parentId === groupId
-              ? {
-                  ...n,
-                  parentId: undefined,
-                  position: { x: n.position.x + groupPos.x, y: n.position.y + groupPos.y },
-                }
-              : n,
-          ),
-      )
-      // Remove edges connected to group node
-      setEdges((eds) => eds.filter((e) => e.source !== groupId && e.target !== groupId))
-      setDirty(true)
-    },
-    [nodes, edges, setNodes, setEdges],
-  )
-
-  // Clear canvas
-  const handleClear = useCallback(() => {
-    if (nodes.length === 0) return
-    if (!confirm('캔버스를 초기화하시겠어요?')) return
-    setNodes([])
-    setEdges([])
-    setCurrentSketchId(null)
-    setCurrentSketchName('')
-    setDirty(false)
-  }, [nodes.length, setNodes, setEdges])
-
-  // Auto-layout
-  const handleAutoLayout = useCallback(async () => {
-    const { getAutoLayout } = await import('../lib/dagre-layout')
-    setNodes((nds) => {
-      const laid = getAutoLayout(nds as Node[], edges)
-      return laid
-    })
-    setDirty(true)
-    setTimeout(() => reactFlowInstance?.fitView({ padding: 0.2 }), 100)
-  }, [edges, setNodes, reactFlowInstance])
-
-  // Strip callback functions from graph data for serialization
-  const getCleanGraphData = useCallback(() => {
-    const cleanNodes = nodes.map(({ data, ...rest }) => {
-      const { onLabelChange: _, ...cleanData } = data as Record<string, unknown>
-      return { ...rest, data: cleanData }
-    })
-    const cleanEdges = edges.map(({ data, ...rest }) => {
-      if (!data) return rest
-      const { onEdgeLabelChange: _, ...cleanData } = data as Record<string, unknown>
-      return { ...rest, data: cleanData }
-    })
-    return { nodes: cleanNodes as Node[], edges: cleanEdges as Edge[] }
-  }, [nodes, edges])
-
-  // Save handler
-  const handleSave = useCallback(() => {
-    if (currentSketchId) {
-      updateSketch.mutate({ id: currentSketchId, graphData: getCleanGraphData() })
-    } else {
-      setSaveNameInput('')
-      setShowSaveDialog(true)
-    }
-  }, [currentSketchId, updateSketch, getCleanGraphData])
-
-  // Save as new
-  const handleSaveNew = useCallback(() => {
-    if (!saveNameInput.trim()) return
-    saveSketch.mutate({
-      name: saveNameInput.trim(),
-      graphData: getCleanGraphData(),
-    })
-  }, [saveNameInput, saveSketch, getCleanGraphData])
-
-  // Load sketch
-  const handleLoadSketch = useCallback(
-    async (id: string) => {
-      try {
-        const res = await api.get<{ data: SketchDetail }>(`/workspace/sketches/${id}`)
-        const sketch = res.data
-        const graphData = sketch.graphData || { nodes: [], edges: [] }
-
-        // Restore nodes with label change handler
-        const restoredNodes = (graphData.nodes || []).map((n: Node) => ({
-          ...n,
-          data: { ...n.data, onLabelChange: handleLabelChange },
-        }))
-
-        // Restore edges with editable type and label change handler
-        const restoredEdges = (graphData.edges || []).map((e: Edge) => ({
-          ...e,
-          type: e.type || 'editable',
-          data: { ...e.data, onEdgeLabelChange: handleEdgeLabelChange },
-        }))
-
-        setNodes(restoredNodes)
-        setEdges(restoredEdges)
-        setCurrentSketchId(sketch.id)
-        setCurrentSketchName(sketch.name)
-        setDirty(false)
-        setTimeout(() => reactFlowInstance?.fitView({ padding: 0.2 }), 100)
-      } catch {
-        // Error handled by API client
-      }
-    },
-    [setNodes, setEdges, handleLabelChange, handleEdgeLabelChange, reactFlowInstance],
-  )
-
-  // New canvas
-  const handleNewCanvas = useCallback(() => {
-    if (dirty && !confirm('저장하지 않은 변경 사항이 있어요. 새 캔버스를 시작할까요?')) return
-    setNodes([])
-    setEdges([])
-    setCurrentSketchId(null)
-    setCurrentSketchName('')
-    setDirty(false)
-  }, [dirty, setNodes, setEdges])
-
-  // Context menu handler
-  const handleContextMenu = useCallback(
-    (event: React.MouseEvent, nodeId?: string) => {
-      event.preventDefault()
-      setContextMenu({
-        x: event.clientX,
-        y: event.clientY,
-        target: nodeId ? 'node' : 'pane',
-        nodeId,
-      })
-    },
-    [],
-  )
-
-  // Mermaid import handler
-  const handleMermaidImport = useCallback(() => {
-    if (!mermaidInput.trim()) return
-    const result = mermaidToCanvas(mermaidInput)
-    if (result.error) {
-      setMermaidError(result.error)
-      return
-    }
-    // Inject callbacks into nodes and edges
-    const importedNodes = result.nodes.map((n) => ({
-      ...n,
-      data: { ...n.data, onLabelChange: handleLabelChange },
-    }))
-    const importedEdges = result.edges.map((e) => ({
-      ...e,
-      data: { ...e.data, onEdgeLabelChange: handleEdgeLabelChange },
-    }))
-    setNodes(importedNodes)
-    setEdges(importedEdges)
-    setDirty(true)
-    setShowMermaidModal(false)
-    setMermaidInput('')
-    setMermaidError('')
-    setTimeout(() => reactFlowInstance?.fitView({ padding: 0.2 }), 100)
-  }, [mermaidInput, handleLabelChange, handleEdgeLabelChange, setNodes, setEdges, reactFlowInstance])
-
-  // Mermaid export handler
-  const handleMermaidExport = useCallback(async () => {
-    const code = canvasToMermaid(nodes, edges)
-    try {
-      await navigator.clipboard.writeText(code)
-      setExportCopied(true)
-      setTimeout(() => setExportCopied(false), 2000)
-    } catch {
-      // Fallback: show in modal
-      setMermaidInput(code)
-      setShowMermaidModal(true)
-    }
-  }, [nodes, edges])
-
-  // === AI Canvas Command ===
-
-  const aiCommandMutation = useMutation({
-    mutationFn: (params: { command: string; graphData: { nodes: Node[]; edges: Edge[] } }) =>
-      api.post<{ data: { commandId: string; mermaid: string; description: string } }>(
-        '/workspace/sketches/ai-command',
-        params,
-      ),
-  })
-
-  const handleAiCommand = useCallback(async () => {
-    if (!aiCommand.trim() || aiLoading) return
-    setAiLoading(true)
-    setAiError('')
-    setAiPreview(null)
-
-    try {
-      const result = await aiCommandMutation.mutateAsync({
-        command: aiCommand.trim(),
-        graphData: getCleanGraphData(),
-      })
-
-      // Parse Mermaid response into preview nodes/edges
-      const parsed = mermaidToCanvas(result.data.mermaid)
-      if (parsed.error) {
-        setAiError(`Mermaid 파싱 오류: ${parsed.error}`)
-        return
-      }
-
-      // Inject callbacks into preview nodes/edges
-      const previewNodes = parsed.nodes.map((n) => ({
-        ...n,
-        data: { ...n.data, onLabelChange: handleLabelChange },
-      }))
-      const previewEdges = parsed.edges.map((e) => ({
-        ...e,
-        data: { ...e.data, onEdgeLabelChange: handleEdgeLabelChange },
-      }))
-
-      setAiPreview({
-        nodes: previewNodes,
-        edges: previewEdges,
-        description: result.data.description,
-      })
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'AI 명령 처리에 실패했습니다'
-      setAiError(message)
-    } finally {
-      setAiLoading(false)
-    }
-  }, [aiCommand, aiLoading, aiCommandMutation, getCleanGraphData, handleLabelChange, handleEdgeLabelChange])
-
-  // Apply AI preview
-  const handleApplyAiPreview = useCallback(() => {
-    if (!aiPreview) return
-    // Save current state to undo stack
-    setUndoStack((prev) => [...prev.slice(-19), { nodes: [...nodes], edges: [...edges] }])
-    setRedoStack([])
-    // Apply preview
-    setNodes(aiPreview.nodes)
-    setEdges(aiPreview.edges)
-    setDirty(true)
-    setAiPreview(null)
-    setAiCommand('')
-    setTimeout(() => reactFlowInstance?.fitView({ padding: 0.2 }), 100)
-  }, [aiPreview, nodes, edges, setNodes, setEdges, reactFlowInstance])
-
-  // Cancel AI preview
-  const handleCancelAiPreview = useCallback(() => {
-    setAiPreview(null)
-  }, [])
-
-  // Undo
-  const handleUndo = useCallback(() => {
-    if (undoStack.length === 0) return
-    const prev = undoStack[undoStack.length - 1]
-    setRedoStack((r) => [...r, { nodes: [...nodes], edges: [...edges] }])
-    setUndoStack((u) => u.slice(0, -1))
-    // Restore with callbacks
-    setNodes(prev.nodes.map((n) => ({ ...n, data: { ...n.data, onLabelChange: handleLabelChange } })))
-    setEdges(prev.edges.map((e) => ({ ...e, data: { ...e.data, onEdgeLabelChange: handleEdgeLabelChange } })))
-    setDirty(true)
-  }, [undoStack, nodes, edges, setNodes, setEdges, handleLabelChange, handleEdgeLabelChange])
-
-  // Redo
-  const handleRedo = useCallback(() => {
-    if (redoStack.length === 0) return
-    const next = redoStack[redoStack.length - 1]
-    setUndoStack((u) => [...u, { nodes: [...nodes], edges: [...edges] }])
-    setRedoStack((r) => r.slice(0, -1))
-    setNodes(next.nodes.map((n) => ({ ...n, data: { ...n.data, onLabelChange: handleLabelChange } })))
-    setEdges(next.edges.map((e) => ({ ...e, data: { ...e.data, onEdgeLabelChange: handleEdgeLabelChange } })))
-    setDirty(true)
-  }, [redoStack, nodes, edges, setNodes, setEdges, handleLabelChange, handleEdgeLabelChange])
-
-  // === WebSocket nexus channel listener ===
-  const { subscribe, addListener, removeListener, isConnected } = useWsStore()
-
-  useEffect(() => {
-    if (!isConnected) return
-    subscribe('nexus')
-  }, [isConnected, subscribe])
-
-  useEffect(() => {
-    const handleNexusMessage = (data: unknown) => {
-      const msg = data as { type?: string; mermaid?: string; description?: string; error?: string; command?: string; toolName?: string }
-      if (!msg?.type) return
-
-      switch (msg.type) {
-        case 'canvas_ai_start':
-          setAiLoading(true)
-          setAiError('')
-          break
-        case 'canvas_update': {
-          if (!msg.mermaid) break
-          const parsed = mermaidToCanvas(msg.mermaid)
-          if (parsed.error) break
-          const pNodes = parsed.nodes.map((n) => ({
-            ...n,
-            data: { ...n.data, onLabelChange: handleLabelChange },
-          }))
-          const pEdges = parsed.edges.map((e) => ({
-            ...e,
-            data: { ...e.data, onEdgeLabelChange: handleEdgeLabelChange },
-          }))
-          setAiPreview({ nodes: pNodes, edges: pEdges, description: msg.description || '' })
-          setAiLoading(false)
-          break
-        }
-        case 'canvas_mcp_update': {
-          // MCP tool 발 업데이트 — 즉시 적용 (프리뷰 없음)
-          if (!msg.mermaid) break
-          const mcpParsed = mermaidToCanvas(msg.mermaid)
-          if (mcpParsed.error) break
-          // Undo 스택에 현재 상태 저장 (ref로 최신값 참조)
-          setUndoStack((prev) => [...prev.slice(-19), { nodes: [...nodesRef.current], edges: [...edgesRef.current] }])
-          setRedoStack([])
-          const mcpNodes = mcpParsed.nodes.map((n) => ({
-            ...n,
-            data: { ...n.data, onLabelChange: handleLabelChange },
-          }))
-          const mcpEdges = mcpParsed.edges.map((e) => ({
-            ...e,
-            data: { ...e.data, onEdgeLabelChange: handleEdgeLabelChange },
-          }))
-          setNodes(mcpNodes)
-          setEdges(mcpEdges)
-          setDirty(true)
-          break
-        }
-        case 'canvas_ai_error':
-          setAiError(msg.error || 'AI 오류')
-          setAiLoading(false)
-          break
-      }
-    }
-
-    addListener('nexus', handleNexusMessage)
-    return () => removeListener('nexus', handleNexusMessage)
-  }, [addListener, removeListener, handleLabelChange, handleEdgeLabelChange, setNodes, setEdges])
-
-  // Context menu action handler
-  const handleContextAction = useCallback(
-    (action: { type: string; nodeId?: string; nodeType?: SvNodeType; position?: { x: number; y: number } }) => {
-      setContextMenu(null)
-      switch (action.type) {
-        case 'edit-label': {
-          if (action.nodeId) {
-            setNodes((nds) =>
-              nds.map((n) =>
-                n.id === action.nodeId ? { ...n, selected: true } : { ...n, selected: false },
-              ),
-            )
-          }
-          break
-        }
-        case 'duplicate': {
-          if (action.nodeId) {
-            const sourceNode = nodes.find((n) => n.id === action.nodeId)
-            if (sourceNode) {
-              nodeCounter++
-              const id = `sv-${sourceNode.type}-${Date.now()}-${nodeCounter}`
-              const newNode: Node = {
-                id,
-                type: sourceNode.type,
-                position: {
-                  x: sourceNode.position.x + 30,
-                  y: sourceNode.position.y + 30,
-                },
-                data: {
-                  ...(sourceNode.data as Record<string, unknown>),
-                  label: `${(sourceNode.data as { label?: string })?.label || ''} (복사)`,
-                  onLabelChange: handleLabelChange,
-                },
-              }
-              setNodes((nds) => [...nds, newNode])
-              setDirty(true)
-            }
-          }
-          break
-        }
-        case 'delete': {
-          if (action.nodeId) {
-            setNodes((nds) => nds.filter((n) => n.id !== action.nodeId))
-            setEdges((eds) =>
-              eds.filter((e) => e.source !== action.nodeId && e.target !== action.nodeId),
-            )
-            setDirty(true)
-          }
-          break
-        }
-        case 'add-node': {
-          if (action.nodeType && action.position) {
-            handleAddNode(action.nodeType, action.position)
-          }
-          break
-        }
-        case 'group-selected': {
-          handleGroupSelected()
-          break
-        }
-        case 'ungroup': {
-          if (action.nodeId) {
-            handleUngroupNode(action.nodeId)
-          }
-          break
-        }
-      }
-    },
-    [nodes, setNodes, setEdges, handleLabelChange, handleAddNode, handleGroupSelected, handleUngroupNode],
-  )
+  if (isEmpty) {
+    return (
+      <div data-testid="nexus-page" className="flex items-center justify-center h-full">
+        <div className="bg-slate-800/30 border border-dashed border-slate-700 rounded-xl p-12 text-center">
+          <p className="text-4xl mb-3">🏢</p>
+          <p className="text-sm font-medium text-slate-300">
+            조직이 구성되지 않았습니다
+          </p>
+          <p className="text-xs text-slate-500 mt-1">
+            관리자 패널에서 부서와 에이전트를 추가해주세요
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div data-testid="nexus-page" className="h-full flex flex-col">
-      {/* 헤더 */}
-      <div className="px-3 py-2 border-b border-slate-700 flex items-center gap-2">
-        <h2 className="text-base font-semibold shrink-0 text-slate-50">SketchVibe</h2>
-
-        {currentSketchName && (
-          <span className="text-xs text-slate-400 truncate max-w-[120px]">
-            — {currentSketchName}{dirty ? ' *' : ''}
-          </span>
-        )}
-
-        {/* 저장 버튼 */}
-        <button
-          data-testid="nexus-save-btn"
-          onClick={handleSave}
-          disabled={nodes.length === 0}
-          className="px-2 py-1 text-xs bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded transition-colors"
+    <div data-testid="nexus-page" className="flex h-full">
+      <div className="flex-1">
+        <ReactFlow
+          nodes={currentNodes}
+          edges={currentEdges}
+          nodeTypes={nexusNodeTypes}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onNodeClick={handleNodeClick}
+          fitView
+          fitViewOptions={{ padding: 0.3 }}
+          minZoom={0.2}
+          maxZoom={2}
+          nodesDraggable={false}
+          nodesConnectable={false}
+          elementsSelectable={true}
+          deleteKeyCode={[]}
+          proOptions={{ hideAttribution: true }}
         >
-          저장
-        </button>
-
-        {/* 캔버스 목록 토글 */}
-        <button
-          data-testid="nexus-sidebar-toggle"
-          onClick={() => setShowSidebar(!showSidebar)}
-          className={`px-2 py-1 text-xs rounded transition-colors ${
-            showSidebar ? 'bg-blue-600 text-white' : 'bg-slate-700 hover:bg-slate-600 text-slate-300'
-          }`}
-        >
-          목록
-        </button>
-
-        {/* Mermaid Import */}
-        <button
-          data-testid="nexus-mermaid-import-btn"
-          onClick={() => { setMermaidInput(''); setMermaidError(''); setShowMermaidModal(true) }}
-          className="px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 rounded transition-colors"
-          title="Mermaid 코드 가져오기"
-        >
-          Mermaid
-        </button>
-
-        {/* Mermaid Export */}
-        <button
-          data-testid="nexus-mermaid-export-btn"
-          onClick={handleMermaidExport}
-          disabled={nodes.length === 0}
-          className="px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 text-slate-300 rounded transition-colors"
-          title="Mermaid 코드 내보내기"
-        >
-          {exportCopied ? '복사됨!' : '내보내기'}
-        </button>
-
-        {/* 지식 베이스에 저장 */}
-        <button
-          data-testid="nexus-kb-save-btn"
-          onClick={() => setShowExportKnowledge(true)}
-          disabled={nodes.length === 0 || !currentSketchId}
-          className="px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 text-slate-300 rounded transition-colors"
-          title="지식 베이스에 다이어그램 저장"
-        >
-          지식 저장
-        </button>
-
-        {/* Undo / Redo */}
-        <button
-          data-testid="nexus-undo-btn"
-          onClick={handleUndo}
-          disabled={undoStack.length === 0}
-          className="px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 text-slate-300 rounded transition-colors"
-          title="실행 취소"
-        >
-          ↩
-        </button>
-        <button
-          data-testid="nexus-redo-btn"
-          onClick={handleRedo}
-          disabled={redoStack.length === 0}
-          className="px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 text-slate-300 rounded transition-colors"
-          title="다시 실행"
-        >
-          ↪
-        </button>
-
-        {/* 에이전트 선택 */}
-        <select
-          data-testid="nexus-agent-select"
-          value={selectedAgentId || ''}
-          onChange={(e) => handleAgentSelect(e.target.value)}
-          className="text-xs bg-slate-800 border border-slate-700 rounded px-2 py-1 max-w-[140px] text-slate-200"
-        >
-          {agents.map((a) => (
-            <option key={a.id} value={a.id}>
-              {a.name}
-            </option>
-          ))}
-        </select>
-
-        <div className="flex-1" />
-
-        {/* 모바일 뷰 토글 */}
-        <div className="flex md:hidden gap-1">
-          <button
-            data-testid="nexus-mobile-canvas-tab"
-            onClick={() => setMobileView('canvas')}
-            className={`px-2 py-1 text-xs rounded ${
-              mobileView === 'canvas' ? 'bg-slate-700 text-white' : 'text-slate-400'
-            }`}
-          >
-            캔버스
-          </button>
-          <button
-            data-testid="nexus-mobile-chat-tab"
-            onClick={() => setMobileView('chat')}
-            className={`px-2 py-1 text-xs rounded ${
-              mobileView === 'chat' ? 'bg-slate-700 text-white' : 'text-slate-400'
-            }`}
-          >
-            채팅
-          </button>
-        </div>
-
-        {/* 데스크톱 채팅 토글 */}
-        <button
-          data-testid="nexus-chat-toggle"
-          onClick={() => setChatOpen(!chatOpen)}
-          className="hidden md:block px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 text-white rounded transition-colors"
-        >
-          {chatOpen ? '채팅 닫기' : '채팅 열기'}
-        </button>
+          <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#334155" />
+          <Controls className="!bg-slate-800 !border-slate-700 !shadow-lg [&_button]:!bg-slate-700 [&_button]:!border-slate-600 [&_button]:!text-slate-300 [&_button:hover]:!bg-slate-600" />
+          <MiniMap
+            nodeStrokeWidth={3}
+            style={{ width: 150, height: 100 }}
+            className="!bg-slate-800 !border-slate-700 hidden md:block"
+          />
+        </ReactFlow>
       </div>
 
-      {/* 메인 영역 */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* 캔버스 목록 사이드바 */}
-        {showSidebar && (
-          <div data-testid="nexus-sidebar" className="w-52 border-r border-slate-800 shrink-0 hidden md:block">
-            <CanvasSidebar
-              currentSketchId={currentSketchId}
-              onLoad={handleLoadSketch}
-              onNew={handleNewCanvas}
-              onLoadFromKnowledge={handleLoadFromKnowledge}
-              onImportFromKnowledge={handleImportFromKnowledge}
-            />
-          </div>
-        )}
-
-        {/* 캔버스 */}
-        <div
-          data-testid="nexus-canvas"
-          className={`flex-1 flex flex-col relative ${
-            mobileView === 'chat' ? 'hidden md:flex' : 'flex'
-          }`}
-        >
-          {/* 캔버스 도구 모음 */}
-          <div className="absolute top-2 left-2 z-10 flex flex-col gap-1">
-            {/* 노드 추가 버튼 */}
-            <div className="relative">
-              <button
-                data-testid="nexus-node-palette-btn"
-                onClick={() => setShowToolbar(!showToolbar)}
-                className="px-3 py-2 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-lg transition-colors"
-              >
-                + 노드
-              </button>
-
-              {/* 팔레트 드롭다운 */}
-              {showToolbar && (
-                <div className="absolute top-full left-0 mt-1 bg-slate-900 border border-slate-700 rounded-lg shadow-xl p-2 w-44 z-50">
-                  {NODE_PALETTE.map((item) => (
-                    <button
-                      key={item.type}
-                      onClick={() => handleAddNode(item.type)}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-left hover:bg-slate-800 rounded transition-colors"
-                    >
-                      <span
-                        className={`w-5 h-5 rounded flex items-center justify-center text-white text-[10px] ${item.color}`}
-                      >
-                        {item.icon}
-                      </span>
-                      <span className="text-slate-200">{item.label}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* 자동 정렬 */}
-            <button
-              data-testid="nexus-auto-layout-btn"
-              onClick={handleAutoLayout}
-              className="px-3 py-2 text-xs bg-slate-700 hover:bg-slate-600 text-white rounded-lg shadow transition-colors"
-              title="자동 정렬"
-            >
-              ⟳ 정렬
-            </button>
-
-            {/* 초기화 */}
-            <button
-              data-testid="nexus-clear-btn"
-              onClick={handleClear}
-              className="px-3 py-2 text-xs bg-slate-700 hover:bg-slate-600 text-white rounded-lg shadow transition-colors"
-              title="초기화"
-            >
-              ✕ 초기화
-            </button>
-          </div>
-
-          {/* AI 프리뷰 오버레이 */}
-          {aiPreview && (
-            <div data-testid="nexus-ai-preview" className="absolute top-2 right-2 z-20 bg-slate-900/95 border border-blue-500 rounded-lg shadow-xl p-3 w-72">
-              <p className="text-xs text-blue-400 font-semibold mb-1">AI 제안</p>
-              <p className="text-xs text-slate-300 mb-3">{aiPreview.description}</p>
-              <div className="flex gap-2">
-                <button
-                  data-testid="nexus-ai-apply-btn"
-                  onClick={handleApplyAiPreview}
-                  className="flex-1 px-3 py-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors"
-                >
-                  적용
-                </button>
-                <button
-                  data-testid="nexus-ai-cancel-btn"
-                  onClick={handleCancelAiPreview}
-                  className="flex-1 px-3 py-1.5 text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-colors"
-                >
-                  취소
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* 캔버스 안내 (비어있을 때) */}
-          {nodes.length === 0 && !aiPreview && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-              <div className="text-center text-slate-500">
-                <p className="text-lg mb-2">여기에 그림을 그려보세요</p>
-                <p className="text-sm">왼쪽 위 &quot;+ 노드&quot; 버튼으로 노드를 추가하고,</p>
-                <p className="text-sm">드래그해서 연결하세요.</p>
-                <p className="text-sm mt-2">하단 AI 명령으로 자동 생성할 수도 있어요.</p>
-              </div>
-            </div>
-          )}
-
-          {/* ReactFlow 캔버스 */}
-          <div className="flex-1">
-            <ReactFlow
-              nodes={aiPreview ? aiPreview.nodes : nodes}
-              edges={aiPreview ? aiPreview.edges : edges}
-              onNodesChange={aiPreview ? undefined : handleNodesChange}
-              onEdgesChange={aiPreview ? undefined : handleEdgesChange}
-              onConnect={aiPreview ? undefined : onConnect}
-              onNodeClick={aiPreview ? undefined : handleNodeClickForConnection}
-              nodeTypes={sketchVibeNodeTypes}
-              edgeTypes={sketchVibeEdgeTypes}
-              defaultEdgeOptions={{ type: 'editable' }}
-              fitView
-              fitViewOptions={{ padding: 0.3 }}
-              minZoom={0.1}
-              maxZoom={3}
-              nodesDraggable={!aiPreview && !connectionMode}
-              nodesConnectable={!aiPreview}
-              deleteKeyCode={aiPreview ? [] : ['Backspace', 'Delete']}
-              multiSelectionKeyCode="Control"
-              panOnScroll
-              zoomOnPinch
-              proOptions={{ hideAttribution: true }}
-              onPaneClick={() => {
-                setShowToolbar(false)
-                setContextMenu(null)
-                if (connectionMode) setPendingSource(null)
-              }}
-              onNodeContextMenu={aiPreview ? undefined : (event, node) => handleContextMenu(event, node.id)}
-              onPaneContextMenu={aiPreview ? undefined : (event) => handleContextMenu(event as unknown as React.MouseEvent)}
-              className={connectionMode ? 'cursor-crosshair' : ''}
-            >
-              <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#3f3f46" />
-              <Controls />
-              <MiniMap
-                nodeStrokeWidth={3}
-                style={{ width: 120, height: 80 }}
-                className="!bg-slate-800 hidden md:block"
-              />
-            </ReactFlow>
-          </div>
-
-          {/* AI 명령 입력란 */}
-          <div className="px-3 py-2 border-t border-slate-800 bg-slate-900/90 flex items-center gap-2">
-            <span className="text-[10px] text-blue-400 font-semibold shrink-0">AI</span>
-            <input
-              data-testid="nexus-ai-input"
-              value={aiCommand}
-              onChange={(e) => setAiCommand(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleAiCommand() } }}
-              placeholder="예: DB 노드를 추가하고 API 서버에 연결해줘"
-              disabled={aiLoading}
-              className="flex-1 bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-slate-200 placeholder:text-slate-600 outline-none focus:border-blue-500 disabled:opacity-50"
-            />
-            <button
-              data-testid="nexus-ai-send-btn"
-              onClick={handleAiCommand}
-              disabled={!aiCommand.trim() || aiLoading}
-              className="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded transition-colors shrink-0"
-            >
-              {aiLoading ? '처리중...' : '전송'}
-            </button>
-          </div>
-
-          {/* AI 오류 표시 */}
-          {aiError && (
-            <div className="px-3 py-1 bg-red-900/30 border-t border-red-800">
-              <p className="text-[10px] text-red-400">{aiError}</p>
-            </div>
-          )}
-
-          {/* 하단 상태바 */}
-          <div data-testid="nexus-status-bar" className="px-3 py-1 border-t border-slate-800 bg-slate-900/80 flex items-center gap-3 text-[10px] text-slate-500">
-            <span>노드 {nodes.length}개</span>
-            <span>연결 {edges.length}개</span>
-            {selectedCount > 0 && (
-              <span className="text-blue-400">{selectedCount}개 선택됨</span>
-            )}
-            {connectionMode && (
-              <span className="text-cyan-400 font-semibold">
-                연결 모드 {pendingSource ? `(${pendingSource} →)` : '(노드 클릭)'}
-              </span>
-            )}
-            {dirty && <span className="text-amber-500">미저장</span>}
-            {autoSaveToast && <span className="text-emerald-400">자동 저장됨</span>}
-            {undoStack.length > 0 && <span className="text-slate-600">Undo {undoStack.length}</span>}
-            <span className="hidden sm:inline text-slate-500">Space: 연결 | Ctrl+클릭: 멀티선택 | 더블클릭: 편집 | Del: 삭제</span>
-          </div>
-        </div>
-
-        {/* 채팅 패널 */}
-        {(chatOpen || mobileView === 'chat') && (
-          <div
-            data-testid="nexus-chat-panel"
-            className={`border-l border-slate-800 flex flex-col ${
-              mobileView === 'canvas' ? 'hidden md:flex' : 'flex'
-            } w-full md:w-[380px] lg:w-[420px] shrink-0`}
-          >
-            <ChatArea
-              agent={selectedAgent}
-              sessionId={selectedSessionId}
-              canvasContext={canvasContext}
-            />
-          </div>
-        )}
-      </div>
-
-      {/* 컨텍스트 메뉴 */}
-      {contextMenu && (
-        <ContextMenu
-          x={contextMenu.x}
-          y={contextMenu.y}
-          target={contextMenu.target}
-          nodeId={contextMenu.nodeId}
-          nodeType={contextMenu.nodeId ? nodes.find((n) => n.id === contextMenu.nodeId)?.type : undefined}
-          selectedCount={selectedCount}
-          onAction={handleContextAction as (action: unknown) => void}
-          onClose={() => setContextMenu(null)}
-        />
-      )}
-
-      {/* 저장 다이얼로그 */}
-      {showSaveDialog && (
-        <div data-testid="nexus-save-dialog" className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 w-80 shadow-2xl">
-            <h3 className="text-sm font-semibold text-slate-200 mb-3">캔버스 저장</h3>
-            <input
-              autoFocus
-              value={saveNameInput}
-              onChange={(e) => setSaveNameInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleSaveNew()
-                if (e.key === 'Escape') setShowSaveDialog(false)
-              }}
-              placeholder="캔버스 이름을 입력하세요"
-              className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-200 outline-none focus:border-blue-500"
-            />
-            <div className="flex gap-2 mt-4 justify-end">
-              <button
-                onClick={() => setShowSaveDialog(false)}
-                className="px-3 py-1.5 text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg"
-              >
-                취소
-              </button>
-              <button
-                onClick={handleSaveNew}
-                disabled={!saveNameInput.trim()}
-                className="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-lg"
-              >
-                저장
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {/* Mermaid Import 모달 */}
-      {showMermaidModal && (
-        <div data-testid="nexus-mermaid-modal" className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 w-[480px] max-w-[90vw] shadow-2xl">
-            <h3 className="text-sm font-semibold text-slate-200 mb-3">Mermaid 코드 가져오기</h3>
-            <textarea
-              autoFocus
-              value={mermaidInput}
-              onChange={(e) => { setMermaidInput(e.target.value); setMermaidError('') }}
-              placeholder={`flowchart TD\n  A([시작])\n  B[에이전트]\n  A --> B`}
-              rows={10}
-              className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-200 font-mono outline-none focus:border-blue-500 resize-y"
-            />
-            {mermaidError && (
-              <p className="mt-2 text-xs text-red-400">{mermaidError}</p>
-            )}
-            <div className="flex gap-2 mt-4 justify-end">
-              <button
-                onClick={() => setShowMermaidModal(false)}
-                className="px-3 py-1.5 text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg"
-              >
-                취소
-              </button>
-              <button
-                onClick={handleMermaidImport}
-                disabled={!mermaidInput.trim()}
-                className="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-lg"
-              >
-                적용
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 지식 베이스 내보내기 다이얼로그 */}
-      {showExportKnowledge && currentSketchId && (
-        <ExportKnowledgeDialog
-          sketchId={currentSketchId}
-          sketchName={currentSketchName || '새 다이어그램'}
-          onClose={() => setShowExportKnowledge(false)}
-        />
-      )}
-
-      {/* 자동 저장 토스트 */}
-      {autoSaveToast && (
-        <div data-testid="nexus-autosave-toast" className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 bg-emerald-800/90 text-emerald-200 text-xs rounded-lg shadow-lg animate-pulse">
-          자동 저장됨
-        </div>
+      {selectedNode && (
+        <NexusInfoPanel node={selectedNode} onClose={() => setSelectedNode(null)} />
       )}
     </div>
   )
 }
+
+// ── Export ──
 
 export function NexusPage() {
   return (

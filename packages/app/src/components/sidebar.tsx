@@ -6,7 +6,7 @@ import { api } from '../lib/api'
 import {
   LayoutDashboard, Terminal, MessageSquare, TrendingUp, Users,
   Clock, FileText, FolderOpen, Network, Building2, Bot, Layers, Share2,
-  Send, DollarSign, History, Shield, Lock, BookOpen,
+  Send, DollarSign, History, Shield, Lock, BookOpen, Paintbrush,
   Settings, BarChart3
 } from 'lucide-react'
 
@@ -40,6 +40,7 @@ const navSections: NavSection[] = [
   {
     label: 'TOOLS',
     items: [
+      { to: '/sketchvibe', label: '스케치바이브', icon: Paintbrush },
       { to: '/sns', label: 'SNS', icon: Share2 },
       { to: '/trading', label: '전략실', icon: TrendingUp },
       { to: '/messenger', label: '메신저', icon: Send },

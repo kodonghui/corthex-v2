@@ -8,8 +8,8 @@ import '@xyflow/react/dist/style.css'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { mermaidToCanvas } from '../../../lib/mermaid-to-canvas'
-import { sketchVibeNodeTypes } from '../../../components/nexus/sketchvibe-nodes'
-import { sketchVibeEdgeTypes } from '../../../components/nexus/editable-edge'
+import { sketchVibeNodeTypes } from '../../../components/sketchvibe/sketchvibe-nodes'
+import { sketchVibeEdgeTypes } from '../../../components/sketchvibe/editable-edge'
 import { api } from '../../../lib/api'
 
 type Props = {
@@ -51,7 +51,7 @@ export function SketchPreviewCard({ mermaid, description, commandId }: Props) {
   // Open in SketchVibe editor
   const handleOpenInEditor = useCallback(() => {
     sessionStorage.setItem('pendingGraphData', JSON.stringify({ nodes, edges }))
-    navigate('/nexus')
+    navigate('/sketchvibe')
   }, [nodes, edges, navigate])
 
   // Copy Mermaid to clipboard
