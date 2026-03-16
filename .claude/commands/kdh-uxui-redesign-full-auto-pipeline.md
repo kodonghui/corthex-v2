@@ -18,7 +18,11 @@ Output root: `_corthex_full_redesign/`
 
 - `all` or no args: Phase 0→7 fully automated (Stitch MCP for Phase 6)
 - `phase-N`: specific Phase only
-- `resume`: pipeline-status.yaml + context-snapshots based resume
+- `resume` or `계속`: Read pipeline-status.yaml → find first non-complete phase → resume from there
+  - IMPORTANT: `계속` means "continue to completion". Do NOT stop at intermediate milestones.
+  - After Stitch HTML generation (Phase 6), IMMEDIATELY proceed to React conversion (Phase 7).
+  - After React conversion, IMMEDIATELY run tsc --noEmit and fix errors.
+  - Pipeline is NOT done until Phase 7 status=complete AND tsc passes.
 
 ## Pipeline Overview
 
@@ -613,18 +617,25 @@ If Stitch MCP fails (auth error, API down, rate limit):
 
 **Output:** `phase-7-integration/component-decomposition.md` + actual code
 
-**Delegation Strategy:** HTML→React conversion is REPETITIVE work. Delegate to Gemini/external AI.
-Claude generates detailed Gemini prompts (with exact class names, prop types, file paths), user runs them, Claude integrates results.
+**Execution Strategy:** HTML→React conversion uses PARALLEL AGENTS for speed.
+- Split screens into 4-5 batches of 4-5 screens each
+- Launch all batch agents simultaneously (run_in_background=true)
+- Each agent: reads HTML + existing page → adds mobile-responsive patterns → verifies tsc
+- Orchestrator waits for all agents → final tsc check → commit+push
+
+**CRITICAL: Do NOT stop after generating Gemini prompts. Convert ALL screens to working React code.**
 
 **Orchestrator Action:**
 ```
-1. Generate Gemini prompts for HTML→React conversion:
-   a. Prompt 1: Existing component color/icon migration (layout.tsx, sidebar.tsx)
-   b. Prompt 2-N: Stitch HTML → React component extraction (batch by screen group)
-   Each prompt includes: exact Tailwind classes, TypeScript prop interfaces, file paths
-2. Save prompts to phase-7-integration/gemini-prompts.md
-3. Claude focuses on: design token updates, routing plan, API binding map, accessibility audit
-4. When user provides Gemini output → Claude integrates into codebase, fixes tsc errors, wires state
+1. Analyze all phase-6-generated/ HTML files → group into 4-5 batches
+2. For each batch, launch a background Agent with:
+   - List of HTML files to convert
+   - Instructions to read existing page + add mobile patterns
+   - Rule: do NOT rewrite pages, only ADD responsive classes/components
+   - Rule: use existing hooks from use-queries.ts
+3. Wait for all agents to complete
+4. Run tsc --noEmit → fix any errors
+5. git commit+push → verify deploy
 ```
 
 **Writer Instruction (for non-delegatable work):**
@@ -707,7 +718,12 @@ PHASE 6 (Stitch MCP — no team needed):
   Step 6-5: Visual review (read screenshots, compare to tokens/theme) → retry if off
   git commit after each sub-step. Fallback: if MCP fails → status="fallback-manual" → STOP
 
-PHASE 7: spawn team → 4 steps → final commit+push+deploy verify
+PHASE 7 (Parallel Agent Execution):
+  Step 7-1: Split all phase-6 HTML screens into 4-5 batches
+  Launch 4-5 background agents simultaneously (each handles 4-5 screens)
+  Each agent: read HTML + read existing page → add mobile-responsive patterns → commit
+  Wait for ALL agents → run tsc --noEmit → fix errors → final commit+push+deploy verify
+  CRITICAL: Do NOT stop at document generation. WORKING CODE is the deliverable.
 
 Context snapshot after EVERY step → _corthex_full_redesign/context-snapshots/{phase}-{step}-snapshot.md
 Contents: decisions, design tokens referenced, libre tools applied, constraints for next step, connections, critic scores
@@ -744,5 +760,8 @@ Contents: decisions, design tokens referenced, libre tools applied, constraints 
 9. Writer MUST read referenced libre skill files BEFORE writing. Critics verify this.
 10. Phase 4 themes MUST use Archetype+Card synthesis (no generic "Neural Network" or "Cyberpunk" themes).
 11. Accessibility audit uses libre-a11y methodology (axe-core patterns, full WCAG 2.1 AA checklist).
+12. **`계속` = run to completion.** Do NOT stop at intermediate milestones (HTML gen, doc gen, etc.). The pipeline ends when Phase 7 status=complete AND tsc passes AND code is committed+pushed.
+13. **Phase 7 parallel agents**: Split HTML→React work into 4-5 batches, run simultaneously. Do NOT sequentially process 21+ screens.
+14. **Phase 6 app screen coverage**: Generate screens for ALL app routes (analyze packages/app/src/pages/), not just the 6 in Phase 5 prompt. Use web screens as design reference for additional prompts.
 
 ARGUMENTS: $ARGUMENTS
