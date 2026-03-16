@@ -1,3 +1,18 @@
+/**
+ * Admin Workflows Page — Natural Organic Theme
+ *
+ * API Endpoints:
+ *   GET    /admin/workflows?companyId={id}&page=&limit=
+ *   GET    /admin/workflows/:id
+ *   POST   /admin/workflows { name, description?, steps, companyId }
+ *   PATCH  /admin/workflows/:id { name?, description?, steps? }
+ *   DELETE /admin/workflows/:id
+ *   POST   /admin/workflows/:id/execute
+ *   GET    /admin/workflows/:id/executions?page=
+ *   GET    /admin/workflow-suggestions?companyId={id}
+ *   POST   /admin/workflow-suggestions/:id/accept
+ *   POST   /admin/workflow-suggestions/:id/reject
+ */
 import { useState, useMemo, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
@@ -51,6 +66,19 @@ type Execution = {
 
 type Tab = 'list' | 'suggestions'
 
+// === Natural Organic Colors ===
+
+const olive = '#5a7247'
+const oliveBg = 'rgba(90,114,71,0.1)'
+const oliveActive = '#4a5d23'
+const terracotta = '#c4622d'
+const cream = '#faf8f5'
+const sand = '#e5e1d3'
+const warmBrown = '#463e30'
+const muted = '#9c8d66'
+const lightMuted = '#b7aa88'
+const leafLight = '#c5d8a4'
+
 // === Helpers ===
 
 function uuid() {
@@ -64,9 +92,7 @@ function emptyStep(): WorkflowStep {
 /** Topological sort into layers using Kahn's algorithm. Exported for testing. */
 export function buildDagLayers(steps: WorkflowStep[]): WorkflowStep[][] {
   if (steps.length === 0) return []
-
   const inDegree = new Map(steps.map((s) => [s.id, 0]))
-
   for (const s of steps) {
     for (const dep of s.dependsOn || []) {
       if (inDegree.has(dep)) {
@@ -74,10 +100,8 @@ export function buildDagLayers(steps: WorkflowStep[]): WorkflowStep[][] {
       }
     }
   }
-
   const result: WorkflowStep[][] = []
   let queue = steps.filter((s) => (inDegree.get(s.id) || 0) === 0)
-
   while (queue.length > 0) {
     result.push(queue)
     const nextQueue: WorkflowStep[] = []
@@ -92,26 +116,284 @@ export function buildDagLayers(steps: WorkflowStep[]): WorkflowStep[][] {
     }
     queue = nextQueue
   }
-
   return result
 }
 
-const stepTypeLabels: Record<string, string> = {
-  tool: 'Tool',
-  llm: 'LLM',
-  condition: 'Condition',
+const stepTypeLabels: Record<string, { label: string; color: string; bg: string }> = {
+  tool: { label: 'Tool', color: '#3b82f6', bg: 'rgba(59,130,246,0.1)' },
+  llm: { label: 'LLM', color: '#8b5cf6', bg: 'rgba(139,92,246,0.1)' },
+  condition: { label: 'Condition', color: terracotta, bg: 'rgba(196,98,45,0.1)' },
 }
 
-const stepTypeColors: Record<string, string> = {
-  tool: 'bg-blue-500/20 text-blue-400',
-  llm: 'bg-purple-500/20 text-purple-400',
-  condition: 'bg-amber-500/20 text-amber-400',
+const execStatusLabels: Record<string, { label: string; color: string; bg: string }> = {
+  success: { label: 'Success', color: olive, bg: oliveBg },
+  failed: { label: 'Failed', color: '#ef4444', bg: 'rgba(239,68,68,0.1)' },
 }
 
-const stepTypeBorderColors: Record<string, string> = {
-  tool: 'border-blue-500/30',
-  llm: 'border-purple-500/30',
-  condition: 'border-amber-500/30',
+// === Execution Card Sub-component ===
+
+function ExecutionCard({ exec }: { exec: Execution }) {
+  const [expanded, setExpanded] = useState(false)
+  const statusInfo = execStatusLabels[exec.status] || execStatusLabels.failed
+
+  return (
+    <div className="border rounded-xl overflow-hidden" style={{ backgroundColor: '#ffffff', borderColor: sand }}>
+      <div
+        className="px-4 py-3 flex items-center justify-between cursor-pointer transition-colors"
+        onClick={() => setExpanded(!expanded)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpanded(!expanded) } }}
+        style={{ backgroundColor: expanded ? `${cream}80` : 'transparent' }}
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-xs px-2 py-0.5 rounded font-bold" style={{ backgroundColor: statusInfo.bg, color: statusInfo.color }}>{statusInfo.label}</span>
+          <span className="text-xs font-mono" style={{ color: muted }}>{(exec.totalDurationMs / 1000).toFixed(1)}s</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-mono" style={{ color: lightMuted }}>
+            {new Date(exec.createdAt).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+          </span>
+          <span className="text-xs" style={{ color: lightMuted }}>{expanded ? '▲' : '▼'}</span>
+        </div>
+      </div>
+      {expanded && (
+        <div className="px-4 py-3 border-t space-y-2" style={{ borderColor: `${sand}80` }}>
+          {exec.stepSummaries.map((step) => (
+            <div key={step.stepId} className="flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2">
+                <span
+                  className="w-2 h-2 rounded-full"
+                  style={{
+                    backgroundColor: step.status === 'completed' || step.status === 'success' ? olive : step.status === 'failed' ? '#ef4444' : lightMuted,
+                  }}
+                />
+                <span style={{ color: warmBrown }}>{step.stepName}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-mono" style={{ color: lightMuted }}>{(step.durationMs / 1000).toFixed(1)}s</span>
+                {step.error && (
+                  <span className="truncate max-w-[200px]" style={{ color: '#ef4444' }} title={step.error}>{step.error}</span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// === Workflow Form Modal ===
+
+function WorkflowFormModal({ workflow, isPending, onSubmit, onClose }: {
+  workflow: Workflow | null
+  isPending: boolean
+  onSubmit: (data: { name: string; description?: string; steps: WorkflowStep[] }) => void
+  onClose: () => void
+}) {
+  const [name, setName] = useState(workflow?.name || '')
+  const [description, setDescription] = useState(workflow?.description || '')
+  const [steps, setSteps] = useState<WorkflowStep[]>(
+    workflow?.steps ? (workflow.steps as WorkflowStep[]).map(s => ({ ...s })) : [emptyStep()]
+  )
+
+  const inputStyle = { backgroundColor: '#fbfaf8', borderColor: sand, color: warmBrown }
+
+  function addStep() {
+    if (steps.length >= 20) return
+    const newStep = emptyStep()
+    if (steps.length > 0) newStep.dependsOn = [steps[steps.length - 1].id]
+    setSteps([...steps, newStep])
+  }
+
+  function removeStep(idx: number) {
+    if (steps.length <= 1) return
+    const removedId = steps[idx].id
+    const updated = steps.filter((_, i) => i !== idx).map(s => ({
+      ...s,
+      dependsOn: s.dependsOn?.filter(d => d !== removedId),
+    }))
+    setSteps(updated)
+  }
+
+  function updateStep(idx: number, patch: Partial<WorkflowStep>) {
+    setSteps(steps.map((s, i) => i === idx ? { ...s, ...patch } : s))
+  }
+
+  function moveStep(idx: number, direction: -1 | 1) {
+    const targetIdx = idx + direction
+    if (targetIdx < 0 || targetIdx >= steps.length) return
+    const newSteps = [...steps]
+    const temp = newSteps[idx]
+    newSteps[idx] = newSteps[targetIdx]
+    newSteps[targetIdx] = temp
+    setSteps(newSteps)
+  }
+
+  function handleSubmit() {
+    if (!name.trim() || steps.length === 0) return
+    const validSteps = steps.filter(s => s.name?.trim() && s.action.trim())
+    if (validSteps.length === 0) return
+    onSubmit({ name: name.trim(), description: description.trim() || undefined, steps: validSteps })
+  }
+
+  const isValid = name.trim() && steps.some(s => s.name?.trim() && s.action.trim())
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      onKeyDown={(e) => { if (e.key === 'Escape') onClose() }}
+    >
+      <div
+        className="rounded-2xl shadow-2xl max-w-xl w-full mx-4 p-6 max-h-[85vh] overflow-y-auto"
+        style={{ backgroundColor: '#ffffff', border: `1px solid ${sand}` }}
+        onClick={e => e.stopPropagation()}
+        tabIndex={-1}
+        data-testid="workflow-form-modal"
+      >
+        <h3 className="text-lg font-bold mb-4" style={{ color: warmBrown, fontFamily: "'Noto Serif KR', serif" }}>
+          {workflow ? 'Edit Workflow' : 'Create Workflow'}
+        </h3>
+
+        <div className="mb-3">
+          <label className="block text-xs font-medium mb-1" style={{ color: muted }}>Name</label>
+          <input
+            type="text"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            placeholder="Workflow name"
+            className="w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-1"
+            style={{ ...inputStyle, outlineColor: olive }}
+            data-testid="workflow-name-input"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-xs font-medium mb-1" style={{ color: muted }}>Description (optional)</label>
+          <textarea
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            placeholder="Workflow description"
+            rows={2}
+            className="w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-1"
+            style={{ ...inputStyle, outlineColor: olive }}
+            data-testid="workflow-desc-input"
+          />
+        </div>
+
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-xs font-medium" style={{ color: muted }}>Steps ({steps.length}/20)</label>
+            {steps.length < 20 && (
+              <button type="button" onClick={addStep} className="text-xs font-bold" style={{ color: olive }}>+ Add Step</button>
+            )}
+          </div>
+          <div className="space-y-3">
+            {steps.map((step, idx) => (
+              <div key={step.id} className="border rounded-lg p-3 space-y-2" style={{ backgroundColor: '#fbfaf8', borderColor: sand }} data-testid={`form-step-${idx}`}>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold" style={{ color: lightMuted }}>Step {idx + 1}</span>
+                  <div className="flex items-center gap-1">
+                    <button type="button" onClick={() => moveStep(idx, -1)} disabled={idx === 0} className="text-xs disabled:opacity-30 px-1" style={{ color: muted }}>↑</button>
+                    <button type="button" onClick={() => moveStep(idx, 1)} disabled={idx === steps.length - 1} className="text-xs disabled:opacity-30 px-1" style={{ color: muted }}>↓</button>
+                    {steps.length > 1 && (
+                      <button type="button" onClick={() => removeStep(idx)} className="text-xs px-1" style={{ color: '#ef4444' }}>Delete</button>
+                    )}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="text"
+                    value={step.name || ''}
+                    onChange={e => updateStep(idx, { name: e.target.value })}
+                    placeholder="Step name"
+                    className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none"
+                    style={inputStyle}
+                  />
+                  <select
+                    value={step.type}
+                    onChange={e => updateStep(idx, { type: e.target.value as WorkflowStep['type'] })}
+                    className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none appearance-none"
+                    style={inputStyle}
+                  >
+                    <option value="tool">Tool</option>
+                    <option value="llm">LLM</option>
+                    <option value="condition">Condition</option>
+                  </select>
+                </div>
+                <input
+                  type="text"
+                  value={step.action}
+                  onChange={e => updateStep(idx, { action: e.target.value })}
+                  placeholder="Action (tool name or prompt)"
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none"
+                  style={inputStyle}
+                />
+                {step.type === 'llm' && (
+                  <textarea
+                    value={step.systemPrompt || ''}
+                    onChange={e => updateStep(idx, { systemPrompt: e.target.value })}
+                    placeholder="System prompt (optional)"
+                    rows={2}
+                    className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none"
+                    style={inputStyle}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex gap-3 pt-2">
+          <button onClick={onClose} className="flex-1 py-2.5 text-sm font-medium border rounded-xl transition-colors" style={{ borderColor: sand, color: muted }}>
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={!isValid || isPending}
+            className="flex-1 py-2.5 text-white rounded-xl text-sm font-bold disabled:opacity-50"
+            style={{ backgroundColor: olive }}
+            data-testid="submit-workflow-btn"
+          >
+            {isPending ? 'Processing...' : workflow ? 'Update' : 'Create'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// === Delete Confirm Modal ===
+
+function DeleteConfirmModal({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}
+      role="dialog"
+      aria-modal="true"
+      onKeyDown={(e) => { if (e.key === 'Escape') onCancel() }}
+    >
+      <div
+        className="rounded-2xl shadow-2xl p-6 w-96 mx-4"
+        style={{ backgroundColor: '#ffffff', border: `1px solid ${sand}` }}
+        tabIndex={-1}
+        data-testid="delete-confirm-modal"
+      >
+        <h3 className="text-sm font-bold mb-2" style={{ color: warmBrown }}>Delete Workflow</h3>
+        <p className="text-xs mb-4" style={{ color: muted }}>Are you sure you want to delete this workflow?</p>
+        <div className="flex justify-end gap-3">
+          <button onClick={onCancel} className="border rounded-xl px-4 py-2 text-sm" style={{ borderColor: sand, color: muted }}>Cancel</button>
+          <button onClick={onConfirm} className="text-white rounded-xl px-4 py-2 text-sm font-bold" style={{ backgroundColor: '#ef4444' }}>Delete</button>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 // === Main Page ===
@@ -120,972 +402,528 @@ export function WorkflowsPage() {
   const qc = useQueryClient()
   const selectedCompanyId = useAdminStore((s) => s.selectedCompanyId)
   const addToast = useToastStore((s) => s.addToast)
-
-  const [tab, setTab] = useState<Tab>('list')
+  const [activeTab, setActiveTab] = useState<Tab>('list')
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [showCreate, setShowCreate] = useState(false)
   const [editingWorkflow, setEditingWorkflow] = useState<Workflow | null>(null)
-  const [creating, setCreating] = useState(false)
-  const [viewingExecutions, setViewingExecutions] = useState<Workflow | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
+  const [executionsPage, setExecutionsPage] = useState(1)
 
-  // Fetch workflows
-  const { data: wfData, isLoading } = useQuery({
-    queryKey: ['workflows', selectedCompanyId],
-    queryFn: () => api.get<{ data: Workflow[]; meta: { total: number } }>('/workspace/workflows?limit=100'),
+  // --- Queries ---
+  const { data: workflowsData, isLoading } = useQuery({
+    queryKey: ['admin-workflows', selectedCompanyId],
+    queryFn: () => api.get<{ data: Workflow[] }>(`/admin/workflows?companyId=${selectedCompanyId}&page=1&limit=100`),
     enabled: !!selectedCompanyId,
   })
 
-  // Fetch suggestions
-  const { data: sugData } = useQuery({
-    queryKey: ['workflow-suggestions', selectedCompanyId],
-    queryFn: () => api.get<{ data: Suggestion[]; meta: { total: number } }>('/workspace/workflows/suggestions?limit=100'),
+  const { data: detailData, isLoading: detailLoading } = useQuery({
+    queryKey: ['admin-workflow-detail', selectedId],
+    queryFn: () => api.get<{ data: Workflow }>(`/admin/workflows/${selectedId}`),
+    enabled: !!selectedId,
+  })
+
+  const { data: executionsData } = useQuery({
+    queryKey: ['admin-workflow-executions', selectedId, executionsPage],
+    queryFn: () => api.get<{ data: Execution[]; meta?: { total: number } }>(`/admin/workflows/${selectedId}/executions?page=${executionsPage}`),
+    enabled: !!selectedId,
+  })
+
+  const { data: suggestionsData, isLoading: suggestionsLoading } = useQuery({
+    queryKey: ['admin-workflow-suggestions', selectedCompanyId],
+    queryFn: () => api.get<{ data: Suggestion[] }>(`/admin/workflow-suggestions?companyId=${selectedCompanyId}`),
     enabled: !!selectedCompanyId,
   })
 
-  // Delete mutation
-  const deleteMut = useMutation({
-    mutationFn: (id: string) => api.delete(`/workspace/workflows/${id}`),
+  // --- Mutations ---
+  const createMutation = useMutation({
+    mutationFn: (body: { name: string; description?: string; steps: WorkflowStep[] }) =>
+      api.post('/admin/workflows', { ...body, companyId: selectedCompanyId }),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['workflows'] })
-      addToast({ type: 'success', message: '워크플로우가 삭제되었습니다' })
+      qc.invalidateQueries({ queryKey: ['admin-workflows'] })
+      setShowCreate(false)
+      setEditingWorkflow(null)
+      addToast({ type: 'success', message: 'Workflow created' })
     },
-    onError: (e: Error) => addToast({ type: 'error', message: e.message }),
+    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
 
-  // Accept suggestion
-  const acceptMut = useMutation({
-    mutationFn: (id: string) => api.post(`/workspace/workflows/suggestions/${id}/accept`, {}),
+  const updateMutation = useMutation({
+    mutationFn: ({ id, ...body }: { id: string; name?: string; description?: string; steps?: WorkflowStep[] }) =>
+      api.patch(`/admin/workflows/${id}`, body),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['workflows'] })
-      qc.invalidateQueries({ queryKey: ['workflow-suggestions'] })
-      addToast({ type: 'success', message: '제안이 수락되어 워크플로우가 생성되었습니다' })
+      qc.invalidateQueries({ queryKey: ['admin-workflows'] })
+      qc.invalidateQueries({ queryKey: ['admin-workflow-detail'] })
+      setShowCreate(false)
+      setEditingWorkflow(null)
+      addToast({ type: 'success', message: 'Workflow updated' })
     },
-    onError: (e: Error) => addToast({ type: 'error', message: e.message }),
+    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
 
-  // Reject suggestion
-  const rejectMut = useMutation({
-    mutationFn: (id: string) => api.post(`/workspace/workflows/suggestions/${id}/reject`, {}),
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => api.delete(`/admin/workflows/${id}`),
+    onSuccess: (_data, id) => {
+      qc.invalidateQueries({ queryKey: ['admin-workflows'] })
+      setDeleteTarget(null)
+      if (selectedId === id) setSelectedId(null)
+      addToast({ type: 'success', message: 'Workflow deleted' })
+    },
+    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
+  })
+
+  const executeMutation = useMutation({
+    mutationFn: (id: string) => api.post(`/admin/workflows/${id}/execute`, {}),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['workflow-suggestions'] })
-      addToast({ type: 'success', message: '제안이 거절되었습니다' })
+      qc.invalidateQueries({ queryKey: ['admin-workflow-executions'] })
+      addToast({ type: 'success', message: 'Workflow executed' })
     },
-    onError: (e: Error) => addToast({ type: 'error', message: e.message }),
+    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
 
-  // Analyze patterns
-  const analyzeMut = useMutation({
-    mutationFn: () => api.post<{ data: { patternsFound: number; suggestionsCreated: number } }>('/workspace/workflows/analyze', {}),
-    onSuccess: (res) => {
-      qc.invalidateQueries({ queryKey: ['workflow-suggestions'] })
-      addToast({ type: 'success', message: `패턴 분석 완료: ${res.data.patternsFound}개 패턴, ${res.data.suggestionsCreated}개 새 제안` })
+  const acceptSuggestion = useMutation({
+    mutationFn: (id: string) => api.post(`/admin/workflow-suggestions/${id}/accept`, {}),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin-workflow-suggestions'] })
+      qc.invalidateQueries({ queryKey: ['admin-workflows'] })
+      addToast({ type: 'success', message: 'Suggestion accepted' })
     },
-    onError: (e: Error) => addToast({ type: 'error', message: e.message }),
+    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
 
-  // Execute workflow (from list view)
-  const executeMut = useMutation({
-    mutationFn: (id: string) => api.post<{ data: { executionId: string; status: string; totalDurationMs: number; stepSummaries: StepSummary[] } }>(`/workspace/workflows/${id}/execute`, {}),
-    onSuccess: (res, id) => {
-      const d = res.data
-      addToast({ type: d.status === 'success' ? 'success' : 'error', message: `실행 ${d.status === 'success' ? '성공' : '실패'} (${(d.totalDurationMs / 1000).toFixed(1)}초)` })
-      qc.invalidateQueries({ queryKey: ['workflow-executions', id] })
+  const rejectSuggestion = useMutation({
+    mutationFn: (id: string) => api.post(`/admin/workflow-suggestions/${id}/reject`, {}),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin-workflow-suggestions'] })
+      addToast({ type: 'success', message: 'Suggestion rejected' })
     },
-    onError: (e: Error) => addToast({ type: 'error', message: e.message }),
+    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
 
-  const workflows = wfData?.data || []
-  const suggestions = sugData?.data || []
+  const workflows = workflowsData?.data || []
+  const suggestions = suggestionsData?.data || []
+  const detail = detailData?.data || null
+  const executions = executionsData?.data || []
+  const executionsMeta = executionsData?.meta
+
+  function openEdit(wf: Workflow) {
+    setEditingWorkflow(wf)
+    setShowCreate(true)
+  }
 
   if (!selectedCompanyId) {
     return (
-      <div className="flex items-center justify-center py-20 text-sm text-slate-500" data-testid="workflows-no-company">
-        회사를 선택해주세요
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: cream }}>
+        <p className="text-sm" style={{ color: lightMuted }}>Select a company</p>
       </div>
     )
   }
 
-  if (viewingExecutions) {
+  // --- Detail view ---
+  if (selectedId) {
     return (
-      <ExecutionHistory
-        workflow={viewingExecutions}
-        onClose={() => setViewingExecutions(null)}
-      />
-    )
-  }
-
-  if (editingWorkflow || creating) {
-    return (
-      <WorkflowEditor
-        workflow={editingWorkflow}
-        onClose={() => { setEditingWorkflow(null); setCreating(false) }}
-        onSaved={() => {
-          setEditingWorkflow(null)
-          setCreating(false)
-          qc.invalidateQueries({ queryKey: ['workflows'] })
-        }}
-      />
-    )
-  }
-
-  return (
-    <div className="space-y-6 p-6 bg-slate-900 min-h-full" data-testid="workflows-page">
-      <div className="flex items-center justify-between" data-testid="workflows-header">
-        <h1 className="text-2xl font-bold text-slate-50">워크플로우 관리</h1>
-        <div className="flex gap-2">
-          <button
-            onClick={() => analyzeMut.mutate()}
-            disabled={analyzeMut.isPending}
-            className="px-4 py-2 text-sm rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-700 disabled:opacity-50 transition-colors"
-            data-testid="analyze-button"
-          >
-            {analyzeMut.isPending ? '분석 중...' : '패턴 분석'}
-          </button>
-          <button
-            onClick={() => setCreating(true)}
-            className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
-            data-testid="create-workflow-button"
-          >
-            + 새 워크플로우
-          </button>
+      <div className="flex h-screen w-full" style={{ fontFamily: "'Pretendard', sans-serif" }}>
+        {/* Sidebar */}
+        <div className="w-64 text-white flex flex-col h-full flex-shrink-0 z-20 shadow-lg" style={{ backgroundColor: olive }}>
+          <div className="p-6 flex items-center gap-3 border-b" style={{ borderColor: oliveActive }}>
+            <span className="material-symbols-outlined text-2xl">hub</span>
+            <h2 className="text-xl font-bold tracking-wide" style={{ fontFamily: "'Noto Serif KR', serif" }}>Workflows</h2>
+          </div>
+          <div className="p-6 flex flex-col gap-2">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="bg-white/20 w-10 h-10 rounded-full" />
+              <div className="flex flex-col">
+                <h1 className="text-base font-bold" style={{ fontFamily: "'Noto Serif KR', serif" }}>CORTHEX v2</h1>
+                <p className="text-xs" style={{ color: leafLight }}>Admin Workflow Manager</p>
+              </div>
+            </div>
+            <div className="flex flex-col gap-1 mt-4">
+              <button
+                onClick={() => { setSelectedId(null); setExecutionsPage(1) }}
+                className="flex items-center gap-3 px-4 py-3 rounded-2xl transition-colors"
+                style={{ backgroundColor: 'transparent' }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#6a8454')}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+              >
+                <span className="material-symbols-outlined text-xl">arrow_back</span>
+                <span className="text-sm font-medium">Back to List</span>
+              </button>
+              <button className="flex items-center gap-3 px-4 py-3 rounded-2xl shadow-inner" style={{ backgroundColor: oliveActive }}>
+                <span className="material-symbols-outlined text-xl">account_tree</span>
+                <span className="text-sm font-medium truncate">{detailLoading ? '...' : detail?.name || 'Workflow'}</span>
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
 
-      {/* Tabs */}
-      <div className="flex gap-1 border-b border-slate-700" data-testid="workflows-tabs">
-        <button
-          onClick={() => setTab('list')}
-          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-            tab === 'list'
-              ? 'border-blue-500 text-blue-400'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
-          }`}
-          data-testid="tab-list"
-        >
-          워크플로우 ({workflows.length})
-        </button>
-        <button
-          onClick={() => setTab('suggestions')}
-          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-            tab === 'suggestions'
-              ? 'border-blue-500 text-blue-400'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
-          }`}
-          data-testid="tab-suggestions"
-        >
-          제안 ({suggestions.length})
-        </button>
-      </div>
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col relative overflow-hidden" style={{ backgroundColor: cream }}>
+          <header className="border-b px-8 py-6 flex items-center justify-between" style={{ backgroundColor: '#ffffff', borderColor: sand }}>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => { setSelectedId(null); setExecutionsPage(1) }}
+                className="text-sm min-h-[44px] flex items-center px-3 transition-colors"
+                style={{ color: muted }}
+              >
+                ← List
+              </button>
+              <h2 className="text-xl font-semibold" style={{ color: warmBrown, fontFamily: "'Noto Serif KR', serif" }}>
+                {detailLoading ? '...' : detail?.name || 'Workflow'}
+              </h2>
+            </div>
+            {detail && (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => executeMutation.mutate(detail.id)}
+                  disabled={executeMutation.isPending}
+                  className="text-white rounded-xl px-4 py-2 text-sm font-bold disabled:opacity-50 transition-colors"
+                  style={{ backgroundColor: terracotta }}
+                  data-testid="execute-btn"
+                >
+                  {executeMutation.isPending ? 'Running...' : 'Execute'}
+                </button>
+                <button
+                  onClick={() => openEdit(detail)}
+                  className="border rounded-xl px-4 py-2 text-sm transition-colors"
+                  style={{ borderColor: sand, color: muted }}
+                  data-testid="edit-workflow-btn"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => setDeleteTarget(detail.id)}
+                  className="text-sm px-3 py-2"
+                  style={{ color: '#ef4444' }}
+                  data-testid="delete-workflow-btn"
+                >
+                  Delete
+                </button>
+              </div>
+            )}
+          </header>
 
-      {/* Workflow List */}
-      {tab === 'list' && (
-        <div className="space-y-3" data-testid="workflow-list">
-          {isLoading && (
-            <div className="space-y-3" data-testid="workflows-loading">
-              {[1, 2, 3].map(i => (
-                <div key={i} className="h-32 bg-slate-800/50 border border-slate-700 rounded-xl animate-pulse" />
-              ))}
-            </div>
-          )}
-          {!isLoading && workflows.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="workflows-empty">
-              <svg className="w-10 h-10 text-slate-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              <h3 className="text-lg font-medium text-slate-300 mb-2">워크플로우가 없습니다</h3>
-              <p className="text-sm text-slate-500">새 워크플로우를 만들거나 패턴 분석으로 자동 제안을 받아보세요.</p>
-            </div>
-          )}
-          {workflows.map((wf) => (
-            <div
-              key={wf.id}
-              className="p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:border-slate-600 transition-colors"
-              role="article"
-              aria-label={`워크플로우: ${wf.name}`}
-              data-testid={`workflow-card-${wf.id}`}
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <h3 className="text-base font-semibold text-slate-100">{wf.name}</h3>
-                  {wf.description && (
-                    <p className="text-sm text-slate-400 mt-1">{wf.description}</p>
+          <div className="flex-1 overflow-y-auto px-8 py-6">
+            {detailLoading ? (
+              <div className="space-y-3">
+                {[1, 2, 3].map(i => <div key={i} className="h-16 animate-pulse rounded-xl" style={{ backgroundColor: `${sand}80` }} />)}
+              </div>
+            ) : detail ? (
+              <div className="max-w-3xl space-y-6">
+                {detail.description && (
+                  <p className="text-sm" style={{ color: muted }}>{detail.description}</p>
+                )}
+
+                {/* Steps visualization */}
+                <div>
+                  <h3 className="text-sm font-bold mb-3" style={{ color: muted }}>Steps ({detail.steps.length})</h3>
+                  <div className="space-y-2">
+                    {(detail.steps as WorkflowStep[]).map((step, idx) => {
+                      const typeInfo = stepTypeLabels[step.type] || stepTypeLabels.tool
+                      return (
+                        <div key={step.id} className="flex items-start gap-3" data-testid={`step-${idx}`}>
+                          <div className="flex flex-col items-center">
+                            <div className="w-8 h-8 rounded-full border flex items-center justify-center text-xs font-mono" style={{ backgroundColor: '#fbfaf8', borderColor: sand, color: muted }}>
+                              {idx + 1}
+                            </div>
+                            {idx < detail.steps.length - 1 && <div className="w-px h-6 mt-1" style={{ backgroundColor: sand }} />}
+                          </div>
+                          <div className="flex-1 border rounded-xl p-4" style={{ backgroundColor: '#ffffff', borderColor: sand }}>
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-[10px] px-1.5 py-0.5 rounded font-bold" style={{ backgroundColor: typeInfo.bg, color: typeInfo.color }}>{typeInfo.label}</span>
+                              <span className="text-sm font-bold" style={{ color: warmBrown }}>{step.name}</span>
+                            </div>
+                            <p className="text-xs font-mono" style={{ color: muted }}>{step.action}</p>
+                            {step.dependsOn && step.dependsOn.length > 0 && (
+                              <p className="text-[10px] mt-1" style={{ color: lightMuted }}>
+                                Depends on: {step.dependsOn.map(depId => {
+                                  const depStep = (detail.steps as WorkflowStep[]).find(s => s.id === depId)
+                                  return depStep?.name || depId.slice(0, 8)
+                                }).join(', ')}
+                              </p>
+                            )}
+                            {step.timeout && (
+                              <p className="text-[10px] mt-0.5" style={{ color: lightMuted }}>Timeout: {(step.timeout / 1000).toFixed(0)}s</p>
+                            )}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Execution history */}
+                <div>
+                  <h3 className="text-sm font-bold mb-3" style={{ color: muted }}>Execution History</h3>
+                  {executions.length === 0 ? (
+                    <p className="text-xs" style={{ color: lightMuted }}>No execution history yet</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {executions.map(exec => (
+                        <ExecutionCard key={exec.id} exec={exec} />
+                      ))}
+                      {executionsMeta && executionsMeta.total > 10 && (
+                        <div className="flex items-center justify-center gap-3 pt-2">
+                          <button onClick={() => setExecutionsPage(p => Math.max(1, p - 1))} disabled={executionsPage <= 1} className="text-xs disabled:opacity-30" style={{ color: muted }}>Prev</button>
+                          <span className="text-xs" style={{ color: lightMuted }}>{executionsPage} / {Math.ceil(executionsMeta.total / 10)}</span>
+                          <button onClick={() => setExecutionsPage(p => p + 1)} disabled={executionsPage >= Math.ceil(executionsMeta.total / 10)} className="text-xs disabled:opacity-30" style={{ color: muted }}>Next</button>
+                        </div>
+                      )}
+                    </div>
                   )}
-                  <div className="flex items-center gap-3 mt-2 text-xs text-slate-500">
-                    <span className={wf.isActive ? 'text-emerald-400 font-medium' : 'text-slate-500'}>
-                      {wf.isActive ? '활성' : '비활성'}
-                    </span>
-                    <span>{wf.steps.length}개 스텝</span>
-                    <span>{new Date(wf.createdAt).toLocaleDateString('ko-KR')}</span>
-                  </div>
-                  {/* Mini DAG */}
-                  <div className="flex items-center gap-1 mt-3 flex-wrap">
-                    {wf.steps.map((step, idx) => (
-                      <span key={step.id} className="flex items-center gap-1">
-                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${stepTypeColors[step.type]}`}>
-                          {step.action}
-                        </span>
-                        {idx < wf.steps.length - 1 && (
-                          <span className="text-slate-500 text-xs">→</span>
-                        )}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <div className="flex gap-2 ml-4 flex-col">
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => executeMut.mutate(wf.id)}
-                      disabled={executeMut.isPending}
-                      className="px-3 py-1.5 text-xs font-medium rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition-colors disabled:opacity-50"
-                    >
-                      {executeMut.isPending ? '실행 중...' : '실행'}
-                    </button>
-                    <button
-                      onClick={() => setViewingExecutions(wf)}
-                      className="px-3 py-1.5 text-xs rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-700 transition-colors"
-                    >
-                      이력
-                    </button>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setEditingWorkflow(wf)}
-                      className="px-3 py-1.5 text-xs rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-700 transition-colors"
-                    >
-                      편집
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (confirm('정말 삭제하시겠습니까?')) deleteMut.mutate(wf.id)
-                      }}
-                      className="px-3 py-1.5 text-xs rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors"
-                    >
-                      삭제
-                    </button>
-                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Suggestions */}
-      {tab === 'suggestions' && (
-        <div className="space-y-3" data-testid="suggestions-list">
-          {suggestions.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="suggestions-empty">
-              <svg className="w-10 h-10 text-slate-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-              </svg>
-              <h3 className="text-lg font-medium text-slate-300 mb-2">제안이 없습니다</h3>
-              <p className="text-sm text-slate-500">"패턴 분석" 버튼을 눌러 반복 패턴을 감지해보세요.</p>
-            </div>
-          )}
-          {suggestions.map((sug) => (
-            <div
-              key={sug.id}
-              className="p-4 rounded-xl border border-slate-700 bg-slate-800/50"
-              data-testid={`suggestion-card-${sug.id}`}
-            >
-              <p className="text-sm text-slate-300">{sug.reason}</p>
-              <div className="flex items-center gap-1 mt-2 flex-wrap">
-                {(sug.suggestedSteps || []).map((step, idx) => (
-                  <span key={step.id} className="flex items-center gap-1">
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${stepTypeColors[step.type] || 'bg-slate-600/50 text-slate-400'}`}>
-                      {step.action}
-                    </span>
-                    {idx < sug.suggestedSteps.length - 1 && (
-                      <span className="text-slate-500 text-xs">→</span>
-                    )}
-                  </span>
-                ))}
-              </div>
-              <div className="flex gap-2 mt-3">
-                <button
-                  onClick={() => acceptMut.mutate(sug.id)}
-                  disabled={acceptMut.isPending}
-                  className="px-3 py-1.5 text-xs font-medium rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition-colors disabled:opacity-50"
-                >
-                  수락
-                </button>
-                <button
-                  onClick={() => rejectMut.mutate(sug.id)}
-                  disabled={rejectMut.isPending}
-                  className="px-3 py-1.5 text-xs rounded-lg border border-slate-600 text-slate-400 hover:bg-slate-700 disabled:opacity-50 transition-colors"
-                >
-                  거절
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
-
-// === Workflow Editor (Create / Edit) ===
-
-function WorkflowEditor({
-  workflow,
-  onClose,
-  onSaved,
-}: {
-  workflow: Workflow | null
-  onClose: () => void
-  onSaved: () => void
-}) {
-  const addToast = useToastStore((s) => s.addToast)
-
-  const [name, setName] = useState(workflow?.name || '')
-  const [description, setDescription] = useState(workflow?.description || '')
-  const [steps, setSteps] = useState<WorkflowStep[]>(
-    workflow?.steps.length ? workflow.steps : [emptyStep()]
-  )
-  const [saving, setSaving] = useState(false)
-  const [editorMode, setEditorMode] = useState<'canvas' | 'form'>('canvas')
-
-  const isEditing = !!workflow
-
-  const addStep = useCallback(() => {
-    setSteps((prev) => [...prev, emptyStep()])
-  }, [])
-
-  const removeStep = useCallback((idx: number) => {
-    setSteps((prev) => {
-      const removed = prev[idx]
-      return prev
-        .filter((_, i) => i !== idx)
-        .map((s) => ({
-          ...s,
-          dependsOn: s.dependsOn?.filter((d) => d !== removed.id),
-          trueBranch: s.trueBranch === removed.id ? undefined : s.trueBranch,
-          falseBranch: s.falseBranch === removed.id ? undefined : s.falseBranch,
-        }))
-    })
-  }, [])
-
-  const updateStep = useCallback((idx: number, partial: Partial<WorkflowStep>) => {
-    setSteps((prev) => prev.map((s, i) => (i === idx ? { ...s, ...partial } : s)))
-  }, [])
-
-  const moveStep = useCallback((idx: number, dir: -1 | 1) => {
-    setSteps((prev) => {
-      const arr = [...prev]
-      const target = idx + dir
-      if (target < 0 || target >= arr.length) return prev
-      ;[arr[idx], arr[target]] = [arr[target], arr[idx]]
-      return arr
-    })
-  }, [])
-
-  const handleSave = async () => {
-    if (!name.trim()) {
-      addToast({ type: 'error', message: '이름을 입력해주세요' })
-      return
-    }
-    if (steps.some((s) => !s.name.trim() || !s.action.trim())) {
-      addToast({ type: 'error', message: '모든 스텝의 이름과 액션을 입력해주세요' })
-      return
-    }
-
-    setSaving(true)
-    try {
-      if (isEditing) {
-        await api.put(`/workspace/workflows/${workflow.id}`, { name, description: description || undefined, steps })
-        addToast({ type: 'success', message: '워크플로우가 수정되었습니다' })
-      } else {
-        await api.post('/workspace/workflows', { name, description: description || undefined, steps })
-        addToast({ type: 'success', message: '워크플로우가 생성되었습니다' })
-      }
-      onSaved()
-    } catch (e: unknown) {
-      addToast({ type: 'error', message: e instanceof Error ? e.message : '저장 실패' })
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  return (
-    <div className="space-y-6 p-6 bg-slate-900 min-h-full" data-testid="workflow-editor">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-50">
-          {isEditing ? '워크플로우 편집' : '새 워크플로우'}
-        </h1>
-        <div className="flex items-center gap-3">
-          {/* Canvas/Form mode toggle */}
-          <div className="flex rounded-lg border border-slate-600 overflow-hidden" data-testid="editor-mode-toggle">
-            <button
-              onClick={() => setEditorMode('canvas')}
-              className={`px-3 py-1.5 text-xs font-medium transition-colors ${
-                editorMode === 'canvas'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
-              }`}
-            >
-              캔버스
-            </button>
-            <button
-              onClick={() => setEditorMode('form')}
-              className={`px-3 py-1.5 text-xs font-medium transition-colors ${
-                editorMode === 'form'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
-              }`}
-            >
-              폼
-            </button>
-          </div>
-          <button onClick={onClose} className="text-sm text-slate-400 hover:text-slate-200 transition-colors">
-            <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            목록으로
-          </button>
-        </div>
-      </div>
-
-      {/* Name & Description */}
-      <div className="space-y-4 p-4 rounded-xl border border-slate-700 bg-slate-800/50" data-testid="workflow-form">
-        <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1">이름 *</label>
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-slate-50 outline-none transition-colors"
-            placeholder="예: 일일 리포트 생성 파이프라인"
-            data-testid="workflow-name-input"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1">설명</label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={2}
-            className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-slate-50 outline-none resize-none transition-colors"
-            placeholder="워크플로우 설명 (선택)"
-            data-testid="workflow-desc-input"
-          />
-        </div>
-      </div>
-
-      {/* Canvas Mode */}
-      {editorMode === 'canvas' && (
-        <WorkflowCanvas steps={steps} onChange={setSteps} onSave={handleSave} />
-      )}
-
-      {/* Form Mode (original) */}
-      {editorMode === 'form' && (
-        <>
-          {/* DAG Visualization */}
-          <DagPreview steps={steps} />
-
-          {/* Step Builder */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-slate-100">스텝 ({steps.length})</h2>
-              <button
-                onClick={addStep}
-                className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
-                data-testid="add-step-button"
-              >
-                + 스텝 추가
-              </button>
-            </div>
-
-            {steps.map((step, idx) => (
-              <StepForm
-                key={step.id}
-                step={step}
-                index={idx}
-                allSteps={steps}
-                onUpdate={(partial) => updateStep(idx, partial)}
-                onRemove={() => removeStep(idx)}
-                onMove={(dir) => moveStep(idx, dir)}
-                isFirst={idx === 0}
-                isLast={idx === steps.length - 1}
-              />
-            ))}
-          </div>
-
-          {/* Save */}
-          <div className="flex gap-3 pt-4 border-t border-slate-700">
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-6 py-2 text-sm font-medium transition-colors disabled:opacity-50"
-              data-testid="save-workflow-button"
-            >
-              {saving ? '저장 중...' : isEditing ? '수정' : '생성'}
-            </button>
-            <button
-              onClick={onClose}
-              className="px-6 py-2 text-sm rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-700 transition-colors"
-            >
-              취소
-            </button>
-          </div>
-        </>
-      )}
-    </div>
-  )
-}
-
-// === Step Form ===
-
-function StepForm({
-  step,
-  index,
-  allSteps,
-  onUpdate,
-  onRemove,
-  onMove,
-  isFirst,
-  isLast,
-}: {
-  step: WorkflowStep
-  index: number
-  allSteps: WorkflowStep[]
-  onUpdate: (partial: Partial<WorkflowStep>) => void
-  onRemove: () => void
-  onMove: (dir: -1 | 1) => void
-  isFirst: boolean
-  isLast: boolean
-}) {
-  const otherSteps = allSteps.filter((s) => s.id !== step.id)
-
-  return (
-    <div className="p-4 rounded-xl border border-slate-700 bg-slate-800/50 space-y-3" data-testid={`step-form-${index}`}>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-mono text-slate-500">#{index + 1}</span>
-          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${stepTypeColors[step.type]}`}>
-            {stepTypeLabels[step.type]}
-          </span>
-        </div>
-        <div className="flex items-center gap-1">
-          <button onClick={() => onMove(-1)} disabled={isFirst} className="p-1 text-xs text-slate-400 hover:text-slate-200 disabled:opacity-30">▲</button>
-          <button onClick={() => onMove(1)} disabled={isLast} className="p-1 text-xs text-slate-400 hover:text-slate-200 disabled:opacity-30">▼</button>
-          <button onClick={onRemove} className="p-1 text-xs text-red-400 hover:text-red-300 ml-2">✕</button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-3 gap-3">
-        <div>
-          <label className="block text-xs font-medium text-slate-500 mb-1">이름 *</label>
-          <input
-            value={step.name}
-            onChange={(e) => onUpdate({ name: e.target.value })}
-            className="w-full bg-slate-800 border border-slate-600 rounded-lg px-2 py-1.5 text-sm text-slate-50 outline-none focus:border-blue-500 transition-colors"
-            placeholder="스텝 이름"
-          />
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-slate-500 mb-1">타입</label>
-          <select
-            value={step.type}
-            onChange={(e) => onUpdate({ type: e.target.value as WorkflowStep['type'] })}
-            className="w-full bg-slate-800 border border-slate-600 rounded-lg px-2 py-1.5 text-sm text-slate-300 outline-none focus:border-blue-500 transition-colors"
-          >
-            <option value="tool">Tool</option>
-            <option value="llm">LLM</option>
-            <option value="condition">Condition</option>
-          </select>
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-slate-500 mb-1">액션 *</label>
-          <input
-            value={step.action}
-            onChange={(e) => onUpdate({ action: e.target.value })}
-            className="w-full bg-slate-800 border border-slate-600 rounded-lg px-2 py-1.5 text-sm text-slate-50 outline-none focus:border-blue-500 transition-colors"
-            placeholder={step.type === 'tool' ? 'search_web' : step.type === 'llm' ? 'summarize' : 'check_result'}
-          />
-        </div>
-      </div>
-
-      {/* Type-specific fields */}
-      {step.type === 'llm' && (
-        <div>
-          <label className="block text-xs font-medium text-slate-500 mb-1">시스템 프롬프트</label>
-          <textarea
-            value={step.systemPrompt || ''}
-            onChange={(e) => onUpdate({ systemPrompt: e.target.value || undefined })}
-            rows={2}
-            className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-2 py-1.5 text-sm text-slate-50 outline-none resize-none transition-colors"
-            placeholder="LLM에게 전달할 시스템 프롬프트"
-          />
-        </div>
-      )}
-
-      {step.type === 'condition' && (
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">True Branch</label>
-            <select
-              value={step.trueBranch || ''}
-              onChange={(e) => onUpdate({ trueBranch: e.target.value || undefined })}
-              className="w-full bg-slate-800 border border-slate-600 rounded-lg px-2 py-1.5 text-sm text-slate-300 outline-none focus:border-blue-500 transition-colors"
-            >
-              <option value="">선택 없음</option>
-              {otherSteps.map((s) => (
-                <option key={s.id} value={s.id}>{s.name || s.action || s.id.slice(0, 8)}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">False Branch</label>
-            <select
-              value={step.falseBranch || ''}
-              onChange={(e) => onUpdate({ falseBranch: e.target.value || undefined })}
-              className="w-full bg-slate-800 border border-slate-600 rounded-lg px-2 py-1.5 text-sm text-slate-300 outline-none focus:border-blue-500 transition-colors"
-            >
-              <option value="">선택 없음</option>
-              {otherSteps.map((s) => (
-                <option key={s.id} value={s.id}>{s.name || s.action || s.id.slice(0, 8)}</option>
-              ))}
-            </select>
+            ) : null}
           </div>
         </div>
-      )}
 
-      {/* DependsOn */}
-      <div>
-        <label className="block text-xs font-medium text-slate-500 mb-1">의존 스텝 (dependsOn)</label>
-        <div className="flex flex-wrap gap-2">
-          {otherSteps.map((s) => {
-            const isSelected = step.dependsOn?.includes(s.id)
-            return (
-              <button
-                key={s.id}
-                onClick={() => {
-                  const current = step.dependsOn || []
-                  onUpdate({
-                    dependsOn: isSelected
-                      ? current.filter((d) => d !== s.id)
-                      : [...current, s.id],
-                  })
-                }}
-                className={`text-xs px-2 py-1 rounded-full border transition-colors ${
-                  isSelected
-                    ? 'bg-blue-600/20 border-blue-500/40 text-blue-400'
-                    : 'border-slate-600 text-slate-500 hover:border-slate-400'
-                }`}
-              >
-                {s.name || s.action || s.id.slice(0, 8)}
-              </button>
-            )
-          })}
-          {otherSteps.length === 0 && (
-            <span className="text-xs text-slate-500">다른 스텝이 없습니다</span>
-          )}
-        </div>
-      </div>
-
-      {/* Advanced: timeout, retryCount */}
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="block text-xs font-medium text-slate-500 mb-1">타임아웃 (ms)</label>
-          <input
-            type="number"
-            value={step.timeout || ''}
-            onChange={(e) => onUpdate({ timeout: e.target.value ? Number(e.target.value) : undefined })}
-            className="w-full bg-slate-800 border border-slate-600 rounded-lg px-2 py-1.5 text-sm text-slate-50 outline-none focus:border-blue-500 transition-colors"
-            placeholder="30000"
-            min={1000}
-            max={300000}
+        {deleteTarget && <DeleteConfirmModal onConfirm={() => deleteMutation.mutate(deleteTarget)} onCancel={() => setDeleteTarget(null)} />}
+        {showCreate && (
+          <WorkflowFormModal
+            workflow={editingWorkflow}
+            isPending={createMutation.isPending || updateMutation.isPending}
+            onSubmit={(data) => {
+              if (editingWorkflow) updateMutation.mutate({ id: editingWorkflow.id, ...data })
+              else createMutation.mutate(data)
+            }}
+            onClose={() => { setShowCreate(false); setEditingWorkflow(null) }}
           />
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-slate-500 mb-1">재시도 횟수</label>
-          <input
-            type="number"
-            value={step.retryCount ?? ''}
-            onChange={(e) => onUpdate({ retryCount: e.target.value ? Number(e.target.value) : undefined })}
-            className="w-full bg-slate-800 border border-slate-600 rounded-lg px-2 py-1.5 text-sm text-slate-50 outline-none focus:border-blue-500 transition-colors"
-            placeholder="0"
-            min={0}
-            max={3}
-          />
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// === Execution History ===
-
-function ExecutionHistory({
-  workflow,
-  onClose,
-}: {
-  workflow: Workflow
-  onClose: () => void
-}) {
-  const addToast = useToastStore((s) => s.addToast)
-  const qc = useQueryClient()
-  const [selectedExecution, setSelectedExecution] = useState<Execution | null>(null)
-
-  const { data: execData, isLoading } = useQuery({
-    queryKey: ['workflow-executions', workflow.id],
-    queryFn: () => api.get<{ data: Execution[]; meta: { total: number } }>(`/workspace/workflows/${workflow.id}/executions?limit=50`),
-  })
-
-  const executeMut = useMutation({
-    mutationFn: () => api.post<{ data: { executionId: string; status: string; totalDurationMs: number; stepSummaries: StepSummary[] } }>(`/workspace/workflows/${workflow.id}/execute`, {}),
-    onSuccess: (res) => {
-      const d = res.data
-      addToast({ type: d.status === 'success' ? 'success' : 'error', message: `실행 ${d.status === 'success' ? '성공' : '실패'} (${(d.totalDurationMs / 1000).toFixed(1)}초)` })
-      qc.invalidateQueries({ queryKey: ['workflow-executions', workflow.id] })
-    },
-    onError: (e: Error) => addToast({ type: 'error', message: e.message }),
-  })
-
-  const executions = execData?.data || []
-
-  if (selectedExecution) {
-    return (
-      <ExecutionDetail
-        execution={selectedExecution}
-        workflowName={workflow.name}
-        onBack={() => setSelectedExecution(null)}
-      />
-    )
-  }
-
-  return (
-    <div className="space-y-6 p-6 bg-slate-900 min-h-full" data-testid="execution-history">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-50">실행 이력</h1>
-          <p className="text-sm text-slate-500 mt-1">{workflow.name}</p>
-        </div>
-        <div className="flex gap-2">
-          <button
-            onClick={() => executeMut.mutate()}
-            disabled={executeMut.isPending}
-            className="px-4 py-2 text-sm font-medium rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition-colors disabled:opacity-50"
-          >
-            {executeMut.isPending ? '실행 중...' : '지금 실행'}
-          </button>
-          <button onClick={onClose} className="text-sm text-slate-400 hover:text-slate-200 transition-colors">
-            <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            목록으로
-          </button>
-        </div>
-      </div>
-
-      {isLoading && (
-        <div className="space-y-3">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="h-20 bg-slate-800/50 border border-slate-700 rounded-xl animate-pulse" />
-          ))}
-        </div>
-      )}
-      {!isLoading && executions.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="executions-empty">
-          <svg className="w-10 h-10 text-slate-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <h3 className="text-lg font-medium text-slate-300 mb-2">실행 이력이 없습니다</h3>
-          <p className="text-sm text-slate-500">"지금 실행" 버튼을 눌러 워크플로우를 실행해보세요.</p>
-        </div>
-      )}
-
-      <div className="space-y-2">
-        {executions.map((exec) => (
-          <button
-            key={exec.id}
-            onClick={() => setSelectedExecution(exec)}
-            className="w-full text-left p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:border-slate-600 transition-colors"
-            data-testid={`execution-card-${exec.id}`}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  exec.status === 'success'
-                    ? 'bg-emerald-500/20 text-emerald-400'
-                    : 'bg-red-500/20 text-red-400'
-                }`}>
-                  {exec.status === 'success' ? '성공' : '실패'}
-                </span>
-                <span className="text-sm text-slate-300">
-                  {exec.stepSummaries.length}개 스텝
-                </span>
-                <span className="text-sm text-slate-500">
-                  {(exec.totalDurationMs / 1000).toFixed(1)}초
-                </span>
-              </div>
-              <span className="text-xs text-slate-500">
-                {new Date(exec.createdAt).toLocaleString('ko-KR')}
-              </span>
-            </div>
-            {/* Step status mini-bar */}
-            <div className="flex gap-1 mt-2">
-              {exec.stepSummaries.map((step) => (
-                <div
-                  key={step.stepId}
-                  title={`${step.stepName}: ${step.status}`}
-                  className={`h-2 flex-1 rounded-full ${
-                    step.status === 'completed' ? 'bg-emerald-500/60'
-                    : step.status === 'failed' ? 'bg-red-500/60'
-                    : 'bg-slate-600'
-                  }`}
-                />
-              ))}
-            </div>
-          </button>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// === Execution Detail ===
-
-function ExecutionDetail({
-  execution,
-  workflowName,
-  onBack,
-}: {
-  execution: Execution
-  workflowName: string
-  onBack: () => void
-}) {
-  return (
-    <div className="space-y-6 p-6 bg-slate-900 min-h-full" data-testid="execution-detail">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-50">실행 상세</h1>
-          <p className="text-sm text-slate-500 mt-1">{workflowName}</p>
-        </div>
-        <button onClick={onBack} className="text-sm text-slate-400 hover:text-slate-200 transition-colors">
-          <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          이력으로
-        </button>
-      </div>
-
-      {/* Summary */}
-      <div className="p-4 rounded-xl border border-slate-700 bg-slate-800/50">
-        <div className="flex items-center gap-4">
-          <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-            execution.status === 'success'
-              ? 'bg-emerald-500/20 text-emerald-400'
-              : 'bg-red-500/20 text-red-400'
-          }`}>
-            {execution.status === 'success' ? '성공' : '실패'}
-          </span>
-          <span className="text-sm text-slate-400">
-            총 소요시간: {(execution.totalDurationMs / 1000).toFixed(2)}초
-          </span>
-          <span className="text-sm text-slate-500">
-            {new Date(execution.createdAt).toLocaleString('ko-KR')}
-          </span>
-        </div>
-      </div>
-
-      {/* Step Results */}
-      <div className="space-y-3">
-        <h2 className="text-lg font-semibold text-slate-100">
-          스텝 결과 ({execution.stepSummaries.length})
-        </h2>
-        {execution.stepSummaries.map((step, idx) => (
-          <div
-            key={step.stepId}
-            className={`p-4 rounded-xl border bg-slate-800/50 ${
-              step.status === 'completed'
-                ? 'border-emerald-500/30'
-                : step.status === 'failed'
-                ? 'border-red-500/30'
-                : 'border-slate-700'
-            }`}
-            data-testid={`step-result-${idx}`}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-xs font-mono text-slate-500">#{idx + 1}</span>
-                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                  step.status === 'completed'
-                    ? 'bg-emerald-500/20 text-emerald-400'
-                    : step.status === 'failed'
-                    ? 'bg-red-500/20 text-red-400'
-                    : 'bg-slate-600/50 text-slate-400'
-                }`}>
-                  {step.status === 'completed' ? '완료' : step.status === 'failed' ? '실패' : step.status}
-                </span>
-                <span className="text-sm font-medium text-slate-100">
-                  {step.stepName}
-                </span>
-              </div>
-              <span className="text-xs text-slate-500">
-                {step.durationMs >= 1000
-                  ? `${(step.durationMs / 1000).toFixed(1)}초`
-                  : `${step.durationMs}ms`}
-              </span>
-            </div>
-            {step.error && (
-              <div className="mt-2 p-2 rounded-lg bg-red-500/10 text-xs text-red-400 font-mono">
-                {step.error}
-              </div>
-            )}
-            {step.output != null && (
-              <div className="mt-2 p-2 rounded-lg bg-slate-900/50 text-xs text-slate-400 font-mono max-h-32 overflow-y-auto border border-slate-700">
-                {typeof step.output === 'string' ? step.output : JSON.stringify(step.output, null, 2)}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// === DAG Preview ===
-
-function DagPreview({ steps }: { steps: WorkflowStep[] }) {
-  const layers = useMemo(() => buildDagLayers(steps), [steps])
-
-  if (steps.length === 0) return null
-
-  return (
-    <div className="p-4 rounded-xl border border-slate-700 bg-slate-900/50" aria-label="워크플로우 DAG 미리보기" data-testid="dag-preview">
-      <h3 className="text-sm font-medium text-slate-300 mb-3">DAG 미리보기</h3>
-      <div className="space-y-2">
-        {layers.map((layer, layerIdx) => (
-          <div key={layerIdx}>
-            {layerIdx > 0 && (
-              <div className="flex justify-center py-1">
-                <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                </svg>
-              </div>
-            )}
-            <div className="flex gap-2 justify-center flex-wrap">
-              {layer.map((step) => (
-                <div
-                  key={step.id}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium border ${stepTypeColors[step.type]} ${stepTypeBorderColors[step.type]}`}
-                >
-                  <span className="opacity-60 mr-1">{stepTypeLabels[step.type]}:</span>
-                  {step.name || step.action || '(미입력)'}
-                </div>
-              ))}
-              {layer.length > 1 && (
-                <span className="self-center text-[10px] text-slate-500 ml-1">(병렬)</span>
-              )}
-            </div>
-          </div>
-        ))}
-        {layers.reduce((acc, l) => acc + l.length, 0) < steps.length && (
-          <p className="text-xs text-amber-400 text-center mt-2">
-            순환 의존성이 감지되었습니다
-          </p>
         )}
       </div>
+    )
+  }
+
+  // --- List view ---
+  const tabs: { key: Tab; label: string; count: number }[] = [
+    { key: 'list', label: 'Workflows', count: workflows.length },
+    { key: 'suggestions', label: 'Suggestions', count: suggestions.length },
+  ]
+
+  return (
+    <div className="flex h-screen w-full" style={{ fontFamily: "'Pretendard', sans-serif" }}>
+      {/* Sidebar */}
+      <div className="w-64 text-white flex flex-col h-full flex-shrink-0 z-20 shadow-lg" style={{ backgroundColor: olive }}>
+        <div className="p-6 flex items-center gap-3 border-b" style={{ borderColor: oliveActive }}>
+          <span className="material-symbols-outlined text-2xl">hub</span>
+          <h2 className="text-xl font-bold tracking-wide" style={{ fontFamily: "'Noto Serif KR', serif" }}>Workflows</h2>
+        </div>
+        <div className="p-6 flex flex-col gap-2">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="bg-white/20 w-10 h-10 rounded-full" />
+            <div className="flex flex-col">
+              <h1 className="text-base font-bold" style={{ fontFamily: "'Noto Serif KR', serif" }}>CORTHEX v2</h1>
+              <p className="text-xs" style={{ color: leafLight }}>Admin Workflow Manager</p>
+            </div>
+          </div>
+          <div className="flex flex-col gap-1 mt-4">
+            <button
+              onClick={() => setActiveTab('list')}
+              className="flex items-center gap-3 px-4 py-3 rounded-2xl shadow-inner"
+              style={{ backgroundColor: activeTab === 'list' ? oliveActive : 'transparent' }}
+              onMouseEnter={e => { if (activeTab !== 'list') e.currentTarget.style.backgroundColor = '#6a8454' }}
+              onMouseLeave={e => { if (activeTab !== 'list') e.currentTarget.style.backgroundColor = 'transparent' }}
+            >
+              <span className="material-symbols-outlined text-xl">account_tree</span>
+              <span className="text-sm font-medium">All Workflows</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('suggestions')}
+              className="flex items-center gap-3 px-4 py-3 rounded-2xl transition-colors"
+              style={{ backgroundColor: activeTab === 'suggestions' ? oliveActive : 'transparent' }}
+              onMouseEnter={e => { if (activeTab !== 'suggestions') e.currentTarget.style.backgroundColor = '#6a8454' }}
+              onMouseLeave={e => { if (activeTab !== 'suggestions') e.currentTarget.style.backgroundColor = 'transparent' }}
+            >
+              <span className="material-symbols-outlined text-xl">tips_and_updates</span>
+              <span className="text-sm font-medium">Suggestions</span>
+              {suggestions.length > 0 && (
+                <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded-full" style={{ backgroundColor: terracotta }}>{suggestions.length}</span>
+              )}
+            </button>
+          </div>
+        </div>
+        <div className="mt-auto p-6 flex flex-col gap-1 border-t" style={{ borderColor: oliveActive }}>
+          <button
+            className="flex items-center gap-3 px-4 py-3 rounded-2xl transition-colors"
+            style={{ backgroundColor: 'transparent' }}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#6a8454')}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+          >
+            <span className="material-symbols-outlined text-xl">settings</span>
+            <span className="text-sm font-medium">Settings</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col relative overflow-hidden" style={{ backgroundColor: cream }}>
+        <header className="border-b px-8 py-6" style={{ backgroundColor: '#ffffff', borderColor: sand }}>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl" style={{ fontFamily: "'Noto Serif KR', serif", color: warmBrown }}>Admin Workflows</h1>
+              <p className="text-sm mt-1" style={{ color: muted }}>Manage and monitor automation workflows</p>
+            </div>
+            <button
+              onClick={() => { setEditingWorkflow(null); setShowCreate(true) }}
+              className="text-white rounded-2xl px-5 py-2.5 text-sm font-bold shadow-lg transition-all"
+              style={{ backgroundColor: terracotta, boxShadow: '0 10px 15px -3px rgba(196,98,45,0.2)' }}
+              data-testid="create-workflow-btn"
+            >
+              + Create Workflow
+            </button>
+          </div>
+
+          <div className="flex border-b mt-8 gap-8" style={{ borderColor: sand }} data-testid="workflow-tabs">
+            {tabs.map(t => (
+              <button
+                key={t.key}
+                onClick={() => setActiveTab(t.key)}
+                className="pb-3 text-sm transition-colors"
+                style={activeTab === t.key
+                  ? { fontWeight: 700, borderBottom: `2px solid ${warmBrown}`, color: warmBrown }
+                  : { fontWeight: 500, color: muted, borderBottom: '2px solid transparent' }
+                }
+              >
+                {t.label}
+                {t.count > 0 && (
+                  <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full" style={{ backgroundColor: `${sand}80`, color: muted }}>{t.count}</span>
+                )}
+              </button>
+            ))}
+          </div>
+        </header>
+
+        <div className="flex-1 overflow-y-auto px-8 py-6">
+          <div className="max-w-2xl space-y-3">
+            {/* Workflows tab */}
+            {activeTab === 'list' && (
+              isLoading ? (
+                <div className="space-y-3" data-testid="workflows-loading">
+                  {[1, 2, 3].map(i => <div key={i} className="h-20 animate-pulse rounded-xl" style={{ backgroundColor: `${sand}80` }} />)}
+                </div>
+              ) : workflows.length === 0 ? (
+                <div className="text-center py-16" data-testid="workflows-empty">
+                  <div className="w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-3" style={{ backgroundColor: oliveBg }}>
+                    <span className="material-symbols-outlined" style={{ color: olive }}>account_tree</span>
+                  </div>
+                  <p className="text-sm font-medium" style={{ color: muted }}>No workflows yet</p>
+                  <p className="text-xs mt-1" style={{ color: lightMuted }}>Create your first workflow to get started</p>
+                </div>
+              ) : (
+                workflows.map(wf => (
+                  <div
+                    key={wf.id}
+                    onClick={() => setSelectedId(wf.id)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedId(wf.id) } }}
+                    className="border rounded-xl p-4 cursor-pointer transition-all shadow-sm hover:shadow-md"
+                    style={{ backgroundColor: '#ffffff', borderColor: sand }}
+                    data-testid={`workflow-item-${wf.id}`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-bold truncate" style={{ color: warmBrown }}>{wf.name}</h3>
+                        {wf.description && <p className="text-xs mt-0.5 truncate" style={{ color: muted }}>{wf.description}</p>}
+                        <div className="flex items-center gap-3 mt-2 text-[10px] font-mono" style={{ color: lightMuted }}>
+                          <span>{(wf.steps as WorkflowStep[]).length} steps</span>
+                          <span>{new Date(wf.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded" style={{ backgroundColor: wf.isActive ? oliveBg : 'rgba(239,68,68,0.1)', color: wf.isActive ? olive : '#ef4444' }}>
+                            {wf.isActive ? 'Active' : 'Inactive'}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 ml-3">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); openEdit(wf) }}
+                          className="text-xs min-h-[44px] px-3 flex items-center transition-colors font-medium"
+                          style={{ color: muted }}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setDeleteTarget(wf.id) }}
+                          className="text-xs min-h-[44px] px-3 flex items-center font-medium"
+                          style={{ color: '#ef4444' }}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )
+            )}
+
+            {/* Suggestions tab */}
+            {activeTab === 'suggestions' && (
+              suggestionsLoading ? (
+                <div className="space-y-3" data-testid="suggestions-loading">
+                  {[1, 2, 3].map(i => <div key={i} className="h-20 animate-pulse rounded-xl" style={{ backgroundColor: `${sand}80` }} />)}
+                </div>
+              ) : suggestions.length === 0 ? (
+                <div className="text-center py-16" data-testid="suggestions-empty">
+                  <div className="w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-3" style={{ backgroundColor: oliveBg }}>
+                    <span className="material-symbols-outlined" style={{ color: olive }}>tips_and_updates</span>
+                  </div>
+                  <p className="text-sm font-medium" style={{ color: muted }}>No pending suggestions</p>
+                  <p className="text-xs mt-1" style={{ color: lightMuted }}>Suggestions appear when repetitive tool usage patterns are detected</p>
+                </div>
+              ) : (
+                suggestions.map(sg => (
+                  <div
+                    key={sg.id}
+                    className="border rounded-xl p-4"
+                    style={{ backgroundColor: '#ffffff', borderColor: sand }}
+                    data-testid={`suggestion-item-${sg.id}`}
+                  >
+                    <p className="text-sm font-medium mb-2" style={{ color: warmBrown }}>{sg.reason}</p>
+                    <div className="flex items-center gap-2 mb-3 flex-wrap">
+                      {(sg.suggestedSteps as WorkflowStep[]).map((step, i) => (
+                        <span key={step.id} className="inline-flex items-center gap-1">
+                          <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: `${sand}80`, color: muted }}>{step.action}</span>
+                          {i < sg.suggestedSteps.length - 1 && <span className="text-xs" style={{ color: lightMuted }}>→</span>}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => acceptSuggestion.mutate(sg.id)}
+                        disabled={acceptSuggestion.isPending}
+                        className="text-white rounded-xl px-4 py-2 text-xs font-bold disabled:opacity-50 min-h-[44px]"
+                        style={{ backgroundColor: olive }}
+                      >
+                        Accept
+                      </button>
+                      <button
+                        onClick={() => rejectSuggestion.mutate(sg.id)}
+                        disabled={rejectSuggestion.isPending}
+                        className="border rounded-xl px-4 py-2 text-xs disabled:opacity-50 min-h-[44px]"
+                        style={{ borderColor: sand, color: muted }}
+                      >
+                        Reject
+                      </button>
+                      <span className="text-[10px] ml-auto font-mono" style={{ color: lightMuted }}>
+                        {new Date(sg.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              )
+            )}
+          </div>
+        </div>
+      </div>
+
+      {deleteTarget && <DeleteConfirmModal onConfirm={() => deleteMutation.mutate(deleteTarget)} onCancel={() => setDeleteTarget(null)} />}
+      {showCreate && (
+        <WorkflowFormModal
+          workflow={editingWorkflow}
+          isPending={createMutation.isPending || updateMutation.isPending}
+          onSubmit={(data) => {
+            if (editingWorkflow) updateMutation.mutate({ id: editingWorkflow.id, ...data })
+            else createMutation.mutate(data)
+          }}
+          onClose={() => { setShowCreate(false); setEditingWorkflow(null) }}
+        />
+      )}
     </div>
   )
 }

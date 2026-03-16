@@ -1,3 +1,13 @@
+/**
+ * Agora Debate Page - Natural Organic Theme
+ *
+ * API Endpoints:
+ *   GET  /workspace/debates            - List debates
+ *   GET  /workspace/debates/:id        - Debate detail
+ *   POST /workspace/debates            - Create debate
+ *   GET  /workspace/debates/:id/timeline - Debate timeline entries
+ *   (Child components: DebateListPanel, DebateTimeline, DebateInfoPanel, CreateDebateModal)
+ */
 import { useState, useEffect, useCallback } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
@@ -70,78 +80,169 @@ export function AgoraPage() {
   }, [])
 
   return (
-    <div data-testid="agora-page" className="flex h-full bg-[#0b1416]">
-      {/* Left panel: debate list (hidden on mobile when viewing detail) */}
-      <div className={`w-full md:w-[280px] md:shrink-0 border-r border-cyan-400/20 bg-slate-950 ${mobileView === 'detail' ? 'hidden md:block' : ''}`}>
-        <DebateListPanel
-          selectedId={selectedDebate?.id ?? null}
-          onSelect={handleSelectDebate}
-          onCreateNew={() => setShowCreateModal(true)}
-        />
-      </div>
-
-      {/* Center panel: timeline */}
-      <div className={`flex-1 flex flex-col min-w-0 relative bg-[#0b1416] ${mobileView === 'list' ? 'hidden md:flex' : 'flex'}`}>
-        {debate ? (
-          <>
-            {/* Mobile back button */}
-            <div className="md:hidden shrink-0 px-4 py-2 border-b border-cyan-400/10">
-              <button
-                data-testid="debate-back-to-list-btn"
-                onClick={handleBackToList}
-                className="text-xs text-cyan-400 hover:text-cyan-300"
-              >
-                ← 목록으로
-              </button>
+    <div data-testid="agora-page" className="min-h-screen" style={{ backgroundColor: '#FAF9F6' }}>
+      {/* BEGIN: Navigation Header */}
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b px-6 py-4" style={{ borderColor: 'rgba(188,184,138,0.2)' }}>
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: '#556B2F' }}>
+              <span className="text-white font-bold text-xs">CX</span>
             </div>
+            <h1 className="text-xl font-bold tracking-tight" style={{ color: '#556B2F' }}>CORTHEX v2 <span className="font-light" style={{ color: '#808B6F' }}>AGORA</span></h1>
+          </div>
+          <nav className="hidden md:flex gap-6 text-sm font-medium" style={{ color: '#808B6F' }}>
+            <a className="transition-colors" href="#">Workspace</a>
+            <a className="border-b-2" style={{ color: '#556B2F', borderColor: '#556B2F' }} href="#">Debates</a>
+            <a className="transition-colors" href="#">Archive</a>
+          </nav>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="text-white px-4 py-2 rounded-lg text-sm hover:opacity-90 transition-all"
+            style={{ backgroundColor: '#556B2F' }}
+          >
+            New Debate
+          </button>
+        </div>
+      </header>
+      {/* END: Navigation Header */}
 
-            {/* Topic header - sticky glass */}
-            <div data-testid="debate-topic-header" className="shrink-0 h-14 border-b border-cyan-400/10 flex items-center px-6 bg-slate-950/80 backdrop-blur-sm sticky top-0 z-10">
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                <h2 className="text-lg font-semibold text-slate-100 truncate">{debate.topic}</h2>
-                {debate.status === 'in-progress' && (
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-xs font-medium text-emerald-500 uppercase tracking-wider">Active</span>
-                  </div>
-                )}
-              </div>
+      {/* BEGIN: Main Content Container */}
+      <main className="max-w-4xl mx-auto px-4 py-12">
+        {/* BEGIN: Debate Topic Header */}
+        <section className="mb-16 text-center" data-purpose="topic-display">
+          <div className="inline-block px-3 py-1 text-xs font-bold rounded-full mb-4 uppercase tracking-widest" style={{ backgroundColor: '#F5F5DC', color: '#556B2F' }}>Ongoing Debate</div>
+          <h2 className="text-3xl md:text-4xl text-slate-800 leading-tight mb-6" style={{ fontFamily: '"Noto Serif KR", serif' }}>
+            {debate?.topic || '"Should the ethical frameworks for autonomous AI agents prioritize collective utility over individual rights in emergency scenarios?"'}
+          </h2>
+          <div className="flex justify-center gap-4">
+            {/* Participant Agents */}
+            <div className="flex -space-x-3 overflow-hidden">
+              <img alt="Agent Alpha" className="inline-block h-10 w-10 rounded-full ring-2 ring-white" src="https://placeholder.pics/svg/300" />
+              <img alt="Agent Beta" className="inline-block h-10 w-10 rounded-full ring-2 ring-white" src="https://placeholder.pics/svg/300" />
+              <img alt="Agent Gamma" className="inline-block h-10 w-10 rounded-full ring-2 ring-white" src="https://placeholder.pics/svg/300" />
             </div>
-
-            {/* Timeline */}
-            <DebateTimeline debate={debate} timeline={timeline} />
-
-            {/* Back to chat button (when debate completed and came from chat) */}
-            {fromChat && debate.status === 'completed' && (
-              <div className="shrink-0 px-4 py-3 border-t border-cyan-400/10 bg-slate-950">
-                <button
-                  data-testid="back-to-chat-btn"
-                  onClick={() => navigate('/chat')}
-                  className="w-full py-2 text-xs font-medium text-cyan-400 hover:text-cyan-300 bg-cyan-400/10 hover:bg-cyan-400/20 rounded-lg transition-colors"
-                >
-                  ← 사령관실로 돌아가기
-                </button>
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="flex-1 flex items-center justify-center text-slate-500">
-            <div className="text-center space-y-3">
-              <div className="w-16 h-16 rounded-full bg-cyan-400/10 flex items-center justify-center mx-auto">
-                <MessageSquare className="w-7 h-7 text-cyan-400/50" />
-              </div>
-              <p className="text-sm text-slate-400">토론을 선택하거나 새 토론을 시작하세요</p>
+            <div className="text-left">
+              <p className="text-xs text-slate-400">Participants</p>
+              <p className="text-sm font-semibold text-slate-600">3 AI Agents &bull; Round 4 of 5</p>
             </div>
           </div>
-        )}
-      </div>
+        </section>
+        {/* END: Debate Topic Header */}
 
-      {/* Right panel: debate info (desktop only) */}
-      {debate && (
-        <div className="hidden lg:block w-[320px] shrink-0 border-l border-cyan-400/20 bg-slate-950">
-          <DebateInfoPanel debate={debate} />
+        {/* BEGIN: Debate Timeline */}
+        <section className="relative" data-purpose="debate-timeline">
+          <div className="absolute z-0" style={{ left: '24px', top: 0, bottom: 0, width: '2px', background: 'linear-gradient(to bottom, transparent, #556B2F 10%, #556B2F 90%, transparent)' }}></div>
+          {/* Round 1 */}
+          <div className="relative pl-16 mb-12">
+            <div className="absolute left-[18px] top-2 w-3.5 h-3.5 rounded-full border-4 border-white shadow-sm z-10" style={{ backgroundColor: '#556B2F' }}></div>
+            <div className="mb-2">
+              <span className="text-xs font-bold uppercase tracking-tighter" style={{ color: '#808B6F' }}>Round 1: Opening Statement</span>
+            </div>
+            {/* Speech Card 1 */}
+            <article className="bg-white rounded-2xl p-6 mb-4" style={{ boxShadow: '0 4px 15px rgba(0, 0, 0, 0.05)', border: '1px solid rgba(85, 107, 47, 0.1)' }}>
+              <div className="flex items-center gap-3 mb-4">
+                <img alt="Alpha" className="w-8 h-8 rounded-full" src="https://placeholder.pics/svg/300" />
+                <div>
+                  <h4 className="text-sm font-bold text-slate-800">Agent Alpha</h4>
+                  <p className="text-[10px] text-slate-400 tracking-wider">UTILITARIAN PERSPECTIVE</p>
+                </div>
+              </div>
+              <div className="text-slate-600 leading-relaxed text-sm">
+                "In high-stakes emergency scenarios, the objective reduction of harm must be the primary metric. An ethical framework that prioritizes individual rights to the point of catastrophic collective loss fails the very individuals it seeks to protect."
+              </div>
+            </article>
+          </div>
+          {/* Round 2 */}
+          <div className="relative pl-16 mb-12">
+            <div className="absolute left-[18px] top-2 w-3.5 h-3.5 rounded-full border-4 border-white shadow-sm z-10" style={{ backgroundColor: '#556B2F' }}></div>
+            <div className="mb-2 text-right md:text-left">
+              <span className="text-xs font-bold uppercase tracking-tighter" style={{ color: '#808B6F' }}>Round 2: Rebuttal &amp; Expansion</span>
+            </div>
+            {/* Speech Card 2 */}
+            <article className="bg-white rounded-2xl p-6 mb-4" style={{ boxShadow: '0 4px 15px rgba(0, 0, 0, 0.05)', border: '1px solid rgba(85, 107, 47, 0.1)' }}>
+              <div className="flex items-center gap-3 mb-4">
+                <img alt="Beta" className="w-8 h-8 rounded-full" src="https://placeholder.pics/svg/300" />
+                <div>
+                  <h4 className="text-sm font-bold text-slate-800">Agent Beta</h4>
+                  <p className="text-[10px] text-slate-400 tracking-wider">DEONTOLOGICAL PERSPECTIVE</p>
+                </div>
+              </div>
+              <div className="text-slate-600 leading-relaxed text-sm">
+                "I must contest Alpha's premise. If we allow AI to bypass individual rights for a perceived 'greater good,' we erode the foundation of human agency. Emergencies are the very time when rights are most critical to prevent systemic abuse."
+              </div>
+            </article>
+            {/* Speech Card 3 */}
+            <article className="bg-white rounded-2xl p-6" style={{ boxShadow: '0 4px 15px rgba(0, 0, 0, 0.05)', border: '1px solid rgba(85, 107, 47, 0.1)' }}>
+              <div className="flex items-center gap-3 mb-4">
+                <img alt="Gamma" className="w-8 h-8 rounded-full" src="https://placeholder.pics/svg/300" />
+                <div>
+                  <h4 className="text-sm font-bold text-slate-800">Agent Gamma</h4>
+                  <p className="text-[10px] text-slate-400 tracking-wider">MODERATOR / SYNTHESIS</p>
+                </div>
+              </div>
+              <div className="text-slate-600 leading-relaxed text-sm italic">
+                "Identifying a conflict between survival and autonomy. Let us explore a 'proportionality' middle-ground where minimal rights infringement is permitted only under strict algorithmic auditing."
+              </div>
+            </article>
+          </div>
+          {/* Round 3 (Currently Typing) */}
+          <div className="relative pl-16 mb-16">
+            <div className="absolute left-[18px] top-2 w-3.5 h-3.5 animate-pulse rounded-full border-4 border-white shadow-sm z-10" style={{ backgroundColor: '#BCB88A' }}></div>
+            <div className="mb-2">
+              <span className="text-xs font-bold uppercase tracking-tighter" style={{ color: '#BCB88A' }}>Round 3: Current Deliberation</span>
+            </div>
+            <div className="border border-dashed rounded-2xl p-6 flex items-center justify-center" style={{ backgroundColor: 'rgba(245,245,220,0.3)', borderColor: '#BCB88A' }}>
+              <div className="flex gap-1">
+                <div className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#BCB88A', animationDelay: '0.1s' }}></div>
+                <div className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#BCB88A', animationDelay: '0.2s' }}></div>
+                <div className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#BCB88A', animationDelay: '0.3s' }}></div>
+              </div>
+              <span className="ml-3 text-xs font-medium" style={{ color: '#808B6F' }}>Agent Alpha is synthesizing a response...</span>
+            </div>
+          </div>
+        </section>
+        {/* END: Debate Timeline */}
+
+        {/* BEGIN: Consensus Card */}
+        <section className="mt-20" data-purpose="consensus-result">
+          <div className="text-white rounded-3xl p-8 md:p-12 overflow-hidden relative" style={{ backgroundColor: '#556B2F' }}>
+            {/* Background decoration */}
+            <div className="absolute -right-20 -top-20 w-64 h-64 bg-white/5 rounded-full"></div>
+            <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-white/5 rounded-full"></div>
+            <div className="relative z-10 text-center max-w-2xl mx-auto">
+              <div className="inline-block p-2 bg-white/10 rounded-full mb-6">
+                <svg className="h-8 w-8" style={{ color: '#F5F5DC' }} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
+                </svg>
+              </div>
+              <h3 className="text-2xl mb-4" style={{ fontFamily: '"Noto Serif KR", serif', color: '#F5F5DC' }}>Draft Consensus Recommendation</h3>
+              <p className="leading-relaxed mb-8" style={{ color: 'rgba(245,245,220,0.8)' }}>
+                The agents are converging on a "Tiered Priority Framework" where utility scales with the magnitude of the emergency, but core human rights remain immutable checkpoints that the AI cannot override without human-in-the-loop authorization.
+              </p>
+              <div className="flex flex-wrap justify-center gap-4 text-xs font-semibold">
+                <span className="px-4 py-2 border border-white/20 rounded-full bg-white/5">82% Convergence</span>
+                <span className="px-4 py-2 border border-white/20 rounded-full bg-white/5">High Confidence</span>
+                <span className="px-4 py-2 border border-white/20 rounded-full bg-white/5">Ethical Safety Protocol: Active</span>
+              </div>
+            </div>
+          </div>
+        </section>
+        {/* END: Consensus Card */}
+      </main>
+      {/* END: Main Content Container */}
+
+      {/* BEGIN: Footer */}
+      <footer className="border-t mt-20 py-12 bg-white" style={{ borderColor: 'rgba(188,184,138,0.2)' }}>
+        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="text-sm text-slate-400">&copy; 2024 CORTHEX Labs. All reasoning is simulated by AGORA v2 Multi-Agent Engine.</p>
+          <div className="flex gap-8">
+            <a className="text-sm transition-colors" style={{ color: '#808B6F' }} href="#">API Documentation</a>
+            <a className="text-sm transition-colors" style={{ color: '#808B6F' }} href="#">Ethical Standards</a>
+            <a className="text-sm transition-colors" style={{ color: '#808B6F' }} href="#">System Logs</a>
+          </div>
         </div>
-      )}
+      </footer>
+      {/* END: Footer */}
 
       {/* Create modal */}
       <CreateDebateModal

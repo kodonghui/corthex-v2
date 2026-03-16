@@ -1,3 +1,11 @@
+/**
+ * Tool Definition Management — Natural Organic Theme
+ *
+ * API Endpoints:
+ *   GET    /api/admin/tools/catalog
+ *   GET    /api/admin/agents?companyId=...
+ *   PATCH  /api/admin/agents/:id/allowed-tools
+ */
 import { useState, useMemo, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
@@ -14,12 +22,12 @@ const categoryLabels: Record<string, string> = {
   common: 'Common', finance: 'Finance', legal: 'Legal', marketing: 'Marketing', tech: 'Tech',
 }
 
-const categoryBadgeColors: Record<string, string> = {
-  common: 'bg-blue-500/20 text-blue-400',
-  finance: 'bg-emerald-500/20 text-emerald-400',
-  legal: 'bg-purple-500/20 text-purple-400',
-  marketing: 'bg-amber-500/20 text-amber-400',
-  tech: 'bg-cyan-500/20 text-cyan-400',
+const categoryBadgeColors: Record<string, { bg: string; text: string }> = {
+  common: { bg: 'rgba(90,114,71,0.1)', text: '#5a7247' },
+  finance: { bg: 'rgba(196,98,45,0.1)', text: '#c4622d' },
+  legal: { bg: 'rgba(212,168,67,0.1)', text: '#d4a843' },
+  marketing: { bg: 'rgba(196,98,45,0.1)', text: '#c4622d' },
+  tech: { bg: 'rgba(90,114,71,0.1)', text: '#5a7247' },
 }
 
 export function ToolsPage() {
@@ -28,6 +36,7 @@ export function ToolsPage() {
   const addToast = useToastStore((s) => s.addToast)
 
   const [activeCategory, setActiveCategory] = useState<string>('all')
+  const [searchQuery, setSearchQuery] = useState('')
   const [pendingChanges, setPendingChanges] = useState<Map<string, string[]>>(new Map())
   const [saving, setSaving] = useState(false)
 
@@ -48,18 +57,15 @@ export function ToolsPage() {
   const catalog = catalogData?.data || []
   const agents = agentData?.data || []
 
-  // All tools flat list
-  const allTools = useMemo(() => {
-    return catalog.flatMap((g) => g.tools)
-  }, [catalog])
+  const allTools = useMemo(() => catalog.flatMap((g) => g.tools), [catalog])
 
-  // Filtered tools by category
   const filteredTools = useMemo(() => {
-    if (activeCategory === 'all') return allTools
-    return allTools.filter((t) => t.category === activeCategory)
-  }, [allTools, activeCategory])
+    let tools = allTools
+    if (activeCategory !== 'all') tools = tools.filter((t) => t.category === activeCategory)
+    if (searchQuery) tools = tools.filter((t) => t.name.toLowerCase().includes(searchQuery.toLowerCase()) || t.category.toLowerCase().includes(searchQuery.toLowerCase()))
+    return tools
+  }, [allTools, activeCategory, searchQuery])
 
-  // Tools by category for batch operations
   const toolsByCategory = useMemo(() => {
     const map = new Map<string, string[]>()
     for (const group of catalog) {
@@ -68,14 +74,12 @@ export function ToolsPage() {
     return map
   }, [catalog])
 
-  // Get effective allowedTools for an agent (considering pending changes)
   const getAgentTools = useCallback((agentId: string) => {
     if (pendingChanges.has(agentId)) return pendingChanges.get(agentId)!
     const agent = agents.find((a) => a.id === agentId)
     return agent?.allowedTools || []
   }, [agents, pendingChanges])
 
-  // Count pending changes
   const changeCount = useMemo(() => {
     let count = 0
     for (const [agentId, newTools] of pendingChanges) {
@@ -88,7 +92,6 @@ export function ToolsPage() {
     return count
   }, [pendingChanges, agents])
 
-  // Toggle single tool for an agent
   const toggleTool = useCallback((agentId: string, toolName: string) => {
     const current = getAgentTools(agentId)
     const newTools = current.includes(toolName)
@@ -97,14 +100,11 @@ export function ToolsPage() {
     setPendingChanges((prev) => new Map(prev).set(agentId, newTools))
   }, [getAgentTools])
 
-  // Batch toggle category for an agent
   const toggleCategory = useCallback((agentId: string, category: string) => {
     const catTools = toolsByCategory.get(category) || []
     if (catTools.length === 0) return
-
     const current = getAgentTools(agentId)
     const allEnabled = catTools.every((t) => current.includes(t))
-
     let newTools: string[]
     if (allEnabled) {
       const removeSet = new Set(catTools)
@@ -115,7 +115,6 @@ export function ToolsPage() {
     setPendingChanges((prev) => new Map(prev).set(agentId, newTools))
   }, [getAgentTools, toolsByCategory])
 
-  // Save mutation
   const saveMutation = useMutation({
     mutationFn: async () => {
       const promises: Promise<unknown>[] = []
@@ -148,7 +147,7 @@ export function ToolsPage() {
   if (!selectedCompanyId) {
     return (
       <div className="flex items-center justify-center h-64" data-testid="no-company">
-        <p className="text-sm text-slate-400">회사를 선택하세요</p>
+        <p className="text-sm" style={{ color: '#83935d' }}>회사를 선택하세요</p>
       </div>
     )
   }
@@ -156,256 +155,264 @@ export function ToolsPage() {
   const isLoading = catalogLoading || agentsLoading
 
   return (
-    <div className="max-w-[1400px] mx-auto px-6 py-6 space-y-6" data-testid="tools-page">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">도구 관리</h1>
-          {!isLoading && (
-            <p className="text-sm text-slate-400 mt-1">{allTools.length}개 도구 · {agents.length}개 에이전트</p>
-          )}
-        </div>
-        {changeCount > 0 && (
-          <div className="flex items-center gap-3">
-            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/20 text-amber-400 border border-amber-500/30">
-              변경사항 {changeCount}건
-            </span>
-            <button
-              onClick={handleCancel}
-              className="bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
-              data-testid="cancel-btn"
-            >
-              취소
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              data-testid="save-btn"
-            >
-              {saving ? '저장 중...' : '저장'}
-            </button>
+    <div data-testid="tools-page" className="flex h-screen overflow-hidden" style={{ backgroundColor: '#faf8f5', fontFamily: "'Public Sans', sans-serif", color: '#3f3e3a' }}>
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col overflow-hidden">
+        {/* Topbar */}
+        <header className="h-16 bg-white border-b flex items-center justify-between px-8 shrink-0" style={{ borderColor: '#e5e7eb' }}>
+          <div className="flex items-center gap-2 text-slate-400">
+            <span className="text-xs font-medium" style={{ color: '#5a7247' }}>Admin Tools</span>
           </div>
-        )}
-      </div>
+          <div className="flex items-center gap-4">
+            {changeCount > 0 && (
+              <>
+                <span className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ backgroundColor: 'rgba(196,98,45,0.1)', color: '#c4622d' }}>
+                  변경사항 {changeCount}건
+                </span>
+                <button onClick={handleCancel} className="text-sm font-medium px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors" style={{ color: '#3f3e3a' }} data-testid="cancel-btn">
+                  취소
+                </button>
+                <button onClick={handleSave} disabled={saving} className="text-sm font-medium px-4 py-1.5 text-white rounded-lg transition-colors disabled:opacity-50" style={{ backgroundColor: '#5a7247' }} data-testid="save-btn">
+                  {saving ? '저장 중...' : '저장'}
+                </button>
+              </>
+            )}
+          </div>
+        </header>
 
-      {/* Category Filter Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1" data-testid="category-tabs">
-        <button
-          onClick={() => setActiveCategory('all')}
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer whitespace-nowrap ${
-            activeCategory === 'all'
-              ? 'text-white bg-blue-600'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800'
-          }`}
-        >
-          전체<span className="ml-1.5 text-xs opacity-70">({allTools.length})</span>
-        </button>
-        {CATEGORIES.map((cat) => {
-          const count = catalog.find((g) => g.category === cat)?.tools.length || 0
-          if (count === 0) return null
-          return (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer whitespace-nowrap ${
-                activeCategory === cat
-                  ? 'text-white bg-blue-600'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
-              }`}
-            >
-              {categoryLabels[cat]}
-              <span className={`ml-1.5 px-1.5 py-0.5 rounded text-xs ${categoryBadgeColors[cat]}`}>{count}</span>
-            </button>
-          )
-        })}
-      </div>
-
-      {isLoading ? (
-        <div className="space-y-4" data-testid="loading-state">
-          <div className="flex gap-2">
-            {[...Array(6)].map((_, i) => <div key={i} className="bg-slate-700 animate-pulse rounded-lg h-8 w-20" />)}
-          </div>
-          <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-8">
-            <div className="bg-slate-700 animate-pulse rounded h-40 w-full" />
-          </div>
-          <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-8">
-            <div className="bg-slate-700 animate-pulse rounded h-40 w-full" />
-          </div>
-        </div>
-      ) : allTools.length === 0 ? (
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-12 text-center" data-testid="empty-state">
-          <div className="text-4xl mb-3">🔧</div>
-          <h3 className="text-lg font-semibold text-white mb-2">등록된 도구가 없습니다</h3>
-          <p className="text-sm text-slate-400">tool_definitions 테이블에 도구를 등록하세요.</p>
-        </div>
-      ) : (
-        <>
-          {/* Tool Catalog Table */}
-          <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden" data-testid="tool-catalog">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-slate-700">
-                    <th className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 px-4 py-3">이름</th>
-                    <th className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 px-4 py-3">카테고리</th>
-                    <th className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 px-4 py-3">설명</th>
-                    <th className="text-center text-xs font-medium uppercase tracking-wider text-slate-400 px-4 py-3 w-20">상태</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredTools.map((tool) => (
-                    <tr key={tool.name} className="border-b border-slate-700/50 hover:bg-slate-800/50 transition-colors">
-                      <td className="px-4 py-3 font-mono text-sm text-slate-200">{tool.name}</td>
-                      <td className="px-4 py-3">
-                        <span className={`px-2 py-0.5 rounded text-xs font-medium ${categoryBadgeColors[tool.category] || ''}`}>
-                          {tool.category}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-slate-400 max-w-xs truncate">{tool.description}</td>
-                      <td className="px-4 py-3 text-center">
-                        {tool.registered
-                          ? <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" title="등록됨" />
-                          : <span className="inline-block w-2 h-2 rounded-full bg-slate-500" title="미등록" />
-                        }
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        {/* Page Content */}
+        <div className="flex-1 overflow-y-auto p-8">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <div>
+              <h2 className="text-3xl font-bold" style={{ color: '#3f3e3a' }}>도구 정의 관리</h2>
+              <p className="text-slate-500 mt-1">플랫폼 내 에이전트가 사용하는 외부 도구 및 API 엔드포인트를 구성합니다.</p>
             </div>
+            <button className="inline-flex items-center gap-2 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg transition-all" style={{ backgroundColor: '#5a7247', boxShadow: '0 4px 14px rgba(90,114,71,0.2)' }}>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6v12m6-6H6" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
+              <span>새 도구 추가</span>
+            </button>
           </div>
 
-          {/* Agent Permission Matrix */}
-          {agents.length > 0 && (
-            <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden" data-testid="permission-matrix">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-slate-700">
-                      <th className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 px-4 py-3 sticky left-0 z-10 bg-slate-800 min-w-[180px]">
-                        에이전트
-                      </th>
-                      {/* Category batch toggle headers */}
-                      {CATEGORIES.filter((cat) => toolsByCategory.has(cat)).map((cat) => (
-                        <th key={`cat-${cat}`} className="text-center text-[10px] font-medium text-slate-400 uppercase px-1 py-3 border-r border-slate-700/30" colSpan={1}>
-                          {categoryLabels[cat]}
-                        </th>
-                      ))}
-                      {/* Individual tool headers */}
-                      {filteredTools.map((tool) => (
-                        <th key={tool.name} className="px-2 py-3 text-center min-w-[44px]">
-                          <span className="text-xs text-slate-400 [writing-mode:vertical-lr] transform -rotate-45 inline-block origin-bottom-left whitespace-nowrap font-mono">
-                            {tool.name.length > 12 ? tool.name.slice(0, 12) + '…' : tool.name}
-                          </span>
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {agents.map((agent) => {
-                      const agentTools = getAgentTools(agent.id)
-                      const isModified = pendingChanges.has(agent.id)
-
-                      return (
-                        <tr
-                          key={agent.id}
-                          className={`border-b border-slate-700/50 transition-colors ${
-                            isModified ? 'bg-amber-500/5 hover:bg-amber-500/10' : 'hover:bg-slate-800/30'
-                          }`}
-                        >
-                          {/* Agent name cell (sticky) */}
-                          <td className="sticky left-0 z-10 bg-slate-800 px-4 py-3 whitespace-nowrap border-r border-slate-700">
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium text-white">{agent.name}</span>
-                              <span className="text-xs text-slate-500">({agent.tier?.[0]?.toUpperCase() || '?'})</span>
-                              {isModified && <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />}
-                            </div>
-                          </td>
-
-                          {/* Category batch toggle buttons */}
-                          {CATEGORIES.filter((cat) => toolsByCategory.has(cat)).map((cat) => {
-                            const catToolNames = toolsByCategory.get(cat) || []
-                            const allEnabled = catToolNames.every((t) => agentTools.includes(t))
-                            const someEnabled = catToolNames.some((t) => agentTools.includes(t))
-
-                            return (
-                              <td key={`batch-${cat}`} className="px-2 py-3 text-center border-r border-slate-700/30">
-                                <button
-                                  onClick={() => toggleCategory(agent.id, cat)}
-                                  className={`w-6 h-6 rounded border flex items-center justify-center transition-colors text-xs font-bold ${
-                                    allEnabled
-                                      ? 'bg-blue-600 border-blue-500 text-white'
-                                      : someEnabled
-                                        ? 'bg-blue-600/30 border-blue-500/50 text-blue-400'
-                                        : 'bg-slate-700 border-slate-600 text-transparent hover:border-slate-500'
-                                  }`}
-                                  title={`${categoryLabels[cat]} 전체 ${allEnabled ? '해제' : '선택'}`}
-                                >
-                                  {allEnabled ? '✓' : someEnabled ? '−' : ''}
-                                </button>
-                              </td>
-                            )
-                          })}
-
-                          {/* Individual tool checkboxes */}
-                          {filteredTools.map((tool) => {
-                            const checked = agentTools.includes(tool.name)
-                            return (
-                              <td key={tool.name} className="px-2 py-3 text-center">
-                                <button
-                                  className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
-                                    checked
-                                      ? 'bg-blue-600 border-blue-500 text-white'
-                                      : 'bg-slate-700 border-slate-600 hover:border-slate-500'
-                                  }`}
-                                  onClick={() => toggleTool(agent.id, tool.name)}
-                                  role="checkbox"
-                                  aria-checked={checked}
-                                >
-                                  {checked && (
-                                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                  )}
-                                </button>
-                              </td>
-                            )
-                          })}
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
+          {/* Filters & Search */}
+          <div className="bg-white p-4 rounded-xl border flex flex-wrap gap-4 items-center mb-6" style={{ borderColor: '#e5e7eb' }}>
+            <div className="flex-1 min-w-[240px]">
+              <div className="relative">
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
+                <input
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border-none rounded-lg focus:ring-2 text-sm"
+                  style={{ backgroundColor: '#f8f8f6', focusRingColor: 'rgba(90,114,71,0.2)' } as React.CSSProperties}
+                  placeholder="도구명 또는 카테고리 검색..."
+                  type="text"
+                />
               </div>
             </div>
-          )}
+            <div className="flex items-center gap-3" data-testid="category-tabs">
+              <select
+                value={activeCategory}
+                onChange={(e) => setActiveCategory(e.target.value)}
+                className="border-none rounded-lg py-2 pl-3 pr-8 text-sm focus:ring-2"
+                style={{ backgroundColor: '#f8f8f6' }}
+              >
+                <option value="all">전체 카테고리</option>
+                {CATEGORIES.map((cat) => (
+                  <option key={cat} value={cat}>{categoryLabels[cat]}</option>
+                ))}
+              </select>
+            </div>
+          </div>
 
-          {/* Sticky Bottom Save Bar */}
-          {changeCount > 0 && (
-            <div className="fixed bottom-0 left-0 right-0 z-20 bg-slate-900/95 backdrop-blur-sm border-t border-slate-700 px-6 py-3" data-testid="save-bar">
-              <div className="max-w-[1400px] mx-auto flex items-center justify-between">
-                <span className="text-sm text-amber-400 font-medium">변경사항 {changeCount}건</span>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={handleCancel}
-                    className="bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
-                  >
-                    취소
-                  </button>
-                  <button
-                    onClick={handleSave}
-                    disabled={saving}
-                    className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50"
-                  >
-                    {saving ? '저장 중...' : '저장'}
-                  </button>
+          {isLoading ? (
+            <div data-testid="loading-state" className="bg-white rounded-xl border p-8" style={{ borderColor: '#e5e7eb' }}>
+              <div className="animate-pulse space-y-4">
+                <div className="h-8 rounded w-1/3" style={{ backgroundColor: '#eceee3' }} />
+                <div className="h-40 rounded w-full" style={{ backgroundColor: '#eceee3' }} />
+              </div>
+            </div>
+          ) : allTools.length === 0 ? (
+            <div data-testid="empty-state" className="bg-white rounded-xl border p-12 text-center" style={{ borderColor: '#e5e7eb' }}>
+              <h3 className="text-lg font-semibold mb-2" style={{ color: '#3f3e3a' }}>등록된 도구가 없습니다</h3>
+              <p className="text-sm text-slate-500">tool_definitions 테이블에 도구를 등록하세요.</p>
+            </div>
+          ) : (
+            <>
+              {/* Tools Table */}
+              <div data-testid="tool-catalog" className="bg-white rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: '#e5e7eb' }}>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b" style={{ backgroundColor: '#f8f8f6', borderColor: '#e5e7eb' }}>
+                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">도구명</th>
+                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">카테고리</th>
+                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">범위</th>
+                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">상태</th>
+                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">관리</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y" style={{ divideColor: '#f3f4f6' }}>
+                      {filteredTools.map((tool) => {
+                        const badge = categoryBadgeColors[tool.category] || categoryBadgeColors.common
+                        return (
+                          <tr key={tool.name} className="hover:bg-[#faf8f5] transition-colors">
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded flex items-center justify-center" style={{ backgroundColor: '#f3f4f6' }}>
+                                  <svg className="w-5 h-5" style={{ color: '#5a7247' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
+                                </div>
+                                <div>
+                                  <p className="text-sm font-bold" style={{ color: '#3f3e3a' }}>{tool.name}</p>
+                                  <p className="text-xs text-slate-400">{tool.description || 'No description'}</p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" style={{ backgroundColor: badge.bg, color: badge.text }}>
+                                {tool.category}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border" style={{ backgroundColor: 'rgba(196,98,45,0.1)', color: '#c4622d', borderColor: 'rgba(196,98,45,0.2)' }}>
+                                platform
+                              </span>
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-1.5">
+                                <span className={`w-2 h-2 rounded-full ${tool.registered ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+                                <span className={`text-xs font-medium ${tool.registered ? 'text-emerald-600' : 'text-slate-400'}`}>
+                                  {tool.registered ? 'Active' : 'Inactive'}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              <div className="flex justify-end gap-2">
+                                <button className="p-1.5 hover:bg-slate-200 rounded transition-colors text-slate-500">
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
+                                </button>
+                                <button className="p-1.5 hover:bg-red-50 rounded transition-colors text-slate-400 hover:text-red-500">
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="px-6 py-4 flex items-center justify-between" style={{ backgroundColor: '#f8f8f6' }}>
+                  <p className="text-xs text-slate-500 font-medium">전체 {allTools.length}개 도구 중 {filteredTools.length} 표시</p>
+                  <div className="flex items-center gap-1">
+                    <button className="w-7 h-7 flex items-center justify-center text-white rounded-md text-xs font-bold" style={{ backgroundColor: '#5a7247' }}>1</button>
+                  </div>
                 </div>
               </div>
-            </div>
+
+              {/* Agent Permission Matrix */}
+              {agents.length > 0 && (
+                <div data-testid="permission-matrix" className="mt-6 bg-white rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: '#e5e7eb' }}>
+                  <div className="px-6 py-4 border-b" style={{ borderColor: '#e5e7eb' }}>
+                    <h3 className="text-sm font-bold" style={{ color: '#3f3e3a' }}>Agent Permission Matrix</h3>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b" style={{ borderColor: '#e5e7eb' }}>
+                          <th className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 px-4 py-3 sticky left-0 z-10 bg-white min-w-[180px]">에이전트</th>
+                          {filteredTools.map((tool) => (
+                            <th key={tool.name} className="px-2 py-3 text-center min-w-[44px]">
+                              <span className="text-xs text-slate-400 [writing-mode:vertical-lr] transform -rotate-45 inline-block origin-bottom-left whitespace-nowrap font-mono">
+                                {tool.name.length > 12 ? tool.name.slice(0, 12) + '...' : tool.name}
+                              </span>
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {agents.map((agent) => {
+                          const agentTools = getAgentTools(agent.id)
+                          const isModified = pendingChanges.has(agent.id)
+
+                          return (
+                            <tr
+                              key={agent.id}
+                              className={`border-b transition-colors ${isModified ? 'bg-amber-50' : 'hover:bg-[#faf8f5]'}`}
+                              style={{ borderColor: '#f3f4f6' }}
+                            >
+                              <td className="sticky left-0 z-10 bg-white px-4 py-3 whitespace-nowrap border-r" style={{ borderColor: '#e5e7eb' }}>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm font-medium" style={{ color: '#3f3e3a' }}>{agent.name}</span>
+                                  <span className="text-xs text-slate-500">({agent.tier?.[0]?.toUpperCase() || '?'})</span>
+                                  {isModified && <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#c4622d' }} />}
+                                </div>
+                              </td>
+                              {filteredTools.map((tool) => {
+                                const checked = agentTools.includes(tool.name)
+                                return (
+                                  <td key={tool.name} className="px-2 py-3 text-center">
+                                    <button
+                                      className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
+                                        checked
+                                          ? 'text-white'
+                                          : 'hover:border-slate-400'
+                                      }`}
+                                      style={{
+                                        backgroundColor: checked ? '#5a7247' : '#f3f4f6',
+                                        borderColor: checked ? '#5a7247' : '#d1d5db',
+                                      }}
+                                      onClick={() => toggleTool(agent.id, tool.name)}
+                                      role="checkbox"
+                                      aria-checked={checked}
+                                    >
+                                      {checked && (
+                                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                      )}
+                                    </button>
+                                  </td>
+                                )
+                              })}
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* Sticky Bottom Save Bar */}
+              {changeCount > 0 && (
+                <div className="fixed bottom-0 left-0 right-0 z-20 bg-white/95 backdrop-blur-sm border-t px-6 py-3" style={{ borderColor: '#e5e7eb' }} data-testid="save-bar">
+                  <div className="max-w-7xl mx-auto flex items-center justify-between">
+                    <span className="text-sm font-medium" style={{ color: '#c4622d' }}>변경사항 {changeCount}건</span>
+                    <div className="flex items-center gap-3">
+                      <button onClick={handleCancel} className="bg-slate-100 hover:bg-slate-200 rounded-lg px-4 py-2 text-sm font-medium transition-colors" style={{ color: '#3f3e3a' }}>
+                        취소
+                      </button>
+                      <button onClick={handleSave} disabled={saving} className="text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50" style={{ backgroundColor: '#5a7247' }}>
+                        {saving ? '저장 중...' : '저장'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* API Reference */}
+              <div className="mt-8 p-4 rounded-xl border" style={{ backgroundColor: 'rgba(90,114,71,0.05)', borderColor: 'rgba(90,114,71,0.2)' }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <h4 className="text-sm font-bold" style={{ color: '#5a7247' }}>API Endpoints Reference</h4>
+                </div>
+                <code className="text-[11px] font-mono" style={{ color: 'rgba(90,114,71,0.8)' }}>
+                  GET/POST/PATCH/DELETE /api/admin/tools
+                </code>
+              </div>
+            </>
           )}
-        </>
-      )}
+        </div>
+      </main>
     </div>
   )
 }

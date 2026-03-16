@@ -3,7 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuthStore } from '../stores/auth-store'
 import { api } from '../lib/api'
 import { RateLimitError } from '../lib/api'
-import { Mail, Lock, ArrowRight, Bot, Eye, EyeOff } from 'lucide-react'
+
+/* API: POST /api/auth/login */
 
 export function LoginPage() {
   const [username, setUsername] = useState('')
@@ -52,116 +53,106 @@ export function LoginPage() {
     }
   }
 
-  const [showPassword, setShowPassword] = useState(false)
-
   return (
-    <div className="bg-slate-950 min-h-screen flex items-center justify-center relative overflow-hidden font-display">
-      {/* Subtle radial gradient background */}
-      <div className="absolute inset-0 pointer-events-none flex justify-center items-center">
-        <div className="w-[800px] h-[800px] bg-cyan-400/5 rounded-full blur-[120px]" />
-      </div>
-
-      <div className="relative w-full max-w-[400px] p-8 bg-slate-900 border border-slate-800 rounded-[16px] shadow-2xl z-10 mx-4">
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#faf8f5', fontFamily: "'Pretendard', sans-serif" }}>
+      {/* API: POST /api/auth/login */}
+      <main className="w-full max-w-md">
         {/* Header */}
-        <div className="flex flex-col items-center mb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-white mb-2">CORTHEX</h1>
-          <p className="text-sm font-medium text-slate-400">AI 조직 관리 플랫폼</p>
-        </div>
+        <header className="text-center mb-8">
+          <div
+            className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full mb-4"
+            style={{ boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05)' }}
+          >
+            <span className="text-2xl font-bold" style={{ color: '#5a7247', fontFamily: "'Noto Serif KR', serif" }}>C</span>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-800" style={{ fontFamily: "'Noto Serif KR', serif" }}>CORTHEX v2</h1>
+          <p className="text-gray-500 mt-2">자연스러운 연결의 시작</p>
+        </header>
 
-        {/* Form */}
-        <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-slate-300" htmlFor="login-email">이메일</label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 pointer-events-none" />
+        {/* Login Form Card */}
+        <section
+          className="bg-white rounded-2xl p-8"
+          style={{ boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05)' }}
+        >
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            {/* Username Field */}
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700" htmlFor="username">사용자 아이디</label>
               <input
-                className="w-full h-11 pl-10 pr-4 bg-slate-950 border border-slate-700 rounded-lg text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-cyan-400 focus:border-cyan-400 transition-colors text-sm"
-                id="login-email"
-                placeholder="이메일을 입력하세요"
+                className="w-full px-4 py-3 rounded-xl border-gray-200 transition-colors duration-200"
+                id="username"
+                placeholder="아이디를 입력하세요"
                 required
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 autoComplete="username"
+                style={{ borderColor: '#e5e7eb' }}
               />
             </div>
-          </div>
 
-          <div className="flex flex-col gap-2">
-            <div className="flex justify-between items-center">
-              <label className="text-sm font-medium text-slate-300" htmlFor="login-password">비밀번호</label>
-              <button type="button" className="text-xs font-medium text-cyan-400 hover:text-cyan-300 transition-colors">
-                비밀번호를 잊으셨나요?
-              </button>
-            </div>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 pointer-events-none" />
+            {/* Password Field */}
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700" htmlFor="password">비밀번호</label>
               <input
-                className="w-full h-11 pl-10 pr-10 bg-slate-950 border border-slate-700 rounded-lg text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-cyan-400 focus:border-cyan-400 transition-colors text-sm"
-                id="login-password"
+                className="w-full px-4 py-3 rounded-xl border-gray-200 transition-colors duration-200"
+                id="password"
                 placeholder="비밀번호를 입력하세요"
                 required
-                type={showPassword ? 'text' : 'password'}
+                type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
               />
+            </div>
+
+            {/* Error Message */}
+            {error && (
+              <div className="p-3 rounded-lg text-sm" style={{ backgroundColor: 'rgba(196, 98, 45, 0.05)', border: '1px solid rgba(196, 98, 45, 0.2)', color: '#c4622d' }}>
+                <p>{error}</p>
+              </div>
+            )}
+
+            {/* Login Button */}
+            <div className="pt-2">
               <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
-                aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
+                className="w-full text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform active:scale-[0.98] shadow-md disabled:opacity-50"
+                type="submit"
+                disabled={loading || countdown > 0}
+                style={{ backgroundColor: '#5a7247' }}
               >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {countdown > 0
+                  ? `${countdown}초 후 재시도`
+                  : loading
+                    ? '로그인 중...'
+                    : '로그인'}
               </button>
             </div>
-          </div>
 
-          {error && (
-            <p className="text-sm text-red-400">{error}</p>
-          )}
-
-          <button
-            className="w-full h-11 mt-2 bg-cyan-400 hover:bg-cyan-300 disabled:opacity-50 text-slate-900 font-bold rounded-lg transition-colors flex items-center justify-center gap-2"
-            type="submit"
-            disabled={loading || countdown > 0}
-          >
-            <span>
-              {countdown > 0
-                ? `${countdown}초 후 재시도`
-                : loading
-                  ? '로그인 중...'
-                  : '로그인'}
-            </span>
-            {!loading && countdown <= 0 && <ArrowRight className="w-5 h-5" />}
-          </button>
-        </form>
-
-        {/* Divider */}
-        <div className="flex items-center my-6">
-          <div className="flex-grow h-px bg-slate-800" />
-          <span className="px-3 text-xs font-medium text-slate-400">또는</span>
-          <div className="flex-grow h-px bg-slate-800" />
-        </div>
-
-        {/* OAuth */}
-        <button
-          className="w-full h-11 bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-200 font-medium rounded-lg transition-colors flex items-center justify-center gap-3"
-          type="button"
-        >
-          <Bot className="w-5 h-5 text-[#D97757]" />
-          <span>Claude로 로그인</span>
-        </button>
+            {/* Links */}
+            <div className="flex items-center justify-between text-xs text-gray-500 pt-2">
+              <label className="flex items-center space-x-2 cursor-pointer">
+                <input className="rounded border-gray-300" type="checkbox" style={{ color: '#5a7247' }} />
+                <span>아이디 저장</span>
+              </label>
+              <div className="space-x-3">
+                <a className="hover:text-gray-700 transition-colors" href="#">아이디 찾기</a>
+                <span className="text-gray-300">|</span>
+                <a className="hover:text-gray-700 transition-colors" href="#">비밀번호 찾기</a>
+              </div>
+            </div>
+          </form>
+        </section>
 
         {/* Footer */}
-        <p className="mt-8 text-center text-xs text-slate-400">
-          계속 진행함으로써 CORTHEX의{' '}
-          <a className="text-slate-300 hover:text-cyan-400 transition-colors underline decoration-slate-700 underline-offset-2" href="#">이용약관</a>
-          {' '}및{' '}
-          <a className="text-slate-300 hover:text-cyan-400 transition-colors underline decoration-slate-700 underline-offset-2" href="#">개인정보처리방침</a>
-          에 동의합니다.
-        </p>
-      </div>
+        <footer className="mt-8 text-center text-sm text-gray-400">
+          <p>© 2024 CORTHEX. All rights reserved.</p>
+          <div className="mt-2 space-x-4">
+            <a className="hover:underline" href="#">개인정보처리방침</a>
+            <a className="hover:underline" href="#">이용약관</a>
+          </div>
+        </footer>
+      </main>
     </div>
   )
 }

@@ -1,3 +1,10 @@
+// API Endpoints:
+// GET  /workspace/operation-log?page=&limit=&search=&startDate=&endDate=&type=&status=&sortBy=&bookmarkedOnly=
+// GET  /workspace/operation-log/:id
+// POST /workspace/operation-log/bookmarks  { commandId }
+// DELETE /workspace/operation-log/bookmarks/:id
+// GET  /workspace/operation-log/export?search=&startDate=&endDate=&type=&status=&sortBy=
+
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
@@ -57,20 +64,20 @@ const TYPE_LABELS: Record<string, string> = {
   deepwork: '심화',
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  completed: 'bg-emerald-500/20 text-emerald-400',
-  processing: 'bg-blue-500/20 text-blue-400',
-  pending: 'bg-amber-500/20 text-amber-400',
-  failed: 'bg-red-500/20 text-red-400',
-  cancelled: 'bg-slate-700 text-slate-400',
-}
-
 const STATUS_LABELS: Record<string, string> = {
   completed: '완료',
   processing: '진행중',
   pending: '대기',
   failed: '실패',
   cancelled: '취소',
+}
+
+const STATUS_BADGE_STYLES: Record<string, { dotColor: string; bgColor: string; textColor: string; borderColor: string; label: string }> = {
+  completed: { dotColor: '#10b981', bgColor: 'rgba(16,185,129,0.08)', textColor: '#10b981', borderColor: 'rgba(16,185,129,0.2)', label: 'Success' },
+  processing: { dotColor: '#3b82f6', bgColor: 'rgba(59,130,246,0.08)', textColor: '#3b82f6', borderColor: 'rgba(59,130,246,0.2)', label: 'Running' },
+  pending: { dotColor: '#f59e0b', bgColor: 'rgba(245,158,11,0.08)', textColor: '#f59e0b', borderColor: 'rgba(245,158,11,0.2)', label: 'Pending' },
+  failed: { dotColor: '#ef4444', bgColor: 'rgba(239,68,68,0.08)', textColor: '#ef4444', borderColor: 'rgba(239,68,68,0.2)', label: 'Critical' },
+  cancelled: { dotColor: '#d1c9b2', bgColor: 'rgba(209,201,178,0.1)', textColor: '#9c8d66', borderColor: 'rgba(209,201,178,0.3)', label: 'Cancelled' },
 }
 
 const SORT_OPTIONS: { value: string; label: string }[] = [
@@ -103,9 +110,9 @@ function formatCost(micro: number | null | undefined) {
 }
 
 function scoreColor(score: number): string {
-  if (score >= 4) return 'bg-emerald-500'
-  if (score >= 3) return 'bg-amber-500'
-  return 'bg-red-500'
+  if (score >= 4) return '#10b981'
+  if (score >= 3) return '#f59e0b'
+  return '#ef4444'
 }
 
 function useDebounce(value: string, delay: number) {
@@ -134,6 +141,36 @@ function downloadCsv(data: Record<string, unknown>[], filename: string) {
   a.download = filename
   a.click()
   URL.revokeObjectURL(url)
+}
+
+// === Status Badge ===
+
+function StatusBadge({ status }: { status: string }) {
+  const info = STATUS_BADGE_STYLES[status] || { dotColor: '#d1c9b2', bgColor: 'rgba(209,201,178,0.1)', textColor: '#9c8d66', borderColor: 'rgba(209,201,178,0.3)', label: status }
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded uppercase tracking-tighter"
+      style={{ backgroundColor: info.bgColor, color: info.textColor, border: `1px solid ${info.borderColor}` }}
+    >
+      <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: info.dotColor }} />
+      {info.label}
+    </span>
+  )
+}
+
+// === Quality Bar ===
+
+function QualityBar({ score }: { score: number | null }) {
+  if (score == null) return <span className="text-xs" style={{ color: '#9c8d66' }}>-</span>
+  const pct = Math.round(score * 20)
+  return (
+    <div className="flex items-center gap-1.5 min-w-[80px]">
+      <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: '#e5e1d3' }}>
+        <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: scoreColor(score) }} />
+      </div>
+      <span className="text-[10px] w-6 text-right" style={{ color: '#9c8d66' }}>{score.toFixed(1)}</span>
+    </div>
+  )
 }
 
 // === Main Page ===
@@ -291,7 +328,6 @@ export function OpsLogPage() {
       await navigator.clipboard.writeText(text)
       toast.success('명령이 복사되었습니다')
     } catch {
-      // fallback
       const ta = document.createElement('textarea')
       ta.value = text
       document.body.appendChild(ta)
@@ -302,118 +338,109 @@ export function OpsLogPage() {
     }
   }, [])
 
-  const selectInputClass = 'bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-300 outline-none'
+  const inputStyle: React.CSSProperties = {
+    backgroundColor: '#fbfaf8',
+    borderColor: '#e5e1d3',
+    color: '#463e30',
+  }
 
   return (
-    <div className="h-full flex flex-col bg-slate-950" data-testid="ops-log-page">
+    <div
+      data-testid="ops-log-page"
+      className="font-sans min-h-screen flex flex-col"
+      style={{ backgroundColor: '#faf8f5', color: '#463e30', fontFamily: "'Inter', sans-serif" }}
+    >
       {/* Header */}
-      <div className="px-4 md:px-10 py-4 border-b border-slate-800 flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold leading-tight tracking-tight text-slate-50">Ops Log (작전일지)</h1>
-        <div className="flex items-center gap-2">
-          {selectedIds.size === 2 && (
+      <header className="border-b px-8 py-6" style={{ backgroundColor: '#ffffff', borderColor: '#e5e1d3' }}>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <h1 className="text-3xl" style={{ fontFamily: "'Noto Serif KR', serif", color: '#463e30' }}>Ops Log</h1>
+            <p className="text-sm mt-1" style={{ color: '#9c8d66' }}>Operation history and performance tracking.</p>
+          </div>
+          <div className="flex items-center gap-3">
+            {selectedIds.size === 2 && (
+              <button
+                onClick={() => setCompareOpen(true)}
+                className="px-4 py-2 text-sm font-bold rounded transition-colors"
+                style={{ backgroundColor: '#5a7247', color: '#ffffff' }}
+                data-testid="compare-btn"
+              >
+                비교
+              </button>
+            )}
             <button
-              onClick={() => setCompareOpen(true)}
-              className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-bold"
-              data-testid="compare-btn"
+              onClick={handleExport}
+              className="flex items-center gap-2 px-4 py-2 border rounded text-sm font-medium transition-colors"
+              style={{ backgroundColor: '#f2f0e9', borderColor: '#e5e1d3', color: '#6a5d43' }}
+              data-testid="export-btn"
             >
-              비교
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
+              내보내기
             </button>
-          )}
-          <button
-            onClick={handleExport}
-            className="flex items-center justify-center rounded-lg border border-cyan-400 text-cyan-400 hover:bg-cyan-400/10 transition-colors h-10 px-4 text-sm font-bold gap-2"
-            data-testid="export-btn"
-          >
-            내보내기 (Export)
-          </button>
+          </div>
         </div>
-      </div>
+      </header>
 
       {/* KPI Stats Cards */}
-      <div className="px-4 md:px-10 pt-6 pb-2">
+      <div className="px-8 pt-6 pb-2">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="flex flex-col gap-2 rounded-xl p-6 bg-slate-900/80 border border-slate-800 shadow-sm">
-            <p className="text-slate-400 text-sm font-medium uppercase tracking-wider">Daily Operations</p>
-            <div className="flex items-baseline gap-3">
-              <p className="text-3xl font-bold font-mono tabular-nums text-slate-50">{total}</p>
-            </div>
+          <div className="bg-white rounded-2xl p-6 border" style={{ borderColor: '#e5e1d3', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }}>
+            <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#9c8d66' }}>Daily Operations</p>
+            <p className="text-3xl font-bold font-mono tabular-nums" style={{ color: '#463e30' }}>{total}</p>
           </div>
-          <div className="flex flex-col gap-2 rounded-xl p-6 bg-slate-900/80 border border-slate-800 shadow-sm">
-            <p className="text-slate-400 text-sm font-medium uppercase tracking-wider">Average Quality Score</p>
-            <div className="flex items-baseline gap-3">
-              <p className="text-3xl font-bold font-mono tabular-nums text-emerald-400">
-                {items.length > 0
-                  ? (items.reduce((sum, i) => sum + (i.qualityScore ?? 0), 0) / items.filter(i => i.qualityScore != null).length || 0).toFixed(1)
-                  : '-'}
-                <span className="text-slate-500 text-xl">/5</span>
-              </p>
-            </div>
+          <div className="bg-white rounded-2xl p-6 border" style={{ borderColor: '#e5e1d3', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }}>
+            <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#9c8d66' }}>Avg Quality Score</p>
+            <p className="text-3xl font-bold font-mono tabular-nums" style={{ color: '#5a7247' }}>
+              {items.length > 0
+                ? (items.reduce((sum, i) => sum + (i.qualityScore ?? 0), 0) / items.filter(i => i.qualityScore != null).length || 0).toFixed(1)
+                : '-'}
+              <span className="text-xl" style={{ color: '#9c8d66' }}>/5</span>
+            </p>
           </div>
-          <div className="flex flex-col gap-2 rounded-xl p-6 bg-slate-900/80 border border-slate-800 shadow-sm">
-            <p className="text-slate-400 text-sm font-medium uppercase tracking-wider">Total Operational Cost</p>
-            <div className="flex items-baseline gap-3">
-              <p className="text-3xl font-bold font-mono tabular-nums text-slate-50">
-                {items.length > 0
-                  ? formatCost(items.reduce((sum, i) => sum + (i.totalCostMicro ?? 0), 0))
-                  : '-'}
-              </p>
-            </div>
+          <div className="bg-white rounded-2xl p-6 border" style={{ borderColor: '#e5e1d3', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }}>
+            <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#9c8d66' }}>Total Op Cost</p>
+            <p className="text-3xl font-bold font-mono tabular-nums" style={{ color: '#463e30' }}>
+              {items.length > 0
+                ? formatCost(items.reduce((sum, i) => sum + (i.totalCostMicro ?? 0), 0))
+                : '-'}
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Mobile severity filter chips */}
-      <div className="sm:hidden flex gap-2 px-4 py-3 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border-b border-slate-800" data-testid="mobile-severity-chips">
-        {[
-          { value: '', label: '전체', dot: '' },
-          { value: 'failed', label: '에러', dot: 'bg-red-500' },
-          { value: 'pending', label: '경고', dot: 'bg-amber-500' },
-          { value: 'processing', label: '정보', dot: 'bg-blue-500' },
-          { value: 'completed', label: '완료', dot: 'bg-emerald-500' },
-        ].map((chip) => (
-          <button
-            key={chip.value}
-            onClick={() => { setStatusFilter(chip.value); setPage(1) }}
-            className={`flex shrink-0 h-8 items-center justify-center rounded-full px-4 text-sm font-medium transition-colors ${
-              statusFilter === chip.value
-                ? 'bg-cyan-400/20 border border-cyan-400 text-cyan-400'
-                : 'bg-slate-900 border border-transparent text-slate-300 hover:bg-slate-800'
-            }`}
-          >
-            <span className="flex items-center gap-1.5">
-              {chip.dot && <span className={`w-2 h-2 rounded-full ${chip.dot} inline-block`} />}
-              {chip.label}
-            </span>
-          </button>
-        ))}
-      </div>
-
-      {/* Desktop filters */}
-      <div className="hidden sm:flex px-4 md:px-10 py-3 border-b border-slate-800 flex-wrap gap-2 items-center" data-testid="filters-row">
-        <input
-          placeholder="검색..."
-          value={searchInput}
-          onChange={(e) => { setSearchInput(e.target.value); setPage(1) }}
-          className="bg-slate-900 border border-slate-700 focus:border-cyan-400 rounded-lg px-3 py-1.5 text-sm w-48 text-slate-50 placeholder:text-slate-500 outline-none"
-          data-testid="search-input"
-        />
+      {/* Filters Row */}
+      <div className="px-8 py-3 border-b flex flex-wrap gap-2 items-center" style={{ borderColor: '#e5e1d3' }} data-testid="filters-row">
+        <div className="relative">
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#b7aa88' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" strokeWidth="2" /><path d="m21 21-4.35-4.35" strokeLinecap="round" strokeWidth="2" /></svg>
+          <input
+            placeholder="검색..."
+            value={searchInput}
+            onChange={(e) => { setSearchInput(e.target.value); setPage(1) }}
+            className="pl-10 pr-4 py-2 border rounded text-sm w-48 transition-all focus:ring-1"
+            style={{ ...inputStyle, outline: 'none' }}
+            data-testid="search-input"
+          />
+        </div>
         <input
           type="date"
           value={startDate}
           onChange={(e) => { setStartDate(e.target.value); setPage(1) }}
-          className={selectInputClass}
+          className="py-2 px-3 border rounded text-sm"
+          style={inputStyle}
         />
-        <span className="text-sm text-slate-500">~</span>
+        <span className="text-sm" style={{ color: '#9c8d66' }}>~</span>
         <input
           type="date"
           value={endDate}
           onChange={(e) => { setEndDate(e.target.value); setPage(1) }}
-          className={selectInputClass}
+          className="py-2 px-3 border rounded text-sm"
+          style={inputStyle}
         />
         <select
           value={typeFilter}
           onChange={(e) => { setTypeFilter(e.target.value); setPage(1) }}
-          className={selectInputClass}
+          className="py-2 px-3 border rounded text-sm"
+          style={inputStyle}
         >
           <option value="">전체 유형</option>
           {Object.entries(TYPE_LABELS).map(([k, v]) => (
@@ -423,7 +450,8 @@ export function OpsLogPage() {
         <select
           value={statusFilter}
           onChange={(e) => { setStatusFilter(e.target.value); setPage(1) }}
-          className={selectInputClass}
+          className="py-2 px-3 border rounded text-sm"
+          style={inputStyle}
         >
           <option value="">전체 상태</option>
           {Object.entries(STATUS_LABELS).map(([k, v]) => (
@@ -433,7 +461,8 @@ export function OpsLogPage() {
         <select
           value={sortBy}
           onChange={(e) => { setSortBy(e.target.value); setPage(1) }}
-          className={selectInputClass}
+          className="py-2 px-3 border rounded text-sm"
+          style={inputStyle}
         >
           {SORT_OPTIONS.map(opt => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -441,31 +470,33 @@ export function OpsLogPage() {
         </select>
         <button
           onClick={() => { setBookmarkedOnly(!bookmarkedOnly); setPage(1) }}
-          className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${
-            bookmarkedOnly
-              ? 'bg-amber-500/20 border-amber-500/50 text-amber-400'
-              : 'border-slate-700 text-slate-400 hover:bg-slate-800'
-          }`}
+          className="text-sm px-3 py-2 rounded border transition-colors"
+          style={bookmarkedOnly
+            ? { backgroundColor: 'rgba(196,98,45,0.1)', borderColor: 'rgba(196,98,45,0.3)', color: '#c4622d' }
+            : { backgroundColor: 'transparent', borderColor: '#e5e1d3', color: '#9c8d66' }
+          }
           data-testid="bookmark-filter"
         >
-          ★ 북마크
+          &#9733; 북마크
         </button>
       </div>
 
       {/* Filter chips */}
       {filterChips.length > 0 && (
-        <div className="px-4 md:px-10 py-2 border-b border-slate-800/50 flex flex-wrap gap-1.5">
+        <div className="px-8 py-2 border-b flex flex-wrap gap-1.5" style={{ borderColor: '#e5e1d350' }}>
           {filterChips.map(chip => (
             <span
               key={chip.key}
-              className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] bg-blue-500/10 text-blue-400 rounded-full"
+              className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] rounded-full"
+              style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: '#5a7247' }}
             >
               {chip.label}
               <button
                 onClick={chip.onRemove}
-                className="text-blue-300 hover:text-blue-200 ml-0.5"
+                className="ml-0.5 hover:opacity-70"
+                style={{ color: '#5a7247' }}
               >
-                ×
+                &times;
               </button>
             </span>
           ))}
@@ -475,7 +506,8 @@ export function OpsLogPage() {
               setTypeFilter(''); setStatusFilter(''); setBookmarkedOnly(false)
               setPage(1)
             }}
-            className="text-[11px] text-slate-500 hover:text-slate-300 px-2 py-1"
+            className="text-[11px] px-2 py-1 hover:opacity-70"
+            style={{ color: '#9c8d66' }}
           >
             전체 초기화
           </button>
@@ -484,179 +516,144 @@ export function OpsLogPage() {
 
       {/* Selection info */}
       {selectedIds.size > 0 && (
-        <div className="px-4 md:px-10 py-2 bg-blue-600/10 border-b border-blue-500/20 flex items-center justify-between">
-          <span className="text-xs text-blue-400">
+        <div className="px-8 py-2 border-b flex items-center justify-between" style={{ backgroundColor: 'rgba(90,114,71,0.06)', borderColor: 'rgba(90,114,71,0.15)' }}>
+          <span className="text-xs" style={{ color: '#5a7247' }}>
             {selectedIds.size}개 선택됨 {selectedIds.size < 2 && '(비교하려면 2개를 선택하세요)'}
           </span>
           <button
             onClick={() => setSelectedIds(new Set())}
-            className="text-xs text-blue-400 hover:text-blue-300"
+            className="text-xs hover:opacity-70"
+            style={{ color: '#5a7247' }}
           >
             선택 해제
           </button>
         </div>
       )}
 
-      {/* Table (desktop) + Card list (mobile) */}
-      <div className="flex-1 overflow-auto px-4 md:px-10 py-3" data-testid="ops-table">
+      {/* Main Content: Timeline / Table */}
+      <section className="flex-1 overflow-auto p-8" data-testid="ops-table">
         {listQuery.isLoading ? (
-          <div className="space-y-3" data-testid="ops-loading">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="h-10 bg-slate-900 animate-pulse rounded-lg" />
+          <div className="max-w-5xl mx-auto space-y-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-20 rounded-2xl animate-pulse" style={{ backgroundColor: '#f2f0e9' }} />
             ))}
           </div>
         ) : items.length === 0 ? (
           <div className="text-center py-16" data-testid="ops-empty">
-            <div className="text-4xl mb-3">📋</div>
-            <p className="text-sm text-slate-400">보고된 작전이 없습니다</p>
-            <p className="text-xs text-slate-500 mt-1">사령관실에서 명령을 내리면 작전일지가 기록됩니다.</p>
+            <p className="text-sm font-medium mb-2" style={{ color: '#9c8d66' }}>보고된 작전이 없습니다</p>
+            <p className="text-xs mb-4" style={{ color: '#b7aa88' }}>허브에서 명령을 내리면 작전일지가 기록됩니다.</p>
             <button
-              onClick={() => navigate('/command-center')}
-              className="mt-4 bg-cyan-400 hover:bg-cyan-400/90 text-slate-900 rounded-lg px-4 py-2 text-sm font-bold"
+              onClick={() => navigate('/hub')}
+              className="px-4 py-2 text-sm text-white rounded-lg font-medium hover:opacity-90 transition-colors"
+              style={{ backgroundColor: '#5a7247' }}
             >
-              사령관실로 이동
+              허브로 이동
             </button>
           </div>
         ) : (
-          <>
-            {/* Mobile card view */}
-            <div className="sm:hidden flex flex-col gap-2" data-testid="ops-mobile-cards">
-              {items.map(item => {
-                const severityColor = item.status === 'failed' ? 'bg-red-500'
-                  : item.status === 'pending' ? 'bg-amber-500'
-                  : item.status === 'processing' ? 'bg-blue-500'
-                  : item.status === 'completed' ? 'bg-emerald-500'
-                  : 'bg-slate-500'
-                return (
-                  <div
-                    key={item.id}
-                    className="flex gap-0 bg-slate-900 border border-slate-800 rounded-lg overflow-hidden relative cursor-pointer active:bg-slate-800/50"
-                    onClick={() => setDetailId(item.id)}
-                    data-testid={`ops-card-${item.id}`}
-                  >
-                    <div className={`w-1 shrink-0 ${severityColor}`} />
-                    <div className="flex flex-col flex-1 py-3 px-3">
-                      <div className="flex justify-between items-start mb-1">
-                        <StatusBadge status={item.status} />
-                        <span className="font-mono tabular-nums text-xs text-slate-400">{formatTime(item.createdAt)}</span>
-                      </div>
-                      {item.targetAgentName && (
-                        <p className="text-slate-400 text-xs font-medium mb-1">{item.targetAgentName}</p>
-                      )}
-                      <p className="font-mono text-slate-200 text-sm leading-tight break-all line-clamp-2">{item.text}</p>
-                      <div className="flex items-center gap-3 mt-2">
-                        <span className="bg-slate-800 text-slate-300 text-[10px] px-1.5 py-0.5 rounded">{TYPE_LABELS[item.type] || item.type}</span>
-                        <span className="font-mono tabular-nums text-[10px] text-slate-500">{formatDuration(item.durationMs)}</span>
-                        {item.qualityScore != null && (
-                          <div className="flex-1 max-w-[60px]">
-                            <QualityBar score={item.qualityScore} />
-                          </div>
-                        )}
-                        <button
-                          className={`text-sm ml-auto ${item.isBookmarked ? 'text-amber-400' : 'text-slate-500'}`}
-                          onClick={e => handleBookmarkToggle(item, e)}
-                        >
-                          {item.isBookmarked ? '★' : '☆'}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
+          <div className="max-w-5xl mx-auto">
+            {/* Timeline list */}
+            <div className="relative">
+              {/* Vertical timeline line */}
+              <div className="absolute left-5 top-0 bottom-0 w-px" style={{ backgroundColor: '#e5e1d3' }} />
 
-            {/* Desktop table */}
-            <div className="hidden sm:block overflow-hidden rounded-xl border border-slate-800 bg-slate-900/80 shadow-md overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-slate-900/50 border-b border-slate-800">
-                    <th className="px-4 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-8">
-                      <span className="sr-only">선택</span>
-                    </th>
-                    <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-[180px]">Time</th>
-                    <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-[80px]">Agent</th>
-                    <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Operation</th>
-                    <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Target</th>
-                    <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-[120px]">Quality</th>
-                    <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-[120px]">Cost</th>
-                    <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-[140px]">Status</th>
-                    <th className="px-4 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-8">★</th>
-                    <th className="px-4 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-8">
-                      <span className="sr-only">메뉴</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-800">
-                  {items.map(item => (
-                    <tr
+              <div className="space-y-4">
+                {items.map(item => {
+                  const statusInfo = STATUS_BADGE_STYLES[item.status] || STATUS_BADGE_STYLES.cancelled
+                  return (
+                    <article
                       key={item.id}
-                      className="hover:bg-slate-800/30 cursor-pointer transition-colors group"
                       onClick={() => setDetailId(item.id)}
+                      className="relative flex gap-4 pl-12 cursor-pointer group"
                       data-testid={`ops-row-${item.id}`}
                     >
-                      <td className="px-4 py-4" onClick={e => e.stopPropagation()}>
-                        <input
-                          type="checkbox"
-                          checked={selectedIds.has(item.id)}
-                          onChange={() => toggleSelect(item.id)}
-                          disabled={!selectedIds.has(item.id) && selectedIds.size >= 2}
-                          className="w-3.5 h-3.5 rounded border-slate-600 accent-cyan-400"
-                        />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-mono tabular-nums text-slate-300">{formatTime(item.createdAt)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="h-8 w-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-cyan-400">
-                          {(item.targetAgentName || '??').slice(0, 2).toUpperCase()}
+                      {/* Timeline dot */}
+                      <div
+                        className="absolute left-3.5 top-6 w-3 h-3 rounded-full border-4"
+                        style={{ backgroundColor: statusInfo.dotColor, borderColor: '#faf8f5' }}
+                      />
+
+                      <div
+                        className="flex-1 bg-white p-5 rounded-2xl border transition-all group-hover:border-l-4"
+                        style={{
+                          borderColor: '#e5e1d3',
+                          boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                          borderLeftColor: selectedIds.has(item.id) ? '#5a7247' : undefined,
+                        }}
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="flex items-center gap-2">
+                            {/* Checkbox for comparison */}
+                            <input
+                              type="checkbox"
+                              checked={selectedIds.has(item.id)}
+                              onChange={(e) => { e.stopPropagation(); toggleSelect(item.id) }}
+                              disabled={!selectedIds.has(item.id) && selectedIds.size >= 2}
+                              className="w-3.5 h-3.5 rounded accent-[#5a7247]"
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                            <StatusBadge status={item.status} />
+                            <span className="text-[10px] px-2 py-0.5 rounded font-medium uppercase tracking-wider" style={{ backgroundColor: '#f2f0e9', color: '#6a5d43' }}>
+                              {TYPE_LABELS[item.type] || item.type}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-mono tabular-nums" style={{ color: '#9c8d66' }}>{formatTime(item.createdAt)}</span>
+                            <button
+                              className="text-sm hover:scale-110 transition-transform"
+                              style={{ color: item.isBookmarked ? '#c4622d' : '#d1c9b2' }}
+                              onClick={(e) => handleBookmarkToggle(item, e)}
+                            >
+                              {item.isBookmarked ? '\u2605' : '\u2606'}
+                            </button>
+                          </div>
                         </div>
-                      </td>
-                      <td className="px-6 py-4 text-sm font-medium text-slate-200">{TYPE_LABELS[item.type] || item.type}</td>
-                      <td className="px-6 py-4 text-sm text-slate-400 font-mono truncate max-w-[200px]" title={item.text}>{item.text}</td>
-                      <td className="px-6 py-4 text-sm font-mono tabular-nums text-slate-300">
-                        {item.qualityScore != null ? `${item.qualityScore.toFixed(1)}/5` : '-'}
-                      </td>
-                      <td className="px-6 py-4 text-sm font-mono tabular-nums text-slate-300">{formatCost(item.totalCostMicro)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <StatusBadge status={item.status} />
-                      </td>
-                      <td className="px-4 py-4 text-center" onClick={e => handleBookmarkToggle(item, e)}>
-                        <button className={`text-sm hover:scale-110 transition-transform ${item.isBookmarked ? 'text-amber-400' : 'text-slate-500'}`}>
-                          {item.isBookmarked ? '★' : '☆'}
-                        </button>
-                      </td>
-                      <td className="px-4 py-4 text-center" onClick={e => e.stopPropagation()}>
-                        <RowMenu
-                          onReplay={() => handleReplay(item.text)}
-                          onCopy={() => handleCopy(item.text)}
-                        />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+
+                        {item.targetAgentName && (
+                          <p className="text-xs font-medium mb-1" style={{ color: '#5a7247' }}>{item.targetAgentName}</p>
+                        )}
+                        <p className="text-sm leading-relaxed line-clamp-2 mb-3" style={{ color: '#463e30' }}>{item.text}</p>
+
+                        <div className="flex items-center gap-4">
+                          <span className="font-mono tabular-nums text-xs" style={{ color: '#9c8d66' }}>{formatDuration(item.durationMs)}</span>
+                          <span className="font-mono tabular-nums text-xs" style={{ color: '#9c8d66' }}>{formatCost(item.totalCostMicro)}</span>
+                          {item.qualityScore != null && (
+                            <div className="flex-1 max-w-[100px]">
+                              <QualityBar score={item.qualityScore} />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </article>
+                  )
+                })}
+              </div>
             </div>
-          </>
+          </div>
         )}
-      </div>
+      </section>
 
       {/* Pagination */}
       {total > 0 && (
-        <div className="px-4 md:px-10 py-3 border-t border-slate-800 flex items-center justify-between" data-testid="pagination">
-          <span className="text-xs text-slate-500">{total.toLocaleString()}건</span>
+        <div className="px-8 py-3 border-t flex items-center justify-between" style={{ borderColor: '#e5e1d3', backgroundColor: '#ffffff' }} data-testid="pagination">
+          <span className="text-xs" style={{ color: '#9c8d66' }}>{total.toLocaleString()}건</span>
           <div className="flex items-center gap-2">
             <button
               disabled={page <= 1}
               onClick={() => setPage(p => p - 1)}
-              className="border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-300 disabled:opacity-30 hover:bg-slate-800"
+              className="border rounded px-3 py-1.5 text-xs disabled:opacity-30 hover:opacity-70 transition-colors"
+              style={{ borderColor: '#e5e1d3', color: '#6a5d43' }}
             >
               이전
             </button>
-            <span className="text-xs text-slate-400">
+            <span className="text-xs" style={{ color: '#9c8d66' }}>
               {page} / {totalPages}
             </span>
             <button
               disabled={page >= totalPages}
               onClick={() => setPage(p => p + 1)}
-              className="border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-300 disabled:opacity-30 hover:bg-slate-800"
+              className="border rounded px-3 py-1.5 text-xs disabled:opacity-30 hover:opacity-70 transition-colors"
+              style={{ borderColor: '#e5e1d3', color: '#6a5d43' }}
             >
               다음
             </button>
@@ -683,88 +680,29 @@ export function OpsLogPage() {
 
       {/* Replay Confirm */}
       {replayConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-6 w-96">
-            <h3 className="text-sm font-semibold text-slate-100 mb-2">명령 리플레이</h3>
-            <p className="text-xs text-slate-400 mb-4">동일 명령을 다시 실행합니다. 결과가 다를 수 있습니다.</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setReplayConfirm(null)} />
+          <div className="relative bg-white border rounded-2xl shadow-2xl p-6 w-96" style={{ borderColor: '#e5e1d3' }}>
+            <h3 className="text-sm font-semibold mb-2" style={{ color: '#463e30', fontFamily: "'Noto Serif KR', serif" }}>명령 리플레이</h3>
+            <p className="text-xs mb-4" style={{ color: '#9c8d66' }}>동일 명령을 다시 실행합니다. 결과가 다를 수 있습니다.</p>
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setReplayConfirm(null)}
-                className="border border-slate-600 rounded-lg px-4 py-2 text-sm text-slate-300 hover:bg-slate-700"
+                className="border rounded-lg px-4 py-2 text-sm hover:opacity-70 transition-colors"
+                style={{ borderColor: '#e5e1d3', color: '#6a5d43' }}
               >
                 취소
               </button>
               <button
                 onClick={confirmReplay}
-                className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium"
+                className="rounded-lg px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-colors"
+                style={{ backgroundColor: '#5a7247' }}
               >
                 실행
               </button>
             </div>
           </div>
         </div>
-      )}
-    </div>
-  )
-}
-
-// === Sub-components ===
-
-function StatusBadge({ status }: { status: string }) {
-  const colorMap: Record<string, string> = {
-    completed: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
-    processing: 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
-    pending: 'bg-amber-500/10 text-amber-400 border border-amber-500/20',
-    failed: 'bg-red-500/10 text-red-400 border border-red-500/20',
-    cancelled: 'bg-slate-700 text-slate-400 border border-slate-600',
-  }
-  const colorClass = colorMap[status] || 'bg-slate-700 text-slate-400 border border-slate-600'
-  const label = STATUS_LABELS[status] || status
-  return <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${colorClass}`}>{label}</span>
-}
-
-function QualityBar({ score }: { score: number | null }) {
-  if (score == null) return <span className="text-xs text-slate-500">-</span>
-  const pct = Math.round(score * 20) // 0-5 scale -> 0-100%
-  return (
-    <div className="flex items-center gap-1.5 min-w-[80px]">
-      <div className="flex-1 h-1.5 bg-slate-700 rounded-full overflow-hidden">
-        <div className={`h-full rounded-full ${scoreColor(score)}`} style={{ width: `${pct}%` }} />
-      </div>
-      <span className="text-[10px] text-slate-500 w-6 text-right">{score.toFixed(1)}</span>
-    </div>
-  )
-}
-
-function RowMenu({ onReplay, onCopy }: { onReplay: () => void; onCopy: () => void }) {
-  const [open, setOpen] = useState(false)
-
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setOpen(!open)}
-        className="text-slate-500 hover:text-slate-300 px-1"
-      >
-        ⋮
-      </button>
-      {open && (
-        <>
-          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full z-20 bg-slate-800 border border-slate-700 rounded-xl shadow-xl py-1 min-w-[100px]">
-            <button
-              onClick={() => { onReplay(); setOpen(false) }}
-              className="w-full text-left px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-700"
-            >
-              리플레이
-            </button>
-            <button
-              onClick={() => { onCopy(); setOpen(false) }}
-              className="w-full text-left px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-700"
-            >
-              복사
-            </button>
-          </div>
-        </>
       )}
     </div>
   )
@@ -790,18 +728,20 @@ function DetailModal({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
       <div
-        className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-6"
+        className="relative bg-white border rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-6"
+        style={{ borderColor: '#e5e1d3' }}
         onClick={e => e.stopPropagation()}
         data-testid="detail-modal"
       >
         {isLoading || !detail ? (
           <div className="py-8 space-y-3">
-            <div className="h-4 w-1/3 bg-slate-700 animate-pulse rounded" />
-            <div className="h-20 bg-slate-700 animate-pulse rounded-xl" />
+            <div className="h-4 w-1/3 rounded animate-pulse" style={{ backgroundColor: '#f2f0e9' }} />
+            <div className="h-20 rounded-xl animate-pulse" style={{ backgroundColor: '#f2f0e9' }} />
             <div className="grid grid-cols-4 gap-3">
-              {[1,2,3,4].map(i => <div key={i} className="h-14 bg-slate-700 animate-pulse rounded-lg" />)}
+              {[1,2,3,4].map(i => <div key={i} className="h-14 rounded-lg animate-pulse" style={{ backgroundColor: '#f2f0e9' }} />)}
             </div>
           </div>
         ) : (
@@ -809,19 +749,21 @@ function DetailModal({
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h3 className="text-sm font-semibold text-slate-100 mb-1">작전 상세</h3>
-                <p className="text-[11px] text-slate-500">{formatTime(detail.createdAt)}</p>
+                <h3 className="text-sm font-semibold mb-1" style={{ color: '#463e30', fontFamily: "'Noto Serif KR', serif" }}>작전 상세</h3>
+                <p className="text-[11px]" style={{ color: '#9c8d66' }}>{formatTime(detail.createdAt)}</p>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => onCopy(detail.text)}
-                  className="border border-slate-600 text-slate-400 rounded-lg px-3 py-1.5 text-xs hover:bg-slate-700"
+                  className="border rounded-lg px-3 py-1.5 text-xs hover:opacity-70"
+                  style={{ borderColor: '#e5e1d3', color: '#6a5d43' }}
                 >
                   복사
                 </button>
                 <button
                   onClick={() => onReplay(detail.text)}
-                  className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-3 py-1.5 text-xs"
+                  className="rounded-lg px-3 py-1.5 text-xs text-white hover:opacity-90"
+                  style={{ backgroundColor: '#5a7247' }}
                 >
                   리플레이
                 </button>
@@ -829,9 +771,9 @@ function DetailModal({
             </div>
 
             {/* Command text */}
-            <div className="mb-4 bg-slate-900/70 rounded-xl p-4">
-              <p className="text-xs font-medium text-slate-500 mb-1">명령</p>
-              <p className="text-sm text-slate-200">{detail.text}</p>
+            <div className="mb-4 rounded-xl p-4" style={{ backgroundColor: '#fbfaf8', border: '1px solid #e5e1d3' }}>
+              <p className="text-xs font-medium mb-1" style={{ color: '#9c8d66' }}>명령</p>
+              <p className="text-sm" style={{ color: '#463e30' }}>{detail.text}</p>
             </div>
 
             {/* Metadata */}
@@ -844,16 +786,18 @@ function DetailModal({
 
             {/* Quality */}
             {detail.qualityScore != null && (
-              <div className="mb-4 border border-slate-700 rounded-xl p-4">
-                <p className="text-xs font-medium text-slate-500 mb-2">품질 평가</p>
+              <div className="mb-4 border rounded-xl p-4" style={{ borderColor: '#e5e1d3' }}>
+                <p className="text-xs font-medium mb-2" style={{ color: '#9c8d66' }}>품질 평가</p>
                 <div className="flex items-center gap-3">
                   <QualityBar score={detail.qualityScore} />
                   {detail.qualityConclusion && (
-                    <span className={`text-xs px-2 py-0.5 rounded ${
-                      detail.qualityConclusion === 'pass'
-                        ? 'bg-emerald-500/20 text-emerald-400'
-                        : 'bg-red-500/20 text-red-400'
-                    }`}>
+                    <span
+                      className="text-xs px-2 py-0.5 rounded font-bold uppercase"
+                      style={detail.qualityConclusion === 'pass'
+                        ? { backgroundColor: 'rgba(16,185,129,0.1)', color: '#10b981' }
+                        : { backgroundColor: 'rgba(239,68,68,0.1)', color: '#ef4444' }
+                      }
+                    >
                       {detail.qualityConclusion === 'pass' ? 'PASS' : 'FAIL'}
                     </span>
                   )}
@@ -864,8 +808,8 @@ function DetailModal({
             {/* Result */}
             {detail.result && (
               <div className="mb-4">
-                <p className="text-xs font-medium text-slate-500 mb-2">결과</p>
-                <div className="border border-slate-700 rounded-xl p-4 max-h-[300px] overflow-y-auto">
+                <p className="text-xs font-medium mb-2" style={{ color: '#9c8d66' }}>결과</p>
+                <div className="border rounded-xl p-4 max-h-[300px] overflow-y-auto" style={{ borderColor: '#e5e1d3' }}>
                   <MarkdownRenderer content={detail.result} />
                 </div>
               </div>
@@ -873,9 +817,9 @@ function DetailModal({
 
             {/* Bookmark note */}
             {detail.isBookmarked && detail.bookmarkNote && (
-              <div className="mb-4 bg-amber-500/10 border border-amber-500/30 rounded-xl p-4">
-                <p className="text-xs font-medium text-amber-400 mb-1">★ 북마크 메모</p>
-                <p className="text-xs text-amber-300">{detail.bookmarkNote}</p>
+              <div className="mb-4 rounded-xl p-4" style={{ backgroundColor: 'rgba(196,98,45,0.06)', border: '1px solid rgba(196,98,45,0.2)' }}>
+                <p className="text-xs font-medium mb-1" style={{ color: '#c4622d' }}>&#9733; 북마크 메모</p>
+                <p className="text-xs" style={{ color: '#c4622d' }}>{detail.bookmarkNote}</p>
               </div>
             )}
           </div>
@@ -887,9 +831,9 @@ function DetailModal({
 
 function MetaCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-slate-900/70 rounded-lg p-3">
-      <p className="text-[10px] text-slate-500 mb-0.5">{label}</p>
-      <p className="text-xs font-medium text-slate-300">{value}</p>
+    <div className="rounded-lg p-3" style={{ backgroundColor: '#fbfaf8', border: '1px solid #e5e1d3' }}>
+      <p className="text-[10px] mb-0.5" style={{ color: '#9c8d66' }}>{label}</p>
+      <p className="text-xs font-medium" style={{ color: '#463e30' }}>{value}</p>
     </div>
   )
 }
@@ -910,15 +854,17 @@ function CompareModal({
   const [a, b] = items
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
       <div
-        className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6"
+        className="relative bg-white border rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6"
+        style={{ borderColor: '#e5e1d3' }}
         onClick={e => e.stopPropagation()}
         data-testid="compare-modal"
       >
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-slate-100">A/B 비교</h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-200">✕</button>
+          <h3 className="text-sm font-semibold" style={{ color: '#463e30', fontFamily: "'Noto Serif KR', serif" }}>A/B 비교</h3>
+          <button onClick={onClose} className="hover:opacity-70" style={{ color: '#9c8d66' }}>&times;</button>
         </div>
 
         {/* Comparison bars */}
@@ -950,19 +896,18 @@ function CompareBar({
   format: (v: number | null) => string
 }) {
   return (
-    <div className="border border-slate-700 rounded-xl p-4">
-      <p className="text-[10px] text-slate-500 mb-2 text-center">{label}</p>
+    <div className="border rounded-xl p-4" style={{ borderColor: '#e5e1d3' }}>
+      <p className="text-[10px] mb-2 text-center" style={{ color: '#9c8d66' }}>{label}</p>
       <div className="flex items-center justify-center gap-3">
-        <span className="text-xs font-bold text-blue-400">{format(valueA)}</span>
-        <span className="text-[10px] text-slate-500">vs</span>
-        <span className="text-xs font-bold text-emerald-400">{format(valueB)}</span>
+        <span className="text-xs font-bold" style={{ color: '#5a7247' }}>{format(valueA)}</span>
+        <span className="text-[10px]" style={{ color: '#9c8d66' }}>vs</span>
+        <span className="text-xs font-bold" style={{ color: '#c4622d' }}>{format(valueB)}</span>
       </div>
     </div>
   )
 }
 
 function ComparePanel({ item, label }: { item: OperationLogItem; label: string }) {
-  // Fetch full detail for result
   const detailQuery = useQuery({
     queryKey: ['operation-log-detail', item.id],
     queryFn: () => api.get<DetailResponse>(`/workspace/operation-log/${item.id}`),
@@ -971,26 +916,32 @@ function ComparePanel({ item, label }: { item: OperationLogItem; label: string }
   const detail = detailQuery.data?.data
 
   return (
-    <div className="border border-slate-700 rounded-xl overflow-hidden">
-      <div className="bg-slate-900/70 px-3 py-2 border-b border-slate-700">
+    <div className="border rounded-xl overflow-hidden" style={{ borderColor: '#e5e1d3' }}>
+      <div className="px-3 py-2 border-b" style={{ backgroundColor: '#fbfaf8', borderColor: '#e5e1d3' }}>
         <div className="flex items-center gap-2">
-          <span className={`text-xs px-2 py-0.5 rounded ${
-            label === 'A' ? 'bg-blue-500/20 text-blue-400' : 'bg-emerald-500/20 text-emerald-400'
-          }`}>{label}</span>
-          <span className="text-[11px] text-slate-500">{formatTime(item.createdAt)}</span>
+          <span
+            className="text-xs px-2 py-0.5 rounded font-bold"
+            style={label === 'A'
+              ? { backgroundColor: 'rgba(90,114,71,0.1)', color: '#5a7247' }
+              : { backgroundColor: 'rgba(196,98,45,0.1)', color: '#c4622d' }
+            }
+          >
+            {label}
+          </span>
+          <span className="text-[11px]" style={{ color: '#9c8d66' }}>{formatTime(item.createdAt)}</span>
         </div>
-        <p className="text-xs text-slate-300 mt-1 truncate">{item.text}</p>
+        <p className="text-xs mt-1 truncate" style={{ color: '#463e30' }}>{item.text}</p>
       </div>
       <div className="p-3 max-h-[400px] overflow-y-auto">
         {detailQuery.isLoading ? (
           <div className="space-y-2">
-            <div className="h-3 w-3/4 bg-slate-700 animate-pulse rounded" />
-            <div className="h-3 w-1/2 bg-slate-700 animate-pulse rounded" />
+            <div className="h-3 w-3/4 rounded animate-pulse" style={{ backgroundColor: '#f2f0e9' }} />
+            <div className="h-3 w-1/2 rounded animate-pulse" style={{ backgroundColor: '#f2f0e9' }} />
           </div>
         ) : detail?.result ? (
           <MarkdownRenderer content={detail.result} />
         ) : (
-          <p className="text-xs text-slate-500">결과 없음</p>
+          <p className="text-xs" style={{ color: '#9c8d66' }}>결과 없음</p>
         )}
       </div>
     </div>

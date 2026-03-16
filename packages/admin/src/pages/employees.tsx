@@ -1,3 +1,15 @@
+/**
+ * Admin Employees (Employee Assignment) — Natural Organic Theme
+ *
+ * API Endpoints:
+ *   GET    /admin/employees?companyId={id}&page=N&limit=N&search=&departmentId=&isActive=
+ *   POST   /admin/employees?companyId={id}
+ *   PUT    /admin/employees/{id}?companyId={id}
+ *   DELETE /admin/employees/{id}?companyId={id}
+ *   POST   /admin/employees/{id}/reactivate?companyId={id}
+ *   POST   /admin/employees/{id}/reset-password?companyId={id}
+ *   GET    /admin/departments?companyId={id}
+ */
 import { useState, useCallback, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
@@ -28,6 +40,11 @@ type CreateResponse = {
 type ResetPasswordResponse = {
   data: { newPassword: string }
 }
+
+/* Natural Organic colors */
+const olive = '#5a7247'
+const oliveBg = 'rgba(90,114,71,0.1)'
+const cream = '#faf8f5'
 
 export function EmployeesPage() {
   const qc = useQueryClient()
@@ -180,250 +197,187 @@ export function EmployeesPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-6 space-y-6" data-testid="employees-page">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">직원 관리</h1>
-          <p className="text-sm text-slate-400 mt-1">{pagination ? `${pagination.total}명의 직원` : '직원 목록'}</p>
-        </div>
-        <button
-          onClick={() => setShowInvite(true)}
-          className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors flex items-center gap-2"
-          data-testid="invite-btn"
-        >
-          <span>+</span> 직원 초대
-        </button>
-      </div>
-
-      {/* Search + Filters */}
-      <div className="space-y-3" data-testid="filters">
-        <div className="relative">
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input
-            value={search}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            placeholder="이름 또는 이메일로 검색..."
-            className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg pl-10 pr-3 py-2.5 text-sm text-white placeholder-slate-500"
-            data-testid="search-input"
-          />
-        </div>
-
-        {/* Active status filter */}
-        <div className="flex items-center gap-2">
-          {[
-            { label: '전체', value: '' },
-            { label: '활성', value: 'true' },
-            { label: '비활성', value: 'false' },
-          ].map((f) => (
-            <button
-              key={f.value}
-              onClick={() => { setActiveFilter(f.value); setPage(1) }}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-                activeFilter === f.value
-                  ? 'text-white bg-blue-600'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
-              }`}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Department filter */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <button
-            onClick={() => { setDepartmentFilter(''); setPage(1) }}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-              departmentFilter === ''
-                ? 'text-white bg-blue-600'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
-            }`}
-          >
-            전체 부서
-          </button>
-          {departments.map((d) => (
-            <button
-              key={d.id}
-              onClick={() => { setDepartmentFilter(d.id); setPage(1) }}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-                departmentFilter === d.id
-                  ? 'text-white bg-blue-600'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
-              }`}
-            >
-              {d.name}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Employee Table */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden" data-testid="employee-table">
-        {isLoading ? (
-          <div className="p-5">
-            <SkeletonTable rows={5} />
-          </div>
-        ) : employees.length === 0 ? (
-          <EmptyState
-            title={departmentFilter || debouncedSearch ? '조건에 맞는 직원이 없습니다' : '아직 등록된 직원이 없습니다'}
-            description={departmentFilter || debouncedSearch ? '검색어나 필터를 변경해보세요.' : '직원 초대 버튼을 눌러 첫 번째 직원을 등록하세요.'}
-            action={
-              !departmentFilter && !debouncedSearch ? (
+    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: cream, fontFamily: "'Public Sans', sans-serif" }}>
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden" data-testid="employees-page">
+        {/* Content Area */}
+        <div className="flex-1 overflow-hidden flex flex-col p-8 gap-6">
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Employee Assignment</h2>
+                <p className="text-slate-500 dark:text-slate-400">{pagination ? `${pagination.total}명의 직원` : 'Drag and drop users to assign them to their specific departments.'}</p>
+              </div>
+              <div className="flex items-center gap-4">
                 <button
                   onClick={() => setShowInvite(true)}
-                  className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                  className="flex items-center gap-2 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md"
+                  style={{ backgroundColor: olive, boxShadow: '0 4px 6px -1px rgba(90,114,71,0.2)' }}
+                  data-testid="invite-btn"
                 >
-                  + 직원 초대
+                  <span className="material-symbols-outlined text-sm">person_add</span>
+                  Invite Employee
                 </button>
-              ) : undefined
-            }
-          />
-        ) : (
-          <>
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-slate-700">
-                  <th className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 px-4 py-3">이름</th>
-                  <th className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 px-4 py-3">아이디</th>
-                  <th className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 px-4 py-3">이메일</th>
-                  <th className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 px-4 py-3">부서</th>
-                  <th className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 px-4 py-3">상태</th>
-                  <th className="text-right text-xs font-medium uppercase tracking-wider text-slate-400 px-4 py-3">관리</th>
-                </tr>
-              </thead>
-              <tbody>
-                {employees.map((emp) => (
-                  <tr key={emp.id} className="border-b border-slate-700/50 hover:bg-slate-800/50 transition-colors">
-                    <td className="px-4 py-3 text-sm font-medium text-white">{emp.name}</td>
-                    <td className="px-4 py-3 text-sm text-slate-400 font-mono">@{emp.username}</td>
-                    <td className="px-4 py-3 text-sm text-slate-400">{emp.email || '—'}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap gap-1">
-                        {emp.departments.length > 0 ? emp.departments.map((d) => (
-                          <span
-                            key={d.id}
-                            className="px-2 py-0.5 rounded text-xs font-medium bg-blue-500/20 text-blue-400"
-                          >
-                            {d.name}
-                          </span>
-                        )) : (
-                          <span className="text-xs text-slate-500">미배정</span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                        emp.isActive
-                          ? 'bg-emerald-500/20 text-emerald-400'
-                          : 'bg-red-500/20 text-red-400'
-                      }`}>
-                        {emp.isActive ? '활성' : '비활성'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => {
-                            setEditTarget(emp)
-                            setEditForm({
-                              name: emp.name,
-                              email: emp.email || '',
-                              departmentIds: emp.departments.map((d) => d.id),
-                            })
-                          }}
-                          className="text-xs text-slate-400 hover:text-white px-2 py-1 rounded hover:bg-slate-700 transition-colors"
-                        >
-                          수정
-                        </button>
-                        <button
-                          onClick={() => setResetPasswordTarget(emp)}
-                          className="text-xs text-slate-400 hover:text-white px-2 py-1 rounded hover:bg-slate-700 transition-colors"
-                        >
-                          비밀번호 초기화
-                        </button>
-                        {emp.isActive ? (
-                          <button
-                            onClick={() => setDeactivateTarget(emp)}
-                            className="text-xs text-red-400 hover:text-red-300 px-2 py-1 rounded hover:bg-red-500/10 transition-colors"
-                          >
-                            비활성화
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => setReactivateTarget(emp)}
-                            className="text-xs text-emerald-400 hover:text-emerald-300 px-2 py-1 rounded hover:bg-emerald-500/10 transition-colors"
-                          >
-                            재활성화
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            {/* Pagination */}
-            {pagination && pagination.totalPages > 1 && (
-              <div className="flex items-center justify-between px-4 py-3 border-t border-slate-700" data-testid="pagination">
-                <span className="text-sm text-slate-400">
-                  {pagination.total}명 중 {(pagination.page - 1) * pagination.limit + 1}-{Math.min(pagination.page * pagination.limit, pagination.total)}명
-                </span>
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                    className="px-3 py-1.5 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                  >
-                    이전
-                  </button>
-                  {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
-                    .filter((p) => p === 1 || p === pagination.totalPages || Math.abs(p - page) <= 1)
-                    .reduce<(number | 'ellipsis')[]>((acc, p, idx, arr) => {
-                      if (idx > 0 && p - (arr[idx - 1] as number) > 1) acc.push('ellipsis')
-                      acc.push(p)
-                      return acc
-                    }, [])
-                    .map((item, idx) =>
-                      item === 'ellipsis' ? (
-                        <span key={`e-${idx}`} className="text-slate-500 px-1">…</span>
-                      ) : (
-                        <button
-                          key={item}
-                          onClick={() => setPage(item)}
-                          className={`w-8 h-8 rounded-lg text-sm flex items-center justify-center transition-colors ${
-                            page === item
-                              ? 'text-white bg-blue-600'
-                              : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                          }`}
-                        >
-                          {item}
-                        </button>
-                      ),
-                    )}
-                  <button
-                    onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
-                    disabled={page === pagination.totalPages}
-                    className="px-3 py-1.5 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                  >
-                    다음
-                  </button>
-                </div>
               </div>
-            )}
-          </>
-        )}
+            </div>
+          </div>
+
+          {/* Search + Filters */}
+          <div className="space-y-3" data-testid="filters">
+            <div className="relative">
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+              <input
+                value={search}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                placeholder="Global search for employees, IDs, or logs..."
+                className="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-xl pl-10 pr-4 py-2 text-sm transition-all"
+                style={{ outlineColor: olive }}
+                data-testid="search-input"
+                type="text"
+              />
+            </div>
+
+            {/* Active status filter */}
+            <div className="flex items-center gap-2">
+              {[
+                { label: '전체', value: '' },
+                { label: '활성', value: 'true' },
+                { label: '비활성', value: 'false' },
+              ].map((f) => (
+                <button
+                  key={f.value}
+                  onClick={() => { setActiveFilter(f.value); setPage(1) }}
+                  className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer"
+                  style={activeFilter === f.value
+                    ? { backgroundColor: olive, color: 'white' }
+                    : { color: '#64748b' }
+                  }
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Department filter */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                onClick={() => { setDepartmentFilter(''); setPage(1) }}
+                className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer"
+                style={departmentFilter === ''
+                  ? { backgroundColor: olive, color: 'white' }
+                  : { color: '#64748b' }
+                }
+              >
+                전체 부서
+              </button>
+              {departments.map((d) => (
+                <button
+                  key={d.id}
+                  onClick={() => { setDepartmentFilter(d.id); setPage(1) }}
+                  className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer"
+                  style={departmentFilter === d.id
+                    ? { backgroundColor: olive, color: 'white' }
+                    : { color: '#64748b' }
+                  }
+                >
+                  {d.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Assignment Grid */}
+          <div className="flex-1 flex gap-6 overflow-hidden">
+            {/* Left Column: Unassigned Users */}
+            <div className="w-1/3 flex flex-col bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+              <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                <h3 className="font-bold flex items-center gap-2">
+                  <span className="material-symbols-outlined" style={{ color: olive }}>person_search</span>
+                  Unassigned Users
+                  <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: oliveBg, color: olive }}>
+                    {employees.filter((e) => e.departments.length === 0).length}
+                  </span>
+                </h3>
+                <button className="text-slate-400 hover:text-slate-600"><span className="material-symbols-outlined">filter_list</span></button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                {isLoading ? (
+                  <div className="p-5"><SkeletonTable rows={3} /></div>
+                ) : employees.filter((e) => e.departments.length === 0).length === 0 ? (
+                  <p className="text-sm text-center text-slate-400 py-4 italic">All employees assigned</p>
+                ) : (
+                  employees.filter((e) => e.departments.length === 0).map((emp) => (
+                    <div key={emp.id} className="group flex items-center gap-3 p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 cursor-move hover:shadow-md transition-all" style={{ borderColor: 'transparent' }} onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'rgba(90,114,71,0.5)')} onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'transparent')}>
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm" style={{ backgroundColor: oliveBg, color: olive }}>
+                        {emp.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold truncate">{emp.name}</p>
+                        <p className="text-xs text-slate-500">ID: @{emp.username}</p>
+                      </div>
+                      <span className="material-symbols-outlined text-slate-300 group-hover:text-slate-600" style={{ color: undefined }}>drag_indicator</span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Right Column: Departments */}
+            <div className="flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-4 content-start pb-8">
+              {departments.map((dept) => {
+                const deptEmployees = employees.filter((e) => e.departments.some((d) => d.id === dept.id))
+                return (
+                  <div key={dept.id} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
+                    <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/20">
+                      <div>
+                        <h4 className="font-bold text-slate-900 dark:text-white">{dept.name}</h4>
+                        <p className="text-xs text-slate-500">{deptEmployees.length} Members</p>
+                      </div>
+                      <button className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: oliveBg, color: olive }}>
+                        <span className="material-symbols-outlined text-sm">add</span>
+                      </button>
+                    </div>
+                    <div className="p-4 space-y-2 min-h-[120px] border-2 border-dashed border-transparent transition-all rounded-b-xl" style={{}} onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'rgba(90,114,71,0.2)')} onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'transparent')}>
+                      {deptEmployees.map((emp) => (
+                        <div key={emp.id} className="flex items-center justify-between p-2 bg-white dark:bg-slate-800 rounded-lg shadow-sm">
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 rounded-full text-[10px] flex items-center justify-center font-bold" style={{ backgroundColor: oliveBg, color: olive }}>
+                              {emp.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()}
+                            </div>
+                            <span className="text-sm">{emp.name}</span>
+                          </div>
+                          <button className="text-slate-400 hover:text-red-500">
+                            <span className="material-symbols-outlined text-sm">close</span>
+                          </button>
+                        </div>
+                      ))}
+                      {deptEmployees.length === 0 && (
+                        <p className="text-sm text-center text-slate-400 py-4 italic">No members assigned</p>
+                      )}
+                      <div className="pt-2 text-center">
+                        <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Drop here to assign</p>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+
+              {/* New Dept Placeholder */}
+              <button className="border-2 border-dashed border-slate-300 dark:border-slate-800 rounded-xl flex flex-col items-center justify-center p-8 text-slate-400 transition-all" style={{}} onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(90,114,71,0.5)'; e.currentTarget.style.color = olive }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#cbd5e1'; e.currentTarget.style.color = '#94a3b8' }}>
+                <span className="material-symbols-outlined text-3xl">add_circle</span>
+                <span className="text-sm font-bold mt-2">Create New Department</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Invite Employee Modal */}
       {showInvite && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setShowInvite(false)} data-testid="invite-modal">
-          <div className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
-            <div className="px-6 py-4 border-b border-slate-700">
-              <h2 className="text-lg font-semibold text-white">직원 초대</h2>
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
+            <div className="px-6 py-4 border-b border-slate-200">
+              <h2 className="text-lg font-semibold text-slate-900">직원 초대</h2>
             </div>
             <form
               onSubmit={(e) => {
@@ -434,50 +388,51 @@ export function EmployeesPage() {
               className="px-6 py-5 space-y-4"
             >
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1.5">아이디 *</label>
+                <label className="block text-xs font-medium text-slate-500 mb-1.5">아이디 *</label>
                 <input
                   value={inviteForm.username}
                   onChange={(e) => setInviteForm({ ...inviteForm, username: e.target.value })}
-                  className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 transition-colors"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm transition-colors"
                   placeholder="사용자 아이디"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1.5">이름 *</label>
+                <label className="block text-xs font-medium text-slate-500 mb-1.5">이름 *</label>
                 <input
                   value={inviteForm.name}
                   onChange={(e) => setInviteForm({ ...inviteForm, name: e.target.value })}
-                  className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 transition-colors"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm transition-colors"
                   placeholder="직원 이름"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1.5">이메일 *</label>
+                <label className="block text-xs font-medium text-slate-500 mb-1.5">이메일 *</label>
                 <input
                   type="email"
                   value={inviteForm.email}
                   onChange={(e) => setInviteForm({ ...inviteForm, email: e.target.value })}
-                  className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 transition-colors"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm transition-colors"
                   placeholder="email@example.com"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1.5">부서 배정</label>
-                <div className="max-h-40 overflow-y-auto space-y-1 bg-slate-900/50 border border-slate-600 rounded-lg p-2">
+                <label className="block text-xs font-medium text-slate-500 mb-1.5">부서 배정</label>
+                <div className="max-h-40 overflow-y-auto space-y-1 bg-slate-50 border border-slate-200 rounded-lg p-2">
                   {departments.length === 0 ? (
                     <p className="text-xs text-slate-500 text-center py-2">등록된 부서가 없습니다</p>
                   ) : departments.map((d) => (
-                    <label key={d.id} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-slate-800 cursor-pointer transition-colors">
+                    <label key={d.id} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-slate-100 cursor-pointer transition-colors">
                       <input
                         type="checkbox"
                         checked={inviteForm.departmentIds.includes(d.id)}
                         onChange={() => toggleDept(d.id, inviteForm.departmentIds, (ids) => setInviteForm({ ...inviteForm, departmentIds: ids }))}
-                        className="rounded border-slate-600 bg-slate-700 text-blue-500 focus:ring-blue-500"
+                        className="rounded border-slate-300"
+                        style={{ accentColor: olive }}
                       />
-                      <span className="text-sm text-slate-300">{d.name}</span>
+                      <span className="text-sm text-slate-700">{d.name}</span>
                     </label>
                   ))}
                 </div>
@@ -486,14 +441,15 @@ export function EmployeesPage() {
                 <button
                   type="button"
                   onClick={() => setShowInvite(false)}
-                  className="bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                  className="bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
                 >
                   취소
                 </button>
                 <button
                   type="submit"
                   disabled={createMutation.isPending}
-                  className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50"
+                  className="text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50"
+                  style={{ backgroundColor: olive }}
                 >
                   {createMutation.isPending ? '초대 중...' : '초대'}
                 </button>
@@ -506,9 +462,9 @@ export function EmployeesPage() {
       {/* Edit Employee Modal */}
       {editTarget && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setEditTarget(null)} data-testid="edit-modal">
-          <div className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
-            <div className="px-6 py-4 border-b border-slate-700">
-              <h2 className="text-lg font-semibold text-white">직원 수정 — {editTarget.name}</h2>
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
+            <div className="px-6 py-4 border-b border-slate-200">
+              <h2 className="text-lg font-semibold text-slate-900">직원 수정 &mdash; {editTarget.name}</h2>
             </div>
             <form
               onSubmit={(e) => {
@@ -523,45 +479,42 @@ export function EmployeesPage() {
               className="px-6 py-5 space-y-4"
             >
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1.5">아이디</label>
-                <input
-                  value={editTarget.username}
-                  disabled
-                  className="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-500 cursor-not-allowed"
-                />
+                <label className="block text-xs font-medium text-slate-500 mb-1.5">아이디</label>
+                <input value={editTarget.username} disabled className="w-full bg-slate-100 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-500 cursor-not-allowed" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1.5">이름</label>
+                <label className="block text-xs font-medium text-slate-500 mb-1.5">이름</label>
                 <input
                   value={editForm.name}
                   onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                  className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 transition-colors"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm transition-colors"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1.5">이메일</label>
+                <label className="block text-xs font-medium text-slate-500 mb-1.5">이메일</label>
                 <input
                   type="email"
                   value={editForm.email}
                   onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                  className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 transition-colors"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm transition-colors"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1.5">부서 배정</label>
-                <div className="max-h-40 overflow-y-auto space-y-1 bg-slate-900/50 border border-slate-600 rounded-lg p-2">
+                <label className="block text-xs font-medium text-slate-500 mb-1.5">부서 배정</label>
+                <div className="max-h-40 overflow-y-auto space-y-1 bg-slate-50 border border-slate-200 rounded-lg p-2">
                   {departments.length === 0 ? (
                     <p className="text-xs text-slate-500 text-center py-2">등록된 부서가 없습니다</p>
                   ) : departments.map((d) => (
-                    <label key={d.id} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-slate-800 cursor-pointer transition-colors">
+                    <label key={d.id} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-slate-100 cursor-pointer transition-colors">
                       <input
                         type="checkbox"
                         checked={editForm.departmentIds.includes(d.id)}
                         onChange={() => toggleDept(d.id, editForm.departmentIds, (ids) => setEditForm({ ...editForm, departmentIds: ids }))}
-                        className="rounded border-slate-600 bg-slate-700 text-blue-500 focus:ring-blue-500"
+                        className="rounded border-slate-300"
+                        style={{ accentColor: olive }}
                       />
-                      <span className="text-sm text-slate-300">{d.name}</span>
+                      <span className="text-sm text-slate-700">{d.name}</span>
                     </label>
                   ))}
                 </div>
@@ -570,14 +523,15 @@ export function EmployeesPage() {
                 <button
                   type="button"
                   onClick={() => setEditTarget(null)}
-                  className="bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                  className="bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
                 >
                   취소
                 </button>
                 <button
                   type="submit"
                   disabled={updateMutation.isPending}
-                  className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50"
+                  className="text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50"
+                  style={{ backgroundColor: olive }}
                 >
                   {updateMutation.isPending ? '저장 중...' : '저장'}
                 </button>
@@ -590,29 +544,30 @@ export function EmployeesPage() {
       {/* Temporary Password Modal */}
       {passwordModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setPasswordModal(null)} data-testid="password-modal">
-          <div className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
-            <div className="px-6 py-4 border-b border-slate-700">
-              <h2 className="text-lg font-semibold text-white">임시 비밀번호</h2>
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+            <div className="px-6 py-4 border-b border-slate-200">
+              <h2 className="text-lg font-semibold text-slate-900">임시 비밀번호</h2>
             </div>
             <div className="px-6 py-5 space-y-4">
-              <p className="text-sm text-slate-300">{passwordModal.name}님의 임시 비밀번호입니다.</p>
-              <div className="bg-slate-900 border border-slate-600 rounded-lg p-3 flex items-center justify-between">
-                <code className="text-lg font-mono text-cyan-400 tracking-wider select-all">{passwordModal.password}</code>
+              <p className="text-sm text-slate-600">{passwordModal.name}님의 임시 비밀번호입니다.</p>
+              <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 flex items-center justify-between">
+                <code className="text-lg font-mono tracking-wider select-all" style={{ color: olive }}>{passwordModal.password}</code>
                 <button
                   onClick={copyPassword}
-                  className="text-xs text-slate-400 hover:text-white px-2 py-1 rounded hover:bg-slate-700 transition-colors"
+                  className="text-xs text-slate-500 hover:text-slate-900 px-2 py-1 rounded hover:bg-slate-100 transition-colors"
                 >
                   복사
                 </button>
               </div>
-              <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3">
-                <p className="text-xs text-amber-400">이 비밀번호는 다시 확인할 수 없으니 반드시 복사해두세요.</p>
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                <p className="text-xs text-amber-700">이 비밀번호는 다시 확인할 수 없으니 반드시 복사해두세요.</p>
               </div>
             </div>
-            <div className="px-6 py-4 border-t border-slate-700 flex justify-end">
+            <div className="px-6 py-4 border-t border-slate-200 flex justify-end">
               <button
                 onClick={() => setPasswordModal(null)}
-                className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                className="text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                style={{ backgroundColor: olive }}
               >
                 확인
               </button>

@@ -1,3 +1,26 @@
+// API Endpoints:
+// GET    /workspace/knowledge/docs
+// GET    /workspace/knowledge/docs/:id
+// POST   /workspace/knowledge/docs
+// PATCH  /workspace/knowledge/docs/:id
+// DELETE /workspace/knowledge/docs/:id
+// POST   /workspace/knowledge/docs/upload
+// GET    /workspace/knowledge/docs/:id/download
+// GET    /workspace/knowledge/docs/:id/similar
+// GET    /workspace/knowledge/docs/:id/versions
+// POST   /workspace/knowledge/docs/:id/versions/:versionId/restore
+// GET    /workspace/knowledge/search
+// GET    /workspace/knowledge/folders
+// POST   /workspace/knowledge/folders
+// PATCH  /workspace/knowledge/folders/:id
+// DELETE /workspace/knowledge/folders/:id
+// GET    /workspace/knowledge/tags
+// GET    /workspace/knowledge/memories
+// POST   /workspace/knowledge/memories
+// PATCH  /workspace/knowledge/memories/:id
+// DELETE /workspace/knowledge/memories/:id
+// GET    /workspace/agents
+
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
@@ -75,11 +98,15 @@ type Agent = { id: string; name: string; departmentId: string | null }
 
 const PAGE_SIZE = 20
 
+const oliveColor = '#5a7247'
+const sandBg = '#faf8f5'
+const borderColor = '#e5e1da'
+
 const CONTENT_TYPE_COLORS: Record<ContentType, string> = {
-  markdown: 'bg-blue-500/20 text-blue-400',
-  text: 'bg-slate-600/50 text-slate-300',
-  html: 'bg-orange-500/20 text-orange-400',
-  mermaid: 'bg-purple-500/20 text-purple-400',
+  markdown: 'bg-blue-100 text-blue-700',
+  text: 'bg-gray-100 text-gray-600',
+  html: 'bg-orange-100 text-orange-700',
+  mermaid: 'bg-purple-100 text-purple-700',
 }
 
 const CONTENT_TYPE_LABELS: Record<ContentType, string> = {
@@ -90,10 +117,10 @@ const CONTENT_TYPE_LABELS: Record<ContentType, string> = {
 }
 
 const MEMORY_TYPE_COLORS: Record<MemoryType, string> = {
-  learning: 'bg-emerald-500/20 text-emerald-400',
-  insight: 'bg-purple-500/20 text-purple-400',
-  preference: 'bg-blue-500/20 text-blue-400',
-  fact: 'bg-amber-500/20 text-amber-400',
+  learning: 'bg-emerald-100 text-emerald-700',
+  insight: 'bg-purple-100 text-purple-700',
+  preference: 'bg-blue-100 text-blue-700',
+  fact: 'bg-amber-100 text-amber-700',
 }
 
 const MEMORY_TYPE_LABELS: Record<MemoryType, string> = {
@@ -106,12 +133,7 @@ const MEMORY_TYPE_LABELS: Record<MemoryType, string> = {
 // === Helpers ===
 
 function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleString('ko-KR', {
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+  return new Date(dateStr).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
 }
 
 function formatRelative(dateStr: string) {
@@ -161,35 +183,69 @@ export function KnowledgePage() {
   const [showFolderTree, setShowFolderTree] = useState(true)
 
   return (
-    <div className="h-full flex flex-col bg-slate-950" data-testid="knowledge-page">
-      {/* Tab content -- no separate header, docs tab has its own built-in header area */}
+    <div className="h-screen overflow-hidden flex flex-col" data-testid="knowledge-page" style={{ fontFamily: "'Pretendard', sans-serif", backgroundColor: sandBg }}>
+      {/* Navigation Header */}
+      <header className="h-16 bg-white flex items-center justify-between px-6 z-10" style={{ borderBottom: `1px solid ${borderColor}` }}>
+        <div className="flex items-center gap-4">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold" style={{ backgroundColor: oliveColor }}>C</div>
+          <h1 className="text-xl font-bold text-gray-800" style={{ fontFamily: "'Noto Serif KR', serif" }}>CORTHEX <span style={{ color: oliveColor }}>v2</span></h1>
+        </div>
+        <div className="flex items-center gap-6">
+          <div className="relative w-96">
+            <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
+            </span>
+            <input
+              className="block w-full pl-10 pr-3 py-2 border rounded-xl text-sm"
+              placeholder="Search Knowledge Library..."
+              type="text"
+              style={{ borderColor, backgroundColor: sandBg }}
+            />
+          </div>
+          <button
+            className="hover:opacity-90 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all shadow-sm flex items-center gap-2"
+            style={{ backgroundColor: oliveColor }}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
+            New Document
+          </button>
+        </div>
+      </header>
+
+      {/* Tab content */}
       {activeTab === 'docs' ? (
         <DocsTab showFolderTree={showFolderTree} queryClient={queryClient} setShowFolderTree={setShowFolderTree} activeTab={activeTab} setActiveTab={setActiveTab} />
       ) : (
         <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Memories header */}
-          <div className="px-4 sm:px-6 py-4 border-b border-slate-800 flex items-center justify-between">
-            <h1 className="text-xl font-bold text-slate-50 tracking-tight">CORTHEX Knowledge</h1>
+          <div className="px-4 sm:px-6 py-4 border-b flex items-center justify-between bg-white" style={{ borderColor }}>
+            <h1 className="text-xl font-bold text-gray-800 tracking-tight" style={{ fontFamily: "'Noto Serif KR', serif" }}>CORTHEX Knowledge</h1>
             <div className="flex gap-0">
-              <button
-                onClick={() => setActiveTab('docs')}
-                className="px-4 py-2 text-sm font-semibold tracking-wide transition-colors text-slate-400 hover:text-slate-50"
-                data-testid="tab-docs"
-              >
-                문서
-              </button>
-              <button
-                onClick={() => setActiveTab('memories')}
-                className="px-4 py-2 text-sm font-semibold tracking-wide transition-colors text-cyan-400 relative after:absolute after:-bottom-4 after:left-0 after:w-full after:h-0.5 after:bg-cyan-400"
-                data-testid="tab-memories"
-              >
+              <button onClick={() => setActiveTab('docs')} className="px-4 py-2 text-sm font-semibold tracking-wide transition-colors text-gray-400 hover:text-gray-800" data-testid="tab-docs">문서</button>
+              <button onClick={() => setActiveTab('memories')} className="px-4 py-2 text-sm font-semibold tracking-wide transition-colors relative" style={{ color: oliveColor }} data-testid="tab-memories">
                 에이전트 기억
+                <span className="absolute -bottom-4 left-0 w-full h-0.5" style={{ backgroundColor: oliveColor }} />
               </button>
             </div>
           </div>
           <MemoriesTab queryClient={queryClient} />
         </div>
       )}
+
+      {/* Footer / Status Bar */}
+      <footer className="h-8 border-t flex items-center justify-between px-4 text-[10px] text-gray-500 shrink-0 bg-white" style={{ backgroundColor: sandBg, borderColor }}>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            API Online
+          </div>
+          <span>Workspace: <span className="text-gray-700 font-medium">Global_Research_Alpha</span></span>
+        </div>
+        <div className="flex items-center gap-4 uppercase tracking-widest">
+          <span className="cursor-pointer" style={{ color: oliveColor }}>API Reference</span>
+          <span className="cursor-pointer" style={{ color: oliveColor }}>Help Center</span>
+          <span>v2.0.4-stable</span>
+        </div>
+      </footer>
     </div>
   )
 }
@@ -224,7 +280,6 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
     return params.toString()
   }, [page, debouncedSearch, selectedFolderId, selectedTag, contentTypeFilter])
 
-  // Semantic/hybrid search query (uses /search endpoint)
   const searchQuery = useQuery({
     queryKey: ['knowledge-search', debouncedSearch, searchMode, selectedFolderId],
     queryFn: () => {
@@ -235,7 +290,6 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
     enabled: isSearchActive,
   })
 
-  // Regular docs listing (when not searching)
   const docsQuery = useQuery({
     queryKey: ['knowledge-docs', page, debouncedSearch, selectedFolderId, selectedTag, contentTypeFilter],
     queryFn: () => api.get<{ data: KnowledgeDoc[]; pagination: { page: number; limit: number; total: number; totalPages: number } }>(`/workspace/knowledge/docs?${buildParams()}`),
@@ -252,7 +306,6 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
     queryFn: () => api.get<{ data: TagInfo[] }>('/workspace/knowledge/tags'),
   })
 
-  // Derive items from search or listing
   const searchDocs = searchQuery.data?.data?.docs ?? []
   const listDocs = (Array.isArray(docsQuery.data?.data) ? docsQuery.data.data : []) as KnowledgeDoc[]
   const items = isSearchActive ? searchDocs : listDocs
@@ -261,23 +314,18 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
   const folders = foldersQuery.data?.data ?? []
   const resultSearchMode = isSearchActive ? (searchQuery.data?.data?.searchMode ?? null) : null
 
-  // Upload handler
   const handleUploadFiles = useCallback(async (files: FileList | File[]) => {
     const fileArray = Array.from(files)
     if (fileArray.length === 0) return
     setUploading(true)
-    let successCount = 0
-    let errorCount = 0
+    let successCount = 0; let errorCount = 0
     for (const file of fileArray) {
       try {
-        const formData = new FormData()
-        formData.append('file', file)
+        const formData = new FormData(); formData.append('file', file)
         if (selectedFolderId) formData.append('folderId', selectedFolderId)
         await api.upload('/workspace/knowledge/docs/upload', formData)
         successCount++
-      } catch {
-        errorCount++
-      }
+      } catch { errorCount++ }
     }
     setUploading(false)
     if (successCount > 0) {
@@ -310,56 +358,31 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      {/* Top bar with search */}
-      <div className="flex items-center justify-between border-b border-slate-800 px-6 py-3 shrink-0 bg-slate-900">
+      {/* Top bar matching tabs */}
+      <div className="flex items-center justify-between px-6 py-3 shrink-0 bg-white" style={{ borderBottom: `1px solid ${borderColor}` }}>
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowFolderTree(!showFolderTree)}
-            className="md:hidden p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition-colors"
-            aria-label={showFolderTree ? '폴더 숨기기' : '폴더 보기'}
+            className="md:hidden p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
-          <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-50">CORTHEX Knowledge</h1>
-          <label className="flex flex-col min-w-40 !h-9 max-w-72 ml-4">
-            <div className="flex w-full flex-1 items-stretch rounded-md h-full bg-slate-950 border border-slate-800 focus-within:border-cyan-400/50 transition-colors">
-              <div className="text-slate-400 flex items-center justify-center pl-3">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-              <input
-                placeholder="Search knowledge base..."
-                value={searchInput}
-                onChange={(e) => { setSearchInput(e.target.value); setPage(1) }}
-                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden text-slate-50 focus:outline-none focus:ring-0 border-none bg-transparent h-full placeholder:text-slate-500 px-3 text-sm font-medium"
-                data-testid="doc-search"
-              />
-            </div>
-          </label>
+          <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-800" style={{ fontFamily: "'Noto Serif KR', serif" }}>CORTHEX Knowledge</h1>
         </div>
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setActiveTab('docs')}
-              className={`text-sm font-semibold tracking-wide transition-colors ${
-                activeTab === 'docs'
-                  ? 'text-cyan-400 relative after:absolute after:-bottom-4 after:left-0 after:w-full after:h-0.5 after:bg-cyan-400'
-                  : 'text-slate-400 hover:text-slate-50'
-              }`}
+              className={`text-sm font-semibold tracking-wide transition-colors relative ${activeTab === 'docs' ? '' : 'text-gray-400 hover:text-gray-800'}`}
+              style={activeTab === 'docs' ? { color: oliveColor } : undefined}
               data-testid="tab-docs"
             >
               문서
+              {activeTab === 'docs' && <span className="absolute -bottom-4 left-0 w-full h-0.5" style={{ backgroundColor: oliveColor }} />}
             </button>
             <button
               onClick={() => setActiveTab('memories')}
-              className={`text-sm font-semibold tracking-wide transition-colors ${
-                activeTab === 'memories'
-                  ? 'text-cyan-400 relative after:absolute after:-bottom-4 after:left-0 after:w-full after:h-0.5 after:bg-cyan-400'
-                  : 'text-slate-400 hover:text-slate-50'
-              }`}
+              className={`text-sm font-semibold tracking-wide transition-colors ${activeTab === 'memories' ? '' : 'text-gray-400 hover:text-gray-800'}`}
               data-testid="tab-memories"
             >
               에이전트 기억
@@ -367,7 +390,8 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center justify-center gap-2 rounded-md h-9 px-4 bg-cyan-400 hover:bg-cyan-400/90 transition-colors text-slate-900 text-sm font-bold shadow-[0_0_15px_rgba(34,211,238,0.2)]"
+            className="flex items-center justify-center gap-2 rounded-xl h-9 px-4 hover:opacity-90 transition-colors text-white text-sm font-bold shadow-sm"
+            style={{ backgroundColor: oliveColor }}
             data-testid="create-doc-button"
           >
             <span className="text-lg leading-none">+</span>
@@ -378,9 +402,9 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
 
       {/* 3-panel layout */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Left Panel: Library Tree (260px) */}
+        {/* Left Panel: Library Tree */}
         {showFolderTree && (
-          <aside className="w-[260px] flex-shrink-0 border-r border-slate-800 bg-slate-900 flex flex-col overflow-y-auto" data-testid="folder-sidebar">
+          <aside className="w-64 flex-shrink-0 bg-white flex flex-col p-4 overflow-y-auto" style={{ borderRight: `1px solid ${borderColor}` }} data-testid="folder-sidebar">
             <FolderTree
               folders={folders}
               selectedFolderId={selectedFolderId}
@@ -391,100 +415,71 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
         )}
 
         {/* Center Panel: Document List */}
-        <main className="flex-1 flex flex-col border-r border-slate-800 bg-slate-950 min-w-0 overflow-hidden">
-          {/* Center header breadcrumb + filters */}
-          <div className="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="flex items-center gap-2 text-xs font-medium text-slate-500 mb-1">
-                  <span>Library</span>
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                  <span className="text-cyan-400">{selectedFolderId ? (findFolderName(folders, selectedFolderId) || '폴더') : '전체 문서'}</span>
-                </div>
-                <h2 className="text-xl font-bold text-slate-50">{selectedFolderId ? (findFolderName(folders, selectedFolderId) || '폴더') : '전체 문서'}</h2>
-              </div>
-              <div className="flex gap-2">
-                {/* Search mode toggle */}
-                <div className="flex rounded-lg overflow-hidden border border-slate-800 shrink-0" data-testid="search-mode-toggle">
-                  {(['hybrid', 'semantic', 'keyword'] as const).map(mode => (
-                    <button
-                      key={mode}
-                      onClick={() => { setSearchMode(mode); setPage(1) }}
-                      className={`px-2.5 py-1.5 text-xs font-medium transition-colors ${
-                        searchMode === mode
-                          ? 'bg-cyan-400 text-slate-900'
-                          : 'bg-slate-900 text-slate-400 hover:text-slate-200'
-                      }`}
-                    >
-                      {mode === 'hybrid' ? '혼합' : mode === 'semantic' ? '의미' : '키워드'}
-                    </button>
-                  ))}
-                </div>
-                <select
-                  value={contentTypeFilter}
-                  onChange={(e) => { setContentTypeFilter(e.target.value as ContentType | ''); setPage(1) }}
-                  className="shrink-0 bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-300 outline-none focus:border-cyan-400"
+        <main className="flex-1 flex flex-col min-w-0 overflow-hidden" style={{ borderRight: `1px solid ${borderColor}`, backgroundColor: sandBg }}>
+          {/* Center header */}
+          <div className="p-4 bg-white/50 backdrop-blur-sm flex flex-col gap-4" style={{ borderBottom: `1px solid ${borderColor}` }}>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-bold text-gray-800" style={{ fontFamily: "'Noto Serif KR', serif" }}>Documents</h2>
+              <span className="text-xs font-medium text-gray-500 bg-gray-200 px-2 py-0.5 rounded-full">{total} Files</span>
+            </div>
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {(['hybrid', 'semantic', 'keyword'] as const).map(mode => (
+                <span
+                  key={mode}
+                  onClick={() => { setSearchMode(mode); setPage(1) }}
+                  className="whitespace-nowrap bg-white px-3 py-1 rounded-full text-xs font-medium text-gray-600 cursor-pointer transition-colors"
+                  style={searchMode === mode ? { borderColor: oliveColor, borderWidth: '1px', borderStyle: 'solid', color: oliveColor } : { borderColor, borderWidth: '1px', borderStyle: 'solid' }}
                 >
-                  <option value="">전체 유형</option>
-                  <option value="markdown">Markdown</option>
-                  <option value="text">텍스트</option>
-                  <option value="html">HTML</option>
-                  <option value="mermaid">Mermaid</option>
-                </select>
-                <input
-                  placeholder="태그 필터..."
-                  value={selectedTag || ''}
-                  onChange={(e) => { setSelectedTag(e.target.value || null); setPage(1) }}
-                  className="shrink-0 bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-50 placeholder:text-slate-500 outline-none focus:border-cyan-500 w-24 sm:w-32"
-                />
-                <button
-                  onClick={() => setShowCreateModal(true)}
-                  className="shrink-0 bg-cyan-400/10 hover:bg-cyan-400/20 text-cyan-400 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors flex items-center gap-1"
-                  data-testid="create-doc-button"
-                >
-                  <span>+</span> <span className="hidden sm:inline">문서 작성</span><span className="sm:hidden">추가</span>
-                </button>
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploading}
-                  className="shrink-0 p-1.5 rounded border border-slate-800 text-slate-400 hover:text-slate-50 hover:border-slate-600 transition-colors disabled:opacity-50"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-                </button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  multiple
-                  className="hidden"
-                  onChange={(e) => { if (e.target.files) handleUploadFiles(e.target.files); e.target.value = '' }}
-                />
-              </div>
+                  {mode === 'hybrid' ? '혼합' : mode === 'semantic' ? '의미' : '키워드'}
+                </span>
+              ))}
+              <select
+                value={contentTypeFilter}
+                onChange={(e) => { setContentTypeFilter(e.target.value as ContentType | ''); setPage(1) }}
+                className="bg-white border rounded-full px-3 py-1 text-xs text-gray-600 outline-none"
+                style={{ borderColor }}
+              >
+                <option value="">전체 유형</option>
+                <option value="markdown">Markdown</option>
+                <option value="text">텍스트</option>
+                <option value="html">HTML</option>
+                <option value="mermaid">Mermaid</option>
+              </select>
+            </div>
+            {/* Search field */}
+            <div className="relative w-full">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
+              </span>
+              <input
+                className="block w-full pl-10 pr-3 py-2 border rounded-xl text-sm outline-none"
+                placeholder="Search documents..."
+                value={searchInput}
+                onChange={(e) => { setSearchInput(e.target.value); setPage(1) }}
+                style={{ borderColor, backgroundColor: sandBg }}
+                data-testid="doc-search"
+              />
             </div>
           </div>
 
-          {/* Search result mode label */}
+          {/* Search result label */}
           {isSearchActive && resultSearchMode && (
-            <div className="px-5 py-1.5 text-xs text-slate-400 border-b border-slate-800/50">
-              {resultSearchMode === 'semantic' ? '의미 검색 결과' : resultSearchMode === 'hybrid' ? '혼합 검색 결과' : '키워드 검색 결과'}
-              {' '}({total}건)
+            <div className="px-5 py-1.5 text-xs text-gray-400" style={{ borderBottom: `1px solid ${borderColor}` }}>
+              {resultSearchMode === 'semantic' ? '의미 검색 결과' : resultSearchMode === 'hybrid' ? '혼합 검색 결과' : '키워드 검색 결과'} ({total}건)
             </div>
           )}
 
           {/* Document list with drop zone */}
           <div
-            className={`flex-1 overflow-y-auto p-4 space-y-2 relative transition-colors ${
-              dragOver ? 'bg-cyan-400/5' : ''
-            }`}
+            className={`flex-1 overflow-y-auto p-4 space-y-4 relative transition-colors ${dragOver ? 'bg-green-50' : ''}`}
             onDragOver={handleDragOver}
             onDragEnter={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
           >
-            {/* Drag overlay */}
             {dragOver && (
-              <div className="absolute inset-4 border-2 border-dashed border-cyan-400/50 rounded-xl flex flex-col items-center justify-center bg-cyan-400/10 z-10 pointer-events-none">
-                <span className="text-3xl mb-2">📁</span>
-                <span className="text-sm font-medium text-cyan-300">파일을 놓으세요</span>
+              <div className="absolute inset-4 border-2 border-dashed rounded-xl flex flex-col items-center justify-center z-10 pointer-events-none" style={{ borderColor: oliveColor, backgroundColor: `${oliveColor}1a` }}>
+                <span className="text-sm font-medium" style={{ color: oliveColor }}>파일을 놓으세요</span>
               </div>
             )}
 
@@ -492,17 +487,9 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
               <SkeletonTable rows={8} />
             ) : items.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="docs-empty">
-                <div className="w-16 h-16 rounded-2xl bg-slate-900 flex items-center justify-center mb-4">
-                  <svg className="w-8 h-8 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-                <h3 className="text-base font-medium text-slate-300 mb-2">이 폴더에 문서가 없습니다</h3>
-                <p className="text-sm text-slate-500 mb-4">문서를 만들어 지식을 정리해보세요</p>
-                <button
-                  onClick={() => setShowCreateModal(true)}
-                  className="bg-cyan-400 hover:bg-cyan-400/90 text-slate-900 rounded-lg px-4 py-2 text-sm font-bold transition-colors"
-                >문서 만들기</button>
+                <h3 className="text-base font-medium text-gray-600 mb-2">이 폴더에 문서가 없습니다</h3>
+                <p className="text-sm text-gray-400 mb-4">문서를 만들어 지식을 정리해보세요</p>
+                <button onClick={() => setShowCreateModal(true)} className="text-white rounded-lg px-4 py-2 text-sm font-bold transition-colors" style={{ backgroundColor: oliveColor }}>문서 만들기</button>
               </div>
             ) : (
               items.map(doc => {
@@ -511,42 +498,29 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
                   <div
                     key={doc.id}
                     onClick={() => setDetailDoc(doc)}
-                    className={`group relative flex flex-col gap-2 p-4 rounded-lg cursor-pointer transition-colors ${
-                      isActive
-                        ? 'bg-slate-900 border border-cyan-400/30 shadow-[0_0_10px_rgba(34,211,238,0.05)]'
-                        : 'bg-slate-900/50 border border-slate-800 hover:border-slate-700'
+                    className={`bg-white p-4 rounded-2xl shadow-sm cursor-pointer transition-all ${
+                      isActive ? 'ring-4' : 'border border-transparent hover:shadow-md'
                     }`}
+                    style={isActive ? { borderColor: oliveColor, borderWidth: '2px', borderStyle: 'solid', ['--tw-ring-color' as string]: `${oliveColor}14` } : { borderColor: 'transparent' }}
                     data-testid={`doc-row-${doc.id}`}
                   >
-                    {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-cyan-400 rounded-l-lg" />}
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded flex items-center justify-center shrink-0 ${isActive ? 'bg-cyan-400/10 text-cyan-400' : 'bg-slate-800 text-slate-400 group-hover:text-slate-300'}`}>
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                          </svg>
-                        </div>
-                        <div>
-                          <h3 className={`text-sm font-bold mb-0.5 ${isActive ? 'text-slate-50' : 'text-slate-300 group-hover:text-slate-50'} transition-colors`}>{doc.title}</h3>
-                          {isSearchActive && 'highlight' in doc && typeof (doc as Record<string, unknown>).highlight === 'string' && (
-                            <p className="text-xs text-slate-400 line-clamp-1">{(doc as Record<string, string>).highlight}</p>
-                          )}
-                        </div>
-                      </div>
-                      <div className="shrink-0 flex flex-col items-end gap-2">
-                        <span className="text-[11px] font-medium text-slate-500">{formatRelative(doc.updatedAt)}</span>
-                        {doc.embeddingStatus === 'done' ? (
-                          <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            <span className="text-[10px] font-bold tracking-wide">임베딩 완료</span>
-                          </div>
-                        ) : doc.embeddingStatus === 'pending' ? (
-                          <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400">
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                            <span className="text-[10px] font-bold tracking-wide">업데이트 중</span>
-                          </div>
-                        ) : null}
-                      </div>
+                    <h4 className={`font-bold mb-1 ${isActive ? 'text-gray-900' : 'text-gray-800'}`}>{doc.title}</h4>
+                    <div className="flex gap-2 mb-2">
+                      {doc.tags.slice(0, 2).map(tag => (
+                        <span key={tag} className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-tight rounded" style={{ backgroundColor: sandBg, color: oliveColor }}>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    {doc.content && (
+                      <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">{doc.content.slice(0, 150)}</p>
+                    )}
+                    {isSearchActive && 'highlight' in doc && typeof (doc as Record<string, unknown>).highlight === 'string' && (
+                      <p className="text-xs text-gray-400 line-clamp-1 mt-1">{(doc as Record<string, string>).highlight}</p>
+                    )}
+                    <div className="mt-3 text-[10px] text-gray-400 flex items-center justify-between">
+                      <span>Edited {formatRelative(doc.updatedAt)}</span>
+                      <span>By {doc.updatedBy || doc.createdBy || 'Unknown'}</span>
                     </div>
                   </div>
                 )
@@ -556,28 +530,20 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
 
           {/* Pagination */}
           {total > 0 && (
-            <div className="px-5 py-3 border-t border-slate-800 flex items-center justify-between">
-              <span className="text-xs text-slate-500">{total}건 중 {(page - 1) * PAGE_SIZE + 1}-{Math.min(page * PAGE_SIZE, total)}</span>
+            <div className="px-5 py-3 flex items-center justify-between bg-white" style={{ borderTop: `1px solid ${borderColor}` }}>
+              <span className="text-xs text-gray-500">{total}건 중 {(page - 1) * PAGE_SIZE + 1}-{Math.min(page * PAGE_SIZE, total)}</span>
               <div className="flex items-center gap-2">
-                <button
-                  disabled={page <= 1}
-                  onClick={() => setPage(p => p - 1)}
-                  className="px-3 py-1.5 text-xs border border-slate-800 rounded-lg text-slate-400 hover:bg-slate-800 disabled:opacity-30 transition-colors"
-                >이전</button>
-                <span className="text-xs text-slate-400">{page} / {totalPages}</span>
-                <button
-                  disabled={page >= totalPages}
-                  onClick={() => setPage(p => p + 1)}
-                  className="px-3 py-1.5 text-xs border border-slate-800 rounded-lg text-slate-400 hover:bg-slate-800 disabled:opacity-30 transition-colors"
-                >다음</button>
+                <button disabled={page <= 1} onClick={() => setPage(p => p - 1)} className="px-3 py-1.5 text-xs border rounded-lg text-gray-400 hover:bg-gray-50 disabled:opacity-30 transition-colors" style={{ borderColor }}>이전</button>
+                <span className="text-xs text-gray-400">{page} / {totalPages}</span>
+                <button disabled={page >= totalPages} onClick={() => setPage(p => p + 1)} className="px-3 py-1.5 text-xs border rounded-lg text-gray-400 hover:bg-gray-50 disabled:opacity-30 transition-colors" style={{ borderColor }}>다음</button>
               </div>
             </div>
           )}
         </main>
 
-        {/* Right Panel: Document Detail (500px) */}
+        {/* Right Panel: Document Preview */}
         {detailDoc ? (
-          <aside className="w-[500px] flex-shrink-0 bg-slate-900 flex flex-col overflow-hidden hidden lg:flex">
+          <aside className="w-[500px] flex-shrink-0 bg-white flex flex-col overflow-hidden hidden lg:flex">
             <DocDetailView
               doc={detailDoc}
               folders={folders}
@@ -606,19 +572,12 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
       />
 
       {/* Version history modal */}
-      <VersionHistoryModal
-        docId={showVersions}
-        onClose={() => setShowVersions(null)}
-        queryClient={queryClient}
-      />
+      <VersionHistoryModal docId={showVersions} onClose={() => setShowVersions(null)} queryClient={queryClient} />
 
       {/* Delete confirm */}
       <ConfirmDialog
         isOpen={!!deleteConfirmId}
-        onConfirm={() => {
-          if (deleteConfirmId) deleteMutation.mutate(deleteConfirmId)
-          setDeleteConfirmId(null)
-        }}
+        onConfirm={() => { if (deleteConfirmId) deleteMutation.mutate(deleteConfirmId); setDeleteConfirmId(null) }}
         onCancel={() => setDeleteConfirmId(null)}
         title="문서 삭제"
         description="이 문서를 삭제하시겠습니까?"
@@ -631,115 +590,70 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
 
 // === Folder Tree ===
 
-function FolderTree({
-  folders, selectedFolderId, onSelectFolder, queryClient,
-}: {
-  folders: KnowledgeFolder[]
-  selectedFolderId: string | null
-  onSelectFolder: (id: string | null) => void
-  queryClient: ReturnType<typeof useQueryClient>
+function FolderTree({ folders, selectedFolderId, onSelectFolder, queryClient }: {
+  folders: KnowledgeFolder[]; selectedFolderId: string | null; onSelectFolder: (id: string | null) => void; queryClient: ReturnType<typeof useQueryClient>
 }) {
   const [creating, setCreating] = useState(false)
   const [newName, setNewName] = useState('')
   const createRef = useRef<HTMLInputElement>(null)
 
   const createMutation = useMutation({
-    mutationFn: (data: { name: string; parentId?: string }) =>
-      api.post('/workspace/knowledge/folders', data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['knowledge-folders'] })
-      setCreating(false)
-      setNewName('')
-      toast.success('폴더가 생성되었습니다')
-    },
+    mutationFn: (data: { name: string; parentId?: string }) => api.post('/workspace/knowledge/folders', data),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['knowledge-folders'] }); setCreating(false); setNewName(''); toast.success('폴더가 생성되었습니다') },
     onError: (err: Error) => toast.error(err.message),
   })
 
   useEffect(() => { if (creating) createRef.current?.focus() }, [creating])
 
-  const handleSubmit = () => {
-    if (newName.trim()) {
-      createMutation.mutate({ name: newName.trim() })
-    } else {
-      setCreating(false)
-    }
-  }
+  const handleSubmit = () => { if (newName.trim()) createMutation.mutate({ name: newName.trim() }); else setCreating(false) }
 
   return (
     <div className="flex-1">
-      {/* Header */}
-      <div className="p-4 border-b border-slate-700/50 flex items-center justify-between">
-        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Library Directory</h2>
-        <button
-          onClick={() => setCreating(true)}
-          className="text-slate-400 hover:text-cyan-400 transition-colors"
-          title="새 폴더"
-          data-testid="add-folder"
-        >
-          <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-          </svg>
-        </button>
-      </div>
-      {/* Tree */}
-      <div className="flex-1 overflow-y-auto py-2 px-3 space-y-1">
-        <div className="group flex flex-col py-1">
-          <button
-            onClick={() => onSelectFolder(null)}
-            className={`w-full text-left flex items-center gap-2 px-2 py-1.5 rounded text-sm transition-colors ${
-              selectedFolderId === null
-                ? 'bg-cyan-400/10 text-cyan-400 border border-cyan-400/20'
-                : 'text-slate-300 hover:bg-slate-800/50'
-            }`}
-            data-testid="folder-all"
-          >
-            <svg className={`w-4 h-4 shrink-0 ${selectedFolderId === null ? 'text-cyan-400' : 'text-slate-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-            </svg>
-            <span className={`flex-1 truncate select-none ${selectedFolderId === null ? 'font-semibold' : 'font-medium'}`}>전체 문서</span>
+      <div className="mb-6">
+        <div className="flex items-center justify-between px-2 mb-2">
+          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Workspace</h3>
+          <button onClick={() => setCreating(true)} className="text-gray-400 hover:text-gray-600 transition-colors" title="새 폴더" data-testid="add-folder">
+            <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" /></svg>
           </button>
         </div>
-
-        {folders.map(folder => (
-          <FolderNode
-            key={folder.id}
-            folder={folder}
-            depth={0}
-            selectedFolderId={selectedFolderId}
-            onSelectFolder={onSelectFolder}
-            queryClient={queryClient}
-          />
-        ))}
-
-        {creating && (
-          <div className="px-1 py-1">
-            <input
-              ref={createRef}
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleSubmit()
-                if (e.key === 'Escape') { setCreating(false); setNewName('') }
-              }}
-              onBlur={handleSubmit}
-              className="w-full text-sm px-3 py-1.5 border border-blue-500 rounded-lg bg-slate-800 text-slate-50 outline-none"
-              placeholder="폴더 이름"
-            />
-          </div>
-        )}
+        <nav className="space-y-1">
+          <button
+            onClick={() => onSelectFolder(null)}
+            className={`flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-xl w-full text-left transition-colors ${
+              selectedFolderId === null ? 'text-white shadow-sm' : 'text-gray-600 hover:bg-gray-50'
+            }`}
+            style={selectedFolderId === null ? { backgroundColor: oliveColor } : undefined}
+            data-testid="folder-all"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
+            Knowledge Base
+          </button>
+          {folders.map(folder => (
+            <FolderNode key={folder.id} folder={folder} depth={0} selectedFolderId={selectedFolderId} onSelectFolder={onSelectFolder} queryClient={queryClient} />
+          ))}
+        </nav>
       </div>
+
+      {creating && (
+        <div className="px-1 py-1">
+          <input
+            ref={createRef}
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleSubmit(); if (e.key === 'Escape') { setCreating(false); setNewName('') } }}
+            onBlur={handleSubmit}
+            className="w-full text-sm px-3 py-1.5 border rounded-lg bg-white text-gray-900 outline-none"
+            style={{ borderColor: oliveColor }}
+            placeholder="폴더 이름"
+          />
+        </div>
+      )}
     </div>
   )
 }
 
-function FolderNode({
-  folder, depth, selectedFolderId, onSelectFolder, queryClient,
-}: {
-  folder: KnowledgeFolder
-  depth: number
-  selectedFolderId: string | null
-  onSelectFolder: (id: string | null) => void
-  queryClient: ReturnType<typeof useQueryClient>
+function FolderNode({ folder, depth, selectedFolderId, onSelectFolder, queryClient }: {
+  folder: KnowledgeFolder; depth: number; selectedFolderId: string | null; onSelectFolder: (id: string | null) => void; queryClient: ReturnType<typeof useQueryClient>
 }) {
   const [editing, setEditing] = useState(false)
   const [editName, setEditName] = useState(folder.name)
@@ -751,32 +665,19 @@ function FolderNode({
 
   const renameMutation = useMutation({
     mutationFn: (name: string) => api.patch(`/workspace/knowledge/folders/${folder.id}`, { name }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['knowledge-folders'] })
-      setEditing(false)
-      toast.success('이름이 변경되었습니다')
-    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['knowledge-folders'] }); setEditing(false); toast.success('이름이 변경되었습니다') },
     onError: (err: Error) => toast.error(err.message),
   })
 
   const deleteMutation = useMutation({
     mutationFn: () => api.delete(`/workspace/knowledge/folders/${folder.id}`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['knowledge-folders'] })
-      onSelectFolder(null)
-      toast.success('폴더가 삭제되었습니다')
-    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['knowledge-folders'] }); onSelectFolder(null); toast.success('폴더가 삭제되었습니다') },
     onError: (err: Error) => toast.error(err.message),
   })
 
   const createChildMutation = useMutation({
     mutationFn: (name: string) => api.post('/workspace/knowledge/folders', { name, parentId: folder.id }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['knowledge-folders'] })
-      setCreatingChild(false)
-      setChildName('')
-      toast.success('하위 폴더가 생성되었습니다')
-    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['knowledge-folders'] }); setCreatingChild(false); setChildName(''); toast.success('하위 폴더가 생성되었습니다') },
     onError: (err: Error) => toast.error(err.message),
   })
 
@@ -784,20 +685,13 @@ function FolderNode({
   useEffect(() => { if (creatingChild) childRef.current?.focus() }, [creatingChild])
 
   const handleRename = () => {
-    if (editName.trim() && editName.trim() !== folder.name) {
-      renameMutation.mutate(editName.trim())
-    } else {
-      setEditing(false)
-      setEditName(folder.name)
-    }
+    if (editName.trim() && editName.trim() !== folder.name) renameMutation.mutate(editName.trim())
+    else { setEditing(false); setEditName(folder.name) }
   }
 
   const handleCreateChild = () => {
-    if (childName.trim()) {
-      createChildMutation.mutate(childName.trim())
-    } else {
-      setCreatingChild(false)
-    }
+    if (childName.trim()) createChildMutation.mutate(childName.trim())
+    else setCreatingChild(false)
   }
 
   const isSelected = selectedFolderId === folder.id
@@ -806,17 +700,7 @@ function FolderNode({
     <div>
       {editing ? (
         <div style={{ paddingLeft: `${depth * 16 + 4}px` }} className="py-0.5">
-          <input
-            ref={editRef}
-            value={editName}
-            onChange={(e) => setEditName(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleRename()
-              if (e.key === 'Escape') { setEditing(false); setEditName(folder.name) }
-            }}
-            onBlur={handleRename}
-            className="w-full text-sm px-3 py-1.5 border border-blue-500 rounded-lg bg-slate-800 text-slate-50 outline-none"
-          />
+          <input ref={editRef} value={editName} onChange={(e) => setEditName(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handleRename(); if (e.key === 'Escape') { setEditing(false); setEditName(folder.name) } }} onBlur={handleRename} className="w-full text-sm px-3 py-1.5 border rounded-lg bg-white text-gray-900 outline-none" style={{ borderColor: oliveColor }} />
         </div>
       ) : (
         <div className="relative group">
@@ -824,76 +708,36 @@ function FolderNode({
             onClick={() => onSelectFolder(folder.id)}
             onDoubleClick={() => { setEditing(true); setEditName(folder.name) }}
             style={{ paddingLeft: `${depth * 16 + 12}px` }}
-            className={`w-full text-left pr-8 py-1.5 text-sm rounded transition-colors flex items-center gap-2 ${
-              isSelected
-                ? 'bg-cyan-400/10 text-cyan-400 border border-cyan-400/20'
-                : 'text-slate-300 hover:bg-slate-800/50'
+            className={`w-full text-left pr-8 py-2 text-sm rounded-xl transition-colors flex items-center gap-2 ${
+              isSelected ? 'text-white' : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
-            <svg className="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-            </svg>
+            <svg className="w-4 h-4 shrink-0" style={{ color: isSelected ? 'white' : '#9ca3af' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>
             <span className="truncate flex-1">{folder.name}</span>
-            {folder.documentCount > 0 && (
-              <span className="text-xs text-slate-500">{folder.documentCount}</span>
-            )}
+            {folder.documentCount > 0 && <span className="text-xs" style={{ color: isSelected ? 'rgba(255,255,255,0.7)' : '#9ca3af' }}>{folder.documentCount}</span>}
           </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu) }}
-            className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-slate-400 hover:text-slate-200 px-1.5 py-1 text-xs rounded-lg hover:bg-slate-700 transition-all"
-          >
-            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-              <circle cx="12" cy="6" r="1.5" />
-              <circle cx="12" cy="12" r="1.5" />
-              <circle cx="12" cy="18" r="1.5" />
-            </svg>
+          <button onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu) }} className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-gray-600 px-1.5 py-1 text-xs rounded-lg hover:bg-gray-100 transition-all">
+            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="6" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="12" cy="18" r="1.5" /></svg>
           </button>
           {showMenu && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="absolute right-0 top-full z-50 bg-slate-800 border border-slate-600 rounded-lg shadow-xl py-1 min-w-[160px]">
-                <button
-                  onClick={() => { setEditing(true); setEditName(folder.name); setShowMenu(false) }}
-                  className="w-full text-left px-3 py-2 text-sm text-slate-300 hover:bg-slate-700 flex items-center gap-2"
-                >이름 변경</button>
-                <button
-                  onClick={() => { setCreatingChild(true); setShowMenu(false) }}
-                  className="w-full text-left px-3 py-2 text-sm text-slate-300 hover:bg-slate-700 flex items-center gap-2"
-                >하위 폴더 추가</button>
-                <div className="border-t border-slate-700 my-1" />
-                <button
-                  onClick={() => { deleteMutation.mutate(); setShowMenu(false) }}
-                  className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2"
-                >삭제</button>
+              <div className="absolute right-0 top-full z-50 bg-white border border-gray-200 rounded-lg shadow-xl py-1 min-w-[160px]">
+                <button onClick={() => { setEditing(true); setEditName(folder.name); setShowMenu(false) }} className="w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50">이름 변경</button>
+                <button onClick={() => { setCreatingChild(true); setShowMenu(false) }} className="w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50">하위 폴더 추가</button>
+                <div className="border-t border-gray-100 my-1" />
+                <button onClick={() => { deleteMutation.mutate(); setShowMenu(false) }} className="w-full text-left px-3 py-2 text-sm text-red-500 hover:bg-red-50">삭제</button>
               </div>
             </>
           )}
         </div>
       )}
       {folder.children.map(child => (
-        <FolderNode
-          key={child.id}
-          folder={child}
-          depth={depth + 1}
-          selectedFolderId={selectedFolderId}
-          onSelectFolder={onSelectFolder}
-          queryClient={queryClient}
-        />
+        <FolderNode key={child.id} folder={child} depth={depth + 1} selectedFolderId={selectedFolderId} onSelectFolder={onSelectFolder} queryClient={queryClient} />
       ))}
       {creatingChild && (
         <div style={{ paddingLeft: `${(depth + 1) * 16 + 4}px` }} className="py-0.5">
-          <input
-            ref={childRef}
-            value={childName}
-            onChange={(e) => setChildName(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleCreateChild()
-              if (e.key === 'Escape') { setCreatingChild(false); setChildName('') }
-            }}
-            onBlur={handleCreateChild}
-            className="w-full text-sm px-3 py-1.5 border border-blue-500 rounded-lg bg-slate-800 text-slate-50 outline-none"
-            placeholder="하위 폴더 이름"
-          />
+          <input ref={childRef} value={childName} onChange={(e) => setChildName(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handleCreateChild(); if (e.key === 'Escape') { setCreatingChild(false); setChildName('') } }} onBlur={handleCreateChild} className="w-full text-sm px-3 py-1.5 border rounded-lg bg-white text-gray-900 outline-none" style={{ borderColor: oliveColor }} placeholder="하위 폴더 이름" />
         </div>
       )}
     </div>
@@ -902,17 +746,8 @@ function FolderNode({
 
 // === Doc Detail View ===
 
-function DocDetailView({
-  doc, folders, onBack, onEdit, onDelete, onShowVersions, queryClient, onNavigateDoc,
-}: {
-  doc: KnowledgeDoc
-  folders: KnowledgeFolder[]
-  onBack: () => void
-  onEdit: (doc: KnowledgeDoc) => void
-  onDelete: (id: string) => void
-  onShowVersions: (id: string) => void
-  queryClient: ReturnType<typeof useQueryClient>
-  onNavigateDoc?: (docId: string) => void
+function DocDetailView({ doc, folders, onBack, onEdit, onDelete, onShowVersions, queryClient, onNavigateDoc }: {
+  doc: KnowledgeDoc; folders: KnowledgeFolder[]; onBack: () => void; onEdit: (doc: KnowledgeDoc) => void; onDelete: (id: string) => void; onShowVersions: (id: string) => void; queryClient: ReturnType<typeof useQueryClient>; onNavigateDoc?: (docId: string) => void
 }) {
   const detailQuery = useQuery({
     queryKey: ['knowledge-doc-detail', doc.id],
@@ -930,185 +765,97 @@ function DocDetailView({
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden" data-testid="doc-detail">
-      {/* Detail Header */}
-      <div className="p-5 border-b border-slate-800 flex flex-col gap-4 bg-slate-950/30">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-cyan-400/10 flex items-center justify-center text-cyan-400 border border-cyan-400/20">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-slate-50 leading-tight">{fullDoc.title}</h2>
-              <div className="flex items-center gap-2 text-xs text-slate-400 mt-1">
-                <span>{CONTENT_TYPE_LABELS[fullDoc.contentType]}</span>
-                <span className="w-1 h-1 rounded-full bg-slate-600" />
-                <span>마지막 수정: {formatRelative(fullDoc.updatedAt)}</span>
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button onClick={() => onEdit(fullDoc)} className="p-2 rounded border border-slate-800 text-slate-300 hover:text-slate-50 hover:bg-slate-800 transition-colors" title="편집">
-              <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-            </button>
-            <button onClick={() => onDelete(fullDoc.id)} className="p-2 rounded border border-red-900/50 text-red-400 hover:text-red-300 hover:bg-red-900/20 transition-colors" title="삭제">
-              <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-            </button>
-          </div>
+      {/* Toolbar */}
+      <div className="h-12 flex items-center justify-between px-6 bg-white shrink-0" style={{ borderBottom: `1px solid ${borderColor}` }}>
+        <div className="flex items-center gap-4">
+          <button onClick={() => onEdit(fullDoc)} className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors" title="Edit">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
+          </button>
+          <button onClick={() => onDelete(fullDoc.id)} className="p-1.5 hover:bg-red-50 rounded-lg text-red-400 transition-colors" title="Delete">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+          </button>
+          <div className="h-4 w-px mx-1" style={{ backgroundColor: borderColor }}></div>
+          <button onClick={() => onShowVersions(fullDoc.id)} className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors text-xs">버전</button>
+          <button onClick={onBack} className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-400 transition-colors text-xs ml-auto">닫기</button>
         </div>
-        {/* Tags */}
-        <div className="flex flex-wrap gap-2 mt-2">
-          {fullDoc.tags.map(tag => (
-            <span key={tag} className="px-2 py-1 rounded text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700">#{tag}</span>
-          ))}
-          <div className="ml-auto flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-            {fullDoc.embeddingStatus === 'done' ? (
-              <>
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                <span className="text-xs font-bold">벡터 DB 동기화됨</span>
-              </>
-            ) : (
-              <span className="text-xs text-slate-500">임베딩 없음</span>
-            )}
-          </div>
-        </div>
+        <div className="text-xs text-gray-400 italic">Auto-saved at {new Date(fullDoc.updatedAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</div>
       </div>
 
-      {/* Actions row */}
-      <div className="px-5 py-2 border-b border-slate-800 flex items-center gap-2">
-        <button onClick={() => onShowVersions(fullDoc.id)} className="px-3 py-1.5 text-xs border border-slate-800 rounded-lg text-slate-400 hover:bg-slate-800 transition-colors">버전 이력</button>
-        <button onClick={onBack} className="px-3 py-1.5 text-xs text-slate-500 hover:text-slate-300 transition-colors ml-auto">닫기</button>
-      </div>
+      {/* Preview Content */}
+      <div className="flex-1 overflow-y-auto scroll-smooth">
+        <div className="max-w-3xl mx-auto py-12 px-8">
+          <span className="inline-block font-bold text-xs tracking-widest uppercase mb-4" style={{ color: oliveColor }}>Internal Documentation</span>
+          <h1 className="font-bold text-4xl mb-6" style={{ fontFamily: "'Noto Serif KR', serif" }}>{fullDoc.title}</h1>
 
-      {/* Scrollable content area — matching Stitch 3-panel layout */}
-      <div className="flex-1 overflow-y-auto p-6 bg-slate-900 text-sm text-slate-300 leading-relaxed space-y-6">
-
-      {/* Content */}
-      {fullDoc.content && (
-        <div>
-          {fullDoc.contentType === 'markdown' || fullDoc.contentType === 'mermaid' ? (
-            <div className="prose prose-invert prose-sm max-w-none">
-              <MarkdownRenderer content={fullDoc.content} />
-            </div>
-          ) : fullDoc.contentType === 'html' ? (
-            <div className="prose prose-invert prose-sm max-w-none">
-              <MarkdownRenderer content={fullDoc.content} />
-            </div>
-          ) : (
-            <pre className="text-xs text-slate-300 whitespace-pre-wrap font-mono">{fullDoc.content}</pre>
-          )}
-        </div>
-      )}
-
-      {/* File attachment */}
-      {fullDoc.fileUrl && (
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-              </svg>
-              <span className="text-sm text-slate-300">첨부 파일</span>
-            </div>
-            <a
-              href={`/api/workspace/knowledge/docs/${fullDoc.id}/download`}
-              className="text-xs text-blue-400 hover:text-blue-300"
-            >다운로드</a>
-          </div>
-        </div>
-      )}
-
-      {/* Department assignment info */}
-      {(() => {
-        const findFolder = (fid: string | null, list: KnowledgeFolder[]): KnowledgeFolder | null => {
-          if (!fid) return null
-          for (const f of list) {
-            if (f.id === fid) return f
-            const child = findFolder(fid, f.children)
-            if (child) return child
-          }
-          return null
-        }
-        const folder = findFolder(fullDoc.folderId, folders)
-        if (!folder) return null
-        return (
-          <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4" data-testid="dept-assignment">
-            <h4 className="text-sm font-semibold text-slate-300 mb-2">부서 연결</h4>
-            <div className="flex items-center gap-2 text-sm text-slate-400">
-              <span>폴더: {folder.name}</span>
-              {folder.departmentName ? (
-                <Badge variant="info">{folder.departmentName}</Badge>
-              ) : (
-                <span className="text-slate-500">(부서 미연결)</span>
-              )}
-            </div>
-          </div>
-        )
-      })()}
-
-      {/* Embedding status */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-        <h4 className="text-sm font-semibold text-slate-300 mb-2">임베딩 상태</h4>
-        <div className="flex items-center gap-2">
-          {fullDoc.embeddingStatus === 'done' ? (
-            <>
-              <Badge variant="success">완료</Badge>
-              {fullDoc.embeddingModel && <span className="text-xs text-slate-500">{fullDoc.embeddingModel}</span>}
-              {fullDoc.embeddedAt && <span className="text-xs text-slate-500">{formatRelative(fullDoc.embeddedAt)}</span>}
-            </>
-          ) : (
-            <span className="text-xs text-slate-500">임베딩 없음 — 문서 수정 시 자동 생성됩니다</span>
-          )}
-        </div>
-      </div>
-
-      {/* Similar documents */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4" data-testid="similar-docs">
-        <h4 className="text-sm font-semibold text-slate-300 mb-3">유사 문서</h4>
-        {similarQuery.isLoading ? (
-          <p className="text-xs text-slate-500">유사 문서 검색 중...</p>
-        ) : !similarQuery.data?.data?.length ? (
-          <p className="text-xs text-slate-500">
-            {fullDoc.embeddingStatus === 'done' ? '유사 문서가 없습니다' : '임베딩이 없어 유사 문서를 찾을 수 없습니다'}
-          </p>
-        ) : (
-          <div className="space-y-2">
-            {similarQuery.data.data.map(sim => (
-              <div
-                key={sim.id}
-                className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-700/30 cursor-pointer transition-colors"
-                onClick={() => onNavigateDoc?.(sim.id)}
-              >
-                <span className="text-sm text-slate-200 truncate">{sim.title}</span>
-                <Badge variant="info">{Math.round(sim.score * 100)}%</Badge>
-              </div>
+          {/* Tags */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            {fullDoc.tags.map(tag => (
+              <span key={tag} className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-tight rounded" style={{ backgroundColor: sandBg, color: oliveColor }}>
+                {tag}
+              </span>
             ))}
           </div>
-        )}
-      </div>
 
-      {/* End of document marker */}
-      <div className="pt-4 border-t border-slate-800/50 text-xs text-slate-500 text-center">
-        End of document
-      </div>
+          {/* Content */}
+          {fullDoc.content && (
+            <div className="prose prose-sm max-w-none">
+              {fullDoc.contentType === 'markdown' || fullDoc.contentType === 'mermaid' ? (
+                <MarkdownRenderer content={fullDoc.content} />
+              ) : fullDoc.contentType === 'html' ? (
+                <MarkdownRenderer content={fullDoc.content} />
+              ) : (
+                <pre className="text-xs text-gray-600 whitespace-pre-wrap font-mono">{fullDoc.content}</pre>
+              )}
+            </div>
+          )}
 
-      </div>{/* end scroll wrapper */}
+          {/* File attachment */}
+          {fullDoc.fileUrl && (
+            <div className="rounded-2xl p-6 mt-8" style={{ backgroundColor: sandBg, border: `1px solid ${borderColor}` }}>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">첨부 파일</span>
+                <a href={`/api/workspace/knowledge/docs/${fullDoc.id}/download`} className="text-xs" style={{ color: oliveColor }}>다운로드</a>
+              </div>
+            </div>
+          )}
+
+          {/* Implementation Note callout */}
+          {fullDoc.embeddingStatus === 'done' && (
+            <div className="p-6 rounded-2xl my-8" style={{ backgroundColor: sandBg, border: `1px solid ${borderColor}` }}>
+              <h4 className="text-sm font-bold mb-2 flex items-center gap-2" style={{ color: oliveColor }}>
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path clipRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" fillRule="evenodd" /></svg>
+                Embedding Status
+              </h4>
+              <p className="text-sm text-gray-600 italic">
+                벡터 DB에 동기화되었습니다. {fullDoc.embeddingModel && `모델: ${fullDoc.embeddingModel}`}
+              </p>
+            </div>
+          )}
+
+          {/* Similar documents */}
+          {similarQuery.data?.data && similarQuery.data.data.length > 0 && (
+            <div className="mt-8">
+              <h4 className="text-sm font-semibold text-gray-600 mb-3">유사 문서</h4>
+              <div className="space-y-2">
+                {similarQuery.data.data.map(sim => (
+                  <div key={sim.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors" onClick={() => onNavigateDoc?.(sim.id)}>
+                    <span className="text-sm text-gray-700 truncate">{sim.title}</span>
+                    <Badge variant="info">{Math.round(sim.score * 100)}%</Badge>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
 
 // === Doc Modal (Create / Edit) ===
 
-function DocModal({
-  isOpen, doc, folders, selectedFolderId, onClose, queryClient,
-}: {
-  isOpen: boolean
-  doc: KnowledgeDoc | null
-  folders: KnowledgeFolder[]
-  selectedFolderId: string | null
-  onClose: () => void
-  queryClient: ReturnType<typeof useQueryClient>
+function DocModal({ isOpen, doc, folders, selectedFolderId, onClose, queryClient }: {
+  isOpen: boolean; doc: KnowledgeDoc | null; folders: KnowledgeFolder[]; selectedFolderId: string | null; onClose: () => void; queryClient: ReturnType<typeof useQueryClient>
 }) {
   const isEdit = !!doc
   const [title, setTitle] = useState('')
@@ -1118,56 +865,27 @@ function DocModal({
   const [tagsInput, setTagsInput] = useState('')
 
   useEffect(() => {
-    if (doc) {
-      setTitle(doc.title)
-      setContentType(doc.contentType)
-      setContent(doc.content || '')
-      setFolderId(doc.folderId || '')
-      setTagsInput(doc.tags.join(', '))
-    } else {
-      setTitle('')
-      setContentType('markdown')
-      setContent('')
-      setFolderId(selectedFolderId || '')
-      setTagsInput('')
-    }
+    if (doc) { setTitle(doc.title); setContentType(doc.contentType); setContent(doc.content || ''); setFolderId(doc.folderId || ''); setTagsInput(doc.tags.join(', ')) }
+    else { setTitle(''); setContentType('markdown'); setContent(''); setFolderId(selectedFolderId || ''); setTagsInput('') }
   }, [doc, selectedFolderId, isOpen])
 
   const createMutation = useMutation({
-    mutationFn: (body: { title: string; contentType: string; content: string; folderId?: string; tags?: string[] }) =>
-      api.post('/workspace/knowledge/docs', body),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['knowledge-docs'] })
-      queryClient.invalidateQueries({ queryKey: ['knowledge-folders'] })
-      queryClient.invalidateQueries({ queryKey: ['knowledge-tags'] })
-      onClose()
-      toast.success('문서가 생성되었습니다')
-    },
+    mutationFn: (body: { title: string; contentType: string; content: string; folderId?: string; tags?: string[] }) => api.post('/workspace/knowledge/docs', body),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['knowledge-docs'] }); queryClient.invalidateQueries({ queryKey: ['knowledge-folders'] }); queryClient.invalidateQueries({ queryKey: ['knowledge-tags'] }); onClose(); toast.success('문서가 생성되었습니다') },
     onError: (err: Error) => toast.error(err.message),
   })
 
   const updateMutation = useMutation({
-    mutationFn: (body: { title?: string; contentType?: string; content?: string; folderId?: string | null; tags?: string[] }) =>
-      api.patch(`/workspace/knowledge/docs/${doc!.id}`, body),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['knowledge-docs'] })
-      queryClient.invalidateQueries({ queryKey: ['knowledge-doc-detail', doc!.id] })
-      queryClient.invalidateQueries({ queryKey: ['knowledge-folders'] })
-      queryClient.invalidateQueries({ queryKey: ['knowledge-tags'] })
-      onClose()
-      toast.success('문서가 수정되었습니다')
-    },
+    mutationFn: (body: { title?: string; contentType?: string; content?: string; folderId?: string | null; tags?: string[] }) => api.patch(`/workspace/knowledge/docs/${doc!.id}`, body),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['knowledge-docs'] }); queryClient.invalidateQueries({ queryKey: ['knowledge-doc-detail', doc!.id] }); queryClient.invalidateQueries({ queryKey: ['knowledge-folders'] }); queryClient.invalidateQueries({ queryKey: ['knowledge-tags'] }); onClose(); toast.success('문서가 수정되었습니다') },
     onError: (err: Error) => toast.error(err.message),
   })
 
   const handleSubmit = () => {
     if (!title.trim()) { toast.error('제목을 입력하세요'); return }
     const tags = tagsInput.split(',').map(t => t.trim()).filter(Boolean)
-    if (isEdit) {
-      updateMutation.mutate({ title: title.trim(), contentType, content, folderId: folderId || null, tags })
-    } else {
-      createMutation.mutate({ title: title.trim(), contentType, content, folderId: folderId || undefined, tags })
-    }
+    if (isEdit) updateMutation.mutate({ title: title.trim(), contentType, content, folderId: folderId || null, tags })
+    else createMutation.mutate({ title: title.trim(), contentType, content, folderId: folderId || undefined, tags })
   }
 
   const isSubmitting = createMutation.isPending || updateMutation.isPending
@@ -1176,23 +894,13 @@ function DocModal({
     <Modal isOpen={isOpen} onClose={onClose} title={isEdit ? '문서 편집' : '새 문서'} className="max-w-2xl">
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1">제목 *</label>
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-slate-50 outline-none"
-            placeholder="문서 제목"
-            autoFocus
-          />
+          <label className="block text-sm font-medium text-gray-600 mb-1">제목 *</label>
+          <input value={title} onChange={(e) => setTitle(e.target.value)} className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 outline-none" placeholder="문서 제목" autoFocus />
         </div>
         <div className="flex gap-3">
           <div className="flex-1">
-            <label className="block text-sm font-medium text-slate-300 mb-1">유형</label>
-            <select
-              value={contentType}
-              onChange={(e) => setContentType(e.target.value as ContentType)}
-              className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-300 outline-none"
-            >
+            <label className="block text-sm font-medium text-gray-600 mb-1">유형</label>
+            <select value={contentType} onChange={(e) => setContentType(e.target.value as ContentType)} className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none">
               <option value="markdown">마크다운</option>
               <option value="text">텍스트</option>
               <option value="html">HTML</option>
@@ -1200,44 +908,26 @@ function DocModal({
             </select>
           </div>
           <div className="flex-1">
-            <label className="block text-sm font-medium text-slate-300 mb-1">폴더</label>
-            <select
-              value={folderId}
-              onChange={(e) => setFolderId(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-300 outline-none"
-            >
+            <label className="block text-sm font-medium text-gray-600 mb-1">폴더</label>
+            <select value={folderId} onChange={(e) => setFolderId(e.target.value)} className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none">
               <option value="">폴더 없음</option>
-              {flattenFolders(folders).map(f => (
-                <option key={f.id} value={f.id}>{f.indent}{f.name}</option>
-              ))}
+              {flattenFolders(folders).map(f => (<option key={f.id} value={f.id}>{f.indent}{f.name}</option>))}
             </select>
           </div>
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1">태그 (쉼표 구분)</label>
-          <input
-            value={tagsInput}
-            onChange={(e) => setTagsInput(e.target.value)}
-            className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-50 outline-none placeholder:text-slate-500"
-            placeholder="태그1, 태그2, ..."
-          />
+          <label className="block text-sm font-medium text-gray-600 mb-1">태그 (쉼표 구분)</label>
+          <input value={tagsInput} onChange={(e) => setTagsInput(e.target.value)} className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 outline-none placeholder:text-gray-400" placeholder="태그1, 태그2, ..." />
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1">내용</label>
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-50 font-mono min-h-[256px] resize-y outline-none placeholder:text-slate-500"
-            placeholder={contentType === 'markdown' ? '마크다운으로 작성...' : '내용을 입력하세요...'}
-          />
+          <label className="block text-sm font-medium text-gray-600 mb-1">내용</label>
+          <textarea value={content} onChange={(e) => setContent(e.target.value)} className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 font-mono min-h-[256px] resize-y outline-none placeholder:text-gray-400" placeholder={contentType === 'markdown' ? '마크다운으로 작성...' : '내용을 입력하세요...'} />
         </div>
         <div className="flex justify-end gap-2 pt-2">
-          <button onClick={onClose} className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200 transition-colors">취소</button>
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50"
-          >{isSubmitting ? '저장 중...' : isEdit ? '수정' : '생성'}</button>
+          <button onClick={onClose} className="px-4 py-2 text-sm text-gray-400 hover:text-gray-600 transition-colors">취소</button>
+          <button onClick={handleSubmit} disabled={isSubmitting} className="text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50" style={{ backgroundColor: oliveColor }}>
+            {isSubmitting ? '저장 중...' : isEdit ? '수정' : '생성'}
+          </button>
         </div>
       </div>
     </Modal>
@@ -1246,13 +936,7 @@ function DocModal({
 
 // === Version History Modal ===
 
-function VersionHistoryModal({
-  docId, onClose, queryClient,
-}: {
-  docId: string | null
-  onClose: () => void
-  queryClient: ReturnType<typeof useQueryClient>
-}) {
+function VersionHistoryModal({ docId, onClose, queryClient }: { docId: string | null; onClose: () => void; queryClient: ReturnType<typeof useQueryClient> }) {
   const versionsQuery = useQuery({
     queryKey: ['doc-versions', docId],
     queryFn: () => api.get<{ data: DocVersion[] }>(`/workspace/knowledge/docs/${docId}/versions`),
@@ -1260,15 +944,8 @@ function VersionHistoryModal({
   })
 
   const restoreMutation = useMutation({
-    mutationFn: (versionId: string) =>
-      api.post(`/workspace/knowledge/docs/${docId}/versions/${versionId}/restore`, {}),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['knowledge-docs'] })
-      queryClient.invalidateQueries({ queryKey: ['knowledge-doc-detail', docId] })
-      queryClient.invalidateQueries({ queryKey: ['doc-versions', docId] })
-      onClose()
-      toast.success('버전이 복원되었습니다')
-    },
+    mutationFn: (versionId: string) => api.post(`/workspace/knowledge/docs/${docId}/versions/${versionId}/restore`, {}),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['knowledge-docs'] }); queryClient.invalidateQueries({ queryKey: ['knowledge-doc-detail', docId] }); queryClient.invalidateQueries({ queryKey: ['doc-versions', docId] }); onClose(); toast.success('버전이 복원되었습니다') },
     onError: (err: Error) => toast.error(err.message),
   })
 
@@ -1277,23 +954,19 @@ function VersionHistoryModal({
   return (
     <Modal isOpen={!!docId} onClose={onClose} title="버전 이력">
       {versionsQuery.isLoading ? (
-        <div className="py-8 text-center text-sm text-slate-400">로딩 중...</div>
+        <div className="py-8 text-center text-sm text-gray-400">로딩 중...</div>
       ) : versions.length === 0 ? (
-        <div className="py-8 text-center text-sm text-slate-400">버전 이력이 없습니다</div>
+        <div className="py-8 text-center text-sm text-gray-400">버전 이력이 없습니다</div>
       ) : (
-        <div className="divide-y divide-slate-700/50 max-h-96 overflow-y-auto">
+        <div className="divide-y divide-gray-100 max-h-96 overflow-y-auto">
           {versions.map(v => (
-            <div key={v.id} className="px-4 py-3 flex items-center justify-between hover:bg-slate-700/20 transition-colors">
+            <div key={v.id} className="px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors">
               <div>
-                <span className="text-sm text-slate-200">v{v.version}</span>
-                <span className="text-xs text-slate-500 ml-2">{formatDate(v.createdAt)}{v.editedBy ? ` · ${v.editedBy}` : ''}</span>
-                {v.changeNote && <p className="text-xs text-slate-400 mt-0.5">{v.changeNote}</p>}
+                <span className="text-sm text-gray-700">v{v.version}</span>
+                <span className="text-xs text-gray-400 ml-2">{formatDate(v.createdAt)}{v.editedBy ? ` · ${v.editedBy}` : ''}</span>
+                {v.changeNote && <p className="text-xs text-gray-400 mt-0.5">{v.changeNote}</p>}
               </div>
-              <button
-                onClick={() => restoreMutation.mutate(v.id)}
-                disabled={restoreMutation.isPending}
-                className="text-xs text-blue-400 hover:text-blue-300 px-3 py-1 rounded-lg border border-slate-600 hover:bg-blue-500/10 transition-colors"
-              >복원</button>
+              <button onClick={() => restoreMutation.mutate(v.id)} disabled={restoreMutation.isPending} className="text-xs px-3 py-1 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors" style={{ color: oliveColor }}>복원</button>
             </div>
           ))}
         </div>
@@ -1341,161 +1014,82 @@ function MemoriesTab({ queryClient }: { queryClient: ReturnType<typeof useQueryC
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => api.delete(`/workspace/knowledge/memories/${id}`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['knowledge-memories'] })
-      toast.success('기억이 삭제되었습니다')
-    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['knowledge-memories'] }); toast.success('기억이 삭제되었습니다') },
     onError: (err: Error) => toast.error(err.message),
   })
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden" data-testid="memories-tab">
-      {/* Filters */}
-      <div className="px-6 py-3 border-b border-slate-700/50 flex flex-wrap gap-3 items-center">
-        <select
-          value={agentFilter}
-          onChange={(e) => setAgentFilter(e.target.value)}
-          className="bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-300 outline-none focus:border-blue-500"
-        >
+      <div className="px-6 py-3 flex flex-wrap gap-3 items-center bg-white" style={{ borderBottom: `1px solid ${borderColor}` }}>
+        <select value={agentFilter} onChange={(e) => setAgentFilter(e.target.value)} className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none">
           <option value="">전체 에이전트</option>
-          {agents.map(a => (
-            <option key={a.id} value={a.id}>{a.name}</option>
-          ))}
+          {agents.map(a => (<option key={a.id} value={a.id}>{a.name}</option>))}
         </select>
-        <select
-          value={typeFilter}
-          onChange={(e) => setTypeFilter(e.target.value as MemoryType | '')}
-          className="bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-300 outline-none"
-        >
+        <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as MemoryType | '')} className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none">
           <option value="">전체 유형</option>
           <option value="learning">학습</option>
           <option value="insight">인사이트</option>
           <option value="preference">선호</option>
           <option value="fact">사실</option>
         </select>
-        <input
-          className="bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 outline-none w-40"
-          placeholder="검색..."
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-        />
+        <input className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 outline-none w-40" placeholder="검색..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />
         <div className="flex-1" />
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
-          data-testid="add-memory"
-        >+ 기억 추가</button>
+        <button onClick={() => setShowCreateModal(true)} className="text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors" style={{ backgroundColor: oliveColor }} data-testid="add-memory">+ 기억 추가</button>
       </div>
 
-      {/* Memory list */}
-      <div className="flex-1 overflow-auto p-6 space-y-3">
+      <div className="flex-1 overflow-auto p-6 space-y-3" style={{ backgroundColor: sandBg }}>
         {memoriesQuery.isLoading ? (
-          <div className="space-y-3">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-32 bg-slate-700/50 rounded-xl animate-pulse" />
-            ))}
-          </div>
+          <div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => (<div key={i} className="h-32 bg-gray-100 rounded-xl animate-pulse" />))}</div>
         ) : filteredMemories.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="memories-empty">
-            <div className="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center mb-4">
-              <span className="text-3xl">🧠</span>
-            </div>
-            <h3 className="text-base font-medium text-slate-300 mb-2">에이전트 기억이 없습니다</h3>
-            <p className="text-sm text-slate-500">에이전트가 작업하면서 자동으로 기억을 학습합니다</p>
+            <h3 className="text-base font-medium text-gray-600 mb-2">에이전트 기억이 없습니다</h3>
+            <p className="text-sm text-gray-400">에이전트가 작업하면서 자동으로 기억을 학습합니다</p>
           </div>
         ) : (
           filteredMemories.map(mem => (
-            <div
-              key={mem.id}
-              className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 space-y-3 hover:border-slate-600 transition-colors"
-              data-testid={`memory-card-${mem.id}`}
-            >
+            <div key={mem.id} className="bg-white border border-gray-100 rounded-xl p-4 space-y-3 hover:shadow-sm transition-all" data-testid={`memory-card-${mem.id}`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-slate-100">{mem.key}</span>
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${MEMORY_TYPE_COLORS[mem.memoryType]}`}>
-                    {MEMORY_TYPE_LABELS[mem.memoryType]}
-                  </span>
+                  <span className="text-sm font-medium text-gray-800">{mem.key}</span>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${MEMORY_TYPE_COLORS[mem.memoryType]}`}>{MEMORY_TYPE_LABELS[mem.memoryType]}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => setEditMemory(mem)}
-                    className="p-1.5 rounded-lg hover:bg-slate-700 text-slate-400 transition-colors"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                    </svg>
+                  <button onClick={() => setEditMemory(mem)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 transition-colors">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                   </button>
-                  <button
-                    onClick={() => setDeleteConfirmId(mem.id)}
-                    className="p-1.5 rounded-lg hover:bg-red-500/10 text-red-400 transition-colors"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
+                  <button onClick={() => setDeleteConfirmId(mem.id)} className="p-1.5 rounded-lg hover:bg-red-50 text-red-400 transition-colors">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                   </button>
                 </div>
               </div>
-              <p className="text-sm text-slate-300 leading-relaxed">{mem.content}</p>
-              <div className="flex items-center gap-4 text-xs text-slate-500">
-                {mem.agentName && <span>에이전트: <span className="text-cyan-400">{mem.agentName}</span></span>}
+              <p className="text-sm text-gray-600 leading-relaxed">{mem.content}</p>
+              <div className="flex items-center gap-4 text-xs text-gray-400">
+                {mem.agentName && <span>에이전트: <span style={{ color: oliveColor }}>{mem.agentName}</span></span>}
                 <span>출처: {mem.source || '자동'}</span>
                 <span>사용 {mem.usageCount}회</span>
               </div>
-              {/* Confidence bar */}
               <div className="flex items-center gap-2">
-                <span className="text-[10px] text-slate-500 w-12">신뢰도</span>
-                <div className="flex-1 h-1.5 bg-slate-700 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full ${mem.confidence >= 70 ? 'bg-emerald-500' : mem.confidence >= 40 ? 'bg-amber-500' : 'bg-red-500'}`}
-                    style={{ width: `${mem.confidence}%` }}
-                  />
+                <span className="text-[10px] text-gray-400 w-12">신뢰도</span>
+                <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div className={`h-full rounded-full ${mem.confidence >= 70 ? 'bg-emerald-500' : mem.confidence >= 40 ? 'bg-amber-500' : 'bg-red-500'}`} style={{ width: `${mem.confidence}%` }} />
                 </div>
-                <span className={`text-[10px] font-medium ${mem.confidence >= 70 ? 'text-emerald-400' : mem.confidence >= 40 ? 'text-amber-400' : 'text-red-400'}`}>
-                  {mem.confidence}%
-                </span>
+                <span className={`text-[10px] font-medium ${mem.confidence >= 70 ? 'text-emerald-600' : mem.confidence >= 40 ? 'text-amber-600' : 'text-red-600'}`}>{mem.confidence}%</span>
               </div>
             </div>
           ))
         )}
       </div>
 
-      {/* Memory Create/Edit Modal */}
-      <MemoryModal
-        isOpen={showCreateModal || !!editMemory}
-        memory={editMemory}
-        agents={agents}
-        onClose={() => { setShowCreateModal(false); setEditMemory(null) }}
-        queryClient={queryClient}
-      />
-
-      {/* Delete confirm */}
-      <ConfirmDialog
-        isOpen={!!deleteConfirmId}
-        onConfirm={() => {
-          if (deleteConfirmId) deleteMutation.mutate(deleteConfirmId)
-          setDeleteConfirmId(null)
-        }}
-        onCancel={() => setDeleteConfirmId(null)}
-        title="기억 삭제"
-        description="이 기억을 삭제하시겠습니까?"
-        confirmText="삭제"
-        cancelText="취소"
-      />
+      <MemoryModal isOpen={showCreateModal || !!editMemory} memory={editMemory} agents={agents} onClose={() => { setShowCreateModal(false); setEditMemory(null) }} queryClient={queryClient} />
+      <ConfirmDialog isOpen={!!deleteConfirmId} onConfirm={() => { if (deleteConfirmId) deleteMutation.mutate(deleteConfirmId); setDeleteConfirmId(null) }} onCancel={() => setDeleteConfirmId(null)} title="기억 삭제" description="이 기억을 삭제하시겠습니까?" confirmText="삭제" cancelText="취소" />
     </div>
   )
 }
 
 // === Memory Modal ===
 
-function MemoryModal({
-  isOpen, memory, agents, onClose, queryClient,
-}: {
-  isOpen: boolean
-  memory: AgentMemory | null
-  agents: Agent[]
-  onClose: () => void
-  queryClient: ReturnType<typeof useQueryClient>
+function MemoryModal({ isOpen, memory, agents, onClose, queryClient }: {
+  isOpen: boolean; memory: AgentMemory | null; agents: Agent[]; onClose: () => void; queryClient: ReturnType<typeof useQueryClient>
 }) {
   const isEdit = !!memory
   const [agentId, setAgentId] = useState('')
@@ -1505,51 +1099,26 @@ function MemoryModal({
   const [confidence, setConfidence] = useState(80)
 
   useEffect(() => {
-    if (memory) {
-      setAgentId(memory.agentId)
-      setMemoryType(memory.memoryType)
-      setKey(memory.key)
-      setContent(memory.content)
-      setConfidence(memory.confidence)
-    } else {
-      setAgentId(agents[0]?.id || '')
-      setMemoryType('learning')
-      setKey('')
-      setContent('')
-      setConfidence(80)
-    }
+    if (memory) { setAgentId(memory.agentId); setMemoryType(memory.memoryType); setKey(memory.key); setContent(memory.content); setConfidence(memory.confidence) }
+    else { setAgentId(agents[0]?.id || ''); setMemoryType('learning'); setKey(''); setContent(''); setConfidence(80) }
   }, [memory, agents, isOpen])
 
   const createMutation = useMutation({
-    mutationFn: (body: { agentId: string; memoryType: string; key: string; content: string; confidence: number }) =>
-      api.post('/workspace/knowledge/memories', body),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['knowledge-memories'] })
-      onClose()
-      toast.success('기억이 생성되었습니다')
-    },
+    mutationFn: (body: { agentId: string; memoryType: string; key: string; content: string; confidence: number }) => api.post('/workspace/knowledge/memories', body),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['knowledge-memories'] }); onClose(); toast.success('기억이 생성되었습니다') },
     onError: (err: Error) => toast.error(err.message),
   })
 
   const updateMutation = useMutation({
-    mutationFn: (body: { memoryType?: string; key?: string; content?: string; confidence?: number }) =>
-      api.patch(`/workspace/knowledge/memories/${memory!.id}`, body),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['knowledge-memories'] })
-      onClose()
-      toast.success('기억이 수정되었습니다')
-    },
+    mutationFn: (body: { memoryType?: string; key?: string; content?: string; confidence?: number }) => api.patch(`/workspace/knowledge/memories/${memory!.id}`, body),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['knowledge-memories'] }); onClose(); toast.success('기억이 수정되었습니다') },
     onError: (err: Error) => toast.error(err.message),
   })
 
   const handleSubmit = () => {
     if (!key.trim() || !content.trim()) { toast.error('제목과 내용을 입력하세요'); return }
-    if (isEdit) {
-      updateMutation.mutate({ memoryType, key: key.trim(), content: content.trim(), confidence })
-    } else {
-      if (!agentId) { toast.error('에이전트를 선택하세요'); return }
-      createMutation.mutate({ agentId, memoryType, key: key.trim(), content: content.trim(), confidence })
-    }
+    if (isEdit) updateMutation.mutate({ memoryType, key: key.trim(), content: content.trim(), confidence })
+    else { if (!agentId) { toast.error('에이전트를 선택하세요'); return }; createMutation.mutate({ agentId, memoryType, key: key.trim(), content: content.trim(), confidence }) }
   }
 
   const isSubmitting = createMutation.isPending || updateMutation.isPending
@@ -1559,27 +1128,17 @@ function MemoryModal({
       <div className="space-y-4">
         {!isEdit && (
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">에이전트</label>
-            <select
-              value={agentId}
-              onChange={(e) => setAgentId(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-300 outline-none"
-            >
+            <label className="block text-sm font-medium text-gray-600 mb-1">에이전트</label>
+            <select value={agentId} onChange={(e) => setAgentId(e.target.value)} className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none">
               <option value="">에이전트 선택</option>
-              {agents.map(a => (
-                <option key={a.id} value={a.id}>{a.name}</option>
-              ))}
+              {agents.map(a => (<option key={a.id} value={a.id}>{a.name}</option>))}
             </select>
           </div>
         )}
         <div className="flex gap-3">
           <div className="flex-1">
-            <label className="block text-sm font-medium text-slate-300 mb-1">유형</label>
-            <select
-              value={memoryType}
-              onChange={(e) => setMemoryType(e.target.value as MemoryType)}
-              className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-300 outline-none"
-            >
+            <label className="block text-sm font-medium text-gray-600 mb-1">유형</label>
+            <select value={memoryType} onChange={(e) => setMemoryType(e.target.value as MemoryType)} className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none">
               <option value="learning">학습</option>
               <option value="insight">인사이트</option>
               <option value="preference">선호</option>
@@ -1587,35 +1146,23 @@ function MemoryModal({
             </select>
           </div>
           <div className="flex-1">
-            <label className="block text-sm font-medium text-slate-300 mb-1">신뢰도: {confidence}%</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1">신뢰도: {confidence}%</label>
             <input type="range" min={0} max={100} value={confidence} onChange={(e) => setConfidence(Number(e.target.value))} className="w-full h-9" />
           </div>
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1">제목</label>
-          <input
-            value={key}
-            onChange={(e) => setKey(e.target.value)}
-            className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-50 outline-none placeholder:text-slate-500"
-            placeholder="기억 제목"
-          />
+          <label className="block text-sm font-medium text-gray-600 mb-1">제목</label>
+          <input value={key} onChange={(e) => setKey(e.target.value)} className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 outline-none placeholder:text-gray-400" placeholder="기억 제목" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1">내용</label>
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-50 h-32 resize-y outline-none placeholder:text-slate-500"
-            placeholder="학습 내용..."
-          />
+          <label className="block text-sm font-medium text-gray-600 mb-1">내용</label>
+          <textarea value={content} onChange={(e) => setContent(e.target.value)} className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 h-32 resize-y outline-none placeholder:text-gray-400" placeholder="학습 내용..." />
         </div>
         <div className="flex justify-end gap-2 pt-2">
-          <button onClick={onClose} className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200 transition-colors">취소</button>
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50"
-          >{isSubmitting ? '저장 중...' : isEdit ? '수정' : '생성'}</button>
+          <button onClick={onClose} className="px-4 py-2 text-sm text-gray-400 hover:text-gray-600 transition-colors">취소</button>
+          <button onClick={handleSubmit} disabled={isSubmitting} className="text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50" style={{ backgroundColor: oliveColor }}>
+            {isSubmitting ? '저장 중...' : isEdit ? '수정' : '생성'}
+          </button>
         </div>
       </div>
     </Modal>

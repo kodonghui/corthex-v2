@@ -1,9 +1,34 @@
+/**
+ * Admin Settings Page — Natural Organic Theme
+ *
+ * API Endpoints:
+ *   GET    /admin/companies/:id
+ *   PATCH  /admin/companies/:id
+ *   GET    /admin/api-keys
+ *   GET    /admin/api-keys/providers
+ *   POST   /admin/api-keys
+ *   PUT    /admin/api-keys/:id
+ *   DELETE /admin/api-keys/:id
+ *   GET    /admin/company-settings/handoff-depth
+ *   PUT    /admin/company-settings/handoff-depth
+ */
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
 import { useToastStore } from '../stores/toast-store'
 import { Skeleton, ConfirmDialog } from '@corthex/ui'
+
+// === Natural Organic Colors ===
+
+const olive = '#5a7247'
+const oliveBg = 'rgba(90,114,71,0.1)'
+const terracotta = '#c4622d'
+const cream = '#faf8f5'
+const sand = '#e5e1d3'
+const warmBrown = '#463e30'
+const muted = '#9c8d66'
+const lightMuted = '#b7aa88'
 
 // === Types ===
 
@@ -41,14 +66,14 @@ const PROVIDER_LABELS: Record<string, string> = {
   openai: 'OpenAI (GPT)',
   google_ai: 'Google AI (Gemini)',
   kis: 'KIS (한국투자증권)',
-  smtp: 'SMTP 메일',
+  smtp: 'SMTP Mail',
   email: 'Email',
   telegram: 'Telegram',
   instagram: 'Instagram',
-  serper: 'Serper (검색)',
+  serper: 'Serper (Search)',
   notion: 'Notion',
   google_calendar: 'Google Calendar',
-  tts: 'TTS (음성합성)',
+  tts: 'TTS (Voice)',
 }
 
 // === Company Info Section ===
@@ -68,55 +93,67 @@ function CompanyInfoSection({ company, onSave }: { company: Company; onSave: (da
   }
 
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5" data-testid="settings-company-info">
-      <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4">회사 기본 정보</h2>
+    <div className="bg-white rounded-xl border shadow-sm p-6" style={{ borderColor: sand }} data-testid="settings-company-info">
+      <div className="flex items-center gap-3 mb-5">
+        <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: oliveBg }}>
+          <span className="material-symbols-outlined" style={{ color: olive }}>apartment</span>
+        </div>
+        <h2 className="text-lg font-bold" style={{ color: warmBrown, fontFamily: "'Noto Serif KR', serif" }}>Company Info</h2>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">회사명</label>
+          <label className="block text-xs font-medium mb-1.5" style={{ color: muted }}>Company Name</label>
           <input
             value={name}
             onChange={(e) => handleNameChange(e.target.value)}
-            className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            className="w-full px-3 py-2.5 border rounded-lg bg-white text-sm focus:outline-none focus:ring-1"
+            style={{ borderColor: sand, color: warmBrown, outlineColor: olive }}
           />
         </div>
         <div>
-          <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">Slug</label>
+          <label className="block text-xs font-medium mb-1.5" style={{ color: muted }}>Slug</label>
           <input
             value={company.slug}
             disabled
-            className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-zinc-100 dark:bg-zinc-800/50 text-sm text-zinc-500 cursor-not-allowed"
+            className="w-full px-3 py-2.5 border rounded-lg text-sm cursor-not-allowed"
+            style={{ borderColor: sand, backgroundColor: `${cream}80`, color: lightMuted }}
           />
         </div>
         <div>
-          <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">생성일</label>
-          <p className="text-sm text-zinc-900 dark:text-zinc-100 py-2">{formatDate(company.createdAt)}</p>
+          <label className="block text-xs font-medium mb-1.5" style={{ color: muted }}>Created</label>
+          <p className="text-sm py-2" style={{ color: warmBrown }}>{formatDate(company.createdAt)}</p>
         </div>
         <div>
-          <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">상태</label>
-          <span className={`inline-block text-xs px-2.5 py-1 rounded-full ${
-            company.isActive
-              ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
-              : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
-          }`}>
-            {company.isActive ? '활성' : '비활성'}
+          <label className="block text-xs font-medium mb-1.5" style={{ color: muted }}>Status</label>
+          <span
+            className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-bold"
+            style={{
+              backgroundColor: company.isActive ? oliveBg : 'rgba(239,68,68,0.1)',
+              color: company.isActive ? olive : '#ef4444',
+            }}
+          >
+            <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: company.isActive ? olive : '#ef4444' }} />
+            {company.isActive ? 'Active' : 'Inactive'}
           </span>
         </div>
       </div>
 
       {dirty && (
-        <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-700">
+        <div className="flex justify-end gap-3 mt-5 pt-5 border-t" style={{ borderColor: sand }}>
           <button
             onClick={() => { setName(company.name); setDirty(false) }}
-            className="px-4 py-2 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+            className="px-5 py-2 text-sm font-medium transition-colors"
+            style={{ color: muted }}
           >
-            취소
+            Cancel
           </button>
           <button
             onClick={() => onSave({ name })}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors"
+            className="px-5 py-2 text-white text-sm font-bold rounded-xl transition-all"
+            style={{ backgroundColor: olive }}
           >
-            저장
+            Save
           </button>
         </div>
       )}
@@ -153,7 +190,6 @@ function ApiKeySection({ companyId }: { companyId: string }) {
   const apiKeys = apiKeyData?.data || []
   const providerSchemas = providerData?.data || {}
   const providerList = Object.keys(providerSchemas)
-
   const selectedProviderFields = addForm.provider ? (providerSchemas[addForm.provider] || []) : []
 
   const addMutation = useMutation({
@@ -163,7 +199,7 @@ function ApiKeySection({ companyId }: { companyId: string }) {
       qc.invalidateQueries({ queryKey: ['company-api-keys'] })
       setShowAdd(false)
       setAddForm({ provider: '', label: '', fields: {} })
-      addToast({ type: 'success', message: 'API 키가 등록되었습니다' })
+      addToast({ type: 'success', message: 'API key registered' })
     },
     onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
@@ -173,7 +209,7 @@ function ApiKeySection({ companyId }: { companyId: string }) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['company-api-keys'] })
       setDeleteTarget(null)
-      addToast({ type: 'success', message: 'API 키가 삭제되었습니다' })
+      addToast({ type: 'success', message: 'API key deleted' })
     },
     onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
@@ -185,7 +221,7 @@ function ApiKeySection({ companyId }: { companyId: string }) {
       qc.invalidateQueries({ queryKey: ['company-api-keys'] })
       setRotateTarget(null)
       setRotateFields({})
-      addToast({ type: 'success', message: 'API 키가 갱신되었습니다' })
+      addToast({ type: 'success', message: 'API key rotated' })
     },
     onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
@@ -209,85 +245,93 @@ function ApiKeySection({ companyId }: { companyId: string }) {
     })
   }
 
+  const inputStyle = { borderColor: sand, color: warmBrown, backgroundColor: '#fbfaf8' }
+
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5" data-testid="settings-api-keys">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">API 키 관리</h2>
-          <p className="text-xs text-zinc-500 mt-0.5">외부 서비스 연동을 위한 API 키를 관리합니다 (AES-256-GCM 암호화 저장)</p>
+    <div className="bg-white rounded-xl border shadow-sm p-6" style={{ borderColor: sand }} data-testid="settings-api-keys">
+      <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: oliveBg }}>
+            <span className="material-symbols-outlined" style={{ color: olive }}>key</span>
+          </div>
+          <div>
+            <h2 className="text-lg font-bold" style={{ color: warmBrown, fontFamily: "'Noto Serif KR', serif" }}>API Key Management</h2>
+            <p className="text-xs mt-0.5" style={{ color: lightMuted }}>External service API keys (AES-256-GCM encrypted)</p>
+          </div>
         </div>
         <button
           onClick={() => setShowAdd(true)}
-          className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium rounded-lg transition-colors"
+          className="px-4 py-2 text-white text-xs font-bold rounded-xl transition-all shadow-md"
+          style={{ backgroundColor: terracotta }}
           data-testid="api-key-add-btn"
         >
-          + API 키 등록
+          + Add API Key
         </button>
       </div>
 
       {/* Add form */}
       {showAdd && (
-        <form onSubmit={handleSubmitAdd} className="mb-4 p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg space-y-3">
+        <form onSubmit={handleSubmitAdd} className="mb-5 p-5 rounded-xl space-y-3 border" style={{ backgroundColor: `${cream}80`, borderColor: sand }}>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">서비스 제공자</label>
+              <label className="block text-xs font-medium mb-1.5" style={{ color: muted }}>Provider</label>
               <select
                 value={addForm.provider}
                 onChange={(e) => handleProviderChange(e.target.value)}
-                className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100"
+                className="w-full px-3 py-2.5 border rounded-lg text-sm"
+                style={inputStyle}
                 required
               >
-                <option value="">선택...</option>
+                <option value="">Select...</option>
                 {providerList.map((p) => (
-                  <option key={p} value={p}>
-                    {PROVIDER_LABELS[p] || p}
-                  </option>
+                  <option key={p} value={p}>{PROVIDER_LABELS[p] || p}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">라벨 (선택)</label>
+              <label className="block text-xs font-medium mb-1.5" style={{ color: muted }}>Label (optional)</label>
               <input
                 value={addForm.label}
                 onChange={(e) => setAddForm({ ...addForm, label: e.target.value })}
-                className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100"
-                placeholder="예: 프로덕션 키"
+                className="w-full px-3 py-2.5 border rounded-lg text-sm"
+                style={inputStyle}
+                placeholder="e.g. Production Key"
               />
             </div>
           </div>
-
           {selectedProviderFields.length > 0 && (
             <div className="space-y-2">
-              <p className="text-xs text-zinc-500">필수 필드:</p>
+              <p className="text-xs" style={{ color: lightMuted }}>Required fields:</p>
               {selectedProviderFields.map((field) => (
                 <div key={field}>
-                  <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">{field}</label>
+                  <label className="block text-xs font-medium mb-1" style={{ color: muted }}>{field}</label>
                   <input
                     type="password"
                     value={addForm.fields[field] || ''}
                     onChange={(e) => handleFieldChange(field, e.target.value)}
-                    className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 font-mono"
+                    className="w-full px-3 py-2.5 border rounded-lg text-sm font-mono"
+                    style={inputStyle}
                     required
                   />
                 </div>
               ))}
             </div>
           )}
-
-          <div className="flex gap-2 justify-end">
+          <div className="flex gap-3 justify-end">
             <button
               type="button"
               onClick={() => { setShowAdd(false); setAddForm({ provider: '', label: '', fields: {} }) }}
-              className="px-3 py-1.5 text-sm text-zinc-600 dark:text-zinc-400"
+              className="px-4 py-2 text-sm" style={{ color: muted }}
             >
-              취소
+              Cancel
             </button>
             <button
               type="submit"
               disabled={addMutation.isPending || !addForm.provider}
-              className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+              className="px-4 py-2 text-white text-sm font-bold rounded-xl disabled:opacity-50 transition-colors"
+              style={{ backgroundColor: olive }}
             >
-              {addMutation.isPending ? '등록 중...' : '등록'}
+              {addMutation.isPending ? 'Registering...' : 'Register'}
             </button>
           </div>
         </form>
@@ -295,39 +339,41 @@ function ApiKeySection({ companyId }: { companyId: string }) {
 
       {/* Rotate form */}
       {rotateTarget && (
-        <div className="mb-4 p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-lg space-y-3">
-          <h3 className="text-sm font-semibold text-amber-800 dark:text-amber-300">
-            키 갱신: {PROVIDER_LABELS[rotateTarget.provider] || rotateTarget.provider}
-            {rotateTarget.label && ` — ${rotateTarget.label}`}
+        <div className="mb-5 p-5 rounded-xl space-y-3 border" style={{ backgroundColor: 'rgba(196,98,45,0.05)', borderColor: terracotta }}>
+          <h3 className="text-sm font-bold" style={{ color: terracotta }}>
+            Rotate Key: {PROVIDER_LABELS[rotateTarget.provider] || rotateTarget.provider}
+            {rotateTarget.label && ` -- ${rotateTarget.label}`}
           </h3>
-          <p className="text-xs text-amber-600 dark:text-amber-500">새 키 값을 입력하면 기존 키가 교체됩니다</p>
+          <p className="text-xs" style={{ color: lightMuted }}>Enter new key values to replace the existing key</p>
           {(providerSchemas[rotateTarget.provider] || []).map((field) => (
             <div key={field}>
-              <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">{field}</label>
+              <label className="block text-xs font-medium mb-1" style={{ color: muted }}>{field}</label>
               <input
                 type="password"
                 value={rotateFields[field] || ''}
                 onChange={(e) => setRotateFields({ ...rotateFields, [field]: e.target.value })}
-                className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 font-mono"
-                placeholder="새 값 입력..."
+                className="w-full px-3 py-2.5 border rounded-lg text-sm font-mono"
+                style={inputStyle}
+                placeholder="Enter new value..."
                 required
               />
             </div>
           ))}
-          <div className="flex gap-2 justify-end">
+          <div className="flex gap-3 justify-end">
             <button
               type="button"
               onClick={() => { setRotateTarget(null); setRotateFields({}) }}
-              className="px-3 py-1.5 text-sm text-zinc-600 dark:text-zinc-400"
+              className="px-4 py-2 text-sm" style={{ color: muted }}
             >
-              취소
+              Cancel
             </button>
             <button
               onClick={() => rotateMutation.mutate({ id: rotateTarget.id, credentials: rotateFields })}
               disabled={rotateMutation.isPending}
-              className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+              className="px-4 py-2 text-white text-sm font-bold rounded-xl disabled:opacity-50 transition-colors"
+              style={{ backgroundColor: terracotta }}
             >
-              {rotateMutation.isPending ? '갱신 중...' : '갱신'}
+              {rotateMutation.isPending ? 'Rotating...' : 'Rotate'}
             </button>
           </div>
         </div>
@@ -340,43 +386,48 @@ function ApiKeySection({ companyId }: { companyId: string }) {
           <Skeleton className="h-14 w-full" />
         </div>
       ) : apiKeys.length === 0 ? (
-        <p className="text-sm text-zinc-500 text-center py-6">등록된 API 키가 없습니다</p>
+        <div className="text-center py-8">
+          <p className="text-sm" style={{ color: lightMuted }}>No API keys registered</p>
+        </div>
       ) : (
         <div className="space-y-2">
           {apiKeys.map((k) => (
             <div
               key={k.id}
-              className="flex items-center justify-between px-4 py-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50"
+              className="flex items-center justify-between px-4 py-3 rounded-xl border transition-colors"
+              style={{ backgroundColor: `${cream}80`, borderColor: sand }}
             >
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 uppercase font-medium">
+                  <span className="text-xs px-2.5 py-0.5 rounded-full font-bold uppercase" style={{ backgroundColor: oliveBg, color: olive }}>
                     {k.provider}
                   </span>
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300">
-                    {k.scope === 'company' ? '회사 공용' : '개인용'}
+                  <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: `${sand}80`, color: muted }}>
+                    {k.scope === 'company' ? 'Company' : 'Personal'}
                   </span>
-                  <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-                    {k.label || '(라벨 없음)'}
+                  <p className="text-sm font-bold" style={{ color: warmBrown }}>
+                    {k.label || '(No label)'}
                   </p>
                 </div>
-                <p className="text-xs text-zinc-500 mt-0.5">
-                  등록: {formatDate(k.createdAt)}
-                  {k.updatedAt !== k.createdAt && ` | 갱신: ${formatDate(k.updatedAt)}`}
+                <p className="text-xs mt-0.5" style={{ color: lightMuted }}>
+                  Registered: {formatDate(k.createdAt)}
+                  {k.updatedAt !== k.createdAt && ` | Updated: ${formatDate(k.updatedAt)}`}
                 </p>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <button
                   onClick={() => { setRotateTarget(k); setRotateFields({}) }}
-                  className="text-xs text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300"
+                  className="text-xs font-medium transition-colors"
+                  style={{ color: terracotta }}
                 >
-                  갱신
+                  Rotate
                 </button>
                 <button
                   onClick={() => setDeleteTarget(k)}
-                  className="text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                  className="text-xs font-medium transition-colors"
+                  style={{ color: '#ef4444' }}
                 >
-                  삭제
+                  Delete
                 </button>
               </div>
             </div>
@@ -388,9 +439,9 @@ function ApiKeySection({ companyId }: { companyId: string }) {
         isOpen={!!deleteTarget}
         onCancel={() => setDeleteTarget(null)}
         onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
-        title="API 키 삭제"
-        description={`${PROVIDER_LABELS[deleteTarget?.provider || ''] || deleteTarget?.provider} 키를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`}
-        confirmText="삭제"
+        title="Delete API Key"
+        description={`Delete the ${PROVIDER_LABELS[deleteTarget?.provider || ''] || deleteTarget?.provider} key? This action cannot be undone.`}
+        confirmText="Delete"
         variant="danger"
       />
     </div>
@@ -426,7 +477,7 @@ function HandoffDepthSection({ companyId }: { companyId: string }) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['handoff-depth', companyId] })
       setDirty(false)
-      addToast({ type: 'success', message: `핸드오프 깊이가 ${depth}으로 변경되었습니다` })
+      addToast({ type: 'success', message: `Handoff depth set to ${depth}` })
     },
     onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
@@ -438,7 +489,7 @@ function HandoffDepthSection({ companyId }: { companyId: string }) {
 
   if (isLoading) {
     return (
-      <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5">
+      <div className="bg-white rounded-xl border shadow-sm p-6" style={{ borderColor: sand }}>
         <Skeleton className="h-6 w-40 mb-4" />
         <Skeleton className="h-10 w-full" />
       </div>
@@ -446,9 +497,14 @@ function HandoffDepthSection({ companyId }: { companyId: string }) {
   }
 
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5" data-testid="settings-handoff-depth">
-      <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-1">핸드오프 깊이</h2>
-      <p className="text-xs text-zinc-500 mb-4">AI 에이전트 간 핸드오프 최대 깊이를 설정합니다. 값이 클수록 더 깊은 에이전트 체인이 가능합니다.</p>
+    <div className="bg-white rounded-xl border shadow-sm p-6" style={{ borderColor: sand }} data-testid="settings-handoff-depth">
+      <div className="flex items-center gap-3 mb-2">
+        <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: oliveBg }}>
+          <span className="material-symbols-outlined" style={{ color: olive }}>swap_horiz</span>
+        </div>
+        <h2 className="text-lg font-bold" style={{ color: warmBrown, fontFamily: "'Noto Serif KR', serif" }}>Handoff Depth</h2>
+      </div>
+      <p className="text-xs mb-5" style={{ color: lightMuted }}>Maximum handoff depth between AI agents. Higher values allow deeper agent chains.</p>
 
       <div className="flex items-center gap-4">
         <input
@@ -457,30 +513,32 @@ function HandoffDepthSection({ companyId }: { companyId: string }) {
           max={10}
           value={depth}
           onChange={(e) => handleChange(Number(e.target.value))}
-          className="flex-1 h-2 bg-zinc-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+          className="flex-1 h-2 rounded-lg appearance-none cursor-pointer"
+          style={{ accentColor: olive, backgroundColor: sand }}
         />
-        <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 w-10 text-center tabular-nums">{depth}</span>
+        <span className="text-3xl font-black w-12 text-center tabular-nums" style={{ color: olive, fontFamily: "'Noto Serif KR', serif" }}>{depth}</span>
       </div>
 
-      <div className="flex justify-between text-xs text-zinc-400 mt-1 px-0.5">
-        <span>1 (단순)</span>
-        <span>10 (복잡)</span>
+      <div className="flex justify-between text-[10px] mt-1 px-0.5" style={{ color: lightMuted }}>
+        <span>1 (Simple)</span>
+        <span>10 (Complex)</span>
       </div>
 
       {dirty && (
-        <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-700">
+        <div className="flex justify-end gap-3 mt-5 pt-5 border-t" style={{ borderColor: sand }}>
           <button
             onClick={() => { setDepth(currentDepth); setDirty(false) }}
-            className="px-4 py-2 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+            className="px-5 py-2 text-sm" style={{ color: muted }}
           >
-            취소
+            Cancel
           </button>
           <button
             onClick={() => mutation.mutate(depth)}
             disabled={mutation.isPending}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+            className="px-5 py-2 text-white text-sm font-bold rounded-xl disabled:opacity-50 transition-colors"
+            style={{ backgroundColor: olive }}
           >
-            {mutation.isPending ? '저장 중...' : '저장'}
+            {mutation.isPending ? 'Saving...' : 'Save'}
           </button>
         </div>
       )}
@@ -510,11 +568,7 @@ function DefaultSettingsSection({
   }, [company])
 
   const handleSave = () => {
-    onSave({
-      ...currentSettings,
-      timezone,
-      defaultModel,
-    })
+    onSave({ ...currentSettings, timezone, defaultModel })
   }
 
   const handleCancel = () => {
@@ -524,17 +578,25 @@ function DefaultSettingsSection({
     setDirty(false)
   }
 
+  const selectStyle = { borderColor: sand, color: warmBrown, backgroundColor: '#fbfaf8' }
+
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5" data-testid="settings-defaults">
-      <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4">기본 설정</h2>
+    <div className="bg-white rounded-xl border shadow-sm p-6" style={{ borderColor: sand }} data-testid="settings-defaults">
+      <div className="flex items-center gap-3 mb-5">
+        <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: oliveBg }}>
+          <span className="material-symbols-outlined" style={{ color: olive }}>tune</span>
+        </div>
+        <h2 className="text-lg font-bold" style={{ color: warmBrown, fontFamily: "'Noto Serif KR', serif" }}>Default Settings</h2>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">타임존</label>
+          <label className="block text-xs font-medium mb-1.5" style={{ color: muted }}>Timezone</label>
           <select
             value={timezone}
             onChange={(e) => { setTimezone(e.target.value); setDirty(true) }}
-            className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100"
+            className="w-full px-3 py-2.5 border rounded-lg text-sm"
+            style={selectStyle}
           >
             <option value="Asia/Seoul">Asia/Seoul (KST, UTC+9)</option>
             <option value="America/New_York">America/New_York (EST/EDT)</option>
@@ -545,11 +607,12 @@ function DefaultSettingsSection({
           </select>
         </div>
         <div>
-          <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">기본 LLM 모델</label>
+          <label className="block text-xs font-medium mb-1.5" style={{ color: muted }}>Default LLM Model</label>
           <select
             value={defaultModel}
             onChange={(e) => { setDefaultModel(e.target.value); setDirty(true) }}
-            className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100"
+            className="w-full px-3 py-2.5 border rounded-lg text-sm"
+            style={selectStyle}
           >
             <option value="claude-sonnet-4-20250514">Claude Sonnet 4</option>
             <option value="claude-opus-4-20250514">Claude Opus 4</option>
@@ -562,18 +625,19 @@ function DefaultSettingsSection({
       </div>
 
       {dirty && (
-        <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-700">
+        <div className="flex justify-end gap-3 mt-5 pt-5 border-t" style={{ borderColor: sand }}>
           <button
             onClick={handleCancel}
-            className="px-4 py-2 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+            className="px-5 py-2 text-sm" style={{ color: muted }}
           >
-            취소
+            Cancel
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors"
+            className="px-5 py-2 text-white text-sm font-bold rounded-xl transition-colors"
+            style={{ backgroundColor: olive }}
           >
-            저장
+            Save
           </button>
         </div>
       )}
@@ -602,7 +666,7 @@ export function SettingsPage() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['company-detail', selectedCompanyId] })
       qc.invalidateQueries({ queryKey: ['companies'] })
-      addToast({ type: 'success', message: '설정이 저장되었습니다' })
+      addToast({ type: 'success', message: 'Settings saved' })
     },
     onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
@@ -616,35 +680,60 @@ export function SettingsPage() {
   }
 
   if (!selectedCompanyId) {
-    return <div className="p-8 text-center text-zinc-500" data-testid="settings-no-company">회사를 선택하세요</div>
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: cream }}>
+        <p className="text-sm" style={{ color: lightMuted }} data-testid="settings-no-company">Select a company</p>
+      </div>
+    )
   }
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-48 w-full" />
-        <Skeleton className="h-64 w-full" />
-        <Skeleton className="h-48 w-full" />
+      <div className="min-h-screen" style={{ backgroundColor: cream, fontFamily: "'Public Sans', sans-serif" }}>
+        <div className="p-8 max-w-4xl mx-auto space-y-6">
+          <Skeleton className="h-10 w-48" />
+          <Skeleton className="h-48 w-full" />
+          <Skeleton className="h-64 w-full" />
+          <Skeleton className="h-48 w-full" />
+        </div>
       </div>
     )
   }
 
   if (!company) {
-    return <div className="p-8 text-center text-zinc-500">회사 정보를 불러올 수 없습니다</div>
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: cream }}>
+        <p className="text-sm" style={{ color: lightMuted }}>Unable to load company data</p>
+      </div>
+    )
   }
 
   return (
-    <div className="space-y-6" data-testid="settings-page">
-      <div>
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">회사 설정</h1>
-        <p className="text-sm text-zinc-500 mt-1">회사 기본 정보, API 키, 기본 설정을 관리합니다</p>
-      </div>
+    <div className="min-h-screen" style={{ backgroundColor: cream, fontFamily: "'Public Sans', sans-serif" }}>
+      <div className="p-8 max-w-4xl mx-auto" data-testid="settings-page">
+        <div className="mb-8">
+          <h1 className="text-3xl font-black tracking-tight" style={{ fontFamily: "'Noto Serif KR', serif", color: warmBrown }}>
+            Settings
+          </h1>
+          <p className="text-sm mt-1" style={{ color: muted }}>Manage company info, API keys, and default settings</p>
+        </div>
 
-      <CompanyInfoSection company={company} onSave={handleSaveInfo} />
-      <ApiKeySection companyId={selectedCompanyId} />
-      <HandoffDepthSection companyId={selectedCompanyId} />
-      <DefaultSettingsSection company={company} onSave={handleSaveSettings} />
+        <div className="space-y-6">
+          <CompanyInfoSection company={company} onSave={handleSaveInfo} />
+          <ApiKeySection companyId={selectedCompanyId} />
+          <HandoffDepthSection companyId={selectedCompanyId} />
+          <DefaultSettingsSection company={company} onSave={handleSaveSettings} />
+        </div>
+
+        {/* Footer */}
+        <div className="mt-8 flex justify-between items-center text-xs" style={{ color: lightMuted }}>
+          <p>&copy; 2024 CORTHEX Technologies. All rights reserved.</p>
+          <div className="flex gap-6">
+            <span>System Status: <span style={{ color: olive }}>Healthy</span></span>
+            <span>API v2.4.1</span>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

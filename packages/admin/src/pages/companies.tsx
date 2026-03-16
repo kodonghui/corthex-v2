@@ -1,3 +1,13 @@
+/**
+ * Admin Companies Page — Natural Organic Theme
+ *
+ * API Endpoints:
+ *   GET    /admin/companies
+ *   GET    /admin/companies/stats
+ *   POST   /admin/companies
+ *   PATCH  /admin/companies/:id
+ *   DELETE /admin/companies/:id
+ */
 import { useState, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
@@ -8,6 +18,16 @@ type Company = {
   id: string; name: string; slug: string; isActive: boolean; createdAt: string
 }
 type CompanyStats = Record<string, { userCount: number; agentCount: number }>
+
+/* Natural Organic colors */
+const olive = '#5a7247'
+const oliveBg = 'rgba(90,114,71,0.1)'
+const terracotta = '#c4622d'
+const cream = '#faf8f5'
+const sand = '#e5e1d3'
+const warmBrown = '#463e30'
+const muted = '#9c8d66'
+const lightMuted = '#b7aa88'
 
 export function CompaniesPage() {
   const qc = useQueryClient()
@@ -47,7 +67,7 @@ export function CompaniesPage() {
       qc.invalidateQueries({ queryKey: ['companies-stats'] })
       setShowCreate(false)
       setForm({ name: '', slug: '' })
-      addToast({ type: 'success', message: '회사가 생성되었습니다' })
+      addToast({ type: 'success', message: 'Company created' })
     },
     onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
@@ -58,7 +78,7 @@ export function CompaniesPage() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['companies'] })
       setEditId(null)
-      addToast({ type: 'success', message: '회사가 수정되었습니다' })
+      addToast({ type: 'success', message: 'Company updated' })
     },
     onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
@@ -69,7 +89,7 @@ export function CompaniesPage() {
       qc.invalidateQueries({ queryKey: ['companies'] })
       qc.invalidateQueries({ queryKey: ['companies-stats'] })
       setDeactivateTarget(null)
-      addToast({ type: 'success', message: '회사가 비활성화되었습니다' })
+      addToast({ type: 'success', message: 'Company deactivated' })
     },
     onError: (err: Error) => {
       setDeactivateTarget(null)
@@ -77,175 +97,236 @@ export function CompaniesPage() {
     },
   })
 
+  const inputStyle = { borderColor: sand, color: warmBrown, backgroundColor: '#fbfaf8' }
+
   return (
-    <div className="space-y-6" data-testid="companies-page">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">회사 관리</h1>
-          <p className="text-sm text-zinc-500 mt-1">
-            {filteredCompanies.length === companies.length
-              ? `${companies.length}개 회사`
-              : `${filteredCompanies.length} / ${companies.length}개 회사`}
-          </p>
-        </div>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors"
-          data-testid="company-add-btn"
-        >
-          + 회사 추가
-        </button>
-      </div>
-
-      {/* 검색 */}
-      <input
-        type="text"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        placeholder="회사명 또는 슬러그로 검색..."
-        className="w-full max-w-md px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-        data-testid="company-search"
-      />
-
-      {showCreate && (
-        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5" data-testid="company-create-form">
-          <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4">새 회사</h3>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              createMutation.mutate(form)
-            }}
-            className="grid grid-cols-2 gap-4"
+    <div className="min-h-screen" style={{ backgroundColor: cream, fontFamily: "'Public Sans', sans-serif" }}>
+      <div className="p-8 max-w-5xl mx-auto w-full" data-testid="companies-page">
+        {/* Page Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+          <div>
+            <h1 className="text-3xl font-black tracking-tight" style={{ fontFamily: "'Noto Serif KR', serif", color: warmBrown }}>
+              Company Management
+            </h1>
+            <p className="mt-1" style={{ color: muted }}>
+              {filteredCompanies.length === companies.length
+                ? `${companies.length} companies`
+                : `${filteredCompanies.length} / ${companies.length} companies`}
+            </p>
+          </div>
+          <button
+            onClick={() => setShowCreate(true)}
+            className="font-bold py-2.5 px-6 rounded-xl flex items-center gap-2 transition-all text-white shadow-lg"
+            style={{ backgroundColor: terracotta, boxShadow: '0 10px 15px -3px rgba(196,98,45,0.2)' }}
+            data-testid="company-add-btn"
           >
-            <div>
-              <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">회사명</label>
-              <input
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">슬러그</label>
-              <input
-                value={form.slug}
-                onChange={(e) => setForm({ ...form, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') })}
-                className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                placeholder="영문, 숫자, 하이픈만"
-                required
-              />
-            </div>
-            <div className="col-span-2 flex gap-2 justify-end">
-              <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2 text-sm text-zinc-600">
-                취소
-              </button>
-              <button
-                type="submit"
-                disabled={createMutation.isPending}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
-              >
-                {createMutation.isPending ? '생성 중...' : '생성'}
-              </button>
-            </div>
-            {createMutation.isError && (
-              <p className="col-span-2 text-sm text-red-600">{(createMutation.error as Error).message}</p>
-            )}
-          </form>
+            <span className="material-symbols-outlined">add_business</span>
+            <span>Add Company</span>
+          </button>
         </div>
-      )}
 
-      {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[1, 2, 3, 4].map((i) => <SkeletonCard key={i} />)}
+        {/* Search */}
+        <div className="bg-white rounded-xl border p-4 mb-6 flex items-center" style={{ borderColor: sand }}>
+          <div className="relative w-full md:w-96">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2" style={{ color: lightMuted }}>search</span>
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by company name or slug..."
+              className="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-1"
+              style={{ ...inputStyle, outlineColor: olive }}
+              data-testid="company-search"
+            />
+          </div>
         </div>
-      ) : (
-        <div className="space-y-4" data-testid="company-list">
-          {filteredCompanies.map((c) => {
-            const s = stats[c.id] || { userCount: 0, agentCount: 0 }
-            return (
-              <div
-                key={c.id}
-                className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5"
-                data-testid={`company-card-${c.slug}`}
-              >
-                {editId === c.id ? (
-                  <div className="flex items-center gap-4">
-                    <input
-                      value={editForm.name}
-                      onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                      className="flex-1 px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100"
-                    />
-                    <button
-                      onClick={() => updateMutation.mutate({ id: c.id, name: editForm.name })}
-                      className="text-sm text-indigo-600 hover:text-indigo-700"
-                    >
-                      저장
-                    </button>
-                    <button onClick={() => setEditId(null)} className="text-sm text-zinc-500">
-                      취소
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">{c.name}</h3>
-                      <p className="text-sm text-zinc-500">slug: {c.slug}</p>
-                      <div className="flex items-center gap-4 mt-2">
-                        <span className="text-xs text-zinc-500">
-                          직원 {s.userCount}명
+
+        {/* Create Form */}
+        {showCreate && (
+          <div className="bg-white rounded-xl border p-6 mb-6 shadow-sm" style={{ borderColor: sand }} data-testid="company-create-form">
+            <h3 className="text-lg font-bold mb-4" style={{ color: warmBrown, fontFamily: "'Noto Serif KR', serif" }}>New Company</h3>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                createMutation.mutate(form)
+              }}
+              className="grid grid-cols-2 gap-4"
+            >
+              <div>
+                <label className="block text-xs font-medium mb-1.5" style={{ color: muted }}>Company Name</label>
+                <input
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  className="w-full px-3 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-1"
+                  style={{ ...inputStyle, outlineColor: olive }}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium mb-1.5" style={{ color: muted }}>Slug</label>
+                <input
+                  value={form.slug}
+                  onChange={(e) => setForm({ ...form, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') })}
+                  className="w-full px-3 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-1"
+                  style={{ ...inputStyle, outlineColor: olive }}
+                  placeholder="lowercase, numbers, hyphens only"
+                  required
+                />
+              </div>
+              <div className="col-span-2 flex gap-3 justify-end">
+                <button type="button" onClick={() => setShowCreate(false)} className="px-5 py-2 text-sm" style={{ color: muted }}>
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={createMutation.isPending}
+                  className="px-5 py-2 text-white text-sm font-bold rounded-xl disabled:opacity-50 transition-colors"
+                  style={{ backgroundColor: olive }}
+                >
+                  {createMutation.isPending ? 'Creating...' : 'Create'}
+                </button>
+              </div>
+              {createMutation.isError && (
+                <p className="col-span-2 text-sm" style={{ color: '#ef4444' }}>{(createMutation.error as Error).message}</p>
+              )}
+            </form>
+          </div>
+        )}
+
+        {/* Company List */}
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[1, 2, 3, 4].map((i) => <SkeletonCard key={i} />)}
+          </div>
+        ) : (
+          <div className="space-y-4" data-testid="company-list">
+            {filteredCompanies.map((c) => {
+              const s = stats[c.id] || { userCount: 0, agentCount: 0 }
+              return (
+                <div
+                  key={c.id}
+                  className="bg-white rounded-xl border p-6 shadow-sm transition-all hover:shadow-md"
+                  style={{ borderColor: sand }}
+                  data-testid={`company-card-${c.slug}`}
+                >
+                  {editId === c.id ? (
+                    <div className="flex items-center gap-4">
+                      <input
+                        value={editForm.name}
+                        onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                        className="flex-1 px-3 py-2.5 border rounded-lg text-sm"
+                        style={inputStyle}
+                      />
+                      <button
+                        onClick={() => updateMutation.mutate({ id: c.id, name: editForm.name })}
+                        className="text-sm font-bold" style={{ color: olive }}
+                      >
+                        Save
+                      </button>
+                      <button onClick={() => setEditId(null)} className="text-sm" style={{ color: muted }}>
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm" style={{ backgroundColor: oliveBg, color: olive }}>
+                            {c.name.slice(0, 2).toUpperCase()}
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-bold" style={{ color: warmBrown, fontFamily: "'Noto Serif KR', serif" }}>{c.name}</h3>
+                            <p className="text-xs" style={{ color: lightMuted }}>slug: {c.slug}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4 mt-3 ml-[52px]">
+                          <div className="flex items-center gap-1.5">
+                            <span className="material-symbols-outlined text-base" style={{ color: muted }}>group</span>
+                            <span className="text-xs font-medium" style={{ color: muted }}>{s.userCount} users</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="material-symbols-outlined text-base" style={{ color: muted }}>smart_toy</span>
+                            <span className="text-xs font-medium" style={{ color: muted }}>{s.agentCount} agents</span>
+                          </div>
+                          <span className="text-xs" style={{ color: lightMuted }}>
+                            Created: {new Date(c.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span
+                          className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-bold"
+                          style={{
+                            backgroundColor: c.isActive ? oliveBg : 'rgba(239,68,68,0.1)',
+                            color: c.isActive ? olive : '#ef4444',
+                          }}
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: c.isActive ? olive : '#ef4444' }} />
+                          {c.isActive ? 'Active' : 'Inactive'}
                         </span>
-                        <span className="text-xs text-zinc-500">
-                          에이전트 {s.agentCount}개
-                        </span>
-                        <span className="text-xs text-zinc-400">
-                          생성: {new Date(c.createdAt).toLocaleDateString('ko')}
-                        </span>
+                        <button
+                          onClick={() => {
+                            setEditId(c.id)
+                            setEditForm({ name: c.name, slug: c.slug })
+                          }}
+                          className="p-1.5 rounded hover:bg-slate-100 transition-colors"
+                          title="Edit"
+                        >
+                          <span className="material-symbols-outlined text-xl" style={{ color: muted }}>edit</span>
+                        </button>
+                        {c.isActive && (
+                          <button
+                            onClick={() => setDeactivateTarget(c)}
+                            className="p-1.5 rounded hover:bg-red-50 transition-colors"
+                            title="Deactivate"
+                          >
+                            <span className="material-symbols-outlined text-xl" style={{ color: '#ef4444' }}>block</span>
+                          </button>
+                        )}
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span
-                        className={`text-xs px-2 py-0.5 rounded-full ${
-                          c.isActive
-                            ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
-                            : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
-                        }`}
-                      >
-                        {c.isActive ? '활성' : '비활성'}
-                      </span>
-                      <button
-                        onClick={() => {
-                          setEditId(c.id)
-                          setEditForm({ name: c.name, slug: c.slug })
-                        }}
-                        className="text-sm text-indigo-600 hover:text-indigo-700"
-                      >
-                        수정
-                      </button>
-                      {c.isActive && (
-                        <button
-                          onClick={() => setDeactivateTarget(c)}
-                          className="text-sm text-red-600 hover:text-red-700"
-                        >
-                          비활성화
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )
-          })}
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {filteredCompanies.length > 0 && (
+          <div className="mt-6 flex items-center justify-between">
+            <p className="text-xs font-medium" style={{ color: lightMuted }}>
+              Showing {filteredCompanies.length} of {companies.length} companies
+            </p>
+            <div className="flex gap-2">
+              <button className="p-1 border rounded bg-white transition-colors disabled:opacity-50" style={{ borderColor: sand }} disabled>
+                <span className="material-symbols-outlined" style={{ color: lightMuted }}>chevron_left</span>
+              </button>
+              <button className="w-8 h-8 flex items-center justify-center rounded text-white font-bold text-xs" style={{ backgroundColor: olive }}>1</button>
+              <button className="p-1 border rounded bg-white transition-colors" style={{ borderColor: sand }}>
+                <span className="material-symbols-outlined" style={{ color: lightMuted }}>chevron_right</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Footer */}
+        <div className="mt-8 flex flex-col md:flex-row justify-between items-center text-xs gap-4" style={{ color: lightMuted }}>
+          <p>&copy; 2024 CORTHEX Technologies. All rights reserved.</p>
+          <div className="flex gap-6">
+            <span>System Status: <span style={{ color: olive }}>Healthy</span></span>
+            <span>API v2.4.1</span>
+          </div>
         </div>
-      )}
+      </div>
 
       <ConfirmDialog
         isOpen={!!deactivateTarget}
         onConfirm={() => deactivateTarget && deactivateMutation.mutate(deactivateTarget.id)}
         onCancel={() => setDeactivateTarget(null)}
-        title={`${deactivateTarget?.name} 비활성화`}
-        description="이 회사를 비활성화하면 소속 직원은 로그인할 수 없습니다. 활성 직원이 있으면 먼저 비활성화해야 합니다."
-        confirmText="비활성화"
+        title={`Deactivate ${deactivateTarget?.name}`}
+        description="Deactivating this company will prevent its employees from logging in. Active employees must be deactivated first."
+        confirmText="Deactivate"
         variant="danger"
       />
     </div>

@@ -1,3 +1,15 @@
+/**
+ * CLI Credentials Management — Natural Organic Theme
+ *
+ * API Endpoints:
+ *   GET    /api/admin/users?companyId=...
+ *   GET    /api/admin/cli-credentials?userId=...
+ *   POST   /api/admin/cli-credentials
+ *   DELETE /api/admin/cli-credentials/:id
+ *   GET    /api/admin/api-keys?userId=...
+ *   POST   /api/admin/api-keys
+ *   DELETE /api/admin/api-keys/:id
+ */
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
@@ -87,80 +99,91 @@ export function CredentialsPage() {
 
   const selectedUser = users.find((u) => u.id === selectedUserId)
 
-  const inputCls = 'w-full px-3 py-2 border border-slate-600 rounded-lg bg-slate-800 text-sm text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none'
-
-  if (!selectedCompanyId) return <div className="p-8 text-center text-slate-500">회사를 선택하세요</div>
+  if (!selectedCompanyId) return <div className="p-8 text-center" style={{ color: '#83935d' }}>회사를 선택하세요</div>
 
   return (
-    <div data-testid="credentials-page" className="space-y-6">
-      <div>
-        <h1 data-testid="credentials-title" className="text-3xl font-bold tracking-tight text-slate-50">CLI 토큰 / API 키 관리</h1>
-        <p className="text-sm text-slate-400 mt-1">직원별 Claude OAuth 토큰 및 외부 API 키를 관리합니다</p>
-      </div>
-
-      {/* 가이드 */}
-      <div data-testid="credentials-guide-banner" className="bg-amber-900/10 border border-amber-800 rounded-xl p-4">
-        <h3 className="text-sm font-semibold text-amber-300 mb-2">
-          Claude OAuth 토큰 찾는 법
-        </h3>
-        <ol className="text-sm text-amber-400 space-y-1 list-decimal list-inside">
-          <li>Claude Desktop 앱에서 로그인 상태 확인</li>
-          <li>파일 탐색기에서 <code className="bg-amber-900/30 px-1 rounded">~/.claude/.credentials.json</code> 열기</li>
-          <li><code className="bg-amber-900/30 px-1 rounded">claudeAiOauth.accessToken</code> 값 복사 (sk-ant-oat01-... 형식)</li>
-          <li>아래에서 해당 직원 선택 후 토큰 등록</li>
-        </ol>
-        <p className="text-xs text-amber-500 mt-2">
-          * API 키(sk-ant-api...)가 아닌 OAuth 토큰(sk-ant-oat01-...)을 등록해야 합니다
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* 유저 목록 */}
-        <div data-testid="credentials-user-list" className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-          <h2 className="text-sm font-semibold text-slate-50 mb-3">직원 선택</h2>
-          <div className="space-y-1">
-            {users.map((u) => (
-              <button
-                key={u.id}
-                data-testid={`credentials-user-${u.id}`}
-                onClick={() => {
-                  setSelectedUserId(u.id)
-                  setShowAddToken(false)
-                  setShowAddApiKey(false)
-                }}
-                className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors ${
-                  selectedUserId === u.id
-                    ? 'bg-blue-950 text-blue-300 font-medium'
-                    : 'text-slate-300 hover:bg-slate-800'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span>{u.name}</span>
-                  <span className="text-xs text-slate-400">@{u.username}</span>
-                </div>
-              </button>
-            ))}
+    <div data-testid="credentials-page" className="min-h-screen flex" style={{ backgroundColor: '#f8faf7', fontFamily: "'Inter', 'Noto Sans KR', sans-serif", color: '#263222' }}>
+      {/* BEGIN: Main Content */}
+      <main className="flex-1 flex flex-col min-w-0 overflow-auto" style={{ backgroundColor: '#f8faf7' }}>
+        {/* BEGIN: Header Section */}
+        <header className="bg-white border-b px-8 py-6 flex items-center justify-between sticky top-0 z-10" style={{ borderColor: '#dce8d5' }}>
+          <div>
+            <h2 data-testid="credentials-title" className="text-2xl font-bold" style={{ color: '#263222' }}>CLI 인증 관리</h2>
+            <p className="text-sm text-gray-500 mt-1">시스템 배포 및 CLI 도구 사용을 위한 관리자 인증 토큰을 관리합니다.</p>
           </div>
-        </div>
+          <button
+            data-testid="credentials-cli-add-btn"
+            onClick={() => setShowAddToken(true)}
+            className="text-white px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-sm font-medium"
+            style={{ backgroundColor: '#4a6741' }}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
+            인증 토큰 추가
+          </button>
+        </header>
+        {/* END: Header Section */}
 
-        {/* 토큰/키 관리 */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="p-8 max-w-7xl mx-auto w-full space-y-6">
+          {/* BEGIN: Info Card */}
+          <section data-testid="credentials-guide-banner" className="bg-white rounded-xl border p-6 flex items-start gap-4 shadow-sm" style={{ borderColor: '#dce8d5' }}>
+            <div className="p-3 rounded-full" style={{ backgroundColor: '#edf3e9' }}>
+              <svg className="w-6 h-6" style={{ color: '#4a6741' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
+            </div>
+            <div>
+              <h3 className="font-semibold" style={{ color: '#263222' }}>보안 정책 안내</h3>
+              <p className="text-sm text-gray-600 mt-1 leading-relaxed">
+                모든 CLI 인증 토큰은 <span className="font-bold" style={{ color: '#3d5435' }}>AES-256</span> 알고리즘을 사용하여 강력하게 암호화되어 저장됩니다.
+                토큰은 생성 시 단 한 번만 노출되며, 이후에는 관리자도 값을 확인할 수 없습니다. 유출이 의심되는 경우 즉시 삭제하고 재발급하시기 바랍니다.
+              </p>
+            </div>
+          </section>
+          {/* END: Info Card */}
+
+          {/* BEGIN: User Selection */}
+          <section data-testid="credentials-user-list" className="bg-white rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: '#dce8d5' }}>
+            <div className="px-6 py-4 border-b" style={{ borderColor: '#edf3e9' }}>
+              <h3 className="text-sm font-semibold" style={{ color: '#263222' }}>직원 선택</h3>
+            </div>
+            <div className="p-4 flex flex-wrap gap-2">
+              {users.map((u) => (
+                <button
+                  key={u.id}
+                  data-testid={`credentials-user-${u.id}`}
+                  onClick={() => {
+                    setSelectedUserId(u.id)
+                    setShowAddToken(false)
+                    setShowAddApiKey(false)
+                  }}
+                  className={`px-4 py-2 rounded-lg text-sm transition-colors ${
+                    selectedUserId === u.id
+                      ? 'font-semibold text-white'
+                      : 'text-gray-600 hover:bg-[#edf3e9]'
+                  }`}
+                  style={selectedUserId === u.id ? { backgroundColor: '#4a6741' } : {}}
+                >
+                  {u.name} <span className="text-xs opacity-70">@{u.username}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+
           {!selectedUserId ? (
-            <div data-testid="credentials-no-selection" className="bg-slate-800/50 border border-slate-700 rounded-xl p-8 text-center text-slate-400">
+            <div data-testid="credentials-no-selection" className="bg-white rounded-xl border p-8 text-center" style={{ borderColor: '#dce8d5', color: '#83935d' }}>
               좌측에서 직원을 선택하세요
             </div>
           ) : (
             <>
-              {/* CLI OAuth 토큰 */}
-              <div data-testid="credentials-cli-section" className="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 data-testid="credentials-cli-title" className="text-lg font-semibold text-slate-50">
+              {/* BEGIN: CLI Credentials Table Section */}
+              <section data-testid="credentials-cli-section" className="bg-white rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: '#dce8d5' }}>
+                <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: '#edf3e9' }}>
+                  <h3 data-testid="credentials-cli-title" className="font-semibold" style={{ color: '#263222' }}>
                     CLI OAuth 토큰 — {selectedUser?.name}
-                  </h2>
+                  </h3>
                   <button
                     data-testid="credentials-cli-add-btn"
                     onClick={() => setShowAddToken(true)}
-                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium rounded-lg transition-colors"
+                    className="text-xs px-3 py-1.5 text-white font-medium rounded-lg transition-colors"
+                    style={{ backgroundColor: '#4a6741' }}
                   >
                     + 토큰 등록
                   </button>
@@ -179,39 +202,44 @@ export function CredentialsPage() {
                         token: tokenForm.token,
                       })
                     }}
-                    className="mb-4 p-4 bg-slate-800/50 rounded-lg space-y-3"
+                    className="mx-6 my-4 p-4 rounded-lg space-y-3"
+                    style={{ backgroundColor: '#f8faf7' }}
                   >
                     <div>
-                      <label className="block text-sm text-slate-400 mb-1">라벨</label>
+                      <label className="block text-sm font-semibold mb-2" style={{ color: '#31422b' }}>식별 레이블</label>
                       <input
                         data-testid="credentials-cli-label-input"
                         value={tokenForm.label}
                         onChange={(e) => setTokenForm({ ...tokenForm, label: e.target.value })}
-                        className={inputCls}
-                        placeholder="예: 대표님 노트북"
+                        className="w-full rounded-lg border text-sm focus:border-[#4a6741] focus:ring-[#4a6741]"
+                        style={{ borderColor: '#dce8d5' }}
+                        placeholder="예: CI/CD Pipeline A"
                         required
                       />
+                      <p className="text-xs text-gray-400 mt-1">토큰의 용도를 구분하기 위한 이름입니다.</p>
                     </div>
                     <div>
-                      <label className="block text-sm text-slate-400 mb-1">
-                        OAuth 토큰 (sk-ant-oat01-...)
-                      </label>
-                      <textarea
-                        data-testid="credentials-cli-token-input"
-                        value={tokenForm.token}
-                        onChange={(e) => setTokenForm({ ...tokenForm, token: e.target.value })}
-                        rows={2}
-                        className={`${inputCls} resize-none font-mono`}
-                        placeholder="sk-ant-oat01-..."
-                        required
-                      />
+                      <label className="block text-sm font-semibold mb-2" style={{ color: '#31422b' }}>토큰 문자열 (비밀값)</label>
+                      <div className="relative">
+                        <textarea
+                          data-testid="credentials-cli-token-input"
+                          value={tokenForm.token}
+                          onChange={(e) => setTokenForm({ ...tokenForm, token: e.target.value })}
+                          rows={2}
+                          className="w-full rounded-lg border text-sm font-mono resize-none focus:border-[#4a6741] focus:ring-[#4a6741]"
+                          style={{ borderColor: '#dce8d5' }}
+                          placeholder="sk-ant-oat01-..."
+                          required
+                        />
+                      </div>
                     </div>
-                    <div className="flex gap-2 justify-end">
+                    <div className="pt-2 flex gap-3">
                       <button
                         data-testid="credentials-cli-cancel"
                         type="button"
                         onClick={() => setShowAddToken(false)}
-                        className="px-3 py-1.5 text-sm text-slate-400"
+                        className="flex-1 px-4 py-2.5 border rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+                        style={{ borderColor: '#dce8d5' }}
                       >
                         취소
                       </button>
@@ -219,9 +247,10 @@ export function CredentialsPage() {
                         data-testid="credentials-cli-submit"
                         type="submit"
                         disabled={addTokenMutation.isPending}
-                        className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+                        className="flex-1 px-4 py-2.5 text-white rounded-lg text-sm font-medium transition-all disabled:opacity-50"
+                        style={{ backgroundColor: '#4a6741' }}
                       >
-                        {addTokenMutation.isPending ? '등록 중...' : '등록'}
+                        {addTokenMutation.isPending ? '등록 중...' : '토큰 생성'}
                       </button>
                     </div>
                     {addTokenMutation.isError && (
@@ -231,60 +260,82 @@ export function CredentialsPage() {
                 )}
 
                 {creds.length === 0 ? (
-                  <p data-testid="credentials-cli-empty" className="text-sm text-slate-400">등록된 CLI 토큰이 없습니다</p>
+                  <div data-testid="credentials-cli-empty" className="px-6 py-8 text-center text-sm" style={{ color: '#83935d' }}>
+                    등록된 CLI 토큰이 없습니다
+                  </div>
                 ) : (
-                  <div className="space-y-2">
-                    {creds.map((c) => (
-                      <div
-                        key={c.id}
-                        data-testid={`credentials-cli-token-${c.id}`}
-                        className="flex items-center justify-between px-4 py-3 rounded-lg bg-slate-800/50"
-                      >
-                        <div>
-                          <p data-testid={`credentials-cli-token-label-${c.id}`} className="text-sm font-medium text-slate-50">{c.label}</p>
-                          <p className="text-xs text-slate-400">
-                            등록: {new Date(c.createdAt).toLocaleDateString('ko')}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <span
-                            data-testid={`credentials-cli-token-status-${c.id}`}
-                            className={`text-xs px-2 py-0.5 rounded-full ${
-                              c.isActive
-                                ? 'bg-emerald-900/30 text-emerald-300'
-                                : 'bg-red-900/30 text-red-300'
-                            }`}
-                          >
-                            {c.isActive ? '활성' : '비활성'}
-                          </span>
-                          {c.isActive && (
-                            <button
-                              data-testid={`credentials-cli-deactivate-${c.id}`}
-                              onClick={() => {
-                                if (confirm('이 토큰을 비활성화하시겠습니까?')) {
-                                  deactivateTokenMutation.mutate(c.id)
-                                }
-                              }}
-                              className="text-xs text-red-500 hover:text-red-400"
-                            >
-                              비활성화
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="text-xs uppercase tracking-wider font-semibold border-b" style={{ backgroundColor: '#f8faf7', color: '#31422b', borderColor: '#dce8d5' }}>
+                          <th className="px-6 py-4">사용자 ID / 이름</th>
+                          <th className="px-6 py-4">식별 레이블</th>
+                          <th className="px-6 py-4">생성일</th>
+                          <th className="px-6 py-4">상태</th>
+                          <th className="px-6 py-4 text-right">관리</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y text-sm" style={{ divideColor: '#edf3e9' }}>
+                        {creds.map((c) => (
+                          <tr key={c.id} data-testid={`credentials-cli-token-${c.id}`} className="hover:bg-[#f8faf7] transition-colors">
+                            <td className="px-6 py-4">
+                              <div className="font-medium" style={{ color: '#263222' }}>{selectedUser?.username || c.userId}</div>
+                              <div className="text-xs text-gray-500">{selectedUser?.name}</div>
+                            </td>
+                            <td data-testid={`credentials-cli-token-label-${c.id}`} className="px-6 py-4 text-gray-600">{c.label}</td>
+                            <td className="px-6 py-4 text-gray-600">{new Date(c.createdAt).toLocaleString('ko')}</td>
+                            <td className="px-6 py-4">
+                              <span
+                                data-testid={`credentials-cli-token-status-${c.id}`}
+                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                  c.isActive
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-gray-100 text-gray-800'
+                                }`}
+                              >
+                                {c.isActive ? '활성' : '비활성'}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              {c.isActive && (
+                                <button
+                                  data-testid={`credentials-cli-deactivate-${c.id}`}
+                                  onClick={() => {
+                                    if (confirm('이 토큰을 비활성화하시겠습니까?')) {
+                                      deactivateTokenMutation.mutate(c.id)
+                                    }
+                                  }}
+                                  className="text-red-600 hover:text-red-800 font-medium hover:underline"
+                                >
+                                  삭제
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 )}
-              </div>
+                <div className="px-6 py-4 bg-white border-t flex items-center justify-between text-xs text-gray-500" style={{ borderColor: '#edf3e9' }}>
+                  <span>총 {creds.length}개의 인증 토큰이 검색되었습니다.</span>
+                  <div className="flex gap-2">
+                    <button className="p-1 px-2 border rounded hover:bg-[#f8faf7] disabled:opacity-50" style={{ borderColor: '#dce8d5' }} disabled>이전</button>
+                    <button className="p-1 px-2 border rounded hover:bg-[#f8faf7]" style={{ borderColor: '#dce8d5' }}>다음</button>
+                  </div>
+                </div>
+              </section>
+              {/* END: CLI Credentials Table Section */}
 
-              {/* 외부 API 키 */}
-              <div data-testid="credentials-api-section" className="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 data-testid="credentials-api-title" className="text-lg font-semibold text-slate-50">외부 API 키</h2>
+              {/* BEGIN: API Keys Section */}
+              <section data-testid="credentials-api-section" className="bg-white rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: '#dce8d5' }}>
+                <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: '#edf3e9' }}>
+                  <h3 data-testid="credentials-api-title" className="font-semibold" style={{ color: '#263222' }}>외부 API 키</h3>
                   <button
                     data-testid="credentials-api-add-btn"
                     onClick={() => setShowAddApiKey(true)}
-                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium rounded-lg transition-colors"
+                    className="text-xs px-3 py-1.5 text-white font-medium rounded-lg transition-colors"
+                    style={{ backgroundColor: '#4a6741' }}
                   >
                     + API 키 등록
                   </button>
@@ -305,16 +356,18 @@ export function CredentialsPage() {
                         scope: apiKeyForm.scope,
                       })
                     }}
-                    className="mb-4 p-4 bg-slate-800/50 rounded-lg space-y-3"
+                    className="mx-6 my-4 p-4 rounded-lg space-y-3"
+                    style={{ backgroundColor: '#f8faf7' }}
                   >
                     <div className="grid grid-cols-3 gap-3">
                       <div>
-                        <label className="block text-sm text-slate-400 mb-1">제공자</label>
+                        <label className="block text-sm font-semibold mb-1" style={{ color: '#31422b' }}>제공자</label>
                         <select
                           data-testid="credentials-api-provider"
                           value={apiKeyForm.provider}
                           onChange={(e) => setApiKeyForm({ ...apiKeyForm, provider: e.target.value })}
-                          className="w-full px-3 py-2 border border-slate-600 rounded-lg bg-slate-800 text-sm text-slate-100"
+                          className="w-full rounded-lg border text-sm focus:border-[#4a6741] focus:ring-[#4a6741]"
+                          style={{ borderColor: '#dce8d5' }}
                         >
                           <option value="kis">KIS (한국투자증권)</option>
                           <option value="notion">Notion</option>
@@ -323,45 +376,48 @@ export function CredentialsPage() {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm text-slate-400 mb-1">범위</label>
+                        <label className="block text-sm font-semibold mb-1" style={{ color: '#31422b' }}>범위</label>
                         <select
                           data-testid="credentials-api-scope"
                           value={apiKeyForm.scope}
                           onChange={(e) => setApiKeyForm({ ...apiKeyForm, scope: e.target.value as 'company' | 'user' })}
-                          className="w-full px-3 py-2 border border-slate-600 rounded-lg bg-slate-800 text-sm text-slate-100"
+                          className="w-full rounded-lg border text-sm focus:border-[#4a6741] focus:ring-[#4a6741]"
+                          style={{ borderColor: '#dce8d5' }}
                         >
                           <option value="user">개인용</option>
                           <option value="company">회사 공용</option>
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm text-slate-400 mb-1">라벨</label>
+                        <label className="block text-sm font-semibold mb-1" style={{ color: '#31422b' }}>라벨</label>
                         <input
                           data-testid="credentials-api-label-input"
                           value={apiKeyForm.label}
                           onChange={(e) => setApiKeyForm({ ...apiKeyForm, label: e.target.value })}
-                          className="w-full px-3 py-2 border border-slate-600 rounded-lg bg-slate-800 text-sm text-slate-100"
+                          className="w-full rounded-lg border text-sm focus:border-[#4a6741] focus:ring-[#4a6741]"
+                          style={{ borderColor: '#dce8d5' }}
                           placeholder="선택사항"
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm text-slate-400 mb-1">API 키</label>
+                      <label className="block text-sm font-semibold mb-1" style={{ color: '#31422b' }}>API 키</label>
                       <input
                         data-testid="credentials-api-key-input"
                         type="password"
                         value={apiKeyForm.key}
                         onChange={(e) => setApiKeyForm({ ...apiKeyForm, key: e.target.value })}
-                        className="w-full px-3 py-2 border border-slate-600 rounded-lg bg-slate-800 text-sm text-slate-100 font-mono"
+                        className="w-full rounded-lg border text-sm font-mono focus:border-[#4a6741] focus:ring-[#4a6741]"
+                        style={{ borderColor: '#dce8d5' }}
                         required
                       />
                     </div>
-                    <div className="flex gap-2 justify-end">
+                    <div className="flex gap-3 justify-end">
                       <button
                         data-testid="credentials-api-cancel"
                         type="button"
                         onClick={() => setShowAddApiKey(false)}
-                        className="px-3 py-1.5 text-sm text-slate-400"
+                        className="px-3 py-1.5 text-sm text-gray-500"
                       >
                         취소
                       </button>
@@ -369,7 +425,8 @@ export function CredentialsPage() {
                         data-testid="credentials-api-submit"
                         type="submit"
                         disabled={addApiKeyMutation.isPending}
-                        className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+                        className="px-3 py-1.5 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+                        style={{ backgroundColor: '#4a6741' }}
                       >
                         {addApiKeyMutation.isPending ? '등록 중...' : '등록'}
                       </button>
@@ -381,25 +438,25 @@ export function CredentialsPage() {
                 )}
 
                 {apiKeys.length === 0 ? (
-                  <p data-testid="credentials-api-empty" className="text-sm text-slate-400">등록된 API 키가 없습니다</p>
+                  <p data-testid="credentials-api-empty" className="px-6 py-8 text-center text-sm" style={{ color: '#83935d' }}>등록된 API 키가 없습니다</p>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="divide-y" style={{ divideColor: '#edf3e9' }}>
                     {apiKeys.map((k) => (
                       <div
                         key={k.id}
                         data-testid={`credentials-api-key-${k.id}`}
-                        className="flex items-center justify-between px-4 py-3 rounded-lg bg-slate-800/50"
+                        className="flex items-center justify-between px-6 py-4 hover:bg-[#f8faf7] transition-colors"
                       >
                         <div>
                           <div className="flex items-center gap-2">
-                            <span data-testid={`credentials-api-provider-${k.id}`} className="text-xs px-2 py-0.5 rounded-full bg-blue-900/30 text-blue-300 uppercase">
+                            <span data-testid={`credentials-api-provider-${k.id}`} className="text-xs px-2 py-0.5 rounded-full uppercase font-medium" style={{ backgroundColor: '#edf3e9', color: '#4a6741' }}>
                               {k.provider}
                             </span>
-                            <p data-testid={`credentials-api-key-label-${k.id}`} className="text-sm font-medium text-slate-50">
+                            <p data-testid={`credentials-api-key-label-${k.id}`} className="text-sm font-medium" style={{ color: '#263222' }}>
                               {k.label || '(라벨 없음)'}
                             </p>
                           </div>
-                          <p className="text-xs text-slate-400 mt-0.5">
+                          <p className="text-xs text-gray-500 mt-0.5">
                             등록: {new Date(k.createdAt).toLocaleDateString('ko')}
                           </p>
                         </div>
@@ -410,7 +467,7 @@ export function CredentialsPage() {
                               deleteApiKeyMutation.mutate(k.id)
                             }
                           }}
-                          className="text-xs text-red-500 hover:text-red-400"
+                          className="text-xs text-red-600 hover:text-red-800 font-medium hover:underline"
                         >
                           삭제
                         </button>
@@ -418,11 +475,13 @@ export function CredentialsPage() {
                     ))}
                   </div>
                 )}
-              </div>
+              </section>
+              {/* END: API Keys Section */}
             </>
           )}
         </div>
-      </div>
+      </main>
+      {/* END: Main Content */}
     </div>
   )
 }

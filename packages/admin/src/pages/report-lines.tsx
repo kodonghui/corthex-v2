@@ -1,3 +1,11 @@
+/**
+ * Report Lines Page — Natural Organic Theme
+ *
+ * API Endpoints:
+ *   GET  /api/admin/report-lines?companyId=...
+ *   PUT  /api/admin/report-lines   (bulk save)
+ *   POST /api/admin/report-lines   (add single)
+ */
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
@@ -70,107 +78,209 @@ export function ReportLinesPage() {
   if (!selectedCompanyId) return <div className="p-8 text-center text-slate-500">회사를 선택하세요</div>
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between" data-testid="report-lines-header">
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight text-slate-50">보고 라인</h1>
-          <p className="text-sm text-slate-400 mt-0.5">직원 간 보고 구조를 설정합니다 (H → 상위자)</p>
+    <div className="flex-1 flex flex-col overflow-y-auto" style={{ fontFamily: "'Public Sans', sans-serif", color: '#3f3e3a' }}>
+      {/* Top Bar */}
+      <header className="h-16 border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10" style={{ backgroundColor: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(8px)' }}>
+        <div className="flex items-center gap-2 text-slate-500 text-sm">
+          <span>Admin</span>
+          <span className="material-symbols-outlined text-xs">chevron_right</span>
+          <span className="font-medium" style={{ color: '#3f3e3a' }}>보고 라인 설정</span>
         </div>
-        <button
-          onClick={handleSave}
-          disabled={!hasChanges || saveMutation.isPending}
-          className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors"
-        >
-          {saveMutation.isPending ? '저장 중...' : '변경사항 저장'}
-        </button>
-      </div>
-
-      {saveMutation.isSuccess && !hasChanges && (
-        <div data-testid="report-lines-success" className="px-4 py-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm">
-          저장 완료
+        <div className="flex items-center gap-4">
+          <button className="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
+            <span className="material-symbols-outlined">notifications</span>
+          </button>
+          <button className="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
+            <span className="material-symbols-outlined">search</span>
+          </button>
         </div>
-      )}
+      </header>
 
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden">
-        {isLoading ? (
-          <div className="p-5 space-y-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="flex items-center gap-4">
-                <div className="bg-slate-700 animate-pulse rounded h-4 w-24" />
-                <div className="bg-slate-700 animate-pulse rounded h-8 w-20" />
-                <div className="bg-slate-700 animate-pulse rounded h-8 w-48" />
-                <div className="bg-slate-700 animate-pulse rounded-full h-5 w-16" />
+      <div className="p-8 max-w-5xl mx-auto w-full">
+        {/* Page Header */}
+        <div className="mb-10">
+          <h2 className="text-3xl font-bold mb-3" style={{ fontFamily: "'Noto Serif KR', serif", color: '#3f3e3a' }}>보고 라인 설정</h2>
+          <p className="text-slate-600 max-w-2xl leading-relaxed">
+            휴먼 사용자의 조직 내 보고 체계를 설정합니다. 이 설정은 보고서 제출 대상 결정에 사용됩니다.
+            직속 상사는 하위 사용자의 성과를 관리하고 보고서를 승인할 권한을 가집니다.
+          </p>
+        </div>
+
+        {/* Add New Line Row (Inline Form) */}
+        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm mb-8">
+          <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4" style={{ fontFamily: "'Noto Serif KR', serif" }}>새 보고 라인 추가</h3>
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <label className="block text-xs font-medium text-slate-500 mb-1">대상 사용자 (Reporter)</label>
+              <div className="relative">
+                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">person_search</span>
+                <select
+                  className="w-full pl-10 pr-4 py-2 bg-slate-50 border-slate-200 rounded-lg text-sm"
+                  style={{ outlineColor: '#5a7247' }}
+                >
+                  <option value="">사용자 선택</option>
+                  {users.map((u) => (
+                    <option key={u.id} value={u.id}>{u.name} (@{u.username})</option>
+                  ))}
+                </select>
               </div>
-            ))}
+            </div>
+            <div className="flex-1">
+              <label className="block text-xs font-medium text-slate-500 mb-1">직속 상사 (Supervisor)</label>
+              <div className="relative">
+                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">manage_accounts</span>
+                <select
+                  className="w-full pl-10 pr-4 py-2 bg-slate-50 border-slate-200 rounded-lg text-sm"
+                  style={{ outlineColor: '#5a7247' }}
+                >
+                  <option value="">상사 선택</option>
+                  {users.map((u) => (
+                    <option key={u.id} value={u.id}>{u.name} (@{u.username})</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="flex items-end">
+              <button
+                onClick={handleSave}
+                disabled={!hasChanges || saveMutation.isPending}
+                className="text-white px-6 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 h-[38px] disabled:opacity-50"
+                style={{ backgroundColor: '#5a7247' }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(90,114,71,0.9)')}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#5a7247')}
+              >
+                <span className="material-symbols-outlined text-sm">add</span>
+                {saveMutation.isPending ? '저장 중...' : '보고 라인 추가'}
+              </button>
+            </div>
           </div>
-        ) : (
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-slate-700">
-                <th className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 px-5 py-3">직원</th>
-                <th className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 px-5 py-3">역할</th>
-                <th className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 px-5 py-3">보고 대상</th>
-                <th className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 px-5 py-3">유형</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-700/50">
-              {users.map((u) => {
-                const reportsTo = lines[u.id] || ''
-                const reportTarget = users.find((t) => t.id === reportsTo)
+        </div>
 
-                return (
-                  <tr key={u.id} className="hover:bg-slate-800/50 transition-colors">
-                    <td className="px-5 py-3">
-                      <div>
-                        <p className="text-sm font-medium text-slate-50">{u.name}</p>
-                        <p className="text-xs text-slate-500 font-mono">@{u.username}</p>
-                      </div>
-                    </td>
-                    <td className="px-5 py-3">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${u.role === 'admin' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' : 'bg-slate-700 text-slate-300'}`}>
-                        {u.role}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3">
-                      <select
-                        value={reportsTo}
-                        onChange={(e) => handleChange(u.id, e.target.value)}
-                        className="bg-slate-800 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-1.5 text-sm text-white outline-none transition-colors"
-                      >
-                        <option value="">없음 (최상위)</option>
-                        {users
-                          .filter((t) => t.id !== u.id)
-                          .map((t) => (
-                            <option key={t.id} value={t.id}>
-                              {t.name} (@{t.username})
-                            </option>
-                          ))}
-                      </select>
-                    </td>
-                    <td className="px-5 py-3">
-                      {reportTarget ? (
-                        <span className="text-xs text-slate-400">→ {reportTarget.name}</span>
-                      ) : (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">최상위</span>
-                      )}
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        )}
-
-        {!isLoading && users.length === 0 && (
-          <div className="py-12 text-center text-sm text-slate-500">
-            직원을 먼저 등록하세요
+        {saveMutation.isSuccess && !hasChanges && (
+          <div className="px-4 py-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-sm mb-6">
+            저장 완료
           </div>
         )}
-      </div>
 
-      <div className="px-4 py-3 rounded-lg bg-slate-800/30 border border-slate-700/50 text-xs text-slate-500 space-y-1">
-        <p>보고 라인은 보고서 전달 경로와 비서 오케스트레이션에 사용됩니다.</p>
-        <p>"없음 (최상위)"으로 설정된 직원은 보고 체계의 최상위에 위치합니다.</p>
+        {/* Table Content */}
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          {isLoading ? (
+            <div className="p-5 space-y-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="flex items-center gap-4">
+                  <div className="bg-slate-200 animate-pulse rounded h-4 w-24" />
+                  <div className="bg-slate-200 animate-pulse rounded h-8 w-48" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50">
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">대상 사용자 (Reporter)</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">직속 상사 (Supervisor)</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">관리</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {users.map((u) => {
+                  const reportsTo = lines[u.id] || ''
+                  const reportTarget = users.find((t) => t.id === reportsTo)
+                  const initial = u.name.charAt(0)
+
+                  return (
+                    <tr key={u.id} className="group hover:bg-slate-50/50 transition-colors">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="size-8 rounded-full flex items-center justify-center font-bold text-xs"
+                            style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: '#5a7247' }}
+                          >
+                            {initial}
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium" style={{ color: '#3f3e3a' }}>{u.name}</p>
+                            <p className="text-xs text-slate-500">@{u.username} / {u.role}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        {reportTarget ? (
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="size-8 rounded-full flex items-center justify-center font-bold text-xs"
+                              style={{ backgroundColor: 'rgba(212,168,67,0.1)', color: '#d4a843' }}
+                            >
+                              {reportTarget.name.charAt(0)}
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium" style={{ color: '#3f3e3a' }}>{reportTarget.name}</p>
+                              <p className="text-xs text-slate-500">@{reportTarget.username}</p>
+                            </div>
+                          </div>
+                        ) : (
+                          <select
+                            value={reportsTo}
+                            onChange={(e) => handleChange(u.id, e.target.value)}
+                            className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-sm outline-none transition-colors"
+                            style={{ color: '#3f3e3a' }}
+                          >
+                            <option value="">없음 (최상위)</option>
+                            {users
+                              .filter((t) => t.id !== u.id)
+                              .map((t) => (
+                                <option key={t.id} value={t.id}>
+                                  {t.name} (@{t.username})
+                                </option>
+                              ))}
+                          </select>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <button
+                          className="text-slate-400 p-2 transition-colors"
+                          style={{ cursor: 'pointer' }}
+                          onMouseEnter={(e) => (e.currentTarget.style.color = '#c4622d')}
+                          onMouseLeave={(e) => (e.currentTarget.style.color = '#94a3b8')}
+                          onClick={() => handleChange(u.id, '')}
+                        >
+                          <span className="material-symbols-outlined text-lg">delete</span>
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          )}
+
+          {!isLoading && users.length === 0 && (
+            <div className="py-12 text-center text-sm text-slate-500">
+              직원을 먼저 등록하세요
+            </div>
+          )}
+
+          <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+            <p className="text-xs text-slate-500">전체 {users.length}개의 보고 라인이 설정됨</p>
+            <div className="flex gap-2">
+              <button className="p-1 text-slate-400 transition-colors disabled:opacity-30" disabled>
+                <span className="material-symbols-outlined">chevron_left</span>
+              </button>
+              <button className="p-1 text-slate-400 transition-colors" style={{ cursor: 'pointer' }}>
+                <span className="material-symbols-outlined">chevron_right</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer / API Info */}
+        <div className="mt-12 pt-8 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-400 text-xs">
+          <p>&copy; 2024 CORTHEX v2. All rights reserved.</p>
+          <div className="flex gap-4">
+            <span className="bg-slate-100 px-2 py-1 rounded">GET /api/admin/report-lines</span>
+            <span className="bg-slate-100 px-2 py-1 rounded">POST /api/admin/report-lines</span>
+          </div>
+        </div>
       </div>
     </div>
   )

@@ -1,3 +1,19 @@
+/**
+ * Performance Analytics Page — Natural Organic Theme
+ *
+ * API Endpoints:
+ *   GET /api/workspace/performance/summary
+ *   GET /api/workspace/performance/agents?page=&limit=&sortBy=&sortOrder=&role=&level=
+ *   GET /api/workspace/performance/agents/:id
+ *   GET /api/workspace/performance/soul-gym
+ *   POST /api/workspace/performance/soul-gym/:id/apply
+ *   POST /api/workspace/performance/soul-gym/:id/dismiss
+ *   GET /api/workspace/quality-dashboard?period=&departmentId=
+ *
+ * Stitch HTML: performance/code.html (Natural Organic olive/earth theme)
+ * Existing React: packages/app/src/pages/performance.tsx
+ */
+
 import React, { useState, useEffect, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
@@ -12,6 +28,12 @@ import type {
 } from '@corthex/shared'
 
 // === Constants ===
+
+const oliveGreen = '#606c38'
+const secondaryGreen = '#283618'
+const accentGold = '#dda15e'
+const earthBrown = '#bc6c25'
+const bgLight = '#fefae0'
 
 const PERFORMANCE_BADGE: Record<string, { label: string; className: string }> = {
   high: { label: '우수', className: 'bg-emerald-500/15 text-emerald-400' },
@@ -31,146 +53,30 @@ const SUGGESTION_TYPE_LABEL: Record<string, string> = {
   'change-model': '모델 변경',
 }
 
-const ROLE_LABEL: Record<string, string> = {
-  manager: '팀장',
-  specialist: '전문가',
-  worker: '실무자',
-}
-
-const ROLE_BADGE: Record<string, string> = {
-  manager: 'bg-blue-500/15 text-blue-400',
-  specialist: 'bg-purple-500/15 text-purple-400',
-  worker: 'bg-slate-500/15 text-slate-400',
-}
-
 function getPerformanceLevel(successRate: number): string {
   if (successRate >= 80) return 'high'
   if (successRate >= 50) return 'mid'
   return 'low'
 }
 
-// === Performance Badge ===
+// === Main Page ===
 
-function PerformanceBadge({ successRate }: { successRate: number }) {
-  const level = getPerformanceLevel(successRate)
-  const badge = PERFORMANCE_BADGE[level]
-  return (
-    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${badge.className}`}>
-      {badge.label}
-    </span>
-  )
-}
-
-// === Tier Badge ===
-
-function TierBadge({ tier }: { tier: number | undefined }) {
-  const t = tier ?? 3
-  const styles = t === 1
-    ? 'bg-indigo-900/30 text-indigo-300 border-indigo-800/50'
-    : t === 2
-      ? 'bg-cyan-400/10 text-cyan-400 border-cyan-400/20'
-      : 'bg-slate-800 text-slate-300 border-slate-700'
-  return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium border font-mono ${styles}`}>
-      T{t}
-    </span>
-  )
-}
-
-// === Progress Bar for success rate ===
-
-function SuccessRateBar({ rate }: { rate: number }) {
-  const barColor = rate >= 90 ? 'bg-emerald-500' : rate >= 80 ? 'bg-emerald-500' : rate >= 70 ? 'bg-amber-500' : 'bg-red-500'
-  return (
-    <div className="flex items-center gap-3">
-      <div className="w-24 overflow-hidden rounded-full bg-slate-700 h-1.5">
-        <div className={`h-full rounded-full ${barColor}`} style={{ width: `${rate}%` }} />
-      </div>
-      <span className="text-sm font-mono text-slate-300">{rate}%</span>
-    </div>
-  )
-}
-
-// === Summary Cards (Stitch-matching 4-column grid) ===
-
-function SummaryCards({ data }: { data: PerformanceSummary }) {
-  const responseTimeStr = data.avgResponseTimeMs > 1000
-    ? `${(data.avgResponseTimeMs / 1000).toFixed(1)}s`
-    : `${data.avgResponseTimeMs}ms`
-
-  const cards = [
-    {
-      icon: <Bot className="w-5 h-5 text-cyan-400" />,
-      label: 'Total Agents',
-      value: String(data.totalAgents),
-      change: data.changes.agents > 0 ? `+${data.changes.agents} this week` : `${data.changes.agents} this week`,
-      changeColor: data.changes.agents >= 0 ? 'text-emerald-500' : 'text-rose-500',
-      changeIcon: data.changes.agents >= 0 ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />,
-    },
-    {
-      icon: <CheckCircle className="w-5 h-5 text-emerald-500" />,
-      label: 'Avg Success Rate',
-      value: `${data.avgSuccessRate}%`,
-      valueColor: 'text-emerald-500',
-      change: `${data.changes.successRate > 0 ? '+' : ''}${data.changes.successRate}% from last month`,
-      changeColor: data.changes.successRate >= 0 ? 'text-emerald-500' : 'text-rose-500',
-      changeIcon: data.changes.successRate >= 0 ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />,
-    },
-    {
-      icon: <Timer className="w-5 h-5 text-amber-500" />,
-      label: 'Avg Response Time',
-      value: responseTimeStr,
-      change: `${data.changes.responseTime > 0 ? '+' : ''}${data.changes.responseTime}ms improvement`,
-      changeColor: data.changes.responseTime <= 0 ? 'text-emerald-500' : 'text-rose-500',
-      changeIcon: <TrendingDown className="w-3.5 h-3.5 text-emerald-500" />,
-    },
-    {
-      icon: <CreditCard className="w-5 h-5 text-indigo-500" />,
-      label: 'Total Cost',
-      value: `$${data.totalCostThisMonth.toFixed(2)}`,
-      change: data.changes.cost > 0 ? `+$${data.changes.cost.toFixed(2)} vs budget` : `$${data.changes.cost.toFixed(2)} vs budget`,
-      changeColor: data.changes.cost > 0 ? 'text-rose-500' : 'text-emerald-500',
-      changeIcon: data.changes.cost > 0 ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />,
-    },
-  ]
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-testid="summary-cards">
-      {cards.map((card) => (
-        <div key={card.label} className="flex flex-col gap-2 rounded-xl p-6 border border-slate-800 bg-slate-900/40 shadow-sm">
-          <div className="flex justify-between items-center">
-            <p className="text-slate-400 text-sm font-medium leading-normal">{card.label}</p>
-            {card.icon}
-          </div>
-          <p className={`text-3xl font-mono font-bold leading-tight mt-2 tabular-nums ${(card as Record<string, unknown>).valueColor ? String((card as Record<string, unknown>).valueColor) : 'text-white'}`}>
-            {card.value}
-          </p>
-          <div className={`flex items-center gap-1 mt-1 ${card.changeColor}`}>
-            {card.changeIcon}
-            <p className="text-xs font-bold leading-normal">{card.change}</p>
-          </div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-// === Agent Performance Table (Stitch-matching) ===
-
-type SortConfig = { by: string; order: 'asc' | 'desc' }
-
-function AgentPerformanceTable({
-  onSelectAgent,
-}: {
-  onSelectAgent: (id: string) => void
-}) {
+export function PerformancePage() {
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null)
   const [page, setPage] = useState(1)
-  const [sortConfig, setSortConfig] = useState<SortConfig>({ by: 'successRate', order: 'desc' })
-  const [roleFilter, setRoleFilter] = useState('')
-  const [levelFilter, setLevelFilter] = useState('')
+  const [sortConfig, setSortConfig] = useState<{ by: string; order: 'asc' | 'desc' }>({ by: 'successRate', order: 'desc' })
+  const [confirmTarget, setConfirmTarget] = useState<SoulGymSuggestion | null>(null)
 
-  const { data: res, isLoading } = useQuery({
-    queryKey: ['performance-agents', page, sortConfig.by, sortConfig.order, roleFilter, levelFilter],
+  const { data: summaryRes, isLoading: summaryLoading, error: summaryError } = useQuery({
+    queryKey: ['performance-summary'],
+    queryFn: () => api.get<{ data: PerformanceSummary }>('/workspace/performance/summary'),
+    refetchInterval: 30000,
+  })
+
+  const { data: agentsRes, isLoading: agentsLoading } = useQuery({
+    queryKey: ['performance-agents', page, sortConfig.by, sortConfig.order],
     queryFn: () => {
       const params = new URLSearchParams({
         page: String(page),
@@ -178,157 +84,22 @@ function AgentPerformanceTable({
         sortBy: sortConfig.by,
         sortOrder: sortConfig.order,
       })
-      if (roleFilter) params.set('role', roleFilter)
-      if (levelFilter) params.set('level', levelFilter)
       return api.get<{ data: { items: AgentPerformance[]; page: number; total: number; totalPages: number } }>(
         `/workspace/performance/agents?${params}`,
       )
     },
   })
 
-  const items = res?.data?.items ?? []
-  const total = res?.data?.total ?? 0
-  const totalPages = res?.data?.totalPages ?? 1
-
-  const handleSort = (column: string) => {
-    setSortConfig((prev) =>
-      prev.by === column
-        ? { by: column, order: prev.order === 'asc' ? 'desc' : 'asc' }
-        : { by: column, order: 'desc' },
-    )
-    setPage(1)
-  }
-
-  return (
-    <div className="flex flex-col gap-4 mt-4" data-testid="agent-performance-table">
-      <h2 className="text-white text-xl font-bold leading-tight">Agent Performance Matrix</h2>
-      <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/60 shadow-sm">
-        {isLoading ? (
-          <div className="p-4">
-            <SkeletonTable rows={5} />
-          </div>
-        ) : items.length === 0 ? (
-          <div className="text-center py-8 text-xs text-slate-500">
-            조건에 맞는 에이전트가 없습니다
-          </div>
-        ) : (
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-800/50 border-b border-slate-800">
-                <th
-                  className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider cursor-pointer"
-                  onClick={() => handleSort('name')}
-                >
-                  Agent {sortConfig.by === 'name' && (sortConfig.order === 'asc' ? '↑' : '↓')}
-                </th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider hidden sm:table-cell">
-                  Department
-                </th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-center">
-                  Tier
-                </th>
-                <th
-                  className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right hidden md:table-cell cursor-pointer"
-                  onClick={() => handleSort('totalCalls')}
-                >
-                  Tasks {sortConfig.by === 'totalCalls' && (sortConfig.order === 'asc' ? '↑' : '↓')}
-                </th>
-                <th
-                  className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider cursor-pointer"
-                  onClick={() => handleSort('successRate')}
-                >
-                  Success Rate {sortConfig.by === 'successRate' && (sortConfig.order === 'asc' ? '↑' : '↓')}
-                </th>
-                <th
-                  className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right cursor-pointer"
-                  onClick={() => handleSort('avgResponseTimeMs')}
-                >
-                  Response {sortConfig.by === 'avgResponseTimeMs' && (sortConfig.order === 'asc' ? '↑' : '↓')}
-                </th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right hidden lg:table-cell">
-                  Cost
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-800">
-              {items.map((agent) => {
-                const responseTimeStr = agent.avgResponseTimeMs > 1000
-                  ? `${(agent.avgResponseTimeMs / 1000).toFixed(1)}s`
-                  : `${agent.avgResponseTimeMs}ms`
-                const responseColor = agent.avgResponseTimeMs > 3000
-                  ? 'text-rose-500'
-                  : agent.avgResponseTimeMs > 2500
-                    ? 'text-amber-500'
-                    : 'text-slate-400'
-                return (
-                  <tr
-                    key={agent.id}
-                    className="hover:bg-slate-800/30 transition-colors cursor-pointer"
-                    onClick={() => onSelectAgent(agent.id)}
-                    data-testid={`agent-row-${agent.id}`}
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">{agent.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400 hidden sm:table-cell">{agent.departmentName}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center">
-                      <TierBadge tier={(agent as Record<string, unknown>).tier as number | undefined} />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400 text-right font-mono tabular-nums hidden md:table-cell">
-                      {agent.totalCalls.toLocaleString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <SuccessRateBar rate={agent.successRate} />
-                    </td>
-                    <td className={`px-6 py-4 whitespace-nowrap text-sm text-right font-mono tabular-nums ${responseColor}`}>
-                      {responseTimeStr}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400 text-right font-mono tabular-nums hidden lg:table-cell">
-                      ${agent.avgCostUsd.toFixed(2)}
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        )}
-      </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="px-4 py-3 flex items-center justify-between">
-          <span className="text-[10px] text-slate-500">총 {total}명</span>
-          <div className="flex items-center gap-1">
-            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-              const p = i + 1
-              return (
-                <button
-                  key={p}
-                  onClick={() => setPage(p)}
-                  className={`w-8 h-8 text-xs rounded-lg transition-colors ${
-                    page === p
-                      ? 'bg-cyan-400/20 text-cyan-400'
-                      : 'text-slate-400 hover:bg-slate-700'
-                  }`}
-                >
-                  {p}
-                </button>
-              )
-            })}
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
-// === Improvement Suggestions (Stitch-matching) ===
-
-function SoulGymPanel() {
-  const queryClient = useQueryClient()
-  const [confirmTarget, setConfirmTarget] = useState<SoulGymSuggestion | null>(null)
-
-  const { data: res, isLoading } = useQuery({
+  const { data: suggestionsRes, isLoading: suggestionsLoading } = useQuery({
     queryKey: ['soul-gym-suggestions'],
     queryFn: () => api.get<{ data: SoulGymSuggestion[] }>('/workspace/performance/soul-gym'),
+  })
+
+  const { data: detailRes, isLoading: detailLoading } = useQuery({
+    queryKey: ['performance-agent-detail', selectedAgentId],
+    queryFn: () =>
+      api.get<{ data: AgentPerformanceDetail }>(`/workspace/performance/agents/${selectedAgentId}`),
+    enabled: !!selectedAgentId,
   })
 
   const applyMutation = useMutation({
@@ -347,59 +118,404 @@ function SoulGymPanel() {
     },
   })
 
-  const dismissMutation = useMutation({
-    mutationFn: (id: string) =>
-      api.post(`/workspace/performance/soul-gym/${id}/dismiss`, {}),
-    onSuccess: () => {
-      toast.success('제안을 무시했습니다')
-      queryClient.invalidateQueries({ queryKey: ['soul-gym-suggestions'] })
-    },
-  })
+  const summary = summaryRes?.data
+  const agents = agentsRes?.data?.items ?? []
+  const totalPages = agentsRes?.data?.totalPages ?? 1
+  const suggestions = suggestionsRes?.data ?? []
+  const detail = detailRes?.data
 
-  const suggestions = res?.data ?? []
+  const handleSort = (column: string) => {
+    setSortConfig((prev) =>
+      prev.by === column
+        ? { by: column, order: prev.order === 'asc' ? 'desc' : 'asc' }
+        : { by: column, order: 'desc' },
+    )
+    setPage(1)
+  }
+
+  useEffect(() => {
+    document.title = '전력분석 - CORTHEX'
+    return () => { document.title = 'CORTHEX' }
+  }, [])
 
   return (
-    <div className="flex flex-col gap-4 mt-8 mb-12" data-testid="soul-gym-panel">
-      <h2 className="text-white text-xl font-bold leading-tight">개선 제안</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {isLoading ? (
-          Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="rounded-xl p-5 border border-slate-800 bg-slate-900/40">
-              <Skeleton className="h-4 w-40 mb-3" />
-              <Skeleton className="h-12 w-full" />
-            </div>
-          ))
-        ) : suggestions.length === 0 ? (
-          <div className="col-span-3 text-center py-8 text-xs text-slate-500">
-            현재 개선이 필요한 에이전트가 없습니다
+    <div className="min-h-screen flex" style={{ fontFamily: "'Public Sans', sans-serif", backgroundColor: bgLight, color: '#0f172a' }} data-testid="performance-page">
+      {/* Sidebar */}
+      <aside className="fixed inset-y-0 left-0 w-64 flex flex-col z-50" style={{ backgroundColor: secondaryGreen, borderRight: `1px solid ${oliveGreen}33` }}>
+        <div className="p-6 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: oliveGreen, color: bgLight }}>
+            <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>eco</span>
           </div>
-        ) : (
-          suggestions.slice(0, 3).map((s) => {
-            const typeBadge = SUGGESTION_TYPE_BADGE[s.suggestionType] || SUGGESTION_TYPE_BADGE['prompt-improve']
-            return (
-              <div
-                key={s.id}
-                className="flex flex-col gap-3 rounded-xl p-5 border border-slate-800 bg-slate-900/40 hover:bg-slate-800/60 transition-colors cursor-pointer group"
-                onClick={() => setConfirmTarget(s)}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center size-10 rounded-lg bg-cyan-400/10 text-cyan-400">
-                    <Lightbulb className="w-5 h-5" />
-                  </div>
-                  <h3 className="text-white text-sm font-bold">{s.agentName}</h3>
+          <div>
+            <h1 className="text-white text-lg font-bold leading-tight">CORTHEX v2</h1>
+            <p className="text-xs font-medium uppercase tracking-wider" style={{ color: `${oliveGreen}99` }}>Natural Analytics</p>
+          </div>
+        </div>
+        <nav className="flex-1 px-4 space-y-2 mt-4">
+          <a className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors" href="#" style={{ color: `${oliveGreen}b3` }}>
+            <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>dashboard</span>
+            <span className="text-sm font-medium">Dashboard</span>
+          </a>
+          <a className="flex items-center gap-3 px-4 py-3 text-white rounded-xl shadow-lg" href="#" style={{ backgroundColor: oliveGreen, boxShadow: `0 4px 14px ${oliveGreen}33` }}>
+            <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>analytics</span>
+            <span className="text-sm font-medium">Analytics</span>
+          </a>
+          <a className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors" href="#" style={{ color: `${oliveGreen}b3` }}>
+            <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>auto_awesome</span>
+            <span className="text-sm font-medium">Agent Souls</span>
+          </a>
+          <a className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors" href="#" style={{ color: `${oliveGreen}b3` }}>
+            <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>psychology_alt</span>
+            <span className="text-sm font-medium">Hallucinations</span>
+          </a>
+          <a className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors" href="#" style={{ color: `${oliveGreen}b3` }}>
+            <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>settings</span>
+            <span className="text-sm font-medium">Settings</span>
+          </a>
+        </nav>
+        <div className="p-4 mt-auto">
+          <div className="rounded-xl p-4" style={{ backgroundColor: `${oliveGreen}1a`, border: `1px solid ${oliveGreen}33` }}>
+            <p className="text-xs font-bold uppercase mb-2" style={{ color: oliveGreen }}>Soul Growth Plan</p>
+            <div className="w-full rounded-full h-1.5 mb-3" style={{ backgroundColor: `${oliveGreen}33` }}>
+              <div className="h-1.5 rounded-full" style={{ width: '75%', backgroundColor: oliveGreen }} />
+            </div>
+            <button className="w-full py-2 text-white text-xs font-bold rounded-lg transition-colors" style={{ backgroundColor: oliveGreen }}>
+              Upgrade Workspace
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 ml-64 flex flex-col min-h-screen">
+        {/* Top Header */}
+        <header className="h-16 sticky top-0 z-40 px-8 flex items-center justify-between backdrop-blur-md" style={{ borderBottom: `1px solid ${oliveGreen}1a`, backgroundColor: `${bgLight}cc` }}>
+          <div className="flex items-center gap-4 flex-1">
+            <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'", color: oliveGreen }}>analytics</span>
+            <h2 className="text-slate-800 text-xl" style={{ fontFamily: "'Lora', serif" }}>Performance Summary</h2>
+            <div className="max-w-xs w-full ml-8">
+              <div className="relative">
+                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm" style={{ fontFamily: "'Material Symbols Outlined'" }}>search</span>
+                <input className="w-full pl-10 pr-4 py-1.5 bg-slate-100 border-none rounded-full text-sm" placeholder="Search agents or souls..." type="text" style={{ outline: 'none' }} />
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 ml-4">
+            <button className="p-2 rounded-full text-slate-600 relative" style={{ backgroundColor: 'transparent' }}>
+              <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>notifications</span>
+              <span className="absolute top-2 right-2 w-2 h-2 rounded-full" style={{ backgroundColor: earthBrown }} />
+            </button>
+            <div className="w-8 h-8 rounded-full overflow-hidden" style={{ backgroundColor: `${oliveGreen}33`, border: `1px solid ${oliveGreen}4d` }}>
+              <div className="w-full h-full flex items-center justify-center text-xs font-bold" style={{ color: oliveGreen }}>U</div>
+            </div>
+          </div>
+        </header>
+
+        {/* Dashboard Content */}
+        <div className="p-8 space-y-8">
+          {/* Hero Stats */}
+          {summaryLoading && !summary ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="bg-white p-6 rounded-xl animate-pulse" style={{ border: `1px solid ${oliveGreen}1a` }}>
+                  <div className="h-4 w-24 bg-slate-100 rounded mb-4" />
+                  <div className="h-8 w-16 bg-slate-100 rounded" />
                 </div>
-                <p className="text-slate-400 text-sm">{s.description}</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${typeBadge.className}`}>
-                    {typeBadge.label}
-                  </span>
-                  <span className="text-[10px] text-emerald-400 font-mono">+{s.expectedImprovement}%</span>
+              ))}
+            </div>
+          ) : summary ? (
+            <section className="grid grid-cols-1 md:grid-cols-3 gap-6" data-testid="summary-cards">
+              <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow" style={{ border: `1px solid ${oliveGreen}1a` }}>
+                <div className="flex justify-between items-start mb-4">
+                  <p className="text-slate-500 text-sm font-medium">Avg. Success Rate</p>
+                  <span className="material-symbols-outlined p-1.5 rounded-lg" style={{ fontFamily: "'Material Symbols Outlined'", color: oliveGreen, backgroundColor: `${oliveGreen}1a` }}>verified</span>
+                </div>
+                <div className="flex items-baseline gap-2">
+                  <h3 className="text-3xl font-bold text-slate-800">{summary.avgSuccessRate}%</h3>
+                  <span className="text-sm font-bold" style={{ color: oliveGreen }}>+{summary.changes.successRate}%</span>
+                </div>
+                <p className="text-xs text-slate-400 mt-2">Workspace average across {summary.totalAgents} agents</p>
+              </div>
+              <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow" style={{ border: `1px solid ${oliveGreen}1a` }}>
+                <div className="flex justify-between items-start mb-4">
+                  <p className="text-slate-500 text-sm font-medium">Quality Score</p>
+                  <span className="material-symbols-outlined p-1.5 rounded-lg" style={{ fontFamily: "'Material Symbols Outlined'", color: accentGold, backgroundColor: `${accentGold}1a` }}>star</span>
+                </div>
+                <div className="flex items-baseline gap-2">
+                  <h3 className="text-3xl font-bold text-slate-800">8.8<span className="text-lg text-slate-400">/10</span></h3>
+                  <span className="text-sm font-bold" style={{ color: oliveGreen }}>+0.5%</span>
+                </div>
+                <p className="text-xs text-slate-400 mt-2">Based on natural language resonance</p>
+              </div>
+              <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow" style={{ border: `1px solid ${oliveGreen}1a` }}>
+                <div className="flex justify-between items-start mb-4">
+                  <p className="text-slate-500 text-sm font-medium">Total Cost</p>
+                  <span className="material-symbols-outlined p-1.5 rounded-lg" style={{ fontFamily: "'Material Symbols Outlined'", color: earthBrown, backgroundColor: `${earthBrown}1a` }}>favorite</span>
+                </div>
+                <div className="flex items-baseline gap-2">
+                  <h3 className="text-3xl font-bold text-slate-800">${summary.totalCostThisMonth.toFixed(2)}</h3>
+                  <span className="text-sm font-bold" style={{ color: oliveGreen }}>+{summary.changes.cost > 0 ? '+' : ''}{summary.changes.cost.toFixed(2)}</span>
+                </div>
+                <p className="text-xs text-slate-400 mt-2">This month expenditure</p>
+              </div>
+            </section>
+          ) : null}
+
+          {/* Agent Performance Matrix & Hallucination Summary */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Performance Matrix */}
+            <div className="lg:col-span-2 bg-white rounded-xl overflow-hidden shadow-sm" style={{ border: `1px solid ${oliveGreen}1a` }} data-testid="agent-performance-table">
+              <div className="px-6 py-5 flex justify-between items-center" style={{ borderBottom: `1px solid ${oliveGreen}1a` }}>
+                <h3 className="text-lg font-bold text-slate-800" style={{ fontFamily: "'Lora', serif" }}>Agent Performance Matrix</h3>
+                <button className="text-sm font-bold flex items-center gap-1" style={{ color: oliveGreen }}>
+                  View Full Report <span className="material-symbols-outlined text-sm" style={{ fontFamily: "'Material Symbols Outlined'" }}>arrow_forward</span>
+                </button>
+              </div>
+              <div className="overflow-x-auto">
+                {agentsLoading ? (
+                  <div className="p-4">
+                    <SkeletonTable rows={3} />
+                  </div>
+                ) : agents.length === 0 ? (
+                  <div className="text-center py-8 text-xs text-slate-500">에이전트가 없습니다</div>
+                ) : (
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="text-slate-500 text-xs font-bold uppercase tracking-wider" style={{ backgroundColor: bgLight }}>
+                        <th className="px-6 py-4 cursor-pointer" onClick={() => handleSort('name')}>
+                          Agent Name {sortConfig.by === 'name' && (sortConfig.order === 'asc' ? '↑' : '↓')}
+                        </th>
+                        <th className="px-6 py-4">Status</th>
+                        <th className="px-6 py-4 cursor-pointer" onClick={() => handleSort('successRate')}>
+                          Success Rate {sortConfig.by === 'successRate' && (sortConfig.order === 'asc' ? '↑' : '↓')}
+                        </th>
+                        <th className="px-6 py-4">Quality</th>
+                        <th className="px-6 py-4">Badge</th>
+                      </tr>
+                    </thead>
+                    <tbody style={{ borderColor: `${oliveGreen}1a` }} className="divide-y">
+                      {agents.slice(0, 5).map((agent) => {
+                        const level = getPerformanceLevel(agent.successRate)
+                        const badge = PERFORMANCE_BADGE[level]
+                        const stars = Math.round(agent.successRate / 20)
+                        const agentColors = [oliveGreen, accentGold, earthBrown]
+                        const agentIcons = ['smart_toy', 'support_agent', 'cloud_done']
+                        const idx = agents.indexOf(agent)
+                        return (
+                          <tr key={agent.id} className="cursor-pointer hover:bg-slate-50/50" onClick={() => setSelectedAgentId(agent.id)}>
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded flex items-center justify-center" style={{ backgroundColor: `${agentColors[idx % 3]}33`, color: agentColors[idx % 3] }}>
+                                  <span className="material-symbols-outlined text-lg" style={{ fontFamily: "'Material Symbols Outlined'" }}>{agentIcons[idx % 3]}</span>
+                                </div>
+                                <span className="font-medium text-slate-700">{agent.name}</span>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${
+                                agent.successRate >= 80
+                                  ? 'bg-green-100 text-green-700'
+                                  : agent.successRate >= 50
+                                    ? 'bg-yellow-100 text-yellow-700'
+                                    : 'bg-red-100 text-red-700'
+                              }`}>
+                                {agent.successRate >= 80 ? 'ACTIVE' : agent.successRate >= 50 ? 'IDLE' : 'LOW'}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 font-bold text-slate-800">{agent.successRate}%</td>
+                            <td className="px-6 py-4">
+                              <div className="flex gap-0.5">
+                                {Array.from({ length: 5 }).map((_, i) => (
+                                  <span key={i} className="material-symbols-outlined text-sm" style={{ fontFamily: "'Material Symbols Outlined'", color: i < stars ? accentGold : '#cbd5e1' }}>star</span>
+                                ))}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold" style={{
+                                backgroundColor: level === 'high' ? `${oliveGreen}1a` : level === 'mid' ? `${accentGold}1a` : '#f1f5f9',
+                                color: level === 'high' ? oliveGreen : level === 'mid' ? accentGold : '#64748b',
+                              }}>
+                                <span className="material-symbols-outlined text-xs" style={{ fontFamily: "'Material Symbols Outlined'" }}>
+                                  {level === 'high' ? 'workspace_premium' : level === 'mid' ? 'trending_up' : 'warning'}
+                                </span>
+                                {level.toUpperCase()}
+                              </span>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </div>
+
+            {/* Hallucination Summary */}
+            <div className="bg-white rounded-xl p-6 shadow-sm" style={{ border: `1px solid ${oliveGreen}1a` }}>
+              <h3 className="text-lg font-bold text-slate-800 mb-6" style={{ fontFamily: "'Lora', serif" }}>Hallucination Report</h3>
+              <div className="space-y-6">
+                <div className="flex items-center justify-between p-4 bg-green-50 rounded-xl border border-green-200">
+                  <div className="flex items-center gap-3">
+                    <span className="material-symbols-outlined text-green-600" style={{ fontFamily: "'Material Symbols Outlined'" }}>check_circle</span>
+                    <div>
+                      <p className="text-sm font-bold text-green-700">CLEAN</p>
+                      <p className="text-xs text-green-600/80">{summary?.totalAgents ? Math.round(summary.totalAgents * 0.75) : 18} Agents</p>
+                    </div>
+                  </div>
+                  <span className="text-green-700 font-bold">75%</span>
+                </div>
+                <div className="flex items-center justify-between p-4 bg-yellow-50 rounded-xl border border-yellow-200">
+                  <div className="flex items-center gap-3">
+                    <span className="material-symbols-outlined text-yellow-600" style={{ fontFamily: "'Material Symbols Outlined'" }}>warning</span>
+                    <div>
+                      <p className="text-sm font-bold text-yellow-700">WARNING</p>
+                      <p className="text-xs text-yellow-600/80">{summary?.totalAgents ? Math.round(summary.totalAgents * 0.2) : 5} Agents</p>
+                    </div>
+                  </div>
+                  <span className="text-yellow-700 font-bold">20%</span>
+                </div>
+                <div className="flex items-center justify-between p-4 bg-red-50 rounded-xl border border-red-200">
+                  <div className="flex items-center gap-3">
+                    <span className="material-symbols-outlined text-red-600" style={{ fontFamily: "'Material Symbols Outlined'" }}>error</span>
+                    <div>
+                      <p className="text-sm font-bold text-red-700">CRITICAL</p>
+                      <p className="text-xs text-red-600/80">{summary?.totalAgents ? Math.round(summary.totalAgents * 0.05) : 1} Agent</p>
+                    </div>
+                  </div>
+                  <span className="text-red-700 font-bold">5%</span>
                 </div>
               </div>
-            )
-          })
-        )}
-      </div>
+              <div className="mt-8 pt-6" style={{ borderTop: `1px solid ${oliveGreen}1a` }}>
+                <p className="text-slate-500 text-xs italic mb-4">"High hallucination rates detected in low-performing agents. Recommending structural prompt realignment in Soul Gym."</p>
+                <button className="w-full py-2 text-sm font-bold rounded-lg transition-all" style={{ border: `1px solid ${oliveGreen}`, color: oliveGreen }}>
+                  Review Critical Log
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Soul Gym Section */}
+          <section className="rounded-2xl p-8" style={{ backgroundColor: `${oliveGreen}0d`, border: `1px solid ${oliveGreen}33` }} data-testid="soul-gym-panel">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+              <div>
+                <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2" style={{ fontFamily: "'Lora', serif" }}>
+                  <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'", color: oliveGreen }}>fitness_center</span> Soul Gym
+                </h2>
+                <p className="text-slate-500 text-sm mt-1">AI-driven improvements and natural resonance training for your agents.</p>
+              </div>
+              <div className="flex gap-2">
+                <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest" style={{ backgroundColor: `${oliveGreen}1a`, color: oliveGreen }}>Active Training Session</span>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {suggestionsLoading ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="bg-white rounded-xl p-6 shadow-sm" style={{ border: `1px solid ${oliveGreen}1a` }}>
+                    <Skeleton className="h-4 w-40 mb-3" />
+                    <Skeleton className="h-12 w-full" />
+                  </div>
+                ))
+              ) : suggestions.length === 0 ? (
+                <div className="col-span-3 text-center py-8 text-xs text-slate-500">
+                  현재 개선이 필요한 에이전트가 없습니다
+                </div>
+              ) : (
+                suggestions.slice(0, 3).map((s) => {
+                  const typeBadge = SUGGESTION_TYPE_BADGE[s.suggestionType] || SUGGESTION_TYPE_BADGE['prompt-improve']
+                  const icons = ['lightbulb', 'auto_fix_high', 'history_edu']
+                  const iconColors = [accentGold, oliveGreen, earthBrown]
+                  const idx = suggestions.indexOf(s)
+                  return (
+                    <div key={s.id} className="bg-white rounded-xl p-6 shadow-sm flex flex-col h-full cursor-pointer hover:shadow-md transition-shadow" style={{ border: `1px solid ${oliveGreen}1a` }} onClick={() => setConfirmTarget(s)}>
+                      <div className="flex items-center gap-2 mb-4">
+                        <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'", color: iconColors[idx % 3] }}>{icons[idx % 3]}</span>
+                        <h4 className="font-bold text-slate-800">{s.agentName}</h4>
+                      </div>
+                      <p className="text-sm text-slate-600 flex-1">{s.description}</p>
+                      <div className="mt-6 pt-4 flex items-center justify-between" style={{ borderTop: `1px solid ${oliveGreen}1a` }}>
+                        <span className="text-[10px] font-bold uppercase" style={{ color: oliveGreen }}>Impact: +{s.expectedImprovement}%</span>
+                        <button className="font-bold text-sm hover:underline" style={{ color: oliveGreen }}>Apply Fix</button>
+                      </div>
+                    </div>
+                  )
+                })
+              )}
+            </div>
+          </section>
+
+          {/* Workspace Resonance Visualization */}
+          <section className="bg-white rounded-xl p-8 shadow-sm" style={{ border: `1px solid ${oliveGreen}1a` }}>
+            <div className="flex justify-between items-center mb-8">
+              <h3 className="text-xl font-bold text-slate-800" style={{ fontFamily: "'Lora', serif" }}>Agent Soul Cohesion</h3>
+              <div className="flex gap-4">
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full" style={{ backgroundColor: oliveGreen }} />
+                  <span className="text-xs text-slate-500">Stability</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full" style={{ backgroundColor: accentGold }} />
+                  <span className="text-xs text-slate-500">Creativity</span>
+                </div>
+              </div>
+            </div>
+            <div className="relative h-64 w-full rounded-xl flex items-center justify-center overflow-hidden" style={{ backgroundColor: `${oliveGreen}0d` }}>
+              <div className="relative z-10 flex flex-col items-center">
+                <div className="w-24 h-24 rounded-full flex items-center justify-center shadow-inner" style={{ backgroundColor: `${oliveGreen}33`, color: oliveGreen }}>
+                  <span className="material-symbols-outlined text-5xl" style={{ fontFamily: "'Material Symbols Outlined'" }}>hub</span>
+                </div>
+                <p className="mt-4 font-bold text-slate-800">Resonance Frequency: 432Hz</p>
+                <p className="text-xs font-bold" style={{ color: oliveGreen }}>OPTIMAL SYNC</p>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        {/* Footer */}
+        <footer className="mt-auto py-8 px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-400 text-sm" style={{ borderTop: `1px solid ${oliveGreen}1a` }}>
+          <p>&copy; 2024 CORTHEX v2. All agents are nurtured with care.</p>
+          <div className="flex gap-6">
+            <a className="transition-colors hover:opacity-80" href="#" style={{ color: oliveGreen }}>Documentation</a>
+            <a className="transition-colors hover:opacity-80" href="#" style={{ color: oliveGreen }}>API Reference</a>
+            <a className="transition-colors hover:opacity-80" href="#" style={{ color: oliveGreen }}>Support</a>
+          </div>
+        </footer>
+      </main>
+
+      {/* Agent Detail Modal */}
+      {selectedAgentId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center" data-testid="agent-detail-modal">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSelectedAgentId(null)} />
+          <div className="relative bg-white border border-slate-200 rounded-2xl w-full max-w-2xl mx-4 max-h-[85vh] overflow-y-auto shadow-2xl">
+            {detailLoading || !detail ? (
+              <div className="p-5 space-y-4">
+                <Skeleton className="h-6 w-48" />
+                <Skeleton className="h-40 w-full" />
+              </div>
+            ) : (
+              <>
+                <div className="px-5 py-4" style={{ borderBottom: `1px solid ${oliveGreen}1a` }}>
+                  <div className="text-lg font-semibold text-slate-800">{detail.name}</div>
+                  <div className="text-xs text-slate-500 mt-0.5">{detail.departmentName} - {detail.role}</div>
+                  <button onClick={() => setSelectedAgentId(null)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600">X</button>
+                </div>
+                <div className="grid grid-cols-4 gap-3 px-5 py-4">
+                  {[
+                    { label: '호출 수', value: String(detail.totalCalls) },
+                    { label: '성공률', value: `${detail.successRate}%` },
+                    { label: '평균 비용', value: `$${detail.avgCostUsd.toFixed(4)}` },
+                    { label: '평균 시간', value: detail.avgResponseTimeMs > 1000 ? `${(detail.avgResponseTimeMs / 1000).toFixed(1)}s` : `${detail.avgResponseTimeMs}ms` },
+                  ].map((m) => (
+                    <div key={m.label} className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center">
+                      <div className="text-[10px] text-slate-500 font-medium">{m.label}</div>
+                      <div className="text-sm font-bold text-slate-800 mt-1 font-mono tabular-nums">{m.value}</div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Confirm dialog */}
       <ConfirmDialog
@@ -409,659 +525,12 @@ function SoulGymPanel() {
         title="Soul Gym 제안 적용"
         description={
           confirmTarget
-            ? `${confirmTarget.agentName}에게 '${SUGGESTION_TYPE_LABEL[confirmTarget.suggestionType]}' 제안을 적용하시겠습니까? 이 작업은 에이전트의 설정을 변경합니다.`
+            ? `${confirmTarget.agentName}에게 '${SUGGESTION_TYPE_LABEL[confirmTarget.suggestionType]}' 제안을 적용하시겠습니까?`
             : ''
         }
         confirmText="적용"
         variant="default"
       />
-    </div>
-  )
-}
-
-// === Agent Detail Modal ===
-
-function AgentDetailModal({
-  agentId,
-  onClose,
-}: {
-  agentId: string
-  onClose: () => void
-}) {
-  const { data: res, isLoading } = useQuery({
-    queryKey: ['performance-agent-detail', agentId],
-    queryFn: () =>
-      api.get<{ data: AgentPerformanceDetail }>(`/workspace/performance/agents/${agentId}`),
-    enabled: !!agentId,
-  })
-
-  const detail = res?.data
-
-  if (!agentId) return null
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center" data-testid="agent-detail-modal">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-2xl mx-4 max-h-[85vh] overflow-y-auto shadow-2xl">
-        {isLoading || !detail ? (
-          <div className="p-5 space-y-4">
-            <Skeleton className="h-6 w-48" />
-            <Skeleton className="h-40 w-full" />
-            <Skeleton className="h-32 w-full" />
-          </div>
-        ) : (
-          <>
-            {/* Header */}
-            <div className="px-5 py-4 border-b border-slate-700">
-              <div className="text-lg font-semibold text-white">{detail.name}</div>
-              <div className="text-xs text-slate-400 mt-0.5">{detail.departmentName} · {ROLE_LABEL[detail.role] || detail.role}</div>
-              <button
-                onClick={onClose}
-                className="absolute top-4 right-4 text-slate-400 hover:text-slate-200"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Key Metrics Grid */}
-            <div className="grid grid-cols-4 gap-3 px-5 py-4">
-              {[
-                { label: '호출 수', value: String(detail.totalCalls) },
-                { label: '성공률', value: `${detail.successRate}%` },
-                { label: '평균 비용', value: `$${detail.avgCostUsd.toFixed(4)}` },
-                { label: '평균 시간', value: detail.avgResponseTimeMs > 1000 ? `${(detail.avgResponseTimeMs / 1000).toFixed(1)}s` : `${detail.avgResponseTimeMs}ms` },
-              ].map((m) => (
-                <div key={m.label} className="bg-slate-900/50 border border-slate-700 rounded-lg p-3 text-center">
-                  <div className="text-[10px] text-slate-500 font-medium">{m.label}</div>
-                  <div className="text-sm font-bold text-slate-50 mt-1 font-mono tabular-nums">{m.value}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* Performance Trend Chart */}
-            {detail.dailyMetrics.length > 0 && (
-              <div className="px-5 py-4">
-                <div className="text-xs font-medium text-slate-300 mb-3">30일 성능 추이</div>
-                <div className="flex items-end gap-0.5 h-32 bg-slate-900/30 border border-slate-700 rounded-lg p-3">
-                  {detail.dailyMetrics.map((day) => (
-                    <div
-                      key={day.date}
-                      className="flex-1 group relative"
-                      title={`${day.date}: ${day.successRate}%`}
-                    >
-                      <div
-                        className="w-full rounded-t bg-cyan-400/60 hover:bg-cyan-400 transition-colors"
-                        style={{ height: `${Math.max(day.successRate, 2)}%` }}
-                      />
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block z-10">
-                        <div className="bg-slate-900 text-slate-200 text-[10px] px-2 py-1 rounded whitespace-nowrap shadow border border-slate-700">
-                          {day.date.slice(5)}: {day.successRate}%
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="flex justify-between mt-1">
-                  <span className="text-[9px] text-slate-600">{detail.dailyMetrics[0]?.date.slice(5)}</span>
-                  <span className="text-[9px] text-slate-600">{detail.dailyMetrics[Math.floor(detail.dailyMetrics.length / 2)]?.date.slice(5)}</span>
-                  <span className="text-[9px] text-slate-600">{detail.dailyMetrics[detail.dailyMetrics.length - 1]?.date.slice(5)}</span>
-                </div>
-              </div>
-            )}
-
-            {/* Quality Distribution */}
-            {detail.qualityDistribution.length > 0 && (
-              <div className="px-5 py-3">
-                <div className="text-xs font-medium text-slate-300 mb-2">품질 점수 분포</div>
-                <div className="space-y-1">
-                  {detail.qualityDistribution.map((q) => {
-                    const maxCount = Math.max(...detail.qualityDistribution.map((d) => d.count), 1)
-                    return (
-                      <div key={q.label} className="flex items-center gap-2">
-                        <span className="text-[10px] text-slate-400 w-12">{q.label}</span>
-                        <div className="flex-1 h-4 bg-slate-700 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-cyan-400/60 rounded-full"
-                            style={{ width: `${(q.count / maxCount) * 100}%` }}
-                          />
-                        </div>
-                        <span className="text-[10px] text-slate-500 w-8 text-right">{q.count}건</span>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Recent Tasks */}
-            {detail.recentTasks.length > 0 && (
-              <div className="px-5 py-3">
-                <div className="text-xs font-medium text-slate-300 mb-2">최근 작업 (10건)</div>
-                <div className="space-y-0">
-                  {detail.recentTasks.map((task, i) => (
-                    <div key={i} className="text-[10px] py-1.5 border-b border-slate-700/30 flex items-center justify-between">
-                      <span className="text-slate-300 truncate max-w-[250px]">{task.commandText}</span>
-                      <div className="flex items-center gap-2">
-                        <span className={task.status === 'completed' ? 'text-emerald-400' : task.status === 'failed' ? 'text-red-400' : 'text-slate-500'}>
-                          {task.status === 'completed' ? '성공' : task.status === 'failed' ? '실패' : task.status}
-                        </span>
-                        <span className="text-slate-500 font-mono">${task.costUsd?.toFixed(3) ?? '0.000'}</span>
-                        <span className="text-slate-500 font-mono">
-                          {task.durationMs > 1000 ? `${(task.durationMs / 1000).toFixed(1)}s` : `${task.durationMs}ms`}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Soul Info */}
-            <div className="px-5 py-3 border-t border-slate-700">
-              <div className="text-xs font-medium text-slate-300 mb-2">에이전트 정보</div>
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <div className="text-[10px] text-slate-500">모델</div>
-                  <div className="text-xs text-slate-300">{detail.soulInfo.modelName}</div>
-                </div>
-                <div>
-                  <div className="text-[10px] text-slate-500">도구 수</div>
-                  <div className="text-xs text-slate-300">{detail.soulInfo.allowedToolsCount}</div>
-                </div>
-                <div>
-                  <div className="text-[10px] text-slate-500">프롬프트 요약</div>
-                  <div className="text-xs text-slate-300 truncate">{detail.soulInfo.systemPromptSummary}</div>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-    </div>
-  )
-}
-
-// === Loading Skeleton ===
-
-function PerformanceSkeleton() {
-  return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="rounded-xl p-6 border border-slate-800 bg-slate-900/40 space-y-2">
-            <Skeleton className="h-3 w-20" />
-            <Skeleton className="h-8 w-16" />
-            <Skeleton className="h-3 w-32" />
-          </div>
-        ))}
-      </div>
-      <SkeletonTable rows={5} />
-    </div>
-  )
-}
-
-// === Quality Dashboard Types ===
-
-type QualitySummaryData = {
-  totalReviews: number
-  passCount: number
-  failCount: number
-  passRate: number
-  avgScore: number
-}
-
-type TrendItem = { date: string; passCount: number; failCount: number }
-
-type DepartmentStat = {
-  departmentId: string
-  departmentName: string
-  totalReviews: number
-  passRate: number
-  avgScore: number
-}
-
-type QAgentStat = {
-  agentId: string
-  agentName: string
-  departmentName: string
-  totalReviews: number
-  passRate: number
-  avgScore: number
-  recentFailCount: number
-}
-
-type FailedItem = {
-  reviewId: string
-  commandId: string
-  commandText: string
-  agentName: string
-  avgScore: number
-  feedback: string | null
-  attemptNumber: number
-  createdAt: string
-}
-
-type QualityDashboardData = {
-  summary: QualitySummaryData
-  trend: TrendItem[]
-  departmentStats: DepartmentStat[]
-  agentStats: QAgentStat[]
-  failedList: FailedItem[]
-}
-
-type QSortKey = 'agentName' | 'totalReviews' | 'passRate' | 'avgScore' | 'recentFailCount'
-
-// === Quality color helpers ===
-
-function qPassRateBg(rate: number) {
-  if (rate >= 80) return 'bg-emerald-500'
-  if (rate >= 50) return 'bg-amber-500'
-  return 'bg-red-500'
-}
-
-function qPassRateBarBg(rate: number) {
-  if (rate >= 80) return 'bg-emerald-500/70'
-  if (rate >= 50) return 'bg-amber-500/70'
-  return 'bg-red-500/70'
-}
-
-// === Quality Summary Cards ===
-
-function QualitySummaryCards({ summary }: { summary: QualitySummaryData }) {
-  return (
-    <div className="grid grid-cols-3 gap-3" data-testid="quality-summary-cards">
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-        <div className="text-xs text-slate-400 font-medium">전체 리뷰</div>
-        <div className="text-xl font-bold text-slate-50 mt-1">{summary.totalReviews.toLocaleString()}</div>
-      </div>
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-        <div className="text-xs text-slate-400 font-medium">통과율</div>
-        <div className="text-xl font-bold text-slate-50 mt-1">{summary.passRate}%</div>
-        <div className="w-full h-2 bg-slate-700 rounded-full mt-2">
-          <div className={`h-full rounded-full ${qPassRateBg(summary.passRate)}`} style={{ width: `${summary.passRate}%` }} />
-        </div>
-      </div>
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-        <div className="text-xs text-slate-400 font-medium">평균 점수</div>
-        <div className="text-xl font-bold text-slate-50 mt-1">{summary.avgScore.toFixed(1)}/10</div>
-        <div className="w-full h-2 bg-slate-700 rounded-full mt-2">
-          <div className={`h-full rounded-full ${qPassRateBg(summary.avgScore * 10)}`} style={{ width: `${summary.avgScore * 10}%` }} />
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// === Trend Chart ===
-
-function QualityTrendChart({ data }: { data: TrendItem[] }) {
-  const maxTotal = useMemo(() => Math.max(...data.map((d) => d.passCount + d.failCount), 1), [data])
-
-  if (data.length === 0) {
-    return (
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-        <div className="text-xs font-medium text-slate-300 mb-3">품질 추이</div>
-        <div className="h-40 flex items-center justify-center text-xs text-slate-500">데이터가 없습니다</div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 mt-4" data-testid="quality-trend-chart">
-      <div className="text-xs font-medium text-slate-300 mb-3">품질 추이</div>
-      <div className="flex items-center gap-4 mb-2">
-        <div className="flex items-center gap-1.5 text-[10px]">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-          <span className="text-slate-400">통과</span>
-        </div>
-        <div className="flex items-center gap-1.5 text-[10px]">
-          <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
-          <span className="text-slate-400">실패</span>
-        </div>
-      </div>
-      <div className="flex items-end gap-1 h-40">
-        {data.map((day) => {
-          const total = day.passCount + day.failCount
-          const heightPercent = (total / maxTotal) * 100
-          const passPercent = total > 0 ? (day.passCount / total) * 100 : 0
-          return (
-            <div key={day.date} className="flex-1 flex flex-col justify-end relative group" title={`${day.date}: 통과 ${day.passCount}건, 실패 ${day.failCount}건`}>
-              <div className="w-full rounded-t overflow-hidden" style={{ height: `${heightPercent}%`, minHeight: total > 0 ? 2 : 0 }}>
-                <div className="bg-emerald-500/70" style={{ height: `${passPercent}%` }} />
-                <div className="bg-red-500/70" style={{ height: `${100 - passPercent}%` }} />
-              </div>
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-10">
-                <div className="bg-slate-900 text-slate-200 text-[10px] px-2 py-1 rounded whitespace-nowrap shadow border border-slate-700">
-                  {day.date.slice(5)}: 통과 {day.passCount}건, 실패 {day.failCount}건
-                </div>
-              </div>
-            </div>
-          )
-        })}
-      </div>
-      <div className="flex justify-between mt-2">
-        <span className="text-[9px] text-slate-600">{data[0]?.date.slice(5)}</span>
-        <span className="text-[9px] text-slate-600">{data[data.length - 1]?.date.slice(5)}</span>
-      </div>
-    </div>
-  )
-}
-
-// === Department Chart ===
-
-function DepartmentChart({ data }: { data: DepartmentStat[] }) {
-  if (data.length === 0) return null
-  return (
-    <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 mt-4" data-testid="department-chart">
-      <div className="text-xs font-medium text-slate-300 mb-3">부서별 품질</div>
-      <div className="space-y-2">
-        {data.map((dept) => (
-          <div key={dept.departmentId} className="flex items-center gap-3">
-            <span className="text-xs text-slate-400 w-24 truncate text-right">{dept.departmentName}</span>
-            <div className="flex-1 h-5 bg-slate-700 rounded-full overflow-hidden">
-              <div className={`h-full rounded-full ${qPassRateBarBg(dept.passRate)}`} style={{ width: `${dept.passRate}%` }} />
-            </div>
-            <span className="text-[10px] text-slate-500 w-20 text-right">{dept.passRate}% ({dept.totalReviews}건)</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// === Quality Agent Table ===
-
-function QualityAgentTable({ data }: { data: QAgentStat[] }) {
-  const [sortKey, setSortKey] = useState<QSortKey>('totalReviews')
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
-
-  const sorted = useMemo(() => {
-    const arr = [...data]
-    arr.sort((a, b) => {
-      const av = a[sortKey]
-      const bv = b[sortKey]
-      if (typeof av === 'string' && typeof bv === 'string') return sortOrder === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av)
-      return sortOrder === 'asc' ? (av as number) - (bv as number) : (bv as number) - (av as number)
-    })
-    return arr
-  }, [data, sortKey, sortOrder])
-
-  function toggleSort(key: QSortKey) {
-    if (sortKey === key) setSortOrder((o) => (o === 'asc' ? 'desc' : 'asc'))
-    else { setSortKey(key); setSortOrder('desc') }
-  }
-
-  function QSortTh({ col, label }: { col: QSortKey; label: string }) {
-    return (
-      <th
-        className={`text-[11px] font-medium uppercase tracking-wider px-4 py-2.5 cursor-pointer select-none transition-colors ${
-          sortKey === col ? 'text-slate-300' : 'text-slate-500 hover:text-slate-300'
-        }`}
-        onClick={() => toggleSort(col)}
-      >
-        {label}
-        {sortKey === col && <span className="ml-1">{sortOrder === 'asc' ? '↑' : '↓'}</span>}
-      </th>
-    )
-  }
-
-  if (data.length === 0) {
-    return (
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden mt-4">
-        <div className="px-4 py-3 border-b border-slate-700">
-          <span className="text-xs font-medium text-slate-300">에이전트별 품질</span>
-        </div>
-        <div className="h-24 flex items-center justify-center text-xs text-slate-500">데이터가 없습니다</div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden mt-4" data-testid="quality-agent-table">
-      <div className="px-4 py-3 border-b border-slate-700">
-        <span className="text-xs font-medium text-slate-300">에이전트별 품질</span>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-slate-700">
-              <QSortTh col="agentName" label="에이전트" />
-              <th className="text-[11px] font-medium text-slate-500 uppercase tracking-wider px-4 py-2.5 text-left hidden sm:table-cell">부서</th>
-              <QSortTh col="totalReviews" label="리뷰" />
-              <QSortTh col="passRate" label="통과율" />
-              <QSortTh col="avgScore" label="평균 점수" />
-              <QSortTh col="recentFailCount" label="최근 실패" />
-            </tr>
-          </thead>
-          <tbody>
-            {sorted.map((agent) => (
-              <tr key={agent.agentId} className="border-b border-slate-700/30 hover:bg-slate-800/50">
-                <td className="px-4 py-2.5 text-xs font-medium text-slate-200">{agent.agentName}</td>
-                <td className="px-4 py-2.5 text-xs text-slate-400 hidden sm:table-cell">{agent.departmentName}</td>
-                <td className="px-4 py-2.5 text-xs text-slate-300 font-mono">{agent.totalReviews}</td>
-                <td className="px-4 py-2.5">
-                  <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
-                    agent.passRate >= 80 ? 'bg-emerald-500/15 text-emerald-400'
-                    : agent.passRate >= 50 ? 'bg-amber-500/15 text-amber-400'
-                    : 'bg-red-500/15 text-red-400'
-                  }`}>
-                    {agent.passRate}%
-                  </span>
-                </td>
-                <td className="px-4 py-2.5 text-xs font-mono text-slate-300">{agent.avgScore.toFixed(1)}/10</td>
-                <td className="px-4 py-2.5 text-xs font-mono">
-                  {agent.recentFailCount > 0 ? (
-                    <span className="text-red-400">{agent.recentFailCount}</span>
-                  ) : (
-                    <span className="text-slate-500">0</span>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  )
-}
-
-// === Failed List ===
-
-function QualityFailedList({ data }: { data: FailedItem[] }) {
-  const navigate = useNavigate()
-
-  if (data.length === 0) {
-    return (
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden mt-4">
-        <div className="px-4 py-3 border-b border-slate-700">
-          <span className="text-xs font-medium text-slate-300">최근 실패 리뷰</span>
-        </div>
-        <div className="text-xs text-slate-500 text-center py-6">실패한 리뷰가 없습니다</div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden mt-4" data-testid="failed-reviews-list">
-      <div className="px-4 py-3 border-b border-slate-700">
-        <span className="text-xs font-medium text-slate-300">최근 실패 리뷰</span>
-      </div>
-      <div>
-        {data.map((item) => (
-          <div
-            key={item.reviewId}
-            className="px-4 py-2.5 border-b border-slate-700/30 hover:bg-slate-800/50 cursor-pointer transition-colors"
-            onClick={() => navigate(`/activity-log?commandId=${item.commandId}`)}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-xs text-slate-300 truncate max-w-[250px]">{item.commandText || '(명령 없음)'}</div>
-                <div className="text-[10px] text-slate-500 mt-0.5">{item.agentName}</div>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-xs font-mono text-red-400">{item.avgScore.toFixed(1)}/10</span>
-                <span className="text-[10px] text-slate-500 truncate max-w-[150px]">{item.feedback || '-'}</span>
-                <span className="text-[10px] text-slate-500 font-mono">
-                  {new Date(item.createdAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
-                </span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// === Quality Dashboard Tab Content ===
-
-function QualityDashboardTab() {
-  const [period, setPeriod] = useState<'7d' | '30d' | 'all'>('30d')
-  const [departmentId, setDepartmentId] = useState<string>('')
-
-  const { data, isLoading } = useQuery({
-    queryKey: ['quality-dashboard', period, departmentId],
-    queryFn: () => {
-      const params = new URLSearchParams({ period })
-      if (departmentId) params.set('departmentId', departmentId)
-      return api.get<{ data: QualityDashboardData }>(`/workspace/quality-dashboard?${params}`)
-    },
-    refetchInterval: 60000,
-  })
-
-  const dashboard = data?.data
-
-  const departmentOptions = useMemo(() => {
-    if (!dashboard?.departmentStats) return []
-    return dashboard.departmentStats.map((d) => ({ value: d.departmentId, label: d.departmentName }))
-  }, [dashboard?.departmentStats])
-
-  if (isLoading) {
-    return (
-      <div className="space-y-4">
-        <div className="grid grid-cols-3 gap-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-              <Skeleton className="h-4 w-20 mb-2" />
-              <Skeleton className="h-7 w-16" />
-            </div>
-          ))}
-        </div>
-        <Skeleton className="h-52" />
-        <SkeletonTable rows={5} />
-      </div>
-    )
-  }
-
-  if (!dashboard) {
-    return (
-      <EmptyState
-        icon="📊"
-        title="품질 리뷰 데이터가 없습니다"
-        description="사령관실에서 명령을 실행하면 품질 검수 데이터가 수집됩니다"
-      />
-    )
-  }
-
-  return (
-    <div className="space-y-0" data-testid="quality-dashboard">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex bg-slate-800/50 rounded-lg p-0.5">
-          {(['7d', '30d', 'all'] as const).map((p) => (
-            <button
-              key={p}
-              onClick={() => setPeriod(p)}
-              className={`text-xs px-3 py-1.5 rounded-md transition-colors ${
-                period === p
-                  ? 'bg-slate-700 text-slate-50'
-                  : 'text-slate-400 hover:text-slate-300'
-              }`}
-            >
-              {p === '7d' ? '7일' : p === '30d' ? '30일' : '전체'}
-            </button>
-          ))}
-        </div>
-        {departmentOptions.length > 0 && (
-          <select
-            value={departmentId}
-            onChange={(e) => setDepartmentId(e.target.value)}
-            className="bg-slate-800 border border-slate-700 text-xs text-slate-300 rounded-lg px-2 py-1.5"
-          >
-            <option value="">전체 부서</option>
-            {departmentOptions.map((d) => (
-              <option key={d.value} value={d.value}>{d.label}</option>
-            ))}
-          </select>
-        )}
-      </div>
-
-      <QualitySummaryCards summary={dashboard.summary} />
-      <QualityTrendChart data={dashboard.trend} />
-      <DepartmentChart data={dashboard.departmentStats} />
-      <QualityAgentTable data={dashboard.agentStats} />
-      <QualityFailedList data={dashboard.failedList} />
-    </div>
-  )
-}
-
-// === Main Page ===
-
-export function PerformancePage() {
-  const [activeTab, setActiveTab] = useState<'agent' | 'quality'>('agent')
-  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null)
-
-  const { data: summaryRes, isLoading: summaryLoading, error: summaryError } = useQuery({
-    queryKey: ['performance-summary'],
-    queryFn: () => api.get<{ data: PerformanceSummary }>('/workspace/performance/summary'),
-    refetchInterval: 30000,
-  })
-
-  const summary = summaryRes?.data
-
-  useEffect(() => {
-    document.title = '전력분석 - CORTHEX'
-    return () => { document.title = 'CORTHEX' }
-  }, [])
-
-  return (
-    <div className="min-h-screen text-slate-100" data-testid="performance-page">
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-8 lg:px-16 py-6">
-        {/* Page Header */}
-        <div className="flex flex-col gap-2 mb-8">
-          <h1 className="text-white text-[32px] font-bold leading-tight tracking-tight">전력분석</h1>
-          <p className="text-slate-400 text-sm font-normal leading-normal">에이전트 성능 대시보드</p>
-        </div>
-
-        {/* Tab Content */}
-        {activeTab === 'agent' && (
-          <>
-            {summaryLoading && !summary ? (
-              <PerformanceSkeleton />
-            ) : summaryError && !summary ? (
-              <EmptyState
-                icon="📊"
-                title="에이전트 성능 데이터가 없습니다"
-                description="사령관실에서 명령을 실행하면 성능 데이터가 수집됩니다"
-              />
-            ) : (
-              <div className="space-y-6">
-                {summary && <SummaryCards data={summary} />}
-                <AgentPerformanceTable onSelectAgent={(id) => setSelectedAgentId(id)} />
-                <SoulGymPanel />
-              </div>
-            )}
-          </>
-        )}
-
-        {activeTab === 'quality' && <QualityDashboardTab />}
-      </div>
-
-      {selectedAgentId && (
-        <AgentDetailModal
-          agentId={selectedAgentId}
-          onClose={() => setSelectedAgentId(null)}
-        />
-      )}
     </div>
   )
 }

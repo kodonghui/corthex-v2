@@ -1,3 +1,10 @@
+// API Endpoints:
+// GET /workspace/activity/agents?page=&limit=&search=&startDate=&endDate=
+// GET /workspace/activity/delegations?page=&limit=&search=&startDate=&endDate=
+// GET /workspace/activity/quality?page=&limit=&search=&startDate=&endDate=&conclusion=
+// GET /workspace/activity/tools?page=&limit=&search=&startDate=&endDate=&toolName=
+// GET /workspace/activity/security-alerts?page=&limit=&startDate=&endDate=
+
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
@@ -138,27 +145,27 @@ type ToolInvocation = {
 // === Constants ===
 
 const TAB_ITEMS = [
-  { value: 'agents', label: '활동' },
-  { value: 'delegations', label: '통신' },
-  { value: 'quality', label: 'QA' },
-  { value: 'tools', label: '도구' },
+  { value: 'agents', label: 'Activity' },
+  { value: 'delegations', label: 'Delegation' },
+  { value: 'quality', label: 'QA Reviews' },
+  { value: 'tools', label: 'Tools' },
 ]
 
-const STATUS_BADGE: Record<string, { label: string; classes: string }> = {
-  completed: { label: '완료', classes: 'bg-emerald-500/10 text-emerald-400 ring-1 ring-inset ring-emerald-500/20' },
-  done: { label: '완료', classes: 'bg-emerald-500/10 text-emerald-400 ring-1 ring-inset ring-emerald-500/20' },
-  end: { label: '완료', classes: 'bg-emerald-500/10 text-emerald-400 ring-1 ring-inset ring-emerald-500/20' },
-  success: { label: '성공', classes: 'bg-emerald-500/10 text-emerald-400 ring-1 ring-inset ring-emerald-500/20' },
-  failed: { label: '실패', classes: 'bg-red-500/10 text-red-400 ring-1 ring-inset ring-red-500/20' },
-  error: { label: '오류', classes: 'bg-red-500/10 text-red-400 ring-1 ring-inset ring-red-500/20' },
-  working: { label: '진행중', classes: 'bg-blue-500/10 text-blue-400 ring-1 ring-inset ring-blue-500/20' },
-  start: { label: '진행중', classes: 'bg-blue-500/10 text-blue-400 ring-1 ring-inset ring-blue-500/20' },
-  running: { label: '진행중', classes: 'bg-blue-500/10 text-blue-400 ring-1 ring-inset ring-blue-500/20' },
-  pass: { label: 'PASS', classes: 'bg-emerald-500/10 text-emerald-400 ring-1 ring-inset ring-emerald-500/20' },
-  fail: { label: 'FAIL', classes: 'bg-red-500/10 text-red-400 ring-1 ring-inset ring-red-500/20' },
-  warning: { label: '경고', classes: 'bg-amber-500/10 text-amber-400 ring-1 ring-inset ring-amber-500/20' },
-  clean: { label: '정상', classes: 'bg-emerald-500/10 text-emerald-400 ring-1 ring-inset ring-emerald-500/20' },
-  critical: { label: '위험', classes: 'bg-red-500/10 text-red-400 ring-1 ring-inset ring-red-500/20' },
+const STATUS_BADGE: Record<string, { label: string; dotColor: string; bgColor: string; textColor: string; borderColor: string }> = {
+  completed: { label: 'Success', dotColor: '#10b981', bgColor: 'rgba(16,185,129,0.08)', textColor: '#10b981', borderColor: 'rgba(16,185,129,0.2)' },
+  done: { label: 'Success', dotColor: '#10b981', bgColor: 'rgba(16,185,129,0.08)', textColor: '#10b981', borderColor: 'rgba(16,185,129,0.2)' },
+  end: { label: 'Success', dotColor: '#10b981', bgColor: 'rgba(16,185,129,0.08)', textColor: '#10b981', borderColor: 'rgba(16,185,129,0.2)' },
+  success: { label: 'Success', dotColor: '#10b981', bgColor: 'rgba(16,185,129,0.08)', textColor: '#10b981', borderColor: 'rgba(16,185,129,0.2)' },
+  failed: { label: 'Critical', dotColor: '#ef4444', bgColor: 'rgba(239,68,68,0.08)', textColor: '#ef4444', borderColor: 'rgba(239,68,68,0.2)' },
+  error: { label: 'Critical', dotColor: '#ef4444', bgColor: 'rgba(239,68,68,0.08)', textColor: '#ef4444', borderColor: 'rgba(239,68,68,0.2)' },
+  working: { label: 'Info', dotColor: '#3b82f6', bgColor: 'rgba(59,130,246,0.08)', textColor: '#3b82f6', borderColor: 'rgba(59,130,246,0.2)' },
+  start: { label: 'Info', dotColor: '#3b82f6', bgColor: 'rgba(59,130,246,0.08)', textColor: '#3b82f6', borderColor: 'rgba(59,130,246,0.2)' },
+  running: { label: 'Info', dotColor: '#3b82f6', bgColor: 'rgba(59,130,246,0.08)', textColor: '#3b82f6', borderColor: 'rgba(59,130,246,0.2)' },
+  pass: { label: 'PASS', dotColor: '#10b981', bgColor: 'rgba(16,185,129,0.08)', textColor: '#10b981', borderColor: 'rgba(16,185,129,0.2)' },
+  fail: { label: 'FAIL', dotColor: '#ef4444', bgColor: 'rgba(239,68,68,0.08)', textColor: '#ef4444', borderColor: 'rgba(239,68,68,0.2)' },
+  warning: { label: 'Neutral', dotColor: '#d1c9b2', bgColor: 'rgba(209,201,178,0.1)', textColor: '#9c8d66', borderColor: 'rgba(209,201,178,0.3)' },
+  clean: { label: 'Clean', dotColor: '#10b981', bgColor: 'rgba(16,185,129,0.08)', textColor: '#10b981', borderColor: 'rgba(16,185,129,0.2)' },
+  critical: { label: 'Critical', dotColor: '#ef4444', bgColor: 'rgba(239,68,68,0.08)', textColor: '#ef4444', borderColor: 'rgba(239,68,68,0.2)' },
 }
 
 const SCORE_LABELS: Record<string, string> = {
@@ -169,16 +176,16 @@ const SCORE_LABELS: Record<string, string> = {
   logicalCoherence: '논리 일관성',
 }
 
-const SEVERITY_STYLES: Record<string, string> = {
-  critical: 'bg-red-500/20 text-red-400',
-  major: 'bg-amber-500/20 text-amber-400',
-  minor: 'bg-slate-600/50 text-slate-400',
+const SEVERITY_STYLES: Record<string, { bg: string; text: string }> = {
+  critical: { bg: 'rgba(239,68,68,0.15)', text: '#ef4444' },
+  major: { bg: 'rgba(245,158,11,0.15)', text: '#f59e0b' },
+  minor: { bg: 'rgba(209,201,178,0.2)', text: '#9c8d66' },
 }
 
-const RESULT_STYLES: Record<string, string> = {
-  pass: 'bg-emerald-500/20 text-emerald-400',
-  warn: 'bg-amber-500/20 text-amber-400',
-  fail: 'bg-red-500/20 text-red-400',
+const RESULT_STYLES: Record<string, { bg: string; text: string }> = {
+  pass: { bg: 'rgba(16,185,129,0.15)', text: '#10b981' },
+  warn: { bg: 'rgba(245,158,11,0.15)', text: '#f59e0b' },
+  fail: { bg: 'rgba(239,68,68,0.15)', text: '#ef4444' },
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -212,14 +219,6 @@ function formatDuration(ms: number | null | undefined) {
   return `${(ms / 1000).toFixed(1)}s`
 }
 
-function formatTokens(metadata: Record<string, unknown> | null) {
-  if (!metadata) return '-'
-  const usage = metadata.tokenUsage as { inputTokens?: number; outputTokens?: number } | undefined
-  if (!usage) return '-'
-  const total = (usage.inputTokens || 0) + (usage.outputTokens || 0)
-  return total > 0 ? total.toLocaleString() : '-'
-}
-
 function useDebounce(value: string, delay: number) {
   const [debounced, setDebounced] = useState(value)
   useEffect(() => {
@@ -235,56 +234,33 @@ function scorePercent(score: number | undefined, max: number | undefined): numbe
 }
 
 function scoreColor(pct: number): string {
-  if (pct >= 80) return 'bg-emerald-500'
-  if (pct >= 60) return 'bg-amber-500'
-  return 'bg-red-500'
-}
-
-function scoreTextColor(pct: number): string {
-  if (pct >= 80) return 'text-emerald-400'
-  if (pct >= 60) return 'text-amber-400'
-  return 'text-red-400'
-}
-
-// === Status Icon Component ===
-
-function StatusIcon({ phase }: { phase: string }) {
-  if (['completed', 'done', 'end', 'success'].includes(phase)) {
-    return <CheckCircle className="w-5 h-5" />
-  }
-  if (['failed', 'error'].includes(phase)) {
-    return <XCircle className="w-5 h-5" />
-  }
-  if (phase === 'warning') {
-    return <AlertTriangle className="w-5 h-5" />
-  }
-  return <Info className="w-5 h-5" />
+  if (pct >= 80) return '#10b981'
+  if (pct >= 60) return '#f59e0b'
+  return '#ef4444'
 }
 
 // === Status Badge ===
 
 function StatusBadgeEl({ status }: { status: string }) {
-  const info = STATUS_BADGE[status] || { label: status, classes: 'bg-slate-600/50 text-slate-400' }
+  const info = STATUS_BADGE[status] || { label: status, dotColor: '#d1c9b2', bgColor: 'rgba(209,201,178,0.1)', textColor: '#9c8d66', borderColor: 'rgba(209,201,178,0.3)' }
   return (
-    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${info.classes}`}>
+    <span
+      className="text-xs font-bold px-2 py-0.5 rounded uppercase tracking-tighter"
+      style={{ backgroundColor: info.bgColor, color: info.textColor, border: `1px solid ${info.borderColor}` }}
+    >
       {info.label}
     </span>
   )
 }
 
-// === Phase Icon Style ===
+// === Phase dot color mapping ===
 
-const PHASE_ICON_STYLE: Record<string, { bg: string; text: string; accent: string }> = {
-  completed: { bg: 'bg-emerald-500/10', text: 'text-emerald-500', accent: 'bg-emerald-500' },
-  done: { bg: 'bg-emerald-500/10', text: 'text-emerald-500', accent: 'bg-emerald-500' },
-  end: { bg: 'bg-emerald-500/10', text: 'text-emerald-500', accent: 'bg-emerald-500' },
-  success: { bg: 'bg-emerald-500/10', text: 'text-emerald-500', accent: 'bg-emerald-500' },
-  failed: { bg: 'bg-red-500/10', text: 'text-red-500', accent: 'bg-red-500' },
-  error: { bg: 'bg-red-500/10', text: 'text-red-500', accent: 'bg-red-500' },
-  working: { bg: 'bg-cyan-400/10', text: 'text-cyan-400', accent: 'bg-cyan-400' },
-  start: { bg: 'bg-cyan-400/10', text: 'text-cyan-400', accent: 'bg-cyan-400' },
-  running: { bg: 'bg-cyan-400/10', text: 'text-cyan-400', accent: 'bg-cyan-400' },
-  warning: { bg: 'bg-amber-500/10', text: 'text-amber-500', accent: 'bg-amber-500' },
+function phaseDotColor(phase: string): string {
+  if (['completed', 'done', 'end', 'success'].includes(phase)) return '#10b981'
+  if (['failed', 'error'].includes(phase)) return '#ef4444'
+  if (['working', 'start', 'running'].includes(phase)) return '#3b82f6'
+  if (phase === 'warning') return '#d1c9b2'
+  return '#d1c9b2'
 }
 
 // === Main Page ===
@@ -374,272 +350,347 @@ export function ActivityLogPage() {
   const alertCount24h = securityQuery.data?.data?.count24h ?? 0
 
   return (
-    <div className="h-full flex flex-col" data-testid="activity-log-page">
-      {/* Page Title & Description */}
-      <div className="px-4 md:px-10 py-6" data-testid="activity-header">
-        <div className="flex flex-wrap justify-between gap-3 mb-6">
-          <div className="flex min-w-72 flex-col gap-2">
-            <h1 className="text-white tracking-tight text-[32px] font-bold leading-tight">통신로그</h1>
-            <p className="text-slate-400 text-sm font-normal leading-normal">
-              모든 AI 에이전트의 활동 및 시스템 이벤트를 모니터링합니다.
-            </p>
-          </div>
-          <WsStatusIndicator />
-        </div>
+    <div className="swiss-grid" style={{ display: 'grid', gridTemplateColumns: '240px 1fr', minHeight: '100vh' }}>
+      {/* Sidebar — not rendered here, handled by app shell */}
 
-        {/* Filters & Search (Stitch-matching) */}
-        <div className="flex flex-col md:flex-row gap-4 mb-6 justify-between items-start md:items-center">
-          <div className="flex gap-2 flex-wrap">
-            {TAB_ITEMS.map(item => (
-              <button
-                key={item.value}
-                onClick={() => setTab(item.value)}
-                className={`flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg pl-4 pr-2 transition-colors ${
-                  tab === item.value
-                    ? 'bg-cyan-400/10 border border-cyan-400/20 text-cyan-400'
-                    : 'bg-slate-800/50 border border-slate-700 hover:bg-slate-800 text-slate-200'
-                }`}
-                data-testid={`tab-${item.value}`}
-              >
-                <span className="text-sm font-medium leading-normal">{item.label}</span>
-                <ChevronDown className="w-4 h-4 text-slate-400" />
-              </button>
-            ))}
-            {tab === 'tools' && (
-              <input
-                placeholder="도구명 필터..."
-                value={toolNameFilter}
-                onChange={(e) => { setToolNameFilter(e.target.value); setPage(1) }}
-                className="h-9 bg-slate-800/50 border border-slate-700 focus:border-cyan-500 rounded-lg px-3 text-xs text-slate-50 placeholder:text-slate-500 outline-none w-32 md:w-40 transition-colors"
-                data-testid="tool-name-filter"
-              />
-            )}
-            {tab === 'quality' && (
-              <select
-                value={conclusionFilter}
-                onChange={(e) => { setConclusionFilter(e.target.value); setPage(1) }}
-                className="h-9 px-3 border border-slate-700 rounded-lg bg-slate-800/50 text-slate-300 text-xs outline-none focus:border-cyan-500"
-                data-testid="conclusion-filter"
-              >
-                <option value="">전체 판정</option>
-                <option value="pass">PASS</option>
-                <option value="fail">FAIL</option>
-              </select>
-            )}
-          </div>
-          <div className="w-full md:w-72">
-            <label className="flex flex-col w-full h-10">
-              <div className="flex w-full flex-1 items-stretch rounded-lg h-full border border-slate-700 bg-slate-900/50 focus-within:border-cyan-400 transition-colors">
-                <div className="text-slate-500 flex items-center justify-center pl-3">
-                  <Search className="w-4 h-4" />
-                </div>
+      {/* Main Content */}
+      <main className="flex flex-col h-screen overflow-hidden" style={{ backgroundColor: '#fbfaf8', color: '#463e30', fontFamily: "'Inter', sans-serif", gridColumn: '1 / -1' }}>
+        {/* Header Section */}
+        <header className="border-b px-8 py-6" style={{ backgroundColor: '#ffffff', borderColor: '#e5e1d3' }} data-purpose="page-header">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <h1 className="text-3xl" style={{ fontFamily: "'Instrument Serif', serif", color: '#463e30' }}>Activity Log</h1>
+              <p className="text-sm mt-1" style={{ color: '#9c8d66' }}>Audit trail for workspace events and operations.</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <WsStatusIndicator />
+              <div className="relative">
+                <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                  <Search className="h-4 w-4" style={{ color: '#b7aa88' }} />
+                </span>
                 <input
-                  className="flex w-full min-w-0 flex-1 bg-transparent text-white focus:outline-none focus:ring-0 border-none h-full placeholder:text-slate-500 px-3 text-sm font-normal leading-normal"
-                  placeholder="이벤트 검색..."
+                  className="pl-10 pr-4 py-2 border rounded text-sm focus:ring-1 w-64 transition-all"
+                  style={{ backgroundColor: '#fbfaf8', borderColor: '#e5e1d3', color: '#463e30' }}
+                  placeholder="Search events..."
+                  type="text"
                   value={searchInput}
                   onChange={(e) => { setSearchInput(e.target.value); setPage(1) }}
                   data-testid="search-input"
                 />
               </div>
-            </label>
+              {tab === 'tools' && (
+                <input
+                  placeholder="Tool name filter..."
+                  value={toolNameFilter}
+                  onChange={(e) => { setToolNameFilter(e.target.value); setPage(1) }}
+                  className="py-2 px-3 border rounded text-sm w-40 transition-colors"
+                  style={{ backgroundColor: '#fbfaf8', borderColor: '#e5e1d3', color: '#463e30' }}
+                  data-testid="tool-name-filter"
+                />
+              )}
+              {tab === 'quality' && (
+                <select
+                  value={conclusionFilter}
+                  onChange={(e) => { setConclusionFilter(e.target.value); setPage(1) }}
+                  className="py-2 px-3 border rounded text-sm"
+                  style={{ backgroundColor: '#fbfaf8', borderColor: '#e5e1d3', color: '#463e30' }}
+                  data-testid="conclusion-filter"
+                >
+                  <option value="">All</option>
+                  <option value="pass">PASS</option>
+                  <option value="fail">FAIL</option>
+                </select>
+              )}
+              <button
+                className="flex items-center gap-2 px-4 py-2 border rounded text-sm font-medium transition-colors"
+                style={{ backgroundColor: '#f2f0e9', borderColor: '#e5e1d3', color: '#6a5d43' }}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
+                Filters
+              </button>
+              <button className="p-2 rounded transition-colors" style={{ backgroundColor: '#554b38', color: '#ffffff' }}>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
+              </button>
+            </div>
           </div>
-        </div>
-      </div>
-
-      {/* Security Alert Banner (QA tab only) */}
-      {tab === 'quality' && alertCount24h > 0 && (
-        <div
-          className="mx-4 md:mx-10 mb-4 px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl cursor-pointer flex items-center justify-between hover:bg-red-500/15 transition-colors"
-          onClick={() => setShowSecurityAlerts(!showSecurityAlerts)}
-          role="alert"
-          data-testid="security-alert-banner"
-        >
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-red-400" />
-            <span className="text-red-400 text-sm font-medium">
-              보안 알림: 최근 24시간 {alertCount24h}건 차단
-            </span>
-          </div>
-          <span className="text-xs text-red-500">{showSecurityAlerts ? '접기' : '상세 보기'}</span>
-        </div>
-      )}
-
-      {/* Security Alerts Detail (collapsible) */}
-      {tab === 'quality' && showSecurityAlerts && securityQuery.data?.data?.items && (
-        <div className="mx-4 md:mx-10 mb-4 p-3 bg-red-500/5 border border-red-500/20 rounded-b-xl" data-testid="security-alerts-detail">
-          <table className="w-full text-xs">
-            <thead>
-              <tr className="text-slate-500 border-b border-red-500/20">
-                <th className="text-left py-1 pr-2 font-medium">시간</th>
-                <th className="text-left py-1 pr-2 font-medium">유형</th>
-                <th className="text-left py-1 pr-2 font-medium">심각도</th>
-                <th className="text-left py-1 font-medium">상세</th>
-              </tr>
-            </thead>
-            <tbody>
-              {securityQuery.data.data.items.slice(0, 10).map((alert) => {
-                const meta = alert.metadata as Record<string, unknown> | null
-                return (
-                  <tr key={alert.id} className="border-b border-red-500/10">
-                    <td className="py-1.5 pr-2 text-slate-500 whitespace-nowrap">{formatTime(alert.createdAt)}</td>
-                    <td className="py-1.5 pr-2">
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-red-500/20 text-red-400">
-                        {SECURITY_ACTION_LABELS[alert.action] || alert.action}
-                      </span>
-                    </td>
-                    <td className="py-1.5 pr-2">
-                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${SEVERITY_STYLES[(meta?.severity as string) || 'major']}`}>
-                        {(meta?.severity as string) || 'major'}
-                      </span>
-                    </td>
-                    <td className="py-1.5 text-slate-400 truncate max-w-[300px]">
-                      {(meta?.pattern as string) || (meta?.threatType as string) || '-'}
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Activity Feed (Stitch-matching card style) */}
-      <div className="flex-1 overflow-auto px-4 md:px-10 pb-8" data-testid="activity-content">
-        {activeQuery.isLoading ? (
-          <div className="flex flex-col gap-3" data-testid="activity-loading">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-20 bg-slate-900/80 rounded-xl animate-pulse" />
+          {/* Navigation Tabs */}
+          <div className="flex border-b mt-8 gap-8" style={{ borderColor: '#e5e1d3' }} data-purpose="content-tabs">
+            {TAB_ITEMS.map(item => (
+              <button
+                key={item.value}
+                onClick={() => setTab(item.value)}
+                className="pb-3 text-sm transition-colors"
+                style={tab === item.value
+                  ? { fontWeight: 600, borderBottom: '2px solid #554b38', color: '#463e30' }
+                  : { fontWeight: 500, color: '#9c8d66', borderBottom: '2px solid transparent' }
+                }
+                data-testid={`tab-${item.value}`}
+              >
+                {item.label}
+              </button>
             ))}
           </div>
-        ) : !activeQuery.data?.data?.items?.length ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="activity-empty">
-            <FileText className="w-10 h-10 text-slate-600 mb-4" />
-            <h3 className="text-base font-medium text-slate-300 mb-2">데이터가 없습니다</h3>
-            <p className="text-sm text-slate-500">선택한 기간에 해당하는 기록이 없습니다</p>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {tab === 'agents' && agentsQuery.data!.data.items.map((item) => {
-              const iconStyle = PHASE_ICON_STYLE[item.phase] || { bg: 'bg-cyan-400/10', text: 'text-cyan-400', accent: 'bg-cyan-400' }
-              return (
-                <div
-                  key={item.id}
-                  className="flex gap-4 bg-slate-900/80 border border-slate-800/60 rounded-xl p-4 hover:border-slate-700 transition-colors relative overflow-hidden group"
-                >
-                  {/* Left accent bar */}
-                  <div className={`absolute left-0 top-0 bottom-0 w-1 ${iconStyle.accent}`} />
-                  <div className="flex items-start gap-4 w-full">
-                    {/* Avatar with status dot */}
-                    <div className="relative">
-                      <div className={`${iconStyle.bg} ${iconStyle.text} aspect-square rounded-full h-12 w-12 border-2 border-slate-900 shadow-sm flex items-center justify-center`}>
-                        <StatusIcon phase={item.phase} />
-                      </div>
-                      <div className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-slate-900 ${iconStyle.accent}`} />
-                    </div>
-                    <div className="flex flex-1 flex-col justify-center gap-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-white text-base font-semibold leading-tight">{item.action}</p>
-                        <StatusBadgeEl status={item.phase} />
-                        {item.agentName && (
-                          <span className="inline-flex items-center rounded-full bg-slate-800 px-2 py-0.5 text-xs font-medium text-slate-300 ring-1 ring-inset ring-slate-500/20">
-                            {item.agentName}
-                          </span>
-                        )}
-                      </div>
-                      {item.detail && (
-                        <p className="text-slate-400 text-sm font-normal leading-relaxed">{item.detail}</p>
-                      )}
-                    </div>
-                    <div className="flex flex-col items-end shrink-0 gap-1 text-right">
-                      <p className="font-mono text-slate-400 text-sm font-medium tracking-tight tabular-nums">
-                        {new Date(item.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                      </p>
-                      <p className="text-slate-500 text-xs font-normal">
-                        {formatTime(item.createdAt).split(' ')[0]}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
+        </header>
 
-            {tab === 'delegations' && delegationsQuery.data!.data.items.map((item) => {
-              const meta = item.metadata as Record<string, unknown> | null
-              return (
-                <div
-                  key={item.id}
-                  className="flex gap-4 bg-slate-900/80 border border-slate-800/60 rounded-xl p-4 hover:border-slate-700 transition-colors relative overflow-hidden"
-                >
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-violet-500" />
-                  <div className="flex items-start gap-4 w-full">
-                    <div className="relative">
-                      <div className="bg-violet-500/10 text-violet-400 aspect-square rounded-full h-12 w-12 border-2 border-slate-900 shadow-sm flex items-center justify-center">
-                        <ArrowRight className="w-5 h-5" />
-                      </div>
-                      <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-slate-900 bg-violet-500" />
-                    </div>
-                    <div className="flex flex-1 flex-col justify-center gap-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-white text-base font-semibold leading-tight">위임</p>
-                        <StatusBadgeEl status={item.status} />
-                        <span className="inline-flex items-center rounded-full bg-slate-800 px-2 py-0.5 text-xs font-medium text-slate-300 ring-1 ring-inset ring-slate-500/20">
-                          {item.agentName || '시스템'}
-                        </span>
-                      </div>
-                      <p className="text-slate-400 text-sm font-normal leading-relaxed">
-                        {item.agentName || '시스템'} → {(meta?.toAgentName as string) || '-'}
-                        {item.input ? `: ${String(item.input).slice(0, 80)}` : ''}
-                      </p>
-                    </div>
-                    <div className="flex flex-col items-end shrink-0 gap-1 text-right">
-                      <p className="font-mono text-slate-400 text-sm font-medium tracking-tight tabular-nums">
-                        {new Date(item.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                      </p>
-                      <p className="text-slate-500 text-xs font-normal">{formatDuration(item.durationMs)}</p>
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-
-            {tab === 'quality' && (
-              <QualityTable
-                items={qualityQuery.data!.data.items}
-                expandedId={expandedQaId}
-                onToggle={(id) => setExpandedQaId(expandedQaId === id ? null : id)}
-              />
-            )}
-
-            {tab === 'tools' && <ToolsTable items={toolsQuery.data!.data.items} />}
+        {/* Security Alert Banner (QA tab only) */}
+        {tab === 'quality' && alertCount24h > 0 && (
+          <div
+            className="mx-8 mt-4 px-4 py-3 rounded-lg cursor-pointer flex items-center justify-between transition-colors"
+            style={{ backgroundColor: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.2)' }}
+            onClick={() => setShowSecurityAlerts(!showSecurityAlerts)}
+            role="alert"
+            data-testid="security-alert-banner"
+          >
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4" style={{ color: '#ef4444' }} />
+              <span className="text-sm font-medium" style={{ color: '#ef4444' }}>
+                보안 알림: 최근 24시간 {alertCount24h}건 차단
+              </span>
+            </div>
+            <span className="text-xs" style={{ color: '#ef4444' }}>{showSecurityAlerts ? '접기' : '상세 보기'}</span>
           </div>
         )}
-      </div>
 
-      {/* Pagination */}
-      {totalCount > 0 && (
-        <div className="px-4 md:px-10 py-3 border-t border-slate-800 flex items-center justify-between" data-testid="activity-pagination">
-          <span className="text-xs text-slate-500">{totalCount.toLocaleString()}건</span>
-          <div className="flex items-center gap-2">
-            <button
-              disabled={page <= 1}
-              onClick={() => setPage((p) => p - 1)}
-              className="px-3 py-1.5 text-xs border border-slate-700 rounded-lg text-slate-400 disabled:opacity-30 hover:bg-slate-800 transition-colors"
-            >
-              이전
-            </button>
-            <span className="text-xs text-slate-400 font-mono tabular-nums">
-              {page} / {totalPages}
+        {/* Security Alerts Detail */}
+        {tab === 'quality' && showSecurityAlerts && securityQuery.data?.data?.items && (
+          <div className="mx-8 mb-4 p-3 rounded-b-lg" style={{ backgroundColor: 'rgba(239,68,68,0.03)', border: '1px solid rgba(239,68,68,0.15)' }} data-testid="security-alerts-detail">
+            <table className="w-full text-xs">
+              <thead>
+                <tr style={{ color: '#9c8d66', borderBottom: '1px solid rgba(239,68,68,0.15)' }}>
+                  <th className="text-left py-1 pr-2 font-medium">시간</th>
+                  <th className="text-left py-1 pr-2 font-medium">유형</th>
+                  <th className="text-left py-1 pr-2 font-medium">심각도</th>
+                  <th className="text-left py-1 font-medium">상세</th>
+                </tr>
+              </thead>
+              <tbody>
+                {securityQuery.data.data.items.slice(0, 10).map((alert) => {
+                  const meta = alert.metadata as Record<string, unknown> | null
+                  const sevStyle = SEVERITY_STYLES[(meta?.severity as string) || 'major'] || SEVERITY_STYLES.major
+                  return (
+                    <tr key={alert.id} style={{ borderBottom: '1px solid rgba(239,68,68,0.08)' }}>
+                      <td className="py-1.5 pr-2 whitespace-nowrap" style={{ color: '#9c8d66' }}>{formatTime(alert.createdAt)}</td>
+                      <td className="py-1.5 pr-2">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-medium" style={{ backgroundColor: 'rgba(239,68,68,0.15)', color: '#ef4444' }}>
+                          {SECURITY_ACTION_LABELS[alert.action] || alert.action}
+                        </span>
+                      </td>
+                      <td className="py-1.5 pr-2">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-medium" style={{ backgroundColor: sevStyle.bg, color: sevStyle.text }}>
+                          {(meta?.severity as string) || 'major'}
+                        </span>
+                      </td>
+                      <td className="py-1.5 truncate max-w-[300px]" style={{ color: '#9c8d66' }}>
+                        {(meta?.pattern as string) || (meta?.threatType as string) || '-'}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Activity Content */}
+        <section className="flex-1 overflow-y-auto p-8" data-purpose="activity-timeline">
+          {activeQuery.isLoading ? (
+            <div className="max-w-5xl mx-auto space-y-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="h-20 rounded-lg animate-pulse" style={{ backgroundColor: '#f2f0e9' }} />
+              ))}
+            </div>
+          ) : !activeQuery.data?.data?.items?.length ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="activity-empty">
+              <FileText className="w-10 h-10 mb-4" style={{ color: '#d1c9b2' }} />
+              <h3 className="text-base font-medium mb-2" style={{ color: '#6a5d43' }}>데이터가 없습니다</h3>
+              <p className="text-sm" style={{ color: '#9c8d66' }}>선택한 기간에 해당하는 기록이 없습니다</p>
+            </div>
+          ) : (
+            <div className="max-w-5xl mx-auto space-y-12">
+              {tab === 'agents' && (
+                <TimelineView items={agentsQuery.data!.data.items} />
+              )}
+
+              {tab === 'delegations' && (
+                <DelegationTimeline items={delegationsQuery.data!.data.items} />
+              )}
+
+              {tab === 'quality' && (
+                <QualityTable
+                  items={qualityQuery.data!.data.items}
+                  expandedId={expandedQaId}
+                  onToggle={(id) => setExpandedQaId(expandedQaId === id ? null : id)}
+                />
+              )}
+
+              {tab === 'tools' && <ToolsTable items={toolsQuery.data!.data.items} />}
+            </div>
+          )}
+        </section>
+
+        {/* Footer Pagination */}
+        {totalCount > 0 && (
+          <footer className="border-t px-8 py-3 flex items-center justify-between" style={{ backgroundColor: '#f2f0e9', borderColor: '#e5e1d3' }} data-purpose="list-pagination">
+            <span className="text-xs font-medium" style={{ color: '#9c8d66' }}>
+              Showing {((page - 1) * PAGE_SIZE) + 1}-{Math.min(page * PAGE_SIZE, totalCount)} of {totalCount.toLocaleString()} activities
             </span>
-            <button
-              disabled={page >= totalPages}
-              onClick={() => setPage((p) => p + 1)}
-              className="px-3 py-1.5 text-xs border border-slate-700 rounded-lg text-slate-400 disabled:opacity-30 hover:bg-slate-800 transition-colors"
-            >
-              다음
-            </button>
+            <div className="flex gap-1">
+              <button
+                className="p-1 rounded disabled:opacity-30"
+                disabled={page <= 1}
+                onClick={() => setPage((p) => p - 1)}
+                style={{ color: '#6a5d43' }}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
+              </button>
+              {Array.from({ length: Math.min(3, totalPages) }, (_, i) => i + 1).map(p => (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  className="w-6 h-6 flex items-center justify-center text-xs font-medium rounded transition-colors"
+                  style={page === p
+                    ? { backgroundColor: '#554b38', color: '#ffffff', fontWeight: 700 }
+                    : { color: '#6a5d43' }
+                  }
+                >
+                  {p}
+                </button>
+              ))}
+              <button
+                className="p-1 rounded disabled:opacity-30"
+                disabled={page >= totalPages}
+                onClick={() => setPage((p) => p + 1)}
+                style={{ color: '#6a5d43' }}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
+              </button>
+            </div>
+          </footer>
+        )}
+      </main>
+    </div>
+  )
+}
+
+// === Timeline View (Activity tab) ===
+
+function TimelineView({ items }: { items: AgentActivity[] }) {
+  // Group by date
+  const grouped = useMemo(() => {
+    const groups: Record<string, AgentActivity[]> = {}
+    for (const item of items) {
+      const date = new Date(item.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      if (!groups[date]) groups[date] = []
+      groups[date].push(item)
+    }
+    return groups
+  }, [items])
+
+  return (
+    <>
+      {Object.entries(grouped).map(([date, dateItems]) => (
+        <div key={date} className="relative" style={{ paddingLeft: '10px' }}>
+          {/* Timeline line */}
+          <div className="absolute" style={{ left: '19px', top: 0, bottom: 0, width: '1px', backgroundColor: '#e5e1d3' }} />
+          <h3 className="sticky top-0 py-2 text-xs font-bold uppercase tracking-widest mb-6 z-10" style={{ backgroundColor: '#fbfaf8', color: '#b7aa88' }}>
+            {date}
+          </h3>
+          <div className="space-y-6">
+            {dateItems.map((item) => (
+              <div key={item.id} className="relative flex items-start gap-4 pl-10" data-purpose="event-card">
+                <div
+                  className="absolute rounded-full z-20"
+                  style={{
+                    left: '16px', top: '4px', width: '8px', height: '8px',
+                    backgroundColor: phaseDotColor(item.phase),
+                    boxShadow: `0 0 0 4px #fbfaf8`,
+                  }}
+                />
+                <div
+                  className="flex-1 border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
+                  style={{ backgroundColor: '#ffffff', borderColor: '#e5e1d3' }}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <StatusBadgeEl status={item.phase} />
+                      <span className="text-xs font-medium" style={{ color: '#b7aa88' }}>
+                        {new Date(item.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-mono" style={{ color: '#b7aa88' }}>ID: {item.id.slice(0, 8)}</span>
+                  </div>
+                  <p className="text-sm font-medium" style={{ color: '#554b38' }}>
+                    {item.action}
+                    {item.detail && (
+                      <span style={{ color: '#837452', fontWeight: 400 }}> - {item.detail}</span>
+                    )}
+                  </p>
+                  <div className="mt-3 flex items-center gap-4 text-xs" style={{ color: '#9c8d66' }}>
+                    {item.agentName && (
+                      <span className="flex items-center gap-1">
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
+                        {item.agentName}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      )}
+      ))}
+    </>
+  )
+}
+
+// === Delegation Timeline ===
+
+function DelegationTimeline({ items }: { items: Delegation[] }) {
+  return (
+    <div className="space-y-6">
+      {items.map((item) => {
+        const meta = item.metadata as Record<string, unknown> | null
+        return (
+          <div key={item.id} className="relative flex items-start gap-4 pl-10" data-purpose="event-card">
+            <div
+              className="absolute rounded-full z-20"
+              style={{
+                left: '16px', top: '4px', width: '8px', height: '8px',
+                backgroundColor: '#3b82f6',
+                boxShadow: '0 0 0 4px #fbfaf8',
+              }}
+            />
+            <div
+              className="flex-1 border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
+              style={{ backgroundColor: '#ffffff', borderColor: '#e5e1d3' }}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <StatusBadgeEl status={item.status} />
+                  <span className="text-xs font-medium" style={{ color: '#b7aa88' }}>
+                    {new Date(item.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono" style={{ color: '#b7aa88' }}>ID: {item.id.slice(0, 8)}</span>
+              </div>
+              <p className="text-sm font-medium" style={{ color: '#554b38' }}>
+                Delegation from <span style={{ textDecoration: 'underline', textDecorationColor: '#d1c9b2' }}>{item.agentName || 'System'}</span>
+                {' '}to {(meta?.toAgentName as string) || '-'}
+              </p>
+              {item.input && (
+                <p className="mt-2 text-xs leading-relaxed" style={{ color: '#9c8d66' }}>
+                  {String(item.input).slice(0, 120)}
+                </p>
+              )}
+              {item.durationMs != null && (
+                <div className="mt-2 text-xs" style={{ color: '#9c8d66' }}>
+                  Duration: {formatDuration(item.durationMs)}
+                </div>
+              )}
+            </div>
+          </div>
+        )
+      })}
     </div>
   )
 }
@@ -659,7 +710,7 @@ function QualityTable({
     <div className="overflow-x-auto" data-testid="quality-table">
       <table className="w-full text-sm min-w-[560px]">
         <thead>
-          <tr className="text-xs text-slate-500 border-b border-slate-700">
+          <tr className="text-xs border-b" style={{ color: '#9c8d66', borderColor: '#e5e1d3' }}>
             <th className="text-left py-2 pr-3 font-medium">시간</th>
             <th className="text-left py-2 pr-3 font-medium">명령</th>
             <th className="text-left py-2 pr-3 font-medium">검수 점수</th>
@@ -679,26 +730,27 @@ function QualityTable({
               <tr key={item.id} className="group">
                 <td colSpan={5} className="p-0">
                   <div
-                    className="flex items-center cursor-pointer hover:bg-slate-800/50 transition-colors"
+                    className="flex items-center cursor-pointer transition-colors"
                     onClick={() => onToggle(item.id)}
                     aria-expanded={expandedId === item.id}
+                    style={{ borderBottom: '1px solid #e5e1d3' }}
                   >
-                    <div className="py-2.5 pr-3 text-xs text-slate-500 whitespace-nowrap pl-0 min-w-[90px]">{formatTime(item.createdAt)}</div>
-                    <div className="py-2.5 pr-3 text-xs text-slate-300 truncate max-w-[200px] flex-1">{item.commandText || '-'}</div>
+                    <div className="py-2.5 pr-3 text-xs whitespace-nowrap min-w-[90px]" style={{ color: '#9c8d66' }}>{formatTime(item.createdAt)}</div>
+                    <div className="py-2.5 pr-3 text-xs truncate max-w-[200px] flex-1" style={{ color: '#554b38' }}>{item.commandText || '-'}</div>
                     <div className="py-2.5 pr-3 min-w-[120px]">
                       {pct != null ? (
                         <div className="flex items-center gap-2">
-                          <div className="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
-                            <div className={`h-full rounded-full ${scoreColor(pct)}`} style={{ width: `${pct}%` }} />
+                          <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ backgroundColor: '#e5e1d3' }}>
+                            <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: scoreColor(pct) }} />
                           </div>
-                          <span className={`text-xs font-bold ${scoreTextColor(pct)}`}>{pct}%</span>
+                          <span className="text-xs font-bold" style={{ color: scoreColor(pct) }}>{pct}%</span>
                         </div>
                       ) : (
-                        <span className="text-xs text-slate-500">-</span>
+                        <span className="text-xs" style={{ color: '#9c8d66' }}>-</span>
                       )}
                     </div>
                     <div className="py-2.5 pr-3 min-w-[60px]"><StatusBadgeEl status={item.conclusion} /></div>
-                    <div className="py-2.5 text-xs text-right min-w-[50px] text-slate-400">{item.attemptNumber > 1 ? item.attemptNumber - 1 : 0}</div>
+                    <div className="py-2.5 text-xs text-right min-w-[50px]" style={{ color: '#9c8d66' }}>{item.attemptNumber > 1 ? item.attemptNumber - 1 : 0}</div>
                   </div>
 
                   {expandedId === item.id && scores && (
@@ -718,15 +770,14 @@ function QualityTable({
 
 function QualityDetailPanel({ scores, feedback }: { scores: MergedScores; feedback: string | null }) {
   const [detailTab, setDetailTab] = useState<'rules' | 'rubric' | 'hallucination' | 'legacy'>('rules')
-  const hasRules = scores.ruleResults && scores.ruleResults.length > 0
   const hasRubric = scores.rubricScores && scores.rubricScores.length > 0
   const hasHallucination = scores.hallucinationReport != null
 
   return (
-    <div className="bg-slate-800/30 border-b border-slate-700" data-testid="qa-detail-panel">
-      <div className="px-4 pt-2 flex gap-1 border-b border-slate-700">
+    <div className="border-b" style={{ backgroundColor: 'rgba(242,240,233,0.5)', borderColor: '#e5e1d3' }} data-testid="qa-detail-panel">
+      <div className="px-4 pt-2 flex gap-1 border-b" style={{ borderColor: '#e5e1d3' }}>
         <DetailTabButton active={detailTab === 'rules'} onClick={() => setDetailTab('rules')}>
-          규칙별 결과 {hasRules ? `(${scores.ruleResults!.length})` : ''}
+          규칙별 결과
         </DetailTabButton>
         {hasRubric && (
           <DetailTabButton active={detailTab === 'rubric'} onClick={() => setDetailTab('rubric')}>
@@ -752,7 +803,7 @@ function QualityDetailPanel({ scores, feedback }: { scores: MergedScores; feedba
 
       {feedback && (
         <div className="px-4 pb-3">
-          <p className="text-[11px] text-slate-400 whitespace-pre-wrap border-t border-slate-700 pt-2">
+          <p className="text-[11px] whitespace-pre-wrap border-t pt-2" style={{ color: '#9c8d66', borderColor: '#e5e1d3' }}>
             {feedback}
           </p>
         </div>
@@ -765,11 +816,11 @@ function DetailTabButton({ active, onClick, children }: { active: boolean; onCli
   return (
     <button
       onClick={onClick}
-      className={`px-3 py-1.5 text-[11px] font-medium rounded-t border-b-2 transition-colors ${
-        active
-          ? 'border-cyan-400 text-cyan-400 bg-slate-800'
-          : 'border-transparent text-slate-500 hover:text-slate-300'
-      }`}
+      className="px-3 py-1.5 text-[11px] font-medium rounded-t border-b-2 transition-colors"
+      style={active
+        ? { borderColor: '#554b38', color: '#463e30', backgroundColor: '#f2f0e9' }
+        : { borderColor: 'transparent', color: '#9c8d66' }
+      }
     >
       {children}
     </button>
@@ -780,7 +831,7 @@ function DetailTabButton({ active, onClick, children }: { active: boolean; onCli
 
 function RuleResultsPanel({ ruleResults }: { ruleResults: RuleResult[] }) {
   if (ruleResults.length === 0) {
-    return <p className="text-xs text-slate-500">규칙별 검수 데이터가 없습니다.</p>
+    return <p className="text-xs" style={{ color: '#9c8d66' }}>규칙별 검수 데이터가 없습니다.</p>
   }
 
   const grouped = ruleResults.reduce<Record<string, RuleResult[]>>((acc, r) => {
@@ -794,27 +845,31 @@ function RuleResultsPanel({ ruleResults }: { ruleResults: RuleResult[] }) {
     <div className="space-y-3">
       {Object.entries(grouped).map(([category, rules]) => (
         <div key={category}>
-          <h4 className="text-[11px] font-semibold text-slate-300 mb-1.5">
+          <h4 className="text-[11px] font-semibold mb-1.5" style={{ color: '#6a5d43' }}>
             {CATEGORY_LABELS[category] || category}
           </h4>
           <div className="space-y-1">
-            {rules.map((rule) => (
-              <div key={rule.ruleId} className="flex items-start gap-2 px-2 py-1.5 rounded-lg bg-slate-900/50">
-                <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium shrink-0 ${SEVERITY_STYLES[rule.severity] || SEVERITY_STYLES.minor}`}>
-                  {rule.severity}
-                </span>
-                <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium shrink-0 ${RESULT_STYLES[rule.result] || ''}`}>
-                  {rule.result === 'pass' ? 'PASS' : rule.result === 'warn' ? 'WARN' : 'FAIL'}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <span className="text-xs font-medium text-slate-300">{rule.ruleName}</span>
-                  {rule.message && (
-                    <p className="text-[10px] text-slate-500 mt-0.5 truncate">{rule.message}</p>
-                  )}
+            {rules.map((rule) => {
+              const sevStyle = SEVERITY_STYLES[rule.severity] || SEVERITY_STYLES.minor
+              const resStyle = RESULT_STYLES[rule.result] || {}
+              return (
+                <div key={rule.ruleId} className="flex items-start gap-2 px-2 py-1.5 rounded-lg" style={{ backgroundColor: 'rgba(242,240,233,0.5)' }}>
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-medium shrink-0" style={{ backgroundColor: sevStyle.bg, color: sevStyle.text }}>
+                    {rule.severity}
+                  </span>
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-medium shrink-0" style={{ backgroundColor: resStyle.bg || 'transparent', color: resStyle.text || '#9c8d66' }}>
+                    {rule.result === 'pass' ? 'PASS' : rule.result === 'warn' ? 'WARN' : 'FAIL'}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-xs font-medium" style={{ color: '#554b38' }}>{rule.ruleName}</span>
+                    {rule.message && (
+                      <p className="text-[10px] mt-0.5 truncate" style={{ color: '#9c8d66' }}>{rule.message}</p>
+                    )}
+                  </div>
+                  {rule.skipped && <span className="text-[10px] italic shrink-0" style={{ color: '#9c8d66' }}>건너뜀</span>}
                 </div>
-                {rule.skipped && <span className="text-[10px] text-slate-500 italic shrink-0">건너뜀</span>}
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       ))}
@@ -828,17 +883,17 @@ function RubricPanel({ rubricScores }: { rubricScores: RubricScore[] }) {
   return (
     <div className="space-y-2">
       {rubricScores.map((item) => (
-        <div key={item.id} className="flex items-center gap-3 px-2 py-1.5 rounded-lg bg-slate-900/50">
+        <div key={item.id} className="flex items-center gap-3 px-2 py-1.5 rounded-lg" style={{ backgroundColor: 'rgba(242,240,233,0.5)' }}>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-slate-300">{item.label}</span>
-              <span className="text-[10px] text-slate-500">(가중치 {item.weight}%{item.critical ? ', 필수' : ''})</span>
+              <span className="text-xs font-medium" style={{ color: '#554b38' }}>{item.label}</span>
+              <span className="text-[10px]" style={{ color: '#9c8d66' }}>(가중치 {item.weight}%{item.critical ? ', 필수' : ''})</span>
             </div>
             {item.feedback && (
-              <p className="text-[10px] text-slate-500 mt-0.5 truncate">{item.feedback}</p>
+              <p className="text-[10px] mt-0.5 truncate" style={{ color: '#9c8d66' }}>{item.feedback}</p>
             )}
           </div>
-          <span className={`text-sm font-bold ${item.score >= 4 ? 'text-emerald-400' : item.score >= 3 ? 'text-amber-400' : 'text-red-400'}`}>
+          <span className="text-sm font-bold" style={{ color: item.score >= 4 ? '#10b981' : item.score >= 3 ? '#f59e0b' : '#ef4444' }}>
             {item.score}/5
           </span>
         </div>
@@ -857,57 +912,60 @@ function HallucinationPanel({ report }: { report: HallucinationReport }) {
       <div className="flex items-center gap-3 flex-wrap">
         <StatusBadgeEl status={report.verdict} />
         <div className="flex gap-4 text-xs">
-          <span className="text-slate-500">총 주장: <span className="font-medium text-slate-200">{report.totalClaims}</span></span>
-          <span className="text-slate-500">검증: <span className="font-medium text-emerald-400">{report.verifiedClaims}</span></span>
-          <span className="text-slate-500">불일치: <span className="font-medium text-red-400">{report.mismatchedClaims}</span></span>
-          <span className="text-slate-500">미확인: <span className="font-medium text-amber-400">{report.unsourcedCount}</span></span>
+          <span style={{ color: '#9c8d66' }}>총 주장: <span className="font-medium" style={{ color: '#554b38' }}>{report.totalClaims}</span></span>
+          <span style={{ color: '#9c8d66' }}>검증: <span className="font-medium" style={{ color: '#10b981' }}>{report.verifiedClaims}</span></span>
+          <span style={{ color: '#9c8d66' }}>불일치: <span className="font-medium" style={{ color: '#ef4444' }}>{report.mismatchedClaims}</span></span>
+          <span style={{ color: '#9c8d66' }}>미확인: <span className="font-medium" style={{ color: '#f59e0b' }}>{report.unsourcedCount}</span></span>
         </div>
       </div>
 
       <div className="flex items-center gap-2">
-        <span className="text-[10px] text-slate-500 w-16">환각 점수</span>
-        <div className="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
+        <span className="text-[10px] w-16" style={{ color: '#9c8d66' }}>환각 점수</span>
+        <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ backgroundColor: '#e5e1d3' }}>
           <div
-            className={`h-full rounded-full ${scoreColor(Math.round(report.score * 100))}`}
-            style={{ width: `${Math.round(report.score * 100)}%` }}
+            className="h-full rounded-full"
+            style={{ width: `${Math.round(report.score * 100)}%`, backgroundColor: scoreColor(Math.round(report.score * 100)) }}
           />
         </div>
-        <span className={`text-xs font-bold ${scoreTextColor(Math.round(report.score * 100))}`}>
+        <span className="text-xs font-bold" style={{ color: scoreColor(Math.round(report.score * 100)) }}>
           {Math.round(report.score * 100)}%
         </span>
       </div>
 
       {report.details && (
-        <p className="text-[10px] text-slate-400">{report.details}</p>
+        <p className="text-[10px]" style={{ color: '#9c8d66' }}>{report.details}</p>
       )}
 
       {report.claims.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[10px] font-medium text-slate-500">주장별 검증 결과</span>
+            <span className="text-[10px] font-medium" style={{ color: '#9c8d66' }}>주장별 검증 결과</span>
             {report.claims.length > 5 && (
-              <button onClick={() => setShowAll(!showAll)} className="text-[10px] text-cyan-400 hover:underline">
+              <button onClick={() => setShowAll(!showAll)} className="text-[10px]" style={{ color: '#554b38', textDecoration: 'underline' }}>
                 {showAll ? '일부만 보기' : `전체 보기 (${report.claims.length})`}
               </button>
             )}
           </div>
           <div className="space-y-1">
             {(showAll ? report.claims : report.claims.filter(c => !c.verified || c.severity !== 'none').slice(0, 5)).map((cv, i) => (
-              <div key={i} className="flex items-start gap-2 px-2 py-1 rounded-lg bg-slate-900/50 text-[10px]">
-                <span className={`shrink-0 mt-0.5 w-2 h-2 rounded-full ${
-                  cv.verified ? 'bg-emerald-500' : cv.severity === 'critical' ? 'bg-red-500' : 'bg-amber-500'
-                }`} />
+              <div key={i} className="flex items-start gap-2 px-2 py-1 rounded-lg text-[10px]" style={{ backgroundColor: 'rgba(242,240,233,0.5)' }}>
+                <span
+                  className="shrink-0 mt-0.5 w-2 h-2 rounded-full"
+                  style={{ backgroundColor: cv.verified ? '#10b981' : cv.severity === 'critical' ? '#ef4444' : '#f59e0b' }}
+                />
                 <div className="flex-1 min-w-0">
-                  <span className="text-slate-300 font-medium">{cv.claim.value}</span>
-                  <span className="text-slate-500 ml-1">({cv.claim.type})</span>
-                  {cv.toolSource && <span className="text-cyan-400 ml-1">via {cv.toolSource}</span>}
-                  {cv.discrepancy && <p className="text-red-400 mt-0.5">{cv.discrepancy}</p>}
+                  <span className="font-medium" style={{ color: '#554b38' }}>{cv.claim.value}</span>
+                  <span className="ml-1" style={{ color: '#9c8d66' }}>({cv.claim.type})</span>
+                  {cv.toolSource && <span className="ml-1" style={{ color: '#837452' }}>via {cv.toolSource}</span>}
+                  {cv.discrepancy && <p className="mt-0.5" style={{ color: '#ef4444' }}>{cv.discrepancy}</p>}
                 </div>
-                <span className={`shrink-0 px-1 py-0.5 rounded ${
-                  cv.verified ? 'bg-emerald-500/20 text-emerald-400'
-                  : cv.matched ? 'bg-red-500/20 text-red-400'
-                  : 'bg-slate-600/50 text-slate-400'
-                }`}>
+                <span
+                  className="shrink-0 px-1 py-0.5 rounded"
+                  style={{
+                    backgroundColor: cv.verified ? 'rgba(16,185,129,0.15)' : cv.matched ? 'rgba(239,68,68,0.15)' : 'rgba(209,201,178,0.3)',
+                    color: cv.verified ? '#10b981' : cv.matched ? '#ef4444' : '#9c8d66',
+                  }}
+                >
                   {cv.verified ? '검증' : cv.matched ? '불일치' : '미확인'}
                 </span>
               </div>
@@ -928,8 +986,8 @@ function LegacyScoresPanel({ scores }: { scores: MergedScores }) {
         const score = (scores as unknown as Record<string, number>)[key] ?? 0
         return (
           <div key={key} className="text-center">
-            <p className="text-[10px] text-slate-500 mb-1">{label}</p>
-            <p className={`text-sm font-bold ${score >= 4 ? 'text-emerald-400' : score >= 3 ? 'text-amber-400' : 'text-red-400'}`}>
+            <p className="text-[10px] mb-1" style={{ color: '#9c8d66' }}>{label}</p>
+            <p className="text-sm font-bold" style={{ color: score >= 4 ? '#10b981' : score >= 3 ? '#f59e0b' : '#ef4444' }}>
               {score}/5
             </p>
           </div>
@@ -946,7 +1004,7 @@ function ToolsTable({ items }: { items: ToolInvocation[] }) {
     <div className="overflow-x-auto" data-testid="tools-table">
       <table className="w-full text-sm min-w-[640px]">
         <thead>
-          <tr className="text-xs text-slate-500 border-b border-slate-700">
+          <tr className="text-xs border-b" style={{ color: '#9c8d66', borderColor: '#e5e1d3' }}>
             <th className="text-left py-2 pr-3 font-medium">시간</th>
             <th className="text-left py-2 pr-3 font-medium">도구명</th>
             <th className="text-left py-2 pr-3 font-medium">에이전트</th>
@@ -957,13 +1015,13 @@ function ToolsTable({ items }: { items: ToolInvocation[] }) {
         </thead>
         <tbody>
           {items.map((item) => (
-            <tr key={item.id} className="border-b border-slate-700/50 hover:bg-slate-800/50 transition-colors">
-              <td className="py-2.5 pr-3 text-xs text-slate-500 whitespace-nowrap">{formatTime(item.createdAt)}</td>
-              <td className="py-2.5 pr-3 text-xs font-medium font-mono text-cyan-400">{item.toolName}</td>
-              <td className="py-2.5 pr-3 text-xs text-slate-300">{item.agentName || '-'}</td>
-              <td className="py-2.5 pr-3 text-xs text-right text-slate-500">{formatDuration(item.durationMs)}</td>
+            <tr key={item.id} className="transition-colors" style={{ borderBottom: '1px solid rgba(229,225,211,0.5)' }}>
+              <td className="py-2.5 pr-3 text-xs whitespace-nowrap" style={{ color: '#9c8d66' }}>{formatTime(item.createdAt)}</td>
+              <td className="py-2.5 pr-3 text-xs font-medium font-mono" style={{ color: '#5a7247' }}>{item.toolName}</td>
+              <td className="py-2.5 pr-3 text-xs" style={{ color: '#554b38' }}>{item.agentName || '-'}</td>
+              <td className="py-2.5 pr-3 text-xs text-right" style={{ color: '#9c8d66' }}>{formatDuration(item.durationMs)}</td>
               <td className="py-2.5 pr-3"><StatusBadgeEl status={item.status} /></td>
-              <td className="py-2.5 text-xs truncate max-w-[200px] text-slate-500">{item.input || '-'}</td>
+              <td className="py-2.5 text-xs truncate max-w-[200px]" style={{ color: '#9c8d66' }}>{item.input || '-'}</td>
             </tr>
           ))}
         </tbody>
