@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
+import { compress } from 'hono/compress'
 import { logger } from 'hono/logger'
 import { errorHandler } from './middleware/error'
 import { healthRoute } from './routes/health'
@@ -93,6 +94,7 @@ const isProd = process.env.NODE_ENV === 'production'
 export let isShuttingDown = false
 
 // 글로벌 미들웨어
+app.use('*', compress())
 app.use('*', logger())
 app.use('*', cors({
   origin: isProd

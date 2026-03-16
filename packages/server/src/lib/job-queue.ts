@@ -46,7 +46,7 @@ export async function queueNightJob(params: {
 // 다음 처리할 작업 선택 (FIFO, 스케줄 시간 도달한 것만)
 // 원자적 UPDATE ... RETURNING으로 동시 워커 간 중복 방지
 async function pickNextJob() {
-  const now = new Date()
+  const now = new Date().toISOString()
 
   const [job] = await db
     .update(nightJobs)
