@@ -217,34 +217,11 @@ export function ClassifiedPage() {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
 
   return (
-    <div data-testid="classified-page" className="h-full flex flex-col">
-      {/* Header */}
-      <div className="px-4 sm:px-6 lg:px-8 py-4 border-b border-slate-700 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="text-red-500 md:hidden">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-          </div>
-          <h2 className="text-lg sm:text-xl font-semibold text-slate-50">기밀문서</h2>
-          <button
-            onClick={() => setShowFolderTree(!showFolderTree)}
-            className="md:hidden px-2 py-1 text-xs border border-slate-700 rounded hover:bg-slate-800 text-slate-300"
-          >
-            {showFolderTree ? '폴더 숨기기' : '폴더 보기'}
-          </button>
-        </div>
-        {detailId && (
-          <button
-            data-testid="back-to-list-btn"
-            onClick={() => setDetailId(null)}
-            className="px-3 py-1.5 text-xs border border-slate-700 rounded-lg hover:bg-slate-800 text-slate-300"
-          >
-            목록으로
-          </button>
-        )}
-      </div>
+    <div data-testid="classified-page" className="h-full flex flex-col bg-slate-950 overflow-hidden">
+      {/* No top header -- Stitch uses a full-height 3-panel layout */}
 
       {/* Security warning banner (mobile) */}
-      <div className="md:hidden px-4 py-3">
+      <div className="md:hidden px-4 py-3 border-b border-slate-800">
         <div className="flex flex-col gap-3 rounded-xl border border-red-500/30 bg-red-500/10 p-4">
           <div className="flex items-center gap-2">
             <span className="text-red-400 text-lg">⚠</span>
@@ -256,30 +233,193 @@ export function ClassifiedPage() {
         </div>
       </div>
 
-      {/* Main content: 2-panel */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left panel: Folder tree + Stats (overlay on mobile) */}
+      {/* Main 3-panel Layout */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left Panel: Library Tree (240px) */}
         {showFolderTree && (
           <>
             <div className="md:hidden fixed inset-0 bg-black/40 z-10" onClick={() => setShowFolderTree(false)} />
-            <div data-testid="folder-sidebar" className="fixed md:relative left-0 top-0 h-full z-20 w-64 lg:w-64 border-r border-slate-700 bg-slate-900 md:bg-slate-900/80 flex flex-col overflow-y-auto flex-shrink-0">
+            <aside data-testid="folder-sidebar" className="fixed md:relative left-0 top-0 h-full z-20 w-[240px] flex-shrink-0 border-r border-slate-800 bg-slate-900 flex flex-col">
+              <div className="p-4 border-b border-slate-800 flex gap-3 items-center">
+                <div className="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                </div>
+                <div className="flex flex-col">
+                  <h1 className="text-slate-50 text-sm font-semibold leading-tight">Library</h1>
+                  <p className="text-slate-400 text-xs font-normal leading-tight">Archive System</p>
+                </div>
+              </div>
               {/* Stats */}
               {stats && <StatsCard stats={stats} />}
-
-              {/* Folder tree */}
-              <FolderTree
-                folders={folders}
-                selectedFolderId={selectedFolderId}
-                onSelectFolder={(id) => { setSelectedFolderId(id); setPage(1); setDetailId(null); setShowFolderTree(false) }}
-                queryClient={queryClient}
-              />
-            </div>
+              <div className="flex-1 overflow-y-auto">
+                <FolderTree
+                  folders={folders}
+                  selectedFolderId={selectedFolderId}
+                  onSelectFolder={(id) => { setSelectedFolderId(id); setPage(1); setDetailId(null); setShowFolderTree(false) }}
+                  queryClient={queryClient}
+                />
+              </div>
+            </aside>
           </>
         )}
 
-        {/* Right panel: List or Detail */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {detailId ? (
+        {/* Center Panel: Archive List */}
+        <section className="flex-1 min-w-[300px] border-r border-slate-800 flex flex-col bg-slate-950">
+          {/* List header with filter + sort */}
+          <div className="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-900 sticky top-0 z-10">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowFolderTree(!showFolderTree)}
+                className="md:hidden p-1 rounded-md text-slate-400 hover:text-slate-50 hover:bg-slate-800 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+              </button>
+              <h3 className="text-slate-50 font-semibold text-sm">{selectedFolderId ? (findFolderName(folders, selectedFolderId) || '폴더') : '전체 문서'} ({total})</h3>
+            </div>
+            <div className="flex gap-2">
+              <select
+                value={classificationFilter}
+                onChange={(e) => { setClassificationFilter(e.target.value); setPage(1) }}
+                className="bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-md px-2 py-1.5"
+              >
+                <option value="">전체 등급</option>
+                {(Object.entries(CLASSIFICATION_CONFIG) as [Classification, { label: string }][]).map(([k, v]) => (
+                  <option key={k} value={k}>{v.label}</option>
+                ))}
+              </select>
+              <select
+                value={sortBy}
+                onChange={(e) => { setSortBy(e.target.value); setPage(1) }}
+                className="bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-md px-2 py-1.5"
+              >
+                {SORT_OPTIONS.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Search */}
+          <div data-testid="filter-bar" className="px-4 py-2 border-b border-slate-800">
+            <input
+              placeholder="검색..."
+              value={searchInput}
+              onChange={(e) => { setSearchInput(e.target.value); setPage(1) }}
+              className="w-full text-xs px-3 py-1.5 bg-slate-900/50 border border-slate-800 focus:border-cyan-400 text-slate-50 rounded-lg outline-none"
+            />
+          </div>
+
+          {/* Filter chips */}
+          {filterChips.length > 0 && (
+            <div data-testid="filter-chips" className="px-4 py-2 border-b border-slate-800/50 flex flex-wrap items-center gap-1.5">
+              {filterChips.map(chip => (
+                <span
+                  key={chip.key}
+                  className="flex items-center gap-1 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[11px] px-2.5 py-1 rounded-full"
+                >
+                  {chip.label}
+                  <button
+                    onClick={chip.onRemove}
+                    className="hover:text-blue-200 ml-0.5"
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+              <button
+                onClick={() => {
+                  setSearchInput(''); setClassificationFilter(''); setStartDate(''); setEndDate('')
+                  setSortBy('date'); setSelectedFolderId(null); setPage(1)
+                }}
+                className="text-[11px] text-slate-500 hover:text-slate-300 ml-2"
+              >
+                전체 초기화
+              </button>
+            </div>
+          )}
+
+          {/* Document list - Stitch card-style items */}
+          <div className="flex-1 overflow-y-auto">
+            {listQuery.isLoading ? (
+              <div className="px-4 py-3 space-y-2">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="h-16 bg-slate-900/30 rounded animate-pulse" />
+                ))}
+              </div>
+            ) : items.length === 0 ? (
+              <div data-testid="classified-empty-state" className="flex-1 flex flex-col items-center justify-center py-16">
+                <p className="text-3xl mb-3">🔒</p>
+                <p className="text-sm font-medium text-slate-300">아카이브된 문서가 없습니다</p>
+                <p className="text-xs text-slate-500 mt-1">사령관실에서 완료된 명령의 결과를 아카이브하면 기밀문서에 보관됩니다.</p>
+                <button
+                  onClick={() => navigate('/command-center')}
+                  className="mt-3 px-4 py-2 text-xs bg-red-600 text-white rounded-md hover:bg-red-500"
+                >
+                  사령관실로 이동
+                </button>
+              </div>
+            ) : (
+              items.map(item => {
+                const isActive = detailId === item.id
+                const clsColor = item.classification === 'secret' ? 'bg-red-500' : item.classification === 'confidential' ? 'bg-amber-500' : item.classification === 'internal' ? 'bg-blue-500' : 'bg-slate-500'
+                return (
+                  <div
+                    key={item.id}
+                    data-testid={`doc-row-${item.id}`}
+                    className={`flex gap-4 px-4 py-3 border-b border-slate-800 cursor-pointer transition-colors relative ${
+                      isActive ? 'bg-slate-900 hover:bg-slate-900' : 'hover:bg-slate-900'
+                    }`}
+                    onClick={() => setDetailId(item.id)}
+                  >
+                    {isActive && <div className={`absolute left-0 top-0 bottom-0 w-1 ${clsColor}`} />}
+                    <div className="flex items-start gap-4 w-full">
+                      <div className="text-slate-50 flex items-center justify-center rounded-md bg-slate-800 shrink-0 size-10">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                      </div>
+                      <div className="flex flex-1 flex-col justify-center">
+                        <div className="flex justify-between items-center mb-1">
+                          <p className="text-slate-50 text-sm font-medium leading-normal truncate">{item.title}</p>
+                          <ClassificationBadge classification={item.classification} />
+                        </div>
+                        <div className="flex justify-between items-center text-xs font-mono tabular-nums text-slate-400">
+                          <span>Accessed: {formatDate(item.createdAt)}</span>
+                          {item.agentName && <span>{item.agentName}</span>}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })
+            )}
+          </div>
+
+          {/* Pagination */}
+          {total > 0 && (
+            <div data-testid="pagination" className="px-4 py-3 border-t border-slate-800 flex items-center justify-center gap-3">
+              <button
+                disabled={page <= 1}
+                onClick={() => setPage(p => p - 1)}
+                className="text-xs text-slate-400 hover:text-slate-200 disabled:opacity-30 px-2 py-1"
+              >
+                ← 이전
+              </button>
+              <span className="text-xs text-slate-500">
+                {page} / {totalPages}
+              </span>
+              <button
+                disabled={page >= totalPages}
+                onClick={() => setPage(p => p + 1)}
+                className="text-xs text-slate-400 hover:text-slate-200 disabled:opacity-30 px-2 py-1"
+              >
+                다음 →
+              </button>
+            </div>
+          )}
+        </section>
+
+        {/* Right Panel: Document Detail (400px) */}
+        {detailId ? (
+          <article className="w-[400px] flex-shrink-0 bg-slate-900 flex flex-col hidden lg:flex">
             <DocumentDetailView
               detail={detail}
               isLoading={detailQuery.isLoading}
@@ -289,169 +429,8 @@ export function ClassifiedPage() {
               queryClient={queryClient}
               folders={folders}
             />
-          ) : (
-            <>
-              {/* Filters */}
-              <div data-testid="filter-bar" className="px-4 py-3 border-b border-slate-700 flex flex-wrap items-center gap-2">
-                <input
-                  placeholder="검색..."
-                  value={searchInput}
-                  onChange={(e) => { setSearchInput(e.target.value); setPage(1) }}
-                  className={`text-xs px-3 py-1.5 w-40 md:w-48 ${inputClasses}`}
-                />
-                <select
-                  value={classificationFilter}
-                  onChange={(e) => { setClassificationFilter(e.target.value); setPage(1) }}
-                  className="bg-slate-800 border border-slate-700 text-xs text-slate-300 rounded-lg px-2 py-1.5"
-                >
-                  <option value="">전체 등급</option>
-                  {(Object.entries(CLASSIFICATION_CONFIG) as [Classification, { label: string }][]).map(([k, v]) => (
-                    <option key={k} value={k}>{v.label}</option>
-                  ))}
-                </select>
-                <div className="flex items-center gap-1">
-                  <input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => { setStartDate(e.target.value); setPage(1) }}
-                    className="bg-slate-800 border border-slate-700 text-xs text-slate-300 rounded-lg px-2 py-1.5"
-                  />
-                  <span className="text-xs text-slate-500">~</span>
-                  <input
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => { setEndDate(e.target.value); setPage(1) }}
-                    className="bg-slate-800 border border-slate-700 text-xs text-slate-300 rounded-lg px-2 py-1.5"
-                  />
-                </div>
-                <select
-                  value={sortBy}
-                  onChange={(e) => { setSortBy(e.target.value); setPage(1) }}
-                  className="bg-slate-800 border border-slate-700 text-xs text-slate-300 rounded-lg px-2 py-1.5"
-                >
-                  {SORT_OPTIONS.map(opt => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Filter chips */}
-              {filterChips.length > 0 && (
-                <div data-testid="filter-chips" className="px-4 py-2 flex flex-wrap items-center gap-1.5">
-                  {filterChips.map(chip => (
-                    <span
-                      key={chip.key}
-                      className="flex items-center gap-1 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[11px] px-2.5 py-1 rounded-full"
-                    >
-                      {chip.label}
-                      <button
-                        onClick={chip.onRemove}
-                        className="hover:text-blue-200 ml-0.5"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                  <button
-                    onClick={() => {
-                      setSearchInput(''); setClassificationFilter(''); setStartDate(''); setEndDate('')
-                      setSortBy('date'); setSelectedFolderId(null); setPage(1)
-                    }}
-                    className="text-[11px] text-slate-500 hover:text-slate-300 ml-2"
-                  >
-                    전체 초기화
-                  </button>
-                </div>
-              )}
-
-              {/* Document list */}
-              <div className="flex-1 overflow-auto">
-                {listQuery.isLoading ? (
-                  <div className="px-4 py-3 space-y-2">
-                    {Array.from({ length: 8 }).map((_, i) => (
-                      <div key={i} className="h-10 bg-slate-800/30 rounded animate-pulse" />
-                    ))}
-                  </div>
-                ) : items.length === 0 ? (
-                  <div data-testid="classified-empty-state" className="flex-1 flex flex-col items-center justify-center py-16">
-                    <p className="text-3xl mb-3">🔒</p>
-                    <p className="text-sm font-medium text-slate-300">아카이브된 문서가 없습니다</p>
-                    <p className="text-xs text-slate-500 mt-1">사령관실에서 완료된 명령의 결과를 아카이브하면 기밀문서에 보관됩니다.</p>
-                    <button
-                      onClick={() => navigate('/command-center')}
-                      className="mt-3 px-4 py-2 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-500"
-                    >
-                      사령관실로 이동
-                    </button>
-                  </div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table data-testid="document-table" className="w-full text-sm min-w-[700px]">
-                      <thead>
-                        <tr className="border-b border-slate-700">
-                          <th className="text-[11px] font-medium text-slate-500 uppercase tracking-wider px-3 py-2.5 text-left">제목</th>
-                          <th className="text-[11px] font-medium text-slate-500 uppercase tracking-wider px-3 py-2.5 text-left">등급</th>
-                          <th className="text-[11px] font-medium text-slate-500 uppercase tracking-wider px-3 py-2.5 text-left">부서</th>
-                          <th className="text-[11px] font-medium text-slate-500 uppercase tracking-wider px-3 py-2.5 text-left">에이전트</th>
-                          <th className="text-[11px] font-medium text-slate-500 uppercase tracking-wider px-3 py-2.5 text-left">품질</th>
-                          <th className="text-[11px] font-medium text-slate-500 uppercase tracking-wider px-3 py-2.5 text-left">태그</th>
-                          <th className="text-[11px] font-medium text-slate-500 uppercase tracking-wider px-3 py-2.5 text-left">날짜</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {items.map(item => (
-                          <tr
-                            key={item.id}
-                            data-testid={`doc-row-${item.id}`}
-                            className="border-b border-slate-700/50 hover:bg-slate-800/50 cursor-pointer transition-colors"
-                            onClick={() => setDetailId(item.id)}
-                          >
-                            <td className="px-3 py-2.5 text-xs font-medium text-slate-200 truncate max-w-[200px]" title={item.title}>{item.title}</td>
-                            <td className="px-3 py-2.5">
-                              <ClassificationBadge classification={item.classification} />
-                            </td>
-                            <td className="px-3 py-2.5 text-xs text-slate-400">{item.departmentName || '-'}</td>
-                            <td className="px-3 py-2.5 text-xs text-slate-400">{item.agentName || '-'}</td>
-                            <td className="px-3 py-2.5">
-                              <QualityBar score={item.qualityScore} />
-                            </td>
-                            <td className="px-3 py-2.5">
-                              <TagList tags={item.tags} max={2} />
-                            </td>
-                            <td className="px-3 py-2.5 text-[10px] text-slate-500 font-mono whitespace-nowrap">{formatDate(item.createdAt)}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-
-              {/* Pagination */}
-              {total > 0 && (
-                <div data-testid="pagination" className="px-4 py-3 border-t border-slate-700 flex items-center justify-center gap-3">
-                  <button
-                    disabled={page <= 1}
-                    onClick={() => setPage(p => p - 1)}
-                    className="text-xs text-slate-400 hover:text-slate-200 disabled:opacity-30 px-2 py-1"
-                  >
-                    ← 이전
-                  </button>
-                  <span className="text-xs text-slate-500">
-                    {page} / {totalPages}
-                  </span>
-                  <button
-                    disabled={page >= totalPages}
-                    onClick={() => setPage(p => p + 1)}
-                    className="text-xs text-slate-400 hover:text-slate-200 disabled:opacity-30 px-2 py-1"
-                  >
-                    다음 →
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-        </div>
+          </article>
+        ) : null}
       </div>
 
       {/* Delete confirm dialog */}
@@ -1060,10 +1039,23 @@ function DocumentDetailView({
 // === Sub-components ===
 
 function ClassificationBadge({ classification, small }: { classification: Classification; small?: boolean }) {
-  const info = CLASSIFICATION_CONFIG[classification] || { label: classification, classes: 'bg-slate-500/15 text-slate-400' }
+  const borderMap: Record<Classification, string> = {
+    secret: 'bg-red-500/20 text-red-400 border border-red-500/30',
+    confidential: 'bg-amber-500/20 text-amber-500 border border-amber-500/30',
+    internal: 'bg-blue-500/20 text-blue-400 border border-blue-500/30',
+    public: 'bg-slate-500/20 text-slate-400 border border-slate-500/30',
+  }
+  const labelMap: Record<Classification, string> = {
+    secret: '1급 기밀',
+    confidential: '2급 기밀',
+    internal: '3급 기밀',
+    public: '공개',
+  }
+  const cls = borderMap[classification] || 'bg-slate-500/20 text-slate-400 border border-slate-500/30'
+  const label = small ? (CLASSIFICATION_CONFIG[classification]?.label?.[0] || classification[0]) : (labelMap[classification] || classification)
   return (
-    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${info.classes}`}>
-      {small ? info.label[0] : info.label}
+    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${cls}`}>
+      {label}
     </span>
   )
 }

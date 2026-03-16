@@ -161,55 +161,34 @@ export function KnowledgePage() {
   const [showFolderTree, setShowFolderTree] = useState(true)
 
   return (
-    <div className="h-full flex flex-col bg-slate-900" data-testid="knowledge-page">
-      {/* Header — mobile-optimized with stacked layout on small screens */}
-      <div className="px-4 sm:px-6 py-4 border-b border-slate-700">
-        <div className="flex items-center justify-between mb-3 sm:mb-0">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setShowFolderTree(!showFolderTree)}
-              className="md:hidden p-1.5 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors"
-              aria-label={showFolderTree ? '폴더 숨기기' : '폴더 보기'}
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-            <h1 className="text-lg sm:text-xl font-bold text-slate-50 tracking-tight">지식 베이스</h1>
-          </div>
-          {/* Tabs */}
-          <div className="flex gap-0">
-            <button
-              onClick={() => setActiveTab('docs')}
-              className={`px-3 sm:px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                activeTab === 'docs'
-                  ? 'bg-cyan-400/20 text-cyan-400'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-              data-testid="tab-docs"
-            >
-              문서
-            </button>
-            <button
-              onClick={() => setActiveTab('memories')}
-              className={`px-3 sm:px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                activeTab === 'memories'
-                  ? 'bg-cyan-400/20 text-cyan-400'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-              data-testid="tab-memories"
-            >
-              에이전트 기억
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Tab content */}
+    <div className="h-full flex flex-col bg-slate-950" data-testid="knowledge-page">
+      {/* Tab content -- no separate header, docs tab has its own built-in header area */}
       {activeTab === 'docs' ? (
-        <DocsTab showFolderTree={showFolderTree} queryClient={queryClient} />
+        <DocsTab showFolderTree={showFolderTree} queryClient={queryClient} setShowFolderTree={setShowFolderTree} activeTab={activeTab} setActiveTab={setActiveTab} />
       ) : (
-        <MemoriesTab queryClient={queryClient} />
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Memories header */}
+          <div className="px-4 sm:px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+            <h1 className="text-xl font-bold text-slate-50 tracking-tight">CORTHEX Knowledge</h1>
+            <div className="flex gap-0">
+              <button
+                onClick={() => setActiveTab('docs')}
+                className="px-4 py-2 text-sm font-semibold tracking-wide transition-colors text-slate-400 hover:text-slate-50"
+                data-testid="tab-docs"
+              >
+                문서
+              </button>
+              <button
+                onClick={() => setActiveTab('memories')}
+                className="px-4 py-2 text-sm font-semibold tracking-wide transition-colors text-cyan-400 relative after:absolute after:-bottom-4 after:left-0 after:w-full after:h-0.5 after:bg-cyan-400"
+                data-testid="tab-memories"
+              >
+                에이전트 기억
+              </button>
+            </div>
+          </div>
+          <MemoriesTab queryClient={queryClient} />
+        </div>
       )}
     </div>
   )
@@ -217,7 +196,7 @@ export function KnowledgePage() {
 
 // === Docs Tab ===
 
-function DocsTab({ showFolderTree, queryClient }: { showFolderTree: boolean; queryClient: ReturnType<typeof useQueryClient> }) {
+function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, setActiveTab }: { showFolderTree: boolean; queryClient: ReturnType<typeof useQueryClient>; setShowFolderTree: (v: boolean) => void; activeTab: 'docs' | 'memories'; setActiveTab: (v: 'docs' | 'memories') => void }) {
   const [page, setPage] = useState(1)
   const [searchInput, setSearchInput] = useState('')
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null)
@@ -330,55 +309,103 @@ function DocsTab({ showFolderTree, queryClient }: { showFolderTree: boolean; que
   })
 
   return (
-    <div className="flex-1 flex overflow-hidden">
-      {/* Sidebar */}
-      {showFolderTree && (
-        <aside className="w-64 border-r border-slate-700 bg-slate-800/50 flex flex-col overflow-y-auto" data-testid="folder-sidebar">
-          <FolderTree
-            folders={folders}
-            selectedFolderId={selectedFolderId}
-            onSelectFolder={(id) => { setSelectedFolderId(id); setPage(1); setDetailDoc(null) }}
-            queryClient={queryClient}
-          />
-        </aside>
-      )}
-
-      {/* Main content */}
-      <main className="flex-1 flex flex-col overflow-hidden">
-        {detailDoc ? (
-          <DocDetailView
-            doc={detailDoc}
-            folders={folders}
-            onBack={() => setDetailDoc(null)}
-            onEdit={(d) => { setEditDoc(d); setDetailDoc(null) }}
-            onDelete={(id) => setDeleteConfirmId(id)}
-            onShowVersions={(id) => setShowVersions(id)}
-            queryClient={queryClient}
-            onNavigateDoc={(docId) => {
-              api.get<{ data: KnowledgeDoc }>(`/workspace/knowledge/docs/${docId}`)
-                .then(res => { if (res.data) setDetailDoc(res.data) })
-            }}
-          />
-        ) : (
-          <>
-            {/* Search Bar — full width, mobile-friendly */}
-            <div className="px-4 sm:px-6 py-3 border-b border-slate-700/50">
-              <div className="relative w-full mb-3">
-                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div className="flex-1 flex flex-col overflow-hidden">
+      {/* Top bar with search */}
+      <div className="flex items-center justify-between border-b border-slate-800 px-6 py-3 shrink-0 bg-slate-900">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowFolderTree(!showFolderTree)}
+            className="md:hidden p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition-colors"
+            aria-label={showFolderTree ? '폴더 숨기기' : '폴더 보기'}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-50">CORTHEX Knowledge</h1>
+          <label className="flex flex-col min-w-40 !h-9 max-w-72 ml-4">
+            <div className="flex w-full flex-1 items-stretch rounded-md h-full bg-slate-950 border border-slate-800 focus-within:border-cyan-400/50 transition-colors">
+              <div className="text-slate-400 flex items-center justify-center pl-3">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                <input
-                  placeholder="문서 및 데이터 검색..."
-                  value={searchInput}
-                  onChange={(e) => { setSearchInput(e.target.value); setPage(1) }}
-                  className="w-full bg-slate-800 border border-slate-700 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 rounded-xl pl-9 pr-3 py-2.5 text-sm text-slate-50 placeholder:text-slate-500 outline-none transition-all"
-                  data-testid="doc-search"
-                />
               </div>
-              {/* Filter chips — horizontally scrollable on mobile */}
-              <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+              <input
+                placeholder="Search knowledge base..."
+                value={searchInput}
+                onChange={(e) => { setSearchInput(e.target.value); setPage(1) }}
+                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden text-slate-50 focus:outline-none focus:ring-0 border-none bg-transparent h-full placeholder:text-slate-500 px-3 text-sm font-medium"
+                data-testid="doc-search"
+              />
+            </div>
+          </label>
+        </div>
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setActiveTab('docs')}
+              className={`text-sm font-semibold tracking-wide transition-colors ${
+                activeTab === 'docs'
+                  ? 'text-cyan-400 relative after:absolute after:-bottom-4 after:left-0 after:w-full after:h-0.5 after:bg-cyan-400'
+                  : 'text-slate-400 hover:text-slate-50'
+              }`}
+              data-testid="tab-docs"
+            >
+              문서
+            </button>
+            <button
+              onClick={() => setActiveTab('memories')}
+              className={`text-sm font-semibold tracking-wide transition-colors ${
+                activeTab === 'memories'
+                  ? 'text-cyan-400 relative after:absolute after:-bottom-4 after:left-0 after:w-full after:h-0.5 after:bg-cyan-400'
+                  : 'text-slate-400 hover:text-slate-50'
+              }`}
+              data-testid="tab-memories"
+            >
+              에이전트 기억
+            </button>
+          </div>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="flex items-center justify-center gap-2 rounded-md h-9 px-4 bg-cyan-400 hover:bg-cyan-400/90 transition-colors text-slate-900 text-sm font-bold shadow-[0_0_15px_rgba(34,211,238,0.2)]"
+            data-testid="create-doc-button"
+          >
+            <span className="text-lg leading-none">+</span>
+            <span>새 문서</span>
+          </button>
+        </div>
+      </div>
+
+      {/* 3-panel layout */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left Panel: Library Tree (260px) */}
+        {showFolderTree && (
+          <aside className="w-[260px] flex-shrink-0 border-r border-slate-800 bg-slate-900 flex flex-col overflow-y-auto" data-testid="folder-sidebar">
+            <FolderTree
+              folders={folders}
+              selectedFolderId={selectedFolderId}
+              onSelectFolder={(id) => { setSelectedFolderId(id); setPage(1); setDetailDoc(null) }}
+              queryClient={queryClient}
+            />
+          </aside>
+        )}
+
+        {/* Center Panel: Document List */}
+        <main className="flex-1 flex flex-col border-r border-slate-800 bg-slate-950 min-w-0 overflow-hidden">
+          {/* Center header breadcrumb + filters */}
+          <div className="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2 text-xs font-medium text-slate-500 mb-1">
+                  <span>Library</span>
+                  <span className="text-[10px]">›</span>
+                  <span className="text-cyan-400">{selectedFolderId ? (findFolderName(folders, selectedFolderId) || '폴더') : '전체 문서'}</span>
+                </div>
+                <h2 className="text-xl font-bold text-slate-50">{selectedFolderId ? (findFolderName(folders, selectedFolderId) || '폴더') : '전체 문서'}</h2>
+              </div>
+              <div className="flex gap-2">
                 {/* Search mode toggle */}
-                <div className="flex rounded-lg overflow-hidden border border-slate-700 shrink-0" data-testid="search-mode-toggle">
+                <div className="flex rounded-lg overflow-hidden border border-slate-800 shrink-0" data-testid="search-mode-toggle">
                   {(['hybrid', 'semantic', 'keyword'] as const).map(mode => (
                     <button
                       key={mode}
@@ -386,7 +413,7 @@ function DocsTab({ showFolderTree, queryClient }: { showFolderTree: boolean; que
                       className={`px-2.5 py-1.5 text-xs font-medium transition-colors ${
                         searchMode === mode
                           ? 'bg-cyan-400 text-slate-900'
-                          : 'bg-slate-800 text-slate-400 hover:text-slate-200'
+                          : 'bg-slate-900 text-slate-400 hover:text-slate-200'
                       }`}
                     >
                       {mode === 'hybrid' ? '혼합' : mode === 'semantic' ? '의미' : '키워드'}
@@ -396,7 +423,7 @@ function DocsTab({ showFolderTree, queryClient }: { showFolderTree: boolean; que
                 <select
                   value={contentTypeFilter}
                   onChange={(e) => { setContentTypeFilter(e.target.value as ContentType | ''); setPage(1) }}
-                  className="shrink-0 bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-300 outline-none focus:border-cyan-500"
+                  className="shrink-0 bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-300 outline-none focus:border-cyan-400"
                 >
                   <option value="">전체 유형</option>
                   <option value="markdown">Markdown</option>
@@ -420,9 +447,9 @@ function DocsTab({ showFolderTree, queryClient }: { showFolderTree: boolean; que
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
-                  className="shrink-0 px-3 py-1.5 text-xs border border-slate-700 rounded-lg text-slate-300 hover:bg-slate-700 disabled:opacity-50 transition-colors"
+                  className="shrink-0 p-1.5 rounded border border-slate-800 text-slate-400 hover:text-slate-50 hover:border-slate-600 transition-colors disabled:opacity-50"
                 >
-                  {uploading ? '업로드...' : '파일'}
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
                 </button>
                 <input
                   ref={fileInputRef}
@@ -433,150 +460,140 @@ function DocsTab({ showFolderTree, queryClient }: { showFolderTree: boolean; que
                 />
               </div>
             </div>
+          </div>
 
-            {/* Search result mode label */}
-            {isSearchActive && resultSearchMode && (
-              <div className="px-6 py-1.5 text-xs text-slate-400 border-b border-slate-700/30">
-                {resultSearchMode === 'semantic' ? '의미 검색 결과' : resultSearchMode === 'hybrid' ? '혼합 검색 결과' : '키워드 검색 결과'}
-                {' '}({total}건)
-              </div>
-            )}
-
-            {/* Document list with drop zone */}
-            <div
-              className={`flex-1 overflow-auto p-6 relative transition-colors ${
-                dragOver ? 'bg-blue-500/5' : ''
-              }`}
-              onDragOver={handleDragOver}
-              onDragEnter={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-            >
-              {/* Drag overlay */}
-              {dragOver && (
-                <div className="absolute inset-4 border-2 border-dashed border-blue-500/50 rounded-xl flex flex-col items-center justify-center bg-blue-500/10 z-10 pointer-events-none">
-                  <span className="text-3xl mb-2">📁</span>
-                  <span className="text-sm font-medium text-blue-300">파일을 놓으세요</span>
-                </div>
-              )}
-
-              {(isSearchActive ? searchQuery.isLoading : docsQuery.isLoading) ? (
-                <SkeletonTable rows={8} />
-              ) : items.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="docs-empty">
-                  <div className="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center mb-4">
-                    <svg className="w-8 h-8 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-base font-medium text-slate-300 mb-2">이 폴더에 문서가 없습니다</h3>
-                  <p className="text-sm text-slate-500 mb-4">문서를 만들어 지식을 정리해보세요</p>
-                  <button
-                    onClick={() => setShowCreateModal(true)}
-                    className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
-                  >문서 만들기</button>
-                </div>
-              ) : (
-                <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden" data-testid="doc-table">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-slate-700">
-                        <th className="text-left py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">제목</th>
-                        {isSearchActive && <th className="text-center py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-16">유사도</th>}
-                        <th className="text-left py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-24">유형</th>
-                        <th className="text-left py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">태그</th>
-                        <th className="text-center py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-20">임베딩</th>
-                        <th className="text-right py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-32">수정일</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-700/50">
-                      {items.map(doc => (
-                        <tr
-                          key={doc.id}
-                          onClick={() => setDetailDoc(doc)}
-                          className="hover:bg-slate-700/30 cursor-pointer transition-colors"
-                          data-testid={`doc-row-${doc.id}`}
-                        >
-                          <td className="py-3 px-4">
-                            <div className="flex items-center gap-2">
-                              <svg className="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                              </svg>
-                              <div className="min-w-0">
-                                <span className="text-sm font-medium text-slate-100 truncate block">{doc.title}</span>
-                                {isSearchActive && 'highlight' in doc && typeof (doc as Record<string, unknown>).highlight === 'string' && (
-                                  <span className="text-xs text-slate-400 truncate block mt-0.5">{(doc as Record<string, string>).highlight}</span>
-                                )}
-                              </div>
-                              {doc.fileUrl && (
-                                <svg className="w-3 h-3 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                                </svg>
-                              )}
-                            </div>
-                          </td>
-                          {isSearchActive && (
-                            <td className="py-3 px-4 text-center">
-                              {'score' in doc && (doc as Record<string, unknown>).score != null ? (
-                                <Badge variant="info">{Math.round(Number((doc as Record<string, unknown>).score) * 100)}%</Badge>
-                              ) : (
-                                <span className="text-slate-500 text-xs">—</span>
-                              )}
-                            </td>
-                          )}
-                          <td className="py-3 px-4">
-                            <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${CONTENT_TYPE_COLORS[doc.contentType]}`}>
-                              {CONTENT_TYPE_LABELS[doc.contentType] || doc.contentType}
-                            </span>
-                          </td>
-                          <td className="py-3 px-4">
-                            <div className="flex gap-1 flex-wrap">
-                              {doc.tags.slice(0, 3).map(tag => (
-                                <span key={tag} className="px-1.5 py-0.5 rounded text-[10px] bg-slate-700 text-slate-300">{tag}</span>
-                              ))}
-                              {doc.tags.length > 3 && <span className="text-[10px] text-slate-500">+{doc.tags.length - 3}</span>}
-                            </div>
-                          </td>
-                          <td className="py-3 px-4 text-center">
-                            {doc.embeddingStatus === 'done' ? (
-                              <Badge variant="success">완료</Badge>
-                            ) : doc.embeddingStatus === 'pending' ? (
-                              <span className="text-amber-400 text-xs">대기</span>
-                            ) : (
-                              <span className="text-slate-500 text-xs">—</span>
-                            )}
-                          </td>
-                          <td className="py-3 px-4 text-right text-xs text-slate-400">{formatRelative(doc.updatedAt)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+          {/* Search result mode label */}
+          {isSearchActive && resultSearchMode && (
+            <div className="px-5 py-1.5 text-xs text-slate-400 border-b border-slate-800/50">
+              {resultSearchMode === 'semantic' ? '의미 검색 결과' : resultSearchMode === 'hybrid' ? '혼합 검색 결과' : '키워드 검색 결과'}
+              {' '}({total}건)
             </div>
+          )}
 
-            {/* Pagination */}
-            {total > 0 && (
-              <div className="px-6 py-3 border-t border-slate-700 flex items-center justify-between">
-                <span className="text-xs text-slate-500">{total}건 중 {(page - 1) * PAGE_SIZE + 1}-{Math.min(page * PAGE_SIZE, total)}</span>
-                <div className="flex items-center gap-2">
-                  <button
-                    disabled={page <= 1}
-                    onClick={() => setPage(p => p - 1)}
-                    className="px-3 py-1.5 text-xs border border-slate-600 rounded-lg text-slate-400 hover:bg-slate-700 disabled:opacity-30 transition-colors"
-                  >이전</button>
-                  <span className="text-xs text-slate-400">{page} / {totalPages}</span>
-                  <button
-                    disabled={page >= totalPages}
-                    onClick={() => setPage(p => p + 1)}
-                    className="px-3 py-1.5 text-xs border border-slate-600 rounded-lg text-slate-400 hover:bg-slate-700 disabled:opacity-30 transition-colors"
-                  >다음</button>
-                </div>
+          {/* Document list with drop zone */}
+          <div
+            className={`flex-1 overflow-y-auto p-4 space-y-2 relative transition-colors ${
+              dragOver ? 'bg-cyan-400/5' : ''
+            }`}
+            onDragOver={handleDragOver}
+            onDragEnter={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            {/* Drag overlay */}
+            {dragOver && (
+              <div className="absolute inset-4 border-2 border-dashed border-cyan-400/50 rounded-xl flex flex-col items-center justify-center bg-cyan-400/10 z-10 pointer-events-none">
+                <span className="text-3xl mb-2">📁</span>
+                <span className="text-sm font-medium text-cyan-300">파일을 놓으세요</span>
               </div>
             )}
-          </>
-        )}
-      </main>
+
+            {(isSearchActive ? searchQuery.isLoading : docsQuery.isLoading) ? (
+              <SkeletonTable rows={8} />
+            ) : items.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="docs-empty">
+                <div className="w-16 h-16 rounded-2xl bg-slate-900 flex items-center justify-center mb-4">
+                  <svg className="w-8 h-8 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-base font-medium text-slate-300 mb-2">이 폴더에 문서가 없습니다</h3>
+                <p className="text-sm text-slate-500 mb-4">문서를 만들어 지식을 정리해보세요</p>
+                <button
+                  onClick={() => setShowCreateModal(true)}
+                  className="bg-cyan-400 hover:bg-cyan-400/90 text-slate-900 rounded-lg px-4 py-2 text-sm font-bold transition-colors"
+                >문서 만들기</button>
+              </div>
+            ) : (
+              items.map(doc => {
+                const isActive = detailDoc?.id === doc.id
+                return (
+                  <div
+                    key={doc.id}
+                    onClick={() => setDetailDoc(doc)}
+                    className={`group relative flex flex-col gap-2 p-4 rounded-lg cursor-pointer transition-colors ${
+                      isActive
+                        ? 'bg-slate-900 border border-cyan-400/30 shadow-[0_0_10px_rgba(34,211,238,0.05)]'
+                        : 'bg-slate-900/50 border border-slate-800 hover:border-slate-700'
+                    }`}
+                    data-testid={`doc-row-${doc.id}`}
+                  >
+                    {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-cyan-400 rounded-l-lg" />}
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded flex items-center justify-center shrink-0 ${isActive ? 'bg-cyan-400/10 text-cyan-400' : 'bg-slate-800 text-slate-400 group-hover:text-slate-300'}`}>
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <h3 className={`text-sm font-bold mb-0.5 ${isActive ? 'text-slate-50' : 'text-slate-300 group-hover:text-slate-50'} transition-colors`}>{doc.title}</h3>
+                          {isSearchActive && 'highlight' in doc && typeof (doc as Record<string, unknown>).highlight === 'string' && (
+                            <p className="text-xs text-slate-400 line-clamp-1">{(doc as Record<string, string>).highlight}</p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="shrink-0 flex flex-col items-end gap-2">
+                        <span className="text-[11px] font-medium text-slate-500">{formatRelative(doc.updatedAt)}</span>
+                        {doc.embeddingStatus === 'done' ? (
+                          <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span className="text-[10px] font-bold tracking-wide">임베딩 완료</span>
+                          </div>
+                        ) : doc.embeddingStatus === 'pending' ? (
+                          <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                            <span className="text-[10px] font-bold tracking-wide">업데이트 중</span>
+                          </div>
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })
+            )}
+          </div>
+
+          {/* Pagination */}
+          {total > 0 && (
+            <div className="px-5 py-3 border-t border-slate-800 flex items-center justify-between">
+              <span className="text-xs text-slate-500">{total}건 중 {(page - 1) * PAGE_SIZE + 1}-{Math.min(page * PAGE_SIZE, total)}</span>
+              <div className="flex items-center gap-2">
+                <button
+                  disabled={page <= 1}
+                  onClick={() => setPage(p => p - 1)}
+                  className="px-3 py-1.5 text-xs border border-slate-800 rounded-lg text-slate-400 hover:bg-slate-800 disabled:opacity-30 transition-colors"
+                >이전</button>
+                <span className="text-xs text-slate-400">{page} / {totalPages}</span>
+                <button
+                  disabled={page >= totalPages}
+                  onClick={() => setPage(p => p + 1)}
+                  className="px-3 py-1.5 text-xs border border-slate-800 rounded-lg text-slate-400 hover:bg-slate-800 disabled:opacity-30 transition-colors"
+                >다음</button>
+              </div>
+            </div>
+          )}
+        </main>
+
+        {/* Right Panel: Document Detail (500px) */}
+        {detailDoc ? (
+          <aside className="w-[500px] flex-shrink-0 bg-slate-900 flex flex-col overflow-hidden hidden lg:flex">
+            <DocDetailView
+              doc={detailDoc}
+              folders={folders}
+              onBack={() => setDetailDoc(null)}
+              onEdit={(d) => { setEditDoc(d); setDetailDoc(null) }}
+              onDelete={(id) => setDeleteConfirmId(id)}
+              onShowVersions={(id) => setShowVersions(id)}
+              queryClient={queryClient}
+              onNavigateDoc={(docId) => {
+                api.get<{ data: KnowledgeDoc }>(`/workspace/knowledge/docs/${docId}`)
+                  .then(res => { if (res.data) setDetailDoc(res.data) })
+              }}
+            />
+          </aside>
+        ) : null}
+      </div>
 
       {/* Create/Edit Modal */}
       <DocModal
@@ -910,40 +927,61 @@ function DocDetailView({
   const fullDoc = detailQuery.data?.data ?? doc
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 space-y-6" data-testid="doc-detail">
-      {/* Back + Title */}
-      <div className="flex items-center gap-3">
-        <button onClick={onBack} className="p-2 rounded-lg hover:bg-slate-700 text-slate-400 transition-colors">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <h3 className="flex-1 text-xl font-semibold text-slate-50 truncate">{fullDoc.title}</h3>
-        <div className="flex items-center gap-2">
-          <button onClick={() => onShowVersions(fullDoc.id)} className="px-3 py-1.5 text-xs border border-slate-600 rounded-lg text-slate-400 hover:bg-slate-700 transition-colors">버전 이력</button>
-          <button onClick={() => onEdit(fullDoc)} className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors">편집</button>
-          <button onClick={() => onDelete(fullDoc.id)} className="p-2 rounded-lg hover:bg-red-500/10 text-red-400 transition-colors">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-          </button>
+    <div className="flex-1 flex flex-col overflow-hidden" data-testid="doc-detail">
+      {/* Detail Header */}
+      <div className="p-5 border-b border-slate-800 flex flex-col gap-4 bg-slate-950/30">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-cyan-400/10 flex items-center justify-center text-cyan-400 border border-cyan-400/20">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-slate-50 leading-tight">{fullDoc.title}</h2>
+              <div className="flex items-center gap-2 text-xs text-slate-400 mt-1">
+                <span>{CONTENT_TYPE_LABELS[fullDoc.contentType]}</span>
+                <span className="w-1 h-1 rounded-full bg-slate-600" />
+                <span>마지막 수정: {formatRelative(fullDoc.updatedAt)}</span>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={() => onEdit(fullDoc)} className="p-2 rounded border border-slate-800 text-slate-300 hover:text-slate-50 hover:bg-slate-800 transition-colors" title="편집">
+              <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+            </button>
+            <button onClick={() => onDelete(fullDoc.id)} className="p-2 rounded border border-red-900/50 text-red-400 hover:text-red-300 hover:bg-red-900/20 transition-colors" title="삭제">
+              <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            </button>
+          </div>
+        </div>
+        {/* Tags */}
+        <div className="flex flex-wrap gap-2 mt-2">
+          {fullDoc.tags.map(tag => (
+            <span key={tag} className="px-2 py-1 rounded text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700">#{tag}</span>
+          ))}
+          <div className="ml-auto flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+            {fullDoc.embeddingStatus === 'done' ? (
+              <>
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <span className="text-xs font-bold">벡터 DB 동기화됨</span>
+              </>
+            ) : (
+              <span className="text-xs text-slate-500">임베딩 없음</span>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Meta bar */}
-      <div className="flex flex-wrap items-center gap-3">
-        <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${CONTENT_TYPE_COLORS[fullDoc.contentType]}`}>
-          {CONTENT_TYPE_LABELS[fullDoc.contentType]}
-        </span>
-        {fullDoc.tags.map(tag => (
-          <span key={tag} className="px-2 py-0.5 rounded-full text-[11px] bg-slate-700 text-slate-300">{tag}</span>
-        ))}
-        <span className="text-xs text-slate-500">수정: {formatRelative(fullDoc.updatedAt)}</span>
+      {/* Actions row */}
+      <div className="px-5 py-2 border-b border-slate-800 flex items-center gap-2">
+        <button onClick={() => onShowVersions(fullDoc.id)} className="px-3 py-1.5 text-xs border border-slate-800 rounded-lg text-slate-400 hover:bg-slate-800 transition-colors">버전 이력</button>
+        <button onClick={onBack} className="px-3 py-1.5 text-xs text-slate-500 hover:text-slate-300 transition-colors ml-auto">닫기</button>
       </div>
 
       {/* Content */}
       {fullDoc.content && (
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 max-h-[600px] overflow-y-auto">
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 max-h-[600px] overflow-y-auto">
           {fullDoc.contentType === 'markdown' || fullDoc.contentType === 'mermaid' ? (
             <div className="prose prose-invert prose-sm max-w-none">
               <MarkdownRenderer content={fullDoc.content} />

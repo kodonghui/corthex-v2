@@ -302,18 +302,18 @@ export function OpsLogPage() {
     }
   }, [])
 
-  const selectInputClass = 'bg-slate-800 border border-slate-600 rounded-lg px-3 py-1.5 text-sm'
+  const selectInputClass = 'bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-300 outline-none'
 
   return (
-    <div className="h-full flex flex-col bg-slate-900" data-testid="ops-log-page">
+    <div className="h-full flex flex-col bg-slate-950" data-testid="ops-log-page">
       {/* Header */}
-      <div className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 border-b border-slate-700 flex items-center justify-between">
-        <h2 className="text-lg sm:text-xl font-bold text-slate-50 tracking-tight">작전일지</h2>
+      <div className="px-4 md:px-10 py-4 border-b border-slate-800 flex flex-wrap items-center justify-between gap-4">
+        <h1 className="text-2xl font-bold leading-tight tracking-tight text-slate-50">Ops Log (작전일지)</h1>
         <div className="flex items-center gap-2">
           {selectedIds.size === 2 && (
             <button
               onClick={() => setCompareOpen(true)}
-              className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium"
+              className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-bold"
               data-testid="compare-btn"
             >
               비교
@@ -321,16 +321,49 @@ export function OpsLogPage() {
           )}
           <button
             onClick={handleExport}
-            className="border border-slate-600 text-slate-300 hover:bg-slate-800 rounded-lg px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm"
+            className="flex items-center justify-center rounded-lg border border-cyan-400 text-cyan-400 hover:bg-cyan-400/10 transition-colors h-10 px-4 text-sm font-bold gap-2"
             data-testid="export-btn"
           >
-            내보내기
+            내보내기 (Export)
           </button>
         </div>
       </div>
 
+      {/* KPI Stats Cards */}
+      <div className="px-4 md:px-10 py-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div className="flex flex-col gap-2 rounded-xl p-6 bg-slate-900 border border-slate-800 shadow-sm">
+            <p className="text-slate-400 text-sm font-medium uppercase tracking-wider">Daily Operations</p>
+            <div className="flex items-baseline gap-3">
+              <p className="text-3xl font-bold font-mono tabular-nums text-slate-50">{total}</p>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2 rounded-xl p-6 bg-slate-900 border border-slate-800 shadow-sm">
+            <p className="text-slate-400 text-sm font-medium uppercase tracking-wider">Average Quality Score</p>
+            <div className="flex items-baseline gap-3">
+              <p className="text-3xl font-bold font-mono tabular-nums text-emerald-400">
+                {items.length > 0
+                  ? (items.reduce((sum, i) => sum + (i.qualityScore ?? 0), 0) / items.filter(i => i.qualityScore != null).length || 0).toFixed(1)
+                  : '-'}
+                <span className="text-slate-500 text-xl">/5</span>
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2 rounded-xl p-6 bg-slate-900 border border-slate-800 shadow-sm">
+            <p className="text-slate-400 text-sm font-medium uppercase tracking-wider">Total Operational Cost</p>
+            <div className="flex items-baseline gap-3">
+              <p className="text-3xl font-bold font-mono tabular-nums text-slate-50">
+                {items.length > 0
+                  ? formatCost(items.reduce((sum, i) => sum + (i.totalCostMicro ?? 0), 0))
+                  : '-'}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Mobile severity filter chips */}
-      <div className="sm:hidden flex gap-2 px-4 py-3 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border-b border-slate-700/50" data-testid="mobile-severity-chips">
+      <div className="sm:hidden flex gap-2 px-4 py-3 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border-b border-slate-800" data-testid="mobile-severity-chips">
         {[
           { value: '', label: '전체', dot: '' },
           { value: 'failed', label: '에러', dot: 'bg-red-500' },
@@ -344,7 +377,7 @@ export function OpsLogPage() {
             className={`flex shrink-0 h-8 items-center justify-center rounded-full px-4 text-sm font-medium transition-colors ${
               statusFilter === chip.value
                 ? 'bg-cyan-400/20 border border-cyan-400 text-cyan-400'
-                : 'bg-slate-800 border border-transparent text-slate-300 hover:bg-slate-700'
+                : 'bg-slate-900 border border-transparent text-slate-300 hover:bg-slate-800'
             }`}
           >
             <span className="flex items-center gap-1.5">
@@ -356,12 +389,12 @@ export function OpsLogPage() {
       </div>
 
       {/* Desktop filters */}
-      <div className="hidden sm:flex px-6 py-3 border-b border-slate-700/50 flex-wrap gap-2 items-center" data-testid="filters-row">
+      <div className="hidden sm:flex px-4 md:px-10 py-3 border-b border-slate-800 flex-wrap gap-2 items-center" data-testid="filters-row">
         <input
           placeholder="검색..."
           value={searchInput}
           onChange={(e) => { setSearchInput(e.target.value); setPage(1) }}
-          className="bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-1.5 text-sm w-48"
+          className="bg-slate-900 border border-slate-700 focus:border-cyan-400 rounded-lg px-3 py-1.5 text-sm w-48 text-slate-50 placeholder:text-slate-500 outline-none"
           data-testid="search-input"
         />
         <input
@@ -411,7 +444,7 @@ export function OpsLogPage() {
           className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${
             bookmarkedOnly
               ? 'bg-amber-500/20 border-amber-500/50 text-amber-400'
-              : 'border-slate-600 text-slate-400 hover:bg-slate-800'
+              : 'border-slate-700 text-slate-400 hover:bg-slate-800'
           }`}
           data-testid="bookmark-filter"
         >
@@ -421,7 +454,7 @@ export function OpsLogPage() {
 
       {/* Filter chips */}
       {filterChips.length > 0 && (
-        <div className="px-6 py-2 border-b border-slate-700/30 flex flex-wrap gap-1.5">
+        <div className="px-4 md:px-10 py-2 border-b border-slate-800/50 flex flex-wrap gap-1.5">
           {filterChips.map(chip => (
             <span
               key={chip.key}
@@ -451,7 +484,7 @@ export function OpsLogPage() {
 
       {/* Selection info */}
       {selectedIds.size > 0 && (
-        <div className="px-6 py-2 bg-blue-600/10 border-b border-blue-500/20 flex items-center justify-between">
+        <div className="px-4 md:px-10 py-2 bg-blue-600/10 border-b border-blue-500/20 flex items-center justify-between">
           <span className="text-xs text-blue-400">
             {selectedIds.size}개 선택됨 {selectedIds.size < 2 && '(비교하려면 2개를 선택하세요)'}
           </span>
@@ -465,11 +498,11 @@ export function OpsLogPage() {
       )}
 
       {/* Table (desktop) + Card list (mobile) */}
-      <div className="flex-1 overflow-auto px-3 sm:px-6 py-3" data-testid="ops-table">
+      <div className="flex-1 overflow-auto px-4 md:px-10 py-3" data-testid="ops-table">
         {listQuery.isLoading ? (
           <div className="space-y-3" data-testid="ops-loading">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="h-10 bg-slate-800 animate-pulse rounded-lg" />
+              <div key={i} className="h-10 bg-slate-900 animate-pulse rounded-lg" />
             ))}
           </div>
         ) : items.length === 0 ? (
@@ -479,7 +512,7 @@ export function OpsLogPage() {
             <p className="text-xs text-slate-500 mt-1">사령관실에서 명령을 내리면 작전일지가 기록됩니다.</p>
             <button
               onClick={() => navigate('/command-center')}
-              className="mt-4 bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm"
+              className="mt-4 bg-cyan-400 hover:bg-cyan-400/90 text-slate-900 rounded-lg px-4 py-2 text-sm font-bold"
             >
               사령관실로 이동
             </button>
@@ -497,24 +530,23 @@ export function OpsLogPage() {
                 return (
                   <div
                     key={item.id}
-                    className="flex gap-0 bg-slate-800 border border-slate-700 rounded-lg overflow-hidden relative cursor-pointer active:bg-slate-700/50"
+                    className="flex gap-0 bg-slate-900 border border-slate-800 rounded-lg overflow-hidden relative cursor-pointer active:bg-slate-800/50"
                     onClick={() => setDetailId(item.id)}
                     data-testid={`ops-card-${item.id}`}
                   >
-                    {/* Severity bar */}
                     <div className={`w-1 shrink-0 ${severityColor}`} />
                     <div className="flex flex-col flex-1 py-3 px-3">
                       <div className="flex justify-between items-start mb-1">
                         <StatusBadge status={item.status} />
-                        <span className="font-mono text-xs text-slate-400">{formatTime(item.createdAt)}</span>
+                        <span className="font-mono tabular-nums text-xs text-slate-400">{formatTime(item.createdAt)}</span>
                       </div>
                       {item.targetAgentName && (
                         <p className="text-slate-400 text-xs font-medium mb-1">{item.targetAgentName}</p>
                       )}
                       <p className="font-mono text-slate-200 text-sm leading-tight break-all line-clamp-2">{item.text}</p>
                       <div className="flex items-center gap-3 mt-2">
-                        <span className="bg-slate-700 text-slate-300 text-[10px] px-1.5 py-0.5 rounded">{TYPE_LABELS[item.type] || item.type}</span>
-                        <span className="font-mono text-[10px] text-slate-500">{formatDuration(item.durationMs)}</span>
+                        <span className="bg-slate-800 text-slate-300 text-[10px] px-1.5 py-0.5 rounded">{TYPE_LABELS[item.type] || item.type}</span>
+                        <span className="font-mono tabular-nums text-[10px] text-slate-500">{formatDuration(item.durationMs)}</span>
                         {item.qualityScore != null && (
                           <div className="flex-1 max-w-[60px]">
                             <QualityBar score={item.qualityScore} />
@@ -534,62 +566,64 @@ export function OpsLogPage() {
             </div>
 
             {/* Desktop table */}
-            <div className="hidden sm:block overflow-x-auto">
-              <table className="w-full text-sm min-w-[800px]">
+            <div className="hidden sm:block overflow-hidden rounded-xl border border-slate-800 bg-slate-900 shadow-md overflow-x-auto">
+              <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="text-xs text-slate-500 border-b border-slate-700 font-medium">
-                    <th className="text-left py-2 pr-2 w-8">
+                  <tr className="bg-slate-900/50 border-b border-slate-800">
+                    <th className="px-4 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-8">
                       <span className="sr-only">선택</span>
                     </th>
-                    <th className="text-left py-2 pr-3">시간</th>
-                    <th className="text-left py-2 pr-3">명령</th>
-                    <th className="text-left py-2 pr-3">유형</th>
-                    <th className="text-left py-2 pr-3">상태</th>
-                    <th className="text-left py-2 pr-3">에이전트</th>
-                    <th className="text-left py-2 pr-3">품질</th>
-                    <th className="text-right py-2 pr-3">소요시간</th>
-                    <th className="text-center py-2 w-8">★</th>
-                    <th className="text-center py-2 w-8">
+                    <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-[180px]">Time</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-[80px]">Agent</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Operation</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Target</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-[120px]">Quality</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-[120px]">Cost</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-[140px]">Status</th>
+                    <th className="px-4 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-8">★</th>
+                    <th className="px-4 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-8">
                       <span className="sr-only">메뉴</span>
                     </th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-slate-800">
                   {items.map(item => (
                     <tr
                       key={item.id}
-                      className="border-b border-slate-800 hover:bg-slate-800/50 cursor-pointer transition-colors"
+                      className="hover:bg-slate-800/30 cursor-pointer transition-colors group"
                       onClick={() => setDetailId(item.id)}
                       data-testid={`ops-row-${item.id}`}
                     >
-                      <td className="py-2.5 pr-2" onClick={e => e.stopPropagation()}>
+                      <td className="px-4 py-4" onClick={e => e.stopPropagation()}>
                         <input
                           type="checkbox"
                           checked={selectedIds.has(item.id)}
                           onChange={() => toggleSelect(item.id)}
                           disabled={!selectedIds.has(item.id) && selectedIds.size >= 2}
-                          className="w-3.5 h-3.5 rounded border-slate-600 accent-blue-500"
+                          className="w-3.5 h-3.5 rounded border-slate-600 accent-cyan-400"
                         />
                       </td>
-                      <td className="py-2.5 pr-3 text-xs text-slate-500 whitespace-nowrap">{formatTime(item.createdAt)}</td>
-                      <td className="py-2.5 pr-3 text-xs text-slate-300 truncate max-w-[200px]" title={item.text}>{item.text}</td>
-                      <td className="py-2.5 pr-3">
-                        <span className="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded">{TYPE_LABELS[item.type] || item.type}</span>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-mono tabular-nums text-slate-300">{formatTime(item.createdAt)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="h-8 w-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-cyan-400">
+                          {(item.targetAgentName || '??').slice(0, 2).toUpperCase()}
+                        </div>
                       </td>
-                      <td className="py-2.5 pr-3">
+                      <td className="px-6 py-4 text-sm font-medium text-slate-200">{TYPE_LABELS[item.type] || item.type}</td>
+                      <td className="px-6 py-4 text-sm text-slate-400 font-mono truncate max-w-[200px]" title={item.text}>{item.text}</td>
+                      <td className="px-6 py-4 text-sm font-mono tabular-nums text-slate-300">
+                        {item.qualityScore != null ? `${item.qualityScore.toFixed(1)}/5` : '-'}
+                      </td>
+                      <td className="px-6 py-4 text-sm font-mono tabular-nums text-slate-300">{formatCost(item.totalCostMicro)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
                         <StatusBadge status={item.status} />
                       </td>
-                      <td className="py-2.5 pr-3 text-xs text-slate-400">{item.targetAgentName || '-'}</td>
-                      <td className="py-2.5 pr-3">
-                        <QualityBar score={item.qualityScore} />
-                      </td>
-                      <td className="py-2.5 pr-3 text-xs text-right text-slate-500">{formatDuration(item.durationMs)}</td>
-                      <td className="py-2.5 text-center" onClick={e => handleBookmarkToggle(item, e)}>
+                      <td className="px-4 py-4 text-center" onClick={e => handleBookmarkToggle(item, e)}>
                         <button className={`text-sm hover:scale-110 transition-transform ${item.isBookmarked ? 'text-amber-400' : 'text-slate-500'}`}>
                           {item.isBookmarked ? '★' : '☆'}
                         </button>
                       </td>
-                      <td className="py-2.5 text-center" onClick={e => e.stopPropagation()}>
+                      <td className="px-4 py-4 text-center" onClick={e => e.stopPropagation()}>
                         <RowMenu
                           onReplay={() => handleReplay(item.text)}
                           onCopy={() => handleCopy(item.text)}
@@ -606,13 +640,13 @@ export function OpsLogPage() {
 
       {/* Pagination */}
       {total > 0 && (
-        <div className="px-6 py-3 border-t border-slate-700 flex items-center justify-between" data-testid="pagination">
+        <div className="px-4 md:px-10 py-3 border-t border-slate-800 flex items-center justify-between" data-testid="pagination">
           <span className="text-xs text-slate-500">{total.toLocaleString()}건</span>
           <div className="flex items-center gap-2">
             <button
               disabled={page <= 1}
               onClick={() => setPage(p => p - 1)}
-              className="border border-slate-600 rounded-lg px-3 py-1.5 text-xs text-slate-300 disabled:opacity-30 hover:bg-slate-800"
+              className="border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-300 disabled:opacity-30 hover:bg-slate-800"
             >
               이전
             </button>
@@ -622,7 +656,7 @@ export function OpsLogPage() {
             <button
               disabled={page >= totalPages}
               onClick={() => setPage(p => p + 1)}
-              className="border border-slate-600 rounded-lg px-3 py-1.5 text-xs text-slate-300 disabled:opacity-30 hover:bg-slate-800"
+              className="border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-300 disabled:opacity-30 hover:bg-slate-800"
             >
               다음
             </button>
@@ -677,9 +711,16 @@ export function OpsLogPage() {
 // === Sub-components ===
 
 function StatusBadge({ status }: { status: string }) {
-  const colorClass = STATUS_COLORS[status] || 'bg-slate-700 text-slate-400'
+  const colorMap: Record<string, string> = {
+    completed: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
+    processing: 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
+    pending: 'bg-amber-500/10 text-amber-400 border border-amber-500/20',
+    failed: 'bg-red-500/10 text-red-400 border border-red-500/20',
+    cancelled: 'bg-slate-700 text-slate-400 border border-slate-600',
+  }
+  const colorClass = colorMap[status] || 'bg-slate-700 text-slate-400 border border-slate-600'
   const label = STATUS_LABELS[status] || status
-  return <span className={`text-xs px-2 py-0.5 rounded ${colorClass}`}>{label}</span>
+  return <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${colorClass}`}>{label}</span>
 }
 
 function QualityBar({ score }: { score: number | null }) {

@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { ConfirmDialog, toast } from '@corthex/ui'
 import { api } from '../lib/api'
 import { useAuthStore } from '../stores/auth-store'
+import { Search, Upload, MoreVertical, Download, Trash2, CloudUpload, FileText, Image, Table2, Film, FileCode, FileSpreadsheet, File, LayoutGrid, LayoutList } from 'lucide-react'
 
 type FileRecord = {
   id: string
@@ -15,16 +16,15 @@ type FileRecord = {
 
 type FileFilter = 'all' | 'images' | 'documents' | 'others'
 
-function getFileIcon(mimeType: string): { icon: string; colorClass: string } {
-  if (mimeType.startsWith('image/')) return { icon: '🖼', colorClass: 'text-blue-400' }
-  if (mimeType.includes('pdf')) return { icon: '📄', colorClass: 'text-red-400' }
-  if (mimeType.includes('sheet') || mimeType.includes('excel')) return { icon: '📊', colorClass: 'text-emerald-400' }
-  if (mimeType.includes('presentation') || mimeType.includes('powerpoint')) return { icon: '📑', colorClass: 'text-orange-400' }
-  if (mimeType.includes('word') || mimeType.includes('wordprocessing')) return { icon: '📝', colorClass: 'text-blue-400' }
-  if (mimeType.includes('json')) return { icon: '{ }', colorClass: 'text-amber-400' }
-  if (mimeType.includes('zip')) return { icon: '📦', colorClass: 'text-purple-400' }
-  if (mimeType.startsWith('text/')) return { icon: '📃', colorClass: 'text-slate-400' }
-  return { icon: '📄', colorClass: 'text-slate-400' }
+function getFileIcon(mimeType: string): { icon: React.ReactNode; bgClass: string; colorClass: string } {
+  if (mimeType.includes('pdf')) return { icon: <FileText className="w-6 h-6" />, bgClass: 'bg-red-500/10', colorClass: 'text-red-500' }
+  if (mimeType.startsWith('image/')) return { icon: <Image className="w-6 h-6" />, bgClass: 'bg-blue-500/10', colorClass: 'text-blue-500' }
+  if (mimeType.includes('sheet') || mimeType.includes('excel') || mimeType.includes('csv')) return { icon: <Table2 className="w-6 h-6" />, bgClass: 'bg-green-500/10', colorClass: 'text-green-500' }
+  if (mimeType.includes('video') || mimeType.includes('mp4')) return { icon: <Film className="w-6 h-6" />, bgClass: 'bg-purple-500/10', colorClass: 'text-purple-500' }
+  if (mimeType.includes('word') || mimeType.includes('wordprocessing')) return { icon: <FileText className="w-6 h-6" />, bgClass: 'bg-blue-400/10', colorClass: 'text-blue-400' }
+  if (mimeType.includes('json') || mimeType.includes('javascript') || mimeType.includes('typescript')) return { icon: <FileCode className="w-6 h-6" />, bgClass: 'bg-teal-500/10', colorClass: 'text-teal-500' }
+  if (mimeType.includes('markdown')) return { icon: <FileSpreadsheet className="w-6 h-6" />, bgClass: 'bg-slate-500/10', colorClass: 'text-slate-400' }
+  return { icon: <File className="w-6 h-6" />, bgClass: 'bg-slate-500/10', colorClass: 'text-slate-400' }
 }
 
 function formatBytes(bytes: number): string {
@@ -137,7 +137,7 @@ export function FilesPage() {
     }
   }, [queryClient])
 
-  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid')
   const [sortBy, setSortBy] = useState<'date' | 'name' | 'size'>('date')
 
   const files = data?.data || []
@@ -152,7 +152,7 @@ export function FilesPage() {
 
   return (
     <div
-      className="h-full overflow-y-auto bg-slate-900"
+      className="h-full overflow-y-auto bg-slate-950"
       onDragOver={handleDragOver}
       onDragEnter={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -163,167 +163,208 @@ export function FilesPage() {
       {dragOver && (
         <div className="fixed inset-0 z-40 bg-cyan-400/10 border-2 border-dashed border-cyan-400/50 flex items-center justify-center">
           <div className="text-center">
-            <div className="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">📂</span>
-            </div>
-            <p className="text-lg font-medium text-cyan-300">파일을 여기에 놓으세요</p>
-            <p className="text-sm text-cyan-400/70">최대 50MB</p>
+            <CloudUpload className="w-16 h-16 text-slate-500 mx-auto mb-4" />
+            <p className="text-lg font-bold text-slate-50 mb-1">Drag and drop files here</p>
+            <p className="text-sm text-slate-400">or click to browse from your computer</p>
           </div>
         </div>
       )}
 
-      <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 max-w-4xl mx-auto space-y-4">
-        {/* Header */}
+      <div className="w-full max-w-7xl mx-auto px-6 sm:px-10 py-8 flex flex-col gap-6">
+        {/* Page Title */}
         <div className="flex items-center justify-between" data-testid="files-header">
-          <h1 className="text-lg sm:text-xl font-bold text-slate-50 tracking-tight">파일 관리</h1>
+          <h1 className="text-[32px] font-bold leading-tight text-slate-50">Files (파일)</h1>
           <div>
             <input ref={fileInputRef} type="file" hidden onChange={handleUpload} />
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
-              className="bg-cyan-400/10 hover:bg-cyan-400/20 text-cyan-400 rounded-xl p-2.5 sm:px-4 sm:py-2 text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+              className="flex cursor-pointer items-center justify-center rounded bg-cyan-400 text-slate-900 text-sm font-bold h-9 px-5 hover:bg-cyan-400/90 transition-colors disabled:opacity-50"
               aria-label="파일 업로드"
               data-testid="upload-button"
             >
-              <span className="text-sm">↑</span>
-              <span className="hidden sm:inline">{isUploading ? '업로드 중...' : '파일 업로드'}</span>
+              <Upload className="w-[18px] h-[18px] mr-2" />
+              {isUploading ? '업로드 중...' : '업로드'}
             </button>
           </div>
         </div>
 
-        {/* Search bar (full width on mobile) */}
-        <div className="space-y-3" data-testid="files-filters">
-          <div className="relative">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+        {/* Filter Tabs */}
+        <div className="flex items-center gap-2" data-testid="files-filters">
+          {FILTER_OPTIONS.map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => setFilter(opt.value)}
+              className={`flex h-8 items-center justify-center rounded px-4 text-sm font-medium transition-colors ${
+                filter === opt.value
+                  ? 'bg-cyan-400 text-slate-900'
+                  : 'bg-slate-900 border border-slate-700 text-slate-50 hover:border-cyan-400/50'
+              }`}
+              data-testid={`filter-${opt.value}`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Search Bar */}
+        <div className="w-full">
+          <label className="flex items-center w-full h-12 bg-slate-900 border border-slate-700 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-cyan-400 focus-within:border-cyan-400 transition-shadow">
+            <Search className="w-5 h-5 text-slate-400 ml-4" />
             <input
+              className="w-full bg-transparent border-none text-sm px-3 focus:outline-none focus:ring-0 placeholder-slate-500 text-slate-50"
+              placeholder="Search files, formats, or uploaders..."
               type="text"
-              placeholder="파일 검색..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full sm:max-w-xs bg-slate-800/50 border border-slate-700 focus:border-cyan-400/50 focus:ring-1 focus:ring-cyan-400/50 rounded-xl pl-10 pr-3 py-2.5 text-sm text-slate-50 placeholder:text-slate-500 outline-none transition-all"
               data-testid="file-search"
             />
-          </div>
+          </label>
+        </div>
 
-          {/* Sort + View toggle */}
-          <div className="flex justify-between items-center">
-            <select
-              value={sortBy}
-              onChange={e => setSortBy(e.target.value as 'date' | 'name' | 'size')}
-              className="bg-transparent border-none text-sm font-medium text-slate-300 hover:text-cyan-400 transition-colors cursor-pointer p-0 focus:ring-0"
+        {/* Sort + View toggle */}
+        <div className="flex justify-between items-center">
+          <select
+            value={sortBy}
+            onChange={e => setSortBy(e.target.value as 'date' | 'name' | 'size')}
+            className="bg-transparent border-none text-sm font-medium text-slate-300 hover:text-cyan-400 transition-colors cursor-pointer p-0 focus:ring-0"
+          >
+            <option value="date">최근 생성일순</option>
+            <option value="name">이름순</option>
+            <option value="size">크기순</option>
+          </select>
+          <div className="flex gap-1">
+            <button
+              onClick={() => setViewMode('list')}
+              className={`p-1.5 rounded-lg transition-colors ${viewMode === 'list' ? 'text-cyan-400 bg-cyan-400/10' : 'text-slate-500 hover:bg-slate-800'}`}
+              aria-label="리스트 보기"
             >
-              <option value="date">최근 생성일순</option>
-              <option value="name">이름순</option>
-              <option value="size">크기순</option>
-            </select>
-            <div className="flex gap-1">
-              <button
-                onClick={() => setViewMode('list')}
-                className={`p-1.5 rounded-lg transition-colors ${viewMode === 'list' ? 'text-cyan-400 bg-cyan-400/10' : 'text-slate-500 hover:bg-slate-800'}`}
-                aria-label="리스트 보기"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
-              </button>
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-1.5 rounded-lg transition-colors ${viewMode === 'grid' ? 'text-cyan-400 bg-cyan-400/10' : 'text-slate-500 hover:bg-slate-800'}`}
-                aria-label="그리드 보기"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" /></svg>
-              </button>
-            </div>
-          </div>
-
-          {/* Filter Chips */}
-          <div className="flex gap-2 flex-wrap">
-            {FILTER_OPTIONS.map(opt => (
-              <button
-                key={opt.value}
-                onClick={() => setFilter(opt.value)}
-                className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
-                  filter === opt.value
-                    ? 'bg-cyan-400/20 text-cyan-400 border border-cyan-400/50'
-                    : 'bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700 hover:text-slate-200'
-                }`}
-                data-testid={`filter-${opt.value}`}
-              >
-                {opt.label}
-              </button>
-            ))}
+              <LayoutList className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`p-1.5 rounded-lg transition-colors ${viewMode === 'grid' ? 'text-cyan-400 bg-cyan-400/10' : 'text-slate-500 hover:bg-slate-800'}`}
+              aria-label="그리드 보기"
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
           </div>
         </div>
 
-        {/* File List */}
+        {/* Drop zone */}
+        <div
+          className="flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed border-slate-700 bg-slate-900/50 p-12 hover:border-cyan-400/50 transition-colors cursor-pointer"
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <CloudUpload className="w-10 h-10 text-slate-500" />
+          <div className="text-center">
+            <p className="text-lg font-bold text-slate-50 mb-1">Drag and drop files here</p>
+            <p className="text-sm text-slate-400">or click to browse from your computer</p>
+          </div>
+        </div>
+
+        {/* File List / Grid */}
         {isLoading ? (
-          <div className="space-y-2" data-testid="files-loading">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="h-16 bg-slate-800/50 border border-slate-700 rounded-xl animate-pulse" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-testid="files-loading">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="h-32 bg-slate-900 border border-slate-800 rounded-lg animate-pulse" />
             ))}
           </div>
         ) : filtered.length === 0 ? (
           search || filter !== 'all' ? (
             <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="files-empty-search">
-              <svg className="w-10 h-10 text-slate-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 4h.01" />
-              </svg>
+              <Search className="w-10 h-10 text-slate-600 mb-4" />
               <h3 className="text-base font-medium text-slate-300 mb-2">검색 결과가 없습니다</h3>
               <p className="text-sm text-slate-500">필터를 변경하거나 검색어를 수정해보세요</p>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-20 text-center" data-testid="files-empty">
-              <div className="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center mb-4">
-                <span className="text-3xl">📂</span>
-              </div>
+              <CloudUpload className="w-16 h-16 text-slate-600 mb-4" />
               <h3 className="text-base font-medium text-slate-300 mb-2">파일이 없습니다</h3>
               <p className="text-sm text-slate-500 mb-4">파일을 업로드하면 여기에 표시됩니다</p>
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                className="bg-cyan-400 hover:bg-cyan-400/90 text-slate-900 rounded-lg px-4 py-2 text-sm font-bold transition-colors"
               >
                 파일 업로드
               </button>
             </div>
           )
-        ) : viewMode === 'list' ? (
-          <div className="space-y-2 sm:space-y-1.5 pb-24 sm:pb-0" data-testid="files-list">
+        ) : viewMode === 'grid' ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-testid="files-grid">
             {filtered.map(file => {
-              const { icon, colorClass } = getFileIcon(file.mimeType)
-              const bgColor = file.mimeType.includes('pdf') ? 'bg-red-500/10'
-                : file.mimeType.includes('sheet') || file.mimeType.includes('excel') ? 'bg-emerald-500/10'
-                : file.mimeType.startsWith('image/') ? 'bg-violet-500/10'
-                : file.mimeType.includes('json') ? 'bg-amber-500/10'
-                : file.mimeType.includes('word') ? 'bg-blue-500/10'
-                : 'bg-slate-700/50'
+              const { icon, bgClass, colorClass } = getFileIcon(file.mimeType)
               return (
                 <div
                   key={file.id}
-                  className="flex items-center gap-3 p-3 rounded-xl border border-slate-700 bg-slate-800/50 hover:border-cyan-400/30 transition-colors group cursor-pointer"
+                  className="flex flex-col rounded-lg border border-slate-800 bg-slate-900 p-4 hover:border-cyan-400/50 transition-colors group cursor-pointer relative overflow-hidden"
+                  data-testid={`file-grid-${file.id}`}
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className={`size-10 rounded ${bgClass} ${colorClass} flex items-center justify-center`}>
+                      {icon}
+                    </div>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <a
+                        href={`/api/workspace/files/${file.id}/download`}
+                        download
+                        className="p-1 rounded hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors"
+                        title="다운로드"
+                        aria-label={`다운로드: ${file.filename}`}
+                        onClick={e => e.stopPropagation()}
+                      >
+                        <Download className="w-4 h-4" />
+                      </a>
+                      {file.userId === user?.id && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setDeleteTarget(file) }}
+                          className="p-1 rounded hover:bg-red-500/10 text-red-400 hover:text-red-300 transition-colors"
+                          title="삭제"
+                          aria-label={`삭제: ${file.filename}`}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                      <button className="text-slate-400 hover:text-cyan-400 transition-colors">
+                        <MoreVertical className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                  <h3 className="font-medium text-sm truncate mb-1 text-slate-50" title={file.filename}>{file.filename}</h3>
+                  <div className="flex items-center justify-between text-xs text-slate-400 mt-auto pt-2">
+                    <span className="font-mono tabular-nums">{formatBytes(file.sizeBytes)}</span>
+                    <span>{new Date(file.createdAt).toLocaleDateString('ko-KR')}</span>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        ) : (
+          <div className="space-y-2" data-testid="files-list">
+            {filtered.map(file => {
+              const { icon, bgClass, colorClass } = getFileIcon(file.mimeType)
+              return (
+                <div
+                  key={file.id}
+                  className="flex items-center gap-3 p-3 rounded-lg border border-slate-800 bg-slate-900 hover:border-cyan-400/30 transition-colors group cursor-pointer"
                   data-testid={`file-row-${file.id}`}
                 >
-                  {/* File Type Icon — larger on mobile */}
-                  <div className={`w-12 h-12 sm:w-10 sm:h-10 rounded-lg ${bgColor} flex items-center justify-center shrink-0 ${colorClass}`}>
-                    <span className="text-xl sm:text-lg">{icon}</span>
+                  <div className={`w-10 h-10 rounded ${bgClass} ${colorClass} flex items-center justify-center shrink-0`}>
+                    {icon}
                   </div>
-                  {/* File Info */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-100 truncate group-hover:text-cyan-400 transition-colors">{file.filename}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">{formatBytes(file.sizeBytes)} · {new Date(file.createdAt).toLocaleDateString('ko-KR')}</p>
+                    <p className="text-sm font-medium text-slate-50 truncate group-hover:text-cyan-400 transition-colors">{file.filename}</p>
+                    <p className="text-xs text-slate-500 mt-0.5 font-mono tabular-nums">{formatBytes(file.sizeBytes)} · {new Date(file.createdAt).toLocaleDateString('ko-KR')}</p>
                   </div>
-                  {/* Actions — visible on mobile, hover on desktop */}
-                  <div className="flex items-center gap-1 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                    <span className="font-mono text-xs text-slate-500 hidden sm:inline mr-2">{formatBytes(file.sizeBytes)}</span>
+                  <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                     <a
                       href={`/api/workspace/files/${file.id}/download`}
                       download
-                      className="p-2 rounded-lg hover:bg-slate-600 text-slate-400 hover:text-slate-200 transition-colors"
+                      className="p-2 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors"
                       title="다운로드"
                       aria-label={`다운로드: ${file.filename}`}
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                      </svg>
+                      <Download className="w-4 h-4" />
                     </a>
                     {file.userId === user?.id && (
                       <button
@@ -332,9 +373,7 @@ export function FilesPage() {
                         title="삭제"
                         aria-label={`삭제: ${file.filename}`}
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     )}
                   </div>
@@ -342,62 +381,18 @@ export function FilesPage() {
               )
             })}
           </div>
-        ) : (
-          /* Grid view */
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 pb-24 sm:pb-0" data-testid="files-grid">
-            {filtered.map(file => {
-              const { icon, colorClass } = getFileIcon(file.mimeType)
-              const bgColor = file.mimeType.includes('pdf') ? 'bg-red-500/10'
-                : file.mimeType.includes('sheet') || file.mimeType.includes('excel') ? 'bg-emerald-500/10'
-                : file.mimeType.startsWith('image/') ? 'bg-violet-500/10'
-                : file.mimeType.includes('json') ? 'bg-amber-500/10'
-                : file.mimeType.includes('word') ? 'bg-blue-500/10'
-                : 'bg-slate-700/50'
-              return (
-                <div
-                  key={file.id}
-                  className="flex flex-col items-center gap-2 p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:border-cyan-400/30 transition-colors cursor-pointer group"
-                  data-testid={`file-grid-${file.id}`}
-                >
-                  <div className={`w-14 h-14 rounded-xl ${bgColor} flex items-center justify-center ${colorClass}`}>
-                    <span className="text-2xl">{icon}</span>
-                  </div>
-                  <p className="text-xs font-medium text-slate-100 truncate w-full text-center group-hover:text-cyan-400 transition-colors">{file.filename}</p>
-                  <p className="text-[10px] font-mono text-slate-500">{formatBytes(file.sizeBytes)}</p>
-                </div>
-              )
-            })}
-          </div>
         )}
 
-        {/* Storage bar (mobile fixed bottom) */}
+        {/* Storage summary */}
         {files.length > 0 && (
-          <div className="sm:hidden fixed bottom-0 left-0 right-0 p-4 bg-slate-900 border-t border-slate-800 z-20">
-            <div className="rounded-xl border border-slate-800 bg-slate-800/80 p-3">
-              <div className="flex justify-between items-center mb-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-cyan-400 text-sm">☁</span>
-                  <h3 className="text-xs font-bold text-slate-100">스토리지</h3>
-                </div>
-                <span className="text-[10px] font-mono text-slate-400">{formatBytes(totalSize)} / 1 GB</span>
-              </div>
-              <div className="w-full h-1.5 bg-slate-700 rounded-full overflow-hidden">
-                <div className="h-full bg-cyan-400 rounded-full transition-all" style={{ width: `${storagePercent}%` }} />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Desktop storage summary */}
-        {files.length > 0 && (
-          <div className="hidden sm:flex items-center gap-4 px-1">
+          <div className="flex items-center gap-4 px-1">
             <span className="text-xs text-slate-500">{files.length}개 파일</span>
             <span className="text-xs text-slate-500">·</span>
             <span className="text-xs text-slate-500">총 {formatBytes(totalSize)}</span>
             <div className="flex-1 max-w-[200px] h-1.5 bg-slate-700 rounded-full overflow-hidden">
               <div className="h-full bg-cyan-400 rounded-full" style={{ width: `${storagePercent}%` }} />
             </div>
-            <span className="text-xs font-mono text-slate-500">{storagePercent}%</span>
+            <span className="text-xs font-mono tabular-nums text-slate-500">{storagePercent}%</span>
           </div>
         )}
       </div>
