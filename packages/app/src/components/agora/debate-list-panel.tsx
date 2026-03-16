@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { cn } from '@corthex/ui'
 import { api } from '../../lib/api'
+import { MessageCircle, History, Plus } from 'lucide-react'
 import type { Debate, DebateStatus } from '@corthex/shared'
 
 type Props = {
@@ -15,6 +16,13 @@ const STATUS_BADGE: Record<DebateStatus, { label: string; className: string }> =
   'in-progress': { label: '진행중', className: 'bg-amber-500/20 text-amber-400' },
   completed: { label: '완료', className: 'bg-emerald-500/20 text-emerald-400' },
   failed: { label: '실패', className: 'bg-red-500/20 text-red-400' },
+}
+
+const STATUS_DOT: Record<DebateStatus, string> = {
+  pending: 'bg-slate-500',
+  'in-progress': 'bg-emerald-500',
+  completed: 'bg-slate-500',
+  failed: 'bg-red-500',
 }
 
 const FILTER_LABELS: Record<string, string> = {
@@ -47,18 +55,12 @@ export function DebateListPanel({ selectedId, onSelect, onCreateNew }: Props) {
   return (
     <div data-testid="debate-list-panel" className="flex flex-col h-full">
       {/* Header */}
-      <div className="shrink-0 px-4 py-3 border-b border-slate-700">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-sm font-bold text-slate-100">AGORA 토론</h2>
-          <button
-            data-testid="debate-create-btn"
-            onClick={onCreateNew}
-            className="bg-blue-600 hover:bg-blue-500 text-white text-sm rounded-lg px-3 py-1.5 transition-colors"
-          >
-            + 새 토론
-          </button>
-        </div>
-        {/* Filter */}
+      <div className="shrink-0 p-4 border-b border-cyan-400/10">
+        <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Debates</h3>
+      </div>
+
+      {/* Filter */}
+      <div className="shrink-0 px-4 py-2 border-b border-cyan-400/10">
         <div className="flex gap-1">
           {(['all', 'in-progress', 'completed', 'failed'] as StatusFilter[]).map((f) => (
             <button
@@ -68,7 +70,7 @@ export function DebateListPanel({ selectedId, onSelect, onCreateNew }: Props) {
               className={cn(
                 'text-[10px] px-2 py-1 rounded-full transition-colors',
                 filter === f
-                  ? 'bg-blue-900/50 text-blue-300'
+                  ? 'bg-cyan-400/10 text-cyan-400'
                   : 'text-slate-400 hover:text-slate-300',
               )}
             >
@@ -82,7 +84,7 @@ export function DebateListPanel({ selectedId, onSelect, onCreateNew }: Props) {
       <div className="flex-1 overflow-y-auto">
         {isLoading && (
           <div className="flex items-center justify-center h-32">
-            <div className="w-5 h-5 border-2 border-slate-600 border-t-blue-500 rounded-full animate-spin" />
+            <div className="w-5 h-5 border-2 border-slate-600 border-t-cyan-400 rounded-full animate-spin" />
           </div>
         )}
 
@@ -92,44 +94,69 @@ export function DebateListPanel({ selectedId, onSelect, onCreateNew }: Props) {
             <p className="text-xs text-slate-500 mb-3">AGORA에서 에이전트 간 토론을 시작하세요</p>
             <button
               onClick={onCreateNew}
-              className="bg-blue-600 hover:bg-blue-500 text-white text-sm rounded-lg px-3 py-1.5 transition-colors"
+              className="bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 text-sm rounded-lg px-4 py-2 transition-colors flex items-center gap-2"
             >
+              <Plus className="w-4 h-4" />
               토론 시작
             </button>
           </div>
         )}
 
         {filtered.map((debate) => {
-          const badgeInfo = STATUS_BADGE[debate.status]
           const isSelected = debate.id === selectedId
+          const isActive = debate.status === 'in-progress'
+          const dotColor = STATUS_DOT[debate.status] ?? 'bg-slate-500'
           return (
             <button
               key={debate.id}
               data-testid={`debate-item-${debate.id}`}
               onClick={() => onSelect(debate)}
               className={cn(
-                'w-full text-left px-4 py-3 border-b border-slate-800 transition-colors',
+                'w-full flex items-center gap-4 px-4 min-h-[72px] py-2 justify-between cursor-pointer transition-colors border-l-4',
                 isSelected
-                  ? 'bg-blue-950/50'
-                  : 'hover:bg-slate-800/50',
+                  ? 'bg-cyan-400/10 border-cyan-400'
+                  : 'hover:bg-cyan-400/5 border-transparent',
               )}
             >
-              <div className="flex items-start justify-between gap-2 mb-1">
-                <p className="text-sm font-medium text-slate-100 line-clamp-1">{debate.topic}</p>
-                <span className={cn('shrink-0 text-[10px] px-1.5 py-0.5 rounded-full font-medium', badgeInfo.className)}>
-                  {badgeInfo.label}
-                </span>
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className={cn(
+                  'flex items-center justify-center rounded shrink-0 w-10 h-10',
+                  isActive
+                    ? 'bg-cyan-400/20 text-cyan-400'
+                    : 'bg-slate-800 text-slate-400',
+                )}>
+                  {isActive ? <MessageCircle className="w-5 h-5" /> : <History className="w-5 h-5" />}
+                </div>
+                <div className="flex flex-col justify-center min-w-0">
+                  <p className={cn(
+                    'text-sm font-medium leading-normal line-clamp-1',
+                    isSelected ? 'text-slate-100' : 'text-slate-300',
+                  )}>
+                    {debate.topic}
+                  </p>
+                  <p className="text-slate-500 text-xs font-normal leading-normal line-clamp-1">
+                    {debate.participants.length} participants
+                  </p>
+                </div>
               </div>
-              <div className="flex items-center gap-2 text-[10px] text-slate-400">
-                <span>{debate.debateType === 'deep-debate' ? '심층토론' : '토론'}</span>
-                <span>·</span>
-                <span>{debate.participants.length}명</span>
-                <span>·</span>
-                <span>{new Date(debate.createdAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}</span>
+              <div className="shrink-0 flex w-5 h-5 items-center justify-center">
+                <div className={cn('w-2 h-2 rounded-full', dotColor)} />
               </div>
             </button>
           )
         })}
+      </div>
+
+      {/* New Debate Button */}
+      <div className="mt-auto p-4 border-t border-cyan-400/10">
+        <button
+          data-testid="debate-create-btn"
+          onClick={onCreateNew}
+          className="w-full py-2 px-4 rounded-lg bg-cyan-400/20 text-cyan-400 hover:bg-cyan-400/30 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
+        >
+          <Plus className="w-4 h-4" />
+          New Debate
+        </button>
       </div>
     </div>
   )

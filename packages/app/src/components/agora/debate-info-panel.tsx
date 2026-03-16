@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { cn } from '@corthex/ui'
+import { StopCircle, Clock } from 'lucide-react'
 import type { Debate } from '@corthex/shared'
 import { DiffView } from './diff-view'
 
@@ -11,17 +12,17 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 const AVATAR_COLORS = [
-  'bg-blue-500/20 text-blue-400',
-  'bg-red-500/20 text-red-400',
-  'bg-purple-500/20 text-purple-400',
-  'bg-emerald-500/20 text-emerald-400',
-  'bg-amber-500/20 text-amber-400',
-  'bg-cyan-500/20 text-cyan-400',
-  'bg-pink-500/20 text-pink-400',
-  'bg-orange-500/20 text-orange-400',
+  { bg: 'bg-cyan-400/20', text: 'text-cyan-400', border: 'border-cyan-400/30' },
+  { bg: 'bg-violet-500/20', text: 'text-violet-400', border: 'border-violet-500/30' },
+  { bg: 'bg-amber-500/20', text: 'text-amber-400', border: 'border-amber-500/30' },
+  { bg: 'bg-emerald-500/20', text: 'text-emerald-400', border: 'border-emerald-500/30' },
+  { bg: 'bg-pink-500/20', text: 'text-pink-400', border: 'border-pink-500/30' },
+  { bg: 'bg-blue-500/20', text: 'text-blue-400', border: 'border-blue-500/30' },
+  { bg: 'bg-orange-500/20', text: 'text-orange-400', border: 'border-orange-500/30' },
+  { bg: 'bg-red-500/20', text: 'text-red-400', border: 'border-red-500/30' },
 ]
 
-function getColor(id: string): string {
+function getColor(id: string) {
   let hash = 0
   for (let i = 0; i < id.length; i++) hash = ((hash << 5) - hash + id.charCodeAt(i)) | 0
   return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length]
@@ -58,7 +59,7 @@ export function DebateInfoPanel({ debate }: { debate: Debate }) {
   return (
     <div data-testid="debate-info-panel" className="h-full flex flex-col overflow-hidden">
       {/* Tabs */}
-      <div className="shrink-0 flex border-b border-slate-700">
+      <div className="shrink-0 flex border-b border-cyan-400/10">
         {TAB_ITEMS.map((tab) => {
           const isDisabled = tab.value === 'diff' && !isDiffEnabled
           const isActive = activeTab === tab.value
@@ -71,7 +72,7 @@ export function DebateInfoPanel({ debate }: { debate: Debate }) {
               className={cn(
                 'flex-1 py-2.5 text-xs font-medium transition-colors border-b-2',
                 isActive
-                  ? 'border-blue-500 text-blue-400'
+                  ? 'border-cyan-400 text-cyan-400'
                   : 'border-transparent text-slate-400 hover:text-slate-300',
                 isDisabled && 'opacity-40 cursor-not-allowed',
               )}
@@ -97,50 +98,86 @@ export function DebateInfoPanel({ debate }: { debate: Debate }) {
 }
 
 function InfoContent({ debate }: { debate: Debate }) {
+  const isActive = debate.status === 'in-progress'
+
   return (
     <>
       {/* Header */}
-      <div className="px-4 py-3 border-b border-slate-700">
-        <h3 className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-2">
-          토론 정보
-        </h3>
-        <p className="text-sm font-medium text-slate-100">{debate.topic}</p>
+      <div className="p-6 border-b border-cyan-400/10">
+        <h3 className="text-lg font-semibold text-slate-100 mb-1">Debate Info</h3>
+        {isActive && (
+          <div className="flex items-center gap-2 text-emerald-500">
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-xs font-medium uppercase tracking-wider">Active Debate</span>
+          </div>
+        )}
+        {!isActive && (
+          <div className="flex items-center gap-2 text-slate-400">
+            <div className="w-2 h-2 rounded-full bg-slate-500" />
+            <span className="text-xs font-medium uppercase tracking-wider">
+              {STATUS_LABELS[debate.status] ?? debate.status}
+            </span>
+          </div>
+        )}
       </div>
 
-      <div className="px-4 py-3 space-y-4">
-        {/* Meta */}
-        <div className="space-y-2">
-          <InfoRow label="유형" value={debate.debateType === 'deep-debate' ? '심층토론 (3라운드)' : '토론 (2라운드)'} />
-          <InfoRow label="상태" value={STATUS_LABELS[debate.status] ?? debate.status} />
-          <InfoRow label="최대 라운드" value={String(debate.maxRounds)} />
-          <InfoRow label="진행 라운드" value={String(debate.rounds.length)} />
-          <InfoRow label="시작" value={formatDate(debate.startedAt)} />
-          <InfoRow label="완료" value={formatDate(debate.completedAt)} />
+      <div className="p-6 flex flex-col gap-6 flex-1">
+        {/* Duration placeholder */}
+        <div className="flex flex-col gap-2">
+          <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Duration</span>
+          <div className="flex items-center gap-2">
+            <Clock className="w-4 h-4 text-slate-500" />
+            <div className="font-mono text-2xl text-cyan-400 font-medium">
+              {debate.rounds.length > 0 ? `R${debate.rounds.length}/${debate.maxRounds}` : '--:--'}
+            </div>
+          </div>
         </div>
 
         {/* Participants */}
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-2">
-            참여자 ({debate.participants.length})
-          </p>
-          <div className="space-y-1.5">
-            {debate.participants.map((p) => (
-              <div key={p.agentId} data-testid={`debate-participant-${p.agentId}`} className="flex items-center gap-2">
-                <div
-                  className={cn(
-                    'w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold',
-                    getColor(p.agentId),
-                  )}
-                >
-                  {p.agentName[0]}
-                </div>
-                <div>
-                  <p className="text-xs text-slate-100">{p.agentName}</p>
-                  <p className="text-[10px] text-slate-400">{p.role}</p>
-                </div>
-              </div>
-            ))}
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold">
+              Participants ({debate.participants.length})
+            </span>
           </div>
+          <div className="flex flex-col gap-3">
+            {debate.participants.map((p) => {
+              const color = getColor(p.agentId)
+              return (
+                <div key={p.agentId} data-testid={`debate-participant-${p.agentId}`} className="flex items-center gap-3">
+                  <div className={cn(
+                    'rounded-full w-8 h-8 flex items-center justify-center text-[12px] font-bold border',
+                    color.bg,
+                    color.text,
+                    color.border,
+                  )}>
+                    {p.agentName[0]}
+                  </div>
+                  <span className="text-sm text-slate-300">{p.agentName}</span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Meta */}
+        <div className="flex flex-col gap-2">
+          <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Details</span>
+          <div className="space-y-2">
+            <InfoRow label="유형" value={debate.debateType === 'deep-debate' ? '심층토론 (3R)' : '토론 (2R)'} />
+            <InfoRow label="최대 라운드" value={String(debate.maxRounds)} />
+            <InfoRow label="진행 라운드" value={String(debate.rounds.length)} />
+            <InfoRow label="시작" value={formatDate(debate.startedAt)} />
+            <InfoRow label="완료" value={formatDate(debate.completedAt)} />
+          </div>
+        </div>
+
+        {/* Objective (topic as objective) */}
+        <div className="flex flex-col gap-2">
+          <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Objective</span>
+          <p className="text-sm text-slate-400 leading-relaxed bg-slate-800/50 p-3 rounded-lg border border-slate-700/50">
+            {debate.topic}
+          </p>
         </div>
 
         {/* Error */}
@@ -151,6 +188,16 @@ function InfoContent({ debate }: { debate: Debate }) {
           </div>
         )}
       </div>
+
+      {/* End debate button */}
+      {isActive && (
+        <div className="p-6 border-t border-cyan-400/10">
+          <button className="w-full py-3 px-4 rounded-lg bg-red-500/10 text-red-500 border border-red-500/30 hover:bg-red-500/20 transition-colors flex items-center justify-center gap-2 font-medium">
+            <StopCircle className="w-5 h-5" />
+            토론 종료 (End Debate)
+          </button>
+        </div>
+      )}
     </>
   )
 }

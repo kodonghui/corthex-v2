@@ -6,6 +6,7 @@ import { DebateListPanel } from '../components/agora/debate-list-panel'
 import { DebateTimeline } from '../components/agora/debate-timeline'
 import { DebateInfoPanel } from '../components/agora/debate-info-panel'
 import { CreateDebateModal } from '../components/agora/create-debate-modal'
+import { MessageSquare } from 'lucide-react'
 import type { Debate, DebateTimelineEntry } from '@corthex/shared'
 
 export function AgoraPage() {
@@ -69,9 +70,9 @@ export function AgoraPage() {
   }, [])
 
   return (
-    <div data-testid="agora-page" className="flex h-full bg-slate-900">
+    <div data-testid="agora-page" className="flex h-full bg-[#0b1416]">
       {/* Left panel: debate list (hidden on mobile when viewing detail) */}
-      <div className={`w-full md:w-72 md:shrink-0 border-r border-slate-700 ${mobileView === 'detail' ? 'hidden md:block' : ''}`}>
+      <div className={`w-full md:w-[280px] md:shrink-0 border-r border-cyan-400/20 bg-slate-950 ${mobileView === 'detail' ? 'hidden md:block' : ''}`}>
         <DebateListPanel
           selectedId={selectedDebate?.id ?? null}
           onSelect={handleSelectDebate}
@@ -80,38 +81,30 @@ export function AgoraPage() {
       </div>
 
       {/* Center panel: timeline */}
-      <div className={`flex-1 flex flex-col min-w-0 ${mobileView === 'list' ? 'hidden md:flex' : 'flex'}`}>
+      <div className={`flex-1 flex flex-col min-w-0 relative bg-[#0b1416] ${mobileView === 'list' ? 'hidden md:flex' : 'flex'}`}>
         {debate ? (
           <>
             {/* Mobile back button */}
-            <div className="md:hidden shrink-0 px-4 py-2 border-b border-slate-700">
+            <div className="md:hidden shrink-0 px-4 py-2 border-b border-cyan-400/10">
               <button
                 data-testid="debate-back-to-list-btn"
                 onClick={handleBackToList}
-                className="text-xs text-blue-400 hover:text-blue-300"
+                className="text-xs text-cyan-400 hover:text-cyan-300"
               >
                 ← 목록으로
               </button>
             </div>
 
-            {/* Topic header */}
-            <div data-testid="debate-topic-header" className="shrink-0 px-4 py-3 border-b border-slate-700">
-              <div className="flex items-center gap-2">
-                <h2 className="text-sm font-bold text-slate-100 truncate flex-1 min-w-0">{debate.topic}</h2>
+            {/* Topic header - sticky glass */}
+            <div data-testid="debate-topic-header" className="shrink-0 h-14 border-b border-cyan-400/10 flex items-center px-6 bg-slate-950/80 backdrop-blur-sm sticky top-0 z-10">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <h2 className="text-lg font-semibold text-slate-100 truncate">{debate.topic}</h2>
                 {debate.status === 'in-progress' && (
-                  <span className="flex items-center gap-1 text-[10px] text-emerald-500 shrink-0">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    진행중
-                  </span>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-xs font-medium text-emerald-500 uppercase tracking-wider">Active</span>
+                  </div>
                 )}
-              </div>
-              <div className="flex items-center gap-2 mt-1 flex-wrap">
-                <span className="inline-flex items-center rounded-md bg-cyan-400/10 px-2 py-0.5 text-[10px] font-medium text-cyan-400 ring-1 ring-inset ring-cyan-400/20">
-                  {debate.debateType === 'deep-debate' ? '심층토론' : '토론'}
-                </span>
-                <span className="text-[10px] text-slate-400">
-                  {debate.participants.length}명 · Round {debate.rounds.length}/{debate.maxRounds}
-                </span>
               </div>
             </div>
 
@@ -120,11 +113,11 @@ export function AgoraPage() {
 
             {/* Back to chat button (when debate completed and came from chat) */}
             {fromChat && debate.status === 'completed' && (
-              <div className="shrink-0 px-4 py-3 border-t border-slate-700">
+              <div className="shrink-0 px-4 py-3 border-t border-cyan-400/10 bg-slate-950">
                 <button
                   data-testid="back-to-chat-btn"
                   onClick={() => navigate('/chat')}
-                  className="w-full py-2 text-xs font-medium text-blue-400 hover:text-blue-300 bg-blue-500/10 hover:bg-blue-500/20 rounded-lg transition-colors"
+                  className="w-full py-2 text-xs font-medium text-cyan-400 hover:text-cyan-300 bg-cyan-400/10 hover:bg-cyan-400/20 rounded-lg transition-colors"
                 >
                   ← 사령관실로 돌아가기
                 </button>
@@ -133,9 +126,11 @@ export function AgoraPage() {
           </>
         ) : (
           <div className="flex-1 flex items-center justify-center text-slate-500">
-            <div className="text-center space-y-2">
-              <p className="text-3xl opacity-30">🗣️</p>
-              <p className="text-sm">토론을 선택하거나 새 토론을 시작하세요</p>
+            <div className="text-center space-y-3">
+              <div className="w-16 h-16 rounded-full bg-cyan-400/10 flex items-center justify-center mx-auto">
+                <MessageSquare className="w-7 h-7 text-cyan-400/50" />
+              </div>
+              <p className="text-sm text-slate-400">토론을 선택하거나 새 토론을 시작하세요</p>
             </div>
           </div>
         )}
@@ -143,7 +138,7 @@ export function AgoraPage() {
 
       {/* Right panel: debate info (desktop only) */}
       {debate && (
-        <div className="hidden lg:block w-72 shrink-0 border-l border-slate-700">
+        <div className="hidden lg:block w-[320px] shrink-0 border-l border-cyan-400/20 bg-slate-950">
           <DebateInfoPanel debate={debate} />
         </div>
       )}

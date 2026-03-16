@@ -151,7 +151,7 @@ export function DebateTimeline({ debate, timeline }: Props) {
     return (
       <div className="flex-1 flex items-center justify-center text-slate-500">
         <div className="text-center space-y-2">
-          <div className="w-5 h-5 border-2 border-slate-600 border-t-blue-500 rounded-full animate-spin mx-auto" />
+          <div className="w-5 h-5 border-2 border-slate-600 border-t-cyan-400 rounded-full animate-spin mx-auto" />
           <p className="text-xs">토론 시작 대기 중...</p>
         </div>
       </div>
@@ -159,17 +159,15 @@ export function DebateTimeline({ debate, timeline }: Props) {
   }
 
   return (
-    <div data-testid="debate-timeline" ref={scrollRef} onScroll={handleScroll} className="flex-1 overflow-y-auto p-4 space-y-4">
+    <div data-testid="debate-timeline" ref={scrollRef} onScroll={handleScroll} className="flex-1 overflow-y-auto p-6 pb-24 flex flex-col gap-6">
       {allEntries.map((entry, i) => {
         switch (entry.type) {
           case 'round-header':
             return (
-              <div key={`rh-${i}`} data-testid={`round-header-${entry.roundNum}`} className="flex items-center gap-3 py-2">
-                <div className="h-px flex-1 bg-slate-700" />
-                <span className="text-xs font-semibold text-slate-400">
+              <div key={`rh-${i}`} data-testid={`round-header-${entry.roundNum}`} className="flex justify-center my-2">
+                <span className="px-3 py-1 bg-cyan-400/10 text-cyan-400 text-xs rounded-full font-mono">
                   Round {entry.roundNum} / {entry.totalRounds}
                 </span>
-                <div className="h-px flex-1 bg-slate-700" />
               </div>
             )
           case 'speech':
@@ -186,8 +184,8 @@ export function DebateTimeline({ debate, timeline }: Props) {
             )
           case 'round-end':
             return (
-              <div key={`re-${i}`} className="text-center py-1">
-                <span className="text-[10px] text-slate-500">
+              <div key={`re-${i}`} className="flex justify-center py-1">
+                <span className="text-[10px] text-slate-500 font-mono">
                   Round {entry.roundNum} 완료 — {entry.speechCount}명 발언
                 </span>
               </div>
@@ -208,7 +206,7 @@ export function DebateTimeline({ debate, timeline }: Props) {
       {isLive && allEntries.length === 0 && (
         <div className="flex items-center justify-center h-full">
           <div className="text-center space-y-2 text-slate-400">
-            <div className="w-5 h-5 border-2 border-slate-600 border-t-blue-500 rounded-full animate-spin mx-auto" />
+            <div className="w-5 h-5 border-2 border-slate-600 border-t-cyan-400 rounded-full animate-spin mx-auto" />
             <p className="text-xs">토론 진행 중...</p>
           </div>
         </div>
