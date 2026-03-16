@@ -12,56 +12,63 @@ export function HandoffTracker({
   return (
     <div
       data-testid="handoff-tracker"
-      className="flex items-center gap-1.5 px-4 py-2 bg-slate-800/60 border-b border-slate-700/50"
+      className="relative pl-6 border-l border-slate-700 pb-2"
     >
-      <span className="text-xs text-slate-500 shrink-0 mr-1">위임:</span>
-      <div className="flex items-center gap-1 flex-wrap">
-        {chain.length > 0 ? (
-          chain.map((entry, i) => (
-            <span key={`${entry.toAgentId}-${i}`} className="flex items-center gap-1">
+      {chain.length > 0 ? (
+        chain.map((entry, i) => {
+          const isLast = i === chain.length - 1
+          const isDelegating = entry.status === 'delegating'
+          const isCompleted = entry.status === 'completed'
+          const isFailed = entry.status === 'failed'
+
+          return (
+            <div key={`${entry.toAgentId}-${i}`} className={`${isLast ? '' : 'mb-6'} relative`}>
+              {/* Timeline dot */}
+              <div className="absolute -left-[31px] bg-slate-900 p-1 rounded-full">
+                <div
+                  className={`size-3 rounded-full border-2 border-slate-900 ${
+                    isDelegating
+                      ? 'bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]'
+                      : isCompleted
+                        ? 'bg-slate-600'
+                        : isFailed
+                          ? 'bg-red-500'
+                          : 'bg-slate-600'
+                  }`}
+                />
+              </div>
+              {/* Agent info */}
               {i === 0 && (
-                <span className="text-xs font-medium text-slate-300">
-                  {entry.fromAgent}
-                </span>
+                <div className="mb-6 relative">
+                  <div className="absolute -left-[31px] bg-slate-900 p-1 rounded-full">
+                    <div className="size-3 rounded-full bg-slate-600 border-2 border-slate-900" />
+                  </div>
+                  <p className="text-xs font-bold text-slate-300">{entry.fromAgent}</p>
+                  <p className="text-[10px] text-slate-500 font-mono mt-0.5">Completed</p>
+                </div>
               )}
-              <svg
-                className="w-3 h-3 text-slate-600 shrink-0"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-              <span
-                className={`inline-flex items-center gap-1 text-xs font-medium px-1.5 py-0.5 rounded ${
-                  entry.status === 'delegating'
-                    ? 'text-blue-400 bg-blue-500/10'
-                    : entry.status === 'completed'
-                      ? 'text-emerald-400 bg-emerald-500/10'
-                      : 'text-red-400 bg-red-500/10'
-                }`}
-              >
-                {entry.status === 'delegating' && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-                )}
-                {entry.status === 'completed' && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                )}
-                {entry.status === 'failed' && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
-                )}
+              <p className={`text-xs font-bold ${
+                isDelegating ? 'text-slate-50' : isFailed ? 'text-red-400' : 'text-slate-500'
+              }`}>
                 {entry.toAgent}
-              </span>
-            </span>
-          ))
-        ) : processingAgent ? (
-          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-400">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-            {processingAgent} 분석 중...
-          </span>
-        ) : null}
-      </div>
+              </p>
+              <p className={`text-[10px] font-mono mt-0.5 ${
+                isDelegating ? 'text-cyan-400' : isFailed ? 'text-red-400' : 'text-slate-500'
+              }`}>
+                {isDelegating ? 'Processing...' : isCompleted ? 'Completed' : 'Failed'}
+              </p>
+            </div>
+          )
+        })
+      ) : processingAgent ? (
+        <div className="relative">
+          <div className="absolute -left-[31px] bg-slate-900 p-1 rounded-full">
+            <div className="size-3 rounded-full bg-cyan-400 border-2 border-slate-900 shadow-[0_0_8px_rgba(34,211,238,0.6)]" />
+          </div>
+          <p className="text-xs font-bold text-slate-50">{processingAgent}</p>
+          <p className="text-[10px] text-cyan-400 font-mono mt-0.5">Processing...</p>
+        </div>
+      ) : null}
     </div>
   )
 }
