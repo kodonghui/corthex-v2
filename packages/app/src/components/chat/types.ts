@@ -4,6 +4,9 @@ export type Agent = {
   role: string
   status: 'online' | 'working' | 'error' | 'offline'
   isSecretary: boolean
+  soul?: string
+  modelName?: string
+  allowedTools?: string[]
 }
 
 export type Session = {

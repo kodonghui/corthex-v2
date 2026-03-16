@@ -1,3 +1,13 @@
+// API Endpoints:
+// GET  /workspace/agents
+// GET  /workspace/chat/sessions
+// POST /workspace/chat/sessions { agentId }
+// POST /workspace/sketches { name, graphData }
+// PUT  /workspace/sketches/:id { graphData, name? }
+// GET  /workspace/sketches/:id
+// POST /workspace/sketches/import-knowledge/:docId
+// POST /workspace/ai/canvas-command { command, canvasContext }
+
 import { useCallback, useState, useEffect, useRef, useMemo } from 'react'
 import {
   ReactFlow,
@@ -212,10 +222,10 @@ function NexusPageInner() {
   // Canvas context for AI (serialized as text)
   const canvasContext = useMemo(() => canvasToText(nodes, edges), [nodes, edges])
 
-  // Selected node count (memoized to avoid repeated filter in render)
+  // Selected node count
   const selectedCount = useMemo(() => nodes.filter((n) => n.selected).length, [nodes])
 
-  // Node label change handler (for double-click editing)
+  // Node label change handler
   const handleLabelChange = useCallback(
     (nodeId: string, label: string) => {
       setNodes((nds) =>
@@ -263,7 +273,7 @@ function NexusPageInner() {
     [dirty, setNodes, setEdges, handleLabelChange, handleEdgeLabelChange, reactFlowInstance],
   )
 
-  // Import from knowledge by docId (Story 11.4 — creates new sketch linked to knowledge doc)
+  // Import from knowledge by docId
   const handleImportFromKnowledge = useCallback(
     async (docId: string) => {
       try {
@@ -297,7 +307,7 @@ function NexusPageInner() {
     [setNodes, setEdges, handleLabelChange, handleEdgeLabelChange, reactFlowInstance, queryClient],
   )
 
-  // === Load pending graph data from command center ===
+  // Load pending graph data from command center
   useEffect(() => {
     const pending = sessionStorage.getItem('pendingGraphData')
     if (pending) {
@@ -343,18 +353,15 @@ function NexusPageInner() {
     [setEdges, handleEdgeLabelChange],
   )
 
-  // Add node (from palette or context menu)
+  // Add node
   const handleAddNode = useCallback(
     (type: SvNodeType, position?: { x: number; y: number }) => {
       nodeCounter++
       const id = `sv-${type}-${Date.now()}-${nodeCounter}`
-
-      // If position is screen coords from context menu, convert to flow coords
       let flowPosition = position
       if (position && reactFlowInstance) {
         flowPosition = reactFlowInstance.screenToFlowPosition({ x: position.x, y: position.y })
       }
-
       const newNode: Node = {
         id,
         type,
@@ -371,7 +378,7 @@ function NexusPageInner() {
     [setNodes, handleLabelChange, reactFlowInstance],
   )
 
-  // Inject onLabelChange into all nodes and onEdgeLabelChange into all edges
+  // Inject handlers
   useEffect(() => {
     setNodes((nds) =>
       nds.map((n) => {
@@ -394,13 +401,12 @@ function NexusPageInner() {
     )
   }, [handleEdgeLabelChange, setEdges])
 
-  // Refs for current nodes/edges (avoids stale closures in WS handlers)
+  // Refs
   const nodesRef = useRef(nodes)
   nodesRef.current = nodes
   const edgesRef = useRef(edges)
   edgesRef.current = edges
 
-  // Track dirty state on node/edge changes
   const nodesChangeRef = useRef(onNodesChange)
   nodesChangeRef.current = onNodesChange
   const handleNodesChange = useCallback(
@@ -425,7 +431,7 @@ function NexusPageInner() {
     [],
   )
 
-  // === Space bar connection mode ===
+  // Space bar connection mode
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const isEditing = e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || (e.target instanceof HTMLElement && e.target.isContentEditable)
@@ -448,7 +454,6 @@ function NexusPageInner() {
     }
   }, [])
 
-  // Connection mode node click handler
   const handleNodeClickForConnection = useCallback(
     (_event: React.MouseEvent, node: Node) => {
       if (!connectionMode) return
@@ -470,16 +475,12 @@ function NexusPageInner() {
     [connectionMode, pendingSource, handleEdgeLabelChange, setEdges],
   )
 
-  // === Group/Ungroup ===
+  // Group/Ungroup
   const handleGroupSelected = useCallback(() => {
     const selected = nodes.filter((n) => n.selected && n.type !== 'group')
     if (selected.length < 2) return
-
-    // Save undo
     setUndoStack((prev) => [...prev.slice(-19), { nodes: [...nodes], edges: [...edges] }])
     setRedoStack([])
-
-    // Calculate bounding box using measured dimensions when available
     const bounds = selected.map((n) => {
       const w = (n.measured?.width as number | undefined) ?? 160
       const h = (n.measured?.height as number | undefined) ?? 80
@@ -489,7 +490,6 @@ function NexusPageInner() {
     const minY = Math.min(...bounds.map((b) => b.top)) - 40
     const maxX = Math.max(...bounds.map((b) => b.right)) + 20
     const maxY = Math.max(...bounds.map((b) => b.bottom)) + 20
-
     const groupId = `group-${Date.now()}`
     const groupNode: Node = {
       id: groupId,
@@ -498,19 +498,12 @@ function NexusPageInner() {
       data: { label: '서브그래프', onLabelChange: handleLabelChange },
       style: { width: maxX - minX, height: maxY - minY },
     }
-
-    // Reparent selected nodes
     const selectedIds = new Set(selected.map((n) => n.id))
     setNodes((nds) => [
       groupNode,
       ...nds.map((n) =>
         selectedIds.has(n.id)
-          ? {
-              ...n,
-              parentId: groupId,
-              position: { x: n.position.x - minX, y: n.position.y - minY },
-              selected: false,
-            }
+          ? { ...n, parentId: groupId, position: { x: n.position.x - minX, y: n.position.y - minY }, selected: false }
           : n,
       ),
     ])
@@ -521,26 +514,18 @@ function NexusPageInner() {
     (groupId: string) => {
       const groupNode = nodes.find((n) => n.id === groupId)
       if (!groupNode || groupNode.type !== 'group') return
-
-      // Save undo
       setUndoStack((prev) => [...prev.slice(-19), { nodes: [...nodes], edges: [...edges] }])
       setRedoStack([])
-
       const groupPos = groupNode.position
       setNodes((nds) =>
         nds
           .filter((n) => n.id !== groupId)
           .map((n) =>
             n.parentId === groupId
-              ? {
-                  ...n,
-                  parentId: undefined,
-                  position: { x: n.position.x + groupPos.x, y: n.position.y + groupPos.y },
-                }
+              ? { ...n, parentId: undefined, position: { x: n.position.x + groupPos.x, y: n.position.y + groupPos.y } }
               : n,
           ),
       )
-      // Remove edges connected to group node
       setEdges((eds) => eds.filter((e) => e.source !== groupId && e.target !== groupId))
       setDirty(true)
     },
@@ -569,7 +554,7 @@ function NexusPageInner() {
     setTimeout(() => reactFlowInstance?.fitView({ padding: 0.2 }), 100)
   }, [edges, setNodes, reactFlowInstance])
 
-  // Strip callback functions from graph data for serialization
+  // Clean graph data for serialization
   const getCleanGraphData = useCallback(() => {
     const cleanNodes = nodes.map(({ data, ...rest }) => {
       const { onLabelChange: _, ...cleanData } = data as Record<string, unknown>
@@ -593,7 +578,6 @@ function NexusPageInner() {
     }
   }, [currentSketchId, updateSketch, getCleanGraphData])
 
-  // Save as new
   const handleSaveNew = useCallback(() => {
     if (!saveNameInput.trim()) return
     saveSketch.mutate({
@@ -609,20 +593,15 @@ function NexusPageInner() {
         const res = await api.get<{ data: SketchDetail }>(`/workspace/sketches/${id}`)
         const sketch = res.data
         const graphData = sketch.graphData || { nodes: [], edges: [] }
-
-        // Restore nodes with label change handler
         const restoredNodes = (graphData.nodes || []).map((n: Node) => ({
           ...n,
           data: { ...n.data, onLabelChange: handleLabelChange },
         }))
-
-        // Restore edges with editable type and label change handler
         const restoredEdges = (graphData.edges || []).map((e: Edge) => ({
           ...e,
           type: e.type || 'editable',
           data: { ...e.data, onEdgeLabelChange: handleEdgeLabelChange },
         }))
-
         setNodes(restoredNodes)
         setEdges(restoredEdges)
         setCurrentSketchId(sketch.id)
@@ -668,7 +647,6 @@ function NexusPageInner() {
       setMermaidError(result.error)
       return
     }
-    // Inject callbacks into nodes and edges
     const importedNodes = result.nodes.map((n) => ({
       ...n,
       data: { ...n.data, onLabelChange: handleLabelChange },
@@ -686,701 +664,339 @@ function NexusPageInner() {
     setTimeout(() => reactFlowInstance?.fitView({ padding: 0.2 }), 100)
   }, [mermaidInput, handleLabelChange, handleEdgeLabelChange, setNodes, setEdges, reactFlowInstance])
 
-  // Mermaid export handler
-  const handleMermaidExport = useCallback(async () => {
-    const code = canvasToMermaid(nodes, edges)
-    try {
-      await navigator.clipboard.writeText(code)
-      setExportCopied(true)
-      setTimeout(() => setExportCopied(false), 2000)
-    } catch {
-      // Fallback: show in modal
-      setMermaidInput(code)
-      setShowMermaidModal(true)
-    }
+  // Mermaid export
+  const handleMermaidExport = useCallback(() => {
+    const mermaid = canvasToMermaid(nodes, edges)
+    navigator.clipboard.writeText(mermaid)
+    setExportCopied(true)
+    setTimeout(() => setExportCopied(false), 2000)
   }, [nodes, edges])
 
-  // === AI Canvas Command ===
-
-  const aiCommandMutation = useMutation({
-    mutationFn: (params: { command: string; graphData: { nodes: Node[]; edges: Edge[] } }) =>
-      api.post<{ data: { commandId: string; mermaid: string; description: string } }>(
-        '/workspace/sketches/ai-command',
-        params,
-      ),
-  })
-
-  const handleAiCommand = useCallback(async () => {
-    if (!aiCommand.trim() || aiLoading) return
-    setAiLoading(true)
-    setAiError('')
-    setAiPreview(null)
-
-    try {
-      const result = await aiCommandMutation.mutateAsync({
-        command: aiCommand.trim(),
-        graphData: getCleanGraphData(),
-      })
-
-      // Parse Mermaid response into preview nodes/edges
-      const parsed = mermaidToCanvas(result.data.mermaid)
-      if (parsed.error) {
-        setAiError(`Mermaid 파싱 오류: ${parsed.error}`)
-        return
-      }
-
-      // Inject callbacks into preview nodes/edges
-      const previewNodes = parsed.nodes.map((n) => ({
-        ...n,
-        data: { ...n.data, onLabelChange: handleLabelChange },
-      }))
-      const previewEdges = parsed.edges.map((e) => ({
-        ...e,
-        data: { ...e.data, onEdgeLabelChange: handleEdgeLabelChange },
-      }))
-
-      setAiPreview({
-        nodes: previewNodes,
-        edges: previewEdges,
-        description: result.data.description,
-      })
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'AI 명령 처리에 실패했습니다'
-      setAiError(message)
-    } finally {
-      setAiLoading(false)
-    }
-  }, [aiCommand, aiLoading, aiCommandMutation, getCleanGraphData, handleLabelChange, handleEdgeLabelChange])
-
-  // Apply AI preview
-  const handleApplyAiPreview = useCallback(() => {
-    if (!aiPreview) return
-    // Save current state to undo stack
+  // Delete selected nodes
+  const handleDeleteSelected = useCallback(() => {
+    const selectedIds = new Set(nodes.filter((n) => n.selected).map((n) => n.id))
+    if (selectedIds.size === 0) return
     setUndoStack((prev) => [...prev.slice(-19), { nodes: [...nodes], edges: [...edges] }])
     setRedoStack([])
-    // Apply preview
-    setNodes(aiPreview.nodes)
-    setEdges(aiPreview.edges)
+    setNodes((nds) => nds.filter((n) => !selectedIds.has(n.id)))
+    setEdges((eds) => eds.filter((e) => !selectedIds.has(e.source) && !selectedIds.has(e.target)))
     setDirty(true)
-    setAiPreview(null)
-    setAiCommand('')
-    setTimeout(() => reactFlowInstance?.fitView({ padding: 0.2 }), 100)
-  }, [aiPreview, nodes, edges, setNodes, setEdges, reactFlowInstance])
+  }, [nodes, edges, setNodes, setEdges])
 
-  // Cancel AI preview
-  const handleCancelAiPreview = useCallback(() => {
-    setAiPreview(null)
-  }, [])
-
-  // Undo
-  const handleUndo = useCallback(() => {
-    if (undoStack.length === 0) return
-    const prev = undoStack[undoStack.length - 1]
-    setRedoStack((r) => [...r, { nodes: [...nodes], edges: [...edges] }])
-    setUndoStack((u) => u.slice(0, -1))
-    // Restore with callbacks
-    setNodes(prev.nodes.map((n) => ({ ...n, data: { ...n.data, onLabelChange: handleLabelChange } })))
-    setEdges(prev.edges.map((e) => ({ ...e, data: { ...e.data, onEdgeLabelChange: handleEdgeLabelChange } })))
-    setDirty(true)
-  }, [undoStack, nodes, edges, setNodes, setEdges, handleLabelChange, handleEdgeLabelChange])
-
-  // Redo
-  const handleRedo = useCallback(() => {
-    if (redoStack.length === 0) return
-    const next = redoStack[redoStack.length - 1]
-    setUndoStack((u) => [...u, { nodes: [...nodes], edges: [...edges] }])
-    setRedoStack((r) => r.slice(0, -1))
-    setNodes(next.nodes.map((n) => ({ ...n, data: { ...n.data, onLabelChange: handleLabelChange } })))
-    setEdges(next.edges.map((e) => ({ ...e, data: { ...e.data, onEdgeLabelChange: handleEdgeLabelChange } })))
-    setDirty(true)
-  }, [redoStack, nodes, edges, setNodes, setEdges, handleLabelChange, handleEdgeLabelChange])
-
-  // === WebSocket nexus channel listener ===
-  const { subscribe, addListener, removeListener, isConnected } = useWsStore()
-
-  useEffect(() => {
-    if (!isConnected) return
-    subscribe('nexus')
-  }, [isConnected, subscribe])
-
-  useEffect(() => {
-    const handleNexusMessage = (data: unknown) => {
-      const msg = data as { type?: string; mermaid?: string; description?: string; error?: string; command?: string; toolName?: string }
-      if (!msg?.type) return
-
-      switch (msg.type) {
-        case 'canvas_ai_start':
-          setAiLoading(true)
-          setAiError('')
-          break
-        case 'canvas_update': {
-          if (!msg.mermaid) break
-          const parsed = mermaidToCanvas(msg.mermaid)
-          if (parsed.error) break
-          const pNodes = parsed.nodes.map((n) => ({
-            ...n,
-            data: { ...n.data, onLabelChange: handleLabelChange },
-          }))
-          const pEdges = parsed.edges.map((e) => ({
-            ...e,
-            data: { ...e.data, onEdgeLabelChange: handleEdgeLabelChange },
-          }))
-          setAiPreview({ nodes: pNodes, edges: pEdges, description: msg.description || '' })
-          setAiLoading(false)
-          break
-        }
-        case 'canvas_mcp_update': {
-          // MCP tool 발 업데이트 — 즉시 적용 (프리뷰 없음)
-          if (!msg.mermaid) break
-          const mcpParsed = mermaidToCanvas(msg.mermaid)
-          if (mcpParsed.error) break
-          // Undo 스택에 현재 상태 저장 (ref로 최신값 참조)
-          setUndoStack((prev) => [...prev.slice(-19), { nodes: [...nodesRef.current], edges: [...edgesRef.current] }])
-          setRedoStack([])
-          const mcpNodes = mcpParsed.nodes.map((n) => ({
-            ...n,
-            data: { ...n.data, onLabelChange: handleLabelChange },
-          }))
-          const mcpEdges = mcpParsed.edges.map((e) => ({
-            ...e,
-            data: { ...e.data, onEdgeLabelChange: handleEdgeLabelChange },
-          }))
-          setNodes(mcpNodes)
-          setEdges(mcpEdges)
-          setDirty(true)
-          break
-        }
-        case 'canvas_ai_error':
-          setAiError(msg.error || 'AI 오류')
-          setAiLoading(false)
-          break
-      }
-    }
-
-    addListener('nexus', handleNexusMessage)
-    return () => removeListener('nexus', handleNexusMessage)
-  }, [addListener, removeListener, handleLabelChange, handleEdgeLabelChange, setNodes, setEdges])
-
-  // Context menu action handler
-  const handleContextAction = useCallback(
-    (action: { type: string; nodeId?: string; nodeType?: SvNodeType; position?: { x: number; y: number } }) => {
-      setContextMenu(null)
-      switch (action.type) {
-        case 'edit-label': {
-          if (action.nodeId) {
-            setNodes((nds) =>
-              nds.map((n) =>
-                n.id === action.nodeId ? { ...n, selected: true } : { ...n, selected: false },
-              ),
-            )
-          }
-          break
-        }
-        case 'duplicate': {
-          if (action.nodeId) {
-            const sourceNode = nodes.find((n) => n.id === action.nodeId)
-            if (sourceNode) {
-              nodeCounter++
-              const id = `sv-${sourceNode.type}-${Date.now()}-${nodeCounter}`
-              const newNode: Node = {
-                id,
-                type: sourceNode.type,
-                position: {
-                  x: sourceNode.position.x + 30,
-                  y: sourceNode.position.y + 30,
-                },
-                data: {
-                  ...(sourceNode.data as Record<string, unknown>),
-                  label: `${(sourceNode.data as { label?: string })?.label || ''} (복사)`,
-                  onLabelChange: handleLabelChange,
-                },
-              }
-              setNodes((nds) => [...nds, newNode])
-              setDirty(true)
-            }
-          }
-          break
-        }
-        case 'delete': {
-          if (action.nodeId) {
-            setNodes((nds) => nds.filter((n) => n.id !== action.nodeId))
-            setEdges((eds) =>
-              eds.filter((e) => e.source !== action.nodeId && e.target !== action.nodeId),
-            )
-            setDirty(true)
-          }
-          break
-        }
-        case 'add-node': {
-          if (action.nodeType && action.position) {
-            handleAddNode(action.nodeType, action.position)
-          }
-          break
-        }
-        case 'group-selected': {
-          handleGroupSelected()
-          break
-        }
-        case 'ungroup': {
-          if (action.nodeId) {
-            handleUngroupNode(action.nodeId)
-          }
-          break
-        }
-      }
-    },
-    [nodes, setNodes, setEdges, handleLabelChange, handleAddNode, handleGroupSelected, handleUngroupNode],
-  )
-
+  // === RENDER ===
   return (
-    <div data-testid="nexus-page" className="h-full flex flex-col">
-      {/* 헤더 */}
-      <div className="px-3 py-2 border-b border-slate-700 flex items-center gap-2">
-        <h2 className="text-base font-semibold shrink-0 text-slate-50">SketchVibe</h2>
-
-        {currentSketchName && (
-          <span className="text-xs text-slate-400 truncate max-w-[120px]">
-            — {currentSketchName}{dirty ? ' *' : ''}
-          </span>
-        )}
-
-        {/* 저장 버튼 */}
-        <button
-          data-testid="nexus-save-btn"
-          onClick={handleSave}
-          disabled={nodes.length === 0}
-          className="px-2 py-1 text-xs bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded transition-colors"
-        >
-          저장
-        </button>
-
-        {/* 캔버스 목록 토글 */}
-        <button
-          data-testid="nexus-sidebar-toggle"
-          onClick={() => setShowSidebar(!showSidebar)}
-          className={`px-2 py-1 text-xs rounded transition-colors ${
-            showSidebar ? 'bg-blue-600 text-white' : 'bg-slate-700 hover:bg-slate-600 text-slate-300'
-          }`}
-        >
-          목록
-        </button>
-
-        {/* Mermaid Import */}
-        <button
-          data-testid="nexus-mermaid-import-btn"
-          onClick={() => { setMermaidInput(''); setMermaidError(''); setShowMermaidModal(true) }}
-          className="px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 rounded transition-colors"
-          title="Mermaid 코드 가져오기"
-        >
-          Mermaid
-        </button>
-
-        {/* Mermaid Export */}
-        <button
-          data-testid="nexus-mermaid-export-btn"
-          onClick={handleMermaidExport}
-          disabled={nodes.length === 0}
-          className="px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 text-slate-300 rounded transition-colors"
-          title="Mermaid 코드 내보내기"
-        >
-          {exportCopied ? '복사됨!' : '내보내기'}
-        </button>
-
-        {/* 지식 베이스에 저장 */}
-        <button
-          data-testid="nexus-kb-save-btn"
-          onClick={() => setShowExportKnowledge(true)}
-          disabled={nodes.length === 0 || !currentSketchId}
-          className="px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 text-slate-300 rounded transition-colors"
-          title="지식 베이스에 다이어그램 저장"
-        >
-          지식 저장
-        </button>
-
-        {/* Undo / Redo */}
-        <button
-          data-testid="nexus-undo-btn"
-          onClick={handleUndo}
-          disabled={undoStack.length === 0}
-          className="px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 text-slate-300 rounded transition-colors"
-          title="실행 취소"
-        >
-          ↩
-        </button>
-        <button
-          data-testid="nexus-redo-btn"
-          onClick={handleRedo}
-          disabled={redoStack.length === 0}
-          className="px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 text-slate-300 rounded transition-colors"
-          title="다시 실행"
-        >
-          ↪
-        </button>
-
-        {/* 에이전트 선택 */}
-        <select
-          data-testid="nexus-agent-select"
-          value={selectedAgentId || ''}
-          onChange={(e) => handleAgentSelect(e.target.value)}
-          className="text-xs bg-slate-800 border border-slate-700 rounded px-2 py-1 max-w-[140px] text-slate-200"
-        >
-          {agents.map((a) => (
-            <option key={a.id} value={a.id}>
-              {a.name}
-            </option>
-          ))}
-        </select>
-
-        <div className="flex-1" />
-
-        {/* 모바일 뷰 토글 */}
-        <div className="flex md:hidden gap-1">
+    <div className="flex h-screen w-full" style={{ fontFamily: "'Pretendard', sans-serif" }}>
+      {/* Sidebar */}
+      <div className="w-64 text-white flex flex-col h-full flex-shrink-0 z-20 shadow-lg" style={{ backgroundColor: '#5a7247' }}>
+        <div className="p-6 flex items-center gap-3 border-b" style={{ borderColor: '#4a5d23' }}>
+          <span className="material-symbols-outlined text-2xl">hub</span>
+          <h2 className="text-xl font-bold tracking-wide" style={{ fontFamily: "'Noto Serif KR', serif" }}>SketchVibe</h2>
+        </div>
+        <div className="p-6 flex flex-col gap-2">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="bg-white/20 aspect-square rounded-full" style={{ width: '40px', height: '40px' }}></div>
+            <div className="flex flex-col">
+              <h1 className="text-base font-bold" style={{ fontFamily: "'Noto Serif KR', serif" }}>CORTHEX v2</h1>
+              <p className="text-xs" style={{ color: '#c5d8a4' }}>AI Canvas Workspace</p>
+            </div>
+          </div>
+          <div className="flex flex-col gap-1 mt-4">
+            <button
+              onClick={handleNewCanvas}
+              className="flex items-center gap-3 px-4 py-3 rounded-2xl transition-colors"
+              style={{ backgroundColor: 'transparent' }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#6a8454')}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+            >
+              <span className="material-symbols-outlined text-xl">home</span>
+              <span className="text-sm font-medium">Home</span>
+            </button>
+            <button
+              onClick={() => setShowSidebar(!showSidebar)}
+              className="flex items-center gap-3 px-4 py-3 rounded-2xl shadow-inner"
+              style={{ backgroundColor: '#4a5d23' }}
+            >
+              <span className="material-symbols-outlined text-xl">folder</span>
+              <span className="text-sm font-medium">Workspaces</span>
+            </button>
+            <button
+              onClick={() => setShowMermaidModal(true)}
+              className="flex items-center gap-3 px-4 py-3 rounded-2xl transition-colors"
+              style={{ backgroundColor: 'transparent' }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#6a8454')}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+            >
+              <span className="material-symbols-outlined text-xl">dashboard</span>
+              <span className="text-sm font-medium">Templates</span>
+            </button>
+          </div>
+        </div>
+        <div className="mt-auto p-6 flex flex-col gap-1 border-t" style={{ borderColor: '#4a5d23' }}>
           <button
-            data-testid="nexus-mobile-canvas-tab"
-            onClick={() => setMobileView('canvas')}
-            className={`px-2 py-1 text-xs rounded ${
-              mobileView === 'canvas' ? 'bg-slate-700 text-white' : 'text-slate-400'
-            }`}
+            className="flex items-center gap-3 px-4 py-3 rounded-2xl transition-colors"
+            style={{ backgroundColor: 'transparent' }}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#6a8454')}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
           >
-            캔버스
+            <span className="material-symbols-outlined text-xl">settings</span>
+            <span className="text-sm font-medium">Settings</span>
           </button>
           <button
-            data-testid="nexus-mobile-chat-tab"
-            onClick={() => setMobileView('chat')}
-            className={`px-2 py-1 text-xs rounded ${
-              mobileView === 'chat' ? 'bg-slate-700 text-white' : 'text-slate-400'
-            }`}
+            className="flex items-center gap-3 px-4 py-3 rounded-2xl transition-colors"
+            style={{ backgroundColor: 'transparent' }}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#6a8454')}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
           >
-            채팅
+            <span className="material-symbols-outlined text-xl">help</span>
+            <span className="text-sm font-medium">Help</span>
           </button>
         </div>
-
-        {/* 데스크톱 채팅 토글 */}
-        <button
-          data-testid="nexus-chat-toggle"
-          onClick={() => setChatOpen(!chatOpen)}
-          className="hidden md:block px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 text-white rounded transition-colors"
-        >
-          {chatOpen ? '채팅 닫기' : '채팅 열기'}
-        </button>
       </div>
 
-      {/* 메인 영역 */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* 캔버스 목록 사이드바 */}
-        {showSidebar && (
-          <div data-testid="nexus-sidebar" className="w-52 border-r border-slate-800 shrink-0 hidden md:block">
-            <CanvasSidebar
-              currentSketchId={currentSketchId}
-              onLoad={handleLoadSketch}
-              onNew={handleNewCanvas}
-              onLoadFromKnowledge={handleLoadFromKnowledge}
-              onImportFromKnowledge={handleImportFromKnowledge}
-            />
+      {/* Main Canvas Area */}
+      <div className="flex-1 flex flex-col relative overflow-hidden" style={{ backgroundColor: '#faf8f5' }}>
+        {/* Top Bar */}
+        <header className="h-16 flex items-center justify-between px-8 absolute top-0 w-full z-10 pointer-events-none" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.05), transparent)' }}>
+          <div className="flex items-center gap-4 pointer-events-auto backdrop-blur-md px-4 py-2 rounded-2xl shadow-sm" style={{ backgroundColor: 'rgba(255,255,255,0.8)' }}>
+            <span className="text-sm font-medium" style={{ color: '#6a5d43' }}>
+              {currentSketchName || 'Untitled Canvas'}
+            </span>
+            {dirty && <span className="text-xs" style={{ color: '#c4622d' }}>(unsaved)</span>}
           </div>
-        )}
-
-        {/* 캔버스 */}
-        <div
-          data-testid="nexus-canvas"
-          className={`flex-1 flex flex-col relative ${
-            mobileView === 'chat' ? 'hidden md:flex' : 'flex'
-          }`}
-        >
-          {/* 캔버스 도구 모음 */}
-          <div className="absolute top-2 left-2 z-10 flex flex-col gap-1">
-            {/* 노드 추가 버튼 */}
-            <div className="relative">
-              <button
-                data-testid="nexus-node-palette-btn"
-                onClick={() => setShowToolbar(!showToolbar)}
-                className="px-3 py-2 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-lg transition-colors"
-              >
-                + 노드
-              </button>
-
-              {/* 팔레트 드롭다운 */}
-              {showToolbar && (
-                <div className="absolute top-full left-0 mt-1 bg-slate-900 border border-slate-700 rounded-lg shadow-xl p-2 w-44 z-50">
-                  {NODE_PALETTE.map((item) => (
-                    <button
-                      key={item.type}
-                      onClick={() => handleAddNode(item.type)}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-left hover:bg-slate-800 rounded transition-colors"
-                    >
-                      <span
-                        className={`w-5 h-5 rounded flex items-center justify-center text-white text-[10px] ${item.color}`}
-                      >
-                        {item.icon}
-                      </span>
-                      <span className="text-slate-200">{item.label}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* 자동 정렬 */}
-            <button
-              data-testid="nexus-auto-layout-btn"
-              onClick={handleAutoLayout}
-              className="px-3 py-2 text-xs bg-slate-700 hover:bg-slate-600 text-white rounded-lg shadow transition-colors"
-              title="자동 정렬"
-            >
-              ⟳ 정렬
-            </button>
-
-            {/* 초기화 */}
-            <button
-              data-testid="nexus-clear-btn"
-              onClick={handleClear}
-              className="px-3 py-2 text-xs bg-slate-700 hover:bg-slate-600 text-white rounded-lg shadow transition-colors"
-              title="초기화"
-            >
-              ✕ 초기화
-            </button>
-          </div>
-
-          {/* AI 프리뷰 오버레이 */}
-          {aiPreview && (
-            <div data-testid="nexus-ai-preview" className="absolute top-2 right-2 z-20 bg-slate-900/95 border border-blue-500 rounded-lg shadow-xl p-3 w-72">
-              <p className="text-xs text-blue-400 font-semibold mb-1">AI 제안</p>
-              <p className="text-xs text-slate-300 mb-3">{aiPreview.description}</p>
-              <div className="flex gap-2">
-                <button
-                  data-testid="nexus-ai-apply-btn"
-                  onClick={handleApplyAiPreview}
-                  className="flex-1 px-3 py-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors"
-                >
-                  적용
-                </button>
-                <button
-                  data-testid="nexus-ai-cancel-btn"
-                  onClick={handleCancelAiPreview}
-                  className="flex-1 px-3 py-1.5 text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-colors"
-                >
-                  취소
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* 캔버스 안내 (비어있을 때) */}
-          {nodes.length === 0 && !aiPreview && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-              <div className="text-center text-slate-500">
-                <p className="text-lg mb-2">여기에 그림을 그려보세요</p>
-                <p className="text-sm">왼쪽 위 &quot;+ 노드&quot; 버튼으로 노드를 추가하고,</p>
-                <p className="text-sm">드래그해서 연결하세요.</p>
-                <p className="text-sm mt-2">하단 AI 명령으로 자동 생성할 수도 있어요.</p>
-              </div>
-            </div>
-          )}
-
-          {/* ReactFlow 캔버스 */}
-          <div className="flex-1">
-            <ReactFlow
-              nodes={aiPreview ? aiPreview.nodes : nodes}
-              edges={aiPreview ? aiPreview.edges : edges}
-              onNodesChange={aiPreview ? undefined : handleNodesChange}
-              onEdgesChange={aiPreview ? undefined : handleEdgesChange}
-              onConnect={aiPreview ? undefined : onConnect}
-              onNodeClick={aiPreview ? undefined : handleNodeClickForConnection}
-              nodeTypes={sketchVibeNodeTypes}
-              edgeTypes={sketchVibeEdgeTypes}
-              defaultEdgeOptions={{ type: 'editable' }}
-              fitView
-              fitViewOptions={{ padding: 0.3 }}
-              minZoom={0.1}
-              maxZoom={3}
-              nodesDraggable={!aiPreview && !connectionMode}
-              nodesConnectable={!aiPreview}
-              deleteKeyCode={aiPreview ? [] : ['Backspace', 'Delete']}
-              multiSelectionKeyCode="Control"
-              panOnScroll
-              zoomOnPinch
-              proOptions={{ hideAttribution: true }}
-              onPaneClick={() => {
-                setShowToolbar(false)
-                setContextMenu(null)
-                if (connectionMode) setPendingSource(null)
-              }}
-              onNodeContextMenu={aiPreview ? undefined : (event, node) => handleContextMenu(event, node.id)}
-              onPaneContextMenu={aiPreview ? undefined : (event) => handleContextMenu(event as unknown as React.MouseEvent)}
-              className={connectionMode ? 'cursor-crosshair' : ''}
-            >
-              <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#3f3f46" />
-              <Controls />
-              <MiniMap
-                nodeStrokeWidth={3}
-                style={{ width: 120, height: 80 }}
-                className="!bg-slate-800 hidden md:block"
-              />
-            </ReactFlow>
-          </div>
-
-          {/* AI 명령 입력란 */}
-          <div className="px-3 py-2 border-t border-slate-800 bg-slate-900/90 flex items-center gap-2">
-            <span className="text-[10px] text-blue-400 font-semibold shrink-0">AI</span>
-            <input
-              data-testid="nexus-ai-input"
-              value={aiCommand}
-              onChange={(e) => setAiCommand(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleAiCommand() } }}
-              placeholder="예: DB 노드를 추가하고 API 서버에 연결해줘"
-              disabled={aiLoading}
-              className="flex-1 bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-slate-200 placeholder:text-slate-600 outline-none focus:border-blue-500 disabled:opacity-50"
-            />
-            <button
-              data-testid="nexus-ai-send-btn"
-              onClick={handleAiCommand}
-              disabled={!aiCommand.trim() || aiLoading}
-              className="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded transition-colors shrink-0"
-            >
-              {aiLoading ? '처리중...' : '전송'}
-            </button>
-          </div>
-
-          {/* AI 오류 표시 */}
-          {aiError && (
-            <div className="px-3 py-1 bg-red-900/30 border-t border-red-800">
-              <p className="text-[10px] text-red-400">{aiError}</p>
-            </div>
-          )}
-
-          {/* 하단 상태바 */}
-          <div data-testid="nexus-status-bar" className="px-3 py-1 border-t border-slate-800 bg-slate-900/80 flex items-center gap-3 text-[10px] text-slate-500">
-            <span>노드 {nodes.length}개</span>
-            <span>연결 {edges.length}개</span>
-            {selectedCount > 0 && (
-              <span className="text-blue-400">{selectedCount}개 선택됨</span>
-            )}
-            {connectionMode && (
-              <span className="text-cyan-400 font-semibold">
-                연결 모드 {pendingSource ? `(${pendingSource} →)` : '(노드 클릭)'}
+          <div className="flex items-center gap-4 pointer-events-auto">
+            {autoSaveToast && (
+              <span className="text-xs px-3 py-1 rounded-full" style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: '#5a7247' }}>
+                Auto-saved
               </span>
             )}
-            {dirty && <span className="text-amber-500">미저장</span>}
-            {autoSaveToast && <span className="text-emerald-400">자동 저장됨</span>}
-            {undoStack.length > 0 && <span className="text-slate-600">Undo {undoStack.length}</span>}
-            <span className="hidden sm:inline text-slate-500">Space: 연결 | Ctrl+클릭: 멀티선택 | 더블클릭: 편집 | Del: 삭제</span>
+            <button
+              onClick={handleSave}
+              className="text-white px-4 py-2 rounded-2xl text-sm font-medium shadow-md transition-colors"
+              style={{ backgroundColor: '#c4622d' }}
+            >
+              Save
+            </button>
+            <button
+              onClick={() => setShowExportKnowledge(true)}
+              className="text-white px-4 py-2 rounded-2xl text-sm font-medium shadow-md transition-colors"
+              style={{ backgroundColor: '#5a7247' }}
+            >
+              Share
+            </button>
           </div>
+        </header>
+
+        {/* Canvas Content */}
+        <div className="flex-1 w-full h-full relative cursor-move" style={{ backgroundImage: 'radial-gradient(#e5e1d3 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={handleNodesChange}
+            onEdgesChange={handleEdgesChange}
+            onConnect={onConnect}
+            onNodeClick={handleNodeClickForConnection}
+            onPaneContextMenu={(e) => handleContextMenu(e as unknown as React.MouseEvent)}
+            onNodeContextMenu={(e, node) => handleContextMenu(e as unknown as React.MouseEvent, node.id)}
+            nodeTypes={sketchVibeNodeTypes}
+            edgeTypes={sketchVibeEdgeTypes}
+            fitView
+            className="w-full h-full"
+          >
+            <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="#d1c9b2" />
+            <Controls
+              className="!rounded-2xl !border !shadow-md"
+              style={{ borderColor: '#e5e1d3', backgroundColor: '#ffffff' }}
+            />
+            <MiniMap
+              nodeStrokeWidth={3}
+              pannable
+              zoomable
+              style={{ backgroundColor: '#fbfaf8', border: '1px solid #e5e1d3', borderRadius: '12px' }}
+            />
+          </ReactFlow>
+
+          {/* Context Menu */}
+          {contextMenu && (
+            <ContextMenu
+              x={contextMenu.x}
+              y={contextMenu.y}
+              target={contextMenu.target}
+              nodeId={contextMenu.nodeId}
+              nodeType={contextMenu.nodeId ? nodes.find((n) => n.id === contextMenu.nodeId)?.type as string | undefined : undefined}
+              selectedCount={selectedCount}
+              onAction={(action) => {
+                switch (action.type) {
+                  case 'add-node':
+                    handleAddNode(action.nodeType, action.position)
+                    break
+                  case 'delete':
+                    setNodes((nds) => nds.filter((n) => n.id !== action.nodeId))
+                    setEdges((eds) => eds.filter((e) => e.source !== action.nodeId && e.target !== action.nodeId))
+                    setDirty(true)
+                    break
+                  case 'group-selected':
+                    handleGroupSelected()
+                    break
+                  case 'ungroup':
+                    handleUngroupNode(action.nodeId)
+                    break
+                  default:
+                    break
+                }
+                setContextMenu(null)
+              }}
+              onClose={() => setContextMenu(null)}
+            />
+          )}
         </div>
 
-        {/* 채팅 패널 */}
-        {(chatOpen || mobileView === 'chat') && (
-          <div
-            data-testid="nexus-chat-panel"
-            className={`border-l border-slate-800 flex flex-col ${
-              mobileView === 'canvas' ? 'hidden md:flex' : 'flex'
-            } w-full md:w-[380px] lg:w-[420px] shrink-0`}
+        {/* Canvas Controls (Zoom/Pan) */}
+        <div className="absolute bottom-24 right-8 flex flex-col gap-2 z-20">
+          <button
+            onClick={handleAutoLayout}
+            className="w-10 h-10 rounded-full shadow-md flex items-center justify-center border transition-colors"
+            style={{ backgroundColor: '#ffffff', borderColor: '#e5e1d3', color: '#6a5d43' }}
           >
-            <ChatArea
-              agent={selectedAgent}
-              sessionId={selectedSessionId}
-              canvasContext={canvasContext}
-            />
+            <span className="material-symbols-outlined text-xl">fit_screen</span>
+          </button>
+        </div>
+
+        {/* Floating Toolbar */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
+          <div className="rounded-full shadow-xl px-6 py-3 flex items-center gap-6 border" style={{ backgroundColor: '#ffffff', borderColor: '#e5e1d3' }}>
+            {Object.entries(NODE_PALETTE).slice(0, 4).map(([type, config]) => (
+              <button
+                key={type}
+                onClick={() => handleAddNode(type as SvNodeType)}
+                className="flex flex-col items-center gap-1 group"
+              >
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+                  style={{ backgroundColor: '#f2f0e9', color: '#6a5d43' }}
+                >
+                  <span className="material-symbols-outlined">{config.icon || 'smart_toy'}</span>
+                </div>
+                <span className="text-[10px] font-medium" style={{ color: '#9c8d66' }}>{config.label || type}</span>
+              </button>
+            ))}
+            <div className="w-px h-8" style={{ backgroundColor: '#e5e1d3' }}></div>
+            <button
+              onClick={handleMermaidExport}
+              className="flex flex-col items-center gap-1 group"
+            >
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+                style={{ backgroundColor: '#f2f0e9', color: '#6a5d43' }}
+              >
+                <span className="material-symbols-outlined">ios_share</span>
+              </div>
+              <span className="text-[10px] font-medium" style={{ color: '#9c8d66' }}>
+                {exportCopied ? 'Copied!' : 'Export'}
+              </span>
+            </button>
           </div>
-        )}
+        </div>
       </div>
 
-      {/* 컨텍스트 메뉴 */}
-      {contextMenu && (
-        <ContextMenu
-          x={contextMenu.x}
-          y={contextMenu.y}
-          target={contextMenu.target}
-          nodeId={contextMenu.nodeId}
-          nodeType={contextMenu.nodeId ? nodes.find((n) => n.id === contextMenu.nodeId)?.type : undefined}
-          selectedCount={selectedCount}
-          onAction={handleContextAction as (action: unknown) => void}
-          onClose={() => setContextMenu(null)}
+      {/* Chat Panel */}
+      {chatOpen && selectedAgent && selectedSessionId && (
+        <div className="w-96 border-l flex flex-col h-full" style={{ borderColor: '#e5e1d3', backgroundColor: '#fbfaf8' }}>
+          <ChatArea
+            agent={selectedAgent}
+            sessionId={selectedSessionId}
+            canvasContext={canvasContext}
+          />
+        </div>
+      )}
+
+      {/* Sidebar Panel */}
+      {showSidebar && (
+        <CanvasSidebar
+          onLoad={handleLoadSketch}
+          onNew={handleNewCanvas}
+          currentSketchId={currentSketchId}
+          onLoadFromKnowledge={handleLoadFromKnowledge}
+          onImportFromKnowledge={handleImportFromKnowledge}
         />
       )}
 
-      {/* 저장 다이얼로그 */}
+      {/* Save Dialog */}
       {showSaveDialog && (
-        <div data-testid="nexus-save-dialog" className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 w-80 shadow-2xl">
-            <h3 className="text-sm font-semibold text-slate-200 mb-3">캔버스 저장</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}>
+          <div className="rounded-2xl shadow-2xl p-6 w-96 mx-4" style={{ backgroundColor: '#ffffff', border: '1px solid #e5e1d3' }}>
+            <h3 className="text-sm font-semibold mb-3" style={{ color: '#463e30' }}>Save Canvas</h3>
             <input
-              autoFocus
+              type="text"
               value={saveNameInput}
               onChange={(e) => setSaveNameInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleSaveNew()
-                if (e.key === 'Escape') setShowSaveDialog(false)
-              }}
-              placeholder="캔버스 이름을 입력하세요"
-              className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-200 outline-none focus:border-blue-500"
+              placeholder="Canvas name"
+              className="w-full border rounded-lg px-3 py-2 text-sm mb-4 focus:outline-none focus:ring-1"
+              style={{ borderColor: '#e5e1d3', color: '#463e30', backgroundColor: '#fbfaf8' }}
+              autoFocus
             />
-            <div className="flex gap-2 mt-4 justify-end">
+            <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowSaveDialog(false)}
-                className="px-3 py-1.5 text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg"
+                className="border rounded-lg px-4 py-2 text-sm transition-colors"
+                style={{ borderColor: '#e5e1d3', color: '#6a5d43' }}
               >
-                취소
+                Cancel
               </button>
               <button
                 onClick={handleSaveNew}
-                disabled={!saveNameInput.trim()}
-                className="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-lg"
+                className="text-white rounded-lg px-4 py-2 text-sm font-medium"
+                style={{ backgroundColor: '#5a7247' }}
               >
-                저장
+                Save
               </button>
             </div>
           </div>
         </div>
       )}
-      {/* Mermaid Import 모달 */}
+
+      {/* Mermaid Import Modal */}
       {showMermaidModal && (
-        <div data-testid="nexus-mermaid-modal" className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 w-[480px] max-w-[90vw] shadow-2xl">
-            <h3 className="text-sm font-semibold text-slate-200 mb-3">Mermaid 코드 가져오기</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}>
+          <div className="rounded-2xl shadow-2xl p-6 w-[500px] mx-4" style={{ backgroundColor: '#ffffff', border: '1px solid #e5e1d3' }}>
+            <h3 className="text-sm font-semibold mb-3" style={{ color: '#463e30' }}>Import Mermaid</h3>
             <textarea
-              autoFocus
               value={mermaidInput}
               onChange={(e) => { setMermaidInput(e.target.value); setMermaidError('') }}
-              placeholder={`flowchart TD\n  A([시작])\n  B[에이전트]\n  A --> B`}
-              rows={10}
-              className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-200 font-mono outline-none focus:border-blue-500 resize-y"
+              placeholder="Paste Mermaid code here..."
+              rows={8}
+              className="w-full border rounded-lg px-3 py-2 text-sm mb-2 font-mono focus:outline-none focus:ring-1"
+              style={{ borderColor: '#e5e1d3', color: '#463e30', backgroundColor: '#fbfaf8' }}
             />
             {mermaidError && (
-              <p className="mt-2 text-xs text-red-400">{mermaidError}</p>
+              <p className="text-xs mb-2" style={{ color: '#ef4444' }}>{mermaidError}</p>
             )}
-            <div className="flex gap-2 mt-4 justify-end">
+            <div className="flex justify-end gap-2">
               <button
-                onClick={() => setShowMermaidModal(false)}
-                className="px-3 py-1.5 text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg"
+                onClick={() => { setShowMermaidModal(false); setMermaidInput(''); setMermaidError('') }}
+                className="border rounded-lg px-4 py-2 text-sm"
+                style={{ borderColor: '#e5e1d3', color: '#6a5d43' }}
               >
-                취소
+                Cancel
               </button>
               <button
                 onClick={handleMermaidImport}
-                disabled={!mermaidInput.trim()}
-                className="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-lg"
+                className="text-white rounded-lg px-4 py-2 text-sm font-medium"
+                style={{ backgroundColor: '#5a7247' }}
               >
-                적용
+                Import
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* 지식 베이스 내보내기 다이얼로그 */}
-      {showExportKnowledge && currentSketchId && (
+      {/* Export Knowledge Dialog */}
+      {showExportKnowledge && (
         <ExportKnowledgeDialog
-          sketchId={currentSketchId}
-          sketchName={currentSketchName || '새 다이어그램'}
+          sketchId={currentSketchId || ''}
+          sketchName={currentSketchName}
           onClose={() => setShowExportKnowledge(false)}
         />
-      )}
-
-      {/* 자동 저장 토스트 */}
-      {autoSaveToast && (
-        <div data-testid="nexus-autosave-toast" className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 bg-emerald-800/90 text-emerald-200 text-xs rounded-lg shadow-lg animate-pulse">
-          자동 저장됨
-        </div>
       )}
     </div>
   )

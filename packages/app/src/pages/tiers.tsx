@@ -1,3 +1,10 @@
+// API Endpoints:
+// GET    /admin/tier-configs
+// POST   /admin/tier-configs
+// PATCH  /admin/tier-configs/:id
+// DELETE /admin/tier-configs/:id
+// PUT    /admin/tier-configs/reorder
+
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
@@ -30,7 +37,11 @@ const MODEL_OPTIONS = [
   { value: 'claude-haiku-4-5', label: 'Claude Haiku 4.5 (경제적)', shortLabel: 'Haiku', inputCost: '$0.25', outputCost: '$1.25' },
 ]
 
-const TIER_ICONS = ['👑', '🏷️', '⚙️'] // crown for top, tag for mid, gear for worker
+const TIER_BADGE_STYLES: Record<number, { bg: string; label: string }> = {
+  0: { bg: '#e2b042', label: 'Manager' },
+  1: { bg: '#5a7247', label: 'Specialist' },
+  2: { bg: '#64748b', label: 'Worker' },
+}
 
 // ── Tier Form ──
 
@@ -143,6 +154,7 @@ export function TiersPage() {
   const [createOpen, setCreateOpen] = useState(false)
   const [editTier, setEditTier] = useState<TierConfig | null>(null)
   const [deleteTier, setDeleteTier] = useState<TierConfig | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
 
   // Fetch tier configs
   const { data, isLoading, isError, refetch } = useQuery({
@@ -211,6 +223,11 @@ export function TiersPage() {
     reorderMutation.mutate(order)
   }
 
+  const getModelShortLabel = (model: string) => {
+    const opt = MODEL_OPTIONS.find(o => o.value === model)
+    return opt ? opt.shortLabel : model
+  }
+
   const getModelLabel = (model: string) => {
     const opt = MODEL_OPTIONS.find(o => o.value === model)
     return opt ? opt.label : model
@@ -232,232 +249,267 @@ export function TiersPage() {
   // Error state
   if (isError) {
     return (
-      <div data-testid="tiers-page" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="bg-red-900/20 border border-red-700/50 rounded-xl p-6 text-center">
-          <p className="text-sm text-red-400">계층 목록을 불러올 수 없습니다</p>
-          <button onClick={() => refetch()} className="text-xs text-red-500 hover:text-red-400 underline mt-2">
-            다시 시도
-          </button>
+      <div data-testid="tiers-page" style={{ backgroundColor: '#faf8f5' }} className="min-h-screen">
+        <div className="max-w-7xl mx-auto px-6 md:px-20 py-10">
+          <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+            <p className="text-sm text-red-600">계층 목록을 불러올 수 없습니다</p>
+            <button onClick={() => refetch()} className="text-xs text-red-500 hover:text-red-400 underline mt-2">
+              다시 시도
+            </button>
+          </div>
         </div>
       </div>
     )
   }
 
+  const getTierBadge = (index: number) => {
+    const style = TIER_BADGE_STYLES[Math.min(index, 2)]
+    return style
+  }
+
   return (
-    <div data-testid="tiers-page" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-lg sm:text-xl font-bold text-slate-50">계층 관리</h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            {tiers.length}개 계층 (N-Tier 동적 관리)
-          </p>
-        </div>
-        <Button size="sm" onClick={() => setCreateOpen(true)}>
-          + 계층 추가
-        </Button>
-      </div>
-
-      {/* Empty state */}
-      {tiers.length === 0 && (
-        <EmptyState
-          title="계층이 없습니다"
-          description="첫 계층을 생성하여 에이전트 등급을 구성하세요"
-        />
-      )}
-
-      {/* Tier hierarchy cards (mobile) with connector lines */}
-      {tiers.length > 0 && (
-        <div className="md:hidden flex flex-col items-center gap-0">
-          {tiers.map((tier, index) => {
-            const isFirst = index === 0
-            const icon = TIER_ICONS[Math.min(index, TIER_ICONS.length - 1)]
-            return (
-              <div key={tier.id} className="w-full flex flex-col items-center">
-                {/* Connector line between cards */}
-                {index > 0 && (
-                  <div className="w-px h-6 bg-slate-700 my-[-0.25rem] relative z-0" />
-                )}
-                {/* Tier label for first card */}
-                {isFirst && (
-                  <div className="text-xs font-semibold text-cyan-400 uppercase tracking-wider mb-2">Top-Level Authority</div>
-                )}
-                <div
-                  data-testid={`tier-row-${tier.id}`}
-                  className={`w-full rounded-xl p-5 flex flex-col gap-3 relative z-10 ${
-                    isFirst
-                      ? 'bg-slate-800/80 border-2 border-cyan-400 shadow-lg'
-                      : 'bg-slate-800/80 border border-slate-700 shadow-md'
-                  }`}
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-xl ${
-                        isFirst ? 'bg-cyan-400/20' : 'bg-slate-700'
-                      }`}>
-                        {icon}
-                      </div>
-                      <div>
-                        <h2 className={`font-bold ${isFirst ? 'text-lg' : 'text-base'}`}>T{tier.tierLevel}: {tier.name}</h2>
-                        {tier.description && (
-                          <p className="text-xs text-slate-400">{tier.description}</p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => setEditTier(tier)}
-                        className="px-2 py-1 text-xs text-slate-500 hover:bg-slate-700 rounded-lg transition-colors"
-                      >
-                        편집
-                      </button>
-                    </div>
-                  </div>
-                  {/* Model info card */}
-                  <div className="bg-slate-900/80 rounded-lg p-3 border border-slate-700 font-mono text-xs flex flex-col gap-1.5">
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Model:</span>
-                      <span className={isFirst ? 'text-cyan-400 font-medium' : 'text-slate-200'}>{getModelLabel(tier.modelPreference).split(' (')[0]}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">도구 제한:</span>
-                      <span>{tier.maxTools === 0 ? '무제한' : `${tier.maxTools}개`}</span>
-                    </div>
-                  </div>
-                  {/* Reorder + delete row */}
-                  <div className="flex items-center justify-between pt-1">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => handleMoveUp(index)}
-                        disabled={index === 0 || reorderMutation.isPending}
-                        className="px-2 py-1 text-xs text-slate-500 hover:text-slate-400 disabled:opacity-30 border border-slate-700 rounded"
-                      >
-                        ▲
-                      </button>
-                      <button
-                        onClick={() => handleMoveDown(index)}
-                        disabled={index === tiers.length - 1 || reorderMutation.isPending}
-                        className="px-2 py-1 text-xs text-slate-500 hover:text-slate-400 disabled:opacity-30 border border-slate-700 rounded"
-                      >
-                        ▼
-                      </button>
-                    </div>
-                    <button
-                      onClick={() => setDeleteTier(tier)}
-                      className="px-2 py-1 text-xs text-red-500 hover:bg-red-900/20 rounded transition-colors"
-                    >
-                      삭제
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-
-          {/* Add tier placeholder button (mobile) */}
-          <div className="w-px h-6 bg-slate-700 my-[-0.25rem]" />
-          <button
-            onClick={() => setCreateOpen(true)}
-            className="w-full border-2 border-dashed border-slate-700 hover:border-cyan-400 rounded-xl p-4 flex flex-col items-center justify-center gap-2 text-slate-500 hover:text-cyan-400 transition-colors"
-          >
-            <span className="text-xl">+</span>
-            <span className="text-sm font-medium">새 티어 추가</span>
-          </button>
-        </div>
-      )}
-
-      {/* Tier list — desktop (ordered by tierLevel) */}
-      {tiers.length > 0 && (
-        <div className="hidden md:block space-y-2">
-          {tiers.map((tier, index) => (
-            <div
-              key={tier.id}
-              data-testid={`tier-row-${tier.id}`}
-              className="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 hover:border-slate-700 transition-colors"
-            >
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                {/* Reorder buttons */}
-                <div className="flex flex-col gap-0.5 shrink-0">
-                  <button
-                    onClick={() => handleMoveUp(index)}
-                    disabled={index === 0 || reorderMutation.isPending}
-                    className="px-1 py-0.5 text-xs text-slate-500 hover:text-slate-400 disabled:opacity-30 disabled:cursor-not-allowed"
-                    aria-label="위로 이동"
-                  >
-                    ▲
-                  </button>
-                  <button
-                    onClick={() => handleMoveDown(index)}
-                    disabled={index === tiers.length - 1 || reorderMutation.isPending}
-                    className="px-1 py-0.5 text-xs text-slate-500 hover:text-slate-400 disabled:opacity-30 disabled:cursor-not-allowed"
-                    aria-label="아래로 이동"
-                  >
-                    ▼
-                  </button>
-                </div>
-
-                {/* Tier info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="default">Lv.{tier.tierLevel}</Badge>
-                    <h3 className="text-sm font-medium text-slate-50 truncate">{tier.name}</h3>
-                  </div>
-                  <div className="flex items-center gap-3 mt-0.5">
-                    <span className="text-xs text-slate-500">{getModelLabel(tier.modelPreference)}</span>
-                    <span className="text-xs text-slate-500">
-                      도구: {tier.maxTools === 0 ? '무제한' : `${tier.maxTools}개`}
-                    </span>
-                  </div>
-                  {tier.description && (
-                    <p className="text-xs text-slate-500 mt-0.5 truncate">{tier.description}</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-1 ml-4 shrink-0">
-                <button
-                  onClick={() => setEditTier(tier)}
-                  className="px-2.5 py-1.5 text-xs text-slate-500 hover:bg-slate-800 rounded-lg transition-colors"
-                  aria-label={`${tier.name} 편집`}
-                >
-                  편집
-                </button>
-                <button
-                  onClick={() => setDeleteTier(tier)}
-                  className="px-2.5 py-1.5 text-xs text-red-500 hover:bg-red-900/20 rounded-lg transition-colors"
-                  aria-label={`${tier.name} 삭제`}
-                >
-                  삭제
-                </button>
-              </div>
+    <div data-testid="tiers-page" className="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden" style={{ backgroundColor: '#faf8f5', fontFamily: "'Public Sans', sans-serif" }}>
+      <div className="layout-container flex h-full grow flex-col">
+        {/* Top Navigation */}
+        <header className="flex items-center justify-between whitespace-nowrap border-b border-solid px-6 md:px-20 py-4" style={{ borderColor: 'rgba(90,114,71,0.1)', backgroundColor: '#faf8f5' }}>
+          <div className="flex items-center gap-8">
+            <div className="flex items-center gap-3" style={{ color: '#5a7247' }}>
+              <span className="material-symbols-outlined text-3xl font-bold">account_tree</span>
+              <h2 className="text-slate-900 text-lg font-bold leading-tight tracking-tight uppercase">CORTHEX <span style={{ color: 'rgba(90,114,71,0.7)' }}>v2</span></h2>
             </div>
-          ))}
-        </div>
-      )}
-
-      {/* Model Cost Summary (mobile) */}
-      {tiers.length > 0 && (
-        <div className="md:hidden bg-slate-800/80 border border-slate-700 rounded-xl p-4">
-          <h3 className="text-sm font-semibold mb-3 flex items-center gap-2 text-slate-50">
-            <span className="text-cyan-400">💰</span>
-            Model Cost Summary (per 1M tokens)
-          </h3>
-          <div className="font-mono text-xs w-full">
-            <div className="grid grid-cols-3 gap-2 py-2 border-b border-slate-700 text-slate-400">
-              <div>Model</div>
-              <div className="text-right">Input</div>
-              <div className="text-right">Output</div>
-            </div>
-            {MODEL_OPTIONS.map((opt, i) => (
-              <div key={opt.value} className={`grid grid-cols-3 gap-2 py-2 ${i < MODEL_OPTIONS.length - 1 ? 'border-b border-slate-700' : ''}`}>
-                <div className={`truncate ${i === 0 ? 'text-cyan-400' : 'text-slate-200'}`}>{opt.shortLabel}</div>
-                <div className="text-right text-slate-200">{opt.inputCost}</div>
-                <div className="text-right text-slate-200">{opt.outputCost}</div>
-              </div>
-            ))}
+            <nav className="hidden md:flex items-center gap-6">
+              <a className="text-slate-600 hover:transition-colors text-sm font-medium" href="#" style={{ color: '#5a7247' }}>Dashboard</a>
+              <a className="text-slate-600 hover:transition-colors text-sm font-medium" href="#">Workspace</a>
+              <a className="text-sm font-semibold border-b-2 pb-1" href="#" style={{ color: '#5a7247', borderColor: '#5a7247' }}>Tiers</a>
+              <a className="text-slate-600 hover:transition-colors text-sm font-medium" href="#">Settings</a>
+            </nav>
           </div>
-        </div>
-      )}
+          <div className="flex flex-1 justify-end gap-6 items-center">
+            <label className="hidden sm:flex flex-col min-w-40 h-10 max-w-64">
+              <div className="flex w-full flex-1 items-stretch rounded-xl h-full border bg-white" style={{ borderColor: 'rgba(90,114,71,0.2)' }}>
+                <div className="flex items-center justify-center pl-3" style={{ color: 'rgba(90,114,71,0.5)' }}>
+                  <span className="material-symbols-outlined">search</span>
+                </div>
+                <input
+                  className="form-input flex w-full min-w-0 flex-1 border-none bg-transparent text-sm placeholder:text-slate-400 focus:ring-0"
+                  placeholder="Search tiers..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+            </label>
+            <div className="rounded-full p-1 border" style={{ backgroundColor: 'rgba(90,114,71,0.1)', borderColor: 'rgba(90,114,71,0.2)' }}>
+              <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8 bg-slate-300" />
+            </div>
+          </div>
+        </header>
+
+        <main className="flex-1 px-6 md:px-20 py-10 max-w-7xl mx-auto w-full">
+          {/* Hero Section */}
+          <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-10">
+            <div className="flex flex-col gap-2">
+              <nav className="flex items-center gap-2 text-xs font-medium mb-1 uppercase tracking-wider" style={{ color: 'rgba(90,114,71,0.6)' }}>
+                <span>Workspace</span>
+                <span className="material-symbols-outlined text-[12px]">chevron_right</span>
+                <span>Management</span>
+              </nav>
+              <h1 className="text-slate-900 text-4xl font-extrabold tracking-tight">Tier Permissions</h1>
+              <p className="text-slate-500 text-lg max-w-xl">Configure dynamic N-tier governance models, preferred LLM routing, and tool access limits across your organization.</p>
+            </div>
+            <button
+              onClick={() => setCreateOpen(true)}
+              className="flex items-center gap-2 px-5 py-2.5 text-white rounded-xl font-semibold shadow-lg hover:opacity-90 transition-all"
+              style={{ backgroundColor: '#5a7247', boxShadow: '0 10px 15px -3px rgba(90,114,71,0.2)' }}
+            >
+              <span className="material-symbols-outlined text-sm">add</span>
+              <span>New Tier</span>
+            </button>
+          </div>
+
+          {/* Dashboard Stats Summary */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="p-6 rounded-xl bg-white border shadow-sm flex items-center gap-4" style={{ borderColor: 'rgba(90,114,71,0.1)' }}>
+              <div className="size-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: '#5a7247' }}>
+                <span className="material-symbols-outlined">groups</span>
+              </div>
+              <div>
+                <p className="text-sm text-slate-500">Active Tiers</p>
+                <p className="text-2xl font-bold">{String(tiers.length).padStart(2, '0')}</p>
+              </div>
+            </div>
+            <div className="p-6 rounded-xl bg-white border shadow-sm flex items-center gap-4" style={{ borderColor: 'rgba(90,114,71,0.1)' }}>
+              <div className="size-12 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center">
+                <span className="material-symbols-outlined">auto_awesome</span>
+              </div>
+              <div>
+                <p className="text-sm text-slate-500">Avg. Model Power</p>
+                <p className="text-2xl font-bold">High</p>
+              </div>
+            </div>
+            <div className="p-6 rounded-xl bg-white border shadow-sm flex items-center gap-4" style={{ borderColor: 'rgba(90,114,71,0.1)' }}>
+              <div className="size-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+                <span className="material-symbols-outlined">build</span>
+              </div>
+              <div>
+                <p className="text-sm text-slate-500">Tools Deployed</p>
+                <p className="text-2xl font-bold">{tiers.reduce((sum, t) => sum + (t.maxTools || 0), 0) || 42}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Empty state */}
+          {tiers.length === 0 && (
+            <EmptyState
+              title="계층이 없습니다"
+              description="첫 계층을 생성하여 에이전트 등급을 구성하세요"
+            />
+          )}
+
+          {/* Tiers Table Container */}
+          {tiers.length > 0 && (
+            <div className="bg-white rounded-xl border shadow-xl overflow-hidden" style={{ borderColor: 'rgba(90,114,71,0.1)' }}>
+              <div className="p-5 border-b flex justify-between items-center" style={{ borderColor: 'rgba(90,114,71,0.1)', backgroundColor: 'rgba(248,250,252,0.5)' }}>
+                <h3 className="font-bold text-slate-700 flex items-center gap-2">
+                  <span className="material-symbols-outlined" style={{ color: '#5a7247' }}>list_alt</span>
+                  Active Configuration
+                </h3>
+                <div className="flex gap-2">
+                  <button className="p-2 rounded-lg border hover:opacity-80" style={{ borderColor: 'rgba(90,114,71,0.2)', color: '#5a7247' }}>
+                    <span className="material-symbols-outlined text-sm">filter_list</span>
+                  </button>
+                  <button onClick={() => refetch()} className="p-2 rounded-lg border hover:opacity-80" style={{ borderColor: 'rgba(90,114,71,0.2)', color: '#5a7247' }}>
+                    <span className="material-symbols-outlined text-sm">refresh</span>
+                  </button>
+                </div>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="text-slate-400 text-xs font-bold uppercase tracking-widest bg-slate-50">
+                      <th className="px-6 py-4">Level</th>
+                      <th className="px-6 py-4">Tier Identity</th>
+                      <th className="px-6 py-4">Preferred Model</th>
+                      <th className="px-6 py-4">Tool Quota</th>
+                      <th className="px-6 py-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y" style={{ borderColor: 'rgba(90,114,71,0.05)' }}>
+                    {tiers.map((tier, index) => {
+                      const badge = getTierBadge(index)
+                      return (
+                        <tr key={tier.id} data-testid={`tier-row-${tier.id}`} className="transition-colors" style={{ cursor: 'pointer' }} onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(90,114,71,0.02)')} onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}>
+                          <td className="px-6 py-5">
+                            <span className="text-lg font-black" style={{ color: 'rgba(90,114,71,0.3)' }}>{String(tier.tierLevel).padStart(2, '0')}</span>
+                          </td>
+                          <td className="px-6 py-5">
+                            <div className="flex flex-col">
+                              <span
+                                className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider w-fit mb-1 shadow-sm text-white"
+                                style={{ backgroundColor: badge.bg }}
+                              >
+                                {badge.label}
+                              </span>
+                              <span className="text-sm font-semibold">{tier.name}</span>
+                              {tier.description && <span className="text-xs text-slate-400">{tier.description}</span>}
+                            </div>
+                          </td>
+                          <td className="px-6 py-5 text-sm">
+                            <div className="flex items-center gap-2">
+                              <div className="size-6 rounded bg-slate-100 flex items-center justify-center">
+                                <span className="material-symbols-outlined text-sm text-slate-500">neurology</span>
+                              </div>
+                              <span className="font-medium text-slate-700">{getModelShortLabel(tier.modelPreference)}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-5">
+                            {tier.maxTools === 0 ? (
+                              <span className="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-xs font-bold">Unlimited</span>
+                            ) : (
+                              <span className="text-sm font-bold text-slate-600">{tier.maxTools} Tools</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-5 text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <button
+                                onClick={() => handleMoveUp(index)}
+                                disabled={index === 0 || reorderMutation.isPending}
+                                className="px-1 py-0.5 text-xs text-slate-400 hover:text-slate-600 disabled:opacity-30"
+                              >
+                                ▲
+                              </button>
+                              <button
+                                onClick={() => handleMoveDown(index)}
+                                disabled={index === tiers.length - 1 || reorderMutation.isPending}
+                                className="px-1 py-0.5 text-xs text-slate-400 hover:text-slate-600 disabled:opacity-30"
+                              >
+                                ▼
+                              </button>
+                              <button
+                                onClick={() => setEditTier(tier)}
+                                className="text-slate-400 hover:transition-colors px-2 py-1 text-xs rounded hover:bg-slate-100"
+                                style={{ ['--tw-text-opacity' as string]: 1 }}
+                              >
+                                편집
+                              </button>
+                              <button
+                                onClick={() => setDeleteTier(tier)}
+                                className="text-red-400 hover:text-red-500 px-2 py-1 text-xs rounded hover:bg-red-50"
+                              >
+                                삭제
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <div className="p-4 flex justify-between items-center text-xs text-slate-500" style={{ backgroundColor: 'rgba(248,250,252,0.5)' }}>
+                <p>Endpoint: <code className="px-1 rounded" style={{ backgroundColor: 'rgba(90,114,71,0.05)' }}>GET /api/admin/tier-configs</code></p>
+                <p>Last updated: just now</p>
+              </div>
+            </div>
+          )}
+
+          {/* Help/Details Section */}
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="flex gap-4">
+              <div className="size-10 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: '#5a7247' }}>
+                <span className="material-symbols-outlined">security</span>
+              </div>
+              <div>
+                <h4 className="font-bold mb-1">Permission Propagation</h4>
+                <p className="text-sm text-slate-500">Higher tiers automatically inherit lower tier capabilities but can be configured with specific override restrictions per workspace.</p>
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <div className="size-10 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: '#5a7247' }}>
+                <span className="material-symbols-outlined">settings_suggest</span>
+              </div>
+              <div>
+                <h4 className="font-bold mb-1">Model Preference Logic</h4>
+                <p className="text-sm text-slate-500">Models are prioritized based on reasoning capability and speed metrics. Tiers can specify fallback models for high-traffic periods.</p>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        {/* Footer */}
+        <footer className="px-6 md:px-20 py-8 border-t mt-20" style={{ borderColor: 'rgba(90,114,71,0.1)' }}>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-400 uppercase tracking-widest font-bold">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-sm">copyright</span>
+              <span>2024 CORTHEX Dynamics</span>
+            </div>
+            <div className="flex gap-6">
+              <a className="hover:opacity-80" href="#" style={{ color: '#5a7247' }}>API Documentation</a>
+              <a className="hover:opacity-80" href="#" style={{ color: '#5a7247' }}>System Status</a>
+              <a className="hover:opacity-80" href="#" style={{ color: '#5a7247' }}>Privacy Policy</a>
+            </div>
+          </div>
+        </footer>
+      </div>
 
       {/* Create Modal */}
       <Modal isOpen={createOpen} onClose={() => setCreateOpen(false)} title="계층 생성">
