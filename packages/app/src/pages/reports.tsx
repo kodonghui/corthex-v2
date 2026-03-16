@@ -250,14 +250,14 @@ export function ReportsPage() {
 
   if (view === 'list' || (view === 'detail' && report)) {
     return (
-      <div className="h-full flex flex-col bg-slate-950 overflow-hidden" data-testid="reports-page">
+      <div className="h-full flex flex-col overflow-hidden" data-testid="reports-page">
         <div className="flex flex-1 overflow-hidden">
           {/* Left panel: List */}
           <main className={`flex-1 flex flex-col overflow-y-auto ${view === 'detail' ? 'border-r border-slate-800' : ''}`}>
             {/* Header */}
             <div className="flex flex-wrap items-center justify-between gap-3 p-6 pb-4">
               <div className="flex flex-col gap-1">
-                <h1 className="text-slate-50 tracking-tight text-2xl font-bold leading-tight">
+                <h1 className="text-slate-100 tracking-tight text-2xl font-bold leading-tight">
                   Reports (보고서)
                 </h1>
                 <p className="text-slate-400 text-sm font-normal leading-normal">
@@ -303,7 +303,7 @@ export function ReportsPage() {
                   onClick={() => setActiveTab(tab.value)}
                   className={`flex h-8 items-center justify-center rounded px-4 text-sm font-medium transition-colors ${
                     activeTab === tab.value
-                      ? 'bg-slate-800 text-slate-50'
+                      ? 'bg-slate-800 text-slate-100'
                       : 'text-slate-400 hover:bg-slate-900 border border-transparent hover:border-slate-800'
                   }`}
                 >
@@ -344,13 +344,13 @@ export function ReportsPage() {
                         <div className={`flex items-center justify-center rounded size-10 shrink-0 mt-0.5 ${
                           isSelected
                             ? 'bg-cyan-400/10 text-cyan-400'
-                            : 'bg-slate-900 border border-slate-800 text-slate-400'
+                            : 'bg-slate-900/80 border border-slate-800 text-slate-400'
                         }`}>
                           <FileText className="w-5 h-5" />
                         </div>
                         <div className="flex flex-col">
                           <div className="flex items-center gap-3 mb-1">
-                            <p className={`text-base font-medium leading-tight ${isSelected ? 'text-slate-50' : 'text-slate-300'}`}>
+                            <p className={`text-base font-medium leading-tight ${isSelected ? 'text-slate-100' : 'text-slate-300'}`}>
                               {r.title}
                             </p>
                             <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${style.className} ${style.ringClass}`}>
@@ -375,11 +375,11 @@ export function ReportsPage() {
 
           {/* Right panel: Detail (Stitch sidebar style) */}
           {view === 'detail' && report && (
-            <aside className="w-[600px] flex-none bg-slate-900 flex flex-col h-full border-l border-slate-800 hidden lg:flex">
+            <aside className="w-[600px] flex-none bg-slate-900/80 flex flex-col h-full border-l border-slate-800 hidden lg:flex">
               {/* Detail Header */}
               <div className="p-6 border-b border-slate-800 flex-none">
                 <div className="flex justify-between items-start mb-4">
-                  <h2 className="text-xl font-bold text-slate-50 leading-tight">{report.title}</h2>
+                  <h2 className="text-xl font-bold text-slate-100 leading-tight">{report.title}</h2>
                   <div className="flex gap-2">
                     {report.status !== 'draft' && (
                       <button
@@ -462,7 +462,7 @@ export function ReportsPage() {
                 ) : (
                   <MarkdownRenderer
                     content={report.content || '(내용 없음)'}
-                    className="prose prose-invert max-w-none text-slate-300 text-sm leading-relaxed prose-headings:text-slate-50 prose-a:text-cyan-400"
+                    className="prose prose-invert max-w-none text-slate-300 text-sm leading-relaxed prose-headings:text-slate-100 prose-a:text-cyan-400"
                   />
                 )}
 
@@ -505,7 +505,7 @@ export function ReportsPage() {
               {/* Comments Section */}
               {report.status !== 'draft' && (
                 <div className="p-6 border-t border-slate-800 bg-slate-950 flex-none">
-                  <h4 className="text-sm font-semibold text-slate-50 mb-4">
+                  <h4 className="text-sm font-semibold text-slate-100 mb-4">
                     Comments ({comments.length})
                   </h4>
 
@@ -642,12 +642,12 @@ export function ReportsPage() {
   // === Create view ===
   if (view === 'create') {
     return (
-      <div className="h-full flex flex-col bg-slate-950" data-testid="reports-page">
+      <div className="h-full flex flex-col" data-testid="reports-page">
         <div className="px-6 py-4 border-b border-slate-800 flex items-center gap-3">
           <button onClick={handleBack} className="text-sm text-slate-400 hover:text-slate-200" data-testid="back-btn">
             ← 목록
           </button>
-          <h2 className="text-lg font-semibold text-slate-50">새 보고서</h2>
+          <h2 className="text-lg font-semibold text-slate-100">새 보고서</h2>
         </div>
         <div className="flex-1 overflow-y-auto px-6 py-4 max-w-2xl space-y-4">
           <input

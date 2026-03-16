@@ -103,7 +103,7 @@ function PeriodTabs({
             onClick={() => onPeriodChange(p)}
             className={`flex flex-col items-center justify-center border-b-[3px] pb-[13px] pt-4 transition-colors ${
               period === p
-                ? 'border-b-cyan-400 text-slate-50'
+                ? 'border-b-cyan-400 text-slate-100'
                 : 'border-b-transparent text-slate-400 hover:text-slate-100'
             }`}
             aria-pressed={period === p}
@@ -171,9 +171,9 @@ function DailyCostChart({
     <div className="flex min-w-72 flex-1 flex-col gap-2 rounded-lg border border-slate-800 bg-slate-900 p-6">
       <div className="flex justify-between items-start">
         <div>
-          <h3 className="text-slate-50 text-base font-semibold leading-normal">비용 추이 차트 (Cost Trend Chart)</h3>
+          <h3 className="text-slate-100 text-base font-semibold leading-normal">비용 추이 차트 (Cost Trend Chart)</h3>
           <div className="flex items-baseline gap-3 mt-1">
-            <p className="text-slate-50 font-mono text-[32px] font-bold leading-tight tabular-nums">
+            <p className="text-slate-100 font-mono text-[32px] font-bold leading-tight tabular-nums">
               ${totalCostUsd.toFixed(2)}
             </p>
             <div className="flex gap-1 items-center">
@@ -345,12 +345,12 @@ export function CostsPage() {
   }, [])
 
   return (
-    <div className="h-full overflow-y-auto bg-slate-950" data-testid="costs-page">
+    <div className="h-full overflow-y-auto" data-testid="costs-page">
       <div className="max-w-[960px] mx-auto flex-1 px-4 py-5">
         {/* Page Title */}
         <div className="flex flex-wrap justify-between gap-3 p-4">
           <div className="flex min-w-72 flex-col gap-3">
-            <h1 className="text-slate-50 tracking-tight text-[32px] font-bold leading-tight">
+            <h1 className="text-slate-100 tracking-tight text-[32px] font-bold leading-tight">
               비용 분석 (Cost Analytics)
             </h1>
             <p className="text-slate-400 text-sm font-normal leading-normal">
@@ -382,7 +382,7 @@ export function CostsPage() {
             <div className="flex flex-wrap gap-4 p-4" data-testid="cost-summary">
               <div className="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 border border-slate-800 bg-slate-900/50">
                 <p className="text-slate-400 text-sm font-medium leading-normal">Total Monthly Cost</p>
-                <p className="text-slate-50 font-mono text-2xl font-bold leading-tight tabular-nums">
+                <p className="text-slate-100 font-mono text-2xl font-bold leading-tight tabular-nums">
                   ${costData.totalCostUsd.toFixed(2)}
                 </p>
                 <p className="text-emerald-400 text-sm font-medium leading-normal flex items-center gap-1">
@@ -391,7 +391,7 @@ export function CostsPage() {
               </div>
               <div className="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 border border-slate-800 bg-slate-900/50">
                 <p className="text-slate-400 text-sm font-medium leading-normal">Daily Average</p>
-                <p className="text-slate-50 font-mono text-2xl font-bold leading-tight tabular-nums">
+                <p className="text-slate-100 font-mono text-2xl font-bold leading-tight tabular-nums">
                   ${dailyAvg.toFixed(2)}
                 </p>
                 <p className="text-rose-400 text-sm font-medium leading-normal flex items-center gap-1">
@@ -400,7 +400,7 @@ export function CostsPage() {
               </div>
               <div className="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 border border-slate-800 bg-slate-900/50">
                 <p className="text-slate-400 text-sm font-medium leading-normal">Most Expensive Model</p>
-                <p className="text-slate-50 font-mono text-xl font-bold leading-tight truncate tabular-nums">
+                <p className="text-slate-100 font-mono text-xl font-bold leading-tight truncate tabular-nums">
                   {topModel?.model ?? '-'}
                 </p>
                 <p className="text-slate-500 text-sm font-medium leading-normal">
@@ -409,7 +409,7 @@ export function CostsPage() {
               </div>
               <div className="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 border border-slate-800 bg-slate-900/50">
                 <p className="text-slate-400 text-sm font-medium leading-normal">Active Agent Count</p>
-                <p className="text-slate-50 font-mono text-2xl font-bold leading-tight tabular-nums">
+                <p className="text-slate-100 font-mono text-2xl font-bold leading-tight tabular-nums">
                   {activeAgentCount}
                 </p>
                 <p className="text-emerald-400 text-sm font-medium leading-normal flex items-center gap-1">
@@ -432,7 +432,7 @@ export function CostsPage() {
             <div className="flex flex-wrap gap-4 px-4 py-4 pb-12">
               {/* Cost by Model */}
               <div className="flex-1 min-w-[300px] flex flex-col gap-4">
-                <h3 className="text-slate-50 text-base font-semibold px-1">모델별 비용 (Cost by Model)</h3>
+                <h3 className="text-slate-100 text-base font-semibold px-1">모델별 비용 (Cost by Model)</h3>
                 <div className="rounded-lg border border-slate-800 bg-slate-900/50 overflow-hidden">
                   <table className="w-full text-left border-collapse">
                     <thead>
@@ -450,11 +450,11 @@ export function CostsPage() {
                       ) : (
                         costData.byModel.map((m) => (
                           <tr key={m.model}>
-                            <td className="py-3 px-4 text-sm text-slate-50 font-medium">{m.model}</td>
+                            <td className="py-3 px-4 text-sm text-slate-100 font-medium">{m.model}</td>
                             <td className="py-3 px-4 text-sm text-slate-400 font-mono text-right tabular-nums">
                               {formatNumber(m.inputTokens + m.outputTokens)}
                             </td>
-                            <td className="py-3 px-4 text-sm text-slate-50 font-mono text-right tabular-nums">
+                            <td className="py-3 px-4 text-sm text-slate-100 font-mono text-right tabular-nums">
                               ${m.costUsd.toFixed(2)}
                             </td>
                           </tr>
@@ -467,7 +467,7 @@ export function CostsPage() {
 
               {/* Cost by Agent */}
               <div className="flex-1 min-w-[300px] flex flex-col gap-4">
-                <h3 className="text-slate-50 text-base font-semibold px-1">에이전트별 비용 (Cost by Agent)</h3>
+                <h3 className="text-slate-100 text-base font-semibold px-1">에이전트별 비용 (Cost by Agent)</h3>
                 <div className="rounded-lg border border-slate-800 bg-slate-900/50 overflow-hidden">
                   <table className="w-full text-left border-collapse">
                     <thead>
@@ -485,14 +485,14 @@ export function CostsPage() {
                       ) : (
                         agentCostData.slice(0, 10).map((a, i) => (
                           <tr key={a.agentId || a.agentName}>
-                            <td className="py-3 px-4 text-sm text-slate-50 font-medium flex items-center gap-2">
+                            <td className="py-3 px-4 text-sm text-slate-100 font-medium flex items-center gap-2">
                               <div className={`w-2 h-2 rounded-full ${AGENT_DOT_COLORS[i % AGENT_DOT_COLORS.length]}`} />
                               {a.agentName}
                             </td>
                             <td className="py-3 px-4 text-sm text-slate-400 font-mono text-right tabular-nums">
                               {formatNumber(a.count)}
                             </td>
-                            <td className="py-3 px-4 text-sm text-slate-50 font-mono text-right tabular-nums">
+                            <td className="py-3 px-4 text-sm text-slate-100 font-mono text-right tabular-nums">
                               ${a.costUsd.toFixed(2)}
                             </td>
                           </tr>

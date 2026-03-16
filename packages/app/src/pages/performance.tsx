@@ -142,7 +142,7 @@ function SummaryCards({ data }: { data: PerformanceSummary }) {
             <p className="text-slate-400 text-sm font-medium leading-normal">{card.label}</p>
             {card.icon}
           </div>
-          <p className={`text-3xl font-mono font-bold leading-tight mt-2 tabular-nums ${(card as Record<string, unknown>).valueColor ? String((card as Record<string, unknown>).valueColor) : 'text-slate-50'}`}>
+          <p className={`text-3xl font-mono font-bold leading-tight mt-2 tabular-nums ${(card as Record<string, unknown>).valueColor ? String((card as Record<string, unknown>).valueColor) : 'text-white'}`}>
             {card.value}
           </p>
           <div className={`flex items-center gap-1 mt-1 ${card.changeColor}`}>
@@ -201,7 +201,7 @@ function AgentPerformanceTable({
 
   return (
     <div className="flex flex-col gap-4 mt-4" data-testid="agent-performance-table">
-      <h2 className="text-slate-50 text-xl font-bold leading-tight">Agent Performance Matrix</h2>
+      <h2 className="text-white text-xl font-bold leading-tight">Agent Performance Matrix</h2>
       <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/60 shadow-sm">
         {isLoading ? (
           <div className="p-4">
@@ -267,7 +267,7 @@ function AgentPerformanceTable({
                     onClick={() => onSelectAgent(agent.id)}
                     data-testid={`agent-row-${agent.id}`}
                   >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-50">{agent.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">{agent.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400 hidden sm:table-cell">{agent.departmentName}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
                       <TierBadge tier={(agent as Record<string, unknown>).tier as number | undefined} />
@@ -360,7 +360,7 @@ function SoulGymPanel() {
 
   return (
     <div className="flex flex-col gap-4 mt-8 mb-12" data-testid="soul-gym-panel">
-      <h2 className="text-slate-50 text-xl font-bold leading-tight">개선 제안</h2>
+      <h2 className="text-white text-xl font-bold leading-tight">개선 제안</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {isLoading ? (
           Array.from({ length: 3 }).map((_, i) => (
@@ -386,7 +386,7 @@ function SoulGymPanel() {
                   <div className="flex items-center justify-center size-10 rounded-lg bg-cyan-400/10 text-cyan-400">
                     <Lightbulb className="w-5 h-5" />
                   </div>
-                  <h3 className="text-slate-50 text-sm font-bold">{s.agentName}</h3>
+                  <h3 className="text-white text-sm font-bold">{s.agentName}</h3>
                 </div>
                 <p className="text-slate-400 text-sm">{s.description}</p>
                 <div className="flex items-center gap-2 mt-1">
@@ -453,7 +453,7 @@ function AgentDetailModal({
           <>
             {/* Header */}
             <div className="px-5 py-4 border-b border-slate-700">
-              <div className="text-lg font-semibold text-slate-50">{detail.name}</div>
+              <div className="text-lg font-semibold text-white">{detail.name}</div>
               <div className="text-xs text-slate-400 mt-0.5">{detail.departmentName} · {ROLE_LABEL[detail.role] || detail.role}</div>
               <button
                 onClick={onClose}
@@ -1024,11 +1024,11 @@ export function PerformancePage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-50" data-testid="performance-page">
+    <div className="min-h-screen text-slate-100" data-testid="performance-page">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-8 lg:px-16 py-6">
         {/* Page Header */}
         <div className="flex flex-col gap-2 mb-8">
-          <h1 className="text-slate-50 text-[32px] font-bold leading-tight tracking-tight">전력분석</h1>
+          <h1 className="text-white text-[32px] font-bold leading-tight tracking-tight">전력분석</h1>
           <p className="text-slate-400 text-sm font-normal leading-normal">에이전트 성능 대시보드</p>
         </div>
 

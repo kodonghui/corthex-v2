@@ -374,12 +374,12 @@ export function ActivityLogPage() {
   const alertCount24h = securityQuery.data?.data?.count24h ?? 0
 
   return (
-    <div className="h-full flex flex-col bg-slate-950" data-testid="activity-log-page">
+    <div className="h-full flex flex-col" data-testid="activity-log-page">
       {/* Page Title & Description */}
       <div className="px-4 md:px-10 py-6" data-testid="activity-header">
         <div className="flex flex-wrap justify-between gap-3 mb-6">
           <div className="flex min-w-72 flex-col gap-2">
-            <h1 className="text-slate-50 tracking-tight text-[32px] font-bold leading-tight">통신로그</h1>
+            <h1 className="text-white tracking-tight text-[32px] font-bold leading-tight">통신로그</h1>
             <p className="text-slate-400 text-sm font-normal leading-normal">
               모든 AI 에이전트의 활동 및 시스템 이벤트를 모니터링합니다.
             </p>
@@ -434,7 +434,7 @@ export function ActivityLogPage() {
                   <Search className="w-4 h-4" />
                 </div>
                 <input
-                  className="flex w-full min-w-0 flex-1 bg-transparent text-slate-50 focus:outline-none focus:ring-0 border-none h-full placeholder:text-slate-500 px-3 text-sm font-normal leading-normal"
+                  className="flex w-full min-w-0 flex-1 bg-transparent text-white focus:outline-none focus:ring-0 border-none h-full placeholder:text-slate-500 px-3 text-sm font-normal leading-normal"
                   placeholder="이벤트 검색..."
                   value={searchInput}
                   onChange={(e) => { setSearchInput(e.target.value); setPage(1) }}
@@ -538,7 +538,7 @@ export function ActivityLogPage() {
                     </div>
                     <div className="flex flex-1 flex-col justify-center gap-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-slate-50 text-base font-semibold leading-tight">{item.action}</p>
+                        <p className="text-white text-base font-semibold leading-tight">{item.action}</p>
                         <StatusBadgeEl status={item.phase} />
                         {item.agentName && (
                           <span className="inline-flex items-center rounded-full bg-slate-800 px-2 py-0.5 text-xs font-medium text-slate-300 ring-1 ring-inset ring-slate-500/20">
@@ -580,7 +580,7 @@ export function ActivityLogPage() {
                     </div>
                     <div className="flex flex-1 flex-col justify-center gap-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-slate-50 text-base font-semibold leading-tight">위임</p>
+                        <p className="text-white text-base font-semibold leading-tight">위임</p>
                         <StatusBadgeEl status={item.status} />
                         <span className="inline-flex items-center rounded-full bg-slate-800 px-2 py-0.5 text-xs font-medium text-slate-300 ring-1 ring-inset ring-slate-500/20">
                           {item.agentName || '시스템'}
