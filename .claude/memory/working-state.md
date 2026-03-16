@@ -1,44 +1,39 @@
 # Working State — 2026-03-16
 
 ## 현재 작업
-- App Shell Stitch 리빌드 완료 (배포 중) → 페이지별 비교 완료 → 구조 차이 수정 대기
+- Phase 6 리셋 완료. Gemini 프롬프트 4개 작성 → 유저가 직접 Gemini로 디자인 생성 예정
 
 ## 오늘 완료한 것 (2026-03-16)
-1. Stitch MCP 앱 화면 21개 추가 생성 (총 56개)
-2. Phase 7 JSX 재작성 (6배치 병렬) — 21개 페이지
-3. NEXUS/SketchVibe 분리 리팩토링
-4. gzip 압축 + 야간 워커 버그 수정
-5. Workflow 페이지 추가 (PRD #14)
-6. FR49 서버재시작 알림 + FR66 에이전트 취소
-7. 코드 리뷰 v2.0 실행 (7.0→7.95)
-8. 파이프라인 개선: kdh-uxui v4.3, kdh-full v7.2, kdh-code-review v2.0
-9. PRD 전수검사 97%, SketchVibe/NEXUS 전수검사
-10. Docker 정리 (40GB→19GB), env.production 복구
-11. LeetMaster 메모리 저장, 영어 교정 모드 설정
-12. **App Shell 리빌드** — Stitch 01-app-shell.html 기준
-    - sidebar.tsx: Hexagon 브랜드 아이콘 + "MANAGEMENT PLATFORM" + bg-slate-900 + nav active bg-cyan-400/10
-    - layout.tsx: 상단 바 추가 (브레드크럼 + 검색(⌘K) + 알림 벨)
-13. **6개 에이전트 병렬 비교** — Stitch HTML vs 현재 코드 전수비교
-    - 잘 맞음: Hub(95%), Dashboard(90%), Chat(90%), SNS(85%), Notifications(85%)
-    - 구조 차이: Trading(테이블/타임프레임), Agents(detail panel), Departments(상세섹션)
+1. App Shell Stitch 리빌드 (sidebar + top bar)
+2. 9개 병렬 에이전트로 25개 페이지 Stitch 디자인 반영
+3. Playwright 스모크 테스트 25/25 통과
+4. **유저 피드백: Stitch 디자인 자체가 구림** → Phase 6+ 삭제
+5. Gemini 4 (Natural Organic) + Gemini 5 (Minimal Warm) 분석
+6. 프롬프트 4개 작성:
+   - prompt-1: Gemini 4 스타일 Web (Pretendard + Noto Serif KR, 올리브/테라코타/머스타드)
+   - prompt-2: Gemini 4 스타일 App 모바일
+   - prompt-3: Gemini 5 스타일 Web (Inter + Noto Sans KR, 코랄/테라코타/앰버/그린)
+   - prompt-4: Gemini 5 스타일 App 모바일
+7. 파이프라인 개선 등 이전 세션 작업
 
 ## 다음 할 일
-1. 배포 확인 후 유저에게 알림
-2. 구조 차이 페이지 수정 (유저 우선순위에 따라):
-   - Trading: Recent Trades 테이블 + 타임프레임 버튼 + AI 퀵액션
-   - Agents: persistent detail panel + 활동목록 + 성과통계
-   - Departments: 상세 섹션 + 할당 에이전트 목록
-3. VS Code Playwright QA 프롬프트 작성 (이전 세션에서 소실)
-4. 버그 수정 후 재배포
+1. 유저가 Gemini로 HTML 생성해옴
+2. HTML 받으면 → React 변환 + API 연결
+3. Phase 7 통합 (이번엔 제대로)
 
 ## 핵심 교훈
-- App Shell(사이드바+상단바)이 전체 인상의 70%. 여기를 먼저 맞춰야 함
-- Phase 7 파이프라인에 "레이아웃 셸 리빌드" 단계가 빠져있었음 → 근본 원인
-- Stitch HTML에서 sidebar/topbar는 무시, content area만 참고
-- Dark mode 전용이므로 Stitch의 light mode 차이는 무시
-- Light mode 차이를 "문제"로 보고하면 안 됨 — 우리 앱은 dark mode only
+- Stitch MCP 자동생성 < Gemini 직접 프롬프트 (디자인 퀄리티)
+- Phase 7에서 App Shell을 먼저 맞추는 게 70% 임팩트
+- 유저가 직접 디자인 방향을 정하는 게 가장 확실함
+- 프롬프트에 정확한 hex, 폰트, 컴포넌트 클래스를 넣어야 일관성 유지
 
-## 미해결
-- Playwright QA 프롬프트 재작성 필요 (컴팩으로 소실)
-- Trading/Agents/Departments 구조 수정 대기
-- hook→렌더링 바인딩 미검증 (Playwright QA 필요)
+## 프롬프트 위치
+`_corthex_full_redesign/phase-6-prompts/`
+- prompt-1-gemini4-web.md
+- prompt-2-gemini4-app.md
+- prompt-3-gemini5-web.md
+- prompt-4-gemini5-app.md
+
+## 레퍼런스 (기존 Gemini 결과물)
+- `_uxui-redesign/02-design/gemini4/` — Natural Organic (html 54 + react 54)
+- `_uxui-redesign/02-design/gemini5/html-full/` — Minimal Warm (html 32)
