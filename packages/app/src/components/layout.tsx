@@ -161,7 +161,7 @@ export function Layout() {
                 readOnly
               />
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                <kbd className="inline-flex items-center px-1.5 font-mono text-[10px] text-slate-400 bg-slate-800 border border-slate-700 rounded">⌘</kbd>
+                <kbd className="inline-flex items-center px-1.5 font-mono text-[10px] text-slate-400 bg-slate-800 border border-slate-700 rounded">Ctrl</kbd>
                 <kbd className="inline-flex items-center px-1.5 font-mono text-[10px] text-slate-400 bg-slate-800 border border-slate-700 rounded">K</kbd>
               </div>
             </div>

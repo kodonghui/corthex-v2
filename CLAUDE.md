@@ -36,6 +36,18 @@
 - Files: kebab-case. Components: PascalCase. Imports: match `git ls-files` casing.
 - API: `{ success, data }` / `{ success, error: { code, message } }`. Tests: bun:test
 
+## UXUI Redesign (Phase 7)
+- Stitch MCP가 생성한 HTML = 디자인 기준 (`_corthex_full_redesign/phase-6-generated/web/`)
+- **App Shell** (layout.tsx + sidebar.tsx): `01-app-shell.html` 기준으로 리빌드 완료
+- **페이지 콘텐츠**: 각 Stitch HTML에서 content area만 참고 (sidebar/topbar 무시)
+- **Dark mode 전용**: Stitch HTML의 `dark:` 클래스가 우리 기준. light mode 차이는 무시
+- **아이콘**: Lucide React 유지 (Material Symbols 대신 — 번들 크기)
+- **디자인 토큰**: Sovereign Sage — slate-950 bg, cyan-400 accent, Inter + JetBrains Mono
+- 비교 결과 (2026-03-16):
+  - 잘 맞음: Hub(95%), Dashboard(90%), Chat(90%), SNS(85%), Notifications(85%)
+  - 구조 차이: Trading(테이블/타임프레임), Agents(detail panel), Departments(상세섹션)
+  - React이 더 나음: Jobs(복잡한 기능), Settings(10탭)
+
 ## Context Memory
 - Auto-save to `.claude/memory/working-state.md` on key decisions
 - **"컴팩대비"** = update working-state + MEMORY.md + git commit+push all
