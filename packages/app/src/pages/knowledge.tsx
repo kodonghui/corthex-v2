@@ -162,44 +162,46 @@ export function KnowledgePage() {
 
   return (
     <div className="h-full flex flex-col bg-slate-900" data-testid="knowledge-page">
-      {/* Header */}
-      <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setShowFolderTree(!showFolderTree)}
-            className="md:hidden p-1.5 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors"
-            aria-label={showFolderTree ? '폴더 숨기기' : '폴더 보기'}
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-          <h1 className="text-lg font-semibold text-slate-50">지식 베이스</h1>
-        </div>
-        {/* Tabs */}
-        <div className="flex gap-0">
-          <button
-            onClick={() => setActiveTab('docs')}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-              activeTab === 'docs'
-                ? 'bg-blue-600/20 text-blue-400'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-            data-testid="tab-docs"
-          >
-            문서
-          </button>
-          <button
-            onClick={() => setActiveTab('memories')}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-              activeTab === 'memories'
-                ? 'bg-blue-600/20 text-blue-400'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-            data-testid="tab-memories"
-          >
-            에이전트 기억
-          </button>
+      {/* Header — mobile-optimized with stacked layout on small screens */}
+      <div className="px-4 sm:px-6 py-4 border-b border-slate-700">
+        <div className="flex items-center justify-between mb-3 sm:mb-0">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowFolderTree(!showFolderTree)}
+              className="md:hidden p-1.5 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors"
+              aria-label={showFolderTree ? '폴더 숨기기' : '폴더 보기'}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            <h1 className="text-lg sm:text-2xl font-bold text-slate-50 tracking-tight">지식 베이스</h1>
+          </div>
+          {/* Tabs */}
+          <div className="flex gap-0">
+            <button
+              onClick={() => setActiveTab('docs')}
+              className={`px-3 sm:px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                activeTab === 'docs'
+                  ? 'bg-cyan-400/20 text-cyan-400'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+              data-testid="tab-docs"
+            >
+              문서
+            </button>
+            <button
+              onClick={() => setActiveTab('memories')}
+              className={`px-3 sm:px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                activeTab === 'memories'
+                  ? 'bg-cyan-400/20 text-cyan-400'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+              data-testid="tab-memories"
+            >
+              에이전트 기억
+            </button>
+          </div>
         </div>
       </div>
 
@@ -359,74 +361,77 @@ function DocsTab({ showFolderTree, queryClient }: { showFolderTree: boolean; que
           />
         ) : (
           <>
-            {/* Search + Filters Bar */}
-            <div className="px-6 py-3 border-b border-slate-700/50 flex flex-wrap items-center gap-3">
-              <div className="relative flex-1 min-w-[200px] max-w-sm">
+            {/* Search Bar — full width, mobile-friendly */}
+            <div className="px-4 sm:px-6 py-3 border-b border-slate-700/50">
+              <div className="relative w-full mb-3">
                 <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 <input
-                  placeholder="문서 검색..."
+                  placeholder="문서 및 데이터 검색..."
                   value={searchInput}
                   onChange={(e) => { setSearchInput(e.target.value); setPage(1) }}
-                  className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 outline-none transition-colors"
+                  className="w-full bg-slate-800 border border-slate-700 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 rounded-xl pl-9 pr-3 py-2.5 text-sm text-slate-50 placeholder:text-slate-500 outline-none transition-all"
                   data-testid="doc-search"
                 />
               </div>
-              {/* Search mode toggle */}
-              <div className="flex rounded-lg overflow-hidden border border-slate-600" data-testid="search-mode-toggle">
-                {(['hybrid', 'semantic', 'keyword'] as const).map(mode => (
-                  <button
-                    key={mode}
-                    onClick={() => { setSearchMode(mode); setPage(1) }}
-                    className={`px-2.5 py-1.5 text-xs font-medium transition-colors ${
-                      searchMode === mode
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-slate-700 text-slate-400 hover:text-slate-200'
-                    }`}
-                  >
-                    {mode === 'hybrid' ? '혼합' : mode === 'semantic' ? '의미' : '키워드'}
-                  </button>
-                ))}
+              {/* Filter chips — horizontally scrollable on mobile */}
+              <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                {/* Search mode toggle */}
+                <div className="flex rounded-lg overflow-hidden border border-slate-700 shrink-0" data-testid="search-mode-toggle">
+                  {(['hybrid', 'semantic', 'keyword'] as const).map(mode => (
+                    <button
+                      key={mode}
+                      onClick={() => { setSearchMode(mode); setPage(1) }}
+                      className={`px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                        searchMode === mode
+                          ? 'bg-cyan-400 text-slate-900'
+                          : 'bg-slate-800 text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      {mode === 'hybrid' ? '혼합' : mode === 'semantic' ? '의미' : '키워드'}
+                    </button>
+                  ))}
+                </div>
+                <select
+                  value={contentTypeFilter}
+                  onChange={(e) => { setContentTypeFilter(e.target.value as ContentType | ''); setPage(1) }}
+                  className="shrink-0 bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-300 outline-none focus:border-cyan-500"
+                >
+                  <option value="">전체 유형</option>
+                  <option value="markdown">Markdown</option>
+                  <option value="text">텍스트</option>
+                  <option value="html">HTML</option>
+                  <option value="mermaid">Mermaid</option>
+                </select>
+                <input
+                  placeholder="태그 필터..."
+                  value={selectedTag || ''}
+                  onChange={(e) => { setSelectedTag(e.target.value || null); setPage(1) }}
+                  className="shrink-0 bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-50 placeholder:text-slate-500 outline-none focus:border-cyan-500 w-24 sm:w-32"
+                />
+                <button
+                  onClick={() => setShowCreateModal(true)}
+                  className="shrink-0 bg-cyan-400/10 hover:bg-cyan-400/20 text-cyan-400 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors flex items-center gap-1"
+                  data-testid="create-doc-button"
+                >
+                  <span>+</span> <span className="hidden sm:inline">문서 작성</span><span className="sm:hidden">추가</span>
+                </button>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="shrink-0 px-3 py-1.5 text-xs border border-slate-700 rounded-lg text-slate-300 hover:bg-slate-700 disabled:opacity-50 transition-colors"
+                >
+                  {uploading ? '업로드...' : '파일'}
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  className="hidden"
+                  onChange={(e) => { if (e.target.files) handleUploadFiles(e.target.files); e.target.value = '' }}
+                />
               </div>
-              <select
-                value={contentTypeFilter}
-                onChange={(e) => { setContentTypeFilter(e.target.value as ContentType | ''); setPage(1) }}
-                className="bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-300 outline-none focus:border-blue-500"
-              >
-                <option value="">전체 유형</option>
-                <option value="markdown">Markdown</option>
-                <option value="text">텍스트</option>
-                <option value="html">HTML</option>
-                <option value="mermaid">Mermaid</option>
-              </select>
-              <input
-                placeholder="태그 필터..."
-                value={selectedTag || ''}
-                onChange={(e) => { setSelectedTag(e.target.value || null); setPage(1) }}
-                className="bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 outline-none focus:border-blue-500 w-32"
-              />
-              <button
-                onClick={() => setShowCreateModal(true)}
-                className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors flex items-center gap-2"
-                data-testid="create-doc-button"
-              >
-                <span>+</span> 문서 작성
-              </button>
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploading}
-                className="px-3 py-2 text-sm border border-slate-600 rounded-lg text-slate-300 hover:bg-slate-700 disabled:opacity-50 transition-colors"
-              >
-                {uploading ? '업로드 중...' : '파일 업로드'}
-              </button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                className="hidden"
-                onChange={(e) => { if (e.target.files) handleUploadFiles(e.target.files); e.target.value = '' }}
-              />
             </div>
 
             {/* Search result mode label */}

@@ -309,33 +309,61 @@ export function ReportsPage() {
                 )}
               </div>
             ) : (
-              <div className="space-y-2" data-testid="reports-list">
+              <div className="space-y-3" data-testid="reports-list">
                 {filteredReports.map((r) => {
                   const style = STATUS_STYLES[r.status] || STATUS_STYLES.draft
+                  const isSubmitted = r.status === 'submitted' || r.status === 'reviewed'
                   return (
-                    <button
+                    <article
                       key={r.id}
                       onClick={() => handleOpenDetail(r.id)}
-                      className="w-full text-left px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 hover:border-slate-600 cursor-pointer transition-all"
+                      className="w-full text-left rounded-xl bg-slate-800/50 border border-slate-700 hover:border-slate-600 cursor-pointer transition-all p-4 flex flex-col gap-3"
                       data-testid={`report-item-${r.id}`}
                     >
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-sm text-slate-100 truncate">
-                          {r.title}
-                        </span>
-                        <span className={`text-xs px-2 py-0.5 rounded shrink-0 ${style.className}`}>
-                          {style.label}
-                        </span>
+                      <div className="flex items-start gap-3">
+                        {/* File type badge icon */}
+                        <div className={`flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center ${
+                          isSubmitted ? 'bg-red-500/10 text-red-400' : 'bg-slate-700/50 text-slate-400'
+                        }`}>
+                          <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                          </svg>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-sm text-slate-100 truncate">
+                            {r.title}
+                          </h3>
+                          <div className="flex items-center gap-2 mt-1 text-xs text-slate-500">
+                            <span className="font-medium text-slate-400">{r.authorName}</span>
+                            <span>·</span>
+                            <time className="font-mono text-[11px]">{new Date(r.submittedAt || r.updatedAt).toLocaleDateString('ko-KR')}</time>
+                          </div>
+                        </div>
                       </div>
                       {r.content && (
-                        <p className="text-xs text-slate-500 line-clamp-2 mb-1">
+                        <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
                           {(r.content || '').slice(0, 120)}
                         </p>
                       )}
-                      <div className="text-[11px] text-slate-500">
-                        {r.authorName} · {new Date(r.submittedAt || r.updatedAt).toLocaleDateString('ko-KR')}
+                      <div className="flex items-center justify-between pt-2 border-t border-slate-700/50">
+                        <div className="flex items-center gap-2">
+                          <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${style.className}`}>
+                            {style.label}
+                          </span>
+                        </div>
+                        {isSubmitted && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleOpenDetail(r.id) }}
+                            className="flex items-center justify-center w-8 h-8 rounded-full text-cyan-400 hover:bg-cyan-500/10 transition-colors"
+                            aria-label="다운로드"
+                          >
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                            </svg>
+                          </button>
+                        )}
                       </div>
-                    </button>
+                    </article>
                   )
                 })}
               </div>

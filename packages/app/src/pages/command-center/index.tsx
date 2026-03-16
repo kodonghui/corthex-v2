@@ -108,7 +108,7 @@ export function CommandCenterPage() {
       </div>
 
       {/* KPI Summary Cards */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 px-6 py-4 shrink-0">
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-2 sm:gap-4 px-4 sm:px-6 py-3 sm:py-4 shrink-0">
         {/* Total Commands */}
         <div
           data-testid="kpi-card-commands"

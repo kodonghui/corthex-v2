@@ -45,6 +45,14 @@ const PROVIDER_LABELS: Record<string, string> = {
   google: 'Google',
 }
 
+const AGENT_RANK_COLORS = [
+  'bg-cyan-400/20 text-cyan-400',
+  'bg-blue-500/20 text-blue-500',
+  'bg-purple-500/20 text-purple-500',
+  'bg-emerald-500/20 text-emerald-500',
+  'bg-amber-500/20 text-amber-500',
+]
+
 // === Helpers ===
 
 function microToUsd(micro: number): string {
@@ -86,7 +94,7 @@ function PeriodSelector({
   onCustomEndChange: (v: string) => void
 }) {
   return (
-    <div className="flex items-center gap-2 flex-wrap">
+    <div className="flex items-center gap-2 flex-wrap overflow-x-auto no-scrollbar">
       {(['7d', '30d', 'custom'] as const).map((p) => (
         <button
           key={p}
@@ -198,16 +206,31 @@ function CostOverviewSection({
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4" data-testid="cost-summary">
-      {/* Total Cost */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl px-5 py-4">
-        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">총 비용</p>
-        <p className="text-3xl font-bold text-slate-50">${totalCost.toFixed(2)}</p>
-        <p className="text-xs text-slate-500 mt-1">최근 {costData.days}일 합계</p>
+      {/* Total Cost — mobile-optimized with larger font-mono */}
+      <div className="bg-slate-800/50 border border-slate-700 rounded-xl px-4 sm:px-5 py-4">
+        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">총 비용</p>
+        <p className="text-3xl font-mono font-bold text-slate-50">${totalCost.toFixed(2)}</p>
+        <div className="flex justify-between items-center mt-2">
+          <p className="text-xs text-slate-500">최근 {costData.days}일 합계</p>
+          {totalCost > 0 && (
+            <div className="flex items-center text-emerald-500 bg-emerald-50/10 px-2 py-0.5 rounded text-xs font-medium">
+              <svg className="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
+              </svg>
+              {costData.days}d
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Budget Usage */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl px-5 py-4">
-        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">예산 사용률</p>
+      {/* Budget Usage — with progress bar for mobile */}
+      <div className="bg-slate-800/50 border border-slate-700 rounded-xl px-4 sm:px-5 py-4">
+        <div className="flex justify-between items-start mb-2">
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">예산 사용률</p>
+          <p className="text-xs font-mono text-slate-500">
+            {budget ? `$${budget.currentMonthSpendUsd.toFixed(2)} / $${budget.monthlyBudgetUsd.toFixed(0)}` : ''}
+          </p>
+        </div>
         <p className={`text-3xl font-bold ${
           usagePercent >= 100
             ? 'text-red-500'
@@ -217,9 +240,18 @@ function CostOverviewSection({
         }`}>
           {usagePercent.toFixed(0)}%
         </p>
+        {/* Budget progress bar — mobile-friendly visual */}
+        <div className="h-2 w-full bg-slate-700 rounded-full overflow-hidden mt-2">
+          <div
+            className={`h-full rounded-full transition-all ${
+              usagePercent >= 100 ? 'bg-red-500' : usagePercent >= 80 ? 'bg-amber-400' : 'bg-cyan-400'
+            }`}
+            style={{ width: `${Math.min(usagePercent, 100)}%` }}
+          />
+        </div>
         <p className="text-xs text-slate-500 mt-1">
           {budget
-            ? `$${budget.currentMonthSpendUsd.toFixed(2)} / $${budget.monthlyBudgetUsd.toFixed(0)}`
+            ? `$${Math.max(budget.monthlyBudgetUsd - budget.currentMonthSpendUsd, 0).toFixed(2)} remaining`
             : '예산 미설정'}
         </p>
       </div>
@@ -284,33 +316,41 @@ function TopAgentsSection({ agents }: { agents: { agentId: string; agentName: st
   const maxCost = sorted[0]?.costUsd ?? 1
 
   return (
-    <div className="bg-slate-800/50 border border-slate-700 rounded-xl px-5 py-4" data-testid="top-agents">
-      <h3 className="text-sm font-semibold text-slate-300 mb-3">에이전트별 비용 순위</h3>
+    <div className="bg-slate-800/50 border border-slate-700 rounded-xl px-4 sm:px-5 py-4" data-testid="top-agents">
+      <h3 className="text-base sm:text-sm font-bold sm:font-semibold text-slate-200 sm:text-slate-300 mb-4 sm:mb-3">에이전트별 비용 순위</h3>
       {display.length === 0 ? (
         <div className="h-24 flex items-center justify-center text-sm text-slate-500">
           데이터가 없습니다
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-3">
           {display.map((agent, i) => {
             const barWidth = maxCost > 0 ? (agent.costUsd / maxCost) * 100 : 0
+            const colorClass = AGENT_RANK_COLORS[i % AGENT_RANK_COLORS.length]
             return (
-              <div key={agent.agentId} className="flex items-center gap-3">
-                <span className="text-xs text-slate-500 w-5 text-right font-mono">{i + 1}</span>
+              <div key={agent.agentId} className="flex items-center gap-3 py-2 border-b border-slate-700/50 last:border-b-0">
+                {/* Agent icon circle */}
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${colorClass}`}>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-0.5">
-                    <span className="text-sm text-slate-100 truncate">{agent.agentName}</span>
-                    <span className="text-xs font-mono text-slate-300 ml-2 flex-shrink-0">
+                    <span className="text-sm font-medium text-slate-100 truncate">{agent.agentName}</span>
+                    <span className="text-sm font-mono text-slate-200 ml-2 flex-shrink-0">
                       ${agent.costUsd.toFixed(2)}
                     </span>
                   </div>
-                  <div className="h-1.5 rounded-full bg-slate-700 overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-blue-500 transition-all"
-                      style={{ width: `${barWidth}%` }}
-                    />
+                  <div className="hidden sm:block">
+                    <div className="h-1.5 rounded-full bg-slate-700 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-cyan-400 transition-all"
+                        style={{ width: `${barWidth}%` }}
+                      />
+                    </div>
+                    <span className="text-[10px] text-slate-500">{formatNumber(agent.count)} 호출</span>
                   </div>
-                  <span className="text-[10px] text-slate-500">{formatNumber(agent.count)} 호출</span>
                 </div>
               </div>
             )
@@ -350,8 +390,8 @@ function DailyCostChart({
   const maxCost = Math.max(...items.map((d) => d.costMicro), 1)
 
   return (
-    <div className="bg-slate-800/50 border border-slate-700 rounded-xl px-5 py-4" data-testid="daily-chart">
-      <h3 className="text-sm font-semibold text-slate-300 mb-4">일일 비용 추이</h3>
+    <div className="bg-slate-800/50 border border-slate-700 rounded-xl px-4 sm:px-5 py-4" data-testid="daily-chart">
+      <h3 className="text-base sm:text-sm font-bold sm:font-semibold text-slate-200 sm:text-slate-300 mb-4">일별 비용 추이</h3>
 
       {isLoading ? (
         <div className="h-40 w-full bg-slate-700/50 rounded animate-pulse" />
@@ -360,16 +400,17 @@ function DailyCostChart({
           데이터가 없습니다
         </div>
       ) : (
-        <div className="flex items-end gap-[2px] h-40">
+        <div className="flex items-end gap-[2px] h-32 sm:h-40 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-t from-cyan-400/10 to-transparent pointer-events-none" />
           {items.map((d) => {
             const pct = (d.costMicro / maxCost) * 100
             return (
               <div
                 key={d.date}
-                className="flex-1 flex flex-col items-center justify-end h-full min-w-0 group relative"
+                className="flex-1 flex flex-col items-center justify-end h-full min-w-0 group relative z-[1]"
               >
                 <div
-                  className="w-full bg-blue-500 rounded-t transition-all hover:bg-blue-400 min-h-[2px]"
+                  className="w-full bg-cyan-400/80 rounded-t transition-all hover:bg-cyan-400 min-h-[2px]"
                   style={{ height: `${Math.max(pct, 1)}%` }}
                 />
                 <span className="text-[8px] text-slate-500 mt-1 truncate w-full text-center">
@@ -482,21 +523,23 @@ export function CostsPage() {
 
   return (
     <div className="h-full overflow-y-auto bg-slate-900" data-testid="costs-page">
-      {/* Header */}
-      <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between flex-wrap gap-3">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="text-slate-400 hover:text-slate-200 transition-colors"
-            aria-label="대시보드로 돌아가기"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <div>
-            <h2 className="text-lg font-semibold text-slate-50">비용 분석</h2>
-            <p className="text-xs text-slate-500 mt-0.5">AI 운영 비용을 상세하게 분석합니다</p>
+      {/* Header — mobile sticky with compact layout */}
+      <div className="sticky top-0 z-10 bg-slate-900/80 backdrop-blur-md px-4 sm:px-6 py-4 border-b border-slate-700">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="text-slate-400 hover:text-slate-200 transition-colors p-2 rounded-full bg-slate-800 sm:bg-transparent"
+              aria-label="대시보드로 돌아가기"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <div>
+              <h2 className="text-lg sm:text-xl font-bold text-slate-50 tracking-tight">비용 분석</h2>
+              <p className="text-xs text-slate-500 mt-0.5 hidden sm:block">AI 운영 비용을 상세하게 분석합니다</p>
+            </div>
           </div>
         </div>
         <PeriodSelector
@@ -509,7 +552,7 @@ export function CostsPage() {
         />
       </div>
 
-      <div className="px-6 py-4 space-y-6 max-w-6xl">
+      <div className="px-4 sm:px-6 py-4 space-y-6 max-w-6xl">
         {isLoading && !costData ? (
           <CostsSkeleton />
         ) : !costData ? (

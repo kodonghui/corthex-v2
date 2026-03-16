@@ -171,6 +171,26 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
 
   return (
     <div className="relative shrink-0 border-t border-slate-700/50 bg-gradient-to-t from-slate-900 to-slate-900/95 backdrop-blur-sm p-4">
+      {/* Quick Agent Mention Chips — mobile only */}
+      {managers.length > 0 && !targetAgentId && (
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-4 px-4 md:hidden no-scrollbar">
+          {managers.slice(0, 5).map((agent) => (
+            <button
+              key={agent.id}
+              type="button"
+              onClick={() => {
+                setTargetAgentId(agent.id)
+                handleChange(text + `@${agent.name} `)
+              }}
+              className="flex-shrink-0 px-3 py-1.5 bg-slate-800 text-slate-300 rounded-full text-xs font-medium border border-slate-700 hover:border-cyan-500 hover:text-cyan-400 transition-colors flex items-center gap-1"
+            >
+              <span className="text-cyan-400 font-bold">@</span>
+              {agent.name}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Popups */}
       {showSlash && (
         <div className="absolute bottom-full left-4 mb-2 z-50">

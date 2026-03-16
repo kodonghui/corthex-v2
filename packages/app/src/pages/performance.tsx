@@ -50,6 +50,27 @@ function getPerformanceLevel(successRate: number): string {
 
 // === Summary Cards ===
 
+function OverallScoreRing({ score }: { score: number }) {
+  const circumference = 2 * Math.PI * 45
+  const offset = circumference - (score / 100) * circumference
+  return (
+    <div className="relative flex h-[80px] w-[80px] items-center justify-center rounded-full bg-slate-900 shadow-[inset_0_0_10px_rgba(34,211,238,0.1)]">
+      <svg className="absolute h-full w-full -rotate-90" viewBox="0 0 100 100">
+        <circle className="stroke-cyan-500/20" cx="50" cy="50" fill="transparent" r="45" strokeWidth="8" />
+        <circle
+          className="stroke-cyan-400 transition-all duration-700"
+          cx="50" cy="50" fill="transparent" r="45"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          strokeWidth="8"
+        />
+      </svg>
+      <span className="text-slate-100 font-mono font-bold text-lg z-10">{score}%</span>
+    </div>
+  )
+}
+
 function SummaryCards({ data }: { data: PerformanceSummary }) {
   const cards = [
     {
@@ -85,23 +106,34 @@ function SummaryCards({ data }: { data: PerformanceSummary }) {
   ]
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3" data-testid="summary-cards">
-      {cards.map((card) => (
-        <div key={card.label} className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-          <div className="text-lg mb-1">{card.icon}</div>
-          <div className="text-xs text-slate-400 font-medium">{card.label}</div>
-          <div className="text-xl font-bold text-slate-50 mt-0.5">{card.value}</div>
-          <div className="flex items-center gap-1 mt-1">
-            {card.change > 0 ? (
-              <span className="text-[10px] text-emerald-400">↑ +{card.change}{card.changeSuffix}</span>
-            ) : card.change < 0 ? (
-              <span className="text-[10px] text-red-400">↓ {card.change}{card.changeSuffix}</span>
-            ) : (
-              <span className="text-[10px] text-slate-500">— 0</span>
-            )}
-          </div>
+    <div data-testid="summary-cards">
+      {/* Mobile: Overall score ring + 2x2 metric grid */}
+      <div className="flex items-center justify-between rounded-xl bg-cyan-500/5 border border-cyan-500/10 p-5 mb-4 sm:hidden">
+        <div className="flex flex-col gap-1">
+          <p className="text-slate-300 text-sm font-bold">Overall Score</p>
+          <p className="text-cyan-400 text-2xl font-mono font-bold">{data.avgSuccessRate}점</p>
         </div>
-      ))}
+        <OverallScoreRing score={data.avgSuccessRate} />
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {cards.map((card) => (
+          <div key={card.label} className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+            <div className="text-lg mb-1">{card.icon}</div>
+            <div className="text-xs text-slate-400 font-medium">{card.label}</div>
+            <div className="text-xl font-bold text-slate-50 mt-0.5 font-mono">{card.value}</div>
+            <div className="flex items-center gap-1 mt-1">
+              {card.change > 0 ? (
+                <span className="text-[10px] text-emerald-400">↑ +{card.change}{card.changeSuffix}</span>
+              ) : card.change < 0 ? (
+                <span className="text-[10px] text-red-400">↓ {card.change}{card.changeSuffix}</span>
+              ) : (
+                <span className="text-[10px] text-slate-500">— 0</span>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
@@ -115,6 +147,59 @@ function PerformanceBadge({ successRate }: { successRate: number }) {
     <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${badge.className}`}>
       {badge.label}
     </span>
+  )
+}
+
+// === Mobile Agent Ranking Bars ===
+
+const RANK_COLORS = [
+  { bg: 'bg-yellow-500/20', text: 'text-yellow-500', barBg: 'bg-cyan-400', cardBg: 'bg-cyan-500/10 border-cyan-500/20' },
+  { bg: 'bg-slate-300/20', text: 'text-slate-300', barBg: 'bg-cyan-400/80', cardBg: 'bg-cyan-500/5 border-cyan-500/10' },
+  { bg: 'bg-orange-400/20', text: 'text-orange-400', barBg: 'bg-cyan-400/60', cardBg: 'bg-cyan-500/5 border-cyan-500/10' },
+]
+
+function MobileAgentRanking({ onSelectAgent }: { onSelectAgent: (id: string) => void }) {
+  const { data: res, isLoading } = useQuery({
+    queryKey: ['performance-agents', 1, 'successRate', 'desc', '', ''],
+    queryFn: () =>
+      api.get<{ data: { items: AgentPerformance[]; page: number; total: number; totalPages: number } }>(
+        '/workspace/performance/agents?page=1&limit=5&sortBy=successRate&sortOrder=desc',
+      ),
+  })
+
+  const items = res?.data?.items ?? []
+
+  if (isLoading || items.length === 0) return null
+
+  return (
+    <div className="sm:hidden" data-testid="mobile-agent-ranking">
+      <h3 className="text-base font-bold text-slate-100 mb-3">Agent Ranking</h3>
+      <div className="flex flex-col gap-2">
+        {items.slice(0, 5).map((agent, idx) => {
+          const rankStyle = RANK_COLORS[idx] || { bg: 'bg-slate-700', text: 'text-slate-400', barBg: 'bg-slate-500', cardBg: 'bg-transparent border-transparent' }
+          return (
+            <div
+              key={agent.id}
+              onClick={() => onSelectAgent(agent.id)}
+              className={`flex items-center gap-3 rounded-xl p-3 border cursor-pointer transition-colors hover:border-cyan-500/30 ${rankStyle.cardBg}`}
+            >
+              <div className={`flex h-8 w-8 items-center justify-center rounded-full ${rankStyle.bg} ${rankStyle.text} font-bold text-sm`}>
+                {idx + 1}
+              </div>
+              <div className="flex-1">
+                <div className="flex justify-between mb-1">
+                  <span className="text-slate-100 font-medium text-sm">{agent.name}</span>
+                  <span className="text-cyan-400 font-mono text-sm">{agent.successRate}%</span>
+                </div>
+                <div className="h-1.5 w-full rounded-full bg-cyan-500/10 overflow-hidden">
+                  <div className={`h-full ${rankStyle.barBg} rounded-full transition-all`} style={{ width: `${agent.successRate}%` }} />
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
   )
 }
 
@@ -1118,6 +1203,8 @@ export function PerformancePage() {
             ) : (
               <div className="space-y-6">
                 {summary && <SummaryCards data={summary} />}
+                {/* Mobile Agent Ranking Bars — shown only on small screens */}
+                <MobileAgentRanking onSelectAgent={(id) => setSelectedAgentId(id)} />
                 <AgentPerformanceTable onSelectAgent={(id) => setSelectedAgentId(id)} />
                 <SoulGymPanel />
               </div>

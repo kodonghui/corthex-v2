@@ -103,7 +103,7 @@ export const PipelineVisualization = memo(function PipelineVisualization({ activ
     <div
       data-testid="pipeline-bar"
       aria-live="polite"
-      className="flex items-center gap-3 px-6 py-3 border-b border-slate-800/80 shrink-0 overflow-x-auto"
+      className="flex items-center gap-3 px-4 md:px-6 py-3 border-b border-slate-800/80 shrink-0 overflow-x-auto"
     >
       {stages.map((stage, idx) => {
         const isDone = stage.status === 'done'
@@ -154,19 +154,29 @@ export const PipelineVisualization = memo(function PipelineVisualization({ activ
               data-testid={`pipeline-stage-${stage.role.toLowerCase()}`}
               role="status"
               aria-label={`${stage.role}: ${stage.description}`}
-              className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl border transition-all duration-300 ${cardClass}`}
+              className={`flex items-center gap-2 md:gap-2.5 px-3 md:px-4 py-2 md:py-2.5 rounded-xl border transition-all duration-300 ${cardClass}`}
             >
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${iconBgClass}`}>
+              {/* Mobile: compact circle indicator */}
+              <div className={`w-8 h-8 rounded-full md:rounded-lg flex items-center justify-center ${iconBgClass} relative`}>
                 <span className={iconColor}>
-                  {STAGE_ICONS[stage.role] || <span className={`w-2.5 h-2.5 rounded-full ${dotClass}`} />}
+                  {isDone ? (
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    STAGE_ICONS[stage.role] || <span className={`w-2.5 h-2.5 rounded-full ${dotClass}`} />
+                  )}
                 </span>
+                {isWorking && (
+                  <span className="absolute inset-0 rounded-full md:rounded-lg bg-blue-500/30 animate-ping" />
+                )}
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-white">{stage.role}</span>
+                  <span className="text-[11px] md:text-xs font-semibold text-white">{stage.role}</span>
                   <span className={`w-1.5 h-1.5 rounded-full ${dotClass}`} />
                 </div>
-                <p className="text-xs text-slate-500 mt-0.5">{stage.description}</p>
+                <p className="text-[10px] md:text-xs text-slate-500 mt-0.5 hidden sm:block">{stage.description}</p>
               </div>
             </div>
 

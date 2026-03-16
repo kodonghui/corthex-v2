@@ -333,14 +333,16 @@ export function ActivityLogPage() {
 
   return (
     <div className="h-full flex flex-col bg-slate-900" data-testid="activity-log-page">
-      {/* Header */}
-      <div className="px-4 md:px-6 py-4 border-b border-slate-700 flex items-center justify-between" data-testid="activity-header">
-        <h2 className="text-lg font-semibold text-slate-50">통신로그</h2>
-        <WsStatusIndicator />
+      {/* Header — mobile sticky */}
+      <div className="sticky top-0 z-10 bg-slate-900/90 backdrop-blur-md px-4 md:px-6 py-4 border-b border-slate-700/50 flex items-center justify-between" data-testid="activity-header">
+        <h2 className="text-xl font-bold text-slate-50 tracking-tight">활동 로그</h2>
+        <div className="flex items-center gap-2">
+          <WsStatusIndicator />
+        </div>
       </div>
 
-      {/* Tabs */}
-      <div className="px-4 md:px-6 border-b border-slate-700" data-testid="activity-tabs">
+      {/* Tabs — horizontally scrollable on mobile */}
+      <div className="px-4 md:px-6 border-b border-slate-700 overflow-x-auto no-scrollbar" data-testid="activity-tabs">
         <div className="flex gap-0" role="tablist">
           {TAB_ITEMS.map(item => (
             <button
@@ -348,9 +350,9 @@ export function ActivityLogPage() {
               role="tab"
               aria-selected={tab === item.value}
               onClick={() => setTab(item.value)}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                 tab === item.value
-                  ? 'border-blue-500 text-blue-400'
+                  ? 'border-cyan-400 text-cyan-400'
                   : 'border-transparent text-slate-400 hover:text-slate-200'
               }`}
               data-testid={`tab-${item.value}`}
@@ -420,9 +422,9 @@ export function ActivityLogPage() {
         </div>
       )}
 
-      {/* Filters */}
-      <div className="px-4 md:px-6 py-3 border-b border-slate-700/50 flex flex-wrap gap-2 items-center" data-testid="activity-filters">
-        <div className="relative">
+      {/* Filters — mobile-friendly with scrollable row */}
+      <div className="px-4 md:px-6 py-3 border-b border-slate-700/50 flex flex-wrap gap-2 items-center overflow-x-auto no-scrollbar" data-testid="activity-filters">
+        <div className="relative shrink-0 flex-1 min-w-[140px] max-w-[200px] md:max-w-[240px]">
           <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
@@ -430,7 +432,7 @@ export function ActivityLogPage() {
             placeholder="검색..."
             value={searchInput}
             onChange={(e) => { setSearchInput(e.target.value); setPage(1) }}
-            className="bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg pl-8 pr-3 py-2 text-xs text-slate-50 placeholder:text-slate-500 outline-none w-40 md:w-48 transition-colors"
+            className="w-full bg-slate-800 border border-slate-700 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 rounded-xl pl-8 pr-3 py-2 text-xs text-slate-50 placeholder:text-slate-500 outline-none transition-all"
             data-testid="search-input"
           />
         </div>
@@ -438,15 +440,15 @@ export function ActivityLogPage() {
           type="date"
           value={startDate}
           onChange={(e) => { setStartDate(e.target.value); setPage(1) }}
-          className="text-xs h-8 px-2 border border-slate-600 rounded-lg bg-slate-800 text-slate-300 outline-none focus:border-blue-500"
+          className="shrink-0 text-xs h-8 px-2 border border-slate-700 rounded-lg bg-slate-800 text-slate-300 outline-none focus:border-cyan-500"
           data-testid="date-start"
         />
-        <span className="text-xs text-slate-500">~</span>
+        <span className="text-xs text-slate-500 shrink-0">~</span>
         <input
           type="date"
           value={endDate}
           onChange={(e) => { setEndDate(e.target.value); setPage(1) }}
-          className="text-xs h-8 px-2 border border-slate-600 rounded-lg bg-slate-800 text-slate-300 outline-none focus:border-blue-500"
+          className="shrink-0 text-xs h-8 px-2 border border-slate-700 rounded-lg bg-slate-800 text-slate-300 outline-none focus:border-cyan-500"
           data-testid="date-end"
         />
         {tab === 'tools' && (
@@ -546,37 +548,89 @@ function StatusBadge({ status }: { status: string }) {
   )
 }
 
+const PHASE_ICON_STYLE: Record<string, { bg: string; text: string }> = {
+  completed: { bg: 'bg-emerald-500/10', text: 'text-emerald-500' },
+  done: { bg: 'bg-emerald-500/10', text: 'text-emerald-500' },
+  end: { bg: 'bg-emerald-500/10', text: 'text-emerald-500' },
+  success: { bg: 'bg-emerald-500/10', text: 'text-emerald-500' },
+  failed: { bg: 'bg-red-500/10', text: 'text-red-500' },
+  error: { bg: 'bg-red-500/10', text: 'text-red-500' },
+  working: { bg: 'bg-cyan-400/10', text: 'text-cyan-400' },
+  start: { bg: 'bg-cyan-400/10', text: 'text-cyan-400' },
+  running: { bg: 'bg-cyan-400/10', text: 'text-cyan-400' },
+  warning: { bg: 'bg-amber-500/10', text: 'text-amber-500' },
+}
+
 function AgentsTable({ items }: { items: AgentActivity[] }) {
   return (
-    <div className="overflow-x-auto" data-testid="agents-table">
-      <table className="w-full text-sm min-w-[640px]">
-        <thead>
-          <tr className="text-xs text-slate-500 border-b border-slate-700">
-            <th className="text-left py-2 pr-3 font-medium">시간</th>
-            <th className="text-left py-2 pr-3 font-medium">에이전트</th>
-            <th className="text-left py-2 pr-3 font-medium">명령</th>
-            <th className="text-left py-2 pr-3 font-medium">상태</th>
-            <th className="text-right py-2 pr-3 font-medium">소요시간</th>
-            <th className="text-right py-2 font-medium">토큰</th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((item) => (
-            <tr key={item.id} className="border-b border-slate-700/50 hover:bg-slate-800/50 transition-colors">
-              <td className="py-2.5 pr-3 text-xs text-slate-500 whitespace-nowrap">{formatTime(item.createdAt)}</td>
-              <td className="py-2.5 pr-3 text-xs font-medium text-slate-200">{item.agentName || '-'}</td>
-              <td className="py-2.5 pr-3 text-xs text-slate-300 truncate max-w-[200px]">{item.action}</td>
-              <td className="py-2.5 pr-3"><StatusBadge status={item.phase} /></td>
-              <td className="py-2.5 pr-3 text-xs text-right text-slate-500">
-                {formatDuration((item.metadata as Record<string, unknown>)?.durationMs as number | undefined)}
-              </td>
-              <td className="py-2.5 text-xs text-right text-slate-500">{formatTokens(item.metadata)}</td>
+    <div data-testid="agents-table">
+      {/* Mobile card view */}
+      <div className="flex flex-col gap-2 md:hidden">
+        {items.map((item) => {
+          const iconStyle = PHASE_ICON_STYLE[item.phase] || { bg: 'bg-cyan-400/10', text: 'text-cyan-400' }
+          return (
+            <div key={item.id} className="flex items-start gap-3 bg-slate-800/50 rounded-xl p-4">
+              <div className={`${iconStyle.text} flex items-center justify-center rounded-full ${iconStyle.bg} shrink-0 size-10 mt-0.5`}>
+                <StatusIcon phase={item.phase} />
+              </div>
+              <div className="flex flex-col flex-1 min-w-0">
+                <div className="flex justify-between items-start gap-2 mb-1">
+                  <p className="text-sm font-semibold text-cyan-400 line-clamp-1">{item.agentName || '-'}</p>
+                  <p className="text-slate-500 text-xs font-mono shrink-0 pt-0.5">
+                    {new Date(item.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                  </p>
+                </div>
+                <p className="text-sm font-medium leading-snug line-clamp-2">{item.action}</p>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+      {/* Desktop table view */}
+      <div className="overflow-x-auto hidden md:block">
+        <table className="w-full text-sm min-w-[640px]">
+          <thead>
+            <tr className="text-xs text-slate-500 border-b border-slate-700">
+              <th className="text-left py-2 pr-3 font-medium">시간</th>
+              <th className="text-left py-2 pr-3 font-medium">에이전트</th>
+              <th className="text-left py-2 pr-3 font-medium">명령</th>
+              <th className="text-left py-2 pr-3 font-medium">상태</th>
+              <th className="text-right py-2 pr-3 font-medium">소요시간</th>
+              <th className="text-right py-2 font-medium">토큰</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {items.map((item) => (
+              <tr key={item.id} className="border-b border-slate-700/50 hover:bg-slate-800/50 transition-colors">
+                <td className="py-2.5 pr-3 text-xs text-slate-500 whitespace-nowrap">{formatTime(item.createdAt)}</td>
+                <td className="py-2.5 pr-3 text-xs font-medium text-slate-200">{item.agentName || '-'}</td>
+                <td className="py-2.5 pr-3 text-xs text-slate-300 truncate max-w-[200px]">{item.action}</td>
+                <td className="py-2.5 pr-3"><StatusBadge status={item.phase} /></td>
+                <td className="py-2.5 pr-3 text-xs text-right text-slate-500">
+                  {formatDuration((item.metadata as Record<string, unknown>)?.durationMs as number | undefined)}
+                </td>
+                <td className="py-2.5 text-xs text-right text-slate-500">{formatTokens(item.metadata)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
+}
+
+function StatusIcon({ phase }: { phase: string }) {
+  const svgClass = "w-5 h-5"
+  if (['completed', 'done', 'end', 'success'].includes(phase)) {
+    return <svg className={svgClass} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+  }
+  if (['failed', 'error'].includes(phase)) {
+    return <svg className={svgClass} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+  }
+  if (phase === 'warning') {
+    return <svg className={svgClass} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+  }
+  return <svg className={svgClass} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
 }
 
 function DelegationsTable({ items }: { items: Delegation[] }) {

@@ -213,24 +213,75 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
           </div>
         )}
 
-        {/* List view */}
+        {/* List view — mobile-friendly card layout */}
         {viewMode === 'list' && filteredList.map((item) => (
-          <div key={item.id}
+          <article key={item.id}
             data-testid={`sns-content-item-${item.id}`}
             onClick={() => { setSelectedId(item.id); setView('detail') }}
-            className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 hover:border-slate-600 cursor-pointer transition-all">
-            <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-400">{PLATFORM_LABELS[item.platform] || item.platform}</span>
-                {item.accountName && <span className="text-xs text-cyan-400">@{item.accountName}</span>}
-                {item.variantOf && <span className="bg-purple-500/20 text-purple-400 text-xs px-1.5 py-0.5 rounded">변형</span>}
-                {item.isCardNews && <span className="bg-orange-500/20 text-orange-400 text-xs px-1.5 py-0.5 rounded">카드뉴스</span>}
+            className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 hover:border-slate-600 cursor-pointer transition-all flex flex-col gap-3">
+            <div className="flex justify-between items-start">
+              <div className="flex items-center gap-3">
+                {/* Platform icon */}
+                <div className="flex items-center justify-center rounded-lg bg-slate-700/50 text-slate-300 shrink-0 w-10 h-10">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    {item.platform === 'instagram' || item.platform === 'facebook' ? (
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                    ) : item.platform === 'twitter' ? (
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+                    ) : item.platform === 'youtube' ? (
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                    ) : (
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18V7.875c0-.621.504-1.125 1.125-1.125H7.5" />
+                    )}
+                  </svg>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs text-slate-400">{PLATFORM_LABELS[item.platform] || item.platform}</span>
+                    {item.accountName && <span className="text-xs text-cyan-400">@{item.accountName}</span>}
+                    {item.variantOf && <span className="bg-purple-500/20 text-purple-400 text-xs px-1.5 py-0.5 rounded">변형</span>}
+                    {item.isCardNews && <span className="bg-orange-500/20 text-orange-400 text-xs px-1.5 py-0.5 rounded">카드뉴스</span>}
+                  </div>
+                  {/* Status badge with dot */}
+                  <span className={`inline-flex items-center gap-1.5 mt-1 text-xs px-2 py-0.5 rounded-full ${STATUS_COLORS[item.status]}`}>
+                    <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                    {STATUS_LABELS[item.status]}
+                  </span>
+                </div>
               </div>
-              <span className={`text-xs px-2 py-0.5 rounded-full ${STATUS_COLORS[item.status]}`}>{STATUS_LABELS[item.status]}</span>
+              <button
+                onClick={(e) => { e.stopPropagation() }}
+                className="text-slate-400 hover:text-slate-300 p-1"
+                aria-label="더보기"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                </svg>
+              </button>
             </div>
-            <h3 className="text-sm font-medium text-slate-100">{item.title}</h3>
-            <p className="text-xs text-slate-500 mt-1">{item.creatorName} · {new Date(item.createdAt).toLocaleDateString('ko')}</p>
-          </div>
+            <div className={item.imageUrl ? 'flex gap-3' : ''}>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-[15px] font-medium text-slate-100 line-clamp-2 leading-snug">{item.title}</h3>
+                <div className="flex items-center gap-2 mt-2 text-slate-500 font-mono text-xs">
+                  {item.scheduledAt ? (
+                    <>
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>{new Date(item.scheduledAt).toLocaleString('ko', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                    </>
+                  ) : (
+                    <span>{item.creatorName} · {new Date(item.createdAt).toLocaleDateString('ko')}</span>
+                  )}
+                </div>
+              </div>
+              {item.imageUrl && (
+                <div className="shrink-0 w-16 h-16 rounded-lg bg-slate-700 overflow-hidden border border-slate-600">
+                  <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
+                </div>
+              )}
+            </div>
+          </article>
         ))}
       </div>
     )

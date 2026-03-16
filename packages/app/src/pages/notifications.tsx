@@ -26,6 +26,24 @@ const TYPE_ICON: Record<string, string> = {
   system: '⚙️',
 }
 
+const TYPE_ICON_COLOR: Record<string, { bg: string; text: string }> = {
+  chat_complete: { bg: 'bg-cyan-500/20', text: 'text-cyan-400' },
+  delegation_complete: { bg: 'bg-cyan-500/20', text: 'text-cyan-400' },
+  tool_error: { bg: 'bg-amber-500/20', text: 'text-amber-500' },
+  job_complete: { bg: 'bg-emerald-500/20', text: 'text-emerald-500' },
+  job_error: { bg: 'bg-rose-500/20', text: 'text-rose-500' },
+  system: { bg: 'bg-indigo-500/20', text: 'text-indigo-500' },
+}
+
+const TYPE_CATEGORY: Record<string, string> = {
+  chat_complete: '작업',
+  delegation_complete: '작업',
+  tool_error: '시스템',
+  job_complete: '작업',
+  job_error: '시스템',
+  system: '시스템',
+}
+
 function getDateGroup(dateStr: string): string {
   const d = new Date(dateStr)
   const now = new Date()
@@ -51,6 +69,7 @@ function timeAgo(dateStr: string): string {
 export function NotificationsPage() {
   const [activeTab, setTab] = useState('list')
   const [filter, setFilter] = useState<'all' | 'unread'>('all')
+  const [category, setCategory] = useState<'all' | 'task' | 'system' | 'alert'>('all')
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const { subscribe, addListener, removeListener, isConnected } = useWsStore()
@@ -111,8 +130,18 @@ export function NotificationsPage() {
   const notifications = data?.data ?? []
   const unreadCount = countData?.data?.unread ?? 0
 
+  // 카테고리 필터링
+  const filteredNotifications = category === 'all'
+    ? notifications
+    : notifications.filter((n) => {
+        const cat = TYPE_CATEGORY[n.type] || '알림'
+        if (category === 'task') return cat === '작업'
+        if (category === 'system') return cat === '시스템'
+        return cat === '알림'
+      })
+
   // 날짜 그룹핑
-  const grouped = notifications.reduce<Record<string, Notification[]>>((acc, n) => {
+  const grouped = filteredNotifications.reduce<Record<string, Notification[]>>((acc, n) => {
     const group = getDateGroup(n.createdAt)
     ;(acc[group] ??= []).push(n)
     return acc
@@ -130,20 +159,52 @@ export function NotificationsPage() {
 
   return (
     <div className="p-4 sm:p-6 max-w-2xl mx-auto space-y-4" data-testid="notifications-page">
-      <h1 className="text-xl font-semibold tracking-tight text-slate-50">알림</h1>
+      {/* Header: mobile-optimized with "모두 읽음" right-aligned */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold tracking-tight text-slate-50">알림</h1>
+        {unreadCount > 0 && (
+          <button
+            onClick={() => markAllRead.mutate()}
+            className="text-sm text-cyan-400 hover:text-cyan-300 font-bold transition-colors"
+            data-testid="mark-all-read"
+          >
+            모두 읽음
+          </button>
+        )}
+      </div>
 
       <Tabs items={tabsWithCount} value={activeTab} onChange={setTab} />
 
       {activeTab === 'list' && (
         <div className="space-y-4">
-          {/* 필터 + 모두 읽음 */}
-          <div className="flex items-center justify-between">
-            <div className="flex gap-2">
+          {/* Category filter chips (mobile-scrollable) + read/unread filter */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+              {([
+                { key: 'all' as const, label: '전체' },
+                { key: 'task' as const, label: '작업' },
+                { key: 'system' as const, label: '시스템' },
+                { key: 'alert' as const, label: '알림' },
+              ]).map((c) => (
+                <button
+                  key={c.key}
+                  onClick={() => setCategory(c.key)}
+                  className={`shrink-0 h-8 px-4 rounded-full text-sm font-medium transition-colors ${
+                    category === c.key
+                      ? 'bg-cyan-400 text-slate-900'
+                      : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-300'
+                  }`}
+                >
+                  {c.label}
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-1.5 shrink-0">
               <button
                 onClick={() => setFilter('all')}
                 className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                   filter === 'all'
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-cyan-400/20 text-cyan-400'
                     : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-300'
                 }`}
                 data-testid="filter-all"
@@ -154,23 +215,14 @@ export function NotificationsPage() {
                 onClick={() => setFilter('unread')}
                 className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                   filter === 'unread'
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-cyan-400/20 text-cyan-400'
                     : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-300'
                 }`}
                 data-testid="filter-unread"
               >
-                미확인만
+                미확인
               </button>
             </div>
-            {unreadCount > 0 && (
-              <button
-                onClick={() => markAllRead.mutate()}
-                className="text-xs text-blue-400 hover:text-blue-300 font-medium transition-colors"
-                data-testid="mark-all-read"
-              >
-                모두 읽음 ✓
-              </button>
-            )}
           </div>
 
           {/* 알림 목록 */}
@@ -190,45 +242,56 @@ export function NotificationsPage() {
             Object.entries(grouped).map(([group, items]) => (
               <div key={group}>
                 <p className="text-xs font-semibold text-slate-500 mb-2">{group}</p>
-                <div className="space-y-1">
-                  {items.map((n) => (
-                    <button
-                      key={n.id}
-                      onClick={() => handleClick(n)}
-                      className={`w-full text-left flex items-start gap-3 px-4 py-3 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:ring-offset-0 ${
-                        n.isRead
-                          ? 'hover:bg-slate-800/50'
-                          : 'bg-blue-950/20 hover:bg-blue-950/30'
-                      }`}
-                      data-testid={`notification-${n.id}`}
-                    >
-                      {/* 미읽음 인디케이터 */}
-                      <div className="pt-1.5">
-                        {!n.isRead ? (
-                          <div className="w-2 h-2 rounded-full bg-blue-500" />
-                        ) : (
-                          <div className="w-2 h-2" />
+                <div className="space-y-0">
+                  {items.map((n) => {
+                    const iconStyle = TYPE_ICON_COLOR[n.type] || { bg: 'bg-cyan-500/20', text: 'text-cyan-400' }
+                    return (
+                      <button
+                        key={n.id}
+                        onClick={() => handleClick(n)}
+                        className={`relative w-full text-left flex items-start gap-3 px-4 py-4 border-b border-slate-800/50 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500/40 focus:ring-offset-0 ${
+                          n.isRead
+                            ? 'opacity-80 hover:bg-slate-800/50'
+                            : 'bg-cyan-500/5 hover:bg-cyan-500/10'
+                        }`}
+                        data-testid={`notification-${n.id}`}
+                      >
+                        {/* Unread left border indicator */}
+                        {!n.isRead && (
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-cyan-400 rounded-r" />
                         )}
-                      </div>
-                      {/* 아이콘 */}
-                      <span className="text-base leading-none pt-0.5">
-                        {TYPE_ICON[n.type] || '🔔'}
-                      </span>
-                      {/* 내용 */}
-                      <div className="flex-1 min-w-0">
-                        <p className={`text-sm ${n.isRead ? 'text-slate-400' : 'text-slate-50 font-medium'}`}>
-                          {n.title}
-                        </p>
-                        {n.body && (
-                          <p className="text-xs text-slate-500 mt-0.5 truncate">{n.body}</p>
-                        )}
-                      </div>
-                      {/* 시간 */}
-                      <span className="text-[11px] text-slate-500 whitespace-nowrap pt-0.5">
-                        {timeAgo(n.createdAt)}
-                      </span>
-                    </button>
-                  ))}
+                        {/* Icon box */}
+                        <div className={`flex items-center justify-center rounded-lg shrink-0 size-10 ${iconStyle.bg}`}>
+                          <span className={`text-base leading-none ${iconStyle.text}`}>
+                            {TYPE_ICON[n.type] || '🔔'}
+                          </span>
+                        </div>
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex justify-between items-center mb-1">
+                            <p className={`text-sm truncate pr-2 flex items-center gap-2 ${
+                              n.isRead
+                                ? 'text-slate-300 font-semibold'
+                                : 'text-slate-50 font-bold'
+                            }`}>
+                              {n.title}
+                              {!n.isRead && <span className="size-2 rounded-full bg-cyan-400 inline-block shrink-0" />}
+                            </p>
+                            <span className={`text-xs font-medium whitespace-nowrap shrink-0 ${
+                              n.isRead ? 'text-slate-500' : 'text-cyan-400'
+                            }`}>
+                              {timeAgo(n.createdAt)}
+                            </span>
+                          </div>
+                          {n.body && (
+                            <p className={`text-sm font-normal leading-snug line-clamp-2 ${
+                              n.isRead ? 'text-slate-500' : 'text-slate-400'
+                            }`}>{n.body}</p>
+                          )}
+                        </div>
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
             ))
