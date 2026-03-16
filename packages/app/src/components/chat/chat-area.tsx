@@ -117,6 +117,7 @@ export function ChatArea({
   const prevScrollHeightRef = useRef(0)
   const { isConnected } = useWsStore()
   const { streamingText, isStreaming, toolCalls, error, delegationStatus, delegationStatuses, delegationChain, startStream, stopStream, clearError } = useChatStream(sessionId)
+  const [isCancelling, setIsCancelling] = useState(false)
   const [chainExpanded, setChainExpanded] = useState(false)
   const [debateResults, setDebateResults] = useState<DebateResultEntry[]>([])
   const [debateNotice, setDebateNotice] = useState<string | null>(null)
@@ -229,6 +230,21 @@ export function ChatArea({
     }
     sendMessage.mutate(payload)
     setInput('')
+  }
+
+  // FR66: Cancel active agent task via API
+  const handleCancel = async () => {
+    if (!sessionId || isCancelling) return
+    setIsCancelling(true)
+    try {
+      await api.post(`/workspace/chat/sessions/${sessionId}/cancel`, {})
+      toast.info('작업이 중단되었습니다')
+    } catch {
+      // API 실패해도 로컬 스트림은 중지
+      stopStream()
+    } finally {
+      setIsCancelling(false)
+    }
   }
 
   const handleRetry = () => {
@@ -875,11 +891,15 @@ export function ChatArea({
               />
               {isStreaming ? (
                 <button
-                  onClick={stopStream}
-                  className="p-2.5 rounded-lg bg-red-600 hover:bg-red-500 text-white transition-colors shrink-0"
-                  aria-label="스트리밍 중지"
+                  data-testid="cancel-btn"
+                  onClick={handleCancel}
+                  disabled={isCancelling}
+                  className="p-2.5 rounded-lg bg-red-600 hover:bg-red-500 disabled:opacity-60 text-white transition-colors shrink-0"
+                  aria-label="작업 중단"
                 >
-                  ■
+                  {isCancelling ? (
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin inline-block" />
+                  ) : '■'}
                 </button>
               ) : (
                 <button

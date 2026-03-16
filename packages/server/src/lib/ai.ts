@@ -330,6 +330,22 @@ export type StreamEvent =
   | { type: 'done'; sessionId: string }
   | { type: 'error'; code: string; message: string }
 
+/** FR66: Active streaming sessions — sessionId → cancelled flag */
+const activeStreamingSessions = new Map<string, { cancelled: boolean }>()
+
+/** FR66: Cancel an active streaming session */
+export function cancelStreamingSession(sessionId: string): boolean {
+  const session = activeStreamingSessions.get(sessionId)
+  if (!session) return false
+  session.cancelled = true
+  return true
+}
+
+/** FR66: Check if a session is currently streaming */
+export function isSessionStreaming(sessionId: string): boolean {
+  return activeStreamingSessions.has(sessionId)
+}
+
 /**
  * 스트리밍 AI 응답 생성 — 이벤트 콜백으로 실시간 전달
  * 최종 전체 텍스트를 반환하여 DB 저장에 사용
@@ -337,6 +353,22 @@ export type StreamEvent =
 export async function generateAgentResponseStream(
   ctx: ChatContext,
   onEvent: (event: StreamEvent) => void,
+): Promise<string> {
+  // FR66: Register active session for cancel support
+  const streamState = { cancelled: false }
+  activeStreamingSessions.set(ctx.sessionId, streamState)
+
+  try {
+  return await _generateAgentResponseStreamInner(ctx, onEvent, streamState)
+  } finally {
+    activeStreamingSessions.delete(ctx.sessionId)
+  }
+}
+
+async function _generateAgentResponseStreamInner(
+  ctx: ChatContext,
+  onEvent: (event: StreamEvent) => void,
+  streamState: { cancelled: boolean },
 ): Promise<string> {
   const client = await getClientForUser(ctx.userId, ctx.companyId)
 
@@ -421,6 +453,14 @@ export async function generateAgentResponseStream(
   let fullText = ''
 
   for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
+    // FR66: Check cancel before each round
+    if (streamState.cancelled) {
+      fullText += '\n\n[작업이 중단되었습니다]'
+      onEvent({ type: 'token', content: '\n\n[작업이 중단되었습니다]' })
+      onEvent({ type: 'done', sessionId: ctx.sessionId })
+      return fullText
+    }
+
     const stream = client.messages.stream({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 2048,
@@ -431,6 +471,7 @@ export async function generateAgentResponseStream(
 
     // 텍스트 토큰 스트리밍
     stream.on('text', (text) => {
+      if (streamState.cancelled) return
       fullText += text
       onEvent({ type: 'token', content: text })
     })
