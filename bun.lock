@@ -82,6 +82,23 @@
         "dotenv": "^16.4.7",
       },
     },
+    "packages/landing": {
+      "name": "@corthex/landing",
+      "version": "0.0.1",
+      "dependencies": {
+        "react": "^19",
+        "react-dom": "^19",
+      },
+      "devDependencies": {
+        "@tailwindcss/vite": "^4",
+        "@types/react": "^19",
+        "@types/react-dom": "^19",
+        "@vitejs/plugin-react": "^4",
+        "tailwindcss": "^4",
+        "typescript": "^5",
+        "vite": "^6",
+      },
+    },
     "packages/server": {
       "name": "@corthex/server",
       "version": "0.0.1",
@@ -296,6 +313,8 @@
     "@corthex/app": ["@corthex/app@workspace:packages/app"],
 
     "@corthex/e2e": ["@corthex/e2e@workspace:packages/e2e"],
+
+    "@corthex/landing": ["@corthex/landing@workspace:packages/landing"],
 
     "@corthex/server": ["@corthex/server@workspace:packages/server"],
 
