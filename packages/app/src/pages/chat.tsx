@@ -131,8 +131,8 @@ export function ChatPage() {
   )
 
   return (
-    <div data-testid="chat-page" className="flex h-full bg-slate-900">
-      {/* 세션 패널 — 모바일에서는 showChat일 때 숨김 */}
+    <div data-testid="chat-page" className="flex h-full bg-slate-950">
+      {/* 세션 패널 -- 모바일에서는 showChat일 때 숨김 */}
       <div className={`${showChat ? 'hidden md:flex' : 'flex'} w-full md:w-72 shrink-0`}>
         <SessionPanel
           sessions={sessions}
@@ -145,16 +145,18 @@ export function ChatPage() {
         />
       </div>
 
-      {/* 채팅 영역 — 모바일에서는 showChat일 때만 표시 */}
-      <div className={`${!showChat ? 'hidden md:flex' : 'flex'} flex-1 min-w-0`}>
-        <ChatArea
-          agent={selectedAgent}
-          sessionId={selectedSessionId}
-          onBack={() => {
-            setShowChat(false)
-            setSearchParams({}, { replace: true })
-          }}
-        />
+      {/* 채팅 영역 -- Stitch 스타일 centered container */}
+      <div className={`${!showChat ? 'hidden md:flex' : 'flex'} flex-1 min-w-0 justify-center py-4 px-4 sm:px-6 lg:px-8`}>
+        <div className="flex flex-col w-full max-w-[800px] flex-1 bg-slate-900 rounded-3xl border border-slate-800 shadow-xl overflow-hidden relative">
+          <ChatArea
+            agent={selectedAgent}
+            sessionId={selectedSessionId}
+            onBack={() => {
+              setShowChat(false)
+              setSearchParams({}, { replace: true })
+            }}
+          />
+        </div>
       </div>
 
       {/* 에이전트 선택 모달 */}

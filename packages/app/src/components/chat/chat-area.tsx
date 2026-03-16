@@ -7,6 +7,7 @@ import { useWsStore } from '../../stores/ws-store'
 import { useChatStream } from '../../hooks/use-chat-stream'
 import { ToolCallCard } from './tool-call-card'
 import { DebateResultCard } from '../agora/debate-result-card'
+import { Bot, Paperclip, Send, MoreHorizontal, ArrowLeft, Square, Loader2 } from 'lucide-react'
 import type { Agent, Message, Delegation, SavedToolCall, FileAttachment } from './types'
 import type { ToolCall } from '../../hooks/use-chat-stream'
 import type { Debate, DebateResult, DebateWsEvent, CreateDebateRequest } from '@corthex/shared'
@@ -52,12 +53,12 @@ function renderTextWithLinks(
         <button
           key={key++}
           onClick={() => onNavigate(href)}
-          className="text-blue-400 underline hover:text-blue-300"
+          className="text-cyan-400 underline hover:text-cyan-300"
         >
           {linkText}
         </button>
       ) : (
-        <a key={key++} href={href} target="_blank" rel="noopener noreferrer" className="text-blue-400 underline hover:text-blue-300">
+        <a key={key++} href={href} target="_blank" rel="noopener noreferrer" className="text-cyan-400 underline hover:text-cyan-300">
           {linkText}
         </a>
       ),
@@ -389,13 +390,15 @@ export function ChatArea({
   if (!agent || !sessionId) {
     return (
       <div data-testid="chat-empty" className="flex-1 flex flex-col items-center justify-center h-full px-6 text-center">
-        <span className="text-slate-700 text-5xl mb-3">💬</span>
+        <div className="bg-cyan-400/20 flex items-center justify-center rounded-full w-16 h-16 mb-4 border border-cyan-400/30">
+          <Bot className="w-8 h-8 text-cyan-400" />
+        </div>
         <p className="text-sm font-medium text-slate-400">에이전트와 대화를 시작하세요</p>
         <p className="text-xs text-slate-500 mt-1">무엇이든 질문해보세요</p>
         {onBack && (
           <button
             onClick={onBack}
-            className="mt-4 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors"
+            className="mt-4 px-4 py-2 text-sm bg-cyan-400 text-slate-950 rounded-lg font-medium hover:bg-cyan-300 transition-colors"
           >
             새 대화 시작
           </button>
@@ -408,138 +411,110 @@ export function ChatArea({
     <div data-testid="chat-area" className="flex-1 flex flex-col min-w-0">
       {/* 연결 상태 배너 */}
       {!isConnected && (
-        <div data-testid="connection-banner" className="flex items-center gap-2 px-4 py-2 bg-amber-950/50 border-b border-amber-900/50 text-amber-300 text-xs">
-          ⚠️ 연결이 끊어졌습니다. 재연결 중...
+        <div data-testid="connection-banner" className="flex items-center gap-2 px-6 py-2 bg-amber-950/50 border-b border-amber-900/50 text-amber-300 text-xs">
+          연결이 끊어졌습니다. 재연결 중...
         </div>
       )}
       {reconnectBanner && (
-        <div data-testid="connection-banner" className="flex items-center gap-2 px-4 py-2 bg-emerald-950/50 border-b border-emerald-900/50 text-emerald-300 text-xs">
-          ✓ 다시 연결되었습니다
+        <div data-testid="connection-banner" className="flex items-center gap-2 px-6 py-2 bg-emerald-950/50 border-b border-emerald-900/50 text-emerald-300 text-xs">
+          다시 연결되었습니다
         </div>
       )}
 
-      {/* 헤더 */}
-      <div data-testid="chat-header" className="flex items-center justify-between px-4 py-3 border-b border-slate-700 shrink-0">
+      {/* 헤더 -- Stitch style */}
+      <header data-testid="chat-header" className="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-800 px-6 py-4 bg-slate-900/80 backdrop-blur-md sticky top-0 z-10 shrink-0">
         <div className="flex items-center gap-3">
           {onBack && (
             <button
               data-testid="mobile-back-btn"
               onClick={onBack}
-              className="md:hidden p-1.5 rounded-lg text-slate-400 hover:bg-slate-700 mr-1"
+              className="md:hidden flex items-center justify-center rounded-xl size-10 text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors mr-1"
             >
-              ← 대화 목록
+              <ArrowLeft className="w-5 h-5" />
             </button>
           )}
-          {/* Agent avatar with status dot */}
-          <span className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-300 shrink-0 relative">
-            {agent.name.charAt(0)}
-            <span className={`absolute bottom-0 right-0 w-2 h-2 rounded-full border-2 border-slate-900 ${statusColors[agent.status]}`} />
-          </span>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-slate-100">{agent.name}</span>
-              {agent.isSecretary && (
-                <span className="text-xs px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                  비서
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-slate-500">
-              {(() => {
-                // 우선순위 1: delegation-chain (연쇄 위임)
-                if (delegationChain && delegationChain.length >= 3) {
-                  if (chainExpanded) {
-                    return (
-                      <span className="text-blue-400">
-                        <button onClick={() => setChainExpanded(false)} className="hover:underline">
-                          🔀 {delegationChain.join(' → ')}
-                        </button>
-                        <span className="block text-[10px] text-slate-500 ml-4">
-                          현재 활성: {delegationChain[delegationChain.length - 1]}
-                        </span>
-                      </span>
-                    )
-                  }
+          <div className="flex items-center gap-2">
+            {/* Status Dot */}
+            <div className={`size-2.5 rounded-full ${statusColors[agent.status]} shadow-[0_0_8px_rgba(16,185,129,0.5)]`} />
+            <h2 className="text-white text-lg font-semibold leading-tight tracking-tight">{agent.name}</h2>
+            {agent.isSecretary && (
+              <span className="text-xs px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                비서
+              </span>
+            )}
+          </div>
+        </div>
+        <div className="flex flex-1 justify-end gap-2">
+          {/* Delegation status subtitle */}
+          <div className="hidden md:flex items-center text-xs text-slate-500 mr-2">
+            {(() => {
+              if (delegationChain && delegationChain.length >= 3) {
+                if (chainExpanded) {
                   return (
-                    <button
-                      onClick={() => setChainExpanded(true)}
-                      className="text-blue-400 animate-pulse hover:underline"
-                    >
-                      🔀 {delegationChain.length - 1}단계 위임 중 ▾
+                    <button onClick={() => setChainExpanded(false)} className="text-cyan-400 hover:underline">
+                      {delegationChain.join(' -> ')}
                     </button>
                   )
                 }
-                if (delegationChain && delegationChain.length === 2) {
-                  return (
-                    <span className="text-blue-400 animate-pulse">
-                      {delegationChain[1]}에게 위임 중...
-                    </span>
-                  )
-                }
-                // 우선순위 2: delegationStatuses (병렬 위임)
-                const entries = Object.values(delegationStatuses)
-                const total = entries.length
-                const completed = entries.filter(s => s.status !== 'delegating').length
-                const delegating = entries.filter(s => s.status === 'delegating')
-                if (total > 1 && completed < total) {
-                  return (
-                    <span className="text-blue-400 animate-pulse">
-                      → {total}개 부서 위임 중 ({completed}/{total} 완료)
-                    </span>
-                  )
-                }
-                if (total > 1 && completed === total) {
-                  return (
-                    <span className="text-emerald-400">
-                      ✓ {total}개 부서 위임 완료
-                    </span>
-                  )
-                }
-                if (delegating.length === 1) {
-                  return (
-                    <span className="text-blue-400 animate-pulse">
-                      → {delegating[0].targetAgentName}에게 위임 중...
-                    </span>
-                  )
-                }
-                return <span>{statusLabels[agent.status] || agent.role}</span>
-              })()}
-            </p>
+                return (
+                  <button onClick={() => setChainExpanded(true)} className="text-cyan-400 animate-pulse hover:underline">
+                    {delegationChain.length - 1}단계 위임 중
+                  </button>
+                )
+              }
+              if (delegationChain && delegationChain.length === 2) {
+                return <span className="text-cyan-400 animate-pulse">{delegationChain[1]}에게 위임 중...</span>
+              }
+              const entries = Object.values(delegationStatuses)
+              const total = entries.length
+              const completed = entries.filter(s => s.status !== 'delegating').length
+              const delegating = entries.filter(s => s.status === 'delegating')
+              if (total > 1 && completed < total) {
+                return <span className="text-cyan-400 animate-pulse">{total}개 부서 위임 중 ({completed}/{total})</span>
+              }
+              if (total > 1 && completed === total) {
+                return <span className="text-emerald-400">{total}개 부서 위임 완료</span>
+              }
+              if (delegating.length === 1) {
+                return <span className="text-cyan-400 animate-pulse">{delegating[0].targetAgentName}에게 위임 중...</span>
+              }
+              return <span>{statusLabels[agent.status] || agent.role}</span>
+            })()}
           </div>
+          {agent.isSecretary && delegationList.length > 0 && (
+            <button
+              data-testid="delegation-toggle"
+              onClick={() => setShowDelegations(!showDelegations)}
+              className={`flex items-center justify-center rounded-xl size-10 transition-colors ${
+                showDelegations
+                  ? 'text-cyan-400 bg-cyan-400/10'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+              }`}
+            >
+              <MoreHorizontal className="w-5 h-5" />
+            </button>
+          )}
         </div>
-        {agent.isSecretary && delegationList.length > 0 && (
-          <button
-            data-testid="delegation-toggle"
-            onClick={() => setShowDelegations(!showDelegations)}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
-              showDelegations
-                ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-                : 'text-slate-500 hover:bg-slate-700'
-            }`}
-          >
-            🔀 위임 내역
-          </button>
-        )}
-      </div>
+      </header>
 
       {/* 위임 내역 패널 */}
       {showDelegations ? (
-        <div data-testid="delegation-panel" className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+        <div data-testid="delegation-panel" className="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
           {delegationList.map((del) => (
             <div
               key={del.id}
-              className="bg-slate-800/50 border border-slate-700 rounded-xl p-4"
+              className="bg-slate-800 border border-slate-700 rounded-2xl p-4"
             >
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-slate-200">{del.targetAgentName}</span>
                 <span
-                  className={`text-xs px-1.5 py-0.5 rounded ${
+                  className={`text-xs px-1.5 py-0.5 rounded-full font-mono ${
                     del.status === 'completed'
                       ? 'bg-emerald-500/20 text-emerald-400'
                       : del.status === 'failed'
                         ? 'bg-red-500/20 text-red-400'
                         : del.status === 'processing'
-                          ? 'bg-blue-500/20 text-blue-400'
+                          ? 'bg-cyan-400/20 text-cyan-400'
                           : 'bg-slate-600 text-slate-400'
                   }`}
                 >
@@ -550,7 +525,7 @@ export function ChatArea({
               {del.agentResponse && (
                 <p className="text-xs text-slate-300 line-clamp-3">{del.agentResponse}</p>
               )}
-              <div className="flex items-center gap-3 mt-2 text-xs text-slate-600">
+              <div className="flex items-center gap-3 mt-2 text-xs text-slate-600 font-mono">
                 <span>생성: {new Date(del.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</span>
                 {del.completedAt && (
                   <span>완료: {new Date(del.completedAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</span>
@@ -561,19 +536,19 @@ export function ChatArea({
         </div>
       ) : (
         <>
-          {/* 메시지 목록 */}
+          {/* 메시지 목록 -- Stitch chat area style */}
           <div
             ref={scrollContainerRef}
             onScroll={handleScroll}
             data-testid="message-list"
             role="log"
             aria-live="polite"
-            className="flex-1 overflow-y-auto px-4 py-3 space-y-4 [-webkit-overflow-scrolling:touch]"
+            className="flex-1 overflow-y-auto p-6 flex flex-col gap-6 [-webkit-overflow-scrolling:touch]"
           >
             {/* 이전 메시지 로딩 스피너 */}
             {isFetchingNextPage && (
               <div className="flex justify-center py-2">
-                <div className="w-5 h-5 border-2 border-slate-600 border-t-blue-500 rounded-full animate-spin" />
+                <Loader2 className="w-5 h-5 text-cyan-400 animate-spin" />
               </div>
             )}
             {hasNextPage && !isFetchingNextPage && (
@@ -585,15 +560,25 @@ export function ChatArea({
                     if (el) prevScrollHeightRef.current = el.scrollHeight
                     fetchNextPage()
                   }}
-                  className="flex items-center justify-center w-full py-2 text-xs text-slate-500 hover:text-slate-300 transition-colors"
+                  className="flex items-center justify-center w-full py-2 text-xs text-slate-500 hover:text-slate-300 transition-colors font-mono"
                 >
                   이전 메시지 더 보기
                 </button>
               </div>
             )}
+
+            {/* Date separator */}
+            {messages.length > 0 && (
+              <div className="flex justify-center">
+                <span className="text-xs font-mono text-slate-500 px-3 py-1 bg-slate-800/50 rounded-full">TODAY</span>
+              </div>
+            )}
+
             {messages.length === 0 && !isStreaming && (
               <div data-testid="chat-empty" className="flex flex-col items-center justify-center h-full px-6 text-center">
-                <span className="text-slate-700 text-5xl mb-3">💬</span>
+                <div className="bg-cyan-400/20 flex items-center justify-center rounded-full w-12 h-12 mb-3 border border-cyan-400/30">
+                  <Bot className="w-6 h-6 text-cyan-400" />
+                </div>
                 <p className="text-sm font-medium text-slate-400">
                   {agent.name}과(와) 대화를 시작하세요
                 </p>
@@ -614,38 +599,41 @@ export function ChatArea({
                   <div
                     key={msg.id}
                     data-testid={`msg-user-${msg.id}`}
-                    className="flex justify-end"
+                    className="flex items-end gap-3 justify-end group"
                   >
-                    <div className="max-w-[75%] bg-blue-600 rounded-2xl rounded-br-md px-4 py-2.5">
-                      <p className="text-sm text-white whitespace-pre-wrap">{renderTextWithLinks(mainContent, navigate)}</p>
-                      {msg.attachments && msg.attachments.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 mt-2">
-                          {msg.attachments.map(att => (
-                            <a
-                              key={att.id}
-                              data-testid={`attachment-${att.id}`}
-                              href={`/api/workspace/files/${att.id}/download`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-blue-500/30 text-xs text-blue-100"
-                            >
-                              {att.mimeType.startsWith('image/') ? (
-                                <img
-                                  src={`/api/workspace/files/${att.id}/download`}
-                                  alt={att.filename}
-                                  className="w-16 h-16 object-cover rounded"
-                                  loading="lazy"
-                                />
-                              ) : (
-                                <span>📎</span>
-                              )}
-                              <span className="truncate max-w-[150px]">{att.filename}</span>
-                              <span>· {formatBytes(att.sizeBytes)}</span>
-                            </a>
-                          ))}
-                        </div>
-                      )}
-                      <p className="text-xs text-blue-200/70 mt-1 text-right">
+                    <div className="flex flex-col gap-1 items-end max-w-[80%]">
+                      <p className="text-slate-400 text-xs font-medium px-2">User</p>
+                      <div className="text-[15px] font-normal leading-relaxed rounded-2xl rounded-br-sm px-5 py-3.5 bg-cyan-400/10 text-cyan-400">
+                        <p className="whitespace-pre-wrap">{renderTextWithLinks(mainContent, navigate)}</p>
+                        {msg.attachments && msg.attachments.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 mt-2">
+                            {msg.attachments.map(att => (
+                              <a
+                                key={att.id}
+                                data-testid={`attachment-${att.id}`}
+                                href={`/api/workspace/files/${att.id}/download`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-cyan-400/20 text-xs text-cyan-300"
+                              >
+                                {att.mimeType.startsWith('image/') ? (
+                                  <img
+                                    src={`/api/workspace/files/${att.id}/download`}
+                                    alt={att.filename}
+                                    className="w-16 h-16 object-cover rounded"
+                                    loading="lazy"
+                                  />
+                                ) : (
+                                  <Paperclip className="w-3 h-3" />
+                                )}
+                                <span className="truncate max-w-[150px]">{att.filename}</span>
+                                <span>· {formatBytes(att.sizeBytes)}</span>
+                              </a>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-xs text-slate-500 px-2 font-mono tabular-nums">
                         {new Date(msg.createdAt).toLocaleTimeString('ko-KR', {
                           hour: '2-digit',
                           minute: '2-digit',
@@ -656,62 +644,65 @@ export function ChatArea({
                 )
               }
 
-              // Agent message
+              // Agent message -- Stitch style
               return (
                 <div
                   key={msg.id}
                   data-testid={`msg-agent-${msg.id}`}
-                  className="flex items-start gap-2.5"
+                  className="flex items-start gap-3 group"
                 >
-                  <span className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-300 shrink-0">
-                    {agent.name.charAt(0)}
-                  </span>
-                  <div className="max-w-[75%] bg-slate-800 border border-slate-700 rounded-2xl rounded-bl-md px-4 py-2.5">
-                    <p className="text-xs font-medium text-slate-400 mb-1">{agent.name}</p>
-                    {msgToolCalls.length > 0 && msgToolCalls.map((tc) => (
-                      <ToolCallCard key={tc.toolId} tool={tc} />
-                    ))}
-                    <div className="text-sm text-slate-200 prose prose-sm prose-invert max-w-none">
-                      <p className="whitespace-pre-wrap">{renderTextWithLinks(mainContent, navigate)}</p>
-                    </div>
-                    {msg.attachments && msg.attachments.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {msg.attachments.map(att => (
-                          <a
-                            key={att.id}
-                            data-testid={`attachment-${att.id}`}
-                            href={`/api/workspace/files/${att.id}/download`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-xs text-slate-300 transition-colors"
-                          >
-                            {att.mimeType.startsWith('image/') ? (
-                              <img
-                                src={`/api/workspace/files/${att.id}/download`}
-                                alt={att.filename}
-                                className="w-16 h-16 object-cover rounded"
-                                loading="lazy"
-                              />
-                            ) : (
-                              <span>📎</span>
-                            )}
-                            <span className="truncate max-w-[150px]">{att.filename}</span>
-                            <span>· {formatBytes(att.sizeBytes)}</span>
-                          </a>
+                  {/* Avatar */}
+                  <div className="bg-cyan-400/20 flex items-center justify-center aspect-square rounded-full w-8 h-8 shrink-0 mt-6 border border-cyan-400/30">
+                    <Bot className="w-4 h-4 text-cyan-400" />
+                  </div>
+                  <div className="flex flex-col gap-1 items-start max-w-[80%] w-full">
+                    <p className="text-slate-400 text-xs font-medium px-2">{agent.name}</p>
+                    {/* Tool calls */}
+                    {msgToolCalls.length > 0 && (
+                      <div className="flex flex-col gap-1 mb-1 px-2">
+                        {msgToolCalls.map((tc) => (
+                          <ToolCallCard key={tc.toolId} tool={tc} />
                         ))}
                       </div>
                     )}
-                    {toolContent && (
-                      <div className="mt-2 pt-2 border-t border-slate-700">
-                        <p className="text-[10px] font-medium text-blue-400 mb-1">
-                          🔧 도구 호출
-                        </p>
-                        <p className="text-[11px] text-slate-400 whitespace-pre-wrap">
-                          {toolContent}
-                        </p>
-                      </div>
-                    )}
-                    <p className="text-xs text-slate-500 mt-1">
+                    {/* Message Bubble */}
+                    <div className="text-[15px] font-normal leading-relaxed rounded-2xl rounded-bl-sm px-5 py-3.5 bg-slate-800 text-slate-200 w-full shadow-sm">
+                      <p className="whitespace-pre-wrap">{renderTextWithLinks(mainContent, navigate)}</p>
+                      {msg.attachments && msg.attachments.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mt-2">
+                          {msg.attachments.map(att => (
+                            <a
+                              key={att.id}
+                              data-testid={`attachment-${att.id}`}
+                              href={`/api/workspace/files/${att.id}/download`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-xs text-slate-300 transition-colors"
+                            >
+                              {att.mimeType.startsWith('image/') ? (
+                                <img
+                                  src={`/api/workspace/files/${att.id}/download`}
+                                  alt={att.filename}
+                                  className="w-16 h-16 object-cover rounded"
+                                  loading="lazy"
+                                />
+                              ) : (
+                                <Paperclip className="w-3 h-3" />
+                              )}
+                              <span className="truncate max-w-[150px]">{att.filename}</span>
+                              <span>· {formatBytes(att.sizeBytes)}</span>
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                      {toolContent && (
+                        <div className="mt-3 pt-3 border-t border-slate-700">
+                          <p className="text-[10px] font-medium text-cyan-400 mb-1 font-mono">도구 호출</p>
+                          <p className="text-[11px] text-slate-400 whitespace-pre-wrap font-mono">{toolContent}</p>
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-500 px-2 font-mono tabular-nums">
                       {new Date(msg.createdAt).toLocaleTimeString('ko-KR', {
                         hour: '2-digit',
                         minute: '2-digit',
@@ -724,27 +715,29 @@ export function ChatArea({
 
             {/* 스트리밍 메시지 */}
             {isStreaming && (streamingText || toolCalls.length > 0) && (
-              <div data-testid="msg-streaming" className="flex items-start gap-2.5">
-                <span className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-300 shrink-0">
-                  {agent.name.charAt(0)}
-                </span>
-                <div className="max-w-[75%] bg-slate-800 border border-slate-700 rounded-2xl rounded-bl-md px-4 py-2.5 text-sm leading-relaxed">
-                  <p className="text-xs font-medium text-slate-400 mb-1">
-                    {agent.name}
-                  </p>
-                  {toolCalls.map((tool) => (
-                    <ToolCallCard key={tool.toolId} tool={tool} />
-                  ))}
+              <div data-testid="msg-streaming" className="flex items-start gap-3">
+                <div className="bg-cyan-400/20 flex items-center justify-center aspect-square rounded-full w-8 h-8 shrink-0 mt-6 border border-cyan-400/30">
+                  <Bot className="w-4 h-4 text-cyan-400" />
+                </div>
+                <div className="flex flex-col gap-1 items-start max-w-[80%] w-full">
+                  <p className="text-slate-400 text-xs font-medium px-2">{agent.name}</p>
+                  {toolCalls.length > 0 && (
+                    <div className="flex flex-col gap-1 mb-1 px-2">
+                      {toolCalls.map((tool) => (
+                        <ToolCallCard key={tool.toolId} tool={tool} />
+                      ))}
+                    </div>
+                  )}
                   {streamingText && (
-                    <div className="text-sm text-slate-200 prose prose-sm prose-invert max-w-none">
+                    <div className="text-[15px] font-normal leading-relaxed rounded-2xl rounded-bl-sm px-5 py-3.5 bg-slate-800 text-slate-200 w-full shadow-sm">
                       <p className="whitespace-pre-wrap">
                         {renderTextWithLinks(streamingText, navigate)}
-                        <span className="inline-block w-0.5 h-4 bg-blue-400 animate-pulse ml-0.5" />
+                        <span className="inline-block w-2 h-4 bg-cyan-400 ml-1 align-middle animate-[blink_1s_step-end_infinite]" />
                       </p>
                     </div>
                   )}
                   {!streamingText && toolCalls.length > 0 && toolCalls.every(t => t.status === 'done') && (
-                    <div className="flex items-center gap-1 py-1">
+                    <div className="flex items-center gap-1 py-1 px-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-slate-500 animate-bounce" style={{ animationDelay: '0ms' }} />
                       <span className="w-1.5 h-1.5 rounded-full bg-slate-500 animate-bounce" style={{ animationDelay: '150ms' }} />
                       <span className="w-1.5 h-1.5 rounded-full bg-slate-500 animate-bounce" style={{ animationDelay: '300ms' }} />
@@ -756,32 +749,27 @@ export function ChatArea({
 
             {/* 스트리밍 시작 대기 (아직 토큰 없음) */}
             {isStreaming && !streamingText && toolCalls.length === 0 && (
-              <div data-testid="msg-streaming" className="flex items-start gap-2.5">
-                <span className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-300 shrink-0">
-                  {agent.name.charAt(0)}
-                </span>
-                <div className="bg-slate-800 border border-slate-700 rounded-2xl rounded-bl-md px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-slate-500 animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <span className="w-1.5 h-1.5 rounded-full bg-slate-500 animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <span className="w-1.5 h-1.5 rounded-full bg-slate-500 animate-bounce" style={{ animationDelay: '300ms' }} />
-                    </div>
-                    {agent.isSecretary && (
-                      <span className="text-xs text-slate-400">
-                        {(() => {
-                          if (delegationChain && delegationChain.length >= 2) {
-                            return `🔀 ${delegationChain.join(' → ')}`
-                          }
-                          const entries = Object.values(delegationStatuses)
-                          const total = entries.length
-                          const completed = entries.filter(s => s.status !== 'delegating').length
-                          if (total > 1) return `${total}개 부서 위임 중 (${completed}/${total} 완료)`
-                          if (delegationStatus?.targetAgentName) return `${delegationStatus.targetAgentName}에게 위임 중...`
-                          return '부서 위임 분석 중...'
-                        })()}
-                      </span>
-                    )}
+              <div data-testid="msg-streaming" className="flex items-start gap-3">
+                <div className="bg-cyan-400/20 flex items-center justify-center aspect-square rounded-full w-8 h-8 shrink-0 mt-6 border border-cyan-400/30">
+                  <Bot className="w-4 h-4 text-cyan-400" />
+                </div>
+                <div className="flex flex-col gap-1 items-start max-w-[80%]">
+                  <p className="text-slate-400 text-xs font-medium px-2">{agent.name}</p>
+                  <div className="flex items-center gap-2 px-2 mb-1">
+                    <Loader2 className="w-3.5 h-3.5 text-slate-400 animate-spin" />
+                    <span className="text-xs font-mono text-slate-400">
+                      {(() => {
+                        if (delegationChain && delegationChain.length >= 2) {
+                          return `${delegationChain.join(' -> ')}`
+                        }
+                        const entries = Object.values(delegationStatuses)
+                        const total = entries.length
+                        const completed = entries.filter(s => s.status !== 'delegating').length
+                        if (total > 1) return `${total}개 부서 위임 중 (${completed}/${total} 완료)`
+                        if (delegationStatus?.targetAgentName) return `${delegationStatus.targetAgentName}에게 위임 중...`
+                        return agent.isSecretary ? '부서 위임 분석 중...' : '응답 생성 중...'
+                      })()}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -789,20 +777,20 @@ export function ChatArea({
 
             {/* Delegation status inline */}
             {isStreaming && delegationStatus && !delegationChain && (
-              <div data-testid="delegation-status" className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/50 rounded-lg border border-slate-700/50 text-xs text-slate-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                → {delegationStatus.targetAgentName}에게 위임 중...
+              <div data-testid="delegation-status" className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/50 rounded-full border border-slate-700/50 text-xs text-slate-400 font-mono mx-auto">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                {delegationStatus.targetAgentName}에게 위임 중...
               </div>
             )}
 
             {/* 에러 표시 */}
             {error && (
-              <div className="flex items-center gap-2 px-4 py-2 bg-red-950/30 border border-red-900/30 rounded-lg mx-4">
-                <span className="text-red-400 shrink-0">⚠️</span>
+              <div className="flex items-center gap-2 px-5 py-3 bg-red-950/30 border border-red-900/30 rounded-2xl">
+                <span className="text-red-400 shrink-0 text-sm">!</span>
                 <span className="text-sm text-red-300">{error}</span>
                 <button
                   onClick={handleRetry}
-                  className="text-xs text-red-400 hover:text-red-300 ml-auto"
+                  className="text-xs text-red-400 hover:text-red-300 ml-auto font-medium"
                 >
                   다시 시도
                 </button>
@@ -812,8 +800,8 @@ export function ChatArea({
             {/* Debate notice */}
             {debateNotice && (
               <div className="flex justify-center">
-                <div className="bg-blue-950/30 border border-blue-900/30 rounded-lg px-4 py-2 text-xs text-blue-400 animate-pulse">
-                  🗣️ {debateNotice}
+                <div className="bg-cyan-400/10 border border-cyan-400/20 rounded-full px-4 py-2 text-xs text-cyan-400 animate-pulse font-mono">
+                  {debateNotice}
                 </div>
               </div>
             )}
@@ -834,25 +822,25 @@ export function ChatArea({
             <div ref={messagesEndRef} />
           </div>
 
-          {/* 입력 영역 */}
-          <div data-testid="chat-input" className="shrink-0 border-t border-slate-700 bg-slate-900 px-4 py-3">
+          {/* 입력 영역 -- Stitch style */}
+          <div data-testid="chat-input" className="p-4 bg-slate-900 border-t border-slate-800 shrink-0">
             {/* 첨부 파일 미리보기 */}
             {pendingAttachments.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-2">
                 {pendingAttachments.map(f => (
                   <span key={f.id} data-testid={`attachment-${f.id}`} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-xs text-slate-300">
-                    <span>📎</span>
+                    <Paperclip className="w-3 h-3" />
                     <span className="max-w-[120px] truncate">{f.filename}</span>
                     <span className="text-slate-500">· {formatBytes(f.sizeBytes)}</span>
                     <button
                       onClick={() => setPendingAttachments(prev => prev.filter(a => a.id !== f.id))}
                       className="text-slate-500 hover:text-red-400 transition-colors"
-                    >✕</button>
+                    >x</button>
                   </span>
                 ))}
               </div>
             )}
-            <div className="flex items-end gap-2">
+            <div className="flex items-end gap-2 bg-slate-800 rounded-2xl p-2 border border-slate-700/50 shadow-inner focus-within:ring-1 focus-within:ring-cyan-400/50 transition-all">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -863,55 +851,64 @@ export function ChatArea({
                 data-testid="attach-btn"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isStreaming || isUploading || pendingAttachments.length >= 5}
-                className="p-2 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-slate-700 transition-colors shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex items-center justify-center p-2.5 text-slate-400 hover:text-slate-300 rounded-xl hover:bg-slate-700 transition-colors shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
                 aria-label="파일 첨부"
               >
                 {isUploading ? (
-                  <span className="w-4 h-4 border-2 border-slate-600 border-t-blue-500 rounded-full animate-spin inline-block" />
-                ) : '📎'}
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Paperclip className="w-5 h-5" />
+                )}
               </button>
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault()
-                    handleSend()
+              <div className="flex-1 max-h-32 min-h-[44px] flex items-center">
+                <textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault()
+                      handleSend()
+                    }
+                  }}
+                  placeholder={
+                    agent.isSecretary
+                      ? `Message ${agent.name}...`
+                      : `Message ${agent.name}...`
                   }
-                }}
-                placeholder={
-                  agent.isSecretary
-                    ? `${agent.name}에게 업무 지시...`
-                    : '메시지를 입력하세요...'
-                }
-                disabled={sendMessage.isPending || isStreaming}
-                aria-label="메시지 입력"
-                className="flex-1 bg-slate-800 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 outline-none resize-none min-h-[44px] max-h-[120px] transition-colors disabled:opacity-40"
-                rows={1}
-              />
+                  disabled={sendMessage.isPending || isStreaming}
+                  aria-label="메시지 입력"
+                  className="w-full bg-transparent border-0 focus:ring-0 resize-none text-[15px] text-slate-200 placeholder:text-slate-500 py-3 px-2 h-full block font-display disabled:opacity-40"
+                  rows={1}
+                />
+              </div>
               {isStreaming ? (
                 <button
                   data-testid="cancel-btn"
                   onClick={handleCancel}
                   disabled={isCancelling}
-                  className="p-2.5 rounded-lg bg-red-600 hover:bg-red-500 disabled:opacity-60 text-white transition-colors shrink-0"
+                  className="flex items-center justify-center bg-red-500 text-white rounded-full w-10 h-10 shrink-0 hover:bg-red-400 transition-colors shadow-sm disabled:opacity-60"
                   aria-label="작업 중단"
                 >
                   {isCancelling ? (
-                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin inline-block" />
-                  ) : '■'}
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <Square className="w-4 h-4" />
+                  )}
                 </button>
               ) : (
                 <button
                   data-testid="chat-send-btn"
                   onClick={handleSend}
                   disabled={!input.trim() || sendMessage.isPending}
-                  className="p-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white transition-colors shrink-0"
+                  className="flex items-center justify-center bg-cyan-400 text-slate-950 rounded-full w-10 h-10 shrink-0 hover:bg-cyan-300 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
                   aria-label="메시지 전송"
                 >
-                  전송
+                  <Send className="w-5 h-5 ml-0.5" />
                 </button>
               )}
+            </div>
+            <div className="text-center mt-2">
+              <span className="text-[10px] text-slate-500 font-mono">CORTHEX AI can make mistakes. Consider verifying important information.</span>
             </div>
           </div>
         </>
