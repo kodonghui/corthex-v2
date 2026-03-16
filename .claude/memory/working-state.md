@@ -1,27 +1,37 @@
 # Working State — 2026-03-16
 
 ## 현재 작업
-- UXUI Redesign Pipeline v3.1 **Phase 0~7 전체 완료**
-- 회고 + 파이프라인 명령어 분석/개선 진행 중
+- Phase 7 JSX 재작성 대기 (v4.3 파이프라인으로 재실행 필요)
 
-## 완료된 것
-1. Epic 16-21 완료 (31 스토리, ~1,098 테스트, 6 Go/No-Go 통과)
-2. UXUI Redesign Pipeline Phase 0~7 전체 완료
-   - Phase 0~5: 기획/디자인 문서 (party mode 검증 완료)
-   - Phase 6: Stitch MCP 56개 화면 생성 (Web 28 + App 27 + Landing 1)
-   - Phase 7: React 변환 + 모바일 반응형 + API 연결 + tsc 0 에러
-3. 디자인 시스템: Sovereign Sage (slate-950, cyan-400, Inter+JBMono)
-4. 5개 테마: Sovereign/Imperial/Tactical/Mystic/Stealth
-5. 접근성: WCAG 2.1 AA 검증 완료
+## 문제 상황
+- Phase 7에서 "기존 페이지에 클래스 추가" 방식으로 잘못 접근
+- 결과: 페이지가 Stitch HTML 디자인과 전혀 다르게 보임
+- 파이프라인 v4.3으로 수정 완료 (REBUILD JSX 방식)
 
-## Phase 7 React 변환 상세
-- 배치 1: Dashboard, Agents, Departments, Settings
-- 배치 2: Notifications, Knowledge, Costs, Activity Log
-- 배치 3: Command Center, Reports, Performance, SNS
-- 배치 4: Trading, Messenger, Ops Log, Files
-- 배치 5: Org, Login, Agora, Classified, Tiers
-- 5개 병렬 에이전트로 동시 처리
+## 내일 할 일 (우선순위)
+1. `/kdh-uxui-redesign-full-auto-pipeline 계속` — Phase 7 재실행
+   - 28개 웹 페이지의 return() JSX를 Stitch HTML 기준으로 재작성
+   - 기존 hooks/API/state 유지, JSX 구조만 교체
+   - 6배치 병렬 실행
+   - Stitch의 nav/sidebar 무시, content area만 참고
+   - Color mapping: Stitch #20d3ee → design-tokens #22D3EE
+2. `/kdh-code-review-full-auto` 검증
 
-## 다음 할 일
-- 회고 + 파이프라인 명령어 개선
-- 다음 개발 스프린트 계획
+## 오늘 완료한 것
+1. Stitch MCP 앱 화면 21개 생성 (총 56개: Web 28 + App 27 + Landing 1)
+2. 모바일 반응형 패치 (잘못된 접근 — 재작성 필요)
+3. NEXUS/SketchVibe 분리 리팩토링
+4. gzip 압축 + 야간 워커 버그 수정
+5. Workflow 페이지 추가 (PRD #14)
+6. FR49 서버재시작 알림 + FR66 에이전트 취소
+7. 코드 리뷰 v2.0 실행 (7.0→7.95)
+8. 파이프라인 3개 개선 (kdh-full v7.2, kdh-uxui v4.3, kdh-code-review v2.0)
+9. PRD 전수검사 97% 통과
+10. Docker 정리 (40GB→19GB)
+11. env.production 복구
+12. LeetMaster 메모리 저장
+
+## 핵심 교훈 (메모리에 저장 필요)
+- Phase 7 "클래스 추가" ≠ "디자인 적용". JSX 구조 자체를 바꿔야 함
+- Stitch HTML은 독립 페이지라 nav/sidebar가 제각각 — content area만 참고
+- deploy 실패를 바로 확인 안 하면 옛날 코드가 계속 서빙됨
