@@ -613,88 +613,118 @@ If Stitch MCP fails (auth error, API down, rate limit):
 
 **Libre Tools:** Rapid Prototyping, Accessibility Audit
 
-### Step 7-1: Component Decomposition (3R)
+### Step 7-1: Page JSX Rebuild (parallel agents, ~15min)
 
-**Output:** `phase-7-integration/component-decomposition.md` + actual code
+**Output:** Actual working React pages that LOOK LIKE the Stitch HTML designs.
 
-**Execution Strategy:** HTML→React conversion uses PARALLEL AGENTS for speed.
-- Split screens into 4-5 batches of 4-5 screens each
-- Launch all batch agents simultaneously (run_in_background=true)
-- Each agent: reads HTML + existing page → adds mobile-responsive patterns → verifies tsc
-- Orchestrator waits for all agents → final tsc check → commit+push
+**CRITICAL RULE: This is a REBUILD, not a patch.**
+- DO NOT "add classes to existing pages"
+- DO rewrite each page's return() JSX to match Stitch HTML structure
+- DO preserve existing hooks, API calls, state management, event handlers
+- The page must VISUALLY MATCH the Stitch HTML when rendered
 
-**CRITICAL: Do NOT stop after generating Gemini prompts. Convert ALL screens to working React code.**
-
-**Orchestrator Action:**
+**Execution Strategy:**
 ```
-1. Analyze all phase-6-generated/ HTML files → group into 4-5 batches
-2. For each batch, launch a background Agent with:
-   - List of HTML files to convert
-   - Instructions to read existing page + add mobile patterns
-   - Rule: do NOT rewrite pages, only ADD responsive classes/components
-   - Rule: use existing hooks from use-queries.ts
-3. Wait for all agents to complete
-4. Run tsc --noEmit → fix any errors
-5. git commit+push → verify deploy
-```
+1. For each page with a Stitch HTML counterpart:
+   a. Read the Stitch HTML file (phase-6-generated/web/{screen}.html)
+   b. Read the existing React page (packages/app/src/pages/{page}.tsx)
+   c. EXTRACT from Stitch HTML:
+      - Layout structure (grid/flex patterns, section ordering)
+      - Card designs (border-radius, padding, bg colors, shadows)
+      - Typography (font sizes, weights, colors, font-mono for numbers)
+      - Spacing (gaps, margins, paddings)
+      - Icon usage and placement
+      - Color palette (must match design-tokens.md, NOT Stitch's inline config)
+   d. PRESERVE from existing React:
+      - All useQuery/useMutation hooks
+      - All useState/useEffect logic
+      - All event handlers (onClick, onSubmit, etc.)
+      - All conditional rendering logic
+      - All TypeScript types and interfaces
+   e. REWRITE the return() JSX:
+      - Structure matches Stitch HTML layout
+      - Tailwind classes match Stitch HTML (standardized to design-tokens.md colors)
+      - Dynamic data replaces Stitch's hardcoded demo data
+      - Responsive: mobile-first (Stitch app/ for mobile, Stitch web/ for desktop)
+   f. Verify: tsc --noEmit passes
 
-**Writer Instruction (for non-delegatable work):**
-```
-[Step Instruction] Decompose Stitch output into React components.
+2. For pages WITHOUT Stitch HTML (19 of 29):
+   - Apply design tokens only (bg-slate-950, border-slate-800, text-cyan-400 accent)
+   - Match card/spacing patterns from the Stitch pages for consistency
+   - Do NOT redesign layout — just color/token alignment
 
-BEFORE WRITING — Read:
-- .claude/plugins/vibe-coding/skills/rapid-prototyping/SKILL.md
-
-Apply Rapid Prototyping patterns:
-- 10-min prototype approach: quick validation of each decomposed component before full integration
-- Variant explosion: generate minimal/dense/dark/light variants for key components
-
-Read: phase-6-generated/ + phase-3 component strategy
-1. Analyze Stitch code → identify reusable components → map to Phase 3 inventory
-2. Create component files in packages/ui/src/ or packages/app/src/components/
-3. Apply design tokens. Ensure TypeScript types correct.
-4. For each key component: build 10-min prototype, validate, then integrate
-```
-
-### Step 7-2: Routing & State (3R)
-
-**Writer Instruction:**
-```
-[Step Instruction] Connect components to React Router. Set up state management.
-
-Apply Rapid Prototyping storyboard pattern:
-- Generate screen flow storyboard for key user journeys
-- Validate navigation flow before wiring
-
-Wire navigation between pages. Match Phase 2 route structure.
+3. App Shell (layout.tsx + sidebar.tsx):
+   - Use Stitch web/01-app-shell.html as reference
+   - Sidebar structure, colors, active states must match
+   - Stitch's sidebar may differ from app shell — use Stitch CONTENT AREA only
+   - Ignore Stitch's standalone nav/sidebar (each HTML has its own, they're inconsistent)
 ```
 
-### Step 7-3: API Binding (3R, critics=opus)
-
-**Writer Instruction:**
+**Batch Strategy (parallel agents):**
 ```
-[Step Instruction] Connect React components to backend API endpoints.
-Wire SSE for real-time. Implement data fetching (SWR/React Query/fetch).
-Verify all CRUD operations end-to-end.
+Batch 1: App Shell + Dashboard + Hub + Chat (core screens)
+Batch 2: Agents + Departments + Jobs + Settings (org screens)
+Batch 3: NEXUS + Login + Command Center + SNS (feature screens)
+Batch 4: Trading + Messenger + Knowledge + Reports (content screens)
+Batch 5: Costs + Performance + Ops Log + Activity Log (analytics screens)
+Batch 6: Files + Agora + Classified + Tiers + Workflows (remaining screens)
+
+Each agent prompt MUST include:
+- The exact Stitch HTML file path to read
+- The exact React page file path to rewrite
+- The design-tokens.md color mapping (Stitch #20d3ee → use #22D3EE)
+- "REBUILD the JSX, don't patch it"
+- "PRESERVE all hooks/API/state, only change the return() JSX and Tailwind classes"
 ```
 
-### Step 7-4: Accessibility Final Audit (3R)
-
-**Writer Instruction:**
+**Stitch → React Color Mapping (override Stitch's inline config):**
 ```
-[Step Instruction] Full WCAG 2.1 AA audit on integrated product.
+Stitch bg-primary (#20d3ee)     → text-cyan-400 (#22D3EE)
+Stitch bg-background-dark       → bg-slate-950 (#020617)
+Stitch bg-surface/bg-card-dark  → bg-slate-900 (#0F172A)
+Stitch bg-surface-secondary     → bg-slate-800 (#1E293B)
+Stitch text-content-primary     → text-slate-50 (#F8FAFC)
+Stitch text-content-secondary   → text-slate-400 (#94A3B8)
+Stitch Material Symbols icons   → Lucide React icons (same semantic icon)
+Stitch font: Inter              → font-sans (Inter already in tailwind config)
+Stitch font: JetBrains Mono     → font-mono (JetBrains Mono already configured)
+```
 
-BEFORE WRITING — Read:
-- .claude/plugins/accessibility-compliance/README.md
+### Step 7-2: Visual Verification (per batch)
 
-Apply libre-a11y-audit full methodology:
-- Automated: axe-core + Puppeteer (weighted: critical 10pts, serious 5, moderate 2, minor 1)
-- Contrast: relative luminance for all text/bg pairs
-- Keyboard: Tab traversal, trap detection, logical order
-- Screen reader: landmarks, heading hierarchy, form labels, ARIA
-- Manual: cognitive a11y + visual a11y (200% resize, 320px reflow)
-- Focus: visible indicators, restoration after modal close
-- Lighthouse perf audit. Generate scored report with remediation code.
+**After each batch of page rebuilds:**
+```
+1. Run tsc --noEmit → must pass (0 errors)
+2. If Playwright is available:
+   - Screenshot each rebuilt page (desktop 1280x800 + mobile 390x844)
+   - Compare against Stitch PNG (phase-6-generated/web/{screen}.png)
+   - Flag pages with >10% visual difference
+3. If Playwright NOT available:
+   - Read the rebuilt JSX and Stitch HTML side by side
+   - Verify: same section ordering, same card structure, same color usage
+   - Check responsive breakpoints (sm:, md:, lg:) present
+4. Fix any visual mismatches before moving to next batch
+```
+
+### Step 7-3: API Binding + Routing (sequential)
+
+```
+1. Verify all existing hooks still work (no broken imports after JSX rebuild)
+2. Check routing: all lazy imports in App.tsx point to correct files
+3. Verify sidebar links match routes
+4. Test SSE/WebSocket connections if applicable
+5. Run bun test for affected test files
+```
+
+### Step 7-4: Accessibility + Final QA
+
+```
+1. axe-core scan on all rebuilt pages (if Playwright available)
+2. Keyboard navigation: Tab through all interactive elements
+3. Focus management: modals trap focus, restore on close
+4. Touch targets: all buttons/links ≥ 44px on mobile
+5. Color contrast: verify all text/bg pairs meet WCAG AA (4.5:1)
+6. Final tsc --noEmit + deploy verify
 ```
 
 ---
@@ -729,13 +759,15 @@ Context snapshot after EVERY step → _corthex_full_redesign/context-snapshots/{
 Contents: decisions, design tokens referenced, libre tools applied, constraints for next step, connections, critic scores
 ```
 
-## Anti-Patterns (from kdh-full-auto-pipeline + uxui retro)
+## Anti-Patterns (production failures — ranked by severity)
 
-1. **Writer calls Skill tool** — Skill auto-completes, bypasses critic review. FIX: Writer reads step files manually.
-2. **Writer batches all steps** — Writes everything then sends one review. FIX: ONE step → review → fix → next.
-3. **Orchestrator stops at intermediate milestone** — Generates HTML but doesn't convert to React. FIX: `계속` = run to Phase 7 complete + tsc pass.
-4. **Phase 6 incomplete app coverage** — Only generates screens from Phase 5 prompt (6 screens), not all routes. FIX: Analyze all pages/ routes and generate screens for each.
-5. **Phase 7 sequential processing** — 21+ screens one-by-one is too slow. FIX: 4-5 parallel background agents.
+1. **"Add classes" instead of "rebuild JSX"** — Agent adds `sm:p-4` to existing page instead of rewriting return() to match Stitch HTML. RESULT: Page looks nothing like the design. FIX: Phase 7 instruction explicitly says "REBUILD the JSX" and "the page must VISUALLY MATCH the Stitch design." Verify by comparing JSX structure against HTML.
+2. **Ignoring Stitch HTML structure** — Agent reads Stitch HTML but only extracts colors, ignores layout/sections/ordering. RESULT: Colors match but layout is completely different. FIX: Extract FULL structure (section ordering, grid patterns, card hierarchy) not just tokens.
+3. **Orchestrator stops at intermediate milestone** — Generates HTML but doesn't convert to React, or converts but doesn't verify visual match. FIX: `계속` = run to Phase 7 complete + tsc pass + visual match verified.
+4. **Treating Stitch nav/sidebar as authoritative** — Each Stitch HTML has its own sidebar/nav that differs between screens. FIX: IGNORE Stitch's nav. Use only the main content area. App shell (layout.tsx) is the single source of truth for navigation.
+5. **Phase 6 incomplete coverage** — Only generates screens from Phase 5 prompt, not all routes. FIX: Analyze all pages/ routes and generate screens for each.
+6. **Writer calls Skill tool** — Bypasses critic review. FIX: Read step files manually.
+7. **Writer batches all steps** — Writes everything then sends one review. FIX: ONE step → review → fix → next.
 
 ## Safeguards & Timeouts
 
@@ -760,7 +792,11 @@ Additional:
 ```
 [ ] Phase 0-5: all steps score >= 7/10
 [ ] Phase 6: all screens generated (web + app + landing), visual review PASS
-[ ] Phase 7: all screens converted to React, mobile-responsive patterns applied
+[ ] Phase 7-1: pages VISUALLY MATCH Stitch HTML (not just "classes added")
+[ ] Phase 7-1: verify by reading rebuilt JSX vs Stitch HTML — same structure, same colors, same layout
+[ ] Phase 7-2: visual verification pass (screenshot comparison or manual JSX review)
+[ ] Phase 7-3: all API hooks connected, no broken imports
+[ ] Phase 7-4: axe-core 0 critical violations, keyboard nav works
 [ ] tsc --noEmit: 0 errors (app package)
 [ ] git commit + push: deployed successfully
 [ ] pipeline-status.yaml: all phases status=complete
@@ -789,8 +825,11 @@ Additional:
 9. Writer MUST read referenced libre skill files BEFORE writing. Critics verify this.
 10. Phase 4 themes MUST use Archetype+Card synthesis (no generic "Neural Network" or "Cyberpunk" themes).
 11. Accessibility audit uses libre-a11y methodology (axe-core patterns, full WCAG 2.1 AA checklist).
-12. **`계속` = run to completion.** Do NOT stop at intermediate milestones (HTML gen, doc gen, etc.). The pipeline ends when Phase 7 status=complete AND tsc passes AND code is committed+pushed.
-13. **Phase 7 parallel agents**: Split HTML→React work into 4-5 batches, run simultaneously. Do NOT sequentially process 21+ screens.
-14. **Phase 6 app screen coverage**: Generate screens for ALL app routes (analyze packages/app/src/pages/), not just the 6 in Phase 5 prompt. Use web screens as design reference for additional prompts.
+12. **`계속` = run to completion.** Do NOT stop at intermediate milestones (HTML gen, doc gen, etc.). The pipeline ends when Phase 7 status=complete AND tsc passes AND pages VISUALLY MATCH Stitch AND code is committed+pushed.
+13. **Phase 7 = REBUILD, not patch.** Each page's return() JSX must be REWRITTEN to match Stitch HTML structure. "Adding responsive classes to existing pages" is NOT Phase 7 completion. The page must look like the Stitch design when rendered.
+14. **Phase 6 app screen coverage**: Generate screens for ALL app routes (analyze packages/app/src/pages/), not just the 6 in Phase 5 prompt.
+15. **Stitch HTML = visual spec, not drop-in code.** Extract layout/colors/typography from Stitch. Replace hardcoded demo data with real hooks. Map Stitch's inline Tailwind config to design-tokens.md values. Map Material Symbols → Lucide icons.
+16. **Stitch inconsistencies (sidebar/nav) = ignore.** Each Stitch HTML is standalone — they have different sidebars, navs, etc. Use ONLY the main content area from each Stitch HTML. The app shell (layout.tsx + sidebar.tsx) is shared and consistent.
+17. **Visual verification before completion.** After rebuilding each page, compare the JSX structure against Stitch HTML. Same section ordering, same card patterns, same color usage. If they don't match, it's not done.
 
 ARGUMENTS: $ARGUMENTS
