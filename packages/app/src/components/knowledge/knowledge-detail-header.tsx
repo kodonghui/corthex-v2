@@ -1,4 +1,4 @@
-import { Edit2, Trash2 } from 'lucide-react'
+import { Edit2, Trash2, FileText, CheckCircle } from 'lucide-react'
 
 export interface KnowledgeDetailHeaderProps {
     title: string;
@@ -14,7 +14,7 @@ export function KnowledgeDetailHeader({ title, version, author, lastModified, ta
             <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-cyan-400/10 flex items-center justify-center text-cyan-400 border border-cyan-400/20">
-                        <span className="material-symbols-outlined text-[24px]">description</span>
+                        <FileText className="w-6 h-6" />
                     </div>
                     <div>
                         <h2 className="text-lg font-bold text-slate-100 leading-tight">{title}</h2>
@@ -43,7 +43,7 @@ export function KnowledgeDetailHeader({ title, version, author, lastModified, ta
                     </span>
                 ))}
                 <div className="ml-auto flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-                    <span className="material-symbols-outlined text-[14px]">check_circle</span>
+                    <CheckCircle className="w-3.5 h-3.5" />
                     <span className="text-xs font-bold">벡터 DB 동기화됨</span>
                 </div>
             </div>

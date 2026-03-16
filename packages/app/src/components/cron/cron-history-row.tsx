@@ -1,3 +1,5 @@
+import { CheckCircle, AlertCircle } from 'lucide-react'
+
 export interface CronHistoryRowProps {
   timestamp: string;
   status: 'Success' | 'Failed';
@@ -15,11 +17,11 @@ export function CronHistoryRow({ timestamp, status, duration, cost, isErrorBg }:
       <td className="px-4 py-3">
         {status === 'Success' ? (
           <span className="inline-flex items-center gap-1 text-green-400">
-            <span className="material-symbols-outlined text-[14px]">check_circle</span> Success
+            <CheckCircle className="w-3.5 h-3.5" /> Success
           </span>
         ) : (
           <span className="inline-flex items-center gap-1 text-red-400">
-            <span className="material-symbols-outlined text-[14px]">error</span> Failed
+            <AlertCircle className="w-3.5 h-3.5" /> Failed
           </span>
         )}
       </td>

@@ -1,4 +1,5 @@
 import { ReactNode } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 
 export interface ClassifiedListItemProps {
     title: string;
@@ -34,7 +35,7 @@ export function ClassifiedListItem({ title, levelText, levelColorClass, dateLabe
                     <div className="flex justify-between items-center text-xs font-mono text-slate-400">
                         <span>{dateLabel}: {dateValue}</span>
                         <span className="flex items-center gap-1">
-                            <span className="material-symbols-outlined text-[14px]">{iconType}</span> {viewCount}
+                            {iconType === 'visibility' ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />} {viewCount}
                         </span>
                     </div>
                 </div>

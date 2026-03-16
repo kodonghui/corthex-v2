@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { Settings } from 'lucide-react'
+import { Settings, Clock } from 'lucide-react'
 
 export interface TriggerCardProps {
     agentName: string;
@@ -29,7 +29,7 @@ export function TriggerCard({
                     </div>
                     <h4 className="text-lg font-bold text-slate-800 dark:text-white">{triggerName}</h4>
                     <p className="font-mono text-sm text-slate-600 dark:text-slate-300 flex items-center gap-1 mt-1">
-                        <span className="material-symbols-outlined text-sm">schedule</span>
+                        <Clock className="w-4 h-4" />
                         {scheduleText}
                     </p>
                 </div>
