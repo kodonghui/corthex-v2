@@ -152,7 +152,7 @@ export function FilesPage() {
 
   return (
     <div
-      className="h-full overflow-y-auto bg-slate-950"
+      className="h-full overflow-y-auto bg-[#0f172a]"
       onDragOver={handleDragOver}
       onDragEnter={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -198,7 +198,7 @@ export function FilesPage() {
               className={`flex h-8 items-center justify-center rounded px-4 text-sm font-medium transition-colors ${
                 filter === opt.value
                   ? 'bg-cyan-400 text-slate-900'
-                  : 'bg-slate-900 border border-slate-700 text-slate-50 hover:border-cyan-400/50'
+                  : 'bg-slate-800 border border-slate-600 text-slate-100 hover:border-cyan-400/50'
               }`}
               data-testid={`filter-${opt.value}`}
             >
@@ -209,7 +209,7 @@ export function FilesPage() {
 
         {/* Search Bar */}
         <div className="w-full">
-          <label className="flex items-center w-full h-12 bg-slate-900 border border-slate-700 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-cyan-400 focus-within:border-cyan-400 transition-shadow">
+          <label className="flex items-center w-full h-12 bg-slate-800 border border-slate-600 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-cyan-400 focus-within:border-cyan-400 transition-shadow">
             <Search className="w-5 h-5 text-slate-400 ml-4" />
             <input
               className="w-full bg-transparent border-none text-sm px-3 focus:outline-none focus:ring-0 placeholder-slate-500 text-slate-50"
@@ -253,7 +253,7 @@ export function FilesPage() {
 
         {/* Drop zone */}
         <div
-          className="flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed border-slate-700 bg-slate-900/50 p-12 hover:border-cyan-400/50 transition-colors cursor-pointer"
+          className="flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed border-slate-600 bg-slate-800/50 p-12 hover:border-cyan-400/50 transition-colors cursor-pointer"
           onClick={() => fileInputRef.current?.click()}
         >
           <CloudUpload className="w-10 h-10 text-slate-500" />
@@ -267,7 +267,7 @@ export function FilesPage() {
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-testid="files-loading">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="h-32 bg-slate-900 border border-slate-800 rounded-lg animate-pulse" />
+              <div key={i} className="h-32 bg-slate-800 border border-slate-700 rounded-lg animate-pulse" />
             ))}
           </div>
         ) : filtered.length === 0 ? (
@@ -297,7 +297,7 @@ export function FilesPage() {
               return (
                 <div
                   key={file.id}
-                  className="flex flex-col rounded-lg border border-slate-800 bg-slate-900 p-4 hover:border-cyan-400/50 transition-colors group cursor-pointer relative overflow-hidden"
+                  className="flex flex-col rounded-lg border border-slate-700 bg-slate-800 p-4 hover:border-cyan-400/50 transition-colors group cursor-pointer relative overflow-hidden"
                   data-testid={`file-grid-${file.id}`}
                 >
                   <div className="flex items-start justify-between mb-4">
@@ -346,7 +346,7 @@ export function FilesPage() {
               return (
                 <div
                   key={file.id}
-                  className="flex items-center gap-3 p-3 rounded-lg border border-slate-800 bg-slate-900 hover:border-cyan-400/30 transition-colors group cursor-pointer"
+                  className="flex items-center gap-3 p-3 rounded-lg border border-slate-700 bg-slate-800 hover:border-cyan-400/30 transition-colors group cursor-pointer"
                   data-testid={`file-row-${file.id}`}
                 >
                   <div className={`w-10 h-10 rounded ${bgClass} ${colorClass} flex items-center justify-center shrink-0`}>

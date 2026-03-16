@@ -217,7 +217,7 @@ export function ClassifiedPage() {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
 
   return (
-    <div data-testid="classified-page" className="h-full flex flex-col bg-slate-950 overflow-hidden">
+    <div data-testid="classified-page" className="h-full flex flex-col bg-[#020617] overflow-hidden">
       {/* No top header -- Stitch uses a full-height 3-panel layout */}
 
       {/* Security warning banner (mobile) */}
@@ -239,7 +239,7 @@ export function ClassifiedPage() {
         {showFolderTree && (
           <>
             <div className="md:hidden fixed inset-0 bg-black/40 z-10" onClick={() => setShowFolderTree(false)} />
-            <aside data-testid="folder-sidebar" className="fixed md:relative left-0 top-0 h-full z-20 w-[240px] flex-shrink-0 border-r border-slate-800 bg-slate-900 flex flex-col">
+            <aside data-testid="folder-sidebar" className="fixed md:relative left-0 top-0 h-full z-20 w-[240px] flex-shrink-0 border-r border-slate-800 bg-[#0f172a] flex flex-col">
               <div className="p-4 border-b border-slate-800 flex gap-3 items-center">
                 <div className="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center">
                   <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
@@ -264,9 +264,9 @@ export function ClassifiedPage() {
         )}
 
         {/* Center Panel: Archive List */}
-        <section className="flex-1 min-w-[300px] border-r border-slate-800 flex flex-col bg-slate-950">
+        <section className="flex-1 min-w-[300px] border-r border-slate-800 flex flex-col bg-[#020617]">
           {/* List header with filter + sort */}
-          <div className="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-900 sticky top-0 z-10">
+          <div className="p-4 border-b border-slate-800 flex justify-between items-center bg-[#0f172a] sticky top-0 z-10">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setShowFolderTree(!showFolderTree)}
@@ -367,7 +367,7 @@ export function ClassifiedPage() {
                     key={item.id}
                     data-testid={`doc-row-${item.id}`}
                     className={`flex gap-4 px-4 py-3 border-b border-slate-800 cursor-pointer transition-colors relative ${
-                      isActive ? 'bg-slate-900 hover:bg-slate-900' : 'hover:bg-slate-900'
+                      isActive ? 'bg-[#0f172a] hover:bg-[#0f172a]' : 'hover:bg-[#0f172a]'
                     }`}
                     onClick={() => setDetailId(item.id)}
                   >
@@ -419,7 +419,7 @@ export function ClassifiedPage() {
 
         {/* Right Panel: Document Detail (400px) */}
         {detailId ? (
-          <article className="w-[400px] flex-shrink-0 bg-slate-900 flex flex-col hidden lg:flex">
+          <article className="w-[400px] flex-shrink-0 bg-[#0f172a] flex flex-col hidden lg:flex">
             <DocumentDetailView
               detail={detail}
               isLoading={detailQuery.isLoading}
@@ -790,6 +790,7 @@ function DocumentDetailView({
   folders: ArchiveFolder[]
 }) {
   const [editing, setEditing] = useState(false)
+  const [detailTab, setDetailTab] = useState<'content' | 'access'>('content')
   const [editForm, setEditForm] = useState<{
     title: string
     classification: Classification
@@ -848,164 +849,246 @@ function DocumentDetailView({
   return (
     <div data-testid="document-detail" className="flex-1 flex overflow-hidden">
       {/* Detail main */}
-      <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-4 space-y-4">
-        {/* Header */}
-        <div className="flex items-start justify-between">
-          <div className="flex-1 min-w-0">
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Document Header - Stitch style */}
+        <div className="p-6 border-b border-slate-800">
+          <div className="flex justify-between items-start mb-4">
             {editing ? (
-              <input
-                value={editForm.title}
-                onChange={(e) => setEditForm(f => ({ ...f, title: e.target.value }))}
-                className={`text-sm font-semibold w-full px-3 py-1.5 ${inputClasses}`}
-              />
+              <select
+                value={editForm.classification}
+                onChange={(e) => setEditForm(f => ({ ...f, classification: e.target.value as Classification }))}
+                className="bg-slate-800 border border-slate-700 text-xs text-slate-300 rounded-lg px-2 py-1.5"
+              >
+                {(Object.entries(CLASSIFICATION_CONFIG) as [Classification, { label: string }][]).map(([k, v]) => (
+                  <option key={k} value={k}>{v.label}</option>
+                ))}
+              </select>
             ) : (
-              <h3 className="text-sm font-semibold text-slate-50">{detail.title}</h3>
+              <ClassificationBadge classification={detail.classification} />
             )}
-            <div className="flex items-center gap-2 mt-1">
+            <div className="flex items-center gap-1">
               {editing ? (
+                <>
+                  <button onClick={() => setEditing(false)} className="text-xs text-slate-400 px-2 py-1 rounded hover:bg-slate-700/50">취소</button>
+                  <button onClick={handleSave} className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1.5 rounded-lg">저장</button>
+                </>
+              ) : (
+                <>
+                  <button onClick={startEditing} className="text-xs text-slate-400 hover:text-slate-200 px-2 py-1 rounded hover:bg-slate-700/50">편집</button>
+                  <button onClick={() => onDelete(detail.id)} className="text-xs text-red-400 hover:bg-red-500/10 px-2 py-1 rounded">삭제</button>
+                </>
+              )}
+            </div>
+          </div>
+          {editing ? (
+            <input
+              value={editForm.title}
+              onChange={(e) => setEditForm(f => ({ ...f, title: e.target.value }))}
+              className={`text-lg font-bold w-full px-3 py-1.5 mb-2 ${inputClasses}`}
+            />
+          ) : (
+            <h2 className="text-xl font-bold text-slate-50 mb-2">{detail.title}</h2>
+          )}
+          <div className="flex flex-wrap gap-4 text-xs font-mono text-slate-400">
+            <div className="flex items-center gap-1.5">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              <span>{formatDate(detail.createdAt)}</span>
+            </div>
+            {detail.agentName && (
+              <div className="flex items-center gap-1.5">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                <span>{detail.agentName}</span>
+              </div>
+            )}
+            {detail.departmentName && <span>· {detail.departmentName}</span>}
+          </div>
+        </div>
+
+        {/* Tabs - Stitch style */}
+        <div className="flex border-b border-slate-800 px-6 gap-6 shrink-0">
+          <button
+            onClick={() => setDetailTab('content')}
+            className={`flex flex-col items-center justify-center border-b-2 pb-2 pt-3 ${
+              detailTab === 'content'
+                ? 'border-b-red-500 text-slate-50'
+                : 'border-b-transparent text-slate-400 hover:text-slate-200'
+            } transition-colors`}
+          >
+            <span className="text-sm font-bold leading-normal tracking-[0.015em]">내용</span>
+          </button>
+          <button
+            onClick={() => setDetailTab('access')}
+            className={`flex flex-col items-center justify-center border-b-2 pb-2 pt-3 ${
+              detailTab === 'access'
+                ? 'border-b-red-500 text-slate-50'
+                : 'border-b-transparent text-slate-400 hover:text-slate-200'
+            } transition-colors`}
+          >
+            <span className="text-sm font-semibold leading-normal tracking-[0.015em]">접근 로그</span>
+          </button>
+        </div>
+
+        {/* Tab content */}
+        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+
+        {detailTab === 'content' ? (
+          <>
+            {/* Summary (editable) */}
+            {editing ? (
+              <div>
+                <label className="text-[10px] text-slate-500 font-medium uppercase tracking-wider mb-1 block">요약</label>
+                <textarea
+                  value={editForm.summary}
+                  onChange={(e) => setEditForm(f => ({ ...f, summary: e.target.value }))}
+                  className={`w-full text-xs p-3 h-20 resize-none ${inputClasses}`}
+                  placeholder="요약 입력..."
+                />
+              </div>
+            ) : detail.summary ? (
+              <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-3">
+                <p className="text-xs text-slate-300">{detail.summary}</p>
+              </div>
+            ) : null}
+
+            {/* Tags (editable) */}
+            {editing ? (
+              <div>
+                <label className="text-[10px] text-slate-500 font-medium uppercase tracking-wider mb-1 block">태그 (쉼표 구분)</label>
+                <input
+                  value={editForm.tags}
+                  onChange={(e) => setEditForm(f => ({ ...f, tags: e.target.value }))}
+                  className={`w-full text-xs px-3 py-2 ${inputClasses}`}
+                  placeholder="태그1, 태그2, ..."
+                />
+              </div>
+            ) : detail.tags.length > 0 ? (
+              <div className="flex flex-wrap gap-1">
+                {detail.tags.map(tag => (
+                  <span key={tag} className="bg-slate-700/50 text-slate-300 text-[10px] px-2 py-0.5 rounded-full">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+
+            {/* Folder (editable) */}
+            {editing && (
+              <div>
+                <label className="text-[10px] text-slate-500 font-medium uppercase tracking-wider mb-1 block">폴더</label>
                 <select
-                  value={editForm.classification}
-                  onChange={(e) => setEditForm(f => ({ ...f, classification: e.target.value as Classification }))}
+                  value={editForm.folderId}
+                  onChange={(e) => setEditForm(f => ({ ...f, folderId: e.target.value }))}
                   className="bg-slate-800 border border-slate-700 text-xs text-slate-300 rounded-lg px-2 py-1.5"
                 >
-                  {(Object.entries(CLASSIFICATION_CONFIG) as [Classification, { label: string }][]).map(([k, v]) => (
-                    <option key={k} value={k}>{v.label}</option>
+                  <option value="">폴더 없음</option>
+                  {flattenFolders(folders).map(f => (
+                    <option key={f.id} value={f.id}>{f.indent}{f.name}</option>
                   ))}
                 </select>
-              ) : (
-                <ClassificationBadge classification={detail.classification} />
-              )}
-              <span className="text-[10px] text-slate-500 font-mono">{formatDate(detail.createdAt)}</span>
-              {detail.agentName && <span className="text-[10px] text-slate-400">· {detail.agentName}</span>}
-              {detail.departmentName && <span className="text-[10px] text-slate-400">· {detail.departmentName}</span>}
-            </div>
-          </div>
-          <div className="flex items-center gap-1 ml-3">
-            {editing ? (
-              <>
-                <button onClick={() => setEditing(false)} className="text-xs text-slate-400 px-2 py-1 rounded hover:bg-slate-700/50">취소</button>
-                <button onClick={handleSave} className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1.5 rounded-lg">저장</button>
-              </>
-            ) : (
-              <>
-                <button onClick={startEditing} className="text-xs text-slate-400 hover:text-slate-200 px-2 py-1 rounded hover:bg-slate-700/50">편집</button>
-                <button onClick={() => onDelete(detail.id)} className="text-xs text-red-400 hover:bg-red-500/10 px-2 py-1 rounded">삭제</button>
-              </>
+              </div>
             )}
-          </div>
-        </div>
 
-        {/* Summary (editable) */}
-        {editing ? (
-          <div>
-            <label className="text-[10px] text-slate-500 font-medium uppercase tracking-wider mb-1 block">요약</label>
-            <textarea
-              value={editForm.summary}
-              onChange={(e) => setEditForm(f => ({ ...f, summary: e.target.value }))}
-              className={`w-full text-xs p-3 h-20 resize-none ${inputClasses}`}
-              placeholder="요약 입력..."
-            />
-          </div>
-        ) : detail.summary ? (
-          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-3">
-            <p className="text-xs text-slate-300">{detail.summary}</p>
-          </div>
-        ) : null}
-
-        {/* Tags (editable) */}
-        {editing ? (
-          <div>
-            <label className="text-[10px] text-slate-500 font-medium uppercase tracking-wider mb-1 block">태그 (쉼표 구분)</label>
-            <input
-              value={editForm.tags}
-              onChange={(e) => setEditForm(f => ({ ...f, tags: e.target.value }))}
-              className={`w-full text-xs px-3 py-2 ${inputClasses}`}
-              placeholder="태그1, 태그2, ..."
-            />
-          </div>
-        ) : detail.tags.length > 0 ? (
-          <div className="flex flex-wrap gap-1">
-            {detail.tags.map(tag => (
-              <span key={tag} className="bg-slate-700/50 text-slate-300 text-[10px] px-2 py-0.5 rounded-full">
-                {tag}
-              </span>
-            ))}
-          </div>
-        ) : null}
-
-        {/* Folder (editable) */}
-        {editing && (
-          <div>
-            <label className="text-[10px] text-slate-500 font-medium uppercase tracking-wider mb-1 block">폴더</label>
-            <select
-              value={editForm.folderId}
-              onChange={(e) => setEditForm(f => ({ ...f, folderId: e.target.value }))}
-              className="bg-slate-800 border border-slate-700 text-xs text-slate-300 rounded-lg px-2 py-1.5"
-            >
-              <option value="">폴더 없음</option>
-              {flattenFolders(folders).map(f => (
-                <option key={f.id} value={f.id}>{f.indent}{f.name}</option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        {/* Meta cards */}
-        <div className="grid grid-cols-3 gap-3">
-          <MetaCard label="품질 점수" value={detail.qualityScore != null ? detail.qualityScore.toFixed(1) : '-'} />
-          <MetaCard label="비용" value={formatCost(totalCost)} />
-          <MetaCard label="명령 유형" value={detail.commandType || '-'} />
-        </div>
-
-        {/* Quality review */}
-        {detail.qualityReview && (
-          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-300">품질 리뷰</span>
-              <span className={`text-[10px] px-2 py-0.5 rounded-full ${
-                detail.qualityReview.conclusion === 'pass'
-                  ? 'bg-emerald-500/15 text-emerald-400'
-                  : 'bg-red-500/15 text-red-400'
-              }`}>
-                {detail.qualityReview.conclusion === 'pass' ? 'PASS' : 'FAIL'}
-              </span>
+            {/* Meta cards */}
+            <div className="grid grid-cols-3 gap-3">
+              <MetaCard label="품질 점수" value={detail.qualityScore != null ? detail.qualityScore.toFixed(1) : '-'} />
+              <MetaCard label="비용" value={formatCost(totalCost)} />
+              <MetaCard label="명령 유형" value={detail.commandType || '-'} />
             </div>
-            <p className="text-xs text-slate-400 mt-1">점수: {detail.qualityReview.score}/5</p>
-            {detail.qualityReview.feedback && (
-              <p className="text-xs text-slate-300 mt-2">{detail.qualityReview.feedback}</p>
-            )}
-          </div>
-        )}
 
-        {/* Delegation chain */}
-        {detail.delegationChain.length > 0 && (
-          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-3">
-            <p className="text-xs font-medium text-slate-300 mb-2">위임 체인</p>
-            <div className="flex items-center flex-wrap gap-1">
-              {detail.delegationChain.map((step, i) => (
-                <span key={i} className="flex items-center gap-1">
-                  {i > 0 && <span className="text-slate-600">→</span>}
-                  <span className="text-[10px] bg-slate-700/50 px-2 py-1 rounded text-slate-300">
-                    {step.agentName}
+            {/* Quality review */}
+            {detail.qualityReview && (
+              <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-slate-300">품질 리뷰</span>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full ${
+                    detail.qualityReview.conclusion === 'pass'
+                      ? 'bg-emerald-500/15 text-emerald-400'
+                      : 'bg-red-500/15 text-red-400'
+                  }`}>
+                    {detail.qualityReview.conclusion === 'pass' ? 'PASS' : 'FAIL'}
                   </span>
-                </span>
+                </div>
+                <p className="text-xs text-slate-400 mt-1">점수: {detail.qualityReview.score}/5</p>
+                {detail.qualityReview.feedback && (
+                  <p className="text-xs text-slate-300 mt-2">{detail.qualityReview.feedback}</p>
+                )}
+              </div>
+            )}
+
+            {/* Delegation chain */}
+            {detail.delegationChain.length > 0 && (
+              <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-3">
+                <p className="text-xs font-medium text-slate-300 mb-2">위임 체인</p>
+                <div className="flex items-center flex-wrap gap-1">
+                  {detail.delegationChain.map((step, i) => (
+                    <span key={i} className="flex items-center gap-1">
+                      {i > 0 && <span className="text-slate-600">→</span>}
+                      <span className="text-[10px] bg-slate-700/50 px-2 py-1 rounded text-slate-300">
+                        {step.agentName}
+                      </span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Content - Stitch markdown style */}
+            {detail.content && (
+              <div className="text-sm text-slate-100/90 leading-relaxed font-mono">
+                <MarkdownRenderer content={detail.content} />
+              </div>
+            )}
+
+            {/* Warning notice - Stitch style */}
+            {(detail.classification === 'secret' || detail.classification === 'confidential') && (
+              <div className="bg-[#020617] border border-slate-800 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-2 text-amber-500">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
+                  <span className="font-bold text-xs uppercase tracking-wider">Warning</span>
+                </div>
+                <p className="text-xs text-slate-400">이 정보의 무단 공개는 CORTHEX Protocol 8A에 따른 엄중한 처벌을 받을 수 있습니다.</p>
+              </div>
+            )}
+
+            {/* Original command */}
+            {detail.commandText && (
+              <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-3">
+                <p className="text-[10px] text-slate-500 font-medium mb-1">원본 명령</p>
+                <p className="text-xs text-slate-300 font-mono">{detail.commandText}</p>
+              </div>
+            )}
+          </>
+        ) : (
+          /* Access Log tab */
+          <div className="space-y-3">
+            <p className="text-xs text-slate-400">이 문서의 접근 로그를 표시합니다.</p>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-xs font-mono text-slate-400 py-2 border-b border-slate-800">
+                <span>{formatDate(detail.createdAt)}</span>
+                <span className="text-slate-300">문서 생성</span>
+              </div>
+              {detail.delegationChain.map((step, i) => (
+                <div key={i} className="flex justify-between items-center text-xs font-mono text-slate-400 py-2 border-b border-slate-800">
+                  <span>{step.agentName}</span>
+                  <span className={`text-xs px-2 py-0.5 rounded ${
+                    step.status === 'completed' ? 'bg-emerald-500/15 text-emerald-400'
+                      : step.status === 'failed' ? 'bg-red-500/15 text-red-400'
+                      : 'bg-blue-500/15 text-blue-400'
+                  }`}>{step.status}</span>
+                </div>
               ))}
             </div>
           </div>
         )}
+        </div>
 
-        {/* Content */}
-        {detail.content && (
-          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4 max-h-[500px] overflow-y-auto">
-            <MarkdownRenderer content={detail.content} />
-          </div>
-        )}
-
-        {/* Original command */}
-        {detail.commandText && (
-          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-3">
-            <p className="text-[10px] text-slate-500 font-medium mb-1">원본 명령</p>
-            <p className="text-xs text-slate-300 font-mono">{detail.commandText}</p>
+        {/* Request Decryption Key button - Stitch style */}
+        {(detail.classification === 'secret' || detail.classification === 'confidential') && (
+          <div className="p-4 border-t border-slate-800 bg-[#020617]/50 shrink-0">
+            <button className="w-full bg-red-600 hover:bg-red-600/90 text-white font-medium py-2 rounded-md transition-colors text-sm flex items-center justify-center gap-2">
+              <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" /></svg>
+              Request Decryption Key
+            </button>
           </div>
         )}
       </div>
@@ -1042,7 +1125,7 @@ function ClassificationBadge({ classification, small }: { classification: Classi
   const borderMap: Record<Classification, string> = {
     secret: 'bg-red-500/20 text-red-400 border border-red-500/30',
     confidential: 'bg-amber-500/20 text-amber-500 border border-amber-500/30',
-    internal: 'bg-blue-500/20 text-blue-400 border border-blue-500/30',
+    internal: 'bg-slate-500/20 text-slate-400 border border-slate-500/30',
     public: 'bg-slate-500/20 text-slate-400 border border-slate-500/30',
   }
   const labelMap: Record<Classification, string> = {
@@ -1051,10 +1134,17 @@ function ClassificationBadge({ classification, small }: { classification: Classi
     internal: '3급 기밀',
     public: '공개',
   }
+  const dotColorMap: Record<Classification, string> = {
+    secret: 'bg-red-500',
+    confidential: 'bg-amber-500',
+    internal: 'bg-slate-500',
+    public: 'bg-slate-500',
+  }
   const cls = borderMap[classification] || 'bg-slate-500/20 text-slate-400 border border-slate-500/30'
   const label = small ? (CLASSIFICATION_CONFIG[classification]?.label?.[0] || classification[0]) : (labelMap[classification] || classification)
   return (
-    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${cls}`}>
+    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${cls}`}>
+      {classification === 'secret' && <span className={`size-1.5 rounded-full ${dotColorMap[classification]} animate-pulse`} />}
       {label}
     </span>
   )

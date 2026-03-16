@@ -330,15 +330,15 @@ export function OpsLogPage() {
       </div>
 
       {/* KPI Stats Cards */}
-      <div className="px-4 md:px-10 py-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="flex flex-col gap-2 rounded-xl p-6 bg-slate-900 border border-slate-800 shadow-sm">
+      <div className="px-4 md:px-10 pt-6 pb-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="flex flex-col gap-2 rounded-xl p-6 bg-slate-900/80 border border-slate-800 shadow-sm">
             <p className="text-slate-400 text-sm font-medium uppercase tracking-wider">Daily Operations</p>
             <div className="flex items-baseline gap-3">
               <p className="text-3xl font-bold font-mono tabular-nums text-slate-50">{total}</p>
             </div>
           </div>
-          <div className="flex flex-col gap-2 rounded-xl p-6 bg-slate-900 border border-slate-800 shadow-sm">
+          <div className="flex flex-col gap-2 rounded-xl p-6 bg-slate-900/80 border border-slate-800 shadow-sm">
             <p className="text-slate-400 text-sm font-medium uppercase tracking-wider">Average Quality Score</p>
             <div className="flex items-baseline gap-3">
               <p className="text-3xl font-bold font-mono tabular-nums text-emerald-400">
@@ -349,7 +349,7 @@ export function OpsLogPage() {
               </p>
             </div>
           </div>
-          <div className="flex flex-col gap-2 rounded-xl p-6 bg-slate-900 border border-slate-800 shadow-sm">
+          <div className="flex flex-col gap-2 rounded-xl p-6 bg-slate-900/80 border border-slate-800 shadow-sm">
             <p className="text-slate-400 text-sm font-medium uppercase tracking-wider">Total Operational Cost</p>
             <div className="flex items-baseline gap-3">
               <p className="text-3xl font-bold font-mono tabular-nums text-slate-50">
@@ -566,7 +566,7 @@ export function OpsLogPage() {
             </div>
 
             {/* Desktop table */}
-            <div className="hidden sm:block overflow-hidden rounded-xl border border-slate-800 bg-slate-900 shadow-md overflow-x-auto">
+            <div className="hidden sm:block overflow-hidden rounded-xl border border-slate-800 bg-slate-900/80 shadow-md overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-900/50 border-b border-slate-800">

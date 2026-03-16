@@ -1026,7 +1026,7 @@ function ChannelsView() {
       {/* Stitch-style 2-panel layout */}
       <div className="flex flex-1 overflow-hidden" data-testid="channels-header">
         {/* Left Panel: Conversation List — Stitch: 320px sidebar */}
-        <aside className={`w-full md:w-[320px] shrink-0 border-r border-slate-800 bg-slate-950 flex flex-col ${showChat ? 'hidden md:flex' : 'flex'}`} data-testid="channel-sidebar">
+        <aside className={`w-full md:w-[320px] shrink-0 border-r border-slate-800 bg-[#0b1416] flex flex-col ${showChat ? 'hidden md:flex' : 'flex'}`} data-testid="channel-sidebar">
           {/* Search */}
           <div ref={searchRef} className="p-4 border-b border-slate-800 relative">
             <div className="relative">
@@ -1144,7 +1144,7 @@ function ChannelsView() {
 
         {/* Right Panel: Chat Area */}
         <main className={`flex-1 flex min-w-0 ${showChat ? '' : 'hidden md:flex'}`}>
-          <div className="flex-1 flex flex-col min-w-0 bg-slate-950">
+          <div className="flex-1 flex flex-col min-w-0 bg-[#101f22]">
             {!selectedChannel ? (
               <div className="flex-1 flex items-center justify-center text-slate-500 text-sm">
                 채널을 선택하세요
@@ -1152,7 +1152,7 @@ function ChannelsView() {
             ) : (
               <>
                 {/* Chat Header — Stitch style */}
-                <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between shrink-0" data-testid="channel-header">
+                <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between shrink-0 bg-[#101f22]" data-testid="channel-header">
                   <div className="flex items-center gap-4 min-w-0">
                     <button
                       onClick={() => setShowChat(false)}
@@ -1187,7 +1187,7 @@ function ChannelsView() {
                 </div>
 
                 {/* Messages Area — Stitch style with rounded bubbles */}
-                <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6 [-webkit-overflow-scrolling:touch]">
+                <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6 [-webkit-overflow-scrolling:touch] bg-[#101f22]">
                   {messages.length === 0 && (
                     <div className="flex justify-center my-2">
                       <span className="text-xs font-medium text-slate-500 bg-slate-800/50 px-3 py-1 rounded-full">아직 메시지가 없습니다</span>
@@ -1285,7 +1285,7 @@ function ChannelsView() {
                             <div className="flex flex-col items-start gap-1">
                               <p className="text-xs font-medium text-slate-400 mb-0.5">{msg.userName}</p>
                               <div className="relative">
-                                <div className="bg-slate-900 text-slate-200 p-4 rounded-2xl rounded-tl-sm text-sm leading-relaxed border border-slate-800 shadow-sm">
+                                <div className="bg-slate-800 text-slate-200 p-4 rounded-2xl rounded-tl-sm text-sm leading-relaxed border border-slate-700/50 shadow-sm">
                                   {msg.content}
                                   {msg.attachments && <AttachmentRenderer attachments={msg.attachments} />}
                                 </div>
@@ -1399,7 +1399,7 @@ function ChannelsView() {
                     </div>
                   )}
                   <input type="file" ref={fileInputRef} hidden multiple accept={FILE_ACCEPT} onChange={(e) => { handleFileSelect(e.target.files); e.target.value = '' }} />
-                  <div className="max-w-4xl mx-auto relative flex items-center bg-slate-900 border border-slate-800 rounded-full shadow-sm pr-2 pl-4 py-2 focus-within:ring-1 focus-within:ring-cyan-400 focus-within:border-cyan-400 transition-all">
+                  <div className="max-w-4xl mx-auto relative flex items-center bg-slate-800 border border-slate-700 rounded-full shadow-sm pr-2 pl-4 py-2 focus-within:ring-1 focus-within:ring-cyan-400 focus-within:border-cyan-400 transition-all">
                     <button
                       onClick={() => fileInputRef.current?.click()}
                       disabled={uploading || pendingFiles.length >= 5}
