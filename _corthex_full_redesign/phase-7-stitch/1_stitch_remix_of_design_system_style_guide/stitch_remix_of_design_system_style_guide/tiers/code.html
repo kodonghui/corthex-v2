@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#5a7247",
+                        "background-light": "#faf8f5",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+        .tier-badge-mustard { background-color: #e2b042; color: white; }
+        .tier-badge-olive { background-color: #5a7247; color: white; }
+        .tier-badge-slate { background-color: #64748b; color: white; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display transition-colors duration-300">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Top Navigation -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary/10 px-6 md:px-20 py-4 bg-background-light dark:bg-background-dark">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-primary">
+<span class="material-symbols-outlined text-3xl font-bold">account_tree</span>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight uppercase">CORTHEX <span class="text-primary/70">v2</span></h2>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium" href="#">Dashboard</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium" href="#">Workspace</a>
+<a class="text-primary text-sm font-semibold border-b-2 border-primary pb-1" href="#">Tiers</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium" href="#">Settings</a>
+</nav>
+</div>
+<div class="flex flex-1 justify-end gap-6 items-center">
+<label class="hidden sm:flex flex-col min-w-40 h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-xl h-full border border-primary/20 bg-white dark:bg-slate-800">
+<div class="text-primary/50 flex items-center justify-center pl-3">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 border-none bg-transparent text-sm placeholder:text-slate-400 focus:ring-0" placeholder="Search tiers..." value=""/>
+</div>
+</label>
+<div class="bg-primary/10 rounded-full p-1 border border-primary/20">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8" data-alt="User profile avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDsuU-js70kwTQ59NLJZakOr2pGAvsB7-Ve8k04QaEKdTX6TQgAERiymLXc_rVfzgW1wSjCpUzbwFbOPyQ_Y6sbFVolUtkDdbTjZ24hG_1A5QPwDs195bKHTaTiHs9MLAz2MYE6OPf8s4ZDftuKC3rSEybXZIsWeRl14GEECUD1yi_zuqzCi5jvojoTpixEHxye2DAG32To_63X-Ba8pq7eLW4CmO7T43OFXw2uPY2v7jY6oex3cxUCM6pBSO8wES3nrW-eYLAqWw4s");'></div>
+</div>
+</div>
+</header>
+<main class="flex-1 px-6 md:px-20 py-10 max-w-7xl mx-auto w-full">
+<!-- Hero Section -->
+<div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-10">
+<div class="flex flex-col gap-2">
+<nav class="flex items-center gap-2 text-xs text-primary/60 font-medium mb-1 uppercase tracking-wider">
+<span>Workspace</span>
+<span class="material-symbols-outlined text-[12px]">chevron_right</span>
+<span>Management</span>
+</nav>
+<h1 class="text-slate-900 dark:text-slate-50 text-4xl font-extrabold tracking-tight">Tier Permissions</h1>
+<p class="text-slate-500 dark:text-slate-400 text-lg max-w-xl">Configure dynamic N-tier governance models, preferred LLM routing, and tool access limits across your organization.</p>
+</div>
+<button class="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-semibold shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all">
+<span class="material-symbols-outlined text-sm">add</span>
+<span>New Tier</span>
+</button>
+</div>
+<!-- Dashboard Stats Summary -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+<div class="p-6 rounded-xl bg-white dark:bg-slate-800 border border-primary/10 shadow-sm flex items-center gap-4">
+<div class="size-12 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined">groups</span>
+</div>
+<div>
+<p class="text-sm text-slate-500">Active Tiers</p>
+<p class="text-2xl font-bold">03</p>
+</div>
+</div>
+<div class="p-6 rounded-xl bg-white dark:bg-slate-800 border border-primary/10 shadow-sm flex items-center gap-4">
+<div class="size-12 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center">
+<span class="material-symbols-outlined">auto_awesome</span>
+</div>
+<div>
+<p class="text-sm text-slate-500">Avg. Model Power</p>
+<p class="text-2xl font-bold">High</p>
+</div>
+</div>
+<div class="p-6 rounded-xl bg-white dark:bg-slate-800 border border-primary/10 shadow-sm flex items-center gap-4">
+<div class="size-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+<span class="material-symbols-outlined">build</span>
+</div>
+<div>
+<p class="text-sm text-slate-500">Tools Deployed</p>
+<p class="text-2xl font-bold">42</p>
+</div>
+</div>
+</div>
+<!-- Tiers Table Container -->
+<div class="bg-white dark:bg-slate-800 rounded-xl border border-primary/10 shadow-xl overflow-hidden">
+<div class="p-5 border-b border-primary/10 bg-slate-50/50 dark:bg-slate-900/50 flex justify-between items-center">
+<h3 class="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">list_alt</span>
+                        Active Configuration
+                    </h3>
+<div class="flex gap-2">
+<button class="p-2 rounded-lg border border-primary/20 hover:bg-primary/5 text-primary">
+<span class="material-symbols-outlined text-sm">filter_list</span>
+</button>
+<button class="p-2 rounded-lg border border-primary/20 hover:bg-primary/5 text-primary">
+<span class="material-symbols-outlined text-sm">refresh</span>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="text-slate-400 text-xs font-bold uppercase tracking-widest bg-slate-50 dark:bg-slate-900">
+<th class="px-6 py-4">Level</th>
+<th class="px-6 py-4">Tier Identity</th>
+<th class="px-6 py-4">Preferred Model</th>
+<th class="px-6 py-4">Tool Quota</th>
+<th class="px-6 py-4 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-primary/5">
+<tr class="hover:bg-primary/[0.02] transition-colors">
+<td class="px-6 py-5">
+<span class="text-lg font-black text-primary/30">01</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-col">
+<span class="tier-badge-mustard px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider w-fit mb-1 shadow-sm">Manager</span>
+<span class="text-sm font-semibold">Executive Overseer</span>
+</div>
+</td>
+<td class="px-6 py-5 text-sm">
+<div class="flex items-center gap-2">
+<div class="size-6 rounded bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
+<span class="material-symbols-outlined text-sm text-slate-500">neurology</span>
+</div>
+<span class="font-medium text-slate-700 dark:text-slate-300">Claude 3.5 Sonnet</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-lg text-xs font-bold">Unlimited</span>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-primary/[0.02] transition-colors">
+<td class="px-6 py-5">
+<span class="text-lg font-black text-primary/30">02</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-col">
+<span class="tier-badge-olive px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider w-fit mb-1 shadow-sm">Specialist</span>
+<span class="text-sm font-semibold">Department Analyst</span>
+</div>
+</td>
+<td class="px-6 py-5 text-sm">
+<div class="flex items-center gap-2">
+<div class="size-6 rounded bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
+<span class="material-symbols-outlined text-sm text-slate-500">psychology</span>
+</div>
+<span class="font-medium text-slate-700 dark:text-slate-300">GPT-4o</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="text-sm font-bold text-slate-600 dark:text-slate-400">15 Tools</span>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-primary/[0.02] transition-colors">
+<td class="px-6 py-5">
+<span class="text-lg font-black text-primary/30">03</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-col">
+<span class="tier-badge-slate px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider w-fit mb-1 shadow-sm">Worker</span>
+<span class="text-sm font-semibold">Operational Agent</span>
+</div>
+</td>
+<td class="px-6 py-5 text-sm">
+<div class="flex items-center gap-2">
+<div class="size-6 rounded bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
+<span class="material-symbols-outlined text-sm text-slate-500">model_training</span>
+</div>
+<span class="font-medium text-slate-700 dark:text-slate-300">Claude 3 Haiku</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="text-sm font-bold text-slate-600 dark:text-slate-400">5 Tools</span>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 bg-slate-50 dark:bg-slate-900/30 flex justify-between items-center text-xs text-slate-500">
+<p>Endpoint: <code class="bg-primary/5 px-1 rounded">GET /api/workspace/tiers</code></p>
+<p>Last updated: 2 minutes ago</p>
+</div>
+</div>
+<!-- Help/Details Section -->
+<div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="flex gap-4">
+<div class="size-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined">security</span>
+</div>
+<div>
+<h4 class="font-bold mb-1">Permission Propagation</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400">Higher tiers automatically inherit lower tier capabilities but can be configured with specific override restrictions per workspace.</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="size-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined">settings_suggest</span>
+</div>
+<div>
+<h4 class="font-bold mb-1">Model Preference Logic</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400">Models are prioritized based on reasoning capability and speed metrics. Tiers can specify fallback models for high-traffic periods.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="px-6 md:px-20 py-8 border-t border-primary/10 mt-20">
+<div class="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-400 uppercase tracking-widest font-bold">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">copyright</span>
+<span>2024 CORTHEX Dynamics</span>
+</div>
+<div class="flex gap-6">
+<a class="hover:text-primary" href="#">API Documentation</a>
+<a class="hover:text-primary" href="#">System Status</a>
+<a class="hover:text-primary" href="#">Privacy Policy</a>
+</div>
+</div>
+</footer>
+</div>
+</div>
+</body></html>

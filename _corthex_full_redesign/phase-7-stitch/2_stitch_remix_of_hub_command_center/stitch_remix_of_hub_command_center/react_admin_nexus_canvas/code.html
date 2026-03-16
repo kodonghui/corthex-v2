@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>React Admin NEXUS Canvas</title>
+<!-- Tailwind CSS v3 with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Phosphor Icons -->
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'nexus-warm': '#fcfbf9',
+            'nexus-navy': '#1a1f2e',
+            'nexus-accent': '#e29578',
+            'nexus-muted': '#8d99ae',
+            'canvas-grid': 'rgba(26, 31, 46, 0.05)'
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="canvas-background">
+    /* Custom grid pattern for the NEXUS canvas area */
+    .canvas-grid-bg {
+      background-color: #fcfbf9;
+      background-image: radial-gradient(circle, #1a1f2e 1px, transparent 1px);
+      background-size: 30px 30px;
+    }
+    .node-selected {
+      outline: 2px solid #e29578;
+      box-shadow: 0 0 15px rgba(226, 149, 120, 0.3);
+    }
+  </style>
+<style data-purpose="layout-ui">
+    .property-panel {
+      transition: transform 0.3s ease-in-out;
+    }
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(8px);
+    }
+  </style>
+</head>
+<body class="bg-nexus-warm font-sans text-nexus-navy overflow-hidden h-screen flex flex-col">
+<!-- BEGIN: Top Navigation Bar -->
+<header class="h-16 border-b border-gray-200 bg-white flex items-center justify-between px-6 z-20">
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 bg-nexus-navy rounded flex items-center justify-center text-white">
+<i class="ph-bold ph-intersect-three text-lg"></i>
+</div>
+<div>
+<h1 class="text-lg font-semibold tracking-tight">CORTHEX v2 <span class="text-nexus-muted font-normal">/</span> NEXUS Canvas</h1>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+<i class="ph ph-cloud-arrow-up"></i>
+        Export
+      </button>
+<button class="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-nexus-navy text-white rounded-lg hover:bg-opacity-90 transition-all shadow-sm">
+<i class="ph ph-floppy-disk"></i>
+        Save Layout
+      </button>
+</div>
+</header>
+<!-- END: Top Navigation Bar -->
+<!-- BEGIN: Main Content Area -->
+<main class="flex-1 flex overflow-hidden relative">
+<!-- BEGIN: Left Toolbar -->
+<aside class="w-16 border-r border-gray-200 bg-white flex flex-col items-center py-4 gap-6 z-10">
+<div class="flex flex-col gap-4">
+<button class="p-2 bg-nexus-navy text-white rounded-lg shadow-md" title="Select Tool">
+<i class="ph-bold ph-cursor"></i>
+</button>
+<button class="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors" title="Add Company">
+<i class="ph-bold ph-buildings"></i>
+</button>
+<button class="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors" title="Add Department">
+<i class="ph-bold ph-users-four"></i>
+</button>
+<button class="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors" title="Add Agent">
+<i class="ph-bold ph-robot"></i>
+</button>
+</div>
+<div class="mt-auto flex flex-col gap-4 border-t pt-4">
+<button class="p-2 text-gray-500 hover:bg-gray-100 rounded-lg" title="Zoom In">
+<i class="ph ph-plus"></i>
+</button>
+<button class="p-2 text-gray-500 hover:bg-gray-100 rounded-lg" title="Zoom Out">
+<i class="ph ph-minus"></i>
+</button>
+</div>
+</aside>
+<!-- END: Left Toolbar -->
+<!-- BEGIN: Canvas Viewport -->
+<section class="flex-1 canvas-grid-bg relative overflow-hidden cursor-grab active:cursor-grabbing" data-purpose="design-canvas" id="nexus-canvas">
+<!-- BEGIN: Mock Node - Company -->
+<div class="absolute top-20 left-40 w-64 glass-panel border border-nexus-navy/10 rounded-xl shadow-lg p-4 cursor-pointer node-selected" data-purpose="node-company">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<span class="p-1.5 bg-nexus-navy text-white rounded">
+<i class="ph-bold ph-buildings"></i>
+</span>
+<span class="text-xs font-bold uppercase tracking-wider text-nexus-muted">Organization</span>
+</div>
+<i class="ph ph-dots-three-vertical text-gray-400"></i>
+</div>
+<h3 class="font-bold text-lg">CORTEX Global</h3>
+<p class="text-sm text-nexus-muted mb-4">Primary HQ Entity</p>
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full bg-blue-100 border-2 border-white"></div>
+<div class="w-6 h-6 rounded-full bg-green-100 border-2 border-white"></div>
+<div class="w-6 h-6 rounded-full bg-gray-100 border-2 border-white flex items-center justify-center text-[8px]">+4</div>
+</div>
+</div>
+<!-- END: Mock Node - Company -->
+<!-- BEGIN: Mock Node - Department -->
+<div class="absolute top-64 left-80 w-56 glass-panel border border-blue-200 rounded-xl shadow-md p-4 cursor-pointer" data-purpose="node-department">
+<div class="flex items-center gap-2 mb-3">
+<span class="p-1.5 bg-blue-500 text-white rounded">
+<i class="ph-bold ph-users-four"></i>
+</span>
+<span class="text-xs font-bold uppercase tracking-wider text-nexus-muted">Department</span>
+</div>
+<h3 class="font-semibold text-base">Neural R&amp;D</h3>
+<p class="text-xs text-nexus-muted">12 Agents Active</p>
+</div>
+<!-- END: Mock Node - Department -->
+<!-- BEGIN: Mock Node - Agent -->
+<div class="absolute top-[420px] left-[450px] w-48 glass-panel border border-nexus-accent/30 rounded-xl shadow-md p-4 cursor-pointer" data-purpose="node-agent">
+<div class="flex items-center gap-2 mb-3">
+<span class="p-1.5 bg-nexus-accent text-white rounded">
+<i class="ph-bold ph-robot"></i>
+</span>
+<span class="text-xs font-bold uppercase tracking-wider text-nexus-muted">Agent</span>
+</div>
+<h3 class="font-semibold text-sm">Synthetic Orchestrator</h3>
+<div class="mt-2 flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span class="text-[10px] text-green-600 font-medium uppercase">Active</span>
+</div>
+</div>
+<!-- END: Mock Node - Agent -->
+<!-- SVG Connection Layer -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: -1;">
+<path d="M 292 140 L 412 256" fill="none" opacity="0.2" stroke="#1a1f2e" stroke-dasharray="4" stroke-width="2"></path>
+<path d="M 460 330 L 520 412" fill="none" opacity="0.2" stroke="#1a1f2e" stroke-dasharray="4" stroke-width="2"></path>
+</svg>
+</section>
+<!-- END: Canvas Viewport -->
+<!-- BEGIN: Property Panel -->
+<aside class="w-80 border-l border-gray-200 bg-white flex flex-col z-20 shadow-[-4px_0_15px_rgba(0,0,0,0.02)]">
+<!-- Panel Header -->
+<div class="p-4 border-b border-gray-100 flex items-center justify-between">
+<h2 class="font-semibold text-gray-800">Node Properties</h2>
+<button class="text-gray-400 hover:text-gray-600"><i class="ph ph-x"></i></button>
+</div>
+<!-- Scrollable Properties -->
+<div class="flex-1 overflow-y-auto p-6">
+<div class="space-y-6">
+<!-- Identity Section -->
+<div class="space-y-3">
+<label class="text-xs font-bold text-nexus-muted uppercase tracking-wider">Identity</label>
+<div>
+<label class="block text-xs text-gray-500 mb-1">Name</label>
+<input class="w-full border-gray-200 rounded-lg text-sm focus:ring-nexus-accent focus:border-nexus-accent" type="text" value="CORTEX Global"/>
+</div>
+<div>
+<label class="block text-xs text-gray-500 mb-1">Entity ID</label>
+<input class="w-full border-gray-100 bg-gray-50 rounded-lg text-sm text-gray-400" readonly="" type="text" value="ORG-00194-X"/>
+</div>
+</div>
+<!-- Configuration Section -->
+<div class="space-y-3">
+<label class="text-xs font-bold text-nexus-muted uppercase tracking-wider">Configuration</label>
+<div class="flex items-center justify-between p-3 border border-gray-100 rounded-lg bg-gray-50/50">
+<span class="text-sm font-medium">Inherit Permissions</span>
+<button class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-nexus-navy">
+<span class="translate-x-4 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+</button>
+</div>
+<div>
+<label class="block text-xs text-gray-500 mb-1">Security Level</label>
+<select class="w-full border-gray-200 rounded-lg text-sm focus:ring-nexus-accent">
+<option>Tier 1 - Public</option>
+<option selected="">Tier 2 - Internal</option>
+<option>Tier 3 - Restricted</option>
+<option>Tier 4 - Confidential</option>
+</select>
+</div>
+</div>
+<!-- Metadata Section -->
+<div class="space-y-3">
+<label class="text-xs font-bold text-nexus-muted uppercase tracking-wider">Coordinates</label>
+<div class="grid grid-cols-2 gap-2">
+<div class="flex items-center gap-2 border border-gray-100 p-2 rounded">
+<span class="text-[10px] text-gray-400">X:</span>
+<span class="text-xs font-mono">160.00</span>
+</div>
+<div class="flex items-center gap-2 border border-gray-100 p-2 rounded">
+<span class="text-[10px] text-gray-400">Y:</span>
+<span class="text-xs font-mono">80.00</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Footer -->
+<div class="p-4 bg-gray-50 border-t border-gray-200 flex gap-2">
+<button class="flex-1 px-4 py-2 bg-red-50 text-red-600 text-xs font-bold rounded-lg border border-red-100 hover:bg-red-100 transition-colors">
+          DELETE NODE
+        </button>
+<button class="p-2 bg-white border border-gray-200 rounded-lg text-gray-400 hover:text-nexus-navy">
+<i class="ph ph-copy"></i>
+</button>
+</div>
+</aside>
+<!-- END: Property Panel -->
+</main>
+<!-- END: Main Content Area -->
+<!-- BEGIN: Canvas Footer/Status -->
+<footer class="h-8 bg-nexus-navy text-white/60 text-[10px] flex items-center justify-between px-4 z-20">
+<div class="flex gap-4">
+<span class="flex items-center gap-1"><i class="ph ph-broadcast"></i> API CONNECTED: /api/admin/nexus/layout</span>
+<span class="flex items-center gap-1 uppercase tracking-widest"><i class="ph ph-clock"></i> Last Auto-save: 2m ago</span>
+</div>
+<div class="flex gap-4">
+<span>NODES: 14</span>
+<span>EDGES: 12</span>
+<span class="text-white font-medium uppercase tracking-widest">Minimal Warm System v2.0</span>
+</div>
+</footer>
+<!-- END: Canvas Footer/Status -->
+<!-- Scripts for placeholder interactivity -->
+<script data-purpose="canvas-interactivity">
+    // Simple drag simulation logic for visual feedback
+    const canvas = document.getElementById('nexus-canvas');
+    let isDragging = false;
+    let startX, startY, scrollLeft, scrollTop;
+
+    canvas.addEventListener('mousedown', (e) => {
+      if (e.target === canvas) {
+        isDragging = true;
+        canvas.classList.add('cursor-grabbing');
+        startX = e.pageX - canvas.offsetLeft;
+        startY = e.pageY - canvas.offsetTop;
+        scrollLeft = canvas.scrollLeft;
+        scrollTop = canvas.scrollTop;
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+      canvas.classList.remove('cursor-grabbing');
+    });
+
+    // Node selection visual toggle
+    document.querySelectorAll('[data-purpose^="node-"]').forEach(node => {
+      node.addEventListener('click', (e) => {
+        document.querySelectorAll('[data-purpose^="node-"]').forEach(n => n.classList.remove('node-selected'));
+        node.classList.add('node-selected');
+        e.stopPropagation();
+      });
+    });
+  </script>
+</body></html>

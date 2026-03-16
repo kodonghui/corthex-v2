@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 - SNS Publishing Workflow</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#6b705c", // Olive Green
+                        "secondary": "#a5a58d", // Soft Sage
+                        "accent": "#ec5b13", // Theme Primary Orange
+                        "background-light": "#f8f6f6", // Warm Beige
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+        .kanban-column { min-width: 300px; width: 300px; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between border-b border-primary/20 bg-background-light dark:bg-background-dark px-6 py-3 sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-primary">
+<div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">account_tree</span>
+</div>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight">CORTHEX v2</h2>
+</div>
+<label class="flex flex-col min-w-40 h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-xl h-full bg-primary/10">
+<div class="text-primary flex items-center justify-center pl-4">
+<span class="material-symbols-outlined text-xl">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 border-none bg-transparent focus:ring-0 text-slate-900 dark:text-white placeholder:text-primary/60 px-4 pl-2 text-sm font-normal" placeholder="Search workflow..." value=""/>
+</div>
+</label>
+</div>
+<div class="flex items-center gap-6">
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-primary text-sm font-bold border-b-2 border-primary pb-1" href="#">SNS</a>
+<a class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors" href="#">Analytics</a>
+<a class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors" href="#">Settings</a>
+</nav>
+<div class="flex gap-2">
+<button class="flex items-center justify-center rounded-xl size-10 bg-primary/10 text-primary hover:bg-primary/20 transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="bg-primary/20 p-0.5 rounded-full border border-primary/30">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-9" data-alt="User profile avatar of the CEO" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBsaKqY7h3KDNR1-tqYKiGJo_DlcgEyTCTG1agR7pS25LG6uenuDG-p4xGaovsFVbmQcZWDoo4A0gsfZyD4tjHZpRiSxw91iqU9IFA61uYfC6brEZdirKx8In-p1-28BjzZGCWQl7T0Ju67BkgnoSEldK_alVQsIyjgFYBVImDaBiNNTDg-W76U6CcXMybIUOU7r_Yjee8e5n2Yju6J-DE4HVCwmPCQHBlI2Oq-7L2cO8UGWCShKGRVCjM-D0l-mk80P9nCunnTOJm6");'></div>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-1 flex flex-col p-6 gap-6">
+<!-- Subheader & Actions -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<h1 class="text-2xl font-bold text-slate-900 dark:text-white">SNS Publishing Workflow</h1>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Natural Organic Theme - Workspace Alpha</p>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex bg-primary/10 p-1 rounded-xl">
+<button class="px-4 py-2 rounded-lg bg-white dark:bg-slate-800 shadow-sm text-sm font-bold text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">view_kanban</span> Kanban
+                    </button>
+<button class="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">playlist_add_check</span> Approval Queue
+                    </button>
+<button class="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">insights</span> Engagement
+                    </button>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-lg">add</span> New Post
+                </button>
+</div>
+</div>
+<!-- Platform Filter -->
+<div class="flex gap-3 overflow-x-auto pb-2 hide-scrollbar">
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-white text-sm font-medium shadow-md">
+<span class="material-symbols-outlined text-lg">apps</span> All Platforms
+            </button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm font-medium hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-lg text-pink-500">camera</span> Instagram
+            </button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm font-medium hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-lg text-blue-400">flutter_dash</span> Twitter
+            </button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm font-medium hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-lg text-blue-700">work</span> LinkedIn
+            </button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm font-medium hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-lg text-indigo-600">social_leaderboard</span> Facebook
+            </button>
+</div>
+<!-- Kanban Board Area -->
+<div class="flex-1 flex gap-6 overflow-x-auto pb-6 hide-scrollbar">
+<!-- Column: Drafts -->
+<div class="kanban-column flex flex-col gap-4">
+<div class="flex items-center justify-between px-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400">edit_note</span>
+<h3 class="font-bold text-sm uppercase tracking-wider text-slate-500">Drafts</h3>
+<span class="bg-slate-200 dark:bg-slate-700 px-2 py-0.5 rounded-full text-[10px] font-bold">3</span>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<!-- Card 1 -->
+<div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md transition-shadow group">
+<div class="flex justify-between items-start mb-3">
+<span class="material-symbols-outlined text-pink-500 text-xl">camera</span>
+<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-orange-100 text-orange-700 uppercase">High Priority</span>
+</div>
+<div class="w-full h-32 rounded-lg bg-slate-100 mb-3 overflow-hidden">
+<div class="w-full h-full bg-cover bg-center" data-alt="Organic skincare product mockup on olive background" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAmuRHHaQFbulNNjUEk5CVpHiHP0nqGSjvRBQt9pCRUXfId04mPvyEIZVLNYbDaOO1rSrG_aFElFHDjdagECEg1I3e83wDLyNJ27RYKHQU3QnG7n8XTaAi3E1GpCsRrHVlM9cbQKVwF9sAvhsQZP9niBLXR-vjsaL3RFUU9Vtf690TFA9n9mdMV7_jaMkSnRhbWX5rcQxptgLpaQBM7WI9Rvn9Wbozlx3AW60uEOUX9ollGG5kyhDad2RxQHJbVr3NNY6HwjWKEJZd6');"></div>
+</div>
+<h4 class="text-sm font-bold mb-1 line-clamp-1">Organic Skincare Launch</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mb-4">Initial draft for the botanical serum collection launch post...</p>
+<div class="flex items-center justify-between pt-3 border-t border-slate-50 dark:border-slate-700">
+<div class="flex items-center gap-2">
+<div class="size-6 rounded-full bg-primary/20 text-[10px] flex items-center justify-center font-bold text-primary">AS</div>
+<span class="text-[10px] font-medium text-slate-500">Agent Smith</span>
+</div>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors cursor-pointer">drag_indicator</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
+<div class="flex justify-between items-start mb-3">
+<span class="material-symbols-outlined text-blue-400 text-xl">flutter_dash</span>
+<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600 uppercase">Low</span>
+</div>
+<h4 class="text-sm font-bold mb-1">Morning Routine Thread</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mb-4">A 5-part thread about sustainable morning rituals.</p>
+<div class="flex items-center justify-between pt-3 border-t border-slate-50 dark:border-slate-700">
+<div class="flex items-center gap-2">
+<div class="size-6 rounded-full bg-secondary/20 text-[10px] flex items-center justify-center font-bold text-secondary">JD</div>
+<span class="text-[10px] font-medium text-slate-500">Agent Doe</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Column: Pending -->
+<div class="kanban-column flex flex-col gap-4">
+<div class="flex items-center justify-between px-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-amber-500">pending</span>
+<h3 class="font-bold text-sm uppercase tracking-wider text-slate-500">Pending Review</h3>
+<span class="bg-amber-100 dark:bg-amber-900/30 text-amber-600 px-2 py-0.5 rounded-full text-[10px] font-bold">1</span>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border-l-4 border-amber-400 border-y border-r border-slate-100 dark:border-slate-700">
+<div class="flex justify-between items-start mb-3">
+<span class="material-symbols-outlined text-blue-700 text-xl">work</span>
+<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-700 uppercase">Medium</span>
+</div>
+<h4 class="text-sm font-bold mb-1">Q2 Sustainability Report</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mb-4">Sharing our progress on plastic-free packaging goals.</p>
+<div class="flex items-center justify-between pt-3 border-t border-slate-50 dark:border-slate-700">
+<div class="flex items-center gap-2">
+<div class="size-6 rounded-full bg-primary/20 text-[10px] flex items-center justify-center font-bold text-primary">BW</div>
+<span class="text-[10px] font-medium text-slate-500">Agent White</span>
+</div>
+<div class="flex gap-1">
+<button class="size-7 rounded-lg bg-green-500 text-white flex items-center justify-center hover:bg-green-600" title="Approve">
+<span class="material-symbols-outlined text-sm">check</span>
+</button>
+<button class="size-7 rounded-lg bg-red-500 text-white flex items-center justify-center hover:bg-red-600" title="Reject">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Column: Approved -->
+<div class="kanban-column flex flex-col gap-4">
+<div class="flex items-center justify-between px-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-green-500">verified</span>
+<h3 class="font-bold text-sm uppercase tracking-wider text-slate-500">Approved</h3>
+<span class="bg-green-100 dark:bg-green-900/30 text-green-600 px-2 py-0.5 rounded-full text-[10px] font-bold">2</span>
+</div>
+</div>
+<div class="flex flex-col gap-4 opacity-80">
+<div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
+<div class="flex justify-between items-start mb-3">
+<span class="material-symbols-outlined text-pink-500 text-xl">camera</span>
+<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-primary text-white uppercase">Ready</span>
+</div>
+<h4 class="text-sm font-bold mb-1">Weekend Sale Teaser</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mb-2">Wait for the surprise this Saturday! 🌿 #NatureLover</p>
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-xs text-slate-400">calendar_today</span>
+<span class="text-[10px] text-slate-400">Waiting for scheduling</span>
+</div>
+<div class="flex items-center justify-between pt-3 border-t border-slate-50 dark:border-slate-700">
+<div class="flex items-center gap-2">
+<div class="size-6 rounded-full bg-primary/20 text-[10px] flex items-center justify-center font-bold text-primary">BB</div>
+<span class="text-[10px] font-medium text-slate-500">Agent Brown</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Column: Scheduled -->
+<div class="kanban-column flex flex-col gap-4">
+<div class="flex items-center justify-between px-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-blue-500">schedule</span>
+<h3 class="font-bold text-sm uppercase tracking-wider text-slate-500">Scheduled</h3>
+<span class="bg-blue-100 dark:bg-blue-900/30 text-blue-600 px-2 py-0.5 rounded-full text-[10px] font-bold">1</span>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-blue-200 dark:border-blue-900 ring-2 ring-blue-50 dark:ring-blue-900/10">
+<div class="flex justify-between items-start mb-3">
+<span class="material-symbols-outlined text-pink-500 text-xl">camera</span>
+<div class="flex flex-col items-end">
+<span class="text-[10px] font-bold text-blue-600">Today, 5:00 PM</span>
+</div>
+</div>
+<div class="w-full h-24 rounded-lg bg-slate-50 mb-3 relative overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Abstract leaf pattern background" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBEVNe-cCrR80WUSAEJFRddkm9eE3WxpxxXXIchC5GEaxs7xaIgvsiMbmZF7EjddCGdYa0dZ89NlGyNOr1Q-FDFgJlfDSMFIp0IBHN_Y_bDzaV9vGPocLvVlCjuOeWWWwPMaJW4xhaL-nXX2HTbwBgMv8UZsBRf9hGUmKdRkDYIlSqzhOGAvEcgHa_0hPHYMVsPNDUDW-MEipZCp8DaDi3vflxWjBuVCSPSdc3pfAfP3wneLYSVXOeJbZ_f-kq5QxqX_HVuRrxpxZUT');"></div>
+<div class="absolute top-2 right-2 bg-white/90 px-1.5 py-0.5 rounded text-[8px] font-bold flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[10px]">timer</span> AUTO
+                            </div>
+</div>
+<h4 class="text-sm font-bold mb-1">Spring Collection Recap</h4>
+<div class="flex items-center justify-between pt-3 border-t border-slate-50 dark:border-slate-700">
+<div class="flex items-center gap-2">
+<div class="size-6 rounded-full bg-primary/20 text-[10px] flex items-center justify-center font-bold text-primary">JD</div>
+<span class="text-[10px] font-medium text-slate-500">Agent Doe</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Column: Published -->
+<div class="kanban-column flex flex-col gap-4">
+<div class="flex items-center justify-between px-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">cloud_done</span>
+<h3 class="font-bold text-sm uppercase tracking-wider text-slate-500">Published</h3>
+<span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-[10px] font-bold">12</span>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
+<div class="flex justify-between items-start mb-2">
+<span class="material-symbols-outlined text-indigo-600 text-xl">social_leaderboard</span>
+<span class="text-[10px] font-medium text-slate-400">2h ago</span>
+</div>
+<h4 class="text-sm font-bold text-slate-600 dark:text-slate-400">Brand Story: Roots</h4>
+<div class="mt-3 grid grid-cols-3 gap-2 text-center">
+<div>
+<div class="text-[10px] font-bold text-primary">1.2k</div>
+<div class="text-[8px] text-slate-400 uppercase">Likes</div>
+</div>
+<div>
+<div class="text-[10px] font-bold text-primary">45</div>
+<div class="text-[8px] text-slate-400 uppercase">Shares</div>
+</div>
+<div>
+<div class="text-[10px] font-bold text-primary">8.4%</div>
+<div class="text-[8px] text-slate-400 uppercase">ER</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Right Sidebar Overlay: Approval Queue for CEO -->
+<aside class="fixed right-0 top-0 bottom-0 w-80 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl z-50 flex flex-col translate-x-full lg:translate-x-0 transition-transform">
+<div class="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+<h2 class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">security</span> CEO Approval
+            </h2>
+<span class="bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full">1 Pending</span>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-4">
+<div class="bg-primary/5 rounded-xl p-4 border border-primary/20">
+<div class="flex items-center gap-3 mb-3">
+<div class="size-10 rounded-lg bg-cover bg-center" data-alt="Thumbnail of post awaiting CEO approval" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBtic-B6KNyXJotEfGjjMmPgut7AaLFnU-sj_IYYeRC8gtl0jb153jsPJrwltta7k1HR5Bk5A1H9lzuEvThShByFb0bmE3L_zH6jN_fhm1xP7-yjft2L2j0CRzCax-fGL09C_tgC2v1m3WrznbRDga2gxa3HAtMYrRsXljxkZYiwzXjYj87Qq58rudPXw4cgze82r7JAOSrm2iKe_hGCoIcPQtAWDd0YpVAHcsJPzKQFAPxDllPrNEyrMGKS6_g1LGgJ_NJegGFIA4A');"></div>
+<div>
+<h4 class="text-xs font-bold">New Logistics Partnership</h4>
+<span class="text-[10px] text-slate-500">Proposed for LinkedIn</span>
+</div>
+</div>
+<p class="text-[11px] text-slate-600 dark:text-slate-400 mb-4 bg-white/50 dark:bg-slate-800/50 p-2 rounded italic">
+                    "We're thrilled to announce our new carbon-neutral shipping partnership with Eco-Cargo. Moving towards a greener future..."
+                </p>
+<!-- CEO API Action: PATCH /api/workspace/sns/:id/approve -->
+<div class="grid grid-cols-2 gap-2">
+<button class="flex items-center justify-center gap-1 bg-primary text-white py-2 rounded-lg text-xs font-bold hover:bg-primary/90">
+<span class="material-symbols-outlined text-sm">thumb_up</span> Approve
+                    </button>
+<button class="flex items-center justify-center gap-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 py-2 rounded-lg text-xs font-bold hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors">
+<span class="material-symbols-outlined text-sm">edit</span> Revise
+                    </button>
+</div>
+</div>
+<!-- Analytics Overview -->
+<div class="pt-4">
+<h3 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3 px-2">Weekly Engagement</h3>
+<div class="space-y-3">
+<div class="flex items-center justify-between px-2">
+<span class="text-xs text-slate-600 dark:text-slate-300">Total Reach</span>
+<span class="text-xs font-bold text-green-500">+12.4%</span>
+</div>
+<div class="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 75%"></div>
+</div>
+<div class="flex items-center justify-between px-2 mt-4">
+<span class="text-xs text-slate-600 dark:text-slate-300">Avg. Engagement</span>
+<span class="text-xs font-bold text-primary">5.2%</span>
+</div>
+<div class="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 45%"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="p-4 bg-slate-50 dark:bg-slate-800/30 border-t border-slate-100 dark:border-slate-800">
+<button class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined text-sm">summarize</span> Full Weekly Report
+            </button>
+</div>
+</aside>
+</div>
+</body></html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SketchVibe - CORTHEX v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&amp;family=Pretendard:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Noto Serif KR", "Pretendard", "sans-serif"],
+                        "body": ["Pretendard", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Pretendard', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .font-display { font-family: 'Noto Serif KR', serif; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen overflow-hidden">
+<div class="flex h-screen w-full">
+<!-- Sidebar -->
+<div class="w-64 bg-[#4a5d23] text-white flex flex-col h-full flex-shrink-0 z-20 shadow-lg">
+<div class="p-6 flex items-center gap-3 border-b border-[#3d4c1c]">
+<span class="material-symbols-outlined text-2xl">hub</span>
+<h2 class="text-xl font-bold font-display tracking-wide">SketchVibe</h2>
+</div>
+<div class="p-6 flex flex-col gap-2">
+<div class="flex items-center gap-3 mb-6">
+<div class="bg-white/20 aspect-square rounded-full size-10 bg-center bg-cover" data-alt="User Avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAT5vAq19ozcOQTkSH0ZYdXOUiJCJFJcP_9bIM8XK21GO-NEw4t0RKuEMs8fQx98SMxqIUQ-NstZoDyToASGiFPEse2i700PHzT8_D-2B67HfRgBxHQnXAmHA-jB7kYk8F135wwNTYw-5FDJZURpOwr2LtOqNPwHURsfQa1TTWg3E2P8kuiO4y6sjEM_mSYNqucQps0e-iE4a_3W_wFQTxRzmlapwsEYZKkYkxZ8KFYIR7Mv4cNUkjV3Uy0mtzwFcpNubSMnpbMIqTq");'></div>
+<div class="flex flex-col">
+<h1 class="text-base font-bold font-display">CORTHEX v2</h1>
+<p class="text-[#c5d8a4] text-xs">AI Canvas Workspace</p>
+</div>
+</div>
+<div class="flex flex-col gap-1 mt-4">
+<a class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-[#5a6e2e] transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">home</span>
+<span class="text-sm font-medium">Home</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-[#3d4c1c] shadow-inner" href="#">
+<span class="material-symbols-outlined text-xl">folder</span>
+<span class="text-sm font-medium">Workspaces</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-[#5a6e2e] transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">dashboard</span>
+<span class="text-sm font-medium">Templates</span>
+</a>
+</div>
+</div>
+<div class="mt-auto p-6 flex flex-col gap-1 border-t border-[#3d4c1c]">
+<a class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-[#5a6e2e] transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-[#5a6e2e] transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">help</span>
+<span class="text-sm font-medium">Help</span>
+</a>
+</div>
+</div>
+<!-- Main Canvas Area -->
+<div class="flex-1 flex flex-col relative bg-[#faf8f5] dark:bg-[#1a1c18] overflow-hidden">
+<!-- Top Bar -->
+<header class="h-16 flex items-center justify-between px-8 absolute top-0 w-full z-10 bg-gradient-to-b from-black/5 to-transparent pointer-events-none">
+<div class="flex items-center gap-4 pointer-events-auto bg-white/80 dark:bg-black/50 backdrop-blur-md px-4 py-2 rounded-2xl shadow-sm">
+<span class="text-sm font-medium text-slate-700 dark:text-slate-300">Project Alpha /</span>
+<span class="text-sm font-bold text-slate-900 dark:text-white">Marketing Strategy Canvas</span>
+</div>
+<div class="flex items-center gap-4 pointer-events-auto">
+<div class="flex -space-x-2">
+<img class="w-8 h-8 rounded-full border-2 border-white dark:border-slate-800" data-alt="Collaborator 1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfzjSyKEvLKw73Etm3rxOo5bevFq-y84R2Rdplp1qnKvhcxrkxCwpU9dDrKO1QpAkZGzOlIm4SMp79WLqEvjkxf2mX6h5rVAfjRvQj30Z5eCutg8vaejtg7kvnAPgargajwdA7nnnsMBjwCzNuJkj1btBKJWwKgX3rROsMQTqmc4-eXogBLPGeCm2A9s7GGnYV8pri2QC8sY6SPaaJ0XznWe3JQw0ymmiNkPbCvjPCCTCdglFfoYV9_2QV3ZRvB6QRDRevUKCyXl-G"/>
+<img class="w-8 h-8 rounded-full border-2 border-white dark:border-slate-800" data-alt="Collaborator 2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlxMVujnvDgri5XVsnfcRJQIDYyWzk07sGLcGujU239G4u8zpyRoPxjoLUVDda6YvlbxzOiLHJpVVeKu2KLJDYGIWZtz7ysj1FK6J5ceiJkCU4ZJfVRRjuu8aJahMLrSFh3Ajl6MnQpbM9KlATiXqQjdwmH70a6lUmPMD80cfeaFl-vLe1_W45auenCZ_lvp-vIKlHe_irfH_S7_981CeTCOCri3ydhRFElP73q1h5TRDeROJNtL6McMbJXk8bLvnBfKIY7uLubJNP"/>
+<div class="w-8 h-8 rounded-full border-2 border-white dark:border-slate-800 bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold">+3</div>
+</div>
+<button class="bg-primary text-white px-4 py-2 rounded-2xl text-sm font-medium shadow-md hover:bg-primary/90 transition-colors">
+                        Share
+                    </button>
+</div>
+</header>
+<!-- Canvas Content (Simulated Graph) -->
+<div class="flex-1 w-full h-full relative cursor-move bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#374151_1px,transparent_1px)] [background-size:24px_24px]">
+<!-- Connections (SVG) -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none z-0">
+<path class="dark:stroke-slate-600" d="M 300 200 C 450 200, 350 400, 500 400" fill="none" stroke="#94a3b8" stroke-width="2"></path>
+<path class="dark:stroke-slate-600" d="M 500 400 C 650 400, 600 250, 750 250" fill="none" stroke="#94a3b8" stroke-width="2"></path>
+<path class="dark:stroke-slate-600" d="M 300 200 C 400 200, 450 100, 550 100" fill="none" stroke="#94a3b8" stroke-dasharray="5,5" stroke-width="2"></path>
+</svg>
+<!-- Nodes -->
+<!-- Node 1 -->
+<div class="absolute top-[150px] left-[150px] w-64 bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-4 z-10 border border-slate-200 dark:border-slate-700 cursor-pointer hover:shadow-xl transition-shadow">
+<div class="flex items-center gap-3 mb-3">
+<div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+<span class="material-symbols-outlined">smart_toy</span>
+</div>
+<div>
+<h3 class="font-bold text-sm">Product Strategy Agent</h3>
+<span class="text-xs text-slate-500">AI Assistant</span>
+</div>
+</div>
+<p class="text-xs text-slate-600 dark:text-slate-400 line-clamp-2">Analyzing market gaps and defining core feature requirements for Q3 launch.</p>
+</div>
+<!-- Node 2 -->
+<div class="absolute top-[350px] left-[450px] w-72 bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-4 z-10 border-2 border-primary/50 cursor-pointer hover:shadow-xl transition-shadow ring-4 ring-primary/10">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div>
+<h3 class="font-bold text-sm">Market Trend Research</h3>
+<span class="text-xs text-slate-500">Knowledge Doc</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-400 text-sm">more_vert</span>
+</div>
+<div class="bg-slate-50 dark:bg-slate-900 rounded-xl p-3 text-xs text-slate-700 dark:text-slate-300">
+                        Synthesized 15 competitor reports. Key finding: shift towards eco-friendly packaging is accelerating.
+                    </div>
+<div class="mt-3 flex gap-2">
+<span class="px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded text-[10px] text-slate-600 dark:text-slate-300">Updated 2h ago</span>
+</div>
+</div>
+<!-- Node 3 -->
+<div class="absolute top-[200px] left-[700px] w-60 bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-4 z-10 border border-slate-200 dark:border-slate-700 cursor-pointer hover:shadow-xl transition-shadow">
+<div class="flex items-center gap-3 mb-3">
+<div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400">
+<span class="material-symbols-outlined">psychology</span>
+</div>
+<div>
+<h3 class="font-bold text-sm">Customer Interview Analysis</h3>
+<span class="text-xs text-slate-500">Processing...</span>
+</div>
+</div>
+<div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 mt-2">
+<div class="bg-green-500 h-1.5 rounded-full" style="width: 45%"></div>
+</div>
+</div>
+<!-- Node 4 -->
+<div class="absolute top-[50px] left-[500px] w-48 bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-3 z-10 border border-dashed border-slate-300 dark:border-slate-600 cursor-pointer flex items-center justify-center gap-2 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700/50">
+<span class="material-symbols-outlined text-xl">add</span>
+<span class="text-sm font-medium">Add Context</span>
+</div>
+</div>
+<!-- Canvas Controls (Zoom/Pan) -->
+<div class="absolute bottom-24 right-8 flex flex-col gap-2 z-20">
+<button class="w-10 h-10 bg-white dark:bg-slate-800 rounded-full shadow-md flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700">
+<span class="material-symbols-outlined text-xl">add</span>
+</button>
+<button class="w-10 h-10 bg-white dark:bg-slate-800 rounded-full shadow-md flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700">
+<span class="material-symbols-outlined text-xl">remove</span>
+</button>
+<button class="w-10 h-10 bg-white dark:bg-slate-800 rounded-full shadow-md flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 mt-2">
+<span class="material-symbols-outlined text-xl">fit_screen</span>
+</button>
+</div>
+<!-- Floating Toolbar -->
+<div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
+<div class="bg-white dark:bg-slate-800 rounded-full shadow-xl px-6 py-3 flex items-center gap-6 border border-slate-200 dark:border-slate-700">
+<button class="flex flex-col items-center gap-1 group">
+<div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">
+<span class="material-symbols-outlined">smart_toy</span>
+</div>
+<span class="text-[10px] font-medium text-slate-500">Agent</span>
+</button>
+<button class="flex flex-col items-center gap-1 group">
+<div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 group-hover:bg-orange-100 group-hover:text-orange-600 transition-colors">
+<span class="material-symbols-outlined">description</span>
+</div>
+<span class="text-[10px] font-medium text-slate-500">Doc</span>
+</button>
+<div class="w-px h-8 bg-slate-200 dark:bg-slate-700"></div>
+<button class="flex flex-col items-center gap-1 group">
+<div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 group-hover:bg-purple-100 group-hover:text-purple-600 transition-colors">
+<span class="material-symbols-outlined">account_tree</span>
+</div>
+<span class="text-[10px] font-medium text-slate-500">Link</span>
+</button>
+<button class="flex flex-col items-center gap-1 group">
+<div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 group-hover:bg-green-100 group-hover:text-green-600 transition-colors">
+<span class="material-symbols-outlined">tips_and_updates</span>
+</div>
+<span class="text-[10px] font-medium text-slate-500">Idea</span>
+</button>
+<div class="w-px h-8 bg-slate-200 dark:bg-slate-700"></div>
+<button class="flex flex-col items-center gap-1 group">
+<div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 group-hover:bg-primary/20 group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined">ios_share</span>
+</div>
+<span class="text-[10px] font-medium text-slate-500">Export</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</body></html>

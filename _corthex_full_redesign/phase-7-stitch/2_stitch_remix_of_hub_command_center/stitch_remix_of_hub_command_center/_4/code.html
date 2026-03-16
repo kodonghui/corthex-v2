@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 - Org Hierarchy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+        .hierarchy-line {
+            position: absolute;
+            background-color: #ec5b13;
+            opacity: 0.2;
+        }
+        .line-v { width: 2px; height: 24px; left: 50%; transform: translateX(-50%); }
+        .line-h { height: 2px; top: -24px; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark px-6 py-3 sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-primary">
+<div class="size-8 flex items-center justify-center bg-primary/10 rounded-lg">
+<span class="material-symbols-outlined text-primary">hub</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight">CORTHEX v2</h2>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors" href="#">Dashboard</a>
+<a class="text-primary text-sm font-semibold border-b-2 border-primary pb-1" href="#">Departments</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors" href="#">Agents</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors" href="#">Settings</a>
+</nav>
+</div>
+<div class="flex flex-1 justify-end gap-4 items-center">
+<label class="hidden sm:flex items-center relative min-w-40 max-w-64">
+<span class="material-symbols-outlined absolute left-3 text-slate-400 text-xl">search</span>
+<input class="w-full rounded-xl border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all" placeholder="Search API hierarchy..." value=""/>
+</label>
+<div class="flex items-center gap-2">
+<button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="size-9 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold border border-primary/30 overflow-hidden" data-alt="User avatar placeholder profile picture">
+<img alt="Admin" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbMcJ20W_DrXxhUOCRemfXXMVfHUhP52sRb2Prjo6eum8rJBdKTWQiOrjU98kMFViEe986pj5WF0uWjdzGpdeT7VqINasSaf6BvEcE_fpIOwpWYGkSL5Lh9tFfTTQ8JJ_NHP47VBK09eUgi38qYBv4YLKZMJ-4JAkPaTqPPNohHkeIWnV_jWq0NFEvgi35959t9uIQLdXK12dehARVTSSUkjrtpLCyS0vzhES-dYKooASm02-sYm-PaMkm5upSiMsyLvxPKizs-A"/>
+</div>
+</div>
+</div>
+</header>
+<div class="flex grow">
+<!-- Sidebar Navigation -->
+<aside class="hidden lg:flex w-64 flex-col border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark p-4 gap-6">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-3 px-3 py-4 border-b border-slate-100 dark:border-slate-800 mb-2">
+<div class="size-10 rounded-xl bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">account_tree</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-slate-900 dark:text-slate-100 text-sm font-bold">Workspace</h1>
+<p class="text-slate-500 text-xs">V2 Management</p>
+</div>
+</div>
+<div class="flex flex-col gap-1 mt-2">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined text-xl group-hover:text-primary">dashboard</span>
+<span class="text-sm font-medium">Overview</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-primary/10 text-primary rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined text-xl">account_tree</span>
+<span class="text-sm font-bold">Hierarchy</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined text-xl group-hover:text-primary">group</span>
+<span class="text-sm font-medium">Teams</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined text-xl group-hover:text-primary">verified_user</span>
+<span class="text-sm font-medium">Roles</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined text-xl group-hover:text-primary">bar_chart</span>
+<span class="text-sm font-medium">Analytics</span>
+</a>
+</div>
+</div>
+<div class="mt-auto p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
+<p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">API Connection</p>
+<div class="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300 overflow-hidden">
+<span class="material-symbols-outlined text-xs text-green-500">fiber_manual_record</span>
+<span class="truncate font-mono">GET /agents/hierarchy</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0 bg-background-light dark:bg-background-dark">
+<!-- Breadcrumbs & Header -->
+<div class="px-8 pt-8">
+<nav class="flex items-center gap-2 text-xs font-medium text-slate-400 uppercase tracking-widest mb-4">
+<a class="hover:text-primary transition-colors" href="#">Workspace</a>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<span class="text-slate-600 dark:text-slate-200">Org Hierarchy</span>
+</nav>
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div class="max-w-2xl">
+<h2 class="text-3xl md:text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight mb-2">Organizational Hierarchy</h2>
+<p class="text-slate-500 dark:text-slate-400 text-base">Visual representation of departments and sub-units mapped via agent architecture.</p>
+</div>
+<button class="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-xl font-bold text-sm shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined text-xl">add</span>
+<span>Add Department</span>
+</button>
+</div>
+<!-- View Switcher Tabs -->
+<div class="mt-8 border-b border-slate-200 dark:border-slate-800 flex gap-8">
+<button class="pb-4 border-b-2 border-primary text-primary text-sm font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">account_tree</span> Tree View
+                    </button>
+<button class="pb-4 border-b-2 border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-sm font-bold flex items-center gap-2 transition-all">
+<span class="material-symbols-outlined text-lg">list</span> List View
+                    </button>
+<button class="pb-4 border-b-2 border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-sm font-bold flex items-center gap-2 transition-all">
+<span class="material-symbols-outlined text-lg">bubble_chart</span> Graph View
+                    </button>
+</div>
+</div>
+<!-- Hierarchy Visualization Area -->
+<div class="flex-1 p-8 overflow-auto">
+<div class="min-w-[800px] flex flex-col items-center">
+<!-- Root Node -->
+<div class="relative mb-12 flex flex-col items-center">
+<div class="bg-white dark:bg-slate-800 border-2 border-primary p-4 rounded-xl shadow-xl w-64 text-center group transition-all hover:border-primary/60">
+<span class="text-[10px] font-black text-primary uppercase tracking-tighter mb-1 block">Headquarters</span>
+<h4 class="text-slate-900 dark:text-slate-100 font-bold">Executive Board</h4>
+<p class="text-slate-500 text-xs mt-1">12 Total Agents</p>
+</div>
+<!-- Vertical line down -->
+<div class="hierarchy-line line-v bottom-[-48px]"></div>
+</div>
+<!-- Level 2 Containers -->
+<div class="relative w-full">
+<!-- Horizontal connector -->
+<div class="absolute top-0 left-1/4 right-1/4 h-[2px] bg-primary/20"></div>
+<div class="flex justify-around items-start pt-12">
+<!-- Dept 1 -->
+<div class="flex flex-col items-center relative">
+<div class="hierarchy-line line-v top-[-48px]"></div>
+<div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-xl shadow-md w-56 text-center hover:shadow-lg transition-all border-l-4 border-l-primary">
+<h4 class="text-slate-900 dark:text-slate-100 font-bold">Product Strategy</h4>
+<div class="flex items-center justify-center gap-2 mt-2">
+<span class="material-symbols-outlined text-xs text-slate-400">group</span>
+<p class="text-slate-500 text-xs">4 Units</p>
+</div>
+</div>
+<div class="hierarchy-line line-v bottom-[-48px]"></div>
+<!-- Sub Units Level 3 -->
+<div class="pt-12 flex gap-4">
+<div class="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 p-3 rounded-lg shadow-sm w-40 text-center hover:bg-primary/5 transition-all">
+<p class="text-slate-800 dark:text-slate-200 text-xs font-bold">UX Research</p>
+<p class="text-primary text-[10px] font-bold mt-1 tracking-wider uppercase">Active</p>
+</div>
+<div class="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 p-3 rounded-lg shadow-sm w-40 text-center hover:bg-primary/5 transition-all">
+<p class="text-slate-800 dark:text-slate-200 text-xs font-bold">Core Dev</p>
+<p class="text-primary text-[10px] font-bold mt-1 tracking-wider uppercase">Active</p>
+</div>
+</div>
+</div>
+<!-- Dept 2 -->
+<div class="flex flex-col items-center relative">
+<div class="hierarchy-line line-v top-[-48px]"></div>
+<div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-xl shadow-md w-56 text-center hover:shadow-lg transition-all border-l-4 border-l-primary">
+<h4 class="text-slate-900 dark:text-slate-100 font-bold">Revenue Ops</h4>
+<div class="flex items-center justify-center gap-2 mt-2">
+<span class="material-symbols-outlined text-xs text-slate-400">group</span>
+<p class="text-slate-500 text-xs">2 Units</p>
+</div>
+</div>
+<div class="hierarchy-line line-v bottom-[-48px]"></div>
+<!-- Sub Units Level 3 -->
+<div class="pt-12">
+<div class="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 p-3 rounded-lg shadow-sm w-44 text-center hover:bg-primary/5 transition-all">
+<p class="text-slate-800 dark:text-slate-200 text-xs font-bold">Growth &amp; Marketing</p>
+<p class="text-primary text-[10px] font-bold mt-1 tracking-wider uppercase">Active</p>
+</div>
+</div>
+</div>
+<!-- Dept 3 -->
+<div class="flex flex-col items-center relative">
+<div class="hierarchy-line line-v top-[-48px]"></div>
+<div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-xl shadow-md w-56 text-center hover:shadow-lg transition-all border-l-4 border-l-primary">
+<h4 class="text-slate-900 dark:text-slate-100 font-bold">Security &amp; Compliance</h4>
+<div class="flex items-center justify-center gap-2 mt-2">
+<span class="material-symbols-outlined text-xs text-slate-400">group</span>
+<p class="text-slate-500 text-xs">1 Unit</p>
+</div>
+</div>
+<div class="hierarchy-line line-v bottom-[-48px]"></div>
+<!-- Sub Units Level 3 -->
+<div class="pt-12">
+<div class="bg-primary/5 border border-primary/20 p-3 rounded-lg shadow-sm w-44 text-center">
+<p class="text-slate-800 dark:text-slate-200 text-xs font-bold">Cyber Threat Lab</p>
+<p class="text-primary text-[10px] font-bold mt-1 tracking-wider uppercase">Top Priority</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Meta Info -->
+<footer class="p-6 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center text-xs text-slate-400 font-medium">
+<div class="flex items-center gap-4">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> Last updated: 2 mins ago</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">settings_input_component</span> API v2.4.1</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="size-2 rounded-full bg-green-500"></span>
+<span class="text-slate-500">All agent nodes synchronized</span>
+</div>
+</footer>
+</main>
+</div>
+</div>
+</body></html>

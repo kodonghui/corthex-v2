@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Knowledge Library - CORTHEX v2</title>
+<!-- Tailwind CSS v3 CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              coral: '#E77C71',
+              amber: '#ED9F6D',
+              sage: '#89B399',
+              base: '#FBFBF9',
+              muted: '#9CA3AF',
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-typography">
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #FBFBF9;
+      color: #374151;
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+<!-- BEGIN: LeftSidebar -->
+<aside class="w-64 border-r border-gray-100 bg-white flex flex-col shrink-0" data-purpose="main-sidebar">
+<div class="p-6">
+<div class="flex items-center gap-2 mb-10">
+<div class="w-8 h-8 bg-brand-coral rounded-md flex items-center justify-center text-white font-bold">C2</div>
+<span class="font-bold text-xl tracking-tight">CORTHEX v2</span>
+</div>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-gray-500 hover:bg-gray-50 rounded-lg transition-colors" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-sm font-medium">홈</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-brand-coral/5 text-brand-coral rounded-lg transition-colors" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-sm font-medium">허브 (지식 라이브러리)</span>
+</a>
+</nav>
+<div class="mt-10">
+<p class="px-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">UI Framework</p>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-gray-500 hover:bg-gray-50 rounded-lg" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-sm font-medium">컴포넌트 가이드</span>
+</a>
+</nav>
+</div>
+</div>
+<div class="mt-auto p-6 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-gray-500 hover:bg-gray-50 rounded-lg" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-sm font-medium">설정</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-brand-coral hover:bg-red-50 rounded-lg" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-sm font-medium">로그아웃</span>
+</a>
+</div>
+</aside>
+<!-- END: LeftSidebar -->
+<!-- Main Application Area -->
+<main class="flex-1 flex flex-col min-w-0 bg-brand-base">
+<!-- BEGIN: TopHeader -->
+<header class="h-16 border-b border-gray-100 bg-white flex items-center justify-between px-8 shrink-0">
+<div class="flex-1 max-w-xl">
+<div class="relative">
+<svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<input class="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-lg text-sm focus:ring-1 focus:ring-brand-coral" placeholder="지식 베이스 검색... (Cmd+K)" type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="relative text-gray-400 hover:text-gray-600">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="absolute top-0 right-0 w-2 h-2 bg-brand-coral rounded-full border-2 border-white"></span>
+</button>
+<div class="flex items-center gap-3 border-l pl-6 border-gray-100">
+<div class="text-right">
+<p class="text-sm font-bold text-gray-800">Alex Kim</p>
+<p class="text-[10px] text-gray-400 font-bold uppercase tracking-tight">CEO / ADMIN</p>
+</div>
+<img alt="Profile" class="w-10 h-10 rounded-full border border-gray-100" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB059_owZsOfKLGm4Oqcvzl3a-Nm0ti4yohor-T8TBL1duL_nmhY8nCd5UQK6RRdJPKVsqi4QHbK3Ao2SKU5i3IaIqyqwZFu2tRBMGHwvkRTc9wKYi9CF7Jw1NAtgQVkN9kCYQ23HCEK-IBU50dvJtJqI-A6ie6BtI-sNKKrOop49Wz5OgDwEh6icIG6lyDmTaZ2JfxbxPDzEc-u5B0lG3-oBWU9n8hGcmg70JBnuBQ9easYW6gfAzsfx9qWqWUhEfF_CQThYH9ENQ"/>
+</div>
+</div>
+</header>
+<!-- END: TopHeader -->
+<!-- BEGIN: KnowledgeLayout -->
+<div class="flex-1 flex overflow-hidden">
+<!-- Panel 1: Folder Tree -->
+<section class="w-72 border-r border-gray-100 flex flex-col bg-white" data-purpose="folder-tree">
+<div class="p-4 border-b border-gray-100 flex items-center justify-between">
+<h2 class="text-sm font-bold text-gray-700 uppercase tracking-wider">탐색기</h2>
+<button class="text-brand-coral hover:bg-brand-coral/10 p-1 rounded">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-2 scrollbar-hide">
+<div class="group">
+<div class="flex items-center gap-2 text-sm text-gray-700 font-medium p-2 hover:bg-gray-50 rounded cursor-pointer">
+<svg class="w-4 h-4 text-gray-400" fill="currentColor" viewbox="0 0 20 20"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg>
+<span>프로젝트 매뉴얼</span>
+</div>
+<div class="ml-6 mt-1 space-y-1">
+<div class="text-xs text-gray-500 p-2 border-l-2 border-transparent hover:border-brand-coral hover:bg-gray-50 rounded-r cursor-pointer">신규 입사자 가이드</div>
+<div class="text-xs text-brand-coral font-bold p-2 border-l-2 border-brand-coral bg-brand-coral/5 rounded-r cursor-pointer">인공지능 모델링 보안</div>
+</div>
+</div>
+<div class="flex items-center gap-2 text-sm text-gray-700 font-medium p-2 hover:bg-gray-50 rounded cursor-pointer">
+<svg class="w-4 h-4 text-gray-400" fill="currentColor" viewbox="0 0 20 20"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg>
+<span>마케팅 에셋</span>
+</div>
+<div class="flex items-center gap-2 text-sm text-gray-700 font-medium p-2 hover:bg-gray-50 rounded cursor-pointer">
+<svg class="w-4 h-4 text-gray-400" fill="currentColor" viewbox="0 0 20 20"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg>
+<span>기술 스택 아카이브</span>
+</div>
+</div>
+</section>
+<!-- Panel 2: Document List -->
+<section class="w-80 border-r border-gray-100 flex flex-col bg-gray-50/50" data-purpose="document-list">
+<div class="p-4 bg-white border-b border-gray-100 flex items-center justify-between">
+<span class="text-xs font-bold text-gray-400">문서 리스트 (12)</span>
+<div class="flex gap-2">
+<button class="text-gray-400 hover:text-gray-600"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto scrollbar-hide">
+<!-- Document Item: Active -->
+<div class="p-4 bg-white border-b border-brand-coral/20 border-l-4 border-l-brand-coral cursor-pointer">
+<div class="flex justify-between items-start mb-1">
+<h3 class="text-sm font-bold text-gray-900 line-clamp-1">인공지능 비즈니스의 새로운 차원</h3>
+<span class="text-[10px] bg-brand-sage/10 text-brand-sage px-1.5 py-0.5 rounded font-bold uppercase">Public</span>
+</div>
+<p class="text-xs text-gray-500 line-clamp-2 mb-3">코텍스 v2는 복잡한 데이터 처리를 최소화하고 사용자 경험을 극대화하는 것을 목표로 합니다.</p>
+<div class="flex items-center justify-between">
+<span class="text-[10px] text-gray-400">2023.10.24</span>
+<div class="flex -space-x-2">
+<img class="w-5 h-5 rounded-full border-2 border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBe3XiG0V7Nd1NCkuECLGdyELnX__IfoHiDd2SrtpB-MDyvuQz3IgTvhFIrTWUoDDJZah_8k7JtnlheF5_VUqbnZkp54jbx2hJDOqpBB1bszh9xQgxYiOkAYAVXJwODeEB3N3OmxLTpOwBLxyO9t8t6v22Y1kPgfz22dm9TeuLRKfWrLRvPeBGeK1E9BZlG9tO7OHsTcwea8nO4fUF5tKmqytDquPgS1HmNNVTZJmcdJiyAAi-kCAqY4Pqb9Lr-KD_kBfmN5xePx_0"/>
+<img class="w-5 h-5 rounded-full border-2 border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyhzRRve-NncTbdAhYcqTG5lJV9vDThEz_4sMPkg7sj1JqqCd78tugo8B5oYlv_Z72qoRJB9pN5XhOMOAcxwN-noky1mkKLm8WuXNU6VTwP4eoq0d_5_BIpELS11s-HYlL_voEhvAdBcxhxd1Ow7ojGqcEJDNG_V3U6lmCT8y-FLRM4udtxjtlWMTVVQV2UxH_lUzAgGRqNI-pK70sSATPShrCMGw2wv7YmcNAhyD39to-pqE7bfEFcaMnehLjLpTrqrXdkL02r9k"/>
+</div>
+</div>
+</div>
+<!-- Document Item: Regular -->
+<div class="p-4 border-b border-gray-100 hover:bg-white transition-colors cursor-pointer group">
+<div class="flex justify-between items-start mb-1">
+<h3 class="text-sm font-medium text-gray-700 group-hover:text-gray-900 line-clamp-1">넥서스 워크플로우 대시보드 v2.1</h3>
+<span class="text-[10px] bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded font-bold uppercase">Draft</span>
+</div>
+<p class="text-xs text-gray-400 line-clamp-2 mb-3">워크플로우 자동화 시스템의 주요 인터페이스 디자인 원칙 및 사용자 흐름 정의...</p>
+<div class="flex items-center justify-between">
+<span class="text-[10px] text-gray-400">2023.10.20</span>
+</div>
+</div>
+<!-- More items... -->
+<div class="p-4 border-b border-gray-100 hover:bg-white transition-colors cursor-pointer group" v-for="i in 5">
+<div class="flex justify-between items-start mb-1">
+<h3 class="text-sm font-medium text-gray-700 group-hover:text-gray-900 line-clamp-1">클라우드 아키텍처 설계도</h3>
+</div>
+<p class="text-xs text-gray-400 line-clamp-1 mb-2">AWS 기반의 마이크로서비스 배포 전략</p>
+<span class="text-[10px] text-gray-400">2023.09.15</span>
+</div>
+</div>
+</section>
+<!-- Panel 3: Content Reader -->
+<section class="flex-1 flex flex-col min-w-0 bg-white" data-purpose="content-reader">
+<!-- Content Header -->
+<div class="h-14 px-8 border-b border-gray-100 flex items-center justify-between shrink-0">
+<div class="flex items-center gap-4 text-xs">
+<span class="text-gray-400">Knowledge</span>
+<svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-gray-400">Project Manual</span>
+<svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-gray-800 font-medium">인공지능 모델링 보안</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-3 py-1.5 text-xs font-bold text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50">편집</button>
+<button class="px-3 py-1.5 text-xs font-bold text-white bg-brand-coral rounded-lg shadow-sm shadow-brand-coral/20">공유하기</button>
+</div>
+</div>
+<!-- Content Tabs -->
+<div class="px-8 border-b border-gray-100 flex gap-8 shrink-0">
+<button class="py-3 text-sm font-bold text-brand-coral border-b-2 border-brand-coral">본문</button>
+<button class="py-3 text-sm font-medium text-gray-400 hover:text-gray-600 transition-colors">에이전트 메모리</button>
+<button class="py-3 text-sm font-medium text-gray-400 hover:text-gray-600 transition-colors">버전 히스토리</button>
+</div>
+<!-- Scrollable Document Content -->
+<article class="flex-1 overflow-y-auto p-12 max-w-4xl mx-auto w-full scrollbar-hide">
+<header class="mb-12">
+<div class="text-[10px] font-bold text-brand-coral uppercase tracking-widest mb-2">Heading 1</div>
+<h1 class="text-4xl font-extrabold text-gray-900 tracking-tight leading-tight">인공지능 비즈니스의 새로운 차원</h1>
+<div class="mt-6 flex items-center gap-4 text-sm text-gray-500">
+<div class="flex items-center gap-2">
+<img class="w-6 h-6 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7dnSJvejAz_wsvbXRC8i5Yfiszzdbo5jCxMaYUXzI_mAfgbE2scQomV5j2t-ooWy0--rq8oXrI26vr7mTRCgWYCsqQGcAYYIq6eplo5xl2Q9dZT-GlD-8GZvI-pPsPlKuBaWcYvweiwo8am_ZkwQI6_sOEHOtvXo6hWODc1j7WAUXx0_mzOP1nzdkWMO0AuNCr6p-lbn5afmLoGMbi62Ud4NjKm9fzm9GLbEWiKbDe0BD-ltjt_CJf4juBFTOy8SYc5tae8HZiE4"/>
+<span class="font-medium text-gray-700">Alex Kim</span>
+</div>
+<span class="w-1 h-1 bg-gray-300 rounded-full"></span>
+<span>2023년 10월 24일 14:30 (KST)</span>
+</div>
+</header>
+<div class="space-y-8 text-gray-700 leading-relaxed">
+<div class="space-y-4">
+<div class="text-[10px] font-bold text-brand-amber uppercase tracking-widest">Heading 2</div>
+<h2 class="text-2xl font-bold text-gray-900">넥서스 워크플로우 대시보드 개요</h2>
+<p>코텍스 v2는 복잡한 데이터 처리를 최소화하고 사용자 경험을 극대화하는 것을 목표로 합니다. 미니멀한 웜톤 디자인은 장시간 사용 시의 피로도를 줄여주며, 핵심 정보에 집중할 수 있도록 돕습니다.</p>
+</div>
+<div class="grid grid-cols-2 gap-6 my-10">
+<div class="p-6 bg-brand-base border border-gray-100 rounded-2xl">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-xl bg-brand-coral/10 flex items-center justify-center text-brand-coral">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<h3 class="font-bold text-gray-900">고성능 엔진</h3>
+</div>
+<p class="text-sm text-gray-500">초당 250개 이상의 토큰을 처리하는 독자적인 추론 엔진을 탑재하여 지연 없는 사용자 경험을 제공합니다.</p>
+</div>
+<div class="p-6 bg-brand-base border border-gray-100 rounded-2xl">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-xl bg-brand-sage/10 flex items-center justify-center text-brand-sage">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<h3 class="font-bold text-gray-900">엔터프라이즈 보안</h3>
+</div>
+<p class="text-sm text-gray-500">군사 등급의 AES-256 암호화와 온프레미스 배포 옵션을 통해 기업의 핵심 자산을 안전하게 보호합니다.</p>
+</div>
+</div>
+<div class="space-y-4">
+<h3 class="text-xl font-bold text-gray-900">사용자 권한 및 접근 제어</h3>
+<p>각 문서와 지식 베이스는 RBAC(Role-Based Access Control) 기반의 정교한 권한 관리를 지원합니다. 관리자는 개별 에이전트가 접근할 수 있는 데이터 범위를 실시간으로 조정할 수 있습니다.</p>
+<ul class="space-y-3 list-disc pl-5 text-gray-600">
+<li>읽기 전용: 데이터 소비 위주의 사용자</li>
+<li>편집자: 지식 베이스 수정 및 정제 권한</li>
+<li>관리자: 시스템 전반의 설정 및 에이전트 튜닝</li>
+</ul>
+</div>
+</div>
+<div class="mt-20 pt-8 border-t border-gray-100 flex items-center justify-between">
+<div class="text-xs text-gray-400">
+              마지막 업데이트: <span class="font-medium text-gray-600">2023.10.24 14:30</span>
+</div>
+<div class="flex gap-2">
+<span class="px-2 py-1 bg-gray-100 text-[10px] font-bold text-gray-400 rounded">AI-MODELING</span>
+<span class="px-2 py-1 bg-gray-100 text-[10px] font-bold text-gray-400 rounded">V2-GUIDE</span>
+</div>
+</div>
+</article>
+</section>
+</div>
+<!-- END: KnowledgeLayout -->
+</main>
+</body></html>

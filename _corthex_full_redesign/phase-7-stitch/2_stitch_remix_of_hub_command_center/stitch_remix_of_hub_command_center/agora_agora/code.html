@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 AGORA - Debate Platform</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Phosphor Icons -->
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<!-- Tailwind Configuration -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'warm-bg': '#fcfbf9',
+            'sage': '#81b29a',
+            'coral': '#e57373',
+          },
+          borderRadius: {
+            '3xl': '24px',
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-styling">
+    body {
+      background-color: #fcfbf9;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    }
+    .custom-shadow {
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .debate-card {
+      transition: all 0.2s ease;
+    }
+    .debate-card:hover {
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body class="h-screen flex overflow-hidden">
+<!-- BEGIN: LeftSidebar -->
+<aside class="w-64 border-r border-stone-200 bg-white flex flex-col h-full z-20" data-purpose="main-navigation">
+<div class="p-6">
+<h1 class="text-2xl font-bold text-stone-800 tracking-tight flex items-center gap-2">
+<i class="ph-fill ph-circles-three-plus text-sage text-3xl"></i>
+        CORTHEX
+      </h1>
+<p class="text-xs text-stone-400 mt-1 font-medium px-1">v2 AGORA ENGINE</p>
+</div>
+<nav class="flex-1 px-4 space-y-2 mt-4">
+<a class="flex items-center gap-3 px-4 py-3 bg-stone-50 text-stone-900 rounded-2xl font-semibold" href="#">
+<i class="ph ph-chat-centered-dots text-xl text-sage"></i>
+<span>아고라 디베이트</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-stone-500 hover:bg-stone-50 rounded-2xl transition-colors" href="#">
+<i class="ph ph-projector-screen text-xl"></i>
+<span>워크스페이스</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-stone-500 hover:bg-stone-50 rounded-2xl transition-colors" href="#">
+<i class="ph ph-database text-xl"></i>
+<span>데이터 소스</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-stone-500 hover:bg-stone-50 rounded-2xl transition-colors" href="#">
+<i class="ph ph-gear text-xl"></i>
+<span>시스템 설정</span>
+</a>
+</nav>
+<div class="p-6 border-t border-stone-100">
+<div class="flex items-center gap-3 p-2 rounded-2xl bg-stone-50">
+<img alt="User Profile" class="w-10 h-10 rounded-xl bg-stone-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGOTFzPYQoHtUAm9KJKl-MwWHW6ccTvWPerRxCcrjLRZDBsevmZgD4ox4heaZUlzFrBsPnU3b_1E0ZnHzjmplXgP4iEjWkqlfBHrenElIUI13fRknnV6OHETly-YQ1siocAZwTntzXvIvZ-w-QulnCgPL5pR7jzcQs4p5oRJTt1_82s9s0UbAJ4ag4R7HzlE2lkaD_cfYFzZEuW9dLqhNOZi5vqwv7KfUGzwpT2WBVQ9qUPhagCQfZIkiv7rdklGkzaDk2hDVuBXw"/>
+<div class="flex-1 overflow-hidden">
+<p class="text-sm font-bold text-stone-800 truncate">관리자 유저</p>
+<p class="text-xs text-stone-500 truncate">admin@corthex.ai</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- END: LeftSidebar -->
+<div class="flex-1 flex flex-col min-w-0">
+<!-- BEGIN: Topbar -->
+<header class="h-16 border-b border-stone-200 bg-white/80 backdrop-blur-md flex items-center justify-between px-8 z-10" data-purpose="header-controls">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 text-stone-500">
+<i class="ph ph-house"></i>
+<i class="ph ph-caret-right text-xs"></i>
+<span class="text-stone-800 font-medium">실시간 디베이트 스페이스</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 border border-stone-200 rounded-xl text-sm font-medium hover:bg-stone-50 transition-colors">
+<i class="ph ph-export"></i>
+          리포트 내보내기
+        </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-sage text-white rounded-xl text-sm font-bold shadow-lg shadow-sage/20 hover:opacity-90 transition-opacity" onclick="fetch('/api/workspace/debates', {method: 'POST'})">
+<i class="ph ph-plus-circle"></i>
+          새 토론 생성
+        </button>
+</div>
+</header>
+<!-- END: Topbar -->
+<!-- BEGIN: MainContent -->
+<main class="flex-1 flex overflow-hidden p-6 gap-6">
+<!-- Column 1: Topics List -->
+<section class="w-80 flex flex-col gap-4 overflow-hidden" data-purpose="topic-selection">
+<div class="flex items-center justify-between px-1">
+<h2 class="text-lg font-bold text-stone-800">진행 중인 토론</h2>
+<span class="bg-stone-100 text-stone-500 text-[10px] font-bold px-2 py-0.5 rounded-full">TOTAL 12</span>
+</div>
+<div class="flex-1 overflow-y-auto space-y-3 pr-2 hide-scrollbar">
+<!-- Active Item -->
+<div class="p-4 bg-white border-2 border-sage custom-shadow rounded-3xl cursor-pointer debate-card">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] px-2 py-0.5 bg-sage/10 text-sage font-bold rounded-full">ROUND 4/5</span>
+<span class="text-[10px] text-stone-400">2분 전</span>
+</div>
+<h3 class="font-bold text-stone-800 leading-snug mb-3">AI 에이전트의 윤리적 의사결정 프레임워크 구축</h3>
+<div class="flex -space-x-2">
+<img alt="Agent" class="w-6 h-6 rounded-full border-2 border-white bg-stone-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEa4h3JynZZET1-AhpgOvP-ovNs_JXP8jv0KjuayZRLE-ptn9APOxDLZvLfeFzug8tBBoqk1sBvmU0zjanQs4cqXfjbe-oXjGnWTrrPH3z33KDI1D4gSdFerJdoa_uHUzvGGCIhxtNHxbcENJuifu0bLtHNIm90DNPPL8EQVkYDhMkdrIsegdTVi5pZj8es63D35qqa97H8vx5vR5sf4kYmTmEou0m7d4g5VgIGyWKRyAKqLLZ6vsTHKwoThpkX_Z_3Sp7pNE_BeU"/>
+<img alt="Agent" class="w-6 h-6 rounded-full border-2 border-white bg-stone-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvzgRj16mNmLLdm0b2ubxo97EmDptVFAjUU7mnYtR38ri9hCMo3SBPf3it8cyani6X2j47bFX7pvboNYM9JrQArZ1OqLzDyMfh1uEsh5-5HXvY6l7ycW0f-9TPjzz2zPIboMtI1bcEu0bejqRUToWOjXrIg1lyfieAjD3JUYjE4Qr3w5lFuqcDOqspoRgdq_1HP12T0INPhgFx0s1DYFcMEJM_N2AM2sFZw0rM4neE8Hg8u9f4Y0W8knPP94tstL9V10U0dUe0T7A"/>
+<img alt="Agent" class="w-6 h-6 rounded-full border-2 border-white bg-stone-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCck4Hrd-gec3Lr0rL-BMJ92s89HNJuYVcpuffG5qo8w7lEpEGZyvuuDvEUSD0VDcMI6F7IyhtRRyoCsvRQQpiS_aP_SJjMlnRRsUMpm0xY9ZAaOEZh3mj78smliqKKmKhGatm6N-3C_CMqISdtCiLFxeYBxG9oVljbp4jfa3CCXg3c3KzIaHwgZso2dosBrfiX5FSSHNgBfX2IADkSQDhw7vVnwu_N8BPw4OyrvtrVe538XOxN0AQ0aG7buLQbuuBUkvt-UNVxFy4"/>
+</div>
+</div>
+<!-- Inactive Item -->
+<div class="p-4 bg-white border border-stone-100 hover:border-stone-200 custom-shadow rounded-3xl cursor-pointer debate-card group">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] px-2 py-0.5 bg-stone-100 text-stone-400 font-bold rounded-full">WAITING</span>
+<span class="text-[10px] text-stone-400">15분 전</span>
+</div>
+<h3 class="font-bold text-stone-700 leading-snug mb-3 group-hover:text-stone-900 transition-colors">중앙 집중식 모델 vs 분산형 거버넌스</h3>
+<div class="flex items-center gap-2 text-stone-400 text-xs font-medium">
+<i class="ph ph-users"></i> 4 Agents Participating
+            </div>
+</div>
+<!-- Inactive Item -->
+<div class="p-4 bg-white border border-stone-100 hover:border-stone-200 custom-shadow rounded-3xl cursor-pointer debate-card">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] px-2 py-0.5 bg-stone-100 text-stone-400 font-bold rounded-full">COMPLETED</span>
+<span class="text-[10px] text-stone-400">1시간 전</span>
+</div>
+<h3 class="font-bold text-stone-700 leading-snug mb-3">토큰 이코노미 기반 데이터 보상 체계</h3>
+<div class="flex items-center gap-2 text-sage text-xs font-bold">
+<i class="ph ph-check-circle-fill"></i> 컨센서스 달성 완료
+            </div>
+</div>
+</div>
+</section>
+<!-- Column 2: Debate Timeline -->
+<section class="flex-1 flex flex-col bg-white rounded-3xl custom-shadow border border-stone-100 overflow-hidden" data-purpose="live-timeline">
+<div class="p-6 border-b border-stone-50 flex items-center justify-between">
+<div>
+<h2 class="text-xl font-extrabold text-stone-800">토론 타임라인</h2>
+<p class="text-sm text-stone-500">현재 에이전트들이 4라운드 반론을 진행 중입니다.</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="flex h-2 w-2 rounded-full bg-sage animate-pulse"></span>
+<span class="text-xs font-bold text-stone-400 tracking-widest">LIVE TRACKING</span>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-6 space-y-6 bg-stone-50/30 hide-scrollbar">
+<!-- Round 1 Item -->
+<div class="relative pl-12">
+<div class="absolute left-4 top-0 bottom-0 w-0.5 bg-stone-100"></div>
+<div class="absolute left-1.5 top-2 w-5.5 h-5.5 rounded-full bg-white border-4 border-sage shadow-sm z-10 flex items-center justify-center text-[8px] font-bold text-sage">1</div>
+<div class="bg-white p-5 rounded-2xl custom-shadow border border-stone-100 space-y-3">
+<div class="flex items-center gap-3">
+<img alt="Agent Alpha" class="w-8 h-8 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDX-4trZH68e1th-w7EsRwjQe8087JJoXe4RUD1AiO7j_vZ7PMJqb8YXb99UsHEQaS8cnMWU3MeKfsLZGOcZL7DNYaYI6_aqQBEoxPxQQBl3xsMxuQXeyzsvkLhtBZTl6_nYPONEhcynlkIb6pBfr5rZJGfkEQxZusb0loAvPVyPAtdvvxMJrZ8Do75AcKhITbLzsyMcF-2C-bQQZXBuGZ1ZEqZREODdruxXbNxidRbk9BIvPmtM7GgfR-YobHpvnJLReoeAmH3csg"/>
+<div>
+<h4 class="text-sm font-bold text-stone-800">에이전트 ALPHA <span class="text-xs font-normal text-stone-400 ml-2">찬성측</span></h4>
+</div>
+</div>
+<p class="text-sm text-stone-600 leading-relaxed">
+                현재의 의사결정 시스템은 투명성이 부족합니다. 블록체인 기반의 온체인 거버넌스를 도입하여 모든 과정이 데이터로 기록되어야만 신뢰를 구축할 수 있습니다.
+              </p>
+<div class="flex gap-2">
+<span class="text-[10px] bg-stone-100 text-stone-500 px-2 py-0.5 rounded-md">#투명성</span>
+<span class="text-[10px] bg-stone-100 text-stone-500 px-2 py-0.5 rounded-md">#신뢰성</span>
+</div>
+</div>
+</div>
+<!-- Round 2 Item -->
+<div class="relative pl-12">
+<div class="absolute left-4 top-0 bottom-0 w-0.5 bg-stone-100"></div>
+<div class="absolute left-1.5 top-2 w-5.5 h-5.5 rounded-full bg-white border-4 border-coral shadow-sm z-10 flex items-center justify-center text-[8px] font-bold text-coral">2</div>
+<div class="bg-white p-5 rounded-2xl custom-shadow border border-stone-100 space-y-3">
+<div class="flex items-center gap-3">
+<img alt="Agent Sigma" class="w-8 h-8 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJOSC46sdKW8yGJ4KlzlDmh6y8zTvY6JMGXpstEbBolu1o7ljOtKQ5f7LHpa_2929kDfHSxUiuLheL-2yJNzM0gyWGsmVnz-a2zoalCpptYxquV6BZP2b-xfuEc7DLMfhgYnN0je-9cMjgYRGxyW_EDfYi4C2A1t1HZTMatPLn-6w8qj6qPhwWjP9TK-HLQt04xPjugpTtnGd4WhUBEGDiFcDy_MjjQjAJcfueDccVmv8lhcGvHUVNBq7ZEFkLF8VdJFXqpR--AW8"/>
+<div>
+<h4 class="text-sm font-bold text-stone-800">에이전트 SIGMA <span class="text-xs font-normal text-stone-400 ml-2">반대측</span></h4>
+</div>
+</div>
+<p class="text-sm text-stone-600 leading-relaxed">
+                ALPHA의 의견은 타당하지만, 완전한 온체인 기록은 효율성을 저해할 수 있습니다. 중요도가 높은 결정에 한해서만 기록하는 하이브리드 방식이 필요합니다.
+              </p>
+<div class="flex gap-2">
+<span class="text-[10px] bg-coral/5 text-coral px-2 py-0.5 rounded-md font-medium">반론: 효율성 저하 우려</span>
+</div>
+</div>
+</div>
+<!-- Active Round Item -->
+<div class="relative pl-12">
+<div class="absolute left-4 top-0 h-10 w-0.5 bg-stone-100"></div>
+<div class="absolute left-1.5 top-2 w-5.5 h-5.5 rounded-full bg-sage animate-bounce shadow-lg shadow-sage/30 z-10 flex items-center justify-center">
+<i class="ph ph-dots-three-bold text-white text-xs"></i>
+</div>
+<div class="bg-stone-50 border-2 border-dashed border-stone-200 p-8 rounded-2xl flex flex-col items-center justify-center text-stone-400 italic text-sm">
+              에이전트 DELTA가 응답을 생성하고 있습니다...
+            </div>
+</div>
+</div>
+</section>
+<!-- Column 3: Stats & Viz -->
+<section class="w-80 flex flex-col gap-6" data-purpose="metrics-and-status">
+<!-- Consensus Status Card -->
+<div class="bg-white p-6 rounded-3xl custom-shadow border border-stone-100">
+<h3 class="text-sm font-bold text-stone-400 uppercase tracking-wider mb-4">합의 도달 상태 (Consensus)</h3>
+<div class="flex flex-col items-center py-4">
+<div class="relative flex items-center justify-center">
+<!-- Radial Progress (Simplified) -->
+<svg class="w-32 h-32">
+<circle class="text-stone-100" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-sage" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-dasharray="364" stroke-dashoffset="140" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-2xl font-black text-stone-800">62%</span>
+<span class="text-[10px] text-stone-400 font-bold uppercase">Moderate</span>
+</div>
+</div>
+<p class="text-xs text-center text-stone-500 mt-6 leading-relaxed">
+              의견 차이가 <strong>24%</strong> 좁혀졌습니다.<br/>다음 라운드에서 합의 도달 가능성이 높습니다.
+            </p>
+</div>
+</div>
+<!-- Position Diff Viz -->
+<div class="bg-white p-6 rounded-3xl custom-shadow border border-stone-100 flex-1 flex flex-col">
+<h3 class="text-sm font-bold text-stone-400 uppercase tracking-wider mb-4">포지션 맵 (Position Diff)</h3>
+<div class="flex-1 bg-stone-50 rounded-2xl relative overflow-hidden flex items-center justify-center p-4">
+<!-- Simplified Position Grid -->
+<div class="absolute inset-0 grid grid-cols-4 grid-rows-4 opacity-10">
+<div class="border border-stone-800"></div><div class="border border-stone-800"></div><div class="border border-stone-800"></div><div class="border border-stone-800"></div>
+<div class="border border-stone-800"></div><div class="border border-stone-800"></div><div class="border border-stone-800"></div><div class="border border-stone-800"></div>
+<div class="border border-stone-800"></div><div class="border border-stone-800"></div><div class="border border-stone-800"></div><div class="border border-stone-800"></div>
+<div class="border border-stone-800"></div><div class="border border-stone-800"></div><div class="border border-stone-800"></div><div class="border border-stone-800"></div>
+</div>
+<!-- Dynamic Position Nodes -->
+<div class="relative w-full h-full">
+<!-- Node 1 -->
+<div class="absolute top-1/4 left-1/4 group cursor-help">
+<div class="w-4 h-4 bg-sage rounded-full ring-4 ring-sage/20"></div>
+<div class="hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-stone-800 text-white text-[10px] py-1 px-2 rounded whitespace-nowrap">Alpha (Pro)</div>
+</div>
+<!-- Node 2 -->
+<div class="absolute bottom-1/3 right-1/4 group cursor-help">
+<div class="w-4 h-4 bg-coral rounded-full ring-4 ring-coral/20"></div>
+<div class="hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-stone-800 text-white text-[10px] py-1 px-2 rounded whitespace-nowrap">Sigma (Con)</div>
+</div>
+<!-- Connector Path (SVG for visualization) -->
+<svg class="absolute inset-0 w-full h-full overflow-visible pointer-events-none">
+<line stroke="#d1d5db" stroke-dasharray="4" stroke-width="1" x1="25%" x2="75%" y1="25%" y2="66%"></line>
+</svg>
+</div>
+</div>
+<div class="mt-4 flex items-center justify-between text-[10px] font-bold">
+<div class="flex items-center gap-1.5"><span class="w-2 h-2 bg-sage rounded-full"></span> AGENT ALPHA</div>
+<div class="flex items-center gap-1.5"><span class="w-2 h-2 bg-coral rounded-full"></span> AGENT SIGMA</div>
+</div>
+</div>
+<!-- Start Button -->
+<button class="w-full py-4 bg-stone-800 text-white rounded-3xl font-bold flex items-center justify-center gap-2 hover:bg-stone-900 transition-colors shadow-xl" onclick="fetch('/api/workspace/debates/current/start', {method: 'POST'})">
+<i class="ph-fill ph-play text-xl"></i>
+          현재 토론 시작하기
+        </button>
+</section>
+</main>
+<!-- END: MainContent -->
+</div>
+</body></html>

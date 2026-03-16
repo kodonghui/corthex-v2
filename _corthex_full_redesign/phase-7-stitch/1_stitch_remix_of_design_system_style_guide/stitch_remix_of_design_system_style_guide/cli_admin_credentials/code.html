@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CLI 인증 관리 - CORTHEX v2</title>
+<!-- Tailwind CSS v3 with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Natural Organic Theme (Inter & Noto Sans KR) -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Sans+KR:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            organic: {
+              50: '#f8faf7',
+              100: '#edf3e9',
+              200: '#dce8d5',
+              600: '#4a6741', // Deep forest green
+              700: '#3d5435',
+              800: '#31422b',
+              900: '#263222',
+            },
+            earth: {
+              500: '#a68a64',
+              600: '#8c7354',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans KR', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-layout">
+    body {
+      background-color: #f8faf7;
+      color: #263222;
+    }
+    .sidebar-active {
+      background-color: #dce8d5;
+      color: #31422b;
+      font-weight: 600;
+      border-right: 4px solid #4a6741;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex">
+<!-- BEGIN: Sidebar -->
+<aside class="w-64 bg-white border-r border-organic-200 flex flex-col sticky top-0 h-screen" data-purpose="sidebar-navigation">
+<div class="p-6 border-b border-organic-100">
+<h1 class="text-xl font-bold text-organic-800 tracking-tight">CORTHEX <span class="text-organic-600">v2</span></h1>
+<p class="text-xs text-organic-600 mt-1 uppercase tracking-widest font-medium">Admin Console</p>
+</div>
+<nav class="flex-1 py-4 overflow-y-auto">
+<div class="px-4 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Dashboard</div>
+<a class="flex items-center px-6 py-3 text-gray-600 hover:bg-organic-50 transition-colors" href="#">
+<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>홈</span>
+</a>
+<div class="px-4 mt-6 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Security &amp; Access</div>
+<a class="flex items-center px-6 py-3 sidebar-active" href="#">
+<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Admin Credentials</span>
+</a>
+<a class="flex items-center px-6 py-3 text-gray-600 hover:bg-organic-50 transition-colors" href="#">
+<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>접근 권한 관리</span>
+</a>
+<a class="flex items-center px-6 py-3 text-gray-600 hover:bg-organic-50 transition-colors" href="#">
+<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>로그 기록</span>
+</a>
+</nav>
+<div class="p-4 bg-organic-50 border-t border-organic-100">
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full bg-organic-600 flex items-center justify-center text-white text-xs font-bold">A</div>
+<div class="ml-3 overflow-hidden">
+<p class="text-sm font-semibold text-organic-900 truncate">System Admin</p>
+<p class="text-xs text-organic-600 truncate">admin@corthex.io</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- END: Sidebar -->
+<!-- BEGIN: Main Content -->
+<main class="flex-1 flex flex-col min-w-0 bg-organic-50 overflow-auto">
+<!-- BEGIN: Header Section -->
+<header class="bg-white border-b border-organic-200 px-8 py-6 flex items-center justify-between sticky top-0 z-10" data-purpose="content-header">
+<div>
+<h2 class="text-2xl font-bold text-organic-900">CLI 인증 관리</h2>
+<p class="text-sm text-gray-500 mt-1">시스템 배포 및 CLI 도구 사용을 위한 관리자 인증 토큰을 관리합니다.</p>
+</div>
+<button class="bg-organic-600 hover:bg-organic-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-sm font-medium" onclick="toggleModal(true)">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+        인증 토큰 추가
+      </button>
+</header>
+<!-- END: Header Section -->
+<div class="p-8 max-w-7xl mx-auto w-full space-y-6">
+<!-- BEGIN: Info Card -->
+<section class="bg-white rounded-xl border border-organic-200 p-6 flex items-start gap-4 shadow-sm" data-purpose="security-info">
+<div class="bg-organic-100 p-3 rounded-full">
+<svg class="w-6 h-6 text-organic-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<h3 class="font-semibold text-organic-900">보안 정책 안내</h3>
+<p class="text-sm text-gray-600 mt-1 leading-relaxed">
+            모든 CLI 인증 토큰은 <span class="font-bold text-organic-700">AES-256</span> 알고리즘을 사용하여 강력하게 암호화되어 저장됩니다. 
+            토큰은 생성 시 단 한 번만 노출되며, 이후에는 관리자도 값을 확인할 수 없습니다. 유출이 의심되는 경우 즉시 삭제하고 재발급하시기 바랍니다.
+          </p>
+</div>
+</section>
+<!-- END: Info Card -->
+<!-- BEGIN: Table Section -->
+<section class="bg-white rounded-xl border border-organic-200 overflow-hidden shadow-sm" data-purpose="credentials-table">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-organic-50 text-organic-800 text-xs uppercase tracking-wider font-semibold border-b border-organic-200">
+<th class="px-6 py-4">사용자 ID / 이름</th>
+<th class="px-6 py-4">식별 레이블</th>
+<th class="px-6 py-4">생성일</th>
+<th class="px-6 py-4">상태</th>
+<th class="px-6 py-4 text-right">관리</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-organic-100 text-sm">
+<!-- Mock Row 1 -->
+<tr class="hover:bg-organic-50 transition-colors">
+<td class="px-6 py-4">
+<div class="font-medium text-organic-900">dev_manager</div>
+<div class="text-xs text-gray-500">김철수 팀장</div>
+</td>
+<td class="px-6 py-4 text-gray-600">CI/CD Production Server</td>
+<td class="px-6 py-4 text-gray-600">2023-10-24 14:30</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">활성</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-red-600 hover:text-red-800 font-medium hover:underline">삭제</button>
+</td>
+</tr>
+<!-- Mock Row 2 -->
+<tr class="hover:bg-organic-50 transition-colors">
+<td class="px-6 py-4">
+<div class="font-medium text-organic-900">cloud_ops</div>
+<div class="text-xs text-gray-500">이영희 매니저</div>
+</td>
+<td class="px-6 py-4 text-gray-600">Local Dev Tooling</td>
+<td class="px-6 py-4 text-gray-600">2023-11-02 09:15</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">활성</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-red-600 hover:text-red-800 font-medium hover:underline">삭제</button>
+</td>
+</tr>
+<!-- Mock Row 3 -->
+<tr class="hover:bg-organic-50 transition-colors">
+<td class="px-6 py-4">
+<div class="font-medium text-organic-900">system_monitor</div>
+<div class="text-xs text-gray-500">박지민</div>
+</td>
+<td class="px-6 py-4 text-gray-600">Monitoring Agent v2</td>
+<td class="px-6 py-4 text-gray-600">2023-11-15 17:42</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">만료예정</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-red-600 hover:text-red-800 font-medium hover:underline">삭제</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-6 py-4 bg-white border-t border-organic-100 flex items-center justify-between text-xs text-gray-500">
+<span>총 3개의 인증 토큰이 검색되었습니다.</span>
+<div class="flex gap-2">
+<button class="p-1 px-2 border border-organic-200 rounded hover:bg-organic-50 disabled:opacity-50" disabled="">이전</button>
+<button class="p-1 px-2 border border-organic-200 rounded hover:bg-organic-50">다음</button>
+</div>
+</div>
+</section>
+<!-- END: Table Section -->
+</div>
+</main>
+<!-- END: Main Content -->
+<!-- BEGIN: Modal Placeholder (Add Token Form) -->
+<div class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" data-purpose="modal-container" id="tokenModal">
+<div class="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden border border-organic-200">
+<div class="px-6 py-4 border-b border-organic-100 flex items-center justify-between bg-organic-50">
+<h3 class="text-lg font-bold text-organic-900">새 인증 토큰 추가</h3>
+<button class="text-gray-400 hover:text-gray-600" onclick="toggleModal(false)">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+<form class="p-6 space-y-5" onsubmit="event.preventDefault(); alert('Token added (Mock)'); toggleModal(false);">
+<div>
+<label class="block text-sm font-semibold text-organic-800 mb-2">사용자 선택</label>
+<select class="w-full rounded-lg border-organic-200 focus:border-organic-600 focus:ring-organic-600 text-sm">
+<option value="">대상 사용자를 선택하세요</option>
+<option>김철수 팀장 (dev_manager)</option>
+<option>이영희 매니저 (cloud_ops)</option>
+<option>박지민 (system_monitor)</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-semibold text-organic-800 mb-2">식별 레이블</label>
+<input class="w-full rounded-lg border-organic-200 focus:border-organic-600 focus:ring-organic-600 text-sm" placeholder="예: CI/CD Pipeline A" type="text"/>
+<p class="text-xs text-gray-400 mt-1">토큰의 용도를 구분하기 위한 이름입니다.</p>
+</div>
+<div>
+<label class="block text-sm font-semibold text-organic-800 mb-2">토큰 문자열 (비밀값)</label>
+<div class="relative">
+<input class="w-full rounded-lg border-organic-200 focus:border-organic-600 focus:ring-organic-600 text-sm pr-10" placeholder="자동 생성 또는 직접 입력" type="password"/>
+<button class="absolute right-3 top-2.5 text-gray-400 hover:text-organic-600" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</div>
+<div class="pt-4 flex gap-3">
+<button class="flex-1 px-4 py-2.5 border border-organic-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors" onclick="toggleModal(false)" type="button">취소</button>
+<button class="flex-1 px-4 py-2.5 bg-organic-600 text-white rounded-lg text-sm font-medium hover:bg-organic-700 transition-all" type="submit">토큰 생성</button>
+</div>
+</form>
+</div>
+</div>
+<!-- END: Modal Placeholder -->
+<script data-purpose="modal-logic">
+    /**
+     * Toggles the visibility of the Add Token modal.
+     * @param {boolean} show - Whether to show or hide.
+     */
+    function toggleModal(show) {
+      const modal = document.getElementById('tokenModal');
+      if (show) {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      } else {
+        modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+      }
+    }
+  </script>
+</body></html>

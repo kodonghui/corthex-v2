@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#ec5b13",
+                "background-light": "#f8f6f6",
+                "background-dark": "#221610",
+              },
+              fontFamily: {
+                "display": ["Public Sans"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<title>CORTHEX v2 Admin Settings</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md sticky top-0 z-50 px-6 lg:px-10 py-3">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-primary">
+<div class="size-8 flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl">hexagon</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-[-0.015em]">CORTHEX v2</h2>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium" href="#">Dashboard</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium" href="#">Users</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium" href="#">Analytics</a>
+<a class="text-primary text-sm font-bold" href="#">Settings</a>
+</nav>
+</div>
+<div class="flex flex-1 justify-end gap-4 lg:gap-8">
+<label class="hidden sm:flex flex-col min-w-40 h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-xl h-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
+<div class="text-slate-400 flex items-center justify-center pl-4">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 border-none bg-transparent focus:ring-0 h-full placeholder:text-slate-400 px-4 pl-2 text-sm" placeholder="System Search" value=""/>
+</div>
+</label>
+<div class="flex gap-2">
+<button class="flex items-center justify-center rounded-xl h-10 w-10 bg-slate-200/50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-primary/10 hover:text-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<button class="flex items-center justify-center rounded-xl h-10 w-10 bg-slate-200/50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-primary/10 hover:text-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">account_circle</span>
+</button>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary" data-alt="Admin user profile avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDeQFMed-2xIPcz8PjsoHkVPdnLeDkYIanAcFe6olzivs_6XvNiaCksQenQeIZRUmp3z5B6rfBcTacmLB4Gi8VvKMU1oonWS-quNNKCXZqulyFZngt_haA7mItY0on4gyRU3NzbE6PItBU3yOf9pGnLtWorklT0yNofPpR4Sh008YSpMirteiqlx6oKzrVqxaZZeLTofOLW8ZKh8AzM4AmxmqtKb5jAaS2tnB2SuTX3bANlDNN5wEvFVMpmm5sPuE8_EPqWhk0Hsdo");'></div>
+</div>
+</header>
+<div class="flex flex-1">
+<aside class="hidden lg:flex w-64 flex-col border-r border-slate-200 dark:border-slate-800 p-4 gap-4 bg-white/30 dark:bg-slate-900/10">
+<div class="flex flex-col">
+<h1 class="text-slate-900 dark:text-slate-100 text-base font-bold">CORTHEX Admin</h1>
+<p class="text-slate-500 text-xs font-normal">v2.0.4-stable build</p>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<p class="text-sm font-medium">Overview</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl bg-primary text-white shadow-lg shadow-primary/20" href="#">
+<span class="material-symbols-outlined">settings</span>
+<p class="text-sm font-medium">System</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">shield</span>
+<p class="text-sm font-medium">Security</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">group</span>
+<p class="text-sm font-medium">Users</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">description</span>
+<p class="text-sm font-medium">Logs</p>
+</a>
+</nav>
+</aside>
+<main class="flex-1 overflow-y-auto px-6 lg:px-12 py-8">
+<div class="max-w-[1000px] mx-auto">
+<div class="mb-8">
+<h2 class="text-slate-900 dark:text-slate-100 text-4xl font-black tracking-tight mb-2">Admin Settings <span class="text-primary">관리자 설정</span></h2>
+<p class="text-slate-600 dark:text-slate-400 text-lg">Manage your system configurations, security policies, and third-party integrations.</p>
+</div>
+<div class="border-b border-slate-200 dark:border-slate-800 mb-8 overflow-x-auto">
+<div class="flex gap-8 min-w-max">
+<a class="border-b-2 border-primary text-primary pb-4 font-bold text-sm tracking-wide" href="#">GENERAL</a>
+<a class="border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 pb-4 font-bold text-sm tracking-wide transition-all" href="#">SECURITY</a>
+<a class="border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 pb-4 font-bold text-sm tracking-wide transition-all" href="#">INTEGRATIONS</a>
+<a class="border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 pb-4 font-bold text-sm tracking-wide transition-all" href="#">NOTIFICATIONS</a>
+</div>
+</div>
+<section class="grid gap-8">
+<div class="bg-white dark:bg-slate-900/40 rounded-xl p-6 border border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary">tune</span>
+<h3 class="text-xl font-bold">General System Settings</h3>
+</div>
+<div class="grid md:grid-cols-2 gap-6">
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">System Name</label>
+<input class="rounded-lg border-slate-200 dark:border-slate-800 bg-transparent focus:border-primary focus:ring-primary w-full text-sm" type="text" value="CORTHEX Production Environment"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Default Timezone</label>
+<select class="rounded-lg border-slate-200 dark:border-slate-800 bg-transparent focus:border-primary focus:ring-primary w-full text-sm">
+<option>Asia/Seoul (GMT+09:00)</option>
+<option>UTC (GMT+00:00)</option>
+<option>America/Los_Angeles (GMT-08:00)</option>
+</select>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Maintenance Mode</label>
+<div class="flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-slate-800">
+<span class="text-sm text-slate-500">System access restricted</span>
+<button class="w-12 h-6 rounded-full bg-slate-300 dark:bg-slate-700 relative transition-all">
+<div class="absolute left-1 top-1 w-4 h-4 rounded-full bg-white shadow-sm"></div>
+</button>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Default Language</label>
+<select class="rounded-lg border-slate-200 dark:border-slate-800 bg-transparent focus:border-primary focus:ring-primary w-full text-sm">
+<option>Korean (한국어)</option>
+<option>English (US)</option>
+<option>Japanese (日本語)</option>
+</select>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900/40 rounded-xl p-6 border border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary">security</span>
+<h3 class="text-xl font-bold">Security Policies</h3>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between py-3 border-b border-slate-100 dark:border-slate-800">
+<div>
+<h4 class="text-sm font-bold">Two-Factor Authentication (2FA)</h4>
+<p class="text-xs text-slate-500">Require 2FA for all administrative accounts</p>
+</div>
+<button class="w-12 h-6 rounded-full bg-primary relative transition-all">
+<div class="absolute right-1 top-1 w-4 h-4 rounded-full bg-white shadow-sm"></div>
+</button>
+</div>
+<div class="flex items-center justify-between py-3 border-b border-slate-100 dark:border-slate-800">
+<div>
+<h4 class="text-sm font-bold">Password Expiry</h4>
+<p class="text-xs text-slate-500">Force password change every 90 days</p>
+</div>
+<button class="w-12 h-6 rounded-full bg-primary relative transition-all">
+<div class="absolute right-1 top-1 w-4 h-4 rounded-full bg-white shadow-sm"></div>
+</button>
+</div>
+<div class="flex items-center justify-between py-3">
+<div>
+<h4 class="text-sm font-bold">IP Whitelisting</h4>
+<p class="text-xs text-slate-500">Only allow admin access from authorized IP ranges</p>
+</div>
+<button class="w-12 h-6 rounded-full bg-slate-300 dark:bg-slate-700 relative transition-all">
+<div class="absolute left-1 top-1 w-4 h-4 rounded-full bg-white shadow-sm"></div>
+</button>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900/40 rounded-xl p-6 border border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary">hub</span>
+<h3 class="text-xl font-bold">Integration Toggles</h3>
+</div>
+<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+<div class="p-4 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<span class="material-symbols-outlined text-2xl">mail</span>
+<button class="w-10 h-5 rounded-full bg-primary relative transition-all">
+<div class="absolute right-1 top-0.5 w-4 h-4 rounded-full bg-white"></div>
+</button>
+</div>
+<h4 class="font-bold text-sm">SMTP Gateway</h4>
+<p class="text-xs text-slate-500">Connected to AWS SES</p>
+</div>
+<div class="p-4 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 flex flex-col gap-3 opacity-60">
+<div class="flex items-center justify-between">
+<span class="material-symbols-outlined text-2xl">chat</span>
+<button class="w-10 h-5 rounded-full bg-slate-300 dark:bg-slate-600 relative transition-all">
+<div class="absolute left-1 top-0.5 w-4 h-4 rounded-full bg-white"></div>
+</button>
+</div>
+<h4 class="font-bold text-sm">Slack Webhooks</h4>
+<p class="text-xs text-slate-500">Not configured</p>
+</div>
+<div class="p-4 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<span class="material-symbols-outlined text-2xl">storage</span>
+<button class="w-10 h-5 rounded-full bg-primary relative transition-all">
+<div class="absolute right-1 top-0.5 w-4 h-4 rounded-full bg-white"></div>
+</button>
+</div>
+<h4 class="font-bold text-sm">S3 Backup</h4>
+<p class="text-xs text-slate-500">Active - Last sync 2h ago</p>
+</div>
+</div>
+</div>
+</section>
+<div class="mt-12 pt-8 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-4 pb-12">
+<button class="px-6 py-2 rounded-xl text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-200 dark:hover:bg-slate-800 transition-all">Discard Changes</button>
+<button class="px-8 py-2 rounded-xl bg-primary text-white font-bold shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all">Save Changes</button>
+</div>
+</div>
+</main>
+</div>
+</div>
+</div>
+</body></html>

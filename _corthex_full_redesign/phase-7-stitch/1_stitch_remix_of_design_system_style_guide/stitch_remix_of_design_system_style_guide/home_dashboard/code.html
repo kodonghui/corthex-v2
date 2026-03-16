@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 - Home Dashboard</title>
+<!-- API: GET /api/workspace/agents, GET /api/workspace/jobs/notifications, GET /api/workspace/notifications -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&amp;family=Noto+Sans+KR:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            organic: {
+              cream: '#F9F8F3',
+              olive: '#606C38',
+              'olive-dark': '#283618',
+              'earth-brown': '#BC6C25',
+              'sand': '#DDA15E',
+              'white-soft': '#FEFEFE'
+            }
+          },
+          fontFamily: {
+            serif: ['Noto Serif KR', 'serif'],
+            sans: ['Noto Sans KR', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-animations">
+    @keyframes pulse-green {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    }
+    .status-pulse-active {
+      animation: pulse-green 2s infinite;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #E5E7EB;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body class="bg-organic-cream font-sans text-slate-800 antialiased">
+<div class="flex min-h-screen">
+<!-- BEGIN: Sidebar -->
+<aside class="fixed inset-y-0 left-0 w-64 bg-organic-olive-dark text-white p-6 flex flex-col z-50">
+<div class="mb-10 px-2" data-purpose="sidebar-logo">
+<h1 class="font-serif text-2xl font-bold tracking-tight">CORTHEX <span class="text-organic-sand text-sm align-top ml-1">v2</span></h1>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center space-x-3 px-4 py-3 bg-organic-olive text-white rounded-lg transition-colors" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="font-medium">대시보드</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg transition-colors" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>AI 에이전트 채팅</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg transition-colors" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>워크플로우 (Jobs)</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg transition-colors" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>보고서</span>
+</a>
+</nav>
+<div class="mt-auto pt-6 border-t border-white/10" data-purpose="sidebar-footer">
+<a class="flex items-center space-x-3 px-4 py-3 text-slate-400 hover:text-white transition-colors" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>설정</span>
+</a>
+</div>
+</aside>
+<!-- END: Sidebar -->
+<!-- BEGIN: Main Content Area -->
+<main class="ml-64 flex-1 flex flex-col min-h-screen">
+<!-- BEGIN: Topbar -->
+<header class="h-16 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-40">
+<div class="flex items-center space-x-4">
+<span class="text-slate-400">워크스페이스:</span>
+<div class="flex items-center space-x-1 font-medium cursor-pointer">
+<span>나의 전략 연구소</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+<div class="flex items-center space-x-6">
+<button class="relative text-slate-500 hover:text-organic-olive transition-colors">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+</button>
+<div class="flex items-center space-x-3 border-l pl-6 border-slate-200">
+<div class="w-8 h-8 rounded-full bg-organic-sand flex items-center justify-center text-white font-bold">C</div>
+<span class="font-medium">CEO님</span>
+</div>
+</div>
+</header>
+<!-- END: Topbar -->
+<!-- BEGIN: Content Scroll Area -->
+<div class="p-8 flex-1">
+<!-- BEGIN: Greeting -->
+<div class="mb-10">
+<h2 class="font-serif text-3xl font-bold text-organic-olive-dark">반갑습니다, CEO님</h2>
+<p class="text-slate-500 mt-2">오늘도 CORTHEX가 당신의 비즈니스를 지원하고 있습니다.</p>
+</div>
+<!-- END: Greeting -->
+<!-- BEGIN: Quick Start Shortcuts -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10" data-purpose="quick-shortcuts">
+<button class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-organic-olive/30 transition-all text-left flex items-start space-x-4">
+<div class="p-3 bg-organic-cream rounded-xl text-organic-olive">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<h3 class="font-bold text-lg">새로운 대화</h3>
+<p class="text-sm text-slate-500">에이전트에게 업무 지시하기</p>
+</div>
+</button>
+<button class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-organic-olive/30 transition-all text-left flex items-start space-x-4">
+<div class="p-3 bg-organic-cream rounded-xl text-organic-olive">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<h3 class="font-bold text-lg">워크플로우 생성</h3>
+<p class="text-sm text-slate-500">자동화된 작업 설계</p>
+</div>
+</button>
+<button class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-organic-olive/30 transition-all text-left flex items-start space-x-4">
+<div class="p-3 bg-organic-cream rounded-xl text-organic-olive">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<h3 class="font-bold text-lg">주간 분석</h3>
+<p class="text-sm text-slate-500">에이전트 성과 보고서 확인</p>
+</div>
+</button>
+</div>
+<!-- END: Quick Start Shortcuts -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- BEGIN: Agent Status Grid -->
+<div class="lg:col-span-2 space-y-6" data-purpose="agent-grid">
+<div class="flex items-center justify-between">
+<h3 class="font-serif text-xl font-bold">에이전트 현황</h3>
+<a class="text-sm text-organic-olive font-medium hover:underline" href="#">모두 보기</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Secretary Agent (Special) -->
+<div class="bg-white p-5 rounded-2xl shadow-sm border-2 border-organic-olive/20 flex items-center space-x-4">
+<div class="relative">
+<div class="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 overflow-hidden">
+<img alt="Secretary" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBg6aGz9lAcgrdta9v1LBMN5iTP17Cl-HXeD_1NDU8JeYGLngziM9oGFj_GXyC32O2ZmqIUC5LSkEDT4l6uFIAxANzW04q3MoQESVh9AmX77r_NmlLBYRoC5pe5emzB3TovSYZMuZyqIwBIauc4WzbXCuX5JNnwp7fTJVbcReZHeX1FzjvUYuPNeWKVVYxEG7r1By6TKavoyObLr1OKURuTjEICgD7kG_qqhs-JKGDPN3wIS84rTc2MtX7zWvEdK1mL9TK1tk7_wA"/>
+</div>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white status-pulse-active"></div>
+</div>
+<div class="flex-1">
+<div class="flex items-center space-x-2">
+<h4 class="font-bold">메인 비서</h4>
+<span class="px-2 py-0.5 bg-organic-olive text-white text-[10px] rounded uppercase tracking-wider font-bold">Secretary</span>
+</div>
+<p class="text-xs text-slate-400 mt-1">상태: <span class="text-green-600 font-medium">대기 중</span></p>
+</div>
+<button class="p-2 text-slate-400 hover:text-organic-olive">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+<!-- Working Agent -->
+<div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
+<div class="relative">
+<div class="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 overflow-hidden">
+<img alt="Researcher" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8IYIKY8fQLHRl8bB-Leza0kUABHTOKk_4MqMRFNOn4mziFOQZNoQ2SQ2XLunwLy287w9NSZg1HIAd1ljtxA-PrRd_9-3BzSqmYOm2bxV506O1jf4wyK7l-yi2_ouBW-p13yl4QQWuhh8Lh5uq4GCwJ8roQKKmFqFrnziBVWRAa8NxbvLdoPRFH8syxKXzhOvAUlpOTFaZly_7M_xIzoofrYTMqrBQuFGilEfu9XIKMp07jZ8Wdy4BDp3Rn5nInCYsXicMpOoxrQ"/>
+</div>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-blue-500 rounded-full border-2 border-white"></div>
+</div>
+<div class="flex-1">
+<h4 class="font-bold">시장 조사원</h4>
+<p class="text-xs text-slate-400 mt-1">상태: <span class="text-blue-600 font-medium">작업 중 (74%)</span></p>
+</div>
+</div>
+<!-- Online Agent -->
+<div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
+<div class="relative">
+<div class="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 overflow-hidden">
+<img alt="Writer" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDe2hKWSiNDt2nIF7UtM2_VZncIMwoO7B5QZGmbCQKoLvOU5vT4J7bMU8ILJzkdwSVro3Olc55kFrN5GvME0T5E5W1BKR-VLXEIxy5QJJd942Wcx2KYdgHaMs-LyUDC1ZUKsIZ-xw0a__oYIRKtzks_-7qnzdEC5nyajAMVQ8tG8CdnfZvp9rJ0uOtcgxyGtBoCN5FyjrBTyRbVqygvFDctIJkhtXReNpvkdFehnyvnjdNdSxK3IlmPEwIXGHmAumclqXfsdaJzCw"/>
+</div>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+</div>
+<div class="flex-1">
+<h4 class="font-bold">콘텐츠 작가</h4>
+<p class="text-xs text-slate-400 mt-1">상태: <span class="text-green-600 font-medium">온라인</span></p>
+</div>
+</div>
+<!-- Error/Error Agent -->
+<div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
+<div class="relative">
+<div class="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 overflow-hidden">
+<img alt="Developer" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUaKf2FR9ET4Hj2xpQS-1ybArfly0HsyXgL5xEi_bBE4pyDecwpuDBeLQrhZ2iJQXvfIjrST_cHYfgTUZgME2MOabLEIUV3V2fXSbT76Vqq8u9zuTGFkfY2MdRklXyD5VSeO1vL5WNLoSrwbdjxNZfsMOtA3z5UnLTRCtt1Y_jheGNh8-UBlFFh4BTpRzDO9Lx72IGw9bBBLVuvYjP5_RJQ1KXLhZgDkk1YE473e-L4xdPJ8Ig1aGOlXM5DqeaY58GsKO0mr57bQ"/>
+</div>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white"></div>
+</div>
+<div class="flex-1">
+<h4 class="font-bold">코드 리뷰어</h4>
+<p class="text-xs text-slate-400 mt-1">상태: <span class="text-red-600 font-medium">연결 끊김</span></p>
+</div>
+</div>
+<!-- Offline Agent -->
+<div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4 opacity-75">
+<div class="relative">
+<div class="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 overflow-hidden grayscale">
+<img alt="Analyst" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnMTE6HDQQAbYX4OZX7x-XlVCu1uY7vPGxXaHl2TxwU-11kR2QEPiXw19AKkR__z5DkUqMuH8oro0uVKuTrWn3n11GCgvEfyWZjmpsx-UlUIvf-7wQpamf2iv2Y0uPWva_2F9DhubjEahRjikSo3xft0piYuPO_iWdteNzq53UN77K5M0NPZ1WxKnkQt8U1mNINiI5UaxyPteXrLonXiLrz0q7CeYl-sSMJwGMpPQOegzN_zbd7x2zDtOxGo5iGCd4PA-puoNS5Q"/>
+</div>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-slate-400 rounded-full border-2 border-white"></div>
+</div>
+<div class="flex-1">
+<h4 class="font-bold">데이터 분석가</h4>
+<p class="text-xs text-slate-400 mt-1">상태: <span class="text-slate-500">오프라인</span></p>
+</div>
+</div>
+</div>
+</div>
+<!-- END: Agent Status Grid -->
+<!-- BEGIN: Recent Notifications -->
+<div class="space-y-6" data-purpose="notifications">
+<div class="flex items-center justify-between">
+<h3 class="font-serif text-xl font-bold">최근 알림</h3>
+<button class="text-slate-400 hover:text-slate-600">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+<div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+<div class="divide-y divide-slate-50">
+<!-- Notification Item -->
+<div class="p-4 hover:bg-slate-50 transition-colors cursor-pointer group">
+<div class="flex items-start space-x-3">
+<div class="mt-1 w-2 h-2 rounded-full bg-organic-olive"></div>
+<div class="flex-1">
+<p class="text-sm font-medium text-slate-800">보고서 완료: 2024년 2분기 트렌드</p>
+<p class="text-xs text-slate-500 mt-1">시장 조사원이 요청하신 보고서를 생성했습니다.</p>
+<p class="text-[10px] text-slate-400 mt-2">15분 전</p>
+</div>
+</div>
+</div>
+<!-- Notification Item -->
+<div class="p-4 hover:bg-slate-50 transition-colors cursor-pointer group">
+<div class="flex items-start space-x-3">
+<div class="mt-1 w-2 h-2 rounded-full bg-slate-200"></div>
+<div class="flex-1">
+<p class="text-sm font-medium text-slate-800">시스템 업데이트 안내</p>
+<p class="text-xs text-slate-500 mt-1">v2.1 패치노트가 공개되었습니다. 신규 기능을 확인하세요.</p>
+<p class="text-[10px] text-slate-400 mt-2">2시간 전</p>
+</div>
+</div>
+</div>
+<!-- Notification Item -->
+<div class="p-4 hover:bg-slate-50 transition-colors cursor-pointer group">
+<div class="flex items-start space-x-3">
+<div class="mt-1 w-2 h-2 rounded-full bg-red-400"></div>
+<div class="flex-1">
+<p class="text-sm font-medium text-slate-800">작업 중단: 데이터 크롤링</p>
+<p class="text-xs text-slate-500 mt-1">대상 사이트의 응답 지연으로 작업이 일시 중단되었습니다.</p>
+<p class="text-[10px] text-slate-400 mt-2">5시간 전</p>
+</div>
+</div>
+</div>
+</div>
+<button class="w-full py-3 bg-slate-50 text-xs font-medium text-slate-500 hover:bg-slate-100 transition-colors">
+                모든 알림 확인하기
+              </button>
+</div>
+</div>
+<!-- END: Recent Notifications -->
+</div>
+</div>
+<!-- END: Content Scroll Area -->
+<!-- BEGIN: Footer Credits -->
+<footer class="p-8 text-center">
+<p class="text-sm text-slate-400">© 2024 CORTHEX Technologies. All rights reserved.</p>
+</footer>
+<!-- END: Footer Credits -->
+</main>
+<!-- END: Main Content Area -->
+</div>
+</body></html>

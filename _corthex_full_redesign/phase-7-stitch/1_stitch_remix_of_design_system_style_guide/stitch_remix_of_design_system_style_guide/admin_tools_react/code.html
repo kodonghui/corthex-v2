@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 Admin - Tool Catalog</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Navigation -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary/10 bg-white dark:bg-background-dark px-6 md:px-10 py-3 sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-primary">
+<div class="size-6 bg-primary rounded flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-sm">account_tree</span>
+</div>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight">CORTHEX v2</h2>
+</div>
+<nav class="hidden lg:flex items-center gap-6">
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium" href="#">Dashboard</a>
+<a class="text-primary text-sm font-bold border-b-2 border-primary pb-1" href="#">Catalog</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium" href="#">Schemas</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium" href="#">Settings</a>
+</nav>
+</div>
+<div class="flex flex-1 justify-end gap-4 items-center">
+<label class="hidden md:flex flex-col min-w-40 h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-xl bg-slate-100 dark:bg-primary/5">
+<div class="text-slate-400 flex items-center justify-center pl-4">
+<span class="material-symbols-outlined text-xl">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 border-none bg-transparent focus:ring-0 text-slate-900 dark:text-white placeholder:text-slate-400 text-sm" placeholder="Search components..." value=""/>
+</div>
+</label>
+<div class="flex items-center gap-2">
+<div class="bg-primary/10 p-2 rounded-full text-primary flex items-center justify-center">
+<span class="material-symbols-outlined">notifications</span>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/20" data-alt="User avatar placeholder profile picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB4uqyk_27FIu7C4zmKOw6dJPZFwYEdS-cgl4tMACXTPMgNHC2wxg_HryH1o84I3umnUlhJVv5NDWhrPnXMS6pvgpYkljMfobjS3oo6GsK6iJE04nq0akYJyLBsEH6sEjsZ8aDRfmiVKOWPEHYvSicf3n98y7QNvTjwLjyQozMfZHxPyXIROqyvRfIxagT_u89q1JVADRPPFmqBrp1WWc1wahRCYrhxh6vT9jf_wLGESGAP_eedJjEMVjR2xZnTIsNa0kXLw8lwmXeP");'></div>
+</div>
+</div>
+</header>
+<div class="flex flex-1 flex-col lg:flex-row">
+<!-- Sidebar Navigation -->
+<aside class="w-full lg:w-64 border-r border-primary/10 bg-white dark:bg-background-dark/50 p-4 space-y-2">
+<div class="p-2 mb-4">
+<p class="text-xs font-bold uppercase tracking-wider text-slate-400">Main Menu</p>
+</div>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-primary/5" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-semibold">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-primary text-white shadow-lg shadow-primary/20" href="#">
+<span class="material-symbols-outlined">manufacturing</span>
+<span class="text-sm font-semibold">Tool Catalog</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-primary/5" href="#">
+<span class="material-symbols-outlined">schema</span>
+<span class="text-sm font-semibold">JSON Schemas</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-primary/5" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-sm font-semibold">Usage Logs</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-primary/5" href="#">
+<span class="material-symbols-outlined">key</span>
+<span class="text-sm font-semibold">API Keys</span>
+</a>
+<div class="pt-8 p-2">
+<p class="text-xs font-bold uppercase tracking-wider text-slate-400">System</p>
+</div>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-primary/5" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-semibold">Global Config</span>
+</a>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col p-6 md:p-10 gap-8">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div class="max-w-2xl">
+<div class="flex items-center gap-2 text-primary mb-2">
+<span class="material-symbols-outlined text-sm">inventory_2</span>
+<span class="text-xs font-bold uppercase tracking-widest">Admin Dashboard</span>
+</div>
+<h1 class="text-3xl md:text-4xl font-black text-slate-900 dark:text-white leading-tight">Tool Definitions Catalog</h1>
+<p class="text-slate-600 dark:text-slate-400 mt-2 text-lg">Manage natural language processing tools, JSON input schemas, and organizational mapping for the CORTHEX ecosystem.</p>
+</div>
+<button class="flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-white font-bold transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-primary/30">
+<span class="material-symbols-outlined">add_circle</span>
+<span>Create New Tool</span>
+</button>
+</div>
+<!-- Filter Chips -->
+<div class="flex flex-wrap gap-2 py-2">
+<button class="flex h-10 items-center justify-center gap-2 rounded-xl bg-primary/10 text-primary px-4 border border-primary/20">
+<span class="text-sm font-bold">All Categories</span>
+<span class="material-symbols-outlined text-lg">expand_more</span>
+</button>
+<button class="flex h-10 items-center justify-center gap-2 rounded-xl bg-white dark:bg-primary/5 text-slate-600 dark:text-slate-300 px-4 border border-slate-200 dark:border-primary/10 hover:border-primary/30">
+<span class="text-sm font-medium">NLP Extraction</span>
+<span class="material-symbols-outlined text-lg">expand_more</span>
+</button>
+<button class="flex h-10 items-center justify-center gap-2 rounded-xl bg-white dark:bg-primary/5 text-slate-600 dark:text-slate-300 px-4 border border-slate-200 dark:border-primary/10 hover:border-primary/30">
+<span class="text-sm font-medium">Vision Processing</span>
+<span class="material-symbols-outlined text-lg">expand_more</span>
+</button>
+<button class="flex h-10 items-center justify-center gap-2 rounded-xl bg-white dark:bg-primary/5 text-slate-600 dark:text-slate-300 px-4 border border-slate-200 dark:border-primary/10 hover:border-primary/30">
+<span class="text-sm font-medium">System Utilities</span>
+<span class="material-symbols-outlined text-lg">expand_more</span>
+</button>
+</div>
+<!-- Table Container -->
+<div class="bg-white dark:bg-background-dark/30 rounded-xl border border-slate-200 dark:border-primary/10 overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 dark:bg-primary/5 border-b border-slate-200 dark:border-primary/10">
+<th class="px-6 py-4 text-xs font-bold uppercase text-slate-500 tracking-wider">Tool Identity</th>
+<th class="px-6 py-4 text-xs font-bold uppercase text-slate-500 tracking-wider">Category Mapping</th>
+<th class="px-6 py-4 text-xs font-bold uppercase text-slate-500 tracking-wider">Schema Validation</th>
+<th class="px-6 py-4 text-xs font-bold uppercase text-slate-500 tracking-wider">Last Sync</th>
+<th class="px-6 py-4 text-xs font-bold uppercase text-slate-500 tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-primary/5">
+<tr class="hover:bg-slate-50/50 dark:hover:bg-primary/5 transition-colors">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">text_snippet</span>
+</div>
+<div>
+<p class="font-bold text-slate-900 dark:text-white">Entity Extractor</p>
+<p class="text-xs text-slate-500">v2.4.0 • ner-engine-main</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/30 px-3 py-1 text-xs font-bold text-blue-700 dark:text-blue-300">
+                                        Natural Language
+                                    </span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="size-2 rounded-full bg-emerald-500"></span>
+<span class="text-sm font-medium text-slate-700 dark:text-slate-300 uppercase tracking-tight">Valid Schema</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<p class="text-sm text-slate-600 dark:text-slate-400">Oct 12, 2023</p>
+<p class="text-[10px] text-slate-400 uppercase">14:23 GMT</p>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="text-primary hover:text-primary/80 font-bold text-sm underline decoration-2 underline-offset-4">Configure</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-primary/5 transition-colors">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">rule</span>
+</div>
+<div>
+<p class="font-bold text-slate-900 dark:text-white">Schema Validator</p>
+<p class="text-xs text-slate-500">v1.1.2 • core-utils</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center rounded-full bg-purple-100 dark:bg-purple-900/30 px-3 py-1 text-xs font-bold text-purple-700 dark:text-purple-300">
+                                        System Utilities
+                                    </span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2 text-amber-500">
+<span class="material-symbols-outlined text-sm">pending</span>
+<span class="text-sm font-medium uppercase tracking-tight">Draft Stage</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<p class="text-sm text-slate-600 dark:text-slate-400">Oct 10, 2023</p>
+<p class="text-[10px] text-slate-400 uppercase">09:12 GMT</p>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="text-primary hover:text-primary/80 font-bold text-sm underline decoration-2 underline-offset-4">Configure</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-primary/5 transition-colors">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">image</span>
+</div>
+<div>
+<p class="font-bold text-slate-900 dark:text-white">Image Resizer</p>
+<p class="text-xs text-slate-500">v3.0.1 • vision-module</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center rounded-full bg-orange-100 dark:bg-orange-900/30 px-3 py-1 text-xs font-bold text-orange-700 dark:text-orange-300">
+                                        Image Analysis
+                                    </span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="size-2 rounded-full bg-emerald-500"></span>
+<span class="text-sm font-medium text-slate-700 dark:text-slate-300 uppercase tracking-tight">Valid Schema</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<p class="text-sm text-slate-600 dark:text-slate-400">Oct 05, 2023</p>
+<p class="text-[10px] text-slate-400 uppercase">18:55 GMT</p>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="text-primary hover:text-primary/80 font-bold text-sm underline decoration-2 underline-offset-4">Configure</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-primary/5 transition-colors">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">database</span>
+</div>
+<div>
+<p class="font-bold text-slate-900 dark:text-white">Data Normalizer</p>
+<p class="text-xs text-slate-500">v0.9.5 • pipeline-tools</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-3 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-300">
+                                        Data Processing
+                                    </span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="size-2 rounded-full bg-emerald-500"></span>
+<span class="text-sm font-medium text-slate-700 dark:text-slate-300 uppercase tracking-tight">Valid Schema</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<p class="text-sm text-slate-600 dark:text-slate-400">Sep 28, 2023</p>
+<p class="text-[10px] text-slate-400 uppercase">11:04 GMT</p>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="text-primary hover:text-primary/80 font-bold text-sm underline decoration-2 underline-offset-4">Configure</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination footer -->
+<div class="px-6 py-4 bg-slate-50 dark:bg-primary/5 border-t border-slate-200 dark:border-primary/10 flex items-center justify-between">
+<p class="text-sm text-slate-500 font-medium">Showing 4 of 28 tools</p>
+<div class="flex gap-2">
+<button class="p-2 rounded-lg border border-slate-200 dark:border-primary/10 text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="p-2 rounded-lg border border-slate-200 dark:border-primary/10 text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Dashboard Stats -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="p-6 rounded-xl bg-white dark:bg-background-dark/30 border border-slate-200 dark:border-primary/10">
+<div class="flex items-center justify-between mb-4">
+<span class="text-slate-500 font-bold text-xs uppercase tracking-wider">Health Index</span>
+<span class="material-symbols-outlined text-emerald-500">check_circle</span>
+</div>
+<div class="flex items-end gap-2">
+<span class="text-3xl font-black text-slate-900 dark:text-white">98%</span>
+<span class="text-emerald-500 text-sm font-bold mb-1">+2.4%</span>
+</div>
+<p class="text-xs text-slate-400 mt-2">Tools currently operating within SLA</p>
+</div>
+<div class="p-6 rounded-xl bg-white dark:bg-background-dark/30 border border-slate-200 dark:border-primary/10">
+<div class="flex items-center justify-between mb-4">
+<span class="text-slate-500 font-bold text-xs uppercase tracking-wider">Total Calls</span>
+<span class="material-symbols-outlined text-primary">show_chart</span>
+</div>
+<div class="flex items-end gap-2">
+<span class="text-3xl font-black text-slate-900 dark:text-white">1.2M</span>
+<span class="text-slate-400 text-sm font-bold mb-1">/ month</span>
+</div>
+<p class="text-xs text-slate-400 mt-2">Aggregated API requests across catalog</p>
+</div>
+<div class="p-6 rounded-xl bg-white dark:bg-background-dark/30 border border-slate-200 dark:border-primary/10">
+<div class="flex items-center justify-between mb-4">
+<span class="text-slate-500 font-bold text-xs uppercase tracking-wider">Draft Schemas</span>
+<span class="material-symbols-outlined text-amber-500">description</span>
+</div>
+<div class="flex items-end gap-2">
+<span class="text-3xl font-black text-slate-900 dark:text-white">03</span>
+<span class="text-amber-500 text-sm font-bold mb-1">Attention</span>
+</div>
+<p class="text-xs text-slate-400 mt-2">Pending JSON definitions in registry</p>
+</div>
+</div>
+</main>
+</div>
+</div>
+</body></html>

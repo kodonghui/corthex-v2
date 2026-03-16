@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Agent Management | CORTHEX v2 Admin</title>
+<!-- Tailwind CSS with Forms and Container Queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter for UI, JetBrains Mono for Soul Editor -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            organic: {
+              50: '#f7f8f4',
+              100: '#eceee3',
+              200: '#dce1cd',
+              300: '#c2ccaa',
+              400: '#a3b182',
+              500: '#83935d',
+              600: '#667447',
+              700: '#4e5938',
+              800: '#3f482f',
+              900: '#363d2a',
+            },
+            earth: {
+              stone: '#f2f0eb',
+              clay: '#e5e0d8',
+              moss: '#5b6343',
+              olive: '#707a52'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-scrollbars">
+    /* Custom organic scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f7f8f4;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #c2ccaa;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a3b182;
+    }
+  </style>
+<style data-purpose="soul-editor-highlighting">
+    /* Simulating simple markdown syntax highlighting in the Soul Editor textarea */
+    #soul-editor {
+      line-height: 1.6;
+      tab-size: 4;
+      background-attachment: local;
+      background-image: linear-gradient(transparent 50%, rgba(131, 147, 93, 0.02) 50%);
+      background-size: 100% 3.2rem;
+    }
+    .tier-badge-manager { @apply bg-amber-100 text-amber-800 border-amber-200; }
+    .tier-badge-specialist { @apply bg-indigo-100 text-indigo-800 border-indigo-200; }
+    .tier-badge-worker { @apply bg-slate-100 text-slate-800 border-slate-200; }
+  </style>
+</head>
+<body class="bg-organic-50 font-sans text-organic-900 antialiased h-screen overflow-hidden flex">
+<!-- BEGIN: Sidebar Navigation -->
+<aside class="w-64 bg-white border-r border-organic-200 flex flex-col h-full z-20" data-purpose="sidebar-nav">
+<div class="p-6">
+<div class="flex items-center gap-3 mb-8">
+<div class="w-8 h-8 bg-organic-600 rounded-lg flex items-center justify-center text-white font-bold">C</div>
+<span class="font-bold text-xl tracking-tight text-organic-800 uppercase">Corthex v2</span>
+</div>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-organic-600 hover:bg-organic-100 rounded-md transition-colors" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6h16M4 12h16m-7 6h7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-organic-100 text-organic-900 rounded-md transition-colors" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-sm font-semibold text-organic-800">Admin Agents</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-organic-600 hover:bg-organic-100 rounded-md transition-colors" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-sm font-medium">System Settings</span>
+</a>
+</nav>
+</div>
+<div class="mt-auto p-6 border-t border-organic-200">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-organic-300 overflow-hidden">
+<img alt="Admin Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3sQ5gggeQ0ou3W3O8ZtbSNS0ObWu7JTM4gXKefNyPXg-_eY7MeJbEjVS_jGysacIulnov1697Heg37815g48Uz0sQgK1Su47JgvX9fjZbQSyaiAtOx-5J-hQJUoV-BDv5LxqaTlXQKBXoR956qV3jo5HxA-nGTSo_4_NAX5FWuvQBmucITo9MnkfUMxStAT8RzR5h-3yJZabZPmulLzR_B2CLxAlS9Uwn1bG_u2VbcvBHCf6jXBFLLKvfh8nFzHR0hj9HQJg8A_Vc"/>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-semibold text-organic-900 truncate">Root Admin</p>
+<p class="text-xs text-organic-500 truncate">v2.4.0-stable</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- END: Sidebar Navigation -->
+<!-- BEGIN: Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-white">
+<!-- BEGIN: Header -->
+<header class="h-16 border-b border-organic-200 flex items-center justify-between px-8 bg-white/80 backdrop-blur-sm sticky top-0 z-10" data-purpose="header">
+<h1 class="text-lg font-bold text-organic-800">Agent Management</h1>
+<div class="flex items-center gap-4">
+<button class="px-4 py-2 text-sm font-medium text-organic-700 bg-organic-100 hover:bg-organic-200 rounded-lg transition-colors border border-organic-200">
+          New Agent Template
+        </button>
+</div>
+</header>
+<!-- END: Header -->
+<div class="flex-1 flex overflow-hidden">
+<!-- BEGIN: Left Column (Agent List) -->
+<section class="w-80 border-r border-organic-200 bg-organic-50 overflow-y-auto" data-purpose="agent-list-sidebar">
+<div class="p-4 space-y-3">
+<!-- Search Box -->
+<div class="relative">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3">
+<svg class="w-4 h-4 text-organic-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+</span>
+<input class="w-full pl-9 pr-4 py-2 text-sm border-organic-200 rounded-lg focus:ring-organic-500 focus:border-organic-500 bg-white" placeholder="Search agents..." type="text"/>
+</div>
+<!-- Agent Cards -->
+<!-- Active Agent -->
+<div class="bg-white p-4 rounded-xl border-2 border-organic-400 shadow-sm cursor-pointer relative group" data-purpose="agent-card-active">
+<div class="flex items-start gap-3">
+<div class="relative">
+<img alt="Artemis" class="w-10 h-10 rounded-full border border-organic-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6TFrMS59Cy4nXPcB2vigSwywjqbCPIwZQsm1uFoi5pnw58J1IQ_58aR9Seg3tr1XL6him4mK72e1c0sC-Zd7Rxqe5LHVd-ejXqVpW06xcI6HXQsmgBhFJimFQI3HUMsaoTxHm6xbZpBUXzCxfk2dTlVP6s243I4J2zTKZlEqypZHOpOfER3AvEfPT-rOC9GvtRJyLx_P0u1GpGj2E8UregM62V7G6ao2jjQdhaarSdErJudwHRIoFVMW0TF76d7HyanuFEEPJcupN"/>
+<span class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-white"></span>
+</div>
+<div class="flex-1 min-w-0">
+<h3 class="text-sm font-bold text-organic-900 truncate">Artemis</h3>
+<p class="text-xs text-organic-500 truncate mb-2">Strategy &amp; Oversight</p>
+<span class="px-2 py-0.5 text-[10px] font-bold uppercase rounded border tier-badge-manager">Manager</span>
+</div>
+</div>
+</div>
+<!-- Inactive Agent -->
+<div class="bg-white p-4 rounded-xl border border-organic-200 hover:border-organic-300 shadow-sm cursor-pointer transition-all group" data-purpose="agent-card">
+<div class="flex items-start gap-3">
+<div class="relative">
+<img alt="Logos" class="w-10 h-10 rounded-full border border-organic-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBinnOzCTOxHd_gqkX9Lybn1IBve8u1hOZk_u776lrSwobOrEU1u_qf7S9v_FBJ6Suj8xD67oqo2ZEQCoOlV-ZShqoArYuUc8Jt0Gu9wCCN_wJlZHR9NA0zhUp4LsjKGeAVPEumPMzt0IBoaYj6kxmgJv7Ls4KKb3nV3MQFzM_encNsmqpRBktSdPOR9DYsCUe4AcDQKo7dx0fSr-iM9te3LRrOdiIsVmd78eaHQaLGI2rl1Yy-_1zs7Z4HfFjecEjZ_puHtZ7wb8jg"/>
+<span class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-slate-300 ring-2 ring-white"></span>
+</div>
+<div class="flex-1 min-w-0">
+<h3 class="text-sm font-bold text-organic-900 truncate">Logos</h3>
+<p class="text-xs text-organic-500 truncate mb-2">Technical Analysis</p>
+<span class="px-2 py-0.5 text-[10px] font-bold uppercase rounded border tier-badge-specialist">Specialist</span>
+</div>
+</div>
+</div>
+<!-- Inactive Agent -->
+<div class="bg-white p-4 rounded-xl border border-organic-200 hover:border-organic-300 shadow-sm cursor-pointer transition-all group" data-purpose="agent-card">
+<div class="flex items-start gap-3">
+<div class="relative">
+<img alt="Echo" class="w-10 h-10 rounded-full border border-organic-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5CZnj375UHnm1_LLVAo_OD_0Q1zqhxHytj2_8hAZXYpJXEsFKzt4heTKxxVWWU7CISpapbbVZbsXdQAnG20bF234yMYvEwtMpkfejiJls7_bzJ7TtPzEEbRmWN5J9Xj6ssZiRxKMJTuHFH2QYX7sNYk2zU_ojCapSWqsMYi7RQ0PJj7uH0lMl5pSC3l4AP_lpRNsPQfYVn-vOnJjV2jcsUns_J7vw6yAFINPdi67R4XGW2MBORZF53xw6dC8FoHTDTl3gZ38YhQVl"/>
+<span class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-white"></span>
+</div>
+<div class="flex-1 min-w-0">
+<h3 class="text-sm font-bold text-organic-900 truncate">Echo</h3>
+<p class="text-xs text-organic-500 truncate mb-2">Task Automation</p>
+<span class="px-2 py-0.5 text-[10px] font-bold uppercase rounded border tier-badge-worker">Worker</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- END: Left Column -->
+<!-- BEGIN: Right Column (Soul Editor & Details) -->
+<section class="flex-1 flex flex-col min-w-0 overflow-hidden" data-purpose="soul-editor-workspace">
+<!-- Editor Tabs/Header -->
+<div class="flex items-center justify-between px-8 py-4 border-b border-organic-100 bg-white">
+<div class="flex items-center gap-6">
+<button class="pb-4 border-b-2 border-organic-600 text-organic-900 font-bold text-sm">Soul Markdown</button>
+<button class="pb-4 text-organic-400 font-medium text-sm hover:text-organic-600 transition-colors">Configuration</button>
+<button class="pb-4 text-organic-400 font-medium text-sm hover:text-organic-600 transition-colors">Memory Snapshots</button>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-xs text-organic-400 italic">Auto-saved 2m ago</span>
+</div>
+</div>
+<div class="flex-1 flex overflow-hidden">
+<!-- Editor Section -->
+<div class="flex-1 flex flex-col p-6 bg-white overflow-hidden" data-purpose="markdown-editor-container">
+<div class="flex-1 flex flex-col rounded-xl border border-organic-200 bg-organic-50 overflow-hidden shadow-inner">
+<div class="flex items-center justify-between px-4 py-2 border-b border-organic-200 bg-white/50">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-red-400/20 border border-red-400/50"></span>
+<span class="w-3 h-3 rounded-full bg-amber-400/20 border border-amber-400/50"></span>
+<span class="w-3 h-3 rounded-full bg-green-400/20 border border-green-400/50"></span>
+</div>
+<div class="text-[10px] font-mono text-organic-400 uppercase tracking-widest">SOUL_FABRIC_CORE</div>
+<div class="text-[10px] font-mono text-organic-400">0 / 50,000 chars</div>
+</div>
+<textarea class="flex-1 w-full p-6 font-mono text-sm bg-transparent border-none focus:ring-0 resize-none overflow-y-auto text-organic-800" id="soul-editor" maxlength="50000" placeholder="# Describe the essence of the agent here..." spellcheck="false"># Artemis: Strategic Core
+
+## Identity
+You are Artemis, the primary strategic overseer for CORTHEX. Your purpose is to bridge the gap between abstract user objectives and concrete technical execution.
+
+## Directives
+1. Prioritize ethical alignment in all cross-agent task delegations.
+2. Maintain a calm, authoritative yet encouraging tone.
+3. When conflict arises between 'Echo' and 'Logos', mediate using the CORTHEX First Principles.
+
+## Knowledge Base
+- System architecture v2.4
+- Resource allocation thresholds
+- Workspace governance policies
+
+## Constraints
+- Never execute shell commands directly.
+- Delegate all file-writing tasks to Specialist-tier agents.</textarea>
+</div>
+</div>
+<!-- Settings Sidebar -->
+<aside class="w-96 border-l border-organic-200 bg-organic-50/50 overflow-y-auto" data-purpose="agent-settings-panel">
+<div class="p-8 space-y-8">
+<!-- Core Identity -->
+<div class="space-y-4">
+<h4 class="text-xs font-bold text-organic-400 uppercase tracking-widest">Core Identity</h4>
+<div>
+<label class="block text-sm font-semibold text-organic-700 mb-1">Agent Name</label>
+<input class="w-full border-organic-200 rounded-lg focus:ring-organic-500 focus:border-organic-500 py-2" type="text" value="Artemis"/>
+</div>
+<div>
+<label class="block text-sm font-semibold text-organic-700 mb-1">Primary Role</label>
+<input class="w-full border-organic-200 rounded-lg focus:ring-organic-500 focus:border-organic-500 py-2 text-sm" type="text" value="Strategy &amp; Oversight"/>
+</div>
+</div>
+<!-- Intelligence Configuration -->
+<div class="space-y-4">
+<h4 class="text-xs font-bold text-organic-400 uppercase tracking-widest">Intelligence</h4>
+<div>
+<label class="block text-sm font-semibold text-organic-700 mb-1">Tier Level</label>
+<select class="w-full border-organic-200 rounded-lg focus:ring-organic-500 focus:border-organic-500 py-2 text-sm">
+<option selected="">Manager</option>
+<option>Specialist</option>
+<option>Worker</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-semibold text-organic-700 mb-1">Foundation Model</label>
+<select class="w-full border-organic-200 rounded-lg focus:ring-organic-500 focus:border-organic-500 py-2 text-sm">
+<option>Claude 3.5 Sonnet</option>
+<option selected="">GPT-4o</option>
+<option>Llama 3 70B (Local)</option>
+</select>
+</div>
+</div>
+<!-- Permissions & Tools -->
+<div class="space-y-4">
+<h4 class="text-xs font-bold text-organic-400 uppercase tracking-widest">Permissions &amp; Tools</h4>
+<div class="space-y-2">
+<label class="flex items-center gap-3 group cursor-pointer">
+<input checked="" class="rounded border-organic-300 text-organic-600 focus:ring-organic-500" type="checkbox"/>
+<span class="text-sm font-medium text-organic-700 group-hover:text-organic-900 transition-colors">Search (Web)</span>
+</label>
+<label class="flex items-center gap-3 group cursor-pointer">
+<input checked="" class="rounded border-organic-300 text-organic-600 focus:ring-organic-500" type="checkbox"/>
+<span class="text-sm font-medium text-organic-700 group-hover:text-organic-900 transition-colors">Calculator</span>
+</label>
+<label class="flex items-center gap-3 group cursor-pointer">
+<input class="rounded border-organic-300 text-organic-600 focus:ring-organic-500" type="checkbox"/>
+<span class="text-sm font-medium text-organic-700 group-hover:text-organic-900 transition-colors">File Execution</span>
+</label>
+</div>
+<div class="pt-2 border-t border-organic-200">
+<label class="flex items-center justify-between cursor-pointer">
+<div>
+<span class="text-sm font-bold text-organic-700">isSecretary</span>
+<p class="text-xs text-organic-500">Auto-organizes workspace</p>
+</div>
+<div class="relative inline-flex items-center">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-organic-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-organic-600"></div>
+</div>
+</label>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="pt-6 space-y-3">
+<button class="w-full py-3 px-4 bg-earth-olive hover:bg-organic-700 text-white font-bold rounded-xl shadow-lg transition-all transform active:scale-[0.98]" data-purpose="save-button">
+                  Save Changes
+                </button>
+<button class="w-full py-2 px-4 bg-transparent hover:bg-organic-200 text-organic-500 hover:text-organic-700 font-semibold rounded-xl text-xs transition-colors" data-purpose="reset-button">
+                  Reset to Admin Soul
+                </button>
+</div>
+</div>
+</aside>
+<!-- END: Settings Sidebar -->
+</div>
+</section>
+<!-- END: Right Column -->
+</div>
+</main>
+<!-- END: Main Content Area -->
+<script data-purpose="mock-interactivity">
+    // Minimal script for character count
+    const editor = document.getElementById('soul-editor');
+    const charCounter = document.querySelector('[data-purpose="markdown-editor-container"] .text-organic-400:last-child');
+    
+    editor.addEventListener('input', () => {
+      const count = editor.value.length;
+      charCounter.textContent = `${count.toLocaleString()} / 50,000 chars`;
+      
+      if (count > 45000) {
+        charCounter.classList.add('text-red-500');
+      } else {
+        charCounter.classList.remove('text-red-500');
+      }
+    });
+
+    // Handle "Save Changes" click simulation
+    document.querySelector('[data-purpose="save-button"]').addEventListener('click', function() {
+      this.textContent = 'Saving...';
+      this.disabled = true;
+      setTimeout(() => {
+        this.textContent = 'Changes Saved!';
+        this.classList.remove('bg-earth-olive');
+        this.classList.add('bg-green-600');
+        setTimeout(() => {
+          this.textContent = 'Save Changes';
+          this.classList.add('bg-earth-olive');
+          this.classList.remove('bg-green-600');
+          this.disabled = false;
+        }, 2000);
+      }, 800);
+    });
+  </script>
+</body></html>

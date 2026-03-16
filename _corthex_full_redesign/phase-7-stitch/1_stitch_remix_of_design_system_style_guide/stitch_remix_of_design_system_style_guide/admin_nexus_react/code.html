@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 NEXUS | Admin Canvas</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Header / TopNavBar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-slate-200 dark:border-slate-800 bg-background-light dark:bg-background-dark px-6 lg:px-10 py-3 sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-primary">
+<div class="size-8 flex items-center justify-center bg-primary/10 rounded-lg">
+<span class="material-symbols-outlined text-primary text-2xl">hub</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight uppercase">CORTEX <span class="text-primary">v2</span> NEXUS</h2>
+</div>
+<label class="hidden md:flex flex-col min-w-40 h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-xl h-full">
+<div class="text-slate-400 flex border-none bg-slate-100 dark:bg-slate-800 items-center justify-center pl-4 rounded-l-xl">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border-none bg-slate-100 dark:bg-slate-800 focus:border-none h-full placeholder:text-slate-400 px-4 rounded-l-none border-l-0 pl-2 text-sm font-normal" placeholder="Search agents..." value=""/>
+</div>
+</label>
+</div>
+<div class="flex flex-1 justify-end gap-6 items-center">
+<nav class="hidden lg:flex items-center gap-8">
+<a class="text-primary text-sm font-semibold leading-normal border-b-2 border-primary pb-1" href="#">Canvas</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary text-sm font-medium transition-colors" href="#">Agents</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary text-sm font-medium transition-colors" href="#">Departments</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary text-sm font-medium transition-colors" href="#">Analytics</a>
+</nav>
+<div class="h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
+<button class="flex min-w-[120px] cursor-pointer items-center justify-center rounded-xl h-10 px-4 bg-primary text-white text-sm font-bold transition-all hover:bg-primary/90 shadow-sm shadow-primary/20">
+<span class="truncate">Deploy Changes</span>
+</button>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-9 border-2 border-primary/20" data-alt="User profile avatar placeholder" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDzvzeGjqlZg6yjqQNwaUWSHZboqcUxKwjt8f5n7CrcGtMOvZ9BkmZau9HPMEGPoKiAZQKyFK8VOUgQN4RXtrzbccA0Vop3iBAnQoVPP1FlaZc6tpPr8WWM-mHcItwskEqKbRyNgjMkTv9yBJ8pLyzy7z1nfsfPUaVs5D9QDS-NcvFdeRIJbEpub0AZEN2ByQgcKrD6TdKJ1M19rTlaVDhKKA7o7PlHqF6D9hOGaf-Z8rUrTeiTFR6UiUAmgx2zstKqx8xGv_rkp4Ue");'></div>
+</div>
+</header>
+<main class="flex flex-1 h-[calc(100vh-64px)]">
+<!-- Sidebar Navigation -->
+<aside class="w-64 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between bg-white dark:bg-slate-900/50 p-4 shrink-0">
+<div class="flex flex-col gap-6">
+<div class="flex flex-col px-2">
+<h1 class="text-slate-900 dark:text-slate-100 text-base font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">auto_graph</span>
+                            NEXUS Canvas
+                        </h1>
+<p class="text-slate-500 text-[11px] font-semibold uppercase tracking-wider mt-1">v2.0 Administrator</p>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-primary/10 text-primary">
+<span class="material-symbols-outlined">map</span>
+<p class="text-sm font-bold">Map View</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined">account_tree</span>
+<p class="text-sm font-medium">Hierarchy</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined">layers</span>
+<p class="text-sm font-medium">Templates</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined">eco</span>
+<p class="text-sm font-medium">Assets</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined">settings</span>
+<p class="text-sm font-medium">Settings</p>
+</div>
+</div>
+<div class="pt-4 border-t border-slate-100 dark:border-slate-800">
+<p class="px-3 text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">Departments</p>
+<div class="space-y-1">
+<div class="flex items-center justify-between px-3 py-1.5 group cursor-pointer">
+<span class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Bio-Tech</span>
+<span class="material-symbols-outlined opacity-0 group-hover:opacity-100 text-xs text-slate-400">more_vert</span>
+</div>
+<div class="flex items-center justify-between px-3 py-1.5 group cursor-pointer">
+<span class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Neural Labs</span>
+<span class="material-symbols-outlined opacity-0 group-hover:opacity-100 text-xs text-slate-400">more_vert</span>
+</div>
+<div class="flex items-center justify-between px-3 py-1.5 group cursor-pointer">
+<span class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400"><span class="w-2 h-2 rounded-full bg-amber-500"></span> Organic Core</span>
+<span class="material-symbols-outlined opacity-0 group-hover:opacity-100 text-xs text-slate-400">more_vert</span>
+</div>
+</div>
+</div>
+</div>
+<button class="flex w-full items-center justify-center gap-2 rounded-xl h-11 px-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-bold transition-all hover:scale-[1.02] active:scale-95 shadow-lg">
+<span class="material-symbols-outlined text-lg">add</span>
+<span class="truncate">Add New Agent</span>
+</button>
+</aside>
+<!-- Main Canvas Area -->
+<div class="flex flex-col flex-1 overflow-hidden">
+<!-- Toolbar/Breadcrumb -->
+<div class="bg-white dark:bg-slate-900/30 border-b border-slate-200 dark:border-slate-800 px-6 py-4">
+<div class="flex flex-wrap justify-between items-end gap-4">
+<div class="flex flex-col gap-1">
+<nav class="flex items-center gap-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+<a class="hover:text-primary" href="#">Admin</a>
+<span>/</span>
+<span class="text-slate-600 dark:text-slate-300">Organization Map</span>
+</nav>
+<h2 class="text-slate-900 dark:text-slate-100 text-3xl font-black leading-tight tracking-tight">Organization NEXUS</h2>
+<p class="text-slate-500 text-sm font-normal">Architect and restructure your organic agent network with live drag-and-drop.</p>
+</div>
+<div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+<button class="p-2 text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 rounded-lg shadow-sm">
+<span class="material-symbols-outlined">zoom_in</span>
+</button>
+<button class="p-2 text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 rounded-lg shadow-sm">
+<span class="material-symbols-outlined">zoom_out</span>
+</button>
+<div class="w-px h-6 bg-slate-200 dark:border-slate-700 mx-1"></div>
+<button class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-lg text-sm font-bold shadow-sm">
+<span class="material-symbols-outlined text-sm">grid_view</span>
+                                Auto-Layout
+                            </button>
+</div>
+</div>
+<!-- View Switcher -->
+<div class="mt-6">
+<div class="flex border-b border-slate-200 dark:border-slate-800 gap-8">
+<a class="flex items-center gap-2 border-b-2 border-primary text-primary pb-3 font-bold text-sm tracking-wide" href="#">
+<span class="material-symbols-outlined text-lg">select</span>
+                                Main Canvas
+                            </a>
+<a class="flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 pb-3 font-medium text-sm transition-all" href="#">
+<span class="material-symbols-outlined text-lg">stack</span>
+                                Department Layers
+                            </a>
+<a class="flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 pb-3 font-medium text-sm transition-all" href="#">
+<span class="material-symbols-outlined text-lg">history</span>
+                                Change History
+                            </a>
+</div>
+</div>
+</div>
+<!-- Canvas Grid -->
+<div class="flex-1 bg-slate-50 dark:bg-[#1a110a] relative overflow-hidden overflow-auto p-12">
+<!-- Dots Pattern Overlay -->
+<div class="absolute inset-0 opacity-[0.05] pointer-events-none" style="background-image: radial-gradient(circle at 1px 1px, #ec5b13 1px, transparent 0); background-size: 24px 24px;"></div>
+<!-- Organic Map Nodes Container -->
+<div class="relative w-full h-full min-h-[600px]">
+<!-- Main Central Hub -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 group">
+<div class="relative z-10 w-48 h-48 rounded-full bg-white dark:bg-slate-800 border-4 border-primary flex flex-col items-center justify-center p-6 text-center shadow-2xl shadow-primary/20 ring-8 ring-primary/5 transition-transform group-hover:scale-105 cursor-move">
+<div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-primary text-4xl">dns</span>
+</div>
+<h3 class="font-black text-slate-900 dark:text-slate-100 uppercase tracking-tighter leading-none">Nexus Core</h3>
+<p class="text-[10px] text-primary font-bold mt-1">MAIN CONTROL</p>
+</div>
+<!-- Connecting Lines (Visual Elements) -->
+<svg class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] pointer-events-none opacity-20 dark:opacity-40">
+<line stroke="#ec5b13" stroke-dasharray="8 4" stroke-width="2" x1="300" x2="100" y1="300" y2="100"></line>
+<line stroke="#ec5b13" stroke-dasharray="8 4" stroke-width="2" x1="300" x2="500" y1="300" y2="100"></line>
+<line stroke="#ec5b13" stroke-dasharray="8 4" stroke-width="2" x1="300" x2="500" y1="300" y2="500"></line>
+<line stroke="#ec5b13" stroke-dasharray="8 4" stroke-width="2" x1="300" x2="100" y1="300" y2="500"></line>
+</svg>
+</div>
+<!-- Department Node: Neural Labs -->
+<div class="absolute top-[15%] left-[15%] group">
+<div class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-xl border border-slate-200 dark:border-slate-700 w-56 cursor-move transition-all group-hover:-translate-y-1">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-500/20 text-blue-600 flex items-center justify-center">
+<span class="material-symbols-outlined">psychology</span>
+</div>
+<div>
+<h4 class="font-bold text-slate-900 dark:text-slate-100 text-sm">Neural Labs</h4>
+<p class="text-[10px] text-slate-400 font-bold uppercase">Department</p>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex items-center gap-2 p-2 bg-slate-50 dark:bg-slate-900 rounded-lg text-xs">
+<span class="material-symbols-outlined text-xs text-blue-500">fiber_manual_record</span>
+<span class="font-medium">Agent Cortex-01</span>
+</div>
+<div class="flex items-center gap-2 p-2 bg-slate-50 dark:bg-slate-900 rounded-lg text-xs">
+<span class="material-symbols-outlined text-xs text-blue-500">fiber_manual_record</span>
+<span class="font-medium">Agent Synapse-04</span>
+</div>
+</div>
+<button class="mt-4 w-full py-1.5 border border-dashed border-slate-300 dark:border-slate-600 rounded-lg text-[10px] font-bold text-slate-400 hover:text-primary hover:border-primary transition-all uppercase">
+                                    Add Agent
+                                </button>
+</div>
+</div>
+<!-- Department Node: Organic Core -->
+<div class="absolute bottom-[10%] right-[12%] group">
+<div class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-xl border border-slate-200 dark:border-slate-700 w-56 cursor-move transition-all group-hover:-translate-y-1">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 flex items-center justify-center">
+<span class="material-symbols-outlined">nature_people</span>
+</div>
+<div>
+<h4 class="font-bold text-slate-900 dark:text-slate-100 text-sm">Organic Core</h4>
+<p class="text-[10px] text-slate-400 font-bold uppercase">Department</p>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex items-center gap-2 p-2 bg-slate-50 dark:bg-slate-900 rounded-lg text-xs">
+<span class="material-symbols-outlined text-xs text-emerald-500">fiber_manual_record</span>
+<span class="font-medium">Lichen v4.2</span>
+</div>
+</div>
+<button class="mt-4 w-full py-1.5 border border-dashed border-slate-300 dark:border-slate-600 rounded-lg text-[10px] font-bold text-slate-400 hover:text-primary hover:border-primary transition-all uppercase">
+                                    Add Agent
+                                </button>
+</div>
+</div>
+<!-- Individual Agent: Free Floating -->
+<div class="absolute top-[20%] right-[20%]">
+<div class="bg-primary/5 dark:bg-primary/10 border-2 border-primary/30 rounded-xl px-4 py-3 flex items-center gap-3 shadow-lg backdrop-blur-sm cursor-move hover:border-primary transition-all">
+<div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
+<span class="material-symbols-outlined text-lg">robot_2</span>
+</div>
+<div>
+<p class="text-xs font-bold text-slate-900 dark:text-slate-100">SuperAgent 09</p>
+<p class="text-[10px] text-primary font-bold">UNASSIGNED</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Mini Map HUD -->
+<div class="fixed bottom-8 right-8 w-48 h-32 bg-white/80 dark:bg-slate-900/80 backdrop-blur border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-2xl pointer-events-none">
+<div class="absolute inset-0 opacity-10 bg-primary/20" style="background-image: radial-gradient(circle at 1px 1px, #ec5b13 1px, transparent 0); background-size: 8px 8px;"></div>
+<div class="h-full w-full p-2 relative">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full border border-primary/40 bg-primary/20"></div>
+<div class="absolute top-4 left-4 w-6 h-4 bg-blue-500/40 rounded-sm"></div>
+<div class="absolute bottom-4 right-4 w-6 h-4 bg-emerald-500/40 rounded-sm"></div>
+<div class="absolute top-8 right-12 w-4 h-2 bg-primary/40 rounded-sm"></div>
+<!-- Viewport Indicator -->
+<div class="absolute top-1/4 left-1/4 w-1/2 h-1/2 border-2 border-primary rounded shadow-inner"></div>
+</div>
+<div class="absolute top-2 left-2 px-1.5 py-0.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[8px] font-black rounded">HUD MAP</div>
+</div>
+<!-- Floating Tool Overlay -->
+<div class="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white/90 dark:bg-slate-800/90 backdrop-blur px-2 py-2 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl">
+<button class="w-10 h-10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl" title="Select Tool">
+<span class="material-symbols-outlined">near_me</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl" title="Hand Tool">
+<span class="material-symbols-outlined">pan_tool</span>
+</button>
+<div class="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1"></div>
+<button class="w-10 h-10 flex items-center justify-center text-primary bg-primary/10 rounded-xl" title="Add Agent">
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl" title="Connect Nodes">
+<span class="material-symbols-outlined">polyline</span>
+</button>
+<div class="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1"></div>
+<button class="w-10 h-10 flex items-center justify-center text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl" title="Delete Selection">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Properties Sidebar -->
+<aside class="w-72 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0">
+<div class="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+<h3 class="font-bold text-sm">Node Properties</h3>
+<button class="text-slate-400 hover:text-slate-600"><span class="material-symbols-outlined text-lg">close</span></button>
+</div>
+<div class="flex-1 p-6 space-y-8 overflow-y-auto">
+<!-- Preview Card -->
+<div class="flex flex-col items-center text-center">
+<div class="size-20 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-4xl text-primary">dns</span>
+</div>
+<h4 class="text-lg font-black tracking-tight">Nexus Core</h4>
+<p class="text-xs text-primary font-bold uppercase mb-1">Central Authority</p>
+<span class="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 text-[10px] font-bold rounded-full">ACTIVE</span>
+</div>
+<!-- Form Controls -->
+<div class="space-y-4">
+<div class="space-y-2">
+<label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest px-1">Label</label>
+<input class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-xl px-4 py-2.5 text-sm" type="text" value="Nexus Core"/>
+</div>
+<div class="space-y-2">
+<label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest px-1">Organic Hue</label>
+<div class="flex items-center gap-2">
+<div class="size-8 rounded-lg bg-primary ring-2 ring-offset-2 ring-primary cursor-pointer"></div>
+<div class="size-8 rounded-lg bg-blue-500 cursor-pointer"></div>
+<div class="size-8 rounded-lg bg-emerald-500 cursor-pointer"></div>
+<div class="size-8 rounded-lg bg-slate-300 dark:bg-slate-700 cursor-pointer"></div>
+<div class="size-8 rounded-lg border-2 border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center cursor-pointer">
+<span class="material-symbols-outlined text-xs">add</span>
+</div>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest px-1">Flow Capacity</label>
+<input class="w-full accent-primary h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full cursor-pointer" type="range"/>
+<div class="flex justify-between text-[10px] font-bold text-slate-400 uppercase">
+<span>Low</span>
+<span>Max</span>
+</div>
+</div>
+</div>
+<!-- Connection List -->
+<div class="pt-6 border-t border-slate-100 dark:border-slate-800">
+<h5 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Downstream Nodes</h5>
+<div class="space-y-2">
+<div class="flex items-center justify-between p-2 rounded-lg border border-slate-100 dark:border-slate-800 text-xs">
+<span class="font-medium">Neural Labs</span>
+<span class="text-slate-400">0.4s lat</span>
+</div>
+<div class="flex items-center justify-between p-2 rounded-lg border border-slate-100 dark:border-slate-800 text-xs">
+<span class="font-medium">Organic Core</span>
+<span class="text-slate-400">0.2s lat</span>
+</div>
+</div>
+</div>
+</div>
+<div class="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+<button class="w-full py-3 bg-primary/10 text-primary hover:bg-primary hover:text-white rounded-xl font-bold text-sm transition-all">
+                        Update Settings
+                    </button>
+</div>
+</aside>
+</main>
+</div>
+</body></html>

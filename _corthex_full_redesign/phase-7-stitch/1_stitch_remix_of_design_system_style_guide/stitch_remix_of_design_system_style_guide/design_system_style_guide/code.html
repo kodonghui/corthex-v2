@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 - Design System Style Guide</title>
+<!-- Google Fonts: Noto Serif KR for Headings -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Pretendard is often served via CDN or local, using Manrope as fallback/secondary as per theme snapshot -->
+<link as="style" crossorigin="" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              bg: '#faf8f5',
+              bgAlt: '#f5f0eb',
+              olive: {
+                DEFAULT: '#5a7247',
+                600: '#61864b',
+                400: '#7fa368',
+                200: '#a3c28f',
+                100: '#c6dab8',
+              },
+              terracotta: {
+                DEFAULT: '#c4622d',
+                light: '#faebe4',
+              },
+              mustard: {
+                DEFAULT: '#d4a843',
+                light: '#fbf4e4',
+              },
+              text: {
+                main: '#2d2c2a',
+                muted: '#73706c',
+                light: '#a6a39f',
+              },
+              border: '#e5e0d8',
+              cardBorder: '#e8e6e1'
+            }
+          },
+          fontFamily: {
+            serif: ['"Noto Serif KR"', 'serif'],
+            sans: ['Pretendard', 'Manrope', 'sans-serif'],
+          },
+          borderRadius: {
+            'twelve': '12px',
+          },
+          boxShadow: {
+            'soft': '0 4px 20px -2px rgba(45, 44, 42, 0.08)',
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="base-typography">
+    body {
+      background-color: #faf8f5;
+      color: #2d2c2a;
+      font-family: 'Pretendard', 'Manrope', sans-serif;
+    }
+    h1, h2, h3, h4 {
+      font-family: 'Noto Serif KR', serif;
+    }
+    .style-guide-section {
+      padding-top: 4rem;
+      padding-bottom: 4rem;
+      border-bottom: 1px solid #e5e0d8;
+    }
+    .color-swatch {
+      height: 80px;
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+  </style>
+</head>
+<body class="bg-brand-bg text-brand-text-main">
+<!-- BEGIN: Main Layout Wrapper -->
+<div class="flex min-h-screen">
+<!-- BEGIN: Sidebar Navigation -->
+<aside class="w-64 border-r border-brand-border bg-brand-bgAlt hidden lg:block sticky top-0 h-screen overflow-y-auto" id="sidebar">
+<div class="p-8">
+<div class="flex items-center gap-2 mb-10">
+<div class="w-8 h-8 bg-brand-olive rounded-twelve flex items-center justify-center text-white font-bold">C</div>
+<span class="font-serif font-bold text-xl tracking-tight">CORTHEX v2</span>
+</div>
+<nav class="space-y-1">
+<p class="text-[10px] uppercase tracking-widest text-brand-text-light font-bold mb-4 px-3">Documentation</p>
+<a class="flex items-center px-3 py-2 text-sm font-medium rounded-twelve bg-brand-olive/10 text-brand-olive" href="#vision">
+            Brand Vision
+          </a>
+<a class="flex items-center px-3 py-2 text-sm font-medium rounded-twelve text-brand-text-muted hover:bg-brand-olive/5 transition-colors" href="#colors">
+            Color Palette
+          </a>
+<a class="flex items-center px-3 py-2 text-sm font-medium rounded-twelve text-brand-text-muted hover:bg-brand-olive/5 transition-colors" href="#typography">
+            Typography
+          </a>
+<a class="flex items-center px-3 py-2 text-sm font-medium rounded-twelve text-brand-text-muted hover:bg-brand-olive/5 transition-colors" href="#components">
+            UI Components
+          </a>
+<a class="flex items-center px-3 py-2 text-sm font-medium rounded-twelve text-brand-text-muted hover:bg-brand-olive/5 transition-colors" href="#layout">
+            Layout Grid
+          </a>
+</nav>
+</div>
+</aside>
+<!-- END: Sidebar Navigation -->
+<!-- BEGIN: Main Content Area -->
+<main class="flex-1 p-6 md:p-12 lg:p-20 max-w-5xl mx-auto">
+<!-- BEGIN: Brand Vision Section -->
+<section class="style-guide-section pt-0" id="vision">
+<span class="text-brand-olive font-semibold tracking-wider text-sm uppercase">Foundation</span>
+<h1 class="text-5xl font-bold mt-4 mb-6">Brand Vision</h1>
+<p class="text-xl text-brand-text-muted leading-relaxed max-w-3xl">
+          CORTHEX v2 is a pioneering <span class="text-brand-text-main font-semibold">AI Organizational Operating System</span>. 
+          Designed for the future of work, it harmonizes human creativity with artificial intelligence through a calm, organic, and highly efficient interface.
+        </p>
+<div class="mt-8 p-6 bg-brand-olive/5 border-l-4 border-brand-olive rounded-r-twelve">
+<p class="italic text-brand-text-main">"Our mission is to organize the world's workflow through intuitive, bio-mimetic design."</p>
+</div>
+</section>
+<!-- END: Brand Vision Section -->
+<!-- BEGIN: Color Palette Section -->
+<section class="style-guide-section" id="colors">
+<h2 class="text-3xl font-bold mb-10">Color Palette</h2>
+<!-- Primary Colors -->
+<div class="mb-12">
+<h3 class="text-sm font-bold uppercase tracking-widest text-brand-text-light mb-6">Primary (Olive)</h3>
+<div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+<div>
+<div class="color-swatch bg-[#5a7247]"></div>
+<p class="text-xs font-mono">#5A7247</p>
+<p class="text-[10px] text-brand-text-muted">Olive Base</p>
+</div>
+<div>
+<div class="color-swatch bg-[#61864b]"></div>
+<p class="text-xs font-mono">#61864B</p>
+<p class="text-[10px] text-brand-text-muted">Olive 600</p>
+</div>
+<div>
+<div class="color-swatch bg-[#7fa368]"></div>
+<p class="text-xs font-mono">#7FA368</p>
+<p class="text-[10px] text-brand-text-muted">Olive 400</p>
+</div>
+<div>
+<div class="color-swatch bg-[#a3c28f]"></div>
+<p class="text-xs font-mono">#A3C28F</p>
+<p class="text-[10px] text-brand-text-muted">Olive 200</p>
+</div>
+<div>
+<div class="color-swatch bg-[#c6dab8]"></div>
+<p class="text-xs font-mono">#C6DAB8</p>
+<p class="text-[10px] text-brand-text-muted">Olive 100</p>
+</div>
+</div>
+</div>
+<div class="grid md:grid-cols-2 gap-12">
+<!-- Secondary & Accent -->
+<div>
+<h3 class="text-sm font-bold uppercase tracking-widest text-brand-text-light mb-6">Secondary &amp; Accent</h3>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<div class="color-swatch bg-[#c4622d]"></div>
+<p class="text-xs font-mono">#C4622D</p>
+<p class="text-[10px] text-brand-text-muted">Terracotta</p>
+</div>
+<div>
+<div class="color-swatch bg-[#faebe4]"></div>
+<p class="text-xs font-mono">#FAEBE4</p>
+<p class="text-[10px] text-brand-text-muted">Terra Light</p>
+</div>
+<div>
+<div class="color-swatch bg-[#d4a843]"></div>
+<p class="text-xs font-mono">#D4A843</p>
+<p class="text-[10px] text-brand-text-muted">Mustard</p>
+</div>
+<div>
+<div class="color-swatch bg-[#fbf4e4]"></div>
+<p class="text-xs font-mono">#FBF4E4</p>
+<p class="text-[10px] text-brand-text-muted">Mustard Light</p>
+</div>
+</div>
+</div>
+<!-- Neutrals -->
+<div>
+<h3 class="text-sm font-bold uppercase tracking-widest text-brand-text-light mb-6">Neutral &amp; Text</h3>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<div class="color-swatch bg-[#2d2c2a]"></div>
+<p class="text-xs font-mono">#2D2C2A</p>
+<p class="text-[10px] text-brand-text-muted">Main Text</p>
+</div>
+<div>
+<div class="color-swatch bg-[#73706c]"></div>
+<p class="text-xs font-mono">#73706C</p>
+<p class="text-[10px] text-brand-text-muted">Muted</p>
+</div>
+<div>
+<div class="color-swatch bg-[#e5e0d8]"></div>
+<p class="text-xs font-mono">#E5E0D8</p>
+<p class="text-[10px] text-brand-text-muted">Border</p>
+</div>
+<div>
+<div class="color-swatch bg-[#faf8f5]"></div>
+<p class="text-xs font-mono">#FAF8F5</p>
+<p class="text-[10px] text-brand-text-muted">Background</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- END: Color Palette Section -->
+<!-- BEGIN: Typography Section -->
+<section class="style-guide-section" id="typography">
+<h2 class="text-3xl font-bold mb-10">Typography</h2>
+<div class="space-y-12">
+<!-- Headings -->
+<div data-purpose="typography-spec">
+<h3 class="text-sm font-bold uppercase tracking-widest text-brand-text-light mb-6">Heading (Noto Serif KR)</h3>
+<div class="space-y-4">
+<h1 class="text-5xl font-bold">Heading 1 - 48px</h1>
+<h2 class="text-4xl font-semibold">Heading 2 - 36px</h2>
+<h3 class="text-3xl font-medium">Heading 3 - 30px</h3>
+<h4 class="text-2xl font-normal">Heading 4 - 24px</h4>
+</div>
+</div>
+<!-- Body -->
+<div>
+<h3 class="text-sm font-bold uppercase tracking-widest text-brand-text-light mb-6">Body (Pretendard / Manrope)</h3>
+<div class="space-y-6 max-w-2xl">
+<p class="text-lg font-semibold">Body Large - 18px. The quick brown fox jumps over the lazy dog.</p>
+<p class="text-base font-normal leading-relaxed">Body Regular - 16px. Efficient organizational structures require clear communication and intuitive design systems. CORTHEX v2 leverages these principles to deliver a seamless user experience.</p>
+<p class="text-sm text-brand-text-muted font-medium">Body Small - 14px. Used for descriptions, labels, and secondary information.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- END: Typography Section -->
+<!-- BEGIN: UI Components Showcase Section -->
+<section class="style-guide-section" id="components">
+<h2 class="text-3xl font-bold mb-10">UI Components</h2>
+<!-- Buttons -->
+<div class="mb-16">
+<h3 class="text-sm font-bold uppercase tracking-widest text-brand-text-light mb-6">Buttons</h3>
+<div class="flex flex-wrap gap-4 items-center">
+<button class="px-6 py-2.5 bg-brand-olive text-white rounded-twelve font-medium hover:bg-brand-olive-600 transition-all shadow-sm">
+              Primary Button
+            </button>
+<button class="px-6 py-2.5 bg-brand-terracotta text-white rounded-twelve font-medium hover:opacity-90 transition-all shadow-sm">
+              Secondary
+            </button>
+<button class="px-6 py-2.5 border-2 border-brand-olive text-brand-olive rounded-twelve font-medium hover:bg-brand-olive/5 transition-all">
+              Outline Button
+            </button>
+<button class="px-6 py-2.5 text-brand-text-muted rounded-twelve font-medium hover:bg-brand-bgAlt transition-all">
+              Ghost Button
+            </button>
+</div>
+</div>
+<!-- Cards & Badges -->
+<div class="grid md:grid-cols-2 gap-12 mb-16">
+<div>
+<h3 class="text-sm font-bold uppercase tracking-widest text-brand-text-light mb-6">Standard Card</h3>
+<div class="bg-white border border-brand-cardBorder rounded-twelve p-6 shadow-soft" data-purpose="sample-card">
+<div class="flex justify-between items-start mb-4">
+<h4 class="text-xl font-bold">Project Alpha</h4>
+<span class="px-2.5 py-0.5 bg-brand-mustard-light text-brand-mustard text-xs font-bold rounded-full">TIER 1</span>
+</div>
+<p class="text-sm text-brand-text-muted mb-6">A central hub for managing AI-driven data pipelines and internal organization workflows.</p>
+<div class="flex items-center gap-4 text-xs font-medium">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-green-500"></span> Online
+                </div>
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-brand-terracotta"></span> Working
+                </div>
+</div>
+</div>
+</div>
+<div>
+<h3 class="text-sm font-bold uppercase tracking-widest text-brand-text-light mb-6">Status Dots &amp; Badges</h3>
+<div class="space-y-6">
+<div class="flex flex-wrap gap-3">
+<span class="px-3 py-1 bg-brand-olive/10 text-brand-olive text-xs font-bold rounded-twelve border border-brand-olive/20">Active Status</span>
+<span class="px-3 py-1 bg-brand-terracotta-light text-brand-terracotta text-xs font-bold rounded-twelve">Critical Alert</span>
+<span class="px-3 py-1 bg-brand-bgAlt text-brand-text-muted text-xs font-bold rounded-twelve">Archived</span>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex items-center gap-3 p-3 rounded-twelve border border-brand-border">
+<span class="w-3 h-3 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]"></span>
+<span class="text-sm font-medium">System Online</span>
+</div>
+<div class="flex items-center gap-3 p-3 rounded-twelve border border-brand-border">
+<span class="w-3 h-3 rounded-full bg-brand-mustard shadow-[0_0_8px_rgba(212,168,67,0.4)]"></span>
+<span class="text-sm font-medium">Maintenance</span>
+</div>
+<div class="flex items-center gap-3 p-3 rounded-twelve border border-brand-border">
+<span class="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.4)]"></span>
+<span class="text-sm font-medium">Error Logged</span>
+</div>
+<div class="flex items-center gap-3 p-3 rounded-twelve border border-brand-border">
+<span class="w-3 h-3 rounded-full bg-brand-text-light"></span>
+<span class="text-sm font-medium">System Offline</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Form Elements -->
+<div class="mb-16">
+<h3 class="text-sm font-bold uppercase tracking-widest text-brand-text-light mb-6">Form Elements</h3>
+<div class="grid md:grid-cols-2 gap-8">
+<div class="space-y-4">
+<label class="block">
+<span class="text-sm font-semibold text-brand-text-main">Input Field</span>
+<input class="mt-1 block w-full rounded-twelve border-brand-border shadow-sm focus:border-brand-olive focus:ring focus:ring-brand-olive/20 focus:ring-opacity-50" placeholder="Enter value..." type="text"/>
+</label>
+<label class="block">
+<span class="text-sm font-semibold text-brand-text-main">Select Menu</span>
+<select class="mt-1 block w-full rounded-twelve border-brand-border shadow-sm focus:border-brand-olive focus:ring focus:ring-brand-olive/20 focus:ring-opacity-50">
+<option>Select an option</option>
+<option>Machine Learning</option>
+<option>Data Analytics</option>
+</select>
+</label>
+</div>
+<div class="flex flex-col gap-6 pt-6">
+<label class="inline-flex items-center cursor-pointer">
+<input checked="" class="rounded w-5 h-5 border-brand-border text-brand-olive focus:ring-brand-olive/20" type="checkbox"/>
+<span class="ml-3 text-sm font-medium">Enable AI Optimization</span>
+</label>
+<div class="flex items-center">
+<div class="relative inline-block w-10 mr-3 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer checked:right-0 right-4 border-brand-border checked:border-brand-olive" id="toggle" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-brand-bgAlt cursor-pointer border border-brand-border" for="toggle"></label>
+</div>
+<span class="text-sm font-medium">Dark Mode Sync</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- END: UI Components Showcase Section -->
+<!-- BEGIN: Layout Grid Section -->
+<section class="style-guide-section border-b-0" id="layout">
+<h2 class="text-3xl font-bold mb-10">Layout Grid</h2>
+<div class="bg-brand-bgAlt rounded-twelve p-8 border border-brand-border" data-purpose="layout-demo">
+<div class="flex h-64 border-2 border-dashed border-brand-text-light/30 rounded-lg overflow-hidden">
+<div class="w-32 bg-brand-border/40 flex items-center justify-center text-[10px] font-bold uppercase rotate-180 [writing-mode:vertical-lr]">Sidebar (256px)</div>
+<div class="flex-1 flex flex-col">
+<div class="h-10 bg-brand-border/20 border-b border-dashed border-brand-text-light/30 flex items-center px-4 text-[10px] font-bold uppercase">Header / Breadcrumbs</div>
+<div class="flex-1 p-6 grid grid-cols-3 gap-4">
+<div class="bg-white/50 rounded-lg border border-dashed border-brand-text-light/30"></div>
+<div class="bg-white/50 rounded-lg border border-dashed border-brand-text-light/30"></div>
+<div class="bg-white/50 rounded-lg border border-dashed border-brand-text-light/30"></div>
+</div>
+</div>
+</div>
+<p class="mt-4 text-sm text-brand-text-muted text-center italic">Responsive 12-column grid layout with fixed sidebar desktop navigation.</p>
+</div>
+</section>
+<!-- END: Layout Grid Section -->
+<!-- BEGIN: Footer -->
+<footer class="mt-20 pt-10 border-t border-brand-border flex justify-between items-center text-brand-text-light text-xs font-medium">
+<p>© 2024 CORTHEX v2 Design Systems</p>
+<p>Built with Tailwind CSS v3 &amp; Noto Serif KR</p>
+</footer>
+<!-- END: Footer -->
+</main>
+<!-- END: Main Content Area -->
+</div>
+<!-- END: Main Layout Wrapper -->
+<style data-purpose="custom-elements">
+    /* Custom toggle switch style for Tailwind checkbox */
+    .toggle-checkbox:checked {
+      right: 0;
+      border-color: #5a7247;
+    }
+    .toggle-checkbox:checked + .toggle-label {
+      background-color: #c6dab8;
+    }
+    .toggle-checkbox {
+      transition: all 0.3s ease;
+    }
+
+    /* Scroll smoothing */
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</body></html>

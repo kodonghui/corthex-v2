@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Public Sans', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen transition-colors duration-200">
+<div class="layout-container flex h-full grow flex-col max-w-6xl mx-auto px-4 sm:px-10">
+<!-- Top Nav Bar Component -->
+<header class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 py-6 mb-8">
+<div class="flex items-center gap-4">
+<div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">settings</span>
+</div>
+<div>
+<h2 class="text-xl font-bold leading-tight tracking-tight">설정 (Settings)</h2>
+<p class="text-slate-500 dark:text-slate-400 text-xs">CORTHEX v2 Workspace</p>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center justify-center rounded-xl h-10 w-10 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-300">notifications</span>
+</button>
+<button class="flex items-center justify-center rounded-xl h-10 w-10 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-300">help</span>
+</button>
+</div>
+</header>
+<div class="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-10">
+<!-- Sidebar Navigation -->
+<aside class="flex flex-col gap-2">
+<div class="mb-4 px-3">
+<h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Workspace</h3>
+</div>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary text-white font-medium shadow-sm shadow-primary/20" href="#">
+<span class="material-symbols-outlined">person</span>
+<span>사용자 프로필</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">notifications_active</span>
+<span>알림 설정</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">dns</span>
+<span>MCP 서버 구성</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">palette</span>
+<span>테마 설정</span>
+</a>
+<div class="mt-8 pt-8 border-t border-slate-200 dark:border-slate-800">
+<button class="flex items-center gap-3 px-4 py-3 w-full text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-xl transition-colors text-left">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-medium">로그아웃</span>
+</button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex flex-col gap-10 pb-20">
+<!-- Section: User Profile -->
+<section id="user-profile">
+<div class="mb-6">
+<h2 class="text-2xl font-bold tracking-tight">사용자 프로필</h2>
+<p class="text-slate-500 dark:text-slate-400">워크스페이스에 표시될 정보를 관리하세요.</p>
+</div>
+<div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
+<div class="flex flex-col sm:flex-row items-center gap-6 mb-8 pb-8 border-b border-slate-100 dark:border-slate-800">
+<div class="relative group">
+<div class="w-24 h-24 rounded-full bg-slate-200 dark:bg-slate-700 bg-cover bg-center overflow-hidden border-4 border-white dark:border-slate-800 shadow-sm" data-alt="Professional user portrait with a soft background" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDGvLYzGXlFGG6FW9-hXuU44JTdTTk83MEy2izVWe2KuvZ12OspxuLNu40bydsxkaHCG9_H33mdEcy2ALVkKR1fJqe93D_YzFD-2g97bR0n_aiohhtRTEG7E5AwWo7INA3J0wSVgM7HEU0NQRHRoolwbHk35aoX00YnY0o32Rc616cqMpjvSp2G6f8k6HnK192HqD24cfj7Nfd0QdPO7StVUMoR4b2uKj-HMadmfHL6tjw0EJ-wfr2o7baF3m_Pq-uYArRLtLgpjmQ')"></div>
+<button class="absolute bottom-0 right-0 p-1.5 bg-primary text-white rounded-full shadow-lg border-2 border-white dark:border-slate-900">
+<span class="material-symbols-outlined text-sm">edit</span>
+</button>
+</div>
+<div class="text-center sm:text-left">
+<h4 class="text-lg font-bold">Alex Johnson</h4>
+<p class="text-slate-500 dark:text-slate-400 text-sm mb-3">alex.johnson@corthex.ai</p>
+<button class="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-lg hover:bg-slate-200 transition-colors">이미지 업로드</button>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">표시 이름 (Display Name)</label>
+<input class="form-input rounded-xl bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus:ring-primary focus:border-primary px-4 py-3" type="text" value="Alex Johnson"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">직책 (Title)</label>
+<input class="form-input rounded-xl bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus:ring-primary focus:border-primary px-4 py-3" type="text" value="Software Architect"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Notification Preferences -->
+<section id="notifications">
+<div class="mb-6">
+<h2 class="text-2xl font-bold tracking-tight">알림 기본 설정</h2>
+<p class="text-slate-500 dark:text-slate-400">시스템 메시지 및 업데이트 알림을 구성합니다.</p>
+</div>
+<div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800">
+<div class="p-6 flex items-center justify-between">
+<div>
+<h4 class="font-semibold">이메일 알림</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400">주요 업데이트 및 리포트를 이메일로 수신합니다.</p>
+</div>
+<div class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary transition-colors duration-200 ease-in-out">
+<span class="translate-x-5 inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+</div>
+</div>
+<div class="p-6 flex items-center justify-between">
+<div>
+<h4 class="font-semibold">브라우저 푸시 알림</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400">워크스페이스 활동에 대한 즉각적인 알림을 받습니다.</p>
+</div>
+<div class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-slate-200 dark:bg-slate-700 transition-colors duration-200 ease-in-out">
+<span class="translate-x-0 inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: MCP Server Configuration -->
+<section id="mcp-config">
+<div class="mb-6">
+<h2 class="text-2xl font-bold tracking-tight">MCP 서버 구성</h2>
+<p class="text-slate-500 dark:text-slate-400">Model Context Protocol 서버 연결 설정을 관리합니다.</p>
+</div>
+<div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
+<div class="space-y-4">
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">서버 엔드포인트 URL</label>
+<div class="flex gap-2">
+<input class="form-input flex-1 rounded-xl bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus:ring-primary focus:border-primary px-4 py-3" type="text" value="https://mcp-server-primary.corthex.ai/v2"/>
+<button class="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold rounded-xl hover:bg-slate-200 transition-colors">연결 확인</button>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">API 키 (Optional)</label>
+<input class="form-input rounded-xl bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus:ring-primary focus:border-primary px-4 py-3" placeholder="••••••••••••••••" type="password"/>
+</div>
+<div class="pt-4 flex items-center gap-2 text-emerald-500 text-sm">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+<span>서버가 온라인 상태이며 정상적으로 작동 중입니다.</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Theme Toggle -->
+<section id="theme-settings">
+<div class="mb-6">
+<h2 class="text-2xl font-bold tracking-tight">테마 설정</h2>
+<p class="text-slate-500 dark:text-slate-400">워크스페이스의 시각적 스타일을 변경합니다.</p>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+<button class="p-4 rounded-xl border-2 border-primary bg-white dark:bg-slate-900 flex flex-col items-center gap-3 transition-all ring-4 ring-primary/10">
+<div class="w-full h-20 bg-slate-50 rounded-lg flex flex-col gap-2 p-2">
+<div class="w-1/2 h-2 bg-slate-200 rounded"></div>
+<div class="w-full h-8 bg-white border border-slate-200 rounded"></div>
+<div class="w-3/4 h-2 bg-slate-200 rounded"></div>
+</div>
+<span class="font-bold text-sm">라이트 모드</span>
+</button>
+<button class="p-4 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col items-center gap-3 hover:border-slate-300 transition-all">
+<div class="w-full h-20 bg-slate-900 rounded-lg flex flex-col gap-2 p-2">
+<div class="w-1/2 h-2 bg-slate-700 rounded"></div>
+<div class="w-full h-8 bg-slate-800 border border-slate-700 rounded"></div>
+<div class="w-3/4 h-2 bg-slate-700 rounded"></div>
+</div>
+<span class="font-bold text-sm text-slate-500 dark:text-slate-400">다크 모드</span>
+</button>
+<button class="p-4 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col items-center gap-3 hover:border-slate-300 transition-all">
+<div class="w-full h-20 bg-gradient-to-br from-slate-50 to-slate-900 rounded-lg flex flex-col gap-2 p-2">
+<div class="w-1/2 h-2 bg-slate-400 rounded"></div>
+<div class="w-full h-8 bg-slate-200/20 backdrop-blur-sm border border-white/20 rounded"></div>
+</div>
+<span class="font-bold text-sm text-slate-500 dark:text-slate-400">시스템 연동</span>
+</button>
+</div>
+</section>
+<!-- Action Buttons -->
+<div class="pt-10 flex items-center justify-end gap-4 border-t border-slate-200 dark:border-slate-800">
+<button class="px-6 py-3 text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">취소</button>
+<button class="px-8 py-3 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/30 hover:bg-primary/90 transform hover:-translate-y-0.5 transition-all">설정 저장</button>
+</div>
+</main>
+</div>
+</div>
+</body></html>

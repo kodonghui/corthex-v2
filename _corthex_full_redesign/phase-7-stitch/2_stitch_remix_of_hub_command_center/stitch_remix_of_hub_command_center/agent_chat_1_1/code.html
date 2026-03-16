@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 | Agent Chat</title>
+<!-- Tailwind CSS with Forms and Container Queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Phosphor Icons -->
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<!-- Tailwind Configuration for Warm Minimal Theme -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            warm: {
+              50: '#fafaf9',
+              100: '#f5f5f4',
+              200: '#e7e5e4',
+              300: '#d6d3d1',
+              400: '#a8a29e',
+              500: '#78716c',
+              600: '#57534e',
+              700: '#44403c',
+              800: '#292524',
+              900: '#1c1917',
+            },
+            accent: {
+              orange: '#f97316',
+              amber: '#d97706',
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-typography">
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    code, pre { font-family: 'JetBrains Mono', monospace; }
+    .markdown-content p { margin-bottom: 1rem; line-height: 1.6; }
+    .markdown-content p:last-child { margin-bottom: 0; }
+  </style>
+<!-- 
+    API Endpoints Reference:
+    - GET /api/workspace/chat/sessions : Fetch list of recent chat sessions
+    - POST /api/workspace/chat/sessions : Create a new chat session
+    - GET /api/workspace/chat/sessions/:id/messages : Retrieve message history for a session
+  -->
+</head>
+<body class="bg-warm-50 text-warm-900 h-screen flex overflow-hidden">
+<!-- BEGIN: Main Sidebar -->
+<aside class="w-64 bg-warm-100 border-r border-warm-200 flex flex-col h-full z-20" data-purpose="app-navigation">
+<div class="p-4 border-b border-warm-200 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-warm-900 rounded flex items-center justify-center text-white">
+<i class="ph-bold ph-cube text-lg"></i>
+</div>
+<span class="font-bold text-lg tracking-tight">CORTHEX</span>
+</div>
+<span class="text-[10px] font-bold px-1.5 py-0.5 bg-warm-200 rounded uppercase tracking-widest">v2</span>
+</div>
+<nav class="flex-1 overflow-y-auto p-3 space-y-1">
+<button class="w-full flex items-center gap-3 px-3 py-2 rounded-lg bg-warm-200/50 text-warm-900 font-medium transition-colors">
+<i class="ph ph-chat-circle-dots text-xl"></i>
+<span>Chat</span>
+</button>
+<button class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-warm-600 hover:bg-warm-200/40 transition-colors">
+<i class="ph ph-database text-xl"></i>
+<span>Knowledge Base</span>
+</button>
+<button class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-warm-600 hover:bg-warm-200/40 transition-colors">
+<i class="ph ph-lightning text-xl"></i>
+<span>Workflows</span>
+</button>
+<button class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-warm-600 hover:bg-warm-200/40 transition-colors">
+<i class="ph ph-gear-six text-xl"></i>
+<span>Settings</span>
+</button>
+</nav>
+<div class="p-4 border-t border-warm-200">
+<div class="flex items-center gap-3 px-2 py-1">
+<div class="w-8 h-8 rounded-full bg-accent-orange/20 flex items-center justify-center text-accent-orange">
+<i class="ph-bold ph-user"></i>
+</div>
+<div class="flex flex-col">
+<span class="text-xs font-semibold">Workspace Admin</span>
+<span class="text-[10px] text-warm-500 uppercase tracking-wider">Free Plan</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- END: Main Sidebar -->
+<!-- BEGIN: Chat Session List Panel -->
+<section class="w-80 bg-warm-50 border-r border-warm-200 flex flex-col h-full" data-purpose="session-management">
+<div class="p-4 border-b border-warm-200 flex items-center justify-between">
+<h2 class="font-semibold text-sm uppercase tracking-wider text-warm-500">History</h2>
+<button class="p-1.5 rounded-md hover:bg-warm-200 transition-colors" title="New Chat">
+<i class="ph-bold ph-plus text-sm"></i>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-2 space-y-1">
+<!-- Active Session -->
+<div class="p-3 bg-white border border-warm-200 rounded-xl shadow-sm cursor-pointer group">
+<div class="flex justify-between items-start mb-1">
+<span class="text-xs font-medium text-warm-400">2 mins ago</span>
+<i class="ph ph-dots-three text-warm-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+</div>
+<p class="text-sm font-semibold text-warm-800 line-clamp-1">Q4 Performance Analysis</p>
+<p class="text-xs text-warm-500 line-clamp-1 mt-1">Based on the recent data, the trend...</p>
+</div>
+<!-- Inactive Session -->
+<div class="p-3 hover:bg-warm-100 rounded-xl cursor-pointer transition-colors group">
+<div class="flex justify-between items-start mb-1">
+<span class="text-xs font-medium text-warm-400">3 hours ago</span>
+<i class="ph ph-dots-three text-warm-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+</div>
+<p class="text-sm font-medium text-warm-700 line-clamp-1">Market Research for SaaS</p>
+<p class="text-xs text-warm-400 line-clamp-1 mt-1">I've compiled the latest competitors...</p>
+</div>
+<!-- Inactive Session -->
+<div class="p-3 hover:bg-warm-100 rounded-xl cursor-pointer transition-colors group">
+<div class="flex justify-between items-start mb-1">
+<span class="text-xs font-medium text-warm-400">Yesterday</span>
+<i class="ph ph-dots-three text-warm-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+</div>
+<p class="text-sm font-medium text-warm-700 line-clamp-1">Product Roadmap Brainstorm</p>
+</div>
+</div>
+</section>
+<!-- END: Chat Session List Panel -->
+<!-- BEGIN: Main Chat Area -->
+<main class="flex-1 flex flex-col bg-white relative" data-purpose="chat-interface">
+<!-- Header -->
+<header class="h-16 border-b border-warm-200 px-6 flex items-center justify-between bg-white/80 backdrop-blur-md z-10 sticky top-0">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" title="Agent Online"></div>
+<h1 class="font-bold text-warm-900">Intelligence Agent</h1>
+</div>
+<div class="h-4 w-px bg-warm-200"></div>
+<div class="flex items-center gap-1.5 px-2 py-0.5 bg-accent-amber/10 text-accent-amber rounded-full">
+<i class="ph-bold ph-sparkle text-xs"></i>
+<span class="text-[10px] font-bold uppercase tracking-wider">autoLearn</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 text-warm-500 hover:text-warm-800 transition-colors"><i class="ph-bold ph-export text-xl"></i></button>
+<button class="p-2 text-warm-500 hover:text-warm-800 transition-colors"><i class="ph-bold ph-trash text-xl"></i></button>
+</div>
+</header>
+<!-- Chat Message Container -->
+<div class="flex-1 overflow-y-auto px-6 py-8" id="chat-scroller">
+<div class="max-w-3xl mx-auto space-y-8">
+<!-- BEGIN: User Message -->
+<div class="flex flex-col items-end gap-2" data-purpose="user-message">
+<div class="bg-warm-900 text-white px-4 py-3 rounded-2xl rounded-tr-none shadow-sm max-w-[85%]">
+<p class="text-[15px]">Can you analyze the attached CSV for Q4 revenue trends and compare it with our previous search data? Also, generate a brief summary for the board.</p>
+</div>
+<div class="flex items-center gap-3">
+<!-- File Attachment Chip -->
+<div class="flex items-center gap-2 bg-warm-100 border border-warm-200 px-3 py-1.5 rounded-lg text-xs font-medium">
+<i class="ph ph-file-csv text-emerald-600 text-base"></i>
+<span>q4_revenue_raw.csv</span>
+<span class="text-warm-400">1.2 MB</span>
+</div>
+</div>
+</div>
+<!-- END: User Message -->
+<!-- BEGIN: Tool Call - Search -->
+<div class="max-w-[85%] space-y-3" data-purpose="tool-execution">
+<div class="flex items-center gap-2 text-xs font-semibold text-warm-400 uppercase tracking-widest px-1">
+<i class="ph-bold ph-gear-six animate-spin"></i>
+<span>System Process</span>
+</div>
+<div class="bg-warm-50 border border-warm-200 rounded-xl p-4 flex items-center justify-between group">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
+<i class="ph-bold ph-magnifying-glass text-xl"></i>
+</div>
+<div>
+<p class="text-sm font-bold text-warm-800">Search Execution</p>
+<p class="text-xs text-warm-500">Querying: "Q3 2023 financial benchmark SaaS"</p>
+</div>
+</div>
+<div class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded">Completed</div>
+</div>
+</div>
+<!-- END: Tool Call - Search -->
+<!-- BEGIN: Agent Message -->
+<div class="flex gap-4" data-purpose="agent-message">
+<div class="w-8 h-8 rounded-lg bg-warm-900 flex-shrink-0 flex items-center justify-center text-white mt-1">
+<i class="ph-bold ph-robot"></i>
+</div>
+<div class="flex-1 space-y-4 max-w-[85%]">
+<div class="markdown-content text-warm-800 leading-relaxed text-[15px]">
+<p>I have processed the revenue data for Q4. The trends show a significant 14% increase in MRR (Monthly Recurring Revenue) compared to Q3, primarily driven by enterprise upgrades.</p>
+<p>Here is a breakdown of the core metrics:</p>
+<div class="bg-warm-50 border border-warm-200 rounded-xl p-4 my-4 overflow-x-auto" data-purpose="analysis-result">
+<table class="w-full text-sm text-left">
+<thead class="text-warm-500 border-b border-warm-200">
+<tr>
+<th class="pb-2 font-semibold">Metric</th>
+<th class="pb-2 font-semibold text-right">Q3</th>
+<th class="pb-2 font-semibold text-right">Q4</th>
+<th class="pb-2 font-semibold text-right text-emerald-600">Growth</th>
+</tr>
+</thead>
+<tbody class="text-warm-800">
+<tr>
+<td class="py-2">Net New MRR</td>
+<td class="py-2 text-right">$45,200</td>
+<td class="py-2 text-right">$52,100</td>
+<td class="py-2 text-right text-emerald-600">+15.2%</td>
+</tr>
+<tr>
+<td class="py-2">Churn Rate</td>
+<td class="py-2 text-right">2.1%</td>
+<td class="py-2 text-right">1.8%</td>
+<td class="py-2 text-right text-emerald-600">-0.3%</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>To implement the board summary, you can use the following structure in your reporting tool:</p>
+<!-- BEGIN: Code Block -->
+<div class="rounded-xl overflow-hidden bg-warm-900 text-warm-100 my-4 shadow-lg" data-purpose="code-snippet">
+<div class="flex items-center justify-between px-4 py-2 bg-warm-800/50 border-b border-warm-700">
+<span class="text-[10px] font-mono uppercase tracking-widest text-warm-400">javascript</span>
+<button class="flex items-center gap-1.5 text-[10px] font-bold hover:text-white transition-colors">
+<i class="ph ph-copy"></i> Copy
+                  </button>
+</div>
+<pre class="p-4 overflow-x-auto text-sm leading-relaxed"><code>const report = {
+  quarter: "Q4 2023",
+  status: "Exceeded Targets",
+  highlights: [
+    "14% MRR Growth",
+    "Customer retention up by 0.3%",
+    "Enterprise segment leads expansion"
+  ]
+};
+
+console.log(`Report Generated: ${report.status}`);</code></pre>
+</div>
+<!-- END: Code Block -->
+<p>Would you like me to dive deeper into the churn metrics or prepare the final presentation slides?</p>
+</div>
+<div class="flex items-center gap-4 text-warm-400">
+<button class="hover:text-warm-600 transition-colors"><i class="ph ph-thumbs-up"></i></button>
+<button class="hover:text-warm-600 transition-colors"><i class="ph ph-thumbs-down"></i></button>
+<button class="hover:text-warm-600 transition-colors"><i class="ph ph-arrow-counter-clockwise"></i></button>
+</div>
+</div>
+</div>
+<!-- END: Agent Message -->
+</div>
+</div>
+<!-- BEGIN: Input Area -->
+<div class="p-6 pt-0 bg-white" data-purpose="chat-input-container">
+<div class="max-w-3xl mx-auto relative group">
+<!-- Input Backdrop with Shadow Focus -->
+<div class="absolute -inset-1 bg-gradient-to-r from-warm-200 to-warm-100 rounded-2xl blur opacity-25 group-focus-within:opacity-75 transition duration-500"></div>
+<div class="relative bg-white border border-warm-200 rounded-2xl shadow-xl overflow-hidden focus-within:border-warm-400 transition-all">
+<textarea class="w-full bg-transparent border-none focus:ring-0 p-4 pb-12 resize-none text-[15px] placeholder-warm-400" placeholder="Type your instruction to Corthex..." rows="3"></textarea>
+<div class="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+<div class="flex items-center gap-1">
+<button class="p-2 text-warm-400 hover:text-warm-600 hover:bg-warm-100 rounded-lg transition-all" title="Attach file">
+<i class="ph-bold ph-paperclip text-lg"></i>
+</button>
+<button class="p-2 text-warm-400 hover:text-warm-600 hover:bg-warm-100 rounded-lg transition-all" title="Voice input">
+<i class="ph-bold ph-microphone text-lg"></i>
+</button>
+<button class="p-2 text-warm-400 hover:text-warm-600 hover:bg-warm-100 rounded-lg transition-all" title="Select Tool">
+<i class="ph-bold ph-browsers text-lg"></i>
+</button>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-medium text-warm-400 hidden sm:inline">Press ⌘ + Enter to send</span>
+<button class="bg-warm-900 text-white w-10 h-10 rounded-xl flex items-center justify-center hover:bg-black transition-all shadow-md active:scale-95">
+<i class="ph-bold ph-paper-plane-right text-lg"></i>
+</button>
+</div>
+</div>
+</div>
+</div>
+<p class="text-center text-[10px] text-warm-400 mt-4 uppercase tracking-[0.2em] font-medium">Powered by Corthex Intelligence v2.0.4-stable</p>
+</div>
+<!-- END: Input Area -->
+</main>
+<!-- END: Main Chat Area -->
+<script data-purpose="chat-scroll-logic">
+    // Auto-scroll to bottom of chat on load
+    const scroller = document.getElementById('chat-scroller');
+    scroller.scrollTop = scroller.scrollHeight;
+
+    // Simple placeholder for text area height adjustment
+    const tx = document.getElementsByTagName("textarea");
+    for (let i = 0; i < tx.length; i++) {
+      tx[i].setAttribute("style", "height:" + (tx[i].scrollHeight) + "px;overflow-y:hidden;");
+      tx[i].addEventListener("input", OnInput, false);
+    }
+
+    function OnInput() {
+      this.style.height = 0;
+      this.style.height = (this.scrollHeight) + "px";
+    }
+  </script>
+</body></html>

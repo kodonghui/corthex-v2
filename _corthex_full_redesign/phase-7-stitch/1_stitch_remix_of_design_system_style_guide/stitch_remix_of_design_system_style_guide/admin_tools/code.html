@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 - 도구 정의 관리</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;900&amp;family=Noto+Serif+KR:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#5a7247",
+                        "secondary": "#c4622d",
+                        "accent": "#d4a843",
+                        "background-light": "#faf8f5",
+                        "background-dark": "#221610",
+                        "surface": "#ffffff",
+                        "neutral-text": "#3f3e3a"
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"],
+                        "serif": ["Noto Serif KR", "serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: "Public Sans", sans-serif;
+            background-color: #faf8f5;
+            color: #3f3e3a;
+        }
+        h1, h2, h3, .serif-font {
+            font-family: "Noto Serif KR", serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-neutral-text dark:text-slate-100">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-64 bg-white dark:bg-zinc-900 border-r border-slate-200 dark:border-zinc-800 flex flex-col shrink-0">
+<div class="p-6 flex items-center gap-3 border-b border-slate-100 dark:border-zinc-800">
+<div class="bg-primary rounded-lg p-1.5">
+<span class="material-symbols-outlined text-white">ecg_heart</span>
+</div>
+<div>
+<h1 class="text-lg font-bold leading-tight serif-font text-primary">CORTHEX v2</h1>
+<p class="text-xs text-slate-500 font-medium tracking-wide uppercase">Admin Console</p>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">dashboard</span>
+<span class="text-sm font-medium">대시보드</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">group</span>
+<span class="text-sm font-medium">사용자 관리</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">badge</span>
+<span class="text-sm font-medium">임직원 관리</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">account_tree</span>
+<span class="text-sm font-medium">부서 관리</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">smart_toy</span>
+<span class="text-sm font-medium">에이전트 관리</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">vpn_key</span>
+<span class="text-sm font-medium">인증 자격 관리</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-primary/10 text-primary rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">construction</span>
+<span class="text-sm font-bold">도구 정의 관리</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">payments</span>
+<span class="text-sm font-medium">비용 관리</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">monitoring</span>
+<span class="text-sm font-medium">보고 체계</span>
+</a>
+</nav>
+<div class="p-4 border-t border-slate-100 dark:border-zinc-800">
+<div class="flex items-center gap-3 p-2 bg-slate-50 dark:bg-zinc-800 rounded-xl">
+<img class="size-9 rounded-full object-cover" data-alt="User profile portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAp-17R1Wjd-YuA3PoLoj7pmSQ556I0xkMVdpDD2FVXtTOv6Y9NhcLB-nYEZhYfsdCIcVzZmBs8eXKGUuN05eCDeobdHEYc418MSfOoq8LFSsNE2dQQIjnEyOf5EqMBV24JpuLj_O4Fq-l-01thIQycXFQJtpINE5Fi9ySn_vNajnzL31CnglDMpNrUKcHfxnRRxTfieJeDJvAYWxbxVO9h8Ang0Q6V47YmmX9PQPvex9KD169-f2PLIafRSIExmrDtE6YOs2-6vpSm"/>
+<div class="overflow-hidden">
+<p class="text-xs font-bold truncate">관리자</p>
+<p class="text-[10px] text-slate-500 truncate">admin@corthex.com</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col overflow-hidden">
+<!-- Topbar -->
+<header class="h-16 bg-white dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between px-8 shrink-0">
+<div class="flex items-center gap-2 text-slate-400">
+<span class="material-symbols-outlined text-lg">home</span>
+<span class="text-xs">/</span>
+<span class="text-xs font-medium text-slate-600 dark:text-slate-300">Admin Tools</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-full transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<!-- Page Content -->
+<div class="flex-1 overflow-y-auto p-8">
+<!-- Header -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+<div>
+<h2 class="text-3xl font-bold serif-font text-slate-800 dark:text-white">도구 정의 관리</h2>
+<p class="text-slate-500 mt-1">플랫폼 내 에이전트가 사용하는 외부 도구 및 API 엔드포인트를 구성합니다.</p>
+</div>
+<button class="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-primary/20 transition-all">
+<span class="material-symbols-outlined">add</span>
+<span>새 도구 추가</span>
+</button>
+</div>
+<!-- Filters & Search -->
+<div class="bg-white dark:bg-zinc-900 p-4 rounded-xl border border-slate-200 dark:border-zinc-800 flex flex-wrap gap-4 items-center mb-6">
+<div class="flex-1 min-w-[240px]">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-zinc-800 border-none rounded-lg focus:ring-2 focus:ring-primary/20 text-sm" placeholder="도구명 또는 카테고리 검색..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<select class="bg-slate-50 dark:bg-zinc-800 border-none rounded-lg py-2 pl-3 pr-8 text-sm focus:ring-2 focus:ring-primary/20">
+<option>전체 카테고리</option>
+<option>search</option>
+<option>finance</option>
+<option>content</option>
+<option>utility</option>
+</select>
+<select class="bg-slate-50 dark:bg-zinc-800 border-none rounded-lg py-2 pl-3 pr-8 text-sm focus:ring-2 focus:ring-primary/20">
+<option>전체 범위</option>
+<option>platform</option>
+<option>company</option>
+<option>department</option>
+</select>
+<button class="p-2 bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 rounded-lg text-slate-600 transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+</div>
+<!-- Tools Table -->
+<div class="bg-white dark:bg-zinc-900 rounded-xl border border-slate-200 dark:border-zinc-800 overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 dark:bg-zinc-800/50 border-b border-slate-200 dark:border-zinc-800">
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">도구명</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">카테고리</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">범위</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">상태</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">관리</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-zinc-800">
+<!-- Row 1 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-zinc-800/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded bg-slate-100 dark:bg-zinc-800 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-xl">language</span>
+</div>
+<div>
+<p class="text-sm font-bold text-slate-800 dark:text-slate-100">Web Search</p>
+<p class="text-xs text-slate-400">Google Search API integration</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">search</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20">platform</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-1.5">
+<span class="size-2 rounded-full bg-emerald-500"></span>
+<span class="text-xs font-medium text-emerald-600">Active</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 hover:bg-slate-200 dark:hover:bg-zinc-700 rounded transition-colors text-slate-500">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors text-slate-400 hover:text-red-500">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-zinc-800/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded bg-slate-100 dark:bg-zinc-800 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-xl">trending_up</span>
+</div>
+<div>
+<p class="text-sm font-bold text-slate-800 dark:text-slate-100">KIS Trading API</p>
+<p class="text-xs text-slate-400">Stock market data and trading</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-accent/10 text-accent border border-accent/20">finance</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20">company</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-1.5">
+<span class="size-2 rounded-full bg-emerald-500"></span>
+<span class="text-xs font-medium text-emerald-600">Active</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 hover:bg-slate-200 dark:hover:bg-zinc-700 rounded transition-colors text-slate-500">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors text-slate-400 hover:text-red-500">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-zinc-800/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded bg-slate-100 dark:bg-zinc-800 flex items-center justify-center text-slate-600">
+<span class="material-symbols-outlined text-xl">sticky_note_2</span>
+</div>
+<div>
+<p class="text-sm font-bold text-slate-800 dark:text-slate-100">Notion Sync</p>
+<p class="text-xs text-slate-400">Knowledge base synchronization</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-slate-400">content</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">department</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-1.5">
+<span class="size-2 rounded-full bg-slate-300"></span>
+<span class="text-xs font-medium text-slate-400">Inactive</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 hover:bg-slate-200 dark:hover:bg-zinc-700 rounded transition-colors text-slate-500">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors text-slate-400 hover:text-red-500">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-zinc-800/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded bg-slate-100 dark:bg-zinc-800 flex items-center justify-center text-accent">
+<span class="material-symbols-outlined text-xl">mail</span>
+</div>
+<div>
+<p class="text-sm font-bold text-slate-800 dark:text-slate-100">Email Dispatcher</p>
+<p class="text-xs text-slate-400">Internal communication tool</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">utility</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20">company</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-1.5">
+<span class="size-2 rounded-full bg-emerald-500"></span>
+<span class="text-xs font-medium text-emerald-600">Active</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 hover:bg-slate-200 dark:hover:bg-zinc-700 rounded transition-colors text-slate-500">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors text-slate-400 hover:text-red-500">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-6 py-4 bg-slate-50 dark:bg-zinc-800/50 flex items-center justify-between">
+<p class="text-xs text-slate-500 font-medium">전체 24개 도구 중 1-4 표시</p>
+<div class="flex items-center gap-1">
+<button class="p-1 hover:bg-slate-200 dark:hover:bg-zinc-700 rounded transition-colors disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-7 h-7 flex items-center justify-center bg-primary text-white rounded-md text-xs font-bold">1</button>
+<button class="w-7 h-7 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-zinc-700 rounded-md text-xs font-medium">2</button>
+<button class="w-7 h-7 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-zinc-700 rounded-md text-xs font-medium">3</button>
+<button class="p-1 hover:bg-slate-200 dark:hover:bg-zinc-700 rounded transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- API Reference Placeholder -->
+<div class="mt-8 p-4 bg-primary/5 border border-primary/20 rounded-xl">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary text-sm">api</span>
+<h4 class="text-sm font-bold text-primary serif-font">API Endpoints Reference</h4>
+</div>
+<code class="text-[11px] font-mono text-primary/80">
+                        GET/POST/PATCH/DELETE /api/admin/tools
+                    </code>
+</div>
+</div>
+</main>
+</div>
+</body></html>

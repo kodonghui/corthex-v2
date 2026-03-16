@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                        "olive-drab": "#6b8e23",
+                        "organic-green": "#304724",
+                        "organic-light": "#a5c893"
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+        .canvas-grid {
+            background-image: radial-gradient(circle, #304724 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+        .node-pulse {
+            box-shadow: 0 0 0 0 rgba(107, 142, 35, 0.4);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(107, 142, 35, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(107, 142, 35, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(107, 142, 35, 0); }
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="relative flex h-screen w-full flex-col overflow-hidden">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between border-b border-organic-green/20 bg-background-light dark:bg-background-dark px-6 py-3 z-20">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-primary">
+<span class="material-symbols-outlined text-3xl">hub</span>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold tracking-tight">CORTHEX v2</h2>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="#">Workspaces</a>
+<a class="text-primary text-sm font-bold border-b-2 border-primary" href="#">Nexus Tracker</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden sm:flex items-center bg-slate-200/50 dark:bg-organic-green/20 rounded-xl px-3 py-1.5 border border-organic-green/10">
+<span class="material-symbols-outlined text-organic-light text-lg mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-40 placeholder:text-slate-400" placeholder="Search nodes..." type="text"/>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-sm">rocket_launch</span>
+                    Deploy to Production
+                </button>
+<div class="h-10 w-10 rounded-full bg-organic-green flex items-center justify-center text-white border-2 border-background-light dark:border-background-dark shadow-md" data-alt="User profile avatar circle">
+<span class="material-symbols-outlined">person</span>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-64 border-r border-organic-green/10 bg-white/50 dark:bg-background-dark/50 p-4 flex flex-col justify-between z-10">
+<div class="space-y-6">
+<div>
+<div class="flex items-center gap-3 mb-6 p-2">
+<div class="size-10 rounded-xl bg-organic-green flex items-center justify-center text-organic-light">
+<span class="material-symbols-outlined">account_tree</span>
+</div>
+<div>
+<h3 class="text-sm font-bold uppercase tracking-wider">Nexus</h3>
+<p class="text-xs text-organic-light font-mono">v2.4.0-organic</p>
+</div>
+</div>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-organic-green text-white shadow-md" href="#">
+<span class="material-symbols-outlined">visibility</span>
+<span class="text-sm font-medium">Visualizer</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-organic-green/10 transition-colors" href="#">
+<span class="material-symbols-outlined">list_alt</span>
+<span class="text-sm font-medium">Logs</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-organic-green/10 transition-colors" href="#">
+<span class="material-symbols-outlined">database</span>
+<span class="text-sm font-medium">Metadata</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-organic-green/10 transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</nav>
+</div>
+<div class="p-3 bg-primary/5 rounded-xl border border-primary/10">
+<p class="text-[10px] font-bold text-primary uppercase mb-2">Current Context</p>
+<p class="text-xs font-mono break-all text-slate-500">GET /api/workspace/chat/sessions/:id/delegations</p>
+</div>
+</div>
+<div class="flex items-center justify-around p-2 bg-slate-100 dark:bg-organic-green/20 rounded-xl">
+<button class="p-2 hover:text-primary transition-colors"><span class="material-symbols-outlined">magic_button</span></button>
+<button class="p-2 hover:text-primary transition-colors"><span class="material-symbols-outlined">photo_camera</span></button>
+<button class="p-2 hover:text-primary transition-colors"><span class="material-symbols-outlined">auto_fix</span></button>
+</div>
+</aside>
+<!-- Main Canvas Area -->
+<main class="flex-1 relative bg-slate-50 dark:bg-background-dark canvas-grid flex flex-col">
+<!-- Secondary Toolbar -->
+<div class="flex items-center justify-between px-6 py-3 border-b border-organic-green/10 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md z-10">
+<div class="flex items-center gap-2 text-sm">
+<span class="text-organic-light">Workspaces</span>
+<span class="text-slate-300 dark:text-slate-700">/</span>
+<span class="text-organic-light">NEXUS Tracker</span>
+<span class="text-slate-300 dark:text-slate-700">/</span>
+<span class="font-bold">Delegation Chain #402</span>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-organic-green/30 text-xs font-bold hover:bg-white transition-colors">
+<span class="material-symbols-outlined text-sm">grid_view</span>
+                            Auto Layout
+                        </button>
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-organic-green/30 text-xs font-bold hover:bg-white transition-colors">
+<span class="material-symbols-outlined text-sm">camera</span>
+                            Snapshot
+                        </button>
+</div>
+</div>
+<!-- Node Canvas Wrapper -->
+<div class="flex-1 relative overflow-hidden">
+<!-- Nodes and Edges (Mockup Illustration) -->
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="relative w-full h-full max-w-4xl max-h-[600px]">
+<!-- SVG Edges -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none">
+<defs>
+<marker id="arrowhead" markerheight="7" markerwidth="10" orient="auto" refx="0" refy="3.5">
+<polygon fill="#a5c893" points="0 0, 10 3.5, 0 7"></polygon>
+</marker>
+</defs>
+<path d="M200 300 L380 300" stroke="#a5c893" stroke-dasharray="5,5" stroke-width="2"></path>
+<path d="M520 300 L700 300" stroke="#a5c893" stroke-width="2"></path>
+<path d="M450 340 L450 480" stroke="#a5c893" stroke-width="2"></path>
+</svg>
+<!-- Node 1: Coordinator -->
+<div class="absolute top-[260px] left-[50px] w-40 bg-white dark:bg-organic-green/40 p-3 rounded-xl border-2 border-organic-green shadow-xl z-20">
+<div class="flex items-center justify-between mb-2">
+<span class="text-[10px] uppercase font-bold text-organic-light">Coordinator</span>
+<div class="size-2 bg-olive-drab rounded-full node-pulse"></div>
+</div>
+<h4 class="text-sm font-bold truncate">Nexus_Alpha</h4>
+<p class="text-[10px] text-slate-500 mt-1 italic">Status: Working</p>
+</div>
+<!-- Connection Metadata 1 -->
+<div class="absolute top-[270px] left-[220px] bg-slate-100/80 dark:bg-background-dark/80 px-2 py-1 rounded border border-organic-green/20 backdrop-blur-sm z-10">
+<p class="text-[9px] font-mono text-organic-light">Lat: 42ms</p>
+<p class="text-[9px] font-mono text-primary">Tkn: 1.2k</p>
+</div>
+<!-- Node 2: Logic Processor -->
+<div class="absolute top-[250px] left-[390px] w-40 bg-white dark:bg-organic-green/40 p-3 rounded-xl border-2 border-primary shadow-xl z-20">
+<div class="flex items-center justify-between mb-2">
+<span class="text-[10px] uppercase font-bold text-primary">In Progress</span>
+<div class="size-2 bg-primary rounded-full animate-ping"></div>
+</div>
+<h4 class="text-sm font-bold truncate">Logic_Bot_04</h4>
+<p class="text-[10px] text-slate-500 mt-1 italic">Handoff received...</p>
+</div>
+<!-- Connection Metadata 2 -->
+<div class="absolute top-[270px] left-[550px] bg-slate-100/80 dark:bg-background-dark/80 px-2 py-1 rounded border border-organic-green/20 backdrop-blur-sm z-10">
+<p class="text-[9px] font-mono text-organic-light">Lat: 12ms</p>
+<p class="text-[9px] font-mono text-primary">Tkn: 0.4k</p>
+</div>
+<!-- Node 3: Result Store -->
+<div class="absolute top-[260px] left-[710px] w-40 bg-white dark:bg-organic-green/40 p-3 rounded-xl border border-organic-green/30 shadow-md z-20 opacity-60">
+<div class="flex items-center justify-between mb-2">
+<span class="text-[10px] uppercase font-bold text-slate-400">Idle</span>
+<div class="size-2 bg-slate-300 rounded-full"></div>
+</div>
+<h4 class="text-sm font-bold truncate">Data_Vault</h4>
+<p class="text-[10px] text-slate-500 mt-1 italic">Waiting...</p>
+</div>
+<!-- Node 4: Sub-Agent (Vertical Branch) -->
+<div class="absolute top-[490px] left-[390px] w-40 bg-white dark:bg-organic-green/40 p-3 rounded-xl border-2 border-olive-drab shadow-xl z-20">
+<div class="flex items-center justify-between mb-2">
+<span class="text-[10px] uppercase font-bold text-olive-drab">Success</span>
+<div class="size-2 bg-olive-drab rounded-full"></div>
+</div>
+<h4 class="text-sm font-bold truncate">Analytic_Sliver</h4>
+<p class="text-[10px] text-slate-500 mt-1 italic">Task Completed</p>
+</div>
+</div>
+</div>
+<!-- Mini-map -->
+<div class="absolute bottom-6 right-6 w-48 h-32 bg-white/60 dark:bg-background-dark/60 backdrop-blur-md rounded-xl border border-organic-green/20 shadow-2xl overflow-hidden pointer-events-none">
+<div class="absolute inset-0 opacity-40 canvas-grid scale-50 origin-top-left"></div>
+<div class="absolute top-1/2 left-1/4 w-4 h-2 bg-primary rounded-full blur-[2px]"></div>
+<div class="absolute top-1/3 right-1/4 w-2 h-2 bg-organic-light rounded-full blur-[2px]"></div>
+<!-- Viewport indicator -->
+<div class="absolute top-4 left-4 w-20 h-16 border-2 border-primary/40 bg-primary/5 rounded"></div>
+<div class="absolute bottom-1 right-2 text-[8px] font-bold text-organic-light uppercase tracking-tighter">Mini Map</div>
+</div>
+<!-- Zoom Controls -->
+<div class="absolute bottom-6 left-6 flex flex-col gap-2">
+<button class="size-10 bg-white dark:bg-background-dark rounded-full shadow-lg border border-organic-green/20 flex items-center justify-center hover:text-primary transition-colors">
+<span class="material-symbols-outlined">add</span>
+</button>
+<button class="size-10 bg-white dark:bg-background-dark rounded-full shadow-lg border border-organic-green/20 flex items-center justify-center hover:text-primary transition-colors">
+<span class="material-symbols-outlined">remove</span>
+</button>
+</div>
+</div>
+<!-- Bottom Status Bar -->
+<footer class="h-8 bg-organic-green text-white px-4 flex items-center justify-between text-[11px] font-medium z-20">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-1.5">
+<span class="size-1.5 rounded-full bg-olive-drab animate-pulse"></span>
+<span>System Healthy</span>
+</div>
+<div class="h-3 w-px bg-white/20"></div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-xs">group</span>
+<span>0.4 agents active</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-mono">ID: dc_402_organic_881</span>
+<div class="h-3 w-px bg-white/20"></div>
+<span>Last sync: Just now</span>
+</div>
+</footer>
+</main>
+</div>
+</div>
+</body></html>

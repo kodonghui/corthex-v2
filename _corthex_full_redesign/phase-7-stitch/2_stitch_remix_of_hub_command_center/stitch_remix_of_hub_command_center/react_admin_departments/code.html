@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 - Admin Departments</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#ec5b13",
+                "background-light": "#f8f6f6",
+                "background-dark": "#221610",
+                "sage": "#78866b",
+                "coral-soft": "#f28b82"
+              },
+              fontFamily: {
+                "display": ["Public Sans"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "1.5rem", "full": "9999px"},
+            },
+          },
+        }
+      </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Top Nav Bar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md px-6 md:px-10 py-3 sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-primary">
+<div class="size-8 flex items-center justify-center bg-primary/10 rounded-xl">
+<span class="material-symbols-outlined text-primary">hub</span>
+</div>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight">CORTHEX v2</h2>
+</div>
+<div class="hidden md:block">
+<label class="flex flex-col min-w-40 h-10 w-64">
+<div class="flex w-full flex-1 items-stretch rounded-xl h-full bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+<div class="text-slate-400 flex items-center justify-center pl-4">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 border-none bg-transparent focus:ring-0 placeholder:text-slate-400 px-4 pl-2 text-sm" placeholder="Search departments..."/>
+</div>
+</label>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex gap-2">
+<button class="flex items-center justify-center rounded-xl h-10 w-10 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="flex items-center justify-center rounded-xl h-10 w-10 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+<div class="bg-primary/20 rounded-full size-10 flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-sm overflow-hidden">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="User profile avatar illustration" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_xbZP3Y6QA126KXKwc_oGyffa5aUxDSgGzUZF4OARmSyUkqfVoZeC0EbgQMPLi_pjY4cNc1kxEI9-_3mwTgWFxhhcp_dvkAc8iYdfuO74aK22ygxqjh3LtzEM7pa5LquhSuGSb8O24BgJT4Y10w8qhFhOTDtBWj2fnnzoB-It2afsrXufkzIoVcb_kMW9Ub9tqVu4SKtdF_It53XmMXJUBsv1a3DEPzMZXG5uxwM9o2rHK0toLSFGwplnK4m2w3_9cIu7EOMhkTM"/>
+</div>
+</div>
+</header>
+<div class="flex flex-1">
+<!-- Sidebar -->
+<aside class="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark hidden lg:flex flex-col p-6 gap-8">
+<div class="flex flex-col gap-1">
+<h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest px-3">Management</h3>
+<nav class="flex flex-col gap-1 mt-3">
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-semibold">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl bg-primary/10 text-primary transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">corporate_fare</span>
+<span class="text-sm font-semibold">Departments</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-sm font-semibold">Agents</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="text-sm font-semibold">Analytics</span>
+</a>
+</nav>
+</div>
+<div class="mt-auto flex flex-col gap-4 p-4 rounded-xl bg-primary/5 border border-primary/10">
+<p class="text-xs font-medium text-primary">Storage usage: 82%</p>
+<div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[82%]"></div>
+</div>
+<button class="text-xs font-bold text-primary underline underline-offset-4">Upgrade Plan</button>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
+<div>
+<h1 class="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">Departments</h1>
+<p class="text-slate-500 dark:text-slate-400 mt-2 text-lg">Manage organizational structure and lead assignments.</p>
+</div>
+<button class="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-primary/20 transition-all active:scale-95">
+<span class="material-symbols-outlined">add_circle</span>
+                    Create Department
+                </button>
+</div>
+<!-- Filters -->
+<div class="flex border-b border-slate-200 dark:border-slate-800 gap-8 mb-8 overflow-x-auto">
+<button class="flex items-center justify-center border-b-2 border-primary text-primary pb-4 pt-2 whitespace-nowrap">
+<span class="text-sm font-bold">All Departments</span>
+<span class="ml-2 bg-primary/10 px-2 py-0.5 rounded-full text-[10px]">12</span>
+</button>
+<button class="flex items-center justify-center border-b-2 border-transparent text-slate-500 dark:text-slate-400 pb-4 pt-2 whitespace-nowrap hover:text-slate-700 transition-all">
+<span class="text-sm font-bold">Active</span>
+</button>
+<button class="flex items-center justify-center border-b-2 border-transparent text-slate-500 dark:text-slate-400 pb-4 pt-2 whitespace-nowrap hover:text-slate-700 transition-all">
+<span class="text-sm font-bold">Archived</span>
+</button>
+</div>
+<!-- Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+<!-- Card 1 -->
+<div class="group bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm hover:shadow-xl transition-all duration-300">
+<div class="flex justify-between items-start mb-4">
+<div class="size-12 rounded-xl bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">code</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sage"></div>
+</label>
+</div>
+<h3 class="text-xl font-bold text-slate-900 dark:text-white">Engineering</h3>
+<p class="text-slate-500 dark:text-slate-400 text-sm mt-1 line-clamp-2">Product development, infrastructure management, and technical architecture.</p>
+<div class="mt-6 space-y-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400 text-[20px]">person</span>
+<div>
+<p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider leading-none">Department Lead</p>
+<p class="text-sm font-semibold text-slate-700 dark:text-slate-300">Alex Rivera</p>
+</div>
+</div>
+<div class="flex items-center justify-between py-3 border-t border-slate-100 dark:border-slate-800">
+<div class="flex flex-col">
+<span class="text-2xl font-black text-slate-900 dark:text-white">24</span>
+<span class="text-[10px] text-slate-400 uppercase font-bold">Active Agents</span>
+</div>
+<div class="text-right flex flex-col items-end">
+<span class="text-[10px] text-slate-400 uppercase font-bold">Recent Activity</span>
+<span class="text-xs text-sage font-medium mt-1">Updated 2m ago</span>
+</div>
+</div>
+</div>
+<button class="w-full mt-4 py-2 text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors border border-dashed border-slate-200 dark:border-slate-700">View Details</button>
+</div>
+<!-- Card 2 -->
+<div class="group bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm hover:shadow-xl transition-all duration-300">
+<div class="flex justify-between items-start mb-4">
+<div class="size-12 rounded-xl bg-blue-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-blue-600">headset_mic</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sage"></div>
+</label>
+</div>
+<h3 class="text-xl font-bold text-slate-900 dark:text-white">Customer Success</h3>
+<p class="text-slate-500 dark:text-slate-400 text-sm mt-1 line-clamp-2">Retention, onboarding, and high-tier enterprise support accounts.</p>
+<div class="mt-6 space-y-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400 text-[20px]">person</span>
+<div>
+<p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider leading-none">Department Lead</p>
+<p class="text-sm font-semibold text-slate-700 dark:text-slate-300">Sarah Chen</p>
+</div>
+</div>
+<div class="flex items-center justify-between py-3 border-t border-slate-100 dark:border-slate-800">
+<div class="flex flex-col">
+<span class="text-2xl font-black text-slate-900 dark:text-white">18</span>
+<span class="text-[10px] text-slate-400 uppercase font-bold">Active Agents</span>
+</div>
+<div class="text-right flex flex-col items-end">
+<span class="text-[10px] text-slate-400 uppercase font-bold">Recent Activity</span>
+<span class="text-xs text-sage font-medium mt-1">Updated 15m ago</span>
+</div>
+</div>
+</div>
+<button class="w-full mt-4 py-2 text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors border border-dashed border-slate-200 dark:border-slate-700">View Details</button>
+</div>
+<!-- Card 3 -->
+<div class="group bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm hover:shadow-xl transition-all duration-300">
+<div class="flex justify-between items-start mb-4">
+<div class="size-12 rounded-xl bg-coral-soft/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-coral-soft">campaign</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sage"></div>
+</label>
+</div>
+<h3 class="text-xl font-bold text-slate-900 dark:text-white">Marketing</h3>
+<p class="text-slate-500 dark:text-slate-400 text-sm mt-1 line-clamp-2">Brand strategy, growth hacking, and social media presence.</p>
+<div class="mt-6 space-y-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400 text-[20px]">person</span>
+<div>
+<p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider leading-none">Department Lead</p>
+<p class="text-sm font-semibold text-slate-700 dark:text-slate-300">Mike Ross</p>
+</div>
+</div>
+<div class="flex items-center justify-between py-3 border-t border-slate-100 dark:border-slate-800">
+<div class="flex flex-col">
+<span class="text-2xl font-black text-slate-900 dark:text-white">12</span>
+<span class="text-[10px] text-slate-400 uppercase font-bold">Active Agents</span>
+</div>
+<div class="text-right flex flex-col items-end">
+<span class="text-[10px] text-slate-400 uppercase font-bold">Recent Activity</span>
+<span class="text-xs text-slate-400 font-medium mt-1">Updated 1h ago</span>
+</div>
+</div>
+</div>
+<button class="w-full mt-4 py-2 text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors border border-dashed border-slate-200 dark:border-slate-700">View Details</button>
+</div>
+</div>
+</main>
+</div>
+<!-- Create Department Modal (Simulated) -->
+<div class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm hidden">
+<div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
+<div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+<h2 class="text-xl font-bold text-slate-900 dark:text-white">Create New Department</h2>
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<form class="p-6 space-y-5">
+<div>
+<label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Department Name</label>
+<input class="w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-primary focus:ring-primary py-3" placeholder="e.g. Quality Assurance" type="text"/>
+</div>
+<div>
+<label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Lead Name</label>
+<div class="relative">
+<select class="w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-primary focus:ring-primary py-3 appearance-none">
+<option>Select an agent...</option>
+<option>Alex Rivera</option>
+<option>Sarah Chen</option>
+<option>Mike Ross</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">expand_more</span>
+</div>
+</div>
+<div>
+<label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Description</label>
+<textarea class="w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-primary focus:ring-primary py-3 min-h-[100px]" placeholder="Briefly describe the department's focus..."></textarea>
+</div>
+<div class="flex items-center gap-3">
+<input checked="" class="rounded text-sage focus:ring-sage border-slate-300 dark:border-slate-700 dark:bg-slate-800" type="checkbox"/>
+<span class="text-sm font-medium text-slate-600 dark:text-slate-400">Set as Active immediately</span>
+</div>
+<div class="pt-4 flex gap-3">
+<button class="flex-1 py-3 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" type="button">Cancel</button>
+<button class="flex-1 py-3 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all" type="submit">Create Department</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</body></html>

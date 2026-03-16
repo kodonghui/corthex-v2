@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Onboarding Configuration | CORTHEX v2</title>
+<!-- Google Fonts: Inter & Noto Sans KR -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Sans+KR:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<!-- Phosphor Icons -->
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              accent: '#e57373',
+              bg: '#fcfbf9',
+              warm: '#faf7f2',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans KR', 'sans-serif'],
+          },
+          borderRadius: {
+            '3xl': '1.5rem',
+            '4xl': '2rem',
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-transitions">
+    .drag-handle { cursor: grab; }
+    .drag-handle:active { cursor: grabbing; }
+    .step-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .step-card:hover { transform: translateY(-2px); }
+  </style>
+</head>
+<body class="bg-brand-bg font-sans text-slate-800 antialiased flex min-h-screen">
+<!-- BEGIN: Sidebar -->
+<aside class="w-64 border-r border-stone-200 bg-white flex flex-col sticky top-0 h-screen" data-purpose="sidebar-navigation">
+<div class="p-8">
+<h1 class="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
+<div class="w-8 h-8 bg-brand-accent rounded-lg flex items-center justify-center text-white">
+<i class="ph-fill ph-cube text-xl"></i>
+</div>
+        CORTHEX <span class="text-brand-accent">v2</span>
+</h1>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-stone-50 rounded-xl transition-colors" href="#">
+<i class="ph ph-squares-four text-xl"></i>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-stone-50 rounded-xl transition-colors" href="#">
+<i class="ph ph-users text-xl"></i>
+<span class="font-medium">User Management</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-brand-warm text-brand-accent rounded-xl transition-colors" href="#">
+<i class="ph ph-gear-six text-xl"></i>
+<span class="font-medium">Onboarding Config</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-stone-50 rounded-xl transition-colors" href="#">
+<i class="ph ph-chart-line-up text-xl"></i>
+<span class="font-medium">Analytics</span>
+</a>
+</nav>
+<div class="p-4 mt-auto border-t border-stone-100">
+<div class="flex items-center gap-3 p-2">
+<div class="w-10 h-10 rounded-full bg-stone-200 overflow-hidden">
+<img alt="Admin Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPKUlzn6lauB3Qj3f2CEc0fUwV6lJzfHo79VQHqMdWJN_IxXUipO43zUqxewmSdfVuBfo_MOa7Sv2EnFx1X8OQAvXi3JQgSi5kNJvYSdsePGzeylpjHWmaum1vu2olqlIkFTfhR-g0e6955hWIRTiQ0WVEqZx70R5pp3n-C9JWNH_yvD1kqkM4xMQKAxGIlm-eH7TIDy71Nri2FHZCaLYJXYRKukCeFcpxph69R1imO5HW34EtSHoh6ms-iLkDXQ9TcxjLLsWwJbI"/>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-semibold truncate">Admin User</p>
+<p class="text-xs text-slate-400 truncate">admin@corthex.io</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- END: Sidebar -->
+<!-- BEGIN: Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
+<!-- BEGIN: Header -->
+<header class="h-20 bg-white/80 backdrop-blur-md border-b border-stone-100 px-10 flex items-center justify-between sticky top-0 z-10" data-purpose="main-header">
+<div>
+<h2 class="text-xl font-semibold text-slate-900">Onboarding Configuration</h2>
+<p class="text-sm text-slate-500">Configure steps for new CORTHEX users</p>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-xs font-mono text-slate-400 bg-slate-100 px-2 py-1 rounded">API: /api/admin/onboarding</span>
+<button class="flex items-center gap-2 px-5 py-2.5 rounded-full border border-stone-200 bg-white text-slate-700 font-medium hover:bg-stone-50 transition-all">
+<i class="ph ph-eye"></i>
+          Preview Experience
+        </button>
+<button class="flex items-center gap-2 px-6 py-2.5 rounded-full bg-brand-accent text-white font-semibold shadow-lg shadow-red-200 hover:scale-[1.02] active:scale-[0.98] transition-all">
+<i class="ph ph-floppy-disk"></i>
+          Save Changes
+        </button>
+</div>
+</header>
+<!-- END: Header -->
+<!-- BEGIN: Content Body -->
+<div class="p-10 max-w-5xl mx-auto w-full">
+<div class="mb-8 flex items-center justify-between">
+<div>
+<h3 class="text-lg font-semibold text-slate-800">Workflow Steps</h3>
+<p class="text-sm text-slate-500">Drag to reorder steps or click to edit requirements.</p>
+</div>
+<button class="text-brand-accent font-medium flex items-center gap-1 hover:underline">
+<i class="ph ph-plus-circle"></i>
+          Add Custom Step
+        </button>
+</div>
+<!-- BEGIN: Step List (Drag & Drop Mockup) -->
+<div class="space-y-4" id="onboarding-steps-container">
+<!-- Step 1: Welcome -->
+<div class="step-card bg-white p-6 rounded-3xl border border-stone-100 shadow-sm flex items-center gap-6" data-step-id="1">
+<div class="drag-handle text-stone-300 p-2 hover:text-stone-500 transition-colors">
+<i class="ph ph-dots-six-vertical text-2xl"></i>
+</div>
+<div class="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center text-brand-accent">
+<i class="ph ph-hand-waving text-2xl"></i>
+</div>
+<div class="flex-1">
+<h4 class="font-semibold text-slate-800">Welcome Screen</h4>
+<p class="text-sm text-slate-500">Initial greeting and value proposition</p>
+</div>
+<div class="flex items-center gap-8">
+<div class="flex flex-col items-end">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-stone-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-accent"></div>
+</label>
+<span class="text-[10px] uppercase tracking-wider font-bold text-slate-400 mt-1">Mandatory</span>
+</div>
+<button class="p-2 text-stone-400 hover:text-slate-600">
+<i class="ph ph-caret-right text-xl"></i>
+</button>
+</div>
+</div>
+<!-- Step 2: Company Info -->
+<div class="step-card bg-white p-6 rounded-3xl border border-stone-100 shadow-sm flex items-center gap-6" data-step-id="2">
+<div class="drag-handle text-stone-300 p-2 hover:text-stone-500 transition-colors">
+<i class="ph ph-dots-six-vertical text-2xl"></i>
+</div>
+<div class="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center text-brand-accent">
+<i class="ph ph-buildings text-2xl"></i>
+</div>
+<div class="flex-1">
+<h4 class="font-semibold text-slate-800">Company Information</h4>
+<p class="text-sm text-slate-500">Legal entity, address, and registration details</p>
+</div>
+<div class="flex items-center gap-8">
+<div class="flex flex-col items-end">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-stone-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-accent"></div>
+</label>
+<span class="text-[10px] uppercase tracking-wider font-bold text-slate-400 mt-1">Mandatory</span>
+</div>
+<button class="p-2 text-stone-400 hover:text-slate-600">
+<i class="ph ph-caret-right text-xl"></i>
+</button>
+</div>
+</div>
+<!-- Step 3: Department Setup -->
+<div class="step-card bg-white p-6 rounded-3xl border border-stone-100 shadow-sm flex items-center gap-6" data-step-id="3">
+<div class="drag-handle text-stone-300 p-2 hover:text-stone-500 transition-colors">
+<i class="ph ph-dots-six-vertical text-2xl"></i>
+</div>
+<div class="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center text-brand-accent">
+<i class="ph ph-tree-structure text-2xl"></i>
+</div>
+<div class="flex-1">
+<h4 class="font-semibold text-slate-800">Department Setup</h4>
+<p class="text-sm text-slate-500">Configure organizational hierarchy and nodes</p>
+</div>
+<div class="flex items-center gap-8">
+<div class="flex flex-col items-end">
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-stone-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-accent"></div>
+</label>
+<span class="text-[10px] uppercase tracking-wider font-bold text-slate-400 mt-1">Optional</span>
+</div>
+<button class="p-2 text-stone-400 hover:text-slate-600">
+<i class="ph ph-caret-right text-xl"></i>
+</button>
+</div>
+</div>
+<!-- Step 4: Agent Assignment -->
+<div class="step-card bg-white p-6 rounded-3xl border border-stone-100 shadow-sm flex items-center gap-6" data-step-id="4">
+<div class="drag-handle text-stone-300 p-2 hover:text-stone-500 transition-colors">
+<i class="ph ph-dots-six-vertical text-2xl"></i>
+</div>
+<div class="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center text-brand-accent">
+<i class="ph ph-user-plus text-2xl"></i>
+</div>
+<div class="flex-1">
+<h4 class="font-semibold text-slate-800">Agent Assignment</h4>
+<p class="text-sm text-slate-500">Assign first batch of agents to departments</p>
+</div>
+<div class="flex items-center gap-8">
+<div class="flex flex-col items-end">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-stone-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-accent"></div>
+</label>
+<span class="text-[10px] uppercase tracking-wider font-bold text-slate-400 mt-1">Mandatory</span>
+</div>
+<button class="p-2 text-stone-400 hover:text-slate-600">
+<i class="ph ph-caret-right text-xl"></i>
+</button>
+</div>
+</div>
+</div>
+<!-- END: Step List -->
+<!-- BEGIN: Advanced Configuration -->
+<section class="mt-12 bg-white rounded-4xl p-10 border border-stone-100 shadow-sm" data-purpose="advanced-config">
+<h3 class="text-xl font-bold text-slate-900 mb-6">Global Requirements</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="space-y-6">
+<div class="flex items-start gap-4">
+<div class="pt-1">
+<input class="w-5 h-5 rounded border-stone-300 text-brand-accent focus:ring-brand-accent" id="require-email" type="checkbox"/>
+</div>
+<div>
+<label class="font-semibold text-slate-800 block" for="require-email">Require Email Verification</label>
+<p class="text-sm text-slate-500">Users must verify email before accessing dashboard nodes.</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="pt-1">
+<input class="w-5 h-5 rounded border-stone-300 text-brand-accent focus:ring-brand-accent" id="require-2fa" type="checkbox"/>
+</div>
+<div>
+<label class="font-semibold text-slate-800 block" for="require-2fa">Enforce 2FA during Onboarding</label>
+<p class="text-sm text-slate-500">Security step will be injected after Company Info.</p>
+</div>
+</div>
+</div>
+<div class="space-y-4 p-6 bg-stone-50 rounded-2xl border border-stone-100">
+<h4 class="text-sm font-bold text-stone-400 uppercase tracking-widest">Notification Logic</h4>
+<select class="w-full bg-white border-stone-200 rounded-xl py-3 px-4 text-slate-600 focus:border-brand-accent focus:ring-0">
+<option>Alert Admin on Step Completion</option>
+<option>Only on Total Completion</option>
+<option>Disabled</option>
+</select>
+<p class="text-xs text-stone-400 italic">Configuration persists to POST /api/admin/onboarding hook.</p>
+</div>
+</div>
+</section>
+<!-- END: Advanced Configuration -->
+</div>
+<!-- END: Content Body -->
+<footer class="mt-auto py-8 text-center text-stone-400 text-sm">
+      © 2024 CORTHEX Technologies. Built for Enterprise Efficiency.
+    </footer>
+</main>
+<!-- END: Main Content Area -->
+<!-- BEGIN: Interactive Logic (Simple Mockup) -->
+<script data-purpose="ui-interactivity">
+    // Mock simple drag reordering visually
+    document.querySelectorAll('.drag-handle').forEach(handle => {
+      handle.addEventListener('mousedown', () => {
+        handle.closest('.step-card').classList.add('ring-2', 'ring-brand-accent', 'opacity-70');
+      });
+      window.addEventListener('mouseup', () => {
+        document.querySelectorAll('.step-card').forEach(card => {
+          card.classList.remove('ring-2', 'ring-brand-accent', 'opacity-70');
+        });
+      });
+    });
+  </script>
+<!-- END: Interactive Logic -->
+</body></html>

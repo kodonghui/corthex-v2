@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#fcfbf9",
+                        "background-dark": "#221610",
+                        "neutral-warm": "#f4f1ee",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "3xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    boxShadow: {
+                        "soft": "0 10px 40px -10px rgba(0, 0, 0, 0.05)",
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+        .sidebar-item-active { background-color: rgba(236, 91, 19, 0.1); color: #ec5b13; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="flex min-h-screen">
+<!-- Sidebar -->
+<aside class="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col fixed h-full">
+<div class="p-6 flex items-center gap-3">
+<div class="bg-primary p-2 rounded-xl text-white">
+<span class="material-symbols-outlined text-2xl">neurology</span>
+</div>
+<h2 class="text-xl font-black tracking-tight text-slate-900 dark:text-white uppercase">CORTEX v2</h2>
+</div>
+<nav class="flex-1 px-4 mt-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-neutral-warm dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-semibold">대시보드</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-neutral-warm dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">workspaces</span>
+<span class="text-sm font-semibold">워크스페이스</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl sidebar-item-active" href="#">
+<span class="material-symbols-outlined">layers</span>
+<span class="text-sm font-semibold">티어 관리</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-neutral-warm dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-sm font-semibold">분석</span>
+</a>
+<div class="pt-4 pb-2 px-4">
+<p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">System</p>
+</div>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-neutral-warm dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-semibold">설정</span>
+</a>
+</nav>
+<div class="p-4 mt-auto border-t border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-3 p-2 bg-neutral-warm dark:bg-slate-800 rounded-2xl">
+<div class="size-10 rounded-full bg-slate-300 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="User profile avatar showing a smiling person" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpLlIQfDhtLG3uU-wXllTjlEyJtbCz9rBNN7FdZYOvDbtl7gmd2nnQ72qAIILgE2U19S2IbL2GsWwx4iXSWO2dDU82kXiMcEh5jrO2kpxzgSHSLolzrNwZE77z7x3imOraCMJv_u3fuiHSe4mR93fi6O-y1SXSy5yGOu10XMXW7F_pggZengyrHziACU8ES4k13QZIFxxwild3niRAKocXC00n-KuLdOy4uCE3il7f0sF18Jv444grgCURtc_92wDJtImMNTN9IQ"/>
+</div>
+<div class="flex flex-col">
+<p class="text-xs font-bold text-slate-900 dark:text-white">김철수</p>
+<p class="text-[10px] text-slate-500">Professional Plan</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="ml-64 flex-1 flex flex-col min-w-0">
+<!-- Top Nav -->
+<header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-10 px-8 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="text-xs font-medium text-slate-500">API Endpoint:</span>
+<code class="text-xs px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded font-mono text-primary">GET /api/workspace/tiers</code>
+</div>
+<div class="flex items-center gap-4">
+<button class="size-10 flex items-center justify-center rounded-xl hover:bg-neutral-warm dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="size-10 flex items-center justify-center rounded-xl hover:bg-neutral-warm dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-primary rounded-full"></span>
+</button>
+<div class="h-6 w-[1px] bg-slate-200 dark:bg-slate-800"></div>
+<button class="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform">
+<span class="material-symbols-outlined text-sm">add</span>
+                    워크스페이스 생성
+                </button>
+</div>
+</header>
+<div class="p-8 max-w-6xl mx-auto w-full">
+<div class="mb-10 text-center">
+<h1 class="text-4xl font-black tracking-tight text-slate-900 dark:text-white mb-4">워크스페이스 티어 선택</h1>
+<p class="text-slate-500 dark:text-slate-400 max-w-xl mx-auto leading-relaxed">
+                    프로젝트의 규모와 필요한 AI 연산 성능에 맞춰 최적화된 워크스페이스 티어를 선택하세요. 매월 유연하게 변경이 가능합니다.
+                </p>
+</div>
+<!-- Pricing Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+<!-- Worker Tier -->
+<div class="bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-soft border border-slate-100 dark:border-slate-800 flex flex-col group hover:border-primary/30 transition-colors">
+<div class="mb-8">
+<div class="size-12 rounded-2xl bg-neutral-warm dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 mb-6 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-3xl">precision_manufacturing</span>
+</div>
+<h3 class="text-xl font-bold mb-1">Worker</h3>
+<p class="text-sm text-slate-500 mb-6">개인 학습 및 테스트용</p>
+<div class="flex items-baseline gap-1">
+<span class="text-4xl font-black">₩0</span>
+<span class="text-slate-400 text-sm font-medium">/월</span>
+</div>
+</div>
+<ul class="space-y-4 mb-10 flex-1 text-sm">
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-green-500 text-lg">check_circle</span>
+<span class="text-slate-600 dark:text-slate-300">표준 AI 모델 (GPT-3.5)</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-green-500 text-lg">check_circle</span>
+<span class="text-slate-600 dark:text-slate-300">최대 3개 도구 연결</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-300 dark:text-slate-700 text-lg">cancel</span>
+<span class="text-slate-400">우선 응답 지원 미포함</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-300 dark:text-slate-700 text-lg">cancel</span>
+<span class="text-slate-400">데이터 분석 API 제한</span>
+</li>
+</ul>
+<button class="w-full py-4 rounded-2xl bg-neutral-warm dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-200 transition-colors">현재 플랜</button>
+</div>
+<!-- Specialist Tier (Recommended) -->
+<div class="bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-soft border-2 border-primary relative flex flex-col transform md:scale-105 z-10">
+<div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-white px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Recommended</div>
+<div class="mb-8">
+<div class="size-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-6">
+<span class="material-symbols-outlined text-3xl">psychology</span>
+</div>
+<h3 class="text-xl font-bold mb-1">Specialist</h3>
+<p class="text-sm text-slate-500 mb-6">전문적인 분석 및 실무용</p>
+<div class="flex items-baseline gap-1">
+<span class="text-4xl font-black text-primary">₩29,000</span>
+<span class="text-slate-400 text-sm font-medium">/월</span>
+</div>
+</div>
+<ul class="space-y-4 mb-10 flex-1 text-sm">
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+<span class="text-slate-700 dark:text-slate-200 font-medium">고성능 AI 모델 (GPT-4)</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+<span class="text-slate-700 dark:text-slate-200 font-medium">최대 10개 도구 연결</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+<span class="text-slate-700 dark:text-slate-200 font-medium">우선 응답 지원 (High Priority)</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+<span class="text-slate-700 dark:text-slate-200 font-medium">기본 데이터 분석 도구</span>
+</li>
+</ul>
+<button class="w-full py-4 rounded-2xl bg-primary text-white font-bold shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity">업그레이드하기</button>
+</div>
+<!-- Manager Tier -->
+<div class="bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-soft border border-slate-100 dark:border-slate-800 flex flex-col group hover:border-primary/30 transition-colors">
+<div class="mb-8">
+<div class="size-12 rounded-2xl bg-neutral-warm dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 mb-6 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-3xl">corporate_fare</span>
+</div>
+<h3 class="text-xl font-bold mb-1">Manager</h3>
+<p class="text-sm text-slate-500 mb-6">대규모 프로젝트 및 기업용</p>
+<div class="flex items-baseline gap-1">
+<span class="text-4xl font-black">₩99,000</span>
+<span class="text-slate-400 text-sm font-medium">/월</span>
+</div>
+</div>
+<ul class="space-y-4 mb-10 flex-1 text-sm">
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-green-500 text-lg">check_circle</span>
+<span class="text-slate-600 dark:text-slate-300">커스텀 전용 AI 모델</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-green-500 text-lg">check_circle</span>
+<span class="text-slate-600 dark:text-slate-300">무제한 도구 연결</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-green-500 text-lg">check_circle</span>
+<span class="text-slate-600 dark:text-slate-300">24/7 전담 기술 지원</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-green-500 text-lg">check_circle</span>
+<span class="text-slate-600 dark:text-slate-300">엔터프라이즈 API 접근</span>
+</li>
+</ul>
+<button class="w-full py-4 rounded-2xl bg-neutral-warm dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-200 transition-colors">플랜 선택</button>
+</div>
+</div>
+<!-- Detailed Comparison Table -->
+<div class="bg-white dark:bg-slate-900 rounded-3xl p-10 shadow-soft border border-slate-100 dark:border-slate-800">
+<h2 class="text-2xl font-bold mb-8 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">analytics</span>
+                    티어별 상세 설정 비교
+                </h2>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="border-b border-slate-100 dark:border-slate-800">
+<th class="pb-6 text-sm font-black text-slate-400 uppercase tracking-widest">기능 및 서비스</th>
+<th class="pb-6 text-sm font-bold px-4">Worker</th>
+<th class="pb-6 text-sm font-bold px-4 text-primary">Specialist</th>
+<th class="pb-6 text-sm font-bold px-4">Manager</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-50 dark:divide-slate-800/50">
+<tr>
+<td class="py-6 pr-4">
+<p class="font-bold text-slate-700 dark:text-slate-200">AI 모델 사양</p>
+<p class="text-xs text-slate-400 mt-1">응답 속도 및 정확도 기준</p>
+</td>
+<td class="py-6 px-4 text-sm text-slate-500">Standard</td>
+<td class="py-6 px-4 text-sm font-bold text-slate-700 dark:text-slate-200 bg-primary/5">High Performance</td>
+<td class="py-6 px-4 text-sm text-slate-500">Custom Fine-tuned</td>
+</tr>
+<tr>
+<td class="py-6 pr-4">
+<p class="font-bold text-slate-700 dark:text-slate-200">도구 연합 (Tools Connect)</p>
+<p class="text-xs text-slate-400 mt-1">동시 연결 가능한 외부 앱 개수</p>
+</td>
+<td class="py-6 px-4 text-sm text-slate-500">3개 도구</td>
+<td class="py-6 px-4 text-sm font-bold text-slate-700 dark:text-slate-200 bg-primary/5">10개 도구</td>
+<td class="py-6 px-4 text-sm text-slate-500">무제한</td>
+</tr>
+<tr>
+<td class="py-6 pr-4">
+<p class="font-bold text-slate-700 dark:text-slate-200">워크스페이스 협업</p>
+<p class="text-xs text-slate-400 mt-1">초대 가능한 팀원 수</p>
+</td>
+<td class="py-6 px-4 text-sm text-slate-500">1명</td>
+<td class="py-6 px-4 text-sm font-bold text-slate-700 dark:text-slate-200 bg-primary/5">5명</td>
+<td class="py-6 px-4 text-sm text-slate-500">무제한</td>
+</tr>
+<tr>
+<td class="py-6 pr-4">
+<p class="font-bold text-slate-700 dark:text-slate-200">데이터 보존 기간</p>
+<p class="text-xs text-slate-400 mt-1">히스토리 및 로그 보관</p>
+</td>
+<td class="py-6 px-4 text-sm text-slate-500">7일</td>
+<td class="py-6 px-4 text-sm font-bold text-slate-700 dark:text-slate-200 bg-primary/5">90일</td>
+<td class="py-6 px-4 text-sm text-slate-500">무기한 (SLA 기준)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="mt-12 p-8 bg-neutral-warm/50 dark:bg-slate-800/30 rounded-3xl border border-dashed border-slate-200 dark:border-slate-700 flex flex-col md:flex-row items-center justify-between gap-6">
+<div class="flex items-center gap-4">
+<div class="size-12 rounded-full bg-white dark:bg-slate-900 flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined">help</span>
+</div>
+<div>
+<p class="font-bold">엔터프라이즈 도입을 고려하시나요?</p>
+<p class="text-sm text-slate-500">별도의 견적 문의와 맞춤형 도입 상담을 받아보세요.</p>
+</div>
+</div>
+<button class="px-8 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold hover:bg-slate-50 transition-colors">영업 담당자 문의</button>
+</div>
+</div>
+<!-- Footer -->
+<footer class="mt-auto border-t border-slate-200 dark:border-slate-800 p-8 text-center text-slate-400 text-xs">
+<p>© 2024 CORTHEX AI Workspace. All rights reserved. 대한민국 서울특별시 강남구</p>
+</footer>
+</main>
+</div>
+</body></html>

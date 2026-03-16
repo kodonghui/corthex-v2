@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin NEXUS - CORTHEX v2</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#ec5b13",
+            "background-light": "#f8f6f6",
+            "background-dark": "#221610",
+          },
+          fontFamily: {
+            "display": ["Public Sans", "sans-serif"]
+          },
+          borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+        },
+      },
+    }
+  </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-hidden">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 px-6 py-3 bg-white dark:bg-slate-900 z-10 shrink-0">
+<div class="flex items-center gap-4">
+<div class="size-6 text-primary">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M24 45.8096C19.6865 45.8096 15.4698 44.5305 11.8832 42.134C8.29667 39.7376 5.50128 36.3314 3.85056 32.3462C2.19985 28.361 1.76794 23.9758 2.60947 19.7452C3.451 15.5145 5.52816 11.6284 8.57829 8.5783C11.6284 5.52817 15.5145 3.45101 19.7452 2.60948C23.9758 1.76795 28.361 2.19986 32.3462 3.85057C36.3314 5.50129 39.7376 8.29668 42.134 11.8833C44.5305 15.4698 45.8096 19.6865 45.8096 24L24 24L24 45.8096Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">Admin NEXUS</h2>
+</div>
+<div class="flex gap-2">
+<button class="flex items-center justify-center overflow-hidden rounded-xl h-9 px-4 bg-primary/10 text-primary dark:bg-primary/20 hover:bg-primary/20 dark:hover:bg-primary/30 transition-colors text-sm font-bold leading-normal tracking-[0.015em]">
+<span class="material-symbols-outlined text-base mr-2">auto_awesome_mosaic</span>
+<span>Auto Layout</span>
+</button>
+<button class="flex items-center justify-center overflow-hidden rounded-xl h-9 px-4 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-sm font-bold leading-normal tracking-[0.015em]">
+<span class="material-symbols-outlined text-base mr-2">grid_on</span>
+<span>Snap to Grid</span>
+</button>
+<div class="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1 self-center"></div>
+<button class="flex items-center justify-center overflow-hidden rounded-xl h-9 px-4 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-sm font-bold leading-normal tracking-[0.015em]">
+<span class="material-symbols-outlined text-base mr-2">download</span>
+<span>Export Image</span>
+</button>
+<button class="flex items-center justify-center overflow-hidden rounded-xl h-9 px-4 bg-primary text-white hover:bg-primary/90 transition-colors text-sm font-bold leading-normal tracking-[0.015em]">
+<span class="material-symbols-outlined text-base mr-2">sync</span>
+<span>Sync to App</span>
+</button>
+</div>
+</header>
+<!-- Main Content Area -->
+<div class="flex flex-1 overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0">
+<div class="p-6">
+<div class="flex gap-3 items-center mb-6">
+<div class="bg-primary/20 aspect-square rounded-full size-10 flex items-center justify-center text-primary font-bold text-xl">
+            C
+          </div>
+<div class="flex flex-col">
+<h1 class="text-base font-bold leading-normal">CORTHEX v2</h1>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-medium leading-normal">Admin Console</p>
+</div>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">home</span>
+<p class="text-sm font-medium leading-normal">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-primary/10 text-primary dark:bg-primary/20 font-semibold" href="#">
+<span class="material-symbols-outlined text-[20px]">account_tree</span>
+<p class="text-sm leading-normal">Organization</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">smart_toy</span>
+<p class="text-sm font-medium leading-normal">Agents</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">domain</span>
+<p class="text-sm font-medium leading-normal">Departments</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<p class="text-sm font-medium leading-normal">Settings</p>
+</a>
+</nav>
+</div>
+<div class="mt-auto p-6 border-t border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3">
+<img alt="Admin User" class="size-8 rounded-full" data-alt="Admin user profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBj4IHTsoiRTwJtMxqJQ9QPjoKU4IY9fPtHje8zzFJGJT_JJIuLdfztOeK2yHF-_YyiGxAI_OA5faKBeP7k-fg2oRk4wE_rH9j-IoV5F7BTftgT2GwKdAGwTRaPbr1k8tu-_DUeL_L64jOPMFQCQzS8vVofI7VAaHWIV6KcDQC3lTKM7VUOU5YKKL6sT-hUbRNz2LgekMNQ0zjiSMxOZy87WPdJ7GdFLaN0UZ2-aB6If3Ei0XcBth4R2cTvn_1mTCGfDg2tg2EwNddT"/>
+<div>
+<p class="text-sm font-medium">Jane Doe</p>
+<p class="text-xs text-slate-500">System Admin</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Canvas Area -->
+<main class="flex-1 relative overflow-hidden bg-slate-50 dark:bg-[#1a110d]" style="background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 24px 24px;">
+<!-- Canvas Controls -->
+<div class="absolute bottom-6 left-6 flex gap-2 bg-white dark:bg-slate-800 p-1.5 rounded-xl shadow-lg shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700 z-10">
+<button class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors bg-slate-100 dark:bg-slate-700">
+<span class="material-symbols-outlined text-[20px]">near_me</span>
+</button>
+<button class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[20px]">pan_tool</span>
+</button>
+<div class="w-px h-6 bg-slate-200 dark:bg-slate-600 mx-1 self-center"></div>
+<button class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[20px]">zoom_in</span>
+</button>
+<span class="text-sm font-medium self-center px-2 text-slate-500">100%</span>
+<button class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[20px]">zoom_out</span>
+</button>
+</div>
+<!-- Department Nodes (Absolute positioning to simulate canvas) -->
+<div class="absolute inset-0 overflow-auto p-12">
+<div class="relative w-[1200px] h-[800px]">
+<!-- Marketing Department -->
+<div class="absolute top-10 left-10 w-80 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md rounded-2xl border-2 border-[#556b2f]/30 dark:border-[#556b2f]/50 shadow-xl shadow-slate-200/50 dark:shadow-none p-5">
+<div class="flex justify-between items-center mb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#556b2f]">campaign</span>
+<h3 class="font-bold text-lg text-slate-800 dark:text-white">Marketing</h3>
+</div>
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+<span class="material-symbols-outlined text-[20px]">more_horiz</span>
+</button>
+</div>
+<div class="flex flex-col gap-3">
+<!-- Agent Node: Selected -->
+<div class="bg-primary/10 border-2 border-primary rounded-xl p-3 flex items-center gap-3 cursor-pointer shadow-sm">
+<div class="bg-white dark:bg-slate-700 size-10 rounded-full flex items-center justify-center border border-primary/30 shrink-0">
+<span class="material-symbols-outlined text-primary text-[20px]">robot_2</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-bold text-sm truncate text-slate-900 dark:text-white">Content Creator Alpha</p>
+<p class="text-xs text-primary font-medium">Tier 2 • Content</p>
+</div>
+</div>
+<!-- Agent Node -->
+<div class="bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl p-3 flex items-center gap-3 cursor-pointer hover:border-primary/50 transition-colors">
+<div class="bg-white dark:bg-slate-600 size-10 rounded-full flex items-center justify-center border border-slate-200 dark:border-slate-500 shrink-0">
+<span class="material-symbols-outlined text-slate-500 text-[20px]">robot_2</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-bold text-sm truncate text-slate-700 dark:text-slate-200">SEO Optimizer Beta</p>
+<p class="text-xs text-slate-500">Tier 1 • Analysis</p>
+</div>
+</div>
+</div>
+<button class="w-full mt-4 py-2 border border-dashed border-slate-300 dark:border-slate-600 rounded-xl text-slate-500 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-slate-700 dark:hover:text-slate-300 transition-colors flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-[18px]">add</span> Add Agent
+            </button>
+</div>
+<!-- Sales Department -->
+<div class="absolute top-20 left-[450px] w-80 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md rounded-2xl border-2 border-slate-200 dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-none p-5">
+<div class="flex justify-between items-center mb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-400">trending_up</span>
+<h3 class="font-bold text-lg text-slate-800 dark:text-white">Sales</h3>
+</div>
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+<span class="material-symbols-outlined text-[20px]">more_horiz</span>
+</button>
+</div>
+<div class="flex flex-col gap-3">
+<!-- Agent Node -->
+<div class="bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl p-3 flex items-center gap-3 cursor-pointer hover:border-primary/50 transition-colors">
+<div class="bg-white dark:bg-slate-600 size-10 rounded-full flex items-center justify-center border border-slate-200 dark:border-slate-500 shrink-0">
+<span class="material-symbols-outlined text-slate-500 text-[20px]">robot_2</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-bold text-sm truncate text-slate-700 dark:text-slate-200">Lead Gen Gamma</p>
+<p class="text-xs text-slate-500">Tier 3 • Outreach</p>
+</div>
+</div>
+</div>
+<button class="w-full mt-4 py-2 border border-dashed border-slate-300 dark:border-slate-600 rounded-xl text-slate-500 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-slate-700 dark:hover:text-slate-300 transition-colors flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-[18px]">add</span> Add Agent
+            </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Right Properties Panel -->
+<aside class="w-80 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0 overflow-y-auto shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.05)] z-20">
+<div class="p-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center sticky top-0 bg-white dark:bg-slate-900 z-10">
+<h3 class="font-bold text-lg">Properties</h3>
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<div class="p-5 flex flex-col gap-6">
+<!-- Agent Header -->
+<div class="flex items-center gap-4">
+<div class="bg-primary/10 size-14 rounded-2xl flex items-center justify-center border border-primary/30 shrink-0">
+<span class="material-symbols-outlined text-primary text-3xl">robot_2</span>
+</div>
+<div>
+<h4 class="font-bold text-base text-slate-900 dark:text-white">Content Creator Alpha</h4>
+<p class="text-sm text-slate-500">Agent ID: AGT-8429</p>
+</div>
+</div>
+<!-- Form Fields -->
+<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Role Name</label>
+<input class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all" type="text" value="Content Creator Alpha"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Department Assignment</label>
+<select class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all appearance-none">
+<option selected="" value="marketing">Marketing</option>
+<option value="sales">Sales</option>
+<option value="support">Customer Support</option>
+<option value="engineering">Engineering</option>
+</select>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Intelligence Tier</label>
+<div class="grid grid-cols-3 gap-2">
+<button class="py-2 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800">Tier 1</button>
+<button class="py-2 border-2 border-primary bg-primary/5 rounded-xl text-primary text-sm font-bold">Tier 2</button>
+<button class="py-2 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800">Tier 3</button>
+</div>
+</div>
+<div class="flex flex-col gap-1.5 mt-2">
+<label class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">System Prompt Extract</label>
+<textarea class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all resize-none text-slate-600 dark:text-slate-300 font-mono text-xs" rows="4">You are an expert content creator specializing in marketing copy. Your goal is to generate engaging social media posts based on product specs...</textarea>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex gap-3 mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
+<button class="flex-1 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-sm rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Discard</button>
+<button class="flex-1 py-2.5 bg-primary text-white font-bold text-sm rounded-xl hover:bg-primary/90 transition-colors">Save Changes</button>
+</div>
+<button class="flex items-center justify-center gap-2 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl text-sm font-semibold transition-colors mt-2">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+          Remove Agent
+        </button>
+</div>
+</aside>
+</div>
+</body></html>

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 - Departments</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: "Public Sans", sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark hidden md:flex flex-col">
+<div class="p-6 flex items-center gap-3 border-b border-slate-100 dark:border-slate-800">
+<div class="size-8 bg-primary rounded flex items-center justify-center text-white">
+<span class="material-symbols-outlined">hub</span>
+</div>
+<h1 class="font-display font-bold text-xl tracking-tight">CORTHEX <span class="text-primary">v2</span></h1>
+</div>
+<nav class="flex-1 p-4 flex flex-col gap-1 overflow-y-auto">
+<p class="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 px-3 mb-2 tracking-widest">Main Menu</p>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">corporate_fare</span>
+<span class="text-sm font-bold">Departments</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="text-sm font-medium">Agents</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="text-sm font-medium">Analytics</span>
+</a>
+<div class="mt-8">
+<p class="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 px-3 mb-2 tracking-widest">Workspace</p>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-sm font-medium">Teams</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">credit_card</span>
+<span class="text-sm font-medium">Billing</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</div>
+</nav>
+<div class="p-4 border-t border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-3 p-2 rounded-xl bg-slate-50 dark:bg-slate-900">
+<div class="size-10 rounded-full bg-slate-300 overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="User profile avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsnJtQaN5JzfcAreazDNTye4xwmzSg7XF5IRVUYd8hZ4xB12-Ptf0iOhTRVVMh2FkTBOj8Oy5I1pzVqVwdpo0JTupcyNZEeKcixfp1nTDUTFhToASH2llimAjWCVD9mY4cNucZAfHlZPBTRJgoWHgKEIHbRpSxHyvQf82kHOTdTSktCmZUnLDX2w8QIF6w0C0ym6FzX3irJX1q16zjuLsIQTQOaku4Ult3iCgdy_DAzbgqovZymmEBvjrGzpeIwckr-Um-MllsWg"/>
+</div>
+<div class="overflow-hidden">
+<p class="text-sm font-bold truncate">Alex Morgan</p>
+<p class="text-xs text-slate-500 truncate">Admin Access</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col overflow-hidden">
+<!-- Top Navigation Bar -->
+<header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark flex items-center justify-between px-8 shrink-0">
+<div class="flex items-center gap-4 flex-1">
+<div class="max-w-md w-full relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/20" placeholder="Search departments, resources, or agents..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-primary rounded-full border-2 border-white dark:border-background-dark"></span>
+</button>
+<div class="h-8 w-[1px] bg-slate-200 dark:bg-slate-800"></div>
+<div class="text-xs font-mono text-slate-400 bg-slate-100 dark:bg-slate-900 px-2 py-1 rounded">
+                        GET /api/workspace/departments
+                    </div>
+</div>
+</header>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto p-8">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+<div>
+<h2 class="text-4xl font-black font-display tracking-tight mb-2">Departments</h2>
+<p class="text-slate-500 dark:text-slate-400 max-w-2xl leading-relaxed">
+                            Efficiently organize your workspace by defining operational boundaries. 
+                            Configure resource limits, monitor agent performance, and track cost distributions per department.
+                        </p>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-white font-bold py-3 px-6 rounded-xl flex items-center gap-2 transition-transform active:scale-95 shrink-0 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">add</span>
+                        New Department
+                    </button>
+</div>
+<!-- Stats Overview (Optional extra) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+<div class="bg-white dark:bg-background-dark border border-slate-200 dark:border-slate-800 p-6 rounded-xl shadow-sm">
+<p class="text-slate-500 text-sm font-medium mb-1">Total Active Tasks</p>
+<p class="text-3xl font-black text-slate-900 dark:text-slate-100">142</p>
+</div>
+<div class="bg-white dark:bg-background-dark border border-slate-200 dark:border-slate-800 p-6 rounded-xl shadow-sm">
+<p class="text-slate-500 text-sm font-medium mb-1">Live Agents</p>
+<p class="text-3xl font-black text-slate-900 dark:text-slate-100">38</p>
+</div>
+<div class="bg-white dark:bg-background-dark border border-slate-200 dark:border-slate-800 p-6 rounded-xl shadow-sm">
+<p class="text-slate-500 text-sm font-medium mb-1">Monthly Cost Projection</p>
+<p class="text-3xl font-black text-primary">$32,450.00</p>
+</div>
+</div>
+<!-- Departments Grid (Variant 2 - Detailed Cards) -->
+<div class="space-y-6">
+<!-- Engineering Card -->
+<div class="group bg-white dark:bg-background-dark border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:shadow-xl hover:shadow-primary/5 transition-all duration-300">
+<div class="flex flex-col @xl:flex-row">
+<div class="w-full @xl:w-80 h-48 @xl:h-auto overflow-hidden relative">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/40 to-primary/10 mix-blend-overlay"></div>
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Code on a computer screen for engineering" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5LxNULw9VFTsfAWc1G7Pnq73HLDfLhCDQ2PPqmfzbPhx8BtH3-yH5zjIEf4-T_FmWiJaxVTDOGh5VlorfsOD6nnzGiVaLLNzq5EfP7NXdfmH-LRxN-vDTCzb_CQaNVgiDudbIuX9-ZSnenjEBY-IgzwDfn-jO1lXmwO2VSHPk0w7blh9OgiCCR3_5ruNZMBxlG2UnmJEr7hLrWP05s0d3ueL9qZd-lS0oLJRSeHXkFe4IbdniirX-0HwcucX_cIqJ36_wtFYikQ"/>
+<div class="absolute top-4 left-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold shadow-sm">
+<span class="text-emerald-500 inline-block mr-1">●</span> 12 Agents Online
+                                </div>
+</div>
+<div class="flex-1 p-8 flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-primary text-xl">terminal</span>
+<h3 class="text-2xl font-black tracking-tight">Engineering</h3>
+</div>
+<p class="text-slate-500 dark:text-slate-400">Core product development, DevOps, and cloud infrastructure management.</p>
+</div>
+<div class="flex -space-x-2">
+<div class="size-8 rounded-full border-2 border-white dark:border-background-dark bg-slate-300 overflow-hidden"><img class="w-full h-full" data-alt="Agent headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8_kYfHEB89gocamNcUXpv0JS7Y_uM4mD6oApl1ccA-rTSnypHnWQJY8hrzsyeNIBP65hsccLnFacdYNSDtASQRjOqN7r_TIY4AQn0ZoAdjhHsDrpb8NWDJLkx45IPZcXF-KJOgHZW9SEjMqmTybycrjlkKJoshOUhjc8rNF6JedMJioY3ZOkTZjfYV-1xwFpRhebPDLIbU3qDtudbFuzdhRYrHQXwMgpt4vaBdFeayIiqh3hey2Gx83K6ukDX86OfbJrN9UOc3Q"/></div>
+<div class="size-8 rounded-full border-2 border-white dark:border-background-dark bg-slate-300 overflow-hidden"><img class="w-full h-full" data-alt="Agent headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB59Bi7kyyvhi-ZBsmII_0S7HVPPD6X-lH1px_KJPF76hJnCrKqqA52rj1Iuayxz1Jm4K3md6icFc8EZCdAxt1u01Q6Tvs6IahqqN4CwmbDcEbU2_hQqzucTZGqAVnJ8oWSZFrukqN8w0nEpLjgucEBC_mXEn7nOvAXXx5rB45nBTG6QpXt3pv8QRFVCy1x91raTqQdVxcVpGXK-ecuF0x4fcBICfvn2FXYSB33bmgRreEb1Xvz4WTw-UGHUk3L0haMjsLzhGUKyA"/></div>
+<div class="size-8 rounded-full border-2 border-white dark:border-background-dark bg-slate-300 overflow-hidden"><img class="w-full h-full" data-alt="Agent headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvU--fiAUjLV6uG8S56EzxBkeZJEvBrbG0G74ChEChDJIauWTGTaTKrSHqrwDHKwckYBuXrxA91JN6SBt1bfZ6V3lZNO5i14_fAvz0nEDawKliP476CRkhdq_UhcdpjHgW0phlNBPY20VAanhBtZUkAhaHRLu6hBLKXqxPa24Xsv7A3WIAxH5J0F4VDv3ny7Nx_mf2l4qsbao4HOCdT-DrGC3AKP81Svsuhd_D6vbaWcQ7BYaL4StG6U2rOEAhQrMlO7ELvTk3Qg"/></div>
+<div class="size-8 rounded-full border-2 border-white dark:border-background-dark bg-slate-100 flex items-center justify-center text-[10px] font-bold">+9</div>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-8 py-6 border-y border-slate-100 dark:border-slate-800">
+<div>
+<p class="text-xs text-slate-400 uppercase font-bold tracking-widest mb-1">Active Tasks</p>
+<div class="flex items-center gap-2">
+<span class="text-xl font-bold">42</span>
+<span class="text-xs text-emerald-500 font-medium">↑ 12%</span>
+</div>
+</div>
+<div>
+<p class="text-xs text-slate-400 uppercase font-bold tracking-widest mb-1">Total Agents</p>
+<p class="text-xl font-bold">12</p>
+</div>
+<div>
+<p class="text-xs text-slate-400 uppercase font-bold tracking-widest mb-1">Monthly Cost</p>
+<p class="text-xl font-bold text-primary">$14,500.00</p>
+</div>
+</div>
+<div class="flex items-center justify-between mt-6">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 text-sm text-slate-500">
+<span class="material-symbols-outlined text-lg">schedule</span>
+                                            Uptime: 99.9%
+                                        </div>
+<div class="flex items-center gap-2 text-sm text-slate-500">
+<span class="material-symbols-outlined text-lg">check_circle</span>
+                                            SLA Status: Healthy
+                                        </div>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-slate-500">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="bg-primary/10 hover:bg-primary/20 text-primary font-bold px-6 py-2.5 rounded-lg transition-colors">
+                                            Manage Department
+                                        </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Customer Success Card -->
+<div class="group bg-white dark:bg-background-dark border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:shadow-xl hover:shadow-primary/5 transition-all duration-300">
+<div class="flex flex-col @xl:flex-row">
+<div class="w-full @xl:w-80 h-48 @xl:h-auto overflow-hidden relative">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/40 to-primary/10 mix-blend-overlay"></div>
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Customer success representatives working" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6qtmX24EfqVshsGHKNwMdZwbKmxcJlniCS5dz6AMh_-kWQhPqvEZLs6Fd920QTLc_tTvqKuKA33v-virgYSw-H4AkRKVOvyyv5MJsPk2bs33j7QA-vhHV-d-qgIWS0-DUQX6B1lBdHmuSg-iXPg5gHFhRw9VGNsVKKoOCz8FYxCRWgI3lYk-B2-kXpJbfWfjNxz4VG5agerQcOMLcji2vOxgn0lf5JH8-2q1MdmzBYkAGb6OrQsZc7bc5r7jjeHeSGJ7UEKFJdQ"/>
+<div class="absolute top-4 left-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold shadow-sm">
+<span class="text-emerald-500 inline-block mr-1">●</span> 8 Agents Online
+                                </div>
+</div>
+<div class="flex-1 p-8 flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-primary text-xl">support_agent</span>
+<h3 class="text-2xl font-black tracking-tight">Customer Success</h3>
+</div>
+<p class="text-slate-500 dark:text-slate-400">Managing client relationships, support tickets, and renewal strategies.</p>
+</div>
+<div class="flex -space-x-2">
+<div class="size-8 rounded-full border-2 border-white dark:border-background-dark bg-slate-300 overflow-hidden"><img class="w-full h-full" data-alt="Agent headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD00vKB57SaYewSmY5rq9RkXVldKJs2oqB43VCXerHQoMcKTbffl08PE0C86KT2Gb1kpMinqs-RR0QXqufNIEt1_k4R1FLKeaRh53q0R0fOErKLKRjP34bwQ0Jwn1yX-DOjBXdJkrL-cO22dRqkKvcHHfvBO_sB6_QC-i2Xt5PPFT3-rkDVCLonutUdoHH-u42Oh_Y6owZeelLM8K02o-lLBJ_vqKP-fJc_VRsQ2WbxLTv4DlOZNUayKyjUWieyEA_XEFK_Pe-lkA"/></div>
+<div class="size-8 rounded-full border-2 border-white dark:border-background-dark bg-slate-300 overflow-hidden"><img class="w-full h-full" data-alt="Agent headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCoLoSMMheHvr7ulb-Zth64tZwt-d9Aex1fbFaEXUUWcWxOCINtZhPIR9yIiJMg-go1iIG1MTwxmt-sw8IPBR-32VZVdPdO7ruTr5sDAE0GmLc-IuYNa0XZOYjPEu6jD6CUhxYO0KcWX1tNwWI-h1L3e0KlXcxeTIXr9egPpfYDzTVJvmm0Pc8N5eIZZos95sECYDtZCUSauoo0SgxOtez_B9xjNLZSG3WaGlk_m_pxAXhw7HhCjjOJ7U-87Z9qvhwmoU26yBZlgw"/></div>
+<div class="size-8 rounded-full border-2 border-white dark:border-background-dark bg-slate-100 flex items-center justify-center text-[10px] font-bold">+5</div>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-8 py-6 border-y border-slate-100 dark:border-slate-800">
+<div>
+<p class="text-xs text-slate-400 uppercase font-bold tracking-widest mb-1">Active Tasks</p>
+<div class="flex items-center gap-2">
+<span class="text-xl font-bold">18</span>
+<span class="text-xs text-amber-500 font-medium">↓ 5%</span>
+</div>
+</div>
+<div>
+<p class="text-xs text-slate-400 uppercase font-bold tracking-widest mb-1">Total Agents</p>
+<p class="text-xl font-bold">8</p>
+</div>
+<div>
+<p class="text-xs text-slate-400 uppercase font-bold tracking-widest mb-1">Monthly Cost</p>
+<p class="text-xl font-bold text-primary">$7,200.00</p>
+</div>
+</div>
+<div class="flex items-center justify-between mt-6">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 text-sm text-slate-500">
+<span class="material-symbols-outlined text-lg">sentiment_very_satisfied</span>
+                                            NPS: 78
+                                        </div>
+<div class="flex items-center gap-2 text-sm text-slate-500">
+<span class="material-symbols-outlined text-lg">timer</span>
+                                            Response Time: 2h
+                                        </div>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-slate-500">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="bg-primary/10 hover:bg-primary/20 text-primary font-bold px-6 py-2.5 rounded-lg transition-colors">
+                                            Manage Department
+                                        </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Marketing Card -->
+<div class="group bg-white dark:bg-background-dark border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:shadow-xl hover:shadow-primary/5 transition-all duration-300">
+<div class="flex flex-col @xl:flex-row">
+<div class="w-full @xl:w-80 h-48 @xl:h-auto overflow-hidden relative">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/40 to-primary/10 mix-blend-overlay"></div>
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Vibrant marketing design workspace" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAo8sf0XSrgeyAhRwFk4ZyujxM-cIcfTWyBkId1Mirbz5ewwJSwGg0Nm6D_FDuX6S55BsEifQ9Hd9PomALZLTksMxHebyl6yXtsrWzmUhJM0e2mG-u0WpSJV5KIYYTfGOifocoOl-bNRSFa25LarN7iVSzEaRdqVK2SkrABS3j_XdBFPkOis29zVXOyTjGs6WtRKQFfwGPDEwgxe8VYXCZCTKtUl0Nwvr-slkjgzsEI3Ys59GDCCFjy91JBmDtkOMm0FbKdx22-wg"/>
+<div class="absolute top-4 left-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold shadow-sm">
+<span class="text-slate-400 inline-block mr-1">●</span> 4 Agents Online
+                                </div>
+</div>
+<div class="flex-1 p-8 flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-primary text-xl">campaign</span>
+<h3 class="text-2xl font-black tracking-tight">Marketing</h3>
+</div>
+<p class="text-slate-500 dark:text-slate-400">Brand awareness, content creation, and lead generation campaigns.</p>
+</div>
+<div class="flex -space-x-2">
+<div class="size-8 rounded-full border-2 border-white dark:border-background-dark bg-slate-300 overflow-hidden"><img class="w-full h-full" data-alt="Agent headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHz44shqIbH7pTPit9akTnLt4lftbeIdTJngyMRN0lyN2-Kh27LPG2HMvs-HzjcNVj71qWd7BrcKRumFRknlBG5kHPj_GBZ_UrgCWqezHe7Gz4PlDCABRoAiWbHZlu7LnBvDFAk5-NH1Oipo47cRJtky8vYE7GbyFcFpoOP51tpwsleFKlsSo1u83_5j4Huie4NitGg131zPArJDPvNiTslFkKNMtaSJZKVFIB5ey2HUmMqijJeN2cHKRl3E9Z87WVIOHqorFBXQ"/></div>
+<div class="size-8 rounded-full border-2 border-white dark:border-background-dark bg-slate-300 overflow-hidden"><img class="w-full h-full" data-alt="Agent headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1VDUi69dObUvYS0y6RmgKy9vMM-H0Jjm_Qpwp7LU2pqok6pbGqERD7TFhpMSfJNod_lC5dA0V-HzVYpD_qupTTLZpls4_s3P9SSMziUUBKDRjhl4nICNHI-mkseS4HxRQEskW5-rZFFHWZ0ZNPLdfg0JncNWtsFKT_4F7eT16-oWxEgwbBD42-locllhu4AkmbCHVzguxokMbKp_5gGBKnpIrav1w-jWPWXYLdVPT0gCWzqoc2FvdDiG4uh1ijLadEcC0_GKVQA"/></div>
+<div class="size-8 rounded-full border-2 border-white dark:border-background-dark bg-slate-100 flex items-center justify-center text-[10px] font-bold">+2</div>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-8 py-6 border-y border-slate-100 dark:border-slate-800">
+<div>
+<p class="text-xs text-slate-400 uppercase font-bold tracking-widest mb-1">Active Tasks</p>
+<div class="flex items-center gap-2">
+<span class="text-xl font-bold">24</span>
+<span class="text-xs text-emerald-500 font-medium">↑ 8%</span>
+</div>
+</div>
+<div>
+<p class="text-xs text-slate-400 uppercase font-bold tracking-widest mb-1">Total Agents</p>
+<p class="text-xl font-bold">5</p>
+</div>
+<div>
+<p class="text-xs text-slate-400 uppercase font-bold tracking-widest mb-1">Monthly Cost</p>
+<p class="text-xl font-bold text-primary">$5,800.00</p>
+</div>
+</div>
+<div class="flex items-center justify-between mt-6">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 text-sm text-slate-500">
+<span class="material-symbols-outlined text-lg">ads_click</span>
+                                            CTR: 4.2%
+                                        </div>
+<div class="flex items-center gap-2 text-sm text-slate-500">
+<span class="material-symbols-outlined text-lg">trending_up</span>
+                                            ROAS: 3.5x
+                                        </div>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-slate-500">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="bg-primary/10 hover:bg-primary/20 text-primary font-bold px-6 py-2.5 rounded-lg transition-colors">
+                                            Manage Department
+                                        </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer with API Info -->
+<footer class="mt-16 pb-12 pt-8 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
+<p class="text-sm text-slate-400">© 2024 CORTHEX Dynamics. All rights reserved.</p>
+<div class="flex items-center gap-6">
+<a class="text-sm text-slate-400 hover:text-primary transition-colors" href="#">Documentation</a>
+<a class="text-sm text-slate-400 hover:text-primary transition-colors" href="#">Support Portal</a>
+<div class="flex items-center gap-2 text-xs font-mono text-slate-400 px-3 py-1 bg-slate-100 dark:bg-slate-900 rounded-full">
+<span class="size-2 bg-emerald-500 rounded-full"></span>
+                            API v2.0-STABLE
+                        </div>
+</div>
+</footer>
+</div>
+</main>
+</div>
+</body></html>

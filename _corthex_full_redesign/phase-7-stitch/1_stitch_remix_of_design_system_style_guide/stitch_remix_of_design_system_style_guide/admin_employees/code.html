@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 - Employee Assignment</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0">
+<div class="p-6 flex items-center gap-3">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">account_tree</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-primary">CORTHEX</h1>
+</div>
+<nav class="flex-1 px-4 py-2 space-y-1 overflow-y-auto">
+<div class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider px-3 py-2">Management</div>
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium leading-normal">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl bg-primary text-white shadow-lg shadow-primary/20" href="#">
+<span class="material-symbols-outlined">group_add</span>
+<span class="text-sm font-medium leading-normal">Employee Assignment</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">domain</span>
+<span class="text-sm font-medium leading-normal">Departments</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="text-sm font-medium leading-normal">Analytics</span>
+</a>
+<div class="pt-6">
+<div class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider px-3 py-2">System</div>
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium leading-normal">Settings</span>
+</a>
+</div>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3 p-2">
+<img class="size-10 rounded-full border-2 border-primary/20" data-alt="User profile avatar of admin user" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCO4RtTKv7fpJdZQRrAIMD_clvOJdLMBMhKs8K6dnfR3mdgvUxAnG2BIrvyUbuonQ5OjKa7MT8PrRRXOAd9SZRGb_LEIpGnCeCExcEoYcQADhx10OI7793L3cUX2xczyQ9_TsqabyTsOVcseGkBXxdyv1YAECG3n1Y1n_Rg4_uKikhHNZZcLBCBMc_3YNfSDGjXot1QNMP5_Z61goZSM-o0tBSmeATPpxOq1PuiqhuL9wBvcI07RoYs2Lth5But4U8jZtl-PYG2iAcQ"/>
+<div class="flex flex-col min-w-0">
+<p class="text-sm font-semibold truncate">Alex Chen</p>
+<p class="text-xs text-slate-500 dark:text-slate-400 truncate">System Administrator</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col overflow-hidden">
+<!-- Top Header -->
+<header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-between px-8 shrink-0">
+<div class="flex items-center gap-4 flex-1 max-w-xl">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary/50 transition-all" placeholder="Global search for employees, IDs, or logs..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md shadow-primary/20">
+<span class="material-symbols-outlined text-sm">save</span>
+                        Save Changes
+                    </button>
+</div>
+</header>
+<!-- Content Area -->
+<div class="flex-1 overflow-hidden flex flex-col p-8 gap-6">
+<div class="flex flex-col gap-1">
+<h2 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Employee Assignment</h2>
+<p class="text-slate-500 dark:text-slate-400">Drag and drop users to assign them to their specific departments.</p>
+</div>
+<!-- Assignment Grid -->
+<div class="flex-1 flex gap-6 overflow-hidden">
+<!-- Left Column: Unassigned Users -->
+<div class="w-1/3 flex flex-col bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+<div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+<h3 class="font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">person_search</span>
+                                Unassigned Users
+                                <span class="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">12</span>
+</h3>
+<button class="text-slate-400 hover:text-primary"><span class="material-symbols-outlined">filter_list</span></button>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-3">
+<!-- User Card -->
+<div class="group flex items-center gap-3 p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 cursor-move hover:border-primary/50 hover:shadow-md transition-all">
+<img class="size-10 rounded-lg bg-slate-200" data-alt="Employee headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoVzB_uABoG3X9ZIEZEPECYvYZpSaRWGs9PoibCQ6jva76nbAxZXYHGuSYEdZ-7xCVWUfkeJRyWKRhzSo6_fIWEH5tGdKrAubKzxSKIl1HXusVadFEtBqBNJbFBzfT12ly8hfzBsaGcOE4Rbkvzu9OWv_wZ4pu1dzq_6daYqPJBLxFbgq1JJDXa5QWXszM6x5W3zbH9NKasb5yujC51y5y9b3C42_RVw1jTWieHWYoSyHIeI6GaHHenkYW-AKx3JlqhHlkdlX2o205"/>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold truncate">Sarah Johnson</p>
+<p class="text-xs text-slate-500">ID: #9902 • UI Designer</p>
+</div>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary">drag_indicator</span>
+</div>
+<!-- User Card -->
+<div class="group flex items-center gap-3 p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 cursor-move hover:border-primary/50 hover:shadow-md transition-all">
+<img class="size-10 rounded-lg bg-slate-200" data-alt="Employee headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAni_A53Tra16uRxYHubzO044Maal8e8XCzF1_sCpB4Y_WISfns1ocA5axtmOMWP3higDdPCRQJk_a5ujZ2-Vw-lejDQAOuOITr31MycJ2ROZmjaDdbLeRseGkMJYvC68Bbn_oP_QtgT8HCYlSlONkxSTl1WNNNXjfEjgzfhPL76E7dKD7v7AeP9OJcdZlBSgpNcx9CtBOOLeoOoVR5fwedcHQeAdplMT4lhvMuOxgOKr1rqWhBP0OBEyW8yKhcYRR0pKH2uh6Qu5Cf"/>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold truncate">Marcus Aurelius</p>
+<p class="text-xs text-slate-500">ID: #4412 • Systems Eng.</p>
+</div>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary">drag_indicator</span>
+</div>
+<!-- User Card -->
+<div class="group flex items-center gap-3 p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 cursor-move hover:border-primary/50 hover:shadow-md transition-all">
+<img class="size-10 rounded-lg bg-slate-200" data-alt="Employee headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkdwI2FA4t1hCPYM3h_iEDXub--z9l5FxK99ZAvzbayu7bwPV-bqWzO9JKrW-58fIo1vDrRi1dSOQ7FHcR5r7ibDZSCpJF--Qm7QTbWv3kVGgK7AEN212CHRUE5XbFekEMZdnbWqRD1L4YCj5_uHH5kcQtSQknzWfDZsKlP8w4Mzmis1mZPqBxyewrdA4KukFL2yrKfe6u9dtHR2jw1LVB6Sa7F5cKVuwGGqmC6iYBimWAGLOy1_Oq9xGkG19SgQtAlPhcI2rRWqQ2"/>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold truncate">Evelyn Harper</p>
+<p class="text-xs text-slate-500">ID: #2293 • Dev Ops</p>
+</div>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary">drag_indicator</span>
+</div>
+<!-- User Card -->
+<div class="group flex items-center gap-3 p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 cursor-move hover:border-primary/50 hover:shadow-md transition-all">
+<img class="size-10 rounded-lg bg-slate-200" data-alt="Employee headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZ4_JBVjvTPICi9WKyestLu8SNVMAxlgsLUsev_9LKhY3nPJngeNmWU2dVJ4MURE-1_itWc3JXXCtUe1eztR_1I6sKTBJrWr81ju-ZyxLVkJnadnlw-OZsdl7lj9veH4zrLW9cmokCh32hEGhpFCa6cRAUwHNT7BsYER9B__Ty3kVI49E0voVArIVQZ9UvQaEm-o5jl18BHr4TSpcGgJmAZq2oBvF3TNakJfpk6iIyxt-IeTKnZlLUv1YkFNLqXXLoTkf0gLZKUAQr"/>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold truncate">Liam Neeson</p>
+<p class="text-xs text-slate-500">ID: #1004 • QA Lead</p>
+</div>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary">drag_indicator</span>
+</div>
+</div>
+</div>
+<!-- Right Column: Departments -->
+<div class="flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-4 content-start pb-8">
+<!-- Dept Card -->
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
+<div class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/20">
+<div>
+<h4 class="font-bold text-slate-900 dark:text-white">Product &amp; Design</h4>
+<p class="text-xs text-slate-500">8 Members</p>
+</div>
+<button class="size-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+</div>
+<div class="p-4 space-y-2 min-h-[120px] border-2 border-dashed border-transparent hover:border-primary/20 transition-all rounded-b-xl">
+<div class="flex items-center justify-between p-2 bg-white dark:bg-slate-800 rounded-lg shadow-sm">
+<div class="flex items-center gap-2">
+<div class="size-6 rounded-full bg-primary/20 text-primary text-[10px] flex items-center justify-center font-bold">JD</div>
+<span class="text-sm">Jordan Doe</span>
+</div>
+<button class="text-slate-400 hover:text-red-500"><span class="material-symbols-outlined text-sm">close</span></button>
+</div>
+<div class="flex items-center justify-between p-2 bg-white dark:bg-slate-800 rounded-lg shadow-sm">
+<div class="flex items-center gap-2">
+<div class="size-6 rounded-full bg-primary/20 text-primary text-[10px] flex items-center justify-center font-bold">AK</div>
+<span class="text-sm">Anna Klein</span>
+</div>
+<button class="text-slate-400 hover:text-red-500"><span class="material-symbols-outlined text-sm">close</span></button>
+</div>
+<div class="pt-2 text-center">
+<p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Drop here to assign</p>
+</div>
+</div>
+</div>
+<!-- Dept Card -->
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
+<div class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/20">
+<div>
+<h4 class="font-bold text-slate-900 dark:text-white">Engineering</h4>
+<p class="text-xs text-slate-500">24 Members</p>
+</div>
+<button class="size-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+</div>
+<div class="p-4 space-y-2 min-h-[120px] border-2 border-dashed border-transparent hover:border-primary/20 transition-all rounded-b-xl">
+<div class="flex items-center justify-between p-2 bg-white dark:bg-slate-800 rounded-lg shadow-sm">
+<div class="flex items-center gap-2">
+<div class="size-6 rounded-full bg-primary/20 text-primary text-[10px] flex items-center justify-center font-bold">RS</div>
+<span class="text-sm">Rick Sanchez</span>
+</div>
+<button class="text-slate-400 hover:text-red-500"><span class="material-symbols-outlined text-sm">close</span></button>
+</div>
+<div class="pt-2 text-center">
+<p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Drop here to assign</p>
+</div>
+</div>
+</div>
+<!-- Dept Card -->
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
+<div class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/20">
+<div>
+<h4 class="font-bold text-slate-900 dark:text-white">Marketing</h4>
+<p class="text-xs text-slate-500">5 Members</p>
+</div>
+<button class="size-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+</div>
+<div class="p-4 space-y-2 min-h-[120px] border-2 border-dashed border-transparent hover:border-primary/20 transition-all rounded-b-xl">
+<p class="text-sm text-center text-slate-400 py-4 italic">No members assigned</p>
+</div>
+</div>
+<!-- Dept Card -->
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
+<div class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/20">
+<div>
+<h4 class="font-bold text-slate-900 dark:text-white">Customer Success</h4>
+<p class="text-xs text-slate-500">12 Members</p>
+</div>
+<button class="size-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+</div>
+<div class="p-4 space-y-2 min-h-[120px] border-2 border-dashed border-transparent hover:border-primary/20 transition-all rounded-b-xl">
+<div class="flex items-center justify-between p-2 bg-white dark:bg-slate-800 rounded-lg shadow-sm">
+<div class="flex items-center gap-2">
+<div class="size-6 rounded-full bg-primary/20 text-primary text-[10px] flex items-center justify-center font-bold">MB</div>
+<span class="text-sm">Morty Brown</span>
+</div>
+<button class="text-slate-400 hover:text-red-500"><span class="material-symbols-outlined text-sm">close</span></button>
+</div>
+</div>
+</div>
+<!-- New Dept Placeholder -->
+<button class="border-2 border-dashed border-slate-300 dark:border-slate-800 rounded-xl flex flex-col items-center justify-center p-8 text-slate-400 hover:border-primary/50 hover:text-primary transition-all">
+<span class="material-symbols-outlined text-3xl">add_circle</span>
+<span class="text-sm font-bold mt-2">Create New Department</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

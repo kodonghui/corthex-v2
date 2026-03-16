@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 | Performance Analytics</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&amp;family=Lora:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#606c38", /* Natural Olive Green */
+                        "secondary": "#283618",
+                        "accent": "#dda15e",
+                        "earth": "#bc6c25",
+                        "background-light": "#fefae0",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"],
+                        "serif": ["Lora", "serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+        h1, h2, h3, .serif-font { font-family: 'Lora', serif; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex">
+<!-- Sidebar -->
+<aside class="fixed inset-y-0 left-0 w-64 bg-secondary dark:bg-background-dark border-r border-primary/20 flex flex-col z-50">
+<div class="p-6 flex items-center gap-3">
+<div class="size-10 rounded-xl bg-primary flex items-center justify-center text-background-light">
+<span class="material-symbols-outlined">eco</span>
+</div>
+<div>
+<h1 class="text-white text-lg font-bold leading-tight">CORTHEX v2</h1>
+<p class="text-primary/60 text-xs font-medium uppercase tracking-wider">Natural Analytics</p>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-2 mt-4">
+<a class="flex items-center gap-3 px-4 py-3 text-primary/70 hover:bg-primary/10 rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary text-white rounded-xl shadow-lg shadow-primary/20" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-sm font-medium">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-primary/70 hover:bg-primary/10 rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="text-sm font-medium">Agent Souls</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-primary/70 hover:bg-primary/10 rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined">psychology_alt</span>
+<span class="text-sm font-medium">Hallucinations</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-primary/70 hover:bg-primary/10 rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</nav>
+<div class="p-4 mt-auto">
+<div class="bg-primary/10 dark:bg-primary/5 rounded-xl p-4 border border-primary/20">
+<p class="text-xs text-primary font-bold uppercase mb-2">Soul Growth Plan</p>
+<div class="w-full bg-primary/20 rounded-full h-1.5 mb-3">
+<div class="bg-primary h-1.5 rounded-full" style="width: 75%"></div>
+</div>
+<button class="w-full py-2 bg-primary text-white text-xs font-bold rounded-lg hover:bg-secondary transition-colors">
+                    Upgrade Workspace
+                </button>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 ml-64 flex flex-col min-h-screen">
+<!-- Top Header -->
+<header class="h-16 border-b border-primary/10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md sticky top-0 z-40 px-8 flex items-center justify-between">
+<div class="flex items-center gap-4 flex-1">
+<span class="material-symbols-outlined text-primary">analytics</span>
+<h2 class="text-slate-800 dark:text-slate-100 font-serif text-xl">Performance Summary</h2>
+<div class="max-w-xs w-full ml-8">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+<input class="w-full pl-10 pr-4 py-1.5 bg-slate-100 dark:bg-slate-800 border-none rounded-full text-sm focus:ring-2 focus:ring-primary/30" placeholder="Search agents or souls..." type="text"/>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-500 dark:text-slate-400">
+<a class="text-primary border-b-2 border-primary py-5" href="#">Overview</a>
+<a class="hover:text-primary transition-colors py-5" href="#">Reports</a>
+<a class="hover:text-primary transition-colors py-5" href="#">Real-time</a>
+</div>
+<div class="flex items-center gap-3 ml-4">
+<button class="p-2 rounded-full hover:bg-primary/10 text-slate-600 dark:text-slate-300 relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-earth rounded-full"></span>
+</button>
+<div class="w-8 h-8 rounded-full bg-primary/20 border border-primary/30 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="User profile avatar illustration" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSXpZt0MfpccmQOov1MkhCt57Xbl8MES_D2zrC4YETpT5u8r9wMW7qVUHDIX-FP4tbSUwdiBZ3VR8fnJEo4jG21R-gtN1uD-85PRJK0xMQsWbw4x0oYCfDoSCr0uJE7FvceNxFGdRH99awACUeS6XSSwja_jAeQRUaz5Tw9VTrqWKFVtGC-BJmCBxYEHO-oU92VBuNU_HBSwCFrQ_2CUcSyy8ERIN7czq2_49rw2vD8H4RIFmOydt0KZsyHWI7rcVKf8ak6s1pBDdd"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="p-8 space-y-8">
+<!-- Hero Stats -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-primary/10 shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-4">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Avg. Success Rate</p>
+<span class="material-symbols-outlined text-primary bg-primary/10 p-1.5 rounded-lg">verified</span>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-3xl font-bold text-slate-800 dark:text-slate-100">94.2%</h3>
+<span class="text-primary text-sm font-bold">+2.4%</span>
+</div>
+<p class="text-xs text-slate-400 mt-2">Workspace average across 24 agents</p>
+</div>
+<div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-primary/10 shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-4">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Quality Score</p>
+<span class="material-symbols-outlined text-accent bg-accent/10 p-1.5 rounded-lg">star</span>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-3xl font-bold text-slate-800 dark:text-slate-100">8.8<span class="text-lg text-slate-400">/10</span></h3>
+<span class="text-primary text-sm font-bold">+0.5%</span>
+</div>
+<p class="text-xs text-slate-400 mt-2">Based on natural language resonance</p>
+</div>
+<div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-primary/10 shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-4">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Soul Resonance</p>
+<span class="material-symbols-outlined text-earth bg-earth/10 p-1.5 rounded-lg">favorite</span>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-3xl font-bold text-slate-800 dark:text-slate-100">High</h3>
+<span class="text-primary text-sm font-bold">+1.2%</span>
+</div>
+<p class="text-xs text-slate-400 mt-2">Cohesion level within agent swarm</p>
+</div>
+</section>
+<!-- Agent Performance Matrix & Hallucination Summary -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Performance Matrix -->
+<div class="lg:col-span-2 bg-white dark:bg-slate-800 rounded-xl border border-primary/10 overflow-hidden shadow-sm">
+<div class="px-6 py-5 border-b border-primary/10 flex justify-between items-center">
+<h3 class="font-serif text-lg font-bold text-slate-800 dark:text-slate-100">Agent Performance Matrix</h3>
+<button class="text-primary text-sm font-bold flex items-center gap-1">
+                            View Full Report <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-background-light dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">
+<th class="px-6 py-4">Agent Name</th>
+<th class="px-6 py-4">Status</th>
+<th class="px-6 py-4">Success Rate</th>
+<th class="px-6 py-4">Quality</th>
+<th class="px-6 py-4">Badge</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-primary/10">
+<tr>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-lg">smart_toy</span>
+</div>
+<span class="font-medium text-slate-700 dark:text-slate-200">Arborist v1</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">ACTIVE</span>
+</td>
+<td class="px-6 py-4 font-bold text-slate-800 dark:text-slate-100">98.2%</td>
+<td class="px-6 py-4">
+<div class="flex gap-0.5">
+<span class="material-symbols-outlined text-accent text-sm fill-current">star</span>
+<span class="material-symbols-outlined text-accent text-sm fill-current">star</span>
+<span class="material-symbols-outlined text-accent text-sm fill-current">star</span>
+<span class="material-symbols-outlined text-accent text-sm fill-current">star</span>
+<span class="material-symbols-outlined text-accent text-sm fill-current">star</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1 bg-primary/10 text-primary px-2 py-1 rounded-lg text-xs font-bold">
+<span class="material-symbols-outlined text-xs">workspace_premium</span> HIGH
+                                        </span>
+</td>
+</tr>
+<tr>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded bg-accent/20 flex items-center justify-center text-accent">
+<span class="material-symbols-outlined text-lg">support_agent</span>
+</div>
+<span class="font-medium text-slate-700 dark:text-slate-200">Sower Support</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">ACTIVE</span>
+</td>
+<td class="px-6 py-4 font-bold text-slate-800 dark:text-slate-100">89.4%</td>
+<td class="px-6 py-4">
+<div class="flex gap-0.5">
+<span class="material-symbols-outlined text-accent text-sm fill-current">star</span>
+<span class="material-symbols-outlined text-accent text-sm fill-current">star</span>
+<span class="material-symbols-outlined text-accent text-sm fill-current">star</span>
+<span class="material-symbols-outlined text-accent text-sm fill-current">star</span>
+<span class="material-symbols-outlined text-slate-300 text-sm">star</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1 bg-accent/10 text-accent px-2 py-1 rounded-lg text-xs font-bold">
+<span class="material-symbols-outlined text-xs">trending_up</span> MID
+                                        </span>
+</td>
+</tr>
+<tr>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded bg-earth/20 flex items-center justify-center text-earth">
+<span class="material-symbols-outlined text-lg">cloud_done</span>
+</div>
+<span class="font-medium text-slate-700 dark:text-slate-200">Hydra Processor</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 rounded-full text-[10px] font-bold bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">IDLE</span>
+</td>
+<td class="px-6 py-4 font-bold text-slate-800 dark:text-slate-100">72.1%</td>
+<td class="px-6 py-4">
+<div class="flex gap-0.5">
+<span class="material-symbols-outlined text-accent text-sm fill-current">star</span>
+<span class="material-symbols-outlined text-accent text-sm fill-current">star</span>
+<span class="material-symbols-outlined text-accent text-sm fill-current">star</span>
+<span class="material-symbols-outlined text-slate-300 text-sm">star</span>
+<span class="material-symbols-outlined text-slate-300 text-sm">star</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1 bg-slate-100 text-slate-500 px-2 py-1 rounded-lg text-xs font-bold">
+<span class="material-symbols-outlined text-xs">warning</span> LOW
+                                        </span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Hallucination Summary -->
+<div class="bg-white dark:bg-slate-800 rounded-xl border border-primary/10 p-6 shadow-sm">
+<h3 class="font-serif text-lg font-bold text-slate-800 dark:text-slate-100 mb-6">Hallucination Report</h3>
+<div class="space-y-6">
+<div class="flex items-center justify-between p-4 bg-green-50 dark:bg-green-900/10 rounded-xl border border-green-200 dark:border-green-800">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-green-600">check_circle</span>
+<div>
+<p class="text-sm font-bold text-green-700 dark:text-green-400">CLEAN</p>
+<p class="text-xs text-green-600/80">18 Agents</p>
+</div>
+</div>
+<span class="text-green-700 font-bold">75%</span>
+</div>
+<div class="flex items-center justify-between p-4 bg-yellow-50 dark:bg-yellow-900/10 rounded-xl border border-yellow-200 dark:border-yellow-800">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-yellow-600">warning</span>
+<div>
+<p class="text-sm font-bold text-yellow-700 dark:text-yellow-400">WARNING</p>
+<p class="text-xs text-yellow-600/80">5 Agents</p>
+</div>
+</div>
+<span class="text-yellow-700 font-bold">20%</span>
+</div>
+<div class="flex items-center justify-between p-4 bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-200 dark:border-red-800">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-red-600">error</span>
+<div>
+<p class="text-sm font-bold text-red-700 dark:text-red-400">CRITICAL</p>
+<p class="text-xs text-red-600/80">1 Agent</p>
+</div>
+</div>
+<span class="text-red-700 font-bold">5%</span>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-primary/10">
+<p class="text-slate-500 dark:text-slate-400 text-xs italic mb-4">"High hallucination rates detected in Hydraphase Soul. Recommending structural prompt realignment in Soul Gym."</p>
+<button class="w-full py-2 border border-primary text-primary text-sm font-bold rounded-lg hover:bg-primary hover:text-white transition-all">
+                            Review Critical Log
+                        </button>
+</div>
+</div>
+</div>
+<!-- Soul Gym Section -->
+<section class="bg-primary/5 dark:bg-primary/5 rounded-2xl border border-primary/20 p-8">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+<div>
+<h2 class="font-serif text-2xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">fitness_center</span> Soul Gym
+                        </h2>
+<p class="text-slate-500 dark:text-slate-400 text-sm mt-1">AI-driven improvements and natural resonance training for your agents.</p>
+</div>
+<div class="flex gap-2">
+<span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Active Training Session</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Suggestion 1 -->
+<div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-primary/10 flex flex-col h-full">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-accent">lightbulb</span>
+<h4 class="font-bold text-slate-800 dark:text-slate-100">Contextual Rooting</h4>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400 flex-1">
+                            Arborist v1's soul is showing signs of context drift. Suggested prompt improvement: Add <b>Grounding Meta-Instructions</b> to reinforce domain boundaries.
+                        </p>
+<div class="mt-6 pt-4 border-t border-primary/10 flex items-center justify-between">
+<span class="text-[10px] font-bold text-primary uppercase">Impact: +12% Stability</span>
+<button class="text-primary font-bold text-sm hover:underline">Apply Fix</button>
+</div>
+</div>
+<!-- Suggestion 2 -->
+<div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-primary/10 flex flex-col h-full">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-primary">auto_fix_high</span>
+<h4 class="font-bold text-slate-800 dark:text-slate-100">Tool Harmonic Synergy</h4>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400 flex-1">
+                            Sower Support has conflicting tool calls. Optimization: Merge <i>Mail-Link</i> and <i>Ticket-Sync</i> into a single <b>Unified Outreach Tool</b>.
+                        </p>
+<div class="mt-6 pt-4 border-t border-primary/10 flex items-center justify-between">
+<span class="text-[10px] font-bold text-primary uppercase">Impact: -40ms Latency</span>
+<button class="text-primary font-bold text-sm hover:underline">Apply Fix</button>
+</div>
+</div>
+<!-- Suggestion 3 -->
+<div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-primary/10 flex flex-col h-full">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-earth">history_edu</span>
+<h4 class="font-bold text-slate-800 dark:text-slate-100">Persona Deepening</h4>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400 flex-1">
+                            Hydra Processor responses feel robotic. Introduce <b>Adaptive Empathy Tokens</b> to the core soul personality template.
+                        </p>
+<div class="mt-6 pt-4 border-t border-primary/10 flex items-center justify-between">
+<span class="text-[10px] font-bold text-primary uppercase">Impact: +1.4 Quality Score</span>
+<button class="text-primary font-bold text-sm hover:underline">Apply Fix</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Workspace Resonance Visualization -->
+<section class="bg-white dark:bg-slate-800 rounded-xl border border-primary/10 p-8 shadow-sm">
+<div class="flex justify-between items-center mb-8">
+<h3 class="font-serif text-xl font-bold text-slate-800 dark:text-slate-100">Agent Soul Cohesion</h3>
+<div class="flex gap-4">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-primary"></span>
+<span class="text-xs text-slate-500">Stability</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-accent"></span>
+<span class="text-xs text-slate-500">Creativity</span>
+</div>
+</div>
+</div>
+<div class="relative h-64 w-full bg-primary/5 rounded-xl flex items-center justify-center overflow-hidden">
+<!-- Abstract Visualization Placeholder -->
+<div class="absolute inset-0 flex items-center justify-center opacity-40">
+<div class="w-96 h-96 border-4 border-dashed border-primary/20 rounded-full animate-spin-slow"></div>
+<div class="absolute w-64 h-64 border-2 border-primary/30 rounded-full animate-reverse-spin"></div>
+</div>
+<div class="relative z-10 flex flex-col items-center">
+<div class="size-24 rounded-full bg-primary/20 flex items-center justify-center text-primary shadow-inner">
+<span class="material-symbols-outlined text-5xl">hub</span>
+</div>
+<p class="mt-4 font-bold text-slate-800 dark:text-slate-100">Resonance Frequency: 432Hz</p>
+<p class="text-xs text-primary font-bold">OPTIMAL SYNC</p>
+</div>
+<img class="absolute inset-0 w-full h-full object-cover opacity-10 mix-blend-overlay" data-alt="Abstract gradient waves representing frequency stability" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAClbVHTEZ3SCeJG4HIClDf-DUmuBRmKhEg5iuTnwGGbO4eoVtdscgajtPsLnIVaqP7dI3V3VHAJpEynvPJaCaM8guAiKYDlIlfy-6xiA78dvtPUEzQh2keV0TVyxPGKU1OL8HN3tbsUzbK2a6YLgQkKmI0sVR5CHvFE9ZTy0OUEJcNOEepwQcYvUx6UiRSzMsbpO5fO4aC80dFbA1fwx5KE6hFWX9mLKWq6JFi-7nujWUosi1iejQ136cpumAynkOL9OV9We74oc1S"/>
+</div>
+</section>
+</div>
+<!-- Footer -->
+<footer class="mt-auto py-8 px-8 border-t border-primary/10 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-400 text-sm">
+<p>© 2024 CORTHEX v2. All agents are nurtured with care.</p>
+<div class="flex gap-6">
+<a class="hover:text-primary transition-colors" href="#">Documentation</a>
+<a class="hover:text-primary transition-colors" href="#">API Reference</a>
+<a class="hover:text-primary transition-colors" href="#">Support</a>
+</div>
+</footer>
+</main>
+<style>
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes reverse-spin {
+            from { transform: rotate(360deg); }
+            to { transform: rotate(0deg); }
+        }
+        .animate-spin-slow {
+            animation: spin-slow 20s linear infinite;
+        }
+        .animate-reverse-spin {
+            animation: reverse-spin 15s linear infinite;
+        }
+    </style>
+</body></html>

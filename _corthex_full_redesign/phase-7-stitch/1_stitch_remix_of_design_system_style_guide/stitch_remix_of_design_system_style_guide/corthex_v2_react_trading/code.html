@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Natural Organic Trading - Strategy Workspace</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: "Public Sans", sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100">
+<div class="relative flex h-screen w-full flex-col overflow-hidden">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-slate-200 dark:border-slate-800 bg-background-light dark:bg-background-dark px-6 py-3">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-primary">
+<span class="material-symbols-outlined text-3xl">eco</span>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight">Natural Organic Trading</h2>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium" href="#">Markets</a>
+<a class="text-primary text-sm font-bold border-b-2 border-primary" href="#">Portfolio</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium" href="#">Strategies</a>
+</nav>
+</div>
+<div class="flex flex-1 justify-end gap-4 items-center">
+<label class="hidden sm:flex items-center min-w-40 max-w-64 h-10 relative">
+<span class="material-symbols-outlined absolute left-3 text-slate-400">search</span>
+<input class="w-full h-full rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 pl-10 pr-4 text-sm focus:ring-primary focus:border-primary" placeholder="Search markets..."/>
+</label>
+<div class="flex gap-2">
+<button class="flex items-center justify-center rounded-xl h-10 w-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="flex items-center justify-center rounded-xl h-10 w-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+<div class="bg-primary/20 rounded-full size-10 flex items-center justify-center border border-primary/30 overflow-hidden" data-alt="User avatar profile picture">
+<img alt="User profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBE-oX73vQF1bbAccluw59mei8TpTlxPJmNptdgRSybHDteGrUrGbNq-Iuvfb4J5a2_proqhK95z3PKTvlF2Tx_Pde3cz3L_upeWQOssXEz1MMrcgXt2eBn6j6akQWRlCVYvwSOu08_t9KjJRSsYhhMitNZ6Ylxg7phDhkvW_quSgDfXKOMNXOEFyhMVj6tCcWnlxzuG2PAHSln2UMcO56t5QKDlb5kVTVQV1VUd4GlKIgBGexACd9ztUd64VP6Zsb6cn8z37R6HasE"/>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-64 border-r border-slate-200 dark:border-slate-800 bg-background-light dark:bg-background-dark hidden lg:flex flex-col p-4 gap-6">
+<div class="flex gap-3 items-center">
+<div class="size-10 rounded-xl bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined">monitoring</span>
+</div>
+<div class="flex flex-col">
+<h3 class="text-sm font-bold">Organic Trade</h3>
+<p class="text-xs text-slate-500">Strategy Workspace</p>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-sm font-medium">Home</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-primary/10 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">query_stats</span>
+<span class="text-sm font-bold">Strategy</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="text-sm font-medium">Assets</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</div>
+<div class="mt-auto border-t border-slate-200 dark:border-slate-800 pt-4">
+<div class="bg-primary/5 rounded-xl p-4 border border-primary/10">
+<p class="text-xs font-bold text-primary mb-1 uppercase tracking-wider">Plan Status</p>
+<p class="text-sm font-medium mb-3">Organic Premium</p>
+<div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full mb-3">
+<div class="bg-primary h-full rounded-full w-3/4"></div>
+</div>
+<button class="w-full py-2 text-xs font-bold bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">Manage Subscription</button>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col overflow-hidden bg-white dark:bg-slate-950">
+<!-- Inner Tabs -->
+<div class="border-b border-slate-200 dark:border-slate-800 px-6 bg-background-light/50 dark:bg-background-dark/50">
+<div class="flex gap-8">
+<button class="py-4 text-sm font-bold border-b-2 border-primary text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">list_alt</span> Watchlist
+                        </button>
+<button class="py-4 text-sm font-medium text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">show_chart</span> Chart
+                        </button>
+<button class="py-4 text-sm font-medium text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">smart_toy</span> AI Strategy
+                        </button>
+</div>
+</div>
+<!-- Dashboard Content Grid -->
+<div class="flex-1 overflow-y-auto p-6 grid grid-cols-12 gap-6">
+<!-- Left: Watchlist Table -->
+<div class="col-span-12 xl:col-span-7 flex flex-col gap-6">
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+<div class="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+<h4 class="font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">visibility</span>
+                                    Active Watchlist
+                                </h4>
+<div class="flex gap-2">
+<button class="text-xs font-bold bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg">View All</button>
+<button class="text-xs font-bold bg-primary text-white px-3 py-1.5 rounded-lg">+ Add</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 text-xs font-bold uppercase tracking-wider">
+<tr>
+<th class="px-6 py-4">Symbol</th>
+<th class="px-6 py-4">Price</th>
+<th class="px-6 py-4">Change</th>
+<th class="px-6 py-4">Volume</th>
+<th class="px-6 py-4">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 font-bold">BTC/USDT</td>
+<td class="px-6 py-4">$65,432.10</td>
+<td class="px-6 py-4">
+<span class="text-emerald-500 font-bold bg-emerald-500/10 px-2 py-1 rounded-lg text-xs">+2.45%</span>
+</td>
+<td class="px-6 py-4 text-slate-500">1.2B</td>
+<td class="px-6 py-4">
+<button class="text-primary hover:bg-primary/10 p-2 rounded-full"><span class="material-symbols-outlined">trending_up</span></button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 font-bold">ETH/USDT</td>
+<td class="px-6 py-4">$3,450.12</td>
+<td class="px-6 py-4">
+<span class="text-rose-500 font-bold bg-rose-500/10 px-2 py-1 rounded-lg text-xs">-0.80%</span>
+</td>
+<td class="px-6 py-4 text-slate-500">850M</td>
+<td class="px-6 py-4">
+<button class="text-primary hover:bg-primary/10 p-2 rounded-full"><span class="material-symbols-outlined">trending_down</span></button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 font-bold">SOL/USDT</td>
+<td class="px-6 py-4">$145.67</td>
+<td class="px-6 py-4">
+<span class="text-emerald-500 font-bold bg-emerald-500/10 px-2 py-1 rounded-lg text-xs">+5.12%</span>
+</td>
+<td class="px-6 py-4 text-slate-500">300M</td>
+<td class="px-6 py-4">
+<button class="text-primary hover:bg-primary/10 p-2 rounded-full"><span class="material-symbols-outlined">trending_up</span></button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 font-bold">DOT/USDT</td>
+<td class="px-6 py-4">$7.23</td>
+<td class="px-6 py-4">
+<span class="text-emerald-500 font-bold bg-emerald-500/10 px-2 py-1 rounded-lg text-xs">+1.15%</span>
+</td>
+<td class="px-6 py-4 text-slate-500">50M</td>
+<td class="px-6 py-4">
+<button class="text-primary hover:bg-primary/10 p-2 rounded-full"><span class="material-symbols-outlined">trending_flat</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Chart View -->
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+<div class="flex justify-between items-center mb-6">
+<div>
+<h4 class="font-bold text-lg">BTC/USDT Strategy View</h4>
+<div class="flex items-center gap-2">
+<span class="text-2xl font-bold">$65,432.10</span>
+<span class="text-emerald-500 text-sm font-bold">+2.45% (24h)</span>
+</div>
+</div>
+<div class="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+<button class="px-3 py-1 text-xs font-bold rounded-md bg-white dark:bg-slate-700 shadow-sm">1H</button>
+<button class="px-3 py-1 text-xs font-medium rounded-md text-slate-500 hover:text-slate-900 dark:hover:text-slate-100">4H</button>
+<button class="px-3 py-1 text-xs font-medium rounded-md text-slate-500 hover:text-slate-900 dark:hover:text-slate-100">1D</button>
+<button class="px-3 py-1 text-xs font-medium rounded-md text-slate-500 hover:text-slate-900 dark:hover:text-slate-100">1W</button>
+</div>
+</div>
+<div class="h-64 relative">
+<svg fill="none" height="100%" preserveaspectratio="none" viewbox="0 0 478 150" width="100%" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25V149H0V109Z" fill="url(#chartGradient)"></path>
+<path d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25" stroke="#ec5b13" stroke-linecap="round" stroke-width="3"></path>
+<defs>
+<lineargradient gradientunits="userSpaceOnUse" id="chartGradient" x1="236" x2="236" y1="1" y2="149">
+<stop stop-color="#ec5b13" stop-opacity="0.2"></stop>
+<stop offset="1" stop-color="#ec5b13" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+</svg>
+<div class="flex justify-between mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+<span>00:00</span>
+<span>04:00</span>
+<span>08:00</span>
+<span>12:00</span>
+<span>16:00</span>
+<span>20:00</span>
+<span>23:59</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right: AI Strategy Assistant Chat -->
+<div class="col-span-12 xl:col-span-5 flex flex-col h-full min-h-[500px]">
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl flex flex-col h-full overflow-hidden shadow-sm">
+<div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
+<div class="size-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined">smart_toy</span>
+</div>
+<div>
+<h4 class="font-bold leading-none">Organic Strategy AI</h4>
+<p class="text-xs text-emerald-500 font-medium">Assistant Active</p>
+</div>
+<button class="ml-auto text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<!-- Chat Messages Area -->
+<div class="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+<div class="flex flex-col gap-1 max-w-[85%]">
+<div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-2xl rounded-tl-none text-sm">
+                                        Hello! I'm your Natural Organic Trading assistant. How can I help with your strategy today?
+                                    </div>
+<span class="text-[10px] text-slate-400 font-medium ml-1">Assistant · 10:24 AM</span>
+</div>
+<div class="flex flex-col gap-1 max-w-[85%] self-end">
+<div class="bg-primary text-white p-3 rounded-2xl rounded-tr-none text-sm">
+                                        Analyze the current BTC/USDT trend based on the 4H RSI and MACD indicators.
+                                    </div>
+<span class="text-[10px] text-slate-400 font-medium mr-1 text-right">You · 10:25 AM</span>
+</div>
+<div class="flex flex-col gap-1 max-w-[85%]">
+<div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-2xl rounded-tl-none text-sm">
+                                        Currently, BTC/USDT shows a bullish divergence on the 4H chart. RSI is at 62, indicating upward momentum with room before overbought levels. MACD just crossed the signal line bullishly. 
+                                        <br/><br/>
+<span class="font-bold">Recommendation:</span> Consider a long position if the price sustains above the $65,100 support level.
+                                    </div>
+<span class="text-[10px] text-slate-400 font-medium ml-1">Assistant · 10:25 AM</span>
+</div>
+<!-- Loading state/typing placeholder -->
+<div class="flex items-center gap-1.5 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 w-fit">
+<div class="size-1.5 bg-slate-300 rounded-full animate-bounce"></div>
+<div class="size-1.5 bg-slate-300 rounded-full animate-bounce [animation-delay:0.2s]"></div>
+<div class="size-1.5 bg-slate-300 rounded-full animate-bounce [animation-delay:0.4s]"></div>
+</div>
+</div>
+<!-- Input Area -->
+<div class="p-4 bg-slate-50 dark:bg-slate-800/20 border-t border-slate-200 dark:border-slate-800">
+<div class="flex gap-2 p-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl items-center">
+<button class="text-slate-400 hover:text-primary p-1">
+<span class="material-symbols-outlined">attach_file</span>
+</button>
+<input class="flex-1 bg-transparent border-none focus:ring-0 text-sm py-1.5" placeholder="Ask about strategies..." type="text"/>
+<button class="bg-primary text-white size-8 rounded-lg flex items-center justify-center hover:bg-primary/90 transition-transform active:scale-95">
+<span class="material-symbols-outlined text-sm">send</span>
+</button>
+</div>
+<div class="flex gap-2 mt-3">
+<button class="text-[10px] font-bold text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-full hover:bg-white dark:hover:bg-slate-800 transition-colors">Risk Analysis</button>
+<button class="text-[10px] font-bold text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-full hover:bg-white dark:hover:bg-slate-800 transition-colors">Yield Prediction</button>
+<button class="text-[10px] font-bold text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-full hover:bg-white dark:hover:bg-slate-800 transition-colors">Backtest Strategy</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+</body></html>

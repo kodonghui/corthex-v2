@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 NEXUS | Organization Chart</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&amp;family=Pretendard:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'c-natural-bg': '#faf8f5',
+            'c-natural-sub': '#f5f0eb',
+            'c-olive': {
+              50: '#f4f6f1',
+              100: '#e7ece2',
+              500: '#5a7247',
+              600: '#4a5d3a',
+            },
+            'c-status-online': '#10b981',
+            'c-status-working': '#3b82f6',
+            'c-status-error': '#ef4444',
+          },
+          fontFamily: {
+            serif: ['"Noto Serif KR"', 'serif'],
+            sans: ['Pretendard', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+<style data-purpose="layout">
+    body {
+      background-color: #faf8f5;
+      color: #333;
+      overflow: hidden; /* Canvas focus */
+    }
+    /* Grid pattern for the canvas */
+    .nexus-grid {
+      background-image: radial-gradient(#d1cfcc 0.5px, transparent 0.5px);
+      background-size: 24px 24px;
+    }
+    /* Simple React-Flow-like node styling */
+    .node-connector {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: #5a7247;
+      border-radius: 50%;
+    }
+    .node-connector-top { top: -4px; left: 50%; transform: translateX(-50%); }
+    .node-connector-bottom { bottom: -4px; left: 50%; transform: translateX(-50%); }
+  </style>
+<style data-purpose="typography">
+    h1, h2, h3 {
+      font-family: 'Noto Serif KR', serif;
+    }
+    body {
+      font-family: 'Pretendard', sans-serif;
+    }
+  </style>
+</head>
+<body class="h-screen flex flex-col">
+<!-- 
+    API ENDPOINTS:
+    GET /api/workspace/nexus/layout
+    PUT /api/workspace/nexus/layout
+  -->
+<!-- BEGIN: Header -->
+<header class="h-14 bg-white border-b border-c-natural-sub px-6 flex items-center justify-between z-10">
+<div class="flex items-center gap-4">
+<div class="text-c-olive-500 font-bold text-xl tracking-tighter">CORTHEX <span class="text-xs font-normal border border-c-olive-500 px-1 rounded">v2</span></div>
+<div class="h-4 w-px bg-gray-200"></div>
+<h1 class="text-lg font-medium text-gray-700">NEXUS <span class="text-sm font-light text-gray-400">/ Org Chart</span></h1>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-4 py-1.5 text-sm bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors shadow-sm">
+        Save Draft
+      </button>
+<button class="px-4 py-1.5 text-sm bg-c-olive-500 text-white rounded-md hover:bg-c-olive-600 transition-colors shadow-sm">
+        Publish Changes
+      </button>
+</div>
+</header>
+<!-- END: Header -->
+<!-- BEGIN: Workspace -->
+<main class="flex-1 flex overflow-hidden relative">
+<!-- BEGIN: Left Sidebar (Tools) -->
+<aside class="w-16 bg-white border-r border-c-natural-sub flex flex-col items-center py-6 gap-6 z-10" data-purpose="sidebar-tools">
+<div class="flex flex-col gap-4">
+<!-- Add Department -->
+<button class="p-3 bg-c-natural-sub text-c-olive-500 rounded-xl hover:bg-c-olive-100 transition-all group relative" title="Add Department">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+<!-- Add Agent -->
+<button class="p-3 bg-c-natural-sub text-c-olive-500 rounded-xl hover:bg-c-olive-100 transition-all group relative" title="Add Agent">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+<div class="w-8 h-px bg-gray-100"></div>
+<!-- Layout Tool -->
+<button class="p-3 text-gray-400 hover:text-c-olive-500 transition-colors" id="autoLayoutBtn" title="ELK.js Auto-layout">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 6h16M4 12h16m-7 6h7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</aside>
+<!-- END: Left Sidebar -->
+<!-- BEGIN: Nexus Canvas Area -->
+<section class="flex-1 relative nexus-grid overflow-auto bg-c-natural-bg" data-purpose="visual-org-chart" id="nexusCanvas">
+<!-- Placeholder SVG for Connections (Simulated React Flow Lines) -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none" style="min-width: 2000px; min-height: 2000px;">
+<path d="M 400 150 C 400 200, 250 200, 250 250" fill="none" stroke="#d1cfcc" stroke-width="2"></path>
+<path d="M 400 150 C 400 200, 550 200, 550 250" fill="none" stroke="#d1cfcc" stroke-width="2"></path>
+<path d="M 250 330 C 250 380, 150 380, 150 420" fill="none" stroke="#d1cfcc" stroke-width="2"></path>
+<path d="M 250 330 C 250 380, 350 380, 350 420" fill="none" stroke="#d1cfcc" stroke-width="2"></path>
+</svg>
+<!-- Nodes -->
+<div class="absolute" style="top: 80px; left: 300px;">
+<!-- Root Department Node -->
+<div class="w-48 bg-white border-2 border-c-olive-500 rounded-lg shadow-sm p-4 cursor-pointer hover:shadow-md transition-shadow" onclick="selectNode('dept-core')">
+<div class="flex items-center justify-between mb-2">
+<span class="text-[10px] uppercase tracking-widest text-c-olive-500 font-bold">Department</span>
+<div class="w-2 h-2 rounded-full bg-c-status-online"></div>
+</div>
+<h3 class="text-sm font-semibold">Core Strategy</h3>
+<p class="text-[11px] text-gray-500 mt-1">Management of all neural assets.</p>
+<div class="node-connector node-connector-bottom"></div>
+</div>
+</div>
+<div class="absolute" style="top: 250px; left: 150px;">
+<!-- Sub Department Node -->
+<div class="w-48 bg-white border border-gray-200 rounded-lg shadow-sm p-4 cursor-pointer hover:border-c-olive-500 transition-all" onclick="selectNode('dept-ops')">
+<div class="flex items-center justify-between mb-2">
+<span class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Department</span>
+<div class="w-2 h-2 rounded-full bg-c-status-online"></div>
+</div>
+<h3 class="text-sm font-semibold">Operations</h3>
+<div class="node-connector node-connector-top"></div>
+<div class="node-connector node-connector-bottom"></div>
+</div>
+</div>
+<div class="absolute" style="top: 420px; left: 50px;">
+<!-- Agent Node (Working) -->
+<div class="w-48 bg-white border border-gray-200 rounded-lg shadow-sm p-4 cursor-pointer hover:border-c-olive-500 transition-all" onclick="selectNode('agent-lucas')">
+<div class="flex items-center justify-between mb-2">
+<span class="text-[10px] uppercase tracking-widest text-blue-500 font-bold">Agent</span>
+<div class="flex gap-1 items-center">
+<span class="text-[9px] text-blue-500">Working</span>
+<div class="w-2 h-2 rounded-full bg-c-status-working animate-pulse"></div>
+</div>
+</div>
+<h3 class="text-sm font-semibold italic">Lucas-01</h3>
+<p class="text-[11px] text-gray-500 mt-1 italic">"Processing data streams..."</p>
+<div class="node-connector node-connector-top"></div>
+</div>
+</div>
+<div class="absolute" style="top: 420px; left: 250px;">
+<!-- Agent Node (Error) -->
+<div class="w-48 bg-white border border-red-200 rounded-lg shadow-sm p-4 cursor-pointer hover:border-red-500 transition-all" onclick="selectNode('agent-nexus-error')">
+<div class="flex items-center justify-between mb-2">
+<span class="text-[10px] uppercase tracking-widest text-red-500 font-bold">Agent</span>
+<div class="flex gap-1 items-center">
+<span class="text-[9px] text-red-500">Error</span>
+<div class="w-2 h-2 rounded-full bg-c-status-error"></div>
+</div>
+</div>
+<h3 class="text-sm font-semibold italic">Nexus-9</h3>
+<p class="text-[11px] text-red-400 mt-1">Connection timed out.</p>
+<div class="node-connector node-connector-top"></div>
+</div>
+</div>
+</section>
+<!-- END: Nexus Canvas Area -->
+<!-- BEGIN: Property Panel (Right Sidebar) -->
+<aside class="w-80 bg-white border-l border-c-natural-sub transform translate-x-full transition-transform duration-300 ease-in-out fixed right-0 top-14 bottom-0 shadow-2xl z-20 flex flex-col" data-purpose="node-properties" id="propertyPanel">
+<div class="p-6 border-b border-c-natural-sub flex items-center justify-between">
+<h2 class="text-lg font-semibold" id="panelTitle">Node Settings</h2>
+<button class="text-gray-400 hover:text-gray-600" onclick="closePanel()">
+<svg class="w-5 h-5" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" fill-rule="evenodd"></path>
+</svg>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-6 space-y-8">
+<!-- Configuration Section -->
+<section>
+<h4 class="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-4">Configuration</h4>
+<div class="space-y-4">
+<div>
+<label class="block text-xs font-medium text-gray-600 mb-1">Display Name</label>
+<input class="w-full text-sm border-gray-200 rounded-md focus:ring-c-olive-500 focus:border-c-olive-500" id="nodeNameInput" type="text" value="Core Strategy"/>
+</div>
+<div>
+<label class="block text-xs font-medium text-gray-600 mb-1">Access Level</label>
+<select class="w-full text-sm border-gray-200 rounded-md focus:ring-c-olive-500 focus:border-c-olive-500">
+<option>Full Access</option>
+<option>Restricted</option>
+<option>Audit Only</option>
+</select>
+</div>
+</div>
+</section>
+<!-- Soul Editor Section (Agent Specific) -->
+<section class="hidden" id="soulEditor">
+<div class="flex items-center justify-between mb-4">
+<h4 class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Soul Editor</h4>
+<span class="text-[9px] bg-c-olive-50 text-c-olive-500 px-2 py-0.5 rounded-full">v2.4 Kernel</span>
+</div>
+<div class="space-y-4">
+<div>
+<label class="block text-xs font-medium text-gray-600 mb-1">Core Directives (JSON)</label>
+<textarea class="w-full text-[13px] font-mono bg-gray-50 border-gray-200 rounded-md focus:ring-c-olive-500 focus:border-c-olive-500" placeholder='{ "personality": "analytical" }' rows="8"></textarea>
+</div>
+<button class="w-full py-2 bg-c-olive-100 text-c-olive-600 text-xs font-semibold rounded hover:bg-c-olive-200 transition-colors">
+              Test Consciousness
+            </button>
+</div>
+</section>
+</div>
+<div class="p-6 bg-c-natural-sub/50 border-t border-c-natural-sub">
+<button class="w-full py-2.5 bg-gray-800 text-white text-sm font-medium rounded-md hover:bg-black transition-colors">
+          Apply Changes
+        </button>
+</div>
+</aside>
+<!-- END: Property Panel -->
+</main>
+<!-- END: Workspace -->
+<script data-purpose="interaction-logic">
+    const propertyPanel = document.getElementById('propertyPanel');
+    const soulEditor = document.getElementById('soulEditor');
+    const panelTitle = document.getElementById('panelTitle');
+    const nodeNameInput = document.getElementById('nodeNameInput');
+
+    function selectNode(nodeId) {
+      // Open panel
+      propertyPanel.classList.remove('translate-x-full');
+      
+      // Dynamic content based on nodeId (Simulated)
+      if (nodeId.includes('agent')) {
+        soulEditor.classList.remove('hidden');
+        panelTitle.innerText = 'Agent Properties';
+        nodeNameInput.value = nodeId === 'agent-lucas' ? 'Lucas-01' : 'Nexus-9';
+      } else {
+        soulEditor.classList.add('hidden');
+        panelTitle.innerText = 'Department Properties';
+        nodeNameInput.value = nodeId === 'dept-core' ? 'Core Strategy' : 'Operations';
+      }
+    }
+
+    function closePanel() {
+      propertyPanel.classList.add('translate-x-full');
+    }
+
+    // Auto-layout simulation
+    document.getElementById('autoLayoutBtn').addEventListener('click', () => {
+      const canvas = document.getElementById('nexusCanvas');
+      canvas.classList.add('opacity-40');
+      console.log('Running ELK.js layout algorithm...');
+      
+      setTimeout(() => {
+        canvas.classList.remove('opacity-40');
+        alert('Layout optimized via ELK.js');
+      }, 600);
+    });
+
+    // Close panel when clicking on canvas background
+    document.getElementById('nexusCanvas').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('nexusCanvas')) {
+        closePanel();
+      }
+    });
+  </script>
+</body></html>

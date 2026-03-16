@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Workflow Management | CORTHEX v2</title>
+<!-- Fonts: Inter and Noto Sans KR -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Noto+Sans+KR:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<!-- Icons: Phosphor Icons -->
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<!-- Tailwind CSS v3 with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration for Warm Theme -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              accent: '#e57373',
+              warmBg: '#fcfbf9',
+            },
+            neutral: {
+              50: '#fafafa',
+              100: '#f5f5f5',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans KR', 'sans-serif'],
+          },
+          borderRadius: {
+            '3xl': '1.5rem',
+            '4xl': '2rem',
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-layout">
+    body {
+      background-color: #fcfbf9;
+      color: #333;
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+    .status-pill-active { @apply bg-green-100 text-green-700; }
+    .status-pill-draft { @apply bg-amber-100 text-amber-700; }
+    .status-pill-inactive { @apply bg-gray-100 text-gray-700; }
+  </style>
+</head>
+<body class="antialiased font-sans">
+<div class="flex h-screen overflow-hidden">
+<!-- BEGIN: Sidebar -->
+<aside class="w-64 border-r border-gray-100 bg-white flex flex-col hidden md:flex" data-purpose="sidebar-navigation">
+<div class="p-8">
+<h1 class="text-xl font-bold tracking-tight text-gray-900">CORTHEX <span class="text-brand-accent">v2</span></h1>
+</div>
+<nav class="flex-1 px-4 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-brand-warmBg rounded-2xl transition-colors" href="#">
+<i class="ph ph-squares-four text-xl"></i>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-brand-warmBg text-brand-accent rounded-2xl transition-colors" href="#">
+<i class="ph ph-git-network text-xl"></i>
+<span class="font-medium">Workflows</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-brand-warmBg rounded-2xl transition-colors" href="#">
+<i class="ph ph-users-three text-xl"></i>
+<span class="font-medium">Users</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-brand-warmBg rounded-2xl transition-colors" href="#">
+<i class="ph ph-chart-bar text-xl"></i>
+<span class="font-medium">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-brand-warmBg rounded-2xl transition-colors" href="#">
+<i class="ph ph-gear text-xl"></i>
+<span class="font-medium">Settings</span>
+</a>
+</nav>
+<div class="p-6 mt-auto border-t border-gray-50">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-brand-accent/10 flex items-center justify-center text-brand-accent font-bold">
+            AD
+          </div>
+<div>
+<p class="text-sm font-semibold text-gray-900">Admin User</p>
+<p class="text-xs text-gray-400">System Manager</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- END: Sidebar -->
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col overflow-y-auto scrollbar-hide">
+<!-- BEGIN: Header -->
+<header class="h-20 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-8 sticky top-0 z-10" data-purpose="main-header">
+<div>
+<h2 class="text-lg font-semibold text-gray-800">Workflow Management</h2>
+<p class="text-xs text-gray-400">API: <code class="bg-gray-50 px-1 rounded">GET /api/admin/workflows</code></p>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-gray-400 hover:text-gray-600">
+<i class="ph ph-bell text-2xl"></i>
+</button>
+<button class="bg-brand-accent text-white px-5 py-2.5 rounded-2xl font-medium flex items-center gap-2 hover:opacity-90 transition-opacity">
+<i class="ph ph-plus-circle text-xl"></i>
+<span>Create Workflow</span>
+</button>
+</div>
+</header>
+<!-- END: Header -->
+<!-- Content Container -->
+<div class="p-8 max-w-7xl mx-auto w-full space-y-8">
+<!-- BEGIN: High Level Stats -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6" data-purpose="stats-overview">
+<!-- Total Executions -->
+<div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-5">
+<div class="w-14 h-14 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center">
+<i class="ph ph-activity text-3xl"></i>
+</div>
+<div>
+<p class="text-sm text-gray-400 font-medium">Total Executions</p>
+<h3 class="text-2xl font-bold text-gray-800">12,842</h3>
+</div>
+</div>
+<!-- Success Rate -->
+<div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-5">
+<div class="w-14 h-14 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center">
+<i class="ph ph-check-circle text-3xl"></i>
+</div>
+<div>
+<p class="text-sm text-gray-400 font-medium">Success Rate</p>
+<h3 class="text-2xl font-bold text-gray-800">99.4%</h3>
+</div>
+</div>
+<!-- Avg. Duration -->
+<div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-5">
+<div class="w-14 h-14 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center">
+<i class="ph ph-clock text-3xl"></i>
+</div>
+<div>
+<p class="text-sm text-gray-400 font-medium">Avg. Duration</p>
+<h3 class="text-2xl font-bold text-gray-800">1.2s</h3>
+</div>
+</div>
+</section>
+<!-- END: High Level Stats -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- BEGIN: Workflow List -->
+<section class="lg:col-span-2 space-y-4" data-purpose="workflow-list-container">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-xl font-bold text-gray-800">System Workflows</h3>
+<div class="flex gap-2">
+<button class="px-3 py-1 text-sm bg-white border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50">Filter</button>
+<button class="px-3 py-1 text-sm bg-white border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50">Sort</button>
+</div>
+</div>
+<!-- Workflow Card 1 -->
+<div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow group">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-indigo-50 text-indigo-500 rounded-2xl flex items-center justify-center">
+<i class="ph ph-envelope-simple text-2xl"></i>
+</div>
+<div>
+<h4 class="font-bold text-gray-800">User Onboarding Email</h4>
+<p class="text-sm text-gray-400">Trigger: New User Registration</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<span class="px-3 py-1 rounded-full text-xs font-bold status-pill-active uppercase tracking-wider">Active</span>
+<a class="p-2 text-gray-300 group-hover:text-brand-accent transition-colors" href="#">
+<i class="ph ph-pencil-simple text-xl"></i>
+</a>
+</div>
+</div>
+<div class="mt-4 pt-4 border-t border-gray-50 flex gap-8 text-xs text-gray-500">
+<span class="flex items-center gap-1"><i class="ph ph-play"></i> 4,201 Runs</span>
+<span class="flex items-center gap-1"><i class="ph ph-calendar-blank"></i> Updated 2h ago</span>
+</div>
+</div>
+<!-- Workflow Card 2 -->
+<div class="bg-white p-5 rounded-3xl border-2 border-brand-accent/20 shadow-md ring-4 ring-brand-accent/5">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-2xl flex items-center justify-center">
+<i class="ph ph-database text-2xl"></i>
+</div>
+<div>
+<h4 class="font-bold text-gray-800">Data Synchronization</h4>
+<p class="text-sm text-gray-400">Trigger: Periodic (1hr)</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<span class="px-3 py-1 rounded-full text-xs font-bold status-pill-active uppercase tracking-wider">Active</span>
+<a class="p-2 text-brand-accent" href="#">
+<i class="ph ph-pencil-simple text-xl"></i>
+</a>
+</div>
+</div>
+<div class="mt-4 pt-4 border-t border-gray-50 flex gap-8 text-xs text-gray-500">
+<span class="flex items-center gap-1 font-semibold text-brand-accent"><i class="ph ph-play"></i> 8,450 Runs</span>
+<span class="flex items-center gap-1"><i class="ph ph-calendar-blank"></i> Updated 1d ago</span>
+</div>
+</div>
+<!-- Workflow Card 3 -->
+<div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm opacity-80">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-gray-50 text-gray-400 rounded-2xl flex items-center justify-center">
+<i class="ph ph-cloud-arrow-down text-2xl"></i>
+</div>
+<div>
+<h4 class="font-bold text-gray-800">Legacy Backup</h4>
+<p class="text-sm text-gray-400">Trigger: Manual</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<span class="px-3 py-1 rounded-full text-xs font-bold status-pill-inactive uppercase tracking-wider">Inactive</span>
+<a class="p-2 text-gray-300 hover:text-brand-accent" href="#">
+<i class="ph ph-pencil-simple text-xl"></i>
+</a>
+</div>
+</div>
+<div class="mt-4 pt-4 border-t border-gray-50 flex gap-8 text-xs text-gray-500">
+<span class="flex items-center gap-1"><i class="ph ph-play"></i> 192 Runs</span>
+<span class="flex items-center gap-1"><i class="ph ph-calendar-blank"></i> Updated 12d ago</span>
+</div>
+</div>
+<!-- Workflow Card 4 -->
+<div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center">
+<i class="ph ph-sparkle text-2xl"></i>
+</div>
+<div>
+<h4 class="font-bold text-gray-800">AI Model Training Pipeline</h4>
+<p class="text-sm text-gray-400">Trigger: Batch Data Upload</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<span class="px-3 py-1 rounded-full text-xs font-bold status-pill-draft uppercase tracking-wider">Draft</span>
+<a class="p-2 text-gray-300 hover:text-brand-accent" href="#">
+<i class="ph ph-pencil-simple text-xl"></i>
+</a>
+</div>
+</div>
+<div class="mt-4 pt-4 border-t border-gray-50 flex gap-8 text-xs text-gray-500">
+<span class="flex items-center gap-1"><i class="ph ph-play"></i> 0 Runs</span>
+<span class="flex items-center gap-1"><i class="ph ph-calendar-blank"></i> Created 5m ago</span>
+</div>
+</div>
+</section>
+<!-- END: Workflow List -->
+<!-- BEGIN: Execution Logs Summary -->
+<section class="space-y-4" data-purpose="execution-logs-sidebar">
+<h3 class="text-xl font-bold text-gray-800 px-2">Live Activity</h3>
+<div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 overflow-hidden relative">
+<div class="absolute top-6 right-6">
+<span class="flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+</span>
+</div>
+<div class="mb-4">
+<p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Current Focus</p>
+<h4 class="text-sm font-bold text-gray-800">Data Synchronization</h4>
+</div>
+<div class="space-y-6">
+<!-- Log Entry -->
+<div class="flex gap-4 items-start relative pb-6 border-l-2 border-gray-50 ml-2">
+<div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-green-500 border-4 border-white"></div>
+<div class="pl-4">
+<p class="text-sm font-medium text-gray-800">Step 3: Database Commit</p>
+<p class="text-xs text-gray-400">Successfully updated 452 records</p>
+<p class="text-[10px] text-gray-400 mt-1">10:42:01 AM</p>
+</div>
+</div>
+<!-- Log Entry -->
+<div class="flex gap-4 items-start relative pb-6 border-l-2 border-gray-50 ml-2">
+<div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-green-500 border-4 border-white"></div>
+<div class="pl-4">
+<p class="text-sm font-medium text-gray-800">Step 2: Schema Validation</p>
+<p class="text-xs text-gray-400">All data packets verified</p>
+<p class="text-[10px] text-gray-400 mt-1">10:41:58 AM</p>
+</div>
+</div>
+<!-- Log Entry (Warning/Error State) -->
+<div class="flex gap-4 items-start relative pb-6 border-l-2 border-gray-50 ml-2">
+<div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-amber-500 border-4 border-white"></div>
+<div class="pl-4">
+<p class="text-sm font-medium text-gray-800">Step 1: Fetching API Data</p>
+<p class="text-xs text-amber-600 font-medium">Retry triggered: Connection Timeout</p>
+<p class="text-[10px] text-gray-400 mt-1">10:41:50 AM</p>
+</div>
+</div>
+<!-- Log Entry (Final) -->
+<div class="flex gap-4 items-start relative ml-2">
+<div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-green-500 border-4 border-white"></div>
+<div class="pl-4">
+<p class="text-sm font-medium text-gray-800">Workflow Triggered</p>
+<p class="text-xs text-gray-400">Schedule: hourly_sync_task</p>
+<p class="text-[10px] text-gray-400 mt-1">10:41:45 AM</p>
+</div>
+</div>
+</div>
+<button class="w-full mt-6 py-3 border border-gray-100 rounded-2xl text-sm font-medium text-gray-500 hover:bg-brand-warmBg transition-colors">
+                View Full Logs
+              </button>
+</div>
+<div class="bg-brand-accent/5 p-6 rounded-3xl border border-brand-accent/10">
+<h5 class="text-sm font-bold text-brand-accent mb-2">Need help?</h5>
+<p class="text-xs text-gray-500 leading-relaxed mb-4">Check our documentation on advanced workflow triggers and API node configuration.</p>
+<a class="text-xs font-bold text-brand-accent flex items-center gap-1 group" href="#">
+                Go to Docs <i class="ph ph-arrow-right group-hover:translate-x-1 transition-transform"></i>
+</a>
+</div>
+</section>
+<!-- END: Execution Logs Summary -->
+</div>
+</div>
+</main>
+</div>
+</body></html>

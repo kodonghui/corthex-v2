@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 | Command Center</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;family=Noto+Serif+KR:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#5a7247", // Olive Green
+                        "background-light": "#faf8f5", // Beige
+                        "background-dark": "#1c1c1a",
+                        "accent-beige": "#f0ede4",
+                    },
+                    fontFamily: {
+                        "display": ["Noto Serif KR", "serif"],
+                        "sans": ["Public Sans", "sans-serif"],
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Public Sans', sans-serif;
+        }
+        h1, h2, h3 {
+            font-family: 'Noto Serif KR', serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased overflow-hidden">
+<div class="flex h-screen w-full">
+<!-- Global Sidebar (Left) -->
+<aside class="w-64 flex flex-col border-r border-primary/10 bg-accent-beige/30 dark:bg-background-dark shrink-0">
+<div class="p-6 flex items-center gap-3">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-xl">eco</span>
+</div>
+<div>
+<h1 class="text-lg font-bold leading-none text-primary">CORTHEX</h1>
+<p class="text-[10px] uppercase tracking-widest text-primary/60 font-bold">Natural Organic v2</p>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-1 overflow-y-auto">
+<div class="flex items-center gap-3 px-3 py-2 rounded-xl bg-primary/10 text-primary font-semibold">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm">Command Center</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-primary/5 cursor-pointer transition-colors">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="text-sm">Agent Library</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-primary/5 cursor-pointer transition-colors">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="text-sm">Workspaces</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-primary/5 cursor-pointer transition-colors">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="text-sm">Knowledge Base</span>
+</div>
+<div class="mt-8 pt-8 border-t border-primary/10">
+<p class="px-3 text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">Recent Threads</p>
+<div class="space-y-1">
+<div class="px-3 py-2 text-sm text-slate-600 hover:text-primary cursor-pointer truncate">Q4 Market Expansion</div>
+<div class="px-3 py-2 text-sm text-slate-600 hover:text-primary cursor-pointer truncate">Supply Chain Audit</div>
+</div>
+</div>
+</nav>
+<div class="p-4 border-t border-primary/10">
+<div class="flex items-center gap-3 p-2 rounded-xl hover:bg-primary/5 cursor-pointer">
+<div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden">
+<img alt="User profile avatar" class="w-full h-full object-cover" data-alt="Minimalist user profile avatar circle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3F9S7LOQjb9BS4W-h8ls5uruJzD7F7c1Ig8lyEZAAATqrK8qjd2EMMEshkSs8mAGbB7qnDHNGPaUEa8b6eFz9tf5NWOlUvkTdXUwaKL4qwftyKvh-bntKHuiRJWtlieKV-VRTPf2deDpqlsFDzcu8_61rllUo1FILgTA9Y2Svv98eI7JPMnv5krNB4ffmbsaauw9Y3xMR8oj28Tt3Fi5afhayAAKnd4ZtPF8zz2XCOKsyzYezlU8bwRah_6AEFZurB4VUcloApSn0"/>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-xs font-bold truncate">Admin User</p>
+<p class="text-[10px] text-slate-500">Professional Plan</p>
+</div>
+<span class="material-symbols-outlined text-slate-400 text-sm">settings</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col relative overflow-hidden bg-background-light dark:bg-background-dark">
+<!-- Header -->
+<header class="h-16 border-b border-primary/10 flex items-center justify-between px-8 bg-white/50 dark:bg-background-dark/50 backdrop-blur-sm z-10">
+<div class="flex items-center gap-4">
+<h2 class="text-xl font-bold">Workspace Stream</h2>
+<span class="px-2 py-0.5 rounded bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider">Live</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined text-slate-400 hover:text-primary cursor-pointer">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-primary rounded-full border-2 border-white"></span>
+</div>
+<button class="bg-primary text-white px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-sm">add</span>
+                        New Command
+                    </button>
+</div>
+</header>
+<!-- Message Stream Area -->
+<section class="flex-1 overflow-y-auto p-8 space-y-6 flex flex-col items-center">
+<!-- Message Card 1 -->
+<div class="w-full max-w-3xl flex gap-4">
+<div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white shrink-0 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">person_outline</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="font-bold text-sm">System Secretary</span>
+<span class="text-[10px] text-slate-400">10:42 AM</span>
+</div>
+<div class="bg-white dark:bg-slate-800 p-5 rounded-2xl rounded-tl-none shadow-sm border border-primary/5">
+<p class="text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+                                I've received your request for the "Organic Growth Strategy 2024". I am currently coordinating with the CMO agent to pull current market benchmarks and will hand off the creative brief to the Specialist once the data is verified.
+                            </p>
+</div>
+</div>
+</div>
+<!-- Hand-off Event -->
+<div class="flex items-center gap-2 text-slate-400 py-2">
+<div class="h-[1px] w-12 bg-primary/20"></div>
+<span class="text-[10px] font-bold uppercase tracking-widest flex items-center gap-1 text-primary/60">
+<span class="material-symbols-outlined text-sm">swap_horiz</span>
+                        Hand-off to CMO
+                    </span>
+<div class="h-[1px] w-12 bg-primary/20"></div>
+</div>
+<!-- Message Card 2 (CMO Agent) -->
+<div class="w-full max-w-3xl flex gap-4">
+<div class="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined">monitoring</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="font-bold text-sm">Chief Marketing Agent (CMO)</span>
+<span class="text-[10px] text-slate-400">10:43 AM</span>
+</div>
+<div class="bg-white dark:bg-slate-800 p-5 rounded-2xl rounded-tl-none shadow-sm border border-primary/5">
+<p class="text-sm leading-relaxed text-slate-700 dark:text-slate-300 mb-4">
+                                Data synthesis complete. We are seeing a 14% uptick in organic search volume for "sustainable farming" keywords. Here are the top 3 focus areas for the strategy:
+                            </p>
+<div class="grid grid-cols-3 gap-3">
+<div class="p-3 rounded-xl bg-background-light dark:bg-slate-900 border border-primary/10">
+<p class="text-[10px] font-bold text-primary uppercase mb-1">Volume</p>
+<p class="text-lg font-bold font-display">24.2k</p>
+</div>
+<div class="p-3 rounded-xl bg-background-light dark:bg-slate-900 border border-primary/10">
+<p class="text-[10px] font-bold text-primary uppercase mb-1">Growth</p>
+<p class="text-lg font-bold font-display text-emerald-600">+12%</p>
+</div>
+<div class="p-3 rounded-xl bg-background-light dark:bg-slate-900 border border-primary/10">
+<p class="text-[10px] font-bold text-primary uppercase mb-1">CPC</p>
+<p class="text-lg font-bold font-display">$1.42</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Final Message Card (Typing indicator/Status) -->
+<div class="w-full max-w-3xl flex gap-4 opacity-60">
+<div class="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-500 shrink-0">
+<span class="material-symbols-outlined">brush</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="font-bold text-sm">Creative Specialist</span>
+<span class="text-[10px] text-slate-400">Streaming...</span>
+</div>
+<div class="bg-white/50 dark:bg-slate-800/50 p-5 rounded-2xl rounded-tl-none border border-dashed border-primary/20">
+<div class="flex gap-1">
+<div class="w-1.5 h-1.5 rounded-full bg-primary animate-bounce"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-primary animate-bounce [animation-delay:0.2s]"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-primary animate-bounce [animation-delay:0.4s]"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Command Input Area -->
+<footer class="p-6 bg-transparent">
+<div class="max-w-4xl mx-auto">
+<div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl shadow-primary/10 border border-primary/20 p-2 focus-within:ring-2 ring-primary/30 transition-all">
+<div class="flex items-center gap-2 px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+<span class="text-primary">@mention</span> to tag agents • <span class="text-primary">/slash</span> for commands
+                        </div>
+<div class="flex items-end gap-2 p-2">
+<textarea class="w-full bg-transparent border-none focus:ring-0 resize-none py-2 text-sm placeholder:text-slate-400 max-h-32" placeholder="Tell the system what to do..." rows="1"></textarea>
+<div class="flex gap-1 pb-1">
+<button class="p-2 rounded-xl text-slate-400 hover:text-primary hover:bg-primary/10">
+<span class="material-symbols-outlined text-xl">attach_file</span>
+</button>
+<button class="p-2 rounded-xl bg-primary text-white shadow-md shadow-primary/20 hover:opacity-90">
+<span class="material-symbols-outlined text-xl">send</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</footer>
+</main>
+<!-- Hand-off Tracker (Right Sidebar) -->
+<aside class="w-72 border-l border-primary/10 bg-accent-beige/20 dark:bg-background-dark hidden xl:flex flex-col">
+<div class="p-6 border-b border-primary/10">
+<h3 class="text-sm font-bold uppercase tracking-widest text-primary mb-1">Process Chain</h3>
+<p class="text-[10px] text-slate-500">Live Workspace Execution</p>
+</div>
+<div class="flex-1 p-6 relative">
+<!-- Timeline/Chain Logic -->
+<div class="absolute left-10 top-12 bottom-12 w-0.5 bg-primary/10"></div>
+<div class="space-y-12 relative">
+<!-- Step 1 (Completed) -->
+<div class="flex gap-4 items-start">
+<div class="z-10 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-lg">check</span>
+</div>
+<div>
+<p class="text-sm font-bold">Secretary</p>
+<p class="text-[11px] text-slate-500">Task Initiation</p>
+<p class="text-[10px] text-emerald-600 font-bold mt-1 uppercase">Completed</p>
+</div>
+</div>
+<!-- Step 2 (Active) -->
+<div class="flex gap-4 items-start">
+<div class="z-10 w-8 h-8 rounded-full bg-white border-2 border-primary text-primary flex items-center justify-center">
+<div class="w-3 h-3 bg-primary rounded-full animate-pulse"></div>
+</div>
+<div>
+<p class="text-sm font-bold">CMO Agent</p>
+<p class="text-[11px] text-slate-500">Strategy Synthesis</p>
+<p class="text-[10px] text-primary font-bold mt-1 uppercase">Active</p>
+</div>
+</div>
+<!-- Step 3 (Pending) -->
+<div class="flex gap-4 items-start opacity-40">
+<div class="z-10 w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-500">
+<span class="material-symbols-outlined text-lg">hourglass_empty</span>
+</div>
+<div>
+<p class="text-sm font-bold">Specialist</p>
+<p class="text-[11px] text-slate-500">Creative Drafting</p>
+<p class="text-[10px] text-slate-400 font-bold mt-1 uppercase">Pending</p>
+</div>
+</div>
+</div>
+<!-- Stats Card -->
+<div class="mt-12 p-4 rounded-2xl bg-white dark:bg-slate-800 border border-primary/10 shadow-sm">
+<p class="text-[10px] font-bold text-slate-400 uppercase mb-3">Workspace Health</p>
+<div class="space-y-3">
+<div class="flex justify-between items-center text-xs">
+<span>API Latency</span>
+<span class="font-bold text-emerald-600">24ms</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-700 h-1 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-4/5"></div>
+</div>
+<div class="flex justify-between items-center text-xs">
+<span>Tokens / min</span>
+<span class="font-bold">4.2k</span>
+</div>
+</div>
+</div>
+</div>
+<div class="p-6 bg-primary/5">
+<button class="w-full py-2 rounded-xl border border-primary/20 text-xs font-bold text-primary hover:bg-primary hover:text-white transition-all">
+                    View Full Workflow
+                </button>
+</div>
+</aside>
+</div>
+</body></html>

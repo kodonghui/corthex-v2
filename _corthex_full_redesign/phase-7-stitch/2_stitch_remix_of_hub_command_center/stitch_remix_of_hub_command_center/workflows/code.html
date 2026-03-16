@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 - Workflows</title>
+<!-- BEGIN: External Scripts & Styles -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'warm-bg': '#fcfbf9',
+            'sage': '#81b29a',
+            'terracotta': '#e07a5f',
+            'warm-gray': '#78716c',
+          },
+          borderRadius: {
+            '3xl': '24px',
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-layout">
+    body {
+      background-color: #fcfbf9;
+      color: #2d2d2d;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    }
+    .canvas-bg {
+      background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+    .workflow-node {
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    }
+    .line-connection {
+      stroke: #d1d5db;
+      stroke-width: 2;
+      fill: none;
+    }
+  </style>
+<!-- END: External Scripts & Styles -->
+</head>
+<body class="h-screen flex overflow-hidden">
+<!-- BEGIN: Sidebar -->
+<aside class="w-64 border-r border-stone-200 bg-white flex flex-col z-30" data-purpose="navigation-sidebar">
+<div class="p-6">
+<h1 class="text-2xl font-bold tracking-tighter text-stone-800 flex items-center gap-2">
+<i class="ph-fill ph-cpu text-sage"></i> CORTHEX
+      </h1>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-stone-500 hover:bg-stone-50 rounded-xl transition-colors" href="#">
+<i class="ph ph-house text-xl"></i>
+<span class="font-medium text-sm">대시보드</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-sage/10 text-sage rounded-xl transition-colors" href="#">
+<i class="ph-fill ph-git-merge text-xl"></i>
+<span class="font-medium text-sm">워크플로우</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-stone-500 hover:bg-stone-50 rounded-xl transition-colors" href="#">
+<i class="ph ph-users text-xl"></i>
+<span class="font-medium text-sm">에이전트</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-stone-500 hover:bg-stone-50 rounded-xl transition-colors" href="#">
+<i class="ph ph-database text-xl"></i>
+<span class="font-medium text-sm">데이터 스토어</span>
+</a>
+</nav>
+<div class="p-4 mt-auto">
+<div class="bg-stone-50 rounded-2xl p-4">
+<p class="text-xs text-stone-400 mb-2">현재 요금제</p>
+<p class="text-sm font-bold text-stone-700">Pro Plan</p>
+<div class="w-full bg-stone-200 h-1.5 rounded-full mt-2 overflow-hidden">
+<div class="bg-terracotta w-3/4 h-full"></div>
+</div>
+</div>
+</div>
+</aside>
+<!-- END: Sidebar -->
+<!-- BEGIN: Main Content Area -->
+<main class="flex-1 flex flex-col relative overflow-hidden">
+<!-- BEGIN: Topbar -->
+<header class="h-16 border-b border-stone-200 bg-white/80 backdrop-blur-md flex items-center justify-between px-8 z-20">
+<div class="flex items-center gap-4">
+<div class="flex flex-col">
+<span class="text-xs text-stone-400 font-medium uppercase tracking-widest">Nexus Automation</span>
+<h2 class="text-lg font-bold text-stone-800">고객 지원 이메일 자동화</h2>
+</div>
+<span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Active</span>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 border border-stone-200 rounded-full text-sm font-medium hover:bg-stone-50 transition-colors">
+<i class="ph ph-play"></i> 테스트 실행
+        </button>
+<button class="flex items-center gap-2 px-6 py-2 bg-sage text-white rounded-full text-sm font-bold hover:bg-opacity-90 transition-all shadow-lg shadow-sage/20">
+<i class="ph ph-floppy-disk"></i> 저장하기
+        </button>
+<div class="h-8 w-[1px] bg-stone-200 mx-2"></div>
+<button class="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-stone-600">
+<i class="ph ph-gear text-xl"></i>
+</button>
+</div>
+</header>
+<!-- END: Topbar -->
+<!-- BEGIN: Workflow Canvas -->
+<section class="flex-1 relative overflow-hidden canvas-bg" id="workflow-canvas">
+<!-- Canvas Controls -->
+<div class="absolute bottom-8 left-8 flex gap-2 z-10">
+<div class="flex bg-white rounded-full shadow-lg border border-stone-100 p-1">
+<button class="w-10 h-10 flex items-center justify-center hover:bg-stone-50 rounded-full"><i class="ph ph-plus"></i></button>
+<button class="w-10 h-10 flex items-center justify-center hover:bg-stone-50 rounded-full"><i class="ph ph-minus"></i></button>
+</div>
+<button class="bg-white px-4 py-2 rounded-full shadow-lg border border-stone-100 text-sm font-medium flex items-center gap-2">
+<i class="ph ph-arrows-out"></i> 맞춤 보기
+        </button>
+</div>
+<!-- NODES Layer -->
+<div class="absolute inset-0 p-20 flex items-start justify-center gap-32">
+<!-- Node: Trigger -->
+<div class="relative">
+<div class="workflow-node w-64 bg-white rounded-3xl p-5 border border-stone-100 relative group" data-purpose="node-trigger">
+<div class="absolute -top-3 left-6 px-3 py-1 bg-terracotta text-white text-[10px] font-bold rounded-full uppercase tracking-wider">Trigger</div>
+<div class="flex items-center gap-4 mb-4 mt-2">
+<div class="w-12 h-12 bg-terracotta/10 rounded-2xl flex items-center justify-center text-terracotta">
+<i class="ph-fill ph-envelope-simple text-2xl"></i>
+</div>
+<div>
+<h4 class="font-bold text-sm text-stone-800">이메일 수신</h4>
+<p class="text-[11px] text-stone-400">Gmail API</p>
+</div>
+</div>
+<div class="space-y-2">
+<div class="text-[11px] font-medium text-stone-500 bg-stone-50 p-2 rounded-lg border border-stone-100">
+                필터: support@corthex.ai
+              </div>
+</div>
+<!-- Output Port -->
+<div class="absolute top-1/2 -right-3 w-6 h-6 bg-white border-2 border-stone-200 rounded-full flex items-center justify-center -translate-y-1/2 hover:border-sage cursor-pointer">
+<div class="w-2 h-2 bg-stone-300 rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- SVG Connection Lines -->
+<svg class="absolute inset-0 pointer-events-none w-full h-full">
+<!-- Trigger to Agent -->
+<path class="line-connection" d="M 336 215 C 400 215, 400 215, 464 215" style="stroke: #81b29a; stroke-dasharray: 4;"></path>
+<!-- Agent to Tool -->
+<path class="line-connection" d="M 720 215 C 784 215, 784 215, 848 215"></path>
+</svg>
+<!-- Node: Agent -->
+<div class="relative">
+<div class="workflow-node w-64 bg-white rounded-3xl p-5 border-2 border-sage ring-4 ring-sage/5 relative" data-purpose="node-agent">
+<div class="absolute -top-3 left-6 px-3 py-1 bg-sage text-white text-[10px] font-bold rounded-full uppercase tracking-wider">Agent (Soul)</div>
+<div class="flex items-center gap-4 mb-4 mt-2">
+<div class="w-12 h-12 bg-sage/10 rounded-2xl flex items-center justify-center text-sage">
+<i class="ph-fill ph-brain text-2xl"></i>
+</div>
+<div>
+<h4 class="font-bold text-sm text-stone-800">의도 분석 전문가</h4>
+<p class="text-[11px] text-stone-400">GPT-4o Model</p>
+</div>
+</div>
+<div class="text-[11px] leading-relaxed text-stone-600 bg-stone-50 p-3 rounded-xl">
+              "당신은 고객 이메일의 감정과 의도를 분석하여 분류하는 전문가입니다..."
+            </div>
+<!-- Input Port -->
+<div class="absolute top-1/2 -left-3 w-6 h-6 bg-white border-2 border-sage rounded-full flex items-center justify-center -translate-y-1/2">
+<div class="w-2 h-2 bg-sage rounded-full"></div>
+</div>
+<!-- Output Port -->
+<div class="absolute top-1/2 -right-3 w-6 h-6 bg-white border-2 border-stone-200 rounded-full flex items-center justify-center -translate-y-1/2 hover:border-sage cursor-pointer">
+<div class="w-2 h-2 bg-stone-300 rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Node: Tool -->
+<div class="relative">
+<div class="workflow-node w-64 bg-white rounded-3xl p-5 border border-stone-100 relative opacity-80 grayscale-[0.5]" data-purpose="node-tool">
+<div class="absolute -top-3 left-6 px-3 py-1 bg-stone-800 text-white text-[10px] font-bold rounded-full uppercase tracking-wider">Action</div>
+<div class="flex items-center gap-4 mb-4 mt-2">
+<div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-500">
+<i class="ph-fill ph-database text-2xl"></i>
+</div>
+<div>
+<h4 class="font-bold text-sm text-stone-800">지식 베이스 조회</h4>
+<p class="text-[11px] text-stone-400">Vector Search</p>
+</div>
+</div>
+<!-- Input Port -->
+<div class="absolute top-1/2 -left-3 w-6 h-6 bg-white border-2 border-stone-200 rounded-full flex items-center justify-center -translate-y-1/2">
+<div class="w-2 h-2 bg-stone-300 rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- END: Workflow Canvas -->
+<!-- BEGIN: Properties Panel (Right) -->
+<aside class="absolute top-0 right-0 h-full w-80 bg-white border-l border-stone-200 shadow-2xl z-20 flex flex-col" data-purpose="properties-panel">
+<div class="p-6 border-b border-stone-100 flex items-center justify-between">
+<h3 class="font-bold text-stone-800">노드 설정</h3>
+<button class="text-stone-400 hover:text-stone-600"><i class="ph ph-x text-xl"></i></button>
+</div>
+<div class="flex-1 overflow-y-auto p-6 space-y-8">
+<!-- Section: Basic Info -->
+<section data-purpose="property-section">
+<label class="text-[11px] font-bold text-stone-400 uppercase tracking-widest block mb-4">기본 정보</label>
+<div class="space-y-4">
+<div>
+<label class="text-xs font-medium text-stone-600 block mb-1.5">에이전트 이름</label>
+<input class="w-full bg-stone-50 border-stone-200 rounded-xl text-sm focus:ring-sage focus:border-sage" type="text" value="의도 분석 전문가"/>
+</div>
+<div>
+<label class="text-xs font-medium text-stone-600 block mb-1.5">모델 선택</label>
+<select class="w-full bg-stone-50 border-stone-200 rounded-xl text-sm focus:ring-sage focus:border-sage">
+<option>GPT-4o (Recommended)</option>
+<option>GPT-3.5 Turbo</option>
+<option>Claude 3 Opus</option>
+</select>
+</div>
+</div>
+</section>
+<!-- Section: Soul Editing -->
+<section data-purpose="soul-editor">
+<div class="flex items-center justify-between mb-4">
+<label class="text-[11px] font-bold text-stone-400 uppercase tracking-widest block">Agent Soul (프롬프트)</label>
+<span class="text-[10px] bg-sage/10 text-sage px-2 py-0.5 rounded font-bold uppercase">System</span>
+</div>
+<textarea class="w-full bg-stone-50 border-stone-200 rounded-2xl text-sm p-4 focus:ring-sage focus:border-sage leading-relaxed text-stone-700" placeholder="에이전트의 성격과 역할을 정의하세요..." rows="8">당신은 고객 이메일의 감정과 의도를 분석하여 분류하는 전문가입니다. 
+
+[지침]
+1. 이메일 톤이 '부정적'인 경우 즉시 에스컬레이션 플래그를 생성하십시오.
+2. 환불 문의의 경우 Order ID를 반드시 추출하십시오.
+3. 한국어 응답 원칙을 준수하십시오.</textarea>
+</section>
+<!-- Section: Advanced -->
+<section>
+<label class="text-[11px] font-bold text-stone-400 uppercase tracking-widest block mb-4">고급 설정</label>
+<div class="space-y-3">
+<div class="flex items-center justify-between">
+<span class="text-xs text-stone-600">Temperature</span>
+<span class="text-xs font-bold text-sage">0.7</span>
+</div>
+<input class="w-full h-1.5 bg-stone-100 rounded-lg appearance-none cursor-pointer accent-sage" type="range"/>
+<div class="flex items-center justify-between pt-4">
+<span class="text-xs text-stone-600">스트리밍 응답</span>
+<button class="w-10 h-5 bg-sage rounded-full relative">
+<div class="absolute right-1 top-1 w-3 h-3 bg-white rounded-full"></div>
+</button>
+</div>
+</div>
+</section>
+</div>
+<!-- Footer Buttons -->
+<div class="p-6 border-t border-stone-100 bg-stone-50/50">
+<button class="w-full bg-stone-800 text-white py-3 rounded-xl font-bold text-sm hover:bg-stone-900 transition-colors">
+          변경사항 적용
+        </button>
+</div>
+</aside>
+<!-- END: Properties Panel -->
+</main>
+<!-- END: Main Content Area -->
+<!-- BEGIN: UI Overlay Elements -->
+<!-- Floating Add Node Button -->
+<button class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-white px-8 py-4 rounded-full shadow-2xl border border-stone-200 flex items-center gap-3 hover:scale-105 transition-transform z-40">
+<div class="w-6 h-6 bg-sage text-white rounded-full flex items-center justify-center">
+<i class="ph ph-plus"></i>
+</div>
+<span class="font-bold text-stone-700">새로운 단계 추가</span>
+</button>
+<!-- END: UI Overlay Elements -->
+<script data-purpose="interactivity">
+    // Simple drag simulation for nodes (conceptual)
+    document.querySelectorAll('.workflow-node').forEach(node => {
+      node.addEventListener('mousedown', () => {
+        node.classList.add('scale-[1.02]', 'cursor-grabbing');
+      });
+      node.addEventListener('mouseup', () => {
+        node.classList.remove('scale-[1.02]', 'cursor-grabbing');
+      });
+    });
+  </script>
+</body></html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 | Agent Chat</title>
+<!-- Google Fonts for Noto Serif KR & Pretendard via CDN -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link as="style" crossorigin="" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet"/>
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- BEGIN: Tailwind Configuration -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'c-bg': '#faf8f5',
+            'c-sub': '#f5f0eb',
+            'c-primary': '#5a7247', // Olive Green
+            'c-text-main': '#2d2d2d',
+            'c-text-muted': '#6b6b6b'
+          },
+          fontFamily: {
+            serif: ['"Noto Serif KR"', 'serif'],
+            sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', 'sans-serif'],
+          },
+          borderRadius: {
+            '2xl': '16px',
+          }
+        }
+      }
+    }
+  </script>
+<!-- END: Tailwind Configuration -->
+<style data-purpose="custom-typography">
+    body {
+      font-family: 'Pretendard', sans-serif;
+      background-color: #faf8f5;
+      color: #2d2d2d;
+    }
+    h1, h2, h3, .font-serif {
+      font-family: 'Noto Serif KR', serif;
+    }
+    /* Custom Scrollbar for Organic Feel */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #e2ddd9;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #d4cdc7;
+    }
+  </style>
+</head>
+<body class="h-screen overflow-hidden flex flex-col">
+<!-- BEGIN: API Documentation Metadata -->
+<!-- 
+    API ENDPOINTS:
+    - GET /api/workspace/chat/sessions : Fetch list of previous chat sessions
+    - POST /api/workspace/chat/sessions : Create a new chat session
+    - GET /api/workspace/chat/sessions/:id/messages : Retrieve message history for a session
+    - POST /api/workspace/chat/sessions/:id/messages : Send a new message to the agent
+  -->
+<!-- END: API Documentation Metadata -->
+<!-- BEGIN: Global Header -->
+<header class="h-16 border-b border-gray-200 bg-white/80 backdrop-blur-md flex items-center justify-between px-6 z-10 shrink-0" data-purpose="main-header">
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 bg-c-primary rounded-lg flex items-center justify-center text-white font-bold">C</div>
+<h1 class="text-xl font-bold tracking-tight">CORTHEX <span class="text-c-primary font-light">v2</span></h1>
+</div>
+<div class="flex items-center gap-3">
+<div class="text-right mr-2 hidden md:block">
+<p class="text-xs font-semibold">Workspace Alpha</p>
+<p class="text-[10px] text-c-text-muted uppercase tracking-widest">Active Session</p>
+</div>
+<div class="w-10 h-10 rounded-full bg-c-sub border border-gray-100 flex items-center justify-center overflow-hidden">
+<img alt="User Profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDY71maqfjHJ8tQYvP3g1V_Ev1XPQUGmZZWdjRh7rdMSuIdcOaGeAlDjOYaHeg0mV9PX8e-oI0NdkdrrjakiUhRGzkBA4RXVJt7iKxOdM31-s2B-ANsG2Lz1g4oHgrcmbNf_O0AokhqxWle1HJKsDpR-7iPBklwu0uFpHffD_JKMdn7OTG3EoboCH70rM-j_vCePAER4Jgw1v-SqIEYmGFvx0_SE8A_YzhDoR2crcN5Jl8oQ0AHaORxuDG3H9Yqsf3l0gI_lkR7Jg"/>
+</div>
+</div>
+</header>
+<!-- END: Global Header -->
+<main class="flex-1 flex overflow-hidden">
+<!-- BEGIN: Left Sidebar (Session List) -->
+<aside class="w-72 bg-c-sub border-r border-gray-200 flex flex-col overflow-hidden" data-purpose="session-sidebar">
+<div class="p-4">
+<button class="w-full bg-white border border-gray-200 py-3 px-4 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2 font-medium text-c-primary">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+          New Chat Session
+        </button>
+</div>
+<div class="flex-1 overflow-y-auto px-3 space-y-2 pb-6">
+<p class="px-4 py-2 text-[11px] font-bold text-c-text-muted uppercase tracking-widest">Recent Chats</p>
+<!-- Active Session Item -->
+<div class="bg-white p-3 rounded-2xl shadow-sm border-l-4 border-c-primary cursor-pointer">
+<h3 class="text-sm font-bold truncate">Strategic Market Analysis</h3>
+<p class="text-xs text-c-text-muted mt-1 truncate italic">Analyzing Q3 trends...</p>
+<span class="text-[10px] text-c-text-muted mt-2 block">2 mins ago</span>
+</div>
+<!-- Inactive Session Items -->
+<div class="p-3 rounded-2xl hover:bg-white/50 transition-colors cursor-pointer group">
+<h3 class="text-sm font-medium truncate text-gray-700">Code Refactoring: Auth Logic</h3>
+<p class="text-xs text-c-text-muted mt-1 truncate">Updated schema for users...</p>
+<span class="text-[10px] text-c-text-muted mt-2 block">4 hours ago</span>
+</div>
+<div class="p-3 rounded-2xl hover:bg-white/50 transition-colors cursor-pointer group">
+<h3 class="text-sm font-medium truncate text-gray-700">Onboarding Flow Script</h3>
+<p class="text-xs text-c-text-muted mt-1 truncate">Drafting welcome emails...</p>
+<span class="text-[10px] text-c-text-muted mt-2 block">Yesterday</span>
+</div>
+</div>
+</aside>
+<!-- END: Left Sidebar -->
+<!-- BEGIN: Middle Pane (Active Chat Area) -->
+<section class="flex-1 flex flex-col bg-c-bg relative" data-purpose="active-chat-area">
+<!-- Chat Message Scroll Area -->
+<div class="flex-1 overflow-y-auto p-6 space-y-8" id="chat-messages">
+<!-- Agent Message -->
+<div class="flex gap-4 max-w-4xl">
+<div class="w-10 h-10 rounded-2xl bg-c-primary flex items-center justify-center shrink-0 shadow-lg">
+<svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<div class="space-y-4">
+<div class="bg-white p-5 rounded-2xl rounded-tl-none shadow-sm border border-gray-100">
+<p class="leading-relaxed">Hello! I've been reviewing the market data you uploaded. Based on the current trends, I'm initiating a deep dive into the competitor's pricing models. Would you like me to focus on the SaaS sector first?</p>
+</div>
+<!-- Tool Call Card -->
+<div class="bg-c-sub/50 border border-dashed border-gray-300 rounded-2xl p-4 flex flex-col gap-3" data-purpose="tool-call-card">
+<div class="flex items-center gap-2 text-xs font-bold text-c-primary uppercase tracking-wider">
+<svg class="h-4 w-4" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+                Action: SearchMarketData
+              </div>
+<div class="bg-white/60 rounded-lg p-3 text-xs font-mono text-gray-600">
+                { "query": "SaaS pricing trends 2024", "depth": "high" }
+              </div>
+<div class="flex items-center gap-2 text-[10px] text-gray-400">
+<span class="w-2 h-2 rounded-full bg-green-400"></span> Completed in 1.4s
+              </div>
+</div>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex gap-4 max-w-4xl ml-auto flex-row-reverse">
+<div class="w-10 h-10 rounded-2xl bg-white border border-gray-200 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
+<img alt="User" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAspF4bCmFnY5oz4_4JAsxIPTyAhcsumJXg_SLzGG_5BoGKA3IxElN8e2sSKaLZxQwU0vY6HbpXIiISoCTQjEqq1P0cRIpDm8JiPcuoSkP3i7ogaegIB978KFHoxphTyeLSo6vgNvhUSrVXWfJO6U_Y0gmx6Gh7IUabB37NjSipj9UmhoSo1wrLEUL-1ywSZf5PCxgO7PORVezqziKymaDehWdcGkbeU-r8DQKacspX4AkprnIhyEKviWvwKX5roEEm2RaoC4Yf-Q"/>
+</div>
+<div class="space-y-3 flex flex-col items-end">
+<div class="bg-c-primary text-white p-5 rounded-2xl rounded-tr-none shadow-md">
+<p class="leading-relaxed">Yes, please focus on the SaaS sector. Also, check how they handle enterprise tier discounting. I've attached the latest internal report for context.</p>
+</div>
+<!-- File Preview -->
+<div class="flex items-center gap-3 bg-white border border-gray-100 p-3 rounded-xl shadow-sm max-w-xs" data-purpose="file-attachment-preview">
+<div class="w-10 h-10 bg-red-50 text-red-500 rounded flex items-center justify-center">
+<svg class="h-6 w-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<div class="overflow-hidden">
+<p class="text-xs font-bold truncate">Q3_Internal_Pricing.pdf</p>
+<p class="text-[10px] text-gray-400">2.4 MB</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Chat Input Area -->
+<footer class="p-6 bg-transparent" data-purpose="chat-input-section">
+<div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl border border-gray-100 p-2 flex flex-col">
+<textarea class="w-full border-none focus:ring-0 text-sm p-4 min-h-[100px] resize-none placeholder:text-gray-300" placeholder="Type your instruction to the agent... (Shift + Enter for new line)"></textarea>
+<div class="flex items-center justify-between p-2 border-t border-gray-50">
+<div class="flex gap-2">
+<button class="p-2 text-gray-400 hover:text-c-primary hover:bg-c-sub rounded-lg transition-colors" title="Attach Files">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+<button class="p-2 text-gray-400 hover:text-c-primary hover:bg-c-sub rounded-lg transition-colors" title="Voice Input">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+<button class="bg-c-primary text-white px-6 py-2 rounded-xl font-bold text-sm shadow-md hover:opacity-90 transition-opacity">
+              Send Message
+            </button>
+</div>
+</div>
+<p class="text-center text-[10px] text-gray-400 mt-4">CORTHEX v2 Agents may hallucinate. Verify critical information.</p>
+</footer>
+</section>
+<!-- END: Middle Pane -->
+<!-- BEGIN: Right Sidebar (Agent Info) -->
+<aside class="w-80 border-l border-gray-200 bg-white flex flex-col" data-purpose="agent-info-sidebar">
+<div class="p-8 text-center space-y-4">
+<div class="relative inline-block">
+<div class="w-24 h-24 rounded-3xl bg-c-sub flex items-center justify-center mx-auto shadow-inner relative overflow-hidden">
+<svg class="h-12 w-12 text-c-primary opacity-60" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<div class="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 border-4 border-white rounded-full"></div>
+</div>
+<div>
+<h2 class="text-xl font-bold font-serif">Aura-7</h2>
+<p class="text-xs text-c-primary font-bold tracking-widest uppercase mt-1">Strategic Analyst</p>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto px-6 space-y-8 pb-10">
+<!-- Soul Summary -->
+<div class="space-y-3">
+<h3 class="text-xs font-bold text-c-text-muted uppercase tracking-widest border-b border-gray-100 pb-2">Agent 'Soul'</h3>
+<p class="text-sm leading-relaxed text-gray-600">
+            Aura-7 is optimized for market intelligence and competitive strategy. Its personality is "Pragmatic &amp; Methodical," focusing on data-driven conclusions while maintaining a helpful, collaborative tone.
+          </p>
+</div>
+<!-- Capability Tags -->
+<div class="space-y-3">
+<h3 class="text-xs font-bold text-c-text-muted uppercase tracking-widest border-b border-gray-100 pb-2">Active Capabilities</h3>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1 bg-c-sub text-c-primary text-[11px] font-semibold rounded-full">Web Search</span>
+<span class="px-3 py-1 bg-c-sub text-c-primary text-[11px] font-semibold rounded-full">Data Analysis</span>
+<span class="px-3 py-1 bg-c-sub text-c-primary text-[11px] font-semibold rounded-full">PDF Processing</span>
+<span class="px-3 py-1 bg-c-sub text-c-primary text-[11px] font-semibold rounded-full">SQL Generation</span>
+</div>
+</div>
+<!-- Context Summary -->
+<div class="p-4 bg-c-sub rounded-2xl border border-gray-100">
+<div class="flex items-center gap-2 mb-2">
+<svg class="h-4 w-4 text-c-primary" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<h4 class="text-xs font-bold">Session Context</h4>
+</div>
+<p class="text-xs text-c-text-muted leading-relaxed">
+            Memory window: 12,000 tokens active. Currently prioritizing "Competitor Pricing" in the context buffer.
+          </p>
+</div>
+</div>
+<!-- Action Footer -->
+<div class="p-6 border-t border-gray-100 bg-c-sub/20">
+<button class="w-full text-xs font-bold text-red-500 hover:bg-red-50 py-3 rounded-xl transition-colors flex items-center justify-center gap-2 border border-red-100">
+<svg class="h-4 w-4" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+          Delete This Session
+        </button>
+</div>
+</aside>
+<!-- END: Right Sidebar -->
+</main>
+<script data-purpose="ui-interactions">
+    // Simple script to handle textarea auto-resize if needed
+    const tx = document.getElementsByTagName("textarea");
+    for (let i = 0; i < tx.length; i++) {
+      tx[i].setAttribute("style", "height:" + (tx[i].scrollHeight) + "px;overflow-y:hidden;");
+      tx[i].addEventListener("input", OnInput, false);
+    }
+
+    function OnInput() {
+      this.style.height = "auto";
+      this.style.height = (this.scrollHeight) + "px";
+    }
+  </script>
+</body></html>

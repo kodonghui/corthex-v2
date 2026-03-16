@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 Analysis Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#6b705c", // Olive Green Accent
+                        "secondary": "#a5a58d",
+                        "accent": "#ddbea9",
+                        "background-light": "#f8f6f2", // Warm Beige
+                        "background-dark": "#221610",
+                        "card-light": "#ffffff",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+        .sidebar-item-active { background-color: #6b705c; color: white; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-64 flex-shrink-0 bg-white dark:bg-zinc-900 border-r border-primary/10 flex flex-col">
+<div class="p-6 flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined">eco</span>
+</div>
+<div>
+<h1 class="text-lg font-bold leading-none tracking-tight">CORTHEX v2</h1>
+<p class="text-xs text-primary/70 font-medium">Natural Organic UI</p>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-2 mt-4">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl sidebar-item-active" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-semibold">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">workspaces</span>
+<span class="text-sm font-semibold">Workspaces</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="text-sm font-semibold">Agents</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="text-sm font-semibold">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-semibold">Settings</span>
+</a>
+</nav>
+<div class="p-4 border-t border-primary/10">
+<div class="flex items-center gap-3 p-2">
+<div class="w-10 h-10 rounded-full bg-accent/30 overflow-hidden">
+<img alt="User Profile" data-alt="Avatar of a male professional with glasses" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAOaOUcdqVGkLgqzTIsjFxN3uRdNclGGBYFT3x06BN9wA7gL1cb-gayaM-GKjjpNk_1MKZJ0hBqT2w3KOtfxMK6C4kRDvLmk9MHE1w5n6iIrzBberJd7MurH_VSPTrTjBMnaTsSoIcbeoVaaQ8kWg5QHjys0avqMBhydrEKoVWaNORfZFlUwdNWsUffbtMrQqfwdBktTYzmcX5N8fVK_L3v_-fjU3yIe3qB-1fYXS2FTWeU11cwOKtnjaAuFORJIwCQ122fKzewQ"/>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold truncate">Alex Rivera</p>
+<p class="text-xs text-slate-500 truncate">Pro Account</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto">
+<!-- Top Header -->
+<header class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-primary/10 px-8 py-4 flex items-center justify-between">
+<div>
+<h2 class="text-xl font-bold">Workspace Dashboard</h2>
+<p class="text-sm text-slate-500">API: GET /api/workspace/dashboard</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="pl-10 pr-4 py-2 bg-white dark:bg-zinc-800 border border-primary/20 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-sm w-64" placeholder="Search data..." type="text"/>
+</div>
+<button class="p-2 bg-white dark:bg-zinc-800 border border-primary/20 rounded-xl text-slate-600 hover:bg-primary/5">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</header>
+<div class="p-8 space-y-8">
+<!-- 1. Top 4-Column Metric Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-primary/10 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<span class="text-slate-500 text-sm font-medium">총 작업수</span>
+<span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">task_alt</span>
+</div>
+<div class="space-y-1">
+<h3 class="text-2xl font-bold">12,840</h3>
+<div class="flex items-center gap-1 text-emerald-600 text-sm font-semibold">
+<span class="material-symbols-outlined text-xs">trending_up</span>
+                                12.5%
+                            </div>
+</div>
+</div>
+<div class="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-primary/10 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<span class="text-slate-500 text-sm font-medium">총 비용</span>
+<span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">payments</span>
+</div>
+<div class="space-y-1">
+<h3 class="text-2xl font-bold">$4,250.20</h3>
+<div class="flex items-center gap-1 text-rose-600 text-sm font-semibold">
+<span class="material-symbols-outlined text-xs">trending_down</span>
+                                2.1%
+                            </div>
+</div>
+</div>
+<div class="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-primary/10 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<span class="text-slate-500 text-sm font-medium">활성 에이전트</span>
+<span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">smart_toy</span>
+</div>
+<div class="space-y-1">
+<h3 class="text-2xl font-bold">24</h3>
+<div class="flex items-center gap-1 text-slate-400 text-sm font-semibold">
+<span class="material-symbols-outlined text-xs">horizontal_rule</span>
+                                유지됨
+                            </div>
+</div>
+</div>
+<div class="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-primary/10 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<span class="text-slate-500 text-sm font-medium">만족도</span>
+<span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">sentiment_very_satisfied</span>
+</div>
+<div class="space-y-1">
+<h3 class="text-2xl font-bold">98.2%</h3>
+<div class="flex items-center gap-1 text-emerald-600 text-sm font-semibold">
+<span class="material-symbols-outlined text-xs">trending_up</span>
+                                0.5%
+                            </div>
+</div>
+</div>
+</div>
+<!-- 2. Central LLM Usage Chart -->
+<div class="bg-white dark:bg-zinc-900 p-8 rounded-xl border border-primary/10 shadow-sm">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h3 class="text-lg font-bold">LLM Usage by Provider</h3>
+<p class="text-sm text-slate-500">Token consumption per model provider over the last 30 days</p>
+</div>
+<select class="text-sm border-primary/20 rounded-lg bg-background-light dark:bg-zinc-800 py-1 pl-3 pr-8">
+<option>Last 30 Days</option>
+<option>Last 7 Days</option>
+</select>
+</div>
+<div class="flex items-end justify-between h-64 gap-12 px-12">
+<!-- Anthropic -->
+<div class="flex-1 flex flex-col items-center group">
+<div class="w-full bg-primary/20 rounded-t-xl relative flex items-end justify-center h-48 group-hover:bg-primary/30 transition-colors">
+<div class="w-2/3 bg-primary rounded-t-lg h-[75%] shadow-lg shadow-primary/20"></div>
+<div class="absolute -top-8 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-xs px-2 py-1 rounded">342M Tokens</div>
+</div>
+<span class="mt-4 text-sm font-semibold">Anthropic</span>
+</div>
+<!-- OpenAI -->
+<div class="flex-1 flex flex-col items-center group">
+<div class="w-full bg-primary/20 rounded-t-xl relative flex items-end justify-center h-60 group-hover:bg-primary/30 transition-colors">
+<div class="w-2/3 bg-primary rounded-t-lg h-[90%] shadow-lg shadow-primary/20"></div>
+<div class="absolute -top-8 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-xs px-2 py-1 rounded">512M Tokens</div>
+</div>
+<span class="mt-4 text-sm font-semibold">OpenAI</span>
+</div>
+<!-- Google -->
+<div class="flex-1 flex flex-col items-center group">
+<div class="w-full bg-primary/20 rounded-t-xl relative flex items-end justify-center h-40 group-hover:bg-primary/30 transition-colors">
+<div class="w-2/3 bg-primary rounded-t-lg h-[60%] shadow-lg shadow-primary/20"></div>
+<div class="absolute -top-8 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-xs px-2 py-1 rounded">218M Tokens</div>
+</div>
+<span class="mt-4 text-sm font-semibold">Google</span>
+</div>
+<!-- Meta -->
+<div class="flex-1 flex flex-col items-center group">
+<div class="w-full bg-primary/20 rounded-t-xl relative flex items-end justify-center h-32 group-hover:bg-primary/30 transition-colors">
+<div class="w-2/3 bg-primary rounded-t-lg h-[40%] shadow-lg shadow-primary/20"></div>
+<div class="absolute -top-8 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-xs px-2 py-1 rounded">105M Tokens</div>
+</div>
+<span class="mt-4 text-sm font-semibold">Meta (LLama)</span>
+</div>
+</div>
+</div>
+<!-- 3. Bottom Activity Log and Budget Gauge -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Activity Log -->
+<div class="lg:col-span-2 bg-white dark:bg-zinc-900 p-6 rounded-xl border border-primary/10 shadow-sm">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-lg font-bold">최근 활동 로그</h3>
+<button class="text-sm text-primary font-semibold hover:underline">모두 보기</button>
+</div>
+<div class="space-y-4">
+<div class="flex items-center gap-4 p-3 rounded-lg hover:bg-background-light dark:hover:bg-zinc-800 transition-colors">
+<div class="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-accent">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold">보고서 생성 완료</p>
+<p class="text-xs text-slate-500">Claude-3 Opus 가 마케팅 분석 보고서를 생성했습니다.</p>
+</div>
+<span class="text-xs text-slate-400">2분 전</span>
+</div>
+<div class="flex items-center gap-4 p-3 rounded-lg hover:bg-background-light dark:hover:bg-zinc-800 transition-colors">
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">sync</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold">에이전트 스케줄링</p>
+<p class="text-xs text-slate-500">OpenAI 에이전트 4개가 활성화되었습니다.</p>
+</div>
+<span class="text-xs text-slate-400">15분 전</span>
+</div>
+<div class="flex items-center gap-4 p-3 rounded-lg hover:bg-background-light dark:hover:bg-zinc-800 transition-colors">
+<div class="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center text-rose-500">
+<span class="material-symbols-outlined">priority_high</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold">예산 한도 도달 경고</p>
+<p class="text-xs text-slate-500">일일 할당량의 85%를 사용했습니다.</p>
+</div>
+<span class="text-xs text-slate-400">1시간 전</span>
+</div>
+</div>
+</div>
+<!-- Budget Gauge -->
+<div class="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-primary/10 shadow-sm flex flex-col items-center justify-center text-center">
+<h3 class="text-lg font-bold mb-6">월간 예산 사용량</h3>
+<div class="relative w-40 h-40">
+<!-- SVG Gauge -->
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-slate-100 dark:text-zinc-800" cx="80" cy="80" fill="transparent" r="70" stroke="currentColor" stroke-width="12"></circle>
+<circle class="text-primary" cx="80" cy="80" fill="transparent" r="70" stroke="currentColor" stroke-dasharray="440" stroke-dashoffset="110" stroke-width="12"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center rotate-90">
+<span class="text-3xl font-bold">75%</span>
+<span class="text-xs text-slate-500">Used</span>
+</div>
+</div>
+<div class="mt-8 space-y-2 w-full">
+<div class="flex justify-between text-sm">
+<span class="text-slate-500">Current Spent</span>
+<span class="font-bold">$3,187</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-slate-500">Remaining</span>
+<span class="font-bold text-primary">$1,063</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-zinc-800 h-2 rounded-full mt-4 overflow-hidden">
+<div class="bg-primary h-full w-3/4"></div>
+</div>
+</div>
+<button class="mt-6 w-full py-2 bg-primary text-white rounded-lg font-bold text-sm hover:opacity-90 transition-opacity">
+                            Upgrade Plan
+                        </button>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

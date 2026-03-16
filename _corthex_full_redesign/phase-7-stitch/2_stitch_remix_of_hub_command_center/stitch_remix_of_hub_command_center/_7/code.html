@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#fcfbf9",
+                        "background-dark": "#221610",
+                        "warm-gray": "#f5f3ec",
+                        "dark-text": "#2c2c2c"
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "3xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Public Sans', sans-serif;
+            background-color: #fcfbf9;
+            color: #2c2c2c;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-dark-text dark:text-slate-100">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Header / Top Nav -->
+<header class="flex items-center justify-between border-b border-warm-gray dark:border-slate-800 px-6 py-4 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md sticky top-0 z-50">
+<div class="flex items-center gap-3">
+<div class="bg-primary p-1.5 rounded-lg text-white">
+<span class="material-symbols-outlined text-2xl">grid_view</span>
+</div>
+<h2 class="text-xl font-black tracking-tight uppercase">CORTHEX <span class="text-primary">v2</span></h2>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex flex-col items-end">
+<span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Environment</span>
+<span class="text-xs font-medium">Production Alpha</span>
+</div>
+<button class="flex items-center justify-center rounded-full size-10 bg-warm-gray dark:bg-slate-800 hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-300">account_circle</span>
+</button>
+</div>
+</header>
+<main class="flex-1 flex flex-col items-center justify-start py-12 px-4 sm:px-6 lg:px-8">
+<!-- Progress Stepper -->
+<div class="w-full max-w-4xl mb-12">
+<div class="flex items-center justify-between mb-4">
+<span class="text-xs font-bold uppercase tracking-widest text-primary">Step 1 of 4</span>
+<span class="text-xs font-bold text-slate-400 italic">API: GET /onboarding/templates</span>
+</div>
+<div class="h-1.5 w-full bg-warm-gray dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-1/4 rounded-full transition-all duration-500"></div>
+</div>
+<div class="mt-8 text-center">
+<h1 class="text-4xl font-black tracking-tight mb-3">Select your organization foundation</h1>
+<p class="text-slate-500 dark:text-slate-400 max-w-xl mx-auto">Start with a pre-configured structure tailored to your industry. You can customize every agent and department later.</p>
+</div>
+</div>
+<!-- Templates Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-6xl">
+<!-- Basic Org -->
+<div class="group relative bg-white dark:bg-slate-900 border border-warm-gray dark:border-slate-800 rounded-3xl p-6 hover:shadow-2xl hover:shadow-primary/5 transition-all flex flex-col justify-between">
+<div>
+<div class="size-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">corporate_fare</span>
+</div>
+<h3 class="text-lg font-bold mb-2">Basic Org</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Standard operational structure for general business needs.</p>
+<div class="space-y-2">
+<div class="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined text-sm">account_tree</span>
+                                3 Departments
+                            </div>
+<div class="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined text-sm">smart_toy</span>
+                                5 Agents
+                            </div>
+</div>
+</div>
+<button class="mt-8 w-full py-3 px-4 bg-warm-gray dark:bg-slate-800 hover:bg-primary hover:text-white text-dark-text dark:text-white text-sm font-bold rounded-xl transition-all">
+                        Start with this
+                    </button>
+</div>
+<!-- Tech Team -->
+<div class="group relative bg-white dark:bg-slate-900 border-2 border-primary rounded-3xl p-6 shadow-xl shadow-primary/5 flex flex-col justify-between">
+<div class="absolute -top-3 right-6 bg-primary text-white text-[10px] font-black uppercase px-3 py-1 rounded-full">Recommended</div>
+<div>
+<div class="size-12 rounded-2xl bg-primary flex items-center justify-center mb-6 text-white">
+<span class="material-symbols-outlined">terminal</span>
+</div>
+<h3 class="text-lg font-bold mb-2">Tech Team</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Agile development and high-velocity product focus.</p>
+<div class="space-y-2">
+<div class="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined text-sm">account_tree</span>
+                                5 Departments
+                            </div>
+<div class="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined text-sm">smart_toy</span>
+                                12 Agents
+                            </div>
+</div>
+</div>
+<button class="mt-8 w-full py-3 px-4 bg-primary text-white text-sm font-bold rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
+                        Start with this
+                    </button>
+</div>
+<!-- Marketing Hub -->
+<div class="group relative bg-white dark:bg-slate-900 border border-warm-gray dark:border-slate-800 rounded-3xl p-6 hover:shadow-2xl hover:shadow-primary/5 transition-all flex flex-col justify-between">
+<div>
+<div class="size-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">campaign</span>
+</div>
+<h3 class="text-lg font-bold mb-2">Marketing Hub</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Omni-channel brand and campaign lifecycle management.</p>
+<div class="space-y-2">
+<div class="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined text-sm">account_tree</span>
+                                4 Departments
+                            </div>
+<div class="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined text-sm">smart_toy</span>
+                                8 Agents
+                            </div>
+</div>
+</div>
+<button class="mt-8 w-full py-3 px-4 bg-warm-gray dark:bg-slate-800 hover:bg-primary hover:text-white text-dark-text dark:text-white text-sm font-bold rounded-xl transition-all">
+                        Start with this
+                    </button>
+</div>
+<!-- Investment Firm -->
+<div class="group relative bg-white dark:bg-slate-900 border border-warm-gray dark:border-slate-800 rounded-3xl p-6 hover:shadow-2xl hover:shadow-primary/5 transition-all flex flex-col justify-between">
+<div>
+<div class="size-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">trending_up</span>
+</div>
+<h3 class="text-lg font-bold mb-2">Investment Firm</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Portfolio analytics and real-time asset intelligence.</p>
+<div class="space-y-2">
+<div class="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined text-sm">account_tree</span>
+                                6 Departments
+                            </div>
+<div class="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined text-sm">smart_toy</span>
+                                10 Agents
+                            </div>
+</div>
+</div>
+<button class="mt-8 w-full py-3 px-4 bg-warm-gray dark:bg-slate-800 hover:bg-primary hover:text-white text-dark-text dark:text-white text-sm font-bold rounded-xl transition-all">
+                        Start with this
+                    </button>
+</div>
+</div>
+<!-- Footer Controls -->
+<div class="mt-16 flex items-center gap-4">
+<button class="px-8 py-3 text-sm font-bold border border-warm-gray dark:border-slate-800 rounded-xl hover:bg-white dark:hover:bg-slate-900 transition-colors">
+                    Preview Template Details
+                </button>
+<div class="h-10 w-px bg-warm-gray dark:bg-slate-800"></div>
+<p class="text-xs text-slate-400 font-medium">Or skip to <button class="text-primary hover:underline">Custom Setup</button></p>
+</div>
+</main>
+<!-- Preview Modal Concept (Hidden by default, shown for UI representation) -->
+<div class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-dark-text/40 backdrop-blur-sm pointer-events-none opacity-0">
+<div class="bg-background-light dark:bg-background-dark w-full max-w-2xl rounded-3xl shadow-2xl border border-warm-gray dark:border-slate-800 p-8">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h2 class="text-2xl font-black">Tech Team Details</h2>
+<p class="text-slate-500">POST /onboarding/select-template</p>
+</div>
+<button class="size-8 rounded-full bg-warm-gray dark:bg-slate-800 flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-8">
+<div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-warm-gray dark:border-slate-800">
+<span class="text-[10px] font-black uppercase text-slate-400">Structure</span>
+<div class="mt-2 space-y-1">
+<p class="text-sm font-bold">Engineering Dept.</p>
+<p class="text-sm font-bold">Product Strategy</p>
+<p class="text-sm font-bold">QA &amp; Testing</p>
+<p class="text-sm font-bold">DevOps Hub</p>
+</div>
+</div>
+<div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-warm-gray dark:border-slate-800">
+<span class="text-[10px] font-black uppercase text-slate-400">Key Agents</span>
+<div class="mt-2 space-y-1">
+<p class="text-sm font-bold">CodeReviewer_AI</p>
+<p class="text-sm font-bold">SprintManager_v2</p>
+<p class="text-sm font-bold">Documentation_Bot</p>
+<p class="text-sm font-bold">Security_Sentry</p>
+</div>
+</div>
+</div>
+<button class="w-full py-4 bg-primary text-white font-black rounded-2xl hover:bg-primary/90 transition-colors uppercase tracking-widest text-sm">
+                    Confirm &amp; Initialize Organization
+                </button>
+</div>
+</div>
+</div>
+</body></html>

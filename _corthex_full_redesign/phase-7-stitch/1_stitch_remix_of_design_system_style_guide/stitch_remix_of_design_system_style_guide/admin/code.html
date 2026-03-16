@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 - Admin System Monitoring</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;family=Noto+Serif+KR:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#5a7247", // Olive base
+                        "warning": "#d4a843", // Mustard
+                        "background-light": "#f8f6f2", // Warm paper
+                        "background-dark": "#1a1c18", // Dark moss
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"],
+                        "serif-kr": ["Noto Serif KR", "serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.4rem",
+                        "lg": "0.75rem",
+                        "xl": "1.25rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .tabular-nums { font-variant-numeric: tabular-nums; }
+        .organic-gradient {
+            background: linear-gradient(135deg, rgba(90, 114, 71, 0.05) 0%, rgba(212, 168, 67, 0.05) 100%);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-800 dark:text-slate-200 transition-colors duration-300">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-64 flex-shrink-0 border-r border-primary/10 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md flex flex-col">
+<div class="p-6 flex items-center gap-3">
+<div class="size-10 rounded-xl bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-2xl">eco</span>
+</div>
+<div>
+<h1 class="font-serif-kr text-lg leading-none text-primary dark:text-primary">CORTHEX v2</h1>
+<p class="text-[10px] uppercase tracking-widest font-bold text-slate-400 dark:text-slate-500">Natural Organic</p>
+</div>
+</div>
+<nav class="flex-1 px-4 py-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                    Dashboard
+                </a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg bg-primary/10 text-primary border border-primary/10" href="#">
+<span class="material-symbols-outlined">analytics</span>
+                    System Metrics
+                </a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">group</span>
+                    User Management
+                </a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">description</span>
+                    Log Files
+                </a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+                    Settings
+                </a>
+</nav>
+<div class="p-4 border-t border-primary/10">
+<div class="bg-primary/5 dark:bg-primary/10 p-4 rounded-xl border border-primary/10">
+<p class="text-xs font-semibold text-primary mb-1 uppercase tracking-tighter">System Status</p>
+<div class="flex items-center gap-2">
+<span class="size-2 bg-primary rounded-full animate-pulse"></span>
+<span class="text-sm font-medium text-slate-600 dark:text-slate-400">All services healthy</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+<!-- Topbar -->
+<header class="h-16 border-b border-primary/10 bg-white/30 dark:bg-slate-900/30 backdrop-blur-md flex items-center justify-between px-8 z-10">
+<div class="flex items-center gap-4">
+<h2 class="font-serif-kr text-xl text-slate-900 dark:text-slate-100">Admin System Monitoring</h2>
+<span class="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase border border-primary/20 tracking-wider">Live</span>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative max-w-xs">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl leading-none">search</span>
+<input class="w-64 pl-10 pr-4 py-2 bg-white/50 dark:bg-slate-800/50 border border-primary/10 rounded-full text-sm focus:ring-primary focus:border-primary placeholder:text-slate-400" placeholder="Search resources..." type="text"/>
+</div>
+<div class="flex items-center gap-3 border-l border-primary/10 pl-6">
+<button class="size-9 rounded-full bg-white dark:bg-slate-800 border border-primary/10 flex items-center justify-center text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-xl">notifications</span>
+</button>
+<div class="flex items-center gap-3">
+<img class="size-9 rounded-full object-cover border-2 border-primary/20" data-alt="Admin user avatar in olive theme" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBn0zAHkO6qFm1ca0Ep_W6IUzL8v3TlxEODEKGpbimNWYvE7O_dU1WrQvRnPqhP5_A0o-hRQJtu8Nh8orna0mJTQWhroC_oBAZQFwTQ0ti-xFhUQ3ssDZxzDBIds4DBUx9roqrY5--ovG-xdY8-gmWzAjVFzQiKvAkTHp4jwrVssrXxYWqC7EQHSkeqRRjbNlXN8f1N70uF-2Az1Clkr3rg1K2BZ6usk8JijQdaN4SnJ60_5n-_cPxgOlMazcse2anSV7deW-vGUoog"/>
+<div class="hidden md:block">
+<p class="text-xs font-bold leading-none mb-1">C. Admin</p>
+<p class="text-[10px] text-slate-500">Super Administrator</p>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="flex-1 overflow-y-auto p-8 organic-gradient">
+<!-- Metric Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+<div class="bg-white/70 dark:bg-slate-800/70 p-6 rounded-xl border border-primary/10 shadow-sm">
+<div class="flex items-start justify-between mb-4">
+<p class="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Active Sessions</p>
+<span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">sensor_occupied</span>
+</div>
+<p class="text-3xl font-bold tabular-nums text-slate-900 dark:text-slate-100">1,284</p>
+<div class="mt-2 flex items-center gap-1 text-primary text-sm font-semibold">
+<span class="material-symbols-outlined text-base">trending_up</span>
+<span>12%</span>
+<span class="text-slate-400 font-normal ml-1">vs last hr</span>
+</div>
+</div>
+<div class="bg-white/70 dark:bg-slate-800/70 p-6 rounded-xl border border-primary/10 shadow-sm">
+<div class="flex items-start justify-between mb-4">
+<p class="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Memory Usage</p>
+<span class="material-symbols-outlined text-warning bg-warning/10 p-2 rounded-lg">memory</span>
+</div>
+<p class="text-3xl font-bold tabular-nums text-slate-900 dark:text-slate-100">4.2 GB</p>
+<div class="mt-2 flex items-center gap-1 text-warning text-sm font-semibold">
+<span class="material-symbols-outlined text-base">warning</span>
+<span>High Usage</span>
+</div>
+</div>
+<div class="bg-white/70 dark:bg-slate-800/70 p-6 rounded-xl border border-primary/10 shadow-sm">
+<div class="flex items-start justify-between mb-4">
+<p class="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">CPU Load</p>
+<span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">speed</span>
+</div>
+<p class="text-3xl font-bold tabular-nums text-slate-900 dark:text-slate-100">28.5%</p>
+<div class="mt-2 flex items-center gap-1 text-primary text-sm font-semibold">
+<span class="material-symbols-outlined text-base">check_circle</span>
+<span>Stable</span>
+</div>
+</div>
+<div class="bg-white/70 dark:bg-slate-800/70 p-6 rounded-xl border border-primary/10 shadow-sm">
+<div class="flex items-start justify-between mb-4">
+<p class="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Active Agents</p>
+<span class="material-symbols-outlined text-slate-500 bg-slate-100 dark:bg-slate-700 p-2 rounded-lg">smart_toy</span>
+</div>
+<p class="text-3xl font-bold tabular-nums text-slate-900 dark:text-slate-100">42</p>
+<div class="mt-2 flex items-center gap-1 text-slate-400 text-sm font-semibold">
+<span class="material-symbols-outlined text-base">horizontal_rule</span>
+<span>Neutral</span>
+</div>
+</div>
+</div>
+<!-- Middle Row: Charts -->
+<div class="bg-white/70 dark:bg-slate-800/70 p-8 rounded-xl border border-primary/10 shadow-sm mb-8">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h3 class="font-serif-kr text-lg text-slate-900 dark:text-slate-100">System Load &amp; Active Connections</h3>
+<p class="text-sm text-slate-500">Real-time telemetry for the last 24 hours</p>
+</div>
+<div class="flex gap-4">
+<div class="flex items-center gap-2">
+<span class="size-3 rounded-full bg-primary"></span>
+<span class="text-xs font-medium text-slate-600 dark:text-slate-400">System Load (0.85)</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="size-3 rounded-full bg-warning"></span>
+<span class="text-xs font-medium text-slate-600 dark:text-slate-400">Active Connections</span>
+</div>
+</div>
+</div>
+<div class="h-64 relative">
+<!-- Simulated Chart Background Lines -->
+<div class="absolute inset-0 flex flex-col justify-between opacity-10">
+<div class="w-full h-px bg-slate-900 dark:bg-white"></div>
+<div class="w-full h-px bg-slate-900 dark:bg-white"></div>
+<div class="w-full h-px bg-slate-900 dark:bg-white"></div>
+<div class="w-full h-px bg-slate-900 dark:bg-white"></div>
+</div>
+<!-- SVG Time Series Chart -->
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 1000 100">
+<!-- Connection Area (Mustard) -->
+<path d="M0,80 Q100,70 200,85 T400,60 T600,75 T800,50 T1000,65 L1000,100 L0,100 Z" fill="rgba(212, 168, 67, 0.08)"></path>
+<path d="M0,80 Q100,70 200,85 T400,60 T600,75 T800,50 T1000,65" fill="none" stroke="#d4a843" stroke-dasharray="4" stroke-width="2"></path>
+<!-- System Load Line (Olive Green) -->
+<path d="M0,50 Q125,40 250,55 T500,30 T750,45 T1000,20" fill="none" stroke="#5a7247" stroke-linecap="round" stroke-width="3"></path>
+<!-- Highlight Point -->
+<circle cx="750" cy="45" fill="#5a7247" r="4"></circle>
+<circle cx="750" cy="45" fill="#5a7247" opacity="0.2" r="10"></circle>
+</svg>
+<div class="flex justify-between mt-4 text-[11px] font-bold text-slate-400 uppercase tracking-tighter tabular-nums">
+<span>00:00</span>
+<span>04:00</span>
+<span>08:00</span>
+<span>12:00</span>
+<span>16:00</span>
+<span>20:00</span>
+<span>23:59</span>
+</div>
+</div>
+</div>
+<!-- Bottom Row: Table -->
+<div class="bg-white/70 dark:bg-slate-800/70 rounded-xl border border-primary/10 shadow-sm overflow-hidden">
+<div class="p-6 border-b border-primary/10 flex items-center justify-between">
+<h3 class="font-serif-kr text-lg text-slate-900 dark:text-slate-100">Active Processes &amp; Sessions</h3>
+<button class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-primary/10 rounded-lg text-xs font-bold text-primary hover:bg-primary/5 transition-colors uppercase tracking-wider">
+<span class="material-symbols-outlined text-lg">refresh</span>
+                            Refresh Table
+                        </button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-primary/5 text-[11px] uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400">
+<tr>
+<th class="px-6 py-4">Agent Name</th>
+<th class="px-6 py-4">User</th>
+<th class="px-6 py-4">Duration</th>
+<th class="px-6 py-4">Status</th>
+<th class="px-6 py-4 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-primary/5 text-sm">
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4 font-semibold text-slate-800 dark:text-slate-200">Processing_Node_A1</td>
+<td class="px-6 py-4">sarah.j@corthex.io</td>
+<td class="px-6 py-4 tabular-nums">02:45:12</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-bold">
+<span class="size-1.5 rounded-full bg-primary"></span>
+                                            Running
+                                        </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-400 hover:text-primary"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4 font-semibold text-slate-800 dark:text-slate-200">Data_Ingest_B4</td>
+<td class="px-6 py-4">system.auto</td>
+<td class="px-6 py-4 tabular-nums">00:12:05</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-warning/10 text-warning text-xs font-bold">
+<span class="size-1.5 rounded-full bg-warning"></span>
+                                            Waiting
+                                        </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-400 hover:text-primary"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4 font-semibold text-slate-800 dark:text-slate-200">Neural_Model_X9</td>
+<td class="px-6 py-4">dev.lead</td>
+<td class="px-6 py-4 tabular-nums">14:02:44</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs font-bold">
+<span class="size-1.5 rounded-full bg-red-600"></span>
+                                            Error
+                                        </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-400 hover:text-primary"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4 font-semibold text-slate-800 dark:text-slate-200">Backup_Service</td>
+<td class="px-6 py-4">root</td>
+<td class="px-6 py-4 tabular-nums">00:05:33</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-bold">
+<span class="size-1.5 rounded-full bg-primary"></span>
+                                            Running
+                                        </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-400 hover:text-primary"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-6 py-4 border-t border-primary/10 bg-primary/5 flex items-center justify-between text-xs font-medium text-slate-500">
+<p>Showing 4 of 42 active agents</p>
+<div class="flex gap-2">
+<button class="px-3 py-1 rounded border border-primary/20 hover:bg-primary/10">Prev</button>
+<button class="px-3 py-1 rounded border border-primary/20 hover:bg-primary/10">Next</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

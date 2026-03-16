@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 - Operations Log</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "3xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex">
+<!-- Sidebar -->
+<aside class="w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col justify-between hidden md:flex">
+<div class="p-4 flex flex-col gap-6">
+<div class="flex items-center gap-3 px-2">
+<div class="bg-primary/20 aspect-square rounded-full size-10 flex items-center justify-center text-primary font-bold" data-alt="Abstract gradient logo">C2</div>
+<div class="flex flex-col">
+<h1 class="text-base font-bold leading-tight">CORTHEX v2</h1>
+<p class="text-slate-500 dark:text-slate-400 text-xs">Workspace</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">smart_toy</span>
+<span class="text-sm font-medium">Agents</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">database</span>
+<span class="text-sm font-medium">Knowledge</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl bg-primary/10 text-primary dark:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">list_alt</span>
+<span class="text-sm font-medium">Ops Log</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</nav>
+</div>
+<div class="p-4">
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span>
+<span class="text-sm font-medium">Help &amp; Support</span>
+</a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col h-screen overflow-hidden">
+<!-- Header -->
+<header class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 px-8 py-4 bg-white dark:bg-slate-800">
+<div class="flex items-center gap-3">
+<button class="md:hidden text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h2 class="text-xl font-bold">Operations Log</h2>
+</div>
+<button class="flex items-center justify-center gap-2 rounded-xl h-10 px-4 bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors">
+<span class="material-symbols-outlined text-[18px]">download</span>
+<span>Export CSV/JSON</span>
+</button>
+</header>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto p-8">
+<div class="max-w-4xl mx-auto flex flex-col gap-6">
+<div class="flex flex-col gap-2">
+<h3 class="text-3xl font-bold">Activity Timeline</h3>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Review system events, commands, and security alerts. <span class="text-xs ml-2 opacity-60">GET /api/workspace/activity-log</span></p>
+</div>
+<!-- Search -->
+<div class="bg-white dark:bg-slate-800 rounded-3xl p-2 shadow-sm border border-slate-200 dark:border-slate-700 flex items-center">
+<span class="material-symbols-outlined text-slate-400 ml-3">search</span>
+<input class="flex-1 bg-transparent border-none focus:ring-0 text-sm px-3 text-slate-900 dark:text-slate-100 placeholder:text-slate-400" placeholder="Search keywords or actor IDs..." type="text"/>
+</div>
+<!-- Timeline -->
+<div class="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+<div class="grid grid-cols-[32px_1fr] gap-x-4">
+<!-- Event 1 -->
+<div class="flex flex-col items-center pt-1">
+<div class="size-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px]">terminal</span>
+</div>
+<div class="w-[2px] bg-slate-100 dark:bg-slate-700 h-full my-1"></div>
+</div>
+<div class="pb-6">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
+<p class="text-base font-semibold">Command Executed</p>
+<span class="text-xs text-slate-500 font-medium bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-md">10:45 AM</span>
+</div>
+<p class="text-sm text-slate-500 dark:text-slate-400 mb-2">Actor: <span class="font-medium text-slate-700 dark:text-slate-300">user_01</span></p>
+<div class="bg-slate-50 dark:bg-slate-900 rounded-lg p-3 border border-slate-100 dark:border-slate-700 font-mono text-xs text-slate-600 dark:text-slate-300">
+                                &gt; run analytics --module=core_v2 --fast
+                            </div>
+</div>
+<!-- Event 2 -->
+<div class="flex flex-col items-center pt-1">
+<div class="size-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px]">login</span>
+</div>
+<div class="w-[2px] bg-slate-100 dark:bg-slate-700 h-full my-1"></div>
+</div>
+<div class="pb-6">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
+<p class="text-base font-semibold">Login Successful</p>
+<span class="text-xs text-slate-500 font-medium bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-md">09:30 AM</span>
+</div>
+<p class="text-sm text-slate-500 dark:text-slate-400">Actor: <span class="font-medium text-slate-700 dark:text-slate-300">admin_99</span> via SSO</p>
+</div>
+<!-- Event 3 -->
+<div class="flex flex-col items-center pt-1">
+<div class="size-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px]">error</span>
+</div>
+<div class="w-[2px] bg-slate-100 dark:bg-slate-700 h-full my-1"></div>
+</div>
+<div class="pb-6">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
+<p class="text-base font-semibold text-red-600 dark:text-red-400">Tool Execution Failed</p>
+<span class="text-xs text-slate-500 font-medium bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-md">08:15 AM</span>
+</div>
+<p class="text-sm text-slate-500 dark:text-slate-400 mb-2">Actor: <span class="font-medium text-slate-700 dark:text-slate-300">system</span></p>
+<p class="text-xs text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-2 rounded-md border border-red-100 dark:border-red-900/30">Error 503: Data pipeline timeout during sync operation.</p>
+</div>
+<!-- Event 4 -->
+<div class="flex flex-col items-center pt-1">
+<div class="size-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px]">settings</span>
+</div>
+</div>
+<div>
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
+<p class="text-base font-semibold">Settings Updated</p>
+<span class="text-xs text-slate-500 font-medium bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-md">07:00 AM</span>
+</div>
+<p class="text-sm text-slate-500 dark:text-slate-400">Actor: <span class="font-medium text-slate-700 dark:text-slate-300">user_01</span> updated 'Retention Policy'</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

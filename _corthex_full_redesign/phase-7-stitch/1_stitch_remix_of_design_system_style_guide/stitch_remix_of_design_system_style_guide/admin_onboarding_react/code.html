@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 - Admin Onboarding</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Public Sans', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased font-display">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary/10 px-6 lg:px-40 py-3 bg-white dark:bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<div class="size-8 text-primary">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M42.1739 20.1739L27.8261 5.82609C29.1366 7.13663 28.3989 10.1876 26.2002 13.7654C24.8538 15.9564 22.9595 18.3449 20.6522 20.6522C18.3449 22.9595 15.9564 24.8538 13.7654 26.2002C10.1876 28.3989 7.13663 29.1366 5.82609 27.8261L20.1739 42.1739C21.4845 43.4845 24.5355 42.7467 28.1133 40.548C30.3042 39.2016 32.6927 37.3073 35 35C37.3073 32.6927 39.2016 30.3042 40.548 28.1133C42.7467 24.5355 43.4845 21.4845 42.1739 20.1739Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight uppercase">CORTHEX v2</h2>
+</div>
+<div class="flex flex-1 justify-end gap-8 items-center">
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors" href="#">Help Center</a>
+<a class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors" href="#">Support</a>
+</nav>
+<div class="bg-primary/10 rounded-full p-1 border border-primary/20 flex items-center gap-2 pr-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8" data-alt="Admin user profile picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDqKbnlywBPEOlo1sbxW05xIX30yqED4YskLwYofOaQx-hDze_87t7rHzsIytnLF6IAmsbUdJ6RCRvqqTfLAdw9LhddMnAogjuMV8TP3QYjgChoqXtjiERVYpbXk9jE39IJpNgC_gIUhTCwIWWvaH8utTgp51-feJaC0FY_xux4-n17lOnaF77_PkuwjKbSHBlab8I-Aght3L71Mb6rB269wnTOkrflyAWXWfHoMtBmVbQL2MRuqB6FegV3R-lyVsEjmzdcxf06fVtV");'></div>
+<span class="text-xs font-semibold text-primary">Admin</span>
+</div>
+</div>
+</header>
+<main class="flex-1 flex justify-center py-10 px-4">
+<div class="max-w-[1100px] w-full grid grid-cols-1 lg:grid-cols-12 gap-8">
+<aside class="lg:col-span-4 flex flex-col gap-6">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-primary/10 shadow-sm flex flex-col gap-6">
+<div class="flex gap-4 items-center">
+<div class="bg-primary/10 p-3 rounded-lg text-primary">
+<span class="material-symbols-outlined !text-3xl">settings_input_component</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-slate-900 dark:text-white text-lg font-bold leading-tight">Onboarding</h1>
+<p class="text-slate-500 dark:text-slate-400 text-sm">New Tenant Setup</p>
+</div>
+</div>
+<nav class="flex flex-col gap-1">
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary text-white shadow-md shadow-primary/20 transition-all">
+<span class="material-symbols-outlined">domain</span>
+<p class="text-sm font-semibold">Company Info</p>
+<span class="ml-auto material-symbols-outlined text-sm">chevron_right</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer group">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">group</span>
+<p class="text-sm font-medium">Team Roles</p>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer group">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">hub</span>
+<p class="text-sm font-medium">Integrations</p>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer group">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">verified</span>
+<p class="text-sm font-medium">Final Review</p>
+</div>
+</nav>
+<div class="pt-6 border-t border-slate-100 dark:border-slate-800">
+<div class="flex justify-between items-end mb-2">
+<p class="text-slate-900 dark:text-white text-sm font-bold">Progress</p>
+<p class="text-primary text-xs font-black">25%</p>
+</div>
+<div class="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+<div class="h-full rounded-full bg-primary" style="width: 25%;"></div>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-xs mt-3 italic">"Just getting started on your organic journey."</p>
+</div>
+</div>
+<div class="bg-primary/5 p-6 rounded-xl border border-primary/10">
+<h3 class="text-primary text-sm font-bold uppercase tracking-wider mb-2">Need help?</h3>
+<p class="text-slate-600 dark:text-slate-400 text-sm mb-4 leading-relaxed">Our implementation specialists are available to guide you through the setup process.</p>
+<button class="w-full py-2.5 px-4 bg-white dark:bg-slate-800 border border-primary/20 rounded-lg text-primary text-sm font-bold hover:bg-primary hover:text-white transition-all">
+                                Schedule a Call
+                            </button>
+</div>
+</aside>
+<div class="lg:col-span-8">
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-primary/10 shadow-sm overflow-hidden">
+<div class="p-8 lg:p-10">
+<div class="mb-10">
+<h2 class="text-slate-900 dark:text-white text-3xl font-black leading-tight tracking-tight mb-2">Welcome to CORTHEX</h2>
+<p class="text-slate-500 dark:text-slate-400 text-lg">Let's get your natural organic enterprise set up correctly.</p>
+</div>
+<div class="space-y-8">
+<div class="border-b border-slate-100 dark:border-slate-800 pb-2">
+<h3 class="text-slate-900 dark:text-white text-xl font-bold">Company Information</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Company Legal Name</label>
+<input class="w-full px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="e.g. Terra Organic Goods LLC" type="text"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Industry Sector</label>
+<select class="w-full px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none">
+<option>Agriculture &amp; Farming</option>
+<option>Retail &amp; Distribution</option>
+<option>Wholesale Organics</option>
+<option>Eco-Manufacturing</option>
+</select>
+</div>
+<div class="flex flex-col gap-2 md:col-span-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Website URL</label>
+<div class="flex">
+<span class="inline-flex items-center px-4 rounded-l-lg border border-r-0 border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-500 text-sm">https://</span>
+<input class="flex-1 px-4 py-3 rounded-r-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="www.yourcompany.com" type="text"/>
+</div>
+</div>
+</div>
+<div class="space-y-4">
+<p class="text-sm font-semibold text-slate-700 dark:text-slate-300">Company Logo</p>
+<div class="border-2 border-dashed border-primary/20 rounded-xl p-8 flex flex-col items-center justify-center bg-primary/5 hover:bg-primary/10 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-4xl text-primary mb-2">cloud_upload</span>
+<p class="text-slate-900 dark:text-white font-bold">Click to upload or drag and drop</p>
+<p class="text-slate-500 text-xs mt-1">PNG, JPG or SVG (max. 2MB)</p>
+</div>
+</div>
+<div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-xl border border-slate-100 dark:border-slate-800">
+<div class="flex items-start gap-4">
+<div class="bg-primary/20 p-2 rounded-full text-primary mt-0.5">
+<span class="material-symbols-outlined !text-xl">eco</span>
+</div>
+<div>
+<h4 class="text-slate-900 dark:text-white font-bold">Certification Status</h4>
+<p class="text-slate-500 dark:text-slate-400 text-sm mb-4">Is your enterprise already USDA Organic or Fair Trade certified?</p>
+<div class="flex gap-4">
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="w-4 h-4 text-primary focus:ring-primary border-slate-300" name="certified" type="radio"/>
+<span class="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-primary transition-colors">Yes, Certified</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="w-4 h-4 text-primary focus:ring-primary border-slate-300" name="certified" type="radio"/>
+<span class="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-primary transition-colors">In Progress</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="w-4 h-4 text-primary focus:ring-primary border-slate-300" name="certified" type="radio"/>
+<span class="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-primary transition-colors">Not yet</span>
+</label>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="px-8 py-6 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
+<button class="px-6 py-2.5 rounded-lg text-slate-500 dark:text-slate-400 font-bold hover:text-slate-900 dark:hover:text-white transition-colors">
+                                    Save Draft
+                                </button>
+<div class="flex gap-4">
+<button class="px-8 py-2.5 bg-primary text-white rounded-lg font-bold shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all">
+                                        Continue to Roles
+                                    </button>
+</div>
+</div>
+</div>
+<div class="mt-8 flex items-center justify-center gap-6 opacity-50 grayscale hover:grayscale-0 transition-all">
+<img class="h-8 object-contain" data-alt="Eco certification logo 1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQbjpr42xd9a9O1kGhumcdANByzhaGVRTvwAhs1sW2UmcZdGhkcYG-aII2lsT00I5dRX-z6C5IqCzy_LNMMLQd93OSrK4rLFor9Grq-peCO9AN-_Y0C4DuVdi1jlRcdI_qFNp8mXI_P2OqTPZhLWZ9iv2XetP8DYqo_B7C0CRDZIWmnNXsWAe4jtLpjfGHgoeTAij7FYYjy_Kmpjsl-RERaSSSfcsyFNS0TGd2tbgmJy1oNQnKEVQgC8KPmY-U06YJNaVx2QkHgp1p"/>
+<img class="h-8 object-contain" data-alt="Fair trade badge logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzxEvSk5GJeqAx_6uLw95wjH9Jkae1vVHN_vL5fIDhA9Vft9MV3kWzPnZ9OBaJCDPjWNxOAoNf0GNa-XqhKOnWxWoy9u0yRXI_zwHIWNhwu729tm5qQprWOfD787Iq_LQ-5AzyhegNlDQQL6jrEcnkjudMHbdVzjr9Lnvh3OhrpekXsmpbXT7EAXgCklMiQaCGQXaC82r320SFogW19gD3KxJsPkPqP9zqCJxww2yGwLrgk9GatUgI4iUOEIPLVNJQeSab3aeqsech"/>
+<img class="h-8 object-contain" data-alt="Natural products seal logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqeQNMfQFBYQuJyvKweNZdI9H7jJjuArR7X4lhuRJcSvDExh67LnNXjWsJtFL-n85SQYQCwOYDGLV04DJYxpLaQabs9kIjqYrDoGqkJK0Pmtdbb-lpj0s2lRBRqBKbb55oBJrvrhVZVRFhcFdvK9Fw8HsKitK18klXTj9Cak4eyw4DewTqlDOFQ7jS7XioLpuXHTBDYTJIE6d_yqOC_w4AsnBHxoKR-zbGamOOVmBOZ9ZHfv7ou782xvIaQoFUb1pBpstj2RrnNuIe"/>
+</div>
+</div>
+</div>
+</main>
+<footer class="py-10 text-center border-t border-primary/5 mt-auto">
+<p class="text-slate-400 text-sm">© 2024 CORTHEX v2. Organic Management Systems. All rights reserved.</p>
+</footer>
+</div>
+</div>
+</body></html>

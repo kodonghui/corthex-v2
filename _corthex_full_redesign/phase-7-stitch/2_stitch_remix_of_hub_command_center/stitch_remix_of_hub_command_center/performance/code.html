@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 | Agent Performance</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="flex min-h-screen">
+<!-- Sidebar -->
+<aside class="w-64 border-r border-primary/10 bg-white dark:bg-background-dark/50 flex flex-col shrink-0 sticky top-0 h-screen">
+<div class="p-6 flex items-center gap-3">
+<div class="bg-primary/10 p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary text-2xl">rocket_launch</span>
+</div>
+<div>
+<h1 class="text-sm font-bold tracking-tight text-slate-900 dark:text-white uppercase">Cortex v2</h1>
+<p class="text-[10px] text-primary font-medium tracking-widest uppercase">Enterprise AI</p>
+</div>
+</div>
+<nav class="flex-1 px-4 py-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-primary/5 hover:text-primary rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-primary/10 text-primary rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">trending_up</span>
+<span class="text-sm font-medium">Agent Performance</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-primary/5 hover:text-primary rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">fitness_center</span>
+<span class="text-sm font-medium">Soul Gym</span>
+</a>
+<div class="pt-4 pb-2 px-3">
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Configuration</p>
+</div>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-primary/5 hover:text-primary rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-primary/5 hover:text-primary rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">help</span>
+<span class="text-sm font-medium">Support</span>
+</a>
+</nav>
+<div class="p-4 border-t border-primary/10">
+<div class="flex items-center gap-3 p-2 bg-primary/5 rounded-xl">
+<div class="size-8 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="User avatar profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMoBxmW45uICbnYCZlSzbWTYhu6cZcqZjGgKJzf2dGTG4X9CbyG7DvNlD9ij1OoX3wToXPStVywIecrBIsavvxVaSDdi9eURwTH3IPxknL33NRAlL-kKHLy5kEM2opFpNcTJNiUVYBWac8cNNXiVTfcW5ETXyzvYeoZdbYUWXzQifZAQxanDCOe4a-8IPKXWeHPq4DYCJnOHCyHOz2SN_5ZSBtYO2fOyJ-KU_otgobJ3ephDS-ds9tK2euvMJrYP3vohta_4tSnYM"/>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-xs font-bold truncate">Alex Rivera</p>
+<p class="text-[10px] text-slate-500">Admin</p>
+</div>
+<span class="material-symbols-outlined text-slate-400 text-sm">unfold_more</span>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col min-w-0">
+<!-- Top Bar -->
+<header class="h-16 border-b border-primary/10 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-10">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">analytics</span>
+<h2 class="text-lg font-semibold text-slate-800 dark:text-white">Performance Analytics</h2>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden md:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+<input class="pl-10 pr-4 py-1.5 rounded-full border border-primary/10 bg-background-light dark:bg-slate-800 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" placeholder="Search workspace..." type="text"/>
+</div>
+<button class="relative p-2 text-slate-500 hover:bg-primary/5 rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-primary rounded-full border-2 border-white"></span>
+</button>
+<div class="h-8 w-[1px] bg-primary/10"></div>
+<button class="flex items-center gap-2 px-3 py-1.5 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-primary/90 transition-all">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                        New Agent
+                    </button>
+</div>
+</header>
+<!-- Dashboard Grid -->
+<div class="p-8 space-y-8">
+<!-- Summary Stats -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-primary/10 shadow-sm relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-primary/10 to-transparent -mr-8 -mt-8 rounded-full transition-transform group-hover:scale-110"></div>
+<p class="text-sm font-medium text-slate-500 dark:text-slate-400">Total Active Agents</p>
+<div class="mt-2 flex items-baseline gap-2">
+<h3 class="text-3xl font-bold">1,284</h3>
+<span class="text-xs font-bold text-emerald-500 flex items-center">
+<span class="material-symbols-outlined text-[14px]">trending_up</span> 12.5%
+                            </span>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-primary/10 shadow-sm relative overflow-hidden group">
+<p class="text-sm font-medium text-slate-500 dark:text-slate-400">Avg. Success Rate</p>
+<div class="mt-2 flex items-baseline gap-2">
+<h3 class="text-3xl font-bold">94.2%</h3>
+<span class="text-xs font-bold text-emerald-500 flex items-center">
+<span class="material-symbols-outlined text-[14px]">trending_up</span> 2.1%
+                            </span>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-primary/10 shadow-sm relative overflow-hidden group">
+<p class="text-sm font-medium text-slate-500 dark:text-slate-400">Quality Score</p>
+<div class="mt-2 flex items-baseline gap-2">
+<h3 class="text-3xl font-bold">8.8<span class="text-lg font-medium text-slate-400">/10</span></h3>
+<span class="text-xs font-bold text-amber-500 flex items-center">
+<span class="material-symbols-outlined text-[14px]">horizontal_rule</span> 0.0%
+                            </span>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-primary/10 shadow-sm relative overflow-hidden group">
+<p class="text-sm font-medium text-slate-500 dark:text-slate-400">Hallucination Rate</p>
+<div class="mt-2 flex items-baseline gap-2">
+<h3 class="text-3xl font-bold">0.12%</h3>
+<span class="text-xs font-bold text-red-500 flex items-center">
+<span class="material-symbols-outlined text-[14px]">trending_up</span> 0.04%
+                            </span>
+</div>
+</div>
+</div>
+<!-- Main Section Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Performance Table -->
+<div class="lg:col-span-2 bg-white dark:bg-slate-800 rounded-xl border border-primary/10 shadow-sm overflow-hidden flex flex-col">
+<div class="p-6 border-b border-primary/10 flex items-center justify-between bg-primary/[0.02]">
+<h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">groups</span>
+                                Individual Agent Performance
+                            </h3>
+<button class="text-xs font-bold text-primary hover:underline">View All</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-background-light dark:bg-slate-900/50">
+<tr>
+<th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-slate-500">Agent Name</th>
+<th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-slate-500">Model</th>
+<th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-slate-500 text-center">Success Rate</th>
+<th class="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-slate-500 text-right">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-primary/5">
+<tr class="hover:bg-primary/[0.02] transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+<span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-sm">support_agent</span>
+</div>
+<span class="text-sm font-semibold">Customer-Care-v4</span>
+</div>
+</td>
+<td class="px-6 py-4 text-xs text-slate-500 font-medium">GPT-4-Turbo</td>
+<td class="px-6 py-4 text-center font-bold text-sm">98.2%</td>
+<td class="px-6 py-4 text-right">
+<span class="px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 text-[10px] font-bold uppercase tracking-wide">High</span>
+</td>
+</tr>
+<tr class="hover:bg-primary/[0.02] transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-lg bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-sm">data_exploration</span>
+</div>
+<span class="text-sm font-semibold">Data-Analyzer</span>
+</div>
+</td>
+<td class="px-6 py-4 text-xs text-slate-500 font-medium">Claude-3-Sonnet</td>
+<td class="px-6 py-4 text-center font-bold text-sm">84.5%</td>
+<td class="px-6 py-4 text-right">
+<span class="px-2 py-1 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 text-[10px] font-bold uppercase tracking-wide">Mid</span>
+</td>
+</tr>
+<tr class="hover:bg-primary/[0.02] transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+<span class="material-symbols-outlined text-blue-600 dark:text-blue-400 text-sm">edit_note</span>
+</div>
+<span class="text-sm font-semibold">Copy-Writer-02</span>
+</div>
+</td>
+<td class="px-6 py-4 text-xs text-slate-500 font-medium">Llama-3-70b</td>
+<td class="px-6 py-4 text-center font-bold text-sm">92.0%</td>
+<td class="px-6 py-4 text-right">
+<span class="px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 text-[10px] font-bold uppercase tracking-wide">High</span>
+</td>
+</tr>
+<tr class="hover:bg-primary/[0.02] transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+<span class="material-symbols-outlined text-red-600 dark:text-red-400 text-sm">code</span>
+</div>
+<span class="text-sm font-semibold">Dev-Helper-Alpha</span>
+</div>
+</td>
+<td class="px-6 py-4 text-xs text-slate-500 font-medium">GPT-3.5-Turbo</td>
+<td class="px-6 py-4 text-center font-bold text-sm">62.1%</td>
+<td class="px-6 py-4 text-right">
+<span class="px-2 py-1 rounded-full bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 text-[10px] font-bold uppercase tracking-wide">Low</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Soul Gym Panel -->
+<div class="bg-primary/[0.03] dark:bg-slate-800 rounded-xl border-2 border-primary/20 shadow-lg overflow-hidden flex flex-col">
+<div class="p-6 bg-primary text-white">
+<div class="flex items-center justify-between mb-2">
+<h3 class="font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-white">fitness_center</span>
+                                    Soul Gym Recommendations
+                                </h3>
+<span class="bg-white/20 text-[10px] font-bold px-2 py-0.5 rounded uppercase">AI Powered</span>
+</div>
+<p class="text-xs text-primary-100 opacity-80">Automated optimizations based on last 24h usage patterns.</p>
+</div>
+<div class="p-4 space-y-4">
+<div class="p-4 bg-white dark:bg-slate-900 rounded-lg border border-primary/10 shadow-sm space-y-3">
+<div class="flex items-center justify-between">
+<span class="text-[10px] font-bold text-primary uppercase tracking-wider">Prompt Improve</span>
+<span class="material-symbols-outlined text-primary text-sm">magic_button</span>
+</div>
+<h4 class="text-sm font-bold">Dev-Helper-Alpha</h4>
+<p class="text-xs text-slate-500">Clarity issues detected in code generation prompts. Refine constraints.</p>
+<button class="w-full py-2 bg-primary/10 text-primary text-xs font-bold rounded hover:bg-primary/20 transition-colors">Apply Optimization</button>
+</div>
+<div class="p-4 bg-white dark:bg-slate-900 rounded-lg border border-primary/10 shadow-sm space-y-3">
+<div class="flex items-center justify-between">
+<span class="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">Add Tool</span>
+<span class="material-symbols-outlined text-emerald-500 text-sm">build</span>
+</div>
+<h4 class="text-sm font-bold">Data-Analyzer</h4>
+<p class="text-xs text-slate-500">Enable 'Chart-Gen' tool to improve visual reporting success by ~15%.</p>
+<button class="w-full py-2 bg-emerald-500/10 text-emerald-600 text-xs font-bold rounded hover:bg-emerald-500/20 transition-colors">Add Tool</button>
+</div>
+<div class="p-4 bg-white dark:bg-slate-900 rounded-lg border border-primary/10 shadow-sm space-y-3">
+<div class="flex items-center justify-between">
+<span class="text-[10px] font-bold text-amber-500 uppercase tracking-wider">Change Model</span>
+<span class="material-symbols-outlined text-amber-500 text-sm">swap_horiz</span>
+</div>
+<h4 class="text-sm font-bold">Copy-Writer-02</h4>
+<p class="text-xs text-slate-500">Latency is spiking. Switch to Llama-3-8b for faster response cycles.</p>
+<button class="w-full py-2 bg-amber-500/10 text-amber-600 text-xs font-bold rounded hover:bg-amber-500/20 transition-colors">Switch Model</button>
+</div>
+</div>
+<div class="mt-auto p-4 border-t border-primary/10 text-center">
+<p class="text-[10px] text-slate-400 font-medium">Last synced: 4 minutes ago</p>
+</div>
+</div>
+</div>
+<!-- Quality Dashboard Metrics -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-primary/10 shadow-sm">
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">rule</span>
+                                Rubric Performance Trends
+                            </h3>
+<select class="bg-background-light dark:bg-slate-900 border-none rounded-lg text-xs font-bold px-3 py-1 focus:ring-1 focus:ring-primary">
+<option>Last 30 Days</option>
+<option>Last 7 Days</option>
+</select>
+</div>
+<div class="h-48 flex items-end gap-2 px-2">
+<div class="flex-1 bg-primary/5 rounded-t-lg group relative" style="height: 65%;">
+<div class="absolute inset-0 bg-primary/20 scale-y-0 origin-bottom transition-transform group-hover:scale-y-100 rounded-t-lg"></div>
+<div class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-slate-400">MON</div>
+</div>
+<div class="flex-1 bg-primary/5 rounded-t-lg group relative" style="height: 45%;">
+<div class="absolute inset-0 bg-primary/20 scale-y-0 origin-bottom transition-transform group-hover:scale-y-100 rounded-t-lg"></div>
+<div class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-slate-400">TUE</div>
+</div>
+<div class="flex-1 bg-primary/10 rounded-t-lg group relative" style="height: 85%;">
+<div class="absolute inset-0 bg-primary/30 scale-y-0 origin-bottom transition-transform group-hover:scale-y-100 rounded-t-lg"></div>
+<div class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-slate-400">WED</div>
+</div>
+<div class="flex-1 bg-primary/5 rounded-t-lg group relative" style="height: 70%;">
+<div class="absolute inset-0 bg-primary/20 scale-y-0 origin-bottom transition-transform group-hover:scale-y-100 rounded-t-lg"></div>
+<div class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-slate-400">THU</div>
+</div>
+<div class="flex-1 bg-primary/5 rounded-t-lg group relative" style="height: 55%;">
+<div class="absolute inset-0 bg-primary/20 scale-y-0 origin-bottom transition-transform group-hover:scale-y-100 rounded-t-lg"></div>
+<div class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-slate-400">FRI</div>
+</div>
+<div class="flex-1 bg-primary/5 rounded-t-lg group relative" style="height: 90%;">
+<div class="absolute inset-0 bg-primary/40 scale-y-0 origin-bottom transition-transform group-hover:scale-y-100 rounded-t-lg"></div>
+<div class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-slate-400">SAT</div>
+</div>
+<div class="flex-1 bg-primary/10 rounded-t-lg group relative" style="height: 95%;">
+<div class="absolute inset-0 bg-primary/40 scale-y-0 origin-bottom transition-transform group-hover:scale-y-100 rounded-t-lg"></div>
+<div class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-slate-400">SUN</div>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-primary/10 shadow-sm flex flex-col">
+<h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary">warning</span>
+                            Hallucination Detection results
+                        </h3>
+<div class="space-y-6 flex-1">
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-bold">
+<span>Factual Contradiction</span>
+<span class="text-primary">0.02%</span>
+</div>
+<div class="w-full h-1.5 bg-primary/5 rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 12%"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-bold">
+<span>Logical Fallacy</span>
+<span class="text-primary">0.08%</span>
+</div>
+<div class="w-full h-1.5 bg-primary/5 rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 45%"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-bold">
+<span>Constraint Violation</span>
+<span class="text-primary">0.02%</span>
+</div>
+<div class="w-full h-1.5 bg-primary/5 rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 15%"></div>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-4 border-t border-primary/5 flex items-center justify-between">
+<div class="flex -space-x-2">
+<div class="size-6 rounded-full ring-2 ring-white bg-slate-200 overflow-hidden"><img data-alt="Reviewer 1 avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtZbsysSCHJZjqZ-laW6jRULiZ06KFk-UlLh5vE0ug_KW4qfpFh3HuDeL4b6OLYD7TFrM6el-r-XKayGWyNL_32Wrn8J6VSf0x6pkPGVCRvuC8eRmCZwcIOwn0DVM2YDhIdK3xU_jY59qvCzaeIzEAW4EeuffasSbtc5P-GP9Z7zv2y44nvEOjMG30mmJw_p-dWYRVl_2MZa8wFQwyygLjYQ7-B9x8GnXRcdBT2UVxCsgRRd-4HFqdguSxtSozem4tkm-X9OSmkY0"/></div>
+<div class="size-6 rounded-full ring-2 ring-white bg-slate-300 overflow-hidden"><img data-alt="Reviewer 2 avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOOy-1rLsoHMUKX7h8s_M7UfrRxKPGCtHYsCtTdYQkKUEiGRaQC0GgHk7UvBFo7BxZV5Yqho7RPzzuHl13fBBXpqjTHoBFQMYD-SkyJ45UkmyY6xl_z3yYoMBCO5tANXjy5eqzO1NB4fGlTNlc8nxZP7xf-alpKXDB6bbMlVSbB0vK12RySeS7CNEZbXrsm4Gl7KYMh94P4dBxMW7awYRxh2ZLJOQODPJfQKrq_ROSi-YmnZc0QSQ3qaj2ddMLSM_AbAUEQZazzLw"/></div>
+<div class="size-6 rounded-full ring-2 ring-white bg-slate-400 flex items-center justify-center text-[8px] font-bold text-white">+4</div>
+</div>
+<p class="text-[10px] text-slate-500 italic">Validated by Human-in-the-loop (HITL)</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

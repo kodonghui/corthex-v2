@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 Admin - Department Management</title>
+<!-- Tailwind CSS v3 with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Serif for Headings and Sans for body -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'c-cream': '#faf8f5',
+            'c-olive': '#5a7247',
+            'c-olive-dark': '#4a5e3a',
+            'c-olive-light': '#e8ede4',
+          },
+          fontFamily: {
+            serif: ['"Noto Serif KR"', 'serif'],
+            sans: ['Inter', 'sans-serif'],
+          },
+          borderRadius: {
+            '2xl': '16px',
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-typography">
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #faf8f5;
+    }
+    h1, h2, h3 {
+      font-family: 'Noto Serif KR', serif;
+    }
+  </style>
+<style data-purpose="layout-sidebar">
+    /* Sidebar specific styles to ensure visual consistency */
+    .sidebar-link-active {
+      background-color: #5a7247;
+      color: white !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex text-slate-800">
+<!-- BEGIN: Sidebar Navigation -->
+<aside class="w-64 bg-white border-r border-slate-200 flex flex-col fixed h-full z-20" data-purpose="sidebar">
+<div class="p-6 border-b border-slate-100">
+<div class="text-2xl font-bold text-c-olive tracking-tight">CORTHEX v2</div>
+</div>
+<nav class="flex-1 p-4 space-y-2 overflow-y-auto" data-purpose="nav-links">
+<a class="flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl transition-colors" href="#">
+<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+        Dashboard
+      </a>
+<!-- Active Link: Admin Departments -->
+<a class="sidebar-link-active flex items-center px-4 py-3 rounded-xl transition-colors" href="#">
+<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+        Admin Departments
+      </a>
+<a class="flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl transition-colors" href="#">
+<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+        User Management
+      </a>
+<a class="flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl transition-colors" href="#">
+<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+        System Settings
+      </a>
+</nav>
+<div class="p-4 border-t border-slate-100" data-purpose="user-profile-summary">
+<div class="flex items-center space-x-3 p-2">
+<div class="w-10 h-10 rounded-full bg-c-olive-light flex items-center justify-center text-c-olive font-bold">
+          AD
+        </div>
+<div>
+<p class="text-sm font-semibold">Admin User</p>
+<p class="text-xs text-slate-500">Super Admin</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- END: Sidebar Navigation -->
+<!-- BEGIN: Main Content Area -->
+<main class="flex-1 ml-64 flex flex-col min-h-screen" data-purpose="main-layout">
+<!-- BEGIN: Top Bar -->
+<header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-10" data-purpose="top-bar">
+<nav class="flex items-center text-sm text-slate-500" data-purpose="breadcrumbs">
+<a class="hover:text-c-olive" href="#">Admin</a>
+<span class="mx-2 text-slate-300">/</span>
+<span class="text-slate-900 font-medium">부서 관리</span>
+</nav>
+<div class="flex items-center space-x-4">
+<button class="p-2 text-slate-400 hover:text-c-olive transition-colors relative">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+</button>
+<div class="h-8 w-px bg-slate-200"></div>
+<button class="flex items-center space-x-2 text-sm font-medium text-slate-700 hover:text-c-olive transition-colors">
+<span>KR</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</header>
+<!-- END: Top Bar -->
+<!-- BEGIN: Page Content -->
+<div class="p-8 max-w-7xl mx-auto w-full">
+<!-- BEGIN: Content Header -->
+<div class="flex items-center justify-between mb-8" data-purpose="page-header">
+<div>
+<h1 class="text-3xl font-bold text-slate-900 mb-2">부서 관리</h1>
+<p class="text-slate-500">조직 내 부서를 생성하고 팀원 현황을 관리하세요.</p>
+</div>
+<button class="bg-c-olive hover:bg-c-olive-dark text-white px-6 py-3 rounded-2xl font-semibold flex items-center shadow-sm transition-all transform hover:-translate-y-0.5">
+<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          새 부서 생성
+        </button>
+</div>
+<!-- END: Content Header -->
+<!-- BEGIN: Department Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-purpose="department-grid">
+<!-- Department Card: Product & Design -->
+<div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow relative group">
+<div class="flex justify-between items-start mb-4">
+<div class="bg-c-olive-light p-3 rounded-xl">
+<svg class="w-6 h-6 text-c-olive" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 text-slate-400 hover:text-c-olive hover:bg-slate-50 rounded-lg transition-colors">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<button class="p-2 text-slate-400 hover:text-red-500 hover:bg-slate-50 rounded-lg transition-colors">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</div>
+<h3 class="text-xl font-bold text-slate-900 mb-2">Product &amp; Design</h3>
+<p class="text-slate-500 text-sm mb-6 line-clamp-2">사용자 경험을 설계하고 브랜드 아이덴티티를 확립하는 핵심 부서입니다.</p>
+<div class="flex items-center justify-between mt-auto">
+<span class="text-sm font-medium text-slate-600 flex items-center">
+<svg class="w-4 h-4 mr-1.5 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+              12 Members
+            </span>
+<span class="px-2.5 py-1 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-full uppercase tracking-wider">Active</span>
+</div>
+</div>
+<!-- Department Card: Engineering -->
+<div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow relative group">
+<div class="flex justify-between items-start mb-4">
+<div class="bg-c-olive-light p-3 rounded-xl">
+<svg class="w-6 h-6 text-c-olive" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 text-slate-400 hover:text-c-olive hover:bg-slate-50 rounded-lg transition-colors">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<button class="p-2 text-slate-400 hover:text-red-500 hover:bg-slate-50 rounded-lg transition-colors">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</div>
+<h3 class="text-xl font-bold text-slate-900 mb-2">Engineering</h3>
+<p class="text-slate-500 text-sm mb-6 line-clamp-2">코어 인프라 구축 및 서비스 고도화를 담당하는 기술 전문가 그룹입니다.</p>
+<div class="flex items-center justify-between mt-auto">
+<span class="text-sm font-medium text-slate-600 flex items-center">
+<svg class="w-4 h-4 mr-1.5 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+              24 Members
+            </span>
+<span class="px-2.5 py-1 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-full uppercase tracking-wider">Active</span>
+</div>
+</div>
+<!-- Department Card: Marketing -->
+<div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow relative group">
+<div class="flex justify-between items-start mb-4">
+<div class="bg-c-olive-light p-3 rounded-xl">
+<svg class="w-6 h-6 text-c-olive" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 text-slate-400 hover:text-c-olive hover:bg-slate-50 rounded-lg transition-colors">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<button class="p-2 text-slate-400 hover:text-red-500 hover:bg-slate-50 rounded-lg transition-colors">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</div>
+<h3 class="text-xl font-bold text-slate-900 mb-2">Marketing</h3>
+<p class="text-slate-500 text-sm mb-6 line-clamp-2">글로벌 시장 확장을 위한 전략 수립 및 캠페인 실행을 총괄합니다.</p>
+<div class="flex items-center justify-between mt-auto">
+<span class="text-sm font-medium text-slate-600 flex items-center">
+<svg class="w-4 h-4 mr-1.5 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+              8 Members
+            </span>
+<span class="px-2.5 py-1 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-full uppercase tracking-wider">Active</span>
+</div>
+</div>
+<!-- Department Card: Customer Success -->
+<div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow relative group">
+<div class="flex justify-between items-start mb-4">
+<div class="bg-c-olive-light p-3 rounded-xl">
+<svg class="w-6 h-6 text-c-olive" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 text-slate-400 hover:text-c-olive hover:bg-slate-50 rounded-lg transition-colors">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<button class="p-2 text-slate-400 hover:text-red-500 hover:bg-slate-50 rounded-lg transition-colors">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</div>
+<h3 class="text-xl font-bold text-slate-900 mb-2">Customer Success</h3>
+<p class="text-slate-500 text-sm mb-6 line-clamp-2">고객 만족을 최우선으로 하며 장기적인 고객 관계를 형성합니다.</p>
+<div class="flex items-center justify-between mt-auto">
+<span class="text-sm font-medium text-slate-600 flex items-center">
+<svg class="w-4 h-4 mr-1.5 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+              15 Members
+            </span>
+<span class="px-2.5 py-1 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-full uppercase tracking-wider">Active</span>
+</div>
+</div>
+<!-- Empty State / CTA Card -->
+<button class="border-2 border-dashed border-slate-200 rounded-2xl p-6 flex flex-col items-center justify-center text-slate-400 hover:border-c-olive hover:text-c-olive hover:bg-white transition-all group" data-purpose="create-new-card">
+<div class="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-c-olive-light transition-colors">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="font-semibold text-lg">새 부서 생성</span>
+<p class="text-xs mt-1 text-slate-400 group-hover:text-c-olive/70">새로운 팀과 권한을 설정하세요</p>
+</button>
+</div>
+<!-- END: Department Grid -->
+</div>
+<!-- END: Page Content -->
+<!-- BEGIN: Footer -->
+<footer class="mt-auto p-8 border-t border-slate-200 text-sm text-slate-400 text-center" data-purpose="page-footer">
+<p>© 2023 CORTHEX v2. All rights reserved.</p>
+</footer>
+<!-- END: Footer -->
+</main>
+<!-- END: Main Content Area -->
+<!-- BEGIN: Interactive Logic (Mockup Only) -->
+<script data-purpose="event-handlers">
+    // Placeholder for future API integration logic
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('Department Management initialized.');
+      // API Endpoints:
+      // GET /api/admin/departments
+      // POST /api/admin/departments
+      // PATCH /api/admin/departments/{id}
+      // DELETE /api/admin/departments/{id}
+    });
+  </script>
+<!-- END: Interactive Logic -->
+</body></html>

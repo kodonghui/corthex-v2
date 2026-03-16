@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>N-Tier Workspace Management</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-200">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Navigation Header -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary/20 bg-background-light dark:bg-background-dark px-6 md:px-10 py-3 sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-primary">
+<div class="size-6 flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">layers</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-[-0.015em]">Tier Management</h2>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium leading-normal" href="#">Overview</a>
+<a class="text-primary text-sm font-bold leading-normal border-b-2 border-primary pb-1" href="#">Models</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium leading-normal" href="#">Mapping</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium leading-normal" href="#">History</a>
+</nav>
+</div>
+<div class="flex flex-1 justify-end gap-4 md:gap-8 items-center">
+<label class="hidden sm:flex flex-col min-w-40 h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-xl h-full">
+<div class="text-slate-400 flex border-none bg-primary/5 dark:bg-primary/10 items-center justify-center pl-4 rounded-l-xl">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 border-none bg-primary/5 dark:bg-primary/10 rounded-r-xl text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:ring-1 focus:ring-primary h-full px-4 text-base font-normal" placeholder="Search models..." value=""/>
+</div>
+</label>
+<div class="flex gap-2">
+<button class="flex items-center justify-center rounded-xl h-10 w-10 bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="flex items-center justify-center rounded-xl h-10 w-10 bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/20" data-alt="User profile avatar icon" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCRodemsyk0_D_2_G5HwtuRM8gqU8eoowxPVGLQpaYlP8P4KUMvb-3r9FiU6Uu95uHRno4TSoLtW-tBA46zUGfWhYz-zyZXKdctLaj2Gy2M4B2zGtefV35l6jtMvkcL34jd2w7-UBxhrqTJv8sGMHlK2hc0b1TSokv9tCNbgwc_7Iund3RzFPeNRKL2ZTTs5rOraa9BeyHCDfMDrvC4on4uF_yPzQ2RS7sldRaXonxFzBfx2t1bGi_VJY91Jcpy1nVG3Ii9535TN8PH");'></div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- Sidebar -->
+<aside class="hidden lg:flex w-64 flex-col border-r border-primary/10 bg-background-light dark:bg-background-dark p-4 space-y-6">
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-3 px-2">
+<div class="bg-primary rounded-lg p-2 flex items-center justify-center text-white">
+<span class="material-symbols-outlined">workspace_premium</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-slate-900 dark:text-slate-100 text-sm font-bold">Workspace AI</h1>
+<p class="text-slate-500 text-xs">v2.4.0 • Enterprise</p>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-primary/5 cursor-pointer text-slate-600 dark:text-slate-400 transition-colors">
+<span class="material-symbols-outlined">dashboard</span>
+<p class="text-sm font-medium">Dashboard</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-primary text-white shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">layers</span>
+<p class="text-sm font-medium">Tiers</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-primary/5 cursor-pointer text-slate-600 dark:text-slate-400 transition-colors">
+<span class="material-symbols-outlined">memory</span>
+<p class="text-sm font-medium">Models</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-primary/5 cursor-pointer text-slate-600 dark:text-slate-400 transition-colors">
+<span class="material-symbols-outlined">description</span>
+<p class="text-sm font-medium">Logs</p>
+</div>
+</div>
+</div>
+<div class="mt-auto p-4 rounded-xl bg-primary/5 border border-primary/10">
+<p class="text-xs font-bold text-primary uppercase tracking-wider mb-2">Usage Limit</p>
+<div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-3/4"></div>
+</div>
+<p class="text-[10px] mt-2 text-slate-500">75% of compute credits used</p>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto p-4 md:p-8">
+<!-- Title Section -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+<div>
+<h1 class="text-3xl md:text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight">N-Tier Configuration</h1>
+<p class="text-slate-600 dark:text-slate-400 mt-2">Manage natural organic workspace tiers and optimized model mappings.</p>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg shadow-primary/30 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-xl">add</span>
+<span>Add New Tier</span>
+</button>
+</div>
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+<div class="bg-white dark:bg-slate-800/50 p-6 rounded-xl border border-primary/10 shadow-sm flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Total Tiers</p>
+<span class="material-symbols-outlined text-primary text-xl">layers</span>
+</div>
+<p class="text-3xl font-bold text-slate-900 dark:text-slate-100">5</p>
+<div class="flex items-center gap-1 text-emerald-500 text-sm font-bold">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span>Stable</span>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-800/50 p-6 rounded-xl border border-primary/10 shadow-sm flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Active Mappings</p>
+<span class="material-symbols-outlined text-primary text-xl">account_tree</span>
+</div>
+<p class="text-3xl font-bold text-slate-900 dark:text-slate-100">12</p>
+<div class="flex items-center gap-1 text-emerald-500 text-sm font-bold">
+<span class="material-symbols-outlined text-sm">arrow_upward</span>
+<span>+2.4%</span>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-800/50 p-6 rounded-xl border border-primary/10 shadow-sm flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">API Health</p>
+<span class="material-symbols-outlined text-emerald-500 text-xl">check_circle</span>
+</div>
+<p class="text-3xl font-bold text-slate-900 dark:text-slate-100">99.9%</p>
+<div class="flex items-center gap-1 text-rose-500 text-sm font-bold">
+<span class="material-symbols-outlined text-sm">arrow_downward</span>
+<span>-0.1%</span>
+</div>
+</div>
+</div>
+<!-- Tabs Section -->
+<div class="border-b border-primary/10 mb-6 flex gap-8">
+<button class="border-b-2 border-primary pb-3 text-primary text-sm font-bold flex items-center gap-2 px-1">
+<span>Active Tiers</span>
+<span class="bg-primary/10 text-primary text-[10px] px-1.5 py-0.5 rounded-full">3</span>
+</button>
+<button class="pb-3 text-slate-500 text-sm font-medium hover:text-primary transition-colors px-1">Draft Configurations</button>
+<button class="pb-3 text-slate-500 text-sm font-medium hover:text-primary transition-colors px-1">Archived</button>
+</div>
+<!-- Tiers Table Container -->
+<div class="bg-white dark:bg-slate-800/30 rounded-xl border border-primary/10 shadow-sm overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-primary/5 border-b border-primary/10">
+<th class="p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Tier Level</th>
+<th class="p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Mapped Model</th>
+<th class="p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Description</th>
+<th class="p-4 text-xs font-bold uppercase tracking-wider text-slate-500">Status</th>
+<th class="p-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-primary/10">
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="p-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-lg bg-emerald-500/20 text-emerald-600 flex items-center justify-center font-bold">1</div>
+<span class="font-bold text-slate-900 dark:text-slate-100">Organic Essential</span>
+</div>
+</td>
+<td class="p-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg">bolt</span>
+<span class="text-sm">Llama-3-8B-Turbo</span>
+</div>
+</td>
+<td class="p-4 text-sm text-slate-500">Basic organic pattern matching and lightweight inference.</td>
+<td class="p-4">
+<span class="px-2 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 text-[10px] font-bold uppercase">Live</span>
+</td>
+<td class="p-4 text-right">
+<button class="p-2 hover:bg-primary/10 rounded-lg transition-colors text-slate-400 hover:text-primary">
+<span class="material-symbols-outlined">edit</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="p-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-lg bg-blue-500/20 text-blue-600 flex items-center justify-center font-bold">2</div>
+<span class="font-bold text-slate-900 dark:text-slate-100">Bloom Enhanced</span>
+</div>
+</td>
+<td class="p-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg">auto_awesome</span>
+<span class="text-sm">GPT-4o-Mini</span>
+</div>
+</td>
+<td class="p-4 text-sm text-slate-500">Advanced semantic analysis with organic flow optimization.</td>
+<td class="p-4">
+<span class="px-2 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 text-[10px] font-bold uppercase">Live</span>
+</td>
+<td class="p-4 text-right">
+<button class="p-2 hover:bg-primary/10 rounded-lg transition-colors text-slate-400 hover:text-primary">
+<span class="material-symbols-outlined">edit</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="p-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-lg bg-primary/20 text-primary flex items-center justify-center font-bold">3</div>
+<span class="font-bold text-slate-900 dark:text-slate-100">Forest Enterprise</span>
+</div>
+</td>
+<td class="p-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg">diamond</span>
+<span class="text-sm">Claude-3.5-Sonnet</span>
+</div>
+</td>
+<td class="p-4 text-sm text-slate-500">Deep organic neural processing for complex architectures.</td>
+<td class="p-4">
+<span class="px-2 py-1 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 text-[10px] font-bold uppercase">Deploying</span>
+</td>
+<td class="p-4 text-right">
+<button class="p-2 hover:bg-primary/10 rounded-lg transition-colors text-slate-400 hover:text-primary">
+<span class="material-symbols-outlined">edit</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Footer / Info Panel -->
+<div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="bg-primary/5 p-6 rounded-xl border border-primary/10">
+<h3 class="font-bold text-slate-900 dark:text-slate-100 mb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">info</span>
+                                Active Configuration Notes
+                            </h3>
+<p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                You are currently using the "Natural Organic" theme for Tier 2 and 3. Any changes to the model mapping for these tiers will require a workspace re-propagation, taking approximately 2-3 minutes.
+                            </p>
+</div>
+<div class="flex flex-col justify-center items-end text-right">
+<p class="text-xs text-slate-500 mb-1 tracking-tight uppercase">API Endpoint</p>
+<code class="bg-slate-200 dark:bg-slate-700 px-3 py-1 rounded text-primary text-sm font-mono">GET /api/workspace/tiers</code>
+<p class="text-[10px] text-slate-400 mt-2">Last updated: Today, 10:42 AM</p>
+</div>
+</div>
+</main>
+</div>
+</div>
+</div>
+</body></html>

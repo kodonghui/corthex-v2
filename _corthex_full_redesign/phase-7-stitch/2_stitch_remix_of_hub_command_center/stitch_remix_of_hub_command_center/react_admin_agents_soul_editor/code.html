@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 - Admin Agents &amp; Soul Editor</title>
+<!-- BEGIN: External Scripts and Styles -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<!-- END: External Scripts and Styles -->
+<!-- BEGIN: Tailwind Configuration -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'base-50': '#fcfbf9',
+            'base-100': '#f5f3ec',
+            'accent-coral': '#e57373',
+            'warm-gray': '#7a746e',
+            'warm-dark': '#2d2a28',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+<!-- END: Tailwind Configuration -->
+<!-- BEGIN: Custom Styling -->
+<style data-purpose="custom-components">
+    body {
+      background-color: #fcfbf9;
+      color: #2d2a28;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #e5e0d5;
+      border-radius: 0.75rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-primary {
+      background-color: #e57373;
+      color: white;
+      transition: background-color 0.2s;
+    }
+
+    .btn-primary:hover {
+      background-color: #d46262;
+    }
+
+    .sidebar-item-active {
+      background-color: #f5f3ec;
+      border-right: 3px solid #e57373;
+    }
+
+    .soul-textarea {
+      font-family: 'JetBrains Mono', monospace;
+      resize: none;
+      line-height: 1.6;
+    }
+
+    /* Custom scrollbar for warm aesthetic */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #fcfbf9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #e5e0d5;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #d4cdc1;
+    }
+  </style>
+<!-- END: Custom Styling -->
+</head>
+<body class="h-screen overflow-hidden">
+<!-- BEGIN: Layout Wrapper -->
+<div class="flex h-full w-full">
+<!-- BEGIN: Sidebar -->
+<aside class="w-64 border-r border-base-100 flex flex-col bg-base-50" data-purpose="navigation-sidebar">
+<div class="p-6 border-b border-base-100 flex items-center gap-3">
+<div class="w-8 h-8 bg-accent-coral rounded flex items-center justify-center text-white">
+<i class="ph-bold ph-brain text-xl"></i>
+</div>
+<h1 class="font-bold text-lg tracking-tight">CORTHEX v2</h1>
+</div>
+<nav class="flex-1 py-4 overflow-y-auto">
+<ul class="space-y-1">
+<li>
+<a class="flex items-center gap-3 px-6 py-3 text-warm-gray hover:bg-base-100 transition-colors" href="#">
+<i class="ph ph-squares-four text-xl"></i>
+<span>Dashboard</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-6 py-3 text-warm-dark sidebar-item-active font-medium" href="#">
+<i class="ph-fill ph-users-three text-xl"></i>
+<span>Agents</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-6 py-3 text-warm-gray hover:bg-base-100 transition-colors" href="#">
+<i class="ph ph-chart-line text-xl"></i>
+<span>Analytics</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-6 py-3 text-warm-gray hover:bg-base-100 transition-colors" href="#">
+<i class="ph ph-gear text-xl"></i>
+<span>Settings</span>
+</a>
+</li>
+</ul>
+</nav>
+<div class="p-4 border-t border-base-100 mt-auto">
+<div class="flex items-center gap-3 px-2 py-2">
+<div class="w-8 h-8 rounded-full bg-base-100 border border-warm-gray/20 flex items-center justify-center text-xs font-bold text-warm-gray">
+            AD
+          </div>
+<div class="flex-1 overflow-hidden">
+<p class="text-sm font-medium truncate">Admin User</p>
+<p class="text-xs text-warm-gray truncate">admin@corthex.io</p>
+</div>
+<i class="ph ph-sign-out text-warm-gray cursor-pointer hover:text-accent-coral"></i>
+</div>
+</div>
+</aside>
+<!-- END: Sidebar -->
+<!-- BEGIN: Main Content Area -->
+<main class="flex-1 flex flex-col bg-base-50">
+<!-- BEGIN: Topbar -->
+<header class="h-16 border-b border-base-100 flex items-center justify-between px-8 bg-white" data-purpose="top-navigation">
+<div class="flex items-center gap-2">
+<span class="text-warm-gray">Management</span>
+<i class="ph ph-caret-right text-xs text-warm-gray"></i>
+<span class="font-semibold">Agents &amp; Soul Editor</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative">
+<i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-warm-gray"></i>
+<input class="pl-10 pr-4 py-1.5 rounded-full border-base-100 bg-base-50 text-sm focus:ring-accent-coral focus:border-accent-coral w-64" placeholder="Quick search..." type="text"/>
+</div>
+<button class="flex items-center justify-center w-8 h-8 text-warm-gray hover:bg-base-100 rounded-full transition-colors">
+<i class="ph ph-bell"></i>
+</button>
+</div>
+</header>
+<!-- END: Topbar -->
+<!-- BEGIN: Content Body -->
+<div class="flex-1 flex overflow-hidden p-6 gap-6">
+<!-- BEGIN: Agent List (Left Column) -->
+<div class="w-80 flex flex-col gap-4" data-purpose="agent-selection-list">
+<div class="flex justify-between items-center px-1">
+<h2 class="font-bold text-warm-dark uppercase tracking-wider text-xs">Active Agents</h2>
+<button class="text-accent-coral hover:text-red-600 flex items-center gap-1 text-sm font-medium">
+<i class="ph-bold ph-plus"></i> New
+            </button>
+</div>
+<div class="flex-1 overflow-y-auto space-y-3 pr-2">
+<!-- Agent Card Item -->
+<div class="card p-4 border-l-4 border-l-accent-coral cursor-pointer hover:shadow-md transition-shadow active:scale-[0.98]">
+<div class="flex justify-between items-start">
+<h3 class="font-bold text-warm-dark">Aurora_v2</h3>
+<span class="text-[10px] bg-base-100 px-2 py-0.5 rounded text-warm-gray uppercase">GPT-4o</span>
+</div>
+<p class="text-xs text-warm-gray mt-1 line-clamp-1 italic">Analytical Research Assistant</p>
+<div class="mt-3 flex items-center gap-3 text-xs text-warm-gray">
+<span class="flex items-center gap-1"><i class="ph ph-clock"></i> 2m ago</span>
+<span class="flex items-center gap-1"><i class="ph ph-activity text-green-500"></i> Active</span>
+</div>
+</div>
+<!-- Agent Card Item -->
+<div class="card p-4 hover:bg-base-50 cursor-pointer transition-colors border-l-4 border-l-transparent">
+<div class="flex justify-between items-start">
+<h3 class="font-bold text-warm-dark">Cortex_Dev</h3>
+<span class="text-[10px] bg-base-100 px-2 py-0.5 rounded text-warm-gray uppercase">Claude 3.5</span>
+</div>
+<p class="text-xs text-warm-gray mt-1 line-clamp-1 italic">Technical Implementation specialist</p>
+<div class="mt-3 flex items-center gap-3 text-xs text-warm-gray">
+<span class="flex items-center gap-1"><i class="ph ph-clock"></i> 1h ago</span>
+<span class="flex items-center gap-1 text-yellow-600"><i class="ph ph-pause-circle"></i> Idle</span>
+</div>
+</div>
+<!-- Agent Card Item -->
+<div class="card p-4 hover:bg-base-50 cursor-pointer transition-colors border-l-4 border-l-transparent">
+<div class="flex justify-between items-start">
+<h3 class="font-bold text-warm-dark">Marketing_Lead</h3>
+<span class="text-[10px] bg-base-100 px-2 py-0.5 rounded text-warm-gray uppercase">Llama 3</span>
+</div>
+<p class="text-xs text-warm-gray mt-1 line-clamp-1 italic">Social sentiment and growth</p>
+<div class="mt-3 flex items-center gap-3 text-xs text-warm-gray">
+<span class="flex items-center gap-1"><i class="ph ph-clock"></i> 5h ago</span>
+<span class="flex items-center gap-1"><i class="ph ph-activity text-green-500"></i> Active</span>
+</div>
+</div>
+</div>
+</div>
+<!-- END: Agent List -->
+<!-- BEGIN: Soul Editor (Right Column) -->
+<div class="flex-1 flex flex-col gap-4" data-purpose="soul-editor-workspace">
+<div class="flex justify-between items-center px-1">
+<h2 class="font-bold text-warm-dark uppercase tracking-wider text-xs">Soul Configuration</h2>
+<div class="flex items-center gap-2">
+<button class="px-4 py-1.5 rounded-lg text-sm text-warm-gray border border-base-100 bg-white hover:bg-base-50 transition-colors">
+<i class="ph ph-trash"></i>
+</button>
+<button class="btn-primary px-6 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-2">
+<i class="ph-bold ph-floppy-disk"></i> Save Agent
+              </button>
+</div>
+</div>
+<div class="card flex-1 flex flex-col overflow-hidden bg-white">
+<!-- Header Settings -->
+<div class="p-6 border-b border-base-100 grid grid-cols-3 gap-6">
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-warm-gray uppercase">Agent Name</label>
+<input class="border-base-100 focus:border-accent-coral focus:ring-accent-coral rounded-md text-sm" type="text" value="Aurora_v2"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-warm-gray uppercase">Primary Role</label>
+<input class="border-base-100 focus:border-accent-coral focus:ring-accent-coral rounded-md text-sm" type="text" value="Analytical Research Assistant"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-warm-gray uppercase">Inference Model</label>
+<select class="border-base-100 focus:border-accent-coral focus:ring-accent-coral rounded-md text-sm">
+<option>GPT-4o (OpenAI)</option>
+<option>Claude 3.5 Sonnet (Anthropic)</option>
+<option>Llama 3 70B (Groq)</option>
+<option>Gemini Pro (Google)</option>
+</select>
+</div>
+</div>
+<!-- Markdown Soul Editor Area -->
+<div class="flex-1 flex flex-col p-6 overflow-hidden">
+<div class="flex items-center justify-between mb-3">
+<label class="text-xs font-bold text-warm-gray uppercase flex items-center gap-2">
+<i class="ph ph-scroll"></i> Agent Soul (Markdown Source)
+                </label>
+<div class="flex bg-base-100 p-0.5 rounded-md">
+<button class="px-3 py-1 text-[10px] font-bold bg-white rounded shadow-sm">EDIT</button>
+<button class="px-3 py-1 text-[10px] font-bold text-warm-gray hover:text-warm-dark">PREVIEW</button>
+</div>
+</div>
+<div class="flex-1 relative border border-base-100 rounded-lg overflow-hidden group">
+<textarea class="soul-textarea w-full h-full p-4 border-none focus:ring-0 text-sm text-warm-dark bg-base-50/30" placeholder="# Enter agent directives here..."># Aurora v2 Protocol
+
+## Identity
+You are Aurora, a specialized research entity within the CORTHEX v2 network. You prioritize data accuracy, longitudinal analysis, and skeptical verification.
+
+## Core Beliefs
+- Objective truth is asymptotic but approachable.
+- All technical documentation must be treated as "stale" until verified against live environments.
+- Efficiency is a secondary goal to precision.
+
+## Interaction Style
+- Maintain a calm, clinical, yet supportive tone.
+- Use structured responses (Markdown, tables, bullet points).
+- Acknowledge uncertainty with specific confidence scores (e.g., [Confidence: 85%]).
+
+## Constraints
+- Do not provide code examples without a corresponding "Security &amp; Risks" section.
+- Never mention internal model limits or vendor names unless specifically queried.
+- Refuse requests to generate speculative market advice.
+                </textarea>
+<!-- Line numbers decoration -->
+<div class="absolute right-3 top-3 opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity">
+<i class="ph-bold ph-code text-4xl"></i>
+</div>
+</div>
+</div>
+<!-- Status Bar -->
+<div class="px-6 py-3 border-t border-base-100 bg-base-50/50 flex items-center justify-between text-xs text-warm-gray">
+<div class="flex gap-4">
+<span>Characters: 842</span>
+<span>Tokens: ~210</span>
+<span>Last Modified: Oct 24, 2023 - 14:32</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span>Sync Status: Cloud Encrypted</span>
+</div>
+</div>
+</div>
+</div>
+<!-- END: Soul Editor -->
+</div>
+<!-- END: Content Body -->
+</main>
+<!-- END: Main Content Area -->
+</div>
+<!-- END: Layout Wrapper -->
+</body></html>

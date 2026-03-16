@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Reports Archive - CORTHEX v2</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'warm-base': '#f9f8f6',
+            'coral-primary': '#e87c6e',
+            'amber-action': '#f2a154',
+            'sage-success': '#82b194',
+            'corthex-dark': '#333333',
+            'corthex-muted': '#888888',
+          }
+        }
+      }
+    }
+  </script>
+<!-- BEGIN: Custom Styles -->
+<style data-purpose="layout-typography">
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f9f8f6;
+      color: #333333;
+    }
+    .sidebar-item-active {
+      background-color: #ffffff;
+      color: #e87c6e;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border-radius: 0.5rem;
+    }
+    .markdown-content h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; }
+    .markdown-content p { margin-bottom: 1rem; line-height: 1.6; color: #4a4a4a; }
+  </style>
+<!-- END: Custom Styles -->
+</head>
+<body class="min-h-screen flex">
+<!-- BEGIN: Left Sidebar -->
+<aside class="w-64 border-r border-gray-200 flex flex-col h-screen sticky top-0 bg-[#f9f8f6]" data-purpose="navigation-sidebar">
+<div class="p-6">
+<h1 class="text-xl font-bold tracking-tight text-corthex-dark flex items-center gap-2">
+<span class="w-8 h-8 bg-coral-primary rounded flex items-center justify-center text-white text-xs">C2</span>
+        CORTHEX v2
+      </h1>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<div class="py-2">
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-white rounded-lg transition-colors" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+          홈
+        </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-white rounded-lg transition-colors" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"></path></svg>
+          허브
+        </a>
+</div>
+<div class="pt-4 pb-2">
+<p class="px-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">UI Framework</p>
+<a class="sidebar-item-active flex items-center gap-3 px-3 py-2 text-sm font-medium" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          컴포넌트 가이드
+        </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-white rounded-lg transition-colors" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+          디자인 시스템
+        </a>
+</div>
+<div class="pt-4 pb-2">
+<p class="px-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">도구</p>
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-white rounded-lg transition-colors" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+          대시보드
+        </a>
+</div>
+</nav>
+<div class="mt-auto p-4 border-t border-gray-200">
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-white rounded-lg transition-colors" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
+        설정
+      </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-coral-primary hover:bg-white rounded-lg transition-colors" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+        로그아웃
+      </a>
+</div>
+</aside>
+<!-- END: Left Sidebar -->
+<main class="flex-1 flex flex-col min-w-0 bg-[#f9f8f6]" data-purpose="main-content-area">
+<!-- BEGIN: Top Header -->
+<header class="h-16 border-b border-gray-200 flex items-center justify-between px-8 bg-white/80 backdrop-blur-sm sticky top-0 z-10" data-purpose="main-header">
+<div class="relative w-96">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+</span>
+<input class="block w-full pl-10 pr-3 py-2 border-none bg-gray-50 rounded-lg text-sm focus:ring-1 focus:ring-coral-primary transition-all" placeholder="UI 구성 요소 검색... (Cmd+K)" type="text"/>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-gray-400 hover:text-gray-600 relative">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-coral-primary rounded-full"></span>
+</button>
+<div class="flex items-center gap-3 border-l pl-6 border-gray-200">
+<div class="text-right">
+<p class="text-xs font-bold text-gray-900">Alex Kim</p>
+<p class="text-[10px] text-gray-500 uppercase tracking-tighter">CEO / ADMIN</p>
+</div>
+<img alt="Avatar" class="w-8 h-8 rounded-full bg-gray-200 border border-gray-100" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_1HG_uHqMZmRkFcWSpd4-l56HytExPsqxz6bzU5IoUGnBVQOrKKkKbG7XfBHRGEDDRa2CeSshQL9yPqRTaBoDiV5vWQARPGEr46wGSqjXZ9_stx4kNJyJAUWON2632JuO-Wvt6ayhQUvyidj06aHV6imuLn-slThEES7XEtdGzk4-sYZJlYI3IoemiWOfY_c1q5A7ray5VCI7bIp-9P3YmhonWPNb0mFK-3A4acJLneKoh8APfahd_2KfB17j2a9lvt-Sb381sVM"/>
+</div>
+</div>
+</header>
+<!-- END: Top Header -->
+<div class="p-8 max-w-7xl mx-auto w-full space-y-8" data-purpose="reports-container">
+<!-- BEGIN: Page Title Section -->
+<div>
+<h2 class="text-3xl font-extrabold text-corthex-dark tracking-tight">Report Archive</h2>
+<p class="text-gray-500 mt-2">CORTEX v2 워크스페이스의 모든 리포트 및 문서 보관함입니다.</p>
+</div>
+<!-- END: Page Title Section -->
+<div class="grid grid-cols-12 gap-8 items-start">
+<!-- BEGIN: Reports List (Sidebar style list) -->
+<section class="col-span-4 space-y-4" data-purpose="reports-list">
+<div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+<div class="p-4 border-b border-gray-50 bg-gray-50/50 flex justify-between items-center">
+<span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Workspace Reports</span>
+<span class="text-[10px] bg-gray-200 px-2 py-0.5 rounded-full font-bold">12 Total</span>
+</div>
+<div class="divide-y divide-gray-50">
+<!-- Report Item 1: Reviewed -->
+<button class="w-full text-left p-4 hover:bg-warm-base transition-colors group">
+<div class="flex items-center justify-between mb-1">
+<span class="text-xs font-bold text-sage-success flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-sage-success"></span>
+                    Reviewed
+                  </span>
+<span class="text-[10px] text-gray-400">2023.11.14</span>
+</div>
+<h3 class="font-bold text-gray-800 text-sm group-hover:text-coral-primary transition-colors">Q4 AI 비즈니스 전략 기획서</h3>
+<p class="text-xs text-gray-500 mt-1 line-clamp-1">인공지능 비즈니스의 새로운 차원과 차세대 워크플로우에 대한...</p>
+</button>
+<!-- Report Item 2: Submitted (Active/Selected) -->
+<button class="w-full text-left p-4 bg-warm-base border-l-4 border-amber-action">
+<div class="flex items-center justify-between mb-1">
+<span class="text-xs font-bold text-amber-action flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-action animate-pulse"></span>
+                    Submitted
+                  </span>
+<span class="text-[10px] text-gray-400">2023.11.12</span>
+</div>
+<h3 class="font-bold text-coral-primary text-sm">넥서스 워크플로우 대시보드 구조 분석</h3>
+<p class="text-xs text-gray-500 mt-1 line-clamp-1">복잡한 데이터 처리를 최소화하고 사용자 경험을 극대화하는...</p>
+</button>
+<!-- Report Item 3: Draft -->
+<button class="w-full text-left p-4 hover:bg-warm-base transition-colors group">
+<div class="flex items-center justify-between mb-1">
+<span class="text-xs font-bold text-gray-400 flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
+                    Draft
+                  </span>
+<span class="text-[10px] text-gray-400">2023.11.10</span>
+</div>
+<h3 class="font-bold text-gray-800 text-sm group-hover:text-coral-primary transition-colors">에이전트 아리아 언어 처리 로직</h3>
+<p class="text-xs text-gray-500 mt-1 line-clamp-1">Natural Language Expert의 처리 속도 및 아키텍처 가이드...</p>
+</button>
+<!-- Report Item 4: System Error State (Placeholder) -->
+<button class="w-full text-left p-4 hover:bg-warm-base transition-colors group">
+<div class="flex items-center justify-between mb-1">
+<span class="text-xs font-bold text-coral-primary flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-coral-primary"></span>
+                    System Error
+                  </span>
+<span class="text-[10px] text-gray-400">2023.11.08</span>
+</div>
+<h3 class="font-bold text-gray-800 text-sm group-hover:text-coral-primary transition-colors">데이터 통합 모듈 에러 리포트</h3>
+<p class="text-xs text-gray-500 mt-1 line-clamp-1">워크스페이스 동기화 과정에서 발생한 비정상 종료 이슈...</p>
+</button>
+</div>
+<div class="p-4 bg-gray-50/50">
+<button class="w-full py-2 bg-white border border-gray-200 rounded-lg text-xs font-bold text-gray-600 hover:border-coral-primary hover:text-coral-primary transition-all">
+                Load More Reports
+              </button>
+</div>
+</div>
+</section>
+<!-- END: Reports List -->
+<!-- BEGIN: Report Preview & Feedback -->
+<section class="col-span-8 space-y-6" data-purpose="report-detail-view">
+<!-- Report Content Card -->
+<article class="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 markdown-content" data-purpose="markdown-preview">
+<div class="flex items-center gap-2 mb-8">
+<span class="text-[10px] font-bold text-amber-action uppercase tracking-widest px-2 py-0.5 bg-amber-50 rounded">In Review</span>
+<span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Created by AI Assistant Aria</span>
+</div>
+<h1 class="text-3xl font-extrabold text-gray-900 mb-6">넥서스 워크플로우 대시보드 구조 분석</h1>
+<p>코텍스 v2는 복잡한 데이터 처리를 최소화하고 사용자 경험을 극대화하는 것을 목표로 합니다. 미니멀한 웜톤 디자인은 장시간 사용 시의 피로도를 줄여주며, 핵심 정보에 집중할 수 있도록 설계되었습니다.</p>
+<h3 class="text-lg font-bold text-gray-800 mt-8 mb-4">1. 인터페이스 설계 원칙</h3>
+<p>우리는 '적을수록 많다(Less is More)'는 원칙을 따릅니다. 불필요한 장식 요소를 제거하고, 사용자가 필요한 정보에 즉각적으로 접근할 수 있도록 계층 구조를 최적화했습니다. 모든 버튼과 폼 요소는 접근성을 최우선으로 고려하여 배치되었습니다.</p>
+<h3 class="text-lg font-bold text-gray-800 mt-8 mb-4">2. 상태 관리 및 피드백</h3>
+<p>사용자가 시스템의 현재 상태를 즉시 파악할 수 있도록 다양한 상태 배지(Status Badges)를 도입했습니다. <code>Working</code>, <code>Idle</code>, <code>Offline</code>, <code>Error</code> 상태는 각각 고유한 컬러 코드를 사용하여 직관적인 이해를 돕습니다.</p>
+<div class="my-8 p-6 bg-gray-50 rounded-xl border-l-4 border-gray-200 italic text-gray-600">
+              "넥서스 워크플로우는 단순한 도구가 아니라, 창의적인 비즈니스를 위한 최적의 파트너가 될 것입니다."
+            </div>
+<p>마지막 동기화: 2023년 11월 12일 14:30 (KST)</p>
+<hr class="my-10 border-gray-100"/>
+<div class="flex items-center justify-between">
+<div class="flex gap-2">
+<button class="px-4 py-2 bg-coral-primary text-white text-sm font-bold rounded-lg shadow-md hover:bg-opacity-90 transition-all">Approve Report</button>
+<button class="px-4 py-2 border border-gray-200 text-gray-600 text-sm font-bold rounded-lg hover:bg-gray-50 transition-all">Request Revision</button>
+</div>
+<button class="text-gray-400 hover:text-gray-600">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+</button>
+</div>
+</article>
+<!-- BEGIN: CEO Feedback Section -->
+<div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" data-purpose="feedback-section">
+<div class="p-6 border-b border-gray-50 flex items-center gap-2">
+<svg class="w-5 h-5 text-amber-action" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg>
+<h4 class="font-bold text-gray-800">CEO Feedback &amp; Comments</h4>
+</div>
+<div class="p-6 space-y-6">
+<!-- Comment 1 -->
+<div class="flex gap-4">
+<img alt="CEO Avatar" class="w-10 h-10 rounded-full border border-warm-base" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMEp64HvTNiXYhdjPp4cGNtB-8MyMN37pKwmc4gwuWehOTivpfRxfRkv6HRJNIo4BjX_qiqSqVrHO4-7fY-uLoemHBnxlAjwoVGETm-FU87E3etotNbRSoAJiPtHIEBUWQS7p_lw8MnddZzv1HKEOyRgz5cn65Uny2l5CJRk-6SIOr8cttI1eHWFXy2favyU1H7GOxf6ZlLHCckw8BQkyWmteXiXeW-JBT01DmzLV4dXRSS5Itjj3xeeJLEtZh2GwsroJ7kHT03hw"/>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="text-sm font-bold text-gray-900">Alex Kim</span>
+<span class="text-[10px] text-gray-400 font-medium">10 mins ago</span>
+</div>
+<div class="p-4 bg-gray-50 rounded-2xl rounded-tl-none text-sm text-gray-700 leading-relaxed">
+                    구조 분석이 매우 탄탄하네요. 특히 사용자 경험(UX) 관점에서의 미니멀한 접근이 마음에 듭니다. 2절의 상태 배지 구현 시 실제 데이터 바인딩 로직을 한 번 더 검토해 주세요.
+                  </div>
+</div>
+</div>
+<!-- Comment Input -->
+<div class="flex gap-4 mt-8">
+<div class="w-10 h-10 rounded-full bg-coral-primary flex items-center justify-center text-white text-xs font-bold shadow-sm">AK</div>
+<div class="flex-1 relative">
+<textarea class="w-full border-gray-100 bg-gray-50 rounded-2xl p-4 text-sm focus:ring-coral-primary focus:border-coral-primary transition-all resize-none" placeholder="피드백을 입력하세요..." rows="2"></textarea>
+<div class="absolute right-3 bottom-3 flex gap-2">
+<button class="p-1.5 text-gray-400 hover:text-coral-primary">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+</button>
+<button class="bg-coral-primary text-white px-4 py-1.5 rounded-xl text-xs font-bold hover:shadow-lg transition-all">Post</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- END: CEO Feedback Section -->
+</section>
+<!-- END: Report Preview & Feedback -->
+</div>
+</div>
+</main>
+</body></html>

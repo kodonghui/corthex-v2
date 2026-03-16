@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 - 기밀 문서 아카이브</title>
+<!-- Tailwind CSS v3 CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Phosphor Icons -->
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<!-- Custom Configuration -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'warm-bg': '#fcfbf9',
+            'coral-accent': '#e57373',
+            'amber-accent': '#f4a261',
+            'internal-accent': '#5c7c8a',
+          },
+          borderRadius: {
+            '3xl': '24px',
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="layout-styles">
+    body {
+      background-color: #fcfbf9;
+      color: #333;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #e2e2e2;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body class="h-screen flex overflow-hidden">
+<!-- BEGIN: Sidebar -->
+<aside class="w-64 h-full border-r border-stone-200 bg-white flex flex-col z-20" data-purpose="sidebar-navigation">
+<div class="p-6 flex items-center gap-2">
+<div class="w-8 h-8 bg-stone-800 rounded-lg flex items-center justify-center">
+<i class="ph-bold ph-shield-checkered text-white text-xl"></i>
+</div>
+<span class="font-bold text-xl tracking-tight">CORTHEX <span class="text-xs font-normal opacity-50">v2</span></span>
+</div>
+<nav class="flex-1 px-4 py-4 space-y-6 overflow-y-auto custom-scrollbar">
+<!-- Section: Navigation -->
+<div>
+<h3 class="px-2 mb-2 text-xs font-semibold text-stone-400 uppercase tracking-wider">메뉴</h3>
+<ul class="space-y-1">
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl text-stone-600 hover:bg-stone-50 transition-colors" href="#">
+<i class="ph ph-house text-lg"></i>
+<span class="text-sm font-medium">대시보드</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl bg-stone-100 text-stone-900 font-semibold shadow-sm" href="#">
+<i class="ph-fill ph-archive text-lg"></i>
+<span class="text-sm">기밀 아카이브</span>
+</a>
+</li>
+</ul>
+</div>
+<!-- Section: Classification Filters -->
+<div>
+<h3 class="px-2 mb-2 text-xs font-semibold text-stone-400 uppercase tracking-wider">보안 등급</h3>
+<ul class="space-y-1">
+<li>
+<button class="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-stone-50 group">
+<div class="flex items-center gap-3 text-stone-600">
+<i class="ph ph-circle-dashed text-coral-accent"></i>
+<span class="text-sm">1급 기밀 (Secret)</span>
+</div>
+<span class="text-[10px] bg-red-50 text-coral-accent px-1.5 py-0.5 rounded font-bold">12</span>
+</button>
+</li>
+<li>
+<button class="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-stone-50 group">
+<div class="flex items-center gap-3 text-stone-600">
+<i class="ph ph-circle-dashed text-amber-accent"></i>
+<span class="text-sm">2급 대외비 (Confidential)</span>
+</div>
+<span class="text-[10px] bg-orange-50 text-amber-accent px-1.5 py-0.5 rounded font-bold">45</span>
+</button>
+</li>
+<li>
+<button class="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-stone-50 group">
+<div class="flex items-center gap-3 text-stone-600">
+<i class="ph ph-circle-dashed text-internal-accent"></i>
+<span class="text-sm">내부용 (Internal)</span>
+</div>
+<span class="text-[10px] bg-blue-50 text-internal-accent px-1.5 py-0.5 rounded font-bold">128</span>
+</button>
+</li>
+</ul>
+</div>
+<!-- Section: Folder Tree -->
+<div>
+<h3 class="px-2 mb-2 text-xs font-semibold text-stone-400 uppercase tracking-wider">폴더 구조</h3>
+<ul class="space-y-0.5">
+<li class="group">
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-stone-50 cursor-pointer text-stone-600">
+<i class="ph ph-caret-down text-xs"></i>
+<i class="ph ph-folder-open text-lg opacity-70"></i>
+<span class="text-sm">전략 기획실</span>
+</div>
+<ul class="ml-7 mt-0.5 space-y-0.5 border-l border-stone-100">
+<li class="px-3 py-1.5 text-sm text-stone-500 hover:text-stone-900 cursor-pointer">2024 프로젝트 로드맵</li>
+<li class="px-3 py-1.5 text-sm text-stone-500 hover:text-stone-900 cursor-pointer font-medium bg-stone-50/50 rounded-r-md border-l-2 border-stone-800">M&amp;A 검토 보고서</li>
+</ul>
+</li>
+<li>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-stone-50 cursor-pointer text-stone-600">
+<i class="ph ph-caret-right text-xs"></i>
+<i class="ph ph-folder text-lg opacity-70"></i>
+<span class="text-sm">연구 개발본부</span>
+</div>
+</li>
+</ul>
+</div>
+</nav>
+<div class="p-4 border-t border-stone-100">
+<div class="flex items-center gap-3 p-2 bg-stone-50 rounded-2xl">
+<div class="w-10 h-10 rounded-full bg-stone-200 overflow-hidden">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0bCo68Y0GA-i6UOzJ2G1lqcZmFjzftl9zXJ5N7X7bCh7TfephNKQdPvtKgtIXxx5ZpaGL02E-8I_HsrmrnGv3IXhqzepuAihZDAOpv-RIrrtV4dauG-m7O2u3vE2UY47txuPOH_H1MORIIJ4uI_h2JGiCG8c_EDOL7pmBYzVhP2sTsSoqTaZ7zbGhSPLb691U1A3YYTkuaUBDXC2kQGOn7dWReEY2d4Y8MEYfa2qOKGPW34MNoj4mXxnbdbCvatmkvdYRRxcwwEs"/>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold truncate">김보안 관리자</p>
+<p class="text-[10px] text-stone-400">보안 인증 레벨: L7</p>
+</div>
+<i class="ph ph-gear text-stone-400 hover:text-stone-600 cursor-pointer"></i>
+</div>
+</div>
+</aside>
+<!-- END: Sidebar -->
+<div class="flex-1 flex flex-col relative overflow-hidden">
+<!-- BEGIN: Topbar -->
+<header class="h-16 border-b border-stone-100 bg-white/80 backdrop-blur-md flex items-center justify-between px-8 z-10" data-purpose="topbar">
+<div class="flex items-center gap-4 w-1/3">
+<div class="relative w-full max-w-sm">
+<i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-stone-400"></i>
+<input class="w-full pl-10 pr-4 py-2 bg-stone-100 border-none rounded-2xl text-sm focus:ring-2 focus:ring-stone-200 transition-all" placeholder="아카이브 문서 검색..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 text-stone-500">
+<i class="ph ph-clock-counter-clockwise"></i>
+<span class="text-xs">최근 동기화: 2분 전</span>
+</div>
+<div class="h-4 w-[1px] bg-stone-200"></div>
+<button class="relative">
+<i class="ph ph-bell text-xl text-stone-600"></i>
+<span class="absolute top-0 right-0 w-2 h-2 bg-coral-accent rounded-full border-2 border-white"></span>
+</button>
+<button class="bg-stone-900 text-white px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 hover:bg-stone-800 transition-shadow">
+<i class="ph ph-upload-simple"></i>
+          문서 반입
+        </button>
+</div>
+</header>
+<!-- END: Topbar -->
+<main class="flex-1 flex overflow-hidden">
+<!-- BEGIN: Center Content (Document Grid) -->
+<section class="flex-1 overflow-y-auto p-8 custom-scrollbar" data-purpose="archive-grid">
+<div class="mb-8">
+<h1 class="text-2xl font-bold text-stone-800">문서 아카이브</h1>
+<p class="text-stone-500 text-sm mt-1">인가된 사용자만 열람 가능한 암호화 문서 보관소입니다.</p>
+</div>
+<!-- Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+<!-- Document Card 1 (Secret) -->
+<div class="bg-white rounded-3xl p-6 shadow-sm border border-stone-100 hover:shadow-md transition-shadow cursor-pointer group relative overflow-hidden" data-purpose="document-card">
+<div class="absolute top-0 left-0 w-1 h-full bg-coral-accent"></div>
+<div class="flex justify-between items-start mb-4">
+<span class="px-2 py-1 bg-red-50 text-coral-accent text-[10px] font-bold rounded-md flex items-center gap-1">
+<i class="ph-fill ph-lock-key"></i> SECRET
+              </span>
+<button class="text-stone-400 hover:text-stone-600"><i class="ph ph-dots-three-outline-vertical"></i></button>
+</div>
+<h3 class="text-lg font-bold text-stone-800 mb-2 leading-tight">2024 하반기 신사업 추진 전략 (Project Aether)</h3>
+<p class="text-stone-400 text-sm mb-4 line-clamp-2">본 문서는 당사의 차세대 에너지 솔루션 개발을 위한 3개년 로드맵 및 핵심 특허 기술 보호 방안을 포함하고 있습니다...</p>
+<div class="flex items-center justify-between pt-4 border-t border-stone-50">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-coral-accent/10 flex items-center justify-center">
+<i class="ph ph-user text-xs text-coral-accent"></i>
+</div>
+<span class="text-xs text-stone-500">전략본부장</span>
+</div>
+<span class="text-[10px] text-stone-400 font-mono">ID: CTX-992-S</span>
+</div>
+</div>
+<!-- Document Card 2 (Confidential) -->
+<div class="bg-white rounded-3xl p-6 shadow-sm border border-stone-100 hover:shadow-md transition-shadow cursor-pointer group relative overflow-hidden" data-purpose="document-card">
+<div class="absolute top-0 left-0 w-1 h-full bg-amber-accent"></div>
+<div class="flex justify-between items-start mb-4">
+<span class="px-2 py-1 bg-orange-50 text-amber-accent text-[10px] font-bold rounded-md flex items-center gap-1">
+<i class="ph-fill ph-shield-warning"></i> CONFIDENTIAL
+              </span>
+<button class="text-stone-400 hover:text-stone-600"><i class="ph ph-dots-three-outline-vertical"></i></button>
+</div>
+<h3 class="text-lg font-bold text-stone-800 mb-2 leading-tight">Q3 파트너사 협약 검토안 (Draft)</h3>
+<p class="text-stone-400 text-sm mb-4 line-clamp-2">글로벌 공급망 다변화를 위한 동남아시아 지역 5개 주요 파트너사와의 협약 조건 및 리스크 관리 계획에 대한 내부 검토...</p>
+<div class="flex items-center justify-between pt-4 border-t border-stone-50">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-amber-accent/10 flex items-center justify-center">
+<i class="ph ph-user text-xs text-amber-accent"></i>
+</div>
+<span class="text-xs text-stone-500">법무팀</span>
+</div>
+<span class="text-[10px] text-stone-400 font-mono">ID: CTX-451-C</span>
+</div>
+</div>
+<!-- Document Card 3 (Internal) -->
+<div class="bg-white rounded-3xl p-6 shadow-sm border border-stone-100 hover:shadow-md transition-shadow cursor-pointer group relative overflow-hidden" data-purpose="document-card">
+<div class="absolute top-0 left-0 w-1 h-full bg-internal-accent"></div>
+<div class="flex justify-between items-start mb-4">
+<span class="px-2 py-1 bg-slate-50 text-internal-accent text-[10px] font-bold rounded-md flex items-center gap-1">
+<i class="ph-fill ph-eye"></i> INTERNAL
+              </span>
+<button class="text-stone-400 hover:text-stone-600"><i class="ph ph-dots-three-outline-vertical"></i></button>
+</div>
+<h3 class="text-lg font-bold text-stone-800 mb-2 leading-tight">조직 문화 개선 설문 결과 보고서</h3>
+<p class="text-stone-400 text-sm mb-4 line-clamp-2">전사 임직원을 대상으로 실시한 2024 상반기 조직 만족도 및 근무 환경 개선 사항에 대한 데이터 분석 결과입니다...</p>
+<div class="flex items-center justify-between pt-4 border-t border-stone-50">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-internal-accent/10 flex items-center justify-center">
+<i class="ph ph-user text-xs text-internal-accent"></i>
+</div>
+<span class="text-xs text-stone-500">인사팀</span>
+</div>
+<span class="text-[10px] text-stone-400 font-mono">ID: CTX-102-I</span>
+</div>
+</div>
+<!-- Document Card 4 (Secret) -->
+<div class="bg-white rounded-3xl p-6 shadow-sm border border-stone-100 hover:shadow-md transition-shadow cursor-pointer group relative overflow-hidden" data-purpose="document-card">
+<div class="absolute top-0 left-0 w-1 h-full bg-coral-accent"></div>
+<div class="flex justify-between items-start mb-4">
+<span class="px-2 py-1 bg-red-50 text-coral-accent text-[10px] font-bold rounded-md flex items-center gap-1">
+<i class="ph-fill ph-lock-key"></i> SECRET
+              </span>
+<button class="text-stone-400 hover:text-stone-600"><i class="ph ph-dots-three-outline-vertical"></i></button>
+</div>
+<h3 class="text-lg font-bold text-stone-800 mb-2 leading-tight">보안 서버 인프라 교체 예산 기획</h3>
+<p class="text-stone-400 text-sm mb-4 line-clamp-2">데이터 센터 이전에 따른 물리적 보안 장비 및 양자 암호 시스템 구축을 위한 세부 소요 예산 및 승인 요청서...</p>
+<div class="flex items-center justify-between pt-4 border-t border-stone-50">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-coral-accent/10 flex items-center justify-center">
+<i class="ph ph-user text-xs text-coral-accent"></i>
+</div>
+<span class="text-xs text-stone-500">CTO실</span>
+</div>
+<span class="text-[10px] text-stone-400 font-mono">ID: CTX-228-S</span>
+</div>
+</div>
+</div>
+</section>
+<!-- END: Center Content -->
+<!-- BEGIN: Right Detail Panel -->
+<aside class="w-96 bg-white border-l border-stone-100 flex flex-col p-6 overflow-y-auto custom-scrollbar" data-purpose="document-details">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-10 h-10 rounded-xl bg-stone-50 flex items-center justify-center">
+<i class="ph ph-file-pdf text-2xl text-stone-500"></i>
+</div>
+<div class="flex-1 min-w-0">
+<h2 class="font-bold text-stone-800 truncate">CTX-992-S 상세보기</h2>
+<p class="text-xs text-stone-400 italic">마지막 열람: 1시간 전 (관리자)</p>
+</div>
+</div>
+<!-- Section: Security Metadata -->
+<div class="space-y-4 mb-8">
+<div class="p-4 rounded-2xl bg-stone-50 border border-stone-100">
+<p class="text-[10px] text-stone-400 uppercase tracking-widest font-bold mb-3">보안 체인 (Delegation Chain)</p>
+<div class="relative space-y-4">
+<!-- Chain Item 1 -->
+<div class="flex gap-3 relative z-10">
+<div class="w-6 h-6 rounded-full bg-stone-800 flex items-center justify-center border-2 border-white shadow-sm shrink-0">
+<i class="ph ph-key text-[10px] text-white"></i>
+</div>
+<div>
+<p class="text-xs font-bold text-stone-800">최종 승인자 (Origin)</p>
+<p class="text-[10px] text-stone-500">C-Level 이사회 - 2024.01.12</p>
+</div>
+</div>
+<!-- Connector line -->
+<div class="absolute left-3 top-3 bottom-3 w-[1px] bg-stone-200 -z-0"></div>
+<!-- Chain Item 2 -->
+<div class="flex gap-3 relative z-10">
+<div class="w-6 h-6 rounded-full bg-stone-400 flex items-center justify-center border-2 border-white shadow-sm shrink-0">
+<i class="ph ph-check text-[10px] text-white"></i>
+</div>
+<div>
+<p class="text-xs font-bold text-stone-800">기술 검토 (Reviewer)</p>
+<p class="text-[10px] text-stone-500">CTO 박진호 - 2024.01.14</p>
+</div>
+</div>
+<!-- Chain Item 3 -->
+<div class="flex gap-3 relative z-10">
+<div class="w-6 h-6 rounded-full bg-coral-accent flex items-center justify-center border-2 border-white shadow-sm shrink-0">
+<i class="ph ph-seal-check text-[10px] text-white"></i>
+</div>
+<div>
+<p class="text-xs font-bold text-stone-800 text-coral-accent">현재 수탁자 (Custodian)</p>
+<p class="text-[10px] text-stone-500">기획 1팀 김철수 - 2024.01.20</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Section: Similarity Search (AI powered) -->
+<div class="mb-8">
+<div class="flex items-center justify-between mb-4">
+<h4 class="text-sm font-bold text-stone-800 flex items-center gap-2">
+<i class="ph ph-sparkle text-amber-500"></i>
+              유사 문서 분석
+            </h4>
+<span class="text-[10px] text-stone-400">Semantic Search</span>
+</div>
+<div class="space-y-3">
+<div class="p-3 rounded-xl border border-stone-100 hover:border-stone-300 transition-colors cursor-pointer group">
+<div class="flex justify-between items-center mb-1">
+<span class="text-[10px] text-stone-400 font-mono">CTX-881-S</span>
+<span class="text-[10px] bg-stone-100 text-stone-600 px-1 rounded font-bold">98% 일치</span>
+</div>
+<p class="text-xs font-medium text-stone-700 group-hover:text-stone-900 truncate">2023 핵심 프로젝트 결과 요약본</p>
+</div>
+<div class="p-3 rounded-xl border border-stone-100 hover:border-stone-300 transition-colors cursor-pointer group">
+<div class="flex justify-between items-center mb-1">
+<span class="text-[10px] text-stone-400 font-mono">CTX-221-C</span>
+<span class="text-[10px] bg-stone-100 text-stone-600 px-1 rounded font-bold">74% 일치</span>
+</div>
+<p class="text-xs font-medium text-stone-700 group-hover:text-stone-900 truncate">에너지 사업부 중장기 인력 계획</p>
+</div>
+</div>
+</div>
+<!-- Section: Action Buttons -->
+<div class="mt-auto space-y-2">
+<button class="w-full py-3 bg-stone-50 text-stone-700 rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-stone-100 transition-colors">
+<i class="ph ph-file-text"></i>
+            문서 미리보기
+          </button>
+<button class="w-full py-3 bg-stone-900 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+<i class="ph ph-keyhole"></i>
+            접근 권한 요청
+          </button>
+<p class="text-[10px] text-center text-stone-400 mt-4 leading-relaxed">
+            모든 접근 시도는 로깅되며 기록은 영구 보존됩니다.<br/>
+            CORTHEX Security Engine v2.4.1
+          </p>
+</div>
+</aside>
+<!-- END: Right Detail Panel -->
+</main>
+</div>
+</body></html>

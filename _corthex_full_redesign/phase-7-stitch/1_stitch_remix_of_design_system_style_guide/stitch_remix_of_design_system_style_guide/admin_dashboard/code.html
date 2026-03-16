@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 Admin Console</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&amp;family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#5a7247", // Olive Green
+                        "background-light": "#faf8f5", // Natural Cream
+                        "background-dark": "#221610",
+                        "surface": "#ffffff",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"],
+                        "serif": ["Noto Serif KR", "serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Public Sans', sans-serif;
+        }
+        h1, h2, h3 {
+            font-family: 'Noto Serif KR', serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex">
+<!-- Sidebar Navigation -->
+<aside class="fixed inset-y-0 left-0 w-64 bg-surface dark:bg-background-dark border-r border-slate-200 dark:border-slate-800 flex flex-col z-50">
+<div class="p-6 flex items-center gap-3">
+<div class="bg-primary/10 p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary text-3xl">eco</span>
+</div>
+<div>
+<h1 class="text-xl font-bold text-primary leading-none">CORTHEX</h1>
+<p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mt-1">Admin Console v2</p>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-1 mt-4">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-primary text-white shadow-md shadow-primary/20" href="#">
+<span class="material-symbols-outlined text-xl">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">corporate_fare</span>
+<span class="text-sm font-medium">Companies</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">group</span>
+<span class="text-sm font-medium">User Directory</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">memory</span>
+<span class="text-sm font-medium">API Management</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">receipt_long</span>
+<span class="text-sm font-medium">System Logs</span>
+</a>
+<div class="pt-4 pb-2 px-3">
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Tools</p>
+</div>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">analytics</span>
+<span class="text-sm font-medium">Reporting</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</nav>
+<div class="p-4 mt-auto border-t border-slate-100 dark:border-slate-800">
+<button class="w-full flex items-center justify-center gap-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 px-4 py-2.5 rounded-xl font-bold text-sm transition-opacity hover:opacity-90">
+<span class="material-symbols-outlined text-sm">add</span>
+<span>Generate Report</span>
+</button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-64 flex flex-col min-h-screen">
+<!-- Top Bar -->
+<header class="h-16 bg-surface/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 sticky top-0 z-40">
+<div class="flex items-center gap-4">
+<h2 class="text-lg font-bold">System Overview</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative w-64 group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+<input class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary/20 transition-all" placeholder="Search commands..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<button class="p-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</div>
+<div class="flex items-center gap-3 pl-4 border-l border-slate-200 dark:border-slate-800">
+<div class="text-right hidden sm:block">
+<p class="text-xs font-bold leading-none">Admin Root</p>
+<p class="text-[10px] text-slate-500 mt-1">Super Admin</p>
+</div>
+<div class="w-9 h-9 rounded-full bg-slate-200 overflow-hidden ring-2 ring-primary/20">
+<img alt="Admin Profile Avatar" class="w-full h-full object-cover" data-alt="Close up of a professional person smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsXyC91Dg92Xc6WS_nppwDAGjO263duCMN6UDas8gv2WvUHHaW-GrhoZUiqoJVAakReCyoFiUcrp1B38N6IdPAez4kd-C0biurDSt27ata0DQzfQkjEaYskn7lbm1y6VDPMcIkYHrnF213MFaJha8-D8p9yiiLr3ZzcfHwnnzBV3nM4lfo5xNE39o2G9ziMEsKtQipcuMSPKNtkgo00DlfFTDE9R-mhb9AZ2OEE9WEis21sU0rJZLxLLNCxoAU64k1jYM_1DJs9gUA"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="p-8 max-w-7xl mx-auto w-full">
+<!-- Quick Stats Metrics -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+<div class="bg-surface dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<p class="text-sm font-medium text-slate-500">Total Companies</p>
+<span class="bg-primary/10 text-primary px-2 py-0.5 rounded text-[10px] font-bold">+12.5%</span>
+</div>
+<h3 class="text-3xl font-bold tracking-tight">1,284</h3>
+<p class="text-[10px] text-slate-400 mt-2">v.s last 30 days</p>
+</div>
+<div class="bg-surface dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<p class="text-sm font-medium text-slate-500">Active Users</p>
+<span class="bg-primary/10 text-primary px-2 py-0.5 rounded text-[10px] font-bold">+5.2%</span>
+</div>
+<h3 class="text-3xl font-bold tracking-tight">42,560</h3>
+<p class="text-[10px] text-slate-400 mt-2">Active now: 1,840</p>
+</div>
+<div class="bg-surface dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<p class="text-sm font-medium text-slate-500">Total API Cost</p>
+<span class="bg-red-50 text-red-600 px-2 py-0.5 rounded text-[10px] font-bold">+8.1%</span>
+</div>
+<h3 class="text-3xl font-bold tracking-tight">$14,240</h3>
+<p class="text-[10px] text-slate-400 mt-2">Current billing cycle</p>
+</div>
+<div class="bg-surface dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm border-l-4 border-l-primary">
+<div class="flex justify-between items-start mb-4">
+<p class="text-sm font-medium text-slate-500">System Health</p>
+<span class="material-symbols-outlined text-primary">check_circle</span>
+</div>
+<h3 class="text-3xl font-bold tracking-tight">98.2%</h3>
+<p class="text-[10px] text-slate-400 mt-2">Operational Status</p>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+<!-- Revenue vs Cost Chart -->
+<div class="lg:col-span-2 bg-surface dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-6">
+<h4 class="font-bold text-lg">Revenue vs API Cost Trend</h4>
+<select class="text-xs bg-slate-50 dark:bg-slate-800 border-none rounded-lg py-1 px-3">
+<option>Last 30 Days</option>
+<option>Last 7 Days</option>
+</select>
+</div>
+<div class="h-[280px] w-full relative">
+<svg class="w-full h-full" viewbox="0 0 800 280">
+<!-- Chart Grid -->
+<line class="text-slate-100 dark:text-slate-800" stroke="currentColor" stroke-dasharray="4" x1="0" x2="800" y1="50" y2="50"></line>
+<line class="text-slate-100 dark:text-slate-800" stroke="currentColor" stroke-dasharray="4" x1="0" x2="800" y1="150" y2="150"></line>
+<line class="text-slate-100 dark:text-slate-800" stroke="currentColor" stroke-dasharray="4" x1="0" x2="800" y1="250" y2="250"></line>
+<!-- Revenue Line Area -->
+<path d="M0,200 Q100,180 200,120 T400,100 T600,60 T800,40 L800,280 L0,280 Z" fill="url(#revGradient)" opacity="0.1"></path>
+<path d="M0,200 Q100,180 200,120 T400,100 T600,60 T800,40" fill="none" stroke="#5a7247" stroke-linecap="round" stroke-width="4"></path>
+<!-- Cost Line Area -->
+<path d="M0,250 Q100,240 200,230 T400,210 T600,220 T800,200" fill="none" stroke="#94a3b8" stroke-dasharray="6" stroke-linecap="round" stroke-width="2"></path>
+<defs>
+<lineargradient id="revGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#5a7247"></stop>
+<stop offset="100%" stop-color="#5a7247" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+</svg>
+<div class="flex justify-between mt-4 text-[10px] text-slate-400 font-bold uppercase tracking-widest px-2">
+<span>Week 1</span>
+<span>Week 2</span>
+<span>Week 3</span>
+<span>Week 4</span>
+</div>
+</div>
+</div>
+<!-- Active Sessions Bar -->
+<div class="bg-surface dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col">
+<h4 class="font-bold text-lg mb-1">Active Sessions</h4>
+<p class="text-xs text-slate-400 mb-8">Real-time traffic last 24h</p>
+<div class="flex-1 flex items-end justify-between gap-1 h-full px-2">
+<div class="w-full bg-primary/20 rounded-t-sm" style="height: 40%"></div>
+<div class="w-full bg-primary/20 rounded-t-sm" style="height: 35%"></div>
+<div class="w-full bg-primary/20 rounded-t-sm" style="height: 30%"></div>
+<div class="w-full bg-primary/40 rounded-t-sm" style="height: 55%"></div>
+<div class="w-full bg-primary/40 rounded-t-sm" style="height: 70%"></div>
+<div class="w-full bg-primary rounded-t-sm" style="height: 95%"></div>
+<div class="w-full bg-primary rounded-t-sm" style="height: 85%"></div>
+<div class="w-full bg-primary rounded-t-sm" style="height: 100%"></div>
+<div class="w-full bg-primary/60 rounded-t-sm" style="height: 60%"></div>
+<div class="w-full bg-primary/40 rounded-t-sm" style="height: 40%"></div>
+<div class="w-full bg-primary/20 rounded-t-sm" style="height: 25%"></div>
+<div class="w-full bg-primary/20 rounded-t-sm" style="height: 15%"></div>
+</div>
+<div class="flex justify-between mt-4 text-[10px] text-slate-400 font-bold px-1">
+<span>00:00</span>
+<span>06:00</span>
+<span>12:00</span>
+<span>18:00</span>
+</div>
+<div class="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
+<div class="flex justify-between items-center mb-2">
+<span class="text-sm">Peak Concurrency</span>
+<span class="text-sm font-bold">2,410</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-800 h-1 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[85%]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Alerts Table -->
+<div class="bg-surface dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
+<div class="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+<div>
+<h4 class="font-bold text-lg leading-none">Recent System Alerts</h4>
+<p class="text-xs text-slate-400 mt-2">Latest security and operational logs</p>
+</div>
+<button class="text-primary text-sm font-bold hover:underline">View All Logs</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-slate-50 dark:bg-slate-800/50 text-slate-400 text-[11px] font-bold uppercase tracking-wider">
+<th class="px-6 py-4">Status</th>
+<th class="px-6 py-4">Event</th>
+<th class="px-6 py-4">Source</th>
+<th class="px-6 py-4">Location</th>
+<th class="px-6 py-4">Timestamp</th>
+<th class="px-6 py-4 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4">
+<span class="flex items-center gap-1.5 text-red-500 font-bold text-xs uppercase">
+<span class="w-2 h-2 rounded-full bg-red-500"></span> Critical
+                                    </span>
+</td>
+<td class="px-6 py-4">
+<p class="text-sm font-bold">API Rate Limit Exceeded</p>
+<p class="text-xs text-slate-400">Endpoint: /v2/data/export</p>
+</td>
+<td class="px-6 py-4 text-sm">TechCorp Inc.</td>
+<td class="px-6 py-4 text-sm">New York, US</td>
+<td class="px-6 py-4 text-sm text-slate-400">2 mins ago</td>
+<td class="px-6 py-4 text-right">
+<button class="material-symbols-outlined text-slate-400 hover:text-slate-900 transition-colors">more_vert</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4">
+<span class="flex items-center gap-1.5 text-amber-500 font-bold text-xs uppercase">
+<span class="w-2 h-2 rounded-full bg-amber-500"></span> Warning
+                                    </span>
+</td>
+<td class="px-6 py-4">
+<p class="text-sm font-bold">Unusual Login Pattern</p>
+<p class="text-xs text-slate-400">Multiple failed attempts</p>
+</td>
+<td class="px-6 py-4 text-sm">User: admin_jason</td>
+<td class="px-6 py-4 text-sm">Seoul, KR</td>
+<td class="px-6 py-4 text-sm text-slate-400">14 mins ago</td>
+<td class="px-6 py-4 text-right">
+<button class="material-symbols-outlined text-slate-400 hover:text-slate-900 transition-colors">more_vert</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4">
+<span class="flex items-center gap-1.5 text-primary font-bold text-xs uppercase">
+<span class="w-2 h-2 rounded-full bg-primary"></span> Info
+                                    </span>
+</td>
+<td class="px-6 py-4">
+<p class="text-sm font-bold">New Company Registered</p>
+<p class="text-xs text-slate-400">Subscription: Enterprise Plus</p>
+</td>
+<td class="px-6 py-4 text-sm">BioLab Systems</td>
+<td class="px-6 py-4 text-sm">Berlin, DE</td>
+<td class="px-6 py-4 text-sm text-slate-400">1 hour ago</td>
+<td class="px-6 py-4 text-right">
+<button class="material-symbols-outlined text-slate-400 hover:text-slate-900 transition-colors">more_vert</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4">
+<span class="flex items-center gap-1.5 text-primary font-bold text-xs uppercase">
+<span class="w-2 h-2 rounded-full bg-primary"></span> Info
+                                    </span>
+</td>
+<td class="px-6 py-4">
+<p class="text-sm font-bold">System Maintenance Complete</p>
+<p class="text-xs text-slate-400">Database optimization success</p>
+</td>
+<td class="px-6 py-4 text-sm">System Cron</td>
+<td class="px-6 py-4 text-sm">Cluster-A1</td>
+<td class="px-6 py-4 text-sm text-slate-400">4 hours ago</td>
+<td class="px-6 py-4 text-right">
+<button class="material-symbols-outlined text-slate-400 hover:text-slate-900 transition-colors">more_vert</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="mt-auto p-8 border-t border-slate-200 dark:border-slate-800 text-center">
+<p class="text-xs text-slate-400">© 2024 CORTHEX v2. Developed for Technical Spec Compliance. System Status: <span class="text-primary font-bold">Healthy</span></p>
+</footer>
+</main>
+</body></html>

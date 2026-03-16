@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 - Knowledge Library</title>
+<!-- Tailwind CSS v3 with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Fonts: Serif for headings, Sans-serif for body -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&amp;family=Pretendard:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'cortex-olive': '#5a7247',
+            'cortex-sand': '#faf8f5',
+            'cortex-border': '#e5e1da',
+          },
+          fontFamily: {
+            serif: ['"Noto Serif KR"', 'serif'],
+            sans: ['Pretendard', 'ui-sans-serif', 'system-ui'],
+          },
+        }
+      }
+    }
+  </script>
+<style data-purpose="typography">
+    body {
+      font-family: 'Pretendard', sans-serif;
+      background-color: #faf8f5;
+    }
+    h1, h2, h3, .serif-heading {
+      font-family: 'Noto Serif KR', serif;
+    }
+    /* Markdown Preview Styling */
+    .prose-content h1 { font-size: 1.875rem; margin-bottom: 1rem; color: #1a1a1a; }
+    .prose-content p { margin-bottom: 1rem; line-height: 1.6; color: #4a4a4a; }
+    .prose-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
+  </style>
+<style data-purpose="scrollbar">
+    /* Custom thin scrollbar for a clean look */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d1cfcb; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #5a7247; }
+  </style>
+</head>
+<body class="h-screen overflow-hidden flex flex-col">
+<!-- BEGIN: Navigation Header -->
+<header class="h-16 bg-white border-b border-cortex-border flex items-center justify-between px-6 z-10">
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 bg-cortex-olive rounded-lg flex items-center justify-center text-white font-bold">C</div>
+<h1 class="text-xl font-bold text-gray-800">CORTHEX <span class="text-cortex-olive">v2</span></h1>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative w-96">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</span>
+<input class="block w-full pl-10 pr-3 py-2 border border-cortex-border rounded-xl bg-cortex-sand focus:ring-cortex-olive focus:border-cortex-olive text-sm" placeholder="Search Knowledge Library..." type="text"/>
+</div>
+<button class="bg-cortex-olive hover:bg-opacity-90 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all shadow-sm flex items-center gap-2">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+        New Document
+      </button>
+</div>
+</header>
+<!-- END: Navigation Header -->
+<!-- BEGIN: Main Dashboard Layout -->
+<main class="flex-1 flex overflow-hidden">
+<!-- BEGIN: Left Column - Folder Tree -->
+<aside class="w-64 border-r border-cortex-border bg-white flex flex-col p-4 overflow-y-auto">
+<div class="mb-6">
+<h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-2 mb-2">Workspace</h3>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-xl bg-cortex-olive text-white shadow-sm" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+            Knowledge Base
+          </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-cortex-sand rounded-xl transition-colors" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+            Agent Memories
+          </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-cortex-sand rounded-xl transition-colors" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+            Department Docs
+          </a>
+</nav>
+</div>
+<div class="mb-6">
+<h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-2 mb-2">Pinned Items</h3>
+<div class="space-y-1">
+<div class="px-3 py-2 text-sm text-gray-500 hover:text-cortex-olive cursor-pointer flex items-center gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-orange-400"></div>
+            Q3 Strategy.md
+          </div>
+<div class="px-3 py-2 text-sm text-gray-500 hover:text-cortex-olive cursor-pointer flex items-center gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-blue-400"></div>
+            API Guidelines
+          </div>
+</div>
+</div>
+</aside>
+<!-- END: Left Column -->
+<!-- BEGIN: Middle Column - Document List -->
+<section class="w-1/3 min-w-[320px] border-r border-cortex-border bg-cortex-sand flex flex-col overflow-hidden">
+<div class="p-4 border-b border-cortex-border bg-white/50 backdrop-blur-sm">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-lg font-bold text-gray-800">Documents</h2>
+<span class="text-xs font-medium text-gray-500 bg-gray-200 px-2 py-0.5 rounded-full">128 Files</span>
+</div>
+<div class="flex gap-2 overflow-x-auto pb-1">
+<span class="whitespace-nowrap bg-white border border-cortex-border px-3 py-1 rounded-full text-xs font-medium text-gray-600 cursor-pointer hover:border-cortex-olive">All</span>
+<span class="whitespace-nowrap bg-white border border-cortex-border px-3 py-1 rounded-full text-xs font-medium text-gray-600 cursor-pointer hover:border-cortex-olive">Recent</span>
+<span class="whitespace-nowrap bg-white border border-cortex-border px-3 py-1 rounded-full text-xs font-medium text-gray-600 cursor-pointer hover:border-cortex-olive">Drafts</span>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-4">
+<!-- Document Card 1 (Active) -->
+<div class="bg-white p-4 rounded-2xl shadow-sm border-2 border-cortex-olive cursor-pointer ring-4 ring-cortex-olive ring-opacity-5">
+<h4 class="font-bold text-gray-900 mb-1">Cortex System Architecture v2</h4>
+<div class="flex gap-2 mb-2">
+<span class="px-2 py-0.5 bg-cortex-sand text-[10px] font-bold text-cortex-olive uppercase tracking-tight rounded">Technical</span>
+<span class="px-2 py-0.5 bg-cortex-sand text-[10px] font-bold text-cortex-olive uppercase tracking-tight rounded">Core</span>
+</div>
+<p class="text-xs text-gray-500 line-clamp-2 leading-relaxed">Detailed breakdown of the neural orchestration layer and data persistence strategy for the v2 rollout...</p>
+<div class="mt-3 text-[10px] text-gray-400 flex items-center justify-between">
+<span>Edited 2h ago</span>
+<span>By Dr. Aris</span>
+</div>
+</div>
+<!-- Document Card 2 -->
+<div class="bg-white p-4 rounded-2xl shadow-sm border border-transparent hover:border-cortex-border transition-all cursor-pointer group">
+<h4 class="font-bold text-gray-800 mb-1 group-hover:text-cortex-olive transition-colors">Neural Tokenization Process</h4>
+<div class="flex gap-2 mb-2">
+<span class="px-2 py-0.5 bg-gray-100 text-[10px] font-bold text-gray-500 uppercase tracking-tight rounded">Research</span>
+</div>
+<p class="text-xs text-gray-500 line-clamp-2 leading-relaxed">Exploring sub-word tokenization optimizations specifically for multi-modal embedding spaces.</p>
+<div class="mt-3 text-[10px] text-gray-400 flex items-center justify-between">
+<span>Edited 1d ago</span>
+<span>By AI-Agent-09</span>
+</div>
+</div>
+<!-- Document Card 3 -->
+<div class="bg-white p-4 rounded-2xl shadow-sm border border-transparent hover:border-cortex-border transition-all cursor-pointer group">
+<h4 class="font-bold text-gray-800 mb-1 group-hover:text-cortex-olive transition-colors">Onboarding Guide for New Nodes</h4>
+<div class="flex gap-2 mb-2">
+<span class="px-2 py-0.5 bg-gray-100 text-[10px] font-bold text-gray-500 uppercase tracking-tight rounded">Ops</span>
+</div>
+<p class="text-xs text-gray-500 line-clamp-2 leading-relaxed">Step-by-step instructions for initializing local compute clusters into the CORTHEX mesh.</p>
+<div class="mt-3 text-[10px] text-gray-400 flex items-center justify-between">
+<span>Edited 3d ago</span>
+<span>By Admin</span>
+</div>
+</div>
+</div>
+</section>
+<!-- END: Middle Column -->
+<!-- BEGIN: Right Column - Document Preview/Editor -->
+<section class="flex-1 bg-white flex flex-col overflow-hidden relative">
+<!-- Toolbar -->
+<div class="h-12 border-b border-cortex-border flex items-center justify-between px-6 bg-white shrink-0">
+<div class="flex items-center gap-4">
+<button class="p-1.5 hover:bg-cortex-sand rounded-lg text-gray-500 transition-colors" title="Edit">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<button class="p-1.5 hover:bg-cortex-sand rounded-lg text-gray-500 transition-colors" title="Share">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<div class="h-4 w-px bg-cortex-border mx-1"></div>
+<button class="p-1.5 hover:bg-cortex-sand rounded-lg text-gray-500 transition-colors">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+<div class="text-xs text-gray-400 italic">Auto-saved at 14:22</div>
+</div>
+<!-- Preview Content -->
+<div class="flex-1 overflow-y-auto scroll-smooth">
+<div class="max-w-3xl mx-auto py-12 px-8 prose-content">
+<span class="inline-block text-cortex-olive font-bold text-xs tracking-widest uppercase mb-4">Internal Documentation • V2.0.4</span>
+<h1 class="serif-heading font-bold text-4xl mb-6">Cortex System Architecture v2</h1>
+<p class="text-lg text-gray-600 font-medium mb-8 border-l-4 border-cortex-olive pl-6">
+            This document outlines the evolutionary leap from v1.5 to v2.0, focusing on the "Living Memory" module which allows agents to maintain long-term contextual continuity across session timeouts.
+          </p>
+<h2 class="serif-heading text-2xl font-bold mt-10 mb-4">1. Overview of Neural Orchestration</h2>
+<p>
+            The v2 architecture departs from the monolithic request-response cycle. Instead, we implement a <strong>Vectorized Intent Mesh</strong> where user queries are decomposed into atomic objectives.
+          </p>
+<h2 class="serif-heading text-2xl font-bold mt-10 mb-4">2. Data Persistence Layer</h2>
+<p>
+            The POST <code>/api/workspace/knowledge/docs</code> endpoint handles the serialization of these intents. Key improvements include:
+          </p>
+<ul>
+<li>Sub-millisecond embedding generation using local hardware acceleration.</li>
+<li>Automatic cross-referencing with Department Docs to ensure compliance.</li>
+<li>Immutable versioning for regulatory auditing.</li>
+</ul>
+<div class="bg-cortex-sand p-6 rounded-2xl border border-cortex-border my-8">
+<h4 class="text-sm font-bold text-cortex-olive mb-2 flex items-center gap-2">
+<svg class="w-4 h-4" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" fill-rule="evenodd"></path></svg>
+              Implementation Note
+            </h4>
+<p class="text-sm text-gray-600 mb-0 italic">
+              "Developers should use the <code>--force-consistency</code> flag when updating core agent memories to ensure immediate propagation across the mesh."
+            </p>
+</div>
+<p>
+            As we scale the CORTHEX v2 framework, the reliance on semantic search over keyword matching becomes paramount. The following sections will detail the API integration requirements for front-end modules.
+          </p>
+</div>
+</div>
+</section>
+<!-- END: Right Column -->
+</main>
+<!-- END: Main Dashboard Layout -->
+<!-- BEGIN: Footer / Status Bar -->
+<footer class="h-8 bg-cortex-sand border-t border-cortex-border flex items-center justify-between px-4 text-[10px] text-gray-500 shrink-0">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+        API Online
+      </div>
+<span>Workspace: <span class="text-gray-700 font-medium">Global_Research_Alpha</span></span>
+</div>
+<div class="flex items-center gap-4 uppercase tracking-widest">
+<span class="hover:text-cortex-olive cursor-pointer">API Reference</span>
+<span class="hover:text-cortex-olive cursor-pointer">Help Center</span>
+<span>v2.0.4-stable</span>
+</div>
+</footer>
+<!-- END: Footer -->
+</body></html>

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Activity Log (Communication) | CORTHEX v2</title>
+<!-- Google Fonts: Inter and Noto Sans KR -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Noto+Sans+KR:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<!-- Phosphor Icons -->
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<!-- Tailwind CSS v3 with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              warm: '#fcfbf9',
+              accent: '#e57373',
+              muted: '#71717a',
+              border: '#f1f1ef'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans KR', 'sans-serif'],
+          },
+          borderRadius: {
+            '3xl': '1.5rem',
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-scrollbar">
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #e5e5e5;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #d4d4d4;
+    }
+  </style>
+<style data-purpose="animations">
+    .expandable-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+    }
+    .expanded .expandable-content {
+      max-height: 500px;
+    }
+    .expanded .chevron-icon {
+      transform: rotate(180deg);
+    }
+  </style>
+</head>
+<body class="bg-brand-warm text-slate-800 font-sans antialiased min-h-screen flex">
+<!-- BEGIN: Sidebar Navigation -->
+<aside class="w-64 border-r border-brand-border h-screen sticky top-0 bg-white flex flex-col" data-purpose="main-sidebar">
+<div class="p-8">
+<h1 class="text-2xl font-bold tracking-tight text-brand-accent italic">CORTHEX<span class="text-slate-400 not-italic font-normal">v2</span></h1>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-brand-warm rounded-2xl transition-colors" href="#">
+<i class="ph ph-squares-four text-xl"></i>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-brand-accent/5 text-brand-accent rounded-2xl transition-colors" href="#">
+<i class="ph ph-chats-circle text-xl"></i>
+<span class="font-medium">Activity Log</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-brand-warm rounded-2xl transition-colors" href="#">
+<i class="ph ph-robot text-xl"></i>
+<span class="font-medium">Agents</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-brand-warm rounded-2xl transition-colors" href="#">
+<i class="ph ph-chart-line-up text-xl"></i>
+<span class="font-medium">Performance</span>
+</a>
+</nav>
+<div class="p-6 border-t border-brand-border">
+<div class="flex items-center gap-3 px-2">
+<div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold">JD</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-semibold truncate">Jane Doe</p>
+<p class="text-xs text-slate-400 truncate">Admin</p>
+</div>
+<i class="ph ph-gear text-lg text-slate-400"></i>
+</div>
+</div>
+</aside>
+<!-- END: Sidebar Navigation -->
+<!-- BEGIN: Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0">
+<!-- BEGIN: Header -->
+<header class="h-20 bg-white/80 backdrop-blur-md border-b border-brand-border px-8 flex items-center justify-between sticky top-0 z-10" data-purpose="top-header">
+<div>
+<h2 class="text-xl font-semibold text-slate-900">Communication Activity</h2>
+<p class="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
+<i class="ph ph-database"></i> API: GET /api/workspace/activity/delegations
+        </p>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 px-4 py-2 bg-white border border-brand-border rounded-xl text-sm font-medium hover:bg-brand-warm transition-colors shadow-sm">
+<i class="ph ph-export"></i> Export CSV
+        </button>
+<button class="p-2 text-slate-500 hover:bg-brand-warm rounded-full transition-colors relative">
+<i class="ph ph-bell text-xl"></i>
+<span class="absolute top-2 right-2 w-2 h-2 bg-brand-accent rounded-full border-2 border-white"></span>
+</button>
+</div>
+</header>
+<!-- END: Header -->
+<div class="p-8 space-y-6">
+<!-- BEGIN: Filter Section -->
+<section class="bg-white p-6 rounded-3xl border border-brand-border shadow-sm" data-purpose="filters">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<div class="space-y-1.5">
+<label class="text-xs font-semibold text-slate-500 uppercase tracking-wider px-1">Agent</label>
+<select class="w-full bg-brand-warm border-none rounded-2xl text-sm focus:ring-2 focus:ring-brand-accent/20">
+<option>All Agents</option>
+<option>Coordinator_A</option>
+<option>Executor_B</option>
+<option>Analyst_C</option>
+</select>
+</div>
+<div class="space-y-1.5">
+<label class="text-xs font-semibold text-slate-500 uppercase tracking-wider px-1">Date Range</label>
+<div class="relative">
+<input class="w-full bg-brand-warm border-none rounded-2xl text-sm focus:ring-2 focus:ring-brand-accent/20 pl-10" readonly="" type="text" value="Oct 24, 2023 - Oct 25, 2023"/>
+<i class="ph ph-calendar-blank absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+</div>
+</div>
+<div class="space-y-1.5">
+<label class="text-xs font-semibold text-slate-500 uppercase tracking-wider px-1">Status</label>
+<select class="w-full bg-brand-warm border-none rounded-2xl text-sm focus:ring-2 focus:ring-brand-accent/20">
+<option>All Statuses</option>
+<option>Success</option>
+<option>Failed</option>
+<option>Pending</option>
+</select>
+</div>
+<div class="flex items-end">
+<button class="w-full bg-brand-accent text-white font-semibold py-2.5 rounded-2xl hover:bg-opacity-90 transition-all shadow-md shadow-brand-accent/20">
+              Apply Filters
+            </button>
+</div>
+</div>
+</section>
+<!-- END: Filter Section -->
+<!-- BEGIN: Log Table -->
+<section class="bg-white rounded-3xl border border-brand-border shadow-sm overflow-hidden" data-purpose="log-list">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50/50 border-b border-brand-border">
+<th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Timestamp</th>
+<th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">From Agent</th>
+<th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">To Agent</th>
+<th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-center">Depth</th>
+<th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Latency</th>
+<th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+<th class="px-6 py-4"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-brand-border" id="activity-log-body">
+<!-- Row 1: Success -->
+<tr class="hover:bg-brand-warm/30 transition-colors cursor-pointer group" onclick="toggleDetails(this)">
+<td class="px-6 py-5">
+<span class="text-sm font-medium text-slate-900 block">2023-10-25</span>
+<span class="text-xs text-slate-400">14:32:01.442</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-blue-400"></span>
+<span class="text-sm font-medium text-slate-700">Coordinator_Main</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+<span class="text-sm font-medium text-slate-700">Search_Expert</span>
+</div>
+</td>
+<td class="px-6 py-5 text-center">
+<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-[10px] font-bold text-slate-600">D2</span>
+</td>
+<td class="px-6 py-5">
+<span class="text-sm font-mono text-slate-500">142ms</span>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-xs font-semibold">
+<i class="ph-fill ph-check-circle"></i> Success
+                  </span>
+</td>
+<td class="px-6 py-5 text-right">
+<i class="ph ph-caret-down text-slate-400 transition-transform duration-300 chevron-icon"></i>
+</td>
+</tr>
+<!-- Hidden Row Detail 1 -->
+<tr class="detail-row bg-slate-50 hidden">
+<td class="p-0" colspan="7">
+<div class="expandable-content px-6 py-6 border-l-4 border-emerald-400">
+<div class="grid grid-cols-2 gap-8">
+<div>
+<h4 class="text-xs font-bold text-slate-400 uppercase mb-3">Input Payload (JSON)</h4>
+<pre class="bg-slate-900 text-slate-300 p-4 rounded-2xl text-xs overflow-x-auto">
+{
+  "task_id": "8823-AF",
+  "query": "Recent market trends in AI hardware",
+  "context": {
+    "depth_limit": 3,
+    "user_tier": "enterprise"
+  }
+}</pre>
+</div>
+<div>
+<h4 class="text-xs font-bold text-slate-400 uppercase mb-3">Output Response</h4>
+<pre class="bg-slate-900 text-slate-300 p-4 rounded-2xl text-xs overflow-x-auto">
+{
+  "status": "completed",
+  "results_count": 12,
+  "execution_time": "142ms",
+  "data_ref": "store://8823-AF-results"
+}</pre>
+</div>
+</div>
+</div>
+</td>
+</tr>
+<!-- Row 2: Failed -->
+<tr class="hover:bg-brand-warm/30 transition-colors cursor-pointer group" onclick="toggleDetails(this)">
+<td class="px-6 py-5">
+<span class="text-sm font-medium text-slate-900 block">2023-10-25</span>
+<span class="text-xs text-slate-400">14:30:12.891</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-blue-400"></span>
+<span class="text-sm font-medium text-slate-700">Coordinator_Main</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-purple-400"></span>
+<span class="text-sm font-medium text-slate-700">Financial_Modeler</span>
+</div>
+</td>
+<td class="px-6 py-5 text-center">
+<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-[10px] font-bold text-slate-600">D1</span>
+</td>
+<td class="px-6 py-5">
+<span class="text-sm font-mono text-slate-500">2401ms</span>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-accent/10 text-brand-accent text-xs font-semibold">
+<i class="ph-fill ph-warning-circle"></i> Failed
+                  </span>
+</td>
+<td class="px-6 py-5 text-right">
+<i class="ph ph-caret-down text-slate-400 transition-transform duration-300 chevron-icon"></i>
+</td>
+</tr>
+<!-- Hidden Row Detail 2 -->
+<tr class="detail-row bg-slate-50 hidden">
+<td class="p-0" colspan="7">
+<div class="expandable-content px-6 py-6 border-l-4 border-brand-accent">
+<div class="flex flex-col gap-4">
+<div class="bg-red-50 border border-red-100 p-4 rounded-2xl flex items-start gap-3">
+<i class="ph ph-warning-octagon text-brand-accent text-xl"></i>
+<div>
+<p class="text-sm font-bold text-red-800">Timeout Exception</p>
+<p class="text-xs text-red-600">The downstream agent 'Financial_Modeler' failed to respond within the allocated 2000ms window.</p>
+</div>
+</div>
+<div class="grid grid-cols-1 gap-4">
+<h4 class="text-xs font-bold text-slate-400 uppercase mb-1">Retry Configuration</h4>
+<div class="bg-white p-4 rounded-2xl border border-brand-border text-sm flex gap-12">
+<div>
+<span class="text-slate-400 block text-[10px] uppercase font-bold">Max Retries</span>
+<span class="font-mono">3</span>
+</div>
+<div>
+<span class="text-slate-400 block text-[10px] uppercase font-bold">Backoff Strategy</span>
+<span class="font-mono">Exponential</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</td>
+</tr>
+<!-- Row 3: Success -->
+<tr class="hover:bg-brand-warm/30 transition-colors cursor-pointer group" onclick="toggleDetails(this)">
+<td class="px-6 py-5">
+<span class="text-sm font-medium text-slate-900 block">2023-10-25</span>
+<span class="text-xs text-slate-400">14:28:44.012</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+<span class="text-sm font-medium text-slate-700">Search_Expert</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-orange-400"></span>
+<span class="text-sm font-medium text-slate-700">Summarizer_Lite</span>
+</div>
+</td>
+<td class="px-6 py-5 text-center">
+<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-[10px] font-bold text-slate-600">D3</span>
+</td>
+<td class="px-6 py-5">
+<span class="text-sm font-mono text-slate-500">88ms</span>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-xs font-semibold">
+<i class="ph-fill ph-check-circle"></i> Success
+                  </span>
+</td>
+<td class="px-6 py-5 text-right">
+<i class="ph ph-caret-down text-slate-400 transition-transform duration-300 chevron-icon"></i>
+</td>
+</tr>
+<!-- Hidden Row Detail 3 -->
+<tr class="detail-row bg-slate-50 hidden">
+<td class="p-0" colspan="7">
+<div class="expandable-content px-6 py-6 border-l-4 border-emerald-400">
+<div class="bg-slate-900 text-slate-300 p-4 rounded-2xl text-xs">
+<p>// Payload omitted for brevity - Standard successful handoff</p>
+</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- BEGIN: Pagination -->
+<div class="px-6 py-4 bg-white border-t border-brand-border flex items-center justify-between">
+<p class="text-xs font-medium text-slate-500">Showing 1 to 10 of 2,451 records</p>
+<div class="flex gap-2">
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-brand-border hover:bg-brand-warm transition-colors">
+<i class="ph ph-caret-left"></i>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg bg-brand-accent text-white font-bold text-xs">1</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-brand-border hover:bg-brand-warm text-xs">2</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-brand-border hover:bg-brand-warm text-xs">3</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-brand-border hover:bg-brand-warm transition-colors">
+<i class="ph ph-caret-right"></i>
+</button>
+</div>
+</div>
+<!-- END: Pagination -->
+</section>
+<!-- END: Log Table -->
+</div>
+</main>
+<!-- END: Main Content Area -->
+<script data-purpose="interaction-handlers">
+    /**
+     * Toggles the visibility of detail rows in the activity log table.
+     * @param {HTMLElement} row - The clicked table row element.
+     */
+    function toggleDetails(row) {
+      const nextRow = row.nextElementSibling;
+      const chevron = row.querySelector('.chevron-icon');
+      
+      // Close all other expanded rows for clarity (Optional behavior)
+      const allDetailRows = document.querySelectorAll('.detail-row');
+      const allIcons = document.querySelectorAll('.chevron-icon');
+      
+      if (nextRow.classList.contains('hidden')) {
+        // Show current row
+        nextRow.classList.remove('hidden');
+        row.classList.add('expanded');
+        // Small delay for smooth transition entry
+        setTimeout(() => {
+          nextRow.querySelector('.expandable-content').style.maxHeight = '500px';
+        }, 10);
+      } else {
+        // Hide current row
+        nextRow.querySelector('.expandable-content').style.maxHeight = '0px';
+        row.classList.remove('expanded');
+        // Wait for transition before hiding element
+        setTimeout(() => {
+          nextRow.classList.add('hidden');
+        }, 300);
+      }
+    }
+  </script>
+</body></html>

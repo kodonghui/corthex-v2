@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v2 - Analytics Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="flex flex-col lg:flex-row h-screen">
+<!-- Side Navigation -->
+<aside class="w-full lg:w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0">
+<div class="p-6 flex items-center gap-3">
+<div class="bg-primary p-2 rounded-lg text-white">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<div>
+<h2 class="text-xl font-bold leading-tight">CORTHEX</h2>
+<p class="text-xs text-slate-500 font-medium">v2.4.1</p>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 text-primary font-semibold" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">cloud_upload</span>
+<span>Deployments</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span>Performance</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span>Budgeting</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Workspace Settings</span>
+</a>
+</nav>
+<div class="p-6 border-t border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3">
+<img class="size-10 rounded-full border border-slate-200 dark:border-slate-700" data-alt="User avatar placeholder" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhI2jJ5UtR7bsYzVqFabWc8ZdIGEgJuZ4ZRYQxT_oNrl7MTZVR7CJztxyRUziu2Bk_wSuyL9ZwU3mkN2UalbTnd_d_Qd_EnkL2TuMQOUxSwAalIQxGSaovqArH-B3TNRPFPmGFVIFnxBvDjbLx76maQKp_-l1Nf9sMt4T6yrVS3FVOPon9Lsd-o_tHc2iqccI5wtJOFo10ZjVMSoCbgxSkvvvU6wt7pZJDPgUYuZj2rcYIPWGoGNs4Sqybs4GOzu5xBL3iZv3q6ZA"/>
+<div>
+<p class="text-sm font-bold">Admin User</p>
+<p class="text-xs text-slate-500">Premium Plan</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto">
+<!-- Top Navbar -->
+<header class="sticky top-0 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-8 py-4 flex flex-wrap items-center justify-between gap-4">
+<div class="flex items-center gap-2">
+<span class="flex size-2 rounded-full bg-emerald-500"></span>
+<span class="text-sm font-medium text-slate-500 uppercase tracking-wider">Live: /api/workspace/dashboard</span>
+</div>
+<div class="flex items-center gap-4 flex-1 justify-center max-w-md">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+<input class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary/50" placeholder="Search insights..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="size-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="bg-primary text-white px-5 py-2 rounded-xl text-sm font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">download</span>
+                        Export
+                    </button>
+</div>
+</header>
+<div class="p-8 space-y-8">
+<!-- Dashboard Heading -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h1 class="text-4xl font-black tracking-tight">Analytics Overview</h1>
+<p class="text-slate-500 mt-1">Real-time workspace performance and usage metrics across all providers.</p>
+</div>
+<div class="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 rounded-lg border border-primary/20">
+<span class="material-symbols-outlined text-base">sync</span>
+<span class="text-xs font-bold">Updating every 30s</span>
+</div>
+</div>
+<!-- KPI Summary Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">input</span>
+<span class="text-emerald-500 text-xs font-bold bg-emerald-500/10 px-2 py-1 rounded-full">+12.5%</span>
+</div>
+<p class="text-slate-500 text-sm font-medium">Total Requests</p>
+<h3 class="text-3xl font-bold mt-1">1,248,390</h3>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">bolt</span>
+<span class="text-primary text-xs font-bold bg-primary/10 px-2 py-1 rounded-full">-4.2%</span>
+</div>
+<p class="text-slate-500 text-sm font-medium">Avg Latency</p>
+<h3 class="text-3xl font-bold mt-1">42.8ms</h3>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">dns</span>
+<span class="text-slate-500 text-xs font-bold bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-full">Stable</span>
+</div>
+<p class="text-slate-500 text-sm font-medium">Active Nodes</p>
+<h3 class="text-3xl font-bold mt-1">128</h3>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">verified_user</span>
+<span class="text-emerald-500 text-xs font-bold bg-emerald-500/10 px-2 py-1 rounded-full">+0.1%</span>
+</div>
+<p class="text-slate-500 text-sm font-medium">Success Rate</p>
+<h3 class="text-3xl font-bold mt-1">99.98%</h3>
+</div>
+</div>
+<!-- Usage Chart & Budget Section -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+<!-- Provider Usage Breakdown -->
+<div class="xl:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h3 class="text-lg font-bold">Usage Chart</h3>
+<p class="text-sm text-slate-500">Provider request breakdown over time</p>
+</div>
+<div class="flex gap-2">
+<span class="flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-400">
+<span class="size-2 rounded-full bg-primary"></span> AWS
+                                </span>
+<span class="flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-400">
+<span class="size-2 rounded-full bg-blue-500"></span> Azure
+                                </span>
+<span class="flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-400">
+<span class="size-2 rounded-full bg-emerald-500"></span> GCP
+                                </span>
+</div>
+</div>
+<!-- Visual Mockup of Chart -->
+<div class="h-64 flex items-end gap-3 px-2">
+<div class="flex-1 space-y-1 flex flex-col justify-end">
+<div class="bg-primary/40 h-20 rounded-t w-full"></div>
+<div class="bg-primary h-32 rounded-b w-full"></div>
+</div>
+<div class="flex-1 space-y-1 flex flex-col justify-end">
+<div class="bg-primary/40 h-24 rounded-t w-full"></div>
+<div class="bg-primary h-40 rounded-b w-full"></div>
+</div>
+<div class="flex-1 space-y-1 flex flex-col justify-end">
+<div class="bg-primary/40 h-16 rounded-t w-full"></div>
+<div class="bg-primary h-28 rounded-b w-full"></div>
+</div>
+<div class="flex-1 space-y-1 flex flex-col justify-end">
+<div class="bg-blue-500/40 h-28 rounded-t w-full"></div>
+<div class="bg-blue-500 h-44 rounded-b w-full"></div>
+</div>
+<div class="flex-1 space-y-1 flex flex-col justify-end">
+<div class="bg-emerald-500/40 h-20 rounded-t w-full"></div>
+<div class="bg-emerald-500 h-32 rounded-b w-full"></div>
+</div>
+<div class="flex-1 space-y-1 flex flex-col justify-end">
+<div class="bg-primary/40 h-32 rounded-t w-full"></div>
+<div class="bg-primary h-48 rounded-b w-full"></div>
+</div>
+<div class="flex-1 space-y-1 flex flex-col justify-end">
+<div class="bg-primary/40 h-24 rounded-t w-full"></div>
+<div class="bg-primary h-36 rounded-b w-full"></div>
+</div>
+<div class="flex-1 space-y-1 flex flex-col justify-end">
+<div class="bg-blue-500/40 h-28 rounded-t w-full"></div>
+<div class="bg-blue-500 h-40 rounded-b w-full"></div>
+</div>
+</div>
+<div class="flex justify-between mt-4 text-[10px] text-slate-400 font-bold uppercase tracking-widest px-2">
+<span>00:00</span>
+<span>04:00</span>
+<span>08:00</span>
+<span>12:00</span>
+<span>16:00</span>
+<span>20:00</span>
+<span>23:59</span>
+</div>
+</div>
+<!-- Budget Gauge -->
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col">
+<div class="mb-4">
+<h3 class="text-lg font-bold">Monthly Budget</h3>
+<p class="text-sm text-slate-500">Usage cost visualization</p>
+</div>
+<div class="flex-1 flex flex-col items-center justify-center py-4">
+<div class="relative size-48 flex items-center justify-center">
+<!-- Semi-circle Gauge Mockup -->
+<svg class="size-full -rotate-90 transform" viewbox="0 0 100 100">
+<circle class="text-slate-100 dark:text-slate-800" cx="50" cy="50" fill="transparent" r="40" stroke="currentColor" stroke-dasharray="125 251" stroke-linecap="round" stroke-width="8"></circle>
+<circle class="text-primary" cx="50" cy="50" fill="transparent" r="40" stroke="currentColor" stroke-dasharray="85 251" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center pt-8">
+<span class="text-4xl font-black">$4.2k</span>
+<span class="text-xs text-slate-500 font-bold">of $5.0k limit</span>
+</div>
+</div>
+<div class="mt-4 w-full text-center">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-bold">
+<span class="material-symbols-outlined text-sm">warning</span>
+                                    Approaching Limit (84%)
+                                </div>
+</div>
+</div>
+<button class="w-full mt-auto py-3 rounded-xl border-2 border-slate-100 dark:border-slate-800 font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                            Manage Billing
+                        </button>
+</div>
+</div>
+<!-- Quick Actions & Secondary Table -->
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-6 pb-8">
+<!-- Quick Actions -->
+<div class="lg:col-span-1 space-y-4">
+<h3 class="text-lg font-bold">Quick Actions</h3>
+<div class="grid grid-cols-2 lg:grid-cols-1 gap-3">
+<button class="flex items-center gap-3 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-primary transition-colors text-left group">
+<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">add_circle</span>
+<span class="text-sm font-bold">New Node</span>
+</button>
+<button class="flex items-center gap-3 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-primary transition-colors text-left group">
+<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">history</span>
+<span class="text-sm font-bold">Logs</span>
+</button>
+<button class="flex items-center gap-3 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-primary transition-colors text-left group">
+<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">shield</span>
+<span class="text-sm font-bold">Security Scan</span>
+</button>
+<button class="flex items-center gap-3 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-primary transition-colors text-left group">
+<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">share</span>
+<span class="text-sm font-bold">Invite</span>
+</button>
+</div>
+</div>
+<!-- Recent Nodes / Providers Table -->
+<div class="lg:col-span-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+<div class="p-6 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+<h3 class="text-lg font-bold">Active Providers</h3>
+<button class="text-sm font-bold text-primary hover:underline">View All</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-slate-50 dark:bg-slate-800/50">
+<tr>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Provider</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Status</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Requests</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Cost (24h)</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase text-right">Uptime</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+<td class="px-6 py-4 flex items-center gap-3">
+<div class="size-8 rounded bg-primary/20 flex items-center justify-center font-bold text-primary text-xs">AWS</div>
+<span class="font-bold">AWS Lambda (us-east-1)</span>
+</td>
+<td class="px-6 py-4">
+<span class="flex items-center gap-1.5 text-xs font-bold text-emerald-500">
+<span class="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Active
+                                            </span>
+</td>
+<td class="px-6 py-4 text-sm">482,210</td>
+<td class="px-6 py-4 text-sm font-bold">$12.42</td>
+<td class="px-6 py-4 text-sm text-right">99.99%</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+<td class="px-6 py-4 flex items-center gap-3">
+<div class="size-8 rounded bg-blue-500/20 flex items-center justify-center font-bold text-blue-500 text-xs">AZR</div>
+<span class="font-bold">Azure Functions</span>
+</td>
+<td class="px-6 py-4">
+<span class="flex items-center gap-1.5 text-xs font-bold text-emerald-500">
+<span class="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Active
+                                            </span>
+</td>
+<td class="px-6 py-4 text-sm">312,940</td>
+<td class="px-6 py-4 text-sm font-bold">$8.15</td>
+<td class="px-6 py-4 text-sm text-right">100%</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+<td class="px-6 py-4 flex items-center gap-3">
+<div class="size-8 rounded bg-emerald-500/20 flex items-center justify-center font-bold text-emerald-500 text-xs">GCP</div>
+<span class="font-bold">Cloud Engine</span>
+</td>
+<td class="px-6 py-4">
+<span class="flex items-center gap-1.5 text-xs font-bold text-amber-500">
+<span class="size-1.5 rounded-full bg-amber-500"></span> Maintenance
+                                            </span>
+</td>
+<td class="px-6 py-4 text-sm">11,203</td>
+<td class="px-6 py-4 text-sm font-bold">$1.02</td>
+<td class="px-6 py-4 text-sm text-right">98.5%</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

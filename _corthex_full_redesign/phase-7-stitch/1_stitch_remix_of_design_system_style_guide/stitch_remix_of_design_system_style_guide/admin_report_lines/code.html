@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;family=Noto+Serif+KR:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#5a7247",
+                        "secondary": "#c4622d",
+                        "accent": "#d4a843",
+                        "background-light": "#faf8f5",
+                        "background-dark": "#221610",
+                        "surface": "#ffffff",
+                        "text-main": "#3f3e3a",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"],
+                        "serif": ["Noto Serif KR", "serif"],
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Public Sans', sans-serif;
+            color: #3f3e3a;
+        }
+        h1, h2, h3 {
+            font-family: 'Noto Serif KR', serif;
+        }
+        .sidebar-item-active {
+            background-color: rgba(90, 114, 71, 0.1);
+            color: #5a7247;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-64 border-r border-slate-200 bg-surface dark:bg-background-dark dark:border-slate-800 flex flex-col">
+<div class="p-6 flex items-center gap-3">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-xl">account_tree</span>
+</div>
+<div>
+<h1 class="text-lg font-bold text-text-main dark:text-slate-100 leading-none">CORTHEX v2</h1>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Admin Console</p>
+</div>
+</div>
+<nav class="flex-1 px-4 py-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-sm rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">dashboard</span>
+<span>대시보드</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">group</span>
+<span>사용자 관리</span>
+</a>
+<a class="sidebar-item-active flex items-center gap-3 px-3 py-2 text-sm rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">schema</span>
+<span>보고 라인 설정</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">settings</span>
+<span>시스템 설정</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">verified_user</span>
+<span>권한 관리</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">history</span>
+<span>로그 확인</span>
+</a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3 p-2">
+<div class="size-8 rounded-full bg-slate-200" data-alt="User profile avatar" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBja32MKvV_vUZUwCVrRlnOCGEH2wrJzEiNm7OLi-97T9p7ej6vcdbjuYNWJI83n80w0_NG865hEoSoYI8-q5Gf9cpLlOJwKSOotGxk5Z5ma91QlAFwouPGosCOmOgnVQ7pSsdC9mBZLV8N5g4Ctt0N_xyXjFbxevCXabhRqGyGel6FsNqPtvG58L0Ksq1em6kGMxD5AnmP_stgCaVjaSJYW900AIXhzaXwls77SAayrMA2PHucpv_-37ed5aDmpFID7uRtpIcZPC9M'); background-size: cover;"></div>
+<div class="flex-1 min-w-0">
+<p class="text-xs font-semibold text-text-main truncate">Admin User</p>
+<p class="text-[10px] text-slate-500 truncate">admin@corthex.io</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col overflow-y-auto">
+<!-- Top Bar -->
+<header class="h-16 border-b border-slate-200 bg-surface/80 backdrop-blur-sm dark:bg-background-dark/80 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
+<div class="flex items-center gap-2 text-slate-500 text-sm">
+<span>Admin</span>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<span class="text-text-main font-medium">보고 라인 설정</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
+<span class="material-symbols-outlined">search</span>
+</button>
+</div>
+</header>
+<div class="p-8 max-w-5xl mx-auto w-full">
+<!-- Page Header -->
+<div class="mb-10">
+<h2 class="text-3xl font-bold text-text-main dark:text-slate-100 mb-3">보고 라인 설정</h2>
+<p class="text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed">
+                        휴먼 사용자의 조직 내 보고 체계를 설정합니다. 이 설정은 보고서 제출 대상 결정에 사용됩니다. 
+                        직속 상사는 하위 사용자의 성과를 관리하고 보고서를 승인할 권한을 가집니다.
+                    </p>
+</div>
+<!-- Add New Line Row (Inline Form) -->
+<div class="bg-surface dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm mb-8">
+<h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">새 보고 라인 추가</h3>
+<div class="flex flex-col md:flex-row gap-4">
+<div class="flex-1">
+<label class="block text-xs font-medium text-slate-500 mb-1">대상 사용자 (Reporter)</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">person_search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-50 border-slate-200 rounded-lg focus:ring-primary focus:border-primary text-sm" placeholder="사용자 이름 또는 부서 검색" type="text"/>
+</div>
+</div>
+<div class="flex-1">
+<label class="block text-xs font-medium text-slate-500 mb-1">직속 상사 (Supervisor)</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">manage_accounts</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-50 border-slate-200 rounded-lg focus:ring-primary focus:border-primary text-sm" placeholder="상사 이름 또는 직책 검색" type="text"/>
+</div>
+</div>
+<div class="flex items-end">
+<button class="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 h-[38px]">
+<span class="material-symbols-outlined text-sm">add</span>
+                                보고 라인 추가
+                            </button>
+</div>
+</div>
+</div>
+<!-- Table Content -->
+<div class="bg-surface dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 dark:bg-slate-800/50">
+<th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">대상 사용자 (Reporter)</th>
+<th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">직속 상사 (Supervisor)</th>
+<th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">관리</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<!-- GET /api/admin/report-lines mock data -->
+<tr class="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">김</div>
+<div>
+<p class="text-sm font-medium text-text-main dark:text-slate-200">김철수</p>
+<p class="text-xs text-slate-500">영업1팀 / 대리</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-accent/10 flex items-center justify-center text-accent font-bold text-xs">이</div>
+<div>
+<p class="text-sm font-medium text-text-main dark:text-slate-200">이영희</p>
+<p class="text-xs text-slate-500">영업본부 / 팀장</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<!-- DELETE /api/admin/report-lines/:id -->
+<button class="text-slate-400 hover:text-secondary p-2 transition-colors">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</td>
+</tr>
+<tr class="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">박</div>
+<div>
+<p class="text-sm font-medium text-text-main dark:text-slate-200">박지민</p>
+<p class="text-xs text-slate-500">플랫폼개발팀 / 선임</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-accent/10 flex items-center justify-center text-accent font-bold text-xs">정</div>
+<div>
+<p class="text-sm font-medium text-text-main dark:text-slate-200">정본부</p>
+<p class="text-xs text-slate-500">기술본부 / 본부장</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-400 hover:text-secondary p-2 transition-colors">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</td>
+</tr>
+<tr class="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">최</div>
+<div>
+<p class="text-sm font-medium text-text-main dark:text-slate-200">최동욱</p>
+<p class="text-xs text-slate-500">인사팀 / 사원</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-accent/10 flex items-center justify-center text-accent font-bold text-xs">강</div>
+<div>
+<p class="text-sm font-medium text-text-main dark:text-slate-200">강이사</p>
+<p class="text-xs text-slate-500">경영지원실 / 이사</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-400 hover:text-secondary p-2 transition-colors">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/30 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+<p class="text-xs text-slate-500">전체 3개의 보고 라인이 설정됨</p>
+<div class="flex gap-2">
+<button class="p-1 text-slate-400 hover:text-primary transition-colors disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="p-1 text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Footer / API Info -->
+<div class="mt-12 pt-8 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-400 text-xs">
+<p>© 2024 CORTHEX v2. All rights reserved.</p>
+<div class="flex gap-4">
+<span class="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">GET /api/admin/report-lines</span>
+<span class="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">POST /api/admin/report-lines</span>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

@@ -1,0 +1,28 @@
+# CORTHEX v2 React Migration Plan
+
+## 1. Project Structure (Based on Technical Spec)
+```
+packages/
+├── ui/              # CVA-based Shared Component Library
+├── shared/          # Shared Types & Constants
+├── app/             # Main SPA (User/CEO)
+│   ├── src/
+│   │   ├── layouts/ # App Shell, Sidebar, Header
+│   │   ├── pages/   # Lazy-loaded Route Components
+│   │   ├── stores/  # Zustand (Auth, UI state)
+│   │   └── hooks/   # TanStack Query (Data fetching)
+└── admin/           # Admin SPA
+```
+
+## 2. Core Layout Implementation Strategy
+- **Navigation**: Sidebar with multi-level grouping (P0-P3).
+- **Theme**: Document-level dark/light mode toggle via Tailwind.
+- **Routing**: React Router v6 with code-splitting.
+
+## 3. Migration Sequence
+1.  **Phase 1: Foundation**: Shared UI components & Global Layout.
+2.  **Phase 2: App Core**: Home, Hub, Chat, NEXUS.
+3.  **Phase 3: Data & Ops**: Analysis, Knowledge, Jobs, Reports.
+4.  **Phase 4: Specialized**: Trading, Agora, SNS, SketchVibe.
+5.  **Phase 5: Admin Panel**: All 16 Admin routes.
+```
