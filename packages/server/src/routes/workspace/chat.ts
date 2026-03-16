@@ -6,7 +6,7 @@ import { db } from '../../db'
 import { chatSessions, chatMessages, agents, delegations, toolCalls, files } from '../../db/schema'
 import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
-import { generateAgentResponse, generateAgentResponseStream, cancelStreamingSession, isSessionStreaming } from '../../lib/ai'
+import { generateAgentResponse, generateAgentResponseStream, cancelStreamingSession } from '../../lib/ai'
 import type { StreamEvent } from '../../lib/ai'
 import { orchestrateSecretary } from '../../lib/orchestrator'
 import { logActivity } from '../../lib/activity-logger'
@@ -436,6 +436,11 @@ chatRoute.post('/sessions/:sessionId/cancel', async (c) => {
   const tenant = c.get('tenant')
   const sessionId = c.req.param('sessionId')
 
+  const uuidResult = z.string().uuid().safeParse(sessionId)
+  if (!uuidResult.success) {
+    return c.json({ success: false, error: { code: 'INVALID_SESSION_ID', message: '유효하지 않은 세션 ID입니다' } }, 400)
+  }
+
   // 세션 소유권 확인
   const [session] = await db
     .select({ id: chatSessions.id })
@@ -447,13 +452,9 @@ chatRoute.post('/sessions/:sessionId/cancel', async (c) => {
     return c.json({ success: false, error: { code: 'SESSION_NOT_FOUND', message: '세션을 찾을 수 없습니다' } }, 404)
   }
 
-  if (!isSessionStreaming(sessionId)) {
-    return c.json({ success: false, error: { code: 'SESSION_NOT_ACTIVE', message: '현재 스트리밍 중인 세션이 아닙니다' } }, 400)
-  }
-
   const cancelled = cancelStreamingSession(sessionId)
   if (!cancelled) {
-    return c.json({ success: false, error: { code: 'CANCEL_FAILED', message: '취소에 실패했습니다' } }, 500)
+    return c.json({ success: false, error: { code: 'SESSION_COMPLETED', message: '세션이 이미 완료되었습니다' } }, 409)
   }
 
   logActivity({

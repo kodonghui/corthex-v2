@@ -233,19 +233,19 @@ export function ChatArea({
   }
 
   // FR66: Cancel active agent task via API
-  const handleCancel = async () => {
+  const handleCancel = useCallback(async () => {
     if (!sessionId || isCancelling) return
     setIsCancelling(true)
     try {
       await api.post(`/workspace/chat/sessions/${sessionId}/cancel`, {})
       toast.info('작업이 중단되었습니다')
     } catch {
-      // API 실패해도 로컬 스트림은 중지
+      toast.warning('서버 중단 실패, 로컬 스트림만 중지됨')
       stopStream()
     } finally {
       setIsCancelling(false)
     }
-  }
+  }, [sessionId, isCancelling, stopStream])
 
   const handleRetry = () => {
     clearError()
