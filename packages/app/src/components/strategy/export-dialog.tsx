@@ -81,7 +81,7 @@ export function ExportDialog({ isOpen, onClose, stockCode }: Props) {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-sm">
-      <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
+      <h3 className="text-sm font-semibold text-zinc-900 mb-4">
         전략 데이터 내보내기
       </h3>
 
@@ -99,7 +99,7 @@ export function ExportDialog({ isOpen, onClose, stockCode }: Props) {
                   onChange={() => handleTypeChange(opt.value)}
                   className="accent-indigo-600"
                 />
-                <span className="text-sm text-zinc-700 dark:text-zinc-300">{opt.label}</span>
+                <span className="text-sm text-zinc-700">{opt.label}</span>
               </label>
             ))}
           </div>
@@ -116,8 +116,8 @@ export function ExportDialog({ isOpen, onClose, stockCode }: Props) {
                   onClick={() => setFormat(f)}
                   className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
                     format === f
-                      ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400'
-                      : 'border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                      ? 'border-indigo-500 bg-indigo-50 text-indigo-600'
+                      : 'border-zinc-200 text-zinc-500 hover:bg-zinc-50'
                   }`}
                 >
                   {FORMAT_LABELS[f]}

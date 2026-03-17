@@ -97,14 +97,14 @@ function DepartmentForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-xs font-medium text-slate-400 mb-1">
+        <label className="block text-xs font-medium text-stone-500 mb-1">
           부서명 <span className="text-red-500">*</span>
         </label>
         <Input value={name} onChange={(e) => { setName(e.target.value); setNameError('') }} placeholder="예: 마케팅부" maxLength={100} autoFocus />
         {nameError && <p className="text-xs text-red-500 mt-1">{nameError}</p>}
       </div>
       <div>
-        <label className="block text-xs font-medium text-slate-400 mb-1">설명</label>
+        <label className="block text-xs font-medium text-stone-500 mb-1">설명</label>
         <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="부서 설명 (선택)" rows={3} />
       </div>
       <div className="flex gap-2 justify-end pt-2">
@@ -153,7 +153,7 @@ function CascadePanel({
       </div>
       {analysis.agentBreakdown.length > 0 && (
         <div className="max-h-40 overflow-y-auto">
-          <p className="text-xs font-medium text-slate-500 mb-1">영향 받는 에이전트</p>
+          <p className="text-xs font-medium text-stone-400 mb-1">영향 받는 에이전트</p>
           <div className="space-y-1">
             {analysis.agentBreakdown.map((agent) => (
               <div key={agent.id} className="flex items-center justify-between text-xs px-2 py-1 bg-slate-50 rounded border border-slate-100">
@@ -180,7 +180,7 @@ const STATUS_COLORS: Record<string, { bg: string; text: string; label: string }>
   online: { bg: 'bg-green-50', text: 'text-green-700', label: '활성' },
   working: { bg: 'bg-blue-50', text: 'text-blue-700', label: '작업 중' },
   error: { bg: 'bg-red-50', text: 'text-red-700', label: '오류' },
-  offline: { bg: 'bg-slate-50', text: 'text-slate-500', label: '오프라인' },
+  offline: { bg: 'bg-slate-50', text: 'text-stone-400', label: '오프라인' },
 }
 
 const TIER_COLORS: Record<string, string> = {
@@ -214,7 +214,7 @@ function DepartmentDetailSection({
     <div className="flex flex-col gap-6 bg-white rounded-2xl border border-slate-200 p-8 shadow-sm">
       {/* Detail Header */}
       <div className="flex flex-col gap-2">
-        <nav aria-label="Breadcrumb" className="flex text-sm text-slate-400">
+        <nav aria-label="Breadcrumb" className="flex text-sm text-stone-500">
           <ol className="inline-flex items-center space-x-1 md:space-x-2">
             <li className="inline-flex items-center">
               <button onClick={onClose} className="hover:underline transition-colors" style={{ color: '#4a6741' }}>부서 목록</button>
@@ -230,7 +230,7 @@ function DepartmentDetailSection({
         <div className="flex flex-wrap justify-between items-end gap-4">
           <div>
             <h2 className="text-2xl font-bold text-slate-900">{dept.name} 상세</h2>
-            <p className="text-slate-500 mt-1 max-w-2xl">{dept.description || '설명 없음'}</p>
+            <p className="text-stone-400 mt-1 max-w-2xl">{dept.description || '설명 없음'}</p>
           </div>
           <div className="flex gap-3">
             <button onClick={onEdit} className="flex items-center justify-center gap-2 rounded-xl h-9 px-4 bg-white border border-slate-200 text-slate-700 text-sm font-medium hover:shadow-md transition-all">
@@ -256,8 +256,8 @@ function DepartmentDetailSection({
           </div>
         ) : agents.length === 0 ? (
           <div className="bg-slate-50 border border-slate-100 rounded-xl p-6 text-center">
-            <Bot className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-            <p className="text-sm text-slate-500">이 부서에 할당된 에이전트가 없습니다</p>
+            <Bot className="w-8 h-8 text-stone-600 mx-auto mb-2" />
+            <p className="text-sm text-stone-400">이 부서에 할당된 에이전트가 없습니다</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -276,8 +276,8 @@ function DepartmentDetailSection({
                         {statusInfo.label}
                       </span>
                     </div>
-                    <p className="text-sm text-slate-500 mb-3 truncate">{agent.role || '역할 미지정'}</p>
-                    <div className="flex items-center gap-4 text-xs font-mono text-slate-400">
+                    <p className="text-sm text-stone-400 mb-3 truncate">{agent.role || '역할 미지정'}</p>
+                    <div className="flex items-center gap-4 text-xs font-mono text-stone-500">
                       <div className="flex items-center gap-1">
                         <Cpu className="w-3.5 h-3.5" />
                         <span>{agent.modelName}</span>
@@ -400,14 +400,14 @@ export function DepartmentsPage() {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
             <div>
               <nav aria-label="Breadcrumb" className="flex mb-2">
-                <ol className="flex items-center space-x-2 text-xs text-slate-400 font-medium">
+                <ol className="flex items-center space-x-2 text-xs text-stone-500 font-medium">
                   <li>Workspace</li>
                   <li><ChevronRight className="w-2.5 h-2.5 inline" /></li>
                   <li style={{ color: '#4a6741' }}>부서 관리</li>
                 </ol>
               </nav>
               <h1 className="text-3xl font-black text-slate-900 tracking-tight">부서 관리</h1>
-              <p className="text-slate-500 mt-1">워크스페이스 내 부서를 관리하고 에이전트 리소스를 최적화하세요.</p>
+              <p className="text-stone-400 mt-1">워크스페이스 내 부서를 관리하고 에이전트 리소스를 최적화하세요.</p>
             </div>
             <div className="flex items-center gap-3">
               <button className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold transition-all">
@@ -494,16 +494,16 @@ export function DepartmentsPage() {
                       </div>
                       <button
                         onClick={(e) => { e.stopPropagation(); setEditDept(dept) }}
-                        className="p-2 text-slate-400 hover:text-slate-700 transition-colors"
+                        className="p-2 text-stone-500 hover:text-slate-700 transition-colors"
                       >
                         <MoreVertical className="w-5 h-5" />
                       </button>
                     </div>
                     <h3 className="text-xl font-bold mb-2">{dept.name}</h3>
-                    <p className="text-slate-500 text-sm mb-6 flex-1">{dept.description || '설명 없음'}</p>
+                    <p className="text-stone-400 text-sm mb-6 flex-1">{dept.description || '설명 없음'}</p>
                     <div className="space-y-4">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-slate-400 flex items-center gap-1.5">
+                        <span className="text-stone-500 flex items-center gap-1.5">
                           <Bot className="w-5 h-5" /> 할당된 에이전트
                         </span>
                         <span className="font-bold" style={{ color: '#4a6741' }}>--명</span>
@@ -551,14 +551,14 @@ export function DepartmentsPage() {
             <>
               <div className="w-full h-px bg-slate-200 mb-8 mt-12" />
               <div className="space-y-3">
-                <p className="text-xs font-medium text-slate-400 uppercase tracking-wider px-1 mb-3">비활성 부서</p>
+                <p className="text-xs font-medium text-stone-500 uppercase tracking-wider px-1 mb-3">비활성 부서</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-6">
                   {inactiveDepts.map((dept) => (
                     <div key={dept.id} className="flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden opacity-60 p-6">
-                      <h3 className="text-lg font-bold text-slate-500 mb-2">{dept.name}</h3>
-                      {dept.description && <p className="text-xs text-slate-400 line-clamp-2">{dept.description}</p>}
+                      <h3 className="text-lg font-bold text-stone-400 mb-2">{dept.name}</h3>
+                      {dept.description && <p className="text-xs text-stone-500 line-clamp-2">{dept.description}</p>}
                       <div className="mt-auto pt-3">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-400">비활성</span>
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-stone-500">비활성</span>
                       </div>
                     </div>
                   ))}
@@ -580,7 +580,7 @@ export function DepartmentsPage() {
                 </div>
                 <div className="flex-1 border-b border-slate-100 pb-4">
                   <p className="text-sm font-medium">부서 에이전트가 <span className="font-bold" style={{ color: '#4a6741' }}>업데이트</span>되었습니다.</p>
-                  <p className="text-xs text-slate-400 mt-1">방금 전 &bull; 시스템</p>
+                  <p className="text-xs text-stone-500 mt-1">방금 전 &bull; 시스템</p>
                 </div>
               </div>
               <div className="flex gap-4">
@@ -589,7 +589,7 @@ export function DepartmentsPage() {
                 </div>
                 <div className="flex-1 border-b border-slate-100 pb-4">
                   <p className="text-sm font-medium">새로운 <span className="font-bold" style={{ color: '#4a6741' }}>에이전트가 할당</span>되었습니다.</p>
-                  <p className="text-xs text-slate-400 mt-1">최근 &bull; 관리자</p>
+                  <p className="text-xs text-stone-500 mt-1">최근 &bull; 관리자</p>
                 </div>
               </div>
               <div className="flex gap-4">
@@ -598,7 +598,7 @@ export function DepartmentsPage() {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-medium">부서 <span className="font-bold" style={{ color: '#4a6741' }}>설정이 수정</span>되었습니다.</p>
-                  <p className="text-xs text-slate-400 mt-1">이전 &bull; 시스템</p>
+                  <p className="text-xs text-stone-500 mt-1">이전 &bull; 시스템</p>
                 </div>
               </div>
             </div>

@@ -76,11 +76,11 @@ const TRIGGER_TYPE_BADGE: Record<string, { classes: string; label: string }> = {
   schedule: { classes: 'bg-purple-500/15 text-purple-400', label: '일정' },
   'market-open': { classes: 'bg-emerald-500/15 text-emerald-400', label: '장시작' },
   'market-close': { classes: 'bg-emerald-500/15 text-emerald-400', label: '장마감' },
-  custom: { classes: 'bg-slate-500/15 text-slate-400', label: '커스텀' },
+  custom: { classes: 'bg-slate-500/15 text-stone-500', label: '커스텀' },
 }
 
 const EVENT_STATUS_BADGE: Record<string, { label: string; classes: string }> = {
-  detected: { label: '감지됨', classes: 'bg-slate-500/15 text-slate-400' },
+  detected: { label: '감지됨', classes: 'bg-slate-500/15 text-stone-500' },
   executing: { label: '실행중', classes: 'bg-blue-500/15 text-blue-400 animate-pulse' },
   completed: { label: '완료', classes: 'bg-emerald-500/15 text-emerald-400' },
   failed: { label: '실패', classes: 'bg-red-500/15 text-red-400' },
@@ -143,7 +143,7 @@ function formatRelativeTime(dateStr: string): string {
   return `${Math.floor(hours / 24)}일 전`
 }
 
-const inputClasses = 'w-full bg-slate-900/50 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 text-sm text-slate-50 rounded-lg px-3 py-2 outline-none transition-colors placeholder:text-slate-600'
+const inputClasses = 'w-full bg-white/50 border border-stone-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 text-sm text-slate-50 rounded-lg px-3 py-2 outline-none transition-colors placeholder:text-slate-600'
 
 // ── Main Page ──
 
@@ -294,7 +294,7 @@ export function ArgosPage() {
       <div className="flex items-center justify-between mb-2">
         <div>
           <h1 className="text-2xl font-bold text-slate-50">ARGOS</h1>
-          <p className="text-sm text-slate-400 mt-1">조건 기반 정보 자동 수집 — 놓치지 않겠습니다</p>
+          <p className="text-sm text-stone-500 mt-1">조건 기반 정보 자동 수집 — 놓치지 않겠습니다</p>
         </div>
         <button data-testid="add-trigger-btn" onClick={openCreate} className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors">
           + 트리거 추가
@@ -308,14 +308,14 @@ export function ArgosPage() {
       {triggersLoading ? (
         <div className="space-y-3 mt-6">
           {[1, 2, 3].map(i => (
-            <div key={i} className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-4 animate-pulse h-28" />
+            <div key={i} className="bg-stone-100/30 border border-stone-200/50 rounded-xl p-4 animate-pulse h-28" />
           ))}
         </div>
       ) : triggers.length === 0 ? (
-        <div data-testid="argos-empty-state" className="bg-slate-800/30 border border-dashed border-slate-700 rounded-xl p-12 text-center mt-6">
+        <div data-testid="argos-empty-state" className="bg-stone-100/30 border border-dashed border-stone-200 rounded-xl p-12 text-center mt-6">
           <p className="text-4xl mb-3">🔭</p>
-          <p className="text-sm font-medium text-slate-300">설정된 감시 트리거가 없습니다</p>
-          <p className="text-xs text-slate-500 mt-1">트리거를 추가하면 조건 충족 시 자동으로 에이전트가 작업합니다</p>
+          <p className="text-sm font-medium text-stone-600">설정된 감시 트리거가 없습니다</p>
+          <p className="text-xs text-stone-400 mt-1">트리거를 추가하면 조건 충족 시 자동으로 에이전트가 작업합니다</p>
           <button onClick={openCreate} className="bg-blue-600 hover:bg-blue-500 text-white text-sm rounded-lg px-4 py-2 mt-4 transition-colors">트리거 추가</button>
         </div>
       ) : (
@@ -363,11 +363,11 @@ export function ArgosPage() {
       {deleteTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/60" onClick={() => setDeleteTarget(null)} />
-          <div className="relative bg-slate-800 border border-slate-700 rounded-xl p-5 max-w-sm mx-4 shadow-2xl">
+          <div className="relative bg-stone-100 border border-stone-200 rounded-xl p-5 max-w-sm mx-4 shadow-2xl">
             <h3 className="text-sm font-semibold text-slate-50">트리거 삭제</h3>
-            <p className="text-xs text-slate-400 mt-2">이 트리거와 관련된 이벤트 기록이 모두 삭제됩니다. 계속하시겠습니까?</p>
+            <p className="text-xs text-stone-500 mt-2">이 트리거와 관련된 이벤트 기록이 모두 삭제됩니다. 계속하시겠습니까?</p>
             <div className="flex justify-end gap-2 mt-4">
-              <button onClick={() => setDeleteTarget(null)} className="text-xs text-slate-400 hover:text-slate-200 px-3 py-1.5 rounded-lg">취소</button>
+              <button onClick={() => setDeleteTarget(null)} className="text-xs text-stone-500 hover:text-slate-200 px-3 py-1.5 rounded-lg">취소</button>
               <button onClick={() => deleteTarget && deleteTriggerMut.mutate(deleteTarget)} className="bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1.5 rounded-lg">삭제</button>
             </div>
           </div>
@@ -386,31 +386,31 @@ function StatusBar({ status }: { status?: ArgosStatus }) {
         {/* Data */}
         <div className={`rounded-xl p-3 border ${status?.dataOk !== false ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-red-500/10 border-red-500/20 animate-pulse'}`}>
           <span className="text-lg">📡</span>
-          <p className="text-xs text-slate-400 font-medium mt-1">데이터</p>
+          <p className="text-xs text-stone-500 font-medium mt-1">데이터</p>
           <p className={`text-lg font-bold ${status?.dataOk !== false ? 'text-emerald-400' : 'text-red-400'}`}>{status?.dataOk !== false ? 'OK' : 'NG'}</p>
         </div>
         {/* AI */}
         <div className={`rounded-xl p-3 border ${status?.aiOk !== false ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-red-500/10 border-red-500/20 animate-pulse'}`}>
           <span className="text-lg">🤖</span>
-          <p className="text-xs text-slate-400 font-medium mt-1">AI</p>
+          <p className="text-xs text-stone-500 font-medium mt-1">AI</p>
           <p className={`text-lg font-bold ${status?.aiOk !== false ? 'text-emerald-400' : 'text-red-400'}`}>{status?.aiOk !== false ? 'OK' : 'NG'}</p>
         </div>
         {/* Active Triggers */}
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-3">
+        <div className="bg-stone-100/50 border border-stone-200 rounded-xl p-3">
           <span className="text-lg">🎯</span>
-          <p className="text-xs text-slate-400 font-medium mt-1">활성 트리거</p>
+          <p className="text-xs text-stone-500 font-medium mt-1">활성 트리거</p>
           <p className="text-lg font-bold text-slate-50">{status?.activeTriggersCount ?? 0}</p>
         </div>
         {/* Cost */}
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-3">
+        <div className="bg-stone-100/50 border border-stone-200 rounded-xl p-3">
           <span className="text-lg">💵</span>
-          <p className="text-xs text-slate-400 font-medium mt-1">오늘 비용</p>
+          <p className="text-xs text-stone-500 font-medium mt-1">오늘 비용</p>
           <p className="text-lg font-bold text-slate-50">${(status?.todayCost ?? 0).toFixed(2)}</p>
         </div>
       </div>
       {status?.lastCheckAt && (
         <div className="flex justify-end mt-1">
-          <span className="text-[10px] text-slate-500 font-mono">마지막 확인: {new Date(status.lastCheckAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+          <span className="text-[10px] text-stone-400 font-mono">마지막 확인: {new Date(status.lastCheckAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
         </div>
       )}
     </div>
@@ -430,11 +430,11 @@ function TriggerCard({ trigger: t, isSelected, isHighlighted, onSelect, onEdit, 
     <div
       data-testid={`trigger-card-${t.id}`}
       onClick={onSelect}
-      className={`bg-slate-800/50 border rounded-xl p-4 cursor-pointer transition-all ${
-        isHighlighted ? 'border-cyan-400/50 ring-2 ring-cyan-400/30 bg-cyan-400/5'
+      className={`bg-stone-100/50 border rounded-xl p-4 cursor-pointer transition-all ${
+        isHighlighted ? 'border-[#5a7247]/50 ring-2 ring-[#5a7247]/30 bg-[#5a7247]/5'
         : isSelected ? 'bg-blue-500/5 border-blue-500/30 ring-1 ring-blue-500/20'
-        : t.isActive ? 'border-slate-700 hover:border-slate-600 hover:bg-slate-800/70'
-        : 'border-slate-700 opacity-50'
+        : t.isActive ? 'border-stone-200 hover:border-stone-300 hover:bg-stone-100/70'
+        : 'border-stone-200 opacity-50'
       }`}
     >
       {/* Row 1 */}
@@ -445,25 +445,25 @@ function TriggerCard({ trigger: t, isSelected, isHighlighted, onSelect, onEdit, 
           <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${typeBadge.classes}`}>{typeBadge.label}</span>
         </div>
         <div className="flex items-center gap-1">
-          {t.agentName && <span className="text-xs text-slate-400">{t.agentName}</span>}
+          {t.agentName && <span className="text-xs text-stone-500">{t.agentName}</span>}
         </div>
       </div>
 
       {/* Row 2: Condition */}
-      <p className="text-xs text-slate-300 mt-2">{conditionDesc}</p>
+      <p className="text-xs text-stone-600 mt-2">{conditionDesc}</p>
 
       {/* Row 3: Instruction */}
-      <p className="text-xs text-slate-500 truncate max-w-full mt-1">{t.instruction}</p>
+      <p className="text-xs text-stone-400 truncate max-w-full mt-1">{t.instruction}</p>
 
       {/* Row 4: Meta + Actions */}
       <div className="flex items-center justify-between mt-3">
         <div className="flex items-center gap-3">
-          <span className="text-[10px] text-slate-500 font-mono">쿨다운 {t.cooldownMinutes}분</span>
-          {t.lastTriggeredAt && <span className="text-[10px] text-slate-500">마지막: {formatRelativeTime(t.lastTriggeredAt)}</span>}
-          {t.eventCount !== undefined && <span className="text-[10px] text-slate-500">이벤트 {t.eventCount}건</span>}
+          <span className="text-[10px] text-stone-400 font-mono">쿨다운 {t.cooldownMinutes}분</span>
+          {t.lastTriggeredAt && <span className="text-[10px] text-stone-400">마지막: {formatRelativeTime(t.lastTriggeredAt)}</span>}
+          {t.eventCount !== undefined && <span className="text-[10px] text-stone-400">이벤트 {t.eventCount}건</span>}
         </div>
         <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
-          <button onClick={onEdit} className="text-xs text-slate-400 hover:text-slate-200 px-2 py-1 rounded hover:bg-slate-700/50 transition-colors">편집</button>
+          <button onClick={onEdit} className="text-xs text-stone-500 hover:text-slate-200 px-2 py-1 rounded hover:bg-stone-200/50 transition-colors">편집</button>
           <button onClick={onToggle} className={`text-xs px-2 py-1 rounded transition-colors ${t.isActive ? 'text-amber-400 hover:bg-amber-500/10' : 'text-emerald-400 hover:bg-emerald-500/10'}`}>
             {t.isActive ? '중지' : '시작'}
           </button>
@@ -493,16 +493,16 @@ function EventLogSection({ events, isLoading, pagination, selectedTriggerId, tri
         <div className="flex items-center gap-2">
           <h3 className="text-sm font-semibold text-slate-50">이벤트 로그</h3>
           {selectedTriggerName && <span className="text-xs text-blue-400">— {selectedTriggerName}</span>}
-          {pagination && <span className="text-[10px] text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded">{pagination.total}건</span>}
+          {pagination && <span className="text-[10px] text-stone-400 bg-stone-100 px-1.5 py-0.5 rounded">{pagination.total}건</span>}
         </div>
         <div className="flex items-center gap-2">
           {/* Tabs */}
-          <div className="flex bg-slate-800 rounded-lg p-0.5">
+          <div className="flex bg-stone-100 rounded-lg p-0.5">
             {([['all', '전체'], ['error', '오류']] as const).map(([key, label]) => (
               <button
                 key={key}
                 onClick={() => { setEventTab(key); setEventPage(1) }}
-                className={`text-xs px-3 py-1.5 rounded-md transition-colors ${eventTab === key ? 'bg-slate-700 text-slate-50' : 'text-slate-400 hover:text-slate-300'}`}
+                className={`text-xs px-3 py-1.5 rounded-md transition-colors ${eventTab === key ? 'bg-stone-200 text-slate-50' : 'text-stone-500 hover:text-stone-600'}`}
               >
                 {label}
               </button>
@@ -512,7 +512,7 @@ function EventLogSection({ events, isLoading, pagination, selectedTriggerId, tri
             <select
               value={eventStatusFilter}
               onChange={e => { setEventStatusFilter(e.target.value); setEventPage(1) }}
-              className="bg-slate-800 border border-slate-700 text-xs text-slate-300 rounded-lg px-2 py-1.5"
+              className="bg-stone-100 border border-stone-200 text-xs text-stone-600 rounded-lg px-2 py-1.5"
             >
               <option value="">전체 상태</option>
               <option value="detected">감지됨</option>
@@ -527,61 +527,61 @@ function EventLogSection({ events, isLoading, pagination, selectedTriggerId, tri
       {/* Event Rows */}
       <div className="mt-3">
         {!selectedTriggerId ? (
-          <p className="text-xs text-slate-500 text-center py-8">위의 트리거 카드를 클릭하면 이벤트 기록이 표시됩니다</p>
+          <p className="text-xs text-stone-400 text-center py-8">위의 트리거 카드를 클릭하면 이벤트 기록이 표시됩니다</p>
         ) : isLoading ? (
-          <p className="text-xs text-slate-500 text-center py-8">로딩 중...</p>
+          <p className="text-xs text-stone-400 text-center py-8">로딩 중...</p>
         ) : events.length === 0 ? (
-          <p className="text-xs text-slate-500 text-center py-8">이벤트 기록이 없습니다</p>
+          <p className="text-xs text-stone-400 text-center py-8">이벤트 기록이 없습니다</p>
         ) : (
           events.map(evt => {
-            const cfg = EVENT_STATUS_BADGE[evt.status] || { label: evt.status, classes: 'bg-slate-500/15 text-slate-400' }
+            const cfg = EVENT_STATUS_BADGE[evt.status] || { label: evt.status, classes: 'bg-slate-500/15 text-stone-500' }
             const isExpanded = expandedEventId === evt.id
             return (
               <div key={evt.id}>
                 <div
-                  className="bg-slate-800/30 border-b border-slate-700/50 px-3 py-2.5 cursor-pointer hover:bg-slate-800/50 transition-colors flex items-center justify-between"
+                  className="bg-stone-100/30 border-b border-stone-200/50 px-3 py-2.5 cursor-pointer hover:bg-stone-100/50 transition-colors flex items-center justify-between"
                   onClick={() => setExpandedEventId(isExpanded ? null : evt.id)}
                 >
                   <div className="flex items-center gap-2">
                     <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${cfg.classes}`}>{cfg.label}</span>
-                    <span className="text-xs text-slate-300">{evt.eventType}</span>
-                    <span className="text-[10px] text-slate-500 font-mono">{formatShortDate(evt.createdAt)}</span>
+                    <span className="text-xs text-stone-600">{evt.eventType}</span>
+                    <span className="text-[10px] text-stone-400 font-mono">{formatShortDate(evt.createdAt)}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    {evt.durationMs != null && <span className="text-[10px] text-slate-500 font-mono">{(evt.durationMs / 1000).toFixed(1)}초</span>}
-                    <span className="text-slate-500 text-xs">{isExpanded ? '▲' : '▼'}</span>
+                    {evt.durationMs != null && <span className="text-[10px] text-stone-400 font-mono">{(evt.durationMs / 1000).toFixed(1)}초</span>}
+                    <span className="text-stone-400 text-xs">{isExpanded ? '▲' : '▼'}</span>
                   </div>
                 </div>
                 {isExpanded && (
-                  <div className="bg-slate-800/60 border-b border-slate-700/50 px-4 py-3 space-y-2">
+                  <div className="bg-stone-100/60 border-b border-stone-200/50 px-4 py-3 space-y-2">
                     {evt.eventData && (
                       <div>
-                        <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">이벤트 데이터</p>
-                        <pre className="text-xs text-slate-300 font-mono bg-slate-900/50 rounded p-2 mt-0.5 break-all">{JSON.stringify(evt.eventData, null, 2)}</pre>
+                        <p className="text-[10px] text-stone-400 font-medium uppercase tracking-wider">이벤트 데이터</p>
+                        <pre className="text-xs text-stone-600 font-mono bg-white/50 rounded p-2 mt-0.5 break-all">{JSON.stringify(evt.eventData, null, 2)}</pre>
                       </div>
                     )}
                     {evt.result && (
                       <div>
-                        <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">실행 결과</p>
-                        <pre className="text-xs text-slate-300 font-mono bg-slate-900/50 rounded p-2 mt-0.5 break-all">{evt.result}</pre>
+                        <p className="text-[10px] text-stone-400 font-medium uppercase tracking-wider">실행 결과</p>
+                        <pre className="text-xs text-stone-600 font-mono bg-white/50 rounded p-2 mt-0.5 break-all">{evt.result}</pre>
                       </div>
                     )}
                     {evt.error && (
                       <div>
-                        <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">오류 메시지</p>
-                        <pre className="text-xs text-red-400 font-mono bg-slate-900/50 rounded p-2 mt-0.5 break-all">{evt.error}</pre>
+                        <p className="text-[10px] text-stone-400 font-medium uppercase tracking-wider">오류 메시지</p>
+                        <pre className="text-xs text-red-400 font-mono bg-white/50 rounded p-2 mt-0.5 break-all">{evt.error}</pre>
                       </div>
                     )}
                     {evt.processedAt && (
                       <div>
-                        <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">처리 시각</p>
-                        <p className="text-xs text-slate-300 font-mono mt-0.5">{formatShortDate(evt.processedAt)}</p>
+                        <p className="text-[10px] text-stone-400 font-medium uppercase tracking-wider">처리 시각</p>
+                        <p className="text-xs text-stone-600 font-mono mt-0.5">{formatShortDate(evt.processedAt)}</p>
                       </div>
                     )}
                     {evt.commandId && (
                       <div>
-                        <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">연결 명령</p>
-                        <p className="text-xs text-slate-300 font-mono mt-0.5">{evt.commandId}</p>
+                        <p className="text-[10px] text-stone-400 font-medium uppercase tracking-wider">연결 명령</p>
+                        <p className="text-xs text-stone-600 font-mono mt-0.5">{evt.commandId}</p>
                       </div>
                     )}
                   </div>
@@ -595,9 +595,9 @@ function EventLogSection({ events, isLoading, pagination, selectedTriggerId, tri
       {/* Pagination */}
       {pagination && pagination.totalPages > 1 && (
         <div className="flex items-center justify-center gap-3 mt-3">
-          <button onClick={() => setEventPage(Math.max(1, eventPage - 1))} disabled={eventPage <= 1} className="text-xs text-slate-400 hover:text-slate-200 disabled:opacity-30 disabled:cursor-not-allowed px-2 py-1">← 이전</button>
-          <span className="text-xs text-slate-500">{pagination.page} / {pagination.totalPages}</span>
-          <button onClick={() => setEventPage(Math.min(pagination.totalPages, eventPage + 1))} disabled={eventPage >= pagination.totalPages} className="text-xs text-slate-400 hover:text-slate-200 disabled:opacity-30 disabled:cursor-not-allowed px-2 py-1">다음 →</button>
+          <button onClick={() => setEventPage(Math.max(1, eventPage - 1))} disabled={eventPage <= 1} className="text-xs text-stone-500 hover:text-slate-200 disabled:opacity-30 disabled:cursor-not-allowed px-2 py-1">← 이전</button>
+          <span className="text-xs text-stone-400">{pagination.page} / {pagination.totalPages}</span>
+          <button onClick={() => setEventPage(Math.min(pagination.totalPages, eventPage + 1))} disabled={eventPage >= pagination.totalPages} className="text-xs text-stone-500 hover:text-slate-200 disabled:opacity-30 disabled:cursor-not-allowed px-2 py-1">다음 →</button>
         </div>
       )}
     </div>
@@ -700,24 +700,24 @@ function TriggerModal({ editing, agents, onClose, onSubmit, isPending }: {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" data-testid="trigger-modal">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-lg mx-4 max-h-[85vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
+      <div className="relative bg-stone-100 border border-stone-200 rounded-2xl w-full max-w-lg mx-4 max-h-[85vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-700">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-stone-200">
           <h3 className="text-lg font-semibold text-slate-50">{editing ? '트리거 수정' : 'ARGOS 트리거 추가'}</h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-200 transition-colors">✕</button>
+          <button onClick={onClose} className="text-stone-500 hover:text-slate-200 transition-colors">✕</button>
         </div>
 
         {/* Body */}
         <div className="px-5 py-4 space-y-4">
           {/* Name */}
           <div>
-            <label className="text-xs font-medium text-slate-300 mb-1.5 block">트리거 이름 (선택)</label>
+            <label className="text-xs font-medium text-stone-600 mb-1.5 block">트리거 이름 (선택)</label>
             <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="예: 삼성전자 급등 감시" className={inputClasses} />
           </div>
 
           {/* Trigger Type */}
           <div>
-            <label className="text-xs font-medium text-slate-300 mb-1.5 block">트리거 유형</label>
+            <label className="text-xs font-medium text-stone-600 mb-1.5 block">트리거 유형</label>
             <div className="grid grid-cols-4 gap-2">
               {TRIGGER_TYPES.map(tt => (
                 <button
@@ -725,7 +725,7 @@ function TriggerModal({ editing, agents, onClose, onSubmit, isPending }: {
                   type="button"
                   onClick={() => setTriggerType(tt.value)}
                   className={`text-[11px] font-medium px-2 py-2 rounded-lg border transition-all text-center ${
-                    triggerType === tt.value ? 'bg-blue-500/15 border-blue-500/40 text-blue-400' : 'bg-slate-800/50 border-slate-700 text-slate-400 hover:border-slate-600'
+                    triggerType === tt.value ? 'bg-blue-500/15 border-blue-500/40 text-blue-400' : 'bg-stone-100/50 border-stone-200 text-stone-500 hover:border-stone-300'
                   }`}
                 >
                   {tt.label}
@@ -740,11 +740,11 @@ function TriggerModal({ editing, agents, onClose, onSubmit, isPending }: {
               <>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="text-xs font-medium text-slate-300 mb-1.5 block">종목코드</label>
+                    <label className="text-xs font-medium text-stone-600 mb-1.5 block">종목코드</label>
                     <input type="text" value={ticker} onChange={e => setTicker(e.target.value)} placeholder="종목코드 (예: 삼성전자)" className={inputClasses} />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-slate-300 mb-1.5 block">시장</label>
+                    <label className="text-xs font-medium text-stone-600 mb-1.5 block">시장</label>
                     <select value={market} onChange={e => setMarket(e.target.value)} className={inputClasses}>
                       <option value="KR">KR</option><option value="US">US</option>
                     </select>
@@ -752,14 +752,14 @@ function TriggerModal({ editing, agents, onClose, onSubmit, isPending }: {
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="text-xs font-medium text-slate-300 mb-1.5 block">조건</label>
+                    <label className="text-xs font-medium text-stone-600 mb-1.5 block">조건</label>
                     <select value={operator} onChange={e => setOperator(e.target.value)} className={inputClasses}>
                       <option value="above">이상</option><option value="below">이하</option>
                       <option value="change_pct_above">% 변동(상승)</option><option value="change_pct_below">% 변동(하락)</option>
                     </select>
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-slate-300 mb-1.5 block">값</label>
+                    <label className="text-xs font-medium text-stone-600 mb-1.5 block">값</label>
                     <input type="number" value={priceValue} onChange={e => setPriceValue(e.target.value)} className={inputClasses} />
                   </div>
                 </div>
@@ -769,12 +769,12 @@ function TriggerModal({ editing, agents, onClose, onSubmit, isPending }: {
             {triggerType === 'news' && (
               <>
                 <div>
-                  <label className="text-xs font-medium text-slate-300 mb-1.5 block">키워드</label>
+                  <label className="text-xs font-medium text-stone-600 mb-1.5 block">키워드</label>
                   <input type="text" value={keywords} onChange={e => setKeywords(e.target.value)} placeholder="키워드1, 키워드2, ..." className={inputClasses} />
                 </div>
                 <div className="flex gap-3">
                   {([['any', '하나 이상 매치'], ['all', '모두 포함']] as const).map(([val, label]) => (
-                    <label key={val} className="flex items-center gap-1.5 text-xs text-slate-300 cursor-pointer">
+                    <label key={val} className="flex items-center gap-1.5 text-xs text-stone-600 cursor-pointer">
                       <input type="radio" name="matchMode" checked={matchMode === val} onChange={() => setMatchMode(val)} className="accent-blue-500" />
                       {label}
                     </label>
@@ -786,25 +786,25 @@ function TriggerModal({ editing, agents, onClose, onSubmit, isPending }: {
             {triggerType === 'schedule' && (
               <>
                 <div>
-                  <label className="text-xs font-medium text-slate-300 mb-1.5 block">수집 간격 (분)</label>
+                  <label className="text-xs font-medium text-stone-600 mb-1.5 block">수집 간격 (분)</label>
                   <input type="number" value={intervalMinutes} onChange={e => setIntervalMinutes(e.target.value)} min="1" className={inputClasses} />
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="text-xs font-medium text-slate-300 mb-1.5 block">시작 시간 (선택)</label>
+                    <label className="text-xs font-medium text-stone-600 mb-1.5 block">시작 시간 (선택)</label>
                     <input type="number" value={activeHoursStart} onChange={e => setActiveHoursStart(e.target.value)} min="0" max="23" className={inputClasses} />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-slate-300 mb-1.5 block">종료 시간 (선택)</label>
+                    <label className="text-xs font-medium text-stone-600 mb-1.5 block">종료 시간 (선택)</label>
                     <input type="number" value={activeHoursEnd} onChange={e => setActiveHoursEnd(e.target.value)} min="0" max="23" className={inputClasses} />
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-slate-300 mb-1.5 block">활성 요일 (선택)</label>
+                  <label className="text-xs font-medium text-stone-600 mb-1.5 block">활성 요일 (선택)</label>
                   <div className="flex gap-2">
                     {DAY_NAMES.map((d, i) => (
                       <button key={i} type="button" onClick={() => setActiveDays(prev => prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i])}
-                        className={`w-8 h-8 text-xs rounded-lg border transition-all ${activeDays.includes(i) ? 'bg-blue-500/20 border-blue-500/40 text-blue-400' : 'border-slate-700 text-slate-500'}`}>
+                        className={`w-8 h-8 text-xs rounded-lg border transition-all ${activeDays.includes(i) ? 'bg-blue-500/20 border-blue-500/40 text-blue-400' : 'border-stone-200 text-stone-400'}`}>
                         {d}
                       </button>
                     ))}
@@ -815,7 +815,7 @@ function TriggerModal({ editing, agents, onClose, onSubmit, isPending }: {
 
             {(triggerType === 'market-open' || triggerType === 'market-close') && (
               <div>
-                <label className="text-xs font-medium text-slate-300 mb-1.5 block">시장</label>
+                <label className="text-xs font-medium text-stone-600 mb-1.5 block">시장</label>
                 <select value={market} onChange={e => setMarket(e.target.value)} className={inputClasses}>
                   <option value="KR">KR</option><option value="US">US</option>
                 </select>
@@ -826,11 +826,11 @@ function TriggerModal({ editing, agents, onClose, onSubmit, isPending }: {
               <>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="text-xs font-medium text-slate-300 mb-1.5 block">필드</label>
+                    <label className="text-xs font-medium text-stone-600 mb-1.5 block">필드</label>
                     <input type="text" value={customField} onChange={e => setCustomField(e.target.value)} className={inputClasses} />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-slate-300 mb-1.5 block">연산자</label>
+                    <label className="text-xs font-medium text-stone-600 mb-1.5 block">연산자</label>
                     <select value={customOperator} onChange={e => setCustomOperator(e.target.value)} className={inputClasses}>
                       <option value="gte">이상</option><option value="lte">이하</option><option value="eq">같음</option>
                       <option value="contains">포함</option><option value="excludes">제외</option>
@@ -839,11 +839,11 @@ function TriggerModal({ editing, agents, onClose, onSubmit, isPending }: {
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="text-xs font-medium text-slate-300 mb-1.5 block">값</label>
+                    <label className="text-xs font-medium text-stone-600 mb-1.5 block">값</label>
                     <input type="text" value={customValue} onChange={e => setCustomValue(e.target.value)} className={inputClasses} />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-slate-300 mb-1.5 block">데이터 소스 (선택)</label>
+                    <label className="text-xs font-medium text-stone-600 mb-1.5 block">데이터 소스 (선택)</label>
                     <input type="text" value={customDataSource} onChange={e => setCustomDataSource(e.target.value)} className={inputClasses} />
                   </div>
                 </div>
@@ -853,7 +853,7 @@ function TriggerModal({ editing, agents, onClose, onSubmit, isPending }: {
 
           {/* Agent */}
           <div>
-            <label className="text-xs font-medium text-slate-300 mb-1.5 block">담당 에이전트</label>
+            <label className="text-xs font-medium text-stone-600 mb-1.5 block">담당 에이전트</label>
             <select value={agent} onChange={e => setAgent(e.target.value)} className={inputClasses}>
               <option value="">에이전트 선택...</option>
               {agents.map(a => (
@@ -864,24 +864,24 @@ function TriggerModal({ editing, agents, onClose, onSubmit, isPending }: {
 
           {/* Instruction */}
           <div>
-            <label className="text-xs font-medium text-slate-300 mb-1.5 block">실행 지시</label>
+            <label className="text-xs font-medium text-stone-600 mb-1.5 block">실행 지시</label>
             <textarea value={instruction} onChange={e => setInstruction(e.target.value)} placeholder="조건 충족 시 에이전트에게 시킬 작업" rows={3} className={`${inputClasses} resize-none`} />
           </div>
 
           {/* Cooldown */}
           <div>
-            <label className="text-xs font-medium text-slate-300 mb-1.5 block">쿨다운 (분)</label>
+            <label className="text-xs font-medium text-stone-600 mb-1.5 block">쿨다운 (분)</label>
             <div className="flex items-center gap-2">
               <input type="number" value={cooldownMinutes} onChange={e => setCooldownMinutes(Number(e.target.value) || 30)} min={1} max={1440} className={`${inputClasses} w-20`} />
-              <span className="text-xs text-slate-400">분</span>
+              <span className="text-xs text-stone-500">분</span>
             </div>
-            <p className="text-[10px] text-slate-500 mt-1">트리거 발동 후 재발동까지 대기 시간</p>
+            <p className="text-[10px] text-stone-400 mt-1">트리거 발동 후 재발동까지 대기 시간</p>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-2 px-5 py-4 border-t border-slate-700">
-          <button onClick={onClose} className="text-sm text-slate-400 hover:text-slate-200 px-4 py-2 rounded-lg hover:bg-slate-700/50 transition-colors">취소</button>
+        <div className="flex justify-end gap-2 px-5 py-4 border-t border-stone-200">
+          <button onClick={onClose} className="text-sm text-stone-500 hover:text-slate-200 px-4 py-2 rounded-lg hover:bg-stone-200/50 transition-colors">취소</button>
           <button onClick={handleSubmit} disabled={!isValid() || isPending} className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
             {isPending ? '처리 중...' : editing ? '수정' : '등록'}
           </button>

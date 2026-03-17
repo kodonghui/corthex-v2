@@ -69,13 +69,13 @@ export function CreateDebateModal({ open, onClose, onCreated }: Props) {
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal content */}
-      <div className="relative bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+      <div className="relative bg-white border border-stone-200 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-cyan-400/10">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#5a7247]/10">
           <h2 className="text-base font-bold text-slate-100">새 토론 시작</h2>
           <button
             onClick={onClose}
-            className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-colors"
+            className="w-7 h-7 flex items-center justify-center rounded-lg text-stone-500 hover:text-slate-100 hover:bg-stone-100 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -84,19 +84,19 @@ export function CreateDebateModal({ open, onClose, onCreated }: Props) {
         <div className="p-6 space-y-5">
           {/* Topic */}
           <div>
-            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 block">토론 주제</label>
+            <label className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2 block">토론 주제</label>
             <input
               data-testid="debate-topic-input"
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
               placeholder="예: 신규 사업 진출 전략에 대한 논의"
-              className="w-full bg-slate-800/50 border border-slate-700 text-slate-100 rounded-lg px-4 py-2.5 text-sm placeholder:text-slate-500 focus:outline-none focus:border-cyan-400/50 focus:ring-1 focus:ring-cyan-400/20 transition-all"
+              className="w-full bg-stone-100/50 border border-stone-200 text-slate-100 rounded-lg px-4 py-2.5 text-sm placeholder:text-stone-400 focus:outline-none focus:border-[#5a7247]/50 focus:ring-1 focus:ring-[#5a7247]/20 transition-all"
             />
           </div>
 
           {/* Debate type */}
           <div>
-            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 block">토론 유형</label>
+            <label className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2 block">토론 유형</label>
             <div className="flex gap-2">
               {([
                 { value: 'debate' as DebateType, label: '토론 (2라운드)', testId: 'debate-type-debate' },
@@ -109,8 +109,8 @@ export function CreateDebateModal({ open, onClose, onCreated }: Props) {
                   className={cn(
                     'flex-1 py-2.5 rounded-lg text-xs font-medium border transition-colors',
                     debateType === opt.value
-                      ? 'border-cyan-400/50 bg-cyan-400/10 text-cyan-400'
-                      : 'border-slate-700 text-slate-500 hover:border-slate-600',
+                      ? 'border-[#5a7247]/50 bg-[#5a7247]/10 text-[#5a7247]'
+                      : 'border-stone-200 text-stone-400 hover:border-stone-300',
                   )}
                 >
                   {opt.label}
@@ -121,10 +121,10 @@ export function CreateDebateModal({ open, onClose, onCreated }: Props) {
 
           {/* Agent selection */}
           <div>
-            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 block">
+            <label className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2 block">
               참여 에이전트 (최소 2명)
             </label>
-            <div className="max-h-48 overflow-y-auto border border-slate-700 rounded-lg divide-y divide-slate-800/50">
+            <div className="max-h-48 overflow-y-auto border border-stone-200 rounded-lg divide-y divide-slate-800/50">
               {agents.map((agent) => {
                 const selected = selectedAgentIds.includes(agent.id)
                 return (
@@ -134,34 +134,34 @@ export function CreateDebateModal({ open, onClose, onCreated }: Props) {
                     onClick={() => toggleAgent(agent.id)}
                     className={cn(
                       'w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors',
-                      selected ? 'bg-cyan-400/5' : 'hover:bg-slate-800/50',
+                      selected ? 'bg-[#5a7247]/5' : 'hover:bg-stone-100/50',
                     )}
                   >
                     <div
                       className={cn(
                         'w-5 h-5 rounded border flex items-center justify-center',
                         selected
-                          ? 'bg-cyan-400 border-cyan-400 text-slate-900'
-                          : 'border-slate-600',
+                          ? 'bg-[#5a7247] border-[#5a7247] text-slate-900'
+                          : 'border-stone-300',
                       )}
                     >
                       {selected && <Check className="w-3 h-3" />}
                     </div>
                     <div className="flex-1 min-w-0">
                       <span className="text-xs font-medium text-slate-100">{agent.name}</span>
-                      <span className="text-[10px] text-slate-400 ml-1.5">{agent.role}</span>
+                      <span className="text-[10px] text-stone-500 ml-1.5">{agent.role}</span>
                     </div>
                     {agent.departmentName && (
-                      <span className="text-[10px] text-slate-500 shrink-0">{agent.departmentName}</span>
+                      <span className="text-[10px] text-stone-400 shrink-0">{agent.departmentName}</span>
                     )}
                   </button>
                 )
               })}
               {agents.length === 0 && (
-                <p className="text-xs text-slate-400 p-3 text-center">에이전트를 불러오는 중...</p>
+                <p className="text-xs text-stone-500 p-3 text-center">에이전트를 불러오는 중...</p>
               )}
             </div>
-            <p className="text-[10px] text-slate-400 mt-1.5">{selectedAgentIds.length}명 선택됨</p>
+            <p className="text-[10px] text-stone-500 mt-1.5">{selectedAgentIds.length}명 선택됨</p>
           </div>
 
           {/* Error */}
@@ -176,7 +176,7 @@ export function CreateDebateModal({ open, onClose, onCreated }: Props) {
             <button
               data-testid="debate-cancel-btn"
               onClick={onClose}
-              className="text-slate-400 hover:text-slate-300 hover:bg-slate-800 text-sm rounded-lg px-4 py-2 transition-colors"
+              className="text-stone-500 hover:text-stone-600 hover:bg-stone-100 text-sm rounded-lg px-4 py-2 transition-colors"
             >
               취소
             </button>
@@ -187,8 +187,8 @@ export function CreateDebateModal({ open, onClose, onCreated }: Props) {
               className={cn(
                 'text-sm rounded-lg px-4 py-2 font-medium transition-colors',
                 canSubmit
-                  ? 'bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 border border-cyan-400/30'
-                  : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700',
+                  ? 'bg-[#5a7247]/20 hover:bg-[#5a7247]/30 text-[#5a7247] border border-[#5a7247]/30'
+                  : 'bg-stone-100 text-stone-400 cursor-not-allowed border border-stone-200',
               )}
             >
               {createMutation.isPending ? '생성 중...' : '토론 시작'}

@@ -54,7 +54,7 @@ const STATUS_CONFIG: Record<string, { dot: string; bg: string; text: string; lab
   online: { dot: 'bg-emerald-400 animate-pulse', bg: 'bg-emerald-500/10', text: 'text-emerald-400', label: '활성' },
   working: { dot: 'bg-blue-400 animate-pulse', bg: 'bg-blue-500/10', text: 'text-blue-400', label: '작업중' },
   error: { dot: 'bg-red-400', bg: 'bg-red-500/10', text: 'text-red-400', label: '오류' },
-  offline: { dot: 'bg-slate-500', bg: 'bg-slate-500/10', text: 'text-slate-500', label: '오프라인' },
+  offline: { dot: 'bg-slate-500', bg: 'bg-slate-500/10', text: 'text-stone-400', label: '오프라인' },
 }
 
 export function HomePage() {
@@ -96,7 +96,7 @@ export function HomePage() {
           <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white">
             안녕하세요, {user?.name}님
           </h1>
-          <p className="text-sm text-slate-500 font-medium">{formatDate()}</p>
+          <p className="text-sm text-stone-400 font-medium">{formatDate()}</p>
         </div>
 
         {/* ── Overnight Jobs Card ── */}
@@ -106,7 +106,7 @@ export function HomePage() {
             className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-600/15 via-slate-800/80 to-slate-800/80 border border-violet-500/20 backdrop-blur-sm"
           >
             <div className="absolute top-0 right-0 w-40 h-40 bg-violet-500/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-            <div className="relative px-6 py-5 border-b border-slate-700/40 flex items-center justify-between">
+            <div className="relative px-6 py-5 border-b border-stone-200/40 flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-xl bg-violet-500/20 flex items-center justify-center">
                   <svg className="w-5 h-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -131,7 +131,7 @@ export function HomePage() {
                 <button
                   data-testid="mark-all-read-btn"
                   onClick={() => readAll.mutate()}
-                  className="text-xs text-slate-400 hover:text-white px-3 py-1.5 rounded-lg hover:bg-slate-700/60 transition-all border border-transparent hover:border-slate-600/50"
+                  className="text-xs text-stone-500 hover:text-white px-3 py-1.5 rounded-lg hover:bg-stone-200/60 transition-all border border-transparent hover:border-stone-300/50"
                 >
                   모두 읽음
                 </button>
@@ -146,7 +146,7 @@ export function HomePage() {
             </div>
             <div className="divide-y divide-slate-700/30">
               {notifications.jobs.slice(0, 5).map((job) => (
-                <div key={job.id} className="px-6 py-3.5 flex items-start gap-3 hover:bg-slate-800/30 transition-colors">
+                <div key={job.id} className="px-6 py-3.5 flex items-start gap-3 hover:bg-stone-100/30 transition-colors">
                   {job.status === 'completed' ? (
                     <span className="mt-0.5 w-6 h-6 rounded-lg bg-emerald-500/15 text-emerald-400 flex items-center justify-center text-xs flex-shrink-0">
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
@@ -159,13 +159,13 @@ export function HomePage() {
                   <div className="flex-1 min-w-0">
                     <span className="text-xs font-semibold text-slate-200">{job.agentName}</span>
                     <span className="text-xs text-slate-600 mx-2">—</span>
-                    <span className="text-xs text-slate-400 truncate">{job.instruction}</span>
+                    <span className="text-xs text-stone-500 truncate">{job.instruction}</span>
                   </div>
                 </div>
               ))}
               {notifications.total > 5 && (
                 <div className="px-6 py-3 text-center">
-                  <button onClick={() => navigate('/jobs')} className="text-xs text-slate-500 hover:text-violet-400 transition-colors font-medium">
+                  <button onClick={() => navigate('/jobs')} className="text-xs text-stone-400 hover:text-violet-400 transition-colors font-medium">
                     +{notifications.total - 5}건 더 보기
                   </button>
                 </div>
@@ -177,21 +177,21 @@ export function HomePage() {
         {/* ── My Team ── */}
         <div data-testid="my-team-section" className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xs font-semibold uppercase tracking-widest text-cyan-400/80">내 팀</h2>
+            <h2 className="text-xs font-semibold uppercase tracking-widest text-[#5a7247]/80">내 팀</h2>
             {allAgents.length > 0 && (
-              <span className="text-xs text-slate-500 font-mono">{allAgents.length}명</span>
+              <span className="text-xs text-stone-400 font-mono">{allAgents.length}명</span>
             )}
           </div>
           {agentsLoading ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="rounded-2xl bg-slate-800/40 border border-slate-700/50 p-5 h-32">
+                <div key={i} className="rounded-2xl bg-stone-100/40 border border-stone-200/50 p-5 h-32">
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="w-8 h-8 rounded-xl bg-slate-700/50 animate-pulse" />
-                    <div className="h-3 w-16 bg-slate-700/50 animate-pulse rounded" />
+                    <div className="w-8 h-8 rounded-xl bg-stone-200/50 animate-pulse" />
+                    <div className="h-3 w-16 bg-stone-200/50 animate-pulse rounded" />
                   </div>
-                  <div className="h-3 w-24 bg-slate-700/30 animate-pulse rounded mt-3" />
-                  <div className="h-5 w-12 bg-slate-700/20 animate-pulse rounded-full mt-3" />
+                  <div className="h-3 w-24 bg-stone-200/30 animate-pulse rounded mt-3" />
+                  <div className="h-5 w-12 bg-stone-200/20 animate-pulse rounded-full mt-3" />
                 </div>
               ))}
             </div>
@@ -208,18 +208,18 @@ export function HomePage() {
                       <div
                         key={a.id}
                         data-testid={`agent-card-${a.id}`}
-                        className="rounded-2xl bg-slate-800/20 border border-slate-700/30 p-5 opacity-50"
+                        className="rounded-2xl bg-stone-100/20 border border-stone-200/30 p-5 opacity-50"
                       >
                         <div className="flex items-center gap-2.5 mb-2">
-                          <div className="w-8 h-8 rounded-xl bg-slate-700/30 flex items-center justify-center">
+                          <div className="w-8 h-8 rounded-xl bg-stone-200/30 flex items-center justify-center">
                             <svg className="w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                             </svg>
                           </div>
-                          <span className="text-sm font-medium text-slate-500 truncate">{a.name}</span>
+                          <span className="text-sm font-medium text-stone-400 truncate">{a.name}</span>
                         </div>
                         <p className="text-xs text-slate-600 truncate">{a.role}</p>
-                        <span className="inline-flex items-center gap-1 mt-3 px-2 py-0.5 rounded-full text-xs bg-slate-700/30 text-slate-600">
+                        <span className="inline-flex items-center gap-1 mt-3 px-2 py-0.5 rounded-full text-xs bg-stone-200/30 text-slate-600">
                           <span className="w-1.5 h-1.5 rounded-full bg-slate-600" /> 오프라인
                         </span>
                       </div>
@@ -233,16 +233,16 @@ export function HomePage() {
                       className={`relative overflow-hidden rounded-2xl p-5 cursor-pointer group transition-all duration-300 ${
                         isError
                           ? 'bg-gradient-to-br from-red-600/10 via-slate-800/80 to-slate-800/80 border border-red-500/20 hover:border-red-500/40'
-                          : 'bg-gradient-to-br from-cyan-600/10 via-slate-800/80 to-slate-800/80 border border-cyan-500/15 hover:border-cyan-500/30'
+                          : 'bg-gradient-to-br from-cyan-600/10 via-slate-800/80 to-slate-800/80 border border-[#5a7247]/15 hover:border-[#5a7247]/30'
                       }`}
                     >
                       <div className={`absolute top-0 right-0 w-20 h-20 rounded-full -translate-y-1/2 translate-x-1/2 transition-colors ${
-                        isError ? 'bg-red-500/5 group-hover:bg-red-500/10' : 'bg-cyan-500/5 group-hover:bg-cyan-500/10'
+                        isError ? 'bg-red-500/5 group-hover:bg-red-500/10' : 'bg-[#5a7247]/5 group-hover:bg-[#5a7247]/10'
                       }`} />
                       <div className="relative">
                         <div className="flex items-center gap-2.5 mb-2">
-                          <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${isError ? 'bg-red-500/20' : 'bg-cyan-500/15'}`}>
-                            <svg className={`w-4 h-4 ${isError ? 'text-red-400' : 'text-cyan-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${isError ? 'bg-red-500/20' : 'bg-[#5a7247]/15'}`}>
+                            <svg className={`w-4 h-4 ${isError ? 'text-red-400' : 'text-[#5a7247]'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                             </svg>
                           </div>
@@ -251,7 +251,7 @@ export function HomePage() {
                             <span className="text-xs px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400 font-medium">COS</span>
                           )}
                         </div>
-                        <p className="text-xs text-slate-400 truncate">{a.role}</p>
+                        <p className="text-xs text-stone-500 truncate">{a.role}</p>
                         <div className="flex items-center justify-between mt-3">
                           <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${cfg.bg} ${cfg.text}`}>
                             <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} /> {cfg.label}
@@ -267,20 +267,20 @@ export function HomePage() {
               </div>
               {overflowCount > 0 && (
                 <div className="text-right">
-                  <button onClick={() => navigate('/chat')} className="text-xs text-slate-500 hover:text-cyan-400 transition-colors font-medium">
+                  <button onClick={() => navigate('/chat')} className="text-xs text-stone-400 hover:text-[#5a7247] transition-colors font-medium">
                     +{overflowCount}명 더 보기 →
                   </button>
                 </div>
               )}
             </>
           ) : (
-            <div className="rounded-2xl bg-slate-800/30 border border-slate-700/40 p-12 text-center backdrop-blur-sm">
-              <div className="w-14 h-14 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center mx-auto mb-4">
+            <div className="rounded-2xl bg-stone-100/30 border border-stone-200/40 p-12 text-center backdrop-blur-sm">
+              <div className="w-14 h-14 rounded-2xl bg-stone-100 border border-stone-200 flex items-center justify-center mx-auto mb-4">
                 <svg className="w-7 h-7 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
                 </svg>
               </div>
-              <p className="text-sm text-slate-400 font-medium">아직 배정된 에이전트가 없습니다</p>
+              <p className="text-sm text-stone-500 font-medium">아직 배정된 에이전트가 없습니다</p>
               <p className="text-xs text-slate-600 mt-1">관리자에게 문의하세요.</p>
             </div>
           )}
@@ -352,7 +352,7 @@ export function HomePage() {
                     {item.icon}
                   </div>
                   <h4 className="text-sm font-semibold text-white">{item.title}</h4>
-                  <p className="text-xs text-slate-500 mt-1">{item.description}</p>
+                  <p className="text-xs text-stone-400 mt-1">{item.description}</p>
                 </div>
               </div>
             ))}
@@ -396,16 +396,16 @@ function RecentNotifications() {
           모두 보기 →
         </button>
       </div>
-      <div className="rounded-2xl bg-slate-800/40 border border-slate-700/50 overflow-hidden backdrop-blur-sm">
+      <div className="rounded-2xl bg-stone-100/40 border border-stone-200/50 overflow-hidden backdrop-blur-sm">
         <div className="divide-y divide-slate-700/30">
           {items.map((n) => (
             <div
               key={n.id}
-              className={`px-5 py-3.5 flex items-center gap-3 hover:bg-slate-800/40 transition-colors ${!n.isRead ? 'bg-blue-500/5' : ''}`}
+              className={`px-5 py-3.5 flex items-center gap-3 hover:bg-stone-100/40 transition-colors ${!n.isRead ? 'bg-blue-500/5' : ''}`}
             >
               {!n.isRead && <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0 shadow-sm shadow-blue-500/50" />}
               <span className="text-sm flex-shrink-0">{NOTIF_ICON[n.type] || '\u{1F514}'}</span>
-              <span className={`text-sm truncate flex-1 ${n.isRead ? 'text-slate-400' : 'text-white font-medium'}`}>
+              <span className={`text-sm truncate flex-1 ${n.isRead ? 'text-stone-500' : 'text-white font-medium'}`}>
                 {n.title}
               </span>
               <span className="text-xs text-slate-600 font-mono flex-shrink-0">

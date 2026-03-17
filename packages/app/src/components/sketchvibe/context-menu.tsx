@@ -46,7 +46,7 @@ export function ContextMenu({ x, y, target, nodeId, nodeType, selectedCount, onA
     <div
       ref={ref}
       data-testid="nexus-context-menu"
-      className="fixed bg-slate-900 border border-slate-700 rounded-lg shadow-xl py-1 z-[100] min-w-[160px]"
+      className="fixed bg-white border border-stone-200 rounded-lg shadow-xl py-1 z-[100] min-w-[160px]"
       style={{ left: x, top: y }}
     >
       {target === 'node' && nodeId && (
@@ -62,7 +62,7 @@ export function ContextMenu({ x, y, target, nodeId, nodeType, selectedCount, onA
           />
           {(selectedCount ?? 0) >= 2 && (
             <>
-              <div className="border-t border-slate-800 my-1" />
+              <div className="border-t border-stone-200 my-1" />
               <MenuItem
                 label="그룹 만들기"
                 onClick={() => onAction({ type: 'group-selected' })}
@@ -75,7 +75,7 @@ export function ContextMenu({ x, y, target, nodeId, nodeType, selectedCount, onA
               onClick={() => onAction({ type: 'ungroup', nodeId })}
             />
           )}
-          <div className="border-t border-slate-800 my-1" />
+          <div className="border-t border-stone-200 my-1" />
           <MenuItem
             label="삭제"
             shortcut="Del"
@@ -87,7 +87,7 @@ export function ContextMenu({ x, y, target, nodeId, nodeType, selectedCount, onA
 
       {target === 'pane' && (
         <>
-          <div className="px-3 py-1 text-[10px] text-slate-500 font-medium">노드 추가</div>
+          <div className="px-3 py-1 text-[10px] text-stone-400 font-medium">노드 추가</div>
           {NODE_PALETTE.map((item) => (
             <MenuItem
               key={item.type}
@@ -121,12 +121,12 @@ function MenuItem({
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center justify-between px-3 py-1.5 text-xs hover:bg-slate-800 transition-colors ${
+      className={`w-full flex items-center justify-between px-3 py-1.5 text-xs hover:bg-stone-100 transition-colors ${
         danger ? 'text-red-400 hover:text-red-300' : 'text-slate-200'
       }`}
     >
       <span>{label}</span>
-      {shortcut && <span className="text-[10px] text-slate-500 ml-4">{shortcut}</span>}
+      {shortcut && <span className="text-[10px] text-stone-400 ml-4">{shortcut}</span>}
     </button>
   )
 }

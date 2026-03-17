@@ -170,7 +170,7 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
   const isEmpty = !text.trim()
 
   return (
-    <div className="relative shrink-0 border-t border-slate-700/50 bg-gradient-to-t from-slate-900 to-slate-900/95 backdrop-blur-sm p-4">
+    <div className="relative shrink-0 border-t border-stone-200/50 bg-gradient-to-t from-slate-900 to-slate-900/95 backdrop-blur-sm p-4">
       {/* Quick Agent Mention Chips — mobile only */}
       {managers.length > 0 && !targetAgentId && (
         <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-4 px-4 md:hidden no-scrollbar">
@@ -182,9 +182,9 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
                 setTargetAgentId(agent.id)
                 handleChange(text + `@${agent.name} `)
               }}
-              className="flex-shrink-0 px-3 py-1.5 bg-slate-800 text-slate-300 rounded-full text-xs font-medium border border-slate-700 hover:border-cyan-500 hover:text-cyan-400 transition-colors flex items-center gap-1"
+              className="flex-shrink-0 px-3 py-1.5 bg-stone-100 text-stone-600 rounded-full text-xs font-medium border border-stone-200 hover:border-[#5a7247] hover:text-[#5a7247] transition-colors flex items-center gap-1"
             >
-              <span className="text-cyan-400 font-bold">@</span>
+              <span className="text-[#5a7247] font-bold">@</span>
               {agent.name}
             </button>
           ))}
@@ -246,7 +246,7 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
             onClick={() => handleChange(text + '/')}
             title="슬래시 명령"
             aria-label="슬래시 명령"
-            className="p-2 rounded-xl text-slate-500 hover:text-blue-400 hover:bg-slate-800/80 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
+            className="p-2 rounded-xl text-stone-400 hover:text-blue-400 hover:bg-stone-100/80 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
           >
             <span className="text-sm font-mono font-bold">/</span>
           </button>
@@ -255,7 +255,7 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
             onClick={() => handleChange(text + '@')}
             title="에이전트 멘션"
             aria-label="에이전트 멘션"
-            className="p-2 rounded-xl text-slate-500 hover:text-cyan-400 hover:bg-slate-800/80 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
+            className="p-2 rounded-xl text-stone-400 hover:text-[#5a7247] hover:bg-stone-100/80 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
           >
             <span className="text-sm font-bold">@</span>
           </button>
@@ -265,7 +265,7 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
             onClick={onOpenPresets}
             title="템플릿"
             aria-label="템플릿"
-            className="p-2 rounded-xl text-slate-500 hover:text-amber-400 hover:bg-slate-800/80 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
+            className="p-2 rounded-xl text-stone-400 hover:text-amber-400 hover:bg-stone-100/80 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M3 2l5 3-5 3V2z" fill="currentColor" opacity="0.3" />
@@ -286,7 +286,7 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
             placeholder="명령을 입력하세요... (Enter 전송 · Shift+Enter 줄바꿈)"
             aria-label="명령 입력"
             rows={1}
-            className="w-full bg-slate-800/80 border border-slate-600/80 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 outline-none resize-none transition-all"
+            className="w-full bg-stone-100/80 border border-stone-300/80 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 outline-none resize-none transition-all"
             style={{ minHeight: '48px', maxHeight: '160px' }}
           />
         </div>

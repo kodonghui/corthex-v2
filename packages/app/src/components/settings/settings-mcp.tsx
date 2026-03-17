@@ -120,12 +120,12 @@ export function SettingsMcp() {
     <div className="space-y-6">
       <section>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400">MCP 서버 연결</h3>
+          <h3 className="text-sm font-medium text-zinc-500">MCP 서버 연결</h3>
           {isAdmin && (
             <button
               onClick={() => { setShowForm(!showForm); setTestResult(null) }}
               disabled={isMaxReached && !showForm}
-              className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-xs text-indigo-600 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {showForm ? '취소' : '+ 서버 추가'}
             </button>
@@ -137,7 +137,7 @@ export function SettingsMcp() {
         )}
 
         {isAdmin && showForm && (
-          <div className="mb-4 p-4 rounded-lg border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950 space-y-3">
+          <div className="mb-4 p-4 rounded-lg border border-indigo-200 bg-indigo-50 space-y-3">
             <div>
               <label className="block text-xs font-medium text-zinc-500 mb-1">서버 URL</label>
               <input
@@ -146,7 +146,7 @@ export function SettingsMcp() {
                 onChange={(e) => setFormUrl(e.target.value)}
                 onBlur={handleUrlBlur}
                 placeholder="http://localhost:3000/mcp 또는 https://host/sse"
-                className="w-full px-3 py-2 rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm"
+                className="w-full px-3 py-2 rounded-md border border-zinc-200 bg-white text-sm"
               />
             </div>
             <div>
@@ -156,7 +156,7 @@ export function SettingsMcp() {
                 value={formName}
                 onChange={(e) => { setFormName(e.target.value); setNameManuallySet(true) }}
                 placeholder="자동 제안됨 (URL 입력 후)"
-                className="w-full px-3 py-2 rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm"
+                className="w-full px-3 py-2 rounded-md border border-zinc-200 bg-white text-sm"
               />
             </div>
 
@@ -164,7 +164,7 @@ export function SettingsMcp() {
               <button
                 onClick={() => testConnection.mutate(formUrl)}
                 disabled={!formUrl || testConnection.isPending}
-                className="px-3 py-2 text-xs border border-zinc-300 dark:border-zinc-600 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-700 disabled:opacity-50"
+                className="px-3 py-2 text-xs border border-zinc-300 rounded-md hover:bg-zinc-100 disabled:opacity-50"
               >
                 {testConnection.isPending ? (
                   <span className="flex items-center gap-1">
@@ -259,9 +259,9 @@ function ServerCard({
   }[status]
 
   return (
-    <div className="rounded-md border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+    <div className="rounded-md border border-zinc-200 overflow-hidden">
       <div
-        className="flex items-center justify-between p-3 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+        className="flex items-center justify-between p-3 cursor-pointer hover:bg-zinc-50"
         onClick={onToggle}
       >
         <div className="flex-1 min-w-0">
@@ -272,7 +272,7 @@ function ServerCard({
           </div>
           <p className="text-xs text-zinc-400 truncate mt-0.5">{server.url}</p>
           {server.url.startsWith('http://') && (
-            <p className="text-[10px] text-yellow-600 dark:text-yellow-500 mt-0.5">HTTPS 사용을 권장합니다</p>
+            <p className="text-[10px] text-yellow-600 mt-0.5">HTTPS 사용을 권장합니다</p>
           )}
         </div>
         {isAdmin && (
@@ -287,12 +287,12 @@ function ServerCard({
       </div>
 
       {expanded && (
-        <div className="border-t border-zinc-200 dark:border-zinc-800 p-3 bg-zinc-50 dark:bg-zinc-900">
+        <div className="border-t border-zinc-200 p-3 bg-zinc-50">
           <p className="text-xs font-medium text-zinc-500 mb-2">도구 목록</p>
           {toolsLoading ? (
             <div className="space-y-2">
-              <div className="h-4 bg-zinc-200 dark:bg-zinc-700 rounded animate-pulse w-3/4" />
-              <div className="h-4 bg-zinc-200 dark:bg-zinc-700 rounded animate-pulse w-1/2" />
+              <div className="h-4 bg-zinc-200 rounded animate-pulse w-3/4" />
+              <div className="h-4 bg-zinc-200 rounded animate-pulse w-1/2" />
             </div>
           ) : tools.length === 0 ? (
             <p className="text-xs text-zinc-400">등록된 도구가 없습니다</p>

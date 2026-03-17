@@ -52,7 +52,7 @@ export function NodeDetailPanel({ selectedNode, onClose }: Props) {
   }
 
   return (
-    <div className="w-72 border-l border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 p-4 overflow-y-auto">
+    <div className="w-72 border-l border-zinc-200 bg-zinc-50 p-4 overflow-y-auto">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold">노드 상세</h3>
         <button onClick={onClose} className="text-xs text-zinc-400 hover:text-zinc-600">
@@ -86,7 +86,7 @@ export function NodeDetailPanel({ selectedNode, onClose }: Props) {
               <p className="text-xs text-amber-600 font-medium">비서실장 에이전트</p>
             )}
 
-            <hr className="border-zinc-200 dark:border-zinc-700" />
+            <hr className="border-zinc-200" />
 
             <div>
               <label className="block text-xs text-zinc-500 mb-1">부서 이동</label>
@@ -112,7 +112,7 @@ export function NodeDetailPanel({ selectedNode, onClose }: Props) {
         {nodeType === 'department' && typeof nodeData.description === 'string' && (
           <div>
             <span className="text-xs text-zinc-500">설명</span>
-            <p className="text-xs text-zinc-600 dark:text-zinc-400">
+            <p className="text-xs text-zinc-600">
               {nodeData.description}
             </p>
           </div>

@@ -66,22 +66,22 @@ export function StatusStepper({ status, createdAt, reviewedAt, scheduledAt, publ
                         ? 'border-emerald-500 bg-emerald-500 text-white'
                         : active
                           ? 'border-blue-500 bg-blue-500/20 text-blue-400'
-                          : 'border-slate-600 text-slate-500'
+                          : 'border-stone-300 text-stone-400'
                   }`}
                 >
                   {failedStep ? '!' : done ? '✓' : idx + 1}
                 </div>
                 <span className={`text-[10px] mt-1 whitespace-nowrap ${
-                  failedStep ? 'text-red-400 font-medium' : done || active ? 'text-slate-300' : 'text-slate-500'
+                  failedStep ? 'text-red-400 font-medium' : done || active ? 'text-stone-600' : 'text-stone-400'
                 }`}>
                   {step.label}
                 </span>
                 {timestamps[idx] && (
-                  <span className="text-[9px] text-slate-500 mt-0.5">{timestamps[idx]}</span>
+                  <span className="text-[9px] text-stone-400 mt-0.5">{timestamps[idx]}</span>
                 )}
               </div>
               {idx < STEPS.length - 1 && (
-                <div className={`flex-1 h-0.5 mx-1 ${idx < currentIdx ? 'bg-emerald-500' : 'bg-slate-700'}`} />
+                <div className={`flex-1 h-0.5 mx-1 ${idx < currentIdx ? 'bg-emerald-500' : 'bg-stone-200'}`} />
               )}
             </div>
           )

@@ -7,8 +7,8 @@ export interface TradeHistoryRowProps {
 
 export function TradeHistoryRow({ time, type, price, amount }: TradeHistoryRowProps) {
     return (
-        <tr className="border-b border-slate-700/50 hover:bg-slate-800 transition-colors">
-            <td className="py-2.5 px-4 text-slate-400">{time}</td>
+        <tr className="border-b border-stone-200/50 hover:bg-stone-100 transition-colors">
+            <td className="py-2.5 px-4 text-stone-500">{time}</td>
             <td className="py-2.5 px-4">
                 <span className={type === 'Buy' ? 'text-emerald-500' : 'text-red-500'}>{type}</span>
             </td>

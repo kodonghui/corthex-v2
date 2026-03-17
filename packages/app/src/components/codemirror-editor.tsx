@@ -122,7 +122,7 @@ export default function CodeMirrorEditor({
   return (
     <div
       ref={containerRef}
-      className={`border border-zinc-200 dark:border-zinc-700 rounded-md overflow-hidden ${className || ''}`}
+      className={`border border-zinc-200 rounded-md overflow-hidden ${className || ''}`}
     />
   )
 }

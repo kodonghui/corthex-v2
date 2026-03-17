@@ -182,7 +182,7 @@ export function NotesPanel() {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+        <h3 className="text-sm font-medium text-zinc-700">
           메모 ({notes.length})
         </h3>
         {!isEditing && !shareTarget && (
@@ -191,14 +191,14 @@ export function NotesPanel() {
       </div>
 
       {isEditing && (
-        <div className="fixed inset-0 z-50 bg-white dark:bg-zinc-900 flex flex-col p-4 sm:static sm:inset-auto sm:z-auto sm:bg-transparent sm:dark:bg-transparent sm:p-0">
-          <div className="border border-zinc-200 dark:border-zinc-700 rounded-lg p-3 space-y-2 flex-1 flex flex-col sm:flex-none">
+        <div className="fixed inset-0 z-50 bg-white flex flex-col p-4 sm:static sm:inset-auto sm:z-auto sm:bg-transparent sm:sm:p-0">
+          <div className="border border-zinc-200 rounded-lg p-3 space-y-2 flex-1 flex flex-col sm:flex-none">
             <input
               type="text"
               placeholder="제목 (선택)"
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
-              className="w-full text-sm bg-transparent border-b border-zinc-200 dark:border-zinc-700 pb-1 outline-none placeholder:text-zinc-400"
+              className="w-full text-sm bg-transparent border-b border-zinc-200 pb-1 outline-none placeholder:text-zinc-400"
             />
             <textarea
               value={editContent}
@@ -225,12 +225,12 @@ export function NotesPanel() {
 
       {/* 공유 관리 패널 */}
       {shareTarget && (
-        <div className="border border-zinc-200 dark:border-zinc-700 rounded-lg p-3 space-y-2">
+        <div className="border border-zinc-200 rounded-lg p-3 space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">공유 대상 관리</span>
+            <span className="text-sm font-medium text-zinc-700">공유 대상 관리</span>
             <button
               onClick={() => setShareTarget(null)}
-              className="text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+              className="text-xs text-zinc-400 hover:text-zinc-600"
             >
               닫기
             </button>
@@ -242,7 +242,7 @@ export function NotesPanel() {
             {companyUsers.filter((u) => u.id !== currentUserId).map((user) => (
               <label
                 key={user.id}
-                className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-800/50 cursor-pointer text-sm min-h-[32px]"
+                className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-zinc-50 cursor-pointer text-sm min-h-[32px]"
               >
                 <input
                   type="checkbox"
@@ -251,7 +251,7 @@ export function NotesPanel() {
                   disabled={shareMutation.isPending || unshareMutation.isPending}
                   className="rounded border-zinc-300"
                 />
-                <span className="text-zinc-700 dark:text-zinc-300">{user.name || user.email}</span>
+                <span className="text-zinc-700">{user.name || user.email}</span>
               </label>
             ))}
           </div>
@@ -265,12 +265,12 @@ export function NotesPanel() {
       {notes.map((note) => (
         <div
           key={note.id}
-          className="border border-zinc-200 dark:border-zinc-700 rounded-lg p-3 group"
+          className="border border-zinc-200 rounded-lg p-3 group"
         >
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
               {note.title && (
-                <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200 truncate">
+                <p className="text-sm font-medium text-zinc-800 truncate">
                   {note.title}
                 </p>
               )}
@@ -295,7 +295,7 @@ export function NotesPanel() {
               )}
             </div>
           </div>
-          <div className="mt-2 text-sm prose prose-sm dark:prose-invert max-w-none line-clamp-4">
+          <div className="mt-2 text-sm prose prose-sm max-w-none line-clamp-4">
             <MarkdownRenderer content={note.content} />
           </div>
         </div>

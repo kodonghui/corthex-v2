@@ -72,11 +72,11 @@ export function MentionPopup({ query, selectedIndex, agents, deptMap, onSelect, 
       ref={listRef}
       role="listbox"
       aria-label="에이전트 멘션"
-      className="w-64 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl overflow-hidden z-50 max-h-80 overflow-y-auto"
+      className="w-64 bg-stone-100 border border-stone-200 rounded-xl shadow-2xl overflow-hidden z-50 max-h-80 overflow-y-auto"
     >
       {/* Search */}
       <input
-        className="w-full px-3 py-2 text-sm bg-transparent text-white border-b border-slate-700 outline-none placeholder-slate-500"
+        className="w-full px-3 py-2 text-sm bg-transparent text-white border-b border-stone-200 outline-none placeholder-slate-500"
         placeholder="에이전트 검색..."
         value={query}
         readOnly
@@ -89,7 +89,7 @@ export function MentionPopup({ query, selectedIndex, agents, deptMap, onSelect, 
         return (
           <div key={deptName}>
             {/* Dept label */}
-            <p className="px-3 py-1 text-xs font-medium text-slate-500 bg-slate-800/50 sticky top-0">{deptName}</p>
+            <p className="px-3 py-1 text-xs font-medium text-stone-400 bg-stone-100/50 sticky top-0">{deptName}</p>
             {/* Agent rows */}
             {agentsInDept.map((agent, i) => {
               const idx = groupStartIdx + i
@@ -103,14 +103,14 @@ export function MentionPopup({ query, selectedIndex, agents, deptMap, onSelect, 
                   data-testid={`mention-agent-${agent.id}`}
                   role="option"
                   aria-selected={isSelected}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-slate-700 transition-colors ${
-                    isSelected ? 'bg-slate-700' : ''
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-stone-200 transition-colors ${
+                    isSelected ? 'bg-stone-200' : ''
                   }`}
                   onClick={() => onSelect(agent)}
                   onMouseDown={(e) => e.preventDefault()}
                 >
                   {/* Avatar */}
-                  <span className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-300 shrink-0">
+                  <span className="w-7 h-7 rounded-full bg-stone-200 flex items-center justify-center text-xs font-bold text-stone-600 shrink-0">
                     {agent.name.charAt(0).toUpperCase()}
                   </span>
                   {/* Name */}

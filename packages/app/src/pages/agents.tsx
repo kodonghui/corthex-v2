@@ -115,7 +115,7 @@ const statusConfig: Record<string, { dotBg: string; labelBg: string; labelText: 
   online: { dotBg: 'bg-green-500', labelBg: 'bg-green-50', labelText: 'text-green-700', label: 'Online' },
   working: { dotBg: 'bg-blue-500', labelBg: 'bg-blue-50', labelText: 'text-blue-700', label: 'Working' },
   error: { dotBg: 'bg-red-500', labelBg: 'bg-red-50', labelText: 'text-red-700', label: 'Error' },
-  offline: { dotBg: 'bg-slate-400', labelBg: 'bg-slate-50', labelText: 'text-slate-500', label: 'Offline' },
+  offline: { dotBg: 'bg-slate-400', labelBg: 'bg-slate-50', labelText: 'text-stone-400', label: 'Offline' },
 }
 
 const agentIconComponents = [
@@ -197,38 +197,38 @@ function AgentForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-xs font-medium text-slate-400 mb-1">
+        <label className="block text-xs font-medium text-stone-500 mb-1">
           에이전트 이름 <span className="text-red-500">*</span>
         </label>
         <Input value={name} onChange={(e) => { setName(e.target.value); setNameError('') }} placeholder="예: 마케팅분석관" maxLength={100} autoFocus />
         {nameError && <p className="text-xs text-red-500 mt-1">{nameError}</p>}
       </div>
       <div>
-        <label className="block text-xs font-medium text-slate-400 mb-1">영문 이름</label>
+        <label className="block text-xs font-medium text-stone-500 mb-1">영문 이름</label>
         <Input value={nameEn} onChange={(e) => setNameEn(e.target.value)} placeholder="예: Marketing Analyst" maxLength={100} />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1">소속 부서</label>
+          <label className="block text-xs font-medium text-stone-500 mb-1">소속 부서</label>
           <Select options={deptOptions} value={departmentId} onChange={(e) => setDepartmentId(e.target.value)} />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1">등급</label>
+          <label className="block text-xs font-medium text-stone-500 mb-1">등급</label>
           <Select options={tierOptions} value={tier} onChange={(e) => setTier(e.target.value as 'manager' | 'specialist' | 'worker')} />
         </div>
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1">모델명</label>
+          <label className="block text-xs font-medium text-stone-500 mb-1">모델명</label>
           <Input value={modelName} onChange={(e) => setModelName(e.target.value)} placeholder="claude-haiku-4-5" />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1">역할/전문분야</label>
+          <label className="block text-xs font-medium text-stone-500 mb-1">역할/전문분야</label>
           <Input value={role} onChange={(e) => setRole(e.target.value)} placeholder="예: 시장 분석" />
         </div>
       </div>
       <div>
-        <label className="block text-xs font-medium text-slate-400 mb-1">CLI 소유 인간직원</label>
+        <label className="block text-xs font-medium text-stone-500 mb-1">CLI 소유 인간직원</label>
         <Select options={userOptions} value={ownerUserId} onChange={(e) => setOwnerUserId(e.target.value)} />
       </div>
       <div className="flex items-center gap-3">
@@ -280,10 +280,10 @@ function SoulEditor({
     <div className="space-y-4">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1">Soul (마크다운)</label>
+          <label className="block text-xs font-medium text-stone-500 mb-1">Soul (마크다운)</label>
           <textarea value={soul} onChange={(e) => setSoul(e.target.value)} className="w-full h-64 p-3 rounded-lg border border-slate-300 bg-white text-sm font-mono resize-y focus:outline-none focus:ring-2" style={{ outlineColor: '#5a7247' }} placeholder="에이전트의 Soul을 작성하세요..." />
           <div className="mt-2">
-            <p className="text-[10px] font-medium text-slate-500 mb-1">사용 가능한 변수:</p>
+            <p className="text-[10px] font-medium text-stone-400 mb-1">사용 가능한 변수:</p>
             <div className="flex flex-wrap gap-1">
               {availableVars.map((v) => (
                 <span key={v} className="px-1.5 py-0.5 rounded text-[10px] font-mono cursor-pointer" style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: '#5a7247' }} onClick={() => setSoul((prev) => prev + v)} title="클릭하여 삽입">{v}</span>
@@ -293,7 +293,7 @@ function SoulEditor({
         </div>
         <div>
           <div className="flex items-center justify-between mb-1">
-            <label className="block text-xs font-medium text-slate-400">프리뷰</label>
+            <label className="block text-xs font-medium text-stone-500">프리뷰</label>
             <Button size="sm" variant="outline" onClick={handlePreview} disabled={isPreviewing}>{isPreviewing ? '로딩...' : '프리뷰 새로고침'}</Button>
           </div>
           <div className="w-full h-64 p-3 rounded-lg border border-slate-200 bg-slate-50 text-sm overflow-y-auto whitespace-pre-wrap">
@@ -301,9 +301,9 @@ function SoulEditor({
           </div>
           {preview?.variables && Object.keys(preview.variables).length > 0 && (
             <div className="mt-2 space-y-1">
-              <p className="text-[10px] font-medium text-slate-500">치환된 변수:</p>
+              <p className="text-[10px] font-medium text-stone-400">치환된 변수:</p>
               {Object.entries(preview.variables).map(([key, val]) => (
-                <div key={key} className="text-[10px] font-mono text-slate-500 truncate">
+                <div key={key} className="text-[10px] font-mono text-stone-400 truncate">
                   <span style={{ color: '#5a7247' }}>{`{{${key}}}`}</span>{' = '}<span>{val || '(빈 값)'}</span>
                 </div>
               ))}
@@ -385,7 +385,7 @@ function AgentDetailPanel({
                 {tierLabels[agent.tier] || agent.tier}
               </span>
             </div>
-            <p className="text-slate-500 text-base">{deptName} &middot; {agent.role || 'Agent'}</p>
+            <p className="text-stone-400 text-base">{deptName} &middot; {agent.role || 'Agent'}</p>
           </div>
         </div>
         <div className="flex gap-3 mt-4 md:mt-0">
@@ -408,7 +408,7 @@ function AgentDetailPanel({
               className={`pb-4 border-b-2 text-sm transition-colors ${
                 detailTab === tab.value
                   ? 'font-bold'
-                  : 'border-transparent text-slate-400 hover:text-slate-600 font-medium'
+                  : 'border-transparent text-stone-500 hover:text-slate-600 font-medium'
               }`}
               style={detailTab === tab.value ? { borderColor: '#5a7247', color: '#5a7247' } : {}}
             >
@@ -432,10 +432,10 @@ function AgentDetailPanel({
                     </div>
                     <div>
                       <p className="text-slate-800 font-medium text-sm">{act.title}</p>
-                      <p className="text-slate-400 text-xs mt-1">{act.detail}</p>
+                      <p className="text-stone-500 text-xs mt-1">{act.detail}</p>
                     </div>
                   </div>
-                  <span className="text-slate-400 text-xs">{act.time}</span>
+                  <span className="text-stone-500 text-xs">{act.time}</span>
                 </div>
               ))}
             </div>
@@ -445,12 +445,12 @@ function AgentDetailPanel({
             <div className="rounded-xl p-6 border border-slate-100 shadow-sm relative overflow-hidden" style={{ backgroundColor: '#f0f2ee' }}>
               <div className="flex flex-col gap-6 relative z-10">
                 <div>
-                  <p className="text-slate-500 text-sm mb-1">총 처리 작업</p>
+                  <p className="text-stone-400 text-sm mb-1">총 처리 작업</p>
                   <span className="text-3xl font-bold tracking-tight text-slate-800">--</span>
                 </div>
                 <div className="w-full h-px bg-slate-200" />
                 <div>
-                  <p className="text-slate-500 text-sm mb-1">작업 성공률</p>
+                  <p className="text-stone-400 text-sm mb-1">작업 성공률</p>
                   <span className="text-2xl font-bold tracking-tight text-slate-800">--%</span>
                   <div className="w-full bg-slate-200 h-1.5 rounded-full mt-3 overflow-hidden">
                     <div className="h-full rounded-full" style={{ width: '0%', backgroundColor: '#5a7247' }} />
@@ -458,7 +458,7 @@ function AgentDetailPanel({
                 </div>
                 <div className="w-full h-px bg-slate-200" />
                 <div>
-                  <p className="text-slate-500 text-sm mb-1">누적 API 비용</p>
+                  <p className="text-stone-400 text-sm mb-1">누적 API 비용</p>
                   <span className="text-2xl font-bold tracking-tight text-slate-800">$--</span>
                 </div>
               </div>
@@ -476,9 +476,9 @@ function AgentDetailPanel({
       {detailTab === 'history' && (
         <div className="mt-6">
           <div className="bg-slate-50 rounded-xl border border-slate-100 p-8 text-center">
-            <Clock className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-            <p className="text-slate-400 text-sm">작업 이력이 없습니다</p>
-            <p className="text-slate-400 text-xs mt-1">에이전트가 작업을 수행하면 여기에 기록됩니다</p>
+            <Clock className="w-10 h-10 text-stone-600 mx-auto mb-3" />
+            <p className="text-stone-500 text-sm">작업 이력이 없습니다</p>
+            <p className="text-stone-500 text-xs mt-1">에이전트가 작업을 수행하면 여기에 기록됩니다</p>
           </div>
         </div>
       )}
@@ -487,7 +487,7 @@ function AgentDetailPanel({
         <div className="mt-6 space-y-4">
           <div className="bg-slate-50 rounded-xl border border-slate-100 p-6">
             <h4 className="text-slate-800 font-bold text-sm mb-4 flex items-center gap-2">
-              <Settings className="w-4 h-4 text-slate-400" /> 에이전트 설정
+              <Settings className="w-4 h-4 text-stone-500" /> 에이전트 설정
             </h4>
             <div className="space-y-3">
               {[
@@ -498,7 +498,7 @@ function AgentDetailPanel({
                 { label: '허용된 도구', value: agent.allowedTools.length > 0 ? `${agent.allowedTools.length}개` : '없음' },
               ].map((item, i) => (
                 <div key={i} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-b-0">
-                  <span className="text-slate-500 text-sm">{item.label}</span>
+                  <span className="text-stone-400 text-sm">{item.label}</span>
                   <span className="text-slate-800 text-sm font-medium">{item.value}</span>
                 </div>
               ))}
@@ -659,13 +659,13 @@ export function AgentsPage() {
         <div className="px-8 py-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
             <div>
-              <nav className="flex text-xs text-slate-400 mb-2 gap-2">
+              <nav className="flex text-xs text-stone-500 mb-2 gap-2">
                 <span>Workspace</span>
                 <span>/</span>
                 <span className="font-medium" style={{ color: '#4a5d40' }}>Agents</span>
               </nav>
               <h2 className="text-4xl font-bold text-slate-800" style={{ fontFamily: "'Noto Serif KR', serif" }}>Agents Directory</h2>
-              <p className="text-slate-500 mt-1">Manage your specialized AI workforce and monitor real-time performance.</p>
+              <p className="text-stone-400 mt-1">Manage your specialized AI workforce and monitor real-time performance.</p>
             </div>
             <div className="flex gap-2">
               <div className="bg-white p-1 rounded-xl shadow-sm flex">
@@ -674,7 +674,7 @@ export function AgentsPage() {
                     key={f}
                     onClick={() => setFilterActive(f)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium ${
-                      filterActive === f ? 'text-white' : 'text-slate-500 hover:bg-slate-50'
+                      filterActive === f ? 'text-white' : 'text-stone-400 hover:bg-slate-50'
                     }`}
                     style={filterActive === f ? { backgroundColor: '#4a5d40' } : {}}
                   >
@@ -693,7 +693,7 @@ export function AgentsPage() {
               </div>
             </div>
             <div className="h-6 w-px bg-slate-300 mx-2"></div>
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Active Filters:</span>
+            <span className="text-xs font-semibold text-stone-500 uppercase tracking-wider">Active Filters:</span>
             <span className="px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1" style={{ backgroundColor: 'rgba(74,93,64,0.1)', color: '#4a5d40' }}>
               {filterActive === 'active' ? 'Active' : filterActive === 'inactive' ? 'Inactive' : 'All Status'}
             </span>
@@ -733,10 +733,10 @@ export function AgentsPage() {
                       </div>
                     </div>
                     <h3 className="text-xl font-bold text-slate-800" style={{ fontFamily: "'Noto Serif KR', serif" }}>{agent.name}</h3>
-                    <p className="text-slate-500 text-sm mb-4">{agent.role || 'Agent'}</p>
+                    <p className="text-stone-400 text-sm mb-4">{agent.role || 'Agent'}</p>
                     <div className="mt-auto space-y-3">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-slate-400">Department</span>
+                        <span className="text-stone-500">Department</span>
                         <span className="font-medium text-slate-700">{deptName}</span>
                       </div>
                       <div className="flex items-center justify-between">
@@ -757,11 +757,11 @@ export function AgentsPage() {
                 onClick={() => setCreateOpen(true)}
                 className="border-2 border-dashed border-slate-200 p-5 rounded-xl flex flex-col items-center justify-center text-center hover:border-opacity-50 transition-colors cursor-pointer group"
               >
-                <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 group-hover:text-white transition-all mb-3" style={{ ...(false ? { backgroundColor: '#4a5d40' } : {}) }}>
+                <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-stone-500 group-hover:text-white transition-all mb-3" style={{ ...(false ? { backgroundColor: '#4a5d40' } : {}) }}>
                   <Plus className="w-8 h-8" />
                 </div>
                 <h3 className="font-bold text-slate-700">Deploy New Agent</h3>
-                <p className="text-slate-400 text-xs mt-1">Scale your workspace capacity</p>
+                <p className="text-stone-500 text-xs mt-1">Scale your workspace capacity</p>
               </div>
             </div>
           )}
@@ -789,19 +789,19 @@ export function AgentsPage() {
           <div className="flex flex-wrap gap-8 justify-between items-center">
             <div className="flex gap-8">
               <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Agents</p>
+                <p className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Total Agents</p>
                 <p className="text-2xl font-bold text-slate-800">{agents.length}</p>
               </div>
               <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Tasks</p>
+                <p className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Active Tasks</p>
                 <p className="text-2xl font-bold text-slate-800">--</p>
               </div>
               <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Success Rate</p>
+                <p className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Success Rate</p>
                 <p className="text-2xl font-bold text-green-600">--%</p>
               </div>
             </div>
-            <div className="text-slate-400 text-xs italic">
+            <div className="text-stone-500 text-xs italic">
               All systems operational. Last sync: just now.
             </div>
           </div>
@@ -828,7 +828,7 @@ export function AgentsPage() {
             )}
             {!deleteAgent.isSecretary && !deleteAgent.isSystem && (
               <>
-                <p className="text-sm text-slate-500">이 에이전트를 비활성화하시겠습니까? 에이전트가 부서에서 해제되고 비활성화됩니다.</p>
+                <p className="text-sm text-stone-400">이 에이전트를 비활성화하시겠습니까? 에이전트가 부서에서 해제되고 비활성화됩니다.</p>
                 <div className="flex gap-2 justify-end pt-2">
                   <Button variant="outline" size="sm" onClick={() => setDeleteAgent(null)} disabled={deleteMutation.isPending}>취소</Button>
                   <Button variant="destructive" size="sm" onClick={() => deleteMutation.mutate(deleteAgent.id)} disabled={deleteMutation.isPending}>

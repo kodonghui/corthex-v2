@@ -91,13 +91,13 @@ export function NotificationSettings() {
       )}
 
       {/* 전체 설정 */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl">
-        <div className="px-4 py-3 border-b border-slate-700">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">전체 설정</p>
+      <div className="bg-stone-100/50 border border-stone-200 rounded-xl">
+        <div className="px-4 py-3 border-b border-stone-200">
+          <p className="text-xs font-semibold text-stone-500 uppercase tracking-wider">전체 설정</p>
         </div>
         <div className="divide-y divide-slate-700">
           <div className="flex items-center justify-between px-4 py-3">
-            <span className="text-sm text-slate-300">앱 알림</span>
+            <span className="text-sm text-stone-600">앱 알림</span>
             <Toggle
               checked={prefs?.inApp ?? true}
               onChange={(v) => toggleGlobal('inApp', v)}
@@ -105,7 +105,7 @@ export function NotificationSettings() {
             />
           </div>
           <div className="flex items-center justify-between px-4 py-3">
-            <span className="text-sm text-slate-300">이메일 알림</span>
+            <span className="text-sm text-stone-600">이메일 알림</span>
             <Toggle
               checked={prefs?.email ?? false}
               onChange={(v) => toggleGlobal('email', v)}
@@ -118,13 +118,13 @@ export function NotificationSettings() {
 
       {/* 이벤트별 설정 */}
       {EVENT_CATEGORIES.map((cat) => (
-        <div key={cat.label} className="bg-slate-800/50 border border-slate-700 rounded-xl">
-          <div className="px-4 py-3 border-b border-slate-700">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{cat.label}</p>
+        <div key={cat.label} className="bg-stone-100/50 border border-stone-200 rounded-xl">
+          <div className="px-4 py-3 border-b border-stone-200">
+            <p className="text-xs font-semibold text-stone-500 uppercase tracking-wider">{cat.label}</p>
           </div>
           <div className="divide-y divide-slate-700">
             {/* 헤더 */}
-            <div className="flex items-center px-4 py-2 text-[11px] text-slate-500">
+            <div className="flex items-center px-4 py-2 text-[11px] text-stone-400">
               <span className="flex-1" />
               <span className="w-14 text-center">앱</span>
               <span className="w-14 text-center">이메일</span>
@@ -135,7 +135,7 @@ export function NotificationSettings() {
                 <div key={ev.key} className="flex items-center px-4 py-2.5">
                   <div className="flex items-center gap-2 flex-1 min-w-0">
                     <span className="text-sm">{ev.icon}</span>
-                    <span className="text-sm text-slate-300">{ev.label}</span>
+                    <span className="text-sm text-stone-600">{ev.label}</span>
                   </div>
                   <div className="w-14 flex justify-center">
                     <Toggle
@@ -161,7 +161,7 @@ export function NotificationSettings() {
       ))}
 
       {/* 30일 보관 안내 */}
-      <p className="text-xs text-slate-500 text-center py-2">
+      <p className="text-xs text-stone-400 text-center py-2">
         알림은 30일간 보관됩니다
       </p>
     </div>

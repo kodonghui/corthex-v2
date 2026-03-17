@@ -149,9 +149,9 @@ export function DebateTimeline({ debate, timeline }: Props) {
 
   if (allEntries.length === 0 && debate.status === 'pending') {
     return (
-      <div className="flex-1 flex items-center justify-center text-slate-500">
+      <div className="flex-1 flex items-center justify-center text-stone-400">
         <div className="text-center space-y-2">
-          <div className="w-5 h-5 border-2 border-slate-600 border-t-cyan-400 rounded-full animate-spin mx-auto" />
+          <div className="w-5 h-5 border-2 border-stone-300 border-t-[#5a7247] rounded-full animate-spin mx-auto" />
           <p className="text-xs">토론 시작 대기 중...</p>
         </div>
       </div>
@@ -165,7 +165,7 @@ export function DebateTimeline({ debate, timeline }: Props) {
           case 'round-header':
             return (
               <div key={`rh-${i}`} data-testid={`round-header-${entry.roundNum}`} className="flex justify-center my-2">
-                <span className="px-3 py-1 bg-cyan-400/10 text-cyan-400 text-xs rounded-full font-mono">
+                <span className="px-3 py-1 bg-[#5a7247]/10 text-[#5a7247] text-xs rounded-full font-mono">
                   Round {entry.roundNum} / {entry.totalRounds}
                 </span>
               </div>
@@ -185,7 +185,7 @@ export function DebateTimeline({ debate, timeline }: Props) {
           case 'round-end':
             return (
               <div key={`re-${i}`} className="flex justify-center py-1">
-                <span className="text-[10px] text-slate-500 font-mono">
+                <span className="text-[10px] text-stone-400 font-mono">
                   Round {entry.roundNum} 완료 — {entry.speechCount}명 발언
                 </span>
               </div>
@@ -205,8 +205,8 @@ export function DebateTimeline({ debate, timeline }: Props) {
 
       {isLive && allEntries.length === 0 && (
         <div className="flex items-center justify-center h-full">
-          <div className="text-center space-y-2 text-slate-400">
-            <div className="w-5 h-5 border-2 border-slate-600 border-t-cyan-400 rounded-full animate-spin mx-auto" />
+          <div className="text-center space-y-2 text-stone-500">
+            <div className="w-5 h-5 border-2 border-stone-300 border-t-[#5a7247] rounded-full animate-spin mx-auto" />
             <p className="text-xs">토론 진행 중...</p>
           </div>
         </div>

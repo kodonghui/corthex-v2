@@ -212,14 +212,14 @@ export function CronBasePage() {
       {schedulesLoading ? (
         <div className="space-y-3">
           {[1, 2, 3].map(i => (
-            <div key={i} className="bg-slate-800/30 border border-slate-700/50 rounded-xl animate-pulse h-28" />
+            <div key={i} className="bg-stone-100/30 border border-stone-200/50 rounded-xl animate-pulse h-28" />
           ))}
         </div>
       ) : schedules.length === 0 ? (
-        <div data-testid="cron-empty-state" className="bg-slate-800/30 border border-dashed border-slate-700 rounded-xl p-12 text-center">
+        <div data-testid="cron-empty-state" className="bg-stone-100/30 border border-dashed border-stone-200 rounded-xl p-12 text-center">
           <p className="text-4xl mb-3">⏰</p>
-          <p className="text-sm font-medium text-slate-300">설정된 크론 작업이 없습니다</p>
-          <p className="text-xs text-slate-500 mt-1">정기적으로 에이전트가 수행할 작업을 추가해보세요</p>
+          <p className="text-sm font-medium text-stone-600">설정된 크론 작업이 없습니다</p>
+          <p className="text-xs text-stone-400 mt-1">정기적으로 에이전트가 수행할 작업을 추가해보세요</p>
           <button onClick={openCreate} className="bg-blue-600 hover:bg-blue-500 text-white text-sm rounded-lg px-4 py-2 mt-4 transition-colors">크론 추가</button>
         </div>
       ) : (
@@ -260,11 +260,11 @@ export function CronBasePage() {
       {deleteTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/60" onClick={() => setDeleteTarget(null)} />
-          <div className="relative bg-slate-800 border border-slate-700 rounded-xl p-5 max-w-sm mx-4 shadow-2xl">
+          <div className="relative bg-stone-100 border border-stone-200 rounded-xl p-5 max-w-sm mx-4 shadow-2xl">
             <h3 className="text-sm font-semibold text-slate-50">크론 삭제</h3>
-            <p className="text-xs text-slate-400 mt-2">이 스케줄과 실행 기록이 모두 삭제됩니다. 계속하시겠습니까?</p>
+            <p className="text-xs text-stone-500 mt-2">이 스케줄과 실행 기록이 모두 삭제됩니다. 계속하시겠습니까?</p>
             <div className="flex justify-end gap-2 mt-4">
-              <button onClick={() => setDeleteTarget(null)} className="text-xs text-slate-400 hover:text-slate-200 px-3 py-1.5 rounded-lg">취소</button>
+              <button onClick={() => setDeleteTarget(null)} className="text-xs text-stone-500 hover:text-slate-200 px-3 py-1.5 rounded-lg">취소</button>
               <button onClick={() => deleteTarget && deleteScheduleMutation.mutate(deleteTarget)} className="bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1.5 rounded-lg">삭제</button>
             </div>
           </div>
@@ -296,7 +296,7 @@ function ScheduleCard({
   const cronDesc = s.description || describeCron(s.cronExpression)
 
   return (
-    <div data-testid={`schedule-card-${s.id}`} className={`bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden transition-all ${!s.isActive ? 'opacity-50' : ''}`}>
+    <div data-testid={`schedule-card-${s.id}`} className={`bg-stone-100/50 border border-stone-200 rounded-xl overflow-hidden transition-all ${!s.isActive ? 'opacity-50' : ''}`}>
       <div className="px-4 py-4">
         {/* Row 1: Name + Agent */}
         <div className="flex items-center justify-between">
@@ -305,31 +305,31 @@ function ScheduleCard({
             <span className="text-sm font-semibold text-slate-50 truncate max-w-[250px]">{s.name || s.instruction.slice(0, 40)}</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-400">Agent: {s.agentName}</span>
+            <span className="text-xs text-stone-500">Agent: {s.agentName}</span>
           </div>
         </div>
 
         {/* Row 2: Instruction */}
-        <p className="text-xs text-slate-400 line-clamp-2 mt-2">{s.instruction}</p>
+        <p className="text-xs text-stone-500 line-clamp-2 mt-2">{s.instruction}</p>
 
         {/* Row 3: Schedule info + Actions */}
         <div className="flex items-center justify-between mt-3">
           <div className="flex items-center gap-3">
-            <span className="text-xs font-medium text-cyan-400">{cronDesc}</span>
-            <span className="text-[10px] text-slate-500">
+            <span className="text-xs font-medium text-[#5a7247]">{cronDesc}</span>
+            <span className="text-[10px] text-stone-400">
               다음: {s.nextRunAt && s.isActive ? formatRelativeTime(s.nextRunAt) : '—'}
             </span>
-            <span className="text-[10px] text-slate-500">
+            <span className="text-[10px] text-stone-400">
               마지막: {s.lastRunAt ? formatShortDate(s.lastRunAt) : '—'}
             </span>
           </div>
           <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
-            <button onClick={onEdit} className="text-xs text-slate-400 hover:text-slate-200 px-2 py-1 rounded hover:bg-slate-700/50 transition-colors">편집</button>
+            <button onClick={onEdit} className="text-xs text-stone-500 hover:text-slate-200 px-2 py-1 rounded hover:bg-stone-200/50 transition-colors">편집</button>
             <button onClick={onToggle} className={`text-xs px-2 py-1 rounded transition-colors ${s.isActive ? 'text-amber-400 hover:bg-amber-500/10' : 'text-emerald-400 hover:bg-emerald-500/10'}`}>
               {s.isActive ? '중지' : '시작'}
             </button>
             <button onClick={onDelete} className="text-xs text-red-400 hover:bg-red-500/10 px-2 py-1 rounded transition-colors">삭제</button>
-            <button onClick={onToggleExpand} className="text-xs text-slate-500 hover:text-slate-300 px-2 py-1">{isExpanded ? '▲' : '▼'}</button>
+            <button onClick={onToggleExpand} className="text-xs text-stone-400 hover:text-stone-600 px-2 py-1">{isExpanded ? '▲' : '▼'}</button>
           </div>
         </div>
       </div>
@@ -356,40 +356,40 @@ function RunHistory({ scheduleId, jobProgress }: { scheduleId: string; jobProgre
   const pagination = runsData?.pagination
 
   return (
-    <div className="border-t border-slate-700 bg-slate-900/30">
+    <div className="border-t border-stone-200 bg-white/30">
       {isLoading ? (
-        <div className="py-6 text-center text-xs text-slate-500">로딩 중...</div>
+        <div className="py-6 text-center text-xs text-stone-400">로딩 중...</div>
       ) : runs.length === 0 ? (
-        <div className="py-6 text-center text-xs text-slate-500">실행 기록이 없습니다</div>
+        <div className="py-6 text-center text-xs text-stone-400">실행 기록이 없습니다</div>
       ) : (
         <>
           {runs.map(run => {
-            const cfg = RUN_STATUS_CONFIG[run.status] || { label: run.status, classes: 'bg-slate-500/15 text-slate-400' }
+            const cfg = RUN_STATUS_CONFIG[run.status] || { label: run.status, classes: 'bg-slate-500/15 text-stone-500' }
             const progress = jobProgress[run.id]
             return (
-              <div key={run.id} className="px-4 py-2.5 border-b border-slate-700/30 flex items-center justify-between">
+              <div key={run.id} className="px-4 py-2.5 border-b border-stone-200/30 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${cfg.classes}`}>{cfg.label}</span>
-                  <span className="text-[10px] text-slate-400 font-mono">{run.startedAt ? formatShortDate(run.startedAt) : '—'}</span>
+                  <span className="text-[10px] text-stone-500 font-mono">{run.startedAt ? formatShortDate(run.startedAt) : '—'}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   {run.durationMs !== null && run.status !== 'running' && (
-                    <span className="text-[10px] text-slate-500 font-mono">{(run.durationMs / 1000).toFixed(1)}초</span>
+                    <span className="text-[10px] text-stone-400 font-mono">{(run.durationMs / 1000).toFixed(1)}초</span>
                   )}
                   {run.tokensUsed !== null && (
-                    <span className="text-[10px] text-slate-500 font-mono">{run.tokensUsed.toLocaleString()}토큰</span>
+                    <span className="text-[10px] text-stone-400 font-mono">{run.tokensUsed.toLocaleString()}토큰</span>
                   )}
                   {run.costMicro !== null && run.costMicro > 0 && (
-                    <span className="text-[10px] text-slate-500 font-mono">${(run.costMicro / 1_000_000).toFixed(3)}</span>
+                    <span className="text-[10px] text-stone-400 font-mono">${(run.costMicro / 1_000_000).toFixed(3)}</span>
                   )}
                 </div>
                 {run.status === 'running' && progress && (
-                  <div className="w-full h-1 bg-slate-700 rounded-full mt-2">
+                  <div className="w-full h-1 bg-stone-200 rounded-full mt-2">
                     <div className="h-full bg-blue-500 rounded-full animate-pulse" style={{ width: `${Math.max(progress.progress, 33)}%` }} />
                   </div>
                 )}
                 {run.status === 'running' && !progress && (
-                  <div className="w-full h-1 bg-slate-700 rounded-full mt-2">
+                  <div className="w-full h-1 bg-stone-200 rounded-full mt-2">
                     <div className="h-full bg-blue-500 rounded-full animate-pulse w-1/3" />
                   </div>
                 )}
@@ -397,7 +397,7 @@ function RunHistory({ scheduleId, jobProgress }: { scheduleId: string; jobProgre
                   <span className="text-[10px] text-red-400 truncate max-w-full mt-1">{run.error.slice(0, 60)}</span>
                 )}
                 {run.status === 'success' && run.result && (
-                  <span className="text-[10px] text-slate-500 truncate max-w-full mt-1">{run.result.slice(0, 60)}</span>
+                  <span className="text-[10px] text-stone-400 truncate max-w-full mt-1">{run.result.slice(0, 60)}</span>
                 )}
               </div>
             )
@@ -409,15 +409,15 @@ function RunHistory({ scheduleId, jobProgress }: { scheduleId: string; jobProgre
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="text-[10px] text-slate-400 hover:text-slate-200 disabled:opacity-30 px-2 py-1"
+                className="text-[10px] text-stone-500 hover:text-slate-200 disabled:opacity-30 px-2 py-1"
               >
                 ← 이전
               </button>
-              <span className="text-[10px] text-slate-500">{pagination.page} / {pagination.totalPages}</span>
+              <span className="text-[10px] text-stone-400">{pagination.page} / {pagination.totalPages}</span>
               <button
                 onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
                 disabled={page >= pagination.totalPages}
-                className="text-[10px] text-slate-400 hover:text-slate-200 disabled:opacity-30 px-2 py-1"
+                className="text-[10px] text-stone-500 hover:text-slate-200 disabled:opacity-30 px-2 py-1"
               >
                 다음 →
               </button>
@@ -506,32 +506,32 @@ function ScheduleModal({
     mode === 'legacy' ? (frequency !== 'custom' || days.length > 0) : !!cronExpression
   )
 
-  const inputClasses = 'w-full bg-slate-900/50 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 text-sm text-slate-50 rounded-lg px-3 py-2 outline-none transition-colors placeholder:text-slate-600'
+  const inputClasses = 'w-full bg-white/50 border border-stone-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 text-sm text-slate-50 rounded-lg px-3 py-2 outline-none transition-colors placeholder:text-slate-600'
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" data-testid="cron-modal">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       <div
-        className="relative bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-lg mx-4 max-h-[85vh] overflow-y-auto shadow-2xl"
+        className="relative bg-stone-100 border border-stone-200 rounded-2xl w-full max-w-lg mx-4 max-h-[85vh] overflow-y-auto shadow-2xl"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-700">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-stone-200">
           <h3 className="text-lg font-semibold text-slate-50">{editing ? '크론 수정' : '크론 추가'}</h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-200 transition-colors">✕</button>
+          <button onClick={onClose} className="text-stone-500 hover:text-slate-200 transition-colors">✕</button>
         </div>
 
         {/* Body */}
         <div className="px-5 py-4 space-y-4">
           {/* Name */}
           <div>
-            <label className="text-xs font-medium text-slate-300 mb-1.5 block">스케줄 이름</label>
+            <label className="text-xs font-medium text-stone-600 mb-1.5 block">스케줄 이름</label>
             <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder='예: 일일 시장 브리핑' className={inputClasses} />
           </div>
 
           {/* Agent */}
           <div>
-            <label className="text-xs font-medium text-slate-300 mb-1.5 block">에이전트</label>
+            <label className="text-xs font-medium text-stone-600 mb-1.5 block">에이전트</label>
             <select value={agent} onChange={e => setAgent(e.target.value)} className={inputClasses}>
               <option value="">에이전트 선택...</option>
               {agents.map(a => (
@@ -542,7 +542,7 @@ function ScheduleModal({
 
           {/* Instruction */}
           <div>
-            <label className="text-xs font-medium text-slate-300 mb-1.5 block">작업 지시</label>
+            <label className="text-xs font-medium text-stone-600 mb-1.5 block">작업 지시</label>
             <textarea
               value={instruction}
               onChange={e => setInstruction(e.target.value)}
@@ -554,17 +554,17 @@ function ScheduleModal({
 
           {/* Frequency */}
           <div>
-            <label className="text-xs font-medium text-slate-300 mb-1.5 block">실행 주기</label>
+            <label className="text-xs font-medium text-stone-600 mb-1.5 block">실행 주기</label>
 
             {/* Tabs */}
-            <div className="flex bg-slate-900/50 rounded-lg p-0.5 mb-3">
+            <div className="flex bg-white/50 rounded-lg p-0.5 mb-3">
               {([['preset', '프리셋'], ['custom', '커스텀'], ['legacy', '시간 지정']] as const).map(([val, label]) => (
                 <button
                   key={val}
                   type="button"
                   onClick={() => setMode(val)}
                   className={`text-xs px-3 py-1.5 rounded-md transition-colors flex-1 text-center ${
-                    mode === val ? 'bg-slate-700 text-slate-50' : 'text-slate-400 hover:text-slate-300'
+                    mode === val ? 'bg-stone-200 text-slate-50' : 'text-stone-500 hover:text-stone-600'
                   }`}
                 >
                   {label}
@@ -583,7 +583,7 @@ function ScheduleModal({
                     className={`text-xs px-3 py-2.5 rounded-lg border text-center transition-all ${
                       selectedPreset === preset.value
                         ? 'bg-blue-500/15 border-blue-500/40 text-blue-400'
-                        : 'bg-slate-800/50 border-slate-700 text-slate-400 hover:border-slate-600'
+                        : 'bg-stone-100/50 border-stone-200 text-stone-500 hover:border-stone-300'
                     }`}
                   >
                     <span className="text-lg block mb-1">{preset.icon}</span>
@@ -619,14 +619,14 @@ function ScheduleModal({
             {mode === 'legacy' && (
               <div className="space-y-3">
                 <div>
-                  <label className="text-xs font-medium text-slate-300 mb-1.5 block">실행 시간</label>
+                  <label className="text-xs font-medium text-stone-600 mb-1.5 block">실행 시간</label>
                   <input type="time" value={time} onChange={e => setTime(e.target.value)} className={inputClasses} />
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-slate-300 mb-1.5 block">주기</label>
+                  <label className="text-xs font-medium text-stone-600 mb-1.5 block">주기</label>
                   <div className="flex gap-3">
                     {([['daily', '매일'], ['weekdays', '평일'], ['custom', '특정 요일']] as const).map(([val, label]) => (
-                      <label key={val} className="flex items-center gap-1.5 text-xs text-slate-300 cursor-pointer">
+                      <label key={val} className="flex items-center gap-1.5 text-xs text-stone-600 cursor-pointer">
                         <input type="radio" name="frequency" checked={frequency === val} onChange={() => setFrequency(val)} className="accent-blue-500" />
                         {label}
                       </label>
@@ -642,7 +642,7 @@ function ScheduleModal({
                           type="button"
                           onClick={() => setDays(prev => prev.includes(i) ? prev.filter(d => d !== i) : [...prev, i])}
                           className={`w-8 h-8 text-xs rounded-lg border transition-all ${
-                            days.includes(i) ? 'bg-blue-500/20 border-blue-500/40 text-blue-400' : 'border-slate-700 text-slate-500'
+                            days.includes(i) ? 'bg-blue-500/20 border-blue-500/40 text-blue-400' : 'border-stone-200 text-stone-400'
                           }`}
                         >
                           {dayName}
@@ -665,8 +665,8 @@ function ScheduleModal({
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-2 px-5 py-4 border-t border-slate-700">
-          <button onClick={onClose} className="text-sm text-slate-400 hover:text-slate-200 px-4 py-2 rounded-lg hover:bg-slate-700/50 transition-colors">취소</button>
+        <div className="flex justify-end gap-2 px-5 py-4 border-t border-stone-200">
+          <button onClick={onClose} className="text-sm text-stone-500 hover:text-slate-200 px-4 py-2 rounded-lg hover:bg-stone-200/50 transition-colors">취소</button>
           <button
             onClick={handleSubmit}
             disabled={!isValid || isPending}

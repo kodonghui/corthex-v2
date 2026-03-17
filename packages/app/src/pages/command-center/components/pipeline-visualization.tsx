@@ -89,7 +89,7 @@ export const PipelineVisualization = memo(function PipelineVisualization({ activ
       <div
         data-testid="pipeline-bar"
         aria-live="polite"
-        className="flex items-center gap-3 px-6 py-3 border-b border-slate-800/80 shrink-0"
+        className="flex items-center gap-3 px-6 py-3 border-b border-stone-200/80 shrink-0"
       >
         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600/10 to-slate-800/60 flex items-center justify-center">
           <span className="w-2 h-2 rounded-full bg-blue-500/40" />
@@ -103,7 +103,7 @@ export const PipelineVisualization = memo(function PipelineVisualization({ activ
     <div
       data-testid="pipeline-bar"
       aria-live="polite"
-      className="flex items-center gap-3 px-4 md:px-6 py-3 border-b border-slate-800/80 shrink-0 overflow-x-auto"
+      className="flex items-center gap-3 px-4 md:px-6 py-3 border-b border-stone-200/80 shrink-0 overflow-x-auto"
     >
       {stages.map((stage, idx) => {
         const isDone = stage.status === 'done'
@@ -116,7 +116,7 @@ export const PipelineVisualization = memo(function PipelineVisualization({ activ
             ? 'bg-gradient-to-br from-blue-600/20 via-slate-800 to-slate-800 border-blue-500/30 shadow-lg shadow-blue-500/5'
             : isFailed
               ? 'bg-gradient-to-br from-red-600/20 via-slate-800 to-slate-800 border-red-500/30'
-              : 'bg-slate-800/40 border-slate-700/50'
+              : 'bg-stone-100/40 border-stone-200/50'
 
         const iconBgClass = isDone
           ? 'bg-emerald-500/20'
@@ -124,7 +124,7 @@ export const PipelineVisualization = memo(function PipelineVisualization({ activ
             ? 'bg-blue-500/20'
             : isFailed
               ? 'bg-red-500/20'
-              : 'bg-slate-700/50'
+              : 'bg-stone-200/50'
 
         const iconColor = isDone
           ? 'text-emerald-400'
@@ -146,7 +146,7 @@ export const PipelineVisualization = memo(function PipelineVisualization({ activ
           ? 'bg-emerald-500/40'
           : isFailed
             ? 'bg-red-500/40'
-            : 'bg-slate-700/50'
+            : 'bg-stone-200/50'
 
         return (
           <div key={stage.id} className="flex items-center gap-3 shrink-0">
@@ -176,7 +176,7 @@ export const PipelineVisualization = memo(function PipelineVisualization({ activ
                   <span className="text-[11px] md:text-xs font-semibold text-white">{stage.role}</span>
                   <span className={`w-1.5 h-1.5 rounded-full ${dotClass}`} />
                 </div>
-                <p className="text-[10px] md:text-xs text-slate-500 mt-0.5 hidden sm:block">{stage.description}</p>
+                <p className="text-[10px] md:text-xs text-stone-400 mt-0.5 hidden sm:block">{stage.description}</p>
               </div>
             </div>
 

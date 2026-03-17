@@ -74,8 +74,8 @@ function SortableStockItem({
   }
 
   const changeColor = priceData
-    ? priceData.changeRate > 0 ? 'text-emerald-500' : priceData.changeRate < 0 ? 'text-red-500' : 'text-slate-400'
-    : 'text-slate-400'
+    ? priceData.changeRate > 0 ? 'text-emerald-500' : priceData.changeRate < 0 ? 'text-red-500' : 'text-stone-500'
+    : 'text-stone-500'
 
   return (
     <div
@@ -87,10 +87,10 @@ function SortableStockItem({
       onKeyDown={(e) => e.key === 'Enter' && onSelect()}
       className={`w-full flex flex-col gap-1 px-4 py-3 text-left text-sm transition-colors cursor-pointer border-l-2 ${
         isCompareActive && isCompareChecked
-          ? 'bg-slate-800 border-cyan-400'
+          ? 'bg-stone-100 border-[#5a7247]'
           : isSelected
-            ? 'bg-slate-800 border-cyan-400'
-            : 'border-transparent hover:bg-slate-800'
+            ? 'bg-stone-100 border-[#5a7247]'
+            : 'border-transparent hover:bg-stone-100'
       }`}
     >
       <div className="flex justify-between items-center">
@@ -99,7 +99,7 @@ function SortableStockItem({
             <span
               {...attributes}
               {...listeners}
-              className="shrink-0 cursor-grab text-slate-600 hover:text-slate-400 text-xs select-none"
+              className="shrink-0 cursor-grab text-slate-600 hover:text-stone-500 text-xs select-none"
               onClick={(e) => e.stopPropagation()}
             >
               ⠿
@@ -110,7 +110,7 @@ function SortableStockItem({
               type="checkbox"
               checked={isCompareChecked}
               readOnly
-              className="accent-cyan-400 shrink-0"
+              className="accent-[#5a7247] shrink-0"
             />
           )}
           <span className="font-bold text-sm text-slate-100 truncate">{stock.stockName}</span>
@@ -127,7 +127,7 @@ function SortableStockItem({
                 e.stopPropagation()
                 onRemove()
               }}
-              className="shrink-0 text-slate-500 hover:text-red-500 p-0.5 flex items-center justify-center transition-colors"
+              className="shrink-0 text-stone-400 hover:text-red-500 p-0.5 flex items-center justify-center transition-colors"
               title="삭제"
             >
               x
@@ -136,7 +136,7 @@ function SortableStockItem({
         </div>
       </div>
       <div className="flex justify-between items-center text-xs">
-        <span className="text-slate-400">{stock.stockCode}</span>
+        <span className="text-stone-500">{stock.stockCode}</span>
         {priceData && (
           <span className={`font-mono ${changeColor}`}>
             {priceData.changeRate > 0 ? '+' : ''}{priceData.changeRate.toFixed(2)}%
@@ -284,8 +284,8 @@ export function StockSidebar({ className }: StockSidebarProps) {
             onClick={toggleCompare}
             className={`text-xs px-2 py-1 rounded-md transition-colors ${
               compareActive
-                ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400'
-                : 'text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300'
+                ? 'bg-indigo-100 text-indigo-600'
+                : 'text-zinc-400 hover:text-zinc-600'
             }`}
           >
             비교 {compareActive ? '●' : '○'}
@@ -304,8 +304,8 @@ export function StockSidebar({ className }: StockSidebarProps) {
               onClick={() => setMarketFilter(f)}
               className={`text-[10px] px-2 py-0.5 rounded-full transition-colors ${
                 marketFilter === f
-                  ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400'
-                  : 'text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 bg-zinc-100 dark:bg-zinc-800'
+                  ? 'bg-indigo-100 text-indigo-600'
+                  : 'text-zinc-400 hover:text-zinc-600 bg-zinc-100'
               }`}
             >
               {f === 'all' ? '전체' : f}

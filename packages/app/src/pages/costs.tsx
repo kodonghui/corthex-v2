@@ -143,7 +143,7 @@ export function CostsPage() {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
             <div>
               <h1 className="text-4xl font-bold text-slate-900 mb-2" style={{ fontFamily: "'Noto Serif KR', serif" }}>비용 분석</h1>
-              <p className="text-slate-500">실시간 API 사용량 및 비용 트렌드를 확인하세요.</p>
+              <p className="text-stone-400">실시간 API 사용량 및 비용 트렌드를 확인하세요.</p>
             </div>
             <button
               onClick={() => toast.info('이 기능은 준비 중입니다')}
@@ -168,8 +168,8 @@ export function CostsPage() {
             </div>
           ) : !costData ? (
             <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="costs-empty">
-              <h3 className="text-base font-medium text-slate-500 mb-2">데이터가 없습니다</h3>
-              <p className="text-sm text-slate-400">선택한 기간에 해당하는 비용 데이터가 없습니다</p>
+              <h3 className="text-base font-medium text-stone-400 mb-2">데이터가 없습니다</h3>
+              <p className="text-sm text-stone-500">선택한 기간에 해당하는 비용 데이터가 없습니다</p>
             </div>
           ) : (
             <>
@@ -183,7 +183,7 @@ export function CostsPage() {
                     </div>
                     <span className="text-xs font-bold text-green-500 bg-green-50 px-2 py-1 rounded-lg">+12.5%</span>
                   </div>
-                  <p className="text-sm text-slate-500 mb-1 font-medium">Total Monthly Cost</p>
+                  <p className="text-sm text-stone-400 mb-1 font-medium">Total Monthly Cost</p>
                   <h3 className="text-3xl font-bold text-slate-900">${costData.totalCostUsd.toFixed(2)}</h3>
                 </div>
                 {/* Top Model */}
@@ -192,9 +192,9 @@ export function CostsPage() {
                     <div className="p-2 rounded-lg" style={{ backgroundColor: `${mustardTan}1a`, color: mustardTan }}>
                       <SlidersHorizontal className="w-5 h-5" />
                     </div>
-                    <span className="text-xs font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-lg">-2.4%</span>
+                    <span className="text-xs font-bold text-stone-500 bg-slate-50 px-2 py-1 rounded-lg">-2.4%</span>
                   </div>
-                  <p className="text-sm text-slate-500 mb-1 font-medium">{topModel?.model ?? 'Anthropic (Claude)'}</p>
+                  <p className="text-sm text-stone-400 mb-1 font-medium">{topModel?.model ?? 'Anthropic (Claude)'}</p>
                   <h3 className="text-3xl font-bold text-slate-900">${topModel?.costUsd.toFixed(2) ?? '0.00'}</h3>
                 </div>
                 {/* Daily Average */}
@@ -205,7 +205,7 @@ export function CostsPage() {
                     </div>
                     <span className="text-xs font-bold text-green-500 bg-green-50 px-2 py-1 rounded-lg">+18.2%</span>
                   </div>
-                  <p className="text-sm text-slate-500 mb-1 font-medium">Daily Average</p>
+                  <p className="text-sm text-stone-400 mb-1 font-medium">Daily Average</p>
                   <h3 className="text-3xl font-bold text-slate-900">${dailyAvg.toFixed(2)}</h3>
                 </div>
                 {/* Active Agents */}
@@ -216,7 +216,7 @@ export function CostsPage() {
                     </div>
                     <span className="text-xs font-bold text-green-500 bg-green-50 px-2 py-1 rounded-lg">+5.1%</span>
                   </div>
-                  <p className="text-sm text-slate-500 mb-1 font-medium">Active Agents</p>
+                  <p className="text-sm text-stone-400 mb-1 font-medium">Active Agents</p>
                   <h3 className="text-3xl font-bold text-slate-900">{activeAgentCount}</h3>
                 </div>
               </div>
@@ -226,7 +226,7 @@ export function CostsPage() {
                 <div className="flex items-center justify-between mb-8">
                   <div>
                     <h3 className="text-xl font-bold text-slate-900">Cost Trends</h3>
-                    <p className="text-sm text-slate-500">Daily spending over the last {days} days</p>
+                    <p className="text-sm text-stone-400">Daily spending over the last {days} days</p>
                   </div>
                   <div className="flex gap-2">
                     <button
@@ -258,7 +258,7 @@ export function CostsPage() {
                   {dailyLoading ? (
                     <div className="h-full w-full bg-slate-50 rounded animate-pulse" />
                   ) : dailyItems.length === 0 ? (
-                    <div className="h-full flex items-center justify-center text-sm text-slate-400">데이터가 없습니다</div>
+                    <div className="h-full flex items-center justify-center text-sm text-stone-500">데이터가 없습니다</div>
                   ) : (
                     <div className="absolute inset-0 flex items-end justify-between px-2">
                       {dailyItems.map((d, i) => {
@@ -281,7 +281,7 @@ export function CostsPage() {
                   )}
                   <div className="absolute bottom-0 left-0 right-0 h-px bg-slate-100" />
                 </div>
-                <div className="flex justify-between mt-4 text-xs font-medium text-slate-400">
+                <div className="flex justify-between mt-4 text-xs font-medium text-stone-500">
                   {dailyItems.length >= 5 ? (
                     <>
                       <span>{dailyItems[0]?.date}</span>
@@ -308,7 +308,7 @@ export function CostsPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
                     <thead>
-                      <tr className="bg-slate-50/50 text-slate-500 text-xs uppercase tracking-wider">
+                      <tr className="bg-slate-50/50 text-stone-400 text-xs uppercase tracking-wider">
                         <th className="px-8 py-4 font-bold">Agent Name</th>
                         <th className="px-8 py-4 font-bold">Model</th>
                         <th className="px-8 py-4 font-bold text-center">Tokens</th>
@@ -319,7 +319,7 @@ export function CostsPage() {
                     <tbody className="divide-y divide-slate-50">
                       {agentCostData.length === 0 ? (
                         <tr>
-                          <td colSpan={5} className="py-8 text-center text-sm text-slate-400">데이터 없음</td>
+                          <td colSpan={5} className="py-8 text-center text-sm text-stone-500">데이터 없음</td>
                         </tr>
                       ) : (
                         agentCostData.slice(0, 10).map((a, i) => {
@@ -350,7 +350,7 @@ export function CostsPage() {
                               <td className="px-8 py-4 text-right font-bold text-slate-900">
                                 ${a.costUsd.toFixed(2)}
                               </td>
-                              <td className="px-8 py-4 text-center text-xs text-slate-500">
+                              <td className="px-8 py-4 text-center text-xs text-stone-400">
                                 {formatNumber(a.count)}
                               </td>
                             </tr>
@@ -361,7 +361,7 @@ export function CostsPage() {
                   </table>
                 </div>
                 <div className="px-8 py-6 border-t border-slate-50 flex items-center justify-between">
-                  <p className="text-xs text-slate-500">Showing {Math.min(agentCostData.length, 10)} of {agentCostData.length} agents</p>
+                  <p className="text-xs text-stone-400">Showing {Math.min(agentCostData.length, 10)} of {agentCostData.length} agents</p>
                   <div className="flex gap-2">
                     <button className="p-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
                       <ChevronLeft className="w-4 h-4" />

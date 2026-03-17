@@ -16,11 +16,11 @@ export interface ClassifiedListItemProps {
 
 export function ClassifiedListItem({ title, levelText, levelColorClass, dateLabel, dateValue, viewCount, icon, iconType = 'visibility', isActive, isRevoked }: ClassifiedListItemProps) {
     return (
-        <div className={`flex gap-4 px-4 py-3 border-b border-slate-800 cursor-pointer transition-colors relative ${isActive ? 'bg-slate-900 hover:bg-slate-800/50' : 'hover:bg-slate-900'
+        <div className={`flex gap-4 px-4 py-3 border-b border-stone-200 cursor-pointer transition-colors relative ${isActive ? 'bg-white hover:bg-stone-100/50' : 'hover:bg-white'
             } ${isRevoked ? 'opacity-50' : ''}`}>
             {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500"></div>}
             <div className="flex items-start gap-4 w-full">
-                <div className="text-slate-100 flex items-center justify-center rounded-md bg-slate-800 shrink-0 size-10">
+                <div className="text-slate-100 flex items-center justify-center rounded-md bg-stone-100 shrink-0 size-10">
                     {icon}
                 </div>
                 <div className="flex flex-1 flex-col justify-center">
@@ -32,7 +32,7 @@ export function ClassifiedListItem({ title, levelText, levelColorClass, dateLabe
                             {levelText}
                         </span>
                     </div>
-                    <div className="flex justify-between items-center text-xs font-mono text-slate-400">
+                    <div className="flex justify-between items-center text-xs font-mono text-stone-500">
                         <span>{dateLabel}: {dateValue}</span>
                         <span className="flex items-center gap-1">
                             {iconType === 'visibility' ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />} {viewCount}

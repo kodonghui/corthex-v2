@@ -205,10 +205,10 @@ function AgentStatusGrid({ data }: { data: DashboardSummary }) {
                   <span className="px-2 py-0.5 text-white text-[10px] rounded uppercase tracking-wider font-bold" style={{ backgroundColor: ORGANIC.olive }}>Secretary</span>
                 )}
               </div>
-              <p className="text-xs text-slate-400 mt-1">상태: <span className="font-medium" style={{ [agent.statusColor.split(':')[0]]: agent.statusColor.split(':')[1]?.trim() } as React.CSSProperties}>{agent.statusText}</span></p>
+              <p className="text-xs text-stone-500 mt-1">상태: <span className="font-medium" style={{ [agent.statusColor.split(':')[0]]: agent.statusColor.split(':')[1]?.trim() } as React.CSSProperties}>{agent.statusText}</span></p>
             </div>
             {agent.isSecretary && (
-              <button className="p-2 text-slate-400 hover:text-slate-600" style={{ ['--tw-text-opacity' as string]: 1 } as React.CSSProperties}>
+              <button className="p-2 text-stone-500 hover:text-slate-600" style={{ ['--tw-text-opacity' as string]: 1 } as React.CSSProperties}>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
               </button>
             )}
@@ -266,7 +266,7 @@ function NotificationsPanel({ data }: { data: DashboardSummary }) {
     <div className="space-y-6" data-purpose="notifications">
       <div className="flex items-center justify-between">
         <h3 className="text-xl font-bold" style={{ fontFamily: "'Noto Serif KR', serif" }}>최근 알림</h3>
-        <button className="text-slate-400 hover:text-slate-600">
+        <button className="text-stone-500 hover:text-slate-600">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
         </button>
       </div>
@@ -278,14 +278,14 @@ function NotificationsPanel({ data }: { data: DashboardSummary }) {
                 <div className="mt-1 w-2 h-2 rounded-full" style={{ backgroundColor: item.dotColor }}></div>
                 <div className="flex-1">
                   <p className="text-sm font-medium text-slate-800">{item.title}</p>
-                  <p className="text-xs text-slate-500 mt-1">{item.description}</p>
-                  <p className="text-[10px] text-slate-400 mt-2">{item.time}</p>
+                  <p className="text-xs text-stone-400 mt-1">{item.description}</p>
+                  <p className="text-[10px] text-stone-500 mt-2">{item.time}</p>
                 </div>
               </div>
             </div>
           ))}
         </div>
-        <button className="w-full py-3 bg-slate-50 text-xs font-medium text-slate-500 hover:bg-slate-100 transition-colors">
+        <button className="w-full py-3 bg-slate-50 text-xs font-medium text-stone-400 hover:bg-slate-100 transition-colors">
           모든 알림 확인하기
         </button>
       </div>
@@ -369,15 +369,15 @@ export function DashboardPage() {
               <DashboardSkeleton />
             ) : summaryError && !summary ? (
               <div className="flex flex-col items-center justify-center py-24">
-                <p className="text-base font-medium text-slate-500">데이터를 불러올 수 없습니다</p>
-                <p className="text-sm text-slate-400 mt-1">잠시 후 자동으로 재시도합니다</p>
+                <p className="text-base font-medium text-stone-400">데이터를 불러올 수 없습니다</p>
+                <p className="text-sm text-stone-500 mt-1">잠시 후 자동으로 재시도합니다</p>
               </div>
             ) : (
               <>
                 {/* Greeting */}
                 <div className="mb-10">
                   <h2 className="text-3xl font-bold" style={{ fontFamily: "'Noto Serif KR', serif", color: ORGANIC.oliveDark }}>반갑습니다, CEO님</h2>
-                  <p className="text-slate-500 mt-2">오늘도 CORTHEX가 당신의 비즈니스를 지원하고 있습니다.</p>
+                  <p className="text-stone-400 mt-2">오늘도 CORTHEX가 당신의 비즈니스를 지원하고 있습니다.</p>
                 </div>
 
                 {/* Quick Start Shortcuts */}
@@ -392,7 +392,7 @@ export function DashboardPage() {
                     </div>
                     <div>
                       <h3 className="font-bold text-lg">새로운 대화</h3>
-                      <p className="text-sm text-slate-500">에이전트에게 업무 지시하기</p>
+                      <p className="text-sm text-stone-400">에이전트에게 업무 지시하기</p>
                     </div>
                   </button>
                   <button
@@ -404,7 +404,7 @@ export function DashboardPage() {
                     </div>
                     <div>
                       <h3 className="font-bold text-lg">워크플로우 생성</h3>
-                      <p className="text-sm text-slate-500">자동화된 작업 설계</p>
+                      <p className="text-sm text-stone-400">자동화된 작업 설계</p>
                     </div>
                   </button>
                   <button
@@ -416,7 +416,7 @@ export function DashboardPage() {
                     </div>
                     <div>
                       <h3 className="font-bold text-lg">주간 분석</h3>
-                      <p className="text-sm text-slate-500">에이전트 성과 보고서 확인</p>
+                      <p className="text-sm text-stone-400">에이전트 성과 보고서 확인</p>
                     </div>
                   </button>
                 </div>

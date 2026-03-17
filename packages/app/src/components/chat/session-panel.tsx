@@ -57,17 +57,17 @@ function SessionMenu({
     <div
       ref={ref}
       data-testid={`session-menu-${sessionId}`}
-      className="absolute right-0 top-8 z-20 bg-slate-800 border border-slate-700 rounded-lg shadow-xl py-1 w-36"
+      className="absolute right-0 top-8 z-20 bg-stone-100 border border-stone-200 rounded-lg shadow-xl py-1 w-36"
     >
       <button
         onClick={onRename}
-        className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-slate-300 hover:bg-slate-700"
+        className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-stone-600 hover:bg-stone-200"
       >
         ✏️ 이름 변경
       </button>
       <button
         onClick={onDelete}
-        className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-red-400 hover:bg-slate-700"
+        className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-red-400 hover:bg-stone-200"
       >
         🗑️ 삭제
       </button>
@@ -129,9 +129,9 @@ export function SessionPanel({
   }
 
   return (
-    <div data-testid="session-panel" className="w-72 flex flex-col border-r border-slate-700 bg-slate-900 shrink-0 h-full">
+    <div data-testid="session-panel" className="w-72 flex flex-col border-r border-stone-200 bg-white shrink-0 h-full">
       {/* 새 대화 버튼 */}
-      <div className="px-3 py-3 border-b border-slate-700 shrink-0">
+      <div className="px-3 py-3 border-b border-stone-200 shrink-0">
         <button
           data-testid="new-chat-btn"
           onClick={onNewChat}
@@ -144,14 +144,14 @@ export function SessionPanel({
       {/* 세션 목록 */}
       <div className="flex-1 overflow-y-auto [-webkit-overflow-scrolling:touch]">
         {groups.length === 0 ? (
-          <p className="text-xs text-slate-500 text-center py-6">대화 내역이 없습니다</p>
+          <p className="text-xs text-stone-400 text-center py-6">대화 내역이 없습니다</p>
         ) : (
           groups.map((group) => (
             <div key={group.label}>
               {/* 그룹 헤더 */}
               <button
                 onClick={() => toggleGroup(group.label)}
-                className="flex items-center justify-between w-full px-3 py-2 text-xs font-medium uppercase tracking-wider text-slate-500 hover:bg-slate-800/50 transition-colors"
+                className="flex items-center justify-between w-full px-3 py-2 text-xs font-medium uppercase tracking-wider text-stone-400 hover:bg-stone-100/50 transition-colors"
               >
                 <span>{group.label}</span>
                 <span className={`text-[10px] transition-transform ${collapsedGroups.has(group.label) ? 'rotate-180' : ''}`}>▾</span>
@@ -176,12 +176,12 @@ export function SessionPanel({
                       <button
                         data-testid={`session-${session.id}`}
                         onClick={() => onSessionSelect(session.id)}
-                        className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-left hover:bg-slate-800 transition-colors group ${
-                          isSelected ? 'bg-slate-800' : ''
+                        className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-left hover:bg-stone-100 transition-colors group ${
+                          isSelected ? 'bg-stone-100' : ''
                         }`}
                       >
                         {/* 에이전트 이니셜 */}
-                        <span className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-300 shrink-0">
+                        <span className="w-8 h-8 rounded-full bg-stone-200 flex items-center justify-center text-xs font-bold text-stone-600 shrink-0">
                           {initial}
                         </span>
                         <div className="flex-1 min-w-0">
@@ -196,12 +196,12 @@ export function SessionPanel({
                                 if (e.key === 'Escape') setRenamingId(null)
                               }}
                               onClick={(e) => e.stopPropagation()}
-                              className="w-full bg-slate-700 border border-blue-500 rounded px-2 py-0.5 text-sm text-white outline-none"
+                              className="w-full bg-stone-200 border border-blue-500 rounded px-2 py-0.5 text-sm text-white outline-none"
                             />
                           ) : (
                             <p className="text-sm text-slate-200 truncate">{session.title}</p>
                           )}
-                          <p className="text-xs text-slate-500">{time}</p>
+                          <p className="text-xs text-stone-400">{time}</p>
                         </div>
                       </button>
 
@@ -211,7 +211,7 @@ export function SessionPanel({
                           e.stopPropagation()
                           setMenuSessionId(menuSessionId === session.id ? null : session.id)
                         }}
-                        className="absolute right-1 top-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 text-slate-500 hover:text-slate-300 text-xs p-2 transition-opacity"
+                        className="absolute right-1 top-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 text-stone-400 hover:text-stone-600 text-xs p-2 transition-opacity"
                       >
                         ···
                       </button>
@@ -238,13 +238,13 @@ export function SessionPanel({
       {/* 삭제 확인 다이얼로그 */}
       {deleteTargetId && (
         <div data-testid="delete-dialog" className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center">
-          <div className="bg-slate-800 border border-slate-700 rounded-xl p-5 max-w-sm mx-4">
+          <div className="bg-stone-100 border border-stone-200 rounded-xl p-5 max-w-sm mx-4">
             <h4 className="text-sm font-semibold text-slate-100 mb-2">대화 삭제</h4>
-            <p className="text-xs text-slate-400 mb-4">이 대화를 삭제하면 모든 메시지, 도구 호출, 위임이 함께 삭제됩니다.</p>
+            <p className="text-xs text-stone-500 mb-4">이 대화를 삭제하면 모든 메시지, 도구 호출, 위임이 함께 삭제됩니다.</p>
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setDeleteTargetId(null)}
-                className="px-3 py-1.5 text-sm rounded-lg text-slate-400 hover:bg-slate-700 transition-colors"
+                className="px-3 py-1.5 text-sm rounded-lg text-stone-500 hover:bg-stone-200 transition-colors"
               >
                 취소
               </button>

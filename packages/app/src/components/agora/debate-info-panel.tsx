@@ -12,7 +12,7 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 const AVATAR_COLORS = [
-  { bg: 'bg-cyan-400/20', text: 'text-cyan-400', border: 'border-cyan-400/30' },
+  { bg: 'bg-[#5a7247]/20', text: 'text-[#5a7247]', border: 'border-[#5a7247]/30' },
   { bg: 'bg-violet-500/20', text: 'text-violet-400', border: 'border-violet-500/30' },
   { bg: 'bg-amber-500/20', text: 'text-amber-400', border: 'border-amber-500/30' },
   { bg: 'bg-emerald-500/20', text: 'text-emerald-400', border: 'border-emerald-500/30' },
@@ -59,7 +59,7 @@ export function DebateInfoPanel({ debate }: { debate: Debate }) {
   return (
     <div data-testid="debate-info-panel" className="h-full flex flex-col overflow-hidden">
       {/* Tabs */}
-      <div className="shrink-0 flex border-b border-cyan-400/10">
+      <div className="shrink-0 flex border-b border-[#5a7247]/10">
         {TAB_ITEMS.map((tab) => {
           const isDisabled = tab.value === 'diff' && !isDiffEnabled
           const isActive = activeTab === tab.value
@@ -72,8 +72,8 @@ export function DebateInfoPanel({ debate }: { debate: Debate }) {
               className={cn(
                 'flex-1 py-2.5 text-xs font-medium transition-colors border-b-2',
                 isActive
-                  ? 'border-cyan-400 text-cyan-400'
-                  : 'border-transparent text-slate-400 hover:text-slate-300',
+                  ? 'border-[#5a7247] text-[#5a7247]'
+                  : 'border-transparent text-stone-500 hover:text-stone-600',
                 isDisabled && 'opacity-40 cursor-not-allowed',
               )}
             >
@@ -103,7 +103,7 @@ function InfoContent({ debate }: { debate: Debate }) {
   return (
     <>
       {/* Header */}
-      <div className="p-6 border-b border-cyan-400/10">
+      <div className="p-6 border-b border-[#5a7247]/10">
         <h3 className="text-lg font-semibold text-slate-100 mb-1">Debate Info</h3>
         {isActive && (
           <div className="flex items-center gap-2 text-emerald-500">
@@ -112,7 +112,7 @@ function InfoContent({ debate }: { debate: Debate }) {
           </div>
         )}
         {!isActive && (
-          <div className="flex items-center gap-2 text-slate-400">
+          <div className="flex items-center gap-2 text-stone-500">
             <div className="w-2 h-2 rounded-full bg-slate-500" />
             <span className="text-xs font-medium uppercase tracking-wider">
               {STATUS_LABELS[debate.status] ?? debate.status}
@@ -124,10 +124,10 @@ function InfoContent({ debate }: { debate: Debate }) {
       <div className="p-6 flex flex-col gap-6 flex-1">
         {/* Duration placeholder */}
         <div className="flex flex-col gap-2">
-          <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Duration</span>
+          <span className="text-xs text-stone-400 uppercase tracking-wider font-semibold">Duration</span>
           <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-slate-500" />
-            <div className="font-mono text-2xl text-cyan-400 font-medium">
+            <Clock className="w-4 h-4 text-stone-400" />
+            <div className="font-mono text-2xl text-[#5a7247] font-medium">
               {debate.rounds.length > 0 ? `R${debate.rounds.length}/${debate.maxRounds}` : '--:--'}
             </div>
           </div>
@@ -136,7 +136,7 @@ function InfoContent({ debate }: { debate: Debate }) {
         {/* Participants */}
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold">
+            <span className="text-xs text-stone-400 uppercase tracking-wider font-semibold">
               Participants ({debate.participants.length})
             </span>
           </div>
@@ -153,7 +153,7 @@ function InfoContent({ debate }: { debate: Debate }) {
                   )}>
                     {p.agentName[0]}
                   </div>
-                  <span className="text-sm text-slate-300">{p.agentName}</span>
+                  <span className="text-sm text-stone-600">{p.agentName}</span>
                 </div>
               )
             })}
@@ -162,7 +162,7 @@ function InfoContent({ debate }: { debate: Debate }) {
 
         {/* Meta */}
         <div className="flex flex-col gap-2">
-          <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Details</span>
+          <span className="text-xs text-stone-400 uppercase tracking-wider font-semibold">Details</span>
           <div className="space-y-2">
             <InfoRow label="유형" value={debate.debateType === 'deep-debate' ? '심층토론 (3R)' : '토론 (2R)'} />
             <InfoRow label="최대 라운드" value={String(debate.maxRounds)} />
@@ -174,8 +174,8 @@ function InfoContent({ debate }: { debate: Debate }) {
 
         {/* Objective (topic as objective) */}
         <div className="flex flex-col gap-2">
-          <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Objective</span>
-          <p className="text-sm text-slate-400 leading-relaxed bg-slate-800/50 p-3 rounded-lg border border-slate-700/50">
+          <span className="text-xs text-stone-400 uppercase tracking-wider font-semibold">Objective</span>
+          <p className="text-sm text-stone-500 leading-relaxed bg-stone-100/50 p-3 rounded-lg border border-stone-200/50">
             {debate.topic}
           </p>
         </div>
@@ -191,7 +191,7 @@ function InfoContent({ debate }: { debate: Debate }) {
 
       {/* End debate button */}
       {isActive && (
-        <div className="p-6 border-t border-cyan-400/10">
+        <div className="p-6 border-t border-[#5a7247]/10">
           <button className="w-full py-3 px-4 rounded-lg bg-red-500/10 text-red-500 border border-red-500/30 hover:bg-red-500/20 transition-colors flex items-center justify-center gap-2 font-medium">
             <StopCircle className="w-5 h-5" />
             토론 종료 (End Debate)
@@ -205,8 +205,8 @@ function InfoContent({ debate }: { debate: Debate }) {
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-[10px] text-slate-400">{label}</span>
-      <span className="text-xs text-slate-300">{value}</span>
+      <span className="text-[10px] text-stone-500">{label}</span>
+      <span className="text-xs text-stone-600">{value}</span>
     </div>
   )
 }

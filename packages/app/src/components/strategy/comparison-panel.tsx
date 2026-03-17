@@ -85,7 +85,7 @@ export function ComparisonPanel() {
       <Card variant="bordered" className="shrink-0">
         <div className="px-5 py-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+            <h2 className="text-lg font-semibold text-zinc-900">
               종목 비교 ({codes.length}개)
             </h2>
             <div className="flex items-center gap-2">
@@ -111,7 +111,7 @@ export function ComparisonPanel() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-zinc-200 dark:border-zinc-700">
+              <tr className="border-b border-zinc-200">
                 <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 whitespace-nowrap">종목명</th>
                 <th className="text-right px-4 py-3 text-xs font-medium text-zinc-500 whitespace-nowrap">현재가</th>
                 <th className="text-right px-4 py-3 text-xs font-medium text-zinc-500 whitespace-nowrap">등락률</th>
@@ -133,18 +133,18 @@ export function ComparisonPanel() {
                 return (
                   <tr
                     key={code}
-                    className="border-b border-zinc-100 dark:border-zinc-800 last:border-0 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 cursor-pointer"
+                    className="border-b border-zinc-100 last:border-0 hover:bg-zinc-50 cursor-pointer"
                     onClick={() => goToStock(code)}
                   >
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="font-medium text-zinc-900 dark:text-zinc-100">
+                      <div className="font-medium text-zinc-900">
                         {hasData ? p.name : code}
                       </div>
                       <div className="text-xs text-zinc-400">{code}</div>
                     </td>
                     {hasData ? (
                       <>
-                        <td className="text-right px-4 py-3 font-mono font-semibold text-zinc-900 dark:text-zinc-100 whitespace-nowrap">
+                        <td className="text-right px-4 py-3 font-mono font-semibold text-zinc-900 whitespace-nowrap">
                           {formatPrice(p.price)}
                         </td>
                         <td className={`text-right px-4 py-3 font-medium whitespace-nowrap ${changeColor}`}>

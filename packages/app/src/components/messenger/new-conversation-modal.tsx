@@ -83,11 +83,11 @@ export function NewConversationModal({ onClose, onCreated }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose} data-testid="new-conversation-modal">
-      <div className="bg-slate-800 border border-slate-700 rounded-2xl w-96 max-h-[80vh] shadow-2xl flex flex-col" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-stone-100 border border-stone-200 rounded-2xl w-96 max-h-[80vh] shadow-2xl flex flex-col" onClick={(e) => e.stopPropagation()}>
         {/* 헤더 */}
-        <div className="px-4 py-3 border-b border-slate-700 flex items-center justify-between">
+        <div className="px-4 py-3 border-b border-stone-200 flex items-center justify-between">
           <h3 className="font-medium text-sm text-slate-50">새 대화</h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-200 text-sm">✕</button>
+          <button onClick={onClose} className="text-stone-500 hover:text-slate-200 text-sm">✕</button>
         </div>
 
         {/* 모드 선택 */}
@@ -97,7 +97,7 @@ export function NewConversationModal({ onClose, onCreated }: Props) {
             className={`px-3 py-1 text-xs rounded-full border ${
               mode === 'direct'
                 ? 'bg-blue-600 text-white border-blue-600'
-                : 'border-slate-600 hover:bg-slate-700'
+                : 'border-stone-300 hover:bg-stone-200'
             }`}
           >
             1:1 대화
@@ -107,7 +107,7 @@ export function NewConversationModal({ onClose, onCreated }: Props) {
             className={`px-3 py-1 text-xs rounded-full border ${
               mode === 'group'
                 ? 'bg-blue-600 text-white border-blue-600'
-                : 'border-slate-600 hover:bg-slate-700'
+                : 'border-stone-300 hover:bg-stone-200'
             }`}
           >
             그룹 대화
@@ -121,7 +121,7 @@ export function NewConversationModal({ onClose, onCreated }: Props) {
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
               placeholder="그룹 이름 (선택)"
-              className="w-full px-3 py-2 bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg text-sm"
+              className="w-full px-3 py-2 bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg text-sm"
             />
           </div>
         )}
@@ -150,7 +150,7 @@ export function NewConversationModal({ onClose, onCreated }: Props) {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="이름으로 검색..."
-            className="w-full px-3 py-2 bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg text-sm"
+            className="w-full px-3 py-2 bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg text-sm"
             autoFocus
           />
         </div>
@@ -166,30 +166,30 @@ export function NewConversationModal({ onClose, onCreated }: Props) {
                 className={`w-full text-left px-2.5 py-2 rounded-lg text-sm flex items-center gap-2 ${
                   isSelected
                     ? 'bg-blue-600/10 text-blue-400'
-                    : 'hover:bg-slate-700'
+                    : 'hover:bg-stone-200'
                 }`}
               >
-                <span className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-xs font-medium text-slate-300">
+                <span className="w-7 h-7 rounded-full bg-stone-200 flex items-center justify-center text-xs font-medium text-stone-600">
                   {u.name.charAt(0)}
                 </span>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate text-slate-100">{u.name}</p>
-                  <p className="text-[10px] text-slate-500">{u.role}</p>
+                  <p className="text-[10px] text-stone-400">{u.role}</p>
                 </div>
                 {isSelected && <span className="text-blue-400 text-sm">✓</span>}
               </button>
             )
           })}
           {filteredUsers.length === 0 && (
-            <p className="text-xs text-slate-400 text-center py-4">사용자를 찾을 수 없습니다</p>
+            <p className="text-xs text-stone-500 text-center py-4">사용자를 찾을 수 없습니다</p>
           )}
         </div>
 
         {/* 하단 */}
-        <div className="px-4 py-3 border-t border-slate-700 flex justify-end gap-2">
+        <div className="px-4 py-3 border-t border-stone-200 flex justify-end gap-2">
           <button
             onClick={onClose}
-            className="px-3 py-1.5 text-xs rounded-lg border border-slate-600 hover:bg-slate-700"
+            className="px-3 py-1.5 text-xs rounded-lg border border-stone-300 hover:bg-stone-200"
           >
             취소
           </button>

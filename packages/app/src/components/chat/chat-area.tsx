@@ -53,12 +53,12 @@ function renderTextWithLinks(
         <button
           key={key++}
           onClick={() => onNavigate(href)}
-          className="text-cyan-400 underline hover:text-cyan-300"
+          className="text-[#5a7247] underline hover:text-[#869e71]"
         >
           {linkText}
         </button>
       ) : (
-        <a key={key++} href={href} target="_blank" rel="noopener noreferrer" className="text-cyan-400 underline hover:text-cyan-300">
+        <a key={key++} href={href} target="_blank" rel="noopener noreferrer" className="text-[#5a7247] underline hover:text-[#869e71]">
           {linkText}
         </a>
       ),
@@ -390,15 +390,15 @@ export function ChatArea({
   if (!agent || !sessionId) {
     return (
       <div data-testid="chat-empty" className="flex-1 flex flex-col items-center justify-center h-full px-6 text-center">
-        <div className="bg-cyan-400/20 flex items-center justify-center rounded-full w-16 h-16 mb-4 border border-cyan-400/30">
-          <Bot className="w-8 h-8 text-cyan-400" />
+        <div className="bg-[#5a7247]/20 flex items-center justify-center rounded-full w-16 h-16 mb-4 border border-[#5a7247]/30">
+          <Bot className="w-8 h-8 text-[#5a7247]" />
         </div>
-        <p className="text-sm font-medium text-slate-400">에이전트와 대화를 시작하세요</p>
-        <p className="text-xs text-slate-500 mt-1">무엇이든 질문해보세요</p>
+        <p className="text-sm font-medium text-stone-500">에이전트와 대화를 시작하세요</p>
+        <p className="text-xs text-stone-400 mt-1">무엇이든 질문해보세요</p>
         {onBack && (
           <button
             onClick={onBack}
-            className="mt-4 px-4 py-2 text-sm bg-cyan-400 text-slate-950 rounded-lg font-medium hover:bg-cyan-300 transition-colors"
+            className="mt-4 px-4 py-2 text-sm bg-[#5a7247] text-slate-950 rounded-lg font-medium hover:bg-[#869e71] transition-colors"
           >
             새 대화 시작
           </button>
@@ -422,13 +422,13 @@ export function ChatArea({
       )}
 
       {/* 헤더 -- Stitch style */}
-      <header data-testid="chat-header" className="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-800 px-6 py-4 bg-[#111827]/80 backdrop-blur-md sticky top-0 z-10 shrink-0">
+      <header data-testid="chat-header" className="flex items-center justify-between whitespace-nowrap border-b border-solid border-stone-200 px-6 py-4 bg-[#111827]/80 backdrop-blur-md sticky top-0 z-10 shrink-0">
         <div className="flex items-center gap-3">
           {onBack && (
             <button
               data-testid="mobile-back-btn"
               onClick={onBack}
-              className="md:hidden flex items-center justify-center rounded-xl size-10 text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors mr-1"
+              className="md:hidden flex items-center justify-center rounded-xl size-10 text-stone-500 hover:text-slate-200 hover:bg-stone-100 transition-colors mr-1"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
@@ -446,37 +446,37 @@ export function ChatArea({
         </div>
         <div className="flex flex-1 justify-end gap-2">
           {/* Delegation status subtitle */}
-          <div className="hidden md:flex items-center text-xs text-slate-500 mr-2">
+          <div className="hidden md:flex items-center text-xs text-stone-400 mr-2">
             {(() => {
               if (delegationChain && delegationChain.length >= 3) {
                 if (chainExpanded) {
                   return (
-                    <button onClick={() => setChainExpanded(false)} className="text-cyan-400 hover:underline">
+                    <button onClick={() => setChainExpanded(false)} className="text-[#5a7247] hover:underline">
                       {delegationChain.join(' -> ')}
                     </button>
                   )
                 }
                 return (
-                  <button onClick={() => setChainExpanded(true)} className="text-cyan-400 animate-pulse hover:underline">
+                  <button onClick={() => setChainExpanded(true)} className="text-[#5a7247] animate-pulse hover:underline">
                     {delegationChain.length - 1}단계 위임 중
                   </button>
                 )
               }
               if (delegationChain && delegationChain.length === 2) {
-                return <span className="text-cyan-400 animate-pulse">{delegationChain[1]}에게 위임 중...</span>
+                return <span className="text-[#5a7247] animate-pulse">{delegationChain[1]}에게 위임 중...</span>
               }
               const entries = Object.values(delegationStatuses)
               const total = entries.length
               const completed = entries.filter(s => s.status !== 'delegating').length
               const delegating = entries.filter(s => s.status === 'delegating')
               if (total > 1 && completed < total) {
-                return <span className="text-cyan-400 animate-pulse">{total}개 부서 위임 중 ({completed}/{total})</span>
+                return <span className="text-[#5a7247] animate-pulse">{total}개 부서 위임 중 ({completed}/{total})</span>
               }
               if (total > 1 && completed === total) {
                 return <span className="text-emerald-400">{total}개 부서 위임 완료</span>
               }
               if (delegating.length === 1) {
-                return <span className="text-cyan-400 animate-pulse">{delegating[0].targetAgentName}에게 위임 중...</span>
+                return <span className="text-[#5a7247] animate-pulse">{delegating[0].targetAgentName}에게 위임 중...</span>
               }
               return <span>{statusLabels[agent.status] || agent.role}</span>
             })()}
@@ -487,8 +487,8 @@ export function ChatArea({
               onClick={() => setShowDelegations(!showDelegations)}
               className={`flex items-center justify-center rounded-xl size-10 transition-colors ${
                 showDelegations
-                  ? 'text-cyan-400 bg-cyan-400/10'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                  ? 'text-[#5a7247] bg-[#5a7247]/10'
+                  : 'text-stone-500 hover:text-slate-200 hover:bg-stone-100'
               }`}
             >
               <MoreHorizontal className="w-5 h-5" />
@@ -503,7 +503,7 @@ export function ChatArea({
           {delegationList.map((del) => (
             <div
               key={del.id}
-              className="bg-slate-800 border border-slate-700 rounded-2xl p-4"
+              className="bg-stone-100 border border-stone-200 rounded-2xl p-4"
             >
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-slate-200">{del.targetAgentName}</span>
@@ -514,16 +514,16 @@ export function ChatArea({
                       : del.status === 'failed'
                         ? 'bg-red-500/20 text-red-400'
                         : del.status === 'processing'
-                          ? 'bg-cyan-400/20 text-cyan-400'
-                          : 'bg-slate-600 text-slate-400'
+                          ? 'bg-[#5a7247]/20 text-[#5a7247]'
+                          : 'bg-slate-600 text-stone-500'
                   }`}
                 >
                   {del.status === 'completed' ? '완료' : del.status === 'failed' ? '실패' : del.status === 'processing' ? '처리중' : '대기'}
                 </span>
               </div>
-              <p className="text-xs text-slate-400 mb-2 line-clamp-2">{del.delegationPrompt}</p>
+              <p className="text-xs text-stone-500 mb-2 line-clamp-2">{del.delegationPrompt}</p>
               {del.agentResponse && (
-                <p className="text-xs text-slate-300 line-clamp-3">{del.agentResponse}</p>
+                <p className="text-xs text-stone-600 line-clamp-3">{del.agentResponse}</p>
               )}
               <div className="flex items-center gap-3 mt-2 text-xs text-slate-600 font-mono">
                 <span>생성: {new Date(del.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</span>
@@ -548,7 +548,7 @@ export function ChatArea({
             {/* 이전 메시지 로딩 스피너 */}
             {isFetchingNextPage && (
               <div className="flex justify-center py-2">
-                <Loader2 className="w-5 h-5 text-cyan-400 animate-spin" />
+                <Loader2 className="w-5 h-5 text-[#5a7247] animate-spin" />
               </div>
             )}
             {hasNextPage && !isFetchingNextPage && (
@@ -560,7 +560,7 @@ export function ChatArea({
                     if (el) prevScrollHeightRef.current = el.scrollHeight
                     fetchNextPage()
                   }}
-                  className="flex items-center justify-center w-full py-2 text-xs text-slate-500 hover:text-slate-300 transition-colors font-mono"
+                  className="flex items-center justify-center w-full py-2 text-xs text-stone-400 hover:text-stone-600 transition-colors font-mono"
                 >
                   이전 메시지 더 보기
                 </button>
@@ -570,19 +570,19 @@ export function ChatArea({
             {/* Date separator */}
             {messages.length > 0 && (
               <div className="flex justify-center">
-                <span className="text-xs font-mono text-slate-500 px-3 py-1 bg-slate-800/50 rounded-full">TODAY</span>
+                <span className="text-xs font-mono text-stone-400 px-3 py-1 bg-stone-100/50 rounded-full">TODAY</span>
               </div>
             )}
 
             {messages.length === 0 && !isStreaming && (
               <div data-testid="chat-empty" className="flex flex-col items-center justify-center h-full px-6 text-center">
-                <div className="bg-cyan-400/20 flex items-center justify-center rounded-full w-12 h-12 mb-3 border border-cyan-400/30">
-                  <Bot className="w-6 h-6 text-cyan-400" />
+                <div className="bg-[#5a7247]/20 flex items-center justify-center rounded-full w-12 h-12 mb-3 border border-[#5a7247]/30">
+                  <Bot className="w-6 h-6 text-[#5a7247]" />
                 </div>
-                <p className="text-sm font-medium text-slate-400">
+                <p className="text-sm font-medium text-stone-500">
                   {agent.name}과(와) 대화를 시작하세요
                 </p>
-                <p className="text-xs text-slate-500 mt-1">무엇이든 질문해보세요</p>
+                <p className="text-xs text-stone-400 mt-1">무엇이든 질문해보세요</p>
               </div>
             )}
 
@@ -602,8 +602,8 @@ export function ChatArea({
                     className="flex items-end gap-3 justify-end group"
                   >
                     <div className="flex flex-col gap-1 items-end max-w-[80%]">
-                      <p className="text-slate-400 text-xs font-medium px-2">User</p>
-                      <div className="text-[15px] font-normal leading-relaxed rounded-2xl rounded-br-sm px-5 py-3.5 bg-cyan-400/10 text-cyan-400">
+                      <p className="text-stone-500 text-xs font-medium px-2">User</p>
+                      <div className="text-[15px] font-normal leading-relaxed rounded-2xl rounded-br-sm px-5 py-3.5 bg-[#5a7247]/10 text-[#5a7247]">
                         <p className="whitespace-pre-wrap">{renderTextWithLinks(mainContent, navigate)}</p>
                         {msg.attachments && msg.attachments.length > 0 && (
                           <div className="flex flex-wrap gap-1.5 mt-2">
@@ -614,7 +614,7 @@ export function ChatArea({
                                 href={`/api/workspace/files/${att.id}/download`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-cyan-400/20 text-xs text-cyan-300"
+                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#5a7247]/20 text-xs text-[#869e71]"
                               >
                                 {att.mimeType.startsWith('image/') ? (
                                   <img
@@ -633,7 +633,7 @@ export function ChatArea({
                           </div>
                         )}
                       </div>
-                      <p className="text-xs text-slate-500 px-2 font-mono tabular-nums">
+                      <p className="text-xs text-stone-400 px-2 font-mono tabular-nums">
                         {new Date(msg.createdAt).toLocaleTimeString('ko-KR', {
                           hour: '2-digit',
                           minute: '2-digit',
@@ -652,11 +652,11 @@ export function ChatArea({
                   className="flex items-start gap-3 group"
                 >
                   {/* Avatar */}
-                  <div className="bg-cyan-400/20 flex items-center justify-center aspect-square rounded-full w-8 h-8 shrink-0 mt-6 border border-cyan-400/30">
-                    <Bot className="w-4 h-4 text-cyan-400" />
+                  <div className="bg-[#5a7247]/20 flex items-center justify-center aspect-square rounded-full w-8 h-8 shrink-0 mt-6 border border-[#5a7247]/30">
+                    <Bot className="w-4 h-4 text-[#5a7247]" />
                   </div>
                   <div className="flex flex-col gap-1 items-start max-w-[80%] w-full">
-                    <p className="text-slate-400 text-xs font-medium px-2">{agent.name}</p>
+                    <p className="text-stone-500 text-xs font-medium px-2">{agent.name}</p>
                     {/* Tool calls */}
                     {msgToolCalls.length > 0 && (
                       <div className="flex flex-col gap-1 mb-1 px-2">
@@ -666,7 +666,7 @@ export function ChatArea({
                       </div>
                     )}
                     {/* Message Bubble */}
-                    <div className="text-[15px] font-normal leading-relaxed rounded-2xl rounded-bl-sm px-5 py-3.5 bg-slate-800 text-slate-200 w-full shadow-sm">
+                    <div className="text-[15px] font-normal leading-relaxed rounded-2xl rounded-bl-sm px-5 py-3.5 bg-stone-100 text-slate-200 w-full shadow-sm">
                       <p className="whitespace-pre-wrap">{renderTextWithLinks(mainContent, navigate)}</p>
                       {msg.attachments && msg.attachments.length > 0 && (
                         <div className="flex flex-wrap gap-1.5 mt-2">
@@ -677,7 +677,7 @@ export function ChatArea({
                               href={`/api/workspace/files/${att.id}/download`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-xs text-slate-300 transition-colors"
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-stone-200 hover:bg-slate-600 text-xs text-stone-600 transition-colors"
                             >
                               {att.mimeType.startsWith('image/') ? (
                                 <img
@@ -696,13 +696,13 @@ export function ChatArea({
                         </div>
                       )}
                       {toolContent && (
-                        <div className="mt-3 pt-3 border-t border-slate-700">
-                          <p className="text-[10px] font-medium text-cyan-400 mb-1 font-mono">도구 호출</p>
-                          <p className="text-[11px] text-slate-400 whitespace-pre-wrap font-mono">{toolContent}</p>
+                        <div className="mt-3 pt-3 border-t border-stone-200">
+                          <p className="text-[10px] font-medium text-[#5a7247] mb-1 font-mono">도구 호출</p>
+                          <p className="text-[11px] text-stone-500 whitespace-pre-wrap font-mono">{toolContent}</p>
                         </div>
                       )}
                     </div>
-                    <p className="text-xs text-slate-500 px-2 font-mono tabular-nums">
+                    <p className="text-xs text-stone-400 px-2 font-mono tabular-nums">
                       {new Date(msg.createdAt).toLocaleTimeString('ko-KR', {
                         hour: '2-digit',
                         minute: '2-digit',
@@ -716,11 +716,11 @@ export function ChatArea({
             {/* 스트리밍 메시지 */}
             {isStreaming && (streamingText || toolCalls.length > 0) && (
               <div data-testid="msg-streaming" className="flex items-start gap-3">
-                <div className="bg-cyan-400/20 flex items-center justify-center aspect-square rounded-full w-8 h-8 shrink-0 mt-6 border border-cyan-400/30">
-                  <Bot className="w-4 h-4 text-cyan-400" />
+                <div className="bg-[#5a7247]/20 flex items-center justify-center aspect-square rounded-full w-8 h-8 shrink-0 mt-6 border border-[#5a7247]/30">
+                  <Bot className="w-4 h-4 text-[#5a7247]" />
                 </div>
                 <div className="flex flex-col gap-1 items-start max-w-[80%] w-full">
-                  <p className="text-slate-400 text-xs font-medium px-2">{agent.name}</p>
+                  <p className="text-stone-500 text-xs font-medium px-2">{agent.name}</p>
                   {toolCalls.length > 0 && (
                     <div className="flex flex-col gap-1 mb-1 px-2">
                       {toolCalls.map((tool) => (
@@ -729,10 +729,10 @@ export function ChatArea({
                     </div>
                   )}
                   {streamingText && (
-                    <div className="text-[15px] font-normal leading-relaxed rounded-2xl rounded-bl-sm px-5 py-3.5 bg-slate-800 text-slate-200 w-full shadow-sm">
+                    <div className="text-[15px] font-normal leading-relaxed rounded-2xl rounded-bl-sm px-5 py-3.5 bg-stone-100 text-slate-200 w-full shadow-sm">
                       <p className="whitespace-pre-wrap">
                         {renderTextWithLinks(streamingText, navigate)}
-                        <span className="inline-block w-2 h-4 bg-cyan-400 ml-1 align-middle animate-[blink_1s_step-end_infinite]" />
+                        <span className="inline-block w-2 h-4 bg-[#5a7247] ml-1 align-middle animate-[blink_1s_step-end_infinite]" />
                       </p>
                     </div>
                   )}
@@ -750,14 +750,14 @@ export function ChatArea({
             {/* 스트리밍 시작 대기 (아직 토큰 없음) */}
             {isStreaming && !streamingText && toolCalls.length === 0 && (
               <div data-testid="msg-streaming" className="flex items-start gap-3">
-                <div className="bg-cyan-400/20 flex items-center justify-center aspect-square rounded-full w-8 h-8 shrink-0 mt-6 border border-cyan-400/30">
-                  <Bot className="w-4 h-4 text-cyan-400" />
+                <div className="bg-[#5a7247]/20 flex items-center justify-center aspect-square rounded-full w-8 h-8 shrink-0 mt-6 border border-[#5a7247]/30">
+                  <Bot className="w-4 h-4 text-[#5a7247]" />
                 </div>
                 <div className="flex flex-col gap-1 items-start max-w-[80%]">
-                  <p className="text-slate-400 text-xs font-medium px-2">{agent.name}</p>
+                  <p className="text-stone-500 text-xs font-medium px-2">{agent.name}</p>
                   <div className="flex items-center gap-2 px-2 mb-1">
-                    <Loader2 className="w-3.5 h-3.5 text-slate-400 animate-spin" />
-                    <span className="text-xs font-mono text-slate-400">
+                    <Loader2 className="w-3.5 h-3.5 text-stone-500 animate-spin" />
+                    <span className="text-xs font-mono text-stone-500">
                       {(() => {
                         if (delegationChain && delegationChain.length >= 2) {
                           return `${delegationChain.join(' -> ')}`
@@ -777,8 +777,8 @@ export function ChatArea({
 
             {/* Delegation status inline */}
             {isStreaming && delegationStatus && !delegationChain && (
-              <div data-testid="delegation-status" className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/50 rounded-full border border-slate-700/50 text-xs text-slate-400 font-mono mx-auto">
-                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+              <div data-testid="delegation-status" className="flex items-center gap-2 px-3 py-1.5 bg-stone-100/50 rounded-full border border-stone-200/50 text-xs text-stone-500 font-mono mx-auto">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#5a7247] animate-pulse" />
                 {delegationStatus.targetAgentName}에게 위임 중...
               </div>
             )}
@@ -800,7 +800,7 @@ export function ChatArea({
             {/* Debate notice */}
             {debateNotice && (
               <div className="flex justify-center">
-                <div className="bg-cyan-400/10 border border-cyan-400/20 rounded-full px-4 py-2 text-xs text-cyan-400 animate-pulse font-mono">
+                <div className="bg-[#5a7247]/10 border border-[#5a7247]/20 rounded-full px-4 py-2 text-xs text-[#5a7247] animate-pulse font-mono">
                   {debateNotice}
                 </div>
               </div>
@@ -823,24 +823,24 @@ export function ChatArea({
           </div>
 
           {/* 입력 영역 -- Stitch style */}
-          <div data-testid="chat-input" className="p-4 bg-[#111827] border-t border-slate-800 shrink-0">
+          <div data-testid="chat-input" className="p-4 bg-[#111827] border-t border-stone-200 shrink-0">
             {/* 첨부 파일 미리보기 */}
             {pendingAttachments.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-2">
                 {pendingAttachments.map(f => (
-                  <span key={f.id} data-testid={`attachment-${f.id}`} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-xs text-slate-300">
+                  <span key={f.id} data-testid={`attachment-${f.id}`} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-stone-100 border border-stone-200 text-xs text-stone-600">
                     <Paperclip className="w-3 h-3" />
                     <span className="max-w-[120px] truncate">{f.filename}</span>
-                    <span className="text-slate-500">· {formatBytes(f.sizeBytes)}</span>
+                    <span className="text-stone-400">· {formatBytes(f.sizeBytes)}</span>
                     <button
                       onClick={() => setPendingAttachments(prev => prev.filter(a => a.id !== f.id))}
-                      className="text-slate-500 hover:text-red-400 transition-colors"
+                      className="text-stone-400 hover:text-red-400 transition-colors"
                     >x</button>
                   </span>
                 ))}
               </div>
             )}
-            <div className="flex items-end gap-2 bg-[#1E293B] rounded-2xl p-2 border border-slate-700/50 shadow-inner focus-within:ring-1 focus-within:ring-cyan-400/50 transition-all">
+            <div className="flex items-end gap-2 bg-[#1E293B] rounded-2xl p-2 border border-stone-200/50 shadow-inner focus-within:ring-1 focus-within:ring-[#5a7247]/50 transition-all">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -851,7 +851,7 @@ export function ChatArea({
                 data-testid="attach-btn"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isStreaming || isUploading || pendingAttachments.length >= 5}
-                className="flex items-center justify-center p-2.5 text-slate-400 hover:text-slate-300 rounded-xl hover:bg-slate-700 transition-colors shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex items-center justify-center p-2.5 text-stone-500 hover:text-stone-600 rounded-xl hover:bg-stone-200 transition-colors shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
                 aria-label="파일 첨부"
               >
                 {isUploading ? (
@@ -877,7 +877,7 @@ export function ChatArea({
                   }
                   disabled={sendMessage.isPending || isStreaming}
                   aria-label="메시지 입력"
-                  className="w-full bg-transparent border-0 focus:ring-0 resize-none text-[15px] text-slate-200 placeholder:text-slate-500 py-3 px-2 h-full block font-display disabled:opacity-40"
+                  className="w-full bg-transparent border-0 focus:ring-0 resize-none text-[15px] text-slate-200 placeholder:text-stone-400 py-3 px-2 h-full block font-display disabled:opacity-40"
                   rows={1}
                 />
               </div>
@@ -900,7 +900,7 @@ export function ChatArea({
                   data-testid="chat-send-btn"
                   onClick={handleSend}
                   disabled={!input.trim() || sendMessage.isPending}
-                  className="flex items-center justify-center bg-cyan-400 text-slate-950 rounded-full w-10 h-10 shrink-0 hover:bg-cyan-300 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
+                  className="flex items-center justify-center bg-[#5a7247] text-slate-950 rounded-full w-10 h-10 shrink-0 hover:bg-[#869e71] disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
                   aria-label="메시지 전송"
                 >
                   <Send className="w-5 h-5 ml-0.5" />
@@ -908,7 +908,7 @@ export function ChatArea({
               )}
             </div>
             <div className="text-center mt-2">
-              <span className="text-[10px] text-slate-500 font-mono">CORTHEX AI can make mistakes. Consider verifying important information.</span>
+              <span className="text-[10px] text-stone-400 font-mono">CORTHEX AI can make mistakes. Consider verifying important information.</span>
             </div>
           </div>
         </>

@@ -86,17 +86,17 @@ export function CommandCenterPage() {
   return (
     <div
       data-testid="command-center-page"
-      className="flex flex-col h-full bg-slate-950 antialiased"
+      className="flex flex-col h-full bg-[#faf8f5] antialiased"
     >
       {/* Mobile tab bar */}
-      <div className="flex md:hidden border-b border-slate-800 shrink-0">
+      <div className="flex md:hidden border-b border-stone-200 shrink-0">
         <button
           data-testid="mobile-tab-chat"
           onClick={() => setMobileTab('chat')}
           className={`flex-1 py-3 text-sm font-medium text-center transition-colors ${
             mobileTab === 'chat'
-              ? 'text-cyan-400 border-b-2 border-cyan-400'
-              : 'text-slate-500 hover:text-slate-400'
+              ? 'text-[#5a7247] border-b-2 border-[#5a7247]'
+              : 'text-stone-400 hover:text-stone-500'
           }`}
         >
           대화
@@ -106,8 +106,8 @@ export function CommandCenterPage() {
           onClick={() => setMobileTab('report')}
           className={`flex-1 py-3 text-sm font-medium text-center transition-colors ${
             mobileTab === 'report'
-              ? 'text-cyan-400 border-b-2 border-cyan-400'
-              : 'text-slate-500 hover:text-slate-400'
+              ? 'text-[#5a7247] border-b-2 border-[#5a7247]'
+              : 'text-stone-400 hover:text-stone-500'
           }`}
         >
           보고서
@@ -118,13 +118,13 @@ export function CommandCenterPage() {
       <main className="flex-1 flex w-full overflow-hidden">
         {/* Left Panel: Command Thread */}
         <div
-          className={`flex-[8] flex flex-col border-r border-slate-800 relative overflow-hidden
+          className={`flex-[8] flex flex-col border-r border-stone-200 relative overflow-hidden
             ${mobileTab === 'chat' ? 'flex' : 'hidden'} md:flex`}
         >
           {/* Thread Header */}
-          <div className="sticky top-0 bg-slate-950/95 backdrop-blur-sm z-10 border-b border-slate-800 p-4 flex justify-between items-center shrink-0">
+          <div className="sticky top-0 bg-[#faf8f5]/95 backdrop-blur-sm z-10 border-b border-stone-200 p-4 flex justify-between items-center shrink-0">
             <div className="flex items-center gap-3">
-              <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+              <svg className="w-5 h-5 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
               <h3 className="font-semibold text-lg text-slate-50">Command Center</h3>
             </div>
             <div className="flex items-center gap-2">
@@ -162,33 +162,33 @@ export function CommandCenterPage() {
 
         {/* Right Panel: Info & Tracking */}
         <div
-          className={`flex-[4] bg-slate-900 flex flex-col overflow-y-auto border-l border-slate-800
+          className={`flex-[4] bg-white flex flex-col overflow-y-auto border-l border-stone-200
             ${mobileTab === 'report' ? 'flex' : 'hidden'} md:flex`}
         >
           <div className="p-6 flex flex-col gap-6">
             {/* Session Info */}
             <div className="flex flex-col gap-3">
-              <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Session Info</h4>
-              <div className="bg-slate-800 rounded-xl border border-slate-700 p-4 flex flex-col gap-3">
+              <h4 className="text-xs font-semibold text-stone-500 uppercase tracking-wider">Session Info</h4>
+              <div className="bg-stone-100 rounded-xl border border-stone-200 p-4 flex flex-col gap-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-slate-400">Commands</span>
+                  <span className="text-sm text-stone-500">Commands</span>
                   <span className="text-sm font-mono tabular-nums text-slate-50">{userMsgCount}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-slate-400">Responses</span>
+                  <span className="text-sm text-stone-500">Responses</span>
                   <span className="text-sm font-mono tabular-nums text-slate-50">{agentMsgCount}</span>
                 </div>
-                <div className="h-px w-full bg-slate-700 my-1" />
+                <div className="h-px w-full bg-stone-200 my-1" />
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-slate-400">Active Agents</span>
-                  <span className="text-sm font-mono tabular-nums text-cyan-400">{activeAgentCount}/{managers.length}</span>
+                  <span className="text-sm text-stone-500">Active Agents</span>
+                  <span className="text-sm font-mono tabular-nums text-[#5a7247]">{activeAgentCount}/{managers.length}</span>
                 </div>
               </div>
             </div>
 
             {/* Delegation Pipeline */}
             <div className="flex flex-col gap-3">
-              <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Delegation Pipeline</h4>
+              <h4 className="text-xs font-semibold text-stone-500 uppercase tracking-wider">Delegation Pipeline</h4>
               <PipelineVisualization
                 activeCommandId={activeCommandId}
                 delegationSteps={activeSteps}
@@ -197,7 +197,7 @@ export function CommandCenterPage() {
 
             {/* Deliverables */}
             <div className="flex flex-col gap-3">
-              <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Deliverables</h4>
+              <h4 className="text-xs font-semibold text-stone-500 uppercase tracking-wider">Deliverables</h4>
               <DeliverableViewer
                 commandId={selectedReportId}
                 command={selectedCommand}
@@ -212,11 +212,11 @@ export function CommandCenterPage() {
 
             {/* Presets */}
             <div className="flex flex-col gap-3">
-              <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Presets ({presets.length})</h4>
+              <h4 className="text-xs font-semibold text-stone-500 uppercase tracking-wider">Presets ({presets.length})</h4>
               <button
                 data-testid="kpi-card-presets"
                 onClick={() => setShowPresetManager(true)}
-                className="bg-slate-800 rounded-xl border border-slate-700 p-3 text-sm text-amber-400 hover:bg-slate-700/50 transition-colors text-left"
+                className="bg-stone-100 rounded-xl border border-stone-200 p-3 text-sm text-amber-400 hover:bg-stone-200/50 transition-colors text-left"
               >
                 프리셋 관리하기 →
               </button>

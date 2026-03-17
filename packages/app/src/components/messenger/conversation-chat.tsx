@@ -195,16 +195,16 @@ export function ConversationChat({ conversationId, conversationDetail, currentUs
   return (
     <div className="flex-1 flex flex-col min-h-0" data-testid="conversation-chat">
       {/* 헤더 */}
-      <div className="px-4 py-2.5 border-b border-slate-700 flex items-center justify-between shrink-0">
+      <div className="px-4 py-2.5 border-b border-stone-200 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2 min-w-0">
           <button
             onClick={onBack}
-            className="md:hidden p-2 -ml-2 rounded-lg hover:bg-slate-700 text-sm text-slate-400 shrink-0"
+            className="md:hidden p-2 -ml-2 rounded-lg hover:bg-stone-200 text-sm text-stone-500 shrink-0"
           >
             ←
           </button>
           <span className="font-medium text-sm text-slate-100 truncate">{displayName}</span>
-          <span className="text-xs text-slate-500 shrink-0">{participantCount}명</span>
+          <span className="text-xs text-stone-400 shrink-0">{participantCount}명</span>
         </div>
         {conversationDetail?.type === 'group' && (
           <button
@@ -225,7 +225,7 @@ export function ConversationChat({ conversationId, conversationDetail, currentUs
       >
         {isFetchingNextPage && (
           <div className="text-center py-2">
-            <span className="text-xs text-slate-400">이전 메시지 로딩...</span>
+            <span className="text-xs text-stone-500">이전 메시지 로딩...</span>
           </div>
         )}
         {hasNextPage && !isFetchingNextPage && (
@@ -241,7 +241,7 @@ export function ConversationChat({ conversationId, conversationDetail, currentUs
           if (msg.type === 'system') {
             return (
               <div key={msg.id} className="text-center py-1">
-                <span className="bg-slate-800 text-slate-500 text-xs px-3 py-1 rounded-full inline">
+                <span className="bg-stone-100 text-stone-400 text-xs px-3 py-1 rounded-full inline">
                   {msg.content}
                 </span>
               </div>
@@ -269,15 +269,15 @@ export function ConversationChat({ conversationId, conversationDetail, currentUs
                       <span className="text-xs font-medium text-blue-400">AI 보고서</span>
                     </div>
                   </div>
-                  <div className="px-3 py-2 bg-slate-900">
+                  <div className="px-3 py-2 bg-white">
                     <p className="text-sm font-medium text-slate-100 truncate">{reportData.title}</p>
                     {reportData.summary && (
-                      <p className="text-xs text-slate-500 mt-1 line-clamp-2">{reportData.summary}</p>
+                      <p className="text-xs text-stone-400 mt-1 line-clamp-2">{reportData.summary}</p>
                     )}
                     <p className="text-[10px] text-blue-400 mt-1.5">전체 보기 →</p>
                   </div>
                   <div className={`px-3 py-1 ${isMine ? 'text-right' : 'text-left'}`}>
-                    <span className="text-[10px] text-slate-500">
+                    <span className="text-[10px] text-stone-400">
                       {new Date(msg.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
@@ -298,13 +298,13 @@ export function ConversationChat({ conversationId, conversationDetail, currentUs
                   className={`px-3 py-2 rounded-lg text-sm ${
                     isMine
                       ? 'bg-blue-600 text-white rounded-br-sm'
-                      : 'bg-slate-800 text-slate-100 rounded-bl-sm'
+                      : 'bg-stone-100 text-slate-100 rounded-bl-sm'
                   }`}
                 >
                   {msg.content}
                 </div>
                 <div className={`flex items-center gap-1 mt-0.5 ${isMine ? 'justify-end' : 'justify-start'}`}>
-                  <span className="text-[10px] text-slate-500">
+                  <span className="text-[10px] text-stone-400">
                     {new Date(msg.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
@@ -333,13 +333,13 @@ export function ConversationChat({ conversationId, conversationDetail, currentUs
 
       {/* 타이핑 표시 */}
       {typingUsers.size > 0 && (
-        <div className="px-4 py-1 text-xs text-slate-500">
+        <div className="px-4 py-1 text-xs text-stone-400">
           입력 중...
         </div>
       )}
 
       {/* 입력 영역 */}
-      <div className="px-4 py-3 border-t border-slate-700 shrink-0">
+      <div className="px-4 py-3 border-t border-stone-200 shrink-0">
         <div className="flex items-end gap-2">
           <textarea
             ref={inputRef}
@@ -353,7 +353,7 @@ export function ConversationChat({ conversationId, conversationDetail, currentUs
             }}
             placeholder="메시지를 입력하세요..."
             rows={1}
-            className="flex-1 bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm resize-none max-h-32 overflow-y-auto"
+            className="flex-1 bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg px-3 py-2 text-sm resize-none max-h-32 overflow-y-auto"
             data-testid="conversation-input"
           />
           <button
@@ -370,13 +370,13 @@ export function ConversationChat({ conversationId, conversationDetail, currentUs
       {/* 나가기 확인 모달 */}
       {showLeaveConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-slate-800 border border-slate-700 rounded-2xl p-5 w-80 shadow-2xl">
+          <div className="bg-stone-100 border border-stone-200 rounded-2xl p-5 w-80 shadow-2xl">
             <h3 className="font-medium text-sm text-slate-50 mb-3">대화방 나가기</h3>
-            <p className="text-xs text-slate-400 mb-4">이 그룹 대화방에서 나가시겠습니까?</p>
+            <p className="text-xs text-stone-500 mb-4">이 그룹 대화방에서 나가시겠습니까?</p>
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setShowLeaveConfirm(false)}
-                className="px-3 py-1.5 text-xs rounded-lg border border-slate-600 hover:bg-slate-700"
+                className="px-3 py-1.5 text-xs rounded-lg border border-stone-300 hover:bg-stone-200"
               >
                 취소
               </button>

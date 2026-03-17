@@ -120,13 +120,13 @@ export function SystemNode({ id, data, selected }: NodeProps) {
   const { label, onChange } = useLabel(id, data as Record<string, unknown>)
   return (
     <div
-      className={`px-4 py-3 rounded-md bg-slate-800 shadow-md border-2 min-w-[140px] text-center ${
-        selected ? 'border-slate-400 ring-2 ring-slate-300' : 'border-slate-600'
+      className={`px-4 py-3 rounded-md bg-stone-100 shadow-md border-2 min-w-[140px] text-center ${
+        selected ? 'border-slate-400 ring-2 ring-slate-300' : 'border-stone-300'
       }`}
     >
       <Handle type="target" position={Position.Top} className="!bg-slate-400" />
       <Handle type="target" position={Position.Left} className="!bg-slate-400" />
-      <div className="text-[10px] text-slate-500 font-medium mb-1">SYSTEM</div>
+      <div className="text-[10px] text-stone-400 font-medium mb-1">SYSTEM</div>
       <EditableLabel value={label} onChange={onChange} className="text-sm font-bold text-slate-200" />
       <Handle type="source" position={Position.Bottom} className="!bg-slate-400" />
       <Handle type="source" position={Position.Right} className="!bg-slate-400" />
@@ -230,18 +230,18 @@ export function GroupNode({ id, data, selected }: NodeProps) {
   return (
     <div
       className={`rounded-lg border-2 border-dashed min-w-[200px] min-h-[120px] ${
-        selected ? 'border-cyan-400 bg-cyan-900/15' : 'border-slate-600 bg-slate-800/20'
+        selected ? 'border-[#5a7247] bg-cyan-900/15' : 'border-stone-300 bg-stone-100/20'
       }`}
       style={{ padding: 12 }}
     >
       <div className="flex items-center gap-1 mb-2">
-        <span className="text-[10px] text-cyan-500 font-medium">GROUP</span>
-        <EditableLabel value={label} onChange={onChange} className="text-xs font-semibold text-cyan-300" />
+        <span className="text-[10px] text-[#5a7247] font-medium">GROUP</span>
+        <EditableLabel value={label} onChange={onChange} className="text-xs font-semibold text-[#869e71]" />
       </div>
-      <Handle type="target" position={Position.Top} className="!bg-cyan-400" />
-      <Handle type="target" position={Position.Left} className="!bg-cyan-400" />
-      <Handle type="source" position={Position.Bottom} className="!bg-cyan-400" />
-      <Handle type="source" position={Position.Right} className="!bg-cyan-400" />
+      <Handle type="target" position={Position.Top} className="!bg-[#5a7247]" />
+      <Handle type="target" position={Position.Left} className="!bg-[#5a7247]" />
+      <Handle type="source" position={Position.Bottom} className="!bg-[#5a7247]" />
+      <Handle type="source" position={Position.Right} className="!bg-[#5a7247]" />
     </div>
   )
 }

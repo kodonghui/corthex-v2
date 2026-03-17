@@ -122,7 +122,7 @@ export function AgoraPage() {
               <img alt="Agent Gamma" className="inline-block h-10 w-10 rounded-full ring-2 ring-white" src="https://placeholder.pics/svg/300" />
             </div>
             <div className="text-left">
-              <p className="text-xs text-slate-400">Participants</p>
+              <p className="text-xs text-stone-500">Participants</p>
               <p className="text-sm font-semibold text-slate-600">3 AI Agents &bull; Round 4 of 5</p>
             </div>
           </div>
@@ -144,7 +144,7 @@ export function AgoraPage() {
                 <img alt="Alpha" className="w-8 h-8 rounded-full" src="https://placeholder.pics/svg/300" />
                 <div>
                   <h4 className="text-sm font-bold text-slate-800">Agent Alpha</h4>
-                  <p className="text-[10px] text-slate-400 tracking-wider">UTILITARIAN PERSPECTIVE</p>
+                  <p className="text-[10px] text-stone-500 tracking-wider">UTILITARIAN PERSPECTIVE</p>
                 </div>
               </div>
               <div className="text-slate-600 leading-relaxed text-sm">
@@ -164,7 +164,7 @@ export function AgoraPage() {
                 <img alt="Beta" className="w-8 h-8 rounded-full" src="https://placeholder.pics/svg/300" />
                 <div>
                   <h4 className="text-sm font-bold text-slate-800">Agent Beta</h4>
-                  <p className="text-[10px] text-slate-400 tracking-wider">DEONTOLOGICAL PERSPECTIVE</p>
+                  <p className="text-[10px] text-stone-500 tracking-wider">DEONTOLOGICAL PERSPECTIVE</p>
                 </div>
               </div>
               <div className="text-slate-600 leading-relaxed text-sm">
@@ -177,7 +177,7 @@ export function AgoraPage() {
                 <img alt="Gamma" className="w-8 h-8 rounded-full" src="https://placeholder.pics/svg/300" />
                 <div>
                   <h4 className="text-sm font-bold text-slate-800">Agent Gamma</h4>
-                  <p className="text-[10px] text-slate-400 tracking-wider">MODERATOR / SYNTHESIS</p>
+                  <p className="text-[10px] text-stone-500 tracking-wider">MODERATOR / SYNTHESIS</p>
                 </div>
               </div>
               <div className="text-slate-600 leading-relaxed text-sm italic">
@@ -234,7 +234,7 @@ export function AgoraPage() {
       {/* BEGIN: Footer */}
       <footer className="border-t mt-20 py-12 bg-white" style={{ borderColor: 'rgba(188,184,138,0.2)' }}>
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-sm text-slate-400">&copy; 2026 CORTHEX Labs. All reasoning is simulated by AGORA v2 Multi-Agent Engine.</p>
+          <p className="text-sm text-stone-500">&copy; 2026 CORTHEX Labs. All reasoning is simulated by AGORA v2 Multi-Agent Engine.</p>
           <div className="flex gap-8">
             <span className="text-sm" style={{ color: '#808B6F' }}>API Documentation</span>
             <span className="text-sm" style={{ color: '#808B6F' }}>Ethical Standards</span>

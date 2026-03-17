@@ -41,7 +41,7 @@ export function ConversationsPanel({ conversations, selectedId, currentUserId, o
   if (conversations.length === 0) {
     return (
       <div className="flex-1 flex items-center justify-center p-4" data-testid="conversations-empty">
-        <p className="text-xs text-slate-400 text-center">대화가 없습니다.<br />새 대화를 시작해보세요.</p>
+        <p className="text-xs text-stone-500 text-center">대화가 없습니다.<br />새 대화를 시작해보세요.</p>
       </div>
     )
   }
@@ -57,10 +57,10 @@ export function ConversationsPanel({ conversations, selectedId, currentUserId, o
             key={conv.id}
             onClick={() => onSelect(conv.id)}
             data-testid={`conversation-item-${conv.id}`}
-            className={`w-full text-left px-3 py-2.5 text-sm border-b border-slate-800 transition-colors ${
+            className={`w-full text-left px-3 py-2.5 text-sm border-b border-stone-200 transition-colors ${
               selectedId === conv.id
                 ? 'bg-blue-600/10 text-blue-400'
-                : 'hover:bg-slate-800'
+                : 'hover:bg-stone-100'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -77,14 +77,14 @@ export function ConversationsPanel({ conversations, selectedId, currentUserId, o
                       </span>
                     )}
                     {conv.lastMessage && (
-                      <span className="text-[10px] text-slate-500">{formatTime(conv.lastMessage.createdAt)}</span>
+                      <span className="text-[10px] text-stone-400">{formatTime(conv.lastMessage.createdAt)}</span>
                     )}
                   </div>
                 </div>
                 {conv.lastMessage ? (
-                  <p className="text-xs text-slate-500 truncate mt-0.5">{conv.lastMessage.content}</p>
+                  <p className="text-xs text-stone-400 truncate mt-0.5">{conv.lastMessage.content}</p>
                 ) : (
-                  <p className="text-xs text-slate-400 mt-0.5">메시지 없음</p>
+                  <p className="text-xs text-stone-500 mt-0.5">메시지 없음</p>
                 )}
               </div>
             </div>

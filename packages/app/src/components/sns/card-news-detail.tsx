@@ -62,9 +62,9 @@ export function CardNewsDetail({ seriesId, onBack }: CardNewsDetailProps) {
   if (!series) {
     return (
       <div data-testid="sns-cardnews-detail-loading" className="space-y-4 max-w-3xl">
-        <div className="h-4 w-32 bg-slate-700 animate-pulse rounded" />
-        <div className="h-72 bg-slate-700 animate-pulse rounded-xl" />
-        <div className="h-4 w-48 bg-slate-700 animate-pulse rounded" />
+        <div className="h-4 w-32 bg-stone-200 animate-pulse rounded" />
+        <div className="h-72 bg-stone-200 animate-pulse rounded-xl" />
+        <div className="h-4 w-48 bg-stone-200 animate-pulse rounded" />
       </div>
     )
   }
@@ -91,15 +91,15 @@ export function CardNewsDetail({ seriesId, onBack }: CardNewsDetailProps) {
 
   return (
     <div data-testid="sns-cardnews-detail" className="max-w-3xl space-y-4">
-      <button onClick={onBack} className="text-sm text-slate-400 hover:text-slate-200">← 카드뉴스 목록</button>
+      <button onClick={onBack} className="text-sm text-stone-500 hover:text-slate-200">← 카드뉴스 목록</button>
 
       <StatusStepper status={series.status} createdAt={series.createdAt} reviewedAt={series.reviewedAt} scheduledAt={series.scheduledAt} publishedAt={series.publishedAt} />
 
       <div className="flex items-center gap-2">
         <h3 className="text-lg font-semibold text-slate-50">{seriesTitle}</h3>
-        <span className="text-xs text-slate-400">{PLATFORM_LABELS[series.platform] || series.platform}</span>
+        <span className="text-xs text-stone-500">{PLATFORM_LABELS[series.platform] || series.platform}</span>
         <span className={`text-xs px-2 py-0.5 rounded-full ${STATUS_COLORS[series.status]}`}>{STATUS_LABELS[series.status]}</span>
-        <span className="text-xs text-slate-400">{cards.length}장</span>
+        <span className="text-xs text-stone-500">{cards.length}장</span>
       </div>
 
       {series.rejectReason && (
@@ -111,11 +111,11 @@ export function CardNewsDetail({ seriesId, onBack }: CardNewsDetailProps) {
       {/* Card Carousel Preview */}
       {cards.length > 0 && (
         <div className="space-y-3">
-          <div className="relative rounded-xl overflow-hidden border border-slate-700 bg-slate-800">
+          <div className="relative rounded-xl overflow-hidden border border-stone-200 bg-stone-100">
             {cards[currentSlide]?.imageUrl ? (
               <img src={cards[currentSlide].imageUrl} alt={`카드 ${currentSlide + 1}`} className="w-full h-72 object-contain" />
             ) : (
-              <div className="w-full h-72 flex items-center justify-center text-slate-500">이미지 없음</div>
+              <div className="w-full h-72 flex items-center justify-center text-stone-400">이미지 없음</div>
             )}
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
               <p className="text-white text-sm">{cards[currentSlide]?.caption}</p>
@@ -149,42 +149,42 @@ export function CardNewsDetail({ seriesId, onBack }: CardNewsDetailProps) {
 
       {/* Card List for editing */}
       <div className="space-y-2">
-        <h4 className="text-sm font-medium text-slate-400">카드 목록</h4>
+        <h4 className="text-sm font-medium text-stone-500">카드 목록</h4>
         {cards.map((card, idx) => (
           <div key={idx}
-            className={`bg-slate-800/50 border rounded-lg p-3 flex items-center gap-3 cursor-pointer transition-all ${
-              idx === currentSlide ? 'border-orange-500 bg-orange-500/10' : 'border-slate-700 hover:border-slate-600'
+            className={`bg-stone-100/50 border rounded-lg p-3 flex items-center gap-3 cursor-pointer transition-all ${
+              idx === currentSlide ? 'border-orange-500 bg-orange-500/10' : 'border-stone-200 hover:border-stone-300'
             }`}
             onClick={() => setCurrentSlide(idx)}>
             {card.imageUrl ? (
               <img src={card.imageUrl} alt="" className="w-12 h-12 object-cover rounded" />
             ) : (
-              <div className="w-12 h-12 bg-slate-700 rounded flex items-center justify-center text-xs text-slate-400">{idx + 1}</div>
+              <div className="w-12 h-12 bg-stone-200 rounded flex items-center justify-center text-xs text-stone-500">{idx + 1}</div>
             )}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5 mb-0.5">
                 <span className={`text-[10px] px-1.5 py-0.5 rounded ${
                   card.layout === 'cover' ? 'bg-purple-500/20 text-purple-400'
                     : card.layout === 'closing' ? 'bg-emerald-500/20 text-emerald-400'
-                      : 'bg-slate-700 text-slate-400'
+                      : 'bg-stone-200 text-stone-500'
                 }`}>
                   {card.layout === 'cover' ? '커버' : card.layout === 'closing' ? '마무리' : '내용'}
                 </span>
-                <span className="text-xs text-slate-500">#{idx + 1}</span>
+                <span className="text-xs text-stone-400">#{idx + 1}</span>
               </div>
               <p className="text-sm text-slate-200 truncate">{card.caption || '(캡션 없음)'}</p>
             </div>
             {series.status === 'draft' && (
               <div className="flex gap-1 shrink-0">
                 <button onClick={(e) => { e.stopPropagation(); startEdit(idx) }}
-                  className="border border-slate-600 text-slate-400 text-xs px-1.5 py-0.5 rounded">수정</button>
+                  className="border border-stone-300 text-stone-500 text-xs px-1.5 py-0.5 rounded">수정</button>
                 {idx > 0 && (
                   <button onClick={(e) => { e.stopPropagation(); moveSlide(idx, -1) }}
-                    className="border border-slate-600 text-slate-400 text-xs px-1.5 py-0.5 rounded">↑</button>
+                    className="border border-stone-300 text-stone-500 text-xs px-1.5 py-0.5 rounded">↑</button>
                 )}
                 {idx < cards.length - 1 && (
                   <button onClick={(e) => { e.stopPropagation(); moveSlide(idx, 1) }}
-                    className="border border-slate-600 text-slate-400 text-xs px-1.5 py-0.5 rounded">↓</button>
+                    className="border border-stone-300 text-stone-500 text-xs px-1.5 py-0.5 rounded">↓</button>
                 )}
               </div>
             )}
@@ -195,20 +195,20 @@ export function CardNewsDetail({ seriesId, onBack }: CardNewsDetailProps) {
       {/* Edit Card Modal */}
       {editingCard !== null && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setEditingCard(null)}>
-          <div className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-stone-100 border border-stone-200 rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
             <h4 className="text-base font-semibold text-slate-50">카드 {editingCard + 1} 수정</h4>
             <input value={editForm.imageUrl} onChange={(e) => setEditForm({ ...editForm, imageUrl: e.target.value })} placeholder="이미지 URL"
-              className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-slate-300" />
+              className="w-full bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-stone-600" />
             <input value={editForm.caption} onChange={(e) => setEditForm({ ...editForm, caption: e.target.value })} placeholder="캡션"
-              className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-slate-300" />
+              className="w-full bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-stone-600" />
             <select value={editForm.layout} onChange={(e) => setEditForm({ ...editForm, layout: e.target.value })}
-              className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-slate-300">
+              className="w-full bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-stone-600">
               <option value="cover">커버</option>
               <option value="content">내용</option>
               <option value="closing">마무리</option>
             </select>
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setEditingCard(null)} className="text-slate-400 text-sm px-3 py-1.5">취소</button>
+              <button onClick={() => setEditingCard(null)} className="text-stone-500 text-sm px-3 py-1.5">취소</button>
               <button onClick={() => updateCard.mutate({ index: editingCard, ...editForm })}
                 disabled={updateCard.isPending}
                 className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm disabled:opacity-50">
@@ -220,7 +220,7 @@ export function CardNewsDetail({ seriesId, onBack }: CardNewsDetailProps) {
       )}
 
       {/* Actions */}
-      <div className="flex gap-2 pt-2 flex-wrap border-t border-slate-700">
+      <div className="flex gap-2 pt-2 flex-wrap border-t border-stone-200">
         {(series.status === 'draft' || series.status === 'rejected') && (
           <button onClick={() => submitSeries.mutate()} disabled={submitSeries.isPending}
             className="bg-amber-600 hover:bg-amber-500 text-white rounded-lg px-4 py-2 text-sm disabled:opacity-50">
@@ -235,7 +235,7 @@ export function CardNewsDetail({ seriesId, onBack }: CardNewsDetailProps) {
             </button>
             <div className="flex gap-1">
               <input value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} placeholder="반려 사유"
-                className="bg-slate-800 border border-slate-600 rounded-lg px-3 py-1.5 text-sm text-slate-300" />
+                className="bg-stone-100 border border-stone-300 rounded-lg px-3 py-1.5 text-sm text-stone-600" />
               <button onClick={() => rejectSeries.mutate(rejectReason)} disabled={!rejectReason || rejectSeries.isPending}
                 className="bg-red-600 hover:bg-red-500 text-white rounded-lg px-4 py-2 text-sm disabled:opacity-50">
                 {rejectSeries.isPending ? '반려 중...' : '반려'}

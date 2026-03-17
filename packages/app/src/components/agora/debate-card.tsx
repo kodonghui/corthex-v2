@@ -10,8 +10,8 @@ export interface DebateCardProps {
 
 export function DebateCard({ title, participants, icon, iconBgClass, active }: DebateCardProps) {
     const containerClass = active
-        ? 'bg-cyan-400/10 border-l-cyan-400 cursor-pointer'
-        : 'hover:bg-cyan-400/5 cursor-pointer border-l-transparent transition-colors';
+        ? 'bg-[#5a7247]/10 border-l-[#5a7247] cursor-pointer'
+        : 'hover:bg-[#5a7247]/5 cursor-pointer border-l-transparent transition-colors';
 
     const dotClass = active ? 'bg-emerald-500' : 'bg-slate-500';
 
@@ -22,8 +22,8 @@ export function DebateCard({ title, participants, icon, iconBgClass, active }: D
                     {icon}
                 </div>
                 <div className="flex flex-col justify-center">
-                    <p className={`text-sm font-medium leading-normal line-clamp-1 ${active ? 'text-slate-900 dark:text-slate-100' : 'text-slate-700 dark:text-slate-300'}`}>{title}</p>
-                    <p className="text-slate-500 text-xs font-normal leading-normal line-clamp-1">{participants} participants</p>
+                    <p className={`text-sm font-medium leading-normal line-clamp-1 ${active ? 'text-slate-900' : 'text-slate-700'}`}>{title}</p>
+                    <p className="text-stone-400 text-xs font-normal leading-normal line-clamp-1">{participants} participants</p>
                 </div>
             </div>
             <div className="shrink-0 flex size-5 items-center justify-center">

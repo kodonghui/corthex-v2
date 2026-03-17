@@ -28,18 +28,18 @@ export function OpsLogItem({ time, agentId, operation, target, quality, cost, st
     };
 
     const config = statusConfig[status];
-    const qualityColorClass = quality.includes('-') ? 'text-slate-500' : parseFloat(quality) < 5 ? 'text-red-500' : parseFloat(quality) >= 9 ? 'text-emerald-500' : 'text-slate-300';
+    const qualityColorClass = quality.includes('-') ? 'text-stone-400' : parseFloat(quality) < 5 ? 'text-red-500' : parseFloat(quality) >= 9 ? 'text-emerald-500' : 'text-stone-600';
 
     return (
-        <tr className="hover:bg-slate-800/30 transition-colors group">
-            <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-300">{time}</td>
+        <tr className="hover:bg-stone-100/30 transition-colors group">
+            <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-stone-600">{time}</td>
             <td className="px-6 py-4 whitespace-nowrap">
-                <div className="h-8 w-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-cyan-400">{agentId}</div>
+                <div className="h-8 w-8 rounded-full bg-stone-100 border border-stone-200 flex items-center justify-center text-xs font-bold text-[#5a7247]">{agentId}</div>
             </td>
             <td className="px-6 py-4 text-sm font-medium text-slate-200">{operation}</td>
-            <td className="px-6 py-4 text-sm text-slate-400 font-mono">{target}</td>
+            <td className="px-6 py-4 text-sm text-stone-500 font-mono">{target}</td>
             <td className={`px-6 py-4 text-sm font-mono ${qualityColorClass}`}>{quality}</td>
-            <td className="px-6 py-4 text-sm font-mono text-slate-300">{cost}</td>
+            <td className="px-6 py-4 text-sm font-mono text-stone-600">{cost}</td>
             <td className="px-6 py-4 whitespace-nowrap">
                 <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${config.bg} ${config.text} border ${config.border}`}>
                     {status}

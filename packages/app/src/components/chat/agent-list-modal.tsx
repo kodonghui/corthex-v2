@@ -53,13 +53,13 @@ export function AgentListModal({
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-md mx-4 max-h-[70vh] flex flex-col">
+      <div className="bg-stone-100 border border-stone-200 rounded-2xl shadow-2xl w-full max-w-md mx-4 max-h-[70vh] flex flex-col">
         {/* 헤더 */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-700 shrink-0">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-stone-200 shrink-0">
           <h3 className="text-lg font-semibold text-slate-50">에이전트 선택</h3>
           <button
             onClick={onClose}
-            className="text-slate-500 hover:text-slate-300 p-1 rounded-lg hover:bg-slate-700 transition-colors"
+            className="text-stone-400 hover:text-stone-600 p-1 rounded-lg hover:bg-stone-200 transition-colors"
           >
             ✕
           </button>
@@ -73,14 +73,14 @@ export function AgentListModal({
             onChange={(e) => setSearch(e.target.value)}
             placeholder="이름 또는 역할 검색..."
             disabled={searchDisabled}
-            className="w-full bg-slate-700 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-white outline-none placeholder-slate-500 disabled:opacity-40 transition-colors"
+            className="w-full bg-stone-200 border border-stone-300 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-white outline-none placeholder-slate-500 disabled:opacity-40 transition-colors"
           />
         </div>
 
         {/* 에이전트 목록 */}
         <div className="flex-1 overflow-y-auto">
           {filtered.length === 0 ? (
-            <p className="text-center text-sm text-slate-500 py-6">검색 결과가 없습니다</p>
+            <p className="text-center text-sm text-stone-400 py-6">검색 결과가 없습니다</p>
           ) : (
             filtered.map((agent) => {
               const isOffline = agent.status === 'offline'
@@ -92,14 +92,14 @@ export function AgentListModal({
                   data-testid={`agent-item-${agent.id}`}
                   onClick={() => !isOffline && onSelect(agent)}
                   disabled={isOffline}
-                  className={`w-full flex items-center gap-3 px-5 py-3 hover:bg-slate-700/50 transition-colors ${
+                  className={`w-full flex items-center gap-3 px-5 py-3 hover:bg-stone-200/50 transition-colors ${
                     isOffline ? 'opacity-40 cursor-not-allowed' : ''
                   }`}
                 >
                   {/* 아바타 */}
-                  <span className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-sm font-bold text-slate-300 shrink-0 relative">
+                  <span className="w-10 h-10 rounded-full bg-stone-200 flex items-center justify-center text-sm font-bold text-stone-600 shrink-0 relative">
                     {initial}
-                    <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-slate-800 ${statusColors[agent.status]}`} />
+                    <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-stone-200 ${statusColors[agent.status]}`} />
                   </span>
 
                   {/* 정보 */}
@@ -110,7 +110,7 @@ export function AgentListModal({
                         <span className="text-xs px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">⭐ 비서</span>
                       )}
                     </div>
-                    <p className="text-xs text-slate-400 truncate mt-0.5">{agent.role}</p>
+                    <p className="text-xs text-stone-500 truncate mt-0.5">{agent.role}</p>
                   </div>
                 </button>
               )

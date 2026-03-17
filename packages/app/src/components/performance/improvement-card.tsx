@@ -8,14 +8,14 @@ export interface ImprovementCardProps {
 
 export function ImprovementCard({ title, description, icon }: ImprovementCardProps) {
     return (
-        <div className="flex flex-col gap-3 rounded-xl p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer group">
+        <div className="flex flex-col gap-3 rounded-xl p-5 border border-slate-200 bg-white/40 hover:bg-slate-50 transition-colors cursor-pointer group">
             <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center size-10 rounded-lg bg-cyan-400/10 text-cyan-400">
+                <div className="flex items-center justify-center size-10 rounded-lg bg-[#5a7247]/10 text-[#5a7247]">
                     {icon}
                 </div>
-                <h3 className="text-slate-900 dark:text-white text-sm font-bold">{title}</h3>
+                <h3 className="text-slate-900 text-sm font-bold">{title}</h3>
             </div>
-            <p className="text-slate-500 dark:text-slate-400 text-sm">{description}</p>
+            <p className="text-stone-400 text-sm">{description}</p>
         </div>
     )
 }

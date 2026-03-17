@@ -127,11 +127,11 @@ export function BacktestPanel({ stockCode, candles, onMarkers, onParamsChange, i
     <Card variant="bordered" className="shrink-0">
       <div className="px-5 py-4 space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">백테스트</h3>
+          <h3 className="text-sm font-semibold text-zinc-900">백테스트</h3>
           {result && (
             <button
               onClick={clearResult}
-              className="text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+              className="text-xs text-zinc-400 hover:text-zinc-600"
             >
               초기화
             </button>
@@ -148,7 +148,7 @@ export function BacktestPanel({ stockCode, candles, onMarkers, onParamsChange, i
               max={50}
               value={shortPeriod}
               onChange={(e) => setShortPeriod(Number(e.target.value))}
-              className="block w-20 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-2 py-1.5 text-sm text-zinc-900 dark:text-zinc-100"
+              className="block w-20 rounded-md border border-zinc-300 bg-white px-2 py-1.5 text-sm text-zinc-900"
             />
           </label>
           <label className="space-y-1">
@@ -159,7 +159,7 @@ export function BacktestPanel({ stockCode, candles, onMarkers, onParamsChange, i
               max={200}
               value={longPeriod}
               onChange={(e) => setLongPeriod(Number(e.target.value))}
-              className="block w-20 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-2 py-1.5 text-sm text-zinc-900 dark:text-zinc-100"
+              className="block w-20 rounded-md border border-zinc-300 bg-white px-2 py-1.5 text-sm text-zinc-900"
             />
           </label>
           <Button size="sm" onClick={runBacktest} disabled={candles.length === 0}>
@@ -169,7 +169,7 @@ export function BacktestPanel({ stockCode, candles, onMarkers, onParamsChange, i
 
         {/* Result Summary */}
         {result && (
-          <div className="border border-zinc-200 dark:border-zinc-700 rounded-lg p-3 space-y-2">
+          <div className="border border-zinc-200 rounded-lg p-3 space-y-2">
             <div className="grid grid-cols-2 gap-2 text-sm">
               <div>
                 <span className="text-xs text-zinc-500">총 수익률</span>
@@ -179,11 +179,11 @@ export function BacktestPanel({ stockCode, candles, onMarkers, onParamsChange, i
               </div>
               <div>
                 <span className="text-xs text-zinc-500">거래 횟수</span>
-                <div className="font-semibold text-zinc-900 dark:text-zinc-100">{result.metrics.tradeCount}회</div>
+                <div className="font-semibold text-zinc-900">{result.metrics.tradeCount}회</div>
               </div>
               <div>
                 <span className="text-xs text-zinc-500">승률</span>
-                <div className="font-semibold text-zinc-900 dark:text-zinc-100">{result.metrics.winRate}%</div>
+                <div className="font-semibold text-zinc-900">{result.metrics.winRate}%</div>
               </div>
               <div>
                 <span className="text-xs text-zinc-500">최대 손실</span>
@@ -207,7 +207,7 @@ export function BacktestPanel({ stockCode, candles, onMarkers, onParamsChange, i
                 tabIndex={0}
                 onClick={() => loadSaved(item)}
                 onKeyDown={(e) => e.key === 'Enter' && loadSaved(item)}
-                className="flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-800/50 cursor-pointer text-sm min-h-[36px]"
+                className="flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-zinc-50 cursor-pointer text-sm min-h-[36px]"
               >
                 <div className="flex items-center gap-2 min-w-0">
                   <span className="text-zinc-500 text-xs">

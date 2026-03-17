@@ -18,7 +18,7 @@ const PLATFORM_BADGE_STYLES: Record<string, { bg: string; text: string; icon: ty
 }
 
 const STATUS_BADGE_STYLES: Record<string, string> = {
-  draft: 'bg-slate-500/20 text-slate-400',
+  draft: 'bg-slate-500/20 text-stone-500',
   pending: 'bg-amber-500/20 text-amber-400',
   approved: 'bg-emerald-500/20 text-emerald-400',
   scheduled: 'bg-amber-500/20 text-amber-400',
@@ -157,34 +157,34 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
           <div className="flex gap-3 items-center flex-wrap">
             {accounts.length > 0 && (
               <div className="flex gap-2 items-center">
-                <span className="text-xs text-slate-400">계정:</span>
+                <span className="text-xs text-stone-500">계정:</span>
                 <select
                   data-testid="sns-account-filter"
                   value={accountFilter}
                   onChange={(e) => setAccountFilter(e.target.value)}
-                  className="bg-slate-800 border border-slate-600 rounded-lg text-sm px-3 py-1.5 text-slate-300"
+                  className="bg-stone-100 border border-stone-300 rounded-lg text-sm px-3 py-1.5 text-stone-600"
                 >
                   <option value="">전체</option>
                   {accounts.map((a) => <option key={a.id} value={a.id}>{a.accountName} ({PLATFORM_LABELS[a.platform] || a.platform})</option>)}
                 </select>
               </div>
             )}
-            <label className="flex items-center gap-1.5 text-sm text-slate-400 cursor-pointer">
-              <input type="checkbox" checked={showOnlyOriginals} onChange={(e) => setShowOnlyOriginals(e.target.checked)} className="rounded border-slate-600" />
+            <label className="flex items-center gap-1.5 text-sm text-stone-500 cursor-pointer">
+              <input type="checkbox" checked={showOnlyOriginals} onChange={(e) => setShowOnlyOriginals(e.target.checked)} className="rounded border-stone-300" />
               원본만
             </label>
-            <div className="flex border border-slate-600 rounded-lg overflow-hidden">
+            <div className="flex border border-stone-300 rounded-lg overflow-hidden">
               <button
                 data-testid="sns-view-list"
                 onClick={() => setViewMode('list')}
-                className={`px-3 py-1.5 text-xs ${viewMode === 'list' ? 'bg-blue-600/20 text-blue-400' : 'text-slate-400 hover:bg-slate-700'}`}
+                className={`px-3 py-1.5 text-xs ${viewMode === 'list' ? 'bg-blue-600/20 text-blue-400' : 'text-stone-500 hover:bg-stone-200'}`}
               >
                 목록
               </button>
               <button
                 data-testid="sns-view-gallery"
                 onClick={() => setViewMode('gallery')}
-                className={`px-3 py-1.5 text-xs ${viewMode === 'gallery' ? 'bg-blue-600/20 text-blue-400' : 'text-slate-400 hover:bg-slate-700'}`}
+                className={`px-3 py-1.5 text-xs ${viewMode === 'gallery' ? 'bg-blue-600/20 text-blue-400' : 'text-stone-500 hover:bg-stone-200'}`}
               >
                 갤러리
               </button>
@@ -203,8 +203,8 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
         {filteredList.length === 0 && (
           <div data-testid="sns-empty" className="text-center py-16">
             <p className="text-4xl mb-3">📝</p>
-            <p className="text-sm text-slate-400">아직 SNS 콘텐츠가 없습니다</p>
-            <p className="text-xs text-slate-500">새 콘텐츠를 만들어보세요!</p>
+            <p className="text-sm text-stone-500">아직 SNS 콘텐츠가 없습니다</p>
+            <p className="text-xs text-stone-400">새 콘텐츠를 만들어보세요!</p>
           </div>
         )}
 
@@ -215,11 +215,11 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
               <div key={item.id}
                 data-testid={`sns-gallery-item-${item.id}`}
                 onClick={() => { setSelectedId(item.id); setView('detail') }}
-                className="relative group bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden cursor-pointer hover:ring-2 ring-blue-500 transition-all">
+                className="relative group bg-stone-100/50 border border-stone-200 rounded-xl overflow-hidden cursor-pointer hover:ring-2 ring-blue-500 transition-all">
                 {item.imageUrl ? (
                   <img src={item.imageUrl} alt={item.title} className="w-full h-40 object-cover" />
                 ) : (
-                  <div className="w-full h-40 bg-slate-800 flex items-center justify-center text-slate-500 text-sm">이미지 없음</div>
+                  <div className="w-full h-40 bg-stone-100 flex items-center justify-center text-stone-400 text-sm">이미지 없음</div>
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2">
                   <p className="text-white text-xs font-medium truncate">{item.title}</p>
@@ -239,9 +239,9 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
         {viewMode === 'list' && filteredList.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-12">
             {filteredList.map((item) => {
-              const platStyle = PLATFORM_BADGE_STYLES[item.platform] || { bg: 'bg-slate-500/20', text: 'text-slate-400', icon: FileText }
+              const platStyle = PLATFORM_BADGE_STYLES[item.platform] || { bg: 'bg-slate-500/20', text: 'text-stone-500', icon: FileText }
               const PlatIcon = platStyle.icon
-              const statusBadge = STATUS_BADGE_STYLES[item.status] || 'bg-slate-500/20 text-slate-400'
+              const statusBadge = STATUS_BADGE_STYLES[item.status] || 'bg-slate-500/20 text-stone-500'
               const metrics = (item.metadata as Record<string, unknown>)?.metrics as SnsMetrics | undefined
               const isScheduled = item.status === 'scheduled' || item.status === 'pending'
               return (
@@ -249,7 +249,7 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
                   key={item.id}
                   data-testid={`sns-content-item-${item.id}`}
                   onClick={() => { setSelectedId(item.id); setView('detail') }}
-                  className="flex flex-col rounded-xl bg-slate-900 border border-slate-800 overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                  className="flex flex-col rounded-xl bg-white border border-stone-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                 >
                   <div className="p-5 flex flex-col gap-4 h-full">
                     {/* Top row: platform badge + date + status */}
@@ -259,7 +259,7 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
                           <PlatIcon className="w-3.5 h-3.5" />
                           {item.platform === 'instagram' ? 'Instagram' : item.platform === 'facebook' ? 'Facebook' : item.platform === 'twitter' ? 'Twitter' : item.platform === 'youtube' ? 'YouTube' : item.platform === 'linkedin' ? 'LinkedIn' : PLATFORM_LABELS[item.platform] || item.platform}
                         </div>
-                        <span className="text-slate-400 text-xs font-medium font-mono">
+                        <span className="text-stone-500 text-xs font-medium font-mono">
                           {new Date(item.createdAt).toLocaleString('ko', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
@@ -283,32 +283,32 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
 
                     {/* Image preview */}
                     {item.imageUrl ? (
-                      <div className="bg-slate-800 rounded-lg h-40 w-full overflow-hidden mt-auto">
+                      <div className="bg-stone-100 rounded-lg h-40 w-full overflow-hidden mt-auto">
                         <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
                       </div>
                     ) : (
-                      <div className="bg-slate-800 rounded-lg h-40 w-full flex items-center justify-center text-slate-600 text-sm mt-auto">
+                      <div className="bg-stone-100 rounded-lg h-40 w-full flex items-center justify-center text-slate-600 text-sm mt-auto">
                         이미지 없음
                       </div>
                     )}
 
                     {/* Engagement stats bar */}
-                    <div className={`flex items-center gap-6 mt-2 pt-4 border-t border-slate-800 ${isScheduled ? 'opacity-50' : ''}`}>
-                      <div className="flex items-center gap-1.5 text-slate-400">
+                    <div className={`flex items-center gap-6 mt-2 pt-4 border-t border-stone-200 ${isScheduled ? 'opacity-50' : ''}`}>
+                      <div className="flex items-center gap-1.5 text-stone-500">
                         <Heart className="w-[18px] h-[18px]" />
                         <span className="text-xs font-mono font-medium">{metrics?.likes?.toLocaleString() ?? '-'}</span>
                       </div>
-                      <div className="flex items-center gap-1.5 text-slate-400">
+                      <div className="flex items-center gap-1.5 text-stone-500">
                         <MessageCircle className="w-[18px] h-[18px]" />
                         <span className="text-xs font-mono font-medium">{metrics?.clicks?.toLocaleString() ?? '-'}</span>
                       </div>
-                      <div className="flex items-center gap-1.5 text-slate-400">
+                      <div className="flex items-center gap-1.5 text-stone-500">
                         <Share2 className="w-[18px] h-[18px]" />
                         <span className="text-xs font-mono font-medium">{metrics?.shares?.toLocaleString() ?? '-'}</span>
                       </div>
                       <button
                         onClick={(e) => { e.stopPropagation() }}
-                        className="ml-auto text-slate-400 hover:text-slate-300"
+                        className="ml-auto text-stone-500 hover:text-stone-600"
                         aria-label="더보기"
                       >
                         <MoreHorizontal className="w-5 h-5" />
@@ -328,16 +328,16 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
   if (view === 'create') {
     return (
       <div data-testid="sns-create-view" className="max-w-2xl space-y-4">
-        <button onClick={() => setView('list')} className="text-sm text-slate-400 hover:text-slate-200 mb-4">← 목록으로</button>
+        <button onClick={() => setView('list')} className="text-sm text-stone-500 hover:text-slate-200 mb-4">← 목록으로</button>
 
         {/* Mode Toggle */}
         <div className="flex gap-2 mb-4">
           <button onClick={() => setCreateMode('manual')}
-            className={`px-3 py-1.5 text-sm rounded-lg ${createMode === 'manual' ? 'bg-blue-600/20 text-blue-400' : 'text-slate-400 hover:text-slate-300'}`}>
+            className={`px-3 py-1.5 text-sm rounded-lg ${createMode === 'manual' ? 'bg-blue-600/20 text-blue-400' : 'text-stone-500 hover:text-stone-600'}`}>
             직접 작성
           </button>
           <button onClick={() => setCreateMode('ai')}
-            className={`px-3 py-1.5 text-sm rounded-lg ${createMode === 'ai' ? 'bg-blue-600/20 text-blue-400' : 'text-slate-400 hover:text-slate-300'}`}>
+            className={`px-3 py-1.5 text-sm rounded-lg ${createMode === 'ai' ? 'bg-blue-600/20 text-blue-400' : 'text-stone-500 hover:text-stone-600'}`}>
             AI 생성
           </button>
         </div>
@@ -345,25 +345,25 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
         {createMode === 'manual' && (
           <>
             <select value={form.platform} onChange={(e) => setForm({ ...form, platform: e.target.value })}
-              className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-slate-300">
+              className="w-full bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-stone-600">
               {PLATFORM_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
             <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })}
-              placeholder="제목" className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-slate-300" />
+              placeholder="제목" className="w-full bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-stone-600" />
             <textarea value={form.body} onChange={(e) => setForm({ ...form, body: e.target.value })} placeholder="본문 내용" rows={6}
-              className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-slate-300" />
+              className="w-full bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-stone-600" />
             <input value={form.hashtags} onChange={(e) => setForm({ ...form, hashtags: e.target.value })}
-              placeholder="해시태그 (#태그1 #태그2)" className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-slate-300" />
+              placeholder="해시태그 (#태그1 #태그2)" className="w-full bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-stone-600" />
             <div>
-              <label className="block text-xs text-slate-400 mb-1">예약 발행 (선택)</label>
+              <label className="block text-xs text-stone-500 mb-1">예약 발행 (선택)</label>
               <input type="datetime-local" value={form.scheduledAt} onChange={(e) => setForm({ ...form, scheduledAt: e.target.value })}
-                className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-slate-300" />
+                className="w-full bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-stone-600" />
             </div>
             {accounts.length > 0 && (
               <div>
-                <label className="block text-xs text-slate-400 mb-1">발행 계정 (선택)</label>
+                <label className="block text-xs text-stone-500 mb-1">발행 계정 (선택)</label>
                 <select value={form.snsAccountId} onChange={(e) => setForm({ ...form, snsAccountId: e.target.value })}
-                  className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-slate-300">
+                  className="w-full bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-stone-600">
                   <option value="">계정 미선택</option>
                   {accounts.filter((a) => a.platform === form.platform).map((a) => (
                     <option key={a.id} value={a.id}>{a.accountName} ({a.accountId})</option>
@@ -381,20 +381,20 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
         {createMode === 'ai' && (
           <>
             <select value={aiForm.platform} onChange={(e) => setAiForm({ ...aiForm, platform: e.target.value })}
-              className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-slate-300">
+              className="w-full bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-stone-600">
               {PLATFORM_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
             <select value={aiForm.agentId} onChange={(e) => setAiForm({ ...aiForm, agentId: e.target.value })}
-              className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-slate-300">
+              className="w-full bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-stone-600">
               <option value="">에이전트 선택</option>
               {agents.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
             </select>
             <input value={aiForm.topic} onChange={(e) => setAiForm({ ...aiForm, topic: e.target.value })}
-              placeholder="주제 (예: AI 자동화 마케팅 트렌드)" className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-slate-300" />
+              placeholder="주제 (예: AI 자동화 마케팅 트렌드)" className="w-full bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-stone-600" />
             <div>
-              <label className="block text-xs text-slate-400 mb-1">이미지 설명 (선택)</label>
+              <label className="block text-xs text-stone-500 mb-1">이미지 설명 (선택)</label>
               <input value={aiForm.imagePrompt} onChange={(e) => setAiForm({ ...aiForm, imagePrompt: e.target.value })}
-                placeholder="AI가 생성할 이미지 설명" className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-slate-300" />
+                placeholder="AI가 생성할 이미지 설명" className="w-full bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-stone-600" />
             </div>
             <button onClick={() => generateAi.mutate(aiForm)} disabled={!aiForm.agentId || !aiForm.topic || generateAi.isPending}
               className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-5 py-2.5 text-sm font-medium disabled:opacity-50">
@@ -410,29 +410,29 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
   if (view === 'detail' && detail) {
     return (
       <div data-testid="sns-detail-view" className="max-w-2xl space-y-4">
-        <button onClick={() => setView('list')} className="text-sm text-slate-400 hover:text-slate-200 mb-4">← 목록으로</button>
+        <button onClick={() => setView('list')} className="text-sm text-stone-500 hover:text-slate-200 mb-4">← 목록으로</button>
 
         <StatusStepper status={detail.status} createdAt={detail.createdAt} reviewedAt={detail.reviewedAt} scheduledAt={detail.scheduledAt} publishedAt={detail.publishedAt} />
 
         {/* Platform + Status */}
         <div className="flex items-center gap-2 mb-2">
-          <span className="text-xs text-slate-400">{PLATFORM_LABELS[detail.platform] || detail.platform}</span>
+          <span className="text-xs text-stone-500">{PLATFORM_LABELS[detail.platform] || detail.platform}</span>
           <span className={`text-xs px-2 py-0.5 rounded-full ${STATUS_COLORS[detail.status]}`}>{STATUS_LABELS[detail.status]}</span>
         </div>
 
         <h3 className="text-lg font-semibold text-slate-50">{detail.title}</h3>
 
         {detail.body && (
-          <div className="bg-slate-800/70 rounded-xl p-4 text-sm text-slate-300 whitespace-pre-wrap">{detail.body}</div>
+          <div className="bg-stone-100/70 rounded-xl p-4 text-sm text-stone-600 whitespace-pre-wrap">{detail.body}</div>
         )}
 
         {detail.imageUrl && (
-          <div className="rounded-xl overflow-hidden border border-slate-700">
+          <div className="rounded-xl overflow-hidden border border-stone-200">
             <img src={detail.imageUrl} alt={detail.title} className="w-full max-h-96 object-cover" />
           </div>
         )}
 
-        {detail.hashtags && <p className="text-sm text-cyan-400">{detail.hashtags}</p>}
+        {detail.hashtags && <p className="text-sm text-[#5a7247]">{detail.hashtags}</p>}
 
         {detail.rejectReason && (
           <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3">
@@ -449,9 +449,9 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
         {detail.publishError && <p className="text-sm text-red-400">발행 오류: {detail.publishError}</p>}
         {detail.scheduledAt && <p className="text-sm text-blue-400">예약 시간: {new Date(detail.scheduledAt).toLocaleString('ko')}</p>}
 
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-stone-400">
           작성: {detail.creatorName} · {new Date(detail.createdAt).toLocaleString('ko')}
-          {detail.accountName && <> · 계정: <span className="text-cyan-400">@{detail.accountName}</span></>}
+          {detail.accountName && <> · 계정: <span className="text-[#5a7247]">@{detail.accountName}</span></>}
         </p>
 
         {/* Actions */}
@@ -466,7 +466,7 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
                 className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg px-4 py-2 text-sm">승인</button>
               <div className="flex gap-1">
                 <input value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} placeholder="반려 사유"
-                  className="bg-slate-800 border border-slate-600 rounded-lg px-3 py-1.5 text-sm text-slate-300" />
+                  className="bg-stone-100 border border-stone-300 rounded-lg px-3 py-1.5 text-sm text-stone-600" />
                 <button data-testid="sns-reject-btn" onClick={() => reject.mutate({ id: detail.id, reason: rejectReason })} disabled={!rejectReason}
                   className="bg-red-600 hover:bg-red-500 text-white rounded-lg px-4 py-2 text-sm disabled:opacity-50">반려</button>
               </div>
@@ -497,20 +497,20 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
         {showImagePrompt && (
           <div className="flex gap-2 items-end">
             <div className="flex-1">
-              <label className="block text-xs text-slate-400 mb-1">이미지 설명</label>
+              <label className="block text-xs text-stone-500 mb-1">이미지 설명</label>
               <input value={imagePromptInput} onChange={(e) => setImagePromptInput(e.target.value)} placeholder="AI가 생성할 이미지를 설명하세요"
-                className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-slate-300" />
+                className="w-full bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-stone-600" />
             </div>
             <button onClick={() => generateImage.mutate({ id: detail.id, imagePrompt: imagePromptInput })} disabled={!imagePromptInput || generateImage.isPending}
               className="bg-purple-600 hover:bg-purple-500 text-white rounded-lg px-4 py-2 text-sm disabled:opacity-50">
               {generateImage.isPending ? '생성 중...' : '생성'}
             </button>
-            <button onClick={() => { setShowImagePrompt(false); setImagePromptInput('') }} className="text-slate-400 text-sm px-3 py-2 hover:text-slate-200">취소</button>
+            <button onClick={() => { setShowImagePrompt(false); setImagePromptInput('') }} className="text-stone-500 text-sm px-3 py-2 hover:text-slate-200">취소</button>
           </div>
         )}
 
         {/* A/B Test Section */}
-        <div className="border-t border-slate-700 pt-4 mt-4 space-y-3">
+        <div className="border-t border-stone-200 pt-4 mt-4 space-y-3">
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-semibold text-slate-200">A/B 테스트</h4>
             <div className="flex gap-2">
@@ -521,7 +521,7 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
               <button onClick={() => setShowVariantModal(true)}
                 className="bg-purple-600 hover:bg-purple-500 text-white rounded-lg px-3 py-1.5 text-xs">AI 변형 생성</button>
               <button onClick={() => { setShowMetricsForm(!showMetricsForm); const m = (detail.metadata as Record<string, unknown>)?.metrics as SnsMetrics | undefined; if (m) setMetricsForm({ views: m.views, likes: m.likes, shares: m.shares, clicks: m.clicks }) }}
-                className="border border-slate-600 text-slate-400 rounded-lg px-3 py-1.5 text-xs">성과 입력</button>
+                className="border border-stone-300 text-stone-500 rounded-lg px-3 py-1.5 text-xs">성과 입력</button>
               {(detail.variants?.length ?? 0) > 0 && (
                 <button onClick={() => setShowAbResults(!showAbResults)}
                   className="border border-emerald-500/50 text-emerald-400 rounded-lg px-3 py-1.5 text-xs">
@@ -532,19 +532,19 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
           </div>
 
           {showMetricsForm && (
-            <div className="bg-slate-800/70 rounded-xl p-4 space-y-3">
+            <div className="bg-stone-100/70 rounded-xl p-4 space-y-3">
               <div className="grid grid-cols-4 gap-3">
                 {(['views', 'likes', 'shares', 'clicks'] as const).map((key) => (
                   <div key={key}>
-                    <label className="block text-xs text-slate-400 mb-1">{{ views: '조회', likes: '좋아요', shares: '공유', clicks: '클릭' }[key]}</label>
+                    <label className="block text-xs text-stone-500 mb-1">{{ views: '조회', likes: '좋아요', shares: '공유', clicks: '클릭' }[key]}</label>
                     <input type="number" min={0} value={metricsForm[key]}
                       onChange={(e) => setMetricsForm({ ...metricsForm, [key]: Number(e.target.value) || 0 })}
-                      className="w-full bg-slate-800 border border-slate-600 rounded-lg px-2 py-1 text-sm text-slate-300" />
+                      className="w-full bg-stone-100 border border-stone-300 rounded-lg px-2 py-1 text-sm text-stone-600" />
                   </div>
                 ))}
               </div>
               <div className="flex gap-2 justify-end">
-                <button onClick={() => setShowMetricsForm(false)} className="px-2 py-1 text-xs text-slate-400">취소</button>
+                <button onClick={() => setShowMetricsForm(false)} className="px-2 py-1 text-xs text-stone-500">취소</button>
                 <button onClick={() => updateMetrics.mutate({ id: detail.id, ...metricsForm })} disabled={updateMetrics.isPending}
                   className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-3 py-1.5 text-xs disabled:opacity-50">
                   {updateMetrics.isPending ? '저장 중...' : '저장'}
@@ -555,10 +555,10 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
 
           {detail.variants && detail.variants.length > 0 && (
             <div className="space-y-2">
-              <p className="text-xs text-slate-500">변형 {detail.variants.length}개</p>
+              <p className="text-xs text-stone-400">변형 {detail.variants.length}개</p>
               {detail.variants.map((v) => (
                 <div key={v.id} onClick={() => { setSelectedId(v.id); setShowAbResults(false); setShowMetricsForm(false) }}
-                  className="bg-slate-800/50 border border-slate-700 rounded-lg p-3 cursor-pointer hover:border-slate-600 flex justify-between items-center">
+                  className="bg-stone-100/50 border border-stone-200 rounded-lg p-3 cursor-pointer hover:border-stone-300 flex justify-between items-center">
                   <div>
                     <span className="bg-purple-500/20 text-purple-400 text-xs px-1.5 py-0.5 rounded mr-2">변형</span>
                     <span className="text-sm text-slate-200">{v.title}</span>
@@ -572,8 +572,8 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
           {showAbResults && abResultsData?.data && (() => {
             const ab = abResultsData.data
             return (
-              <div className="bg-slate-800/70 rounded-xl p-4 space-y-2">
-                <h5 className="text-xs font-semibold text-slate-400">A/B 테스트 결과</h5>
+              <div className="bg-stone-100/70 rounded-xl p-4 space-y-2">
+                <h5 className="text-xs font-semibold text-stone-500">A/B 테스트 결과</h5>
                 <div className="space-y-1">
                   {ab.scores.map((s) => (
                     <div key={s.id} className={`flex items-center justify-between p-2 rounded-lg text-sm ${ab.winner?.id === s.id ? 'bg-emerald-500/10 border border-emerald-500/30' : ''}`}>
@@ -581,14 +581,14 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
                         {ab.winner?.id === s.id && <span className="text-xs text-emerald-400 font-bold">WINNER</span>}
                         <span className="truncate max-w-[200px] text-slate-200">{s.title}</span>
                       </div>
-                      <div className="flex gap-3 text-xs text-slate-400">
+                      <div className="flex gap-3 text-xs text-stone-500">
                         {s.metrics ? (
                           <>
                             <span>조회 {s.metrics.views}</span><span>좋아요 {s.metrics.likes}</span>
                             <span>공유 {s.metrics.shares}</span><span>클릭 {s.metrics.clicks}</span>
                             <span className="font-bold text-blue-400">점수 {s.score}</span>
                           </>
-                        ) : <span className="text-slate-500">성과 미입력</span>}
+                        ) : <span className="text-stone-400">성과 미입력</span>}
                       </div>
                     </div>
                   ))}
@@ -601,14 +601,14 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
         {/* Variant Modal */}
         {showVariantModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowVariantModal(false)}>
-            <div className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-stone-100 border border-stone-200 rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
               <h4 className="text-base font-semibold text-slate-50">AI A/B 변형 생성</h4>
               <div>
-                <label className="block text-xs text-slate-400 mb-1">변형 수 ({variantCount}개)</label>
+                <label className="block text-xs text-stone-500 mb-1">변형 수 ({variantCount}개)</label>
                 <input type="range" min={2} max={5} value={variantCount} onChange={(e) => setVariantCount(Number(e.target.value))} className="w-full" />
               </div>
               <select value={variantStrategy} onChange={(e) => setVariantStrategy(e.target.value)}
-                className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-slate-300">
+                className="w-full bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-stone-600">
                 <option value="tone">어조 변경</option>
                 <option value="length">길이 변경</option>
                 <option value="hashtag">해시태그 최적화</option>
@@ -616,12 +616,12 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
                 <option value="mixed">전체 변경</option>
               </select>
               <select value={aiForm.agentId} onChange={(e) => setAiForm({ ...aiForm, agentId: e.target.value })}
-                className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-slate-300">
+                className="w-full bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-stone-600">
                 <option value="">에이전트 선택</option>
                 {agents.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
               </select>
               <div className="flex gap-2 justify-end">
-                <button onClick={() => setShowVariantModal(false)} className="text-slate-400 text-sm px-3 py-1.5">취소</button>
+                <button onClick={() => setShowVariantModal(false)} className="text-stone-500 text-sm px-3 py-1.5">취소</button>
                 <button onClick={() => generateVariants.mutate({ id: detail.id, count: variantCount, strategy: variantStrategy, agentId: aiForm.agentId })}
                   disabled={!aiForm.agentId || generateVariants.isPending}
                   className="bg-purple-600 hover:bg-purple-500 text-white rounded-lg px-4 py-2 text-sm disabled:opacity-50">

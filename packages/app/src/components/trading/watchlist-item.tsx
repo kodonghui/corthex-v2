@@ -9,8 +9,8 @@ export interface WatchlistItemProps {
 
 export function WatchlistItem({ symbol, price, name, change, isPositive, active }: WatchlistItemProps) {
     const containerClass = active
-        ? 'bg-slate-800 border-l-cyan-400'
-        : 'hover:bg-slate-800 border-l-transparent';
+        ? 'bg-stone-100 border-l-[#5a7247]'
+        : 'hover:bg-stone-100 border-l-transparent';
 
     return (
         <div className={`flex flex-col gap-1 px-4 py-3 border-l-2 cursor-pointer transition-colors ${containerClass}`}>
@@ -19,7 +19,7 @@ export function WatchlistItem({ symbol, price, name, change, isPositive, active 
                 <span className="font-mono text-sm text-slate-100">{price}</span>
             </div>
             <div className="flex justify-between items-center text-xs">
-                <span className="text-slate-400">{name}</span>
+                <span className="text-stone-500">{name}</span>
                 <span className={`font-mono ${isPositive ? 'text-emerald-500' : 'text-red-500'}`}>
                     {isPositive ? '+' : ''}{change}
                 </span>

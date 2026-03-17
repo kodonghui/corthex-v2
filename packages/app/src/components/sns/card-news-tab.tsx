@@ -89,16 +89,16 @@ export function CardNewsTab({ agents }: CardNewsTabProps) {
   if (view === 'create') {
     return (
       <div data-testid="sns-cardnews-create" className="max-w-2xl space-y-4">
-        <button onClick={() => setView('list')} className="text-sm text-slate-400 hover:text-slate-200">← 목록으로</button>
+        <button onClick={() => setView('list')} className="text-sm text-stone-500 hover:text-slate-200">← 목록으로</button>
         <h3 className="text-base font-semibold text-slate-50">카드뉴스 시리즈 만들기</h3>
 
         <div className="flex gap-2 mb-4">
           <button onClick={() => setCreateMode('manual')}
-            className={`px-3 py-1.5 text-sm rounded-lg ${createMode === 'manual' ? 'bg-blue-600/20 text-blue-400' : 'text-slate-400 hover:text-slate-300'}`}>
+            className={`px-3 py-1.5 text-sm rounded-lg ${createMode === 'manual' ? 'bg-blue-600/20 text-blue-400' : 'text-stone-500 hover:text-stone-600'}`}>
             직접 작성
           </button>
           <button onClick={() => setCreateMode('ai')}
-            className={`px-3 py-1.5 text-sm rounded-lg ${createMode === 'ai' ? 'bg-blue-600/20 text-blue-400' : 'text-slate-400 hover:text-slate-300'}`}>
+            className={`px-3 py-1.5 text-sm rounded-lg ${createMode === 'ai' ? 'bg-blue-600/20 text-blue-400' : 'text-stone-500 hover:text-stone-600'}`}>
             AI 자동 생성
           </button>
         </div>
@@ -106,17 +106,17 @@ export function CardNewsTab({ agents }: CardNewsTabProps) {
         {createMode === 'manual' && (
           <>
             <input value={seriesTitle} onChange={(e) => setSeriesTitle(e.target.value)} placeholder="시리즈 제목"
-              className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-slate-300" />
+              className="w-full bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-stone-600" />
             <input value={seriesDesc} onChange={(e) => setSeriesDesc(e.target.value)} placeholder="시리즈 설명 (선택)"
-              className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-slate-300" />
+              className="w-full bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-stone-600" />
             <select value={seriesPlatform} onChange={(e) => setSeriesPlatform(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-slate-300">
+              className="w-full bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-stone-600">
               {PLATFORM_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-medium text-slate-300">카드 목록 ({cards.length}/10)</h4>
+                <h4 className="text-sm font-medium text-stone-600">카드 목록 ({cards.length}/10)</h4>
                 <button onClick={addCard} disabled={cards.length >= 10}
                   className="bg-orange-600 hover:bg-orange-500 text-white text-xs px-3 py-1.5 rounded-lg disabled:opacity-50">
                   + 카드 추가
@@ -124,24 +124,24 @@ export function CardNewsTab({ agents }: CardNewsTabProps) {
               </div>
 
               {cards.map((card, idx) => (
-                <div key={idx} className="bg-slate-800/50 border border-slate-700 rounded-lg p-3 space-y-2">
+                <div key={idx} className="bg-stone-100/50 border border-stone-200 rounded-lg p-3 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-slate-400">카드 {idx + 1}</span>
+                    <span className="text-xs font-medium text-stone-500">카드 {idx + 1}</span>
                     <div className="flex gap-1">
                       <button onClick={() => moveCard(idx, -1)} disabled={idx === 0}
-                        className="border border-slate-600 text-slate-400 text-xs px-1.5 py-0.5 rounded disabled:opacity-30">↑</button>
+                        className="border border-stone-300 text-stone-500 text-xs px-1.5 py-0.5 rounded disabled:opacity-30">↑</button>
                       <button onClick={() => moveCard(idx, 1)} disabled={idx === cards.length - 1}
-                        className="border border-slate-600 text-slate-400 text-xs px-1.5 py-0.5 rounded disabled:opacity-30">↓</button>
+                        className="border border-stone-300 text-stone-500 text-xs px-1.5 py-0.5 rounded disabled:opacity-30">↓</button>
                       <button onClick={() => removeCard(idx)} disabled={cards.length <= 1}
                         className="border border-red-500/50 text-red-400 text-xs px-1.5 py-0.5 rounded disabled:opacity-30">삭제</button>
                     </div>
                   </div>
                   <input value={card.imageUrl} onChange={(e) => updateCard(idx, 'imageUrl', e.target.value)} placeholder="이미지 URL"
-                    className="w-full bg-slate-800 border border-slate-600 rounded-lg px-2 py-1.5 text-sm text-slate-300" />
+                    className="w-full bg-stone-100 border border-stone-300 rounded-lg px-2 py-1.5 text-sm text-stone-600" />
                   <input value={card.caption} onChange={(e) => updateCard(idx, 'caption', e.target.value)} placeholder="캡션"
-                    className="w-full bg-slate-800 border border-slate-600 rounded-lg px-2 py-1.5 text-sm text-slate-300" />
+                    className="w-full bg-stone-100 border border-stone-300 rounded-lg px-2 py-1.5 text-sm text-stone-600" />
                   <select value={card.layout} onChange={(e) => updateCard(idx, 'layout', e.target.value)}
-                    className="bg-slate-800 border border-slate-600 rounded-lg px-2 py-1 text-xs text-slate-300">
+                    className="bg-stone-100 border border-stone-300 rounded-lg px-2 py-1 text-xs text-stone-600">
                     <option value="cover">커버</option>
                     <option value="content">내용</option>
                     <option value="closing">마무리</option>
@@ -161,17 +161,17 @@ export function CardNewsTab({ agents }: CardNewsTabProps) {
         {createMode === 'ai' && (
           <>
             <input value={aiTopic} onChange={(e) => setAiTopic(e.target.value)} placeholder="주제 (예: 2026 AI 마케팅 트렌드 5가지)"
-              className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-slate-300" />
+              className="w-full bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-stone-600" />
             <select value={aiPlatform} onChange={(e) => setAiPlatform(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-slate-300">
+              className="w-full bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-stone-600">
               {PLATFORM_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
             <div>
-              <label className="block text-xs text-slate-400 mb-1">카드 수 ({aiCardCount}장)</label>
+              <label className="block text-xs text-stone-500 mb-1">카드 수 ({aiCardCount}장)</label>
               <input type="range" min={3} max={10} value={aiCardCount} onChange={(e) => setAiCardCount(Number(e.target.value))} className="w-full" />
             </div>
             <select value={aiAgentId} onChange={(e) => setAiAgentId(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-slate-300">
+              className="w-full bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-stone-600">
               <option value="">에이전트 선택</option>
               {agents.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
             </select>
@@ -190,7 +190,7 @@ export function CardNewsTab({ agents }: CardNewsTabProps) {
   return (
     <div data-testid="sns-cardnews-tab" className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-slate-400">카드뉴스 시리즈 {seriesList.length}개</h3>
+        <h3 className="text-sm font-medium text-stone-500">카드뉴스 시리즈 {seriesList.length}개</h3>
         <button onClick={() => setView('create')}
           className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium">
           + 새 시리즈
@@ -200,8 +200,8 @@ export function CardNewsTab({ agents }: CardNewsTabProps) {
       {seriesList.length === 0 && (
         <div data-testid="sns-cardnews-empty" className="text-center py-16">
           <p className="text-4xl mb-3">🗂️</p>
-          <p className="text-sm text-slate-400">카드뉴스 시리즈가 없습니다</p>
-          <p className="text-xs text-slate-500">새 시리즈를 만들어 멀티 이미지 콘텐츠를 관리해보세요.</p>
+          <p className="text-sm text-stone-500">카드뉴스 시리즈가 없습니다</p>
+          <p className="text-xs text-stone-400">새 시리즈를 만들어 멀티 이미지 콘텐츠를 관리해보세요.</p>
         </div>
       )}
 
@@ -216,20 +216,20 @@ export function CardNewsTab({ agents }: CardNewsTabProps) {
             <div key={item.id}
               data-testid={`sns-cardnews-item-${item.id}`}
               onClick={() => { setSelectedId(item.id); setView('detail') }}
-              className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden cursor-pointer hover:ring-2 ring-orange-500 transition-all">
+              className="bg-stone-100/50 border border-stone-200 rounded-xl overflow-hidden cursor-pointer hover:ring-2 ring-orange-500 transition-all">
               {coverCard?.imageUrl ? (
                 <img src={coverCard.imageUrl} alt={item.title} className="w-full h-36 object-cover" />
               ) : (
-                <div className="w-full h-36 bg-slate-800 flex items-center justify-center text-slate-500 text-sm">이미지 없음</div>
+                <div className="w-full h-36 bg-stone-100 flex items-center justify-center text-stone-400 text-sm">이미지 없음</div>
               )}
               <div className="p-3">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xs text-slate-400">{PLATFORM_LABELS[item.platform] || item.platform}</span>
+                  <span className="text-xs text-stone-500">{PLATFORM_LABELS[item.platform] || item.platform}</span>
                   <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${STATUS_COLORS[item.status]}`}>{STATUS_LABELS[item.status]}</span>
-                  <span className="text-[10px] text-slate-400">{totalCards}장</span>
+                  <span className="text-[10px] text-stone-500">{totalCards}장</span>
                 </div>
                 <h4 className="text-sm font-medium text-slate-100 truncate">{item.title}</h4>
-                <p className="text-xs text-slate-500 mt-0.5">{new Date(item.createdAt).toLocaleDateString('ko')}</p>
+                <p className="text-xs text-stone-400 mt-0.5">{new Date(item.createdAt).toLocaleDateString('ko')}</p>
               </div>
             </div>
           )

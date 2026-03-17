@@ -11,14 +11,14 @@ export function EventTimelineItem({ time, message, duration, status }: EventTime
             case 'error':
                 return {
                     bg: 'bg-rose-500',
-                    text: 'text-rose-600 dark:text-rose-400'
+                    text: 'text-rose-600'
                 }
             case 'success':
             case 'info':
             default:
                 return {
                     bg: 'bg-emerald-500',
-                    text: 'text-slate-900 dark:text-slate-100'
+                    text: 'text-slate-900'
                 }
         }
     }
@@ -27,13 +27,13 @@ export function EventTimelineItem({ time, message, duration, status }: EventTime
 
     return (
         <div className="relative">
-            <div className={`absolute -left-[31px] w-3 h-3 rounded-full border-[3px] border-white dark:border-slate-900 mt-1.5 ${bg}`}></div>
+            <div className={`absolute -left-[31px] w-3 h-3 rounded-full border-[3px] border-white mt-1.5 ${bg}`}></div>
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
                 <div>
-                    <p className="font-mono text-sm text-slate-500 dark:text-slate-400">{time}</p>
+                    <p className="font-mono text-sm text-stone-400">{time}</p>
                     <p className={`font-medium ${text}`}>{message}</p>
                 </div>
-                <div className="font-mono text-sm text-slate-500 dark:text-slate-400">
+                <div className="font-mono text-sm text-stone-400">
                     소요시간: {duration}
                 </div>
             </div>

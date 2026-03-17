@@ -136,7 +136,7 @@ export function ApprovalQueue() {
     return (
       <div className="p-6 text-center">
         <div className="text-2xl mb-2">✅</div>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">승인 대기 주문이 없습니다</p>
+        <p className="text-sm text-zinc-500">승인 대기 주문이 없습니다</p>
       </div>
     )
   }
@@ -159,7 +159,7 @@ export function ApprovalQueue() {
       {/* Header + Bulk Actions */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">승인 대기</h3>
+          <h3 className="text-sm font-semibold text-zinc-900">승인 대기</h3>
           <Badge variant="warning">{orders.length}건</Badge>
         </div>
         {orders.length > 1 && (
@@ -202,7 +202,7 @@ export function ApprovalQueue() {
                     <Badge variant={order.side === 'buy' ? 'success' : 'error'}>
                       {order.side === 'buy' ? '매수' : '매도'}
                     </Badge>
-                    <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">{order.tickerName}</span>
+                    <span className="text-sm font-medium text-zinc-900 truncate">{order.tickerName}</span>
                     <span className="text-xs text-zinc-400">{order.ticker}</span>
                     {order.tradingMode === 'real' && <Badge variant="error">실거래</Badge>}
                     {confidence && <Badge variant="info">확신도 {confidence}</Badge>}
@@ -214,7 +214,7 @@ export function ApprovalQueue() {
                     <span>{formatTime(order.createdAt)}</span>
                   </div>
                   {order.reason && (
-                    <p className="mt-1.5 text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2">{order.reason}</p>
+                    <p className="mt-1.5 text-xs text-zinc-500 line-clamp-2">{order.reason}</p>
                   )}
                 </div>
                 <div className="flex gap-1 shrink-0">

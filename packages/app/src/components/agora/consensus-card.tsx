@@ -39,32 +39,32 @@ export function ConsensusCard({ result }: { result: DebateResult }) {
       <div className="flex items-center gap-2">
         <Icon className={cn('w-5 h-5', style.iconColor)} />
         <h3 className="text-sm font-bold text-slate-100">{style.label}</h3>
-        <span className="text-[10px] text-slate-400 font-mono ml-auto">{result.roundCount}R</span>
+        <span className="text-[10px] text-stone-500 font-mono ml-auto">{result.roundCount}R</span>
       </div>
 
       {/* Summary */}
-      <p className="text-sm text-slate-300 leading-relaxed">{result.summary}</p>
+      <p className="text-sm text-stone-600 leading-relaxed">{result.summary}</p>
 
       {/* Positions */}
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">다수 의견</p>
-          <p className="text-xs text-slate-400">{result.majorityPosition}</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-stone-500">다수 의견</p>
+          <p className="text-xs text-stone-500">{result.majorityPosition}</p>
         </div>
         <div className="space-y-1">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">소수 의견</p>
-          <p className="text-xs text-slate-400">{result.minorityPosition}</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-stone-500">소수 의견</p>
+          <p className="text-xs text-stone-500">{result.minorityPosition}</p>
         </div>
       </div>
 
       {/* Key arguments */}
       {result.keyArguments.length > 0 && (
         <div className="space-y-1">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">핵심 논점</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-stone-500">핵심 논점</p>
           <ul className="space-y-1">
             {result.keyArguments.map((arg, i) => (
-              <li key={i} className="text-xs text-slate-400 flex gap-1.5">
-                <span className="text-slate-500 shrink-0">•</span>
+              <li key={i} className="text-xs text-stone-500 flex gap-1.5">
+                <span className="text-stone-400 shrink-0">•</span>
                 <span>{arg}</span>
               </li>
             ))}

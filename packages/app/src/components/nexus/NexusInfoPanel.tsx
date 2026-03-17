@@ -7,7 +7,7 @@ const STATUS_LABELS: Record<string, { label: string; color: string; dotColor: st
   online: { label: '온라인', color: 'text-emerald-400', dotColor: 'bg-emerald-400' },
   working: { label: '작업 중', color: 'text-amber-400', dotColor: 'bg-amber-400' },
   error: { label: '오류', color: 'text-red-400', dotColor: 'bg-red-400' },
-  offline: { label: '오프라인', color: 'text-slate-400', dotColor: 'bg-slate-500' },
+  offline: { label: '오프라인', color: 'text-stone-500', dotColor: 'bg-slate-500' },
 }
 
 type Props = {
@@ -53,15 +53,15 @@ export function NexusInfoPanel({ node, onClose }: Props) {
       {/* Role */}
       {node.role && (
         <div>
-          <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold">역할</span>
-          <p className="text-sm text-slate-300 mt-1">{node.role}</p>
+          <span className="text-xs text-stone-400 uppercase tracking-wider font-semibold">역할</span>
+          <p className="text-sm text-stone-600 mt-1">{node.role}</p>
         </div>
       )}
 
       {/* Soul */}
       {node.soul && (
-        <div className="bg-slate-800/50 p-3 rounded-lg border border-slate-700/50">
-          <p className="text-xs text-slate-400 italic leading-relaxed">"{node.soul}"</p>
+        <div className="bg-stone-100/50 p-3 rounded-lg border border-stone-200/50">
+          <p className="text-xs text-stone-500 italic leading-relaxed">"{node.soul}"</p>
         </div>
       )}
 
@@ -72,13 +72,13 @@ export function NexusInfoPanel({ node, onClose }: Props) {
         </div>
       )}
 
-      <hr className="border-slate-800" />
+      <hr className="border-stone-200" />
 
       {/* Chat action */}
       {node.agentId && (
         <button
           onClick={() => navigate(`/chat?agentId=${node.agentId}`)}
-          className="w-full py-2.5 bg-cyan-400/10 text-cyan-400 border border-cyan-400/20 text-sm font-medium rounded-lg hover:bg-cyan-400/20 transition-colors flex items-center justify-center gap-2"
+          className="w-full py-2.5 bg-[#5a7247]/10 text-[#5a7247] border border-[#5a7247]/20 text-sm font-medium rounded-lg hover:bg-[#5a7247]/20 transition-colors flex items-center justify-center gap-2"
         >
           <MessageSquare className="w-4 h-4" />
           채팅하기
@@ -93,18 +93,18 @@ export function NexusInfoPanel({ node, onClose }: Props) {
       <div className="md:hidden fixed inset-0 z-40" onClick={onClose}>
         <div className="absolute inset-0 bg-black/40" />
         <div
-          className="absolute bottom-0 inset-x-0 bg-slate-900 border-t border-slate-800 rounded-t-2xl p-4 max-h-[60vh] overflow-y-auto [-webkit-overflow-scrolling:touch] animate-slide-up"
+          className="absolute bottom-0 inset-x-0 bg-white border-t border-stone-200 rounded-t-2xl p-4 max-h-[60vh] overflow-y-auto [-webkit-overflow-scrolling:touch] animate-slide-up"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Drag handle */}
           <div className="flex justify-center mb-3">
-            <div className="w-10 h-1 bg-slate-700 rounded-full" />
+            <div className="w-10 h-1 bg-stone-200 rounded-full" />
           </div>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-slate-100">에이전트 정보</h3>
             <button
               onClick={onClose}
-              className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-colors"
+              className="w-7 h-7 flex items-center justify-center rounded-lg text-stone-500 hover:text-slate-100 hover:bg-stone-100 transition-colors"
               aria-label="닫기"
             >
               <X className="w-4 h-4" />
@@ -115,13 +115,13 @@ export function NexusInfoPanel({ node, onClose }: Props) {
       </div>
 
       {/* Desktop: right sidebar */}
-      <div className="hidden md:flex flex-col w-80 border-l border-slate-800 bg-slate-900/80 backdrop-blur-md overflow-y-auto transition-all">
-        <div className="p-6 border-b border-slate-800">
+      <div className="hidden md:flex flex-col w-80 border-l border-stone-200 bg-white/80 backdrop-blur-md overflow-y-auto transition-all">
+        <div className="p-6 border-b border-stone-200">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-slate-100">에이전트 정보</h3>
             <button
               onClick={onClose}
-              className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-colors"
+              className="w-7 h-7 flex items-center justify-center rounded-lg text-stone-500 hover:text-slate-100 hover:bg-stone-100 transition-colors"
               aria-label="닫기"
             >
               <X className="w-4 h-4" />

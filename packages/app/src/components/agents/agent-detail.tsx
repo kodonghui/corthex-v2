@@ -35,7 +35,7 @@ export function AgentDetail({
         <div className="flex flex-col gap-6 p-4">
             <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
                 <div className="flex items-center gap-6">
-                    <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center shadow-lg relative">
+                    <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#5a7247] to-cyan-600 flex items-center justify-center shadow-lg relative">
                         <Headset className="text-white w-10 h-10" />
                         <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#102022] rounded-full flex items-center justify-center">
                             <div className="w-4 h-4 rounded-full bg-green-500"></div>
@@ -46,12 +46,12 @@ export function AgentDetail({
                             <h2 className="text-slate-100 text-3xl font-bold tracking-tight">{name}</h2>
                             <TierBadge level={tier} />
                         </div>
-                        <p className="text-slate-400 text-base font-mono">{department} · ID: {agentId}</p>
-                        <p className="text-slate-300 text-sm max-w-lg mt-1">{description}</p>
+                        <p className="text-stone-500 text-base font-mono">{department} · ID: {agentId}</p>
+                        <p className="text-stone-600 text-sm max-w-lg mt-1">{description}</p>
                     </div>
                 </div>
                 <div className="flex gap-3 mt-4 md:mt-0">
-                    <button className="flex items-center justify-center rounded-lg h-10 px-6 bg-slate-800 text-slate-300 text-sm font-bold border border-slate-700 hover:bg-slate-700 transition-colors">
+                    <button className="flex items-center justify-center rounded-lg h-10 px-6 bg-stone-100 text-stone-600 text-sm font-bold border border-stone-200 hover:bg-stone-200 transition-colors">
                         <Edit2 className="w-4 h-4 mr-2" />
                         편집
                     </button>
@@ -62,21 +62,21 @@ export function AgentDetail({
                 </div>
             </div>
 
-            <div className="border-b border-slate-800 mt-6">
+            <div className="border-b border-stone-200 mt-6">
                 <div className="flex gap-8">
-                    <button className="pb-4 border-b-2 border-cyan-400 text-cyan-400 font-bold text-sm">개요</button>
-                    <button className="pb-4 border-b-2 border-transparent text-slate-400 hover:text-slate-300 font-medium text-sm transition-colors">Soul</button>
-                    <button className="pb-4 border-b-2 border-transparent text-slate-400 hover:text-slate-300 font-medium text-sm transition-colors">작업 이력</button>
-                    <button className="pb-4 border-b-2 border-transparent text-slate-400 hover:text-slate-300 font-medium text-sm transition-colors">설정</button>
+                    <button className="pb-4 border-b-2 border-[#5a7247] text-[#5a7247] font-bold text-sm">개요</button>
+                    <button className="pb-4 border-b-2 border-transparent text-stone-500 hover:text-stone-600 font-medium text-sm transition-colors">Soul</button>
+                    <button className="pb-4 border-b-2 border-transparent text-stone-500 hover:text-stone-600 font-medium text-sm transition-colors">작업 이력</button>
+                    <button className="pb-4 border-b-2 border-transparent text-stone-500 hover:text-stone-600 font-medium text-sm transition-colors">설정</button>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-6">
                 <div className="lg:col-span-2 flex flex-col gap-4">
                     <h3 className="text-slate-100 font-bold text-lg mb-2">최근 활동</h3>
-                    <div className="bg-slate-900/50 rounded-xl border border-slate-800 divide-y divide-slate-800">
+                    <div className="bg-white/50 rounded-xl border border-stone-200 divide-y divide-slate-800">
                         {activities.map(act => (
-                            <div key={act.id} className="p-4 flex items-center justify-between hover:bg-slate-800/50 transition-colors">
+                            <div key={act.id} className="p-4 flex items-center justify-between hover:bg-stone-100/50 transition-colors">
                                 <div className="flex items-center gap-4">
                                     {act.type === 'success' ? (
                                         <div className="w-10 h-10 rounded-lg bg-green-900/30 text-green-400 flex items-center justify-center">
@@ -89,14 +89,14 @@ export function AgentDetail({
                                     )}
                                     <div>
                                         <p className="text-slate-100 font-medium text-sm">{act.title}</p>
-                                        <p className="text-slate-400 text-xs font-mono mt-1">{act.detail}</p>
+                                        <p className="text-stone-500 text-xs font-mono mt-1">{act.detail}</p>
                                     </div>
                                 </div>
-                                <span className="text-slate-500 text-xs font-mono">{act.timeAgo}</span>
+                                <span className="text-stone-400 text-xs font-mono">{act.timeAgo}</span>
                             </div>
                         ))}
                     </div>
-                    <button className="w-full py-3 rounded-lg border border-slate-700 text-slate-300 text-sm font-medium hover:bg-slate-800 transition-colors mt-2">
+                    <button className="w-full py-3 rounded-lg border border-stone-200 text-stone-600 text-sm font-medium hover:bg-stone-100 transition-colors mt-2">
                         전체 활동 보기
                     </button>
                 </div>

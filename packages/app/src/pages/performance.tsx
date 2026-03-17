@@ -156,36 +156,36 @@ export function PerformancePage() {
             <section className="grid grid-cols-1 md:grid-cols-3 gap-6" data-testid="summary-cards">
               <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow" style={{ border: `1px solid ${oliveGreen}1a` }}>
                 <div className="flex justify-between items-start mb-4">
-                  <p className="text-slate-500 text-sm font-medium">Avg. Success Rate</p>
+                  <p className="text-stone-400 text-sm font-medium">Avg. Success Rate</p>
                   <ShieldCheck className="w-5 h-5 p-1.5 rounded-lg" style={{ color: oliveGreen, backgroundColor: `${oliveGreen}1a`, width: 32, height: 32 }} />
                 </div>
                 <div className="flex items-baseline gap-2">
                   <h3 className="text-3xl font-bold text-slate-800">{summary.avgSuccessRate}%</h3>
                   <span className="text-sm font-bold" style={{ color: oliveGreen }}>+{summary.changes.successRate}%</span>
                 </div>
-                <p className="text-xs text-slate-400 mt-2">Workspace average across {summary.totalAgents} agents</p>
+                <p className="text-xs text-stone-500 mt-2">Workspace average across {summary.totalAgents} agents</p>
               </div>
               <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow" style={{ border: `1px solid ${oliveGreen}1a` }}>
                 <div className="flex justify-between items-start mb-4">
-                  <p className="text-slate-500 text-sm font-medium">Quality Score</p>
+                  <p className="text-stone-400 text-sm font-medium">Quality Score</p>
                   <Star className="w-5 h-5 p-1.5 rounded-lg" style={{ color: accentGold, backgroundColor: `${accentGold}1a`, width: 32, height: 32 }} />
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <h3 className="text-3xl font-bold text-slate-800">8.8<span className="text-lg text-slate-400">/10</span></h3>
+                  <h3 className="text-3xl font-bold text-slate-800">8.8<span className="text-lg text-stone-500">/10</span></h3>
                   <span className="text-sm font-bold" style={{ color: oliveGreen }}>+0.5%</span>
                 </div>
-                <p className="text-xs text-slate-400 mt-2">Based on natural language resonance</p>
+                <p className="text-xs text-stone-500 mt-2">Based on natural language resonance</p>
               </div>
               <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow" style={{ border: `1px solid ${oliveGreen}1a` }}>
                 <div className="flex justify-between items-start mb-4">
-                  <p className="text-slate-500 text-sm font-medium">Total Cost</p>
+                  <p className="text-stone-400 text-sm font-medium">Total Cost</p>
                   <CreditCard className="w-5 h-5 p-1.5 rounded-lg" style={{ color: earthBrown, backgroundColor: `${earthBrown}1a`, width: 32, height: 32 }} />
                 </div>
                 <div className="flex items-baseline gap-2">
                   <h3 className="text-3xl font-bold text-slate-800">${summary.totalCostThisMonth.toFixed(2)}</h3>
                   <span className="text-sm font-bold" style={{ color: oliveGreen }}>+{summary.changes.cost > 0 ? '+' : ''}{summary.changes.cost.toFixed(2)}</span>
                 </div>
-                <p className="text-xs text-slate-400 mt-2">This month expenditure</p>
+                <p className="text-xs text-stone-500 mt-2">This month expenditure</p>
               </div>
             </section>
           ) : null}
@@ -206,11 +206,11 @@ export function PerformancePage() {
                     <SkeletonTable rows={3} />
                   </div>
                 ) : agents.length === 0 ? (
-                  <div className="text-center py-8 text-xs text-slate-500">에이전트가 없습니다</div>
+                  <div className="text-center py-8 text-xs text-stone-400">에이전트가 없습니다</div>
                 ) : (
                   <table className="w-full text-left">
                     <thead>
-                      <tr className="text-slate-500 text-xs font-bold uppercase tracking-wider" style={{ backgroundColor: bgLight }}>
+                      <tr className="text-stone-400 text-xs font-bold uppercase tracking-wider" style={{ backgroundColor: bgLight }}>
                         <th className="px-6 py-4 cursor-pointer" onClick={() => handleSort('name')}>
                           Agent Name {sortConfig.by === 'name' && (sortConfig.order === 'asc' ? '↑' : '↓')}
                         </th>
@@ -314,7 +314,7 @@ export function PerformancePage() {
                 </div>
               </div>
               <div className="mt-8 pt-6" style={{ borderTop: `1px solid ${oliveGreen}1a` }}>
-                <p className="text-slate-500 text-xs italic mb-4">"High hallucination rates detected in low-performing agents. Recommending structural prompt realignment in Soul Gym."</p>
+                <p className="text-stone-400 text-xs italic mb-4">"High hallucination rates detected in low-performing agents. Recommending structural prompt realignment in Soul Gym."</p>
                 <button className="w-full py-2 text-sm font-bold rounded-lg transition-all" style={{ border: `1px solid ${oliveGreen}`, color: oliveGreen }}>
                   Review Critical Log
                 </button>
@@ -329,7 +329,7 @@ export function PerformancePage() {
                 <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2" style={{ fontFamily: "'Lora', serif" }}>
                   <Dumbbell className="w-6 h-6" style={{ color: oliveGreen }} /> Soul Gym
                 </h2>
-                <p className="text-slate-500 text-sm mt-1">AI-driven improvements and natural resonance training for your agents.</p>
+                <p className="text-stone-400 text-sm mt-1">AI-driven improvements and natural resonance training for your agents.</p>
               </div>
               <div className="flex gap-2">
                 <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest" style={{ backgroundColor: `${oliveGreen}1a`, color: oliveGreen }}>Active Training Session</span>
@@ -344,7 +344,7 @@ export function PerformancePage() {
                   </div>
                 ))
               ) : suggestions.length === 0 ? (
-                <div className="col-span-3 text-center py-8 text-xs text-slate-500">
+                <div className="col-span-3 text-center py-8 text-xs text-stone-400">
                   현재 개선이 필요한 에이전트가 없습니다
                 </div>
               ) : (
@@ -379,11 +379,11 @@ export function PerformancePage() {
               <div className="flex gap-4">
                 <div className="flex items-center gap-2">
                   <span className="w-3 h-3 rounded-full" style={{ backgroundColor: oliveGreen }} />
-                  <span className="text-xs text-slate-500">Stability</span>
+                  <span className="text-xs text-stone-400">Stability</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-3 h-3 rounded-full" style={{ backgroundColor: accentGold }} />
-                  <span className="text-xs text-slate-500">Creativity</span>
+                  <span className="text-xs text-stone-400">Creativity</span>
                 </div>
               </div>
             </div>
@@ -413,8 +413,8 @@ export function PerformancePage() {
               <>
                 <div className="px-5 py-4" style={{ borderBottom: `1px solid ${oliveGreen}1a` }}>
                   <div className="text-lg font-semibold text-slate-800">{detail.name}</div>
-                  <div className="text-xs text-slate-500 mt-0.5">{detail.departmentName} - {detail.role}</div>
-                  <button onClick={() => setSelectedAgentId(null)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600">X</button>
+                  <div className="text-xs text-stone-400 mt-0.5">{detail.departmentName} - {detail.role}</div>
+                  <button onClick={() => setSelectedAgentId(null)} className="absolute top-4 right-4 text-stone-500 hover:text-slate-600">X</button>
                 </div>
                 <div className="grid grid-cols-4 gap-3 px-5 py-4">
                   {[
@@ -424,7 +424,7 @@ export function PerformancePage() {
                     { label: '평균 시간', value: detail.avgResponseTimeMs > 1000 ? `${(detail.avgResponseTimeMs / 1000).toFixed(1)}s` : `${detail.avgResponseTimeMs}ms` },
                   ].map((m) => (
                     <div key={m.label} className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center">
-                      <div className="text-[10px] text-slate-500 font-medium">{m.label}</div>
+                      <div className="text-[10px] text-stone-400 font-medium">{m.label}</div>
                       <div className="text-sm font-bold text-slate-800 mt-1 font-mono tabular-nums">{m.value}</div>
                     </div>
                   ))}

@@ -69,7 +69,7 @@ export function ChatPanel() {
 
   if (isLoading || createSession.isPending) {
     return (
-      <div className="flex items-center justify-center h-full border-l border-zinc-200 dark:border-zinc-800">
+      <div className="flex items-center justify-center h-full border-l border-zinc-200">
         <p className="text-sm text-zinc-400">채팅 준비 중...</p>
       </div>
     )
@@ -77,7 +77,7 @@ export function ChatPanel() {
 
   if (!session) {
     return (
-      <div className="flex items-center justify-center h-full border-l border-zinc-200 dark:border-zinc-800">
+      <div className="flex items-center justify-center h-full border-l border-zinc-200">
         <EmptyState
           title="전략 에이전트와 대화하세요"
           description="투자 전략, 종목 분석, 시장 동향에 대해 질문해보세요"
@@ -105,7 +105,7 @@ export function ChatPanel() {
           {QUICK_ACTIONS.map((action) => (
             <button
               key={action}
-              className="whitespace-nowrap px-3 py-1 bg-slate-700/50 hover:bg-slate-700 text-xs text-slate-400 rounded-full transition-colors border border-slate-700"
+              className="whitespace-nowrap px-3 py-1 bg-stone-200/50 hover:bg-stone-200 text-xs text-stone-500 rounded-full transition-colors border border-stone-200"
             >
               {action}
             </button>

@@ -13,17 +13,17 @@ export function LibraryTreeItem({ label, icon, isExpanded, isActive, children }:
     return (
         <div className="group flex flex-col py-1">
             <div className={`flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer transition-colors ${isActive
-                    ? 'bg-cyan-400/10 text-cyan-400 border border-cyan-400/20'
-                    : 'hover:bg-slate-800/50 text-slate-300'
+                    ? 'bg-[#5a7247]/10 text-[#5a7247] border border-[#5a7247]/20'
+                    : 'hover:bg-stone-100/50 text-stone-600'
                 }`}>
-                {isExpanded ? <ChevronDown className={`w-4 h-4 ${isActive ? '' : 'text-slate-500'}`} /> : <ChevronRight className={`w-4 h-4 ${isActive ? '' : 'text-slate-500'}`} />}
-                <div className={`flex items-center ${isActive ? '' : 'text-slate-400'}`}>
+                {isExpanded ? <ChevronDown className={`w-4 h-4 ${isActive ? '' : 'text-stone-400'}`} /> : <ChevronRight className={`w-4 h-4 ${isActive ? '' : 'text-stone-400'}`} />}
+                <div className={`flex items-center ${isActive ? '' : 'text-stone-500'}`}>
                     {icon}
                 </div>
                 <span className={`text-sm select-none truncate ${isActive ? 'font-semibold' : 'font-medium'}`}>{label}</span>
             </div>
             {isExpanded && children && (
-                <div className="pl-8 flex flex-col mt-1 space-y-0.5 border-l border-slate-800 ml-4 pb-2">
+                <div className="pl-8 flex flex-col mt-1 space-y-0.5 border-l border-stone-200 ml-4 pb-2">
                     {children}
                 </div>
             )}
@@ -34,10 +34,10 @@ export function LibraryTreeItem({ label, icon, isExpanded, isActive, children }:
 export function LibraryTreeSubItem({ label, icon, isActive }: { label: string, icon: ReactNode, isActive?: boolean }) {
     return (
         <div className={`flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer transition-colors ${isActive
-                ? 'bg-slate-800/80 text-slate-100'
-                : 'hover:bg-slate-800/50 text-slate-400'
+                ? 'bg-stone-100/80 text-slate-100'
+                : 'hover:bg-stone-100/50 text-stone-500'
             }`}>
-            <div className={`${isActive ? 'text-cyan-400' : ''}`}>
+            <div className={`${isActive ? 'text-[#5a7247]' : ''}`}>
                 {icon}
             </div>
             <span className="text-sm font-medium select-none truncate">{label}</span>

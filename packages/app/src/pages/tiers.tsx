@@ -88,7 +88,7 @@ function TierForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-xs font-medium text-slate-400 mb-1">
+        <label className="block text-xs font-medium text-stone-500 mb-1">
           계층명 <span className="text-red-500">*</span>
         </label>
         <Input
@@ -101,13 +101,13 @@ function TierForm({
         {nameError && <p className="text-xs text-red-500 mt-1">{nameError}</p>}
       </div>
       <div>
-        <label className="block text-xs font-medium text-slate-400 mb-1">
+        <label className="block text-xs font-medium text-stone-500 mb-1">
           AI 모델
         </label>
         <select
           value={modelPreference}
           onChange={(e) => setModelPreference(e.target.value)}
-          className="w-full px-3 py-2 text-sm bg-slate-900 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 text-sm bg-white border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           {MODEL_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -115,8 +115,8 @@ function TierForm({
         </select>
       </div>
       <div>
-        <label className="block text-xs font-medium text-slate-400 mb-1">
-          최대 도구 수 <span className="text-slate-500">(0 = 무제한)</span>
+        <label className="block text-xs font-medium text-stone-500 mb-1">
+          최대 도구 수 <span className="text-stone-400">(0 = 무제한)</span>
         </label>
         <Input
           type="number"
@@ -126,7 +126,7 @@ function TierForm({
         />
       </div>
       <div>
-        <label className="block text-xs font-medium text-slate-400 mb-1">
+        <label className="block text-xs font-medium text-stone-500 mb-1">
           설명
         </label>
         <Textarea
@@ -292,7 +292,7 @@ export function TiersPage() {
                   <Search className="w-5 h-5" />
                 </div>
                 <input
-                  className="form-input flex w-full min-w-0 flex-1 border-none bg-transparent text-sm placeholder:text-slate-400 focus:ring-0"
+                  className="form-input flex w-full min-w-0 flex-1 border-none bg-transparent text-sm placeholder:text-stone-500 focus:ring-0"
                   placeholder="Search tiers..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -315,7 +315,7 @@ export function TiersPage() {
                 <span>Management</span>
               </nav>
               <h1 className="text-slate-900 text-4xl font-extrabold tracking-tight">Tier Permissions</h1>
-              <p className="text-slate-500 text-lg max-w-xl">Configure dynamic N-tier governance models, preferred LLM routing, and tool access limits across your organization.</p>
+              <p className="text-stone-400 text-lg max-w-xl">Configure dynamic N-tier governance models, preferred LLM routing, and tool access limits across your organization.</p>
             </div>
             <button
               onClick={() => setCreateOpen(true)}
@@ -334,7 +334,7 @@ export function TiersPage() {
                 <Users className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-sm text-slate-500">Active Tiers</p>
+                <p className="text-sm text-stone-400">Active Tiers</p>
                 <p className="text-2xl font-bold">{String(tiers.length).padStart(2, '0')}</p>
               </div>
             </div>
@@ -343,7 +343,7 @@ export function TiersPage() {
                 <Sparkles className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-sm text-slate-500">Avg. Model Power</p>
+                <p className="text-sm text-stone-400">Avg. Model Power</p>
                 <p className="text-2xl font-bold">High</p>
               </div>
             </div>
@@ -352,7 +352,7 @@ export function TiersPage() {
                 <Wrench className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-sm text-slate-500">Tools Deployed</p>
+                <p className="text-sm text-stone-400">Tools Deployed</p>
                 <p className="text-2xl font-bold">{tiers.reduce((sum, t) => sum + (t.maxTools || 0), 0) || 42}</p>
               </div>
             </div>
@@ -386,7 +386,7 @@ export function TiersPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="text-slate-400 text-xs font-bold uppercase tracking-widest bg-slate-50">
+                    <tr className="text-stone-500 text-xs font-bold uppercase tracking-widest bg-slate-50">
                       <th className="px-6 py-4">Level</th>
                       <th className="px-6 py-4">Tier Identity</th>
                       <th className="px-6 py-4">Preferred Model</th>
@@ -411,13 +411,13 @@ export function TiersPage() {
                                 {badge.label}
                               </span>
                               <span className="text-sm font-semibold">{tier.name}</span>
-                              {tier.description && <span className="text-xs text-slate-400">{tier.description}</span>}
+                              {tier.description && <span className="text-xs text-stone-500">{tier.description}</span>}
                             </div>
                           </td>
                           <td className="px-6 py-5 text-sm">
                             <div className="flex items-center gap-2">
                               <div className="size-6 rounded bg-slate-100 flex items-center justify-center">
-                                <Brain className="w-4 h-4 text-slate-500" />
+                                <Brain className="w-4 h-4 text-stone-400" />
                               </div>
                               <span className="font-medium text-slate-700">{getModelShortLabel(tier.modelPreference)}</span>
                             </div>
@@ -434,20 +434,20 @@ export function TiersPage() {
                               <button
                                 onClick={() => handleMoveUp(index)}
                                 disabled={index === 0 || reorderMutation.isPending}
-                                className="px-1 py-0.5 text-xs text-slate-400 hover:text-slate-600 disabled:opacity-30"
+                                className="px-1 py-0.5 text-xs text-stone-500 hover:text-slate-600 disabled:opacity-30"
                               >
                                 ▲
                               </button>
                               <button
                                 onClick={() => handleMoveDown(index)}
                                 disabled={index === tiers.length - 1 || reorderMutation.isPending}
-                                className="px-1 py-0.5 text-xs text-slate-400 hover:text-slate-600 disabled:opacity-30"
+                                className="px-1 py-0.5 text-xs text-stone-500 hover:text-slate-600 disabled:opacity-30"
                               >
                                 ▼
                               </button>
                               <button
                                 onClick={() => setEditTier(tier)}
-                                className="text-slate-400 hover:transition-colors px-2 py-1 text-xs rounded hover:bg-slate-100"
+                                className="text-stone-500 hover:transition-colors px-2 py-1 text-xs rounded hover:bg-slate-100"
                                 style={{ ['--tw-text-opacity' as string]: 1 }}
                               >
                                 편집
@@ -466,7 +466,7 @@ export function TiersPage() {
                   </tbody>
                 </table>
               </div>
-              <div className="p-4 flex justify-between items-center text-xs text-slate-500" style={{ backgroundColor: 'rgba(248,250,252,0.5)' }}>
+              <div className="p-4 flex justify-between items-center text-xs text-stone-400" style={{ backgroundColor: 'rgba(248,250,252,0.5)' }}>
                 <p>Endpoint: <code className="px-1 rounded" style={{ backgroundColor: 'rgba(90,114,71,0.05)' }}>GET /api/admin/tier-configs</code></p>
                 <p>Last updated: just now</p>
               </div>
@@ -481,7 +481,7 @@ export function TiersPage() {
               </div>
               <div>
                 <h4 className="font-bold mb-1">Permission Propagation</h4>
-                <p className="text-sm text-slate-500">Higher tiers automatically inherit lower tier capabilities but can be configured with specific override restrictions per workspace.</p>
+                <p className="text-sm text-stone-400">Higher tiers automatically inherit lower tier capabilities but can be configured with specific override restrictions per workspace.</p>
               </div>
             </div>
             <div className="flex gap-4">
@@ -490,7 +490,7 @@ export function TiersPage() {
               </div>
               <div>
                 <h4 className="font-bold mb-1">Model Preference Logic</h4>
-                <p className="text-sm text-slate-500">Models are prioritized based on reasoning capability and speed metrics. Tiers can specify fallback models for high-traffic periods.</p>
+                <p className="text-sm text-stone-400">Models are prioritized based on reasoning capability and speed metrics. Tiers can specify fallback models for high-traffic periods.</p>
               </div>
             </div>
           </div>
@@ -498,7 +498,7 @@ export function TiersPage() {
 
         {/* Footer */}
         <footer className="px-6 md:px-20 py-8 border-t mt-20" style={{ borderColor: 'rgba(90,114,71,0.1)' }}>
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-400 uppercase tracking-widest font-bold">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-stone-500 uppercase tracking-widest font-bold">
             <div className="flex items-center gap-2">
               <span className="text-sm">&copy;</span>
               <span>2026 CORTHEX Dynamics</span>

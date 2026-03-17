@@ -127,12 +127,12 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
     <section className="space-y-4">
       {/* 상단: 에이전트 선택 + 초기화 */}
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400">소울 편집</h3>
+        <h3 className="text-sm font-medium text-zinc-500">소울 편집</h3>
         {selectedAgent && detail?.adminSoul && (
           <button
             onClick={handleReset}
             disabled={resetSoul.isPending}
-            className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+            className="text-xs text-zinc-500 hover:text-zinc-700"
           >
             {resetSoul.isPending ? '초기화 중...' : '초기화 ↺'}
           </button>
@@ -160,7 +160,7 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
                   setShowTemplateConfirm(true)
                 }
               }}
-              className="w-full px-3 py-1.5 border border-zinc-200 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500/40 focus:outline-none"
+              className="w-full px-3 py-1.5 border border-zinc-200 rounded-md bg-white text-xs text-zinc-900 focus:ring-2 focus:ring-indigo-500/40 focus:outline-none"
             >
               <option value="">템플릿 불러오기...</option>
               {soulTemplates.map((t) => (
@@ -171,7 +171,7 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
 
           {/* 미저장 변경사항 배너 */}
           {isDirty && (
-            <div className="flex items-center justify-between px-3 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md text-xs text-amber-700 dark:text-amber-300">
+            <div className="flex items-center justify-between px-3 py-2 bg-amber-50 border border-amber-200 rounded-md text-xs text-amber-700">
               <span>저장하지 않은 변경사항이 있습니다.</span>
               <button
                 onClick={() => updateSoul.mutate()}
@@ -184,12 +184,12 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
           )}
 
           {/* 모바일 탭 전환 */}
-          <div className="flex md:hidden border-b border-zinc-200 dark:border-zinc-700">
+          <div className="flex md:hidden border-b border-zinc-200">
             <button
               onClick={() => setMobileTab('edit')}
               className={`flex-1 py-2 text-sm font-medium text-center ${
                 mobileTab === 'edit'
-                  ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600'
+                  ? 'text-indigo-600 border-b-2 border-indigo-600'
                   : 'text-zinc-500'
               }`}
             >
@@ -199,7 +199,7 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
               onClick={() => setMobileTab('preview')}
               className={`flex-1 py-2 text-sm font-medium text-center ${
                 mobileTab === 'preview'
-                  ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600'
+                  ? 'text-indigo-600 border-b-2 border-indigo-600'
                   : 'text-zinc-500'
               }`}
             >
@@ -214,7 +214,7 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
               <div className="relative">
                 <Suspense
                   fallback={
-                    <div className="border border-zinc-200 dark:border-zinc-700 rounded-md p-3 min-h-[288px] animate-pulse bg-zinc-100 dark:bg-zinc-800" />
+                    <div className="border border-zinc-200 rounded-md p-3 min-h-[288px] animate-pulse bg-zinc-100" />
                   }
                 >
                   <CodeMirrorEditor
@@ -238,7 +238,7 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
 
             {/* 미리보기 */}
             <div className={`flex-1 ${mobileTab !== 'preview' ? 'hidden md:block' : ''}`}>
-              <div className="border border-zinc-200 dark:border-zinc-700 rounded-md p-3 min-h-[288px] max-h-[288px] overflow-y-auto">
+              <div className="border border-zinc-200 rounded-md p-3 min-h-[288px] max-h-[288px] overflow-y-auto">
                 {soulText ? (
                   <MarkdownRenderer content={soulText} />
                 ) : (

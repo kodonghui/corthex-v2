@@ -324,7 +324,7 @@ export function WorkflowEditor({ workflowId, onBack }: Props) {
           <MiniMap
             nodeStrokeWidth={3}
             style={{ width: 150, height: 100 }}
-            className="!bg-zinc-100 dark:!bg-zinc-800 hidden md:block"
+            className="!bg-zinc-100 hidden md:block"
           />
         </ReactFlow>
       </div>

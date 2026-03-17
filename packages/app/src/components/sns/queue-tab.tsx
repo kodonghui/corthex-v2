@@ -63,12 +63,12 @@ export function QueueTab() {
           {[
             { label: '총 예약', value: stats.byStatus.reduce((s, b) => s + b.count, 0), color: 'text-blue-400' },
             { label: '오늘 발행', value: stats.todayCount, color: 'text-emerald-400' },
-            { label: '실패', value: stats.failedCount, color: stats.failedCount > 0 ? 'text-red-400' : 'text-slate-400' },
-            { label: '다음 발행', value: stats.nextScheduled ? new Date(stats.nextScheduled).toLocaleString('ko', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-', color: 'text-cyan-400' },
+            { label: '실패', value: stats.failedCount, color: stats.failedCount > 0 ? 'text-red-400' : 'text-stone-500' },
+            { label: '다음 발행', value: stats.nextScheduled ? new Date(stats.nextScheduled).toLocaleString('ko', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-', color: 'text-[#5a7247]' },
           ].map(({ label, value, color }) => (
-            <div key={label} className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 text-center">
+            <div key={label} className="bg-stone-100/50 border border-stone-200 rounded-xl p-4 text-center">
               <p className={`text-2xl font-bold ${color}`}>{value}</p>
-              <p className="text-xs text-slate-400 mt-1">{label}</p>
+              <p className="text-xs text-stone-500 mt-1">{label}</p>
             </div>
           ))}
         </div>
@@ -88,7 +88,7 @@ export function QueueTab() {
               className={`px-3 py-1.5 text-xs rounded-full border transition-colors ${
                 statusFilter === s.value
                   ? 'bg-blue-600/20 text-blue-400 border-blue-500/50'
-                  : 'border-slate-600 text-slate-400 hover:border-slate-500'
+                  : 'border-stone-300 text-stone-500 hover:border-slate-500'
               }`}>
               {s.label}
             </button>
@@ -97,10 +97,10 @@ export function QueueTab() {
 
         {selectedIds.size > 0 && (
           <div className="flex gap-2 items-center">
-            <span className="text-xs text-slate-400">{selectedIds.size}개 선택</span>
+            <span className="text-xs text-stone-500">{selectedIds.size}개 선택</span>
             <div className="flex gap-1 items-center">
               <input type="datetime-local" value={batchScheduleDate} onChange={(e) => setBatchScheduleDate(e.target.value)}
-                className="bg-slate-800 border border-slate-600 rounded-lg px-2 py-1 text-xs text-slate-300" />
+                className="bg-stone-100 border border-stone-300 rounded-lg px-2 py-1 text-xs text-stone-600" />
               <button onClick={() => { if (batchScheduleDate) batchSchedule.mutate({ ids: [...selectedIds], scheduledAt: new Date(batchScheduleDate).toISOString() }) }}
                 disabled={!batchScheduleDate || batchSchedule.isPending}
                 className="bg-blue-600 hover:bg-blue-500 text-white text-xs rounded-lg px-3 py-1.5 disabled:opacity-50">
@@ -119,8 +119,8 @@ export function QueueTab() {
       {queue.length === 0 && (
         <div data-testid="sns-queue-empty" className="text-center py-16">
           <p className="text-4xl mb-3">📋</p>
-          <p className="text-sm text-slate-400">예약된 발행이 없습니다</p>
-          <p className="text-xs text-slate-500">콘텐츠 탭에서 예약 발행을 설정해보세요.</p>
+          <p className="text-sm text-stone-500">예약된 발행이 없습니다</p>
+          <p className="text-xs text-stone-400">콘텐츠 탭에서 예약 발행을 설정해보세요.</p>
         </div>
       )}
 
@@ -128,17 +128,17 @@ export function QueueTab() {
         <div className="space-y-2">
           <div className="flex items-center gap-2 px-2">
             <input type="checkbox" checked={selectedIds.size === queue.length && queue.length > 0}
-              onChange={toggleAll} className="rounded border-slate-600 accent-blue-500" />
-            <span className="text-xs text-slate-500">전체 선택</span>
+              onChange={toggleAll} className="rounded border-stone-300 accent-blue-500" />
+            <span className="text-xs text-stone-400">전체 선택</span>
           </div>
 
           {queue.map((item) => (
             <div key={item.id} data-testid={`sns-queue-item-${item.id}`}
-              className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 flex items-center gap-3 hover:border-slate-600">
-              <input type="checkbox" checked={selectedIds.has(item.id)} onChange={() => toggleSelect(item.id)} className="rounded border-slate-600 accent-blue-500" />
+              className="bg-stone-100/50 border border-stone-200 rounded-xl p-4 flex items-center gap-3 hover:border-stone-300">
+              <input type="checkbox" checked={selectedIds.has(item.id)} onChange={() => toggleSelect(item.id)} className="rounded border-stone-300 accent-blue-500" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-0.5">
-                  <span className="text-xs text-slate-400">{PLATFORM_LABELS[item.platform] || item.platform}</span>
+                  <span className="text-xs text-stone-500">{PLATFORM_LABELS[item.platform] || item.platform}</span>
                   <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${STATUS_COLORS[item.status]}`}>{STATUS_LABELS[item.status]}</span>
                   {item.priority != null && item.priority > 0 && (
                     <span className="bg-amber-500/20 text-amber-400 text-xs px-1.5 py-0.5 rounded">우선순위 {item.priority}</span>
@@ -151,11 +151,11 @@ export function QueueTab() {
               </div>
               <div className="text-right shrink-0">
                 {item.scheduledAt && (
-                  <p className="text-xs text-cyan-400">
+                  <p className="text-xs text-[#5a7247]">
                     {new Date(item.scheduledAt).toLocaleString('ko', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                   </p>
                 )}
-                <p className="text-[10px] text-slate-500">{item.creatorName}</p>
+                <p className="text-[10px] text-stone-400">{item.creatorName}</p>
               </div>
             </div>
           ))}

@@ -183,11 +183,11 @@ export function ChartPanel() {
   return (
     <div className="h-full flex flex-col overflow-y-auto">
       {/* Chart Header — Stitch layout */}
-      <div className="flex-none p-6 border-b border-slate-700 flex justify-between items-end">
+      <div className="flex-none p-6 border-b border-stone-200 flex justify-between items-end">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <h2 className="text-2xl font-bold text-slate-100">{stock.stockName}</h2>
-            <span className="px-2 py-0.5 bg-slate-700 text-xs rounded text-slate-400 font-medium">
+            <span className="px-2 py-0.5 bg-stone-200 text-xs rounded text-stone-500 font-medium">
               {stock.market}
             </span>
           </div>
@@ -206,28 +206,28 @@ export function ChartPanel() {
               </span>
             </div>
           )}
-          {!price && <div className="text-sm text-slate-400 mt-1">{stock.stockCode}</div>}
-          <div className="mt-2 flex items-center gap-2 text-xs text-slate-400">
+          {!price && <div className="text-sm text-stone-500 mt-1">{stock.stockCode}</div>}
+          <div className="mt-2 flex items-center gap-2 text-xs text-stone-500">
             {hasError && (
               <span className="text-amber-500">가격 정보를 불러올 수 없습니다</span>
             )}
             {!hasError && lastUpdated && (
               <span>마지막 갱신: {lastUpdated.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
             )}
-            {!marketOpen && <span className="text-slate-500">장 마감</span>}
+            {!marketOpen && <span className="text-stone-400">장 마감</span>}
           </div>
         </div>
         {/* Timeframe Selectors + Action Buttons */}
         <div className="flex items-center gap-2">
-          <div className="flex gap-1 bg-slate-900 p-1 rounded border border-slate-700">
+          <div className="flex gap-1 bg-white p-1 rounded border border-stone-200">
             {TIMEFRAMES.map((tf) => (
               <button
                 key={tf}
                 onClick={() => setTimeframe(tf)}
                 className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
                   timeframe === tf
-                    ? 'bg-slate-700 text-white'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-stone-200 text-white'
+                    : 'text-stone-500 hover:text-white'
                 }`}
               >
                 {tf}
@@ -246,7 +246,7 @@ export function ChartPanel() {
 
       {/* OHLCV bar */}
       {price && !price.error && (
-        <div className="flex-none px-6 py-2 border-b border-slate-700/50 flex gap-4 text-xs text-slate-400">
+        <div className="flex-none px-6 py-2 border-b border-stone-200/50 flex gap-4 text-xs text-stone-500">
           <span>시가 {formatPrice(price.open)}</span>
           <span>고가 <span className="text-emerald-500">{formatPrice(price.high)}</span></span>
           <span>저가 <span className="text-red-500">{formatPrice(price.low)}</span></span>
@@ -255,15 +255,15 @@ export function ChartPanel() {
       )}
 
       {/* Chart Area */}
-      <div className="flex-none h-[400px] border-b border-slate-700 relative bg-slate-900/50">
+      <div className="flex-none h-[400px] border-b border-stone-200 relative bg-white/50">
         {chartLoading && (
           <div className="flex items-center justify-center h-full">
-            <p className="text-sm text-slate-400">차트 로딩 중...</p>
+            <p className="text-sm text-stone-500">차트 로딩 중...</p>
           </div>
         )}
         {!chartLoading && candles.length === 0 && (
           <div className="flex items-center justify-center h-full">
-            <p className="text-sm text-slate-400">차트 데이터가 없습니다</p>
+            <p className="text-sm text-stone-500">차트 데이터가 없습니다</p>
           </div>
         )}
         {!chartLoading && candles.length > 0 && (
@@ -288,11 +288,11 @@ export function ChartPanel() {
 
       {/* Recent Trades Table — Stitch layout */}
       <div className="flex-1 flex flex-col p-6">
-        <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Recent Trades</h3>
-        <div className="border border-slate-700 rounded bg-slate-900 overflow-hidden">
+        <h3 className="text-sm font-bold text-stone-500 uppercase tracking-wider mb-4">Recent Trades</h3>
+        <div className="border border-stone-200 rounded bg-white overflow-hidden">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-slate-700 bg-slate-800/50 text-xs text-slate-400 uppercase tracking-wide">
+              <tr className="border-b border-stone-200 bg-stone-100/50 text-xs text-stone-500 uppercase tracking-wide">
                 <th className="py-3 px-4 font-medium">Time</th>
                 <th className="py-3 px-4 font-medium">Type</th>
                 <th className="py-3 px-4 font-medium text-right">Price</th>
@@ -303,11 +303,11 @@ export function ChartPanel() {
               {recentTrades.map((trade, idx) => (
                 <tr
                   key={idx}
-                  className={`hover:bg-slate-800 transition-colors ${
-                    idx < recentTrades.length - 1 ? 'border-b border-slate-700/50' : ''
+                  className={`hover:bg-stone-100 transition-colors ${
+                    idx < recentTrades.length - 1 ? 'border-b border-stone-200/50' : ''
                   }`}
                 >
-                  <td className="py-2.5 px-4 text-slate-400">{trade.time}</td>
+                  <td className="py-2.5 px-4 text-stone-500">{trade.time}</td>
                   <td className="py-2.5 px-4">
                     <span className={trade.type === 'Buy' ? 'text-emerald-500' : 'text-red-500'}>
                       {trade.type}

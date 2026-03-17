@@ -13,16 +13,16 @@ export interface ConversationItemProps {
 
 export function ConversationItem({ name, time, previewMessage, icon, imageUrl, active, unreadCount, status }: ConversationItemProps) {
     const containerClass = active
-        ? 'bg-cyan-400/10 border-l-cyan-400'
-        : 'hover:bg-slate-100 dark:hover:bg-slate-800/30 border-l-transparent';
+        ? 'bg-[#5a7247]/10 border-l-[#5a7247]'
+        : 'hover:bg-slate-100 border-l-transparent';
 
     return (
         <div className={`flex items-center gap-3 p-4 cursor-pointer transition-colors border-l-2 ${containerClass}`}>
             <div className="relative shrink-0">
                 {imageUrl ? (
-                    <div className="h-10 w-10 rounded-full bg-slate-300 dark:bg-slate-700 bg-cover bg-center" style={{ backgroundImage: `url('${imageUrl}')` }}></div>
+                    <div className="h-10 w-10 rounded-full bg-slate-300 bg-cover bg-center" style={{ backgroundImage: `url('${imageUrl}')` }}></div>
                 ) : (
-                    <div className="h-10 w-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400">
+                    <div className="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center text-stone-400">
                         {icon}
                     </div>
                 )}
@@ -32,13 +32,13 @@ export function ConversationItem({ name, time, previewMessage, icon, imageUrl, a
             </div>
             <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-baseline mb-0.5">
-                    <h3 className={`text-sm truncate ${active ? 'font-semibold text-slate-900 dark:text-white' : 'font-medium text-slate-700 dark:text-slate-300'}`}>{name}</h3>
-                    <span className="text-xs text-slate-500">{time}</span>
+                    <h3 className={`text-sm truncate ${active ? 'font-semibold text-slate-900' : 'font-medium text-slate-700'}`}>{name}</h3>
+                    <span className="text-xs text-stone-400">{time}</span>
                 </div>
-                <p className={`text-sm truncate ${active ? 'text-slate-600 dark:text-slate-400' : 'text-slate-500'}`}>{previewMessage}</p>
+                <p className={`text-sm truncate ${active ? 'text-slate-600' : 'text-stone-400'}`}>{previewMessage}</p>
             </div>
             {unreadCount !== undefined && unreadCount > 0 && (
-                <div className="h-2 w-2 rounded-full bg-cyan-400 shrink-0"></div>
+                <div className="h-2 w-2 rounded-full bg-[#5a7247] shrink-0"></div>
             )}
         </div>
     )

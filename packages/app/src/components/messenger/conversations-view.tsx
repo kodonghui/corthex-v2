@@ -122,8 +122,8 @@ export function ConversationsView() {
   return (
     <div className="flex flex-1 min-h-0" data-testid="conversations-view">
       {/* 좌측: 대화 목록 */}
-      <div className={`w-full md:w-72 border-r border-slate-700 flex flex-col ${showChat ? 'hidden md:flex' : ''}`}>
-        <div className="p-2 border-b border-slate-700">
+      <div className={`w-full md:w-72 border-r border-stone-200 flex flex-col ${showChat ? 'hidden md:flex' : ''}`}>
+        <div className="p-2 border-b border-stone-200">
           <button
             onClick={() => setShowNewModal(true)}
             className="w-full px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg"
@@ -143,7 +143,7 @@ export function ConversationsView() {
       {/* 우측: 채팅 영역 */}
       <div className={`flex-1 flex flex-col min-w-0 ${showChat ? '' : 'hidden md:flex'}`}>
         {!selectedConvId ? (
-          <div className="flex-1 flex items-center justify-center text-slate-400 text-sm">
+          <div className="flex-1 flex items-center justify-center text-stone-500 text-sm">
             대화를 선택하세요
           </div>
         ) : (

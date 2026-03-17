@@ -117,7 +117,7 @@ export function PendingOrders() {
       <div className="px-4 py-3">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">승인 대기 주문</h3>
+            <h3 className="text-sm font-semibold text-zinc-900">승인 대기 주문</h3>
             <Badge variant="warning">{orders.length}건</Badge>
           </div>
           {orders.length > 1 && (
@@ -153,7 +153,7 @@ export function PendingOrders() {
           {orders.map((order) => (
             <div
               key={order.id}
-              className="flex items-center gap-3 p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/50"
+              className="flex items-center gap-3 p-2 rounded-lg bg-zinc-50"
             >
               {orders.length > 1 && (
                 <input
@@ -168,7 +168,7 @@ export function PendingOrders() {
                   <Badge variant={order.side === 'buy' ? 'success' : 'error'}>
                     {order.side === 'buy' ? '매수' : '매도'}
                   </Badge>
-                  <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">{order.tickerName}</span>
+                  <span className="text-sm font-medium text-zinc-900 truncate">{order.tickerName}</span>
                   <span className="text-xs text-zinc-400">{order.ticker}</span>
                 </div>
                 <div className="flex gap-3 mt-1 text-xs text-zinc-400">
@@ -177,7 +177,7 @@ export function PendingOrders() {
                   <span>총 {formatPrice(order.totalAmount)}원</span>
                 </div>
                 {order.reason && (
-                  <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2">{order.reason}</p>
+                  <p className="mt-1 text-xs text-zinc-500 line-clamp-2">{order.reason}</p>
                 )}
               </div>
               <div className="flex gap-1 shrink-0">

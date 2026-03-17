@@ -13,10 +13,10 @@ export function AgentNode({ data, selected }: NodeProps) {
   const d = data as unknown as AgentData
   return (
     <div
-      className={`px-4 py-3 rounded-lg bg-slate-900 shadow border min-w-[160px] ${
+      className={`px-4 py-3 rounded-lg bg-white shadow border min-w-[160px] ${
         selected
-          ? 'border-cyan-400 ring-2 ring-cyan-400/20'
-          : 'border-slate-700'
+          ? 'border-[#5a7247] ring-2 ring-[#5a7247]/20'
+          : 'border-stone-200'
       } ${d.isSecretary ? 'ring-1 ring-amber-400/30' : ''}`}
     >
       <Handle type="target" position={Position.Top} className="!bg-slate-500 !w-2 !h-2 !border-2 !border-slate-900" />
@@ -29,7 +29,7 @@ export function AgentNode({ data, selected }: NodeProps) {
           </span>
         )}
       </div>
-      {d.role && <div className="text-xs text-slate-400">{d.role}</div>}
+      {d.role && <div className="text-xs text-stone-500">{d.role}</div>}
     </div>
   )
 }

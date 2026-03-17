@@ -87,15 +87,15 @@ function DelegationChain({ chain }: { chain: DelegationChainItem[] }) {
       {chain.map((item) => (
         <div
           key={item.taskId}
-          className="flex items-center gap-3 p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/50"
+          className="flex items-center gap-3 p-2 rounded-lg bg-zinc-50"
         >
-          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
-            <span className="text-xs font-medium text-indigo-600 dark:text-indigo-400">
+          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
+            <span className="text-xs font-medium text-indigo-600">
               {item.agentName.charAt(0)}
             </span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
+            <p className="text-sm font-medium text-zinc-900 truncate">
               {item.agentName}
             </p>
             <p className="text-xs text-zinc-500">
@@ -136,10 +136,10 @@ function QualityScoreCard({ reviews }: { reviews: QualityReviewItem[] }) {
           return (
             <div key={key}>
               <div className="flex justify-between text-xs mb-0.5">
-                <span className="text-zinc-600 dark:text-zinc-400">{label}</span>
+                <span className="text-zinc-600">{label}</span>
                 <span className="text-zinc-500">{score}/{maxScore}</span>
               </div>
-              <div className="h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+              <div className="h-1.5 bg-zinc-200 rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all ${
                     pct >= 80 ? 'bg-emerald-500' : pct >= 60 ? 'bg-amber-500' : 'bg-red-500'
@@ -151,15 +151,15 @@ function QualityScoreCard({ reviews }: { reviews: QualityReviewItem[] }) {
           )
         })}
       </div>
-      <div className="flex items-center justify-between pt-2 border-t border-zinc-200 dark:border-zinc-700">
-        <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">총점</span>
+      <div className="flex items-center justify-between pt-2 border-t border-zinc-200">
+        <span className="text-sm font-medium text-zinc-700">총점</span>
         <Badge variant={latest.conclusion === 'pass' ? 'success' : 'error'}>
           {latest.conclusion === 'pass' ? 'PASS' : 'FAIL'}{' '}
           {Object.values(scores).reduce((a: number, b: unknown) => a + (typeof b === 'number' ? b : 0), 0)}/25
         </Badge>
       </div>
       {latest.feedback && (
-        <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 rounded text-xs text-red-700 dark:text-red-300">
+        <div className="mt-2 p-2 bg-red-50 rounded text-xs text-red-700">
           <strong>재작업 지시:</strong> {latest.feedback}
         </div>
       )}
@@ -223,9 +223,9 @@ export function ReportDetailModal({ isOpen, onClose, commandId }: ReportDetailMo
 
       {/* Cost Summary */}
       {cost && (cost.inputTokens > 0 || cost.outputTokens > 0) && (
-        <div className="mb-4 p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg">
-          <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">비용 요약</h3>
-          <div className="flex gap-4 text-xs text-zinc-600 dark:text-zinc-400">
+        <div className="mb-4 p-3 bg-zinc-50 rounded-lg">
+          <h3 className="text-sm font-semibold text-zinc-700 mb-2">비용 요약</h3>
+          <div className="flex gap-4 text-xs text-zinc-600">
             <span>입력: {cost.inputTokens.toLocaleString()} 토큰</span>
             <span>출력: {cost.outputTokens.toLocaleString()} 토큰</span>
             <span className="font-medium">${cost.totalCostUsd.toFixed(4)}</span>
@@ -235,13 +235,13 @@ export function ReportDetailModal({ isOpen, onClose, commandId }: ReportDetailMo
 
       {/* Delegation Chain */}
       <div className="mb-4">
-        <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">위임 체인</h3>
+        <h3 className="text-sm font-semibold text-zinc-700 mb-2">위임 체인</h3>
         {loadingDelegation ? <Spinner /> : <DelegationChain chain={chain} />}
       </div>
 
       {/* Quality Gate Details */}
       <div className="mb-4">
-        <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">품질 검수</h3>
+        <h3 className="text-sm font-semibold text-zinc-700 mb-2">품질 검수</h3>
         {loadingDelegation ? <Spinner /> : <QualityScoreCard reviews={reviews} />}
       </div>
 
@@ -249,7 +249,7 @@ export function ReportDetailModal({ isOpen, onClose, commandId }: ReportDetailMo
       <div className="flex justify-end pt-2">
         <button
           onClick={onClose}
-          className="px-4 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 bg-zinc-100 dark:bg-zinc-800 rounded-lg transition-colors"
+          className="px-4 py-2 text-sm font-medium text-zinc-600 hover:text-zinc-900 bg-zinc-100 rounded-lg transition-colors"
         >
           닫기
         </button>

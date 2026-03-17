@@ -16,33 +16,33 @@ export function TrackerActiveJobs({ jobs = [
     { id: '2', name: 'CRM Data Ingestion', type: 'running', detail: 'Running for 4m 12s' },
 ] }: TrackerActiveJobsProps) {
     return (
-        <div className="bg-slate-900 rounded-xl border border-slate-800 shadow-sm overflow-hidden">
-            <div className="px-5 py-4 border-b border-slate-800">
+        <div className="bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-stone-200">
                 <h3 className="text-sm font-bold text-slate-100 uppercase tracking-wider font-display">Active Jobs</h3>
             </div>
 
             <div className="divide-y divide-slate-800">
                 {jobs.map(job => (
-                    <div key={job.id} className="p-4 hover:bg-slate-800/50 transition-colors cursor-pointer">
+                    <div key={job.id} className="p-4 hover:bg-stone-100/50 transition-colors cursor-pointer">
                         <div className="flex items-start justify-between">
                             <div className="flex gap-3">
                                 {job.type === 'scheduled' ? (
-                                    <Clock className="w-[18px] h-[18px] text-slate-400 mt-0.5" />
+                                    <Clock className="w-[18px] h-[18px] text-stone-500 mt-0.5" />
                                 ) : (
-                                    <RefreshCw className="w-[18px] h-[18px] text-cyan-400 mt-0.5 translate-y-[1px] animate-spin-slow" />
+                                    <RefreshCw className="w-[18px] h-[18px] text-[#5a7247] mt-0.5 translate-y-[1px] animate-spin-slow" />
                                 )}
                                 <div>
                                     <p className="text-sm font-medium text-slate-100">{job.name}</p>
-                                    <p className="text-xs text-slate-400 mt-1 tabular-nums">{job.detail}</p>
+                                    <p className="text-xs text-stone-500 mt-1 tabular-nums">{job.detail}</p>
                                 </div>
                             </div>
 
                             {job.type === 'scheduled' ? (
-                                <span className="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-400 border border-slate-700 font-bold tracking-wider">
+                                <span className="px-2 py-0.5 rounded text-[10px] bg-stone-100 text-stone-500 border border-stone-200 font-bold tracking-wider">
                                     IDLE
                                 </span>
                             ) : (
-                                <span className="px-2 py-0.5 rounded text-[10px] bg-[rgba(34,211,238,0.10)] text-cyan-400 border border-[rgba(34,211,238,0.20)] font-bold tracking-wider animate-pulse">
+                                <span className="px-2 py-0.5 rounded text-[10px] bg-[rgba(34,211,238,0.10)] text-[#5a7247] border border-[rgba(34,211,238,0.20)] font-bold tracking-wider animate-pulse">
                                     SYNC
                                 </span>
                             )}

@@ -12,7 +12,7 @@ type SpeechCardProps = {
 }
 
 const AGENT_THEMES = [
-  { avatar: 'bg-cyan-400/20 text-cyan-400 border-cyan-400/30', bubble: 'bg-slate-800 border-slate-700', bubbleRadius: 'rounded-2xl rounded-tl-sm' },
+  { avatar: 'bg-[#5a7247]/20 text-[#5a7247] border-[#5a7247]/30', bubble: 'bg-stone-100 border-stone-200', bubbleRadius: 'rounded-2xl rounded-tl-sm' },
   { avatar: 'bg-violet-500/20 text-violet-400 border-violet-500/30', bubble: 'bg-violet-500/10 border-violet-500/20', bubbleRadius: 'rounded-2xl rounded-tr-sm' },
   { avatar: 'bg-amber-500/20 text-amber-400 border-amber-500/30', bubble: 'bg-amber-500/10 border-amber-500/20', bubbleRadius: 'rounded-2xl rounded-tr-sm' },
   { avatar: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30', bubble: 'bg-emerald-500/10 border-emerald-500/20', bubbleRadius: 'rounded-2xl rounded-tl-sm' },
@@ -62,10 +62,10 @@ export function SpeechCard({ agentName, agentId, content, position, roundNum, in
       {/* Content */}
       <div className={cn('flex flex-col gap-1', isRight ? 'items-end' : 'items-start')}>
         <div className={cn('flex items-center gap-2', isRight && 'flex-row-reverse')}>
-          <p className="text-slate-500 text-xs font-medium uppercase tracking-wider">{agentName}</p>
+          <p className="text-stone-400 text-xs font-medium uppercase tracking-wider">{agentName}</p>
           <span className="text-slate-600 text-[10px] font-mono">R{roundNum}</span>
           {position && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-cyan-400/10 text-cyan-400">
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#5a7247]/10 text-[#5a7247]">
               {position}
             </span>
           )}
@@ -86,7 +86,7 @@ export function SpeechCard({ agentName, agentId, content, position, roundNum, in
         {isLong && (
           <button
             onClick={() => setExpanded(!expanded)}
-            className="mt-1 text-xs text-cyan-400 hover:text-cyan-300 transition-colors"
+            className="mt-1 text-xs text-[#5a7247] hover:text-[#869e71] transition-colors"
           >
             {expanded ? '접기' : '더 보기'}
           </button>

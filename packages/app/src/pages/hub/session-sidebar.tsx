@@ -91,14 +91,14 @@ export function SessionSidebar({
         data-testid="session-sidebar"
         className={`
           fixed lg:relative inset-y-0 left-0 z-40 lg:z-0
-          w-64 bg-slate-900 border-r border-slate-800 flex flex-col
+          w-64 bg-white border-r border-stone-200 flex flex-col
           transition-transform duration-200 lg:translate-x-0
           ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800">
-          <h2 className="text-sm font-semibold text-slate-300">대화 기록</h2>
+        <div className="flex items-center justify-between px-4 py-3 border-b border-stone-200">
+          <h2 className="text-sm font-semibold text-stone-600">대화 기록</h2>
           <button
             data-testid="new-session-btn"
             onClick={() => createSession.mutate()}
@@ -113,12 +113,12 @@ export function SessionSidebar({
         <div className="flex-1 overflow-y-auto">
           {isLoading && (
             <div className="flex justify-center py-6">
-              <div className="w-5 h-5 border-2 border-slate-600 border-t-blue-500 rounded-full animate-spin" />
+              <div className="w-5 h-5 border-2 border-stone-300 border-t-blue-500 rounded-full animate-spin" />
             </div>
           )}
 
           {!isLoading && sessions.length === 0 && (
-            <div className="px-4 py-6 text-center text-xs text-slate-500">
+            <div className="px-4 py-6 text-center text-xs text-stone-400">
               대화 기록이 없습니다
             </div>
           )}
@@ -127,10 +127,10 @@ export function SessionSidebar({
             <div
               key={session.id}
               data-testid={`session-item-${session.id}`}
-              className={`group flex items-center justify-between px-4 py-3 cursor-pointer border-b border-slate-800/50 transition-colors ${
+              className={`group flex items-center justify-between px-4 py-3 cursor-pointer border-b border-stone-200/50 transition-colors ${
                 activeSessionId === session.id
-                  ? 'bg-slate-700/50 border-l-2 border-l-blue-500'
-                  : 'hover:bg-slate-800/50'
+                  ? 'bg-stone-200/50 border-l-2 border-l-blue-500'
+                  : 'hover:bg-stone-100/50'
               }`}
               onClick={() => {
                 onSelectSession(session.id)
@@ -141,7 +141,7 @@ export function SessionSidebar({
                 <p className="text-sm text-slate-200 truncate">
                   {session.title || '새 대화'}
                 </p>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-stone-400 mt-0.5">
                   {formatRelativeTime(session.lastMessageAt || session.createdAt)}
                 </p>
               </div>
@@ -150,7 +150,7 @@ export function SessionSidebar({
                   e.stopPropagation()
                   setDeleteTarget(session.id)
                 }}
-                className="opacity-0 group-hover:opacity-100 p-1 text-slate-500 hover:text-red-400 transition-all shrink-0"
+                className="opacity-0 group-hover:opacity-100 p-1 text-stone-400 hover:text-red-400 transition-all shrink-0"
                 aria-label="대화 삭제"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -165,15 +165,15 @@ export function SessionSidebar({
       {/* Delete confirmation modal */}
       {deleteTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="bg-slate-800 rounded-xl border border-slate-700 p-6 w-80 shadow-xl">
+          <div className="bg-stone-100 rounded-xl border border-stone-200 p-6 w-80 shadow-xl">
             <h3 className="text-sm font-semibold text-white mb-2">대화 삭제</h3>
-            <p className="text-xs text-slate-400 mb-4">
+            <p className="text-xs text-stone-500 mb-4">
               이 대화의 모든 메시지가 삭제됩니다. 이 작업은 되돌릴 수 없습니다.
             </p>
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setDeleteTarget(null)}
-                className="px-3 py-1.5 text-xs rounded-lg bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors"
+                className="px-3 py-1.5 text-xs rounded-lg bg-stone-200 text-stone-600 hover:bg-slate-600 transition-colors"
               >
                 취소
               </button>
