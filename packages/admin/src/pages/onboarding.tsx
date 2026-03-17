@@ -112,11 +112,10 @@ const TIER_LABELS: Record<string, { label: string; color: string }> = {
   worker: { label: 'Worker', color: 'bg-gray-100 text-gray-600' },
 }
 
-const ONBOARDING_PROVIDERS = ['openai', 'google_ai'] as const
+const ONBOARDING_PROVIDERS = ['anthropic'] as const
 
 const PROVIDER_LABELS: Record<string, string> = {
-  openai: 'OpenAI (GPT)',
-  google_ai: 'Google AI (Gemini)',
+  anthropic: 'Anthropic (Claude)',
 }
 
 // ============================================================
@@ -534,8 +533,7 @@ function ApiKeyStep({
   const qc = useQueryClient()
   const [savedCount, setSavedCount] = useState(0)
   const [fields, setFields] = useState<Record<string, Record<string, string>>>({
-    openai: {},
-    google_ai: {},
+    anthropic: {},
   })
 
   const { data: providerData } = useQuery({

@@ -12,7 +12,10 @@ node_modules
 .env.example
 
 # === Build Artifacts ===
+# dist 전체 제외하되, 프론트엔드 빌드 결과물은 포함 (Docker 밖에서 pre-build)
 dist
+!packages/app/dist
+!packages/admin/dist
 *.tsbuildinfo
 *.log
 

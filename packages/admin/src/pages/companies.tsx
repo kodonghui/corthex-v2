@@ -13,6 +13,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useToastStore } from '../stores/toast-store'
 import { ConfirmDialog, SkeletonCard } from '@corthex/ui'
+import { Plus, Search, Users, Bot, Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
 
 type Company = {
   id: string; name: string; slug: string; isActive: boolean; createdAt: string
@@ -37,7 +38,7 @@ export function CompaniesPage() {
   const [editId, setEditId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState({ name: '', slug: '' })
   const [search, setSearch] = useState('')
-  const [deactivateTarget, setDeactivateTarget] = useState<Company | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<Company | null>(null)
 
   const { data, isLoading } = useQuery({
     queryKey: ['companies'],
@@ -83,16 +84,16 @@ export function CompaniesPage() {
     onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
 
-  const deactivateMutation = useMutation({
+  const deleteMutation = useMutation({
     mutationFn: (id: string) => api.delete(`/admin/companies/${id}`),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['companies'] })
       qc.invalidateQueries({ queryKey: ['companies-stats'] })
-      setDeactivateTarget(null)
-      addToast({ type: 'success', message: 'Company deactivated' })
+      setDeleteTarget(null)
+      addToast({ type: 'success', message: 'Company deleted' })
     },
     onError: (err: Error) => {
-      setDeactivateTarget(null)
+      setDeleteTarget(null)
       addToast({ type: 'error', message: err.message })
     },
   })
@@ -120,7 +121,7 @@ export function CompaniesPage() {
             style={{ backgroundColor: terracotta, boxShadow: '0 10px 15px -3px rgba(196,98,45,0.2)' }}
             data-testid="company-add-btn"
           >
-            <span className="material-symbols-outlined">add_business</span>
+            <Plus size={18} />
             <span>Add Company</span>
           </button>
         </div>
@@ -128,7 +129,7 @@ export function CompaniesPage() {
         {/* Search */}
         <div className="bg-white rounded-xl border p-4 mb-6 flex items-center" style={{ borderColor: sand }}>
           <div className="relative w-full md:w-96">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2" style={{ color: lightMuted }}>search</span>
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: lightMuted }} />
             <input
               type="text"
               value={search}
@@ -241,11 +242,11 @@ export function CompaniesPage() {
                         </div>
                         <div className="flex items-center gap-4 mt-3 ml-[52px]">
                           <div className="flex items-center gap-1.5">
-                            <span className="material-symbols-outlined text-base" style={{ color: muted }}>group</span>
+                            <Users size={14} style={{ color: muted }} />
                             <span className="text-xs font-medium" style={{ color: muted }}>{s.userCount} users</span>
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <span className="material-symbols-outlined text-base" style={{ color: muted }}>smart_toy</span>
+                            <Bot size={14} style={{ color: muted }} />
                             <span className="text-xs font-medium" style={{ color: muted }}>{s.agentCount} agents</span>
                           </div>
                           <span className="text-xs" style={{ color: lightMuted }}>
@@ -272,17 +273,15 @@ export function CompaniesPage() {
                           className="p-1.5 rounded hover:bg-slate-100 transition-colors"
                           title="Edit"
                         >
-                          <span className="material-symbols-outlined text-xl" style={{ color: muted }}>edit</span>
+                          <Pencil size={16} style={{ color: muted }} />
                         </button>
-                        {c.isActive && (
-                          <button
-                            onClick={() => setDeactivateTarget(c)}
-                            className="p-1.5 rounded hover:bg-red-50 transition-colors"
-                            title="Deactivate"
-                          >
-                            <span className="material-symbols-outlined text-xl" style={{ color: '#ef4444' }}>block</span>
-                          </button>
-                        )}
+                        <button
+                          onClick={() => setDeleteTarget(c)}
+                          className="p-1.5 rounded hover:bg-red-50 transition-colors"
+                          title="Delete"
+                        >
+                          <Trash2 size={16} style={{ color: '#ef4444' }} />
+                        </button>
                       </div>
                     </div>
                   )}
@@ -300,11 +299,11 @@ export function CompaniesPage() {
             </p>
             <div className="flex gap-2">
               <button className="p-1 border rounded bg-white transition-colors disabled:opacity-50" style={{ borderColor: sand }} disabled>
-                <span className="material-symbols-outlined" style={{ color: lightMuted }}>chevron_left</span>
+                <ChevronLeft size={18} style={{ color: lightMuted }} />
               </button>
               <button className="w-8 h-8 flex items-center justify-center rounded text-white font-bold text-xs" style={{ backgroundColor: olive }}>1</button>
               <button className="p-1 border rounded bg-white transition-colors" style={{ borderColor: sand }}>
-                <span className="material-symbols-outlined" style={{ color: lightMuted }}>chevron_right</span>
+                <ChevronRight size={18} style={{ color: lightMuted }} />
               </button>
             </div>
           </div>
@@ -321,12 +320,12 @@ export function CompaniesPage() {
       </div>
 
       <ConfirmDialog
-        isOpen={!!deactivateTarget}
-        onConfirm={() => deactivateTarget && deactivateMutation.mutate(deactivateTarget.id)}
-        onCancel={() => setDeactivateTarget(null)}
-        title={`Deactivate ${deactivateTarget?.name}`}
-        description="Deactivating this company will prevent its employees from logging in. Active employees must be deactivated first."
-        confirmText="Deactivate"
+        isOpen={!!deleteTarget}
+        onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
+        onCancel={() => setDeleteTarget(null)}
+        title={`Delete ${deleteTarget?.name}`}
+        description="이 회사를 삭제하면 소속 직원의 로그인이 차단됩니다. 이 작업은 되돌릴 수 없습니다."
+        confirmText="Delete"
         variant="danger"
       />
     </div>
