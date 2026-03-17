@@ -9,10 +9,9 @@
     },
     "playwright": {
       "type": "stdio",
-      "command": "C:\\Users\\elddl\\AppData\\Roaming\\npm\\playwright-mcp.cmd",
-      "args": ["--headless"],
-      "env": {},
-      "cwd": "C:\\Users\\elddl"
+      "command": "npx",
+      "args": ["@playwright/mcp", "--headless"],
+      "env": {}
     }
   }
 }
