@@ -11,6 +11,7 @@
  *   GET    /admin/departments?companyId={id}
  */
 import { useState, useCallback, useRef } from 'react'
+import { UserPlus, Search, UserSearch, Filter, GripVertical, Plus, PlusCircle, X } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
@@ -215,7 +216,7 @@ export function EmployeesPage() {
                   style={{ backgroundColor: olive, boxShadow: '0 4px 6px -1px rgba(90,114,71,0.2)' }}
                   data-testid="invite-btn"
                 >
-                  <span className="material-symbols-outlined text-sm">person_add</span>
+                  <UserPlus className="w-4 h-4" />
                   Invite Employee
                 </button>
               </div>
@@ -225,7 +226,7 @@ export function EmployeesPage() {
           {/* Search + Filters */}
           <div className="space-y-3" data-testid="filters">
             <div className="relative">
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 value={search}
                 onChange={(e) => handleSearchChange(e.target.value)}
@@ -292,13 +293,13 @@ export function EmployeesPage() {
             <div className="w-1/3 flex flex-col bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
               <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
                 <h3 className="font-bold flex items-center gap-2">
-                  <span className="material-symbols-outlined" style={{ color: olive }}>person_search</span>
+                  <UserSearch className="w-5 h-5" style={{ color: olive }} />
                   Unassigned Users
                   <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: oliveBg, color: olive }}>
                     {employees.filter((e) => e.departments.length === 0).length}
                   </span>
                 </h3>
-                <button className="text-slate-400 hover:text-slate-600"><span className="material-symbols-outlined">filter_list</span></button>
+                <button className="text-slate-400 hover:text-slate-600"><Filter className="w-5 h-5" /></button>
               </div>
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {isLoading ? (
@@ -315,7 +316,7 @@ export function EmployeesPage() {
                         <p className="text-sm font-bold truncate">{emp.name}</p>
                         <p className="text-xs text-slate-500">ID: @{emp.username}</p>
                       </div>
-                      <span className="material-symbols-outlined text-slate-300 group-hover:text-slate-600" style={{ color: undefined }}>drag_indicator</span>
+                      <GripVertical className="w-5 h-5 text-slate-300 group-hover:text-slate-600" />
                     </div>
                   ))
                 )}
@@ -334,7 +335,7 @@ export function EmployeesPage() {
                         <p className="text-xs text-slate-500">{deptEmployees.length} Members</p>
                       </div>
                       <button className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: oliveBg, color: olive }}>
-                        <span className="material-symbols-outlined text-sm">add</span>
+                        <Plus className="w-4 h-4" />
                       </button>
                     </div>
                     <div className="p-4 space-y-2 min-h-[120px] border-2 border-dashed border-transparent transition-all rounded-b-xl" style={{}} onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'rgba(90,114,71,0.2)')} onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'transparent')}>
@@ -347,7 +348,7 @@ export function EmployeesPage() {
                             <span className="text-sm">{emp.name}</span>
                           </div>
                           <button className="text-slate-400 hover:text-red-500">
-                            <span className="material-symbols-outlined text-sm">close</span>
+                            <X className="w-4 h-4" />
                           </button>
                         </div>
                       ))}
@@ -364,7 +365,7 @@ export function EmployeesPage() {
 
               {/* New Dept Placeholder */}
               <button className="border-2 border-dashed border-slate-300 dark:border-slate-800 rounded-xl flex flex-col items-center justify-center p-8 text-slate-400 transition-all" style={{}} onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(90,114,71,0.5)'; e.currentTarget.style.color = olive }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#cbd5e1'; e.currentTarget.style.color = '#94a3b8' }}>
-                <span className="material-symbols-outlined text-3xl">add_circle</span>
+                <PlusCircle className="w-8 h-8" />
                 <span className="text-sm font-bold mt-2">Create New Department</span>
               </button>
             </div>

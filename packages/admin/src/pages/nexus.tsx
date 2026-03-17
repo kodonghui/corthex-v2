@@ -11,6 +11,7 @@
  *   PATCH /api/admin/agents/nx_core_01
  */
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { Network, Search, Bell, Settings, LayoutDashboard, GitBranch, Users, Shield, ZoomIn, ZoomOut, Crosshair, X, RefreshCw } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   ReactFlow,
@@ -425,7 +426,7 @@ function NexusCanvas() {
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-3">
             <div className="p-1.5 rounded-lg text-white" style={{ backgroundColor: ORGANIC.primary }}>
-              <span className="material-symbols-outlined text-2xl">hub</span>
+              <Network className="w-6 h-6" />
             </div>
             <h2 className="text-xl font-bold tracking-tight" style={{ fontFamily: "'Noto Serif KR', serif" }}>
               CORTHEX <span style={{ color: ORGANIC.primary }}>v2</span>
@@ -440,7 +441,7 @@ function NexusCanvas() {
         </div>
         <div className="flex items-center gap-4">
           <div className="relative hidden sm:block">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+            <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               className="border-none rounded-xl pl-10 pr-4 py-2 text-sm w-64"
               style={{ backgroundColor: 'rgba(90,114,71,0.1)' }}
@@ -449,10 +450,10 @@ function NexusCanvas() {
             />
           </div>
           <button className="p-2 rounded-xl transition-colors" style={{ backgroundColor: 'rgba(90,114,71,0.1)' }}>
-            <span className="material-symbols-outlined text-xl">notifications</span>
+            <Bell className="w-5 h-5" />
           </button>
           <button className="p-2 rounded-xl transition-colors" style={{ backgroundColor: 'rgba(90,114,71,0.1)' }}>
-            <span className="material-symbols-outlined text-xl">settings</span>
+            <Settings className="w-5 h-5" />
           </button>
           <div className="h-8 w-8 rounded-full border-2 overflow-hidden" style={{ backgroundColor: 'rgba(90,114,71,0.2)', borderColor: ORGANIC.primary }}></div>
         </div>
@@ -465,19 +466,19 @@ function NexusCanvas() {
             <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">Management</h3>
           </div>
           <button className="flex items-center gap-3 p-3 rounded-xl transition-colors" style={{ ['--hover-bg' as string]: 'rgba(90,114,71,0.1)' }}>
-            <span className="material-symbols-outlined">dashboard</span>
+            <LayoutDashboard className="w-5 h-5" />
             <span className="hidden lg:block text-sm font-medium">Dashboard</span>
           </button>
           <button className="flex items-center gap-3 p-3 rounded-xl text-white shadow-lg" style={{ backgroundColor: ORGANIC.primary, boxShadow: `0 10px 15px -3px rgba(90,114,71,0.3)` }}>
-            <span className="material-symbols-outlined">account_tree</span>
+            <GitBranch className="w-5 h-5" />
             <span className="hidden lg:block text-sm font-medium">Nexus Canvas</span>
           </button>
           <button className="flex items-center gap-3 p-3 rounded-xl transition-colors">
-            <span className="material-symbols-outlined">group</span>
+            <Users className="w-5 h-5" />
             <span className="hidden lg:block text-sm font-medium">Directory</span>
           </button>
           <button className="flex items-center gap-3 p-3 rounded-xl transition-colors">
-            <span className="material-symbols-outlined">security</span>
+            <Shield className="w-5 h-5" />
             <span className="hidden lg:block text-sm font-medium">Permissions</span>
           </button>
         </aside>
@@ -554,13 +555,13 @@ function NexusCanvas() {
               {/* Floating Canvas Controls */}
               <div className="absolute bottom-6 left-6 z-30 flex gap-2">
                 <button className="bg-white p-2 rounded-lg shadow-md border border-slate-200">
-                  <span className="material-symbols-outlined">zoom_in</span>
+                  <ZoomIn className="w-5 h-5" />
                 </button>
                 <button className="bg-white p-2 rounded-lg shadow-md border border-slate-200">
-                  <span className="material-symbols-outlined">zoom_out</span>
+                  <ZoomOut className="w-5 h-5" />
                 </button>
                 <button className="bg-white p-2 rounded-lg shadow-md border border-slate-200">
-                  <span className="material-symbols-outlined">center_focus_strong</span>
+                  <Crosshair className="w-5 h-5" />
                 </button>
               </div>
             </>
@@ -577,7 +578,7 @@ function NexusCanvas() {
               <div className="flex items-center justify-between mb-2">
                 <h2 className="text-lg font-bold" style={{ fontFamily: "'Noto Serif KR', serif" }}>Agent Property Panel</h2>
                 <button className="text-slate-400 hover:text-slate-600 transition-colors" onClick={() => setSelectedNodeId(null)}>
-                  <span className="material-symbols-outlined">close</span>
+                  <X className="w-5 h-5" />
                 </button>
               </div>
               <p className="text-sm text-slate-500 flex items-center gap-2">
@@ -611,7 +612,7 @@ function NexusCanvas() {
                 className="w-full text-white font-bold py-4 rounded-xl shadow-xl flex items-center justify-center gap-3 transition-transform active:scale-95 disabled:opacity-50"
                 style={{ backgroundColor: ORGANIC.primary, boxShadow: `0 20px 25px -5px rgba(90,114,71,0.3)` }}
               >
-                <span className="material-symbols-outlined">sync</span>
+                <RefreshCw className="w-5 h-5" />
                 {saveMutation.isPending ? 'Syncing...' : 'Sync to Live Environment'}
               </button>
               <p className="text-center mt-3 text-[10px] text-slate-400 font-mono">PATCH /api/admin/agents/{selectedNodeId}</p>

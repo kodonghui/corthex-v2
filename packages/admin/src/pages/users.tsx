@@ -16,6 +16,7 @@ import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
 import { useToastStore } from '../stores/toast-store'
 import { ConfirmDialog, EmptyState, SkeletonTable } from '@corthex/ui'
+import { UserPlus, Search, Pencil, Ban, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react'
 
 type User = {
   id: string; companyId: string; name: string; username: string
@@ -152,7 +153,7 @@ export function UsersPage() {
             style={{ backgroundColor: olive, boxShadow: '0 10px 15px -3px rgba(90,114,71,0.2)' }}
             data-testid="add-user-btn"
           >
-            <span className="material-symbols-outlined">person_add</span>
+            <UserPlus className="w-5 h-5" />
             <span>Invite User</span>
           </button>
         </div>
@@ -249,7 +250,7 @@ export function UsersPage() {
         {/* Filters */}
         <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 mb-6 flex flex-col md:flex-row gap-4 items-center">
           <div className="relative w-full md:w-96">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+            <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -396,7 +397,7 @@ export function UsersPage() {
                               className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-400 hover:text-slate-900 dark:hover:text-white"
                               title="Edit"
                             >
-                              <span className="material-symbols-outlined text-xl">edit</span>
+                              <Pencil className="w-5 h-5" />
                             </button>
                             {u.isActive ? (
                               <button
@@ -404,7 +405,7 @@ export function UsersPage() {
                                 className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-400 hover:text-red-500"
                                 title="Deactivate"
                               >
-                                <span className="material-symbols-outlined text-xl">block</span>
+                                <Ban className="w-5 h-5" />
                               </button>
                             ) : (
                               <button
@@ -412,7 +413,7 @@ export function UsersPage() {
                                 className="p-1.5 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded text-slate-400 hover:text-emerald-600"
                                 title="Reset Password"
                               >
-                                <span className="material-symbols-outlined text-xl">check_circle</span>
+                                <CheckCircle className="w-5 h-5" />
                               </button>
                             )}
                           </div>
@@ -431,11 +432,11 @@ export function UsersPage() {
               <p className="text-xs font-medium text-slate-500">Showing 1 to {filteredUsers.length} of {users.length} users</p>
               <div className="flex gap-2">
                 <button className="p-1 border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-slate-400 transition-colors disabled:opacity-50" disabled>
-                  <span className="material-symbols-outlined">chevron_left</span>
+                  <ChevronLeft className="w-5 h-5" />
                 </button>
                 <button className="w-8 h-8 flex items-center justify-center rounded text-white font-bold text-xs" style={{ backgroundColor: olive }}>1</button>
                 <button className="p-1 border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-slate-400 transition-colors">
-                  <span className="material-symbols-outlined">chevron_right</span>
+                  <ChevronRight className="w-5 h-5" />
                 </button>
               </div>
             </div>

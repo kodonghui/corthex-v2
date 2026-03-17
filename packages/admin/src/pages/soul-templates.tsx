@@ -10,6 +10,7 @@
  *   POST   /api/admin/soul-templates/:id/unpublish
  */
 import { useState } from 'react'
+import { Search, PlusCircle, ChevronRight, Filter, Layers, Brain, Pencil, Wrench, Download, ArrowRight, Plus, ChevronLeft } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
@@ -120,7 +121,7 @@ export function SoulTemplatesPage() {
           </div>
           <div className="flex items-center gap-6">
             <div className="relative group">
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 transition-colors">search</span>
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 transition-colors" />
               <input
                 className="pl-10 pr-4 py-2 border-none rounded-xl text-sm w-64 transition-all"
                 style={{ backgroundColor: '#faf8f5' }}
@@ -137,7 +138,7 @@ export function SoulTemplatesPage() {
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(90,114,71,0.9)')}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#5a7247')}
             >
-              <span className="material-symbols-outlined text-[20px]">add_circle</span>
+              <PlusCircle className="w-5 h-5" />
               New Template
             </button>
           </div>
@@ -149,7 +150,7 @@ export function SoulTemplatesPage() {
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2 text-sm text-slate-500 font-medium">
               <span>Admin</span>
-              <span className="material-symbols-outlined text-xs">chevron_right</span>
+              <ChevronRight className="w-3 h-3" />
               <span style={{ color: '#5a7247' }}>Soul Templates</span>
             </div>
             <h1 className="text-3xl font-bold tracking-tight text-slate-900" style={{ fontFamily: "'Noto Serif KR', serif" }}>Soul Templates Library</h1>
@@ -161,7 +162,7 @@ export function SoulTemplatesPage() {
             <aside className="w-64 shrink-0 space-y-8">
               <div>
                 <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                  <span className="material-symbols-outlined" style={{ color: '#5a7247' }}>filter_list</span>
+                  <Filter className="w-5 h-5" style={{ color: '#5a7247' }} />
                   Category
                 </h4>
                 <div className="space-y-2">
@@ -175,7 +176,7 @@ export function SoulTemplatesPage() {
               </div>
               <div>
                 <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                  <span className="material-symbols-outlined" style={{ color: '#5a7247' }}>layers</span>
+                  <Layers className="w-5 h-5" style={{ color: '#5a7247' }} />
                   Tier
                 </h4>
                 <div className="space-y-2">
@@ -189,7 +190,7 @@ export function SoulTemplatesPage() {
               </div>
               <div>
                 <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                  <span className="material-symbols-outlined" style={{ color: '#5a7247' }}>psychology</span>
+                  <Brain className="w-5 h-5" style={{ color: '#5a7247' }} />
                   Tool Complexity
                 </h4>
                 <input className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-slate-200" type="range" style={{ accentColor: '#5a7247' }} />
@@ -372,7 +373,7 @@ export function SoulTemplatesPage() {
                                 style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: '#5a7247' }}
                                 onClick={() => setEditTemplate(t)}
                               >
-                                <span className="material-symbols-outlined text-sm">edit</span>
+                                <Pencil className="w-4 h-4" />
                               </button>
                             )}
                           </div>
@@ -408,12 +409,12 @@ export function SoulTemplatesPage() {
                           <div className="flex items-center justify-between pt-6 border-t border-slate-50">
                             <div className="flex items-center gap-4">
                               <div className="flex items-center gap-1.5 text-slate-400">
-                                <span className="material-symbols-outlined text-[18px]">construction</span>
+                                <Wrench className="w-[18px] h-[18px]" />
                                 <span className="text-xs font-bold">{t.content.split('\n').length}</span>
                               </div>
                               {t.downloadCount !== undefined && (
                                 <div className="flex items-center gap-1.5 text-slate-400">
-                                  <span className="material-symbols-outlined text-[18px]">download_for_offline</span>
+                                  <Download className="w-[18px] h-[18px]" />
                                   <span className="text-xs font-bold">{t.downloadCount}</span>
                                 </div>
                               )}
@@ -424,7 +425,7 @@ export function SoulTemplatesPage() {
                                 className="font-bold text-sm flex items-center gap-1"
                                 style={{ color: '#5a7247' }}
                               >
-                                Details <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                                Details <ArrowRight className="w-4 h-4 inline" />
                               </button>
                               {!t.isBuiltin && (
                                 <button
@@ -449,7 +450,7 @@ export function SoulTemplatesPage() {
                     onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#e2e8f0')}
                   >
                     <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-opacity-80 transition-colors" style={{ ['--group-hover-bg' as string]: 'rgba(90,114,71,0.1)' }}>
-                      <span className="material-symbols-outlined text-slate-400">add</span>
+                      <Plus className="w-5 h-5 text-slate-400" />
                     </div>
                     <div>
                       <p className="font-bold text-slate-600">Add Custom Template</p>
@@ -462,7 +463,7 @@ export function SoulTemplatesPage() {
               {/* Pagination */}
               <div className="mt-12 flex items-center justify-center gap-4">
                 <button className="w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center text-slate-400 transition-colors">
-                  <span className="material-symbols-outlined">chevron_left</span>
+                  <ChevronLeft className="w-5 h-5" />
                 </button>
                 <div className="flex gap-2">
                   <button className="w-10 h-10 rounded-xl text-white font-bold" style={{ backgroundColor: '#5a7247' }}>1</button>
@@ -472,7 +473,7 @@ export function SoulTemplatesPage() {
                   <button className="w-10 h-10 rounded-xl border border-slate-200 text-slate-600 font-bold">12</button>
                 </div>
                 <button className="w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center text-slate-400 transition-colors">
-                  <span className="material-symbols-outlined">chevron_right</span>
+                  <ChevronRight className="w-5 h-5" />
                 </button>
               </div>
             </div>

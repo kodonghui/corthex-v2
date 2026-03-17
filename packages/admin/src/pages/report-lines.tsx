@@ -7,6 +7,7 @@
  *   POST /api/admin/report-lines   (add single)
  */
 import { useState, useEffect } from 'react'
+import { ChevronRight, Bell, Search, UserSearch, UserCog, Plus, Trash2, ChevronLeft } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
@@ -83,15 +84,15 @@ export function ReportLinesPage() {
       <header className="h-16 border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10" style={{ backgroundColor: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(8px)' }}>
         <div className="flex items-center gap-2 text-slate-500 text-sm">
           <span>Admin</span>
-          <span className="material-symbols-outlined text-xs">chevron_right</span>
+          <ChevronRight className="w-3 h-3" />
           <span className="font-medium" style={{ color: '#3f3e3a' }}>보고 라인 설정</span>
         </div>
         <div className="flex items-center gap-4">
           <button className="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
-            <span className="material-symbols-outlined">notifications</span>
+            <Bell className="w-5 h-5" />
           </button>
           <button className="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
-            <span className="material-symbols-outlined">search</span>
+            <Search className="w-5 h-5" />
           </button>
         </div>
       </header>
@@ -113,7 +114,7 @@ export function ReportLinesPage() {
             <div className="flex-1">
               <label className="block text-xs font-medium text-slate-500 mb-1">대상 사용자 (Reporter)</label>
               <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">person_search</span>
+                <UserSearch className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <select
                   className="w-full pl-10 pr-4 py-2 bg-slate-50 border-slate-200 rounded-lg text-sm"
                   style={{ outlineColor: '#5a7247' }}
@@ -128,7 +129,7 @@ export function ReportLinesPage() {
             <div className="flex-1">
               <label className="block text-xs font-medium text-slate-500 mb-1">직속 상사 (Supervisor)</label>
               <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">manage_accounts</span>
+                <UserCog className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <select
                   className="w-full pl-10 pr-4 py-2 bg-slate-50 border-slate-200 rounded-lg text-sm"
                   style={{ outlineColor: '#5a7247' }}
@@ -149,7 +150,7 @@ export function ReportLinesPage() {
                 onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(90,114,71,0.9)')}
                 onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#5a7247')}
               >
-                <span className="material-symbols-outlined text-sm">add</span>
+                <Plus className="w-4 h-4" />
                 {saveMutation.isPending ? '저장 중...' : '보고 라인 추가'}
               </button>
             </div>
@@ -244,7 +245,7 @@ export function ReportLinesPage() {
                           onMouseLeave={(e) => (e.currentTarget.style.color = '#94a3b8')}
                           onClick={() => handleChange(u.id, '')}
                         >
-                          <span className="material-symbols-outlined text-lg">delete</span>
+                          <Trash2 className="w-5 h-5" />
                         </button>
                       </td>
                     </tr>
@@ -264,10 +265,10 @@ export function ReportLinesPage() {
             <p className="text-xs text-slate-500">전체 {users.length}개의 보고 라인이 설정됨</p>
             <div className="flex gap-2">
               <button className="p-1 text-slate-400 transition-colors disabled:opacity-30" disabled>
-                <span className="material-symbols-outlined">chevron_left</span>
+                <ChevronLeft className="w-5 h-5" />
               </button>
               <button className="p-1 text-slate-400 transition-colors" style={{ cursor: 'pointer' }}>
-                <span className="material-symbols-outlined">chevron_right</span>
+                <ChevronRight className="w-5 h-5" />
               </button>
             </div>
           </div>

@@ -5,6 +5,7 @@
  *   GET /admin/monitoring/status
  */
 import { useQuery } from '@tanstack/react-query'
+import { AlertCircle, Server, Cpu, Database, AlertTriangle, CheckCircle } from 'lucide-react'
 import { api } from '../lib/api'
 
 type MonitoringData = {
@@ -93,7 +94,7 @@ export function MonitoringPage() {
           </h1>
           <div className="bg-white rounded-xl border p-8 text-center" style={{ borderColor: sand }}>
             <div className="w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: 'rgba(239,68,68,0.1)' }}>
-              <span className="material-symbols-outlined text-2xl" style={{ color: '#ef4444' }}>error</span>
+              <AlertCircle className="w-6 h-6" style={{ color: '#ef4444' }} />
             </div>
             <p className="text-sm" style={{ color: '#ef4444' }}>Failed to load monitoring data.</p>
             <p className="text-xs mt-1" style={{ color: lightMuted }}>{(error as Error)?.message}</p>
@@ -165,7 +166,7 @@ export function MonitoringPage() {
             <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: sand, backgroundColor: `${cream}80` }}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: oliveBg }}>
-                  <span className="material-symbols-outlined" style={{ color: olive }}>dns</span>
+                  <Server className="w-5 h-5" style={{ color: olive }} />
                 </div>
                 <h3 className="text-sm font-bold" style={{ color: warmBrown, fontFamily: "'Noto Serif KR', serif" }}>Server Status</h3>
               </div>
@@ -194,7 +195,7 @@ export function MonitoringPage() {
             <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: sand, backgroundColor: `${cream}80` }}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: oliveBg }}>
-                  <span className="material-symbols-outlined" style={{ color: olive }}>memory</span>
+                  <Cpu className="w-5 h-5" style={{ color: olive }} />
                 </div>
                 <h3 className="text-sm font-bold" style={{ color: warmBrown, fontFamily: "'Noto Serif KR', serif" }}>Memory</h3>
               </div>
@@ -218,7 +219,7 @@ export function MonitoringPage() {
             <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: sand, backgroundColor: `${cream}80` }}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: oliveBg }}>
-                  <span className="material-symbols-outlined" style={{ color: olive }}>database</span>
+                  <Database className="w-5 h-5" style={{ color: olive }} />
                 </div>
                 <h3 className="text-sm font-bold" style={{ color: warmBrown, fontFamily: "'Noto Serif KR', serif" }}>Database</h3>
               </div>
@@ -250,9 +251,10 @@ export function MonitoringPage() {
             <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: sand, backgroundColor: `${cream}80` }}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: d.errors.count24h > 0 ? 'rgba(239,68,68,0.1)' : oliveBg }}>
-                  <span className="material-symbols-outlined" style={{ color: d.errors.count24h > 0 ? '#ef4444' : olive }}>
-                    {d.errors.count24h > 0 ? 'warning' : 'check_circle'}
-                  </span>
+                  {d.errors.count24h > 0
+                    ? <AlertTriangle className="w-5 h-5" style={{ color: '#ef4444' }} />
+                    : <CheckCircle className="w-5 h-5" style={{ color: olive }} />
+                  }
                 </div>
                 <h3 className="text-sm font-bold" style={{ color: warmBrown, fontFamily: "'Noto Serif KR', serif" }}>Errors (24h)</h3>
               </div>

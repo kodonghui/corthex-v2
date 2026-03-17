@@ -13,6 +13,7 @@
  *   PUT    /admin/company-settings/handoff-depth
  */
 import { useState, useEffect } from 'react'
+import { Building2, Key, ArrowLeftRight, SlidersHorizontal } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
@@ -96,7 +97,7 @@ function CompanyInfoSection({ company, onSave }: { company: Company; onSave: (da
     <div className="bg-white rounded-xl border shadow-sm p-6" style={{ borderColor: sand }} data-testid="settings-company-info">
       <div className="flex items-center gap-3 mb-5">
         <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: oliveBg }}>
-          <span className="material-symbols-outlined" style={{ color: olive }}>apartment</span>
+          <Building2 className="w-5 h-5" style={{ color: olive }} />
         </div>
         <h2 className="text-lg font-bold" style={{ color: warmBrown, fontFamily: "'Noto Serif KR', serif" }}>Company Info</h2>
       </div>
@@ -252,7 +253,7 @@ function ApiKeySection({ companyId }: { companyId: string }) {
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: oliveBg }}>
-            <span className="material-symbols-outlined" style={{ color: olive }}>key</span>
+            <Key className="w-5 h-5" style={{ color: olive }} />
           </div>
           <div>
             <h2 className="text-lg font-bold" style={{ color: warmBrown, fontFamily: "'Noto Serif KR', serif" }}>API Key Management</h2>
@@ -500,7 +501,7 @@ function HandoffDepthSection({ companyId }: { companyId: string }) {
     <div className="bg-white rounded-xl border shadow-sm p-6" style={{ borderColor: sand }} data-testid="settings-handoff-depth">
       <div className="flex items-center gap-3 mb-2">
         <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: oliveBg }}>
-          <span className="material-symbols-outlined" style={{ color: olive }}>swap_horiz</span>
+          <ArrowLeftRight className="w-5 h-5" style={{ color: olive }} />
         </div>
         <h2 className="text-lg font-bold" style={{ color: warmBrown, fontFamily: "'Noto Serif KR', serif" }}>Handoff Depth</h2>
       </div>
@@ -584,7 +585,7 @@ function DefaultSettingsSection({
     <div className="bg-white rounded-xl border shadow-sm p-6" style={{ borderColor: sand }} data-testid="settings-defaults">
       <div className="flex items-center gap-3 mb-5">
         <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: oliveBg }}>
-          <span className="material-symbols-outlined" style={{ color: olive }}>tune</span>
+          <SlidersHorizontal className="w-5 h-5" style={{ color: olive }} />
         </div>
         <h2 className="text-lg font-bold" style={{ color: warmBrown, fontFamily: "'Noto Serif KR', serif" }}>Default Settings</h2>
       </div>

@@ -14,6 +14,7 @@
  *   POST   /admin/workflow-suggestions/:id/reject
  */
 import { useState, useMemo, useCallback } from 'react'
+import { Network, ArrowLeft, GitBranch, Lightbulb, Settings } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
@@ -525,7 +526,7 @@ export function WorkflowsPage() {
         {/* Sidebar */}
         <div className="w-64 text-white flex flex-col h-full flex-shrink-0 z-20 shadow-lg" style={{ backgroundColor: olive }}>
           <div className="p-6 flex items-center gap-3 border-b" style={{ borderColor: oliveActive }}>
-            <span className="material-symbols-outlined text-2xl">hub</span>
+            <Network className="w-6 h-6" />
             <h2 className="text-xl font-bold tracking-wide" style={{ fontFamily: "'Noto Serif KR', serif" }}>Workflows</h2>
           </div>
           <div className="p-6 flex flex-col gap-2">
@@ -544,11 +545,11 @@ export function WorkflowsPage() {
                 onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#6a8454')}
                 onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
-                <span className="material-symbols-outlined text-xl">arrow_back</span>
+                <ArrowLeft className="w-5 h-5" />
                 <span className="text-sm font-medium">Back to List</span>
               </button>
               <button className="flex items-center gap-3 px-4 py-3 rounded-2xl shadow-inner" style={{ backgroundColor: oliveActive }}>
-                <span className="material-symbols-outlined text-xl">account_tree</span>
+                <GitBranch className="w-5 h-5" />
                 <span className="text-sm font-medium truncate">{detailLoading ? '...' : detail?.name || 'Workflow'}</span>
               </button>
             </div>
@@ -702,7 +703,7 @@ export function WorkflowsPage() {
       {/* Sidebar */}
       <div className="w-64 text-white flex flex-col h-full flex-shrink-0 z-20 shadow-lg" style={{ backgroundColor: olive }}>
         <div className="p-6 flex items-center gap-3 border-b" style={{ borderColor: oliveActive }}>
-          <span className="material-symbols-outlined text-2xl">hub</span>
+          <Network className="w-6 h-6" />
           <h2 className="text-xl font-bold tracking-wide" style={{ fontFamily: "'Noto Serif KR', serif" }}>Workflows</h2>
         </div>
         <div className="p-6 flex flex-col gap-2">
@@ -721,7 +722,7 @@ export function WorkflowsPage() {
               onMouseEnter={e => { if (activeTab !== 'list') e.currentTarget.style.backgroundColor = '#6a8454' }}
               onMouseLeave={e => { if (activeTab !== 'list') e.currentTarget.style.backgroundColor = 'transparent' }}
             >
-              <span className="material-symbols-outlined text-xl">account_tree</span>
+              <GitBranch className="w-5 h-5" />
               <span className="text-sm font-medium">All Workflows</span>
             </button>
             <button
@@ -731,7 +732,7 @@ export function WorkflowsPage() {
               onMouseEnter={e => { if (activeTab !== 'suggestions') e.currentTarget.style.backgroundColor = '#6a8454' }}
               onMouseLeave={e => { if (activeTab !== 'suggestions') e.currentTarget.style.backgroundColor = 'transparent' }}
             >
-              <span className="material-symbols-outlined text-xl">tips_and_updates</span>
+              <Lightbulb className="w-5 h-5" />
               <span className="text-sm font-medium">Suggestions</span>
               {suggestions.length > 0 && (
                 <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded-full" style={{ backgroundColor: terracotta }}>{suggestions.length}</span>
@@ -746,7 +747,7 @@ export function WorkflowsPage() {
             onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#6a8454')}
             onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
           >
-            <span className="material-symbols-outlined text-xl">settings</span>
+            <Settings className="w-5 h-5" />
             <span className="text-sm font-medium">Settings</span>
           </button>
         </div>
@@ -801,7 +802,7 @@ export function WorkflowsPage() {
               ) : workflows.length === 0 ? (
                 <div className="text-center py-16" data-testid="workflows-empty">
                   <div className="w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-3" style={{ backgroundColor: oliveBg }}>
-                    <span className="material-symbols-outlined" style={{ color: olive }}>account_tree</span>
+                    <GitBranch className="w-5 h-5" style={{ color: olive }} />
                   </div>
                   <p className="text-sm font-medium" style={{ color: muted }}>No workflows yet</p>
                   <p className="text-xs mt-1" style={{ color: lightMuted }}>Create your first workflow to get started</p>
@@ -861,7 +862,7 @@ export function WorkflowsPage() {
               ) : suggestions.length === 0 ? (
                 <div className="text-center py-16" data-testid="suggestions-empty">
                   <div className="w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-3" style={{ backgroundColor: oliveBg }}>
-                    <span className="material-symbols-outlined" style={{ color: olive }}>tips_and_updates</span>
+                    <Lightbulb className="w-5 h-5" style={{ color: olive }} />
                   </div>
                   <p className="text-sm font-medium" style={{ color: muted }}>No pending suggestions</p>
                   <p className="text-xs mt-1" style={{ color: lightMuted }}>Suggestions appear when repetitive tool usage patterns are detected</p>
