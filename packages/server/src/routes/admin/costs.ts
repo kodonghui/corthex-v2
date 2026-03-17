@@ -13,6 +13,7 @@ costsRoute.use('*', authMiddleware, adminOnly)
 const dateRangeSchema = z.object({
   startDate: z.string().date().optional(),
   endDate: z.string().date().optional(),
+  companyId: z.string().uuid().optional(),
 })
 
 function parseDateRange(query: { startDate?: string; endDate?: string }) {
