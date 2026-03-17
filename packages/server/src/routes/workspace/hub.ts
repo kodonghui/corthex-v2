@@ -5,6 +5,7 @@ import { authMiddleware } from '../../middleware/auth'
 import { getDB } from '../../db/scoped-query'
 import { runAgent, sseStream, renderSoul } from '../../engine'
 import { ERROR_CODES } from '../../lib/error-codes'
+import { resolveCliToken } from '../../lib/cli-token-resolver'
 import { getMaxHandoffDepth } from '../../services/handoff-depth-settings'
 import { collectKnowledgeContext } from '../../services/knowledge-injector'
 import type { AppEnv } from '../../types'
@@ -32,8 +33,11 @@ hubRoute.post('/stream', zValidator('json', streamSchema), async (c) => {
   const { message, sessionId: inputSessionId, agentId: requestedAgentId } = c.req.valid('json')
   const { companyId, userId } = tenant
 
-  // CLI 토큰 체크 — 없으면 에이전트 실행 불가
-  if (!process.env.ANTHROPIC_API_KEY) {
+  // CLI 토큰 resolve — DB 우선, env 폴백
+  let cliToken: string
+  try {
+    cliToken = await resolveCliToken(userId, companyId)
+  } catch {
     return sseErrorResponse(ERROR_CODES.AGENT_SPAWN_FAILED, 'CLI 토큰이 등록되지 않았습니다')
   }
 
@@ -105,7 +109,7 @@ hubRoute.post('/stream', zValidator('json', streamSchema), async (c) => {
   // Build SessionContext (E1)
   const sessionId = inputSessionId ?? crypto.randomUUID()
   const ctx: SessionContext = {
-    cliToken: process.env.ANTHROPIC_API_KEY || '',
+    cliToken,
     userId,
     companyId,
     depth: 0,

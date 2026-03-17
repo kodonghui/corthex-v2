@@ -14,6 +14,7 @@ import { collectAgentResponse, renderSoul } from '../engine'
 import type { SessionContext } from '../engine'
 import { getDB } from '../db/scoped-query'
 import { getMaxHandoffDepth } from '../services/handoff-depth-settings'
+import { resolveCliToken } from '../lib/cli-token-resolver'
 import { processDebateCommand } from '../services/debate-command-handler'
 import { processSketchCommand } from '../services/sketch-command-handler'
 import { processToolCheck } from '../services/tool-check-handler'
@@ -53,7 +54,7 @@ async function runAgentForCommand(opts: {
 
   const soul = agentRow.soul ? await renderSoul(agentRow.soul, agentRow.id, companyId) : ''
   const ctx: SessionContext = {
-    cliToken: process.env.ANTHROPIC_API_KEY || '',
+    cliToken: await resolveCliToken(userId, companyId),
     userId,
     companyId,
     depth: 0,

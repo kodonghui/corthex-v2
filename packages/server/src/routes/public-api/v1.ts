@@ -11,6 +11,7 @@ import { collectAgentResponse, renderSoul } from '../../engine'
 import type { SessionContext } from '../../engine'
 import { getDB } from '../../db/scoped-query'
 import { getMaxHandoffDepth } from '../../services/handoff-depth-settings'
+import { resolveCliToken } from '../../lib/cli-token-resolver'
 import type { AppEnv } from '../../types'
 
 // === Agent execution helper (new engine) ===
@@ -44,7 +45,7 @@ async function runAgentForCommand(opts: {
 
   const soul = agentRow.soul ? await renderSoul(agentRow.soul, agentRow.id, companyId) : ''
   const ctx: SessionContext = {
-    cliToken: process.env.ANTHROPIC_API_KEY || '',
+    cliToken: await resolveCliToken(userId, companyId),
     userId,
     companyId,
     depth: 0,

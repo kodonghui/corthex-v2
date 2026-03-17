@@ -1,11 +1,11 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { db } from '../db'
-import { chatMessages, chatSessions, agents, agentMemory, cliCredentials, mcpServers } from '../db/schema'
+import { chatMessages, chatSessions, agents, agentMemory, mcpServers } from '../db/schema'
 import { eq, and, desc } from 'drizzle-orm'
 import { loadAgentTools, toClaudeTools, executeTool } from './tool-executor'
 import { mcpListTools, mcpCallTool, mcpCallToolStream } from './mcp-client'
 import { recordCost } from './cost-tracker'
-import { decrypt } from './crypto'
+import { resolveCliToken } from './cli-token-resolver'
 import { checkMcpRateLimit } from './mcp-rate-limit'
 import { logActivity } from './activity-logger'
 
@@ -14,23 +14,7 @@ import { logActivity } from './activity-logger'
  * 설계: 각 유저(H)마다 자기 CLI 토큰 → 비용/데이터 격리
  */
 export async function getClientForUser(userId: string, companyId: string): Promise<Anthropic> {
-  const [cred] = await db
-    .select({ encryptedToken: cliCredentials.encryptedToken })
-    .from(cliCredentials)
-    .where(
-      and(
-        eq(cliCredentials.userId, userId),
-        eq(cliCredentials.companyId, companyId),
-        eq(cliCredentials.isActive, true),
-      ),
-    )
-    .limit(1)
-
-  if (!cred) {
-    throw new Error('CLI 토큰이 등록되지 않았습니다. 관리자에게 CLI 크레덴셜 등록을 요청하세요.')
-  }
-
-  const apiKey = await decrypt(cred.encryptedToken)
+  const apiKey = await resolveCliToken(userId, companyId)
   return new Anthropic({ apiKey })
 }
 

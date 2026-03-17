@@ -7,8 +7,8 @@ import { cliCredentials } from '../../db/schema'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
 import { tenantMiddleware } from '../../middleware/tenant'
 import { HTTPError } from '../../middleware/error'
-import { encrypt } from '../../lib/crypto'
 import { encrypt as encryptCredential } from '../../lib/credential-crypto'
+import Anthropic from '@anthropic-ai/sdk'
 import { getDB } from '../../db/scoped-query'
 import {
   SUPPORTED_PROVIDERS,
@@ -57,7 +57,20 @@ credentialsRoute.get('/cli-credentials', async (c) => {
 // POST /api/admin/cli-credentials
 credentialsRoute.post('/cli-credentials', zValidator('json', createCliSchema), async (c) => {
   const { token, ...rest } = c.req.valid('json')
-  const encryptedToken = await encrypt(token)
+
+  // FR59: Validate token with minimal API call
+  try {
+    const anthropic = new Anthropic({ apiKey: token })
+    await anthropic.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 1,
+      messages: [{ role: 'user', content: 'ping' }],
+    })
+  } catch {
+    throw new HTTPError(400, 'CLI 토큰이 유효하지 않습니다. 토큰을 확인해주세요.', 'CRED_003')
+  }
+
+  const encryptedToken = await encryptCredential(token)
 
   const [cred] = await db
     .insert(cliCredentials)
