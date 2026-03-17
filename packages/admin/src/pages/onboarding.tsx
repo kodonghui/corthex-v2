@@ -543,7 +543,7 @@ function ApiKeyStep({
 
   const { data: existingKeys } = useQuery({
     queryKey: ['company-api-keys', companyId],
-    queryFn: () => api.get<{ data: Array<{ id: string; provider: string }> }>('/admin/api-keys'),
+    queryFn: () => api.get<{ data: Array<{ id: string; provider: string }> }>(`/admin/api-keys?companyId=${companyId}`),
     enabled: !!companyId,
   })
 

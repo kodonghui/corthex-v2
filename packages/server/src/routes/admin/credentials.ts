@@ -121,7 +121,9 @@ credentialsRoute.get('/api-keys/providers', async (c) => {
 // GET /api/admin/api-keys — list credentials by company (tenant-scoped, no decrypted values)
 credentialsRoute.get('/api-keys', async (c) => {
   const tenant = c.get('tenant')
-  const result = await listCredentials(tenant.companyId)
+  // Admin JWT has companyId='system' — use query param companyId from UI
+  const companyId = c.req.query('companyId') || tenant.companyId
+  const result = await listCredentials(companyId)
   return c.json({ data: result })
 })
 
@@ -131,8 +133,9 @@ credentialsRoute.post('/api-keys', zValidator('json', createApiKeySchema), async
   // tenant.userId is the admin user's ID from JWT
   const body = c.req.valid('json')
 
+  // Admin JWT has companyId='system' — use body.companyId (selected company from UI)
   const result = await storeCredentials({
-    companyId: tenant.companyId,
+    companyId: body.companyId,
     provider: body.provider,
     credentials: body.credentials,
     scope: body.scope,
@@ -152,9 +155,11 @@ credentialsRoute.put('/api-keys/:id', zValidator('json', updateApiKeySchema), as
   const id = c.req.param('id')
   const { credentials: newCreds } = c.req.valid('json')
 
+  // Admin JWT has companyId='system' — use query param companyId from UI
+  const companyId = c.req.query('companyId') || tenant.companyId
   await updateCredentials(
     id,
-    tenant.companyId,
+    companyId,
     newCreds,
     'admin_user',
     tenant.userId,
@@ -169,9 +174,11 @@ credentialsRoute.delete('/api-keys/:id', async (c) => {
   // tenant.userId is the admin user's ID from JWT
   const id = c.req.param('id')
 
+  // Admin JWT has companyId='system' — use query param companyId from UI
+  const companyId = c.req.query('companyId') || tenant.companyId
   await deleteCredential(
     id,
-    tenant.companyId,
+    companyId,
     'admin_user',
     tenant.userId,
   )
