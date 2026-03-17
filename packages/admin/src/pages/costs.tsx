@@ -453,7 +453,7 @@ function BudgetPanel({ companyId, summaryData }: { companyId: string; summaryDat
       <div className="mt-8 pt-6 border-t border-stone-100">
         <div className="flex justify-between text-sm mb-2">
           <span className="text-stone-500">현재 사용량 ({Math.round(usagePercent)}%)</span>
-          <span className="font-bold">${microToUsd(currentSpendMicro)} / ${activeForm ? `$${Number(activeForm.monthlyBudget).toLocaleString()}` : '$0'}</span>
+          <span className="font-bold">{`$${microToUsd(currentSpendMicro)}`} / {activeForm ? `$${Number(activeForm.monthlyBudget).toLocaleString()}` : '$0'}</span>
         </div>
         <div className="w-full h-2 bg-stone-100 rounded-full overflow-hidden">
           <div className="h-full rounded-full" style={{ width: `${usagePercent}%`, backgroundColor: '#d4a843' }} />

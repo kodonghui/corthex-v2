@@ -25,7 +25,7 @@ function parseDateRange(query: { startDate?: string; endDate?: string }) {
 
 // GET /api/admin/costs/by-agent
 costsRoute.get('/costs/by-agent', zValidator('query', dateRangeSchema), async (c) => {
-  const companyId = c.get('tenant').companyId
+  const companyId = c.req.query('companyId') || c.get('tenant').companyId
   const range = parseDateRange(c.req.valid('query'))
   const items = await costAggregation.getByAgent(companyId, range)
   return c.json({
@@ -39,7 +39,7 @@ costsRoute.get('/costs/by-agent', zValidator('query', dateRangeSchema), async (c
 
 // GET /api/admin/costs/by-model
 costsRoute.get('/costs/by-model', zValidator('query', dateRangeSchema), async (c) => {
-  const companyId = c.get('tenant').companyId
+  const companyId = c.req.query('companyId') || c.get('tenant').companyId
   const range = parseDateRange(c.req.valid('query'))
   const items = await costAggregation.getByModel(companyId, range)
   return c.json({
@@ -53,7 +53,7 @@ costsRoute.get('/costs/by-model', zValidator('query', dateRangeSchema), async (c
 
 // GET /api/admin/costs/by-department
 costsRoute.get('/costs/by-department', zValidator('query', dateRangeSchema), async (c) => {
-  const companyId = c.get('tenant').companyId
+  const companyId = c.req.query('companyId') || c.get('tenant').companyId
   const range = parseDateRange(c.req.valid('query'))
   const items = await costAggregation.getByDepartment(companyId, range)
   return c.json({
@@ -67,7 +67,7 @@ costsRoute.get('/costs/by-department', zValidator('query', dateRangeSchema), asy
 
 // GET /api/admin/costs/summary
 costsRoute.get('/costs/summary', zValidator('query', dateRangeSchema), async (c) => {
-  const companyId = c.get('tenant').companyId
+  const companyId = c.req.query('companyId') || c.get('tenant').companyId
   const range = parseDateRange(c.req.valid('query'))
   const summary = await costAggregation.getSummary(companyId, range)
   return c.json({
@@ -81,7 +81,7 @@ costsRoute.get('/costs/summary', zValidator('query', dateRangeSchema), async (c)
 
 // GET /api/admin/costs/daily
 costsRoute.get('/costs/daily', zValidator('query', dateRangeSchema), async (c) => {
-  const companyId = c.get('tenant').companyId
+  const companyId = c.req.query('companyId') || c.get('tenant').companyId
   const range = parseDateRange(c.req.valid('query'))
   const items = await costAggregation.getDaily(companyId, range)
   return c.json({

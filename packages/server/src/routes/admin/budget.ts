@@ -14,7 +14,7 @@ budgetRoute.use('*', authMiddleware, adminOnly)
 
 // GET /api/admin/budget — current budget settings
 budgetRoute.get('/budget', async (c) => {
-  const companyId = c.get('tenant').companyId
+  const companyId = c.req.query('companyId') || c.get('tenant').companyId
   const config = await loadBudgetConfig(companyId)
 
   return c.json({
@@ -32,7 +32,7 @@ const budgetUpdateSchema = z.object({
 })
 
 budgetRoute.put('/budget', zValidator('json', budgetUpdateSchema), async (c) => {
-  const companyId = c.get('tenant').companyId
+  const companyId = c.req.query('companyId') || c.get('tenant').companyId
   const body = c.req.valid('json')
 
   // Load existing settings to merge

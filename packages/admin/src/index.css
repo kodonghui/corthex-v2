@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+body {
+  font-family: 'Inter', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+code, pre, .font-mono {
+  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+}
+
 @theme {
   --color-corthex-accent: oklch(0.55 0.2 264);
   --color-corthex-accent-dark: oklch(0.7 0.17 264);
