@@ -57,7 +57,7 @@ function SwitchToCeoButton({ companyId }: { companyId: string | null }) {
     <button
       onClick={handleSwitch}
       disabled={!companyId || switching}
-      className="flex items-center gap-2 w-full px-3 py-2 text-xs font-medium rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950 hover:bg-indigo-100 dark:hover:bg-indigo-900"
+      className="flex items-center gap-2 w-full px-3 py-2 text-xs font-medium rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-[#556B2F] dark:text-[#A3B18A] bg-[#556B2F]/10 dark:bg-[#556B2F]/20 hover:bg-[#556B2F]/20 dark:hover:bg-[#556B2F]/30"
     >
       <span>⇄</span>
       <span>{switching ? '전환 중...' : 'CEO 앱으로 전환'}</span>
@@ -89,7 +89,7 @@ export function Sidebar() {
     <aside className="w-60 h-screen flex flex-col bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800">
       <div className="p-4 border-b border-zinc-200 dark:border-zinc-800">
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-sm font-bold">
+          <div className="w-8 h-8 rounded-lg bg-[#556B2F] text-white flex items-center justify-center text-sm font-bold">
             C
           </div>
           <div>
@@ -103,7 +103,7 @@ export function Sidebar() {
           <select
             value={selectedCompanyId || ''}
             onChange={(e) => setSelectedCompanyId(e.target.value)}
-            className="w-full px-2 py-1.5 text-xs border border-zinc-200 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500/40 focus:outline-none"
+            className="w-full px-2 py-1.5 text-xs border border-zinc-200 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-[#556B2F]/40 focus:outline-none"
           >
             {companies.map((c) => (
               <option key={c.id} value={c.id}>
@@ -123,7 +123,7 @@ export function Sidebar() {
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                 isActive
-                  ? 'bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-medium'
+                  ? 'bg-[#556B2F]/10 dark:bg-[#556B2F]/20 text-[#556B2F] dark:text-[#A3B18A] font-medium'
                   : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
               }`
             }
@@ -140,7 +140,7 @@ export function Sidebar() {
           className={({ isActive }) =>
             `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
               isActive
-                ? 'bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-medium'
+                ? 'bg-[#556B2F]/10 dark:bg-[#556B2F]/20 text-[#556B2F] dark:text-[#A3B18A] font-medium'
                 : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
             }`
           }

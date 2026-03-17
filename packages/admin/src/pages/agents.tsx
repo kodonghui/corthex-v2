@@ -72,7 +72,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 const TIER_BADGE: Record<string, string> = {
   manager: 'bg-amber-100 text-amber-800 border-amber-200',
-  specialist: 'bg-indigo-100 text-indigo-800 border-indigo-200',
+  specialist: 'bg-[#556B2F]/10 text-[#556B2F] border-[#556B2F]/20',
   worker: 'bg-slate-100 text-slate-800 border-slate-200',
 }
 

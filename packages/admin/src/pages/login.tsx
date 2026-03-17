@@ -50,7 +50,7 @@ export function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg border border-zinc-200 dark:border-zinc-800 p-8">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-600 text-white text-lg font-bold mb-4">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#556B2F] text-white text-lg font-bold mb-4">
               C
             </div>
             <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">CORTHEX ADMIN</h1>
@@ -66,7 +66,7 @@ export function LoginPage() {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-3 py-2.5 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                className="w-full px-3 py-2.5 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#556B2F] focus:border-transparent transition"
                 placeholder="admin"
                 required
               />
@@ -79,7 +79,7 @@ export function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2.5 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                className="w-full px-3 py-2.5 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#556B2F] focus:border-transparent transition"
                 required
               />
             </div>
@@ -101,7 +101,7 @@ export function LoginPage() {
             <button
               type="submit"
               disabled={loading || countdown > 0}
-              className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer"
+              className="w-full py-2.5 px-4 bg-[#556B2F] hover:bg-[#3E4E22] disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer"
             >
               {loading ? '로그인 중...' : countdown > 0 ? `${countdown}초 후 재시도` : '로그인'}
             </button>

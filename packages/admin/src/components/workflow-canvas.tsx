@@ -393,7 +393,7 @@ export function WorkflowCanvas({
       <div className="flex items-center gap-2 px-2">
         <button
           onClick={() => setShowAddModal({ x: viewBox.x + viewBox.w / 2 - NODE_W / 2, y: viewBox.y + viewBox.h / 2 - NODE_H / 2 })}
-          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
+          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-[#556B2F] text-white hover:bg-[#3E4E22]"
         >
           + 노드 추가
         </button>
@@ -407,7 +407,7 @@ export function WorkflowCanvas({
           onClick={() => setShowJsonEditor(!showJsonEditor)}
           className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
             showJsonEditor
-              ? 'bg-indigo-100 dark:bg-indigo-900/40 border-indigo-300 dark:border-indigo-600 text-indigo-700 dark:text-indigo-300'
+              ? 'bg-[#556B2F]/10 dark:bg-[#556B2F]/20 border-[#556B2F]/40 dark:border-[#556B2F]/60 text-[#556B2F] dark:text-[#A3B18A]'
               : 'border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
           }`}
         >
@@ -558,7 +558,7 @@ export function WorkflowCanvas({
                     height={NODE_H}
                     rx={8}
                     fill={style.fill}
-                    stroke={isSelected ? '#6366f1' : style.stroke}
+                    stroke={isSelected ? '#556B2F' : style.stroke}
                     strokeWidth={isSelected ? 2.5 : 1.5}
                     style={{ cursor: 'move' }}
                   />
@@ -730,7 +730,7 @@ export function WorkflowCanvas({
               <input
                 value={selectedNode.name}
                 onChange={(e) => updateSelectedNode({ name: e.target.value })}
-                className="w-full px-2 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-indigo-500/40 focus:outline-none"
+                className="w-full px-2 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-[#556B2F]/40 focus:outline-none"
                 placeholder="노드 이름"
               />
             </div>
@@ -740,7 +740,7 @@ export function WorkflowCanvas({
               <select
                 value={selectedNode.type}
                 onChange={(e) => updateSelectedNode({ type: e.target.value as WorkflowStep['type'] })}
-                className="w-full px-2 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-indigo-500/40 focus:outline-none"
+                className="w-full px-2 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-[#556B2F]/40 focus:outline-none"
               >
                 <option value="tool">Tool</option>
                 <option value="llm">LLM</option>
@@ -753,7 +753,7 @@ export function WorkflowCanvas({
               <input
                 value={selectedNode.action}
                 onChange={(e) => updateSelectedNode({ action: e.target.value })}
-                className="w-full px-2 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-indigo-500/40 focus:outline-none"
+                className="w-full px-2 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-[#556B2F]/40 focus:outline-none"
                 placeholder="액션명"
               />
             </div>
@@ -765,7 +765,7 @@ export function WorkflowCanvas({
                   value={selectedNode.systemPrompt || ''}
                   onChange={(e) => updateSelectedNode({ systemPrompt: e.target.value || undefined })}
                   rows={3}
-                  className="w-full px-2 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 resize-none focus:ring-1 focus:ring-indigo-500/40 focus:outline-none"
+                  className="w-full px-2 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 resize-none focus:ring-1 focus:ring-[#556B2F]/40 focus:outline-none"
                 />
               </div>
             )}
@@ -777,7 +777,7 @@ export function WorkflowCanvas({
                   type="number"
                   value={selectedNode.timeout || ''}
                   onChange={(e) => updateSelectedNode({ timeout: e.target.value ? Number(e.target.value) : undefined })}
-                  className="w-full px-2 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-indigo-500/40 focus:outline-none"
+                  className="w-full px-2 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-[#556B2F]/40 focus:outline-none"
                   placeholder="30000"
                 />
               </div>
@@ -787,7 +787,7 @@ export function WorkflowCanvas({
                   type="number"
                   value={selectedNode.retryCount ?? ''}
                   onChange={(e) => updateSelectedNode({ retryCount: e.target.value ? Number(e.target.value) : undefined })}
-                  className="w-full px-2 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-indigo-500/40 focus:outline-none"
+                  className="w-full px-2 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-[#556B2F]/40 focus:outline-none"
                   placeholder="0"
                   min={0}
                   max={3}
@@ -812,7 +812,7 @@ export function WorkflowCanvas({
             <span className="text-xs font-medium text-zinc-500">Steps JSON</span>
             <button
               onClick={handleJsonApply}
-              className="px-3 py-1 text-xs font-medium rounded bg-indigo-600 text-white hover:bg-indigo-700"
+              className="px-3 py-1 text-xs font-medium rounded bg-[#556B2F] text-white hover:bg-[#3E4E22]"
             >
               적용
             </button>
@@ -821,7 +821,7 @@ export function WorkflowCanvas({
             value={jsonText}
             onChange={(e) => setJsonText(e.target.value)}
             rows={12}
-            className="w-full px-3 py-2 text-xs font-mono border border-zinc-300 dark:border-zinc-600 rounded bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 resize-y focus:ring-1 focus:ring-indigo-500/40 focus:outline-none"
+            className="w-full px-3 py-2 text-xs font-mono border border-zinc-300 dark:border-zinc-600 rounded bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 resize-y focus:ring-1 focus:ring-[#556B2F]/40 focus:outline-none"
             spellCheck={false}
           />
         </div>
