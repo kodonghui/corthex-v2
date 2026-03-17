@@ -88,6 +88,22 @@ Step 3: API Keys (register Anthropic key)
 Step 4: Invite employees
 Step 5: Complete
 
+## Auth Pre-check Result: PASSED (2026-03-17)
+- Login: admin/admin1234 → dashboard loaded
+- companyId: 6ee92cb0-5065-4e48-8149-38f30ad8913e (CORTHEX HQ selected)
+- Dashboard console errors (6):
+  - 500: /api/admin/costs/summary (x2)
+  - 500: /api/admin/budget (x2)
+  - 500: /api/admin/agents (x2)
+- "Loading..." stuck in system alerts table
+
+## Playwright MCP Login Steps
+1. browser_navigate("https://corthex-hq.com/admin/login")
+2. browser_snapshot() → find textbox refs
+3. browser_fill_form: textbox "admin" → "admin", password field → "admin1234"
+4. browser_click: "로그인" button
+5. Verify URL changed to /admin and sidebar is visible
+
 ## Source Code Paths (for scenario generation)
 - Admin pages: /home/ubuntu/corthex-v2/packages/admin/src/pages/
 - Admin components: /home/ubuntu/corthex-v2/packages/admin/src/components/

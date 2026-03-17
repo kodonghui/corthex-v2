@@ -10,7 +10,7 @@
     "playwright": {
       "type": "stdio",
       "command": "npx",
-      "args": ["@playwright/mcp", "--headless"],
+      "args": ["@playwright/mcp", "--headless", "--executable-path", "/home/ubuntu/.cache/ms-playwright/chromium-1208/chrome-linux/chrome"],
       "env": {}
     }
   }

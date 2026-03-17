@@ -1,40 +1,24 @@
-# Phase 3: Risk Classification
+# Phase 3: Risk Classification — Full Codebase Audit
 
-## File Classification
+## Mode: Full (all files)
+## Risk Score: 100+ (ASK — maximum scrutiny)
 
-| Risk | File | Score | Reason |
-|------|------|-------|--------|
-| HIGH | packages/server/src/lib/ai.ts | 10 | Core AI engine, cancel session logic |
-| HIGH | packages/server/src/routes/workspace/chat.ts | 10 | API endpoint, auth/session handling |
-| MEDIUM | packages/app/src/stores/ws-store.ts | 5 | State management, WebSocket reconnect |
-| MEDIUM | packages/app/src/components/chat/chat-area.tsx | 5 | Stateful component, cancel UX |
-| MEDIUM | packages/app/src/hooks/use-queries.ts | 5 | State management, 5 new query hooks |
-| MEDIUM | packages/app/src/pages/workflows.tsx | 5 | New page, 830 lines, CRUD logic |
-| MEDIUM | packages/app/src/App.tsx | 5 | Routing changes |
-| MEDIUM | packages/app/src/components/sidebar.tsx | 5 | Navigation entry point |
-| LOW | packages/app/src/pages/dashboard.tsx | 1 | Layout/spacing only |
-| LOW | packages/app/src/pages/command-center/index.tsx | 1 | Layout/spacing only |
-| LOW | packages/app/src/pages/costs.tsx | 1 | Layout/spacing only |
-| LOW | packages/app/src/pages/reports.tsx | 1 | Layout/spacing only |
-| LOW | packages/app/src/pages/activity-log.tsx | 1 | Layout/spacing only |
-| LOW | packages/app/src/pages/sns.tsx | 1 | Layout/spacing only |
-| LOW | packages/app/src/pages/settings.tsx | 1 | Layout/spacing only |
-| LOW | packages/app/src/pages/notifications.tsx | 1 | Layout/spacing only |
-| LOW | packages/app/src/pages/classified.tsx | 1 | Layout/spacing only |
-| LOW | packages/app/src/pages/agents.tsx | 1 | Layout/spacing only |
-| LOW | packages/app/src/pages/departments.tsx | 1 | Layout/spacing only |
-| LOW | packages/app/src/pages/files.tsx | 1 | Layout/spacing only |
-| LOW | packages/app/src/pages/knowledge.tsx | 1 | Layout/spacing only |
-| LOW | packages/app/src/pages/org.tsx | 1 | Layout/spacing only |
-| LOW | packages/app/src/pages/performance.tsx | 1 | Layout/spacing only |
-| LOW | packages/app/src/pages/tiers.tsx | 1 | Layout/spacing only |
-| LOW | packages/app/src/pages/login.tsx | 1 | Whitespace only |
-| LOW | packages/app/src/pages/ops-log.tsx | 1 | Layout/spacing only |
+### Rationale
+- Full codebase audit = all files in scope
+- Entry files changed (App.tsx, layout.tsx, sidebar.tsx) → force HIGH
+- Design tokens incomplete → force HIGH
+- Auth guard missing → force HIGH
+- 6 Critical bugs found in Phase 2B → maximum depth required
 
-## Summary
-- HIGH: 2 files (20 points)
-- MEDIUM: 6 files (30 points)
-- LOW: 18 files (18 points)
-- **Total: 68 points → "Ask" (full review)**
+### Classification
+| Category | Files | Risk |
+|----------|-------|------|
+| Auth/Security | admin auth-store, protected routes | HIGH |
+| Layout/Shell | layout.tsx, sidebar.tsx | HIGH |
+| Entry/Router | App.tsx (admin + app) | HIGH |
+| Server Routes | admin/* (8+ returning 500) | HIGH |
+| Pages | 26 admin pages | MEDIUM-HIGH |
+| Design Tokens | tailwind.config, index.css | HIGH |
+| Tests | ~40 test files | LOW |
 
-## Verdict: FULL REVIEW REQUIRED
+**Verdict: ASK (full deep review)**
