@@ -6,6 +6,13 @@
       "headers": {
         "X-Goog-Api-Key": "AQ.Ab8RN6Kk6kNCuzh_M0uYfw42ZTQzGLOPTY1w5SiC3AuQ9MMELA"
       }
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "C:\\Users\\elddl\\AppData\\Roaming\\npm\\playwright-mcp.cmd",
+      "args": ["--headless"],
+      "env": {},
+      "cwd": "C:\\Users\\elddl"
     }
   }
 }

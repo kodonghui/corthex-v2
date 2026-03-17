@@ -116,59 +116,108 @@ Orchestrator runs simultaneously:
 
 ---
 
-## Phase 2: Visual & E2E Gate (parallel, ~3min)
+## Phase 2: Visual & E2E Gate (parallel, ~12min)
 
 Run if Phase 1 passes AND changed files include frontend/UI files (auto-detected from Step 0).
 
+### Phase 2A: Static E2E (existing Playwright specs, ~2min)
+
+Orchestrator runs existing test suites directly:
+
 ```
-MANDATORY when UI files are changed:
-
-1. Playwright VRT (Visual Regression Testing):
-   ├── Start dev server (auto-detect: npm run dev / bun dev / etc.)
-   ├── Navigate to EVERY changed page + pages that import changed components
-   ├── Screenshot desktop (1280x800) + mobile (390x844)
-   ├── Compare against baseline screenshots
-   │   ├── First run = create baseline (store in review-report/screenshots/baseline/)
-   │   └── Subsequent runs = compare against baseline
-   ├── Diff > 5% → flag as visual regression
-   └── Generate diff images for any pixel changes > threshold
-
-2. Full Interaction E2E on changed pages:
-   ├── Every button → click → verify response (no console errors)
-   ├── Every input → type → verify value accepted
-   ├── Every form → submit → verify submission handled
-   ├── Every dropdown/select → open → select option → verify selection
-   ├── Every modal/dialog → open → interact → close → verify state
-   ├── Every CRUD operation → full create/read/update/delete cycle
-   ├── Every link/navigation → click → verify correct page loads
-   └── Console errors → collect ALL (any error = flag for review)
-
-3. Integration Smoke Tests:
-   ├── Login/auth flow works (if auth exists)
-   ├── Navigation between 3+ pages works without errors
-   ├── No blank pages or error boundaries triggered
-   ├── API calls return expected responses (no 500s)
-   └── State persists across navigation (if applicable)
-
-4. Accessibility (axe-core):
-   ├── Run @axe-core/playwright on each changed page
-   └── Report: critical (block), serious (warn), moderate/minor (info)
-
-5. Lighthouse CI (if dashboard/landing changed):
-   ├── Performance score (budget: 90+)
-   ├── Accessibility score (budget: 95+)
-   └── Best practices score (budget: 90+)
+IF packages/e2e/ or tests/e2e/ exists:
+  npx playwright test --reporter=json 2>&1 | tee review-report/phase-2a-static.json
+ELIF tests/ or __tests__/ with *.spec.* files exist:
+  Run detected test runner (vitest, jest, etc.)
+ELSE:
+  Skip Phase 2A, note "No existing E2E specs"
 ```
 
-**Gate criteria:**
-- E2E: all critical flows pass
-- VRT: no unexpected visual regressions (diff <= 5% or reviewed)
-- Interaction: no unhandled console errors on any interaction
-- axe-core: 0 critical violations
-- Lighthouse: above budget scores (if applicable)
-- Integration smoke: login + navigation + no blank pages
+**Output:** `review-report/phase-2a-static.md`
 
-**Output:** `review-report/phase-2-visual.md` + `review-report/screenshots/`
+### Phase 2B: 소크라테스 Dynamic E2E (team agents, ~8min)
+
+TRIGGER: Always run when UI files changed. Phase 2A failure does NOT block 2B.
+
+Uses 소크라테스 QA methodology: state expected result BEFORE verification, then compare.
+Uses Claude Code TeamCreate for 4 parallel agents, each with Playwright MCP (--headless).
+
+```
+Step 2B.0: Pre-flight (orchestrator, ~15s)
+  ├── Read phase-0-detection.md → routes, auth, base URL, design tokens
+  ├── git diff → changed files → map to affected routes (priority)
+  ├── Map unchanged pages sharing components → regression targets
+  ├── Detect PRD/feature-spec for scenario generation (Tier 1/2/3 fallback)
+  ├── Auto-detect routes universally:
+  │   ├── React Router: parse App.tsx for <Route path>
+  │   ├── Next.js: list app/ or pages/ directory
+  │   ├── Vue Router: parse router/index.ts
+  │   ├── SvelteKit: list src/routes/
+  │   └── Fallback: grep for path: in config files
+  ├── Generate route assignments (round-robin, priority routes first)
+  ├── AUTH PRE-CHECK: Orchestrator tests login via Playwright MCP BEFORE spawning agents
+  │   ├── Login success → proceed
+  │   └── Login failure → Phase 2B FAIL immediately (don't waste agent resources)
+  └── Write: review-report/socrates-e2e/phase-2b-preflight.md
+      (includes: route assignments, credentials, design tokens, changed files, PRD path)
+
+Step 2B.1: Team Creation (~5s)
+  TeamCreate(team_name: "socrates-e2e")
+  Create shared blockers file: review-report/socrates-e2e/blockers.md (empty)
+
+Step 2B.2: Spawn 4 Agents (staggered 10s apart to avoid resource contention)
+  Agent A: socrates-functional (CRUD, forms, navigation, data persistence)
+  Agent B: socrates-visual (screenshots, design tokens, responsive, icons)
+  Agent C: socrates-edge (empty states, security/auth bypass, console errors, input boundaries)
+  Agent D: socrates-regression (sidebar sweep, shared component consumers, theme consistency)
+
+  Each agent:
+  - Reads phase-2b-preflight.md for assignments
+  - Reads blockers.md before starting (other agents may have found blockers)
+  - Logs in independently via Playwright MCP
+  - Uses 소크라테스 method: 기댓값 → navigate → snapshot → interact → screenshot → compare
+
+Step 2B.3: Agent Work (parallel, timeout: 8min per agent)
+  Each agent executes its specialized checklist on assigned routes:
+
+  12-item universal checklist (agent-specific focus):
+    Agent A: items 3(buttons), 5(forms), 10(CRUD)
+    Agent B: items 1(load), 2(layout), 11(empty state)
+    Agent C: items 8(delete dialogs), 11(empty state), 12(console errors) + security
+    Agent D: items 1(load), 2(layout), 3(buttons) + sidebar sweep
+
+  FOR EACH assigned route:
+    1. State 기댓값 (expected result) BEFORE verification
+    2. browser_navigate → browser_snapshot → interact
+    3. browser_take_screenshot (on bugs or significant states)
+    4. Compare actual vs expected
+    5. Mismatch → BUG record (severity, screenshot, console errors, fix suggestion)
+    6. Check blockers.md — if blocker found by another agent, skip affected routes
+
+  Write results → review-report/socrates-e2e/agent-{A|B|C|D}.md
+  Write blockers → review-report/socrates-e2e/blockers.md (if found)
+
+Step 2B.4: Aggregation (orchestrator, ~30s)
+  ├── Read all 4 agent reports (partial results OK if timeout)
+  ├── De-duplicate bugs (same page + same symptom = 1 bug, cross-referenced)
+  ├── Assign final severity: Critical / Major / Minor / Security
+  ├── Calculate Phase 2B score: (pages_passed / pages_tested) × 10
+  ├── Collect fix suggestions for Phase 6 input
+  └── Write: review-report/phase-2b-socrates.md
+```
+
+**Gate criteria (Phase 2A + 2B combined):**
+- Phase 2A: existing E2E specs pass (if they exist)
+- Phase 2B: 0 Critical bugs
+- Phase 2B: 0 Security bugs (unauthorized access)
+- Phase 2B: page load success rate >= 80%
+- Phase 2B: 0 Uncaught/ChunkLoadError console errors across all pages
+
+**Output:**
+- `review-report/phase-2a-static.md`
+- `review-report/phase-2b-socrates.md`
+- `review-report/socrates-e2e/agent-{A|B|C|D}.md`
+- `review-report/socrates-e2e/screenshots/agent-{A|B|C|D}/`
 
 ---
 
@@ -277,6 +326,7 @@ Personas: Quinn (QA, coverage-first) + Dana (Security, paranoid)
 
 BEFORE REVIEWING — Read project context:
 - review-report/phase-0-detection.md (project structure, conventions)
+- review-report/socrates-e2e/agent-C.md (Socrates security test results: auth bypass, credential exposure)
 - Shared type/contract files (auto-detected in Step 0)
 
 FOR EACH changed file (HIGH risk first):
@@ -306,6 +356,7 @@ Personas: Winston (Architect, pragmatist) + Amelia (Dev, speaks in file paths)
 
 BEFORE REVIEWING — Read project context:
 - review-report/phase-0-detection.md (project structure, conventions)
+- review-report/socrates-e2e/agent-D.md (Socrates regression findings: shared components, theme consistency)
 - Architecture docs if detected (architecture.md, ADR/, CLAUDE.md conventions)
 - Project entry points and module boundaries
 
@@ -372,7 +423,9 @@ BEFORE REVIEWING — Auto-detect design tokens:
      (flag any colors/fonts that appear only once = likely inconsistency)
 
 Read Phase 2 results:
-- review-report/phase-2-visual.md (VRT diffs, a11y results, Lighthouse)
+- review-report/phase-2a-static.md (existing Playwright spec results)
+- review-report/phase-2b-socrates.md (Socrates dynamic E2E results)
+- review-report/socrates-e2e/agent-B.md (detailed visual findings for cross-reference)
 
 FOR EACH changed UI file:
 1. Read file FROM DISK
@@ -794,10 +847,16 @@ Step 1: Phase 1 — Static Gate (parallel)
   Use auto-detected tools from Step 0
   Any FAIL → report + EXIT (don't waste time on deeper review)
 
-Step 2: Phase 2 — Visual Gate (parallel, if UI changed)
-  Run Playwright VRT + Full Interaction E2E + Integration Smoke + axe-core + Lighthouse
-  Critical E2E fail → report + EXIT
-  Visual regression > 5% → flag for critic review
+Step 2: Phase 2 — Visual & E2E Gate (if UI changed)
+  Phase 2A: Run existing Playwright specs (packages/e2e/ or tests/) → phase-2a-static.md
+  Phase 2B: 소크라테스 Dynamic E2E — TeamCreate 4 agents (Playwright MCP --headless)
+    Pre-flight: detect routes, auth pre-check, assign routes to agents
+    Agent A (Functional): CRUD, forms, navigation — checklist items 3,5,10
+    Agent B (Visual): screenshots, design tokens, responsive — items 1,2,11
+    Agent C (Edge/Security): empty states, auth bypass, console errors — items 8,11,12
+    Agent D (Regression): sidebar sweep, shared components, theme — items 1,2,3
+    Aggregation: merge 4 reports, de-duplicate, score → phase-2b-socrates.md
+  Critical E2E fail or Security bug → report + EXIT
 
 Step 3: Phase 3 — Risk Classification
   Classify all changed files using universal patterns → compute risk score
@@ -892,7 +951,11 @@ expect(page).toHaveScreenshot({
 |-----------|-------|--------|
 | Step 0 detection timeout | 30sec | Use best-effort defaults, warn |
 | Phase 1 timeout | 2min | FAIL phase, report what passed |
-| Phase 2 timeout | 5min | Skip remaining, report partial |
+| Phase 2A timeout | 3min | Skip remaining static specs, report partial |
+| Phase 2B total timeout | 12min | Force-collect partial agent reports, aggregate |
+| Phase 2B per-agent timeout | 8min | SendMessage warning → 30s → shutdown agent |
+| Phase 2B page navigation | 30sec | Skip page, mark TIMEOUT, continue next |
+| Phase 2B team creation fail | 10sec | Fallback: orchestrator runs Phase 2B solo |
 | Phase 4 critic timeout | 5min each | Accept partial review |
 | Cross-talk timeout | 2min | Skip cross-talk, use individual scores |
 | Phase 6 fixer timeout | 3min per fix | Mark as FAILED, move to next |
@@ -901,7 +964,7 @@ expect(page).toHaveScreenshot({
 | Phase 7 re-review timeout | 3min | Accept partial re-review |
 | Phase 7 regression loop | 1 max | NO re-reviewing the re-review. Ever. |
 | Max fix rounds | 1 | Phase 6→7 runs once. No Phase 6→7→6→7 loop |
-| Total pipeline timeout | 25min | Force final verdict with available data |
+| Total pipeline timeout | 35min | Force final verdict with available data |
 
 ---
 
