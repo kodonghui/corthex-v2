@@ -1,4 +1,16 @@
+import { useAdminStore } from '../stores/admin-store'
+
 const API_BASE = '/api'
+
+/** Append ?companyId= to admin API paths if not already present.
+ *  Admin JWT has companyId='system', so we inject the selected company from the store. */
+function injectCompanyId(path: string): string {
+  const companyId = useAdminStore.getState().selectedCompanyId
+  if (!companyId) return path
+  if (path.includes('companyId=')) return path  // already has it
+  const sep = path.includes('?') ? '&' : '?'
+  return `${path}${sep}companyId=${companyId}`
+}
 
 const errorMessages: Record<string, string> = {
   AUTH_001: '아이디 또는 비밀번호가 올바르지 않습니다',
@@ -66,12 +78,12 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  get: <T>(path: string) => request<T>(path),
+  get: <T>(path: string) => request<T>(injectCompanyId(path)),
   post: <T>(path: string, body: unknown) =>
-    request<T>(path, { method: 'POST', body: JSON.stringify(body) }),
+    request<T>(injectCompanyId(path), { method: 'POST', body: JSON.stringify(body) }),
   put: <T>(path: string, body: unknown) =>
-    request<T>(path, { method: 'PUT', body: JSON.stringify(body) }),
+    request<T>(injectCompanyId(path), { method: 'PUT', body: JSON.stringify(body) }),
   patch: <T>(path: string, body: unknown) =>
-    request<T>(path, { method: 'PATCH', body: JSON.stringify(body) }),
-  delete: <T>(path: string) => request<T>(path, { method: 'DELETE' }),
+    request<T>(injectCompanyId(path), { method: 'PATCH', body: JSON.stringify(body) }),
+  delete: <T>(path: string) => request<T>(injectCompanyId(path), { method: 'DELETE' }),
 }
