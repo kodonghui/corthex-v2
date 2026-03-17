@@ -23,6 +23,12 @@ type LogParams = {
  */
 export async function logActivity(params: LogParams): Promise<void> {
   try {
+    // companyId가 'system'이면 UUID가 아니므로 DB insert 불가 — skip
+    if (params.companyId === 'system') {
+      console.info('[ActivityLogger] companyId=system → skip DB insert:', params.action)
+      return
+    }
+
     const eventId = params.eventId ?? crypto.randomUUID()
     const [inserted] = await db.insert(activityLogs).values({
       eventId,

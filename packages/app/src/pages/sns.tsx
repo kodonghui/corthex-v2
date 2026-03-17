@@ -8,6 +8,7 @@
  *   (Tab components use additional endpoints)
  */
 import { useCallback } from 'react'
+import { toast } from '@corthex/ui'
 import { useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
 import { Plus, Filter, Camera, Briefcase, Heart, MessageCircle, Share2, MoreHorizontal, Sparkles, LayoutGrid, Calendar, Clock, CheckCircle, Link, PlusCircle, FileText, AtSign, Play } from 'lucide-react'
@@ -93,7 +94,7 @@ export function SnsPage() {
               <h1 className="text-4xl font-bold text-stone-800 mb-2">Organic Content Pipeline</h1>
               <p className="text-stone-500 max-w-lg">Orchestrate your social presence with AI-assisted generation and automated scheduling for natural brand growth.</p>
             </div>
-            <button className="flex items-center gap-2 text-white px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-all shadow-md" style={{ backgroundColor: '#6b705c' }}>
+            <button onClick={() => toast.info('이 기능은 준비 중입니다')} className="flex items-center gap-2 text-white px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-all shadow-md" style={{ backgroundColor: '#6b705c' }}>
               <Sparkles className="w-5 h-5" />
               Generate New Content
             </button>
@@ -181,7 +182,7 @@ export function SnsPage() {
                       <FileText className="w-2.5 h-2.5" />
                     </div>
                   </div>
-                  <button className="text-xs font-bold uppercase tracking-widest transition-colors" style={{ color: '#6b705c' }}>Approve</button>
+                  <button onClick={() => toast.info('이 기능은 준비 중입니다')} className="text-xs font-bold uppercase tracking-widest transition-colors" style={{ color: '#6b705c' }}>Approve</button>
                 </div>
               </div>
             </div>
@@ -212,7 +213,7 @@ export function SnsPage() {
                       <Link className="w-2.5 h-2.5" />
                     </div>
                   </div>
-                  <button className="text-xs font-bold text-stone-400 hover:text-stone-600 transition-colors uppercase tracking-widest">Edit Draft</button>
+                  <button onClick={() => toast.info('이 기능은 준비 중입니다')} className="text-xs font-bold text-stone-400 hover:text-stone-600 transition-colors uppercase tracking-widest">Edit Draft</button>
                 </div>
               </div>
             </div>
@@ -246,7 +247,7 @@ export function SnsPage() {
                       <Camera className="w-2.5 h-2.5" />
                     </div>
                   </div>
-                  <button className="text-xs font-bold text-stone-400 hover:text-stone-600 transition-colors uppercase tracking-widest">Reschedule</button>
+                  <button onClick={() => toast.info('이 기능은 준비 중입니다')} className="text-xs font-bold text-stone-400 hover:text-stone-600 transition-colors uppercase tracking-widest">Reschedule</button>
                 </div>
               </div>
             </div>
@@ -277,7 +278,7 @@ export function SnsPage() {
                       <span className="text-xs text-stone-400 font-bold">18</span>
                     </div>
                   </div>
-                  <button className="text-xs font-bold uppercase tracking-widest transition-colors" style={{ color: '#6b705c' }}>View Stats</button>
+                  <button onClick={() => toast.info('이 기능은 준비 중입니다')} className="text-xs font-bold uppercase tracking-widest transition-colors" style={{ color: '#6b705c' }}>View Stats</button>
                 </div>
               </div>
             </div>

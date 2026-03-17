@@ -178,7 +178,7 @@ export function TiersPage() {
   // Update mutation
   const updateMutation = useMutation({
     mutationFn: ({ id, body }: { id: string; body: Partial<TierFormData> }) =>
-      api.patch(`/admin/tier-configs/${id}`, body),
+      api.patch(`/workspace/tier-configs/${id}`, body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspace-tier-configs'] })
       setEditTier(null)
@@ -189,7 +189,7 @@ export function TiersPage() {
 
   // Delete mutation
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => api.delete(`/admin/tier-configs/${id}`),
+    mutationFn: (id: string) => api.delete(`/workspace/tier-configs/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspace-tier-configs'] })
       setDeleteTier(null)

@@ -24,7 +24,7 @@ import { api } from '../lib/api'
 import { MarkdownRenderer } from '../components/markdown-renderer'
 import { useAuthStore } from '../stores/auth-store'
 import { toast } from '@corthex/ui'
-import { Sparkles, LayoutDashboard, FileText, BarChart3, Bot, Settings, Search, Plus, Wrench, Download, Share2, Trash2, Lightbulb, Send } from 'lucide-react'
+import { Wrench, Download, Share2, Trash2, Lightbulb, Send } from 'lucide-react'
 import { ShareToConversationModal } from '../components/messenger/share-to-conversation-modal'
 
 // === Constants ===
@@ -319,89 +319,8 @@ export function ReportsPage() {
   // === List + Detail split layout ===
   return (
     <div className="h-full flex flex-col overflow-hidden" style={{ fontFamily: "'Public Sans', sans-serif", backgroundColor: organicBeige }} data-testid="reports-page">
-      <div className="flex h-screen overflow-hidden">
-        {/* Sidebar */}
-        <aside className="w-64 bg-white border-r border-stone-200 flex flex-col shrink-0">
-          <div className="p-6 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white" style={{ backgroundColor: oliveGreen }}>
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold tracking-tight text-stone-900">CORTHEX v2</h1>
-              <p className="text-xs text-stone-500">Natural Organic Workspace</p>
-            </div>
-          </div>
-          <nav className="flex-1 px-4 space-y-1">
-            <a className="flex items-center gap-3 px-3 py-2 text-stone-600 hover:bg-stone-100 rounded-lg transition-colors" href="#">
-              <LayoutDashboard className="w-5 h-5" />
-              <span className="text-sm font-medium">Dashboard</span>
-            </a>
-            <a className="flex items-center gap-3 px-3 py-2 rounded-lg" href="#" style={{ backgroundColor: `${oliveGreen}1a`, color: oliveGreen }}>
-              <FileText className="w-5 h-5" />
-              <span className="text-sm font-medium">Reports</span>
-            </a>
-            <a className="flex items-center gap-3 px-3 py-2 text-stone-600 hover:bg-stone-100 rounded-lg transition-colors" href="#">
-              <BarChart3 className="w-5 h-5" />
-              <span className="text-sm font-medium">Analytics</span>
-            </a>
-            <a className="flex items-center gap-3 px-3 py-2 text-stone-600 hover:bg-stone-100 rounded-lg transition-colors" href="#">
-              <Bot className="w-5 h-5" />
-              <span className="text-sm font-medium">Agents</span>
-            </a>
-            <div className="pt-4 pb-2 px-3 text-[10px] font-bold text-stone-400 uppercase tracking-widest">Settings</div>
-            <a className="flex items-center gap-3 px-3 py-2 text-stone-600 hover:bg-stone-100 rounded-lg transition-colors" href="#">
-              <Settings className="w-5 h-5" />
-              <span className="text-sm font-medium">Workspace Settings</span>
-            </a>
-          </nav>
-          {user && (
-            <div className="p-4 border-t border-stone-200">
-              <div className="flex items-center gap-3 p-2">
-                <div className="w-8 h-8 rounded-full bg-stone-200 flex items-center justify-center text-stone-500 text-xs font-bold">
-                  {user.name?.[0]?.toUpperCase() ?? 'U'}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate text-stone-900">{user.name ?? 'User'}</p>
-                  <p className="text-xs text-stone-500 truncate">{user.role ?? 'Member'}</p>
-                </div>
-              </div>
-            </div>
-          )}
-        </aside>
-
+      <div className="flex h-full overflow-hidden">
         {/* Main Content Area */}
-        <main className="flex-1 flex flex-col overflow-hidden">
-          {/* Header */}
-          <header className="h-16 bg-white border-b border-stone-200 flex items-center justify-between px-8 shrink-0">
-            <div className="flex items-center gap-4">
-              <h2 className="text-2xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>Workspace Reports</h2>
-              <div className="h-4 w-px bg-stone-300" />
-              <span className="text-sm text-stone-500 font-medium">GET /api/workspace/reports</span>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
-                <input
-                  className="pl-10 pr-4 py-2 bg-stone-100 border-none rounded-xl text-sm w-64 transition-all"
-                  placeholder="Search reports..."
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  style={{ outline: 'none' }}
-                />
-              </div>
-              <button
-                onClick={() => { setTitle(''); setContent(''); setView('create') }}
-                className="text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors shadow-sm hover:opacity-90"
-                style={{ backgroundColor: oliveGreen }}
-                data-testid="new-report-btn"
-              >
-                <Plus className="w-4 h-4" />
-                New Report
-              </button>
-            </div>
-          </header>
-
           {/* Dashboard Content */}
           <div className="flex-1 flex overflow-hidden">
             {/* Report List Column */}
@@ -667,7 +586,6 @@ export function ReportsPage() {
               )}
             </div>
           </div>
-        </main>
       </div>
 
       {/* ConfirmDialog: CEO 보고 */}

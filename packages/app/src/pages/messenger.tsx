@@ -142,18 +142,18 @@ export function MessengerPage() {
           <h1 className="text-2xl" style={{ color: '#606c38', fontFamily: '"DM Serif Display", serif' }}>CORTHEX v2</h1>
         </div>
         <nav className="flex-1 px-4 space-y-2 overflow-y-auto">
-          <a className="flex items-center space-x-3 p-3 rounded-2xl bg-white shadow-sm font-medium" style={{ color: '#606c38' }} href="#">
+          <span className="flex items-center space-x-3 p-3 rounded-2xl bg-white shadow-sm font-medium" style={{ color: '#606c38' }}>
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
             <span>Messages</span>
-          </a>
-          <a className="flex items-center space-x-3 p-3 rounded-2xl hover:bg-white/50 transition-colors" href="#">
+          </span>
+          <span className="flex items-center space-x-3 p-3 rounded-2xl">
             <svg className="h-5 w-5 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
             <span>Contacts</span>
-          </a>
-          <a className="flex items-center space-x-3 p-3 rounded-2xl hover:bg-white/50 transition-colors" href="#">
+          </span>
+          <span className="flex items-center space-x-3 p-3 rounded-2xl">
             <svg className="h-5 w-5 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
             <span>Files</span>
-          </a>
+          </span>
         </nav>
         <div className="p-4 border-t border-stone-200">
           <div className="flex items-center space-x-3 p-2">

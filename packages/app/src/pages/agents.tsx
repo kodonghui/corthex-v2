@@ -31,13 +31,7 @@ import {
   MessageSquare,
   Clock,
   Settings,
-  LayoutDashboard,
-  Network,
-  BarChart3,
-  Search,
-  Bell,
   ArrowRight,
-  ChevronsUpDown,
   Headphones,
   Wallet,
   Megaphone,
@@ -269,7 +263,7 @@ function SoulEditor({
     setIsPreviewing(true)
     try {
       const res = await api.post<{ success: boolean; data: SoulPreviewResponse }>(
-        `/admin/agents/${agentId}/soul-preview`,
+        `/workspace/agents/${agentId}/soul-preview`,
         { soul },
       )
       setPreview(res.data)
@@ -553,7 +547,7 @@ export function AgentsPage() {
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['workspace-agents', filterDept, filterActive],
-    queryFn: () => api.get<{ success: boolean; data: Agent[] }>(`/admin/agents${buildQueryString()}`),
+    queryFn: () => api.get<{ success: boolean; data: Agent[] }>(`/workspace/agents${buildQueryString()}`),
   })
 
   const { data: deptData } = useQuery({
@@ -580,7 +574,7 @@ export function AgentsPage() {
   })
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, body }: { id: string; body: Record<string, unknown> }) => api.patch(`/admin/agents/${id}`, body),
+    mutationFn: ({ id, body }: { id: string; body: Record<string, unknown> }) => api.patch(`/workspace/agents/${id}`, body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspace-agents'] })
       toast.success('에이전트가 수정되었습니다')
@@ -589,7 +583,7 @@ export function AgentsPage() {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => api.delete(`/admin/agents/${id}`),
+    mutationFn: (id: string) => api.delete(`/workspace/agents/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspace-agents'] })
       setDeleteAgent(null)
@@ -639,12 +633,10 @@ export function AgentsPage() {
 
   if (isLoading) {
     return (
-      <div data-testid="agents-page" className="flex-1 ml-64 flex flex-col min-h-screen" style={{ backgroundColor: '#faf8f5' }}>
-        <div className="px-8 py-8 space-y-6">
-          <Skeleton className="h-10 w-64" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-48 w-full rounded-xl" />)}
-          </div>
+      <div data-testid="agents-page" className="flex-1 px-8 py-8 space-y-6" style={{ backgroundColor: '#faf8f5' }}>
+        <Skeleton className="h-10 w-64" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-48 w-full rounded-xl" />)}
         </div>
       </div>
     )
@@ -652,98 +644,17 @@ export function AgentsPage() {
 
   if (isError) {
     return (
-      <div data-testid="agents-page" className="flex-1 ml-64 flex flex-col min-h-screen" style={{ backgroundColor: '#faf8f5' }}>
-        <div className="px-8 py-8">
-          <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-            <p className="text-sm text-red-600">에이전트 목록을 불러올 수 없습니다</p>
-            <button onClick={() => refetch()} className="text-xs text-red-500 hover:text-red-400 underline mt-2">다시 시도</button>
-          </div>
+      <div data-testid="agents-page" className="flex-1 px-8 py-8" style={{ backgroundColor: '#faf8f5' }}>
+        <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+          <p className="text-sm text-red-600">에이전트 목록을 불러올 수 없습니다</p>
+          <button onClick={() => refetch()} className="text-xs text-red-500 hover:text-red-400 underline mt-2">다시 시도</button>
         </div>
       </div>
     )
   }
 
   return (
-    <div data-testid="agents-page" className="flex min-h-screen" style={{ backgroundColor: '#faf8f5', fontFamily: "'Public Sans', sans-serif" }}>
-      {/* Sidebar */}
-      <aside className="w-64 fixed inset-y-0 left-0 text-white flex flex-col z-50" style={{ backgroundColor: '#4a5d40' }}>
-        <div className="p-6 flex items-center gap-3 border-b border-white/10">
-          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-            <span className="text-white font-bold text-sm">C</span>
-          </div>
-          <div>
-            <h1 className="text-lg font-bold leading-tight">CORTHEX v2</h1>
-            <p className="text-xs text-white/70">Natural Organic System</p>
-          </div>
-        </div>
-        <nav className="flex-1 px-4 py-6 space-y-2">
-          <a className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 transition-colors" href="#">
-            <LayoutDashboard className="w-6 h-6" />
-            <span className="text-sm font-medium">Dashboard</span>
-          </a>
-          <a className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/20 shadow-sm" href="#">
-            <Bot className="w-6 h-6" />
-            <span className="text-sm font-medium">Agents</span>
-          </a>
-          <a className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 transition-colors" href="#">
-            <Network className="w-6 h-6" />
-            <span className="text-sm font-medium">Workspaces</span>
-          </a>
-          <a className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 transition-colors" href="#">
-            <BarChart3 className="w-6 h-6" />
-            <span className="text-sm font-medium">Analytics</span>
-          </a>
-          <div className="pt-4 mt-4 border-t border-white/10">
-            <a className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 transition-colors" href="#">
-              <Settings className="w-6 h-6" />
-              <span className="text-sm font-medium">Settings</span>
-            </a>
-          </div>
-        </nav>
-        <div className="p-4 border-t border-white/10">
-          <div className="bg-white/10 p-3 rounded-xl flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-slate-200"></div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold truncate">Admin User</p>
-              <p className="text-[10px] text-white/50 truncate">Pro Plan</p>
-            </div>
-            <ChevronsUpDown className="w-4 h-4" />
-          </div>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 ml-64 flex flex-col min-h-screen">
-        {/* Top Nav */}
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-40 backdrop-blur-md">
-          <div className="flex items-center gap-4 flex-1 max-w-xl">
-            <div className="relative w-full">
-              <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                className="w-full pl-10 pr-4 py-2 border-none rounded-xl focus:ring-2 text-sm"
-                style={{ backgroundColor: '#faf8f5', outlineColor: '#4a5d40' }}
-                placeholder="Search agents by name, role, or department..."
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <button className="p-2 text-slate-500 hover:text-slate-700 transition-colors">
-              <Bell className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => setCreateOpen(true)}
-              className="flex items-center gap-2 text-white px-4 py-2 rounded-xl text-sm font-medium hover:opacity-90 transition-all"
-              style={{ backgroundColor: '#4a5d40' }}
-            >
-              <Plus className="w-[18px] h-[18px]" />
-              Deploy Agent
-            </button>
-          </div>
-        </header>
-
+    <div data-testid="agents-page" className="flex-1 flex flex-col min-h-0" style={{ backgroundColor: '#faf8f5', fontFamily: "'Public Sans', sans-serif" }}>
         {/* Page Header */}
         <div className="px-8 py-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
@@ -895,7 +806,6 @@ export function AgentsPage() {
             </div>
           </div>
         </footer>
-      </main>
 
       {/* Create Modal */}
       <Modal isOpen={createOpen} onClose={() => setCreateOpen(false)} title="에이전트 생성">

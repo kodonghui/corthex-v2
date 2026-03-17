@@ -396,6 +396,7 @@ export function DashboardPage() {
                     </div>
                   </button>
                   <button
+                    onClick={() => navigate('/workflows')}
                     className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all text-left flex items-start space-x-4"
                   >
                     <div className="p-3 rounded-xl" style={{ backgroundColor: ORGANIC.cream, color: ORGANIC.olive }}>

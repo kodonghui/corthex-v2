@@ -1061,7 +1061,7 @@ export function OnboardingWizardPage() {
         )}
 
         <p className="text-center mt-8 text-xs text-slate-400">
-          Need help? Check our <a className="underline" style={{ color: OC.olive }} href="#">Onboarding Documentation</a>
+          Need help? Check our <span className="underline" style={{ color: OC.olive }}>Onboarding Documentation</span>
         </p>
       </main>
     </div>

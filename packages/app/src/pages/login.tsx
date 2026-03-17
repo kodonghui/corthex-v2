@@ -136,9 +136,9 @@ export function LoginPage() {
                 <span>아이디 저장</span>
               </label>
               <div className="space-x-3">
-                <a className="hover:text-gray-700 transition-colors" href="#">아이디 찾기</a>
+                <span className="text-gray-400">아이디 찾기</span>
                 <span className="text-gray-300">|</span>
-                <a className="hover:text-gray-700 transition-colors" href="#">비밀번호 찾기</a>
+                <span className="text-gray-400">비밀번호 찾기</span>
               </div>
             </div>
           </form>
@@ -148,8 +148,8 @@ export function LoginPage() {
         <footer className="mt-8 text-center text-sm text-gray-400">
           <p>© 2026 CORTHEX. All rights reserved.</p>
           <div className="mt-2 space-x-4">
-            <a className="hover:underline" href="#">개인정보처리방침</a>
-            <a className="hover:underline" href="#">이용약관</a>
+            <span>개인정보처리방침</span>
+            <span>이용약관</span>
           </div>
         </footer>
       </main>

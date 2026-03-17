@@ -196,7 +196,7 @@ export function PerformancePage() {
             <div className="lg:col-span-2 bg-white rounded-xl overflow-hidden shadow-sm" style={{ border: `1px solid ${oliveGreen}1a` }} data-testid="agent-performance-table">
               <div className="px-6 py-5 flex justify-between items-center" style={{ borderBottom: `1px solid ${oliveGreen}1a` }}>
                 <h3 className="text-lg font-bold text-slate-800" style={{ fontFamily: "'Lora', serif" }}>Agent Performance Matrix</h3>
-                <button className="text-sm font-bold flex items-center gap-1" style={{ color: oliveGreen }}>
+                <button onClick={() => toast.info('이 기능은 준비 중입니다')} className="text-sm font-bold flex items-center gap-1" style={{ color: oliveGreen }}>
                   View Full Report <ArrowRight className="w-4 h-4 inline" />
                 </button>
               </div>

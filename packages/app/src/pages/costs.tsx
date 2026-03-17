@@ -12,6 +12,7 @@
  */
 
 import { useState, useMemo, useEffect } from 'react'
+import { toast } from '@corthex/ui'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../lib/api'
@@ -145,6 +146,7 @@ export function CostsPage() {
               <p className="text-slate-500">실시간 API 사용량 및 비용 트렌드를 확인하세요.</p>
             </div>
             <button
+              onClick={() => toast.info('이 기능은 준비 중입니다')}
               className="flex items-center gap-2 text-white px-5 py-2.5 rounded-xl font-semibold shadow-lg transition-all hover:opacity-90"
               style={{ backgroundColor: oliveGreen, boxShadow: `0 4px 14px -2px ${oliveGreen}33` }}
             >

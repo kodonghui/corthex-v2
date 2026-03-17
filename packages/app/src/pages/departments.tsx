@@ -12,7 +12,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { Modal, Button, Input, Textarea, Skeleton, EmptyState, Badge, toast } from '@corthex/ui'
-import { Plus, Pencil, Trash2, Bot, Building2, ChevronRight, Users, MoreVertical, Cpu, Leaf, LayoutDashboard, Network, Settings, Search, Bell, HelpCircle, Filter, TrendingUp, Zap, RefreshCw, UserPlus } from 'lucide-react'
+import { Plus, Pencil, Trash2, Bot, Building2, ChevronRight, Users, MoreVertical, Cpu, Filter, TrendingUp, Zap, RefreshCw, UserPlus } from 'lucide-react'
 
 // ── Types ──
 
@@ -204,7 +204,7 @@ function DepartmentDetailSection({
 }) {
   const { data: agentsData, isLoading: agentsLoading } = useQuery({
     queryKey: ['admin-agents', dept.id],
-    queryFn: () => api.get<{ success: boolean; data: DeptAgent[] }>(`/admin/agents?departmentId=${dept.id}`),
+    queryFn: () => api.get<{ success: boolean; data: DeptAgent[] }>(`/workspace/agents?departmentId=${dept.id}`),
     enabled: !!dept.id,
   })
 
@@ -314,7 +314,7 @@ export function DepartmentsPage() {
 
   const { data: cascadeData, isLoading: cascadeLoading } = useQuery({
     queryKey: ['cascade-analysis', deleteDept?.id],
-    queryFn: () => api.get<{ success: boolean; data: CascadeAnalysis }>(`/admin/departments/${deleteDept!.id}/cascade-analysis`),
+    queryFn: () => api.get<{ success: boolean; data: CascadeAnalysis }>(`/workspace/departments/${deleteDept!.id}/cascade-analysis`),
     enabled: !!deleteDept,
   })
 
@@ -329,7 +329,7 @@ export function DepartmentsPage() {
   })
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, body }: { id: string; body: Partial<DeptFormData> }) => api.patch(`/admin/departments/${id}`, body),
+    mutationFn: ({ id, body }: { id: string; body: Partial<DeptFormData> }) => api.patch(`/workspace/departments/${id}`, body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspace-departments'] })
       if (editDept && selectedDept && editDept.id === selectedDept.id) {
@@ -342,7 +342,7 @@ export function DepartmentsPage() {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => api.delete(`/admin/departments/${id}?mode=force`),
+    mutationFn: (id: string) => api.delete(`/workspace/departments/${id}?mode=force`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspace-departments'] })
       if (deleteDept && selectedDept && deleteDept.id === selectedDept.id) {
@@ -372,12 +372,10 @@ export function DepartmentsPage() {
 
   if (isLoading) {
     return (
-      <div data-testid="departments-page" className="flex h-screen overflow-hidden" style={{ fontFamily: "'Public Sans', sans-serif" }}>
-        <div className="flex-1 p-8 space-y-6" style={{ backgroundColor: '#fcfaf7' }}>
-          <Skeleton className="h-10 w-48" />
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-52 w-full rounded-2xl" />)}
-          </div>
+      <div data-testid="departments-page" className="flex-1 p-8 space-y-6" style={{ fontFamily: "'Public Sans', sans-serif", backgroundColor: '#fcfaf7' }}>
+        <Skeleton className="h-10 w-48" />
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-52 w-full rounded-2xl" />)}
         </div>
       </div>
     )
@@ -385,95 +383,19 @@ export function DepartmentsPage() {
 
   if (isError) {
     return (
-      <div data-testid="departments-page" className="flex h-screen overflow-hidden" style={{ fontFamily: "'Public Sans', sans-serif" }}>
-        <div className="flex-1 p-8" style={{ backgroundColor: '#fcfaf7' }}>
-          <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-            <p className="text-sm text-red-600">부서 목록을 불러올 수 없습니다</p>
-            <button onClick={() => refetch()} className="text-xs text-red-500 hover:text-red-400 underline mt-2">다시 시도</button>
-          </div>
+      <div data-testid="departments-page" className="flex-1 p-8" style={{ fontFamily: "'Public Sans', sans-serif", backgroundColor: '#fcfaf7' }}>
+        <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+          <p className="text-sm text-red-600">부서 목록을 불러올 수 없습니다</p>
+          <button onClick={() => refetch()} className="text-xs text-red-500 hover:text-red-400 underline mt-2">다시 시도</button>
         </div>
       </div>
     )
   }
 
   return (
-    <div data-testid="departments-page" className="flex h-screen overflow-hidden" style={{ fontFamily: "'Public Sans', sans-serif", backgroundColor: '#fcfaf7', color: '#0f172a' }}>
-      {/* Sidebar */}
-      <aside className="w-64 flex-shrink-0 border-r border-slate-200 bg-white hidden md:flex flex-col">
-        <div className="p-6 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white" style={{ backgroundColor: '#4a6741' }}>
-            <Leaf className="w-5 h-5" />
-          </div>
-          <h2 className="text-xl font-bold tracking-tight" style={{ color: '#4a6741' }}>CORTHEX v2</h2>
-        </div>
-        <nav className="flex-1 px-4 space-y-2 mt-4">
-          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mb-2">Main Menu</div>
-          <a className="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors" href="#">
-            <LayoutDashboard className="w-5 h-5" />
-            <span className="text-sm font-medium">대시보드</span>
-          </a>
-          <a className="flex items-center gap-3 px-3 py-2 rounded-xl shadow-sm text-white transition-colors" href="#" style={{ backgroundColor: '#4a6741' }}>
-            <Building2 className="w-5 h-5" />
-            <span className="text-sm font-medium">부서 관리</span>
-          </a>
-          <a className="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors" href="#">
-            <Bot className="w-5 h-5" />
-            <span className="text-sm font-medium">에이전트 설정</span>
-          </a>
-          <a className="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors" href="#">
-            <Network className="w-5 h-5" />
-            <span className="text-sm font-medium">워크스페이스</span>
-          </a>
-          <div className="pt-4">
-            <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mb-2">System</div>
-            <a className="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors" href="#">
-              <Settings className="w-5 h-5" />
-              <span className="text-sm font-medium">시스템 설정</span>
-            </a>
-          </div>
-        </nav>
-        <div className="p-4 border-t border-slate-200">
-          <div className="flex items-center gap-3 p-2">
-            <div className="w-10 h-10 rounded-full bg-slate-200 overflow-hidden flex items-center justify-center">
-              <span className="text-sm font-bold text-slate-500">K</span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold truncate">김관리 관리자</p>
-              <p className="text-xs text-slate-500 truncate">admin@corthex.ai</p>
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Top Bar */}
-        <header className="h-16 flex-shrink-0 flex items-center justify-between px-8 bg-white/80 backdrop-blur-md border-b border-slate-200 z-10">
-          <div className="flex items-center flex-1">
-            <div className="relative w-full max-w-md">
-              <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                className="w-full pl-10 pr-4 py-2 bg-slate-100 border-none rounded-xl text-sm focus:ring-2 transition-all"
-                placeholder="부서 또는 에이전트 검색..."
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <button className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg relative transition-colors">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full border-2 border-white" style={{ backgroundColor: '#ec5b13' }}></span>
-            </button>
-            <button className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors">
-              <HelpCircle className="w-5 h-5" />
-            </button>
-          </div>
-        </header>
-
+    <div data-testid="departments-page" className="flex-1 overflow-y-auto" style={{ fontFamily: "'Public Sans', sans-serif", backgroundColor: '#fcfaf7', color: '#0f172a' }}>
         {/* Dashboard Content */}
-        <main className="flex-1 overflow-y-auto p-8">
+        <main className="p-8">
           {/* Header Section */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
             <div>
@@ -649,7 +571,7 @@ export function DepartmentsPage() {
           <div className="mt-12 bg-white rounded-2xl border border-slate-200 p-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-bold">최근 변경 내역</h2>
-              <a className="text-sm font-semibold hover:underline" href="#" style={{ color: '#4a6741' }}>모든 내역 보기</a>
+              <span className="text-sm font-semibold" style={{ color: '#4a6741' }}>모든 내역 보기</span>
             </div>
             <div className="space-y-6">
               <div className="flex gap-4">
@@ -682,7 +604,6 @@ export function DepartmentsPage() {
             </div>
           </div>
         </main>
-      </div>
 
       {/* Create Modal */}
       <Modal isOpen={createOpen} onClose={() => setCreateOpen(false)} title="부서 생성">

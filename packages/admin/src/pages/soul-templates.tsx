@@ -112,55 +112,7 @@ export function SoulTemplatesPage() {
   if (!selectedCompanyId) return <div className="p-8 text-center text-slate-500">회사를 선택하세요</div>
 
   return (
-    <div className="flex min-h-screen" style={{ fontFamily: "'Public Sans', sans-serif" }}>
-      {/* Sidebar */}
-      <aside className="w-64 text-white flex flex-col fixed h-full z-20" style={{ backgroundColor: '#172211' }}>
-        <div className="p-6">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="rounded-full p-2 flex items-center justify-center" style={{ backgroundColor: 'rgba(90,114,71,0.2)' }}>
-              <span className="material-symbols-outlined" style={{ color: '#5a7247' }}>eco</span>
-            </div>
-            <div>
-              <h1 className="text-lg font-bold leading-none tracking-tight" style={{ fontFamily: "'Noto Serif KR', serif" }}>CORTHEX v2</h1>
-              <p className="text-xs font-medium" style={{ color: 'rgba(90,114,71,0.7)' }}>Natural Organic Admin</p>
-            </div>
-          </div>
-          <nav className="space-y-1">
-            <a className="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:text-white transition-colors" href="#">
-              <span className="material-symbols-outlined">dashboard</span>
-              <span className="text-sm font-medium">Dashboard</span>
-            </a>
-            <a className="flex items-center gap-3 px-3 py-2 rounded-xl text-white shadow-lg" href="#" style={{ backgroundColor: '#5a7247', boxShadow: '0 10px 15px -3px rgba(90,114,71,0.2)' }}>
-              <span className="material-symbols-outlined">library_books</span>
-              <span className="text-sm font-medium">Templates Library</span>
-            </a>
-            <a className="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:text-white transition-colors" href="#">
-              <span className="material-symbols-outlined">group</span>
-              <span className="text-sm font-medium">User Management</span>
-            </a>
-            <a className="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:text-white transition-colors" href="#">
-              <span className="material-symbols-outlined">terminal</span>
-              <span className="text-sm font-medium">API Logs</span>
-            </a>
-          </nav>
-        </div>
-        <div className="mt-auto p-6 border-t border-white/10">
-          <a className="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:text-white transition-colors" href="#">
-            <span className="material-symbols-outlined">settings</span>
-            <span className="text-sm font-medium">Settings</span>
-          </a>
-          <div className="mt-4 flex items-center gap-3 px-3">
-            <div className="w-8 h-8 rounded-full bg-slate-700 overflow-hidden"></div>
-            <div className="text-xs">
-              <p className="font-bold">Admin Soul</p>
-              <p className="text-slate-500">Super User</p>
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      {/* Main Content Wrapper */}
-      <div className="flex-1 ml-64 flex flex-col min-h-screen" style={{ backgroundColor: '#faf8f5' }}>
+    <div className="flex-1 flex flex-col min-h-screen" style={{ fontFamily: "'Public Sans', sans-serif", backgroundColor: '#faf8f5' }}>
         {/* Topbar */}
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-10">
           <div className="flex items-center gap-4">
@@ -589,7 +541,6 @@ export function SoulTemplatesPage() {
             &copy; 2024 CORTHEX v2. All Rights Reserved.
           </div>
         </footer>
-      </div>
 
       {/* View content modal */}
       {viewContent && (

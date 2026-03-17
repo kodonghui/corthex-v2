@@ -22,7 +22,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { api } from '../lib/api'
 import { toast } from '@corthex/ui'
-import { Leaf, LayoutDashboard, Briefcase, Calendar, Zap, Settings, PlusCircle, Terminal, Search, Bell, Plus, Moon, Repeat, Target, Trash2, MoreVertical } from 'lucide-react'
+import { Plus, Moon, Repeat, Target, Trash2, MoreVertical } from 'lucide-react'
 import { useWsStore } from '../stores/ws-store'
 import { useAuthStore } from '../stores/auth-store'
 
@@ -355,78 +355,7 @@ export function JobsPage() {
   const sage = '#a3b18a'
 
   return (
-    <div className="flex h-screen overflow-hidden" data-testid="jobs-page" style={{ fontFamily: "'Public Sans', sans-serif" }}>
-      {/* Fixed Side Navigation */}
-      <aside className="w-64 flex-shrink-0 border-r flex flex-col justify-between p-6" style={{ backgroundColor: `${oliveGreen}10`, borderColor: `${oliveGreen}33` }}>
-        <div className="flex flex-col gap-8">
-          <div className="flex items-center gap-3">
-            <div className="rounded-full size-10 flex items-center justify-center text-white" style={{ backgroundColor: oliveGreen }}>
-              <Leaf className="w-5 h-5" />
-            </div>
-            <div className="flex flex-col">
-              <h1 className="text-slate-900 text-base font-bold leading-none">CORTHEX v2</h1>
-              <p className="text-xs font-medium" style={{ color: oliveGreen }}>Natural Workspace</p>
-            </div>
-          </div>
-          <nav className="flex flex-col gap-2">
-            <a className="flex items-center gap-3 px-4 py-3 rounded-xl hover:opacity-80 transition-colors" href="#" style={{ color: oliveGreen }}>
-              <LayoutDashboard className="w-5 h-5" />
-              <p className="text-sm font-semibold">Dashboard</p>
-            </a>
-            <a className="flex items-center gap-3 px-4 py-3 rounded-xl text-white shadow-sm" href="#" style={{ backgroundColor: oliveGreen }}>
-              <Briefcase className="w-5 h-5" />
-              <p className="text-sm font-semibold">Jobs</p>
-            </a>
-            <a className="flex items-center gap-3 px-4 py-3 rounded-xl hover:opacity-80 transition-colors" href="#" style={{ color: oliveGreen }}>
-              <Calendar className="w-5 h-5" />
-              <p className="text-sm font-semibold">Schedules</p>
-            </a>
-            <a className="flex items-center gap-3 px-4 py-3 rounded-xl hover:opacity-80 transition-colors" href="#" style={{ color: oliveGreen }}>
-              <Zap className="w-5 h-5" />
-              <p className="text-sm font-semibold">Triggers</p>
-            </a>
-            <a className="flex items-center gap-3 px-4 py-3 rounded-xl hover:opacity-80 transition-colors mt-4 border-t pt-6" href="#" style={{ color: oliveGreen, borderColor: `${oliveGreen}1a` }}>
-              <Settings className="w-5 h-5" />
-              <p className="text-sm font-semibold">Settings</p>
-            </a>
-          </nav>
-        </div>
-        <button className="w-full flex items-center justify-center gap-2 py-3 font-bold text-sm rounded-xl hover:opacity-90 transition-opacity" style={{ backgroundColor: sage, color: emeraldAccent }}>
-          <PlusCircle className="w-4 h-4" />
-          New Workspace
-        </button>
-      </aside>
-
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col overflow-y-auto" style={{ backgroundColor: '#f8f6f6' }}>
-        {/* Header */}
-        <header className="flex items-center justify-between px-8 py-6 sticky top-0 backdrop-blur-md z-10 border-b" style={{ backgroundColor: 'rgba(248,246,246,0.8)', borderColor: `${oliveGreen}1a` }}>
-          <div className="flex items-center gap-3">
-            <Terminal className="w-8 h-8" style={{ color: oliveGreen }} />
-            <h2 className="text-2xl font-bold tracking-tight">Job Management</h2>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="relative group">
-              <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2" style={{ color: `${oliveGreen}99` }} />
-              <input
-                className="pl-10 pr-4 py-2 border-none rounded-xl focus:ring-2 w-64 text-sm outline-none transition-all"
-                placeholder="Search tasks..."
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ backgroundColor: `${oliveGreen}0d`, ['--tw-ring-color' as string]: oliveGreen }}
-                data-testid="jobs-search"
-              />
-            </div>
-            <button className="p-2 rounded-full relative" style={{ backgroundColor: `${oliveGreen}1a` }}>
-              <Bell className="w-5 h-5 text-slate-600" />
-              <span className="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2" style={{ borderColor: '#f8f6f6' }}></span>
-            </button>
-            <div className="size-10 rounded-full border-2 overflow-hidden" style={{ backgroundColor: `${oliveGreen}33`, borderColor: `${oliveGreen}4d` }}>
-              <div className="w-full h-full bg-slate-300" />
-            </div>
-          </div>
-        </header>
+    <div className="flex-1 flex flex-col overflow-y-auto" data-testid="jobs-page" style={{ fontFamily: "'Public Sans', sans-serif", backgroundColor: '#f8f6f6' }}>
 
         {/* Tabs Navigation */}
         <div className="px-8 mt-2">
@@ -624,7 +553,6 @@ export function JobsPage() {
             </div>
           </div>
         </div>
-      </main>
 
       {/* Create/Edit Modal */}
       {showModal && (

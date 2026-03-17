@@ -91,9 +91,9 @@ export function AgoraPage() {
             <h1 className="text-xl font-bold tracking-tight" style={{ color: '#556B2F' }}>CORTHEX v2 <span className="font-light" style={{ color: '#808B6F' }}>AGORA</span></h1>
           </div>
           <nav className="hidden md:flex gap-6 text-sm font-medium" style={{ color: '#808B6F' }}>
-            <a className="transition-colors" href="#">Workspace</a>
-            <a className="border-b-2" style={{ color: '#556B2F', borderColor: '#556B2F' }} href="#">Debates</a>
-            <a className="transition-colors" href="#">Archive</a>
+            <span>Workspace</span>
+            <span className="border-b-2" style={{ color: '#556B2F', borderColor: '#556B2F' }}>Debates</span>
+            <span>Archive</span>
           </nav>
           <button
             onClick={() => setShowCreateModal(true)}
@@ -236,9 +236,9 @@ export function AgoraPage() {
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-sm text-slate-400">&copy; 2026 CORTHEX Labs. All reasoning is simulated by AGORA v2 Multi-Agent Engine.</p>
           <div className="flex gap-8">
-            <a className="text-sm transition-colors" style={{ color: '#808B6F' }} href="#">API Documentation</a>
-            <a className="text-sm transition-colors" style={{ color: '#808B6F' }} href="#">Ethical Standards</a>
-            <a className="text-sm transition-colors" style={{ color: '#808B6F' }} href="#">System Logs</a>
+            <span className="text-sm" style={{ color: '#808B6F' }}>API Documentation</span>
+            <span className="text-sm" style={{ color: '#808B6F' }}>Ethical Standards</span>
+            <span className="text-sm" style={{ color: '#808B6F' }}>System Logs</span>
           </div>
         </div>
       </footer>

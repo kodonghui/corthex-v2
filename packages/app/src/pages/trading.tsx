@@ -9,6 +9,7 @@
  *   - ComparisonPanel: GET /workspace/trading/compare
  */
 import { useState } from 'react'
+import { toast } from '@corthex/ui'
 import { useSearchParams } from 'react-router-dom'
 import { Search, ArrowUpRight, Bot, Send, Settings } from 'lucide-react'
 import { StockSidebar } from '../components/strategy/stock-sidebar'
@@ -36,9 +37,9 @@ export function TradingPage() {
           </div>
           <h1 className="text-xl font-bold tracking-tight" style={{ color: '#5a7247' }}>CORTHEX <span className="text-stone-400 font-medium">v2</span></h1>
           <nav className="ml-8 flex gap-6 text-sm font-medium text-stone-500">
-            <a className="border-b-2 pb-5 pt-5" style={{ color: '#5a7247', borderColor: '#5a7247' }} href="#">Strategy Room</a>
-            <a className="hover:text-stone-900 transition-colors py-5" href="#">Portfolio</a>
-            <a className="hover:text-stone-900 transition-colors py-5" href="#">Analytics</a>
+            <span className="border-b-2 pb-5 pt-5" style={{ color: '#5a7247', borderColor: '#5a7247' }}>Strategy Room</span>
+            <span className="py-5">Portfolio</span>
+            <span className="py-5">Analytics</span>
           </nav>
         </div>
         {/* Trading Mode Toggle */}
@@ -131,15 +132,15 @@ export function TradingPage() {
               <div className="flex items-center gap-4">
                 <span className="text-lg font-bold">NVDA / USD</span>
                 <div className="flex bg-stone-100 rounded-lg p-1 text-xs">
-                  <button className="px-2 py-1 bg-white rounded shadow-sm font-bold">1H</button>
-                  <button className="px-2 py-1 hover:bg-stone-200 transition-colors">4H</button>
-                  <button className="px-2 py-1 hover:bg-stone-200 transition-colors">1D</button>
-                  <button className="px-2 py-1 hover:bg-stone-200 transition-colors">1W</button>
+                  <button onClick={() => toast.info('이 기능은 준비 중입니다')} className="px-2 py-1 bg-white rounded shadow-sm font-bold">1H</button>
+                  <button onClick={() => toast.info('이 기능은 준비 중입니다')} className="px-2 py-1 hover:bg-stone-200 transition-colors">4H</button>
+                  <button onClick={() => toast.info('이 기능은 준비 중입니다')} className="px-2 py-1 hover:bg-stone-200 transition-colors">1D</button>
+                  <button onClick={() => toast.info('이 기능은 준비 중입니다')} className="px-2 py-1 hover:bg-stone-200 transition-colors">1W</button>
                 </div>
               </div>
               <div className="flex gap-2">
-                <button className="px-3 py-1 text-xs font-bold text-white rounded-lg" style={{ backgroundColor: '#10b981' }}>BUY</button>
-                <button className="px-3 py-1 text-xs font-bold text-white rounded-lg" style={{ backgroundColor: '#ef4444' }}>SELL</button>
+                <button onClick={() => toast.info('이 기능은 준비 중입니다')} className="px-3 py-1 text-xs font-bold text-white rounded-lg" style={{ backgroundColor: '#10b981' }}>BUY</button>
+                <button onClick={() => toast.info('이 기능은 준비 중입니다')} className="px-3 py-1 text-xs font-bold text-white rounded-lg" style={{ backgroundColor: '#ef4444' }}>SELL</button>
               </div>
             </div>
             {/* Canvas Container for Strategy Chart */}
