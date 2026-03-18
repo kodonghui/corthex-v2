@@ -1,6 +1,6 @@
 import { db } from '../db'
 import { costRecords, agents, departments, tierConfigs } from '../db/schema'
-import { sql, and, eq, gte, lte, sum, count, desc, inArray, asc } from 'drizzle-orm'
+import { sql, and, eq, gte, lt, lte, sum, count, desc, inArray, asc } from 'drizzle-orm'
 import { getModelConfig } from '../config/models'
 import type {
   AdminCostByAgent,
@@ -155,7 +155,7 @@ export async function getSummary(companyId: string, range: DateRange): Promise<A
     .where(and(
       eq(costRecords.companyId, companyId),
       gte(costRecords.createdAt, prevStart),
-      sql`${costRecords.createdAt} < ${prevEnd}`,
+      lt(costRecords.createdAt, prevEnd),
     ))
 
   const currentCost = current?.totalCostMicro ?? 0
