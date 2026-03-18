@@ -99,16 +99,16 @@ companiesRoute.delete('/companies/:id', async (c) => {
   // Cascade: deactivate all related records in a single transaction
   const result = await db.transaction(async (tx) => {
     // Run independent deactivations in parallel
-    const [userResult, agentResult, adminResult] = await Promise.all([
+    const [userRows, agentRows, adminRows] = await Promise.all([
       tx.update(users).set({ isActive: false })
         .where(and(eq(users.companyId, id), eq(users.isActive, true)))
-        .returning({ n: count() }).then((r) => r[0]?.n ?? 0),
+        .returning({ id: users.id }),
       tx.update(agents).set({ isActive: false, status: 'offline' })
         .where(and(eq(agents.companyId, id), eq(agents.isActive, true)))
-        .returning({ n: count() }).then((r) => r[0]?.n ?? 0),
+        .returning({ id: agents.id }),
       tx.update(adminUsers).set({ isActive: false })
         .where(and(eq(adminUsers.companyId, id), eq(adminUsers.isActive, true)))
-        .returning({ n: count() }).then((r) => r[0]?.n ?? 0),
+        .returning({ id: adminUsers.id }),
     ])
 
     const [company] = await tx.update(companies)
@@ -117,7 +117,7 @@ companiesRoute.delete('/companies/:id', async (c) => {
       .returning()
     if (!company) throw new HTTPError(404, '회사를 찾을 수 없습니다', 'COMPANY_001')
 
-    return { deactivatedUsers: Number(userResult), deactivatedAgents: Number(agentResult), deactivatedAdmins: Number(adminResult) }
+    return { deactivatedUsers: userRows.length, deactivatedAgents: agentRows.length, deactivatedAdmins: adminRows.length }
   })
 
   return c.json({ data: { message: '비활성화되었습니다', ...result } })
