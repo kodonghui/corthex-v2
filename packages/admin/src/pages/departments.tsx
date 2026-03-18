@@ -366,11 +366,11 @@ export function DepartmentsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={closeCascadeModal}>
           <div
             data-testid="departments-cascade-modal"
-            className="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-lg mx-4"
+            className="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-lg mx-4 max-h-[80vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 shrink-0">
               <h2 className="text-lg font-semibold text-slate-900" style={{ fontFamily: "'Noto Serif KR', serif" }}>
                 부서 삭제 - {cascadeTarget.name}
               </h2>
@@ -382,7 +382,7 @@ export function DepartmentsPage() {
             </div>
 
             {/* Modal Body */}
-            <div className="px-6 py-5 space-y-5">
+            <div className="px-6 py-5 space-y-5 overflow-y-auto flex-1 min-h-0">
               {cascadeLoading ? (
                 <div className="text-center text-slate-400 py-8">영향 분석 중...</div>
               ) : cascadeData ? (
@@ -498,7 +498,7 @@ export function DepartmentsPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-200">
+            <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-200 shrink-0">
               <button
                 data-testid="departments-cascade-cancel"
                 onClick={closeCascadeModal}

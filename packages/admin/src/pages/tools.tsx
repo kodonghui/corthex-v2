@@ -6,11 +6,12 @@
  *   GET    /api/admin/agents?companyId=...
  *   PATCH  /api/admin/agents/:id/allowed-tools
  */
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, type FormEvent } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
 import { useToastStore } from '../stores/toast-store'
+import { X } from 'lucide-react'
 
 type CatalogTool = { name: string; description: string | null; category: string; registered: boolean }
 type CatalogGroup = { category: string; tools: CatalogTool[] }
@@ -39,6 +40,8 @@ export function ToolsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [pendingChanges, setPendingChanges] = useState<Map<string, string[]>>(new Map())
   const [saving, setSaving] = useState(false)
+  const [showCreateDialog, setShowCreateDialog] = useState(false)
+  const [newTool, setNewTool] = useState({ name: '', description: '', category: 'common' })
 
   // Fetch tool catalog
   const { data: catalogData, isLoading: catalogLoading } = useQuery({
@@ -135,6 +138,26 @@ export function ToolsPage() {
     },
   })
 
+  const createMutation = useMutation({
+    mutationFn: (data: { name: string; description: string; category: string }) =>
+      api.post('/admin/tools', data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['tool-catalog'] })
+      setShowCreateDialog(false)
+      setNewTool({ name: '', description: '', category: 'common' })
+      addToast({ type: 'success', message: '도구가 추가되었습니다' })
+    },
+    onError: (err: Error) => {
+      addToast({ type: 'error', message: err.message })
+    },
+  })
+
+  const handleCreateTool = (e: FormEvent) => {
+    e.preventDefault()
+    if (!newTool.name.trim()) return
+    createMutation.mutate(newTool)
+  }
+
   const handleSave = () => {
     setSaving(true)
     saveMutation.mutate()
@@ -188,7 +211,7 @@ export function ToolsPage() {
               <h2 className="text-3xl font-bold" style={{ color: '#3f3e3a' }}>도구 정의 관리</h2>
               <p className="text-slate-500 mt-1">플랫폼 내 에이전트가 사용하는 외부 도구 및 API 엔드포인트를 구성합니다.</p>
             </div>
-            <button className="inline-flex items-center gap-2 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg transition-all" style={{ backgroundColor: '#5a7247', boxShadow: '0 4px 14px rgba(90,114,71,0.2)' }}>
+            <button onClick={() => setShowCreateDialog(true)} className="inline-flex items-center gap-2 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg transition-all" style={{ backgroundColor: '#5a7247', boxShadow: '0 4px 14px rgba(90,114,71,0.2)' }}>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6v12m6-6H6" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
               <span>새 도구 추가</span>
             </button>
@@ -413,6 +436,66 @@ export function ToolsPage() {
           )}
         </div>
       </main>
+
+      {/* Create Tool Dialog */}
+      {showCreateDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setShowCreateDialog(false)}>
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold" style={{ color: '#3f3e3a' }}>새 도구 추가</h3>
+              <button onClick={() => setShowCreateDialog(false)} className="p-1 hover:bg-slate-100 rounded-lg transition-colors">
+                <X className="w-5 h-5 text-slate-400" />
+              </button>
+            </div>
+            <form onSubmit={handleCreateTool} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: '#3f3e3a' }}>도구명</label>
+                <input
+                  type="text"
+                  value={newTool.name}
+                  onChange={(e) => setNewTool((prev) => ({ ...prev, name: e.target.value }))}
+                  className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:outline-none"
+                  style={{ borderColor: '#e5e7eb' }}
+                  placeholder="예: web-search"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: '#3f3e3a' }}>설명</label>
+                <input
+                  type="text"
+                  value={newTool.description}
+                  onChange={(e) => setNewTool((prev) => ({ ...prev, description: e.target.value }))}
+                  className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:outline-none"
+                  style={{ borderColor: '#e5e7eb' }}
+                  placeholder="도구에 대한 간단한 설명"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: '#3f3e3a' }}>카테고리</label>
+                <select
+                  value={newTool.category}
+                  onChange={(e) => setNewTool((prev) => ({ ...prev, category: e.target.value }))}
+                  className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:outline-none"
+                  style={{ borderColor: '#e5e7eb' }}
+                >
+                  {CATEGORIES.map((cat) => (
+                    <option key={cat} value={cat}>{categoryLabels[cat]}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button type="button" onClick={() => setShowCreateDialog(false)} className="px-4 py-2 text-sm font-medium rounded-lg hover:bg-slate-100 transition-colors" style={{ color: '#3f3e3a' }}>
+                  취소
+                </button>
+                <button type="submit" disabled={createMutation.isPending} className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50" style={{ backgroundColor: '#5a7247' }}>
+                  {createMutation.isPending ? '추가 중...' : '추가'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

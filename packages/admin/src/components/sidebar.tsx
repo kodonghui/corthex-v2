@@ -5,7 +5,7 @@ import { useAuthStore } from '../stores/auth-store'
 import { useAdminStore } from '../stores/admin-store'
 import { api } from '../lib/api'
 import {
-  LayoutDashboard, Building2, Users, Building, Bot, Wrench,
+  LayoutDashboard, Building2, Users, UserCog, Building, Bot, Wrench,
   DollarSign, KeyRound, ClipboardList, Sparkles, Monitor,
   Network, Orbit, FileStack, ShoppingCart, BrainCircuit,
   Lock, Zap, Settings, ArrowLeftRight,
@@ -22,6 +22,7 @@ const nav: { to: string; label: string; icon: LucideIcon }[] = [
   { to: '/', label: '대시보드', icon: LayoutDashboard },
   { to: '/companies', label: '회사 관리', icon: Building2 },
   { to: '/employees', label: '직원 관리', icon: Users },
+  { to: '/users', label: '사용자 관리', icon: UserCog },
   { to: '/departments', label: '부서 관리', icon: Building },
   { to: '/agents', label: 'AI 에이전트', icon: Bot },
   { to: '/tools', label: '도구 관리', icon: Wrench },

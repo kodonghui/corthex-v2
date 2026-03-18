@@ -664,14 +664,14 @@ export function AgentsPage() {
       {/* Create Agent Modal */}
       {showCreate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 overflow-hidden border" style={{ borderColor: '#dce1cd' }}>
-            <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: '#eceee3', backgroundColor: '#f7f8f4' }}>
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 overflow-hidden border max-h-[80vh] flex flex-col" style={{ borderColor: '#dce1cd' }}>
+            <div className="px-6 py-4 border-b flex items-center justify-between shrink-0" style={{ borderColor: '#eceee3', backgroundColor: '#f7f8f4' }}>
               <h3 className="text-lg font-bold" style={{ color: '#363d2a' }}>New Agent Template</h3>
               <button onClick={() => { setShowCreate(false); setForm({ ...defaultCreateForm }) }} className="text-gray-400 hover:text-gray-600">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
               </button>
             </div>
-            <form data-testid="agents-create-form" onSubmit={handleCreate} className="p-6 space-y-5">
+            <form data-testid="agents-create-form" onSubmit={handleCreate} className="p-6 space-y-5 overflow-y-auto flex-1 min-h-0">
               <div>
                 <label className="block text-sm font-semibold mb-2" style={{ color: '#4e5938' }}>Agent Name *</label>
                 <input data-testid="agents-create-name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputCls} placeholder="예: 마케팅 매니저" required />
