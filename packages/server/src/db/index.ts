@@ -42,7 +42,6 @@ export async function runMigrations() {
     console.log('[DB] 마이그레이션 적용 완료')
   } catch (err) {
     console.error('[DB] 마이그레이션 실패:', err)
-    process.exit(1)
   }
 }
 

@@ -95,7 +95,8 @@ export const authMiddleware: MiddlewareHandler<AppEnv> = async (c, next) => {
     }
     c.set('tenant', tenant)
     await next()
-  } catch {
+  } catch (err) {
+    if (err instanceof HTTPError) throw err
     throw new HTTPError(401, '토큰이 만료되었거나 유효하지 않습니다', 'AUTH_002')
   }
 }
