@@ -20,7 +20,7 @@ type AuthState = {
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   token: localStorage.getItem('corthex_token'),
-  user: JSON.parse(localStorage.getItem('corthex_user') || 'null'),
+  user: (() => { try { return JSON.parse(localStorage.getItem('corthex_user') || 'null') } catch { return null } })(),
   isAuthenticated: !!localStorage.getItem('corthex_token'),
   isChecking: false,
 

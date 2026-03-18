@@ -23,7 +23,9 @@ export const errorHandler: ErrorHandler = (err, c) => {
   const response: ApiError = {
     error: {
       code: err instanceof HTTPError ? (err.code ?? 'ERROR') : 'INTERNAL_ERROR',
-      message: err instanceof Error ? err.message : 'Unknown error',
+      message: err instanceof HTTPError
+        ? err.message
+        : '서버 내부 오류가 발생했습니다',
     },
   }
 

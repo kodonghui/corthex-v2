@@ -1,53 +1,191 @@
-# Critic-Architecture Report
+# Critic-Architecture Report — Full Codebase Audit
 
-## Score: 7/10
+## Score: 7.5/10
 
-## Findings
+A well-structured monorepo with clear boundaries, strong tenant isolation patterns, and disciplined engine encapsulation. The main issues are API response format inconsistency (the single most pervasive violation), dual DB access patterns (getDB vs raw db), and duplicated logic between admin/app packages.
 
-### HIGH Risk Files
+---
 
-#### packages/server/src/lib/ai.ts
-- **[ARCH] Cancel logic lives in lib/ai.ts, which is correct (E8 boundary respected).** The cancel mechanism (`activeStreamingSessions`, `cancelStreamingSession`, `isSessionStreaming`) operates in `lib/ai.ts` — the "legacy" streaming path — not inside `engine/`. This is correct because `engine/agent-loop.ts` has its own `activeSessions` map (line 17) for the E8-compliant engine path, and `lib/ai.ts` serves the older direct-chat streaming path. No E8 violation here.
-- **[RACE] Cancel flag is checked only between tool rounds, not mid-stream.** The `streamState.cancelled` flag is checked at two points: (1) top of the tool-round loop (line 457), (2) inside the `stream.on('text')` callback (line 474). However, the `await stream.finalMessage()` on line 479 is a blocking call that waits for the full Anthropic response. If a user cancels during this await, the cancel won't take effect until the entire LLM response finishes and the next round starts. The `stream.on('text')` handler silently drops tokens but doesn't abort the HTTP request. Suggestion: call `stream.controller.abort()` or equivalent to terminate the Anthropic stream when cancelled, so the user doesn't wait for a full LLM turn to complete.
-- **[INDENT] Misaligned code in try block (line 362-363).** The `return await _generateAgentResponseStreamInner(...)` line has incorrect indentation — it's at 2-space indent inside a 4-space `try` block. This is a cosmetic issue but violates consistent style.
-- **[DRY] `generateAgentResponse` (non-streaming) has no cancel support.** FR66 cancel is only wired into the streaming path. If a non-streaming call is in progress (line 106), there is no way to cancel it. This may be intentional if non-streaming is only used internally, but worth documenting.
+## 1. Module Boundaries & Public API
 
-#### packages/server/src/routes/workspace/chat.ts
-- **[API] Inconsistent response envelope format.** The cancel endpoint (line 447, 451, 456) returns `{ success: false, error: { code, message } }` format, which matches the project convention. But the success case (line 469) returns `{ success: true, data: { cancelled: true } }`. Meanwhile, all other endpoints in this file return `{ data: ... }` without a `success` field (lines 48, 75, 320, 342, etc.). The cancel endpoint introduces a new pattern (`success` field) that diverges from the rest of the file. Suggestion: either add `success` to all endpoints (breaking change) or remove it from the cancel endpoint for consistency within this file.
-- **[AUTHZ] Cancel endpoint doesn't check if the streaming session belongs to the lib/ai.ts path vs engine path.** The `isSessionStreaming()` only checks `activeStreamingSessions` in `lib/ai.ts`. If the session was started through the engine path (`engine/agent-loop.ts`), the cancel API will return "not active" even though the session is running. This could confuse users. Suggestion: document or unify cancel support across both execution paths.
-- **[RACE] TOCTOU between isSessionStreaming and cancelStreamingSession.** Lines 450-454: the check `isSessionStreaming()` and the actual `cancelStreamingSession()` are not atomic. The session could complete between the two calls, making `cancelStreamingSession` return false. The 500 error on line 456 ("CANCEL_FAILED") is misleading in this case — the session simply finished. Suggestion: remove the separate `isSessionStreaming` check and just call `cancelStreamingSession` directly; if it returns false, return a 409 "session already completed" instead of 500.
+### praise: [ARCH] Engine encapsulation is airtight
+- `engine/index.ts` is a proper barrel: exports only `runAgent`, `collectAgentResponse`, `getActiveSessions`, `renderSoul`, `selectModel`, `selectModelFromDB`, `sseStream`, and types.
+- **Zero** direct imports from engine internals (hooks/, mcp/, model-selector, soul-renderer, sse-adapter) found outside engine/. Grep confirmed 0 matches for `from.*engine/(?!agent-loop|types|index)`.
+- `engine/types.ts` line 1 explicitly documents: "server internal only, do NOT re-export from shared/".
 
-### MEDIUM Risk Files
+### praise: [ARCH] No server types leak to frontend
+- Grep for `from.*server` in `packages/app/src/` and `packages/admin/src/` returned zero matches. All shared types flow through `@corthex/shared`.
 
-#### packages/app/src/stores/ws-store.ts
-- **[UX] Toast spam potential on flaky connections.** If the WebSocket connection is unstable (e.g., mobile network), every disconnect/reconnect cycle produces two toasts: "disconnected" + "reconnected". With exponential backoff starting at 3s, rapid reconnects could flood the user with toasts. Suggestion: debounce or rate-limit toast notifications (e.g., max 1 disconnect toast per 30s).
-- **[PATTERN] Good use of `wasDisconnected` guard** to avoid toast on initial connect. Clean implementation.
+### issue: [ARCH] Engine index.ts exports more than documented public API — `packages/server/src/engine/index.ts`
+- CLAUDE.md says "engine/ public API: agent-loop.ts + types.ts only", but `index.ts` also re-exports `renderSoul` from `soul-renderer.ts`, `selectModel`/`selectModelFromDB` from `model-selector.ts`, and `sseStream` from `sse-adapter.ts`. While the barrel prevents direct imports, the public surface is wider than documented.
 
-#### packages/app/src/components/chat/chat-area.tsx
-- **[UX] Cancel error handling falls back to local `stopStream()` but doesn't inform user.** Line 243: if the cancel API fails, the catch block calls `stopStream()` (local-only disconnect from WebSocket stream) but shows no toast/error to the user. The user sees the stream stop but doesn't know if the server-side processing continues (and consumes API credits). Suggestion: show a warning toast like "Server cancel failed; stream stopped locally but AI may still be processing."
-- **[PATTERN] Good accessibility: `aria-label` and `data-testid` on cancel button.** Follows existing patterns.
+---
 
-#### packages/app/src/hooks/use-queries.ts
-- **[DRY] `WorkflowStep` type is duplicated in 3+ locations.** `use-queries.ts` (line 224), `workflows.tsx` (line 8), and `shared/types.ts` (line 1031) all define `WorkflowStep`. The `shared/types.ts` version is the canonical source but has fewer fields (missing `name`, `agentId`, `trueBranch`, `falseBranch`, `systemPrompt`, `timeout`, `retryCount`). The app-side definitions have diverged significantly with extra fields. Suggestion: update `@corthex/shared` `WorkflowStep` to include all fields, then import from shared in both `use-queries.ts` and `workflows.tsx`.
-- **[PATTERN] Hooks follow existing patterns well.** `useWorkflows`, `useWorkflowDetail`, `useWorkflowExecutions` all use the same `useQuery` + `api.get` pattern with `enabled` guards. `useWorkflowMutations` follows the compound-hook pattern from `useDelegationRuleMutations`. Clean.
+## 2. Architecture Patterns — API Response Format
 
-#### packages/app/src/pages/workflows.tsx (NEW, 830 lines)
-- **[ARCH] Monolithic file — should be split into 4+ files.** 830 lines with 4 components (`WorkflowsPage`, `ExecutionCard`, `DeleteConfirmModal`, `WorkflowFormModal`) and 6 local type definitions. The `WorkflowFormModal` alone is ~210 lines. Suggestion: extract into `pages/workflows/index.tsx` (main page), `pages/workflows/workflow-form-modal.tsx`, `pages/workflows/execution-card.tsx`, and `components/delete-confirm-modal.tsx` (the delete modal is generic and reusable).
-- **[DRY] Queries and mutations are defined inline instead of using `use-queries.ts` hooks.** Lines 94-165 define 7 inline `useQuery`/`useMutation` calls that duplicate the exact same API calls already defined in `use-queries.ts` (`useWorkflows`, `useWorkflowDetail`, `useWorkflowExecutions`, `useWorkflowSuggestions`, `useWorkflowMutations`). This means any API URL change needs updating in two places. Suggestion: import and use the hooks from `use-queries.ts` instead of re-declaring them.
-- **[DRY] `WorkflowStep`, `Workflow`, `Execution`, `StepSummary`, `Suggestion`, `ListMeta` types are all duplicated from `use-queries.ts`.** Six type definitions appear in both files with slight variations (e.g., `workflows.tsx` has `StepSummary` which `use-queries.ts` doesn't). These should be in a single shared location.
-- **[UX] No loading/error states on mutations.** The create/update/delete mutations show `toast.error` on failure but the UI doesn't show inline error states. The execute button shows "executing..." but if the mutation hangs, there's no timeout or cancel. Minor issue for now.
+### issue (major): [ARCH] API response envelope is inconsistent across routes
+- **CLAUDE.md specifies**: `{ success, data }` / `{ success, error: { code, message } }`
+- **shared/types.ts `ApiResponse<T>`** defines: `{ data: T; meta?: ... }` — NO `success` field
+- **Actual counts** across all route files:
+  - `{ data: ... }` (without success): **292 occurrences** in 37 files
+  - `{ success: true, data: ... }`: **138 occurrences** in 29 files
+  - `{ success: false, ... }`: **51 occurrences** in 14 files
+  - `{ error: { code, message } }` (without success): **1 occurrence** (`quality-dashboard.ts:18`)
+- **Pattern**: Dashboard, conversations, archive, debates, departments, operation-log, admin agents/departments/mcp-servers, tier-configs, workflows use `{ success: true, data }`. The majority of other routes use `{ data }` without `success`.
+- The `ApiResponse<T>` type in `shared/types.ts` (line 23) omits `success`, contradicting CLAUDE.md.
 
-#### packages/app/src/App.tsx
-- **[PATTERN] Clean lazy-load integration.** The `WorkflowsPage` import follows the established pattern. No issues.
+### suggestion: [ARCH] Reconcile ApiResponse type with CLAUDE.md convention
+- Either update `shared/types.ts` to `{ success: boolean; data: T }` and fix all routes, or update CLAUDE.md to reflect the actual `{ data }` pattern. The current state means frontend code cannot reliably check `response.success`.
 
-#### packages/app/src/components/sidebar.tsx
-- **[PATTERN] Clean nav entry addition.** Follows existing icon import and section structure. No issues.
+### praise: [ARCH] Error response format is consistent
+- The `errorHandler` middleware (`middleware/error.ts`) enforces `{ error: { code, message } }` format via `ApiError` type from `@corthex/shared`. All `HTTPError` throws flow through this handler. The one exception is `quality-dashboard.ts` which manually returns a similar format.
 
-### LOW Risk Files (spot check)
-- 18 files with layout/spacing changes only were not individually reviewed. Based on the diff summary (+/- counts), these appear to be CSS/spacing adjustments consistent with design system updates. No architectural concerns.
+---
 
-## Summary
+## 3. Route-Service Separation
 
-**Winston (Architect):** The cancel feature (FR66) is architecturally sound — it correctly stays in `lib/ai.ts` without breaching the E8 engine boundary. The main concern is that the cancel mechanism is cooperative (flag-based), meaning in-flight LLM calls run to completion before the flag is checked. For a user-facing cancel button, this could mean waiting 10-30 seconds with no visible effect. The TOCTOU race in the cancel endpoint could produce misleading 500 errors. The API envelope inconsistency (`success` field appears only in the cancel endpoint) should be normalized.
+### praise: [ARCH] Clean separation of concerns
+- Routes handle: HTTP concerns (validation via `zValidator`, auth via middleware, response formatting)
+- Services handle: business logic, DB queries, cross-entity operations
+- Example: `dashboard.ts` route delegates to `getSummary`, `getUsage`, `getBudget` service functions.
 
-**Amelia (Dev):** `packages/app/src/pages/workflows.tsx` is the biggest concern — 830 lines with duplicated types and queries that already exist in `packages/app/src/hooks/use-queries.ts`. Six types and 7 query/mutation hooks are copy-pasted. The `shared/types.ts` `WorkflowStep` is also stale (missing 7 fields vs the app-side definition). This will cause drift bugs. Split the page, delete the inline queries, and update the shared type.
+### thought: [ARCH] Some routes contain inline DB queries instead of delegating to services
+- `workspace/agents.ts`: 20+ direct Drizzle queries inline in route handlers
+- `workspace/notifications.ts`: all DB queries inline
+- `admin/companies.ts`: all DB queries inline
+- This is acceptable for simple CRUD (no business logic), but creates a gray area where complexity can creep in without extraction to a service.
+
+---
+
+## 4. DB Architecture — Dual Access Patterns
+
+### issue: [ARCH] Routes use raw `db` import (50 files) while engine uses `getDB()` (10 files) — inconsistent tenant isolation strategy
+- **50 route files** import `db` directly from `../../db` or `../../db/index`
+- **10 route files** import `getDB` from `../../db/scoped-query`
+- Routes with raw `db` manually add `eq(table.companyId, tenant.companyId)` in every WHERE clause
+- Engine hooks/services use `getDB(companyId)` which auto-injects the WHERE clause
+
+### thought: [ARCH] The dual pattern is architecturally intentional but risky
+- `getDB()` is designed for engine internals where `SessionContext` provides `companyId`
+- Routes get `companyId` from `tenant` middleware (`c.get('tenant').companyId`)
+- Both achieve tenant isolation, but the manual `eq()` approach in routes is error-prone — a forgotten `companyId` filter is a cross-tenant data leak
+- The `tenant-helpers.ts` provides `withTenant()` and `scopedWhere()` helpers, but they're only used inside `scoped-query.ts`, not in routes
+
+### suggestion: [ARCH] Consider extending `getDB()` or creating a route-level helper that makes tenant isolation mandatory rather than manual
+
+---
+
+## 5. Import Integrity & Cross-Package Dependencies
+
+### praise: [ARCH] Clean cross-package dependency graph
+- `@corthex/shared` is the only bridge between server and frontend packages
+- No circular dependencies detected between packages
+- Frontend packages import shared types correctly: `WsChannel`, `DebateWsEvent`, `Agent`, `Workflow`, etc.
+
+### praise: [ARCH] Shared package is well-utilized
+- `shared/types.ts` (1166 lines) contains comprehensive type definitions
+- Both server (20+ imports) and app (20+ imports) actively use shared types
+- `shared/constants.ts` and `shared/mermaid-parser.ts` provide utility functions used by both sides
+
+---
+
+## 6. DRY / Code Duplication
+
+### issue: [ARCH] Duplicated API client between admin and app — `packages/admin/src/lib/api.ts` vs `packages/app/src/lib/api.ts`
+- Both files implement the same pattern: token from localStorage, auth header injection, 401/429 handling, error parsing
+- Differences are legitimate (admin: `corthex_admin_token` + `injectCompanyId()`, app: `corthex_token` + `getErrorMessage()`)
+- But the core `request<T>()` function, `RateLimitError` class, and `api` object are ~80% identical
+
+### issue: [ARCH] Duplicated error message maps — `packages/admin/src/lib/api.ts:15` vs `packages/app/src/lib/error-messages.ts`
+- Admin has 7 inline error codes (`AUTH_001`-`AUTH_004`, `USER_001`, `COMPANY_001`, `DEPT_001`, `TENANT_001`, `RATE_001`)
+- App has 27 error codes in a dedicated file with handoff-specific messages
+- Shared codes overlap but admin's map is a subset. Should be in `@corthex/shared`.
+
+### suggestion: [ARCH] Extract shared API client base and error codes to `@corthex/shared` or `@corthex/ui`
+- Create a base `createApiClient(config)` function in shared
+- Move error code map to shared constants
+
+### issue: [ARCH] Duplicated auth-store logic — `packages/app/src/stores/auth-store.ts` (63 lines) vs `packages/admin/src/stores/auth-store.ts` (33 lines)
+- Both implement Zustand stores with `isAuthenticated`, `user`, `checkAuth()`, `logout()` patterns
+- Different token keys make simple sharing impractical, but a factory function would reduce duplication
+
+---
+
+## 7. Router Integrity (Cross-File Integration)
+
+### praise: [INTEGRATION] All App.tsx routes map to existing page files
+- App: 30 lazy imports all resolve to existing files in `pages/`
+- Admin: 26 lazy imports all resolve to existing files in `pages/`
+- Verified: `hub/`, `command-center/` directories exist with `index.tsx`
+
+### praise: [INTEGRATION] Route redirects are clean
+- `command-center` -> `/hub`, `org` -> `/nexus`, `cron` -> `/jobs`, `argos` -> `/jobs` — logical consolidation
+
+---
+
+## 8. Engine Architecture Deep Dive
+
+### praise: [ARCH] Single entry point pattern enforced — `engine/agent-loop.ts`
+- `runAgent()` is the sole entry point (line 49), exported as `AsyncGenerator<SSEEvent>`
+- Session lifecycle: register -> pre-spawn events -> tool loop -> cost tracking -> cleanup
+- `SessionContext` is readonly/immutable (all fields marked `readonly`)
+
+### praise: [ARCH] Hook system is well-designed — 5 hooks, all composable
+- `tool-permission-guard.ts`: Pre-tool allowed_tools check
+- `credential-scrubber.ts`: Init/release lifecycle for scrubbing secrets from output
+- `output-redactor.ts`: Post-response content filtering
+- `delegation-tracker.ts`: Handoff depth/cycle detection
+- `cost-tracker.ts`: Post-session cost recording via `getDB()`
+
+### praise: [ARCH] MCP 8-Stage Lifecycle is fully implemented
+- `mcp-manager.ts` documents and implements all 8 stages (RESOLVE through TEARDOWN)
+- Lazy spawn (D26), warm start caching, 120s cold start timeout, SIGTERM->SIGKILL cleanup
+- Injectable `SpawnFn` for test mocking
+- Session-scoped lifecycle events logged to DB
+
+### thought: [ARCH] `McpSession` type is duplicated — `engine/types.ts:66` vs `engine/mcp/mcp-manager.ts:42`
+- Both define `McpSession` with similar but not identical fields. The `types.ts` version has `tools` as a plain array of objects, while `mcp-manager.ts` version has a `transport: McpTransport` field. The `types.ts` version appears to be the public API type, while `mcp-manager.ts` is the internal implementation type.
+
+---
+
+## 9. Shared Types vs DB Schema Alignment
+
+### praise: [ARCH] Shared types serve as a clean API contract
+- `ApiResponse<T>`, `ApiError` types define the wire format
+- Domain types (`Agent`, `Debate`, `Workflow`, etc.) match DB schema fields
+- `UserRole` union ('super_admin' | 'company_admin' | 'ceo' | 'employee') is used consistently in auth middleware
+
+### issue (minor): [ARCH] `shared/types.ts` User.role uses 'admin'|'user' but UserRole uses 'super_admin'|'company_admin'|'ceo'|'employee' — `packages/shared/src/types.ts:59`
+- `User.role` on line 59 is typed as `'admin' | 'user'`, which doesn't match the `UserRole` type on line 2. This may cause confusion — the `User` type appears to be a simplified frontend representation, not the full RBAC model.
+
+---
+
+## 10. UI Package Architecture
+
+### praise: [ARCH] Clean shared component library — 20 components
+- `@corthex/ui` provides foundational components: Button, Card, Modal, Input, Select, Tabs, Toast, etc.
+- Both admin and app import from `@corthex/ui` (confirmed: `Skeleton` usage in both App.tsx files)
+- Components are atomic/presentational — no business logic
+
+---
+
+## Summary of Findings
+
+| Category | Status | Key Finding |
+|----------|--------|------------|
+| Engine Boundaries | Excellent | Zero leaks, proper barrel export |
+| API Response Format | Poor | 292 `{data}` vs 138 `{success,data}` — CLAUDE.md violated |
+| Tenant Isolation | Good | Works but dual pattern (getDB vs raw db) is fragile |
+| Cross-Package Deps | Excellent | Clean graph, no circular deps, no server type leaks |
+| Code Duplication | Fair | api.ts, auth-store, error messages duplicated across admin/app |
+| Router Integrity | Excellent | All routes map to existing files |
+| Engine Internals | Excellent | Hooks, MCP lifecycle, single entry point all solid |
+| DB Architecture | Good | Drizzle ORM consistent, getDB() pattern well-designed |
+
+## Top 3 Recommendations
+
+1. **Standardize API response envelope**: Choose `{data}` or `{success, data}` and apply uniformly. Update `shared/types.ts` `ApiResponse<T>` to match. This is the single largest inconsistency in the codebase (430 total response calls).
+
+2. **Extract shared frontend utilities**: Move API client base, error code maps, and auth-store factory to `@corthex/shared` or `@corthex/ui`. Currently ~200 lines of near-identical code exist in both admin and app.
+
+3. **Unify DB access pattern in routes**: Either adopt `getDB()` in routes (stronger isolation guarantee) or document the current manual `eq(companyId)` pattern as intentional and add a lint rule to catch missing tenant filters.

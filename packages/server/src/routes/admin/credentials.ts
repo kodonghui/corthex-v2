@@ -36,8 +36,14 @@ const createCliSchema = z.object({
 
 // GET /api/admin/cli-credentials?userId=xxx
 credentialsRoute.get('/cli-credentials', async (c) => {
+  const tenant = c.get('tenant')
   const userId = c.req.query('userId')
   if (!userId) throw new HTTPError(400, 'userId 파라미터가 필요합니다', 'CRED_001')
+
+  // Tenant isolation: company_admin can only see their own company's credentials
+  const conditions = tenant.role === 'super_admin'
+    ? eq(cliCredentials.userId, userId)
+    : and(eq(cliCredentials.userId, userId), eq(cliCredentials.companyId, tenant.companyId))
 
   const result = await db
     .select({
@@ -49,7 +55,7 @@ credentialsRoute.get('/cli-credentials', async (c) => {
       createdAt: cliCredentials.createdAt,
     })
     .from(cliCredentials)
-    .where(eq(cliCredentials.userId, userId))
+    .where(conditions)
 
   return c.json({ data: result })
 })

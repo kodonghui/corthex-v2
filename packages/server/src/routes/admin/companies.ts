@@ -32,9 +32,12 @@ const smtpConfigSchema = z.object({
   pass: z.string().min(1),
 })
 
-// GET /api/admin/companies — 전체 회사 목록
+// GET /api/admin/companies — 전체 회사 목록 (super_admin) / 자기 회사만 (company_admin)
 companiesRoute.get('/companies', async (c) => {
-  const result = await db.select().from(companies).orderBy(companies.createdAt)
+  const tenant = c.get('tenant')
+  const result = tenant.role === 'super_admin'
+    ? await db.select().from(companies).orderBy(companies.createdAt)
+    : await db.select().from(companies).where(eq(companies.id, tenant.companyId)).limit(1)
   return c.json({ data: result })
 })
 

@@ -8,7 +8,8 @@ import { db } from '../db'
 import { users, companies, adminUsers } from '../db/schema'
 import { eq } from 'drizzle-orm'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'corthex-v2-dev-secret-change-in-production'
+const JWT_SECRET = process.env.JWT_SECRET
+if (!JWT_SECRET) throw new Error('JWT_SECRET environment variable is required')
 
 // 30-second TTL cache for user/company active status (avoids DB hit on every request)
 const activeStatusCache = new Map<string, { active: boolean; companyActive?: boolean; expiresAt: number }>()
@@ -95,7 +96,8 @@ export const authMiddleware: MiddlewareHandler<AppEnv> = async (c, next) => {
     }
     c.set('tenant', tenant)
     await next()
-  } catch {
+  } catch (err) {
+    if (err instanceof HTTPError) throw err
     throw new HTTPError(401, '토큰이 만료되었거나 유효하지 않습니다', 'AUTH_002')
   }
 }
