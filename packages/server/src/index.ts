@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
+import { secureHeaders } from 'hono/secure-headers'
 import { compress } from 'hono/compress'
 import { logger } from 'hono/logger'
 import { errorHandler } from './middleware/error'
@@ -98,6 +99,7 @@ export let isShuttingDown = false
 
 // 글로벌 미들웨어
 app.use('*', compress())
+app.use('*', secureHeaders())
 app.use('*', logger())
 app.use('*', cors({
   origin: isProd

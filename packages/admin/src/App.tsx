@@ -111,6 +111,7 @@ export function App() {
             <Route path="mcp-credentials" element={<Suspense fallback={<PageSkeleton />}><McpCredentialsPage /></Suspense>} />
             <Route path="settings" element={<Suspense fallback={<PageSkeleton />}><SettingsPage /></Suspense>} />
             <Route path="onboarding" element={<Suspense fallback={<PageSkeleton />}><OnboardingWizardPage /></Suspense>} />
+            <Route path="*" element={<div className="flex flex-col items-center justify-center min-h-[60vh] text-center"><h2 className="text-2xl font-semibold mb-4">404 — 페이지를 찾을 수 없습니다</h2><a href="/admin" className="text-olive-600 hover:underline">홈으로 돌아가기</a></div>} />
           </Route>
         </Routes>
       </BrowserRouter>
