@@ -6,8 +6,9 @@ import { db } from '../../db'
 import { companies, users, agents } from '../../db/schema'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
+import type { AppEnv } from '../../types'
 
-export const companiesRoute = new Hono()
+export const companiesRoute = new Hono<AppEnv>()
 
 // 모든 관리자 라우트는 인증 + admin 권한 필요
 companiesRoute.use('*', authMiddleware, adminOnly)
@@ -91,19 +92,24 @@ companiesRoute.patch('/companies/:id', zValidator('json', updateCompanySchema), 
   return c.json({ data: company })
 })
 
-// DELETE /api/admin/companies/:id — 회사 비활성화 (soft delete)
+// DELETE /api/admin/companies/:id — 회사 비활성화 (cascade soft delete)
 companiesRoute.delete('/companies/:id', async (c) => {
   const id = c.req.param('id')
 
-  // 활성 직원 수 체크
-  const [{ activeCount }] = await db
-    .select({ activeCount: count() })
-    .from(users)
+  // Cascade: deactivate all users and agents first
+  const [{ deactivatedUsers }] = await db
+    .update(users)
+    .set({ isActive: false })
     .where(and(eq(users.companyId, id), eq(users.isActive, true)))
+    .returning({ deactivatedUsers: count() })
+    .then((rows) => rows.length ? rows : [{ deactivatedUsers: 0 }])
 
-  if (Number(activeCount) > 0) {
-    throw new HTTPError(409, `활성 직원이 ${activeCount}명 있어 비활성화할 수 없습니다. 먼저 직원을 이동하거나 비활성화하세요`, 'COMPANY_002')
-  }
+  const [{ deactivatedAgents }] = await db
+    .update(agents)
+    .set({ isActive: false, status: 'offline' })
+    .where(and(eq(agents.companyId, id), eq(agents.isActive, true)))
+    .returning({ deactivatedAgents: count() })
+    .then((rows) => rows.length ? rows : [{ deactivatedAgents: 0 }])
 
   const [company] = await db
     .update(companies)
@@ -111,7 +117,14 @@ companiesRoute.delete('/companies/:id', async (c) => {
     .where(eq(companies.id, id))
     .returning()
   if (!company) throw new HTTPError(404, '회사를 찾을 수 없습니다', 'COMPANY_001')
-  return c.json({ data: { message: '비활성화되었습니다' } })
+
+  return c.json({
+    data: {
+      message: '비활성화되었습니다',
+      deactivatedUsers: Number(deactivatedUsers),
+      deactivatedAgents: Number(deactivatedAgents),
+    },
+  })
 })
 
 // PUT /api/admin/companies/:id/smtp — SMTP 설정 저장
