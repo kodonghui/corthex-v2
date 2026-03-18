@@ -20,12 +20,16 @@
 
 ## BMAD Workflow (absolute rules)
 - Planning: `/kdh-full-auto-pipeline planning`. Party mode required. Fresh every time.
-- Story Dev: 5 skills mandatory → create-story → dev-story → TEA → QA → code-review
+- Story Dev: create-story → dev-story → simplify → TEA → QA → code-review → **cross-check → smoke-test**
+- cross-check: `.claude/hooks/cross-check.sh` (tenantMiddleware, colors, icons, migrations 일관성)
+- smoke-test: `.claude/hooks/smoke-test.sh` (배포 후 전 API 엔드포인트 200 OK 확인)
 - Orchestrator only assigns + commits. Workers do everything else.
 - Prohibited: skipping skills, stub/mock as "done", orchestrator running party mode
 
 ## Output Quality
 - Specific and detailed only. "Vague" = instant FAIL.
+- 질문에 대답할 때는 반드시 **최신 정확한 정보**로 답변. 모르거나 확실하지 않으면 WebSearch로 찾아서 답변. 추측 금지.
+- 프로젝트 상태를 언급할 때는 **반드시 코드를 직접 읽어서 확인**. 메모리만 보고 답하지 말 것.
 
 ## Engine Patterns
 - All execution → `engine/agent-loop.ts`. DB → `getDB(ctx.companyId)` only.

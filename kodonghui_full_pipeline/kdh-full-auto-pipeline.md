@@ -1,11 +1,11 @@
 ---
 name: 'kdh-full-auto-pipeline'
-description: 'BMAD Full Pipeline v5.2 (team agents + swarm). planning(3-agent real party) or story dev(single/parallel/swarm). Usage: /kdh-full-auto-pipeline [planning|story-ID|parallel ID1 ID2...|swarm epic-N]'
+description: 'BMAD Full Pipeline v5.3 (team agents + swarm + smoke-test + cross-check). planning(3-agent real party) or story dev(single/parallel/swarm). Usage: /kdh-full-auto-pipeline [planning|story-ID|parallel ID1 ID2...|swarm epic-N]'
 ---
 
-# Kodonghui Full Pipeline v5.2
+# Kodonghui Full Pipeline v5.3
 
-BMAD pipeline with **team agent real party**, **parallel story dev**, and **swarm auto-epic**.
+BMAD pipeline with **team agent real party**, **parallel story dev**, **swarm auto-epic**, **smoke-test**, and **cross-check**.
 "Brief만 참여 → 자러감 → 아침에 완성" 가능.
 
 ## Mode Selection
@@ -16,6 +16,15 @@ BMAD pipeline with **team agent real party**, **parallel story dev**, and **swar
 - `swarm epic-N`: **Swarm auto-epic** — registers ALL stories as tasks, 3 workers self-organize (v5.1)
 
 ---
+
+## What Changed in v5.3 (from v5.2)
+
+| Change | Why |
+|--------|-----|
+| **Step 5: cross-check** | Pattern consistency across files. Catches: tenantMiddleware missing, hardcoded colors, Material Symbols remnants, insecure companyId patterns, unsafe migrations. Script: `.claude/hooks/cross-check.sh` |
+| **Step 6: smoke-test** | Production API health check post-deploy. Hits every admin + workspace endpoint. Catches: missing DB tables, unregistered routes, migration failures. Script: `.claude/hooks/smoke-test.sh` |
+| **10-item checklist** | Was 8 items. Added cross-check PASS + smoke-test PASS as mandatory before "done". |
+| **Root cause** | v5.2 had 0 production verification. tsc + tests passing ≠ production working. 7 DB tables were missing, 13 routes had no tenantMiddleware — none caught until manual API check on 2026-03-18. |
 
 ## What Changed in v5.2 (from v5.1)
 
@@ -612,7 +621,15 @@ Step 2: Worker reports "[dev-story complete]"
   → SendMessage to Worker: "simplify {result}. Continue with TEA."
 Step 3: Worker runs TEA → QA → code-review → reports checklist
 Step 4: Verify 7/7 checks → commit + push
-Step 5: Update sprint-status.yaml
+Step 5: Orchestrator runs CROSS-CHECK (pattern consistency):
+  → bash .claude/hooks/cross-check.sh
+  → If issues found: SendMessage to Worker with list → Worker fixes → re-commit
+  → If clean: proceed
+Step 6: Orchestrator runs SMOKE-TEST (production API health):
+  → bash .claude/hooks/smoke-test.sh
+  → If failures: SendMessage to Worker with failing endpoints → Worker fixes → re-deploy → re-test
+  → If all pass: proceed
+Step 7: Update sprint-status.yaml
 ```
 
 ### Developer Worker Prompt
@@ -647,6 +664,8 @@ Report to team-lead:
 [x] 6. code-review complete
 [x] 7. Real functionality confirmed (not stub/mock)
 [x] 8. tsc --noEmit PASS
+[x] 9. cross-check PASS (tenantMiddleware, colors, icons, migrations)
+[x] 10. smoke-test PASS (all API endpoints 200 OK on production)
 ```
 
 ---
