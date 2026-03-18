@@ -1,4 +1,4 @@
-# KDH Playwright E2E Full-Auto 24/7 — VS Version
+# KDH Playwright E2E Full-Auto 24/7 — VS Version v2.0
 
 Loop-based automated E2E testing + instant bug fix + deploy. Designed to run via `/loop 15m` in VSCode Claude Code.
 
@@ -26,19 +26,39 @@ Loop-based automated E2E testing + instant bug fix + deploy. Designed to run via
 
 ## Cycle Structure (15min target)
 
-Each cycle is fully autonomous: detect → test → fix → deploy → report.
+Each cycle is fully autonomous: detect → test → fix → deploy → cleanup → report.
 
-### Phase 0: Pre-flight (15s)
+### Phase 0: Pre-flight (30s)
 
 ```
 1. curl GET {BASE_URL}/health → site alive?
    - DOWN → log "SITE DOWN" → skip cycle → wait for next
+
 2. POST {BASE_URL}/api/auth/admin/login → get token
    - FAIL → log "LOGIN FAILED" → skip cycle
+
 3. gh run list -L 1 → last deploy status
    - FAILED → log warning, continue anyway (might be the bug we need to fix)
+
 4. Read _qa-e2e/playwright-e2e/cycle-report.md → previous cycle results
    - Unresolved bugs from last cycle = priority targets this cycle
+
+5. Read _qa-e2e/playwright-e2e/known-behaviors.md → load KB entries
+   - Used in Phase 2 to suppress known false positives
+
+6. Read _qa-e2e/playwright-e2e/ESCALATED.md → load escalated bugs
+   - Count report frequency per bug ID for warning threshold
+
+7. Read _qa-e2e/playwright-e2e/stability-state.md → load stability state
+   - Check current mode (ACTIVE or WATCH)
+   - Read last_commit_hash, compare with `git rev-parse HEAD`
+   - If new commit detected → reset consecutive_clean_cycles to 0, set mode ACTIVE
+   - If mode=WATCH → run Auto-Stabilization Protocol (see below)
+
+8. Create test company for CRUD isolation:
+   POST /api/admin/companies { name: "E2E-TEMP-{N}" }
+   Store E2E_COMPANY_ID from response
+   - FAIL → log warning, continue (CRUD tests will use existing data read-only)
 ```
 
 ### Phase 1: API Smoke Test (1min)
@@ -72,6 +92,14 @@ For each:
 ```
 Using Playwright MCP tools:
 
+Step 2.0: Pre-check
+  Load known-behaviors.md entries (from Phase 0)
+  Load ESCALATED.md entries (from Phase 0)
+  For any bug candidate in Steps 2.1-2.5:
+    - Match against KB entries → if match AND "When it IS a bug" NOT met → SKIP
+    - Match against ESCALATED entries → if already reported >= 3 cycles → do NOT re-report,
+      just note "still present" in report
+
 Step 2.1: Login
   browser_navigate → /admin/login
   browser_fill_form → admin / admin1234
@@ -102,13 +130,13 @@ Step 2.3: Interaction Testing (on each page)
 
   For each form found:
     1. Try submit empty → check validation
-    2. Fill with Korean test data:
+    2. Fill with Korean test data using E2E_COMPANY_ID scope:
        - 회사명: "테스트 주식회사"
        - 이름: "김테스트"
        - 이메일: "test@test.com"
        - 비밀번호: "Test1234!"
     3. Submit → check success/error
-    4. If created something → DELETE it (cleanup)
+    4. If created something → DELETE it immediately (cleanup within E2E_COMPANY_ID)
 
   For each dropdown/select:
     1. browser_select_option → try each option
@@ -123,7 +151,7 @@ Step 2.4: Socrates Method
     "Dashboard should show: 4 stat cards, recent activity table"
     "Companies should show: company list or empty state with Add button"
   After test, compare actual vs expected.
-  Mismatch = BUG.
+  Mismatch = BUG (unless matched by known-behaviors.md).
 
 Step 2.5: Console Error Sweep
   After all pages visited:
@@ -168,10 +196,19 @@ For each bug (P0 first):
   4. Run: bunx tsc --noEmit -p packages/server/tsconfig.json
   5. Run: bunx tsc --noEmit -p packages/admin/tsconfig.json
   6. If type error → fix it
-  7. If 2 attempts fail → skip, mark as ESCALATED
+  7. If 2 attempts fail → mark as ESCALATED:
+     a. Append to _qa-e2e/playwright-e2e/ESCALATED.md under ## Active:
+        "### ESC-{id}: {title}\n- Page: {url}\n- Error: {msg}\n- Cycles reported: 1\n- First seen: {date}"
+     b. If bug already in ESCALATED.md → increment "Cycles reported" count
+     c. If "Cycles reported" >= 3 → add "⚠ WARNING: re-reported 3+ cycles" to cycle report
 
-Safety limits:
-  - Max 5 files modified per cycle
+Smart file limits per cycle:
+  - Logic files (*.ts server routes, engine, lib): max 3
+  - Style files (*.css, tailwind classes in *.tsx): max 10
+  - Text/i18n files (labels, messages, constants): max 15
+  - Mixed changes: max 5 files total
+
+Safety rules:
   - No deleting files
   - No changing package.json dependencies
   - No modifying migrations
@@ -189,7 +226,7 @@ If any files were modified in Phase 4:
   Fix any issues found.
 ```
 
-### Phase 6: Deploy + Verify (2min)
+### Phase 6: Deploy + Post-Deploy Verification (2min)
 
 ```
 If any files were modified:
@@ -203,6 +240,10 @@ If any files were modified:
      Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
   3. git push origin main
   4. gh run list -L 1 → verify deploy started
+  5. Wait for deploy to complete (poll gh run list every 15s, max 90s)
+  6. Run: bash .claude/hooks/smoke-test.sh
+     - Record result: PASS (all endpoints 200) or FAIL (list failing endpoints)
+     - If FAIL → note in cycle report, these become P0 targets next cycle
 
 If no files modified:
   Skip deploy.
@@ -218,14 +259,25 @@ Update .claude/memory/working-state.md:
   - Total cycles run: {N}
   - Total bugs fixed: {N}
   - Next cycle priority: {what to focus on}
+
+Update _qa-e2e/playwright-e2e/stability-state.md:
+  - If 0 bugs found this cycle → increment consecutive_clean_cycles
+  - If bugs found → reset consecutive_clean_cycles to 0
+  - Update last_commit_hash to current HEAD
+  - If consecutive_clean_cycles >= 3 → set mode: WATCH, record entered_watch_at
 ```
 
-### Phase 8: Report (15s)
+### Phase 8: Report + Cleanup (15s)
 
 ```
-Append to _qa-e2e/playwright-e2e/cycle-report.md:
+1. Delete test company:
+   DELETE /api/admin/companies/{E2E_COMPANY_ID}
+   - FAIL → log warning (will be cleaned up next cycle or manually)
+
+2. Append to _qa-e2e/playwright-e2e/cycle-report.md:
 
 ## Cycle #{N} — {timestamp}
+- Mode: {ACTIVE|WATCH}
 - API: {passed}/{total} OK
 - Pages loaded: {N}/{total}
 - Console errors: {N}
@@ -234,8 +286,42 @@ Append to _qa-e2e/playwright-e2e/cycle-report.md:
 - Bugs fixed: {N}
 - Bugs remaining: {N}
 - Bugs escalated: {N}
+- Known-behavior matches skipped: {N}
 - Files modified: {list}
 - Deploy: {success|failed|skipped}
+- Post-deploy smoke: {PASS|FAIL|skipped}
+- Clean cycles streak: {N}
+```
+
+---
+
+## Auto-Stabilization Protocol
+
+When `stability-state.md` shows `mode: WATCH`:
+
+```
+Trigger: consecutive_clean_cycles >= 3 (no bugs found for 3 straight cycles)
+
+VS WATCH Mode behavior:
+  - Phase 0: normal (including commit hash check)
+  - Phase 1: normal API smoke test
+  - Phase 2: REDUCED — API smoke + sidebar navigation only
+    - Navigate each sidebar link, verify page loads without crash
+    - Skip: interaction testing, form fills, click sweeps
+  - Phase 3: normal cross-check
+  - Phase 4: SKIPPED entirely (no fixes in watch mode)
+  - Phase 5: SKIPPED
+  - Phase 6: SKIPPED (nothing to deploy)
+  - Phase 7: normal (update stability state)
+  - Phase 8: normal report
+  - Interval: 2 hours (not 15min)
+
+Exit WATCH mode when ANY of:
+  - New bug detected in Phase 1 or 2 → immediate exit, run full ACTIVE cycle
+  - New commit detected (git rev-parse HEAD != last_commit_hash) → exit, full cycle
+  - Manual request ("E2E 돌려", "전수검사") → exit, full cycle
+
+On exit: set mode=ACTIVE, reset consecutive_clean_cycles=0 in stability-state.md
 ```
 
 ---
@@ -249,26 +335,33 @@ Append to _qa-e2e/playwright-e2e/cycle-report.md:
 | Per page navigation | 10s | Mark TIMEOUT, continue |
 | Per interaction | 5s | Mark FAIL, continue |
 | Bug fix per bug | 3min | Skip bug, mark ESCALATED |
+| Post-deploy smoke | 2min | Mark FAIL, continue |
 | Total cycle | 14min | Force report with partial results |
 
 ## Rules
 
 1. **Never stop on single failure** — record and continue
 2. **Screenshot on bugs** — visual evidence is mandatory
-3. **Console errors are bugs** — no exceptions
+3. **Console errors are bugs** — no exceptions (unless in known-behaviors.md)
 4. **Dead buttons are bugs** — clickable element that does nothing = BUG
-5. **Clean up test data** — delete anything created during CRUD testing
+5. **Clean up test data** — delete E2E-TEMP company in Phase 8; delete anything created during CRUD
 6. **Type-check before commit** — tsc must pass or no deploy
-7. **Max 5 files per cycle** — prevent runaway changes
+7. **Smart file limits** — Logic 3, Style 10, Text/i18n 15, Mixed 5
 8. **Don't touch auth/middleware** — too risky for auto-fix
 9. **Olive theme only** — any blue (#3b82f6, bg-blue-*) = immediate fix
 10. **Report every cycle** — even if 0 bugs found
+11. **Check known-behaviors.md** — before reporting any bug, verify it's not a known behavior
+12. **Update ESCALATED.md** — failed fixes go to ESCALATED; warn at 3+ re-reports
+13. **Respect stabilization mode** — WATCH mode = reduced testing, 2h interval
 
 ## Output
 
 ```
 _qa-e2e/playwright-e2e/
   cycle-report.md          ← cumulative report (appended each cycle)
+  known-behaviors.md       ← intentional behaviors, not bugs (read in Phase 0)
+  ESCALATED.md             ← bugs requiring manual intervention (updated in Phase 4)
+  stability-state.md       ← ACTIVE/WATCH mode + clean cycle count
   screenshots/
     cycle-{N}/
       {page}-{bug-id}.png  ← bug evidence
