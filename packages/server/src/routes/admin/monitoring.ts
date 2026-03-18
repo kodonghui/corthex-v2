@@ -9,6 +9,11 @@ export const monitoringRoute = new Hono<AppEnv>()
 
 monitoringRoute.use('*', authMiddleware, adminOnly)
 
+// GET /api/admin/monitoring/ping — lightweight health check
+monitoringRoute.get('/monitoring/ping', async (c) => {
+  return c.json({ success: true, data: { status: 'ok', timestamp: new Date().toISOString() } })
+})
+
 monitoringRoute.get('/monitoring/status', async (c) => {
   // 서버 정보
   const uptime = Math.floor(process.uptime())
