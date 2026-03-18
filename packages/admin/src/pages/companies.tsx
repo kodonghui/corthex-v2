@@ -33,7 +33,7 @@ export function CompaniesPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ['companies'],
-    queryFn: () => api.get<{ data: Company[] }>('/admin/companies'),
+    queryFn: () => api.get<{ data: Company[] }>('/admin/companies?all=true'),
   })
 
   const { data: statsData } = useQuery({

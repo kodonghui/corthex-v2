@@ -83,7 +83,7 @@ export function Sidebar() {
     queryFn: () => api.get<{ data: Company[] }>('/admin/companies'),
   })
 
-  const companies = (companyData?.data || []).filter((c) => c.isActive)
+  const companies = companyData?.data || []
 
   // 회사 미선택 시 첫 번째 회사 자동 선택
   useEffect(() => {

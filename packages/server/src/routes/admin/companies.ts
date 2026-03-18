@@ -32,9 +32,12 @@ const smtpConfigSchema = z.object({
   pass: z.string().min(1),
 })
 
-// GET /api/admin/companies — 전체 회사 목록
+// GET /api/admin/companies — 회사 목록 (기본: active만, ?all=true면 전체)
 companiesRoute.get('/companies', async (c) => {
-  const result = await db.select().from(companies).orderBy(companies.createdAt)
+  const showAll = c.req.query('all') === 'true'
+  const result = showAll
+    ? await db.select().from(companies).orderBy(companies.createdAt)
+    : await db.select().from(companies).where(eq(companies.isActive, true)).orderBy(companies.createdAt)
   return c.json({ data: result })
 })
 
