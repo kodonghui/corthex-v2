@@ -4,10 +4,34 @@ import { db } from '../../db'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
 import { getRecentErrors, getErrorCount24h } from '../../utils/error-counter'
 import type { AppEnv } from '../../types'
+import { readFileSync } from 'fs'
+import { resolve } from 'path'
 
 export const monitoringRoute = new Hono<AppEnv>()
 
 monitoringRoute.use('*', authMiddleware, adminOnly)
+
+// POST /api/admin/monitoring/run-recovery — Force run recovery migration SQL
+monitoringRoute.post('/monitoring/run-recovery', async (c) => {
+  const results: string[] = []
+  try {
+    const migPath = resolve(import.meta.dir, '../../db/migrations/0058_recovery-missing-tables.sql')
+    const migSql = readFileSync(migPath, 'utf-8')
+    // Split by statement-breakpoint and run each
+    const statements = migSql.split('--> statement-breakpoint').map(s => s.replace(/--.*$/gm, '').trim()).filter(Boolean)
+    for (const stmt of statements) {
+      try {
+        await db.execute(sql.raw(stmt))
+        results.push(`OK: ${stmt.slice(0, 60)}...`)
+      } catch (err) {
+        results.push(`SKIP: ${(err as Error).message.slice(0, 80)} — ${stmt.slice(0, 40)}...`)
+      }
+    }
+    return c.json({ success: true, data: { executed: results.length, results } })
+  } catch (err) {
+    return c.json({ success: false, error: { message: (err as Error).message } }, 500)
+  }
+})
 
 monitoringRoute.get('/monitoring/status', async (c) => {
   // 서버 정보
