@@ -673,7 +673,7 @@ export function SettingsPage() {
   if (!selectedCompanyId) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: cream }}>
-        <p className="text-sm" style={{ color: lightMuted }} data-testid="settings-no-company">Select a company</p>
+        <p className="text-sm" style={{ color: lightMuted }} data-testid="settings-no-company">회사를 선택하세요</p>
       </div>
     )
   }

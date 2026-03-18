@@ -108,7 +108,7 @@ const STEPS = [
 
 const TIER_LABELS: Record<string, { label: string; color: string }> = {
   manager: { label: 'Manager', color: 'bg-[#556B2F]/10 text-[#556B2F]' },
-  specialist: { label: 'Specialist', color: 'bg-blue-100 text-blue-700' },
+  specialist: { label: 'Specialist', color: 'bg-[#5a7247]/10 text-[#5a7247]' },
   worker: { label: 'Worker', color: 'bg-gray-100 text-gray-600' },
 }
 
@@ -852,8 +852,8 @@ function SummaryStep({
         settings: { ...existingSettings, onboardingCompleted: true },
       })
     },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['company-detail'] })
+    onSuccess: async () => {
+      await qc.refetchQueries({ queryKey: ['company-detail', companyId] })
       qc.invalidateQueries({ queryKey: ['companies'] })
       addToast({ type: 'success', message: '온보딩이 완료되었습니다!' })
       onComplete()

@@ -99,7 +99,18 @@ export let isShuttingDown = false
 
 // 글로벌 미들웨어
 app.use('*', compress())
-app.use('*', secureHeaders())
+app.use('*', secureHeaders({
+  contentSecurityPolicy: isProd ? {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'"],
+    styleSrc: ["'self'", "'unsafe-inline'"],
+    imgSrc: ["'self'", 'data:', 'https:'],
+    connectSrc: ["'self'", 'https://corthex-hq.com', 'wss://corthex-hq.com'],
+    fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+    objectSrc: ["'none'"],
+    frameAncestors: ["'none'"],
+  } : undefined,
+}))
 app.use('*', logger())
 app.use('*', cors({
   origin: isProd

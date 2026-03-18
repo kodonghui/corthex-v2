@@ -112,7 +112,7 @@ export function Sidebar() {
         </div>
 
         {/* 회사 선택 드롭다운 */}
-        {companies.length > 0 && (
+        {companies.length > 0 ? (
           <select
             value={selectedCompanyId || ''}
             onChange={(e) => setSelectedCompanyId(e.target.value)}
@@ -124,6 +124,10 @@ export function Sidebar() {
               </option>
             ))}
           </select>
+        ) : (
+          <div className="w-full px-2 py-1.5 text-xs text-[#8fae7a] animate-pulse">
+            회사 로딩중...
+          </div>
         )}
       </div>
 

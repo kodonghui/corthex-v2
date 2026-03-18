@@ -28,6 +28,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: () => {
     localStorage.removeItem('corthex_admin_token')
     localStorage.removeItem('corthex_admin_user')
+    localStorage.removeItem('corthex-admin-company')
     set({ token: null, user: null, isAuthenticated: false })
   },
 }))

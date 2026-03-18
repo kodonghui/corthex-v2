@@ -679,7 +679,7 @@ export function WorkflowCanvas({
               <div className="flex gap-2">
                 <button
                   onClick={() => addNode('tool', showAddModal.x, showAddModal.y)}
-                  className="px-3 py-2 text-xs rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 hover:bg-blue-200"
+                  className="px-3 py-2 text-xs rounded-lg bg-[#5a7247]/10 dark:bg-[#5a7247]/20 text-[#5a7247] dark:text-[#8fae7a] border border-[#5a7247]/30 dark:border-[#5a7247]/50 hover:bg-[#5a7247]/20"
                 >
                   {'\u{1F527}'} Tool
                 </button>
@@ -711,7 +711,7 @@ export function WorkflowCanvas({
           <div className="w-72 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 p-4 space-y-3 overflow-y-auto" style={{ maxHeight: 540 }}>
             <div className="flex items-center justify-between">
               <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                selectedNode.type === 'tool' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                selectedNode.type === 'tool' ? 'bg-[#5a7247]/10 text-[#5a7247] dark:bg-[#5a7247]/20 dark:text-[#8fae7a]'
                 : selectedNode.type === 'llm' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
                 : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
               }`}>

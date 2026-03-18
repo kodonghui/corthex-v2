@@ -69,9 +69,15 @@ workflowsRoute.post(
     const tenant = c.get('tenant')
     requireCeoOrAdmin(tenant)
 
+    const companyId = c.req.query('companyId') || tenant.companyId
+    const isValidUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(companyId)
+    if (!isValidUuid) {
+      throw new HTTPError(400, 'Valid companyId is required', 'INVALID_COMPANY_ID')
+    }
+
     const body = c.req.valid('json')
     const result = await WorkflowService.create({
-      companyId: tenant.companyId,
+      companyId,
       name: body.name,
       description: body.description,
       steps: body.steps,

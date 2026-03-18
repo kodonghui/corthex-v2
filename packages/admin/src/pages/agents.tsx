@@ -65,7 +65,7 @@ const STATUS_LABELS: Record<string, string> = {
 
 const STATUS_COLORS: Record<string, string> = {
   online: 'bg-green-500',
-  working: 'bg-blue-400 animate-pulse',
+  working: 'bg-[#5a7247] animate-pulse',
   error: 'bg-red-400',
   offline: 'bg-slate-300',
 }
