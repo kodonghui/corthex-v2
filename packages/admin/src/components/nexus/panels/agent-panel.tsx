@@ -121,7 +121,7 @@ export function AgentPanel({ agent }: { agent: OrgAgent }) {
 
   const statusColor: Record<string, string> = {
     online: 'bg-emerald-500',
-    working: 'bg-blue-500',
+    working: 'bg-[#5a7247]',
     error: 'bg-red-500',
     offline: 'bg-slate-500',
   }
@@ -163,7 +163,7 @@ export function AgentPanel({ agent }: { agent: OrgAgent }) {
         <select
           value={tierLevel}
           onChange={(e) => handleTierChange(e.target.value)}
-          className="mt-1 w-full rounded-lg bg-slate-800 border border-slate-700 text-sm text-slate-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="mt-1 w-full rounded-lg bg-slate-800 border border-slate-700 text-sm text-slate-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#5a7247]"
           data-testid="agent-tier-select"
         >
           <option value={1}>Manager (T1)</option>
@@ -184,7 +184,7 @@ export function AgentPanel({ agent }: { agent: OrgAgent }) {
           href="/admin/agents"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs text-blue-400 hover:text-blue-300 underline"
+          className="text-xs text-[#8fae7a] hover:text-[#a3c48a] underline"
         >
           Soul 편집 (에이전트 관리) →
         </a>
@@ -206,7 +206,7 @@ export function AgentPanel({ agent }: { agent: OrgAgent }) {
                   type="checkbox"
                   checked={allowedTools.includes(tool.name)}
                   onChange={() => handleToolToggle(tool.name)}
-                  className="rounded border-slate-600 bg-slate-800 text-blue-500 focus:ring-blue-500 focus:ring-offset-0"
+                  className="rounded border-slate-600 bg-slate-800 text-[#5a7247] focus:ring-[#5a7247] focus:ring-offset-0"
                 />
                 <span className="text-xs text-slate-300 truncate">{tool.name}</span>
               </label>

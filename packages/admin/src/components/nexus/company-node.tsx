@@ -11,12 +11,12 @@ export const CompanyNode = memo(function CompanyNode({ data, selected }: { data:
   return (
     <div
       className={`px-5 py-3 rounded-xl bg-slate-100 text-slate-900 border-2 shadow-lg min-w-[280px] ${
-        selected ? 'border-blue-400 ring-2 ring-blue-400/50' : 'border-slate-300'
+        selected ? 'border-[#8fae7a] ring-2 ring-[#8fae7a]/50' : 'border-slate-300'
       }`}
       data-testid="nexus-company-node"
     >
       <div className="flex items-center gap-3">
-        <span className="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
+        <span className="w-9 h-9 rounded-lg bg-[#5a7247] text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
           {data.name.charAt(0)}
         </span>
         <div>
