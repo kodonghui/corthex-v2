@@ -14,17 +14,20 @@ workspaceAgentMarketplaceRoute.use('*', authMiddleware)
 // GET /api/workspace/agent-marketplace — browse published soul templates (exclude own company)
 workspaceAgentMarketplaceRoute.get('/agent-marketplace', async (c) => {
   const tenant = c.get('tenant')
+  const companyId = c.req.query('companyId') || tenant.companyId
   const q = c.req.query('q')?.trim()
   const category = c.req.query('category')?.trim()
   const tier = c.req.query('tier')?.trim()
 
+  // If companyId is not a valid UUID (e.g. "system"), skip the exclude filter
+  const isValidUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(companyId)
   const conditions = [
     eq(soulTemplates.isPublished, true),
     eq(soulTemplates.isActive, true),
-    or(
+    ...(isValidUuid ? [or(
       isNull(soulTemplates.companyId),  // builtin always visible
-      ne(soulTemplates.companyId, tenant.companyId),  // other companies
-    ),
+      ne(soulTemplates.companyId, companyId),  // other companies
+    )] : []),
   ]
 
   if (q) {
@@ -63,6 +66,8 @@ workspaceAgentMarketplaceRoute.get('/agent-marketplace', async (c) => {
 workspaceAgentMarketplaceRoute.get('/agent-marketplace/:id', async (c) => {
   const tenant = c.get('tenant')
   const id = c.req.param('id')
+  const companyId = c.req.query('companyId') || tenant.companyId
+  const isValidUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(companyId)
 
   const [tmpl] = await db
     .select()
@@ -72,10 +77,10 @@ workspaceAgentMarketplaceRoute.get('/agent-marketplace/:id', async (c) => {
         eq(soulTemplates.id, id),
         eq(soulTemplates.isPublished, true),
         eq(soulTemplates.isActive, true),
-        or(
+        ...(isValidUuid ? [or(
           isNull(soulTemplates.companyId),
-          ne(soulTemplates.companyId, tenant.companyId),
-        ),
+          ne(soulTemplates.companyId, companyId),
+        )] : []),
       ),
     )
     .limit(1)

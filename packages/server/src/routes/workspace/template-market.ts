@@ -14,16 +14,19 @@ workspaceTemplateMarketRoute.use('*', authMiddleware)
 // GET /api/workspace/template-market — browse published templates (exclude own company)
 workspaceTemplateMarketRoute.get('/template-market', async (c) => {
   const tenant = c.get('tenant')
+  const companyId = c.req.query('companyId') || tenant.companyId
   const q = c.req.query('q')?.trim()
   const tag = c.req.query('tag')?.trim()
 
+  // If companyId is not a valid UUID (e.g. "system"), skip the exclude filter
+  const isValidUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(companyId)
   const conditions = [
     eq(orgTemplates.isPublished, true),
     eq(orgTemplates.isActive, true),
-    or(
+    ...(isValidUuid ? [or(
       isNull(orgTemplates.companyId),  // builtin always visible
-      ne(orgTemplates.companyId, tenant.companyId),  // other companies
-    ),
+      ne(orgTemplates.companyId, companyId),  // other companies
+    )] : []),
   ]
 
   if (q) {
@@ -57,6 +60,8 @@ workspaceTemplateMarketRoute.get('/template-market', async (c) => {
 workspaceTemplateMarketRoute.get('/template-market/:id', async (c) => {
   const tenant = c.get('tenant')
   const id = c.req.param('id')
+  const companyId = c.req.query('companyId') || tenant.companyId
+  const isValidUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(companyId)
 
   const [tmpl] = await db
     .select()
@@ -66,10 +71,10 @@ workspaceTemplateMarketRoute.get('/template-market/:id', async (c) => {
         eq(orgTemplates.id, id),
         eq(orgTemplates.isPublished, true),
         eq(orgTemplates.isActive, true),
-        or(
+        ...(isValidUuid ? [or(
           isNull(orgTemplates.companyId),
-          ne(orgTemplates.companyId, tenant.companyId),
-        ),
+          ne(orgTemplates.companyId, companyId),
+        )] : []),
       ),
     )
     .limit(1)

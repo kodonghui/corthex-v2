@@ -48,5 +48,18 @@ export const tenantMiddleware: MiddlewareHandler<AppEnv> = async (c, next) => {
     }
   }
 
+  // After override resolution, check if companyId is a valid UUID.
+  // Admin JWT has companyId='system' which is NOT a UUID — if no company
+  // was selected (no ?companyId= override), return empty data for GETs
+  // and 400 for writes instead of letting "system" reach DB UUID columns.
+  const resolvedTenant = c.get('tenant')
+  const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  if (!uuidRe.test(resolvedTenant.companyId)) {
+    if (method === 'GET') {
+      return c.json({ success: true, data: [] })
+    }
+    throw new HTTPError(400, '회사를 먼저 선택해주세요.', 'TENANT_003')
+  }
+
   await next()
 }
