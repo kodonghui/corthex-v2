@@ -260,6 +260,13 @@
       "when": 1774108800057,
       "tag": "0057_add-template-publish-columns",
       "breakpoints": true
+    },
+    {
+      "idx": 58,
+      "version": "7",
+      "when": 1774195200058,
+      "tag": "0058_recovery-missing-tables",
+      "breakpoints": true
     }
   ]
 }
