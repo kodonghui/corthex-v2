@@ -96,43 +96,31 @@ companiesRoute.patch('/companies/:id', zValidator('json', updateCompanySchema), 
 companiesRoute.delete('/companies/:id', async (c) => {
   const id = c.req.param('id')
 
-  // Cascade: deactivate all users and agents first
-  const [{ deactivatedUsers }] = await db
-    .update(users)
-    .set({ isActive: false })
-    .where(and(eq(users.companyId, id), eq(users.isActive, true)))
-    .returning({ deactivatedUsers: count() })
-    .then((rows) => rows.length ? rows : [{ deactivatedUsers: 0 }])
+  // Cascade: deactivate all related records in a single transaction
+  const result = await db.transaction(async (tx) => {
+    // Run independent deactivations in parallel
+    const [userResult, agentResult, adminResult] = await Promise.all([
+      tx.update(users).set({ isActive: false })
+        .where(and(eq(users.companyId, id), eq(users.isActive, true)))
+        .returning({ n: count() }).then((r) => r[0]?.n ?? 0),
+      tx.update(agents).set({ isActive: false, status: 'offline' })
+        .where(and(eq(agents.companyId, id), eq(agents.isActive, true)))
+        .returning({ n: count() }).then((r) => r[0]?.n ?? 0),
+      tx.update(adminUsers).set({ isActive: false })
+        .where(and(eq(adminUsers.companyId, id), eq(adminUsers.isActive, true)))
+        .returning({ n: count() }).then((r) => r[0]?.n ?? 0),
+    ])
 
-  const [{ deactivatedAgents }] = await db
-    .update(agents)
-    .set({ isActive: false, status: 'offline' })
-    .where(and(eq(agents.companyId, id), eq(agents.isActive, true)))
-    .returning({ deactivatedAgents: count() })
-    .then((rows) => rows.length ? rows : [{ deactivatedAgents: 0 }])
+    const [company] = await tx.update(companies)
+      .set({ isActive: false, updatedAt: new Date() })
+      .where(eq(companies.id, id))
+      .returning()
+    if (!company) throw new HTTPError(404, '회사를 찾을 수 없습니다', 'COMPANY_001')
 
-  const [{ deactivatedAdmins }] = await db
-    .update(adminUsers)
-    .set({ isActive: false })
-    .where(and(eq(adminUsers.companyId, id), eq(adminUsers.isActive, true)))
-    .returning({ deactivatedAdmins: count() })
-    .then((rows) => rows.length ? rows : [{ deactivatedAdmins: 0 }])
-
-  const [company] = await db
-    .update(companies)
-    .set({ isActive: false, updatedAt: new Date() })
-    .where(eq(companies.id, id))
-    .returning()
-  if (!company) throw new HTTPError(404, '회사를 찾을 수 없습니다', 'COMPANY_001')
-
-  return c.json({
-    data: {
-      message: '비활성화되었습니다',
-      deactivatedUsers: Number(deactivatedUsers),
-      deactivatedAgents: Number(deactivatedAgents),
-      deactivatedAdmins: Number(deactivatedAdmins),
-    },
+    return { deactivatedUsers: Number(userResult), deactivatedAgents: Number(agentResult), deactivatedAdmins: Number(adminResult) }
   })
+
+  return c.json({ data: { message: '비활성화되었습니다', ...result } })
 })
 
 // PUT /api/admin/companies/:id/smtp — SMTP 설정 저장
