@@ -1,0 +1,35 @@
+# CodeRabbit AI Code Review Configuration
+# Docs: https://docs.coderabbit.ai/getting-started/yaml-configuration
+language: ko-KR
+
+reviews:
+  auto_review:
+    enabled: true
+    drafts: false
+  path_instructions:
+    - path: "packages/server/src/routes/**/*.ts"
+      instructions: |
+        Check that every admin route file uses tenantMiddleware.
+        Verify companyId is always from c.get('tenant').companyId, never from raw query params.
+        Ensure all endpoints return { success, data } or { success, error: { code, message } }.
+    - path: "packages/server/src/engine/**/*.ts"
+      instructions: |
+        Only agent-loop.ts and types.ts are public API.
+        No other file should be imported outside engine/.
+    - path: "packages/admin/src/pages/**/*.tsx"
+      instructions: |
+        Colors must be imported from '../lib/colors.ts', not hardcoded.
+        Icons must use Lucide React, not Material Symbols.
+    - path: "packages/app/src/pages/**/*.tsx"
+      instructions: |
+        Colors must be imported from shared constants, not hardcoded.
+        Icons must use Lucide React.
+  path_filters:
+    - "!_bmad/**"
+    - "!_bmad-output/**"
+    - "!_qa-e2e/**"
+    - "!review-report/**"
+    - "!.claude/**"
+
+chat:
+  auto_reply: true
