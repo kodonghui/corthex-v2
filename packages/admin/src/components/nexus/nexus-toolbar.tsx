@@ -77,7 +77,7 @@ export const NexusToolbar = memo(function NexusToolbar({
         onClick={onToggleEditMode}
         className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
           isEditMode
-            ? 'bg-blue-600 text-white hover:bg-blue-500'
+            ? 'bg-[#5a7247] text-white hover:bg-[#3a5a1c]'
             : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
         }`}
         title={isEditMode ? '보기 모드로 전환' : '편집 모드로 전환'}
