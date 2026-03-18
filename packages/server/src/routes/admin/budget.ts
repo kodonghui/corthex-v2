@@ -5,16 +5,17 @@ import { eq } from 'drizzle-orm'
 import { db } from '../../db'
 import { companies } from '../../db/schema'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
+import { tenantMiddleware } from '../../middleware/tenant'
 import { clearBudgetCache, loadBudgetConfig } from '../../services/budget-guard'
 import type { AppEnv } from '../../types'
 
 export const budgetRoute = new Hono<AppEnv>()
 
-budgetRoute.use('*', authMiddleware, adminOnly)
+budgetRoute.use('*', authMiddleware, adminOnly, tenantMiddleware)
 
 // GET /api/admin/budget — current budget settings
 budgetRoute.get('/budget', async (c) => {
-  const companyId = c.req.query('companyId') || c.get('tenant').companyId
+  const companyId = c.get('tenant').companyId
   const config = await loadBudgetConfig(companyId)
 
   return c.json({
@@ -32,7 +33,7 @@ const budgetUpdateSchema = z.object({
 })
 
 budgetRoute.put('/budget', zValidator('json', budgetUpdateSchema), async (c) => {
-  const companyId = c.req.query('companyId') || c.get('tenant').companyId
+  const companyId = c.get('tenant').companyId
   const body = c.req.valid('json')
 
   // Load existing settings to merge

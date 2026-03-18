@@ -67,18 +67,7 @@ type Execution = {
 
 type Tab = 'list' | 'suggestions'
 
-// === Natural Organic Colors ===
-
-const olive = '#5a7247'
-const oliveBg = 'rgba(90,114,71,0.1)'
-const oliveActive = '#4a5d23'
-const terracotta = '#c4622d'
-const cream = '#faf8f5'
-const sand = '#e5e1d3'
-const warmBrown = '#463e30'
-const muted = '#9c8d66'
-const lightMuted = '#b7aa88'
-const leafLight = '#c5d8a4'
+import { olive, oliveBg, oliveActive, terracotta, cream, sand, warmBrown, muted, lightMuted, leafLight } from '../lib/colors'
 
 // === Helpers ===
 

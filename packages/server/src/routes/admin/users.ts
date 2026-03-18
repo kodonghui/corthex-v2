@@ -5,13 +5,14 @@ import { eq, and } from 'drizzle-orm'
 import { db } from '../../db'
 import { users, sessions } from '../../db/schema'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
+import { tenantMiddleware } from '../../middleware/tenant'
 import { HTTPError } from '../../middleware/error'
 import { logActivity } from '../../lib/activity-logger'
 import type { AppEnv } from '../../types'
 
 export const usersRoute = new Hono<AppEnv>()
 
-usersRoute.use('*', authMiddleware, adminOnly)
+usersRoute.use('*', authMiddleware, adminOnly, tenantMiddleware)
 
 const createUserSchema = z.object({
   companyId: z.string().uuid(),
@@ -30,10 +31,11 @@ const updateUserSchema = z.object({
   password: z.string().min(6).optional(),
 })
 
-// GET /api/admin/users?companyId=xxx — 직원 목록 (회사별)
+// GET /api/admin/users — 직원 목록 (회사별)
 usersRoute.get('/users', async (c) => {
-  const companyId = c.req.query('companyId')
-  const query = db
+  const companyId = c.get('tenant').companyId
+
+  const result = await db
     .select({
       id: users.id,
       companyId: users.companyId,
@@ -45,10 +47,7 @@ usersRoute.get('/users', async (c) => {
       createdAt: users.createdAt,
     })
     .from(users)
-
-  const result = companyId
-    ? await query.where(eq(users.companyId, companyId))
-    : await query
+    .where(eq(users.companyId, companyId))
 
   return c.json({ data: result })
 })

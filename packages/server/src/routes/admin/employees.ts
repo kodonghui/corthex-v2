@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
+import { tenantMiddleware } from '../../middleware/tenant'
 import { HTTPError } from '../../middleware/error'
 import type { AppEnv } from '../../types'
 import {
@@ -16,7 +17,7 @@ import {
 
 export const employeesRoute = new Hono<AppEnv>()
 
-employeesRoute.use('*', authMiddleware, adminOnly)
+employeesRoute.use('*', authMiddleware, adminOnly, tenantMiddleware)
 
 // === Zod Schemas ===
 
@@ -33,18 +34,13 @@ const updateEmployeeSchema = z.object({
   departmentIds: z.array(z.string().uuid()).optional(),
 })
 
-// Helper to resolve companyId based on role
-function resolveCompanyId(tenant: { role: string; companyId: string }, queryCompanyId?: string): string {
-  return tenant.role === 'super_admin' && queryCompanyId ? queryCompanyId : tenant.companyId
-}
-
 // === Routes ===
 
 // POST /api/admin/employees — 직원 초대 (생성)
 employeesRoute.post('/employees', zValidator('json', createEmployeeSchema), async (c) => {
   const tenant = c.get('tenant')
   const input = c.req.valid('json')
-  const companyId = resolveCompanyId(tenant, c.req.query('companyId') ?? undefined)
+  const companyId = tenant.companyId
 
   const result = await createEmployee(companyId, input, tenant.userId)
 
@@ -58,7 +54,7 @@ employeesRoute.post('/employees', zValidator('json', createEmployeeSchema), asyn
 // GET /api/admin/employees — 직원 목록
 employeesRoute.get('/employees', async (c) => {
   const tenant = c.get('tenant')
-  const companyId = resolveCompanyId(tenant, c.req.query('companyId') ?? undefined)
+  const companyId = tenant.companyId
 
   const page = c.req.query('page') ? parseInt(c.req.query('page')!, 10) : undefined
   const limit = c.req.query('limit') ? parseInt(c.req.query('limit')!, 10) : undefined
@@ -76,7 +72,7 @@ employeesRoute.get('/employees', async (c) => {
 employeesRoute.get('/employees/:id', async (c) => {
   const tenant = c.get('tenant')
   const id = c.req.param('id')
-  const companyId = resolveCompanyId(tenant, c.req.query('companyId') ?? undefined)
+  const companyId = tenant.companyId
 
   const employee = await getEmployeeDetail(id, companyId)
 
@@ -92,7 +88,7 @@ employeesRoute.put('/employees/:id', zValidator('json', updateEmployeeSchema), a
   const tenant = c.get('tenant')
   const id = c.req.param('id')
   const input = c.req.valid('json')
-  const companyId = resolveCompanyId(tenant, c.req.query('companyId') ?? undefined)
+  const companyId = tenant.companyId
 
   const result = await updateEmployee(id, companyId, input, tenant.userId)
 
@@ -111,7 +107,7 @@ employeesRoute.put('/employees/:id', zValidator('json', updateEmployeeSchema), a
 employeesRoute.delete('/employees/:id', async (c) => {
   const tenant = c.get('tenant')
   const id = c.req.param('id')
-  const companyId = resolveCompanyId(tenant, c.req.query('companyId') ?? undefined)
+  const companyId = tenant.companyId
 
   const result = await deactivateEmployee(id, companyId, tenant.userId)
 
@@ -127,7 +123,7 @@ employeesRoute.delete('/employees/:id', async (c) => {
 employeesRoute.post('/employees/:id/reactivate', async (c) => {
   const tenant = c.get('tenant')
   const id = c.req.param('id')
-  const companyId = resolveCompanyId(tenant, c.req.query('companyId') ?? undefined)
+  const companyId = tenant.companyId
 
   const result = await reactivateEmployee(id, companyId, tenant.userId)
 
@@ -143,7 +139,7 @@ employeesRoute.post('/employees/:id/reactivate', async (c) => {
 employeesRoute.post('/employees/:id/reset-password', async (c) => {
   const tenant = c.get('tenant')
   const id = c.req.param('id')
-  const companyId = resolveCompanyId(tenant, c.req.query('companyId') ?? undefined)
+  const companyId = tenant.companyId
 
   const result = await resetEmployeePassword(id, companyId, tenant.userId)
 

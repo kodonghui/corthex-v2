@@ -17,6 +17,7 @@ import { useAdminStore } from '../stores/admin-store'
 import { useToastStore } from '../stores/toast-store'
 import { ConfirmDialog, EmptyState, SkeletonTable } from '@corthex/ui'
 import { UserPlus, Search, Pencil, Ban, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react'
+import { olive, oliveBg, cream } from '../lib/colors'
 
 type User = {
   id: string; companyId: string; name: string; username: string
@@ -24,11 +25,6 @@ type User = {
 }
 type Department = { id: string; name: string }
 type Agent = { id: string; name: string; departmentId: string | null; userId: string }
-
-/* Natural Organic colors */
-const olive = '#5a7247'
-const oliveBg = 'rgba(90,114,71,0.1)'
-const cream = '#faf8f5'
 
 export function UsersPage() {
   const qc = useQueryClient()

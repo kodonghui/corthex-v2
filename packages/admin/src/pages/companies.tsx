@@ -14,21 +14,12 @@ import { api } from '../lib/api'
 import { useToastStore } from '../stores/toast-store'
 import { ConfirmDialog, SkeletonCard } from '@corthex/ui'
 import { Plus, Search, Users, Bot, Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { olive, oliveBg, terracotta, cream, sand, warmBrown, muted, lightMuted } from '../lib/colors'
 
 type Company = {
   id: string; name: string; slug: string; isActive: boolean; createdAt: string
 }
 type CompanyStats = Record<string, { userCount: number; agentCount: number }>
-
-/* Natural Organic colors */
-const olive = '#5a7247'
-const oliveBg = 'rgba(90,114,71,0.1)'
-const terracotta = '#c4622d'
-const cream = '#faf8f5'
-const sand = '#e5e1d3'
-const warmBrown = '#463e30'
-const muted = '#9c8d66'
-const lightMuted = '#b7aa88'
 
 export function CompaniesPage() {
   const qc = useQueryClient()

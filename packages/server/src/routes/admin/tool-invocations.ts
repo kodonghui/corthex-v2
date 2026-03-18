@@ -3,13 +3,14 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { queryToolInvocations, getToolInvocationStats } from '../../services/tool-invocation-log'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
+import { tenantMiddleware } from '../../middleware/tenant'
+import type { AppEnv } from '../../types'
 
-export const toolInvocationsRoute = new Hono()
+export const toolInvocationsRoute = new Hono<AppEnv>()
 
-toolInvocationsRoute.use('*', authMiddleware, adminOnly)
+toolInvocationsRoute.use('*', authMiddleware, adminOnly, tenantMiddleware)
 
 const querySchema = z.object({
-  companyId: z.string().uuid(),
   agentId: z.string().uuid().optional(),
   toolName: z.string().optional(),
   status: z.enum(['success', 'error', 'timeout']).optional(),
@@ -22,9 +23,10 @@ const querySchema = z.object({
 // GET /api/admin/tool-invocations?companyId=xxx&agentId=xxx&toolName=xxx&page=1
 toolInvocationsRoute.get('/tool-invocations', zValidator('query', querySchema), async (c) => {
   const query = c.req.valid('query')
+  const companyId = c.get('tenant').companyId
 
   const result = await queryToolInvocations({
-    companyId: query.companyId,
+    companyId,
     agentId: query.agentId,
     toolName: query.toolName,
     status: query.status,
@@ -38,7 +40,6 @@ toolInvocationsRoute.get('/tool-invocations', zValidator('query', querySchema), 
 })
 
 const statsQuerySchema = z.object({
-  companyId: z.string().uuid(),
   startDate: z.string().datetime().optional(),
   endDate: z.string().datetime().optional(),
 })
@@ -46,9 +47,10 @@ const statsQuerySchema = z.object({
 // GET /api/admin/tool-invocations/stats?companyId=xxx
 toolInvocationsRoute.get('/tool-invocations/stats', zValidator('query', statsQuerySchema), async (c) => {
   const query = c.req.valid('query')
+  const companyId = c.get('tenant').companyId
 
   const stats = await getToolInvocationStats(
-    query.companyId,
+    companyId,
     query.startDate ? new Date(query.startDate) : undefined,
     query.endDate ? new Date(query.endDate) : undefined,
   )

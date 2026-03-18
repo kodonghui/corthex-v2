@@ -3,17 +3,17 @@ import { eq, and, sql } from 'drizzle-orm'
 import { db } from '../../db'
 import { companies, departments, agents, users, employeeDepartments, cliCredentials } from '../../db/schema'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
+import { tenantMiddleware } from '../../middleware/tenant'
 import { HTTPError } from '../../middleware/error'
 import type { AppEnv } from '../../types'
 
 export const orgChartRoute = new Hono<AppEnv>()
 
-orgChartRoute.use('*', authMiddleware, adminOnly)
+orgChartRoute.use('*', authMiddleware, adminOnly, tenantMiddleware)
 
-// GET /org-chart?companyId=xxx
+// GET /org-chart
 orgChartRoute.get('/org-chart', async (c) => {
-  const companyId = c.req.query('companyId')
-  if (!companyId) throw new HTTPError(400, 'companyId가 필요합니다', 'ORG_001')
+  const companyId = c.get('tenant').companyId
 
   const [company] = await db
     .select({ id: companies.id, name: companies.name, slug: companies.slug })

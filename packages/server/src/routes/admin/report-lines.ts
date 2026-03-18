@@ -5,12 +5,13 @@ import { eq } from 'drizzle-orm'
 import { db } from '../../db'
 import { reportLines } from '../../db/schema'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
+import { tenantMiddleware } from '../../middleware/tenant'
 import { HTTPError } from '../../middleware/error'
 import type { AppEnv } from '../../types'
 
 export const reportLinesRoute = new Hono<AppEnv>()
 
-reportLinesRoute.use('*', authMiddleware, adminOnly)
+reportLinesRoute.use('*', authMiddleware, adminOnly, tenantMiddleware)
 
 const bulkUpsertSchema = z.object({
   companyId: z.string().uuid(),
@@ -20,10 +21,9 @@ const bulkUpsertSchema = z.object({
   })),
 })
 
-// GET /api/admin/report-lines?companyId=xxx — 보고 라인 목록
+// GET /api/admin/report-lines — 보고 라인 목록
 reportLinesRoute.get('/report-lines', async (c) => {
-  const companyId = c.req.query('companyId')
-  if (!companyId) throw new HTTPError(400, 'companyId가 필요합니다', 'REPORT_LINE_001')
+  const companyId = c.get('tenant').companyId
 
   const result = await db
     .select()

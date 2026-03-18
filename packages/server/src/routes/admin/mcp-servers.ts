@@ -12,6 +12,7 @@ import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
+import { tenantMiddleware } from '../../middleware/tenant'
 import { getDB } from '../../db/scoped-query'
 import { McpManager } from '../../engine/mcp/mcp-manager'
 import { ToolError } from '../../lib/tool-error'
@@ -19,7 +20,7 @@ import type { AppEnv } from '../../types'
 
 export const adminMcpServersRoute = new Hono<AppEnv>()
 
-adminMcpServersRoute.use('*', authMiddleware, adminOnly)
+adminMcpServersRoute.use('*', authMiddleware, adminOnly, tenantMiddleware)
 
 // ─── Schemas ─────────────────────────────────────────────────────────────────
 

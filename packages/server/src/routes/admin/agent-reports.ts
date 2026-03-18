@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
+import { tenantMiddleware } from '../../middleware/tenant'
 import { HTTPError } from '../../middleware/error'
 import { getDB } from '../../db/scoped-query'
 import { mdToPdf } from '../../lib/tool-handlers/builtins/md-to-pdf'
@@ -11,7 +12,7 @@ import type { AppEnv } from '../../types'
 
 export const adminAgentReportsRoute = new Hono<AppEnv>()
 
-adminAgentReportsRoute.use('*', authMiddleware, adminOnly)
+adminAgentReportsRoute.use('*', authMiddleware, adminOnly, tenantMiddleware)
 
 // GET /api/admin/agent-reports — list all agent reports (sorted by createdAt DESC)
 // Supports optional ?type= filter

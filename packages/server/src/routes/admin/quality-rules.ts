@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
+import { tenantMiddleware } from '../../middleware/tenant'
 import {
   getRulesGroupedByCategory,
   getAllRules,
@@ -16,7 +17,7 @@ import type { AppEnv } from '../../types'
 
 export const qualityRulesRoute = new Hono<AppEnv>()
 
-qualityRulesRoute.use('*', authMiddleware, adminOnly)
+qualityRulesRoute.use('*', authMiddleware, adminOnly, tenantMiddleware)
 
 // GET /api/admin/quality-rules — full rules list grouped by category
 qualityRulesRoute.get('/quality-rules', async (c) => {

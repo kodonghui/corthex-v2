@@ -17,6 +17,7 @@ import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
 import { useToastStore } from '../stores/toast-store'
 import { ConfirmDialog, EmptyState, SkeletonTable } from '@corthex/ui'
+import { olive, oliveBg, cream } from '../lib/colors'
 
 type Department = { id: string; name: string }
 type Employee = {
@@ -41,11 +42,6 @@ type CreateResponse = {
 type ResetPasswordResponse = {
   data: { newPassword: string }
 }
-
-/* Natural Organic colors */
-const olive = '#5a7247'
-const oliveBg = 'rgba(90,114,71,0.1)'
-const cream = '#faf8f5'
 
 export function EmployeesPage() {
   const qc = useQueryClient()

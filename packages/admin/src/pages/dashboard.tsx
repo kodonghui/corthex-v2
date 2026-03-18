@@ -10,17 +10,11 @@ import { useQuery } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
 import { CheckCircle, MoreVertical } from 'lucide-react'
+import { olive, oliveBg, cream, sand, warmBrown } from '../lib/colors'
 
 type User = { id: string; name: string; username: string; role: string; isActive: boolean }
 type Agent = { id: string; name: string; role: string; status: string; isActive: boolean }
 type Department = { id: string; name: string }
-
-/* Natural Organic colors */
-const olive = '#5a7247'
-const oliveBg = 'rgba(90,114,71,0.1)'
-const cream = '#faf8f5'
-const sand = '#e5e1d3'
-const warmBrown = '#463e30'
 
 export function DashboardPage() {
   const selectedCompanyId = useAdminStore((s) => s.selectedCompanyId)

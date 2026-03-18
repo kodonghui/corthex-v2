@@ -3,13 +3,14 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { queryAuditLogs } from '../../services/audit-log'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
+import { tenantMiddleware } from '../../middleware/tenant'
+import type { AppEnv } from '../../types'
 
-export const auditLogsRoute = new Hono()
+export const auditLogsRoute = new Hono<AppEnv>()
 
-auditLogsRoute.use('*', authMiddleware, adminOnly)
+auditLogsRoute.use('*', authMiddleware, adminOnly, tenantMiddleware)
 
 const querySchema = z.object({
-  companyId: z.string().uuid(),
   action: z.string().optional(),
   targetType: z.string().optional(),
   targetId: z.string().uuid().optional(),
@@ -22,9 +23,10 @@ const querySchema = z.object({
 // GET /api/admin/audit-logs?companyId=xxx&action=org.department.create&page=1&limit=50
 auditLogsRoute.get('/audit-logs', zValidator('query', querySchema), async (c) => {
   const query = c.req.valid('query')
+  const companyId = c.get('tenant').companyId
 
   const result = await queryAuditLogs({
-    companyId: query.companyId,
+    companyId,
     action: query.action,
     targetType: query.targetType,
     targetId: query.targetId,

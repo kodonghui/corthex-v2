@@ -19,17 +19,7 @@ import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
 import { useToastStore } from '../stores/toast-store'
 import { Skeleton, ConfirmDialog } from '@corthex/ui'
-
-// === Natural Organic Colors ===
-
-const olive = '#5a7247'
-const oliveBg = 'rgba(90,114,71,0.1)'
-const terracotta = '#c4622d'
-const cream = '#faf8f5'
-const sand = '#e5e1d3'
-const warmBrown = '#463e30'
-const muted = '#9c8d66'
-const lightMuted = '#b7aa88'
+import { olive, oliveBg, terracotta, cream, sand, warmBrown, muted, lightMuted } from '../lib/colors'
 
 // === Types ===
 

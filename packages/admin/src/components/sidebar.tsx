@@ -64,7 +64,7 @@ function SwitchToCeoButton({ companyId }: { companyId: string | null }) {
     <button
       onClick={handleSwitch}
       disabled={!companyId || switching}
-      className="flex items-center gap-2 w-full px-3 py-2 text-xs font-medium rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-[#556B2F] dark:text-[#A3B18A] bg-[#556B2F]/10 dark:bg-[#556B2F]/20 hover:bg-[#556B2F]/20 dark:hover:bg-[#556B2F]/30"
+      className="flex items-center gap-2 w-full px-3 py-2 text-xs font-medium rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-[#a3c48a] bg-[#5a7247]/20 hover:bg-[#5a7247]/30"
     >
       <ArrowLeftRight className="w-4 h-4" />
       <span>{switching ? '전환 중...' : 'CEO 앱으로 전환'}</span>

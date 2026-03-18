@@ -8,13 +8,14 @@ import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
+import { tenantMiddleware } from '../../middleware/tenant'
 import { getPromptGuardSettings, savePromptGuardSettings } from '../../services/prompt-guard-settings'
 import { createAuditLog, AUDIT_ACTIONS } from '../../services/audit-log'
 import type { AppEnv } from '../../types'
 
 export const securityRoute = new Hono<AppEnv>()
 
-securityRoute.use('*', authMiddleware, adminOnly)
+securityRoute.use('*', authMiddleware, adminOnly, tenantMiddleware)
 
 // GET /api/admin/security/prompt-guard
 securityRoute.get('/security/prompt-guard', async (c) => {

@@ -37,7 +37,7 @@ export function Layout() {
   }, [company, isOnboardingPage, navigate])
 
   return (
-    <div className="flex h-screen bg-[#faf8f5] dark:bg-zinc-950">
+    <div className="flex h-screen bg-[#faf8f5]">
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
         <div className="p-6">

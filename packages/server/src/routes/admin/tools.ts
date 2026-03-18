@@ -5,6 +5,7 @@ import { eq, and, or, isNull } from 'drizzle-orm'
 import { db } from '../../db'
 import { toolDefinitions, agentTools, agents } from '../../db/schema'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
+import { tenantMiddleware } from '../../middleware/tenant'
 import { HTTPError } from '../../middleware/error'
 import { registry } from '../../lib/tool-handlers'
 import { createAuditLog } from '../../services/audit-log'
@@ -13,7 +14,7 @@ import type { AppEnv } from '../../types'
 
 export const toolsRoute = new Hono<AppEnv>()
 
-toolsRoute.use('*', authMiddleware, adminOnly)
+toolsRoute.use('*', authMiddleware, adminOnly, tenantMiddleware)
 
 // === Tools ===
 

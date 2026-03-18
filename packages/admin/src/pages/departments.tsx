@@ -49,12 +49,7 @@ function formatCost(usdMicro: number): string {
   return `$${(usdMicro / 1_000_000).toFixed(2)}`
 }
 
-/* Natural Organic colors */
-const olive = '#5a7247'
-const oliveDark = '#4a5e3a'
-const oliveBg = 'rgba(90,114,71,0.1)'
-const oliveLight = '#e8ede4'
-const cream = '#faf8f5'
+import { olive, oliveDark, oliveBg, oliveLight, cream } from '../lib/colors'
 
 export function DepartmentsPage() {
   const qc = useQueryClient()
