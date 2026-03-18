@@ -2,16 +2,16 @@
  * Admin Workflows Page — Natural Organic Theme
  *
  * API Endpoints:
- *   GET    /admin/workflows?companyId={id}&page=&limit=
- *   GET    /admin/workflows/:id
- *   POST   /admin/workflows { name, description?, steps, companyId }
- *   PATCH  /admin/workflows/:id { name?, description?, steps? }
- *   DELETE /admin/workflows/:id
- *   POST   /admin/workflows/:id/execute
- *   GET    /admin/workflows/:id/executions?page=
- *   GET    /admin/workflow-suggestions?companyId={id}
- *   POST   /admin/workflow-suggestions/:id/accept
- *   POST   /admin/workflow-suggestions/:id/reject
+ *   GET    /workspace/workflows?companyId={id}&page=&limit=
+ *   GET    /workspace/workflows/:id
+ *   POST   /workspace/workflows { name, description?, steps, companyId }
+ *   PUT    /workspace/workflows/:id { name?, description?, steps? }
+ *   DELETE /workspace/workflows/:id
+ *   POST   /workspace/workflows/:id/execute
+ *   GET    /workspace/workflows/:id/executions?page=
+ *   GET    /workspace/workflows/suggestions?companyId={id}
+ *   POST   /workspace/workflows/suggestions/:id/accept
+ *   POST   /workspace/workflows/suggestions/:id/reject
  */
 import { useState, useMemo, useCallback } from 'react'
 import { Network, ArrowLeft, GitBranch, Lightbulb, Settings } from 'lucide-react'
@@ -402,32 +402,32 @@ export function WorkflowsPage() {
   // --- Queries ---
   const { data: workflowsData, isLoading } = useQuery({
     queryKey: ['admin-workflows', selectedCompanyId],
-    queryFn: () => api.get<{ data: Workflow[] }>(`/admin/workflows?companyId=${selectedCompanyId}&page=1&limit=100`),
+    queryFn: () => api.get<{ data: Workflow[] }>(`/workspace/workflows?companyId=${selectedCompanyId}&page=1&limit=100`),
     enabled: !!selectedCompanyId,
   })
 
   const { data: detailData, isLoading: detailLoading } = useQuery({
     queryKey: ['admin-workflow-detail', selectedId],
-    queryFn: () => api.get<{ data: Workflow }>(`/admin/workflows/${selectedId}`),
+    queryFn: () => api.get<{ data: Workflow }>(`/workspace/workflows/${selectedId}`),
     enabled: !!selectedId,
   })
 
   const { data: executionsData } = useQuery({
     queryKey: ['admin-workflow-executions', selectedId, executionsPage],
-    queryFn: () => api.get<{ data: Execution[]; meta?: { total: number } }>(`/admin/workflows/${selectedId}/executions?page=${executionsPage}`),
+    queryFn: () => api.get<{ data: Execution[]; meta?: { total: number } }>(`/workspace/workflows/${selectedId}/executions?page=${executionsPage}`),
     enabled: !!selectedId,
   })
 
   const { data: suggestionsData, isLoading: suggestionsLoading } = useQuery({
     queryKey: ['admin-workflow-suggestions', selectedCompanyId],
-    queryFn: () => api.get<{ data: Suggestion[] }>(`/admin/workflow-suggestions?companyId=${selectedCompanyId}`),
+    queryFn: () => api.get<{ data: Suggestion[] }>(`/workspace/workflows/suggestions?companyId=${selectedCompanyId}`),
     enabled: !!selectedCompanyId,
   })
 
   // --- Mutations ---
   const createMutation = useMutation({
     mutationFn: (body: { name: string; description?: string; steps: WorkflowStep[] }) =>
-      api.post('/admin/workflows', { ...body, companyId: selectedCompanyId }),
+      api.post('/workspace/workflows', { ...body, companyId: selectedCompanyId }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin-workflows'] })
       setShowCreate(false)
@@ -439,7 +439,7 @@ export function WorkflowsPage() {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, ...body }: { id: string; name?: string; description?: string; steps?: WorkflowStep[] }) =>
-      api.patch(`/admin/workflows/${id}`, body),
+      api.put(`/workspace/workflows/${id}`, body),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin-workflows'] })
       qc.invalidateQueries({ queryKey: ['admin-workflow-detail'] })
@@ -451,7 +451,7 @@ export function WorkflowsPage() {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => api.delete(`/admin/workflows/${id}`),
+    mutationFn: (id: string) => api.delete(`/workspace/workflows/${id}`),
     onSuccess: (_data, id) => {
       qc.invalidateQueries({ queryKey: ['admin-workflows'] })
       setDeleteTarget(null)
@@ -462,7 +462,7 @@ export function WorkflowsPage() {
   })
 
   const executeMutation = useMutation({
-    mutationFn: (id: string) => api.post(`/admin/workflows/${id}/execute`, {}),
+    mutationFn: (id: string) => api.post(`/workspace/workflows/${id}/execute`, {}),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin-workflow-executions'] })
       addToast({ type: 'success', message: 'Workflow executed' })
@@ -471,7 +471,7 @@ export function WorkflowsPage() {
   })
 
   const acceptSuggestion = useMutation({
-    mutationFn: (id: string) => api.post(`/admin/workflow-suggestions/${id}/accept`, {}),
+    mutationFn: (id: string) => api.post(`/workspace/workflows/suggestions/${id}/accept`, {}),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin-workflow-suggestions'] })
       qc.invalidateQueries({ queryKey: ['admin-workflows'] })
@@ -481,7 +481,7 @@ export function WorkflowsPage() {
   })
 
   const rejectSuggestion = useMutation({
-    mutationFn: (id: string) => api.post(`/admin/workflow-suggestions/${id}/reject`, {}),
+    mutationFn: (id: string) => api.post(`/workspace/workflows/suggestions/${id}/reject`, {}),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin-workflow-suggestions'] })
       addToast({ type: 'success', message: 'Suggestion rejected' })

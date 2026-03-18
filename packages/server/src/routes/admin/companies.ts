@@ -3,7 +3,7 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { eq, and, count } from 'drizzle-orm'
 import { db } from '../../db'
-import { companies, users, agents } from '../../db/schema'
+import { companies, users, agents, adminUsers } from '../../db/schema'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import type { AppEnv } from '../../types'
@@ -111,6 +111,13 @@ companiesRoute.delete('/companies/:id', async (c) => {
     .returning({ deactivatedAgents: count() })
     .then((rows) => rows.length ? rows : [{ deactivatedAgents: 0 }])
 
+  const [{ deactivatedAdmins }] = await db
+    .update(adminUsers)
+    .set({ isActive: false })
+    .where(and(eq(adminUsers.companyId, id), eq(adminUsers.isActive, true)))
+    .returning({ deactivatedAdmins: count() })
+    .then((rows) => rows.length ? rows : [{ deactivatedAdmins: 0 }])
+
   const [company] = await db
     .update(companies)
     .set({ isActive: false, updatedAt: new Date() })
@@ -123,6 +130,7 @@ companiesRoute.delete('/companies/:id', async (c) => {
       message: '비활성화되었습니다',
       deactivatedUsers: Number(deactivatedUsers),
       deactivatedAgents: Number(deactivatedAgents),
+      deactivatedAdmins: Number(deactivatedAdmins),
     },
   })
 })

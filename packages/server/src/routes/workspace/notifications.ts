@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { eq, and, desc, count } from 'drizzle-orm'
+import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { db } from '../../db'
 import { notifications, companies, notificationPreferences } from '../../db/schema'
@@ -126,14 +127,9 @@ notificationsRoute.get('/notification-prefs', async (c) => {
 })
 
 // PUT /api/workspace/notification-prefs — 알림 설정 업데이트 (upsert)
-notificationsRoute.put('/notification-prefs', async (c) => {
+notificationsRoute.put('/notification-prefs', zValidator('json', notificationPrefsSchema), async (c) => {
   const tenant = c.get('tenant')
-  const raw = await c.req.json()
-  const parsed = notificationPrefsSchema.safeParse(raw)
-  if (!parsed.success) {
-    return c.json({ error: 'Invalid request body' }, 400)
-  }
-  const body = parsed.data
+  const body = c.req.valid('json')
 
   const values: Record<string, unknown> = { updatedAt: new Date() }
   if (body.inApp !== undefined) values.inApp = body.inApp

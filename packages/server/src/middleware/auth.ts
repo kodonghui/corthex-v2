@@ -4,6 +4,9 @@ import type { TenantContext, UserRole } from '@corthex/shared'
 import { isAdminLevel } from '@corthex/shared'
 import type { AppEnv } from '../types'
 import { HTTPError } from './error'
+import { db } from '../db'
+import { users, companies, adminUsers } from '../db/schema'
+import { eq } from 'drizzle-orm'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'corthex-v2-dev-secret-change-in-production'
 
@@ -33,6 +36,28 @@ export const authMiddleware: MiddlewareHandler<AppEnv> = async (c, next) => {
   const token = authHeader.slice(7)
   try {
     const payload = await verify(token, JWT_SECRET, 'HS256') as JwtPayload
+    
+    // DB에서 활성 상태 확인
+    if (payload.type === 'admin') {
+      const [admin] = await db.select({ isActive: adminUsers.isActive }).from(adminUsers).where(eq(adminUsers.id, payload.sub)).limit(1)
+      if (!admin || !admin.isActive) {
+        throw new HTTPError(401, '계정이 비활성화되었습니다', 'AUTH_005')
+      }
+    } else {
+      const [record] = await db
+        .select({ userActive: users.isActive, companyActive: companies.isActive })
+        .from(users)
+        .innerJoin(companies, eq(users.companyId, companies.id))
+        .where(eq(users.id, payload.sub))
+        .limit(1)
+      if (!record || !record.userActive) {
+        throw new HTTPError(401, '계정이 비활성화되었습니다', 'AUTH_005')
+      }
+      if (!record.companyActive) {
+        throw new HTTPError(401, '팀(작업 공간)이 비활성화되었습니다', 'AUTH_006')
+      }
+    }
+
     const tenant: TenantContext = {
       companyId: payload.companyId,
       userId: payload.sub,
