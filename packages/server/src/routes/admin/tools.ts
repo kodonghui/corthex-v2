@@ -65,6 +65,7 @@ toolsRoute.get('/tools/catalog', async (c) => {
 
   // Build catalog grouped by category
   const categoryMap = new Map<string, Array<{
+    id: string
     name: string
     description: string | null
     category: string
@@ -76,6 +77,7 @@ toolsRoute.get('/tools/catalog', async (c) => {
     const cat = tool.category || 'common'
     if (!categoryMap.has(cat)) categoryMap.set(cat, [])
     categoryMap.get(cat)!.push({
+      id: tool.id,
       name: tool.handler || tool.name,
       description: tool.description,
       category: cat,
@@ -157,6 +159,23 @@ toolsRoute.put('/tools/:id', zValidator('json', updateToolSchema), async (c) => 
       handlerRegistered: updated.handler ? !!registry.get(updated.handler) : false,
     },
   })
+})
+
+// DELETE /api/admin/tools/:id
+toolsRoute.delete('/tools/:id', async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+
+  const companyFilter = and(
+    eq(toolDefinitions.id, id),
+    or(isNull(toolDefinitions.companyId), eq(toolDefinitions.companyId, tenant.companyId)),
+  )
+  const [existing] = await db.select({ id: toolDefinitions.id }).from(toolDefinitions).where(companyFilter).limit(1)
+  if (!existing) throw new HTTPError(404, '도구를 찾을 수 없습니다', 'TOOL_003')
+
+  await db.delete(toolDefinitions).where(companyFilter)
+
+  return c.json({ success: true, data: { message: '삭제되었습니다' } })
 })
 
 // === Agent Allowed Tools Management ===

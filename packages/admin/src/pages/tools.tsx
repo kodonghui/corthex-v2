@@ -13,7 +13,7 @@ import { useAdminStore } from '../stores/admin-store'
 import { useToastStore } from '../stores/toast-store'
 import { X } from 'lucide-react'
 
-type CatalogTool = { name: string; description: string | null; category: string; registered: boolean }
+type CatalogTool = { id: string; name: string; description: string | null; category: string; registered: boolean }
 type CatalogGroup = { category: string; tools: CatalogTool[] }
 type Agent = { id: string; name: string; tier: string; allowedTools: string[] | null }
 
@@ -42,6 +42,8 @@ export function ToolsPage() {
   const [saving, setSaving] = useState(false)
   const [showCreateDialog, setShowCreateDialog] = useState(false)
   const [newTool, setNewTool] = useState({ name: '', description: '', category: 'common' })
+  const [editingTool, setEditingTool] = useState<CatalogTool | null>(null)
+  const [deletingTool, setDeletingTool] = useState<CatalogTool | null>(null)
 
   // Fetch tool catalog
   const { data: catalogData, isLoading: catalogLoading } = useQuery({
@@ -151,6 +153,37 @@ export function ToolsPage() {
       addToast({ type: 'error', message: err.message })
     },
   })
+
+  const editMutation = useMutation({
+    mutationFn: (data: { id: string; name: string; description: string }) =>
+      api.put(`/admin/tools/${data.id}`, { name: data.name, description: data.description }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['tool-catalog'] })
+      setEditingTool(null)
+      addToast({ type: 'success', message: '도구가 수정되었습니다' })
+    },
+    onError: (err: Error) => {
+      addToast({ type: 'error', message: err.message })
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => api.delete(`/admin/tools/${id}`),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['tool-catalog'] })
+      setDeletingTool(null)
+      addToast({ type: 'success', message: '도구가 삭제되었습니다' })
+    },
+    onError: (err: Error) => {
+      addToast({ type: 'error', message: err.message })
+    },
+  })
+
+  const handleEditTool = (e: FormEvent) => {
+    e.preventDefault()
+    if (!editingTool) return
+    editMutation.mutate({ id: editingTool.id, name: editingTool.name, description: editingTool.description || '' })
+  }
 
   const handleCreateTool = (e: FormEvent) => {
     e.preventDefault()
@@ -310,10 +343,10 @@ export function ToolsPage() {
                             </td>
                             <td className="px-6 py-4 text-right">
                               <div className="flex justify-end gap-2">
-                                <button className="p-1.5 hover:bg-slate-200 rounded transition-colors text-slate-500">
+                                <button className="p-1.5 hover:bg-slate-200 rounded transition-colors text-slate-500" onClick={() => setEditingTool(tool)} data-testid={`edit-tool-${tool.name}`}>
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
                                 </button>
-                                <button className="p-1.5 hover:bg-red-50 rounded transition-colors text-slate-400 hover:text-red-500">
+                                <button className="p-1.5 hover:bg-red-50 rounded transition-colors text-slate-400 hover:text-red-500" onClick={() => setDeletingTool(tool)} data-testid={`delete-tool-${tool.name}`}>
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
                                 </button>
                               </div>
@@ -493,6 +526,74 @@ export function ToolsPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* Edit Tool Dialog */}
+      {editingTool && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setEditingTool(null)}>
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold" style={{ color: '#3f3e3a' }}>도구 수정</h3>
+              <button onClick={() => setEditingTool(null)} className="p-1 hover:bg-slate-100 rounded-lg transition-colors">
+                <X className="w-5 h-5 text-slate-400" />
+              </button>
+            </div>
+            <form onSubmit={handleEditTool} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: '#3f3e3a' }}>도구명</label>
+                <input
+                  type="text"
+                  value={editingTool.name}
+                  onChange={(e) => setEditingTool((prev) => prev ? { ...prev, name: e.target.value } : null)}
+                  className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:outline-none"
+                  style={{ borderColor: '#e5e7eb' }}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: '#3f3e3a' }}>설명</label>
+                <input
+                  type="text"
+                  value={editingTool.description || ''}
+                  onChange={(e) => setEditingTool((prev) => prev ? { ...prev, description: e.target.value } : null)}
+                  className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:outline-none"
+                  style={{ borderColor: '#e5e7eb' }}
+                />
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button type="button" onClick={() => setEditingTool(null)} className="px-4 py-2 text-sm font-medium rounded-lg hover:bg-slate-100 transition-colors" style={{ color: '#3f3e3a' }}>
+                  취소
+                </button>
+                <button type="submit" disabled={editMutation.isPending} className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50" style={{ backgroundColor: '#5a7247' }}>
+                  {editMutation.isPending ? '수정 중...' : '수정'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      {deletingTool && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setDeletingTool(null)}>
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 p-6" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-bold mb-2" style={{ color: '#3f3e3a' }}>도구 삭제</h3>
+            <p className="text-sm text-slate-500 mb-6">
+              <strong style={{ color: '#3f3e3a' }}>{deletingTool.name}</strong> 도구를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button onClick={() => setDeletingTool(null)} className="px-4 py-2 text-sm font-medium rounded-lg hover:bg-slate-100 transition-colors" style={{ color: '#3f3e3a' }}>
+                취소
+              </button>
+              <button
+                onClick={() => deleteMutation.mutate(deletingTool.id)}
+                disabled={deleteMutation.isPending}
+                className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 bg-red-500 hover:bg-red-600"
+              >
+                {deleteMutation.isPending ? '삭제 중...' : '삭제'}
+              </button>
+            </div>
           </div>
         </div>
       )}

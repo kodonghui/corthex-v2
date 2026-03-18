@@ -70,11 +70,14 @@ function ResponseTimeText({ ms }: { ms: number }) {
 }
 
 export function MonitoringPage() {
-  const { data, isLoading, isError, error, refetch, isFetching } = useQuery({
+  const { data: rawData, isLoading, isError, error, refetch, isFetching } = useQuery({
     queryKey: ['monitoring'],
     queryFn: () => api.get<MonitoringData>('/admin/monitoring/status'),
     refetchInterval: 30_000,
   })
+
+  // Defensive: ensure all nested objects exist to prevent crashes
+  const data = rawData && rawData.server ? rawData : undefined
 
   if (isError) {
     return (
