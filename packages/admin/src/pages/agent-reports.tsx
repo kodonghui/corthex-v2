@@ -22,7 +22,7 @@ type AgentReportDetail = AgentReport & {
 }
 
 const TYPE_COLORS: Record<string, string> = {
-  competitor_analysis: 'bg-blue-500/20 text-blue-400',
+  competitor_analysis: 'bg-[#5a7247]/20 text-[#a3c48a]',
   market_research: 'bg-emerald-500/20 text-emerald-400',
   ai_analysis: 'bg-purple-500/20 text-purple-400',
 }
@@ -78,7 +78,7 @@ export function AgentReportsPage() {
             placeholder="타입 필터 (예: competitor_analysis)"
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="w-full bg-slate-800 border border-slate-600 rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full bg-slate-800 border border-slate-600 rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#5a7247]"
           />
         </div>
 
@@ -158,7 +158,7 @@ export function AgentReportsPage() {
               </div>
               <button
                 onClick={() => handleDownloadPdf(detail.id)}
-                className="flex-shrink-0 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded transition-colors"
+                className="flex-shrink-0 px-3 py-1.5 bg-[#5a7247] hover:bg-[#6b8a55] text-white text-xs font-medium rounded transition-colors"
               >
                 PDF 다운로드
               </button>

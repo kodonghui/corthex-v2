@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware'
 
 type AdminState = {
   selectedCompanyId: string | null
-  setSelectedCompanyId: (id: string) => void
+  setSelectedCompanyId: (id: string | null) => void
 }
 
 export const useAdminStore = create<AdminState>()(

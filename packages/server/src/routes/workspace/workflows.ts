@@ -45,6 +45,7 @@ const UpdateWorkflowSchema = z.object({
 const ListQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
+  companyId: z.string().uuid().optional(),
 })
 
 // === Routes ===
@@ -91,9 +92,10 @@ workflowsRoute.get(
   zValidator('query', ListQuerySchema),
   async (c) => {
     const tenant = c.get('tenant')
-    const { page, limit } = c.req.valid('query')
+    const { page, limit, companyId } = c.req.valid('query')
+    const effectiveCompanyId = companyId || tenant.companyId
 
-    const result = await WorkflowService.list(tenant.companyId, { page, limit })
+    const result = await WorkflowService.list(effectiveCompanyId, { page, limit })
     return c.json({ success: true, data: result.data, meta: result.meta })
   }
 )
@@ -106,10 +108,11 @@ workflowsRoute.get(
   zValidator('query', ListQuerySchema),
   async (c) => {
     const tenant = c.get('tenant')
-    const { page, limit } = c.req.valid('query')
+    const { page, limit, companyId } = c.req.valid('query')
+    const effectiveCompanyId = companyId || tenant.companyId
 
     const result = await WorkflowSuggestionService.list(
-      tenant.companyId, tenant.userId, { page, limit }
+      effectiveCompanyId, tenant.userId, { page, limit }
     )
     return c.json({ success: true, data: result.data, meta: result.meta })
   }

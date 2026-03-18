@@ -121,7 +121,7 @@ export function ApiKeysPage() {
         </div>
         <button
           onClick={() => setShowCreate(true)}
-          className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors"
+          className="bg-[#5a7247] hover:bg-[#6b8a55] text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors"
         >
           + 새 API 키
         </button>
@@ -183,7 +183,7 @@ export function ApiKeysPage() {
                         <div className="flex gap-2">
                           <button
                             onClick={() => setRotateConfirmId(k.id)}
-                            className="text-xs text-blue-400 hover:text-blue-300 font-medium transition-colors"
+                            className="text-xs text-[#a3c48a] hover:text-[#b8d4a0] font-medium transition-colors"
                           >
                             로테이션
                           </button>
@@ -221,7 +221,7 @@ export function ApiKeysPage() {
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   placeholder="예: 대시보드 연동"
-                  className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 outline-none"
+                  className="w-full bg-slate-800 border border-slate-600 focus:border-[#5a7247] focus:ring-1 focus:ring-[#5a7247] rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 outline-none"
                 />
               </div>
               <div>
@@ -233,7 +233,7 @@ export function ApiKeysPage() {
                         type="checkbox"
                         checked={formScopes.includes(scope)}
                         onChange={() => toggleScope(scope)}
-                        className="rounded-sm border-slate-600 bg-slate-800 text-blue-500 focus:ring-blue-500 focus:ring-offset-0"
+                        className="rounded-sm border-slate-600 bg-slate-800 text-[#5a7247] focus:ring-[#5a7247] focus:ring-offset-0"
                       />
                       {scope}
                     </label>
@@ -246,7 +246,7 @@ export function ApiKeysPage() {
                   type="datetime-local"
                   value={formExpires}
                   onChange={(e) => setFormExpires(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm text-white outline-none [color-scheme:dark]"
+                  className="w-full bg-slate-800 border border-slate-600 focus:border-[#5a7247] focus:ring-1 focus:ring-[#5a7247] rounded-lg px-3 py-2 text-sm text-white outline-none [color-scheme:dark]"
                 />
               </div>
               <div>
@@ -257,7 +257,7 @@ export function ApiKeysPage() {
                   onChange={(e) => setFormRateLimit(Number(e.target.value))}
                   min={1}
                   max={10000}
-                  className="w-full bg-slate-800 border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-sm text-white outline-none"
+                  className="w-full bg-slate-800 border border-slate-600 focus:border-[#5a7247] focus:ring-1 focus:ring-[#5a7247] rounded-lg px-3 py-2 text-sm text-white outline-none"
                 />
               </div>
             </div>
@@ -268,7 +268,7 @@ export function ApiKeysPage() {
               <button
                 onClick={handleCreate}
                 disabled={!formName || formScopes.length === 0 || createMutation.isPending}
-                className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors"
+                className="bg-[#5a7247] hover:bg-[#6b8a55] disabled:opacity-50 text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors"
               >
                 {createMutation.isPending ? '생성 중...' : '생성'}
               </button>
@@ -299,7 +299,7 @@ export function ApiKeysPage() {
               </code>
               <button
                 onClick={handleCopy}
-                className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium rounded-lg px-3 py-1.5 transition-colors whitespace-nowrap"
+                className="bg-[#5a7247] hover:bg-[#6b8a55] text-white text-xs font-medium rounded-lg px-3 py-1.5 transition-colors whitespace-nowrap"
               >
                 {copied ? '복사됨!' : '복사'}
               </button>
@@ -351,7 +351,7 @@ export function ApiKeysPage() {
               <button
                 onClick={() => rotateMutation.mutate(rotateConfirmId)}
                 disabled={rotateMutation.isPending}
-                className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors"
+                className="bg-[#5a7247] hover:bg-[#6b8a55] disabled:opacity-50 text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors"
               >
                 {rotateMutation.isPending ? '로테이션 중...' : '로테이션'}
               </button>

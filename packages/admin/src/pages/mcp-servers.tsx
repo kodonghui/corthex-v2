@@ -203,7 +203,7 @@ export function McpServersPage() {
         </div>
         <button
           onClick={() => { setShowForm(true); setEditId(null); setForm(EMPTY_FORM) }}
-          className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded transition-colors"
+          className="px-3 py-1.5 bg-[#5a7247] hover:bg-[#6b8a55] text-white text-sm font-medium rounded transition-colors"
         >
           + MCP 서버 추가
         </button>
@@ -223,7 +223,7 @@ export function McpServersPage() {
                 value={form.displayName}
                 onChange={e => setForm(f => ({ ...f, displayName: e.target.value }))}
                 placeholder="notion"
-                className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#5a7247]"
               />
             </div>
 
@@ -232,7 +232,7 @@ export function McpServersPage() {
               <select
                 value={form.transport}
                 onChange={e => setForm(f => ({ ...f, transport: e.target.value }))}
-                className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[#5a7247]"
               >
                 <option value="stdio">stdio (Phase 1 — 권장)</option>
                 <option value="sse">sse (Phase 2 — 미지원)</option>
@@ -251,7 +251,7 @@ export function McpServersPage() {
                 value={form.command}
                 onChange={e => setForm(f => ({ ...f, command: e.target.value }))}
                 placeholder="npx"
-                className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#5a7247]"
               />
             </div>
 
@@ -261,7 +261,7 @@ export function McpServersPage() {
                 value={form.args}
                 onChange={e => setForm(f => ({ ...f, args: e.target.value }))}
                 placeholder="-y @notionhq/notion-mcp-server"
-                className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#5a7247]"
               />
             </div>
 
@@ -275,7 +275,7 @@ export function McpServersPage() {
                 onChange={e => setForm(f => ({ ...f, env: e.target.value }))}
                 rows={3}
                 placeholder={'NOTION_TOKEN={{credential:notion_integration_token}}'}
-                className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 font-mono focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 font-mono focus:outline-none focus:ring-1 focus:ring-[#5a7247] resize-none"
               />
             </div>
 
@@ -283,7 +283,7 @@ export function McpServersPage() {
               <button
                 type="submit"
                 disabled={createMutation.isPending || updateMutation.isPending}
-                className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium rounded transition-colors"
+                className="px-4 py-1.5 bg-[#5a7247] hover:bg-[#6b8a55] disabled:opacity-50 text-white text-sm font-medium rounded transition-colors"
               >
                 {createMutation.isPending || updateMutation.isPending ? '저장 중...' : '저장'}
               </button>

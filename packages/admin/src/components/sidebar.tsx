@@ -85,9 +85,14 @@ export function Sidebar() {
 
   const companies = companyData?.data || []
 
-  // 회사 미선택 시 첫 번째 회사 자동 선택
+  // 회사 미선택 또는 선택된 회사가 목록에 없으면 첫 번째 회사 자동 선택
   useEffect(() => {
-    if (!selectedCompanyId && companies.length > 0) {
+    if (companies.length === 0) {
+      if (selectedCompanyId) setSelectedCompanyId(null)
+      return
+    }
+    const found = companies.find((c) => c.id === selectedCompanyId)
+    if (!found) {
       setSelectedCompanyId(companies[0].id)
     }
   }, [selectedCompanyId, companies, setSelectedCompanyId])
