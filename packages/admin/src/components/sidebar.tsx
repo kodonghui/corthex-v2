@@ -16,7 +16,7 @@ declare const __BUILD_NUMBER__: string
 declare const __BUILD_HASH__: string
 declare const __BUILD_TIME__: string
 
-type Company = { id: string; name: string; slug: string }
+type Company = { id: string; name: string; slug: string; isActive: boolean }
 
 const nav: { to: string; label: string; icon: LucideIcon }[] = [
   { to: '/', label: '대시보드', icon: LayoutDashboard },
@@ -83,7 +83,7 @@ export function Sidebar() {
     queryFn: () => api.get<{ data: Company[] }>('/admin/companies'),
   })
 
-  const companies = companyData?.data || []
+  const companies = (companyData?.data || []).filter((c) => c.isActive)
 
   // 회사 미선택 시 첫 번째 회사 자동 선택
   useEffect(() => {
