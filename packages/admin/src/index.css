@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 body {
-  font-family: 'Inter', 'Noto Sans KR', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-family: 'Inter', 'Noto Serif KR', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }
 
 code, pre, .font-mono {
