@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 body {
-  font-family: 'Inter', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-family: 'Inter', 'Noto Sans KR', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }
 
 code, pre, .font-mono {
@@ -9,8 +9,8 @@ code, pre, .font-mono {
 }
 
 @theme {
-  --color-corthex-accent: oklch(0.55 0.2 264);
-  --color-corthex-accent-dark: oklch(0.7 0.17 264);
+  --color-corthex-accent: oklch(0.55 0.15 145);
+  --color-corthex-accent-dark: oklch(0.7 0.13 145);
   --color-corthex-success: oklch(0.55 0.16 160);
   --color-corthex-warning: oklch(0.65 0.16 75);
   --color-corthex-error: oklch(0.55 0.2 25);
