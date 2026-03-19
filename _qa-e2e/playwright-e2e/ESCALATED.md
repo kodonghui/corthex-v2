@@ -15,4 +15,14 @@ When cycle count >= 3, user is notified in cycle-report.md.
 
 ## Resolved
 
-_(Move entries here when manually fixed, with resolution date and commit hash)_
+### ESC-002: Agent Create 500 FK — RESOLVED
+- **Resolved**: 2026-03-19, commit 2106ec2
+- **Fix**: agents.user_id DROP NOT NULL + migration 0060
+
+### ESC-003: Onboarding Loop — RESOLVED
+- **Resolved**: 2026-03-19, commit 2106ec2
+- **Fix**: layout.tsx staleTime + isFetching guard
+
+### ESC-004: Tenant Middleware Cross-Contamination — RESOLVED
+- **Resolved**: 2026-03-19, commit 2106ec2
+- **Fix**: tenant.ts companies POST bypass + onboarding.ts scoped path
