@@ -110,7 +110,7 @@ export function buildDagLayers(steps: WorkflowStep[]): WorkflowStep[][] {
 }
 
 const stepTypeLabels: Record<string, { label: string; color: string; bg: string }> = {
-  tool: { label: 'Tool', color: '#3b82f6', bg: 'rgba(59,130,246,0.1)' },
+  tool: { label: 'Tool', color: '#0d9488', bg: 'rgba(13,148,136,0.1)' },
   llm: { label: 'LLM', color: '#8b5cf6', bg: 'rgba(139,92,246,0.1)' },
   condition: { label: 'Condition', color: terracotta, bg: 'rgba(196,98,45,0.1)' },
 }

@@ -263,7 +263,7 @@ export function UsersPage() {
               onChange={(e) => setDeptFilter(e.target.value)}
               className="rounded-lg bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-sm py-2 px-3 min-w-[140px]"
             >
-              <option value="all">All Roles</option>
+              <option value="all">All Departments</option>
               {depts.map((d) => (
                 <option key={d.id} value={d.id}>{d.name}</option>
               ))}

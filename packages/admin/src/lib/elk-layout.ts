@@ -112,7 +112,7 @@ export async function computeElkLayout(orgData: OrgChartData): Promise<{ nodes: 
       id: `edge-${companyNodeId}-${deptNodeId}`,
       source: companyNodeId,
       target: deptNodeId,
-      style: { stroke: '#3b82f6', strokeWidth: 2 },
+      style: { stroke: '#0d9488', strokeWidth: 2 },
     })
 
     // Agent nodes within department

@@ -41,7 +41,7 @@ const LAYER_GAP = 120
 const NODE_GAP = 180
 
 const NODE_STYLES: Record<string, { fill: string; stroke: string; textFill: string; icon: string }> = {
-  tool: { fill: '#dbeafe', stroke: '#3b82f6', textFill: '#1e3a5f', icon: '\u{1F527}' },
+  tool: { fill: '#ccfbf1', stroke: '#0d9488', textFill: '#134e4a', icon: '\u{1F527}' },
   llm: { fill: '#f3e8ff', stroke: '#a855f7', textFill: '#581c87', icon: '\u{1F9E0}' },
   condition: { fill: '#fef3c7', stroke: '#f59e0b', textFill: '#78350f', icon: '\u2753' },
 }
