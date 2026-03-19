@@ -27,7 +27,7 @@ export async function renderSoul(
     scopedDb.agentsByReportTo(agentId),
     scopedDb.agentToolsWithDefs(agentId),
     agent.departmentId ? scopedDb.departmentById(agent.departmentId) : Promise.resolve([]),
-    scopedDb.userById(agent.userId),
+    agent.userId ? scopedDb.userById(agent.userId) : Promise.resolve([]),
   ])
 
   // Build variable map — built-in vars + caller-provided extraVars

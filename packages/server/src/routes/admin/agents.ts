@@ -20,7 +20,7 @@ export const agentsRoute = new Hono<AppEnv>()
 agentsRoute.use('*', authMiddleware, adminOnly, tenantMiddleware)
 
 const createAgentSchema = z.object({
-  userId: z.string().uuid(),
+  userId: z.string().uuid().nullable().optional(),
   departmentId: z.string().uuid().nullable().optional(),
   name: z.string().min(1).max(100),
   nameEn: z.string().max(100).nullable().optional(),

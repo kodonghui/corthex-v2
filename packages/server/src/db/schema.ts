@@ -145,7 +145,7 @@ export const departments = pgTable('departments', {
 export const agents = pgTable('agents', {
   id: uuid('id').primaryKey().defaultRandom(),
   companyId: uuid('company_id').notNull().references(() => companies.id),
-  userId: uuid('user_id').notNull().references(() => users.id),
+  userId: uuid('user_id').references(() => users.id),
   departmentId: uuid('department_id').references(() => departments.id),
   name: varchar('name', { length: 100 }).notNull(),
   role: varchar('role', { length: 200 }),

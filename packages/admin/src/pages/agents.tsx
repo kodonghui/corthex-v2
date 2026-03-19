@@ -236,7 +236,6 @@ export function AgentsPage() {
     e.preventDefault()
     if (!authUser) return
     createMutation.mutate({
-      userId: authUser.id,
       name: form.name,
       role: form.role || undefined,
       tier: form.tier,
@@ -591,6 +590,14 @@ export function AgentsPage() {
                           style={{ color: '#83935d' }}
                         >
                           Reset to Admin Soul
+                        </button>
+                        <button
+                          data-testid="agents-deactivate-btn"
+                          onClick={() => openDeactivateModal(selectedAgent)}
+                          disabled={!selectedAgent.isActive}
+                          className="w-full py-2 px-4 border border-red-200 text-red-600 font-semibold rounded-xl text-xs transition-colors hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                          {selectedAgent.isActive ? 'Deactivate Agent' : 'Already Deactivated'}
                         </button>
                       </div>
                     </div>

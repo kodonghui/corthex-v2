@@ -23,7 +23,7 @@ export interface DepartmentUpdateInput {
 }
 
 export interface AgentInput {
-  userId: string
+  userId?: string | null
   departmentId?: string | null
   name: string
   nameEn?: string | null
@@ -332,7 +332,7 @@ export async function createAgent(tenant: TenantActor, input: AgentInput) {
   const [agent] = await db
     .insert(agents)
     .values(scopedInsert(tenant.companyId, {
-      userId: input.userId,
+      userId: input.userId ?? null,
       departmentId: input.departmentId ?? null,
       name: input.name,
       nameEn: input.nameEn ?? null,

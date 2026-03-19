@@ -41,23 +41,25 @@ export function Layout() {
   const location = useLocation()
   const selectedCompanyId = useAdminStore((s) => s.selectedCompanyId)
 
-  const { data: companyData } = useQuery({
+  const { data: companyData, isFetching } = useQuery({
     queryKey: ['company-detail', selectedCompanyId],
     queryFn: () => api.get<{ data: Company }>(`/admin/companies/${selectedCompanyId}`),
     enabled: !!selectedCompanyId,
+    staleTime: 2000, // prevent immediate re-fetch race after onboarding completion
   })
 
   const company = companyData?.data
   const isOnboardingPage = location.pathname === '/onboarding'
 
   // Auto-redirect to onboarding if not completed
+  // Wait for fresh data (isFetching=false) to avoid redirect based on stale cache
   useEffect(() => {
-    if (!company || isOnboardingPage) return
+    if (!company || isOnboardingPage || isFetching) return
     const settings = company.settings || {}
     if (settings.onboardingCompleted !== true) {
       navigate('/onboarding', { replace: true })
     }
-  }, [company, isOnboardingPage, navigate])
+  }, [company, isOnboardingPage, isFetching, navigate])
 
   return (
     <div className="flex h-screen bg-[#faf8f5]">

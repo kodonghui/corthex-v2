@@ -52,9 +52,19 @@ export const tenantMiddleware: MiddlewareHandler<AppEnv> = async (c, next) => {
   // Admin JWT has companyId='system' which is NOT a UUID — if no company
   // was selected (no ?companyId= override), return empty data for GETs
   // and 400 for writes instead of letting "system" reach DB UUID columns.
+  //
+  // Skip check for company-creation endpoints (they don't need tenant isolation):
+  // POST /companies (admin), POST /companies (super-admin)
   const resolvedTenant = c.get('tenant')
   const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
   if (!uuidRe.test(resolvedTenant.companyId)) {
+    const pathname = new URL(c.req.url).pathname
+    const isCompanyCreate = method === 'POST' && /\/companies\/?$/.test(pathname)
+    if (isCompanyCreate) {
+      // Company creation doesn't need tenant companyId — let it pass through
+      await next()
+      return
+    }
     if (method === 'GET') {
       return c.json({ success: true, data: [] })
     }

@@ -60,7 +60,7 @@ async function assertMember(channelId: string, userId: string, companyId: string
 
 // AI 에이전트 멘션 → 비동기 응답 생성
 async function handleAgentMention(
-  agent: { id: string; name: string; soul: string | null; userId: string },
+  agent: { id: string; name: string; soul: string | null; userId: string | null },
   channelId: string,
   userMessage: string,
   userId: string,
@@ -101,13 +101,13 @@ async function handleAgentMention(
       .map((b) => (b as { type: 'text'; text: string }).text)
       .join('')
 
-    // 에이전트 응답을 메시지로 저장 (에이전트의 userId 사용)
+    // 에이전트 응답을 메시지로 저장 (에이전트의 userId 사용, 없으면 호출자 userId)
     const [agentMessage] = await db
       .insert(messengerMessages)
       .values({
         companyId,
         channelId,
-        userId: agent.userId,
+        userId: agent.userId || userId,
         content: responseText,
       })
       .returning()
@@ -128,7 +128,7 @@ async function handleAgentMention(
     const errorContent = '죄송합니다, 응답을 생성하지 못했습니다. 잠시 후 다시 시도해주세요.'
     const [errorMsg] = await db
       .insert(messengerMessages)
-      .values({ companyId, channelId, userId: agent.userId, content: errorContent })
+      .values({ companyId, channelId, userId: agent.userId || userId, content: errorContent })
       .returning()
 
     broadcastToChannel(`messenger::${channelId}`, {

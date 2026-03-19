@@ -15,7 +15,8 @@ import {
 export const onboardingRoute = new Hono<AppEnv>()
 
 // authMiddleware + tenantMiddleware only (no adminOnly — CEO users use onboarding)
-onboardingRoute.use('*', authMiddleware, tenantMiddleware)
+// Scope middleware to /onboarding/* only (not '*') to prevent leaking to sibling routes
+onboardingRoute.use('/onboarding/*', authMiddleware, tenantMiddleware)
 
 // GET /api/onboarding/status — onboarding status for current company
 onboardingRoute.get('/onboarding/status', async (c) => {
