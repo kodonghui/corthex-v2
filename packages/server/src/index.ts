@@ -102,8 +102,8 @@ app.use('*', compress())
 app.use('*', secureHeaders({
   contentSecurityPolicy: isProd ? {
     defaultSrc: ["'self'"],
-    scriptSrc: ["'self'"],
-    styleSrc: ["'self'", "'unsafe-inline'"],
+    scriptSrc: ["'self'", 'https://static.cloudflareinsights.com'],
+    styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
     imgSrc: ["'self'", 'data:', 'https:'],
     connectSrc: ["'self'", 'https://corthex-hq.com', 'wss://corthex-hq.com'],
     fontSrc: ["'self'", 'https://fonts.gstatic.com'],

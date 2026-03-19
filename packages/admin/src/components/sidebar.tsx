@@ -79,7 +79,7 @@ export function Sidebar() {
   const selectedCompanyId = useAdminStore((s) => s.selectedCompanyId)
   const setSelectedCompanyId = useAdminStore((s) => s.setSelectedCompanyId)
 
-  const { data: companyData } = useQuery({
+  const { data: companyData, isLoading: companiesLoading } = useQuery({
     queryKey: ['companies'],
     queryFn: () => api.get<{ data: Company[] }>('/admin/companies'),
   })
@@ -124,9 +124,13 @@ export function Sidebar() {
               </option>
             ))}
           </select>
-        ) : (
+        ) : companiesLoading ? (
           <div className="w-full px-2 py-1.5 text-xs text-[#8fae7a] animate-pulse">
             회사 로딩중...
+          </div>
+        ) : (
+          <div className="w-full px-2 py-1.5 text-xs text-[#8fae7a]/60">
+            등록된 회사 없음
           </div>
         )}
       </div>
