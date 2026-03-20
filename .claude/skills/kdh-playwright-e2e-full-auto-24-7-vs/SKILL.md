@@ -55,7 +55,12 @@ Each cycle is fully autonomous: detect → test → fix → deploy → cleanup �
    - If new commit detected → reset consecutive_clean_cycles to 0, set mode ACTIVE
    - If mode=WATCH → run Auto-Stabilization Protocol (see below)
 
-8. Create test company for CRUD isolation:
+8. Clean up stale test companies from previous cycles:
+   GET /api/admin/companies → find any with name starting "E2E-TEMP"
+   For each found: DELETE /api/admin/companies/{id}
+   Log: "Cleaned N stale E2E-TEMP companies"
+
+9. Create test company for CRUD isolation:
    POST /api/admin/companies { name: "E2E-TEMP-{N}" }
    Store E2E_COMPANY_ID from response
    - FAIL → log warning, continue (CRUD tests will use existing data read-only)
@@ -272,7 +277,8 @@ Update _qa-e2e/playwright-e2e/stability-state.md:
 ```
 1. Delete test company:
    DELETE /api/admin/companies/{E2E_COMPANY_ID}
-   - FAIL → log warning (will be cleaned up next cycle or manually)
+   - FAIL → retry once after 2s
+   - Still FAIL → log warning (Phase 0 of next cycle will clean it up)
 
 2. Append to _qa-e2e/playwright-e2e/cycle-report.md:
 
