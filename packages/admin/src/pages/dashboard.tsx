@@ -9,7 +9,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
-import { CheckCircle, MoreVertical, Building2, Users, Bot, Activity } from 'lucide-react'
+import { CheckCircle, Building2, Users, Bot, Activity } from 'lucide-react'
 import { olive, oliveBg, cream, sand, warmBrown } from '../lib/colors'
 
 type User = { id: string; name: string; username: string; role: string; isActive: boolean }
@@ -99,7 +99,6 @@ export function DashboardPage() {
                 <th className="px-6 py-4">Name</th>
                 <th className="px-6 py-4">Type</th>
                 <th className="px-6 py-4">Role</th>
-                <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y" style={{ borderColor: sand }}>
@@ -132,11 +131,6 @@ export function DashboardPage() {
                       </td>
                       <td className="px-6 py-4 text-sm" style={{ color: warmBrown }}>User</td>
                       <td className="px-6 py-4 text-sm" style={{ color: warmBrown }}>{u.role}</td>
-                      <td className="px-6 py-4 text-right">
-                        <button className="text-slate-400 hover:text-slate-700 transition-colors">
-                          <MoreVertical size={18} />
-                        </button>
-                      </td>
                     </tr>
                   ))}
                   {agents.map((a) => (
@@ -152,11 +146,6 @@ export function DashboardPage() {
                       </td>
                       <td className="px-6 py-4 text-sm" style={{ color: warmBrown }}>Agent</td>
                       <td className="px-6 py-4 text-sm" style={{ color: warmBrown }}>{a.role}</td>
-                      <td className="px-6 py-4 text-right">
-                        <button className="text-slate-400 hover:text-slate-700 transition-colors">
-                          <MoreVertical size={18} />
-                        </button>
-                      </td>
                     </tr>
                   ))}
                 </>

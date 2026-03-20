@@ -10,7 +10,7 @@
  *   POST   /api/admin/soul-templates/:id/unpublish
  */
 import { useState } from 'react'
-import { Search, PlusCircle, ChevronRight, Filter, Layers, Brain, Pencil, Wrench, Download, ArrowRight, Plus, ChevronLeft } from 'lucide-react'
+import { Search, PlusCircle, ChevronRight, Filter, Layers, Brain, Pencil, Wrench, Download, ArrowRight, Plus } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
@@ -42,7 +42,6 @@ export function SoulTemplatesPage() {
   const [deleteTarget, setDeleteTarget] = useState<SoulTemplate | null>(null)
   const [publishConfirmId, setPublishConfirmId] = useState<string | null>(null)
   const [form, setForm] = useState({ name: '', description: '', content: '', category: '' })
-  const [activeTab, setActiveTab] = useState<'all' | 'recent' | 'popular'>('all')
   const [searchQuery, setSearchQuery] = useState('')
 
   const { data, isLoading } = useQuery({
@@ -199,37 +198,12 @@ export function SoulTemplatesPage() {
                   <span>Advanced</span>
                 </div>
               </div>
-              <button
-                className="w-full py-2 font-bold rounded-xl text-sm transition-colors border"
-                style={{ borderColor: '#5a7247', color: '#5a7247' }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(90,114,71,0.05)')}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-              >
-                Reset Filters
-              </button>
             </aside>
 
             {/* Content Grid */}
             <div className="flex-1">
-              {/* Tabs */}
-              <div className="flex border-b border-slate-200 mb-8">
-                {[
-                  { key: 'all' as const, label: 'All Templates' },
-                  { key: 'recent' as const, label: 'Recently Added' },
-                  { key: 'popular' as const, label: 'Most Downloaded' },
-                ].map((tab) => (
-                  <button
-                    key={tab.key}
-                    onClick={() => setActiveTab(tab.key)}
-                    className="px-6 py-3 border-b-2 text-sm font-bold"
-                    style={{
-                      borderColor: activeTab === tab.key ? '#5a7247' : 'transparent',
-                      color: activeTab === tab.key ? '#5a7247' : '#94a3b8',
-                    }}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
+              <div className="mb-8">
+                <h3 className="text-sm font-bold" style={{ color: '#5a7247' }}>All Templates</h3>
               </div>
 
               {/* Create form */}
@@ -460,22 +434,6 @@ export function SoulTemplatesPage() {
                 </div>
               )}
 
-              {/* Pagination */}
-              <div className="mt-12 flex items-center justify-center gap-4">
-                <button className="w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center text-slate-400 transition-colors">
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <div className="flex gap-2">
-                  <button className="w-10 h-10 rounded-xl text-white font-bold" style={{ backgroundColor: '#5a7247' }}>1</button>
-                  <button className="w-10 h-10 rounded-xl border border-slate-200 text-slate-600 font-bold">2</button>
-                  <button className="w-10 h-10 rounded-xl border border-slate-200 text-slate-600 font-bold">3</button>
-                  <span className="px-2 py-2 text-slate-400">...</span>
-                  <button className="w-10 h-10 rounded-xl border border-slate-200 text-slate-600 font-bold">12</button>
-                </div>
-                <button className="w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center text-slate-400 transition-colors">
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
             </div>
           </div>
         </main>

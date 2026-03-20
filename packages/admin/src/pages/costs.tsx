@@ -483,16 +483,6 @@ function RecentCostRecords({ startDate, endDate, companyId }: { startDate: strin
           </svg>
           최근 비용 기록
         </h4>
-        <div className="flex gap-2" data-testid="daily-chart-title">
-          <button className="flex items-center gap-2 px-4 py-2 text-stone-600 text-sm font-medium rounded-lg hover:bg-stone-100" style={{ backgroundColor: '#faf8f5' }}>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
-            필터
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2 text-stone-600 text-sm font-medium rounded-lg hover:bg-stone-100" style={{ backgroundColor: '#faf8f5' }}>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
-            CSV 추출
-          </button>
-        </div>
       </div>
 
       {isLoading ? (
