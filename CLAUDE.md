@@ -29,6 +29,7 @@
 ## Output Quality
 - Specific and detailed only. "Vague" = instant FAIL.
 - 질문에 대답할 때는 반드시 **최신 정확한 정보**로 답변. 모르거나 확실하지 않으면 WebSearch로 찾아서 답변. 추측 금지.
+- **기술 결정/라이브러리 선택/아키텍처 패턴 논의 시 반드시 WebSearch로 최신 정보 확인.** 파이프라인 에이전트(Writer/Critic 모두)도 동일. 2026년 기준 최신 버전, 호환성, 베스트 프랙티스를 검증 없이 추측하지 말 것.
 - 프로젝트 상태를 언급할 때는 **반드시 코드를 직접 읽어서 확인**. 메모리만 보고 답하지 말 것.
 - **기능/구조 질문 시 반드시 참고**: brief(`_bmad-output/product-brief.md`), PRD(`_bmad-output/prd.md`), architecture(`_bmad-output/planning-artifacts/architecture.md`), v1-feature-spec 읽고 답변. 추측으로 대답 금지.
 
