@@ -1,44 +1,60 @@
 # Working State — 2026-03-20
 
-## 현재 작업: CORTHEX v3 OpenClaw 대규모 리팩토링
+## 현재 작업: CORTHEX v3 OpenClaw 기획 파이프라인
+
+### 파이프라인 v9.0 재설계 완료 (이번 세션)
+
+v8.0의 근본 문제를 발견하고 전면 재설계:
+- BMAD 워크플로우 62% 누락 → 100% 자동 디스커버리로 수정
+- 가짜 페르소나(Amelia, Dana) → BMAD 8명 실명 스폰 (winston, quinn, john, sally, bob, dev, analyst, tech-writer)
+- PRD Spec Fix 단일패스 → BMAD Brief부터 9 Stage 풀 사이클
+- Story Dev Skill 호출 → 6 Phase 파티 모드
+- User Gate 16개 추가 (사장님 비즈니스 결정 체크포인트)
+- PRD Validate + Readiness 병렬화
+
+### 파이프라인 v9.0 Planning 구조 (72 스텝)
+
+| Stage | 워크플로우 | 스텝 | Writer | 팀 규모 | GATE |
+|-------|-----------|------|--------|---------|------|
+| 0 | Product Brief | 6 | analyst | 5 | 4 |
+| 1 | Technical Research | 6 | dev | 4 | 0 |
+| 2 | PRD Create | 14 | john | 5 | 8 |
+| 3 | PRD Validate | 14 | analyst | 4 | 0 (병렬) |
+| 4 | Architecture | 8 | winston | 5 | 1 |
+| 5 | UX Design | 14 | sally | 5 | 2 |
+| 6 | Epics & Stories | 4 | bob | 5 | 1 |
+| 7 | Readiness Check | 6 | tech-writer | 5 | 0 (병렬) |
+| 8 | Sprint Planning | auto | - | - | 0 |
+
+### 다음 할 것
+- `/kdh-full-auto-pipeline planning` 실행 (v9.0으로)
+- Brief부터 시작, 4개 root 파일을 input으로
 
 ### 사장님 결정사항 (2026-03-20)
 - 기존 테마 전부 폐기 → 새 테마로 UXUI 완전 리디자인
 - OpenClaw 가상 사무실 + n8n + 성격 시스템 + 메모리 아키텍처 추가
-- `/kdh-full-auto-pipeline planning`으로 기획부터 시작
-- VPS tmux에서 파티 모드로 실행 예정
+- UXUI: Subframe 메인 + Stitch 보조 (둘 다 MCP 설치됨)
+- 조직 템플릿: 유지 (온보딩 연결)
+- 전원 Opus 모델, 스텝 등급별 sonnet 믹스
+- 품질 우선, 병렬 코딩 지원
+- Brief/PRD는 사장님 align 포인트 (User Gate)
 
-### 기획 문서 (VPS에서 읽어야 할 것)
-1. `_bmad-output/planning-artifacts/v3-openclaw-planning-brief.md` — 전체 브리프
-2. `_bmad-output/planning-artifacts/critic-rubric.md` — 6차원 채점 루브릭
-3. `_bmad-output/planning-artifacts/v3-vps-prompt.md` — VPS 실행 프롬프트
-4. `_bmad-output/planning-artifacts/v3-corthex-v2-audit.md` — v2 현황 정확한 수치 (생성 중)
+### 기획 문서 (root input)
+1. `_bmad-output/planning-artifacts/v3-openclaw-planning-brief.md` — 초안 (참고용)
+2. `_bmad-output/planning-artifacts/v3-corthex-v2-audit.md` — v2 정확한 수치
+3. `_bmad-output/planning-artifacts/critic-rubric.md` — 6차원 채점 루브릭
+4. `_bmad-output/planning-artifacts/v3-vps-prompt.md` — 실행 맥락
 
-### 순서
-1. **전체 기획** — PRD 업데이트 + 아키텍처 + Epic/Story (VPS pipeline)
-2. **UXUI 풀 리디자인** — 새 테마 + 새 페이지 포함
-3. **구현** — Story 단위 파이프라인
+### 이번 세션 커밋 이력
+- a20de20: feat(pipeline): kdh-full-auto-pipeline v8.0 → v9.0 BMAD full-cycle rewrite
+- 0ac7326: docs(v3): accurate v2 audit — 485 APIs, 71 pages, 86 tables
 
-### 이번 세션에서 한 것 (2026-03-20)
-- E2E Cycle #23~35 실행 (12연속 clean, WATCH 모드 진입)
-- Admin 6건 수정 (LLM 모델, 워크플로우 사이드바, 조직도/SketchVibe, 마켓 UX)
-- Dead button 7개 제거 (Dashboard, 비용관리, 소울 템플릿)
-- Agent 모델 목록 GPT/Gemini 제거
-- E2E 스킬 cleanup 강화
-- Playwright MCP npx→node 수정
-- CLAUDE.md: PRD/아키텍처 참조 규칙 추가
-- Critic 채점 루브릭 v1.0 작성
-- OpenClaw planning brief 작성
-- VPS 실행 프롬프트 작성
-
-### 커밋 이력
-- e294213: admin 6건 수정
-- 5ca692c: dead button + 모델 목록
-- 8603cf7: E2E cleanup 강화
-- 6c7b37d: v3 planning brief
-- fea8363: critic rubric
+### Stitch/UXUI 교훈 (v3에 반영 필수)
+- App shell(layout+sidebar) 먼저 확정 → 페이지는 content area만
+- 사이드바 중복 방지 (v2에서 Stitch가 페이지마다 사이드바 생성)
+- 테마 변경 시 전체 grep (v2 428곳 색상 혼재 사건)
+- Dead button 금지
 
 ### E2E 상태
 - 35 사이클 완료, WATCH 모드
 - Recurring known: workflow suggestions 500
-- ESCALATED: 1 active (ESC-001 mobile sidebar)
