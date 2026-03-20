@@ -143,10 +143,14 @@ Phase 4: Writer Fixes
     "[Fixes Applied] Fixed {N} issues. Please verify."
 
 Phase 5: Verification (Critics verify fixes — quick pass)
+  IMPORTANT: Critics MUST use the rubric at _bmad-output/planning-artifacts/critic-rubric.md
+  Score using 6 dimensions (D1-D6) with per-critic weighted averages.
+  Auto-fail if ANY dimension < 3/10 or if auto-fail conditions are met (hallucination, security hole, etc.)
+
   Critic-A: re-reads fixed section FROM FILE → verifies product/UX fixes
-    → SendMessage to Writer: "[Verified] score {X}/10" or "[Issues Remaining] [list]"
+    → Score per rubric → SendMessage to Writer: "[Verified] score {X}/10" or "[Issues Remaining] [list]"
   Critic-B: re-reads fixed section FROM FILE → verifies tech/QA fixes
-    → SendMessage to Writer: "[Verified] score {X}/10" or "[Issues Remaining] [list]"
+    → Score per rubric → SendMessage to Writer: "[Verified] score {X}/10" or "[Issues Remaining] [list]"
 
 Phase 6: Final Score
   Writer: calculates average score from both Critics

@@ -1,39 +1,44 @@
-# Working State — 2026-03-16
+# Working State — 2026-03-20
 
-## 현재 작업
-- Phase 6 리셋 완료. Gemini 프롬프트 4개 작성 → 유저가 직접 Gemini로 디자인 생성 예정
+## 현재 작업: CORTHEX v3 OpenClaw 대규모 리팩토링
 
-## 오늘 완료한 것 (2026-03-16)
-1. App Shell Stitch 리빌드 (sidebar + top bar)
-2. 9개 병렬 에이전트로 25개 페이지 Stitch 디자인 반영
-3. Playwright 스모크 테스트 25/25 통과
-4. **유저 피드백: Stitch 디자인 자체가 구림** → Phase 6+ 삭제
-5. Gemini 4 (Natural Organic) + Gemini 5 (Minimal Warm) 분석
-6. 프롬프트 4개 작성:
-   - prompt-1: Gemini 4 스타일 Web (Pretendard + Noto Serif KR, 올리브/테라코타/머스타드)
-   - prompt-2: Gemini 4 스타일 App 모바일
-   - prompt-3: Gemini 5 스타일 Web (Inter + Noto Sans KR, 코랄/테라코타/앰버/그린)
-   - prompt-4: Gemini 5 스타일 App 모바일
-7. 파이프라인 개선 등 이전 세션 작업
+### 사장님 결정사항 (2026-03-20)
+- 기존 테마 전부 폐기 → 새 테마로 UXUI 완전 리디자인
+- OpenClaw 가상 사무실 + n8n + 성격 시스템 + 메모리 아키텍처 추가
+- `/kdh-full-auto-pipeline planning`으로 기획부터 시작
+- VPS tmux에서 파티 모드로 실행 예정
 
-## 다음 할 일
-1. 유저가 Gemini로 HTML 생성해옴
-2. HTML 받으면 → React 변환 + API 연결
-3. Phase 7 통합 (이번엔 제대로)
+### 기획 문서 (VPS에서 읽어야 할 것)
+1. `_bmad-output/planning-artifacts/v3-openclaw-planning-brief.md` — 전체 브리프
+2. `_bmad-output/planning-artifacts/critic-rubric.md` — 6차원 채점 루브릭
+3. `_bmad-output/planning-artifacts/v3-vps-prompt.md` — VPS 실행 프롬프트
+4. `_bmad-output/planning-artifacts/v3-corthex-v2-audit.md` — v2 현황 정확한 수치 (생성 중)
 
-## 핵심 교훈
-- Stitch MCP 자동생성 < Gemini 직접 프롬프트 (디자인 퀄리티)
-- Phase 7에서 App Shell을 먼저 맞추는 게 70% 임팩트
-- 유저가 직접 디자인 방향을 정하는 게 가장 확실함
-- 프롬프트에 정확한 hex, 폰트, 컴포넌트 클래스를 넣어야 일관성 유지
+### 순서
+1. **전체 기획** — PRD 업데이트 + 아키텍처 + Epic/Story (VPS pipeline)
+2. **UXUI 풀 리디자인** — 새 테마 + 새 페이지 포함
+3. **구현** — Story 단위 파이프라인
 
-## 프롬프트 위치
-`_corthex_full_redesign/phase-6-prompts/`
-- prompt-1-gemini4-web.md
-- prompt-2-gemini4-app.md
-- prompt-3-gemini5-web.md
-- prompt-4-gemini5-app.md
+### 이번 세션에서 한 것 (2026-03-20)
+- E2E Cycle #23~35 실행 (12연속 clean, WATCH 모드 진입)
+- Admin 6건 수정 (LLM 모델, 워크플로우 사이드바, 조직도/SketchVibe, 마켓 UX)
+- Dead button 7개 제거 (Dashboard, 비용관리, 소울 템플릿)
+- Agent 모델 목록 GPT/Gemini 제거
+- E2E 스킬 cleanup 강화
+- Playwright MCP npx→node 수정
+- CLAUDE.md: PRD/아키텍처 참조 규칙 추가
+- Critic 채점 루브릭 v1.0 작성
+- OpenClaw planning brief 작성
+- VPS 실행 프롬프트 작성
 
-## 레퍼런스 (기존 Gemini 결과물)
-- `_uxui-redesign/02-design/gemini4/` — Natural Organic (html 54 + react 54)
-- `_uxui-redesign/02-design/gemini5/html-full/` — Minimal Warm (html 32)
+### 커밋 이력
+- e294213: admin 6건 수정
+- 5ca692c: dead button + 모델 목록
+- 8603cf7: E2E cleanup 강화
+- 6c7b37d: v3 planning brief
+- fea8363: critic rubric
+
+### E2E 상태
+- 35 사이클 완료, WATCH 모드
+- Recurring known: workflow suggestions 500
+- ESCALATED: 1 active (ESC-001 mobile sidebar)
