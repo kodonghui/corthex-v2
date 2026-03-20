@@ -7,7 +7,7 @@ import { api } from '../lib/api'
 import {
   LayoutDashboard, Building2, Users, UserCog, Building, Bot, Wrench,
   DollarSign, KeyRound, ClipboardList, Sparkles, Monitor,
-  Network, Orbit, FileStack, ShoppingCart, BrainCircuit,
+  Orbit, FileStack, ShoppingCart, BrainCircuit, Paintbrush,
   Lock, Zap, Settings, ArrowLeftRight,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -31,8 +31,8 @@ const nav: { to: string; label: string; icon: LucideIcon }[] = [
   { to: '/report-lines', label: '보고 라인', icon: ClipboardList },
   { to: '/soul-templates', label: '소울 템플릿', icon: Sparkles },
   { to: '/monitoring', label: '시스템 모니터링', icon: Monitor },
-  { to: '/org-chart', label: '조직도', icon: Network },
   { to: '/nexus', label: 'NEXUS 조직도', icon: Orbit },
+  { to: '/sketchvibe', label: 'SketchVibe', icon: Paintbrush },
   { to: '/org-templates', label: '조직 템플릿', icon: FileStack },
   { to: '/template-market', label: '템플릿 마켓', icon: ShoppingCart },
   { to: '/agent-marketplace', label: '에이전트 마켓', icon: BrainCircuit },

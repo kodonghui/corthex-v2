@@ -30,6 +30,7 @@
 - Specific and detailed only. "Vague" = instant FAIL.
 - 질문에 대답할 때는 반드시 **최신 정확한 정보**로 답변. 모르거나 확실하지 않으면 WebSearch로 찾아서 답변. 추측 금지.
 - 프로젝트 상태를 언급할 때는 **반드시 코드를 직접 읽어서 확인**. 메모리만 보고 답하지 말 것.
+- **기능/구조 질문 시 반드시 참고**: brief(`_bmad-output/product-brief.md`), PRD(`_bmad-output/prd.md`), architecture(`_bmad-output/planning-artifacts/architecture.md`), v1-feature-spec 읽고 답변. 추측으로 대답 금지.
 
 ## Engine Patterns
 - All execution → `engine/agent-loop.ts`. DB → `getDB(ctx.companyId)` only.

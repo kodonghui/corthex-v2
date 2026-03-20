@@ -16,7 +16,7 @@ const MessengerPage = lazy(() => import('./pages/messenger').then((m) => ({ defa
 const DashboardPage = lazy(() => import('./pages/dashboard').then((m) => ({ default: m.DashboardPage })))
 const OpsLogPage = lazy(() => import('./pages/ops-log').then((m) => ({ default: m.OpsLogPage })))
 const NexusPage = lazy(() => import('./pages/nexus').then((m) => ({ default: m.NexusPage })))
-const SketchVibePage = lazy(() => import('./pages/sketchvibe').then((m) => ({ default: m.SketchVibePage })))
+
 const NotificationsPage = lazy(() => import('./pages/notifications').then((m) => ({ default: m.NotificationsPage })))
 const TradingPage = lazy(() => import('./pages/trading').then((m) => ({ default: m.TradingPage })))
 const FilesPage = lazy(() => import('./pages/files').then((m) => ({ default: m.FilesPage })))
@@ -108,7 +108,7 @@ export function App() {
             <Route path="dashboard" element={<Suspense fallback={<PageSkeleton />}><DashboardPage /></Suspense>} />
             <Route path="ops-log" element={<Suspense fallback={<PageSkeleton />}><OpsLogPage /></Suspense>} />
             <Route path="nexus" element={<Suspense fallback={<PageSkeleton />}><NexusPage /></Suspense>} />
-            <Route path="sketchvibe" element={<Suspense fallback={<PageSkeleton />}><SketchVibePage /></Suspense>} />
+            {/* SketchVibe moved to Admin app */}
             <Route path="trading" element={<Suspense fallback={<PageSkeleton />}><TradingPage /></Suspense>} />
             <Route path="files" element={<Suspense fallback={<PageSkeleton />}><FilesPage /></Suspense>} />
             <Route path="org" element={<Navigate to="/nexus" replace />} />

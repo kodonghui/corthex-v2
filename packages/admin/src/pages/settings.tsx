@@ -548,13 +548,13 @@ function DefaultSettingsSection({
 }) {
   const currentSettings = company.settings || {}
   const [timezone, setTimezone] = useState((currentSettings.timezone as string) || 'Asia/Seoul')
-  const [defaultModel, setDefaultModel] = useState((currentSettings.defaultModel as string) || 'claude-sonnet-4-20250514')
+  const [defaultModel, setDefaultModel] = useState((currentSettings.defaultModel as string) || 'claude-sonnet-4-6-20250520')
   const [dirty, setDirty] = useState(false)
 
   useEffect(() => {
     const s = company.settings || {}
     setTimezone((s.timezone as string) || 'Asia/Seoul')
-    setDefaultModel((s.defaultModel as string) || 'claude-sonnet-4-20250514')
+    setDefaultModel((s.defaultModel as string) || 'claude-sonnet-4-6-20250520')
     setDirty(false)
   }, [company])
 
@@ -565,7 +565,7 @@ function DefaultSettingsSection({
   const handleCancel = () => {
     const s = company.settings || {}
     setTimezone((s.timezone as string) || 'Asia/Seoul')
-    setDefaultModel((s.defaultModel as string) || 'claude-sonnet-4-20250514')
+    setDefaultModel((s.defaultModel as string) || 'claude-sonnet-4-6-20250520')
     setDirty(false)
   }
 
@@ -605,12 +605,8 @@ function DefaultSettingsSection({
             className="w-full px-3 py-2.5 border rounded-lg text-sm"
             style={selectStyle}
           >
-            <option value="claude-sonnet-4-20250514">Claude Sonnet 4</option>
-            <option value="claude-opus-4-20250514">Claude Opus 4</option>
-            <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5</option>
-            <option value="gpt-4o">GPT-4o</option>
-            <option value="gpt-4o-mini">GPT-4o Mini</option>
-            <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+            <option value="claude-sonnet-4-6-20250520">Claude Sonnet 4.6</option>
+            <option value="claude-opus-4-6-20250520">Claude Opus 4.6</option>
           </select>
         </div>
       </div>

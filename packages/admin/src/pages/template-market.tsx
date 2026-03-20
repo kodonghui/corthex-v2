@@ -341,6 +341,11 @@ export function TemplateMarketPage() {
             <p className="text-sm text-slate-500">
               {searchQuery || selectedTag ? '검색 결과가 없습니다.' : '공개된 템플릿이 아직 없습니다.'}
             </p>
+            {!searchQuery && !selectedTag && (
+              <p className="text-xs text-slate-600 mt-2">
+                여러 회사가 조직 구조 템플릿을 공개하면 여기에 표시됩니다.
+              </p>
+            )}
           </div>
         </div>
       ) : (

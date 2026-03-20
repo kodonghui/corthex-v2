@@ -14,7 +14,7 @@
  *   POST   /workspace/workflows/suggestions/:id/reject
  */
 import { useState, useMemo, useCallback } from 'react'
-import { Network, ArrowLeft, GitBranch, Lightbulb, Settings } from 'lucide-react'
+import { GitBranch, Lightbulb } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
@@ -67,7 +67,7 @@ type Execution = {
 
 type Tab = 'list' | 'suggestions'
 
-import { olive, oliveBg, oliveActive, terracotta, cream, sand, warmBrown, muted, lightMuted, leafLight } from '../lib/colors'
+import { olive, oliveBg, terracotta, cream, sand, warmBrown, muted, lightMuted } from '../lib/colors'
 
 // === Helpers ===
 
@@ -511,41 +511,7 @@ export function WorkflowsPage() {
   // --- Detail view ---
   if (selectedId) {
     return (
-      <div className="flex h-screen w-full" style={{ fontFamily: "'Pretendard', sans-serif" }}>
-        {/* Sidebar */}
-        <div className="w-64 text-white flex flex-col h-full flex-shrink-0 z-20 shadow-lg" style={{ backgroundColor: olive }}>
-          <div className="p-6 flex items-center gap-3 border-b" style={{ borderColor: oliveActive }}>
-            <Network className="w-6 h-6" />
-            <h2 className="text-xl font-bold tracking-wide" style={{ fontFamily: "'Noto Serif KR', serif" }}>Workflows</h2>
-          </div>
-          <div className="p-6 flex flex-col gap-2">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="bg-white/20 w-10 h-10 rounded-full" />
-              <div className="flex flex-col">
-                <h1 className="text-base font-bold" style={{ fontFamily: "'Noto Serif KR', serif" }}>CORTHEX v2</h1>
-                <p className="text-xs" style={{ color: leafLight }}>Admin Workflow Manager</p>
-              </div>
-            </div>
-            <div className="flex flex-col gap-1 mt-4">
-              <button
-                onClick={() => { setSelectedId(null); setExecutionsPage(1) }}
-                className="flex items-center gap-3 px-4 py-3 rounded-2xl transition-colors"
-                style={{ backgroundColor: 'transparent' }}
-                onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#6a8454')}
-                onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
-              >
-                <ArrowLeft className="w-5 h-5" />
-                <span className="text-sm font-medium">Back to List</span>
-              </button>
-              <button className="flex items-center gap-3 px-4 py-3 rounded-2xl shadow-inner" style={{ backgroundColor: oliveActive }}>
-                <GitBranch className="w-5 h-5" />
-                <span className="text-sm font-medium truncate">{detailLoading ? '...' : detail?.name || 'Workflow'}</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content */}
+      <div className="flex flex-col h-full" style={{ fontFamily: "'Pretendard', sans-serif" }}>
         <div className="flex-1 flex flex-col relative overflow-hidden" style={{ backgroundColor: cream }}>
           <header className="border-b px-8 py-6 flex items-center justify-between" style={{ backgroundColor: '#ffffff', borderColor: sand }}>
             <div className="flex items-center gap-3">
@@ -688,61 +654,7 @@ export function WorkflowsPage() {
   ]
 
   return (
-    <div className="flex h-screen w-full" style={{ fontFamily: "'Pretendard', sans-serif" }}>
-      {/* Sidebar */}
-      <div className="w-64 text-white flex flex-col h-full flex-shrink-0 z-20 shadow-lg" style={{ backgroundColor: olive }}>
-        <div className="p-6 flex items-center gap-3 border-b" style={{ borderColor: oliveActive }}>
-          <Network className="w-6 h-6" />
-          <h2 className="text-xl font-bold tracking-wide" style={{ fontFamily: "'Noto Serif KR', serif" }}>Workflows</h2>
-        </div>
-        <div className="p-6 flex flex-col gap-2">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="bg-white/20 w-10 h-10 rounded-full" />
-            <div className="flex flex-col">
-              <h1 className="text-base font-bold" style={{ fontFamily: "'Noto Serif KR', serif" }}>CORTHEX v2</h1>
-              <p className="text-xs" style={{ color: leafLight }}>Admin Workflow Manager</p>
-            </div>
-          </div>
-          <div className="flex flex-col gap-1 mt-4">
-            <button
-              onClick={() => setActiveTab('list')}
-              className="flex items-center gap-3 px-4 py-3 rounded-2xl shadow-inner"
-              style={{ backgroundColor: activeTab === 'list' ? oliveActive : 'transparent' }}
-              onMouseEnter={e => { if (activeTab !== 'list') e.currentTarget.style.backgroundColor = '#6a8454' }}
-              onMouseLeave={e => { if (activeTab !== 'list') e.currentTarget.style.backgroundColor = 'transparent' }}
-            >
-              <GitBranch className="w-5 h-5" />
-              <span className="text-sm font-medium">All Workflows</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('suggestions')}
-              className="flex items-center gap-3 px-4 py-3 rounded-2xl transition-colors"
-              style={{ backgroundColor: activeTab === 'suggestions' ? oliveActive : 'transparent' }}
-              onMouseEnter={e => { if (activeTab !== 'suggestions') e.currentTarget.style.backgroundColor = '#6a8454' }}
-              onMouseLeave={e => { if (activeTab !== 'suggestions') e.currentTarget.style.backgroundColor = 'transparent' }}
-            >
-              <Lightbulb className="w-5 h-5" />
-              <span className="text-sm font-medium">Suggestions</span>
-              {suggestions.length > 0 && (
-                <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded-full" style={{ backgroundColor: terracotta }}>{suggestions.length}</span>
-              )}
-            </button>
-          </div>
-        </div>
-        <div className="mt-auto p-6 flex flex-col gap-1 border-t" style={{ borderColor: oliveActive }}>
-          <button
-            className="flex items-center gap-3 px-4 py-3 rounded-2xl transition-colors"
-            style={{ backgroundColor: 'transparent' }}
-            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#6a8454')}
-            onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
-          >
-            <Settings className="w-5 h-5" />
-            <span className="text-sm font-medium">Settings</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Main Content */}
+    <div className="flex flex-col h-full" style={{ fontFamily: "'Pretendard', sans-serif" }}>
       <div className="flex-1 flex flex-col relative overflow-hidden" style={{ backgroundColor: cream }}>
         <header className="border-b px-8 py-6" style={{ backgroundColor: '#ffffff', borderColor: sand }}>
           <div className="flex items-center justify-between">

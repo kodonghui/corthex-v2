@@ -256,6 +256,11 @@ export function AgentMarketplacePage() {
               ? '검색 결과가 없습니다'
               : '공개된 에이전트 템플릿이 없습니다'}
           </p>
+          {!search && !categoryFilter && !tierFilter && (
+            <p className="text-xs text-slate-500 mt-2">
+              다른 회사가 에이전트 Soul 템플릿을 공개하면 여기에서 가져올 수 있습니다.
+            </p>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
