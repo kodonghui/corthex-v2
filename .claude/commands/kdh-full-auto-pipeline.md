@@ -142,20 +142,15 @@ PROHIBITION: Never spawn agents as `critic-a`, `critic-b`, `critic-c` or any gen
 
 ## Model Strategy
 
-### Step Grades
+**ALL agents = opus. No exceptions.** Agent tool fixes model at spawn time, so per-step mixing is not possible. All agents in all stages are spawned with `model: opus`.
 
-| Grade | Agents | Max Retries | When |
-|-------|--------|-------------|------|
-| **A** (critical) | ALL opus | 3 | Core decisions, functional/nonfunctional reqs, architecture patterns |
-| **B** (important) | Writer opus, Critics opus/sonnet mix | 2 | Most content steps |
-| **C** (setup) | ALL sonnet | 1 | init, complete, routine validation |
+### Step Grades (retry limits only)
 
-### Stage-Level Overrides
-
-| Stage | Default | Override |
-|-------|---------|----------|
-| Stage 4: Architecture | B | Steps 4-7 forced to **A** (all opus) |
-| Stage 6: Epics | B | Steps 2-3 forced to **A** |
+| Grade | Max Retries | When |
+|-------|-------------|------|
+| **A** (critical) | 3 | Core decisions, functional/nonfunctional reqs, architecture patterns |
+| **B** (important) | 2 | Most content steps |
+| **C** (setup) | 1 | init, complete, routine validation |
 
 ---
 
@@ -288,14 +283,14 @@ Input references (root material for brief):
 - Existing PRD, architecture, v1-feature-spec (from project-context.yaml)
 
 Step grades:
-| Step | Grade | analyst(W) | john | sally | bob | winston |
-|------|-------|-----------|------|-------|-----|---------|
-| init | C | S | S | S | S | S |
-| vision | A | O | O | O | O | O |
-| users | B | O | O | O | S | S |
-| metrics | B | O | O | S | O | S |
-| scope | A | O | O | O | O | O |
-| complete | C | S | S | S | S | S |
+| Step | Grade | GATE |
+|------|-------|------|
+| init | C | AUTO |
+| vision | A | GATE |
+| users | B | GATE |
+| metrics | B | GATE |
+| scope | A | GATE |
+| complete | C | AUTO |
 
 #### Stage 1: Technical Research
 
@@ -307,14 +302,14 @@ GATES: none
 ```
 
 Step grades:
-| Step | Grade | dev(W) | winston | quinn | john |
-|------|-------|--------|---------|-------|------|
-| init | C | S | S | S | S |
-| technical-overview | B | S | O | O | S |
-| integration-patterns | B | S | O | O | S |
-| architectural-patterns | A | O | O | O | S |
-| implementation-research | B | S | O | O | S |
-| research-synthesis | A | O | O | O | O |
+| Step | Grade |
+|------|-------|
+| init | C |
+| technical-overview | B |
+| integration-patterns | B |
+| architectural-patterns | A |
+| implementation-research | B |
+| research-synthesis | A |
 
 #### Stage 2: PRD Create
 
@@ -327,22 +322,22 @@ GATES: discovery, vision, success, journeys, innovation, scoping, functional, no
 ```
 
 Step grades:
-| Step | Grade | john(W) | winston | quinn | sally | bob |
-|------|-------|---------|---------|-------|-------|-----|
-| init | C | S | S | S | S | S |
-| discovery | B | O | O | S | S | O |
-| vision | B | O | O | S | O | S |
-| executive-summary | B | O | S | S | S | O |
-| success | B | O | S | S | O | O |
-| journeys | B | O | O | S | O | S |
-| domain | B | O | O | S | S | S |
-| innovation | B | O | O | S | S | S |
-| project-type | B | O | O | S | S | O |
-| scoping | A | O | O | O | O | O |
-| functional | A | O | O | O | O | O |
-| nonfunctional | A | O | O | O | S | O |
-| polish | B | O | O | O | O | O |
-| complete | C | S | S | S | S | S |
+| Step | Grade | GATE |
+|------|-------|------|
+| init | C | AUTO |
+| discovery | B | GATE |
+| vision | B | GATE |
+| executive-summary | B | AUTO |
+| success | B | GATE |
+| journeys | B | GATE |
+| domain | B | AUTO |
+| innovation | B | GATE |
+| project-type | B | AUTO |
+| scoping | A | GATE |
+| functional | A | GATE |
+| nonfunctional | A | GATE |
+| polish | B | AUTO |
+| complete | C | AUTO |
 
 #### Stage 3: PRD Validate (PARALLELIZED)
 
@@ -364,23 +359,7 @@ Round 5 (sequential): step-v-12, v-13
 
 For parallel rounds: spawn separate background agents per step, each runs party mode independently. Orchestrator collects all results before next round.
 
-Step grades:
-| Step | Grade |
-|------|-------|
-| v-01 discovery | C |
-| v-02 format-detection | C |
-| v-02b parity-check | B |
-| v-03 density | C |
-| v-04 brief-coverage | B |
-| v-05 measurability | B |
-| v-06 traceability | B |
-| v-07 impl-leakage | A |
-| v-08 domain-compliance | B |
-| v-09 project-type | B |
-| v-10 smart-validation | A |
-| v-11 holistic-quality | A |
-| v-12 completeness | B |
-| v-13 report-complete | C |
+Step grades: v-01=C, v-02=C, v-02b=B, v-03=C, v-04=B, v-05=B, v-06=B, v-07=A, v-08=B, v-09=B, v-10=A, v-11=A, v-12=B, v-13=C
 
 #### Stage 4: Architecture (MOST CRITICAL — all opus)
 
@@ -393,16 +372,16 @@ GATES: decisions
 ```
 
 Step grades:
-| Step | Grade | winston(W) | dev | quinn | john | bob |
-|------|-------|-----------|-----|-------|------|-----|
-| init | C | S | S | S | S | S |
-| context | B | O | O | O | O | S |
-| starter | B | O | O | O | S | S |
-| decisions | A | O | O | O | O | O |
-| patterns | A | O | O | O | O | O |
-| structure | A | O | O | O | O | O |
-| validation | A | O | O | O | O | O |
-| complete | C | S | S | S | S | S |
+| Step | Grade | GATE |
+|------|-------|------|
+| init | C | AUTO |
+| context | B | AUTO |
+| starter | B | AUTO |
+| decisions | A | GATE |
+| patterns | A | AUTO |
+| structure | A | AUTO |
+| validation | A | AUTO |
+| complete | C | AUTO |
 
 #### Stage 5: UX Design
 
@@ -421,22 +400,22 @@ UXUI Rules (injected into Writer prompt):
 4. Dead buttons prohibited — every UI element must have a function
 
 Step grades:
-| Step | Grade | sally(W) | john | dev | winston | quinn |
-|------|-------|---------|------|-----|---------|-------|
-| init | C | S | S | S | S | S |
-| discovery | B | O | O | S | S | S |
-| core-experience | B | O | O | S | S | S |
-| emotional-response | C | O | O | S | S | S |
-| inspiration | C | S | O | S | S | S |
-| design-system | A | O | O | O | O | S |
-| defining-experience | B | O | O | S | S | S |
-| visual-foundation | A | O | O | O | O | S |
-| design-directions | B | O | O | S | S | S |
-| user-journeys | A | O | O | O | O | S |
-| component-strategy | B | O | O | O | S | S |
-| ux-patterns | B | O | O | S | S | O |
-| responsive-a11y | B | O | S | O | S | O |
-| complete | C | S | S | S | S | S |
+| Step | Grade | GATE |
+|------|-------|------|
+| init | C | AUTO |
+| discovery | B | AUTO |
+| core-experience | B | AUTO |
+| emotional-response | C | AUTO |
+| inspiration | C | AUTO |
+| design-system | A | GATE |
+| defining-experience | B | AUTO |
+| visual-foundation | A | AUTO |
+| design-directions | B | GATE |
+| user-journeys | A | AUTO |
+| component-strategy | B | AUTO |
+| ux-patterns | B | AUTO |
+| responsive-a11y | B | AUTO |
+| complete | C | AUTO |
 
 #### Stage 6: Epics & Stories
 
@@ -449,12 +428,12 @@ GATES: design-epics
 ```
 
 Step grades:
-| Step | Grade | bob(W) | john | winston | dev | quinn |
-|------|-------|--------|------|---------|-----|-------|
-| validate-prereqs | B | S | O | O | S | O |
-| design-epics | A | O | O | O | O | O |
-| create-stories | A | O | O | O | O | O |
-| final-validation | B | S | O | O | O | O |
+| Step | Grade | GATE |
+|------|-------|------|
+| validate-prereqs | B | AUTO |
+| design-epics | A | GATE |
+| create-stories | A | AUTO |
+| final-validation | B | AUTO |
 
 #### Stage 7: Readiness Check (PARALLELIZED)
 
@@ -474,14 +453,14 @@ Round 3 (sequential): step-06-final-assessment
 ```
 
 Step grades:
-| Step | Grade | tech-writer(W) | winston | quinn | john | bob |
-|------|-------|---------------|---------|-------|------|-----|
-| document-discovery | C | S | S | S | S | S |
-| prd-analysis | B | S | O | S | O | S |
-| epic-coverage | B | S | O | O | S | O |
-| ux-alignment | B | S | S | S | O | S |
-| epic-quality | A | S | O | O | O | O |
-| final-assessment | A | S | O | O | O | O |
+| Step | Grade |
+|------|-------|
+| document-discovery | C |
+| prd-analysis | B |
+| epic-coverage | B |
+| ux-alignment | B |
+| epic-quality | A |
+| final-assessment | A |
 
 #### Stage 8: Sprint Planning
 

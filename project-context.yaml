@@ -1,0 +1,71 @@
+## Project Auto-Scan — Generated 2026-03-20
+package_manager: bun
+monorepo:
+  type: turborepo
+  packages:
+    - packages/server    # Hono + Bun backend
+    - packages/app       # React + Vite SPA (CEO app)
+    - packages/admin     # React + Vite SPA (Admin app)
+    - packages/ui        # Shared UI components
+    - packages/shared    # Shared types
+    - packages/e2e       # Playwright E2E tests
+    - packages/landing   # Landing page (Vite SSG)
+
+tsc:
+  enabled: true
+  commands:
+    - "npx tsc --noEmit -p packages/server/tsconfig.json"
+    - "npx tsc --noEmit -p packages/app/tsconfig.json"
+    - "npx tsc --noEmit -p packages/admin/tsconfig.json"
+    - "npx tsc --noEmit -p packages/ui/tsconfig.json"
+    - "npx tsc --noEmit -p packages/shared/tsconfig.json"
+    - "npx tsc --noEmit -p packages/landing/tsconfig.json"
+    - "npx tsc --noEmit -p tsconfig.json"
+
+test:
+  enabled: true
+  command: "bun test src/__tests__/"
+  runner: bun
+  test_files: 393
+  test_cases: 10154
+
+playwright:
+  enabled: true
+  config_path: "packages/e2e/playwright.config.ts"
+
+bmad:
+  enabled: true
+  path: "_bmad/"
+  workflows:
+    analysis: "_bmad/bmm/workflows/1-analysis/"
+    planning: "_bmad/bmm/workflows/2-plan-workflows/"
+    solutioning: "_bmad/bmm/workflows/3-solutioning/"
+    implementation: "_bmad/bmm/workflows/4-implementation/"
+
+ui:
+  framework: react
+  dev_command: "bun run dev"
+  css: tailwindcss-v4
+  apps:
+    - name: admin
+      dev_command: "bun run --cwd packages/admin dev"
+    - name: app
+      dev_command: "bun run --cwd packages/app dev"
+
+docs:
+  architecture: "_bmad-output/planning-artifacts/architecture.md"
+  feature_spec: "_bmad-output/planning-artifacts/v1-feature-spec.md"
+  prd: "_bmad-output/planning-artifacts/prd.md"
+  v3_brief: "_bmad-output/planning-artifacts/v3-openclaw-planning-brief.md"
+  audit: "_bmad-output/planning-artifacts/v3-corthex-v2-audit.md"
+  critic_rubric: "_bmad-output/planning-artifacts/critic-rubric.md"
+
+codebase_stats:
+  api_endpoints: 485
+  frontend_pages: 71
+  db_tables: 86
+  db_enums: 29
+  builtin_tools: 68
+  websocket_channels: 14
+  background_workers: 6
+  migrations: 60
