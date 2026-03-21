@@ -1,4 +1,4 @@
-## Project Auto-Scan — Generated 2026-03-20
+## Project Auto-Scan — Generated 2026-03-21 (v9.2 fresh run)
 package_manager: bun
 monorepo:
   type: turborepo
@@ -59,6 +59,14 @@ docs:
   v3_brief: "_bmad-output/planning-artifacts/v3-openclaw-planning-brief.md"
   audit: "_bmad-output/planning-artifacts/v3-corthex-v2-audit.md"
   critic_rubric: "_bmad-output/planning-artifacts/critic-rubric.md"
+
+key_constraints:
+  - "Claude OAuth CLI only — NO Gemini API anywhere"
+  - "Embedding: Voyage AI (Anthropic recommended) — NOT Gemini"
+  - "v2 unused/deprecated — v3 is fresh start, must be actually usable"
+  - "v1 features must all work in v3"
+  - "No stubs/mocks as done"
+  - "Korean 존댓말 for user communication"
 
 codebase_stats:
   api_endpoints: 485
