@@ -19,6 +19,46 @@ Full-cycle AI-powered development workflow. Works on any project with Claude Cod
 ```
 
 ---
+---
+
+## 0. Global Installation (One-Time Setup)
+
+All hooks, commands, and skills can be installed globally so they work on every project.
+
+### Option A: Copy from existing project
+```bash
+# From a project that already has the full setup
+cp -r .claude/hooks/ecc/ ~/.claude/hooks/ecc/
+cp -r .claude/hooks/instincts/ ~/.claude/hooks/instincts/
+cp .claude/commands/*.md ~/.claude/commands/
+cp -r .claude/skills/ ~/.claude/skills/
+cp -r .claude/agents/ ~/.claude/agents/
+# hooks.json is auto-created (see below)
+```
+
+### Option B: Fresh install
+Copy the following directories to `~/.claude/`:
+- `hooks/ecc/` — ECC Node.js hook infrastructure
+- `hooks/instincts/` — Instinct learning system (Python 3 required)
+- `commands/` — All slash commands
+- `skills/` — Domain knowledge skills
+- `agents/` — Specialized subagents
+
+### What's Global vs Project-Local
+| Component | Global (~/.claude/) | Project (.claude/) |
+|-----------|--------------------|--------------------|
+| ECC hooks (session, cost, security) | Global | - |
+| Slash commands (/learn, /evolve, etc.) | Global | - |
+| Skills (design, prototyping, etc.) | Global | - |
+| Agents (Socrates reviewers) | Global | - |
+| hooks.json (universal hooks) | Global | Project adds project-specific hooks |
+| BMAD workflow files (_bmad/) | - | Project (required for planning pipeline) |
+| cleanup.sh, pre-commit-tsc.sh | - | Project-specific |
+| cross-check.sh, smoke-test.sh | - | Project-specific |
+
+### After Global Install
+All `/kdh-*`, `/bmad-*`, `/learn`, `/evolve`, `/save-session` etc. commands work in any project directory.
+---
 
 ## 1. Pipeline Overview
 
@@ -397,7 +437,41 @@ Useful for tracking pipeline efficiency (how many tokens does Stage 2 with 5 age
 
 ## 11. Setting Up for a New Project
 
-### Step 1: Copy core infrastructure
+### If Using Global Setup (Recommended)
+
+If you've completed the global installation (Section 0), all commands and hooks are already available. You only need:
+
+#### Step 1: Set up BMAD workflow files (if using planning pipeline)
+The planning pipeline requires BMAD workflow directories in the project:
+```
+_bmad/bmm/
+  agents/          # Agent persona files
+  workflows/       # Stage workflow step files
+```
+Copy these from an existing project or the BMAD template repository.
+
+#### Step 2: Add project-specific hooks (optional)
+Create `.claude/hooks.json` in your project for project-specific hooks only:
+```bash
+# Examples of project-specific hooks:
+# - pre-commit-tsc.sh (TypeScript projects)
+# - cleanup.sh (tmux/worktree cleanup)
+# - cross-check.sh (domain-specific checks)
+# - smoke-test.sh (post-deploy verification)
+```
+Project hooks.json merges with the global hooks.json automatically.
+
+#### Step 3: Create CLAUDE.md for the new project
+Add project-specific rules (deploy instructions, coding conventions, etc.).
+
+#### Step 4: First run
+```bash
+/kdh-full-auto-pipeline planning   # Auto-scans project, starts planning
+```
+
+### If NOT Using Global Setup (Manual Per-Project)
+
+#### Step 1: Copy core infrastructure
 ```bash
 # From an existing project with the workflow
 cp -r .claude/hooks/ecc/ <new-project>/.claude/hooks/ecc/
@@ -405,7 +479,7 @@ cp -r .claude/hooks/instincts/ <new-project>/.claude/hooks/instincts/
 cp .claude/hooks.json <new-project>/.claude/hooks.json
 ```
 
-### Step 2: Copy commands you want
+#### Step 2: Copy commands you want
 ```bash
 # Core pipelines (always)
 cp .claude/commands/kdh-full-auto-pipeline.md <new-project>/.claude/commands/
@@ -426,7 +500,7 @@ cp .claude/commands/libre-*.md <new-project>/.claude/commands/
 cp .claude/commands/kdh-uxui-redesign-full-auto-pipeline.md <new-project>/.claude/commands/
 ```
 
-### Step 3: Ensure BMAD is set up (if using planning pipeline)
+#### Step 3: Ensure BMAD is set up (if using planning pipeline)
 The planning pipeline requires BMAD workflow directories:
 ```
 _bmad/bmm/
@@ -434,10 +508,10 @@ _bmad/bmm/
   workflows/       # Stage workflow step files
 ```
 
-### Step 4: Create CLAUDE.md for the new project
+#### Step 4: Create CLAUDE.md for the new project
 Add project-specific rules. The hooks and commands are self-contained.
 
-### Step 5: First run
+#### Step 5: First run
 ```bash
 /kdh-full-auto-pipeline planning   # Auto-scans project, starts planning
 ```
