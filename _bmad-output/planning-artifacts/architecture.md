@@ -1,17 +1,51 @@
 ---
-stepsCompleted: [1, 2, 3, 4, 5, 6, 7]
-partyModeRounds: 32
+# v3 "OpenClaw" Architecture Workflow — initialized 2026-03-21
+# Previous: v2 Architecture (7 steps complete, 32 party rounds, 2026-03-11)
+stepsCompleted: [1]
+workflowStatus: in-progress
+workflowVersion: 'v3-update'
+v2StepsCompleted: [1, 2, 3, 4, 5, 6, 7]
+v2PartyModeRounds: 32
+v2Date: '2026-03-11'
 inputDocuments:
-  - _bmad-output/planning-artifacts/prd.md
-  - _bmad-output/planning-artifacts/product-brief-corthex-v2-engine-refactor-2026-03-10.md
-  - _bmad-output/planning-artifacts/v1-feature-spec.md
-  - _poc/agent-engine-v3/POC-RESULT.md
-  - _bmad-output/planning-artifacts/ux-design-specification.md
+  # v3 PRIMARY sources
+  - path: _bmad-output/planning-artifacts/prd.md
+    role: "PRIMARY — v3 OpenClaw PRD (12 steps, Stage 2 avg 9.03/10). 116 FR + 74 NFR + 9 Journeys"
+  - path: _bmad-output/planning-artifacts/product-brief-corthex-v3-2026-03-20.md
+    role: "PRIMARY — v3 Brief. 4 layers + sprint order + Go/No-Go 8개 + target users + success metrics"
+  - path: _bmad-output/planning-artifacts/technical-research-2026-03-20.md
+    role: "RESEARCH — Stage 1 Technical Research. 6 domains, 2100 lines, avg 8.91/10"
+  - path: _bmad-output/planning-artifacts/prd-validation-fixes.md
+    role: "FIXES — 11 actionable fixes (4 CRITICAL applied). FR-TOOLSANITIZE, Go/No-Go #9, reflections table, Haiku API"
+  - path: .claude/logs/2026-03-21/ecc-analysis-plan.md
+    role: "ECC — Part 2: v3 architecture ideas (call_agent response, cost-aware routing, confidence scoring, tool sanitize)"
+  # v2 BASELINE sources (update, don't replace)
+  - path: _bmad-output/planning-artifacts/architecture.md
+    role: "BASELINE — v2 architecture (this file). D1~D21, E1~E10, 7 steps complete"
+  - path: _bmad-output/planning-artifacts/v1-feature-spec.md
+    role: "CONSTRAINT — v1 feature parity: if it worked in v1, it must work in v2/v3"
+  # Context snapshots (Stage 0-2)
+  - path: context-snapshots/planning-v3/stage-0-step-05-scope-snapshot.md
+    role: "CONTEXT — Stage 0 decisions, sprint order, blocker conditions"
+  - path: context-snapshots/planning-v3/stage-1-step-06-scope-snapshot.md
+    role: "CONTEXT — Stage 1 synthesis, Go/No-Go matrix, risk registry"
+  - path: context-snapshots/planning-v3/stage-2-step-11-12-scope-snapshot.md
+    role: "CONTEXT — Stage 2 final, PRD complete (116 FR, 74 NFR, 9 Journeys)"
+  # Structure
+  - path: project-context.yaml
+    role: "STRUCTURE — monorepo layout, codebase stats (485 API, 71 pages, 86 tables, 10,154 tests)"
+  - path: _bmad-output/planning-artifacts/v3-corthex-v2-audit.md
+    role: "AUTHORITY — code-verified v2 accurate numbers"
 workflowType: 'architecture'
 project_name: 'corthex-v2'
 user_name: 'ubuntu'
-date: '2026-03-11'
-partyModeRounds: 15
+date: '2026-03-21'
+v3EccIdeas:
+  - "ECC-1: call_agent response standardization: { status, summary, next_actions, artifacts }"
+  - "ECC-2: Cost-aware model routing: Tier-based model selection (admin configurable)"
+  - "ECC-3: Memory confidence scoring: Reflection cron confidence (0.3-0.9, decay, reinforcement)"
+  - "ECC-4: FR-TOOLSANITIZE: Tool response prompt injection defense at agent-loop.ts"
+  - "ECC-5: Go/No-Go #9: Capability evaluation testing methodology"
 ---
 
 # Architecture Decision Document
@@ -1194,3 +1228,200 @@ UX Design 시작 시 입력으로 전달:
 1. UX Design → `/bmad-bmm-create-ux-design` (UX Handoff Items 참조)
 2. Epics & Stories → `/bmad-bmm-create-epics-and-stories`
 3. Phase 1 첫 스토리: 의존성 검증 (bun.lockb 추적 확인 포함 — V11)
+
+---
+
+## v3 "OpenClaw" — Project Context Analysis
+
+_v3 Brownfield Update — v2 아키텍처(D1~D21, E1~E10) 위에 4 Layer + UXUI 리셋 추가. v2 삭제 없음._
+
+### v2 Baseline (코드 검증 완료 — 2026-03-20 감사)
+
+| 항목 | 수치 | 출처 |
+|------|------|------|
+| API 엔드포인트 | 485개 | `v3-corthex-v2-audit.md` |
+| 프론트엔드 페이지 | 71개 | `v3-corthex-v2-audit.md` |
+| DB 테이블 | 86개 | `v3-corthex-v2-audit.md` |
+| DB Enum | 29개 | `project-context.yaml` |
+| 빌트인 도구 | 68개 | `project-context.yaml` |
+| WebSocket 채널 | 16개 (`shared/types.ts:484-501`) | PRD 코드 검증 |
+| 백그라운드 워커 | 6개 | `project-context.yaml` |
+| 마이그레이션 | 60개 | `project-context.yaml` |
+| 테스트 | 10,154 cases / 393 files | `project-context.yaml` |
+| Epic | 21개 완료 (98/98 스토리) | MEMORY.md |
+
+### v3 Requirements Overview
+
+**v3 Functional Requirements (49개 신규, v2 97개 활성 → 총 116개 활성, 2개 삭제):**
+
+| Area | FR 수 | Sprint | 아키텍처 영향 |
+|------|-------|--------|-------------|
+| OpenClaw 가상 사무실 (FR-OC) | 11 | Sprint 4 | `packages/office/` 독립 패키지, PixiJS 8 React.lazy, `/ws/office` 17번째 WS 채널, `office-channel.ts` activity_logs tail, PostgreSQL LISTEN/NOTIFY 또는 500ms 폴링 폴백 |
+| n8n 워크플로우 (FR-N8N) | 6 | Sprint 2 | `n8nio/n8n:2.12.3` Docker ARM64, Hono reverse proxy `/admin/n8n/*` + `/admin/n8n-editor/*`, 포트 5678 localhost 전용, N8N-SEC 6-layer 보안, tag 기반 멀티테넌트 |
+| 마케팅 자동화 (FR-MKT) | 7 | Sprint 2 | n8n 프리셋 워크플로우, 외부 AI 도구 엔진 카테고리 선택, `company.settings` JSONB AES-256 API 키 저장, 워터마크 ON/OFF, fallback 엔진 |
+| 에이전트 성격 (FR-PERS) | 8 | Sprint 1 | `personality_traits JSONB` agents 테이블 컬럼, `soul-enricher.ts` 5개 extraVars, 4-layer sanitization (PER-1), 프리셋 3종+, DB CHECK 제약 |
+| 에이전트 메모리 (FR-MEM) | 11 | Sprint 3 | `observations` 테이블 신규, `reflections` 테이블 신규 (FIX-3 해소: 별도 테이블 확정), `memory-reflection.ts` 크론 워커, Gemini Embedding 768차원 벡터화, cosine ≥ 0.75 검색, `{relevant_memories}` Soul 주입 |
+| 도구 응답 보안 (FR-TOOLSANITIZE) | 3 | Sprint 2 | `agent-loop.ts` PostToolUse에 injection detection 레이어 추가, 10종 adversarial payload 100% 차단, 감사 로그 |
+| CEO앱 페이지 통합 (FR-UX) | 3 | 병행 | 14→6 그룹 통합, 라우트 redirect 호환, 기능 100% 유지 |
+
+**FIX-3 해소 (CRITICAL — 아키텍처 결정):** PRD에서 "Option B 기존 agent_memories 확장"과 "별도 reflections 테이블" 간 모순이 있었다. **아키텍처 결정: 3-테이블 모델 확정.**
+- `agent_memories`: v2 기존 유지 (Zero Regression). `memoryTypeEnum`에 `'reflection'`, `'observation'` 추가하지 않음
+- `observations`: 신규 테이블 (raw INPUT 계층, company_id FK)
+- `reflections`: 신규 테이블 (크론 LLM 요약 OUTPUT, pgvector embedding, company_id FK)
+- 근거: agent_memories는 v2 memory-extractor.ts 즉시 추출용. observations/reflections는 v3 3단계 파이프라인 전용. 스키마 분리로 Zero Regression 보장 + race condition 불가.
+
+**v3 Non-Functional Requirements (16개 신규, v2 58개 활성 → 총 74개 활성, 2개 삭제):**
+
+| Category | 신규 | P0 | 아키텍처 영향 |
+|---------|------|-----|-------------|
+| Performance (P13~P17) | 5 | P13 `/office` FCP ≤3초 + 번들 ≤200KB | PixiJS tree-shaking 6클래스, React.lazy 코드 스플릿, Reflection 크론 ≤30초/에이전트, MKT E2E 이미지≤2분/영상≤10분 |
+| Security (S8~S9) | 2 | S8+S9 둘 다 P0 | personality 4-layer sanitization, n8n 6-layer 보안 (포트→proxy→tag→HMAC→Docker→DB차단) |
+| Scalability (SC8~SC9) | 2 | SC9 P0 | /ws/office 회사별 20연결 부하, n8n Docker ≤4GB/2CPU + VPS 전체 ≤80% |
+| Accessibility (A5~A7) | 3 | — | Big Five aria-valuenow+키보드, /office aria-live 대안패널, /office 모바일 리스트뷰 |
+| Data (D8) | 1 | — | observations 90일 보관→아카이브, reflections 무기한 |
+| Cost (COST3) | 1 | — | Reflection Haiku ≤$0.10/일 |
+| External (EXT3) | 1 | — | 외부 AI API 타임아웃 정책 |
+| Operations (O9~O10) | 1 | — | n8n Docker 모니터링 |
+
+### v3 Scale & Complexity Assessment
+
+**Complexity: HIGH (33/40점, v2 29/40에서 상승)**
+
+| 축 | v2 | v3 | v3 근거 |
+|---|------|------|--------|
+| 아키텍처 변경 범위 | 5/5 | 3/5 | v3: 순수 추가(신규 테이블+서비스). 기존 engine/ 구조 불변 |
+| 외부 의존성 리스크 | 4/5 | 5/5 | PixiJS 8 + @pixi/react + n8n Docker + Tiled + AI 스프라이트 = 5개 신규 |
+| DB 스키마 변경 | 3/5 | 3/5 | observations + reflections 신규, personality_traits JSONB, memoryTypeEnum 확장 없음 |
+| 실시간 시스템 영향 | 4/5 | 4/5 | /ws/office 17번째 채널, PixiJS 60fps, 적응형 heartbeat |
+| 인증/보안 변경 | 3/5 | 4/5 | n8n 6-layer + personality 4-layer + /ws/office JWT+token bucket + FR-TOOLSANITIZE |
+| 회귀 테스트 범위 | 5/5 | 5/5 | 485 API + 10,154 테스트 전체 통과 필수 (Zero Regression) |
+| UX 변경 범위 | 3/5 | 5/5 | UXUI 완전 리셋 + /office 신규 + n8n 관리 + Big Five 슬라이더 + 14→6 페이지 통합 |
+| 팀 역량 요구 | 2/5 | 4/5 | PixiJS 게임 시각화 + Tiled + 스프라이트 애니메이션 = 완전 신규 도메인 |
+
+**Primary domain:** AI Agent Orchestration (1차) + Workflow Automation (2차, n8n) + Agent Intelligence (3차, Big Five + Memory)
+
+**Type composition:** web_app 40% / saas_b2b 35% / developer_tool 25%
+
+**Estimated v3 architectural components:** ~25개 (v2 15개 + 신규 10: observations table, reflections table, memory-reflection.ts, soul-enricher.ts 확장, office-channel.ts, packages/office/, n8n Docker + compose, Hono n8n proxy, tool-sanitizer, personality DB migration)
+
+### v3 Infrastructure Impact
+
+**VPS 리소스 예산 (Oracle ARM64 4코어, 24GB RAM):**
+
+| 서비스 | RAM (idle) | RAM (peak) | CPU | v2/v3 |
+|--------|-----------|-----------|-----|-------|
+| Bun 서버 | ~500MB | ~2GB | 1코어 | v2 |
+| PostgreSQL + pgvector | ~1GB | ~3GB | 0.5코어 | v2 |
+| GitHub Actions runner | ~200MB | ~4GB (빌드 시) | 1코어 (빌드 시) | v2 |
+| **n8n Docker** | **~860MB** | **~4GB** | **2코어 상한** | **v3 신규** |
+| OS + Docker overhead | ~500MB | ~1GB | 0.5코어 | v2 |
+| **총계** | **~3GB** | **~14GB** | **4코어** | — |
+| **여유** | **~21GB** | **~10GB** | **포화 가능** | — |
+
+**병목 분석 (v3 업데이트):**
+- **메모리: 여유** — 24GB에서 peak 14GB = 10GB 여유. n8n 4GB 상한 제한으로 OOM 방지
+- **CPU: v3 악화** — n8n Docker 2코어 상한이 추가됨. Bun+PG+CI+n8n 동시 peak 시 4코어 포화. Reflection 크론이 LLM API I/O 대기 위주이므로 CPU 부하는 미미
+- **디스크: 주의** — observations 90일 보관, reflections 무기한. 에이전트 50개 × 일 20 observations × 90일 = 90,000행. pgvector 768차원 × 90,000 ≈ 270MB. 관리 가능
+
+### v3 Sprint Dependencies & Go/No-Go Matrix
+
+```
+Pre-Sprint (Phase 0):
+  - Stitch 2 디자인 토큰 확정 (Sprint 1 착수 선행 조건)
+  - Neon Pro 업그레이드 (전 Sprint 블로커)
+  - 사이드바 IA 선행 결정
+  ↓ [선행 조건: 전부 완료 필수]
+Sprint 1 (Layer 3: Big Five 성격, 독립·낮음)
+  ↓ [soul-enricher.ts 주입 경로 확보]
+Sprint 2 (Layer 2: n8n + 마케팅 + FR-TOOLSANITIZE, 독립·중간)
+  ↓ [Layer 0 ≥60% 미달 시 레드라인]
+Sprint 3 (Layer 4: 에이전트 메모리 3단계, 복잡·높음)
+  ↓ [Go/No-Go #7: Reflection 비용 한도]
+Sprint 4 (Layer 1: OpenClaw PixiJS, 에셋 선행 필요)
+  ↓ [Go/No-Go #8: 에셋 PM 승인]
+
+Layer 0 (UXUI 리셋): 전 Sprint 병행 (인터리브)
+```
+
+**Go/No-Go 매트릭스 (9개 — 원본 8개 + #9 Capability Evaluation):**
+
+| # | Gate | Sprint | 기준 | 실패 시 |
+|---|------|--------|------|--------|
+| 1 | Zero Regression | 전체 | 485 API smoke-test + 10,154 테스트 전통과 | Sprint 차단 |
+| 2 | Big Five 주입 | 1 | extraVars 5개 키 존재 + 빈 문자열 미허용 + 4-layer sanitization 100% | Sprint 1 롤백 |
+| 3 | n8n 보안 | 2 | 포트 5678 외부 차단 + Hono proxy Admin JWT + 6-layer 전부 통과 | n8n 비활성화 + ARGOS 유지 |
+| 4 | Memory Zero Regression | 3 | 기존 agent_memories 데이터 단절 0건 | Sprint 3 롤백 |
+| 5 | PixiJS 번들 | 4 | `/office` 번들 < 200KB gzipped (tree-shaking 6클래스) | Canvas 2D 최소 구현 (0KB) |
+| 6 | UXUI Layer 0 | 전체 | ESLint 하드코딩 색상 0건 + Playwright dead button 0건 | Layer 0 가속 |
+| 7 | Reflection 비용 | 3 | Tier 3-4 Haiku ≤ $0.10/day. 초과 시 크론 일시 중지 | Reflection 주기 확대 |
+| 8 | 에셋 품질 | 4 시작 전 | AI 생성 스프라이트 PM 최종 승인 | Sprint 4 미착수 |
+| **9** | **Capability Evaluation** | **3** | **동일 태스크 N ≥ 3회 반복, 3회차 재수정 횟수 ≤ 1회차 50%** | **메모리 파이프라인 재검토** |
+
+### v3 Risk Registry (R1~R9, Stage 1 Research 검증 완료)
+
+| # | Risk | 심각도 | Sprint | 완화 | 상태 |
+|---|------|--------|--------|------|------|
+| R1 | PixiJS 8 번들 200KB 초과 | HIGH | 4 | tree-shaking 6클래스 extend(), 실패 시 Canvas 2D | READY (200KB 미만 검증) |
+| R2 | n8n iframe vs API 복잡성 | MEDIUM | 2 | API-only 확정 (iframe 불사용) | RESOLVED |
+| R3 | pgvector Neon 호환 | LOW | 3 | Epic 10에서 이미 검증 완료 | RESOLVED |
+| R4 | UXUI 428 color-mix | HIGH | 병행 | 완전 리셋 (Stitch 2 디자인 기준) | READY |
+| R5 | PRD 7개 known issues | MEDIUM | 전체 | v3-corthex-v2-audit.md 교차 검증 | RESOLVED |
+| R6 | n8n Docker ARM64 리소스 경합 | CRITICAL | 2 | 4G/2CPU 제한 + OOM restart:unless-stopped + healthcheck | READY |
+| R7 | personality_traits prompt injection | HIGH | 1 | 4-layer sanitization (Key→Zod→strip→regex) | READY |
+| R8 | AI 스프라이트 재현 불가능성 | MEDIUM | 4 | seed/deterministic 도구 또는 오픈소스 LPC Sprite Sheet | READY |
+| R9 | soul-renderer `\|\| ''` silent failure | LOW | 1 | Go/No-Go #2 빈 문자열 검증 기준 | READY |
+
+### v3 Cross-Cutting Concerns (v2 6개 유지 + v3 5개 추가)
+
+**v2 유지 (1~6):**
+1. CLI 토큰 전파 — SessionContext.cliToken 핸드오프 체인 전체 전파
+2. 멀티테넌시 (company_id) — getDB(ctx.companyId) 전 테이블
+3. 실시간 이벤트 버스 — WebSocket 16→17채널
+4. SDK 격리 경계 (E8) — engine/ 공개 API 2파일만
+5. Soul 템플릿 변수 치환 — soul-renderer.ts 6개 + v3 personality 5개 + memory 1개 = 12개
+6. 에러 투명성 — "블랙박스 에러 0건"
+
+**v3 신규 (7~11):**
+
+7. **도구 응답 프롬프트 주입 방어 (FR-TOOLSANITIZE)** — n8n webhook, 외부 API, 웹 스크래핑 응답에서 injection 패턴 감지·차단. agent-loop.ts PostToolUse 레이어에서 `credential-scrubber` 이후, `delegation-tracker` 이전에 실행. 10종 adversarial payload 100% 차단.
+
+8. **Cost-aware 모델 라우팅 (ECC-2)** — v2 model-selector.ts는 tier→model 단순 매핑. v3에서 Admin이 Tier별 모델을 직접 설정 가능 (tier_configs 테이블 확장). Reflection 크론은 무조건 Haiku (비용 제한). 대화는 회사별 Admin 설정 모델.
+
+9. **call_agent 응답 표준화 (ECC-1)** — v2 call_agent 응답은 자유 형식 텍스트. v3에서 구조화:
+```typescript
+interface CallAgentResponse {
+  status: 'success' | 'partial' | 'error';
+  summary: string;          // 1-2문장 요약
+  next_actions?: string[];  // 후속 제안
+  artifacts?: string[];     // 생성된 파일/URL
+}
+```
+상위 에이전트가 하위 결과를 파싱하여 교차 검증(FR16)에 활용.
+
+10. **메모리 Confidence Scoring (ECC-3)** — Reflection 크론이 observations를 분석할 때 confidence score (0.3~0.9) 부여. 초기 관찰은 0.3 (낮음), 반복 패턴 확인 시 reinforcement (최대 0.9), 시간 경과 시 decay. confidence ≥ 0.7인 reflections만 Soul 주입 대상. 구체적 decay/reinforcement 알고리즘은 Step 4 결정.
+
+11. **Go/No-Go #9 Capability Evaluation (ECC-5)** — "에이전트가 실제로 성장했는가" 검증. 표준화된 태스크 corpus로 N ≥ 3회 반복 실행, 3회차 재수정 횟수가 1회차 대비 ≤ 50%인지 통계적으로 측정. Sprint 3 종료 조건.
+
+### v3 ECC Architecture Ideas Summary
+
+| # | ECC Idea | 아키텍처 반영 위치 | Sprint | 우선순위 |
+|---|----------|------------------|--------|---------|
+| ECC-1 | call_agent 응답 표준화 | `tool-handlers/builtins/call-agent.ts` 응답 파싱 | Sprint 1 (call_agent 구조 선행) | HIGH |
+| ECC-2 | Cost-aware 모델 라우팅 | `engine/model-selector.ts` Admin 설정 확장 | Sprint 1 | MEDIUM |
+| ECC-3 | Memory confidence scoring | `memory-reflection.ts` confidence 필드 + decay/reinforcement | Sprint 3 | HIGH |
+| ECC-4 | FR-TOOLSANITIZE | `engine/hooks/tool-sanitizer.ts` 신규 PostToolUse Hook | Sprint 2 | CRITICAL |
+| ECC-5 | Capability evaluation (#9) | 테스트 프레임워크 + 표준 태스크 corpus | Sprint 3 | HIGH |
+
+### PRD Carry-Forward (아키텍처에서 해소할 항목)
+
+| 항목 | 출처 | 아키텍처 결정 필요 |
+|------|------|-----------------|
+| FIX-3 reflections 테이블 모순 | prd-validation-fixes.md | ✅ 해소: 3-테이블 모델 (agent_memories/observations/reflections 독립) |
+| FIX-6 FR-OC7 구현 상세 | prd-validation-fixes.md | Step 4에서 LISTEN/NOTIFY vs 폴링 결정 |
+| FIX-9 8 FR 구현 누설 | prd-validation-fixes.md | Step 4~6에서 흡수 |
+| N8N-SEC API key + rate limiting | Stage 2 carry-forward | Step 4에서 n8n 보안 아키텍처 결정 |
+| n8n 백업 전략 | Stage 2 carry-forward | Step 6 Infrastructure에서 다룸 |
+| Sprint 2 과부하 (15건+) | PRD §구현 고려사항 | Step 4에서 Sprint 2/2.5 분할 결정 |
+| Reflection 크론 스케줄링 | PRD §구현 고려사항 | Step 4에서 크론 오프셋 vs pg-boss 큐잉 결정 |
+| packages/office 독립 패키지 | FR-OC1, FR-OC8 | Step 6 Structure에서 다룸 |
+| JSONB race condition | PRD §토큰 보안 | Step 4에서 atomic update vs 별도 테이블 결정 |
