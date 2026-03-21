@@ -40,6 +40,16 @@
             "type": "command",
             "command": "/home/ubuntu/corthex-v2/.claude/hooks/pre-commit-tsc.sh",
             "timeout": 120
+          },
+          {
+            "type": "command",
+            "command": "/home/ubuntu/corthex-v2/.claude/hooks/party-log-verify.sh",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "node /home/ubuntu/corthex-v2/.claude/hooks/party-mode-compliance.js",
+            "timeout": 30
           }
         ]
       },
