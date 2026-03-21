@@ -33,7 +33,7 @@ v8.0의 근본 문제를 발견하고 전면 재설계:
 ### 사장님 결정사항 (2026-03-20)
 - 기존 테마 전부 폐기 → 새 테마로 UXUI 완전 리디자인
 - OpenClaw 가상 사무실 + n8n + 성격 시스템 + 메모리 아키텍처 추가
-- UXUI: Subframe 메인 + Stitch 보조 (둘 다 MCP 설치됨)
+- UXUI: **Stitch 2 메인** (Subframe 폐기). Stitch 2 = 2026-03-19 업데이트 (React 내보내기, DESIGN.md, MCP SDK)
 - 조직 템플릿: 유지 (온보딩 연결)
 - 전원 Opus 모델, 스텝 등급별 sonnet 믹스
 - 품질 우선, 병렬 코딩 지원

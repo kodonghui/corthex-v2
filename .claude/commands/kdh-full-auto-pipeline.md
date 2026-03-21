@@ -1,9 +1,9 @@
 ---
 name: 'kdh-full-auto-pipeline'
-description: 'Universal Full Pipeline v9.0 — BMAD-powered full-cycle automation. Auto-discovers workflows, real BMAD agent personas, party mode per step, user gates. Usage: /kdh-full-auto-pipeline [planning|story-ID|parallel ID1 ID2...|swarm epic-N]'
+description: 'Universal Full Pipeline v9.1 — BMAD-powered full-cycle automation. Auto-discovers workflows, real BMAD agent personas, party mode per step, user gates. Usage: /kdh-full-auto-pipeline [planning|story-ID|parallel ID1 ID2...|swarm epic-N]'
 ---
 
-# Universal Full Pipeline v9.0
+# Universal Full Pipeline v9.1
 
 ## Mode Selection
 
@@ -152,9 +152,13 @@ PROHIBITION: Never spawn agents as `critic-a`, `critic-b`, `critic-c` or any gen
 | **B** (important) | 2 | Most content steps |
 | **C** (setup) | 1 | init, complete, routine validation |
 
+**Grade C = Writer Solo.** Grade C steps (init, complete) skip party mode entirely. Writer executes alone, no critic review needed. This saves agent resources on routine steps.
+
 ---
 
 ## Party Mode Protocol (per step)
+
+**Applies to Grade A and B steps only.** Grade C steps use Writer Solo (see above).
 
 Supports variable team sizes (3-5 critics).
 
@@ -175,10 +179,23 @@ Supports variable team sizes (3-5 critics).
    - Avg >= 7: PASS → save context-snapshot → Writer reports [Step Complete]
    - Avg < 7 AND retry < grade_max: Writer rewrites
    - Retry >= grade_max: ESCALATE to Orchestrator
+10. Score Variance Check (v9.1):
+   - Calculate standard deviation of all critic scores
+   - If stdev < 0.3: Orchestrator warns "점수가 너무 수렴합니다" and requests at least 1 critic to independently re-score
+   - Purpose: prevent score inflation and consensus bias (e.g., unanimous 9.00)
 ```
 
 Party-log naming: `party-logs/{stage}-{step}-{agent-name}.md`
-Orchestrator validates ALL critic logs + fixes.md exist before accepting [Step Complete].
+
+### Party-log Verification (v9.1)
+
+Orchestrator validates ALL critic logs + fixes.md exist before accepting [Step Complete]:
+```
+1. For each critic in team: check file exists at party-logs/{stage}-{step}-{critic-name}.md
+2. Check fixes log exists: party-logs/{stage}-{step}-fixes.md
+3. If ANY file missing → REJECT [Step Complete], request missing critic to write their log
+4. Only accept [Step Complete] when ALL files verified
+```
 
 ---
 
@@ -225,7 +242,7 @@ AUTO steps (non-gate) proceed without user input. Orchestrator only notifies use
 
 ---
 
-## Anti-Patterns (v9.0 — production failures)
+## Anti-Patterns (v9.1 — production failures)
 
 1. **Writer calls Skill tool** — Skill auto-completes all steps internally, bypasses critic review. FIX: Writer MUST NEVER use Skill tool. Read step files with Read tool, write manually.
 2. **Writer batches steps** — Writes steps 2-6 then sends one review. FIX: Write ONE step → party mode → THEN next step.
@@ -233,6 +250,9 @@ AUTO steps (non-gate) proceed without user input. Orchestrator only notifies use
 4. **Critic skips persona file** — Reviews without reading `_bmad/bmm/agents/*.md`. FIX: First action MUST be Read persona file.
 5. **GATE step auto-proceeds** — Writer skips user input on GATE step. FIX: GATE steps MUST send [GATE] to Orchestrator and WAIT.
 6. **Shutdown-then-cancel race** — shutdown_request is irreversible. FIX: NEVER send unless 100% committed.
+7. **Writer duplicates prior step content** (v9.1) — Writer copies risk/requirement tables that already exist in earlier steps. FIX: Before writing, Writer MUST Read prior steps' sections on the same topic. If content exists, use `§{section_name} 참조` cross-reference instead of duplicating. (Incident: Step 06/08 risk tables had 6 duplicate entries.)
+8. **Score convergence inflation** (v9.1) — All critics give identical scores after fixes (e.g., unanimous 9.00). FIX: Orchestrator checks score standard deviation; if stdev < 0.3, triggers independent re-scoring warning. (Incident: Step 08 all 4 critics scored exactly 9.00.)
+9. **Missing party-log files** (v9.1) — Critic reviews sent via message only, no file written. FIX: Orchestrator verifies all `party-logs/{stage}-{step}-{critic-name}.md` files exist before accepting [Step Complete]. Missing file = REJECT. (Incident: Step 02-05 had only winston's logs.)
 
 Additional safeguards:
 - TeamDelete fails after tmux kill → `rm -rf ~/.claude/teams/{name} ~/.claude/tasks/{name}`, retry

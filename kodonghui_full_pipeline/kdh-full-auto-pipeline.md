@@ -1,1021 +1,845 @@
 ---
 name: 'kdh-full-auto-pipeline'
-description: 'BMAD Full Pipeline v5.3 (team agents + swarm + smoke-test + cross-check). planning(3-agent real party) or story dev(single/parallel/swarm). Usage: /kdh-full-auto-pipeline [planning|story-ID|parallel ID1 ID2...|swarm epic-N]'
+description: 'Universal Full Pipeline v9.1 — BMAD-powered full-cycle automation. Auto-discovers workflows, real BMAD agent personas, party mode per step, user gates. Usage: /kdh-full-auto-pipeline [planning|story-ID|parallel ID1 ID2...|swarm epic-N]'
 ---
 
-# Kodonghui Full Pipeline v5.3
-
-BMAD pipeline with **team agent real party**, **parallel story dev**, **swarm auto-epic**, **smoke-test**, and **cross-check**.
-"Brief만 참여 → 자러감 → 아침에 완성" 가능.
+# Universal Full Pipeline v9.1
 
 ## Mode Selection
 
-- `planning` or no args: Planning pipeline with **3-agent real party** (Writer + Critic-A + Critic-B)
-- Story ID (e.g. `3-1`): Single story dev pipeline (create -> dev -> simplify -> TEA -> QA -> CR)
-- `parallel story-ID1 story-ID2 ...`: **Parallel story dev** with Git Worktrees (max 3 simultaneous)
-- `swarm epic-N`: **Swarm auto-epic** — registers ALL stories as tasks, 3 workers self-organize (v5.1)
+- `planning` or no args: Planning pipeline — BMAD full-cycle, 9 stages, real agent party mode
+- Story ID (e.g. `3-1`): Single story dev — 6 phases with party mode per phase
+- `parallel story-ID1 story-ID2 ...`: Parallel story dev — Git Worktrees, max 3 simultaneous
+- `swarm epic-N`: Swarm auto-epic — all stories as tasks, 3 self-organizing agent teams
 
 ---
 
-## What Changed in v5.3 (from v5.2)
+## Step 0 (ALL Modes): Project Auto-Scan
 
-| Change | Why |
-|--------|-----|
-| **Step 5: cross-check** | Pattern consistency across files. Catches: tenantMiddleware missing, hardcoded colors, Material Symbols remnants, insecure companyId patterns, unsafe migrations. Script: `.claude/hooks/cross-check.sh` |
-| **Step 6: smoke-test** | Production API health check post-deploy. Hits every admin + workspace endpoint. Catches: missing DB tables, unregistered routes, migration failures. Script: `.claude/hooks/smoke-test.sh` |
-| **10-item checklist** | Was 8 items. Added cross-check PASS + smoke-test PASS as mandatory before "done". |
-| **Root cause** | v5.2 had 0 production verification. tsc + tests passing ≠ production working. 7 DB tables were missing, 13 routes had no tenantMiddleware — none caught until manual API check on 2026-03-18. |
+Run this BEFORE any other step. Results are cached in `project-context.yaml` at project root.
 
-## What Changed in v5.2 (from v5.1)
+```
+1. Read package.json → detect:
+   - Package manager: check for bun.lockb (bun), pnpm-lock.yaml (pnpm), yarn.lock (yarn), else npm
+   - Project name, version, scripts (dev, build, test, lint)
 
-| Change | Why |
-|--------|-----|
-| **Writer Skill prohibition** | Writer called Skill tool → skill auto-completed all steps → Critics never reviewed. Now explicitly forbidden with fallback instructions. |
-| **Step file paths in Planning Stages** | v5.1 listed `Skill: bmad-bmm-*` → Orchestrator told Writer to call skills. Now lists actual step file paths. |
-| **Explicit per-step loop in Writer prompt** | v5.1 Writer prompt was ambiguous about when to stop and request review. Now has 5-phase mandatory loop with WAIT points. |
-| **Anti-Pattern documentation** | 3 production failures documented as warnings to prevent recurrence. |
-| **Orchestrator step instruction format** | v5.1 said "embed step context". Now specifies exact message format with file paths. |
+2. Find ALL tsconfig.json files:
+   - glob("**/tsconfig.json", ignore node_modules)
+   - If monorepo: find the root tsconfig AND each package tsconfig
+   - Build tsc command list: ["npx tsc --noEmit -p {path}" for each tsconfig]
+   - If zero found: tsc_enabled = false
 
-## What Changed in v5.1 (from v5.0)
+3. Detect monorepo structure:
+   - turbo.json → Turborepo
+   - pnpm-workspace.yaml → pnpm workspace
+   - lerna.json → Lerna
+   - workspaces in package.json → npm/yarn workspaces
+   - None found → single-package project
 
-| Change | Why |
-|--------|-----|
-| **Mode D: Swarm auto-epic** | `swarm epic-N` → ALL stories registered as tasks, 3 workers self-organize. Sleep-and-done. |
-| **TaskCreate/TaskUpdate** | Orchestrator pre-registers all stories with dependencies. Workers auto-pick unblocked tasks. |
-| **Completion report** | After all stories done → auto-generate epic summary + retrospective suggestion |
-| **Auto-retry on merge fail** | If worktree merge fails tsc, worker auto-fixes (1 attempt) before escalating |
+4. Find test runner config:
+   - vitest.config.* → "npx vitest run"
+   - jest.config.* or jest in package.json → "npx jest"
+   - "bun:test" in files → "bun test"
+   - playwright.config.* → playwright_enabled = true
+   - cypress.config.* → cypress_enabled = true
+   - None found → test_enabled = false
 
-### v5.0 Changes (preserved)
+5. Detect BMAD:
+   - Check if _bmad/ directory exists → bmad_enabled = true/false
+   - If true: locate workflow dirs, agent files, templates
+   - If false: use simplified workflow (see "Non-BMAD Workflow" section)
 
-| Change | Why |
-|--------|-----|
-| **3-agent real party** (planning) | 1 brain role-playing 7 experts → 3 independent brains cross-checking. Blind spot detection ↑ |
-| **Model mixing** | Orchestrator=Opus (judgment), Workers=Sonnet (execution). Opus weekly hours preserved |
-| **Parallel story dev** (Mode C) | Independent stories run simultaneously in Git Worktrees. Time ÷3 |
-| **Graceful fallback** | If TeamCreate or multi-agent fails → auto-fallback to v4.2 single-worker mode |
+6. Detect UI framework:
+   - Check for: React (react-dom), Vue, Svelte, Angular, Next.js, Nuxt, Remix, Astro
+   - Find dev server command from package.json scripts
+   - Check for Playwright config → vrt_enabled = true/false
+   - Check for Tailwind/CSS framework config
 
-### Preserved from v4.2
-- Context-snapshot after every step (Worker resilience)
-- Snapshot injection on respawn/new stage
-- `/simplify` external quality gate (story dev)
-- max_retry: 2, step_timeout: 10min, party-log validation
-- Pipeline never blocks (graceful degradation)
+7. Detect architecture docs (any of these):
+   - _bmad-output/planning-artifacts/architecture.md
+   - docs/architecture.md, docs/ARCHITECTURE.md
+   - ARCHITECTURE.md at root
+   - Any file matching **/architecture*.md
+   - Store path or null
+
+8. Detect existing feature spec (any of these):
+   - _bmad-output/planning-artifacts/*feature-spec*
+   - docs/*feature-spec*, docs/*features*
+   - Any file matching **/*feature-spec*.md
+   - Store path or null
+
+9. Detect existing PRD (any of these):
+   - _bmad-output/planning-artifacts/prd.md
+   - docs/prd.md, docs/PRD.md
+   - Any file matching **/prd*.md
+   - Store path or null
+
+10. Save results to project-context.yaml
+```
+
+If `project-context.yaml` already exists and is < 1 hour old, skip re-scan (use cached).
+
+---
+
+## BMAD Auto-Discovery Protocol
+
+For each planning stage, steps are discovered dynamically — NEVER hardcoded.
+
+```
+1. Read the workflow directory path for the stage
+2. glob("{dir}/steps/*.md") OR glob("{dir}/steps-c/*.md") as configured per stage
+3. Filter out files matching *-continue* or *-01b-*
+4. Sort by filename (natural sort: step-01, step-02, step-02b, step-02c, step-03...)
+5. For each discovered step file: execute party mode
+```
+
+If a steps/ directory is empty or missing → SKIP stage with warning, never fail.
+
+---
+
+## BMAD Agent Roster
+
+ALL agents are spawned with their **real BMAD names** and **full persona files loaded**.
+
+| Spawn Name | Persona File | Expertise |
+|-----------|-------------|-----------|
+| `winston` | `_bmad/bmm/agents/architect.md` | Distributed systems, cloud infra, API design, scalable patterns |
+| `quinn` | `_bmad/bmm/agents/qa.md` | Test automation, API testing, E2E, coverage analysis |
+| `john` | `_bmad/bmm/agents/pm.md` | PRD, requirements discovery, stakeholder alignment |
+| `sally` | `_bmad/bmm/agents/ux-designer.md` | User research, interaction design, UI patterns |
+| `bob` | `_bmad/bmm/agents/sm.md` | Scrum master, sprint planning, delivery risk |
+| `dev` | `_bmad/bmm/agents/dev.md` | Implementation, code quality, debugging |
+| `analyst` | `_bmad/bmm/agents/analyst.md` | Analysis, research synthesis |
+| `tech-writer` | `_bmad/bmm/agents/tech-writer/tech-writer.md` | Documentation, technical writing |
+
+### Agent Spawn Template
+
+Every agent MUST be spawned with this structure:
+
+```
+You are {NAME} in team "{team_name}". Role: {Writer|Critic}.
+
+## Your Persona
+Read and fully embody: _bmad/bmm/agents/{file}.md
+Load the persona file with the Read tool BEFORE doing anything else.
+
+## Your Expertise
+{expertise from roster above}
+
+## Scoring Rubric
+Read: _bmad-output/planning-artifacts/critic-rubric.md
+6 dimensions, 7/10 pass threshold, any dimension <3 = auto-fail.
+
+## References
+- project-context.yaml
+- All context-snapshots from prior stages
+- {stage-specific references}
+```
+
+PROHIBITION: Never spawn agents as `critic-a`, `critic-b`, `critic-c` or any generic name.
 
 ---
 
 ## Model Strategy
 
-```
-Orchestrator (team-lead): model=opus   — judgment, merge decisions, orchestration
-Writer (planning):        model=sonnet — document writing, enough quality for drafting
-Critic-A (planning):      model=sonnet — product+UX review, independent brain
-Critic-B (planning):      model=sonnet — tech+QA review, independent brain
-Story Dev Worker:         model=sonnet — code implementation, BMAD skill execution
-```
+**ALL agents = opus. No exceptions.** Agent tool fixes model at spawn time, so per-step mixing is not possible. All agents in all stages are spawned with `model: opus`.
 
-Why Sonnet for workers: Independent brains > single stronger brain for cross-review.
-3 Sonnet agents finding each other's blind spots beats 1 Opus reviewing itself.
-Sonnet weekly cap (~240-480h) is 6-20x larger than Opus (~24-40h). Plenty of room.
+### Step Grades (retry limits only)
 
----
+| Grade | Max Retries | When |
+|-------|-------------|------|
+| **A** (critical) | 3 | Core decisions, functional/nonfunctional reqs, architecture patterns |
+| **B** (important) | 2 | Most content steps |
+| **C** (setup) | 1 | init, complete, routine validation |
 
-## Team Party Mode (Planning — v5 NEW)
-
-### Why 3 Agents Beat 1 Agent
-
-```
-v4 (fake party):                    v5 (real party):
-┌──────────────────┐                ┌────────┐ ┌──────────┐ ┌──────────┐
-│ Worker 1 brain   │                │ Writer │ │ Critic-A │ │ Critic-B │
-│ "I'm PM John..." │                │(Sonnet)│ │ (Sonnet) │ │ (Sonnet) │
-│ "I'm Arch Win..."│                │ writes │ │product+UX│ │ tech+QA  │
-│ "I'm QA Quinn..."│                │ + fixes│ │ review   │ │ review   │
-│ = same brain,    │                └───┬────┘ └────┬─────┘ └────┬─────┘
-│   different hats │                    │      DM   │    DM      │
-└──────────────────┘                    ←───────────┼────────────→
-                                           P2P cross-talk
-```
-
-- Each critic has its own context window = no bias from writing phase
-- Critics DM each other directly = genuine disagreements surface
-- Writer receives 2 independent reviews = higher fix quality
-
-### Critic Role Assignments
-
-**Critic-A (Product + UX + Business):**
-- John (PM): user value, requirements gaps, priorities
-- Sally (UX): user experience, accessibility, flow
-- Mary (BA): business value, market fit, ROI
-
-**Critic-B (Tech + QA + Delivery):**
-- Winston (Architect): technical contradictions, feasibility, scalability
-- Amelia (Dev): implementation complexity, tech debt, testability
-- Quinn (QA): edge cases, test coverage, quality risks
-- Bob (SM): scope, dependencies, schedule risks
-
-### Team Party Flow (per step)
-
-```
-Phase 1: Writer Drafts
-  Writer: reads references → writes section → saves to document file
-  Writer: SendMessage to Critic-A AND Critic-B:
-    "[Review Request] {step_name} — section written. Read {file_path} lines {N}-{M}."
-
-Phase 2: Parallel Review (Critics work simultaneously)
-  Critic-A: reads section FROM FILE → reviews from product/UX/business lens
-    → writes findings to _bmad-output/party-logs/{stage}-{step}-critic-a.md
-    → SendMessage to Critic-B: "My findings: [summary]. What do you think about [specific point]?"
-  Critic-B: reads section FROM FILE → reviews from tech/QA/delivery lens
-    → writes findings to _bmad-output/party-logs/{stage}-{step}-critic-b.md
-    → SendMessage to Critic-A: "My findings: [summary]. I disagree about [point], because..."
-
-Phase 3: Cross-Talk (Critics discuss with each other — 1-2 rounds)
-  Critic-A ↔ Critic-B: exchange DMs about disagreements
-  Each updates their log with cross-talk outcomes
-  Each sends final consolidated feedback to Writer:
-    "[Feedback] {N} issues found. Priority fixes: [list]"
-
-Phase 4: Writer Fixes
-  Writer: reads BOTH critic logs FROM FILE
-  Writer: applies all fixes to document
-  Writer: writes fix summary to _bmad-output/party-logs/{stage}-{step}-fixes.md
-  Writer: SendMessage to both Critics:
-    "[Fixes Applied] Fixed {N} issues. Please verify."
-
-Phase 5: Verification (Critics verify fixes — quick pass)
-  IMPORTANT: Critics MUST use the rubric at _bmad-output/planning-artifacts/critic-rubric.md
-  Score using 6 dimensions (D1-D6) with per-critic weighted averages.
-  Auto-fail if ANY dimension < 3/10 or if auto-fail conditions are met (hallucination, security hole, etc.)
-
-  Critic-A: re-reads fixed section FROM FILE → verifies product/UX fixes
-    → Score per rubric → SendMessage to Writer: "[Verified] score {X}/10" or "[Issues Remaining] [list]"
-  Critic-B: re-reads fixed section FROM FILE → verifies tech/QA fixes
-    → Score per rubric → SendMessage to Writer: "[Verified] score {X}/10" or "[Issues Remaining] [list]"
-
-Phase 6: Final Score
-  Writer: calculates average score from both Critics
-  If avg >= 7: PASS → save context-snapshot → report "[Step Complete]" to Orchestrator
-  If avg < 7 AND retry < 2: rewrite section, go back to Phase 1
-  If avg < 7 AND retry >= 2: ESCALATE to Orchestrator
-
-Party logs created (4 files per step):
-  - {stage}-{step}-critic-a.md  (Critic-A review + cross-talk)
-  - {stage}-{step}-critic-b.md  (Critic-B review + cross-talk)
-  - {stage}-{step}-fixes.md     (Writer fix summary)
-  - {stage}-{step}-snapshot.md  (context-snapshot for resilience)
-```
-
-### Fallback: Single-Worker Mode
-
-If TeamCreate fails or critics don't respond within 5 minutes:
-→ Orchestrator shuts down team
-→ Falls back to v4.2 single-worker 3-round self-review
-→ Logs: "Team party failed, using single-worker fallback"
-→ Pipeline continues without interruption
+**Grade C = Writer Solo.** Grade C steps (init, complete) skip party mode entirely. Writer executes alone, no critic review needed. This saves agent resources on routine steps.
 
 ---
 
-### ⛔ CRITICAL ANTI-PATTERNS (v5.2 — learned from production failures)
+## Party Mode Protocol (per step)
 
-These failures ACTUALLY HAPPENED. They are not hypothetical.
+**Applies to Grade A and B steps only.** Grade C steps use Writer Solo (see above).
 
-#### Anti-Pattern 1: Writer calls Skill tool for planning documents
-**What happened:** Writer called `skill="bmad-bmm-create-product-brief"`. The skill's internal YOLO mode auto-proceeded through ALL steps (2→3→4→5→6) without stopping. Critics waited forever for `[Review Request]` that never came.
-**Root cause:** Skill tool runs a complete workflow internally. It has its own step-loop with menu auto-selection (YOLO). There is NO hook to pause mid-skill and SendMessage to critics.
-**Fix:** Planning mode Writer MUST NEVER use the Skill tool. Writer reads BMAD step files with the Read tool and manually writes each section. Only story dev workers use the Skill tool.
-
-#### Anti-Pattern 2: Writer writes all steps then sends one review request
-**What happened:** Writer wrote steps 2-6 all at once, then sent one "[Review Request]" for the entire document. Critics couldn't give step-by-step feedback.
-**Root cause:** Writer prompt said "write the section" but didn't enforce one-step-at-a-time discipline.
-**Fix:** Writer MUST follow this exact loop: write ONE step → SendMessage "[Review Request]" → WAIT for BOTH critics → fix → get verified → ONLY THEN proceed to next step. Orchestrator validates that party-logs exist PER STEP.
-
-#### Anti-Pattern 3: Orchestrator says "run this skill" to Writer
-**What happened:** Orchestrator's step instruction said "Execute skill=bmad-bmm-create-ux-design". Writer dutifully called the Skill tool.
-**Root cause:** Planning Stages section listed `Skill: bmad-bmm-create-ux-design`, implying Skill tool usage.
-**Fix:** Planning Stages now list STEP FILE PATHS, not skill names. Orchestrator sends step file path to Writer, not skill name.
-
----
-
-## Writer Prompt Template (Planning Mode — v5.2 FIXED)
+Supports variable team sizes (3-5 critics).
 
 ```
-You are a BMAD planning document WRITER in team "{team_name}".
-Model: sonnet. YOLO mode — auto-proceed, never wait for user input.
-
-## ⛔ CRITICAL PROHIBITION
-You MUST NEVER use the Skill tool for planning documents.
-- ❌ FORBIDDEN: skill="bmad-bmm-create-product-brief"
-- ❌ FORBIDDEN: skill="bmad-bmm-create-prd"
-- ❌ FORBIDDEN: skill="bmad-bmm-create-ux-design"
-- ❌ FORBIDDEN: skill="bmad-bmm-create-architecture"
-- ❌ FORBIDDEN: skill="bmad-bmm-create-epics-and-stories"
-- ❌ FORBIDDEN: Any skill that writes planning documents
-The Skill tool runs a complete workflow internally and BYPASSES the critic review loop.
-
-## Your Role
-You WRITE document sections and FIX them based on critic feedback.
-You do NOT self-review — two independent Critics will review your work.
-
-## How You Write Content (instead of using Skill tool)
-1. Receive step instruction from Orchestrator: includes STEP FILE PATH
-2. Read the step file with the Read tool (e.g. `_bmad/bmm/workflows/.../steps/step-02-vision.md`)
-3. Extract the CONTENT TEMPLATE from the step file (the markdown structure to append)
-4. Read ALL reference documents listed below
-5. Write the section content — filling the template with real, specific, concrete content
-6. Append/write the content to the output document file
-7. Note the line numbers you wrote (start-end)
-8. SendMessage to BOTH critics with exact file path + line numbers
-
-## Reference Documents (read BEFORE writing any step)
-- v1-feature-spec: _bmad-output/planning-artifacts/v1-feature-spec.md
-- architecture: _bmad-output/planning-artifacts/architecture.md
-- prd: _bmad-output/planning-artifacts/prd.md
-- Prior decisions: _bmad-output/context-snapshots/*.md (all files, if any exist)
-- Epic-specific input: (provided by Orchestrator in step instruction)
-
-## Your Per-Step Loop (MANDATORY — no shortcuts)
-For EACH step the Orchestrator assigns:
-
-### Phase 1: Write
-1. Read the step file (path from Orchestrator)
-2. Read reference documents (above list + any step-specific refs)
-3. Read prior context-snapshots for decisions from earlier steps
-4. Write the section in the output document — concrete, specific, no placeholders
-5. Record: which file, which lines (start line - end line)
-
-### Phase 2: Request Review
-6. SendMessage to "critic-a": "[Review Request] {step_name} written. File: {path} lines {start}-{end}. Step file: {step_file_path}"
-7. SendMessage to "critic-b": "[Review Request] {step_name} written. File: {path} lines {start}-{end}. Step file: {step_file_path}"
-8. STOP AND WAIT. Do NOT write the next step. Do NOT do anything until BOTH critics respond.
-
-### Phase 3: Fix
-9. When BOTH critics have sent "[Feedback]" messages:
-10. Read BOTH critic review logs FROM FILE (Read tool, not from message):
-    - _bmad-output/party-logs/{stage}-{step}-critic-a.md
-    - _bmad-output/party-logs/{stage}-{step}-critic-b.md
-11. Apply ALL suggested fixes to the document
-12. Write fix summary: _bmad-output/party-logs/{stage}-{step}-fixes.md
-
-### Phase 4: Verify
-13. SendMessage to "critic-a": "[Fixes Applied] Fixed {N} issues. Please verify {path} lines {start}-{end}"
-14. SendMessage to "critic-b": "[Fixes Applied] Fixed {N} issues. Please verify {path} lines {start}-{end}"
-15. STOP AND WAIT for both verification scores.
-
-### Phase 5: Score & Next
-16. If avg score >= 7: PASS
-    → Save context-snapshot: _bmad-output/context-snapshots/{stage}-{step}-snapshot.md
-      ## {step_name}
-      - Decisions: (what was decided and why)
-      - Constraints: (what next step MUST respect)
-      - Connections: (how this relates to previous steps)
-    → SendMessage to team-lead: "[Step Complete] {step_name}. Score: {avg}/10"
-    → WAIT for next step instruction from Orchestrator. Do NOT auto-proceed.
-17. If avg < 7 AND retry < 2: rewrite section from scratch, go back to Phase 1
-18. If avg < 7 AND retry >= 2: SendMessage to team-lead: "[ESCALATE] {step_name}"
-
-## Rules
-- ⛔ NEVER use the Skill tool (see prohibition above)
-- ⛔ NEVER write more than ONE step before sending review request
-- ⛔ NEVER auto-proceed to next step — WAIT for Orchestrator's instruction
-- ✅ Always read step file with Read tool to understand what content to write
-- ✅ Always read references BEFORE writing
-- ✅ Always read critic logs FROM FILE (Read tool), never from message memory
-- ✅ Always include exact line numbers in review requests
-- ✅ No stubs/mocks/placeholders — concrete, real, specific content only
+1. Writer: Read step file with Read tool → write section → save to output doc
+2. Writer: SendMessage [Review Request] to ALL critics BY REAL NAME
+   Include: file path, line range, step file path
+3. Critics (parallel): Read FROM FILE → review → write to party-logs/{stage}-{step}-{name}.md
+4. Critics: Cross-talk with relevant peers (1 round):
+   - 3 critics: 3 pairs (all)
+   - 4 critics: 4 relevant pairs (adjacent expertise, skip 2 least-related)
+   - 5 critics: 5 relevant pairs (adjacent expertise, skip 5 least-related)
+5. Critics: SendMessage [Feedback] to Writer BY NAME — "{N} issues. Priority: [top 3]"
+6. Writer: Read ALL critic logs FROM FILE → apply fixes → write party-logs/{stage}-{step}-fixes.md
+7. Writer: SendMessage [Fixes Applied] to ALL critics BY NAME
+8. Critics (parallel): Re-read FROM FILE → verify → SendMessage [Verified] score X/10
+9. Calculate average:
+   - Avg >= 7: PASS → save context-snapshot → Writer reports [Step Complete]
+   - Avg < 7 AND retry < grade_max: Writer rewrites
+   - Retry >= grade_max: ESCALATE to Orchestrator
+10. Score Variance Check (v9.1):
+   - Calculate standard deviation of all critic scores
+   - If stdev < 0.3: Orchestrator warns "점수가 너무 수렴합니다" and requests at least 1 critic to independently re-score
+   - Purpose: prevent score inflation and consensus bias (e.g., unanimous 9.00)
 ```
 
-## Critic-A Prompt Template (Product + UX + Business)
+Party-log naming: `party-logs/{stage}-{step}-{agent-name}.md`
 
+### Party-log Verification (v9.1)
+
+Orchestrator validates ALL critic logs + fixes.md exist before accepting [Step Complete]:
 ```
-You are CRITIC-A in team "{team_name}", reviewing from product/UX/business perspective.
-Model: sonnet. YOLO mode — auto-proceed, never wait for user input.
-
-## Your Roles (play all 3 in character)
-- **John (PM):** "WHY should the user care? Where's the evidence?" — Relentless detective.
-- **Sally (UX):** "A real user would never do it this way." — Empathetic advocate.
-- **Mary (BA):** "The business case doesn't hold." — Excited treasure hunter.
-
-## Your Workflow
-1. WAIT for Writer's "[Review Request]" message
-2. Read the section FROM FILE (path provided in message) — never from message text
-3. Also read: v1-feature-spec.md, product-brief.md, prd.md for cross-checking
-4. Review in character as John, Sally, Mary (2-3 sentences each, minimum):
-   - John: Are requirements complete? User value clear? Priorities right?
-   - Sally: Is the UX intuitive? Accessible? Would a real user understand this?
-   - Mary: Does the business case hold? Market fit? ROI justified?
-5. Find minimum 2 issues (zero findings = suspicious, re-analyze)
-6. Write review to _bmad-output/party-logs/{stage}-{step}-critic-a.md:
-   ## [Critic-A Review] {step_name}
-   ### Agent Discussion (in character, cross-talking)
-   ### Issues Found
-   | # | Severity | Raised By | Issue | Suggestion |
-   ### v1-feature-spec Coverage Check
-   - Features verified: (list)
-   - Gaps found: (specific or "none")
-7. SendMessage to "critic-b": "My findings: [1-2 line summary]. Thoughts on [specific point]?"
-8. Read Critic-B's message → respond if disagreement exists (1 round of cross-talk)
-9. Update your review log with cross-talk outcomes
-10. SendMessage to "writer": "[Feedback] {N} issues. Priority: [top 3]"
-11. WAIT for Writer's "[Fixes Applied]" message
-12. Re-read the fixed section FROM FILE
-13. Verify your issues were addressed
-14. SendMessage to "writer": "[Verified] score {X}/10" or "[Issues Remaining] [list]"
-
-## Rules
-- ALWAYS read FROM FILE, never from message content
-- Cross-check every claim against v1-feature-spec and prd.md
-- In-character comments: 2-3 sentences minimum, no one-liners
-- Zero findings = re-analyze (you missed something)
-```
-
-## Critic-B Prompt Template (Tech + QA + Delivery)
-
-```
-You are CRITIC-B in team "{team_name}", reviewing from tech/QA/delivery perspective.
-Model: sonnet. YOLO mode — auto-proceed, never wait for user input.
-
-## Your Roles (play all 4 in character)
-- **Winston (Architect):** "This will break under load." — Calm pragmatist.
-- **Amelia (Dev):** "This is untestable." — Ultra-succinct, speaks in file paths.
-- **Quinn (QA):** "What happens when X is null/empty/concurrent?" — Practical, coverage-first.
-- **Bob (SM):** "This scope is unrealistic." — Checklist-driven, zero ambiguity tolerance.
-
-## Your Workflow
-1. WAIT for Writer's "[Review Request]" message
-2. Read the section FROM FILE (path provided in message) — never from message text
-3. Also read: architecture.md, prd.md (NFRs), v1-feature-spec.md for cross-checking
-4. Review in character as Winston, Amelia, Quinn, Bob (2-3 sentences each, minimum):
-   - Winston: Is it architecturally sound? Scalable? Failure modes covered?
-   - Amelia: Is it implementable? Testable? What's the complexity?
-   - Quinn: Edge cases covered? What breaks? Test strategy clear?
-   - Bob: Scope realistic? Dependencies identified? Schedule risk?
-5. Find minimum 2 issues (zero findings = suspicious, re-analyze)
-6. Write review to _bmad-output/party-logs/{stage}-{step}-critic-b.md:
-   ## [Critic-B Review] {step_name}
-   ### Agent Discussion (in character, cross-talking)
-   ### Issues Found
-   | # | Severity | Raised By | Issue | Suggestion |
-   ### Architecture Consistency Check
-   - Checked against: architecture.md decisions D1-D16, patterns E1-E10
-   - Contradictions found: (specific or "none with evidence")
-7. SendMessage to "critic-a": "My findings: [1-2 line summary]. Thoughts on [specific point]?"
-8. Read Critic-A's message → respond if disagreement exists (1 round of cross-talk)
-9. Update your review log with cross-talk outcomes
-10. SendMessage to "writer": "[Feedback] {N} issues. Priority: [top 3]"
-11. WAIT for Writer's "[Fixes Applied]" message
-12. Re-read the fixed section FROM FILE
-13. Verify your issues were addressed
-14. SendMessage to "writer": "[Verified] score {X}/10" or "[Issues Remaining] [list]"
-
-## Rules
-- ALWAYS read FROM FILE, never from message content
-- Cross-check against architecture.md (D1-D16, E1-E10) and prd.md NFRs
-- In-character comments: 2-3 sentences minimum, no one-liners
-- Zero findings = re-analyze (you missed something)
+1. For each critic in team: check file exists at party-logs/{stage}-{step}-{critic-name}.md
+2. Check fixes log exists: party-logs/{stage}-{step}-fixes.md
+3. If ANY file missing → REJECT [Step Complete], request missing critic to write their log
+4. Only accept [Step Complete] when ALL files verified
 ```
 
 ---
 
-## Defense Mechanisms (preserved from v4)
+## User Gate Protocol
 
-### 1. max_retry: 2 (FAIL Loop Prevention)
-```
-Both Critics score avg < 7:
-  retry_count += 1
-  if retry_count <= 2: Writer rewrites, Critics re-review
-  if retry_count > 2: ESCALATE to Orchestrator, continue to next step
-```
+16 steps across the pipeline pause for user (사장님) input on non-technical decisions.
 
-### 2. step_timeout: 10 minutes (Stall Prevention)
+### Gate Flow
 ```
-Orchestrator tracks elapsed time per step.
-If 10 min pass without "[Step Complete]" from Writer:
-  → Send reminder to Writer via SendMessage
-  → Wait 2 min grace
-  → If still no response: shutdown ALL team members, respawn fresh team
-    ** Inject ALL _bmad-output/context-snapshots/*.md into new prompts **
-  → stall_count > 2 for same step: SKIP step, log warning
+1. Writer drafts options (A/B/C format with pros/cons)
+2. Writer sends "[GATE] {step_name}" to team-lead (Orchestrator)
+3. Orchestrator presents to user:
+   - Summary of what was written
+   - Options with pros/cons
+   - Clear question: "어떻게 할까요? A/B/C 또는 수정사항?"
+4. User responds
+5. Orchestrator sends user decision to Writer
+6. Writer incorporates decision into document
+7. Normal party mode continues (Critics review the gate-resolved content)
 ```
 
-### 3. Party-Log Validation
-```
-When Writer reports "[Step Complete]":
-  Orchestrator checks:
-  - _bmad-output/party-logs/{stage}-{step}-critic-a.md  → must exist
-  - _bmad-output/party-logs/{stage}-{step}-critic-b.md  → must exist
-  - _bmad-output/party-logs/{stage}-{step}-fixes.md     → must exist
-  If ANY missing: REJECT (up to 2x), then accept with warning on 3rd
-```
+### Gate Inventory
 
-### 4. /simplify Gate (Story Dev Only — unchanged)
-```
-After "[dev-story complete]": Orchestrator runs /simplify, 3min timeout, skip on fail.
-```
+| # | Stage | Step | Question for User |
+|---|-------|------|-------------------|
+| 1 | 0 Brief | vision | v3 핵심 비전 방향 맞는지? |
+| 2 | 0 Brief | users | 타겟 사용자, CEO vs Admin 우선순위? |
+| 3 | 0 Brief | metrics | 성공 기준 뭘로 잡을지? |
+| 4 | 0 Brief | scope | 4개 기능 각각 넣을지/뺄지/수정 |
+| 5 | 2 PRD | discovery | v2 기능 중 v3에서 바꿀 것/유지할 것 |
+| 6 | 2 PRD | vision | PRD 비전 문구 확인 |
+| 7 | 2 PRD | success | 성공 기준 수치 현실적인지 |
+| 8 | 2 PRD | journeys | 유저 저니가 상상하는 흐름과 일치? |
+| 9 | 2 PRD | innovation | 혁신 vs 기본 기능 구분 |
+| 10 | 2 PRD | scoping | Phase 나누기, 우선순위 결정 |
+| 11 | 2 PRD | functional | FR 하나하나 넣을지/뺄지 |
+| 12 | 2 PRD | nonfunctional | NFR 수치 확인 (FPS, 응답시간, 메모리) |
+| 13 | 4 Arch | decisions | 기술 선택 최종 확인 |
+| 14 | 5 UX | design-system | 디자인 시스템/테마 방향 |
+| 15 | 5 UX | design-directions | 디자인 시안 선택 |
+| 16 | 6 Epics | design-epics | Epic 스코프 확정 |
 
-### 5. Team Failure Fallback (v5 NEW)
-```
-If TeamCreate fails, or Critics don't respond within 5 minutes:
-  → Shutdown team
-  → Fall back to v4.2 single-worker 3-round self-review
-  → Log: "Team party failed at {step}, falling back to single-worker"
-  → Pipeline continues without interruption
-```
+AUTO steps (non-gate) proceed without user input. Orchestrator only notifies user at stage boundaries.
 
 ---
 
-## Mode A: Planning Pipeline (planning)
+## Anti-Patterns (v9.1 — production failures)
 
-### Orchestrator Execution Flow
+1. **Writer calls Skill tool** — Skill auto-completes all steps internally, bypasses critic review. FIX: Writer MUST NEVER use Skill tool. Read step files with Read tool, write manually.
+2. **Writer batches steps** — Writes steps 2-6 then sends one review. FIX: Write ONE step → party mode → THEN next step.
+3. **Agent spawned with generic name** — `critic-a` or `worker-1` instead of BMAD name. FIX: ALWAYS use real names from BMAD Agent Roster.
+4. **Critic skips persona file** — Reviews without reading `_bmad/bmm/agents/*.md`. FIX: First action MUST be Read persona file.
+5. **GATE step auto-proceeds** — Writer skips user input on GATE step. FIX: GATE steps MUST send [GATE] to Orchestrator and WAIT.
+6. **Shutdown-then-cancel race** — shutdown_request is irreversible. FIX: NEVER send unless 100% committed.
+7. **Writer duplicates prior step content** (v9.1) — Writer copies risk/requirement tables that already exist in earlier steps. FIX: Before writing, Writer MUST Read prior steps' sections on the same topic. If content exists, use `§{section_name} 참조` cross-reference instead of duplicating. (Incident: Step 06/08 risk tables had 6 duplicate entries.)
+8. **Score convergence inflation** (v9.1) — All critics give identical scores after fixes (e.g., unanimous 9.00). FIX: Orchestrator checks score standard deviation; if stdev < 0.3, triggers independent re-scoring warning. (Incident: Step 08 all 4 critics scored exactly 9.00.)
+9. **Missing party-log files** (v9.1) — Critic reviews sent via message only, no file written. FIX: Orchestrator verifies all `party-logs/{stage}-{step}-{critic-name}.md` files exist before accepting [Step Complete]. Missing file = REJECT. (Incident: Step 02-05 had only winston's logs.)
 
-```
-Step 0: Team Setup
-  → TeamCreate (team name: bmad-planning)
-  → Read _bmad/_config/agent-manifest.csv (or use defaults)
-  → Read project context (CLAUDE.md, feature specs, etc.)
-  → Create dir if not exists: _bmad-output/context-snapshots/
-  → Initialize: stall_count={}, escalation_log=[], team_mode="team" (or "single" on fallback)
-
-Step 1: Spawn Team for Stage
-  → Read ALL _bmad-output/context-snapshots/*.md for "Prior Decisions" injection
-  → Spawn Writer (model=sonnet, mode=bypassPermissions):
-    - Include: stage context, reference file paths, prior decisions
-    - CRITICAL: Embed FIRST step instruction in spawn prompt (use "[Step Instruction]" format — see Step 2a)
-  → Spawn Critic-A (model=sonnet, mode=bypassPermissions):
-    - Include: role description, reference file paths, prior decisions
-    - Prompt: "WAIT for Writer's [Review Request] before starting"
-  → Spawn Critic-B (model=sonnet, mode=bypassPermissions):
-    - Include: role description, reference file paths, prior decisions
-    - Prompt: "WAIT for Writer's [Review Request] before starting"
-  (Critics waiting is OK here — they WILL receive Writer's DM as their trigger)
-
-Step 2: Step Loop
-  2a. Orchestrator sends step instruction to Writer via SendMessage:
-      "[Step Instruction] Execute {step_name}.
-       Step file: {full_path_to_step_file}
-       Output file: {output_document_path}
-       References: {comma-separated list of reference doc paths}
-       Epic-specific input: {path to research doc or prior brief, if applicable}
-
-       Read the step file, extract the content template, write the section.
-       Then SendMessage to critic-a and critic-b with [Review Request]."
-  2b. Writer writes + requests review → Critics review in parallel → cross-talk → feedback
-  2c. Writer fixes → Critics verify → score → PASS or retry
-  2d. Orchestrator receives "[Step Complete]" from Writer:
-      → VALIDATE: check ALL 3 party-log files exist:
-        - _bmad-output/party-logs/{stage}-{step}-critic-a.md
-        - _bmad-output/party-logs/{stage}-{step}-critic-b.md
-        - _bmad-output/party-logs/{stage}-{step}-fixes.md
-      → If ANY missing: REJECT. SendMessage to Writer: "[REJECTED] Missing party-logs: {list}. Redo review cycle."
-      → If present: ACCEPT
-  2e. TIMEOUT: 10min + 2min grace → shutdown team, respawn with snapshots
-  2f. ESCALATION: log and skip
-  2g. Send NEXT step instruction to Writer (same format as 2a)
-  2h. Repeat for all steps in stage
-
-Step 3: Stage Complete
-  → git commit: docs(planning): {stage} complete -- {N} steps, team-party, {E} escalations
-  → Shutdown ALL team members (shutdown_request to each)
-
-Step 4: Next Stage
-  → Spawn fresh team (new context, inject all snapshots from previous stages)
-  → Go to Step 1
-
-Step 5: Final
-  → Count total steps, escalations
-  → Report: "Planning complete. {N} steps, {E} escalations, mode: {team|single}"
-```
-
-### Planning Stages & Steps
-
-**SKIPPED (already completed):**
-- ~~Stage 1: Product Brief~~ ✅
-- ~~Stage 2: PRD~~ ✅ (1,226 lines)
-- ~~Stage 3: Architecture~~ ✅ (1,150 lines, 32 party rounds)
-
-#### Stage 0: PRD Spec Fix
-Worker Spawn: embed the 6 corrections (NFR-SC1/SC2/SC7, NFR-P7, OPS-1, server refs).
-Critics: verify all 6 applied, no unintended changes, numbers consistent.
-Commit: `docs(planning): PRD spec fix -- server 4GB→24GB, session 10→20, memory 50→200MB`
-
-#### Stage 1: UX Design
-Workflow dir: `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/`
-Template: `ux-design-template.md`
-Output: `_bmad-output/planning-artifacts/ux-design.md`
-
-| Step | File | Content Section |
-|------|------|----------------|
-| step-02 | `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-02-discovery.md` | Discovery |
-| step-03 | `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-03-core-experience.md` | Core Experience |
-| step-04 | `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-04-emotional-response.md` | Emotional Response |
-| step-05 | `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-05-inspiration.md` | Inspiration |
-| step-06 | `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-06-design-system.md` | Design System |
-| step-07 | `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-07-defining-experience.md` | Defining Experience |
-| step-08 | `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-08-visual-foundation.md` | Visual Foundation |
-| step-09 | `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-09-design-directions.md` | Design Directions |
-| step-10 | `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-10-user-journeys.md` | User Journeys |
-| step-11 | `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-11-component-strategy.md` | Component Strategy |
-| step-12 | `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-12-ux-patterns.md` | UX Patterns |
-| step-13 | `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-13-responsive-accessibility.md` | Responsive & Accessibility |
-| step-14 | `_bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-14-complete.md` | Final Review + Completion |
-
-Orchestrator sends to Writer per step:
-  "[Step Instruction] Execute step-02 (Discovery).
-   Step file: _bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/step-02-discovery.md
-   Output file: _bmad-output/planning-artifacts/ux-design.md
-   References: _bmad-output/planning-artifacts/v1-feature-spec.md, _bmad-output/planning-artifacts/prd.md, _bmad-output/planning-artifacts/architecture.md
-   Read the step file, extract the content template, write the section.
-   Then SendMessage to critic-a and critic-b with [Review Request]."
-
-Commit: `docs(planning): UX Design complete -- {N} steps, team-party`
-
-#### Stage 2: Epics & Stories
-Workflow dir: `_bmad/bmm/workflows/3-solutioning/create-epics-and-stories/`
-Template: `_bmad/bmm/workflows/3-solutioning/create-epics-and-stories/templates/epics-template.md`
-Output: `_bmad-output/planning-artifacts/epics-and-stories.md`
-
-| Step | File | Content Section |
-|------|------|----------------|
-| step-01 | `_bmad/bmm/workflows/3-solutioning/create-epics-and-stories/steps/step-01-validate-prerequisites.md` | Validate Prerequisites |
-| step-02 | `_bmad/bmm/workflows/3-solutioning/create-epics-and-stories/steps/step-02-design-epics.md` | Design Epics |
-| step-03 | `_bmad/bmm/workflows/3-solutioning/create-epics-and-stories/steps/step-03-create-stories.md` | Create Stories |
-| step-04 | `_bmad/bmm/workflows/3-solutioning/create-epics-and-stories/steps/step-04-final-validation.md` | Final Validation |
-
-Commit: `docs(planning): Epics complete -- {N} steps, team-party`
-
-#### Stage 3: Implementation Readiness
-Workflow dir: `_bmad/bmm/workflows/3-solutioning/check-implementation-readiness/`
-Template: `_bmad/bmm/workflows/3-solutioning/check-implementation-readiness/templates/readiness-report-template.md`
-Output: `_bmad-output/planning-artifacts/implementation-readiness.md`
-
-| Step | File | Content Section |
-|------|------|----------------|
-| step-01 | `_bmad/bmm/workflows/3-solutioning/check-implementation-readiness/steps/step-01-document-discovery.md` | Document Discovery |
-| step-02 | `_bmad/bmm/workflows/3-solutioning/check-implementation-readiness/steps/step-02-prd-analysis.md` | PRD Analysis |
-| step-03 | `_bmad/bmm/workflows/3-solutioning/check-implementation-readiness/steps/step-03-epic-coverage-validation.md` | Epic Coverage Validation |
-| step-04 | `_bmad/bmm/workflows/3-solutioning/check-implementation-readiness/steps/step-04-ux-alignment.md` | UX Alignment |
-| step-05 | `_bmad/bmm/workflows/3-solutioning/check-implementation-readiness/steps/step-05-epic-quality-review.md` | Epic Quality Review |
-| step-06 | `_bmad/bmm/workflows/3-solutioning/check-implementation-readiness/steps/step-06-final-assessment.md` | Final Assessment |
-
-Commit: `docs(planning): Readiness complete -- {N} steps, team-party`
-
-#### Stage 4: Sprint Planning
-No party mode (automated generation).
-Commit: `docs(planning): Sprint planning complete`
-
-**Reference — Brief stage step files (for future use):**
-Workflow dir: `_bmad/bmm/workflows/1-analysis/create-product-brief/`
-Template: `_bmad/bmm/workflows/1-analysis/create-product-brief/product-brief.template.md`
-
-| Step | File | Content Section |
-|------|------|----------------|
-| step-02 | `_bmad/bmm/workflows/1-analysis/create-product-brief/steps/step-02-vision.md` | Executive Summary + Core Vision |
-| step-03 | `_bmad/bmm/workflows/1-analysis/create-product-brief/steps/step-03-users.md` | Target Users + Personas |
-| step-04 | `_bmad/bmm/workflows/1-analysis/create-product-brief/steps/step-04-metrics.md` | Success Metrics + KPIs |
-| step-05 | `_bmad/bmm/workflows/1-analysis/create-product-brief/steps/step-05-scope.md` | MVP Scope + Future Vision |
-| step-06 | `_bmad/bmm/workflows/1-analysis/create-product-brief/steps/step-06-complete.md` | Final Review + Completion |
-
-**Reference — PRD stage step files (for future use):**
-Workflow dir: `_bmad/bmm/workflows/2-plan-workflows/create-prd/`
-Template: `_bmad/bmm/workflows/2-plan-workflows/create-prd/templates/prd-template.md`
-
-Create-PRD steps (steps-c):
-
-| Step | File | Content Section |
-|------|------|----------------|
-| step-02 | `_bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/step-02-discovery.md` | Discovery |
-| step-02b | `_bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/step-02b-vision.md` | Vision |
-| step-02c | `_bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/step-02c-executive-summary.md` | Executive Summary |
-| step-03 | `_bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/step-03-success.md` | Success Metrics |
-| step-04 | `_bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/step-04-journeys.md` | User Journeys |
-| step-05 | `_bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/step-05-domain.md` | Domain |
-| step-06 | `_bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/step-06-innovation.md` | Innovation |
-| step-07 | `_bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/step-07-project-type.md` | Project Type |
-| step-08 | `_bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/step-08-scoping.md` | Scoping |
-| step-09 | `_bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/step-09-functional.md` | Functional Requirements |
-| step-10 | `_bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/step-10-nonfunctional.md` | Non-Functional Requirements |
-| step-11 | `_bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/step-11-polish.md` | Polish |
-| step-12 | `_bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/step-12-complete.md` | Final Review + Completion |
-
-**Reference — Architecture stage step files (for future use):**
-Workflow dir: `_bmad/bmm/workflows/3-solutioning/create-architecture/`
-
-| Step | File | Content Section |
-|------|------|----------------|
-| step-02 | `_bmad/bmm/workflows/3-solutioning/create-architecture/steps/step-02-context.md` | Context |
-| step-03 | `_bmad/bmm/workflows/3-solutioning/create-architecture/steps/step-03-starter.md` | Starter |
-| step-04 | `_bmad/bmm/workflows/3-solutioning/create-architecture/steps/step-04-decisions.md` | Decisions |
-| step-05 | `_bmad/bmm/workflows/3-solutioning/create-architecture/steps/step-05-patterns.md` | Patterns |
-| step-06 | `_bmad/bmm/workflows/3-solutioning/create-architecture/steps/step-06-structure.md` | Structure |
-| step-07 | `_bmad/bmm/workflows/3-solutioning/create-architecture/steps/step-07-validation.md` | Validation |
-| step-08 | `_bmad/bmm/workflows/3-solutioning/create-architecture/steps/step-08-complete.md` | Final Review + Completion |
+Additional safeguards:
+- TeamDelete fails after tmux kill → `rm -rf ~/.claude/teams/{name} ~/.claude/tasks/{name}`, retry
+- Shutdown stall → 30s timeout → `tmux kill-pane` → force cleanup
+- Context compaction → PostCompact hook auto-saves working-state.md + git commit
+- Stale resources → auto-clean stale worktrees + cleanup.sh handles tmux/sessions
 
 ---
 
-## Mode B: Story Dev Pipeline (single story)
-
-Same as v4.2. One Worker (model=sonnet) runs all 5 BMAD skills sequentially.
+## Mode A: Planning Pipeline
 
 ### Orchestrator Flow
+
 ```
-Step 0: TeamCreate (team: bmad-dev)
-Step 1: Spawn Developer Worker (model=sonnet, mode=bypassPermissions)
-  → Embed story ID + first 2 stages (create-story + dev-story) in prompt
-Step 2: Worker reports "[dev-story complete]"
-  → Orchestrator runs /simplify (3min timeout, skip on fail)
-  → SendMessage to Worker: "simplify {result}. Continue with TEA."
-Step 3: Worker runs TEA → QA → code-review → reports checklist
-Step 4: Verify 7/7 checks → commit + push
-Step 5: Orchestrator runs CROSS-CHECK (pattern consistency):
-  → bash .claude/hooks/cross-check.sh
-  → If issues found: SendMessage to Worker with list → Worker fixes → re-commit
-  → If clean: proceed
-Step 6: Orchestrator runs SMOKE-TEST (production API health):
-  → bash .claude/hooks/smoke-test.sh
-  → If failures: SendMessage to Worker with failing endpoints → Worker fixes → re-deploy → re-test
-  → If all pass: proceed
-Step 7: Update sprint-status.yaml
+Step 0: Project Auto-Scan → load project-context.yaml
+Step 1: For each Stage (0-8):
+  a. TeamCreate("{project}-{stage-name}")
+  b. Create party-logs/ and context-snapshots/ dirs
+  c. Spawn Writer + Critics per Stage Team Config (see below)
+     - Writer: embed stage context + refs + FIRST step instruction
+     - Critics: embed persona + "WAIT for Writer's [Review Request]"
+  d. Step Loop — for each discovered step:
+     - If GATE step: Writer drafts → [GATE] → Orchestrator asks user → forward decision
+     - Party mode runs (Writer ↔ Critics)
+     - On [Step Complete]: validate party-log files exist → ACCEPT or REJECT
+     - Timeout: 20min + 2min grace. 3 stalls → SKIP.
+  e. git commit: "docs(planning): {stage} complete — {N} steps, party mode"
+  f. Shutdown ALL → TeamDelete → next stage with fresh team + all snapshots
+Step 2: Final report with all stage summaries
 ```
 
-### Developer Worker Prompt
+### Planning Stages — BMAD Mode (bmad_enabled = true)
+
+#### Stage 0: Product Brief
+
 ```
-You are a BMAD pipeline executor. Model: sonnet.
-YOLO mode — auto-proceed, never wait for user input.
-IMPORTANT: Real working features only. No stub/mock/placeholder.
-
-Target story: [Story ID]
-
-## Phase A: Create + Develop
-Stage 1: skill="bmad-bmm-create-story", args="[Story ID]" (skip if file exists)
-Stage 2: skill="bmad-bmm-dev-story", args="[story file path]"
-  → After completion: SendMessage to team-lead: "[dev-story complete] Story [ID]"
-  → WAIT for team-lead response (Orchestrator runs /simplify)
-
-## Phase B: Test + Review (after simplify result)
-Stage 3: skill="bmad-tea-automate"
-Stage 4: skill="bmad-agent-bmm-qa" (no menu, execute immediately)
-Stage 5: skill="bmad-bmm-code-review" (auto-fix)
-
-## After All Stages
-npx tsc --noEmit -p packages/server/tsconfig.json (must pass before reporting)
-
-Report to team-lead:
-[BMAD Checklist -- Story [ID]]
-[x] 1. create-story complete
-[x] 2. dev-story complete
-[x] 3. /simplify executed
-[x] 4. TEA complete
-[x] 5. QA complete
-[x] 6. code-review complete
-[x] 7. Real functionality confirmed (not stub/mock)
-[x] 8. tsc --noEmit PASS
-[x] 9. cross-check PASS (tenantMiddleware, colors, icons, migrations)
-[x] 10. smoke-test PASS (all API endpoints 200 OK on production)
+Dir: _bmad/bmm/workflows/1-analysis/create-product-brief/steps/
+Output: _bmad-output/planning-artifacts/product-brief-{project}-{date}.md
+Team (5): analyst(Writer), john, sally, bob, winston
+GATES: vision, users, metrics, scope
 ```
+
+Input references (root material for brief):
+- `_bmad-output/planning-artifacts/v3-openclaw-planning-brief.md` (draft, reference only)
+- `_bmad-output/planning-artifacts/v3-corthex-v2-audit.md` (accurate numbers)
+- `_bmad-output/planning-artifacts/critic-rubric.md` (scoring)
+- `_bmad-output/planning-artifacts/v3-vps-prompt.md` (execution context)
+- Existing PRD, architecture, v1-feature-spec (from project-context.yaml)
+
+Step grades:
+| Step | Grade | GATE |
+|------|-------|------|
+| init | C | AUTO |
+| vision | A | GATE |
+| users | B | GATE |
+| metrics | B | GATE |
+| scope | A | GATE |
+| complete | C | AUTO |
+
+#### Stage 1: Technical Research
+
+```
+Dir: _bmad/bmm/workflows/1-analysis/research/technical-steps/
+Output: _bmad-output/planning-artifacts/technical-research-{date}.md
+Team (4): dev(Writer), winston, quinn, john
+GATES: none
+```
+
+Step grades:
+| Step | Grade |
+|------|-------|
+| init | C |
+| technical-overview | B |
+| integration-patterns | B |
+| architectural-patterns | A |
+| implementation-research | B |
+| research-synthesis | A |
+
+#### Stage 2: PRD Create
+
+```
+Dir: _bmad/bmm/workflows/2-plan-workflows/create-prd/steps-c/
+Output: _bmad-output/planning-artifacts/prd.md
+Team (5): john(Writer), winston, quinn, sally, bob
+Skip: step-01b-continue.md
+GATES: discovery, vision, success, journeys, innovation, scoping, functional, nonfunctional
+```
+
+Step grades:
+| Step | Grade | GATE |
+|------|-------|------|
+| init | C | AUTO |
+| discovery | B | GATE |
+| vision | B | GATE |
+| executive-summary | B | AUTO |
+| success | B | GATE |
+| journeys | B | GATE |
+| domain | B | AUTO |
+| innovation | B | GATE |
+| project-type | B | AUTO |
+| scoping | A | GATE |
+| functional | A | GATE |
+| nonfunctional | A | GATE |
+| polish | B | AUTO |
+| complete | C | AUTO |
+
+#### Stage 3: PRD Validate (PARALLELIZED)
+
+```
+Dir: _bmad/bmm/workflows/2-plan-workflows/create-prd/steps-v/
+Output: _bmad-output/planning-artifacts/prd-validation-report.md
+Team (4): analyst(Writer), john, winston, quinn
+GATES: none
+```
+
+Parallelization:
+```
+Round 1 (sequential): step-v-01-discovery
+Round 2 (4 parallel):  step-v-02, v-02b, v-03, v-04
+Round 3 (4 parallel):  step-v-05, v-06, v-07, v-08
+Round 4 (3 parallel):  step-v-09, v-10, v-11
+Round 5 (sequential): step-v-12, v-13
+```
+
+For parallel rounds: spawn separate background agents per step, each runs party mode independently. Orchestrator collects all results before next round.
+
+Step grades: v-01=C, v-02=C, v-02b=B, v-03=C, v-04=B, v-05=B, v-06=B, v-07=A, v-08=B, v-09=B, v-10=A, v-11=A, v-12=B, v-13=C
+
+#### Stage 4: Architecture (MOST CRITICAL — all opus)
+
+```
+Dir: _bmad/bmm/workflows/3-solutioning/create-architecture/steps/
+Output: _bmad-output/planning-artifacts/architecture.md
+Team (5): winston(Writer), dev, quinn, john, bob
+Skip: step-01b-continue.md
+GATES: decisions
+```
+
+Step grades:
+| Step | Grade | GATE |
+|------|-------|------|
+| init | C | AUTO |
+| context | B | AUTO |
+| starter | B | AUTO |
+| decisions | A | GATE |
+| patterns | A | AUTO |
+| structure | A | AUTO |
+| validation | A | AUTO |
+| complete | C | AUTO |
+
+#### Stage 5: UX Design
+
+```
+Dir: _bmad/bmm/workflows/2-plan-workflows/create-ux-design/steps/
+Output: _bmad-output/planning-artifacts/ux-design-specification.md
+Team (5): sally(Writer), john, dev, winston, quinn
+Skip: step-01b-continue.md
+GATES: design-system, design-directions
+```
+
+UXUI Rules (injected into Writer prompt):
+1. App shell (layout + sidebar) MUST be confirmed FIRST → pages generate content area only
+2. No sidebar duplication in page components — Stitch v2 lesson
+3. Theme changes require full grep for remnants (v2 428-location incident)
+4. Dead buttons prohibited — every UI element must have a function
+
+Step grades:
+| Step | Grade | GATE |
+|------|-------|------|
+| init | C | AUTO |
+| discovery | B | AUTO |
+| core-experience | B | AUTO |
+| emotional-response | C | AUTO |
+| inspiration | C | AUTO |
+| design-system | A | GATE |
+| defining-experience | B | AUTO |
+| visual-foundation | A | AUTO |
+| design-directions | B | GATE |
+| user-journeys | A | AUTO |
+| component-strategy | B | AUTO |
+| ux-patterns | B | AUTO |
+| responsive-a11y | B | AUTO |
+| complete | C | AUTO |
+
+#### Stage 6: Epics & Stories
+
+```
+Dir: _bmad/bmm/workflows/3-solutioning/create-epics-and-stories/steps/
+Output: _bmad-output/planning-artifacts/epics-and-stories.md
+Template: _bmad/bmm/workflows/3-solutioning/create-epics-and-stories/templates/epics-template.md
+Team (5): bob(Writer), john, winston, dev, quinn
+GATES: design-epics
+```
+
+Step grades:
+| Step | Grade | GATE |
+|------|-------|------|
+| validate-prereqs | B | AUTO |
+| design-epics | A | GATE |
+| create-stories | A | AUTO |
+| final-validation | B | AUTO |
+
+#### Stage 7: Readiness Check (PARALLELIZED)
+
+```
+Dir: _bmad/bmm/workflows/3-solutioning/check-implementation-readiness/steps/
+Output: _bmad-output/planning-artifacts/readiness-report.md
+Template: _bmad/bmm/workflows/3-solutioning/check-implementation-readiness/templates/readiness-report-template.md
+Team (5): tech-writer(Writer), winston, quinn, john, bob
+GATES: none
+```
+
+Parallelization:
+```
+Round 1 (sequential): step-01-document-discovery
+Round 2 (4 parallel):  step-02, step-03, step-04, step-05
+Round 3 (sequential): step-06-final-assessment
+```
+
+Step grades:
+| Step | Grade |
+|------|-------|
+| document-discovery | C |
+| prd-analysis | B |
+| epic-coverage | B |
+| ux-alignment | B |
+| epic-quality | A |
+| final-assessment | A |
+
+#### Stage 8: Sprint Planning
+
+No party mode. Orchestrator executes automatically using:
+- `_bmad/bmm/workflows/4-implementation/sprint-planning/instructions.md`
+- Output: `_bmad-output/implementation-artifacts/sprint-status.yaml`
+- Commit: `docs(planning): sprint planning complete`
+
+### Planning Stages — Non-BMAD Mode (bmad_enabled = false)
+
+**Stage 0: Project Analysis**
+- Read all existing docs from project-context.yaml
+- Analyze codebase structure, key modules, dependencies
+- Output: `docs/project-analysis.md`
+
+**Stage 1: Requirements & Design**
+- Define user journeys, functional requirements, non-functional requirements
+- Output: `docs/requirements.md`
+
+**Stage 2: Architecture Review/Creation**
+- If architecture doc exists: review and update
+- If not: create architecture document
+- Output: `docs/architecture.md`
+
+**Stage 3: Epic & Story Breakdown**
+- Break work into epics and stories with acceptance criteria
+- Output: `docs/epics-and-stories.md`
+
+**Stage 4: Implementation Plan**
+- Dependency order, sprint allocation, risk assessment
+- Output: `docs/implementation-plan.md`
+
+Non-BMAD stages use 4-agent party mode (1 Writer + 3 Critics with generic roles).
 
 ---
 
-## Mode C: Parallel Story Dev Pipeline (v5 NEW)
+## Mode B: Story Dev Pipeline
 
-Usage: `/kdh-full-auto-pipeline parallel 9-1 9-2 9-3`
-
-### When to Use
-- Stories are **independent** (don't depend on each other's output)
-- Different stories modify **different files/folders**
-- Maximum **3 simultaneous workers** (Sonnet weekly cap safety margin)
+### Key Change from v8.0
+OLD: 1 Worker calls BMAD Skills sequentially, no party mode.
+NEW: 6 phases, each with Writer + Critics party mode using BMAD checklists.
 
 ### Orchestrator Flow
+
 ```
-Step 0: Dependency Check
-  → Read sprint-status.yaml
-  → Verify requested stories have no blockedBy dependencies on each other
-  → If dependencies found: reorder to sequential where needed, parallel where safe
-  → TeamCreate (team: bmad-parallel)
-
-Step 1: Spawn Workers (up to 3, each in Git Worktree)
-  → For each story:
-     Agent(
-       name: "dev-{story-id}",
-       model: "sonnet",
-       mode: "bypassPermissions",
-       isolation: "worktree",
-       prompt: Developer Worker Prompt (same as Mode B, with story ID embedded)
-     )
-  → All workers start simultaneously in separate worktrees
-
-Step 2: Monitor Progress
-  → As each Worker reports "[dev-story complete]":
-     → Orchestrator runs /simplify on that worker's changes (3min timeout)
-     → SendMessage to that Worker: "simplify {result}. Continue with TEA."
-  → Track completion: completed_stories=[], pending_stories=[]
-  → TIMEOUT: 15min per worker (longer than planning — code is complex)
-    → If timeout: SendMessage reminder → 3min grace → skip worker, log warning
-
-Step 3: Collect Results
-  → As each Worker reports final checklist:
-     → Verify 8/8 checks (7 BMAD + tsc)
-     → Add to completed_stories
-  → Wait until ALL workers done (or timed out)
-
-Step 4: Sequential Merge
-  → For each completed story (in order):
-     1. Checkout main
-     2. Merge worktree branch: git merge --no-ff {worktree-branch}
-     3. If merge conflict: attempt auto-resolve, if can't → log and skip
-     4. Run: npx tsc --noEmit -p packages/server/tsconfig.json
-     5. If tsc fails: revert merge, log warning
-     6. If tsc passes: commit
-        Commit: feat: Story [ID] [title] -- [summary] + TEA [N] tests
-     7. Update sprint-status.yaml
-
-Step 5: Push + Report
-  → git push
-  → Wait for deploy: gh run list -L 1
-  → Report:
-    "Parallel dev complete.
-     Completed: [list]
-     Skipped: [list with reasons]
-     Merge conflicts: [list]
-     Deploy: build #{N} {status}"
+Step 0: Project Auto-Scan → load project-context.yaml
+Step 1: TeamCreate("{project}-story-{id}")
+Step 2: Spawn base team: dev(Writer), winston, quinn, john (4 agents, bypassPermissions)
+Step 3: Execute Phase A → B → C → D → E → F (details below)
+  - Between phases: save context-snapshot, team continues (no recreation)
+  - Phase C (simplify): Orchestrator runs directly, no team needed
+  - Phase D/E: team rotation (different Writer, same members)
+Step 4: Verify completion checklist → tsc (if enabled) → commit + push
+Step 5: Shutdown ALL → TeamDelete → update sprint status
 ```
 
-### Parallel Worker Prompt (same as Mode B plus)
-```
-(Same as Mode B Developer Worker Prompt, with addition:)
+### Phase A: Create Story
 
-## Important: Worktree Isolation
-You are working in an isolated Git Worktree. Other workers are modifying other files.
-- Do NOT touch files outside your story's scope
-- If you need to modify shared files (e.g. shared/types.ts):
-  → SendMessage to team-lead: "[Shared File] I need to modify {path}. Reason: {why}"
-  → WAIT for team-lead approval before modifying
-- Orchestrator will handle merging your worktree after you complete
+```
+Team: dev(Writer), winston, quinn, john = 4
+Reference: _bmad/bmm/workflows/4-implementation/create-story/checklist.md
+
+1. dev reads story requirements from epics file
+2. dev reads create-story checklist and template
+3. dev writes story file following template
+4. Party mode: dev sends [Review Request] → winston/quinn/john review
+   - winston: architecture alignment, file structure
+   - quinn: testability, edge cases, acceptance criteria completeness
+   - john: product requirements coverage, user value
+5. Fix → verify → PASS (avg >= 7)
+6. Save: context-snapshots/stories/{story-id}-phase-a.md
+```
+
+### Phase B: Develop Story
+
+```
+Team: dev(Writer), winston, quinn, john = 4
+Reference: _bmad/bmm/workflows/4-implementation/dev-story/checklist.md
+
+1. dev reads story file + DoD checklist
+2. dev implements REAL working code (no stubs/mocks/placeholders)
+3. Party mode: dev sends [Review Request] with changed files list
+   - winston: architecture compliance, engine boundary (agent-loop.ts untouched)
+   - quinn: code quality, error handling, test hooks
+   - john: acceptance criteria satisfaction
+4. Fix → verify → PASS
+5. Save: context-snapshots/stories/{story-id}-phase-b.md
+```
+
+### Phase C: Simplify
+
+```
+No team needed. Orchestrator runs /simplify directly.
+Timeout: 3 minutes. Skip on fail — code-review catches issues.
+```
+
+### Phase D: Test (TEA)
+
+```
+Team rotation: quinn(Writer), dev, winston = 3
+Reference: TEA risk-based test strategy
+
+1. quinn designs test strategy based on story requirements
+2. quinn writes tests (unit + integration + E2E as needed)
+3. Party mode: quinn sends [Review Request]
+   - dev: implementability, test framework compliance
+   - winston: architecture test coverage, boundary tests
+4. Fix → verify → PASS
+5. Run all tests — must pass
+6. Save: context-snapshots/stories/{story-id}-phase-d.md
+```
+
+### Phase E: QA
+
+```
+Team rotation: quinn(Writer), john, dev = 3
+
+1. quinn runs QA checklist against implemented code
+2. quinn verifies ALL acceptance criteria from story file
+3. Party mode: quinn sends [Review Request]
+   - john: acceptance criteria met? user value delivered?
+   - dev: code completeness, no shortcuts
+4. Fix → verify → PASS
+5. Save: context-snapshots/stories/{story-id}-phase-e.md
+```
+
+### Phase F: Code Review
+
+```
+Team rotation: winston(Writer), quinn, dev, john = 4
+Reference: _bmad/bmm/workflows/4-implementation/code-review/checklist.md
+
+1. winston reads all changed files + code-review checklist
+2. winston performs architecture + security + quality review
+3. Party mode: winston sends [Review Request]
+   - quinn: security patterns, test coverage, edge cases
+   - dev: code conventions, performance, dependencies
+   - john: product alignment, scope compliance
+4. Fix → verify → PASS
+5. Save: context-snapshots/stories/{story-id}-phase-f.md
+```
+
+### Phase transitions
+
+After Phase F passes:
+1. Run tsc commands from project-context.yaml (all must pass)
+2. If UI files changed → run UI Verification (see section below)
+3. Verify Story Dev Completion Checklist (all items [x])
+4. git commit + push
+5. Shutdown team → TeamDelete
+
+### Developer Writer Prompt Template (Phase A/B)
+
+```
+You are dev in team "{team_name}". Model: opus. YOLO mode.
+
+## Your Persona
+Read and embody: _bmad/bmm/agents/dev.md
+
+## PROHIBITION: NEVER use the Skill tool.
+Read BMAD checklist/template files directly with Read tool.
+
+## Role
+Implement real, working features. Fix based on critic feedback. No stubs.
+
+## Phase {A|B} Workflow
+1. Read step instruction from Orchestrator
+2. Read BMAD checklist: {checklist_path}
+3. Read references: project-context.yaml, story file, architecture, prior snapshots
+4. {Write story file | Implement code}
+5. SendMessage [Review Request] to winston, quinn, john BY NAME
+6. WAIT for ALL feedback
+7. Read ALL critic logs FROM FILE → apply fixes → write fixes.md
+8. SendMessage [Fixes Applied] to ALL BY NAME → WAIT for scores
+9. Avg >= 7: [Phase Complete] → WAIT for next instruction
+10. Avg < 7: rewrite (max 2 retries)
+
+## Rules
+- NEVER use Skill tool. Read .md files manually.
+- Real working code only. No stubs/mocks.
+- All references read FROM FILE, not from message memory.
 ```
 
 ---
 
-## Mode D: Swarm Auto-Epic (v5.1 NEW)
+## Mode C: Parallel Story Dev
+
+Usage: `/kdh-full-auto-pipeline parallel 9-1 9-2 9-3` (max 3 workers)
+Requires: stories are independent (no mutual dependencies, different files)
+
+```
+Step 0: Project Auto-Scan → load project-context.yaml
+Step 1: Read status/dependency info → verify no cross-dependencies
+Step 2: For each story (up to 3), in separate Git Worktrees:
+  - TeamCreate("{project}-story-{id}")
+  - Spawn team: dev, winston, quinn, john
+  - Execute Phase A → F (same as Mode B)
+Step 3: Collect all results (timeout: 30min per story)
+Step 4: Sequential merge (in dependency order):
+  - checkout main → merge --no-ff → tsc → commit or revert
+Step 5: git push → wait for deploy → report
+```
+
+Worktree rule: workers must NOT touch files outside their story scope. Shared files → ESCALATE to Orchestrator.
+
+---
+
+## Mode D: Swarm Auto-Epic
 
 Usage: `/kdh-full-auto-pipeline swarm epic-9`
 
-**"이번 Epic 돌려줘" → 자러감 → 아침에 완성**
-
-### How It Works (비유)
-
 ```
-회사에 일감 게시판이 있음
-  → 사장이 "이번 프로젝트 일감 8개" 올려놓고 퇴근
-  → 직원 3명이 출근해서 게시판 확인
-  → 각자 "이거 내가 할게" 하고 가져감
-  → 하나 끝나면 게시판 다시 확인 → 다음 일감 가져감
-  → 전부 끝나면 사장한테 보고서 올림
-  → 사장 아침에 보고서 확인
-```
-
-### Orchestrator Flow
-
-```
-Step 0: Epic Analysis
-  → Read sprint-status.yaml
-  → Find all stories in epic-N
-  → Analyze dependencies between stories (blockedBy fields)
-  → Sort stories: independent first, dependent later
-
-Step 1: Register ALL Stories as Tasks
-  → For each story in epic:
-     TaskCreate({
-       subject: "Story {id}: {title}",
-       description: "Run full BMAD 5-skill pipeline. Story file: {path}",
-       status: "pending",
-       owner: null,
-       blockedBy: [{dependent story task IDs}]
-     })
-  → Log: "Registered {N} tasks for epic-{M}. {X} independent, {Y} dependent."
-
-Step 2: Spawn Swarm Workers (3 workers, Git Worktrees)
-  → TeamCreate (team: bmad-swarm-epic-N)
-  → For i in 1..3:
-     Agent(
-       name: "swarm-worker-{i}",
-       model: "sonnet",
-       mode: "bypassPermissions",
-       isolation: "worktree",
-       prompt: Swarm Worker Prompt (see below)
-     )
-  → All 3 workers start simultaneously
-  → Each worker immediately checks TaskList and claims first available task
-
-Step 3: Orchestrator Monitors (minimal intervention)
-  → Periodically check TaskList for overall progress
-  → Handle special messages from workers:
-    - "[Shared File]" → approve or coordinate between workers
-    - "[ESCALATE]" → log, mark task as skipped, workers auto-pick next
-    - "[All Tasks Done]" → worker reports it has no more tasks to do
-  → TIMEOUT per task: 20 minutes (stories are bigger than planning steps)
-    → If a task is in_progress for 20min with no update:
-       → SendMessage to assigned worker: "Task {id} timeout. Status?"
-       → 3min grace → if no response: mark task as pending (owner=null)
-       → Another worker will pick it up
-  → Track: completed_count, skipped_count, total_count
-
-Step 4: Sequential Merge (after all tasks done or timed out)
-  → Shutdown all workers (shutdown_request to each)
-  → For each completed story (in dependency order):
-     1. git checkout main && git pull
-     2. git merge --no-ff {worktree-branch}
-     3. If merge conflict:
-        → Spawn single fix-worker (model=sonnet, isolation=none):
-          "Resolve merge conflict in {files}. Then run tsc."
-        → Timeout: 5min → skip if can't resolve
-     4. npx tsc --noEmit -p packages/server/tsconfig.json
-     5. If tsc fails:
-        → Spawn single fix-worker: "Fix tsc errors. Changed files: {list}"
-        → Timeout: 5min → revert merge if can't fix
-     6. If tsc passes: commit
-        Commit: feat: Story [ID] [title] -- [summary] + TEA [N] tests
-     7. Update sprint-status.yaml → done
-
-Step 5: Push + Deploy + Report
-  → git push
-  → Wait for deploy: gh run list -L 1 (poll until complete)
-  → Generate epic completion report:
-
-  _bmad-output/pipeline-logs/swarm-epic-{N}-report.md:
-  ## Swarm Epic {N} Completion Report
-
-  ### Summary
-  - Total stories: {N}
-  - Completed: {X} ✅
-  - Skipped: {Y} ⚠️ (with reasons)
-  - Merge conflicts resolved: {Z}
-  - Merge conflicts unresolved: {W}
-
-  ### Per-Story Results
-  | Story | Status | Worker | Duration | Tests | Issues |
-  |-------|--------|--------|----------|-------|--------|
-
-  ### Deploy
-  - Build: #{N}
-  - Status: {success|failure}
-  - URL: {deploy URL}
-
-  ### Recommendations
-  - Skipped stories needing manual attention: [list]
-  - Suggested next: `/kdh-full-auto-pipeline swarm epic-{N+1}` or retrospective
-
-Step 6: Suggest Retrospective
-  → "Epic {N} complete. Run retrospective? /bmad-bmm-retrospective"
+Step 0: Project Auto-Scan → load project-context.yaml
+Step 1: Read sprint status → find all stories in epic → analyze dependencies
+Step 2: TaskCreate for each story (status=pending, blockedBy=dependencies)
+Step 3: Spawn 3 story teams (Git Worktrees, self-organizing):
+  - Each team: dev, winston, quinn, john
+  - Each follows Phase A→F flow
+Step 4: Monitor:
+  - On [Phase Complete]: verify artifacts
+  - On [Shared File]: coordinate merge
+  - On [ESCALATE]: intervene
+  - On [All Tasks Done]: proceed to merge
+  - Timeout: 30min per story
+Step 5: Shutdown all teams → sequential merge (dependency order) → tsc → commit per story
+Step 6: git push → deploy → generate epic completion report
 ```
 
-### Swarm Worker Prompt
+### Swarm Worker Loop
 
 ```
-You are a SWARM WORKER in team "{team_name}". Model: sonnet.
-YOLO mode — auto-proceed, never wait for user input.
-You are SELF-ORGANIZING: pick your own tasks from the task board.
-
-## Your Loop (repeat until no tasks remain)
-
-### 1. Find Next Task
-  → TaskList — check all tasks
-  → Find first task where: status="pending" AND owner=null AND blockedBy all completed
-  → If no such task exists:
-    → Check if any tasks are still in_progress (other workers)
-    → If yes: wait 30 seconds, then TaskList again
-    → If no: all done → SendMessage to team-lead: "[All Tasks Done] Worker {name} idle."
-    → STOP
-
-### 2. Claim Task
-  → TaskUpdate: status="in_progress", owner="{my_name}"
-  → Read the story file path from task description
-
-### 3. Execute Full BMAD Pipeline (5 skills)
-  a. skill="bmad-bmm-create-story", args="{story_id}" (skip if file exists)
-  b. skill="bmad-bmm-dev-story", args="{story_file_path}"
-     → No stubs/mocks — real working code only
-  c. skill="bmad-tea-automate"
-     → Risk-based tests for changed/added code
-  d. skill="bmad-agent-bmm-qa"
-     → No menu, execute immediately
-  e. skill="bmad-bmm-code-review"
-     → Auto-fix issues found
-
-### 4. Quality Check
-  → npx tsc --noEmit -p packages/server/tsconfig.json
-  → If tsc fails: fix errors (1 attempt), re-run tsc
-  → If still fails: SendMessage to team-lead: "[ESCALATE] Story {id} tsc fails after fix attempt"
-
-### 5. Complete Task
-  → TaskUpdate: status="completed"
-  → SendMessage to team-lead:
-    "[Task Complete] Story {id}
-     Tests: {N} generated
-     Issues: {N} found/fixed in code-review
-     tsc: PASS
-     Files changed: {list}"
-
-### 6. Go Back to Step 1
-
-## Rules
-- NEVER modify files outside your story's scope
-- If you need to modify shared files (shared/types.ts, shared/constants.ts, etc.):
-  → SendMessage to team-lead: "[Shared File] Need to modify {path}. Reason: {why}"
-  → WAIT for approval
-- If a task takes longer than 15 minutes, send progress update to team-lead
-- If Skill tool doesn't work, read the BMAD agent .md file and follow manually
-- Real functionality only — no stubs, no mocks, no placeholders
-- Each completed task = one worktree branch ready for merge
+Loop until no tasks remain:
+1. TaskList → find first task: status=pending, owner=null, blockedBy all completed
+   - No available task + others in_progress → wait 30s → retry
+   - No tasks at all → "[All Tasks Done]"
+2. TaskUpdate: status=in_progress, owner="{team_name}"
+3. Execute Phase A → F (full party mode per phase)
+4. Run tsc + UI verification (if applicable)
+5. TaskUpdate: status=completed → report summary
+6. Go to step 1
 ```
-
-### Swarm vs Parallel: When to Use Which
-
-| | Mode C: Parallel | Mode D: Swarm |
-|---|---|---|
-| **Input** | Specific story IDs you choose | Entire epic (auto-discovers stories) |
-| **Task assignment** | Fixed: worker-1=story-A, etc. | **Self-organizing**: workers pick from board |
-| **Dependency handling** | Manual (you choose independent ones) | **Automatic** (blockedBy in TaskCreate) |
-| **Scale** | Fixed 3 workers for 3 stories | 3 workers for **N stories** (keeps working until done) |
-| **Ideal for** | "이 3개만 빨리" | **"이번 Epic 전부 돌려놓고 자러감"** |
-| **Recovery** | Worker dies → that story lost | Worker dies → **task goes back to board, another picks up** |
 
 ---
 
-## Troubleshooting
+## UI Verification (triggered when UI files changed)
 
-### Writer goes idle without completing
-**Fix:** Orchestrator sends reminder. step_timeout: 10min + 2min grace + respawn team.
+### Detection
+UI files changed = any modified/added file matching:
+- `**/*.tsx`, `**/*.jsx`, `**/*.vue`, `**/*.svelte`
+- `**/*.css`, `**/*.scss`, `**/*.less`
+- `**/*.html` (in src/ or app/ directories)
+- Route/page config files
 
-### Critics don't respond to Writer's review request
-**Cause:** Critic agent idle or crashed.
-**Fix:** Writer waits 5 minutes max. If no response → Writer reports to Orchestrator → Orchestrator falls back to single-worker mode for this step.
+### Full Interaction E2E
 
-### Critics disagree on score (one PASS, one FAIL)
-**Fix:** Average score determines outcome. If avg >= 7: PASS. Disagreement logged but not blocking.
+```
+Step 1: Start dev server (dev_command from project-context.yaml, 60s timeout)
+Step 2: Identify changed pages (git diff → filter UI → map to routes)
+Step 3: Playwright screenshot of ALL changed pages
+Step 4: Full interaction E2E on each changed page:
+  a. Every button: click → verify no crash + expected response
+  b. Every input: type test data → verify value + validation
+  c. Every form: fill + submit → verify success/error states
+  d. Every dropdown: open → verify options → select → verify
+  e. CRUD operations (if applicable): create → read → update → delete
+  f. Console errors: capture all, filter benign, fail on unexpected
+Step 5: Theme consistency check (design tokens match app shell)
+Step 6: Router import check (all lazy-loaded routes resolve)
+Step 7: Stop dev server
+```
 
-### Worker dies mid-stage
-**Fix (v4.2):** Context-snapshots in `_bmad-output/context-snapshots/`. Respawned team gets all prior decisions.
-
-### Team creation fails entirely
-**Fix (v5):** Orchestrator falls back to v4.2 single-worker self-review. Pipeline continues.
-
-### Parallel workers modify same file (merge conflict)
-**Fix:** Each worker runs in Git Worktree = separate branch. Conflicts detected at merge time. Orchestrator attempts auto-resolve. If can't → skip that story, log warning, continue with others.
-
-### Worker can't call Skill tool from TeamCreate context
-**Fallback:** Worker reads the BMAD agent's .md file directly and follows instructions manually. Reports issue to Orchestrator.
-
-### Swarm worker stuck on a task for too long
-**Cause:** Complex story or worker hit an edge case.
-**Fix:** Orchestrator sends reminder at 20min. If no response after 3min grace → task goes back to board (owner=null, status=pending). Another worker picks it up fresh.
-
-### Swarm task dependency deadlock
-**Cause:** All remaining tasks are blocked by in_progress tasks that are stuck.
-**Fix:** Orchestrator detects: all pending tasks have blockedBy that are in_progress but timed out. Resolution: force-complete the blocking task (mark as skipped), unblocking dependents.
-
-### Swarm merge conflicts pile up
-**Cause:** Multiple workers modified adjacent code.
-**Fix:** Orchestrator spawns a single fix-worker (5min timeout) per conflict. If unresolvable → skip that story, add to "needs manual attention" in report.
-
-### /simplify times out or errors
-**Fix:** Skip, log, continue. code-review still catches issues.
-
-### Writer called Skill tool instead of reading step file
-**Cause:** Anti-Pattern #1 (see CRITICAL ANTI-PATTERNS section above).
-**Fix:** Shut down Writer. Respawn Writer with explicit prohibition. Inject context-snapshots. Resend step instruction in "[Step Instruction]" format with full step file path.
+If Playwright not configured → skip automated E2E, still run router + console checks.
 
 ---
 
-## Absolute Rules
+## Story Dev Completion Checklist
 
-1. Never implement code without BMAD skills
-2. Never review code without BMAD skills
-3. Never skip QA/TEA stages
-4. Never treat stub/mock/placeholder as "complete"
-5. Never skip planning stages because "file already exists" — always fresh
-6. Never batch planning stages into one commit — individual commits per stage
-7. BMAD skills: no menus, execute immediately (YOLO) — BUT planning mode Writer NEVER uses Skill tool (see Anti-Pattern #1)
-8. Planning stages: create fresh every time (overwrite existing)
-9. Workers run in tmux (visible to user in split-pane)
-10. Workers stay alive for all steps within a STAGE — shutdown and respawn between stages
-11. Orchestrator does NOT write documents or run party mode — Workers do everything
-12. Orchestrator MUST embed first task in Writer's spawn prompt — never say "wait" (Critics CAN wait — they trigger on Writer's DM)
-13. All agents must read FROM FILE (Read tool) — never from memory or message text
-14. Expert comments must be in character with 2-3 sentence minimum — no one-liners
-15. "Zero findings" triggers re-analysis (BMAD adversarial protocol)
-16. max_retry: 2 per step — FAIL 3 times = ESCALATE, never infinite rewrite
-17. step_timeout: 10min + 2min grace — stall 3 times = SKIP step
-18. Party-log validation: Orchestrator MUST verify critic-a.md + critic-b.md + fixes.md before accepting
-19. /simplify: Orchestrator executes (not Worker), 3min timeout, skip on failure
-20. Pipeline never blocks — timeout/fail/escalate always leads to "continue"
-21. Worker MUST save context-snapshot after EVERY step (before reporting)
-22. On Worker respawn/new stage, Orchestrator MUST inject ALL context-snapshots into prompt
-23. Model strategy: Orchestrator=opus, Workers=sonnet (override only if explicitly requested)
-24. Team failure → auto-fallback to single-worker mode, log warning, continue
-25. Parallel mode: max 3 simultaneous workers. Shared file changes require Orchestrator approval.
-26. tsc --noEmit MUST pass before any story dev commit
-27. Swarm: workers MUST use TaskList→TaskUpdate for task claiming (no manual assignment)
-28. Swarm: task timeout 20min → task returns to board (owner=null). Another worker picks up.
-29. Swarm: Orchestrator generates epic completion report after all tasks done
-30. Swarm: merge in dependency order. Merge conflict → spawn fix-worker (5min). Unresolvable → skip + log.
-31. Planning Writer MUST NEVER call the Skill tool. Content is written manually by reading step files.
-32. Planning Writer MUST write exactly ONE step, then SendMessage to BOTH critics, then WAIT. No batching steps.
-33. Orchestrator MUST send step file paths (not skill names) in Writer instructions. Format: "[Step Instruction] ..."
+```
+Story Dev completion checklist:
+  [ ] Phase A: create-story + party review PASS
+  [ ] Phase B: dev-story (real code, no stubs) + party review PASS
+  [ ] Phase C: simplify completed
+  [ ] Phase D: TEA tests written + party review PASS + tests passing
+  [ ] Phase E: QA acceptance criteria verified + party review PASS
+  [ ] Phase F: code-review + party review PASS
+  [ ] tsc passes (if tsc_enabled)
+  [ ] If UI story: full interaction E2E passes
+  [ ] If UI story: theme consistency verified
+  [ ] If UI story: no unexpected console errors
+  [ ] All router imports resolve
+  [ ] Real functionality (no stub/mock/placeholder)
+```
+
+ALL items must be [x] before story is accepted.
+If any UI check fails → fix → re-run → must pass.
+
+---
+
+## Pipeline Interconnection: UXUI Redesign → Code Review
+
+When `/kdh-uxui-redesign-full-auto-pipeline` completes, auto-trigger full code review:
+
+```
+Review context:
+  type: "uxui-redesign"
+  risk_level: HIGH (forced)
+
+Required checks:
+  1. Theme consistency across ALL pages
+  2. Full interaction E2E on ALL pages (not just changed)
+  3. Router integrity (all imports resolve, no 404s)
+  4. Accessibility baseline (WCAG AA contrast, keyboard nav, screen reader)
+  5. Performance sanity (bundle size, no render-blocking imports)
+
+Output: _qa-e2e/uxui-redesign-review-{date}.md
+```
+
+---
+
+## Defense & Timeouts
+
+| Mechanism | Value | Action |
+|-----------|-------|--------|
+| max_retry (Grade A) | 3 per step | 4th fail → ESCALATE |
+| max_retry (Grade B) | 2 per step | 3rd fail → ESCALATE |
+| max_retry (Grade C) | 1 per step | 2nd fail → ESCALATE |
+| step_timeout | 20min + 2min grace | Reminder → grace → respawn with snapshots |
+| party_timeout | 15min per round | Critic unresponsive → fallback to single-worker |
+| gate_timeout | none | GATE waits indefinitely for user |
+| stall_threshold | 5min no message | Ping → 2nd stall → force-close |
+| max_stalls | 3 | SKIP step |
+| shutdown_timeout | 30s | → tmux kill-pane → force cleanup |
+| /simplify | 3min timeout | Skip on fail |
+| ui_dev_server | 60s startup | WARN + continue without E2E |
+| ui_e2e_per_page | 2min per page | Skip page with WARN |
+| context_window | 1M tokens (Opus 4.6) | No early compaction |
+| story_timeout | 30min per story | ESCALATE |
+
+---
+
+## Core Rules
+
+1. **BMAD real names mandatory.** All agents spawned with names from BMAD Agent Roster. Each agent Reads their persona file as first action.
+2. **GATE steps pause for user.** Never auto-proceed on GATE steps. Wait indefinitely.
+3. **BMAD steps auto-discovered.** glob steps/ directories, filter continue files, sort by filename. Never hardcode step lists.
+4. **Independent steps run in parallel.** PRD Validate and Readiness use parallel groups.
+5. **Writer NEVER calls Skill tool.** Read step/checklist files manually with Read tool.
+6. **One step at a time.** Write ONE step → full party mode → THEN next step.
+7. **All reads FROM FILE.** Use Read tool, never message memory.
+8. **Output quality: specific and concrete.** File paths, hex colors, exact values. "Vague" = instant FAIL.
+9. **Orchestrator embeds first task in spawn.** Never spawn with just "wait".
+10. **Stage transition: clean restart.** Verify all steps → commit → shutdown ALL → TeamDelete → fresh team + snapshots.
+11. **Pipeline never blocks.** Timeout/fail/escalate always leads to "continue".
+12. **tsc MUST pass** before any commit (if tsc_enabled).
+13. **Context snapshots after every step/phase.** Save to context-snapshots/. On resume: read ALL snapshots first.
+14. **Project Auto-Scan first.** ALWAYS run Step 0. Never assume project structure.
+15. **UI verification gate.** UI files changed + verification fails = story NOT complete.
+16. **No hardcoded paths.** All paths from project-context.yaml or dynamic discovery.
+17. **Scoring rubric mandatory.** Critics use `_bmad-output/planning-artifacts/critic-rubric.md` — 6 dimensions, 7/10 pass, any dim <3 auto-fail.
+18. **`계속` = run to completion.** Do NOT stop at intermediate milestones (except GATE steps).
+19. **Batch parallelism.** Independent files needing similar changes → split into batches, launch background agents.
+20. **Startup cleanup.** Clean stale worktrees/panes/dirs. Shutdown: clean all resources.
