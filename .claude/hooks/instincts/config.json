@@ -1,0 +1,10 @@
+{
+  "version": "2.1",
+  "observer": {
+    "enabled": true,
+    "run_interval_minutes": 5,
+    "min_observations_to_analyze": 20
+  },
+  "min_session_length": 10,
+  "learned_skills_path": "~/.claude/skills/learned"
+}

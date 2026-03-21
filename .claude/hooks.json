@@ -20,6 +20,16 @@
             "timeout": 30
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /home/ubuntu/corthex-v2/.claude/hooks/ecc/hooks/session-start.js",
+            "timeout": 15
+          }
+        ]
       }
     ],
     "PreToolUse": [
@@ -30,6 +40,48 @@
             "type": "command",
             "command": "/home/ubuntu/corthex-v2/.claude/hooks/pre-commit-tsc.sh",
             "timeout": 120
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /home/ubuntu/corthex-v2/.claude/hooks/ecc/hooks/doc-file-warning.js",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /home/ubuntu/corthex-v2/.claude/hooks/ecc/hooks/suggest-compact.js",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /home/ubuntu/corthex-v2/.claude/hooks/ecc/hooks/governance-capture.js",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /home/ubuntu/corthex-v2/.claude/hooks/ecc/hooks/pre-compact.js",
+            "timeout": 15
           }
         ]
       }
@@ -46,6 +98,28 @@
         ]
       }
     ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /home/ubuntu/corthex-v2/.claude/hooks/ecc/hooks/post-edit-console-warn.js",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /home/ubuntu/corthex-v2/.claude/hooks/ecc/hooks/governance-capture.js",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "matcher": "",
@@ -54,6 +128,36 @@
             "type": "command",
             "command": "/home/ubuntu/corthex-v2/.claude/hooks/session-end-reminder.sh",
             "timeout": 15
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /home/ubuntu/corthex-v2/.claude/hooks/ecc/hooks/session-end.js",
+            "timeout": 15
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /home/ubuntu/corthex-v2/.claude/hooks/ecc/hooks/cost-tracker.js",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /home/ubuntu/corthex-v2/.claude/hooks/ecc/hooks/evaluate-session.js",
+            "timeout": 10
           }
         ]
       }
