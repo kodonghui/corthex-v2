@@ -171,18 +171,41 @@ Supports variable team sizes (3-5 critics).
    - 3 critics: 3 pairs (all)
    - 4 critics: 4 relevant pairs (adjacent expertise, skip 2 least-related)
    - 5 critics: 5 relevant pairs (adjacent expertise, skip 5 least-related)
+   Cross-talk MUST happen. Each critic SendMessage to assigned peer(s) with top disagreement/concern.
+   Peer responds. Both update their party-logs with cross-talk section before scoring.
 5. Critics: SendMessage [Feedback] to Writer BY NAME — "{N} issues. Priority: [top 3]"
 6. Writer: Read ALL critic logs FROM FILE → apply fixes → write party-logs/{stage}-{step}-fixes.md
 7. Writer: SendMessage [Fixes Applied] to ALL critics BY NAME
 8. Critics (parallel): Re-read FROM FILE → verify → SendMessage [Verified] score X/10
-9. Calculate average:
-   - Avg >= 7: PASS → save context-snapshot → Writer reports [Step Complete]
-   - Avg < 7 AND retry < grade_max: Writer rewrites
+9. Calculate average + enforce thresholds:
+   - Grade A: avg >= 8.0 required (was 7.0)
+   - Grade B: avg >= 7.5 required (was 7.0)
+   - Avg >= threshold: proceed to Minimum Cycle Check (step 11)
+   - Avg < threshold AND retry < grade_max: Writer rewrites from step 1
    - Retry >= grade_max: ESCALATE to Orchestrator
 10. Score Variance Check (v9.1):
    - Calculate standard deviation of all critic scores
-   - If stdev < 0.3: Orchestrator warns "점수가 너무 수렴합니다" and requests at least 1 critic to independently re-score
-   - Purpose: prevent score inflation and consensus bias (e.g., unanimous 9.00)
+   - If stdev < 0.5 (was 0.3): Orchestrator flags "Suspiciously High Agreement"
+   - At least 1 critic MUST independently re-score without seeing others' scores
+11. Minimum Cycle Check (v9.2 — MANDATORY):
+   - Grade A: MINIMUM 2 full cycles required regardless of scores
+     - Cycle 1: steps 1-8 above (normal review)
+     - Cycle 2: Devil's Advocate mode — 1 designated critic MUST find ≥ 3 issues
+     - If Devil's Advocate finds 0 issues: suspicious, Orchestrator reviews directly
+   - Grade B: MINIMUM 1 full cycle + cross-talk verified
+   - Only after minimum cycles met AND avg >= threshold → PASS
+12. Orchestrator Step Completion Checklist (v9.2 — BLOCKING):
+   Before accepting [Step Complete], Orchestrator MUST verify ALL:
+   - [ ] party-logs/{stage}-{step}-{critic1}.md EXISTS (file, not message)
+   - [ ] party-logs/{stage}-{step}-{critic2}.md EXISTS
+   - [ ] party-logs/{stage}-{step}-{critic3}.md EXISTS
+   - [ ] party-logs/{stage}-{step}-{critic4}.md EXISTS (if 4 critics)
+   - [ ] party-logs/{stage}-{step}-fixes.md EXISTS
+   - [ ] Each critic log contains "## Cross-talk" section
+   - [ ] Score stdev >= 0.5
+   - [ ] Grade A: 2nd cycle completed with Devil's Advocate
+   - [ ] Context snapshot saved
+   ANY item unchecked → REJECT [Step Complete], do NOT proceed
 ```
 
 Party-log naming: `party-logs/{stage}-{step}-{agent-name}.md`
@@ -253,6 +276,9 @@ AUTO steps (non-gate) proceed without user input. Orchestrator only notifies use
 7. **Writer duplicates prior step content** (v9.1) — Writer copies risk/requirement tables that already exist in earlier steps. FIX: Before writing, Writer MUST Read prior steps' sections on the same topic. If content exists, use `§{section_name} 참조` cross-reference instead of duplicating. (Incident: Step 06/08 risk tables had 6 duplicate entries.)
 8. **Score convergence inflation** (v9.1) — All critics give identical scores after fixes (e.g., unanimous 9.00). FIX: Orchestrator checks score standard deviation; if stdev < 0.3, triggers independent re-scoring warning. (Incident: Step 08 all 4 critics scored exactly 9.00.)
 9. **Missing party-log files** (v9.1) — Critic reviews sent via message only, no file written. FIX: Orchestrator verifies all `party-logs/{stage}-{step}-{critic-name}.md` files exist before accepting [Step Complete]. Missing file = REJECT. (Incident: Step 02-05 had only winston's logs.)
+10. **Single-cycle rubber stamp** (v9.2) — All critics score 8.5+ on first review, no retry triggered, issues slip through. FIX: Grade A requires MINIMUM 2 cycles regardless of scores. Cycle 2 uses Devil's Advocate mode (1 critic MUST find ≥ 3 issues). (Incident: Stage 2 Step 06-10 all passed with 9.0+ on first cycle, zero retries across 5 steps.)
+11. **Cross-talk skipped** (v9.2) — Critics review independently but never discuss with each other. FIX: Cross-talk is MANDATORY. Each critic log MUST contain "## Cross-talk" section documenting peer discussion. Orchestrator rejects logs without this section. (Incident: Stage 0-3 had zero cross-talk across all steps.)
+12. **Orchestrator skips own checklist** (v9.2) — Rules exist but Orchestrator doesn't follow them. FIX: Step Completion Checklist (v9.2) is BLOCKING — Orchestrator must verify every checkbox before accepting. Pre-commit hook validates party-log file completeness. (Incident: Stage 2 Step 02-05 accepted with only 1/4 critic logs.)
 
 Additional safeguards:
 - TeamDelete fails after tmux kill → `rm -rf ~/.claude/teams/{name} ~/.claude/tasks/{name}`, retry
