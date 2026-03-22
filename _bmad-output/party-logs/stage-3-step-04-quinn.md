@@ -134,6 +134,28 @@
 
 계산: 0.80 + 2.25 + 1.20 + 0.80 + 1.20 + 2.25 = **8.50**
 
+### R2 Residual Fix Verification (Post-fix)
+
+**R1 residual (Gap 2 L218 cross-talk 불일치):** FIXED.
+- L215: "dynamic model routing" -> "Admin-editable 모델 배정" -- John cross-talk 결론 반영 ✅
+- L218: Withdrawn security angle REMOVED. "Existing FR35 extends naturally" 표현으로 교체 ✅
+- L220: Cross-talk consensus recommended FR with Admin static mapping pattern ✅
+
+**Residual resolution: 1/1 FIXED. D3 8->9, D5 8->9 복원.**
+
+### R2 Final Scores (post-residual-fix)
+
+| 차원 | R2 pre | R2 final | 가중치 | 가중점수 |
+|------|--------|----------|--------|---------|
+| D1 | 8 | 8 | 10% | 0.80 |
+| D2 | 9 | 9 | 25% | 2.25 |
+| D3 | 8 | 9 | 15% | 1.35 |
+| D4 | 8 | 8 | 10% | 0.80 |
+| D5 | 8 | 9 | 15% | 1.35 |
+| D6 | 9 | 9 | 25% | 2.25 |
+
+**R2 Final Weighted Average: 8.80/10 ✅ PASS**
+
 ### R2 Verdict (FINAL)
 
-**8.50/10 PASS.** 8건 수정 중 5 PASS, 2 PASS with note, 1 LOW residual. Gap 6(CLI 토큰 유출) 추가로 보안 커버리지 대폭 강화. Gap 7/8 Informational 추가로 완전성 향상. 1건 LOW residual: Gap 2 L218 보안 각도가 cross-talk 후 철회되었으나 미반영 — non-blocking (Gap 존재와 severity 유효, 설명만 수정 필요).
+**[Verified] 8.80/10 PASS.** All 8 fixes + 1 residual verified. Gap 2 "dynamic routing" -> "Admin-editable" 교정 + withdrawn security angle 삭제로 cross-talk 결론과 완전 정합. Gap 6(CLI 토큰 유출 감지) 보안 커버리지 확보. 8개 갭 전부 실존, 0 false positive, 8개 Brief 커버리지 영역 추가.
