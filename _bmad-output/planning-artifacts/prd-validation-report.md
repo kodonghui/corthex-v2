@@ -273,10 +273,9 @@ Deferred/future items are scattered across at least 3 PRD locations with no cons
 
 **Recommendation:** Add a consolidated "Deferred Items" section (or appendix) that cross-references all deferred decisions in one place, so future sprint planning doesn't miss scattered deferrals.
 
-#### CR-3: Go/No-Go #6 References Deprecated Subframe
-Go/No-Go gate #6 (L447) still references "Subframe" as a UXUI tool. Subframe was deprecated in favor of Gemini/Stitch 2 (see Phase 6 UXUI redesign history). The gate text should be updated to reference the current UXUI toolchain.
-
-**Recommendation:** Update Go/No-Go #6 to replace "Subframe" with "Stitch 2" or the appropriate current design tool name.
+#### CR-3: Go/No-Go #6 References Deprecated Subframe — **RESOLVED (v9.2 Pre-sweep 2026-03-22)**
+~~Go/No-Go gate #6 (L447) still references "Subframe" as a UXUI tool.~~
+**Fixed:** PRD pre-sweep에서 Subframe→Stitch 2 일괄 치환 완료.
 
 ---
 
