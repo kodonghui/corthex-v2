@@ -25,6 +25,7 @@
 - smoke-test: `.claude/hooks/smoke-test.sh` (배포 후 전 API 엔드포인트 200 OK 확인)
 - Orchestrator only assigns + commits. Workers do everything else.
 - Prohibited: skipping skills, stub/mock as "done", orchestrator running party mode
+- **파이프라인 에이전트 = 반드시 TeamCreate + Agent(team_name) 사용. 단독 Agent(서브에이전트) 금지.** 크리틱 간 cross-talk은 SendMessage로 직접 통신해야 하므로 팀 필수.
 
 ## Output Quality
 - Specific and detailed only. "Vague" = instant FAIL.

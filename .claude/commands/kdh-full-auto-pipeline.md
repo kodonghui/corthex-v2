@@ -1,16 +1,14 @@
 ---
 name: 'kdh-full-auto-pipeline'
-description: 'Universal Full Pipeline v9.1 — BMAD-powered full-cycle automation. Auto-discovers workflows, real BMAD agent personas, party mode per step, user gates. Usage: /kdh-full-auto-pipeline [planning|story-ID|parallel ID1 ID2...|swarm epic-N]'
+description: 'Universal Full Pipeline v9.2 — BMAD-powered full-cycle automation. Auto-discovers workflows, real BMAD agent personas, party mode per step, user gates. Usage: /kdh-full-auto-pipeline [planning|story-ID|parallel ID1 ID2...|swarm epic-N|reverify stage-N]'
 ---
 
-# Universal Full Pipeline v9.1
+# Universal Full Pipeline v9.2
 
 ## Mode Selection
 
-- `planning` or no args: Planning pipeline — BMAD full-cycle, 9 stages, real agent party mode
-- Story ID (e.g. `3-1`): Single story dev — 6 phases with party mode per phase
-- `parallel story-ID1 story-ID2 ...`: Parallel story dev — Git Worktrees, max 3 simultaneous
-- `swarm epic-N`: Swarm auto-epic — all stories as tasks, 3 self-organizing agent teams
+- `planning` or no args: Planning pipeline — BMAD full-cycle, 9 stages, real agent party mode. 병렬 가능한 스텝은 병렬 실행.
+- `reverify stage-N`: Re-verify a completed stage with v9.2 party mode (existing output, fresh critic review)
 
 ---
 
@@ -543,211 +541,42 @@ Non-BMAD stages use 4-agent party mode (1 Writer + 3 Critics with generic roles)
 
 ---
 
-## Mode B: Story Dev Pipeline
+## Mode B: Reverify Stage
 
-### Key Change from v8.0
-OLD: 1 Worker calls BMAD Skills sequentially, no party mode.
-NEW: 6 phases, each with Writer + Critics party mode using BMAD checklists.
+Re-verify a completed stage's output with v9.2 party mode. Content is NOT rewritten — critics review the existing document.
+
+### Usage
+`/kdh-full-auto-pipeline reverify stage-N` (e.g., `reverify stage-1`)
 
 ### Orchestrator Flow
 
 ```
 Step 0: Project Auto-Scan → load project-context.yaml
-Step 1: TeamCreate("{project}-story-{id}")
-Step 2: Spawn base team: dev(Writer), winston, quinn, john (4 agents, bypassPermissions)
-Step 3: Execute Phase A → B → C → D → E → F (details below)
-  - Between phases: save context-snapshot, team continues (no recreation)
-  - Phase C (simplify): Orchestrator runs directly, no team needed
-  - Phase D/E: team rotation (different Writer, same members)
-Step 4: Verify completion checklist → tsc (if enabled) → commit + push
-Step 5: Shutdown ALL → TeamDelete → update sprint status
+Step 1: Identify target stage config (team, steps, grades, output file)
+Step 2: TeamCreate("{project}-reverify-stage-{N}")
+Step 3: Create party-logs/ dir if not exists
+Step 4: Spawn Writer + Critics per Stage Team Config
+  - Writer: "You are reviewing EXISTING content, not writing new."
+  - Critics: Full persona + rubric + "WAIT for Writer's [Review Request]"
+Step 5: For each non-Grade-C step:
+  a. Writer reads existing output section → SendMessage [Review Request] to all critics
+  b. Critics review → write party-logs/{stage}-{step}-{name}.md
+  c. Cross-talk: 3 critics = 3 pairs, all must exchange
+  d. Critics: SendMessage [Feedback] to Writer
+  e. Writer: read feedback → write party-logs/{stage}-{step}-fixes.md (issues found + resolution)
+  f. Critics: re-verify → final score
+  g. Grade A: Cycle 2 with Devil's Advocate (1 critic must find ≥ 3 issues)
+  h. Orchestrator Step Completion Checklist (BLOCKING)
+Step 6: git commit: "docs(planning): Stage {N} reverify — v9.2 party mode, avg {score}"
+Step 7: Shutdown ALL → TeamDelete
 ```
 
-### Phase A: Create Story
-
-```
-Team: dev(Writer), winston, quinn, john = 4
-Reference: _bmad/bmm/workflows/4-implementation/create-story/checklist.md
-
-1. dev reads story requirements from epics file
-2. dev reads create-story checklist and template
-3. dev writes story file following template
-4. Party mode: dev sends [Review Request] → winston/quinn/john review
-   - winston: architecture alignment, file structure
-   - quinn: testability, edge cases, acceptance criteria completeness
-   - john: product requirements coverage, user value
-5. Fix → verify → PASS (avg >= 7)
-6. Save: context-snapshots/stories/{story-id}-phase-a.md
-```
-
-### Phase B: Develop Story
-
-```
-Team: dev(Writer), winston, quinn, john = 4
-Reference: _bmad/bmm/workflows/4-implementation/dev-story/checklist.md
-
-1. dev reads story file + DoD checklist
-2. dev implements REAL working code (no stubs/mocks/placeholders)
-3. Party mode: dev sends [Review Request] with changed files list
-   - winston: architecture compliance, engine boundary (agent-loop.ts untouched)
-   - quinn: code quality, error handling, test hooks
-   - john: acceptance criteria satisfaction
-4. Fix → verify → PASS
-5. Save: context-snapshots/stories/{story-id}-phase-b.md
-```
-
-### Phase C: Simplify
-
-```
-No team needed. Orchestrator runs /simplify directly.
-Timeout: 3 minutes. Skip on fail — code-review catches issues.
-```
-
-### Phase D: Test (TEA)
-
-```
-Team rotation: quinn(Writer), dev, winston = 3
-Reference: TEA risk-based test strategy
-
-1. quinn designs test strategy based on story requirements
-2. quinn writes tests (unit + integration + E2E as needed)
-3. Party mode: quinn sends [Review Request]
-   - dev: implementability, test framework compliance
-   - winston: architecture test coverage, boundary tests
-4. Fix → verify → PASS
-5. Run all tests — must pass
-6. Save: context-snapshots/stories/{story-id}-phase-d.md
-```
-
-### Phase E: QA
-
-```
-Team rotation: quinn(Writer), john, dev = 3
-
-1. quinn runs QA checklist against implemented code
-2. quinn verifies ALL acceptance criteria from story file
-3. Party mode: quinn sends [Review Request]
-   - john: acceptance criteria met? user value delivered?
-   - dev: code completeness, no shortcuts
-4. Fix → verify → PASS
-5. Save: context-snapshots/stories/{story-id}-phase-e.md
-```
-
-### Phase F: Code Review
-
-```
-Team rotation: winston(Writer), quinn, dev, john = 4
-Reference: _bmad/bmm/workflows/4-implementation/code-review/checklist.md
-
-1. winston reads all changed files + code-review checklist
-2. winston performs architecture + security + quality review
-3. Party mode: winston sends [Review Request]
-   - quinn: security patterns, test coverage, edge cases
-   - dev: code conventions, performance, dependencies
-   - john: product alignment, scope compliance
-4. Fix → verify → PASS
-5. Save: context-snapshots/stories/{story-id}-phase-f.md
-```
-
-### Phase transitions
-
-After Phase F passes:
-1. Run tsc commands from project-context.yaml (all must pass)
-2. If UI files changed → run UI Verification (see section below)
-3. Verify Story Dev Completion Checklist (all items [x])
-4. git commit + push
-5. Shutdown team → TeamDelete
-
-### Developer Writer Prompt Template (Phase A/B)
-
-```
-You are dev in team "{team_name}". Model: opus. YOLO mode.
-
-## Your Persona
-Read and embody: _bmad/bmm/agents/dev.md
-
-## PROHIBITION: NEVER use the Skill tool.
-Read BMAD checklist/template files directly with Read tool.
-
-## Role
-Implement real, working features. Fix based on critic feedback. No stubs.
-
-## Phase {A|B} Workflow
-1. Read step instruction from Orchestrator
-2. Read BMAD checklist: {checklist_path}
-3. Read references: project-context.yaml, story file, architecture, prior snapshots
-4. {Write story file | Implement code}
-5. SendMessage [Review Request] to winston, quinn, john BY NAME
-6. WAIT for ALL feedback
-7. Read ALL critic logs FROM FILE → apply fixes → write fixes.md
-8. SendMessage [Fixes Applied] to ALL BY NAME → WAIT for scores
-9. Avg >= 7: [Phase Complete] → WAIT for next instruction
-10. Avg < 7: rewrite (max 2 retries)
-
-## Rules
-- NEVER use Skill tool. Read .md files manually.
-- Real working code only. No stubs/mocks.
-- All references read FROM FILE, not from message memory.
-```
-
----
-
-## Mode C: Parallel Story Dev
-
-Usage: `/kdh-full-auto-pipeline parallel 9-1 9-2 9-3` (max 3 workers)
-Requires: stories are independent (no mutual dependencies, different files)
-
-```
-Step 0: Project Auto-Scan → load project-context.yaml
-Step 1: Read status/dependency info → verify no cross-dependencies
-Step 2: For each story (up to 3), in separate Git Worktrees:
-  - TeamCreate("{project}-story-{id}")
-  - Spawn team: dev, winston, quinn, john
-  - Execute Phase A → F (same as Mode B)
-Step 3: Collect all results (timeout: 30min per story)
-Step 4: Sequential merge (in dependency order):
-  - checkout main → merge --no-ff → tsc → commit or revert
-Step 5: git push → wait for deploy → report
-```
-
-Worktree rule: workers must NOT touch files outside their story scope. Shared files → ESCALATE to Orchestrator.
-
----
-
-## Mode D: Swarm Auto-Epic
-
-Usage: `/kdh-full-auto-pipeline swarm epic-9`
-
-```
-Step 0: Project Auto-Scan → load project-context.yaml
-Step 1: Read sprint status → find all stories in epic → analyze dependencies
-Step 2: TaskCreate for each story (status=pending, blockedBy=dependencies)
-Step 3: Spawn 3 story teams (Git Worktrees, self-organizing):
-  - Each team: dev, winston, quinn, john
-  - Each follows Phase A→F flow
-Step 4: Monitor:
-  - On [Phase Complete]: verify artifacts
-  - On [Shared File]: coordinate merge
-  - On [ESCALATE]: intervene
-  - On [All Tasks Done]: proceed to merge
-  - Timeout: 30min per story
-Step 5: Shutdown all teams → sequential merge (dependency order) → tsc → commit per story
-Step 6: git push → deploy → generate epic completion report
-```
-
-### Swarm Worker Loop
-
-```
-Loop until no tasks remain:
-1. TaskList → find first task: status=pending, owner=null, blockedBy all completed
-   - No available task + others in_progress → wait 30s → retry
-   - No tasks at all → "[All Tasks Done]"
-2. TaskUpdate: status=in_progress, owner="{team_name}"
-3. Execute Phase A → F (full party mode per phase)
-4. Run tsc + UI verification (if applicable)
-5. TaskUpdate: status=completed → report summary
-6. Go to step 1
-```
+### Key Differences from Planning Mode
+- Content is NOT rewritten from scratch
+- Writer presents existing content for review (reads from file, not generates)
+- Fixes are documented in party-logs/{stage}-{step}-fixes.md but may or may not modify the source document
+- All v9.2 rules apply: cross-talk mandatory, score stdev >= 0.5, Grade A 2-cycle, Orchestrator checklist
+- GATE steps are skipped (already approved in original run)
 
 ---
 
