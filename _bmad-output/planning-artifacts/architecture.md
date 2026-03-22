@@ -1,8 +1,11 @@
 ---
 # v3 "OpenClaw" Architecture Workflow — initialized 2026-03-21
 # Previous: v2 Architecture (7 steps complete, 32 party rounds, 2026-03-11)
-stepsCompleted: [1, 2, 3, 4]
-workflowStatus: in-progress
+stepsCompleted: [1, 2, 3, 4, 5, 6, 7, 8]
+workflowType: 'architecture'
+lastStep: 8
+workflowStatus: complete
+completedAt: '2026-03-22'
 workflowVersion: 'v3-update'
 v2StepsCompleted: [1, 2, 3, 4, 5, 6, 7]
 v2PartyModeRounds: 32
@@ -2487,9 +2490,13 @@ corthex-v2/
 │   │       │                                  #   기존 embedding-service.ts 교체
 │   │       │
 │   │       ├── routes/
-│   │       │   └── admin/
-│   │       │       ├── n8n-proxy.ts           # NEW Sprint 2: Hono proxy() + 8-layer (E20, D25)
-│   │       │       └── marketing.ts           # NEW Sprint 2: marketing settings API (E20b)
+│   │       │   ├── admin/
+│   │       │   │   ├── n8n-proxy.ts           # NEW Sprint 2: Hono proxy() + 8-layer (E20, D25)
+│   │       │   │   └── marketing.ts           # NEW Sprint 2: marketing settings API (E20b)
+│   │       │   │                              #   프리셋 설치: n8n-proxy 내부 HTTP fetch 경유 (Docker 직접 금지)
+│   │       │   └── workspace/
+│   │       │       └── observations.ts        # NEW Sprint 3: observation CRUD (E13, FR-MEM1~2)
+│   │       │                                  #   sanitizeObservation() 호출 후 INSERT
 │   │       │
 │   │       ├── ws/
 │   │       │   └── channels.ts               # MODIFY Sprint 4: + 'office' case (E16, D24)
@@ -2497,10 +2504,11 @@ corthex-v2/
 │   │       │
 │   │       ├── db/
 │   │       │   └── migrations/
-│   │       │       ├── XXXX_add_personality_traits.ts      # NEW Sprint 1: agents.personality_traits JSONB
-│   │       │       ├── XXXX_add_observations.ts            # NEW Sprint 3: observations 테이블 (D22)
-│   │       │       ├── XXXX_extend_agent_memories.ts       # NEW Sprint 3: memoryType='reflection' + embedding
-│   │       │       └── XXXX_voyage_vector_1024.ts          # NEW Pre-Sprint: vector(768)→vector(1024) + HNSW
+│   │       │       ├── 0061_voyage_vector_1024.sql         # NEW Pre-Sprint: vector(768)→vector(1024) + HNSW
+│   │       │       │                                       #   ⚠️ 비가역: 롤백 시 전체 re-embed 필요
+│   │       │       ├── 0062_add_personality_traits.sql     # NEW Sprint 1: agents.personality_traits JSONB
+│   │       │       ├── 0063_add_observations.sql           # NEW Sprint 3: observations 테이블 (D22)
+│   │       │       └── 0064_extend_agent_memories.sql      # NEW Sprint 3: memoryType='reflection' + embedding
 │   │       │
 │   │       └── __tests__/
 │   │           ├── unit/
@@ -2511,11 +2519,14 @@ corthex-v2/
 │   │           │   ├── memory-reflection.test.ts          # NEW Sprint 3
 │   │           │   ├── n8n-proxy.test.ts                  # NEW Sprint 2
 │   │           │   └── personality-pipeline.test.ts       # NEW Sprint 1: PER-1 4-layer E2E
-│   │           └── security/
-│   │               ├── per-1-adversarial.test.ts          # NEW Sprint 1: Go/No-Go #2
-│   │               ├── mem-6-adversarial.test.ts          # NEW Sprint 3: Go/No-Go #9
-│   │               ├── toolsanitize-adversarial.test.ts   # NEW Sprint 2: Go/No-Go #11
-│   │               └── n8n-sec-8layer.test.ts             # NEW Sprint 2: Go/No-Go #3
+│   │           ├── security/
+│   │           │   ├── per-1-adversarial.test.ts          # NEW Sprint 1: Go/No-Go #2
+│   │           │   ├── mem-6-adversarial.test.ts          # NEW Sprint 3: Go/No-Go #9
+│   │           │   ├── toolsanitize-adversarial.test.ts   # NEW Sprint 2: Go/No-Go #11
+│   │           │   └── n8n-sec-8layer.test.ts             # NEW Sprint 2: Go/No-Go #3
+│   │           └── sprint4/
+│   │               ├── office-bundle-size.test.ts         # NEW Sprint 4: 번들 200KB 미만 검증
+│   │               └── office-ws.test.ts                  # NEW Sprint 4: /ws/office 6-state broadcast
 │   │
 │   ├── office/                                # NEW Sprint 4: 독립 workspace (D30, E17)
 │   │   ├── package.json                       #   pixi.js 8.17.1, @pixi/react 8.0.5 (exact pin)
@@ -2559,11 +2570,13 @@ corthex-v2/
 |--------|---------|------------|------|--------|
 | Pre-Sprint | 2 (voyage-embedding.ts, migration) | 3 (package.json pin교정, embedding-service.ts→교체, schema.ts) | 1 (@google/genai) | 0 |
 | Sprint 1 | 3 (soul-enricher, migration, presets seed) | 9 (renderSoul callers × 9) | 0 | 3 (unit + integration + PER-1 adversarial) |
-| Sprint 2 | 7 (tool-sanitizer, n8n-proxy, marketing, compose, presets ×4) | 1 (agent-loop.ts L265+L277) | 0 | 4 (unit + integration + TOOLSANITIZE + N8N-SEC) |
-| Sprint 3 | 4 (observation-sanitizer, memory-reflection, migrations ×2) | 2 (soul-enricher +memoryVars, schema.ts) | 0 | 3 (unit + integration + MEM-6 adversarial) |
-| Sprint 4 | 9 (packages/office/ 전체, ws channels, office.tsx) | 3 (turbo.json, shared/types.ts, channels.ts) | 0 | 2 (번들 크기 + ws) |
+| Sprint 2 | 8 (tool-sanitizer, n8n-proxy, marketing, compose, presets ×4) | 1 (agent-loop.ts L265+L277) | 0 | 4 (unit + integration + TOOLSANITIZE + N8N-SEC) |
+| Sprint 3 | 5 (observations.ts, observation-sanitizer, memory-reflection, migrations ×2) | 2 (soul-enricher +memoryVars, schema.ts) | 0 | 3 (unit + integration + MEM-6 adversarial) |
+| Sprint 4 | 11 (packages/office/ 10파일, office.tsx) | 3 (turbo.json, shared/types.ts, channels.ts) | 0 | 2 (번들 크기 + ws) |
 | 병행 Layer 0 | 0 | ~67 (UXUI 리셋 페이지 점진적 전환) | 0 | Playwright dead button |
-| **총계** | **~25** | **~85** | **1** | **~12** |
+| **총계** | **~29** | **~85** | **1** | **~12** |
+
+> **Layer 0 순서 규칙**: agents.tsx는 Sprint 1(성격 UI), Sprint 3(메모리 탭), Layer 0(UXUI 리셋)에서 3회 수정됨. Layer 0 UXUI 리셋은 각 Sprint 해당 페이지 구현 완료 후 순차 적용. 병렬 작업 시 merge conflict 방지.
 
 ### v3 Architectural Boundaries (v2 기존 + v3 확장)
 
@@ -2597,12 +2610,13 @@ corthex-v2/
 | 레이어 | 의존 가능 | 의존 금지 |
 |--------|----------|----------|
 | routes/admin/n8n-proxy.ts | middleware/, Docker proxy | engine/, services/ |
-| routes/admin/marketing.ts | middleware/, db/ (jsonb_set) | engine/, n8n Docker 직접 |
+| routes/admin/marketing.ts | middleware/, db/ (jsonb_set), n8n-proxy 내부 fetch | engine/, n8n Docker 직접 |
+| routes/workspace/observations.ts | middleware/, db/, services/observation-sanitizer.ts | engine/ |
 | services/soul-enricher.ts | db/, services/voyage-embedding.ts | engine/ (E8), routes/ |
 | services/observation-sanitizer.ts | (순수 함수, 의존 없음) | engine/, routes/, db/ |
 | services/memory-reflection.ts | db/, services/voyage-embedding.ts, croner | engine/, routes/ |
 | services/voyage-embedding.ts | voyageai SDK, services/credential-vault.ts | engine/, routes/ |
-| engine/tool-sanitizer.ts | engine/types.ts, db/logger | routes/, services/ |
+| engine/tool-sanitizer.ts | engine/types.ts, lib/activity-logger.ts | routes/, services/ |
 | packages/office/* | pixi.js, @pixi/react, zustand, shared/types.ts | server/*, admin/* |
 
 ### v3 Requirements → Structure Mapping
@@ -2611,18 +2625,20 @@ corthex-v2/
 
 | FR | 파일 위치 |
 |----|----------|
-| FR-PERS1~3 성격 CRUD | routes/admin/agents.ts (기존 확장) + migration |
-| FR-PERS4~5 프리셋 | routes/admin/agents.ts + DB seed |
-| FR-PERS6 Soul 주입 | services/soul-enricher.ts (E11) |
-| FR-PERS7 PER-1 보안 | services/soul-enricher.ts (E12 4-layer) |
-| FR-PERS8~9 UI 슬라이더 | app/src/pages/agents.tsx (기존 확장) |
+| FR-PERS1~2 슬라이더 UI + DB 저장 (Zod+CHECK) | routes/admin/agents.ts (기존 확장) + 0062 migration + app/src/pages/agents.tsx |
+| FR-PERS3 Soul extraVars 주입 | services/soul-enricher.ts (E11, PER-1 E12 4-layer) |
+| FR-PERS4~5 즉시반영 + 코드분기없음 | (아키텍처 내재 — 프롬프트 주입 방식, 추가 파일 불필요) |
+| FR-PERS6~7 역할 프리셋 + 기본 3종 | routes/admin/agents.ts + DB seed |
+| FR-PERS8~9 툴팁 + 접근성 (aria) | app/src/pages/agents.tsx (기존 확장) |
 
 **Sprint 2 — n8n + 마케팅 + TOOLSANITIZE (FR-N8N 6 + FR-MKT 7 + FR-TOOLSANITIZE 3 = 16 FRs):**
 
 | FR | 파일 위치 |
 |----|----------|
-| FR-N8N1~3 Docker 설정 | docker-compose.n8n.yml + iptables |
-| FR-N8N4~6 Proxy + 보안 | routes/admin/n8n-proxy.ts (E20) |
+| FR-N8N1~2 Admin API 목록 + CEO 읽기전용 | routes/admin/n8n-proxy.ts (E20) + app/src/pages/ |
+| FR-N8N3 기존 워크플로우 코드 삭제 | routes/ + pages/ (기존 파일 제거) |
+| FR-N8N4 Docker + N8N-SEC 8-layer | docker-compose.n8n.yml + iptables (D25) |
+| FR-N8N5~6 장애 메시지 + 에디터 접근 | app/src/ + routes/admin/n8n-proxy.ts |
 | FR-MKT1~4 설정 API | routes/admin/marketing.ts (E20b) |
 | FR-MKT5~7 프리셋 설치 | _n8n/presets/*.json + marketing.ts |
 | FR-TOOLSANITIZE1~3 | engine/tool-sanitizer.ts (E15) |
@@ -2631,7 +2647,7 @@ corthex-v2/
 
 | FR | 파일 위치 |
 |----|----------|
-| FR-MEM1~2 Observation 저장 | routes/observations.ts (신규) + observation-sanitizer.ts (E13) |
+| FR-MEM1~2 Observation 저장 | routes/workspace/observations.ts (신규) + observation-sanitizer.ts (E13) |
 | FR-MEM3~5 Reflection 크론 | services/memory-reflection.ts (E14) |
 | FR-MEM6~8 메모리 검색 | services/soul-enricher.ts + voyage-embedding.ts (E18) |
 | FR-MEM9~11 모니터링 UI | app/src/pages/agents.tsx (memory 탭) |
@@ -2661,10 +2677,11 @@ corthex-v2/
 |--------|-------------|
 | Soul 전처리 (E11) | services/soul-enricher.ts → 9 renderSoul callers |
 | PER-1 Sanitization (E12) | services/soul-enricher.ts (Layer 1,3) + routes/admin/agents.ts (Layer 2) + engine/soul-renderer.ts (Layer 4) |
-| MEM-6 Sanitization (E13) | services/observation-sanitizer.ts → routes/observations.ts |
+| MEM-6 Sanitization (E13) | services/observation-sanitizer.ts → routes/workspace/observations.ts |
 | TOOLSANITIZE (E15) | engine/tool-sanitizer.ts → engine/agent-loop.ts (L265, L277) |
 | Voyage AI 전파 (E18) | services/voyage-embedding.ts → soul-enricher.ts + memory-reflection.ts + routes/knowledge.ts |
 | n8n 보안 격리 (E20) | routes/admin/n8n-proxy.ts + docker-compose.n8n.yml + iptables |
+| Reflection 크론 (E14) | services/memory-reflection.ts → voyage-embedding.ts + observations + agent_memories + Claude Haiku API |
 | /ws/office 파이프라인 (E16) | ws/channels.ts → packages/office/hooks/useOfficeWs.ts → store.ts → OfficeCanvas.tsx |
 
 ### v3 Integration Points
@@ -2676,7 +2693,8 @@ corthex-v2/
 | renderSoul callers | soul-enricher.ts | 함수 호출 | 1 |
 | agent-loop.ts | tool-sanitizer.ts | 함수 호출 (PreToolResult) | 2 |
 | Hono proxy | n8n Docker | HTTP reverse proxy (127.0.0.1:5678) | 2 |
-| marketing.ts | n8n API | HTTP (proxy 경유) | 2 |
+| marketing.ts | n8n-proxy.ts | 내부 HTTP fetch (localhost, Docker 직접 금지) | 2 |
+| hub.ts (route) | observations.ts | agent-loop 응답 후처리 → observation 생성 (E8 경계 준수) | 3 |
 | memory-reflection.ts | voyage-embedding.ts | 함수 호출 | 3 |
 | ws/channels.ts | activity_logs | SQL polling (500ms) | 4 |
 | packages/office | /ws/office | WebSocket | 4 |
@@ -2704,7 +2722,7 @@ corthex-v2/
   MCP tool response → tool-sanitizer.check() → sanitized content → toolResults.push → LLM
 
 [Sprint 3] 메모리 파이프라인:
-  agent-loop.ts Stop → observation 생성 → sanitizeObservation() → INSERT observations
+  agent-loop.ts Stop → hub.ts 후처리 → sanitizeObservation() → INSERT observations (E8 경계: engine/ 외부에서 처리)
   → 크론 03:00 → SELECT unreflected (confidence≥0.7, flagged=false, importance DESC)
   → Haiku API → reflection 요약 → Voyage embed → INSERT agent_memories(reflection)
   → enrich() → memoryVars → renderSoul → agent-loop.ts
@@ -2712,4 +2730,283 @@ corthex-v2/
 [Sprint 4] OpenClaw 실시간:
   agent-loop.ts → INSERT activity_logs → 500ms polling → ws 'office' broadcast
   → useOfficeWs.ts → Zustand store → OfficeCanvas.tsx → PixiJS render
+```
+
+---
+
+## v3 Architecture Validation Results
+
+_v3 Steps 1-6 + v2 Steps 1-7 교차 검증. R1 14건 수정 반영 후 최종 검증._
+
+### v3 Coherence Validation ✅
+
+**Decision Compatibility (D22~D34 + D1~D21):**
+
+| 검증 항목 | 결과 | 근거 |
+|----------|------|------|
+| D22(observations) + D1(Claude SDK) | ✅ 호환 | observations는 engine/ 외부에서 생성 (E8 경계 준수). agent-loop 수정 불필요 |
+| D23(Big Five) + D4(Soul 변수) | ✅ 호환 | soul-enricher.ts가 기존 renderSoul extraVars 확장. 기존 변수 불변 |
+| D24(PixiJS) + D2(Hono) | ✅ 호환 | packages/office/ 독립 워크스페이스. 서버 코드 무관 |
+| D25(n8n Docker) + D5(PostgreSQL) | ✅ 호환 | n8n SQLite 내부 DB 사용. CORTHEX PG 접근 금지 (SEC-6) |
+| D27(PreToolResult) + D1(SDK Hooks) | ✅ 호환 | PreToolResult는 SDK Hook이 아닌 인라인 함수. E8 경계 내부 |
+| D28(Haiku reflection) + D17(Prompt Cache) | ✅ 호환 | reflection은 별도 API 호출. 기존 캐싱 경로와 분리 |
+| D31(Voyage AI) + D19(Semantic Cache) | ✅ 호환 | Voyage 1024d로 통일. vector(768)→vector(1024) 마이그레이션 포함 |
+| D30(PixiJS 독립) + D7(Turborepo) | ✅ 호환 | turbo.json pipeline에 "office#build" 추가. 기존 빌드 불변 |
+| D34(페이지 통합) + D6(Vite SPA) | ✅ 호환 | 라우터 리디렉트로 구현. 빌드 변경 없음 |
+
+**충돌: 0건.** v3 결정은 전부 v2 위에 순수 추가. v2 기존 결정 수정 없음.
+
+**Pattern Consistency (E11~E22 + E1~E10):**
+
+| 검증 항목 | 결과 |
+|----------|------|
+| E11(soul-enricher) ↔ E4(soul-renderer) | ✅ enricher가 extraVars 생성, renderer가 치환. 분리 명확 |
+| E15(tool-sanitizer) ↔ E6(Hook 체계) | ✅ tool-sanitizer는 Hook이 아닌 인라인 함수. Hook 체계와 독립 |
+| E16(ws/office) ↔ E5(SSE 이벤트) | ✅ office는 WebSocket 별도 채널. SSE 스트림과 무관 |
+| E18(Voyage) ↔ E10(embedding) | ✅ Voyage가 기존 embedding-service.ts 완전 교체 (1:1 치환) |
+| E21(CSS 변수) ↔ 기존 Tailwind | ✅ CSS 변수 + Tailwind 토큰 조합. 기존 유틸리티 클래스 호환 |
+| Naming patterns (v2 확립) | ✅ v3 전부 기존 규칙 준수: snake_case DB, kebab-case 파일, PascalCase 컴포넌트 |
+
+**Structure Alignment:**
+- v3 디렉토리 트리가 v2 기존 구조 위에 추가만 함. 삭제/이동 없음 (embedding-service.ts→voyage-embedding.ts 교체 1건 제외)
+- 9-row 의존성 매트릭스가 E8 engine 경계 완전 준수
+- 53 FR → 파일 매핑 전부 트리 내 존재 확인 (R2에서 observations.ts 누락 해소)
+
+### v3 Requirements Coverage ✅
+
+**Functional Requirements (53개 v3 신규):**
+
+| Area | FR 수 | 아키텍처 커버 | 누락 |
+|------|-------|------------|------|
+| FR-PERS (성격) | 9 | 9/9 ✅ | — |
+| FR-N8N (n8n) | 6 | 6/6 ✅ | — |
+| FR-MKT (마케팅) | 7 | 7/7 ✅ | — |
+| FR-TOOLSANITIZE | 3 | 3/3 ✅ | — |
+| FR-MEM (메모리) | 14 | 14/14 ✅ | — |
+| FR-OC (OpenClaw) | 11 | 11/11 ✅ | — |
+| FR-UX (페이지 통합) | 3 | 3/3 ✅ | — |
+| **총계** | **53** | **53/53** | **0** |
+
+**FR 검증 상세:**
+- FR-PERS1~9: D23 + E11 + E12 + migration 0062 + UI 슬라이더 — PRD 매핑 R2 수정 완료
+- FR-N8N1~6: D25 + E20 + N8N-SEC 8-layer + docker-compose — PRD 매핑 R2 수정 완료
+- FR-MKT1~7: E20b + _n8n/presets/ + marketing.ts + n8n-proxy 내부 fetch (R1 gap 해소)
+- FR-TOOLSANITIZE1~3: D27 + E15 + 5-path mapping (L265+L277 sanitize, L219/L238/L291 skip)
+- FR-MEM1~14: D22 + D28 + E13 + E14 + observations.ts + memory-reflection.ts + Voyage 1024d
+- FR-OC1~11: D24 + D30 + E16 + E17 + packages/office/ + /ws/office
+- FR-UX1~3: D34 + E22 + router.tsx redirect
+
+**Non-Functional Requirements (20개 v3 신규):**
+
+| Category | NFR | 아키텍처 지원 |
+|---------|-----|-------------|
+| Performance | NFR-P13 /office FCP≤3초 + 번들≤200KB | E17 React.lazy + 독립 패키지 + tree-shaking 6클래스 |
+| Performance | NFR-P14 /ws/office 상태 동기화 ≤2초 | E16 adaptive polling 500ms + WebSocket broadcast |
+| Performance | NFR-P15 WS heartbeat 5초 | E16 adaptive polling 500ms + heartbeat |
+| Performance | NFR-P16 Reflection ≤30초/에이전트 | E14 크론 03:00 + company hash stagger + Haiku API |
+| Performance | NFR-P17 MKT E2E (이미지≤2분, 영상≤10분, 게시≤30초) | E20b 타임아웃 정책 + fallback |
+| Security | NFR-S8 PER-1 4-layer | E12 Layer 1→2→3→4 순서 고정 |
+| Security | NFR-S9 N8N-SEC 8-layer | E20 + confirmed-decisions #3 |
+| Security | NFR-S10 MEM-6 4-layer | E13 sanitizeObservation() 필수 |
+| Scalability | NFR-SC7 PG 메모리 ≤3GB | Voyage 1024d × 30K observations ≈ 120MB. 관리 가능 |
+| Scalability | NFR-SC8 /ws/office 50/500 | E16 + confirmed-decisions #10 |
+| Scalability | NFR-SC9 n8n Docker ≤2G | confirmed-decisions #2 + OOM recovery (E20) |
+| Accessibility | NFR-A5 슬라이더 aria | FR-PERS9 + E12 Layer 4 |
+| Accessibility | NFR-A6 /office aria-live | FR-OC10 + packages/office/ |
+| Accessibility | NFR-A7 /office 모바일 | FR-OC11 + 리스트뷰 폴백 |
+| Data | NFR-D8 observation 30일 TTL | confirmed-decisions #5 + E14 |
+| Cost | NFR-COST3 Haiku ≤$0.10/일 | E14 반성 크론 일일 한도 + 자동 일시 중지 |
+| External | NFR-EXT3 외부 AI 타임아웃 | E20b fallback + 타임아웃 정책 |
+| Operations | NFR-O9~O10 n8n 모니터링 | E20 Docker healthcheck + restart + Admin 알림 |
+| Operations | NFR-O11 CEO 일상 태스크 ≤5분 | E22 페이지 통합 + UX 최적화 |
+| Operations | NFR-O12 Go/No-Go gates 자동 검증 | smoke-test.sh + 14 gate 테스트 |
+
+**v2 기존 NFR (58개):** 변경 없음. v3 추가 사항이 기존 NFR에 영향 없음 확인.
+
+**Go/No-Go Gates (14개):**
+
+| # | Gate | 아키텍처 지원 | 검증 방법 |
+|---|------|-------------|----------|
+| 1 | Zero Regression | 485 API + 10,154 테스트 | smoke-test.sh |
+| 2 | PER-1 adversarial + renderSoul() extraVars 주입 검증 | E12 4-layer | per-1-adversarial.test.ts + personality-pipeline.test.ts |
+| 3 | N8N-SEC 8-layer | E20 | n8n-sec-8layer.test.ts |
+| 4 | Memory Zero Regression | agent_memories 기존 데이터 | 마이그레이션 검증 |
+| 5 | PixiJS 번들 ≤200KB | E17 React.lazy | office-bundle-size.test.ts |
+| 6 | 하드코딩 색상 0건 + Playwright dead button 0건 | E21 ESLint + Playwright | ESLint 규칙 + Playwright dead button scan |
+| 7 | Reflection 비용 한도 | E14 자동 일시 중지 | memory-reflection.test.ts |
+| 8 | AI 스프라이트 PM 승인 | Sprint 4 선행 | PM 승인 게이트 |
+| 9 | Observation poisoning | E13 MEM-6 4-layer | mem-6-adversarial.test.ts |
+| 10 | Voyage 마이그레이션 | E18 + 0061 migration | 0061 SQL 검증 쿼리 + re-embed 완료 확인 |
+| 11 | TOOLSANITIZE 100% 차단 | E15 5-path | toolsanitize-adversarial.test.ts |
+| 12 | v1 Feature Parity | v1-feature-spec.md | E2E 테스트 |
+| 13 | Usability CEO ≤5분 | NFR-O11 (CEO 일상 태스크 ≤5분) | 사용성 테스트 |
+| 14 | Capability Eval | 3회차 재수정 ≤ 1회차의 50% | 반복 평가 (동일 태스크 N≥3회) |
+
+**14/14 gates 전부 아키텍처 지원 확인.**
+
+### v3 Implementation Readiness ✅
+
+**Decision Completeness:**
+- D22~D34: 13개 결정 전부 선택 + 근거 + 코드 예시 ✅
+- confirmed-decisions-stage1.md: 12개 항목 전부 반영 ✅
+
+**Pattern Completeness:**
+- E11~E22 + E20b: 13개 패턴 전부 코드 예시 + Anti-Pattern 10개 ✅
+- 3 독립 sanitization 체인 (PER-1, MEM-6, TOOLSANITIZE): 각각 layer 명세 + 검증 규칙 ✅
+- Interface contract (E11 Sprint 1 freeze + additive-only): Cross-Sprint 안정성 보장 ✅
+- 5-path tool sanitize mapping: L219/L238/L265/L277/L291 전부 근거 ✅
+
+**Structure Completeness:**
+- 디렉토리 트리: 29 NEW + ~85 MODIFY + ~12 테스트 파일 전부 명시 ✅
+- 9-row 의존성 매트릭스: 모든 v3 모듈 커버 ✅
+- 8 cross-cutting concerns → 파일 매핑 완료 ✅
+- 8 internal + 3 external integration points ✅
+
+### v3 Gap Analysis
+
+**Critical Gaps: 0건** — 구현 차단 요소 없음.
+
+**Important Gaps (3건, 비차단):**
+
+| # | Gap | 영향 | 해소 시점 |
+|---|-----|------|----------|
+| G1 | E22 6그룹 구성 PRD 원문 차이 | D34 deferred 결정으로 구현 시 GATE에서 최종 확정 | Sprint 착수 시 |
+| G2 | E15 L265/L277 라벨 치환 (Step 5 잔존) | 구현 코드에 영향 없음 (PreToolResult 결정 자체는 정확) | Story 작성 시 정정 |
+| G3 | E20 rate limit PRD 내부 모순 (L1779=100 vs NFR-S9=60) | Architecture는 NFR-S9=60 채택 (보수적). PRD 수정 필요 | PRD 정정 시 |
+
+**Nice-to-Have (3건):**
+
+| # | 항목 | 비고 |
+|---|------|------|
+| N1 | n8n Docker healthcheck 주기 명시 | 기본 30초, 구현 시 조정 가능 |
+| N2 | Sprint 2 E2E 통합 테스트 추가 | n8n-proxy → Docker → webhook → CORTHEX API 왕복 |
+| N3 | Pre-Sprint Voyage 마이그레이션 롤백 절차 상세화 | 비가역 경고는 추가됨, 상세 절차는 story에서 |
+
+### v3 Process Statistics
+
+| 항목 | v2 | v3 | 총계 |
+|------|-----|-----|------|
+| Steps | 7/7 | 7/7 (Step 8 = 완료 마커) | — |
+| Decisions | D1~D21 (21) | D22~D34 (13) | 34 |
+| Patterns | E1~E10 (10) | E11~E22 + E20b (13) | 23 |
+| Anti-Patterns | 8 | 10 | 18 |
+| FRs covered | 72 (2삭제=70 active) | 53 | 123 (2삭제) |
+| NFRs covered | 58 (2삭제=56 active) | 20 | 78 (2삭제) |
+| Go/No-Go gates | — | 14 | 14 |
+| Party Mode reviews | 2 rounds (R1→R2) | 2 rounds (R1→R2) | — |
+| R1 issues fixed | — | Steps 5+6: 15+14 = 29 (Steps 2-4 별도) | 29+ |
+| Critic avg (R2) | — | Step 5: 8.74, Step 6: 8.93 | 8.84 |
+
+### v3 Architecture Completeness Checklist
+
+**✅ v3 Step 2 — Context Analysis**
+- [x] v2 baseline 감사 (485 API, 86 테이블, 10,154 테스트)
+- [x] 53 v3 FR + 20 v3 NFR 분석
+- [x] VPS 리소스 예산 (24GB RAM, n8n 2G cap)
+- [x] Sprint 의존성 + Go/No-Go 14 gates
+
+**✅ v3 Step 3 — Starter Template**
+- [x] Brownfield + v2 기존 스택 유지
+- [x] Sprint별 신규 의존성 (PixiJS, n8n, Voyage AI, croner)
+- [x] 코드 처분: 삭제 1건 (@google/genai), 교체 1건 (embedding→voyage)
+
+**✅ v3 Step 4 — Decisions**
+- [x] D22~D34 (Critical 8 + Important 3 + Deferred 2)
+- [x] confirmed-decisions-stage1.md 12항목 전부 반영
+
+**✅ v3 Step 5 — Patterns**
+- [x] E11~E22 + E20b (13개 패턴)
+- [x] Anti-Pattern 10개
+- [x] 3 독립 sanitization 체인 + 5-path tool mapping
+- [x] 검증 테이블 (Go/No-Go 14/14)
+
+**✅ v3 Step 6 — Structure**
+- [x] 완전한 디렉토리 트리 (29 NEW, ~85 MODIFY)
+- [x] 9-row 의존성 매트릭스
+- [x] 53 FR → 파일 매핑
+- [x] 8 cross-cutting concerns + 11 integration points (8 internal + 3 external)
+- [x] Layer 0 merge conflict sequencing rule
+
+**✅ v3 Step 7 — Validation**
+- [x] D22~D34 + D1~D21 호환성 전수 검증 (0 충돌)
+- [x] 53 FR + 20 NFR + 14 Go/No-Go 커버리지 100%
+- [x] 0 critical gaps, 3 important (비차단), 3 nice-to-have
+
+### v3 Readiness Assessment
+
+**Overall: READY FOR IMPLEMENTATION**
+
+**Confidence: HIGH** — v2 검증된 아키텍처 위에 순수 추가. 기존 engine/E8 경계 불변. 4 Critic R2 평균 8.84/10.
+
+**Key Strengths:**
+1. **Zero Regression 설계** — v2 기존 485 API, 86 테이블, 10,154 테스트 전부 불변
+2. **3 독립 sanitization 체인** — PER-1, MEM-6, TOOLSANITIZE 각각 독립 검증 가능
+3. **E8 engine 경계 최소 침범** — engine/ 내부 수정은 E15(tool-sanitizer.ts NEW + agent-loop.ts MODIFY) 1건만. 나머지 전부 engine/ 외부
+4. **Sprint 격리** — 각 Sprint가 독립적으로 Go/No-Go gate 통과 가능
+5. **14 Go/No-Go gates** — 구현 품질 관문 명시적
+
+**Areas for Future Enhancement:**
+- Redis 전환 (D21 deferred) — Phase 4+
+- Cross-provider LLM (D15 deferred) — Phase 5+
+- n8n HA 클러스터 — 현재 단일 Docker, 트래픽 증가 시 검토
+
+### v3 Implementation Handoff
+
+**AI Agent Guidelines:**
+- v2 아키텍처 결정 (D1~D21, E1~E10) 전부 유지. 수정 금지
+- v3 결정 (D22~D34, E11~E22) 순서대로 구현
+- engine/ 내부 수정은 E15 1건만 (tool-sanitizer.ts NEW + agent-loop.ts L265/L277 MODIFY)
+- E16 ws/channels.ts는 engine/ 외부 (ws/ 디렉토리)
+- 나머지 전부 engine/ 외부 (services/, routes/, packages/, ws/)
+
+**Sprint 구현 순서:**
+1. **Pre-Sprint**: Voyage AI 마이그레이션 (0061) + 의존성 pin 교정
+2. **Sprint 1**: Big Five 성격 (soul-enricher + PER-1 + migration 0062 + UI)
+3. **Sprint 2**: n8n Docker + proxy + marketing + TOOLSANITIZE
+4. **Sprint 3**: Agent Memory (observations + reflection cron + Voyage embed)
+5. **Sprint 4**: OpenClaw PixiJS (packages/office/ + ws/office + office.tsx)
+6. **Layer 0 병행**: UXUI 리셋 (각 Sprint 완료 후 순차 적용)
+
+**첫 구현 시작점:** `Pre-Sprint → 0061_voyage_vector_1024.sql` + `services/voyage-embedding.ts`
+
+---
+
+## Step 8: Architecture Completion (2026-03-22)
+
+**Status:** ✅ COMPLETE — v3 "OpenClaw" Architecture Workflow Finished
+
+### Completion Summary
+
+| Step | Title | Grade | Critic Rounds | Avg Score |
+|------|-------|-------|---------------|-----------|
+| 1 | v2 Baseline Audit | — | (v2 retained) | — |
+| 2 | v3 Context Analysis | B | Stage 2 | 9.03/10 |
+| 3 | Starter Template | B | Stage 2 | 9.03/10 |
+| 4 | Decisions (D22-D34) | A | Stage 2 | 9.03/10 |
+| 5 | Patterns (E11-E22) | A | R1→R2 | 8.80/10 |
+| 6 | Structure | A | R1→R2 | 8.93/10 |
+| 7 | Validation | A | R1→R2 | 8.84/10 |
+| 8 | Complete | C (solo) | — | — |
+
+### Architecture Deliverables
+
+- **34 Decisions** — D1~D21 (v2) + D22~D34 (v3), 0 conflicts
+- **22 Patterns** — E1~E10 (v2) + E11~E22 + E20b (v3)
+- **10 Anti-Patterns** — 명시적 금지 사항
+- **53 v3 FRs + 20 v3 NFRs** — 100% architectural coverage
+- **14 Go/No-Go Gates** — Sprint progression quality gates
+- **29 NEW files + ~85 MODIFY** — complete directory tree with FR mapping
+- **3 Important Gaps** (non-blocking) + **3 Nice-to-Have** — documented for future
+
+### Workflow Metadata
+
+```yaml
+workflow: create-architecture (v3-update)
+stepsCompleted: [1, 2, 3, 4, 5, 6, 7, 8]
+status: complete
+completedAt: 2026-03-22
+v2Base: 7 steps, 32 party rounds (2026-03-11)
+v3Addition: Steps 2-8, 4 critics × 3 Grade-A steps
+totalDecisions: 34 (D1-D34)
+totalPatterns: 22 (E1-E22 + E20b)
 ```
