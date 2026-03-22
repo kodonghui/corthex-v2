@@ -1,59 +1,90 @@
 ## Critic-B (Quinn) Review — Step 4: Architectural Patterns (Grade A)
 
 ### Review Date
-2026-03-21
+2026-03-22 (Cycle 3 — FINAL score determination, CONDITIONAL -> PASS/FAIL)
 
 ### Content Reviewed
-`_bmad-output/planning-artifacts/technical-research-2026-03-20.md`, Lines 993-1349
+`_bmad-output/planning-artifacts/technical-research-2026-03-20.md`, Lines 1088-1547
 
-### Security/QA Verification Performed
-- [x] Prompt injection paths analyzed: Decision 4.3.2 (spread reversal) and Decision 4.3.3 (key-aware fallback) together provide a solid defense. However, the PERSONALITY_KEYS Set hardcodes 10 key names. If a future developer adds a new personality var (e.g., `personality_creativity`) without updating the Set, the key-aware fallback silently falls through to `|| ''`. This is a maintenance trap. The Set should be derived from a single source of truth (e.g., the BigFiveTraits type definition) rather than manually duplicated.
-- [x] Race conditions checked: (1) Decision 4.4.1 observation pipeline: `async: Gemini embed -> UPDATE embedding` is fire-and-forget. If the server crashes between INSERT and UPDATE, embedding is NULL — handled by backfill cron. (2) Decision 4.4.3(B) cron failure backpressure: MAX_BATCH=50 limits per-run processing, but no advisory lock prevents overlapping cron runs. ARGOS scheduler may serialize, but this is NOT stated in the architecture decision. (3) Decision 4.2.1 atomic create-with-tags: this ASSUMES n8n API `POST /workflows` accepts tags in the creation payload. If it doesn't (some n8n versions require separate tag assignment), there's a race window where an untagged workflow exists momentarily. Needs API version verification.
-- [x] Missing test scenarios identified: 12 scenarios listed below
-- [x] Resource limit claims verified: (1) Decision 4.4.4 HNSW memory: "768-dim x ~365K rows/year = 1.7-2.2GB RAM" — this estimate is for VPS RAM but line 1274 says "Step 2 VPS headroom: 15.5GB -> ~12.5GB remaining after pgvector indexes." This contradicts Step 5 (line 1637-1654) which CORRECTS this to say HNSW runs on Neon compute, NOT VPS. Step 4 still contains the incorrect attribution. The correction only appears in Step 5. (2) 365K observations/year estimate: 50 agents x 20 observations/day x 365 days = 365,000. This assumes 20 observations per agent per day — what if an agent has 100 conversations/day? The estimate scales linearly but the floor assumption is undocumented.
-- [x] Edge cases documented: 14 edge cases
+### Review History
+- Cycle 1 (2026-03-21): 7.30/10 PASS (marginal) — 8 issues found
+- Cycle 2 (2026-03-22): Pre-fix 5.60 FAIL -> Post-fix 8.65 PASS — 13 issues found, all resolved
+- Cycle 3 (2026-03-22): THIS REVIEW — final re-verification of fixes + residual issues
 
-### Dimension Scores
+---
+
+### Cycle 3 Verification: All Cycle 2 Fixes Confirmed
+
+| Cycle 2 Issue | Fix Status | Line Evidence |
+|--------------|-----------|---------------|
+| CRIT-1: "Gemini embed" in pipeline diagrams | **FIXED** | L1319: "Voyage AI embed (voyage-3, 1024d)", L1349: "Voyage AI embed (voyage-3, 1024d)". Zero grep matches for "Gemini embed" in Step 4 scope. |
+| CRIT-2: Docker `memory: 4G` in security table | **FIXED** | L1178: `memory: 2G, cpus: '2'`. L1179: `NODE_OPTIONS \| --max-old-space-size=1536`. |
+| CRIT-3: Observation poisoning defense missing | **FIXED** | New Decision 4.4.5 (L1442-1468): attack vector documented, 4-layer defense table, sanitization code snippet, content_type classification. |
+| HIGH-4: Advisory lock missing in cron | **FIXED** | L1337: `pg_advisory_xact_lock(hashtext(companyId))` in diagram. L1381: implementation in `runReflectionCron()`. |
+| HIGH-5: `is_processed` -> `reflected` | **FIXED** | L1338/1345/1385/1399/1410/1411/1425: all use `reflected`/`reflected_at`. |
+| HIGH-6: Personality key injection bypass | **FIXED** | L1225-1229: `personalityVars` spread LAST after `sanitizeExtraVars`, with unit test requirement noted. |
+| HIGH-7: Security table 6->8 layers | **FIXED** | L1178-1180: V8 Heap row + Credential Encryption row present. 8-layer table confirmed. |
+| HIGH-8: WS connection flooding | **FIXED** | L1135-1137: per-company cap (50), server-wide pre-auth cap (500), exponential backoff reconnection. |
+| MED-9: Retries 3->5 | **FIXED** | L1350: "Max retries: 5, then dead letter -> manual review". |
+| MED-10: confidence/domain in lifecycle | **FIXED** | L1395-1400: `gte(observations.confidence, 0.7)` filter. L1402: `desc(observations.importance)` ordering. L1405: domain grouping note. |
+| MED-11: Retention index | **FIXED** | L1412: `CREATE INDEX idx_observations_retention ON observations(reflected, reflected_at) WHERE reflected = true`. |
+| LOW-12: Go/No-Go #3 webhook test | **FIXED** | L1182: test case (4) "Company A's agent triggers Company B's workflow webhook -> verify 403 rejection". |
+| LOW-13: Voyage AI explicit in diagram | **FIXED** | L1319/1349: "Voyage AI embed (voyage-3, 1024d)". |
+
+### New Content Verified (added since Cycle 1)
+
+| New Section | Assessment |
+|------------|-----------|
+| Decision 4.3.5: Role-Based Personality Presets (L1284-1304) | Good addition. 5 archetypes with specific trait values. UX flow documented. Addresses Brief §4 core feature. |
+| Decision 4.4.5: Observation Content Sanitization (L1442-1468) | Excellent. 4-layer defense: length cap (10KB), char strip, injection regex, prompt hardening. Attack vector explicitly documented. Code snippet provided. |
+| Decision 4.4.6: importance vs confidence (L1472-1481) | Good clarification. Two fields serve distinct purposes: importance for reflection triggering, confidence for quality filtering. Query pattern shown. |
+| Section 3.7b: Error States + Degraded Mode UX (L1058-1072) | Excellent addition. 8 failure modes with user-facing error messages (Korean), degraded mode behavior. Addresses v2's "technically complete, practically unused" problem. |
+| Decision 4.4.3(D): Neon Pro Budget Contingency (L1416-1419) | Good. 3 fallback options if Neon Pro deferred. Sprint 0 prerequisite with CEO approval. |
+
+### Residual Issue: Migration 0064 Dimension
+
+**One issue remains in Step 4 scope**: Decision 4.6.1 migration summary (line 1515) still says `vector(768)`:
+
+```
+0064_agent-memories-add-embedding.sql — ALTER TABLE agent_memories ADD COLUMN embedding vector(768)
+```
+
+While Decision 4.4.4 (line 1428) correctly says `vector(1024)` with explicit note "(1024d = Voyage AI voyage-3)".
+
+**Severity assessment**: This is a copy-paste inconsistency in the summary table, NOT an architecture error. The authoritative decision (4.4.4) is correct. An implementer reading the document sequentially would encounter 1024 first (at Decision 4.4.4) before reaching the summary (4.6.1). The risk is that someone reads ONLY the summary and uses the wrong dimension.
+
+**Verdict on this issue**: **Minor** — it is a formatting/propagation error in a summary table, not a design flaw. The correct architectural decision is clearly stated with rationale. This does NOT warrant a FAIL.
+
+### Dimension Scores (Cycle 3 — Final)
+
 | Dimension | Score | Weight | Weighted | Evidence |
 |-----------|-------|--------|----------|----------|
-| D1 Specificity | 9/10 | 10% | 0.90 | Decisions numbered (4.1.1-4.6.3), code patterns with exact variable names, migration filenames (0061-0065), PERSONALITY_KEYS Set with all 10 key names, token bucket parameters (10 tokens, refill 10/s), Docker resource limits. Very specific. |
-| D2 Completeness | 7/10 | 25% | 1.75 | All 6 layers have architecture decisions. 9 carry-forwards from Steps 2-3 addressed. Gaps: (1) No decision on concurrent reflection cron execution (advisory lock). (2) Decision 4.1.3 rate limiting specifies token bucket but not what happens to dropped messages — does the client see an error? Is the message silently discarded? (3) No decision on maximum observation content length — unbounded TEXT column could store 10MB observations. (4) Decision 4.2.1 tag-based isolation doesn't address workflow EXECUTION isolation — a workflow from company A could theoretically call external APIs that affect company B's data (n8n workflows are arbitrary code). (5) No decision on how personality defaults are backfilled for existing agents (migration 0063 mentions DEFAULT but doesn't specify backfill strategy for agents already in DB). |
-| D3 Accuracy | 7/10 | 15% | 1.05 | (1) HNSW memory attribution error at line 1274 — says VPS RAM impact but Step 5 corrects this to Neon compute. The Step 4 text is factually wrong even though it's corrected later. (2) Decision 4.3.4 says "keep `[^}]+` regex" and provides a template audit query `SELECT DISTINCT regexp_matches(...)` which is correct PostgreSQL syntax. (3) Decision 4.4.2 cost model: "Haiku 4.5" and "Sonnet 4.6" — these model names/numbers need WebSearch verification for current pricing. Model naming may have changed. (4) Migration 0063 at line 1317 specifies `DEFAULT '{"openness":60,...}'::jsonb` which is correct PostgreSQL syntax for JSONB defaults with existing rows. |
-| D4 Implementability | 8/10 | 10% | 0.80 | Architecture decisions are implementation-ready. OfficeStateStore pattern (4.1.1), token bucket (4.1.3), 6-layer security model (4.2.3), key-aware fallback (4.3.3), observation lifecycle (4.4.3) — all have code patterns. Go/No-Go test descriptions (line 1340-1349) are actionable. Minor: Decision 4.4.2 says tier_configs table controls model selection but doesn't specify the exact config key or value format. |
-| D5 Consistency | 7/10 | 15% | 1.05 | (1) HNSW memory: Step 4 says VPS impact, Step 5 says Neon compute — internal contradiction within the same document. (2) observations schema: Step 4 (line 783-801, carried from Step 3) uses `source`, `importance`, `isProcessed` but Step 2 (line 340-354) used `confidence`, `observed_at`, `reflected`. Step 4 doesn't explicitly acknowledge or reconcile this change. (3) Decision 4.3.1 confirms 0-100 integer scale, consistent with Steps 2-3. (4) E8 boundary consistently maintained — all decisions place new code in services/ or routes/. |
-| D6 Risk Awareness | 7/10 | 25% | 1.75 | (1) Decision 4.2.3 n8n security: 6-layer model is thorough. But missing: DNS rebinding attack (from Step 2 review — still not addressed). (2) Decision 4.4.3(B) cron failure backpressure is good (MAX_BATCH=50, MAX_UNPROCESSED_ALERT=500) but no advisory lock for concurrent cron prevention. (3) n8n workflow execution isolation: tag-based isolation only filters VISIBILITY. A workflow can still execute arbitrary HTTP requests to other companies' endpoints. n8n credential isolation is not discussed. (4) Decision 4.1.3 rate limiting only covers message rate, not connection rate. 1000 WebSocket connection attempts/second from a single IP would exhaust server resources before any rate limiting kicks in. |
+| D1 Specificity | 9/10 | 10% | 0.90 | Voyage AI named with dimensions + SDK in diagrams. Advisory lock SQL syntax exact. 4-layer observation sanitization with byte limits (10,240), regex literals, content_type enum. Docker limits exact (2G + 1536 max-old-space-size). WS caps (50/company, 500/server). Presets with exact trait values. Error messages in Korean. |
+| D2 Completeness | 9/10 | 25% | 2.25 | All Cycle 2 gaps filled: observation poisoning defense (4.4.5), 8-layer n8n security, WS flooding prevention, importance vs confidence (4.4.6), personality presets (4.3.5), error states UX (3.7b), Neon budget contingency (4.4.3D). Minor gap: Decision 4.6.1 summary has stale 768 value, but the authoritative decision (4.4.4) is complete and correct. |
+| D3 Accuracy | 8/10 | 15% | 1.20 | All Cycle 2 factual errors corrected within Step 4 decisions: Gemini->Voyage AI (zero matches), 4G->2G, is_processed->reflected, retries 3->5, 90->30 day TTL, vector(1024) in 4.4.4. One residual: 4.6.1 summary still says 768 (propagation lag). No auto-fail triggers (no hallucination, no security holes, no build-breaking suggestions). |
+| D4 Implementability | 8/10 | 10% | 0.80 | `runReflectionCron()` production-ready: advisory lock + confidence filter + domain grouping + importance ordering + batch cap. `sanitizeObservation()` copy-pasteable. Personality merge pattern with spread order clear. Error states table directly usable by frontend developers. Memory planner query with pgvector syntax correct. |
+| D5 Consistency | 8/10 | 15% | 1.20 | All Cycle 2 Step 3 regressions fixed. Embedding provider: Voyage AI throughout Step 4 decisions. Field names: `reflected`/`reflected_at` throughout. Docker: 2G + 1536. Brief alignment: 30-day TTL, 0-100 integer scale, E8 boundary. One deduction: 4.6.1 summary has 768 vs 4.4.4's 1024. |
+| D6 Risk Awareness | 8/10 | 25% | 2.00 | Observation poisoning: full attack vector + 4-layer defense. Advisory lock: transaction-scoped, per-companyId. WS flooding: pre-auth + per-company caps. OOM: documented non-recovery + proper V8 sizing. DNS rebinding: addressed in Step 2 fixes, propagated to security table. Credential encryption: AES-256-GCM. Error states: 8 failure modes with degraded UX. Neon budget: contingency plan. Minor gap: n8n per-company credential access control (encryption != isolation), accepted as v3 scope limitation. |
 
-### Weighted Average: 7.30/10
+### Weighted Average: 8.35/10
 
-### Issues Found
-1. **[D3 Accuracy]** HNSW memory attribution error. Line 1274 states "observations HNSW (768-dim x ~365K rows/year) ~ 1.7-2.2GB RAM ... total pgvector memory ~ 2.5-3GB ... Step 2 VPS headroom: 15.5GB -> ~12.5GB remaining after pgvector indexes." This is WRONG — pgvector HNSW indexes run on Neon compute nodes, not VPS. Step 5 corrects this but Step 4 still contains the incorrect claim. An architect reading Step 4 alone would make wrong resource allocation decisions. — **Critical**
-2. **[D6 Risk Awareness]** No advisory lock or single-instance guarantee for reflection cron. If ARGOS scheduler fires overlapping cron runs (e.g., previous run takes longer than interval), duplicate reflections will be generated from the same observations. Pattern: `SELECT ... FOR UPDATE SKIP LOCKED` or `pg_advisory_lock()` should be specified. — **Major**
-3. **[D2 Completeness]** n8n credential isolation unaddressed. Tag-based isolation controls workflow VISIBILITY but not EXECUTION. An n8n workflow can use any credential stored in n8n, including credentials belonging to other companies. n8n credentials should also be tagged/filtered per company, or credential access should be restricted via n8n RBAC. — **Major**
-4. **[D2 Completeness]** No maximum observation content length specified. The `content TEXT` column in the observations table is unbounded. An agent could generate a 1MB observation from a long conversation, which would then be processed by the reflection cron (sending 1MB to the LLM). This is both a cost risk (large input tokens) and a performance risk (slow embedding generation). — **Major**
-5. **[D6 Risk Awareness]** WebSocket connection flooding not mitigated. Decision 4.1.3 implements message-level rate limiting (10 msg/s token bucket) but no connection-level rate limiting. A DDoS or misbehaving client could open thousands of WebSocket connections. The existing per-userId limit of 3 only applies after JWT authentication succeeds — unauthenticated connection attempts still consume server resources. — **Major**
-6. **[D2 Completeness]** Decision 4.2.1 atomic create-with-tags assumes n8n API supports tags in workflow creation payload. This is version-dependent — older n8n versions required separate `POST /tags` followed by `PATCH /workflows/:id`. The assumption needs explicit n8n API version verification. — **Minor**
-7. **[D5 Consistency]** PERSONALITY_KEYS Set is manually duplicated from BigFiveTraits type + descriptor names. If a developer adds a trait dimension (e.g., for extended personality models), they must update the Set in soul-renderer.ts, the BigFiveTraits type in shared/types.ts, and the DEFAULT_PERSONALITY object — three places. A single source of truth is architecturally preferable. — **Minor**
-8. **[D2 Completeness]** Migration 0063 specifies DEFAULT for NEW rows but doesn't explicitly address backfill of existing agents. The DEFAULT clause in `ALTER TABLE ADD COLUMN ... DEFAULT '...'::jsonb` will populate existing rows in PostgreSQL (since PG 11, ADD COLUMN with DEFAULT is instant and applies to existing rows). This PostgreSQL behavior should be explicitly stated for clarity, since it's a common misconception that DEFAULT only applies to new INSERTs. — **Minor**
+### Final Issues List (Post-fix)
+1. **[D5 Consistency]** Decision 4.6.1 migration summary (line 1515): `vector(768)` should be `vector(1024)` to match Decision 4.4.4. — **Minor** (propagation error in summary, authoritative decision is correct)
+2. **[D6 Risk Awareness]** n8n credential isolation: encryption-at-rest does not prevent cross-company credential access at runtime within a single n8n instance. Accepted as v3 scope limitation since only admin has n8n access. — **Minor** (risk accepted)
+3. **[D4 Implementability]** Decision 4.4.5 `INJECTION_PATTERNS` regex incomplete: missing `<img onerror=`, `<svg onload=`, `data:text/html`. Low impact since observations go to LLM, not HTML rendering. — **Minor**
 
-### Missing Test Scenarios (per step)
-1. Advisory lock for reflection cron: verify that concurrent cron executions do not produce duplicate reflections
-2. n8n credential isolation: verify that a workflow tagged for company-A cannot access credentials tagged for company-B
-3. WebSocket connection flooding: 1000 rapid connection attempts from same IP, verify server degrades gracefully
-4. observation content with 1MB text: verify reflection cron handles large observations (LLM token limit, timeout)
-5. OfficeStateStore memory usage with 500 agents in a single company: verify Map doesn't leak memory
-6. PERSONALITY_KEYS Set completeness: unit test that PERSONALITY_KEYS contains exactly the keys produced by buildPersonalityVars()
-7. Token bucket rate limiter edge cases: exactly 10 messages at once (should pass), then 1 more immediately (should fail), then 1 after refill (should pass)
-8. PixiJS tree-shaking verification: build with only extend() registered classes, verify no unused PixiJS code in bundle (source map analysis)
-9. n8n atomic create-with-tags: verify that a failed tag assignment doesn't leave an orphaned untagged workflow
-10. soul-renderer spread reversal: test that `extraVars = { agent_list: 'malicious' }` does NOT override the real agent_list after fix
-11. Migration 0063 DEFAULT backfill: verify that existing agents in DB have personality_traits populated after migration
-12. Observation recording with server crash mid-operation: kill process after INSERT but before embedding UPDATE, verify backfill cron recovers the NULL embedding
-
-### Cross-talk
-**To Winston (Architect):** The HNSW memory attribution error in Step 4 (VPS RAM) vs Step 5 correction (Neon compute) needs a retroactive fix in Step 4 or a clear errata note. Architects who read Step 4 in isolation will make wrong capacity decisions. Also, the reflection cron needs an advisory lock pattern — please define this in the architecture.
-**To John (PM):** The n8n credential isolation gap means that in a multi-tenant deployment, one company's n8n workflows could potentially use another company's API keys. This is a security risk that must be addressed before Sprint 2 can pass Go/No-Go #3. Please add credential isolation to the acceptance criteria.
-**From Winston:** [Pending -- will be filled after cross-talk round]
-**From John:** [Pending -- will be filled after cross-talk round]
+### Cross-talk (Final)
+**To Winston (Architect):** Step 4 is architecturally sound. One propagation fix needed: line 1515 `vector(768)` -> `vector(1024)`. This is a 4-character edit. All architectural decisions (advisory lock, observation sanitization, personality merge order, WS caps, Docker sizing) are correct and implementable. Proceed to Architecture stage.
+**To John (PM):** Step 4 now includes error states UX table (3.7b) and personality presets (4.3.5) — both directly usable for Sprint 1 acceptance criteria. The observation poisoning defense (4.4.5) addresses the trust concern from Cycle 2. LLM cost model still needs importance scoring cost added (flagged in Step 6 review).
+**From Winston:** [Pending — will be filled after cross-talk round]
+**From John:** [Pending — will be filled after cross-talk round]
 
 ### Verdict
-PASS (marginal) — Architecture decisions are well-structured and comprehensive. The HNSW memory attribution error is critical but corrected in Step 5 (same document). The missing advisory lock for reflection cron and n8n credential isolation gaps are significant but addressable. Weighted average 7.30 passes the 7.0 threshold. For a Grade A step, I would prefer 8.0+; a second review cycle should address the 3 Major issues.
+
+**8.35/10 -- PASS**
+
+All 3 Critical, 5 High, 3 Medium, and 2 Low issues from Cycle 2 are verified as resolved in the source document. Three Minor residual issues remain (migration summary dimension propagation, n8n credential isolation scope limitation, incomplete sanitization regex) -- none are blockers.
+
+Score progression: 7.30 (Cycle 1) -> 5.60/8.65 (Cycle 2 pre/post) -> **8.35 (Cycle 3 final)**. The slight drop from 8.65 to 8.35 reflects the confirmed residual 768/1024 inconsistency in Decision 4.6.1 which I am now scoring as a real (if minor) consistency defect rather than deferring it as "outside scope."
+
+Step 4 is approved for Architecture stage handoff.
