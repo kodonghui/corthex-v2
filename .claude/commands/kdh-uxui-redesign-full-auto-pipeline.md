@@ -126,26 +126,75 @@ Folders: `phase-0-foundation/`, `phase-1-research/`, `phase-2-analysis/`, `phase
 
 ## Model Strategy
 
-Orchestrator=opus, Writer/Critics=sonnet by default.
+**ALL agents = opus. No exceptions.** (Synced with `/kdh-full-auto-pipeline` v9.2)
 
-**Opus overrides for critics:**
+## Party Mode (v9.2 synced)
 
-| Step | Why |
-|------|-----|
-| 0-1 Technical Spec | tech spec is foundation for all subsequent Phases |
-| 2-* Deep Analysis | final option selection = entire design direction |
-| 3-1 Design Tokens | tokens are foundation for all components/themes |
-| 7-3 API Binding | backend integration errors = runtime bugs |
+Follows `/kdh-full-auto-pipeline` v9.2 party mode protocol.
 
-## Party Mode
+### Step Grades
 
-3R = Write → Review×3 critics → Fix → Verify → Score. 2R = Write → Review×3 → Fix → Score.
-Pass: avg score >= 7/10 across all 3 critics. Fail: retry (max 2) → escalate → continue.
+| Phase-Step | Grade | Threshold | Cycles |
+|------------|-------|-----------|--------|
+| 0-1 Tech Spec | **A** | avg >= 8.0 | 2 (Devil's Advocate) |
+| 0-2 Vision | B | avg >= 7.5 | 1 |
+| 2-1/2/3 Deep Analysis | **A** | avg >= 8.0 | 2 (Devil's Advocate) |
+| 3-1 Design Tokens | **A** | avg >= 8.0 | 2 (Devil's Advocate) |
+| 5-1 DESIGN.md | **A** | avg >= 8.0 | 2 (Devil's Advocate) |
+| 7-3 API Binding | **A** | avg >= 8.0 | 2 (Devil's Advocate) |
+| All others | B | avg >= 7.5 | 1 |
 
-**Critics:**
-- **Critic-A (UX+Brand):** Sally (user advocacy) + Luna (brand consistency)
-- **Critic-B (Visual+A11y):** Marcus (visual hierarchy) + Quinn (WCAG verification)
-- **Critic-C (Tech+Perf):** Amelia (implementation feasibility) + Bob (performance reality)
+### Party Mode Protocol (per step)
+
+```
+1. Writer: write section → save to output doc
+2. Writer: SendMessage [Review Request] to ALL critics BY NAME
+3. Critics (parallel): Read FROM FILE → review → write to party-logs/{phase}-{step}-{name}.md
+4. Critics: Cross-talk with ALL peers (1 round):
+   - 3 critics: 3 pairs (all must exchange)
+   - Each critic SendMessage to assigned peer(s) with top disagreement/concern
+5. Critics: SendMessage [Feedback] to Writer BY NAME
+6. Writer: Read ALL critic logs FROM FILE → apply fixes → write party-logs/{phase}-{step}-fixes.md
+7. Writer: SendMessage [Fixes Applied] to ALL critics BY NAME
+8. Critics (parallel): Re-read FROM FILE → verify → SendMessage [Verified] score X/10
+9. Calculate average + enforce thresholds
+10. Score Variance Check: stdev < 0.5 → Orchestrator flags "점수 수렴 경고"
+11. Grade A: MINIMUM 2 cycles. Cycle 2 = Devil's Advocate (1 critic MUST find >= 3 issues)
+12. Orchestrator Step Completion Checklist (BLOCKING):
+    - [ ] party-logs/{phase}-{step}-{critic1}.md EXISTS
+    - [ ] party-logs/{phase}-{step}-{critic2}.md EXISTS
+    - [ ] party-logs/{phase}-{step}-{critic3}.md EXISTS
+    - [ ] party-logs/{phase}-{step}-fixes.md EXISTS
+    - [ ] Each critic log contains "## Cross-talk" section
+    - [ ] Score stdev >= 0.5
+    - [ ] Grade A: 2nd cycle completed with Devil's Advocate
+```
+
+### Team Creation (MANDATORY — no sub-agents)
+
+```
+For each Phase:
+  TeamCreate("{project}-uxui-phase-{N}")
+  Spawn Writer + 3 Critics with Agent(team_name=..., name=...)
+  On Phase complete: Shutdown ALL → TeamDelete → fresh team for next Phase
+```
+
+**PROHIBITION: Never use standalone Agent (sub-agent). Always TeamCreate + Agent(team_name).**
+
+### Critics (use these names — no generic critic-a/b/c)
+
+- **ux-brand:** Sally (user advocacy) + Luna (brand consistency)
+- **visual-a11y:** Marcus (visual hierarchy) + Quinn (WCAG verification)
+- **tech-perf:** Amelia (implementation feasibility) + Bob (performance reality)
+
+### Confirmed Decisions Reference (MANDATORY in all prompts)
+
+All Writer and Critic prompts MUST include:
+```
+References:
+- _bmad-output/party-logs/confirmed-decisions-stage1.md (12 확정 결정)
+- CRITICAL: Gemini 금지 → Voyage AI 1024d, Stitch 2 메인, n8n 2G, Lucide React 아이콘
+```
 
 ## Libre Tools Reference
 
@@ -166,7 +215,7 @@ Pass: avg score >= 7/10 across all 3 critics. Fail: retry (max 2) → escalate �
 ## Writer Prompt Template
 
 ```
-You are a UXUI REDESIGN WRITER in team "{team_name}". Model: sonnet. YOLO mode.
+You are a UXUI REDESIGN WRITER in team "{team_name}". Model: opus. YOLO mode.
 
 PROJECT: Read _uxui_redesign/project-context.yaml for all project-specific paths, framework, and conventions.
 
@@ -194,7 +243,7 @@ OUTPUT QUALITY (ABSOLUTE):
 ## Critic-C Prompt Template
 
 ```
-You are CRITIC-C in team "{team_name}". Model: sonnet. YOLO mode.
+You are CRITIC-C (tech-perf) in team "{team_name}". Model: opus. YOLO mode.
 
 PROJECT: Read _uxui_redesign/project-context.yaml for framework, tech stack, and conventions.
 
@@ -209,6 +258,64 @@ ON REVIEW:
 4. Min 2 issues (1 per role). Write to party-logs/{phase}-{step}-critic-c.md
 5. Cross-talk: SendMessage to critic-a, critic-b with summary
 6. Score honestly: vague/unimplementable <= 4. Zero findings = re-analyze.
+```
+
+---
+
+## Phase 0.5: Live Benchmark (Playwright)
+
+**Output:** `_uxui_redesign/phase-0.5-benchmark/`
+
+**Runs BEFORE Phase 0.** Uses Playwright MCP to capture real screenshots from popular websites.
+
+```
+Step 0.5-1: Playwright Screenshot Collection (~50 screenshots)
+
+Target sites (desktop 1280x800 + mobile 390x844):
+
+SaaS Dashboards:
+  - linear.app (dashboard, issues, projects)
+  - vercel.com/dashboard
+  - supabase.com/dashboard
+  - clerk.com/dashboard
+  - posthog.com (dashboard, insights)
+  - mixpanel.com (dashboard)
+
+AI Products:
+  - claude.ai (chat, projects)
+  - chat.openai.com (chat)
+  - perplexity.ai (search, library)
+  - v0.dev (playground)
+
+Enterprise:
+  - github.com (repo, issues, PRs, actions)
+  - figma.com (dashboard, file browser)
+  - notion.so (workspace, page)
+  - slack.com (channel view)
+
+Landing Pages:
+  - tailwindui.com
+  - ui.shadcn.com
+  - linear.app (homepage)
+  - vercel.com (homepage)
+  - supabase.com (homepage)
+  - clerk.com (homepage)
+
+For EACH screenshot:
+  1. mcp__playwright__browser_navigate → URL
+  2. mcp__playwright__browser_take_screenshot → save to phase-0.5-benchmark/{site}-{page}-{viewport}.png
+  3. mcp__playwright__browser_snapshot → save DOM structure
+
+After collection:
+  4. Write benchmark-report.md:
+     - Layout patterns (sidebar, topbar, split-pane, etc.)
+     - Color schemes (dark/light, accent colors)
+     - Typography (fonts, sizes, weights)
+     - Spacing patterns (card gaps, section padding)
+     - Navigation patterns (sidebar, tabs, breadcrumbs)
+     - Best practices for our domain (AI agent management SaaS)
+  5. Rank top 5 reference designs for CORTHEX
+  6. This report feeds into Phase 0-2 Vision and Phase 1 Research
 ```
 
 ---

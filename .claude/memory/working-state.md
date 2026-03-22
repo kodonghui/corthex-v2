@@ -1,43 +1,52 @@
-# Working State — 2026-03-21
+# Working State — 2026-03-22
 
 ## Pipeline 현황 (`/kdh-full-auto-pipeline` v9.2)
 
-| Stage | 상태 | Party-logs |
-|-------|------|-----------|
-| 0 Brief | 완료 (avg 8.73) | v9.2 완료 |
-| 1 Tech Research | 완료 (avg 8.92) | **재검증 필요** (`reverify stage-1`) |
-| 2 PRD Create | 완료 (avg 9.03) | 없음 |
-| 3 PRD Validate | 완료 (avg 8.33) | 없음 |
-| 4 Architecture | 미시작 | `planning` Mode A |
-| 5~8 | 미시작 | |
+| Stage | 상태 | 방식 | Avg |
+|-------|------|------|-----|
+| 0 Brief | 완료 | v9.2 reverify (이전 세션) | 8.73 |
+| 1 Tech Research | 완료 | Mode B reverify | 8.52 |
+| 2 PRD Create | 완료 | Mode B reverify | 8.86 |
+| 3 PRD Validate | 완료 | **Mode A fresh write** | 8.73 |
+| 4 Architecture | **미시작** | Mode A | — |
+| 5~8 | 미시작 | Mode A | — |
 
 ## 다음 할 것
 
-1. Stage 1 재검증: `/kdh-full-auto-pipeline reverify stage-1`
-2. Stage 4~8: `/kdh-full-auto-pipeline planning` (Mode A)
+1. **Stage 4 Architecture** — Mode A, `/kdh-full-auto-pipeline planning` (Stage 4부터)
+2. Stage 5~8 순차 진행
 
-## Mode 사용법
+## 이번 세션 작업 요약
 
-- `planning` (Mode A) = 새로 쓸 때 (Stage 4부터)
-- `reverify stage-N` (Mode B) = 이미 있는 산출물 재검증
+### Stage 1 reverify (Mode B)
+- 5 steps, 102 fixes, avg 5.76→8.52
+- 핵심: Gemini→Voyage AI 1024d, Docker 4G→2G, observation poisoning 4-layer, advisory lock
 
-## 이번 세션 작업 (2026-03-21 #2)
+### Stage 2 reverify (Mode B)
+- 12 steps, avg 8.86
+- Pre-sweep 도입 (용어 일괄 치환 후 구조에 집중)
+- 핵심: FR-MEM12/13/14 신규, NFR-S10, 14-gate 확장, 76 NFR
 
-- 파이프라인 v9.2 정비: 버전 라벨 수정, Mode B/C/D 삭제, Mode B(reverify) 추가
-- CLAUDE.md: "팀 에이전트 필수, 서브에이전트 금지" 규칙 추가
-- 피드백 메모리 2건 저장
-- 서브에이전트(비정식) 리뷰 결과 참고용 확보 (Winston avg 8.42, Quinn avg 6.85)
+### Stage 3 fresh write (Mode A)
+- 구식 validation report 폐기 → 수정된 PRD 기준 새로 작성
+- 12 steps, avg 8.73, 4/5 Good
+- 핵심: 28 implementation leakage 분석, SMART 4.59/5.0, Architecture handoff 준비
 
-## 서브에이전트 리뷰에서 발견된 주요 이슈 (재검증 때 반영)
+### 파이프라인 v9.2 개선
+- Mode B/C/D 삭제, Mode B=reverify 추가
+- CLAUDE.md: 팀 에이전트 필수 규칙
+- Pre-sweep 패턴 도입 (용어 치환 → 구조 집중)
 
-- Embedding 768→1024 차원 충돌 (Gemini 금지 → Voyage AI)
-- generateEmbedding() 시그니처 틀림
-- Scenario.gg 가격 오류 ($15→$45-99)
-- Docker host.docker.internal 리눅스 미지원
-- memory-reflection.ts 구현 패턴 누락
+### 프로세스 교훈
+- reverify vs Mode A: 구식 문서는 Mode A가 맞음 (Stage 3에서 입증)
+- Pre-sweep: 크리틱 12명 리뷰보다 grep+치환이 용어 이슈에 효과적
+- 크리틱 피로도: Stage 2 후반 점수 수렴 경향 → Devil's Advocate 강화 필요
+
+## 확정 결정 (12건)
+- confirmed-decisions-stage1.md 참조
+- 핵심: Voyage AI 1024d, n8n 2G, 8-layer, Stitch 2, 30일 TTL, Option B, advisory lock, 14 Go/No-Go
 
 ## 인프라 상태
-
-- ECC hooks: 설치 완료, hooks.json 등록됨, 동작 중
-- UXUI 파이프라인: v5.1 (Stitch 2 메인)
-- Stage 0~3 산출물: `_bmad-output/planning-artifacts/` 에 전부 있음
+- ECC hooks: 동작 중
+- UXUI 파이프라인: v5.1 (Stitch 2)
+- 서브에이전트 quinn: 세션 초반 실수로 스폰, 계속 백그라운드 실행 중 (git push 여러 번 트리거)
