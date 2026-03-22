@@ -394,12 +394,13 @@
 
 | Step | R1 | R2 | Status |
 |------|-----|-----|--------|
-| V-04 | 6.85 | **8.50** | ✅ PASS |
+| V-02b | 7.90 | **8.55** | ✅ PASS |
+| V-04 | 6.85 | **8.80** | ✅ PASS (residual fix: 8.50->8.80) |
 | V-05 | 6.10 | **9.00** | ✅ PASS |
 | V-06 | 7.80 | **9.10** | ✅ PASS |
 | V-07 | 7.95 | **9.10** | ✅ PASS |
 | V-10 | 7.85 | **9.10** | ✅ PASS |
 | V-11 | 8.50 | **9.25** | ✅ PASS |
-| V-12 | 8.60 | **9.25** | ✅ PASS |
+| V-12 | 8.60 | **8.75** | ✅ PASS (standalone file) |
 
-**Cumulative R2 Average: 9.04/10** (7 steps, all PASS, min 8.50)
+**Cumulative R2 Average: 8.96/10** (8 steps, all PASS, min 8.55)
