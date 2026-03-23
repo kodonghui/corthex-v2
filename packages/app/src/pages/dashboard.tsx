@@ -4,11 +4,16 @@
 // API: POST /workspace/presets/:presetId/execute
 
 import { useState, useMemo, useEffect } from 'react'
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../lib/api'
 import { useDashboardWs } from '../hooks/use-dashboard-ws'
 import { useWsStore } from '../stores/ws-store'
+import {
+  Bot, Zap, CheckCircle, DollarSign, Timer, Database,
+  TrendingUp, TrendingDown, Plus, XCircle, ArrowRight,
+  MessageSquare, Workflow, BarChart3, Calendar,
+} from 'lucide-react'
 import type {
   LLMProviderName,
   DashboardSummary,
@@ -33,39 +38,7 @@ const PROVIDER_LABELS: Record<LLMProviderName, string> = {
   google: 'Google',
 }
 
-// === Custom CSS for animations ===
-const customStyles = `
-@keyframes pulse-green {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
-}
-.status-pulse-active {
-  animation: pulse-green 2s infinite;
-}
-.custom-scrollbar::-webkit-scrollbar {
-  width: 4px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #E5E7EB;
-  border-radius: 10px;
-}
-`
-
-// === Organic theme color constants (inline styles) ===
-const ORGANIC = {
-  cream: '#F9F8F3',
-  olive: '#606C38',
-  oliveDark: '#283618',
-  earthBrown: '#BC6C25',
-  sand: '#DDA15E',
-  whiteSoft: '#FEFEFE',
-}
-
-// === Usage Chart helpers (from existing) ===
+// === Usage Chart helpers ===
 
 type DayData = { date: string; byProvider: Record<LLMProviderName, number>; total: number }
 
@@ -85,133 +58,203 @@ function groupUsageByDate(usage: DashboardUsageDay[]): DayData[] {
     }))
 }
 
-// === Agent Status Grid ===
+// === KPI Card ===
 
-function AgentStatusGrid({ data }: { data: DashboardSummary }) {
-  // Build agent display items from summary data
-  const agentItems = useMemo(() => {
-    const items: Array<{
-      id: string
-      name: string
-      status: 'active' | 'working' | 'online' | 'error' | 'offline'
-      statusText: string
-      statusColor: string
-      dotColor: string
-      isSecretary: boolean
-      progress?: number
-      imgSrc: string
-    }> = []
+function KpiCard({
+  label,
+  value,
+  icon,
+  trend,
+  trendLabel,
+}: {
+  label: string
+  value: string
+  icon: React.ReactNode
+  trend?: 'up' | 'down' | 'neutral'
+  trendLabel?: string
+}) {
+  return (
+    <div className="bg-white p-6 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)] border border-[#e5e1d3]/10 group hover:bg-[#f5f3f0] transition-colors">
+      <div className="flex justify-between items-start mb-4">
+        <span className="text-[10px] uppercase tracking-widest font-bold text-[#6b705c]">{label}</span>
+        <span className="text-[#606C38]">{icon}</span>
+      </div>
+      <div className="flex items-baseline gap-2">
+        <span className="text-3xl font-mono font-bold text-[#1a1a1a]">{value}</span>
+        {trendLabel && (
+          <span className={`text-xs font-bold flex items-center gap-0.5 ${
+            trend === 'up' ? 'text-[#4d7c0f]' : trend === 'down' ? 'text-[#dc2626]' : 'text-[#6b705c]'
+          }`}>
+            {trend === 'up' && <TrendingUp className="w-3 h-3" />}
+            {trend === 'down' && <TrendingDown className="w-3 h-3" />}
+            {trendLabel}
+          </span>
+        )}
+      </div>
+    </div>
+  )
+}
 
-    // Secretary agent (always show)
-    items.push({
-      id: 'secretary',
-      name: '메인 비서',
-      status: 'active',
-      statusText: '대기 중',
-      statusColor: 'color: #16a34a',
-      dotColor: '#22c55e',
-      isSecretary: true,
-      imgSrc: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBg6aGz9lAcgrdta9v1LBMN5iTP17Cl-HXeD_1NDU8JeYGLngziM9oGFj_GXyC32O2ZmqIUC5LSkEDT4l6uFIAxANzW04q3MoQESVh9AmX77r_NmlLBYRoC5pe5emzB3TovSYZMuZyqIwBIauc4WzbXCuX5JNnwp7fTJVbcReZHeX1FzjvUYuPNeWKVVYxEG7r1By6TKavoyObLr1OKURuTjEICgD7kG_qqhs-JKGDPN3wIS84rTc2MtX7zWvEdK1mL9TK1tk7_wA',
-    })
+// === Cost Trend Chart (SVG Area) ===
 
-    // Working agent
-    if (data.tasks.inProgress > 0) {
-      items.push({
-        id: 'working',
-        name: '시장 조사원',
-        status: 'working',
-        statusText: `작업 중 (74%)`,
-        statusColor: 'color: #2563eb',
-        dotColor: '#3b82f6',
-        isSecretary: false,
-        progress: 74,
-        imgSrc: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD8IYIKY8fQLHRl8bB-Leza0kUABHTOKk_4MqMRFNOn4mziFOQZNoQ2SQ2XLunwLy287w9NSZg1HIAd1ljtxA-PrRd_9-3BzSqmYOm2bxV506O1jf4wyK7l-yi2_ouBW-p13yl4QQWuhh8Lh5uq4GCwJ8roQKKmFqFrnziBVWRAa8NxbvLdoPRFH8syxKXzhOvAUlpOTFaZly_7M_xIzoofrYTMqrBQuFGilEfu9XIKMp07jZ8Wdy4BDp3Rn5nInCYsXicMpOoxrQ',
-      })
-    }
+function CostTrendChart({ usage, budget }: { usage: DashboardUsage | undefined; budget: DashboardBudget | undefined }) {
+  const days = useMemo(() => usage ? groupUsageByDate(usage.usage) : [], [usage])
+  const maxTotal = useMemo(() => Math.max(...days.map(d => d.total), 1), [days])
+  const totalSpend = budget?.currentMonthSpendUsd ?? 0
 
-    // Online agent
-    if (data.agents.active > 0) {
-      items.push({
-        id: 'online',
-        name: '콘텐츠 작가',
-        status: 'online',
-        statusText: '온라인',
-        statusColor: 'color: #16a34a',
-        dotColor: '#22c55e',
-        isSecretary: false,
-        imgSrc: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDe2hKWSiNDt2nIF7UtM2_VZncIMwoO7B5QZGmbCQKoLvOU5vT4J7bMU8ILJzkdwSVro3Olc55kFrN5GvME0T5E5W1BKR-VLXEIxy5QJJd942Wcx2KYdgHaMs-LyUDC1ZUKsIZ-xw0a__oYIRKtzks_-7qnzdEC5nyajAMVQ8tG8CdnfZvp9rJ0uOtcgxyGtBoCN5FyjrBTyRbVqygvFDctIJkhtXReNpvkdFehnyvnjdNdSxK3IlmPEwIXGHmAumclqXfsdaJzCw',
-      })
-    }
+  // Build SVG path from data
+  const chartWidth = 800
+  const chartHeight = 200
+  const points = days.map((d, i) => ({
+    x: days.length > 1 ? (i / (days.length - 1)) * chartWidth : chartWidth / 2,
+    y: chartHeight - (d.total / maxTotal) * (chartHeight - 20) - 10,
+  }))
 
-    // Error agent
-    if (data.agents.error > 0) {
-      items.push({
-        id: 'error',
-        name: '코드 리뷰어',
-        status: 'error',
-        statusText: '연결 끊김',
-        statusColor: 'color: #dc2626',
-        dotColor: '#ef4444',
-        isSecretary: false,
-        imgSrc: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAUaKf2FR9ET4Hj2xpQS-1ybArfly0HsyXgL5xEi_bBE4pyDecwpuDBeLQrhZ2iJQXvfIjrST_cHYfgTUZgME2MOabLEIUV3V2fXSbT76Vqq8u9zuTGFkfY2MdRklXyD5VSeO1vL5WNLoSrwbdjxNZfsMOtA3z5UnLTRCtt1Y_jheGNh8-UBlFFh4BTpRzDO9Lx72IGw9bBBLVuvYjP5_RJQ1KXLhZgDkk1YE473e-L4xdPJ8Ig1aGOlXM5DqeaY58GsKO0mr57bQ',
-      })
-    }
+  const linePath = points.length > 0
+    ? `M${points.map(p => `${p.x},${p.y}`).join(' L')}`
+    : 'M0,180 L800,180'
+  const areaPath = points.length > 0
+    ? `${linePath} L${chartWidth},${chartHeight} L0,${chartHeight} Z`
+    : 'M0,180 L800,180 L800,200 L0,200 Z'
 
-    // Offline agent
-    if (data.agents.idle > 0) {
-      items.push({
-        id: 'offline',
-        name: '데이터 분석가',
-        status: 'offline',
-        statusText: '오프라인',
-        statusColor: 'color: #64748b',
-        dotColor: '#94a3b8',
-        isSecretary: false,
-        imgSrc: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDnMTE6HDQQAbYX4OZX7x-XlVCu1uY7vPGxXaHl2TxwU-11kR2QEPiXw19AKkR__z5DkUqMuH8oro0uVKuTrWn3n11GCgvEfyWZjmpsx-UlUIvf-7wQpamf2iv2Y0uPWva_2F9DhubjEahRjikSo3xft0piYuPO_iWdteNzq53UN77K5M0NPZ1WxKnkQt8U1mNINiI5UaxyPteXrLonXiLrz0q7CeYl-sSMJwGMpPQOegzN_zbd7x2zDtOxGo5iGCd4PA-puoNS5Q',
-      })
-    }
-
-    return items
-  }, [data])
+  const dateLabels = days.length > 0
+    ? [days[0]?.date, days[Math.floor(days.length / 4)]?.date, days[Math.floor(days.length / 2)]?.date, days[Math.floor(3 * days.length / 4)]?.date, days[days.length - 1]?.date].filter(Boolean)
+    : []
 
   return (
-    <div className="lg:col-span-2 space-y-6" data-purpose="agent-grid">
-      <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold" style={{ fontFamily: "'Noto Serif KR', serif" }}>에이전트 현황</h3>
-        <a className="text-sm font-medium hover:underline" href="#" style={{ color: ORGANIC.olive }}>모두 보기</a>
+    <div className="lg:col-span-8 bg-white p-8 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)] flex flex-col">
+      <div className="flex justify-between items-center mb-10">
+        <div>
+          <h3 className="text-xl font-bold tracking-tight text-[#283618]">Cost Trend</h3>
+          <p className="text-sm text-[#6b705c]">Daily token consumption across all active agents</p>
+        </div>
+        <div className="text-right">
+          <p className="text-2xl font-mono font-bold text-[#606C38]">${totalSpend.toFixed(2)}</p>
+          <p className="text-[10px] uppercase font-bold text-[#6b705c]">MTD Total</p>
+        </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {agentItems.map((agent) => (
-          <div
-            key={agent.id}
-            className={`bg-white p-5 rounded-2xl shadow-sm flex items-center space-x-4 ${agent.status === 'offline' ? 'opacity-75' : ''}`}
-            style={{
-              border: agent.isSecretary ? `2px solid rgba(96, 108, 56, 0.2)` : '1px solid #f1f5f9',
-            }}
-          >
-            <div className="relative">
-              <div className={`w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 overflow-hidden ${agent.status === 'offline' ? 'grayscale' : ''}`}>
-                <img alt={agent.name} className="w-full h-full object-cover" src={agent.imgSrc} />
-              </div>
+      <div className="relative h-64 w-full mt-auto">
+        <svg className="w-full h-full" preserveAspectRatio="none" viewBox={`0 0 ${chartWidth} ${chartHeight}`}>
+          <defs>
+            <linearGradient id="cost-gradient" x1="0%" x2="0%" y1="0%" y2="100%">
+              <stop offset="0%" stopColor="#606C38" stopOpacity="0.2" />
+              <stop offset="100%" stopColor="#606C38" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          {/* Reference lines */}
+          <line x1="0" x2={chartWidth} y1="50" y2="50" stroke="#e5e1d3" strokeDasharray="4" strokeWidth="1" opacity="0.4" />
+          <line x1="0" x2={chartWidth} y1="100" y2="100" stroke="#e5e1d3" strokeDasharray="4" strokeWidth="1" opacity="0.4" />
+          <line x1="0" x2={chartWidth} y1="150" y2="150" stroke="#e5e1d3" strokeDasharray="4" strokeWidth="1" opacity="0.4" />
+          {/* Area fill */}
+          <path d={areaPath} fill="url(#cost-gradient)" />
+          {/* Line */}
+          <path d={linePath} fill="none" stroke="#606C38" strokeWidth="3" strokeLinecap="round" />
+        </svg>
+        {dateLabels.length > 0 && (
+          <div className="absolute bottom-[-30px] left-0 right-0 flex justify-between text-[10px] font-mono text-[#6b705c]/60 px-2">
+            {dateLabels.map((label, i) => (
+              <span key={i}>{label}</span>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// === Department Load Bar Chart ===
+
+function DeptLoadChart({ budget }: { budget: DashboardBudget | undefined }) {
+  const departments = useMemo(() => {
+    if (!budget?.byDepartment?.length) return []
+    const sorted = [...budget.byDepartment].sort((a, b) => b.costUsd - a.costUsd)
+    const maxCost = sorted[0]?.costUsd || 1
+    return sorted.slice(0, 5).map(d => ({
+      name: d.name,
+      value: d.costUsd,
+      percent: (d.costUsd / maxCost) * 100,
+    }))
+  }, [budget])
+
+  return (
+    <div className="lg:col-span-4 bg-white p-8 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)] flex flex-col">
+      <h3 className="text-xl font-bold tracking-tight text-[#283618] mb-2">Departmental Load</h3>
+      <p className="text-sm text-[#6b705c] mb-8">Cost per department</p>
+      <div className="space-y-6 flex-1">
+        {departments.length > 0 ? departments.map((dept) => (
+          <div key={dept.name} className="space-y-2">
+            <div className="flex justify-between text-xs font-bold uppercase tracking-wide">
+              <span className="text-[#1a1a1a]">{dept.name}</span>
+              <span className="text-[#6b705c] font-mono">${dept.value.toFixed(2)}</span>
+            </div>
+            <div className="h-2 w-full bg-[#f5f0e8] rounded-full overflow-hidden">
               <div
-                className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${agent.status === 'active' ? 'status-pulse-active' : ''}`}
-                style={{ backgroundColor: agent.dotColor }}
-              ></div>
+                className="h-full bg-[#606C38] rounded-full transition-all duration-500"
+                style={{ width: `${dept.percent}%`, opacity: Math.max(0.3, dept.percent / 100) }}
+              />
             </div>
-            <div className="flex-1">
-              <div className="flex items-center space-x-2">
-                <h4 className="font-bold">{agent.name}</h4>
-                {agent.isSecretary && (
-                  <span className="px-2 py-0.5 text-white text-[10px] rounded uppercase tracking-wider font-bold" style={{ backgroundColor: ORGANIC.olive }}>Secretary</span>
-                )}
-              </div>
-              <p className="text-xs text-stone-500 mt-1">상태: <span className="font-medium" style={{ [agent.statusColor.split(':')[0]]: agent.statusColor.split(':')[1]?.trim() } as React.CSSProperties}>{agent.statusText}</span></p>
-            </div>
-            {agent.isSecretary && (
-              <button className="p-2 text-stone-500 hover:text-slate-600" style={{ ['--tw-text-opacity' as string]: 1 } as React.CSSProperties}>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
-              </button>
-            )}
+          </div>
+        )) : (
+          <div className="flex items-center justify-center h-full text-sm text-[#6b705c]">No department data</div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// === Task Status Donut ===
+
+function TaskStatusDonut({ summary }: { summary: DashboardSummary }) {
+  const { completed, inProgress, failed, total } = summary.tasks
+  const pending = Math.max(0, total - completed - inProgress - failed)
+  const circumference = 2 * Math.PI * 70 // ~440
+
+  const segments = [
+    { label: 'Completed', count: completed, color: '#606C38' },
+    { label: 'In Progress', count: inProgress, color: '#5a7247' },
+    { label: 'Failed', count: failed, color: '#dc2626' },
+    { label: 'Pending', count: pending, color: '#e5e1d3' },
+  ]
+
+  let accOffset = 0
+  const arcs = segments.map(s => {
+    const ratio = total > 0 ? s.count / total : 0
+    const dashLen = ratio * circumference
+    const offset = circumference - accOffset
+    accOffset += dashLen
+    return { ...s, dashLen, offset, ratio }
+  })
+
+  return (
+    <div className="lg:col-span-4 bg-white p-8 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)]">
+      <h3 className="text-xl font-bold tracking-tight text-[#283618] mb-8">Task Status</h3>
+      <div className="flex items-center justify-center relative py-4">
+        <svg className="w-48 h-48 transform -rotate-90">
+          {arcs.map((arc, i) => (
+            <circle
+              key={i}
+              cx="96" cy="96" r="70"
+              fill="transparent"
+              stroke={arc.color}
+              strokeWidth="20"
+              strokeDasharray={`${arc.dashLen} ${circumference - arc.dashLen}`}
+              strokeDashoffset={arc.offset}
+              className="transition-all duration-500"
+            />
+          ))}
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="text-3xl font-mono font-bold text-[#283618]">{total}</span>
+          <span className="text-[10px] uppercase font-bold text-[#6b705c]">Total</span>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4 mt-8">
+        {arcs.map((arc) => (
+          <div key={arc.label} className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: arc.color }} />
+            <span className="text-xs font-medium text-[#6b705c]">
+              {arc.label} ({total > 0 ? Math.round(arc.ratio * 100) : 0}%)
+            </span>
           </div>
         ))}
       </div>
@@ -219,75 +262,61 @@ function AgentStatusGrid({ data }: { data: DashboardSummary }) {
   )
 }
 
-// === Notifications Panel ===
+// === Recent Tasks Table ===
 
-function NotificationsPanel({ data }: { data: DashboardSummary }) {
-  const notificationItems = useMemo(() => {
-    const items: Array<{
-      id: string
-      title: string
-      description: string
-      time: string
-      dotColor: string
-    }> = []
-
-    if (data.tasks.completed > 0) {
-      items.push({
-        id: 'report-done',
-        title: `보고서 완료: ${data.tasks.completed}건 작업 완료`,
-        description: '에이전트가 요청하신 보고서를 생성했습니다.',
-        time: '15분 전',
-        dotColor: ORGANIC.olive,
-      })
-    }
-
-    items.push({
-      id: 'system-update',
-      title: '시스템 업데이트 안내',
-      description: 'v2.1 패치노트가 공개되었습니다. 신규 기능을 확인하세요.',
-      time: '2시간 전',
-      dotColor: '#e2e8f0',
-    })
-
-    if (data.tasks.failed > 0) {
-      items.push({
-        id: 'task-error',
-        title: '작업 중단: 데이터 크롤링',
-        description: '대상 사이트의 응답 지연으로 작업이 일시 중단되었습니다.',
-        time: '5시간 전',
-        dotColor: '#f87171',
-      })
-    }
-
-    return items
-  }, [data])
-
+function RecentTasksTable({ summary }: { summary: DashboardSummary }) {
+  // We display summary-derived info since we don't have a separate recent-tasks endpoint
+  const navigate = useNavigate()
   return (
-    <div className="space-y-6" data-purpose="notifications">
-      <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold" style={{ fontFamily: "'Noto Serif KR', serif" }}>최근 알림</h3>
-        <button className="text-stone-500 hover:text-slate-600">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
+    <div className="lg:col-span-8 bg-white p-8 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)] overflow-hidden">
+      <div className="flex justify-between items-center mb-8">
+        <h3 className="text-xl font-bold tracking-tight text-[#283618]">Recent Tasks</h3>
+        <button
+          onClick={() => navigate('/activity-log')}
+          className="text-sm font-bold text-[#606C38] hover:underline underline-offset-4 flex items-center gap-1"
+        >
+          View History <ArrowRight className="w-4 h-4" />
         </button>
       </div>
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-        <div className="divide-y divide-slate-50">
-          {notificationItems.map((item) => (
-            <div key={item.id} className="p-4 hover:bg-slate-50 transition-colors cursor-pointer group">
-              <div className="flex items-start space-x-3">
-                <div className="mt-1 w-2 h-2 rounded-full" style={{ backgroundColor: item.dotColor }}></div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-slate-800">{item.title}</p>
-                  <p className="text-xs text-stone-400 mt-1">{item.description}</p>
-                  <p className="text-[10px] text-stone-500 mt-2">{item.time}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-        <button className="w-full py-3 bg-slate-50 text-xs font-medium text-stone-400 hover:bg-slate-100 transition-colors">
-          모든 알림 확인하기
-        </button>
+      <div className="overflow-x-auto">
+        <table className="w-full text-left">
+          <thead className="text-[10px] uppercase tracking-widest font-bold text-[#6b705c]/60 border-b border-[#e5e1d3]/30">
+            <tr>
+              <th className="pb-4 font-bold">Status</th>
+              <th className="pb-4 font-bold">Category</th>
+              <th className="pb-4 font-bold">Count</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-[#e5e1d3]/10">
+            <tr className="group hover:bg-[#f5f3f0] transition-colors">
+              <td className="py-5">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#606C38]/10 text-[#606C38] text-[10px] font-bold">
+                  <CheckCircle className="w-3.5 h-3.5" /> COMPLETED
+                </span>
+              </td>
+              <td className="py-5 text-sm font-medium text-[#1a1a1a]">Finished tasks</td>
+              <td className="py-5 font-mono text-sm text-[#1a1a1a]">{summary.tasks.completed}</td>
+            </tr>
+            <tr className="group hover:bg-[#f5f3f0] transition-colors">
+              <td className="py-5">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#2563eb]/10 text-[#2563eb] text-[10px] font-bold">
+                  <Zap className="w-3.5 h-3.5" /> IN PROGRESS
+                </span>
+              </td>
+              <td className="py-5 text-sm font-medium text-[#1a1a1a]">Active tasks</td>
+              <td className="py-5 font-mono text-sm text-[#1a1a1a]">{summary.tasks.inProgress}</td>
+            </tr>
+            <tr className="group hover:bg-[#f5f3f0] transition-colors">
+              <td className="py-5">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#dc2626]/10 text-[#dc2626] text-[10px] font-bold">
+                  <XCircle className="w-3.5 h-3.5" /> FAILED
+                </span>
+              </td>
+              <td className="py-5 text-sm font-medium text-[#1a1a1a]">Failed tasks</td>
+              <td className="py-5 font-mono text-sm text-[#1a1a1a]">{summary.tasks.failed}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   )
@@ -297,28 +326,25 @@ function NotificationsPanel({ data }: { data: DashboardSummary }) {
 
 function DashboardSkeleton() {
   return (
-    <div data-testid="dashboard-skeleton" className="space-y-6 animate-in fade-in duration-300">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="bg-white rounded-2xl border border-slate-100 p-6">
-            <div className="h-4 w-24 bg-slate-200 animate-pulse rounded mb-3" />
-            <div className="h-3 w-32 bg-slate-100 animate-pulse rounded" />
+    <div data-testid="dashboard-skeleton" className="space-y-10 animate-in fade-in duration-300">
+      {/* KPI cards skeleton */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="bg-white rounded-xl border border-[#e5e1d3]/10 p-6">
+            <div className="h-3 w-20 bg-[#e5e1d3] animate-pulse rounded mb-4" />
+            <div className="h-8 w-16 bg-[#f5f0e8] animate-pulse rounded" />
           </div>
         ))}
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
-          <div className="h-4 w-32 bg-slate-200 animate-pulse rounded mb-4" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl border border-slate-100 p-5 h-20 animate-pulse" />
-            ))}
-          </div>
-        </div>
-        <div>
-          <div className="h-4 w-24 bg-slate-200 animate-pulse rounded mb-4" />
-          <div className="bg-white rounded-2xl border border-slate-100 h-60 animate-pulse" />
-        </div>
+      {/* Charts skeleton */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="lg:col-span-8 bg-white rounded-xl border border-[#e5e1d3]/10 p-8 h-80 animate-pulse" />
+        <div className="lg:col-span-4 bg-white rounded-xl border border-[#e5e1d3]/10 p-8 h-80 animate-pulse" />
+      </div>
+      {/* Bottom row skeleton */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="lg:col-span-4 bg-white rounded-xl border border-[#e5e1d3]/10 p-8 h-72 animate-pulse" />
+        <div className="lg:col-span-8 bg-white rounded-xl border border-[#e5e1d3]/10 p-8 h-72 animate-pulse" />
       </div>
     </div>
   )
@@ -357,78 +383,157 @@ export function DashboardPage() {
   const isLoading = summaryLoading || usageLoading || budgetLoading
 
   useEffect(() => {
-    document.title = '대시보드 - CORTHEX'
+    document.title = 'Dashboard - CORTHEX'
     return () => { document.title = 'CORTHEX' }
   }, [])
 
+  // Derived KPI values
+  const completionRate = summary && summary.tasks.total > 0
+    ? ((summary.tasks.completed / summary.tasks.total) * 100).toFixed(1)
+    : '0.0'
+
+  const todayCost = summary?.cost.todayUsd ?? 0
+  const budgetPercent = summary?.cost.budgetUsagePercent ?? 0
+
+  const usageDayOptions = [
+    { label: 'Today', value: 1 },
+    { label: '7d', value: 7 },
+    { label: '30d', value: 30 },
+  ]
+
   return (
-    <div data-testid="dashboard-page" className="font-sans text-slate-800 antialiased" style={{ backgroundColor: ORGANIC.cream }}>
-      <style>{customStyles}</style>
-          <div className="p-8 flex-1">
-            {isLoading && !summary ? (
-              <DashboardSkeleton />
-            ) : summaryError && !summary ? (
-              <div className="flex flex-col items-center justify-center py-24">
-                <p className="text-base font-medium text-stone-400">데이터를 불러올 수 없습니다</p>
-                <p className="text-sm text-stone-500 mt-1">잠시 후 자동으로 재시도합니다</p>
-              </div>
-            ) : (
-              <>
-                {/* Greeting */}
-                <div className="mb-10">
-                  <h2 className="text-3xl font-bold" style={{ fontFamily: "'Noto Serif KR', serif", color: ORGANIC.oliveDark }}>반갑습니다, CEO님</h2>
-                  <p className="text-stone-400 mt-2">오늘도 CORTHEX가 당신의 비즈니스를 지원하고 있습니다.</p>
-                </div>
-
-                {/* Quick Start Shortcuts */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10" data-purpose="quick-shortcuts">
-                  <button
-                    onClick={() => navigate('/command-center')}
-                    className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all text-left flex items-start space-x-4"
-                    style={{ ['--hover-border' as string]: `${ORGANIC.olive}4d` } as React.CSSProperties}
-                  >
-                    <div className="p-3 rounded-xl" style={{ backgroundColor: ORGANIC.cream, color: ORGANIC.olive }}>
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-lg">새로운 대화</h3>
-                      <p className="text-sm text-stone-400">에이전트에게 업무 지시하기</p>
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => navigate('/workflows')}
-                    className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all text-left flex items-start space-x-4"
-                  >
-                    <div className="p-3 rounded-xl" style={{ backgroundColor: ORGANIC.cream, color: ORGANIC.olive }}>
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-lg">워크플로우 생성</h3>
-                      <p className="text-sm text-stone-400">자동화된 작업 설계</p>
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => navigate('/reports')}
-                    className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all text-left flex items-start space-x-4"
-                  >
-                    <div className="p-3 rounded-xl" style={{ backgroundColor: ORGANIC.cream, color: ORGANIC.olive }}>
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-lg">주간 분석</h3>
-                      <p className="text-sm text-stone-400">에이전트 성과 보고서 확인</p>
-                    </div>
-                  </button>
-                </div>
-
-                {/* Main Grid: Agent Status + Notifications */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  {summary && <AgentStatusGrid data={summary} />}
-                  {summary && <NotificationsPanel data={summary} />}
-                </div>
-              </>
-            )}
+    <div data-testid="dashboard-page" className="bg-[#faf8f5] min-h-screen font-sans text-[#1a1a1a] antialiased">
+      <div className="p-8 max-w-[1440px] mx-auto space-y-10">
+        {/* SECTION 1: PAGE HEADER */}
+        <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-1">
+            <h1 className="text-4xl font-black tracking-tighter text-[#283618]">Analytics Overview</h1>
+            <p className="text-[#6b705c] font-medium">Real-time performance metrics and resource allocation.</p>
           </div>
+          <div className="inline-flex p-1 bg-[#f5f3f0] rounded-xl">
+            {usageDayOptions.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setUsageDays(opt.value)}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+                  usageDays === opt.value
+                    ? 'bg-[#e5e1d3] text-[#1a1a1a] shadow-sm font-semibold'
+                    : 'text-[#6b705c] hover:text-[#1a1a1a]'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </header>
+
+        {isLoading && !summary ? (
+          <DashboardSkeleton />
+        ) : summaryError && !summary ? (
+          <div className="flex flex-col items-center justify-center py-24">
+            <p className="text-base font-medium text-[#6b705c]">Failed to load data</p>
+            <p className="text-sm text-[#756e5a] mt-1">Retrying automatically...</p>
+          </div>
+        ) : summary ? (
+          <>
+            {/* SECTION 2: KPI CARDS ROW */}
+            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+              <KpiCard
+                label="Total Agents"
+                value={String(summary.agents.total)}
+                icon={<Bot className="w-5 h-5" />}
+                trend={summary.agents.active > 0 ? 'up' : 'neutral'}
+                trendLabel={`${summary.agents.active} active`}
+              />
+              <KpiCard
+                label="Active Tasks"
+                value={String(summary.tasks.inProgress)}
+                icon={<Zap className="w-5 h-5" />}
+                trend={summary.tasks.inProgress > 0 ? 'up' : 'neutral'}
+                trendLabel={`${summary.tasks.total} total`}
+              />
+              <KpiCard
+                label="Completion Rate"
+                value={`${completionRate}%`}
+                icon={<CheckCircle className="w-5 h-5" />}
+                trend={Number(completionRate) >= 90 ? 'up' : 'down'}
+                trendLabel={`${summary.tasks.completed} done`}
+              />
+              <KpiCard
+                label="Today's Cost"
+                value={`$${todayCost.toFixed(2)}`}
+                icon={<DollarSign className="w-5 h-5" />}
+              />
+              <KpiCard
+                label="Budget Used"
+                value={`${budgetPercent.toFixed(0)}%`}
+                icon={<Timer className="w-5 h-5" />}
+                trend={budgetPercent > 80 ? 'down' : 'up'}
+                trendLabel={budgetPercent > 80 ? 'Near limit' : 'On track'}
+              />
+              <KpiCard
+                label="Error Agents"
+                value={String(summary.agents.error)}
+                icon={<Database className="w-5 h-5" />}
+                trend={summary.agents.error > 0 ? 'down' : 'up'}
+                trendLabel={summary.agents.error > 0 ? 'Needs attention' : 'All clear'}
+              />
+            </section>
+
+            {/* SECTION 3 & 4: COST CHART & DEPT LOAD */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              <CostTrendChart usage={usage} budget={budget} />
+              <DeptLoadChart budget={budget} />
+            </div>
+
+            {/* SECTION 5 & 6: DONUT & TABLE */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              <TaskStatusDonut summary={summary} />
+              <RecentTasksTable summary={summary} />
+            </div>
+
+            {/* SECTION 7: QUICK ACTIONS */}
+            <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <button
+                onClick={() => navigate('/command-center')}
+                className="bg-white p-6 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)] border border-[#e5e1d3]/10 hover:bg-[#f5f3f0] transition-all text-left flex items-start gap-4 group"
+              >
+                <div className="p-3 rounded-xl bg-[#606C38]/10 text-[#606C38]">
+                  <MessageSquare className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg text-[#1a1a1a] group-hover:text-[#283618]">New Conversation</h3>
+                  <p className="text-sm text-[#6b705c]">Give agents a new task</p>
+                </div>
+              </button>
+              <button
+                onClick={() => navigate('/workflows')}
+                className="bg-white p-6 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)] border border-[#e5e1d3]/10 hover:bg-[#f5f3f0] transition-all text-left flex items-start gap-4 group"
+              >
+                <div className="p-3 rounded-xl bg-[#606C38]/10 text-[#606C38]">
+                  <Workflow className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg text-[#1a1a1a] group-hover:text-[#283618]">Create Workflow</h3>
+                  <p className="text-sm text-[#6b705c]">Design automated tasks</p>
+                </div>
+              </button>
+              <button
+                onClick={() => navigate('/reports')}
+                className="bg-white p-6 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)] border border-[#e5e1d3]/10 hover:bg-[#f5f3f0] transition-all text-left flex items-start gap-4 group"
+              >
+                <div className="p-3 rounded-xl bg-[#606C38]/10 text-[#606C38]">
+                  <BarChart3 className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg text-[#1a1a1a] group-hover:text-[#283618]">Weekly Report</h3>
+                  <p className="text-sm text-[#6b705c]">View agent performance</p>
+                </div>
+              </button>
+            </section>
+          </>
+        ) : null}
+      </div>
     </div>
   )
 }
