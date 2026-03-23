@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fef9f1;
+            color: #1d1c17;
+        }
+        .mono {
+            font-family: 'JetBrains+Mono', monospace;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar for the Digital Atelier aesthetic */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f8f3eb;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c7c8b9;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "surface-container-lowest": "#ffffff",
+                "background": "#fef9f1",
+                "primary-container": "#5c6c49",
+                "primary": "#455433",
+                "secondary": "#586330",
+                "on-surface": "#1d1c17",
+                "surface-bright": "#fef9f1",
+                "surface-container-low": "#f8f3eb",
+                "surface-variant": "#e7e2da",
+                "on-primary": "#ffffff",
+                "outline": "#77786b",
+                "outline-variant": "#c7c8b9",
+                "surface-container-highest": "#e7e2da",
+                "surface-container-high": "#ece8e0",
+                "surface-container": "#f2ede5",
+                "error": "#ba1a1a",
+                "accent": "#606C38",
+                "handoff": "#7c3aed"
+              },
+              fontFamily: {
+                "headline": ["Inter"],
+                "body": ["Inter"],
+                "label": ["Inter"],
+                "mono": ["JetBrains Mono"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+            },
+          },
+        }
+      </script>
+</head>
+<body class="antialiased">
+<!-- Main Content Wrapper -->
+<div class="p-8 max-w-[1440px] mx-auto min-h-screen flex flex-col">
+<!-- HEADER SECTION -->
+<header class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<h1 class="text-4xl font-extrabold tracking-tighter text-primary uppercase">Notification Center</h1>
+<p class="text-on-surface/60 mt-2 font-medium">CORTHEX v3 Sovereign Sage System Alerts</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 text-primary font-mono text-xs uppercase tracking-widest hover:bg-surface-container-high transition-colors rounded-lg">
+<span class="material-symbols-outlined text-base">done_all</span>
+                    Mark all read
+                </button>
+</div>
+</header>
+<!-- FILTER BAR -->
+<nav class="mb-8 flex flex-wrap items-center justify-between gap-4 py-2">
+<div class="flex flex-wrap items-center gap-2">
+<button class="bg-accent text-white rounded-full px-5 py-1.5 text-xs font-semibold tracking-wide shadow-sm">All</button>
+<button class="bg-surface-container-high text-secondary hover:bg-surface-container-highest transition-colors rounded-full px-5 py-1.5 text-xs font-semibold tracking-wide">Unread</button>
+<button class="bg-surface-container-high text-secondary hover:bg-surface-container-highest transition-colors rounded-full px-5 py-1.5 text-xs font-semibold tracking-wide">Handoffs</button>
+<button class="bg-surface-container-high text-secondary hover:bg-surface-container-highest transition-colors rounded-full px-5 py-1.5 text-xs font-semibold tracking-wide">Budget</button>
+<button class="bg-surface-container-high text-secondary hover:bg-surface-container-highest transition-colors rounded-full px-5 py-1.5 text-xs font-semibold tracking-wide">Tasks</button>
+<button class="bg-surface-container-high text-secondary hover:bg-surface-container-highest transition-colors rounded-full px-5 py-1.5 text-xs font-semibold tracking-wide">System</button>
+</div>
+<div class="flex items-center gap-2 text-on-surface/40 px-3 py-1 bg-surface-container-low rounded-lg outline-variant/20 outline outline-1">
+<span class="material-symbols-outlined text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-xs font-mono w-48 p-0 placeholder:text-on-surface/30" placeholder="Filter alerts..." type="text"/>
+</div>
+</nav>
+<!-- MASTER-DETAIL LAYOUT -->
+<main class="flex-1 flex flex-col lg:flex-row gap-0 bg-surface-container-low rounded-2xl overflow-hidden shadow-2xl shadow-primary/5 ring-1 ring-outline-variant/10">
+<!-- LIST PANEL (LEFT) -->
+<section class="lg:w-[60%] flex flex-col border-r border-outline-variant/30">
+<div class="p-4 bg-surface-container text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface/50 flex justify-between">
+<span>Active Stream</span>
+<span>12 Records Found</span>
+</div>
+<div class="flex-1 overflow-y-auto max-h-[700px]">
+<!-- Notification Item: Handoff (Unread/Selected) -->
+<div class="group relative flex items-start gap-4 p-5 bg-surface-container-highest transition-all border-l-4 border-handoff cursor-pointer">
+<div class="flex-shrink-0 mt-1 w-10 h-10 rounded-xl bg-handoff/10 text-handoff flex items-center justify-center">
+<span class="material-symbols-outlined">swap_horiz</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-bold text-sm text-on-surface">핸드오프 요청: 법무팀 → 전략부</h3>
+<span class="mono text-[10px] text-on-surface/40">14:22:05</span>
+</div>
+<p class="text-xs text-on-surface/70 line-clamp-1 mb-2">Project Aegis에 대한 최종 법률 검토가 완료되었습니다. 전략 부서의 최종 승인이 필요합니다.</p>
+<div class="flex items-center gap-3">
+<span class="mono text-[10px] px-2 py-0.5 bg-handoff text-white rounded">HANDOFF</span>
+<span class="w-2 h-2 rounded-full bg-handoff animate-pulse"></span>
+</div>
+</div>
+</div>
+<!-- Notification Item: Success -->
+<div class="group flex items-start gap-4 p-5 hover:bg-surface-container-high transition-all border-l-4 border-transparent cursor-pointer">
+<div class="flex-shrink-0 mt-1 w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined">check_circle</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-bold text-sm text-on-surface">에이전트 시그마-01 작업 완료</h3>
+<span class="mono text-[10px] text-on-surface/40">13:45:12</span>
+</div>
+<p class="text-xs text-on-surface/60 line-clamp-1">데이터 클러스터 7번 항목에 대한 무결성 검증이 성공적으로 완료되었습니다.</p>
+</div>
+</div>
+<!-- Notification Item: Warning -->
+<div class="group flex items-start gap-4 p-5 bg-surface-container-low/50 hover:bg-surface-container-high transition-all border-l-4 border-transparent border-b border-outline-variant/10 cursor-pointer">
+<div class="flex-shrink-0 mt-1 w-10 h-10 rounded-xl bg-orange-100 text-orange-700 flex items-center justify-center">
+<span class="material-symbols-outlined">warning</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-bold text-sm text-on-surface">월간 예산 85% 도달</h3>
+<span class="mono text-[10px] text-on-surface/40">12:10:00</span>
+</div>
+<p class="text-xs text-on-surface/60 line-clamp-1">Q3 인프라 운영 예산이 임계치에 도달했습니다. 추가 리소스 할당이 제한될 수 있습니다.</p>
+</div>
+</div>
+<!-- Notification Item: Error -->
+<div class="group flex items-start gap-4 p-5 bg-red-50/30 hover:bg-red-50/50 transition-all border-l-4 border-error cursor-pointer">
+<div class="flex-shrink-0 mt-1 w-10 h-10 rounded-xl bg-error/10 text-error flex items-center justify-center">
+<span class="material-symbols-outlined">gpp_maybe</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-1 text-error">
+<h3 class="font-bold text-sm">보안 경고: 미인가 접근 시도</h3>
+<span class="mono text-[10px]">11:05:22</span>
+</div>
+<p class="text-xs text-error/80 line-clamp-1">IP 192.168.1.105에서 시스템 코어에 대한 무차별 대입 공격이 감지되었습니다.</p>
+</div>
+</div>
+<!-- Notification Item: Info -->
+<div class="group flex items-start gap-4 p-5 hover:bg-surface-container-high transition-all border-l-4 border-transparent border-b border-outline-variant/10 cursor-pointer">
+<div class="flex-shrink-0 mt-1 w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center">
+<span class="material-symbols-outlined">info</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-bold text-sm text-on-surface">System Maintenance Schedule</h3>
+<span class="mono text-[10px] text-on-surface/40">09:30:00</span>
+</div>
+<p class="text-xs text-on-surface/60 line-clamp-1">이번 주 토요일 새벽 2시부터 4시까지 정기 시스템 점검이 예정되어 있습니다.</p>
+</div>
+</div>
+<!-- Additional Rows for Density -->
+<div class="group flex items-start gap-4 p-5 hover:bg-surface-container-high transition-all border-l-4 border-transparent border-b border-outline-variant/10 cursor-pointer opacity-80">
+<div class="flex-shrink-0 mt-1 w-10 h-10 rounded-xl bg-surface-variant text-on-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined">article</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-bold text-sm text-on-surface">New Report Available</h3>
+<span class="mono text-[10px] text-on-surface/40">어제 18:45</span>
+</div>
+<p class="text-xs text-on-surface/60 line-clamp-1">8월 기술 자산 분석 보고서가 생성되었습니다.</p>
+</div>
+</div>
+<div class="group flex items-start gap-4 p-5 hover:bg-surface-container-high transition-all border-l-4 border-transparent border-b border-outline-variant/10 cursor-pointer opacity-80">
+<div class="flex-shrink-0 mt-1 w-10 h-10 rounded-xl bg-surface-variant text-on-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined">settings</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-bold text-sm text-on-surface">시스템 업데이트 완료</h3>
+<span class="mono text-[10px] text-on-surface/40">어제 15:20</span>
+</div>
+<p class="text-xs text-on-surface/60 line-clamp-1">v3.2.1 패치가 성공적으로 적용되었습니다. 서버를 재부팅할 필요는 없습니다.</p>
+</div>
+</div>
+<div class="group flex items-start gap-4 p-5 hover:bg-surface-container-high transition-all border-l-4 border-transparent border-b border-outline-variant/10 cursor-pointer opacity-80">
+<div class="flex-shrink-0 mt-1 w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined">task_alt</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-bold text-sm text-on-surface">주간 백업 성공</h3>
+<span class="mono text-[10px] text-on-surface/40">어제 04:00</span>
+</div>
+<p class="text-xs text-on-surface/60 line-clamp-1">전체 데이터베이스 백업이 오프사이트 스토리지로 전송되었습니다.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- DETAIL PANEL (RIGHT) -->
+<section class="lg:w-[40%] flex flex-col bg-surface-container-low/30 backdrop-blur-sm">
+<div class="p-4 bg-surface-container text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface/50">
+                    Inspection Detail
+                </div>
+<div class="p-8 flex-1 overflow-y-auto">
+<!-- Detail Header -->
+<div class="mb-8">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-handoff/10 text-handoff rounded-full mb-4">
+<span class="material-symbols-outlined text-sm">swap_horiz</span>
+<span class="mono text-[10px] font-bold tracking-widest uppercase">Request #HF-2024-0812</span>
+</div>
+<h2 class="text-2xl font-bold tracking-tight text-on-surface mb-2">핸드오프 요청: 법무팀 → 전략부</h2>
+<div class="flex items-center gap-4 text-xs font-mono text-on-surface/50">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> 14:22:05</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">priority_high</span> High Priority</span>
+</div>
+</div>
+<!-- Detail Content -->
+<div class="space-y-8">
+<div>
+<h4 class="mono text-[10px] uppercase tracking-widest text-on-surface/40 mb-3">Message Content</h4>
+<div class="p-4 bg-surface-container-high rounded-xl border-l-2 border-handoff">
+<p class="text-sm leading-relaxed text-on-surface/80">
+                                    Project Aegis의 최종 법률 검토 단계가 종료되었습니다. 법무팀 에이전트 L-09가 모든 리스크 평가를 마쳤으며, 이제 전략 부서의 최종 사업 타당성 승인 단계로 이관이 필요합니다. 
+                                    <br/><br/>
+                                    첨부된 검토 결과 보고서에는 규제 준수 여부 및 특허 포트폴리오 분석 데이터가 포함되어 있습니다.
+                                </p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="p-4 bg-surface-container rounded-xl">
+<h4 class="mono text-[10px] uppercase tracking-widest text-on-surface/40 mb-2">Sender</h4>
+<p class="text-sm font-bold">에이전트 L-09</p>
+<p class="text-[10px] mono text-on-surface/50">Legal Department</p>
+</div>
+<div class="p-4 bg-surface-container rounded-xl">
+<h4 class="mono text-[10px] uppercase tracking-widest text-on-surface/40 mb-2">Target</h4>
+<p class="text-sm font-bold">전략기획부</p>
+<p class="text-[10px] mono text-on-surface/50">Strategy Division</p>
+</div>
+</div>
+<div class="pt-6">
+<h4 class="mono text-[10px] uppercase tracking-widest text-on-surface/40 mb-4">Available Actions</h4>
+<div class="flex flex-col gap-3">
+<button class="w-full py-4 bg-primary text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-primary-container transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined">verified</span>
+                                    승인 (Approve Handoff)
+                                </button>
+<button class="w-full py-4 bg-surface-container-highest text-on-surface font-bold rounded-xl border border-outline-variant/30 flex items-center justify-center gap-2 hover:bg-surface-container-high transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined">block</span>
+                                    거부 (Reject)
+                                </button>
+</div>
+</div>
+</div>
+</div>
+<div class="p-6 bg-surface-container-high/50 border-t border-outline-variant/10">
+<button class="flex items-center gap-2 text-xs font-mono text-on-surface/40 hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-sm">history</span>
+                        View Event History Logs
+                    </button>
+</div>
+</section>
+</main>
+<!-- FOOTER STATUS -->
+<footer class="mt-8 flex justify-between items-center px-2">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="mono text-[10px] text-on-surface/40 uppercase tracking-widest">System Online</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="mono text-[10px] text-on-surface/40 uppercase tracking-widest">Lat: 22ms</span>
+</div>
+</div>
+<div class="mono text-[10px] text-on-surface/30">
+                CORTHEX NODE-SG-01 // ASYNC_QUEUE_ACTIVE
+            </div>
+</footer>
+</div>
+</body></html>
