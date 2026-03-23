@@ -1,5 +1,5 @@
 /**
- * SNS Page - Natural Organic Theme
+ * SNS Page - Sovereign Sage Theme (Phase 7-1 Rebuild)
  *
  * API Endpoints:
  *   GET  /workspace/sns-accounts       - Fetch linked SNS accounts
@@ -11,7 +11,7 @@ import { useCallback } from 'react'
 import { toast } from '@corthex/ui'
 import { useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
-import { Plus, Filter, Camera, Briefcase, Heart, MessageCircle, Share2, MoreHorizontal, Sparkles, LayoutGrid, Calendar, Clock, CheckCircle, Link, PlusCircle, FileText, AtSign, Play } from 'lucide-react'
+import { Plus, Image, Paperclip, BarChart2, MoreHorizontal, ThumbsUp, Heart, MessageCircle, Download, Bot } from 'lucide-react'
 import { api } from '../lib/api'
 import { ContentTab } from '../components/sns/content-tab'
 import { QueueTab } from '../components/sns/queue-tab'
@@ -28,6 +28,8 @@ const TAB_ITEMS = [
   { value: 'accounts', label: 'Linked Accounts' },
 ]
 
+const FILTER_CHIPS = ['전체 All', '공지 Notice', '업데이트 Update', '토론 Discussion', '성과 Achievement']
+
 // Stats summary for mobile bottom card
 function MobileStatsSummary() {
   const { data: statsData } = useQuery({
@@ -41,21 +43,21 @@ function MobileStatsSummary() {
   const publishedCount = stats.byStatus.find((s) => s.status === 'published')?.count ?? 0
 
   return (
-    <div className="sm:hidden fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-stone-100 via-stone-100 to-transparent pt-12 z-10 pointer-events-none">
-      <div className="bg-white rounded-xl shadow-lg border border-stone-200 p-4 pointer-events-auto">
-        <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-3">This Week</h3>
-        <div className="flex justify-between items-center divide-x divide-stone-200">
+    <div className="sm:hidden fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#f5f0e8] via-[#f5f0e8] to-transparent pt-12 z-10 pointer-events-none">
+      <div className="bg-white rounded-xl shadow-lg border border-[#e5e1d3] p-4 pointer-events-auto">
+        <h3 className="text-xs font-semibold text-[#908a78] uppercase tracking-wider mb-3">This Week</h3>
+        <div className="flex justify-between items-center divide-x divide-[#e5e1d3]">
           <div className="flex flex-col items-center flex-1">
-            <span className="text-2xl font-semibold text-stone-800 font-mono tabular-nums">{publishedCount}</span>
-            <span className="text-[10px] text-stone-400 mt-1">Published</span>
+            <span className="text-2xl font-semibold text-[#1a1a1a] font-mono tabular-nums">{publishedCount}</span>
+            <span className="text-[10px] text-[#908a78] mt-1">Published</span>
           </div>
           <div className="flex flex-col items-center flex-1">
-            <span className="text-2xl font-semibold font-mono tabular-nums" style={{ color: '#5a7247' }}>{stats.total}</span>
-            <span className="text-[10px] text-stone-400 mt-1">Total Content</span>
+            <span className="text-2xl font-semibold font-mono tabular-nums text-[#606C38]">{stats.total}</span>
+            <span className="text-[10px] text-[#908a78] mt-1">Total Content</span>
           </div>
           <div className="flex flex-col items-center flex-1">
-            <span className="text-2xl font-semibold text-stone-800 font-mono tabular-nums">{stats.byPlatform.length}</span>
-            <span className="text-[10px] text-stone-400 mt-1">Platforms</span>
+            <span className="text-2xl font-semibold text-[#1a1a1a] font-mono tabular-nums">{stats.byPlatform.length}</span>
+            <span className="text-[10px] text-[#908a78] mt-1">Platforms</span>
           </div>
         </div>
       </div>
@@ -63,9 +65,90 @@ function MobileStatsSummary() {
   )
 }
 
+// Demo post data matching Stitch design
+const DEMO_POSTS = [
+  {
+    id: 'p1',
+    author: 'Suho Kim',
+    badge: 'Strategy Team',
+    badgeBg: '#283618',
+    badgeText: 'white',
+    timeAgo: '2시간 전 - Public',
+    content: 'Q1 시장 분석 보고서가 완성되었습니다. 경쟁사 대비 성장률 12% 달성! 자세한 내용은 리포트를 확인해주세요.',
+    file: { name: 'Q1_시장분석.pdf', size: '2.4 MB', type: 'Document' },
+    reactions: [
+      { emoji: '\u{1F44D}', count: 12 },
+      { emoji: '\u{2764}\u{FE0F}', count: 5 },
+      { emoji: '\u{1F44F}', count: 8 },
+    ],
+    isSystem: false,
+  },
+  {
+    id: 'p2',
+    author: 'System Bot',
+    badge: '공지',
+    badgeBg: '#2563eb',
+    badgeText: 'white',
+    timeAgo: '4시간 전 - Auto-generated',
+    content: '시스템 업데이트 v3.2가 적용되었습니다. 주요 변경사항: 에이전트 성능 최적화, 비용 절감 알고리즘 개선, 보안 패치 적용',
+    tags: ['#시스템업데이트', '#v3.2'],
+    reactions: [{ emoji: '\u{1F44D}', count: 24 }],
+    isSystem: true,
+  },
+  {
+    id: 'p3',
+    author: 'Da-eun Lee',
+    badge: 'Analysis Team',
+    badgeBg: '#606C38',
+    badgeText: 'white',
+    timeAgo: '6시간 전',
+    content: '새로운 데이터 파이프라인 구축 완료! 처리 속도가 기존 대비 40% 향상되었습니다. 팀원들의 노력에 감사드립니다.',
+    reactions: [
+      { emoji: '\u{1F44F}', count: 15 },
+      { emoji: '\u{1F525}', count: 8 },
+      { emoji: '\u{2764}\u{FE0F}', count: 6 },
+    ],
+    isSystem: false,
+  },
+  {
+    id: 'p4',
+    author: 'Han Ye-jin',
+    badge: 'Security Team',
+    badgeBg: '#283618',
+    badgeText: 'white',
+    timeAgo: '어제',
+    content: '보안 감사 결과: 전체 시스템 보안 등급 A+ 달성. 취약점 0건. 다음 분기 감사 일정은 추후 공지하겠습니다.',
+    securityBanner: { title: '보안 등급 A+ 획득', sub: 'Security Audit Result' },
+    reactions: [
+      { emoji: '\u{1F44D}', count: 18 },
+      { emoji: '\u{1F6E1}\u{FE0F}', count: 7 },
+    ],
+    isSystem: false,
+  },
+  {
+    id: 'p5',
+    author: 'Song Hyun-woo',
+    badge: 'Finance Team',
+    badgeBg: '#606C38',
+    badgeText: 'white',
+    timeAgo: '2일 전',
+    content: '3월 비용 보고서 요약: 총 비용 $4,287.50 (전월 대비 -12.3%). 예산 절감 목표 초과 달성했습니다!',
+    stats: [
+      { label: 'Monthly Cost', value: '$4,287.50', color: '#283618' },
+      { label: 'MoM Growth', value: '-12.3%', color: '#4d7c0f' },
+    ],
+    reactions: [
+      { emoji: '\u{1F44D}', count: 20 },
+      { emoji: '\u{1F4CA}', count: 5 },
+    ],
+    isSystem: false,
+  },
+]
+
 export function SnsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const tab = searchParams.get('tab') || 'content'
+  const [activeFilter, setActiveFilter] = [FILTER_CHIPS[0], (_v: string) => {}] // Static for demo
 
   const setTab = useCallback((t: string) => {
     setSearchParams({ tab: t }, { replace: true })
@@ -86,215 +169,203 @@ export function SnsPage() {
 
   return (
     <div data-testid="sns-page" className="min-h-screen" style={{ backgroundColor: '#faf8f5' }}>
-        {/* Content Area */}
-        <div className="p-8 max-w-7xl mx-auto w-full">
-          {/* Page Header & Action */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
-            <div>
-              <h1 className="text-4xl font-bold text-stone-800 mb-2">Organic Content Pipeline</h1>
-              <p className="text-stone-500 max-w-lg">Orchestrate your social presence with AI-assisted generation and automated scheduling for natural brand growth.</p>
+      <div className="p-8 max-w-[1440px] mx-auto">
+        {/* Header */}
+        <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <h1 className="text-4xl font-bold tracking-tight text-[#1a1a1a] mb-2">
+              소셜 피드 <span className="text-[#6b705c] font-medium">Social Feed</span>
+            </h1>
+            <p className="text-[#6b705c] text-lg">팀 소식과 업데이트를 공유합니다</p>
+          </div>
+          {/* Filter Chips */}
+          <div className="flex flex-wrap gap-2">
+            {FILTER_CHIPS.map((chip, i) => (
+              <button
+                key={chip}
+                className={`rounded-full px-5 py-2.5 font-semibold transition-all text-sm ${
+                  i === 0
+                    ? 'bg-[#606C38] text-white shadow-sm'
+                    : 'border border-[#e5e1d3] text-[#6b705c] bg-white hover:bg-[#f5f0e8]'
+                }`}
+              >
+                {chip}
+              </button>
+            ))}
+          </div>
+        </header>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          {/* Left Sidebar */}
+          <div className="hidden lg:block lg:col-span-3">
+            <div className="sticky top-8 space-y-8">
+              <div className="bg-[#f5f0e8] p-8 rounded-xl border border-[#e5e1d3]/50">
+                <h3 className="text-sm font-mono uppercase tracking-widest text-[#756e5a] mb-4">Current Status</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-[#4d7c0f]" />
+                    <span className="text-sm text-[#6b705c]">System Operational</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-mono text-[#756e5a]">LATENCY:</span>
+                    <span className="text-xs font-mono text-[#606C38]">24ms</span>
+                  </div>
+                </div>
+              </div>
+              <div className="px-4">
+                <h4 className="text-xs font-bold uppercase text-[#756e5a] mb-4">Trending Tags</h4>
+                <div className="flex flex-wrap gap-2">
+                  {['#Q1Growth', '#SecurityPlus', '#Efficiency'].map((tag) => (
+                    <span key={tag} className="text-sm text-[#606C38] hover:underline cursor-pointer">{tag}</span>
+                  ))}
+                </div>
+              </div>
             </div>
-            <button onClick={() => toast.info('이 기능은 준비 중입니다')} className="flex items-center gap-2 text-white px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-all shadow-md" style={{ backgroundColor: '#6b705c' }}>
-              <Sparkles className="w-5 h-5" />
-              Generate New Content
-            </button>
           </div>
 
-          {/* Tabs Navigation */}
-          <div className="border-b border-stone-200 mb-8 overflow-x-auto">
-            <div className="flex gap-8">
-              {TAB_ITEMS.map((item) => (
+          {/* Main Feed */}
+          <div className="lg:col-span-9 xl:col-span-8">
+            {/* Post Composer */}
+            <div className="bg-[#f5f0e8] rounded-xl p-6 mb-12 shadow-sm border border-[#e5e1d3] transition-all focus-within:ring-2 ring-[#606C38]/20">
+              <div className="flex gap-4 mb-4">
+                <div className="w-12 h-12 rounded-full bg-[#283618] text-white flex items-center justify-center font-bold shrink-0">You</div>
+                <textarea
+                  className="w-full bg-transparent border-none focus:ring-0 text-[#1a1a1a] placeholder-[#756e5a] resize-none pt-2 text-lg"
+                  placeholder="새 소식을 공유하세요... Share an update"
+                  rows={2}
+                />
+              </div>
+              <div className="flex items-center justify-between pt-4 border-t border-[#e5e1d3]">
+                <div className="flex gap-2">
+                  <button className="p-2 text-[#6b705c] hover:bg-[#f0ebe0] rounded-lg transition-colors flex items-center gap-1">
+                    <Image className="w-5 h-5" />
+                    <span className="text-xs font-semibold">Image</span>
+                  </button>
+                  <button className="p-2 text-[#6b705c] hover:bg-[#f0ebe0] rounded-lg transition-colors flex items-center gap-1">
+                    <Paperclip className="w-5 h-5" />
+                    <span className="text-xs font-semibold">File</span>
+                  </button>
+                  <button className="p-2 text-[#6b705c] hover:bg-[#f0ebe0] rounded-lg transition-colors flex items-center gap-1">
+                    <BarChart2 className="w-5 h-5" />
+                    <span className="text-xs font-semibold">Poll</span>
+                  </button>
+                </div>
                 <button
-                  key={item.value}
-                  data-testid={`sns-tab-${item.value}`}
-                  onClick={() => setTab(item.value)}
-                  className={`pb-4 border-b-2 font-medium text-sm whitespace-nowrap transition-colors ${
-                    tab === item.value
-                      ? 'font-bold'
-                      : 'border-transparent text-stone-400 hover:text-stone-600'
-                  }`}
-                  style={tab === item.value ? { borderColor: '#6b705c', color: '#6b705c' } : {}}
+                  onClick={() => toast.info('이 기능은 준비 중입니다')}
+                  className="bg-[#4d7c0f] hover:opacity-90 text-white px-8 py-2.5 rounded-lg font-bold shadow-md transition-all active:scale-95"
                 >
-                  {item.label}
+                  게시 Post
                 </button>
+              </div>
+            </div>
+
+            {/* Feed Posts */}
+            <div className="space-y-8">
+              {DEMO_POSTS.map((post) => (
+                <article
+                  key={post.id}
+                  className={`rounded-xl p-8 shadow-sm border transition-shadow hover:shadow-md ${
+                    post.isSystem
+                      ? 'bg-[#f0ebe0] border-l-4 border-l-[#2563eb] border-y border-r border-[#e5e1d3]'
+                      : 'bg-[#f5f0e8] border-[#e5e1d3]'
+                  }`}
+                >
+                  {/* Author Header */}
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="flex gap-4">
+                      {post.isSystem ? (
+                        <div className="w-12 h-12 rounded-full bg-[#283618] flex items-center justify-center">
+                          <Bot className="w-6 h-6 text-white" />
+                        </div>
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-[#606C38] text-white flex items-center justify-center font-bold text-lg">
+                          {post.author.charAt(0)}
+                        </div>
+                      )}
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-bold text-[#1a1a1a]">{post.author}</h3>
+                          <span
+                            className="px-2 py-0.5 text-[10px] uppercase tracking-wider rounded-full font-bold"
+                            style={{ backgroundColor: post.badgeBg, color: post.badgeText }}
+                          >
+                            {post.badge}
+                          </span>
+                        </div>
+                        <p className="text-xs font-mono text-[#756e5a] mt-0.5">{post.timeAgo}</p>
+                      </div>
+                    </div>
+                    {!post.isSystem && (
+                      <button className="text-[#756e5a] hover:bg-[#f0ebe0] rounded-full p-1">
+                        <MoreHorizontal className="w-5 h-5" />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  <div className="mb-6">
+                    {post.securityBanner && (
+                      <div className="bg-[#283618] text-white p-4 rounded-lg mb-4 flex items-center gap-4">
+                        <div className="text-3xl">{'\u{1F6E1}\u{FE0F}'}</div>
+                        <div>
+                          <p className="font-bold">{post.securityBanner.title}</p>
+                          <p className="text-xs opacity-80">{post.securityBanner.sub}</p>
+                        </div>
+                      </div>
+                    )}
+                    <p className={`text-[#6b705c] leading-relaxed ${post.isSystem ? 'font-semibold' : 'text-lg'}`}>
+                      {post.content}
+                    </p>
+                    {post.tags && (
+                      <div className="flex gap-2 mt-4">
+                        {post.tags.map((tag) => (
+                          <span key={tag} className="text-xs font-mono py-1 px-2 bg-white/40 rounded border border-[#e5e1d3] text-[#2563eb]">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    {post.file && (
+                      <div className="flex items-center gap-4 p-4 bg-white/50 border border-[#e5e1d3] rounded-lg cursor-pointer hover:bg-white transition-colors mt-4">
+                        <div className="bg-[#dc2626]/10 p-3 rounded-lg">
+                          <span className="text-[#dc2626] text-xl">{'\u{1F4C4}'}</span>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-bold text-[#1a1a1a]">{post.file.name}</p>
+                          <p className="text-xs text-[#756e5a] font-mono">{post.file.size} - {post.file.type}</p>
+                        </div>
+                        <Download className="w-5 h-5 text-[#756e5a]" />
+                      </div>
+                    )}
+                    {post.stats && (
+                      <div className="grid grid-cols-2 gap-4 mt-4">
+                        {post.stats.map((stat) => (
+                          <div key={stat.label} className="bg-white/60 p-5 rounded-xl border border-[#e5e1d3]">
+                            <p className="text-[10px] uppercase tracking-tighter text-[#756e5a] font-bold mb-1">{stat.label}</p>
+                            <p className="text-2xl font-mono font-bold" style={{ color: stat.color }}>{stat.value}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Reactions */}
+                  <div className="flex items-center gap-6 pt-4 border-t border-[#e5e1d3]/60">
+                    {post.reactions.map((r, i) => (
+                      <button key={i} className="flex items-center gap-2 text-sm text-[#6b705c] hover:text-[#606C38] transition-colors">
+                        <span className="text-base">{r.emoji}</span>
+                        <span className="font-mono">{r.count}</span>
+                      </button>
+                    ))}
+                  </div>
+                </article>
               ))}
             </div>
           </div>
-
-          {/* Filters */}
-          {tab === 'content' && (
-            <div className="flex flex-wrap gap-3 mb-8">
-              <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-stone-200 text-sm font-medium">
-                <span className="text-stone-400">Platform:</span>
-                <select className="bg-transparent border-none p-0 focus:ring-0 text-sm font-bold cursor-pointer">
-                  <option>All Platforms</option>
-                  <option>Instagram</option>
-                  <option>Tistory</option>
-                  <option>X / Twitter</option>
-                </select>
-              </div>
-              <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-stone-200 text-sm font-medium">
-                <span className="text-stone-400">Status:</span>
-                <select className="bg-transparent border-none p-0 focus:ring-0 text-sm font-bold cursor-pointer">
-                  <option>Any Status</option>
-                  <option>Draft</option>
-                  <option>Pending</option>
-                  <option>Approved</option>
-                  <option>Scheduled</option>
-                  <option>Published</option>
-                </select>
-              </div>
-              <button className="ml-auto text-sm font-bold flex items-center gap-1 hover:underline" style={{ color: '#6b705c' }}>
-                <LayoutGrid className="w-4 h-4" />
-                Switch to Board
-              </button>
-            </div>
-          )}
-
-          {/* Content Grid (Kanban Style) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {/* Card 1: Pending */}
-            <div className="bg-white rounded-xl border border-stone-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow group">
-              <div className="relative aspect-video">
-                <img className="w-full h-full object-cover" alt="Natural skincare lifestyle photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4dP1_eyfMG1GHe7vkf1KnXuUHG3R-8yRTLceZO6q2ynxamu7GBjTMr9zbs1jTFOs0NT7h6qGD39X8InkeeVYeSkT9ivtkuTwaBPNCdb1w9r6Gn3hknxto4bwtjuy3dgb4q3XJ-XlTJNCYE1iuwfsTzEJiSdFfAJECPD3oZ2vAQ0lwxVrikvzzUQV-fhVLAsvRrcmc-ICbUIUmUnDsLgbaug3_qghyJ8ORvZ1V1JV5xMtyXZrYTicXulJxSxYoLW-PrL_Zs5XQTwww" />
-                <div className="absolute top-3 left-3 flex gap-2">
-                  <span className="bg-white/90 backdrop-blur px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider text-amber-600 border border-amber-200">Pending</span>
-                </div>
-                <div className="absolute top-3 right-3">
-                  <div className="w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-stone-800 shadow-sm">
-                    <Camera className="w-4 h-4" />
-                  </div>
-                </div>
-              </div>
-              <div className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Calendar className="w-3.5 h-3.5" style={{ color: '#6b705c' }} />
-                  <span className="text-xs text-stone-400">Created Oct 24, 2023</span>
-                </div>
-                <h3 className="font-bold text-lg mb-2 leading-tight group-hover:transition-colors" style={{ ['--tw-text-opacity' as string]: 1 }}>10 Tips for Morning Meditation</h3>
-                <p className="text-sm text-stone-500 line-clamp-2 mb-4">Discover how to start your day with mindfulness and natural energy boosters...</p>
-                <div className="flex items-center justify-between pt-4 border-t border-stone-100">
-                  <div className="flex -space-x-2">
-                    <div className="w-6 h-6 rounded-full border-2 border-white bg-pink-100 flex items-center justify-center">
-                      <Camera className="w-2.5 h-2.5" />
-                    </div>
-                    <div className="w-6 h-6 rounded-full border-2 border-white bg-blue-100 flex items-center justify-center">
-                      <FileText className="w-2.5 h-2.5" />
-                    </div>
-                  </div>
-                  <button onClick={() => toast.info('이 기능은 준비 중입니다')} className="text-xs font-bold uppercase tracking-widest transition-colors" style={{ color: '#6b705c' }}>Approve</button>
-                </div>
-              </div>
-            </div>
-
-            {/* Card 2: Approved */}
-            <div className="bg-white rounded-xl border border-stone-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow group">
-              <div className="relative aspect-video">
-                <img className="w-full h-full object-cover" alt="Minimalist wooden workspace background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhSmNPLfVyHa7QkbHgk9SaGchPYyLjMjWucz8LaRS8jFp2RdOdhuxPmD4bAjBgsBuZ_GcVEeTsVeHvIukSv5dPTFHB5HeNIrLrsfgUiUj9EWKqoaGIGIUyoba8K-hfnrHpdgow1uH5dfRw-ymZca5iFZwmlqOOYmBI642v2YmM9VTo3RYoZ3cQHqsIftjM5aQ-mjhuwi4Ru54DpFG9Qsg93GlXUkcwNPzF4Nd5NkMt5uwJOauqFTRi3hECKuYBDQn3knnwEM6NpHJd" />
-                <div className="absolute top-3 left-3 flex gap-2">
-                  <span className="bg-white/90 backdrop-blur px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider text-green-600 border border-green-200">Approved</span>
-                </div>
-                <div className="absolute top-3 right-3">
-                  <div className="w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-stone-800 shadow-sm">
-                    <AtSign className="w-4 h-4" />
-                  </div>
-                </div>
-              </div>
-              <div className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Clock className="w-3.5 h-3.5" style={{ color: '#6b705c' }} />
-                  <span className="text-xs text-stone-400">Ready to Queue</span>
-                </div>
-                <h3 className="font-bold text-lg mb-2 leading-tight">Sustainable Living Trends 2024</h3>
-                <p className="text-sm text-stone-500 line-clamp-2 mb-4">Analyzing the shift towards zero-waste lifestyles and organic home decor...</p>
-                <div className="flex items-center justify-between pt-4 border-t border-stone-100">
-                  <div className="flex -space-x-2">
-                    <div className="w-6 h-6 rounded-full border-2 border-white bg-stone-100 flex items-center justify-center">
-                      <Link className="w-2.5 h-2.5" />
-                    </div>
-                  </div>
-                  <button onClick={() => toast.info('이 기능은 준비 중입니다')} className="text-xs font-bold text-stone-400 hover:text-stone-600 transition-colors uppercase tracking-widest">Edit Draft</button>
-                </div>
-              </div>
-            </div>
-
-            {/* Card 3: Scheduled */}
-            <div className="bg-white rounded-xl border border-stone-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow group">
-              <div className="relative aspect-video">
-                <img className="w-full h-full object-cover" alt="Close up of organic green tea leaves" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1TMmzLL5qzQqCjilktJwJvcf3kYlPdMaY9OFISDVTDajtqg26YLhOWsJeYSoeMCCovhu6cNRRlr1FsOy2SKM6RFTNBoJdLrP5CC5Iecdjjy7VtsI9e0cgqWgqJzC5Spu2Q-cw5ilDTUoXAxinJULd-woeuZYysU1EIVo_E6RFcXoylq8MCdZ3Wyo15FBQYIJixC8JY8isxLDbke3kYA2CAb6CmBdURKPTfSsrT886_pCvHFXMyq-r32dfk0MhTUPlpisk-cW91hru" />
-                <div className="absolute top-3 left-3 flex gap-2">
-                  <span className="bg-white/90 backdrop-blur px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider text-blue-600 border border-blue-200">Scheduled</span>
-                </div>
-                <div className="absolute top-3 right-3 flex flex-col gap-1">
-                  <div className="w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-stone-800 shadow-sm">
-                    <Camera className="w-4 h-4" />
-                  </div>
-                  <div className="w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-stone-800 shadow-sm">
-                    <Play className="w-4 h-4" />
-                  </div>
-                </div>
-              </div>
-              <div className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Calendar className="w-3.5 h-3.5" style={{ color: '#6b705c' }} />
-                  <span className="text-xs text-stone-400">Posting Tomorrow at 9:00 AM</span>
-                </div>
-                <h3 className="font-bold text-lg mb-2 leading-tight">The Ritual of Tea Making</h3>
-                <p className="text-sm text-stone-500 line-clamp-2 mb-4">Explore the meditative process of brewing the perfect cup of organic green tea...</p>
-                <div className="flex items-center justify-between pt-4 border-t border-stone-100">
-                  <div className="flex -space-x-2">
-                    <div className="w-6 h-6 rounded-full border-2 border-white bg-pink-100 flex items-center justify-center">
-                      <Camera className="w-2.5 h-2.5" />
-                    </div>
-                  </div>
-                  <button onClick={() => toast.info('이 기능은 준비 중입니다')} className="text-xs font-bold text-stone-400 hover:text-stone-600 transition-colors uppercase tracking-widest">Reschedule</button>
-                </div>
-              </div>
-            </div>
-
-            {/* Card 4: Published */}
-            <div className="bg-white rounded-xl border border-stone-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow group opacity-75 grayscale hover:grayscale-0 transition-all">
-              <div className="relative aspect-video">
-                <img className="w-full h-full object-cover" alt="Sunlight hitting a stack of linen towels" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkp3tf9lIxAUfqxNGotsqDsOHLZkgPoKhld-fRh5bxylwd9mHIuSsFAzTWoybswxfokmmU2Xc-es5KdYRtUoecvXlz609m_IsO3XkAei4G2sYxGa4z9kvpSsiGr2agojAaID2n9VL7rpCQqNaRc3RlDi2tcTpzl8OYin-DLytdPJ4aOKTqFuwpb1kFjdyA0QI_DF7UabB1oS2S1t6y9OLAh09LcJzCfEy6tHzwqeaPe6O8pt_B8gkG93AsYM3qBwQv5f8BRDAN-h_B" />
-                <div className="absolute top-3 left-3 flex gap-2">
-                  <span className="bg-stone-100/90 backdrop-blur px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider text-stone-600 border border-stone-200">Published</span>
-                </div>
-              </div>
-              <div className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <CheckCircle className="w-3.5 h-3.5" style={{ color: '#6b705c' }} />
-                  <span className="text-xs text-stone-400">Live for 2 days &bull; 1.2k reach</span>
-                </div>
-                <h3 className="font-bold text-lg mb-2 leading-tight">Natural Fabrics for Better Sleep</h3>
-                <p className="text-sm text-stone-500 line-clamp-2 mb-4">Why organic linen and cotton are the keys to a restful night's sleep...</p>
-                <div className="flex items-center justify-between pt-4 border-t border-stone-100">
-                  <div className="flex gap-4">
-                    <div className="flex items-center gap-1">
-                      <Heart className="w-3.5 h-3.5 text-stone-400" />
-                      <span className="text-xs text-stone-400 font-bold">124</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <MessageCircle className="w-3.5 h-3.5 text-stone-400" />
-                      <span className="text-xs text-stone-400 font-bold">18</span>
-                    </div>
-                  </div>
-                  <button onClick={() => toast.info('이 기능은 준비 중입니다')} className="text-xs font-bold uppercase tracking-widest transition-colors" style={{ color: '#6b705c' }}>View Stats</button>
-                </div>
-              </div>
-            </div>
-
-            {/* Create New Empty Card */}
-            <button className="border-2 border-dashed border-stone-200 rounded-xl flex flex-col items-center justify-center p-8 hover:bg-white transition-all group min-h-[320px]" style={{ ['--hover-border' as string]: 'rgba(107,112,92,0.4)' }}>
-              <div className="w-12 h-12 rounded-full bg-stone-100 flex items-center justify-center mb-4 transition-colors" style={{ ['--group-hover-bg' as string]: 'rgba(107,112,92,0.1)' }}>
-                <PlusCircle className="w-5 h-5 text-stone-400 transition-colors" />
-              </div>
-              <span className="font-bold text-stone-500 group-hover:text-stone-800 transition-colors">New Manual Post</span>
-              <span className="text-xs text-stone-400 mt-1">Or use AI Generator above</span>
-            </button>
-          </div>
         </div>
+      </div>
 
-      {/* Mobile Stats Summary -- bottom card */}
+      {/* Mobile Stats Summary */}
       {tab === 'content' && <MobileStatsSummary />}
     </div>
   )

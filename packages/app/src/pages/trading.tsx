@@ -1,5 +1,5 @@
 /**
- * Trading Page - Natural Organic Theme
+ * Trading Page - Sovereign Sage Theme (Phase 7-1 Rebuild)
  *
  * API Endpoints:
  *   (inherits from child components)
@@ -11,233 +11,287 @@
 import { useState } from 'react'
 import { toast } from '@corthex/ui'
 import { useSearchParams } from 'react-router-dom'
-import { Search, ArrowUpRight, Bot, Send, Settings } from 'lucide-react'
+import { BarChart3, Info, TrendingUp, TrendingDown } from 'lucide-react'
 import { StockSidebar } from '../components/strategy/stock-sidebar'
 import { ChartPanel } from '../components/strategy/chart-panel'
 import { ChatPanel } from '../components/strategy/chat-panel'
 import { ComparisonPanel } from '../components/strategy/comparison-panel'
 
+const TIMEFRAMES = ['1분', '5분', '15분', '1시간', '1일', '1주']
+
+const TICKERS = [
+  { symbol: 'BTC/USD', price: '$67,432.50', change: '+2.34%', positive: true },
+  { symbol: 'ETH/USD', price: '$3,847.20', change: '+1.87%', positive: true },
+  { symbol: 'SOL/USD', price: '$178.45', change: '-0.92%', positive: false },
+  { symbol: 'AAPL', price: '$198.75', change: '+0.45%', positive: true },
+  { symbol: 'NVDA', price: '$924.60', change: '+3.21%', positive: true },
+  { symbol: 'TSLA', price: '$175.30', change: '-1.56%', positive: false },
+  { symbol: 'AMZN', price: '$187.92', change: '+0.78%', positive: true },
+  { symbol: 'GOOGL', price: '$156.40', change: '-0.23%', positive: false },
+]
+
+const PORTFOLIO = [
+  { name: 'BTC', pct: 45, color: '#606C38' },
+  { name: 'ETH', pct: 25, color: '#283618' },
+  { name: 'SOL', pct: 10, color: '#6b705c' },
+  { name: '현금 Cash', pct: 20, color: '#908a78' },
+]
+
+const CHART_TYPES = ['캔들 Candle', '라인 Line', '영역 Area']
+const VOLUME_BARS = [30, 45, 25, 60, 80, 40, 55, 90, 70, 35, 50, 20]
+const CANDLE_BARS = [45, 55, 40, 60, 75, 85, 65, 90, 95]
+
 export function TradingPage() {
   const [mobileTab, setMobileTab] = useState<'chart' | 'chat'>('chart')
   const [searchParams] = useSearchParams()
+  const [selectedTimeframe, setSelectedTimeframe] = useState('1시간')
+  const [selectedChartType, setSelectedChartType] = useState('캔들 Candle')
+  const [orderSide, setOrderSide] = useState<'buy' | 'sell'>('buy')
 
   const isCompareMode = searchParams.has('compare')
 
-  const CenterPanel = isCompareMode ? ComparisonPanel : ChartPanel
-
   return (
-    <div data-testid="trading-page" className="h-[calc(100dvh-var(--header-h,56px))] flex flex-col overflow-hidden" style={{ backgroundColor: '#faf8f5' }}>
-      {/* BEGIN: TopHeader */}
-      <header className="h-16 bg-white border-b border-stone-200 flex items-center justify-between px-6 shrink-0 z-20">
-        <div className="flex items-center gap-4">
-          <div className="text-white p-2 rounded-lg" style={{ backgroundColor: '#5a7247' }}>
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path d="M13 10V3L4 14h7v7l9-11h-7z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
-            </svg>
-          </div>
-          <h1 className="text-xl font-bold tracking-tight" style={{ color: '#5a7247' }}>CORTHEX <span className="text-stone-400 font-medium">v2</span></h1>
-          <nav className="ml-8 flex gap-6 text-sm font-medium text-stone-500">
-            <span className="border-b-2 pb-5 pt-5" style={{ color: '#5a7247', borderColor: '#5a7247' }}>Strategy Room</span>
-            <span className="py-5">Portfolio</span>
-            <span className="py-5">Analytics</span>
-          </nav>
-        </div>
-        {/* Trading Mode Toggle */}
-        <div className="flex items-center gap-3">
-          <label className="text-xs font-semibold uppercase tracking-wider text-stone-500" htmlFor="trading-mode">Live Trading</label>
-          <button
-            className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-stone-200"
-            id="trading-mode"
-          >
-            <span className="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-0" id="mode-indicator"></span>
-          </button>
-          <div className="hidden flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold animate-pulse" style={{ backgroundColor: 'rgba(196,98,45,0.1)', color: '#c4622d' }} id="trading-warning">
-            PAPER TRADING ACTIVE
-          </div>
-        </div>
-      </header>
-      {/* END: TopHeader */}
-
-      {/* BEGIN: MainDashboard */}
-      <main className="flex-1 flex overflow-hidden p-4 gap-4">
-        {/* LEFT PANEL: Stock Watchlist */}
-        <section className="w-80 flex flex-col bg-white rounded-2xl shadow-sm border border-stone-100 overflow-hidden" data-purpose="watchlist-panel">
-          <div className="p-4 border-b border-stone-100 flex justify-between items-center">
-            <h2 className="font-bold text-stone-800">Watchlist</h2>
-            <button className="text-stone-400 hover:text-stone-600">
-              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path clipRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" fillRule="evenodd"></path>
-              </svg>
-            </button>
-          </div>
-          <div className="flex-1 overflow-y-auto">
-            {/* Watchlist Items */}
-            <div className="divide-y divide-stone-50">
-              {/* Row 1: NVIDIA */}
-              <div className="p-4 hover:bg-stone-50 cursor-pointer transition-colors flex justify-between items-center border-l-4" style={{ borderLeftColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.05)' }}>
-                <div>
-                  <div className="font-bold">NVDA</div>
-                  <div className="text-xs text-stone-400">NVIDIA Corp.</div>
-                </div>
-                <div className="text-right">
-                  <div className="font-mono font-bold" style={{ color: '#10b981' }}>$894.52</div>
-                  <div className="text-xs font-medium" style={{ color: '#10b981' }}>+2.45%</div>
-                </div>
-              </div>
-              {/* Row 2: APPLE */}
-              <div className="p-4 hover:bg-stone-50 cursor-pointer transition-colors flex justify-between items-center">
-                <div>
-                  <div className="font-bold">AAPL</div>
-                  <div className="text-xs text-stone-400">Apple Inc.</div>
-                </div>
-                <div className="text-right">
-                  <div className="font-mono font-bold" style={{ color: '#ef4444' }}>$172.62</div>
-                  <div className="text-xs font-medium" style={{ color: '#ef4444' }}>-0.82%</div>
-                </div>
-              </div>
-              {/* Row 3: TESLA */}
-              <div className="p-4 hover:bg-stone-50 cursor-pointer transition-colors flex justify-between items-center">
-                <div>
-                  <div className="font-bold">TSLA</div>
-                  <div className="text-xs text-stone-400">Tesla, Inc.</div>
-                </div>
-                <div className="text-right">
-                  <div className="font-mono font-bold" style={{ color: '#ef4444' }}>$163.57</div>
-                  <div className="text-xs font-medium" style={{ color: '#ef4444' }}>-1.24%</div>
-                </div>
-              </div>
-              {/* Row 4: MICROSOFT */}
-              <div className="p-4 hover:bg-stone-50 cursor-pointer transition-colors flex justify-between items-center">
-                <div>
-                  <div className="font-bold">MSFT</div>
-                  <div className="text-xs text-stone-400">Microsoft Corp.</div>
-                </div>
-                <div className="text-right">
-                  <div className="font-mono font-bold" style={{ color: '#10b981' }}>$415.28</div>
-                  <div className="text-xs font-medium" style={{ color: '#10b981' }}>+0.15%</div>
-                </div>
+    <div data-testid="trading-page" className="min-h-screen" style={{ backgroundColor: '#faf8f5' }}>
+      <div className="p-8 max-w-[1440px] mx-auto">
+        {/* Header */}
+        <header className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <h1 className="text-4xl font-extrabold tracking-tighter text-[#1a1a1a]">트레이딩 Trading</h1>
+              <div className="flex items-center gap-2 px-3 py-1 bg-[#f5f0e8] rounded-full">
+                <span className="w-2 h-2 bg-[#4d7c0f] rounded-full animate-pulse" />
+                <span className="text-xs font-medium text-[#6b705c]">시장 개장 Market Open</span>
               </div>
             </div>
+            <p className="text-sm font-mono text-[#756e5a] opacity-70">TERMINAL_STABLE_V3.0.4 // SESSION_ACTIVE</p>
           </div>
-          <div className="p-3 bg-stone-50 text-[10px] text-stone-400 uppercase tracking-widest text-center">
-            Market Status: Open
-          </div>
-        </section>
-
-        {/* MIDDLE PANEL: Chart and Position */}
-        <section className="flex-1 flex flex-col gap-4" data-purpose="chart-panel">
-          {/* Chart Area */}
-          <div className="flex-1 bg-white rounded-2xl shadow-sm border border-stone-100 flex flex-col overflow-hidden">
-            <div className="p-4 border-b border-stone-100 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <span className="text-lg font-bold">NVDA / USD</span>
-                <div className="flex bg-stone-100 rounded-lg p-1 text-xs">
-                  <button onClick={() => toast.info('이 기능은 준비 중입니다')} className="px-2 py-1 bg-white rounded shadow-sm font-bold">1H</button>
-                  <button onClick={() => toast.info('이 기능은 준비 중입니다')} className="px-2 py-1 hover:bg-stone-200 transition-colors">4H</button>
-                  <button onClick={() => toast.info('이 기능은 준비 중입니다')} className="px-2 py-1 hover:bg-stone-200 transition-colors">1D</button>
-                  <button onClick={() => toast.info('이 기능은 준비 중입니다')} className="px-2 py-1 hover:bg-stone-200 transition-colors">1W</button>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <button onClick={() => toast.info('이 기능은 준비 중입니다')} className="px-3 py-1 text-xs font-bold text-white rounded-lg" style={{ backgroundColor: '#10b981' }}>BUY</button>
-                <button onClick={() => toast.info('이 기능은 준비 중입니다')} className="px-3 py-1 text-xs font-bold text-white rounded-lg" style={{ backgroundColor: '#ef4444' }}>SELL</button>
-              </div>
-            </div>
-            {/* Canvas Container for Strategy Chart */}
-            <div className="flex-1 relative bg-white" id="chart-container">
-              <canvas className="w-full h-full" id="strategyChart"></canvas>
-              {/* Overlay Info */}
-              <div className="absolute top-4 left-4 pointer-events-none">
-                <div className="flex gap-4 text-[10px] font-mono text-stone-400">
-                  <span>O: 889.20</span>
-                  <span>H: 898.15</span>
-                  <span>L: 885.30</span>
-                  <span>C: 894.52</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* Position Summary */}
-          <div className="h-48 bg-white rounded-2xl shadow-sm border border-stone-100 p-4 flex flex-col">
-            <h3 className="text-sm font-bold text-stone-500 uppercase tracking-wider mb-3">Active Position: NVDA</h3>
-            <div className="grid grid-cols-4 gap-4 flex-1">
-              <div className="bg-stone-50 rounded-xl p-3 flex flex-col justify-center">
-                <span className="text-[10px] text-stone-400 font-bold uppercase">Size</span>
-                <span className="text-lg font-mono font-bold">120 Shares</span>
-              </div>
-              <div className="bg-stone-50 rounded-xl p-3 flex flex-col justify-center">
-                <span className="text-[10px] text-stone-400 font-bold uppercase">Avg Entry</span>
-                <span className="text-lg font-mono font-bold">$842.10</span>
-              </div>
-              <div className="bg-stone-50 rounded-xl p-3 flex flex-col justify-center">
-                <span className="text-[10px] text-stone-400 font-bold uppercase">Market Value</span>
-                <span className="text-lg font-mono font-bold">$107,342.40</span>
-              </div>
-              <div className="rounded-xl p-3 flex flex-col justify-center" style={{ backgroundColor: 'rgba(16,185,129,0.1)' }}>
-                <span className="text-[10px] font-bold uppercase" style={{ color: '#10b981' }}>Total P&amp;L</span>
-                <span className="text-lg font-mono font-bold" style={{ color: '#10b981' }}>+$6,290.40</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* RIGHT PANEL: Strategy Chat */}
-        <section className="w-96 flex flex-col bg-white rounded-2xl shadow-sm border border-stone-100 overflow-hidden" data-purpose="chat-panel">
-          <div className="p-4 border-b border-stone-100 flex items-center gap-3">
-            <div className="relative">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs" style={{ backgroundColor: '#5a7247' }}>CIO</div>
-              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 border-2 border-white rounded-full" style={{ backgroundColor: '#10b981' }}></div>
-            </div>
-            <div>
-              <h2 className="font-bold text-stone-800 leading-none">Strategy Agent</h2>
-              <span className="text-[10px] text-stone-400 font-medium">Quant Strategy Advisor</span>
-            </div>
-          </div>
-          {/* Chat History */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ backgroundColor: 'rgba(250,248,245,0.3)' }}>
-            {/* Message 1: Human */}
-            <div className="flex flex-col items-end">
-              <div className="text-white p-3 rounded-2xl rounded-tr-none text-sm max-w-[85%]" style={{ backgroundColor: '#5a7247' }}>
-                What is the current technical outlook for NVDA?
-              </div>
-              <span className="text-[10px] text-stone-400 mt-1">10:42 AM</span>
-            </div>
-            {/* Message 2: Agent */}
-            <div className="flex flex-col items-start">
-              <div className="bg-white border border-stone-200 p-3 rounded-2xl rounded-tl-none text-sm max-w-[85%] shadow-sm">
-                Analyzing market data for NVIDIA (NVDA)...
-                {/* Tool Call Block */}
-                <div className="mt-2 bg-stone-50 border border-stone-100 rounded-lg p-2 font-mono text-[11px] text-stone-500">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-stone-400 italic">Executing tool_call: fetch_ta_metrics</span>
-                    <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: '#10b981' }}></span>
-                  </div>
-                  <div>{'{ "symbol": "NVDA", "indicators": ["RSI", "MACD", "EMA200"] }'}</div>
-                </div>
-              </div>
-            </div>
-            {/* Message 3: Agent Response */}
-            <div className="flex flex-col items-start">
-              <div className="bg-white border border-stone-200 p-3 rounded-2xl rounded-tl-none text-sm max-w-[85%] shadow-sm">
-                NVDA is showing strong bullish momentum. RSI is currently at 62 (neutral-high), and price is trading 12% above the 200-day EMA. I recommend maintaining the current long position with a trailing stop at $875.00.
-              </div>
-              <span className="text-[10px] text-stone-400 mt-1">10:43 AM</span>
-            </div>
-          </div>
-          {/* Chat Input */}
-          <div className="p-4 border-t border-stone-100 bg-white">
-            <div className="relative">
-              <textarea className="w-full bg-stone-100 border-none rounded-xl text-sm p-3 pr-12 focus:ring-1 focus:ring-stone-200 resize-none" placeholder="Ask about strategy..." rows={2}></textarea>
-              <button className="absolute bottom-2 right-2 p-2 text-white rounded-lg transition-colors" style={{ backgroundColor: '#5a7247' }}>
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
-                </svg>
+          {/* Timeframe Selector */}
+          <div className="flex items-center bg-[#f0ebe0] p-1 rounded-xl">
+            {TIMEFRAMES.map((tf) => (
+              <button
+                key={tf}
+                onClick={() => setSelectedTimeframe(tf)}
+                className={`px-4 py-1.5 text-sm rounded-lg transition-colors ${
+                  selectedTimeframe === tf
+                    ? 'font-bold bg-[#606C38] text-white shadow-sm'
+                    : 'font-medium text-[#6b705c] hover:bg-[#e5e1d3]'
+                }`}
+              >
+                {tf}
               </button>
-            </div>
+            ))}
           </div>
-        </section>
-      </main>
-      {/* END: MainDashboard */}
+        </header>
+
+        <main className="flex flex-col lg:flex-row gap-6">
+          {/* LEFT PANEL: Tickers */}
+          <section className="w-full lg:w-[350px] bg-[#f5f0e8] rounded-xl overflow-hidden shadow-sm flex flex-col border border-[#e5e1d3]">
+            <div className="p-5 border-b border-[#e5e1d3]">
+              <h2 className="text-sm font-bold uppercase tracking-widest text-[#6b705c] flex items-center gap-2">
+                <BarChart3 className="w-4 h-4" />
+                시세 Tickers
+              </h2>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="text-[10px] text-[#908a78] font-bold uppercase tracking-tighter bg-[#f0ebe0]/50">
+                    <th className="px-5 py-3">종목 Symbol</th>
+                    <th className="px-5 py-3 text-right">현재가 Price</th>
+                    <th className="px-5 py-3 text-right">변동 Change</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#e5e1d3]/50 text-xs">
+                  {TICKERS.map((t) => (
+                    <tr key={t.symbol} className="hover:bg-[#f0ebe0] transition-colors cursor-pointer">
+                      <td className="px-5 py-4 font-bold text-[#1a1a1a]">{t.symbol}</td>
+                      <td className="px-5 py-4 text-right font-mono">{t.price}</td>
+                      <td className={`px-5 py-4 text-right font-mono ${t.positive ? 'text-[#4d7c0f]' : 'text-[#dc2626]'}`}>{t.change}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* CENTER PANEL: Chart */}
+          <section className="flex-1 flex flex-col gap-4">
+            <div className="flex items-center justify-between px-2">
+              <div className="flex items-baseline gap-4">
+                <h2 className="text-xl font-bold tracking-tight text-[#1a1a1a]">BTC/USD 차트</h2>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl font-mono font-bold">$67,432.50</span>
+                  <span className="text-sm font-mono text-[#4d7c0f]">+$1,543.20 (+2.34%)</span>
+                </div>
+              </div>
+              <div className="flex bg-[#f0ebe0] rounded-lg p-0.5">
+                {CHART_TYPES.map((ct) => (
+                  <button
+                    key={ct}
+                    onClick={() => setSelectedChartType(ct)}
+                    className={`px-3 py-1 text-xs transition-colors ${
+                      selectedChartType === ct
+                        ? 'font-bold bg-white rounded-md shadow-sm'
+                        : 'font-medium text-[#6b705c]'
+                    }`}
+                  >
+                    {ct}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Main Chart Area */}
+            <div className="bg-[#f0ebe0] rounded-xl flex-1 min-h-[450px] relative overflow-hidden border border-[#e5e1d3]">
+              <div
+                className="absolute inset-0 opacity-20 pointer-events-none"
+                style={{
+                  backgroundImage: 'radial-gradient(circle, #606C38 1px, transparent 1px)',
+                  backgroundSize: '24px 24px',
+                }}
+              />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-full h-full p-8 flex flex-col justify-end">
+                  <div className="flex items-end justify-between h-2/3 w-full gap-2 opacity-60">
+                    {CANDLE_BARS.map((h, i) => (
+                      <div
+                        key={i}
+                        className={`w-full rounded-sm ${i === 2 || i === 6 ? 'bg-[#dc2626]/40' : 'bg-[#4d7c0f]/40'}`}
+                        style={{ height: `${h}%` }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              {/* OHLC Badges */}
+              <div className="absolute top-4 left-4 flex gap-4">
+                {[
+                  { label: 'O', value: '65,889.20' },
+                  { label: 'H', value: '68,120.00' },
+                  { label: 'L', value: '65,400.10' },
+                  { label: 'C', value: '67,432.50' },
+                ].map((d) => (
+                  <div key={d.label} className="bg-white/80 backdrop-blur-md px-3 py-1.5 rounded text-[10px] font-mono shadow-sm border border-white">
+                    {d.label}: {d.value}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Volume Chart */}
+            <div className="h-24 bg-[#f0ebe0] rounded-xl relative overflow-hidden p-2 flex items-end gap-1 border border-[#e5e1d3]">
+              {VOLUME_BARS.map((h, i) => (
+                <div key={i} className="flex-1 bg-[#908a78]/20 rounded-t-sm" style={{ height: `${h}%` }} />
+              ))}
+            </div>
+          </section>
+
+          {/* RIGHT PANEL */}
+          <aside className="w-full lg:w-[300px] flex flex-col gap-6">
+            {/* Order Panel */}
+            <div className="bg-[#f5f0e8] rounded-xl p-5 shadow-sm space-y-6 border border-[#e5e1d3]">
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-bold uppercase tracking-widest text-[#6b705c]">주문 Order</h2>
+                <Info className="w-4 h-4 text-[#908a78]" />
+              </div>
+              <div className="grid grid-cols-2 gap-2 p-1 bg-[#f0ebe0] rounded-xl">
+                <button
+                  onClick={() => setOrderSide('buy')}
+                  className={`py-2 text-sm rounded-lg transition-colors ${
+                    orderSide === 'buy'
+                      ? 'font-bold bg-[#4d7c0f] text-white shadow-md'
+                      : 'font-medium text-[#6b705c] hover:bg-[#e5e1d3]'
+                  }`}
+                >
+                  매수 Buy
+                </button>
+                <button
+                  onClick={() => setOrderSide('sell')}
+                  className={`py-2 text-sm rounded-lg transition-colors ${
+                    orderSide === 'sell'
+                      ? 'font-bold bg-[#dc2626] text-white shadow-md'
+                      : 'font-medium text-[#6b705c] hover:bg-[#e5e1d3]'
+                  }`}
+                >
+                  매도 Sell
+                </button>
+              </div>
+              <div className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold uppercase text-[#908a78] ml-1">수량 Amount</label>
+                  <div className="relative">
+                    <input
+                      className="w-full bg-white border-b border-[#e5e1d3] focus:border-[#606C38] focus:ring-0 transition-all font-mono text-sm py-2.5 px-3 rounded-t-lg"
+                      type="text"
+                      defaultValue="0.10"
+                    />
+                    <span className="absolute right-3 top-2.5 text-[10px] font-bold text-[#908a78]">BTC</span>
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold uppercase text-[#908a78] ml-1">가격 Price</label>
+                  <div className="relative">
+                    <input
+                      className="w-full bg-white border-b border-[#e5e1d3] focus:border-[#606C38] focus:ring-0 transition-all font-mono text-sm py-2.5 px-3 rounded-t-lg"
+                      type="text"
+                      defaultValue="67,432.50"
+                    />
+                    <span className="absolute right-3 top-2.5 text-[10px] font-bold text-[#908a78]">USD</span>
+                  </div>
+                </div>
+              </div>
+              <div className="py-4 border-t border-[#e5e1d3]">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-xs text-[#6b705c]">예상 비용 Estimated Cost</span>
+                  <span className="font-mono font-bold">$6,743.25</span>
+                </div>
+                <button
+                  onClick={() => toast.info('이 기능은 준비 중입니다')}
+                  className="w-full bg-[#4d7c0f] hover:brightness-110 text-white font-bold py-3.5 rounded-xl transition-all active:scale-95 shadow-lg shadow-[#4d7c0f]/20"
+                >
+                  주문 실행 Execute
+                </button>
+              </div>
+            </div>
+
+            {/* Portfolio Summary */}
+            <div className="bg-[#f5f0e8] rounded-xl p-5 shadow-sm space-y-5 border border-[#e5e1d3]">
+              <h2 className="text-sm font-bold uppercase tracking-widest text-[#6b705c]">포트폴리오 Portfolio</h2>
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold text-[#908a78] uppercase tracking-wider">Total Value</p>
+                <h3 className="text-2xl font-mono font-black text-[#1a1a1a]">$125,847.30</h3>
+                <p className="text-xs font-mono text-[#4d7c0f] font-medium">일간 손익 Daily P&L: +$2,341.50 (+1.89%)</p>
+              </div>
+              <div className="space-y-3 pt-4 border-t border-[#e5e1d3]">
+                {PORTFOLIO.map((p) => (
+                  <div key={p.name}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }} />
+                        <span className="text-xs font-medium">{p.name}</span>
+                      </div>
+                      <span className="text-xs font-mono font-bold">{p.pct}%</span>
+                    </div>
+                    <div className="w-full bg-[#f0ebe0] h-1.5 rounded-full overflow-hidden mt-1">
+                      <div className="h-full rounded-full" style={{ width: `${p.pct}%`, backgroundColor: p.color }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </aside>
+        </main>
+
+        {/* Footer */}
+        <footer className="mt-12 pt-8 border-t border-[#e5e1d3] flex flex-col md:flex-row justify-between items-center text-[10px] font-mono text-[#908a78] uppercase tracking-[0.2em] gap-4">
+          <div className="flex gap-6">
+            <span>Latency: 14ms</span>
+            <span>Server: Tokyo-AWS-01</span>
+            <span>API Status: 200 OK</span>
+          </div>
+          <div>CORTHEX ARCHIVE // TRADING_ENGINE_ACTIVE</div>
+        </footer>
+      </div>
     </div>
   )
 }
