@@ -146,7 +146,7 @@ function downloadCsv(data: Record<string, unknown>[], filename: string) {
 // === Status Badge ===
 
 function StatusBadge({ status }: { status: string }) {
-  const info = STATUS_BADGE_STYLES[status] || { dotColor: '#d1c9b2', bgColor: 'rgba(209,201,178,0.1)', textColor: '#9c8d66', borderColor: 'rgba(209,201,178,0.3)', label: status }
+  const info = STATUS_BADGE_STYLES[status] || { dotColor: '#756e5a', bgColor: 'rgba(117,110,90,0.1)', textColor: '#756e5a', borderColor: 'rgba(117,110,90,0.2)', label: status }
   return (
     <span
       className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded uppercase tracking-tighter"
@@ -472,7 +472,7 @@ export function OpsLogPage() {
           onClick={() => { setBookmarkedOnly(!bookmarkedOnly); setPage(1) }}
           className="text-sm px-3 py-2 rounded border transition-colors"
           style={bookmarkedOnly
-            ? { backgroundColor: 'rgba(196,98,45,0.1)', borderColor: 'rgba(196,98,45,0.3)', color: '#c4622d' }
+            ? { backgroundColor: 'rgba(180,83,9,0.1)', borderColor: 'rgba(180,83,9,0.3)', color: '#b45309' }
             : { backgroundColor: 'transparent', borderColor: '#e5e1d3', color: '#6b705c' }
           }
           data-testid="bookmark-filter"
@@ -601,7 +601,7 @@ export function OpsLogPage() {
                             <span className="text-xs font-mono tabular-nums" style={{ color: '#6b705c' }}>{formatTime(item.createdAt)}</span>
                             <button
                               className="text-sm hover:scale-110 transition-transform"
-                              style={{ color: item.isBookmarked ? '#c4622d' : '#d1c9b2' }}
+                              style={{ color: item.isBookmarked ? '#b45309' : '#756e5a' }}
                               onClick={(e) => handleBookmarkToggle(item, e)}
                             >
                               {item.isBookmarked ? '\u2605' : '\u2606'}
@@ -818,8 +818,8 @@ function DetailModal({
             {/* Bookmark note */}
             {detail.isBookmarked && detail.bookmarkNote && (
               <div className="mb-4 rounded-xl p-4" style={{ backgroundColor: 'rgba(196,98,45,0.06)', border: '1px solid rgba(196,98,45,0.2)' }}>
-                <p className="text-xs font-medium mb-1" style={{ color: '#c4622d' }}>&#9733; 북마크 메모</p>
-                <p className="text-xs" style={{ color: '#c4622d' }}>{detail.bookmarkNote}</p>
+                <p className="text-xs font-medium mb-1" style={{ color: '#b45309' }}>&#9733; 북마크 메모</p>
+                <p className="text-xs" style={{ color: '#b45309' }}>{detail.bookmarkNote}</p>
               </div>
             )}
           </div>
@@ -901,7 +901,7 @@ function CompareBar({
       <div className="flex items-center justify-center gap-3">
         <span className="text-xs font-bold" style={{ color: '#606C38' }}>{format(valueA)}</span>
         <span className="text-[10px]" style={{ color: '#6b705c' }}>vs</span>
-        <span className="text-xs font-bold" style={{ color: '#c4622d' }}>{format(valueB)}</span>
+        <span className="text-xs font-bold" style={{ color: '#b45309' }}>{format(valueB)}</span>
       </div>
     </div>
   )
@@ -923,7 +923,7 @@ function ComparePanel({ item, label }: { item: OperationLogItem; label: string }
             className="text-xs px-2 py-0.5 rounded font-bold"
             style={label === 'A'
               ? { backgroundColor: 'rgba(96,108,56,0.1)', color: '#606C38' }
-              : { backgroundColor: 'rgba(196,98,45,0.1)', color: '#c4622d' }
+              : { backgroundColor: 'rgba(180,83,9,0.1)', color: '#b45309' }
             }
           >
             {label}

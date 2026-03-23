@@ -242,7 +242,7 @@ function scoreColor(pct: number): string {
 // === Status Badge ===
 
 function StatusBadgeEl({ status }: { status: string }) {
-  const info = STATUS_BADGE[status] || { label: status, dotColor: '#d1c9b2', bgColor: 'rgba(209,201,178,0.1)', textColor: '#9c8d66', borderColor: 'rgba(209,201,178,0.3)' }
+  const info = STATUS_BADGE[status] || { label: status, dotColor: '#756e5a', bgColor: 'rgba(117,110,90,0.1)', textColor: '#756e5a', borderColor: 'rgba(117,110,90,0.2)' }
   return (
     <span
       className="text-xs font-bold px-2 py-0.5 rounded uppercase tracking-tighter"

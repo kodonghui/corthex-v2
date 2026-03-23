@@ -123,9 +123,9 @@ function formatCost(micro: number | null | undefined) {
 }
 
 function scoreColor(score: number): string {
-  if (score >= 4) return 'bg-emerald-500'
-  if (score >= 3) return 'bg-amber-500'
-  return 'bg-red-500'
+  if (score >= 4) return 'bg-[#4d7c0f]'
+  if (score >= 3) return 'bg-[#b45309]'
+  return 'bg-[#dc2626]'
 }
 
 function useDebounce(value: string, delay: number) {
