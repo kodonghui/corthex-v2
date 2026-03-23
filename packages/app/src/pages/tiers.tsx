@@ -8,8 +8,8 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
-import { Modal, ConfirmDialog, Button, Input, Textarea, Skeleton, EmptyState, Badge, toast } from '@corthex/ui'
-import { GitBranch, Search, ChevronRight, Plus, Users, Sparkles, Wrench, ListChecks, Filter, RefreshCw, Brain, Shield, SlidersHorizontal } from 'lucide-react'
+import { Modal, ConfirmDialog, Button, Input, Textarea, Skeleton, EmptyState, toast } from '@corthex/ui'
+import { GitBranch, Plus, Users, Brain, Shield } from 'lucide-react'
 
 // ── Types ──
 
@@ -39,10 +39,14 @@ const MODEL_OPTIONS = [
 ]
 
 const TIER_BADGE_STYLES: Record<number, { bg: string; label: string }> = {
-  0: { bg: '#e2b042', label: 'Manager' },
-  1: { bg: '#5a7247', label: 'Specialist' },
-  2: { bg: '#64748b', label: 'Worker' },
+  0: { bg: '#283618', label: 'Manager' },
+  1: { bg: '#606C38', label: 'Specialist' },
+  2: { bg: '#6b705c', label: 'Worker' },
 }
+
+const TIER_LEVEL_COLORS: string[] = [
+  '#283618', '#606C38', '#6b705c', '#908a78', '#e5e1d3', '#f5f0e8',
+]
 
 // ── Tier Form ──
 
@@ -237,11 +241,11 @@ export function TiersPage() {
   // Loading state
   if (isLoading) {
     return (
-      <div data-testid="tiers-page" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-4">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-4 w-full" />
+      <div data-testid="tiers-page" className="flex-1 p-8 bg-[#faf8f5] space-y-4">
+        <Skeleton className="h-10 w-64" />
+        <Skeleton className="h-4 w-96" />
         {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-16 w-full" />
+          <Skeleton key={i} className="h-20 w-full rounded-xl" />
         ))}
       </div>
     )
@@ -250,14 +254,12 @@ export function TiersPage() {
   // Error state
   if (isError) {
     return (
-      <div data-testid="tiers-page" style={{ backgroundColor: '#faf8f5' }} className="min-h-screen">
-        <div className="max-w-7xl mx-auto px-6 md:px-20 py-10">
-          <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-            <p className="text-sm text-red-600">계층 목록을 불러올 수 없습니다</p>
-            <button onClick={() => refetch()} className="text-xs text-red-500 hover:text-red-400 underline mt-2">
-              다시 시도
-            </button>
-          </div>
+      <div data-testid="tiers-page" className="flex-1 p-8 bg-[#faf8f5]">
+        <div className="bg-[#dc2626]/10 border border-[#dc2626]/20 rounded-xl p-6 text-center">
+          <p className="text-sm text-[#dc2626]">계층 목록을 불러올 수 없습니다</p>
+          <button onClick={() => refetch()} className="text-xs text-[#dc2626] hover:opacity-70 underline mt-2">
+            다시 시도
+          </button>
         </div>
       </div>
     )
@@ -269,245 +271,141 @@ export function TiersPage() {
   }
 
   return (
-    <div data-testid="tiers-page" className="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden" style={{ backgroundColor: '#faf8f5', fontFamily: "'Public Sans', sans-serif" }}>
-      <div className="layout-container flex h-full grow flex-col">
-        {/* Top Navigation */}
-        <header className="flex items-center justify-between whitespace-nowrap border-b border-solid px-6 md:px-20 py-4" style={{ borderColor: 'rgba(90,114,71,0.1)', backgroundColor: '#faf8f5' }}>
-          <div className="flex items-center gap-8">
-            <div className="flex items-center gap-3" style={{ color: '#5a7247' }}>
-              <GitBranch className="w-8 h-8" />
-              <h2 className="text-slate-900 text-lg font-bold leading-tight tracking-tight uppercase">CORTHEX <span style={{ color: 'rgba(90,114,71,0.7)' }}>v2</span></h2>
-            </div>
-            <nav className="hidden md:flex items-center gap-6">
-              <a className="text-slate-600 hover:transition-colors text-sm font-medium" href="#" style={{ color: '#5a7247' }}>Dashboard</a>
-              <a className="text-slate-600 hover:transition-colors text-sm font-medium" href="#">Workspace</a>
-              <a className="text-sm font-semibold border-b-2 pb-1" href="#" style={{ color: '#5a7247', borderColor: '#5a7247' }}>Tiers</a>
-              <a className="text-slate-600 hover:transition-colors text-sm font-medium" href="#">Settings</a>
-            </nav>
+    <div data-testid="tiers-page" className="flex-1 bg-[#faf8f5] overflow-y-auto">
+      <div className="p-8 max-w-[1440px] mx-auto min-h-screen">
+        {/* HEADER SECTION */}
+        <header className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+          <div className="space-y-2">
+            <h1 className="text-[2.75rem] font-extrabold tracking-tighter leading-tight text-[#1a1a1a]">
+              계급 관리 <span className="text-[#6b705c] font-medium">Tier Management</span>
+            </h1>
+            <p className="text-lg text-[#908a78] font-medium">에이전트 계층 구조를 정의하고 관리합니다</p>
           </div>
-          <div className="flex flex-1 justify-end gap-6 items-center">
-            <label className="hidden sm:flex flex-col min-w-40 h-10 max-w-64">
-              <div className="flex w-full flex-1 items-stretch rounded-xl h-full border bg-white" style={{ borderColor: 'rgba(90,114,71,0.2)' }}>
-                <div className="flex items-center justify-center pl-3" style={{ color: 'rgba(90,114,71,0.5)' }}>
-                  <Search className="w-5 h-5" />
-                </div>
-                <input
-                  className="form-input flex w-full min-w-0 flex-1 border-none bg-transparent text-sm placeholder:text-stone-500 focus:ring-0"
-                  placeholder="Search tiers..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-            </label>
-            <div className="rounded-full p-1 border" style={{ backgroundColor: 'rgba(90,114,71,0.1)', borderColor: 'rgba(90,114,71,0.2)' }}>
-              <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8 bg-slate-300" />
-            </div>
-          </div>
+          <button
+            onClick={() => setCreateOpen(true)}
+            className="bg-[#606C38] hover:bg-[#4e5a2b] text-white px-6 h-11 rounded-lg flex items-center gap-2 transition-all shadow-sm active:scale-95"
+          >
+            <Plus className="w-5 h-5" />
+            <span className="font-semibold">계급 생성 Create Tier</span>
+          </button>
         </header>
 
-        <main className="flex-1 px-6 md:px-20 py-10 max-w-7xl mx-auto w-full">
-          {/* Hero Section */}
-          <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-10">
-            <div className="flex flex-col gap-2">
-              <nav className="flex items-center gap-2 text-xs font-medium mb-1 uppercase tracking-wider" style={{ color: 'rgba(90,114,71,0.6)' }}>
-                <span>Workspace</span>
-                <ChevronRight className="w-3 h-3" />
-                <span>Management</span>
-              </nav>
-              <h1 className="text-slate-900 text-4xl font-extrabold tracking-tight">Tier Permissions</h1>
-              <p className="text-stone-400 text-lg max-w-xl">Configure dynamic N-tier governance models, preferred LLM routing, and tool access limits across your organization.</p>
-            </div>
-            <button
-              onClick={() => setCreateOpen(true)}
-              className="flex items-center gap-2 px-5 py-2.5 text-white rounded-xl font-semibold shadow-lg hover:opacity-90 transition-all"
-              style={{ backgroundColor: '#5a7247', boxShadow: '0 10px 15px -3px rgba(90,114,71,0.2)' }}
-            >
-              <Plus className="w-4 h-4" />
-              <span>New Tier</span>
-            </button>
-          </div>
+        {/* Empty state */}
+        {tiers.length === 0 && (
+          <EmptyState
+            title="계층이 없습니다"
+            description="첫 계층을 생성하여 에이전트 등급을 구성하세요"
+          />
+        )}
 
-          {/* Dashboard Stats Summary */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="p-6 rounded-xl bg-white border shadow-sm flex items-center gap-4" style={{ borderColor: 'rgba(90,114,71,0.1)' }}>
-              <div className="size-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: '#5a7247' }}>
-                <Users className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-sm text-stone-400">Active Tiers</p>
-                <p className="text-2xl font-bold">{String(tiers.length).padStart(2, '0')}</p>
-              </div>
-            </div>
-            <div className="p-6 rounded-xl bg-white border shadow-sm flex items-center gap-4" style={{ borderColor: 'rgba(90,114,71,0.1)' }}>
-              <div className="size-12 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center">
-                <Sparkles className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-sm text-stone-400">Avg. Model Power</p>
-                <p className="text-2xl font-bold">High</p>
-              </div>
-            </div>
-            <div className="p-6 rounded-xl bg-white border shadow-sm flex items-center gap-4" style={{ borderColor: 'rgba(90,114,71,0.1)' }}>
-              <div className="size-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
-                <Wrench className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-sm text-stone-400">Tools Deployed</p>
-                <p className="text-2xl font-bold">{tiers.reduce((sum, t) => sum + (t.maxTools || 0), 0) || 42}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Empty state */}
-          {tiers.length === 0 && (
-            <EmptyState
-              title="계층이 없습니다"
-              description="첫 계층을 생성하여 에이전트 등급을 구성하세요"
-            />
-          )}
-
-          {/* Tiers Table Container */}
-          {tiers.length > 0 && (
-            <div className="bg-white rounded-xl border shadow-xl overflow-hidden" style={{ borderColor: 'rgba(90,114,71,0.1)' }}>
-              <div className="p-5 border-b flex justify-between items-center" style={{ borderColor: 'rgba(90,114,71,0.1)', backgroundColor: 'rgba(248,250,252,0.5)' }}>
-                <h3 className="font-bold text-slate-700 flex items-center gap-2">
-                  <ListChecks className="w-5 h-5" style={{ color: '#5a7247' }} />
-                  Active Configuration
-                </h3>
-                <div className="flex gap-2">
-                  <button className="p-2 rounded-lg border hover:opacity-80" style={{ borderColor: 'rgba(90,114,71,0.2)', color: '#5a7247' }}>
-                    <Filter className="w-4 h-4" />
-                  </button>
-                  <button onClick={() => refetch()} className="p-2 rounded-lg border hover:opacity-80" style={{ borderColor: 'rgba(90,114,71,0.2)', color: '#5a7247' }}>
-                    <RefreshCw className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="text-stone-500 text-xs font-bold uppercase tracking-widest bg-slate-50">
-                      <th className="px-6 py-4">Level</th>
-                      <th className="px-6 py-4">Tier Identity</th>
-                      <th className="px-6 py-4">Preferred Model</th>
-                      <th className="px-6 py-4">Tool Quota</th>
-                      <th className="px-6 py-4 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y" style={{ borderColor: 'rgba(90,114,71,0.05)' }}>
-                    {tiers.map((tier, index) => {
-                      const badge = getTierBadge(index)
-                      return (
-                        <tr key={tier.id} data-testid={`tier-row-${tier.id}`} className="transition-colors" style={{ cursor: 'pointer' }} onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(90,114,71,0.02)')} onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}>
-                          <td className="px-6 py-5">
-                            <span className="text-lg font-black" style={{ color: 'rgba(90,114,71,0.3)' }}>{String(tier.tierLevel).padStart(2, '0')}</span>
-                          </td>
-                          <td className="px-6 py-5">
-                            <div className="flex flex-col">
-                              <span
-                                className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider w-fit mb-1 shadow-sm text-white"
-                                style={{ backgroundColor: badge.bg }}
-                              >
-                                {badge.label}
-                              </span>
-                              <span className="text-sm font-semibold">{tier.name}</span>
-                              {tier.description && <span className="text-xs text-stone-500">{tier.description}</span>}
-                            </div>
-                          </td>
-                          <td className="px-6 py-5 text-sm">
-                            <div className="flex items-center gap-2">
-                              <div className="size-6 rounded bg-slate-100 flex items-center justify-center">
-                                <Brain className="w-4 h-4 text-stone-400" />
-                              </div>
-                              <span className="font-medium text-slate-700">{getModelShortLabel(tier.modelPreference)}</span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-5">
-                            {tier.maxTools === 0 ? (
-                              <span className="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-xs font-bold">Unlimited</span>
-                            ) : (
-                              <span className="text-sm font-bold text-slate-600">{tier.maxTools} Tools</span>
-                            )}
-                          </td>
-                          <td className="px-6 py-5 text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              <button
-                                onClick={() => handleMoveUp(index)}
-                                disabled={index === 0 || reorderMutation.isPending}
-                                className="px-1 py-0.5 text-xs text-stone-500 hover:text-slate-600 disabled:opacity-30"
-                              >
-                                ▲
-                              </button>
-                              <button
-                                onClick={() => handleMoveDown(index)}
-                                disabled={index === tiers.length - 1 || reorderMutation.isPending}
-                                className="px-1 py-0.5 text-xs text-stone-500 hover:text-slate-600 disabled:opacity-30"
-                              >
-                                ▼
-                              </button>
-                              <button
-                                onClick={() => setEditTier(tier)}
-                                className="text-stone-500 hover:transition-colors px-2 py-1 text-xs rounded hover:bg-slate-100"
-                                style={{ ['--tw-text-opacity' as string]: 1 }}
-                              >
-                                편집
-                              </button>
-                              <button
-                                onClick={() => setDeleteTier(tier)}
-                                className="text-red-400 hover:text-red-500 px-2 py-1 text-xs rounded hover:bg-red-50"
-                              >
-                                삭제
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
-              <div className="p-4 flex justify-between items-center text-xs text-stone-400" style={{ backgroundColor: 'rgba(248,250,252,0.5)' }}>
-                <p>Endpoint: <code className="px-1 rounded" style={{ backgroundColor: 'rgba(90,114,71,0.05)' }}>GET /api/admin/tier-configs</code></p>
-                <p>Last updated: just now</p>
-              </div>
-            </div>
-          )}
-
-          {/* Help/Details Section */}
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="flex gap-4">
-              <div className="size-10 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: '#5a7247' }}>
-                <Shield className="w-5 h-5" />
-              </div>
-              <div>
-                <h4 className="font-bold mb-1">Permission Propagation</h4>
-                <p className="text-sm text-stone-400">Higher tiers automatically inherit lower tier capabilities but can be configured with specific override restrictions per workspace.</p>
-              </div>
-            </div>
-            <div className="flex gap-4">
-              <div className="size-10 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: '#5a7247' }}>
-                <SlidersHorizontal className="w-5 h-5" />
-              </div>
-              <div>
-                <h4 className="font-bold mb-1">Model Preference Logic</h4>
-                <p className="text-sm text-stone-400">Models are prioritized based on reasoning capability and speed metrics. Tiers can specify fallback models for high-traffic periods.</p>
-              </div>
+        {/* MAIN TABLE SECTION */}
+        {tiers.length > 0 && (
+          <div className="bg-[#f5f0e8] rounded-xl overflow-hidden shadow-sm border border-[#e5e1d3]/50">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-[#e5e1d3]/50">
+                    <th className="px-6 py-5 text-[10px] font-bold uppercase tracking-widest text-[#908a78]">계급명 Tier Name</th>
+                    <th className="px-6 py-5 text-[10px] font-bold uppercase tracking-widest text-[#908a78] text-center">레벨 Level</th>
+                    <th className="px-6 py-5 text-[10px] font-bold uppercase tracking-widest text-[#908a78]">최대 도구 Max Tools</th>
+                    <th className="px-6 py-5 text-[10px] font-bold uppercase tracking-widest text-[#908a78]">AI 모델 Model</th>
+                    <th className="px-6 py-5 text-[10px] font-bold uppercase tracking-widest text-[#908a78] text-right">작업 Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#e5e1d3]/30">
+                  {tiers.map((tier, index) => {
+                    const badge = getTierBadge(index)
+                    const levelColor = TIER_LEVEL_COLORS[Math.min(index, TIER_LEVEL_COLORS.length - 1)]
+                    return (
+                      <tr key={tier.id} data-testid={`tier-row-${tier.id}`} className="hover:bg-[#ede8de] transition-colors group">
+                        <td className="px-6 py-5 relative">
+                          <div className="absolute left-0 top-1/4 bottom-1/4 w-1 rounded-r-full" style={{ backgroundColor: levelColor }} />
+                          <div className="flex flex-col">
+                            <span className="font-bold text-[#1a1a1a]">{tier.name}</span>
+                            {tier.description && <span className="text-xs text-[#908a78]">{tier.description}</span>}
+                          </div>
+                        </td>
+                        <td className="px-6 py-5 text-center">
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full" style={{ backgroundColor: `${levelColor}15`, color: levelColor }}>
+                            <Shield className="w-3.5 h-3.5" />
+                            <span className="font-mono font-bold">{tier.tierLevel}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-5">
+                          {tier.maxTools === 0 ? (
+                            <span className="font-mono text-[#6b705c]">Unlimited</span>
+                          ) : (
+                            <span className="font-mono text-[#6b705c]">{tier.maxTools} tools</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-5">
+                          <span className="px-3 py-1 bg-[#e5e1d3] text-[#1a1a1a] rounded-full text-xs font-semibold">
+                            {getModelShortLabel(tier.modelPreference)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-5 text-right">
+                          <div className="flex justify-end gap-4">
+                            <button
+                              onClick={() => handleMoveUp(index)}
+                              disabled={index === 0 || reorderMutation.isPending}
+                              className="text-xs text-[#6b705c] hover:text-[#283618] disabled:opacity-30 transition-colors"
+                            >
+                              ▲
+                            </button>
+                            <button
+                              onClick={() => handleMoveDown(index)}
+                              disabled={index === tiers.length - 1 || reorderMutation.isPending}
+                              className="text-xs text-[#6b705c] hover:text-[#283618] disabled:opacity-30 transition-colors"
+                            >
+                              ▼
+                            </button>
+                            <button
+                              onClick={() => setEditTier(tier)}
+                              className="text-xs font-bold text-[#6b705c] hover:text-[#606C38] transition-colors"
+                            >
+                              수정 Edit
+                            </button>
+                            <button
+                              onClick={() => setDeleteTier(tier)}
+                              className="text-xs font-bold text-[#dc2626] hover:opacity-70 transition-colors"
+                            >
+                              삭제 Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
             </div>
           </div>
-        </main>
+        )}
 
-        {/* Footer */}
-        <footer className="px-6 md:px-20 py-8 border-t mt-20" style={{ borderColor: 'rgba(90,114,71,0.1)' }}>
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-stone-500 uppercase tracking-widest font-bold">
-            <div className="flex items-center gap-2">
-              <span className="text-sm">&copy;</span>
-              <span>2026 CORTHEX Dynamics</span>
+        {/* SUMMARY SECTION */}
+        <footer className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="bg-[#f5f0e8] p-6 rounded-xl border border-[#e5e1d3]/50 flex items-center justify-between group hover:bg-[#ede8de] transition-colors">
+            <div className="space-y-1">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#908a78]">총 계급 수 Total Tiers</p>
+              <p className="text-2xl font-black text-[#606C38]">{tiers.length}개</p>
             </div>
-            <div className="flex gap-6">
-              <a className="hover:opacity-80" href="#" style={{ color: '#5a7247' }}>API Documentation</a>
-              <a className="hover:opacity-80" href="#" style={{ color: '#5a7247' }}>System Status</a>
-              <a className="hover:opacity-80" href="#" style={{ color: '#5a7247' }}>Privacy Policy</a>
+            <GitBranch className="w-9 h-9 text-[#e5e1d3]" />
+          </div>
+          <div className="bg-[#f5f0e8] p-6 rounded-xl border border-[#e5e1d3]/50 flex items-center justify-between group hover:bg-[#ede8de] transition-colors">
+            <div className="space-y-1">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#908a78]">총 도구 할당 Total Tools</p>
+              <p className="text-2xl font-black text-[#606C38]">{tiers.reduce((sum, t) => sum + (t.maxTools || 0), 0)}</p>
             </div>
+            <Users className="w-9 h-9 text-[#e5e1d3]" />
+          </div>
+          <div className="bg-[#f5f0e8] p-6 rounded-xl border border-[#e5e1d3]/50 flex items-center justify-between group hover:bg-[#ede8de] transition-colors">
+            <div className="space-y-1">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#908a78]">평균 모델 수준</p>
+              <p className="text-2xl font-black text-[#606C38] font-mono">
+                {tiers.length > 0 ? getModelShortLabel(tiers[Math.floor(tiers.length / 2)]?.modelPreference || '') : '--'}
+              </p>
+            </div>
+            <Brain className="w-9 h-9 text-[#e5e1d3]" />
           </div>
         </footer>
       </div>
