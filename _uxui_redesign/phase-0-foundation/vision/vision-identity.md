@@ -205,7 +205,19 @@ Inspired by:
 | Content padding | 24px (p-6) | 3 × 8px — breathing room without waste |
 | Mobile breakpoint | 1024px (lg) | Below: sidebar collapses to overlay |
 
-### 5.3 Border Radius System
+### 5.3 Shadow / Elevation System
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--shadow-none` | `none` | Flat surfaces (default — most elements) |
+| `--shadow-sm` | `0 1px 2px rgba(0,0,0,0.05)` | Subtle lift: cards on cream background, dropdown menus |
+| `--shadow-md` | `0 4px 6px rgba(0,0,0,0.07)` | Modals, drawers, floating panels |
+| `--shadow-lg` | `0 10px 15px rgba(0,0,0,0.10)` | Toasts, popovers, command palette |
+
+> **Rule:** Shadows are used **only for z-order** (indicating an element floats above the surface). Never for decoration. Borders (`--border-primary`) handle visual separation between same-level elements. Do not combine shadow + border on the same element.
+
+### 5.4 Border Radius System
+
 
 | Token | Value | Usage |
 |-------|-------|-------|
