@@ -106,21 +106,30 @@ const tierLabels: Record<string, string> = {
 }
 
 const tierBadgeStyles: Record<string, { bg: string; text: string }> = {
-  manager: { bg: 'bg-orange-50', text: 'text-orange-700' },
-  specialist: { bg: 'bg-green-50', text: 'text-green-700' },
-  worker: { bg: 'bg-slate-50', text: 'text-slate-600' },
+  manager: { bg: 'bg-[#f5f0e8]', text: 'text-[#283618]' },
+  specialist: { bg: 'bg-[#f5f0e8]', text: 'text-[#606C38]' },
+  worker: { bg: 'bg-[#f5f0e8]', text: 'text-[#6b705c]' },
 }
 
-const statusConfig: Record<string, { dotBg: string; labelBg: string; labelText: string; label: string }> = {
-  online: { dotBg: 'bg-green-500', labelBg: 'bg-green-50', labelText: 'text-green-700', label: 'Online' },
-  working: { dotBg: 'bg-blue-500', labelBg: 'bg-blue-50', labelText: 'text-blue-700', label: 'Working' },
-  error: { dotBg: 'bg-red-500', labelBg: 'bg-red-50', labelText: 'text-red-700', label: 'Error' },
-  offline: { dotBg: 'bg-slate-400', labelBg: 'bg-slate-50', labelText: 'text-stone-400', label: 'Offline' },
+const statusConfig: Record<string, { dot: string; label: string; labelKo: string }> = {
+  online: { dot: 'bg-[#4d7c0f]', label: 'Online', labelKo: '활성' },
+  working: { dot: 'bg-[#2563eb]', label: 'Working', labelKo: '작업중' },
+  error: { dot: 'bg-[#dc2626]', label: 'Error', labelKo: '오류' },
+  offline: { dot: 'bg-[#908a78]', label: 'Offline', labelKo: '오프라인' },
 }
 
 const agentIconComponents = [
   Headphones, Wallet, Megaphone, Gavel, SlidersHorizontal, Paintbrush, Database,
 ]
+
+function getInitials(name: string, nameEn: string | null): string {
+  if (nameEn) {
+    const parts = nameEn.trim().split(/\s+/)
+    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+    return nameEn.slice(0, 2).toUpperCase()
+  }
+  return name.slice(0, 2)
+}
 
 // ── Agent Form ──
 
@@ -368,38 +377,78 @@ function AgentDetailPanel({
   }
 
   return (
-    <div className="flex flex-col gap-6 p-6 bg-white rounded-xl border border-slate-200 shadow-sm">
-      {/* Agent Header */}
-      <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
-        <div className="flex items-center gap-6">
-          <div className="w-24 h-24 rounded-2xl flex items-center justify-center shadow-inner relative" style={{ backgroundColor: '#f0f2ee' }}>
-            <Bot className="w-10 h-10" style={{ color: '#4a5d40' }} />
-            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center">
-              <div className={`w-4 h-4 rounded-full ${status.dotBg}`} />
+    <div className="flex flex-col gap-10">
+      {/* Profile Header */}
+      <section className="flex justify-between items-start">
+        <div className="flex gap-6 items-center">
+          <div className="relative">
+            <div className="w-24 h-24 rounded-full bg-[#283618] flex items-center justify-center text-3xl font-bold text-white shadow-xl">
+              {getInitials(agent.name, agent.nameEn)}
+            </div>
+            <div className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-[#f5f0e8] border-4 border-[#f5f0e8] flex items-center justify-center">
+              <div className={`w-3 h-3 rounded-full ${status.dot}`} />
             </div>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="space-y-1">
             <div className="flex items-center gap-3">
-              <h2 className="text-slate-800 text-3xl font-bold tracking-tight" style={{ fontFamily: "'Noto Serif KR', serif" }}>{agent.name}</h2>
-              <span className={`px-2 py-1 ${tierBadge.bg} ${tierBadge.text} text-[10px] font-bold rounded-lg uppercase tracking-wider`}>
+              <h2 className="text-3xl font-extrabold tracking-tight text-[#1a1a1a]">
+                {agent.name}
+                {agent.nameEn && <span className="text-[#6b705c] font-medium text-xl ml-2">{agent.nameEn}</span>}
+              </h2>
+              <span className={`${tierBadge.bg} ${tierBadge.text} px-3 py-1 rounded-full text-xs font-bold tracking-wider`}>
                 {tierLabels[agent.tier] || agent.tier}
               </span>
             </div>
-            <p className="text-stone-400 text-base">{deptName} &middot; {agent.role || 'Agent'}</p>
+            <p className="text-[#6b705c] font-medium flex items-center gap-2">
+              <Bot className="w-4 h-4" />
+              {agent.role || 'Agent'} — {deptName}
+            </p>
+            <div className="flex items-center gap-2 pt-1">
+              <span className="flex items-center gap-1 text-xs font-bold uppercase tracking-widest" style={{ color: status.dot === 'bg-[#4d7c0f]' ? '#4d7c0f' : status.dot === 'bg-[#dc2626]' ? '#dc2626' : '#6b705c' }}>
+                <span className={`w-1.5 h-1.5 rounded-full ${status.dot} ${status.dot === 'bg-[#4d7c0f]' ? 'animate-pulse' : ''}`} />
+                {status.labelKo} {status.label}
+              </span>
+            </div>
           </div>
         </div>
-        <div className="flex gap-3 mt-4 md:mt-0">
-          <button onClick={() => setIsEditing(true)} className="flex items-center justify-center rounded-xl h-10 px-6 bg-white border border-slate-200 text-slate-700 text-sm font-bold hover:shadow-md transition-all">
-            <Pencil className="w-4 h-4 mr-2" /> 편집
+        <div className="flex gap-2">
+          <button onClick={() => setIsEditing(true)} className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[#e5e1d3] hover:bg-[#f5f0e8] transition-colors font-medium text-sm text-[#1a1a1a]">
+            <Pencil className="w-4 h-4" /> 수정
           </button>
-          <button onClick={onDelete} disabled={agent.isSystem || agent.isSecretary} className="flex items-center justify-center rounded-xl h-10 px-6 bg-red-50 text-red-500 text-sm font-bold border border-red-100 hover:bg-red-100 transition-colors disabled:opacity-30">
-            <Trash2 className="w-4 h-4 mr-2" /> 삭제
+          <button onClick={onDelete} disabled={agent.isSystem || agent.isSecretary} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#dc2626] text-white hover:bg-[#b91c1c] transition-colors font-medium text-sm shadow-sm disabled:opacity-30">
+            <Trash2 className="w-4 h-4" /> 비활성화
           </button>
         </div>
-      </div>
+      </section>
+
+      {/* Stats Grid */}
+      <section className="grid grid-cols-4 gap-4">
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-[#e5e1d3]/30">
+          <p className="text-xs font-bold text-[#6b705c] uppercase tracking-widest mb-1">총 작업</p>
+          <p className="text-3xl font-bold font-mono text-[#283618]">--</p>
+          <p className="text-[10px] text-[#4d7c0f] mt-2 font-medium">실적 집계 중</p>
+        </div>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-[#e5e1d3]/30">
+          <p className="text-xs font-bold text-[#6b705c] uppercase tracking-widest mb-1">성공률</p>
+          <p className="text-3xl font-bold font-mono text-[#283618]">--%</p>
+          <div className="w-full bg-[#e5e1d3] h-1 rounded-full mt-4 overflow-hidden">
+            <div className="bg-[#4d7c0f] h-full" style={{ width: '0%' }} />
+          </div>
+        </div>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-[#e5e1d3]/30">
+          <p className="text-xs font-bold text-[#6b705c] uppercase tracking-widest mb-1">평균 응답</p>
+          <p className="text-3xl font-bold font-mono text-[#283618]">--s</p>
+          <p className="text-[10px] text-[#6b705c] mt-2 font-medium">데이터 수집 중</p>
+        </div>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-[#e5e1d3]/30">
+          <p className="text-xs font-bold text-[#6b705c] uppercase tracking-widest mb-1">월간 비용</p>
+          <p className="text-3xl font-bold font-mono text-[#283618]">$--</p>
+          <p className="text-[10px] text-[#756e5a] mt-2 font-medium">예산 집계 중</p>
+        </div>
+      </section>
 
       {/* Detail Tabs */}
-      <div className="border-b border-slate-200 mt-6">
+      <div className="border-b border-[#e5e1d3] mt-2">
         <div className="flex gap-8">
           {detailTabItems.map((tab) => (
             <button
@@ -407,10 +456,9 @@ function AgentDetailPanel({
               onClick={() => setDetailTab(tab.value)}
               className={`pb-4 border-b-2 text-sm transition-colors ${
                 detailTab === tab.value
-                  ? 'font-bold'
-                  : 'border-transparent text-stone-500 hover:text-slate-600 font-medium'
+                  ? 'font-bold text-[#606C38] border-[#606C38]'
+                  : 'border-transparent text-[#6b705c] hover:text-[#283618] font-medium'
               }`}
-              style={detailTab === tab.value ? { borderColor: '#5a7247', color: '#5a7247' } : {}}
             >
               {tab.label}
             </button>
@@ -420,74 +468,81 @@ function AgentDetailPanel({
 
       {/* Tab Content */}
       {detailTab === 'overview' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-6">
-          <div className="lg:col-span-2 flex flex-col gap-4">
-            <h3 className="text-slate-800 font-bold text-lg mb-2">최근 활동</h3>
-            <div className="bg-slate-50 rounded-xl border border-slate-100 divide-y divide-slate-100">
-              {recentActivities.map((act) => (
-                <div key={act.id} className="p-4 flex items-center justify-between hover:bg-slate-100/50 transition-colors">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: act.icon === 'success' ? 'rgba(90,114,71,0.1)' : 'rgba(59,130,246,0.1)', color: act.icon === 'success' ? '#5a7247' : '#3b82f6' }}>
-                      {activityIconMap[act.icon]}
-                    </div>
-                    <div>
-                      <p className="text-slate-800 font-medium text-sm">{act.title}</p>
-                      <p className="text-stone-500 text-xs mt-1">{act.detail}</p>
-                    </div>
-                  </div>
-                  <span className="text-stone-500 text-xs">{act.time}</span>
-                </div>
-              ))}
+        <div className="grid grid-cols-12 gap-8">
+          {/* Recent Tasks */}
+          <section className="col-span-8 space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-bold tracking-tight text-[#1a1a1a]">
+                최근 활동 <span className="text-[#6b705c] font-normal text-sm ml-2">Recent Activity</span>
+              </h3>
             </div>
-          </div>
-          <div className="lg:col-span-1 flex flex-col gap-4">
-            <h3 className="text-slate-800 font-bold text-lg mb-2">성능 지표</h3>
-            <div className="rounded-xl p-6 border border-slate-100 shadow-sm relative overflow-hidden" style={{ backgroundColor: '#f0f2ee' }}>
-              <div className="flex flex-col gap-6 relative z-10">
-                <div>
-                  <p className="text-stone-400 text-sm mb-1">총 처리 작업</p>
-                  <span className="text-3xl font-bold tracking-tight text-slate-800">--</span>
-                </div>
-                <div className="w-full h-px bg-slate-200" />
-                <div>
-                  <p className="text-stone-400 text-sm mb-1">작업 성공률</p>
-                  <span className="text-2xl font-bold tracking-tight text-slate-800">--%</span>
-                  <div className="w-full bg-slate-200 h-1.5 rounded-full mt-3 overflow-hidden">
-                    <div className="h-full rounded-full" style={{ width: '0%', backgroundColor: '#5a7247' }} />
+            <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-[#e5e1d3]/30">
+              <div className="divide-y divide-[#e5e1d3]/30">
+                {recentActivities.map((act) => (
+                  <div key={act.id} className="px-6 py-4 flex items-center justify-between hover:bg-[#faf8f5]/50 transition-colors">
+                    <div className="flex items-center gap-4">
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${act.icon === 'success' ? 'bg-[#606C38]/10 text-[#606C38]' : 'bg-[#283618]/10 text-[#283618]'}`}>
+                        {activityIconMap[act.icon]}
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-[#1a1a1a]">{act.title}</p>
+                        <p className="text-xs text-[#6b705c] mt-0.5">{act.detail}</p>
+                      </div>
+                    </div>
+                    <span className="text-xs text-[#6b705c]">{act.time}</span>
                   </div>
-                </div>
-                <div className="w-full h-px bg-slate-200" />
-                <div>
-                  <p className="text-stone-400 text-sm mb-1">누적 API 비용</p>
-                  <span className="text-2xl font-bold tracking-tight text-slate-800">$--</span>
-                </div>
+                ))}
               </div>
             </div>
-          </div>
+          </section>
+          {/* Performance */}
+          <section className="col-span-4 space-y-4">
+            <h3 className="text-lg font-bold tracking-tight text-[#1a1a1a]">
+              성능 지표 <span className="text-[#6b705c] font-normal text-sm block">Performance</span>
+            </h3>
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-[#e5e1d3]/30 space-y-6">
+              <div>
+                <p className="text-xs font-bold text-[#6b705c] uppercase tracking-widest mb-1">모델</p>
+                <p className="text-sm font-mono font-medium text-[#283618]">{agent.modelName}</p>
+              </div>
+              <div>
+                <p className="text-xs font-bold text-[#6b705c] uppercase tracking-widest mb-1">등급</p>
+                <p className="text-sm font-medium text-[#283618]">{tierLabels[agent.tier] || agent.tier}</p>
+              </div>
+              <div>
+                <p className="text-xs font-bold text-[#6b705c] uppercase tracking-widest mb-1">자동 학습</p>
+                <p className="text-sm font-medium text-[#283618]">{agent.autoLearn ? 'ON' : 'OFF'}</p>
+              </div>
+              <div>
+                <p className="text-xs font-bold text-[#6b705c] uppercase tracking-widest mb-1">허용 도구</p>
+                <p className="text-sm font-medium text-[#283618]">{agent.allowedTools.length > 0 ? `${agent.allowedTools.length}개` : '제한 없음'}</p>
+              </div>
+            </div>
+          </section>
         </div>
       )}
 
       {detailTab === 'soul' && (
-        <div className="mt-6">
+        <div className="mt-2">
           <SoulEditor agentId={agent.id} initialSoul={agent.soul ?? ''} onSave={onSoulSave} isSaving={isUpdating} />
         </div>
       )}
 
       {detailTab === 'history' && (
-        <div className="mt-6">
-          <div className="bg-slate-50 rounded-xl border border-slate-100 p-8 text-center">
-            <Clock className="w-10 h-10 text-stone-600 mx-auto mb-3" />
-            <p className="text-stone-500 text-sm">작업 이력이 없습니다</p>
-            <p className="text-stone-500 text-xs mt-1">에이전트가 작업을 수행하면 여기에 기록됩니다</p>
+        <div className="mt-2">
+          <div className="bg-[#f5f0e8] rounded-xl border border-[#e5e1d3] p-8 text-center">
+            <Clock className="w-10 h-10 text-[#6b705c] mx-auto mb-3" />
+            <p className="text-[#6b705c] text-sm">작업 이력이 없습니다</p>
+            <p className="text-[#756e5a] text-xs mt-1">에이전트가 작업을 수행하면 여기에 기록됩니다</p>
           </div>
         </div>
       )}
 
       {detailTab === 'settings' && (
-        <div className="mt-6 space-y-4">
-          <div className="bg-slate-50 rounded-xl border border-slate-100 p-6">
-            <h4 className="text-slate-800 font-bold text-sm mb-4 flex items-center gap-2">
-              <Settings className="w-4 h-4 text-stone-500" /> 에이전트 설정
+        <div className="mt-2 space-y-4">
+          <div className="bg-[#f5f0e8] rounded-xl border border-[#e5e1d3] p-6">
+            <h4 className="text-[#1a1a1a] font-bold text-sm mb-4 flex items-center gap-2">
+              <Settings className="w-4 h-4 text-[#6b705c]" /> 에이전트 설정
             </h4>
             <div className="space-y-3">
               {[
@@ -497,9 +552,9 @@ function AgentDetailPanel({
                 { label: '비서 에이전트', value: agent.isSecretary ? 'YES' : 'NO' },
                 { label: '허용된 도구', value: agent.allowedTools.length > 0 ? `${agent.allowedTools.length}개` : '없음' },
               ].map((item, i) => (
-                <div key={i} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-b-0">
-                  <span className="text-stone-400 text-sm">{item.label}</span>
-                  <span className="text-slate-800 text-sm font-medium">{item.value}</span>
+                <div key={i} className="flex items-center justify-between py-2 border-b border-[#e5e1d3] last:border-b-0">
+                  <span className="text-[#6b705c] text-sm">{item.label}</span>
+                  <span className="text-[#1a1a1a] text-sm font-medium">{item.value}</span>
                 </div>
               ))}
             </div>
@@ -631,12 +686,22 @@ export function AgentsPage() {
     ...departmentsList.filter((d) => d.isActive).map((d) => ({ value: d.id, label: d.name })),
   ]
 
+  // Filter agents by search
+  const filteredAgents = agents.filter((a) => {
+    if (!searchQuery) return true
+    const q = searchQuery.toLowerCase()
+    return a.name.toLowerCase().includes(q) || (a.nameEn?.toLowerCase().includes(q)) || (a.role?.toLowerCase().includes(q))
+  })
+
   if (isLoading) {
     return (
-      <div data-testid="agents-page" className="flex-1 px-8 py-8 space-y-6" style={{ backgroundColor: '#faf8f5' }}>
+      <div data-testid="agents-page" className="flex-1 p-8 space-y-6 bg-[#faf8f5]">
         <Skeleton className="h-10 w-64" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-48 w-full rounded-xl" />)}
+        <div className="flex gap-8">
+          <div className="w-[380px] space-y-2">
+            {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-20 w-full rounded-xl" />)}
+          </div>
+          <Skeleton className="flex-1 h-96 rounded-[2rem]" />
         </div>
       </div>
     )
@@ -644,135 +709,115 @@ export function AgentsPage() {
 
   if (isError) {
     return (
-      <div data-testid="agents-page" className="flex-1 px-8 py-8" style={{ backgroundColor: '#faf8f5' }}>
+      <div data-testid="agents-page" className="flex-1 p-8 bg-[#faf8f5]">
         <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-          <p className="text-sm text-red-600">에이전트 목록을 불러올 수 없습니다</p>
-          <button onClick={() => refetch()} className="text-xs text-red-500 hover:text-red-400 underline mt-2">다시 시도</button>
+          <p className="text-sm text-[#dc2626]">에이전트 목록을 불러올 수 없습니다</p>
+          <button onClick={() => refetch()} className="text-xs text-[#dc2626] hover:opacity-70 underline mt-2">다시 시도</button>
         </div>
       </div>
     )
   }
 
   return (
-    <div data-testid="agents-page" className="flex-1 flex flex-col min-h-0" style={{ backgroundColor: '#faf8f5', fontFamily: "'Public Sans', sans-serif" }}>
-        {/* Page Header */}
-        <div className="px-8 py-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-            <div>
-              <nav className="flex text-xs text-stone-500 mb-2 gap-2">
-                <span>Workspace</span>
-                <span>/</span>
-                <span className="font-medium" style={{ color: '#4a5d40' }}>Agents</span>
-              </nav>
-              <h2 className="text-4xl font-bold text-slate-800" style={{ fontFamily: "'Noto Serif KR', serif" }}>Agents Directory</h2>
-              <p className="text-stone-400 mt-1">Manage your specialized AI workforce and monitor real-time performance.</p>
-            </div>
-            <div className="flex gap-2">
-              <div className="bg-white p-1 rounded-xl shadow-sm flex">
+    <div data-testid="agents-page" className="flex-1 bg-[#faf8f5] overflow-hidden">
+      <div className="p-8 max-w-[1440px] mx-auto h-full">
+        <div className="flex gap-8 h-[calc(100vh-64px)]">
+          {/* LEFT PANEL: Agent List */}
+          <aside className="w-[380px] flex flex-col gap-6 flex-shrink-0">
+            <header className="flex flex-col gap-4">
+              <div className="flex justify-between items-start">
+                <h1 className="text-2xl font-bold tracking-tight text-[#1a1a1a]">
+                  에이전트 관리 <span className="text-[#6b705c] font-normal ml-1">Agents</span>
+                </h1>
+              </div>
+              <button
+                onClick={() => setCreateOpen(true)}
+                className="w-full flex items-center justify-center gap-2 bg-[#606C38] hover:bg-[#4e5a2b] text-white py-3 px-4 rounded-xl font-semibold transition-all shadow-sm active:scale-95"
+              >
+                <Plus className="w-4 h-4" />
+                <span>새 에이전트 생성</span>
+              </button>
+              <div className="relative">
+                <Bot className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#908a78]" />
+                <input
+                  className="w-full bg-[#f5f0e8] border-none rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-1 focus:ring-[#606C38] placeholder:text-[#908a78] text-[#1a1a1a]"
+                  placeholder="에이전트 검색..."
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+              <div className="flex gap-2 overflow-x-auto pb-1">
                 {(['active', 'all', 'inactive'] as const).map((f) => (
                   <button
                     key={f}
                     onClick={() => setFilterActive(f)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium ${
-                      filterActive === f ? 'text-white' : 'text-stone-400 hover:bg-slate-50'
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
+                      filterActive === f
+                        ? 'bg-[#606C38] text-white'
+                        : 'bg-[#e5e1d3] text-[#6b705c] hover:bg-[#d5d0c3]'
                     }`}
-                    style={filterActive === f ? { backgroundColor: '#4a5d40' } : {}}
                   >
-                    {f === 'active' ? 'All Agents' : f === 'all' ? 'All' : 'Favorites'}
+                    {f === 'active' ? '활성' : f === 'all' ? '전체' : '비활성'}
                   </button>
                 ))}
               </div>
-            </div>
-          </div>
+            </header>
 
-          {/* Filters */}
-          <div className="flex flex-wrap items-center gap-3 mb-8">
-            <div className="group relative">
-              <div className="w-48">
-                <Select options={filterDeptOptions} value={filterDept} onChange={(e) => setFilterDept(e.target.value)} />
-              </div>
-            </div>
-            <div className="h-6 w-px bg-slate-300 mx-2"></div>
-            <span className="text-xs font-semibold text-stone-500 uppercase tracking-wider">Active Filters:</span>
-            <span className="px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1" style={{ backgroundColor: 'rgba(74,93,64,0.1)', color: '#4a5d40' }}>
-              {filterActive === 'active' ? 'Active' : filterActive === 'inactive' ? 'Inactive' : 'All Status'}
-            </span>
-          </div>
-
-          {/* Grid */}
-          {agents.length === 0 && (
-            <EmptyState title="에이전트가 없습니다" description="첫 에이전트를 생성하여 AI 조직을 구성하세요" />
-          )}
-
-          {agents.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {agents.map((agent, idx) => {
-                const deptName = agent.departmentId ? deptMap.get(agent.departmentId) || 'Department' : 'Unassigned'
+            {/* Agent List */}
+            <div className="flex-1 overflow-y-auto pr-2 space-y-2">
+              {filteredAgents.length === 0 && (
+                <EmptyState title="에이전트가 없습니다" description="첫 에이전트를 생성하여 AI 조직을 구성하세요" />
+              )}
+              {filteredAgents.map((agent) => {
+                const deptName = agent.departmentId ? deptMap.get(agent.departmentId) || '부서' : '미배속'
                 const status = statusConfig[agent.status] || statusConfig.offline
-                const tierBadge = tierBadgeStyles[agent.tier] || tierBadgeStyles.worker
                 const isSelected = selectedAgent?.id === agent.id
-                const AgentIconComp = agentIconComponents[idx % agentIconComponents.length]
 
                 return (
                   <div
                     key={agent.id}
                     data-testid={`agent-row-${agent.id}`}
                     onClick={() => setSelectedAgent(isSelected ? null : agent)}
-                    className={`bg-white p-5 rounded-xl shadow-sm border flex flex-col hover:shadow-md transition-shadow cursor-pointer ${
-                      isSelected ? 'border-2' : 'border-slate-100'
+                    className={`p-4 rounded-xl cursor-pointer transition-all ${
+                      isSelected
+                        ? 'bg-[#e5e1d3] border-l-4 border-[#606C38] shadow-sm'
+                        : 'bg-[#f5f0e8] hover:bg-[#ede8de]'
                     } ${!agent.isActive ? 'opacity-50' : ''}`}
-                    style={isSelected ? { borderColor: '#4a5d40' } : {}}
                   >
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#f0f2ee', color: '#4a5d40' }}>
-                        <AgentIconComp className="w-7 h-7" />
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-[#283618] text-white flex items-center justify-center font-bold text-sm">
+                        {getInitials(agent.name, agent.nameEn)}
                       </div>
-                      <div className={`flex items-center gap-1.5 px-2 py-1 ${status.labelBg} ${status.labelText} rounded-lg text-[10px] font-bold uppercase tracking-tight border`} style={{ borderColor: 'transparent' }}>
-                        <span className={`w-2 h-2 rounded-full ${status.dotBg}`}></span>
-                        {status.label}
-                      </div>
-                    </div>
-                    <h3 className="text-xl font-bold text-slate-800" style={{ fontFamily: "'Noto Serif KR', serif" }}>{agent.name}</h3>
-                    <p className="text-stone-400 text-sm mb-4">{agent.role || 'Agent'}</p>
-                    <div className="mt-auto space-y-3">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-stone-500">Department</span>
-                        <span className="font-medium text-slate-700">{deptName}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className={`px-2 py-1 ${tierBadge.bg} ${tierBadge.text} text-[10px] font-bold rounded-lg uppercase tracking-wider`}>
-                          {tierLabels[agent.tier] || agent.tier}
-                        </span>
-                        <button className="hover:underline text-xs font-semibold flex items-center gap-1" style={{ color: '#4a5d40' }}>
-                          Configure <ArrowRight className="w-3.5 h-3.5 inline" />
-                        </button>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-center">
+                          <h3 className={`${isSelected ? 'font-bold' : 'font-medium'} text-[#1a1a1a] truncate`}>
+                            {agent.name}
+                            {agent.nameEn && <span className="text-[10px] text-[#908a78] ml-1">{agent.nameEn}</span>}
+                          </h3>
+                          <span className={`flex h-2 w-2 rounded-full ${status.dot}`} />
+                        </div>
+                        <div className="flex items-center gap-2 text-[11px] text-[#6b705c] mt-0.5">
+                          <span className="font-medium">{deptName}</span>
+                          <span className="w-1 h-1 rounded-full bg-[#e5e1d3]" />
+                          <span className="font-mono">{agent.tier === 'manager' ? 'T1' : agent.tier === 'specialist' ? 'T2' : 'T3'}</span>
+                          <span className="w-1 h-1 rounded-full bg-[#e5e1d3]" />
+                          <span>{status.labelKo}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 )
               })}
-
-              {/* Add Agent Placeholder */}
-              <div
-                onClick={() => setCreateOpen(true)}
-                className="border-2 border-dashed border-slate-200 p-5 rounded-xl flex flex-col items-center justify-center text-center hover:border-opacity-50 transition-colors cursor-pointer group"
-              >
-                <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-stone-500 group-hover:text-white transition-all mb-3" style={{ ...(false ? { backgroundColor: '#4a5d40' } : {}) }}>
-                  <Plus className="w-8 h-8" />
-                </div>
-                <h3 className="font-bold text-slate-700">Deploy New Agent</h3>
-                <p className="text-stone-500 text-xs mt-1">Scale your workspace capacity</p>
-              </div>
             </div>
-          )}
+          </aside>
 
-          {/* Detail Panel */}
-          {selectedAgent && (
-            <>
-              <div className="w-full h-px bg-slate-200 my-8" />
+          {/* RIGHT PANEL: Agent Details */}
+          <main className="flex-1 bg-[#f5f0e8] rounded-[2rem] p-8 overflow-y-auto flex flex-col">
+            {selectedAgent ? (
               <AgentDetailPanel
                 agent={selectedAgent}
-                deptName={selectedAgent.departmentId ? deptMap.get(selectedAgent.departmentId) || 'Department' : 'Unassigned'}
+                deptName={selectedAgent.departmentId ? deptMap.get(selectedAgent.departmentId) || '부서' : '미배속'}
                 departments={departmentsList}
                 users={usersList}
                 onEdit={handleEdit}
@@ -780,32 +825,18 @@ export function AgentsPage() {
                 onSoulSave={handleSoulSave}
                 isUpdating={updateMutation.isPending}
               />
-            </>
-          )}
+            ) : (
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-center space-y-3">
+                  <Bot className="w-16 h-16 text-[#e5e1d3] mx-auto" />
+                  <p className="text-[#6b705c] font-medium">에이전트를 선택하세요</p>
+                  <p className="text-[#908a78] text-sm">좌측 목록에서 에이전트를 클릭하면 상세 정보가 표시됩니다</p>
+                </div>
+              </div>
+            )}
+          </main>
         </div>
-
-        {/* Footer Stats */}
-        <footer className="mt-auto p-8 border-t border-slate-200 bg-white/50">
-          <div className="flex flex-wrap gap-8 justify-between items-center">
-            <div className="flex gap-8">
-              <div>
-                <p className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Total Agents</p>
-                <p className="text-2xl font-bold text-slate-800">{agents.length}</p>
-              </div>
-              <div>
-                <p className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Active Tasks</p>
-                <p className="text-2xl font-bold text-slate-800">--</p>
-              </div>
-              <div>
-                <p className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Success Rate</p>
-                <p className="text-2xl font-bold text-green-600">--%</p>
-              </div>
-            </div>
-            <div className="text-stone-500 text-xs italic">
-              All systems operational. Last sync: just now.
-            </div>
-          </div>
-        </footer>
+      </div>
 
       {/* Create Modal */}
       <Modal isOpen={createOpen} onClose={() => setCreateOpen(false)} title="에이전트 생성">
@@ -817,18 +848,18 @@ export function AgentsPage() {
         {deleteAgent && (
           <div className="space-y-4">
             {deleteAgent.isSecretary && (
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-                <p className="text-sm text-amber-700">비서 에이전트는 삭제할 수 없습니다.</p>
+              <div className="bg-[#b45309]/10 border border-[#b45309]/20 rounded-lg p-3">
+                <p className="text-sm text-[#b45309]">비서 에이전트는 삭제할 수 없습니다.</p>
               </div>
             )}
             {deleteAgent.isSystem && (
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-                <p className="text-sm text-amber-700">시스템 에이전트는 삭제할 수 없습니다.</p>
+              <div className="bg-[#b45309]/10 border border-[#b45309]/20 rounded-lg p-3">
+                <p className="text-sm text-[#b45309]">시스템 에이전트는 삭제할 수 없습니다.</p>
               </div>
             )}
             {!deleteAgent.isSecretary && !deleteAgent.isSystem && (
               <>
-                <p className="text-sm text-stone-400">이 에이전트를 비활성화하시겠습니까? 에이전트가 부서에서 해제되고 비활성화됩니다.</p>
+                <p className="text-sm text-[#6b705c]">이 에이전트를 비활성화하시겠습니까? 에이전트가 부서에서 해제되고 비활성화됩니다.</p>
                 <div className="flex gap-2 justify-end pt-2">
                   <Button variant="outline" size="sm" onClick={() => setDeleteAgent(null)} disabled={deleteMutation.isPending}>취소</Button>
                   <Button variant="destructive" size="sm" onClick={() => deleteMutation.mutate(deleteAgent.id)} disabled={deleteMutation.isPending}>
