@@ -110,18 +110,18 @@ export function WorkflowsPage() {
   // --- Detail view ---
   if (selectedWorkflow) {
     return (
-      <div className="flex flex-col h-full w-full" style={{ fontFamily: "'Pretendard', sans-serif", backgroundColor: '#faf8f5' }}>
+      <div className="flex flex-col h-full w-full" style={{ fontFamily: "'Inter', sans-serif", backgroundColor: '#faf8f5' }}>
           {/* Header */}
           <header className="border-b px-8 py-6 flex items-center justify-between" style={{ backgroundColor: '#ffffff', borderColor: '#e5e1d3' }}>
             <div className="flex items-center gap-3">
               <button
                 onClick={() => { setSelectedWorkflow(null); setExecutionsPage(1) }}
                 className="text-sm min-h-[44px] flex items-center px-3 transition-colors"
-                style={{ color: '#9c8d66' }}
+                style={{ color: '#6b705c' }}
               >
                 ← 목록
               </button>
-              <h2 className="text-xl font-semibold" style={{ color: '#463e30', fontFamily: "'Noto Serif KR', serif" }}>
+              <h2 className="text-xl font-semibold" style={{ color: '#1a1a1a', fontFamily: "'Inter', sans-serif" }}>
                 {detailLoading ? '...' : detail?.name || 'Workflow'}
               </h2>
             </div>
@@ -131,7 +131,7 @@ export function WorkflowsPage() {
                   onClick={() => handleExecute(detail.id)}
                   disabled={executeMutation.isPending}
                   className="text-white rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50 transition-colors"
-                  style={{ backgroundColor: '#c4622d' }}
+                  style={{ backgroundColor: '#606C38' }}
                   data-testid="execute-btn"
                 >
                   {executeMutation.isPending ? '실행 중...' : '실행'}
@@ -139,7 +139,7 @@ export function WorkflowsPage() {
                 <button
                   onClick={() => openEdit(detail)}
                   className="border rounded-lg px-4 py-2 text-sm transition-colors"
-                  style={{ borderColor: '#e5e1d3', color: '#6a5d43' }}
+                  style={{ borderColor: '#e5e1d3', color: '#6b705c' }}
                   data-testid="edit-workflow-btn"
                 >
                   편집
@@ -160,18 +160,18 @@ export function WorkflowsPage() {
           <div className="flex-1 overflow-y-auto px-8 py-6">
             {detailLoading ? (
               <div className="space-y-3">
-                {[1, 2, 3].map(i => <div key={i} className="h-16 animate-pulse rounded-xl" style={{ backgroundColor: '#f2f0e9' }} />)}
+                {[1, 2, 3].map(i => <div key={i} className="h-16 animate-pulse rounded-xl" style={{ backgroundColor: '#f5f0e8' }} />)}
               </div>
             ) : detail ? (
               <div className="max-w-3xl space-y-6">
                 {/* Description */}
                 {detail.description && (
-                  <p className="text-sm" style={{ color: '#9c8d66' }}>{detail.description}</p>
+                  <p className="text-sm" style={{ color: '#6b705c' }}>{detail.description}</p>
                 )}
 
                 {/* Steps visualization */}
                 <div>
-                  <h3 className="text-sm font-medium mb-3" style={{ color: '#9c8d66' }}>단계 ({detail.steps.length})</h3>
+                  <h3 className="text-sm font-medium mb-3" style={{ color: '#6b705c' }}>단계 ({detail.steps.length})</h3>
                   <div className="space-y-2">
                     {(detail.steps as WorkflowStep[]).map((step, idx) => {
                       const typeInfo = STEP_TYPE_LABELS[step.type] || STEP_TYPE_LABELS.tool
@@ -180,7 +180,7 @@ export function WorkflowsPage() {
                           <div className="flex flex-col items-center">
                             <div
                               className="w-8 h-8 rounded-full border flex items-center justify-center text-xs font-mono"
-                              style={{ backgroundColor: '#fbfaf8', borderColor: '#e5e1d3', color: '#9c8d66' }}
+                              style={{ backgroundColor: '#faf8f5', borderColor: '#e5e1d3', color: '#6b705c' }}
                             >
                               {idx + 1}
                             </div>
@@ -196,11 +196,11 @@ export function WorkflowsPage() {
                               >
                                 {typeInfo.label}
                               </span>
-                              <span className="text-sm font-medium" style={{ color: '#463e30' }}>{step.name}</span>
+                              <span className="text-sm font-medium" style={{ color: '#1a1a1a' }}>{step.name}</span>
                             </div>
-                            <p className="text-xs font-mono" style={{ color: '#9c8d66' }}>{step.action}</p>
+                            <p className="text-xs font-mono" style={{ color: '#6b705c' }}>{step.action}</p>
                             {step.dependsOn && step.dependsOn.length > 0 && (
-                              <p className="text-[10px] mt-1" style={{ color: '#b7aa88' }}>
+                              <p className="text-[10px] mt-1" style={{ color: '#756e5a' }}>
                                 의존: {step.dependsOn.map(depId => {
                                   const depStep = (detail.steps as WorkflowStep[]).find(s => s.id === depId)
                                   return depStep?.name || depId.slice(0, 8)
@@ -208,7 +208,7 @@ export function WorkflowsPage() {
                               </p>
                             )}
                             {step.timeout && (
-                              <p className="text-[10px] mt-0.5" style={{ color: '#b7aa88' }}>타임아웃: {(step.timeout / 1000).toFixed(0)}초</p>
+                              <p className="text-[10px] mt-0.5" style={{ color: '#756e5a' }}>타임아웃: {(step.timeout / 1000).toFixed(0)}초</p>
                             )}
                           </div>
                         </div>
@@ -219,9 +219,9 @@ export function WorkflowsPage() {
 
                 {/* Execution history */}
                 <div>
-                  <h3 className="text-sm font-medium mb-3" style={{ color: '#9c8d66' }}>실행 이력</h3>
+                  <h3 className="text-sm font-medium mb-3" style={{ color: '#6b705c' }}>실행 이력</h3>
                   {executions.length === 0 ? (
-                    <p className="text-xs" style={{ color: '#b7aa88' }}>아직 실행 이력이 없습니다</p>
+                    <p className="text-xs" style={{ color: '#756e5a' }}>아직 실행 이력이 없습니다</p>
                   ) : (
                     <div className="space-y-2">
                       {executions.map(exec => {
@@ -236,18 +236,18 @@ export function WorkflowsPage() {
                             onClick={() => setExecutionsPage(p => Math.max(1, p - 1))}
                             disabled={executionsPage <= 1}
                             className="text-xs disabled:opacity-30"
-                            style={{ color: '#9c8d66' }}
+                            style={{ color: '#6b705c' }}
                           >
                             이전
                           </button>
-                          <span className="text-xs" style={{ color: '#b7aa88' }}>
+                          <span className="text-xs" style={{ color: '#756e5a' }}>
                             {executionsPage} / {Math.ceil(executionsMeta.total / 10)}
                           </span>
                           <button
                             onClick={() => setExecutionsPage(p => p + 1)}
                             disabled={executionsPage >= Math.ceil(executionsMeta.total / 10)}
                             className="text-xs disabled:opacity-30"
-                            style={{ color: '#9c8d66' }}
+                            style={{ color: '#6b705c' }}
                           >
                             다음
                           </button>
@@ -289,20 +289,20 @@ export function WorkflowsPage() {
 
   // --- List view ---
   return (
-    <div className="flex flex-col h-full w-full" style={{ fontFamily: "'Pretendard', sans-serif", backgroundColor: '#faf8f5' }}>
+    <div className="flex flex-col h-full w-full" style={{ fontFamily: "'Inter', sans-serif", backgroundColor: '#faf8f5' }}>
         {/* Header */}
         <header className="border-b px-8 py-6" style={{ backgroundColor: '#ffffff', borderColor: '#e5e1d3' }}>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl" style={{ fontFamily: "'Noto Serif KR', serif", color: '#463e30' }}>Workflows</h1>
-              <p className="text-sm mt-1" style={{ color: '#9c8d66' }}>
+              <h1 className="text-3xl" style={{ fontFamily: "'Inter', sans-serif", color: '#1a1a1a' }}>Workflows</h1>
+              <p className="text-sm mt-1" style={{ color: '#6b705c' }}>
                 자동화 워크플로우를 관리하세요
               </p>
             </div>
             <button
               onClick={() => { setEditingWorkflow(null); setShowCreateModal(true) }}
               className="text-white rounded-2xl px-4 py-2 text-sm font-medium shadow-md transition-colors"
-              style={{ backgroundColor: '#c4622d' }}
+              style={{ backgroundColor: '#606C38' }}
               data-testid="create-workflow-btn"
             >
               + 워크플로우 생성
@@ -317,13 +317,13 @@ export function WorkflowsPage() {
                 onClick={() => setActiveTab(t.key)}
                 className="pb-3 text-sm transition-colors"
                 style={activeTab === t.key
-                  ? { fontWeight: 600, borderBottom: '2px solid #554b38', color: '#463e30' }
-                  : { fontWeight: 500, color: '#9c8d66', borderBottom: '2px solid transparent' }
+                  ? { fontWeight: 600, borderBottom: '2px solid #606C38', color: '#1a1a1a' }
+                  : { fontWeight: 500, color: '#6b705c', borderBottom: '2px solid transparent' }
                 }
               >
                 {t.label}
                 {t.count > 0 && (
-                  <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full" style={{ backgroundColor: '#f2f0e9', color: '#9c8d66' }}>
+                  <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full" style={{ backgroundColor: '#f5f0e8', color: '#6b705c' }}>
                     {t.count}
                   </span>
                 )}
@@ -339,12 +339,12 @@ export function WorkflowsPage() {
             {activeTab === 'workflows' && (
               isLoading ? (
                 <div className="space-y-3" data-testid="workflows-loading">
-                  {[1, 2, 3].map(i => <div key={i} className="h-20 animate-pulse rounded-xl" style={{ backgroundColor: '#f2f0e9' }} />)}
+                  {[1, 2, 3].map(i => <div key={i} className="h-20 animate-pulse rounded-xl" style={{ backgroundColor: '#f5f0e8' }} />)}
                 </div>
               ) : workflows.length === 0 ? (
                 <div className="text-center py-16" data-testid="workflows-empty">
-                  <p className="text-sm" style={{ color: '#9c8d66' }}>아직 워크플로우가 없습니다</p>
-                  <p className="text-xs mt-1" style={{ color: '#b7aa88' }}>새 워크플로우를 생성해보세요</p>
+                  <p className="text-sm" style={{ color: '#6b705c' }}>아직 워크플로우가 없습니다</p>
+                  <p className="text-xs mt-1" style={{ color: '#756e5a' }}>새 워크플로우를 생성해보세요</p>
                 </div>
               ) : (
                 workflows.map(wf => (
@@ -360,11 +360,11 @@ export function WorkflowsPage() {
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-medium truncate" style={{ color: '#463e30' }}>{wf.name}</h3>
+                        <h3 className="text-sm font-medium truncate" style={{ color: '#1a1a1a' }}>{wf.name}</h3>
                         {wf.description && (
-                          <p className="text-xs mt-0.5 truncate" style={{ color: '#9c8d66' }}>{wf.description}</p>
+                          <p className="text-xs mt-0.5 truncate" style={{ color: '#6b705c' }}>{wf.description}</p>
                         )}
-                        <div className="flex items-center gap-3 mt-2 text-[10px] font-mono" style={{ color: '#b7aa88' }}>
+                        <div className="flex items-center gap-3 mt-2 text-[10px] font-mono" style={{ color: '#756e5a' }}>
                           <span>{(wf.steps as WorkflowStep[]).length}개 단계</span>
                           <span>{new Date(wf.updatedAt).toLocaleDateString('ko-KR')}</span>
                         </div>
@@ -373,7 +373,7 @@ export function WorkflowsPage() {
                         <button
                           onClick={(e) => { e.stopPropagation(); openEdit(wf) }}
                           className="text-xs min-h-[44px] px-3 flex items-center transition-colors"
-                          style={{ color: '#9c8d66' }}
+                          style={{ color: '#6b705c' }}
                         >
                           편집
                         </button>
@@ -395,12 +395,12 @@ export function WorkflowsPage() {
             {activeTab === 'suggestions' && (
               suggestionsLoading ? (
                 <div className="space-y-3" data-testid="suggestions-loading">
-                  {[1, 2, 3].map(i => <div key={i} className="h-20 animate-pulse rounded-xl" style={{ backgroundColor: '#f2f0e9' }} />)}
+                  {[1, 2, 3].map(i => <div key={i} className="h-20 animate-pulse rounded-xl" style={{ backgroundColor: '#f5f0e8' }} />)}
                 </div>
               ) : suggestions.length === 0 ? (
                 <div className="text-center py-16" data-testid="suggestions-empty">
-                  <p className="text-sm" style={{ color: '#9c8d66' }}>대기 중인 자동 제안이 없습니다</p>
-                  <p className="text-xs mt-1" style={{ color: '#b7aa88' }}>반복적인 도구 사용 패턴이 감지되면 자동으로 제안됩니다</p>
+                  <p className="text-sm" style={{ color: '#6b705c' }}>대기 중인 자동 제안이 없습니다</p>
+                  <p className="text-xs mt-1" style={{ color: '#756e5a' }}>반복적인 도구 사용 패턴이 감지되면 자동으로 제안됩니다</p>
                 </div>
               ) : (
                 suggestions.map(sg => (
@@ -410,12 +410,12 @@ export function WorkflowsPage() {
                     style={{ backgroundColor: '#ffffff', borderColor: '#e5e1d3' }}
                     data-testid={`suggestion-item-${sg.id}`}
                   >
-                    <p className="text-sm mb-2" style={{ color: '#463e30' }}>{sg.reason}</p>
+                    <p className="text-sm mb-2" style={{ color: '#1a1a1a' }}>{sg.reason}</p>
                     <div className="flex items-center gap-2 mb-3 flex-wrap">
                       {(sg.suggestedSteps as WorkflowStep[]).map((step, i) => (
                         <span key={step.id} className="inline-flex items-center gap-1">
-                          <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: '#f2f0e9', color: '#6a5d43' }}>{step.action}</span>
-                          {i < sg.suggestedSteps.length - 1 && <span className="text-xs" style={{ color: '#d1c9b2' }}>→</span>}
+                          <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: '#f5f0e8', color: '#6b705c' }}>{step.action}</span>
+                          {i < sg.suggestedSteps.length - 1 && <span className="text-xs" style={{ color: '#d4cfc4' }}>→</span>}
                         </span>
                       ))}
                     </div>
@@ -424,7 +424,7 @@ export function WorkflowsPage() {
                         onClick={() => handleAcceptSuggestion(sg.id)}
                         disabled={acceptSuggestion.isPending}
                         className="text-white rounded-lg px-3 py-1.5 text-xs font-medium disabled:opacity-50 min-h-[44px]"
-                        style={{ backgroundColor: '#5a7247' }}
+                        style={{ backgroundColor: '#606C38' }}
                       >
                         수락
                       </button>
@@ -432,11 +432,11 @@ export function WorkflowsPage() {
                         onClick={() => handleRejectSuggestion(sg.id)}
                         disabled={rejectSuggestion.isPending}
                         className="border rounded-lg px-3 py-1.5 text-xs disabled:opacity-50 min-h-[44px]"
-                        style={{ borderColor: '#e5e1d3', color: '#6a5d43' }}
+                        style={{ borderColor: '#e5e1d3', color: '#6b705c' }}
                       >
                         거절
                       </button>
-                      <span className="text-[10px] ml-auto font-mono" style={{ color: '#b7aa88' }}>
+                      <span className="text-[10px] ml-auto font-mono" style={{ color: '#756e5a' }}>
                         {new Date(sg.createdAt).toLocaleDateString('ko-KR')}
                       </span>
                     </div>
@@ -491,21 +491,21 @@ function ExecutionCard({ execution, statusInfo }: { execution: WorkflowExecution
       >
         <div className="flex items-center gap-3">
           <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: statusInfo.bg, color: statusInfo.color }}>{statusInfo.label}</span>
-          <span className="text-xs font-mono" style={{ color: '#9c8d66' }}>
+          <span className="text-xs font-mono" style={{ color: '#6b705c' }}>
             {(execution.totalDurationMs / 1000).toFixed(1)}초
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-mono" style={{ color: '#b7aa88' }}>
+          <span className="text-[10px] font-mono" style={{ color: '#756e5a' }}>
             {new Date(execution.createdAt).toLocaleString('ko-KR', {
               month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
             })}
           </span>
-          <span className="text-xs" style={{ color: '#b7aa88' }}>{expanded ? '▲' : '▼'}</span>
+          <span className="text-xs" style={{ color: '#756e5a' }}>{expanded ? '▲' : '▼'}</span>
         </div>
       </div>
       {expanded && (
-        <div className="px-4 py-3 border-t space-y-2" style={{ borderColor: '#f2f0e9' }}>
+        <div className="px-4 py-3 border-t space-y-2" style={{ borderColor: '#e5e1d3' }}>
           {(execution.stepSummaries as WorkflowStepSummary[]).map((step) => (
             <div key={step.stepId} className="flex items-center justify-between text-xs">
               <div className="flex items-center gap-2">
@@ -515,10 +515,10 @@ function ExecutionCard({ execution, statusInfo }: { execution: WorkflowExecution
                     backgroundColor: step.status === 'completed' || step.status === 'success' ? '#10b981' : step.status === 'failed' ? '#ef4444' : '#d1c9b2',
                   }}
                 />
-                <span style={{ color: '#554b38' }}>{step.stepName}</span>
+                <span style={{ color: '#1a1a1a' }}>{step.stepName}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-mono" style={{ color: '#b7aa88' }}>{(step.durationMs / 1000).toFixed(1)}초</span>
+                <span className="font-mono" style={{ color: '#756e5a' }}>{(step.durationMs / 1000).toFixed(1)}초</span>
                 {step.error && (
                   <span className="truncate max-w-[200px]" style={{ color: '#ef4444' }} title={step.error}>{step.error}</span>
                 )}
@@ -549,10 +549,10 @@ function DeleteConfirmModal({ onConfirm, onCancel }: { onConfirm: () => void; on
         tabIndex={-1}
         data-testid="delete-confirm-modal"
       >
-        <h3 id="delete-modal-title" className="text-sm font-semibold mb-2" style={{ color: '#463e30' }}>워크플로우 삭제</h3>
-        <p className="text-xs mb-4" style={{ color: '#9c8d66' }}>이 워크플로우를 삭제하시겠습니까?</p>
+        <h3 id="delete-modal-title" className="text-sm font-semibold mb-2" style={{ color: '#1a1a1a' }}>워크플로우 삭제</h3>
+        <p className="text-xs mb-4" style={{ color: '#6b705c' }}>이 워크플로우를 삭제하시겠습니까?</p>
         <div className="flex justify-end gap-2">
-          <button onClick={onCancel} className="border rounded-lg px-4 py-2 text-sm" style={{ borderColor: '#e5e1d3', color: '#6a5d43' }}>취소</button>
+          <button onClick={onCancel} className="border rounded-lg px-4 py-2 text-sm" style={{ borderColor: '#e5e1d3', color: '#6b705c' }}>취소</button>
           <button onClick={onConfirm} className="text-white rounded-lg px-4 py-2 text-sm font-medium" style={{ backgroundColor: '#ef4444' }}>삭제</button>
         </div>
       </div>
@@ -576,7 +576,7 @@ function WorkflowFormModal({ workflow, isPending, onSubmit, onClose }: {
       : [createEmptyStep()]
   )
 
-  const inputStyle = { backgroundColor: '#fbfaf8', borderColor: '#e5e1d3', color: '#463e30' }
+  const inputStyle = { backgroundColor: '#faf8f5', borderColor: '#e5e1d3', color: '#1a1a1a' }
 
   function createEmptyStep(): WorkflowStep {
     return {
@@ -650,13 +650,13 @@ function WorkflowFormModal({ workflow, isPending, onSubmit, onClose }: {
         tabIndex={-1}
         data-testid="workflow-form-modal"
       >
-        <h3 id="workflow-form-modal-title" className="text-lg font-bold mb-4" style={{ color: '#463e30', fontFamily: "'Noto Serif KR', serif" }}>
+        <h3 id="workflow-form-modal-title" className="text-lg font-bold mb-4" style={{ color: '#1a1a1a', fontFamily: "'Inter', sans-serif" }}>
           {workflow ? '워크플로우 수정' : '워크플로우 생성'}
         </h3>
 
         {/* Name */}
         <div className="mb-3">
-          <label className="block text-xs font-medium mb-1" style={{ color: '#9c8d66' }}>이름</label>
+          <label className="block text-xs font-medium mb-1" style={{ color: '#6b705c' }}>이름</label>
           <input
             type="text"
             value={name}
@@ -670,7 +670,7 @@ function WorkflowFormModal({ workflow, isPending, onSubmit, onClose }: {
 
         {/* Description */}
         <div className="mb-4">
-          <label className="block text-xs font-medium mb-1" style={{ color: '#9c8d66' }}>설명 (선택)</label>
+          <label className="block text-xs font-medium mb-1" style={{ color: '#6b705c' }}>설명 (선택)</label>
           <textarea
             value={description}
             onChange={e => setDescription(e.target.value)}
@@ -685,7 +685,7 @@ function WorkflowFormModal({ workflow, isPending, onSubmit, onClose }: {
         {/* Steps */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">
-            <label className="text-xs font-medium" style={{ color: '#9c8d66' }}>단계 ({steps.length}/20)</label>
+            <label className="text-xs font-medium" style={{ color: '#6b705c' }}>단계 ({steps.length}/20)</label>
             {steps.length < 20 && (
               <button
                 type="button"
@@ -699,16 +699,16 @@ function WorkflowFormModal({ workflow, isPending, onSubmit, onClose }: {
           </div>
           <div className="space-y-3">
             {steps.map((step, idx) => (
-              <div key={step.id} className="border rounded-lg p-3 space-y-2" style={{ backgroundColor: '#fbfaf8', borderColor: '#e5e1d3' }} data-testid={`form-step-${idx}`}>
+              <div key={step.id} className="border rounded-lg p-3 space-y-2" style={{ backgroundColor: '#faf8f5', borderColor: '#e5e1d3' }} data-testid={`form-step-${idx}`}>
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px]" style={{ color: '#b7aa88' }}>단계 {idx + 1}</span>
+                  <span className="text-[10px]" style={{ color: '#756e5a' }}>단계 {idx + 1}</span>
                   <div className="flex items-center gap-1">
                     <button
                       type="button"
                       onClick={() => moveStep(idx, -1)}
                       disabled={idx === 0}
                       className="text-xs disabled:opacity-30 px-1"
-                      style={{ color: '#9c8d66' }}
+                      style={{ color: '#6b705c' }}
                     >
                       ↑
                     </button>
@@ -717,7 +717,7 @@ function WorkflowFormModal({ workflow, isPending, onSubmit, onClose }: {
                       onClick={() => moveStep(idx, 1)}
                       disabled={idx === steps.length - 1}
                       className="text-xs disabled:opacity-30 px-1"
-                      style={{ color: '#9c8d66' }}
+                      style={{ color: '#6b705c' }}
                     >
                       ↓
                     </button>
@@ -772,7 +772,7 @@ function WorkflowFormModal({ workflow, isPending, onSubmit, onClose }: {
                   />
                 )}
                 {step.type === 'condition' && (
-                  <p className="text-[10px]" style={{ color: '#b7aa88' }}>조건 분기는 trueBranch/falseBranch로 연결됩니다</p>
+                  <p className="text-[10px]" style={{ color: '#756e5a' }}>조건 분기는 trueBranch/falseBranch로 연결됩니다</p>
                 )}
               </div>
             ))}
@@ -784,7 +784,7 @@ function WorkflowFormModal({ workflow, isPending, onSubmit, onClose }: {
           <button
             onClick={onClose}
             className="flex-1 py-2.5 text-sm font-medium border rounded-lg transition-colors"
-            style={{ borderColor: '#e5e1d3', color: '#9c8d66' }}
+            style={{ borderColor: '#e5e1d3', color: '#6b705c' }}
           >
             취소
           </button>
@@ -792,7 +792,7 @@ function WorkflowFormModal({ workflow, isPending, onSubmit, onClose }: {
             onClick={handleSubmit}
             disabled={!isValid || isPending}
             className="flex-1 py-2.5 text-white rounded-lg text-sm font-medium disabled:opacity-50"
-            style={{ backgroundColor: '#5a7247' }}
+            style={{ backgroundColor: '#606C38' }}
             data-testid="submit-workflow-btn"
           >
             {isPending ? '처리 중...' : workflow ? '수정' : '생성'}

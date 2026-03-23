@@ -73,11 +73,11 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 const STATUS_BADGE_STYLES: Record<string, { dotColor: string; bgColor: string; textColor: string; borderColor: string; label: string }> = {
-  completed: { dotColor: '#10b981', bgColor: 'rgba(16,185,129,0.08)', textColor: '#10b981', borderColor: 'rgba(16,185,129,0.2)', label: 'Success' },
-  processing: { dotColor: '#3b82f6', bgColor: 'rgba(59,130,246,0.08)', textColor: '#3b82f6', borderColor: 'rgba(59,130,246,0.2)', label: 'Running' },
-  pending: { dotColor: '#f59e0b', bgColor: 'rgba(245,158,11,0.08)', textColor: '#f59e0b', borderColor: 'rgba(245,158,11,0.2)', label: 'Pending' },
-  failed: { dotColor: '#ef4444', bgColor: 'rgba(239,68,68,0.08)', textColor: '#ef4444', borderColor: 'rgba(239,68,68,0.2)', label: 'Critical' },
-  cancelled: { dotColor: '#d1c9b2', bgColor: 'rgba(209,201,178,0.1)', textColor: '#9c8d66', borderColor: 'rgba(209,201,178,0.3)', label: 'Cancelled' },
+  completed: { dotColor: '#4d7c0f', bgColor: 'rgba(77,124,15,0.08)', textColor: '#4d7c0f', borderColor: 'rgba(77,124,15,0.2)', label: 'Success' },
+  processing: { dotColor: '#2563eb', bgColor: 'rgba(37,99,235,0.08)', textColor: '#2563eb', borderColor: 'rgba(37,99,235,0.2)', label: 'Running' },
+  pending: { dotColor: '#b45309', bgColor: 'rgba(180,83,9,0.08)', textColor: '#b45309', borderColor: 'rgba(180,83,9,0.2)', label: 'Pending' },
+  failed: { dotColor: '#dc2626', bgColor: 'rgba(220,38,38,0.08)', textColor: '#dc2626', borderColor: 'rgba(220,38,38,0.2)', label: 'Critical' },
+  cancelled: { dotColor: '#756e5a', bgColor: 'rgba(117,110,90,0.1)', textColor: '#756e5a', borderColor: 'rgba(117,110,90,0.2)', label: 'Cancelled' },
 }
 
 const SORT_OPTIONS: { value: string; label: string }[] = [
@@ -110,9 +110,9 @@ function formatCost(micro: number | null | undefined) {
 }
 
 function scoreColor(score: number): string {
-  if (score >= 4) return '#10b981'
-  if (score >= 3) return '#f59e0b'
-  return '#ef4444'
+  if (score >= 4) return '#4d7c0f'
+  if (score >= 3) return '#b45309'
+  return '#dc2626'
 }
 
 function useDebounce(value: string, delay: number) {
@@ -161,14 +161,14 @@ function StatusBadge({ status }: { status: string }) {
 // === Quality Bar ===
 
 function QualityBar({ score }: { score: number | null }) {
-  if (score == null) return <span className="text-xs" style={{ color: '#9c8d66' }}>-</span>
+  if (score == null) return <span className="text-xs" style={{ color: '#6b705c' }}>-</span>
   const pct = Math.round(score * 20)
   return (
     <div className="flex items-center gap-1.5 min-w-[80px]">
       <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: '#e5e1d3' }}>
         <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: scoreColor(score) }} />
       </div>
-      <span className="text-[10px] w-6 text-right" style={{ color: '#9c8d66' }}>{score.toFixed(1)}</span>
+      <span className="text-[10px] w-6 text-right" style={{ color: '#6b705c' }}>{score.toFixed(1)}</span>
     </div>
   )
 }
@@ -339,30 +339,30 @@ export function OpsLogPage() {
   }, [])
 
   const inputStyle: React.CSSProperties = {
-    backgroundColor: '#fbfaf8',
-    borderColor: '#e5e1d3',
-    color: '#463e30',
+    backgroundColor: '#faf8f5',
+    borderColor: '#908a78',
+    color: '#1a1a1a',
   }
 
   return (
     <div
       data-testid="ops-log-page"
       className="font-sans min-h-screen flex flex-col"
-      style={{ backgroundColor: '#faf8f5', color: '#463e30', fontFamily: "'Inter', sans-serif" }}
+      style={{ backgroundColor: '#faf8f5', color: '#1a1a1a', fontFamily: "'Inter', sans-serif" }}
     >
       {/* Header */}
       <header className="border-b px-8 py-6" style={{ backgroundColor: '#ffffff', borderColor: '#e5e1d3' }}>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <h1 className="text-3xl" style={{ fontFamily: "'Noto Serif KR', serif", color: '#463e30' }}>Ops Log</h1>
-            <p className="text-sm mt-1" style={{ color: '#9c8d66' }}>Operation history and performance tracking.</p>
+            <h1 className="text-3xl font-semibold" style={{ color: '#1a1a1a' }}>Ops Log</h1>
+            <p className="text-sm mt-1" style={{ color: '#6b705c' }}>Operation history and performance tracking.</p>
           </div>
           <div className="flex items-center gap-3">
             {selectedIds.size === 2 && (
               <button
                 onClick={() => setCompareOpen(true)}
                 className="px-4 py-2 text-sm font-bold rounded transition-colors"
-                style={{ backgroundColor: '#5a7247', color: '#ffffff' }}
+                style={{ backgroundColor: '#606C38', color: '#ffffff' }}
                 data-testid="compare-btn"
               >
                 비교
@@ -371,7 +371,7 @@ export function OpsLogPage() {
             <button
               onClick={handleExport}
               className="flex items-center gap-2 px-4 py-2 border rounded text-sm font-medium transition-colors"
-              style={{ backgroundColor: '#f2f0e9', borderColor: '#e5e1d3', color: '#6a5d43' }}
+              style={{ backgroundColor: '#f5f0e8', borderColor: '#e5e1d3', color: '#6b705c' }}
               data-testid="export-btn"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
@@ -385,21 +385,21 @@ export function OpsLogPage() {
       <div className="px-8 pt-6 pb-2">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="bg-white rounded-2xl p-6 border" style={{ borderColor: '#e5e1d3', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }}>
-            <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#9c8d66' }}>Daily Operations</p>
-            <p className="text-3xl font-bold font-mono tabular-nums" style={{ color: '#463e30' }}>{total}</p>
+            <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#6b705c' }}>Daily Operations</p>
+            <p className="text-3xl font-bold font-mono tabular-nums" style={{ color: '#1a1a1a' }}>{total}</p>
           </div>
           <div className="bg-white rounded-2xl p-6 border" style={{ borderColor: '#e5e1d3', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }}>
-            <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#9c8d66' }}>Avg Quality Score</p>
-            <p className="text-3xl font-bold font-mono tabular-nums" style={{ color: '#5a7247' }}>
+            <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#6b705c' }}>Avg Quality Score</p>
+            <p className="text-3xl font-bold font-mono tabular-nums" style={{ color: '#606C38' }}>
               {items.length > 0
                 ? (items.reduce((sum, i) => sum + (i.qualityScore ?? 0), 0) / items.filter(i => i.qualityScore != null).length || 0).toFixed(1)
                 : '-'}
-              <span className="text-xl" style={{ color: '#9c8d66' }}>/5</span>
+              <span className="text-xl" style={{ color: '#6b705c' }}>/5</span>
             </p>
           </div>
           <div className="bg-white rounded-2xl p-6 border" style={{ borderColor: '#e5e1d3', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }}>
-            <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#9c8d66' }}>Total Op Cost</p>
-            <p className="text-3xl font-bold font-mono tabular-nums" style={{ color: '#463e30' }}>
+            <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#6b705c' }}>Total Op Cost</p>
+            <p className="text-3xl font-bold font-mono tabular-nums" style={{ color: '#1a1a1a' }}>
               {items.length > 0
                 ? formatCost(items.reduce((sum, i) => sum + (i.totalCostMicro ?? 0), 0))
                 : '-'}
@@ -411,7 +411,7 @@ export function OpsLogPage() {
       {/* Filters Row */}
       <div className="px-8 py-3 border-b flex flex-wrap gap-2 items-center" style={{ borderColor: '#e5e1d3' }} data-testid="filters-row">
         <div className="relative">
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#b7aa88' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" strokeWidth="2" /><path d="m21 21-4.35-4.35" strokeLinecap="round" strokeWidth="2" /></svg>
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#756e5a' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" strokeWidth="2" /><path d="m21 21-4.35-4.35" strokeLinecap="round" strokeWidth="2" /></svg>
           <input
             placeholder="검색..."
             value={searchInput}
@@ -428,7 +428,7 @@ export function OpsLogPage() {
           className="py-2 px-3 border rounded text-sm"
           style={inputStyle}
         />
-        <span className="text-sm" style={{ color: '#9c8d66' }}>~</span>
+        <span className="text-sm" style={{ color: '#6b705c' }}>~</span>
         <input
           type="date"
           value={endDate}
@@ -473,7 +473,7 @@ export function OpsLogPage() {
           className="text-sm px-3 py-2 rounded border transition-colors"
           style={bookmarkedOnly
             ? { backgroundColor: 'rgba(196,98,45,0.1)', borderColor: 'rgba(196,98,45,0.3)', color: '#c4622d' }
-            : { backgroundColor: 'transparent', borderColor: '#e5e1d3', color: '#9c8d66' }
+            : { backgroundColor: 'transparent', borderColor: '#e5e1d3', color: '#6b705c' }
           }
           data-testid="bookmark-filter"
         >
@@ -488,13 +488,13 @@ export function OpsLogPage() {
             <span
               key={chip.key}
               className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] rounded-full"
-              style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: '#5a7247' }}
+              style={{ backgroundColor: 'rgba(96,108,56,0.1)', color: '#606C38' }}
             >
               {chip.label}
               <button
                 onClick={chip.onRemove}
                 className="ml-0.5 hover:opacity-70"
-                style={{ color: '#5a7247' }}
+                style={{ color: '#606C38' }}
               >
                 &times;
               </button>
@@ -507,7 +507,7 @@ export function OpsLogPage() {
               setPage(1)
             }}
             className="text-[11px] px-2 py-1 hover:opacity-70"
-            style={{ color: '#9c8d66' }}
+            style={{ color: '#6b705c' }}
           >
             전체 초기화
           </button>
@@ -516,14 +516,14 @@ export function OpsLogPage() {
 
       {/* Selection info */}
       {selectedIds.size > 0 && (
-        <div className="px-8 py-2 border-b flex items-center justify-between" style={{ backgroundColor: 'rgba(90,114,71,0.06)', borderColor: 'rgba(90,114,71,0.15)' }}>
-          <span className="text-xs" style={{ color: '#5a7247' }}>
+        <div className="px-8 py-2 border-b flex items-center justify-between" style={{ backgroundColor: 'rgba(96,108,56,0.06)', borderColor: 'rgba(96,108,56,0.15)' }}>
+          <span className="text-xs" style={{ color: '#606C38' }}>
             {selectedIds.size}개 선택됨 {selectedIds.size < 2 && '(비교하려면 2개를 선택하세요)'}
           </span>
           <button
             onClick={() => setSelectedIds(new Set())}
             className="text-xs hover:opacity-70"
-            style={{ color: '#5a7247' }}
+            style={{ color: '#606C38' }}
           >
             선택 해제
           </button>
@@ -535,17 +535,17 @@ export function OpsLogPage() {
         {listQuery.isLoading ? (
           <div className="max-w-5xl mx-auto space-y-4">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-20 rounded-2xl animate-pulse" style={{ backgroundColor: '#f2f0e9' }} />
+              <div key={i} className="h-20 rounded-2xl animate-pulse" style={{ backgroundColor: '#f5f0e8' }} />
             ))}
           </div>
         ) : items.length === 0 ? (
           <div className="text-center py-16" data-testid="ops-empty">
-            <p className="text-sm font-medium mb-2" style={{ color: '#9c8d66' }}>보고된 작전이 없습니다</p>
-            <p className="text-xs mb-4" style={{ color: '#b7aa88' }}>허브에서 명령을 내리면 작전일지가 기록됩니다.</p>
+            <p className="text-sm font-medium mb-2" style={{ color: '#6b705c' }}>보고된 작전이 없습니다</p>
+            <p className="text-xs mb-4" style={{ color: '#756e5a' }}>허브에서 명령을 내리면 작전일지가 기록됩니다.</p>
             <button
               onClick={() => navigate('/hub')}
               className="px-4 py-2 text-sm text-white rounded-lg font-medium hover:opacity-90 transition-colors"
-              style={{ backgroundColor: '#5a7247' }}
+              style={{ backgroundColor: '#606C38' }}
             >
               허브로 이동
             </button>
@@ -578,7 +578,7 @@ export function OpsLogPage() {
                         style={{
                           borderColor: '#e5e1d3',
                           boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
-                          borderLeftColor: selectedIds.has(item.id) ? '#5a7247' : undefined,
+                          borderLeftColor: selectedIds.has(item.id) ? '#606C38' : undefined,
                         }}
                       >
                         <div className="flex justify-between items-start mb-2">
@@ -589,16 +589,16 @@ export function OpsLogPage() {
                               checked={selectedIds.has(item.id)}
                               onChange={(e) => { e.stopPropagation(); toggleSelect(item.id) }}
                               disabled={!selectedIds.has(item.id) && selectedIds.size >= 2}
-                              className="w-3.5 h-3.5 rounded accent-[#5a7247]"
+                              className="w-3.5 h-3.5 rounded accent-[#606C38]"
                               onClick={(e) => e.stopPropagation()}
                             />
                             <StatusBadge status={item.status} />
-                            <span className="text-[10px] px-2 py-0.5 rounded font-medium uppercase tracking-wider" style={{ backgroundColor: '#f2f0e9', color: '#6a5d43' }}>
+                            <span className="text-[10px] px-2 py-0.5 rounded font-medium uppercase tracking-wider" style={{ backgroundColor: '#f5f0e8', color: '#6b705c' }}>
                               {TYPE_LABELS[item.type] || item.type}
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-mono tabular-nums" style={{ color: '#9c8d66' }}>{formatTime(item.createdAt)}</span>
+                            <span className="text-xs font-mono tabular-nums" style={{ color: '#6b705c' }}>{formatTime(item.createdAt)}</span>
                             <button
                               className="text-sm hover:scale-110 transition-transform"
                               style={{ color: item.isBookmarked ? '#c4622d' : '#d1c9b2' }}
@@ -610,13 +610,13 @@ export function OpsLogPage() {
                         </div>
 
                         {item.targetAgentName && (
-                          <p className="text-xs font-medium mb-1" style={{ color: '#5a7247' }}>{item.targetAgentName}</p>
+                          <p className="text-xs font-medium mb-1" style={{ color: '#606C38' }}>{item.targetAgentName}</p>
                         )}
-                        <p className="text-sm leading-relaxed line-clamp-2 mb-3" style={{ color: '#463e30' }}>{item.text}</p>
+                        <p className="text-sm leading-relaxed line-clamp-2 mb-3" style={{ color: '#1a1a1a' }}>{item.text}</p>
 
                         <div className="flex items-center gap-4">
-                          <span className="font-mono tabular-nums text-xs" style={{ color: '#9c8d66' }}>{formatDuration(item.durationMs)}</span>
-                          <span className="font-mono tabular-nums text-xs" style={{ color: '#9c8d66' }}>{formatCost(item.totalCostMicro)}</span>
+                          <span className="font-mono tabular-nums text-xs" style={{ color: '#6b705c' }}>{formatDuration(item.durationMs)}</span>
+                          <span className="font-mono tabular-nums text-xs" style={{ color: '#6b705c' }}>{formatCost(item.totalCostMicro)}</span>
                           {item.qualityScore != null && (
                             <div className="flex-1 max-w-[100px]">
                               <QualityBar score={item.qualityScore} />
@@ -636,24 +636,24 @@ export function OpsLogPage() {
       {/* Pagination */}
       {total > 0 && (
         <div className="px-8 py-3 border-t flex items-center justify-between" style={{ borderColor: '#e5e1d3', backgroundColor: '#ffffff' }} data-testid="pagination">
-          <span className="text-xs" style={{ color: '#9c8d66' }}>{total.toLocaleString()}건</span>
+          <span className="text-xs" style={{ color: '#6b705c' }}>{total.toLocaleString()}건</span>
           <div className="flex items-center gap-2">
             <button
               disabled={page <= 1}
               onClick={() => setPage(p => p - 1)}
               className="border rounded px-3 py-1.5 text-xs disabled:opacity-30 hover:opacity-70 transition-colors"
-              style={{ borderColor: '#e5e1d3', color: '#6a5d43' }}
+              style={{ borderColor: '#e5e1d3', color: '#6b705c' }}
             >
               이전
             </button>
-            <span className="text-xs" style={{ color: '#9c8d66' }}>
+            <span className="text-xs" style={{ color: '#6b705c' }}>
               {page} / {totalPages}
             </span>
             <button
               disabled={page >= totalPages}
               onClick={() => setPage(p => p + 1)}
               className="border rounded px-3 py-1.5 text-xs disabled:opacity-30 hover:opacity-70 transition-colors"
-              style={{ borderColor: '#e5e1d3', color: '#6a5d43' }}
+              style={{ borderColor: '#e5e1d3', color: '#6b705c' }}
             >
               다음
             </button>
@@ -683,20 +683,20 @@ export function OpsLogPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setReplayConfirm(null)} />
           <div className="relative bg-white border rounded-2xl shadow-2xl p-6 w-96" style={{ borderColor: '#e5e1d3' }}>
-            <h3 className="text-sm font-semibold mb-2" style={{ color: '#463e30', fontFamily: "'Noto Serif KR', serif" }}>명령 리플레이</h3>
-            <p className="text-xs mb-4" style={{ color: '#9c8d66' }}>동일 명령을 다시 실행합니다. 결과가 다를 수 있습니다.</p>
+            <h3 className="text-sm font-semibold mb-2" style={{ color: '#1a1a1a', fontFamily: "'Inter', sans-serif" }}>명령 리플레이</h3>
+            <p className="text-xs mb-4" style={{ color: '#6b705c' }}>동일 명령을 다시 실행합니다. 결과가 다를 수 있습니다.</p>
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setReplayConfirm(null)}
                 className="border rounded-lg px-4 py-2 text-sm hover:opacity-70 transition-colors"
-                style={{ borderColor: '#e5e1d3', color: '#6a5d43' }}
+                style={{ borderColor: '#e5e1d3', color: '#6b705c' }}
               >
                 취소
               </button>
               <button
                 onClick={confirmReplay}
                 className="rounded-lg px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-colors"
-                style={{ backgroundColor: '#5a7247' }}
+                style={{ backgroundColor: '#606C38' }}
               >
                 실행
               </button>
@@ -738,10 +738,10 @@ function DetailModal({
       >
         {isLoading || !detail ? (
           <div className="py-8 space-y-3">
-            <div className="h-4 w-1/3 rounded animate-pulse" style={{ backgroundColor: '#f2f0e9' }} />
-            <div className="h-20 rounded-xl animate-pulse" style={{ backgroundColor: '#f2f0e9' }} />
+            <div className="h-4 w-1/3 rounded animate-pulse" style={{ backgroundColor: '#f5f0e8' }} />
+            <div className="h-20 rounded-xl animate-pulse" style={{ backgroundColor: '#f5f0e8' }} />
             <div className="grid grid-cols-4 gap-3">
-              {[1,2,3,4].map(i => <div key={i} className="h-14 rounded-lg animate-pulse" style={{ backgroundColor: '#f2f0e9' }} />)}
+              {[1,2,3,4].map(i => <div key={i} className="h-14 rounded-lg animate-pulse" style={{ backgroundColor: '#f5f0e8' }} />)}
             </div>
           </div>
         ) : (
@@ -749,21 +749,21 @@ function DetailModal({
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h3 className="text-sm font-semibold mb-1" style={{ color: '#463e30', fontFamily: "'Noto Serif KR', serif" }}>작전 상세</h3>
-                <p className="text-[11px]" style={{ color: '#9c8d66' }}>{formatTime(detail.createdAt)}</p>
+                <h3 className="text-sm font-semibold mb-1" style={{ color: '#1a1a1a', fontFamily: "'Inter', sans-serif" }}>작전 상세</h3>
+                <p className="text-[11px]" style={{ color: '#6b705c' }}>{formatTime(detail.createdAt)}</p>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => onCopy(detail.text)}
                   className="border rounded-lg px-3 py-1.5 text-xs hover:opacity-70"
-                  style={{ borderColor: '#e5e1d3', color: '#6a5d43' }}
+                  style={{ borderColor: '#e5e1d3', color: '#6b705c' }}
                 >
                   복사
                 </button>
                 <button
                   onClick={() => onReplay(detail.text)}
                   className="rounded-lg px-3 py-1.5 text-xs text-white hover:opacity-90"
-                  style={{ backgroundColor: '#5a7247' }}
+                  style={{ backgroundColor: '#606C38' }}
                 >
                   리플레이
                 </button>
@@ -771,9 +771,9 @@ function DetailModal({
             </div>
 
             {/* Command text */}
-            <div className="mb-4 rounded-xl p-4" style={{ backgroundColor: '#fbfaf8', border: '1px solid #e5e1d3' }}>
-              <p className="text-xs font-medium mb-1" style={{ color: '#9c8d66' }}>명령</p>
-              <p className="text-sm" style={{ color: '#463e30' }}>{detail.text}</p>
+            <div className="mb-4 rounded-xl p-4" style={{ backgroundColor: '#faf8f5', border: '1px solid #e5e1d3' }}>
+              <p className="text-xs font-medium mb-1" style={{ color: '#6b705c' }}>명령</p>
+              <p className="text-sm" style={{ color: '#1a1a1a' }}>{detail.text}</p>
             </div>
 
             {/* Metadata */}
@@ -787,7 +787,7 @@ function DetailModal({
             {/* Quality */}
             {detail.qualityScore != null && (
               <div className="mb-4 border rounded-xl p-4" style={{ borderColor: '#e5e1d3' }}>
-                <p className="text-xs font-medium mb-2" style={{ color: '#9c8d66' }}>품질 평가</p>
+                <p className="text-xs font-medium mb-2" style={{ color: '#6b705c' }}>품질 평가</p>
                 <div className="flex items-center gap-3">
                   <QualityBar score={detail.qualityScore} />
                   {detail.qualityConclusion && (
@@ -808,7 +808,7 @@ function DetailModal({
             {/* Result */}
             {detail.result && (
               <div className="mb-4">
-                <p className="text-xs font-medium mb-2" style={{ color: '#9c8d66' }}>결과</p>
+                <p className="text-xs font-medium mb-2" style={{ color: '#6b705c' }}>결과</p>
                 <div className="border rounded-xl p-4 max-h-[300px] overflow-y-auto" style={{ borderColor: '#e5e1d3' }}>
                   <MarkdownRenderer content={detail.result} />
                 </div>
@@ -831,9 +831,9 @@ function DetailModal({
 
 function MetaCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg p-3" style={{ backgroundColor: '#fbfaf8', border: '1px solid #e5e1d3' }}>
-      <p className="text-[10px] mb-0.5" style={{ color: '#9c8d66' }}>{label}</p>
-      <p className="text-xs font-medium" style={{ color: '#463e30' }}>{value}</p>
+    <div className="rounded-lg p-3" style={{ backgroundColor: '#faf8f5', border: '1px solid #e5e1d3' }}>
+      <p className="text-[10px] mb-0.5" style={{ color: '#6b705c' }}>{label}</p>
+      <p className="text-xs font-medium" style={{ color: '#1a1a1a' }}>{value}</p>
     </div>
   )
 }
@@ -863,8 +863,8 @@ function CompareModal({
         data-testid="compare-modal"
       >
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold" style={{ color: '#463e30', fontFamily: "'Noto Serif KR', serif" }}>A/B 비교</h3>
-          <button onClick={onClose} className="hover:opacity-70" style={{ color: '#9c8d66' }}>&times;</button>
+          <h3 className="text-sm font-semibold" style={{ color: '#1a1a1a', fontFamily: "'Inter', sans-serif" }}>A/B 비교</h3>
+          <button onClick={onClose} className="hover:opacity-70" style={{ color: '#6b705c' }}>&times;</button>
         </div>
 
         {/* Comparison bars */}
@@ -897,10 +897,10 @@ function CompareBar({
 }) {
   return (
     <div className="border rounded-xl p-4" style={{ borderColor: '#e5e1d3' }}>
-      <p className="text-[10px] mb-2 text-center" style={{ color: '#9c8d66' }}>{label}</p>
+      <p className="text-[10px] mb-2 text-center" style={{ color: '#6b705c' }}>{label}</p>
       <div className="flex items-center justify-center gap-3">
-        <span className="text-xs font-bold" style={{ color: '#5a7247' }}>{format(valueA)}</span>
-        <span className="text-[10px]" style={{ color: '#9c8d66' }}>vs</span>
+        <span className="text-xs font-bold" style={{ color: '#606C38' }}>{format(valueA)}</span>
+        <span className="text-[10px]" style={{ color: '#6b705c' }}>vs</span>
         <span className="text-xs font-bold" style={{ color: '#c4622d' }}>{format(valueB)}</span>
       </div>
     </div>
@@ -917,31 +917,31 @@ function ComparePanel({ item, label }: { item: OperationLogItem; label: string }
 
   return (
     <div className="border rounded-xl overflow-hidden" style={{ borderColor: '#e5e1d3' }}>
-      <div className="px-3 py-2 border-b" style={{ backgroundColor: '#fbfaf8', borderColor: '#e5e1d3' }}>
+      <div className="px-3 py-2 border-b" style={{ backgroundColor: '#faf8f5', borderColor: '#e5e1d3' }}>
         <div className="flex items-center gap-2">
           <span
             className="text-xs px-2 py-0.5 rounded font-bold"
             style={label === 'A'
-              ? { backgroundColor: 'rgba(90,114,71,0.1)', color: '#5a7247' }
+              ? { backgroundColor: 'rgba(96,108,56,0.1)', color: '#606C38' }
               : { backgroundColor: 'rgba(196,98,45,0.1)', color: '#c4622d' }
             }
           >
             {label}
           </span>
-          <span className="text-[11px]" style={{ color: '#9c8d66' }}>{formatTime(item.createdAt)}</span>
+          <span className="text-[11px]" style={{ color: '#6b705c' }}>{formatTime(item.createdAt)}</span>
         </div>
-        <p className="text-xs mt-1 truncate" style={{ color: '#463e30' }}>{item.text}</p>
+        <p className="text-xs mt-1 truncate" style={{ color: '#1a1a1a' }}>{item.text}</p>
       </div>
       <div className="p-3 max-h-[400px] overflow-y-auto">
         {detailQuery.isLoading ? (
           <div className="space-y-2">
-            <div className="h-3 w-3/4 rounded animate-pulse" style={{ backgroundColor: '#f2f0e9' }} />
-            <div className="h-3 w-1/2 rounded animate-pulse" style={{ backgroundColor: '#f2f0e9' }} />
+            <div className="h-3 w-3/4 rounded animate-pulse" style={{ backgroundColor: '#f5f0e8' }} />
+            <div className="h-3 w-1/2 rounded animate-pulse" style={{ backgroundColor: '#f5f0e8' }} />
           </div>
         ) : detail?.result ? (
           <MarkdownRenderer content={detail.result} />
         ) : (
-          <p className="text-xs" style={{ color: '#9c8d66' }}>결과 없음</p>
+          <p className="text-xs" style={{ color: '#6b705c' }}>결과 없음</p>
         )}
       </div>
     </div>

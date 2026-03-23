@@ -29,9 +29,9 @@ import { ShareToConversationModal } from '../components/messenger/share-to-conve
 
 // === Constants ===
 
-const oliveGreen = '#5a7247'
-const organicBeige = '#faf8f5'
-const terracotta = '#c4622d'
+// Sovereign Sage Design Tokens
+const accentColor = '#606C38'
+const accentHover = '#4e5a2b'
 
 // === Types ===
 
@@ -57,8 +57,8 @@ type Comment = {
 }
 
 const STATUS_STYLES: Record<string, { label: string; bgClass: string; textClass: string }> = {
-  draft: { label: 'Draft', bgClass: 'bg-stone-100', textClass: 'text-stone-600' },
-  submitted: { label: 'Submitted', bgClass: 'bg-yellow-100', textClass: 'text-yellow-700' },
+  draft: { label: 'Draft', bgClass: 'bg-[#f0ebe0]', textClass: 'text-[#6b705c]' },
+  submitted: { label: 'Submitted', bgClass: 'bg-amber-100', textClass: 'text-amber-700' },
   reviewed: { label: 'Reviewed', bgClass: 'bg-green-100', textClass: 'text-green-700' },
 }
 
@@ -265,17 +265,17 @@ export function ReportsPage() {
     }
   }
 
-  const inputClass = 'w-full bg-white border border-stone-200 focus:border-stone-400 text-stone-900 rounded-2xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-stone-200 focus:outline-none'
+  const inputClass = 'w-full bg-white border border-[#e5e1d3] focus:border-[#606C38] text-[#1a1a1a] rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#606C38]/20 focus:outline-none'
 
   // === Create view ===
   if (view === 'create') {
     return (
-      <div className="h-full flex flex-col" style={{ fontFamily: "'Public Sans', sans-serif", backgroundColor: organicBeige }} data-testid="reports-page">
-        <div className="px-8 py-4 border-b border-stone-200 flex items-center gap-3 bg-white">
-          <button onClick={handleBack} className="text-sm text-stone-500 hover:text-stone-700" data-testid="back-btn">
+      <div className="h-full flex flex-col" style={{ fontFamily: "'Inter', sans-serif", backgroundColor: '#faf8f5' }} data-testid="reports-page">
+        <div className="px-8 py-4 border-b border-[#e5e1d3] flex items-center gap-3 bg-white">
+          <button onClick={handleBack} className="text-sm text-[#6b705c] hover:text-[#6b705c]" data-testid="back-btn">
             &larr; 목록
           </button>
-          <h2 className="text-lg font-semibold text-stone-900">새 보고서</h2>
+          <h2 className="text-lg font-semibold text-[#1a1a1a]">새 보고서</h2>
         </div>
         <div className="flex-1 overflow-y-auto px-12 py-8 max-w-2xl mx-auto w-full space-y-4">
           <input
@@ -302,12 +302,12 @@ export function ReportsPage() {
               }}
               disabled={!title.trim() || createReport.isPending}
               className="text-white rounded-xl px-5 py-2.5 text-sm font-bold disabled:opacity-50 transition-colors shadow-sm"
-              style={{ backgroundColor: oliveGreen }}
+              style={{ backgroundColor: accentColor }}
               data-testid="save-draft-btn"
             >
               {createReport.isPending ? '저장 중...' : '초안 저장'}
             </button>
-            <button onClick={handleBack} className="text-stone-500 hover:text-stone-700 text-sm px-5 py-2.5">
+            <button onClick={handleBack} className="text-[#6b705c] hover:text-[#6b705c] text-sm px-5 py-2.5">
               취소
             </button>
           </div>
@@ -318,14 +318,14 @@ export function ReportsPage() {
 
   // === List + Detail split layout ===
   return (
-    <div className="h-full flex flex-col overflow-hidden" style={{ fontFamily: "'Public Sans', sans-serif", backgroundColor: organicBeige }} data-testid="reports-page">
+    <div className="h-full flex flex-col overflow-hidden" style={{ fontFamily: "'Inter', sans-serif", backgroundColor: '#faf8f5' }} data-testid="reports-page">
       <div className="flex h-full overflow-hidden">
         {/* Main Content Area */}
           {/* Dashboard Content */}
           <div className="flex-1 flex overflow-hidden">
             {/* Report List Column */}
-            <div className="w-1/3 border-r border-stone-200 flex flex-col overflow-hidden bg-stone-50/50">
-              <div className="p-4 flex gap-2 overflow-x-auto shrink-0 border-b border-stone-200">
+            <div className="w-1/3 border-r border-[#e5e1d3] flex flex-col overflow-hidden bg-[#f5f0e8]/50">
+              <div className="p-4 flex gap-2 overflow-x-auto shrink-0 border-b border-[#e5e1d3]">
                 {filterTabs.map(tab => (
                   <button
                     key={tab.value}
@@ -333,9 +333,9 @@ export function ReportsPage() {
                     className={`whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${
                       activeTab === tab.value
                         ? 'text-white'
-                        : 'bg-white border border-stone-200 text-stone-600'
+                        : 'bg-white border border-[#e5e1d3] text-[#6b705c]'
                     }`}
-                    style={activeTab === tab.value ? { backgroundColor: oliveGreen } : {}}
+                    style={activeTab === tab.value ? { backgroundColor: accentColor } : {}}
                   >
                     {tab.label}
                   </button>
@@ -344,10 +344,10 @@ export function ReportsPage() {
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {isLoading ? (
                   Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="p-4 bg-white rounded-xl h-24 animate-pulse border border-stone-200" />
+                    <div key={i} className="p-4 bg-white rounded-xl h-24 animate-pulse border border-[#e5e1d3]" />
                   ))
                 ) : filteredReports.length === 0 ? (
-                  <div className="text-center py-16 text-sm text-stone-400" data-testid="reports-empty">
+                  <div className="text-center py-16 text-sm text-[#756e5a]" data-testid="reports-empty">
                     보고서가 없습니다
                   </div>
                 ) : (
@@ -361,21 +361,21 @@ export function ReportsPage() {
                         className={`p-4 bg-white rounded-xl transition-all cursor-pointer shadow-sm ${
                           isSelected
                             ? 'border-2 ring-1'
-                            : 'border border-stone-200 hover:border-stone-400'
+                            : 'border border-[#e5e1d3] hover:border-stone-400'
                         }`}
-                        style={isSelected ? { borderColor: oliveGreen, boxShadow: `0 0 0 1px ${oliveGreen}1a` } : {}}
+                        style={isSelected ? { borderColor: accentColor, boxShadow: `0 0 0 1px ${accentColor}1a` } : {}}
                         data-testid={`report-item-${r.id}`}
                       >
                         <div className="flex justify-between items-start mb-2">
                           <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${style.bgClass} ${style.textClass}`}>
                             {style.label}
                           </span>
-                          <span className="text-[10px] text-stone-400 font-medium">
+                          <span className="text-[10px] text-[#756e5a] font-medium">
                             {new Date(r.submittedAt || r.updatedAt).toLocaleDateString('ko-KR')}
                           </span>
                         </div>
-                        <h3 className="font-bold text-stone-900 mb-1 leading-tight">{r.title}</h3>
-                        <div className="flex items-center gap-2 text-xs text-stone-500">
+                        <h3 className="font-bold text-[#1a1a1a] mb-1 leading-tight">{r.title}</h3>
+                        <div className="flex items-center gap-2 text-xs text-[#6b705c]">
                           <Wrench className="w-4 h-4" />
                           <span>Agent: {r.authorName}</span>
                         </div>
@@ -389,26 +389,26 @@ export function ReportsPage() {
             {/* Report Detail Viewer */}
             <div className="flex-1 flex flex-col overflow-hidden bg-white">
               {!selectedReport || !report ? (
-                <div className="flex-1 flex items-center justify-center text-stone-400 text-sm">
+                <div className="flex-1 flex items-center justify-center text-[#756e5a] text-sm">
                   보고서를 선택하세요
                 </div>
               ) : (
                 <>
                   {/* Detail Header Actions */}
-                  <div className="px-8 py-4 border-b border-stone-200 flex justify-between items-center bg-stone-50/30">
+                  <div className="px-8 py-4 border-b border-[#e5e1d3] flex justify-between items-center bg-[#f5f0e8]/30">
                     <div className="flex gap-4">
                       {report.status !== 'draft' && (
-                        <button onClick={handleDownload} disabled={downloading} className="p-2 hover:bg-stone-200 rounded-lg transition-colors">
+                        <button onClick={handleDownload} disabled={downloading} className="p-2 hover:bg-[#f0ebe0] rounded-lg transition-colors">
                           <Download className="w-5 h-5" />
                         </button>
                       )}
                       {report.status !== 'draft' && (
-                        <button onClick={() => setShowShareModal(true)} className="p-2 hover:bg-stone-200 rounded-lg transition-colors">
+                        <button onClick={() => setShowShareModal(true)} className="p-2 hover:bg-[#f0ebe0] rounded-lg transition-colors">
                           <Share2 className="w-5 h-5" />
                         </button>
                       )}
                       {isMyReport && report.status === 'draft' && (
-                        <button onClick={() => setDeleteConfirmOpen(true)} className="p-2 hover:bg-stone-200 rounded-lg transition-colors text-red-500">
+                        <button onClick={() => setDeleteConfirmOpen(true)} className="p-2 hover:bg-[#f0ebe0] rounded-lg transition-colors text-red-500">
                           <Trash2 className="w-5 h-5" />
                         </button>
                       )}
@@ -418,7 +418,7 @@ export function ReportsPage() {
                         <>
                           <button
                             onClick={handleStartEdit}
-                            className="px-4 py-2 bg-stone-100 text-stone-700 rounded-xl text-sm font-bold hover:bg-stone-200 transition-colors"
+                            className="px-4 py-2 bg-[#f0ebe0] text-[#6b705c] rounded-xl text-sm font-bold hover:bg-[#f0ebe0] transition-colors"
                             data-testid="edit-btn"
                           >
                             Request Edit
@@ -427,7 +427,7 @@ export function ReportsPage() {
                             onClick={() => setConfirmOpen(true)}
                             disabled={submitReport.isPending}
                             className="px-6 py-2 text-white rounded-xl text-sm font-bold transition-colors shadow-lg disabled:opacity-50"
-                            style={{ backgroundColor: oliveGreen, boxShadow: `0 4px 14px ${oliveGreen}33` }}
+                            style={{ backgroundColor: accentColor, boxShadow: `0 4px 14px ${accentColor}33` }}
                             data-testid="submit-btn"
                           >
                             Complete Review
@@ -439,7 +439,7 @@ export function ReportsPage() {
                           onClick={() => reviewReport.mutate()}
                           disabled={reviewReport.isPending}
                           className="px-6 py-2 text-white rounded-xl text-sm font-bold transition-colors shadow-lg disabled:opacity-50"
-                          style={{ backgroundColor: oliveGreen }}
+                          style={{ backgroundColor: accentColor }}
                           data-testid="review-btn"
                         >
                           {reviewReport.isPending ? '처리 중...' : 'Complete Review'}
@@ -470,11 +470,11 @@ export function ReportsPage() {
                             onClick={handleSaveEdit}
                             disabled={!title.trim() || updateReport.isPending}
                             className="text-white rounded-xl px-4 py-2 text-sm font-medium disabled:opacity-50"
-                            style={{ backgroundColor: oliveGreen }}
+                            style={{ backgroundColor: accentColor }}
                           >
                             {updateReport.isPending ? '저장 중...' : '저장'}
                           </button>
-                          <button onClick={() => setEditMode(false)} className="text-stone-500 hover:text-stone-700 text-sm px-4 py-2">
+                          <button onClick={() => setEditMode(false)} className="text-[#6b705c] hover:text-[#6b705c] text-sm px-4 py-2">
                             취소
                           </button>
                         </div>
@@ -483,38 +483,38 @@ export function ReportsPage() {
                       <>
                         <div className="space-y-4">
                           <h1 className="text-4xl leading-tight" style={{ fontFamily: "'Playfair Display', serif" }}>{report.title}</h1>
-                          <div className="flex items-center gap-6 py-4 border-y border-stone-100">
+                          <div className="flex items-center gap-6 py-4 border-y border-[#e5e1d3]/50">
                             <div className="flex flex-col">
-                              <span className="text-[10px] text-stone-400 uppercase tracking-widest font-bold">Created Date</span>
+                              <span className="text-[10px] text-[#756e5a] uppercase tracking-widest font-bold">Created Date</span>
                               <span className="text-sm font-medium">{new Date(report.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                             </div>
                             <div className="flex flex-col">
-                              <span className="text-[10px] text-stone-400 uppercase tracking-widest font-bold">Authoring Agent</span>
+                              <span className="text-[10px] text-[#756e5a] uppercase tracking-widest font-bold">Authoring Agent</span>
                               <span className="text-sm font-medium">{report.authorName}</span>
                             </div>
                             <div className="flex flex-col">
-                              <span className="text-[10px] text-stone-400 uppercase tracking-widest font-bold">Status</span>
-                              <span className="text-sm font-medium" style={{ color: oliveGreen }}>{STATUS_STYLES[report.status]?.label ?? report.status}</span>
+                              <span className="text-[10px] text-[#756e5a] uppercase tracking-widest font-bold">Status</span>
+                              <span className="text-sm font-medium" style={{ color: accentColor }}>{STATUS_STYLES[report.status]?.label ?? report.status}</span>
                             </div>
                           </div>
                         </div>
 
                         {/* Markdown Body */}
-                        <div className="prose prose-stone max-w-none space-y-6">
+                        <div className="prose prose-neutral max-w-none space-y-6">
                           <MarkdownRenderer
                             content={report.content || '(내용 없음)'}
-                            className="prose prose-stone max-w-none text-stone-700 text-sm leading-relaxed"
+                            className="prose prose-neutral max-w-none text-[#6b705c] text-sm leading-relaxed"
                           />
                         </div>
 
                         {/* AI Recommendation callout */}
                         {report.content && report.content.length > 100 && (
-                          <div className="p-6 rounded-r-xl my-8" style={{ backgroundColor: `${oliveGreen}0d`, borderLeft: `4px solid ${oliveGreen}` }}>
-                            <h4 className="font-bold mb-2 flex items-center gap-2" style={{ color: oliveGreen }}>
+                          <div className="p-6 rounded-r-xl my-8" style={{ backgroundColor: `${accentColor}0d`, borderLeft: `4px solid ${accentColor}` }}>
+                            <h4 className="font-bold mb-2 flex items-center gap-2" style={{ color: accentColor }}>
                               <Lightbulb className="w-5 h-5" />
                               AI Recommendation
                             </h4>
-                            <p className="text-sm italic text-stone-700">
+                            <p className="text-sm italic text-[#6b705c]">
                               "This report contains actionable insights. Consider sharing with relevant department heads for review."
                             </p>
                           </div>
@@ -524,40 +524,40 @@ export function ReportsPage() {
 
                     {/* CEO Feedback Section */}
                     {report.status !== 'draft' && (
-                      <div className="mt-16 pt-8 border-t border-stone-200">
+                      <div className="mt-16 pt-8 border-t border-[#e5e1d3]">
                         <h3 className="text-xl mb-6" style={{ fontFamily: "'Playfair Display', serif" }}>CEO Feedback &amp; Comments</h3>
                         <div className="space-y-4">
                           {remainingComments > 0 && (
-                            <button onClick={loadMoreComments} className="text-xs hover:underline" style={{ color: oliveGreen }}>
+                            <button onClick={loadMoreComments} className="text-xs hover:underline" style={{ color: accentColor }}>
                               이전 코멘트 {remainingComments}개 더 보기
                             </button>
                           )}
 
                           {comments.map((c) => (
                             <div key={c.id} className="flex gap-4">
-                              <div className="w-10 h-10 rounded-full bg-stone-200 overflow-hidden shrink-0 border border-stone-300 flex items-center justify-center text-stone-500 text-xs font-bold">
+                              <div className="w-10 h-10 rounded-full bg-[#e5e1d3] overflow-hidden shrink-0 border border-[#d4cfc4] flex items-center justify-center text-[#6b705c] text-xs font-bold">
                                 {c.authorName[0]?.toUpperCase() ?? 'U'}
                               </div>
-                              <div className="flex-1 bg-stone-50 p-4 rounded-2xl rounded-tl-none">
+                              <div className="flex-1 bg-[#f5f0e8] p-4 rounded-2xl rounded-tl-none">
                                 <div className="flex justify-between items-center mb-1">
                                   <span className="font-bold text-sm">{c.authorName}
-                                    {c.authorId === user?.id && <span className="ml-2 text-[10px] bg-stone-200 px-1.5 py-0.5 rounded text-stone-500">YOU</span>}
+                                    {c.authorId === user?.id && <span className="ml-2 text-[10px] bg-[#e5e1d3] px-1.5 py-0.5 rounded text-[#6b705c]">YOU</span>}
                                   </span>
-                                  <span className="text-[10px] text-stone-400">
+                                  <span className="text-[10px] text-[#756e5a]">
                                     {new Date(c.createdAt).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                   </span>
                                 </div>
-                                <p className="text-sm text-stone-600 leading-relaxed">{c.content}</p>
+                                <p className="text-sm text-[#6b705c] leading-relaxed">{c.content}</p>
                               </div>
                             </div>
                           ))}
 
                           {/* Input Area */}
                           <div className="mt-6">
-                            <label className="block text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-2 px-1">Add your feedback</label>
+                            <label className="block text-[10px] font-bold uppercase tracking-widest text-[#756e5a] mb-2 px-1">Add your feedback</label>
                             <div className="relative">
                               <textarea
-                                className="w-full bg-white border-stone-200 rounded-2xl p-4 text-sm placeholder:text-stone-400 border"
+                                className="w-full bg-white border-[#e5e1d3] rounded-2xl p-4 text-sm placeholder:text-[#756e5a] border"
                                 placeholder="Write a comment..."
                                 rows={3}
                                 value={commentInput}
@@ -571,7 +571,7 @@ export function ReportsPage() {
                                 }}
                                 disabled={!commentInput.trim() || createComment.isPending}
                                 className="absolute bottom-3 right-3 text-white p-2 rounded-xl transition-colors shadow-lg disabled:opacity-50"
-                                style={{ backgroundColor: oliveGreen, boxShadow: `0 4px 14px ${oliveGreen}4d` }}
+                                style={{ backgroundColor: accentColor, boxShadow: `0 4px 14px ${accentColor}4d` }}
                                 data-testid="comment-send-btn"
                               >
                                 <Send className="w-4 h-4" />
@@ -591,12 +591,12 @@ export function ReportsPage() {
       {/* ConfirmDialog: CEO 보고 */}
       {confirmOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white border border-stone-200 rounded-2xl shadow-2xl p-6 w-96">
-            <h3 className="text-sm font-semibold text-stone-900 mb-2">CEO에게 보고</h3>
-            <p className="text-xs text-stone-500 mb-4">이 보고서를 CEO에게 보고하시겠습니까? 보고 후 본문 수정이 제한됩니다.</p>
+          <div className="bg-white border border-[#e5e1d3] rounded-2xl shadow-2xl p-6 w-96">
+            <h3 className="text-sm font-semibold text-[#1a1a1a] mb-2">CEO에게 보고</h3>
+            <p className="text-xs text-[#6b705c] mb-4">이 보고서를 CEO에게 보고하시겠습니까? 보고 후 본문 수정이 제한됩니다.</p>
             <div className="flex justify-end gap-2">
-              <button onClick={() => setConfirmOpen(false)} className="border border-stone-300 rounded-lg px-4 py-2 text-sm text-stone-600 hover:bg-stone-50">취소</button>
-              <button onClick={() => { setConfirmOpen(false); submitReport.mutate() }} className="text-white rounded-lg px-4 py-2 text-sm font-medium" style={{ backgroundColor: oliveGreen }}>보고하기</button>
+              <button onClick={() => setConfirmOpen(false)} className="border border-[#d4cfc4] rounded-lg px-4 py-2 text-sm text-[#6b705c] hover:bg-[#f5f0e8]">취소</button>
+              <button onClick={() => { setConfirmOpen(false); submitReport.mutate() }} className="text-white rounded-lg px-4 py-2 text-sm font-medium" style={{ backgroundColor: accentColor }}>보고하기</button>
             </div>
           </div>
         </div>
@@ -605,11 +605,11 @@ export function ReportsPage() {
       {/* ConfirmDialog: 삭제 */}
       {deleteConfirmOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white border border-stone-200 rounded-2xl shadow-2xl p-6 w-96">
-            <h3 className="text-sm font-semibold text-stone-900 mb-2">보고서 삭제</h3>
-            <p className="text-xs text-stone-500 mb-4">이 보고서를 삭제하시겠습니까? 되돌릴 수 없습니다.</p>
+          <div className="bg-white border border-[#e5e1d3] rounded-2xl shadow-2xl p-6 w-96">
+            <h3 className="text-sm font-semibold text-[#1a1a1a] mb-2">보고서 삭제</h3>
+            <p className="text-xs text-[#6b705c] mb-4">이 보고서를 삭제하시겠습니까? 되돌릴 수 없습니다.</p>
             <div className="flex justify-end gap-2">
-              <button onClick={() => setDeleteConfirmOpen(false)} className="border border-stone-300 rounded-lg px-4 py-2 text-sm text-stone-600 hover:bg-stone-50">취소</button>
+              <button onClick={() => setDeleteConfirmOpen(false)} className="border border-[#d4cfc4] rounded-lg px-4 py-2 text-sm text-[#6b705c] hover:bg-[#f5f0e8]">취소</button>
               <button onClick={() => { setDeleteConfirmOpen(false); deleteReport.mutate() }} className="bg-red-600 hover:bg-red-500 text-white rounded-lg px-4 py-2 text-sm font-medium">삭제</button>
             </div>
           </div>

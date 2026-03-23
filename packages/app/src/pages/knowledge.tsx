@@ -98,9 +98,9 @@ type Agent = { id: string; name: string; departmentId: string | null }
 
 const PAGE_SIZE = 20
 
-const oliveColor = '#5a7247'
+const oliveColor = '#606C38'
 const sandBg = '#faf8f5'
-const borderColor = '#e5e1da'
+const borderColor = '#e5e1d3'
 
 const CONTENT_TYPE_COLORS: Record<ContentType, string> = {
   markdown: 'bg-blue-100 text-blue-700',
@@ -183,12 +183,12 @@ export function KnowledgePage() {
   const [showFolderTree, setShowFolderTree] = useState(true)
 
   return (
-    <div className="h-screen overflow-hidden flex flex-col" data-testid="knowledge-page" style={{ fontFamily: "'Pretendard', sans-serif", backgroundColor: sandBg }}>
+    <div className="h-screen overflow-hidden flex flex-col" data-testid="knowledge-page" style={{ fontFamily: "'Inter', sans-serif", backgroundColor: sandBg }}>
       {/* Navigation Header */}
       <header className="h-16 bg-white flex items-center justify-between px-6 z-10" style={{ borderBottom: `1px solid ${borderColor}` }}>
         <div className="flex items-center gap-4">
           <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold" style={{ backgroundColor: oliveColor }}>C</div>
-          <h1 className="text-xl font-bold text-gray-800" style={{ fontFamily: "'Noto Serif KR', serif" }}>CORTHEX <span style={{ color: oliveColor }}>v2</span></h1>
+          <h1 className="text-xl font-bold text-gray-800" style={{ fontFamily: "'Inter', sans-serif" }}>CORTHEX <span style={{ color: oliveColor }}>v2</span></h1>
         </div>
         <div className="flex items-center gap-6">
           <div className="relative w-96">
@@ -218,7 +218,7 @@ export function KnowledgePage() {
       ) : (
         <div className="flex-1 flex flex-col overflow-hidden">
           <div className="px-4 sm:px-6 py-4 border-b flex items-center justify-between bg-white" style={{ borderColor }}>
-            <h1 className="text-xl font-bold text-gray-800 tracking-tight" style={{ fontFamily: "'Noto Serif KR', serif" }}>CORTHEX Knowledge</h1>
+            <h1 className="text-xl font-bold text-gray-800 tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>CORTHEX Knowledge</h1>
             <div className="flex gap-0">
               <button onClick={() => setActiveTab('docs')} className="px-4 py-2 text-sm font-semibold tracking-wide transition-colors text-gray-400 hover:text-gray-800" data-testid="tab-docs">문서</button>
               <button onClick={() => setActiveTab('memories')} className="px-4 py-2 text-sm font-semibold tracking-wide transition-colors relative" style={{ color: oliveColor }} data-testid="tab-memories">
@@ -367,7 +367,7 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
-          <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-800" style={{ fontFamily: "'Noto Serif KR', serif" }}>CORTHEX Knowledge</h1>
+          <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-800" style={{ fontFamily: "'Inter', sans-serif" }}>CORTHEX Knowledge</h1>
         </div>
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-4">
@@ -419,7 +419,7 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
           {/* Center header */}
           <div className="p-4 bg-white/50 backdrop-blur-sm flex flex-col gap-4" style={{ borderBottom: `1px solid ${borderColor}` }}>
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-bold text-gray-800" style={{ fontFamily: "'Noto Serif KR', serif" }}>Documents</h2>
+              <h2 className="text-lg font-bold text-gray-800" style={{ fontFamily: "'Inter', sans-serif" }}>Documents</h2>
               <span className="text-xs font-medium text-gray-500 bg-gray-200 px-2 py-0.5 rounded-full">{total} Files</span>
             </div>
             <div className="flex gap-2 overflow-x-auto pb-1">
@@ -785,7 +785,7 @@ function DocDetailView({ doc, folders, onBack, onEdit, onDelete, onShowVersions,
       <div className="flex-1 overflow-y-auto scroll-smooth">
         <div className="max-w-3xl mx-auto py-12 px-8">
           <span className="inline-block font-bold text-xs tracking-widest uppercase mb-4" style={{ color: oliveColor }}>Internal Documentation</span>
-          <h1 className="font-bold text-4xl mb-6" style={{ fontFamily: "'Noto Serif KR', serif" }}>{fullDoc.title}</h1>
+          <h1 className="font-bold text-4xl mb-6" style={{ fontFamily: "'Inter', sans-serif" }}>{fullDoc.title}</h1>
 
           {/* Tags */}
           <div className="flex flex-wrap gap-2 mb-6">

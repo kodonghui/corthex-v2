@@ -94,10 +94,10 @@ const CLASSIFICATION_CONFIG: Record<Classification, { label: string }> = {
 }
 
 const CLASSIFICATION_DOT_COLORS: Record<Classification, string> = {
-  public: '#10b981',
-  internal: '#3b82f6',
-  confidential: '#f59e0b',
-  secret: '#ef4444',
+  public: '#4d7c0f',
+  internal: '#2563eb',
+  confidential: '#b45309',
+  secret: '#dc2626',
 }
 
 const SORT_OPTIONS: { value: string; label: string }[] = [
@@ -240,20 +240,20 @@ export function ClassifiedPage() {
   ]
 
   return (
-    <div data-testid="classified-page" className="font-sans min-h-screen" style={{ backgroundColor: '#faf8f5', color: '#1e293b' }}>
+    <div data-testid="classified-page" className="font-sans min-h-screen" style={{ backgroundColor: '#faf8f5', color: '#1a1a1a' }}>
       {/* BEGIN: MainHeader */}
-      <header className="h-16 border-b border-slate-200 bg-white sticky top-0 z-50 flex items-center justify-between px-8">
+      <header className="h-16 border-b bg-white sticky top-0 z-50 flex items-center justify-between px-8" style={{ borderColor: '#e5e1d3' }}>
         <div className="flex items-center gap-4">
-          <div className="w-8 h-8 bg-stone-100 rounded-lg flex items-center justify-center text-white font-bold">C</div>
-          <h1 className="text-lg font-semibold tracking-tight">CORTHEX <span className="text-stone-500 font-normal">v2.0</span></h1>
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold" style={{ backgroundColor: '#606C38' }}>C</div>
+          <h1 className="text-lg font-semibold tracking-tight" style={{ color: '#1a1a1a' }}>CORTHEX <span style={{ color: '#6b705c' }} className="font-normal">v2.0</span></h1>
         </div>
         <div className="flex items-center gap-6">
           <div className="text-right">
-            <p className="text-xs font-medium text-stone-400 uppercase tracking-widest leading-none">Access Level</p>
-            <p className="text-sm font-bold text-red-600">CLEARANCE: SECRET</p>
+            <p className="text-xs font-medium uppercase tracking-widest leading-none" style={{ color: '#756e5a' }}>Access Level</p>
+            <p className="text-sm font-bold" style={{ color: '#dc2626' }}>CLEARANCE: SECRET</p>
           </div>
-          <div className="w-10 h-10 rounded-full bg-slate-200 border-2 border-white shadow-sm overflow-hidden">
-            <div className="w-full h-full bg-slate-300 flex items-center justify-center text-stone-400 text-xs font-bold">U</div>
+          <div className="w-10 h-10 rounded-full border-2 border-white shadow-sm overflow-hidden" style={{ backgroundColor: '#f5f0e8' }}>
+            <div className="w-full h-full flex items-center justify-center text-xs font-bold" style={{ color: '#6b705c' }}>U</div>
           </div>
         </div>
       </header>
@@ -264,8 +264,8 @@ export function ClassifiedPage() {
         <div className="grid grid-cols-12 gap-6 h-full">
           {/* BEGIN: LeftSidebar (Security Classifications) */}
           <aside className="col-span-12 lg:col-span-3 xl:col-span-2 flex flex-col gap-4">
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 h-full" style={{ boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }}>
-              <h2 className="text-xs font-bold text-stone-500 uppercase tracking-wider mb-6">Security Clearance</h2>
+            <div className="bg-[#f5f0e8] rounded-2xl p-5 border border-[#e5e1d3] h-full">
+              <h2 className="text-xs font-bold uppercase tracking-wider mb-6" style={{ color: '#6b705c' }}>Security Clearance</h2>
               <nav className="space-y-2">
                 {classificationButtons.map((btn) => {
                   const isActive = activeClassification === btn.key
@@ -279,28 +279,29 @@ export function ClassifiedPage() {
                       }}
                       className={`w-full flex items-center justify-between p-3 rounded-xl transition-colors ${
                         isActive
-                          ? 'bg-white text-white shadow-lg'
-                          : 'hover:bg-slate-50 group'
+                          ? 'shadow-lg'
+                          : 'hover:bg-[#f0ebe0] group'
                       }`}
+                      style={isActive ? { backgroundColor: '#606C38', color: '#ffffff' } : undefined}
                     >
                       <div className="flex items-center gap-3">
                         <span
                           className={`w-2 h-2 rounded-full ${isActive && btn.key === 'secret' ? 'animate-pulse' : ''}`}
                           style={{ backgroundColor: CLASSIFICATION_DOT_COLORS[btn.key] }}
                         />
-                        <span className={`text-sm font-medium ${isActive ? 'text-white' : 'text-slate-600'}`}>{btn.label}</span>
+                        <span className="text-sm font-medium" style={isActive ? { color: '#ffffff' } : { color: '#1a1a1a' }}>{btn.label}</span>
                       </div>
-                      <span className={`text-xs px-2 py-0.5 rounded ${
-                        isActive ? 'bg-white/20 text-white/80' : 'bg-slate-100 text-stone-400'
-                      }`}>{count}</span>
+                      <span className="text-xs px-2 py-0.5 rounded" style={
+                        isActive ? { backgroundColor: 'rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.8)' } : { backgroundColor: '#f0ebe0', color: '#6b705c' }
+                      }>{count}</span>
                     </button>
                   )
                 })}
               </nav>
-              <div className="mt-8 pt-6 border-t border-slate-100">
-                <h2 className="text-xs font-bold text-stone-500 uppercase tracking-wider mb-4">API Archive Context</h2>
-                <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
-                  <code className="text-[10px] text-stone-400 break-all">GET /api/workspace/archive</code>
+              <div className="mt-8 pt-6" style={{ borderTop: '1px solid #e5e1d3' }}>
+                <h2 className="text-xs font-bold uppercase tracking-wider mb-4" style={{ color: '#6b705c' }}>API Archive Context</h2>
+                <div className="p-3 rounded-lg border" style={{ backgroundColor: '#faf8f5', borderColor: '#e5e1d3' }}>
+                  <code className="text-[10px] break-all font-mono" style={{ color: '#756e5a' }}>GET /api/workspace/archive</code>
                 </div>
               </div>
             </div>
@@ -310,10 +311,11 @@ export function ClassifiedPage() {
           {/* BEGIN: CenterContent (Document List) */}
           <section className="col-span-12 lg:col-span-5 xl:col-span-6 flex flex-col gap-4 overflow-hidden">
             <div className="flex items-center justify-between px-2">
-              <h2 className="text-xl font-bold text-slate-800">Classified Archive</h2>
+              <h2 className="text-xl font-bold" style={{ color: '#1a1a1a' }}>Classified Archive</h2>
               <div className="flex gap-2">
                 <input
-                  className="text-sm rounded-full border-slate-200 focus:ring-slate-400 focus:border-slate-400 px-4 py-1.5 w-48 transition-all border"
+                  className="text-sm rounded-full px-4 py-1.5 w-48 transition-all border focus:ring-1 focus:ring-[#606C38]"
+                  style={{ borderColor: '#908a78', color: '#1a1a1a' }}
                   placeholder="Filter documents..."
                   type="text"
                   value={searchInput}
@@ -324,15 +326,15 @@ export function ClassifiedPage() {
             <div className="overflow-y-auto pr-2 space-y-4">
               {listQuery.isLoading ? (
                 Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="bg-white p-5 rounded-2xl h-28 animate-pulse" style={{ boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }} />
+                  <div key={i} className="p-5 rounded-2xl h-28 animate-pulse" style={{ backgroundColor: '#f5f0e8', border: '1px solid #e5e1d3' }} />
                 ))
               ) : items.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 text-center">
-                  <p className="text-sm font-medium text-stone-500">아카이브된 문서가 없습니다</p>
+                  <p className="text-sm font-medium" style={{ color: '#6b705c' }}>아카이브된 문서가 없습니다</p>
                   <button
                     onClick={() => navigate('/hub')}
                     className="mt-3 px-4 py-2 text-xs text-white rounded-md hover:opacity-90 transition-colors"
-                    style={{ backgroundColor: '#5a7247' }}
+                    style={{ backgroundColor: '#606C38' }}
                   >
                     허브로 이동
                   </button>
@@ -346,11 +348,10 @@ export function ClassifiedPage() {
                     <article
                       key={item.id}
                       onClick={() => setDetailId(item.id)}
-                      className={`bg-white p-5 rounded-2xl border-l-4 transition-all cursor-pointer ${
+                      className={`bg-[#f5f0e8] p-5 rounded-2xl border border-[#e5e1d3] border-l-4 transition-all cursor-pointer ${
                         isActive ? 'border-l-8' : 'hover:border-l-8'
                       } ${idx > 0 && !isActive ? 'opacity-80 hover:opacity-100' : ''}`}
                       style={{
-                        boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
                         borderLeftColor: borderColor,
                       }}
                     >
@@ -359,17 +360,17 @@ export function ClassifiedPage() {
                           <span className="text-[10px] bg-red-50 text-red-600 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
                             {item.commandType || item.classification.toUpperCase()}
                           </span>
-                          <h3 className="font-bold text-slate-800">{item.title}</h3>
+                          <h3 className="font-bold text-[#1a1a1a]">{item.title}</h3>
                         </div>
-                        <span className="text-xs text-stone-500">{formatDate(item.createdAt)}</span>
+                        <span className="text-xs text-[#6b705c]">{formatDate(item.createdAt)}</span>
                       </div>
                       {item.summary && (
-                        <p className="text-sm text-stone-400 line-clamp-2 mb-4">{item.summary}</p>
+                        <p className="text-sm text-[#756e5a] line-clamp-2 mb-4">{item.summary}</p>
                       )}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           {item.agentName && (
-                            <span className="text-xs text-stone-500">{item.agentName}</span>
+                            <span className="text-xs text-[#6b705c]">{item.agentName}</span>
                           )}
                         </div>
                         <div className="flex items-center gap-2">
@@ -397,9 +398,9 @@ export function ClassifiedPage() {
 
           {/* BEGIN: RightSidebar (Document Detail View) */}
           <aside className="col-span-12 lg:col-span-4 xl:col-span-4 h-full hidden lg:block">
-            <div className="bg-white rounded-2xl border border-slate-100 h-full flex flex-col overflow-hidden" style={{ boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }}>
+            <div className="bg-[#f5f0e8] rounded-2xl border border-[#e5e1d3] h-full flex flex-col overflow-hidden">
               {!detailId ? (
-                <div className="flex-1 flex items-center justify-center text-stone-500 text-sm">
+                <div className="flex-1 flex items-center justify-center text-[#6b705c] text-sm">
                   문서를 선택하세요
                 </div>
               ) : detailQuery.isLoading || !detail ? (
@@ -409,18 +410,18 @@ export function ClassifiedPage() {
               ) : (
                 <>
                   {/* Detail Header */}
-                  <div className="p-6 border-b border-slate-100">
+                  <div className="p-6 border-b border-[#e5e1d3]">
                     <div className="flex items-center gap-2 mb-4">
                       <span className="w-3 h-3 rounded-full" style={{ backgroundColor: CLASSIFICATION_DOT_COLORS[detail.classification] }} />
-                      <span className="text-xs font-bold text-stone-500 tracking-tighter">REF: GET /api/workspace/archive/{detail.id.slice(0, 8)}</span>
+                      <span className="text-xs font-bold text-[#6b705c] tracking-tighter">REF: GET /api/workspace/archive/{detail.id.slice(0, 8)}</span>
                     </div>
-                    <h2 className="text-2xl font-bold text-slate-900 leading-tight">{detail.title}</h2>
+                    <h2 className="text-2xl font-bold text-[#1a1a1a] leading-tight">{detail.title}</h2>
                     <div className="mt-4 flex flex-wrap gap-2">
                       {detail.tags.map(tag => (
-                        <span key={tag} className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-medium">{tag}</span>
+                        <span key={tag} className="px-3 py-1 bg-[#f5f0e8] text-[#6b705c] rounded-full text-xs font-medium">{tag}</span>
                       ))}
                       {detail.departmentName && (
-                        <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-medium">{detail.departmentName}</span>
+                        <span className="px-3 py-1 bg-[#f5f0e8] text-[#6b705c] rounded-full text-xs font-medium">{detail.departmentName}</span>
                       )}
                     </div>
                   </div>
@@ -429,21 +430,21 @@ export function ClassifiedPage() {
                   <div className="p-6 overflow-y-auto flex-1">
                     {detail.delegationChain.length > 0 && (
                       <>
-                        <h3 className="text-xs font-bold text-stone-500 uppercase tracking-wider mb-6">Delegation Chain</h3>
+                        <h3 className="text-xs font-bold text-[#6b705c] uppercase tracking-wider mb-6">Delegation Chain</h3>
                         <div className="space-y-6 relative">
                           {/* Connector Line */}
-                          <div className="absolute left-5 top-2 bottom-8 w-px bg-slate-100" />
+                          <div className="absolute left-5 top-2 bottom-8 w-px bg-[#f5f0e8]" />
                           {detail.delegationChain.map((step, i) => {
                             const initials = step.agentName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
-                            const bgColor = i === 0 ? 'bg-white text-white' : i === 1 ? 'bg-slate-200 text-slate-600' : 'bg-slate-100 text-stone-500'
+                            const bgColor = i === 0 ? 'bg-white text-white' : i === 1 ? 'bg-[#f0ebe0] text-[#6b705c]' : 'bg-[#f5f0e8] text-[#6b705c]'
                             return (
                               <div key={i} className="flex items-start gap-4 relative z-10">
                                 <div className={`w-10 h-10 rounded-full ${bgColor} flex items-center justify-center text-xs border-4 border-white shadow-sm`}>
                                   {initials}
                                 </div>
                                 <div>
-                                  <p className="text-sm font-bold text-slate-800">{step.agentName}</p>
-                                  <p className="text-xs text-stone-400">{step.role} - {step.status}</p>
+                                  <p className="text-sm font-bold text-[#1a1a1a]">{step.agentName}</p>
+                                  <p className="text-xs text-[#756e5a]">{step.role} - {step.status}</p>
                                 </div>
                               </div>
                             )
@@ -455,19 +456,19 @@ export function ClassifiedPage() {
                     {/* Quality Review Scores */}
                     {detail.qualityReview && (
                       <div className="mt-10">
-                        <h3 className="text-xs font-bold text-stone-500 uppercase tracking-wider mb-4">Quality Review Scores</h3>
+                        <h3 className="text-xs font-bold text-[#6b705c] uppercase tracking-wider mb-4">Quality Review Scores</h3>
                         <div className="space-y-4">
                           <div>
                             <div className="flex justify-between text-xs font-medium mb-1">
-                              <span className="text-slate-600">Overall Score</span>
-                              <span className="text-slate-900">{(detail.qualityReview.score * 20)}%</span>
+                              <span className="text-[#6b705c]">Overall Score</span>
+                              <span className="text-[#1a1a1a]">{(detail.qualityReview.score * 20)}%</span>
                             </div>
-                            <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                            <div className="w-full h-1.5 bg-[#f5f0e8] rounded-full overflow-hidden">
                               <div className="h-full bg-green-500 rounded-full" style={{ width: `${detail.qualityReview.score * 20}%` }} />
                             </div>
                           </div>
                           {detail.qualityReview.feedback && (
-                            <p className="text-xs text-stone-400 italic">{detail.qualityReview.feedback}</p>
+                            <p className="text-xs text-[#756e5a] italic">{detail.qualityReview.feedback}</p>
                           )}
                         </div>
                       </div>
@@ -476,8 +477,8 @@ export function ClassifiedPage() {
                     {/* Content preview */}
                     {detail.content && (
                       <div className="mt-8">
-                        <h3 className="text-xs font-bold text-stone-500 uppercase tracking-wider mb-4">Document Content</h3>
-                        <div className="prose prose-sm max-w-none text-slate-600">
+                        <h3 className="text-xs font-bold text-[#6b705c] uppercase tracking-wider mb-4">Document Content</h3>
+                        <div className="prose prose-sm max-w-none text-[#6b705c]">
                           <MarkdownRenderer content={detail.content} />
                         </div>
                       </div>
@@ -485,10 +486,11 @@ export function ClassifiedPage() {
                   </div>
 
                   {/* Bottom Actions */}
-                  <div className="p-6 bg-slate-50 border-t border-slate-100 flex gap-3">
+                  <div className="p-6 border-t flex gap-3" style={{ backgroundColor: '#f0ebe0', borderColor: '#e5e1d3' }}>
                     <button
                       onClick={() => navigate(`/classified/${detail.id}`)}
-                      className="flex-1 bg-white text-white text-sm font-bold py-3 rounded-xl shadow-lg hover:bg-stone-100 transition-all flex items-center justify-center gap-2"
+                      className="flex-1 text-white text-sm font-bold py-3 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 hover:opacity-90"
+                      style={{ backgroundColor: '#606C38' }}
                     >
                       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
@@ -498,7 +500,8 @@ export function ClassifiedPage() {
                     </button>
                     <button
                       onClick={() => setDeleteConfirmId(detail.id)}
-                      className="w-12 h-12 flex items-center justify-center rounded-xl border border-slate-200 bg-white text-stone-400 hover:text-slate-800 hover:bg-slate-50 transition-all"
+                      className="w-12 h-12 flex items-center justify-center rounded-xl border bg-white transition-all hover:opacity-70"
+                      style={{ borderColor: '#e5e1d3', color: '#6b705c' }}
                     >
                       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
@@ -518,13 +521,14 @@ export function ClassifiedPage() {
       {deleteConfirmId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setDeleteConfirmId(null)} />
-          <div className="relative bg-white border border-slate-200 rounded-2xl p-6 w-80 shadow-2xl">
-            <h3 className="text-sm font-semibold text-slate-800 mb-2">문서 삭제</h3>
-            <p className="text-xs text-stone-400 mb-4">이 기밀문서를 삭제하시겠습니까?</p>
+          <div className="relative bg-white border rounded-2xl p-6 w-80 shadow-2xl" style={{ borderColor: '#e5e1d3' }}>
+            <h3 className="text-sm font-semibold mb-2" style={{ color: '#1a1a1a' }}>문서 삭제</h3>
+            <p className="text-xs mb-4" style={{ color: '#6b705c' }}>이 기밀문서를 삭제하시겠습니까?</p>
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setDeleteConfirmId(null)}
-                className="px-3 py-1.5 text-xs text-stone-400 hover:text-slate-700 rounded-lg border border-slate-200 hover:bg-slate-50"
+                className="px-3 py-1.5 text-xs rounded-lg border hover:opacity-70 transition-colors"
+                style={{ color: '#6b705c', borderColor: '#e5e1d3' }}
               >
                 취소
               </button>

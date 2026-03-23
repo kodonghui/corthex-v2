@@ -127,9 +127,9 @@ function getStoredLanguage(): string {
 // === Style helpers ===
 
 const inputStyle: React.CSSProperties = {
-  backgroundColor: '#fbfaf8',
-  borderColor: '#e5e1d3',
-  color: '#463e30',
+  backgroundColor: '#faf8f5',
+  borderColor: '#908a78',
+  color: '#1a1a1a',
 }
 
 const inputBase = 'w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border h-14 placeholder:text-stone-400 p-[15px] text-base font-normal leading-normal transition-all focus:outline-none focus:ring-1'
@@ -168,10 +168,10 @@ export function SettingsPage() {
         {/* Header */}
         <header className="flex items-center justify-between whitespace-nowrap border-b px-4 sm:px-10 py-4" style={{ borderColor: '#e5e1d3' }}>
           <div className="flex items-center gap-4">
-            <div className="w-6 h-6 flex items-center justify-center" style={{ color: '#5a7247' }}>
+            <div className="w-6 h-6 flex items-center justify-center" style={{ color: '#606C38' }}>
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
             </div>
-            <h2 className="text-lg font-bold leading-tight tracking-tight" style={{ fontFamily: "'Noto Serif KR', serif", color: '#463e30' }}>CORTHEX Settings</h2>
+            <h2 className="text-lg font-bold leading-tight tracking-tight" style={{ fontFamily: "'Inter', sans-serif", color: '#1a1a1a' }}>CORTHEX Settings</h2>
           </div>
         </header>
 
@@ -184,8 +184,8 @@ export function SettingsPage() {
                 onClick={() => setTab(tab.value)}
                 className="flex flex-col items-center justify-center pb-3 pt-4 transition-colors whitespace-nowrap"
                 style={activeTab === tab.value
-                  ? { borderBottom: '2px solid #5a7247', color: '#5a7247', fontWeight: 700 }
-                  : { borderBottom: '2px solid transparent', color: '#9c8d66', fontWeight: 500 }
+                  ? { borderBottom: '2px solid #606C38', color: '#606C38', fontWeight: 700 }
+                  : { borderBottom: '2px solid transparent', color: '#6b705c', fontWeight: 500 }
                 }
               >
                 <p className="text-sm leading-normal">{tab.label}</p>
@@ -302,48 +302,48 @@ function ProfileTab() {
   }
 
   if (isLoading) {
-    return <div className="text-center py-8 text-sm" style={{ color: '#9c8d66' }}>불러오는 중...</div>
+    return <div className="text-center py-8 text-sm" style={{ color: '#6b705c' }}>불러오는 중...</div>
   }
 
   return (
     <div data-testid="profile-tab">
       {/* 회사 정보 Section */}
       <section>
-        <h2 className="text-[22px] font-bold leading-tight tracking-tight pb-6" style={{ fontFamily: "'Noto Serif KR', serif", color: '#463e30' }}>회사 정보</h2>
+        <h2 className="text-[22px] font-bold leading-tight tracking-tight pb-6" style={{ fontFamily: "'Inter', sans-serif", color: '#1a1a1a' }}>회사 정보</h2>
         <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-4">
             <label className="flex flex-col flex-1">
-              <p className="text-base font-medium leading-normal pb-2" style={{ color: '#6a5d43' }}>사용자명</p>
-              <input type="text" value={profile?.username || ''} readOnly className={inputReadOnly} style={{ ...inputStyle, color: '#9c8d66', outlineColor: '#5a7247' }} />
+              <p className="text-base font-medium leading-normal pb-2" style={{ color: '#6b705c' }}>사용자명</p>
+              <input type="text" value={profile?.username || ''} readOnly className={inputReadOnly} style={{ ...inputStyle, color: '#6b705c', outlineColor: '#606C38' }} />
             </label>
           </div>
           <div className="flex flex-col gap-4">
             <label className="flex flex-col flex-1">
-              <p className="text-base font-medium leading-normal pb-2" style={{ color: '#6a5d43' }}>이메일</p>
-              <input type="text" value={profile?.email || '미설정'} readOnly className={inputReadOnly} style={{ ...inputStyle, color: '#9c8d66' }} />
+              <p className="text-base font-medium leading-normal pb-2" style={{ color: '#6b705c' }}>이메일</p>
+              <input type="text" value={profile?.email || '미설정'} readOnly className={inputReadOnly} style={{ ...inputStyle, color: '#6b705c' }} />
             </label>
           </div>
           <div className="flex flex-col gap-4">
             <label className="flex flex-col flex-1">
-              <p className="text-base font-medium leading-normal pb-2" style={{ color: '#6a5d43' }}>이름</p>
+              <p className="text-base font-medium leading-normal pb-2" style={{ color: '#6b705c' }}>이름</p>
               <input
                 type="text"
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
                 className={inputEditable}
-                style={{ ...inputStyle, color: '#463e30' }}
+                style={{ ...inputStyle, color: '#1a1a1a' }}
               />
             </label>
           </div>
           <div className="flex flex-col gap-4">
             <label className="flex flex-col flex-1">
-              <p className="text-base font-medium leading-normal pb-2" style={{ color: '#6a5d43' }}>역할</p>
+              <p className="text-base font-medium leading-normal pb-2" style={{ color: '#6b705c' }}>역할</p>
               <input
                 type="text"
                 value={profile?.role === 'admin' ? '관리자' : profile?.role === 'ceo' ? 'CEO' : '직원'}
                 readOnly
                 className={inputReadOnly}
-                style={{ ...inputStyle, color: '#9c8d66' }}
+                style={{ ...inputStyle, color: '#6b705c' }}
               />
             </label>
           </div>
@@ -351,7 +351,7 @@ function ProfileTab() {
             onClick={handleSaveName}
             disabled={updateProfile.isPending || editName.trim() === profile?.name}
             className="px-6 py-2.5 rounded-xl font-semibold transition-all shadow-sm disabled:opacity-50 self-end hover:opacity-90"
-            style={{ backgroundColor: '#5a7247', color: '#ffffff' }}
+            style={{ backgroundColor: '#606C38', color: '#ffffff' }}
           >
             {updateProfile.isPending ? '저장 중...' : '이름 저장'}
           </button>
@@ -362,28 +362,28 @@ function ProfileTab() {
 
       {/* 비밀번호 변경 Section */}
       <section>
-        <h2 className="text-[22px] font-bold leading-tight tracking-tight pb-6" style={{ fontFamily: "'Noto Serif KR', serif", color: '#463e30' }}>비밀번호 변경</h2>
+        <h2 className="text-[22px] font-bold leading-tight tracking-tight pb-6" style={{ fontFamily: "'Inter', sans-serif", color: '#1a1a1a' }}>비밀번호 변경</h2>
         <div className="flex flex-col gap-5">
           <label className="flex flex-col flex-1">
-            <p className="text-base font-medium leading-normal pb-2" style={{ color: '#6a5d43' }}>새 비밀번호</p>
+            <p className="text-base font-medium leading-normal pb-2" style={{ color: '#6b705c' }}>새 비밀번호</p>
             <input
               type="password"
               value={newPassword}
               onChange={(e) => { setNewPassword(e.target.value); setPasswordError('') }}
               placeholder="최소 6자"
               className={inputEditable}
-              style={{ ...inputStyle, color: '#463e30' }}
+              style={{ ...inputStyle, color: '#1a1a1a' }}
             />
           </label>
           <label className="flex flex-col flex-1">
-            <p className="text-base font-medium leading-normal pb-2" style={{ color: '#6a5d43' }}>비밀번호 확인</p>
+            <p className="text-base font-medium leading-normal pb-2" style={{ color: '#6b705c' }}>비밀번호 확인</p>
             <input
               type="password"
               value={confirmPassword}
               onChange={(e) => { setConfirmPassword(e.target.value); setPasswordError('') }}
               placeholder="비밀번호 재입력"
               className={inputEditable}
-              style={{ ...inputStyle, color: '#463e30' }}
+              style={{ ...inputStyle, color: '#1a1a1a' }}
             />
           </label>
           {passwordError && (
@@ -393,7 +393,7 @@ function ProfileTab() {
             onClick={handleChangePassword}
             disabled={!newPassword || !confirmPassword || changePassword.isPending}
             className="px-6 py-2.5 rounded-xl font-semibold transition-all shadow-sm disabled:opacity-50 self-end hover:opacity-90"
-            style={{ backgroundColor: '#5a7247', color: '#ffffff' }}
+            style={{ backgroundColor: '#606C38', color: '#ffffff' }}
           >
             {changePassword.isPending ? '변경 중...' : '비밀번호 변경'}
           </button>
@@ -408,7 +408,7 @@ function ProfileTab() {
             <button
               onClick={handleSwitchToAdmin}
               className="flex items-center gap-2 px-6 py-2.5 rounded-xl border font-medium transition-colors hover:opacity-70"
-              style={{ borderColor: '#e5e1d3', color: '#6a5d43' }}
+              style={{ borderColor: '#e5e1d3', color: '#6b705c' }}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
               관리자 콘솔로 이동
@@ -440,22 +440,22 @@ function DisplayTab() {
   }
 
   const ACCENT_COLORS = [
-    { value: 'olive', color: '#5a7247', label: 'Olive (기본값)' },
+    { value: 'olive', color: '#606C38', label: 'Olive (기본값)' },
     { value: 'terracotta', color: '#c4622d', label: 'Terracotta' },
     { value: 'emerald', color: '#10b981', label: 'Emerald' },
     { value: 'violet', color: '#8b5cf6', label: 'Violet' },
-    { value: 'stone', color: '#9c8d66', label: 'Stone' },
+    { value: 'stone', color: '#6b705c', label: 'Stone' },
   ]
 
   return (
     <div data-testid="display-tab">
       {/* 테마 Section */}
       <section>
-        <h2 className="text-[22px] font-bold leading-tight tracking-tight pb-6" style={{ fontFamily: "'Noto Serif KR', serif", color: '#463e30' }}>테마</h2>
+        <h2 className="text-[22px] font-bold leading-tight tracking-tight pb-6" style={{ fontFamily: "'Inter', sans-serif", color: '#1a1a1a' }}>테마</h2>
         <div className="flex flex-col gap-6">
           {/* Theme mode selector */}
           <div>
-            <p className="text-base font-medium leading-normal mb-3" style={{ color: '#6a5d43' }}>모드</p>
+            <p className="text-base font-medium leading-normal mb-3" style={{ color: '#6b705c' }}>모드</p>
             <div className="grid grid-cols-3 gap-3">
               {[
                 { value: 'system', label: '시스템' },
@@ -467,8 +467,8 @@ function DisplayTab() {
                   onClick={() => handleThemeChange(opt.value)}
                   className="py-3 rounded-xl text-sm font-medium transition-all"
                   style={theme === opt.value
-                    ? { backgroundColor: 'rgba(90,114,71,0.1)', color: '#5a7247', border: '2px solid #5a7247' }
-                    : { backgroundColor: '#f2f0e9', color: '#6a5d43', border: '2px solid transparent' }
+                    ? { backgroundColor: 'rgba(96,108,56,0.1)', color: '#606C38', border: '2px solid #606C38' }
+                    : { backgroundColor: '#f5f0e8', color: '#6b705c', border: '2px solid transparent' }
                   }
                 >
                   {opt.label}
@@ -479,7 +479,7 @@ function DisplayTab() {
 
           {/* Accent color picker */}
           <div>
-            <p className="text-base font-medium leading-normal mb-4" style={{ color: '#6a5d43' }}>액센트 컬러</p>
+            <p className="text-base font-medium leading-normal mb-4" style={{ color: '#6b705c' }}>액센트 컬러</p>
             <div className="flex items-center gap-4 flex-wrap">
               {ACCENT_COLORS.map((ac, idx) => (
                 <button
@@ -496,7 +496,7 @@ function DisplayTab() {
                   )}
                 </button>
               ))}
-              <span className="ml-2 text-sm font-medium" style={{ color: '#9c8d66' }}>Olive (기본값)</span>
+              <span className="ml-2 text-sm font-medium" style={{ color: '#6b705c' }}>Olive (기본값)</span>
             </div>
           </div>
         </div>
@@ -506,22 +506,22 @@ function DisplayTab() {
 
       {/* 언어 Section */}
       <section>
-        <h2 className="text-[22px] font-bold leading-tight tracking-tight pb-6" style={{ fontFamily: "'Noto Serif KR', serif", color: '#463e30' }}>언어</h2>
+        <h2 className="text-[22px] font-bold leading-tight tracking-tight pb-6" style={{ fontFamily: "'Inter', sans-serif", color: '#1a1a1a' }}>언어</h2>
         <div className="flex flex-col gap-4">
           <label className="flex flex-col flex-1">
-            <p className="text-base font-medium leading-normal pb-2" style={{ color: '#6a5d43' }}>언어</p>
+            <p className="text-base font-medium leading-normal pb-2" style={{ color: '#6b705c' }}>언어</p>
             <select
               value={language}
               onChange={(e) => handleLanguageChange(e.target.value)}
               className={selectClass}
-              style={{ ...inputStyle, color: '#463e30' }}
+              style={{ ...inputStyle, color: '#1a1a1a' }}
             >
               <option value="ko">한국어 (Korean)</option>
               <option value="en">English</option>
               <option value="ja">日本語 (Japanese)</option>
             </select>
           </label>
-          <p className="text-xs" style={{ color: '#9c8d66' }}>언어 변경은 향후 업데이트에서 전체 UI에 적용됩니다</p>
+          <p className="text-xs" style={{ color: '#6b705c' }}>언어 변경은 향후 업데이트에서 전체 UI에 적용됩니다</p>
         </div>
       </section>
     </div>
@@ -549,33 +549,33 @@ function CommandCenterTab() {
   return (
     <div data-testid="command-center-tab">
       <section>
-        <h2 className="text-[22px] font-bold leading-tight tracking-tight pb-6" style={{ fontFamily: "'Noto Serif KR', serif", color: '#463e30' }}>허브 설정</h2>
+        <h2 className="text-[22px] font-bold leading-tight tracking-tight pb-6" style={{ fontFamily: "'Inter', sans-serif", color: '#1a1a1a' }}>허브 설정</h2>
         <div className="flex flex-col gap-6">
           {/* Auto scroll toggle */}
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
-              <p className="text-base font-medium" style={{ color: '#463e30' }}>자동 스크롤</p>
-              <p className="text-sm mt-1" style={{ color: '#9c8d66' }}>새 메시지가 올 때 자동으로 아래로 스크롤합니다</p>
+              <p className="text-base font-medium" style={{ color: '#1a1a1a' }}>자동 스크롤</p>
+              <p className="text-sm mt-1" style={{ color: '#6b705c' }}>새 메시지가 올 때 자동으로 아래로 스크롤합니다</p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input checked={autoScroll} onChange={toggleAutoScroll} className="sr-only peer" type="checkbox" />
               <div
                 className="w-12 h-6 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"
-                style={{ backgroundColor: autoScroll ? '#5a7247' : '#d1c9b2' }}
+                style={{ backgroundColor: autoScroll ? '#606C38' : '#756e5a' }}
               />
             </label>
           </div>
           {/* Sound toggle */}
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
-              <p className="text-base font-medium" style={{ color: '#463e30' }}>알림 소리</p>
-              <p className="text-sm mt-1" style={{ color: '#9c8d66' }}>에이전트 응답 완료 시 알림 소리를 재생합니다</p>
+              <p className="text-base font-medium" style={{ color: '#1a1a1a' }}>알림 소리</p>
+              <p className="text-sm mt-1" style={{ color: '#6b705c' }}>에이전트 응답 완료 시 알림 소리를 재생합니다</p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input checked={sound} onChange={toggleSound} className="sr-only peer" type="checkbox" />
               <div
                 className="w-12 h-6 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"
-                style={{ backgroundColor: sound ? '#5a7247' : '#d1c9b2' }}
+                style={{ backgroundColor: sound ? '#606C38' : '#756e5a' }}
               />
             </label>
           </div>
@@ -590,8 +590,8 @@ function CommandCenterTab() {
 function PlaceholderTab() {
   return (
     <div className="text-center py-16">
-      <p className="text-sm" style={{ color: '#9c8d66' }}>준비 중입니다</p>
-      <p className="text-xs mt-1" style={{ color: '#b7aa88' }}>이 기능은 향후 업데이트에서 제공됩니다</p>
+      <p className="text-sm" style={{ color: '#6b705c' }}>준비 중입니다</p>
+      <p className="text-xs mt-1" style={{ color: '#756e5a' }}>이 기능은 향후 업데이트에서 제공됩니다</p>
     </div>
   )
 }
@@ -666,25 +666,25 @@ function ApiKeyTab() {
     <div data-testid="api-key-tab">
       <section>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-[22px] font-bold leading-tight tracking-tight" style={{ fontFamily: "'Noto Serif KR', serif", color: '#463e30' }}>API 연동</h2>
+          <h2 className="text-[22px] font-bold leading-tight tracking-tight" style={{ fontFamily: "'Inter', sans-serif", color: '#1a1a1a' }}>API 연동</h2>
           <button
             onClick={() => { setShowForm(!showForm); setFormCredentials({}) }}
             className="px-4 py-2 rounded-xl font-semibold text-sm hover:opacity-90 transition-colors"
-            style={{ backgroundColor: '#5a7247', color: '#ffffff' }}
+            style={{ backgroundColor: '#606C38', color: '#ffffff' }}
           >
             {showForm ? '취소' : '+ 새 키 등록'}
           </button>
         </div>
 
         {showForm && (
-          <div className="mb-6 p-5 rounded-2xl border flex flex-col gap-4" style={{ borderColor: 'rgba(90,114,71,0.3)', backgroundColor: 'rgba(90,114,71,0.03)' }}>
+          <div className="mb-6 p-5 rounded-2xl border flex flex-col gap-4" style={{ borderColor: 'rgba(96,108,56,0.3)', backgroundColor: 'rgba(96,108,56,0.03)' }}>
             <label className="flex flex-col flex-1">
-              <p className="text-base font-medium leading-normal pb-2" style={{ color: '#6a5d43' }}>서비스</p>
+              <p className="text-base font-medium leading-normal pb-2" style={{ color: '#6b705c' }}>서비스</p>
               <select
                 value={formProvider}
                 onChange={(e) => handleProviderChange(e.target.value)}
                 className={selectClass}
-                style={{ ...inputStyle, color: '#463e30' }}
+                style={{ ...inputStyle, color: '#1a1a1a' }}
               >
                 {PROVIDER_OPTIONS.map((p) => (
                   <option key={p} value={p}>{PROVIDER_LABELS[p] || p}</option>
@@ -692,35 +692,35 @@ function ApiKeyTab() {
               </select>
             </label>
             <label className="flex flex-col flex-1">
-              <p className="text-base font-medium leading-normal pb-2" style={{ color: '#6a5d43' }}>라벨 (선택)</p>
+              <p className="text-base font-medium leading-normal pb-2" style={{ color: '#6b705c' }}>라벨 (선택)</p>
               <input
                 type="text"
                 value={formLabel}
                 onChange={(e) => setFormLabel(e.target.value)}
                 placeholder="예: 내 KIS 계정"
                 className={inputEditable}
-                style={{ ...inputStyle, color: '#463e30' }}
+                style={{ ...inputStyle, color: '#1a1a1a' }}
               />
             </label>
             {fields.map((f) => (
               <label key={f.key} className="flex flex-col flex-1">
-                <p className="text-base font-medium leading-normal pb-2" style={{ color: '#6a5d43' }}>{f.label}</p>
+                <p className="text-base font-medium leading-normal pb-2" style={{ color: '#6b705c' }}>{f.label}</p>
                 <input
                   type={f.type}
                   value={formCredentials[f.key] || ''}
                   onChange={(e) => handleFieldChange(f.key, e.target.value)}
                   placeholder={`${f.label} 입력`}
                   className={inputEditable}
-                  style={{ ...inputStyle, color: '#463e30' }}
+                  style={{ ...inputStyle, color: '#1a1a1a' }}
                 />
               </label>
             ))}
-            <p className="text-xs" style={{ color: '#9c8d66' }}>모든 키는 서버에서 암호화되어 저장됩니다</p>
+            <p className="text-xs" style={{ color: '#6b705c' }}>모든 키는 서버에서 암호화되어 저장됩니다</p>
             <button
               onClick={handleRegister}
               disabled={!allFieldsFilled || registerKey.isPending}
               className="px-6 py-2.5 rounded-xl font-semibold transition-all shadow-sm disabled:opacity-50 self-end hover:opacity-90"
-              style={{ backgroundColor: '#5a7247', color: '#ffffff' }}
+              style={{ backgroundColor: '#606C38', color: '#ffffff' }}
             >
               {registerKey.isPending ? '등록 중...' : '등록'}
             </button>
@@ -729,9 +729,9 @@ function ApiKeyTab() {
 
         <div className="flex flex-col gap-3">
           {keysLoading ? (
-            <div className="text-center py-8 text-sm" style={{ color: '#9c8d66' }}>불러오는 중...</div>
+            <div className="text-center py-8 text-sm" style={{ color: '#6b705c' }}>불러오는 중...</div>
           ) : keys.length === 0 ? (
-            <div className="text-center py-8 text-sm" style={{ color: '#9c8d66' }}>
+            <div className="text-center py-8 text-sm" style={{ color: '#6b705c' }}>
               등록된 API key가 없습니다
             </div>
           ) : (
@@ -743,15 +743,15 @@ function ApiKeyTab() {
               >
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-base font-medium" style={{ color: '#463e30' }}>
+                    <span className="text-base font-medium" style={{ color: '#1a1a1a' }}>
                       {PROVIDER_LABELS[key.provider] || key.provider}
                     </span>
                     <Badge variant="success">연동됨</Badge>
                   </div>
                   {key.label && (
-                    <p className="text-sm mt-0.5" style={{ color: '#9c8d66' }}>{key.label}</p>
+                    <p className="text-sm mt-0.5" style={{ color: '#6b705c' }}>{key.label}</p>
                   )}
-                  <p className="text-xs font-mono tabular-nums" style={{ color: '#9c8d66' }}>
+                  <p className="text-xs font-mono tabular-nums" style={{ color: '#6b705c' }}>
                     {new Date(key.createdAt).toLocaleDateString('ko-KR')} 등록
                   </p>
                 </div>
@@ -775,15 +775,15 @@ function ApiKeyTab() {
       <div className="w-full h-px my-10" style={{ backgroundColor: '#e5e1d3' }} />
 
       <section>
-        <h2 className="text-[22px] font-bold leading-tight tracking-tight pb-6" style={{ fontFamily: "'Noto Serif KR', serif", color: '#463e30' }}>서비스 연동 안내</h2>
+        <h2 className="text-[22px] font-bold leading-tight tracking-tight pb-6" style={{ fontFamily: "'Inter', sans-serif", color: '#1a1a1a' }}>서비스 연동 안내</h2>
         <div className="flex flex-col gap-3">
           <div className="p-4 rounded-2xl bg-white border" style={{ borderColor: '#e5e1d3', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }}>
-            <span className="font-medium" style={{ color: '#463e30' }}>KIS 증권</span>
-            <span className="text-sm" style={{ color: '#9c8d66' }}> -- 한국투자증권 API key를 등록하면 에이전트가 매매 현황을 조회할 수 있습니다.</span>
+            <span className="font-medium" style={{ color: '#1a1a1a' }}>KIS 증권</span>
+            <span className="text-sm" style={{ color: '#6b705c' }}> -- 한국투자증권 API key를 등록하면 에이전트가 매매 현황을 조회할 수 있습니다.</span>
           </div>
           <div className="p-4 rounded-2xl bg-white border" style={{ borderColor: '#e5e1d3', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }}>
-            <span className="font-medium" style={{ color: '#463e30' }}>노션</span>
-            <span className="text-sm" style={{ color: '#9c8d66' }}> -- 노션 API key를 등록하면 노션 연동 도구를 사용할 수 있습니다.</span>
+            <span className="font-medium" style={{ color: '#1a1a1a' }}>노션</span>
+            <span className="text-sm" style={{ color: '#6b705c' }}> -- 노션 API key를 등록하면 노션 연동 도구를 사용할 수 있습니다.</span>
           </div>
         </div>
       </section>
@@ -824,17 +824,17 @@ function TelegramSection() {
 
   return (
     <div data-testid="telegram-tab">
-      <h2 className="text-[22px] font-bold leading-tight tracking-tight pb-6" style={{ fontFamily: "'Noto Serif KR', serif", color: '#463e30' }}>텔레그램 연동</h2>
+      <h2 className="text-[22px] font-bold leading-tight tracking-tight pb-6" style={{ fontFamily: "'Inter', sans-serif", color: '#1a1a1a' }}>텔레그램 연동</h2>
       {config?.isActive ? (
         <div className="p-5 rounded-2xl border flex flex-col gap-4" style={{ borderColor: 'rgba(16,185,129,0.3)', backgroundColor: 'rgba(16,185,129,0.03)' }}>
           <div className="flex items-center gap-2">
             <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ backgroundColor: 'rgba(16,185,129,0.15)', color: '#10b981' }}>연동됨</span>
-            <span className="text-sm font-mono" style={{ color: '#9c8d66' }}>Chat ID: {config.ceoChatId || '미설정'}</span>
+            <span className="text-sm font-mono" style={{ color: '#6b705c' }}>Chat ID: {config.ceoChatId || '미설정'}</span>
           </div>
           <div className="flex gap-3">
             <button onClick={() => testMessage.mutate()} disabled={testMessage.isPending}
               className="px-4 py-2 text-sm font-medium rounded-xl disabled:opacity-50 transition-colors hover:opacity-90"
-              style={{ backgroundColor: '#5a7247', color: '#ffffff' }}>
+              style={{ backgroundColor: '#606C38', color: '#ffffff' }}>
               {testMessage.isPending ? '전송 중...' : '테스트 메시지'}
             </button>
             <button onClick={() => disconnect.mutate()}
@@ -849,18 +849,18 @@ function TelegramSection() {
       ) : (
         <div className="flex flex-col gap-5">
           <label className="flex flex-col flex-1">
-            <p className="text-base font-medium leading-normal pb-2" style={{ color: '#6a5d43' }}>봇 토큰</p>
+            <p className="text-base font-medium leading-normal pb-2" style={{ color: '#6b705c' }}>봇 토큰</p>
             <input type="password" value={botToken} onChange={(e) => setBotToken(e.target.value)}
-              placeholder="봇 토큰 (@BotFather에서 발급)" className={inputEditable} style={{ ...inputStyle, color: '#463e30' }} />
+              placeholder="봇 토큰 (@BotFather에서 발급)" className={inputEditable} style={{ ...inputStyle, color: '#1a1a1a' }} />
           </label>
           <label className="flex flex-col flex-1">
-            <p className="text-base font-medium leading-normal pb-2" style={{ color: '#6a5d43' }}>CEO 채팅 ID (선택)</p>
+            <p className="text-base font-medium leading-normal pb-2" style={{ color: '#6b705c' }}>CEO 채팅 ID (선택)</p>
             <input value={ceoChatId} onChange={(e) => setCeoChatId(e.target.value)}
-              placeholder="CEO 채팅 ID" className={inputEditable} style={{ ...inputStyle, color: '#463e30' }} />
+              placeholder="CEO 채팅 ID" className={inputEditable} style={{ ...inputStyle, color: '#1a1a1a' }} />
           </label>
           <button onClick={() => saveConfig.mutate()} disabled={!botToken || saveConfig.isPending}
             className="px-6 py-2.5 rounded-xl font-semibold transition-all shadow-sm disabled:opacity-50 self-end hover:opacity-90"
-            style={{ backgroundColor: '#5a7247', color: '#ffffff' }}>
+            style={{ backgroundColor: '#606C38', color: '#ffffff' }}>
             {saveConfig.isPending ? '검증 중...' : '연동하기'}
           </button>
           {saveConfig.isError && <p className="text-sm" style={{ color: '#ef4444' }}>{(saveConfig.error as Error).message}</p>}

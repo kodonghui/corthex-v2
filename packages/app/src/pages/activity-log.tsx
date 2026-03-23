@@ -152,20 +152,20 @@ const TAB_ITEMS = [
 ]
 
 const STATUS_BADGE: Record<string, { label: string; dotColor: string; bgColor: string; textColor: string; borderColor: string }> = {
-  completed: { label: 'Success', dotColor: '#10b981', bgColor: 'rgba(16,185,129,0.08)', textColor: '#10b981', borderColor: 'rgba(16,185,129,0.2)' },
-  done: { label: 'Success', dotColor: '#10b981', bgColor: 'rgba(16,185,129,0.08)', textColor: '#10b981', borderColor: 'rgba(16,185,129,0.2)' },
-  end: { label: 'Success', dotColor: '#10b981', bgColor: 'rgba(16,185,129,0.08)', textColor: '#10b981', borderColor: 'rgba(16,185,129,0.2)' },
-  success: { label: 'Success', dotColor: '#10b981', bgColor: 'rgba(16,185,129,0.08)', textColor: '#10b981', borderColor: 'rgba(16,185,129,0.2)' },
-  failed: { label: 'Critical', dotColor: '#ef4444', bgColor: 'rgba(239,68,68,0.08)', textColor: '#ef4444', borderColor: 'rgba(239,68,68,0.2)' },
-  error: { label: 'Critical', dotColor: '#ef4444', bgColor: 'rgba(239,68,68,0.08)', textColor: '#ef4444', borderColor: 'rgba(239,68,68,0.2)' },
-  working: { label: 'Info', dotColor: '#3b82f6', bgColor: 'rgba(59,130,246,0.08)', textColor: '#3b82f6', borderColor: 'rgba(59,130,246,0.2)' },
-  start: { label: 'Info', dotColor: '#3b82f6', bgColor: 'rgba(59,130,246,0.08)', textColor: '#3b82f6', borderColor: 'rgba(59,130,246,0.2)' },
-  running: { label: 'Info', dotColor: '#3b82f6', bgColor: 'rgba(59,130,246,0.08)', textColor: '#3b82f6', borderColor: 'rgba(59,130,246,0.2)' },
-  pass: { label: 'PASS', dotColor: '#10b981', bgColor: 'rgba(16,185,129,0.08)', textColor: '#10b981', borderColor: 'rgba(16,185,129,0.2)' },
-  fail: { label: 'FAIL', dotColor: '#ef4444', bgColor: 'rgba(239,68,68,0.08)', textColor: '#ef4444', borderColor: 'rgba(239,68,68,0.2)' },
-  warning: { label: 'Neutral', dotColor: '#d1c9b2', bgColor: 'rgba(209,201,178,0.1)', textColor: '#9c8d66', borderColor: 'rgba(209,201,178,0.3)' },
-  clean: { label: 'Clean', dotColor: '#10b981', bgColor: 'rgba(16,185,129,0.08)', textColor: '#10b981', borderColor: 'rgba(16,185,129,0.2)' },
-  critical: { label: 'Critical', dotColor: '#ef4444', bgColor: 'rgba(239,68,68,0.08)', textColor: '#ef4444', borderColor: 'rgba(239,68,68,0.2)' },
+  completed: { label: 'Success', dotColor: '#4d7c0f', bgColor: 'rgba(77,124,15,0.08)', textColor: '#4d7c0f', borderColor: 'rgba(77,124,15,0.2)' },
+  done: { label: 'Success', dotColor: '#4d7c0f', bgColor: 'rgba(77,124,15,0.08)', textColor: '#4d7c0f', borderColor: 'rgba(77,124,15,0.2)' },
+  end: { label: 'Success', dotColor: '#4d7c0f', bgColor: 'rgba(77,124,15,0.08)', textColor: '#4d7c0f', borderColor: 'rgba(77,124,15,0.2)' },
+  success: { label: 'Success', dotColor: '#4d7c0f', bgColor: 'rgba(77,124,15,0.08)', textColor: '#4d7c0f', borderColor: 'rgba(77,124,15,0.2)' },
+  failed: { label: 'Critical', dotColor: '#dc2626', bgColor: 'rgba(220,38,38,0.08)', textColor: '#dc2626', borderColor: 'rgba(220,38,38,0.2)' },
+  error: { label: 'Critical', dotColor: '#dc2626', bgColor: 'rgba(220,38,38,0.08)', textColor: '#dc2626', borderColor: 'rgba(220,38,38,0.2)' },
+  working: { label: 'Info', dotColor: '#2563eb', bgColor: 'rgba(37,99,235,0.08)', textColor: '#2563eb', borderColor: 'rgba(37,99,235,0.2)' },
+  start: { label: 'Info', dotColor: '#2563eb', bgColor: 'rgba(37,99,235,0.08)', textColor: '#2563eb', borderColor: 'rgba(37,99,235,0.2)' },
+  running: { label: 'Info', dotColor: '#2563eb', bgColor: 'rgba(37,99,235,0.08)', textColor: '#2563eb', borderColor: 'rgba(37,99,235,0.2)' },
+  pass: { label: 'PASS', dotColor: '#4d7c0f', bgColor: 'rgba(77,124,15,0.08)', textColor: '#4d7c0f', borderColor: 'rgba(77,124,15,0.2)' },
+  fail: { label: 'FAIL', dotColor: '#dc2626', bgColor: 'rgba(220,38,38,0.08)', textColor: '#dc2626', borderColor: 'rgba(220,38,38,0.2)' },
+  warning: { label: 'Neutral', dotColor: '#b45309', bgColor: 'rgba(180,83,9,0.08)', textColor: '#b45309', borderColor: 'rgba(180,83,9,0.2)' },
+  clean: { label: 'Clean', dotColor: '#4d7c0f', bgColor: 'rgba(77,124,15,0.08)', textColor: '#4d7c0f', borderColor: 'rgba(77,124,15,0.2)' },
+  critical: { label: 'Critical', dotColor: '#dc2626', bgColor: 'rgba(220,38,38,0.08)', textColor: '#dc2626', borderColor: 'rgba(220,38,38,0.2)' },
 }
 
 const SCORE_LABELS: Record<string, string> = {
@@ -177,15 +177,15 @@ const SCORE_LABELS: Record<string, string> = {
 }
 
 const SEVERITY_STYLES: Record<string, { bg: string; text: string }> = {
-  critical: { bg: 'rgba(239,68,68,0.15)', text: '#ef4444' },
-  major: { bg: 'rgba(245,158,11,0.15)', text: '#f59e0b' },
-  minor: { bg: 'rgba(209,201,178,0.2)', text: '#9c8d66' },
+  critical: { bg: 'rgba(220,38,38,0.12)', text: '#dc2626' },
+  major: { bg: 'rgba(180,83,9,0.12)', text: '#b45309' },
+  minor: { bg: 'rgba(117,110,90,0.15)', text: '#756e5a' },
 }
 
 const RESULT_STYLES: Record<string, { bg: string; text: string }> = {
-  pass: { bg: 'rgba(16,185,129,0.15)', text: '#10b981' },
-  warn: { bg: 'rgba(245,158,11,0.15)', text: '#f59e0b' },
-  fail: { bg: 'rgba(239,68,68,0.15)', text: '#ef4444' },
+  pass: { bg: 'rgba(77,124,15,0.12)', text: '#4d7c0f' },
+  warn: { bg: 'rgba(180,83,9,0.12)', text: '#b45309' },
+  fail: { bg: 'rgba(220,38,38,0.12)', text: '#dc2626' },
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -234,9 +234,9 @@ function scorePercent(score: number | undefined, max: number | undefined): numbe
 }
 
 function scoreColor(pct: number): string {
-  if (pct >= 80) return '#10b981'
-  if (pct >= 60) return '#f59e0b'
-  return '#ef4444'
+  if (pct >= 80) return '#4d7c0f'
+  if (pct >= 60) return '#b45309'
+  return '#dc2626'
 }
 
 // === Status Badge ===
@@ -256,11 +256,11 @@ function StatusBadgeEl({ status }: { status: string }) {
 // === Phase dot color mapping ===
 
 function phaseDotColor(phase: string): string {
-  if (['completed', 'done', 'end', 'success'].includes(phase)) return '#10b981'
-  if (['failed', 'error'].includes(phase)) return '#ef4444'
-  if (['working', 'start', 'running'].includes(phase)) return '#3b82f6'
-  if (phase === 'warning') return '#d1c9b2'
-  return '#d1c9b2'
+  if (['completed', 'done', 'end', 'success'].includes(phase)) return '#4d7c0f'
+  if (['failed', 'error'].includes(phase)) return '#dc2626'
+  if (['working', 'start', 'running'].includes(phase)) return '#2563eb'
+  if (phase === 'warning') return '#b45309'
+  return '#756e5a'
 }
 
 // === Main Page ===
@@ -350,27 +350,25 @@ export function ActivityLogPage() {
   const alertCount24h = securityQuery.data?.data?.count24h ?? 0
 
   return (
-    <div className="swiss-grid" style={{ display: 'grid', gridTemplateColumns: '240px 1fr', minHeight: '100vh' }}>
-      {/* Sidebar — not rendered here, handled by app shell */}
-
+    <div className="flex flex-col min-h-screen" style={{ backgroundColor: '#faf8f5', color: '#1a1a1a', fontFamily: "'Inter', sans-serif" }}>
       {/* Main Content */}
-      <main className="flex flex-col h-screen overflow-hidden" style={{ backgroundColor: '#fbfaf8', color: '#463e30', fontFamily: "'Inter', sans-serif", gridColumn: '1 / -1' }}>
+      <main className="flex flex-col flex-1 overflow-hidden">
         {/* Header Section */}
         <header className="border-b px-8 py-6" style={{ backgroundColor: '#ffffff', borderColor: '#e5e1d3' }} data-purpose="page-header">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-              <h1 className="text-3xl" style={{ fontFamily: "'Instrument Serif', serif", color: '#463e30' }}>Activity Log</h1>
-              <p className="text-sm mt-1" style={{ color: '#9c8d66' }}>Audit trail for workspace events and operations.</p>
+              <h1 className="text-3xl font-semibold" style={{ color: '#1a1a1a' }}>Activity Log</h1>
+              <p className="text-sm mt-1" style={{ color: '#6b705c' }}>Audit trail for workspace events and operations.</p>
             </div>
             <div className="flex items-center gap-3">
               <WsStatusIndicator />
               <div className="relative">
                 <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                  <Search className="h-4 w-4" style={{ color: '#b7aa88' }} />
+                  <Search className="h-4 w-4" style={{ color: '#756e5a' }} />
                 </span>
                 <input
-                  className="pl-10 pr-4 py-2 border rounded text-sm focus:ring-1 w-64 transition-all"
-                  style={{ backgroundColor: '#fbfaf8', borderColor: '#e5e1d3', color: '#463e30' }}
+                  className="pl-10 pr-4 py-2 border rounded-lg text-sm focus:ring-1 focus:ring-[#606C38] w-64 transition-all"
+                  style={{ backgroundColor: '#faf8f5', borderColor: '#908a78', color: '#1a1a1a' }}
                   placeholder="Search events..."
                   type="text"
                   value={searchInput}
@@ -383,8 +381,8 @@ export function ActivityLogPage() {
                   placeholder="Tool name filter..."
                   value={toolNameFilter}
                   onChange={(e) => { setToolNameFilter(e.target.value); setPage(1) }}
-                  className="py-2 px-3 border rounded text-sm w-40 transition-colors"
-                  style={{ backgroundColor: '#fbfaf8', borderColor: '#e5e1d3', color: '#463e30' }}
+                  className="py-2 px-3 border rounded-lg text-sm w-40 transition-colors focus:ring-1 focus:ring-[#606C38]"
+                  style={{ backgroundColor: '#faf8f5', borderColor: '#908a78', color: '#1a1a1a' }}
                   data-testid="tool-name-filter"
                 />
               )}
@@ -392,8 +390,8 @@ export function ActivityLogPage() {
                 <select
                   value={conclusionFilter}
                   onChange={(e) => { setConclusionFilter(e.target.value); setPage(1) }}
-                  className="py-2 px-3 border rounded text-sm"
-                  style={{ backgroundColor: '#fbfaf8', borderColor: '#e5e1d3', color: '#463e30' }}
+                  className="py-2 px-3 border rounded-lg text-sm"
+                  style={{ backgroundColor: '#faf8f5', borderColor: '#908a78', color: '#1a1a1a' }}
                   data-testid="conclusion-filter"
                 >
                   <option value="">All</option>
@@ -402,13 +400,13 @@ export function ActivityLogPage() {
                 </select>
               )}
               <button
-                className="flex items-center gap-2 px-4 py-2 border rounded text-sm font-medium transition-colors"
-                style={{ backgroundColor: '#f2f0e9', borderColor: '#e5e1d3', color: '#6a5d43' }}
+                className="flex items-center gap-2 px-4 py-2 border rounded-lg text-sm font-medium transition-colors hover:bg-[#f0ebe0]"
+                style={{ backgroundColor: '#f5f0e8', borderColor: '#e5e1d3', color: '#6b705c' }}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
                 Filters
               </button>
-              <button className="p-2 rounded transition-colors" style={{ backgroundColor: '#554b38', color: '#ffffff' }}>
+              <button className="p-2 rounded-lg transition-colors hover:bg-[#4e5a2b]" style={{ backgroundColor: '#606C38', color: '#ffffff' }}>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
               </button>
             </div>
@@ -421,8 +419,8 @@ export function ActivityLogPage() {
                 onClick={() => setTab(item.value)}
                 className="pb-3 text-sm transition-colors"
                 style={tab === item.value
-                  ? { fontWeight: 600, borderBottom: '2px solid #554b38', color: '#463e30' }
-                  : { fontWeight: 500, color: '#9c8d66', borderBottom: '2px solid transparent' }
+                  ? { fontWeight: 600, borderBottom: '2px solid #606C38', color: '#1a1a1a' }
+                  : { fontWeight: 500, color: '#6b705c', borderBottom: '2px solid transparent' }
                 }
                 data-testid={`tab-${item.value}`}
               >
@@ -436,27 +434,27 @@ export function ActivityLogPage() {
         {tab === 'quality' && alertCount24h > 0 && (
           <div
             className="mx-8 mt-4 px-4 py-3 rounded-lg cursor-pointer flex items-center justify-between transition-colors"
-            style={{ backgroundColor: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.2)' }}
+            style={{ backgroundColor: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.2)' }}
             onClick={() => setShowSecurityAlerts(!showSecurityAlerts)}
             role="alert"
             data-testid="security-alert-banner"
           >
             <div className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4" style={{ color: '#ef4444' }} />
-              <span className="text-sm font-medium" style={{ color: '#ef4444' }}>
+              <AlertTriangle className="w-4 h-4" style={{ color: '#dc2626' }} />
+              <span className="text-sm font-medium" style={{ color: '#dc2626' }}>
                 보안 알림: 최근 24시간 {alertCount24h}건 차단
               </span>
             </div>
-            <span className="text-xs" style={{ color: '#ef4444' }}>{showSecurityAlerts ? '접기' : '상세 보기'}</span>
+            <span className="text-xs" style={{ color: '#dc2626' }}>{showSecurityAlerts ? '접기' : '상세 보기'}</span>
           </div>
         )}
 
         {/* Security Alerts Detail */}
         {tab === 'quality' && showSecurityAlerts && securityQuery.data?.data?.items && (
-          <div className="mx-8 mb-4 p-3 rounded-b-lg" style={{ backgroundColor: 'rgba(239,68,68,0.03)', border: '1px solid rgba(239,68,68,0.15)' }} data-testid="security-alerts-detail">
+          <div className="mx-8 mb-4 p-3 rounded-b-lg" style={{ backgroundColor: 'rgba(220,38,38,0.03)', border: '1px solid rgba(220,38,38,0.15)' }} data-testid="security-alerts-detail">
             <table className="w-full text-xs">
               <thead>
-                <tr style={{ color: '#9c8d66', borderBottom: '1px solid rgba(239,68,68,0.15)' }}>
+                <tr style={{ color: '#6b705c', borderBottom: '1px solid rgba(220,38,38,0.15)' }}>
                   <th className="text-left py-1 pr-2 font-medium">시간</th>
                   <th className="text-left py-1 pr-2 font-medium">유형</th>
                   <th className="text-left py-1 pr-2 font-medium">심각도</th>
@@ -468,10 +466,10 @@ export function ActivityLogPage() {
                   const meta = alert.metadata as Record<string, unknown> | null
                   const sevStyle = SEVERITY_STYLES[(meta?.severity as string) || 'major'] || SEVERITY_STYLES.major
                   return (
-                    <tr key={alert.id} style={{ borderBottom: '1px solid rgba(239,68,68,0.08)' }}>
-                      <td className="py-1.5 pr-2 whitespace-nowrap" style={{ color: '#9c8d66' }}>{formatTime(alert.createdAt)}</td>
+                    <tr key={alert.id} style={{ borderBottom: '1px solid rgba(220,38,38,0.08)' }}>
+                      <td className="py-1.5 pr-2 whitespace-nowrap font-mono" style={{ color: '#756e5a' }}>{formatTime(alert.createdAt)}</td>
                       <td className="py-1.5 pr-2">
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-medium" style={{ backgroundColor: 'rgba(239,68,68,0.15)', color: '#ef4444' }}>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-medium" style={{ backgroundColor: 'rgba(220,38,38,0.12)', color: '#dc2626' }}>
                           {SECURITY_ACTION_LABELS[alert.action] || alert.action}
                         </span>
                       </td>
@@ -480,7 +478,7 @@ export function ActivityLogPage() {
                           {(meta?.severity as string) || 'major'}
                         </span>
                       </td>
-                      <td className="py-1.5 truncate max-w-[300px]" style={{ color: '#9c8d66' }}>
+                      <td className="py-1.5 truncate max-w-[300px]" style={{ color: '#756e5a' }}>
                         {(meta?.pattern as string) || (meta?.threatType as string) || '-'}
                       </td>
                     </tr>
@@ -496,14 +494,14 @@ export function ActivityLogPage() {
           {activeQuery.isLoading ? (
             <div className="max-w-5xl mx-auto space-y-6">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="h-20 rounded-lg animate-pulse" style={{ backgroundColor: '#f2f0e9' }} />
+                <div key={i} className="h-20 rounded-xl animate-pulse" style={{ backgroundColor: '#f5f0e8' }} />
               ))}
             </div>
           ) : !activeQuery.data?.data?.items?.length ? (
             <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="activity-empty">
-              <FileText className="w-10 h-10 mb-4" style={{ color: '#d1c9b2' }} />
-              <h3 className="text-base font-medium mb-2" style={{ color: '#6a5d43' }}>데이터가 없습니다</h3>
-              <p className="text-sm" style={{ color: '#9c8d66' }}>선택한 기간에 해당하는 기록이 없습니다</p>
+              <FileText className="w-10 h-10 mb-4" style={{ color: '#756e5a' }} />
+              <h3 className="text-base font-medium mb-2" style={{ color: '#1a1a1a' }}>데이터가 없습니다</h3>
+              <p className="text-sm" style={{ color: '#6b705c' }}>선택한 기간에 해당하는 기록이 없습니다</p>
             </div>
           ) : (
             <div className="max-w-5xl mx-auto space-y-12">
@@ -530,8 +528,8 @@ export function ActivityLogPage() {
 
         {/* Footer Pagination */}
         {totalCount > 0 && (
-          <footer className="border-t px-8 py-3 flex items-center justify-between" style={{ backgroundColor: '#f2f0e9', borderColor: '#e5e1d3' }} data-purpose="list-pagination">
-            <span className="text-xs font-medium" style={{ color: '#9c8d66' }}>
+          <footer className="border-t px-8 py-3 flex items-center justify-between" style={{ backgroundColor: '#f5f0e8', borderColor: '#e5e1d3' }} data-purpose="list-pagination">
+            <span className="text-xs font-medium" style={{ color: '#6b705c' }}>
               Showing {((page - 1) * PAGE_SIZE) + 1}-{Math.min(page * PAGE_SIZE, totalCount)} of {totalCount.toLocaleString()} activities
             </span>
             <div className="flex gap-1">
@@ -539,7 +537,7 @@ export function ActivityLogPage() {
                 className="p-1 rounded disabled:opacity-30"
                 disabled={page <= 1}
                 onClick={() => setPage((p) => p - 1)}
-                style={{ color: '#6a5d43' }}
+                style={{ color: '#6b705c' }}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
               </button>
@@ -549,8 +547,8 @@ export function ActivityLogPage() {
                   onClick={() => setPage(p)}
                   className="w-6 h-6 flex items-center justify-center text-xs font-medium rounded transition-colors"
                   style={page === p
-                    ? { backgroundColor: '#554b38', color: '#ffffff', fontWeight: 700 }
-                    : { color: '#6a5d43' }
+                    ? { backgroundColor: '#606C38', color: '#ffffff', fontWeight: 700 }
+                    : { color: '#6b705c' }
                   }
                 >
                   {p}
@@ -560,7 +558,7 @@ export function ActivityLogPage() {
                 className="p-1 rounded disabled:opacity-30"
                 disabled={page >= totalPages}
                 onClick={() => setPage((p) => p + 1)}
-                style={{ color: '#6a5d43' }}
+                style={{ color: '#6b705c' }}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
               </button>
@@ -592,7 +590,7 @@ function TimelineView({ items }: { items: AgentActivity[] }) {
         <div key={date} className="relative" style={{ paddingLeft: '10px' }}>
           {/* Timeline line */}
           <div className="absolute" style={{ left: '19px', top: 0, bottom: 0, width: '1px', backgroundColor: '#e5e1d3' }} />
-          <h3 className="sticky top-0 py-2 text-xs font-bold uppercase tracking-widest mb-6 z-10" style={{ backgroundColor: '#fbfaf8', color: '#b7aa88' }}>
+          <h3 className="sticky top-0 py-2 text-xs font-bold uppercase tracking-widest mb-6 z-10" style={{ backgroundColor: '#faf8f5', color: '#756e5a' }}>
             {date}
           </h3>
           <div className="space-y-6">
@@ -603,29 +601,28 @@ function TimelineView({ items }: { items: AgentActivity[] }) {
                   style={{
                     left: '16px', top: '4px', width: '8px', height: '8px',
                     backgroundColor: phaseDotColor(item.phase),
-                    boxShadow: `0 0 0 4px #fbfaf8`,
+                    boxShadow: `0 0 0 4px #faf8f5`,
                   }}
                 />
                 <div
-                  className="flex-1 border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
-                  style={{ backgroundColor: '#ffffff', borderColor: '#e5e1d3' }}
+                  className="flex-1 bg-[#f5f0e8] border border-[#e5e1d3] rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <StatusBadgeEl status={item.phase} />
-                      <span className="text-xs font-medium" style={{ color: '#b7aa88' }}>
+                      <span className="text-xs font-medium font-mono" style={{ color: '#756e5a' }}>
                         {new Date(item.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
-                    <span className="text-[10px] font-mono" style={{ color: '#b7aa88' }}>ID: {item.id.slice(0, 8)}</span>
+                    <span className="text-[10px] font-mono" style={{ color: '#756e5a' }}>ID: {item.id.slice(0, 8)}</span>
                   </div>
-                  <p className="text-sm font-medium" style={{ color: '#554b38' }}>
+                  <p className="text-sm font-medium" style={{ color: '#1a1a1a' }}>
                     {item.action}
                     {item.detail && (
-                      <span style={{ color: '#837452', fontWeight: 400 }}> - {item.detail}</span>
+                      <span style={{ color: '#6b705c', fontWeight: 400 }}> - {item.detail}</span>
                     )}
                   </p>
-                  <div className="mt-3 flex items-center gap-4 text-xs" style={{ color: '#9c8d66' }}>
+                  <div className="mt-3 flex items-center gap-4 text-xs" style={{ color: '#6b705c' }}>
                     {item.agentName && (
                       <span className="flex items-center gap-1">
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
@@ -657,33 +654,32 @@ function DelegationTimeline({ items }: { items: Delegation[] }) {
               style={{
                 left: '16px', top: '4px', width: '8px', height: '8px',
                 backgroundColor: '#3b82f6',
-                boxShadow: '0 0 0 4px #fbfaf8',
+                boxShadow: '0 0 0 4px #faf8f5',
               }}
             />
             <div
-              className="flex-1 border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
-              style={{ backgroundColor: '#ffffff', borderColor: '#e5e1d3' }}
+              className="flex-1 bg-[#f5f0e8] border border-[#e5e1d3] rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <StatusBadgeEl status={item.status} />
-                  <span className="text-xs font-medium" style={{ color: '#b7aa88' }}>
+                  <span className="text-xs font-medium font-mono" style={{ color: '#756e5a' }}>
                     {new Date(item.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
-                <span className="text-[10px] font-mono" style={{ color: '#b7aa88' }}>ID: {item.id.slice(0, 8)}</span>
+                <span className="text-[10px] font-mono" style={{ color: '#756e5a' }}>ID: {item.id.slice(0, 8)}</span>
               </div>
-              <p className="text-sm font-medium" style={{ color: '#554b38' }}>
-                Delegation from <span style={{ textDecoration: 'underline', textDecorationColor: '#d1c9b2' }}>{item.agentName || 'System'}</span>
+              <p className="text-sm font-medium" style={{ color: '#1a1a1a' }}>
+                Delegation from <span style={{ textDecoration: 'underline', textDecorationColor: '#e5e1d3' }}>{item.agentName || 'System'}</span>
                 {' '}to {(meta?.toAgentName as string) || '-'}
               </p>
               {item.input && (
-                <p className="mt-2 text-xs leading-relaxed" style={{ color: '#9c8d66' }}>
+                <p className="mt-2 text-xs leading-relaxed" style={{ color: '#6b705c' }}>
                   {String(item.input).slice(0, 120)}
                 </p>
               )}
               {item.durationMs != null && (
-                <div className="mt-2 text-xs" style={{ color: '#9c8d66' }}>
+                <div className="mt-2 text-xs font-mono" style={{ color: '#6b705c' }}>
                   Duration: {formatDuration(item.durationMs)}
                 </div>
               )}
@@ -710,7 +706,7 @@ function QualityTable({
     <div className="overflow-x-auto" data-testid="quality-table">
       <table className="w-full text-sm min-w-[560px]">
         <thead>
-          <tr className="text-xs border-b" style={{ color: '#9c8d66', borderColor: '#e5e1d3' }}>
+          <tr className="text-xs border-b" style={{ color: '#6b705c', borderColor: '#e5e1d3' }}>
             <th className="text-left py-2 pr-3 font-medium">시간</th>
             <th className="text-left py-2 pr-3 font-medium">명령</th>
             <th className="text-left py-2 pr-3 font-medium">검수 점수</th>
@@ -735,8 +731,8 @@ function QualityTable({
                     aria-expanded={expandedId === item.id}
                     style={{ borderBottom: '1px solid #e5e1d3' }}
                   >
-                    <div className="py-2.5 pr-3 text-xs whitespace-nowrap min-w-[90px]" style={{ color: '#9c8d66' }}>{formatTime(item.createdAt)}</div>
-                    <div className="py-2.5 pr-3 text-xs truncate max-w-[200px] flex-1" style={{ color: '#554b38' }}>{item.commandText || '-'}</div>
+                    <div className="py-2.5 pr-3 text-xs whitespace-nowrap min-w-[90px] font-mono" style={{ color: '#756e5a' }}>{formatTime(item.createdAt)}</div>
+                    <div className="py-2.5 pr-3 text-xs truncate max-w-[200px] flex-1" style={{ color: '#1a1a1a' }}>{item.commandText || '-'}</div>
                     <div className="py-2.5 pr-3 min-w-[120px]">
                       {pct != null ? (
                         <div className="flex items-center gap-2">
@@ -746,11 +742,11 @@ function QualityTable({
                           <span className="text-xs font-bold" style={{ color: scoreColor(pct) }}>{pct}%</span>
                         </div>
                       ) : (
-                        <span className="text-xs" style={{ color: '#9c8d66' }}>-</span>
+                        <span className="text-xs" style={{ color: '#756e5a' }}>-</span>
                       )}
                     </div>
                     <div className="py-2.5 pr-3 min-w-[60px]"><StatusBadgeEl status={item.conclusion} /></div>
-                    <div className="py-2.5 text-xs text-right min-w-[50px]" style={{ color: '#9c8d66' }}>{item.attemptNumber > 1 ? item.attemptNumber - 1 : 0}</div>
+                    <div className="py-2.5 text-xs text-right min-w-[50px] font-mono" style={{ color: '#6b705c' }}>{item.attemptNumber > 1 ? item.attemptNumber - 1 : 0}</div>
                   </div>
 
                   {expandedId === item.id && scores && (
@@ -774,7 +770,7 @@ function QualityDetailPanel({ scores, feedback }: { scores: MergedScores; feedba
   const hasHallucination = scores.hallucinationReport != null
 
   return (
-    <div className="border-b" style={{ backgroundColor: 'rgba(242,240,233,0.5)', borderColor: '#e5e1d3' }} data-testid="qa-detail-panel">
+    <div className="border-b" style={{ backgroundColor: 'rgba(245,240,232,0.5)', borderColor: '#e5e1d3' }} data-testid="qa-detail-panel">
       <div className="px-4 pt-2 flex gap-1 border-b" style={{ borderColor: '#e5e1d3' }}>
         <DetailTabButton active={detailTab === 'rules'} onClick={() => setDetailTab('rules')}>
           규칙별 결과
@@ -803,7 +799,7 @@ function QualityDetailPanel({ scores, feedback }: { scores: MergedScores; feedba
 
       {feedback && (
         <div className="px-4 pb-3">
-          <p className="text-[11px] whitespace-pre-wrap border-t pt-2" style={{ color: '#9c8d66', borderColor: '#e5e1d3' }}>
+          <p className="text-[11px] whitespace-pre-wrap border-t pt-2" style={{ color: '#6b705c', borderColor: '#e5e1d3' }}>
             {feedback}
           </p>
         </div>
@@ -818,8 +814,8 @@ function DetailTabButton({ active, onClick, children }: { active: boolean; onCli
       onClick={onClick}
       className="px-3 py-1.5 text-[11px] font-medium rounded-t border-b-2 transition-colors"
       style={active
-        ? { borderColor: '#554b38', color: '#463e30', backgroundColor: '#f2f0e9' }
-        : { borderColor: 'transparent', color: '#9c8d66' }
+        ? { borderColor: '#606C38', color: '#1a1a1a', backgroundColor: '#f5f0e8' }
+        : { borderColor: 'transparent', color: '#6b705c' }
       }
     >
       {children}
@@ -831,7 +827,7 @@ function DetailTabButton({ active, onClick, children }: { active: boolean; onCli
 
 function RuleResultsPanel({ ruleResults }: { ruleResults: RuleResult[] }) {
   if (ruleResults.length === 0) {
-    return <p className="text-xs" style={{ color: '#9c8d66' }}>규칙별 검수 데이터가 없습니다.</p>
+    return <p className="text-xs" style={{ color: '#6b705c' }}>규칙별 검수 데이터가 없습니다.</p>
   }
 
   const grouped = ruleResults.reduce<Record<string, RuleResult[]>>((acc, r) => {
@@ -845,7 +841,7 @@ function RuleResultsPanel({ ruleResults }: { ruleResults: RuleResult[] }) {
     <div className="space-y-3">
       {Object.entries(grouped).map(([category, rules]) => (
         <div key={category}>
-          <h4 className="text-[11px] font-semibold mb-1.5" style={{ color: '#6a5d43' }}>
+          <h4 className="text-[11px] font-semibold mb-1.5" style={{ color: '#6b705c' }}>
             {CATEGORY_LABELS[category] || category}
           </h4>
           <div className="space-y-1">
@@ -853,7 +849,7 @@ function RuleResultsPanel({ ruleResults }: { ruleResults: RuleResult[] }) {
               const sevStyle = SEVERITY_STYLES[rule.severity] || SEVERITY_STYLES.minor
               const resStyle = RESULT_STYLES[rule.result] || {}
               return (
-                <div key={rule.ruleId} className="flex items-start gap-2 px-2 py-1.5 rounded-lg" style={{ backgroundColor: 'rgba(242,240,233,0.5)' }}>
+                <div key={rule.ruleId} className="flex items-start gap-2 px-2 py-1.5 rounded-lg" style={{ backgroundColor: 'rgba(245,240,232,0.5)' }}>
                   <span className="px-1.5 py-0.5 rounded text-[10px] font-medium shrink-0" style={{ backgroundColor: sevStyle.bg, color: sevStyle.text }}>
                     {rule.severity}
                   </span>
@@ -861,12 +857,12 @@ function RuleResultsPanel({ ruleResults }: { ruleResults: RuleResult[] }) {
                     {rule.result === 'pass' ? 'PASS' : rule.result === 'warn' ? 'WARN' : 'FAIL'}
                   </span>
                   <div className="flex-1 min-w-0">
-                    <span className="text-xs font-medium" style={{ color: '#554b38' }}>{rule.ruleName}</span>
+                    <span className="text-xs font-medium" style={{ color: '#1a1a1a' }}>{rule.ruleName}</span>
                     {rule.message && (
-                      <p className="text-[10px] mt-0.5 truncate" style={{ color: '#9c8d66' }}>{rule.message}</p>
+                      <p className="text-[10px] mt-0.5 truncate" style={{ color: '#6b705c' }}>{rule.message}</p>
                     )}
                   </div>
-                  {rule.skipped && <span className="text-[10px] italic shrink-0" style={{ color: '#9c8d66' }}>건너뜀</span>}
+                  {rule.skipped && <span className="text-[10px] italic shrink-0" style={{ color: '#6b705c' }}>건너뜀</span>}
                 </div>
               )
             })}
@@ -883,17 +879,17 @@ function RubricPanel({ rubricScores }: { rubricScores: RubricScore[] }) {
   return (
     <div className="space-y-2">
       {rubricScores.map((item) => (
-        <div key={item.id} className="flex items-center gap-3 px-2 py-1.5 rounded-lg" style={{ backgroundColor: 'rgba(242,240,233,0.5)' }}>
+        <div key={item.id} className="flex items-center gap-3 px-2 py-1.5 rounded-lg" style={{ backgroundColor: 'rgba(245,240,232,0.5)' }}>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium" style={{ color: '#554b38' }}>{item.label}</span>
-              <span className="text-[10px]" style={{ color: '#9c8d66' }}>(가중치 {item.weight}%{item.critical ? ', 필수' : ''})</span>
+              <span className="text-xs font-medium" style={{ color: '#1a1a1a' }}>{item.label}</span>
+              <span className="text-[10px]" style={{ color: '#6b705c' }}>(가중치 {item.weight}%{item.critical ? ', 필수' : ''})</span>
             </div>
             {item.feedback && (
-              <p className="text-[10px] mt-0.5 truncate" style={{ color: '#9c8d66' }}>{item.feedback}</p>
+              <p className="text-[10px] mt-0.5 truncate" style={{ color: '#6b705c' }}>{item.feedback}</p>
             )}
           </div>
-          <span className="text-sm font-bold" style={{ color: item.score >= 4 ? '#10b981' : item.score >= 3 ? '#f59e0b' : '#ef4444' }}>
+          <span className="text-sm font-bold" style={{ color: item.score >= 4 ? '#4d7c0f' : item.score >= 3 ? '#b45309' : '#dc2626' }}>
             {item.score}/5
           </span>
         </div>
@@ -912,15 +908,15 @@ function HallucinationPanel({ report }: { report: HallucinationReport }) {
       <div className="flex items-center gap-3 flex-wrap">
         <StatusBadgeEl status={report.verdict} />
         <div className="flex gap-4 text-xs">
-          <span style={{ color: '#9c8d66' }}>총 주장: <span className="font-medium" style={{ color: '#554b38' }}>{report.totalClaims}</span></span>
-          <span style={{ color: '#9c8d66' }}>검증: <span className="font-medium" style={{ color: '#10b981' }}>{report.verifiedClaims}</span></span>
-          <span style={{ color: '#9c8d66' }}>불일치: <span className="font-medium" style={{ color: '#ef4444' }}>{report.mismatchedClaims}</span></span>
-          <span style={{ color: '#9c8d66' }}>미확인: <span className="font-medium" style={{ color: '#f59e0b' }}>{report.unsourcedCount}</span></span>
+          <span style={{ color: '#6b705c' }}>총 주장: <span className="font-medium" style={{ color: '#1a1a1a' }}>{report.totalClaims}</span></span>
+          <span style={{ color: '#6b705c' }}>검증: <span className="font-medium" style={{ color: '#10b981' }}>{report.verifiedClaims}</span></span>
+          <span style={{ color: '#6b705c' }}>불일치: <span className="font-medium" style={{ color: '#ef4444' }}>{report.mismatchedClaims}</span></span>
+          <span style={{ color: '#6b705c' }}>미확인: <span className="font-medium" style={{ color: '#f59e0b' }}>{report.unsourcedCount}</span></span>
         </div>
       </div>
 
       <div className="flex items-center gap-2">
-        <span className="text-[10px] w-16" style={{ color: '#9c8d66' }}>환각 점수</span>
+        <span className="text-[10px] w-16" style={{ color: '#6b705c' }}>환각 점수</span>
         <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ backgroundColor: '#e5e1d3' }}>
           <div
             className="h-full rounded-full"
@@ -933,30 +929,30 @@ function HallucinationPanel({ report }: { report: HallucinationReport }) {
       </div>
 
       {report.details && (
-        <p className="text-[10px]" style={{ color: '#9c8d66' }}>{report.details}</p>
+        <p className="text-[10px]" style={{ color: '#6b705c' }}>{report.details}</p>
       )}
 
       {report.claims.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[10px] font-medium" style={{ color: '#9c8d66' }}>주장별 검증 결과</span>
+            <span className="text-[10px] font-medium" style={{ color: '#6b705c' }}>주장별 검증 결과</span>
             {report.claims.length > 5 && (
-              <button onClick={() => setShowAll(!showAll)} className="text-[10px]" style={{ color: '#554b38', textDecoration: 'underline' }}>
+              <button onClick={() => setShowAll(!showAll)} className="text-[10px]" style={{ color: '#1a1a1a', textDecoration: 'underline' }}>
                 {showAll ? '일부만 보기' : `전체 보기 (${report.claims.length})`}
               </button>
             )}
           </div>
           <div className="space-y-1">
             {(showAll ? report.claims : report.claims.filter(c => !c.verified || c.severity !== 'none').slice(0, 5)).map((cv, i) => (
-              <div key={i} className="flex items-start gap-2 px-2 py-1 rounded-lg text-[10px]" style={{ backgroundColor: 'rgba(242,240,233,0.5)' }}>
+              <div key={i} className="flex items-start gap-2 px-2 py-1 rounded-lg text-[10px]" style={{ backgroundColor: 'rgba(245,240,232,0.5)' }}>
                 <span
                   className="shrink-0 mt-0.5 w-2 h-2 rounded-full"
                   style={{ backgroundColor: cv.verified ? '#10b981' : cv.severity === 'critical' ? '#ef4444' : '#f59e0b' }}
                 />
                 <div className="flex-1 min-w-0">
-                  <span className="font-medium" style={{ color: '#554b38' }}>{cv.claim.value}</span>
-                  <span className="ml-1" style={{ color: '#9c8d66' }}>({cv.claim.type})</span>
-                  {cv.toolSource && <span className="ml-1" style={{ color: '#837452' }}>via {cv.toolSource}</span>}
+                  <span className="font-medium" style={{ color: '#1a1a1a' }}>{cv.claim.value}</span>
+                  <span className="ml-1" style={{ color: '#6b705c' }}>({cv.claim.type})</span>
+                  {cv.toolSource && <span className="ml-1" style={{ color: '#6b705c' }}>via {cv.toolSource}</span>}
                   {cv.discrepancy && <p className="mt-0.5" style={{ color: '#ef4444' }}>{cv.discrepancy}</p>}
                 </div>
                 <span
@@ -986,8 +982,8 @@ function LegacyScoresPanel({ scores }: { scores: MergedScores }) {
         const score = (scores as unknown as Record<string, number>)[key] ?? 0
         return (
           <div key={key} className="text-center">
-            <p className="text-[10px] mb-1" style={{ color: '#9c8d66' }}>{label}</p>
-            <p className="text-sm font-bold" style={{ color: score >= 4 ? '#10b981' : score >= 3 ? '#f59e0b' : '#ef4444' }}>
+            <p className="text-[10px] mb-1" style={{ color: '#6b705c' }}>{label}</p>
+            <p className="text-sm font-bold" style={{ color: score >= 4 ? '#4d7c0f' : score >= 3 ? '#b45309' : '#dc2626' }}>
               {score}/5
             </p>
           </div>
@@ -1004,7 +1000,7 @@ function ToolsTable({ items }: { items: ToolInvocation[] }) {
     <div className="overflow-x-auto" data-testid="tools-table">
       <table className="w-full text-sm min-w-[640px]">
         <thead>
-          <tr className="text-xs border-b" style={{ color: '#9c8d66', borderColor: '#e5e1d3' }}>
+          <tr className="text-xs border-b" style={{ color: '#6b705c', borderColor: '#e5e1d3' }}>
             <th className="text-left py-2 pr-3 font-medium">시간</th>
             <th className="text-left py-2 pr-3 font-medium">도구명</th>
             <th className="text-left py-2 pr-3 font-medium">에이전트</th>
@@ -1016,12 +1012,12 @@ function ToolsTable({ items }: { items: ToolInvocation[] }) {
         <tbody>
           {items.map((item) => (
             <tr key={item.id} className="transition-colors" style={{ borderBottom: '1px solid rgba(229,225,211,0.5)' }}>
-              <td className="py-2.5 pr-3 text-xs whitespace-nowrap" style={{ color: '#9c8d66' }}>{formatTime(item.createdAt)}</td>
-              <td className="py-2.5 pr-3 text-xs font-medium font-mono" style={{ color: '#5a7247' }}>{item.toolName}</td>
-              <td className="py-2.5 pr-3 text-xs" style={{ color: '#554b38' }}>{item.agentName || '-'}</td>
-              <td className="py-2.5 pr-3 text-xs text-right" style={{ color: '#9c8d66' }}>{formatDuration(item.durationMs)}</td>
+              <td className="py-2.5 pr-3 text-xs whitespace-nowrap font-mono" style={{ color: '#756e5a' }}>{formatTime(item.createdAt)}</td>
+              <td className="py-2.5 pr-3 text-xs font-medium font-mono" style={{ color: '#606C38' }}>{item.toolName}</td>
+              <td className="py-2.5 pr-3 text-xs" style={{ color: '#1a1a1a' }}>{item.agentName || '-'}</td>
+              <td className="py-2.5 pr-3 text-xs text-right font-mono" style={{ color: '#756e5a' }}>{formatDuration(item.durationMs)}</td>
               <td className="py-2.5 pr-3"><StatusBadgeEl status={item.status} /></td>
-              <td className="py-2.5 text-xs truncate max-w-[200px]" style={{ color: '#9c8d66' }}>{item.input || '-'}</td>
+              <td className="py-2.5 text-xs truncate max-w-[200px]" style={{ color: '#6b705c' }}>{item.input || '-'}</td>
             </tr>
           ))}
         </tbody>
