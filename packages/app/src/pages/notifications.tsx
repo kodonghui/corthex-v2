@@ -11,6 +11,10 @@ import { api } from '../lib/api'
 import { useWsStore } from '../stores/ws-store'
 import { Skeleton } from '@corthex/ui'
 import { NotificationSettings } from '../components/notification-settings'
+import {
+  CheckCircle, AlertTriangle, XCircle, Info, ArrowLeftRight,
+  Search, CheckCheck, Settings, Clock, ArrowLeft, History,
+} from 'lucide-react'
 
 type Notification = {
   id: string
@@ -31,14 +35,25 @@ const TYPE_CATEGORY: Record<string, string> = {
   system: '시스템',
 }
 
-const TYPE_ICON_STYLE: Record<string, { bg: string; dot: string; label: string }> = {
-  chat_complete: { bg: 'rgba(90,114,71,0.08)', dot: '#5a7247', label: 'Agent' },
-  delegation_complete: { bg: 'rgba(90,114,71,0.08)', dot: '#5a7247', label: 'Agent' },
-  tool_error: { bg: 'rgba(245,158,11,0.08)', dot: '#f59e0b', label: 'System Alert' },
-  job_complete: { bg: 'rgba(16,185,129,0.08)', dot: '#10b981', label: 'Agent' },
-  job_error: { bg: 'rgba(239,68,68,0.08)', dot: '#ef4444', label: 'Error' },
-  system: { bg: 'rgba(139,92,246,0.08)', dot: '#8b5cf6', label: 'System' },
+const TYPE_ICON_STYLE: Record<string, { bg: string; dot: string; label: string; icon: 'success' | 'warning' | 'error' | 'info' | 'handoff' | 'system' }> = {
+  chat_complete: { bg: 'rgba(96,108,56,0.10)', dot: '#606C38', label: 'Agent', icon: 'success' },
+  delegation_complete: { bg: 'rgba(124,58,237,0.10)', dot: '#7c3aed', label: 'Handoff', icon: 'handoff' },
+  tool_error: { bg: 'rgba(180,83,9,0.10)', dot: '#b45309', label: 'System Alert', icon: 'warning' },
+  job_complete: { bg: 'rgba(96,108,56,0.10)', dot: '#606C38', label: 'Agent', icon: 'success' },
+  job_error: { bg: 'rgba(220,38,38,0.10)', dot: '#dc2626', label: 'Error', icon: 'error' },
+  system: { bg: 'rgba(37,99,235,0.10)', dot: '#2563eb', label: 'System', icon: 'info' },
 }
+
+const FILTER_CHIPS = [
+  { key: 'all' as const, label: 'All' },
+  { key: 'unread' as const, label: 'Unread' },
+]
+
+const TAB_CHIPS = [
+  { key: 'all' as const, label: 'All' },
+  { key: 'agent' as const, label: 'Tasks' },
+  { key: 'system' as const, label: 'System' },
+]
 
 function getDateGroup(dateStr: string): string {
   const d = new Date(dateStr)
@@ -46,20 +61,36 @@ function getDateGroup(dateStr: string): string {
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   const yesterday = new Date(today.getTime() - 86400000)
   const logDate = new Date(d.getFullYear(), d.getMonth(), d.getDate())
-  if (logDate.getTime() === today.getTime()) return '오늘'
-  if (logDate.getTime() === yesterday.getTime()) return '어제'
+  if (logDate.getTime() === today.getTime()) return 'Today'
+  if (logDate.getTime() === yesterday.getTime()) return 'Yesterday'
   return d.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })
 }
 
 function formatTimeShort(dateStr: string): string {
   const d = new Date(dateStr)
-  return d.toLocaleTimeString('ko', { hour: '2-digit', minute: '2-digit', hour12: false })
+  return d.toLocaleTimeString('ko', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
+}
+
+function NotificationIcon({ type }: { type: string }) {
+  const style = TYPE_ICON_STYLE[type]
+  const iconType = style?.icon ?? 'info'
+  const cls = 'w-5 h-5'
+  switch (iconType) {
+    case 'success': return <CheckCircle className={cls} />
+    case 'warning': return <AlertTriangle className={cls} />
+    case 'error': return <XCircle className={cls} />
+    case 'handoff': return <ArrowLeftRight className={cls} />
+    case 'system': return <Info className={cls} />
+    default: return <Info className={cls} />
+  }
 }
 
 export function NotificationsPage() {
   const [activeTab, setTab] = useState<'all' | 'system' | 'agent'>('all')
   const [filter, setFilter] = useState<'all' | 'unread'>('all')
   const [showSettings, setShowSettings] = useState(false)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const { subscribe, addListener, removeListener, isConnected } = useWsStore()
@@ -121,7 +152,7 @@ export function NotificationsPage() {
   const unreadCount = countData?.data?.unread ?? 0
 
   // Category filtering
-  const filteredNotifications = activeTab === 'all'
+  const categoryFiltered = activeTab === 'all'
     ? notifications
     : notifications.filter((n) => {
         const cat = TYPE_CATEGORY[n.type] || '알림'
@@ -130,203 +161,352 @@ export function NotificationsPage() {
         return true
       })
 
-  // Date grouping
-  const grouped = filteredNotifications.reduce<Record<string, Notification[]>>((acc, n) => {
-    const group = getDateGroup(n.createdAt)
-    ;(acc[group] ??= []).push(n)
-    return acc
-  }, {})
+  // Search filtering
+  const filteredNotifications = searchQuery.trim()
+    ? categoryFiltered.filter(n =>
+        n.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (n.body && n.body.toLowerCase().includes(searchQuery.toLowerCase()))
+      )
+    : categoryFiltered
+
+  const selectedNotification = selectedId
+    ? notifications.find(n => n.id === selectedId) ?? null
+    : null
 
   const handleClick = (n: Notification) => {
     if (!n.isRead) markRead.mutate(n.id)
+    setSelectedId(n.id)
+  }
+
+  const handleNavigate = (n: Notification) => {
     if (n.actionUrl) navigate(n.actionUrl)
   }
 
+  // Settings view
   if (showSettings) {
     return (
       <div
-        className="max-w-[800px] mx-auto w-full px-4 py-6 min-h-screen"
-        style={{ backgroundColor: '#faf8f5', fontFamily: "'Inter', sans-serif" }}
+        className="bg-[#faf8f5] min-h-screen font-sans text-[#1a1a1a] antialiased"
         data-testid="notifications-page"
       >
-        <div className="flex items-center justify-between mb-6 px-4">
-          <h1 className="text-[28px] font-bold leading-tight" style={{ fontFamily: "'Noto Serif KR', serif", color: '#463e30' }}>알림 설정</h1>
-          <button
-            onClick={() => setShowSettings(false)}
-            className="flex items-center justify-center rounded-lg h-9 px-4 text-sm font-medium hover:opacity-70 transition-colors"
-            style={{ backgroundColor: '#f2f0e9', color: '#6a5d43' }}
-          >
-            목록으로
-          </button>
+        <div className="p-8 max-w-[1440px] mx-auto">
+          <div className="flex items-center justify-between mb-8">
+            <h1 className="text-4xl font-extrabold tracking-tighter text-[#283618] uppercase">Notification Settings</h1>
+            <button
+              onClick={() => setShowSettings(false)}
+              className="flex items-center gap-2 px-4 py-2 text-[#283618] font-mono text-xs uppercase tracking-widest hover:bg-[#f5f0e8] transition-colors rounded-lg"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to list
+            </button>
+          </div>
+          <NotificationSettings />
         </div>
-        <NotificationSettings />
       </div>
     )
   }
 
   return (
     <div
-      className="max-w-[800px] mx-auto w-full flex flex-col flex-1 px-4 py-5 min-h-screen"
-      style={{ backgroundColor: '#faf8f5', fontFamily: "'Inter', sans-serif" }}
+      className="bg-[#faf8f5] min-h-screen font-sans text-[#1a1a1a] antialiased"
       data-testid="notifications-page"
     >
-      {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 mb-4">
-        <h1 className="text-[28px] font-bold leading-tight tracking-tight" style={{ fontFamily: "'Noto Serif KR', serif", color: '#463e30' }}>알림</h1>
-        <div className="flex items-center gap-2">
-          {unreadCount > 0 && (
-            <button
-              onClick={() => markAllRead.mutate()}
-              className="flex items-center justify-center overflow-hidden rounded-lg h-9 px-4 text-sm font-semibold leading-normal tracking-[0.015em] hover:opacity-90 transition-colors"
-              style={{ backgroundColor: '#5a7247', color: '#ffffff' }}
-              data-testid="mark-all-read"
-            >
-              <span className="truncate">모두 읽음</span>
-            </button>
-          )}
-          <button
-            onClick={() => setShowSettings(true)}
-            className="flex items-center justify-center rounded-lg h-9 w-9 transition-colors hover:opacity-70"
-            style={{ color: '#9c8d66' }}
-            title="알림 설정"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
-          </button>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="pb-3">
-        <div className="flex border-b px-4 gap-8" style={{ borderColor: '#e5e1d3' }}>
-          {([
-            { key: 'all' as const, label: '전체' },
-            { key: 'system' as const, label: '시스템' },
-            { key: 'agent' as const, label: '에이전트' },
-          ]).map((t) => (
-            <button
-              key={t.key}
-              onClick={() => setTab(t.key)}
-              className="flex flex-col items-center justify-center pb-[13px] pt-4 transition-colors"
-              style={activeTab === t.key
-                ? { borderBottom: '2px solid #5a7247', color: '#463e30', fontWeight: 600 }
-                : { borderBottom: '2px solid transparent', color: '#9c8d66', fontWeight: 500 }
-              }
-            >
-              <p className="text-sm leading-normal tracking-[0.015em]">{t.label}</p>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Read/Unread filter */}
-      <div className="flex gap-1.5 px-4 mb-4">
-        <button
-          onClick={() => setFilter('all')}
-          className="px-3 py-1 rounded-full text-xs font-medium transition-colors"
-          style={filter === 'all'
-            ? { backgroundColor: 'rgba(90,114,71,0.15)', color: '#5a7247' }
-            : { backgroundColor: '#f2f0e9', color: '#9c8d66' }
-          }
-          data-testid="filter-all"
-        >
-          전체
-        </button>
-        <button
-          onClick={() => setFilter('unread')}
-          className="px-3 py-1 rounded-full text-xs font-medium transition-colors"
-          style={filter === 'unread'
-            ? { backgroundColor: 'rgba(90,114,71,0.15)', color: '#5a7247' }
-            : { backgroundColor: '#f2f0e9', color: '#9c8d66' }
-          }
-          data-testid="filter-unread"
-        >
-          미확인
-        </button>
-      </div>
-
-      {/* Notification list */}
-      {isLoading ? (
-        <div className="space-y-3 px-4">
-          {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-24 rounded-xl" style={{ backgroundColor: '#f2f0e9' }} />
-          ))}
-        </div>
-      ) : notifications.length === 0 ? (
-        <div className="px-4">
-          <div className="bg-white border rounded-2xl" style={{ borderColor: '#e5e1d3', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }}>
-            <div className="p-8 text-center text-sm" style={{ color: '#9c8d66' }}>
-              {filter === 'unread' ? '미확인 알림이 없습니다' : '알림이 없습니다'}
-            </div>
+      <div className="p-8 max-w-[1440px] mx-auto min-h-screen flex flex-col">
+        {/* HEADER SECTION */}
+        <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <h1 className="text-4xl font-extrabold tracking-tighter text-[#283618] uppercase">Notification Center</h1>
+            <p className="text-[#6b705c] mt-2 font-medium">CORTHEX System Alerts &amp; Updates</p>
           </div>
-        </div>
-      ) : (
-        Object.entries(grouped).map(([group, items], groupIdx) => (
-          <div key={group}>
-            <h3
-              className="text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2"
-              style={{ fontFamily: "'Noto Serif KR', serif", color: '#463e30', paddingTop: groupIdx === 0 ? '24px' : '8px' }}
+          <div className="flex items-center gap-3">
+            {unreadCount > 0 && (
+              <button
+                onClick={() => markAllRead.mutate()}
+                className="flex items-center gap-2 px-4 py-2 text-[#283618] font-mono text-xs uppercase tracking-widest hover:bg-[#f5f0e8] transition-colors rounded-lg"
+                data-testid="mark-all-read"
+              >
+                <CheckCheck className="w-4 h-4" />
+                Mark all read
+              </button>
+            )}
+            <button
+              onClick={() => setShowSettings(true)}
+              className="flex items-center gap-2 px-4 py-2 text-[#6b705c] font-mono text-xs uppercase tracking-widest hover:bg-[#f5f0e8] transition-colors rounded-lg"
+              title="Notification settings"
             >
-              {group}
-            </h3>
-            <div className="flex flex-col gap-2 px-4 pb-6">
-              {items.map((n) => {
-                const iconStyle = TYPE_ICON_STYLE[n.type] || { bg: 'rgba(90,114,71,0.08)', dot: '#5a7247', label: 'Alert' }
-                return (
-                  <button
-                    key={n.id}
-                    onClick={() => handleClick(n)}
-                    className="relative flex gap-4 rounded-2xl p-4 transition-all text-left w-full focus:outline-none"
-                    style={{
-                      backgroundColor: n.isRead ? '#ffffff' : 'rgba(90,114,71,0.03)',
-                      border: n.isRead ? '1px solid #e5e1d3' : '1px solid rgba(90,114,71,0.2)',
-                      boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
-                    }}
-                    data-testid={`notification-${n.id}`}
-                  >
-                    {/* Unread dot */}
-                    {!n.isRead && (
-                      <div className="absolute top-4 left-2 w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#5a7247' }} />
-                    )}
-                    <div className="flex items-start gap-4 w-full ml-2">
-                      {/* Icon */}
+              <Settings className="w-4 h-4" />
+            </button>
+          </div>
+        </header>
+
+        {/* FILTER BAR */}
+        <nav className="mb-8 flex flex-wrap items-center justify-between gap-4 py-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {TAB_CHIPS.map((chip) => (
+              <button
+                key={chip.key}
+                onClick={() => setTab(chip.key)}
+                className={`rounded-full px-5 py-1.5 text-xs font-semibold tracking-wide transition-colors ${
+                  activeTab === chip.key
+                    ? 'bg-[#606C38] text-white shadow-sm'
+                    : 'bg-[#f5f0e8] text-[#6b705c] hover:bg-[#e5e1d3]'
+                }`}
+              >
+                {chip.label}
+              </button>
+            ))}
+            <div className="w-px h-5 bg-[#e5e1d3] mx-1" />
+            {FILTER_CHIPS.map((chip) => (
+              <button
+                key={chip.key}
+                onClick={() => setFilter(chip.key)}
+                className={`rounded-full px-5 py-1.5 text-xs font-semibold tracking-wide transition-colors ${
+                  filter === chip.key
+                    ? 'bg-[#606C38] text-white shadow-sm'
+                    : 'bg-[#f5f0e8] text-[#6b705c] hover:bg-[#e5e1d3]'
+                }`}
+                data-testid={`filter-${chip.key}`}
+              >
+                {chip.label}
+                {chip.key === 'unread' && unreadCount > 0 && (
+                  <span className="ml-1.5 text-[10px]">({unreadCount})</span>
+                )}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-2 text-[#6b705c] px-3 py-1 bg-[#f5f3f0] rounded-lg border border-[#e5e1d3]/30">
+            <Search className="w-4 h-4 text-[#6b705c]/60" />
+            <input
+              className="bg-transparent border-none focus:ring-0 focus:outline-none text-xs font-mono w-48 p-0 placeholder:text-[#6b705c]/40 text-[#1a1a1a]"
+              placeholder="Filter alerts..."
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </nav>
+
+        {/* MASTER-DETAIL LAYOUT */}
+        <main className="flex-1 flex flex-col lg:flex-row gap-0 bg-[#f5f3f0] rounded-2xl overflow-hidden shadow-2xl shadow-[#283618]/5 ring-1 ring-[#e5e1d3]/30">
+          {/* LIST PANEL (LEFT) */}
+          <section className="lg:w-[60%] flex flex-col border-r border-[#e5e1d3]/30">
+            <div className="p-4 bg-[#f5f0e8] text-[10px] font-mono uppercase tracking-[0.2em] text-[#6b705c]/60 flex justify-between">
+              <span>Active Stream</span>
+              <span>{filteredNotifications.length} Records Found</span>
+            </div>
+            <div className="flex-1 overflow-y-auto max-h-[700px]">
+              {isLoading ? (
+                <div className="space-y-0">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="p-5 border-b border-[#e5e1d3]/10">
+                      <Skeleton className="h-16 rounded-xl" style={{ backgroundColor: '#f5f0e8' }} />
+                    </div>
+                  ))}
+                </div>
+              ) : filteredNotifications.length === 0 ? (
+                <div className="p-12 text-center">
+                  <p className="text-sm text-[#6b705c]">
+                    {filter === 'unread' ? 'No unread notifications' : 'No notifications found'}
+                  </p>
+                </div>
+              ) : (
+                filteredNotifications.map((n) => {
+                  const iconStyle = TYPE_ICON_STYLE[n.type] || { bg: 'rgba(96,108,56,0.10)', dot: '#606C38', label: 'Alert', icon: 'info' as const }
+                  const isSelected = selectedId === n.id
+                  const borderColor = iconStyle.icon === 'error' ? '#dc2626'
+                    : iconStyle.icon === 'handoff' ? '#7c3aed'
+                    : iconStyle.icon === 'warning' ? '#b45309'
+                    : 'transparent'
+
+                  return (
+                    <div
+                      key={n.id}
+                      onClick={() => handleClick(n)}
+                      className={`group relative flex items-start gap-4 p-5 transition-all cursor-pointer border-b border-[#e5e1d3]/10 ${
+                        isSelected
+                          ? 'bg-[#e5e1d3]/60'
+                          : n.isRead
+                            ? 'hover:bg-[#f5f0e8]/60'
+                            : 'bg-white/40 hover:bg-[#f5f0e8]'
+                      }`}
+                      style={{ borderLeftWidth: '4px', borderLeftColor: borderColor }}
+                      data-testid={`notification-${n.id}`}
+                    >
+                      {/* Icon bubble */}
                       <div
-                        className="flex items-center justify-center rounded-full shrink-0 w-10 h-10"
-                        style={{ backgroundColor: iconStyle.bg }}
+                        className="flex-shrink-0 mt-1 w-10 h-10 rounded-xl flex items-center justify-center"
+                        style={{ backgroundColor: iconStyle.bg, color: iconStyle.dot }}
                       >
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: iconStyle.dot }} />
+                        <NotificationIcon type={n.type} />
                       </div>
                       {/* Content */}
-                      <div className="flex flex-1 flex-col justify-center min-w-0">
+                      <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-start mb-1">
-                          <p
-                            className="text-base leading-normal truncate pr-2"
-                            style={{
-                              color: n.isRead ? '#6a5d43' : '#463e30',
-                              fontWeight: n.isRead ? 500 : 600,
-                            }}
-                          >
+                          <h3 className={`text-sm text-[#1a1a1a] ${n.isRead ? 'font-medium' : 'font-bold'}`}>
                             {n.title}
-                          </p>
-                          <p className="text-xs font-mono font-medium leading-normal shrink-0 ml-4 mt-1" style={{ color: '#9c8d66' }}>{formatTimeShort(n.createdAt)}</p>
+                          </h3>
+                          <span className="font-mono text-[10px] text-[#6b705c]/50 shrink-0 ml-2">
+                            {formatTimeShort(n.createdAt)}
+                          </span>
                         </div>
-                        <p className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: iconStyle.dot }}>{iconStyle.label}</p>
                         {n.body && (
-                          <p
-                            className="text-sm font-normal leading-relaxed line-clamp-2"
-                            style={{ color: n.isRead ? '#9c8d66' : '#6a5d43' }}
+                          <p className="text-xs text-[#6b705c]/70 line-clamp-1 mb-2">{n.body}</p>
+                        )}
+                        <div className="flex items-center gap-3">
+                          <span
+                            className="font-mono text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider"
+                            style={{ backgroundColor: iconStyle.bg, color: iconStyle.dot }}
                           >
-                            {n.body}
+                            {iconStyle.label}
+                          </span>
+                          {!n.isRead && (
+                            <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: iconStyle.dot }} />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })
+              )}
+            </div>
+          </section>
+
+          {/* DETAIL PANEL (RIGHT) */}
+          <section className="lg:w-[40%] flex flex-col bg-[#f5f3f0]/30">
+            <div className="p-4 bg-[#f5f0e8] text-[10px] font-mono uppercase tracking-[0.2em] text-[#6b705c]/60">
+              Inspection Detail
+            </div>
+            {selectedNotification ? (
+              <>
+                <div className="p-8 flex-1 overflow-y-auto">
+                  {/* Detail Header */}
+                  <div className="mb-8">
+                    {(() => {
+                      const style = TYPE_ICON_STYLE[selectedNotification.type] || { bg: 'rgba(96,108,56,0.10)', dot: '#606C38', label: 'Alert', icon: 'info' as const }
+                      return (
+                        <div
+                          className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-4"
+                          style={{ backgroundColor: style.bg, color: style.dot }}
+                        >
+                          <NotificationIcon type={selectedNotification.type} />
+                          <span className="font-mono text-[10px] font-bold tracking-widest uppercase">
+                            {style.label} // {selectedNotification.id.slice(0, 8).toUpperCase()}
+                          </span>
+                        </div>
+                      )
+                    })()}
+                    <h2 className="text-2xl font-bold tracking-tight text-[#1a1a1a] mb-2">
+                      {selectedNotification.title}
+                    </h2>
+                    <div className="flex items-center gap-4 text-xs font-mono text-[#6b705c]/60">
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5" />
+                        {formatTimeShort(selectedNotification.createdAt)}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        {selectedNotification.isRead ? 'Read' : 'Unread'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Detail Content */}
+                  <div className="space-y-8">
+                    {selectedNotification.body && (
+                      <div>
+                        <h4 className="font-mono text-[10px] uppercase tracking-widest text-[#6b705c]/50 mb-3">
+                          Message Content
+                        </h4>
+                        <div
+                          className="p-4 bg-[#f5f0e8] rounded-xl border-l-2"
+                          style={{ borderLeftColor: (TYPE_ICON_STYLE[selectedNotification.type] || { dot: '#606C38' }).dot }}
+                        >
+                          <p className="text-sm leading-relaxed text-[#1a1a1a]/80">
+                            {selectedNotification.body}
                           </p>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-4 bg-[#f5f0e8] rounded-xl">
+                        <h4 className="font-mono text-[10px] uppercase tracking-widest text-[#6b705c]/50 mb-2">Type</h4>
+                        <p className="text-sm font-bold text-[#1a1a1a]">{selectedNotification.type.replace(/_/g, ' ')}</p>
+                        <p className="text-[10px] font-mono text-[#6b705c]/60">{TYPE_CATEGORY[selectedNotification.type] || 'Alert'}</p>
+                      </div>
+                      <div className="p-4 bg-[#f5f0e8] rounded-xl">
+                        <h4 className="font-mono text-[10px] uppercase tracking-widest text-[#6b705c]/50 mb-2">Created</h4>
+                        <p className="text-sm font-bold text-[#1a1a1a]">{getDateGroup(selectedNotification.createdAt)}</p>
+                        <p className="text-[10px] font-mono text-[#6b705c]/60">{formatTimeShort(selectedNotification.createdAt)}</p>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="pt-6">
+                      <h4 className="font-mono text-[10px] uppercase tracking-widest text-[#6b705c]/50 mb-4">
+                        Available Actions
+                      </h4>
+                      <div className="flex flex-col gap-3">
+                        {selectedNotification.actionUrl && (
+                          <button
+                            onClick={() => handleNavigate(selectedNotification)}
+                            className="w-full py-4 bg-[#606C38] text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-[#4e5a2b] transition-all active:scale-[0.98]"
+                          >
+                            <CheckCircle className="w-5 h-5" />
+                            Open Related Page
+                          </button>
+                        )}
+                        {!selectedNotification.isRead && (
+                          <button
+                            onClick={() => markRead.mutate(selectedNotification.id)}
+                            className="w-full py-4 bg-[#e5e1d3] text-[#1a1a1a] font-bold rounded-xl border border-[#e5e1d3] flex items-center justify-center gap-2 hover:bg-[#f5f0e8] transition-all active:scale-[0.98]"
+                          >
+                            <CheckCheck className="w-5 h-5" />
+                            Mark as Read
+                          </button>
                         )}
                       </div>
                     </div>
+                  </div>
+                </div>
+                {/* Detail Footer */}
+                <div className="p-6 bg-[#f5f0e8]/50 border-t border-[#e5e1d3]/20">
+                  <button className="flex items-center gap-2 text-xs font-mono text-[#6b705c]/50 hover:text-[#1a1a1a] transition-colors">
+                    <History className="w-4 h-4" />
+                    View Event History Logs
                   </button>
-                )
-              })}
+                </div>
+              </>
+            ) : (
+              <div className="flex-1 flex items-center justify-center p-8">
+                <div className="text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-[#f5f0e8] flex items-center justify-center mx-auto mb-4">
+                    <Info className="w-8 h-8 text-[#6b705c]/30" />
+                  </div>
+                  <p className="text-sm text-[#6b705c]/60 font-medium">Select a notification to view details</p>
+                </div>
+              </div>
+            )}
+          </section>
+        </main>
+
+        {/* FOOTER STATUS */}
+        <footer className="mt-8 flex justify-between items-center px-2">
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#606C38]" />
+              <span className="font-mono text-[10px] text-[#6b705c]/50 uppercase tracking-widest">System Online</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[10px] text-[#6b705c]/50 uppercase tracking-widest">
+                {unreadCount} unread
+              </span>
             </div>
           </div>
-        ))
-      )}
+          <div className="font-mono text-[10px] text-[#6b705c]/30">
+            CORTHEX NOTIFICATION ENGINE // ASYNC_QUEUE_ACTIVE
+          </div>
+        </footer>
+      </div>
     </div>
   )
 }
