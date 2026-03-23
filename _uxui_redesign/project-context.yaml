@@ -1,0 +1,81 @@
+project:
+  name: "corthex-v2"
+  framework: react
+  language: typescript
+  package_manager: bun
+  monorepo: turborepo
+  packages: [app, admin, server, shared, ui, landing]
+
+paths:
+  root: "."
+  entry: "packages/app/src/main.tsx"
+  app_root: "packages/app/src/App.tsx"
+  router: "packages/app/src/App.tsx"  # BrowserRouter inline in App.tsx
+  layout: "packages/app/src/components/layout.tsx"
+  sidebar: "packages/app/src/components/sidebar.tsx"
+  index_html: "packages/app/index.html"
+  tailwind_config: null  # No tailwind.config found - uses CSS/themes.css
+  tsconfig: "packages/app/tsconfig.json"
+  pages_dir: "packages/app/src/pages/"
+  architecture_doc: "_bmad-output/planning-artifacts/architecture.md"
+  prd_doc: "_bmad-output/planning-artifacts/prd.md"
+  brief_doc: "_bmad-output/planning-artifacts/product-brief-corthex-v3-2026-03-20.md"
+  tech_research_doc: "_bmad-output/planning-artifacts/technical-research-2026-03-20.md"
+  confirmed_decisions: "_bmad-output/party-logs/confirmed-decisions-stage1.md"
+  benchmark_report: "_uxui_redesign/phase-0.5-benchmark/benchmark-report.md"
+  admin_root: "packages/admin/src/"
+  landing_root: "packages/landing/src/"
+
+type_check_cmd: "npx tsc --noEmit -p packages/app/tsconfig.json"
+
+pages:
+  - { route: "/", redirect: "/hub" }
+  - { route: "/hub", component: "pages/hub/index.tsx", lazy: true }
+  - { route: "/chat", component: "pages/chat.tsx", lazy: true }
+  - { route: "/dashboard", component: "pages/dashboard.tsx", lazy: true }
+  - { route: "/agents", component: "pages/agents.tsx", lazy: true }
+  - { route: "/departments", component: "pages/departments.tsx", lazy: true }
+  - { route: "/tiers", component: "pages/tiers.tsx", lazy: true }
+  - { route: "/nexus", component: "pages/nexus.tsx", lazy: true }
+  - { route: "/jobs", component: "pages/jobs.tsx", lazy: true }
+  - { route: "/reports", component: "pages/reports.tsx", lazy: true }
+  - { route: "/knowledge", component: "pages/knowledge.tsx", lazy: true }
+  - { route: "/sns", component: "pages/sns.tsx", lazy: true }
+  - { route: "/trading", component: "pages/trading.tsx", lazy: true }
+  - { route: "/costs", component: "pages/costs.tsx", lazy: true }
+  - { route: "/settings", component: "pages/settings.tsx", lazy: true }
+  - { route: "/notifications", component: "pages/notifications.tsx", lazy: true }
+  - { route: "/messenger", component: "pages/messenger.tsx", lazy: true }
+  - { route: "/agora", component: "pages/agora.tsx", lazy: true }
+  - { route: "/performance", component: "pages/performance.tsx", lazy: true }
+  - { route: "/workflows", component: "pages/workflows.tsx", lazy: true }
+  - { route: "/activity-log", component: "pages/activity-log.tsx", lazy: true }
+  - { route: "/ops-log", component: "pages/ops-log.tsx", lazy: true }
+  - { route: "/classified", component: "pages/classified.tsx", lazy: true }
+  - { route: "/files", component: "pages/files.tsx", lazy: true }
+
+current_tokens:
+  fonts: ["Inter", "Noto Serif KR"]
+  colors:
+    primary: "#283618"  # olive dark
+    secondary: "#5a7247"  # olive light
+    background: "#faf8f5"  # cream
+    surface: "#e5e1d3"  # sand
+  dark_mode: none  # no forced dark class
+
+app_shell:
+  layout_file: "packages/app/src/components/layout.tsx"
+  sidebar_file: "packages/app/src/components/sidebar.tsx"
+  font_cdn_links:
+    - "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;700&display=swap"
+
+pipeline_status:
+  phase_0_5: complete  # benchmark done
+  phase_0: pending
+  phase_1: pending
+  phase_2: pending
+  phase_3: pending
+  phase_4: pending
+  phase_5: pending
+  phase_6: pending
+  phase_7: pending
