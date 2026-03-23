@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "tertiary-container": "#7f5b80",
+                        "surface-container-highest": "#e4e2df",
+                        "on-tertiary-fixed": "#2d1030",
+                        "secondary-fixed": "#d7e9bd",
+                        "on-secondary-container": "#5a6947",
+                        "on-tertiary": "#ffffff",
+                        "outline": "#77786b",
+                        "surface-variant": "#e4e2df",
+                        "primary-container": "#606c38",
+                        "inverse-surface": "#30312f",
+                        "background": "#fbf9f6",
+                        "outline-variant": "#c7c8b9",
+                        "surface-bright": "#fbf9f6",
+                        "surface-container-high": "#eae8e5",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#bbcda3",
+                        "on-surface-variant": "#46483c",
+                        "on-primary-fixed-variant": "#404b1b",
+                        "surface-container": "#efeeeb",
+                        "primary": "#485422",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#3d4b2b",
+                        "surface-tint": "#586330",
+                        "on-primary-fixed": "#171e00",
+                        "inverse-primary": "#bfcd8f",
+                        "on-surface": "#1b1c1a",
+                        "inverse-on-surface": "#f2f0ed",
+                        "surface-dim": "#dbdad7",
+                        "primary-fixed-dim": "#bfcd8f",
+                        "on-error": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed-variant": "#5c3b5e",
+                        "surface": "#fbf9f6",
+                        "secondary": "#546341",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed-dim": "#e4b9e3",
+                        "surface-container-low": "#f5f3f0",
+                        "secondary-container": "#d7e9bd",
+                        "on-error-container": "#93000a",
+                        "primary-fixed": "#dbe9a9",
+                        "on-tertiary-container": "#ffdcfc",
+                        "tertiary-fixed": "#ffd6fd",
+                        "on-primary-container": "#dfedac",
+                        "on-background": "#1b1c1a",
+                        "on-secondary-fixed": "#121f05",
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#654367"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"],
+                        "mono": ["JetBrains Mono"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+            font-size: 1.25rem;
+        }
+        body {
+            background-color: #faf8f5;
+            color: #1a1a1a;
+            font-family: 'Inter', sans-serif;
+        }
+        .mono-data {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .ghost-border {
+            border: 1px solid rgba(199, 200, 185, 0.2);
+        }
+    </style>
+</head>
+<body class="antialiased">
+<div class="p-8 max-w-[1440px] mx-auto min-h-screen">
+<!-- HEADER SECTION -->
+<header class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+<div class="space-y-2">
+<h1 class="text-[2.75rem] font-extrabold tracking-tighter leading-tight text-on-surface">
+                    계급 관리 <span class="text-secondary font-medium">Tier Management</span>
+</h1>
+<p class="text-lg text-outline font-medium">에이전트 계층 구조를 정의하고 관리합니다</p>
+</div>
+<button class="bg-[#606C38] hover:bg-[#4e5a2b] text-white px-6 h-11 rounded-lg flex items-center gap-2 transition-all shadow-sm active:scale-95 group">
+<span class="material-symbols-outlined group-hover:rotate-90 transition-transform">add</span>
+<span class="font-semibold">계급 생성 Create Tier</span>
+</button>
+</header>
+<!-- MAIN TABLE SECTION -->
+<div class="bg-surface-container-low rounded-xl overflow-hidden shadow-[0_20px_50px_rgba(40,54,24,0.06)] ghost-border">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-high/50">
+<th class="px-6 py-5 text-[10px] font-bold uppercase tracking-widest text-outline">계급명 Tier Name</th>
+<th class="px-6 py-5 text-[10px] font-bold uppercase tracking-widest text-outline text-center">레벨 Level</th>
+<th class="px-6 py-5 text-[10px] font-bold uppercase tracking-widest text-outline">최대 에이전트 Max Agents</th>
+<th class="px-6 py-5 text-[10px] font-bold uppercase tracking-widest text-outline">AI 모델 Model</th>
+<th class="px-6 py-5 text-[10px] font-bold uppercase tracking-widest text-outline text-right">월간 예산 Monthly Budget</th>
+<th class="px-6 py-5 text-[10px] font-bold uppercase tracking-widest text-outline text-right">작업 Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-6 py-5 relative">
+<div class="absolute left-0 top-1/4 bottom-1/4 w-1 bg-[#283618] rounded-r-full"></div>
+<div class="flex flex-col">
+<span class="font-bold text-on-surface">Commander 사령관</span>
+<span class="text-xs text-outline">Tier 0 / Priority 1</span>
+</div>
+</td>
+<td class="px-6 py-5 text-center">
+<div class="inline-flex items-center gap-1.5 px-3 py-1 bg-primary-container/10 text-primary-container rounded-full">
+<span class="material-symbols-outlined !text-sm" data-icon="shield" style="font-variation-settings: 'FILL' 1;">shield</span>
+<span class="mono-data font-bold">1</span>
+</div>
+</td>
+<td class="px-6 py-5 mono-data text-secondary">3 agents</td>
+<td class="px-6 py-5">
+<span class="px-3 py-1 bg-surface-container-highest text-on-surface-variant rounded-full text-xs font-semibold">Claude Opus</span>
+</td>
+<td class="px-6 py-5 text-right mono-data font-bold text-on-surface">$5,000.00</td>
+<td class="px-6 py-5 text-right">
+<div class="flex justify-end gap-4">
+<button class="text-xs font-bold text-secondary hover:text-primary transition-colors">수정 Edit</button>
+<button class="text-xs font-bold text-error hover:opacity-70 transition-colors">삭제 Delete</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-6 py-5 relative">
+<div class="absolute left-0 top-1/4 bottom-1/4 w-1 bg-[#606C38] rounded-r-full"></div>
+<div class="flex flex-col">
+<span class="font-bold text-on-surface">Strategist 전략가</span>
+<span class="text-xs text-outline">Tier 1 / Planning</span>
+</div>
+</td>
+<td class="px-6 py-5 text-center">
+<div class="inline-flex items-center gap-1.5 px-3 py-1 bg-secondary-container/30 text-secondary rounded-full">
+<span class="material-symbols-outlined !text-sm" data-icon="shield">shield</span>
+<span class="mono-data font-bold">2</span>
+</div>
+</td>
+<td class="px-6 py-5 mono-data text-secondary">8 agents</td>
+<td class="px-6 py-5">
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-xs font-semibold">Claude Sonnet</span>
+</td>
+<td class="px-6 py-5 text-right mono-data font-bold text-on-surface">$2,500.00</td>
+<td class="px-6 py-5 text-right">
+<div class="flex justify-end gap-4">
+<button class="text-xs font-bold text-secondary hover:text-primary transition-colors">수정 Edit</button>
+<button class="text-xs font-bold text-error hover:opacity-70 transition-colors">삭제 Delete</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-6 py-5 relative">
+<div class="absolute left-0 top-1/4 bottom-1/4 w-1 bg-secondary rounded-r-full"></div>
+<div class="flex flex-col">
+<span class="font-bold text-on-surface">Analyst 분석관</span>
+<span class="text-xs text-outline">Tier 2 / Verification</span>
+</div>
+</td>
+<td class="px-6 py-5 text-center">
+<div class="inline-flex items-center gap-1.5 px-3 py-1 bg-secondary-container/30 text-secondary rounded-full">
+<span class="material-symbols-outlined !text-sm" data-icon="shield">shield</span>
+<span class="mono-data font-bold">3</span>
+</div>
+</td>
+<td class="px-6 py-5 mono-data text-secondary">15 agents</td>
+<td class="px-6 py-5">
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-xs font-semibold">Claude Sonnet</span>
+</td>
+<td class="px-6 py-5 text-right mono-data font-bold text-on-surface">$1,200.00</td>
+<td class="px-6 py-5 text-right">
+<div class="flex justify-end gap-4">
+<button class="text-xs font-bold text-secondary hover:text-primary transition-colors">수정 Edit</button>
+<button class="text-xs font-bold text-error hover:opacity-70 transition-colors">삭제 Delete</button>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-6 py-5 relative">
+<div class="absolute left-0 top-1/4 bottom-1/4 w-1 bg-outline rounded-r-full"></div>
+<div class="flex flex-col">
+<span class="font-bold text-on-surface">Operative 작전요원</span>
+<span class="text-xs text-outline">Tier 3 / Execution</span>
+</div>
+</td>
+<td class="px-6 py-5 text-center">
+<div class="inline-flex items-center gap-1.5 px-3 py-1 bg-outline-variant/20 text-outline rounded-full">
+<span class="material-symbols-outlined !text-sm" data-icon="shield">shield</span>
+<span class="mono-data font-bold">4</span>
+</div>
+</td>
+<td class="px-6 py-5 mono-data text-secondary">25 agents</td>
+<td class="px-6 py-5">
+<span class="px-3 py-1 bg-surface-container text-outline rounded-full text-xs font-semibold">Claude Haiku</span>
+</td>
+<td class="px-6 py-5 text-right mono-data font-bold text-on-surface">$500.00</td>
+<td class="px-6 py-5 text-right">
+<div class="flex justify-end gap-4">
+<button class="text-xs font-bold text-secondary hover:text-primary transition-colors">수정 Edit</button>
+<button class="text-xs font-bold text-error hover:opacity-70 transition-colors">삭제 Delete</button>
+</div>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-6 py-5 relative">
+<div class="absolute left-0 top-1/4 bottom-1/4 w-1 bg-outline-variant rounded-r-full"></div>
+<div class="flex flex-col">
+<span class="font-bold text-on-surface">Scout 정찰병</span>
+<span class="text-xs text-outline">Tier 4 / Monitoring</span>
+</div>
+</td>
+<td class="px-6 py-5 text-center">
+<div class="inline-flex items-center gap-1.5 px-3 py-1 bg-outline-variant/20 text-outline rounded-full">
+<span class="material-symbols-outlined !text-sm" data-icon="shield">shield</span>
+<span class="mono-data font-bold">5</span>
+</div>
+</td>
+<td class="px-6 py-5 mono-data text-secondary">50 agents</td>
+<td class="px-6 py-5">
+<span class="px-3 py-1 bg-surface-container text-outline rounded-full text-xs font-semibold">Claude Haiku</span>
+</td>
+<td class="px-6 py-5 text-right mono-data font-bold text-on-surface">$200.00</td>
+<td class="px-6 py-5 text-right">
+<div class="flex justify-end gap-4">
+<button class="text-xs font-bold text-secondary hover:text-primary transition-colors">수정 Edit</button>
+<button class="text-xs font-bold text-error hover:opacity-70 transition-colors">삭제 Delete</button>
+</div>
+</td>
+</tr>
+<!-- Row 6 -->
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-6 py-5 relative">
+<div class="absolute left-0 top-1/4 bottom-1/4 w-1 bg-surface-container-highest rounded-r-full"></div>
+<div class="flex flex-col">
+<span class="font-bold text-on-surface">Trainee 훈련생</span>
+<span class="text-xs text-outline">Tier 5 / General</span>
+</div>
+</td>
+<td class="px-6 py-5 text-center">
+<div class="inline-flex items-center gap-1.5 px-3 py-1 bg-outline-variant/10 text-outline/50 rounded-full">
+<span class="material-symbols-outlined !text-sm" data-icon="shield">shield</span>
+<span class="mono-data font-bold">6</span>
+</div>
+</td>
+<td class="px-6 py-5 mono-data text-secondary">100 agents</td>
+<td class="px-6 py-5">
+<span class="px-3 py-1 bg-surface-container text-outline rounded-full text-xs font-semibold">Claude Haiku</span>
+</td>
+<td class="px-6 py-5 text-right mono-data font-bold text-on-surface">$50.00</td>
+<td class="px-6 py-5 text-right">
+<div class="flex justify-end gap-4">
+<button class="text-xs font-bold text-secondary hover:text-primary transition-colors">수정 Edit</button>
+<button class="text-xs font-bold text-error hover:opacity-70 transition-colors">삭제 Delete</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- SUMMARY SECTION -->
+<footer class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="bg-surface p-6 rounded-xl ghost-border flex items-center justify-between group hover:bg-surface-container-low transition-colors">
+<div class="space-y-1">
+<p class="text-[10px] font-bold uppercase tracking-widest text-outline">총 계급 수 Total Tiers</p>
+<p class="text-2xl font-black text-primary">6개</p>
+</div>
+<span class="material-symbols-outlined text-outline/30 text-4xl" data-icon="layers">layers</span>
+</div>
+<div class="bg-surface p-6 rounded-xl ghost-border flex items-center justify-between group hover:bg-surface-container-low transition-colors">
+<div class="space-y-1">
+<p class="text-[10px] font-bold uppercase tracking-widest text-outline">총 에이전트 수 Total Agents</p>
+<p class="text-2xl font-black text-primary">201명</p>
+</div>
+<span class="material-symbols-outlined text-outline/30 text-4xl" data-icon="smart_toy">smart_toy</span>
+</div>
+<div class="bg-surface p-6 rounded-xl ghost-border flex items-center justify-between group hover:bg-surface-container-low transition-colors">
+<div class="space-y-1">
+<p class="text-[10px] font-bold uppercase tracking-widest text-outline">총 월간 예산 Total Monthly Budget</p>
+<p class="text-2xl font-black text-primary mono-data">$9,450.00</p>
+</div>
+<span class="material-symbols-outlined text-outline/30 text-4xl" data-icon="payments">payments</span>
+</div>
+</footer>
+</div>
+</body></html>

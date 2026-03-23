@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX v3 Messenger</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-tertiary-fixed-variant": "#444937",
+                        "secondary-container": "#d8e6a6",
+                        "primary-container": "#5c6c49",
+                        "on-background": "#1d1c17",
+                        "surface-container": "#f2ede5",
+                        "on-surface-variant": "#46483c",
+                        "secondary": "#586330",
+                        "on-surface": "#1d1c17",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-dim": "#ded9d2",
+                        "on-tertiary-container": "#e4e8d0",
+                        "on-primary-fixed": "#121f05",
+                        "surface-container-low": "#f8f3eb",
+                        "outline-variant": "#c7c8b9",
+                        "on-primary-fixed-variant": "#3d4b2b",
+                        "surface-container-high": "#ece8e0",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#c4c9b1",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e7e2da",
+                        "primary-fixed-dim": "#bbcda3",
+                        "on-primary-container": "#daedc1",
+                        "inverse-primary": "#bbcda3",
+                        "background": "#fef9f1",
+                        "primary-fixed": "#d7e9bd",
+                        "secondary-fixed": "#dbe9a9",
+                        "inverse-surface": "#32302b",
+                        "surface-tint": "#546341",
+                        "tertiary": "#4c513e",
+                        "on-secondary-fixed": "#171e00",
+                        "on-tertiary-fixed": "#191d0e",
+                        "on-secondary": "#ffffff",
+                        "primary": "#455433",
+                        "surface": "#fef9f1",
+                        "error": "#ba1a1a",
+                        "secondary-fixed-dim": "#bfcd8f",
+                        "on-secondary-fixed-variant": "#404b1b",
+                        "tertiary-container": "#646955",
+                        "tertiary-fixed": "#e0e5cc",
+                        "outline": "#77786b",
+                        "on-error": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-secondary-container": "#5c6834",
+                        "on-primary": "#ffffff",
+                        "surface-bright": "#fef9f1",
+                        "inverse-on-surface": "#f5f0e8",
+                        "surface-container-highest": "#e7e2da",
+                        "chrome": "#283618",
+                        "handoff": "#7c3aed"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"],
+                        "mono": ["JetBrains Mono"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e5e1d3;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #c7c8b9;
+        }
+    </style>
+</head>
+<body class="bg-background font-body text-on-surface antialiased">
+<!-- Content Area only as per instruction -->
+<div class="p-8 max-w-[1440px] mx-auto min-h-screen flex gap-6">
+<!-- LEFT PANEL: Conversation List (~350px) -->
+<aside class="w-[380px] flex flex-col bg-surface-container-low rounded-2xl overflow-hidden shadow-sm">
+<!-- Header -->
+<div class="p-6 pb-4">
+<div class="flex justify-between items-center mb-6">
+<h1 class="text-xl font-bold tracking-tight text-on-background">메신저 <span class="text-secondary/60 font-medium">Messenger</span></h1>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-primary/90 transition-all active:scale-95">
+<span class="material-symbols-outlined text-sm">add</span>
+<span>새 대화 New Chat</span>
+</button>
+</div>
+<!-- Search -->
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full bg-surface-container-highest border-none rounded-lg pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-outline" placeholder="검색 Search..." type="text"/>
+</div>
+</div>
+<!-- Conversation List -->
+<div class="flex-1 overflow-y-auto custom-scrollbar px-3 pb-6">
+<!-- Chat 1 (Active/Selected) -->
+<div class="flex items-center gap-4 p-4 mb-1 rounded-xl bg-surface-container-highest cursor-pointer group transition-all">
+<div class="w-12 h-12 rounded-full bg-chrome text-white flex items-center justify-center font-bold text-lg shrink-0">ST</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-0.5">
+<h3 class="font-bold text-sm truncate">전략팀 Strategy Team</h3>
+<span class="font-mono text-[10px] text-tertiary">14:32</span>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-xs text-secondary truncate pr-4">시장 분석 결과를 공유합니다</p>
+<span class="bg-secondary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">3</span>
+</div>
+</div>
+</div>
+<!-- Chat 2 -->
+<div class="flex items-center gap-4 p-4 mb-1 rounded-xl hover:bg-surface-container-high cursor-pointer transition-all">
+<div class="w-12 h-12 rounded-full bg-primary-container text-white flex items-center justify-center font-bold text-lg shrink-0">SK</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-0.5">
+<h3 class="font-medium text-sm truncate">김수호 Suho Kim</h3>
+<span class="font-mono text-[10px] text-tertiary">14:15</span>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-xs text-secondary truncate pr-4">보고서 검토 완료했습니다</p>
+<span class="bg-secondary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">1</span>
+</div>
+</div>
+</div>
+<!-- Chat 3 -->
+<div class="flex items-center gap-4 p-4 mb-1 rounded-xl hover:bg-surface-container-high cursor-pointer transition-all">
+<div class="w-12 h-12 rounded-full bg-tertiary text-white flex items-center justify-center font-bold text-lg shrink-0">ST</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-0.5">
+<h3 class="font-medium text-sm truncate">보안팀 Security Team</h3>
+<span class="font-mono text-[10px] text-tertiary">13:45</span>
+</div>
+<p class="text-xs text-secondary truncate">보안 감사 일정 확인</p>
+</div>
+</div>
+<!-- Chat 4 -->
+<div class="flex items-center gap-4 p-4 mb-1 rounded-xl hover:bg-surface-container-high cursor-pointer transition-all">
+<div class="w-12 h-12 rounded-full bg-secondary text-white flex items-center justify-center font-bold text-lg shrink-0">DL</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-0.5">
+<h3 class="font-medium text-sm truncate">이다은 Da-eun Lee</h3>
+<span class="font-mono text-[10px] text-tertiary">13:20</span>
+</div>
+<p class="text-xs text-secondary truncate">데이터 분석 진행상황...</p>
+</div>
+</div>
+<!-- Chat 5 -->
+<div class="flex items-center gap-4 p-4 mb-1 rounded-xl hover:bg-surface-container-high cursor-pointer transition-all">
+<div class="w-12 h-12 rounded-full bg-on-tertiary-fixed-variant text-white flex items-center justify-center font-bold text-lg shrink-0">OP</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-0.5">
+<h3 class="font-medium text-sm truncate">운영팀 Operations</h3>
+<span class="font-mono text-[10px] text-tertiary">12:00</span>
+</div>
+<p class="text-xs text-secondary truncate">시스템 점검 안내</p>
+</div>
+</div>
+<!-- Chat 6 -->
+<div class="flex items-center gap-4 p-4 mb-1 rounded-xl hover:bg-surface-container-high cursor-pointer transition-all">
+<div class="w-12 h-12 rounded-full bg-primary-fixed-dim text-on-primary-fixed flex items-center justify-center font-bold text-lg shrink-0">YH</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-0.5">
+<h3 class="font-medium text-sm truncate">한예진 Ye-jin Han</h3>
+<span class="font-mono text-[10px] text-tertiary">11:30</span>
+</div>
+<p class="text-xs text-secondary truncate">보안 패치 적용 완료</p>
+</div>
+</div>
+<!-- Chat 7 -->
+<div class="flex items-center gap-4 p-4 mb-1 rounded-xl hover:bg-surface-container-high cursor-pointer transition-all">
+<div class="w-12 h-12 rounded-full bg-chrome text-white flex items-center justify-center font-bold text-lg shrink-0">TT</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-0.5">
+<h3 class="font-medium text-sm truncate">트레이딩팀 Trading</h3>
+<span class="font-mono text-[10px] text-tertiary">10:45</span>
+</div>
+<p class="text-xs text-secondary truncate">오늘 포지션 리뷰</p>
+</div>
+</div>
+<!-- Chat 8 -->
+<div class="flex items-center gap-4 p-4 mb-1 rounded-xl hover:bg-surface-container-high cursor-pointer transition-all">
+<div class="w-12 h-12 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-lg shrink-0">JP</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-0.5">
+<h3 class="font-medium text-sm truncate">박지훈 Ji-hun Park</h3>
+<span class="font-mono text-[10px] text-tertiary">09:30</span>
+</div>
+<p class="text-xs text-secondary truncate">트레이딩 전략 논의</p>
+</div>
+</div>
+<!-- Chat 9 -->
+<div class="flex items-center gap-4 p-4 mb-1 rounded-xl hover:bg-surface-container-high cursor-pointer transition-all">
+<div class="w-12 h-12 rounded-full bg-outline-variant text-on-surface flex items-center justify-center font-bold text-lg shrink-0">RT</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-0.5">
+<h3 class="font-medium text-sm truncate">리서치팀 Research</h3>
+<span class="font-mono text-[10px] text-tertiary">어제</span>
+</div>
+<p class="text-xs text-secondary truncate">Q1 보고서 초안</p>
+</div>
+</div>
+<!-- Chat 10 -->
+<div class="flex items-center gap-4 p-4 mb-1 rounded-xl hover:bg-surface-container-high cursor-pointer transition-all">
+<div class="w-12 h-12 rounded-full bg-error text-white flex items-center justify-center font-bold text-lg shrink-0">
+<span class="material-symbols-outlined">campaign</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-0.5">
+<h3 class="font-medium text-sm truncate">전체 공지 Announcements</h3>
+<span class="font-mono text-[10px] text-tertiary">어제</span>
+</div>
+<p class="text-xs text-secondary truncate">시스템 업데이트 v3.2</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- RIGHT PANEL: Message Thread -->
+<main class="flex-1 flex flex-col bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden border border-outline-variant/10">
+<!-- Thread Header -->
+<header class="h-20 flex items-center justify-between px-8 bg-surface-container-low/50 backdrop-blur-md sticky top-0 z-10">
+<div class="flex items-center gap-4">
+<div class="w-11 h-11 rounded-xl bg-chrome text-white flex items-center justify-center font-bold shadow-lg shadow-chrome/10">ST</div>
+<div>
+<h2 class="text-lg font-bold text-on-background">전략팀 Strategy Team</h2>
+<p class="text-xs text-secondary flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                            5명 참여중
+                        </p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2.5 rounded-full text-secondary hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">videocam</span>
+</button>
+<button class="p-2.5 rounded-full text-secondary hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">call</span>
+</button>
+<div class="w-px h-6 bg-outline-variant mx-1"></div>
+<button class="p-2.5 rounded-full text-secondary hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</header>
+<!-- Message Thread Content -->
+<div class="flex-1 overflow-y-auto custom-scrollbar p-8 space-y-8 bg-surface-container-lowest">
+<!-- Message 1 -->
+<div class="flex gap-4 max-w-[80%]">
+<div class="w-9 h-9 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-sm shrink-0 mt-1">SK</div>
+<div class="space-y-1">
+<div class="flex items-baseline gap-2">
+<span class="text-xs font-bold">김수호</span>
+<span class="font-mono text-[10px] text-tertiary">14:10</span>
+</div>
+<div class="bg-surface-container-low p-4 rounded-tr-2xl rounded-br-2xl rounded-bl-2xl text-sm leading-relaxed text-on-surface">
+                            3월 시장 분석 리포트를 첨부합니다. 주요 포인트는 아래와 같습니다.
+                        </div>
+</div>
+</div>
+<!-- Message 2 (File) -->
+<div class="flex gap-4 max-w-[80%]">
+<div class="w-9 h-9 opacity-0 shrink-0"></div> <!-- Spacer for avatar -->
+<div class="space-y-1 w-full">
+<div class="bg-surface-container p-4 rounded-2xl border border-outline-variant/30 flex items-center gap-4 hover:border-primary/30 transition-all cursor-pointer group">
+<div class="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div class="flex-1 overflow-hidden">
+<p class="text-sm font-bold truncate">시장분석_2026Q1.pdf</p>
+<p class="font-mono text-[10px] text-tertiary">2.4 MB • PDF Document</p>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">download</span>
+</div>
+<div class="flex items-center gap-2 mt-1 px-1">
+<span class="font-mono text-[10px] text-tertiary">14:11</span>
+</div>
+</div>
+</div>
+<!-- Message 3 -->
+<div class="flex gap-4 max-w-[80%]">
+<div class="w-9 h-9 rounded-lg bg-secondary text-on-secondary flex items-center justify-center font-bold text-sm shrink-0 mt-1">DL</div>
+<div class="space-y-1">
+<div class="flex items-baseline gap-2">
+<span class="text-xs font-bold">이다은</span>
+<span class="font-mono text-[10px] text-tertiary">14:20</span>
+</div>
+<div class="bg-surface-container-low p-4 rounded-tr-2xl rounded-br-2xl rounded-bl-2xl text-sm leading-relaxed text-on-surface">
+                            분석 결과가 흥미롭네요. 경쟁사 대비 성장률이 12% 높습니다.
+                        </div>
+</div>
+</div>
+<!-- Message 4 -->
+<div class="flex gap-4 max-w-[80%]">
+<div class="w-9 h-9 rounded-lg bg-tertiary-container text-on-tertiary-container flex items-center justify-center font-bold text-sm shrink-0 mt-1">SY</div>
+<div class="space-y-1">
+<div class="flex items-baseline gap-2">
+<span class="text-xs font-bold">최서연</span>
+<span class="font-mono text-[10px] text-tertiary">14:25</span>
+</div>
+<div class="bg-surface-container-low p-4 rounded-tr-2xl rounded-br-2xl rounded-bl-2xl text-sm leading-relaxed text-on-surface">
+                            리서치팀에서 추가 데이터를 보완할 수 있을 것 같습니다.
+                        </div>
+</div>
+</div>
+<!-- Message 5 -->
+<div class="flex gap-4 max-w-[80%]">
+<div class="w-9 h-9 rounded-lg bg-on-tertiary-fixed-variant text-on-tertiary flex items-center justify-center font-bold text-sm shrink-0 mt-1">MW</div>
+<div class="space-y-1">
+<div class="flex items-baseline gap-2">
+<span class="text-xs font-bold">정민우</span>
+<span class="font-mono text-[10px] text-tertiary">14:28</span>
+</div>
+<div class="bg-surface-container-low p-4 rounded-tr-2xl rounded-br-2xl rounded-bl-2xl text-sm leading-relaxed text-on-surface">
+                            다음 미팅에서 세부 전략을 논의합시다. 화요일 2시 가능한가요?
+                        </div>
+</div>
+</div>
+<!-- Message 6 (Own/Right-aligned) -->
+<div class="flex gap-4 max-w-[80%] ml-auto flex-row-reverse">
+<div class="w-9 h-9 rounded-lg bg-chrome text-white flex items-center justify-center font-bold text-sm shrink-0 mt-1">SK</div>
+<div class="space-y-1 text-right">
+<div class="flex items-baseline justify-end gap-2">
+<span class="font-mono text-[10px] text-tertiary">14:32</span>
+<span class="text-xs font-bold text-primary">나 (김수호)</span>
+</div>
+<div class="bg-primary text-on-primary p-4 rounded-tl-2xl rounded-bl-2xl rounded-br-2xl text-sm leading-relaxed shadow-lg shadow-primary/10">
+                            좋습니다. 미팅 일정 확정하겠습니다. 참석자 명단 공유 부탁드립니다.
+                        </div>
+</div>
+</div>
+</div>
+<!-- Message Input Area -->
+<footer class="p-6 bg-surface-container-low/30 border-t border-outline-variant/20">
+<div class="max-w-4xl mx-auto flex items-end gap-3 bg-surface-container-lowest border border-outline-variant p-2 rounded-2xl focus-within:ring-2 focus-within:ring-primary/10 transition-all">
+<button class="p-2 rounded-xl text-outline hover:text-primary hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined">attach_file</span>
+</button>
+<button class="p-2 rounded-xl text-outline hover:text-primary hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined">sentiment_satisfied</span>
+</button>
+<textarea class="flex-1 bg-transparent border-none focus:ring-0 text-sm py-2.5 resize-none custom-scrollbar" placeholder="메시지를 입력하세요... Enter message" rows="1"></textarea>
+<button class="bg-chrome text-white w-10 h-10 rounded-xl flex items-center justify-center hover:bg-chrome/90 transition-all active:scale-90 shadow-md">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</div>
+<div class="mt-3 flex justify-center">
+<p class="text-[10px] text-outline font-mono uppercase tracking-widest">Sovereign Atelier v3.0 // Secured Protocol Active</p>
+</div>
+</footer>
+</main>
+</div>
+</body></html>

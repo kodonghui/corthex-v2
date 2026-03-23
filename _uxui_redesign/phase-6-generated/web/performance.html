@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "inverse-primary": "#bfcd8f",
+              "inverse-surface": "#32302b",
+              "on-error-container": "#93000a",
+              "surface": "#fef9f1",
+              "on-secondary-fixed-variant": "#3d4b2b",
+              "secondary-fixed-dim": "#bbcda3",
+              "secondary": "#546341",
+              "surface-container-low": "#f8f3eb",
+              "on-error": "#ffffff",
+              "on-secondary": "#ffffff",
+              "primary-fixed": "#dbe9a9",
+              "surface-container": "#f2ede5",
+              "primary-fixed-dim": "#bfcd8f",
+              "secondary-container": "#d7e9bd",
+              "on-tertiary-container": "#ffdcfc",
+              "surface-container-lowest": "#ffffff",
+              "primary-container": "#606c38",
+              "on-primary-container": "#dfedac",
+              "on-secondary-container": "#5a6947",
+              "tertiary": "#654367",
+              "on-surface": "#1d1c17",
+              "surface-container-highest": "#e7e2da",
+              "surface-variant": "#e7e2da",
+              "background": "#fef9f1",
+              "on-surface-variant": "#46483c",
+              "error-container": "#ffdad6",
+              "surface-tint": "#586330",
+              "error": "#ba1a1a",
+              "tertiary-fixed-dim": "#e4b9e3",
+              "tertiary-container": "#7f5b80",
+              "on-tertiary": "#ffffff",
+              "on-background": "#1d1c17",
+              "on-primary-fixed-variant": "#404b1b",
+              "tertiary-fixed": "#ffd6fd",
+              "on-tertiary-fixed": "#2d1030",
+              "on-primary-fixed": "#171e00",
+              "on-tertiary-fixed-variant": "#5c3b5e",
+              "surface-container-high": "#ece8e0",
+              "surface-dim": "#ded9d2",
+              "outline-variant": "#c7c8b9",
+              "outline": "#77786b",
+              "inverse-on-surface": "#f5f0e8",
+              "on-primary": "#ffffff",
+              "primary": "#485422",
+              "on-secondary-fixed": "#121f05",
+              "surface-bright": "#fef9f1",
+              "secondary-fixed": "#d7e9bd"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"],
+              "mono": ["JetBrains Mono"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1.5rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body { background-color: #fef9f1; color: #1d1c17; }
+    </style>
+</head>
+<body class="font-body selection:bg-primary-fixed selection:text-on-primary-fixed">
+<div class="p-8 max-w-[1440px] mx-auto space-y-8">
+<!-- HEADER SECTION -->
+<header class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div class="space-y-1">
+<h1 class="text-4xl font-extrabold tracking-tight text-on-surface font-headline">
+                    성과 분석 Performance
+                </h1>
+<p class="text-on-surface-variant text-lg">
+                    에이전트 성과를 분석하고 최적화합니다
+                </p>
+</div>
+<div class="flex items-center gap-3">
+<div class="relative group">
+<button class="flex items-center gap-2 bg-surface-container-high px-4 py-2.5 rounded-xl text-on-surface-variant text-sm font-medium hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+                        최근 30일
+                        <span class="material-symbols-outlined text-[18px]">expand_more</span>
+</button>
+</div>
+<button class="flex items-center gap-2 bg-surface-container-highest text-primary px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm hover:translate-y-[-1px] active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                    보고서 다운로드 Download Report
+                </button>
+</div>
+</header>
+<!-- METRIC CARDS ROW -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Avg Response -->
+<div class="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-outline-variant/10">
+<div class="flex justify-between items-start mb-4">
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant font-mono">Avg Response</span>
+<div class="bg-primary-fixed/30 p-1.5 rounded-lg">
+<span class="material-symbols-outlined text-primary text-[20px]">timer</span>
+</div>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-bold font-mono tracking-tighter">2.4초</span>
+<span class="flex items-center text-xs font-bold text-[#4d7c0f]">
+<span class="material-symbols-outlined text-[14px]">arrow_downward</span>
+                        12%
+                    </span>
+</div>
+<p class="text-[11px] text-on-surface-variant mt-1">평균 응답시간</p>
+</div>
+<!-- Success Rate -->
+<div class="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-outline-variant/10">
+<div class="flex justify-between items-start mb-4">
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant font-mono">Success Rate</span>
+<div class="bg-primary-fixed/30 p-1.5 rounded-lg">
+<span class="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+</div>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-bold font-mono tracking-tighter">97.8%</span>
+<span class="flex items-center text-xs font-bold text-[#4d7c0f]">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span>
+                        0.4%
+                    </span>
+</div>
+<p class="text-[11px] text-on-surface-variant mt-1">전체 성공률</p>
+</div>
+<!-- Throughput -->
+<div class="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-outline-variant/10">
+<div class="flex justify-between items-start mb-4">
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant font-mono">Throughput</span>
+<div class="bg-primary-fixed/30 p-1.5 rounded-lg">
+<span class="material-symbols-outlined text-primary text-[20px]">bolt</span>
+</div>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-bold font-mono tracking-tighter">1,247건/일</span>
+</div>
+<p class="text-[11px] text-on-surface-variant mt-1">작업 처리량</p>
+</div>
+<!-- Cost Efficiency -->
+<div class="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-outline-variant/10">
+<div class="flex justify-between items-start mb-4">
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant font-mono">Cost Efficiency</span>
+<div class="bg-primary-fixed/30 p-1.5 rounded-lg">
+<span class="material-symbols-outlined text-primary text-[20px]">payments</span>
+</div>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-bold font-mono tracking-tighter">$0.034</span>
+</div>
+<p class="text-[11px] text-on-surface-variant mt-1">작업당 비용</p>
+</div>
+</div>
+<!-- CHARTS SECTION GRID -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!-- TOP LEFT: Response Time Trend -->
+<div class="bg-surface-container p-8 rounded-2xl relative overflow-hidden">
+<div class="flex justify-between items-center mb-10">
+<h3 class="font-bold text-lg text-on-surface">응답 시간 추이 Response Time Trend</h3>
+<div class="flex gap-2">
+<div class="flex items-center gap-1.5">
+<span class="w-3 h-3 rounded-full bg-primary-container"></span>
+<span class="text-[10px] font-mono font-bold uppercase text-on-surface-variant">Avg 2.4s</span>
+</div>
+</div>
+</div>
+<!-- Line Chart Placeholder -->
+<div class="h-64 flex items-end justify-between gap-1 relative">
+<!-- Y Axis Labels -->
+<div class="absolute left-0 h-full flex flex-col justify-between text-[10px] font-mono text-outline leading-none -translate-x-8">
+<span>5.0s</span>
+<span>2.5s</span>
+<span>0.0s</span>
+</div>
+<!-- Grid Lines -->
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none">
+<div class="w-full border-b border-outline-variant/20"></div>
+<div class="w-full border-b border-accent/30 border-dashed border-2"></div>
+<div class="w-full border-b border-outline-variant/20"></div>
+</div>
+<!-- Bars/Lines simulation -->
+<div class="flex-1 flex items-end justify-around h-full pt-4 z-10">
+<div class="w-2 bg-primary-container/20 rounded-t-sm h-[60%]"></div>
+<div class="w-2 bg-primary-container/20 rounded-t-sm h-[55%]"></div>
+<div class="w-2 bg-primary-container/20 rounded-t-sm h-[70%]"></div>
+<div class="w-2 bg-primary-container/20 rounded-t-sm h-[40%]"></div>
+<div class="w-2 bg-primary-container/20 rounded-t-sm h-[45%]"></div>
+<div class="w-2 bg-primary-container/30 rounded-t-sm h-[50%]"></div>
+<div class="w-2 bg-primary-container rounded-t-sm h-[48%] shadow-lg"></div>
+<div class="w-2 bg-primary-container/20 rounded-t-sm h-[60%]"></div>
+<div class="w-2 bg-primary-container/20 rounded-t-sm h-[65%]"></div>
+<div class="w-2 bg-primary-container/20 rounded-t-sm h-[45%]"></div>
+</div>
+</div>
+<div class="flex justify-between mt-4 text-[10px] font-mono text-outline px-2">
+<span>Oct 01</span>
+<span>Oct 15</span>
+<span>Oct 30</span>
+</div>
+</div>
+<!-- TOP RIGHT: Success Rate Trend -->
+<div class="bg-surface-container p-8 rounded-2xl">
+<div class="flex justify-between items-center mb-10">
+<h3 class="font-bold text-lg text-on-surface">성공률 추이 Success Rate Trend</h3>
+<div class="flex items-center gap-1.5">
+<span class="w-3 h-3 rounded-full bg-error"></span>
+<span class="text-[10px] font-mono font-bold uppercase text-on-surface-variant">Target 95%</span>
+</div>
+</div>
+<!-- Area Chart Placeholder -->
+<div class="h-64 relative">
+<div class="absolute inset-0 bg-gradient-to-t from-secondary-container/20 to-transparent rounded-lg"></div>
+<svg class="absolute inset-0 w-full h-full" preserveaspectratio="none" viewbox="0 0 400 200">
+<!-- Success Area -->
+<path d="M0 200 L0 50 C 50 40, 100 60, 150 45 S 250 20, 300 30 S 400 10, 400 10 L 400 200 Z" fill="url(#grad1)" fill-opacity="0.4"></path>
+<path d="M0 50 C 50 40, 100 60, 150 45 S 250 20, 300 30 S 400 10, 400 10" fill="none" stroke="#606C38" stroke-width="3"></path>
+<!-- Target Line -->
+<line stroke="#dc2626" stroke-dasharray="5,5" stroke-width="1" x1="0" x2="400" y1="80" y2="80"></line>
+<defs>
+<lineargradient id="grad1" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" style="stop-color:#d7e9bd;stop-opacity:1"></stop>
+<stop offset="100%" style="stop-color:#d7e9bd;stop-opacity:0"></stop>
+</lineargradient>
+</defs>
+</svg>
+<!-- Y Axis Labels -->
+<div class="absolute left-0 h-full flex flex-col justify-between text-[10px] font-mono text-outline leading-none -translate-x-8">
+<span>100%</span>
+<span>95%</span>
+<span>90%</span>
+</div>
+</div>
+<div class="flex justify-between mt-4 text-[10px] font-mono text-outline px-2">
+<span>Oct 01</span>
+<span>Oct 15</span>
+<span>Oct 30</span>
+</div>
+</div>
+<!-- BOTTOM LEFT: Cost Efficiency Scatter -->
+<div class="bg-surface-container p-8 rounded-2xl">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-bold text-lg text-on-surface">비용 효율성 산점도 Cost Efficiency Scatter</h3>
+</div>
+<div class="h-80 relative border-l border-b border-outline-variant bg-surface-container-low/50">
+<!-- Ideal Zone -->
+<div class="absolute bottom-0 left-0 w-1/2 h-1/2 bg-[#4d7c0f]/10 rounded-tr-3xl border-t border-r border-[#4d7c0f]/20">
+<span class="absolute top-2 right-4 text-[9px] font-bold text-[#4d7c0f] uppercase">Ideal Zone</span>
+</div>
+<!-- Scattered Dots -->
+<div class="absolute bottom-[40%] left-[30%] group">
+<div class="w-3 h-3 bg-primary rounded-full shadow-lg ring-4 ring-white transition-transform group-hover:scale-150 cursor-pointer"></div>
+<span class="absolute top-4 left-0 whitespace-nowrap text-[10px] font-bold bg-white px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">김수호 ($0.028)</span>
+</div>
+<div class="absolute bottom-[55%] left-[45%] group">
+<div class="w-3 h-3 bg-accent rounded-full shadow-md ring-4 ring-white transition-transform group-hover:scale-150 cursor-pointer"></div>
+<span class="absolute top-4 left-0 whitespace-nowrap text-[10px] font-bold bg-white px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">한예진 ($0.031)</span>
+</div>
+<div class="absolute bottom-[70%] left-[60%] group">
+<div class="w-3 h-3 bg-outline rounded-full shadow-md ring-4 ring-white transition-transform group-hover:scale-150 cursor-pointer"></div>
+<span class="absolute top-4 left-0 whitespace-nowrap text-[10px] font-bold bg-white px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">이다은 ($0.033)</span>
+</div>
+<div class="absolute bottom-[20%] left-[80%] group">
+<div class="w-3 h-3 bg-outline rounded-full shadow-md ring-4 ring-white transition-transform group-hover:scale-150 cursor-pointer"></div>
+<span class="absolute top-4 left-0 whitespace-nowrap text-[10px] font-bold bg-white px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">송현우 ($0.036)</span>
+</div>
+<!-- Labels -->
+<span class="absolute -left-12 top-1/2 -rotate-90 text-[10px] font-mono text-outline-variant">Cost per Task (USD)</span>
+<span class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] font-mono text-outline-variant">Tasks Completed (Units)</span>
+</div>
+</div>
+<!-- BOTTOM RIGHT: Agent Leaderboard -->
+<div class="bg-surface-container-lowest p-8 rounded-2xl shadow-sm border border-outline-variant/10">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-bold text-lg text-on-surface">에이전트 리더보드 Agent Leaderboard</h3>
+<span class="material-symbols-outlined text-outline">more_horiz</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="text-[10px] font-mono font-bold uppercase text-outline-variant border-b border-outline-variant/20">
+<th class="pb-3 px-2">순위 Rank</th>
+<th class="pb-3 px-2">에이전트 Agent</th>
+<th class="pb-3 px-2">성공률</th>
+<th class="pb-3 px-2">응답시간</th>
+<th class="pb-3 px-2">비용/작업</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<!-- Row 1 -->
+<tr class="group hover:bg-surface-container-low/50 transition-colors">
+<td class="py-4 px-2">
+<div class="flex items-center gap-2">
+<span class="font-mono font-bold text-lg">1</span>
+<span class="material-symbols-outlined text-[#FFD700] text-[20px]" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+</div>
+</td>
+<td class="py-4 px-2 font-medium">김수호</td>
+<td class="py-4 px-2 font-mono text-primary font-bold">98.9%</td>
+<td class="py-4 px-2 font-mono">1.8s</td>
+<td class="py-4 px-2 font-mono">$0.028</td>
+</tr>
+<!-- Row 2 -->
+<tr class="group hover:bg-surface-container-low/50 transition-colors">
+<td class="py-4 px-2">
+<div class="flex items-center gap-2">
+<span class="font-mono font-bold text-lg">2</span>
+<span class="material-symbols-outlined text-[#C0C0C0] text-[20px]" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+</div>
+</td>
+<td class="py-4 px-2 font-medium">한예진</td>
+<td class="py-4 px-2 font-mono text-primary font-bold">98.5%</td>
+<td class="py-4 px-2 font-mono">2.1s</td>
+<td class="py-4 px-2 font-mono">$0.031</td>
+</tr>
+<!-- Row 3 -->
+<tr class="group hover:bg-surface-container-low/50 transition-colors">
+<td class="py-4 px-2">
+<div class="flex items-center gap-2">
+<span class="font-mono font-bold text-lg">3</span>
+<span class="material-symbols-outlined text-[#CD7F32] text-[20px]" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+</div>
+</td>
+<td class="py-4 px-2 font-medium">이다은</td>
+<td class="py-4 px-2 font-mono text-primary font-bold">97.9%</td>
+<td class="py-4 px-2 font-mono">2.3s</td>
+<td class="py-4 px-2 font-mono">$0.033</td>
+</tr>
+<!-- Row 4 -->
+<tr class="group hover:bg-surface-container-low/50 transition-colors">
+<td class="py-4 px-2 font-mono font-bold text-on-surface-variant">4</td>
+<td class="py-4 px-2 font-medium">송현우</td>
+<td class="py-4 px-2 font-mono">97.2%</td>
+<td class="py-4 px-2 font-mono">2.6s</td>
+<td class="py-4 px-2 font-mono">$0.036</td>
+</tr>
+<!-- Row 5 -->
+<tr class="group hover:bg-surface-container-low/50 transition-colors">
+<td class="py-4 px-2 font-mono font-bold text-on-surface-variant">5</td>
+<td class="py-4 px-2 font-medium">임소율</td>
+<td class="py-4 px-2 font-mono">96.8%</td>
+<td class="py-4 px-2 font-mono">2.8s</td>
+<td class="py-4 px-2 font-mono">$0.038</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-error": "#ffffff",
+                        "surface-container-low": "#f8f3eb",
+                        "surface": "#fef9f1",
+                        "on-tertiary-container": "#e4e8d0",
+                        "surface-container": "#f2ede5",
+                        "on-secondary-container": "#5a6947",
+                        "tertiary-fixed-dim": "#c4c9b1",
+                        "surface-container-highest": "#e7e2da",
+                        "error-container": "#ffdad6",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#32302b",
+                        "on-tertiary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-background": "#1d1c17",
+                        "surface-container-high": "#ece8e0",
+                        "on-primary-container": "#dfedac",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#4c513e",
+                        "background": "#fef9f1",
+                        "tertiary-container": "#646955",
+                        "secondary-container": "#d7e9bd",
+                        "on-tertiary-fixed-variant": "#444937",
+                        "on-primary-fixed": "#171e00",
+                        "secondary": "#546341",
+                        "primary": "#485422",
+                        "outline": "#77786b",
+                        "inverse-primary": "#bfcd8f",
+                        "surface-tint": "#586330",
+                        "secondary-fixed-dim": "#bbcda3",
+                        "on-primary-fixed-variant": "#404b1b",
+                        "secondary-fixed": "#d7e9bd",
+                        "on-tertiary-fixed": "#191d0e",
+                        "surface-bright": "#fef9f1",
+                        "outline-variant": "#c7c8b9",
+                        "inverse-on-surface": "#f5f0e8",
+                        "on-secondary-fixed-variant": "#3d4b2b",
+                        "surface-variant": "#e7e2da",
+                        "on-secondary": "#ffffff",
+                        "surface-dim": "#ded9d2",
+                        "primary-fixed-dim": "#bfcd8f",
+                        "on-surface-variant": "#46483c",
+                        "on-surface": "#1d1c17",
+                        "primary-container": "#606c38",
+                        "on-secondary-fixed": "#121f05",
+                        "tertiary-fixed": "#e0e5cc",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#dbe9a9"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background antialiased">
+<div class="p-8 max-w-[1440px] mx-auto h-screen flex flex-col gap-8">
+<main class="flex-1 flex gap-8 min-h-0">
+<!-- LEFT PANEL: Knowledge Management List -->
+<aside class="w-[440px] flex flex-col gap-6 bg-surface-container rounded-xl p-6 overflow-hidden">
+<header class="flex justify-between items-center">
+<h1 class="text-xl font-bold tracking-tight text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">inventory_2</span>
+                    지식 관리 Knowledge
+                </h1>
+<button class="bg-primary-container text-on-primary-container px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:opacity-90 transition-all">
+<span class="material-symbols-outlined text-[18px]">upload</span>
+                    업로드 Upload
+                </button>
+</header>
+<div class="space-y-4">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full bg-surface-container-high border-none rounded-lg pl-10 pr-4 py-2.5 text-sm focus:ring-1 focus:ring-primary focus:bg-surface-container-lowest transition-colors outline-none" placeholder="문서 검색..." type="text"/>
+</div>
+<div class="flex flex-wrap gap-2">
+<button class="px-3 py-1.5 rounded-full bg-primary text-on-primary text-xs font-medium">전체</button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container-highest text-on-surface-variant text-xs font-medium hover:bg-outline-variant transition-colors">PDF</button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container-highest text-on-surface-variant text-xs font-medium hover:bg-outline-variant transition-colors">텍스트</button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container-highest text-on-surface-variant text-xs font-medium hover:bg-outline-variant transition-colors">URL</button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container-highest text-on-surface-variant text-xs font-medium hover:bg-outline-variant transition-colors">이미지</button>
+</div>
+<div class="flex justify-between items-center px-1">
+<span class="text-[11px] font-bold text-outline tracking-wider uppercase">144 Objects Loaded</span>
+<div class="flex items-center gap-1 text-[11px] font-bold text-primary cursor-pointer uppercase">
+                        최근 수정순
+                        <span class="material-symbols-outlined text-[14px]">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Scrollable List -->
+<div class="flex-1 overflow-y-auto pr-2 space-y-2 custom-scrollbar">
+<!-- Active Item -->
+<div class="p-4 bg-surface-container-lowest rounded-xl shadow-sm border-l-4 border-primary group cursor-pointer">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary-container mt-1">picture_as_pdf</span>
+<div>
+<h3 class="text-sm font-semibold text-on-surface group-hover:text-primary transition-colors">2026 시장 분석 보고서.pdf</h3>
+<p class="mono text-[10px] text-outline mt-1 uppercase">2026-05-12 • 4.2 MB</p>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-secondary-container text-on-secondary-container uppercase">임베딩 완료</span>
+</div>
+</div>
+<!-- List Items -->
+<div class="p-4 bg-surface-container-high/50 rounded-xl hover:bg-surface-container-lowest transition-all cursor-pointer group">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-outline group-hover:text-primary mt-1">description</span>
+<div>
+<h3 class="text-sm font-medium text-on-surface">경쟁사 분석 Q1.pdf</h3>
+<p class="mono text-[10px] text-outline mt-1 uppercase">2026-05-10 • 1.8 MB</p>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-secondary-container text-on-secondary-container uppercase">임베딩 완료</span>
+</div>
+</div>
+<div class="p-4 bg-surface-container-high/50 rounded-xl hover:bg-surface-container-lowest transition-all cursor-pointer group">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-outline group-hover:text-primary mt-1">link</span>
+<div>
+<h3 class="text-sm font-medium text-on-surface">Bloomberg 시장 데이터</h3>
+<p class="mono text-[10px] text-outline mt-1 uppercase">2026-05-09 • URL</p>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 uppercase">처리중</span>
+</div>
+</div>
+<div class="p-4 bg-surface-container-high/50 rounded-xl hover:bg-surface-container-lowest transition-all cursor-pointer group">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-outline group-hover:text-primary mt-1">image</span>
+<div>
+<h3 class="text-sm font-medium text-on-surface">조직도 2026.png</h3>
+<p class="mono text-[10px] text-outline mt-1 uppercase">2026-05-08 • 12.4 MB</p>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-surface-variant text-on-surface-variant uppercase">대기</span>
+</div>
+</div>
+<!-- Repeated items for UI density -->
+<div class="p-4 bg-surface-container-high/50 rounded-xl hover:bg-surface-container-lowest transition-all cursor-pointer group">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-outline group-hover:text-primary mt-1">picture_as_pdf</span>
+<div>
+<h3 class="text-sm font-medium text-on-surface">글로벌 공급망 현황.pdf</h3>
+<p class="mono text-[10px] text-outline mt-1 uppercase">2026-05-07 • 3.5 MB</p>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-secondary-container text-on-secondary-container uppercase">임베딩 완료</span>
+</div>
+</div>
+<div class="p-4 bg-surface-container-high/50 rounded-xl hover:bg-surface-container-lowest transition-all cursor-pointer group">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-outline group-hover:text-primary mt-1">article</span>
+<div>
+<h3 class="text-sm font-medium text-on-surface">신규 사업 기획안.txt</h3>
+<p class="mono text-[10px] text-outline mt-1 uppercase">2026-05-06 • 45 KB</p>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-secondary-container text-on-secondary-container uppercase">임베딩 완료</span>
+</div>
+</div>
+<!-- Placeholder items to fill 12 -->
+<div class="p-4 bg-surface-container-high/50 rounded-xl opacity-60">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-outline mt-1">picture_as_pdf</span>
+<div class="h-8 w-32 bg-outline-variant/30 rounded"></div>
+</div>
+</div>
+<div class="p-4 bg-surface-container-high/50 rounded-xl opacity-50"></div>
+<div class="p-4 bg-surface-container-high/50 rounded-xl opacity-40"></div>
+<div class="p-4 bg-surface-container-high/50 rounded-xl opacity-30"></div>
+<div class="p-4 bg-surface-container-high/50 rounded-xl opacity-20"></div>
+<div class="p-4 bg-surface-container-high/50 rounded-xl opacity-10"></div>
+</div>
+</aside>
+<!-- RIGHT PANEL: Document Detail -->
+<section class="flex-1 flex flex-col gap-8 overflow-y-auto pr-4 custom-scrollbar">
+<!-- Detail Header -->
+<div class="bg-surface-container-lowest rounded-xl p-8 border border-outline-variant/10 shadow-[0_10px_40px_rgba(29,28,23,0.04)]">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-5">
+<div class="w-16 h-16 bg-primary-container/10 rounded-2xl flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-[32px]">picture_as_pdf</span>
+</div>
+<div>
+<div class="flex items-center gap-3">
+<h2 class="text-2xl font-bold tracking-tight text-on-surface">2026 시장 분석 보고서.pdf</h2>
+<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-secondary-container text-on-secondary-container flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                                    임베딩 완료
+                                </span>
+</div>
+<div class="flex items-center gap-4 mt-2">
+<span class="text-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span>
+<span class="mono">2026-05-12 14:22</span>
+</span>
+<span class="text-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">database</span>
+<span class="mono">4.2 MB</span>
+</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 hover:bg-surface-container rounded-lg transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">star</span>
+</button>
+<button class="p-2 hover:bg-surface-container rounded-lg transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-4 gap-6 mt-8">
+<div class="bg-surface-container-low rounded-lg p-4">
+<p class="text-[10px] font-bold text-outline tracking-widest uppercase mb-1">Owner</p>
+<p class="text-sm font-semibold text-on-surface">김수호</p>
+</div>
+<div class="bg-surface-container-low rounded-lg p-4">
+<p class="text-[10px] font-bold text-outline tracking-widest uppercase mb-1">Department</p>
+<p class="text-sm font-semibold text-on-surface">전략팀</p>
+</div>
+<div class="bg-surface-container-low rounded-lg p-4">
+<p class="text-[10px] font-bold text-outline tracking-widest uppercase mb-1">Chunks</p>
+<p class="text-sm font-semibold text-on-surface mono">47개</p>
+</div>
+<div class="bg-surface-container-low rounded-lg p-4">
+<p class="text-[10px] font-bold text-outline tracking-widest uppercase mb-1">Token Count</p>
+<p class="text-sm font-semibold text-on-surface mono">1024</p>
+</div>
+</div>
+</div>
+<!-- Semantic Search -->
+<div class="bg-surface-container rounded-xl p-8">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-sm font-bold text-on-surface-variant tracking-widest uppercase flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">neurology</span>
+                        의미 검색 Semantic Search
+                    </h3>
+</div>
+<div class="relative mb-8">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary">search</span>
+<input class="w-full bg-surface-container-lowest border-none rounded-xl pl-12 pr-4 py-4 text-sm font-medium shadow-sm focus:ring-1 focus:ring-primary outline-none" type="text" value="시장 성장률 전망"/>
+</div>
+<div class="space-y-4">
+<div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/5">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[11px] font-bold text-primary mono bg-primary/5 px-2 py-0.5 rounded">RELEVANCE: 0.94</span>
+<span class="text-[10px] text-outline mono">CHUNK #04</span>
+</div>
+<p class="text-sm leading-relaxed text-on-surface">"...2026년 국내 AI 인프라 시장은 연평균 <span class="bg-primary/10 font-semibold px-1">성장률 24.5%</span>를 기록할 것으로 <span class="bg-primary/10 font-semibold px-1">전망</span>되며, 특히 하이퍼스케일 데이터 센터 수요가..."</p>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/5">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[11px] font-bold text-primary mono bg-primary/5 px-2 py-0.5 rounded">RELEVANCE: 0.87</span>
+<span class="text-[10px] text-outline mono">CHUNK #12</span>
+</div>
+<p class="text-sm leading-relaxed text-on-surface">"거시경제 지표에 따른 IT 투자 예산 <span class="bg-primary/10 font-semibold px-1">전망</span> 보고서에 따르면, 기업들은 비용 절감보다는 효율성 개선을 위한 디지털 전환에..."</p>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/5">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[11px] font-bold text-primary mono bg-primary/5 px-2 py-0.5 rounded">RELEVANCE: 0.81</span>
+<span class="text-[10px] text-outline mono">CHUNK #31</span>
+</div>
+<p class="text-sm leading-relaxed text-on-surface">"지역별 <span class="bg-primary/10 font-semibold px-1">시장 성장</span> 속도는 아시아 태평양 지역이 가장 높으며, 이는 클라우드 서비스 도입 가속화와 밀접한..."</p>
+</div>
+</div>
+</div>
+<!-- Content Preview & Actions -->
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-8">
+<div class="lg:col-span-3 bg-surface-container-lowest rounded-xl p-8 border border-outline-variant/10 min-h-[400px]">
+<div class="flex items-center justify-between mb-8 pb-4 border-b border-outline-variant/10">
+<h4 class="text-xs font-bold text-outline tracking-widest uppercase">Document Preview</h4>
+<div class="flex items-center gap-4">
+<span class="text-[11px] font-bold mono">PAGE 1 / 18</span>
+<div class="flex gap-1">
+<button class="p-1 hover:bg-surface-container rounded"><span class="material-symbols-outlined text-[18px]">chevron_left</span></button>
+<button class="p-1 hover:bg-surface-container rounded"><span class="material-symbols-outlined text-[18px]">chevron_right</span></button>
+</div>
+</div>
+</div>
+<div class="space-y-6">
+<div class="h-6 w-3/4 bg-surface-container rounded-sm"></div>
+<div class="space-y-3">
+<div class="h-4 w-full bg-surface-container/60 rounded-sm"></div>
+<div class="h-4 w-full bg-surface-container/60 rounded-sm"></div>
+<div class="h-4 w-5/6 bg-surface-container/60 rounded-sm"></div>
+<div class="h-4 w-full bg-surface-container/60 rounded-sm"></div>
+</div>
+<div class="flex gap-4">
+<div class="h-32 w-1/2 bg-surface-container-low rounded-xl border border-dashed border-outline-variant"></div>
+<div class="h-32 w-1/2 bg-surface-container-low rounded-xl border border-dashed border-outline-variant"></div>
+</div>
+<div class="space-y-3">
+<div class="h-4 w-full bg-surface-container/60 rounded-sm"></div>
+<div class="h-4 w-2/3 bg-surface-container/60 rounded-sm"></div>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<button class="w-full bg-surface-container-highest text-on-surface font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-outline-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]">download</span>
+                        다운로드 Download
+                    </button>
+<button class="w-full bg-surface-container-highest text-on-surface font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-outline-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]">refresh</span>
+                        재임베딩 Re-embed
+                    </button>
+<div class="mt-auto">
+<button class="w-full bg-error-container/20 text-error font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-error-container/40 transition-colors">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+                            삭제 Delete
+                        </button>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+</body></html>

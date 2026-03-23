@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Agora - Discussion Feed</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-tint": "#546341",
+              "on-secondary-container": "#5c6834",
+              "outline": "#75786e",
+              "surface-bright": "#fef9f1",
+              "surface": "#fef9f1",
+              "on-secondary-fixed-variant": "#404b1b",
+              "on-primary-fixed-variant": "#3d4b2b",
+              "surface-container-highest": "#e7e2da",
+              "background": "#fef9f1",
+              "primary-fixed": "#d7e9bd",
+              "surface-container-high": "#ece8e0",
+              "surface-variant": "#e7e2da",
+              "secondary-fixed-dim": "#bfcd8f",
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary": "#ffffff",
+              "inverse-surface": "#32302b",
+              "on-surface": "#1d1c17",
+              "error-container": "#ffdad6",
+              "on-error": "#ffffff",
+              "on-tertiary-fixed": "#2c1326",
+              "tertiary-container": "#45293d",
+              "tertiary": "#2e1427",
+              "on-surface-variant": "#45483f",
+              "on-primary-container": "#8fa078",
+              "primary-container": "#283618",
+              "secondary-fixed": "#dbe9a9",
+              "on-error-container": "#93000a",
+              "outline-variant": "#c5c8bc",
+              "on-primary-fixed": "#121f05",
+              "surface-container": "#f2ede5",
+              "primary-fixed-dim": "#bbcda3",
+              "tertiary-fixed-dim": "#e4bbd4",
+              "tertiary-fixed": "#ffd7f0",
+              "on-primary": "#ffffff",
+              "on-background": "#1d1c17",
+              "surface-dim": "#ded9d2",
+              "primary": "#142005",
+              "inverse-primary": "#bbcda3",
+              "on-secondary-fixed": "#171e00",
+              "on-secondary": "#ffffff",
+              "error": "#ba1a1a",
+              "on-tertiary-fixed-variant": "#5c3d52",
+              "secondary": "#586330",
+              "on-tertiary-container": "#b58fa7",
+              "secondary-container": "#d8e6a6",
+              "surface-container-low": "#f8f3eb",
+              "inverse-on-surface": "#f5f0e8"
+            },
+            fontFamily: {
+              "headline": ["Inter", "sans-serif"],
+              "body": ["Inter", "sans-serif"],
+              "label": ["Inter", "sans-serif"],
+              "mono": ["JetBrains Mono", "monospace"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #faf8f5;
+        }
+    </style>
+</head>
+<body class="font-body text-on-surface">
+<div class="p-8 max-w-[1440px] mx-auto min-h-screen">
+<!-- HEADER -->
+<header class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
+<div>
+<h1 class="text-5xl md:text-6xl font-black tracking-tight text-[#1a1a1a] mb-3">
+                    아고라 Agora
+                </h1>
+<p class="text-[#6b705c] text-lg">
+                    팀 토론과 아이디어를 공유하는 공간입니다
+                </p>
+</div>
+<button class="inline-flex items-center gap-2 bg-[#606C38] hover:bg-[#4d562d] text-white px-6 py-3.5 rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-[#606C38]/10">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                새 토론 시작 New Thread
+            </button>
+</header>
+<!-- CATEGORY FILTER CHIPS -->
+<nav class="flex flex-wrap items-center gap-3 mb-10">
+<button class="px-5 py-2 rounded-full font-semibold text-sm transition-colors bg-[#606C38] text-white">
+                전체 All
+            </button>
+<button class="px-5 py-2 rounded-full font-semibold text-sm transition-colors bg-[#f5f0e8] text-[#6b705c] border border-[#e5e1d3] hover:bg-[#ece8e0]">
+                전략 Strategy
+            </button>
+<button class="px-5 py-2 rounded-full font-semibold text-sm transition-colors bg-[#f5f0e8] text-[#6b705c] border border-[#e5e1d3] hover:bg-[#ece8e0]">
+                기술 Tech
+            </button>
+<button class="px-5 py-2 rounded-full font-semibold text-sm transition-colors bg-[#f5f0e8] text-[#6b705c] border border-[#e5e1d3] hover:bg-[#ece8e0]">
+                운영 Ops
+            </button>
+<button class="px-5 py-2 rounded-full font-semibold text-sm transition-colors bg-[#f5f0e8] text-[#6b705c] border border-[#e5e1d3] hover:bg-[#ece8e0]">
+                자유 Free
+            </button>
+<button class="px-5 py-2 rounded-full font-semibold text-sm transition-colors bg-[#f5f0e8] text-[#6b705c] border border-[#e5e1d3] hover:bg-[#ece8e0]">
+                Q&amp;A
+            </button>
+</nav>
+<!-- THREAD LIST -->
+<div class="flex flex-col space-y-5">
+<!-- Thread 1 (Pinned) -->
+<article class="group bg-[#f5f0e8] rounded-xl p-6 border-l-4 border-[#b45309] transition-all hover:bg-[#f0ebe0]">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-[#b45309] text-sm" data-icon="push_pin" style="font-variation-settings: 'FILL' 1;">push_pin</span>
+<span class="bg-[#fef3c7] text-[#b45309] px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider">고정 Pinned</span>
+</div>
+<div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+<div class="flex-1">
+<h2 class="text-xl font-bold text-[#1a1a1a] mb-2 group-hover:text-[#606C38] transition-colors">v3.2 업데이트 관련 의견 수렴</h2>
+<div class="flex items-center gap-3 mb-3">
+<span class="text-sm font-medium text-[#1a1a1a]">시스템 관리자 System Admin</span>
+<span class="bg-[#606C38]/10 text-[#606C38] px-2 py-0.5 rounded text-[10px] font-bold">전략</span>
+</div>
+<p class="text-[#6b705c] line-clamp-2 mb-4 leading-relaxed">
+                            다음 버전 업데이트에 대한 팀원들의 의견을 수렴합니다. 주요 변경 사항은 UI 개편 및 데이터 처리 엔진 고도화가 포함되어 있습니다. 팀원 여러분의 소중한 의견을 기다립니다.
+                        </p>
+<div class="flex flex-wrap items-center gap-6 text-[#756e5a] text-xs">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base" data-icon="chat_bubble">chat_bubble</span>
+<span>답글 24개</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base" data-icon="visibility">visibility</span>
+<span>조회 156</span>
+</div>
+<div class="flex items-center gap-1.5 font-mono">
+<span class="material-symbols-outlined text-base" data-icon="schedule">schedule</span>
+<span>14:30</span>
+</div>
+</div>
+</div>
+</div>
+</article>
+<!-- Thread 2 -->
+<article class="group bg-[#f5f0e8] rounded-xl p-6 border border-[#e5e1d3] transition-all hover:bg-[#f0ebe0]">
+<div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+<div class="flex-1">
+<h2 class="text-xl font-bold text-[#1a1a1a] mb-2 group-hover:text-[#606C38] transition-colors">에이전트 비용 최적화 전략 토론</h2>
+<div class="flex items-center gap-3 mb-3">
+<span class="text-sm font-medium text-[#1a1a1a]">김수호</span>
+<span class="bg-[#606C38]/10 text-[#606C38] px-2 py-0.5 rounded text-[10px] font-bold">전략</span>
+</div>
+<p class="text-[#6b705c] line-clamp-2 mb-4 leading-relaxed">
+                            에이전트 운영 비용을 줄이면서 성능을 유지할 수 있는 방법에 대해 논의합시다. 특히 API 호출 최적화와 캐싱 전략 도입을 고려 중입니다.
+                        </p>
+<div class="flex flex-wrap items-center gap-6 text-[#756e5a] text-xs">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base" data-icon="chat_bubble">chat_bubble</span>
+<span>답글 18개</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base" data-icon="visibility">visibility</span>
+<span>조회 98</span>
+</div>
+<div class="flex items-center gap-1.5 font-mono">
+<span class="material-symbols-outlined text-base" data-icon="schedule">schedule</span>
+<span>12:45</span>
+</div>
+</div>
+</div>
+</div>
+</article>
+<!-- Thread 3 -->
+<article class="group bg-[#f5f0e8] rounded-xl p-6 border border-[#e5e1d3] transition-all hover:bg-[#f0ebe0]">
+<div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+<div class="flex-1">
+<h2 class="text-xl font-bold text-[#1a1a1a] mb-2 group-hover:text-[#606C38] transition-colors">새로운 데이터 파이프라인 아키텍처 제안</h2>
+<div class="flex items-center gap-3 mb-3">
+<span class="text-sm font-medium text-[#1a1a1a]">이다은</span>
+<span class="bg-info/10 text-info px-2 py-0.5 rounded text-[10px] font-bold">기술</span>
+</div>
+<p class="text-[#6b705c] line-clamp-2 mb-4 leading-relaxed">
+                            현재 데이터 처리 속도를 개선하기 위한 새로운 아키텍처를 제안합니다. 실시간 스트리밍 처리 비중을 높여 지연 시간을 단축하는 것이 목표입니다.
+                        </p>
+<div class="flex flex-wrap items-center gap-6 text-[#756e5a] text-xs">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base" data-icon="chat_bubble">chat_bubble</span>
+<span>답글 12개</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base" data-icon="visibility">visibility</span>
+<span>조회 87</span>
+</div>
+<div class="flex items-center gap-1.5 font-mono">
+<span class="material-symbols-outlined text-base" data-icon="schedule">schedule</span>
+<span>11:20</span>
+</div>
+</div>
+</div>
+</div>
+</article>
+<!-- Thread 4 -->
+<article class="group bg-[#f5f0e8] rounded-xl p-6 border border-[#e5e1d3] transition-all hover:bg-[#f0ebe0]">
+<div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+<div class="flex-1">
+<h2 class="text-xl font-bold text-[#1a1a1a] mb-2 group-hover:text-[#606C38] transition-colors">보안 감사 자동화 범위 확대 논의</h2>
+<div class="flex items-center gap-3 mb-3">
+<span class="text-sm font-medium text-[#1a1a1a]">한예진</span>
+<span class="bg-[#283618]/10 text-[#283618] px-2 py-0.5 rounded text-[10px] font-bold">운영</span>
+</div>
+<p class="text-[#6b705c] line-clamp-2 mb-4 leading-relaxed">
+                            분기별 보안 감사 범위를 확대하여 자동화 커버리지를 높이자는 제안입니다. CI/CD 파이프라인에 통합된 정적 분석 도구 강화가 핵심입니다.
+                        </p>
+<div class="flex flex-wrap items-center gap-6 text-[#756e5a] text-xs">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base" data-icon="chat_bubble">chat_bubble</span>
+<span>답글 8개</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base" data-icon="visibility">visibility</span>
+<span>조회 65</span>
+</div>
+<div class="flex items-center gap-1.5 font-mono">
+<span class="material-symbols-outlined text-base" data-icon="schedule">schedule</span>
+<span>09:15</span>
+</div>
+</div>
+</div>
+</div>
+</article>
+<!-- Thread 5 -->
+<article class="group bg-[#f5f0e8] rounded-xl p-6 border border-[#e5e1d3] transition-all hover:bg-[#f0ebe0]">
+<div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+<div class="flex-1">
+<h2 class="text-xl font-bold text-[#1a1a1a] mb-2 group-hover:text-[#606C38] transition-colors">점심 메뉴 추천 (3월)</h2>
+<div class="flex items-center gap-3 mb-3">
+<span class="text-sm font-medium text-[#1a1a1a]">박지훈</span>
+<span class="bg-[#7c3aed]/10 text-[#7c3aed] px-2 py-0.5 rounded text-[10px] font-bold">자유</span>
+</div>
+<p class="text-[#6b705c] line-clamp-2 mb-4 leading-relaxed">
+                            이번 달 회사 근처 맛집 추천 받습니다! 특히 한식 추천 부탁드립니다. 지난 번 추천해주신 낙지볶음집은 정말 최고였어요.
+                        </p>
+<div class="flex flex-wrap items-center gap-6 text-[#756e5a] text-xs">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base" data-icon="chat_bubble">chat_bubble</span>
+<span>답글 32개</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base" data-icon="visibility">visibility</span>
+<span>조회 210</span>
+</div>
+<div class="flex items-center gap-1.5 font-mono">
+<span class="material-symbols-outlined text-base" data-icon="history">history</span>
+<span>어제</span>
+</div>
+</div>
+</div>
+</div>
+</article>
+<!-- Thread 6 -->
+<article class="group bg-[#f5f0e8] rounded-xl p-6 border border-[#e5e1d3] transition-all hover:bg-[#f0ebe0]">
+<div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+<div class="flex-1">
+<h2 class="text-xl font-bold text-[#1a1a1a] mb-2 group-hover:text-[#606C38] transition-colors">Claude API 모델 선택 가이드</h2>
+<div class="flex items-center gap-3 mb-3">
+<span class="text-sm font-medium text-[#1a1a1a]">송현우</span>
+<span class="bg-info/10 text-info px-2 py-0.5 rounded text-[10px] font-bold">Q&amp;A</span>
+</div>
+<p class="text-[#6b705c] line-clamp-2 mb-4 leading-relaxed">
+                            용도별 최적의 Claude 모델 선택 기준이 궁금합니다. Opus vs Sonnet 중 가성비와 성능의 밸런스를 어떻게 맞춰야 할까요?
+                        </p>
+<div class="flex flex-wrap items-center gap-6 text-[#756e5a] text-xs">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base" data-icon="chat_bubble">chat_bubble</span>
+<span>답글 15개</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base" data-icon="visibility">visibility</span>
+<span>조회 124</span>
+</div>
+<div class="flex items-center gap-1.5 font-mono">
+<span class="material-symbols-outlined text-base" data-icon="history">history</span>
+<span>어제</span>
+</div>
+</div>
+</div>
+</div>
+</article>
+</div>
+<!-- PAGINATION -->
+<footer class="flex justify-center items-center mt-12 gap-2 pb-10">
+<button class="w-10 h-10 flex items-center justify-center text-[#6b705c] hover:bg-[#f5f0e8] rounded-lg transition-colors">
+<span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center bg-[#606C38] text-white rounded-lg font-bold shadow-md shadow-[#606C38]/20">
+                1
+            </button>
+<button class="w-10 h-10 flex items-center justify-center text-[#6b705c] hover:bg-[#f5f0e8] rounded-lg font-semibold transition-colors">
+                2
+            </button>
+<button class="w-10 h-10 flex items-center justify-center text-[#6b705c] hover:bg-[#f5f0e8] rounded-lg font-semibold transition-colors">
+                3
+            </button>
+<span class="w-10 h-10 flex items-center justify-center text-[#6b705c]">...</span>
+<button class="w-10 h-10 flex items-center justify-center text-[#6b705c] hover:bg-[#f5f0e8] rounded-lg font-semibold transition-colors">
+                12
+            </button>
+<button class="w-10 h-10 flex items-center justify-center text-[#6b705c] hover:bg-[#f5f0e8] rounded-lg transition-colors">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</footer>
+</div>
+</body></html>
