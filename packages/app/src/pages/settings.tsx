@@ -132,7 +132,7 @@ const inputStyle: React.CSSProperties = {
   color: '#1a1a1a',
 }
 
-const inputBase = 'w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border h-14 placeholder:text-stone-400 p-[15px] text-base font-normal leading-normal transition-all focus:outline-none focus:ring-1'
+const inputBase = 'w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl border h-14 placeholder:text-[#908a78] p-[15px] text-base font-normal leading-normal transition-all focus:outline-none focus:ring-1'
 const inputReadOnly = `${inputBase} cursor-not-allowed`
 const inputEditable = inputBase
 const selectClass = `${inputBase} appearance-none`
@@ -560,7 +560,7 @@ function CommandCenterTab() {
             <label className="relative inline-flex items-center cursor-pointer">
               <input checked={autoScroll} onChange={toggleAutoScroll} className="sr-only peer" type="checkbox" />
               <div
-                className="w-12 h-6 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"
+                className="w-12 h-6 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-[#e5e1d3] after:border after:rounded-full after:h-5 after:w-5 after:transition-all"
                 style={{ backgroundColor: autoScroll ? '#606C38' : '#756e5a' }}
               />
             </label>
@@ -574,7 +574,7 @@ function CommandCenterTab() {
             <label className="relative inline-flex items-center cursor-pointer">
               <input checked={sound} onChange={toggleSound} className="sr-only peer" type="checkbox" />
               <div
-                className="w-12 h-6 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"
+                className="w-12 h-6 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-[#e5e1d3] after:border after:rounded-full after:h-5 after:w-5 after:transition-all"
                 style={{ backgroundColor: sound ? '#606C38' : '#756e5a' }}
               />
             </label>

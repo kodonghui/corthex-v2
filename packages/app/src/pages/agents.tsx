@@ -206,38 +206,38 @@ function AgentForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-xs font-medium text-stone-500 mb-1">
+        <label className="block text-xs font-medium text-[#6b705c] mb-1">
           에이전트 이름 <span className="text-red-500">*</span>
         </label>
         <Input value={name} onChange={(e) => { setName(e.target.value); setNameError('') }} placeholder="예: 마케팅분석관" maxLength={100} autoFocus />
         {nameError && <p className="text-xs text-red-500 mt-1">{nameError}</p>}
       </div>
       <div>
-        <label className="block text-xs font-medium text-stone-500 mb-1">영문 이름</label>
+        <label className="block text-xs font-medium text-[#6b705c] mb-1">영문 이름</label>
         <Input value={nameEn} onChange={(e) => setNameEn(e.target.value)} placeholder="예: Marketing Analyst" maxLength={100} />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-stone-500 mb-1">소속 부서</label>
+          <label className="block text-xs font-medium text-[#6b705c] mb-1">소속 부서</label>
           <Select options={deptOptions} value={departmentId} onChange={(e) => setDepartmentId(e.target.value)} />
         </div>
         <div>
-          <label className="block text-xs font-medium text-stone-500 mb-1">등급</label>
+          <label className="block text-xs font-medium text-[#6b705c] mb-1">등급</label>
           <Select options={tierOptions} value={tier} onChange={(e) => setTier(e.target.value as 'manager' | 'specialist' | 'worker')} />
         </div>
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-stone-500 mb-1">모델명</label>
+          <label className="block text-xs font-medium text-[#6b705c] mb-1">모델명</label>
           <Input value={modelName} onChange={(e) => setModelName(e.target.value)} placeholder="claude-haiku-4-5" />
         </div>
         <div>
-          <label className="block text-xs font-medium text-stone-500 mb-1">역할/전문분야</label>
+          <label className="block text-xs font-medium text-[#6b705c] mb-1">역할/전문분야</label>
           <Input value={role} onChange={(e) => setRole(e.target.value)} placeholder="예: 시장 분석" />
         </div>
       </div>
       <div>
-        <label className="block text-xs font-medium text-stone-500 mb-1">CLI 소유 인간직원</label>
+        <label className="block text-xs font-medium text-[#6b705c] mb-1">CLI 소유 인간직원</label>
         <Select options={userOptions} value={ownerUserId} onChange={(e) => setOwnerUserId(e.target.value)} />
       </div>
       <div className="flex items-center gap-3">
@@ -289,10 +289,10 @@ function SoulEditor({
     <div className="space-y-4">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-medium text-stone-500 mb-1">Soul (마크다운)</label>
-          <textarea value={soul} onChange={(e) => setSoul(e.target.value)} className="w-full h-64 p-3 rounded-lg border border-slate-300 bg-white text-sm font-mono resize-y focus:outline-none focus:ring-2" style={{ outlineColor: '#5a7247' }} placeholder="에이전트의 Soul을 작성하세요..." />
+          <label className="block text-xs font-medium text-[#6b705c] mb-1">Soul (마크다운)</label>
+          <textarea value={soul} onChange={(e) => setSoul(e.target.value)} className="w-full h-64 p-3 rounded-lg border border-[#e5e1d3] bg-white text-sm font-mono resize-y focus:outline-none focus:ring-2" style={{ outlineColor: '#5a7247' }} placeholder="에이전트의 Soul을 작성하세요..." />
           <div className="mt-2">
-            <p className="text-[10px] font-medium text-stone-400 mb-1">사용 가능한 변수:</p>
+            <p className="text-[10px] font-medium text-[#908a78] mb-1">사용 가능한 변수:</p>
             <div className="flex flex-wrap gap-1">
               {availableVars.map((v) => (
                 <span key={v} className="px-1.5 py-0.5 rounded text-[10px] font-mono cursor-pointer" style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: '#5a7247' }} onClick={() => setSoul((prev) => prev + v)} title="클릭하여 삽입">{v}</span>
@@ -302,17 +302,17 @@ function SoulEditor({
         </div>
         <div>
           <div className="flex items-center justify-between mb-1">
-            <label className="block text-xs font-medium text-stone-500">프리뷰</label>
+            <label className="block text-xs font-medium text-[#6b705c]">프리뷰</label>
             <Button size="sm" variant="outline" onClick={handlePreview} disabled={isPreviewing}>{isPreviewing ? '로딩...' : '프리뷰 새로고침'}</Button>
           </div>
-          <div className="w-full h-64 p-3 rounded-lg border border-slate-200 bg-slate-50 text-sm overflow-y-auto whitespace-pre-wrap">
+          <div className="w-full h-64 p-3 rounded-lg border border-[#e5e1d3] bg-[#faf8f5] text-sm overflow-y-auto whitespace-pre-wrap">
             {preview ? preview.rendered || '(빈 결과)' : '프리뷰 버튼을 클릭하세요'}
           </div>
           {preview?.variables && Object.keys(preview.variables).length > 0 && (
             <div className="mt-2 space-y-1">
-              <p className="text-[10px] font-medium text-stone-400">치환된 변수:</p>
+              <p className="text-[10px] font-medium text-[#908a78]">치환된 변수:</p>
               {Object.entries(preview.variables).map(([key, val]) => (
-                <div key={key} className="text-[10px] font-mono text-stone-400 truncate">
+                <div key={key} className="text-[10px] font-mono text-[#908a78] truncate">
                   <span style={{ color: '#5a7247' }}>{`{{${key}}}`}</span>{' = '}<span>{val || '(빈 값)'}</span>
                 </div>
               ))}

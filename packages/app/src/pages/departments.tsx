@@ -97,14 +97,14 @@ function DepartmentForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-xs font-medium text-stone-500 mb-1">
+        <label className="block text-xs font-medium text-[#6b705c] mb-1">
           부서명 <span className="text-red-500">*</span>
         </label>
         <Input value={name} onChange={(e) => { setName(e.target.value); setNameError('') }} placeholder="예: 마케팅부" maxLength={100} autoFocus />
         {nameError && <p className="text-xs text-red-500 mt-1">{nameError}</p>}
       </div>
       <div>
-        <label className="block text-xs font-medium text-stone-500 mb-1">설명</label>
+        <label className="block text-xs font-medium text-[#6b705c] mb-1">설명</label>
         <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="부서 설명 (선택)" rows={3} />
       </div>
       <div className="flex gap-2 justify-end pt-2">
@@ -143,9 +143,9 @@ function CascadePanel({
 
   return (
     <div className="space-y-4">
-      <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-        <p className="text-sm font-medium text-amber-700 mb-2">삭제 영향 분석</p>
-        <div className="space-y-1 text-xs text-amber-600">
+      <div className="bg-[#b45309]/5 border border-[#b45309]/20 rounded-lg p-3">
+        <p className="text-sm font-medium text-[#b45309] mb-2">삭제 영향 분석</p>
+        <div className="space-y-1 text-xs text-[#b45309]/80">
           <p>소속 에이전트: <strong>{analysis.agentCount}명</strong> (미할당으로 전환됨)</p>
           <p>진행 중 작업: <strong>{analysis.activeTaskCount}건</strong></p>
           <p>부서 지식: <strong>{analysis.knowledgeCount}건</strong></p>
@@ -153,11 +153,11 @@ function CascadePanel({
       </div>
       {analysis.agentBreakdown.length > 0 && (
         <div className="max-h-40 overflow-y-auto">
-          <p className="text-xs font-medium text-stone-400 mb-1">영향 받는 에이전트</p>
+          <p className="text-xs font-medium text-[#908a78] mb-1">영향 받는 에이전트</p>
           <div className="space-y-1">
             {analysis.agentBreakdown.map((agent) => (
-              <div key={agent.id} className="flex items-center justify-between text-xs px-2 py-1 bg-slate-50 rounded border border-slate-100">
-                <span className="text-slate-600">{agent.name}</span>
+              <div key={agent.id} className="flex items-center justify-between text-xs px-2 py-1 bg-[#faf8f5] rounded border border-[#e5e1d3]">
+                <span className="text-[#6b705c]">{agent.name}</span>
                 <Badge variant="default">{agent.tier}</Badge>
               </div>
             ))}

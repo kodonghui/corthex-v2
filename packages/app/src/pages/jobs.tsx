@@ -89,11 +89,11 @@ const TRIGGER_TYPE_LABELS: Record<string, string> = {
 type TabKey = 'oneTime' | 'schedule' | 'trigger'
 
 const STATUS_STYLES: Record<string, { label: string; dotClass: string; textClass: string }> = {
-  queued: { label: '대기', dotClass: 'bg-slate-400', textClass: 'text-stone-400' },
+  queued: { label: '대기', dotClass: 'bg-[#908a78]', textClass: 'text-[#908a78]' },
   processing: { label: '진행 중', dotClass: 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)] animate-pulse', textClass: 'text-blue-600' },
-  completed: { label: '완료', dotClass: 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]', textClass: 'text-emerald-600' },
+  completed: { label: '완료', dotClass: 'bg-[#4d7c0f] shadow-[0_0_8px_rgba(77,124,15,0.5)]', textClass: 'text-[#4d7c0f]' },
   failed: { label: '실패', dotClass: 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]', textClass: 'text-red-600' },
-  blocked: { label: '대기(체인)', dotClass: 'bg-slate-400', textClass: 'text-stone-400' },
+  blocked: { label: '대기(체인)', dotClass: 'bg-[#908a78]', textClass: 'text-[#908a78]' },
 }
 
 const DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토']
@@ -450,7 +450,7 @@ export function JobsPage() {
                     job.status === 'processing' ? 'bg-blue-100 text-blue-700' :
                     job.status === 'completed' ? 'bg-green-100 text-green-700' :
                     job.status === 'failed' ? 'bg-red-100 text-red-700' :
-                    job.status === 'blocked' ? 'bg-amber-100 text-amber-700' :
+                    job.status === 'blocked' ? 'bg-[#b45309]/10 text-[#b45309]' :
                     'bg-[#f0ebe0] text-[#6b705c]'
                   }`}>{status.label}</span>
                   {job.status === 'processing' && progress && (
@@ -627,7 +627,7 @@ export function JobsPage() {
                     {chainSteps.map((step, i) => (
                       <div key={i} className="pl-4 border-l-2 space-y-2" style={{ borderColor: '#606C3880' }}>
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] text-stone-400">단계 {i + 2}</span>
+                          <span className="text-[10px] text-[#908a78]">단계 {i + 2}</span>
                           <button type="button" onClick={() => setChainSteps(prev => prev.filter((_, j) => j !== i))} className="text-[10px] text-red-400">삭제</button>
                         </div>
                         <select value={step.agentId} onChange={e => setChainSteps(prev => prev.map((s, j) => j === i ? { ...s, agentId: e.target.value } : s))} className={selectClass}>
@@ -654,7 +654,7 @@ export function JobsPage() {
                   <input type="time" value={modalTime} onChange={e => setModalTime(e.target.value)} className={inputClass} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-stone-400 mb-2">주기</label>
+                  <label className="block text-xs font-medium text-[#908a78] mb-2">주기</label>
                   <div className="flex gap-3">
                     {([['daily', '매일'], ['weekdays', '평일'], ['custom', '특정 요일']] as const).map(([val, label]) => (
                       <label key={val} className="flex items-center gap-1.5 cursor-pointer">
@@ -666,7 +666,7 @@ export function JobsPage() {
                 </div>
                 {modalFrequency === 'custom' && (
                   <div>
-                    <label className="block text-xs font-medium text-stone-400 mb-2">요일 선택</label>
+                    <label className="block text-xs font-medium text-[#908a78] mb-2">요일 선택</label>
                     <div className="flex gap-2">
                       {DAY_NAMES.map((name, i) => (
                         <button key={i} type="button" onClick={() => toggleDay(i)} className="w-9 h-9 rounded-full text-xs font-medium transition-colors" style={modalDays.includes(i) ? { backgroundColor: '#606C38', color: 'white' } : { backgroundColor: '#f5f0e8', color: '#6b705c' }}>
