@@ -642,7 +642,7 @@ packages/ui/
 │   ├── toggle-group.tsx      # Radix ToggleGroup
 │   ├── drawer.tsx            # vaul
 │   ├── calendar.tsx          # react-day-picker
-│   ├── tree-view.tsx         # Custom (recursive Radix Accordion)
+│   ├── tree-view.tsx         # Custom (Accordion visual structure + custom role="tree" ARIA — see §3.3 warning)
 │   │
 │   └── # Re-exports
 │       └── toast.ts          # sonner re-export
@@ -655,7 +655,7 @@ packages/ui/
 ```json
 {
   "dependencies": {
-    "radix-ui": "^1.4.3",
+    "radix-ui": "1.4.3",          /* pin exact — verify latest at implementation time */
     "class-variance-authority": "^0.7",
     "clsx": "^2",
     "tailwind-merge": "^3",
