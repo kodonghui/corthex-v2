@@ -26,6 +26,7 @@
 - Orchestrator only assigns + commits. Workers do everything else.
 - Prohibited: skipping skills, stub/mock as "done", orchestrator running party mode
 - **파이프라인 에이전트 = 반드시 TeamCreate + Agent(team_name) 사용. 단독 Agent(서브에이전트) 금지.** 크리틱 간 cross-talk은 SendMessage로 직접 통신해야 하므로 팀 필수.
+- **오케스트레이터 중계 필수**: Writer↔Critic 직접 통신에 의존 금지. 모든 단계 전환(리뷰 요청, fixes 완료, 다음 스텝)은 **오케스트레이터가 SendMessage로 직접 깨워서 지시**. idle 팀 에이전트는 자동 wake-up 안 됨.
 
 ## Output Quality
 - Specific and detailed only. "Vague" = instant FAIL.
