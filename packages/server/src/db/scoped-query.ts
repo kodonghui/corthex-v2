@@ -584,5 +584,111 @@ export function getDB(companyId: string) {
         WHERE id = ${id}::uuid AND company_id = ${companyId}::uuid
       `)
     },
+
+    // === Story 28.7: Observation TTL & Memory Cleanup (NFR-D8) ===
+
+    // WRITE — delete reflected observations older than cutoff (batch delete with LIMIT)
+    deleteExpiredObservations: async (params: {
+      reflected: boolean
+      before: Date
+      batchSize: number
+    }): Promise<number> => {
+      const { reflected, before, batchSize } = params
+      const result = await db.execute(sql`
+        DELETE FROM observations
+        WHERE id IN (
+          SELECT id FROM observations
+          WHERE company_id = ${companyId}::uuid
+            AND reflected = ${reflected}
+            AND ${reflected
+              ? sql`reflected_at < ${before.toISOString()}::timestamptz`
+              : sql`created_at < ${before.toISOString()}::timestamptz`
+            }
+          LIMIT ${batchSize}
+        )
+      `)
+      return (result as unknown as { rowCount?: number }).rowCount ?? 0
+    },
+
+    // WRITE — decay confidence for stale memories (multiply by decayFactor)
+    decayMemoryConfidence: async (staleBefore: Date, decayFactor: number): Promise<number> => {
+      const result = await db.execute(sql`
+        UPDATE agent_memories
+        SET confidence = GREATEST(0, FLOOR(confidence * ${decayFactor})),
+            updated_at = NOW()
+        WHERE company_id = ${companyId}::uuid
+          AND is_active = true
+          AND updated_at < ${staleBefore.toISOString()}::timestamptz
+          AND confidence > 0
+      `)
+      return (result as unknown as { rowCount?: number }).rowCount ?? 0
+    },
+
+    // WRITE — delete (soft) memories below confidence threshold
+    deleteWeakMemories: async (minConfidence: number): Promise<number> => {
+      const result = await db.execute(sql`
+        UPDATE agent_memories
+        SET is_active = false,
+            updated_at = NOW()
+        WHERE company_id = ${companyId}::uuid
+          AND is_active = true
+          AND confidence < ${minConfidence}
+      `)
+      return (result as unknown as { rowCount?: number }).rowCount ?? 0
+    },
+
+    // READ — memory/observation stats per agent (Story 28.7 admin stats)
+    getMemoryStats: async (): Promise<Array<{
+      agentId: string
+      totalObservations: number
+      reflectedObservations: number
+      unreflectedObservations: number
+      totalMemories: number
+      activeMemories: number
+      avgConfidence: number
+    }>> => {
+      const obsStats = await db.execute(sql`
+        SELECT agent_id,
+               COUNT(*)::int AS total_observations,
+               COUNT(*) FILTER (WHERE reflected = true)::int AS reflected_observations,
+               COUNT(*) FILTER (WHERE reflected = false)::int AS unreflected_observations
+        FROM observations
+        WHERE company_id = ${companyId}::uuid
+        GROUP BY agent_id
+      `)
+      const memStats = await db.execute(sql`
+        SELECT agent_id,
+               COUNT(*)::int AS total_memories,
+               COUNT(*) FILTER (WHERE is_active = true)::int AS active_memories,
+               COALESCE(AVG(confidence) FILTER (WHERE is_active = true), 0)::int AS avg_confidence
+        FROM agent_memories
+        WHERE company_id = ${companyId}::uuid
+        GROUP BY agent_id
+      `)
+
+      const obsRows = (obsStats as unknown as { rows: any[] }).rows ?? (obsStats as unknown as any[]) ?? []
+      const memRows = (memStats as unknown as { rows: any[] }).rows ?? (memStats as unknown as any[]) ?? []
+
+      const memMap = new Map<string, any>()
+      for (const r of memRows) memMap.set(r.agent_id, r)
+
+      const agentIds = new Set<string>()
+      for (const r of obsRows) agentIds.add(r.agent_id)
+      for (const r of memRows) agentIds.add(r.agent_id)
+
+      return Array.from(agentIds).map(agentId => {
+        const obs = obsRows.find((r: any) => r.agent_id === agentId)
+        const mem = memMap.get(agentId)
+        return {
+          agentId,
+          totalObservations: Number(obs?.total_observations ?? 0),
+          reflectedObservations: Number(obs?.reflected_observations ?? 0),
+          unreflectedObservations: Number(obs?.unreflected_observations ?? 0),
+          totalMemories: Number(mem?.total_memories ?? 0),
+          activeMemories: Number(mem?.active_memories ?? 0),
+          avgConfidence: Number(mem?.avg_confidence ?? 0),
+        }
+      })
+    },
   }
 }

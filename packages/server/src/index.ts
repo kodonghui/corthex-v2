@@ -89,6 +89,7 @@ import { startTriggerWorker, stopTriggerWorker } from './lib/trigger-worker'
 import { startSnsScheduleChecker, stopSnsScheduleChecker } from './lib/sns-schedule-checker'
 import { startSemanticCacheCleanup, stopSemanticCacheCleanup } from './lib/semantic-cache-cleanup'
 import { startReflectionCron, stopReflectionCron } from './services/reflection-cron'
+import { startObservationCleanupCron, stopObservationCleanupCron } from './services/observation-cleanup-cron'
 import { getActiveSessions } from './engine/agent-loop'
 import { loginRateLimit, apiRateLimit } from './middleware/rate-limit'
 import { wsRoute, websocket, broadcastServerRestart } from './ws/server'
@@ -340,6 +341,7 @@ runMigrations().then(() => {
   startSnsScheduleChecker()
   startSemanticCacheCleanup()
   startReflectionCron()
+  startObservationCleanupCron()
 })
 
 // Graceful Shutdown — wait for active agent sessions before exit (NFR-O1)
@@ -356,6 +358,7 @@ process.on('SIGTERM', async () => {
   stopSnsScheduleChecker()
   stopSemanticCacheCleanup()
   stopReflectionCron()
+  stopObservationCleanupCron()
   broadcastServerRestart()
 
   // Force exit after 120s (NFR-P8)

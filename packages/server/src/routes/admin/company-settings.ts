@@ -13,6 +13,8 @@ import {
   ENGINE_CATEGORIES,
   MARKETING_ENGINE_PROVIDERS,
 } from '../../services/marketing-settings'
+import { cleanupExpiredObservations, decayStaleMemories } from '../../services/observation-cleanup'
+import { getDB } from '../../db/scoped-query'
 import type { EngineCategory } from '../../services/marketing-settings'
 import type { AppEnv } from '../../types'
 
@@ -119,3 +121,27 @@ companySettingsRoute.put(
     return c.json({ success: true, data: { watermark: enabled } })
   },
 )
+
+// === Story 28.7: Memory Cleanup Admin Endpoints ===
+
+// GET /api/admin/company-settings/memory-stats — observation/memory counts per agent
+companySettingsRoute.get('/company-settings/memory-stats', async (c) => {
+  const tenant = c.get('tenant')
+  const db = getDB(tenant.companyId)
+  const stats = await db.getMemoryStats()
+  return c.json({ success: true, data: { agents: stats } })
+})
+
+// POST /api/admin/company-settings/memory-cleanup — manual trigger for cleanup
+companySettingsRoute.post('/company-settings/memory-cleanup', async (c) => {
+  const tenant = c.get('tenant')
+  const cleanup = await cleanupExpiredObservations(tenant.companyId)
+  const decay = await decayStaleMemories(tenant.companyId)
+  return c.json({
+    success: true,
+    data: {
+      observations: cleanup,
+      memories: decay,
+    },
+  })
+})
