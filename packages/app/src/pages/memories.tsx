@@ -16,6 +16,7 @@ import { Skeleton, Badge, toast } from '@corthex/ui'
 import {
   Brain, Eye, Clock, Pin, Trash2, ArrowLeft,
   ChevronRight, AlertTriangle, Lightbulb, Filter,
+  Gauge, TrendingUp, Crosshair, BookOpen, Zap, Shield, Wrench,
 } from 'lucide-react'
 
 // Types
@@ -337,6 +338,151 @@ function MemoriesTab({ agentId }: { agentId: string }) {
   )
 }
 
+// Capability types
+type CapabilityScore = {
+  agentId: string
+  companyId: string
+  overall: number
+  dimensions: {
+    taskSuccessRate: number
+    domainBreadth: number
+    learningVelocity: number
+    memoryRetention: number
+    toolProficiency: number
+  }
+  evaluatedAt: string
+  observationCount: number
+  memoryCount: number
+}
+
+type CapabilityHistoryEntry = {
+  id: string
+  overallScore: number
+  dimensions: Record<string, number>
+  observationCount: number
+  memoryCount: number
+  evaluatedAt: string
+}
+
+const dimensionMeta: Record<string, { label: string; icon: typeof Crosshair; color: string }> = {
+  taskSuccessRate: { label: 'Task Success', icon: Crosshair, color: 'text-green-600' },
+  domainBreadth: { label: 'Domain Breadth', icon: BookOpen, color: 'text-blue-600' },
+  learningVelocity: { label: 'Learning Velocity', icon: Zap, color: 'text-amber-600' },
+  memoryRetention: { label: 'Memory Retention', icon: Shield, color: 'text-purple-600' },
+  toolProficiency: { label: 'Tool Proficiency', icon: Wrench, color: 'text-cyan-600' },
+}
+
+function ScoreRing({ score }: { score: number }) {
+  const radius = 36
+  const circumference = 2 * Math.PI * radius
+  const offset = circumference - (score / 100) * circumference
+  const color = score >= 70 ? '#606C38' : score >= 40 ? '#d97706' : '#dc2626'
+  return (
+    <div className="relative w-24 h-24">
+      <svg className="w-24 h-24 -rotate-90" viewBox="0 0 80 80">
+        <circle cx="40" cy="40" r={radius} fill="none" stroke="#e5e1d3" strokeWidth="6" />
+        <circle cx="40" cy="40" r={radius} fill="none" stroke={color} strokeWidth="6"
+          strokeDasharray={circumference} strokeDashoffset={offset}
+          strokeLinecap="round" className="transition-all duration-500" />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-xl font-bold text-stone-800">{score}</span>
+      </div>
+    </div>
+  )
+}
+
+// Capability tab content
+function CapabilityTab({ agentId }: { agentId: string }) {
+  const { data: scoreData, isLoading: scoreLoading } = useQuery({
+    queryKey: ['capability', agentId],
+    queryFn: () => api.get<{ data: CapabilityScore }>(`/workspace/capability/${agentId}`),
+  })
+
+  const { data: historyData } = useQuery({
+    queryKey: ['capability', 'history', agentId],
+    queryFn: () => api.get<{ data: CapabilityHistoryEntry[] }>(`/workspace/capability/${agentId}/history`),
+  })
+
+  const score = scoreData?.data
+  const history = historyData?.data ?? []
+
+  if (scoreLoading) {
+    return <div className="space-y-2">{[1, 2, 3].map(i => <Skeleton key={i} className="h-16" />)}</div>
+  }
+
+  if (!score) {
+    return (
+      <div className="text-center py-12 text-stone-400">
+        <Gauge className="w-8 h-8 mx-auto mb-2 opacity-50" />
+        <p>평가 데이터가 없습니다</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Overall Score */}
+      <div className="flex items-center gap-6 p-4 rounded-lg border border-[#e5e1d3] bg-white">
+        <ScoreRing score={score.overall} />
+        <div className="flex-1">
+          <h3 className="font-medium text-stone-800 mb-1">Overall Capability</h3>
+          <p className="text-sm text-stone-500">
+            Based on {score.observationCount} observations and {score.memoryCount} memories
+          </p>
+          <p className="text-xs text-stone-400 mt-1">
+            Evaluated: {formatDate(score.evaluatedAt)}
+          </p>
+        </div>
+      </div>
+
+      {/* Dimensions Breakdown */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {Object.entries(score.dimensions).map(([key, value]) => {
+          const meta = dimensionMeta[key]
+          if (!meta) return null
+          const Icon = meta.icon
+          return (
+            <div key={key} className="p-3 rounded-lg border border-[#e5e1d3] bg-white">
+              <div className="flex items-center gap-2 mb-2">
+                <Icon className={`w-4 h-4 ${meta.color}`} />
+                <span className="text-sm font-medium text-stone-700">{meta.label}</span>
+                <span className="ml-auto text-sm font-semibold text-stone-800">{value}</span>
+              </div>
+              <div className="h-1.5 rounded-full bg-stone-200 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-[#606C38] transition-all"
+                  style={{ width: `${value}%` }}
+                />
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* History Trend */}
+      {history.length > 1 && (
+        <div className="p-4 rounded-lg border border-[#e5e1d3] bg-white">
+          <div className="flex items-center gap-2 mb-3">
+            <TrendingUp className="w-4 h-4 text-[#606C38]" />
+            <h3 className="text-sm font-medium text-stone-700">Score History</h3>
+          </div>
+          <div className="flex items-end gap-1 h-16">
+            {history.slice(0, 20).reverse().map((h) => (
+              <div
+                key={h.id}
+                className="flex-1 bg-[#606C38]/70 rounded-t hover:bg-[#606C38] transition-colors"
+                style={{ height: `${Math.max(h.overallScore, 4)}%` }}
+                title={`${h.overallScore} — ${formatDate(h.evaluatedAt)}`}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // Timeline tab content
 function TimelineTab({ agentId }: { agentId: string }) {
   const { data, isLoading } = useQuery({
@@ -390,12 +536,13 @@ function TimelineTab({ agentId }: { agentId: string }) {
 
 // Agent detail view
 function AgentDetail({ agentId, agentName, onBack }: { agentId: string; agentName: string; onBack: () => void }) {
-  const [tab, setTab] = useState<'observations' | 'memories' | 'timeline'>('observations')
+  const [tab, setTab] = useState<'observations' | 'memories' | 'timeline' | 'capability'>('observations')
 
   const tabs = [
     { key: 'observations' as const, label: '관찰', icon: Eye },
     { key: 'memories' as const, label: '기억', icon: Brain },
     { key: 'timeline' as const, label: '타임라인', icon: Clock },
+    { key: 'capability' as const, label: '역량', icon: Gauge },
   ]
 
   return (
@@ -428,6 +575,7 @@ function AgentDetail({ agentId, agentName, onBack }: { agentId: string; agentNam
       {tab === 'observations' && <ObservationsTab agentId={agentId} />}
       {tab === 'memories' && <MemoriesTab agentId={agentId} />}
       {tab === 'timeline' && <TimelineTab agentId={agentId} />}
+      {tab === 'capability' && <CapabilityTab agentId={agentId} />}
     </div>
   )
 }

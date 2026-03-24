@@ -66,6 +66,7 @@ import { workspaceAgentMarketplaceRoute } from './routes/workspace/agent-marketp
 import { marketingApprovalRoute } from './routes/workspace/marketing-approval'
 import { observationsRoute } from './routes/workspace/observations'
 import { memoryDashboardRoute } from './routes/workspace/memory-dashboard'
+import { capabilityRoute } from './routes/workspace/capability'
 import { publicApiKeysRoute } from './routes/admin/public-api-keys'
 import { tierConfigsRoute } from './routes/admin/tier-configs'
 import { companySettingsRoute } from './routes/admin/company-settings'
@@ -77,6 +78,7 @@ import { toolSanitizerRoute } from './routes/admin/tool-sanitizer'
 import { n8nProxyRoute } from './routes/admin/n8n-proxy'
 import { n8nPresetsRoute } from './routes/admin/n8n-presets'
 import { memoryManagementRoute } from './routes/admin/memory-management'
+import { adminCapabilityRoute } from './routes/admin/capability'
 import { publicApiV1Route } from './routes/public-api/v1'
 import { superAdminCompaniesRoute } from './routes/super-admin/companies'
 
@@ -196,6 +198,7 @@ app.route('/api/admin', n8nProxyRoute)
 // n8n preset workflows (AR40, FR-MKT2)
 app.route('/api/admin', n8nPresetsRoute)
 app.route('/api/admin', memoryManagementRoute)
+app.route('/api/admin', adminCapabilityRoute)
 
 // 유저 워크스페이스 라우트 (각 파일 내부에서 authMiddleware 적용, 테넌트 격리)
 app.route('/api/workspace', workspaceAgentsRoute)
@@ -244,6 +247,8 @@ app.route('/api/workspace', marketingApprovalRoute)
 app.route('/api/workspace', observationsRoute)
 // Memory Dashboard (Story 28.8)
 app.route('/api/workspace', memoryDashboardRoute)
+// Capability Evaluation (Story 28.10)
+app.route('/api/workspace', capabilityRoute)
 
 // 공개 API (API 키 인증)
 app.route('/api/v1', publicApiV1Route)

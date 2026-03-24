@@ -1923,3 +1923,19 @@ export const observations = pgTable('observations', {
     .on(table.companyId, table.agentId, table.importance),
   ttlIdx: index('idx_observations_ttl').on(table.reflectedAt),
 }))
+
+// === Story 28.10: capability_evaluations — Agent capability evaluation snapshots (FR-MEM9) ===
+export const capabilityEvaluations = pgTable('capability_evaluations', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id, { onDelete: 'cascade' }),
+  agentId: uuid('agent_id').notNull().references(() => agents.id, { onDelete: 'cascade' }),
+  overallScore: integer('overall_score').notNull(),
+  dimensions: jsonb('dimensions').notNull(),
+  observationCount: integer('observation_count').notNull().default(0),
+  memoryCount: integer('memory_count').notNull().default(0),
+  evaluatedAt: timestamp('evaluated_at').notNull().defaultNow(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  agentEvalIdx: index('idx_capability_evaluations_agent')
+    .on(table.companyId, table.agentId, table.evaluatedAt),
+}))

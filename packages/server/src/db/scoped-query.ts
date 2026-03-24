@@ -1,7 +1,7 @@
 import { eq, or, sql, desc, and, isNotNull, asc, inArray, gte, type SQL } from 'drizzle-orm'
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm'
 import { db } from './index'
-import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users, costRecords, presets, sketches, tierConfigs, semanticCache, agentReports, toolCallEvents, mcpServerConfigs, agentMcpAccess, mcpLifecycleEvents, credentials, activityLogs, observations, agentMemories } from './schema'
+import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users, costRecords, presets, sketches, tierConfigs, semanticCache, agentReports, toolCallEvents, mcpServerConfigs, agentMcpAccess, mcpLifecycleEvents, credentials, activityLogs, observations, agentMemories, capabilityEvaluations } from './schema'
 import { decrypt } from '../lib/credential-crypto'
 import { withTenant, scopedWhere, scopedInsert } from './tenant-helpers'
 import { cosineDistance } from './pgvector'
@@ -870,6 +870,178 @@ export function getDB(companyId: string) {
         memoriesDeleted: memResult.length,
         observationsDeleted: obsResult.length,
       }
+    },
+
+    // === Story 28.10: Capability Evaluation Framework (FR-MEM9) ===
+
+    // READ — observation outcome distribution for an agent
+    getObservationOutcomeStats: async (agentId: string): Promise<{
+      success: number; failure: number; unknown: number
+    }> => {
+      const rows = await db.execute(sql`
+        SELECT
+          COUNT(*) FILTER (WHERE outcome = 'success')::int AS success,
+          COUNT(*) FILTER (WHERE outcome = 'failure')::int AS failure,
+          COUNT(*) FILTER (WHERE outcome = 'unknown')::int AS unknown
+        FROM observations
+        WHERE company_id = ${companyId}::uuid AND agent_id = ${agentId}::uuid
+      `)
+      const resultRows = (rows as unknown as { rows: any[] }).rows ?? (rows as unknown as any[]) ?? []
+      const r = resultRows[0]
+      return {
+        success: Number(r?.success ?? 0),
+        failure: Number(r?.failure ?? 0),
+        unknown: Number(r?.unknown ?? 0),
+      }
+    },
+
+    // READ — distinct domains for an agent
+    getObservationDomainStats: async (agentId: string): Promise<Array<{
+      domain: string; count: number
+    }>> => {
+      const rows = await db.execute(sql`
+        SELECT domain, COUNT(*)::int AS count
+        FROM observations
+        WHERE company_id = ${companyId}::uuid AND agent_id = ${agentId}::uuid
+        GROUP BY domain
+        ORDER BY count DESC
+      `)
+      const resultRows = (rows as unknown as { rows: any[] }).rows ?? (rows as unknown as any[]) ?? []
+      return resultRows.map((r: any) => ({
+        domain: r.domain as string,
+        count: Number(r.count),
+      }))
+    },
+
+    // READ — tool proficiency stats for an agent
+    getToolProficiencyStats: async (agentId: string): Promise<Array<{
+      toolUsed: string; successCount: number; totalCount: number
+    }>> => {
+      const rows = await db.execute(sql`
+        SELECT tool_used,
+               COUNT(*)::int AS total_count,
+               COUNT(*) FILTER (WHERE outcome = 'success')::int AS success_count
+        FROM observations
+        WHERE company_id = ${companyId}::uuid
+          AND agent_id = ${agentId}::uuid
+          AND tool_used IS NOT NULL
+        GROUP BY tool_used
+        ORDER BY total_count DESC
+      `)
+      const resultRows = (rows as unknown as { rows: any[] }).rows ?? (rows as unknown as any[]) ?? []
+      return resultRows.map((r: any) => ({
+        toolUsed: r.tool_used as string,
+        successCount: Number(r.success_count),
+        totalCount: Number(r.total_count),
+      }))
+    },
+
+    // READ — memory stats for capability scoring
+    getMemoryCapabilityStats: async (agentId: string): Promise<{
+      totalMemories: number
+      recentMemories: number
+      highConfidenceCount: number
+    }> => {
+      const rows = await db.execute(sql`
+        SELECT
+          COUNT(*)::int AS total_memories,
+          COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '30 days')::int AS recent_memories,
+          COUNT(*) FILTER (WHERE confidence >= 50)::int AS high_confidence_count
+        FROM agent_memories
+        WHERE company_id = ${companyId}::uuid
+          AND agent_id = ${agentId}::uuid
+          AND is_active = true
+      `)
+      const resultRows = (rows as unknown as { rows: any[] }).rows ?? (rows as unknown as any[]) ?? []
+      const r = resultRows[0]
+      return {
+        totalMemories: Number(r?.total_memories ?? 0),
+        recentMemories: Number(r?.recent_memories ?? 0),
+        highConfidenceCount: Number(r?.high_confidence_count ?? 0),
+      }
+    },
+
+    // WRITE — save capability evaluation snapshot
+    insertCapabilityEvaluation: async (score: {
+      agentId: string
+      overall: number
+      dimensions: Record<string, number>
+      observationCount: number
+      memoryCount: number
+      evaluatedAt: Date
+    }): Promise<{ id: string }> => {
+      const [result] = await db.insert(capabilityEvaluations)
+        .values({
+          companyId: companyId as any,
+          agentId: score.agentId,
+          overallScore: score.overall,
+          dimensions: score.dimensions,
+          observationCount: score.observationCount,
+          memoryCount: score.memoryCount,
+          evaluatedAt: score.evaluatedAt,
+        })
+        .returning({ id: capabilityEvaluations.id })
+      return result
+    },
+
+    // READ — capability evaluation history for an agent
+    getCapabilityHistory: async (agentId: string, limit = 20): Promise<Array<{
+      id: string
+      overallScore: number
+      dimensions: Record<string, number>
+      observationCount: number
+      memoryCount: number
+      evaluatedAt: Date
+    }>> => {
+      const rows = await db.select({
+        id: capabilityEvaluations.id,
+        overallScore: capabilityEvaluations.overallScore,
+        dimensions: capabilityEvaluations.dimensions,
+        observationCount: capabilityEvaluations.observationCount,
+        memoryCount: capabilityEvaluations.memoryCount,
+        evaluatedAt: capabilityEvaluations.evaluatedAt,
+      })
+        .from(capabilityEvaluations)
+        .where(and(
+          eq(capabilityEvaluations.companyId, companyId as any),
+          eq(capabilityEvaluations.agentId, agentId),
+        ))
+        .orderBy(desc(capabilityEvaluations.evaluatedAt))
+        .limit(limit)
+      return rows.map(r => ({
+        ...r,
+        dimensions: r.dimensions as Record<string, number>,
+      }))
+    },
+
+    // READ — latest capability scores for all agents in a company
+    getCompanyCapabilityOverview: async (): Promise<Array<{
+      agentId: string
+      agentName: string
+      overallScore: number
+      dimensions: Record<string, number>
+      evaluatedAt: Date
+    }>> => {
+      const rows = await db.execute(sql`
+        SELECT DISTINCT ON (ce.agent_id)
+               ce.agent_id,
+               a.name AS agent_name,
+               ce.overall_score,
+               ce.dimensions,
+               ce.evaluated_at
+        FROM capability_evaluations ce
+        JOIN agents a ON a.id = ce.agent_id
+        WHERE ce.company_id = ${companyId}::uuid
+        ORDER BY ce.agent_id, ce.evaluated_at DESC
+      `)
+      const resultRows = (rows as unknown as { rows: any[] }).rows ?? (rows as unknown as any[]) ?? []
+      return resultRows.map((r: any) => ({
+        agentId: r.agent_id as string,
+        agentName: r.agent_name as string,
+        overallScore: Number(r.overall_score),
+        dimensions: typeof r.dimensions === 'string' ? JSON.parse(r.dimensions) : r.dimensions,
+        evaluatedAt: new Date(r.evaluated_at),
+      }))
     },
   }
 }
