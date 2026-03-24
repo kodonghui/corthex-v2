@@ -81,6 +81,7 @@ export function resolveProvider(modelId: string): LLMProviderName {
  * CredentialVault uses 'google_ai' while models.yaml uses 'google'.
  */
 function toCredentialProvider(provider: LLMProviderName): string {
+  // dead code after 22.2 — kept for backward compat (historical cost records may have provider='google')
   if (provider === 'google') return 'google_ai'
   return provider
 }

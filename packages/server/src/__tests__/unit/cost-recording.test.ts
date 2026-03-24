@@ -35,8 +35,6 @@ mock.module('../../config/models', () => ({
       'claude-haiku-4-5': { id: 'claude-haiku-4-5', provider: 'anthropic', displayName: 'Claude Haiku 4.5', inputPricePer1M: 0.8, outputPricePer1M: 4, maxTokens: 8192, supportsBatch: true },
       'gpt-4.1': { id: 'gpt-4.1', provider: 'openai', displayName: 'GPT-4.1', inputPricePer1M: 2.5, outputPricePer1M: 10, maxTokens: 16384, supportsBatch: true },
       'gpt-4.1-mini': { id: 'gpt-4.1-mini', provider: 'openai', displayName: 'GPT-4.1 Mini', inputPricePer1M: 0.4, outputPricePer1M: 1.6, maxTokens: 16384, supportsBatch: true },
-      'gemini-2.5-pro': { id: 'gemini-2.5-pro', provider: 'google', displayName: 'Gemini 2.5 Pro', inputPricePer1M: 1.25, outputPricePer1M: 10, maxTokens: 8192, supportsBatch: false },
-      'gemini-2.5-flash': { id: 'gemini-2.5-flash', provider: 'google', displayName: 'Gemini 2.5 Flash', inputPricePer1M: 0.075, outputPricePer1M: 0.3, maxTokens: 8192, supportsBatch: false },
     }
     return configs[modelId] ?? undefined
   },
@@ -45,11 +43,11 @@ mock.module('../../config/models', () => ({
       { id: 'claude-sonnet-4-6', provider: 'anthropic', displayName: 'Claude Sonnet 4.6', inputPricePer1M: 3, outputPricePer1M: 15 },
       { id: 'claude-haiku-4-5', provider: 'anthropic', displayName: 'Claude Haiku 4.5', inputPricePer1M: 0.8, outputPricePer1M: 4 },
     ],
-    fallbackOrder: ['anthropic', 'openai', 'google'],
+    fallbackOrder: ['anthropic', 'openai'],
     tierDefaults: { manager: 'claude-sonnet-4-6', specialist: 'claude-haiku-4-5', worker: 'claude-haiku-4-5' },
   }),
   getTierDefaultModel: (tier: string) => tier === 'manager' ? 'claude-sonnet-4-6' : 'claude-haiku-4-5',
-  getFallbackOrder: () => ['anthropic', 'openai', 'google'],
+  getFallbackOrder: () => ['anthropic', 'openai'],
   getFallbackModels: () => [],
   resetModelsCache: () => {},
 }))
@@ -105,16 +103,6 @@ describe('calculateCostMicro', () => {
   test('gpt-4.1-mini: 1000 input + 500 output = 1200 micro', () => {
     // input: 1000 * 0.4 = 400, output: 500 * 1.6 = 800
     expect(calculateCostMicro('gpt-4.1-mini', 1000, 500)).toBe(1200)
-  })
-
-  test('gemini-2.5-pro: 1000 input + 500 output = 6250 micro', () => {
-    // input: 1000 * 1.25 = 1250, output: 500 * 10 = 5000
-    expect(calculateCostMicro('gemini-2.5-pro', 1000, 500)).toBe(6250)
-  })
-
-  test('gemini-2.5-flash: 1000 input + 500 output = 225 micro', () => {
-    // input: 1000 * 0.075 = 75, output: 500 * 0.3 = 150
-    expect(calculateCostMicro('gemini-2.5-flash', 1000, 500)).toBe(225)
   })
 
   test('unknown model uses DEFAULT_PRICING (sonnet-level: 3/15)', () => {
@@ -482,14 +470,12 @@ describe('getModelCostBreakdown', () => {
 // models.yaml pricing validation
 // ============================================================
 describe('models.yaml pricing', () => {
-  test('all 6 models return correct input pricing', () => {
+  test('all 4 models return correct input pricing', () => {
     const expected: Record<string, number> = {
       'claude-sonnet-4-6': 3,
       'claude-haiku-4-5': 0.8,
       'gpt-4.1': 2.5,
       'gpt-4.1-mini': 0.4,
-      'gemini-2.5-pro': 1.25,
-      'gemini-2.5-flash': 0.075,
     }
 
     for (const [modelId, expectedPrice] of Object.entries(expected)) {
@@ -498,14 +484,12 @@ describe('models.yaml pricing', () => {
     }
   })
 
-  test('all 6 models return correct output pricing', () => {
+  test('all 4 models return correct output pricing', () => {
     const expected: Record<string, number> = {
       'claude-sonnet-4-6': 15,
       'claude-haiku-4-5': 4,
       'gpt-4.1': 10,
       'gpt-4.1-mini': 1.6,
-      'gemini-2.5-pro': 10,
-      'gemini-2.5-flash': 0.3,
     }
 
     for (const [modelId, expectedPrice] of Object.entries(expected)) {
@@ -541,19 +525,6 @@ describe('LLM Router integration', () => {
     }
 
     expect(mockInsert).toHaveBeenCalledTimes(5)
-  })
-
-  test('recordCost with google model resolves provider correctly', async () => {
-    await recordCost({
-      companyId: testCompanyId,
-      model: 'gemini-2.5-pro',
-      inputTokens: 100,
-      outputTokens: 50,
-      source: 'chat',
-    })
-
-    const values = mockInsertValues.mock.calls[0][0]
-    expect(values.provider).toBe('google')
   })
 
   test('fallback scenario records cost for actual provider used', async () => {

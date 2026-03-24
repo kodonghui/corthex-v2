@@ -1,7 +1,7 @@
 import { describe, test, expect, mock, beforeEach } from 'bun:test'
 
 /**
- * TEA (Test Architect) — Risk-based test expansion for Story 10.2
+ * TEA (Test Architect) — Risk-based test expansion for Voyage AI embedding
  *
  * Risk Analysis:
  * P0: Embedding generation correctness (wrong dimensions, API failure graceful handling)
@@ -14,9 +14,11 @@ import { describe, test, expect, mock, beforeEach } from 'bun:test'
  */
 
 // Shared mock state
-let mockEmbedContent = mock(() =>
+let mockEmbed = mock(() =>
   Promise.resolve({
-    embedding: { values: Array.from({ length: 768 }, (_, i) => i / 768) },
+    data: [{ embedding: Array.from({ length: 1024 }, (_, i) => i / 1024) }],
+    model: 'voyage-3',
+    usage: { totalTokens: 10 },
   }),
 )
 
@@ -27,14 +29,18 @@ let mockGetCredentials = mock(() =>
 let mockDbExecute = mock(() => Promise.resolve())
 let mockDbSelectResult: any[] = []
 
-mock.module('@google/generative-ai', () => ({
-  GoogleGenerativeAI: mock(function () {
-    return {
-      getGenerativeModel: mock(() => ({
-        embedContent: (...args: any[]) => mockEmbedContent(...args),
-      })),
-    }
+mock.module('voyageai', () => ({
+  VoyageAIClient: mock(function (opts: any) {
+    return { embed: (...args: any[]) => mockEmbed(...args) }
   }),
+  VoyageAIError: class VoyageAIError extends Error {
+    statusCode: number
+    constructor(msg: string, statusCode: number) {
+      super(msg)
+      this.statusCode = statusCode
+    }
+  },
+  VoyageAITimeoutError: class VoyageAITimeoutError extends Error {},
 }))
 
 mock.module('../../db', () => ({
@@ -65,18 +71,20 @@ mock.module('../../services/credential-vault', () => ({
 
 import {
   prepareText,
-  generateEmbedding,
-  generateEmbeddings,
+  getEmbedding,
+  getEmbeddingBatch,
   updateDocEmbedding,
   embedDocument,
   triggerEmbedding,
   embedAllDocuments,
-} from '../../services/embedding-service'
+} from '../../services/voyage-embedding'
 
 beforeEach(() => {
-  mockEmbedContent = mock(() =>
+  mockEmbed = mock(() =>
     Promise.resolve({
-      embedding: { values: Array.from({ length: 768 }, (_, i) => i / 768) },
+      data: [{ embedding: Array.from({ length: 1024 }, (_, i) => i / 1024) }],
+      model: 'voyage-3',
+      usage: { totalTokens: 10 },
     }),
   )
   mockGetCredentials = mock(() => Promise.resolve({ api_key: 'test-key' }))
@@ -132,63 +140,63 @@ describe('[TEA P0] prepareText edge cases', () => {
 
 // === P0: Embedding API Failure Modes ===
 
-describe('[TEA P0] generateEmbedding failure modes', () => {
-  test('null values in embedding array', async () => {
-    mockEmbedContent = mock(() =>
-      Promise.resolve({ embedding: { values: null } }),
+describe('[TEA P0] getEmbedding failure modes', () => {
+  test('null embedding in response', async () => {
+    mockEmbed = mock(() =>
+      Promise.resolve({ data: [{ embedding: null }] }),
     )
-    const result = await generateEmbedding('key', 'text')
+    const result = await getEmbedding('comp-1', 'text')
     expect(result).toBeNull()
   })
 
-  test('empty embedding array', async () => {
-    mockEmbedContent = mock(() =>
-      Promise.resolve({ embedding: { values: [] } }),
+  test('empty data array', async () => {
+    mockEmbed = mock(() =>
+      Promise.resolve({ data: [] }),
     )
-    const result = await generateEmbedding('key', 'text')
+    const result = await getEmbedding('comp-1', 'text')
     expect(result).toBeNull()
   })
 
-  test('wrong dimension (384 instead of 768)', async () => {
-    mockEmbedContent = mock(() =>
+  test('wrong dimension (384 instead of 1024)', async () => {
+    mockEmbed = mock(() =>
       Promise.resolve({
-        embedding: { values: Array.from({ length: 384 }, () => 0.1) },
+        data: [{ embedding: Array.from({ length: 384 }, () => 0.1) }],
       }),
     )
-    const result = await generateEmbedding('key', 'text')
+    const result = await getEmbedding('comp-1', 'text')
     expect(result).toBeNull()
   })
 
-  test('wrong dimension (1536 instead of 768)', async () => {
-    mockEmbedContent = mock(() =>
+  test('wrong dimension (768 instead of 1024)', async () => {
+    mockEmbed = mock(() =>
       Promise.resolve({
-        embedding: { values: Array.from({ length: 1536 }, () => 0.1) },
+        data: [{ embedding: Array.from({ length: 768 }, () => 0.1) }],
       }),
     )
-    const result = await generateEmbedding('key', 'text')
+    const result = await getEmbedding('comp-1', 'text')
     expect(result).toBeNull()
   })
 
-  test('API returns malformed response (no embedding property)', async () => {
-    mockEmbedContent = mock(() => Promise.resolve({}))
-    const result = await generateEmbedding('key', 'text')
+  test('API returns malformed response (no data property)', async () => {
+    mockEmbed = mock(() => Promise.resolve({}))
+    const result = await getEmbedding('comp-1', 'text')
     expect(result).toBeNull()
   })
 
   test('API throws TypeError', async () => {
-    mockEmbedContent = mock(() => Promise.reject(new TypeError('Cannot read property')))
-    const result = await generateEmbedding('key', 'text')
+    mockEmbed = mock(() => Promise.reject(new TypeError('Cannot read property')))
+    const result = await getEmbedding('comp-1', 'text')
     expect(result).toBeNull()
   })
 
   test('successful embedding has correct length', async () => {
-    const result = await generateEmbedding('key', 'test text')
+    const result = await getEmbedding('comp-1', 'test text')
     expect(result).not.toBeNull()
-    expect(result!.length).toBe(768)
+    expect(result!.length).toBe(1024)
   })
 
   test('embedding values are numeric', async () => {
-    const result = await generateEmbedding('key', 'test')
+    const result = await getEmbedding('comp-1', 'test')
     expect(result).not.toBeNull()
     result!.forEach(v => expect(typeof v).toBe('number'))
   })
@@ -233,7 +241,7 @@ describe('[TEA P0] embedDocument credential handling', () => {
   })
 
   test('returns false when embedding generation fails', async () => {
-    mockEmbedContent = mock(() => Promise.reject(new Error('API down')))
+    mockEmbed = mock(() => Promise.reject(new Error('API down')))
     const result = await embedDocument('doc-1', 'company-1')
     expect(result).toBe(false)
   })
@@ -264,7 +272,7 @@ describe('[TEA P0] triggerEmbedding fire-and-forget safety', () => {
 
 describe('[TEA P0] updateDocEmbedding SQL correctness', () => {
   test('calls db.execute for vector update', async () => {
-    const embedding = Array.from({ length: 768 }, () => 0.5)
+    const embedding = Array.from({ length: 1024 }, () => 0.5)
     await updateDocEmbedding('doc-1', 'comp-1', embedding)
     expect(mockDbExecute).toHaveBeenCalled()
   })
@@ -276,62 +284,85 @@ describe('[TEA P0] updateDocEmbedding SQL correctness', () => {
   })
 
   test('handles very large embedding values', async () => {
-    const embedding = Array.from({ length: 768 }, () => 999999.999999)
+    const embedding = Array.from({ length: 1024 }, () => 999999.999999)
     await expect(
       updateDocEmbedding('doc-1', 'comp-1', embedding),
     ).resolves.toBeUndefined()
   })
 
   test('handles negative embedding values', async () => {
-    const embedding = Array.from({ length: 768 }, () => -0.5)
+    const embedding = Array.from({ length: 1024 }, () => -0.5)
     await expect(
       updateDocEmbedding('doc-1', 'comp-1', embedding),
     ).resolves.toBeUndefined()
+  })
+
+  test('rejects NaN values', async () => {
+    await expect(
+      updateDocEmbedding('doc-1', 'comp-1', [NaN, 0.5]),
+    ).rejects.toThrow('non-finite')
+  })
+
+  test('rejects Infinity values', async () => {
+    await expect(
+      updateDocEmbedding('doc-1', 'comp-1', [Infinity, 0.5]),
+    ).rejects.toThrow('non-finite')
   })
 })
 
 // === P1: Batch embedding partial failures ===
 
-describe('[TEA P1] generateEmbeddings batch resilience', () => {
-  test('continues processing after middle failure', async () => {
+describe('[TEA P1] getEmbeddingBatch batch resilience', () => {
+  test('continues processing after middle batch failure', async () => {
     let callNum = 0
-    mockEmbedContent = mock(() => {
+    mockEmbed = mock((req: any) => {
       callNum++
-      if (callNum === 3) return Promise.reject(new Error('transient failure'))
+      if (callNum === 2) return Promise.reject(new Error('transient failure'))
+      const count = req.input.length
       return Promise.resolve({
-        embedding: { values: Array.from({ length: 768 }, () => 0.1) },
+        data: Array.from({ length: count }, () => ({
+          embedding: Array.from({ length: 1024 }, () => 0.1),
+        })),
       })
     })
-    const results = await generateEmbeddings('key', ['a', 'b', 'c', 'd', 'e'])
+    const results = await getEmbeddingBatch('comp-1', ['a', 'b', 'c', 'd', 'e'], 2)
     expect(results).toHaveLength(5)
-    expect(results[2]).toBeNull() // 3rd failed
-    expect(results.filter(r => r !== null)).toHaveLength(4)
+    // batch 1 (a,b) success, batch 2 (c,d) fail, batch 3 (e) success
+    expect(results[0]).not.toBeNull()
+    expect(results[1]).not.toBeNull()
+    expect(results[2]).toBeNull()
+    expect(results[3]).toBeNull()
+    expect(results[4]).not.toBeNull()
   })
 
-  test('all items fail gracefully', async () => {
-    mockEmbedContent = mock(() => Promise.reject(new Error('all fail')))
-    const results = await generateEmbeddings('key', ['a', 'b', 'c'])
+  test('all batches fail gracefully', async () => {
+    mockEmbed = mock(() => Promise.reject(new Error('all fail')))
+    const results = await getEmbeddingBatch('comp-1', ['a', 'b', 'c'])
     expect(results).toEqual([null, null, null])
   })
 
   test('single item batch works', async () => {
-    const results = await generateEmbeddings('key', ['single'])
+    mockEmbed = mock(() =>
+      Promise.resolve({
+        data: [{ embedding: Array.from({ length: 1024 }, () => 0.1) }],
+      }),
+    )
+    const results = await getEmbeddingBatch('comp-1', ['single'])
     expect(results).toHaveLength(1)
     expect(results[0]).not.toBeNull()
   })
 })
 
-// === P1: embedAllDocuments batch ===
+// === P1: embedAllDocuments ===
 
 describe('[TEA P1] embedAllDocuments', () => {
-  test('throws when no API key configured', async () => {
-    mockGetCredentials = mock(() => Promise.resolve({}))
-    await expect(embedAllDocuments('company-1')).rejects.toThrow('No Google AI API key configured')
-  })
-
-  test('throws when credential vault fails', async () => {
-    mockGetCredentials = mock(() => Promise.reject(new Error('vault error')))
-    await expect(embedAllDocuments('company-1')).rejects.toThrow()
+  test('returns result summary with zero docs when none found', async () => {
+    mockDbSelectResult = []
+    // Override the select chain for embedAllDocuments (it queries unembedded docs)
+    const result = await embedAllDocuments('company-1')
+    expect(result.total).toBe(0)
+    expect(result.succeeded).toBe(0)
+    expect(result.failed).toBe(0)
   })
 })
 
@@ -343,32 +374,23 @@ describe('[TEA P1] vector format edge cases', () => {
     const vectorStr = `[${embedding.join(',')}]`
     expect(vectorStr).toBe('[1e-10,0.000025,3.14159]')
   })
-
-  test('NaN in embedding would be problematic', () => {
-    const embedding = [0.1, NaN, 0.3]
-    const vectorStr = `[${embedding.join(',')}]`
-    expect(vectorStr).toContain('NaN')
-    // This documents a known edge case — NaN should be prevented upstream
-  })
-
-  test('Infinity in embedding would be problematic', () => {
-    const embedding = [0.1, Infinity, 0.3]
-    const vectorStr = `[${embedding.join(',')}]`
-    expect(vectorStr).toContain('Infinity')
-    // This documents a known edge case — Infinity should be prevented upstream
-  })
 })
 
 // === P2: Module interface contract ===
 
 describe('[TEA P2] module interface contract', () => {
-  test('generateEmbedding returns Promise<number[] | null>', async () => {
-    const result = await generateEmbedding('key', 'text')
+  test('getEmbedding returns Promise<number[] | null>', async () => {
+    const result = await getEmbedding('comp-1', 'text')
     expect(result === null || Array.isArray(result)).toBe(true)
   })
 
-  test('generateEmbeddings returns Promise<(number[] | null)[]>', async () => {
-    const result = await generateEmbeddings('key', ['a'])
+  test('getEmbeddingBatch returns Promise<(number[] | null)[]>', async () => {
+    mockEmbed = mock(() =>
+      Promise.resolve({
+        data: [{ embedding: Array.from({ length: 1024 }, () => 0.1) }],
+      }),
+    )
+    const result = await getEmbeddingBatch('comp-1', ['a'])
     expect(Array.isArray(result)).toBe(true)
     result.forEach(r => expect(r === null || Array.isArray(r)).toBe(true))
   })

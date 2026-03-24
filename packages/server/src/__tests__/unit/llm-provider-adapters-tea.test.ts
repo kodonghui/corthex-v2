@@ -3,10 +3,10 @@
  * Risk-based test coverage expansion
  *
  * Risk Areas:
- * - HIGH: Tool call response parsing (3 different SDK formats)
+ * - HIGH: Tool call response parsing (2 different SDK formats)
  * - HIGH: Error normalization (auth, rate limit, timeout, server)
  * - MEDIUM: Message format conversion (user/assistant/tool roles)
- * - MEDIUM: Cost estimation accuracy across 6 models
+ * - MEDIUM: Cost estimation accuracy across 4 models
  * - MEDIUM: YAML parser edge cases
  * - LOW: Factory pattern completeness
  *
@@ -159,140 +159,6 @@ describe('TEA: OpenAIAdapter message building', () => {
   })
 })
 
-// === RISK AREA 3: Google Message Building ===
-describe('TEA: GoogleAdapter message building', () => {
-  test('user message converts to Gemini user role', () => {
-    const { GoogleAdapter } = require('../../lib/llm/google')
-    const adapter = new GoogleAdapter('test-key')
-    const contents = adapter['buildContents']({
-      model: 'gemini-2.5-pro',
-      messages: [{ role: 'user', content: 'hello' }],
-    })
-    expect(contents[0].role).toBe('user')
-    expect(contents[0].parts[0].text).toBe('hello')
-  })
-
-  test('assistant message converts to model role', () => {
-    const { GoogleAdapter } = require('../../lib/llm/google')
-    const adapter = new GoogleAdapter('test-key')
-    const contents = adapter['buildContents']({
-      model: 'gemini-2.5-pro',
-      messages: [{ role: 'assistant', content: 'hi' }],
-    })
-    expect(contents[0].role).toBe('model')
-    expect(contents[0].parts[0].text).toBe('hi')
-  })
-
-  test('tool result converts to functionResponse in user role', () => {
-    const { GoogleAdapter } = require('../../lib/llm/google')
-    const adapter = new GoogleAdapter('test-key')
-    const contents = adapter['buildContents']({
-      model: 'gemini-2.5-pro',
-      messages: [{
-        role: 'tool',
-        content: 'result',
-        toolCallId: 'search_fn',
-      }],
-    })
-    expect(contents[0].role).toBe('user')
-    expect(contents[0].parts[0].functionResponse).toBeDefined()
-    expect(contents[0].parts[0].functionResponse.name).toBe('search_fn')
-  })
-
-  test('assistant with tool calls includes functionCall parts', () => {
-    const { GoogleAdapter } = require('../../lib/llm/google')
-    const adapter = new GoogleAdapter('test-key')
-    const contents = adapter['buildContents']({
-      model: 'gemini-2.5-pro',
-      messages: [{
-        role: 'assistant',
-        content: 'I will search',
-        toolCalls: [{ id: 'call_1', name: 'web_search', arguments: { q: 'test' } }],
-      }],
-    })
-    expect(contents[0].role).toBe('model')
-    expect(contents[0].parts).toHaveLength(2)
-    expect(contents[0].parts[0].text).toBe('I will search')
-    expect(contents[0].parts[1].functionCall).toBeDefined()
-    expect(contents[0].parts[1].functionCall.name).toBe('web_search')
-  })
-})
-
-// === RISK AREA 4: Google JSON Schema Conversion ===
-describe('TEA: GoogleAdapter JSON schema conversion', () => {
-  test('converts object type correctly', () => {
-    const { GoogleAdapter } = require('../../lib/llm/google')
-    const adapter = new GoogleAdapter('test-key')
-    const result = adapter['convertJsonSchemaToGemini']({
-      type: 'object',
-      properties: {
-        name: { type: 'string', description: 'Name' },
-        age: { type: 'number' },
-      },
-      required: ['name'],
-    })
-    expect(result.type).toBe('object')
-    expect(result.properties.name.type).toBe('string')
-    expect(result.properties.age.type).toBe('number')
-    expect(result.required).toEqual(['name'])
-  })
-
-  test('converts string type correctly', () => {
-    const { GoogleAdapter } = require('../../lib/llm/google')
-    const adapter = new GoogleAdapter('test-key')
-    const result = adapter['convertJsonSchemaToGemini']({
-      type: 'string',
-      description: 'A name',
-    })
-    expect(result.type).toBe('string')
-    expect(result.description).toBe('A name')
-  })
-
-  test('converts boolean type correctly', () => {
-    const { GoogleAdapter } = require('../../lib/llm/google')
-    const adapter = new GoogleAdapter('test-key')
-    const result = adapter['convertJsonSchemaToGemini']({ type: 'boolean' })
-    expect(result.type).toBe('boolean')
-  })
-
-  test('converts integer type to NUMBER', () => {
-    const { GoogleAdapter } = require('../../lib/llm/google')
-    const adapter = new GoogleAdapter('test-key')
-    const result = adapter['convertJsonSchemaToGemini']({ type: 'integer' })
-    expect(result.type).toBe('number')
-  })
-
-  test('converts array type with items', () => {
-    const { GoogleAdapter } = require('../../lib/llm/google')
-    const adapter = new GoogleAdapter('test-key')
-    const result = adapter['convertJsonSchemaToGemini']({
-      type: 'array',
-      items: { type: 'string' },
-    })
-    expect(result.type).toBe('array')
-    expect(result.items.type).toBe('string')
-  })
-
-  test('converts nested objects', () => {
-    const { GoogleAdapter } = require('../../lib/llm/google')
-    const adapter = new GoogleAdapter('test-key')
-    const result = adapter['convertJsonSchemaToGemini']({
-      type: 'object',
-      properties: {
-        address: {
-          type: 'object',
-          properties: {
-            city: { type: 'string' },
-            zip: { type: 'number' },
-          },
-        },
-      },
-    })
-    expect(result.properties.address.type).toBe('object')
-    expect(result.properties.address.properties.city.type).toBe('string')
-  })
-})
-
 // === RISK AREA 5: Error Normalization (all providers) ===
 describe('TEA: Error normalization patterns', () => {
   test('Anthropic auth error is not retryable', async () => {
@@ -380,38 +246,6 @@ describe('TEA: Error normalization patterns', () => {
     expect(result.provider).toBe('openai')
   })
 
-  test('Google auth error is not retryable', () => {
-    const { GoogleAdapter } = require('../../lib/llm/google')
-    const adapter = new GoogleAdapter('test-key')
-    const result = adapter['normalizeError'](new Error('403 Forbidden API_KEY invalid'))
-    expect(result.code).toBe('auth_error')
-    expect(result.retryable).toBe(false)
-    expect(result.provider).toBe('google')
-  })
-
-  test('Google rate limit is retryable', () => {
-    const { GoogleAdapter } = require('../../lib/llm/google')
-    const adapter = new GoogleAdapter('test-key')
-    const result = adapter['normalizeError'](new Error('429 RESOURCE_EXHAUSTED'))
-    expect(result.code).toBe('rate_limit')
-    expect(result.retryable).toBe(true)
-  })
-
-  test('Google timeout is retryable', () => {
-    const { GoogleAdapter } = require('../../lib/llm/google')
-    const adapter = new GoogleAdapter('test-key')
-    const result = adapter['normalizeError'](new Error('AbortError'))
-    expect(result.code).toBe('timeout')
-    expect(result.retryable).toBe(true)
-  })
-
-  test('Google server error is retryable', () => {
-    const { GoogleAdapter } = require('../../lib/llm/google')
-    const adapter = new GoogleAdapter('test-key')
-    const result = adapter['normalizeError'](new Error('500 INTERNAL server error'))
-    expect(result.code).toBe('server_error')
-    expect(result.retryable).toBe(true)
-  })
 })
 
 // === RISK AREA 6: Cost Estimation Edge Cases ===
@@ -419,11 +253,9 @@ describe('TEA: Cost estimation edge cases', () => {
   test('zero tokens returns zero cost for all adapters', () => {
     const { AnthropicAdapter } = require('../../lib/llm/anthropic')
     const { OpenAIAdapter } = require('../../lib/llm/openai')
-    const { GoogleAdapter } = require('../../lib/llm/google')
 
     expect(new AnthropicAdapter('k').estimateCost(0, 0, 'claude-sonnet-4-6')).toBe(0)
     expect(new OpenAIAdapter('k').estimateCost(0, 0, 'gpt-4.1')).toBe(0)
-    expect(new GoogleAdapter('k').estimateCost(0, 0, 'gemini-2.5-pro')).toBe(0)
   })
 
   test('large token counts produce correct costs', () => {
@@ -458,9 +290,9 @@ describe('TEA: Factory edge cases', () => {
     expect(a1).not.toBe(a2)
   })
 
-  test('all 3 providers implement LLMProvider interface methods', () => {
+  test('all 2 providers implement LLMProvider interface methods', () => {
     const { createProvider } = require('../../lib/llm')
-    const providers = ['anthropic', 'openai', 'google'] as const
+    const providers = ['anthropic', 'openai'] as const
 
     for (const name of providers) {
       const adapter = createProvider(name, 'test-key')
@@ -601,12 +433,12 @@ describe('TEA: OpenAIAdapter response parsing', () => {
 
 // === RISK AREA 10: Models YAML Parser Robustness ===
 describe('TEA: Models config data integrity', () => {
-  test('all 6 models have distinct IDs', () => {
+  test('all 4 models have distinct IDs', () => {
     const { loadModelsConfig, resetModelsCache } = require('../../config/models')
     resetModelsCache()
     const config = loadModelsConfig()
     const ids = new Set(config.models.map((m: any) => m.id))
-    expect(ids.size).toBe(6)
+    expect(ids.size).toBe(4)
   })
 
   test('each provider has exactly 2 models', () => {
@@ -619,7 +451,6 @@ describe('TEA: Models config data integrity', () => {
     }
     expect(byProvider.anthropic).toBe(2)
     expect(byProvider.openai).toBe(2)
-    expect(byProvider.google).toBe(2)
   })
 
   test('tier defaults reference existing model IDs', () => {
@@ -636,7 +467,7 @@ describe('TEA: Models config data integrity', () => {
     const { loadModelsConfig, resetModelsCache } = require('../../config/models')
     resetModelsCache()
     const config = loadModelsConfig()
-    const validProviders = new Set(['anthropic', 'openai', 'google'])
+    const validProviders = new Set(['anthropic', 'openai'])
     for (const p of config.fallbackOrder) {
       expect(validProviders.has(p)).toBe(true)
     }
@@ -655,10 +486,5 @@ describe('TEA: Models config data integrity', () => {
     const mini = getModelConfig('gpt-4.1-mini')
     const full = getModelConfig('gpt-4.1')
     expect(mini.inputPricePer1M).toBeLessThan(full.inputPricePer1M)
-
-    // Google: flash < pro
-    const flash = getModelConfig('gemini-2.5-flash')
-    const pro = getModelConfig('gemini-2.5-pro')
-    expect(flash.inputPricePer1M).toBeLessThan(pro.inputPricePer1M)
   })
 })

@@ -121,7 +121,7 @@ describe('Story 22.1: Dependency Verification & Version Pinning', () => {
       ['hono-rate-limiter', '0.5.3'],
       ['pino', '10.3.1'],
       ['pgvector', '0.2.1'],
-      ['@google/generative-ai', '0.24.1'],
+      ['voyageai', '0.2.1'],
     ]
 
     for (const [pkg, version] of exactPinDeps) {
@@ -294,15 +294,15 @@ describe('Story 22.1 TEA: Extended Verification (Quinn)', () => {
     })
   })
 
-  describe('Edge: @google/generative-ai preserved for Story 22.2', () => {
-    test('@google/generative-ai is still in server dependencies', () => {
-      expect(serverPkg.dependencies['@google/generative-ai']).toBeDefined()
+  describe('Edge: voyageai added for Story 22.2', () => {
+    test('voyageai is in server dependencies', () => {
+      expect(serverPkg.dependencies['voyageai']).toBeDefined()
     })
 
-    test('@google/generative-ai is exact-pinned (0.x rule)', () => {
-      const v = serverPkg.dependencies['@google/generative-ai']
-      expect(v).toBe('0.24.1')
+    test('voyageai is exact-pinned', () => {
+      const v = serverPkg.dependencies['voyageai']
       expect(v).not.toStartWith('^')
+      expect(v).not.toStartWith('~')
     })
   })
 

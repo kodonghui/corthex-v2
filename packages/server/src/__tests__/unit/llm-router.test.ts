@@ -163,14 +163,6 @@ describe('resolveProvider', () => {
     expect(resolveProvider('gpt-4.1-mini')).toBe('openai')
   })
 
-  test('gemini-2.5-pro resolves to google', () => {
-    expect(resolveProvider('gemini-2.5-pro')).toBe('google')
-  })
-
-  test('gemini-2.5-flash resolves to google', () => {
-    expect(resolveProvider('gemini-2.5-flash')).toBe('google')
-  })
-
   test('unknown model throws LLMError', () => {
     expect(() => resolveProvider('unknown-model-xyz')).toThrow('Unknown model: unknown-model-xyz')
   })
@@ -222,15 +214,6 @@ describe('LLMRouter.call', () => {
 
     expect(mockGetCredentials).toHaveBeenCalledWith('company-uuid-1234', 'openai')
     expect(mockCreateProvider).toHaveBeenCalledWith('openai', 'test-key')
-  })
-
-  test('routes gemini model to google adapter with google_ai credential key', async () => {
-    const request = makeRequest({ model: 'gemini-2.5-pro' })
-    await router.call(request, makeContext())
-
-    // Should map 'google' -> 'google_ai' for credential vault
-    expect(mockGetCredentials).toHaveBeenCalledWith('company-uuid-1234', 'google_ai')
-    expect(mockCreateProvider).toHaveBeenCalledWith('google', 'test-key')
   })
 
   test('records cost after successful call', async () => {
@@ -432,14 +415,6 @@ describe('3-Tier Model Assignment Integration', () => {
     expect(provider).toBe('openai')
   })
 
-  test('manual override to gemini routes to google', () => {
-    const resolution = resolveModel({ tier: 'worker', modelName: 'gemini-2.5-flash' })
-    expect(resolution.model).toBe('gemini-2.5-flash')
-    expect(resolution.reason).toBe('manual-override')
-
-    const provider = resolveProvider(resolution.model)
-    expect(provider).toBe('google')
-  })
 })
 
 describe('Routing Decision Logging', () => {

@@ -22,19 +22,17 @@ const REAL_MODELS: Record<string, any> = {
   'claude-haiku-4-5': { id: 'claude-haiku-4-5', provider: 'anthropic', displayName: 'Claude Haiku 4.5', inputPricePer1M: 0.8, outputPricePer1M: 4, maxTokens: 8192, supportsBatch: true },
   'gpt-4.1': { id: 'gpt-4.1', provider: 'openai', displayName: 'GPT-4.1', inputPricePer1M: 2.5, outputPricePer1M: 10, maxTokens: 16384, supportsBatch: true },
   'gpt-4.1-mini': { id: 'gpt-4.1-mini', provider: 'openai', displayName: 'GPT-4.1 Mini', inputPricePer1M: 0.4, outputPricePer1M: 1.6, maxTokens: 16384, supportsBatch: true },
-  'gemini-2.5-pro': { id: 'gemini-2.5-pro', provider: 'google', displayName: 'Gemini 2.5 Pro', inputPricePer1M: 1.25, outputPricePer1M: 10, maxTokens: 8192, supportsBatch: false },
-  'gemini-2.5-flash': { id: 'gemini-2.5-flash', provider: 'google', displayName: 'Gemini 2.5 Flash', inputPricePer1M: 0.075, outputPricePer1M: 0.3, maxTokens: 8192, supportsBatch: false },
 }
 
 mock.module('../../config/models', () => ({
   getModelConfig: (modelId: string) => REAL_MODELS[modelId] ?? undefined,
   loadModelsConfig: () => ({
     models: Object.values(REAL_MODELS),
-    fallbackOrder: ['anthropic', 'openai', 'google'],
+    fallbackOrder: ['anthropic', 'openai'],
     tierDefaults: { manager: 'claude-sonnet-4-6', specialist: 'claude-haiku-4-5', worker: 'claude-haiku-4-5' },
   }),
   getTierDefaultModel: (tier: string) => tier === 'manager' ? 'claude-sonnet-4-6' : 'claude-haiku-4-5',
-  getFallbackOrder: () => ['anthropic', 'openai', 'google'],
+  getFallbackOrder: () => ['anthropic', 'openai'],
   getFallbackModels: () => [],
   resetModelsCache: () => {},
 }))
@@ -54,18 +52,6 @@ beforeEach(() => {
 // P0: Floating point precision risks
 // ============================================================
 describe('TEA P0: Floating point precision', () => {
-  test('gemini-2.5-flash small token count avoids floating point error', () => {
-    // 0.075 * 1 = 0.075, which could have float precision issues
-    const cost = calculateCostMicro('gemini-2.5-flash', 1, 0)
-    expect(cost).toBe(0) // 0.075 rounds to 0
-  })
-
-  test('gemini-2.5-flash 100 tokens produces integer result', () => {
-    // input: 100 * 0.075 = 7.5 rounds to 8
-    const cost = calculateCostMicro('gemini-2.5-flash', 100, 0)
-    expect(cost).toBe(8) // Math.round(7.5) = 8
-  })
-
   test('gpt-4.1-mini fractional pricing stays accurate', () => {
     // input: 3 * 0.4 = 1.2, output: 7 * 1.6 = 11.2, total = 12.4 rounds to 12
     const cost = calculateCostMicro('gpt-4.1-mini', 3, 7)
@@ -89,9 +75,9 @@ describe('TEA P0: Floating point precision', () => {
   })
 
   test('MAX_SAFE_INTEGER tokens do not overflow', () => {
-    // With sonnet pricing (3+15), max tokens would be very large
+    // With mini pricing (0.4+1.6), large tokens should still be finite
     // Just verify it returns a finite number
-    const cost = calculateCostMicro('gemini-2.5-flash', 1_000_000_000, 1_000_000_000)
+    const cost = calculateCostMicro('gpt-4.1-mini', 1_000_000_000, 1_000_000_000)
     expect(Number.isFinite(cost)).toBe(true)
     expect(cost).toBeGreaterThan(0)
   })
@@ -139,25 +125,19 @@ describe('TEA P0: Cross-model pricing consistency', () => {
     expect(gpt).toBeGreaterThan(mini)
   })
 
-  test('gemini-2.5-pro costs more than gemini-2.5-flash', () => {
-    const pro = calculateCostMicro('gemini-2.5-pro', 1000, 1000)
-    const flash = calculateCostMicro('gemini-2.5-flash', 1000, 1000)
-    expect(pro).toBeGreaterThan(flash)
-  })
-
   test('output tokens always cost more than or equal to input tokens per model', () => {
     for (const model of Object.values(REAL_MODELS)) {
       expect(model.outputPricePer1M).toBeGreaterThanOrEqual(model.inputPricePer1M)
     }
   })
 
-  test('cheapest model overall is gemini-2.5-flash', () => {
+  test('cheapest model overall is gpt-4.1-mini', () => {
     const costs = Object.keys(REAL_MODELS).map(id => ({
       id,
       cost: calculateCostMicro(id, 1000, 1000),
     }))
     const cheapest = costs.reduce((min, c) => c.cost < min.cost ? c : min)
-    expect(cheapest.id).toBe('gemini-2.5-flash')
+    expect(cheapest.id).toBe('gpt-4.1-mini')
   })
 
   test('most expensive model overall is claude-sonnet-4-6', () => {
@@ -304,7 +284,7 @@ describe('TEA P1: models.yaml structure validation', () => {
   })
 
   test('provider values are valid', () => {
-    const validProviders = ['anthropic', 'openai', 'google']
+    const validProviders = ['anthropic', 'openai']
     for (const model of Object.values(REAL_MODELS)) {
       expect(validProviders).toContain(model.provider)
     }
@@ -314,7 +294,6 @@ describe('TEA P1: models.yaml structure validation', () => {
     const providers = new Set(Object.values(REAL_MODELS).map(m => m.provider))
     expect(providers.has('anthropic')).toBe(true)
     expect(providers.has('openai')).toBe(true)
-    expect(providers.has('google')).toBe(true)
   })
 
   test('batch-capable models are from anthropic or openai only', () => {

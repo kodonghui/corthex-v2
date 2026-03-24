@@ -160,11 +160,6 @@ export class BatchCollector {
       flushTasks.push(this.flushOpenAI(openaiItems, companyId))
     }
 
-    const googleItems = byProvider.get('google')
-    if (googleItems?.length) {
-      flushTasks.push(this.flushGoogleFallback(googleItems, companyId))
-    }
-
     const settled = await Promise.allSettled(flushTasks)
     for (const result of settled) {
       if (result.status === 'fulfilled') {
@@ -431,67 +426,6 @@ export class BatchCollector {
       }
 
       return { batchId: 'error', provider: 'openai', itemCount: items.length, status: 'failed', error: message }
-    }
-  }
-
-  /**
-   * Gemini has no batch API -- fall back to individual calls.
-   */
-  async flushGoogleFallback(items: BatchItem[], companyId: string): Promise<BatchFlushResult> {
-    try {
-      const credentials = await getCredentials(companyId, 'google_ai')
-      const apiKey = credentials.api_key || credentials.apiKey || Object.values(credentials)[0]
-      if (!apiKey) throw new Error('No Google AI API key found')
-
-      const adapter = createProvider('google', apiKey)
-      let completedCount = 0
-
-      for (const item of items) {
-        try {
-          const response = await adapter.call(item.request)
-          item.result = response
-          item.status = 'completed'
-          item.completedAt = new Date().toISOString()
-          completedCount++
-
-          // Record cost at full price (no batch discount for Gemini)
-          recordCost({
-            companyId,
-            agentId: item.context.agentId,
-            sessionId: item.context.sessionId,
-            provider: 'google',
-            model: item.request.model,
-            inputTokens: response.usage.inputTokens,
-            outputTokens: response.usage.outputTokens,
-            source: item.context.source,
-            isBatch: false,
-          }).catch(() => {})
-        } catch (err) {
-          item.status = 'failed'
-          item.error = err instanceof Error ? err.message : String(err)
-          item.completedAt = new Date().toISOString()
-        }
-      }
-
-      return {
-        batchId: `google-individual-${Date.now()}`,
-        provider: 'google',
-        itemCount: items.length,
-        status: 'submitted',
-      }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err)
-      console.error(`[BatchCollector] Google fallback error: ${message}`)
-
-      for (const item of items) {
-        if (item.status === 'processing') {
-          item.status = 'failed'
-          item.error = message
-          item.completedAt = new Date().toISOString()
-        }
-      }
-
-      return { batchId: 'error', provider: 'google', itemCount: items.length, status: 'failed', error: message }
     }
   }
 

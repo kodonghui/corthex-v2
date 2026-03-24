@@ -906,16 +906,16 @@ phases:
       - id: epic-22
         title: "Production Foundation & Voyage AI Migration"
         priority: P0
-        status: backlog
+        status: in-progress
         dependencies: ["epic-21"]
         go_no_go: ["#10"]
         stories:
           - id: "22.1"
             title: "Dependency Verification & Version Pinning"
-            status: backlog
+            status: done
           - id: "22.2"
             title: "Voyage AI SDK Integration"
-            status: backlog
+            status: ready-for-dev
           - id: "22.3"
             title: "Vector Migration 768→1024"
             status: backlog

@@ -2,8 +2,8 @@ import { describe, test, expect, mock, beforeEach } from 'bun:test'
 
 // --- Mocks ---
 
-const mockGenerateEmbedding = mock(() =>
-  Promise.resolve(Array.from({ length: 768 }, (_, i) => i / 768)),
+const mockGetEmbedding = mock(() =>
+  Promise.resolve(Array.from({ length: 1024 }, (_, i) => i / 1024)),
 )
 
 const mockSearchSimilarDocs = mock(() =>
@@ -13,16 +13,8 @@ const mockSearchSimilarDocs = mock(() =>
   ]),
 )
 
-const mockGetCredentials = mock(() =>
-  Promise.resolve({ api_key: 'test-api-key' }),
-)
-
-mock.module('../../services/embedding-service', () => ({
-  generateEmbedding: (...args: any[]) => mockGenerateEmbedding(...args),
-}))
-
-mock.module('../../services/credential-vault', () => ({
-  getCredentials: (...args: any[]) => mockGetCredentials(...args),
+mock.module('../../services/voyage-embedding', () => ({
+  getEmbedding: (...args: any[]) => mockGetEmbedding(...args),
 }))
 
 mock.module('../../db/scoped-query', () => ({
@@ -34,22 +26,18 @@ mock.module('../../db/scoped-query', () => ({
 import { semanticSearch } from '../../services/semantic-search'
 
 beforeEach(() => {
-  mockGenerateEmbedding.mockClear()
+  mockGetEmbedding.mockClear()
   mockSearchSimilarDocs.mockClear()
-  mockGetCredentials.mockClear()
 
   // Reset to default implementations
-  mockGenerateEmbedding.mockImplementation(() =>
-    Promise.resolve(Array.from({ length: 768 }, (_, i) => i / 768)),
+  mockGetEmbedding.mockImplementation(() =>
+    Promise.resolve(Array.from({ length: 1024 }, (_, i) => i / 1024)),
   )
   mockSearchSimilarDocs.mockImplementation(() =>
     Promise.resolve([
       { id: 'doc-1', title: 'Test Doc 1', content: 'Content about investing', folderId: 'folder-1', tags: ['finance'], distance: 0.15 },
       { id: 'doc-2', title: 'Test Doc 2', content: 'Content about trading', folderId: 'folder-1', tags: ['trading'], distance: 0.35 },
     ]),
-  )
-  mockGetCredentials.mockImplementation(() =>
-    Promise.resolve({ api_key: 'test-api-key' }),
   )
 })
 
@@ -97,24 +85,8 @@ describe('semanticSearch', () => {
     )
   })
 
-  test('returns null when API key is missing', async () => {
-    mockGetCredentials.mockImplementation(() =>
-      Promise.resolve({} as any),
-    )
-    const results = await semanticSearch('company-1', 'test')
-    expect(results).toBeNull()
-  })
-
-  test('returns null when getCredentials throws', async () => {
-    mockGetCredentials.mockImplementation(() =>
-      Promise.reject(new Error('vault error')),
-    )
-    const results = await semanticSearch('company-1', 'test')
-    expect(results).toBeNull()
-  })
-
   test('returns null when embedding generation fails', async () => {
-    mockGenerateEmbedding.mockImplementation(() =>
+    mockGetEmbedding.mockImplementation(() =>
       Promise.resolve(null),
     )
     const results = await semanticSearch('company-1', 'test')
@@ -153,23 +125,14 @@ describe('semanticSearch', () => {
     expect(result).toHaveProperty('score')
   })
 
-  test('calls generateEmbedding with correct API key and query', async () => {
+  test('calls getEmbedding with correct companyId and query', async () => {
     await semanticSearch('company-1', 'AI 투자 전략')
-    expect(mockGenerateEmbedding).toHaveBeenCalledWith('test-api-key', 'AI 투자 전략')
+    expect(mockGetEmbedding).toHaveBeenCalledWith('company-1', 'AI 투자 전략')
   })
 
-  test('calls getCredentials with correct companyId and service', async () => {
+  test('calls getEmbedding with different companyIds', async () => {
     await semanticSearch('company-xyz', 'test')
-    expect(mockGetCredentials).toHaveBeenCalledWith('company-xyz', 'google_ai')
-  })
-
-  test('handles apiKey field name', async () => {
-    mockGetCredentials.mockImplementation(() =>
-      Promise.resolve({ apiKey: 'alt-key' }),
-    )
-    const results = await semanticSearch('company-1', 'test')
-    expect(results).not.toBeNull()
-    expect(mockGenerateEmbedding).toHaveBeenCalledWith('alt-key', 'test')
+    expect(mockGetEmbedding).toHaveBeenCalledWith('company-xyz', 'test')
   })
 })
 
@@ -242,12 +205,6 @@ describe('score conversion (distance → score)', () => {
 // ══════════════════════════════════════════════════════════
 
 describe('edge cases', () => {
-  test('empty credentials object returns null', async () => {
-    mockGetCredentials.mockImplementation(() => Promise.resolve({}))
-    const results = await semanticSearch('company-1', 'test')
-    expect(results).toBeNull()
-  })
-
   test('handles null content in results', async () => {
     mockSearchSimilarDocs.mockImplementation(() =>
       Promise.resolve([

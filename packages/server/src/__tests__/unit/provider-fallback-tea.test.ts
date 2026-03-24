@@ -126,13 +126,10 @@ describe('TEA: CircuitBreaker edge cases', () => {
     cb.recordFailure('anthropic') // open
     cb.recordFailure('openai')
     cb.recordFailure('openai') // still 2
-    cb.recordSuccess('google')
 
     expect(cb.isAvailable('anthropic')).toBe(false)
     expect(cb.isAvailable('openai')).toBe(true)
-    expect(cb.isAvailable('google')).toBe(true)
     expect(cb.getStatus().openai.consecutiveFailures).toBe(2)
-    expect(cb.getStatus().google.consecutiveFailures).toBe(0)
   })
 
   test('custom threshold: 1 failure opens circuit', () => {
@@ -173,11 +170,11 @@ describe('TEA: CircuitBreaker edge cases', () => {
 
 describe('TEA: getFallbackModels edge cases', () => {
   test('all models in catalog have valid provider', () => {
-    const models = ['claude-sonnet-4-6', 'claude-haiku-4-5', 'gpt-4.1', 'gpt-4.1-mini', 'gemini-2.5-pro', 'gemini-2.5-flash']
+    const models = ['claude-sonnet-4-6', 'claude-haiku-4-5', 'gpt-4.1', 'gpt-4.1-mini']
     for (const model of models) {
       const config = getModelConfig(model)
       expect(config).toBeDefined()
-      expect(['anthropic', 'openai', 'google']).toContain(config!.provider)
+      expect(['anthropic', 'openai']).toContain(config!.provider)
     }
   })
 
@@ -189,29 +186,27 @@ describe('TEA: getFallbackModels edge cases', () => {
     }
   })
 
-  test('fallback returns exactly 2 models (one per other provider)', () => {
-    expect(getFallbackModels('claude-sonnet-4-6').length).toBe(2)
-    expect(getFallbackModels('gpt-4.1').length).toBe(2)
-    expect(getFallbackModels('gemini-2.5-flash').length).toBe(2)
+  test('fallback returns exactly 1 model (one per other provider)', () => {
+    expect(getFallbackModels('claude-sonnet-4-6').length).toBe(1)
+    expect(getFallbackModels('gpt-4.1').length).toBe(1)
   })
 
   test('fallback chain follows fallbackOrder from models.yaml', () => {
-    // For anthropic model: next should be openai, then google
+    // For anthropic model: next should be openai
     const fb = getFallbackModels('claude-sonnet-4-6')
+    expect(fb.length).toBe(1)
     expect(getModelConfig(fb[0])!.provider).toBe('openai')
-    expect(getModelConfig(fb[1])!.provider).toBe('google')
   })
 
   test('manager-tier models are higher priced than worker-tier', () => {
-    const managerModels = getFallbackModels('claude-sonnet-4-6')
-    const workerModels = getFallbackModels('claude-haiku-4-5')
+    const managerFallbacks = getFallbackModels('claude-sonnet-4-6')
+    const workerFallbacks = getFallbackModels('claude-haiku-4-5')
 
-    for (const m of managerModels) {
-      expect(getModelConfig(m)!.inputPricePer1M).toBeGreaterThanOrEqual(1)
-    }
-    for (const m of workerModels) {
-      expect(getModelConfig(m)!.inputPricePer1M).toBeLessThan(1)
-    }
+    expect(managerFallbacks.length).toBe(1)
+    expect(workerFallbacks.length).toBe(1)
+
+    expect(getModelConfig(managerFallbacks[0])!.inputPricePer1M).toBeGreaterThanOrEqual(1)
+    expect(getModelConfig(workerFallbacks[0])!.inputPricePer1M).toBeLessThan(1)
   })
 })
 
@@ -237,8 +232,7 @@ describe('TEA: LLMRouter risk scenarios', () => {
     router = new LLMRouter(cb)
   })
 
-  test('credential failure on fallback provider: tries next', async () => {
-    let callCount = 0
+  test('credential failure on fallback provider: all providers fail', async () => {
     mockGetCredentials.mockImplementation((_cid: string, provider: string) => {
       if (provider === 'openai') return Promise.reject(new Error('No credentials'))
       return Promise.resolve({ api_key: 'key-123' })
@@ -248,17 +242,20 @@ describe('TEA: LLMRouter risk scenarios', () => {
       name: 'anthropic' as LLMProviderName,
       supportsBatch: true,
       call: mock(() => {
-        callCount++
-        if (callCount === 1) return Promise.reject(makeErr('server_error', 'anthropic'))
-        return Promise.resolve(makeResp('gemini-2.5-pro', 'google'))
+        return Promise.reject(makeErr('server_error', 'anthropic'))
       }),
       stream: mockAdapterStream,
       estimateCost: () => 0,
     }))
 
-    const result = await router.call(makeRequest('claude-sonnet-4-6'), ctx)
-    // Should skip openai (credential failure) and reach google
-    expect(result.content).toBe('OK from google')
+    // Anthropic fails with server_error, openai has no credentials → all providers fail
+    try {
+      await router.call(makeRequest('claude-sonnet-4-6'), ctx)
+      expect(true).toBe(false) // should not reach
+    } catch (err: any) {
+      expect(err.code).toBe('server_error')
+      expect(err.message).toContain('All providers failed')
+    }
   })
 
   test('unknown error code is treated as non-retryable', async () => {
@@ -305,7 +302,7 @@ describe('TEA: LLMRouter risk scenarios', () => {
 
   test('all circuits open: error mentions circuit breaker', async () => {
     // Open all circuits
-    for (const provider of ['anthropic', 'openai', 'google'] as LLMProviderName[]) {
+    for (const provider of ['anthropic', 'openai'] as LLMProviderName[]) {
       cb.recordFailure(provider)
       cb.recordFailure(provider)
       cb.recordFailure(provider)

@@ -46,32 +46,11 @@ mock.module('../../services/llm-router', () => ({
   resolveProvider: (modelId: string): LLMProviderName => {
     if (modelId.startsWith('claude-')) return 'anthropic'
     if (modelId.startsWith('gpt-')) return 'openai'
-    if (modelId.startsWith('gemini-')) return 'google'
     throw new Error(`Unknown model: ${modelId}`)
   },
   resolveModel: () => ({ model: 'claude-haiku-4-5', reason: 'tier-default' }),
   LLMRouter: class {},
   llmRouter: {},
-}))
-
-// Mock createProvider for Google fallback
-const mockGoogleCall = mock(async (req: LLMRequest) => ({
-  content: `Google response for ${req.model}`,
-  toolCalls: [],
-  usage: { inputTokens: 100, outputTokens: 50 },
-  model: req.model,
-  provider: 'google' as LLMProviderName,
-  finishReason: 'stop' as const,
-}))
-
-mock.module('../../lib/llm/index', () => ({
-  createProvider: (_name: string, _apiKey: string) => ({
-    name: 'google',
-    supportsBatch: false,
-    call: mockGoogleCall,
-    stream: async function* () {},
-    estimateCost: () => 0,
-  }),
 }))
 
 // Mock Anthropic SDK
@@ -173,7 +152,6 @@ describe('BatchCollector', () => {
   beforeEach(() => {
     collector = new BatchCollector()
     mockRecordCost.mockClear()
-    mockGoogleCall.mockClear()
     mockAnthropicBatchCreate.mockClear()
     mockAnthropicBatchRetrieve.mockClear()
     mockAnthropicBatchResults.mockClear()
@@ -286,15 +264,14 @@ describe('BatchCollector', () => {
 
       collector.enqueue(makeRequest('claude-haiku-4-5'), makeContext())
       collector.enqueue(makeRequest('gpt-4.1-mini'), makeContext())
-      collector.enqueue(makeRequest('gemini-2.5-flash'), makeContext())
 
       const results = await collector.flush('company-a')
 
-      // Should have 3 results (one per provider)
-      expect(results.length).toBe(3)
+      // Should have 2 results (one per provider)
+      expect(results.length).toBe(2)
 
       const providers = results.map(r => r.provider).sort()
-      expect(providers).toEqual(['anthropic', 'google', 'openai'])
+      expect(providers).toEqual(['anthropic', 'openai'])
     })
 
     test('returns empty for no pending items', async () => {
@@ -367,20 +344,6 @@ describe('BatchCollector', () => {
       expect(item.result?.usage.outputTokens).toBe(75)
     })
 
-    // === Task 7.9: Gemini falls back to individual calls ===
-    test('Gemini items fall back to individual LLM calls', async () => {
-      const item = collector.enqueue(makeRequest('gemini-2.5-flash'), makeContext())
-
-      const results = await collector.flush('company-a')
-
-      expect(mockGoogleCall).toHaveBeenCalled()
-      expect(results.some(r => r.provider === 'google')).toBe(true)
-
-      // Check item via reference (auto-cleanup removes from queue)
-      expect(item.status).toBe('completed')
-      expect(item.result?.provider).toBe('google')
-    })
-
     // === Task 7.10: marks items processing then completed/failed ===
     test('marks items as processing during flush', async () => {
       // We test by checking items change from pending -> processing -> completed
@@ -437,17 +400,6 @@ describe('BatchCollector', () => {
       expect(callArgs.outputTokens).toBe(200)
     })
 
-    // === Task 7.12: Google records cost WITHOUT batch discount ===
-    test('Google fallback records cost at full price (no batch discount)', async () => {
-      collector.enqueue(makeRequest('gemini-2.5-flash'), makeContext())
-
-      await collector.flush('company-a')
-
-      expect(mockRecordCost).toHaveBeenCalled()
-      const callArgs = (mockRecordCost.mock.calls as any[][])[0][0] as any
-      expect(callArgs.isBatch).toBe(false)
-      expect(callArgs.provider).toBe('google')
-    })
   })
 
   // === Task 7.14: clearCompleted ===
@@ -631,7 +583,6 @@ describe('BatchCollector TEA Risk Analysis', () => {
   beforeEach(() => {
     collector = new BatchCollector()
     mockRecordCost.mockClear()
-    mockGoogleCall.mockClear()
     mockAnthropicBatchCreate.mockClear()
     anthropicResultsData = []
     openaiOutputContent = ''
@@ -656,10 +607,9 @@ describe('BatchCollector TEA Risk Analysis', () => {
   })
 
   describe('multi-provider mixed flush', () => {
-    test('handles all 3 providers in single flush without interference', async () => {
+    test('handles both providers in single flush without interference', async () => {
       const anthropicItem = collector.enqueue(makeRequest('claude-haiku-4-5'), makeContext())
       const openaiItem = collector.enqueue(makeRequest('gpt-4.1-mini'), makeContext())
-      collector.enqueue(makeRequest('gemini-2.5-flash'), makeContext())
 
       anthropicResultsData = [{
         custom_id: anthropicItem.id,
@@ -685,9 +635,9 @@ describe('BatchCollector TEA Risk Analysis', () => {
       })
 
       const results = await collector.flush('company-a')
-      expect(results.length).toBe(3)
+      expect(results.length).toBe(2)
 
-      // All 3 items should be completed (check via reference, auto-cleanup removes from queue)
+      // Both items should be completed (check via reference, auto-cleanup removes from queue)
       expect(anthropicItem.status).toBe('completed')
       expect(openaiItem.status).toBe('completed')
     })
@@ -805,38 +755,6 @@ describe('BatchCollector TEA Risk Analysis', () => {
 
       const createArgs = (mockAnthropicBatchCreate.mock.calls as any[][])[0][0]
       expect(createArgs.requests[0].params.temperature).toBe(0.7)
-    })
-  })
-
-  describe('Google partial failure', () => {
-    test('some Google items succeed while others fail', async () => {
-      let callCount = 0
-      mockGoogleCall.mockImplementation(async (req: LLMRequest) => {
-        callCount++
-        if (callCount === 2) throw new Error('Google item 2 failed')
-        return {
-          content: 'OK',
-          toolCalls: [],
-          usage: { inputTokens: 100, outputTokens: 50 },
-          model: req.model,
-          provider: 'google' as LLMProviderName,
-          finishReason: 'stop' as const,
-        }
-      })
-
-      const g1 = collector.enqueue(makeRequest('gemini-2.5-flash'), makeContext())
-      const g2 = collector.enqueue(makeRequest('gemini-2.5-flash'), makeContext())
-      const g3 = collector.enqueue(makeRequest('gemini-2.5-flash'), makeContext())
-
-      await collector.flush('company-a')
-
-      // Check via references (auto-cleanup removes from queue)
-      const items = [g1, g2, g3]
-      const completed = items.filter(i => i.status === 'completed')
-      const failed = items.filter(i => i.status === 'failed')
-      expect(completed.length).toBe(2)
-      expect(failed.length).toBe(1)
-      expect(failed[0].error).toContain('Google item 2 failed')
     })
   })
 

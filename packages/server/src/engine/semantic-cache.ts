@@ -10,8 +10,7 @@
 
 import { createSessionLogger } from '../db/logger'
 import { getDB } from '../db/scoped-query'
-import { generateEmbedding, extractApiKey } from '../services/embedding-service'
-import { getCredentials } from '../services/credential-vault'
+import { getEmbedding } from '../services/voyage-embedding'
 import { scrubCredentials } from '../lib/credential-patterns'
 
 const SIMILARITY_THRESHOLD = 0.95
@@ -29,10 +28,7 @@ export async function checkSemanticCache(
   query: string,
 ): Promise<{ response: string; similarity: number } | null> {
   try {
-    const apiKey = await getGoogleApiKey(companyId)
-    if (!apiKey) return null
-
-    const embedding = await generateEmbedding(apiKey, query)
+    const embedding = await getEmbedding(companyId, query)
     if (!embedding) return null
 
     const result = await getDB(companyId).findSemanticCache(embedding, SIMILARITY_THRESHOLD)
@@ -54,10 +50,7 @@ export async function saveToSemanticCache(
   response: string,
 ): Promise<void> {
   try {
-    const apiKey = await getGoogleApiKey(companyId)
-    if (!apiKey) return
-
-    const embedding = await generateEmbedding(apiKey, query)
+    const embedding = await getEmbedding(companyId, query)
     if (!embedding) return
 
     // D20: callee-side credential scrubbing — DO NOT store raw response
@@ -72,19 +65,5 @@ export async function saveToSemanticCache(
   } catch (err) {
     log.warn({ event: 'semantic_cache_error', op: 'save', err }, 'Semantic cache save failed')
     // Silently ignore — NFR-CACHE-R2
-  }
-}
-
-async function getGoogleApiKey(companyId: string): Promise<string | null> {
-  try {
-    const credentials = await getCredentials(companyId, 'google_ai')
-    const apiKey = extractApiKey(credentials)
-    if (!apiKey) {
-      log.warn({ event: 'semantic_cache_error', op: 'embedding', reason: 'no_google_api_key', companyId })
-      return null
-    }
-    return apiKey
-  } catch {
-    return null
   }
 }

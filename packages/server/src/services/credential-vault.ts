@@ -11,6 +11,7 @@ export const PROVIDER_SCHEMAS: Record<string, string[]> = {
   anthropic: ['api_key'],
   openai: ['api_key'],
   google_ai: ['api_key'],
+  voyage_ai: ['api_key'],
   kis: ['app_key', 'app_secret', 'account_no'],
   smtp: ['host', 'port', 'user', 'password', 'from'],
   email: ['host', 'port', 'user', 'password', 'from'],

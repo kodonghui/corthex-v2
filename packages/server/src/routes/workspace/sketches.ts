@@ -10,7 +10,7 @@ import { HTTPError } from '../../middleware/error'
 import { logActivity } from '../../lib/activity-logger'
 import { parseMermaid } from '@corthex/shared'
 import { interpretCanvasCommand } from '../../services/canvas-ai'
-import { triggerEmbedding } from '../../services/embedding-service'
+import { triggerEmbedding } from '../../services/voyage-embedding'
 import { semanticSearch } from '../../services/semantic-search'
 import type { AppEnv } from '../../types'
 

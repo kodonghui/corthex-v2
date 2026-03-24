@@ -110,19 +110,12 @@ describe('TEA P0: searchSimilarDocs folderId array support', () => {
 // Section 2: semanticSearch folderIds option (P0)
 // ============================================================
 
-const mockGenerateEmbedding = mock(() => Promise.resolve([0.1, 0.2, 0.3]))
-const mockExtractApiKey = mock(() => 'test-key')
-const mockGetCredentials = mock(() => Promise.resolve({ value: 'test-key' }))
+const mockGetEmbedding = mock(() => Promise.resolve([0.1, 0.2, 0.3]))
 const mockSearchSimilarDocs = mock(() => Promise.resolve([]))
 
-mock.module('../../services/embedding-service', () => ({
-  generateEmbedding: mockGenerateEmbedding,
-  extractApiKey: mockExtractApiKey,
+mock.module('../../services/voyage-embedding', () => ({
+  getEmbedding: mockGetEmbedding,
   prepareText: mock((_t: string, c: string) => c),
-}))
-
-mock.module('../../services/credential-vault', () => ({
-  getCredentials: mockGetCredentials,
 }))
 
 mock.module('../../db/scoped-query', () => ({

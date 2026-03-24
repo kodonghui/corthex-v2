@@ -79,7 +79,7 @@ export class CircuitBreaker {
    */
   getStatus(): Record<LLMProviderName, CircuitBreakerStatus> {
     const result: Record<string, CircuitBreakerStatus> = {}
-    for (const provider of ['anthropic', 'openai', 'google'] as LLMProviderName[]) {
+    for (const provider of ['anthropic', 'openai'] as LLMProviderName[]) {
       const circuit = this.getCircuit(provider)
       result[provider] = {
         state: circuit.state,

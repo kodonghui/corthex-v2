@@ -164,17 +164,17 @@ describe('CircuitBreaker', () => {
 
   test('half-open -> closed on success', () => {
     const fastCb = new CircuitBreaker(3, 1)
-    fastCb.recordFailure('google')
-    fastCb.recordFailure('google')
-    fastCb.recordFailure('google')
+    fastCb.recordFailure('openai')
+    fastCb.recordFailure('openai')
+    fastCb.recordFailure('openai')
 
     const start = Date.now()
     while (Date.now() - start < 5) {}
 
-    expect(fastCb.isAvailable('google')).toBe(true) // transitions to half-open
-    fastCb.recordSuccess('google')
-    expect(fastCb.getStatus().google.state).toBe('closed')
-    expect(fastCb.getStatus().google.consecutiveFailures).toBe(0)
+    expect(fastCb.isAvailable('openai')).toBe(true) // transitions to half-open
+    fastCb.recordSuccess('openai')
+    expect(fastCb.getStatus().openai.state).toBe('closed')
+    expect(fastCb.getStatus().openai.consecutiveFailures).toBe(0)
   })
 
   test('half-open -> open on failure', () => {
@@ -207,12 +207,11 @@ describe('CircuitBreaker', () => {
     cb.recordFailure('anthropic')
     expect(cb.isAvailable('anthropic')).toBe(false)
     expect(cb.isAvailable('openai')).toBe(true)
-    expect(cb.isAvailable('google')).toBe(true)
   })
 
-  test('getStatus returns all three providers', () => {
+  test('getStatus returns all providers', () => {
     const status = cb.getStatus()
-    expect(Object.keys(status)).toEqual(['anthropic', 'openai', 'google'])
+    expect(Object.keys(status)).toEqual(['anthropic', 'openai'])
   })
 
   test('reset clears all circuits', () => {
@@ -230,34 +229,24 @@ describe('CircuitBreaker', () => {
 // =====================================================
 
 describe('getFallbackModels', () => {
-  test('manager-tier: claude-sonnet -> gpt-4.1 -> gemini-2.5-pro', () => {
+  test('manager-tier: claude-sonnet -> gpt-4.1', () => {
     const fallbacks = getFallbackModels('claude-sonnet-4-6')
-    expect(fallbacks).toEqual(['gpt-4.1', 'gemini-2.5-pro'])
+    expect(fallbacks).toEqual(['gpt-4.1'])
   })
 
-  test('specialist/worker-tier: claude-haiku -> gpt-4.1-mini -> gemini-2.5-flash', () => {
+  test('specialist/worker-tier: claude-haiku -> gpt-4.1-mini', () => {
     const fallbacks = getFallbackModels('claude-haiku-4-5')
-    expect(fallbacks).toEqual(['gpt-4.1-mini', 'gemini-2.5-flash'])
+    expect(fallbacks).toEqual(['gpt-4.1-mini'])
   })
 
-  test('openai manager-tier: gpt-4.1 -> claude-sonnet -> gemini-2.5-pro', () => {
+  test('openai manager-tier: gpt-4.1 -> claude-sonnet', () => {
     const fallbacks = getFallbackModels('gpt-4.1')
-    expect(fallbacks).toEqual(['claude-sonnet-4-6', 'gemini-2.5-pro'])
+    expect(fallbacks).toEqual(['claude-sonnet-4-6'])
   })
 
-  test('openai worker-tier: gpt-4.1-mini -> claude-haiku -> gemini-2.5-flash', () => {
+  test('openai worker-tier: gpt-4.1-mini -> claude-haiku', () => {
     const fallbacks = getFallbackModels('gpt-4.1-mini')
-    expect(fallbacks).toEqual(['claude-haiku-4-5', 'gemini-2.5-flash'])
-  })
-
-  test('google manager-tier: gemini-2.5-pro -> claude-sonnet -> gpt-4.1', () => {
-    const fallbacks = getFallbackModels('gemini-2.5-pro')
-    expect(fallbacks).toEqual(['claude-sonnet-4-6', 'gpt-4.1'])
-  })
-
-  test('google worker-tier: gemini-2.5-flash -> claude-haiku -> gpt-4.1-mini', () => {
-    const fallbacks = getFallbackModels('gemini-2.5-flash')
-    expect(fallbacks).toEqual(['claude-haiku-4-5', 'gpt-4.1-mini'])
+    expect(fallbacks).toEqual(['claude-haiku-4-5'])
   })
 
   test('unknown model returns empty', () => {
@@ -334,22 +323,26 @@ describe('LLMRouter fallback', () => {
     expect(auditCall.metadata.fallbackProvider).toBe('openai')
   })
 
-  test('call: providers A,B fail -> provider C succeeds', async () => {
+  test('call: both providers fail -> aggregated error', async () => {
     let callCount = 0
     mockCreateProvider.mockImplementation(() => ({
-      name: (['anthropic', 'openai', 'google'][Math.min(callCount, 2)]) as LLMProviderName,
+      name: (['anthropic', 'openai'][Math.min(callCount, 1)]) as LLMProviderName,
       supportsBatch: true,
       call: mock(() => {
         callCount++
-        if (callCount <= 2) return Promise.reject(makeRetryableError(callCount === 1 ? 'anthropic' : 'openai'))
-        return Promise.resolve(makeSuccessResponse('gemini-2.5-pro', 'google'))
+        return Promise.reject(makeRetryableError(callCount === 1 ? 'anthropic' : 'openai'))
       }),
       stream: mockAdapterStream,
       estimateCost: () => 0,
     }))
 
-    const result = await router.call(makeRequest('claude-sonnet-4-6'), baseContext)
-    expect(result.content).toBe('Response from google')
+    try {
+      await router.call(makeRequest('claude-sonnet-4-6'), baseContext)
+      expect(true).toBe(false) // should not reach
+    } catch (err: any) {
+      expect(err.code).toBe('server_error')
+      expect(err.message).toContain('All providers failed')
+    }
   })
 
   test('call: all providers fail -> aggregated error', async () => {
@@ -559,7 +552,6 @@ describe('LLMRouter fallback', () => {
     expect(status.anthropic.state).toBe('open')
     expect(status.anthropic.consecutiveFailures).toBe(3)
     expect(status.openai.state).toBe('closed')
-    expect(status.google.state).toBe('closed')
   })
 
   // --- Audit log tests ---

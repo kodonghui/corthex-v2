@@ -53,7 +53,7 @@ mock.module('../../lib/activity-logger', () => ({
 mock.module('../../services/canvas-ai', () => ({
   interpretCanvasCommand: mock(async () => ({ commandId: 'cmd1', mermaid: '', description: '' })),
 }))
-mock.module('../../services/embedding-service', () => ({
+mock.module('../../services/voyage-embedding', () => ({
   triggerEmbedding: mock(() => {}),
 }))
 mock.module('../../services/semantic-search', () => ({
@@ -205,7 +205,7 @@ describe('Story 11.4: Knowledge Integration', () => {
     })
 
     test('triggerEmbedding should be callable without blocking', () => {
-      const { triggerEmbedding } = require('../../services/embedding-service')
+      const { triggerEmbedding } = require('../../services/voyage-embedding')
       // Fire-and-forget — should not throw
       expect(() => triggerEmbedding('doc-1', 'company-1')).not.toThrow()
     })

@@ -169,12 +169,6 @@ describe('TEA P1: resolveModel edge cases', () => {
     }
   })
 
-  test('manager with gemini override returns gemini', () => {
-    const result = resolveModel({ tier: 'manager', modelName: 'gemini-2.5-pro' })
-    expect(result.model).toBe('gemini-2.5-pro')
-    expect(result.reason).toBe('manual-override')
-  })
-
   test('worker with sonnet override returns sonnet', () => {
     const result = resolveModel({ tier: 'worker', modelName: 'claude-sonnet-4-6' })
     expect(result.model).toBe('claude-sonnet-4-6')
@@ -200,9 +194,8 @@ describe('TEA P1: resolveProvider edge cases', () => {
     const models = [
       'claude-sonnet-4-6', 'claude-haiku-4-5',
       'gpt-4.1', 'gpt-4.1-mini',
-      'gemini-2.5-pro', 'gemini-2.5-flash',
     ]
-    const validProviders: LLMProviderName[] = ['anthropic', 'openai', 'google']
+    const validProviders: LLMProviderName[] = ['anthropic', 'openai']
 
     for (const model of models) {
       const provider = resolveProvider(model)
@@ -257,18 +250,11 @@ describe('TEA P1: Sequential multi-provider routing', () => {
       ctx(),
     )
 
-    // Call 3: google
-    await router.call(
-      { model: 'gemini-2.5-pro', messages: [{ role: 'user', content: 'c' }] },
-      ctx(),
-    )
-
-    // Verify all 3 providers were called with correct credential keys
+    // Verify both providers were called with correct credential keys
     const credCalls = mockGetCredentials.mock.calls
-    expect(credCalls).toHaveLength(3)
+    expect(credCalls).toHaveLength(2)
     expect(credCalls[0][1]).toBe('anthropic')
     expect(credCalls[1][1]).toBe('openai')
-    expect(credCalls[2][1]).toBe('google_ai')
   })
 
   test('each call creates a new adapter (no caching)', async () => {

@@ -6,8 +6,8 @@ import { describe, test, expect, mock, beforeEach } from 'bun:test'
 
 // --- Mocks for semantic-search service ---
 
-const mockGenerateEmbedding = mock(() =>
-  Promise.resolve(Array.from({ length: 768 }, (_, i) => i / 768)),
+const mockGetEmbedding = mock(() =>
+  Promise.resolve(Array.from({ length: 1024 }, (_, i) => i / 1024)),
 )
 
 const mockSearchSimilarDocs = mock(() =>
@@ -16,16 +16,8 @@ const mockSearchSimilarDocs = mock(() =>
   ]),
 )
 
-const mockGetCredentials = mock(() =>
-  Promise.resolve({ api_key: 'test-key' }),
-)
-
-mock.module('../../services/embedding-service', () => ({
-  generateEmbedding: (...args: any[]) => mockGenerateEmbedding(...args),
-}))
-
-mock.module('../../services/credential-vault', () => ({
-  getCredentials: (...args: any[]) => mockGetCredentials(...args),
+mock.module('../../services/voyage-embedding', () => ({
+  getEmbedding: (...args: any[]) => mockGetEmbedding(...args),
 }))
 
 mock.module('../../db/scoped-query', () => ({
@@ -38,20 +30,16 @@ import { semanticSearch } from '../../services/semantic-search'
 import type { SemanticSearchOptions, SemanticSearchResult } from '../../services/semantic-search'
 
 beforeEach(() => {
-  mockGenerateEmbedding.mockClear()
+  mockGetEmbedding.mockClear()
   mockSearchSimilarDocs.mockClear()
-  mockGetCredentials.mockClear()
 
-  mockGenerateEmbedding.mockImplementation(() =>
-    Promise.resolve(Array.from({ length: 768 }, (_, i) => i / 768)),
+  mockGetEmbedding.mockImplementation(() =>
+    Promise.resolve(Array.from({ length: 1024 }, (_, i) => i / 1024)),
   )
   mockSearchSimilarDocs.mockImplementation(() =>
     Promise.resolve([
       { id: 'sem-1', title: 'Semantic Result', content: 'Semantic content', folderId: 'f-1', tags: ['finance'], distance: 0.1 },
     ]),
-  )
-  mockGetCredentials.mockImplementation(() =>
-    Promise.resolve({ api_key: 'test-key' }),
   )
 })
 
@@ -121,26 +109,19 @@ describe('TEA: folderId filter passthrough', () => {
 })
 
 // ══════════════════════════════════════════════════════════
-// RISK AREA 3: Credential extraction edge cases
+// RISK AREA 3: Embedding failure edge cases
 // ══════════════════════════════════════════════════════════
 
-describe('TEA: credential extraction resilience', () => {
-  test('handles credentials with only arbitrary field name', async () => {
-    mockGetCredentials.mockImplementation(() =>
-      Promise.resolve({ my_custom_key_field: 'key-123' }),
-    )
+describe('TEA: embedding failure edge cases', () => {
+  test('returns null when getEmbedding returns null', async () => {
+    mockGetEmbedding.mockImplementation(() => Promise.resolve(null))
     const results = await semanticSearch('co-1', 'q')
-    // Should use Object.values()[0] fallback
-    expect(results).not.toBeNull()
-    expect(mockGenerateEmbedding).toHaveBeenCalledWith('key-123', 'q')
+    expect(results).toBeNull()
   })
 
-  test('handles credentials with multiple fields (api_key takes priority)', async () => {
-    mockGetCredentials.mockImplementation(() =>
-      Promise.resolve({ api_key: 'primary', apiKey: 'secondary', other: 'tertiary' }),
-    )
-    const results = await semanticSearch('co-1', 'q')
-    expect(mockGenerateEmbedding).toHaveBeenCalledWith('primary', 'q')
+  test('getEmbedding called with correct companyId', async () => {
+    await semanticSearch('co-1', 'q')
+    expect(mockGetEmbedding).toHaveBeenCalledWith('co-1', 'q')
   })
 })
 
@@ -149,30 +130,22 @@ describe('TEA: credential extraction resilience', () => {
 // ══════════════════════════════════════════════════════════
 
 describe('TEA: sequential call independence', () => {
-  test('consecutive calls with different companyIds use correct credentials', async () => {
-    const credentialsByCompany: Record<string, string> = {
-      'co-a': 'key-a',
-      'co-b': 'key-b',
-    }
-    mockGetCredentials.mockImplementation((companyId: string) =>
-      Promise.resolve({ api_key: credentialsByCompany[companyId] }),
-    )
-
+  test('consecutive calls with different companyIds pass correct companyId', async () => {
     await semanticSearch('co-a', 'query-a')
     await semanticSearch('co-b', 'query-b')
 
-    expect(mockGetCredentials.mock.calls[0][0]).toBe('co-a')
-    expect(mockGetCredentials.mock.calls[1][0]).toBe('co-b')
-    expect(mockGenerateEmbedding.mock.calls[0][0]).toBe('key-a')
-    expect(mockGenerateEmbedding.mock.calls[1][0]).toBe('key-b')
+    expect(mockGetEmbedding.mock.calls[0][0]).toBe('co-a')
+    expect(mockGetEmbedding.mock.calls[0][1]).toBe('query-a')
+    expect(mockGetEmbedding.mock.calls[1][0]).toBe('co-b')
+    expect(mockGetEmbedding.mock.calls[1][1]).toBe('query-b')
   })
 
   test('failed first call does not affect second call', async () => {
     let callCount = 0
-    mockGetCredentials.mockImplementation(() => {
+    mockGetEmbedding.mockImplementation(() => {
       callCount++
-      if (callCount === 1) return Promise.reject(new Error('transient'))
-      return Promise.resolve({ api_key: 'recovered-key' })
+      if (callCount === 1) return Promise.resolve(null)
+      return Promise.resolve(Array.from({ length: 1024 }, () => 0.1))
     })
 
     const r1 = await semanticSearch('co-1', 'q1')
@@ -249,17 +222,17 @@ describe('TEA: SemanticSearchResult interface contract', () => {
 describe('TEA: query text edge cases', () => {
   test('Korean text query passes through to embedding', async () => {
     await semanticSearch('co-1', '삼성전자 주가 분석 리포트')
-    expect(mockGenerateEmbedding).toHaveBeenCalledWith('test-key', '삼성전자 주가 분석 리포트')
+    expect(mockGetEmbedding).toHaveBeenCalledWith('co-1', '삼성전자 주가 분석 리포트')
   })
 
   test('very long query text passes through (embedding service handles truncation)', async () => {
     const longQuery = 'a'.repeat(20000)
     await semanticSearch('co-1', longQuery)
-    expect(mockGenerateEmbedding).toHaveBeenCalledWith('test-key', longQuery)
+    expect(mockGetEmbedding).toHaveBeenCalledWith('co-1', longQuery)
   })
 
   test('query with special characters is handled', async () => {
     await semanticSearch('co-1', 'SELECT * FROM docs; DROP TABLE--')
-    expect(mockGenerateEmbedding).toHaveBeenCalledWith('test-key', 'SELECT * FROM docs; DROP TABLE--')
+    expect(mockGetEmbedding).toHaveBeenCalledWith('co-1', 'SELECT * FROM docs; DROP TABLE--')
   })
 })

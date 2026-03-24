@@ -1,5 +1,4 @@
-import { generateEmbedding, extractApiKey } from './embedding-service'
-import { getCredentials } from './credential-vault'
+import { getEmbedding } from './voyage-embedding'
 import { getDB } from '../db/scoped-query'
 
 export interface SemanticSearchOptions {
@@ -19,7 +18,7 @@ export interface SemanticSearchResult {
 }
 
 /**
- * Perform semantic search: query text -> Gemini embedding -> pgvector cosine similarity.
+ * Perform semantic search: query text -> Voyage AI embedding -> pgvector cosine similarity.
  * Returns results sorted by relevance (highest score first).
  * Returns null if embedding generation fails (caller should fallback to keyword search).
  */
@@ -30,25 +29,9 @@ export async function semanticSearch(
 ): Promise<SemanticSearchResult[] | null> {
   const { topK = 5, threshold = 0.8, folderId, folderIds } = options
 
-  // Get API key
-  let apiKey: string | undefined
-  try {
-    const credentials = await getCredentials(companyId, 'google_ai')
-    apiKey = extractApiKey(credentials)
-  } catch {
-    console.warn({ companyId }, 'semantic search: failed to get credentials')
-    return null
-  }
-
-  if (!apiKey) {
-    console.warn({ companyId }, 'semantic search: no Google AI API key configured')
-    return null
-  }
-
-  // Generate query embedding
-  const queryEmbedding = await generateEmbedding(apiKey, query)
+  // Generate query embedding (credentials handled internally)
+  const queryEmbedding = await getEmbedding(companyId, query)
   if (!queryEmbedding) {
-    console.warn({ companyId }, 'semantic search: embedding generation failed')
     return null
   }
 

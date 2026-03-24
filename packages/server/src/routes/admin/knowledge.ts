@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
 import { tenantMiddleware } from '../../middleware/tenant'
-import { embedAllDocuments } from '../../services/embedding-service'
+import { embedAllDocuments } from '../../services/voyage-embedding'
 import type { AppEnv } from '../../types'
 
 export const adminKnowledgeRoute = new Hono<AppEnv>()

@@ -1,6 +1,6 @@
 /**
  * LLM Provider Adapters -- Unit Tests
- * Story 3-1: Claude/GPT/Gemini adapter + types + models.yaml + factory
+ * Story 3-1: Claude/GPT adapter + types + models.yaml + factory
  *
  * bun test src/__tests__/unit/llm-provider-adapters.test.ts
  */
@@ -8,7 +8,7 @@ import { describe, test, expect, beforeEach } from 'bun:test'
 
 // === 1. Shared Types Tests ===
 describe('LLM Shared Types', () => {
-  test('LLMProviderName type covers 3 providers', () => {
+  test('LLMProviderName type covers 3 providers (google kept for legacy DB compat)', () => {
     const providers: import('@corthex/shared').LLMProviderName[] = ['anthropic', 'openai', 'google']
     expect(providers).toHaveLength(3)
   })
@@ -125,16 +125,16 @@ describe('Models Config', () => {
     resetModelsCache()
   })
 
-  test('loadModelsConfig loads all 6 models', () => {
+  test('loadModelsConfig loads all 4 models', () => {
     const { loadModelsConfig } = require('../../config/models')
     const config = loadModelsConfig()
-    expect(config.models).toHaveLength(6)
+    expect(config.models).toHaveLength(4)
   })
 
   test('loadModelsConfig has correct fallback order', () => {
     const { loadModelsConfig } = require('../../config/models')
     const config = loadModelsConfig()
-    expect(config.fallbackOrder).toEqual(['anthropic', 'openai', 'google'])
+    expect(config.fallbackOrder).toEqual(['anthropic', 'openai'])
   })
 
   test('loadModelsConfig has correct tier defaults', () => {
@@ -177,14 +177,6 @@ describe('Models Config', () => {
     expect(models.map((m: any) => m.id)).toContain('gpt-4.1-mini')
   })
 
-  test('getModelsByProvider returns correct models for google', () => {
-    const { getModelsByProvider } = require('../../config/models')
-    const models = getModelsByProvider('google')
-    expect(models).toHaveLength(2)
-    expect(models.map((m: any) => m.id)).toContain('gemini-2.5-pro')
-    expect(models.map((m: any) => m.id)).toContain('gemini-2.5-flash')
-  })
-
   test('getTierDefaultModel returns correct defaults', () => {
     const { getTierDefaultModel } = require('../../config/models')
     expect(getTierDefaultModel('manager')).toBe('claude-sonnet-4-6')
@@ -197,10 +189,10 @@ describe('Models Config', () => {
     expect(getTierDefaultModel('intern')).toBe('claude-haiku-4-5')
   })
 
-  test('getFallbackOrder returns 3 providers in order', () => {
+  test('getFallbackOrder returns 2 providers in order', () => {
     const { getFallbackOrder } = require('../../config/models')
     const order = getFallbackOrder()
-    expect(order).toEqual(['anthropic', 'openai', 'google'])
+    expect(order).toEqual(['anthropic', 'openai'])
   })
 
   test('model pricing values are positive numbers', () => {
@@ -303,31 +295,6 @@ describe('OpenAIAdapter', () => {
   })
 })
 
-describe('GoogleAdapter', () => {
-  test('has correct name and supportsBatch', () => {
-    const { GoogleAdapter } = require('../../lib/llm/google')
-    const adapter = new GoogleAdapter('test-key')
-    expect(adapter.name).toBe('google')
-    expect(adapter.supportsBatch).toBe(false)
-  })
-
-  test('estimateCost for gemini-2.5-pro', () => {
-    const { GoogleAdapter } = require('../../lib/llm/google')
-    const adapter = new GoogleAdapter('test-key')
-    // 1000 * (1.25/1M) + 500 * (10/1M) = 0.00125 + 0.005 = 0.00625
-    const cost = adapter.estimateCost(1000, 500, 'gemini-2.5-pro')
-    expect(cost).toBeCloseTo(0.00625, 6)
-  })
-
-  test('estimateCost for gemini-2.5-flash', () => {
-    const { GoogleAdapter } = require('../../lib/llm/google')
-    const adapter = new GoogleAdapter('test-key')
-    // 1000 * (0.075/1M) + 500 * (0.3/1M) = 0.000075 + 0.00015 = 0.000225
-    const cost = adapter.estimateCost(1000, 500, 'gemini-2.5-flash')
-    expect(cost).toBeCloseTo(0.000225, 6)
-  })
-})
-
 // === 5. Factory Tests ===
 describe('createProvider factory', () => {
   test('creates AnthropicAdapter for "anthropic"', () => {
@@ -344,11 +311,9 @@ describe('createProvider factory', () => {
     expect(adapter.supportsBatch).toBe(true)
   })
 
-  test('creates GoogleAdapter for "google"', () => {
+  test('throws for "google" provider', () => {
     const { createProvider } = require('../../lib/llm')
-    const adapter = createProvider('google', 'test-key')
-    expect(adapter.name).toBe('google')
-    expect(adapter.supportsBatch).toBe(false)
+    expect(() => createProvider('google', 'test-key')).toThrow()
   })
 
   test('throws for unknown provider', () => {
@@ -389,22 +354,6 @@ describe('CostTracker (models.yaml integration)', () => {
     // output: (500/1M) * 1.6 * 1M = 800 micro
     const cost = calculateCostMicro('gpt-4.1-mini', 1000, 500)
     expect(cost).toBe(1200)
-  })
-
-  test('calculateCostMicro for gemini-2.5-pro (from models.yaml)', () => {
-    const { calculateCostMicro } = require('../../lib/cost-tracker')
-    // input: (1000/1M) * 1.25 * 1M = 1250 micro
-    // output: (500/1M) * 10 * 1M = 5000 micro
-    const cost = calculateCostMicro('gemini-2.5-pro', 1000, 500)
-    expect(cost).toBe(6250)
-  })
-
-  test('calculateCostMicro for gemini-2.5-flash (from models.yaml)', () => {
-    const { calculateCostMicro } = require('../../lib/cost-tracker')
-    // input: (1000/1M) * 0.075 * 1M = 75 micro
-    // output: (500/1M) * 0.3 * 1M = 150 micro
-    const cost = calculateCostMicro('gemini-2.5-flash', 1000, 500)
-    expect(cost).toBe(225)
   })
 
   test('calculateCostMicro for unknown model uses default pricing', () => {
@@ -457,14 +406,6 @@ describe('Error normalization', () => {
 
 // === 8. Models Config Edge Cases ===
 describe('Models Config edge cases', () => {
-  test('gemini models have supportsBatch = false', () => {
-    const { getModelsByProvider } = require('../../config/models')
-    const models = getModelsByProvider('google')
-    for (const model of models) {
-      expect(model.supportsBatch).toBe(false)
-    }
-  })
-
   test('anthropic and openai models have supportsBatch = true', () => {
     const { getModelsByProvider } = require('../../config/models')
     for (const provider of ['anthropic', 'openai']) {
