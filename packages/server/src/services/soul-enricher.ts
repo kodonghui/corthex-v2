@@ -40,11 +40,12 @@ export async function enrich(agentId: string, companyId: string): Promise<Enrich
     const traits = agent.personalityTraits as Record<string, unknown>
 
     // E12 Layer 1: Key Boundary — extract only allowed keys, ignore others
+    // E12 Layer 3: extraVars strip — control characters removed before renderSoul (Story 24.3, PER-1)
     const personalityVars: Record<string, string> = {}
     for (const key of PERSONALITY_KEYS) {
       const val = traits[key]
       if (typeof val === 'number' && Number.isInteger(val) && val >= 0 && val <= 100) {
-        personalityVars[`personality_${key}`] = String(val)
+        personalityVars[`personality_${key}`] = String(val).replace(/[\n\r\t\x00-\x1f]/g, '')
       }
     }
 
