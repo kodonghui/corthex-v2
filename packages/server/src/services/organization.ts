@@ -347,6 +347,7 @@ export async function createAgent(tenant: TenantActor, input: AgentInput) {
       adminSoul: soulValue,
       isSecretary: input.isSecretary ?? false,
       ownerUserId: input.ownerUserId ?? null,
+      personalityTraits: input.personalityTraits ?? null,
       status: 'offline',
     }))
     .returning()
