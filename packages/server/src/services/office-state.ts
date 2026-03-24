@@ -3,6 +3,59 @@ import type { AgentOfficeState, AgentOfficeStatus } from '@corthex/shared'
 // In-memory state per company: agentId → AgentOfficeState
 const companyStates = new Map<string, Map<string, AgentOfficeState>>()
 
+// Connection tracking for office WS
+const companyConnectionCounts = new Map<string, number>()
+let totalConnections = 0
+
+export const CONNECTION_LIMITS = {
+  maxPerCompany: 50,
+  maxTotal: 100,
+  heartbeatTimeoutMs: 60_000,
+} as const
+
+/** Check if a new office WS connection is allowed for a company */
+export function canAcceptConnection(companyId: string): { allowed: boolean; reason?: string } {
+  if (totalConnections >= CONNECTION_LIMITS.maxTotal) {
+    return { allowed: false, reason: 'Server connection limit reached' }
+  }
+  const companyCount = companyConnectionCounts.get(companyId) ?? 0
+  if (companyCount >= CONNECTION_LIMITS.maxPerCompany) {
+    return { allowed: false, reason: 'Company connection limit reached' }
+  }
+  return { allowed: true }
+}
+
+/** Register a new office WS connection */
+export function registerConnection(companyId: string): void {
+  companyConnectionCounts.set(companyId, (companyConnectionCounts.get(companyId) ?? 0) + 1)
+  totalConnections++
+}
+
+/** Unregister an office WS connection */
+export function unregisterConnection(companyId: string): void {
+  const count = companyConnectionCounts.get(companyId) ?? 0
+  if (count <= 1) {
+    companyConnectionCounts.delete(companyId)
+  } else {
+    companyConnectionCounts.set(companyId, count - 1)
+  }
+  totalConnections = Math.max(0, totalConnections - 1)
+}
+
+/** Get current connection counts (for monitoring) */
+export function getConnectionCounts(): { total: number; byCompany: Record<string, number> } {
+  return {
+    total: totalConnections,
+    byCompany: Object.fromEntries(companyConnectionCounts),
+  }
+}
+
+/** Reset connection tracking (for tests) */
+export function resetConnectionCounts(): void {
+  companyConnectionCounts.clear()
+  totalConnections = 0
+}
+
 /** Get all agent states for a company */
 export function getOfficeState(companyId: string): AgentOfficeState[] {
   const stateMap = companyStates.get(companyId)

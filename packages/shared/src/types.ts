@@ -538,7 +538,7 @@ export type OfficeWsOutbound =
   | { type: 'pong' }
 
 export type WsInboundMessage = {
-  type: 'subscribe' | 'unsubscribe'
+  type: 'subscribe' | 'unsubscribe' | 'ping'
   channel: WsChannel
   params?: Record<string, string>
 }

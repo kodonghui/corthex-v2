@@ -3,6 +3,12 @@ import { verify } from 'hono/jwt'
 import type { ServerWebSocket } from 'bun'
 import { handleSubscription } from './channels'
 import type { WsInboundMessage, UserRole } from '@corthex/shared'
+import {
+  canAcceptConnection,
+  registerConnection,
+  unregisterConnection,
+  CONNECTION_LIMITS,
+} from '../services/office-state'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'corthex-v2-dev-secret-change-in-production'
 
@@ -15,6 +21,7 @@ export type WsClient = {
   role: UserRole
   subscriptions: Set<string>
   connectedAt: Date
+  lastPingAt: Date
 }
 
 // userId → WsClient 배열 (최대 3개)
@@ -41,6 +48,13 @@ export const wsRoute = upgradeWebSocket(async (c) => {
         return
       }
 
+      // Check office connection limits
+      const check = canAcceptConnection(tenant.companyId)
+      if (!check.allowed) {
+        ws.close(4029, check.reason ?? 'Connection limit exceeded')
+        return
+      }
+
       const client: WsClient = {
         ws: ws.raw as ServerWebSocket<unknown>,
         userId: tenant.sub,
@@ -48,16 +62,19 @@ export const wsRoute = upgradeWebSocket(async (c) => {
         role: tenant.role,
         subscriptions: new Set(),
         connectedAt: new Date(),
+        lastPingAt: new Date(),
       }
 
-      // 최대 3개 연결 제한
+      // 최대 3개 연결 제한 (per user)
       const existing = clientMap.get(tenant.sub) ?? []
       if (existing.length >= 3) {
         const oldest = existing.shift()!
+        unregisterConnection(tenant.companyId)
         oldest.ws.close(4002, 'Connection limit exceeded')
       }
       existing.push(client)
       clientMap.set(tenant.sub, existing)
+      registerConnection(tenant.companyId)
 
       ws.send(JSON.stringify({ type: 'connected', userId: tenant.sub, companyId: tenant.companyId }))
     },
@@ -69,6 +86,13 @@ export const wsRoute = upgradeWebSocket(async (c) => {
         const clients = clientMap.get(tenant.sub) ?? []
         const client = clients.find((c) => c.ws === (ws.raw as ServerWebSocket<unknown>))
         if (!client) return
+
+        // Track last ping for heartbeat timeout
+        if (msg.type === 'ping') {
+          client.lastPingAt = new Date()
+          ws.send(JSON.stringify({ type: 'pong' }))
+          return
+        }
 
         if (msg.type === 'subscribe') {
           await handleSubscription(client, msg.channel, msg.params, ws)
@@ -88,6 +112,7 @@ export const wsRoute = upgradeWebSocket(async (c) => {
       const updated = clients.filter((c) => c.ws !== (ws.raw as ServerWebSocket<unknown>))
       if (updated.length === 0) clientMap.delete(tenant.sub)
       else clientMap.set(tenant.sub, updated)
+      unregisterConnection(tenant.companyId)
     },
   }
 })
@@ -105,6 +130,41 @@ export function broadcastServerRestart() {
     }
   }
   clientMap.clear()
+}
+
+/** Heartbeat checker — disconnect clients that haven't sent ping in 60s */
+let heartbeatTimer: ReturnType<typeof setInterval> | null = null
+
+export function startHeartbeatChecker(): void {
+  if (heartbeatTimer) return
+  heartbeatTimer = setInterval(() => {
+    const now = Date.now()
+    for (const [userId, clients] of clientMap) {
+      const stale = clients.filter(
+        (c) => now - c.lastPingAt.getTime() > CONNECTION_LIMITS.heartbeatTimeoutMs,
+      )
+      for (const client of stale) {
+        try {
+          unregisterConnection(client.companyId)
+          client.ws.close(4003, 'Heartbeat timeout')
+        } catch {
+          // Already closed
+        }
+      }
+      const remaining = clients.filter(
+        (c) => now - c.lastPingAt.getTime() <= CONNECTION_LIMITS.heartbeatTimeoutMs,
+      )
+      if (remaining.length === 0) clientMap.delete(userId)
+      else clientMap.set(userId, remaining)
+    }
+  }, 30_000)
+}
+
+export function stopHeartbeatChecker(): void {
+  if (heartbeatTimer) {
+    clearInterval(heartbeatTimer)
+    heartbeatTimer = null
+  }
 }
 
 export { clientMap }
