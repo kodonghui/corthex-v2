@@ -8,6 +8,7 @@
 
 export { runAgent, collectAgentResponse, getActiveSessions } from './agent-loop'
 export { renderSoul } from './soul-renderer'
-export { selectModel, selectModelFromDB } from './model-selector'
+export { selectModel, selectModelFromDB, selectModelWithCostPreference, REFLECTION_MODEL } from './model-selector'
+export type { CostPreference } from './model-selector'
 export { sseStream } from './sse-adapter'
-export type { SessionContext, SSEEvent, PreToolHookResult, Tool, RunAgentOptions, ToolCallContext, BuiltinToolHandler } from './types'
+export type { SessionContext, SSEEvent, PreToolHookResult, Tool, RunAgentOptions, ToolCallContext, BuiltinToolHandler, CallAgentResponse } from './types'

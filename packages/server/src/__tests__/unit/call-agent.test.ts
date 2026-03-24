@@ -17,7 +17,7 @@ async function* mockRunAgent() {
 
 mock.module('../../db/scoped-query', () => ({ getDB: mockGetDB }))
 mock.module('../../engine/soul-renderer', () => ({ renderSoul: mockRenderSoul }))
-mock.module('../../engine/agent-loop', () => ({ runAgent: mockRunAgent }))
+mock.module('../../engine/agent-loop', () => ({ runAgent: mockRunAgent, collectAgentResponse: mock(), getActiveSessions: mock() }))
 
 // Import AFTER mocking
 const { callAgent } = await import('../../tool-handlers/builtins/call-agent')
@@ -81,14 +81,19 @@ describe('callAgent', () => {
       depth: 1,
     })
 
-    // Remaining events: forwarded from child runAgent
+    // Remaining events: forwarded from child runAgent + AR73 structured response
     expect(events[1]).toEqual({ type: 'accepted', sessionId: 'session-1' })
     expect(events[2]).toEqual({ type: 'message', content: 'Research complete' })
     expect(events[3]).toEqual({ type: 'done', costUsd: 0.05, tokensUsed: 500 })
-    expect(events).toHaveLength(4)
+    // AR73: final structured response message
+    expect(events[4].type).toBe('message')
+    const ar73Result = JSON.parse((events[4] as { type: 'message'; content: string }).content.replace('[call_agent_result: ', '').replace(']', ''))
+    expect(ar73Result.status).toBe('success')
+    expect(ar73Result.delegatedTo).toBe('Researcher')
+    expect(events).toHaveLength(5)
 
-    // Verify renderSoul called with correct args
-    expect(mockRenderSoul).toHaveBeenCalledWith('You are a researcher', 'agent-2', 'company-1')
+    // Verify renderSoul called with correct args (includes empty extraVars from enricher)
+    expect(mockRenderSoul).toHaveBeenCalledWith('You are a researcher', 'agent-2', 'company-1', {})
     // Verify getDB called with companyId
     expect(mockGetDB).toHaveBeenCalledWith('company-1')
   })
@@ -168,10 +173,11 @@ describe('callAgent', () => {
     const ctx = makeCtx()
     const events = await collectEvents(callAgent(ctx, { targetAgentId: 'agent-4', message: 'test' }))
 
-    // Should still work — handoff + done
+    // Should still work — handoff + done + AR73 summary
     expect(events[0].type).toBe('handoff')
     expect(events[1]).toEqual({ type: 'done', costUsd: 0, tokensUsed: 0 })
-    expect(mockRenderSoul).toHaveBeenCalledWith('', 'agent-4', 'company-1')
+    expect(events[2].type).toBe('message') // AR73 structured response
+    expect(mockRenderSoul).toHaveBeenCalledWith('', 'agent-4', 'company-1', {})
   })
 
   test('handles agent with null soul gracefully', async () => {
@@ -183,7 +189,7 @@ describe('callAgent', () => {
     const events = await collectEvents(callAgent(ctx, { targetAgentId: 'agent-5', message: 'test' }))
 
     expect(events[0].type).toBe('handoff')
-    expect(mockRenderSoul).toHaveBeenCalledWith('', 'agent-5', 'company-1')
+    expect(mockRenderSoul).toHaveBeenCalledWith('', 'agent-5', 'company-1', {})
   })
 
   test('from is "unknown" when visitedAgents is empty', async () => {

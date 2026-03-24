@@ -3,7 +3,7 @@ import { ERROR_CODES } from '../lib/error-codes'
 import { createSessionLogger } from '../db/logger'
 import { getDB } from '../db/scoped-query'
 import { selectModel } from './model-selector'
-import type { SessionContext, SSEEvent, RunAgentOptions } from './types'
+import type { SessionContext, SSEEvent, RunAgentOptions, CallAgentResponse } from './types'
 import { toolPermissionGuard } from './hooks/tool-permission-guard'
 import { credentialScrubber, init as scrubberInit, release as scrubberRelease } from './hooks/credential-scrubber'
 import { mcpManager } from './mcp/mcp-manager'
@@ -229,12 +229,19 @@ export async function* runAgent(options: RunAgentOptions): AsyncGenerator<SSEEve
           continue
         }
 
-        // call_agent: emit handoff SSE event, return success result
+        // call_agent: emit handoff SSE event, return AR73 structured response
         if (block.name === 'call_agent') {
           const from = agentName
           const to = (toolInput.targetAgentId as string | undefined) || 'unknown'
+          const message = (toolInput.message as string | undefined) || ''
           pendingEvents.push({ type: 'handoff', from, to, depth: ctx.depth })
-          const callAgentOutput = JSON.stringify({ success: true, delegatedTo: to })
+          const response: CallAgentResponse = {
+            status: 'success',
+            summary: `작업이 ${to}에게 위임되었습니다.`,
+            delegatedTo: to,
+            next_actions: message ? [`${to}가 "${message.slice(0, 100)}" 처리 중`] : undefined,
+          }
+          const callAgentOutput = JSON.stringify(response)
           toolResults.push({
             type: 'tool_result',
             tool_use_id: block.id,

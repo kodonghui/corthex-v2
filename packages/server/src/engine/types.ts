@@ -85,3 +85,17 @@ export interface BuiltinToolHandler {
   schema: z.ZodObject<any>
   execute: (input: Record<string, unknown>, ctx: ToolCallContext) => Promise<string>
 }
+
+/**
+ * AR73: Standardized call_agent response format
+ *
+ * Returned as JSON tool_result to the calling model so it gets structured
+ * data about the child agent's execution outcome.
+ */
+export interface CallAgentResponse {
+  status: 'success' | 'failure' | 'partial'
+  summary: string
+  delegatedTo: string
+  next_actions?: string[]
+  artifacts?: object[]
+}
