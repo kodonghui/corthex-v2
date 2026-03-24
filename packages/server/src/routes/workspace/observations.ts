@@ -3,6 +3,7 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { getDB } from '../../db/scoped-query'
 import { authMiddleware } from '../../middleware/auth'
+import { sanitizeObservation } from '../../services/observation-sanitizer'
 import type { AppEnv } from '../../types'
 
 export const observationsRoute = new Hono<AppEnv>()
@@ -36,6 +37,28 @@ observationsRoute.post('/observations', zValidator('json', createObservationSche
   const tenant = c.get('tenant')
   const body = c.req.valid('json')
 
-  const [result] = await getDB(tenant.companyId).insertObservation(body)
+  // MEM-6 4-Layer sanitization (Story 28.2)
+  const sanitized = sanitizeObservation(body.content)
+  const [result] = await getDB(tenant.companyId).insertObservation({
+    ...body,
+    content: sanitized.content,
+    flagged: sanitized.flagged || body.flagged,
+  })
+
+  // Audit log for flagged observations (fire-and-forget)
+  if (sanitized.flagged) {
+    getDB(tenant.companyId).insertActivityLog({
+      eventId: crypto.randomUUID(),
+      type: 'system',
+      phase: 'error',
+      actorType: 'system',
+      actorName: 'observation-sanitizer',
+      action: 'observation_flagged',
+      detail: `Observation flagged — patterns: ${sanitized.matchedPatterns.join(', ')}`,
+      agentId: body.agentId,
+      metadata: { matchedPatterns: sanitized.matchedPatterns, truncated: sanitized.truncated },
+    }).catch(() => {})
+  }
+
   return c.json({ success: true, data: result }, 201)
 })

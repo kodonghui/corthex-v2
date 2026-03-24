@@ -13,6 +13,7 @@ import { delegationTracker } from './hooks/delegation-tracker'
 import { costTracker } from './hooks/cost-tracker'
 import type { UsageInfo } from './hooks/cost-tracker'
 import { checkSemanticCache, saveToSemanticCache } from './semantic-cache'
+import { sanitizeObservation } from '../services/observation-sanitizer'
 
 /** Log tool sanitize blocked event for audit visibility */
 async function logToolSanitizeEvent(
@@ -384,33 +385,64 @@ export async function* runAgent(options: RunAgentOptions): AsyncGenerator<SSEEve
     yield { type: 'done', costUsd, tokensUsed }
     log.info({ event: 'agent_done', data: { costUsd, tokensUsed } }, 'Agent completed')
 
-    // Auto-record observation (AR67 — fire-and-forget, MEM-6 Layer 1)
+    // Auto-record observation (AR67 — fire-and-forget, MEM-6 4-Layer sanitization)
     try {
+      const rawContent = fullResponseParts.join('')
+      const sanitized = sanitizeObservation(rawContent)
       await getDB(ctx.companyId).insertObservation({
         agentId: agentName,
         sessionId: ctx.sessionId,
-        content: fullResponseParts.join('').slice(0, 10240),
+        content: sanitized.content,
         domain: 'conversation',
         outcome: 'success',
         importance: 5,
         confidence: 0.5,
+        flagged: sanitized.flagged,
       })
+      if (sanitized.flagged) {
+        getDB(ctx.companyId).insertActivityLog({
+          eventId: crypto.randomUUID(),
+          type: 'system',
+          phase: 'error',
+          actorType: 'system',
+          actorName: 'observation-sanitizer',
+          action: 'observation_flagged',
+          detail: `Observation flagged — patterns: ${sanitized.matchedPatterns.join(', ')}`,
+          agentId: agentName,
+          metadata: { matchedPatterns: sanitized.matchedPatterns, truncated: sanitized.truncated },
+        }).catch(() => {})
+      }
     } catch { /* fire-and-forget — observation failure must not impact agent execution */ }
   } catch (err) {
     const errMessage = err instanceof Error ? err.message : 'Unknown error'
     log.error({ event: 'agent_error', data: { error: errMessage } }, 'Agent failed')
 
-    // Auto-record error observation (AR67 — fire-and-forget)
+    // Auto-record error observation (AR67 — fire-and-forget, MEM-6 4-Layer sanitization)
     try {
+      const sanitized = sanitizeObservation(`Error: ${errMessage}`)
       await getDB(ctx.companyId).insertObservation({
         agentId: agentName,
         sessionId: ctx.sessionId,
-        content: `Error: ${errMessage}`.slice(0, 10240),
+        content: sanitized.content,
         domain: 'error',
         outcome: 'failure',
         importance: 7,
         confidence: 0.8,
+        flagged: sanitized.flagged,
       })
+      if (sanitized.flagged) {
+        getDB(ctx.companyId).insertActivityLog({
+          eventId: crypto.randomUUID(),
+          type: 'system',
+          phase: 'error',
+          actorType: 'system',
+          actorName: 'observation-sanitizer',
+          action: 'observation_flagged',
+          detail: `Observation flagged — patterns: ${sanitized.matchedPatterns.join(', ')}`,
+          agentId: agentName,
+          metadata: { matchedPatterns: sanitized.matchedPatterns, truncated: sanitized.truncated },
+        }).catch(() => {})
+      }
     } catch { /* fire-and-forget */ }
 
     yield {

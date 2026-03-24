@@ -405,18 +405,18 @@ export function getDB(companyId: string) {
         flagged: data.flagged ?? false,
       }).returning({ id: observations.id }),
 
-    // READ — unreflected observations for reflection cron (Story 28.1)
+    // READ — unreflected observations for reflection cron (Story 28.1, 28.2: excludes flagged)
     getUnreflectedObservations: (agentId: string, limit = 50) =>
       db.select().from(observations)
-        .where(scopedWhere(observations.companyId, companyId, eq(observations.agentId, agentId), eq(observations.reflected, false)))
+        .where(scopedWhere(observations.companyId, companyId, eq(observations.agentId, agentId), eq(observations.reflected, false), eq(observations.flagged, false)))
         .orderBy(desc(observations.importance), desc(observations.createdAt))
         .limit(limit),
 
-    // READ — count unreflected observations (Story 28.1)
+    // READ — count unreflected observations (Story 28.1, 28.2: excludes flagged)
     countUnreflectedObservations: async (agentId: string): Promise<number> => {
       const [result] = await db.select({ count: sql<number>`count(*)::int` })
         .from(observations)
-        .where(scopedWhere(observations.companyId, companyId, eq(observations.agentId, agentId), eq(observations.reflected, false)))
+        .where(scopedWhere(observations.companyId, companyId, eq(observations.agentId, agentId), eq(observations.reflected, false), eq(observations.flagged, false)))
       return result?.count ?? 0
     },
 
