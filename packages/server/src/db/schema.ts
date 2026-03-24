@@ -1553,8 +1553,8 @@ export const knowledgeDocs = pgTable('knowledge_docs', {
   contentType: varchar('content_type', { length: 50 }).notNull().default('markdown'),
   fileUrl: text('file_url'),  // uploaded file reference
   tags: jsonb('tags').$type<string[]>().default([]),
-  embedding: vector('embedding', { dimensions: 768 }),  // pgvector: Gemini Embedding 768-dim, NULL = not yet embedded
-  embeddingModel: varchar('embedding_model', { length: 50 }),  // e.g. 'gemini-embedding-001'
+  embedding: vector('embedding', { dimensions: 1024 }),  // pgvector: Voyage AI voyage-3 1024-dim, NULL = not yet embedded
+  embeddingModel: varchar('embedding_model', { length: 50 }),  // e.g. 'voyage-3'
   embeddedAt: timestamp('embedded_at'),  // last embedding timestamp
   linkedSketchId: uuid('linked_sketch_id'),  // FK to sketches — linked canvas (Story 11.4)
   createdBy: uuid('created_by').notNull().references(() => users.id),
@@ -1885,7 +1885,7 @@ export const semanticCache = pgTable('semantic_cache', {
   id: uuid('id').primaryKey().defaultRandom(),
   companyId: uuid('company_id').notNull(),
   queryText: text('query_text').notNull(),
-  queryEmbedding: vector('query_embedding', { dimensions: 768 }).notNull(),
+  queryEmbedding: vector('query_embedding', { dimensions: 1024 }).notNull(),  // Voyage AI voyage-3 1024-dim
   response: text('response').notNull(),
   ttlHours: integer('ttl_hours').notNull().default(24),
   createdAt: timestamp('created_at').notNull().defaultNow(),
