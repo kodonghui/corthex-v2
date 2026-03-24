@@ -36,6 +36,7 @@ const AgentsPage = lazy(() => import('./pages/agents').then((m) => ({ default: m
 const TiersPage = lazy(() => import('./pages/tiers').then((m) => ({ default: m.TiersPage })))
 const OnboardingPage = lazy(() => import('./pages/onboarding').then((m) => ({ default: m.OnboardingPage })))
 const N8nWorkflowsPage = lazy(() => import('./pages/n8n-workflows').then((m) => ({ default: m.N8nWorkflowsPage })))
+const MarketingPipelinePage = lazy(() => import('./pages/marketing-pipeline').then((m) => ({ default: m.MarketingPipelinePage })))
 
 const queryClient = new QueryClient()
 
@@ -126,6 +127,7 @@ export function App() {
             <Route path="tiers" element={<Suspense fallback={<PageSkeleton />}><TiersPage /></Suspense>} />
             <Route path="workflows" element={<Navigate to="/n8n-workflows" replace />} />
             <Route path="n8n-workflows" element={<Suspense fallback={<PageSkeleton />}><N8nWorkflowsPage /></Suspense>} />
+            <Route path="marketing-pipeline" element={<Suspense fallback={<PageSkeleton />}><MarketingPipelinePage /></Suspense>} />
             <Route path="settings" element={<Suspense fallback={<PageSkeleton />}><SettingsPage /></Suspense>} />
           </Route>
         </Routes>

@@ -71,6 +71,7 @@ import { nexusLayoutRoute } from './routes/admin/nexus-layout'
 import { adminAgentReportsRoute } from './routes/admin/agent-reports'
 import { adminMcpServersRoute } from './routes/admin/mcp-servers'
 import { n8nProxyRoute } from './routes/admin/n8n-proxy'
+import { n8nPresetsRoute } from './routes/admin/n8n-presets'
 import { publicApiV1Route } from './routes/public-api/v1'
 import { superAdminCompaniesRoute } from './routes/super-admin/companies'
 
@@ -184,6 +185,8 @@ app.route('/api/admin', adminMcpServersRoute)
 
 // n8n reverse proxy (AR35, FR-N8N1, FR-N8N6)
 app.route('/api/admin', n8nProxyRoute)
+// n8n preset workflows (AR40, FR-MKT2)
+app.route('/api/admin', n8nPresetsRoute)
 
 // 유저 워크스페이스 라우트 (각 파일 내부에서 authMiddleware 적용, 테넌트 격리)
 app.route('/api/workspace', workspaceAgentsRoute)

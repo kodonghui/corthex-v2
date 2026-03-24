@@ -6,7 +6,7 @@ import { api } from '../lib/api'
 import {
   LayoutDashboard, Terminal, MessageSquare, TrendingUp, Users,
   Clock, FileText, FolderOpen, Network, Building2, Bot, Layers, Share2,
-  Send, DollarSign, History, Shield, Lock, BookOpen,
+  Send, DollarSign, History, Shield, Lock, BookOpen, GitBranch,
   Settings, BarChart3, Hexagon,
 } from 'lucide-react'
 
@@ -41,6 +41,7 @@ const navSections: NavSection[] = [
     label: 'TOOLS',
     items: [
       { to: '/n8n-workflows', label: '워크플로우', icon: Hexagon },
+      { to: '/marketing-pipeline', label: '마케팅 파이프라인', icon: GitBranch },
       { to: '/sns', label: 'SNS', icon: Share2 },
       { to: '/trading', label: '전략실', icon: TrendingUp },
       { to: '/messenger', label: '메신저', icon: Send },

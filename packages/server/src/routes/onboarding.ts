@@ -11,6 +11,7 @@ import {
   selectOnboardingTemplate,
   completeOnboarding,
 } from '../services/onboarding'
+import { listPresets } from '../services/n8n-preset-workflows'
 
 export const onboardingRoute = new Hono<AppEnv>()
 
@@ -52,6 +53,12 @@ onboardingRoute.post(
     return c.json({ success: true, data: result.data }, 201)
   },
 )
+
+// GET /api/onboarding/marketing-presets — FR-MKT5: marketing template suggestion during onboarding
+onboardingRoute.get('/onboarding/marketing-presets', (c) => {
+  const presets = listPresets()
+  return c.json({ success: true, data: presets })
+})
 
 // POST /api/onboarding/complete — mark onboarding as done
 onboardingRoute.post('/onboarding/complete', async (c) => {

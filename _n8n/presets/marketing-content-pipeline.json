@@ -1,0 +1,65 @@
+{
+  "name": "마케팅 콘텐츠 자동 생성 파이프라인",
+  "description": "주제 입력 → AI 리서치 → 카드뉴스 + 숏폼 동시 생성 → 사람 승인 → 멀티 플랫폼 게시",
+  "version": "1.0.0",
+  "presetId": "marketing-content-pipeline",
+  "stages": [
+    {
+      "id": "topic-input",
+      "name": "주제 입력",
+      "type": "trigger",
+      "description": "마케팅 주제/키워드 입력 (Webhook 또는 수동 트리거)",
+      "n8nNodeType": "n8n-nodes-base.webhook",
+      "position": [0, 0],
+      "next": ["ai-research"]
+    },
+    {
+      "id": "ai-research",
+      "name": "AI 리서치",
+      "type": "processing",
+      "description": "주제에 대한 트렌드/경쟁사/키워드 조사 (Claude API)",
+      "n8nNodeType": "n8n-nodes-base.httpRequest",
+      "position": [250, 0],
+      "next": ["card-news", "short-form"]
+    },
+    {
+      "id": "card-news",
+      "name": "카드뉴스 생성",
+      "type": "processing",
+      "description": "5장 캐러셀 + 캡션 생성 (Image AI Engine)",
+      "n8nNodeType": "n8n-nodes-base.httpRequest",
+      "position": [500, -100],
+      "next": ["human-approval"]
+    },
+    {
+      "id": "short-form",
+      "name": "숏폼 영상 생성",
+      "type": "processing",
+      "description": "15~60초 숏폼 영상 생성 (Video AI Engine)",
+      "n8nNodeType": "n8n-nodes-base.httpRequest",
+      "position": [500, 100],
+      "next": ["human-approval"]
+    },
+    {
+      "id": "human-approval",
+      "name": "사람 승인",
+      "type": "approval",
+      "description": "CEO/Admin이 생성된 콘텐츠 검토 후 승인/거절",
+      "n8nNodeType": "n8n-nodes-base.wait",
+      "position": [750, 0],
+      "next": ["multi-platform-post"]
+    },
+    {
+      "id": "multi-platform-post",
+      "name": "멀티 플랫폼 게시",
+      "type": "output",
+      "description": "승인된 콘텐츠를 Instagram/TikTok/YouTube Shorts/LinkedIn/X에 동시 게시",
+      "n8nNodeType": "n8n-nodes-base.splitInBatches",
+      "position": [1000, 0],
+      "next": []
+    }
+  ],
+  "platforms": ["instagram", "tiktok", "youtube_shorts", "linkedin", "x"],
+  "requiredEngines": ["image", "video"],
+  "optionalEngines": ["narration", "subtitles"]
+}
