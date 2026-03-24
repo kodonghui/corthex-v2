@@ -112,7 +112,7 @@ describe('Story 22.1: Dependency Verification & Version Pinning', () => {
     const exactPinDeps: [string, string][] = [
       ['@anthropic-ai/sdk', '0.78.0'],
       ['@anthropic-ai/claude-agent-sdk', '0.2.72'],
-      ['hono', '4.12.3'],
+      ['hono', '4.12.9'],
       ['drizzle-orm', '0.39.3'],
       ['postgres', '3.4.8'],
       ['@neondatabase/serverless', '1.0.2'],
@@ -186,7 +186,7 @@ describe('Story 22.1 TEA: Extended Verification (Quinn)', () => {
     })
 
     test('bun.lock contains pinned package resolutions', () => {
-      expect(lockContent).toContain('"hono@4.12.3"')
+      expect(lockContent).toContain('"hono@4.12.9"')
       expect(lockContent).toContain('"drizzle-orm@0.39.3"')
       expect(lockContent).toContain('"postgres@3.4.8"')
     })

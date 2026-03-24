@@ -163,6 +163,7 @@ export const agents = pgTable('agents', {
   allowedTools: jsonb('allowed_tools').default([]),  // string[] — 허용 도구 이름 목록
   autoLearn: boolean('auto_learn').notNull().default(true),  // 자동 학습 메모리 추출 on/off
   enableSemanticCache: boolean('enable_semantic_cache').notNull().default(false),  // Story 15.3: semantic caching
+  personalityTraits: jsonb('personality_traits'),  // Story 24.1: Big Five OCEAN (0-100 each), NULL = no personality
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),

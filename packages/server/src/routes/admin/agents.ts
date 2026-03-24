@@ -19,6 +19,16 @@ export const agentsRoute = new Hono<AppEnv>()
 
 agentsRoute.use('*', authMiddleware, adminOnly, tenantMiddleware)
 
+// Story 24.1: Big Five personality traits (OCEAN model, 0-100 each)
+// D33 suggests z.record() but z.object().strict() is superior — enforces exact key names, not just value types
+const personalityTraitsSchema = z.object({
+  openness: z.number().int().min(0).max(100),
+  conscientiousness: z.number().int().min(0).max(100),
+  extraversion: z.number().int().min(0).max(100),
+  agreeableness: z.number().int().min(0).max(100),
+  neuroticism: z.number().int().min(0).max(100),
+}).strict()
+
 const createAgentSchema = z.object({
   userId: z.string().uuid().nullable().optional(),
   departmentId: z.string().uuid().nullable().optional(),
@@ -32,6 +42,7 @@ const createAgentSchema = z.object({
   soul: z.string().nullable().optional(),
   isSecretary: z.boolean().optional(),
   ownerUserId: z.string().uuid().nullable().optional(),
+  personalityTraits: personalityTraitsSchema.nullable().optional(),
 })
 
 const updateAgentSchema = z.object({
@@ -49,6 +60,7 @@ const updateAgentSchema = z.object({
   isSecretary: z.boolean().optional(),
   ownerUserId: z.string().uuid().nullable().optional(),
   enableSemanticCache: z.boolean().optional(),
+  personalityTraits: personalityTraitsSchema.nullable().optional(),  // full replacement only, no partial merge
 })
 
 const soulPreviewSchema = z.object({
@@ -66,7 +78,12 @@ agentsRoute.get('/agents', async (c) => {
   if (isActiveParam !== undefined) filters.isActive = isActiveParam === 'true'
 
   const result = await getAgents(tenant.companyId, Object.keys(filters).length > 0 ? filters : undefined)
-  return c.json({ success: true, data: result })
+  // AR31: NULL personality_traits → empty object
+  const data = result.map((a: Record<string, unknown>) => ({
+    ...a,
+    personalityTraits: a.personalityTraits ?? {},
+  }))
+  return c.json({ success: true, data })
 })
 
 // GET /api/admin/agents/:id -- single agent by ID
@@ -90,7 +107,8 @@ agentsRoute.get('/agents/:id', async (c) => {
     }
   }
 
-  return c.json({ success: true, data: { ...agent, semanticCacheRecommendation } })
+  // AR31: NULL personality_traits → empty object
+  return c.json({ success: true, data: { ...agent, personalityTraits: agent.personalityTraits ?? {}, semanticCacheRecommendation } })
 })
 
 // POST /api/admin/agents
@@ -99,7 +117,9 @@ agentsRoute.post('/agents', zValidator('json', createAgentSchema), async (c) => 
   const body = c.req.valid('json')
   const result = await createAgent(tenant, body)
   if ('error' in result) throw new HTTPError(result.error!.status, result.error!.message, result.error!.code)
-  return c.json({ success: true, data: result.data }, 201)
+  // AR31: NULL personality_traits → empty object
+  const data = { ...result.data, personalityTraits: (result.data as Record<string, unknown>).personalityTraits ?? {} }
+  return c.json({ success: true, data }, 201)
 })
 
 // PATCH /api/admin/agents/:id
@@ -109,7 +129,9 @@ agentsRoute.patch('/agents/:id', zValidator('json', updateAgentSchema), async (c
   const body = c.req.valid('json')
   const result = await updateAgent(tenant, id, body)
   if ('error' in result) throw new HTTPError(result.error!.status, result.error!.message, result.error!.code)
-  return c.json({ success: true, data: result.data })
+  // AR31: NULL personality_traits → empty object
+  const data = { ...result.data, personalityTraits: (result.data as Record<string, unknown>).personalityTraits ?? {} }
+  return c.json({ success: true, data })
 })
 
 // DELETE /api/admin/agents/:id?force=true -- soft deactivation (not hard delete)

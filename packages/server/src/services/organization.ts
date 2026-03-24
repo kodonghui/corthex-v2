@@ -35,6 +35,7 @@ export interface AgentInput {
   soul?: string | null
   isSecretary?: boolean
   ownerUserId?: string | null
+  personalityTraits?: Record<string, number> | null
 }
 
 export interface AgentUpdateInput {
@@ -52,6 +53,7 @@ export interface AgentUpdateInput {
   isSecretary?: boolean
   ownerUserId?: string | null
   enableSemanticCache?: boolean
+  personalityTraits?: Record<string, number> | null
 }
 
 export interface TenantActor {
