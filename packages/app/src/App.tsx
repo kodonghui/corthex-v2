@@ -39,6 +39,7 @@ const N8nWorkflowsPage = lazy(() => import('./pages/n8n-workflows').then((m) => 
 const MarketingPipelinePage = lazy(() => import('./pages/marketing-pipeline').then((m) => ({ default: m.MarketingPipelinePage })))
 const MarketingApprovalPage = lazy(() => import('./pages/marketing-approval').then((m) => ({ default: m.MarketingApprovalPage })))
 const MemoriesPage = lazy(() => import('./pages/memories').then((m) => ({ default: m.MemoriesPage })))
+const OrganizationPage = lazy(() => import('./pages/organization').then((m) => ({ default: m.OrganizationPage })))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -112,8 +113,9 @@ export function App() {
             <Route path="hub" element={<SuspensePage><HubPage /></SuspensePage>} />
             <Route path="dashboard" element={<SuspensePage><DashboardPage /></SuspensePage>} />
 
-            {/* ═══ GROUP 2: Workspace (chat, agents, departments, tiers) ═══ */}
+            {/* ═══ GROUP 2: Workspace (chat, organization, agents, departments, tiers) ═══ */}
             <Route path="chat" element={<SuspensePage><ChatPage /></SuspensePage>} />
+            <Route path="organization" element={<SuspensePage><OrganizationPage /></SuspensePage>} />
             <Route path="agents" element={<SuspensePage><AgentsPage /></SuspensePage>} />
             <Route path="departments" element={<SuspensePage><DepartmentsPage /></SuspensePage>} />
             <Route path="tiers" element={<SuspensePage><TiersPage /></SuspensePage>} />
@@ -149,7 +151,7 @@ export function App() {
 
             {/* ═══ REDIRECTS: Legacy paths → canonical paths ═══ */}
             <Route path="command-center" element={<Navigate to="/hub" replace />} />
-            <Route path="org" element={<Navigate to="/nexus" replace />} />
+            <Route path="org" element={<Navigate to="/organization" replace />} />
             <Route path="cron" element={<Navigate to="/jobs" replace />} />
             <Route path="argos" element={<Navigate to="/jobs" replace />} />
             <Route path="workflows" element={<Navigate to="/n8n-workflows" replace />} />
