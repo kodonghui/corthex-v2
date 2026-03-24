@@ -467,13 +467,13 @@ This document provides the complete epic and story breakdown for CORTHEX v3 "Ope
 
 - **UXR1**: 4-breakpoint system: sm(<640px), md(640-1023px), lg(1024-1439px), xl(>=1440px). Custom Tailwind v4 breakpoints
 - **UXR2**: Mobile (sm): single column, bottom tab bar (5 items), card stack. PixiJS disabled
-- **UXR3**: Tablet (md): single column, collapsible sidebar (56px/240px), hamburger nav. PixiJS disabled
-- **UXR4**: Desktop (lg): fixed sidebar 240px, 2-column grid, PixiJS 30fps
-- **UXR5**: Wide (xl): fixed sidebar 240px, 3-column grid, max-width 1440px, PixiJS 60fps, 3-pane layout
+- **UXR3**: Tablet (md): single column, collapsible sidebar (56px/280px), hamburger nav. PixiJS disabled
+- **UXR4**: Desktop (lg): fixed sidebar 280px, 2-column grid, PixiJS 30fps
+- **UXR5**: Wide (xl): fixed sidebar 280px, 3-column grid, max-width 1440px, PixiJS 60fps, 3-pane layout
 - **UXR6**: FPS transition lg(30fps)/xl(60fps): 500ms debounce, matchMedia listener
 - **UXR7**: Desktop-first SPA, mobile-first CSS (min-width). max-width prohibited
 - **UXR8**: Mobile bottom nav: cream bg + top border, 56px, 5 tabs
-- **UXR9**: Mobile sidebar = overlay drawer with backdrop blur. Desktop sidebar = permanent 240px
+- **UXR9**: Mobile sidebar = overlay drawer with backdrop blur. Desktop sidebar = permanent 280px
 - **UXR10**: Tables: desktop=full, tablet=scroll/card toggle, mobile=card list
 - **UXR11**: Big Five sliders mobile: vertical-stacked full-width
 - **UXR12**: NEXUS mobile: read-only only
@@ -482,7 +482,7 @@ This document provides the complete epic and story breakdown for CORTHEX v3 "Ope
 
 ##### App Shell & Layout (UXR15-UXR18)
 
-- **UXR15**: App shell: Sidebar(240px, olive #283618) + Topbar(56px, cream) + Content(fluid, cream, max-width 1440px, padding 32px)
+- **UXR15**: App shell: Sidebar(280px, olive #283618) + Topbar(56px, cream) + Content(fluid, cream, max-width 1440px, padding 32px)
 - **UXR16**: 7 layout types: Dashboard (auto-fit grid), Master-Detail (280px list + flex-1), Canvas (full-bleed), CRUD (single-col max-width), Tabbed (tabs+content), Panels (2x2 grid), Feed (720px centered)
 - **UXR17**: React Router v7, React.lazy code splitting. No page transition animations
 - **UXR18**: Content max-width Pre-Sprint decision: 1440px vs 1280px
@@ -664,7 +664,7 @@ This document provides the complete epic and story breakdown for CORTHEX v3 "Ope
 
 ##### Miscellaneous (UXR134-UXR140)
 
-- **UXR134**: Sidebar width: 240px (standardized). Master-detail list width: 280px (Korean text accommodation)
+- **UXR134**: Sidebar width: 280px (standardized, matches --sidebar-width design token). Master-detail list width: 280px (Korean text accommodation)
 - **UXR135**: Re-education: `?` icon guide per page, Settings > "Replay tutorial", Hub "Help" widget
 - **UXR136**: Agent personality comparison: before/after sample response A/B preview
 - **UXR137**: Chat misroute reporting: 1-click "Report wrong routing". 3+ triggers Admin notification
@@ -1504,8 +1504,8 @@ So that navigation is effortless on desktop, tablet, and mobile.
 
 **Given** the current app shell uses v2 dark theme layout
 **When** the app shell is rebuilt with Natural Organic theme
-**Then** desktop: fixed sidebar 240px (olive #283618) + topbar 56px (cream) + content (fluid, cream, max-width 1440px, padding 32px) (UXR15)
-**And** tablet (md): collapsible sidebar 56px/240px with hamburger toggle (UXR3)
+**Then** desktop: fixed sidebar 280px (olive #283618) + topbar 56px (cream) + content (fluid, cream, max-width 1440px, padding 32px) (UXR15)
+**And** tablet (md): collapsible sidebar 56px/280px with hamburger toggle (UXR3)
 **And** mobile (sm): sidebar hidden, bottom tab bar (cream bg + top border, 56px, 5 tabs) (UXR2, UXR8)
 **And** mobile sidebar = overlay drawer with backdrop blur (UXR9)
 **And** sidebar has `role="navigation"` (UXR46)
@@ -1708,12 +1708,17 @@ So that I can get my AI organization running quickly.
 
 **Given** a new user completes registration
 **When** they enter the CEO app for the first time
-**Then** onboarding wizard guides through: company info → CLI token → create default org (FR60)
-**And** CLI token validity auto-verified on input (FR59)
-**And** "Create Default AI Organization" one-click option creates Chief of Staff + default departments
+**Then** onboarding wizard renders with 4 steps: (1) Company Info → (2) CLI Token → (3) Default Org → (4) Complete
+**And** step indicator shows current/total progress (e.g., "2/4")
+**And** Step 1: company name + industry input, validation on blur, "다음" button disabled until valid
+**And** Step 2: CLI token paste field with auto-verification via `/api/auth/verify-token` (FR59), success/failure toast within 3s
+**And** Step 3: "Create Default AI Organization" one-click creates Chief of Staff + 3 default departments (HR, Finance, Dev) (FR60)
+**And** Step 4: completion summary with "대시보드로 이동" CTA
+**And** wizard supports back navigation (steps 2-4 can go back)
 **And** admin setup completable in ≤15 minutes (NFR-O7)
-**And** onboarding flow is keyboard accessible
-**And** UXR79-95 user flow patterns followed
+**And** entire flow is keyboard accessible (Tab/Enter/Escape navigation)
+**And** wizard state persisted in sessionStorage — browser refresh doesn't lose progress
+**And** timeout: if no interaction for 30 minutes, show "세션이 만료됩니다" warning
 
 _References: FR59, FR60, FR61, NFR-O7, UXR79-95_
 
@@ -1802,30 +1807,66 @@ _References: UXR133, AR65_
 
 ---
 
-#### Story 23.17: Search, Performance & Testing Patterns
+#### Story 23.17: Global Search Integration
 
 As a CEO,
-I want fast search and a high-performance app,
-So that finding information is instant and the app never feels sluggish.
+I want to search across all content from one place,
+So that finding information is instant regardless of where it lives.
 
 **Acceptance Criteria:**
 
-**Given** the app has various search and performance requirements
-**When** patterns are implemented
+**Given** the command palette exists (from Story 23.10)
+**When** the global search feature is implemented
+**Then** Cmd+K search queries agents, departments, conversations, knowledge docs, and pages
+**And** search results grouped by category with icons (agent → `<Bot>`, department → `<Building2>`, page → `<FileText>`)
+**And** fuzzy matching enabled (typo tolerance via Fuse.js or similar)
+**And** recent searches persisted in localStorage (max 10 items)
+**And** search debounced at 150ms to prevent excessive re-renders
+**And** empty state shows "검색 결과가 없습니다" with suggestions
 
-_Search:_
-**Then** global search integrated into command palette (Cmd+K from Story 23.10) — searches across agents, departments, pages
+_References: UXR122-125, FR69_
 
-_Performance:_
-**And** FCP ≤1.5s, LCP ≤2.5s (NFR-P1) verified via Lighthouse
-**And** Hub bundle ≤200KB gzip, Admin ≤500KB gzip (NFR-P4)
+---
+
+#### Story 23.22: Performance Optimization & Lighthouse Verification
+
+As a CEO,
+I want the app to load fast and feel responsive,
+So that I never wait for pages to render.
+
+**Acceptance Criteria:**
+
+**Given** the app has been rebuilt with Natural Organic theme
+**When** performance is optimized and verified
+**Then** FCP ≤1.5s, LCP ≤2.5s (NFR-P1) verified via Lighthouse CI
+**And** Hub bundle ≤200KB gzip, Admin ≤500KB gzip (NFR-P4) — verified via `bun build --analyze`
 **And** Korea TTFB ≤500ms via Cloudflare CDN (NFR-P12)
+**And** all route-level code splitting verified (lazy imports for each page group)
+**And** image assets optimized (WebP, lazy loading for below-fold)
+**And** Lighthouse CI added to GitHub Actions with score thresholds (Performance ≥90, Accessibility ≥90)
 
-_Migration:_
-**And** container queries used where appropriate (UXR134-140)
-**And** CSS co-existence strategy: new `corthex-*` tokens alongside v2 styles during migration, v2 classes removed incrementally per page redesign
+_References: NFR-P1, NFR-P4, NFR-P12_
 
-_References: NFR-P1, NFR-P4, NFR-P12, UXR122-140_
+---
+
+#### Story 23.23: CSS Migration Strategy & Testing Automation
+
+As a developer,
+I want a clean CSS migration path and automated testing,
+So that v2→v3 style transition is safe and verifiable.
+
+**Acceptance Criteria:**
+
+**Given** v2 styles co-exist with v3 Natural Organic tokens
+**When** the migration strategy is implemented
+**Then** CSS co-existence strategy: new `corthex-*` tokens alongside v2 styles, v2 classes removed incrementally per page redesign
+**And** container queries used where appropriate for component-level responsiveness (UXR134-140)
+**And** axe-core accessibility CI integrated — WCAG 2.1 AA violations = build failure (UXR130)
+**And** Playwright visual regression tests for all 6 page groups (screenshot comparison, 0.1% diff threshold) (UXR131)
+**And** Lighthouse a11y score ≥90 enforced in CI (UXR132)
+**And** CSS specificity audit: no `!important` in new code, max 3-level nesting
+
+_References: UXR130-140_
 
 ---
 

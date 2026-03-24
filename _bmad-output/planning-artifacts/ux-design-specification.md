@@ -2711,8 +2711,8 @@ packages/ui/src/
 | System | Users, Settings, Billing | `<UserCog>`, `<Settings>`, `<CreditCard>` |
 
 **사이드바 동작:**
-- Desktop (lg+): 고정 사이드바 240px, 올리브 `bg-chrome` (#283618) 배경
-- Tablet (md): 접힘 가능 사이드바 — 아이콘만 56px / 열림 240px 오버레이
+- Desktop (lg+): 고정 사이드바 280px, 올리브 `bg-chrome` (#283618) 배경
+- Tablet (md): 접힘 가능 사이드바 — 아이콘만 56px / 열림 280px 오버레이
 - Mobile (sm): 하단 탭바 5개 핵심 + 햄버거 메뉴로 나머지
 
 #### 페이지 간 이동

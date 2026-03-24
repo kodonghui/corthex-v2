@@ -1003,6 +1003,12 @@ phases:
           - id: "23.21"
             title: "Subframe-to-Radix Migration & Hardcoded Color Cleanup"
             status: backlog
+          - id: "23.22"
+            title: "Performance Optimization & Lighthouse Verification"
+            status: backlog
+          - id: "23.23"
+            title: "CSS Migration Strategy & Testing Automation"
+            status: backlog
 
   - name: "v3 Sprint 1: Agent Personality"
     duration: "1-2 weeks"
