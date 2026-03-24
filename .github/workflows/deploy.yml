@@ -41,7 +41,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.filter.outputs.code == 'true'
-        run: bun install
+        run: bun install --frozen-lockfile
 
       - name: Engine boundary check (E10)
         if: steps.filter.outputs.code == 'true'
