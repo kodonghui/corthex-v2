@@ -1,6 +1,6 @@
 # Story 24.4: Personality Presets & Default Values
 
-Status: in-progress
+Status: implemented
 
 ## Story
 
