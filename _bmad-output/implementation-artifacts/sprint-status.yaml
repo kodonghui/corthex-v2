@@ -1163,37 +1163,37 @@ phases:
       - id: epic-29
         title: "OpenClaw Virtual Office"
         priority: P1
-        status: backlog
+        status: done
         dependencies: ["epic-28"]
         go_no_go: ["#1", "#5", "#8", "#12", "#13"]
         stories:
           - id: "29.1"
             title: "packages/office/ Turborepo Workspace Setup"
-            status: backlog
+            status: done
           - id: "29.2"
             title: "/ws/office WebSocket Channel"
-            status: backlog
+            status: done
           - id: "29.3"
             title: "Server-Side State Polling & Broadcasting"
-            status: backlog
+            status: done
           - id: "29.4"
             title: "PixiJS Office Canvas — Agent Sprites & Animations"
-            status: backlog
+            status: done
           - id: "29.5"
             title: "Mobile List View & Responsive Behavior"
-            status: backlog
+            status: done
           - id: "29.6"
             title: "Accessibility — Screen Reader & Keyboard"
-            status: backlog
+            status: done
           - id: "29.7"
             title: "Load Testing & Connection Management"
-            status: backlog
+            status: done
           - id: "29.8"
             title: "AI Sprite Approval & v1 Feature Parity"
-            status: backlog
+            status: done
           - id: "29.9"
             title: "System-Wide Final Verification (Go/No-Go Sprint 4)"
-            status: backlog
+            status: done
 
 # v3 DEPENDENCY CHAIN:
 # Epic 22 (Pre-Sprint) → Epic 24 (Sprint 1) → Epic 25+27 (Sprint 2) → Epic 28 (Sprint 3) → Epic 29 (Sprint 4)
