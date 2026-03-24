@@ -2,16 +2,10 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
-import { visualizer } from 'rollup-plugin-visualizer'
-
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    // Bundle analysis — generates stats.html in build output
-    ...(process.env.ANALYZE === 'true'
-      ? [visualizer({ open: false, filename: 'dist/stats.html', gzipSize: true, brotliSize: true })]
-      : []),
   ],
   define: {
     __BUILD_NUMBER__: JSON.stringify(process.env.BUILD_NUMBER || 'dev'),
