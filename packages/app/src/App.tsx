@@ -38,6 +38,7 @@ const OnboardingPage = lazy(() => import('./pages/onboarding').then((m) => ({ de
 const N8nWorkflowsPage = lazy(() => import('./pages/n8n-workflows').then((m) => ({ default: m.N8nWorkflowsPage })))
 const MarketingPipelinePage = lazy(() => import('./pages/marketing-pipeline').then((m) => ({ default: m.MarketingPipelinePage })))
 const MarketingApprovalPage = lazy(() => import('./pages/marketing-approval').then((m) => ({ default: m.MarketingApprovalPage })))
+const MemoriesPage = lazy(() => import('./pages/memories').then((m) => ({ default: m.MemoriesPage })))
 
 const queryClient = new QueryClient()
 
@@ -130,6 +131,7 @@ export function App() {
             <Route path="n8n-workflows" element={<Suspense fallback={<PageSkeleton />}><N8nWorkflowsPage /></Suspense>} />
             <Route path="marketing-pipeline" element={<Suspense fallback={<PageSkeleton />}><MarketingPipelinePage /></Suspense>} />
             <Route path="marketing-approval" element={<Suspense fallback={<PageSkeleton />}><MarketingApprovalPage /></Suspense>} />
+            <Route path="memories" element={<Suspense fallback={<PageSkeleton />}><MemoriesPage /></Suspense>} />
             <Route path="settings" element={<Suspense fallback={<PageSkeleton />}><SettingsPage /></Suspense>} />
           </Route>
         </Routes>

@@ -10,6 +10,10 @@ import { getDB } from '../db/scoped-query'
 import { getCredentials } from './credential-vault'
 import { recordCost } from '../lib/cost-tracker'
 import { getEmbedding } from './voyage-embedding'
+import { notifyReflectionComplete, notifyMemoryMilestone } from '../lib/notifier'
+import { db as rawDb } from '../db'
+import { users, agentMemories, agents as agentsTable } from '../db/schema'
+import { eq, and, sql } from 'drizzle-orm'
 
 export const REFLECTION_MODEL = 'claude-haiku-4-5-20251001'
 const MIN_OBSERVATIONS = 20
@@ -152,6 +156,48 @@ Output format:
   // Mark observations as reflected
   const observationIds = observations.map(o => o.id)
   await db.markObservationsReflected(observationIds)
+
+  // Story 28.8: Fire-and-forget notifications to CEO
+  if (memoriesCreated > 0) {
+    Promise.resolve().then(async () => {
+      try {
+        // Get agent name
+        const [agent] = await rawDb.select({ name: agentsTable.name })
+          .from(agentsTable)
+          .where(eq(agentsTable.id, agentId))
+          .limit(1)
+        const agentName = agent?.name ?? agentId
+
+        // Get CEO user for this company (DB role='admin' maps to JWT role='ceo')
+        const [ceo] = await rawDb.select({ id: users.id })
+          .from(users)
+          .where(and(eq(users.companyId, companyId), eq(users.role, 'admin')))
+          .limit(1)
+
+        if (ceo) {
+          // Notify reflection complete
+          await notifyReflectionComplete(ceo.id, companyId, agentName, memoriesCreated)
+
+          // Check milestone (10, 50, 100)
+          const [memCount] = await rawDb.select({ count: sql<number>`count(*)::int` })
+            .from(agentMemories)
+            .where(and(
+              eq(agentMemories.companyId, companyId as any),
+              eq(agentMemories.agentId, agentId),
+              eq(agentMemories.isActive, true),
+            ))
+          const total = memCount?.count ?? 0
+          const milestones = [10, 50, 100, 250, 500, 1000]
+          for (const ms of milestones) {
+            if (total >= ms && total - memoriesCreated < ms) {
+              await notifyMemoryMilestone(ceo.id, companyId, agentName, ms)
+              break
+            }
+          }
+        }
+      } catch { /* NFR-D3: fire-and-forget */ }
+    }).catch(() => {})
+  }
 
   return {
     agentId,

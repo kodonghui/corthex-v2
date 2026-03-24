@@ -36,6 +36,7 @@ const PAGE_NAMES: Record<string, string> = {
   'ops-log': 'Ops Log',
   classified: 'Classified',
   settings: 'Settings',
+  memories: 'Memory Dashboard',
   notifications: 'Notifications',
 }
 

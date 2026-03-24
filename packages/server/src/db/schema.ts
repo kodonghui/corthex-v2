@@ -1602,6 +1602,7 @@ export const agentMemories = pgTable('agent_memories', {
   observationIds: text('observation_ids'),  // JSON array of source observation UUIDs (e.g., '["uuid1","uuid2"]')
   usageCount: integer('usage_count').notNull().default(0),
   lastUsedAt: timestamp('last_used_at'),
+  pinned: boolean('pinned').notNull().default(false),
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),

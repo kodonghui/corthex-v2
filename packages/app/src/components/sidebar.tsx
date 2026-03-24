@@ -7,7 +7,7 @@ import {
   LayoutDashboard, Terminal, MessageSquare, TrendingUp, Users,
   Clock, FileText, FolderOpen, Network, Building2, Bot, Layers, Share2,
   Send, DollarSign, History, Shield, Lock, BookOpen, GitBranch, UserCheck,
-  Settings, BarChart3, Hexagon,
+  Settings, BarChart3, Hexagon, Brain,
 } from 'lucide-react'
 
 declare const __BUILD_NUMBER__: string
@@ -48,6 +48,7 @@ const navSections: NavSection[] = [
       { to: '/messenger', label: '메신저', icon: Send },
       { to: '/knowledge', label: '라이브러리', icon: BookOpen },
       { to: '/agora', label: 'AGORA', icon: Users },
+      { to: '/memories', label: '에이전트 기억', icon: Brain },
       { to: '/files', label: '파일', icon: FolderOpen },
     ],
   },

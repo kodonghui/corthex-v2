@@ -65,6 +65,7 @@ import { workspaceTemplateMarketRoute } from './routes/workspace/template-market
 import { workspaceAgentMarketplaceRoute } from './routes/workspace/agent-marketplace'
 import { marketingApprovalRoute } from './routes/workspace/marketing-approval'
 import { observationsRoute } from './routes/workspace/observations'
+import { memoryDashboardRoute } from './routes/workspace/memory-dashboard'
 import { publicApiKeysRoute } from './routes/admin/public-api-keys'
 import { tierConfigsRoute } from './routes/admin/tier-configs'
 import { companySettingsRoute } from './routes/admin/company-settings'
@@ -239,6 +240,8 @@ app.route('/api/workspace', workspaceAgentMarketplaceRoute)
 app.route('/api/workspace', marketingApprovalRoute)
 // Observations (Story 28.1, MEM-6 Layer 1)
 app.route('/api/workspace', observationsRoute)
+// Memory Dashboard (Story 28.8)
+app.route('/api/workspace', memoryDashboardRoute)
 
 // 공개 API (API 키 인증)
 app.route('/api/v1', publicApiV1Route)

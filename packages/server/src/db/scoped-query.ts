@@ -690,5 +690,117 @@ export function getDB(companyId: string) {
         }
       })
     },
+
+    // === Story 28.8: CEO Memory Dashboard ===
+
+    // READ — dashboard overview stats per agent
+    getMemoryDashboardOverview: async (): Promise<Array<{
+      agentId: string
+      agentName: string
+      totalObservations: number
+      unreflectedCount: number
+      totalMemories: number
+      lastReflectionAt: Date | null
+    }>> => {
+      const obsStats = await db.execute(sql`
+        SELECT o.agent_id,
+               a.name AS agent_name,
+               COUNT(*)::int AS total_observations,
+               COUNT(*) FILTER (WHERE o.reflected = false AND o.flagged = false)::int AS unreflected_count
+        FROM observations o
+        JOIN agents a ON a.id = o.agent_id
+        WHERE o.company_id = ${companyId}::uuid
+        GROUP BY o.agent_id, a.name
+      `)
+      const memStats = await db.execute(sql`
+        SELECT agent_id,
+               COUNT(*) FILTER (WHERE is_active = true)::int AS total_memories,
+               MAX(created_at) FILTER (WHERE source = 'reflection') AS last_reflection_at
+        FROM agent_memories
+        WHERE company_id = ${companyId}::uuid
+        GROUP BY agent_id
+      `)
+
+      const obsRows = (obsStats as unknown as { rows: any[] }).rows ?? (obsStats as unknown as any[]) ?? []
+      const memRows = (memStats as unknown as { rows: any[] }).rows ?? (memStats as unknown as any[]) ?? []
+
+      const memMap = new Map<string, any>()
+      for (const r of memRows) memMap.set(r.agent_id, r)
+
+      const agentIds = new Set<string>()
+      for (const r of obsRows) agentIds.add(r.agent_id)
+      for (const r of memRows) agentIds.add(r.agent_id)
+
+      return Array.from(agentIds).map(agentId => {
+        const obs = obsRows.find((r: any) => r.agent_id === agentId)
+        const mem = memMap.get(agentId)
+        return {
+          agentId,
+          agentName: (obs?.agent_name as string) ?? '',
+          totalObservations: Number(obs?.total_observations ?? 0),
+          unreflectedCount: Number(obs?.unreflected_count ?? 0),
+          totalMemories: Number(mem?.total_memories ?? 0),
+          lastReflectionAt: mem?.last_reflection_at ? new Date(mem.last_reflection_at) : null,
+        }
+      })
+    },
+
+    // READ — timeline events (union of observations + memories, ordered by date)
+    getMemoryTimeline: async (agentId: string, limit = 50, offset = 0): Promise<Array<{
+      type: 'observation' | 'memory'
+      id: string
+      content: string
+      timestamp: Date
+      metadata: Record<string, unknown>
+    }>> => {
+      const rows = await db.execute(sql`
+        (
+          SELECT 'observation' AS type, id, content, observed_at AS timestamp,
+                 json_build_object('domain', domain, 'outcome', outcome, 'importance', importance,
+                   'confidence', confidence, 'flagged', flagged, 'reflected', reflected) AS metadata
+          FROM observations
+          WHERE company_id = ${companyId}::uuid AND agent_id = ${agentId}::uuid
+        )
+        UNION ALL
+        (
+          SELECT 'memory' AS type, id, content, created_at AS timestamp,
+                 json_build_object('source', source, 'confidence', confidence, 'category', category,
+                   'memoryType', memory_type, 'pinned', pinned) AS metadata
+          FROM agent_memories
+          WHERE company_id = ${companyId}::uuid AND agent_id = ${agentId}::uuid AND is_active = true
+        )
+        ORDER BY timestamp DESC
+        LIMIT ${limit} OFFSET ${offset}
+      `)
+      const resultRows = (rows as unknown as { rows: any[] }).rows ?? (rows as unknown as any[]) ?? []
+      return resultRows.map((r: any) => ({
+        type: r.type as 'observation' | 'memory',
+        id: r.id as string,
+        content: r.content as string,
+        timestamp: new Date(r.timestamp),
+        metadata: typeof r.metadata === 'string' ? JSON.parse(r.metadata) : r.metadata,
+      }))
+    },
+
+    // WRITE — pin/unpin agent memory (CEO dashboard)
+    pinAgentMemory: async (memoryId: string, pinned: boolean): Promise<void> => {
+      await db.update(agentMemories)
+        .set({ pinned, updatedAt: new Date() })
+        .where(and(
+          eq(agentMemories.id, memoryId),
+          eq(agentMemories.companyId, companyId as any),
+        ))
+    },
+
+    // WRITE — hard delete observation (CEO dashboard)
+    deleteObservation: async (observationId: string): Promise<boolean> => {
+      const result = await db.delete(observations)
+        .where(and(
+          eq(observations.id, observationId),
+          eq(observations.companyId, companyId as any),
+        ))
+        .returning({ id: observations.id })
+      return result.length > 0
+    },
   }
 }

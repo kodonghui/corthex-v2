@@ -5,6 +5,10 @@ import { getDB } from '../../db/scoped-query'
 import { authMiddleware } from '../../middleware/auth'
 import { sanitizeObservation, calculateConfidence } from '../../services/observation-sanitizer'
 import { triggerObservationEmbedding } from '../../services/voyage-embedding'
+import { notifyObservationFlagged } from '../../lib/notifier'
+import { db as rawDb } from '../../db'
+import { agents as agentsTable, users } from '../../db/schema'
+import { eq, and } from 'drizzle-orm'
 import type { AppEnv } from '../../types'
 
 export const observationsRoute = new Hono<AppEnv>()
@@ -58,7 +62,7 @@ observationsRoute.post('/observations', zValidator('json', createObservationSche
     triggerObservationEmbedding(result.id, tenant.companyId, sanitized.content)
   }
 
-  // Audit log for flagged observations (fire-and-forget)
+  // Audit log + CEO notification for flagged observations (fire-and-forget)
   if (sanitized.flagged) {
     getDB(tenant.companyId).insertActivityLog({
       eventId: crypto.randomUUID(),
@@ -70,6 +74,17 @@ observationsRoute.post('/observations', zValidator('json', createObservationSche
       detail: `Observation flagged — patterns: ${sanitized.matchedPatterns.join(', ')}`,
       agentId: body.agentId,
       metadata: { matchedPatterns: sanitized.matchedPatterns, truncated: sanitized.truncated },
+    }).catch(() => {})
+
+    // Story 28.8: notify CEO about flagged observation
+    Promise.resolve().then(async () => {
+      const [agent] = await rawDb.select({ name: agentsTable.name })
+        .from(agentsTable).where(eq(agentsTable.id, body.agentId)).limit(1)
+      const [ceo] = await rawDb.select({ id: users.id })
+        .from(users).where(and(eq(users.companyId, tenant.companyId), eq(users.role, 'admin'))).limit(1)
+      if (ceo) {
+        await notifyObservationFlagged(ceo.id, tenant.companyId, agent?.name ?? body.agentId, sanitized.matchedPatterns)
+      }
     }).catch(() => {})
   }
 

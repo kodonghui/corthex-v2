@@ -7,7 +7,7 @@ import { sendEmail, buildNotificationEmail } from './email-sender'
 type NotifyParams = {
   userId: string
   companyId: string
-  type: 'chat_complete' | 'delegation_complete' | 'tool_error' | 'job_complete' | 'job_error' | 'system' | 'messenger_mention'
+  type: 'chat_complete' | 'delegation_complete' | 'tool_error' | 'job_complete' | 'job_error' | 'system' | 'messenger_mention' | 'memory_reflection' | 'observation_flagged' | 'memory_milestone'
   title: string
   body?: string
   actionUrl?: string
@@ -108,5 +108,41 @@ export function notifyToolError(userId: string, companyId: string, toolName: str
     title: `도구 호출 실패: ${toolName}`,
     body: '작전일지에서 상세 내용을 확인하세요',
     actionUrl: '/ops-log?filter=error',
+  })
+}
+
+/** 리플렉션 완료 알림 (Story 28.8) */
+export function notifyReflectionComplete(userId: string, companyId: string, agentName: string, memoriesCreated: number) {
+  return createNotification({
+    userId,
+    companyId,
+    type: 'memory_reflection',
+    title: `${agentName} — ${memoriesCreated}개 새 기억 생성`,
+    body: `리플렉션으로 ${memoriesCreated}개의 새 기억이 생성되었습니다`,
+    actionUrl: '/memories',
+  })
+}
+
+/** 관찰 플래그 알림 (Story 28.8) */
+export function notifyObservationFlagged(userId: string, companyId: string, agentName: string, patterns: string[]) {
+  return createNotification({
+    userId,
+    companyId,
+    type: 'observation_flagged',
+    title: `${agentName} — 의심스러운 관찰 감지`,
+    body: `감지된 패턴: ${patterns.join(', ')}`,
+    actionUrl: '/memories',
+  })
+}
+
+/** 메모리 마일스톤 알림 (Story 28.8) */
+export function notifyMemoryMilestone(userId: string, companyId: string, agentName: string, count: number) {
+  return createNotification({
+    userId,
+    companyId,
+    type: 'memory_milestone',
+    title: `${agentName} — 기억 ${count}개 달성!`,
+    body: `에이전트가 ${count}개의 기억을 보유하게 되었습니다`,
+    actionUrl: '/memories',
   })
 }
