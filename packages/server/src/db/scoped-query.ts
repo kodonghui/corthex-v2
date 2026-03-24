@@ -1,7 +1,7 @@
 import { eq, or, sql, desc, and, isNotNull, asc, inArray, type SQL } from 'drizzle-orm'
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm'
 import { db } from './index'
-import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users, costRecords, presets, sketches, tierConfigs, semanticCache, agentReports, toolCallEvents, mcpServerConfigs, agentMcpAccess, mcpLifecycleEvents, credentials, activityLogs } from './schema'
+import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users, costRecords, presets, sketches, tierConfigs, semanticCache, agentReports, toolCallEvents, mcpServerConfigs, agentMcpAccess, mcpLifecycleEvents, credentials, activityLogs, observations } from './schema'
 import { decrypt } from '../lib/credential-crypto'
 import { withTenant, scopedWhere, scopedInsert } from './tenant-helpers'
 import { cosineDistance } from './pgvector'
@@ -377,5 +377,58 @@ export function getDB(companyId: string) {
         ...data,
         companyId: companyId as any,
       }),
+
+    // === Story 28.1: Observations — Agent task execution recordings (D22, MEM-6 Layer 1) ===
+
+    // WRITE — insert a new observation (fire-and-forget from agent-loop, AR67)
+    insertObservation: (data: {
+      agentId: string
+      sessionId?: string
+      content: string
+      domain?: string
+      outcome?: string
+      toolUsed?: string
+      importance?: number
+      confidence?: number
+      flagged?: boolean
+    }) =>
+      db.insert(observations).values({
+        companyId: companyId as any,
+        agentId: data.agentId,
+        sessionId: data.sessionId ?? null,
+        content: data.content.slice(0, 10240),
+        domain: data.domain ?? 'conversation',
+        outcome: data.outcome ?? 'unknown',
+        toolUsed: data.toolUsed ?? null,
+        importance: data.importance ?? 5,
+        confidence: data.confidence ?? 0.5,
+        flagged: data.flagged ?? false,
+      }).returning({ id: observations.id }),
+
+    // READ — unreflected observations for reflection cron (Story 28.1)
+    getUnreflectedObservations: (agentId: string, limit = 50) =>
+      db.select().from(observations)
+        .where(scopedWhere(observations.companyId, companyId, eq(observations.agentId, agentId), eq(observations.reflected, false)))
+        .orderBy(desc(observations.importance), desc(observations.createdAt))
+        .limit(limit),
+
+    // READ — count unreflected observations (Story 28.1)
+    countUnreflectedObservations: async (agentId: string): Promise<number> => {
+      const [result] = await db.select({ count: sql<number>`count(*)::int` })
+        .from(observations)
+        .where(scopedWhere(observations.companyId, companyId, eq(observations.agentId, agentId), eq(observations.reflected, false)))
+      return result?.count ?? 0
+    },
+
+    // READ — list observations with pagination and optional agent filter (Story 28.1)
+    listObservations: (opts: { agentId?: string; limit?: number; offset?: number }) => {
+      const conditions: SQL[] = [eq(observations.companyId, companyId as any)]
+      if (opts.agentId) conditions.push(eq(observations.agentId, opts.agentId))
+      return db.select().from(observations)
+        .where(and(...conditions))
+        .orderBy(desc(observations.createdAt))
+        .limit(opts.limit ?? 50)
+        .offset(opts.offset ?? 0)
+    },
   }
 }

@@ -1893,3 +1893,29 @@ export const semanticCache = pgTable('semantic_cache', {
 }, (table) => ({
   companyIdx: index('semantic_cache_company_idx').on(table.companyId),
 }))
+
+// === Story 28.1: observations — Agent task execution recordings (D22, MEM-6 Layer 1) ===
+export const observations = pgTable('observations', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  companyId: uuid('company_id').notNull().references(() => companies.id, { onDelete: 'cascade' }),
+  agentId: uuid('agent_id').notNull().references(() => agents.id, { onDelete: 'cascade' }),
+  sessionId: uuid('session_id'),
+  taskExecutionId: uuid('task_execution_id'),
+  content: text('content').notNull(),
+  domain: varchar('domain', { length: 50 }).notNull().default('conversation'),
+  outcome: varchar('outcome', { length: 20 }).notNull().default('unknown'),
+  toolUsed: varchar('tool_used', { length: 100 }),
+  importance: integer('importance').notNull().default(5),
+  confidence: real('confidence').notNull().default(0.5),
+  embedding: vector('embedding', { dimensions: 1024 }),
+  reflected: boolean('reflected').notNull().default(false),
+  reflectedAt: timestamp('reflected_at'),
+  flagged: boolean('flagged').notNull().default(false),
+  observedAt: timestamp('observed_at').notNull().defaultNow(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  unreflectedIdx: index('idx_observations_unreflected')
+    .on(table.companyId, table.agentId, table.importance),
+  ttlIdx: index('idx_observations_ttl').on(table.reflectedAt),
+}))

@@ -383,9 +383,36 @@ export async function* runAgent(options: RunAgentOptions): AsyncGenerator<SSEEve
     const tokensUsed = totalInputTokens + totalOutputTokens
     yield { type: 'done', costUsd, tokensUsed }
     log.info({ event: 'agent_done', data: { costUsd, tokensUsed } }, 'Agent completed')
+
+    // Auto-record observation (AR67 — fire-and-forget, MEM-6 Layer 1)
+    try {
+      await getDB(ctx.companyId).insertObservation({
+        agentId: agentName,
+        sessionId: ctx.sessionId,
+        content: fullResponseParts.join('').slice(0, 10240),
+        domain: 'conversation',
+        outcome: 'success',
+        importance: 5,
+        confidence: 0.5,
+      })
+    } catch { /* fire-and-forget — observation failure must not impact agent execution */ }
   } catch (err) {
     const errMessage = err instanceof Error ? err.message : 'Unknown error'
     log.error({ event: 'agent_error', data: { error: errMessage } }, 'Agent failed')
+
+    // Auto-record error observation (AR67 — fire-and-forget)
+    try {
+      await getDB(ctx.companyId).insertObservation({
+        agentId: agentName,
+        sessionId: ctx.sessionId,
+        content: `Error: ${errMessage}`.slice(0, 10240),
+        domain: 'error',
+        outcome: 'failure',
+        importance: 7,
+        confidence: 0.8,
+      })
+    } catch { /* fire-and-forget */ }
+
     yield {
       type: 'error',
       code: ERROR_CODES.AGENT_SPAWN_FAILED,
