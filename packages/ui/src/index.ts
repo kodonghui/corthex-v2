@@ -65,6 +65,10 @@ export { StreamingText } from './components/StreamingText'
 export type { StreamingTextProps } from './components/StreamingText'
 export { ErrorBoundary } from './components/ErrorBoundary'
 export type { ErrorBoundaryProps } from './components/ErrorBoundary'
+export { Breadcrumb, breadcrumbsFromPath } from './components/Breadcrumb'
+export type { BreadcrumbItem, BreadcrumbProps } from './components/Breadcrumb'
+export { TabNav } from './components/TabNav'
+export type { TabNavItem, TabNavProps } from './components/TabNav'
 
 // Lib
 export { parseApiError, isApiErrorResponse, toastErrorMessage, withRetry } from './lib/api-error'
