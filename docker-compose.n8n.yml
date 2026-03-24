@@ -1,0 +1,104 @@
+# n8n Workflow Engine — Docker Compose
+# Story 25.1: Isolated sidecar container for workflow automation
+# References: AR33, AR36, N8N-SEC-5~7, NFR-SC9, NFR-O9, FR-N8N5
+#
+# Usage:
+#   docker compose -f docker-compose.n8n.yml up -d
+#   docker compose -f docker-compose.n8n.yml logs -f
+#   docker compose -f docker-compose.n8n.yml down
+
+services:
+  n8n:
+    image: n8nio/n8n:2.12.3  # AR33: pinned version, floating tags forbidden
+    container_name: corthex-n8n
+    restart: unless-stopped
+
+    # N8N-SEC-5 + NFR-SC9: Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+          cpus: "2"
+        reservations:
+          memory: 512m
+          cpus: "0.5"
+
+    # Localhost only — not exposed externally (N8N-SEC-1 prerequisite)
+    ports:
+      - "127.0.0.1:5678:5678"
+
+    environment:
+      # N8N-SEC-6: SQLite database (NOT CORTHEX PostgreSQL)
+      - DB_TYPE=sqlite
+      - DB_SQLITE_DATABASE=/home/node/.n8n/database.sqlite
+
+      # N8N-SEC-7: AES-256-GCM credential encryption
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:?N8N_ENCRYPTION_KEY is required}
+
+      # Node.js memory limit (architecture mandate)
+      - NODE_OPTIONS=--max-old-space-size=1536
+
+      # AR36: Callback URL for n8n → CORTHEX communication
+      - WEBHOOK_URL=http://host.docker.internal:${CORTHEX_PORT:-3000}/api/n8n/webhook
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+
+      # Disable telemetry and public API
+      - N8N_DIAGNOSTICS_ENABLED=false
+      - N8N_VERSION_NOTIFICATIONS_ENABLED=false
+      - N8N_TEMPLATES_ENABLED=false
+
+      # Disable community nodes (security)
+      - N8N_COMMUNITY_PACKAGES_ENABLED=false
+
+      # Execution settings
+      - EXECUTIONS_DATA_SAVE_ON_ERROR=all
+      - EXECUTIONS_DATA_SAVE_ON_SUCCESS=all
+      - EXECUTIONS_DATA_SAVE_ON_PROGRESS=false
+      - EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS=true
+      - EXECUTIONS_DATA_PRUNE=true
+      - EXECUTIONS_DATA_MAX_AGE=168  # 7 days
+
+      # Timezone
+      - GENERIC_TIMEZONE=${TZ:-Asia/Seoul}
+      - TZ=${TZ:-Asia/Seoul}
+
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+    # NFR-O9: Healthcheck every 30s, 3 failures → auto-restart
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5678/healthz || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+    # AR36: host.docker.internal for n8n → CORTHEX callbacks
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    # Security: read-only root FS + no-new-privileges
+    read_only: true
+    tmpfs:
+      - /tmp:size=100m
+      - /run:size=10m
+    security_opt:
+      - no-new-privileges:true
+
+    # Explicit network isolation — not default bridge
+    networks:
+      - n8n_internal
+
+    # FR-N8N5: n8n failure must not crash CORTHEX
+    # Achieved by: separate container + restart policy + resource limits + network isolation
+
+networks:
+  n8n_internal:
+    driver: bridge
+    internal: false  # needs outbound for webhooks, but isolated from other containers
+
+volumes:
+  n8n_data:
+    driver: local
