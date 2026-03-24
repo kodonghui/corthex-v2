@@ -79,3 +79,14 @@ export type { RadixSwitchProps } from './components/RadixSwitch'
 // Lib
 export { parseApiError, isApiErrorResponse, toastErrorMessage, withRetry } from './lib/api-error'
 export type { ApiErrorResponse, ParsedApiError } from './lib/api-error'
+
+// Performance
+export { useDebouncedValue, useThrottledCallback, useIntersectionObserver, useVirtualList } from './lib/performance'
+export type { UseIntersectionObserverOptions, UseVirtualListOptions, VirtualItem } from './lib/performance'
+
+// Test Utils
+export { TestProviders, createWrapper } from './test-utils/render-with-providers'
+export { createMockAgent, createMockAgents } from './test-utils/create-mock-agent'
+export type { MockAgent } from './test-utils/create-mock-agent'
+export { createMockDepartment, createMockDepartments } from './test-utils/create-mock-department'
+export type { MockDepartment } from './test-utils/create-mock-department'
