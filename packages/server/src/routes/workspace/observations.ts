@@ -3,7 +3,8 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { getDB } from '../../db/scoped-query'
 import { authMiddleware } from '../../middleware/auth'
-import { sanitizeObservation } from '../../services/observation-sanitizer'
+import { sanitizeObservation, calculateConfidence } from '../../services/observation-sanitizer'
+import { triggerObservationEmbedding } from '../../services/voyage-embedding'
 import type { AppEnv } from '../../types'
 
 export const observationsRoute = new Hono<AppEnv>()
@@ -37,13 +38,25 @@ observationsRoute.post('/observations', zValidator('json', createObservationSche
   const tenant = c.get('tenant')
   const body = c.req.valid('json')
 
-  // MEM-6 4-Layer sanitization (Story 28.2)
+  // MEM-6 4-Layer sanitization (Story 28.2) + D31 confidence scoring (Story 28.3)
   const sanitized = sanitizeObservation(body.content)
+  const confidence = body.confidence ?? calculateConfidence({
+    domain: (body.domain ?? 'conversation') as 'conversation' | 'tool_use' | 'error',
+    outcome: (body.outcome ?? 'unknown') as 'success' | 'failure' | 'unknown',
+    contentLength: sanitized.content.length,
+    hasToolUsed: !!body.toolUsed,
+  })
   const [result] = await getDB(tenant.companyId).insertObservation({
     ...body,
     content: sanitized.content,
+    confidence,
     flagged: sanitized.flagged || body.flagged,
   })
+
+  // NFR-D3: fire-and-forget vectorization (Story 28.3)
+  if (result?.id && !sanitized.flagged) {
+    triggerObservationEmbedding(result.id, tenant.companyId, sanitized.content)
+  }
 
   // Audit log for flagged observations (fire-and-forget)
   if (sanitized.flagged) {

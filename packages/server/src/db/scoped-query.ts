@@ -420,6 +420,20 @@ export function getDB(companyId: string) {
       return result?.count ?? 0
     },
 
+    // WRITE — update observation embedding vector (Story 28.3, D31)
+    updateObservationEmbedding: async (id: string, embedding: number[]): Promise<void> => {
+      if (embedding.some(v => !Number.isFinite(v))) {
+        throw new Error('embedding contains non-finite values')
+      }
+      const vectorStr = pgvectorToSql(embedding)
+      await db.execute(sql`
+        UPDATE observations
+        SET embedding = ${vectorStr}::vector,
+            updated_at = NOW()
+        WHERE id = ${id}::uuid AND company_id = ${companyId}::uuid
+      `)
+    },
+
     // READ — list observations with pagination and optional agent filter (Story 28.1)
     listObservations: (opts: { agentId?: string; limit?: number; offset?: number }) => {
       const conditions: SQL[] = [eq(observations.companyId, companyId as any)]

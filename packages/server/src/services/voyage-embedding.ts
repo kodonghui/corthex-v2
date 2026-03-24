@@ -241,6 +241,43 @@ export function triggerEmbedding(docId: string, companyId: string): void {
 }
 
 /**
+ * Embed a single observation text. Fire-and-forget safe.
+ * Updates the observation row's embedding column on success.
+ * NFR-D3: failure must not throw — graceful degradation.
+ */
+export async function embedObservation(
+  observationId: string,
+  companyId: string,
+  content: string,
+): Promise<boolean> {
+  try {
+    const text = content.length > MAX_TEXT_LENGTH ? content.slice(0, MAX_TEXT_LENGTH) : content
+    const embedding = await getEmbedding(companyId, text)
+    if (!embedding) return false
+
+    if (embedding.some(v => !Number.isFinite(v))) return false
+    const vectorStr = `[${embedding.join(',')}]`
+    await db.execute(sql`
+      UPDATE observations
+      SET embedding = ${vectorStr}::vector,
+          updated_at = NOW()
+      WHERE id = ${observationId}::uuid AND company_id = ${companyId}::uuid
+    `)
+    return true
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Trigger observation embedding in the background (fire-and-forget).
+ * NFR-D3: does not block caller, failures silently logged.
+ */
+export function triggerObservationEmbedding(observationId: string, companyId: string, content: string): void {
+  Promise.resolve().then(() => embedObservation(observationId, companyId, content)).catch(() => {})
+}
+
+/**
  * Batch embed all documents that have no embedding yet.
  * Returns summary of results.
  */

@@ -63,3 +63,35 @@ export function sanitizeObservation(content: string): SanitizeObservationResult 
 
   return { content, flagged, truncated, controlCharsRemoved, matchedPatterns }
 }
+
+/**
+ * D31: Confidence scoring — determines how reliable an observation is.
+ * Domain, outcome, content length, and tool attribution all contribute.
+ * Clamped to [0.1, 0.95] — never 0 or 1 (epistemic humility).
+ */
+export function calculateConfidence(params: {
+  domain: 'conversation' | 'tool_use' | 'error'
+  outcome: 'success' | 'failure' | 'unknown'
+  contentLength: number
+  hasToolUsed: boolean
+}): number {
+  let confidence = 0.5
+
+  // Domain-based adjustment
+  if (params.domain === 'tool_use') confidence += 0.15
+  if (params.domain === 'error') confidence += 0.1
+  if (params.domain === 'conversation') confidence -= 0.05
+
+  // Outcome-based adjustment
+  if (params.outcome === 'success') confidence += 0.15
+  if (params.outcome === 'failure') confidence += 0.1
+
+  // Content richness
+  if (params.contentLength > 500) confidence += 0.05
+  if (params.contentLength < 50) confidence -= 0.1
+
+  // Tool attribution
+  if (params.hasToolUsed) confidence += 0.05
+
+  return Math.max(0.1, Math.min(0.95, confidence))
+}

@@ -13,7 +13,8 @@ import { delegationTracker } from './hooks/delegation-tracker'
 import { costTracker } from './hooks/cost-tracker'
 import type { UsageInfo } from './hooks/cost-tracker'
 import { checkSemanticCache, saveToSemanticCache } from './semantic-cache'
-import { sanitizeObservation } from '../services/observation-sanitizer'
+import { sanitizeObservation, calculateConfidence } from '../services/observation-sanitizer'
+import { triggerObservationEmbedding } from '../services/voyage-embedding'
 
 /** Log tool sanitize blocked event for audit visibility */
 async function logToolSanitizeEvent(
@@ -385,20 +386,30 @@ export async function* runAgent(options: RunAgentOptions): AsyncGenerator<SSEEve
     yield { type: 'done', costUsd, tokensUsed }
     log.info({ event: 'agent_done', data: { costUsd, tokensUsed } }, 'Agent completed')
 
-    // Auto-record observation (AR67 — fire-and-forget, MEM-6 4-Layer sanitization)
+    // Auto-record observation (AR67 — fire-and-forget, MEM-6 4-Layer sanitization + D31 confidence)
     try {
       const rawContent = fullResponseParts.join('')
       const sanitized = sanitizeObservation(rawContent)
-      await getDB(ctx.companyId).insertObservation({
+      const confidence = calculateConfidence({
+        domain: 'conversation',
+        outcome: 'success',
+        contentLength: sanitized.content.length,
+        hasToolUsed: false,
+      })
+      const [obs] = await getDB(ctx.companyId).insertObservation({
         agentId: agentName,
         sessionId: ctx.sessionId,
         content: sanitized.content,
         domain: 'conversation',
         outcome: 'success',
         importance: 5,
-        confidence: 0.5,
+        confidence,
         flagged: sanitized.flagged,
       })
+      // NFR-D3: fire-and-forget vectorization — embedding failure must not block
+      if (obs?.id && !sanitized.flagged) {
+        triggerObservationEmbedding(obs.id, ctx.companyId, sanitized.content)
+      }
       if (sanitized.flagged) {
         getDB(ctx.companyId).insertActivityLog({
           eventId: crypto.randomUUID(),
@@ -417,19 +428,29 @@ export async function* runAgent(options: RunAgentOptions): AsyncGenerator<SSEEve
     const errMessage = err instanceof Error ? err.message : 'Unknown error'
     log.error({ event: 'agent_error', data: { error: errMessage } }, 'Agent failed')
 
-    // Auto-record error observation (AR67 — fire-and-forget, MEM-6 4-Layer sanitization)
+    // Auto-record error observation (AR67 — fire-and-forget, MEM-6 4-Layer sanitization + D31 confidence)
     try {
       const sanitized = sanitizeObservation(`Error: ${errMessage}`)
-      await getDB(ctx.companyId).insertObservation({
+      const confidence = calculateConfidence({
+        domain: 'error',
+        outcome: 'failure',
+        contentLength: sanitized.content.length,
+        hasToolUsed: false,
+      })
+      const [obs] = await getDB(ctx.companyId).insertObservation({
         agentId: agentName,
         sessionId: ctx.sessionId,
         content: sanitized.content,
         domain: 'error',
         outcome: 'failure',
         importance: 7,
-        confidence: 0.8,
+        confidence,
         flagged: sanitized.flagged,
       })
+      // NFR-D3: fire-and-forget vectorization
+      if (obs?.id && !sanitized.flagged) {
+        triggerObservationEmbedding(obs.id, ctx.companyId, sanitized.content)
+      }
       if (sanitized.flagged) {
         getDB(ctx.companyId).insertActivityLog({
           eventId: crypto.randomUUID(),
