@@ -59,7 +59,7 @@ import { argosRoute } from './routes/workspace/argos'
 import { archiveRoute } from './routes/workspace/archive'
 import { qualityDashboardRoute } from './routes/workspace/quality-dashboard'
 import { performanceRoute } from './routes/workspace/performance'
-import { workflowsRoute } from './routes/workspace/workflows'
+
 import { conversationsRoute } from './routes/workspace/conversations'
 import { workspaceTemplateMarketRoute } from './routes/workspace/template-market'
 import { workspaceAgentMarketplaceRoute } from './routes/workspace/agent-marketplace'
@@ -222,7 +222,7 @@ app.route('/api/workspace/argos', argosRoute)
 app.route('/api/workspace/archive', archiveRoute)
 app.route('/api/workspace', qualityDashboardRoute)
 app.route('/api/workspace', performanceRoute)
-app.route('/api/workspace', workflowsRoute)
+
 app.route('/api/workspace/conversations', conversationsRoute)
 app.route('/api/workspace', workspaceTemplateMarketRoute)
 app.route('/api/workspace', workspaceAgentMarketplaceRoute)

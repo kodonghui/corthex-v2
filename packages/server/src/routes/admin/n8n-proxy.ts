@@ -335,9 +335,7 @@ n8nProxyRoute.get('/n8n/workflows', async (c) => {
 
   try {
     const response = await proxy(targetUrl.toString(), {
-      headers: {
-        Accept: 'application/json',
-      },
+      headers: { Accept: 'application/json', Authorization: undefined, Cookie: undefined },
     })
 
     if (!response.ok) {

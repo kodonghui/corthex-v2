@@ -8,7 +8,7 @@ import {
   LayoutDashboard, Building2, Users, UserCog, Building, Bot, Wrench,
   DollarSign, KeyRound, ClipboardList, Sparkles, Monitor,
   Orbit, FileStack, ShoppingCart, BrainCircuit, Paintbrush,
-  Lock, Zap, Hexagon, Settings, ArrowLeftRight,
+  Lock, Hexagon, Settings, ArrowLeftRight,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
@@ -37,7 +37,6 @@ const nav: { to: string; label: string; icon: LucideIcon }[] = [
   { to: '/template-market', label: '템플릿 마켓', icon: ShoppingCart },
   { to: '/agent-marketplace', label: '에이전트 마켓', icon: BrainCircuit },
   { to: '/api-keys', label: '공개 API 키', icon: Lock },
-  { to: '/workflows', label: '워크플로우', icon: Zap },
   { to: '/n8n-editor', label: 'n8n 에디터', icon: Hexagon },
 ]
 

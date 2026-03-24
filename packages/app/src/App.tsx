@@ -35,7 +35,6 @@ const DepartmentsPage = lazy(() => import('./pages/departments').then((m) => ({ 
 const AgentsPage = lazy(() => import('./pages/agents').then((m) => ({ default: m.AgentsPage })))
 const TiersPage = lazy(() => import('./pages/tiers').then((m) => ({ default: m.TiersPage })))
 const OnboardingPage = lazy(() => import('./pages/onboarding').then((m) => ({ default: m.OnboardingPage })))
-const WorkflowsPage = lazy(() => import('./pages/workflows').then((m) => ({ default: m.WorkflowsPage })))
 const N8nWorkflowsPage = lazy(() => import('./pages/n8n-workflows').then((m) => ({ default: m.N8nWorkflowsPage })))
 
 const queryClient = new QueryClient()
@@ -125,7 +124,7 @@ export function App() {
             <Route path="departments" element={<Suspense fallback={<PageSkeleton />}><DepartmentsPage /></Suspense>} />
             <Route path="agents" element={<Suspense fallback={<PageSkeleton />}><AgentsPage /></Suspense>} />
             <Route path="tiers" element={<Suspense fallback={<PageSkeleton />}><TiersPage /></Suspense>} />
-            <Route path="workflows" element={<Suspense fallback={<PageSkeleton />}><WorkflowsPage /></Suspense>} />
+            <Route path="workflows" element={<Navigate to="/n8n-workflows" replace />} />
             <Route path="n8n-workflows" element={<Suspense fallback={<PageSkeleton />}><N8nWorkflowsPage /></Suspense>} />
             <Route path="settings" element={<Suspense fallback={<PageSkeleton />}><SettingsPage /></Suspense>} />
           </Route>

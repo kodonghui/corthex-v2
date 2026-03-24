@@ -261,10 +261,10 @@ describe('25.4: Route registration', () => {
 // === 6. Sidebar: both apps have navigation entries ===
 
 describe('25.4: Sidebar navigation', () => {
-  test('CEO sidebar has n8n 자동화 entry', () => {
+  test('CEO sidebar has n8n workflows entry', () => {
     const src = readFile('packages/app/src/components/sidebar.tsx')
     expect(src).toContain("'/n8n-workflows'")
-    expect(src).toContain('n8n 자동화')
+    expect(src).toContain('워크플로우')
   })
 
   test('Admin sidebar has n8n 에디터 entry', () => {

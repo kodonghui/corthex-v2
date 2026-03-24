@@ -23,7 +23,7 @@ const OrgTemplatesPage = lazy(() => import('./pages/org-templates').then((m) => 
 const EmployeesPage = lazy(() => import('./pages/employees').then((m) => ({ default: m.EmployeesPage })))
 const SettingsPage = lazy(() => import('./pages/settings').then((m) => ({ default: m.SettingsPage })))
 const OnboardingWizardPage = lazy(() => import('./pages/onboarding').then((m) => ({ default: m.OnboardingWizardPage })))
-const WorkflowsPage = lazy(() => import('./pages/workflows').then((m) => ({ default: m.WorkflowsPage })))
+
 const TemplateMarketPage = lazy(() => import('./pages/template-market').then((m) => ({ default: m.TemplateMarketPage })))
 const AgentMarketplacePage = lazy(() => import('./pages/agent-marketplace').then((m) => ({ default: m.AgentMarketplacePage })))
 const ApiKeysPage = lazy(() => import('./pages/api-keys').then((m) => ({ default: m.ApiKeysPage })))
@@ -102,7 +102,7 @@ export function App() {
             <Route path="sketchvibe" element={<Suspense fallback={<PageSkeleton />}><SketchVibePage /></Suspense>} />
             <Route path="nexus" element={<Suspense fallback={<PageSkeleton />}><NexusPage /></Suspense>} />
             <Route path="org-templates" element={<Suspense fallback={<PageSkeleton />}><OrgTemplatesPage /></Suspense>} />
-            <Route path="workflows" element={<Suspense fallback={<PageSkeleton />}><WorkflowsPage /></Suspense>} />
+            <Route path="workflows" element={<Navigate to="/n8n-editor" replace />} />
             <Route path="template-market" element={<Suspense fallback={<PageSkeleton />}><TemplateMarketPage /></Suspense>} />
             <Route path="agent-marketplace" element={<Suspense fallback={<PageSkeleton />}><AgentMarketplacePage /></Suspense>} />
             <Route path="api-keys" element={<Suspense fallback={<PageSkeleton />}><ApiKeysPage /></Suspense>} />

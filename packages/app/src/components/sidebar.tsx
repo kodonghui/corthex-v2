@@ -7,7 +7,7 @@ import {
   LayoutDashboard, Terminal, MessageSquare, TrendingUp, Users,
   Clock, FileText, FolderOpen, Network, Building2, Bot, Layers, Share2,
   Send, DollarSign, History, Shield, Lock, BookOpen,
-  Settings, BarChart3, Workflow, Hexagon,
+  Settings, BarChart3, Hexagon,
 } from 'lucide-react'
 
 declare const __BUILD_NUMBER__: string
@@ -40,8 +40,7 @@ const navSections: NavSection[] = [
   {
     label: 'TOOLS',
     items: [
-      { to: '/workflows', label: '워크플로우', icon: Workflow },
-      { to: '/n8n-workflows', label: 'n8n 자동화', icon: Hexagon },
+      { to: '/n8n-workflows', label: '워크플로우', icon: Hexagon },
       { to: '/sns', label: 'SNS', icon: Share2 },
       { to: '/trading', label: '전략실', icon: TrendingUp },
       { to: '/messenger', label: '메신저', icon: Send },
