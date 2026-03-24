@@ -29,3 +29,7 @@ export { TimelineGroup } from './timeline'
 export type { TimelineItem, TimelineGroupProps } from './timeline'
 export { ProgressBar } from './progress-bar'
 export type { ProgressBarProps } from './progress-bar'
+
+// Layouts
+export { StackLayout, SplitLayout, SplitLayoutSide, SplitLayoutMain, GridLayout, DashboardLayout, DashboardWidget } from './layouts'
+export type { StackLayoutProps, SplitLayoutProps, GridLayoutProps, DashboardLayoutProps, DashboardWidgetProps } from './layouts'
