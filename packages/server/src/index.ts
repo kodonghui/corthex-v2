@@ -63,6 +63,7 @@ import { performanceRoute } from './routes/workspace/performance'
 import { conversationsRoute } from './routes/workspace/conversations'
 import { workspaceTemplateMarketRoute } from './routes/workspace/template-market'
 import { workspaceAgentMarketplaceRoute } from './routes/workspace/agent-marketplace'
+import { marketingApprovalRoute } from './routes/workspace/marketing-approval'
 import { publicApiKeysRoute } from './routes/admin/public-api-keys'
 import { tierConfigsRoute } from './routes/admin/tier-configs'
 import { companySettingsRoute } from './routes/admin/company-settings'
@@ -229,6 +230,8 @@ app.route('/api/workspace', performanceRoute)
 app.route('/api/workspace/conversations', conversationsRoute)
 app.route('/api/workspace', workspaceTemplateMarketRoute)
 app.route('/api/workspace', workspaceAgentMarketplaceRoute)
+// Marketing approval (FR-MKT3)
+app.route('/api/workspace', marketingApprovalRoute)
 
 // 공개 API (API 키 인증)
 app.route('/api/v1', publicApiV1Route)
