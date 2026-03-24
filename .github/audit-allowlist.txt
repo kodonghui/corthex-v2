@@ -1,0 +1,14 @@
+# Audit Allowlist — Known unfixable transitive vulnerabilities
+# Reviewed: 2026-03-24. Next review: 2026-06-24
+# Each line is matched literally (grep -F) against bun audit output.
+# Add ONLY transitive dependencies where no direct fix is available.
+# Remove entries when upstream packages release fixes.
+# fast-xml-parser via @aws-sdk/client-s3 (transitive, AWS SDK pinned)
+GHSA-m7jm-9gc2-mpf2
+GHSA-jmr7-xgp7-cmfj
+GHSA-fj3w-jwp8-x2g3
+GHSA-jp2q-39xq-3w4g
+GHSA-8gc5-j5rx-235r
+# hono via @modelcontextprotocol/sdk (transitive, MCP SDK pins ^4.11.4 → resolves 4.12.3)
+# Our direct hono is 4.12.9 (patched). Remove when MCP SDK updates to >=4.12.4.
+GHSA-q5qw-h33p-qvwr

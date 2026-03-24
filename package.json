@@ -19,5 +19,9 @@
   "devDependencies": {
     "turbo": "^2",
     "typescript": "^5.7"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^3.8.1",
+    "hono": "^4.12.9"
   }
 }

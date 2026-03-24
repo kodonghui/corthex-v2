@@ -27,7 +27,7 @@
     "@zapier/secret-scrubber": "^1.1.6",
     "croner": "^10.0.1",
     "drizzle-orm": "0.39.3",
-    "hono": "4.12.3",
+    "hono": "4.12.9",
     "hono-rate-limiter": "0.5.3",
     "js-yaml": "^4.1.1",
     "marked": "12.0.0",

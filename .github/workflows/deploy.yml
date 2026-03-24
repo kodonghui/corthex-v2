@@ -43,6 +43,18 @@ jobs:
         if: steps.filter.outputs.code == 'true'
         run: bun install --frozen-lockfile
 
+      - name: Security audit (NFR-S14)
+        if: steps.filter.outputs.code == 'true'
+        run: |
+          AUDIT=$(bun audit 2>&1 || true)
+          echo "$AUDIT"
+          FILTERED=$(echo "$AUDIT" | grep -vFf <(grep -v '^#\|^$' .github/audit-allowlist.txt) || true)
+          HITS=$(echo "$FILTERED" | grep -E '^\s*(critical|high):' || true)
+          if [ -n "$HITS" ]; then
+            echo "$HITS" | while read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+
       - name: Engine boundary check (E10)
         if: steps.filter.outputs.code == 'true'
         run: bash .github/scripts/engine-boundary-check.sh
