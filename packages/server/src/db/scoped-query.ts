@@ -487,5 +487,102 @@ export function getDB(companyId: string) {
         .limit(opts.limit ?? 50)
         .offset(opts.offset ?? 0)
     },
+
+    // === Story 28.5: Agent Memories Extension ===
+
+    // READ — semantic similarity search on agent memories (Story 28.5)
+    searchMemoriesBySimilarity: async (
+      agentId: string,
+      queryEmbedding: number[],
+      limit = 10,
+      minSimilarity = 0.7,
+    ): Promise<Array<{
+      id: string
+      content: string
+      confidence: number
+      category: string | null
+      source: string
+      similarity: number
+    }>> => {
+      const vectorStr = pgvectorToSql(queryEmbedding)
+      const rows = await db.execute(sql`
+        SELECT id, content, confidence, category, source,
+               1 - (embedding <=> ${vectorStr}::vector) AS similarity
+        FROM agent_memories
+        WHERE company_id = ${companyId}::uuid
+          AND agent_id = ${agentId}::uuid
+          AND is_active = true
+          AND embedding IS NOT NULL
+          AND 1 - (embedding <=> ${vectorStr}::vector) >= ${minSimilarity}
+        ORDER BY embedding <=> ${vectorStr}::vector
+        LIMIT ${limit}
+      `)
+      const resultRows = (rows as unknown as { rows: any[] }).rows ?? (rows as unknown as any[])
+      return (resultRows || []).map((r: any) => ({
+        id: r.id as string,
+        content: r.content as string,
+        confidence: Number(r.confidence),
+        category: r.category as string | null,
+        source: r.source as string,
+        similarity: Number(r.similarity),
+      }))
+    },
+
+    // READ — list agent memories with pagination and filters (Story 28.5)
+    listAgentMemories: (agentId: string, opts?: {
+      source?: 'manual' | 'reflection'
+      category?: string
+      limit?: number
+      offset?: number
+    }) => {
+      const conditions: SQL[] = [
+        eq(agentMemories.companyId, companyId as any),
+        eq(agentMemories.agentId, agentId),
+        eq(agentMemories.isActive, true),
+      ]
+      if (opts?.source) conditions.push(eq(agentMemories.source, opts.source))
+      if (opts?.category) conditions.push(eq(agentMemories.category, opts.category))
+      return db.select().from(agentMemories)
+        .where(and(...conditions))
+        .orderBy(desc(agentMemories.createdAt))
+        .limit(opts?.limit ?? 50)
+        .offset(opts?.offset ?? 0)
+    },
+
+    // WRITE — delete a specific memory (soft delete via is_active=false, Story 28.5)
+    deleteAgentMemory: async (memoryId: string): Promise<boolean> => {
+      const result = await db.update(agentMemories)
+        .set({ isActive: false, updatedAt: new Date() })
+        .where(and(
+          eq(agentMemories.id, memoryId),
+          eq(agentMemories.companyId, companyId as any),
+        ))
+        .returning({ id: agentMemories.id })
+      return result.length > 0
+    },
+
+    // WRITE — update memory confidence (decay or reinforcement, Story 28.5)
+    updateMemoryConfidence: async (memoryId: string, confidence: number): Promise<void> => {
+      await db.update(agentMemories)
+        .set({ confidence, updatedAt: new Date() })
+        .where(and(
+          eq(agentMemories.id, memoryId),
+          eq(agentMemories.companyId, companyId as any),
+        ))
+    },
+
+    // WRITE — update agent memory embedding vector (Story 28.5)
+    updateAgentMemoryEmbedding: async (id: string, embedding: number[]): Promise<void> => {
+      if (embedding.some(v => !Number.isFinite(v))) {
+        throw new Error('embedding contains non-finite values')
+      }
+      const vectorStr = pgvectorToSql(embedding)
+      await db.execute(sql`
+        UPDATE agent_memories
+        SET embedding = ${vectorStr}::vector,
+            updated_at = NOW()
+        WHERE id = ${id}::uuid AND company_id = ${companyId}::uuid
+      `)
+    },
   }
 }

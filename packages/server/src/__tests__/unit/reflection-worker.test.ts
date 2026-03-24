@@ -85,6 +85,12 @@ mock.module('../../lib/cost-tracker', () => ({
   recordCost: mock((params: any) => { mockRecordCostCalls.push(params) }),
 }))
 
+mock.module('../../services/voyage-embedding', () => ({
+  getEmbedding: mock(async () => null),
+  EMBEDDING_MODEL: 'voyage-3',
+  EMBEDDING_DIMENSIONS: 1024,
+}))
+
 // Import AFTER mocks
 const { reflectForAgent, REFLECTION_MODEL } = await import('../../services/reflection-worker')
 

@@ -9,6 +9,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { getDB } from '../db/scoped-query'
 import { getCredentials } from './credential-vault'
 import { recordCost } from '../lib/cost-tracker'
+import { getEmbedding } from './voyage-embedding'
 
 export const REFLECTION_MODEL = 'claude-haiku-4-5-20251001'
 const MIN_OBSERVATIONS = 20
@@ -126,13 +127,26 @@ Output format:
       ? Math.max(0, Math.min(100, Math.round(mem.confidence)))
       : 50
 
-    await db.insertReflectionMemory({
+    const truncatedContent = mem.content.slice(0, 500)
+    const [inserted] = await db.insertReflectionMemory({
       agentId,
-      content: mem.content.slice(0, 500),
+      content: truncatedContent,
       confidence,
       category,
     })
     memoriesCreated++
+
+    // Fire-and-forget vectorize the new memory (same pattern as observation vectorization)
+    if (inserted?.id) {
+      Promise.resolve().then(async () => {
+        try {
+          const embedding = await getEmbedding(companyId, truncatedContent)
+          if (embedding) {
+            await db.updateAgentMemoryEmbedding(inserted.id, embedding)
+          }
+        } catch { /* graceful degradation — NFR-D3 */ }
+      }).catch(() => {})
+    }
   }
 
   // Mark observations as reflected

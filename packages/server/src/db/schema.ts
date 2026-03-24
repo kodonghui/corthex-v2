@@ -1597,6 +1597,9 @@ export const agentMemories = pgTable('agent_memories', {
   context: text('context'),  // what task/situation produced this memory
   source: varchar('source', { length: 50 }).notNull().default('manual'),
   confidence: integer('confidence').notNull().default(50),  // 0-100
+  embedding: vector('embedding', { dimensions: 1024 }),  // Voyage AI voyage-3 1024-dim for semantic search
+  category: varchar('category', { length: 50 }),  // 'insight', 'fact', 'preference', 'skill', 'pattern', etc.
+  observationIds: text('observation_ids'),  // JSON array of source observation UUIDs (e.g., '["uuid1","uuid2"]')
   usageCount: integer('usage_count').notNull().default(0),
   lastUsedAt: timestamp('last_used_at'),
   isActive: boolean('is_active').notNull().default(true),
