@@ -43,6 +43,9 @@ const PAGE_NAMES: Record<string, string> = {
 export function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [closing, setClosing] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try { return localStorage.getItem('corthex_sidebar_collapsed') === 'true' } catch { return false }
+  })
   const user = useAuthStore((s) => s.user)
   const location = useLocation()
   const navigate = useNavigate()
@@ -68,6 +71,14 @@ export function Layout() {
       setClosing(false)
     }, 200)
   }, [sidebarOpen])
+
+  const toggleCollapse = useCallback(() => {
+    setSidebarCollapsed((prev) => {
+      const next = !prev
+      try { localStorage.setItem('corthex_sidebar_collapsed', String(next)) } catch {}
+      return next
+    })
+  }, [])
 
   useEffect(() => {
     setSidebarOpen(false)
@@ -106,7 +117,7 @@ export function Layout() {
     <div className="h-screen flex flex-col lg:flex-row bg-[#faf8f5] text-[#1a1a1a]">
       {/* Desktop sidebar */}
       <div className="hidden lg:block">
-        <Sidebar />
+        <Sidebar collapsed={sidebarCollapsed} onToggleCollapse={toggleCollapse} />
       </div>
 
       {/* Mobile top bar */}

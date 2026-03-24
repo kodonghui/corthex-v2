@@ -7,7 +7,7 @@ import {
   LayoutDashboard, Terminal, MessageSquare, TrendingUp, Users,
   Clock, FileText, FolderOpen, Network, Building2, Bot, Layers, Share2,
   Send, DollarSign, History, Shield, Lock, BookOpen, GitBranch, UserCheck,
-  Settings, BarChart3, Hexagon, Brain,
+  Settings, BarChart3, Hexagon, Brain, ChevronsLeft, ChevronsRight,
 } from 'lucide-react'
 
 declare const __BUILD_NUMBER__: string
@@ -65,7 +65,7 @@ const navSections: NavSection[] = [
   },
 ]
 
-function SwitchToAdminButton() {
+function SwitchToAdminButton({ collapsed }: { collapsed?: boolean }) {
   const [switching, setSwitching] = useState(false)
   const { data: canSwitchData } = useQuery({
     queryKey: ['can-switch-admin'],
@@ -97,15 +97,20 @@ function SwitchToAdminButton() {
     <button
       onClick={handleSwitch}
       disabled={switching}
-      className="flex items-center gap-2 w-full px-3 py-2 text-xs font-medium rounded-lg transition-colors text-[#c5d8a4] bg-white/10 hover:bg-white/15"
+      className={`flex items-center gap-2 w-full px-3 py-2 text-xs font-medium rounded-lg transition-colors text-[#c5d8a4] bg-white/10 hover:bg-white/15 ${collapsed ? 'justify-center' : ''}`}
+      title={collapsed ? (switching ? '전환 중...' : '관리자 콘솔') : undefined}
     >
       <span>⇄</span>
-      <span>{switching ? '전환 중...' : '관리자 콘솔'}</span>
+      {!collapsed && <span>{switching ? '전환 중...' : '관리자 콘솔'}</span>}
     </button>
   )
 }
 
-export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
+export function Sidebar({ onNavClick, collapsed, onToggleCollapse }: {
+  onNavClick?: () => void
+  collapsed?: boolean
+  onToggleCollapse?: () => void
+}) {
   const { user, logout } = useAuthStore()
   const { data: countData } = useQuery({
     queryKey: ['notifications-count'],
@@ -116,28 +121,36 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
   const unreadCount = countData?.data?.unread ?? 0
 
   return (
-    <aside className="w-[280px] h-full flex flex-col bg-[#283618] border-r border-[#3a4d28] shrink-0">
+    <aside
+      className={`h-full flex flex-col bg-[#283618] border-r border-[#3a4d28] shrink-0 transition-[width] duration-200 ${collapsed ? 'w-16' : 'w-[280px]'}`}
+      aria-label="Main navigation"
+    >
       {/* Brand */}
-      <div className="h-14 flex items-center px-6 border-b border-white/10 shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded bg-[#606C38]/30 flex items-center justify-center text-[#c5d8a4]">
+      <div className="h-14 flex items-center px-4 border-b border-white/10 shrink-0">
+        <div className={`flex items-center gap-3 ${collapsed ? 'justify-center w-full' : ''}`}>
+          <div className="w-8 h-8 rounded bg-[#606C38]/30 flex items-center justify-center text-[#c5d8a4] shrink-0">
             <Hexagon className="w-5 h-5" />
           </div>
-          <div className="flex flex-col">
-            <span className="font-bold tracking-widest text-sm leading-tight text-white">CORTHEX</span>
-            <span className="text-[10px] text-[#a3c48a] font-mono uppercase tracking-wider">Management Platform</span>
-          </div>
+          {!collapsed && (
+            <div className="flex flex-col">
+              <span className="font-bold tracking-widest text-sm leading-tight text-white">CORTHEX</span>
+              <span className="text-[10px] text-[#a3c48a] font-mono uppercase tracking-wider">Management Platform</span>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-4 px-3 flex flex-col gap-6">
+      <nav className="flex-1 overflow-y-auto py-4 px-2 flex flex-col gap-6" role="navigation">
         {navSections.map((section, si) => (
           <div key={si} className="flex flex-col gap-1">
-            {section.label && (
+            {section.label && !collapsed && (
               <span className="px-3 text-[11px] font-mono text-[#a3c48a] uppercase tracking-widest mb-1">
                 {section.label}
               </span>
+            )}
+            {collapsed && si > 0 && (
+              <div className="mx-3 border-t border-white/10 mb-1" />
             )}
             {section.items.map((item) => (
               <NavLink
@@ -145,17 +158,20 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
                 to={item.to}
                 end={item.to === '/'}
                 onClick={onNavClick}
+                title={collapsed ? item.label : undefined}
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                    collapsed ? 'justify-center' : ''
+                  } ${
                     isActive
-                      ? 'bg-white/10 text-white font-medium'
+                      ? 'bg-[#e5e1d3]/20 text-white font-medium'
                       : 'text-[#a3c48a] hover:bg-white/10 hover:text-white'
                   }`
                 }
               >
                 <item.icon className="w-5 h-5 shrink-0" />
-                <span>{item.label}</span>
-                {item.to === '/notifications' && unreadCount > 0 && (
+                {!collapsed && <span>{item.label}</span>}
+                {!collapsed && item.to === '/notifications' && unreadCount > 0 && (
                   <span className="ml-auto px-1.5 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
                     {unreadCount > 99 ? '99+' : unreadCount}
                   </span>
@@ -166,28 +182,45 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
         ))}
       </nav>
 
+      {/* Collapse toggle (desktop only) */}
+      {onToggleCollapse && (
+        <button
+          onClick={onToggleCollapse}
+          className="hidden lg:flex items-center justify-center h-8 mx-2 mb-2 rounded-lg text-[#a3c48a] hover:bg-white/10 hover:text-white transition-colors"
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {collapsed ? <ChevronsRight className="w-4 h-4" /> : <ChevronsLeft className="w-4 h-4" />}
+        </button>
+      )}
+
       {/* User Context */}
-      <div className="p-4 border-t border-white/10 shrink-0 space-y-2">
-        <SwitchToAdminButton />
-        <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors">
+      <div className="p-3 border-t border-white/10 shrink-0 space-y-2">
+        <SwitchToAdminButton collapsed={collapsed} />
+        <div className={`flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors ${collapsed ? 'justify-center' : ''}`}>
           <div className="w-8 h-8 rounded-full bg-[#606C38] text-white flex items-center justify-center text-xs font-medium shrink-0">
             {user?.name?.charAt(0) || '?'}
           </div>
-          <div className="flex flex-col flex-1 min-w-0">
-            <span className="text-sm font-medium text-white truncate">{user?.name}</span>
-            <span className="text-xs text-[#a3c48a] truncate">{user?.role === 'admin' ? 'System Administrator' : 'User'}</span>
+          {!collapsed && (
+            <div className="flex flex-col flex-1 min-w-0">
+              <span className="text-sm font-medium text-white truncate">{user?.name}</span>
+              <span className="text-xs text-[#a3c48a] truncate">{user?.role === 'admin' ? 'System Administrator' : 'User'}</span>
+            </div>
+          )}
+          {!collapsed && (
+            <button
+              onClick={logout}
+              className="text-xs text-[#a3c48a]/70 hover:text-red-400 transition-colors shrink-0"
+              aria-label="로그아웃"
+            >
+              로그아웃
+            </button>
+          )}
+        </div>
+        {!collapsed && (
+          <div className="px-2 text-[10px] text-[#a3c48a]/50 font-mono">
+            #{__BUILD_NUMBER__}{__BUILD_HASH__ ? ` · ${__BUILD_HASH__}` : ''}
           </div>
-          <button
-            onClick={logout}
-            className="text-xs text-[#a3c48a]/70 hover:text-red-400 transition-colors shrink-0"
-            aria-label="로그아웃"
-          >
-            로그아웃
-          </button>
-        </div>
-        <div className="px-2 text-[10px] text-[#a3c48a]/50 font-mono">
-          #{__BUILD_NUMBER__}{__BUILD_HASH__ ? ` · ${__BUILD_HASH__}` : ''}
-        </div>
+        )}
       </div>
     </aside>
   )
