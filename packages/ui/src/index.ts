@@ -33,3 +33,12 @@ export type { ProgressBarProps } from './progress-bar'
 // Layouts
 export { StackLayout, SplitLayout, SplitLayoutSide, SplitLayoutMain, GridLayout, DashboardLayout, DashboardWidget } from './layouts'
 export type { StackLayoutProps, SplitLayoutProps, GridLayoutProps, DashboardLayoutProps, DashboardWidgetProps } from './layouts'
+
+// Accessibility
+export {
+  createFocusTrap, focusRingClasses, skipToContentId, getSkipToContentProps,
+  liveRegion, describedBy, labelledBy, visuallyHidden, controls, expandable, busy, ariaId, announce,
+  hexToRgb, relativeLuminance, contrastRatio, meetsWcagAA, meetsWcagAAA,
+  motionSafeClasses, prefersReducedMotion, getTransitionDuration, reducedMotionCSS,
+} from './a11y'
+export type { FocusTrapOptions } from './a11y'
