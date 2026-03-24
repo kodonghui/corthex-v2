@@ -43,6 +43,11 @@ describe('soul-templates', () => {
         '{{department_name}}',
         '{{owner_name}}',
         '{{specialty}}',
+        '{{personality_openness}}',
+        '{{personality_conscientiousness}}',
+        '{{personality_extraversion}}',
+        '{{personality_agreeableness}}',
+        '{{personality_neuroticism}}',
       ]
       for (const v of vars) {
         expect(validVars).toContain(v)
@@ -163,6 +168,11 @@ describe('soul-templates', () => {
         '{{department_name}}',
         '{{owner_name}}',
         '{{specialty}}',
+        '{{personality_openness}}',
+        '{{personality_conscientiousness}}',
+        '{{personality_extraversion}}',
+        '{{personality_agreeableness}}',
+        '{{personality_neuroticism}}',
       ]
       for (const v of vars) {
         expect(validVars).toContain(v)

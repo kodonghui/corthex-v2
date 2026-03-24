@@ -47,6 +47,23 @@ export type SwitchAppResponse = {
   targetUrl: string
 }
 
+// === 에이전트 성격 (Story 24.4, Big Five OCEAN) ===
+export type PersonalityTraits = {
+  openness: number
+  conscientiousness: number
+  extraversion: number
+  agreeableness: number
+  neuroticism: number
+}
+
+export type PersonalityPreset = {
+  id: string
+  name: string
+  nameKo: string
+  description: string
+  traits: PersonalityTraits
+}
+
 // === 에이전트 상태 ===
 export type AgentStatus = 'online' | 'working' | 'error' | 'offline'
 

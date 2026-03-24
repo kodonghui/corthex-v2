@@ -14,6 +14,7 @@ import {
   previewSoul,
 } from '../../services/organization'
 import { getCacheRecommendation } from '../../lib/tool-cache-config'
+import { PERSONALITY_PRESETS } from '@corthex/shared'
 
 export const agentsRoute = new Hono<AppEnv>()
 
@@ -65,6 +66,11 @@ const updateAgentSchema = z.object({
 
 const soulPreviewSchema = z.object({
   soul: z.string().optional(),
+})
+
+// GET /api/admin/agents/personality-presets -- Story 24.4: preset personality templates (AR30, FR-PERS6)
+agentsRoute.get('/agents/personality-presets', async (c) => {
+  return c.json({ success: true, data: PERSONALITY_PRESETS })
 })
 
 // GET /api/admin/agents -- tenant-scoped list with optional filters

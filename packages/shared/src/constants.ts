@@ -42,3 +42,31 @@ export const ERROR_CODES = {
 } as const
 
 export type ErrorCode = keyof typeof ERROR_CODES
+
+// === Story 24.4: Personality Presets (AR30, FR-PERS6) ===
+// Hardcoded Big Five OCEAN presets — values 0-100
+import type { PersonalityPreset } from './types'
+
+export const PERSONALITY_PRESETS: readonly PersonalityPreset[] = [
+  {
+    id: 'balanced',
+    name: 'Balanced',
+    nameKo: '균형',
+    description: 'Neutral and adaptable — equal weight across all traits',
+    traits: { openness: 50, conscientiousness: 50, extraversion: 50, agreeableness: 50, neuroticism: 50 },
+  },
+  {
+    id: 'creative',
+    name: 'Creative',
+    nameKo: '창의적',
+    description: 'Open-minded, spontaneous, sociable — strong imagination and curiosity',
+    traits: { openness: 80, conscientiousness: 30, extraversion: 70, agreeableness: 60, neuroticism: 40 },
+  },
+  {
+    id: 'analytical',
+    name: 'Analytical',
+    nameKo: '분석적',
+    description: 'Methodical, focused, reserved — precision and logical rigor',
+    traits: { openness: 40, conscientiousness: 90, extraversion: 20, agreeableness: 40, neuroticism: 30 },
+  },
+] as const
