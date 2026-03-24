@@ -193,6 +193,17 @@ export async function handleSubscription(
       break
     }
 
+    case 'office': {
+      // 같은 companyId만 구독 가능
+      const officeCompanyId = id || client.companyId
+      if (officeCompanyId !== client.companyId) {
+        ws.send(JSON.stringify({ type: 'error', code: 'FORBIDDEN', channel }))
+        return
+      }
+      client.subscriptions.add(`office::${client.companyId}`)
+      break
+    }
+
     case 'cost':
     case 'command':
     case 'delegation':

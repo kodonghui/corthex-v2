@@ -284,6 +284,9 @@ eventBus.on('cost', (data: { companyId: string; payload: unknown }) => {
 eventBus.on('argos', (data: { companyId: string; payload: unknown }) => {
   broadcastToCompany(data.companyId, 'argos', data.payload)
 })
+eventBus.on('office', (data: { companyId: string; payload: unknown }) => {
+  broadcastToCompany(data.companyId, 'office', data.payload)
+})
 eventBus.on('debate', (data: { companyId: string; payload: unknown }) => {
   const payload = data.payload as { debateId?: string }
   if (payload?.debateId) {

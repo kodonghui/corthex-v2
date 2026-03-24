@@ -16,6 +16,8 @@ import { checkSemanticCache, saveToSemanticCache } from './semantic-cache'
 import { sanitizeObservation, calculateConfidence } from '../services/observation-sanitizer'
 import { triggerObservationEmbedding } from '../services/voyage-embedding'
 import { searchRelevantMemories } from '../services/soul-enricher'
+import { updateAgentStatus, getAgentState } from '../services/office-state'
+import { eventBus } from '../lib/event-bus'
 
 /** Log tool sanitize blocked event for audit visibility */
 async function logToolSanitizeEvent(
@@ -106,6 +108,15 @@ export async function* runAgent(options: RunAgentOptions): AsyncGenerator<SSEEve
 
   try {
     log.info({ event: 'agent_start', data: { depth: ctx.depth } }, 'Agent starting')
+
+    // Office state: mark agent as working (fire-and-forget)
+    try {
+      updateAgentStatus(ctx.companyId, agentName, 'working', message.slice(0, 100))
+      const agentState = getAgentState(ctx.companyId, agentName)
+      if (agentState) {
+        eventBus.emit('office', { companyId: ctx.companyId, payload: { type: 'agent_update', agent: agentState } })
+      }
+    } catch { /* office state failure must never impact agent execution */ }
 
     // Resolve model from agent tier (async lookup with fallback)
     const [agentRecord] = await getDB(ctx.companyId).agentById(agentName)
@@ -397,6 +408,15 @@ export async function* runAgent(options: RunAgentOptions): AsyncGenerator<SSEEve
     yield { type: 'done', costUsd, tokensUsed }
     log.info({ event: 'agent_done', data: { costUsd, tokensUsed } }, 'Agent completed')
 
+    // Office state: mark agent as idle (fire-and-forget)
+    try {
+      updateAgentStatus(ctx.companyId, agentName, 'idle')
+      const agentState = getAgentState(ctx.companyId, agentName)
+      if (agentState) {
+        eventBus.emit('office', { companyId: ctx.companyId, payload: { type: 'agent_update', agent: agentState } })
+      }
+    } catch { /* office state failure must never impact agent execution */ }
+
     // Auto-record observation (AR67 — fire-and-forget, MEM-6 4-Layer sanitization + D31 confidence)
     try {
       const rawContent = fullResponseParts.join('')
@@ -438,6 +458,15 @@ export async function* runAgent(options: RunAgentOptions): AsyncGenerator<SSEEve
   } catch (err) {
     const errMessage = err instanceof Error ? err.message : 'Unknown error'
     log.error({ event: 'agent_error', data: { error: errMessage } }, 'Agent failed')
+
+    // Office state: mark agent as error (fire-and-forget)
+    try {
+      updateAgentStatus(ctx.companyId, agentName, 'error', errMessage.slice(0, 100))
+      const agentState = getAgentState(ctx.companyId, agentName)
+      if (agentState) {
+        eventBus.emit('office', { companyId: ctx.companyId, payload: { type: 'agent_update', agent: agentState } })
+      }
+    } catch { /* office state failure must never impact agent execution */ }
 
     // Auto-record error observation (AR67 — fire-and-forget, MEM-6 4-Layer sanitization + D31 confidence)
     try {

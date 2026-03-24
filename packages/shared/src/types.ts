@@ -515,6 +515,27 @@ export type WsChannel =
   | 'debate'
   | 'strategy'
   | 'argos'
+  | 'office'
+
+// === Office WebSocket ===
+export type AgentOfficeStatus = 'idle' | 'working' | 'reflecting' | 'error' | 'offline'
+
+export type AgentOfficeState = {
+  agentId: string
+  name: string
+  status: AgentOfficeStatus
+  currentTask?: string
+  position: { x: number; y: number }
+  lastActiveAt: string // ISO string for serialization
+  tier: string
+  department?: string
+}
+
+export type OfficeWsOutbound =
+  | { type: 'office_state'; agents: AgentOfficeState[] }
+  | { type: 'agent_update'; agent: AgentOfficeState }
+  | { type: 'agent_activity'; agentId: string; activity: string }
+  | { type: 'pong' }
 
 export type WsInboundMessage = {
   type: 'subscribe' | 'unsubscribe'
