@@ -101,9 +101,9 @@ hubRoute.post('/stream', zValidator('json', streamSchema), async (c) => {
       extraVars.knowledge_context = knowledgeCtx
     }
   }
-  const soul = targetAgent.soul
+  const soul = (targetAgent.soul
     ? await renderSoul(targetAgent.soul, targetAgent.id, companyId, extraVars)
-    : ''
+    : '') + enriched.memoryContext
 
   // Build SessionContext (E1)
   const sessionId = inputSessionId ?? crypto.randomUUID()

@@ -15,6 +15,7 @@ import type { UsageInfo } from './hooks/cost-tracker'
 import { checkSemanticCache, saveToSemanticCache } from './semantic-cache'
 import { sanitizeObservation, calculateConfidence } from '../services/observation-sanitizer'
 import { triggerObservationEmbedding } from '../services/voyage-embedding'
+import { searchRelevantMemories } from '../services/soul-enricher'
 
 /** Log tool sanitize blocked event for audit visibility */
 async function logToolSanitizeEvent(
@@ -165,10 +166,20 @@ export async function* runAgent(options: RunAgentOptions): AsyncGenerator<SSEEve
 
     const allTools: Anthropic.Messages.Tool[] = [CALL_AGENT_TOOL, ...agentApiTools, ...mcpApiTools]
 
+    // Story 28.6: Semantic memory search — find relevant memories for this conversation
+    // NFR-D3: fire-and-forget — memory search failure must not impact agent execution
+    let soulWithMemories = soul || ''
+    try {
+      const relevantMemories = await searchRelevantMemories(ctx.companyId, agentName, message, 5)
+      if (relevantMemories) {
+        soulWithMemories += `\n\n<relevant_memories>\nRelevant memories for this conversation:\n${relevantMemories}\n</relevant_memories>`
+      }
+    } catch { /* NFR-D3: memory search failure must not impact agent execution */ }
+
     // System prompt with cache_control (D17: cache_control: { type:'ephemeral' })
     const systemBlocks: Anthropic.Messages.TextBlockParam[] = [{
       type: 'text',
-      text: soul || '',
+      text: soulWithMemories,
       cache_control: { type: 'ephemeral' },
     }]
 

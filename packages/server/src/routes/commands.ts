@@ -55,7 +55,7 @@ async function runAgentForCommand(opts: {
 
   const enriched = await enrich(agentRow.id, companyId)
   const extraVars = { ...enriched.personalityVars, ...enriched.memoryVars }
-  const soul = agentRow.soul ? await renderSoul(agentRow.soul, agentRow.id, companyId, extraVars) : ''
+  const soul = (agentRow.soul ? await renderSoul(agentRow.soul, agentRow.id, companyId, extraVars) : '') + enriched.memoryContext
   const ctx: SessionContext = {
     cliToken: await resolveCliToken(userId, companyId),
     userId,
