@@ -40,7 +40,7 @@ export type RecordParams = {
   model: string
   inputTokens: number
   outputTokens: number
-  source: 'chat' | 'delegation' | 'job' | 'sns' | 'batch'
+  source: 'chat' | 'delegation' | 'job' | 'sns' | 'batch' | 'reflection'
   isBatch?: boolean
 }
 
