@@ -1,18 +1,174 @@
-import { Network } from 'lucide-react'
+import { useCallback, useRef } from 'react'
+import {
+  ReactFlow,
+  Background,
+  BackgroundVariant,
+  Controls,
+  MiniMap,
+  useReactFlow,
+  type Node,
+  type Edge,
+} from '@xyflow/react'
+import { Download, ZoomIn, ZoomOut, Maximize } from 'lucide-react'
+import { CompanyNode } from './CompanyNode'
+import { DepartmentNode } from './DepartmentNode'
+import { AgentNode } from './AgentNode'
 
-export function NexusCanvas() {
-    return (
-        <div className="flex-1 relative bg-[radial-gradient(var(--tw-gradient-stops))] from-slate-400/20 via-transparent to-transparent flex items-center justify-center overflow-hidden" style={{ backgroundSize: '24px 24px', backgroundImage: 'radial-gradient(rgba(148, 163, 184, 0.2) 1px, transparent 1px)' }}>
-            <div className="flex flex-col items-center gap-4 p-8 rounded-2xl border border-dashed border-slate-300 bg-white/50/50 backdrop-blur-sm max-w-md text-center z-0">
-                <div className="w-16 h-16 rounded-full bg-[#5a7247]/10 flex items-center justify-center mb-2">
-                    <Network className="w-8 h-8 text-[#5a7247]" />
-                </div>
-                <h2 className="text-lg font-bold text-slate-900">React Flow 캔버스가 여기에 렌더링됩니다</h2>
-                <p className="text-sm text-stone-400">Interactive network visualization canvas. Use the toolbar above to manage view states.</p>
-                <button className="mt-4 h-10 px-6 bg-white text-white rounded-xl text-sm font-bold hover:opacity-90 transition-opacity">
-                    Initialize Workspace
-                </button>
-            </div>
-        </div>
-    )
+const nodeTypes = {
+  company: CompanyNode,
+  department: DepartmentNode,
+  agent: AgentNode,
+}
+
+const defaultEdgeOptions = {
+  type: 'smoothstep' as const,
+  style: { stroke: '#a3b18a', strokeWidth: 2 },
+  animated: false,
+}
+
+export interface NexusCanvasProps {
+  nodes: Node[]
+  edges: Edge[]
+  onNodesChange?: (changes: unknown[]) => void
+  onEdgesChange?: (changes: unknown[]) => void
+  onNodeClick?: (event: React.MouseEvent, node: Node) => void
+  editMode?: boolean
+}
+
+export function NexusCanvas({
+  nodes,
+  edges,
+  onNodesChange,
+  onEdgesChange,
+  onNodeClick,
+  editMode = false,
+}: NexusCanvasProps) {
+  const canvasRef = useRef<HTMLDivElement>(null)
+
+  return (
+    <div ref={canvasRef} className="flex-1 relative bg-[#faf8f5]" data-testid="nexus-canvas">
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        nodeTypes={nodeTypes}
+        defaultEdgeOptions={defaultEdgeOptions}
+        onNodesChange={onNodesChange as never}
+        onEdgesChange={onEdgesChange as never}
+        onNodeClick={onNodeClick}
+        fitView
+        fitViewOptions={{ padding: 0.3 }}
+        minZoom={0.2}
+        maxZoom={2}
+        nodesDraggable={editMode}
+        nodesConnectable={false}
+        elementsSelectable={true}
+        deleteKeyCode={[]}
+        proOptions={{ hideAttribution: true }}
+      >
+        <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="#d1cfcc" />
+        <Controls
+          showInteractive={false}
+          className="!bg-white !border-[#e5e1d3] !shadow-[0_4px_20px_rgba(40,54,24,0.08)] !rounded-xl [&_button]:!bg-[#faf8f5] [&_button]:!border-[#e5e1d3] [&_button]:!text-[#6b705c] [&_button:hover]:!bg-[#f5f0e8] [&_button]:!rounded-lg"
+        />
+        <MiniMap
+          nodeStrokeWidth={3}
+          style={{ width: 192, height: 128 }}
+          className="!bg-white !border-[#e5e1d3] !rounded-xl !shadow-[0_4px_20px_rgba(40,54,24,0.08)] hidden md:block"
+          nodeColor={(n) => {
+            if (n.type === 'company') return '#283618'
+            if (n.type === 'department') return '#5a7247'
+            return '#a3b18a'
+          }}
+        />
+      </ReactFlow>
+
+      {/* Export Button */}
+      <NexusExportButton canvasRef={canvasRef} />
+    </div>
+  )
+}
+
+function NexusExportButton({ canvasRef }: { canvasRef: React.RefObject<HTMLDivElement | null> }) {
+  const { getNodes } = useReactFlow()
+
+  const handleExport = useCallback(async (format: 'png' | 'svg') => {
+    const el = canvasRef.current
+    if (!el) return
+
+    const viewport = el.querySelector('.react-flow__viewport') as SVGElement | null
+    if (!viewport) return
+
+    if (format === 'svg') {
+      const svgClone = viewport.cloneNode(true) as SVGElement
+      const svgDoc = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+      svgDoc.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+      svgDoc.setAttribute('width', '1920')
+      svgDoc.setAttribute('height', '1080')
+      svgDoc.appendChild(svgClone)
+      const blob = new Blob([svgDoc.outerHTML], { type: 'image/svg+xml' })
+      downloadBlob(blob, 'nexus-orgchart.svg')
+      return
+    }
+
+    // PNG export via canvas
+    try {
+      const canvas = document.createElement('canvas')
+      const rect = el.getBoundingClientRect()
+      canvas.width = rect.width * 2
+      canvas.height = rect.height * 2
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return
+
+      ctx.scale(2, 2)
+      ctx.fillStyle = '#faf8f5'
+      ctx.fillRect(0, 0, rect.width, rect.height)
+
+      // Simple canvas-based PNG export
+      const svgEl = el.querySelector('.react-flow__viewport')
+      if (svgEl) {
+        const svgData = new XMLSerializer().serializeToString(svgEl)
+        const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' })
+        const img = new Image()
+        const svgUrl = URL.createObjectURL(svgBlob)
+        img.onload = () => {
+          ctx.drawImage(img, 0, 0, rect.width, rect.height)
+          canvas.toBlob((blob: Blob | null) => blob && downloadBlob(blob, 'nexus-orgchart.png'), 'image/png')
+          URL.revokeObjectURL(svgUrl)
+        }
+        img.src = svgUrl
+      }
+    } catch {
+      // silently fail
+    }
+  }, [canvasRef, getNodes])
+
+  return (
+    <div className="absolute bottom-4 right-4 z-10 flex gap-2">
+      <button
+        onClick={() => handleExport('png')}
+        className="flex items-center gap-1.5 px-3 py-2 bg-white border border-[#e5e1d3] rounded-lg text-xs font-medium text-[#6b705c] hover:bg-[#f5f0e8] transition-colors shadow-sm"
+        title="Export as PNG"
+      >
+        <Download className="w-3.5 h-3.5" />
+        PNG
+      </button>
+      <button
+        onClick={() => handleExport('svg')}
+        className="flex items-center gap-1.5 px-3 py-2 bg-white border border-[#e5e1d3] rounded-lg text-xs font-medium text-[#6b705c] hover:bg-[#f5f0e8] transition-colors shadow-sm"
+        title="Export as SVG"
+      >
+        <Download className="w-3.5 h-3.5" />
+        SVG
+      </button>
+    </div>
+  )
+}
+
+function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(url)
 }
