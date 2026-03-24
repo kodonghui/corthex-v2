@@ -1,4 +1,4 @@
-import type { AgentOfficeState, AgentOfficeStatus } from '@corthex/shared'
+import type { AgentOfficeState, AgentOfficeStatus, AgentSpriteSettings } from '@corthex/shared'
 
 // In-memory state per company: agentId → AgentOfficeState
 const companyStates = new Map<string, Map<string, AgentOfficeState>>()
@@ -125,6 +125,19 @@ export function calculatePosition(
     x: Math.round(cellW * (col + 1)),
     y: Math.round(cellH * (row + 1)),
   }
+}
+
+/** Update agent sprite customization */
+export function updateAgentSprite(
+  companyId: string,
+  agentId: string,
+  sprite: AgentSpriteSettings,
+): void {
+  const stateMap = companyStates.get(companyId)
+  if (!stateMap) return
+  const agent = stateMap.get(agentId)
+  if (!agent) return
+  agent.sprite = { ...agent.sprite, ...sprite }
 }
 
 /** Clear state for a company (e.g. on teardown) */

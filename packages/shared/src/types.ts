@@ -520,6 +520,11 @@ export type WsChannel =
 // === Office WebSocket ===
 export type AgentOfficeStatus = 'idle' | 'working' | 'reflecting' | 'error' | 'offline'
 
+export type AgentSpriteSettings = {
+  color?: string    // hex color for avatar circle, e.g. '#ff6b6b'
+  icon?: string     // emoji or icon key
+}
+
 export type AgentOfficeState = {
   agentId: string
   name: string
@@ -529,6 +534,7 @@ export type AgentOfficeState = {
   lastActiveAt: string // ISO string for serialization
   tier: string
   department?: string
+  sprite?: AgentSpriteSettings
 }
 
 export type OfficeWsOutbound =
