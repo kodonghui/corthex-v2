@@ -5,8 +5,8 @@
  */
 
 import React from "react";
-import { FeatherPlus } from "@subframe/core";
-import * as SubframeCore from "@subframe/core";
+import { FeatherPlus } from "../subframe-shim";
+import * as SubframeCore from "../subframe-shim";
 import * as SubframeUtils from "../utils";
 
 interface IconButtonRootProps

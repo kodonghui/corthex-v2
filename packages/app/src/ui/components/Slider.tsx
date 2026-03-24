@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import * as SubframeCore from "@subframe/core";
+import * as SubframeCore from "../subframe-shim";
 import * as SubframeUtils from "../utils";
 
 interface RangeProps

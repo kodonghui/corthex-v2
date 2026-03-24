@@ -1,41 +1,29 @@
 "use client";
-/*
- * Documentation:
- * Fullscreen Dialog — https://app.subframe.com/fe1d14ed3033/library?component=Fullscreen+Dialog_3f094173-71de-4378-a09a-05c482f7a137
- */
+// Legacy Subframe component — rewritten to remove @subframe/core dependency
 
 import React from "react";
-import * as SubframeCore from "@subframe/core";
-import * as SubframeUtils from "../utils";
+import { twClassNames } from "../utils";
 
-interface FullscreenDialogRootProps
-  extends React.ComponentProps<typeof SubframeCore.FullScreenDialog.Root> {
+interface FullscreenDialogRootProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   className?: string;
 }
 
-const FullscreenDialogRoot = React.forwardRef<
-  HTMLDivElement,
-  FullscreenDialogRootProps
->(function FullscreenDialogRoot(
-  { children, className, ...otherProps }: FullscreenDialogRootProps,
-  ref
-) {
-  return children ? (
-    <SubframeCore.FullScreenDialog.Root asChild={true} {...otherProps}>
+const FullscreenDialogRoot = React.forwardRef<HTMLDivElement, FullscreenDialogRootProps>(
+  function FullscreenDialogRoot({ children, className, open, onOpenChange, ...otherProps }, ref) {
+    if (!open && open !== undefined) return null;
+    return children ? (
       <div
-        className={SubframeUtils.twClassNames(
-          "flex h-full w-full flex-col items-start bg-default-background",
-          className
-        )}
+        className={twClassNames("fixed inset-0 z-50 flex h-full w-full flex-col items-start bg-white", className)}
         ref={ref}
+        {...otherProps}
       >
         {children}
       </div>
-    </SubframeCore.FullScreenDialog.Root>
-  ) : null;
-});
+    ) : null;
+  }
+);
 
 export const FullscreenDialog = FullscreenDialogRoot;

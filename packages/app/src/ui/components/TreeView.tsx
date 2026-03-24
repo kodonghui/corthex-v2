@@ -6,9 +6,9 @@
  */
 
 import React from "react";
-import { FeatherFile } from "@subframe/core";
-import { FeatherFolder } from "@subframe/core";
-import * as SubframeCore from "@subframe/core";
+import { FeatherFile } from "../subframe-shim";
+import { FeatherFolder } from "../subframe-shim";
+import * as SubframeCore from "../subframe-shim";
 import * as SubframeUtils from "../utils";
 import { Accordion } from "./Accordion";
 

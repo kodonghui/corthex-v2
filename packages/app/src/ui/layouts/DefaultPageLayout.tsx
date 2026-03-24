@@ -9,10 +9,10 @@
  */
 
 import React from "react";
-import { FeatherLogOut } from "@subframe/core";
-import { FeatherSettings } from "@subframe/core";
-import { FeatherUser } from "@subframe/core";
-import * as SubframeCore from "@subframe/core";
+import { FeatherLogOut } from "../subframe-shim";
+import { FeatherSettings } from "../subframe-shim";
+import { FeatherUser } from "../subframe-shim";
+import * as SubframeCore from "../subframe-shim";
 import { Avatar } from "../components/Avatar";
 import { Badge } from "../components/Badge";
 import { DropdownMenu } from "../components/DropdownMenu";

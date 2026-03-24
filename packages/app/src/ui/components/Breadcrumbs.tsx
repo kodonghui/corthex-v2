@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { FeatherChevronRight } from "@subframe/core";
+import { FeatherChevronRight } from "../subframe-shim";
 import * as SubframeUtils from "../utils";
 
 interface ItemProps extends React.HTMLAttributes<HTMLSpanElement> {

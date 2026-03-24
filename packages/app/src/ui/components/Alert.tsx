@@ -5,8 +5,8 @@
  */
 
 import React from "react";
-import { FeatherInfo } from "@subframe/core";
-import * as SubframeCore from "@subframe/core";
+import { FeatherInfo } from "../subframe-shim";
+import * as SubframeCore from "../subframe-shim";
 import * as SubframeUtils from "../utils";
 
 interface AlertRootProps

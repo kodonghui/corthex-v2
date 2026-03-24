@@ -5,8 +5,8 @@
  */
 
 import React from "react";
-import { FeatherChevronDown } from "@subframe/core";
-import * as SubframeCore from "@subframe/core";
+import { FeatherChevronDown } from "../subframe-shim";
+import * as SubframeCore from "../subframe-shim";
 import * as SubframeUtils from "../utils";
 
 interface ChevronProps

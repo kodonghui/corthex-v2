@@ -6,8 +6,8 @@
  */
 
 import React from "react";
-import { FeatherClipboard } from "@subframe/core";
-import * as SubframeCore from "@subframe/core";
+import { FeatherClipboard } from "../subframe-shim";
+import * as SubframeCore from "../subframe-shim";
 import * as SubframeUtils from "../utils";
 import { Tooltip } from "./Tooltip";
 

@@ -1,12 +1,17 @@
-import * as SubframeCore from "@subframe/core";
+// Legacy Subframe utility — replaced with plain implementation
+// This file is part of the legacy ui/ directory (unused by main app, which uses @corthex/ui)
 
-export const twClassNames = SubframeCore.createTwClassNames([
-  "text-caption",
-  "text-caption-bold",
-  "text-body",
-  "text-body-bold",
-  "text-heading-3",
-  "text-heading-2",
-  "text-heading-1",
-  "text-monospace-body",
-]);
+type ClassValue = string | boolean | undefined | null | Record<string, boolean>
+
+function resolveClass(v: ClassValue): string {
+  if (!v) return ''
+  if (typeof v === 'string') return v
+  if (typeof v === 'object') {
+    return Object.entries(v).filter(([, val]) => val).map(([key]) => key).join(' ')
+  }
+  return ''
+}
+
+export function twClassNames(...args: ClassValue[]): string {
+  return args.map(resolveClass).filter(Boolean).join(' ')
+}

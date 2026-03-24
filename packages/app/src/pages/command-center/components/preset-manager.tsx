@@ -90,7 +90,7 @@ export function PresetManager({
       <div ref={modalRef} className="bg-stone-100 border border-stone-200 rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[80vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-stone-200 shrink-0">
-          <h3 id="preset-modal-title" className="text-lg font-semibold text-slate-50">
+          <h3 id="preset-modal-title" className="text-lg font-semibold text-[#1a1a1a]">
             {mode === 'create' ? '새 프리셋 만들기' : mode === 'edit' ? '프리셋 수정' : '명령 프리셋'}
           </h3>
           <button

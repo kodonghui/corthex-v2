@@ -1,11 +1,8 @@
 "use client";
-/*
- * Documentation:
- * Tooltip — https://app.subframe.com/fe1d14ed3033/library?component=Tooltip_ccebd1e9-f6ac-4737-8376-0dfacd90c9f3
- */
+// Legacy Subframe component — rewritten to remove @subframe/core dependency
 
 import React from "react";
-import * as SubframeUtils from "../utils";
+import { twClassNames } from "../utils";
 
 interface TooltipRootProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
@@ -13,24 +10,14 @@ interface TooltipRootProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const TooltipRoot = React.forwardRef<HTMLDivElement, TooltipRootProps>(
-  function TooltipRoot(
-    { children, className, ...otherProps }: TooltipRootProps,
-    ref
-  ) {
+  function TooltipRoot({ children, className, ...otherProps }, ref) {
     return (
       <div
-        className={SubframeUtils.twClassNames(
-          "flex flex-col items-start gap-2 rounded-md border border-solid border-neutral-900 bg-neutral-800 px-2 py-1 shadow-lg",
-          className
-        )}
+        className={twClassNames("flex flex-col items-start gap-2 rounded-md border border-[#283618] bg-[#283618] px-2 py-1 shadow-lg", className)}
         ref={ref}
         {...otherProps}
       >
-        {children ? (
-          <span className="text-caption font-caption text-white">
-            {children}
-          </span>
-        ) : null}
+        {children ? <span className="text-xs text-white">{children}</span> : null}
       </div>
     );
   }
