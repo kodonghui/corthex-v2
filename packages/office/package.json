@@ -1,0 +1,25 @@
+{
+  "name": "@corthex/office",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5175",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit",
+    "test": "bun test src/__tests__/"
+  },
+  "dependencies": {
+    "pixi.js": "8.17.1",
+    "react": "^19",
+    "react-dom": "^19"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^4",
+    "typescript": "^5.7",
+    "vite": "^6"
+  }
+}
