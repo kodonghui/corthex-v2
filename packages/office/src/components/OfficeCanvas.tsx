@@ -4,6 +4,7 @@ import type { AgentOfficeState } from '@corthex/shared'
 import { AgentSprite } from '../sprites/AgentSprite'
 import { OfficeFloor } from '../sprites/OfficeFloor'
 import { AgentTooltip } from './AgentTooltip'
+import { ScreenReaderAnnouncer } from './ScreenReaderAnnouncer'
 import { useOfficeSocket } from '../hooks/useOfficeSocket'
 
 type TooltipState = {
@@ -22,6 +23,7 @@ export function OfficeCanvas({ companyId, token }: OfficeCanvasProps) {
   const spritesRef = useRef<Map<string, AgentSprite>>(new Map())
   const agentLayerRef = useRef<Container | null>(null)
   const floorRef = useRef<OfficeFloor | null>(null)
+  const focusIndexRef = useRef<number>(-1)
 
   const [tooltip, setTooltip] = useState<TooltipState>(null)
 
@@ -120,8 +122,63 @@ export function OfficeCanvas({ companyId, token }: OfficeCanvasProps) {
     }
   }, [agents, tooltip])
 
+  // Keyboard navigation
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (agents.length === 0) return
+
+      const sprites = spritesRef.current
+      const agentIds = agents.map((a) => a.agentId)
+
+      if (e.key === 'Tab' || e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        e.preventDefault()
+        const next = e.shiftKey
+          ? Math.max(0, focusIndexRef.current - 1)
+          : Math.min(agentIds.length - 1, focusIndexRef.current + 1)
+        focusIndexRef.current = next
+        const agent = agents[next]
+        const sprite = sprites.get(agent.agentId)
+        if (sprite) {
+          const pos = sprite.getTooltipPosition()
+          setTooltip({ agent, position: pos })
+        }
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        e.preventDefault()
+        const prev = Math.max(0, focusIndexRef.current - 1)
+        focusIndexRef.current = prev
+        const agent = agents[prev]
+        const sprite = sprites.get(agent.agentId)
+        if (sprite) {
+          const pos = sprite.getTooltipPosition()
+          setTooltip({ agent, position: pos })
+        }
+      } else if (e.key === 'Enter') {
+        e.preventDefault()
+        if (focusIndexRef.current >= 0 && focusIndexRef.current < agents.length) {
+          const agent = agents[focusIndexRef.current]
+          const sprite = sprites.get(agent.agentId)
+          if (sprite) {
+            const pos = sprite.getTooltipPosition()
+            setTooltip({ agent, position: pos })
+          }
+        }
+      } else if (e.key === 'Escape') {
+        e.preventDefault()
+        setTooltip(null)
+        focusIndexRef.current = -1
+      }
+    },
+    [agents],
+  )
+
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100vh' }}>
+    <div
+      style={{ position: 'relative', width: '100%', height: '100vh' }}
+      tabIndex={0}
+      role="application"
+      aria-label={`Virtual Office — ${agents.length} agents`}
+      onKeyDown={handleKeyDown}
+    >
       <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
 
       {/* Connection status indicator */}
@@ -178,6 +235,9 @@ export function OfficeCanvas({ companyId, token }: OfficeCanvasProps) {
           onClose={() => setTooltip(null)}
         />
       )}
+
+      {/* Screen reader announcements */}
+      <ScreenReaderAnnouncer agents={agents} />
     </div>
   )
 }
