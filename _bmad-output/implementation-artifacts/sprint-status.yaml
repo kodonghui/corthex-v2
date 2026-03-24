@@ -1,12 +1,15 @@
-# Sprint Status — CORTHEX v2 Engine Refactor
-# Generated from epics.md (2026-03-11)
-# All stories reset to backlog for fresh engine refactor implementation
+# Sprint Status — CORTHEX v3 "OpenClaw"
+# Generated from epics-and-stories.md (2026-03-24)
+# v2 Epics 1-21: all done (98 stories, 10154 tests)
+# v3 Epics 22-29: backlog (69 stories, 8 epics)
 
-project: corthex-v2-engine-refactor
-generated: "2026-03-10"
-total_epics: 15
-total_stories: 70
-total_sp: 197
+project: corthex-v3-openclaw
+generated: "2026-03-24"
+total_epics: 29  # 21 v2 (done) + 8 v3 (backlog)
+total_stories: 167  # 98 v2 (done) + 69 v3 (backlog)
+
+# Pipeline: /kdh-full-auto-pipeline v9.2 — Stage 8
+# Readiness: READY (8.73/10) — readiness-report.md
 
 # STATUS DEFINITIONS:
 # ==================
@@ -890,3 +893,314 @@ phases:
 # Epic 20: 4 stories (11 SP) — Report system
 # Epic 21: 4 stories (13 SP) — Integration testing + Go/No-Go gates
 # TOTAL: 31 stories, 83 SP
+
+# =============================================================================
+# v3 "OpenClaw" — Epics 22-29 (2026-03-24)
+# Pipeline: /kdh-full-auto-pipeline v9.2 Stage 6-8
+# Readiness: READY (8.73/10)
+# =============================================================================
+
+  - name: "v3 Pre-Sprint: Production Foundation"
+    duration: "3-5 days"
+    epics:
+      - id: epic-22
+        title: "Production Foundation & Voyage AI Migration"
+        priority: P0
+        status: backlog
+        dependencies: ["epic-21"]
+        go_no_go: ["#10"]
+        stories:
+          - id: "22.1"
+            title: "Dependency Verification & Version Pinning"
+            status: backlog
+          - id: "22.2"
+            title: "Voyage AI SDK Integration"
+            status: backlog
+          - id: "22.3"
+            title: "Vector Migration 768→1024"
+            status: backlog
+          - id: "22.4"
+            title: "HTTP Security Headers & Rate Limiting"
+            status: backlog
+          - id: "22.5"
+            title: "CI Dependency Scanning & Quality Baselines"
+            status: backlog
+          - id: "22.6"
+            title: "Neon Pro Upgrade & VPS Resource Verification"
+            status: backlog
+
+  - name: "v3 Layer 0: Design System (parallel)"
+    duration: "All sprints"
+    epics:
+      - id: epic-23
+        title: "Natural Organic Design System"
+        priority: P0
+        status: backlog
+        dependencies: ["epic-22"]
+        go_no_go: ["#6"]
+        notes: "Parallel with Sprint 1-4. ≥60% by Sprint 2 end."
+        stories:
+          - id: "23.1"
+            title: "Design Token System & Tailwind v4 Configuration"
+            status: backlog
+          - id: "23.2"
+            title: "Radix UI Component Library Foundation"
+            status: backlog
+          - id: "23.3"
+            title: "App Shell Redesign — Sidebar & Topbar"
+            status: backlog
+          - id: "23.4"
+            title: "Page Consolidation 14→6 Groups with Route Redirects"
+            status: backlog
+          - id: "23.5"
+            title: "Responsive Layout Types Implementation"
+            status: backlog
+          - id: "23.6"
+            title: "Accessibility Foundations (WCAG 2.1 AA)"
+            status: backlog
+          - id: "23.7"
+            title: "Animation System & Motion Design"
+            status: backlog
+          - id: "23.8"
+            title: "Cross-cutting WebSocket & SSE UX Patterns"
+            status: backlog
+          - id: "23.9"
+            title: "Error Handling & Empty States"
+            status: backlog
+          - id: "23.10"
+            title: "Navigation Redesign & Command Palette"
+            status: backlog
+          - id: "23.11"
+            title: "Forms, Modals, Toasts & Interactive Patterns"
+            status: backlog
+          - id: "23.12"
+            title: "Onboarding Flow Redesign"
+            status: backlog
+          - id: "23.13"
+            title: "Custom Component — NexusCanvas"
+            status: backlog
+          - id: "23.14"
+            title: "Custom Component — HandoffTracker"
+            status: backlog
+          - id: "23.15"
+            title: "Custom Component — StreamingMessage"
+            status: backlog
+          - id: "23.16"
+            title: "State Management Migration (Zustand 5 + React Query 5)"
+            status: backlog
+          - id: "23.17"
+            title: "Search, Performance & Testing Patterns"
+            status: backlog
+          - id: "23.18"
+            title: "Dashboard & Hub Page Redesign"
+            status: backlog
+          - id: "23.19"
+            title: "Page Redesigns — Documents, ARGOS, Activity"
+            status: backlog
+          - id: "23.20"
+            title: "Page Redesign — Organization (Tabbed + Canvas)"
+            status: backlog
+          - id: "23.21"
+            title: "Subframe-to-Radix Migration & Hardcoded Color Cleanup"
+            status: backlog
+
+  - name: "v3 Sprint 1: Agent Personality"
+    duration: "1-2 weeks"
+    epics:
+      - id: epic-24
+        title: "Agent Personality System"
+        priority: P0
+        status: backlog
+        dependencies: ["epic-22"]
+        go_no_go: ["#2"]
+        stories:
+          - id: "24.1"
+            title: "Personality Traits Database Schema & Migration"
+            status: backlog
+          - id: "24.2"
+            title: "Soul Enricher Service & renderSoul Integration"
+            status: backlog
+          - id: "24.3"
+            title: "PER-1 4-Layer Sanitization Chain"
+            status: backlog
+          - id: "24.4"
+            title: "Personality Presets & Default Values"
+            status: backlog
+          - id: "24.5"
+            title: "Big Five Slider UI & Accessibility"
+            status: backlog
+          - id: "24.6"
+            title: "Soul Editor with Variable Autocomplete"
+            status: backlog
+          - id: "24.7"
+            title: "call_agent Response Standardization & Model Routing"
+            status: backlog
+          - id: "24.8"
+            title: "Go/No-Go #2 Verification & Sprint 1 Exit"
+            status: backlog
+
+  - name: "v3 Sprint 2: Workflows & Security"
+    duration: "2-3 weeks"
+    epics:
+      - id: epic-25
+        title: "n8n Workflow Integration"
+        priority: P0
+        status: backlog
+        dependencies: ["epic-24"]
+        go_no_go: ["#3"]
+        stories:
+          - id: "25.1"
+            title: "n8n Docker Container Deployment"
+            status: backlog
+          - id: "25.2"
+            title: "N8N-SEC 8-Layer Security Implementation"
+            status: backlog
+          - id: "25.3"
+            title: "Hono Reverse Proxy for n8n"
+            status: backlog
+          - id: "25.4"
+            title: "CEO Workflow Results View & Admin Editor"
+            status: backlog
+          - id: "25.5"
+            title: "Legacy Workflow Code Deletion"
+            status: backlog
+          - id: "25.6"
+            title: "Go/No-Go #3 — n8n Security Verification"
+            status: backlog
+
+      - id: epic-26
+        title: "AI Marketing Automation"
+        priority: P1
+        status: backlog
+        dependencies: ["epic-25"]
+        stories:
+          - id: "26.1"
+            title: "Marketing Settings & AI Engine Configuration"
+            status: backlog
+          - id: "26.2"
+            title: "Marketing Preset Workflows"
+            status: backlog
+          - id: "26.3"
+            title: "Human Approval & Multi-Platform Posting"
+            status: backlog
+          - id: "26.4"
+            title: "API Failure Fallback & Error Handling"
+            status: backlog
+          - id: "26.5"
+            title: "Marketing E2E Verification"
+            status: backlog
+
+      - id: epic-27
+        title: "Tool Response Security"
+        priority: P0
+        status: backlog
+        dependencies: ["epic-24"]
+        go_no_go: ["#11"]
+        stories:
+          - id: "27.1"
+            title: "Tool Sanitizer at PreToolResult Hook"
+            status: backlog
+          - id: "27.2"
+            title: "Adversarial Payload Testing & Admin Visibility"
+            status: backlog
+          - id: "27.3"
+            title: "Go/No-Go #11 & OWASP Expansion Preparation"
+            status: backlog
+
+  - name: "v3 Sprint 3: Agent Memory"
+    duration: "2 weeks"
+    epics:
+      - id: epic-28
+        title: "Agent Memory & Learning"
+        priority: P0
+        status: backlog
+        dependencies: ["epic-24", "epic-25"]
+        go_no_go: ["#4", "#7", "#9", "#14"]
+        stories:
+          - id: "28.1"
+            title: "Observations Table Schema & Recording"
+            status: backlog
+          - id: "28.2"
+            title: "MEM-6 4-Layer Observation Sanitization"
+            status: backlog
+          - id: "28.3"
+            title: "Observation Vectorization & Confidence Mechanics"
+            status: backlog
+          - id: "28.4"
+            title: "Reflection Cron Worker"
+            status: backlog
+          - id: "28.5"
+            title: "Agent Memories Extension & HNSW Index"
+            status: backlog
+          - id: "28.6"
+            title: "Memory Search in Soul Enricher"
+            status: backlog
+          - id: "28.7"
+            title: "Observation TTL & Memory Cleanup"
+            status: backlog
+          - id: "28.8"
+            title: "CEO Memory Dashboard & Notifications"
+            status: backlog
+          - id: "28.9"
+            title: "Admin Memory Management"
+            status: backlog
+          - id: "28.10"
+            title: "Capability Evaluation Framework"
+            status: backlog
+          - id: "28.11"
+            title: "Go/No-Go Sprint 3 Exit Verification"
+            status: backlog
+
+  - name: "v3 Sprint 4: OpenClaw Virtual Office"
+    duration: "2 weeks"
+    epics:
+      - id: epic-29
+        title: "OpenClaw Virtual Office"
+        priority: P1
+        status: backlog
+        dependencies: ["epic-28"]
+        go_no_go: ["#1", "#5", "#8", "#12", "#13"]
+        stories:
+          - id: "29.1"
+            title: "packages/office/ Turborepo Workspace Setup"
+            status: backlog
+          - id: "29.2"
+            title: "/ws/office WebSocket Channel"
+            status: backlog
+          - id: "29.3"
+            title: "Server-Side State Polling & Broadcasting"
+            status: backlog
+          - id: "29.4"
+            title: "PixiJS Office Canvas — Agent Sprites & Animations"
+            status: backlog
+          - id: "29.5"
+            title: "Mobile List View & Responsive Behavior"
+            status: backlog
+          - id: "29.6"
+            title: "Accessibility — Screen Reader & Keyboard"
+            status: backlog
+          - id: "29.7"
+            title: "Load Testing & Connection Management"
+            status: backlog
+          - id: "29.8"
+            title: "AI Sprite Approval & v1 Feature Parity"
+            status: backlog
+          - id: "29.9"
+            title: "System-Wide Final Verification (Go/No-Go Sprint 4)"
+            status: backlog
+
+# v3 DEPENDENCY CHAIN:
+# Epic 22 (Pre-Sprint) → Epic 24 (Sprint 1) → Epic 25+27 (Sprint 2) → Epic 28 (Sprint 3) → Epic 29 (Sprint 4)
+#                                              → Epic 26 (after Epic 25)
+# Epic 23 (Layer 0) ──────────────────────────────────────────────────────────────────────→ (parallel)
+
+# v3 STORY SUMMARY:
+# Epic 22: 6 stories — Production foundation
+# Epic 23: 21 stories — Design system (parallel)
+# Epic 24: 8 stories — Agent personality
+# Epic 25: 6 stories — n8n workflows
+# Epic 26: 5 stories — Marketing automation
+# Epic 27: 3 stories — Tool security
+# Epic 28: 11 stories — Agent memory
+# Epic 29: 9 stories — OpenClaw virtual office
+# TOTAL v3: 69 stories across 8 epics
