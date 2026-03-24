@@ -7,6 +7,7 @@ import { eq, and, desc, sql } from 'drizzle-orm'
 import { eventBus } from '../lib/event-bus'
 import { createEvent, updateEventStatus } from './argos-service'
 import { collectAgentResponse, renderSoul } from '../engine'
+import { enrich } from './soul-enricher'
 import type { SessionContext } from '../engine'
 import { getMaxHandoffDepth } from './handoff-depth-settings'
 
@@ -375,8 +376,10 @@ async function executeTriggeredAction(trigger: TriggerRow, eventData: Record<str
     })
 
     // Execute via engine/agent-loop (D6 single entry point)
+    const enriched = await enrich(agent.id, trigger.companyId)
+    const extraVars = { ...enriched.personalityVars, ...enriched.memoryVars }
     const soul = agent.soul
-      ? await renderSoul(agent.soul, agent.id, trigger.companyId)
+      ? await renderSoul(agent.soul, agent.id, trigger.companyId, extraVars)
       : ''
 
     const ctx: SessionContext = {

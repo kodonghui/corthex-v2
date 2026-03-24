@@ -3,6 +3,7 @@ import { db } from '../db'
 import { debates, agents } from '../db/schema'
 import { eventBus } from '../lib/event-bus'
 import { collectAgentResponse, renderSoul } from '../engine'
+import { enrich } from './soul-enricher'
 import type { SessionContext } from '../engine'
 import type {
   DebateType,
@@ -167,7 +168,9 @@ async function executeDebateRounds(
     if (!agentRow.soul) return ''
     const cached = soulCache.get(agentRow.id)
     if (cached !== undefined) return cached
-    const rendered = await renderSoul(agentRow.soul, agentRow.id, companyId)
+    const enriched = await enrich(agentRow.id, companyId)
+    const extraVars = { ...enriched.personalityVars, ...enriched.memoryVars }
+    const rendered = await renderSoul(agentRow.soul, agentRow.id, companyId, extraVars)
     soulCache.set(agentRow.id, rendered)
     return rendered
   }
@@ -298,7 +301,13 @@ export async function detectConsensus(
   let soul = ''
   if (firstAgent?.soul) {
     const cached = soulCache?.get(firstAgent.id)
-    soul = cached !== undefined ? cached : await renderSoul(firstAgent.soul, firstAgent.id, companyId)
+    if (cached !== undefined) {
+      soul = cached
+    } else {
+      const enriched = await enrich(firstAgent.id, companyId)
+      const extraVars = { ...enriched.personalityVars, ...enriched.memoryVars }
+      soul = await renderSoul(firstAgent.soul, firstAgent.id, companyId, extraVars)
+    }
   }
 
   const ctx: SessionContext = {

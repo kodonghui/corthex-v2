@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { authMiddleware } from '../../middleware/auth'
 import { getDB } from '../../db/scoped-query'
 import { runAgent, sseStream, renderSoul } from '../../engine'
+import { enrich } from '../../services/soul-enricher'
 import { ERROR_CODES } from '../../lib/error-codes'
 import { resolveCliToken } from '../../lib/cli-token-resolver'
 import { getMaxHandoffDepth } from '../../services/handoff-depth-settings'
@@ -91,19 +92,17 @@ hubRoute.post('/stream', zValidator('json', streamSchema), async (c) => {
     }
   }
 
-  // Render soul template with variable substitution (E4) + knowledge_context (Story 10.4)
-  const extraVars: Record<string, string> = {}
+  // Render soul template with variable substitution (E4) + personality (Story 24.2) + knowledge_context (Story 10.4)
+  const enriched = await enrich(targetAgent.id, companyId)
+  const extraVars: Record<string, string> = { ...enriched.personalityVars, ...enriched.memoryVars }
   if (targetAgent.soul?.includes('{{knowledge_context}}') && targetAgent.departmentId) {
     const knowledgeCtx = await collectKnowledgeContext(companyId, targetAgent.id, targetAgent.departmentId, agentMessage)
     if (knowledgeCtx) {
       extraVars.knowledge_context = knowledgeCtx
     }
   }
-  const hasExtraVars = Object.keys(extraVars).length > 0
   const soul = targetAgent.soul
-    ? hasExtraVars
-      ? await renderSoul(targetAgent.soul, targetAgent.id, companyId, extraVars)
-      : await renderSoul(targetAgent.soul, targetAgent.id, companyId)
+    ? await renderSoul(targetAgent.soul, targetAgent.id, companyId, extraVars)
     : ''
 
   // Build SessionContext (E1)

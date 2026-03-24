@@ -11,6 +11,7 @@ import { promptGuardMiddleware } from '../middleware/prompt-guard'
 import { HTTPError } from '../middleware/error'
 import { classify, createCommand } from '../services/command-router'
 import { collectAgentResponse, renderSoul } from '../engine'
+import { enrich } from '../services/soul-enricher'
 import type { SessionContext } from '../engine'
 import { getDB } from '../db/scoped-query'
 import { getMaxHandoffDepth } from '../services/handoff-depth-settings'
@@ -52,7 +53,9 @@ async function runAgentForCommand(opts: {
     return
   }
 
-  const soul = agentRow.soul ? await renderSoul(agentRow.soul, agentRow.id, companyId) : ''
+  const enriched = await enrich(agentRow.id, companyId)
+  const extraVars = { ...enriched.personalityVars, ...enriched.memoryVars }
+  const soul = agentRow.soul ? await renderSoul(agentRow.soul, agentRow.id, companyId, extraVars) : ''
   const ctx: SessionContext = {
     cliToken: await resolveCliToken(userId, companyId),
     userId,

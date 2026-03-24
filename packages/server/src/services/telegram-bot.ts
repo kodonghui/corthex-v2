@@ -16,6 +16,7 @@ import { classify, createCommand, parseSlash, parseMention, resolveMentionAgent 
 import type { SlashType } from './command-router'
 import { processDebateCommand } from './debate-command-handler'
 import { collectAgentResponse, renderSoul } from '../engine'
+import { enrich } from './soul-enricher'
 import type { SessionContext } from '../engine'
 import { getDB } from '../db/scoped-query'
 import { getMaxHandoffDepth } from './handoff-depth-settings'
@@ -93,7 +94,9 @@ async function runAgentForCommand(opts: {
     return '에이전트를 찾을 수 없습니다'
   }
 
-  const soul = agentRow.soul ? await renderSoul(agentRow.soul, agentRow.id, companyId) : ''
+  const enriched = await enrich(agentRow.id, companyId)
+  const extraVars = { ...enriched.personalityVars, ...enriched.memoryVars }
+  const soul = agentRow.soul ? await renderSoul(agentRow.soul, agentRow.id, companyId, extraVars) : ''
   const ctx: SessionContext = {
     cliToken: process.env.ANTHROPIC_API_KEY || '',
     userId,

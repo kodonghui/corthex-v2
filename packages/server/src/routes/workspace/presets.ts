@@ -6,6 +6,7 @@ import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { classify, createCommand } from '../../services/command-router'
 import { collectAgentResponse, renderSoul } from '../../engine'
+import { enrich } from '../../services/soul-enricher'
 import type { SessionContext } from '../../engine'
 import { getMaxHandoffDepth } from '../../services/handoff-depth-settings'
 import { db } from '../../db'
@@ -42,7 +43,9 @@ async function runAgentForCommand(opts: {
     return
   }
 
-  const soul = agentRow.soul ? await renderSoul(agentRow.soul, agentRow.id, companyId) : ''
+  const enriched = await enrich(agentRow.id, companyId)
+  const extraVars = { ...enriched.personalityVars, ...enriched.memoryVars }
+  const soul = agentRow.soul ? await renderSoul(agentRow.soul, agentRow.id, companyId, extraVars) : ''
   const ctx: SessionContext = {
     cliToken: process.env.ANTHROPIC_API_KEY || '',
     userId,

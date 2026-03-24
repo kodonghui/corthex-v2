@@ -2,6 +2,7 @@ import { runAgent, renderSoul } from '../../engine'
 import { getDB } from '../../db/scoped-query'
 import { ERROR_CODES } from '../../lib/error-codes'
 import { collectKnowledgeContext } from '../../services/knowledge-injector'
+import { enrich } from '../../services/soul-enricher'
 import type { SessionContext, SSEEvent } from '../../engine'
 
 /**
@@ -54,18 +55,17 @@ export async function* callAgent(
     visitedAgents: [...ctx.visitedAgents, targetAgentId] as readonly string[],
   }
 
-  // 5. Render target's soul template (with knowledge_context if present — Story 10.4)
+  // 5. Render target's soul template with personality (Story 24.2) + knowledge_context (Story 10.4)
   const soulText = agent.soul || ''
-  let soulExtraVars: Record<string, string> | undefined
+  const enriched = await enrich(targetAgentId, ctx.companyId)
+  const soulExtraVars: Record<string, string> = { ...enriched.personalityVars, ...enriched.memoryVars }
   if (soulText.includes('{{knowledge_context}}') && agent.departmentId) {
     const knowledgeCtx = await collectKnowledgeContext(ctx.companyId, targetAgentId, agent.departmentId, message)
     if (knowledgeCtx) {
-      soulExtraVars = { knowledge_context: knowledgeCtx }
+      soulExtraVars.knowledge_context = knowledgeCtx
     }
   }
-  const renderedSoul = soulExtraVars
-    ? await renderSoul(soulText, targetAgentId, ctx.companyId, soulExtraVars)
-    : await renderSoul(soulText, targetAgentId, ctx.companyId)
+  const renderedSoul = await renderSoul(soulText, targetAgentId, ctx.companyId, soulExtraVars)
 
   // 6. Yield handoff event
   const currentAgentName = ctx.visitedAgents[ctx.visitedAgents.length - 1] || 'unknown'
