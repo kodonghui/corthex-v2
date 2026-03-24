@@ -548,7 +548,7 @@ phases:
         title: "Engine Cleanup — Hook Wiring + Dual Engine Removal + E8 Boundary Fix"
         priority: P0
         sp: 11
-        status: backlog
+        status: done
         dependencies: ["epic-3", "epic-4"]
         architecture: "D6 (single entry point), E8 (engine boundary), E10 (CI)"
         stories:
@@ -556,19 +556,19 @@ phases:
             title: "Hook 5개 agent-loop.ts 연결"
             sp: 3
             priority: P0
-            status: backlog
+            status: done
             blocked_by: []
           - id: "14.2"
             title: "E8 경계 위반 수정 + engine/index.ts 생성"
             sp: 3
             priority: P0
-            status: backlog
+            status: done
             blocked_by: []
           - id: "14.3"
             title: "이중 엔진 제거 + 옛 서비스 삭제"
             sp: 5
             priority: P0
-            status: backlog
+            status: done
             blocked_by: ["14.1", "14.2"]
 
   - name: "Phase 6: Caching & Cost Optimization"
@@ -1016,34 +1016,34 @@ phases:
       - id: epic-24
         title: "Agent Personality System"
         priority: P0
-        status: backlog
+        status: done
         dependencies: ["epic-22"]
         go_no_go: ["#2"]
         stories:
           - id: "24.1"
             title: "Personality Traits Database Schema & Migration"
-            status: backlog
+            status: done
           - id: "24.2"
             title: "Soul Enricher Service & renderSoul Integration"
-            status: backlog
+            status: done
           - id: "24.3"
             title: "PER-1 4-Layer Sanitization Chain"
-            status: backlog
+            status: done
           - id: "24.4"
             title: "Personality Presets & Default Values"
-            status: backlog
+            status: done
           - id: "24.5"
             title: "Big Five Slider UI & Accessibility"
-            status: backlog
+            status: done
           - id: "24.6"
             title: "Soul Editor with Variable Autocomplete"
-            status: backlog
+            status: done
           - id: "24.7"
             title: "call_agent Response Standardization & Model Routing"
-            status: backlog
+            status: done
           - id: "24.8"
             title: "Go/No-Go #2 Verification & Sprint 1 Exit"
-            status: backlog
+            status: done
 
   - name: "v3 Sprint 2: Workflows & Security"
     duration: "2-3 weeks"
@@ -1051,67 +1051,67 @@ phases:
       - id: epic-25
         title: "n8n Workflow Integration"
         priority: P0
-        status: backlog
+        status: done
         dependencies: ["epic-24"]
         go_no_go: ["#3"]
         stories:
           - id: "25.1"
             title: "n8n Docker Container Deployment"
-            status: backlog
+            status: done
           - id: "25.2"
             title: "N8N-SEC 8-Layer Security Implementation"
-            status: backlog
+            status: done
           - id: "25.3"
             title: "Hono Reverse Proxy for n8n"
-            status: backlog
+            status: done
           - id: "25.4"
             title: "CEO Workflow Results View & Admin Editor"
-            status: backlog
+            status: done
           - id: "25.5"
             title: "Legacy Workflow Code Deletion"
-            status: backlog
+            status: done
           - id: "25.6"
             title: "Go/No-Go #3 — n8n Security Verification"
-            status: backlog
+            status: done
 
       - id: epic-26
         title: "AI Marketing Automation"
         priority: P1
-        status: backlog
+        status: done
         dependencies: ["epic-25"]
         stories:
           - id: "26.1"
             title: "Marketing Settings & AI Engine Configuration"
-            status: backlog
+            status: done
           - id: "26.2"
             title: "Marketing Preset Workflows"
-            status: backlog
+            status: done
           - id: "26.3"
             title: "Human Approval & Multi-Platform Posting"
-            status: backlog
+            status: done
           - id: "26.4"
             title: "API Failure Fallback & Error Handling"
-            status: backlog
+            status: done
           - id: "26.5"
             title: "Marketing E2E Verification"
-            status: backlog
+            status: done
 
       - id: epic-27
         title: "Tool Response Security"
         priority: P0
-        status: backlog
+        status: done
         dependencies: ["epic-24"]
         go_no_go: ["#11"]
         stories:
           - id: "27.1"
             title: "Tool Sanitizer at PreToolResult Hook"
-            status: backlog
+            status: done
           - id: "27.2"
             title: "Adversarial Payload Testing & Admin Visibility"
-            status: backlog
+            status: done
           - id: "27.3"
             title: "Go/No-Go #11 & OWASP Expansion Preparation"
-            status: backlog
+            status: done
 
   - name: "v3 Sprint 3: Agent Memory"
     duration: "2 weeks"
