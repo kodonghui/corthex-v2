@@ -1,5 +1,7 @@
 // @corthex/ui — 공유 UI 컴포넌트
 export { cn } from './utils'
+export { tokens, colors, typography, spacing, borders, shadows, transitions, layout, tokensToCssProperties } from './tokens/design-tokens'
+export type { DesignTokens } from './tokens/design-tokens'
 export { Button } from './button'
 export { Card, CardHeader, CardContent, CardFooter } from './card'
 export { Badge } from './badge'
