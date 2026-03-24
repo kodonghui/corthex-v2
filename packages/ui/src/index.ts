@@ -42,3 +42,12 @@ export {
   motionSafeClasses, prefersReducedMotion, getTransitionDuration, reducedMotionCSS,
 } from './a11y'
 export type { FocusTrapOptions } from './a11y'
+
+// Animations
+export {
+  transitionPresets, transitionCSS,
+  springTransition, springPresets,
+  useAnimatedMount,
+  motion, motionSafe, shouldAnimate, getAnimationDuration,
+} from './animations'
+export type { TransitionPreset, SpringConfig, SpringPreset, AnimatedMountState } from './animations'
