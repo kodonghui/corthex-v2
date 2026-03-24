@@ -41,6 +41,7 @@ const navSections: NavSection[] = [
     label: 'TOOLS',
     items: [
       { to: '/workflows', label: '워크플로우', icon: Workflow },
+      { to: '/n8n-workflows', label: 'n8n 자동화', icon: Hexagon },
       { to: '/sns', label: 'SNS', icon: Share2 },
       { to: '/trading', label: '전략실', icon: TrendingUp },
       { to: '/messenger', label: '메신저', icon: Send },

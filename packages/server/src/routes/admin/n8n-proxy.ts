@@ -265,6 +265,60 @@ n8nProxyRoute.all('/n8n-editor/*', async (c) => {
   }
 })
 
+// === FR-N8N5: n8n health status endpoint ===
+
+n8nProxyRoute.get('/n8n/health', async (c) => {
+  const health = await checkN8nHealth()
+  return c.json({ success: true, data: health })
+})
+
+// === FR-N8N2: Execution results endpoint (CEO read-only) ===
+
+n8nProxyRoute.get('/n8n/executions', async (c) => {
+  const tenant = c.get('tenant')
+
+  const targetUrl = new URL(`${N8N_BASE_URL}/api/v1/executions`)
+  injectCompanyTag(tenant.companyId, targetUrl)
+
+  const limit = c.req.query('limit')
+  const cursor = c.req.query('cursor')
+  const status = c.req.query('status')
+  const workflowId = c.req.query('workflowId')
+  if (limit) targetUrl.searchParams.set('limit', limit)
+  if (cursor) targetUrl.searchParams.set('cursor', cursor)
+  if (status) targetUrl.searchParams.set('status', status)
+  if (workflowId) targetUrl.searchParams.set('workflowId', workflowId)
+
+  try {
+    const response = await proxy(targetUrl.toString(), {
+      headers: { Accept: 'application/json', Authorization: undefined, Cookie: undefined },
+    })
+
+    if (!response.ok) {
+      return c.json(
+        { success: false, error: { code: 'N8N_API_ERROR', message: `n8n API error: ${response.status}` } },
+        response.status as any,
+      )
+    }
+
+    const data = await response.json()
+    return c.json({ success: true, data })
+  } catch {
+    const health = await checkN8nHealth()
+    return c.json(
+      {
+        success: false,
+        error: {
+          code: 'N8N_UNAVAILABLE',
+          message: 'n8n 서비스가 일시적으로 중단되었습니다.',
+          detail: health.status,
+        },
+      },
+      502,
+    )
+  }
+})
+
 // === FR-N8N1: Convenience endpoint — Admin workflow list ===
 
 n8nProxyRoute.get('/n8n/workflows', async (c) => {

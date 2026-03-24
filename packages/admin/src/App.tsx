@@ -31,6 +31,7 @@ const AgentReportsPage = lazy(() => import('./pages/agent-reports').then((m) => 
 const McpServersPage = lazy(() => import('./pages/mcp-servers').then((m) => ({ default: m.McpServersPage })))
 const McpAccessPage = lazy(() => import('./pages/mcp-access').then((m) => ({ default: m.McpAccessPage })))
 const McpCredentialsPage = lazy(() => import('./pages/mcp-credentials').then((m) => ({ default: m.McpCredentialsPage })))
+const N8nEditorPage = lazy(() => import('./pages/n8n-editor').then((m) => ({ default: m.N8nEditorPage })))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -109,6 +110,7 @@ export function App() {
             <Route path="mcp-servers" element={<Suspense fallback={<PageSkeleton />}><McpServersPage /></Suspense>} />
             <Route path="mcp-access" element={<Suspense fallback={<PageSkeleton />}><McpAccessPage /></Suspense>} />
             <Route path="mcp-credentials" element={<Suspense fallback={<PageSkeleton />}><McpCredentialsPage /></Suspense>} />
+            <Route path="n8n-editor" element={<Suspense fallback={<PageSkeleton />}><N8nEditorPage /></Suspense>} />
             <Route path="settings" element={<Suspense fallback={<PageSkeleton />}><SettingsPage /></Suspense>} />
             <Route path="onboarding" element={<Suspense fallback={<PageSkeleton />}><OnboardingWizardPage /></Suspense>} />
             <Route path="*" element={<div className="flex flex-col items-center justify-center min-h-[60vh] text-center"><h2 className="text-2xl font-semibold mb-4">404 — 페이지를 찾을 수 없습니다</h2><a href="/admin" className="text-olive-600 hover:underline">홈으로 돌아가기</a></div>} />
