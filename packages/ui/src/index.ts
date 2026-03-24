@@ -51,3 +51,13 @@ export {
   motion, motionSafe, shouldAnimate, getAnimationDuration,
 } from './animations'
 export type { TransitionPreset, SpringConfig, SpringPreset, AnimatedMountState } from './animations'
+
+// Hooks
+export { useSSE, useWebSocket } from './hooks'
+export type { SSEConnectionState, UseSSEOptions, UseSSEResult, WebSocketState, UseWebSocketOptions, UseWebSocketResult } from './hooks'
+
+// Components
+export { ConnectionStatus } from './components/ConnectionStatus'
+export type { ConnectionStatusProps, ConnectionStateType } from './components/ConnectionStatus'
+export { StreamingText } from './components/StreamingText'
+export type { StreamingTextProps } from './components/StreamingText'
