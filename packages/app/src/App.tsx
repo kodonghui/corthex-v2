@@ -63,6 +63,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 
+function SuspensePage({ children }: { children: React.ReactNode }) {
+  return <Suspense fallback={<PageSkeleton />}>{children}</Suspense>
+}
+
 export function App() {
   const checkAuth = useAuthStore((s) => s.checkAuth)
 
@@ -76,19 +80,13 @@ export function App() {
         <Routes>
           <Route
             path="/login"
-            element={
-              <Suspense fallback={<PageSkeleton />}>
-                <LoginPage />
-              </Suspense>
-            }
+            element={<SuspensePage><LoginPage /></SuspensePage>}
           />
           <Route
             path="/onboarding"
             element={
               <ProtectedRoute>
-                <Suspense fallback={<PageSkeleton />}>
-                  <OnboardingPage />
-                </Suspense>
+                <SuspensePage><OnboardingPage /></SuspensePage>
               </ProtectedRoute>
             }
           />
@@ -100,39 +98,53 @@ export function App() {
             }
           >
             <Route index element={<Navigate to="/hub" replace />} />
-            <Route path="hub" element={<Suspense fallback={<PageSkeleton />}><HubPage /></Suspense>} />
+
+            {/* ═══ GROUP 1: Hub (dashboard, overview) ═══ */}
+            <Route path="hub" element={<SuspensePage><HubPage /></SuspensePage>} />
+            <Route path="dashboard" element={<SuspensePage><DashboardPage /></SuspensePage>} />
+
+            {/* ═══ GROUP 2: Workspace (chat, agents, departments, tiers) ═══ */}
+            <Route path="chat" element={<SuspensePage><ChatPage /></SuspensePage>} />
+            <Route path="agents" element={<SuspensePage><AgentsPage /></SuspensePage>} />
+            <Route path="departments" element={<SuspensePage><DepartmentsPage /></SuspensePage>} />
+            <Route path="tiers" element={<SuspensePage><TiersPage /></SuspensePage>} />
+            <Route path="nexus" element={<SuspensePage><NexusPage /></SuspensePage>} />
+            <Route path="agora" element={<SuspensePage><AgoraPage /></SuspensePage>} />
+            <Route path="memories" element={<SuspensePage><MemoriesPage /></SuspensePage>} />
+            <Route path="messenger" element={<SuspensePage><MessengerPage /></SuspensePage>} />
+
+            {/* ═══ GROUP 3: Library (documents, knowledge) ═══ */}
+            <Route path="knowledge" element={<SuspensePage><KnowledgePage /></SuspensePage>} />
+            <Route path="files" element={<SuspensePage><FilesPage /></SuspensePage>} />
+            <Route path="classified" element={<SuspensePage><ClassifiedPage /></SuspensePage>} />
+            <Route path="reports" element={<SuspensePage><ReportsPage /></SuspensePage>} />
+            <Route path="reports/:id" element={<SuspensePage><ReportsPage /></SuspensePage>} />
+
+            {/* ═══ GROUP 4: ARGOS (jobs, schedules, monitoring) ═══ */}
+            <Route path="jobs" element={<SuspensePage><JobsPage /></SuspensePage>} />
+            <Route path="n8n-workflows" element={<SuspensePage><N8nWorkflowsPage /></SuspensePage>} />
+            <Route path="marketing-pipeline" element={<SuspensePage><MarketingPipelinePage /></SuspensePage>} />
+            <Route path="marketing-approval" element={<SuspensePage><MarketingApprovalPage /></SuspensePage>} />
+
+            {/* ═══ GROUP 5: Activity (logs, notifications, costs) ═══ */}
+            <Route path="activity-log" element={<SuspensePage><ActivityLogPage /></SuspensePage>} />
+            <Route path="ops-log" element={<SuspensePage><OpsLogPage /></SuspensePage>} />
+            <Route path="notifications" element={<SuspensePage><NotificationsPage /></SuspensePage>} />
+            <Route path="costs" element={<SuspensePage><CostsPage /></SuspensePage>} />
+            <Route path="performance" element={<SuspensePage><PerformancePage /></SuspensePage>} />
+            <Route path="sns" element={<SuspensePage><SnsPage /></SuspensePage>} />
+            <Route path="trading" element={<SuspensePage><TradingPage /></SuspensePage>} />
+
+            {/* ═══ GROUP 6: Settings ═══ */}
+            <Route path="settings" element={<SuspensePage><SettingsPage /></SuspensePage>} />
+
+            {/* ═══ REDIRECTS: Legacy paths → canonical paths ═══ */}
             <Route path="command-center" element={<Navigate to="/hub" replace />} />
-            <Route path="chat" element={<Suspense fallback={<PageSkeleton />}><ChatPage /></Suspense>} />
-            <Route path="jobs" element={<Suspense fallback={<PageSkeleton />}><JobsPage /></Suspense>} />
-            <Route path="reports" element={<Suspense fallback={<PageSkeleton />}><ReportsPage /></Suspense>} />
-            <Route path="reports/:id" element={<Suspense fallback={<PageSkeleton />}><ReportsPage /></Suspense>} />
-            <Route path="sns" element={<Suspense fallback={<PageSkeleton />}><SnsPage /></Suspense>} />
-            <Route path="messenger" element={<Suspense fallback={<PageSkeleton />}><MessengerPage /></Suspense>} />
-            <Route path="dashboard" element={<Suspense fallback={<PageSkeleton />}><DashboardPage /></Suspense>} />
-            <Route path="ops-log" element={<Suspense fallback={<PageSkeleton />}><OpsLogPage /></Suspense>} />
-            <Route path="nexus" element={<Suspense fallback={<PageSkeleton />}><NexusPage /></Suspense>} />
-            {/* SketchVibe moved to Admin app */}
-            <Route path="trading" element={<Suspense fallback={<PageSkeleton />}><TradingPage /></Suspense>} />
-            <Route path="files" element={<Suspense fallback={<PageSkeleton />}><FilesPage /></Suspense>} />
             <Route path="org" element={<Navigate to="/nexus" replace />} />
-            <Route path="notifications" element={<Suspense fallback={<PageSkeleton />}><NotificationsPage /></Suspense>} />
-            <Route path="activity-log" element={<Suspense fallback={<PageSkeleton />}><ActivityLogPage /></Suspense>} />
-            <Route path="costs" element={<Suspense fallback={<PageSkeleton />}><CostsPage /></Suspense>} />
             <Route path="cron" element={<Navigate to="/jobs" replace />} />
             <Route path="argos" element={<Navigate to="/jobs" replace />} />
-            <Route path="agora" element={<Suspense fallback={<PageSkeleton />}><AgoraPage /></Suspense>} />
-            <Route path="classified" element={<Suspense fallback={<PageSkeleton />}><ClassifiedPage /></Suspense>} />
-            <Route path="knowledge" element={<Suspense fallback={<PageSkeleton />}><KnowledgePage /></Suspense>} />
-            <Route path="performance" element={<Suspense fallback={<PageSkeleton />}><PerformancePage /></Suspense>} />
-            <Route path="departments" element={<Suspense fallback={<PageSkeleton />}><DepartmentsPage /></Suspense>} />
-            <Route path="agents" element={<Suspense fallback={<PageSkeleton />}><AgentsPage /></Suspense>} />
-            <Route path="tiers" element={<Suspense fallback={<PageSkeleton />}><TiersPage /></Suspense>} />
             <Route path="workflows" element={<Navigate to="/n8n-workflows" replace />} />
-            <Route path="n8n-workflows" element={<Suspense fallback={<PageSkeleton />}><N8nWorkflowsPage /></Suspense>} />
-            <Route path="marketing-pipeline" element={<Suspense fallback={<PageSkeleton />}><MarketingPipelinePage /></Suspense>} />
-            <Route path="marketing-approval" element={<Suspense fallback={<PageSkeleton />}><MarketingApprovalPage /></Suspense>} />
-            <Route path="memories" element={<Suspense fallback={<PageSkeleton />}><MemoriesPage /></Suspense>} />
-            <Route path="settings" element={<Suspense fallback={<PageSkeleton />}><SettingsPage /></Suspense>} />
+            <Route path="home" element={<Navigate to="/hub" replace />} />
           </Route>
         </Routes>
       </BrowserRouter>
