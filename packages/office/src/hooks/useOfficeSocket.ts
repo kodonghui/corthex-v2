@@ -65,6 +65,12 @@ export function useOfficeSocket({ companyId, token }: OfficeSocketOptions) {
     }
   }, [companyId, token])
 
+  const reconnect = useCallback(() => {
+    wsRef.current?.close()
+    wsRef.current = null
+    connect()
+  }, [connect])
+
   useEffect(() => {
     connect()
 
@@ -82,5 +88,5 @@ export function useOfficeSocket({ companyId, token }: OfficeSocketOptions) {
     }
   }, [connect])
 
-  return { agents, connected }
+  return { agents, connected, reconnect }
 }

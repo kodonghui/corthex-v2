@@ -1,5 +1,5 @@
-import { OfficeCanvas } from './components/OfficeCanvas'
+import { ResponsiveOffice } from './components/ResponsiveOffice'
 
 export function App() {
-  return <OfficeCanvas />
+  return <ResponsiveOffice />
 }
