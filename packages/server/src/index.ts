@@ -76,6 +76,7 @@ import { adminMcpServersRoute } from './routes/admin/mcp-servers'
 import { toolSanitizerRoute } from './routes/admin/tool-sanitizer'
 import { n8nProxyRoute } from './routes/admin/n8n-proxy'
 import { n8nPresetsRoute } from './routes/admin/n8n-presets'
+import { memoryManagementRoute } from './routes/admin/memory-management'
 import { publicApiV1Route } from './routes/public-api/v1'
 import { superAdminCompaniesRoute } from './routes/super-admin/companies'
 
@@ -194,6 +195,7 @@ app.route('/api/admin', toolSanitizerRoute)
 app.route('/api/admin', n8nProxyRoute)
 // n8n preset workflows (AR40, FR-MKT2)
 app.route('/api/admin', n8nPresetsRoute)
+app.route('/api/admin', memoryManagementRoute)
 
 // 유저 워크스페이스 라우트 (각 파일 내부에서 authMiddleware 적용, 테넌트 격리)
 app.route('/api/workspace', workspaceAgentsRoute)

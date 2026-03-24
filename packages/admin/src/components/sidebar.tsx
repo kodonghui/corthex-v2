@@ -8,7 +8,7 @@ import {
   LayoutDashboard, Building2, Users, UserCog, Building, Bot, Wrench,
   DollarSign, KeyRound, ClipboardList, Sparkles, Monitor,
   Orbit, FileStack, ShoppingCart, BrainCircuit, Paintbrush,
-  Lock, Hexagon, Megaphone, Settings, ArrowLeftRight,
+  Lock, Hexagon, Megaphone, Brain, Settings, ArrowLeftRight,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
@@ -39,6 +39,7 @@ const nav: { to: string; label: string; icon: LucideIcon }[] = [
   { to: '/api-keys', label: '공개 API 키', icon: Lock },
   { to: '/n8n-editor', label: 'n8n 에디터', icon: Hexagon },
   { to: '/marketing-settings', label: '마케팅 AI 엔진', icon: Megaphone },
+  { to: '/memory-management', label: '메모리 관리', icon: Brain },
 ]
 
 function SwitchToCeoButton({ companyId }: { companyId: string | null }) {

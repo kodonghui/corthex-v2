@@ -802,5 +802,74 @@ export function getDB(companyId: string) {
         .returning({ id: observations.id })
       return result.length > 0
     },
+
+    // === Story 28.9: Admin Memory Management ===
+
+    // READ — list flagged observations for admin review (paginated)
+    listFlaggedObservations: async (limit = 50, offset = 0): Promise<Array<{
+      id: string
+      agentId: string
+      content: string
+      domain: string
+      flagged: boolean
+      observedAt: Date
+    }>> => {
+      const rows = await db.select({
+        id: observations.id,
+        agentId: observations.agentId,
+        content: observations.content,
+        domain: observations.domain,
+        flagged: observations.flagged,
+        observedAt: observations.observedAt,
+      })
+        .from(observations)
+        .where(scopedWhere(observations.companyId, companyId, eq(observations.flagged, true)))
+        .orderBy(desc(observations.observedAt))
+        .limit(limit)
+        .offset(offset)
+      return rows.map(r => ({
+        id: r.id,
+        agentId: r.agentId,
+        content: r.content,
+        domain: r.domain,
+        flagged: r.flagged,
+        observedAt: r.observedAt,
+      }))
+    },
+
+    // WRITE — unflag observation (admin dismisses false positive)
+    unflagObservation: async (observationId: string): Promise<boolean> => {
+      const result = await db.update(observations)
+        .set({ flagged: false, updatedAt: new Date() })
+        .where(and(
+          eq(observations.id, observationId),
+          eq(observations.companyId, companyId as any),
+        ))
+        .returning({ id: observations.id })
+      return result.length > 0
+    },
+
+    // WRITE — reset all memories + observations for an agent (admin nuclear option)
+    resetAgentMemories: async (agentId: string): Promise<{
+      memoriesDeleted: number
+      observationsDeleted: number
+    }> => {
+      const memResult = await db.delete(agentMemories)
+        .where(and(
+          eq(agentMemories.agentId, agentId),
+          eq(agentMemories.companyId, companyId as any),
+        ))
+        .returning({ id: agentMemories.id })
+      const obsResult = await db.delete(observations)
+        .where(and(
+          eq(observations.agentId, agentId),
+          eq(observations.companyId, companyId as any),
+        ))
+        .returning({ id: observations.id })
+      return {
+        memoriesDeleted: memResult.length,
+        observationsDeleted: obsResult.length,
+      }
+    },
   }
 }
