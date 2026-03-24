@@ -67,6 +67,7 @@ import { marketingApprovalRoute } from './routes/workspace/marketing-approval'
 import { observationsRoute } from './routes/workspace/observations'
 import { memoryDashboardRoute } from './routes/workspace/memory-dashboard'
 import { capabilityRoute } from './routes/workspace/capability'
+import { officeRoute } from './routes/workspace/office'
 import { publicApiKeysRoute } from './routes/admin/public-api-keys'
 import { tierConfigsRoute } from './routes/admin/tier-configs'
 import { companySettingsRoute } from './routes/admin/company-settings'
@@ -93,6 +94,7 @@ import { startTriggerWorker, stopTriggerWorker } from './lib/trigger-worker'
 import { startSnsScheduleChecker, stopSnsScheduleChecker } from './lib/sns-schedule-checker'
 import { startSemanticCacheCleanup, stopSemanticCacheCleanup } from './lib/semantic-cache-cleanup'
 import { startReflectionCron, stopReflectionCron } from './services/reflection-cron'
+import { startOfficePoller, stopOfficePoller } from './services/office-poller'
 import { startObservationCleanupCron, stopObservationCleanupCron } from './services/observation-cleanup-cron'
 import { getActiveSessions } from './engine/agent-loop'
 import { loginRateLimit, apiRateLimit } from './middleware/rate-limit'
@@ -249,6 +251,8 @@ app.route('/api/workspace', observationsRoute)
 app.route('/api/workspace', memoryDashboardRoute)
 // Capability Evaluation (Story 28.10)
 app.route('/api/workspace', capabilityRoute)
+// Office state REST fallback (Story 29.3)
+app.route('/api/workspace/office', officeRoute)
 
 // 공개 API (API 키 인증)
 app.route('/api/v1', publicApiV1Route)
@@ -355,6 +359,7 @@ runMigrations().then(() => {
   startSemanticCacheCleanup()
   startReflectionCron()
   startObservationCleanupCron()
+  startOfficePoller()
 })
 
 // Graceful Shutdown — wait for active agent sessions before exit (NFR-O1)
@@ -372,6 +377,7 @@ process.on('SIGTERM', async () => {
   stopSemanticCacheCleanup()
   stopReflectionCron()
   stopObservationCleanupCron()
+  stopOfficePoller()
   broadcastServerRestart()
 
   // Force exit after 120s (NFR-P8)
