@@ -16,7 +16,7 @@ export { Avatar } from './avatar'
 export { Spinner } from './spinner'
 export { Modal } from './modal'
 export { ConfirmDialog } from './confirm-dialog'
-export { toast, ToastProvider } from './toast'
+export { toast, ToastProvider, useToast } from './toast'
 export { Tabs } from './tabs'
 export type { TabItem, TabsProps } from './tabs'
 export { Toggle } from './toggle'
@@ -55,8 +55,8 @@ export {
 export type { TransitionPreset, SpringConfig, SpringPreset, AnimatedMountState } from './animations'
 
 // Hooks
-export { useSSE, useWebSocket } from './hooks'
-export type { SSEConnectionState, UseSSEOptions, UseSSEResult, WebSocketState, UseWebSocketOptions, UseWebSocketResult } from './hooks'
+export { useSSE, useWebSocket, useConfirm } from './hooks'
+export type { SSEConnectionState, UseSSEOptions, UseSSEResult, WebSocketState, UseWebSocketOptions, UseWebSocketResult, ConfirmOptions, UseConfirmResult } from './hooks'
 
 // Components
 export { ConnectionStatus } from './components/ConnectionStatus'
@@ -69,6 +69,12 @@ export { Breadcrumb, breadcrumbsFromPath } from './components/Breadcrumb'
 export type { BreadcrumbItem, BreadcrumbProps } from './components/Breadcrumb'
 export { TabNav } from './components/TabNav'
 export type { TabNavItem, TabNavProps } from './components/TabNav'
+export { FormField } from './components/FormField'
+export type { FormFieldProps } from './components/FormField'
+export { RadixSelect } from './components/RadixSelect'
+export type { RadixSelectOption, RadixSelectProps } from './components/RadixSelect'
+export { RadixSwitch } from './components/RadixSwitch'
+export type { RadixSwitchProps } from './components/RadixSwitch'
 
 // Lib
 export { parseApiError, isApiErrorResponse, toastErrorMessage, withRetry } from './lib/api-error'

@@ -1,4 +1,9 @@
+/**
+ * ConfirmDialog — Modal with confirm/cancel buttons.
+ * Danger variant for destructive actions.
+ */
 import { Modal } from './modal'
+import { cn } from './utils'
 
 type ConfirmDialogProps = {
   isOpen: boolean
@@ -9,6 +14,7 @@ type ConfirmDialogProps = {
   confirmText?: string
   cancelText?: string
   variant?: 'default' | 'danger'
+  loading?: boolean
 }
 
 export function ConfirmDialog({
@@ -20,31 +26,39 @@ export function ConfirmDialog({
   confirmText = '확인',
   cancelText = '취소',
   variant = 'default',
+  loading = false,
 }: ConfirmDialogProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onCancel} className="max-w-sm">
-      <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-2">{title}</h3>
-      {description && (
-        <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-4 leading-relaxed">{description}</p>
-      )}
-      <div className="flex gap-2 justify-end">
-        <button
-          onClick={onCancel}
-          className="px-3 py-1.5 text-xs rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-400/40"
-        >
-          {cancelText}
-        </button>
-        <button
-          onClick={onConfirm}
-          className={`px-3 py-1.5 text-xs rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-offset-1 ${
-            variant === 'danger'
-              ? 'bg-red-500 hover:bg-red-600 focus:ring-red-500/40'
-              : 'bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500/40'
-          }`}
-        >
-          {confirmText}
-        </button>
-      </div>
-    </Modal>
+    <Modal
+      isOpen={isOpen}
+      onClose={onCancel}
+      title={title}
+      description={description}
+      size="sm"
+      footer={
+        <>
+          <button
+            onClick={onCancel}
+            disabled={loading}
+            className="px-3 py-1.5 text-sm rounded-lg border border-[#e5e1d3] text-[#1a1a1a] hover:bg-[#f5f0e8] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#606C38]/40"
+          >
+            {cancelText}
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={loading}
+            className={cn(
+              'px-3 py-1.5 text-sm rounded-lg text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1',
+              variant === 'danger'
+                ? 'bg-[#c4622d] hover:bg-[#b5571f] focus-visible:ring-[#c4622d]/40'
+                : 'bg-[#606C38] hover:bg-[#7a8f5a] focus-visible:ring-[#606C38]/40',
+              loading && 'opacity-50 cursor-not-allowed',
+            )}
+          >
+            {loading ? '처리 중...' : confirmText}
+          </button>
+        </>
+      }
+    />
   )
 }
