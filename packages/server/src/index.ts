@@ -71,6 +71,7 @@ import { adminKnowledgeRoute } from './routes/admin/knowledge'
 import { nexusLayoutRoute } from './routes/admin/nexus-layout'
 import { adminAgentReportsRoute } from './routes/admin/agent-reports'
 import { adminMcpServersRoute } from './routes/admin/mcp-servers'
+import { toolSanitizerRoute } from './routes/admin/tool-sanitizer'
 import { n8nProxyRoute } from './routes/admin/n8n-proxy'
 import { n8nPresetsRoute } from './routes/admin/n8n-presets'
 import { publicApiV1Route } from './routes/public-api/v1'
@@ -183,6 +184,7 @@ app.route('/api/admin', adminKnowledgeRoute)
 app.route('/api/admin', nexusLayoutRoute)
 app.route('/api/admin', adminAgentReportsRoute)
 app.route('/api/admin', adminMcpServersRoute)
+app.route('/api/admin', toolSanitizerRoute)
 
 // n8n reverse proxy (AR35, FR-N8N1, FR-N8N6)
 app.route('/api/admin', n8nProxyRoute)

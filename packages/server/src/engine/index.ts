@@ -12,3 +12,5 @@ export { selectModel, selectModelFromDB, selectModelWithCostPreference, REFLECTI
 export type { CostPreference } from './model-selector'
 export { sseStream } from './sse-adapter'
 export type { SessionContext, SSEEvent, PreToolHookResult, Tool, RunAgentOptions, ToolCallContext, BuiltinToolHandler, CallAgentResponse } from './types'
+export { toolSanitizer, getPatterns, reloadPatterns, savePatterns } from './hooks/tool-sanitizer'
+export type { SanitizeResult } from './hooks/tool-sanitizer'

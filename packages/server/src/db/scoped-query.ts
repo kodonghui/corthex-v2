@@ -1,7 +1,7 @@
 import { eq, or, sql, desc, and, isNotNull, asc, inArray, type SQL } from 'drizzle-orm'
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm'
 import { db } from './index'
-import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users, costRecords, presets, sketches, tierConfigs, semanticCache, agentReports, toolCallEvents, mcpServerConfigs, agentMcpAccess, mcpLifecycleEvents, credentials } from './schema'
+import { agents, departments, knowledgeDocs, agentTools, toolDefinitions, users, costRecords, presets, sketches, tierConfigs, semanticCache, agentReports, toolCallEvents, mcpServerConfigs, agentMcpAccess, mcpLifecycleEvents, credentials, activityLogs } from './schema'
 import { decrypt } from '../lib/credential-crypto'
 import { withTenant, scopedWhere, scopedInsert } from './tenant-helpers'
 import { cosineDistance } from './pgvector'
@@ -359,5 +359,23 @@ export function getDB(companyId: string) {
       db.delete(credentials)
         .where(and(eq(credentials.companyId, companyId), eq(credentials.keyName, keyName)))
         .returning(),
+
+    // WRITE — activity log insert (Story 27.1: tool-sanitizer audit trail)
+    insertActivityLog: (data: {
+      eventId: string
+      type: 'chat' | 'delegation' | 'tool_call' | 'job' | 'sns' | 'error' | 'system' | 'login'
+      phase: 'start' | 'end' | 'error'
+      actorType: string
+      actorName?: string
+      action: string
+      detail?: string
+      userId?: string
+      agentId?: string
+      metadata?: Record<string, unknown>
+    }) =>
+      db.insert(activityLogs).values({
+        ...data,
+        companyId: companyId as any,
+      }),
   }
 }

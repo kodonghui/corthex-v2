@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "patterns": [
+    { "id": "ignore-previous", "regex": "ignore\\s+(all\\s+)?previous", "flags": "i", "description": "Instruction override attempt" },
+    { "id": "system-role", "regex": "^\\s*system\\s*:", "flags": "im", "description": "System role injection" },
+    { "id": "llama-start", "regex": "<\\|im_start\\|>", "flags": "i", "description": "LLaMA delimiter" },
+    { "id": "llama-end", "regex": "<\\|im_end\\|>", "flags": "i", "description": "LLaMA delimiter" },
+    { "id": "mistral-inst", "regex": "\\[INST\\]", "flags": "i", "description": "Mistral instruction wrapper" },
+    { "id": "llama2-sys", "regex": "<<SYS>>", "flags": "i", "description": "Llama-2 system prompt" },
+    { "id": "claude-human", "regex": "^\\s*Human\\s*:", "flags": "m", "description": "Claude conversation marker" },
+    { "id": "claude-assistant", "regex": "^\\s*Assistant\\s*:", "flags": "m", "description": "Claude conversation marker" },
+    { "id": "disregard-instructions", "regex": "disregard\\s+(all\\s+)?(prior|previous|above)", "flags": "i", "description": "Instruction disregard attempt" },
+    { "id": "you-are-now", "regex": "you\\s+are\\s+now\\s+(a|an|the)", "flags": "i", "description": "Role reassignment attempt" },
+    { "id": "new-instructions", "regex": "new\\s+instructions?\\s*:", "flags": "i", "description": "New instruction injection" },
+    { "id": "forget-instructions", "regex": "forget\\s+(all\\s+)?(your\\s+)?(previous|prior|above)", "flags": "i", "description": "Memory wipe attempt" }
+  ]
+}

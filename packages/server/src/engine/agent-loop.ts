@@ -8,10 +8,37 @@ import { toolPermissionGuard } from './hooks/tool-permission-guard'
 import { credentialScrubber, init as scrubberInit, release as scrubberRelease } from './hooks/credential-scrubber'
 import { mcpManager } from './mcp/mcp-manager'
 import { outputRedactor } from './hooks/output-redactor'
+import { toolSanitizer } from './hooks/tool-sanitizer'
 import { delegationTracker } from './hooks/delegation-tracker'
 import { costTracker } from './hooks/cost-tracker'
 import type { UsageInfo } from './hooks/cost-tracker'
 import { checkSemanticCache, saveToSemanticCache } from './semantic-cache'
+
+/** Log tool sanitize blocked event for audit visibility */
+async function logToolSanitizeEvent(
+  ctx: SessionContext,
+  toolName: string,
+  pattern: string,
+  log: ReturnType<typeof createSessionLogger>,
+): Promise<void> {
+  log.warn({
+    event: 'tool_sanitize_blocked',
+    data: { toolName, pattern, agentId: ctx.visitedAgents[ctx.visitedAgents.length - 1] },
+  }, 'Tool response blocked by sanitizer')
+  try {
+    await getDB(ctx.companyId).insertActivityLog({
+      eventId: crypto.randomUUID(),
+      type: 'system',
+      phase: 'error',
+      actorType: 'system',
+      actorName: 'tool-sanitizer',
+      action: 'tool_sanitize_blocked',
+      detail: `Tool "${toolName}" response blocked — pattern: ${pattern}`,
+      agentId: ctx.visitedAgents[ctx.visitedAgents.length - 1] || undefined,
+      metadata: { toolName, pattern },
+    })
+  } catch { /* fire-and-forget */ }
+}
 
 /** Session registry for graceful shutdown (NFR-O1) */
 const activeSessions = new Map<string, SessionContext>()
@@ -241,7 +268,13 @@ export async function* runAgent(options: RunAgentOptions): AsyncGenerator<SSEEve
             delegatedTo: to,
             next_actions: message ? [`${to}가 "${message.slice(0, 100)}" 처리 중`] : undefined,
           }
-          const callAgentOutput = JSON.stringify(response)
+          const rawCallAgentOutput = JSON.stringify(response)
+          // AR37: Sanitize call_agent response (future-proofing — child agent output is external)
+          const sanitizedCall = toolSanitizer(ctx, block.name, rawCallAgentOutput)
+          if (sanitizedCall.blocked) {
+            await logToolSanitizeEvent(ctx, block.name, sanitizedCall.pattern!, log)
+          }
+          const callAgentOutput = sanitizedCall.content
           toolResults.push({
             type: 'tool_result',
             tool_use_id: block.id,
@@ -269,6 +302,12 @@ export async function* runAgent(options: RunAgentOptions): AsyncGenerator<SSEEve
           } catch (err) {
             const errMsg = err instanceof Error ? err.message : String(err)
             mcpOutput = `[MCP tool error: ${errMsg}]`
+            // Sanitize MCP error (err.message is external)
+            const sanitizedErr = toolSanitizer(ctx, block.name, mcpOutput)
+            if (sanitizedErr.blocked) {
+              await logToolSanitizeEvent(ctx, block.name, sanitizedErr.pattern!, log)
+            }
+            mcpOutput = sanitizedErr.content
             toolResults.push({
               type: 'tool_result',
               tool_use_id: block.id,
@@ -281,6 +320,12 @@ export async function* runAgent(options: RunAgentOptions): AsyncGenerator<SSEEve
             delegationTracker(ctx, block.name, output, toolInput)
             continue
           }
+          // Sanitize MCP success output (external tool response)
+          const sanitizedMcp = toolSanitizer(ctx, block.name, mcpOutput)
+          if (sanitizedMcp.blocked) {
+            await logToolSanitizeEvent(ctx, block.name, sanitizedMcp.pattern!, log)
+          }
+          mcpOutput = sanitizedMcp.content
           toolResults.push({
             type: 'tool_result',
             tool_use_id: block.id,
