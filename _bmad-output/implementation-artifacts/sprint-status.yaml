@@ -1119,43 +1119,43 @@ phases:
       - id: epic-28
         title: "Agent Memory & Learning"
         priority: P0
-        status: backlog
+        status: done
         dependencies: ["epic-24", "epic-25"]
         go_no_go: ["#4", "#7", "#9", "#14"]
         stories:
           - id: "28.1"
             title: "Observations Table Schema & Recording"
-            status: backlog
+            status: done
           - id: "28.2"
             title: "MEM-6 4-Layer Observation Sanitization"
-            status: backlog
+            status: done
           - id: "28.3"
             title: "Observation Vectorization & Confidence Mechanics"
-            status: backlog
+            status: done
           - id: "28.4"
             title: "Reflection Cron Worker"
-            status: backlog
+            status: done
           - id: "28.5"
             title: "Agent Memories Extension & HNSW Index"
-            status: backlog
+            status: done
           - id: "28.6"
             title: "Memory Search in Soul Enricher"
-            status: backlog
+            status: done
           - id: "28.7"
             title: "Observation TTL & Memory Cleanup"
-            status: backlog
+            status: done
           - id: "28.8"
             title: "CEO Memory Dashboard & Notifications"
-            status: backlog
+            status: done
           - id: "28.9"
             title: "Admin Memory Management"
-            status: backlog
+            status: done
           - id: "28.10"
             title: "Capability Evaluation Framework"
-            status: backlog
+            status: done
           - id: "28.11"
             title: "Go/No-Go Sprint 3 Exit Verification"
-            status: backlog
+            status: done
 
   - name: "v3 Sprint 4: OpenClaw Virtual Office"
     duration: "2 weeks"
