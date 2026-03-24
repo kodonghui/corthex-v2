@@ -350,15 +350,15 @@ export function ActivityLogPage() {
   const alertCount24h = securityQuery.data?.data?.count24h ?? 0
 
   return (
-    <div className="flex flex-col min-h-screen" style={{ backgroundColor: '#faf8f5', color: '#1a1a1a', fontFamily: "'Inter', sans-serif" }}>
+    <div className="flex-1 flex flex-col bg-[#faf8f5] overflow-hidden" data-testid="activity-log-page">
       {/* Main Content */}
       <main className="flex flex-col flex-1 overflow-hidden">
         {/* Header Section */}
-        <header className="border-b px-8 py-6" style={{ backgroundColor: '#ffffff', borderColor: '#e5e1d3' }} data-purpose="page-header">
+        <header className="border-b border-[#e5e1d3] px-8 py-6 bg-white shrink-0" data-purpose="page-header">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-semibold" style={{ color: '#1a1a1a' }}>Activity Log</h1>
-              <p className="text-sm mt-1" style={{ color: '#6b705c' }}>Audit trail for workspace events and operations.</p>
+              <h1 className="text-2xl font-bold text-[#283618]">Activity Log</h1>
+              <p className="text-sm mt-1 text-[#6b705c]">Audit trail for workspace events and operations.</p>
             </div>
             <div className="flex items-center gap-3">
               <WsStatusIndicator />

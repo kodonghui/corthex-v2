@@ -183,32 +183,30 @@ export function KnowledgePage() {
   const [showFolderTree, setShowFolderTree] = useState(true)
 
   return (
-    <div className="h-screen overflow-hidden flex flex-col" data-testid="knowledge-page" style={{ fontFamily: "'Inter', sans-serif", backgroundColor: sandBg }}>
-      {/* Navigation Header */}
-      <header className="h-16 bg-white flex items-center justify-between px-6 z-10" style={{ borderBottom: `1px solid ${borderColor}` }}>
-        <div className="flex items-center gap-4">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold" style={{ backgroundColor: oliveColor }}>C</div>
-          <h1 className="text-xl font-bold text-[#1a1a1a]" style={{ fontFamily: "'Inter', sans-serif" }}>CORTHEX <span style={{ color: oliveColor }}>v2</span></h1>
+    <div className="flex-1 flex flex-col overflow-hidden bg-[#faf8f5]" data-testid="knowledge-page">
+      {/* Page Header with Tabs */}
+      <header className="border-b border-[#e5e1d3] px-6 py-4 bg-white flex items-center justify-between shrink-0">
+        <div>
+          <h1 className="text-2xl font-bold text-[#283618]">Library</h1>
+          <p className="text-sm text-[#6b705c] mt-0.5">Knowledge documents & agent memories</p>
         </div>
-        <div className="flex items-center gap-6">
-          <div className="relative w-96">
-            <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#908a78]">
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
-            </span>
-            <input
-              className="block w-full pl-10 pr-3 py-2 border rounded-xl text-sm"
-              placeholder="Search Knowledge Library..."
-              type="text"
-              style={{ borderColor, backgroundColor: sandBg }}
-            />
+        <div className="flex items-center gap-4">
+          <div className="flex bg-[#f5f0e8] rounded-lg p-0.5">
+            <button
+              onClick={() => setActiveTab('docs')}
+              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'docs' ? 'bg-white text-[#283618] shadow-sm' : 'text-[#6b705c] hover:text-[#283618]'}`}
+              data-testid="tab-docs"
+            >
+              문서
+            </button>
+            <button
+              onClick={() => setActiveTab('memories')}
+              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'memories' ? 'bg-white text-[#283618] shadow-sm' : 'text-[#6b705c] hover:text-[#283618]'}`}
+              data-testid="tab-memories"
+            >
+              에이전트 기억
+            </button>
           </div>
-          <button
-            className="hover:opacity-90 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all shadow-sm flex items-center gap-2"
-            style={{ backgroundColor: oliveColor }}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
-            New Document
-          </button>
         </div>
       </header>
 
@@ -216,36 +214,8 @@ export function KnowledgePage() {
       {activeTab === 'docs' ? (
         <DocsTab showFolderTree={showFolderTree} queryClient={queryClient} setShowFolderTree={setShowFolderTree} activeTab={activeTab} setActiveTab={setActiveTab} />
       ) : (
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="px-4 sm:px-6 py-4 border-b flex items-center justify-between bg-white" style={{ borderColor }}>
-            <h1 className="text-xl font-bold text-[#1a1a1a] tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>CORTHEX Knowledge</h1>
-            <div className="flex gap-0">
-              <button onClick={() => setActiveTab('docs')} className="px-4 py-2 text-sm font-semibold tracking-wide transition-colors text-[#908a78] hover:text-[#1a1a1a]" data-testid="tab-docs">문서</button>
-              <button onClick={() => setActiveTab('memories')} className="px-4 py-2 text-sm font-semibold tracking-wide transition-colors relative" style={{ color: oliveColor }} data-testid="tab-memories">
-                에이전트 기억
-                <span className="absolute -bottom-4 left-0 w-full h-0.5" style={{ backgroundColor: oliveColor }} />
-              </button>
-            </div>
-          </div>
-          <MemoriesTab queryClient={queryClient} />
-        </div>
+        <MemoriesTab queryClient={queryClient} />
       )}
-
-      {/* Footer / Status Bar */}
-      <footer className="h-8 border-t flex items-center justify-between px-4 text-[10px] text-[#6b705c] shrink-0 bg-white" style={{ backgroundColor: sandBg, borderColor }}>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-            API Online
-          </div>
-          <span>Workspace: <span className="text-[#1a1a1a] font-medium">Global_Research_Alpha</span></span>
-        </div>
-        <div className="flex items-center gap-4 uppercase tracking-widest">
-          <span className="cursor-pointer" style={{ color: oliveColor }}>API Reference</span>
-          <span className="cursor-pointer" style={{ color: oliveColor }}>Help Center</span>
-          <span>v2.0.4-stable</span>
-        </div>
-      </footer>
     </div>
   )
 }
