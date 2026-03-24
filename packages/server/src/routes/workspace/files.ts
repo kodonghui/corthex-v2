@@ -6,6 +6,7 @@ import { authMiddleware } from '../../middleware/auth'
 import { HTTPError } from '../../middleware/error'
 import { logActivity } from '../../lib/activity-logger'
 import { saveFile, getFilePath } from '../../lib/file-storage'
+import { validateMagicBytes, sanitizeFilename } from '../../lib/upload-security'
 import type { AppEnv } from '../../types'
 
 export const filesRoute = new Hono<AppEnv>()
@@ -28,6 +29,8 @@ const ALLOWED_MIME_TYPES = [
 ]
 
 function isAllowedMimeType(mimeType: string): boolean {
+  // SVGs can contain <script> tags — XSS vector (NFR-S12)
+  if (mimeType === 'image/svg+xml') return false
   if (ALLOWED_MIME_PREFIXES.some(p => mimeType.startsWith(p))) return true
   return ALLOWED_MIME_TYPES.includes(mimeType)
 }
@@ -52,6 +55,12 @@ filesRoute.post('/', async (c) => {
   }
 
   const buffer = await file.arrayBuffer()
+
+  // Validate magic bytes match declared MIME type (NFR-S12)
+  if (!validateMagicBytes(buffer, file.type)) {
+    throw new HTTPError(400, '파일 내용이 선언된 형식과 일치하지 않습니다', 'FILE_004')
+  }
+
   const { storagePath } = await saveFile(buffer, file.name, tenant.companyId)
 
   const [saved] = await db
@@ -59,7 +68,7 @@ filesRoute.post('/', async (c) => {
     .values({
       companyId: tenant.companyId,
       userId: tenant.userId,
-      filename: file.name,
+      filename: sanitizeFilename(file.name),
       mimeType: file.type,
       sizeBytes: file.size,
       storagePath,

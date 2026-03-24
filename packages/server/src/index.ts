@@ -100,6 +100,7 @@ export let isShuttingDown = false
 // 글로벌 미들웨어
 app.use('*', compress())
 app.use('*', secureHeaders({
+  strictTransportSecurity: isProd ? 'max-age=31536000; includeSubDomains' : false,
   contentSecurityPolicy: isProd ? {
     defaultSrc: ["'self'"],
     scriptSrc: ["'self'", 'https://static.cloudflareinsights.com'],
@@ -109,6 +110,9 @@ app.use('*', secureHeaders({
     fontSrc: ["'self'", 'https://fonts.gstatic.com'],
     objectSrc: ["'none'"],
     frameAncestors: ["'none'"],
+    baseUri: ["'self'"],
+    formAction: ["'self'"],
+    upgradeInsecureRequests: [],
   } : undefined,
 }))
 app.use('*', logger())

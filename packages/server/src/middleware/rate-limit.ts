@@ -12,7 +12,10 @@ const createRateLimiter = (limit: number, windowMs: number, errorCode: string, e
   }, 5 * 60_000)
 
   return async (c, next) => {
-    const ip = c.req.header('x-forwarded-for') || c.req.header('x-real-ip') || 'unknown'
+    const ip = c.req.header('cf-connecting-ip')
+      || c.req.header('x-forwarded-for')?.split(',')[0]?.trim()
+      || c.req.header('x-real-ip')
+      || 'unknown'
     const key = `${ip}:${c.req.path}`
     const now = Date.now()
 
@@ -45,4 +48,10 @@ export const loginRateLimit = createRateLimiter(
 export const apiRateLimit = createRateLimiter(
   100, 60_000,
   'RATE_001', 'API 요청 한도 초과',
+)
+
+/** CLI 토큰 등록: 분당 10회 (NFR-S13) */
+export const cliRateLimit = createRateLimiter(
+  10, 60_000,
+  'CRED_RATE', 'CLI 인증 요청 한도 초과',
 )

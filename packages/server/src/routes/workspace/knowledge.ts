@@ -15,6 +15,7 @@ import { getDB } from '../../db/scoped-query'
 import type { AppEnv } from '../../types'
 import { join } from 'path'
 import { existsSync, mkdirSync } from 'fs'
+import { validateMagicBytes, sanitizeFilename } from '../../lib/upload-security'
 
 export const knowledgeRoute = new Hono<AppEnv>()
 
@@ -602,6 +603,12 @@ knowledgeRoute.post('/docs/upload', async (c) => {
   // Read file content for text-based files
   let textContent: string | undefined
   const arrayBuffer = await file.arrayBuffer()
+
+  // Validate magic bytes for binary files (NFR-S12) — skip for text files
+  if (ext === '.pdf' && !validateMagicBytes(arrayBuffer, 'application/pdf')) {
+    throw new HTTPError(400, '파일 내용이 PDF 형식과 일치하지 않습니다')
+  }
+
   if (ext === '.md' || ext === '.txt') {
     textContent = new TextDecoder().decode(arrayBuffer)
   }
@@ -617,14 +624,15 @@ knowledgeRoute.post('/docs/upload', async (c) => {
     createdBy: tenant.userId,
   }).returning()
 
-  // Save file to disk
+  // Save file to disk (sanitize filename to prevent path traversal — NFR-S12)
+  const safeName = sanitizeFilename(file.name)
   const uploadDir = join(UPLOAD_BASE, tenant.companyId, doc.id)
   mkdirSync(uploadDir, { recursive: true })
-  const filePath = join(uploadDir, file.name)
+  const filePath = join(uploadDir, safeName)
   await Bun.write(filePath, arrayBuffer)
 
   // Update doc with fileUrl
-  const fileUrl = `/uploads/knowledge/${tenant.companyId}/${doc.id}/${file.name}`
+  const fileUrl = `/uploads/knowledge/${tenant.companyId}/${doc.id}/${safeName}`
   const [updated] = await db.update(knowledgeDocs)
     .set({ fileUrl })
     .where(eq(knowledgeDocs.id, doc.id))

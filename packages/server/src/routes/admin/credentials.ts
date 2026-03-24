@@ -7,6 +7,7 @@ import { cliCredentials } from '../../db/schema'
 import { authMiddleware, adminOnly } from '../../middleware/auth'
 import { tenantMiddleware } from '../../middleware/tenant'
 import { HTTPError } from '../../middleware/error'
+import { cliRateLimit } from '../../middleware/rate-limit'
 import { encrypt as encryptCredential } from '../../lib/credential-crypto'
 import Anthropic from '@anthropic-ai/sdk'
 import { getDB } from '../../db/scoped-query'
@@ -54,8 +55,8 @@ credentialsRoute.get('/cli-credentials', async (c) => {
   return c.json({ data: result })
 })
 
-// POST /api/admin/cli-credentials
-credentialsRoute.post('/cli-credentials', zValidator('json', createCliSchema), async (c) => {
+// POST /api/admin/cli-credentials (rate limited: 10/min per IP — NFR-S13)
+credentialsRoute.post('/cli-credentials', cliRateLimit, zValidator('json', createCliSchema), async (c) => {
   const { token, ...rest } = c.req.valid('json')
 
   // FR59: Validate token with minimal API call
