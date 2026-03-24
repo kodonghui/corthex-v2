@@ -5,6 +5,7 @@ import { markdown } from '@codemirror/lang-markdown'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { defaultKeymap, indentWithTab } from '@codemirror/commands'
 import { basicSetup } from 'codemirror'
+import { soulVariableHighlight, soulAutocomplete, SOUL_VARIABLE_CSS } from '../lib/codemirror-soul-extensions'
 
 function getIsDark() {
   if (typeof document === 'undefined') return false
@@ -16,11 +17,13 @@ export default function CodeMirrorEditor({
   onChange,
   placeholder,
   className,
+  soulMode,
 }: {
   value: string
   onChange: (val: string) => void
   placeholder?: string
   className?: string
+  soulMode?: boolean
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
@@ -62,6 +65,11 @@ export default function CodeMirrorEditor({
       extensions.push(cmPlaceholder(placeholder))
     }
 
+    // Story 24.6: Soul variable highlighting + autocomplete (UXR118, AR15)
+    if (soulMode) {
+      extensions.push(soulVariableHighlight, soulAutocomplete)
+    }
+
     const state = EditorState.create({
       doc: value,
       extensions,
@@ -71,7 +79,18 @@ export default function CodeMirrorEditor({
       state,
       parent: containerRef.current,
     })
-  }, [placeholder])
+  }, [placeholder, soulMode])
+
+  // Inject soul-mode CSS once
+  useEffect(() => {
+    if (!soulMode) return
+    const id = 'cm-soul-variable-css'
+    if (document.getElementById(id)) return
+    const style = document.createElement('style')
+    style.id = id
+    style.textContent = SOUL_VARIABLE_CSS
+    document.head.appendChild(style)
+  }, [soulMode])
 
   // Initialize
   useEffect(() => {

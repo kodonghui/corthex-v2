@@ -220,7 +220,8 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
                   <CodeMirrorEditor
                     value={soulText}
                     onChange={setSoulText}
-                    placeholder="에이전트의 성격, 역할, 말투를 마크다운으로 정의..."
+                    soulMode
+                    placeholder="에이전트의 성격, 역할, 말투를 마크다운으로 정의... {{로 변수 삽입"
                   />
                 </Suspense>
                 {/* 글자 수 카운터 */}

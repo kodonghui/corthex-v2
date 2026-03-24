@@ -9,7 +9,7 @@
  * - GET    /api/admin/users                     : List users (for owner selection)
  */
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, lazy, Suspense } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import {
@@ -40,6 +40,12 @@ import {
   Paintbrush,
   Database,
 } from 'lucide-react'
+import { BigFiveSliderGroup } from '../components/agents/big-five-slider-group'
+import type { PersonalityTraits } from '@corthex/shared'
+import { PERSONALITY_PRESETS } from '@corthex/shared'
+import { SOUL_VARIABLES } from '../lib/codemirror-soul-extensions'
+
+const CodeMirrorEditor = lazy(() => import('../components/codemirror-editor'))
 
 // ── Types ──
 
@@ -61,6 +67,7 @@ type Agent = {
   isSecretary: boolean
   isSystem: boolean
   allowedTools: string[]
+  personalityTraits: Record<string, number> | null
   autoLearn: boolean
   isActive: boolean
   createdAt: string
@@ -90,6 +97,7 @@ type AgentFormData = {
   isSecretary: boolean
   ownerUserId: string
   soul: string
+  personalityTraits: Record<string, number> | null
 }
 
 type SoulPreviewResponse = {
@@ -158,6 +166,9 @@ function AgentForm({
   const [role, setRole] = useState(initialData?.role ?? '')
   const [isSecretary, setIsSecretary] = useState(initialData?.isSecretary ?? false)
   const [ownerUserId, setOwnerUserId] = useState(initialData?.ownerUserId ?? '')
+  const [personalityTraits, setPersonalityTraits] = useState<PersonalityTraits | null>(
+    initialData?.personalityTraits as PersonalityTraits | null ?? null,
+  )
   const [nameError, setNameError] = useState('')
 
   const userId = initialData?.userId ?? users[0]?.id ?? ''
@@ -185,6 +196,7 @@ function AgentForm({
       isSecretary,
       ownerUserId: ownerUserId || '',
       soul: '',
+      personalityTraits,
     })
   }
 
@@ -243,6 +255,10 @@ function AgentForm({
       <div className="flex items-center gap-3">
         <Toggle checked={isSecretary} onChange={setIsSecretary} label="비서 에이전트" />
       </div>
+      {/* Story 24.5: Big Five Personality Sliders */}
+      <div className="border-t border-[#e5e1d3] pt-4">
+        <BigFiveSliderGroup value={personalityTraits} onChange={setPersonalityTraits} disabled={isSubmitting} />
+      </div>
       <div className="flex gap-2 justify-end pt-2">
         <Button variant="outline" size="sm" type="button" onClick={onCancel} disabled={isSubmitting}>취소</Button>
         <Button size="sm" type="submit" disabled={isSubmitting}>{isSubmitting ? '처리 중...' : submitLabel}</Button>
@@ -265,53 +281,101 @@ function SoulEditor({
   isSaving: boolean
 }) {
   const [soul, setSoul] = useState(initialSoul)
-  const [preview, setPreview] = useState<SoulPreviewResponse | null>(null)
+  const [previewA, setPreviewA] = useState<SoulPreviewResponse | null>(null)
+  const [previewB, setPreviewB] = useState<SoulPreviewResponse | null>(null)
   const [isPreviewing, setIsPreviewing] = useState(false)
+  const [presetA, setPresetA] = useState('') // empty = agent's current personality
+  const [presetB, setPresetB] = useState('creative')
+  const [abMode, setAbMode] = useState(false)
+
+  const getPresetTraits = (presetId: string): PersonalityTraits | undefined => {
+    const preset = PERSONALITY_PRESETS.find(p => p.id === presetId)
+    return preset?.traits as PersonalityTraits | undefined
+  }
 
   const handlePreview = useCallback(async () => {
     setIsPreviewing(true)
     try {
-      const res = await api.post<{ success: boolean; data: SoulPreviewResponse }>(
+      const reqA = api.post<{ success: boolean; data: SoulPreviewResponse }>(
         `/workspace/agents/${agentId}/soul-preview`,
-        { soul },
+        { soul, personalityTraits: getPresetTraits(presetA) },
       )
-      setPreview(res.data)
+      if (abMode) {
+        const [resA, resB] = await Promise.all([
+          reqA,
+          api.post<{ success: boolean; data: SoulPreviewResponse }>(
+            `/workspace/agents/${agentId}/soul-preview`,
+            { soul, personalityTraits: getPresetTraits(presetB) },
+          ),
+        ])
+        setPreviewA(resA.data)
+        setPreviewB(resB.data)
+      } else {
+        const resA = await reqA
+        setPreviewA(resA.data)
+        setPreviewB(null)
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : '프리뷰 실패')
     } finally {
       setIsPreviewing(false)
     }
-  }, [agentId, soul])
-
-  const availableVars = ['{{agent_list}}', '{{subordinate_list}}', '{{tool_list}}', '{{department_name}}', '{{owner_name}}', '{{specialty}}']
+  }, [agentId, soul, presetA, presetB, abMode])
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-xs font-medium text-[#6b705c] mb-1">Soul (마크다운)</label>
-          <textarea value={soul} onChange={(e) => setSoul(e.target.value)} className="w-full h-64 p-3 rounded-lg border border-[#e5e1d3] bg-white text-sm font-mono resize-y focus:outline-none focus:ring-2" style={{ outlineColor: '#5a7247' }} placeholder="에이전트의 Soul을 작성하세요..." />
-          <div className="mt-2">
-            <p className="text-[10px] font-medium text-[#908a78] mb-1">사용 가능한 변수:</p>
-            <div className="flex flex-wrap gap-1">
-              {availableVars.map((v) => (
-                <span key={v} className="px-1.5 py-0.5 rounded text-[10px] font-mono cursor-pointer" style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: '#5a7247' }} onClick={() => setSoul((prev) => prev + v)} title="클릭하여 삽입">{v}</span>
-              ))}
-            </div>
+      {/* Editor + Variable chips */}
+      <div>
+        <label className="block text-xs font-medium text-[#6b705c] mb-1">Soul (마크다운) — <code className="text-[10px]">{'{{'}</code> 입력 시 자동완성</label>
+        <Suspense fallback={<div className="border border-[#e5e1d3] rounded-md p-3 min-h-[288px] animate-pulse bg-[#faf8f5]" />}>
+          <CodeMirrorEditor value={soul} onChange={setSoul} soulMode placeholder="에이전트의 Soul을 작성하세요... {{로 변수 삽입" />
+        </Suspense>
+        <div className="mt-2">
+          <p className="text-[10px] font-medium text-[#908a78] mb-1">사용 가능한 변수 ({SOUL_VARIABLES.length}개):</p>
+          <div className="flex flex-wrap gap-1">
+            {SOUL_VARIABLES.map((v) => (
+              <span key={v.name} className="px-1.5 py-0.5 rounded text-[10px] font-mono cursor-pointer" style={{ backgroundColor: v.category === 'personality' ? 'rgba(37,99,235,0.1)' : v.category === 'memory' ? 'rgba(124,58,237,0.1)' : 'rgba(90,114,71,0.1)', color: v.category === 'personality' ? '#2563eb' : v.category === 'memory' ? '#7c3aed' : '#5a7247' }} onClick={() => setSoul((prev) => prev + `{{${v.name}}}`)} title={`${v.label}: ${v.description}`}>
+                {`{{${v.name}}}`}
+              </span>
+            ))}
           </div>
         </div>
+      </div>
+
+      {/* Preview Controls */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <Button size="sm" variant="outline" onClick={handlePreview} disabled={isPreviewing}>
+          {isPreviewing ? '로딩...' : '프리뷰'}
+        </Button>
+        <label className="flex items-center gap-1.5 text-xs text-[#6b705c] cursor-pointer">
+          <input type="checkbox" checked={abMode} onChange={(e) => setAbMode(e.target.checked)} className="rounded border-[#e5e1d3]" />
+          A/B 성격 비교
+        </label>
+        {abMode && (
+          <>
+            <select value={presetA} onChange={(e) => setPresetA(e.target.value)} className="text-xs border border-[#e5e1d3] rounded px-2 py-1 bg-white">
+              <option value="">A: 현재 성격</option>
+              {PERSONALITY_PRESETS.map(p => <option key={p.id} value={p.id}>A: {p.nameKo}</option>)}
+            </select>
+            <select value={presetB} onChange={(e) => setPresetB(e.target.value)} className="text-xs border border-[#e5e1d3] rounded px-2 py-1 bg-white">
+              <option value="">B: 현재 성격</option>
+              {PERSONALITY_PRESETS.map(p => <option key={p.id} value={p.id}>B: {p.nameKo}</option>)}
+            </select>
+          </>
+        )}
+      </div>
+
+      {/* Preview Panes */}
+      <div className={`grid gap-4 ${abMode ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'}`}>
         <div>
-          <div className="flex items-center justify-between mb-1">
-            <label className="block text-xs font-medium text-[#6b705c]">프리뷰</label>
-            <Button size="sm" variant="outline" onClick={handlePreview} disabled={isPreviewing}>{isPreviewing ? '로딩...' : '프리뷰 새로고침'}</Button>
-          </div>
+          {abMode && <p className="text-[10px] font-bold text-[#6b705c] mb-1 uppercase tracking-widest">A: {presetA ? PERSONALITY_PRESETS.find(p => p.id === presetA)?.nameKo : '현재 성격'}</p>}
           <div className="w-full h-64 p-3 rounded-lg border border-[#e5e1d3] bg-[#faf8f5] text-sm overflow-y-auto whitespace-pre-wrap">
-            {preview ? preview.rendered || '(빈 결과)' : '프리뷰 버튼을 클릭하세요'}
+            {previewA ? previewA.rendered || '(빈 결과)' : '프리뷰 버튼을 클릭하세요'}
           </div>
-          {preview?.variables && Object.keys(preview.variables).length > 0 && (
+          {previewA?.variables && Object.keys(previewA.variables).length > 0 && (
             <div className="mt-2 space-y-1">
               <p className="text-[10px] font-medium text-[#908a78]">치환된 변수:</p>
-              {Object.entries(preview.variables).map(([key, val]) => (
+              {Object.entries(previewA.variables).map(([key, val]) => (
                 <div key={key} className="text-[10px] font-mono text-[#908a78] truncate">
                   <span style={{ color: '#5a7247' }}>{`{{${key}}}`}</span>{' = '}<span>{val || '(빈 값)'}</span>
                 </div>
@@ -319,7 +383,26 @@ function SoulEditor({
             </div>
           )}
         </div>
+        {abMode && previewB && (
+          <div>
+            <p className="text-[10px] font-bold text-[#6b705c] mb-1 uppercase tracking-widest">B: {presetB ? PERSONALITY_PRESETS.find(p => p.id === presetB)?.nameKo : '현재 성격'}</p>
+            <div className="w-full h-64 p-3 rounded-lg border border-[#e5e1d3] bg-[#faf8f5] text-sm overflow-y-auto whitespace-pre-wrap">
+              {previewB.rendered || '(빈 결과)'}
+            </div>
+            {previewB.variables && Object.keys(previewB.variables).length > 0 && (
+              <div className="mt-2 space-y-1">
+                <p className="text-[10px] font-medium text-[#908a78]">치환된 변수:</p>
+                {Object.entries(previewB.variables).map(([key, val]) => (
+                  <div key={key} className="text-[10px] font-mono text-[#908a78] truncate">
+                    <span style={{ color: '#5a7247' }}>{`{{${key}}}`}</span>{' = '}<span>{val || '(빈 값)'}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
+
       <div className="flex gap-2 justify-end pt-2">
         <Button size="sm" onClick={() => onSave(soul)} disabled={isSaving}>{isSaving ? '저장 중...' : 'Soul 저장'}</Button>
       </div>
@@ -569,6 +652,7 @@ function AgentDetailPanel({
               userId: agent.userId, name: agent.name, nameEn: agent.nameEn ?? '', departmentId: agent.departmentId ?? '',
               tier: agent.tier, modelName: agent.modelName, role: agent.role ?? '', isSecretary: agent.isSecretary,
               ownerUserId: agent.ownerUserId ?? '', soul: agent.soul ?? '',
+              personalityTraits: agent.personalityTraits,
             }}
             departments={departments} users={users}
             onSubmit={(data) => { onEdit(data); setIsEditing(false) }}

@@ -66,6 +66,7 @@ const updateAgentSchema = z.object({
 
 const soulPreviewSchema = z.object({
   soul: z.string().optional(),
+  personalityTraits: personalityTraitsSchema.optional(),  // Story 24.6: A/B preview override (UXR136)
 })
 
 // GET /api/admin/agents/personality-presets -- Story 24.4: preset personality templates (AR30, FR-PERS6)
@@ -177,6 +178,6 @@ agentsRoute.post('/agents/:id/soul-preview', zValidator('json', soulPreviewSchem
     return c.json({ success: true, data: { rendered: '', variables: {} } })
   }
 
-  const result = await previewSoul(tenant.companyId, id, soulText)
+  const result = await previewSoul(tenant.companyId, id, soulText, body.personalityTraits)
   return c.json({ success: true, data: result })
 })

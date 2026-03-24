@@ -956,8 +956,17 @@ export async function previewSoul(
   companyId: string,
   agentId: string,
   soulText: string,
+  personalityOverride?: { openness: number; conscientiousness: number; extraversion: number; agreeableness: number; neuroticism: number },
 ): Promise<SoulPreviewResult> {
-  const rendered = await renderSoul(soulText, agentId, companyId)
+  // Story 24.6: Build personality extraVars for A/B preview (UXR136)
+  const extraVars: Record<string, string> = {}
+  if (personalityOverride) {
+    for (const [key, val] of Object.entries(personalityOverride)) {
+      extraVars[`personality_${key}`] = String(val)
+    }
+  }
+
+  const rendered = await renderSoul(soulText, agentId, companyId, Object.keys(extraVars).length > 0 ? extraVars : undefined)
 
   const scopedDb = getDB(companyId)
   const [agentRow] = await scopedDb.agentById(agentId)
@@ -976,6 +985,7 @@ export async function previewSoul(
     department_name: dept[0]?.name || '',
     owner_name: owner[0]?.name || '',
     specialty: agentRow?.role || '',
+    ...extraVars,
   }
 
   return { rendered, variables }
