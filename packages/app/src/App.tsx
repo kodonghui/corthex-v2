@@ -40,7 +40,16 @@ const MarketingPipelinePage = lazy(() => import('./pages/marketing-pipeline').th
 const MarketingApprovalPage = lazy(() => import('./pages/marketing-approval').then((m) => ({ default: m.MarketingApprovalPage })))
 const MemoriesPage = lazy(() => import('./pages/memories').then((m) => ({ default: m.MemoriesPage })))
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30_000,
+      gcTime: 5 * 60_000,
+      retry: 2,
+      refetchOnWindowFocus: false,
+    },
+  },
+})
 
 function PageSkeleton() {
   return (
