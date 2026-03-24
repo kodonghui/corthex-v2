@@ -906,7 +906,7 @@ phases:
       - id: epic-22
         title: "Production Foundation & Voyage AI Migration"
         priority: P0
-        status: in-progress
+        status: done
         dependencies: ["epic-21"]
         go_no_go: ["#10"]
         stories:
@@ -915,19 +915,19 @@ phases:
             status: done
           - id: "22.2"
             title: "Voyage AI SDK Integration"
-            status: ready-for-dev
+            status: done
           - id: "22.3"
             title: "Vector Migration 768→1024"
-            status: backlog
+            status: done
           - id: "22.4"
             title: "HTTP Security Headers & Rate Limiting"
-            status: backlog
+            status: done
           - id: "22.5"
             title: "CI Dependency Scanning & Quality Baselines"
-            status: backlog
+            status: done
           - id: "22.6"
             title: "Neon Pro Upgrade & VPS Resource Verification"
-            status: backlog
+            status: done
 
   - name: "v3 Layer 0: Design System (parallel)"
     duration: "All sprints"
