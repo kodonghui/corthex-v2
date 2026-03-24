@@ -4,7 +4,7 @@
  * - POST   /api/admin/agents                    : Create a new agent
  * - PATCH  /api/admin/agents/:id                : Update agent fields
  * - DELETE /api/admin/agents/:id                : Deactivate/delete agent
- * - POST   /api/admin/agents/:id/soul-preview   : Preview rendered soul template
+ * - POST   /api/workspace/agents/:id/soul-preview : Preview rendered soul template
  * - GET    /api/admin/departments               : List departments (for filter & form)
  * - GET    /api/admin/users                     : List users (for owner selection)
  */

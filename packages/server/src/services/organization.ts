@@ -959,10 +959,16 @@ export async function previewSoul(
   personalityOverride?: { openness: number; conscientiousness: number; extraversion: number; agreeableness: number; neuroticism: number },
 ): Promise<SoulPreviewResult> {
   // Story 24.6: Build personality extraVars for A/B preview (UXR136)
+  // PER-1 Layer 1 alignment: iterate PERSONALITY_KEYS whitelist, not Object.entries
+  // PER-1 Layer 3 alignment: strip control chars (defense-in-depth, Zod ensures int upstream)
+  const PERSONALITY_KEYS = ['openness', 'conscientiousness', 'extraversion', 'agreeableness', 'neuroticism'] as const
   const extraVars: Record<string, string> = {}
   if (personalityOverride) {
-    for (const [key, val] of Object.entries(personalityOverride)) {
-      extraVars[`personality_${key}`] = String(val)
+    for (const key of PERSONALITY_KEYS) {
+      const val = personalityOverride[key]
+      if (typeof val === 'number') {
+        extraVars[`personality_${key}`] = String(val).replace(/[\n\r\t\x00-\x1f]/g, '')
+      }
     }
   }
 

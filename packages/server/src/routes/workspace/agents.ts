@@ -14,6 +14,7 @@ import {
   createAgent,
   updateAgent as updateAgentService,
   deactivateAgent,
+  previewSoul,
 } from '../../services/organization'
 import type { AppEnv } from '../../types'
 
@@ -263,6 +264,42 @@ workspaceAgentsRoute.post('/agents/:id/soul/reset', async (c) => {
   })
 
   return c.json({ data: updated })
+})
+
+// POST /api/workspace/agents/:id/soul-preview — render soul with {{variable}} substitution (Story 24.6, UXR136)
+const personalityTraitsSchema = z.object({
+  openness: z.number().int().min(0).max(100),
+  conscientiousness: z.number().int().min(0).max(100),
+  extraversion: z.number().int().min(0).max(100),
+  agreeableness: z.number().int().min(0).max(100),
+  neuroticism: z.number().int().min(0).max(100),
+}).strict()
+
+const soulPreviewSchema = z.object({
+  soul: z.string().optional(),
+  personalityTraits: personalityTraitsSchema.optional(),
+})
+
+workspaceAgentsRoute.post('/agents/:id/soul-preview', zValidator('json', soulPreviewSchema), async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+  const body = c.req.valid('json')
+
+  const [agent] = await db
+    .select({ id: agents.id, userId: agents.userId, soul: agents.soul })
+    .from(agents)
+    .where(and(eq(agents.id, id), eq(agents.companyId, tenant.companyId)))
+    .limit(1)
+
+  if (!agent) throw new HTTPError(404, '에이전트를 찾을 수 없습니다', 'AGENT_001')
+
+  const soulText = body.soul ?? agent.soul ?? ''
+  if (!soulText) {
+    return c.json({ success: true, data: { rendered: '', variables: {} } })
+  }
+
+  const result = await previewSoul(tenant.companyId, id, soulText, body.personalityTraits)
+  return c.json({ success: true, data: result })
 })
 
 // === Agent CRUD (admin/ceo only) ===
