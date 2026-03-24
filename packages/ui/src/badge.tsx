@@ -6,13 +6,14 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-zinc-50 text-zinc-700 ring-zinc-600/20 dark:bg-zinc-800 dark:text-zinc-300 dark:ring-zinc-700',
-        success: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20',
-        warning: 'bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-500/10 dark:text-amber-400 dark:ring-amber-500/20',
-        error: 'bg-red-50 text-red-700 ring-red-600/20 dark:bg-red-500/10 dark:text-red-400 dark:ring-red-500/20',
-        info: 'bg-blue-50 text-blue-700 ring-blue-600/20 dark:bg-blue-500/10 dark:text-blue-400 dark:ring-blue-500/20',
-        purple: 'bg-purple-50 text-purple-700 ring-purple-600/20 dark:bg-purple-500/10 dark:text-purple-400 dark:ring-purple-500/20',
-        amber: 'bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-500/20',
+        default: 'bg-[#f5f0e8] text-[#6b705c] ring-[#e5e1d3]',
+        success: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+        warning: 'bg-amber-50 text-amber-700 ring-amber-600/20',
+        error: 'bg-red-50 text-[#c4622d] ring-[#c4622d]/20',
+        info: 'bg-blue-50 text-blue-700 ring-blue-600/20',
+        purple: 'bg-purple-50 text-purple-700 ring-purple-600/20',
+        amber: 'bg-amber-50 text-amber-700 ring-amber-600/20',
+        brand: 'bg-[#606C38]/10 text-[#606C38] ring-[#606C38]/20',
       },
     },
     defaultVariants: {

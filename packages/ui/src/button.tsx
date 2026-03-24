@@ -6,10 +6,13 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600',
-        outline: 'border border-zinc-200 bg-transparent hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-800',
-        ghost: 'hover:bg-zinc-100 dark:hover:bg-zinc-800',
-        destructive: 'bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600',
+        default: 'bg-[#606C38] text-white hover:bg-[#7a8f5a] focus-visible:ring-[#606C38]',
+        primary: 'bg-[#606C38] text-white hover:bg-[#7a8f5a] focus-visible:ring-[#606C38]',
+        secondary: 'bg-[#f5f0e8] text-[#283618] border border-[#e5e1d3] hover:bg-[#e5e1d3] focus-visible:ring-[#606C38]',
+        ghost: 'text-[#6b705c] hover:bg-[#f5f0e8] hover:text-[#283618]',
+        danger: 'bg-[#c4622d] text-white hover:bg-[#b5571f] focus-visible:ring-[#c4622d]',
+        outline: 'border border-[#e5e1d3] bg-transparent text-[#283618] hover:bg-[#f5f0e8] focus-visible:ring-[#606C38]',
+        destructive: 'bg-[#c4622d] text-white hover:bg-[#b5571f] focus-visible:ring-[#c4622d]',
       },
       size: {
         default: 'h-10 px-4 py-2',
@@ -37,3 +40,5 @@ export function Button({ className, variant, size, ...props }: ButtonProps) {
     />
   )
 }
+
+export { buttonVariants }
